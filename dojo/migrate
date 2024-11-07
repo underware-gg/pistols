@@ -28,7 +28,7 @@ echo ">>> Cleaning..."
 sozo -P $PROFILE clean
 echo ">>> Building..."
 if [[ "$PROFILE" == "dev" ]]; then
-  # sozo -P $PROFILE build --typescript-v2
+  # sozo -P $PROFILE build --typescript
   sozo -P $PROFILE build
 else
   sozo -P $PROFILE build
@@ -54,7 +54,6 @@ sozo -P $PROFILE inspect --world $WORLD_ADDRESS
 #
 # scripts/default_auth.sh $PROFILE
 
-
 #------------------------
 # copy manifest to client
 #
@@ -64,26 +63,27 @@ mkdir -p $CLIENT_MANIFEST_PATH
 cp $MANIFEST_FILE_PATH $CLIENT_MANIFEST_PATH/
 echo "👍"
 
+#
+# create torii config
+export DUEL_TOKEN_ADDRESS=$(get_contract_address "pistols-duel_token")
+export DUELIST_TOKEN_ADDRESS=$(get_contract_address "pistols-duelist_token")
+export FAME_TOKEN_ADDRESS=$(get_contract_address "pistols-fame_coin")
+export LORDS_TOKEN_ADDRESS=${LORDS_ADDRESS:-$(get_contract_address "pistols-lords_mock")}
+echo "------------------------------------------------------------------------------"
+echo ">>> Create torii config [$TORII_CONFIG_PATH]..."
+echo "contracts = [" > $TORII_CONFIG_PATH
+echo "  { type = \"ERC721\", address = \"$DUEL_TOKEN_ADDRESS\" }, # duel_token" >> $TORII_CONFIG_PATH
+echo "  { type = \"ERC721\", address = \"$DUELIST_TOKEN_ADDRESS\" }, # duelist_token" >> $TORII_CONFIG_PATH
+echo "  { type = \"ERC20\", address = \"$FAME_TOKEN_ADDRESS\" }, # fame_coin" >> $TORII_CONFIG_PATH
+echo "  { type = \"ERC20\", address = \"$LORDS_TOKEN_ADDRESS\" }, # lords" >> $TORII_CONFIG_PATH
+echo "]" >> $TORII_CONFIG_PATH
+cat $TORII_CONFIG_PATH
+echo "👍"
+
 #------------------------
 # typescript bindings
 #
 if [[ "$PROFILE" == "dev" ]]; then
-  #
-  # create torii config
-  export DUEL_TOKEN_ADDRESS=$(get_contract_address "pistols-duel_token")
-  export DUELIST_TOKEN_ADDRESS=$(get_contract_address "pistols-duelist_token")
-  export FAME_TOKEN_ADDRESS=$(get_contract_address "pistols-fame_coin")
-  export LORDS_TOKEN_ADDRESS=${LORDS_ADDRESS:-$(get_contract_address "pistols-lords_mock")}
-  echo "------------------------------------------------------------------------------"
-  echo ">>> Create torii config [$TORII_CONFIG_PATH]..."
-  echo "contracts = [" > $TORII_CONFIG_PATH
-  echo "  { type = \"ERC721\", address = \"$DUEL_TOKEN_ADDRESS\" }, # duel_token" >> $TORII_CONFIG_PATH
-  echo "  { type = \"ERC721\", address = \"$DUELIST_TOKEN_ADDRESS\" }, # duelist_token" >> $TORII_CONFIG_PATH
-  echo "  { type = \"ERC20\", address = \"$FAME_TOKEN_ADDRESS\" }, # fame_coin" >> $TORII_CONFIG_PATH
-  echo "  { type = \"ERC20\", address = \"$LORDS_TOKEN_ADDRESS\" }, # lords" >> $TORII_CONFIG_PATH
-  echo "]" >> $TORII_CONFIG_PATH
-  cat $TORII_CONFIG_PATH
-  echo "👍"
   #
   # TODO: Enable this when bindings are ported
   # generate and copy bindings

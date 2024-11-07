@@ -38,7 +38,7 @@ export GAME_SLUG="pistols"
 export PROJECT_NAME=$(toml get $DOJO_PROFILE_FILE --raw world.name)
 export WORLD_ADDRESS=$(get_profile_env "world_address")
 export LORDS_ADDRESS=$(get_profile_env "lords_address")
-export TORII_CONFIG_PATH="./torii.toml"
+export TORII_CONFIG_PATH="./torii_$PROFILE.toml"
 # use $DOJO_ACCOUNT_ADDRESS else read from profile
 export ACCOUNT_ADDRESS=${DOJO_ACCOUNT_ADDRESS:-$(get_profile_env "account_address")}
 # use $STARKNET_RPC_URL else read from profile
