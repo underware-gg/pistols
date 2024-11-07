@@ -138,7 +138,7 @@ export function useToriiTokensByOwner(owner: BigNumberish, watch: boolean = fals
   }
 }
 
-export function useToriiErc721TokenByOwner(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean = false) {
+export function useErc721TokensByOwner(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean = false) {
   const { tokens, refetch } = useToriiTokensByOwner(owner, watch)
   const token = useMemo(() => 
     tokens.ERC721.find(token => bigintEquals(token.contractAddress, contractAddress)),

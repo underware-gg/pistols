@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useTokenConfig } from '@/pistols/hooks/useConfig'
-import { useToriiErc721TokenByOwner } from '@/lib/dojo/hooks/useToriiErcTokens'
+import { useErc721TokensByOwner } from '@/lib/dojo/hooks/useToriiErcTokensQL'
 import { useERC721OwnerOf } from '@/lib/utils/hooks/useERC721'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
+
+
 
 export const useDuelistTokenCount = () => {
   const { duelistContractAddress } = useDuelistTokenContract()
@@ -26,7 +28,7 @@ export const useOwnerOfDuelist = (token_id: BigNumberish) => {
 
 export const useDuelistsOfOwner = (owner: BigNumberish) => {
   const { duelistContractAddress } = useDuelistTokenContract()
-  const { token } = useToriiErc721TokenByOwner(duelistContractAddress, owner, true)
+  const { token } = useErc721TokensByOwner(duelistContractAddress, owner, true)
   return {
     duelistBalance: token?.balance ?? 0,
     duelistIds: token?.tokenIds ?? [],
