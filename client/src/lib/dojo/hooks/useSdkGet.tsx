@@ -4,25 +4,25 @@ import { QueryType } from '@dojoengine/sdk'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
 
-export type PistolsQuery = QueryType<PistolsSchemaType>
+export type PistolsGetQuery = QueryType<PistolsSchemaType>
 
 export type EntityResult = {
   entityId: BigNumberish,
 } & Partial<PistolsSchemaType['pistols']>
 
-export type UseSdkEntitiesResult = {
+export type UseSdkGetEntitiesResult = {
   entities: EntityResult[] | null
   isLoading: boolean
   refetch: () => void
 }
-export type UseSdkEntityResult = {
+export type UseSdkGetEntityResult = {
   entity: EntityResult | null
   isLoading: boolean
   refetch: () => void
 }
 
-export type UseSdkEntitiesProps = {
-  query: PistolsQuery
+export type UseSdkGetEntitiesProps = {
+  query: PistolsGetQuery
   limit?: number
   offset?: number
   logging?: boolean
@@ -35,7 +35,7 @@ export const useSdkGetEntities = <T,>({
   offset = 0,
   logging = false,
   enabled = true,
-}: UseSdkEntitiesProps): UseSdkEntitiesResult => {
+}: UseSdkGetEntitiesProps): UseSdkGetEntitiesResult => {
   const { sdk } = useDojoSetup()
   const [entities, setEntities] = useState<EntityResult[] | null>()
   const [isLoading, setIsLoading] = useState(false)
@@ -89,7 +89,7 @@ export const useSdkGetEntities = <T,>({
 //
 // Single Entity fetch
 // (use only when fetching with a keys)
-export const useSdkGetEntity = (props: UseSdkEntitiesProps): UseSdkEntityResult => {
+export const useSdkGetEntity = (props: UseSdkGetEntitiesProps): UseSdkGetEntityResult => {
   const { entities, isLoading, refetch } = useSdkGetEntities({
     ...props,
     limit: 1,

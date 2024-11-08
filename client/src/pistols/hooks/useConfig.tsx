@@ -3,12 +3,12 @@ import { BigNumberish } from 'starknet'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { bigintToEntity } from '@/lib/utils/types'
-import { useConfigQuery } from '@/pistols/hooks/useSdkQueries'
+import { useGetConfigQuery } from '@/pistols/hooks/useSdkQueries'
 
 
 
 export const useConfig = () => {
-  const { config } = useConfigQuery()
+  const { config } = useGetConfigQuery()
   const isPaused = useMemo(() => config?.is_paused ?? false, [config])
   const treasuryAddress = useMemo(() => config ? BigInt(config.treasury_address) : null, [config])
   const lordsAddress = useMemo(() => config ? BigInt(config.lords_address) : null, [config])

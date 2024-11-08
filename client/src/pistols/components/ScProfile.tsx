@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { BigNumberish } from 'starknet'
 import { Grid, Tab } from 'semantic-ui-react'
 import { RowDivider, VStack } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
@@ -7,6 +8,7 @@ import { useDuelistCalcPrice } from '@/pistols/hooks/useDuelistToken'
 import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
+import { useGetDuelistTokensByOwnerQuery } from '@/pistols/hooks/useSdkQueries'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
@@ -19,7 +21,6 @@ import { Header } from '@/pistols/components/Header'
 import DuelistEditModal from '@/pistols/components/DuelistEditModal'
 import DuelistModal from '@/pistols/components/DuelistModal'
 import WalletHeader from '@/pistols/components/account/WalletHeader'
-import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -40,6 +41,9 @@ export default function ScProfile() {
       }
     }
   }, [fromGate, duelistBalance])
+
+  // TODO: use this...
+  useGetDuelistTokensByOwnerQuery(0, address)
 
   return (
     <div id='Gate'>

@@ -31,7 +31,7 @@ export const useAllDuelistKeys = () => {
 export const useDuelist = (duelist_id: BigNumberish) => {
   const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(CONST.MAX_DUELIST_ID)), [duelist_id])
 
-  // const { duelist } = useDuelistByIdQuery(duelist_id)
+  // const { duelist } = useGetDuelistByIdQuery(duelist_id)
 
   const { Duelist } = useDojoComponents()
   const entityId = useMemo(() => bigintToEntity(duelist_id ?? 0n), [duelist_id])
