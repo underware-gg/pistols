@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { DojoProvider } from "@dojoengine/core";
 import { Account } from "starknet";
 import * as models from "./models.gen";
@@ -11,7 +10,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "bank",
-					entryPoint: "charge",
+					entrypoint: "charge",
 					calldata: [payer, payment],
 				},
 				"pistols",
@@ -27,7 +26,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "rng",
-					entryPoint: "reseed",
+					entrypoint: "reseed",
 					calldata: [seed, salt],
 				},
 				"pistols",
@@ -43,7 +42,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "rng",
-					entryPoint: "new_shuffler",
+					entrypoint: "new_shuffler",
 					calldata: [shuffleSize],
 				},
 				"pistols",
@@ -59,7 +58,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "lords_mock",
-					entryPoint: "total_supply",
+					entrypoint: "total_supply",
 					calldata: [],
 				},
 				"pistols",
@@ -75,7 +74,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "lords_mock",
-					entryPoint: "balance_of",
+					entrypoint: "balance_of",
 					calldata: [account],
 				},
 				"pistols",
@@ -91,7 +90,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "lords_mock",
-					entryPoint: "allowance",
+					entrypoint: "allowance",
 					calldata: [owner, spender],
 				},
 				"pistols",
@@ -107,7 +106,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "lords_mock",
-					entryPoint: "transfer",
+					entrypoint: "transfer",
 					calldata: [recipient, amount],
 				},
 				"pistols",
@@ -123,7 +122,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "lords_mock",
-					entryPoint: "transfer_from",
+					entrypoint: "transfer_from",
 					calldata: [sender, recipient, amount],
 				},
 				"pistols",
@@ -139,7 +138,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "lords_mock",
-					entryPoint: "approve",
+					entrypoint: "approve",
 					calldata: [spender, amount],
 				},
 				"pistols",
@@ -155,7 +154,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "lords_mock",
-					entryPoint: "_name",
+					entrypoint: "_name",
 					calldata: [],
 				},
 				"pistols",
@@ -171,7 +170,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "lords_mock",
-					entryPoint: "symbol",
+					entrypoint: "symbol",
 					calldata: [],
 				},
 				"pistols",
@@ -187,7 +186,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "lords_mock",
-					entryPoint: "decimals",
+					entrypoint: "decimals",
 					calldata: [],
 				},
 				"pistols",
@@ -203,7 +202,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "lords_mock",
-					entryPoint: "faucet",
+					entrypoint: "faucet",
 					calldata: [],
 				},
 				"pistols",
@@ -219,7 +218,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "lords_mock",
-					entryPoint: "mint",
+					entrypoint: "mint",
 					calldata: [recipient, amount],
 				},
 				"pistols",
@@ -235,7 +234,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "admin",
-					entryPoint: "am_i_admin",
+					entrypoint: "am_i_admin",
 					calldata: [accountAddress],
 				},
 				"pistols",
@@ -251,7 +250,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "admin",
-					entryPoint: "grant_admin",
+					entrypoint: "grant_admin",
 					calldata: [accountAddress, granted],
 				},
 				"pistols",
@@ -267,7 +266,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "admin",
-					entryPoint: "set_config",
+					entrypoint: "set_config",
 					calldata: [config],
 				},
 				"pistols",
@@ -283,7 +282,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "admin",
-					entryPoint: "set_paused",
+					entrypoint: "set_paused",
 					calldata: [paused],
 				},
 				"pistols",
@@ -299,7 +298,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "admin",
-					entryPoint: "open_table",
+					entrypoint: "open_table",
 					calldata: [tableId, isOpen],
 				},
 				"pistols",
@@ -315,7 +314,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "admin",
-					entryPoint: "set_table",
+					entrypoint: "set_table",
 					calldata: [table],
 				},
 				"pistols",
@@ -331,7 +330,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "admin",
-					entryPoint: "set_table_admittance",
+					entrypoint: "set_table_admittance",
 					calldata: [tableAdmittance],
 				},
 				"pistols",
@@ -347,7 +346,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "game",
-					entryPoint: "commit_moves",
+					entrypoint: "commit_moves",
 					calldata: [duelistId, duelId, hashed],
 				},
 				"pistols",
@@ -363,7 +362,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "game",
-					entryPoint: "reveal_moves",
+					entrypoint: "reveal_moves",
 					calldata: [duelistId, duelId, salt, moves],
 				},
 				"pistols",
@@ -379,7 +378,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "game",
-					entryPoint: "get_player_card_decks",
+					entrypoint: "get_player_card_decks",
 					calldata: [tableId],
 				},
 				"pistols",
@@ -395,7 +394,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "game",
-					entryPoint: "get_duel_progress",
+					entrypoint: "get_duel_progress",
 					calldata: [duelId],
 				},
 				"pistols",
@@ -411,7 +410,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "game",
-					entryPoint: "test_validate_commit_message",
+					entrypoint: "test_validate_commit_message",
 					calldata: [account, signature, duelId, duelistId],
 				},
 				"pistols",
@@ -427,7 +426,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "can_mint",
+					entrypoint: "can_mint",
 					calldata: [callerAddress],
 				},
 				"pistols",
@@ -443,7 +442,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "exists",
+					entrypoint: "exists",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -459,7 +458,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "is_owner_of",
+					entrypoint: "is_owner_of",
 					calldata: [address, tokenId],
 				},
 				"pistols",
@@ -475,7 +474,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "create_duel",
+					entrypoint: "create_duel",
 					calldata: [duelistId, challengedIdOrAddress, premise, quote, tableId, expireHours],
 				},
 				"pistols",
@@ -491,7 +490,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "reply_duel",
+					entrypoint: "reply_duel",
 					calldata: [duelistId, duelId, accepted],
 				},
 				"pistols",
@@ -507,7 +506,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "delete_duel",
+					entrypoint: "delete_duel",
 					calldata: [duelId],
 				},
 				"pistols",
@@ -523,7 +522,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "calc_mint_fee",
+					entrypoint: "calc_mint_fee",
 					calldata: [tableId],
 				},
 				"pistols",
@@ -539,7 +538,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "get_pact",
+					entrypoint: "get_pact",
 					calldata: [tableId, duelistIdA, duelistIdB],
 				},
 				"pistols",
@@ -555,7 +554,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "has_pact",
+					entrypoint: "has_pact",
 					calldata: [tableId, duelistIdA, duelistIdB],
 				},
 				"pistols",
@@ -571,7 +570,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "can_join",
+					entrypoint: "can_join",
 					calldata: [tableId, duelistId],
 				},
 				"pistols",
@@ -587,7 +586,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "get_token_name",
+					entrypoint: "get_token_name",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -603,7 +602,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "get_token_description",
+					entrypoint: "get_token_description",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -619,7 +618,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "get_token_image",
+					entrypoint: "get_token_image",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -635,7 +634,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "get_attribute_pairs",
+					entrypoint: "get_attribute_pairs",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -651,7 +650,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "get_metadata_pairs",
+					entrypoint: "get_metadata_pairs",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -667,7 +666,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "balance_of",
+					entrypoint: "balance_of",
 					calldata: [account],
 				},
 				"pistols",
@@ -683,7 +682,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "owner_of",
+					entrypoint: "owner_of",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -699,7 +698,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "safe_transfer_from",
+					entrypoint: "safe_transfer_from",
 					calldata: [from, to, tokenId, data],
 				},
 				"pistols",
@@ -715,7 +714,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "transfer_from",
+					entrypoint: "transfer_from",
 					calldata: [from, to, tokenId],
 				},
 				"pistols",
@@ -731,7 +730,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "approve",
+					entrypoint: "approve",
 					calldata: [to, tokenId],
 				},
 				"pistols",
@@ -747,7 +746,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "set_approval_for_all",
+					entrypoint: "set_approval_for_all",
 					calldata: [operator, approved],
 				},
 				"pistols",
@@ -763,7 +762,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "get_approved",
+					entrypoint: "get_approved",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -779,7 +778,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "is_approved_for_all",
+					entrypoint: "is_approved_for_all",
 					calldata: [owner, operator],
 				},
 				"pistols",
@@ -795,7 +794,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "supports_interface",
+					entrypoint: "supports_interface",
 					calldata: [interfaceId],
 				},
 				"pistols",
@@ -811,7 +810,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "_name",
+					entrypoint: "_name",
 					calldata: [],
 				},
 				"pistols",
@@ -827,7 +826,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "symbol",
+					entrypoint: "symbol",
 					calldata: [],
 				},
 				"pistols",
@@ -843,7 +842,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duel_token",
-					entryPoint: "token_uri",
+					entrypoint: "token_uri",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -859,7 +858,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "minted_duelist",
+					entrypoint: "minted_duelist",
 					calldata: [duelistId, amountPaid],
 				},
 				"pistols",
@@ -875,7 +874,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "updated_duelist",
+					entrypoint: "updated_duelist",
 					calldata: [from, to, duelistId],
 				},
 				"pistols",
@@ -891,7 +890,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "total_supply",
+					entrypoint: "total_supply",
 					calldata: [],
 				},
 				"pistols",
@@ -907,7 +906,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "balance_of",
+					entrypoint: "balance_of",
 					calldata: [account],
 				},
 				"pistols",
@@ -923,7 +922,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "allowance",
+					entrypoint: "allowance",
 					calldata: [owner, spender],
 				},
 				"pistols",
@@ -939,7 +938,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "transfer",
+					entrypoint: "transfer",
 					calldata: [recipient, amount],
 				},
 				"pistols",
@@ -955,7 +954,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "transfer_from",
+					entrypoint: "transfer_from",
 					calldata: [sender, recipient, amount],
 				},
 				"pistols",
@@ -971,7 +970,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "approve",
+					entrypoint: "approve",
 					calldata: [spender, amount],
 				},
 				"pistols",
@@ -987,7 +986,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "_name",
+					entrypoint: "_name",
 					calldata: [],
 				},
 				"pistols",
@@ -1003,7 +1002,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "symbol",
+					entrypoint: "symbol",
 					calldata: [],
 				},
 				"pistols",
@@ -1019,7 +1018,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "decimals",
+					entrypoint: "decimals",
 					calldata: [],
 				},
 				"pistols",
@@ -1035,7 +1034,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "address_of_token",
+					entrypoint: "address_of_token",
 					calldata: [contractAddress, tokenId],
 				},
 				"pistols",
@@ -1051,7 +1050,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "token_of_address",
+					entrypoint: "token_of_address",
 					calldata: [address],
 				},
 				"pistols",
@@ -1067,7 +1066,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "fame_coin",
-					entryPoint: "balance_of_token",
+					entrypoint: "balance_of_token",
 					calldata: [contractAddress, tokenId],
 				},
 				"pistols",
@@ -1083,7 +1082,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "balance_of",
+					entrypoint: "balance_of",
 					calldata: [account],
 				},
 				"pistols",
@@ -1099,7 +1098,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "owner_of",
+					entrypoint: "owner_of",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -1115,7 +1114,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "safe_transfer_from",
+					entrypoint: "safe_transfer_from",
 					calldata: [from, to, tokenId, data],
 				},
 				"pistols",
@@ -1131,7 +1130,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "transfer_from",
+					entrypoint: "transfer_from",
 					calldata: [from, to, tokenId],
 				},
 				"pistols",
@@ -1147,7 +1146,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "approve",
+					entrypoint: "approve",
 					calldata: [to, tokenId],
 				},
 				"pistols",
@@ -1163,7 +1162,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "set_approval_for_all",
+					entrypoint: "set_approval_for_all",
 					calldata: [operator, approved],
 				},
 				"pistols",
@@ -1179,7 +1178,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "get_approved",
+					entrypoint: "get_approved",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -1195,7 +1194,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "is_approved_for_all",
+					entrypoint: "is_approved_for_all",
 					calldata: [owner, operator],
 				},
 				"pistols",
@@ -1211,7 +1210,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "supports_interface",
+					entrypoint: "supports_interface",
 					calldata: [interfaceId],
 				},
 				"pistols",
@@ -1227,7 +1226,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "_name",
+					entrypoint: "_name",
 					calldata: [],
 				},
 				"pistols",
@@ -1243,7 +1242,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "symbol",
+					entrypoint: "symbol",
 					calldata: [],
 				},
 				"pistols",
@@ -1259,7 +1258,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "token_uri",
+					entrypoint: "token_uri",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -1275,7 +1274,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "calc_mint_fee",
+					entrypoint: "calc_mint_fee",
 					calldata: [recipient],
 				},
 				"pistols",
@@ -1291,7 +1290,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "create_duelist",
+					entrypoint: "create_duelist",
 					calldata: [recipient, name, profilePicType, profilePicUri],
 				},
 				"pistols",
@@ -1307,7 +1306,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "update_duelist",
+					entrypoint: "update_duelist",
 					calldata: [duelistId, name, profilePicType, profilePicUri],
 				},
 				"pistols",
@@ -1323,7 +1322,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "delete_duelist",
+					entrypoint: "delete_duelist",
 					calldata: [duelistId],
 				},
 				"pistols",
@@ -1339,7 +1338,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "can_mint",
+					entrypoint: "can_mint",
 					calldata: [callerAddress],
 				},
 				"pistols",
@@ -1355,7 +1354,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "exists",
+					entrypoint: "exists",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -1371,7 +1370,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "is_owner_of",
+					entrypoint: "is_owner_of",
 					calldata: [address, tokenId],
 				},
 				"pistols",
@@ -1387,7 +1386,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "get_token_name",
+					entrypoint: "get_token_name",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -1403,7 +1402,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "get_token_description",
+					entrypoint: "get_token_description",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -1419,7 +1418,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "get_token_image",
+					entrypoint: "get_token_image",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -1435,7 +1434,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "get_attribute_pairs",
+					entrypoint: "get_attribute_pairs",
 					calldata: [tokenId],
 				},
 				"pistols",
@@ -1451,7 +1450,7 @@ export async function setupWorld(provider: DojoProvider) {
 				snAccount,
 				{
 					contractName: "duelist_token",
-					entryPoint: "get_metadata_pairs",
+					entrypoint: "get_metadata_pairs",
 					calldata: [tokenId],
 				},
 				"pistols",
