@@ -29,11 +29,20 @@ pub struct Challenge {
     // progress and results
     pub state: ChallengeState,
     pub winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
-    pub reward_amount: u128,        // fame reward amount
     // timestamps in unix epoch
     pub timestamp_start: u64,       // Unix time, started
     pub timestamp_end: u64,         // Unix time, ended
-} // [f] [f] [f] [f] [128] [128] [152]
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct ChallengeFameBalance {
+    #[key]
+    pub duel_id: u128,
+    //-------------------------
+    pub balance_a: i128,    // Challenger FAME balance change
+    pub balance_b: i128,    // Challenged FAME balance change
+}
 
 //
 // Each duel round

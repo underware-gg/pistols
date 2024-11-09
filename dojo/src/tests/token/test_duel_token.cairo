@@ -18,6 +18,7 @@ use pistols::systems::{
 use pistols::models::{
     challenge::{
         m_Challenge, Challenge,
+        m_ChallengeFameBalance, ChallengeFameBalance,
         m_Round, Round,
     },
     duelist::{
@@ -118,6 +119,7 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
         resources: [
             // pistols models
             TestResource::Model(m_Challenge::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH.try_into().unwrap()),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH.try_into().unwrap()),
             TestResource::Model(m_Config::TEST_CLASS_HASH.try_into().unwrap()),
             TestResource::Model(m_Duelist::TEST_CLASS_HASH.try_into().unwrap()),
@@ -287,7 +289,6 @@ fn test_token_uri() {
         // progress
         state: ChallengeState::Resolved,
         winner: 1,
-        reward_amount: 0,
         // times
         timestamp_start: 10000,
         timestamp_end:   20000,

@@ -27,8 +27,10 @@ mod tester {
     };
     use pistols::models::{
         challenge::{
-            m_Challenge, Challenge, ChallengeValue, DuelistState, DuelistStateTrait,
+            m_Challenge, Challenge, ChallengeValue,
+            m_ChallengeFameBalance, ChallengeFameBalance, ChallengeFameBalanceValue,
             m_Round, Round, RoundValue,
+            DuelistState, DuelistStateTrait,
         },
         duelist::{
             m_Duelist, Duelist, DuelistTrait, DuelistValue,
@@ -163,6 +165,7 @@ mod tester {
         let mut resources: Array<TestResource> = array![
             // pistols models
             TestResource::Model(m_Challenge::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH.try_into().unwrap()),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH.try_into().unwrap()),
             TestResource::Model(m_Config::TEST_CLASS_HASH.try_into().unwrap()),
             TestResource::Model(m_Duelist::TEST_CLASS_HASH.try_into().unwrap()),
@@ -542,6 +545,10 @@ mod tester {
     }
     #[inline(always)]
     fn get_ChallengeValue(world: WorldStorage, duel_id: u128) -> ChallengeValue {
+        (world.read_value(duel_id))
+    }
+    #[inline(always)]
+    fn get_ChallengeFameBalanceValue(world: WorldStorage, duel_id: u128) -> ChallengeFameBalanceValue {
         (world.read_value(duel_id))
     }
     #[inline(always)]

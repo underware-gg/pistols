@@ -291,7 +291,6 @@ pub mod duel_token {
                 // progress
                 state: ChallengeState::Awaiting,
                 winner: 0,
-                reward_amount: 0,
                 // times
                 timestamp_start,   // chalenge issued
                 timestamp_end,     // expire

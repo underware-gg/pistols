@@ -6,7 +6,7 @@ mod tests {
 
     use dojo::world::{WorldStorage};
 
-    use pistols::models::challenge::{Challenge, ChallengeValue, Round, RoundValue};
+    use pistols::models::challenge::{Challenge, ChallengeValue, ChallengeFameBalanceValue, Round, RoundValue};
     use pistols::models::duelist::{Duelist, DuelistValue, ProfilePicType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::cards::hand::{PacesCard, PacesCardTrait};
@@ -101,6 +101,8 @@ mod tests {
         let lords_fee: u128 = sys.duels.calc_mint_fee(table_id);
         assert(lords_fee == 0, 'lords_fee == 0');
 
+        let fame_reward_a: u128 = sys.duelists.calc_fame_reward(duelist_id_a);
+        let fame_reward_b: u128 = sys.duelists.calc_fame_reward(duelist_id_b);
         let fame_balance_a: u128 = tester::fame_balance_of_token(@sys, duelist_id_a);
         let fame_balance_b: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);
         assert(fame_balance_a > 0, 'fame_balance_a_init');
@@ -125,7 +127,6 @@ mod tests {
 // round.state_b.health.print();
         assert(challenge.state == ChallengeState::Draw, 'challenge.state');
         assert(challenge.winner == 0, 'challenge.winner');
-        assert(challenge.reward_amount == 0, 'challenge.reward_amount');
         assert(round.state == RoundState::Finished, 'round.state');
         assert(round.state_a.health == final_health, 'round.moves_a.health');
         assert(round.state_b.health == final_health, 'round.moves_b.health');
@@ -167,8 +168,11 @@ mod tests {
         // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee, 0, 'lords_balance_a_2');
         // tester::assert_balance(sys.lords, OTHER(), lords_balance_b, lords_fee, 0, 'lords_balance_b_2');
 
-        tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, 0, 0, 'fame_balance_a_end');
-        tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, 0, 0, 'fame_balance_b_end');
+        let challenge_balance: ChallengeFameBalanceValue = tester::get_ChallengeFameBalanceValue(sys.world, duel_id);
+        assert(challenge_balance.balance_a == -(fame_reward_a / 2).try_into().unwrap(), 'challenge_balance.balance_a');
+        assert(challenge_balance.balance_b == -(fame_reward_b / 2).try_into().unwrap(), 'challenge_balance.balance_b');
+        tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, fame_reward_a/2, 0, 'b_fame_balance_a_end');
+        tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, fame_reward_b/2, 0, 'b_fame_balance_b_end');
 
         // duel nft still owned by contract
         assert(sys.duels.owner_of(duel_id.into()) == sys.game.contract_address, 'duels.owner_of_END');
@@ -296,9 +300,12 @@ mod tests {
         assert(duelist_b.score.honour == round.state_b.honour, 'duelist_b.score.honour');
 
         assert(challenge.winner == winner, 'winner');
+
+        let challenge_balance: ChallengeFameBalanceValue = tester::get_ChallengeFameBalanceValue(sys.world, duel_id);
         if (winner == 1) {
             let reward = fame_reward_b;
-            assert(challenge.reward_amount == reward, 'a_challenge.reward_amount');
+            assert(challenge_balance.balance_a == (reward).try_into().unwrap(), 'challenge_balance.balance_a');
+            assert(challenge_balance.balance_b == -(reward).try_into().unwrap(), 'challenge_balance.balance_b');
 // println!("fame_reward_a: {}", fame_reward_a / CONST::ETH_TO_WEI.low);
 // println!("fame_reward_b: {}", fame_reward_b / CONST::ETH_TO_WEI.low);
 // println!("fame_balance_a: {}", fame_balance_a / CONST::ETH_TO_WEI.low);
@@ -318,8 +325,9 @@ mod tests {
             _assert_is_dead(round.state_b, 'dead_b');
             assert(sys.duels.owner_of(duel_id.into()) == challenge.address_a, 'duels.owner_of_END_1');
         } else if (winner == 2) {
-            let reward = fame_reward_b;
-            assert(challenge.reward_amount == reward, 'b_challenge.reward_amount');
+            let reward = fame_reward_a;
+            assert(challenge_balance.balance_a == -(reward).try_into().unwrap(), 'challenge_balance.balance_a');
+            assert(challenge_balance.balance_b == (reward).try_into().unwrap(), 'challenge_balance.balance_b');
             fame_balance_a = tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, reward, 0, 'b_fame_balance_a_end');
             fame_balance_b = tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, 0, reward, 'b_fame_balance_b_end');
             assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins');
@@ -379,9 +387,12 @@ mod tests {
         assert(round.state_a.honour == (*moves_a.moves[0] * 10).try_into().unwrap(), 'duelist_a.score.honour ++');
         assert(round.state_b.honour == (*moves_b.moves[0] * 10).try_into().unwrap(), 'duelist_b.score.honour ++');
 
+        let challenge_balance: ChallengeFameBalanceValue = tester::get_ChallengeFameBalanceValue(sys.world, duel_id);
+
         if (winner == 1) {
             let reward = fame_reward_b_2;
-            assert(challenge.reward_amount == reward, 'a_challenge.reward_amount ++');
+            assert(challenge_balance.balance_a == (reward).try_into().unwrap(), 'challenge_balance.balance_a');
+            assert(challenge_balance.balance_b == -(reward).try_into().unwrap(), 'challenge_balance.balance_b');
             fame_balance_a = tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, 0, reward, 'a_fame_balance_a_end');
             fame_balance_b = tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, reward, 0, 'a_fame_balance_b_end');
             assert(duelist_a.score.total_wins == 2, 'a_win_duelist_a.total_wins ++');
@@ -390,7 +401,8 @@ mod tests {
             assert(duelist_b.score.total_losses == 2, 'a_win_duelist_b.total_losses ++');
         } else if (winner == 2) {
             let reward = fame_reward_a_2;
-            assert(challenge.reward_amount == reward, 'b_challenge.reward_amount ++');
+            assert(challenge_balance.balance_a == -(reward).try_into().unwrap(), 'challenge_balance.balance_a');
+            assert(challenge_balance.balance_b == (reward).try_into().unwrap(), 'challenge_balance.balance_b');
             fame_balance_a = tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, reward, 0, 'b_fame_balance_a_end');
             fame_balance_b = tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, 0, reward, 'b_fame_balance_b_end');
             assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins ++');
@@ -609,7 +621,7 @@ mod tests {
 
     #[test]
     #[ignore] // TODO: panic on commit/reveal
-    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Duelist A is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duelist_is_dead_b_XXX() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_crit_b();

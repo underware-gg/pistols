@@ -27,6 +27,7 @@ pub trait IFameCoin<TState> {
     fn token_of_address(self: @TState, address: ContractAddress) -> (ContractAddress, u128);
     fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
     fn transfer_from_token(ref self: TState, contract_address: ContractAddress, sender_token_id: u128, recipient_token_id: u128, amount: u256) -> bool;
+    fn burn_from_token(ref self: TState, contract_address: ContractAddress, token_id: u128, amount: u256);
     
     // IFameCoinPublic
     fn minted_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);

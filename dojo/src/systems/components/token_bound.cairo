@@ -1,5 +1,6 @@
 use starknet::ContractAddress;
 use pistols::utils::hash::{hash_values};
+use pistols::utils::misc::{ZERO};
 
 #[starknet::interface]
 pub trait ITokenBoundPublic<TState> {
@@ -16,6 +17,8 @@ pub trait ITokenBoundPublic<TState> {
         recipient_token_id: u128,
         amount: u256,
     ) -> bool;
+    // balance of a token
+    fn burn_from_token(ref self: TState, contract_address: ContractAddress, token_id: u128, amount: u256);
 }
 
 #[starknet::interface]
@@ -37,7 +40,8 @@ pub struct TokenBoundAddress {
 impl TokenBoundAddressImpl of TokenBoundAddressTrait {
     #[inline(always)]
     fn address(contract_address: ContractAddress, token_id: u128) -> ContractAddress {
-        (hash_values([contract_address.into(), token_id.into()].span()).try_into().unwrap())
+        if (token_id != 0) {hash_values([contract_address.into(), token_id.into()].span()).try_into().unwrap()}
+        else {ZERO()} // burn
     }
 }
 
@@ -125,6 +129,16 @@ pub mod TokenBoundComponent {
                 self.address_of_token(contract_address, recipient_token_id),
                 amount)
             )
+        }
+
+        fn burn_from_token(ref self: ComponentState<TContractState>,
+            contract_address: ContractAddress,
+            token_id: u128,
+            amount: u256,
+        ) {
+            let mut erc20 = get_dep_component_mut!(ref self, ERC20);
+            let address: ContractAddress = self.address_of_token(contract_address, token_id);
+            erc20.burn(address, amount);
         }
     }
 
