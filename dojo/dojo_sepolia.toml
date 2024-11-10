@@ -23,7 +23,7 @@ chain_id = "SN_SEPOLIA"
 # rpc_url = ""          # env: STARKNET_RPC_URL
 # account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
 # private_key = ""      # env: DOJO_PRIVATE_KEY
-world_address = "0x577254dbda890787fd79ec4a0247dda90fe880f2c9ad115f8487214ee43c838"
+world_address = "0x1adaf57de23b6d6d43eeb42b6ab6730a022021382fef49eff1f532c21556a5a"
 lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
 
 #--------------------------

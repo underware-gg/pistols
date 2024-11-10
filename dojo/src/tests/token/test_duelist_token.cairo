@@ -1,8 +1,11 @@
 use debug::PrintTrait;
 use starknet::{ContractAddress, get_contract_address, get_caller_address, testing};
 use dojo::world::{WorldStorage, WorldStorageTrait};
-use dojo::model::{Model, ModelTest, ModelIndex};
-use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait};
+use dojo::model::{Model, ModelIndex};
+use dojo_cairo_test::{
+    spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
+    WorldStorageTestTrait,
+};
 
 use pistols::systems::{
     bank::{bank, IBankDispatcher, IBankDispatcherTrait},
@@ -41,10 +44,6 @@ use pistols::models::{
         m_TableAdmittance, TableAdmittance,
     },
     table::{TABLES},
-};
-use pistols::tests::token::mock_duelist::{
-    m_MockDuelistOwners,
-    duelist_token as mock_duelist,
 };
 
 use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
@@ -124,64 +123,63 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
         namespace: "pistols",
         resources: [
             // pistols models
-            TestResource::Model(m_Challenge::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_CoinConfig::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Config::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Duelist::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Pact::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Payment::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Round::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Scoreboard::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_TableConfig::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_TokenConfig::TEST_CLASS_HASH.try_into().unwrap()),
-            // test models
-            TestResource::Model(m_MockDuelistOwners::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Challenge::TEST_CLASS_HASH),
+            TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
+            TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
+            TestResource::Model(m_Config::TEST_CLASS_HASH),
+            TestResource::Model(m_Duelist::TEST_CLASS_HASH),
+            TestResource::Model(m_Pact::TEST_CLASS_HASH),
+            TestResource::Model(m_Payment::TEST_CLASS_HASH),
+            TestResource::Model(m_Round::TEST_CLASS_HASH),
+            TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
+            TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH),
+            TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
+            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
+            TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
             // events
-            // TestResource::Event(actions::e_Moved::TEST_CLASS_HASH.try_into().unwrap()),
+            // TestResource::Event(actions::e_Moved::TEST_CLASS_HASH),
             //
             // contracts
-            TestResource::Contract(
-                ContractDefTrait::new(bank::TEST_CLASS_HASH, "bank")
-                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            ),
-            TestResource::Contract(
-                ContractDefTrait::new(lords_mock::TEST_CLASS_HASH, "lords_mock")
-                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-                    .with_init_calldata([
-                        0, // minter
-                        10_000_000_000_000_000_000_000, // 10,000 Lords
-                    ].span())
-            ),
-            TestResource::Contract(
-                ContractDefTrait::new(duelist_token::TEST_CLASS_HASH, "duelist_token")
-                    .with_writer_of([
-                        // same as config
-                        selector_from_tag!("pistols-TokenConfig"),
-                        selector_from_tag!("pistols-Payment"),
-                        selector_from_tag!("pistols-Duelist"),
-                    ].span())
-                    .with_init_calldata([
-                        'https://pistols.underware.gg',
-                        0, // minter_address
-                        0, // renderer_address
-                        (fee_amount * CONST::ETH_TO_WEI.low).into(), // fee_amount
-                    ].span())
-            ),
-            TestResource::Contract(
-                ContractDefTrait::new(fame_coin::TEST_CLASS_HASH, "fame_coin")
-                    .with_writer_of([
-                        // same as config
-                        selector_from_tag!("pistols-CoinConfig"),
-                        selector_from_tag!("pistols-TokenBoundAddress"),
-                    ].span())
-            ),
+            TestResource::Contract(duelist_token::TEST_CLASS_HASH),
+            TestResource::Contract(fame_coin::TEST_CLASS_HASH),
+            TestResource::Contract(bank::TEST_CLASS_HASH),
+            TestResource::Contract(lords_mock::TEST_CLASS_HASH),
         ].span()
     };
 
     let mut world: WorldStorage = spawn_test_world([ndef].span());
+
+    let mut contract_defs: Array<ContractDef> = array![
+        ContractDefTrait::new(@"pistols", @"duelist_token")
+            .with_writer_of([
+                // same as config
+                selector_from_tag!("pistols-TokenConfig"),
+                selector_from_tag!("pistols-Payment"),
+                selector_from_tag!("pistols-Duelist"),
+            ].span())
+            .with_init_calldata([
+                'https://pistols.underware.gg',
+                0, // minter_address
+                0, // renderer_address
+                (fee_amount * CONST::ETH_TO_WEI.low).into(), // fee_amount
+            ].span()),
+        ContractDefTrait::new(@"pistols", @"fame_coin")
+            .with_writer_of([
+                // same as config
+                selector_from_tag!("pistols-CoinConfig"),
+                selector_from_tag!("pistols-TokenBoundAddress"),
+            ].span()),
+        ContractDefTrait::new(@"pistols", @"bank")
+            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
+        ContractDefTrait::new(@"pistols", @"lords_mock")
+            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            .with_init_calldata([
+                0, // minter
+                10_000_000_000_000_000_000_000, // 10,000 Lords
+            ].span()),
+    ];
+
+    world.sync_perms_and_inits(contract_defs.span());
 
     tester::impersonate(OWNER());
 
