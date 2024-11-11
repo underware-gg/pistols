@@ -188,7 +188,6 @@ pub mod duel_token {
     //*******************************
     fn TOKEN_NAME()   -> ByteArray {("Pistols at 10 Blocks Duels")}
     fn TOKEN_SYMBOL() -> ByteArray {("DUEL")}
-    fn BASE_URI()     -> ByteArray {("https://pistols.underware.gg")}
     //*******************************
 
     fn dojo_init(
@@ -201,7 +200,7 @@ pub mod duel_token {
         self.erc721.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            if(base_uri != 0){base_uri.as_string()}else{BASE_URI()},
+            base_uri.as_string(),
         );
         self.token.initialize(
             minter_address,

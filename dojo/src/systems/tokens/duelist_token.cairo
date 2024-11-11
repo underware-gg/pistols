@@ -163,7 +163,6 @@ pub mod duelist_token {
     //*******************************
     fn TOKEN_NAME()   -> ByteArray {("Pistols at 10 Blocks Duelists")}
     fn TOKEN_SYMBOL() -> ByteArray {("DUELIST")}
-    fn BASE_URI()     -> ByteArray {("https://pistols.underware.gg")}
     //*******************************
 
     fn dojo_init(
@@ -176,7 +175,7 @@ pub mod duelist_token {
         self.erc721.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            if(base_uri != 0){base_uri.as_string()}else{BASE_URI()},
+            base_uri.as_string(),
         );
         let payment = Payment {
             key: get_contract_address().into(),
