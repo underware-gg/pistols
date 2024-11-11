@@ -28,8 +28,7 @@ echo ">>> Cleaning..."
 sozo -P $PROFILE clean
 echo ">>> Building..."
 if [[ "$PROFILE" == "dev" ]]; then
-  # sozo -P $PROFILE build --typescript
-  sozo -P $PROFILE build
+  sozo -P $PROFILE build --typescript
 else
   sozo -P $PROFILE build
 fi
@@ -89,6 +88,7 @@ if [[ "$PROFILE" == "dev" ]]; then
   # generate and copy bindings
   # cp -R $BINDINGS_PATH $CLIENT_GAME_PATH/
   # cp -R $BINDINGS_PATH/typescript_v2 $CLIENT_GAME_PATH/generated/
+  cp -R $BINDINGS_PATH/typescript $CLIENT_GAME_PATH/generated/
   #
   # copy to client
   echo "------------------------------------------------------------------------------"

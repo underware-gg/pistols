@@ -1,9 +1,32 @@
 {
   "world": {
-    "class_hash": "0x139239a99d627697b19b9856beaef7896fc75375caf3d750dd76982a7afeb78",
+    "class_hash": "0x79d9ce84b97bcc2a631996c3100d57966fc2f5b061fb1ec4dfd0040976bcac6",
     "address": "0x1adaf57de23b6d6d43eeb42b6ab6730a022021382fef49eff1f532c21556a5a",
     "seed": "pistols",
     "name": "Pistols at 10 Blocks",
+    "entrypoints": [
+      "uuid",
+      "set_metadata",
+      "register_namespace",
+      "register_event",
+      "register_model",
+      "register_contract",
+      "init_contract",
+      "upgrade_event",
+      "upgrade_model",
+      "upgrade_contract",
+      "emit_event",
+      "emit_events",
+      "set_entity",
+      "set_entities",
+      "delete_entity",
+      "delete_entities",
+      "grant_owner",
+      "revoke_owner",
+      "grant_writer",
+      "revoke_writer",
+      "upgrade"
+    ],
     "abi": [
       {
         "type": "impl",
@@ -83,16 +106,12 @@
         ]
       },
       {
-        "type": "enum",
-        "name": "core::bool",
-        "variants": [
+        "type": "struct",
+        "name": "core::array::Span::<core::array::Span::<core::felt252>>",
+        "members": [
           {
-            "name": "False",
-            "type": "()"
-          },
-          {
-            "name": "True",
-            "type": "()"
+            "name": "snapshot",
+            "type": "@core::array::Array::<core::array::Span::<core::felt252>>"
           }
         ]
       },
@@ -185,6 +204,30 @@
           {
             "name": "Enum",
             "type": "core::array::Span::<dojo::meta::layout::FieldLayout>"
+          }
+        ]
+      },
+      {
+        "type": "struct",
+        "name": "core::array::Span::<dojo::model::definition::ModelIndex>",
+        "members": [
+          {
+            "name": "snapshot",
+            "type": "@core::array::Array::<dojo::model::definition::ModelIndex>"
+          }
+        ]
+      },
+      {
+        "type": "enum",
+        "name": "core::bool",
+        "variants": [
+          {
+            "name": "False",
+            "type": "()"
+          },
+          {
+            "name": "True",
+            "type": "()"
           }
         ]
       },
@@ -398,10 +441,26 @@
               {
                 "name": "values",
                 "type": "core::array::Span::<core::felt252>"
+              }
+            ],
+            "outputs": [],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
+            "name": "emit_events",
+            "inputs": [
+              {
+                "name": "event_selector",
+                "type": "core::felt252"
               },
               {
-                "name": "historical",
-                "type": "core::bool"
+                "name": "keys",
+                "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              },
+              {
+                "name": "values",
+                "type": "core::array::Span::<core::array::Span::<core::felt252>>"
               }
             ],
             "outputs": [],
@@ -433,6 +492,30 @@
           },
           {
             "type": "function",
+            "name": "entities",
+            "inputs": [
+              {
+                "name": "model_selector",
+                "type": "core::felt252"
+              },
+              {
+                "name": "indexes",
+                "type": "core::array::Span::<dojo::model::definition::ModelIndex>"
+              },
+              {
+                "name": "layout",
+                "type": "dojo::meta::layout::Layout"
+              }
+            ],
+            "outputs": [
+              {
+                "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              }
+            ],
+            "state_mutability": "view"
+          },
+          {
+            "type": "function",
             "name": "set_entity",
             "inputs": [
               {
@@ -457,6 +540,30 @@
           },
           {
             "type": "function",
+            "name": "set_entities",
+            "inputs": [
+              {
+                "name": "model_selector",
+                "type": "core::felt252"
+              },
+              {
+                "name": "indexes",
+                "type": "core::array::Span::<dojo::model::definition::ModelIndex>"
+              },
+              {
+                "name": "values",
+                "type": "core::array::Span::<core::array::Span::<core::felt252>>"
+              },
+              {
+                "name": "layout",
+                "type": "dojo::meta::layout::Layout"
+              }
+            ],
+            "outputs": [],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
             "name": "delete_entity",
             "inputs": [
               {
@@ -466,6 +573,26 @@
               {
                 "name": "index",
                 "type": "dojo::model::definition::ModelIndex"
+              },
+              {
+                "name": "layout",
+                "type": "dojo::meta::layout::Layout"
+              }
+            ],
+            "outputs": [],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
+            "name": "delete_entities",
+            "inputs": [
+              {
+                "name": "model_selector",
+                "type": "core::felt252"
+              },
+              {
+                "name": "indexes",
+                "type": "core::array::Span::<dojo::model::definition::ModelIndex>"
               },
               {
                 "name": "layout",
@@ -850,11 +977,6 @@
             "kind": "key"
           },
           {
-            "name": "historical",
-            "type": "core::bool",
-            "kind": "key"
-          },
-          {
             "name": "keys",
             "type": "core::array::Span::<core::felt252>",
             "kind": "data"
@@ -1121,13 +1243,23 @@
   },
   "contracts": [
     {
-      "address": "0x23777f0bce8c4c09596e3af1a4096933cb9c930799f9af3c91c8e7d29afbece",
-      "class_hash": "0x1cb5f3de15689f97f40e0a91601be64bb486840c276a1f52162e6f3f43b8870",
+      "address": "0x2039a62818dcfbb7a1323be0df5ecba41bee6d49592383bd4ec8f16041b7b69",
+      "class_hash": "0x73f7dea9bca8fa814813a92f2c670e58a04249caf01e137dd641d6373412e6b",
       "abi": [
         {
           "type": "impl",
           "name": "admin__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "admin__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -1149,7 +1281,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -1507,16 +1639,36 @@
         "0x0"
       ],
       "tag": "pistols-admin",
-      "systems": []
+      "selector": "0x36fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497",
+      "systems": [
+        "dojo_init",
+        "grant_admin",
+        "set_treasury",
+        "set_paused",
+        "open_table",
+        "set_table",
+        "set_table_admittance",
+        "upgrade"
+      ]
     },
     {
-      "address": "0x59db178c5e415d3ac53e5b0dbc4b15f3217b9bfa2484d58c5bf83896d2f3f54",
-      "class_hash": "0x4c2571c22b15bb8e0f774ce8d0c26edf837966cbcbad7781825bc37c16e121e",
+      "address": "0x438eaa0842ebe59a77396420fdf7bd660aa098acb86d4e6b7a30c515ef43207",
+      "class_hash": "0x4270f635a55613840ec80ae79c3143f4bb0bae76fc82ca96b3732b3e3770007",
       "abi": [
         {
           "type": "impl",
           "name": "bank__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "bank__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -1538,7 +1690,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -1745,16 +1897,30 @@
       ],
       "init_calldata": [],
       "tag": "pistols-bank",
-      "systems": []
+      "selector": "0x7a683ab68bc70300995da8de5781002e781f22ba246fe239ebeff02b2230375",
+      "systems": [
+        "charge",
+        "upgrade"
+      ]
     },
     {
-      "address": "0xecaac72e4d7a58973a0c85db50f8d1b0e836bffb34ec98c30b0fb5fb48daf4",
-      "class_hash": "0x445f941aab0e44085d60c2cd65b703a29b8aa428aca12f1580017a74ffd996c",
+      "address": "0x24978c7aec6c5d928102bf7be54f318552768abd5bb27e9be5520e2a1177be5",
+      "class_hash": "0x7ce9fa7c0b53393951467e469c8b9e4db77b5d9624cdb2da97bd2f1212dcd27",
       "abi": [
         {
           "type": "impl",
           "name": "duel_token__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "duel_token__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -1776,7 +1942,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -2853,22 +3019,47 @@
         }
       ],
       "init_calldata": [
-        "0",
+        "sstr:https://pistols.underware.gg",
         "0x0",
         "0x0",
         "0"
       ],
       "tag": "pistols-duel_token",
-      "systems": []
+      "selector": "0x670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063",
+      "systems": [
+        "dojo_init",
+        "create_duel",
+        "reply_duel",
+        "delete_duel",
+        "transfer_to_winner",
+        "upgrade",
+        "safe_transfer_from",
+        "transfer_from",
+        "approve",
+        "set_approval_for_all",
+        "safeTransferFrom",
+        "transferFrom",
+        "setApprovalForAll"
+      ]
     },
     {
-      "address": "0x19b901b07f7f8930ac5b5e6093bcddb7f93adc7a43ea7f004f1c35f23d71e68",
-      "class_hash": "0x717d16d2fd6268dc9ad9bb6de7ac65ad7fc27158f7f126283456ad83f6bc3c7",
+      "address": "0x79813ddf6f99909b91ebbb15743337036c9ac9a82a4b7a3c091a2b84e104895",
+      "class_hash": "0x9c1fb22d1b281025f8a0d780f42e3c7101801ccb0d8b80e4c75ce6b9812bf2",
       "abi": [
         {
           "type": "impl",
           "name": "duelist_token__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "duelist_token__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -2890,7 +3081,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -3157,7 +3348,7 @@
               ],
               "outputs": [
                 {
-                  "type": "core::integer::u128"
+                  "type": "(core::integer::i128, core::integer::i128)"
                 }
               ],
               "state_mutability": "external"
@@ -3929,22 +4120,47 @@
         }
       ],
       "init_calldata": [
-        "0",
+        "sstr:https://pistols.underware.gg",
         "0x0",
         "0x0",
         "100000000000000000000"
       ],
       "tag": "pistols-duelist_token",
-      "systems": []
+      "selector": "0x45c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e",
+      "systems": [
+        "dojo_init",
+        "create_duelist",
+        "update_duelist",
+        "delete_duelist",
+        "transfer_fame_reward",
+        "upgrade",
+        "safe_transfer_from",
+        "transfer_from",
+        "approve",
+        "set_approval_for_all",
+        "safeTransferFrom",
+        "transferFrom",
+        "setApprovalForAll"
+      ]
     },
     {
-      "address": "0xd148888f1d19399f328088b4d4e92f0ef5fa05c27b9ecf658af39c56a1dd30",
-      "class_hash": "0x1fd29f9d88ef133d70fe22e503f732bfaaa9532f2f0c0f9e0bdfe5473c4375",
+      "address": "0x618c0003a564459310d884846b0e1c31a306d0a87b9a45341d827fa93c3ac8d",
+      "class_hash": "0x6e63400de881a1860139b2f4ee2b22d3356b3748c82b0bdb4f1826b455c77bc",
       "abi": [
         {
           "type": "impl",
           "name": "fame_coin__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "fame_coin__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -3966,7 +4182,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -4416,6 +4632,26 @@
                 }
               ],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "burn_from_token",
+              "inputs": [
+                {
+                  "name": "contract_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "amount",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -4562,16 +4798,38 @@
       ],
       "init_calldata": [],
       "tag": "pistols-fame_coin",
-      "systems": []
+      "selector": "0x371b95cb7056eb2d21819662e973ed32c345c989aa9f6097e7811a5665a0b0a",
+      "systems": [
+        "dojo_init",
+        "minted_duelist",
+        "updated_duelist",
+        "upgrade",
+        "transfer",
+        "transfer_from",
+        "approve",
+        "transferFrom",
+        "transfer_from_token",
+        "burn_from_token"
+      ]
     },
     {
-      "address": "0x9224f903cf48786aa4af8c95267991d5ec6b5801d36aae04afd28539205ba",
-      "class_hash": "0x2a6bb7653644c1b421e537e736e7400384c1de794139a6a28b793cc57fd60fc",
+      "address": "0x571b66fcd24490c11190a6d9cffc88c79c41bb2af4ddbd6e053a187da2f594e",
+      "class_hash": "0x33f0b364f04880aa914ef978dc2ed47ee6a05f7ee8754fdc0db611156b17f86",
       "abi": [
         {
           "type": "impl",
           "name": "game__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "game__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -4593,7 +4851,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -5204,16 +5462,31 @@
       ],
       "init_calldata": [],
       "tag": "pistols-game",
-      "systems": []
+      "selector": "0x32c102830cbffaddecbdce7ef85735e6f08da08ee762a2d7b09304b6533dd57",
+      "systems": [
+        "commit_moves",
+        "reveal_moves",
+        "upgrade"
+      ]
     },
     {
-      "address": "0x223519c44ebc12880d95a8ab0bff7f65cd3334ba9af7a072d361cb22ff9e77d",
-      "class_hash": "0xa5406e234f087ff1d75f25cdce021a8816d08d7e8a2a087f85d1f6801c97f7",
+      "address": "0x64ca8bc2b85d6a26dbba1a28e674fff50661c2af58e05251f8b9e326205a5a6",
+      "class_hash": "0x3f9ca09c1754fdca45c841cd1e1f69de7fc1cd860d2a5c31cffa8139bbb859a",
       "abi": [
         {
           "type": "impl",
           "name": "lords_mock__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "lords_mock__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -5235,7 +5508,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -5724,16 +5997,36 @@
         "10000000000000000000000"
       ],
       "tag": "pistols-lords_mock",
-      "systems": []
+      "selector": "0x2b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788",
+      "systems": [
+        "dojo_init",
+        "faucet",
+        "mint",
+        "upgrade",
+        "transfer",
+        "transfer_from",
+        "approve",
+        "transferFrom"
+      ]
     },
     {
-      "address": "0x41bc4190ec00f2782388885f242d3bc1fb02330075b88a27f92406fdea8aaba",
-      "class_hash": "0x623b9f39e8f75a356df1393461ed6cd1835fa63194a3aa5093f71797375c14",
+      "address": "0x664a85fbb7e4c8771be6f56172ee751c6edecc993d2c3f11879416c0cdd75be",
+      "class_hash": "0x1e0ae106c9da1a5e05a33fc938ac17780af86bfd87db6564381331ba0a813a9",
       "abi": [
         {
           "type": "impl",
           "name": "rng__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "rng__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -5755,7 +6048,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -5984,16 +6277,29 @@
       ],
       "init_calldata": [],
       "tag": "pistols-rng",
-      "systems": []
+      "selector": "0x13f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504",
+      "systems": [
+        "upgrade"
+      ]
     },
     {
-      "address": "0x2a4e46f35e95879a1ac6803e55e49528d5dd2aa722956e27bb43c2772a30a69",
-      "class_hash": "0x3dd9beae78df14983eb8ef783de082aeea8809304f5de1684dd38a797d076c1",
+      "address": "0x3bcf6adcc1f5982692290f01348b42bbf51a3630b3d3bd82d737f3a592d00d",
+      "class_hash": "0x77b4ab14169ee996fcf64bec4532ba22687016728401227559a02f3de0f9e7",
       "abi": [
         {
           "type": "impl",
           "name": "vrf_mock__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "vrf_mock__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
         },
         {
           "type": "struct",
@@ -6015,7 +6321,7 @@
         },
         {
           "type": "interface",
-          "name": "dojo::contract::interface::IContract",
+          "name": "dojo::meta::interface::IDeployedResource",
           "items": [
             {
               "type": "function",
@@ -6169,69 +6475,90 @@
       ],
       "init_calldata": [],
       "tag": "pistols-vrf_mock",
-      "systems": []
+      "selector": "0x7d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e",
+      "systems": [
+        "upgrade"
+      ]
     }
   ],
   "models": [
     {
       "members": [],
-      "class_hash": "0x1bc0786d0de0d8c96836f14b32bc23bcbbd09971d4f379acbadd294b59a9d2d",
-      "tag": "Challenge"
+      "class_hash": "0x2d15685cf3625bd459ea02bf427fa09a033d8d5be46d0cfd8f4aeb34738afa7",
+      "tag": "pistols-Challenge",
+      "selector": "0x673267b69d74c703ea86d97b041278944b49f62b52867345a95d3047b11378a"
     },
     {
       "members": [],
-      "class_hash": "0x2d85f734d7f7f17f416ec8019376689c56a47da106b21eb8581e6a7350bee6c",
-      "tag": "CoinConfig"
+      "class_hash": "0x51599e2a8b425fa6ec3715cc7e94af9743c42eb93530d8dfa1439005f7b87e7",
+      "tag": "pistols-ChallengeFameBalance",
+      "selector": "0x4d3c5336d06d93a8d0c67c59bb8d67291581c276b63c66293779d71c48d49bf"
     },
     {
       "members": [],
-      "class_hash": "0x7973fc70bc6a94180a3d51293a1459384c132868a9634af9536a0861c00a09",
-      "tag": "Config"
+      "class_hash": "0x629759be44737ed0b39af9fd40bd9e0b964301da7b4a3b24eea1a686bfd803",
+      "tag": "pistols-CoinConfig",
+      "selector": "0x26fad4dff063a4f2c3b3889723194b9bdbbbf833e44ff2d573af01741b966ac"
     },
     {
       "members": [],
-      "class_hash": "0x4f71b0ba93bdce3ba86be2a41237c729b19c11a784efac62d81702f6639af38",
-      "tag": "Duelist"
+      "class_hash": "0x1bc62b4c3eb0dea46f4851d52c65412988deaf34778c90576f0e30fa5e2809f",
+      "tag": "pistols-Config",
+      "selector": "0x60742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392"
     },
     {
       "members": [],
-      "class_hash": "0x4790cdef01a501b6ca42325bfa5fd2d294ac0f251254b3807487e549973a9bc",
-      "tag": "Pact"
+      "class_hash": "0x13226522bfb302c0a23d9a747bf4df05d0a37a1ab7eaf404f32c22d3276e410",
+      "tag": "pistols-Duelist",
+      "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
     {
       "members": [],
-      "class_hash": "0x731ff95ccf2fb992b48aae088b775ae4b04c2b02ae2e3de9be7e5d94b6bea4e",
-      "tag": "Payment"
+      "class_hash": "0xe935853433d3e4ae8faaacdc30d43247991f2fca26d551678dcf77b51d4b78",
+      "tag": "pistols-Pact",
+      "selector": "0x72a33a6586ae24471fdae1c6f3cc9da6629f3fd3dce300a48324617dd511617"
     },
     {
       "members": [],
-      "class_hash": "0x3aaba5dc717fdd6f315b20ba0147653fa86a1de87ee98d13b127cbd05e6cdc2",
-      "tag": "Round"
+      "class_hash": "0x6a9342896b526de464841f687ff14937042961bf7e848a5fe55a909e3dba001",
+      "tag": "pistols-Payment",
+      "selector": "0x17a03e9cb461470b9149f9efbd95ad9b217fca9fdccd3827383904c33da96c1"
     },
     {
       "members": [],
-      "class_hash": "0x46ce8f074258171602811af3ba4120f69f66c2ed3868afc1354268d7afe4754",
-      "tag": "Scoreboard"
+      "class_hash": "0x6be45c0a7bd0118d6920db187abd982b5c83f931db1554370fb4b1abe6a1957",
+      "tag": "pistols-Round",
+      "selector": "0x617e0a3d97aa8cb3f83bbb5341ede98d3e3d825b6424bcab0676933fec52bc2"
     },
     {
       "members": [],
-      "class_hash": "0x161491019d3bd8d9b96a195a88b0c20b5545a3d2064e2ad5a4a6f89cf19eba4",
-      "tag": "TableAdmittance"
+      "class_hash": "0x5437bb6d2ec8771f73ce2f3dc5942a91600874ab7aef0f707f0186a9d9c2c77",
+      "tag": "pistols-Scoreboard",
+      "selector": "0x18889906443a52ec3b3fd07ba7108bcf2b0067bdec842953530710a9dfdb728"
     },
     {
       "members": [],
-      "class_hash": "0x1b444e9f4555652f88dbdccd3098c5db40837dbf27f9693a6227d4d1efac22c",
-      "tag": "TableConfig"
+      "class_hash": "0x70c3e14451ef528f94d2fe0ae370d151d7c4aa739033c742d68ef2736e85907",
+      "tag": "pistols-TableAdmittance",
+      "selector": "0x1b01f43d448ff74f466c59d93552263dc1b4c214ca8a1bf19b80ca2e6105136"
     },
     {
       "members": [],
-      "class_hash": "0xe42875e6a96a10a11b773c9f4285666ef4631e67c7fddda67310e4fac0cf60",
-      "tag": "TokenBoundAddress"
+      "class_hash": "0x2a3817a6fe0b221ca51730be0591172b7a943649bddd8020ab3b0b3c64b3c2e",
+      "tag": "pistols-TableConfig",
+      "selector": "0x1e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138"
     },
     {
       "members": [],
-      "class_hash": "0x696bb55f4c4b4afd0b073714167cb2467c6cfaa93be2d113fb04d0eb1a78870",
-      "tag": "TokenConfig"
+      "class_hash": "0x3351c4b4a7df7c8abc53078aa23ddffae286f2a4f922d36f3d65c9f589e0703",
+      "tag": "pistols-TokenBoundAddress",
+      "selector": "0x51e7eddb7555dc0cb6f6bdb0de4d85ac38457ede50d70e4f714a27c00047c8f"
+    },
+    {
+      "members": [],
+      "class_hash": "0x15361d01532e9c5440fead4a40b6888c9c58c538550ab2623ec81e1075a76fb",
+      "tag": "pistols-TokenConfig",
+      "selector": "0x56ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed"
     }
   ],
   "events": []
