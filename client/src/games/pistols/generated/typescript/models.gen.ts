@@ -36,16 +36,16 @@ export interface ChallengeValue {
 // Type definition for `pistols::models::challenge::ChallengeFameBalanceValue` struct
 export interface ChallengeFameBalanceValue {
 	fieldOrder: string[];
-	balance_a: i128;
-	balance_b: i128;
+	balance_a: number;
+	balance_b: number;
 }
 
 // Type definition for `pistols::models::challenge::ChallengeFameBalance` struct
 export interface ChallengeFameBalance {
 	fieldOrder: string[];
 	duel_id: number;
-	balance_a: i128;
-	balance_b: i128;
+	balance_a: number;
+	balance_b: number;
 }
 
 // Type definition for `pistols::models::config::CoinConfigValue` struct
@@ -414,14 +414,14 @@ export const schema: PistolsSchemaType = {
 		},
 		ChallengeFameBalanceValue: {
 			fieldOrder: ['balance_a', 'balance_b'],
-			balance_a: i128,
-			balance_b: i128,
+			balance_a: 0,
+			balance_b: 0,
 		},
 		ChallengeFameBalance: {
 			fieldOrder: ['duel_id', 'balance_a', 'balance_b'],
 			duel_id: 0,
-			balance_a: i128,
-			balance_b: i128,
+			balance_a: 0,
+			balance_b: 0,
 		},
 		CoinConfigValue: {
 			fieldOrder: ['minter_address', 'faucet_amount'],
