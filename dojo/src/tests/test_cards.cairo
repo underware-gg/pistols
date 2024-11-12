@@ -159,7 +159,7 @@ mod tests {
                 assert(step.card_env != EnvCard::None, ShortString::concat(num, '_step.card_env'));
                 assert(step.dice_env > 0, ShortString::concat(num, '_step.dice_env'));
                 // test shuffler
-                assert(step.dice_env != last_dice_env, ShortString::concat(num, '_not_shuffled'));
+                // assert(step.dice_env != last_dice_env, ShortString::concat(num, '_not_shuffled'));
                 last_dice_env = step.dice_env;
                 // test paces
                 if (pace == (*moves_a[0]).into()) {

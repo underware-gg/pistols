@@ -107,7 +107,10 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [1, 1, mock_shuffle_values([ENV_CARD_NEUTRAL].span())].span(),
+                values: [1, 1, mock_shuffle_values(
+                    [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
+                    ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()
+                )].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
@@ -120,7 +123,10 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [100, 100, mock_shuffle_values([ENV_CARD_MISS].span())].span(),
+                values: [100, 100, mock_shuffle_values(
+                    [ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,
+                    ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,].span()
+                )].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),

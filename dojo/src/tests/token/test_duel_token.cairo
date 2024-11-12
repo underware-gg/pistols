@@ -251,22 +251,24 @@ fn test_initializer() {
     // assert(token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(token.symbol() == "DUEL", 'Symbol is wrong');
     _assert_minted_count(world, token, 2, 'Should eq 2');
-    assert(token.balance_of(OWNER()) == 1, 'Should eq 1 (OWNER)');
-    assert(token.balance_of(OTHER()) == 1, 'Should eq 1 (OTHER)');
-    // assert(token.token_of_owner_by_index(OWNER(), 0) == TOKEN_ID_1, 'token_of_owner_by_index_OWNER');
-    // assert(token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_REC');
-
-    // assert(token.token_by_index(0) == TOKEN_ID_1, 'token_by_index_0');
-    // assert(token.token_by_index(1) == TOKEN_ID_2, 'token_by_index_1');
-
-    assert(token.owner_of(TOKEN_ID_1) == OWNER(), 'owner_of_1');
-    assert(token.owner_of(TOKEN_ID_2) == OTHER(), 'owner_of_2');
-    // assert(token.owner_of(TOKEN_ID_3) == ZERO(), 'owner_of_3');
 
     assert(token.owner_of(TOKEN_ID_1).is_non_zero(), 'owner_of_1_non_zero');
     assert(token.owner_of(TOKEN_ID_2).is_non_zero(), 'owner_of_2_non_zero');
-    // assert(token.owner_of(TOKEN_ID_3).is_zero(), 'owner_of_3_non_zero');
+    assert(token.owner_of(TOKEN_ID_1) == world.game_address(), 'owner_of_1');
+    assert(token.owner_of(TOKEN_ID_2) == world.game_address(), 'owner_of_2');
 
+    // owned by game now
+    // assert(token.balance_of(OWNER()) == 1, 'Should eq 1 (OWNER)');
+    // assert(token.balance_of(OTHER()) == 1, 'Should eq 1 (OTHER)');
+    // assert(token.owner_of(TOKEN_ID_1) == OWNER(), 'owner_of_1');
+    // assert(token.owner_of(TOKEN_ID_2) == OTHER(), 'owner_of_2');
+
+    // enumberable
+    // assert(token.token_of_owner_by_index(OWNER(), 0) == TOKEN_ID_1, 'token_of_owner_by_index_OWNER');
+    // assert(token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_REC');
+    // assert(token.token_by_index(0) == TOKEN_ID_1, 'token_by_index_0');
+    // assert(token.token_by_index(1) == TOKEN_ID_2, 'token_by_index_1');
+    
     assert(token.token_uri(TOKEN_ID_1) != "", 'Uri should not be empty');
     assert(token.tokenURI(TOKEN_ID_1) != "", 'Uri should not be empty Camel');
 
@@ -333,6 +335,7 @@ fn test_token_uri_invalid() {
 //
 
 #[test]
+#[ignore] // owned by game now
 fn test_approve() {
     let (world, mut token) = setup(100);
 
@@ -356,6 +359,7 @@ fn test_approve() {
 //
 
 #[test]
+#[ignore] // owned by game now// owned by game now
 fn test_transfer_from() {
     let (world, mut token) = setup(100);
 
@@ -397,11 +401,11 @@ fn test_mint_no_allowance() {
 fn test_mint_free() {
     let (world, mut token) = setup(0);
     _assert_minted_count(world, token, 2, 'invalid total_supply init');
-    assert(token.balance_of(OTHER()) == 1, 'invalid balance_of');
+    // assert(token.balance_of(OTHER()) == 1, 'invalid balance_of == 1');
     // assert(token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_2');
     mint(token, OTHER(), TOKEN_ID_2, TOKEN_ID_4);
     _assert_minted_count(world, token, 3, 'invalid total_supply');
-    assert(token.balance_of(OTHER()) == 2, 'invalid balance_of');
+    // assert(token.balance_of(OTHER()) == 2, 'invalid balance_of == 2');
     // assert(token.token_of_owner_by_index(OTHER(), 1) == TOKEN_ID_3, 'token_of_owner_by_index_3');
 }
 
@@ -424,9 +428,10 @@ fn test_mint_lords() {
 fn test_burn() {
     let (world, mut token) = setup(100);
     _assert_minted_count(world, token, 2, 'invalid total_supply init');
-    assert(token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
+    // assert(token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
+    tester::impersonate(world.game_address());
     token.delete_duel(TOKEN_ID_1.low);
     _assert_minted_count(world, token, 1, 'invalid total_supply');
-    assert(token.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
+    // assert(token.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
 }
 
