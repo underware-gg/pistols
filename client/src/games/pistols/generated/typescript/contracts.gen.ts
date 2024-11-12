@@ -4,14 +4,14 @@ import * as models from "./models.gen";
 
 export async function setupWorld(provider: DojoProvider) {
 
-	const rng_reseed = async (snAccount: Account, seed: number, salt: number) => {
+	const game_commitMoves = async (snAccount: Account, duelistId: number, duelId: number, hashed: number) => {
 		try {
 			return await provider.execute(
 				snAccount,
 				{
-					contractName: "rng",
-					entrypoint: "reseed",
-					calldata: [seed, salt],
+					contractName: "game",
+					entrypoint: "commit_moves",
+					calldata: [duelistId, duelId, hashed],
 				},
 				"pistols",
 			);
@@ -20,14 +20,78 @@ export async function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const rng_newShuffler = async (snAccount: Account, shuffleSize: number) => {
+	const game_revealMoves = async (snAccount: Account, duelistId: number, duelId: number, salt: number, moves: Array<number>) => {
 		try {
 			return await provider.execute(
 				snAccount,
 				{
-					contractName: "rng",
-					entrypoint: "new_shuffler",
-					calldata: [shuffleSize],
+					contractName: "game",
+					entrypoint: "reveal_moves",
+					calldata: [duelistId, duelId, salt, moves],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const game_getPlayerCardDecks = async (snAccount: Account, tableId: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "game",
+					entrypoint: "get_player_card_decks",
+					calldata: [tableId],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const game_getDuelProgress = async (snAccount: Account, duelId: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "game",
+					entrypoint: "get_duel_progress",
+					calldata: [duelId],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const game_testValidateCommitMessage = async (snAccount: Account, account: string, signature: Array<number>, duelId: number, duelistId: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "game",
+					entrypoint: "test_validate_commit_message",
+					calldata: [account, signature, duelId, duelistId],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const vrf_mock_consumeRandom = async (snAccount: Account) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "vrf_mock",
+					entrypoint: "consume_random",
+					calldata: [],
 				},
 				"pistols",
 			);
@@ -44,6 +108,550 @@ export async function setupWorld(provider: DojoProvider) {
 					contractName: "bank",
 					entrypoint: "charge",
 					calldata: [payer, payment],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_mintedDuelist = async (snAccount: Account, duelistId: number, amountPaid: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "minted_duelist",
+					calldata: [duelistId, amountPaid],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_updatedDuelist = async (snAccount: Account, from: string, to: string, duelistId: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "updated_duelist",
+					calldata: [from, to, duelistId],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_addressOfToken = async (snAccount: Account, contractAddress: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "address_of_token",
+					calldata: [contractAddress, tokenId],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_tokenOfAddress = async (snAccount: Account, address: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "token_of_address",
+					calldata: [address],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_balanceOfToken = async (snAccount: Account, contractAddress: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "balance_of_token",
+					calldata: [contractAddress, tokenId],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_transferFromToken = async (snAccount: Account, contractAddress: string, senderTokenId: number, recipientTokenId: number, amount: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "transfer_from_token",
+					calldata: [contractAddress, senderTokenId, recipientTokenId, amount],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_burnFromToken = async (snAccount: Account, contractAddress: string, tokenId: number, amount: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "burn_from_token",
+					calldata: [contractAddress, tokenId, amount],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_totalSupply = async (snAccount: Account) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "total_supply",
+					calldata: [],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_balanceOf = async (snAccount: Account, account: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "balance_of",
+					calldata: [account],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_allowance = async (snAccount: Account, owner: string, spender: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "allowance",
+					calldata: [owner, spender],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_transfer = async (snAccount: Account, recipient: string, amount: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "transfer",
+					calldata: [recipient, amount],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_transferFrom = async (snAccount: Account, sender: string, recipient: string, amount: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "transfer_from",
+					calldata: [sender, recipient, amount],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_approve = async (snAccount: Account, spender: string, amount: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "approve",
+					calldata: [spender, amount],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_name = async (snAccount: Account) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "name",
+					calldata: [],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_symbol = async (snAccount: Account) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "symbol",
+					calldata: [],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const fame_coin_decimals = async (snAccount: Account) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "fame_coin",
+					entrypoint: "decimals",
+					calldata: [],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const admin_amIAdmin = async (snAccount: Account, accountAddress: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "admin",
+					entrypoint: "am_i_admin",
+					calldata: [accountAddress],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const admin_grantAdmin = async (snAccount: Account, accountAddress: string, granted: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "admin",
+					entrypoint: "grant_admin",
+					calldata: [accountAddress, granted],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const admin_setTreasury = async (snAccount: Account, treasuryAddress: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "admin",
+					entrypoint: "set_treasury",
+					calldata: [treasuryAddress],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const admin_setPaused = async (snAccount: Account, paused: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "admin",
+					entrypoint: "set_paused",
+					calldata: [paused],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const admin_openTable = async (snAccount: Account, tableId: number, isOpen: boolean) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "admin",
+					entrypoint: "open_table",
+					calldata: [tableId, isOpen],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const admin_setTable = async (snAccount: Account, table: models.TableConfig) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "admin",
+					entrypoint: "set_table",
+					calldata: [table],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const admin_setTableAdmittance = async (snAccount: Account, tableAdmittance: models.TableAdmittance) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "admin",
+					entrypoint: "set_table_admittance",
+					calldata: [tableAdmittance],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const lords_mock_faucet = async (snAccount: Account) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "lords_mock",
+					entrypoint: "faucet",
+					calldata: [],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const lords_mock_mint = async (snAccount: Account, recipient: string, amount: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "lords_mock",
+					entrypoint: "mint",
+					calldata: [recipient, amount],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const lords_mock_totalSupply = async (snAccount: Account) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "lords_mock",
+					entrypoint: "total_supply",
+					calldata: [],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const lords_mock_balanceOf = async (snAccount: Account, account: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "lords_mock",
+					entrypoint: "balance_of",
+					calldata: [account],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const lords_mock_allowance = async (snAccount: Account, owner: string, spender: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "lords_mock",
+					entrypoint: "allowance",
+					calldata: [owner, spender],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const lords_mock_transfer = async (snAccount: Account, recipient: string, amount: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "lords_mock",
+					entrypoint: "transfer",
+					calldata: [recipient, amount],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const lords_mock_transferFrom = async (snAccount: Account, sender: string, recipient: string, amount: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "lords_mock",
+					entrypoint: "transfer_from",
+					calldata: [sender, recipient, amount],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const lords_mock_approve = async (snAccount: Account, spender: string, amount: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "lords_mock",
+					entrypoint: "approve",
+					calldata: [spender, amount],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const lords_mock_name = async (snAccount: Account) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "lords_mock",
+					entrypoint: "name",
+					calldata: [],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const lords_mock_symbol = async (snAccount: Account) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "lords_mock",
+					entrypoint: "symbol",
+					calldata: [],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const lords_mock_decimals = async (snAccount: Account) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "lords_mock",
+					entrypoint: "decimals",
+					calldata: [],
 				},
 				"pistols",
 			);
@@ -244,54 +852,6 @@ export async function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_canMint = async (snAccount: Account, callerAddress: string) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "duel_token",
-					entrypoint: "can_mint",
-					calldata: [callerAddress],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const duel_token_exists = async (snAccount: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "duel_token",
-					entrypoint: "exists",
-					calldata: [tokenId],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const duel_token_isOwnerOf = async (snAccount: Account, address: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "duel_token",
-					entrypoint: "is_owner_of",
-					calldata: [address, tokenId],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
 	const duel_token_createDuel = async (snAccount: Account, duelistId: number, challengedIdOrAddress: string, premise: models.Premise, quote: number, tableId: number, expireHours: number) => {
 		try {
 			return await provider.execute(
@@ -420,6 +980,54 @@ export async function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const duel_token_canMint = async (snAccount: Account, callerAddress: string) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "duel_token",
+					entrypoint: "can_mint",
+					calldata: [callerAddress],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const duel_token_exists = async (snAccount: Account, tokenId: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "duel_token",
+					entrypoint: "exists",
+					calldata: [tokenId],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const duel_token_isOwnerOf = async (snAccount: Account, address: string, tokenId: number) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				{
+					contractName: "duel_token",
+					entrypoint: "is_owner_of",
+					calldata: [address, tokenId],
+				},
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	const duel_token_getTokenName = async (snAccount: Account, tokenId: number) => {
 		try {
 			return await provider.execute(
@@ -500,14 +1108,14 @@ export async function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const admin_amIAdmin = async (snAccount: Account, accountAddress: string) => {
+	const duelist_token_canMint = async (snAccount: Account, callerAddress: string) => {
 		try {
 			return await provider.execute(
 				snAccount,
 				{
-					contractName: "admin",
-					entrypoint: "am_i_admin",
-					calldata: [accountAddress],
+					contractName: "duelist_token",
+					entrypoint: "can_mint",
+					calldata: [callerAddress],
 				},
 				"pistols",
 			);
@@ -516,14 +1124,14 @@ export async function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const admin_grantAdmin = async (snAccount: Account, accountAddress: string, granted: boolean) => {
+	const duelist_token_exists = async (snAccount: Account, tokenId: number) => {
 		try {
 			return await provider.execute(
 				snAccount,
 				{
-					contractName: "admin",
-					entrypoint: "grant_admin",
-					calldata: [accountAddress, granted],
+					contractName: "duelist_token",
+					entrypoint: "exists",
+					calldata: [tokenId],
 				},
 				"pistols",
 			);
@@ -532,526 +1140,14 @@ export async function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const admin_setTreasury = async (snAccount: Account, treasuryAddress: string) => {
+	const duelist_token_isOwnerOf = async (snAccount: Account, address: string, tokenId: number) => {
 		try {
 			return await provider.execute(
 				snAccount,
 				{
-					contractName: "admin",
-					entrypoint: "set_treasury",
-					calldata: [treasuryAddress],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const admin_setPaused = async (snAccount: Account, paused: boolean) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "admin",
-					entrypoint: "set_paused",
-					calldata: [paused],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const admin_openTable = async (snAccount: Account, tableId: number, isOpen: boolean) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "admin",
-					entrypoint: "open_table",
-					calldata: [tableId, isOpen],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const admin_setTable = async (snAccount: Account, table: models.TableConfig) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "admin",
-					entrypoint: "set_table",
-					calldata: [table],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const admin_setTableAdmittance = async (snAccount: Account, tableAdmittance: models.TableAdmittance) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "admin",
-					entrypoint: "set_table_admittance",
-					calldata: [tableAdmittance],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const vrf_mock_consumeRandom = async (snAccount: Account) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "vrf_mock",
-					entrypoint: "consume_random",
-					calldata: [],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_mintedDuelist = async (snAccount: Account, duelistId: number, amountPaid: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "minted_duelist",
-					calldata: [duelistId, amountPaid],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_updatedDuelist = async (snAccount: Account, from: string, to: string, duelistId: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "updated_duelist",
-					calldata: [from, to, duelistId],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_totalSupply = async (snAccount: Account) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "total_supply",
-					calldata: [],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_balanceOf = async (snAccount: Account, account: string) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "balance_of",
-					calldata: [account],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_allowance = async (snAccount: Account, owner: string, spender: string) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "allowance",
-					calldata: [owner, spender],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_transfer = async (snAccount: Account, recipient: string, amount: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "transfer",
-					calldata: [recipient, amount],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_transferFrom = async (snAccount: Account, sender: string, recipient: string, amount: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "transfer_from",
-					calldata: [sender, recipient, amount],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_approve = async (snAccount: Account, spender: string, amount: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "approve",
-					calldata: [spender, amount],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_name = async (snAccount: Account) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "name",
-					calldata: [],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_symbol = async (snAccount: Account) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "symbol",
-					calldata: [],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_decimals = async (snAccount: Account) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "decimals",
-					calldata: [],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_addressOfToken = async (snAccount: Account, contractAddress: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "address_of_token",
-					calldata: [contractAddress, tokenId],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_tokenOfAddress = async (snAccount: Account, address: string) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "token_of_address",
-					calldata: [address],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_balanceOfToken = async (snAccount: Account, contractAddress: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "balance_of_token",
-					calldata: [contractAddress, tokenId],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_transferFromToken = async (snAccount: Account, contractAddress: string, senderTokenId: number, recipientTokenId: number, amount: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "transfer_from_token",
-					calldata: [contractAddress, senderTokenId, recipientTokenId, amount],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fame_coin_burnFromToken = async (snAccount: Account, contractAddress: string, tokenId: number, amount: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "fame_coin",
-					entrypoint: "burn_from_token",
-					calldata: [contractAddress, tokenId, amount],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const lords_mock_totalSupply = async (snAccount: Account) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "lords_mock",
-					entrypoint: "total_supply",
-					calldata: [],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const lords_mock_balanceOf = async (snAccount: Account, account: string) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "lords_mock",
-					entrypoint: "balance_of",
-					calldata: [account],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const lords_mock_allowance = async (snAccount: Account, owner: string, spender: string) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "lords_mock",
-					entrypoint: "allowance",
-					calldata: [owner, spender],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const lords_mock_transfer = async (snAccount: Account, recipient: string, amount: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "lords_mock",
-					entrypoint: "transfer",
-					calldata: [recipient, amount],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const lords_mock_transferFrom = async (snAccount: Account, sender: string, recipient: string, amount: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "lords_mock",
-					entrypoint: "transfer_from",
-					calldata: [sender, recipient, amount],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const lords_mock_approve = async (snAccount: Account, spender: string, amount: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "lords_mock",
-					entrypoint: "approve",
-					calldata: [spender, amount],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const lords_mock_name = async (snAccount: Account) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "lords_mock",
-					entrypoint: "name",
-					calldata: [],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const lords_mock_symbol = async (snAccount: Account) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "lords_mock",
-					entrypoint: "symbol",
-					calldata: [],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const lords_mock_decimals = async (snAccount: Account) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "lords_mock",
-					entrypoint: "decimals",
-					calldata: [],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const lords_mock_faucet = async (snAccount: Account) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "lords_mock",
-					entrypoint: "faucet",
-					calldata: [],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const lords_mock_mint = async (snAccount: Account, recipient: string, amount: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "lords_mock",
-					entrypoint: "mint",
-					calldata: [recipient, amount],
+					contractName: "duelist_token",
+					entrypoint: "is_owner_of",
+					calldata: [address, tokenId],
 				},
 				"pistols",
 			);
@@ -1252,54 +1348,6 @@ export async function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_canMint = async (snAccount: Account, callerAddress: string) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "duelist_token",
-					entrypoint: "can_mint",
-					calldata: [callerAddress],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const duelist_token_exists = async (snAccount: Account, tokenId: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "duelist_token",
-					entrypoint: "exists",
-					calldata: [tokenId],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const duelist_token_isOwnerOf = async (snAccount: Account, address: string, tokenId: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "duelist_token",
-					entrypoint: "is_owner_of",
-					calldata: [address, tokenId],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
 	const duelist_token_getTokenName = async (snAccount: Account, tokenId: number) => {
 		try {
 			return await provider.execute(
@@ -1492,14 +1540,14 @@ export async function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const game_commitMoves = async (snAccount: Account, duelistId: number, duelId: number, hashed: number) => {
+	const rng_reseed = async (snAccount: Account, seed: number, salt: number) => {
 		try {
 			return await provider.execute(
 				snAccount,
 				{
-					contractName: "game",
-					entrypoint: "commit_moves",
-					calldata: [duelistId, duelId, hashed],
+					contractName: "rng",
+					entrypoint: "reseed",
+					calldata: [seed, salt],
 				},
 				"pistols",
 			);
@@ -1508,62 +1556,14 @@ export async function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const game_revealMoves = async (snAccount: Account, duelistId: number, duelId: number, salt: number, moves: Array<number>) => {
+	const rng_newShuffler = async (snAccount: Account, shuffleSize: number) => {
 		try {
 			return await provider.execute(
 				snAccount,
 				{
-					contractName: "game",
-					entrypoint: "reveal_moves",
-					calldata: [duelistId, duelId, salt, moves],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const game_getPlayerCardDecks = async (snAccount: Account, tableId: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "game",
-					entrypoint: "get_player_card_decks",
-					calldata: [tableId],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const game_getDuelProgress = async (snAccount: Account, duelId: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "game",
-					entrypoint: "get_duel_progress",
-					calldata: [duelId],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const game_testValidateCommitMessage = async (snAccount: Account, account: string, signature: Array<number>, duelId: number, duelistId: number) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "game",
-					entrypoint: "test_validate_commit_message",
-					calldata: [account, signature, duelId, duelistId],
+					contractName: "rng",
+					entrypoint: "new_shuffler",
+					calldata: [shuffleSize],
 				},
 				"pistols",
 			);
@@ -1573,12 +1573,58 @@ export async function setupWorld(provider: DojoProvider) {
 	};
 
 	return {
-		rng: {
-			reseed: rng_reseed,
-			newShuffler: rng_newShuffler,
+		game: {
+			commitMoves: game_commitMoves,
+			revealMoves: game_revealMoves,
+			getPlayerCardDecks: game_getPlayerCardDecks,
+			getDuelProgress: game_getDuelProgress,
+			testValidateCommitMessage: game_testValidateCommitMessage,
+		},
+		vrf_mock: {
+			consumeRandom: vrf_mock_consumeRandom,
 		},
 		bank: {
 			charge: bank_charge,
+		},
+		fame_coin: {
+			mintedDuelist: fame_coin_mintedDuelist,
+			updatedDuelist: fame_coin_updatedDuelist,
+			addressOfToken: fame_coin_addressOfToken,
+			tokenOfAddress: fame_coin_tokenOfAddress,
+			balanceOfToken: fame_coin_balanceOfToken,
+			transferFromToken: fame_coin_transferFromToken,
+			burnFromToken: fame_coin_burnFromToken,
+			totalSupply: fame_coin_totalSupply,
+			balanceOf: fame_coin_balanceOf,
+			allowance: fame_coin_allowance,
+			transfer: fame_coin_transfer,
+			transferFrom: fame_coin_transferFrom,
+			approve: fame_coin_approve,
+			name: fame_coin_name,
+			symbol: fame_coin_symbol,
+			decimals: fame_coin_decimals,
+		},
+		admin: {
+			amIAdmin: admin_amIAdmin,
+			grantAdmin: admin_grantAdmin,
+			setTreasury: admin_setTreasury,
+			setPaused: admin_setPaused,
+			openTable: admin_openTable,
+			setTable: admin_setTable,
+			setTableAdmittance: admin_setTableAdmittance,
+		},
+		lords_mock: {
+			faucet: lords_mock_faucet,
+			mint: lords_mock_mint,
+			totalSupply: lords_mock_totalSupply,
+			balanceOf: lords_mock_balanceOf,
+			allowance: lords_mock_allowance,
+			transfer: lords_mock_transfer,
+			transferFrom: lords_mock_transferFrom,
+			approve: lords_mock_approve,
+			name: lords_mock_name,
+			symbol: lords_mock_symbol,
+			decimals: lords_mock_decimals,
 		},
 		duel_token: {
 			balanceOf: duel_token_balanceOf,
@@ -1593,9 +1639,6 @@ export async function setupWorld(provider: DojoProvider) {
 			name: duel_token_name,
 			symbol: duel_token_symbol,
 			tokenUri: duel_token_tokenUri,
-			canMint: duel_token_canMint,
-			exists: duel_token_exists,
-			isOwnerOf: duel_token_isOwnerOf,
 			createDuel: duel_token_createDuel,
 			replyDuel: duel_token_replyDuel,
 			deleteDuel: duel_token_deleteDuel,
@@ -1604,56 +1647,19 @@ export async function setupWorld(provider: DojoProvider) {
 			getPact: duel_token_getPact,
 			hasPact: duel_token_hasPact,
 			canJoin: duel_token_canJoin,
+			canMint: duel_token_canMint,
+			exists: duel_token_exists,
+			isOwnerOf: duel_token_isOwnerOf,
 			getTokenName: duel_token_getTokenName,
 			getTokenDescription: duel_token_getTokenDescription,
 			getTokenImage: duel_token_getTokenImage,
 			getAttributePairs: duel_token_getAttributePairs,
 			getMetadataPairs: duel_token_getMetadataPairs,
 		},
-		admin: {
-			amIAdmin: admin_amIAdmin,
-			grantAdmin: admin_grantAdmin,
-			setTreasury: admin_setTreasury,
-			setPaused: admin_setPaused,
-			openTable: admin_openTable,
-			setTable: admin_setTable,
-			setTableAdmittance: admin_setTableAdmittance,
-		},
-		vrf_mock: {
-			consumeRandom: vrf_mock_consumeRandom,
-		},
-		fame_coin: {
-			mintedDuelist: fame_coin_mintedDuelist,
-			updatedDuelist: fame_coin_updatedDuelist,
-			totalSupply: fame_coin_totalSupply,
-			balanceOf: fame_coin_balanceOf,
-			allowance: fame_coin_allowance,
-			transfer: fame_coin_transfer,
-			transferFrom: fame_coin_transferFrom,
-			approve: fame_coin_approve,
-			name: fame_coin_name,
-			symbol: fame_coin_symbol,
-			decimals: fame_coin_decimals,
-			addressOfToken: fame_coin_addressOfToken,
-			tokenOfAddress: fame_coin_tokenOfAddress,
-			balanceOfToken: fame_coin_balanceOfToken,
-			transferFromToken: fame_coin_transferFromToken,
-			burnFromToken: fame_coin_burnFromToken,
-		},
-		lords_mock: {
-			totalSupply: lords_mock_totalSupply,
-			balanceOf: lords_mock_balanceOf,
-			allowance: lords_mock_allowance,
-			transfer: lords_mock_transfer,
-			transferFrom: lords_mock_transferFrom,
-			approve: lords_mock_approve,
-			name: lords_mock_name,
-			symbol: lords_mock_symbol,
-			decimals: lords_mock_decimals,
-			faucet: lords_mock_faucet,
-			mint: lords_mock_mint,
-		},
 		duelist_token: {
+			canMint: duelist_token_canMint,
+			exists: duelist_token_exists,
+			isOwnerOf: duelist_token_isOwnerOf,
 			balanceOf: duelist_token_balanceOf,
 			ownerOf: duelist_token_ownerOf,
 			safeTransferFrom: duelist_token_safeTransferFrom,
@@ -1666,9 +1672,6 @@ export async function setupWorld(provider: DojoProvider) {
 			name: duelist_token_name,
 			symbol: duelist_token_symbol,
 			tokenUri: duelist_token_tokenUri,
-			canMint: duelist_token_canMint,
-			exists: duelist_token_exists,
-			isOwnerOf: duelist_token_isOwnerOf,
 			getTokenName: duelist_token_getTokenName,
 			getTokenDescription: duelist_token_getTokenDescription,
 			getTokenImage: duelist_token_getTokenImage,
@@ -1682,12 +1685,9 @@ export async function setupWorld(provider: DojoProvider) {
 			calcFameReward: duelist_token_calcFameReward,
 			transferFameReward: duelist_token_transferFameReward,
 		},
-		game: {
-			commitMoves: game_commitMoves,
-			revealMoves: game_revealMoves,
-			getPlayerCardDecks: game_getPlayerCardDecks,
-			getDuelProgress: game_getDuelProgress,
-			testValidateCommitMessage: game_testValidateCommitMessage,
+		rng: {
+			reseed: rng_reseed,
+			newShuffler: rng_newShuffler,
 		},
 	};
 }
