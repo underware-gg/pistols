@@ -1,6 +1,12 @@
+# torii config for profile [dev]
+world_address = "0x1adaf57de23b6d6d43eeb42b6ab6730a022021382fef49eff1f532c21556a5a"
+rpc = "http://localhost:5050"
+[indexing]
+index_pending = true
+index_transactions = false
 contracts = [
-  { type = "ERC721", address = "0x24978c7aec6c5d928102bf7be54f318552768abd5bb27e9be5520e2a1177be5" }, # duel_token
-  { type = "ERC721", address = "0x79813ddf6f99909b91ebbb15743337036c9ac9a82a4b7a3c091a2b84e104895" }, # duelist_token
-  { type = "ERC20", address = "0x618c0003a564459310d884846b0e1c31a306d0a87b9a45341d827fa93c3ac8d" }, # fame_coin
-  { type = "ERC20", address = "0x64ca8bc2b85d6a26dbba1a28e674fff50661c2af58e05251f8b9e326205a5a6" }, # lords
+  "erc721:0x24978c7aec6c5d928102bf7be54f318552768abd5bb27e9be5520e2a1177be5", # duel_token
+  "erc721:0x79813ddf6f99909b91ebbb15743337036c9ac9a82a4b7a3c091a2b84e104895", # duelist_token
+  "erc20:0x618c0003a564459310d884846b0e1c31a306d0a87b9a45341d827fa93c3ac8d", # fame_coin
+  "erc20:0x64ca8bc2b85d6a26dbba1a28e674fff50661c2af58e05251f8b9e326205a5a6", # lords
 ]

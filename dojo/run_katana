@@ -5,7 +5,7 @@ katana --version
 katana \
   --chain-id KATANA_LOCAL \
   --invoke-max-steps 10000000 $* \
-  --http.corsdomain "*" \
+  --http.cors_origins "*" \
   --dev \
   --dev.accounts 10 \
   --dev.no-fee \

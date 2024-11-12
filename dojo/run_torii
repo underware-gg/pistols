@@ -35,10 +35,10 @@ fi
 
 $TORII_PATH --version
 $TORII_PATH \
-  --allowed-origins "*" \
-  --rpc $RPC_URL \
-  --world $WORLD_ADDRESS \
   --config $TORII_CONFIG_PATH \
+  --http.cors_origins "*" \
+  # --rpc $RPC_URL \ # in cfg file
+  # --world $WORLD_ADDRESS \ # in cfg file
   # --start-block $START_BLOCK \
   # --relay-local-key-path ./0.0.0.0-key.pem \
   # --relay-cert-path ./0.0.0.0.pem \
