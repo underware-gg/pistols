@@ -41,8 +41,8 @@ export default function MainPage() {
   return (
     <AppPistols headerData={{ title: sceneTitle }} backgroundImage={null}>
       <Background className={null}>
-        <GameContainer isVisible={true} />
         { isInitialized &&  <QueryProvider>
+          <GameContainer isVisible={true} />
           <MainUI />
           {overlay}
           <Header />
