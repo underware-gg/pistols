@@ -42,7 +42,8 @@ echo ">>> Inspect migrations..."
 sozo -P $PROFILE inspect --world $WORLD_ADDRESS
 
 echo ">>> Do migrations..."
-sozo -P $PROFILE migrate -vvv --world $WORLD_ADDRESS
+# sozo -P $PROFILE migrate -vvv --world $WORLD_ADDRESS
+sozo -P $PROFILE migrate --world $WORLD_ADDRESS
 echo "👍"
 
 echo ">>> Inspect again..."
