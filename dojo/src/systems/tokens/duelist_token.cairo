@@ -50,7 +50,7 @@ pub trait IDuelistToken<TState> {
     fn delete_duelist(ref self: TState, duelist_id: u128);
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
-    fn transfer_fame_reward(ref self: TState, duel_id: u128) -> u128;
+    fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
 }
 
 #[starknet::interface]
@@ -73,7 +73,7 @@ pub trait IDuelistTokenPublic<TState> {
     fn delete_duelist(ref self: TState, duelist_id: u128);
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
-    fn transfer_fame_reward(ref self: TState, duel_id: u128) -> u128;
+    fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
 }
 
 #[dojo::contract]
@@ -156,15 +156,13 @@ pub mod duelist_token {
         const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
         const NOT_IMPLEMENTED: felt252          = 'DUELIST: Not implemented';
         const DUEL_INVALID_CALLER: felt252      = 'DUELIST: Invalid caller';
-        const DUEL_HAS_NO_WINNER: felt252       = 'DUELIST: Duel has no winner';
-        const REWARD_TRANSFERRED: felt252       = 'DUELIST: Reward transferred';
-        const DUELIST_IS_DEAD: felt252          = 'DUELIST: Duelist is dead!';
+        const DUELIST_A_IS_DEAD: felt252        = 'DUELIST: Duelist A is dead!';
+        const DUELIST_B_IS_DEAD: felt252        = 'DUELIST: Duelist B is dead!';
     }
 
     //*******************************
     fn TOKEN_NAME()   -> ByteArray {("Pistols at 10 Blocks Duelists")}
     fn TOKEN_SYMBOL() -> ByteArray {("DUELIST")}
-    fn BASE_URI()     -> ByteArray {("https://pistols.underware.gg")}
     //*******************************
 
     fn dojo_init(
@@ -177,7 +175,7 @@ pub mod duelist_token {
         self.erc721.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            if(base_uri != 0){base_uri.as_string()}else{BASE_URI()},
+            format!("https://{}",base_uri.as_string()),
         );
         let payment = Payment {
             key: get_contract_address().into(),
@@ -315,24 +313,40 @@ pub mod duelist_token {
         fn transfer_fame_reward(
             ref self: ContractState,
             duel_id: u128,
-        ) -> u128 {
+        ) -> (i128, i128) {
             let mut world = self.world_default();
             assert(world.is_game_contract(get_caller_address()), Errors::DUEL_INVALID_CALLER);
             
+            // calculate penalty of each duelist
             let mut store: Store = StoreTrait::new(world);
             let challenge: ChallengeValue = store.get_challenge_value(duel_id);
-            assert(challenge.winner != 0, Errors::DUEL_HAS_NO_WINNER);
-            assert(challenge.reward_amount == 0, Errors::REWARD_TRANSFERRED);
+            let due_amount_a: u128 = if (challenge.winner == 0 || challenge.winner == 2) {
+                let amount: u128 = self.calc_fame_reward(challenge.duelist_id_a);
+                assert(amount != 0, Errors::DUELIST_A_IS_DEAD);
+                (amount)
+            } else {0};
+            let due_amount_b: u128 = if (challenge.winner == 0 || challenge.winner == 1) {
+                let amount: u128 = self.calc_fame_reward(challenge.duelist_id_b);
+                assert(amount != 0, Errors::DUELIST_B_IS_DEAD);
+                (amount)
+            } else {0};
 
-            let (from, to): (u128, u128) = 
-                if (challenge.winner == 1) {(challenge.duelist_id_b, challenge.duelist_id_a)}
-                else {(challenge.duelist_id_a, challenge.duelist_id_b)};
-            let amount = self.calc_fame_reward(from);
-            assert(amount != 0, Errors::DUELIST_IS_DEAD);
-            
+            // transfer
             let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
-            fame_dispatcher.transfer_from_token(get_contract_address(), from, to, amount.into());
-            (amount)
+            if (due_amount_a != 0 && due_amount_b != 0) {
+                // draw, burn half of each
+                fame_dispatcher.burn_from_token(get_contract_address(), challenge.duelist_id_a, (due_amount_a / 2).into());
+                fame_dispatcher.burn_from_token(get_contract_address(), challenge.duelist_id_b, (due_amount_b / 2).into());
+                (due_amount_a.try_into().unwrap() / -2, due_amount_b.try_into().unwrap() / -2)
+            } else if (due_amount_a != 0) {
+                fame_dispatcher.transfer_from_token(get_contract_address(), challenge.duelist_id_a, challenge.duelist_id_b, due_amount_a.into());
+                (-due_amount_a.try_into().unwrap(), due_amount_a.try_into().unwrap())
+            } else if (due_amount_b != 0) {
+                fame_dispatcher.transfer_from_token(get_contract_address(), challenge.duelist_id_b, challenge.duelist_id_a, due_amount_b.into());
+                (due_amount_b.try_into().unwrap(), -due_amount_b.try_into().unwrap())
+            } else {
+                (0, 0) // should never happen!
+            }
         }
 
     }

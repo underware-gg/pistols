@@ -19,7 +19,7 @@ pub trait IDuelistToken<TState> {
     // Duelist
     fn is_alive(self: @TState, token_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
-    fn transfer_fame_reward(ref self: TState, duel_id: u128) -> u128;
+    fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
 }
 
 #[dojo::contract]
@@ -79,8 +79,8 @@ pub mod duelist_token {
         fn calc_fame_reward(self: @ContractState, duelist_id: u128) -> u128 {
             (FAME::MIN_REWARD_AMOUNT.low)
         }
-        fn transfer_fame_reward(ref self: ContractState, duel_id: u128) -> u128 {
-            (FAME::MIN_REWARD_AMOUNT.low)
+        fn transfer_fame_reward(ref self: ContractState, duel_id: u128) -> (i128, i128) {
+            (0, 0)
         }
     }
 

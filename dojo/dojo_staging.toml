@@ -23,7 +23,7 @@ chain_id = "WP_PISTOLS_STAGING"
 rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
 account_address = "0xcf5a59fce535e4fa443f59e025d81d24e8bd2bf375f6665c5aab22af1a1e27"
 private_key = "0x49714ee0edbcb3fd3d1f1214e5978ada40d62ece7b84f6067ed2c7b28c972bf"
-world_address = "0x8ea585afa76d3a936ef5746c6176b70100df25efc34e45f8f80944bb6550"
+world_address = "0x1adaf57de23b6d6d43eeb42b6ab6730a022021382fef49eff1f532c21556a5a"
 
 #--------------------------
 # namespaces
@@ -64,22 +64,19 @@ default = "pistols"
 # init_calldata
 #
 [init_call_args]
-"pistols-game" = []
-"pistols-bank" = []
-"pistols-rng" = []
 "pistols-admin" = [
   "0x0", # treasury_address (or initializer)
   "0x0", # lords_address (use lords_mock)
   "0x0", # vrf_address (use vrf_mock)
 ]
 "pistols-duel_token" = [
-  "0", # "sstr:https://pistols.underware.gg", # base_uri
+  "sstr:pistols.underware.gg", # base_uri
   "0x0", # minter_address
   "0x0", # renderer_address
   "0", # fee_amount
 ]
 "pistols-duelist_token" = [
-  "0", # "sstr:https://pistols.underware.gg", # base_uri
+  "sstr:pistols.underware.gg", # base_uri
   "0x0", # minter_address
   "0x0", # renderer_address
   "100000000000000000000", # fee_amount: 100 LORDS

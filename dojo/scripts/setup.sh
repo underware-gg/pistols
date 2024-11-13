@@ -37,7 +37,8 @@ get_contract_address () {
 export GAME_SLUG="pistols"
 export PROJECT_NAME=$(toml get $DOJO_PROFILE_FILE --raw world.name)
 export WORLD_ADDRESS=$(get_profile_env "world_address")
-export TORII_CONFIG_PATH="./torii.toml"
+export LORDS_ADDRESS=$(get_profile_env "lords_address")
+export TORII_CONFIG_PATH="./torii_$PROFILE.toml"
 # use $DOJO_ACCOUNT_ADDRESS else read from profile
 export ACCOUNT_ADDRESS=${DOJO_ACCOUNT_ADDRESS:-$(get_profile_env "account_address")}
 # use $STARKNET_RPC_URL else read from profile
@@ -71,6 +72,7 @@ echo "PC Url     : $RPC_URL"
 echo "Chain Id   : $CHAIN_ID"
 echo "World      : $WORLD_ADDRESS"
 echo "Account    : $ACCOUNT_ADDRESS"
+echo "LORDS      : $LORDS_ADDRESS"
 # echo "::game     : $GAME_ADDRESS"
 # echo "::admin    : $ADMIN_ADDRESS"
 # echo "::duels    : $DUEL_TOKEN_ADDRESS"

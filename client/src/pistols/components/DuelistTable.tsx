@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { ButtonGroup, Grid, Input, Table } from 'semantic-ui-react'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useQueryContext, DuelistColumn, SortDirection } from '@/pistols/hooks/QueryContext'
+import { useGetAllDuelistsQuery } from '@/pistols/hooks/useSdkQueries'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useScoreboard } from '@/pistols/hooks/useScore'
@@ -23,6 +24,9 @@ export function DuelistTable() {
     dispatchSelectDuelistId, dispatchDuelistsAnon
   } = usePistolsContext()
   const anonOpener = useOpener()
+
+  // TODO: use this...
+  useGetAllDuelistsQuery()
 
   // query
   const {

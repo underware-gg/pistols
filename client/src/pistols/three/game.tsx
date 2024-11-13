@@ -546,7 +546,8 @@ function loadGltf(scene: THREE.Scene) {
 
         if (child.name.includes(glTFNames.cliffs)) {
           const texture = _textures[TextureName.cliffs]
-          const textureAspectRatio = texture.image.width / texture.image.height
+          // const textureAspectRatio = texture.image.width / texture.image.height
+          const textureAspectRatio = 1.777
           
           const planeGeometry = new THREE.PlaneGeometry(textureAspectRatio, 1)
           const planeMaterial = new THREE.MeshBasicMaterial({ map: texture, alphaTest: 0.5, transparent: true, side: THREE.DoubleSide })

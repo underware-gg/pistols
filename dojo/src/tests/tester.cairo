@@ -7,7 +7,10 @@ mod tester {
 
     use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcher, IWorldDispatcherTrait};
     use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
-    use dojo_cairo_test::{spawn_test_world, NamespaceDef, TestResource, ContractDefTrait};
+    use dojo_cairo_test::{
+        spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
+        WorldStorageTestTrait,
+    };
 
     pub use pistols::systems::{
         bank::{bank, IBankDispatcher, IBankDispatcherTrait},
@@ -27,8 +30,10 @@ mod tester {
     };
     use pistols::models::{
         challenge::{
-            m_Challenge, Challenge, ChallengeValue, DuelistState, DuelistStateTrait,
+            m_Challenge, Challenge, ChallengeValue,
+            m_ChallengeFameBalance, ChallengeFameBalance, ChallengeFameBalanceValue,
             m_Round, Round, RoundValue,
+            DuelistState, DuelistStateTrait,
         },
         duelist::{
             m_Duelist, Duelist, DuelistTrait, DuelistValue,
@@ -52,8 +57,8 @@ mod tester {
         table::{TABLES},
     };
     use pistols::tests::token::mock_duelist::{
-        m_MockDuelistOwners,
         duelist_token as mock_duelist,
+        m_MockDuelistOwners,
     };
     use pistols::tests::mock_rng::{
         rng as mock_rng,
@@ -162,54 +167,60 @@ mod tester {
 // '---- 0'.print();
         let mut resources: Array<TestResource> = array![
             // pistols models
-            TestResource::Model(m_Challenge::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_CoinConfig::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Config::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Duelist::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Pact::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Payment::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Round::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_Scoreboard::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_TableConfig::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH.try_into().unwrap()),
-            TestResource::Model(m_TokenConfig::TEST_CLASS_HASH.try_into().unwrap()),
+            TestResource::Model(m_Challenge::TEST_CLASS_HASH),
+            TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
+            TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
+            TestResource::Model(m_Config::TEST_CLASS_HASH),
+            TestResource::Model(m_Duelist::TEST_CLASS_HASH),
+            TestResource::Model(m_Pact::TEST_CLASS_HASH),
+            TestResource::Model(m_Payment::TEST_CLASS_HASH),
+            TestResource::Model(m_Round::TEST_CLASS_HASH),
+            TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
+            TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH),
+            TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
+            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
+            TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
             // events
-            // TestResource::Event(actions::e_Moved::TEST_CLASS_HASH.try_into().unwrap()),
+            // TestResource::Event(actions::e_Moved::TEST_CLASS_HASH),
         ];
-
         if (deploy_mock_rng) {
-            resources.append(TestResource::Model(m_SaltValue::TEST_CLASS_HASH.try_into().unwrap()));
+            resources.append(TestResource::Model(m_SaltValue::TEST_CLASS_HASH));
         }
         if (!deploy_duelist && deploy_game) {
-            resources.append(TestResource::Model(m_MockDuelistOwners::TEST_CLASS_HASH.try_into().unwrap()));
+            resources.append(TestResource::Model(m_MockDuelistOwners::TEST_CLASS_HASH));
         }
 
+        let mut contract_defs: Array<ContractDef> = array![];
+
         if (deploy_game) {
-            resources.append(TestResource::Contract(
-                ContractDefTrait::new(game::TEST_CLASS_HASH, "game")
+            resources.append(TestResource::Contract(game::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"game")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            ));
-            resources.append(TestResource::Contract(
-                ContractDefTrait::new(vrf_mock::TEST_CLASS_HASH, "vrf_mock")
-            ));
+            );
+            resources.append(TestResource::Contract(vrf_mock::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"vrf_mock")
+            );
         }
 
         if (deploy_admin) {
-            resources.append(TestResource::Contract(
-                ContractDefTrait::new(admin::TEST_CLASS_HASH, "admin")
+            resources.append(TestResource::Contract(admin::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"admin")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
                     .with_init_calldata([
                         TREASURY().into(), // treasury_address
                         0, // lords_address
                         0, // vrf_address
                     ].span())
-            ));
+            );
         }
 
         if (deploy_duel) {
-            resources.append(TestResource::Contract(
-                ContractDefTrait::new(duel_token::TEST_CLASS_HASH, "duel_token")
+            resources.append(TestResource::Contract(duel_token::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"duel_token")
                     .with_writer_of([
                         // same as config
                         selector_from_tag!("pistols-TokenConfig"),
@@ -220,18 +231,19 @@ mod tester {
                         selector_from_tag!("pistols-Scoreboard"),
                     ].span())
                     .with_init_calldata([
-                        'https://pistols.underware.gg',
+                        'pistols.underware.gg',
                         0, // minter_address
                         0, // renderer_address
                         0, // fee_amount
                     ].span())
-            ));
+            );
         }
 
         // '---- 3'.print();
         if (deploy_duelist) {
-            resources.append(TestResource::Contract(
-                ContractDefTrait::new(duelist_token::TEST_CLASS_HASH, "duelist_token")
+            resources.append(TestResource::Contract(duelist_token::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"duelist_token")
                     .with_writer_of([
                         // same as config
                         selector_from_tag!("pistols-TokenConfig"),
@@ -239,25 +251,27 @@ mod tester {
                         selector_from_tag!("pistols-Duelist"),
                     ].span())
                     .with_init_calldata([
-                        'https://pistols.underware.gg',
+                        'pistols.underware.gg',
                         0, // minter_address
                         0, // renderer_address
                         100_000_000_000_000_000_000, // fee_amount: 100 Lords
                     ].span())
-            ));
+            );
         }
         else if (deploy_game) {
-            resources.append(TestResource::Contract(
-                ContractDefTrait::new(mock_duelist::TEST_CLASS_HASH, "duelist_token")
+            resources.append(TestResource::Contract(mock_duelist::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"duelist_token")
                     .with_writer_of([
                         selector_from_tag!("pistols-MockDuelistOwners"),
                     ].span())
-            ));
+            );
         }
 
         if (deploy_lords) {
-            resources.append(TestResource::Contract(
-                ContractDefTrait::new(lords_mock::TEST_CLASS_HASH, "lords_mock")
+            resources.append(TestResource::Contract(lords_mock::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"lords_mock")
                     .with_writer_of([
                         selector_from_tag!("pistols-CoinConfig"),
                     ].span())
@@ -266,59 +280,62 @@ mod tester {
                         0, // minter
                         10_000_000_000_000_000_000_000, // faucet_amount: 10,000 Lords
                     ].span())
-            ));
+            );
         }
 
         if (deploy_bank) {
-            resources.append(TestResource::Contract(
-                ContractDefTrait::new(bank::TEST_CLASS_HASH, "bank")
+            resources.append(TestResource::Contract(bank::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"bank")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            ));
+            );
         }
 
         if (deploy_fame) {
-            resources.append(TestResource::Contract(
-                ContractDefTrait::new(fame_coin::TEST_CLASS_HASH, "fame_coin")
+            resources.append(TestResource::Contract(fame_coin::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"fame_coin")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            ));
+            );
         }
 
         if (deploy_mock_rng) {
-            resources.append(TestResource::Contract(
-                ContractDefTrait::new(mock_rng::TEST_CLASS_HASH, "rng")
+            resources.append(TestResource::Contract(mock_rng::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"rng")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            ));
+            );
         } else {
-            resources.append(TestResource::Contract(
-                ContractDefTrait::new(rng::TEST_CLASS_HASH, "rng")
+            resources.append(TestResource::Contract(rng::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"rng")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            ));
+            );
         }
 
-        // setup testing
-        testing::set_block_number(1);
-        testing::set_block_timestamp(INITIAL_TIMESTAMP);
-
-        let ndef = NamespaceDef {
+        let namespace_def = NamespaceDef {
             namespace: "pistols",
             resources: resources.span(),
         };
 
 // '---- 1'.print();
-        let mut world: WorldStorage = spawn_test_world([ndef].span());
+        let mut world: WorldStorage = spawn_test_world([namespace_def].span());
 // '---- 2'.print();
 
-        // initializers
+        world.sync_perms_and_inits(contract_defs.span());
 // '---- 3'.print();
+
+        // initializers
+// '---- 4'.print();
         if (deploy_admin) {
             world.dispatcher.grant_owner(selector_from_tag!("pistols-admin"), OWNER());
         }
-// '---- 4'.print();
+// '---- 5'.print();
         if (deploy_lords) {
             let lords = world.lords_mock_dispatcher();
             execute_lords_faucet(@lords, OWNER());
             execute_lords_faucet(@lords, OTHER());
-// '---- 5'.print();
+// '---- 6'.print();
             if (approve) {
                 let spender = world.bank_address();
                 execute_lords_approve(@lords, OWNER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
@@ -326,8 +343,11 @@ mod tester {
                 execute_lords_approve(@lords, BUMMER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
             }
         }
-// '---- 6'.print();
+// '---- 7'.print();
 
+        // setup testing
+        testing::set_block_number(1);
+        testing::set_block_timestamp(INITIAL_TIMESTAMP);
         impersonate(OWNER());
 
 // '---- READY!'.print();
@@ -542,6 +562,10 @@ mod tester {
     }
     #[inline(always)]
     fn get_ChallengeValue(world: WorldStorage, duel_id: u128) -> ChallengeValue {
+        (world.read_value(duel_id))
+    }
+    #[inline(always)]
+    fn get_ChallengeFameBalanceValue(world: WorldStorage, duel_id: u128) -> ChallengeFameBalanceValue {
         (world.read_value(duel_id))
     }
     #[inline(always)]

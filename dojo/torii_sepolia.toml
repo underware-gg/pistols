@@ -1,0 +1,12 @@
+# torii config for profile [sepolia]
+world_address = "0x338f3409825a4a9e0f93f5e81b266db4523fe9207e1f29fed44787d44fe4f9d"
+rpc = "https://api.cartridge.gg/rpc/starknet-sepolia"
+[indexing]
+index_pending = true
+index_transactions = false
+contracts = [
+  "erc721:0x157c46d1d5e49f35c794b978e9759b06434985502c3828e05ace5a15f6e5b8b", # duel_token
+  "erc721:0x4d637b5d010076db8ea802c684586fe2b29716f0ecfa384015ce5031e48d3eb", # duelist_token
+  "erc20:0x35fdc07122fcc5874430caf38a74eeef446b539997cdeca4787c9e7306c5ce6", # fame_coin
+  "erc20:0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210", # lords
+]

@@ -118,10 +118,11 @@ fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> Due
     while (step_number <= 10) {
         let pace: PacesCard = step_number.into();
         round.final_blow = pace.variant_name();
-        // println!("Pace [{}] A:{} B:{}", step_number, self.moves_a.card_fire.as_felt(), self.moves_b.card_fire.as_felt());
+        // println!("Pace [{}] A:{} B:{}, shuffle:{}", step_number, round.moves_a.card_1, round.moves_b.card_1, shuffle.seed);
 
         // draw env card
         let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref shuffle);
+        // println!("Env card/dice {}:{}", card_env, dice_env);
 
         // apply env card points to both duelists
         card_env.apply_points(ref specials_a, ref state_a, ref state_b);

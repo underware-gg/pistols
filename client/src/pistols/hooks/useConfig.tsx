@@ -3,15 +3,19 @@ import { BigNumberish } from 'starknet'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { bigintToEntity } from '@/lib/utils/types'
+import { useGetConfigQuery } from '@/pistols/hooks/useSdkQueries'
+
+
 
 export const useConfig = () => {
-  const { Config } = useDojoComponents()
-  const entityId = useMemo(() => bigintToEntity(1n), [])
-  const config = useComponentValue(Config, entityId)
+  const { config } = useGetConfigQuery()
+  const isPaused = useMemo(() => config?.is_paused ?? false, [config])
+  const treasuryAddress = useMemo(() => config ? BigInt(config.treasury_address) : null, [config])
+  const lordsAddress = useMemo(() => config ? BigInt(config.lords_address) : null, [config])
   return {
-    paused: config.is_paused ?? null,
-    treasuryAddress: config.treasury_address ?? null,
-    lordsAddress: config.lords_address ?? null,
+    isPaused,
+    treasuryAddress,
+    lordsAddress,
   }
 }
 
