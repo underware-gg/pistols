@@ -143,8 +143,8 @@ const pistolsSlotConfig: DojoChainConfig = {
   predeployedAccounts: [
     {
       name: 'Predeployed',
-      address: '0xd9ab4d256e0d69e8cc4bcd584b91c11e2194003905112830d58af262b50fe',
-      privateKey: '0x15a4a8a84df92998b5746a448bc889dd626b7cb593618efd6d12287d1eca239',
+      address: '0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7',
+      privateKey: '0x1c9053c053edf324aec366a34c6901b1095b07af69495bffec7d7fe21effb1b',
       active: true,
     }
   ],

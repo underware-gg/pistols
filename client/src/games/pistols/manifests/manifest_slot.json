@@ -3019,7 +3019,7 @@
         }
       ],
       "init_calldata": [
-        "sstr:pistols.underware.gg",
+        "sstr:pistols.stage.underware.gg",
         "0x0",
         "0x0",
         "0"
@@ -4120,7 +4120,7 @@
         }
       ],
       "init_calldata": [
-        "sstr:pistols.underware.gg",
+        "sstr:pistols.stage.underware.gg",
         "0x0",
         "0x0",
         "100000000000000000000"
@@ -4813,8 +4813,8 @@
       ]
     },
     {
-      "address": "0x571b66fcd24490c11190a6d9cffc88c79c41bb2af4ddbd6e053a187da2f594e",
-      "class_hash": "0x33f0b364f04880aa914ef978dc2ed47ee6a05f7ee8754fdc0db611156b17f86",
+      "address": "0x5d8e02e621da06753ba5bc927f09b752113c5490f34f3e9477aa4ef68699bee",
+      "class_hash": "0x24d7d5cbd9134c93361d6c3cced2d634d5db94ff0f9a01884896d04400e0dbf",
       "abi": [
         {
           "type": "impl",
