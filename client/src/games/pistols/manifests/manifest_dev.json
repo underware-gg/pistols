@@ -1904,8 +1904,8 @@
       ]
     },
     {
-      "address": "0x24978c7aec6c5d928102bf7be54f318552768abd5bb27e9be5520e2a1177be5",
-      "class_hash": "0x7ce9fa7c0b53393951467e469c8b9e4db77b5d9624cdb2da97bd2f1212dcd27",
+      "address": "0x506af31a4d189244bcbca70ce13ddfc2d18ed324879a88e48e025255837d4f9",
+      "class_hash": "0x4722382c0b340c06426cc125f6f687d2cac32820dfbc4d8b2ce479422fa7af2",
       "abi": [
         {
           "type": "impl",
@@ -3019,7 +3019,7 @@
         }
       ],
       "init_calldata": [
-        "sstr:https://pistols.underware.gg",
+        "sstr:pistols.stage.underware.gg",
         "0x0",
         "0x0",
         "0"
@@ -3043,8 +3043,8 @@
       ]
     },
     {
-      "address": "0x79813ddf6f99909b91ebbb15743337036c9ac9a82a4b7a3c091a2b84e104895",
-      "class_hash": "0x9c1fb22d1b281025f8a0d780f42e3c7101801ccb0d8b80e4c75ce6b9812bf2",
+      "address": "0x34d33b4834ae27adfb36245dbadc488fb99da488bb6efdaaf70daaaa7f2e774",
+      "class_hash": "0x5e58ab978a0997ad9c9152d6d3ff25993859776c0dd1b8d0a8dc271fd2bc566",
       "abi": [
         {
           "type": "impl",
@@ -4120,7 +4120,7 @@
         }
       ],
       "init_calldata": [
-        "sstr:https://pistols.underware.gg",
+        "sstr:pistols.stage.underware.gg",
         "0x0",
         "0x0",
         "100000000000000000000"

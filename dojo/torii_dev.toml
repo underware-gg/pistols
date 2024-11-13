@@ -5,8 +5,8 @@ rpc = "http://localhost:5050"
 index_pending = true
 index_transactions = false
 contracts = [
-  "erc721:0x24978c7aec6c5d928102bf7be54f318552768abd5bb27e9be5520e2a1177be5", # duel_token
-  "erc721:0x79813ddf6f99909b91ebbb15743337036c9ac9a82a4b7a3c091a2b84e104895", # duelist_token
+  "erc721:0x506af31a4d189244bcbca70ce13ddfc2d18ed324879a88e48e025255837d4f9", # duel_token
+  "erc721:0x34d33b4834ae27adfb36245dbadc488fb99da488bb6efdaaf70daaaa7f2e774", # duelist_token
   "erc20:0x618c0003a564459310d884846b0e1c31a306d0a87b9a45341d827fa93c3ac8d", # fame_coin
   "erc20:0x64ca8bc2b85d6a26dbba1a28e674fff50661c2af58e05251f8b9e326205a5a6", # lords
 ]
