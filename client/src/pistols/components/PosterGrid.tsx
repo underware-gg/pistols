@@ -7,7 +7,7 @@ export interface PosterGridHandle {
   setTransformX: (x: number) => void
 }
 
-export const PosterGrid = forwardRef<PosterGridHandle, { small: boolean }>(({ small }, ref) => {
+export const PosterGrid = forwardRef<PosterGridHandle, { small?: boolean }>(({ small }, ref) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
 
   const [duelPosters, setDuelPosters] = useState<JSX.Element[]>([])
