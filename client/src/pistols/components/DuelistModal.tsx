@@ -2,10 +2,11 @@ import React, { useMemo } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
 import { useSettings } from '../hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
+import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
+import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
+import { useGetDuelistByIdQuery } from '@/pistols/hooks/useSdkQueries'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePact } from '@/pistols/hooks/usePact'
-import { useDuelistOwner } from '@/pistols/hooks/useTokenDuelist'
-import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTableSelectedDuelist } from '@/pistols/components/ChallengeTable'
@@ -16,20 +17,27 @@ import { IconClick } from '@/lib/ui/Icons'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function DuelistModal() {
+export default function DuelistModal({
+  duelButton = false,
+}: {
+  duelButton?: boolean
+}) {
   const { tableId, duelistId, isAnon, dispatchDuelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
 
   const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
-  const { owner } = useDuelistOwner(selectedDuelistId)
+  const { owner } = useOwnerOfDuelist(selectedDuelistId)
   const isOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
   const { isYou } = useIsYou(selectedDuelistId)
   const isMyDuelist = useIsMyDuelist(selectedDuelistId)
 
   const _close = () => { dispatchSelectDuelistId(0n) }
 
-  const { profilePic } = useDuelist(selectedDuelistId)
+  const { profilePic, duelistIdDisplay } = useDuelist(selectedDuelistId)
   const { hasPact, pactDuelId } = usePact(tableId, duelistId, selectedDuelistId)
+
+  // TODO: replace useDuelist with useGetDuelistByIdQuery
+  const { duelist } = useGetDuelistByIdQuery(selectedDuelistId)
 
   const _switch = () => {
     if (isYou) {
@@ -37,6 +45,11 @@ export default function DuelistModal() {
     } else if (isMyDuelist) {
       dispatchDuelistId(selectedDuelistId)
     }
+  }
+
+  const _duel = () => {
+    dispatchSetScene(SceneName.YourDuels)
+    _close()
   }
 
   return (
@@ -51,7 +64,7 @@ export default function DuelistModal() {
         <Grid>
           <Row columns={'equal'}>
             <Col textAlign='left'>
-              Duelist
+              {duelistIdDisplay}
             </Col>
             <Col textAlign='center'>
               {/* {(isYou || isMyDuelist) &&
@@ -78,7 +91,7 @@ export default function DuelistModal() {
         <ProfilePic profilePic={profilePic} duelistId={selectedDuelistId} />
         <Modal.Description className='FillParent'>
           <div className='DuelistModalDescription'>
-            <ProfileDescription duelistId={selectedDuelistId} tableId={tableId} displayBalance displayStats />
+            <ProfileDescription duelistId={selectedDuelistId} displayFameBalance displayStats />
             <div className='Spacer10' />
             <div className='TableInModal'>
               <ChallengeTableSelectedDuelist compact />
@@ -90,12 +103,17 @@ export default function DuelistModal() {
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Close' onClick={() => _close()} />
+              <ActionButton large fill label='Close' onClick={() => _close()} />
             </Col>
             {!isYou &&
               <Col>
-                {hasPact && <ActionButton fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />}
-                {!hasPact && <ActionButton fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(selectedDuelistId)} />}
+                {hasPact && <ActionButton large fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />}
+                {!hasPact && <ActionButton large fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(selectedDuelistId)} />}
+              </Col>
+            }
+            {duelButton &&
+              <Col>
+                <ActionButton large fill important label='Duel!' onClick={() => _duel()} />
               </Col>
             }
           </Row>

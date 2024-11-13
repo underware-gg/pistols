@@ -1,5 +1,4 @@
 import { ReactNode, createContext, useContext } from 'react'
-import { usePredeployedWindowObject } from '@dojoengine/create-burner'
 import { SetupResult } from '@/lib/dojo/setup/useSetup'
 
 interface DojoContextType {
@@ -18,11 +17,6 @@ export const DojoProvider = ({
 }) => {
   const currentValue = useContext(DojoContext);
   if (currentValue) throw new Error('DojoProvider can only be used once');
-
-  const { predeployedManager, dojoProvider } = value ?? {}
-
-  // create injected connectors asynchronously
-  usePredeployedWindowObject(predeployedManager);
 
   return (
     <DojoContext.Provider
@@ -54,6 +48,13 @@ export const useDojoStatus = () => {
   return {
     isInitialized,
     ...status,
+  }
+}
+
+export const useDojoSetup = () => {
+  const { setup } = useDojo()
+  return {
+    ...setup,
   }
 }
 

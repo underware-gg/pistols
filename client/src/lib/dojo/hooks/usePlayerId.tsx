@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { DojoPredeployedStarknetWindowObject } from '@dojoengine/create-burner'
-import { useAccount } from '@starknet-react/core'
 import { stark } from 'starknet'
 
 /** Create local player id, only when using the Dojo Predeployed connector */

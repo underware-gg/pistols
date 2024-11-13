@@ -1,10 +1,16 @@
 #!/bin/bash
 set -e
 #export RUST_LOG=info
+katana --version
 katana \
-  --disable-fee \
   --chain-id KATANA_LOCAL \
   --invoke-max-steps 10000000 $* \
-  --allowed-origins "*" \
-  --accounts 10 \
-| grep -v -e starknet_call -e starknet_blockHashAndNumber -e starknet_getBlockWithTxs
+  --http.cors_origins "*" \
+  --dev \
+  --dev.accounts 10 \
+  --dev.no-fee \
+  | grep -v \
+  -e starknet_call \
+  -e starknet_blockHashAndNumber \
+  -e starknet_getBlockWithTxs \
+  -e starknet_getBlockWithReceipts

@@ -1,21 +1,16 @@
 // use debug::PrintTrait;
 use starknet::{ContractAddress};
-use pistols::utils::hash::{hash_u128, hash_u128_to_u256, felt_to_u128};
 
-// https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/info.cairo
-use starknet::get_block_info;
+use pistols::utils::hash::{hash_values, make_block_hash, felt_to_u128};
 
-fn make_seed(address: ContractAddress, uuid: usize) -> u128 {
-    hash_u128(felt_to_u128(address.into()) ^ uuid.into(), _make_block_hash())
+fn make_seed(caller: ContractAddress, uuid: usize) -> u128 {
+    let hash: felt252 = hash_values([
+        make_block_hash(),
+        caller.into(),
+        uuid.into(),
+    ].span());
+    (felt_to_u128(hash))
 }
-
-fn _make_block_hash() -> u128 {
-    // let block_number = get_block_number();
-    // let block_timestamp = get_block_timestamp();
-    let block_info = get_block_info().unbox();
-    hash_u128(block_info.block_number.into(), block_info.block_timestamp.into())
-}
-
 
 
 //----------------------------------------
@@ -24,16 +19,7 @@ fn _make_block_hash() -> u128 {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use pistols::libs::seeder::{
-        _make_block_hash,
-        make_seed,
-    };
-
-    #[test]
-    fn test__make_block_hash() {
-        let h = _make_block_hash();
-        assert(h != 0, 'block hash');
-    }
+    use super::{make_seed};
 
     #[test]
     fn test_make_seed() {

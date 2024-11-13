@@ -1,11 +1,11 @@
 import React from 'react'
 import { Grid } from 'semantic-ui-react'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { LordsBalance, LockedWagerBalance } from '@/pistols/components/account/LordsBalance'
+import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
-import { useDuelistOwner } from '@/pistols/hooks/useTokenDuelist'
+import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
 import { useValidateWalletAddress } from '@/lib/utils/hooks/useValidateWalletAddress'
 
 const Row = Grid.Row
@@ -41,31 +41,28 @@ export function ProfileBadge({
 export function ProfileDescription({
   duelistId,
   address,
-  tableId,
   displayNameSmall = false,
   displayStats = false,
   displayOwnerAddress = false,
   displayOwnerAddressSmall = false,
-  displayBalance = false,
+  displayFameBalance = false,
   displayHonor = true,
 }: {
   duelistId: BigNumberish
   address?: BigNumberish
-  tableId?: BigNumberish
   displayNameSmall?: boolean
   displayStats?: boolean
   displayOwnerAddress?: boolean
   displayOwnerAddressSmall?: boolean
-  displayBalance?: boolean
+  displayFameBalance?: boolean
   displayHonor?: boolean
 }) {
   const { score: {
     total_wins, total_losses, total_draws, total_duels, honourAndTotal,
-    isVillainous, isTrickster, isHonourable, levelDisplay, levelAndTotal,
   } } = useDuelist(duelistId)
 
   // if its a duelist...
-  const { owner } = useDuelistOwner(duelistId)
+  const { owner } = useOwnerOfDuelist(duelistId)
   
   // if its a wallet...
   const { isStarknetAddress } = useValidateWalletAddress(address)
@@ -79,22 +76,14 @@ export function ProfileDescription({
           {displayNameSmall ? 
             (<h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>)
             :
-            (<h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>)
+            (<h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h1>)
           }
           
           {displayOwnerAddress && <AddressShort address={owner} small={displayOwnerAddressSmall}/>}
           {displayHonor && <h3 className='Important NoMargin TitleCase'>
-            Honour: <span className='Wager'>{honourAndTotal}</span>
-            {isVillainous && <> {EMOJI.VILLAIN} <span className='Wager'>{levelDisplay}</span></>}
-            {isTrickster && <> {EMOJI.TRICKSTER} <span className='Wager'>{levelDisplay}</span></>}
-            {isHonourable && <> {EMOJI.LORD} <span className='Wager'>{levelDisplay}</span></>}
+            Honour: <span className='Coin'>{honourAndTotal}</span>
           </h3>}
-          {displayBalance &&
-            <h5>
-              <LordsBalance address={_owner} big />
-              {tableId && <LockedWagerBalance tableId={tableId} address={_owner} clean />}
-            </h5>
-          }
+          {displayFameBalance && <h5><FameBalanceDuelist duelistId={duelistId} big /></h5>}
         </Col>
 
         {displayStats && total_duels > 0 &&

@@ -10,7 +10,7 @@ export function TextLink({
   children: string,
 }) {
   const classNames = useMemo(() => {
-    let classNames = ['Unselectable']
+    let classNames = ['NoSelection']
     if (!disabled) {
       classNames.push('Anchor')
       classNames.push('Important')

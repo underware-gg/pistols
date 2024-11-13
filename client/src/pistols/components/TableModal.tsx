@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Grid, Modal, Dropdown } from 'semantic-ui-react'
+import { Grid, Modal, Dropdown, ButtonGroup, Button } from 'semantic-ui-react'
 import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
@@ -23,7 +23,7 @@ export default function TableModal({
   opener: Opener
 }) {
   const { tableId, dispatchTableId } = useSettings()
-  const { dispatchSetScene } = usePistolsScene()
+  const { currentScene, dispatchSetScene } = usePistolsScene()
   const [selectedTableId, setSelectedTableId] = useState('')
   const { tableIsOpen } = useTable(selectedTableId)
 
@@ -49,13 +49,13 @@ export default function TableModal({
 
   const _joinTable = () => {
     dispatchTableId(selectedTableId)
-    dispatchSetScene(SceneName.Tavern, [selectedTableId])
+    dispatchSetScene(currentScene, [selectedTableId])
     opener.close()
   }
 
   return (
     <Modal
-      size='tiny'
+      size='small'
       // dimmer='inverted'
       onClose={() => opener.close()}
       open={mounted && opener.isOpen}
@@ -73,21 +73,33 @@ export default function TableModal({
           </Row>
         </Grid>
       </Modal.Header>
+      
       <Modal.Content>
-        <Modal.Description className='FillParent TitleCase'>
-          <TableSwitcher tableId={selectedTableId} setSelectedTableId={setSelectedTableId} />
-          <Divider hidden />
-          <TableDescription tableId={selectedTableId} />
+        <Modal.Description className='FillParent TitleCase ModalText'>
+          <Grid>
+            <Row divided>
+              <Col width={5} className='BgDarkest'>
+                <TableList selectedTableId={selectedTableId} setSelectedTableId={setSelectedTableId} />
+              </Col>
+              <Col width={1}>
+                <Divider vertical />
+              </Col>
+              <Col width={10}>
+                <TableDescription tableId={selectedTableId} />
+              </Col>
+            </Row>
+          </Grid>
         </Modal.Description>
       </Modal.Content>
+      
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Close' onClick={() => opener.close()} />
+              <ActionButton large fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              <ActionButton fill important label='Join Table' disabled={!tableIsOpen || !selectedTableId} onClick={() => _joinTable()} />
+              <ActionButton large fill important label='Join Table' disabled={!tableIsOpen || !selectedTableId} onClick={() => _joinTable()} />
             </Col>
           </Row>
         </Grid>
@@ -100,59 +112,45 @@ export default function TableModal({
 function TableDescription({
   tableId,
 }) {
-  const { wagerContractAddress,
+  const {
     description,
-    wagerMin,
     feeMin,
     feePct,
     tableIsOpen,
     tableType,
   } = useTable(tableId)
-  const { tokenName, tokenSymbol } = useERC20TokenName(wagerContractAddress)
   const { activeDuelistIdsCount } = useActiveDuelistIds(tableId)
   const { liveDuelsCount, pastDuelsCount } = useTableTotals(tableId)
 
   return (
     <Grid className='H5'>
 
+      <Row columns={'equal'} className='NoPadding' textAlign='center'>
+        <Col>
+          <h3 className='Important'>{description}</h3>
+        </Col>
+      </Row>
+
+      <RowDivider />
+
       <Row className='NoPadding' verticalAlign='middle'>
         <Col width={8} textAlign='right'>
           Game Type:
         </Col>
-        <Col width={8} className='Wager PaddedLeft Bold'>
+        <Col width={8} className='Coin PaddedLeft Bold'>
           {tableType}
         </Col>
       </Row>
 
       <Row className='NoPadding' verticalAlign='middle'>
         <Col width={8} textAlign='right'>
-          Wager Coin:
-        </Col>
-        <Col width={8} className='Bold'>
-          {/* {tokenName && <Balance tableId={tableId}>{tokenName}</Balance>} */}
-          {/* {!tokenName && <>N/A</>} */}
-          {tokenName ?? <>N/A</>}
-        </Col>
-      </Row>
-
-      <Row className='NoPadding' verticalAlign='middle'>
-        <Col width={8} textAlign='right'>
-          Minimun Wager:
-        </Col>
-        <Col width={8} className='Bold'>
-          <Balance tableId={tableId} wei={wagerMin} />
-        </Col>
-      </Row>
-
-      <Row className='NoPadding' verticalAlign='middle'>
-        <Col width={8} textAlign='right'>
-          Minimun Fee:
+          Fee:
         </Col>
         <Col width={8} className='Bold'>
           {(Boolean(feePct) && !Boolean(feeMin)) ?
-            <span className='Wager'>{feePct}%</span>
+            <span className='Coin'>{feePct}%</span>
             : <>
-              <Balance tableId={tableId} wei={feeMin ?? 0} />
+              <Balance lords wei={feeMin ?? 0} />
               {Boolean(feePct) && <> (or {feePct}%)</>}
             </>
           }
@@ -163,7 +161,7 @@ function TableDescription({
         <Col width={8} textAlign='right'>
           Active Duelists:
         </Col>
-        <Col width={8} className='Wager PaddedLeft Bold'>
+        <Col width={8} className='Coin PaddedLeft Bold'>
           {activeDuelistIdsCount}
         </Col>
       </Row>
@@ -172,7 +170,7 @@ function TableDescription({
         <Col width={8} textAlign='right'>
           Live Duels:
         </Col>
-        <Col width={8} className='Wager PaddedLeft Bold'>
+        <Col width={8} className='Coin PaddedLeft Bold'>
           {liveDuelsCount}
         </Col>
       </Row>
@@ -181,14 +179,14 @@ function TableDescription({
         <Col width={8} textAlign='right'>
           Past Duels:
         </Col>
-        <Col width={8} className='Wager PaddedLeft Bold'>
+        <Col width={8} className='Coin PaddedLeft Bold'>
           {pastDuelsCount}
         </Col>
       </Row>
 
       <RowDivider />
 
-      <Row columns={'equal'} className='NoPadding H5' textAlign='center'>
+      <Row columns={'equal'} className='NoPadding' textAlign='center'>
         <Col>
           <h5>Table is {tableIsOpen ? <span className='Important'>Open</span> : <span className='Negative'>Closed</span>}</h5>
         </Col>
@@ -198,11 +196,58 @@ function TableDescription({
   )
 }
 
-export function TableSwitcher({
-  tableId,
+//--------------------
+// Tables list 
+//
+export function TableList({
+  selectedTableId,
   setSelectedTableId,
+}: {
+    selectedTableId: string
+  setSelectedTableId: (tableId: string) => void
+}) {
+  const { description } = useTable(selectedTableId)
+  return (
+    <ButtonGroup vertical className='FillWidth Padded'>
+      {Object.keys(TABLES).map(key => (
+        <TableListItem key={TABLES[key]}
+          tableId={TABLES[key]}
+          active={selectedTableId == TABLES[key]}
+          setSelectedTableId={setSelectedTableId}
+        />
+      ))}
+    </ButtonGroup >
+  )
+}
+
+function TableListItem({
+  tableId,
+  active,
+  setSelectedTableId,
+}: {
+  tableId: string
+  active: boolean
+  setSelectedTableId: (tableId: string) => void
 }) {
   const { description } = useTable(tableId)
+  return (
+    <Button size='big' key={tableId} active={active} onClick={() => { setSelectedTableId(tableId) }}>{description}</Button>
+  )
+}
+
+
+
+//------------------
+// as dropdown
+//
+export function TableSwitcher({
+  selectedTableId,
+  setSelectedTableId,
+}: {
+  selectedTableId: string
+  setSelectedTableId: (tableId: string) => void
+}) {
+  const { description } = useTable(selectedTableId)
   return (
     <Dropdown
       text={`${description}`}
@@ -223,6 +268,9 @@ export function TableSwitcher({
 function TableSwitcherItem({
   tableId,
   setSelectedTableId,
+}: {
+  tableId: string
+  setSelectedTableId: (tableId: string) => void
 }) {
   const { description } = useTable(tableId)
   return (

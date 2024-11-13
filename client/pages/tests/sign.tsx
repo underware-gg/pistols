@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { AccountInterface, typedData } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { useAccount, useNetwork } from '@starknet-react/core'
 import { useTypedMessage } from '@/lib/utils/hooks/useTypedMessage'
 import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
 import { bigintToHex, shortAddress } from '@/lib/utils/types'
@@ -15,6 +15,13 @@ const Cell = Table.Cell
 const Body = Table.Body
 const Header = Table.Header
 const HeaderCell = Table.HeaderCell
+
+const starknetDomain = {
+  name: 'Underware',
+  version: '1.0',
+  chainId: 'UNDERWARE_GG',
+  revision: '1',
+}
 
 export default function IndexPage() {
   return (
@@ -68,7 +75,8 @@ function ValidateMessage({
   const [verified, setVerifyed] = useState('...')
 
   const { typedMessage, messageHash } = useTypedMessage({
-    revision: 0,
+    account,
+    starknetDomain,
     messages,
   })
 
@@ -110,9 +118,9 @@ function ValidateMessage({
 
 
 export async function testTypedData(account: AccountInterface) {
-  const typedMessage0 = createTypedMessage({ chainId: 'UNDERWARE_GG', revision: 1, messages: { key: '0x01111' } })
-  const typedMessage1 = createTypedMessage({ chainId: 'UNDERWARE_GG', revision: 1, messages: { key: '0x1111' } })
-  const typedMessage2 = createTypedMessage({ chainId: 'UNDERWARE_GG', revision: 1, messages: { key: '0x1112' } })
+  const typedMessage0 = createTypedMessage({ starknetDomain, messages: { key: '0x01111' } })
+  const typedMessage1 = createTypedMessage({ starknetDomain, messages: { key: '0x1111' } })
+  const typedMessage2 = createTypedMessage({ starknetDomain, messages: { key: '0x1112' } })
   const signature0 = await account.signMessage(typedMessage0)
   const signature1 = await account.signMessage(typedMessage1)
   const signature2 = await account.signMessage(typedMessage2)

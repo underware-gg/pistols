@@ -1,3 +1,9 @@
+#--------------------------
+# dojo profile config
+# https://book.dojoengine.org/framework/config
+# https://github.com/dojoengine/dojo/blob/main/examples/simple/dojo_dev.toml
+#
+
 [world]
 name = "Pistols at 10 Blocks"
 description = "An on-chain pistol duelling game of honour and betrayal."
@@ -12,11 +18,78 @@ github = "https://github.com/underware-gg/pistols"
 # discord = "https://discord.gg/FB2wR6uF"
 # telegram = "https://t.me/dojoengine"
 
+[env]
+chain_id = "WP_PISTOLS"
+rpc_url = "https://api.cartridge.gg/x/pistols/katana"
+account_address = "0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec"
+private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
+world_address = "0x1adaf57de23b6d6d43eeb42b6ab6730a022021382fef49eff1f532c21556a5a"
+
+#--------------------------
+# namespaces
+#
 [namespace]
 default = "pistols"
 
-[env]
-rpc_url = "https://api.cartridge.gg/x/pistols/katana"
-account_address = "0x142155fafb1cb0747c71008e6243789493cdc3825b790cca3dbfa207adce04"
-private_key = "0xf0bae7045c0779c99b14958872009fa77aad7db3a2d554fc7aa142d741f5a8"
-world_address = "0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6"
+#--------------------------
+# namespaces
+#
+[owners]
+"pistols" = [
+  "pistols-game",
+  "pistols-admin",
+]
+
+#--------------------------
+# writers
+#
+[writers]
+"pistols" = [
+  "pistols-game",
+  "pistols-admin",
+] 
+# ERC-721
+"pistols-TokenConfig" = ["pistols-duelist_token","pistols-duel_token"]
+"pistols-Payment"     = ["pistols-duelist_token","pistols-duel_token"]
+"pistols-Duelist"     = ["pistols-duelist_token"]
+"pistols-Challenge"   = ["pistols-duel_token"]
+"pistols-Round"       = ["pistols-duel_token"]
+"pistols-Pact"        = ["pistols-duel_token"]
+"pistols-Scoreboard"  = ["pistols-duel_token"]
+# ERC-20
+"pistols-CoinConfig"        = ["pistols-fame_coin","pistols-lords_mock"]
+"pistols-TokenBoundAddress" = ["pistols-fame_coin"]
+
+#--------------------------
+# init_calldata
+#
+[init_call_args]
+"pistols-admin" = [
+  "0x0", # treasury_address (or initializer)
+  "0x0", # lords_address (use lords_mock)
+  "0x0", # vrf_address (use vrf_mock)
+]
+"pistols-duel_token" = [
+  "sstr:pistols.stage.underware.gg", # base_uri
+  "0x0", # minter_address
+  "0x0", # renderer_address
+  "0", # fee_amount
+]
+"pistols-duelist_token" = [
+  "sstr:pistols.stage.underware.gg", # base_uri
+  "0x0", # minter_address
+  "0x0", # renderer_address
+  "100000000000000000000", # fee_amount: 100 LORDS
+]
+"pistols-lords_mock" = [
+  "0x0", # minter_address
+  "10000000000000000000000", # faucet_amount: 10,000 LORDS
+]
+
+
+#--------------------------
+# migration
+#
+[migration]
+order_inits = []
+skip_contracts = []

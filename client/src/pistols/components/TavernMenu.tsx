@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Grid, Menu, Label, Tab, TabPane } from 'semantic-ui-react'
-import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
@@ -8,9 +7,6 @@ import { useTable } from '@/pistols/hooks/useTable'
 import { ChallengeTableYour, ChallengeTableLive, ChallengeTablePast } from '@/pistols/components/ChallengeTable'
 import { IRLTournamentTab } from '@/pistols/components/tournament/IRLTournamentTab'
 import { DuelistTable } from '@/pistols/components/DuelistTable'
-import { MusicToggle } from '@/pistols/components/ui/Buttons'
-import { IconClick } from '@/lib/ui/Icons'
-import AccountHeader from '@/pistols/components/account/AccountHeader'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -18,7 +14,7 @@ const Col = Grid.Column
 const _makeBubble = (count) => {
   if (count > 0) {
     return (
-      <Label floating>
+      <Label className='Smaller' floating>
         {count}
       </Label>
     )
@@ -26,12 +22,11 @@ const _makeBubble = (count) => {
   return null
 }
 
-export function TavernMenu({
-}) {
-  const { tableId, isAnon } = useSettings()
-  const { tavernMenuItems, tableOpener } = usePistolsContext()
-  const { currentScene, dispatchSetScene } = usePistolsScene()
-  const { description, isTournament, isIRLTournament } = useTable(tableId)
+export function TavernMenu() {
+  const { tableId } = useSettings()
+  const { tavernMenuItems } = usePistolsContext()
+  const { atTavern, atBarkeep, currentScene, dispatchSetScene } = usePistolsScene()
+  const { isTournament, isIRLTournament } = useTable(tableId)
 
   const {
     queryLiveDuels: { liveCount: liveDuelsCount },
@@ -57,7 +52,7 @@ export function TavernMenu({
         ),
         render: () => (
           <TabPane attached={true}>
-            <div className='UIMenuTavernScroller'>
+            <div className='  '>
               {key === SceneName.Duelists && <DuelistTable />}
               {key === SceneName.YourDuels && <ChallengeTableYour />}
               {key === SceneName.LiveDuels && <ChallengeTableLive />}
@@ -74,49 +69,14 @@ export function TavernMenu({
 
   const menuIndex = panes.findIndex(pane => (pane.key == currentScene))
 
-  const _changeTable = () => {
-    tableOpener.open()
-  }
-
-  const { isConnected } = useAccount()
-  const { disconnect } = useDisconnect()
-  const _exit = () => {
-    if (isConnected) {
-      disconnect()
-    }
-    dispatchSetScene(SceneName.Gate)
+  if (atTavern || atBarkeep) {
+    return <></>
   }
 
   return (
-    <>
-      <Grid>
-        <Row className='ProfilePicHeight Unselectable'>
-          <Col width={7} verticalAlign='top' className='TitleCase NoBreak Padded Relative'>
-            <h2>Pistols at 10 Blocks</h2>
-            <h3>
-              <IconClick name='ticket' size={'small'} onClick={() => _changeTable()} />
-              {' '}
-              <b className='Smaller Important'>{description}</b>
-            </h3>
-          </Col>
-          <Col width={9} textAlign='right'>
-            <AccountHeader />
-          </Col>
-        </Row>
-      </Grid>
-
-      <div className='Relative'>
-
-        <div className='AbsoluteRight PaddedDouble'>
-          <MusicToggle />
-          &nbsp;&nbsp;
-          &nbsp;&nbsp;
-          <IconClick name='sign out' size={'large'} onClick={() => _exit()} />
-          &nbsp;&nbsp;&nbsp;
-        </div>
-
-        <Tab activeIndex={menuIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
-      </div>
-    </>
+    <div className='UIContainer'>
+      <Tab activeIndex={menuIndex} menu={{ secondary: true, pointing: true, attached: true }} panes={panes} />
+    </div>
   )
 }
+

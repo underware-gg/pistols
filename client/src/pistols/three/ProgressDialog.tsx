@@ -657,7 +657,7 @@ export class ProgressDialogManager {
     const { stateA, stateB } = this.findCurrentDuelStates(this.lastDuelStageA, this.lastDuelStageB)
 
     const dialogAProps = dialogOptions[stateA]
-    if (this.lastDuelStateA != stateA) {
+    if (this.lastDuelStateA != stateA || !this.dialogA.message) {
 
       const messageA = this.isDialogAYou
         ? dialogAProps.messages[Math.floor(Math.random() * dialogAProps.messages.length)] 
@@ -669,7 +669,7 @@ export class ProgressDialogManager {
     }
 
     const dialogBProps = dialogOptions[stateB]
-    if (this.lastDuelStateB != stateB) {
+    if (this.lastDuelStateB != stateB || !this.dialogB.message) {
 
       const messageB = !this.isDialogAYou
         ? dialogBProps.messages[Math.floor(Math.random() * dialogBProps.messages.length)] 
@@ -691,14 +691,10 @@ export class ProgressDialogManager {
 
     if (stageA[DuelStage.Round1Commit] == false) stateA = DuelState.CHOOSING_STEPS
     else if (stageA[DuelStage.Round1Reveal] == false) stateA = DuelState.REVEALING_STEPS
-    else if (stageA[DuelStage.Round2Commit] == false) stateA = DuelState.CHOOSING_ACTIONS
-    else if (stageA[DuelStage.Round2Reveal] == false) stateA = DuelState.REVEALING_ACTIONS
     else stateA = DuelState.ACTIONS_REVEALED
 
     if (stageB[DuelStage.Round1Commit] == false) stateB = DuelState.CHOOSING_STEPS
     else if (stageB[DuelStage.Round1Reveal] == false) stateB = DuelState.REVEALING_STEPS
-    else if (stageB[DuelStage.Round2Commit] == false) stateB = DuelState.CHOOSING_ACTIONS
-    else if (stageB[DuelStage.Round2Reveal] == false) stateB = DuelState.REVEALING_ACTIONS
     else stateB = DuelState.ACTIONS_REVEALED
 
     if (stateA == DuelState.REVEALING_STEPS && stateB == DuelState.CHOOSING_STEPS) stateA = DuelState.STEPS_CHOSEN
@@ -785,7 +781,7 @@ export class ProgressDialogMesh {
   private dialogTitle: string
   private duelistName: string
   private isThinkingBubble: boolean
-  private message: string
+  public message: string
   private onButtonClick: () => void
 
   constructor(camera: THREE.PerspectiveCamera, position: THREE.Vector3, isLeft: boolean) {
@@ -863,7 +859,7 @@ export class ProgressDialogMesh {
     if (!this.element) return
 
     const bubbleImage = this.isThinkingBubble ? '/images/ui/bubble_thinking.png' : '/images/ui/bubble_speech.png'
-    const textColor = this.isYou ? 'green' : 'red'
+    const textColor = this.isYou ? '#77d64d' : '#e34a4a'
 
     const title = this.element.querySelector('.dialog-title') as HTMLElement
     title.textContent = this.dialogTitle
@@ -881,7 +877,7 @@ export class ProgressDialogMesh {
     const button = this.element.querySelector('.dialog-button') as HTMLElement
     button.textContent = this.message
     button.dataset.contentlength = Math.floor(this.message?.length / 10).toString()
-    const message = this.element.querySelector('.dialog-message') as HTMLElement
+    const message = this.element.querySelector('.dialog-quote') as HTMLElement
     message.textContent = this.message
     message.dataset.contentlength = Math.floor(this.message?.length / 10).toString()
     const spinner = this.element.querySelector('.dialog-spinner') as HTMLElement

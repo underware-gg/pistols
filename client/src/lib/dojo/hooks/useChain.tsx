@@ -1,10 +1,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Connector, useAccount, useConnect } from '@starknet-react/core'
-import { SwitchStarknetChainParameter, AddStarknetChainParameters } from 'get-starknet-core'
+import { Connector, useAccount, useConnect, useNetwork } from '@starknet-react/core'
+import { SwitchStarknetChainParameters, AddStarknetChainParameters } from 'get-starknet-core'
 import { useAddStarknetChain, useSwitchStarknetChain } from '@/lib/dojo/hooks/useWalletRequest'
 import { ChainId, getDojoChainConfig, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
-import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { feltToString } from '@/lib/utils/starknet'
 import { BigNumberish, Provider } from 'starknet'
@@ -33,10 +32,11 @@ export const useChainConfigProvider = (chain_id: ChainId | BigNumberish): Provid
 
 export const useSelectedChain = () => {
   const { selectedChainConfig } = useStarknetContext()
-  const { isConnecting, isConnected, chainId, account, connector } = useAccount()
+  const { isConnecting, isConnected, account, connector } = useAccount()
+  const { chain } = useNetwork()
 
   const { chainId: selectedChainId, chainName: selectedChainName } = useChainConfig(selectedChainConfig.chain.id)
-  const { chainId: connectedChainId, chainName: connectedChainName } = useChainConfig(chainId)
+  const { chainId: connectedChainId, chainName: connectedChainName } = useChainConfig(chain.id)
 
   const isCorrectChain = useMemo(() => {
     const result = (isConnected && connectedChainId == selectedChainId)
@@ -63,6 +63,7 @@ export const useSelectedChain = () => {
 export const useConnectToSelectedChain = (onConnect?: () => void) => {
   const { connect, connectors } = useConnect()
   const { isConnected, isConnecting } = useAccount()
+  const { selectedChainConfig } = useStarknetContext()
 
   const [requestedConnect, setRequestedConnect] = useState(false)
   useEffect(() => {
@@ -75,16 +76,14 @@ export const useConnectToSelectedChain = (onConnect?: () => void) => {
     if (isConnected) {
       onConnect?.()
     } else if (!isConnecting) {
-      const controller = connectors.find((connector) => (connector.id == supportedConnetorIds.CONTROLLER));
-      const predeployed = connectors.find((connector) => (connector.id == supportedConnetorIds.DOJO_PREDEPLOYED));
-      if (controller) {
-        console.log(`Connecting to controller...`)
+      // get 1st supported connector on this chain
+      const connector = selectedChainConfig.connectorIds.reduce((acc, id) => {
+        return acc ?? connectors.find((connector) => (connector.id == id))
+      }, undefined as Connector)
+      if (connector) {
+        console.log(`>> Connecting with [${connector.id}]...`)
         setRequestedConnect(true)
-        connect({ connector: controller })
-      } else if (predeployed) {
-        console.log(`Connecting to predeployed...`)
-        setRequestedConnect(true)
-        connect({ connector: predeployed })
+        connect({ connector })
       } else {
         setRequestedConnect(false)
         console.warn(`NO CONNECTOR!`)
@@ -113,7 +112,7 @@ export const useChainSwitchCallbacks = () => {
   const { selectedChainId, selectedChainConfig } = useSelectedChain()
 
   const switch_params = useMemo(() => {
-    const params: SwitchStarknetChainParameter = {
+    const params: SwitchStarknetChainParameters = {
       chainId: selectedChainId,
     }
     return params
@@ -123,17 +122,13 @@ export const useChainSwitchCallbacks = () => {
   const add_params = useMemo(() => {
     const params: AddStarknetChainParametersImpl = {
       id: selectedChainId,
-      chainId: selectedChainId,
-      chainName: selectedChainConfig.name,
-      baseUrl: selectedChainConfig.rpcUrl,
+      chain_id: selectedChainId,
+      chain_name: selectedChainConfig.name,
       rpcUrl: selectedChainConfig.rpcUrl,
-      rpcUrls: [selectedChainConfig.rpcUrl],
-      nativeCurrency: selectedChainConfig.chain.nativeCurrency,
-      // accountImplementation: selectedChainConfig.accountClassHash,
+      rpc_urls: [selectedChainConfig.rpcUrl],
+      native_currency: { type: 'ERC20', options: selectedChainConfig.chain.nativeCurrency },
       accountClassHash: selectedChainConfig.accountClassHash,
       classHash: selectedChainConfig.accountClassHash,
-      // blockExplorerUrls?: string[],
-      // iconUrls?: string[],
     }
     return params
   }, [selectedChainId, selectedChainConfig])

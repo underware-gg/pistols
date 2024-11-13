@@ -2,18 +2,21 @@
 set -euo pipefail
 source scripts/setup.sh
 
-if [ "$#" -ne 3 ]; then
-  echo "usage: grant_admin <PROFILE> <ACCOUNT> <0|1>"
+if [ $# -ge 3 ]; then
+  export ACCOUNT=$2
+  export GRANT=$3
+else
+  # export PROFILE="dev"
+  echo "usage: $0 <PROFILE> <ACCOUNT> <0|1>"
   exit 1
 fi
 
-export ACCOUNT=$2
-export GRANT=$3
+# move down to /dojo
+pushd $(dirname "$0")/..
 
-echo "------------------------------------------------------------------------------"
-echo "Profile  : $PROFILE"
 echo "Account  : $ACCOUNT"
 echo "Grant    : $GRANT"
+echo "------------------------------------------------------------------------------"
 
 if [[ "$ACCOUNT" != "0x"* ]]; then
   echo "! Bad account 👎"
@@ -30,12 +33,16 @@ if [[ "$GRANT" == "0" ]]; then
   sozo -P $PROFILE auth revoke --world $WORLD_ADDRESS --wait writer \
     model:pistols-Config,$ACCOUNT \
     model:pistols-TableConfig,$ACCOUNT \
-    model:pistols-TokenConfig,$ACCOUNT
+    model:pistols-TokenConfig,$ACCOUNT \
+    model:pistols-CoinConfig,$ACCOUNT \
+    model:pistols-Payment,$ACCOUNT
 else
   echo "* GRANTING admin powers to $ACCOUNT..."
   sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
     model:pistols-Config,$ACCOUNT \
     model:pistols-TableConfig,$ACCOUNT \
-    model:pistols-TokenConfig,$ACCOUNT
+    model:pistols-TokenConfig,$ACCOUNT \
+    model:pistols-CoinConfig,$ACCOUNT \
+    model:pistols-Payment,$ACCOUNT
 fi
 

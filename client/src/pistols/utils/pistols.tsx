@@ -1,5 +1,6 @@
-import { ACTION, Archetype, ChallengeState, RoundState } from '@/games/pistols/generated/constants'
+import { Archetype, BladesCard, ChallengeState, PacesCard, Premise, RoundState } from '@/games/pistols/generated/constants'
 import { EMOJI } from '@/pistols/data/messages'
+import { SceneName } from '@/pistols/hooks/PistolsContext'
 
 //------------------------------------------
 // must be in sync with CHALLENGE_STATE
@@ -56,7 +57,7 @@ export const ChallengeStateClasses: Record<ChallengeState, string> = {
   [ChallengeState.Draw]: 'Warning',
 }
 
-export const ChallengeMessages = [
+export const ChallengeQuotes = [
   //34567890123456789012345678901| << max cairo string size (31 bytes)
   "I challenge ya for a duel!",
   "I demand satisfaction!",
@@ -83,26 +84,25 @@ export const RoundStateNames: Record<RoundState, string> = {
 // (action.cairo)
 //
 export enum Action {
-  Idle = ACTION.IDLE,
-  Paces1 = ACTION.PACES_1,
-  Paces2 = ACTION.PACES_2,
-  Paces3 = ACTION.PACES_3,
-  Paces4 = ACTION.PACES_4,
-  Paces5 = ACTION.PACES_5,
-  Paces6 = ACTION.PACES_6,
-  Paces7 = ACTION.PACES_7,
-  Paces8 = ACTION.PACES_8,
-  Paces9 = ACTION.PACES_9,
-  Paces10 = ACTION.PACES_10,
-  Fast = ACTION.FAST_BLADE,
-  Strong = ACTION.SLOW_BLADE,
-  Block = ACTION.BLOCK,
-  Flee = ACTION.FLEE,
-  Steal = ACTION.STEAL,
-  Seppuku = ACTION.SEPPUKU,
+  Idle = PacesCard.None,
+  Paces1 = PacesCard.Paces1,
+  Paces2 = PacesCard.Paces2,
+  Paces3 = PacesCard.Paces3,
+  Paces4 = PacesCard.Paces4,
+  Paces5 = PacesCard.Paces5,
+  Paces6 = PacesCard.Paces6,
+  Paces7 = PacesCard.Paces7,
+  Paces8 = PacesCard.Paces8,
+  Paces9 = PacesCard.Paces9,
+  Paces10 = PacesCard.Paces10,
+  Seppuku = BladesCard.Seppuku,
+  PocketPistol = BladesCard.PocketPistol,
+  Behead = BladesCard.Behead,
+  Grapple = BladesCard.Grapple,
 }
 
 export const ActionNames: Record<Action, string> = {
+  [Action.Idle]: 'Idle',
   [Action.Paces1]: '1 Pace',
   [Action.Paces2]: '2 Paces',
   [Action.Paces3]: '3 Paces',
@@ -113,53 +113,46 @@ export const ActionNames: Record<Action, string> = {
   [Action.Paces8]: '8 Paces',
   [Action.Paces9]: '9 Paces',
   [Action.Paces10]: '10 Paces',
-  [Action.Idle]: 'Idle',
-  [Action.Fast]: 'Fast Blow',
-  [Action.Strong]: 'Strong Blow',
-  [Action.Block]: 'Block',
-  [Action.Flee]: 'Flee',
-  [Action.Steal]: 'Steal',
   [Action.Seppuku]: 'Seppuku',
+  [Action.PocketPistol]: 'Pocket Pistol',
+  [Action.Behead]: 'Behead',
+  [Action.Grapple]: 'Grapple',
 }
 
 export const ActionVerbs: Record<Action, string> = {
-  [Action.Paces1]: 'Shoots at',
-  [Action.Paces2]: 'Shoots at',
-  [Action.Paces3]: 'Shoots at',
-  [Action.Paces4]: 'Shoots at',
-  [Action.Paces5]: 'Shoots at',
-  [Action.Paces6]: 'Shoots at',
-  [Action.Paces7]: 'Shoots at',
-  [Action.Paces8]: 'Shoots at',
-  [Action.Paces9]: 'Shoots at',
-  [Action.Paces10]: 'Shoots at',
   [Action.Idle]: 'Stays',
-  [Action.Fast]: 'Strikes a',
-  [Action.Strong]: 'Strikes a',
-  [Action.Block]: 'Do a',
-  [Action.Flee]: 'Tries to',
-  [Action.Steal]: 'Tries to',
+  [Action.Paces1]: 'Fires at',
+  [Action.Paces2]: 'Fires at',
+  [Action.Paces3]: 'Fires at',
+  [Action.Paces4]: 'Fires at',
+  [Action.Paces5]: 'Fires at',
+  [Action.Paces6]: 'Fires at',
+  [Action.Paces7]: 'Fires at',
+  [Action.Paces8]: 'Fires at',
+  [Action.Paces9]: 'Fires at',
+  [Action.Paces10]: 'Fires at',
   [Action.Seppuku]: 'Commits a',
+  [Action.PocketPistol]: 'Tries to',
+  [Action.Behead]: 'Commits a',
+  [Action.Grapple]: 'Commits a',
 }
 
 export const ActionEmojis: Record<Action, string> = {
-  [Action.Paces1]: EMOJI.PISTOL,
-  [Action.Paces2]: EMOJI.PISTOL,
-  [Action.Paces3]: EMOJI.PISTOL,
-  [Action.Paces4]: EMOJI.PISTOL,
-  [Action.Paces5]: EMOJI.PISTOL,
-  [Action.Paces6]: EMOJI.PISTOL,
-  [Action.Paces7]: EMOJI.PISTOL,
-  [Action.Paces8]: EMOJI.PISTOL,
-  [Action.Paces9]: EMOJI.PISTOL,
-  [Action.Paces10]: EMOJI.PISTOL,
   [Action.Idle]: EMOJI.IDLE,
-  [Action.Fast]: EMOJI.LIGHT,
-  [Action.Strong]: EMOJI.HEAVY,
-  [Action.Block]: EMOJI.BLOCK,
-  [Action.Flee]: EMOJI.FLEE,
-  [Action.Steal]: EMOJI.STEAL,
+  [Action.Paces1]: EMOJI.PACES,
+  [Action.Paces2]: EMOJI.PACES,
+  [Action.Paces3]: EMOJI.PACES,
+  [Action.Paces4]: EMOJI.PACES,
+  [Action.Paces5]: EMOJI.PACES,
+  [Action.Paces6]: EMOJI.PACES,
+  [Action.Paces7]: EMOJI.PACES,
+  [Action.Paces8]: EMOJI.PACES,
+  [Action.Paces9]: EMOJI.PACES,
+  [Action.Paces10]: EMOJI.PACES,
   [Action.Seppuku]: EMOJI.SEPPUKU,
+  [Action.PocketPistol]: EMOJI.POCKET_PISTOL,
+  [Action.Behead]: EMOJI.BEHEAD,
+  [Action.Grapple]: EMOJI.GRAPPLE,
 }
 
 export const ActionTypes: Record<string, Action[]> = {
@@ -176,14 +169,12 @@ export const ActionTypes: Record<string, Action[]> = {
     Action.Paces10,
   ],
   melee: [
-    Action.Fast,
-    Action.Strong,
-    Action.Block,
+    Action.Behead,
+    Action.Grapple,
   ],
   runner: [
-    Action.Flee,
-    // Action.Steal, // result must display wager, not action
     Action.Seppuku,
+    Action.PocketPistol,
   ]
 }
 
@@ -192,4 +183,26 @@ export const ArchetypeNames: Record<Archetype, string> = {
   [Archetype.Villainous]: 'Villainous',
   [Archetype.Trickster]: 'Trickster',
   [Archetype.Honourable]: 'Honourable',
+}
+
+export const PremisePrefix: Record<Premise, string> = {
+  [Premise.Null]: 'over...?',
+  [Premise.Matter]: 'over the matter of',
+  [Premise.Debt]: 'to discharge a debt',
+  [Premise.Dispute]: 'to satisfy a dispute',
+  [Premise.Honour]: 'to defend their honour',
+  [Premise.Hatred]: 'to satisfy a burning hatred',
+  [Premise.Blood]: 'for the love of death and blood',
+  [Premise.Nothing]: 'for no reason other than',
+  [Premise.Tournament]: 'to be the winner of',
+}
+
+export const MenuLabels: Partial<Record<SceneName, string>> = {
+  [SceneName.Gate]: 'Exit to Gate',
+  [SceneName.Barkeep]: 'Talk to The Barkeep',
+  [SceneName.Tavern]: 'The Bar',
+  [SceneName.Duelists]: 'The Balcony (Opponents)',
+  [SceneName.YourDuels]: 'The Tables (Live Duels)',
+  [SceneName.PastDuels]: 'The Graveyard (Past Duels)',
+  [SceneName.Profile]: 'Account & Duelists',
 }

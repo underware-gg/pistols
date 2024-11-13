@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish, RpcProvider } from 'starknet'
-import { useDojo } from '@/lib/dojo/DojoContext'
+import { useDojoSetup } from '@/lib/dojo/DojoContext'
 
 export const useContractClassHash = (contractAddress: BigNumberish, provider?: RpcProvider) => {
-  const { setup: { dojoProvider } } = useDojo()
+  const { dojoProvider } = useDojoSetup()
 
   const [classHash, setClassHash] = useState<BigNumberish>()
 

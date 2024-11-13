@@ -1,40 +1,49 @@
 use traits::Into;
 
-// https://github.com/starkware-libs/cairo/blob/main/corelib/src/integer.cairo
-// https://github.com/smartcontractkit/chainlink-starknet/blob/develop/contracts/src/utils.cairo
-use integer::{u128s_from_felt252, U128sFromFelt252Result};
+use pistols::utils::misc::{felt_to_u128};
 
-// https://github.com/starkware-libs/cairo/blob/main/corelib/src/pedersen.cairo
-// externals usage:
-// https://github.com/shramee/starklings-cairo1/blob/main/corelib/src/hash.cairo
-extern fn pedersen(a: felt252, b: felt252) -> felt252 implicits(Pedersen) nopanic;
+use core::poseidon::{PoseidonTrait, HashState};
+use core::hash::HashStateTrait;
 
+fn hash_values(values: Span<felt252>) -> felt252 {
+    assert(values.len() > 0, 'hash_values() has no values!');
+    let mut state: HashState = PoseidonTrait::new();
+    state = state.update(*values[0]);
+    if (values.len() == 1) {
+        state = state.update(*values[0]);
+    } else {
+        let mut index: usize = 1;
+        while (index < values.len()) {
+            state = state.update(*values[index]);
+            index += 1;
+        };
+    }
+    (state.finalize())
+}
+
+
+//----------------------------------------
+// Starknet bock info
 //
-// initially hash based on: 
-// https://github.com/shramee/cairo-random/blob/main/src/hash.cairo
-
-fn hash_felt(seed: felt252, offset: felt252) -> felt252 {
-    pedersen(seed, offset)
-}
-
-fn hash_u128(seed: u128, offset: u128) -> u128 {
-    let hash = hash_felt(seed.into(), offset.into());
-    felt_to_u128(hash)
-}
-
-fn felt_to_u128(value: felt252) -> u128 {
-    match u128s_from_felt252(value) {
-        U128sFromFelt252Result::Narrow(x) => x,
-        U128sFromFelt252Result::Wide((_, x)) => x,
-    }
-}
-
-// upgrade a u128 hash to u256
-fn hash_u128_to_u256(value: u128) -> u256 {
-    u256 {
-        low: value,
-        high: hash_u128(value, value)
-    }
+// https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/info.cairo
+// #[derive(Copy, Drop, Debug, Serde)]
+// pub struct BlockInfo {
+//     /// The number, that is, the height, of this block.
+//     pub block_number: u64,
+//     /// The time at which the sequencer began building the block, in seconds since the Unix epoch.
+//     pub block_timestamp: u64,
+//     /// The Starknet address of the sequencer that created the block.
+//     pub sequencer_address: ContractAddress,
+// }
+use starknet::get_block_info;
+fn make_block_hash() -> felt252 {
+    let block_info = get_block_info().unbox();
+    let hash: felt252 = hash_values([
+        block_info.block_number.into(),
+        block_info.block_timestamp.into(),
+        block_info.sequencer_address.into(),
+    ].span());
+    (hash)
 }
 
 
@@ -44,7 +53,11 @@ fn hash_u128_to_u256(value: u128) -> u256 {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use pistols::utils::hash::{felt_to_u128, hash_felt, hash_u128};
+    use pistols::utils::hash::{
+        hash_values,
+        make_block_hash,
+        felt_to_u128,
+    };
 
     #[test]
     fn test_felt_to_u128() {
@@ -52,35 +65,46 @@ mod tests {
     }
 
     #[test]
-    fn test_hash_felt() {
-        let rnd0  = hash_felt(25, 1);
-        let rnd00 = hash_felt(rnd0, rnd0);
-        let rnd1  = hash_felt(25, 1);
-        let rnd12 = hash_felt(25, 2);
-        let rnd2  = hash_felt(26, 1);
-        let rnd22 = hash_felt(26, 2);
-        assert(rnd0 == 0x7f25249bc3b57d4a9cb82bd75d25579ab9d03074bff6ee2d4dbc374dbf3f846, 'bump');
-        assert(rnd0 != rnd00, 'bump');
-        assert(rnd0 == rnd1, 'bump');
-        assert(rnd1 != rnd12, 'bump');
-        assert(rnd1 != rnd2, 'bump');
-        assert(rnd2 != rnd22, 'bump');
+    fn test_make_block_hash() {
+        let h = make_block_hash();
+        assert(h != 0, 'block hash');
     }
 
     #[test]
-    fn test_hash_u128() {
-        let rnd0  = hash_u128(25, 1);
-        let rnd00 = hash_u128(rnd0, rnd0);
-        let rnd1  = hash_u128(25, 1);
-        let rnd12 = hash_u128(25, 2);
-        let rnd2  = hash_u128(26, 1);
-        let rnd22 = hash_u128(26, 2);
-        // rnd.print();
-        assert(rnd0 == 0xab9d03074bff6ee2d4dbc374dbf3f846, 'bump');
-        assert(rnd0 != rnd00, 'bump');
-        assert(rnd0 == rnd1, 'bump');
-        assert(rnd1 != rnd12, 'bump');
-        assert(rnd1 != rnd2, 'bump');
-        assert(rnd2 != rnd22, 'bump');
+    fn test_hash_values() {
+        let h1: felt252 = hash_values([111].span());
+        let h11: felt252 = hash_values([111, 111].span());
+        let h12: felt252 = hash_values([111, 222].span());
+        let h21: felt252 = hash_values([222, 111].span());
+        let h123: felt252 = hash_values([111, 222, 333].span());
+        let h1234: felt252 = hash_values([111, 222, 333, 444].span());
+        assert(h1 != 0,  'h1');
+        assert(h1 == h11,  'h1 == h11');
+        assert(h1 != h12, 'h1 != h12');
+        assert(h12 != h123, 'h12 != h123');
+        assert(h123 != h1234, 'h3 != h4');
+        assert(h12 != h21, 'h12 != h21');
+    }
+
+    #[test]
+    fn test_rehash() {
+        let h1: felt252 = hash_values([111].span());
+        let h2: felt252 = hash_values([h1].span());
+        let h3: felt252 = hash_values([h2].span());
+        assert(h1 != 0,  'h1');
+        assert(h1 != h2, 'h1 != h2');
+        assert(h2 != h3, 'h2 != h3');
+    }
+
+    #[test]
+    fn test_xor_hash() {
+        let a: felt252 = 0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7;
+        let b: felt252 = 0x4d07e40e93398ed3c76981e72dd1fd22557a78ce36c0515f679e27f0bb5bc5f;
+        let aa: u256 = a.into();
+        let bb: u256 = b.into();
+        let a_b = aa ^ bb;
+        let b_a = bb ^ aa;
+        // xor hashes are EQUAL for (a,b) and (b,a)
+        assert(a_b == b_a, 'felt_to_u128');
     }
 }

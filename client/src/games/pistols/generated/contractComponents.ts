@@ -6,240 +6,30 @@ export type ContractComponents = Awaited<ReturnType<typeof defineContractCompone
 
 export function defineContractComponents(world: World) {
   return {
-    ERC20AllowanceModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, owner: RecsType.BigInt, spender: RecsType.BigInt, amount: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC20AllowanceModel",
-            types: ["contractaddress","contractaddress","contractaddress","u256"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC20BalanceModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, account: RecsType.BigInt, amount: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC20BalanceModel",
-            types: ["contractaddress","contractaddress","u256"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC20BridgeableModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, l2_bridge_address: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC20BridgeableModel",
-            types: ["contractaddress","contractaddress"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC20MetadataModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, name: RecsType.String, symbol: RecsType.String, decimals: RecsType.Number, total_supply: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC20MetadataModel",
-            types: ["contractaddress","u8","u256"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC721BalanceModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, account: RecsType.BigInt, amount: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC721BalanceModel",
-            types: ["contractaddress","contractaddress","u128"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC721EnumerableIndexModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, index: RecsType.BigInt, token_id: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC721EnumerableIndexModel",
-            types: ["contractaddress","u128","u128"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC721EnumerableOwnerIndexModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, owner: RecsType.BigInt, index: RecsType.BigInt, token_id: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC721EnumerableOwnerIndexModel",
-            types: ["contractaddress","contractaddress","u128","u128"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC721EnumerableOwnerTokenModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, owner: RecsType.BigInt, token_id: RecsType.BigInt, index: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC721EnumerableOwnerTokenModel",
-            types: ["contractaddress","contractaddress","u128","u128"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC721EnumerableTokenModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, token_id: RecsType.BigInt, index: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC721EnumerableTokenModel",
-            types: ["contractaddress","u128","u128"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC721EnumerableTotalModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, total_supply: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC721EnumerableTotalModel",
-            types: ["contractaddress","u128"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC721MetaModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, name: RecsType.String, symbol: RecsType.String, base_uri: RecsType.String },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC721MetaModel",
-            types: ["contractaddress"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC721OperatorApprovalModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, owner: RecsType.BigInt, operator: RecsType.BigInt, approved: RecsType.Boolean },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC721OperatorApprovalModel",
-            types: ["contractaddress","contractaddress","contractaddress","bool"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC721OwnerModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, token_id: RecsType.BigInt, address: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC721OwnerModel",
-            types: ["contractaddress","u128","contractaddress"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    ERC721TokenApprovalModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, token_id: RecsType.BigInt, address: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "ERC721TokenApprovalModel",
-            types: ["contractaddress","u128","contractaddress"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    InitializableModel: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, initialized: RecsType.Boolean },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "InitializableModel",
-            types: ["contractaddress","bool"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    SRC5Model: (() => {
-      return defineComponent(
-        world,
-        { token: RecsType.BigInt, interface_id: RecsType.BigInt, supports: RecsType.Boolean },
-        {
-          metadata: {
-            namespace: "origami_token",
-            name: "SRC5Model",
-            types: ["contractaddress","felt252","bool"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
     Challenge: (() => {
       return defineComponent(
         world,
-        { duel_id: RecsType.BigInt, table_id: RecsType.BigInt, message: RecsType.BigInt, address_a: RecsType.BigInt, address_b: RecsType.BigInt, duelist_id_a: RecsType.BigInt, duelist_id_b: RecsType.BigInt, state: RecsType.Number, round_number: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.BigInt, timestamp_end: RecsType.BigInt },
+        { duel_id: RecsType.BigInt, table_id: RecsType.BigInt, premise: RecsType.Number, quote: RecsType.BigInt, address_a: RecsType.BigInt, address_b: RecsType.BigInt, duelist_id_a: RecsType.BigInt, duelist_id_b: RecsType.BigInt, state: RecsType.Number, winner: RecsType.Number, timestamp_start: RecsType.BigInt, timestamp_end: RecsType.BigInt },
         {
           metadata: {
             namespace: "pistols",
             name: "Challenge",
-            types: ["u128","felt252","felt252","contractaddress","contractaddress","u128","u128","enum","u8","u8","u64","u64"],
-            customTypes: ["ChallengeState"],
+            types: ["u128","felt252","enum","felt252","contractaddress","contractaddress","u128","u128","enum","u8","u64","u64"],
+            customTypes: ["Premise","ChallengeState"],
+          },
+        }
+      );
+    })(),
+    CoinConfig: (() => {
+      return defineComponent(
+        world,
+        { coin_address: RecsType.BigInt, minter_address: RecsType.BigInt, faucet_amount: RecsType.BigInt },
+        {
+          metadata: {
+            namespace: "pistols",
+            name: "CoinConfig",
+            types: ["contractaddress","contractaddress","u128"],
+            customTypes: [],
           },
         }
       );
@@ -247,12 +37,12 @@ export function defineContractComponents(world: World) {
     Config: (() => {
       return defineComponent(
         world,
-        { key: RecsType.Number, treasury_address: RecsType.BigInt, is_paused: RecsType.Boolean },
+        { key: RecsType.Number, treasury_address: RecsType.BigInt, lords_address: RecsType.BigInt, vrf_address: RecsType.BigInt, is_paused: RecsType.Boolean },
         {
           metadata: {
             namespace: "pistols",
             name: "Config",
-            types: ["u8","contractaddress","bool"],
+            types: ["u8","contractaddress","contractaddress","contractaddress","bool"],
             customTypes: [],
           },
         }
@@ -261,12 +51,12 @@ export function defineContractComponents(world: World) {
     Duelist: (() => {
       return defineComponent(
         world,
-        { duelist_id: RecsType.BigInt, name: RecsType.BigInt, profile_pic_uri: RecsType.String, profile_pic_type: RecsType.Number, timestamp: RecsType.BigInt, score: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt } },
+        { duelist_id: RecsType.BigInt, name: RecsType.BigInt, profile_pic_type: RecsType.Number, profile_pic_uri: RecsType.String, timestamp: RecsType.BigInt, score: { honour: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt } },
         {
           metadata: {
             namespace: "pistols",
             name: "Duelist",
-            types: ["u128","felt252","enum","u64","u8","u8","u8","u8","u16","u16","u16","u16","u64"],
+            types: ["u128","felt252","enum","u64","u8","u16","u16","u16","u16","u64"],
             customTypes: ["ProfilePicType","Score"],
           },
         }
@@ -286,16 +76,30 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
+    Payment: (() => {
+      return defineComponent(
+        world,
+        { key: RecsType.BigInt, amount: RecsType.BigInt, client_percent: RecsType.Number, ranking_percent: RecsType.Number, owner_percent: RecsType.Number, pool_percent: RecsType.Number, treasury_percent: RecsType.Number },
+        {
+          metadata: {
+            namespace: "pistols",
+            name: "Payment",
+            types: ["felt252","u256","u8","u8","u8","u8","u8"],
+            customTypes: [],
+          },
+        }
+      );
+    })(),
     Round: (() => {
       return defineComponent(
         world,
-        { duel_id: RecsType.BigInt, round_number: RecsType.Number, state: RecsType.Number, shot_a: { hash: RecsType.BigInt, salt: RecsType.BigInt, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, chance_lethal: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, win: RecsType.Number, wager: RecsType.Number, health: RecsType.Number, honour: RecsType.Number }, shot_b: { hash: RecsType.BigInt, salt: RecsType.BigInt, action: RecsType.Number, chance_crit: RecsType.Number, chance_hit: RecsType.Number, chance_lethal: RecsType.Number, dice_crit: RecsType.Number, dice_hit: RecsType.Number, damage: RecsType.Number, block: RecsType.Number, win: RecsType.Number, wager: RecsType.Number, health: RecsType.Number, honour: RecsType.Number } },
+        { duel_id: RecsType.BigInt, moves_a: { seed: RecsType.BigInt, salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, moves_b: { seed: RecsType.BigInt, salt: RecsType.BigInt, hashed: RecsType.BigInt, card_1: RecsType.Number, card_2: RecsType.Number, card_3: RecsType.Number, card_4: RecsType.Number }, state_a: { chances: RecsType.Number, damage: RecsType.Number, health: RecsType.Number, dice_fire: RecsType.Number, honour: RecsType.Number }, state_b: { chances: RecsType.Number, damage: RecsType.Number, health: RecsType.Number, dice_fire: RecsType.Number, honour: RecsType.Number }, state: RecsType.Number, final_blow: RecsType.BigInt },
         {
           metadata: {
             namespace: "pistols",
             name: "Round",
-            types: ["u128","u8","enum","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u64","u64","u16","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8"],
-            customTypes: ["RoundState","Shot","Shot"],
+            types: ["u128","felt252","felt252","u128","u8","u8","u8","u8","felt252","felt252","u128","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","u8","enum","felt252"],
+            customTypes: ["Moves","Moves","DuelistState","DuelistState","RoundState"],
           },
         }
       );
@@ -303,27 +107,13 @@ export function defineContractComponents(world: World) {
     Scoreboard: (() => {
       return defineComponent(
         world,
-        { table_id: RecsType.BigInt, duelist_id: RecsType.BigInt, score: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt }, wager_won: RecsType.BigInt, wager_lost: RecsType.BigInt },
+        { table_id: RecsType.BigInt, duelist_id: RecsType.BigInt, score: { honour: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt } },
         {
           metadata: {
             namespace: "pistols",
             name: "Scoreboard",
-            types: ["felt252","u128","u8","u8","u8","u8","u16","u16","u16","u16","u64","u128","u128"],
+            types: ["felt252","u128","u8","u16","u16","u16","u16","u64"],
             customTypes: ["Score"],
-          },
-        }
-      );
-    })(),
-    Snapshot: (() => {
-      return defineComponent(
-        world,
-        { duel_id: RecsType.BigInt, score_a: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt }, score_b: { honour: RecsType.Number, level_villain: RecsType.Number, level_trickster: RecsType.Number, level_lord: RecsType.Number, total_duels: RecsType.Number, total_wins: RecsType.Number, total_losses: RecsType.Number, total_draws: RecsType.Number, honour_history: RecsType.BigInt } },
-        {
-          metadata: {
-            namespace: "pistols",
-            name: "Snapshot",
-            types: ["u128","u8","u8","u8","u8","u16","u16","u16","u16","u64","u8","u8","u8","u8","u16","u16","u16","u16","u64"],
-            customTypes: ["Score","Score"],
           },
         }
       );
@@ -345,13 +135,27 @@ export function defineContractComponents(world: World) {
     TableConfig: (() => {
       return defineComponent(
         world,
-        { table_id: RecsType.BigInt, table_type: RecsType.Number, description: RecsType.BigInt, fee_collector_address: RecsType.BigInt, wager_contract_address: RecsType.BigInt, wager_min: RecsType.BigInt, fee_min: RecsType.BigInt, fee_pct: RecsType.Number, is_open: RecsType.Boolean },
+        { table_id: RecsType.BigInt, description: RecsType.BigInt, table_type: RecsType.Number, deck_type: RecsType.Number, fee_collector_address: RecsType.BigInt, fee_min: RecsType.BigInt, is_open: RecsType.Boolean },
         {
           metadata: {
             namespace: "pistols",
             name: "TableConfig",
-            types: ["felt252","enum","felt252","contractaddress","contractaddress","u128","u128","u8","bool"],
-            customTypes: ["TableType"],
+            types: ["felt252","felt252","enum","enum","contractaddress","u128","bool"],
+            customTypes: ["TableType","DeckType"],
+          },
+        }
+      );
+    })(),
+    TokenBoundAddress: (() => {
+      return defineComponent(
+        world,
+        { recipient: RecsType.BigInt, contract_address: RecsType.BigInt, token_id: RecsType.BigInt },
+        {
+          metadata: {
+            namespace: "pistols",
+            name: "TokenBoundAddress",
+            types: ["contractaddress","contractaddress","u128"],
+            customTypes: [],
           },
         }
       );
@@ -359,26 +163,12 @@ export function defineContractComponents(world: World) {
     TokenConfig: (() => {
       return defineComponent(
         world,
-        { token_address: RecsType.BigInt, max_supply: RecsType.Number, max_per_wallet: RecsType.Number, minted_count: RecsType.Number, is_open: RecsType.Boolean },
+        { token_address: RecsType.BigInt, minter_address: RecsType.BigInt, renderer_address: RecsType.BigInt, minted_count: RecsType.BigInt },
         {
           metadata: {
             namespace: "pistols",
             name: "TokenConfig",
-            types: ["contractaddress","u16","u16","u16","bool"],
-            customTypes: [],
-          },
-        }
-      );
-    })(),
-    Wager: (() => {
-      return defineComponent(
-        world,
-        { duel_id: RecsType.BigInt, value: RecsType.BigInt, fee: RecsType.BigInt },
-        {
-          metadata: {
-            namespace: "pistols",
-            name: "Wager",
-            types: ["u128","u128","u128"],
+            types: ["contractaddress","contractaddress","contractaddress","u128"],
             customTypes: [],
           },
         }

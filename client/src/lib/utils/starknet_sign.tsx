@@ -1,4 +1,3 @@
-import { TYPED_DATA } from '@/games/pistols/generated/constants'
 import { bigintToHex, cleanObject, isBigint } from '@/lib/utils/types'
 import { poseidon } from '@/lib/utils/starknet'
 import {
@@ -10,10 +9,8 @@ import {
   typedData,
   BigNumberish,
   TypedDataRevision,
+  StarknetDomain,
 } from 'starknet'
-
-const DEFAULT_DOMAIN_NAME = TYPED_DATA.NAME;
-const DEFAULT_VERSION = TYPED_DATA.VERSION;
 
 export type Messages = { [key: string]: string | BigInt }
 export type Revision = 0 | 1
@@ -47,17 +44,30 @@ type SignMessagesResult = {
   signatureArray: bigint[], // [r,s] or [...]
   signatureHash: bigint,
 }
-export const signMessages = async (account: AccountInterface, chainId: string, revision: Revision, messages: Messages): Promise<SignMessagesResult> => {
-  const typedMessage = createTypedMessage({ chainId, revision, messages })
+export const signMessages = async (account: AccountInterface, starknetDomain: StarknetDomain, messages: Messages): Promise<SignMessagesResult> => {
+  const typedMessage = createTypedMessage({ starknetDomain, messages })
   const typeHash = getTypeHash(typedMessage, typedMessage.primaryType)
   const typeSelectorName = getTypeSelectorName(typedMessage, typedMessage.primaryType)
   const messageHash = getMessageHash(typedMessage, account.address)
-  const signature = await account.signMessage(typedMessage)
-  //@ts-ignore
+  //--------------------------------
+  // TODO: CONTROLLER UPGRADE BROKE THIS!!!
+  // lets just hash the messages for now
+  //
+  // const signature = await account.signMessage(typedMessage)
+  const signature = [
+    // poseidon(Object.values(messages).map(v => BigInt(v as string))),
+    messages.duelId,
+    messages.duelistId,
+  ] as Signature
+  //
+  //--------------------------------
   let signatureArray: bigint[] =
     Array.isArray(signature) ? signature.map(v => BigInt(v)) // [...]
       : splitSignature(signature) // {r,s}
-  const signatureHash = signatureArray.length >= 2 ? poseidon(signatureArray.slice(-2)) : 0n
+  const signatureHash =
+    signatureArray.length == 2 ? poseidon(signatureArray)
+      : signatureArray.length >= 2 ? poseidon(signatureArray.slice(-2))
+        : 0n
   console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature, signatureArray, 'sigHash:', bigintToHex(signatureHash))
   // throw new Error('STOP')
   return {
@@ -70,8 +80,8 @@ export const signMessages = async (account: AccountInterface, chainId: string, r
     signatureHash,
   }
 }
-export const verifyMessages = async (account: AccountInterface, chainId: string, revision: Revision, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
-  const typedMessage = createTypedMessage({ chainId, revision, messages })
+export const verifyMessages = async (account: AccountInterface, starknetDomain: StarknetDomain, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
+  const typedMessage = createTypedMessage({ starknetDomain, messages })
   return account.verifyMessage(typedMessage, signature)
 }
 
@@ -96,62 +106,48 @@ export function getTypeSelectorName(td: TypedData, type: string): string {
 // https://github.com/starknet-io/SNIPs/blob/main/SNIPS%2Fsnip-12.md
 //
 export interface TypedMessageOptions {
-  revision: Revision
-  chainId: string
-  domainName?: string
-  version?: string
+  starknetDomain: StarknetDomain
   messages: Messages
 }
 
 export function createTypedMessage({
-  revision,
-  chainId,
-  domainName = DEFAULT_DOMAIN_NAME,
-  version = DEFAULT_VERSION,
+  starknetDomain,
   messages,
 }: TypedMessageOptions): TypedData {
   const _messages = cleanObject(messages)
-  const result = revision == 0 ? {
-    primaryType: "Message",
-    domain: {
-      name: domainName,
-      chainId,
-      version,
-    },
+  const revision = starknetDomain ? parseInt(starknetDomain.revision.toString()) : -1
+  const result = (revision == 0) ? {
+    primaryType: 'Message',
+    domain: starknetDomain,
     types: {
       StarkNetDomain: [
-        { name: "name", type: "felt" },
-        { name: "chainId", type: "felt" },
-        { name: "version", type: "felt" },
+        { name: 'name', type: 'felt' },
+        { name: 'chainId', type: 'felt' },
+        { name: 'version', type: 'felt' },
       ],
-      Message: Object.keys(_messages).map((name) => ({ name, type: "felt" })),
+      Message: Object.keys(_messages).map((name) => ({ name, type: 'felt' })),
     },
     message: _messages,
-  } : {
-    primaryType: "Message",
-    domain: {
-      revision: revision.toString(),
-      name: domainName,
-      chainId,
-      version,
-    },
+  } : (revision == 1) ? {
+    primaryType: 'Message',
+    domain: starknetDomain,
     types: {
       StarknetDomain: [
-        { name: "revision", type: "shortstring" },
-        { name: "name", type: "shortstring" },
-        { name: "chainId", type: "shortstring" },
-        { name: "version", type: "shortstring" },
+        { name: 'revision', type: 'string' },
+        { name: 'name', type: 'string' },
+        { name: 'chainId', type: 'string' },
+        { name: 'version', type: 'string' },
       ],
       Message: Object.keys(_messages).map((name) => ({
         name,
-        type: isBigint(_messages[name]) ? 'felt' : 'shortstring',
-        // type: typeof _messages[name] == 'bigint' ? 'felt' : 'shortstring',
+        type: isBigint(_messages[name]) ? 'felt' : 'string',
+        // type: typeof _messages[name] == 'bigint' ? 'felt' : 'string',
       })),
     },
     message: Object.keys(_messages).reduce((acc, name) => {
       acc[name] = (isBigint(_messages[name]) ? bigintToHex(_messages[name]) : _messages[name])
       return acc
     }, {} as { [key: string]: any }),
-  }
+  } : undefined
   return result
 }

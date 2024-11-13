@@ -1,23 +1,26 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { BigNumberish } from 'starknet'
 import { Grid, Tab } from 'semantic-ui-react'
 import { RowDivider, VStack } from '@/lib/ui/Stack'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useCanMintDuelist } from '@/pistols/hooks/useTokenDuelist'
-import { useDuelistBalanceOf, useDuelistOfOwnerByIndex } from '@/pistols/hooks/useTokenDuelist'
+import { useDuelistCalcPrice } from '@/pistols/hooks/useDuelistToken'
+import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
+import { useGetDuelistTokensByOwnerQuery } from '@/pistols/hooks/useSdkQueries'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
-import { WagerBalance } from '@/pistols/components/account/LordsBalance'
+import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/components/ScGate'
 import { SocialsList } from '@/pistols/components/SocialsList'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
-import WalletHeader from '@/pistols/components/account/WalletHeader'
+import { Header } from '@/pistols/components/Header'
 import DuelistEditModal from '@/pistols/components/DuelistEditModal'
-import UIContainer from '@/pistols/components/UIContainer'
+import DuelistModal from '@/pistols/components/DuelistModal'
+import WalletHeader from '@/pistols/components/account/WalletHeader'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -26,23 +29,26 @@ export default function ScProfile() {
   const { isConnected, address } = useAccount()
   const { duelistEditOpener } = usePistolsContext()
   const { fromGate } = usePistolsScene()
-  const { duelistBalance } = useDuelistBalanceOf(address)
-  console.log(`DUELIST BALANCE`, duelistBalance)
+  const { duelistBalance } = useDuelistsOfOwner(address)
+  // console.log(`DUELIST BALANCE`, duelistBalance)
 
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     if (!loaded) {
       setLoaded(true)
-      console.log(`FROM`, fromGate, duelistBalance)
       if (fromGate && duelistBalance === 0) {
         duelistEditOpener.open({ mintNew: true })
       }
     }
   }, [fromGate, duelistBalance])
 
+  // TODO: use this...
+  useGetDuelistTokensByOwnerQuery(0, address)
+
   return (
     <div id='Gate'>
-      <UIContainer>
+      <Header account={false} tables={false} />
+      <div className='UIContainer'>
         <WalletHeader />
         <Tab
           menu={{ secondary: true, pointing: true, attached: true }}
@@ -58,9 +64,10 @@ export default function ScProfile() {
           ]}
         >
         </Tab>
-      </UIContainer>
+      </div>
 
       <DuelistEditModal opener={duelistEditOpener} />
+      <DuelistModal duelButton />
       <CurrentChainHint />
     </div>
   )
@@ -74,7 +81,7 @@ export default function ScProfile() {
 
 function DuelistsConnect() {
   return (
-    <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
+    <VStack className='Faded FillWidth'>
       <Divider />
       <span className='Title'>
         Create or Log In with your
@@ -94,26 +101,30 @@ function DuelistsConnect() {
 
 function DuelistsList() {
   const { address } = useAccount()
+  const { duelistId } = useSettings()
   const { duelistEditOpener } = usePistolsContext()
-  const { duelistBalance } = useDuelistBalanceOf(address)
-  const { canMint } = useCanMintDuelist(address)
+  const { dispatchSetScene } = usePistolsScene()
+  const { duelistBalance, duelistIds } = useDuelistsOfOwner(address)
+  const { amount } = useDuelistCalcPrice(address)
 
   const _mintDuelist = () => {
     duelistEditOpener.open({ mintNew: true })
   }
 
-  const rows = useMemo(() => {
-    let result = []
-    for (let index = 0; index < duelistBalance; ++index) {
-      result.push(<DuelistItem key={`i${index}`} index={index} />)
-    }
-    return result
-  }, [address, duelistBalance])
+  const _goToTavern = () => {
+    dispatchSetScene(SceneName.Tavern)
+  }
+
+  const rows = useMemo(() => (
+    duelistIds.map((duelistId) => {
+      return <DuelistItem key={`i${duelistId}`} duelistId={duelistId} />
+    })
+  ), [address, duelistBalance])
 
   return (
-    <VStack className='Faded FillWidth UIAccountsListScroller_XX'>
+    <VStack className='Faded FillWidth'>
       <Divider hidden />
-      <Grid className='Faded FillWidth'>
+      <Grid className='Faded FillWidth UIAccountsListScroller'>
         {duelistBalance > 0 &&
           <Row columns={'equal'} className='Title'>
             <Col>
@@ -131,28 +142,26 @@ function DuelistsList() {
         }
       </Grid>
       <Divider />
-      <ActionButton fill disabled={!canMint} onClick={() => _mintDuelist()} label='Create New Duelist' />
+      <ActionButton fill important disabled={!duelistId} onClick={() => _goToTavern()} label={!duelistId ? 'Select A Duelist' : 'Enter The Tavern'} />
       <Divider content={'OR'} />
-      <EnterAsGuestButton />
+      <ActionButton fill disabled={false} onClick={() => _mintDuelist()} label='Create New Duelist' />
     </VStack>
   )
 }
 
 
 function DuelistItem({
-  index,
+  duelistId,
 }: {
-  index: number
+  duelistId: BigNumberish
 }) {
-  const { address } = useAccount()
-  const { duelistId: seletedDuelistId } = useSettings()
-  const { duelistId } = useDuelistOfOwnerByIndex(address, index)
+  const { duelistId: selectedDuelistId } = useSettings()
   const { exists, profilePic } = useDuelist(duelistId)
-  const isSelected = (duelistId && duelistId == seletedDuelistId)
+  const isSelected = (duelistId && duelistId == selectedDuelistId)
 
   const _canPlay = (exists)
 
-  const { duelistEditOpener } = usePistolsContext()
+  const { duelistEditOpener, dispatchSelectDuelistId } = usePistolsContext()
   const { dispatchDuelistId } = useSettings()
 
   const _manage = () => {
@@ -163,11 +172,11 @@ function DuelistItem({
   const { dispatchSetScene } = usePistolsScene()
   const _duel = () => {
     dispatchDuelistId(duelistId)
-    dispatchSetScene(SceneName.Tavern)
+    dispatchSetScene(SceneName.YourDuels)
   }
 
   const classNames = useMemo(() => {
-    const result = ['Anchor']
+    const result = ['Anchor', 'Padded']
     if (isSelected) result.push('BgImportant')
     return result
   }, [isSelected])
@@ -175,29 +184,30 @@ function DuelistItem({
   return (
     <>
       <RowDivider />
-      <Row textAlign='center' verticalAlign='top' className={classNames.join(' ')}
+      <Row textAlign='center' verticalAlign='top'
+        className={classNames.join(' ')}
         onClick={() => dispatchDuelistId(duelistId)}
       >
-        <Col width={3} className='NoPadding'>
+        <Col width={3} verticalAlign='middle'>
           <div>
             <ProfilePicSquare medium
               profilePic={profilePic ?? 0}
             />
           </div>
         </Col>
-        <Col width={8} textAlign='left'>
-
+        <Col width={8} textAlign='left' verticalAlign='middle'>
           <h4>
             <IconClick name='edit' size={'small'} onClick={() => _manage()} />
             &nbsp;
             <ProfileName duelistId={duelistId} />
           </h4>
           <h5>
-            <WagerBalance duelistId={duelistId} />
+            <FameBalanceDuelist duelistId={duelistId} />
           </h5>
         </Col>
-        <Col width={5} textAlign='left' verticalAlign='bottom'>
-          <ActionButton fill disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
+        <Col width={5} textAlign='left' verticalAlign='middle'>
+          <ActionButton fill disabled={!_canPlay} onClick={() => dispatchSelectDuelistId(duelistId)} label='Status' />
+          <ActionButton fill important disabled={!_canPlay} onClick={() => _duel()} label='Duel!' />
         </Col>
       </Row>
     </>

@@ -1,0 +1,20 @@
+$aspect: 1.7777;
+$aspect-w: min(100vw,100vh*$aspect);
+$aspect-h: min(100vw/$aspect,100vh);
+$box-w: calc((100vw - $aspect-w) / 2);
+$box-h: calc((100vh - $aspect-h) / 2);
+
+:root {
+  --aspect-w: #{$aspect-w};
+  --aspect-h: #{$aspect-h};
+  --box-w: #{$box-w};
+  --box-h: #{$box-h};
+}
+
+@function aspect-width($vw) {
+  @return calc(($vw / 100) * $aspect-w);
+}
+
+@function aspect-height($vh) {
+  @return calc(($vh / 100) * $aspect-h);
+}

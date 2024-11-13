@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+if [ $# -ge 1 ]; then
+  export SERVICE_NAME=$1
+else
+  echo "Usage: $0 <service_name>"
+  exit 1
+fi
+
+slot deployments logs $SERVICE_NAME katana -f \
+ | grep -v -e starknet_call -e starknet_blockHashAndNumber -e starknet_getBlockWithTxs -e starknet_getBlockWithTxs -e starknet_getBlockWithReceipts

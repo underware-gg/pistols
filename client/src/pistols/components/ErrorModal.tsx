@@ -6,12 +6,12 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 export default function ErrorModal() {
   const [isOpen, setIsOpen] = useState(null)
 
-  const eventData = useGameEvent('transaction_error', null)
+  const { value: eventData, timestamp } = useGameEvent('transaction_error', null)
   useEffect(() => {
     if (eventData) {
       setIsOpen(true)
     }
-  }, [eventData])
+  }, [eventData, timestamp])
 
   return (
     <Modal
@@ -26,7 +26,7 @@ export default function ErrorModal() {
         {eventData?.reason}
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
-        <ActionButton fill label='Close' onClick={() => setIsOpen(false)} />
+        <ActionButton large fill label='Close' onClick={() => setIsOpen(false)} />
       </Modal.Actions>
     </Modal>
   )

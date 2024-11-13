@@ -2,9 +2,18 @@
 set -e
 source scripts/setup.sh
 
-# export WORLD_ADDRESS=0x403b5f047b8c4797139e30801e310473d99ca6877d19e0f27506f353f8f70f7
+export TORII_PATH=torii
+export START_BLOCK=1
 
-echo "@WORLD: $WORLD_ADDRESS"
+# custom params
+# export WORLD_ADDRESS=0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6
+# export TORII_PATH=../../dojo/target/release/torii
+# export START_BLOCK=720000
+
+echo "* TORII   : $TORII_PATH"
+echo "* BLOCK   : $START_BLOCK"
+echo "* CFG     : $TORII_CONFIG_PATH"
+echo "------------------------------------------------------------------------------"
 
 if [[
   "$WORLD_ADDRESS" != "0x"*
@@ -24,9 +33,12 @@ fi
 # Create certificate
 # $ mkcert 0.0.0.0
 
-torii --version
-torii \
-  --world $WORLD_ADDRESS $* \
-  --allowed-origins "*" \
+$TORII_PATH --version
+$TORII_PATH \
+  --config $TORII_CONFIG_PATH \
+  --http.cors_origins "*" \
+  # --rpc $RPC_URL \ # in cfg file
+  # --world $WORLD_ADDRESS \ # in cfg file
+  # --start-block $START_BLOCK \
   # --relay-local-key-path ./0.0.0.0-key.pem \
   # --relay-cert-path ./0.0.0.0.pem \

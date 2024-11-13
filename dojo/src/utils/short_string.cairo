@@ -2,42 +2,38 @@ use core::byte_array::ByteArrayTrait;
 use pistols::utils::bitwise::{BitwiseU256};
 
 trait ShortStringTrait {
+    fn strlen(self: felt252) -> usize;
+    fn as_string(self: felt252) -> ByteArray;
     fn concat(self: felt252, value: felt252) -> felt252;
     fn join(self: felt252, value: felt252) -> felt252;
-    fn to_byte_array(self: felt252) -> ByteArray;
 }
 
 impl ShortString of ShortStringTrait {
-    fn concat(self: felt252, value: felt252) -> felt252 {
-        let _self: u256 = self.into();
-        let _value: u256 = value.into();
-        let mut offset: usize = 0;
-        let mut i: usize = 0;
-        loop {
-            if(i == 256) { break; }
-            if(_value & BitwiseU256::shl(0xff, i) != 0) {
-                offset = i + 8;
-            }
-            i += 8;
+    fn strlen(self: felt252) -> usize {
+        let mut result: usize = 0;
+        let mut v: u256 = self.into();
+        while (v != 0) {
+            result += 1;
+            v /= 0x100;
         };
-        (_value | BitwiseU256::shl(_self, offset)).try_into().unwrap()
+        (result)
+    }
+
+    fn as_string(self: felt252) -> ByteArray {
+        // alternative: core::to_byte_array::FormatAsByteArray
+        let mut result: ByteArray = "";
+        result.append_word(self, self.strlen());
+        (result)
+    }
+
+    fn concat(self: felt252, value: felt252) -> felt252 {
+        let value_strlen: usize = value.strlen();
+        assert(self.strlen() + value_strlen <= 31, 'short_string::concat() Overflow');
+        (BitwiseU256::shl(self.into(), value_strlen * 8) | value.into()).try_into().unwrap()
     }
 
     fn join(self: felt252, value: felt252) -> felt252 {
         Self::concat(Self::concat(self, '_'), value)
-    }
-
-    fn to_byte_array(self: felt252) -> ByteArray {
-        let mut selfie: u256 = self.into();
-        let mut len: usize = 0;
-        loop {
-            if (selfie == 0 || len == 31) { break; }
-            selfie /= 0x100;
-            len += 1;
-        };
-        let mut result = "";
-        result.append_word(self, len);
-        (result)
     }
 }
 
@@ -52,19 +48,40 @@ mod tests {
     use super::{ShortString};
     
     #[test]
-    fn test_string_concat() {
+    fn test_concat() {
         assert(ShortString::concat('ABC', '123') == 'ABC123', 'ABC123');
-        assert(ShortString::concat('Hello ', 'World') == 'Hello World', 'Hello 1');
-        assert(ShortString::concat('Hello', ' World') == 'Hello World', 'Hello 2');
-        assert(ShortString::concat(' Hello', 'World ') == ' HelloWorld ', 'Hello 3');
-        assert(ShortString::concat(' Hello ', ' World ') == ' Hello  World ', 'Hello 4');
-        assert(ShortString::join('Hello', 'World') == 'Hello_World', 'Hello_World');
+        assert(ShortString::concat('Hey ', 'World') == 'Hey World', 'Hey 1');
+        assert(ShortString::concat('Hey', ' World') == 'Hey World', 'Hey 2');
+        assert(ShortString::concat(' Hey', 'World ') == ' HeyWorld ', 'Hey 3');
+        assert(ShortString::concat(' Hey ', ' World ') == ' Hey  World ', 'Hey 4');
+        assert(ShortString::concat('123456789012345678901234567890', '1') == '1234567890123456789012345678901', '1234567890123456789012345678901');
+        assert(ShortString::concat('1', '123456789012345678901234567890') == '1123456789012345678901234567890', '1123456789012345678901234567890');
+        assert(ShortString::join('Hey', 'World') == 'Hey_World', 'Hey_World');
     }
     
     #[test]
-    fn test_to_byte_array() {
-        assert(''.to_byte_array() == "", 'not empty');
-        assert('1'.to_byte_array() == "1", 'not 1');
-        assert('Hello_World'.to_byte_array() == "Hello_World", 'not Hello_World');
+    #[should_panic(expected: 'short_string::concat() Overflow')]
+    fn test_concat_overflow() {
+        ShortString::concat('123456789012345678901234567890', '12');
+    }
+    
+    #[test]
+    fn test_strlen() {
+        assert(0.strlen() == 0, '0');
+        assert(''.strlen() == 0, 'empty');
+        assert('1'.strlen() == 1, 'not 1');
+        assert('Hey'.strlen() == 3, 'not 5');
+        assert('Hey World'.strlen() == 9, 'not 9');
+        assert('1234567890123456789012345678901'.strlen() == 31, 'not 31');
+    }
+    
+    #[test]
+    fn test_string() {
+        assert(0.as_string() == "", 'not 0');
+        assert(''.as_string() == "", 'not empty');
+        assert('1'.as_string() == "1", 'not 1');
+        assert('Hey'.as_string() == "Hey", 'not Hey');
+        assert('Hey World'.as_string() == "Hey World", 'not Hey World');
+        assert('1234567890123456789012345678901'.as_string() == "1234567890123456789012345678901", 'not 31');
     }
 }

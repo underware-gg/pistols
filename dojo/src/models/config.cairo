@@ -1,5 +1,4 @@
 use starknet::ContractAddress;
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 mod CONFIG {
     const CONFIG_KEY: u8 = 1;
@@ -9,26 +8,59 @@ mod CONFIG {
 #[dojo::model]
 pub struct Config {
     #[key]
-    key: u8,
+    pub key: u8,
     //------
-    treasury_address: ContractAddress,
-    is_paused: bool,
+    pub treasury_address: ContractAddress,
+    pub lords_address: ContractAddress,
+    pub vrf_address: ContractAddress,
+    pub is_paused: bool,
 }
 
-#[derive(Copy, Drop)]
-struct ConfigManager {
-    world: IWorldDispatcher
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct TokenConfig {
+    #[key]
+    pub token_address: ContractAddress,
+    //------
+    pub minter_address: ContractAddress,
+    pub renderer_address: ContractAddress,
+    pub minted_count: u128,
+    // use the Payment model for pricing
 }
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct CoinConfig {
+    #[key]
+    pub coin_address: ContractAddress,
+    //------
+    pub minter_address: ContractAddress,
+    pub faucet_amount: u128, // zero if faucet is closed
+}
+
+
+//---------------------------
+// Traits
+//
+pub use pistols::interfaces::ierc20::{ierc20, ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
+pub use pistols::interfaces::systems::{IVRFMockDispatcher, IVRFMockDispatcherTrait};
+use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
-impl ConfigManagerTraitImpl of ConfigManagerTrait {
-    fn new(world: IWorldDispatcher) -> ConfigManager {
-        (ConfigManager { world })
+impl ConfigImpl of ConfigTrait {
+    fn new() -> Config {
+        (Config {
+            key: CONFIG::CONFIG_KEY,
+            treasury_address: ZERO(),
+            lords_address: ZERO(),
+            vrf_address: ZERO(),
+            is_paused: false,
+        })
     }
-    fn get(self: ConfigManager) -> Config {
-        get!(self.world, (CONFIG::CONFIG_KEY), Config)
+    fn lords_dispatcher(self: @Config) -> ERC20ABIDispatcher {
+        (ierc20(*self.lords_address))
     }
-    fn set(self: ConfigManager, config: Config) {
-        set!(self.world, (config));
+    fn vrf_dispatcher(self: @Config) -> IVRFMockDispatcher {
+        (IVRFMockDispatcher{ contract_address: *self.vrf_address })
     }
 }

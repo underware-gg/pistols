@@ -1,4 +1,6 @@
 
+@import 'aspect';
+
 $font-family: 'EB Garamond', serif;
 $font-family-mono: 'Courier Prime', monospace;
 // $font-family-mono: 'Xanh Mono', monospace;
@@ -30,10 +32,10 @@ $border-button: 1px solid $color-bright;
 $border-button-active: 1px solid $color-brightest;
 $border-button-inactive: 1px solid rgba($color-bright, 0.5);
 
-$color-positive: #21ba45;
-$color-negative: #ff4225;
-$color-warning: #f2c037;
-$color-cold: #31b9c3;
+$color-positive: #77d64d;
+$color-negative: #e34a4a;
+$color-warning: #f1d242;
+$color-cold: #4d9ad6;
 
 $game-width: 960px;
 $game-height: 540px;
@@ -193,7 +195,8 @@ canvas {
 .FloatRight { float:right; }
 
 .Block { display: inline-block; }
-.Flex { display: flex; }
+.Flex { display: flex!important; }
+.FlexInline { display: inline-flex!important; }
 
 .Overflow { overflow: hidden; } // do not expand parent
 .BreakWord { word-wrap:break-word!important; overflow-wrap: break-word!important; }
@@ -201,6 +204,13 @@ canvas {
 
 .NoMouse { pointer-events: none; }
 .YesMouse { pointer-events: auto; }
+
+.NoDrag {
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -ms-user-select: none;
+}
 
 .Bold {
   color: $color-brightest;
@@ -225,6 +235,8 @@ canvas {
 .BgBlack     { background-color: #444; }
 .BgImportant { background-color: $color-medium-bg!important; }
 .BgBrightest { background-color: $color-brightest!important; }
+.BgDark      { background-color: $color-dark!important; }
+.BgDarkest   { background-color: $color-darkest!important; }
 .BgPositive  { background-color: $color-positive!important; }
 .BgNegative  { background-color: $color-negative!important; }
 .BgWarning   { background-color: $color-warning!important; }
@@ -273,9 +285,10 @@ canvas {
   cursor: pointer!important;
   pointer-events: all!important;
   user-select: none;
+  z-index: 1000;
 }
 
-.Unselectable {
+.NoSelection {
   user-select: none;
 }
 
@@ -317,6 +330,13 @@ canvas {
   position: absolute;
   top: unset;
   bottom: 0;
+  left: 0;
+}
+.AbsoluteBottomRight {
+  position: absolute;
+  top: unset;
+  bottom: 0;
+  right: 0;
 }
 
 .Grayscale {
@@ -339,6 +359,11 @@ canvas {
   -webkit-filter: sepia(1); /* Old WebKit */
 }
 
+.FillViewport {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
 .FillWidth80 {
   width: 80%!important;
   min-width: 80%;
@@ -402,17 +427,6 @@ TextArea::selection {
   transform: scale(-1, 1);
 }
 
-
-//------------------------
-// ASPECT RATIO
-//
-// $reference-w: 1200;
-// $reference-h: 675;
-$aspect: 1.7777;
-$aspect-w: min(100vw,100vh*$aspect);
-$aspect-h: min(100vw/$aspect,100vh);
-$box-w: calc((100vw - $aspect-w) / 2);
-$box-h: calc((100vh - $aspect-h) / 2);
 .AspectContent {
 	// background-color: #f004;
 	position: absolute;
@@ -598,6 +612,7 @@ $box-h: calc((100vh - $aspect-h) / 2);
 .LargeButton {
   margin: 0 0.1em;
   padding: 1em 2em;
+  font-size: 1.5em!important;
 }
 
 .FilterButton {
@@ -659,48 +674,64 @@ $box-h: calc((100vh - $aspect-h) / 2);
 // Pistols
 //
 $profile-pic-width: 80px;
+$ui-header-height: 100px;
 $ui-container-gap: 1em;
 
+.UIHeader {
+  // background-color: #0f04;
+  background-image: linear-gradient(to bottom, #0008, #0004, transparent);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: $ui-header-height;
+}
 .UIContainer {
+  // background-color: #f004;
+  background-image: linear-gradient(to right, #000a, transparent);
   width: 100%;
   height: 100%;
   position: absolute;
   top: 0px;
   left: 0px;
-}
-.UIContainerDesktop {
-  @extend .UIContainer;
-  // background-color: #f008;
-  background-image: linear-gradient(to right, #0008, #0004, transparent);
-  background-color: #0004; // For browsers that do not support gradients
+  padding: $ui-header-height 1em 1em !important;
+  margin: 0!important;
   padding: $ui-container-gap;
   min-width: $menu-width;
   max-width: $menu-width;
-  width: $menu-width;
 }
 // descendent of #Gate
-#Gate .UIContainerDesktop {
+#Gate .UIContainer {
   // @extend .UIContainerDesktop;
   min-width: 450px;
   max-width: 450px;
   width: 450px;
-  padding: 1em;
+  padding: 1em!important;
 }
-.UIContainerMobile {
-  @extend .UIContainer;
-  background-color: #0004; // For browsers that do not support gradients
-}
-
 .UIMenuTavernScroller {
   @extend .Scroller;
   width: 100%;
-  height: calc($aspect-h - $profile-pic-width - 1em * 6 - 1px);
+  height: calc($aspect-h - $ui-header-height - 1em * 6 - 1px);
 }
 .UIAccountsListScroller {
   @extend .UIMenuTavernScroller;
   height: calc($aspect-h - 12px - 285px - 12px - 41px - 12px);
+  display: block!important; // do not stretch
   // height: 100%;
   // background-color: red;
+}
+
+.BarMenuTooltip {
+  // position: absolute!important;
+  // top: 0!important;
+  // right: 0!important;
+}
+#BarMenuTooltipAnchor {
+  @extend .NoMouse;
+  position: fixed; // absolute to window
+  top: 0;
+  left: 0;
+  // display: none;
 }
 
 .TitleCase {
@@ -726,14 +757,15 @@ $ui-container-gap: 1em;
   height: calc(439px / 2);
 }
 .ProfilePicDuel {
-  width: 8.5vw;
-  height: 8.5vw;
+  width: aspect-width(8.5);
+  height: aspect-width(8.5);
   object-fit: cover;
   clip-path: circle();
   object-position: 50% 20%; //TODO this moves the image center for the rounded image change to a proper solution
-  margin:0.95vw;
+  margin: aspect-width(0.95);
 }
 .ProfilePicSquare {
+  max-width: $profile-pic-width!important; // avoids not taking space in flex
   width: $profile-pic-width;
   height: $profile-pic-width;
   // border: $border-button-inactive;
@@ -742,20 +774,25 @@ $ui-container-gap: 1em;
 }
 .ProfilePicMedium {
   @extend .ProfilePicSquare;
+  max-width: 60px!important; // avoids not taking space in flex
   width: 60px;
   height: 60px;
   border: none;
 }
+.ProfilePicMediumWidth {
+  width: 60px!important;
+}
 .ProfilePicCircle {
-  width: 6.8vw;
-  height: 6.8vw;
+  width: aspect-width(7.5);
+  height: aspect-width(7.5);
   object-fit: cover;
   object-position: 50% 20%; //TODO this moves the image center for the rounded image change to a proper solution
   clip-path: circle();
-  margin: 0.23vw;
+  margin: aspect-width(0.23);
 }
 .ProfilePicSmall {
   @extend .ProfilePicSquare;
+  max-width: 40px!important; // avoids not taking space in flex
   width: 40px;
   height: 40px;
   border: none;
@@ -836,72 +873,72 @@ $ui-container-gap: 1em;
   pointer-events: none;
   position: absolute;
   top: 0;
-  width: 30vw;
-  height: 6vw;
+  width: aspect-width(32);
+  height: aspect-width(7);
 }
 
 .TavernTitle {
   pointer-events: none;
   position: absolute;
   top: 0;
-  left: 4vw;
-  right: 4vw;
-  width: 22vw;
-  height: 1.4vw;
-  line-height: 1.4vw;
+  left: aspect-width(5);
+  right: aspect-width(5);
+  width: aspect-width(22);
+  height: aspect-width(1.4);
+  line-height: aspect-width(1.4);
   text-align: center;
-  font-size: 0.9vw;
+  font-size: aspect-width(0.9);
 }
 
-.TavernWager {
+.TavernQuote {
   pointer-events: none;
   position: absolute;
-  top: 1.2vw;
-  left: 4vw;
-  right: 4vw;
-  width: 22vw;
-  height: 2vw;
-  line-height: 2vw;
+  top: aspect-width(1.2);
+  left: aspect-width(5);
+  right: aspect-width(5);
+  width: aspect-width(22);
+  height: aspect-width(2);
+  line-height: aspect-width(2);
   text-align: center;
 }
 
-.TavernWager[data-contentlength="0"] {
-  font-size: 1.4vw;
+.TavernQuote[data-contentlength="0"] {
+  font-size: aspect-width(1.4);
 }
-.TavernWager[data-contentlength="1"] {
-  font-size: 1.3vw;
+.TavernQuote[data-contentlength="1"] {
+  font-size: aspect-width(1.3);
 }
-.TavernWager[data-contentlength="2"] {
-  font-size: 1.2vw;
+.TavernQuote[data-contentlength="2"] {
+  font-size: aspect-width(1.2);
 }
-.TavernWager[data-contentlength="3"] {
-  font-size: 1vw;
+.TavernQuote[data-contentlength="3"] {
+  font-size: aspect-width(1);
 }
 
 .TavernTable {
   pointer-events: none;
   position: absolute;
-  top: 3.3vw;
-  left: 10.2vw;
-  right: 10.2vw;
-  width: 9.6vw;
-  height: 1.5vw;
-  line-height: 1.5vw;
+  top: aspect-width(3.3);
+  left: aspect-width(11.2);
+  right: aspect-width(11.2);
+  width: aspect-width(9.6);
+  height: aspect-width(1.5);
+  line-height: aspect-width(1.5);
   text-align: center;
   color: black;
 }
 
 .TavernTable[data-contentlength="0"] {
-  font-size: 1vw;
+  font-size: aspect-width(1);
 }
 .TavernTable[data-contentlength="1"] {
-  font-size: 0.85vw;
+  font-size: aspect-width(0.85);
 }
 .TavernTable[data-contentlength="2"] {
-  font-size: 0.7vw;
+  font-size: aspect-width(0.7);
 }
 .TavernTable[data-contentlength="3"] {
-  font-size: 0.6vw;
+  font-size: aspect-width(0.6);
 }
 
 .DuelProfile {
@@ -909,8 +946,19 @@ $ui-container-gap: 1em;
   align-items: flex-start;
   align-content: flex-start;
   position: absolute;
-  width: 30vw;
+  width: aspect-width(28);
+  z-index: 100;
 }
+
+.DuelistProfile {
+  display: flex;
+  align-items: flex-start;
+  align-content: flex-start;
+  position: absolute;
+  width: aspect-width(20);
+  z-index: 100;
+}
+
 .DuelProfileA {
   @extend .DuelProfile;
   justify-content: left;
@@ -927,7 +975,7 @@ $ui-container-gap: 1em;
 }
 
 .DuelistProfileA {
-  @extend .DuelProfile;
+  @extend .DuelistProfile;
   justify-content: left;
   align-items: flex-end;
   text-align: left;
@@ -935,7 +983,7 @@ $ui-container-gap: 1em;
   left: 0;
 }
 .DuelistProfileB {
-  @extend .DuelProfile;
+  @extend .DuelistProfile;
   justify-content: right;
   align-items: flex-end;
   text-align: right;
@@ -945,20 +993,20 @@ $ui-container-gap: 1em;
 
 .DuelistHonourProgress {
   position: absolute;
-  width: 10vw;
-  height: 10vw;
-  margin:0.2vw;
+  width: aspect-width(10.1);
+  height: aspect-width(10.1);
+  margin: aspect-width(0.2);
   overflow: hidden;
 }
 
 .DuelistHonour {
   position: absolute;
-  width: 3vw;
-  height: 3vw;
-  margin:0.75vw;
-  margin-bottom: 0.25vw;
+  width: aspect-width(3.1);
+  height: aspect-width(3.1);
+  margin: aspect-width(0.75);
+  margin-bottom: aspect-width(0.25);
   background-color: #efc258;
-  border-radius: 5vw;
+  border-radius: aspect-width(5);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -973,16 +1021,16 @@ $ui-container-gap: 1em;
 }
 
 .ProfileName {
-  width: 11.4vw; 
-  height: 1.6vw;
-  line-height: 1.6vw;
+  width: aspect-width(13); 
+  height: aspect-width(1.6);
+  line-height: aspect-width(1.6);
   align-content: end;
 }
 
 .ProfileAddress {
-  width: 4.8vw; 
-  height: 1.2vw; 
-  line-height: 1.2vw;
+  width: aspect-width(5.5); 
+  height: aspect-width(1.2); 
+  line-height: aspect-width(1.2);
 }
 
 // .ProfileAndHealth {
@@ -1094,6 +1142,7 @@ $ui-container-gap: 1em;
   @extend .Anchor;
   color: $color-bright;
 	text-shadow: 0.1rem 0.1rem $color-shadow;
+  z-index: 1000;
   &:hover {
     @extend .IconClick_hover;
   }
@@ -1159,13 +1208,13 @@ $logo-url: '/logos/logo_avante.svg';
 }
 
 
-.WagerBig {
+.CoinBig {
   @extend .TitleCase, .H3, .Bold;//, .Number;
 }
-.Wager {
+.Coin {
   @extend .TitleCase, .H4;//, .Number;
 }
-.WagerSmall {
+.CoinSmall {
   @extend .TitleCase, .H5, .Bold;//, .Number;
 }
 
@@ -1207,14 +1256,45 @@ $logo-url: '/logos/logo_avante.svg';
   border: 5px solid $color-medium!important;
 }
 
-//--------------------
-// Unity canvas
-//
-// #react-unity-webgl-canvas-3 {
-// canvas[id^='react-unity-webgl-canvas'] {
-.UnityCanvas {
-  width: 900px;
-  height: 450px;
+.CenteredPanel {
+  background-color: rgba($color-darkest, 0.7);
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 50%;
+  height: 50%;
+}
+.TempRevealPanel {
+  @extend .YesMouse;
+  background-color: rgba($color-darkest, 0.7);
+  width: 300px;
+  height: 120px;
+  position: absolute;
+  bottom: -120px;
+  left: 0;
+  z-index: 1000;
+}
+
+.TempBarkeepOverlay {
+  @extend .FillParent;
+  @extend .AboveAll;
+}
+.TempBarkeepTalkBalloon {
+  width: 300px;
+  height: auto;
+  position: absolute;
+  top: 15%;
+  left: 30%;
+}
+.TempBarkeepTalkBalloonText {
+  @extend .FillParent;
+  color: $color-darkest;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 1.3em;
+  font-size: 2em;
+  text-shadow: $text-shadow;
 }
 
 
@@ -1301,6 +1381,7 @@ input::placeholder {
 }
 .ui.dropdown .menu>.item {
   color: $color-brightest!important;
+  font-size: 1em;
 }
 .ui.active.button, .ui.active.button:hover {
   @extend ._button_active;
@@ -1628,17 +1709,24 @@ a.active.step:hover,
   border-top: 1px solid rgba($color-brightest, .15);
   border-bottom: 1px solid rgba($color-brightest, .25);
 }
+// <Popup>
+.ui.popup,
+.ui.label {
+  background-color: $color-darkest;
+  color: $color-brightest;
+  font-size: 1.5em;
+}
 
 //
 // Dialog above duelists
 //
 .dialog-container {
-  width: 18vw;
-  height: 12vw;
+  width: aspect-width(18);
+  height: aspect-width(12);
   text-align: Left;
   position: absolute;
-  top: calc(50% - 6vw);
-  left: calc(50% - 10vw);
+  top: calc(50% - aspect-width(6));
+  left: calc(50% - aspect-width(10));
   font-family: Arial, sans-serif;
   display: flex;
   flex-direction: column;
@@ -1650,72 +1738,72 @@ a.active.step:hover,
 
 .dialog-background {
   position: absolute;
-  width: 18vw;
-  height: 12vw;
+  width: aspect-width(18);
+  height: aspect-width(12);
 }
 
 .dialog-data {
   position: absolute;
-  margin: 1.3vw;
-  margin-top: 1.6vw;
-  width: 15.4vw;
-  height: 6vw;
+  margin: aspect-width(1.3);
+  margin-top: aspect-width(1.6);
+  width: aspect-width(15.4);
+  height: aspect-width(6);
   padding: 2%;
 }
 
 .dialog-title {
   font-weight: lighter;
-  font-size: 0.7vw;
+  font-size: aspect-width(0.7);
   margin-bottom: 2%;
   color: black;
 }
 
-.dialog-duelist, .dialog-message {
+.dialog-duelist, .dialog-quote {
   font-weight: normal;
   color: black;
 }
 
-.dialog-duelist[data-contentlength="0"], .dialog-message[data-contentlength="0"], .ProfileName[data-contentlength="0"], .Code[data-contentlength="0"] {
-  font-size: 1.2vw;
+.dialog-duelist[data-contentlength="0"], .dialog-quote[data-contentlength="0"], .ProfileName[data-contentlength="0"], .Code[data-contentlength="0"] {
+  font-size: aspect-width(1.2);
 }
-.dialog-duelist[data-contentlength="1"], .dialog-message[data-contentlength="1"], .ProfileName[data-contentlength="1"], .Code[data-contentlength="1"] {
-  font-size: 1.1vw;
+.dialog-duelist[data-contentlength="1"], .dialog-quote[data-contentlength="1"], .ProfileName[data-contentlength="1"], .Code[data-contentlength="1"] {
+  font-size: aspect-width(1.1);
 }
-.dialog-duelist[data-contentlength="2"], .dialog-message[data-contentlength="2"], .ProfileName[data-contentlength="2"], .Code[data-contentlength="2"] {
-  font-size: 1vw;
+.dialog-duelist[data-contentlength="2"], .dialog-quote[data-contentlength="2"], .ProfileName[data-contentlength="2"], .Code[data-contentlength="2"] {
+  font-size: aspect-width(1);
 }
-.dialog-duelist[data-contentlength="3"], .dialog-message[data-contentlength="3"], .ProfileName[data-contentlength="3"], .Code[data-contentlength="3"] {
-  font-size: 0.8vw;
+.dialog-duelist[data-contentlength="3"], .dialog-quote[data-contentlength="3"], .ProfileName[data-contentlength="3"], .Code[data-contentlength="3"] {
+  font-size: aspect-width(0.8);
 }
 
 .Code[data-contentlength="0"] {
-  font-size: 1.0vw;
+  font-size: aspect-width(1.0);
 }
 .Code[data-contentlength="1"] {
-  font-size: 0.9vw;
+  font-size: aspect-width(0.9);
 }
 .Code[data-contentlength="2"] {
-  font-size: 0.8vw;
+  font-size: aspect-width(0.8);
 }
 .Code[data-contentlength="3"] {
-  font-size: 0.7vw;
+  font-size: aspect-width(0.7);
 }
 
 .dialog-button[data-contentlength="0"] {
-  font-size: 1.1vw;
+  font-size: aspect-width(1.1);
 }
 .dialog-button[data-contentlength="1"] {
-  font-size: 0.9vw;
+  font-size: aspect-width(0.9);
 }
 .dialog-button[data-contentlength="2"] {
-  font-size: 0.7vw;
+  font-size: aspect-width(0.7);
 }
 .dialog-button[data-contentlength="3"] {
-  font-size: 0.5vw;
+  font-size: aspect-width(0.5);
 }
 
 .dialog-content {
-  height: 3vw;
+  height: aspect-width(3);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1725,7 +1813,7 @@ a.active.step:hover,
 
 .dialog-button {
   width: 100%;
-  height: 2vw;
+  height: aspect-width(2);
   padding: 5px 10px;
   border: none;
   border-radius: 5px;
@@ -1743,8 +1831,8 @@ a.active.step:hover,
 .dialog-spinner {
   --c1:#673b14;
   --c2:#f8b13b;
-  width: 1vw;
-  height: 2vw;
+  width: aspect-width(1);
+  height: aspect-width(2);
   margin-right: 10px;
   border-top: 4px solid var(--c1);
   border-bottom: 4px solid var(--c1);
@@ -1792,7 +1880,7 @@ a.active.step:hover,
 }
 
 .ContentSmall {
-  font-size: 2vw;
+  font-size: aspect-width(2);
 }
 
 .button_duel {
@@ -1801,14 +1889,14 @@ a.active.step:hover,
   background-color: transparent !important;
   align-items: center;
   justify-content: center;
-  font-size: 0.9vw !important;
+  font-size: aspect-width(0.9) !important;
   min-height: 0 !important;
 }
 
 .button_duel[type="tavern"] {
-  width: 8.9vw;
+  width: aspect-width(8.9);
 }
 
 .button_duel[type="database"], .button_duel[type="volume"] {
-  width: 2.7vw;
+  width: aspect-width(2.7);
 }

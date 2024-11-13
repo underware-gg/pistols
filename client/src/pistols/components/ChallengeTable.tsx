@@ -2,10 +2,10 @@ import React, { useMemo, useState } from 'react'
 import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useQueryContext } from '@/pistols/hooks/QueryContext'
+import { useGetChallengesByDuelistQuery } from '@/pistols/hooks/useSdkQueries'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useDuel } from '@/pistols/hooks/useDuel'
-import { useWager } from '@/pistols/hooks/useWager'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
@@ -39,10 +39,15 @@ export function ChallengeTablePast() {
 }
 
 export function ChallengeTableYour() {
+  // TODO: use this...
+  const { duelistId } = useSettings()
+  useGetChallengesByDuelistQuery(duelistId)
+
   const {
     queryYourDuels: { challengeIds, states },
     filterStatesYourDuels, dispatchFilterStatesYourDuels
   } = useQueryContext()
+
   return <ChallengeTableByIds challengeIds={challengeIds} compact existingStates={states} states={filterStatesYourDuels} setStates={dispatchFilterStatesYourDuels} />
 }
 
@@ -168,7 +173,6 @@ function DuelItem({
     challenge: { duelistIdA, duelistIdB, tableId, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start },
     turnA, turnB,
   } = useDuel(duelId)
-  const { value } = useWager(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistIdA)
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistIdB)
 
@@ -183,6 +187,8 @@ function DuelItem({
   const _gotoChallenge = () => {
     dispatchSelectDuel(duelId)
   }
+
+  const fameBalance = null;
 
   if (nameFilter) {
     const isA = nameA ? nameA.toLowerCase().includes(nameFilter) : false
@@ -225,14 +231,14 @@ function DuelItem({
             <PositiveResult positive={true}>
               <ProfileName duelistId={winnerIsA ? duelistIdA : duelistIdB} badges={false} />
             </PositiveResult>
-            {value && <><br /><Balance small tableId={tableId} wei={value} /></>}
+            {fameBalance && <><br /><Balance fame small wei={fameBalance} /></>}
           </>
           :
           <>
             <span className={ChallengeStateClasses[state]}>
               {ChallengeStateNames[state]}
             </span>
-            {value && <><br /><Balance small tableId={tableId} wei={value} crossed={!isLive} /></>}
+            {fameBalance && <><br /><Balance fame small wei={fameBalance} crossed={!isLive} /></>}
           </>
         }
       </Cell>

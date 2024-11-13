@@ -42,6 +42,7 @@ export function ProfilePic({
   disabled = false,
   // switch button
   duelistId,
+  displayBountyValue = null,
 }: {
   profilePic?: number
   profilePicUrl?: string
@@ -59,6 +60,8 @@ export function ProfilePic({
   disabled?: boolean
   // switch duelist
   duelistId?: BigNumberish
+  // display bounty
+  displayBountyValue?: number | null
 }) {
   const _clickable = (onClick != null && !disabled)
 
@@ -107,8 +110,14 @@ export function ProfilePicSquare({
   profilePic,
   small = false,
   medium = false,
+  className,
+}: {
+  profilePic: number
+  small?: boolean
+  medium?: boolean
+  className?: string
 }) {
-  return <ProfilePic profilePic={profilePic} small={small} medium={medium} square={true} />
+  return <ProfilePic profilePic={profilePic} small={small} medium={medium} square className={className} />
 }
 
 export function ProfilePicSquareButton({
@@ -119,5 +128,5 @@ export function ProfilePicSquareButton({
   dimmed = false,
   onClick,
 }) {
-  return <ProfilePic profilePic={profilePic} onClick={onClick} disabled={disabled} dimmed={dimmed} small={small} medium={medium} square={true} />
+  return <ProfilePic profilePic={profilePic} onClick={onClick} disabled={disabled} dimmed={dimmed} small={small} medium={medium} square />
 }

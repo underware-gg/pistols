@@ -1,48 +1,57 @@
-import { AccountInterface, BigNumberish } from 'starknet'
-import { pedersen } from '@/lib/utils/starknet'
+import { AccountInterface, BigNumberish, StarknetDomain } from 'starknet'
+import { poseidon } from '@/lib/utils/starknet'
 import { signMessages, Messages } from '@/lib/utils/starknet_sign'
-import { HASH_SALT_MASK } from '@/pistols/utils/constants'
 import { bigintToHex } from '@/lib/utils/types'
+import { BITWISE } from '@/games/pistols/generated/constants'
 
-interface CommitMoveMessage extends Messages {
+export interface CommitMoveMessage extends Messages {
   duelId: bigint,
-  roundNumber: bigint,
   duelistId: bigint,
 }
 
-export const make_action_hash = (salt: BigNumberish, action: BigNumberish) => (pedersen(BigInt(salt), BigInt(action)) & HASH_SALT_MASK)
-
-export const pack_action_slots = (slot1: number | null, slot2: number | null): number | null => {
-  if (slot1 != null && slot2 != null) {
-    return slot1 | (slot2 << 8)
+// in sync with pistols::libs::utils::make_moves_hash
+export const make_moves_hash = (salt: BigNumberish, moves: number[]) => {
+  if (!salt) return null
+  let result: bigint = 0n
+  for (let index = 0; index < moves.length; index++) {
+    if (index == 4) {
+      console.warn(`make_moves_hash(): too many moves (${moves.length})!`, moves)
+      break
+    }
+    const move: number = moves[index]
+    if (move != 0) {
+      const move_hash = make_move_hash(salt, index, move)
+      result |= move_hash
+    }
   }
-  return null
+  return result
+}
+const make_move_mask = (index: number): bigint => {
+  return (BigInt(BITWISE.MAX_U32) << (BigInt(index) * 32n))
+}
+const make_move_hash = (salt: BigNumberish, index: number, move: number): bigint => {
+  const mask: bigint = make_move_mask(index)
+  const hash: bigint = move ? poseidon([salt, move]) : 0n
+  return (hash & mask)
 }
 
-export const unpack_action_slots = (packed: number | null): number[] | null => {
-  if (packed != null) {
-    return [packed & 0xff, (packed & 0xff00) >> 8]
-  }
-  return null
-}
 
 
-/** @returns a 64-bit salt from account signature, or 0 if fail */
-const signAndGenerateSalt = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number): Promise<bigint> => {
+/** @returns a salt from account signature, or 0 if fails */
+const signAndGenerateSalt = async (
+  account: AccountInterface, 
+  starknetDomain: StarknetDomain, 
+  messageToSign: CommitMoveMessage,
+): Promise<bigint> => {
   let result = 0n
-  if (duelId && roundNumber) {
+  if (messageToSign) {
     try {
-      const messages: CommitMoveMessage = {
-        duelId: BigInt(duelId),
-        roundNumber: BigInt(roundNumber),
-        duelistId: BigInt(duelistId),
-      }
-      const { signatureHash } = await signMessages(account, chainId, 1, messages)
+      const { signatureHash } = await signMessages(account, starknetDomain, messageToSign)
       if (signatureHash == 0n) {
         // get on-chain????
         throw new Error('null signature')
       }
-      result = (signatureHash & HASH_SALT_MASK)
+      result = signatureHash
     } catch (e) {
       console.warn(`signAndGenerateSalt() exception:`, e)
     }
@@ -51,38 +60,65 @@ const signAndGenerateSalt = async (account: AccountInterface, chainId: string, d
 }
 
 /** @returns the felt252 hash for an action, or 0 if fail */
-export const signAndGenerateActionHash = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number, packed: BigNumberish): Promise<bigint> => {
-  const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
-  const hash = salt ? make_action_hash(salt, BigInt(packed)) : null
-  console.log(`signAndGenerateActionHash():`, bigintToHex(duelId), roundNumber, packed, bigintToHex(salt), bigintToHex(hash))
-  return hash
+export const signAndGenerateMovesHash = async (
+  account: AccountInterface, 
+  starknetDomain: StarknetDomain, 
+  messageToSign: CommitMoveMessage,
+  moves: number[]
+): Promise<{ hash: bigint, salt: bigint }> => {
+  //------------------------------
+  // TODO: REMOVE THIS!!!
+  // return poseidon([duelId, duelistId])
+  //------------------------------
+  const salt = await signAndGenerateSalt(account, starknetDomain, messageToSign)
+  const hash = make_moves_hash(salt, moves)
+  console.log(`signAndGenerateMovesHash():`, messageToSign, moves, bigintToHex(salt), bigintToHex(hash))
+  return { hash, salt }
 }
 
 /** @returns the original action from an action hash, or 0 if fail */
-export const signAndRestoreActionFromHash = async (account: AccountInterface, chainId: string, duelistId: bigint, duelId: bigint, roundNumber: number, hash: bigint, possibleActions: BigNumberish[]): Promise<{ salt: bigint, packed: number, slot1: number, slot2: number }> => {
-  const salt = await signAndGenerateSalt(account, chainId, duelistId, duelId, roundNumber)
-  let packed = null
-  let slots = null
-  console.log(`___RESTORE_HASH Duel:`, bigintToHex(duelId), 'round:', roundNumber, 'hash:', bigintToHex(hash), 'salt:', bigintToHex(salt))
-  for (let i = 0; salt > 0n && i < possibleActions.length; ++i) {
-    const m = possibleActions[i]
-    const h = make_action_hash(salt, m)
-    console.log(`___RESTORE_HASH move:`, m, bigintToHex(hash), '>', bigintToHex(h))
-    if (h == hash) {
-      packed = Number(m)
-      slots = unpack_action_slots(packed)
-      console.log(`___RESTORE_HASH FOUND ACTION:`, packed, slots)
-      break
+export const signAndRestoreMovesFromHash = async (
+  account: AccountInterface, 
+  starknetDomain: StarknetDomain, 
+  messageToSign: CommitMoveMessage,
+  hash: bigint, 
+  decks: number[][]
+): Promise<{ salt: bigint, moves: number[] }> => {
+  const salt = await signAndGenerateSalt(account, starknetDomain, messageToSign)
+  let moves = []
+  console.log(`DECKS:`, decks)
+  console.log(`___RESTORE message:`, messageToSign, '\nsalt:', bigintToHex(salt), '\nhash:', bigintToHex(hash))
+  if (salt > 0n) {
+    // there are 2 to 4 decks...
+    for (let di = 0; di < decks.length; ++di) {
+      const deck = decks[di]
+      const mask = make_move_mask(di)
+      // each deck can contain up to 10 cards/moves...
+      for (let mi = 0; mi < deck.length; ++mi) {
+        const move = deck[mi]
+        const move_hash = make_move_hash(salt, di, move)
+        const stored_hash = (hash & mask)
+        if (stored_hash == 0n) {
+          moves.push(0)
+          break
+        } else {
+          console.log(`___RESTORE D${di}/M${mi}:`, bigintToHex(stored_hash), '>', bigintToHex(move_hash), '?', move)
+          if (stored_hash == move_hash) {
+            moves.push(Number(move))
+            console.log(`___RESTORE D${di}/M${mi}: FOUND!`, move)
+            break
+          }
+        }
+      }
+      if (moves.length != di + 1) {
+        console.warn(`___RESTORE NOT FOUND for deck ${di}`)
+        break
+      }
     }
-  }
-  if (!packed) {
-    console.warn(`___RESTORE_HASH ACTION NOT FOUND for hash:`, hash)
   }
   return {
     salt,
-    packed,
-    slot1: slots?.[0] ?? null,
-    slot2: slots?.[1] ?? null,
+    moves: (moves.length == decks.length) ? moves : [],
   }
 }
 

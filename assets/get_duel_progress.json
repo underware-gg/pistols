@@ -1,0 +1,303 @@
+{
+  "steps": [
+    {
+      "pace": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "card_env": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "dice_env": 0,
+      "card_a": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "card_b": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "state_a": {
+        "health": 3,
+        "damage": 1,
+        "chances": 50,
+        "dice_fire": 64,
+        "honour": 40,
+        "wager": 0,
+        "win": 0
+      },
+      "state_b": {
+        "health": 3,
+        "damage": 1,
+        "chances": 50,
+        "dice_fire": 0,
+        "honour": 50,
+        "wager": 0,
+        "win": 0
+      }
+    },
+    {
+      "pace": {
+        "variant": {
+          "Paces1": {}
+        }
+      },
+      "card_env": {
+        "variant": {
+          "ChancesDown": {}
+        }
+      },
+      "dice_env": 20,
+      "card_a": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "card_b": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "state_a": {
+        "health": 3,
+        "damage": 1,
+        "chances": 40,
+        "dice_fire": 64,
+        "honour": 40,
+        "wager": 0,
+        "win": 0
+      },
+      "state_b": {
+        "health": 3,
+        "damage": 1,
+        "chances": 40,
+        "dice_fire": 0,
+        "honour": 50,
+        "wager": 0,
+        "win": 0
+      }
+    },
+    {
+      "pace": {
+        "variant": {
+          "Paces2": {}
+        }
+      },
+      "card_env": {
+        "variant": {
+          "DoubleDamageUp": {}
+        }
+      },
+      "dice_env": 25,
+      "card_a": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "card_b": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "state_a": {
+        "health": 3,
+        "damage": 3,
+        "chances": 40,
+        "dice_fire": 64,
+        "honour": 40,
+        "wager": 0,
+        "win": 0
+      },
+      "state_b": {
+        "health": 3,
+        "damage": 3,
+        "chances": 40,
+        "dice_fire": 0,
+        "honour": 50,
+        "wager": 0,
+        "win": 0
+      }
+    },
+    {
+      "pace": {
+        "variant": {
+          "Paces3": {}
+        }
+      },
+      "card_env": {
+        "variant": {
+          "DamageUp": {}
+        }
+      },
+      "dice_env": 2,
+      "card_a": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "card_b": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "state_a": {
+        "health": 3,
+        "damage": 4,
+        "chances": 40,
+        "dice_fire": 64,
+        "honour": 40,
+        "wager": 0,
+        "win": 0
+      },
+      "state_b": {
+        "health": 3,
+        "damage": 4,
+        "chances": 40,
+        "dice_fire": 0,
+        "honour": 50,
+        "wager": 0,
+        "win": 0
+      }
+    },
+    {
+      "pace": {
+        "variant": {
+          "Paces4": {}
+        }
+      },
+      "card_env": {
+        "variant": {
+          "DamageUp": {}
+        }
+      },
+      "dice_env": 2,
+      "card_a": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "card_b": {
+        "variant": {
+          "Fire": {
+            "variant": {
+              "Paces4": {}
+            }
+          }
+        }
+      },
+      "state_a": {
+        "health": 3,
+        "damage": 5,
+        "chances": 40,
+        "dice_fire": 64,
+        "honour": 40,
+        "wager": 0,
+        "win": 0
+      },
+      "state_b": {
+        "health": 3,
+        "damage": 5,
+        "chances": 40,
+        "dice_fire": 86,
+        "honour": 50,
+        "wager": 0,
+        "win": 0
+      }
+    },
+    {
+      "pace": {
+        "variant": {
+          "Paces5": {}
+        }
+      },
+      "card_env": {
+        "variant": {
+          "SpecialAllShotsHit": {}
+        }
+      },
+      "dice_env": 31,
+      "card_a": {
+        "variant": {
+          "Fire": {
+            "variant": {
+              "Paces5": {}
+            }
+          }
+        }
+      },
+      "card_b": {
+        "variant": {
+          "None": {}
+        }
+      },
+      "state_a": {
+        "health": 3,
+        "damage": 105,
+        "chances": 140,
+        "dice_fire": 64,
+        "honour": 40,
+        "wager": 0,
+        "win": 0
+      },
+      "state_b": {
+        "health": 0,
+        "damage": 105,
+        "chances": 140,
+        "dice_fire": 0,
+        "honour": 50,
+        "wager": 0,
+        "win": 0
+      }
+    }
+  ],
+  "winner": 1,
+  "hand_a": {
+    "card_fire": {
+      "variant": {
+        "Paces5": {}
+      }
+    },
+    "card_dodge": {
+      "variant": {
+        "Paces6": {}
+      }
+    },
+    "card_tactics": {
+      "variant": {
+        "None": {}
+      }
+    },
+    "card_blades": {
+      "variant": {
+        "None": {}
+      }
+    }
+  },
+  "hand_b": {
+    "card_fire": {
+      "variant": {
+        "Paces4": {}
+      }
+    },
+    "card_dodge": {
+      "variant": {
+        "Paces7": {}
+      }
+    },
+    "card_tactics": {
+      "variant": {
+        "None": {}
+      }
+    },
+    "card_blades": {
+      "variant": {
+        "None": {}
+      }
+    }
+  }
+}

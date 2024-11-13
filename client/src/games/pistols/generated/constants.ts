@@ -2,29 +2,349 @@
 import { BigNumberish } from 'starknet';
 
 //
-// contants
+// enums
 //
+
+// from: ../dojo/src/models/duelist.cairo
+export enum Archetype {
+  Undefined = 'Undefined',
+  Villainous = 'Villainous',
+  Trickster = 'Trickster',
+  Honourable = 'Honourable',
+};
+export const ArchetypeNameToValue: Record<Archetype, number> = {
+  [Archetype.Undefined]: 0,
+  [Archetype.Villainous]: 1,
+  [Archetype.Trickster]: 2,
+  [Archetype.Honourable]: 3,
+};
+export const getArchetypeValue = (name: Archetype): number => (ArchetypeNameToValue[name as string]);
+export const getArchetypeFromValue = (value: number): Archetype => Object.keys(ArchetypeNameToValue).find(key => ArchetypeNameToValue[key] === value) as Archetype;
+
+// from: ../dojo/src/models/duelist.cairo
+export enum ProfilePicType {
+  Undefined = 'Undefined',
+  Duelist = 'Duelist',
+  External = 'External',
+};
+export const ProfilePicTypeNameToValue: Record<ProfilePicType, number> = {
+  [ProfilePicType.Undefined]: 0,
+  [ProfilePicType.Duelist]: 1,
+  [ProfilePicType.External]: 2,
+};
+export const getProfilePicTypeValue = (name: ProfilePicType): number => (ProfilePicTypeNameToValue[name as string]);
+export const getProfilePicTypeFromValue = (value: number): ProfilePicType => Object.keys(ProfilePicTypeNameToValue).find(key => ProfilePicTypeNameToValue[key] === value) as ProfilePicType;
+
+// from: ../dojo/src/models/table.cairo
+export enum TableType {
+  Undefined = 'Undefined',
+  Classic = 'Classic',
+  Tournament = 'Tournament',
+  IRLTournament = 'IRLTournament',
+};
+export const TableTypeNameToValue: Record<TableType, number> = {
+  [TableType.Undefined]: 0,
+  [TableType.Classic]: 1,
+  [TableType.Tournament]: 2,
+  [TableType.IRLTournament]: 3,
+};
+export const getTableTypeValue = (name: TableType): number => (TableTypeNameToValue[name as string]);
+export const getTableTypeFromValue = (value: number): TableType => Object.keys(TableTypeNameToValue).find(key => TableTypeNameToValue[key] === value) as TableType;
+
+// from: ../dojo/src/types/cards/blades.cairo
+export enum BladesCard {
+  None = 'None',
+  Seppuku = 'Seppuku',
+  PocketPistol = 'PocketPistol',
+  Behead = 'Behead',
+  Grapple = 'Grapple',
+};
+export const BladesCardNameToValue: Record<BladesCard, number> = {
+  [BladesCard.None]: 0,
+  [BladesCard.Seppuku]: 1,
+  [BladesCard.PocketPistol]: 2,
+  [BladesCard.Behead]: 3,
+  [BladesCard.Grapple]: 4,
+};
+export const getBladesCardValue = (name: BladesCard): number => (BladesCardNameToValue[name as string]);
+export const getBladesCardFromValue = (value: number): BladesCard => Object.keys(BladesCardNameToValue).find(key => BladesCardNameToValue[key] === value) as BladesCard;
+
+// from: ../dojo/src/types/cards/cards.cairo
+export enum Rarity {
+  None = 'None',
+  Common = 'Common',
+  Uncommon = 'Uncommon',
+  Special = 'Special',
+};
+export const RarityNameToValue: Record<Rarity, number> = {
+  [Rarity.None]: 0,
+  [Rarity.Common]: 1,
+  [Rarity.Uncommon]: 2,
+  [Rarity.Special]: 3,
+};
+export const getRarityValue = (name: Rarity): number => (RarityNameToValue[name as string]);
+export const getRarityFromValue = (value: number): Rarity => Object.keys(RarityNameToValue).find(key => RarityNameToValue[key] === value) as Rarity;
+
+// from: ../dojo/src/types/cards/env.cairo
+export enum EnvCard {
+  None = 'None',
+  DamageUp = 'DamageUp',
+  DamageDown = 'DamageDown',
+  ChancesUp = 'ChancesUp',
+  ChancesDown = 'ChancesDown',
+  DoubleDamageUp = 'DoubleDamageUp',
+  DoubleChancesUp = 'DoubleChancesUp',
+  SpecialAllShotsHit = 'SpecialAllShotsHit',
+  SpecialAllShotsMiss = 'SpecialAllShotsMiss',
+  SpecialDoubleTactics = 'SpecialDoubleTactics',
+  SpecialNoTactics = 'SpecialNoTactics',
+};
+export const EnvCardNameToValue: Record<EnvCard, number> = {
+  [EnvCard.None]: 0,
+  [EnvCard.DamageUp]: 1,
+  [EnvCard.DamageDown]: 2,
+  [EnvCard.ChancesUp]: 3,
+  [EnvCard.ChancesDown]: 4,
+  [EnvCard.DoubleDamageUp]: 5,
+  [EnvCard.DoubleChancesUp]: 6,
+  [EnvCard.SpecialAllShotsHit]: 7,
+  [EnvCard.SpecialAllShotsMiss]: 8,
+  [EnvCard.SpecialDoubleTactics]: 9,
+  [EnvCard.SpecialNoTactics]: 10,
+};
+export const getEnvCardValue = (name: EnvCard): number => (EnvCardNameToValue[name as string]);
+export const getEnvCardFromValue = (value: number): EnvCard => Object.keys(EnvCardNameToValue).find(key => EnvCardNameToValue[key] === value) as EnvCard;
+
+// from: ../dojo/src/types/cards/hand.cairo
+export enum DeckType {
+  None = 'None',
+  Classic = 'Classic',
+};
+export const DeckTypeNameToValue: Record<DeckType, number> = {
+  [DeckType.None]: 0,
+  [DeckType.Classic]: 1,
+};
+export const getDeckTypeValue = (name: DeckType): number => (DeckTypeNameToValue[name as string]);
+export const getDeckTypeFromValue = (value: number): DeckType => Object.keys(DeckTypeNameToValue).find(key => DeckTypeNameToValue[key] === value) as DeckType;
+
+// from: ../dojo/src/types/cards/paces.cairo
+export enum PacesCard {
+  None = 'None',
+  Paces1 = 'Paces1',
+  Paces2 = 'Paces2',
+  Paces3 = 'Paces3',
+  Paces4 = 'Paces4',
+  Paces5 = 'Paces5',
+  Paces6 = 'Paces6',
+  Paces7 = 'Paces7',
+  Paces8 = 'Paces8',
+  Paces9 = 'Paces9',
+  Paces10 = 'Paces10',
+};
+export const PacesCardNameToValue: Record<PacesCard, number> = {
+  [PacesCard.None]: 0,
+  [PacesCard.Paces1]: 1,
+  [PacesCard.Paces2]: 2,
+  [PacesCard.Paces3]: 3,
+  [PacesCard.Paces4]: 4,
+  [PacesCard.Paces5]: 5,
+  [PacesCard.Paces6]: 6,
+  [PacesCard.Paces7]: 7,
+  [PacesCard.Paces8]: 8,
+  [PacesCard.Paces9]: 9,
+  [PacesCard.Paces10]: 10,
+};
+export const getPacesCardValue = (name: PacesCard): number => (PacesCardNameToValue[name as string]);
+export const getPacesCardFromValue = (value: number): PacesCard => Object.keys(PacesCardNameToValue).find(key => PacesCardNameToValue[key] === value) as PacesCard;
+
+// from: ../dojo/src/types/cards/tactics.cairo
+export enum TacticsCard {
+  None = 'None',
+  Insult = 'Insult',
+  CoinToss = 'CoinToss',
+  Vengeful = 'Vengeful',
+  ThickCoat = 'ThickCoat',
+  Reversal = 'Reversal',
+  Bananas = 'Bananas',
+};
+export const TacticsCardNameToValue: Record<TacticsCard, number> = {
+  [TacticsCard.None]: 0,
+  [TacticsCard.Insult]: 1,
+  [TacticsCard.CoinToss]: 2,
+  [TacticsCard.Vengeful]: 3,
+  [TacticsCard.ThickCoat]: 4,
+  [TacticsCard.Reversal]: 5,
+  [TacticsCard.Bananas]: 6,
+};
+export const getTacticsCardValue = (name: TacticsCard): number => (TacticsCardNameToValue[name as string]);
+export const getTacticsCardFromValue = (value: number): TacticsCard => Object.keys(TacticsCardNameToValue).find(key => TacticsCardNameToValue[key] === value) as TacticsCard;
+
+// from: ../dojo/src/types/challenge_state.cairo
+export enum ChallengeState {
+  Null = 'Null',
+  Awaiting = 'Awaiting',
+  Withdrawn = 'Withdrawn',
+  Refused = 'Refused',
+  Expired = 'Expired',
+  InProgress = 'InProgress',
+  Resolved = 'Resolved',
+  Draw = 'Draw',
+};
+export const ChallengeStateNameToValue: Record<ChallengeState, number> = {
+  [ChallengeState.Null]: 0,
+  [ChallengeState.Awaiting]: 1,
+  [ChallengeState.Withdrawn]: 2,
+  [ChallengeState.Refused]: 3,
+  [ChallengeState.Expired]: 4,
+  [ChallengeState.InProgress]: 5,
+  [ChallengeState.Resolved]: 6,
+  [ChallengeState.Draw]: 7,
+};
+export const getChallengeStateValue = (name: ChallengeState): number => (ChallengeStateNameToValue[name as string]);
+export const getChallengeStateFromValue = (value: number): ChallengeState => Object.keys(ChallengeStateNameToValue).find(key => ChallengeStateNameToValue[key] === value) as ChallengeState;
+
+// from: ../dojo/src/types/duel_progress.cairo
+export enum DuelistDrawnCard {
+  None = 'None',
+  Fire = 'Fire',
+  Dodge = 'Dodge',
+  Blades = 'Blades',
+};
+export const DuelistDrawnCardNameToValue: Record<DuelistDrawnCard, number> = {
+  [DuelistDrawnCard.None]: 0,
+  [DuelistDrawnCard.Fire]: 1,
+  [DuelistDrawnCard.Dodge]: 2,
+  [DuelistDrawnCard.Blades]: 3,
+};
+export const getDuelistDrawnCardValue = (name: DuelistDrawnCard): number => (DuelistDrawnCardNameToValue[name as string]);
+export const getDuelistDrawnCardFromValue = (value: number): DuelistDrawnCard => Object.keys(DuelistDrawnCardNameToValue).find(key => DuelistDrawnCardNameToValue[key] === value) as DuelistDrawnCard;
+
+// from: ../dojo/src/types/misc.cairo
+export enum Boolean {
+  Undefined = 'Undefined',
+  True = 'True',
+  False = 'False',
+};
+export const BooleanNameToValue: Record<Boolean, number> = {
+  [Boolean.Undefined]: 0,
+  [Boolean.True]: 1,
+  [Boolean.False]: 2,
+};
+export const getBooleanValue = (name: Boolean): number => (BooleanNameToValue[name as string]);
+export const getBooleanFromValue = (value: number): Boolean => Object.keys(BooleanNameToValue).find(key => BooleanNameToValue[key] === value) as Boolean;
+
+// from: ../dojo/src/types/premise.cairo
+export enum Premise {
+  Null = 'Null',
+  Matter = 'Matter',
+  Debt = 'Debt',
+  Dispute = 'Dispute',
+  Honour = 'Honour',
+  Hatred = 'Hatred',
+  Blood = 'Blood',
+  Nothing = 'Nothing',
+  Tournament = 'Tournament',
+};
+export const PremiseNameToValue: Record<Premise, number> = {
+  [Premise.Null]: 0,
+  [Premise.Matter]: 1,
+  [Premise.Debt]: 2,
+  [Premise.Dispute]: 3,
+  [Premise.Honour]: 4,
+  [Premise.Hatred]: 5,
+  [Premise.Blood]: 6,
+  [Premise.Nothing]: 7,
+  [Premise.Tournament]: 8,
+};
+export const getPremiseValue = (name: Premise): number => (PremiseNameToValue[name as string]);
+export const getPremiseFromValue = (value: number): Premise => Object.keys(PremiseNameToValue).find(key => PremiseNameToValue[key] === value) as Premise;
+
+// from: ../dojo/src/types/round_state.cairo
+export enum RoundState {
+  Null = 'Null',
+  Commit = 'Commit',
+  Reveal = 'Reveal',
+  Finished = 'Finished',
+};
+export const RoundStateNameToValue: Record<RoundState, number> = {
+  [RoundState.Null]: 0,
+  [RoundState.Commit]: 1,
+  [RoundState.Reveal]: 2,
+  [RoundState.Finished]: 3,
+};
+export const getRoundStateValue = (name: RoundState): number => (RoundStateNameToValue[name as string]);
+export const getRoundStateFromValue = (value: number): RoundState => Object.keys(RoundStateNameToValue).find(key => RoundStateNameToValue[key] === value) as RoundState;
+
+//
+// constants
+//
+
+// from: ../dojo/src/types/cards/cards.cairo
+export type CardPoints = {
+  name : string,
+  self_chances : number,
+  self_damage : number,
+  other_chances : number,
+  other_damage : number,
+  special : string,
+};
+
+// from: ../dojo/src/types/cards/cards.cairo
+export type EnvCardPoints = {
+  name : string,
+  rarity : Rarity,
+  chances : number,
+  damage : number,
+};
 
 // from: ../dojo/src/interfaces/systems.cairo
 type type_SELECTORS = {
   ADMIN: BigNumberish, // cairo: felt252
-  ACTIONS: BigNumberish, // cairo: felt252
-  MINTER: BigNumberish, // cairo: felt252
-  TOKEN_DUELIST: BigNumberish, // cairo: felt252
+  BANK: BigNumberish, // cairo: felt252
+  GAME: BigNumberish, // cairo: felt252
+  RNG: BigNumberish, // cairo: felt252
+  DUEL_TOKEN: BigNumberish, // cairo: felt252
+  DUELIST_TOKEN: BigNumberish, // cairo: felt252
+  FAME_COIN: BigNumberish, // cairo: felt252
   LORDS_MOCK: BigNumberish, // cairo: felt252
+  VR_MOCK: BigNumberish, // cairo: felt252
   CONFIG: BigNumberish, // cairo: felt252
   TABLE_CONFIG: BigNumberish, // cairo: felt252
   TOKEN_CONFIG: BigNumberish, // cairo: felt252
+  COIN_CONFIG: BigNumberish, // cairo: felt252
+  PAYMENT: BigNumberish, // cairo: felt252
 };
 export const SELECTORS: type_SELECTORS = {
   ADMIN: '0x036fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497', // 'selector_from_tag!("pistols-admin")'
-  ACTIONS: '0x04f10cff77842b589eafef9f3261c4cb207e41302e7ac01527cff88ad26ded3e', // 'selector_from_tag!("pistols-actions")'
-  MINTER: '0x07b759538267ac8937772e5bdadb6b598748b33c377c90426fc0a4960234de20', // 'selector_from_tag!("pistols-minter")'
-  TOKEN_DUELIST: '0x0541e9c1813eb1f7867062ea0fafcd949ad9d3f8b212bbac1df80c48947c48cd', // 'selector_from_tag!("pistols-token_duelist")'
+  BANK: '0x07a683ab68bc70300995da8de5781002e781f22ba246fe239ebeff02b2230375', // 'selector_from_tag!("pistols-bank")'
+  GAME: '0x032c102830cbffaddecbdce7ef85735e6f08da08ee762a2d7b09304b6533dd57', // 'selector_from_tag!("pistols-game")'
+  RNG: '0x013f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504', // 'selector_from_tag!("pistols-rng")'
+  DUEL_TOKEN: '0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063', // 'selector_from_tag!("pistols-duel_token")'
+  DUELIST_TOKEN: '0x045c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e', // 'selector_from_tag!("pistols-duelist_token")'
+  FAME_COIN: '0x0371b95cb7056eb2d21819662e973ed32c345c989aa9f6097e7811a5665a0b0a', // 'selector_from_tag!("pistols-fame_coin")'
   LORDS_MOCK: '0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788', // 'selector_from_tag!("pistols-lords_mock")'
+  VR_MOCK: '0x07d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e', // 'selector_from_tag!("pistols-vrf_mock")'
   CONFIG: '0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392', // 'selector_from_tag!("pistols-Config")'
   TABLE_CONFIG: '0x01e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138', // 'selector_from_tag!("pistols-TableConfig")'
   TOKEN_CONFIG: '0x056ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed', // 'selector_from_tag!("pistols-TokenConfig")'
+  COIN_CONFIG: '0x026fad4dff063a4f2c3b3889723194b9bdbbbf833e44ff2d573af01741b966ac', // 'selector_from_tag!("pistols-CoinConfig")'
+  PAYMENT: '0x017a03e9cb461470b9149f9efbd95ad9b217fca9fdccd3827383904c33da96c1', // 'selector_from_tag!("pistols-Payment")'
+};
+
+// from: ../dojo/src/libs/events.cairo
+type type_EVENT_SELECTOR = {
+  DuelistRegisteredEvent: BigNumberish, // cairo: felt252
+  NewChallengeEvent: BigNumberish, // cairo: felt252
+  ChallengeAcceptedEvent: BigNumberish, // cairo: felt252
+  ChallengeResolvedEvent: BigNumberish, // cairo: felt252
+  DuelistTurnEvent: BigNumberish, // cairo: felt252
+};
+export const EVENT_SELECTOR: type_EVENT_SELECTOR = {
+  DuelistRegisteredEvent: '0x148c3db21a55576bc012023dc4d3b5bd570c519de855849eac52b1c5d6c9e85',
+  NewChallengeEvent: '0x14a0df74df51e02ef8dedabfd1ea9684ea2087bed6370e881b156d7e2e56975',
+  ChallengeAcceptedEvent: '0x31cdbf7ac39747303190a727df1a270ae5e4f05191f6f58e452ce4eb1e98abe',
+  ChallengeResolvedEvent: '0x23dfe05a8414fd8464370e120099be69327b2a52ae6655ff23733651e8281b1',
+  DuelistTurnEvent: '0x19556e1418f1e7a7e6962eff75d1a46abd50bda431139f855ba85c9119754a4',
 };
 
 // from: ../dojo/src/models/config.cairo
@@ -45,51 +365,287 @@ export const TABLES: type_TABLES = {
   COMMONERS: 'Commoners',
 };
 
-// from: ../dojo/src/types/action.cairo
-type type_ACTION = {
-  PACES_MASK: number, // cairo: u8
-  BLADES_MASK: number, // cairo: u8
-  IDLE: number, // cairo: u8
-  PACES_1: number, // cairo: u8
-  PACES_2: number, // cairo: u8
-  PACES_3: number, // cairo: u8
-  PACES_4: number, // cairo: u8
-  PACES_5: number, // cairo: u8
-  PACES_6: number, // cairo: u8
-  PACES_7: number, // cairo: u8
-  PACES_8: number, // cairo: u8
-  PACES_9: number, // cairo: u8
-  PACES_10: number, // cairo: u8
-  FAST_BLADE: number, // cairo: u8
-  SLOW_BLADE: number, // cairo: u8
-  BLOCK: number, // cairo: u8
-  FLEE: number, // cairo: u8
-  STEAL: number, // cairo: u8
-  SEPPUKU: number, // cairo: u8
+// from: ../dojo/src/systems/components/erc721_hooks.cairo
+type type_Errors = {
+  INVALID_ATTRIBUTES: string, // cairo: felt252
+  INVALID_METADATA: string, // cairo: felt252
 };
-export const ACTION: type_ACTION = {
-  PACES_MASK: 0x0f,
-  BLADES_MASK: 0xf0,
-  IDLE: 0x00,
-  PACES_1: 0x01,
-  PACES_2: 0x02,
-  PACES_3: 0x03,
-  PACES_4: 0x04,
-  PACES_5: 0x05,
-  PACES_6: 0x06,
-  PACES_7: 0x07,
-  PACES_8: 0x08,
-  PACES_9: 0x09,
-  PACES_10: 0x0a,
-  FAST_BLADE: 0x10,
-  SLOW_BLADE: 0x20,
-  BLOCK: 0x30,
-  FLEE: 0x40,
-  STEAL: 0x50,
-  SEPPUKU: 0x60,
+export const Errors: type_Errors = {
+  INVALID_ATTRIBUTES: 'METADATA: invalid attributes',
+  INVALID_METADATA: 'METADATA: invalid metadata',
 };
 
-// from: ../dojo/src/types/challenge.cairo
+// from: ../dojo/src/types/cards/blades.cairo
+type type_BLADES_CARDS = {
+  None: number, // cairo: u8
+  Seppuku: number, // cairo: u8
+  PocketPistol: number, // cairo: u8
+  Behead: number, // cairo: u8
+  Grapple: number, // cairo: u8
+};
+export const BLADES_CARDS: type_BLADES_CARDS = {
+  None: 0,
+  Seppuku: 1,
+  PocketPistol: 2,
+  Behead: 3,
+  Grapple: 4,
+};
+
+// from: ../dojo/src/types/cards/blades.cairo
+type type_BLADES_POINTS = {
+  Seppuku: CardPoints, // cairo: CardPoints
+  PocketPistol: CardPoints, // cairo: CardPoints
+  Behead: CardPoints, // cairo: CardPoints
+  Grapple: CardPoints, // cairo: CardPoints
+};
+export const BLADES_POINTS: type_BLADES_POINTS = {
+  Seppuku: {
+    name: 'Seppuku',
+    self_chances: 20,
+    self_damage: 1,
+    other_chances: 0,
+    other_damage: 0,
+    special: 'Suicide if survives',
+  },
+  PocketPistol: {
+    name: 'Pocket Pistol',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: -10,
+    other_damage: 0,
+    special: 'Beats Behead',
+  },
+  Behead: {
+    name: 'Behead',
+    self_chances: 0,
+    self_damage: 1,
+    other_chances: 0,
+    other_damage: 0,
+    special: 'Beats Grapple',
+  },
+  Grapple: {
+    name: 'Grapple',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: 0,
+    other_damage: -1,
+    special: 'Beats Pocket Pistol',
+  },
+};
+
+// from: ../dojo/src/types/cards/env.cairo
+type type_ENV_CARDS = {
+  None: number, // cairo: u8
+  DamageUp: number, // cairo: u8
+  DamageDown: number, // cairo: u8
+  ChancesUp: number, // cairo: u8
+  ChancesDown: number, // cairo: u8
+  DoubleDamageUp: number, // cairo: u8
+  DoubleChancesUp: number, // cairo: u8
+  SpecialAllShotsHit: number, // cairo: u8
+  SpecialAllShotsMiss: number, // cairo: u8
+  SpecialDoubleTactics: number, // cairo: u8
+  SpecialNoTactics: number, // cairo: u8
+};
+export const ENV_CARDS: type_ENV_CARDS = {
+  None: 0,
+  DamageUp: 1,
+  DamageDown: 2,
+  ChancesUp: 3,
+  ChancesDown: 4,
+  DoubleDamageUp: 5,
+  DoubleChancesUp: 7,
+  SpecialAllShotsHit: 9,
+  SpecialAllShotsMiss: 10,
+  SpecialDoubleTactics: 11,
+  SpecialNoTactics: 12,
+};
+
+// from: ../dojo/src/types/cards/env.cairo
+type type_ENV_POINTS = {
+  DamageUp: EnvCardPoints, // cairo: EnvCardPoints
+  DamageDown: EnvCardPoints, // cairo: EnvCardPoints
+  ChancesUp: EnvCardPoints, // cairo: EnvCardPoints
+  ChancesDown: EnvCardPoints, // cairo: EnvCardPoints
+  DoubleDamageUp: EnvCardPoints, // cairo: EnvCardPoints
+  DoubleChancesUp: EnvCardPoints, // cairo: EnvCardPoints
+  SpecialAllShotsHit: EnvCardPoints, // cairo: EnvCardPoints
+  SpecialAllShotsMiss: EnvCardPoints, // cairo: EnvCardPoints
+  SpecialDoubleTactics: EnvCardPoints, // cairo: EnvCardPoints
+  SpecialNoTactics: EnvCardPoints, // cairo: EnvCardPoints
+};
+export const ENV_POINTS: type_ENV_POINTS = {
+  DamageUp: {
+    name: 'Damage Up',
+    rarity: Rarity.Common,
+    chances: 0,
+    damage: 1,
+  },
+  DamageDown: {
+    name: 'Damage Down',
+    rarity: Rarity.Common,
+    chances: 0,
+    damage: -1,
+  },
+  ChancesUp: {
+    name: 'Chances Up',
+    rarity: Rarity.Common,
+    chances: 10,
+    damage: 0,
+  },
+  ChancesDown: {
+    name: 'Chances Down',
+    rarity: Rarity.Common,
+    chances: -10,
+    damage: 0,
+  },
+  DoubleDamageUp: {
+    name: 'Double Damage Up',
+    rarity: Rarity.Uncommon,
+    chances: 0,
+    damage: 2,
+  },
+  DoubleChancesUp: {
+    name: 'Double Chances Up',
+    rarity: Rarity.Uncommon,
+    chances: 20,
+    damage: 0,
+  },
+  SpecialAllShotsHit: {
+    name: 'All Shots Hit',
+    rarity: Rarity.Special,
+    chances: 100,
+    damage: 0,
+  },
+  SpecialAllShotsMiss: {
+    name: 'All Shots Miss',
+    rarity: Rarity.Special,
+    chances: -100,
+    damage: 0,
+  },
+  SpecialDoubleTactics: {
+    name: 'Double Tactics',
+    rarity: Rarity.Special,
+    chances: 0,
+    damage: 0,
+  },
+  SpecialNoTactics: {
+    name: 'No Tactics',
+    rarity: Rarity.Special,
+    chances: 0,
+    damage: 0,
+  },
+};
+
+// from: ../dojo/src/types/cards/paces.cairo
+type type_PACES_CARDS = {
+  None: number, // cairo: u8
+  Paces1: number, // cairo: u8
+  Paces2: number, // cairo: u8
+  Paces3: number, // cairo: u8
+  Paces4: number, // cairo: u8
+  Paces5: number, // cairo: u8
+  Paces6: number, // cairo: u8
+  Paces7: number, // cairo: u8
+  Paces8: number, // cairo: u8
+  Paces9: number, // cairo: u8
+  Paces10: number, // cairo: u8
+};
+export const PACES_CARDS: type_PACES_CARDS = {
+  None: 0,
+  Paces1: 1,
+  Paces2: 2,
+  Paces3: 3,
+  Paces4: 4,
+  Paces5: 5,
+  Paces6: 6,
+  Paces7: 7,
+  Paces8: 8,
+  Paces9: 9,
+  Paces10: 10,
+};
+
+// from: ../dojo/src/types/cards/tactics.cairo
+type type_TACTICS_CARDS = {
+  None: number, // cairo: u8
+  Insult: number, // cairo: u8
+  CoinToss: number, // cairo: u8
+  Vengeful: number, // cairo: u8
+  ThickCoat: number, // cairo: u8
+  Reversal: number, // cairo: u8
+  Bananas: number, // cairo: u8
+};
+export const TACTICS_CARDS: type_TACTICS_CARDS = {
+  None: 0,
+  Insult: 1,
+  CoinToss: 2,
+  Vengeful: 3,
+  ThickCoat: 4,
+  Reversal: 5,
+  Bananas: 6,
+};
+
+// from: ../dojo/src/types/cards/tactics.cairo
+type type_TACTICS_POINTS = {
+  Insult: CardPoints, // cairo: CardPoints
+  CoinToss: CardPoints, // cairo: CardPoints
+  Vengeful: CardPoints, // cairo: CardPoints
+  ThickCoat: CardPoints, // cairo: CardPoints
+  Reversal: CardPoints, // cairo: CardPoints
+  Bananas: CardPoints, // cairo: CardPoints
+};
+export const TACTICS_POINTS: type_TACTICS_POINTS = {
+  Insult: {
+    name: 'Insult',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: -10,
+    other_damage: 1,
+    special: '',
+  },
+  CoinToss: {
+    name: 'Coin Toss',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: 0,
+    other_damage: 0,
+    special: 'First special doesnt affect you',
+  },
+  Vengeful: {
+    name: 'Vengeful',
+    self_chances: 0,
+    self_damage: 1,
+    other_chances: 0,
+    other_damage: 0,
+    special: '',
+  },
+  ThickCoat: {
+    name: 'Thick Coat',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: 0,
+    other_damage: -1,
+    special: '',
+  },
+  Reversal: {
+    name: 'Reversal',
+    self_chances: 0,
+    self_damage: 0,
+    other_chances: 0,
+    other_damage: 0,
+    special: 'Next decrease increases both',
+  },
+  Bananas: {
+    name: 'Bananas',
+    self_chances: -10,
+    self_damage: 0,
+    other_chances: -10,
+    other_damage: 0,
+    special: '',
+  },
+};
+
+// from: ../dojo/src/types/challenge_state.cairo
 type type_CHALLENGE_STATE = {
   NULL: number, // cairo: u8
   AWAITING: number, // cairo: u8
@@ -118,104 +674,54 @@ type type_CONST = {
   FULL_HEALTH: number, // cairo: u8
   DOUBLE_DAMAGE: number, // cairo: u8
   SINGLE_DAMAGE: number, // cairo: u8
-  HASH_SALT_MASK: BigNumberish, // cairo: u256
+  INITIAL_CHANCE: number, // cairo: u8
+  INITIAL_DAMAGE: number, // cairo: u8
   ETH_TO_WEI: BigNumberish, // cairo: u256
 };
 export const CONST: type_CONST = {
-  ROUND_COUNT: 3,
+  ROUND_COUNT: 1,
   MAX_DUELIST_ID: '0xffff',
   FULL_HEALTH: 3,
   DOUBLE_DAMAGE: 2,
   SINGLE_DAMAGE: 1,
-  HASH_SALT_MASK: '0x1fffffffffffff',
+  INITIAL_CHANCE: 50,
+  INITIAL_DAMAGE: 1,
   ETH_TO_WEI: '1_000_000_000_000_000_000',
 };
 
 // from: ../dojo/src/types/constants.cairo
 type type_HONOUR = {
-  VILLAIN_START: number, // cairo: u8
   TRICKSTER_START: number, // cairo: u8
   LORD_START: number, // cairo: u8
-  HALFWAY: number, // cairo: u8
-  MAX: number, // cairo: u8
-  LEVEL_MIN: number, // cairo: u8
-  LEVEL_MAX: number, // cairo: u8
 };
 export const HONOUR: type_HONOUR = {
-  VILLAIN_START: 10,
-  TRICKSTER_START: 35,
-  LORD_START: 75,
-  HALFWAY: 50,
-  MAX: 100,
-  LEVEL_MIN: 10,
-  LEVEL_MAX: 100,
+  TRICKSTER_START: 40,
+  LORD_START: 70,
 };
 
 // from: ../dojo/src/types/constants.cairo
 type type_CHANCES = {
   NEVER: number, // cairo: u8
   ALWAYS: number, // cairo: u8
-  PISTOLS_KILL_AT_STEP_1: number, // cairo: u8
-  PISTOLS_KILL_AT_STEP_10: number, // cairo: u8
-  PISTOLS_HIT_AT_STEP_1: number, // cairo: u8
-  PISTOLS_HIT_AT_STEP_10: number, // cairo: u8
-  PISTOLS_LETHAL_AT_STEP_1: number, // cairo: u8
-  PISTOLS_LETHAL_AT_STEP_10: number, // cairo: u8
-  BLADES_CRIT: number, // cairo: u8
-  BLADES_HIT: number, // cairo: u8
-  CRIT_BONUS_LORD: number, // cairo: u8
-  CRIT_BONUS_TRICKSTER: number, // cairo: u8
-  HIT_BONUS_VILLAIN: number, // cairo: u8
-  HIT_BONUS_TRICKSTER: number, // cairo: u8
-  EARLY_LORD_CRIT_BONUS: number, // cairo: u8
-  LATE_VILLAIN_CRIT_BONUS: number, // cairo: u8
-  CRIT_PENALTY_PER_DAMAGE: number, // cairo: u8
-  HIT_PENALTY_PER_DAMAGE: number, // cairo: u8
-  LORD_LETHAL_PENALTY: number, // cairo: u8
-  TRICKSTER_CRIT_PENALTY: number, // cairo: u8
-  TRICKSTER_HIT_PENALTY: number, // cairo: u8
 };
 export const CHANCES: type_CHANCES = {
   NEVER: 0,
   ALWAYS: 100,
-  PISTOLS_KILL_AT_STEP_1: 5,
-  PISTOLS_KILL_AT_STEP_10: 20,
-  PISTOLS_HIT_AT_STEP_1: 100,
-  PISTOLS_HIT_AT_STEP_10: 20,
-  PISTOLS_LETHAL_AT_STEP_1: 80,
-  PISTOLS_LETHAL_AT_STEP_10: 5,
-  BLADES_CRIT: 20,
-  BLADES_HIT: 75,
-  CRIT_BONUS_LORD: 12,
-  CRIT_BONUS_TRICKSTER: 6,
-  HIT_BONUS_VILLAIN: 20,
-  HIT_BONUS_TRICKSTER: 10,
-  EARLY_LORD_CRIT_BONUS: 10,
-  LATE_VILLAIN_CRIT_BONUS: 10,
-  CRIT_PENALTY_PER_DAMAGE: 0,
-  HIT_PENALTY_PER_DAMAGE: 10,
-  LORD_LETHAL_PENALTY: 10,
-  TRICKSTER_CRIT_PENALTY: 2,
-  TRICKSTER_HIT_PENALTY: 10,
 };
 
-// from: ../dojo/src/types/events.cairo
-type type_EVENT_SELECTOR = {
-  DuelistRegisteredEvent: BigNumberish, // cairo: felt252
-  NewChallengeEvent: BigNumberish, // cairo: felt252
-  ChallengeAcceptedEvent: BigNumberish, // cairo: felt252
-  ChallengeResolvedEvent: BigNumberish, // cairo: felt252
-  DuelistTurnEvent: BigNumberish, // cairo: felt252
+// from: ../dojo/src/types/constants.cairo
+type type_FAME = {
+  FAME_PER_LORDS: BigNumberish, // cairo: u256
+  MIN_MINT_GRANT_AMOUNT: BigNumberish, // cairo: u256
+  MIN_REWARD_AMOUNT: BigNumberish, // cairo: u256
 };
-export const EVENT_SELECTOR: type_EVENT_SELECTOR = {
-  DuelistRegisteredEvent: '0x148c3db21a55576bc012023dc4d3b5bd570c519de855849eac52b1c5d6c9e85',
-  NewChallengeEvent: '0x14a0df74df51e02ef8dedabfd1ea9684ea2087bed6370e881b156d7e2e56975',
-  ChallengeAcceptedEvent: '0x31cdbf7ac39747303190a727df1a270ae5e4f05191f6f58e452ce4eb1e98abe',
-  ChallengeResolvedEvent: '0x23dfe05a8414fd8464370e120099be69327b2a52ae6655ff23733651e8281b1',
-  DuelistTurnEvent: '0x19556e1418f1e7a7e6962eff75d1a46abd50bda431139f855ba85c9119754a4',
+export const FAME: type_FAME = {
+  FAME_PER_LORDS: '10',
+  MIN_MINT_GRANT_AMOUNT: '1_000 * super.CONST::ETH_TO_WEI',
+  MIN_REWARD_AMOUNT: '100 * super.CONST::ETH_TO_WEI',
 };
 
-// from: ../dojo/src/types/round.cairo
+// from: ../dojo/src/types/round_state.cairo
 type type_ROUND_STATE = {
   NULL: number, // cairo: u8
   COMMIT: number, // cairo: u8
@@ -241,128 +747,32 @@ export const TYPED_DATA: type_TYPED_DATA = {
   COMMIT_MOVE_MESSAGE_TYPE_HASH: '0x74fe0c723488214ab442c24761e9b32d30216def5e93d1c110375d993482ae',
 };
 
-//
-// enums
-//
-
-// from: ../dojo/src/models/duelist.cairo
-export enum Archetype {
-  Undefined = 0,
-  Villainous = 1,
-  Trickster = 2,
-  Honourable = 3,
+// from: ../dojo/src/utils/bitwise.cairo
+type type_BITWISE = {
+  MAX_U8: number, // cairo: u8
+  MAX_U16: number, // cairo: u16
+  MAX_U32: number, // cairo: u32
+  MAX_U64: BigNumberish, // cairo: u64
+  MAX_U128: BigNumberish, // cairo: u128
+  MAX_U256: BigNumberish, // cairo: u256
+  MSB_U8: number, // cairo: u8
+  MSB_U16: number, // cairo: u16
+  MSB_U32: number, // cairo: u32
+  MSB_U64: BigNumberish, // cairo: u64
+  MSB_U128: BigNumberish, // cairo: u128
+  MSB_U256: BigNumberish, // cairo: u256
 };
-export const ArchetypeNameToValue: Record<string, Archetype> = {
-  'Undefined': Archetype.Undefined,
-  'Villainous': Archetype.Villainous,
-  'Trickster': Archetype.Trickster,
-  'Honourable': Archetype.Honourable,
+export const BITWISE: type_BITWISE = {
+  MAX_U8: 0xff,
+  MAX_U16: 0xffff,
+  MAX_U32: 0xffffffff,
+  MAX_U64: '0xffffffffffffffff',
+  MAX_U128: '0xffffffffffffffffffffffffffffffff',
+  MAX_U256: '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+  MSB_U8: 0x80,
+  MSB_U16: 0x8000,
+  MSB_U32: 0x80000000,
+  MSB_U64: '0x8000000000000000',
+  MSB_U128: '0x80000000000000000000000000000000',
+  MSB_U256: '0x8000000000000000000000000000000000000000000000000000000000000000',
 };
-export const getArchetype = (name: string | number): Archetype => (ArchetypeNameToValue[name as string]);
-
-// from: ../dojo/src/models/duelist.cairo
-export enum ProfilePicType {
-  Undefined = 0,
-  Duelist = 1,
-  External = 2,
-};
-export const ProfilePicTypeNameToValue: Record<string, ProfilePicType> = {
-  'Undefined': ProfilePicType.Undefined,
-  'Duelist': ProfilePicType.Duelist,
-  'External': ProfilePicType.External,
-};
-export const getProfilePicType = (name: string | number): ProfilePicType => (ProfilePicTypeNameToValue[name as string]);
-
-// from: ../dojo/src/models/table.cairo
-export enum TableType {
-  Undefined = 0,
-  Classic = 1,
-  Tournament = 2,
-  IRLTournament = 3,
-};
-export const TableTypeNameToValue: Record<string, TableType> = {
-  'Undefined': TableType.Undefined,
-  'Classic': TableType.Classic,
-  'Tournament': TableType.Tournament,
-  'IRLTournament': TableType.IRLTournament,
-};
-export const getTableType = (name: string | number): TableType => (TableTypeNameToValue[name as string]);
-
-// from: ../dojo/src/types/action.cairo
-export enum Action {
-  Idle = 0,
-  Paces1 = 1,
-  Paces2 = 2,
-  Paces3 = 3,
-  Paces4 = 4,
-  Paces5 = 5,
-  Paces6 = 6,
-  Paces7 = 7,
-  Paces8 = 8,
-  Paces9 = 9,
-  Paces10 = 10,
-  FastBlade = 11,
-  SlowBlade = 12,
-  Block = 13,
-  Flee = 14,
-  Steal = 15,
-  Seppuku = 16,
-};
-export const ActionNameToValue: Record<string, Action> = {
-  'Idle': Action.Idle,
-  'Paces1': Action.Paces1,
-  'Paces2': Action.Paces2,
-  'Paces3': Action.Paces3,
-  'Paces4': Action.Paces4,
-  'Paces5': Action.Paces5,
-  'Paces6': Action.Paces6,
-  'Paces7': Action.Paces7,
-  'Paces8': Action.Paces8,
-  'Paces9': Action.Paces9,
-  'Paces10': Action.Paces10,
-  'FastBlade': Action.FastBlade,
-  'SlowBlade': Action.SlowBlade,
-  'Block': Action.Block,
-  'Flee': Action.Flee,
-  'Steal': Action.Steal,
-  'Seppuku': Action.Seppuku,
-};
-export const getAction = (name: string | number): Action => (ActionNameToValue[name as string]);
-
-// from: ../dojo/src/types/challenge.cairo
-export enum ChallengeState {
-  Null = 0,
-  Awaiting = 1,
-  Withdrawn = 2,
-  Refused = 3,
-  Expired = 4,
-  InProgress = 5,
-  Resolved = 6,
-  Draw = 7,
-};
-export const ChallengeStateNameToValue: Record<string, ChallengeState> = {
-  'Null': ChallengeState.Null,
-  'Awaiting': ChallengeState.Awaiting,
-  'Withdrawn': ChallengeState.Withdrawn,
-  'Refused': ChallengeState.Refused,
-  'Expired': ChallengeState.Expired,
-  'InProgress': ChallengeState.InProgress,
-  'Resolved': ChallengeState.Resolved,
-  'Draw': ChallengeState.Draw,
-};
-export const getChallengeState = (name: string | number): ChallengeState => (ChallengeStateNameToValue[name as string]);
-
-// from: ../dojo/src/types/round.cairo
-export enum RoundState {
-  Null = 0,
-  Commit = 1,
-  Reveal = 2,
-  Finished = 3,
-};
-export const RoundStateNameToValue: Record<string, RoundState> = {
-  'Null': RoundState.Null,
-  'Commit': RoundState.Commit,
-  'Reveal': RoundState.Reveal,
-  'Finished': RoundState.Finished,
-};
-export const getRoundState = (name: string | number): RoundState => (RoundStateNameToValue[name as string]);

@@ -11,9 +11,9 @@ export interface FaucetExecuteResult {
 }
 
 export interface FaucetInterface {
-  isMock: boolean
   mintLords: (recipientAccount?: Account | AccountInterface) => Promise<FaucetExecuteResult> | null
   faucetUrl: string | null
+  hasFaucet: boolean
   isMinting: boolean
   error?: string
 }
@@ -21,8 +21,9 @@ export interface FaucetInterface {
 export const useLordsFaucet = (): FaucetInterface => {
   const { account } = useAccount()
   const { selectedChainConfig } = useStarknetContext()
-  const { contractAddress, isMock, abi } = useLordsContract()
-  const faucetUrl = useMemo(() => (selectedChainConfig.lordsFaucetUrl ?? null), [selectedChainConfig])
+  const { lordsContractAddress, isMock, abi } = useLordsContract()
+  const faucetUrl = useMemo(() => (typeof selectedChainConfig.lordsFaucet === 'string' ? selectedChainConfig.lordsFaucet : null), [selectedChainConfig])
+  const hasFaucet = useMemo(() => (selectedChainConfig.lordsFaucet === true), [selectedChainConfig])
 
   const [isMinting, setIsMinting] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)
@@ -35,7 +36,7 @@ export const useLordsFaucet = (): FaucetInterface => {
         return null
       }
       
-      if (isMinting) {
+      if (!hasFaucet || isMinting) {
         return null
       }
       
@@ -49,7 +50,7 @@ export const useLordsFaucet = (): FaucetInterface => {
       try {
         const tx = await execute(
           _signerAccount!,
-          bigintToHex(contractAddress),
+          bigintToHex(lordsContractAddress),
           abi!,
           'mint',
           [bigintToHex(_signerAccount.address), bigintToHex(amount.low), bigintToHex(amount.high)],
@@ -74,13 +75,13 @@ export const useLordsFaucet = (): FaucetInterface => {
       return {
         transaction_hash,
       }
-    }, [account, contractAddress],
+    }, [account, lordsContractAddress, hasFaucet, faucetUrl],
   )
 
   return {
-    isMock,
     mintLords,
     faucetUrl,
+    hasFaucet,
     isMinting,
     error,
   }

@@ -1,10 +1,9 @@
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ChainId, DojoChainConfig, getDojoChainConfig, getStarknetProviderChains, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
-import { StarknetConfig, argent, braavos, injected, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
-import { DojoPredeployedStarknetWindowObject } from '@dojoengine/create-burner'
+import { StarknetConfig, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
-import { useController } from '@/lib/dojo/hooks/useController'
 import { Chain } from '@starknet-react/chains'
+import { useChainConnectors } from './setup/connectors'
 
 
 interface StarknetContextType {
@@ -12,7 +11,6 @@ interface StarknetContextType {
   selectedChainId: ChainId
   selectedChainConfig: DojoChainConfig
   selectChainId: (chainId: ChainId) => void
-  isKatana: boolean
   chains: Chain[]
 }
 
@@ -44,10 +42,8 @@ export const StarknetProvider = ({
 
   //
   // Current chain
-  //
   const [selectedChainId, setSelectedChainId] = useState<ChainId>(intialChainId)
   const [selectedChainConfig, setSelectedChain] = useState<DojoChainConfig>(getDojoChainConfig(intialChainId))
-  const isKatana = useMemo(() => selectedChainConfig?.chain?.network === 'katana', [selectedChainConfig])
   useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainConfig])
 
   const selectChainId = useCallback((chainId: ChainId) => {
@@ -59,31 +55,18 @@ export const StarknetProvider = ({
     window?.localStorage?.setItem('lastSelectedChainId', chainId)
   }, [])
 
-  //
-  // Cartridge Controller
-  const manifest = useMemo(() => (dojoAppConfig.manifests[selectedChainId] ?? null), [selectedChainConfig])
-  const { controller } = useController(
-    manifest,
-    selectedChainConfig.rpcUrl,
-    dojoAppConfig.nameSpace,
-    dojoAppConfig.contractInterfaces,
-  )
+  // Build chain connectors form selectedChainConfig
+  const chainConnectors = useChainConnectors(dojoAppConfig, selectedChainConfig);
 
-  //
-  // Connectors
-  const { connectors } = useInjectedConnectors({
-    // Show these connectors if the user has no connector installed.
-    recommended: [
-      injected({ id: DojoPredeployedStarknetWindowObject.getId() }),
-      argent(),
-      braavos(),
-      controller,
-    ],
-    // Hide recommended connectors if the user has any connector installed.
-    includeRecommended: 'always',
-    // Randomize the order of the connectors.
-    // order: 'random',
-  });
+  // // connectors to be used by starknet-react
+  // const { connectors } = useInjectedConnectors({
+  //   // Show these connectors if the user has no connector installed.
+  //   recommended: chainConnectors,
+  //   // Hide recommended connectors if the user has any connector installed.
+  //   includeRecommended: 'always',
+  //   // Randomize the order of the connectors.
+  //   // order: 'random',
+  // });
 
   //
   // RPC
@@ -103,14 +86,13 @@ export const StarknetProvider = ({
         selectedChainId,
         selectedChainConfig,
         selectChainId,
-        isKatana,
         chains,
       }}
     >
       <StarknetConfig
         chains={chains}
         provider={() => provider(selectedChainConfig.chain)}
-        connectors={connectors}
+        connectors={chainConnectors}
         autoConnect={true}
       // explorer={explorer}
       >

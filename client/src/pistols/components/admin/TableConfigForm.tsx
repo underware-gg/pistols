@@ -11,7 +11,7 @@ import { Balance } from '@/pistols/components/account/Balance'
 import { bigintToEntity, bigintToHex, isBigint, isNumeric } from '@/lib/utils/types'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@/lib/utils/starknet'
-import { getTableType, TableTypeNameToValue, CONFIG } from '@/games/pistols/generated/constants'
+import { TableTypeNameToValue, CONFIG, DeckTypeNameToValue } from '@/games/pistols/generated/constants'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -27,6 +27,7 @@ enum FieldType {
   Number,
   Boolean,
   TableType,
+  DeckType,
 }
 
 type FormSchema = {
@@ -44,13 +45,11 @@ const config_schema: FormSchema = {
 
 const table_config_schema: FormSchema = {
   table_id: { type: FieldType.ShortString, isKey: true },
-  table_type: { type: FieldType.TableType },
   description: { type: FieldType.ShortString },
+  table_type: { type: FieldType.TableType },
+  deck_type: { type: FieldType.DeckType },
   fee_collector_address: { type: FieldType.Address },
-  wager_contract_address: { type: FieldType.Address },
-  wager_min: { type: FieldType.Wei },
   fee_min: { type: FieldType.Wei },
-  fee_pct: { type: FieldType.Number },
   is_open: { type: FieldType.Boolean },
 }
 
@@ -81,7 +80,7 @@ export const ConfigForm = ({
 export const TableConfigForm = ({
 }: {
   }) => {
-  const [tableId, setTableId] = useState()
+  const [tableId, setTableId] = useState<string>()
 
   const { TableConfig } = useDojoComponents()
   const entityKey = useMemo(() => (tableId ? bigintToEntity(stringToFelt(tableId)) : null), [tableId])
@@ -94,7 +93,7 @@ export const TableConfigForm = ({
 
   return (
     <div>
-      <TableSwitcher tableId={tableId} setSelectedTableId={setTableId} />
+      <TableSwitcher selectedTableId={tableId} setSelectedTableId={setTableId} />
       <ComponentForm
         schema={table_config_schema}
         component={TableConfig}
@@ -125,7 +124,6 @@ export const ComponentForm = ({
   const comp_values = useComponentValue(component, entityKey)
   const component_values = useMemo(() => {
     let result = { ...comp_values }
-    if (result.table_type != undefined) result.table_type = getTableType(result.table_type)
     return result
   }, [comp_values])
 
@@ -235,8 +233,17 @@ export const Field = ({
                 value={value}
                 setValue={setValue}
               />
+            </> : fieldType == FieldType.DeckType ? <>
+              {value}
+              <FormSelectFromMap
+                map={DeckTypeNameToValue}
+                label={name}
+                disabled={readOnly}
+                value={value}
+                setValue={setValue}
+              />
             </> : <>
-              {fieldType == FieldType.Wei && <Balance wei={value ?? 0} decimals={18} />}
+              {fieldType == FieldType.Wei && <Balance lords wei={value ?? 0} decimals={18} />}
               <FormInput
                 label={null}
                 placeholder={null}

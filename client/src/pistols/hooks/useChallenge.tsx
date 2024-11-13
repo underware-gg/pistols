@@ -8,7 +8,7 @@ import { useClientTimestamp } from "@/lib/utils/hooks/useTimestamp"
 import { useDuelist } from "@/pistols/hooks/useDuelist"
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from "@/lib/utils/starknet"
-import { ChallengeState, getChallengeState } from '@/games/pistols/generated/constants'
+import { ChallengeState, Premise } from '@/games/pistols/generated/constants'
 import { ChallengeStateDescriptions } from "@/pistols/utils/pistols"
 
 
@@ -91,18 +91,19 @@ export const useChallenge = (duelId: BigNumberish) => {
   // console.log(bigintToHex(duelId), challenge)
 
   const tableId = useMemo(() => feltToString(challenge?.table_id ?? 0n), [challenge])
+  const seed = useMemo(() => BigInt(challenge?.seed ?? 0), [challenge])
   const duelistAddressA = useMemo(() => BigInt(challenge?.address_a ?? 0), [challenge])
   const duelistAddressB = useMemo(() => BigInt(challenge?.address_b ?? 0), [challenge])
   const duelistIdA = useMemo(() => BigInt(challenge?.duelist_id_a ?? 0), [challenge])
   const duelistIdB = useMemo(() => BigInt(challenge?.duelist_id_b ?? 0), [challenge])
   const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
-  const message = useMemo(() => feltToString(challenge?.message ?? 0n), [challenge])
-  const roundNumber = useMemo(() => (challenge?.round_number ?? 0), [challenge])
+  const premise = useMemo(() => (challenge?.premise ?? Premise.Null), [challenge])
+  const quote = useMemo(() => feltToString(challenge?.quote ?? 0n), [challenge])
   const timestamp_start = useMemo(() => Number(challenge?.timestamp_start ?? 0), [challenge])
   const timestamp_end = useMemo(() => Number(challenge?.timestamp_end ?? 0), [challenge])
 
   const { clientTimestamp } = useClientTimestamp(false)
-  let original_state = useMemo(() => (challenge ? getChallengeState(challenge.state) : null), [challenge])
+  let original_state = useMemo(() => (challenge?.state as ChallengeState), [challenge])
   let state = useMemo(() => {
     if (original_state == ChallengeState.Awaiting && (timestamp_end < clientTimestamp)) {
       return ChallengeState.Expired
@@ -114,16 +115,15 @@ export const useChallenge = (duelId: BigNumberish) => {
     challengeExists: (challenge != null),
     duelId,
     tableId,
+    seed,
     state,
     duelistAddressA,
     duelistAddressB,
     duelistIdA,
     duelistIdB,
-    challengerId: duelistIdA,
-    challengedId: duelistIdB,
-    message,
+    premise,
+    quote,
     // progress and results
-    roundNumber,
     winner,
     winnerDuelistId: (winner == 1 ? duelistIdA : winner == 2 ? duelistIdB : 0n),
     isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),

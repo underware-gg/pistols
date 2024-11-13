@@ -1,16 +1,6 @@
 #!/bin/bash
-set -e
+set -e # enable exit on error
 source scripts/setup.sh
-
-echo "------------------------------------------------------------------------------"
-echo "PROJECT: $PROJECT_NAME"
-echo "PROFILE: $PROFILE"
-echo "RPC_URL: $RPC_URL"
-echo "WORLD_ADDRESS: $WORLD_ADDRESS"
-echo "CLIENT_GEN_PATH: $CLIENT_GEN_PATH"
-echo "PROFILE_GEN_PATH: $PROFILE_GEN_PATH"
-echo "BINDINGS_PATH: $BINDINGS_PATH"
-echo ""
 
 if [[
   -z "$PROJECT_NAME" ||
@@ -23,16 +13,22 @@ if [[
   exit 1
 fi
 
+
+echo "BINDINGS_PATH: $BINDINGS_PATH"
+echo "CLIENT_GAME_PATH: $CLIENT_GAME_PATH"
+echo "CLIENT_MANIFEST_PATH: $CLIENT_MANIFEST_PATH"
+
 #-----------------
 # build
 #
+echo "------------------------------------------------------------------------------"
+sozo --version
 echo "------------------------------------------------------------------------------"
 echo ">>> Cleaning..."
 sozo -P $PROFILE clean
 echo ">>> Building..."
 if [[ "$PROFILE" == "dev" ]]; then
-  # sozo -P $PROFILE build --typescript
-  sozo -P $PROFILE build
+  sozo -P $PROFILE build --typescript
 else
   sozo -P $PROFILE build
 fi
@@ -42,26 +38,52 @@ echo "👍"
 # migrate
 #
 echo "------------------------------------------------------------------------------"
-echo ">>> Migrate plan..."
-sozo -P $PROFILE migrate plan --world $WORLD_ADDRESS
-# exit 0
-echo ">>> Migrate apply..."
-sozo -P $PROFILE migrate apply --world $WORLD_ADDRESS
+echo ">>> Inspect migrations..."
+sozo -P $PROFILE inspect --world $WORLD_ADDRESS
+
+echo ">>> Do migrations..."
+# sozo -P $PROFILE migrate -vvv --world $WORLD_ADDRESS
+sozo -P $PROFILE migrate --world $WORLD_ADDRESS
 echo "👍"
+
+echo ">>> Inspect again..."
+sozo -P $PROFILE inspect --world $WORLD_ADDRESS
 
 #-----------------
 # auth write
 #
 # scripts/default_auth.sh $PROFILE
 
-
 #------------------------
 # copy manifest to client
 #
 echo "------------------------------------------------------------------------------"
-echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$PROFILE_GEN_PATH/]"
-mkdir -p $PROFILE_GEN_PATH
-cp $MANIFEST_FILE_PATH $PROFILE_GEN_PATH/
+echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_MANIFEST_PATH/]"
+mkdir -p $CLIENT_MANIFEST_PATH
+cp $MANIFEST_FILE_PATH $CLIENT_MANIFEST_PATH/
+echo "👍"
+
+#
+# create torii config
+export DUEL_TOKEN_ADDRESS=$(get_contract_address "pistols-duel_token")
+export DUELIST_TOKEN_ADDRESS=$(get_contract_address "pistols-duelist_token")
+export FAME_TOKEN_ADDRESS=$(get_contract_address "pistols-fame_coin")
+export LORDS_TOKEN_ADDRESS=${LORDS_ADDRESS:-$(get_contract_address "pistols-lords_mock")}
+echo "------------------------------------------------------------------------------"
+echo ">>> Create torii config [$TORII_CONFIG_PATH]..."
+echo "# torii config for profile [$PROFILE]" > $TORII_CONFIG_PATH
+echo "world_address = \"$WORLD_ADDRESS\"" >> $TORII_CONFIG_PATH
+echo "rpc = \"$RPC_URL\"" >> $TORII_CONFIG_PATH
+echo "[indexing]" >> $TORII_CONFIG_PATH
+echo "index_pending = true" >> $TORII_CONFIG_PATH
+echo "index_transactions = false" >> $TORII_CONFIG_PATH
+echo "contracts = [" >> $TORII_CONFIG_PATH
+echo "  \"erc721:$DUEL_TOKEN_ADDRESS\", # duel_token" >> $TORII_CONFIG_PATH
+echo "  \"erc721:$DUELIST_TOKEN_ADDRESS\", # duelist_token" >> $TORII_CONFIG_PATH
+echo "  \"erc20:$FAME_TOKEN_ADDRESS\", # fame_coin" >> $TORII_CONFIG_PATH
+echo "  \"erc20:$LORDS_TOKEN_ADDRESS\", # lords" >> $TORII_CONFIG_PATH
+echo "]" >> $TORII_CONFIG_PATH
+cat $TORII_CONFIG_PATH
 echo "👍"
 
 #------------------------
@@ -71,19 +93,25 @@ if [[ "$PROFILE" == "dev" ]]; then
   #
   # TODO: Enable this when bindings are ported
   # generate and copy bindings
-  # cp $BINDINGS_PATH/* $CLIENT_GEN_PATH/
+  # cp -R $BINDINGS_PATH $CLIENT_GAME_PATH/
+  # cp -R $BINDINGS_PATH/typescript_v2 $CLIENT_GAME_PATH/generated/
+  cp -R $BINDINGS_PATH/typescript $CLIENT_GAME_PATH/generated/
   #
   # copy to client
   echo "------------------------------------------------------------------------------"
   echo ">>> Generate sources..."
   cd ../client
-  npm run create-components --game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS
-  npm run create-constants --game=$GAME_SLUG --profile=$PROFILE
+  export CMD="npm run create-components --game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS"
+  echo "command: $CMD"
+  $CMD
+  export CMD="npm run create-constants --game=$GAME_SLUG --profile=$PROFILE"
+  echo "command: $CMD"
+  $CMD
   echo "👍?"
   #
   # list copied files
   echo "------------------------------------------------------------------------------"
-  ls -ld $CLIENT_GEN_PATH/* | grep -E 'ts|json'
+  ls -ld $CLIENT_GAME_PATH/* | grep -E 'ts|json'
 fi
 
 

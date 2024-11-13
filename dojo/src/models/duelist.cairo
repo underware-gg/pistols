@@ -1,21 +1,21 @@
 use starknet::ContractAddress;
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use pistols::interfaces::systems::{WorldSystemsTrait};
-use pistols::interfaces::ierc721::{ierc721, IERC721Dispatcher, IERC721DispatcherTrait};
-use pistols::models::config::{ConfigManager, ConfigManagerTrait};
-use pistols::types::constants::{CONST};
+use pistols::types::constants::{CONST, HONOUR};
 
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-enum Archetype {
+pub enum Archetype {
     Undefined,  // 0
     Villainous, // 1
     Trickster,  // 2
     Honourable, // 3
 }
 
+impl ArchetypeDefault of Default<Archetype> {
+    fn default() -> Archetype {(Archetype::Undefined)}
+}
+
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-enum ProfilePicType {
+pub enum ProfilePicType {
     Undefined,  // 0
     Duelist,    // 1
     External,   // 2
@@ -25,22 +25,21 @@ enum ProfilePicType {
 }
 
 
-
 //---------------------
 // Duelist
 //
 // #[derive(Copy, Drop, Serde)] // ByteArray is not copiable!
-#[derive(Clone, Drop, Serde)]   // pass to functions using duelist.clone()
+#[derive(Clone, Drop, Serde, Default)]   // pass to functions using duelist.clone()
 #[dojo::model]
 pub struct Duelist {
     #[key]
-    duelist_id: u128,   // erc721 token_id
+    pub duelist_id: u128,   // erc721 token_id
     //-----------------------
-    name: felt252,
-    profile_pic_uri: ByteArray,     // can be anything
-    profile_pic_type: ProfilePicType,
-    timestamp: u64,                 // date registered
-    score: Score,
+    pub name: felt252,
+    pub profile_pic_type: ProfilePicType,
+    pub profile_pic_uri: ByteArray,     // can be anything
+    pub timestamp: u64,                 // date registered
+    pub score: Score,
 }
 
 // Current challenge between two Duelists
@@ -48,39 +47,34 @@ pub struct Duelist {
 #[dojo::model]
 pub struct Pact {
     #[key]
-    table_id: felt252,
+    pub table_id: felt252,
     #[key]
-    pair: u128,     // xor'd duelists as u256(address).low
+    pub pair: u128,     // xor'd duelists as u256(address).low
     //------------
-    duel_id: u128,  // current Challenge, or 0x0
+    pub duel_id: u128,  // current Challenge, or 0x0
 }
 
 //
-// Duelist scores and wager balance per Table
+// Duelist scores per Table
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct Scoreboard {
     #[key]
-    table_id: felt252,
+    pub table_id: felt252,
     #[key]
-    duelist_id: u128,
+    pub duelist_id: u128,
     //------------
-    score: Score,
-    wager_won: u128,
-    wager_lost: u128,
+    pub score: Score,
 } // [160] [128] [128]
 
-#[derive(Copy, Drop, Serde, IntrospectPacked)]
-struct Score {
-    honour: u8,             // 0..100
-    level_villain: u8,      // 0..100
-    level_trickster: u8,    // 0..100
-    level_lord: u8,         // 0..100
-    total_duels: u16,
-    total_wins: u16,
-    total_losses: u16,
-    total_draws: u16,
-    honour_history: u64,    // past 8 duels, each byte holds one duel honour
+#[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
+pub struct Score {
+    pub honour: u8,             // 0..100
+    pub total_duels: u16,
+    pub total_wins: u16,
+    pub total_losses: u16,
+    pub total_draws: u16,
+    pub honour_history: u64,    // past 8 duels, each byte holds one duel honour
 } // [160]
 
 
@@ -88,6 +82,8 @@ struct Score {
 //----------------------------------
 // Traits
 //
+use pistols::utils::bitwise::{BitwiseU64};
+use pistols::utils::math::{MathU64};
 
 #[generate_trait]
 impl DuelistTraitImpl of DuelistTrait {
@@ -116,13 +112,69 @@ impl DuelistTraitImpl of DuelistTrait {
 #[generate_trait]
 impl ScoreTraitImpl of ScoreTrait {
     #[inline(always)]
-    fn is_villain(self: Score) -> bool { (self.level_villain > 0) }
+    fn is_villain(self: Score) -> bool { (self.total_duels > 0 && self.honour < HONOUR::TRICKSTER_START) }
     #[inline(always)]
-    fn is_trickster(self: Score) -> bool { (self.level_trickster > 0) }
+    fn is_trickster(self: Score) -> bool { (self.honour >= HONOUR::TRICKSTER_START && self.honour < HONOUR::LORD_START) }
     #[inline(always)]
-    fn is_lord(self: Score) -> bool { (self.level_lord > 0) }
+    fn is_lord(self: Score) -> bool { (self.honour >= HONOUR::LORD_START) }
+    #[inline(always)]
+    fn get_archetype(self: Score) -> Archetype {
+        if (self.is_lord()) {(Archetype::Honourable)}
+        else if (self.is_trickster()) {(Archetype::Trickster)}
+        else if (self.is_villain()) {(Archetype::Villainous)}
+        else {(Archetype::Undefined)}
+    }
     #[inline(always)]
     fn format_honour(value: u8) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
+
+    // update duel totals only
+    fn update_totals(ref score_a: Score, ref score_b: Score, winner: u8) {
+        score_a.total_duels += 1;
+        score_b.total_duels += 1;
+        if (winner == 1) {
+            score_a.total_wins += 1;
+            score_b.total_losses += 1;
+        } else if (winner == 2) {
+            score_a.total_losses += 1;
+            score_b.total_wins += 1;
+        } else {
+            score_a.total_draws += 1;
+            score_b.total_draws += 1;
+        }
+    }
+    // average honour has an extra decimal, eg: 100 = 10.0
+    fn update_honour(ref self: Score, duel_honour: u8) {
+        let history_pos: usize = ((self.total_duels.into() - 1) % 8) * 8;
+        self.honour_history =
+            (self.honour_history & ~BitwiseU64::shl(0xff, history_pos)) |
+            BitwiseU64::shl(duel_honour.into(), history_pos);
+        self.honour = (BitwiseU64::sum_bytes(self.honour_history) / MathU64::min(self.total_duels.into(), 8)).try_into().unwrap();
+    }
+}
+
+impl ProfilePicTypeDefault of Default<ProfilePicType> {
+    fn default() -> ProfilePicType {(ProfilePicType::Undefined)}
+}
+
+#[generate_trait]
+impl ProfilePicTypeImpl of ProfilePicTypeTrait {
+    fn get_uri(self: ProfilePicType,
+        base_uri: ByteArray,
+        profile_pic_uri: ByteArray,
+        variant: ByteArray,    
+    ) -> ByteArray {
+        match self {
+            ProfilePicType::Duelist => {
+                let number =
+                    if (profile_pic_uri.len() == 0) {"00"}
+                    else if (profile_pic_uri.len() == 1) {format!("0{}", profile_pic_uri)}
+                    else {profile_pic_uri};
+                (format!("{}/profiles/{}/{}.jpg", base_uri, variant, number))
+            },
+            ProfilePicType::External |
+            ProfilePicType::Undefined => Self::get_uri(ProfilePicType::Duelist, base_uri, "", variant)
+        }
+    }
 }
 
 impl ArchetypeIntoFelt252 of Into<Archetype, felt252> {
@@ -147,41 +199,3 @@ impl ArchetypeIntoByteArray of Into<Archetype, ByteArray> {
 }
 
 
-
-//----------------------------------
-// Manager
-//
-
-#[derive(Copy, Drop)]
-struct DuelistManager {
-    world: IWorldDispatcher,
-    token_dispatcher: IERC721Dispatcher,
-}
-
-#[generate_trait]
-impl DuelistManagerTraitImpl of DuelistManagerTrait {
-    fn new(world: IWorldDispatcher) -> DuelistManager {
-        let contract_address: ContractAddress = world.token_duelist_address();
-        assert(contract_address.is_non_zero(), 'DuelistManager: null token addr');
-        let token_dispatcher = ierc721(contract_address);
-        (DuelistManager { world, token_dispatcher })
-    }
-    fn get(self: DuelistManager, duelist_id: u128) -> Duelist {
-        get!(self.world, (duelist_id), Duelist)
-    }
-    fn set(self: DuelistManager, duelist: Duelist) {
-        set!(self.world, (duelist));
-    }
-    fn get_token_dispatcher(self: DuelistManager) -> IERC721Dispatcher {
-        (self.token_dispatcher)
-    }
-    fn owner_of(self: DuelistManager, duelist_id: u128) -> ContractAddress {
-        (self.token_dispatcher.owner_of(duelist_id.into()))
-    }
-    fn exists(self: DuelistManager, duelist_id: u128) -> bool {
-        (self.owner_of(duelist_id).is_non_zero())
-    }
-    fn is_owner_of(self: DuelistManager, address: ContractAddress, duelist_id: u128) -> bool {
-        (self.owner_of(duelist_id)  == address)
-    }
-}

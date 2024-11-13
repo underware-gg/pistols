@@ -3,14 +3,13 @@ import { Grid, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { LordsBalance } from '@/pistols/components/account/LordsBalance'
+import { useControllerMenu, useControllerUser } from '@/lib/dojo/hooks/useController'
+import { getConnectorIcon } from '@/lib/dojo/setup/connectors'
+import { FameBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { MusicToggle } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { useControllerUsername } from '@/lib/dojo/hooks/useController'
-import { ConnectButton, EnterAsGuestButton } from '@/pistols/components/ScGate'
-import { Divider } from '@/lib/ui/Divider'
+import { _useConnector } from '@/lib/dojo/fix/starknet_react_core'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -18,9 +17,10 @@ const Col = Grid.Column
 export default function WalletHeader({
 }) {
   const { disconnect } = useDisconnect()
-  const { account, address, connector, isConnected } = useAccount()
+  const { account, address, isConnected } = useAccount()
   const { connectedChainName } = useSelectedChain()
-  const { contractAddress: lordsContractAddress } = useLordsContract()
+  const { lordsContractAddress } = useLordsContract()
+  const { connector } = _useConnector()
 
   // BUG: https://github.com/apibara/starknet-react/issues/419
   // const { data, error, isLoading } = useStarkProfile({ address, enabled: false })
@@ -28,9 +28,10 @@ export default function WalletHeader({
   const data = { name: null, profilePicture: null }
 
   const name = useMemo(() => (data?.name ?? `Connected to ${connectedChainName}`), [data])
-  const imageUrl = useMemo(() => (data?.profilePicture ?? connector?.icon?.dark ?? '/profiles/square/00.jpg'), [data, connector])
+  const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? '/profiles/square/00.jpg'), [data, connector])
 
-  const { username } = useControllerUsername()
+  const { username } = useControllerUser()
+  const { openMenu } = useControllerMenu()
 
   return (
     <Grid>
@@ -42,15 +43,15 @@ export default function WalletHeader({
           <Col width={12} textAlign='left'>
             <h4>{name}</h4>
             {username && <span className='H4 Bold'>{username} / </span>} <AddressShort address={address ?? 0n} />
-            {isConnected && lordsContractAddress &&
+            {isConnected &&
               <h5>
-                LORDS: <LordsBalance address={address} big={false} />
-                {/* &nbsp;&nbsp;/&nbsp; */}
+                LORDS: <LordsBalance address={address} />
+                {' / '}
+                FAME: <FameBalance address={address} />
                 {/* <EtherBalance address={address} /> */}
               </h5>
             }
             <div className='AbsoluteRight AbsoluteBottom PaddedDouble'>
-              {/* <MusicToggle /> */}
             </div>
           </Col>
         }
@@ -65,11 +66,14 @@ export default function WalletHeader({
         <Row columns={'equal'}>
           {lordsContractAddress &&
             <Col verticalAlign='middle'>
-              <LordsFaucet fill large account={account} />
+              <LordsFaucet fill account={account} />
             </Col>
           }
           <Col verticalAlign='middle'>
-            <ActionButton fill large onClick={() => disconnect()} label='Disconnect' />
+            <ActionButton fill onClick={() => openMenu()} label='Settings' />
+          </Col>
+          <Col verticalAlign='middle'>
+            <ActionButton fill onClick={() => disconnect()} label='Disconnect' />
           </Col>
         </Row>
       }

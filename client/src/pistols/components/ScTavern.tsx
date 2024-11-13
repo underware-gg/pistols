@@ -1,33 +1,60 @@
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
+import { Label } from 'semantic-ui-react'
 import { QueryProvider } from '@/pistols/hooks/QueryContext'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import { TavernAudios } from '@/pistols/components/GameContainer'
 import { TavernMenu } from '@/pistols/components/TavernMenu'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
-import TableModal from '@/pistols/components/TableModal'
-import DuelistModal from '@/pistols/components/DuelistModal'
-import ChallengeModal from '@/pistols/components/ChallengeModal'
 import NewChallengeModal from '@/pistols/components/NewChallengeModal'
-import UIContainer from '@/pistols/components/UIContainer'
+import ChallengeModal from '@/pistols/components/ChallengeModal'
+import DuelistModal from '@/pistols/components/DuelistModal'
+import BarkeepModal from '@/pistols/components/BarkeepModal'
+import TableModal from '@/pistols/components/TableModal'
+import { MenuLabels } from '@/pistols/utils/pistols'
+import { Header } from '@/pistols/components/Header'
 
 export default function ScTavern() {
   const { tableOpener } = usePistolsContext()
-  // useTestValidateSignature()
+  const { dispatchSetScene } = usePistolsScene()
+
+  const { value: newScene, timestamp } = useGameEvent('change_scene', null)
+  useEffect(() => {
+    if (newScene) {
+      dispatchSetScene(newScene)
+    }
+  }, [newScene, timestamp])
 
   return (
     <QueryProvider>
-      <UIContainer>
-        <TavernMenu />
-      </UIContainer>
+
+      <TavernMenu />
+      <Header />
+      <BarkeepTooltip />
 
       <TableModal opener={tableOpener} />
       <DuelistModal />
       <ChallengeModal />
       <NewChallengeModal />
       <TavernAudios />
+      <BarkeepModal />
 
       <DojoSetupErrorDetector />
       {/* <ConnectionDetector /> */}
     </QueryProvider>
+  )
+}
+
+
+function BarkeepTooltip() {
+  const { value: hoverSceneValue } = useGameEvent('hover_scene', null)
+  const label = useMemo(() => (MenuLabels[hoverSceneValue]), [hoverSceneValue])
+  if (!hoverSceneValue) {
+    return <></>
+  }
+  return (
+    <div id='BarMenuTooltipAnchor' className='Relative'>
+      <Label pointing='below' className='BarMenuTooltip'>{label}</Label>
+    </div>
   )
 }

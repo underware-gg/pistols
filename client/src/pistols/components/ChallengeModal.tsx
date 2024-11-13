@@ -6,13 +6,11 @@ import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/P
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useWager } from '@/pistols/hooks/useWager'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useIsMyAccount, useIsYou } from '@/pistols/hooks/useIsYou'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
-import { WagerAndOrFees } from '@/pistols/components/account/LordsBalance'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { AddressShort } from '@/lib/ui/AddressShort'
@@ -20,12 +18,13 @@ import { IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
 import { bigintToHex } from '@/lib/utils/types'
 import { ChallengeState } from '@/games/pistols/generated/constants'
+import { PremisePrefix } from '../utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function ChallengeModal() {
-  const { reply_challenge } = useDojoSystemCalls()
+  const { reply_duel } = useDojoSystemCalls()
   const { duelistId } = useSettings()
   const { account } = useAccount()
 
@@ -34,8 +33,11 @@ export default function ChallengeModal() {
 
   const _close = () => { dispatchSelectDuel(0n) }
 
-  const { state, tableId, message, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, isLive, isFinished, needToSyncExpired } = useChallenge(selectedDuelId)
-  const { value, fee } = useWager(selectedDuelId)
+  const {
+    state, tableId, premise, quote,
+    duelistIdA, duelistIdB, duelistAddressA, duelistAddressB,
+    isLive, isFinished, needToSyncExpired,
+  } = useChallenge(selectedDuelId)
   const { description: tableDescription } = useTable(tableId)
 
   const { challengeDescription } = useChallengeDescription(selectedDuelId)
@@ -54,7 +56,7 @@ export default function ChallengeModal() {
   const _reply = (accepted: boolean) => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await reply_challenge(account, duelistId, selectedDuelId, accepted)
+      await reply_duel(account, duelistId, selectedDuelId, accepted)
       if (accepted) _gotoDuel()
       setIsSubmitting(false)
     }
@@ -78,16 +80,13 @@ export default function ChallengeModal() {
         <Grid>
           <Row>
             <Col width={4} textAlign='left'>
-              Challenge
+              Challenge #{selectedDuelId.toString()}
             </Col>
             <Col width={8} textAlign='center' className='NoBreak Important'>
               {tableDescription}
             </Col>
-            <Col width={1} textAlign='right'>
+            <Col width={4} textAlign='right'>
               <IconClick name='database' size={'small'} onClick={() => window?.open(`/dueldata/${bigintToHex(selectedDuelId)}`, '_blank')} />
-            </Col>
-            <Col width={3} textAlign='right'>
-              <AddressShort address={selectedDuelId} />
             </Col>
           </Row>
         </Grid>
@@ -109,32 +108,19 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} address={duelistAddressB} displayOwnerAddress={false} />
+                <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <Divider content='for a duel' nomargin />
+                <Divider content={PremisePrefix[premise]} nomargin />
               </Col>
             </Row>
             <Row columns='equal' textAlign='center'>
               <Col>
-                <h3 className='Quote'>{`“${message}”`}</h3>
+                <h3 className='Quote'>{`“${quote}”`}</h3>
               </Col>
             </Row>
-
-            {(value || (isYou && fee)) && <>
-              <Row columns='equal' textAlign='right'>
-                <Col>
-                  <Divider content={value ? 'Placing a wager of' : 'Fees'} nomargin />
-                </Col>
-              </Row>
-              <Row columns='equal' textAlign='center'>
-                <Col>
-                  <WagerAndOrFees big tableId={tableId} value={value} fee={isYou ? fee : 0} />
-                </Col>
-              </Row>
-            </>}
 
             {(isLive || isFinished) && <>
               <Row columns='equal' textAlign='right'>
@@ -171,36 +157,41 @@ export default function ChallengeModal() {
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Close' onClick={() => _close()} />
+              <ActionButton large fill label='Close' onClick={() => _close()} />
             </Col>
             {(state == ChallengeState.Awaiting && isChallenger) &&
+              <>
+                <Col>
+                  <ActionButton large fill negative label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                </Col>
+                <Col>
+                  <ActionButton large fill important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
+                </Col>
+              </>
+            }
+            {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <ActionButton fill negative label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
+                <ActionButton large fill negative label='Cowardly Refuse' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
             {(state == ChallengeState.Awaiting && isChallenged) &&
               <Col>
-                <ActionButton fill negative label='Cowardly Refuse' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
-              </Col>
-            }
-            {(state == ChallengeState.Awaiting && isChallenged) &&
-              <Col>
-                <BalanceRequiredButton label='Accept Challenge!' disabled={isSubmitting} onClick={() => _reply(true)} tableId={tableId} wagerValue={value} fee={fee} />
+                <BalanceRequiredButton label='Accept Challenge!' disabled={isSubmitting} onClick={() => _reply(true)} fee={0} />
               </Col>
             }
             {(state == ChallengeState.InProgress) &&
               <Col>
-                <ActionButton fill important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
+                <ActionButton large fill important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
               </Col>
             }
-            {(state > ChallengeState.InProgress) &&
+            {isFinished &&
               <Col>
-                <ActionButton fill important label='Replay Duel!' onClick={() => _gotoDuel()} />
+                <ActionButton large fill important label='Replay Duel!' onClick={() => _gotoDuel()} />
               </Col>
             }
             {(needToSyncExpired && (isChallenger || isChallenged)) &&
               <Col>
-                <ActionButton fill important label='Withdraw Expired Fees' disabled={isSubmitting} onClick={() => _reply(false)} />
+                <ActionButton large fill important label='Withdraw Expired Fees' disabled={isSubmitting} onClick={() => _reply(false)} />
               </Col>
             }
           </Row>

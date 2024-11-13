@@ -1,0 +1,48 @@
+{
+  "primaryType": "Message",
+  "domain": {
+    "revision": "1",
+    "name": "Underware",
+    "chainId": "WP_PISTOLS_STAGING",
+    "version": "0.1.0"
+  },
+  "types": {
+    "StarknetDomain": [
+      {
+        "name": "revision",
+        "type": "shortstring"
+      },
+      {
+        "name": "name",
+        "type": "shortstring"
+      },
+      {
+        "name": "chainId",
+        "type": "shortstring"
+      },
+      {
+        "name": "version",
+        "type": "shortstring"
+      }
+    ],
+    "Message": [
+      {
+        "name": "duelId",
+        "type": "felt"
+      },
+      {
+        "name": "roundNumber",
+        "type": "felt"
+      },
+      {
+        "name": "duelistId",
+        "type": "felt"
+      }
+    ]
+  },
+  "message": {
+    "duelId": "0xdb6a3c07fc81f90cb82cf33268f8a2ea",
+    "roundNumber": "0x1",
+    "duelistId": "0x4"
+  }
+}

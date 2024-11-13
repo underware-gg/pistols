@@ -111,7 +111,7 @@ function ConnectTwitter() {
   return (
     <SocialItem
       name='X'
-      logoName='twitter'
+      logoName='x'
       status={status}
       isSocialConnected={isSocialConnected}
       canClick={false}

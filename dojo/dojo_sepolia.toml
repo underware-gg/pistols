@@ -1,10 +1,16 @@
+#--------------------------
+# dojo profile config
+# https://book.dojoengine.org/framework/config
+# https://github.com/dojoengine/dojo/blob/main/examples/simple/dojo_dev.toml
+#
+
 [world]
 name = "Pistols at 10 Blocks"
 description = "An on-chain pistol duelling game of honour and betrayal."
 icon_uri = "https://pistols.underware.gg/images/logo.png"
 cover_uri = "https://pistols.underware.gg/images/splash.png"
 website = "https://pistols.underware.gg"
-seed = "pistols"
+seed = "pistols-0.12.0"
 
 [world.socials]
 x = "https://x.com/underware_gg"
@@ -12,14 +18,79 @@ github = "https://github.com/underware-gg/pistols"
 # discord = "https://discord.gg/FB2wR6uF"
 # telegram = "https://t.me/dojoengine"
 
-[namespace]
-default = "pistols"
-
 [env]
+chain_id = "SN_SEPOLIA"
 # rpc_url = ""          # env: STARKNET_RPC_URL
 # account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
 # private_key = ""      # env: DOJO_PRIVATE_KEY
-world_address = "0x360fd2af2f118387ae282b66bfdbb6d4bb7e45a7213e101e5b8aa3471939677"
+world_address = "0x636da0d3f5b0f1d666f15ab7883017cb0536ef7ac8dd0bddd847a8cf16d6854"
+lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
 
+#--------------------------
+# namespaces
+#
+[namespace]
+default = "pistols"
+
+#--------------------------
+# namespaces
+#
+[owners]
+"pistols" = [
+  "pistols-game",
+  "pistols-admin",
+]
+
+#--------------------------
+# writers
+#
+[writers]
+"pistols" = [
+  "pistols-game",
+  "pistols-admin",
+] 
+# ERC-721
+"pistols-TokenConfig" = ["pistols-duelist_token","pistols-duel_token"]
+"pistols-Payment"     = ["pistols-duelist_token","pistols-duel_token"]
+"pistols-Duelist"     = ["pistols-duelist_token"]
+"pistols-Challenge"   = ["pistols-duel_token"]
+"pistols-Round"       = ["pistols-duel_token"]
+"pistols-Pact"        = ["pistols-duel_token"]
+"pistols-Scoreboard"  = ["pistols-duel_token"]
+# ERC-20
+"pistols-CoinConfig"        = ["pistols-fame_coin","pistols-lords_mock"]
+"pistols-TokenBoundAddress" = ["pistols-fame_coin"]
+
+#--------------------------
+# init_calldata
+#
+[init_call_args]
+"pistols-admin" = [
+  "0x0", # treasury_address (or initializer)
+  "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210", # lords_address
+  # "0x00be3edf412dd5982aa102524c0b8a0bcee584c5a627ed1db6a7c36922047257", # vrf_address
+  "0x0", # vrf_address (use vrf_mock) TODO: remove this
+]
+"pistols-duel_token" = [
+  "sstr:pistols.stage.underware.gg", # base_uri
+  "0x0", # minter_address
+  "0x0", # renderer_address
+  "0", # fee_amount
+]
+"pistols-duelist_token" = [
+  "sstr:pistols.stage.underware.gg", # base_uri
+  "0x0", # minter_address
+  "0x0", # renderer_address
+  "100000000000000000000", # fee_amount: 100 LORDS
+]
+
+
+#--------------------------
+# migration
+#
 [migration]
-skip_contracts = ["pistols-lords_mock"]
+order_inits = []
+skip_contracts = [
+  "pistols-lords_mock",
+  # "pistols-vrf_mock", // TODO: uncomment this
+]

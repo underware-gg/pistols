@@ -9,7 +9,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { arrayUnique, bigintEquals, keysToEntity } from '@/lib/utils/types'
-import { ChallengeState, getChallengeState } from '@/games/pistols/generated/constants'
+import { ChallengeState } from '@/games/pistols/generated/constants'
 import { AllChallengeStates } from '@/pistols/utils/pistols'
 
 export type DuelistRow = {
@@ -17,20 +17,18 @@ export type DuelistRow = {
   duelist_id: bigint
   duelist: any
   // filters
-  name: string,
-  score: any,
-  balance: number,
-  level: number,
+  name: string
+  score: any
   win_ratio: number
   total_duels: number
-  is_active: boolean,
+  is_active: boolean
 }
 export type ChallengeRow = {
   entity: Entity
   duel_id: bigint
-  challenge: any,
+  challenge: any
   // filters
-  state: number
+  state: ChallengeState
   timestamp: number
   isLive: boolean
   isFinished: boolean
@@ -48,13 +46,11 @@ export type ChallengeQuery = typeof emptyChallengeQuery
 export enum DuelistColumn {
   Name = 'Name',
   Honour = 'Honour',
-  Level = 'Level',
   Wins = 'Wins',
   Losses = 'Losses',
   Draws = 'Draws',
   Total = 'Total',
   WinRatio = 'WinRatio',
-  Balance = 'Balance',
 }
 export enum SortDirection {
   Ascending = 'ascending',
@@ -247,11 +243,9 @@ const QueryProvider = ({
       const duelist = getComponentValue(Duelist, entity)
       const duelist_id = duelist.duelist_id
       let score = duelist.score
-      let balance = 0
       if (state.filterDuelistTable && tableId) {
         const scoreboard = getComponentValue(Scoreboard, keysToEntity([tableIdAsFelt, duelist_id]))
         score = scoreboard?.score ?? {} as any
-        balance = scoreboard ? (Number(scoreboard.wager_won) - Number(scoreboard.wager_lost)) : undefined
       }
       acc.push({
         entity,
@@ -260,9 +254,7 @@ const QueryProvider = ({
         // filters
         name: feltToString(duelist.name).toLowerCase(),
         score,
-        balance,
         win_ratio: calcWinRatio(score.total_duels ?? 0, score.total_wins ?? 0),
-        level: Math.max(score.level_villain, score.level_trickster, score.level_lord),
         total_duels: score.total_duels ?? 0,
         is_active: (score.total_duels > 0),
       })
@@ -274,7 +266,7 @@ const QueryProvider = ({
       const challenge = getComponentValue(Challenge, entity)
       if (tableId && bigintEquals(challenge.table_id, tableIdAsFelt)) {
         const duel_id = challenge.duel_id
-        const state = getChallengeState(challenge.state)
+        const state = challenge.state as unknown as ChallengeState
         const timestamp = Number(challenge.timestamp_end ? challenge.timestamp_end : challenge.timestamp_start)
         acc.push({
           entity,
@@ -344,13 +336,11 @@ const QueryProvider = ({
         // return (!isAscending ? (b - a) : (a && !b) ? -1 : (!a && b) ? 1 : (a - b))
       }
       if (sortColumn == DuelistColumn.Honour) return _sortTotals(rowA.score.honour, rowB.score.honour)
-      if (sortColumn == DuelistColumn.Level) return _sortTotals(rowA.level, rowB.level)
       if (sortColumn == DuelistColumn.Wins) return _sortTotals(rowA.score.total_wins, rowB.score.total_wins)
       if (sortColumn == DuelistColumn.Losses) return _sortTotals(rowA.score.total_losses, rowB.score.total_losses)
       if (sortColumn == DuelistColumn.Draws) return _sortTotals(rowA.score.total_draws, rowB.score.total_draws)
       if (sortColumn == DuelistColumn.Total) return _sortTotals(rowA.score.total_duels, rowB.score.total_duels)
       if (sortColumn == DuelistColumn.WinRatio) return _sortTotals(rowA.win_ratio, rowB.win_ratio)
-      if (sortColumn == DuelistColumn.Balance) return _sortTotals(rowA.balance, rowB.balance)
       return 0
     })
     //
@@ -379,6 +369,7 @@ const QueryProvider = ({
       if (!statesFilter.includes(row.state)) hides.add(index)
     })
     rows = _reduceRowsExcludes(rows, hides)
+    rows = rows.sort(_sortChallenges)
     // compute totals
     const challengeIds = rows.map(row => row.duel_id)
     const liveCount = rows.reduce((acc, row) => {
@@ -386,7 +377,7 @@ const QueryProvider = ({
       return acc
     }, 0)
     return {
-      rows: rows.sort(_sortChallenges),
+      rows,
       challengeIds,
       liveCount,
       states,

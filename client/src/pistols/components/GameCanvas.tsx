@@ -10,10 +10,10 @@ const GameCanvas = () => {
   const { dispatchAnimated } = useGameplayContext()
   const { currentScene } = usePistolsContext()
 
-  const animated = useGameEvent('animated', -1)
+  const { value: animated, timestamp } = useGameEvent('animated', -1)
   useEffect(() => {
     dispatchAnimated(animated)
-  }, [animated])
+  }, [animated, timestamp])
 
   useEffect(() => {
     gameImpl?.switchScene(currentScene)

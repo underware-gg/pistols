@@ -12,7 +12,7 @@ export const MESSAGES: any = {
   NOT_VERIFIED: 'You found the exit!\n(failed verifying)',
 }
 
-export const EMOJI: any = {
+export const EMOJI = {
   //
   // tavern
   AGREEMENT: '🤝',
@@ -20,25 +20,29 @@ export const EMOJI: any = {
   IN_PROGRESS: '⚔️',
   //
   // Actions
-  PISTOL: '🔫',
   PACES: '🥾',
+  DODGE: '🛡️',
   BLADES: '⚔️',
   IDLE: '👀',
-  LIGHT: '🔪',
-  HEAVY: '🗡️',
-  BLOCK: '🛡️',
-  FLEE: '🏃',
-  STEAL: '🥷',
+  FIRE: '🔥',
+  // BladesCard
   SEPPUKU: '👹',
+  POCKET_PISTOL: '🔫',
+  BEHEAD: '🗡️',
+  GRAPPLE: '🪝',
   //
   // duel
+  LIFE: '❤️',
   ALIVE: '❤️',
   INJURED: '🩸',
   DEAD: '☠️',
-  WAGER: '💰',
+  BOUNTY: '💰',
   WINNER: '🏅',
+  DICE: '🎲',
   //
   // badges
+  FAME: '⭐️',
+  HONOUR: '👑',
   NEUTRAL: '🫥',
   LORD: '👑',
   TRICKSTER: '🃏',
@@ -48,5 +52,5 @@ export const EMOJI: any = {
   GHOST: '👻',    // TODO? used Seppuku / permadeath
   //
   ZERO: '—',      // zero honour, zero balance
-  UNKNOWN: '?',
+  UNKNOWN: '⚠️',
 }

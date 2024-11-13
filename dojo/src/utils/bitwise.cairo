@@ -1,14 +1,28 @@
 use traits::Into;
 
-const U8_ONE_LEFT: u8     = 0x80;
-const U16_ONE_LEFT: u16   = 0x8000;
-const U32_ONE_LEFT: u32   = 0x80000000;
-const U64_ONE_LEFT: u64   = 0x8000000000000000;
-const U128_ONE_LEFT: u128 = 0x80000000000000000000000000000000;
-const U256_ONE_LEFT: u256 = 0x8000000000000000000000000000000000000000000000000000000000000000;
+mod BITWISE {
+    const MAX_U8: u8 = 0xff;
+    const MAX_U16: u16 = 0xffff;
+    const MAX_U32: u32 = 0xffffffff;
+    const MAX_U64: u64 = 0xffffffffffffffff;
+    const MAX_U128: u128 = 0xffffffffffffffffffffffffffffffff;
+    const MAX_U256: u256 = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
-trait Bitwise<T> {
+    // most significant bit (e.g u8: 0b10000000, or 0x80)
+    const MSB_U8: u8     = 0x80;
+    const MSB_U16: u16   = 0x8000;
+    const MSB_U32: u32   = 0x80000000;
+    const MSB_U64: u64   = 0x8000000000000000;
+    const MSB_U128: u128 = 0x80000000000000000000000000000000;
+    const MSB_U256: u256 = 0x8000000000000000000000000000000000000000000000000000000000000000;
+}
+
+
+trait BitwiseTrait<T> {
+    fn bit_count() -> usize;
     fn byte_count() -> usize;
+    fn max() -> T;
+    fn msb() -> T;
     fn bit(n: usize) -> T;
     fn set(x: T, n: usize) -> T;
     fn unset(x: T, n: usize) -> T;
@@ -19,9 +33,15 @@ trait Bitwise<T> {
     fn sum_bytes(x: T) -> T;
 }
 
-impl BitwiseU8 of Bitwise<u8> {
+impl BitwiseU8 of BitwiseTrait<u8> {
+    #[inline(always)]
+    fn bit_count() -> usize {(8)}
     #[inline(always)]
     fn byte_count() -> usize {(1)}
+    #[inline(always)]
+    fn max() -> u8 {(BITWISE::MAX_U8)}
+    #[inline(always)]
+    fn msb() -> u8 {(BITWISE::MSB_U8)}
     fn bit(n: usize) -> u8 {
         if n == 0 { (0b00000001) }
         else if (n == 1) { (0b00000010) }
@@ -56,10 +76,9 @@ impl BitwiseU8 of Bitwise<u8> {
     }
     fn count_bits(x: u8) -> usize {
         let mut result: usize = 0;
-        let mut bit: u8 = U8_ONE_LEFT;
-        loop {
-            if(x & bit > 0) { result += 1; };
-            if(bit == 0x1) { break; }
+        let mut bit: u8 = BITWISE::MSB_U8;
+        while (bit != 0) {
+            if (x & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
@@ -67,9 +86,15 @@ impl BitwiseU8 of Bitwise<u8> {
     fn sum_bytes(x: u8) -> u8 {(x)}
 }
 
-impl BitwiseU16 of Bitwise<u16> {
+impl BitwiseU16 of BitwiseTrait<u16> {
+    #[inline(always)]
+    fn bit_count() -> usize {(16)}
     #[inline(always)]
     fn byte_count() -> usize {(2)}
+    #[inline(always)]
+    fn max() -> u16 {(BITWISE::MAX_U16)}
+    #[inline(always)]
+    fn msb() -> u16 {(BITWISE::MSB_U16)}
     fn bit(n: usize) -> u16 {
         if n < 8 { (BitwiseU8::bit(n).into()) }
         else if n < 16 { (BitwiseU8::bit(n-8).into() * 0x100) }
@@ -98,10 +123,9 @@ impl BitwiseU16 of Bitwise<u16> {
     }
     fn count_bits(x: u16) -> usize {
         let mut result: usize = 0;
-        let mut bit: u16 = U16_ONE_LEFT;
-        loop {
-            if(x & bit > 0) { result += 1; };
-            if(bit == 0x1) { break; }
+        let mut bit: u16 = BITWISE::MSB_U16;
+        while (bit != 0) {
+            if (x & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
@@ -117,9 +141,15 @@ impl BitwiseU16 of Bitwise<u16> {
     }
 }
 
-impl BitwiseU32 of Bitwise<u32> {
+impl BitwiseU32 of BitwiseTrait<u32> {
+    #[inline(always)]
+    fn bit_count() -> usize {(32)}
     #[inline(always)]
     fn byte_count() -> usize {(4)}
+    #[inline(always)]
+    fn max() -> u32 {(BITWISE::MAX_U32)}
+    #[inline(always)]
+    fn msb() -> u32 {(BITWISE::MSB_U32)}
     fn bit(n: usize) -> u32 {
         if n < 16 { (BitwiseU16::bit(n).into()) }
         else if n < 32 { (BitwiseU16::bit(n-16).into() * 0x10000) }
@@ -148,10 +178,9 @@ impl BitwiseU32 of Bitwise<u32> {
     }
     fn count_bits(x: u32) -> usize {
         let mut result: usize = 0;
-        let mut bit: u32 = U32_ONE_LEFT;
-        loop {
-            if(x & bit > 0) { result += 1; };
-            if(bit == 0x1) { break; }
+        let mut bit: u32 = BITWISE::MSB_U32;
+        while (bit != 0) {
+            if (x & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
@@ -167,9 +196,15 @@ impl BitwiseU32 of Bitwise<u32> {
     }
 }
 
-impl BitwiseU64 of Bitwise<u64> {
+impl BitwiseU64 of BitwiseTrait<u64> {
+    #[inline(always)]
+    fn bit_count() -> usize {(64)}
     #[inline(always)]
     fn byte_count() -> usize {(8)}
+    #[inline(always)]
+    fn max() -> u64 {(BITWISE::MAX_U64)}
+    #[inline(always)]
+    fn msb() -> u64 {(BITWISE::MSB_U64)}
     fn bit(n: usize) -> u64 {
         if n < 32 { (BitwiseU32::bit(n).into()) }
         else if n < 64 { (BitwiseU32::bit(n-32).into() * 0x100000000) }
@@ -198,10 +233,9 @@ impl BitwiseU64 of Bitwise<u64> {
     }
     fn count_bits(x: u64) -> usize {
         let mut result: usize = 0;
-        let mut bit: u64 = U64_ONE_LEFT;
-        loop {
-            if(x & bit > 0) { result += 1; };
-            if(bit == 0x1) { break; }
+        let mut bit: u64 = BITWISE::MSB_U64;
+        while (bit != 0) {
+            if (x & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
@@ -217,9 +251,15 @@ impl BitwiseU64 of Bitwise<u64> {
     }
 }
 
-impl BitwiseU128 of Bitwise<u128> {
+impl BitwiseU128 of BitwiseTrait<u128> {
+    #[inline(always)]
+    fn bit_count() -> usize {(128)}
     #[inline(always)]
     fn byte_count() -> usize {(16)}
+    #[inline(always)]
+    fn max() -> u128 {(BITWISE::MAX_U128)}
+    #[inline(always)]
+    fn msb() -> u128 {(BITWISE::MSB_U128)}
     fn bit(n: usize) -> u128 {
         if n < 64 { (BitwiseU64::bit(n).into()) }
         else if n < 128 { (BitwiseU64::bit(n-64).into() * 0x10000000000000000) }
@@ -248,10 +288,9 @@ impl BitwiseU128 of Bitwise<u128> {
     }
     fn count_bits(x: u128) -> usize {
         let mut result: usize = 0;
-        let mut bit: u128 = U128_ONE_LEFT;
-        loop {
-            if(x & bit > 0) { result += 1; };
-            if(bit == 0x1) { break; }
+        let mut bit: u128 = BITWISE::MSB_U128;
+        while (bit != 0) {
+            if (x & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
@@ -267,9 +306,15 @@ impl BitwiseU128 of Bitwise<u128> {
     }
 }
 
-impl BitwiseU256 of Bitwise<u256> {
+impl BitwiseU256 of BitwiseTrait<u256> {
+    #[inline(always)]
+    fn bit_count() -> usize {(256)}
     #[inline(always)]
     fn byte_count() -> usize {(32)}
+    #[inline(always)]
+    fn max() -> u256 {(BITWISE::MAX_U256)}
+    #[inline(always)]
+    fn msb() -> u256 {(BITWISE::MSB_U256)}
     fn bit(n: usize) -> u256 {
         if n < 128 { (u256 { low: BitwiseU128::bit(n), high: 0x0 }) }
         else if n < 256 { (u256 { low: 0x0, high: BitwiseU128::bit(n-128) }) }
@@ -298,10 +343,9 @@ impl BitwiseU256 of Bitwise<u256> {
     }
     fn count_bits(x: u256) -> usize {
         let mut result: usize = 0;
-        let mut bit: u256 = U256_ONE_LEFT;
-        loop {
-            if(x & bit > 0) { result += 1; };
-            if(bit == 0x1) { break; }
+        let mut bit: u256 = BITWISE::MSB_U256;
+        while (bit != 0) {
+            if (x & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
@@ -324,10 +368,17 @@ impl BitwiseU256 of Bitwise<u256> {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use pistols::utils::bitwise::{
+    use super::{
         BitwiseU8, BitwiseU16, BitwiseU32, BitwiseU64, BitwiseU128, BitwiseU256,
-        U8_ONE_LEFT, U16_ONE_LEFT, U32_ONE_LEFT, U64_ONE_LEFT, U128_ONE_LEFT, U256_ONE_LEFT,
     };
+
+    const HALF_U8: u8 = 0x55;
+    const HALF_U16: u16 = 0x5555;
+    const HALF_U32: u32 = 0x55555555;
+    const HALF_U64: u64 = 0x5555555555555555;
+    const HALF_U128: u128 = 0x55555555555555555555555555555555;
+    const HALF_U256: u256 = 0x5555555555555555555555555555555555555555555555555555555555555555;
+
 
     #[test]
     fn test_bit() {
@@ -380,7 +431,7 @@ mod tests {
             if n == 8 { break; }
             let bit = BitwiseU8::bit(n);
             assert(bit == BitwiseU8::shl(1, n), 'test_shl_u8');
-            assert(bit == BitwiseU8::shr(U8_ONE_LEFT, 7-n), 'test_shr_u8');
+            assert(bit == BitwiseU8::shr(BitwiseU8::msb(), 7-n), 'test_shr_u8');
             n += 1;
         };
     }
@@ -392,7 +443,7 @@ mod tests {
             if n == 16 { break; }
             let bit = BitwiseU16::bit(n);
             assert(bit == BitwiseU16::shl(1, n), 'test_shl_u16');
-            assert(bit == BitwiseU16::shr(U16_ONE_LEFT, 15-n), 'test_shr_u16');
+            assert(bit == BitwiseU16::shr(BitwiseU16::msb(), 15-n), 'test_shr_u16');
             n += 1;
         };
     }
@@ -404,7 +455,7 @@ mod tests {
             if n == 32 { break; }
             let bit = BitwiseU32::bit(n);
             assert(bit == BitwiseU32::shl(1, n), 'test_shl_u32');
-            assert(bit == BitwiseU32::shr(U32_ONE_LEFT, (31-n)), 'test_shr_u32');
+            assert(bit == BitwiseU32::shr(BitwiseU32::msb(), (31-n)), 'test_shr_u32');
             n += 1;
         };
     }
@@ -416,7 +467,7 @@ mod tests {
             if n == 64 { break; }
             let bit = BitwiseU64::bit(n);
             assert(bit == BitwiseU64::shl(1, n), 'test_shl_u64');
-            assert(bit == BitwiseU64::shr(U64_ONE_LEFT, (63-n)), 'test_shr_u64');
+            assert(bit == BitwiseU64::shr(BitwiseU64::msb(), (63-n)), 'test_shr_u64');
             n += 1;
         };
     }
@@ -428,7 +479,7 @@ mod tests {
             if n == 128 { break; }
             let bit = BitwiseU128::bit(n);
             assert(bit == BitwiseU128::shl(1, n), 'test_shl_u128');
-            assert(bit == BitwiseU128::shr(U128_ONE_LEFT, (127-n)), 'test_shr_u128');
+            assert(bit == BitwiseU128::shr(BitwiseU128::msb(), (127-n)), 'test_shr_u128');
             n += 1;
         };
     }
@@ -440,7 +491,7 @@ mod tests {
             if n == 256 { break; }
             let bit = BitwiseU256::bit(n);
             assert(bit == BitwiseU256::shl(1, n), 'test_shl_u256');
-            assert(bit == BitwiseU256::shr(U256_ONE_LEFT, (255-n)), 'test_shr_u256');
+            assert(bit == BitwiseU256::shr(BitwiseU256::msb(), (255-n)), 'test_shr_u256');
             n += 1;
         };
     }
@@ -448,7 +499,7 @@ mod tests {
 
     #[test]
     fn test_set_u8() {
-        let ok: u8 = 0x55;
+        let ok: u8 = HALF_U8;
         let mut bitmap: u8 = ok;
         let mut n: usize = 0;
         loop {
@@ -480,7 +531,7 @@ mod tests {
 
     #[test]
     fn test_set_u16() {
-        let ok: u16 = 0x5555;
+        let ok: u16 = HALF_U16;
         let mut bitmap: u16 = ok;
         let mut n: usize = 0;
         loop {
@@ -512,7 +563,7 @@ mod tests {
 
     #[test]
     fn test_set_u32() {
-        let ok: u32 = 0x55555555;
+        let ok: u32 = HALF_U32;
         let mut bitmap: u32 = ok;
         let mut n: usize = 0;
         loop {
@@ -544,7 +595,7 @@ mod tests {
 
     #[test]
     fn test_set_u64() {
-        let ok: u64 = 0x5555555555555555;
+        let ok: u64 = HALF_U64;
         let mut bitmap: u64 = ok;
         let mut n: usize = 0;
         loop {
@@ -576,7 +627,7 @@ mod tests {
 
     #[test]
     fn test_set_u128() {
-        let ok: u128 = 0x55555555555555555555555555555555;
+        let ok: u128 = HALF_U128;
         let mut bitmap: u128 = ok;
         let mut n: usize = 0;
         loop {
@@ -608,7 +659,7 @@ mod tests {
 
     #[test]
     fn test_set_u256() {
-        let ok: u256 = 0x5555555555555555555555555555555555555555555555555555555555555555;
+        let ok: u256 = HALF_U256;
         let mut bitmap: u256 = ok;
         let mut n: usize = 0;
         loop {
@@ -641,8 +692,8 @@ mod tests {
 
     #[test]
     fn test_count_u8() {
-        let full: u8 = 0xff;
-        let half: u8 = 0x55;
+        let full: u8 = BitwiseU8::max();
+        let half: u8 = HALF_U8;
         assert(BitwiseU8::count_bits(0x0) == 0, 'u8_count_0x0');
         assert(BitwiseU8::count_bits(full) == 8, 'u8_count_full');
         assert(BitwiseU8::count_bits(half) == (8 / 2), 'u8_count_half');
@@ -650,8 +701,8 @@ mod tests {
 
     #[test]
     fn test_count_u16() {
-        let full: u16 = 0xffff;
-        let half: u16 = 0x5555;
+        let full: u16 = BitwiseU16::max();
+        let half: u16 = HALF_U16;
         assert(BitwiseU16::count_bits(0x0) == 0, 'u16_count_0x0');
         assert(BitwiseU16::count_bits(full) == 16, 'u16_count_full');
         assert(BitwiseU16::count_bits(half) == (16 / 2), 'u16_count_half');
@@ -659,8 +710,8 @@ mod tests {
 
     #[test]
     fn test_count_u32() {
-        let full: u32 = 0xffffffff;
-        let half: u32 = 0x55555555;
+        let full: u32 = BitwiseU32::max();
+        let half: u32 = HALF_U32;
         assert(BitwiseU32::count_bits(0x0) == 0, 'u32_count_0x0');
         assert(BitwiseU32::count_bits(full) == 32, 'u32_count_full');
         assert(BitwiseU32::count_bits(half) == (32 / 2), 'u32_count_half');
@@ -668,8 +719,8 @@ mod tests {
 
     #[test]
     fn test_count_u64() {
-        let full: u64 = 0xffffffffffffffff;
-        let half: u64 = 0x5555555555555555;
+        let full: u64 = BitwiseU64::max();
+        let half: u64 = HALF_U64;
         assert(BitwiseU64::count_bits(0x0) == 0, 'u64_count_0x0');
         assert(BitwiseU64::count_bits(full) == 64, 'u64_count_full');
         assert(BitwiseU64::count_bits(half) == (64 / 2), 'u64_count_half');
@@ -677,8 +728,8 @@ mod tests {
 
     #[test]
     fn test_count_u128() {
-        let full: u128 = 0xffffffffffffffffffffffffffffffff;
-        let half: u128 = 0x55555555555555555555555555555555;
+        let full: u128 = BitwiseU128::max();
+        let half: u128 = HALF_U128;
         assert(BitwiseU128::count_bits(0x0) == 0, 'u128_count_0x0');
         assert(BitwiseU128::count_bits(full) == 128, 'u128_count_full');
         assert(BitwiseU128::count_bits(half) == (128 / 2), 'u128_count_half');
@@ -686,8 +737,8 @@ mod tests {
 
     #[test]
     fn test_count_u256() {
-        let full: u256 = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
-        let half: u256 = 0x5555555555555555555555555555555555555555555555555555555555555555;
+        let full: u256 = BitwiseU256::max();
+        let half: u256 = HALF_U256;
         assert(BitwiseU256::count_bits(0x0) == 0, 'u256_count_0x0');
         assert(BitwiseU256::count_bits(full) == 256, 'u256_count_full');
         assert(BitwiseU256::count_bits(half) == (256 / 2), 'u256_count_half');
@@ -695,7 +746,7 @@ mod tests {
 
     #[test]
     fn test_sum_bytes() {
-        let full: u256 = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+        let full: u256 = BitwiseU256::max();
         assert(BitwiseU256::sum_bytes(full) == 0xff * 32, 'u256_full');
         assert(BitwiseU64::sum_bytes(0x0101010101010101) == 8, 'u64_8');
         assert(BitwiseU64::sum_bytes(0x1010101010101010) == 16 * 8, 'u64_16');

@@ -112,12 +112,12 @@ export default function AnonModal({
         <Grid className='FillParent Padded' textAlign='center'>
           <Row columns='equal'>
             <Col>
-              <ActionButton fill label='Close' onClick={() => opener.close()} />
+              <ActionButton large fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              {isMyAccount ? <ActionButton fill disabled={true} label='Challenge yourself?' onClick={() => { }} />
-                : hasPact ? <ActionButton fill important label='Existing Challenge' onClick={() => dispatchSelectDuel(pactDuelId)} />
-                  : <ActionButton fill important disabled={!canSubmit} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(validatedAddress)} />
+              {isMyAccount ? <ActionButton large fill disabled={true} label='Challenge yourself?' onClick={() => { }} />
+                : hasPact ? <ActionButton large fill important label='Existing Challenge' onClick={() => dispatchSelectDuel(pactDuelId)} />
+                  : <ActionButton large fill important disabled={!canSubmit} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(validatedAddress)} />
               }
             </Col>
           </Row>
