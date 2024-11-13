@@ -85,7 +85,7 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uPickedColor', this.pickedColor)
     this.maskShader.setUniformValue('uExcludedColor', new THREE.Color(0, 0, 0))
     this.maskShader.setUniformValue('uClickable', this.isClickable)
-    this.maskShader.setUniformValue('uSamples', 4)
+    this.maskShader.setUniformValue('uSamples', 1)
     this.maskShader.setUniformValue('uShiftAmount', 0.0)
     this.maskShader.setUniformValue('uHighlightColor', new THREE.Color('#ffcf40'))
     this.maskShader.setUniformValue('uHighlightOpacity', 0.4)
@@ -209,8 +209,8 @@ export class InteractibleScene extends THREE.Scene {
   }
 
   public toggleBlur(shouldBlur: boolean) {
-    new TWEEN.Tween({ value: shouldBlur ? 4 : 20 })
-      .to({ value: shouldBlur ? 20 : 4 }, 400)
+    new TWEEN.Tween({ value: shouldBlur ? 1 : 20 })
+      .to({ value: shouldBlur ? 20 : 1 }, 400)
       .easing(TWEEN.Easing.Quartic.Out)
       .onUpdate((obj) => {
         this.maskShader.setUniformValue('uSamples', obj.value);
@@ -235,7 +235,7 @@ export class InteractibleScene extends THREE.Scene {
     
     const shiftAmount = { value: 0 };
     new TWEEN.Tween(shiftAmount)
-      .to({ value: isLeft ? -1 : 1 }, 1200)
+      .to({ value: isLeft ? 1 : -1 }, 1200)
       .easing(TWEEN.Easing.Quadratic.InOut)
       .onStart(() => {
         this.setClickable(false);

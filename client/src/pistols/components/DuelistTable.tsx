@@ -127,7 +127,7 @@ export function DuelistTable() {
   )
 }
 
-export function FilterDuelistName() {
+function FilterDuelistName() {
   const {
     filterDuelistName,
     dispatchFilterDuelistName,

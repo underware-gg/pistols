@@ -610,7 +610,7 @@ TextArea::selection {
   // height: 450px;
 }
 .DuelistModalDescription {
-  width: $menu-width;
+  width: aspect-width(36);
 }
 .BladesModalDescription {
   @extend .CenteredContainer;
@@ -642,28 +642,37 @@ TextArea::selection {
 }
 
 .SmallButton {
-  margin: 0 0.1em;
-  padding: 0.1em 0.4em;
+  margin: 0 aspect-width(0.1);
+  padding: aspect-width(0.1) aspect-width(0.4);
   min-height: unset;
+  min-height: aspect-width(1.2)!important;
 }
 
 .LargeButton {
-  margin: 0 0.1em;
-  padding: 1em 2em;
+  margin: 0 aspect-width(0.1);
+  padding: aspect-width(1) aspect-width(2);
   font-size: 1.5em!important;
+  min-height: aspect-width(1.2)!important;
 }
 
 .FilterButton {
-  padding: 0 0.35em!important;
-  min-height: 20px!important;
-  max-height: 20px!important;
-  font-size: 1rem!important;
+  padding: 0 aspect-width(0.4)!important;
+  width: auto;
+  font-size: aspect-width(0.8)!important;
+  line-height: aspect-width(0.8)!important;
+  min-height: aspect-width(1.8)!important;
+  border: 1px solid rgba(200, 182, 168, 0.5) !important;
 }
 .FilterButtonMargin {
   margin: 0 0 0 0.5em!important;
 }
 #FilterByName {
-  @extend .FilterButton, .TitleCase;
+  @extend .TitleCase;
+  padding: 0 aspect-width(0.4)!important;
+  width: auto;
+  font-size: aspect-width(0.8)!important;
+  line-height: aspect-width(0.8)!important;
+  min-height: aspect-width(1.8)!important;
   margin: 0;
   width: 120px;
 }
@@ -843,9 +852,9 @@ $ui-container-gap: 1em;
   margin: aspect-width(0.95);
 }
 .ProfilePicSquare {
-  max-width: $profile-pic-width!important; // avoids not taking space in flex
-  width: $profile-pic-width;
-  height: $profile-pic-width;
+  max-width: aspect-width(6)!important; // avoids not taking space in flex
+  width: aspect-width(6);
+  height: aspect-width(6);
   // border: $border-button-inactive;
   border-radius: 4px;
   margin: auto;
@@ -1445,7 +1454,7 @@ $logo-url: '/logos/logo_avante.svg';
   @extend .AboveAll;
 }
 .TempBarkeepTalkBalloon {
-  width: 300px;
+  width: aspect-width(20);
   height: auto;
   position: absolute;
   top: 15%;
@@ -1457,8 +1466,8 @@ $logo-url: '/logos/logo_avante.svg';
   position: absolute;
   top: 0;
   left: 0;
-  padding: 1.3em;
-  font-size: 2em;
+  padding: aspect-width(2);
+  font-size: aspect-width(1.6);
   text-shadow: $text-shadow;
 }
 
@@ -1511,10 +1520,6 @@ input::placeholder {
   @extend ._round_border_active;
   background-color: $color-dark;
   color: $color-brightest!important;
-}
-.ui.mini.input {
-  @extend .FilterButton;
-  // height: 
 }
 .ui.label {
   @extend ._round_border;
@@ -1574,7 +1579,6 @@ input::placeholder {
   padding: 0.5em 1em;// semantic: 0.78571429em 1.5em 0.78571429em;
   margin: 0.15em 0;
   line-height: 1em;
-  min-height: 30px;
   margin: 0.15em 0;
 }
 ._button {

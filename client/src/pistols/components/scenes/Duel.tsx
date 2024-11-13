@@ -23,7 +23,6 @@ import { AnimationState } from '@/pistols/three/game'
 import { Action, ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel, MenuDuelControl } from '@/pistols/components/Menus'
 import { bigintToHex } from '@/lib/utils/types'
-import { AddressShort } from '@/lib/ui/AddressShort'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import CommitPacesModal from '@/pistols/components/modals/CommitPacesModal'
 import 'react-circular-progressbar/dist/styles.css';
@@ -34,6 +33,7 @@ import { BladesCard, EnvCard, PacesCard, TacticsCard } from '@/games/pistols/gen
 import * as Constants from '../../data/cardConstants'
 import * as TWEEN from '@tweenjs/tween.js'
 import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken';
+import { FameBalanceDuelist } from '../account/LordsBalance';
 
 export type DuelistState = {
   damage: number, 
@@ -41,8 +41,6 @@ export type DuelistState = {
   health: number,
   shotPaces: number, 
   dodgePaces: number,
-  damageDelta: number,
-  hitChanceDelta: number,
 }
 
 export default function Duel({
@@ -91,8 +89,8 @@ export default function Duel({
 
   useEffect(() => dispatchSelectDuel(duelId), [duelId])
 
-  const [statsA, setStatsA] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined, damageDelta: 0, hitChanceDelta: 0 })
-  const [statsB, setStatsB] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined, damageDelta: 0, hitChanceDelta: 0 })
+  const [statsA, setStatsA] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined })
+  const [statsB, setStatsB] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined })
 
   const [ isPlaying, setIsPlaying ] = useState(true)
   const [ triggerReset, setTriggerReset ] = useState(false)
@@ -176,8 +174,6 @@ export default function Duel({
             health: Number(step.state_a.health),
             shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_a.fire ? currentStep.current : undefined),
             dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_a.dodge ? currentStep.current : undefined),
-            damageDelta: Number(step.state_a.damage) - prevValue.damage,
-            hitChanceDelta: Number(step.state_a.chances) - prevValue.hitChance
           }
         })
         setStatsB((prevValue) => {
@@ -187,8 +183,6 @@ export default function Duel({
             health: Number(step.state_b.health),
             shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_b.fire ? currentStep.current : undefined),
             dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_b.dodge ? currentStep.current : undefined),
-            damageDelta: Number(step.state_b.damage) - prevValue.damage,
-            hitChanceDelta: Number(step.state_b.chances) - prevValue.hitChance
           }
         })
       }, 2500);
@@ -271,8 +265,6 @@ export default function Duel({
         health: Number(step.state_a.health),
         shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_a.fire ? currentStep.current : undefined),
         dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_a.dodge ? currentStep.current : undefined),
-        damageDelta: Number(step.state_a.damage) - prevValue.damage,
-        hitChanceDelta: Number(step.state_a.chances) - prevValue.hitChance
       }
       return newStatsA
     })
@@ -283,8 +275,6 @@ export default function Duel({
         health: Number(step.state_b.health),
         shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_b.fire ? currentStep.current : undefined),
         dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_b.dodge ? currentStep.current : undefined),
-        damageDelta: Number(step.state_b.damage) - prevValue.damage,
-        hitChanceDelta: Number(step.state_b.chances) - prevValue.hitChance
       }
       return newStatsB
     })
@@ -348,8 +338,6 @@ export default function Duel({
           health: 3,
           shotPaces: undefined,
           dodgePaces: undefined,
-          damageDelta: 0,
-          hitChanceDelta: 0
         }
       })
       setStatsB((prevValue) => {
@@ -359,8 +347,6 @@ export default function Duel({
           health: 3,
           shotPaces: undefined,
           dodgePaces: undefined,
-          damageDelta: 0,
-          hitChanceDelta: 0
         }
       })
     
@@ -417,7 +403,7 @@ export default function Duel({
           <DuelProfile floated='left' duelistId={duelistIdA} />
         </div>
         <div className='DuelistProfileA NoMouse NoDrag'>
-          <DuelistProfile floated='left' duelistId={duelistIdA} damage={statsA.damage} hitChance={statsA.hitChance} damageDelta={statsA.damageDelta} hitChanceDelta={statsA.hitChanceDelta} speedFactor={duelSpeedFactor} />
+          <DuelistProfile floated='left' duelistId={duelistIdA} damage={statsA.damage} hitChance={statsA.hitChance} speedFactor={duelSpeedFactor} />
         </div>
       </div>
       <div>
@@ -425,7 +411,7 @@ export default function Duel({
           <DuelProfile floated='right' duelistId={duelistIdB} />
         </div>
         <div className='DuelistProfileB NoMouse NoDrag' >
-          <DuelistProfile floated='right' duelistId={duelistIdB} damage={statsB.damage} hitChance={statsB.hitChance} damageDelta={statsB.damageDelta} hitChanceDelta={statsB.hitChanceDelta} speedFactor={duelSpeedFactor} />
+          <DuelistProfile floated='right' duelistId={duelistIdB} damage={statsB.damage} hitChance={statsB.hitChance} speedFactor={duelSpeedFactor} />
         </div>
       </div>
 
@@ -484,7 +470,7 @@ function DuelProfile({
           <Image className='NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), left: aspectWidth(8.3) }}>
             <div className='NoMargin ProfileName' data-contentlength={contentLength}>{nameDisplay}</div>
-            <div className='NoMargin ProfileAddress'><AddressShort copyLink={floated} address={owner} small/></div>
+            <div className='NoMargin ProfileAddress'><FameBalanceDuelist duelistId={duelistId}/></div>
           </div>
         </>
       }
@@ -492,7 +478,7 @@ function DuelProfile({
         <>
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), right: aspectWidth(8.3), display: 'flex', flexDirection: 'column', alignItems: 'end' }}>
             <div className='NoMargin ProfileName' data-contentlength={contentLength}>{nameDisplay}</div>
-            <div className='NoMargin ProfileAddress'><AddressShort copyLink={floated} address={owner} small/></div>
+            <div className='NoMargin ProfileAddress'><FameBalanceDuelist duelistId={duelistId}/></div>
           </div>
           <ProfilePic circle profilePic={profilePic} className='NoMouse NoDrag'/>
           <Image className='FlipHorizontal NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
@@ -507,22 +493,20 @@ function DuelistProfile({
   floated,
   damage,
   hitChance,
-  damageDelta,
-  hitChanceDelta,
   speedFactor
 }: {
   duelistId: BigNumberish,
   floated: SemanticFLOATS
   damage: number
   hitChance: number
-  damageDelta: number
-  hitChanceDelta: number
   speedFactor: number
 }) {
   const { score } = useDuelist(duelistId)
   const { aspectWidth } = useGameAspect()
 
   const [archetypeImage, setArchetypeImage] = useState<string>()
+  const [lastDamage, setLastDamage] = useState(0)
+  const [lastHitChance, setLastHitChance] = useState(0)
 
   useEffect(() => {
     // let imageName = 'duelist_' + ProfileModels[profilePic].toLowerCase() + '_' + ArchetypeNames[score.archetype].toLowerCase()
@@ -531,16 +515,20 @@ function DuelistProfile({
   }, [score])
 
   useEffect(() => {
-    if (damageDelta != 0) {
+    const damageDelta = damage - lastDamage
+    if (damageDelta !== 0) {
       animateNumber(damageContainerRef, damageNumberRef)
+      setLastDamage(damage)
     }
-  }, [damageDelta])
+  }, [damage])
 
   useEffect(() => {
-    if (hitChanceDelta != 0) {
+    const hitChanceDelta = hitChance - lastHitChance
+    if (hitChanceDelta !== 0) {
       animateNumber(hitChanceContainerRef, hitChanceNumberRef)
+      setLastHitChance(hitChance)
     }
-  }, [hitChanceDelta])
+  }, [hitChance])
 
   const animateNumber = (referenceContainer, referenceText) => {
     const endRotation = Math.random() * 10 * (floated == "left" ? 1 : -1);
@@ -603,12 +591,12 @@ function DuelistProfile({
 
           <div ref={hitChanceContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
             <div ref={hitChanceNumberRef} className='NumberDelta HitChance' data-floated={floated}>
-              { hitChanceDelta > 0 ? '+' : '' }{hitChanceDelta}%
+              {hitChance}%
             </div>
           </div>
           <div ref={damageContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
             <div ref={damageNumberRef} className='NumberDelta Damage' data-floated={floated}>
-              { damageDelta > 0 ? '+' : '' }{damageDelta}
+              {damage}
             </div>
           </div>
         </>
@@ -624,12 +612,14 @@ function DuelistProfile({
 
           <div ref={hitChanceContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
             <div ref={hitChanceNumberRef} className='NumberDelta HitChance' data-floated={floated}>
-              { hitChanceDelta > 0 ? '+' : '' }{hitChanceDelta}%
+              {/* { hitChanceDelta > 0 ? '+' : '' }{hitChanceDelta}% */}
+              {hitChance}%
             </div>  
           </div>
           <div ref={damageContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
             <div ref={damageNumberRef} className='NumberDelta Damage' data-floated={floated}>
-              { damageDelta > 0 ? '+' : '' }{damageDelta}
+              {/* { damageDelta > 0 ? '+' : '' }{damageDelta} */}
+              {damage}
             </div>
           </div>
         </>

@@ -7,6 +7,8 @@ import * as Constants from '../../data/cardConstants'
 import { AnimationData } from './Cards'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { ArchetypeNames } from '@/pistols/utils/pistols'
+import { useFameBalanceDuelist } from '@/pistols/hooks/useFame'
+import { FameBalance, FameBalanceDuelist } from '../account/LordsBalance'
 
 interface DuelistCardProps {
   duelistId: number
@@ -21,7 +23,9 @@ interface DuelistCardProps {
   isDraggable?: boolean
   isHighlightable?: boolean
   isBig?: boolean
-  isHanging?: boolean
+  isHanging?: boolean,
+  isHangingLeft?: boolean
+  shouldSwing?: boolean
   instantFlip?: boolean
   onHover?: (isHovered: boolean) => void
   onClick?: (e: React.MouseEvent) => void
@@ -63,6 +67,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
         Math.random() * 20 - 30 : // Random between -30 and -10
         Math.random() * 20 + 10   // Random between 10 and 30 
   })
+  const nailRotationRef = useRef({ rotation: Math.random() * 30 - 15 })
   const lastHangingRotationInteractionTimeRef = useRef(0)
   const flipRotationRef = useRef({ rotation: 0 })
   const scaleRef = useRef({ scale: 1 })
@@ -73,10 +78,19 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const tweenFlipRotationRef = useRef<TWEEN.Tween<{ rotation: number }>>()
   const tweenScaleRef = useRef<TWEEN.Tween<{ scale: number }>>()
   const idleTweenRef = useRef<TWEEN.Tween<{ x: number; y: number }> | null>(null)
+  const initialLoad = useRef<boolean>(true)
 
   const { boxW, boxH, aspectWidth } = useGameAspect()
 
-  const [randomOffset] = useState(() => aspectWidth(props.width) * (Math.random() * 0.3 - 0.15))
+  const [randomOffset] = useState(() => {
+    if (props.isHangingLeft === null) {
+      return aspectWidth(props.width) * (Math.random() * 0.4 - 0.20)
+    } else if (props.isHangingLeft) {
+      return aspectWidth(props.width) * (Math.random() * -0.4)
+    } else {
+      return aspectWidth(props.width) * (Math.random() * 0.4)
+    }
+  })
   
   const archetypeImage = useMemo(() => {
     let imageName = 'card_circular_' + (ArchetypeNames[score.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[score.archetype].toLowerCase())
@@ -213,6 +227,10 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
     toggleVisibility(props.isVisible)
   }, [props.isVisible])
 
+  useEffect(() => {
+    playHangingCard()
+  }, [props.isHanging])
+
   const flipCard = (flipped = false, degree = 0, duration = Constants.CARD_BASE_FLIP_DURATION, easing = TWEEN.Easing.Quadratic.InOut, interpolation = TWEEN.Interpolation.Linear) => {
     setFlipRotation({ dataField1: [flipped ? degree : 0], duration: duration, easing: easing, interpolation: interpolation })
   }
@@ -256,16 +274,23 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
         targetAngle = (startAngle / 3) * -2
       }
 
-      tweenHangRotationRef.current = new TWEEN.Tween(hangRotationRef.current)
-        .to({ rotation: targetAngle }, 1000)
-        .easing(TWEEN.Easing.Quadratic.InOut)
-        .onUpdate((value) => {
-          hangingRef.current?.style.setProperty('--hang-rotation', `${value.rotation}deg`)
-        })
-        .onComplete(() => {
-          animateHanging(targetAngle)
-        })
-        .start()
+      if (props.shouldSwing == false && initialLoad.current) {
+        hangRotationRef.current.rotation = targetRestAngle
+        initialLoad.current = false
+        hangingRef.current?.style.setProperty('--hang-rotation', `${targetRestAngle}deg`) 
+        animateHanging(targetRestAngle)
+      } else {
+        tweenHangRotationRef.current = new TWEEN.Tween(hangRotationRef.current)
+          .to({ rotation: targetAngle }, 1000)
+          .easing(TWEEN.Easing.Quadratic.InOut)
+          .onUpdate((value) => {
+            hangingRef.current?.style.setProperty('--hang-rotation', `${value.rotation}deg`)
+          })
+          .onComplete(() => {
+            animateHanging(targetAngle)
+          })
+          .start()
+      }
     }
 
     animateHanging(hangRotationRef.current.rotation)
@@ -449,7 +474,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
         height: aspectWidth(1.2),
         left: aspectWidth(props.width) / 2 - aspectWidth(0.3) + randomOffset,
         top: aspectWidth(props.height) * 0.03 - aspectWidth(1.2),
-        transform: `rotate(${Math.random() * 30 - 15}deg)` 
+        transform: `rotate(${nailRotationRef.current.rotation}deg)` 
       }}>
         <div className="duelist-nail-point" style={{
           width: aspectWidth(0.2),
@@ -482,13 +507,16 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
         >
           <div className="card-inner">
             <div className="card-front NoMouse NoDrag">
-              <div id='card-filter-overlay' className={props.isDisabled ? 'visible disabled' : 'disabled'} />
               <div id='card-filter-overlay' className={props.isSelected ? 'visible selected' : 'selected'} />
+              <img id='card-filter-overlay' className={props.isDisabled ? 'visible' : ''} src='/textures/cards/card_disabled.png' />
+              {/* <div id='card-filter-overlay' className={props.isDisabled ? 'visible disabled' : 'disabled'} /> */}
               <img className='duelist-card-image-drawing NoMouse NoDrag' src={`/profiles/square/${('00' + profilePic).slice(-2)}.jpg`} alt="Profile Picture" />
               <img className='card-image-front NoMouse NoDrag' src={archetypeImage} alt="Card Front" />
               <div className="duelist-card-details">
                 <div className="duelist-name" data-contentlength={Math.floor(name.length / 10)}>{name}</div>
-                <div className="duelist-fame">Fame: {score.honour}</div>
+                <div className="duelist-fame">
+                  <FameBalanceDuelist duelistId={props.duelistId} />
+                </div>
               </div>
             </div>
             <div className="card-back NoMouse NoDrag"></div>

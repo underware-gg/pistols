@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 
 const useGameAspect = () => {
   const [windowSize, setWindowSize] = useState({
@@ -34,13 +34,13 @@ const useGameAspect = () => {
     };
   }, [windowSize]);
 
-  const aspectWidth = (vw: number) => {
+  const aspectWidth = useCallback((vw: number) => {
     return (vw / 100) * aspectRatio.aspectW;
-  };
+  }, [aspectRatio]);
 
-  const aspectHeight = (vh: number) => {
+  const aspectHeight = useCallback((vh: number) => {
     return (vh / 100) * aspectRatio.aspectH;
-  };
+  }, [aspectRatio]);
 
   return {
     ...aspectRatio,

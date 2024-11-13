@@ -39,7 +39,7 @@ export default function WalletHeader({
     <Grid>
       <Row className='TitleCase Padded'>
         <Col width={4} verticalAlign='middle'>
-          <Image src={imageUrl} className='ProfilePicSquare' />
+          <Image src={imageUrl} className='ProfilePicMedium' />
         </Col>
         {isConnected &&
           <Col width={12} textAlign='left'>

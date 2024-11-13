@@ -19,7 +19,7 @@ export default function BarkeepModal({ open }) {
   }
 
   return (
-    <div className='TempBarkeepOverlay' onClick={() => _close()}>
+    <div className='TempBarkeepOverlay NoMouse NoDrag' onClick={() => _close()}>
       <div className='TempBarkeepTalkBalloon Relative'>
         <Image src={'/images/ui/duel/bubble_speech.png'} className='FillParent' />
         <div className='TempBarkeepTalkBalloonText'>

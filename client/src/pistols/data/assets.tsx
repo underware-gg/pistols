@@ -15,9 +15,12 @@ export enum TextureName {
   bg_tavern = 'bg_tavern',
   bg_tavern_mask = 'bg_tavern_mask',
   bg_duelists = 'bg_duelists',
-  bg_duels_yours = 'bg_duels_yours',
+  bg_duelists_mask = 'bg_duelists_mask',
+  bg_duels = 'bg_duels',
+  bg_duels_mask = 'bg_duels_mask',
   bg_duels_live = 'BG_DUEL',
-  bg_duels_past = 'BG_bg_duels_pastDUEL',
+  bg_graveyard = 'bg_graveyard',
+  bg_graveyard_mask = 'bg_graveyard_mask',
   bg_duel = 'bg_duel',
   duel_ground = 'duel_ground',
   duel_ground_normal = 'duel_ground_normal',
@@ -38,9 +41,12 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_tavern]: { path: '/images/bg_tavern.jpg' },
   [TextureName.bg_tavern_mask]: { path: '/images/bg_tavern_mask.png', alpha: true },
   [TextureName.bg_duelists]: { path: '/images/bg_duelists.jpg' },
-  [TextureName.bg_duels_yours]: { path: '/images/bg_duels_yours.jpg' },
+  [TextureName.bg_duelists_mask]: { path: '/images/bg_duelists_mask.png' },
+  [TextureName.bg_duels]: { path: '/images/bg_duels.png' },
+  [TextureName.bg_duels_mask]: { path: '/images/bg_duels_mask.png' },
   [TextureName.bg_duels_live]: { path: '/images/bg_duels_live.jpg' },
-  [TextureName.bg_duels_past]: { path: '/images/bg_duels_past.jpg' },
+  [TextureName.bg_graveyard]: { path: '/images/bg_graveyard.jpg' },
+  [TextureName.bg_graveyard_mask]: { path: '/images/bg_graveyard_mask.png' },
   [TextureName.bg_duel]: { path: '/images/bg_duel.jpg' },
   [TextureName.duel_ground]: { path: '/textures/ground.ktx2' },
   [TextureName.duel_ground_normal]: { path: '/textures/ground_normalmap.ktx2' },
@@ -527,9 +533,30 @@ export const sceneBackgrounds: Record<SceneName, SceneData> = {
       { name: 'shovel', color: 'ff00ff', description: 'Past Duels' }      // magenta
     ]
   },
-  [SceneName.Duelists]: { background: TextureName.bg_duelists },
-  [SceneName.Duels]: { background: TextureName.bg_duels_yours },
-  [SceneName.Graveyard]: { background: TextureName.bg_duels_past },
+  [SceneName.Duelists]: { 
+    background: TextureName.bg_duelists,
+    mask: TextureName.bg_duelists_mask,
+    items: [
+      { name: 'left arrow', color: '00ff00', description: 'Previous Page' },  // red
+      { name: 'right arrow', color: 'ff0000', description: 'Next Page' },     // green
+    ]
+   },
+  [SceneName.Duels]: { 
+    background: TextureName.bg_duels,
+    mask: TextureName.bg_duels_mask,
+    items: [
+      { name: 'left arrow', color: '00ff00', description: 'Previous Page' },  // red
+      { name: 'right arrow', color: 'ff0000', description: 'Next Page' },     // green
+    ]
+   },
+  [SceneName.Graveyard]: { 
+    background: TextureName.bg_graveyard,
+    mask: TextureName.bg_graveyard_mask,
+    items: [
+      { name: 'left arrow', color: '00ff00', description: 'Previous Page' },  // red
+      { name: 'right arrow', color: 'ff0000', description: 'Next Page' },     // green
+    ]
+   },
   [SceneName.Tournament]: { background: TextureName.bg_duels_live },
   [SceneName.IRLTournament]: { background: TextureName.bg_duels_live },
   [SceneName.Duel]: { background: TextureName.bg_duel },
@@ -574,7 +601,7 @@ const SPRITESHEETS: Spritesheets = {
   FEMALE: {
     [AnimName.STILL]: {
       path: '/textures/animations/Female Duelist/Still',
-      frameCount: 14,
+      frameCount: 8,
       frameRate: 8,
     },
     [AnimName.STILL_BLADE]: {
@@ -691,7 +718,7 @@ const SPRITESHEETS: Spritesheets = {
     },
     [AnimName.SHOOT]: {
       path: '/textures/animations/Male Duelist/Shoot',
-      frameCount: 16,
+      frameCount: 11,
       frameRate: 8,
     },
     [AnimName.DODGE_BACK]: {

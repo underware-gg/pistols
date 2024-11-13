@@ -10,7 +10,7 @@ import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
-import { FilterDuelistName } from '@/pistols/components/DuelistTable'
+// import { FilterDuelistName } from '@/pistols/components/DuelistTable'
 import { Balance } from '@/pistols/components/account/Balance'
 import { arrayRemoveValue, bigintEquals } from '@/lib/utils/types'
 import { ChallengeState } from '@/games/pistols/generated/constants'
@@ -37,13 +37,13 @@ export function ChallengeTablePast() {
   return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact existingStates={states} states={filterStatesPastDuels} setStates={dispatchFilterStatesPastDuels} />
 }
 
-export function ChallengeTableYour() {
-  const {
-    queryYourDuels: { challengeIds, states },
-    filterStatesYourDuels, dispatchFilterStatesYourDuels
-  } = useQueryContext()
-  return <ChallengeTableByIds challengeIds={challengeIds} compact existingStates={states} states={filterStatesYourDuels} setStates={dispatchFilterStatesYourDuels} />
-}
+// export function ChallengeTableYour() {
+//   const {
+//     queryYourDuels: { challengeIds, states },
+//     filterStatesYourDuels, dispatchFilterStatesYourDuels
+//   } = useQueryContext()
+//   return <ChallengeTableByIds challengeIds={challengeIds} compact existingStates={states} states={filterStatesYourLiveDuels} setStates={dispatchFilterStatesYourLiveDuels} />
+// }
 
 export function ChallengeTableSelectedDuelist({
   compact = false,
@@ -118,7 +118,7 @@ function ChallengeTableByIds({
             {filters}
             <FilterButton grouped icon='close' state={false} disabled={!canClear} onClick={() => setStates([])} />
           </ButtonGroup>
-          <FilterDuelistName />
+          {/* <FilterDuelistName /> */}
         </div>
       }
 

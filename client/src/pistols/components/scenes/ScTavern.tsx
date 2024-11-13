@@ -56,7 +56,7 @@ export default function ScTavern() {
   return (
     <div>
 
-      <TavernMenu />
+      {/* <TavernMenu /> */}
 
       {/* <TableModal opener={tableOpener} /> */}
       <DuelistModal />

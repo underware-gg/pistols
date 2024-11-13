@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, FormInput, Grid } from 'semantic-ui-react'
 import { VStack } from '@/lib/ui/Stack'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
@@ -52,6 +52,8 @@ export default function ScDoor() {
   const randomPic = useMemo(() => (Number(poseidon([address ?? 0n, duelistBalance ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, duelistBalance])
   const _profilePic = useMemo(() => (selectedProfilePic || randomPic), [selectedProfilePic, randomPic])
 
+  const duelists = useRef<bigint[]>(duelistIds)
+
   const inputIsValid = inputName.length >= 3
 
   // clear tavern state
@@ -92,14 +94,14 @@ export default function ScDoor() {
       timeoutId = setTimeout(() => {
         if (isMyDuelist) {
           dispatchSetScene(SceneName.Tavern)
-        } else if (duelistIds.length > 0) {
-          dispatchDuelistId(duelistIds[0])
+        } else if (duelists.current.length > 0) {
+          dispatchDuelistId(duelists.current[0])
           dispatchSetScene(SceneName.Tavern)
         } else {
           setIsLoading(false)
           setIsFirstDivVisible(false)
         }
-      }, 800)
+      }, 1000)
     }
 
     return () => {
@@ -119,6 +121,7 @@ export default function ScDoor() {
   }
 
   useEffect(() => {
+    duelists.current = duelistIds
     console.log('isDuelistBeingCreated', isDuelistBeingCreated, duelistIds)
     if (isDuelistBeingCreated && duelistIds.length > 0) {
       dispatchDuelistId(duelistIds[duelistIds.length - 1])

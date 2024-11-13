@@ -153,7 +153,7 @@ export const FilterButton = ({
       onClick={() => onClick()}
       size='mini'
     >
-      {icon ? <Icon name={icon} className='NoMargin' /> : <>{label}</>}
+      {icon && <Icon name={icon} className='NoMargin' />} {label}
     </Button>
   )
 }

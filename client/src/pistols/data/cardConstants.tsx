@@ -9,6 +9,9 @@ export const CARD_HEIGHT = 12
 export const DUELIST_CARD_WIDTH = 8.5 * 1.1
 export const DUELIST_CARD_HEIGHT = 12 * 1.1
 
+export const DUEL_CARD_WIDTH = 8.5 * 0.7
+export const DUEL_CARD_HEIGHT = 12 * 0.7
+
 export const CARD_FLIP_ROTATION = 180
 
 //Card Click
