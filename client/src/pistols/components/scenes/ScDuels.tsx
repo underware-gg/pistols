@@ -250,6 +250,13 @@ export default function ScDuels() {
       }}>
         {posterGrids}
       </div>
+      <img src='/images/bg_duels_lighting.png' className='NoMouse NoDrag' style={{
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        mixBlendMode: 'hard-light',
+        pointerEvents: 'none'
+      }} />
       <DuelistModal />
       <ChallengeModal />
       <NewChallengeModal />
