@@ -168,7 +168,7 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
                 selector_from_tag!("pistols-Scoreboard"),
             ].span())
             .with_init_calldata([
-                'https://pistols.underware.gg',
+                'pistols.underware.gg',
                 0, // minter_address
                 0, // renderer_address
                 0, // fee_amount

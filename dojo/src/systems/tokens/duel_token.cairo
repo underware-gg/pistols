@@ -200,7 +200,7 @@ pub mod duel_token {
         self.erc721.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            base_uri.as_string(),
+            format!("https://{}",base_uri.as_string()),
         );
         self.token.initialize(
             minter_address,

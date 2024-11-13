@@ -70,13 +70,13 @@ default = "pistols"
   "0x0", # vrf_address (use vrf_mock)
 ]
 "pistols-duel_token" = [
-  "sstr:https://pistols.underware.gg", # base_uri
+  "sstr:pistols.stage.underware.gg", # base_uri
   "0x0", # minter_address
   "0x0", # renderer_address
   "0", # fee_amount
 ]
 "pistols-duelist_token" = [
-  "sstr:https://pistols.underware.gg", # base_uri
+  "sstr:pistols.stage.underware.gg", # base_uri
   "0x0", # minter_address
   "0x0", # renderer_address
   "100000000000000000000", # fee_amount: 100 LORDS

@@ -158,7 +158,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
                 selector_from_tag!("pistols-Duelist"),
             ].span())
             .with_init_calldata([
-                'https://pistols.underware.gg',
+                'pistols.underware.gg',
                 0, // minter_address
                 0, // renderer_address
                 (fee_amount * CONST::ETH_TO_WEI.low).into(), // fee_amount
