@@ -149,7 +149,7 @@ const pistolsSlotConfig: DojoChainConfig = {
     }
   ],
   connectorIds: [
-    supportedConnetorIds.PREDEPLOYED,
+    // supportedConnetorIds.PREDEPLOYED,
     supportedConnetorIds.CONTROLLER,
   ],
   // starknet Chain
