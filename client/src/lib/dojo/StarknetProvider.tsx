@@ -58,15 +58,15 @@ export const StarknetProvider = ({
   // Build chain connectors form selectedChainConfig
   const chainConnectors = useChainConnectors(dojoAppConfig, selectedChainConfig);
 
-  // connectors to be used by starknet-react
-  const { connectors } = useInjectedConnectors({
-    // Show these connectors if the user has no connector installed.
-    recommended: chainConnectors,
-    // Hide recommended connectors if the user has any connector installed.
-    includeRecommended: 'always',
-    // Randomize the order of the connectors.
-    // order: 'random',
-  });
+  // // connectors to be used by starknet-react
+  // const { connectors } = useInjectedConnectors({
+  //   // Show these connectors if the user has no connector installed.
+  //   recommended: chainConnectors,
+  //   // Hide recommended connectors if the user has any connector installed.
+  //   includeRecommended: 'always',
+  //   // Randomize the order of the connectors.
+  //   // order: 'random',
+  // });
 
   //
   // RPC
@@ -92,7 +92,7 @@ export const StarknetProvider = ({
       <StarknetConfig
         chains={chains}
         provider={() => provider(selectedChainConfig.chain)}
-        connectors={connectors}
+        connectors={chainConnectors}
         autoConnect={true}
       // explorer={explorer}
       >

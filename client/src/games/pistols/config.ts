@@ -40,7 +40,7 @@ export const makeDojoAppConfig = (): DojoAppConfig => {
         'ILordsMockFaucet',
         // 'IERC20Allowance',
       ],
-      admin: ['IAdmin'],
+      // admin: ['IAdmin'],
     },
     starknetDomain: {
       name: TYPED_DATA.NAME,
