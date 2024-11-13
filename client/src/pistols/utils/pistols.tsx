@@ -199,10 +199,9 @@ export const PremisePrefix: Record<Premise, string> = {
 
 export const MenuLabels: Partial<Record<SceneName, string>> = {
   [SceneName.Gate]: 'Exit to Gate',
-  [SceneName.Barkeep]: 'Talk to The Barkeep',
   [SceneName.Tavern]: 'The Bar',
   [SceneName.Duelists]: 'The Balcony (Opponents)',
-  [SceneName.YourDuels]: 'The Tables (Live Duels)',
-  [SceneName.PastDuels]: 'The Graveyard (Past Duels)',
+  [SceneName.Duels]: 'The Tables (Live Duels)',
+  [SceneName.Graveyard]: 'The Graveyard (Past Duels)',
   [SceneName.Profile]: 'Account & Duelists',
 }

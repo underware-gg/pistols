@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback } from 'react'
+import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { BigNumberish, contractClassResponseToLegacyCompiledContract } from 'starknet'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
@@ -19,13 +19,12 @@ import { poseidon } from '@/lib/utils/starknet'
 
 export enum SceneName {
   Gate = 'Gate',
+  Door = 'Door',
   Profile = 'Profile',
   Tavern = 'Tavern',
-  Barkeep = 'Barkeep',
   Duelists = 'Duelists',
-  YourDuels = 'Your Duels',
-  LiveDuels = 'Live Duels',
-  PastDuels = 'Past Duels',
+  Duels = 'Your Duels',
+  Graveyard = 'Graveyard',
   Tournament = 'Tournament',
   IRLTournament = 'IRL Tournament',
   Duel = 'Duel',
@@ -33,9 +32,8 @@ export enum SceneName {
 
 const tavernMenuItems: SceneName[] = [
   SceneName.Duelists,
-  SceneName.YourDuels,
-  SceneName.LiveDuels,
-  SceneName.PastDuels,
+  SceneName.Duels,
+  SceneName.Graveyard,
   SceneName.Tournament,
   SceneName.IRLTournament,
 ]
@@ -274,17 +272,16 @@ type SceneRoute = {
 
 export const sceneRoutes: Record<SceneName, SceneRoute> = {
   // !!! all routes need to be redirected in next.config.js
+  [SceneName.Door]: { baseUrl: '/door' },
   // standalone scenes
   [SceneName.Profile]: { baseUrl: '/profile', title: 'Pistols - Profile' },
   // scenes with duelId
   [SceneName.Duel]: { baseUrl: '/duel/', hasDuelId: true, title: 'Pistols - Duel!' },
   // scenes with tableId
   [SceneName.Tavern]: { baseUrl: '/tavern/', hasTableId: true },
-  [SceneName.Barkeep]: { baseUrl: '/tavern/', hasTableId: true },
   [SceneName.Duelists]: { baseUrl: '/balcony/', hasTableId: true, title: 'Pistols - Duelists' },
-  [SceneName.YourDuels]: { baseUrl: '/duels/', hasTableId: true, title: 'Pistols - Your Duels' },
-  [SceneName.LiveDuels]: { baseUrl: '/live/', hasTableId: true, title: 'Pistols - Live Duels' },
-  [SceneName.PastDuels]: { baseUrl: '/graveyard/', hasTableId: true, title: 'Pistols - Past Duels' },
+  [SceneName.Duels]: { baseUrl: '/duels/', hasTableId: true, title: 'Pistols - Your Duels' },
+  [SceneName.Graveyard]: { baseUrl: '/graveyard/', hasTableId: true, title: 'Pistols - Past Duels' },
   [SceneName.Tournament]: { baseUrl: '/tournament/', hasTableId: true, title: 'Pistols - Tournament' },
   [SceneName.IRLTournament]: { baseUrl: '/tournament/', hasTableId: true, title: 'Pistols - IRL Tournament' },
   // '/' must be the last...
@@ -312,7 +309,7 @@ export const usePistolsScene = () => {
     }
     url += slug
     if (url != currentRoute) {
-      router.push(url)
+      router.replace(url)
     }
     __dispatchSetScene(newScene)
   }
@@ -326,10 +323,12 @@ export const usePistolsScene = () => {
     tavernMenuItems,
     // helpers
     atGate: (currentScene == SceneName.Gate),
-    // atTavern: (currentScene == SceneName.Tavern || tavernMenuItems.includes(currentScene)),
+    atDoor: (currentScene == SceneName.Door),
     atTavern: (currentScene == SceneName.Tavern),
-    atBarkeep: (currentScene == SceneName.Barkeep),
     atProfile: (currentScene == SceneName.Profile),
+    atDuelists: (currentScene == SceneName.Duelists),
+    atDuels: (currentScene == SceneName.Duels),
+    atGraveyard: (currentScene == SceneName.Graveyard),
     atDuel: (currentScene == SceneName.Duel),
     fromGate: (lastScene == SceneName.Gate),
     // PistolsActions,

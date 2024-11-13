@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo, useState } from 'react'
+import React, { ReactElement, useCallback, useEffect, useMemo, useState } from 'react'
 import { Menu, Button, Confirm, SemanticICONS, Icon } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
@@ -7,6 +7,8 @@ import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useLordsBalance } from '@/lib/dojo/hooks/useLords'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
+import { SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 
 //-----------------
 // Generic Action button
@@ -151,7 +153,7 @@ export const FilterButton = ({
       onClick={() => onClick()}
       size='mini'
     >
-      {icon ? <Icon name={icon} className='NoMargin' /> : <>{label}</>}
+      {icon && <Icon name={icon} className='NoMargin' />} {label}
     </Button>
   )
 }
@@ -265,3 +267,18 @@ export function SettingsMenuItem({
   )
 }
 
+export function BackButton() {
+  const { dispatchSetScene, atDoor } = usePistolsScene();
+
+  const handleClick = () => {
+    if (atDoor) {
+      dispatchSetScene(SceneName.Gate);
+    } else {
+      dispatchSetScene(SceneName.Tavern);
+    }
+  }
+
+  return (
+    <CustomIcon icon name='left-arrow' onClick={() => handleClick()} size='big' disabled={false} />
+  );
+}

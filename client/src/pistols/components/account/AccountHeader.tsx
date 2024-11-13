@@ -9,6 +9,7 @@ import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
 import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
 import { BigNumberish } from 'starknet'
 import { ProfileName } from './ProfileDescription'
+import useGameAspect from '@/pistols/hooks/useGameApect'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -17,37 +18,32 @@ export default function AccountHeader() {
   const { address, isConnected } = useAccount()
   const { isAnon, duelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
-  // const { dispatchSelectDuelistId } = usePistolsContext()
+  const { aspectWidth } = useGameAspect()
 
   const { nameDisplay, profilePic } = useDuelist(duelistId)
 
   const _click = () => {
-    // if (isAnon) {
-    //   dispatchSetScene(SceneName.Profile)
-    // } else {
-    //   dispatchSetScene(SceneName.Profile)
-    // }
+    dispatchSetScene(SceneName.Profile)
   }
 
   return (
-    <Grid>
-      <Row className='ProfilePicHeight' textAlign='center'>
-        <Col width={4} textAlign='center' verticalAlign='middle' className='NoPadding'>
-          <DuelistsNavigationMenu>
-            <ProfilePicSquareButton profilePic={profilePic ?? 0}onClick={() => _click()} />
-          </DuelistsNavigationMenu>
-        </Col>
-        <Col width={12} textAlign='left' verticalAlign='top'>
-          {!isConnected ? <h3>Guest</h3>
-            : <>
-              <h2>{nameDisplay}</h2>
-              {/* <AddressShort address={address} copyLink={'left'} /> */}
-              {/* <h5><FameBalance address={address} big /></h5> */}
+     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ flex: 1, textAlign: 'right' }}>
+        {!isConnected ? <h3>Guest</h3>
+          : <>
+            <h3>{nameDisplay}</h3>
+            <div style={{ lineHeight: 0 }}>
               <h5><FameBalanceDuelist duelistId={duelistId} big /></h5>
-            </>}
-        </Col>
-      </Row>
-    </Grid>
+            </div>
+            {/* //TODO replace with fame */}
+          </>}
+      </div>
+      <div style={{ padding: aspectWidth(0.6) }}>
+        <DuelistsNavigationMenu>
+          <ProfilePicSquareButton profilePic={profilePic ?? 0} onClick={() => _click()} medium />
+        </DuelistsNavigationMenu>
+      </div>
+    </div>
   );
 }
 
@@ -61,6 +57,7 @@ export function DuelistsNavigationMenu({
   const { duelistBalance, duelistIds } = useDuelistsOfOwner(address)
   const { duelistId: selectedDuelistId } = useSettings()
   const { dispatchDuelistId } = useSettings()
+  const { aspectWidth } = useGameAspect()
 
   const _goToProfile = () => {
     dispatchSetScene(SceneName.Profile)
@@ -89,14 +86,14 @@ export function DuelistsNavigationMenu({
 
   return (
     <Dropdown
-      className='huge NoPadding AutoMargin'
-      direction='right'
-      button
+      className='NoPadding NoMargin'
+      direction='left'
       simple
+      icon={null}
       closeOnEscape
       fluid
       trigger={children}
-      style={{ width: '82px', height: '82px' }}
+      style={{ width: aspectWidth(4), height: aspectWidth(4) }}
     >
       <Dropdown.Menu>
         {rows}

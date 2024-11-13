@@ -9,14 +9,18 @@ import { BladesCard, EnvCard, PacesCard, Rarity, TacticsCard } from '@/games/pis
 export enum TextureName {
   Testcard = 'Testcard',
   bg_gate = 'bg_gate',
+  bg_door = 'bg_door',
+  bg_gate_mask = 'bg_gate_mask',
   bg_profile = 'bg_profile',
   bg_tavern = 'bg_tavern',
   bg_tavern_mask = 'bg_tavern_mask',
-  bg_barkeep = 'bg_barkeep',
   bg_duelists = 'bg_duelists',
-  bg_duels_yours = 'bg_duels_yours',
+  bg_duelists_mask = 'bg_duelists_mask',
+  bg_duels = 'bg_duels',
+  bg_duels_mask = 'bg_duels_mask',
   bg_duels_live = 'BG_DUEL',
-  bg_duels_past = 'BG_bg_duels_pastDUEL',
+  bg_graveyard = 'bg_graveyard',
+  bg_graveyard_mask = 'bg_graveyard_mask',
   bg_duel = 'bg_duel',
   duel_ground = 'duel_ground',
   duel_ground_normal = 'duel_ground_normal',
@@ -31,14 +35,18 @@ export type TextureAttributes = {
 const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.Testcard]: { path: '/textures/testcard.jpg' },
   [TextureName.bg_gate]: { path: '/images/bg_gate.jpg' },
+  [TextureName.bg_door]: { path: '/images/bg_door.jpg' },
+  [TextureName.bg_gate_mask]: { path: '/images/bg_gate_mask.png' },
   [TextureName.bg_profile]: { path: '/images/bg_profile.jpg' },
   [TextureName.bg_tavern]: { path: '/images/bg_tavern.jpg' },
   [TextureName.bg_tavern_mask]: { path: '/images/bg_tavern_mask.png', alpha: true },
-  [TextureName.bg_barkeep]: { path: '/images/bg_barkeep.jpg' },
   [TextureName.bg_duelists]: { path: '/images/bg_duelists.jpg' },
-  [TextureName.bg_duels_yours]: { path: '/images/bg_duels_yours.jpg' },
+  [TextureName.bg_duelists_mask]: { path: '/images/bg_duelists_mask.png' },
+  [TextureName.bg_duels]: { path: '/images/bg_duels.png' },
+  [TextureName.bg_duels_mask]: { path: '/images/bg_duels_mask.png' },
   [TextureName.bg_duels_live]: { path: '/images/bg_duels_live.jpg' },
-  [TextureName.bg_duels_past]: { path: '/images/bg_duels_past.jpg' },
+  [TextureName.bg_graveyard]: { path: '/images/bg_graveyard.jpg' },
+  [TextureName.bg_graveyard_mask]: { path: '/images/bg_graveyard_mask.png' },
   [TextureName.bg_duel]: { path: '/images/bg_duel.jpg' },
   [TextureName.duel_ground]: { path: '/textures/ground.ktx2' },
   [TextureName.duel_ground_normal]: { path: '/textures/ground_normalmap.ktx2' },
@@ -46,6 +54,8 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.duel_water_map]: { path: '/textures/water_map.ktx2' },
   [TextureName.cliffs]: { path: '/textures/cliffs.png' },
 }
+
+
 
 export enum CardColor {
   WHITE = 'white',
@@ -62,6 +72,12 @@ export interface CardData {
   title: string,
   rarity: Rarity,
   description: string,
+  descriptionDark?: string,
+  titleShort?: string,
+}
+
+function getTextSpan(color: CardColor, text: string) {
+  return `<span style="color:${color}; font-size:1.3em; font-weight:bold; -webkit-text-stroke: 0.03em #27110b;">${text}</span>`
 }
 
 export const EnvironmentCardsTextures: Record<EnvCard, CardData> = {
@@ -162,7 +178,9 @@ export const FireCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Fire at x', 
     rarity: Rarity.None, 
-    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, 'x')}` 
+    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, 'x')}`, 
+    descriptionDark: `You take your shot at step number ${getTextSpan(CardColor.WHITE, 'x')}`, 
+    titleShort: 'x'
   },
   [PacesCard.Paces1]: { 
     path: '/textures/cards/illustrations/Duelist_Shooting.png', 
@@ -170,7 +188,9 @@ export const FireCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Fire at 1', 
     rarity: Rarity.None, 
-    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '1')}` 
+    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '1')}`, 
+    descriptionDark: `You take your shot at step number ${getTextSpan(CardColor.WHITE, '1')}`, 
+    titleShort: '1'
   },
   [PacesCard.Paces2]: { 
     path: '/textures/cards/illustrations/Duelist_Shooting.png', 
@@ -178,7 +198,9 @@ export const FireCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Fire at 2', 
     rarity: Rarity.None, 
-    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '2')}` 
+    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '2')}`, 
+    descriptionDark: `You take your shot at step number ${getTextSpan(CardColor.WHITE, '2')}`, 
+    titleShort: '2'
   },
   [PacesCard.Paces3]: { 
     path: '/textures/cards/illustrations/Duelist_Shooting.png', 
@@ -186,7 +208,9 @@ export const FireCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Fire at 3', 
     rarity: Rarity.None, 
-    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '3')}` 
+    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '3')}`, 
+    descriptionDark: `You take your shot at step number ${getTextSpan(CardColor.WHITE, '3')}`, 
+    titleShort: '3'
   },
   [PacesCard.Paces4]: { 
     path: '/textures/cards/illustrations/Duelist_Shooting.png', 
@@ -194,7 +218,9 @@ export const FireCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Fire at 4', 
     rarity: Rarity.None, 
-    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '4')}` 
+    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '4')}`, 
+    descriptionDark: `You take your shot at step number ${getTextSpan(CardColor.WHITE, '4')}`, 
+    titleShort: '4'
   },
   [PacesCard.Paces5]: { 
     path: '/textures/cards/illustrations/Duelist_Shooting.png', 
@@ -202,7 +228,9 @@ export const FireCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Fire at 5', 
     rarity: Rarity.None, 
-    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '5')}` 
+    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '5')}`, 
+    descriptionDark: `You take your shot at step number ${getTextSpan(CardColor.WHITE, '5')}`, 
+    titleShort: '5'
   },
   [PacesCard.Paces6]: { 
     path: '/textures/cards/illustrations/Duelist_Shooting.png', 
@@ -210,7 +238,9 @@ export const FireCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Fire at 6', 
     rarity: Rarity.None, 
-    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '6')}` 
+    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '6')}`, 
+    descriptionDark: `You take your shot at step number ${getTextSpan(CardColor.WHITE, '6')}`, 
+    titleShort: '6'
   },
   [PacesCard.Paces7]: { 
     path: '/textures/cards/illustrations/Duelist_Shooting.png', 
@@ -218,7 +248,9 @@ export const FireCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Fire at 7', 
     rarity: Rarity.None, 
-    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '7')}` 
+    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '7')}`, 
+    descriptionDark: `You take your shot at step number ${getTextSpan(CardColor.WHITE, '7')}`, 
+    titleShort: '7'
   },
   [PacesCard.Paces8]: { 
     path: '/textures/cards/illustrations/Duelist_Shooting.png', 
@@ -226,7 +258,9 @@ export const FireCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Fire at 8', 
     rarity: Rarity.None, 
-    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '8')}` 
+    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '8')}`, 
+    descriptionDark: `You take your shot at step number ${getTextSpan(CardColor.WHITE, '8')}`, 
+    titleShort: '8'
   },
   [PacesCard.Paces9]: { 
     path: '/textures/cards/illustrations/Duelist_Shooting.png', 
@@ -234,7 +268,9 @@ export const FireCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Fire at 9', 
     rarity: Rarity.None, 
-    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '9')}` 
+    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '9')}`, 
+    descriptionDark: `You take your shot at step number ${getTextSpan(CardColor.WHITE, '9')}`, 
+    titleShort: '9'
   },
   [PacesCard.Paces10]: { 
     path: '/textures/cards/illustrations/Duelist_Shooting.png', 
@@ -242,7 +278,9 @@ export const FireCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Fire at 10', 
     rarity: Rarity.None, 
-    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '10')}` 
+    description: `You take your shot at step number ${getTextSpan(CardColor.BROWN, '10')}`, 
+    descriptionDark: `You take your shot at step number ${getTextSpan(CardColor.WHITE, '10')}`, 
+    titleShort: '10'
   },
 }
 
@@ -253,7 +291,9 @@ export const DodgeCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Dodge at x', 
     rarity: Rarity.None, 
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, 'x')}` 
+    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, 'x')}`, 
+    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, 'x')}`, 
+    titleShort: 'x'
   },
   [PacesCard.Paces1]: { 
     path: '/textures/cards/illustrations/Blade_Miss.png', 
@@ -261,7 +301,9 @@ export const DodgeCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Dodge at 1', 
     rarity: Rarity.None, 
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '1')}` 
+    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '1')}`, 
+    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '1')}`, 
+    titleShort: '1'
   },
   [PacesCard.Paces2]: { 
     path: '/textures/cards/illustrations/Blade_Miss.png', 
@@ -269,7 +311,9 @@ export const DodgeCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Dodge at 2', 
     rarity: Rarity.None, 
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '2')}` 
+    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '2')}`, 
+    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '2')}`, 
+    titleShort: '2'
   },
   [PacesCard.Paces3]: { 
     path: '/textures/cards/illustrations/Blade_Miss.png', 
@@ -277,7 +321,9 @@ export const DodgeCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Dodge at 3', 
     rarity: Rarity.None, 
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '3')}` 
+    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '3')}`, 
+    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '3')}`, 
+    titleShort: '3'
   },
   [PacesCard.Paces4]: { 
     path: '/textures/cards/illustrations/Blade_Miss.png', 
@@ -285,7 +331,9 @@ export const DodgeCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Dodge at 4', 
     rarity: Rarity.None, 
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '4')}` 
+    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '4')}`, 
+    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '4')}`, 
+    titleShort: '4'
   },
   [PacesCard.Paces5]: { 
     path: '/textures/cards/illustrations/Blade_Miss.png', 
@@ -293,7 +341,9 @@ export const DodgeCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Dodge at 5', 
     rarity: Rarity.None, 
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '5')}` 
+    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '5')}`, 
+    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '5')}`, 
+    titleShort: '5'
   },
   [PacesCard.Paces6]: { 
     path: '/textures/cards/illustrations/Blade_Miss.png', 
@@ -301,7 +351,9 @@ export const DodgeCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Dodge at 6', 
     rarity: Rarity.None, 
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '6')}` 
+    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '6')}`, 
+    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '6')}`, 
+    titleShort: '6'
   },
   [PacesCard.Paces7]: { 
     path: '/textures/cards/illustrations/Blade_Miss.png', 
@@ -309,7 +361,9 @@ export const DodgeCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Dodge at 7', 
     rarity: Rarity.None, 
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '7')}` 
+    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '7')}`, 
+    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '7')}`, 
+    titleShort: '7'
   },
   [PacesCard.Paces8]: { 
     path: '/textures/cards/illustrations/Blade_Miss.png', 
@@ -317,7 +371,9 @@ export const DodgeCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Dodge at 8', 
     rarity: Rarity.None, 
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '8')}` 
+    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '8')}`, 
+    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '8')}`, 
+    titleShort: '8'
   },
   [PacesCard.Paces9]: { 
     path: '/textures/cards/illustrations/Blade_Miss.png', 
@@ -325,7 +381,9 @@ export const DodgeCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Dodge at 9', 
     rarity: Rarity.None, 
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '9')}` 
+    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '9')}`, 
+    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '9')}`, 
+    titleShort: '9'
   },
   [PacesCard.Paces10]: { 
     path: '/textures/cards/illustrations/Blade_Miss.png', 
@@ -333,7 +391,9 @@ export const DodgeCardsTextures: Record<PacesCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Dodge at 10', 
     rarity: Rarity.None, 
-    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '10')}` 
+    description: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.BROWN, '10')}`, 
+    descriptionDark: `You try to dodge the opponents bullet at step number ${getTextSpan(CardColor.WHITE, '10')}`, 
+    titleShort: '10'
   },
 }
 
@@ -360,7 +420,7 @@ export const TacticsCardsTextures: Record<TacticsCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'Coin Flip', 
     rarity: Rarity.None, 
-    description: 'Next special card doesn\'t affect you' 
+    description: 'First special card doesn\'t affect you' 
   },
   [TacticsCard.Vengeful]: { 
     path: '/textures/cards/illustrations/Second_Reaction.png', 
@@ -396,10 +456,6 @@ export const TacticsCardsTextures: Record<TacticsCard, CardData> = {
   }
 }
 
-function getTextSpan(color: CardColor, text: string) {
-  return `<span style="color:${color}; font-size:1.3em; font-weight:bold; -webkit-text-stroke: 0.03em #27110b;">${text}</span>`
-}
-
 export const BladesCardsTextures: Record<BladesCard, CardData> = {
   [BladesCard.None]: { 
     path: '/textures/cards/illustrations/Decapitation.png', 
@@ -417,6 +473,14 @@ export const BladesCardsTextures: Record<BladesCard, CardData> = {
     rarity: Rarity.None, 
     description: `Increase your damage by ${getTextSpan(CardColor.RED, '+1')} and your hit chance by ${getTextSpan(CardColor.YELLOW, '+20%')}` 
   },
+  [BladesCard.PocketPistol]: { 
+    path: '/textures/cards/illustrations/Decapitation.png', 
+    cardFrontPath: '/textures/cards/card_front_brown.png', 
+    color: CardColor.WHITE, 
+    title: 'Pocket Pistol', 
+    rarity: Rarity.None, 
+    description: `Decrease opponents hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`
+  },
   [BladesCard.Behead]: { 
     path: '/textures/cards/illustrations/Decapitation.png', 
     cardFrontPath: '/textures/cards/card_front_brown.png', 
@@ -432,29 +496,70 @@ export const BladesCardsTextures: Record<BladesCard, CardData> = {
     title: 'Grapple', 
     rarity: Rarity.None, 
     description: `Decrease opponents damage by ${getTextSpan(CardColor.RED, '-1')}`
-  },
-  [BladesCard.PocketPistol]: { 
-    path: '/textures/cards/illustrations/Decapitation.png', 
-    cardFrontPath: '/textures/cards/card_front_brown.png', 
-    color: CardColor.WHITE, 
-    title: 'Run Away', 
-    rarity: Rarity.None, 
-    description: `Decrease opponents hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`
-  },
+  }
 }
 
-export const sceneBackgrounds: Record<SceneName, TextureName> = {
-  [SceneName.Gate]: TextureName.bg_gate,
-  [SceneName.Profile]: TextureName.bg_profile,
-  [SceneName.Tavern]: TextureName.bg_tavern,
-  [SceneName.Barkeep]: TextureName.bg_barkeep,
-  [SceneName.Duelists]: TextureName.bg_duelists,
-  [SceneName.YourDuels]: TextureName.bg_duels_yours,
-  [SceneName.LiveDuels]: TextureName.bg_duels_live,
-  [SceneName.PastDuels]: TextureName.bg_duels_past,
-  [SceneName.Tournament]: TextureName.bg_duels_live,
-  [SceneName.IRLTournament]: TextureName.bg_duels_live,
-  [SceneName.Duel]: TextureName.bg_duel,
+export interface SceneData {
+  background: TextureName,
+  mask?: TextureName,
+  items?: SceneObject[]
+}
+
+export interface SceneObject {
+  name: string,
+  color: string,
+  description: string,
+}
+
+export const sceneBackgrounds: Record<SceneName, SceneData> = {
+  [SceneName.Gate]: { 
+    background: TextureName.bg_gate,
+    mask: TextureName.bg_gate_mask,
+    items: [
+      { name: 'door', color: 'ff0000', description: 'Knock on door' },        // red
+      { name: 'duel', color: 'ffff00', description: 'Show duel tutorial' },   // yellow
+      { name: 'sign', color: '00ff00', description: 'See more' },             // green
+    ]
+  },
+  [SceneName.Door]: { background: TextureName.bg_door },
+  [SceneName.Profile]: { background: TextureName.bg_profile },
+  [SceneName.Tavern]: { 
+    background: TextureName.bg_tavern,
+    mask: TextureName.bg_tavern_mask,
+    items: [
+      { name: 'bartender', color: 'ff0000', description: 'Bartender' },   // red
+      { name: 'bottle', color: '00ff00', description: 'All Duelists' },   // green
+      { name: 'pistol', color: '0000ff', description: 'Your Duels' },     // blue
+      { name: 'shovel', color: 'ff00ff', description: 'Past Duels' }      // magenta
+    ]
+  },
+  [SceneName.Duelists]: { 
+    background: TextureName.bg_duelists,
+    mask: TextureName.bg_duelists_mask,
+    items: [
+      { name: 'left arrow', color: '00ff00', description: 'Previous Page' },  // red
+      { name: 'right arrow', color: 'ff0000', description: 'Next Page' },     // green
+    ]
+   },
+  [SceneName.Duels]: { 
+    background: TextureName.bg_duels,
+    mask: TextureName.bg_duels_mask,
+    items: [
+      { name: 'left arrow', color: '00ff00', description: 'Previous Page' },  // red
+      { name: 'right arrow', color: 'ff0000', description: 'Next Page' },     // green
+    ]
+   },
+  [SceneName.Graveyard]: { 
+    background: TextureName.bg_graveyard,
+    mask: TextureName.bg_graveyard_mask,
+    items: [
+      { name: 'left arrow', color: '00ff00', description: 'Previous Page' },  // red
+      { name: 'right arrow', color: 'ff0000', description: 'Next Page' },     // green
+    ]
+   },
+  [SceneName.Tournament]: { background: TextureName.bg_duels_live },
+  [SceneName.IRLTournament]: { background: TextureName.bg_duels_live },
+  [SceneName.Duel]: { background: TextureName.bg_duel },
 }
 
 enum CharacterType {
@@ -496,7 +601,7 @@ const SPRITESHEETS: Spritesheets = {
   FEMALE: {
     [AnimName.STILL]: {
       path: '/textures/animations/Female Duelist/Still',
-      frameCount: 14,
+      frameCount: 8,
       frameRate: 8,
     },
     [AnimName.STILL_BLADE]: {
@@ -551,7 +656,7 @@ const SPRITESHEETS: Spritesheets = {
     },
     [AnimName.SHOT_DEAD_FRONT]: {
       path: '/textures/animations/Female Duelist/Shot_Dead_Front',
-      frameCount: 14,
+      frameCount: 16,
       frameRate: 8,
     },
     [AnimName.STRIKE_LIGHT]: {
@@ -613,7 +718,7 @@ const SPRITESHEETS: Spritesheets = {
     },
     [AnimName.SHOOT]: {
       path: '/textures/animations/Male Duelist/Shoot',
-      frameCount: 16,
+      frameCount: 11,
       frameRate: 8,
     },
     [AnimName.DODGE_BACK]: {
@@ -633,7 +738,7 @@ const SPRITESHEETS: Spritesheets = {
     },
     [AnimName.SHOT_INJURED_FRONT]: {
       path: '/textures/animations/Male Duelist/Shot_Injured_Front',
-      frameCount: 11,
+      frameCount: 16,
       frameRate: 8,
     },
     [AnimName.SHOT_DEAD_BACK]: {
@@ -643,7 +748,7 @@ const SPRITESHEETS: Spritesheets = {
     },
     [AnimName.SHOT_DEAD_FRONT]: {
       path: '/textures/animations/Male Duelist/Shot_Dead_Front',
-      frameCount: 11,
+      frameCount: 16,
       frameRate: 8,
     },
     [AnimName.STRIKE_LIGHT]: {
@@ -700,6 +805,11 @@ const ProfileModels: Record<number, CharacterType> = {
   [14]: CharacterType.MALE,
   [15]: CharacterType.MALE,
   [16]: CharacterType.FEMALE,
+  [17]: CharacterType.MALE,
+  [18]: CharacterType.FEMALE,
+  [19]: CharacterType.FEMALE,
+  [20]: CharacterType.MALE,
+  [21]: CharacterType.MALE,
 }
 
 

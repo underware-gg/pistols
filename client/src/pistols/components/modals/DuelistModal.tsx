@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
-import { useSettings } from '../hooks/SettingsContext'
+import { useSettings } from '../../hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
 import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
@@ -48,7 +48,7 @@ export default function DuelistModal({
   }
 
   const _duel = () => {
-    dispatchSetScene(SceneName.YourDuels)
+    dispatchSetScene(SceneName.Duels)
     _close()
   }
 

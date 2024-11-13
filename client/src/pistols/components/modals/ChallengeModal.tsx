@@ -18,7 +18,7 @@ import { IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
 import { bigintToHex } from '@/lib/utils/types'
 import { ChallengeState } from '@/games/pistols/generated/constants'
-import { PremisePrefix } from '../utils/pistols'
+import { PremisePrefix } from '../../utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column

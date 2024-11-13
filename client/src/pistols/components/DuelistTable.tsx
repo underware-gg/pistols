@@ -10,7 +10,7 @@ import { useOpener } from '@/lib/ui/useOpener'
 import { ProfileBadge, ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
-import AnonModal from '@/pistols/components/AnonModal'
+import AnonModal from '@/pistols/components/modals/AnonModal'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -131,7 +131,7 @@ export function DuelistTable() {
   )
 }
 
-export function FilterDuelistName() {
+function FilterDuelistName() {
   const {
     filterDuelistName,
     dispatchFilterDuelistName,

@@ -81,6 +81,15 @@ fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> Due
     let mut state_b: DuelistState = round.state_b;
 
     //------------------------------------------------------
+    // apply cards
+    //
+    hand_a.card_tactics.apply_points(ref state_a, ref state_b, 1, EnvCard::None);
+    hand_b.card_tactics.apply_points(ref state_b, ref state_a, 1, EnvCard::None);
+    hand_a.card_blades.apply_points(ref state_a, ref state_b);
+    hand_b.card_blades.apply_points(ref state_b, ref state_a);
+
+    
+    //------------------------------------------------------
     // Steps
     //
     // save step 0 (initial state)
@@ -96,14 +105,6 @@ fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> Due
         state_a,
         state_b,
     });
-
-    //------------------------------------------------------
-    // apply cards
-    //
-    hand_a.card_tactics.apply_points(ref state_a, ref state_b, 1, EnvCard::None);
-    hand_b.card_tactics.apply_points(ref state_b, ref state_a, 1, EnvCard::None);
-    hand_a.card_blades.apply_points(ref state_a, ref state_b);
-    hand_b.card_blades.apply_points(ref state_b, ref state_a);
 
 
     //------------------------------------------------------

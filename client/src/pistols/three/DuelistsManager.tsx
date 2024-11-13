@@ -7,7 +7,7 @@ import { Action, ActionTypes } from '@/pistols/utils/pistols'
 import { Actor } from './SpriteSheetMaker'
 import { _sfxEnabled, AnimationState, ASPECT, emitter, playAudio } from './game'
 import { ProgressDialogManager } from './ProgressDialog'
-import { DuelistState } from '../components/Duel'
+import { DuelistState } from '../components/scenes/Duel'
 
 const ACTOR_WIDTH = 2.5
 const ACTOR_HEIGHT = 1.35
@@ -187,6 +187,10 @@ export class DuelistsManager {
     this.duelProgressDialogManger.hideDialogs()
   }
 
+  public setDuelistSpeedFactor(speedFactor) {
+    this.duelistA.actor.setSpeedFactor(speedFactor)
+    this.duelistB.actor.setSpeedFactor(speedFactor)
+  }
 
 
   //----------------

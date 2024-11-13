@@ -69,36 +69,32 @@ export function ProfileDescription({
   const _owner = isStarknetAddress ? address : owner
   
   return (
-    <Grid>
-      <Row>
-
-        <Col width={displayStats ? 12 : 16}>
-          {displayNameSmall ? 
-            (<h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>)
-            :
-            (<h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h1>)
-          }
-          
-          {displayOwnerAddress && <AddressShort address={owner} small={displayOwnerAddressSmall}/>}
-          {displayHonor && <h3 className='Important NoMargin TitleCase'>
-            Honour: <span className='Coin'>{honourAndTotal}</span>
-          </h3>}
-          {displayFameBalance && <h5><FameBalanceDuelist duelistId={duelistId} big /></h5>}
-        </Col>
-
-        {displayStats && total_duels > 0 &&
-          <Col width={4} className='ProfileStats PaddedRight TitleCase' textAlign='right'>
-            Duels: <span className='Bold'>{total_duels}</span>
-            <br />
-            Wins: <span className='Bold'>{total_wins}</span>
-            <br />
-            Losses: <span className='Bold'>{total_losses}</span>
-            <br />
-            Draws: <span className='Bold'>{total_draws}</span>
-          </Col>
+    <div className='FillParent' style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div>
+        {displayNameSmall ? 
+          (<h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>)
+          :
+          (<h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h1>)
         }
+        
+        {displayOwnerAddress && <AddressShort address={owner} small={displayOwnerAddressSmall}/>}
+        {displayHonor && <h3 className='Important NoMargin TitleCase'>
+          Honour: <span className='Coin'>{honourAndTotal}</span>
+        </h3>}
+        {displayFameBalance && <h5><FameBalanceDuelist duelistId={duelistId} big /></h5>}
+      </div>
 
-      </Row>
-    </Grid>
+      {displayStats && total_duels > 0 &&
+        <div className='ProfileStats PaddedRight TitleCase' style={{ textAlign: 'right' }}>
+          Duels: <span className='Bold'>{total_duels}</span>
+          <br />
+          Wins: <span className='Bold'>{total_wins}</span>
+          <br />
+          Losses: <span className='Bold'>{total_losses}</span>
+          <br />
+          Draws: <span className='Bold'>{total_draws}</span>
+        </div>
+      }
+    </div>
   )
 }
