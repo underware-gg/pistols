@@ -132,7 +132,8 @@ export function createSystemCalls(
     //
     // approve call
     const approved_value = await calc_mint_fee_duel(table_id)
-    calls.push(approve_call(approved_value))
+    const approve = approve_call(approved_value)
+    if (approve) calls.push(approve)
     //
     // game call
     const args = [duelist_id, BigInt(challenged_id_or_address), getPremiseValue(premise), stringToFelt(quote), table_id, expire_hours]
@@ -156,7 +157,8 @@ export function createSystemCalls(
     //
     // approve call
     const approved_value = await calc_mint_fee_duelist(signer.address)
-    calls.push(approve_call(approved_value))
+    const approve = approve_call(approved_value)
+    if (approve) calls.push(approve)
     //
     // game call
     const args = [recipient, stringToFelt(name), getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
