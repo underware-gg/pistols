@@ -4,6 +4,7 @@ import { StarknetConfig, jsonRpcProvider, useInjectedConnectors } from '@starkne
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { Chain } from '@starknet-react/chains'
 import { useChainConnectors } from './setup/connectors'
+import { RpcProvider } from 'starknet'
 
 
 interface StarknetContextType {
@@ -29,30 +30,19 @@ export const StarknetProvider = ({
   //
   // Initial state
   //
-  const intialChainId = useMemo(() => {
-    // connect to last
-    // const lastSelectedChainId = (typeof window !== 'undefined' ? window?.localStorage?.getItem('lastSelectedChainId') : undefined) as ChainId
-    // if (isChainIdSupported(lastSelectedChainId)) {
-    //   return lastSelectedChainId
-    // }
-    return dojoAppConfig.initialChainId
-  }, [dojoAppConfig])
-
   const chains: Chain[] = useMemo(() => getStarknetProviderChains(dojoAppConfig.supportedChainIds), [dojoAppConfig])
 
   //
   // Current chain
-  const [selectedChainId, setSelectedChainId] = useState<ChainId>(intialChainId)
-  const [selectedChainConfig, setSelectedChain] = useState<DojoChainConfig>(getDojoChainConfig(intialChainId))
-  useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainConfig])
+  const selectedChainId = useMemo(() => (dojoAppConfig.initialChainId), [dojoAppConfig])
+  const selectedChainConfig = useMemo(() => getDojoChainConfig(selectedChainId), [selectedChainId])
+  useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainId])
 
   const selectChainId = useCallback((chainId: ChainId) => {
     if (!isChainIdSupported(chainId)) {
       throw `selectChainId() Invalid chain [${chainId}]`
     }
-    setSelectedChainId(chainId)
-    setSelectedChain(getDojoChainConfig(chainId))
-    window?.localStorage?.setItem('lastSelectedChainId', chainId)
+    throw `selectChainId() not supported!`
   }, [])
 
   // Build chain connectors form selectedChainConfig
