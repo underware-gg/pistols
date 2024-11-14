@@ -26,27 +26,45 @@ const manifests: Record<ChainId, DojoManifest> = {
   [ChainId.SN_MAINNET]: null,
 }
 
+const NAMESPACE = 'pistols'
+
+const CONTRACT_INTERFACES = {
+  game: ['IGame'],
+  duel_token: ['IDuelTokenPublic'],
+  duelist_token: ['IDuelistTokenPublic'],
+  lords_mock: [
+    'ILordsMockFaucet',
+    // 'IERC20Allowance',
+  ],
+  // admin: ['IAdmin'],
+}
+
+//------------------------ 
+// TODO: REMOVE THIS!
+//
+import { makeControllerConnector } from '@/lib/dojo/hooks/useController'
+import { dojoContextConfig } from '@/lib/dojo/setup/chains'
+const CONTROLLER = makeControllerConnector(
+  manifests[defaultChainId],
+  dojoContextConfig[defaultChainId].rpcUrl,
+  NAMESPACE,
+  CONTRACT_INTERFACES
+);
+//------------------------
+
 export const makeDojoAppConfig = (): DojoAppConfig => {
   return {
     manifests,
     supportedChainIds,
     initialChainId: defaultChainId,
-    nameSpace: 'pistols',
-    contractInterfaces: {
-      game: ['IGame'],
-      duel_token: ['IDuelTokenPublic'],
-      duelist_token: ['IDuelistTokenPublic'],
-      lords_mock: [
-        'ILordsMockFaucet',
-        // 'IERC20Allowance',
-      ],
-      // admin: ['IAdmin'],
-    },
+    nameSpace: NAMESPACE,
+    contractInterfaces: CONTRACT_INTERFACES,
     starknetDomain: {
       name: TYPED_DATA.NAME,
       version: TYPED_DATA.VERSION,
       chainId: defaultChainId,
       revision: '1',
     },
+    controllerConnector: CONTROLLER,
   }
 }

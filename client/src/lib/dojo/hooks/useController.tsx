@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Connector, useAccount } from '@starknet-react/core'
 import { Policy, ControllerOptions, Tokens } from '@cartridge/controller'
-import ControllerConnector from '@cartridge/connector/controller'
+import { ControllerConnector } from "@cartridge/connector";
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import { ContractInterfaces, DojoManifest } from '@/lib/dojo/Dojo'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
@@ -53,46 +53,55 @@ const _makeControllerPolicies = (manifest: DojoManifest, namespace: string, cont
   return policies
 }
 
+
+export const makeControllerConnector = (manifest: DojoManifest, rpcUrl: string, namespace: string, contractInterfaces: ContractInterfaces): Connector => {
+  const policies = _makeControllerPolicies(manifest, namespace, contractInterfaces)
+
+  // tokens to display
+  // const tokens: Tokens = {
+  //   erc20: [
+  //     // bigintToHex(lordsContractAddress),
+  //     // bigintToHex(fameContractAddress),
+  //   ],
+  //   // erc721: [],
+  // }
+
+  // extract slot service name from rpcUrl
+  // const slot = /api\.cartridge\.gg\/x\/([^/]+)\/katana/.exec(rpcUrl)?.[1];
+
+  const options: ControllerOptions = {
+    // ProviderOptions
+    rpc: rpcUrl,
+    // IFrameOptions
+    theme: "pistols",
+    colorMode: "dark",
+    // KeychainOptions
+    policies,
+    // namespace,
+    // slot,
+    // tokens,
+  }
+  // console.log(`-------- ControllerOptions:`, options)
+  const connector = new ControllerConnector(options) as never as Connector
+  assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
+  return connector
+}
+
+
 export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, namespace: string, contractInterfaces: ContractInterfaces) => {
-  // const { lordsContractAddress } = useLordsContract()
-  // const { fameContractAddress } = useFameContract()
-
+  const connectorRef = useRef<any>(undefined)
   const controller = useCallback(() => {
-    const policies = _makeControllerPolicies(manifest, namespace, contractInterfaces)
-
-    // tokens to display
-    // const tokens: Tokens = {
-    //   erc20: [
-    //     // bigintToHex(lordsContractAddress),
-    //     // bigintToHex(fameContractAddress),
-    //   ],
-    //   // erc721: [],
-    // }
-
-    // extract slot service name from rpcUrl
-    // const slot = /api\.cartridge\.gg\/x\/([^/]+)\/katana/.exec(rpcUrl)?.[1];
-
-    const options: ControllerOptions = {
-      // ProviderOptions
-      rpc: rpcUrl,
-      // IFrameOptions
-      theme: "pistols",
-      colorMode: "dark",
-      // KeychainOptions
-      policies,
-      // namespace,
-      // slot,
-      // tokens,
+    if (!connectorRef.current) {
+      connectorRef.current = makeControllerConnector(manifest, rpcUrl, namespace, contractInterfaces)
     }
-    // console.log(`-------- ControllerOptions:`, options)
-    const connector = new ControllerConnector(options) as never as Connector
-    assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
-    return connector
+    return connectorRef.current
   }, [manifest, rpcUrl, namespace, contractInterfaces])
   return {
     controller,
   }
 }
+
+
 
 
 export const useConnectedController = () => {

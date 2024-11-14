@@ -25,13 +25,13 @@ export const getConnectorIcon = (connector: Connector): string  => {
 export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: DojoChainConfig) => {
 
   // Cartridge Controller
-  const manifest = useMemo(() => (dojoAppConfig.manifests[chainConfig.chainId] ?? null), [chainConfig])
-  const { controller } = useControllerConnector(
-    manifest,
-    chainConfig.rpcUrl,
-    dojoAppConfig.nameSpace,
-    dojoAppConfig.contractInterfaces,
-  )
+  // const manifest = useMemo(() => (dojoAppConfig.manifests[chainConfig.chainId] ?? null), [chainConfig])
+  // const { controller } = useControllerConnector(
+  //   manifest,
+  //   chainConfig.rpcUrl,
+  //   dojoAppConfig.nameSpace,
+  //   dojoAppConfig.contractInterfaces,
+  // )
 
   // Predeployed Controller
   const { predeployed } = usePredeployedConnector(chainConfig)
@@ -40,7 +40,8 @@ export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: Do
     const result = chainConfig.connectorIds.reduce((acc, id) => {
       // if (id == supportedConnetorIds.ARGENT) acc.push(argent())
       // if (id == supportedConnetorIds.BRAAVOS) acc.push(braavos())
-      if (id == supportedConnetorIds.CONTROLLER) acc.push(controller())
+      // if (id == supportedConnetorIds.CONTROLLER) acc.push(controller())
+      if (id == supportedConnetorIds.CONTROLLER) acc.push(dojoAppConfig.controllerConnector)
       if (id == supportedConnetorIds.PREDEPLOYED && typeof window !== 'undefined') acc.push(predeployed())
       return acc
     }, [])

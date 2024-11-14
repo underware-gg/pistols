@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react'
 import { StarknetDomain } from 'starknet'
+import { Connector } from '@starknet-react/core'
 import { Manifest } from '@dojoengine/core'
 import { StarknetProvider, useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { DojoProvider } from '@/lib/dojo/DojoContext'
@@ -21,6 +22,7 @@ export interface DojoAppConfig {
   initialChainId: ChainId
   starknetDomain: StarknetDomain
   manifests: { [chain_id: string]: DojoManifest | undefined }
+  controllerConnector: Connector
 }
 
 export default function Dojo({
