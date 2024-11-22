@@ -1,6 +1,8 @@
 # torii config for profile [sepolia]
 world_address = "0x4255cc0cdc92f77f2ae9c3ff07060bfb851a0a93e9bea5c2161cf4934c5ffc8"
 rpc = "https://api.cartridge.gg/x/starknet/sepolia"
+[events]
+raw = false
 [indexing]
 index_pending = true
 index_transactions = false

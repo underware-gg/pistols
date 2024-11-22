@@ -74,6 +74,8 @@ echo ">>> Create torii config [$TORII_CONFIG_PATH]..."
 echo "# torii config for profile [$PROFILE]" > $TORII_CONFIG_PATH
 echo "world_address = \"$WORLD_ADDRESS\"" >> $TORII_CONFIG_PATH
 echo "rpc = \"$RPC_URL\"" >> $TORII_CONFIG_PATH
+echo "[events]" >> $TORII_CONFIG_PATH
+echo "raw = false" >> $TORII_CONFIG_PATH
 echo "[indexing]" >> $TORII_CONFIG_PATH
 echo "index_pending = true" >> $TORII_CONFIG_PATH
 echo "index_transactions = false" >> $TORII_CONFIG_PATH
