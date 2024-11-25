@@ -287,7 +287,7 @@ export default function ScDuelists() {
         transform: 'translateX(-50%)'
       }}>
         {paginatedDuelists.map((duelist, index) => (
-          <div style={{
+          <div key={`duelist-${duelist.duelist_id}`} style={{
             transform: index > 3 && 'translateX(50%)',
             display: 'flex',
             alignItems: 'center',
