@@ -1,4 +1,5 @@
 import 'react-circular-progressbar/dist/styles.css';
+import 'react-circular-progressbar/dist/styles.css';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Segment, SemanticFLOATS, Image, Button } from 'semantic-ui-react'
 import { BigNumberish, num } from 'starknet'
@@ -8,13 +9,15 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
+import { useChallengeDescription } from '@/pistols/hooks/useChallengeDescription'
+import { useChallenge } from '@/pistols/stores/ChallengeStore';
 import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '@/pistols/hooks/useRevealAction'
 import { useIsYou } from '@/pistols/hooks/useIsYou'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
+import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken';
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import { DuelStage, useAnimatedDuel, useDuel } from '@/pistols/hooks/useDuel'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
@@ -24,16 +27,14 @@ import { Action, ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel, MenuDuelControl } from '@/pistols/components/Menus'
 import { bigintToHex } from '@/lib/utils/types'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import CommitPacesModal from '@/pistols/components/modals/CommitPacesModal'
-import 'react-circular-progressbar/dist/styles.css';
-import { DuelistCardType } from '../cards/Cards'
-import Cards, { CardsHandle, DuelistHand } from '../cards/DuelCards'
-import useGameAspect from '@/pistols/hooks/useGameApect'
 import { BladesCard, EnvCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants';
-import * as Constants from '../../data/cardConstants'
-import * as TWEEN from '@tweenjs/tween.js'
-import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken';
+import { DuelistCardType } from '@/pistols/components/cards/Cards'
 import { FameBalanceDuelist } from '../account/LordsBalance';
+import CommitPacesModal from '@/pistols/components/modals/CommitPacesModal'
+import Cards, { CardsHandle, DuelistHand } from '@/pistols/components/cards/DuelCards'
+import useGameAspect from '@/pistols/hooks/useGameApect'
+import * as Constants from '@/pistols/data/cardConstants'
+import * as TWEEN from '@tweenjs/tween.js'
 
 export type DuelistState = {
   damage: number, 

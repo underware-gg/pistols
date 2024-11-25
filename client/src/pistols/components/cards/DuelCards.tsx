@@ -1,13 +1,13 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import useGameAspect from '@/pistols/hooks/useGameApect'
-import { useChallenge } from '../../hooks/useChallenge'
-import { useDuelist } from '../../hooks/useDuelist'
-import { useIsYou } from '../../hooks/useIsYou'
-import * as TWEEN from '@tweenjs/tween.js'
-import { ProfilePic } from '../account/ProfilePic'
+import { useChallenge } from '@/pistols/stores/ChallengeStore'
+import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useIsYou } from '@/pistols/hooks/useIsYou'
+import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { BladesCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants'
-import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '../../data/assets'
+import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '@/pistols/data/assets'
 import { DuelistCardType, CardHandle, Card } from './Cards'
+import * as TWEEN from '@tweenjs/tween.js'
 
 interface DuelistCardsProps {
   isLeft: boolean

@@ -4,7 +4,7 @@ import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useComponentValue } from '@dojoengine/react'
 import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
-import { useChallenge } from "@/pistols/hooks/useChallenge"
+import { useChallenge } from '@/pistols/stores/ChallengeStore'
 import { keysToEntity } from '@/lib/utils/types'
 import { BladesCard, BladesCardNameToValue, CONST, getBladesCardFromValue, getBladesCardValue, getPacesCardFromValue, getRoundStateValue, getTacticsCardFromValue, PacesCard, RoundState, TacticsCard } from '@/games/pistols/generated/constants'
 import { AnimationState } from "@/pistols/three/game"

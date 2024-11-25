@@ -1,14 +1,17 @@
-import { useEffect, useState } from 'react'
-import { BigNumberish } from 'starknet'
-import { createDojoStore, ParsedEntity, StandardizedQueryResult, SubscriptionQueryType } from '@dojoengine/sdk'
+import { useEffect, useMemo, useState } from 'react'
+import { ParsedEntity, SubscriptionQueryType } from '@dojoengine/sdk'
 import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { isPositiveBigint } from '@/lib/utils/types'
+import * as models from '@/games/pistols/generated/typescript/models.gen'
 
 type PistolsSubQuery = SubscriptionQueryType<PistolsSchemaType>
+type PistolsEntity = ParsedEntity<PistolsSchemaType>
 export type {
   PistolsSchemaType,
   PistolsSubQuery,
+  PistolsEntity,
+  models,
 }
 
 export type UseSdkSubEntitiesResult = {
@@ -18,8 +21,8 @@ export type UseSdkSubEntitiesResult = {
 
 export type UseSdkSubEntitiesProps = {
   query: PistolsSubQuery
-  set: (entities: ParsedEntity<PistolsSchemaType>[]) => void
-  update: (entities: ParsedEntity<PistolsSchemaType>) => void
+  set: (entities: PistolsEntity[]) => void
+  update: (entities: PistolsEntity) => void
   logging?: boolean
 }
 
@@ -43,7 +46,7 @@ export const useSdkSubscribeEntities = <T,>({
           if (response.error) {
             console.error("useSdkSubscribeEntities().getEntities() error:", response.error)
           } else if (response.data) {
-            console.log("useSdkSubscribeEntities() GOT:", response.data);
+            // console.log("useSdkSubscribeEntities() GOT:", response.data);
             set?.(response.data);
           }
         },
@@ -65,7 +68,7 @@ export const useSdkSubscribeEntities = <T,>({
           if (response.error) {
             console.error("useSdkSubscribeEntities().subscribeEntityQuery() error:", response.error)
           } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {
-            console.log("useSdkSubscribeEntities() SUB:", response.data[0]);
+            // console.log("useSdkSubscribeEntities() SUB:", response.data[0]);
             update?.(response.data[0]);
           }
         },
@@ -90,3 +93,12 @@ export const useSdkSubscribeEntities = <T,>({
     isSubscribed,
   }
 }
+
+//---------------------------------------
+// Extract one model from a atored entity
+//
+export const useEntityModel = <T,>(entity: PistolsEntity, modelName: string) => {
+  const model = useMemo(() => (entity?.models.pistols[modelName] as T), [entity, modelName])
+  return model
+}
+
