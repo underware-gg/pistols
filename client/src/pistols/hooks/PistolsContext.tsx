@@ -30,14 +30,6 @@ export enum SceneName {
   Duel = 'Duel',
 }
 
-const tavernMenuItems: SceneName[] = [
-  SceneName.Duelists,
-  SceneName.Duels,
-  SceneName.Graveyard,
-  SceneName.Tournament,
-  SceneName.IRLTournament,
-]
-
 //--------------------------------
 // State
 //
@@ -66,7 +58,6 @@ export const initialState = {
 
 const PistolsActions = {
   SET_SIG: 'SET_SIG',
-  SET_ACCOUNT_MENU_KEY: 'SET_ACCOUNT_MENU_KEY',
   SET_SCENE: 'SET_SCENE',
   SELECT_DUEL: 'SELECT_DUEL',
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
@@ -240,7 +231,6 @@ export const usePistolsContext = () => {
   return {
     ...state,
     hasSigned: (state.walletSig.sig > 0n),
-    tavernMenuItems,
     // PistolsActions,
     dispatch,
     dispatchSetSig,
@@ -320,7 +310,6 @@ export const usePistolsScene = () => {
     currentScene,
     lastScene,
     sceneTitle,
-    tavernMenuItems,
     // helpers
     atGate: (currentScene == SceneName.Gate),
     atDoor: (currentScene == SceneName.Door),

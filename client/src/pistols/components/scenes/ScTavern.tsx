@@ -8,7 +8,6 @@ import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
 import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
 import DuelistModal from '@/pistols/components/modals/DuelistModal'
 import TableModal from '@/pistols/components/modals/TableModal'
-import { TavernMenu } from '../TavernMenu'
 import BarkeepModal from '../modals/BarkeepModal'
 import { _currentScene } from '@/pistols/three/game'
 import { InteractibleScene } from '@/pistols/three/InteractibleScene'
@@ -55,8 +54,6 @@ export default function ScTavern() {
 
   return (
     <div>
-
-      {/* <TavernMenu /> */}
 
       {/* <TableModal opener={tableOpener} /> */}
       <DuelistModal />

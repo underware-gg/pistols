@@ -34,8 +34,6 @@ export default function ScGate() {
   return (
     <QueryProvider>
 
-      {/* <TavernMenu /> */}
-
       <TableModal opener={tableOpener} />
       <DuelistModal />
       <ChallengeModal />
