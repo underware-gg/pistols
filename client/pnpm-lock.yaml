@@ -98,6 +98,9 @@ importers:
       use-local-storage-state:
         specifier: ^19.1.0
         version: 19.4.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      zustand:
+        specifier: ^4.5.5
+        version: 4.5.5(@types/react@18.3.12)(immer@10.1.1)(react@18.3.1)
     devDependencies:
       '@next/eslint-plugin-next':
         specifier: ^14.0.3

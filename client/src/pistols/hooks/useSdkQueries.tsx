@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
 import { useSdkGetEntity, PistolsGetQuery, useSdkGetEntities, EntityResult } from '@/lib/dojo/hooks/useSdkGet'
-import { useSdkSubscribeEntities, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkSub'
 import { isPositiveBigint } from '@/lib/utils/types'
 import { CONFIG, CONST } from '@/games/pistols/generated/constants'
 import * as models from '@/games/pistols/generated/typescript/models.gen'
@@ -113,29 +112,6 @@ export const useGetChallengesByDuelistQuery = (duelist_id: BigNumberish) => {
   const challenges = useMemo(() => _filterEntitiesByModel<models.Challenge>(entities, 'Challenge'), [entities])
   useEffect(() => console.log(`useGetChallengesByDuelistQuery()`, challenges), [challenges])
   return { challenges, isLoading, refetch }
-}
-
-export const useSubscribeChallengesByDuelistQuery = (duelist_id: BigNumberish) => {
-  const query = useMemo<PistolsSubQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            // Or: [
-            //   //@ts-ignore
-            //   { duelist_id_a: { $eq: addAddressPadding(duelist_id) } },
-            //   //@ts-ignore
-            //   { duelist_id_b: { $eq: addAddressPadding(duelist_id) } },
-            // ],
-          },
-        },
-      },
-    },
-  }), [duelist_id])
-  const { entities, isSubscribed } = useSdkSubscribeEntities({ query })
-  const challenges = useMemo(() => _filterEntitiesByModel<models.Challenge>(entities, 'Challenge'), [entities])
-  useEffect(() => console.log(`useSubscribeChallengesByDuelistQuery()`, challenges), [challenges])
-  return { challenges, isSubscribed }
 }
 
 

@@ -43,7 +43,8 @@
     "swr": "^2.2.4",
     "three": "^0.157.0",
     "type-fest": "^2.14.0",
-    "use-local-storage-state": "^19.1.0"
+    "use-local-storage-state": "^19.1.0",
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.0.3",

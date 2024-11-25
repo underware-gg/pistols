@@ -20,6 +20,7 @@ import ScDuels from '@/pistols/components/scenes/ScDuels'
 import ScDuelists from '@/pistols/components/scenes/ScDuelists'
 import ScGraveyard from '@/pistols/components/scenes/ScGraveyard'
 import { QueryProvider } from '@/pistols/hooks/QueryContext'
+import { ChallengeStoreSync } from '@/pistols/stores/ChallengeStore'
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {
@@ -41,13 +42,16 @@ export default function MainPage() {
   return (
     <AppPistols headerData={{ title: sceneTitle }} backgroundImage={null}>
       <Background className={null}>
-        { isInitialized &&  <QueryProvider>
-          <GameContainer isVisible={true} />
-          <MainUI />
-          {overlay}
-          <Header />
-        </QueryProvider> }
-        <MouseToolTip/>
+        {isInitialized &&
+          <QueryProvider>
+            <ChallengeStoreSync />
+            <GameContainer isVisible={true} />
+            <MainUI />
+            {overlay}
+            <Header />
+          </QueryProvider>
+        }
+        <MouseToolTip />
         {/* ADD NOTRIFICATIONS - how to make them into a hook? */}
       </Background>
     </AppPistols>

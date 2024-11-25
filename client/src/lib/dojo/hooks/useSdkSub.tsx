@@ -1,83 +1,92 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BigNumberish } from 'starknet'
-import { SubscriptionQueryType } from '@dojoengine/sdk'
-import { useDojoSetup } from '@/lib/dojo/DojoContext'
+import { createDojoStore, ParsedEntity, StandardizedQueryResult, SubscriptionQueryType } from '@dojoengine/sdk'
 import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
+import { useDojoSetup } from '@/lib/dojo/DojoContext'
+import { isPositiveBigint } from '@/lib/utils/types'
 
-export type PistolsSubQuery = SubscriptionQueryType<PistolsSchemaType>
-
-export type EntityResult = {
-  entityId: BigNumberish,
-} & Partial<PistolsSchemaType['pistols']>
+type PistolsSubQuery = SubscriptionQueryType<PistolsSchemaType>
+export type {
+  PistolsSchemaType,
+  PistolsSubQuery,
+}
 
 export type UseSdkSubEntitiesResult = {
-  entities: EntityResult[] | null
+  // entities: EntityResult[] | null
   isSubscribed: boolean
 }
 
 export type UseSdkSubEntitiesProps = {
   query: PistolsSubQuery
+  set: (entities: ParsedEntity<PistolsSchemaType>[]) => void
+  update: (entities: ParsedEntity<PistolsSchemaType>) => void
   logging?: boolean
-  enabled?: boolean
 }
 
 export const useSdkSubscribeEntities = <T,>({
   query,
+  set,
+  update,
   logging = false,
-  enabled = true,
 }: UseSdkSubEntitiesProps): UseSdkSubEntitiesResult => {
   const { sdk } = useDojoSetup()
-  const [entities, setEntities] = useState<EntityResult[] | null>()
   const [isSubscribed, setIsSubscribed] = useState(false)
 
+  //----------------------
+  // get initial entities
+  //
   useEffect(() => {
-    let _unsubscribe: (() => void) | undefined;
-    
+    const _get = async () => {
+      await sdk.getEntities(
+        query,
+        (response) => {
+          if (response.error) {
+            console.error("useSdkSubscribeEntities().getEntities() error:", response.error)
+          } else if (response.data) {
+            console.log("useSdkSubscribeEntities() GOT:", response.data);
+            set?.(response.data);
+          }
+        },
+      );
+    };
+    _get();
+  }, [sdk, query]);
+
+  //----------------------
+  // subscribe for updates
+  //
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+
     const _subscribe = async () => {
       const subscription = await sdk.subscribeEntityQuery(
         query,
         (response) => {
           if (response.error) {
-            if (_unsubscribe) {
-              setEntities(undefined);
-              console.error("useSdkSubscribeEntities() error:", response.error.message)
-            }
-          } else if (
-            response.data &&
-            response.data[0].entityId !== "0x0"
-          ) {
-            if (_unsubscribe) {
-              setEntities(response.data.map((e: any) => ({
-                entityId: e.entityId,
-                ...e.models.pistols,
-              } as EntityResult)))
-            }
+            console.error("useSdkSubscribeEntities().subscribeEntityQuery() error:", response.error)
+          } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {
+            console.log("useSdkSubscribeEntities() SUB:", response.data[0]);
+            update?.(response.data[0]);
           }
         },
         { logging }
       );
       setIsSubscribed(true)
-      _unsubscribe = () => subscription.cancel()
-    }
+      unsubscribe = () => subscription.cancel();
+    };
 
-    // mount
-    setIsSubscribed(false)
-    if (enabled) {
-      _subscribe()
-    } else {
-      setEntities(undefined)
-    }
+    setIsSubscribed(true)
+    _subscribe();
 
-    // umnount
     return () => {
       setIsSubscribed(false)
-      _unsubscribe?.()
-      _unsubscribe = undefined
-    }
-  }, [sdk, query, logging, enabled])
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [sdk, query]);
 
   return {
-    entities,
     isSubscribed,
   }
 }
