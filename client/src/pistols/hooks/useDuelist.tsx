@@ -3,9 +3,10 @@ import { BigNumberish } from 'starknet'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
 import { useEntityKeys } from '@/lib/dojo/hooks/useEntityKeys'
+import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { useScore } from '@/pistols/hooks/useScore'
 import { feltToString } from "@/lib/utils/starknet"
-import { bigintToEntity, isPositiveBigint } from '@/lib/utils/types'
+import { isPositiveBigint } from '@/lib/utils/types'
 import { CONST } from '@/games/pistols/generated/constants'
 
 
@@ -34,7 +35,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   // const { duelist } = useGetDuelistByIdQuery(duelist_id)
 
   const { Duelist } = useDojoComponents()
-  const entityId = useMemo(() => bigintToEntity(duelist_id ?? 0n), [duelist_id])
+  const entityId = useEntityId([duelist_id ?? 0n])
   const duelist: any = useComponentValue(Duelist, entityId)
   // console.log(`Duelist`, duelist_id, entityId, duelist)
 

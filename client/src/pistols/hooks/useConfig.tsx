@@ -2,10 +2,8 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
-import { bigintToEntity } from '@/lib/utils/types'
 import { useGetConfigQuery } from '@/pistols/hooks/useSdkQueries'
-
-
+import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 
 export const useConfig = () => {
   const { config } = useGetConfigQuery()
@@ -21,7 +19,7 @@ export const useConfig = () => {
 
 export const useTokenConfig = (contractAddress: BigNumberish) => {
   const { TokenConfig } = useDojoComponents()
-  const entityId = useMemo(() => bigintToEntity(contractAddress), [])
+  const entityId = useEntityId([contractAddress])
   const token_config = useComponentValue(TokenConfig, entityId)
   return {
     // minterAddress: token_config?.minter_address ?? null,

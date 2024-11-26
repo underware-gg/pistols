@@ -1,15 +1,11 @@
 import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useDojoComponents } from '@/lib/dojo/DojoContext'
-import { useComponentValue } from '@dojoengine/react'
 import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
-import { useChallenge } from '@/pistols/stores/ChallengeStore'
-import { keysToEntity } from '@/lib/utils/types'
-import { BladesCard, BladesCardNameToValue, CONST, getBladesCardFromValue, getBladesCardValue, getPacesCardFromValue, getRoundStateValue, getTacticsCardFromValue, PacesCard, RoundState, TacticsCard } from '@/games/pistols/generated/constants'
+import { useChallenge, useRound } from '@/pistols/stores/ChallengeStore'
+import { CONST, getPacesCardFromValue, getRoundStateValue } from '@/games/pistols/generated/constants'
 import { AnimationState } from "@/pistols/three/game"
 import { Action } from "@/pistols/utils/pistols"
-import { feltToString } from '@/lib/utils/starknet'
 
 export enum DuelStage {
   Null,             // 0
@@ -19,49 +15,6 @@ export enum DuelStage {
   Round1Animation,  // 3
   //
   Finished,         // 4
-}
-
-export type Hand = {
-  card_fire: PacesCard,
-  card_dodge: PacesCard,
-  card_tactics: TacticsCard,
-  card_blades: BladesCard,
-}
-
-export const movesToHand = (moves: number[]): Hand => {
-  return {
-    card_fire: getPacesCardFromValue(moves[0]),
-    card_dodge: getPacesCardFromValue(moves[1]),
-    card_tactics: getTacticsCardFromValue(moves[2]),
-    card_blades: getBladesCardFromValue(moves[3]),
-  }
-}
-
-export const useRound = (duelId: BigNumberish) => {
-  const { Round } = useDojoComponents()
-  const entityId = useMemo(() => keysToEntity([duelId]), [duelId])
-  const round = useComponentValue(Round, entityId)
-  const state = useMemo(() => (round?.state as unknown as RoundState ?? null), [round])
-  const final_blow = useMemo(() => feltToString(round?.final_blow ?? 0n), [round])
-  const endedInBlades = useMemo(() => (round ? (getBladesCardValue(final_blow as unknown as BladesCard) > 0) : false), [final_blow])
-  
-  const hand_a = useMemo(() => round ? movesToHand(
-    [round.moves_a.card_1,round.moves_a.card_2, round.moves_a.card_3, round.moves_a.card_4]
-  ) : null, [round])
-  const hand_b = useMemo(() => round ? movesToHand(
-    [round.moves_b.card_1, round.moves_b.card_2, round.moves_b.card_3, round.moves_b.card_4]
-  ) : null, [round])
-
-  if (!round) console.log(`!!!!! NULL ROUND:`, duelId, entityId, round, Round)
-  if (!round) return null
-  return {
-    ...round,
-    final_blow,
-    state,
-    hand_a,
-    hand_b,
-    endedInBlades,
-  }
 }
 
 export const useDuel = (duelId: BigNumberish) => {
@@ -78,12 +31,12 @@ export const useDuel = (duelId: BigNumberish) => {
   const { completedStagesA, completedStagesB } = useMemo(() => {
     return {
       completedStagesA: {
-        [DuelStage.Round1Commit]: Boolean(round1?.moves_a.hashed),
-        [DuelStage.Round1Reveal]: Boolean(round1?.moves_a.card_1),
+        [DuelStage.Round1Commit]: Boolean(round1?.moves_a?.hashed),
+        [DuelStage.Round1Reveal]: Boolean(round1?.moves_a?.card_1),
       },
       completedStagesB: {
-        [DuelStage.Round1Commit]: Boolean(round1?.moves_b.hashed),
-        [DuelStage.Round1Reveal]: Boolean(round1?.moves_b.card_1),
+        [DuelStage.Round1Commit]: Boolean(round1?.moves_b?.hashed),
+        [DuelStage.Round1Reveal]: Boolean(round1?.moves_b?.card_1),
       },
     }
     }, [round1])

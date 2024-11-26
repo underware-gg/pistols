@@ -1,4 +1,4 @@
-import { Archetype, BladesCard, ChallengeState, PacesCard, Premise, RoundState } from '@/games/pistols/generated/constants'
+import { Archetype, BladesCard, ChallengeState, getBladesCardFromValue, getPacesCardFromValue, getTacticsCardFromValue, PacesCard, Premise, RoundState, TacticsCard } from '@/games/pistols/generated/constants'
 import { EMOJI } from '@/pistols/data/messages'
 import { SceneName } from '@/pistols/hooks/PistolsContext'
 
@@ -204,4 +204,20 @@ export const MenuLabels: Partial<Record<SceneName, string>> = {
   [SceneName.Duels]: 'The Tables (Live Duels)',
   [SceneName.Graveyard]: 'The Graveyard (Past Duels)',
   [SceneName.Profile]: 'Account & Duelists',
+}
+
+export type Hand = {
+  card_fire: PacesCard,
+  card_dodge: PacesCard,
+  card_tactics: TacticsCard,
+  card_blades: BladesCard,
+}
+
+export const movesToHand = (moves: number[]): Hand => {
+  return {
+    card_fire: getPacesCardFromValue(moves[0]),
+    card_dodge: getPacesCardFromValue(moves[1]),
+    card_tactics: getTacticsCardFromValue(moves[2]),
+    card_blades: getBladesCardFromValue(moves[3]),
+  }
 }

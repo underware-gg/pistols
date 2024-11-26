@@ -513,7 +513,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
               <img className='duelist-card-image-drawing NoMouse NoDrag' src={`/profiles/square/${('00' + profilePic).slice(-2)}.jpg`} alt="Profile Picture" />
               <img className='card-image-front NoMouse NoDrag' src={archetypeImage} alt="Card Front" />
               <div className="duelist-card-details">
-                <div className="duelist-name" data-contentlength={Math.floor(name.length / 10)}>{name}</div>
+                <div className="duelist-name" data-contentlength={name ? Math.floor(name.length / 10) : 31}>{name}</div>
                 <div className="duelist-fame">
                   <FameBalanceDuelist duelistId={props.duelistId} />
                 </div>

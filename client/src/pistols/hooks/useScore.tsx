@@ -3,11 +3,11 @@ import { BigNumberish } from 'starknet'
 import { ComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
-import { stringToFelt, weiToEth, weiToEthString } from '@/lib/utils/starknet'
-import { keysToEntity } from '@/lib/utils/types'
-import { EMOJI } from '@/pistols/data/messages'
+import { useEntityId } from '@/lib/utils/hooks/useEntityId'
+import { stringToFelt } from '@/lib/utils/starknet'
 import { ArchetypeNames } from '@/pistols/utils/pistols'
 import { Archetype, HONOUR } from '@/games/pistols/generated/constants'
+import { EMOJI } from '@/pistols/data/messages'
 
 // hijack Score type from Scoreboard
 function _useScoreType() {
@@ -57,7 +57,7 @@ export function useScore(score: Score | undefined) {
 
 export const useScoreboard = (tableId: string, duelistId: BigNumberish) => {
   const { Scoreboard } = useDojoComponents()
-  const entityId = useMemo(() => keysToEntity([stringToFelt(tableId ?? ''), duelistId]), [tableId, duelistId])
+  const entityId = useEntityId([stringToFelt(tableId ?? ''), duelistId])
   const scoreboard = useComponentValue(Scoreboard, entityId)
 
   const score = useScore(scoreboard?.score)

@@ -6,7 +6,8 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
-import { ChallengeState, Premise } from '@/games/pistols/generated/constants'
+import { BladesCard, ChallengeState, getBladesCardValue, Premise, RoundState } from '@/games/pistols/generated/constants'
+import { movesToHand } from '@/pistols/utils/pistols'
 
 //
 // Stores all challenges from current table
@@ -100,5 +101,50 @@ export const useChallenge = (duelId: BigNumberish) => {
     // times
     timestamp_start,
     timestamp_end,
+  }
+}
+
+export const useRound = (duelId: BigNumberish) => {
+  const entityId = useEntityId([duelId])
+  const entities = useChallengeStore((state) => state.entities);
+  const entity = useMemo(() => entities[entityId], [entities[entityId]])
+
+  const round = useEntityModel<models.Round>(entity, 'Round')
+
+  const state = useMemo(() => (round?.state as unknown as RoundState ?? null), [round])
+  const final_blow = useMemo(() => feltToString(round?.final_blow ?? 0n), [round])
+  const endedInBlades = useMemo(() => (round ? (getBladesCardValue(final_blow as unknown as BladesCard) > 0) : false), [final_blow])
+
+  const hand_a = useMemo(() => round ? movesToHand(
+    [round.moves_a.card_1, round.moves_a.card_2, round.moves_a.card_3, round.moves_a.card_4]
+  ) : null, [round])
+  const hand_b = useMemo(() => round ? movesToHand(
+    [round.moves_b.card_1, round.moves_b.card_2, round.moves_b.card_3, round.moves_b.card_4]
+  ) : null, [round])
+
+  const _moves = (moves: models.Moves) => {
+    return moves ? {
+      ...moves,
+      seed: BigInt(moves.seed),
+      salt: BigInt(moves.salt),
+      hashed: BigInt(moves.hashed),
+    } : null
+  }
+
+  const moves_a = useMemo(() => _moves(round?.moves_a), [round])
+  const moves_b = useMemo(() => _moves(round?.moves_b), [round])
+  const state_a = useMemo(() => (round?.state_a), [round])
+  const state_b = useMemo(() => (round?.state_b), [round])
+
+  return {
+    state,
+    final_blow,
+    endedInBlades,
+    hand_a,
+    hand_b,
+    moves_a,
+    moves_b,
+    state_a,
+    state_b,
   }
 }
