@@ -117,25 +117,39 @@ export const useRound = (duelId: BigNumberish) => {
   const endedInBlades = useMemo(() => (round ? (getBladesCardValue(final_blow as unknown as BladesCard) > 0) : false), [final_blow])
 
   const hand_a = useMemo(() => round ? movesToHand(
+    //@ts-ignore
     [round.moves_a.card_1, round.moves_a.card_2, round.moves_a.card_3, round.moves_a.card_4]
   ) : null, [round])
   const hand_b = useMemo(() => round ? movesToHand(
+    //@ts-ignore
     [round.moves_b.card_1, round.moves_b.card_2, round.moves_b.card_3, round.moves_b.card_4]
   ) : null, [round])
 
   const _moves = (moves: models.Moves) => {
     return moves ? {
-      ...moves,
+      card_1: Number(moves.card_1),
+      card_2: Number(moves.card_2),
+      card_3: Number(moves.card_3),
+      card_4: Number(moves.card_4),
       seed: BigInt(moves.seed),
       salt: BigInt(moves.salt),
       hashed: BigInt(moves.hashed),
     } : null
   }
+  const _state = (state: models.DuelistState) => {
+    return state ? {
+      chances: Number(state.chances),
+      damage: Number(state.damage),
+      health: Number(state.health),
+      dice_fire: Number(state.dice_fire),
+      honour: Number(state.honour),
+    } : null
+  }
 
   const moves_a = useMemo(() => _moves(round?.moves_a), [round])
   const moves_b = useMemo(() => _moves(round?.moves_b), [round])
-  const state_a = useMemo(() => (round?.state_a), [round])
-  const state_b = useMemo(() => (round?.state_b), [round])
+  const state_a = useMemo(() => _state(round?.state_a), [round])
+  const state_b = useMemo(() => _state(round?.state_b), [round])
 
   return {
     state,

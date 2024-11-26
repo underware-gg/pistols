@@ -43,9 +43,9 @@ export const useSdkGetEntities = <T,>({
   const fetchEntities = useCallback( async () => {
     try {
       setIsLoading(true)
-      await sdk.getEntities(
+      await sdk.getEntities({
         query,
-        (resp) => {
+        callback: (resp) => {
           if (resp.error) {
             setEntities(undefined);
             console.error("useSdkGetEntities() error:", resp.error.message);
@@ -61,8 +61,8 @@ export const useSdkGetEntities = <T,>({
         },
         limit,
         offset,
-        { logging }
-      );
+        options: { logging },
+      });
     } catch (error) {
       console.error("useSdkGetEntities() exception:", error);
     } finally {

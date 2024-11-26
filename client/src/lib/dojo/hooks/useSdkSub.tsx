@@ -40,9 +40,9 @@ export const useSdkSubscribeEntities = <T,>({
   //
   useEffect(() => {
     const _get = async () => {
-      await sdk.getEntities(
-        query,
-        (response) => {
+      await sdk.getEntities({
+        query: query as PistolsQuery,
+        callback: (response) => {
           if (response.error) {
             console.error("useSdkSubscribeEntities().getEntities() error:", response.error)
           } else if (response.data) {
@@ -50,7 +50,7 @@ export const useSdkSubscribeEntities = <T,>({
             set?.(response.data);
           }
         },
-      );
+      });
     };
     _get();
   }, [sdk, query]);
@@ -62,9 +62,9 @@ export const useSdkSubscribeEntities = <T,>({
     let unsubscribe: (() => void) | undefined;
 
     const _subscribe = async () => {
-      const subscription = await sdk.subscribeEntityQuery(
-        query,
-        (response) => {
+      const subscription = await sdk.subscribeEntityQuery({
+        query: query as PistolsSubQuery,
+        callback: (response) => {
           if (response.error) {
             console.error("useSdkSubscribeEntities().subscribeEntityQuery() error:", response.error)
           } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {
@@ -72,8 +72,8 @@ export const useSdkSubscribeEntities = <T,>({
             update?.(response.data[0]);
           }
         },
-        { logging }
-      );
+        options: { logging },
+      });
       setIsSubscribed(true)
       unsubscribe = () => subscription.cancel();
     };
