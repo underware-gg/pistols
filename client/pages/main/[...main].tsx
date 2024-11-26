@@ -21,6 +21,7 @@ import ScDuelists from '@/pistols/components/scenes/ScDuelists'
 import ScGraveyard from '@/pistols/components/scenes/ScGraveyard'
 import { QueryProvider } from '@/pistols/hooks/QueryContext'
 import { ChallengeStoreSync } from '@/pistols/stores/challengeStore'
+import { ChallengeQueryStoreSync } from '@/pistols/stores/challengeQueryStore'
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {
@@ -45,6 +46,7 @@ export default function MainPage() {
         {isInitialized &&
           <QueryProvider>
             <ChallengeStoreSync />
+            <ChallengeQueryStoreSync />
             <GameContainer isVisible={true} />
             <MainUI />
             {overlay}

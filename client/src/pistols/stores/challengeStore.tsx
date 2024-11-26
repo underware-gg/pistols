@@ -23,10 +23,8 @@ export function ChallengeStoreSync() {
       Challenge: {
         $: {
           where: {
-            table_id: {
-              //@ts-ignore
-              $eq: addAddressPadding(stringToFelt(tableId)),
-            },
+            //@ts-ignore
+            table_id: { $eq: addAddressPadding(stringToFelt(tableId)) },
           },
         },
       },
@@ -34,16 +32,14 @@ export function ChallengeStoreSync() {
   }), [tableId])
 
   const state = useChallengeEntityStore((state) => state)
+  
   useSdkSubscribeEntities({
     query,
     set: state.setEntities,
     update: state.updateEntity,
   })
 
-  const entities = useChallengeEntityStore((state) => state.entities)
-  useEffect(() => {
-    console.log("ChallengeStoreSync() =>", entities);
-  }, [entities])
+  // useEffect(() => console.log("ChallengeStoreSync() =>", state.entities), [state.entities])
 
   return (<></>)
 }

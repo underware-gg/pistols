@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ParsedEntity, SubscriptionQueryType } from '@dojoengine/sdk'
+import { ParsedEntity, SubscriptionQueryType, QueryType } from '@dojoengine/sdk'
 import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { isPositiveBigint } from '@/lib/utils/types'
 import * as models from '@/games/pistols/generated/typescript/models.gen'
 
+type PistolsQuery = QueryType<PistolsSchemaType>
 type PistolsSubQuery = SubscriptionQueryType<PistolsSchemaType>
 type PistolsEntity = ParsedEntity<PistolsSchemaType>
 export type {
   PistolsSchemaType,
+  PistolsQuery,
   PistolsSubQuery,
   PistolsEntity,
   models,
@@ -20,7 +22,7 @@ export type UseSdkSubEntitiesResult = {
 }
 
 export type UseSdkSubEntitiesProps = {
-  query: PistolsSubQuery
+  query: PistolsSubQuery | PistolsQuery
   set: (entities: PistolsEntity[]) => void
   update: (entities: PistolsEntity) => void
   logging?: boolean
