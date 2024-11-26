@@ -35,8 +35,8 @@ export function ChallengeStoreSync() {
   
   useSdkSubscribeEntities({
     query,
-    set: state.setEntities,
-    update: state.updateEntity,
+    setEntities: state.setEntities,
+    updateEntity: state.updateEntity,
   })
 
   // useEffect(() => console.log("ChallengeStoreSync() =>", state.entities), [state.entities])

@@ -23,15 +23,15 @@ export type UseSdkSubEntitiesResult = {
 
 export type UseSdkSubEntitiesProps = {
   query: PistolsSubQuery | PistolsQuery
-  set: (entities: PistolsEntity[]) => void
-  update: (entities: PistolsEntity) => void
+  setEntities: (entities: PistolsEntity[]) => void
+  updateEntity?: (entities: PistolsEntity) => void // if absent, do not subscribe for updates
   logging?: boolean
 }
 
 export const useSdkSubscribeEntities = <T,>({
   query,
-  set,
-  update,
+  setEntities,
+  updateEntity,
   logging = false,
 }: UseSdkSubEntitiesProps): UseSdkSubEntitiesResult => {
   const { sdk } = useDojoSetup()
@@ -49,13 +49,13 @@ export const useSdkSubscribeEntities = <T,>({
             console.error("useSdkSubscribeEntities().getEntities() error:", response.error)
           } else if (response.data) {
             // console.log("useSdkSubscribeEntities() GOT:", response.data);
-            set?.(response.data);
+            setEntities(response.data);
           }
         },
-      });
-    };
-    _get();
-  }, [sdk, query]);
+      })
+    }
+    _get()
+  }, [sdk, query])
 
   //----------------------
   // subscribe for updates
@@ -71,25 +71,27 @@ export const useSdkSubscribeEntities = <T,>({
             console.error("useSdkSubscribeEntities().subscribeEntityQuery() error:", response.error)
           } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {
             // console.log("useSdkSubscribeEntities() SUB:", response.data[0]);
-            update?.(response.data[0]);
+            updateEntity(response.data[0]);
           }
         },
         options: { logging },
-      });
+      })
       setIsSubscribed(true)
-      unsubscribe = () => subscription.cancel();
+      unsubscribe = () => subscription.cancel()
     };
 
     setIsSubscribed(true)
-    _subscribe();
+    if (updateEntity) {
+      _subscribe()
+    }
 
     return () => {
       setIsSubscribed(false)
       if (unsubscribe) {
-        unsubscribe();
+        unsubscribe()
       }
-    };
-  }, [sdk, query]);
+    }
+  }, [sdk, query, logging, updateEntity])
 
   return {
     isSubscribed,

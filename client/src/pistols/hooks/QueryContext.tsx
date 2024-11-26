@@ -1,5 +1,4 @@
 import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect } from 'react'
-import { BigNumberish } from 'starknet'
 import { Entity, getComponentValue, Has } from '@dojoengine/recs'
 import { useAccount } from '@starknet-react/core'
 import { useEntityQuery } from '@dojoengine/react'
@@ -8,10 +7,9 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
-import { arrayUnique, bigintEquals, bigintToEntity, keysToEntity } from '@/lib/utils/types'
+import { keysToEntity } from '@/lib/utils/types'
 import { ChallengeState } from '@/games/pistols/generated/constants'
 import { AllChallengeStates } from '@/pistols/utils/pistols'
-import { useFameBalanceDuelist } from './useFame'
 
 export type DuelistRow = {
   entity: Entity
@@ -38,14 +36,6 @@ export type ChallengeRow = {
   isFinished: boolean
   isCanceled: boolean
 }
-
-const emptyChallengeQuery = {
-  rows: [] as ChallengeRow[],
-  challengeIds: [] as bigint[],
-  states: [] as ChallengeState[],
-  liveCount: 0,
-}
-export type ChallengeQuery = typeof emptyChallengeQuery
 
 export enum DuelistColumn {
   Name = 'Name',
@@ -92,9 +82,6 @@ export const initialState = {
   filterShowAllDuels: false,
   // queries
   queryDuelists: [] as DuelistRow[],
-  queryLiveDuels: emptyChallengeQuery,
-  queryPastDuels: emptyChallengeQuery,
-  querySelectedDuelistDuels: emptyChallengeQuery,
 }
 
 enum QueryActions {
@@ -112,9 +99,6 @@ enum QueryActions {
   FILTER_STATE_DUELIST_DUELS = 'FILTER_STATE_DUELIST_DUELS',
   FILTER_SHOW_ONLY_YOUR_DUELS = 'FILTER_SHOW_ONLY_YOUR_DUELS',
   QUERY_DUELISTS = 'QUERY_DUELISTS',
-  QUERY_LIVE_DUELS = 'QUERY_LIVE_DUELS',
-  QUERY_PAST_DUELS = 'QUERY_PAST_DUELS',
-  QUERY_DUELIST_DUELS = 'QUERY_DUELIST_DUELS',
 }
 
 
@@ -138,9 +122,6 @@ type ActionType =
   | { type: 'FILTER_STATE_DUELIST_DUELS', payload: ChallengeState[] }
   | { type: 'FILTER_SHOW_ONLY_YOUR_DUELS', payload: boolean }
   | { type: 'QUERY_DUELISTS', payload: DuelistRow[] }
-  | { type: 'QUERY_LIVE_DUELS', payload: ChallengeQuery }
-  | { type: 'QUERY_PAST_DUELS', payload: ChallengeQuery }
-  | { type: 'QUERY_DUELIST_DUELS', payload: ChallengeQuery }
 
 
 
@@ -229,18 +210,6 @@ const QueryProvider = ({
         newState.queryDuelists = action.payload as DuelistRow[]
         break
       }
-      case QueryActions.QUERY_LIVE_DUELS: {
-        newState.queryLiveDuels = action.payload as ChallengeQuery
-        break
-      }
-      case QueryActions.QUERY_PAST_DUELS: {
-        newState.queryPastDuels = action.payload as ChallengeQuery
-        break
-      }
-      case QueryActions.QUERY_DUELIST_DUELS: {
-        newState.querySelectedDuelistDuels = action.payload as ChallengeQuery
-        break
-      }
       default:
         console.warn(`QueryProvider: Unknown action [${action.type}]`)
         return state
@@ -253,7 +222,6 @@ const QueryProvider = ({
   // Base data
   //
   const duelistEntities: Entity[] = useEntityQuery([Has(Duelist)]) ?? []
-  const challengeEntities: Entity[] = useEntityQuery([Has(Challenge)]) ?? []
   const tableIdAsFelt = useMemo(() => stringToFelt(tableId ?? ''), [tableId])
 
   const allDuelists: DuelistRow[] = useMemo(() =>
@@ -281,34 +249,8 @@ const QueryProvider = ({
       return acc
     }, [] as DuelistRow[]), [duelistEntities, tableId, tableIdAsFelt, state.filterDuelistTable])
 
-  const allChallenges: ChallengeRow[] = useMemo(() =>
-    challengeEntities.reduce((acc, entity) => {
-      const challenge = getComponentValue(Challenge, entity)
-      const duelistA = getComponentValue(Duelist, bigintToEntity(challenge.duelist_id_a))
-      const duelistB = getComponentValue(Duelist, bigintToEntity(challenge.duelist_id_b))
-      if (tableId && bigintEquals(challenge.table_id, tableIdAsFelt)) {
-        const duel_id = challenge.duel_id
-        const state = challenge.state as unknown as ChallengeState
-        const timestamp = Number(challenge.timestamp_end ? challenge.timestamp_end : challenge.timestamp_start)
-        acc.push({
-          entity,
-          duel_id,
-          challenge,
-          // filters
-          duelist_a_name: feltToString(duelistA.name).toLowerCase(),
-          duelist_b_name: feltToString(duelistB.name).toLowerCase(),
-          state,
-          timestamp,
-          isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
-          isFinished: (state == ChallengeState.Resolved || state == ChallengeState.Draw),
-          isCanceled: (state == ChallengeState.Withdrawn || state == ChallengeState.Refused),
-        })
-      }
-      return acc
-    }, [] as ChallengeRow[]), [challengeEntities, tableId, tableIdAsFelt])
 
   useEffect(() => dispatch({ type: QueryActions.SET_DUELISTS, payload: allDuelists }), [allDuelists])
-  useEffect(() => dispatch({ type: QueryActions.SET_CHALLENGES, payload: allChallenges }), [allChallenges])
 
   function _reduceRowsExcludes<T>(rows: T[], excludes: Set<number>): T[] {
     return rows.reduce((acc, row, index) => {
@@ -377,104 +319,6 @@ const QueryProvider = ({
     state.filterDuelistSortDirection,
   ])
 
-
-  
-  //====================================
-  // Challenge Queries
-  //
-
-  const _buildChallengeQuery = (allRows: ChallengeRow[], excludes: Set<number>, statesFilter: ChallengeState[]): ChallengeQuery => {
-    // all rows without state filter
-    let rows = _reduceRowsExcludes(allRows, excludes)
-    const states = arrayUnique(rows.map(row => row.state))
-    // filter by state
-    let hides = new Set<number>()
-    rows.forEach((row, index) => {
-      if (!statesFilter.includes(row.state)) hides.add(index)
-    })
-    rows = _reduceRowsExcludes(rows, hides)
-    // filter by duelist names
-    if (state.filterDuelistName) {
-      const nameFilter = state.filterDuelistName.toLowerCase()
-      hides = new Set<number>()
-      rows.forEach((row, index) => {
-        const nameA = row.duelist_a_name || ''
-        const nameB = row.duelist_b_name || ''
-        console.log(nameA, nameB, nameFilter)
-        if (!nameA.includes(nameFilter) && !nameB.includes(nameFilter)) {
-          hides.add(index)
-        }
-      })
-      rows = _reduceRowsExcludes(rows, hides)
-    }
-    // sort challenges
-    const isAscending = (state.filterChallengeSortDirection == SortDirection.Ascending)
-    rows = rows.sort((rowA, rowB) => {
-      if (state.filterChallengeSortColumn == ChallengeColumn.Time) {
-        return isAscending ? rowA.timestamp - rowB.timestamp : rowB.timestamp - rowA.timestamp
-      }
-      if (state.filterChallengeSortColumn == ChallengeColumn.Status) {
-        return isAscending ? 
-          Object.values(ChallengeState).indexOf(rowA.state) - Object.values(ChallengeState).indexOf(rowB.state) :
-          Object.values(ChallengeState).indexOf(rowB.state) - Object.values(ChallengeState).indexOf(rowA.state)
-      }
-      return 0
-    })
-    // compute totals
-    const challengeIds = rows.map(row => row.duel_id)
-    const liveCount = rows.reduce((acc, row) => {
-      if (row.isLive) acc++
-      return acc
-    }, 0)
-    return {
-      rows,
-      challengeIds,
-      liveCount,
-      states,
-    }
-  }
-
-  function _excludeRowsByDuelist(rows: ChallengeRow[], address: BigNumberish, duelist_id: BigNumberish): Set<number> {
-    let excludes = new Set<number>()
-    if (!state.filterShowAllDuels) {
-      rows.map((row, index) => {
-        const check = (
-          (duelist_id && bigintEquals(duelist_id, row.challenge.duelist_id_a)) ||
-          (duelist_id && bigintEquals(duelist_id, row.challenge.duelist_id_b)) ||
-          (address && bigintEquals(address, row.challenge.address_b) && row.state == ChallengeState.Awaiting)
-        )
-        if (!check) excludes.add(index)
-      })
-    }
-    return excludes
-  }
-
-  // Live Duels
-  useEffect(() => {
-    let excludes = _excludeRowsByDuelist(allChallenges, address, duelistId)
-    allChallenges.forEach((row, index) => {
-      if (!row.isLive) excludes.add(index)
-    })
-    const result = _buildChallengeQuery(allChallenges, excludes, state.filterStatesLiveDuels)
-    dispatch({ type: QueryActions.QUERY_LIVE_DUELS, payload: result })
-  }, [allChallenges, address, duelistId, state.filterStatesLiveDuels, state.filterChallengeSortColumn, state.filterChallengeSortDirection, state.filterDuelistName, state.filterShowAllDuels])
-
-  // Past Duels
-  useEffect(() => {
-    let excludes = _excludeRowsByDuelist(allChallenges, address, duelistId)
-    allChallenges.forEach((row, index) => {
-      if (row.isLive) excludes.add(index)
-    })
-    const result = _buildChallengeQuery(allChallenges, excludes, state.filterStatesPastDuels)
-    dispatch({ type: QueryActions.QUERY_PAST_DUELS, payload: result })
-  }, [allChallenges, address, duelistId, state.filterStatesPastDuels, state.filterChallengeSortColumn, state.filterChallengeSortDirection, state.filterDuelistName, state.filterShowAllDuels])
-
-  // Selected Duelist Duels
-  useEffect(() => {
-    let excludes = _excludeRowsByDuelist(allChallenges, undefined, selectedDuelistId)
-    const result = _buildChallengeQuery(allChallenges, excludes, state.filterStatesDuelistDuels)
-    dispatch({ type: QueryActions.QUERY_DUELIST_DUELS, payload: result })
-  }, [allChallenges, selectedDuelistId, state.filterStatesDuelistDuels, state.filterChallengeSortColumn, state.filterChallengeSortDirection, state.filterDuelistName])
 
   //
   // Finito

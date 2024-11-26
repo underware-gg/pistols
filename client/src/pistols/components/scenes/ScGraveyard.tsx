@@ -2,18 +2,24 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
 import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
+import { useChallengeQueryIds } from '@/pistols/stores/challengeQueryStore'
 import useGameAspect from '@/pistols/hooks/useGameApect'
-import { DuelPoster, DuelPosterHandle } from '../DuelPoster'
-import DuelistModal from '../modals/DuelistModal'
-import ChallengeModal from '../modals/ChallengeModal'
-import NewChallengeModal from '../modals/NewChallengeModal'
+import { DuelPoster, DuelPosterHandle } from '@/pistols/components/DuelPoster'
+import { PosterGrid, PosterGridHandle } from '@/pistols/components/PosterGrid'
 import { InteractibleScene } from '@/pistols/three/InteractibleScene'
 import { _currentScene } from '@/pistols/three/game'
-import { PosterGrid, PosterGridHandle } from '../PosterGrid'
+import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
+import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
+import DuelistModal from '@/pistols/components/modals/DuelistModal'
+
 
 export default function ScGraveyard() {
-  const { queryPastDuels: { challengeIds } } = useQueryContext()
+  const { duelistId } = useSettings()
+  const { filterStatesPastDuels, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryContext()
+  const { challengeIds } = useChallengeQueryIds(filterStatesPastDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectDuel } = usePistolsContext()
