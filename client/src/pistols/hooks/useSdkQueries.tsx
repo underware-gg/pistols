@@ -4,6 +4,7 @@ import { useSdkGetEntity, PistolsGetQuery, useSdkGetEntities, EntityResult } fro
 import { isPositiveBigint } from '@/lib/utils/types'
 import { CONFIG, CONST } from '@/games/pistols/generated/constants'
 import * as models from '@/games/pistols/generated/typescript/models.gen'
+import { stringToFelt } from '@/lib/utils/starknet'
 
 export type { PistolsGetQuery }
 
@@ -111,6 +112,24 @@ export const useGetChallengesByDuelistQuery = (duelist_id: BigNumberish) => {
   const { entities, isLoading, refetch } = useSdkGetEntities({ query })
   const challenges = useMemo(() => _filterEntitiesByModel<models.Challenge>(entities, 'Challenge'), [entities])
   useEffect(() => console.log(`useGetChallengesByDuelistQuery()`, challenges), [challenges])
+  return { challenges, isLoading, refetch }
+}
+
+export const useGetChallengesByTableQuery = (tableId: string) => {
+  const query = useMemo<PistolsGetQuery>(() => ({
+    pistols: {
+      Challenge: {
+        $: {
+          where: {
+            table_id: { $eq: addAddressPadding(stringToFelt(tableId)) },
+          },
+        },
+      },
+    },
+  }), [tableId])
+  const { entities, isLoading, refetch } = useSdkGetEntities({ query })
+  const challenges = useMemo(() => _filterEntitiesByModel<models.Challenge>(entities, 'Challenge'), [entities])
+  useEffect(() => console.log(`useGetChallengesByTableQuery()`, challenges), [challenges])
   return { challenges, isLoading, refetch }
 }
 

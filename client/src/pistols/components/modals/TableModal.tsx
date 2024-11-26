@@ -3,9 +3,8 @@ import { Grid, Modal, Dropdown, ButtonGroup, Button } from 'semantic-ui-react'
 import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useActiveDuelistIds } from '@/pistols/hooks/useChallenge'
-import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
 import { useTable, useTableTotals } from '@/pistols/hooks/useTable'
+import { useGetChallengesByTableQuery } from '@/pistols/hooks/useSdkQueries'
 import { Balance } from '@/pistols/components/account/Balance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { RowDivider } from '@/lib/ui/Stack'
@@ -13,6 +12,8 @@ import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { getObjectKeyByValue } from '@/lib/utils/types'
 import { TABLES } from '@/games/pistols/generated/constants'
+import { Challenge } from '@/games/pistols/generated/typescript/models.gen'
+import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -119,8 +120,16 @@ function TableDescription({
     tableIsOpen,
     tableType,
   } = useTable(tableId)
-  const { activeDuelistIdsCount } = useActiveDuelistIds(tableId)
   const { liveDuelsCount, pastDuelsCount } = useTableTotals(tableId)
+  const { challenges } = useGetChallengesByTableQuery(tableId)
+  const activeDuelistIds = useMemo(() => (
+    challenges.reduce((acc: BigNumberish[], ch: Challenge) => {
+      if (!acc.includes(ch.duelist_id_a)) acc.push(ch.duelist_id_a)
+      if (!acc.includes(ch.duelist_id_b)) acc.push(ch.duelist_id_b)
+      return acc
+    }, [] as BigNumberish[])
+  ), [challenges])
+
 
   return (
     <Grid className='H5'>
@@ -162,7 +171,7 @@ function TableDescription({
           Active Duelists:
         </Col>
         <Col width={8} className='Coin PaddedLeft Bold'>
-          {activeDuelistIdsCount}
+          {activeDuelistIds.length}
         </Col>
       </Row>
 

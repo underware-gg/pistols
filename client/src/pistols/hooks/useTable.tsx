@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import { getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
+import { useGetChallengesByTableQuery } from './useSdkQueries'
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
-import { useAllChallengeIds } from '@/pistols/hooks/useChallenge'
 import { LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
 import { TableType, ChallengeState } from '@/games/pistols/generated/constants'
 
@@ -34,16 +34,16 @@ export const useTable = (tableId: string) => {
 }
 
 export const useTableTotals = (tableId: string) => {
-  const { challengeIds: allChallengeIds } = useAllChallengeIds(tableId)
+  const { challenges } = useGetChallengesByTableQuery(tableId)
   const { Challenge } = useDojoComponents()
   const result = useMemo(() => {
-    const liveDuelsCount = allChallengeIds.reduce((acc: number, id: bigint) => {
-      const state = (getComponentValue(Challenge, bigintToEntity(id))?.state as unknown as ChallengeState) ?? ChallengeState.Null
+    const liveDuelsCount = challenges.reduce((acc: number, ch: any) => {
+      const state = (getComponentValue(Challenge, bigintToEntity(ch.duel_id))?.state as unknown as ChallengeState) ?? ChallengeState.Null
       if (LiveChallengeStates.includes(state)) acc++
       return acc
     }, 0)
-    const pastDuelsCount = allChallengeIds.reduce((acc: number, id: bigint) => {
-      const state = (getComponentValue(Challenge, bigintToEntity(id))?.state as unknown as ChallengeState) ?? ChallengeState.Null
+    const pastDuelsCount = challenges.reduce((acc: number, ch: any) => {
+      const state = (getComponentValue(Challenge, bigintToEntity(ch.duel_id))?.state as unknown as ChallengeState) ?? ChallengeState.Null
       if (PastChallengeStates.includes(state)) acc++
       return acc
     }, 0)
@@ -52,7 +52,7 @@ export const useTableTotals = (tableId: string) => {
       liveDuelsCount,
       pastDuelsCount
     }
-  }, [allChallengeIds])
+  }, [challenges])
 
   return {
     ...result
