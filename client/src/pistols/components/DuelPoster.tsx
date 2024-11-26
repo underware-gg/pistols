@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState, useMemo } from 'react'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useChallengeDescription } from '@/pistols/hooks/useChallengeDescription'
-import { useChallenge } from '@/pistols/stores/ChallengeStore'
+import { useChallenge } from '@/pistols/stores/challengeStore'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import { DUEL_CARD_WIDTH, DUEL_CARD_HEIGHT } from '@/pistols/data/cardConstants'

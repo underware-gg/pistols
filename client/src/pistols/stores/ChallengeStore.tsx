@@ -11,7 +11,7 @@ import { movesToHand } from '@/pistols/utils/pistols'
 
 //
 // Stores all challenges from current table
-export const useChallengeStore = createDojoStore<PistolsSchemaType>();
+export const useChallengeEntityStore = createDojoStore<PistolsSchemaType>();
 
 //
 // Sync all challenges from current table
@@ -32,14 +32,14 @@ export function ChallengeStoreSync() {
     },
   }), [tableId])
 
-  const state = useChallengeStore((state) => state)
+  const state = useChallengeEntityStore((state) => state)
   useSdkSubscribeEntities({
     query,
     set: state.setEntities,
     update: state.updateEntity,
   })
 
-  const entities = useChallengeStore((state) => state.entities)
+  const entities = useChallengeEntityStore((state) => state.entities)
   useEffect(() => {
     console.log("ChallengeStoreSync() =>", entities);
   }, [entities])
@@ -50,7 +50,7 @@ export function ChallengeStoreSync() {
 
 export const useChallenge = (duelId: BigNumberish) => {
   const entityId = useEntityId([duelId])
-  const entities = useChallengeStore((state) => state.entities);
+  const entities = useChallengeEntityStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const challenge = useEntityModel<models.Challenge>(entity, 'Challenge')
@@ -106,7 +106,7 @@ export const useChallenge = (duelId: BigNumberish) => {
 
 export const useRound = (duelId: BigNumberish) => {
   const entityId = useEntityId([duelId])
-  const entities = useChallengeStore((state) => state.entities);
+  const entities = useChallengeEntityStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const round = useEntityModel<models.Round>(entity, 'Round')

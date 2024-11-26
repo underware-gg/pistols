@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
-import { useChallenge, useRound } from '@/pistols/stores/ChallengeStore'
+import { useChallenge, useRound } from '@/pistols/stores/challengeStore'
 import { CONST, getPacesCardFromValue, getRoundStateValue } from '@/games/pistols/generated/constants'
 import { AnimationState } from "@/pistols/three/game"
 import { Action } from "@/pistols/utils/pistols"

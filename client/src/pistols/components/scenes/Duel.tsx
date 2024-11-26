@@ -10,7 +10,7 @@ import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useChallengeDescription } from '@/pistols/hooks/useChallengeDescription'
-import { useChallenge } from '@/pistols/stores/ChallengeStore';
+import { useChallenge } from '@/pistols/stores/challengeStore';
 import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { useDuelist } from '@/pistols/hooks/useDuelist'
 import { useTable } from '@/pistols/hooks/useTable'

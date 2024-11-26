@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useContractCall } from '@/lib/utils/hooks/useContractCall'
-import { useChallenge } from '@/pistols/stores/ChallengeStore'
+import { useChallenge } from '@/pistols/stores/challengeStore'
 import { isBigint, isPositiveBigint } from '@/lib/utils/types'
 import { DuelProgress } from '@/games/pistols/duel_progress'
 

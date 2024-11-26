@@ -20,7 +20,7 @@ import ScDuels from '@/pistols/components/scenes/ScDuels'
 import ScDuelists from '@/pistols/components/scenes/ScDuelists'
 import ScGraveyard from '@/pistols/components/scenes/ScGraveyard'
 import { QueryProvider } from '@/pistols/hooks/QueryContext'
-import { ChallengeStoreSync } from '@/pistols/stores/ChallengeStore'
+import { ChallengeStoreSync } from '@/pistols/stores/challengeStore'
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {

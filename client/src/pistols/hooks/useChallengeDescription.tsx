@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useDuelist } from "@/pistols/hooks/useDuelist"
 import { ChallengeStateDescriptions } from "@/pistols/utils/pistols"
-import { useChallenge } from '@/pistols/stores/ChallengeStore'
+import { useChallenge } from '@/pistols/stores/challengeStore'
 
 export const useChallengeDescription = (duelId: bigint) => {
   const { state, duelistIdA, duelistIdB, winnerDuelistId } = useChallenge(duelId)
