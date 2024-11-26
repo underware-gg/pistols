@@ -15,6 +15,7 @@ export const useChallengeEntityStore = createDojoStore<PistolsSchemaType>();
 
 //
 // Sync all challenges from current table
+// Add only once to a top level component
 export function ChallengeStoreSync() {
   const { tableId } = useSettings()
   const query = useMemo<PistolsSubQuery>(() => ({
