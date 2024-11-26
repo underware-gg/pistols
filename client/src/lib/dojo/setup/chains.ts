@@ -191,7 +191,7 @@ const snSepoliaConfig: DojoChainConfig = {
   // rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/v0_6',
   // rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
-  toriiUrl: 'https://api.cartridge.gg/x/pistols-sepolia-2/torii',
+  toriiUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii',
   relayUrl: undefined,
   masterAddress: undefined,
   masterPrivateKey: undefined,
