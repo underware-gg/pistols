@@ -1,6 +1,6 @@
 import React from 'react'
 import { Grid } from 'semantic-ui-react'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDuelist } from '@/pistols/stores/duelistStore'
 import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { EMOJI } from '@/pistols/data/messages'

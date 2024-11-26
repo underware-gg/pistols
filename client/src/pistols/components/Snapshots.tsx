@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
-import { useAllDuelistKeys, useDuelist } from '@/pistols/hooks/useDuelist'
 import { useAllChallengeIds } from '@/pistols/hooks/useChallenge'
 import { useChallenge } from '@/pistols/stores/challengeStore'
+import { useDuelist, useAllDuelistsEntityIds, DuelistStoreSync } from '@/pistols/stores/duelistStore'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { CopyIcon } from '@/lib/ui/Icons'
@@ -28,6 +28,8 @@ export function Snapshots() {
 
   return (
     <Container text>
+      <DuelistStoreSync />
+      
       <Grid>
         <Row columns={'equal'}>
           <Col>
@@ -55,11 +57,11 @@ export function Snapshots() {
 function SnapshotDuelists({
   update,
 }) {
-  const { duelistKeys, duelistKeysCount } = useAllDuelistKeys()
+  const { entityIds } = useAllDuelistsEntityIds()
   const [duelists, setDuelists] = useState([])
 
   const [snapping, setSnapping] = useState(false)
-  const canSnap = (duelistKeysCount > 0 && (!snapping || duelists.length == duelistKeys.length))
+  const canSnap = (entityIds.length > 0 && (!snapping || duelists.length == entityIds.length))
 
   useEffect(() => {
     if(snapping) {
@@ -73,13 +75,13 @@ function SnapshotDuelists({
 
   const loaders = useMemo(() => {
     let result = []
-    if (snapping && duelists.length < duelistKeys.length) {
-      const duelistId = duelistKeys[duelists.length]
+    if (snapping && duelists.length < entityIds.length) {
+      const duelistId = entityIds[duelists.length]
       // console.log(`...loaders`, duelists.length, address.toString(16))
       result.push(<SnapDuelist key={bigintToHex(duelistId)} duelistId={duelistId} update={_update} />)
     }
     return result
-  }, [snapping, duelistKeys, duelists])
+  }, [snapping, entityIds, duelists])
 
   const _start = () => {
     setSnapping(true)
@@ -89,7 +91,7 @@ function SnapshotDuelists({
   return (
     <>
       <Button className='FillParent' disabled={!canSnap} onClick={() => _start()}>
-        Duelists Snapshot ({duelistKeysCount > 0 ? `${duelists.length}/${duelistKeysCount}` : '...'})
+        Duelists Snapshot ({entityIds.length > 0 ? `${duelists.length}/${entityIds.length}` : '...'})
       </Button>
       {loaders}
     </>

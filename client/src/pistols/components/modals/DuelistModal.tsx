@@ -5,7 +5,7 @@ import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/P
 import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
 import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
 import { useGetDuelistByIdQuery } from '@/pistols/hooks/useSdkQueries'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDuelist } from '@/pistols/stores/duelistStore'
 import { usePact } from '@/pistols/hooks/usePact'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'

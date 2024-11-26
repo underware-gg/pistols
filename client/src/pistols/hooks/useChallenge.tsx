@@ -1,18 +1,11 @@
 import { useMemo } from 'react'
-import { BigNumberish } from 'starknet'
-import { HasValue, getComponentValue, Component } from '@dojoengine/recs'
+import { getComponentValue, Component } from '@dojoengine/recs'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
-import { useComponentValue } from "@dojoengine/react"
-import { useEntityKeys, useEntityKeysQuery } from '@/lib/dojo/hooks/useEntityKeys'
-import { useClientTimestamp } from "@/lib/utils/hooks/useTimestamp"
-import { useDuelist } from "@/pistols/hooks/useDuelist"
+import { useEntityKeys } from '@/lib/dojo/hooks/useEntityKeys'
 import { bigintToEntity } from '@/lib/utils/types'
-import { feltToString, stringToFelt } from "@/lib/utils/starknet"
-import { ChallengeState, Premise } from '@/games/pistols/generated/constants'
-import { ChallengeStateDescriptions } from "@/pistols/utils/pistols"
+import { stringToFelt } from "@/lib/utils/starknet"
+import { ChallengeState } from '@/games/pistols/generated/constants'
 
-
-const _challegeSorterByTimestamp = ((a: any, b: any) => Number((a.timestamp_end && b.timestamp_end) ? (a.timestamp_end - b.timestamp_end) : (a.timestamp_start - b.timestamp_start)))
 
 const _filterComponentsByValue = (component: Component, entityIds: bigint[], keyName: string, values: any[], include: boolean, also: Function = null): bigint[] => (
   entityIds.reduce((acc: bigint[], id: bigint) => {

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useDuelist } from "@/pistols/hooks/useDuelist"
+import { useDuelist } from '@/pistols/stores/duelistStore'
 import { ChallengeStateDescriptions } from "@/pistols/utils/pistols"
 import { useChallenge } from '@/pistols/stores/challengeStore'
 

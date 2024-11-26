@@ -6,7 +6,7 @@ import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/P
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useChallengeDescription } from '@/pistols/hooks/useChallengeDescription'
 import { useChallenge } from '@/pistols/stores/challengeStore'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useTable } from '@/pistols/hooks/useTable'
 import { useIsMyAccount, useIsYou } from '@/pistols/hooks/useIsYou'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'

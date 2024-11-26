@@ -1,7 +1,7 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import { useChallenge } from '@/pistols/stores/challengeStore'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useIsYou } from '@/pistols/hooks/useIsYou'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { BladesCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants'
