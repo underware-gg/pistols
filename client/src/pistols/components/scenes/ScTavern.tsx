@@ -12,6 +12,7 @@ import BarkeepModal from '../modals/BarkeepModal'
 import { _currentScene } from '@/pistols/three/game'
 import { InteractibleScene } from '@/pistols/three/InteractibleScene'
 import { sceneBackgrounds } from '@/pistols/data/assets'
+import { useElizaMessage } from '@/pistols/utils/eliza'
 
 export default function ScTavern() {
   const { tableOpener } = usePistolsContext()
@@ -20,6 +21,9 @@ export default function ScTavern() {
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
 
   const [open, setOpen] = useState(false)
+
+  const { sendMessage, responses } = useElizaMessage()
+  useEffect(() => console.log(`BARKEEP RESPONSES:`, responses), [responses])
   
   useEffect(() => {
     if (itemClicked) {
@@ -38,6 +42,7 @@ export default function ScTavern() {
           (_currentScene as InteractibleScene).toggleBlur(true);
           (_currentScene as InteractibleScene).setClickable(false);
           (_currentScene as InteractibleScene).excludeItem(sceneBackgrounds.Tavern.items.find(item => item.name === 'bartender'));
+          sendMessage('are you there?')
           break;
       }
     } else {
