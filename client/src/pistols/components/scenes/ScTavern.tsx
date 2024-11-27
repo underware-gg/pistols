@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { QueryProvider } from '@/pistols/hooks/QueryContext'
+import React, { useEffect, useState } from 'react'
 import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import { useElizaMessage } from '@/pistols/utils/eliza'

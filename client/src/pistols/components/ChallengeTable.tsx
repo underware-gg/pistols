@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useQueryContext } from '@/pistols/hooks/QueryContext'
+import { useQueryParams } from '@/pistols/stores/queryParamsStore'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useDuel } from '@/pistols/hooks/useDuel'
@@ -31,7 +31,7 @@ export function ChallengeTableSelectedDuelist({
   const [statesFilter, setStatesFilter] = useState(AllChallengeStates)
 
   const { selectedDuelistId } = usePistolsContext()
-  const { filterChallengeSortColumn, filterChallengeSortDirection } = useQueryContext()
+  const { filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
   const { challengeIds, states } = useQueryChallengeIds(statesFilter, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
   return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} existingStates={states} states={statesFilter} setStates={setStatesFilter} />
@@ -53,7 +53,7 @@ function ChallengeTableByIds({
   states: ChallengeState[]
   setStates: (states: ChallengeState[]) => void
 }) {
-  const { filterDuelistName } = useQueryContext()
+  const { filterDuelistName } = useQueryParams()
 
   const rows = useMemo(() => {
     let result = []

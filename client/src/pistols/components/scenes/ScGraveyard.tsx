@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useQueryContext } from '@/pistols/hooks/QueryContext'
+import { useQueryParams } from '@/pistols/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
@@ -17,7 +17,7 @@ import DuelistModal from '@/pistols/components/modals/DuelistModal'
 
 export default function ScGraveyard() {
   const { duelistId } = useSettings()
-  const { filterStatesPastDuels, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryContext()
+  const { filterStatesPastDuels, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
   const { challengeIds } = useQueryChallengeIds(filterStatesPastDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()

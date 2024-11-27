@@ -19,7 +19,6 @@ import { SCENE_CHANGE_ANIMATION_DURATION } from '@/pistols/three/game'
 import ScDuels from '@/pistols/components/scenes/ScDuels'
 import ScDuelists from '@/pistols/components/scenes/ScDuelists'
 import ScGraveyard from '@/pistols/components/scenes/ScGraveyard'
-import { QueryProvider } from '@/pistols/hooks/QueryContext'
 import { DuelistStoreSync } from '@/pistols/stores/duelistStore'
 import { DuelistQueryStoreSync } from '@/pistols/stores/duelistQueryStore'
 import { ChallengeStoreSync } from '@/pistols/stores/challengeStore'
@@ -46,7 +45,7 @@ export default function MainPage() {
     <AppPistols headerData={{ title: sceneTitle }} backgroundImage={null}>
       <Background className={null}>
         {isInitialized &&
-          <QueryProvider>
+          <>
             <DuelistStoreSync />
             <DuelistQueryStoreSync />
             <ChallengeStoreSync />
@@ -55,7 +54,7 @@ export default function MainPage() {
             <MainUI />
             {overlay}
             <Header />
-          </QueryProvider>
+          </>
         }
         <MouseToolTip />
         {/* ADD NOTRIFICATIONS - how to make them into a hook? */}

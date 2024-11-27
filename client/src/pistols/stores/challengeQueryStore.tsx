@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { addAddressPadding } from 'starknet'
 import { useSdkSubscribeEntities, PistolsQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkSub'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { ChallengeColumn, SortDirection } from '@/pistols/hooks/QueryContext'
+import { ChallengeColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { stringToFelt } from '@/lib/utils/starknet'
 import { ChallengeState, getChallengeStateValue } from '@/games/pistols/generated/constants'
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useQueryContext } from '@/pistols/hooks/QueryContext'
+import { useQueryParams } from '@/pistols/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import { useQueryDuelistIds } from '@/pistols/stores/duelistQueryStore'
@@ -15,7 +15,7 @@ import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
 import DuelistModal from '@/pistols/components/modals/DuelistModal'
 
 export default function ScDuelists() {
-  const { filterDuelistName, filterDuelistActive, filterDuelistSortColumn, filterDuelistSortDirection } = useQueryContext()
+  const { filterDuelistName, filterDuelistActive, filterDuelistSortColumn, filterDuelistSortDirection } = useQueryParams()
   const { duelistIds } = useQueryDuelistIds(filterDuelistName, filterDuelistActive, filterDuelistSortColumn, filterDuelistSortDirection)
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSelectDuelistId } = usePistolsContext()

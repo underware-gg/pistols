@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { useSdkSubscribeEntities, PistolsQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkSub'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { DuelistColumn, SortDirection } from '@/pistols/hooks/QueryContext'
+import { DuelistColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { feltToString } from '@/lib/utils/starknet'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
 

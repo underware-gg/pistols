@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useQueryContext } from '@/pistols/hooks/QueryContext'
+import { useQueryParams } from '@/pistols/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import { useQueryChallengeIds } from '@/pistols/stores/challengeQueryStore'
@@ -15,7 +15,7 @@ import DuelistModal from '@/pistols/components/modals/DuelistModal'
 
 export default function ScDuels() {
   const { duelistId } = useSettings()
-  const { filterStatesLiveDuels, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryContext()
+  const { filterStatesLiveDuels, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
   const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
