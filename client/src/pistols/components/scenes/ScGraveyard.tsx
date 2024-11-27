@@ -17,8 +17,8 @@ import DuelistModal from '@/pistols/components/modals/DuelistModal'
 
 export default function ScGraveyard() {
   const { duelistId } = useSettings()
-  const { filterStatesPastDuels, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds } = useQueryChallengeIds(filterStatesPastDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { filterStatesPastDuels, filterDuelistName, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds } = useQueryChallengeIds(filterStatesPastDuels, filterDuelistName, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()

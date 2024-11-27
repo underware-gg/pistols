@@ -1,11 +1,13 @@
 import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
-import { addAddressPadding } from 'starknet'
+import { addAddressPadding, BigNumberish } from 'starknet'
 import { useSdkSubscribeEntities, PistolsQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkSub'
+import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { ChallengeColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { stringToFelt } from '@/lib/utils/starknet'
 import { ChallengeState, getChallengeStateValue } from '@/games/pistols/generated/constants'
+import { keysToEntity } from '@/lib/utils/types'
 
 
 //-----------------------------------------
@@ -19,6 +21,8 @@ interface StateEntity {
   state_value: number
   duelist_id_a: bigint
   duelist_id_b: bigint
+  duelist_entity_id_a: string
+  duelist_entity_id_b: string
 }
 interface StateEntities {
   [entityId: string]: StateEntity,
@@ -41,6 +45,8 @@ const createStore = () => {
       state_value: getChallengeStateValue(state),
       duelist_id_a: BigInt(e.models.pistols.Challenge.duelist_id_a),
       duelist_id_b: BigInt(e.models.pistols.Challenge.duelist_id_b),
+      duelist_entity_id_a: keysToEntity([e.models.pistols.Challenge.duelist_id_a]),
+      duelist_entity_id_b: keysToEntity([e.models.pistols.Challenge.duelist_id_b]),
     }
   }
   return create<State>()((set) => ({
@@ -117,11 +123,13 @@ export function ChallengeQueryStoreSync() {
 //
 export const useQueryChallengeIds = (
   filterStates: ChallengeState[],
+  filterName: string,
   duelistId: bigint,
   sortColumn: ChallengeColumn,
   sortDirection: SortDirection,
 ) => {
   const entities = useStore((state) => state.entities);
+  const duelistEntities = useDuelistQueryStore((state) => state.entities);
 
   const [challengeIds, states] = useMemo(() => {
     // get all challenges, by duelist (or all)
@@ -135,9 +143,17 @@ export const useQueryChallengeIds = (
       if (!acc.includes(e.state)) acc.push(e.state)
       return acc
     }, [] as ChallengeState[])
-    
+
     // filter by states
     result = result.filter((e) => filterStates.includes(e.state))
+
+    // filter by name
+    if (filterName) {
+      result = result.filter((e) => (
+        duelistEntities[e.duelist_entity_id_a].name.includes(filterName) || 
+        duelistEntities[e.duelist_entity_id_b].name.includes(filterName)
+      ))
+    }
 
     // sort...
     if (sortColumn === ChallengeColumn.Time) {
@@ -149,7 +165,7 @@ export const useQueryChallengeIds = (
     // return ids only
     const challengeIds = result.map((e) => e.duel_id)
     return [challengeIds, states]
-  }, [entities, filterStates, duelistId, sortColumn, sortDirection])
+  }, [entities, filterStates, filterName, duelistId, sortColumn, sortDirection])
 
   return {
     challengeIds,

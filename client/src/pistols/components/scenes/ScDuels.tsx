@@ -15,8 +15,8 @@ import DuelistModal from '@/pistols/components/modals/DuelistModal'
 
 export default function ScDuels() {
   const { duelistId } = useSettings()
-  const { filterStatesLiveDuels, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { filterStatesLiveDuels, filterDuelistName, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterDuelistName, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()

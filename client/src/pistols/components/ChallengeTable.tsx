@@ -31,8 +31,8 @@ export function ChallengeTableSelectedDuelist({
   const [statesFilter, setStatesFilter] = useState(AllChallengeStates)
 
   const { selectedDuelistId } = usePistolsContext()
-  const { filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds, states } = useQueryChallengeIds(statesFilter, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { filterChallengeSortColumn, filterDuelistName, filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds, states } = useQueryChallengeIds(statesFilter, filterDuelistName, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
   return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} existingStates={states} states={statesFilter} setStates={setStatesFilter} />
 }

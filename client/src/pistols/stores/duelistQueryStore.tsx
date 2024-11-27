@@ -70,7 +70,7 @@ const createStore = () => {
   }))
 }
 
-const useStore = createStore();
+export const useDuelistQueryStore = createStore();
 
 //----------------------------------------
 // Sync all duelists!
@@ -84,7 +84,7 @@ export function DuelistQueryStoreSync() {
     },
   }), [tableId])
 
-  const state = useStore((state) => state)
+  const state = useDuelistQueryStore((state) => state)
 
   useSdkSubscribeEntities({
     query,
@@ -108,26 +108,19 @@ export const useQueryDuelistIds = (
   sortColumn: DuelistColumn,
   sortDirection: SortDirection,
 ) => {
-  const entities = useStore((state) => state.entities);
+  const entities = useDuelistQueryStore((state) => state.entities);
 
   const duelistIds = useMemo(() => {
     let result = Object.values(entities)
 
     // filter by name
     if (filterName) {
-      const _name = filterName.toLowerCase()
-      result = result.reduce((acc, e) => {
-        if (e.name.includes(_name)) acc.push(e)
-        return acc
-      }, [])
+      result = result.filter((e) => e.name.includes(filterName))
     }
     
     // filter by active
     if (filterActive) {
-      result = result.reduce((acc, e) => {
-        if (e.is_active) acc.push(e)
-        return acc
-      }, [])
+      result = result.filter((e) => (e.is_active))
     }
 
     // sort...

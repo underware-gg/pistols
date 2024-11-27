@@ -67,7 +67,7 @@ export const useQueryParams = create<State>((set) => ({
   filterStatesDuelistDuels: AllChallengeStates,
   filterShowAllDuels: false,
   // duelist setters
-  setFilterDuelistName: (value: string) => set({ filterDuelistName: value }),
+  setFilterDuelistName: (value: string) => set({ filterDuelistName: value.toLowerCase() }),
   setFilterDuelistActive: (value: boolean) => set({ filterDuelistActive: value }),
   setFilterDuelistSortColumn: (value: DuelistColumn) => set({ filterDuelistSortColumn: value }),
   setFilterDuelistSortDirection: (value: SortDirection) => set({ filterDuelistSortDirection: value }),
