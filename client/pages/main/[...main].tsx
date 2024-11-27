@@ -21,6 +21,7 @@ import ScDuelists from '@/pistols/components/scenes/ScDuelists'
 import ScGraveyard from '@/pistols/components/scenes/ScGraveyard'
 import { QueryProvider } from '@/pistols/hooks/QueryContext'
 import { DuelistStoreSync } from '@/pistols/stores/duelistStore'
+import { DuelistQueryStoreSync } from '@/pistols/stores/duelistQueryStore'
 import { ChallengeStoreSync } from '@/pistols/stores/challengeStore'
 import { ChallengeQueryStoreSync } from '@/pistols/stores/challengeQueryStore'
 
@@ -47,6 +48,7 @@ export default function MainPage() {
         {isInitialized &&
           <QueryProvider>
             <DuelistStoreSync />
+            <DuelistQueryStoreSync />
             <ChallengeStoreSync />
             <ChallengeQueryStoreSync />
             <GameContainer isVisible={true} />

@@ -3,7 +3,7 @@ import * as TWEEN from '@tweenjs/tween.js'
 import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
-import { useChallengeQueryIds } from '@/pistols/stores/challengeQueryStore'
+import { useQueryChallengeIds } from '@/pistols/stores/challengeQueryStore'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import { PosterGrid, PosterGridHandle } from '@/pistols/components/PosterGrid'
@@ -16,7 +16,7 @@ import DuelistModal from '@/pistols/components/modals/DuelistModal'
 export default function ScDuels() {
   const { duelistId } = useSettings()
   const { filterStatesLiveDuels, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryContext()
-  const { challengeIds } = useChallengeQueryIds(filterStatesLiveDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()

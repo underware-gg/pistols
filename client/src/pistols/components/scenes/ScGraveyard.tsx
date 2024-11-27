@@ -4,7 +4,7 @@ import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
-import { useChallengeQueryIds } from '@/pistols/stores/challengeQueryStore'
+import { useQueryChallengeIds } from '@/pistols/stores/challengeQueryStore'
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import { DuelPoster, DuelPosterHandle } from '@/pistols/components/DuelPoster'
 import { PosterGrid, PosterGridHandle } from '@/pistols/components/PosterGrid'
@@ -18,7 +18,7 @@ import DuelistModal from '@/pistols/components/modals/DuelistModal'
 export default function ScGraveyard() {
   const { duelistId } = useSettings()
   const { filterStatesPastDuels, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryContext()
-  const { challengeIds } = useChallengeQueryIds(filterStatesPastDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { challengeIds } = useQueryChallengeIds(filterStatesPastDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()

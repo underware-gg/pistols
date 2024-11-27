@@ -1,19 +1,19 @@
 import { useEffect, useMemo } from 'react'
+import { create } from 'zustand'
 import { addAddressPadding } from 'starknet'
 import { useSdkSubscribeEntities, PistolsQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkSub'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { ChallengeColumn, SortDirection } from '@/pistols/hooks/QueryContext'
 import { stringToFelt } from '@/lib/utils/starknet'
 import { ChallengeState, getChallengeStateValue } from '@/games/pistols/generated/constants'
-import { create } from 'zustand'
 
-//
+
+//-----------------------------------------
 // Stores only the entity ids and sorting data from a challenges query
 // to get challenge data, use challengeStore
 //
-
 interface StateEntity {
-  duelId: bigint
+  duel_id: bigint
   timestamp: number
   state: ChallengeState
   state_value: number
@@ -35,7 +35,7 @@ const createStore = () => {
     const end = Number(e.models.pistols.Challenge.timestamp_end)
     const state = e.models.pistols.Challenge.state as unknown as ChallengeState
     return {
-      duelId: BigInt(e.models.pistols.Challenge.duel_id),
+      duel_id: BigInt(e.models.pistols.Challenge.duel_id),
       timestamp: end ? end : start,
       state,
       state_value: getChallengeStateValue(state),
@@ -65,9 +65,10 @@ const createStore = () => {
 
 const useStore = createStore();
 
-//
+//-----------------------------------------
 // Sync all challenges from current table
 // Add only once to a top level component
+//
 export function ChallengeQueryStoreSync() {
   const { tableId } = useSettings()
   const query = useMemo<PistolsQuery>(() => ({
@@ -79,7 +80,7 @@ export function ChallengeQueryStoreSync() {
               { table_id: { $eq: addAddressPadding(stringToFelt(tableId)) } },
               //
               // THIS IS NOT WORKING... (in conjunction with table_id)
-              // but this is ok! better to filter on useChallengeQueryIds()
+              // but this is ok! better to filter on useQueryChallengeIds()
               // 
               // {
               //   Or: [
@@ -114,7 +115,7 @@ export function ChallengeQueryStoreSync() {
 // 'consumer' hooks
 // will filter and sort all challenges for each view
 //
-export const useChallengeQueryIds = (
+export const useQueryChallengeIds = (
   filterStates: ChallengeState[],
   duelistId: bigint,
   sortColumn: ChallengeColumn,
@@ -146,7 +147,7 @@ export const useChallengeQueryIds = (
     }
 
     // return ids only
-    const challengeIds = result.map((e) => e.duelId)
+    const challengeIds = result.map((e) => e.duel_id)
     return [challengeIds, states]
   }, [entities, filterStates, duelistId, sortColumn, sortDirection])
 

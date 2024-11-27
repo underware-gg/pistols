@@ -5,7 +5,7 @@ import { useQueryContext } from '@/pistols/hooks/QueryContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useDuel } from '@/pistols/hooks/useDuel'
-import { useChallengeQueryIds } from '@/pistols/stores/challengeQueryStore'
+import { useQueryChallengeIds } from '@/pistols/stores/challengeQueryStore'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
@@ -32,7 +32,7 @@ export function ChallengeTableSelectedDuelist({
 
   const { selectedDuelistId } = usePistolsContext()
   const { filterChallengeSortColumn, filterChallengeSortDirection } = useQueryContext()
-  const { challengeIds, states } = useChallengeQueryIds(statesFilter, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { challengeIds, states } = useQueryChallengeIds(statesFilter, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
   return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} existingStates={states} states={statesFilter} setStates={setStatesFilter} />
 }
