@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { QueryProvider } from '@/pistols/hooks/QueryContext'
 import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
+import { useElizaMessage } from '@/pistols/utils/eliza'
+import { useControllerUsername } from '@/lib/dojo/hooks/useController'
 import { TavernAudios } from '@/pistols/components/GameContainer'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
@@ -12,7 +14,6 @@ import BarkeepModal from '../modals/BarkeepModal'
 import { _currentScene } from '@/pistols/three/game'
 import { InteractibleScene } from '@/pistols/three/InteractibleScene'
 import { sceneBackgrounds } from '@/pistols/data/assets'
-import { useElizaMessage } from '@/pistols/utils/eliza'
 
 export default function ScTavern() {
   const { tableOpener } = usePistolsContext()
@@ -22,7 +23,8 @@ export default function ScTavern() {
 
   const [open, setOpen] = useState(false)
 
-  const { sendMessage, responses } = useElizaMessage()
+  const { username } = useControllerUsername()
+  const { sendMessage, responses } = useElizaMessage(username)
   useEffect(() => console.log(`BARKEEP RESPONSES:`, responses), [responses])
   
   useEffect(() => {
