@@ -1,29 +1,17 @@
 import { useMemo } from 'react'
-import { BigNumberish } from 'starknet'
-import { ComponentValue } from '@dojoengine/recs'
-import { useComponentValue } from '@dojoengine/react'
-import { useDojoComponents } from '@/lib/dojo/DojoContext'
-import { useEntityId } from '@/lib/utils/hooks/useEntityId'
-import { stringToFelt } from '@/lib/utils/starknet'
 import { ArchetypeNames } from '@/pistols/utils/pistols'
 import { Archetype, HONOUR } from '@/games/pistols/generated/constants'
 import { EMOJI } from '@/pistols/data/messages'
-
-// hijack Score type from Scoreboard
-function _useScoreType() {
-  const { Scoreboard } = useDojoComponents()
-  return {} as ComponentValue<typeof Scoreboard.schema.score>
-}
-export type Score = ReturnType<typeof _useScoreType>
+import * as models from '@/games/pistols/generated/typescript/models.gen'
 
 export const calcWinRatio = (total_duels: number, total_wins: number) => (total_duels > 0 ? (total_wins / total_duels) : null)
 
-export function useScore(score: Score | undefined) {
-  const total_duels = useMemo(() => (score?.total_duels ?? 0), [score])
-  const total_wins = useMemo(() => (score?.total_wins ?? 0), [score])
-  const total_losses = useMemo(() => (score?.total_losses ?? 0), [score])
-  const total_draws = useMemo(() => (score?.total_draws ?? 0), [score])
-  const honour = useMemo(() => ((score?.honour ?? 0) / 10.0), [score, total_duels])
+export function useScore(score: models.Score | undefined) {
+  const total_duels = useMemo(() => Number(score?.total_duels ?? 0), [score])
+  const total_wins = useMemo(() => Number(score?.total_wins ?? 0), [score])
+  const total_losses = useMemo(() => Number(score?.total_losses ?? 0), [score])
+  const total_draws = useMemo(() => Number(score?.total_draws ?? 0), [score])
+  const honour = useMemo(() => (Number(score?.honour ?? 0) / 10.0), [score, total_duels])
   const honourDisplay = useMemo(() => (total_duels > 0 && honour > 0 ? honour.toFixed(1) : EMOJI.ZERO), [honour, total_duels])
   const honourAndTotal = useMemo(() => (total_duels > 0 && honour > 0 ? <>{honour.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : EMOJI.ZERO), [honour, total_duels])
   const winRatio = useMemo(() => calcWinRatio(total_duels, total_wins), [total_duels, total_wins])
@@ -52,17 +40,5 @@ export function useScore(score: Score | undefined) {
     honourDisplay,
     honourAndTotal,
     winRatio,
-  }
-}
-
-export const useScoreboard = (tableId: string, duelistId: BigNumberish) => {
-  const { Scoreboard } = useDojoComponents()
-  const entityId = useEntityId([stringToFelt(tableId ?? ''), duelistId])
-  const scoreboard = useComponentValue(Scoreboard, entityId)
-
-  const score = useScore(scoreboard?.score)
-
-  return {
-    score,
   }
 }

@@ -3,9 +3,10 @@ import { DuelistStoreSync } from '@/pistols/stores/duelistStore'
 import { DuelistQueryStoreSync } from '@/pistols/stores/duelistQueryStore'
 import { ChallengeStoreSync } from '@/pistols/stores/challengeStore'
 import { ChallengeQueryStoreSync } from '@/pistols/stores/challengeQueryStore'
+import { TableStoreSync } from '@/pistols/stores/tableStore'
 
 //
-// Manages all store sunscriptions
+// Manages all store subscriptions
 //
 
 export default function StoreSync() {
@@ -15,6 +16,7 @@ export default function StoreSync() {
       <DuelistQueryStoreSync />
       <ChallengeStoreSync />
       <ChallengeQueryStoreSync />
+      <TableStoreSync />
     </>
   )
 }

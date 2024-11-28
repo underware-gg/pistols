@@ -11,7 +11,7 @@ import { useScore } from '../hooks/useScore'
 
 //
 // Stores all duelists
-export const useDuelistEntityStore = createDojoStore<PistolsSchemaType>();
+const useStore = createDojoStore<PistolsSchemaType>();
 
 //
 // Sync all duelists
@@ -24,7 +24,7 @@ export function DuelistStoreSync() {
     },
   }), [tableId])
 
-  const state = useDuelistEntityStore((state) => state)
+  const state = useStore((state) => state)
   
   useSdkEntities({
     query,
@@ -38,7 +38,7 @@ export function DuelistStoreSync() {
 }
 
 // export const useAllDuelistsEntityIds = () => {
-//   const entities = useDuelistEntityStore((state) => state.entities)
+//   const entities = useStore((state) => state.entities)
 //   const entityIds = useMemo(() => Object.keys(entities), [entities])
 //   return {
 //     entityIds,
@@ -46,7 +46,7 @@ export function DuelistStoreSync() {
 // }
 
 export const useAllDuelistsIds = () => {
-  const entities = useDuelistEntityStore((state) => state.entities)
+  const entities = useStore((state) => state.entities)
   const duelistIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.Duelist.duelist_id)), [entities])
   return {
     duelistIds,
@@ -55,7 +55,7 @@ export const useAllDuelistsIds = () => {
 
 export const useDuelist = (duelist_id: BigNumberish) => {
   const entityId = useEntityId([duelist_id])
-  const entities = useDuelistEntityStore((state) => state.entities);
+  const entities = useStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const duelist = useEntityModel<models.Duelist>(entity, 'Duelist')
@@ -63,6 +63,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(CONST.MAX_DUELIST_ID)), [duelist_id])
 
+  const duelistId = useMemo(() => BigInt(duelist_id), [duelist_id])
   const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])
   const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id, isValidDuelistId])
   const duelistIdDisplay = useMemo(() => (`Duelist #${isValidDuelistId ? duelist_id : '?'}`), [duelist_id, isValidDuelistId])
@@ -76,7 +77,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   return {
     isValidDuelistId,
-    duelistId: BigInt(duelist_id),
+    duelistId,
     name,
     nameDisplay,
     duelistIdDisplay,

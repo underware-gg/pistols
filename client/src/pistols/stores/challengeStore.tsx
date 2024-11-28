@@ -11,7 +11,7 @@ import { movesToHand } from '@/pistols/utils/pistols'
 
 //
 // Stores all challenges from current table
-export const useChallengeEntityStore = createDojoStore<PistolsSchemaType>();
+const useStore = createDojoStore<PistolsSchemaType>();
 
 //
 // Sync all challenges from current table
@@ -31,7 +31,7 @@ export function ChallengeStoreSync() {
     },
   }), [tableId])
 
-  const state = useChallengeEntityStore((state) => state)
+  const state = useStore((state) => state)
   
   useSdkEntities({
     query,
@@ -45,7 +45,7 @@ export function ChallengeStoreSync() {
 }
 
 export const useAllChallengesEntityIds = () => {
-  const entities = useChallengeEntityStore((state) => state.entities)
+  const entities = useStore((state) => state.entities)
   const entityIds = useMemo(() => Object.keys(entities), [entities])
   return {
     entityIds,
@@ -53,7 +53,7 @@ export const useAllChallengesEntityIds = () => {
 }
 
 export const useAllChallengesIds = () => {
-  const entities = useChallengeEntityStore((state) => state.entities)
+  const entities = useStore((state) => state.entities)
   const duelIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.Challenge.duel_id)), [entities])
   return {
     duelIds,
@@ -62,7 +62,7 @@ export const useAllChallengesIds = () => {
 
 export const useChallenge = (duelId: BigNumberish) => {
   const entityId = useEntityId([duelId])
-  const entities = useChallengeEntityStore((state) => state.entities);
+  const entities = useStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const challenge = useEntityModel<models.Challenge>(entity, 'Challenge')
@@ -118,7 +118,7 @@ export const useChallenge = (duelId: BigNumberish) => {
 
 export const useRound = (duelId: BigNumberish) => {
   const entityId = useEntityId([duelId])
-  const entities = useChallengeEntityStore((state) => state.entities);
+  const entities = useStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const round = useEntityModel<models.Round>(entity, 'Round')

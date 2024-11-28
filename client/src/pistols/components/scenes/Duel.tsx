@@ -13,7 +13,7 @@ import { useChallengeDescription } from '@/pistols/hooks/useChallengeDescription
 import { useChallenge } from '@/pistols/stores/challengeStore';
 import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { useDuelist } from '@/pistols/stores/duelistStore'
-import { useTable } from '@/pistols/hooks/useTable'
+import { useTable } from '@/pistols/stores/tableStore'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '@/pistols/hooks/useRevealAction'
 import { useIsYou } from '@/pistols/hooks/useIsYou'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'

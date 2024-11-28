@@ -3,8 +3,8 @@ import { Grid, Modal, Dropdown, ButtonGroup, Button } from 'semantic-ui-react'
 import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useTable } from '@/pistols/hooks/useTable'
-import { useTableTotals, useTableActiveDuelistIds } from '@/pistols/stores/useTable'
+import { useTable } from '@/pistols/stores/tableStore'
+import { useTableTotals, useTableActiveDuelistIds } from '@/pistols/hooks/useTable'
 import { Balance } from '@/pistols/components/account/Balance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { RowDivider } from '@/lib/ui/Stack'
@@ -114,7 +114,6 @@ function TableDescription({
   const {
     description,
     feeMin,
-    feePct,
     tableIsOpen,
     tableType,
   } = useTable(tableId)
@@ -146,13 +145,7 @@ function TableDescription({
           Fee:
         </Col>
         <Col width={8} className='Bold'>
-          {(Boolean(feePct) && !Boolean(feeMin)) ?
-            <span className='Coin'>{feePct}%</span>
-            : <>
-              <Balance lords wei={feeMin ?? 0} />
-              {Boolean(feePct) && <> (or {feePct}%)</>}
-            </>
-          }
+          <Balance lords wei={feeMin ?? 0} />
         </Col>
       </Row>
 
