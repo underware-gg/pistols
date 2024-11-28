@@ -19,10 +19,7 @@ import { SCENE_CHANGE_ANIMATION_DURATION } from '@/pistols/three/game'
 import ScDuels from '@/pistols/components/scenes/ScDuels'
 import ScDuelists from '@/pistols/components/scenes/ScDuelists'
 import ScGraveyard from '@/pistols/components/scenes/ScGraveyard'
-import { DuelistStoreSync } from '@/pistols/stores/duelistStore'
-import { DuelistQueryStoreSync } from '@/pistols/stores/duelistQueryStore'
-import { ChallengeStoreSync } from '@/pistols/stores/challengeStore'
-import { ChallengeQueryStoreSync } from '@/pistols/stores/challengeQueryStore'
+import StoreSync from '@/pistols/stores/StoreSync'
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {
@@ -46,10 +43,7 @@ export default function MainPage() {
       <Background className={null}>
         {isInitialized &&
           <>
-            <DuelistStoreSync />
-            <DuelistQueryStoreSync />
-            <ChallengeStoreSync />
-            <ChallengeQueryStoreSync />
+            <StoreSync />
             <GameContainer isVisible={true} />
             <MainUI />
             {overlay}
