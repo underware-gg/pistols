@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { addAddressPadding, BigNumberish } from 'starknet'
-import { useSdkSubscribeEntities, PistolsQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkSub'
+import { useSdkEntities, PistolsQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
 import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { ChallengeColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
@@ -105,7 +105,7 @@ export function ChallengeQueryStoreSync() {
 
   const state = useStore((state) => state)
 
-  useSdkSubscribeEntities({
+  useSdkEntities({
     query,
     setEntities: state.setEntities,
     updateEntity: state.updateEntity,

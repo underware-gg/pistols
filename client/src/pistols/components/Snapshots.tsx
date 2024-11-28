@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
-import { useChallenge } from '@/pistols/stores/challengeStore'
-import { useGetChallengesByTableQuery } from '@/pistols/hooks/useSdkQueries'
-import { useDuelist, useAllDuelistsEntityIds, DuelistStoreSync } from '@/pistols/stores/duelistStore'
+import { ChallengeStoreSync, useAllChallengesIds, useChallenge } from '@/pistols/stores/challengeStore'
+import { useDuelist, useAllDuelistsIds, DuelistStoreSync } from '@/pistols/stores/duelistStore'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { CopyIcon } from '@/lib/ui/Icons'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
@@ -30,6 +29,7 @@ export function Snapshots() {
   return (
     <Container text>
       <DuelistStoreSync />
+      <ChallengeStoreSync />
       
       <Grid>
         <Row columns={'equal'}>
@@ -58,11 +58,11 @@ export function Snapshots() {
 function SnapshotDuelists({
   update,
 }) {
-  const { entityIds } = useAllDuelistsEntityIds()
+  const { duelistIds } = useAllDuelistsIds()
   const [duelists, setDuelists] = useState([])
 
   const [snapping, setSnapping] = useState(false)
-  const canSnap = (entityIds.length > 0 && (!snapping || duelists.length == entityIds.length))
+  const canSnap = (duelistIds.length > 0 && (!snapping || duelists.length == duelistIds.length))
 
   useEffect(() => {
     if(snapping) {
@@ -76,13 +76,13 @@ function SnapshotDuelists({
 
   const loaders = useMemo(() => {
     let result = []
-    if (snapping && duelists.length < entityIds.length) {
-      const duelistId = entityIds[duelists.length]
+    if (snapping && duelists.length < duelistIds.length) {
+      const duelistId = duelistIds[duelists.length]
       // console.log(`...loaders`, duelists.length, address.toString(16))
       result.push(<SnapDuelist key={bigintToHex(duelistId)} duelistId={duelistId} update={_update} />)
     }
     return result
-  }, [snapping, entityIds, duelists])
+  }, [snapping, duelistIds, duelists])
 
   const _start = () => {
     setSnapping(true)
@@ -92,7 +92,7 @@ function SnapshotDuelists({
   return (
     <>
       <Button className='FillParent' disabled={!canSnap} onClick={() => _start()}>
-        Duelists Snapshot ({entityIds.length > 0 ? `${duelists.length}/${entityIds.length}` : '...'})
+        Duelists Snapshot ({duelistIds.length > 0 ? `${duelists.length}/${duelistIds.length}` : '...'})
       </Button>
       {loaders}
     </>
@@ -105,11 +105,14 @@ export function SnapDuelist({
 }) {
   const duelist = useDuelist(duelistId)
   useEffect(() => {
+    const score = duelist.score
     update({
       ...duelist,
-      honourDisplay: undefined,
-      honourAndTotal: undefined,
-      isRegistered: undefined,
+      score: {
+        ...score,
+        honourDisplay: undefined,
+        honourAndTotal: undefined,
+      }
     })
   }, [duelist])
   return <></>
@@ -124,11 +127,11 @@ export function SnapDuelist({
 function SnapshotChallenges({
   update,
 }) {
-  const { challenges: allChallenges } = useGetChallengesByTableQuery(TABLES.LORDS)
+  const { duelIds } = useAllChallengesIds()
   const [challenges, setChallenges] = useState([])
 
   const [snapping, setSnapping] = useState(false)
-  const canSnap = (allChallenges.length > 0 && (!snapping || challenges.length == allChallenges.length))
+  const canSnap = (duelIds.length > 0 && (!snapping || challenges.length == duelIds.length))
 
   useEffect(() => {
     if (snapping) {
@@ -142,12 +145,12 @@ function SnapshotChallenges({
 
   const loaders = useMemo(() => {
     let result = []
-    if (snapping && challenges.length < allChallenges.length) {
-      const duelId = BigInt(allChallenges[challenges.length].duel_id)
+    if (snapping && challenges.length < duelIds.length) {
+      const duelId = BigInt(duelIds[challenges.length])
       result.push(<SnapChallenge key={duelId} duelId={duelId} update={_update} />)
     }
     return result
-  }, [snapping, allChallenges, challenges])
+  }, [snapping, duelIds, challenges])
 
   const _start = () => {
     setSnapping(true)
@@ -157,7 +160,7 @@ function SnapshotChallenges({
   return (
     <>
       <Button className='FillParent' disabled={!canSnap} onClick={() => _start()}>
-        Challenges Snapshot ({allChallenges.length > 0 ? `${challenges.length}/${allChallenges.length}` : '...'})
+        Challenges Snapshot ({duelIds.length > 0 ? `${challenges.length}/${duelIds.length}` : '...'})
       </Button>
       {loaders}
     </>

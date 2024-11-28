@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { PistolsEntity } from '@/lib/dojo/hooks/useSdkSub';
+import { PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
 import { BigNumberish } from 'starknet';
 
 

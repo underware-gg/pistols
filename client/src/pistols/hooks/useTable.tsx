@@ -1,12 +1,9 @@
 import { useMemo } from 'react'
-import { getComponentValue } from '@dojoengine/recs'
 import { useComponentValue } from '@dojoengine/react'
 import { useDojoComponents } from '@/lib/dojo/DojoContext'
-import { useGetChallengesByTableQuery } from './useSdkQueries'
 import { bigintToEntity } from '@/lib/utils/types'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
-import { LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
-import { TableType, ChallengeState } from '@/games/pistols/generated/constants'
+import { TableType } from '@/games/pistols/generated/constants'
 
 export const useTable = (tableId: string) => {
   const { TableConfig } = useDojoComponents()
@@ -30,31 +27,5 @@ export const useTable = (tableId: string) => {
     tableIsOpen: table?.is_open ?? false,
     isTournament: (tableType == TableType.Tournament),
     isIRLTournament: (tableType == TableType.IRLTournament),
-  }
-}
-
-export const useTableTotals = (tableId: string) => {
-  const { challenges } = useGetChallengesByTableQuery(tableId)
-  const { Challenge } = useDojoComponents()
-  const result = useMemo(() => {
-    const liveDuelsCount = challenges.reduce((acc: number, ch: any) => {
-      const state = (getComponentValue(Challenge, bigintToEntity(ch.duel_id))?.state as unknown as ChallengeState) ?? ChallengeState.Null
-      if (LiveChallengeStates.includes(state)) acc++
-      return acc
-    }, 0)
-    const pastDuelsCount = challenges.reduce((acc: number, ch: any) => {
-      const state = (getComponentValue(Challenge, bigintToEntity(ch.duel_id))?.state as unknown as ChallengeState) ?? ChallengeState.Null
-      if (PastChallengeStates.includes(state)) acc++
-      return acc
-    }, 0)
-
-    return {
-      liveDuelsCount,
-      pastDuelsCount
-    }
-  }, [challenges])
-
-  return {
-    ...result
   }
 }

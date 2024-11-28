@@ -16,24 +16,31 @@ export type {
   models,
 }
 
-export type UseSdkSubEntitiesResult = {
-  // entities: EntityResult[] | null
+//---------------------------------------
+// Get entities from torii
+//
+// stores at remote store compatible with createDojoStore()
+// initial state calls: setEntities()
+// updates calls: updateEntity() (optional)
+//
+
+export type UseSdkEntitiesResult = {
   isSubscribed: boolean
 }
 
-export type UseSdkSubEntitiesProps = {
+export type UseSdkEntitiesProps = {
   query: PistolsSubQuery | PistolsQuery
-  setEntities: (entities: PistolsEntity[]) => void
-  updateEntity?: (entities: PistolsEntity) => void // if absent, do not subscribe for updates
+  setEntities: (entities: PistolsEntity[]) => void // stores initial state
+  updateEntity?: (entities: PistolsEntity) => void // store updates (if absent, do not subscribe)
   logging?: boolean
 }
 
-export const useSdkSubscribeEntities = <T,>({
+export const useSdkEntities = <T,>({
   query,
   setEntities,
   updateEntity,
   logging = false,
-}: UseSdkSubEntitiesProps): UseSdkSubEntitiesResult => {
+}: UseSdkEntitiesProps): UseSdkEntitiesResult => {
   const { sdk } = useDojoSetup()
   const [isSubscribed, setIsSubscribed] = useState(false)
 
@@ -46,9 +53,9 @@ export const useSdkSubscribeEntities = <T,>({
         query: query as PistolsQuery,
         callback: (response) => {
           if (response.error) {
-            console.error("useSdkSubscribeEntities().getEntities() error:", response.error)
+            console.error("useSdkEntities().getEntities() error:", response.error)
           } else if (response.data) {
-            // console.log("useSdkSubscribeEntities() GOT:", response.data);
+            // console.log("useSdkEntities() GOT:", response.data);
             setEntities(response.data);
           }
         },
@@ -68,9 +75,9 @@ export const useSdkSubscribeEntities = <T,>({
         query: query as PistolsSubQuery,
         callback: (response) => {
           if (response.error) {
-            console.error("useSdkSubscribeEntities().subscribeEntityQuery() error:", response.error)
+            console.error("useSdkEntities().subscribeEntityQuery() error:", response.error)
           } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {
-            // console.log("useSdkSubscribeEntities() SUB:", response.data[0]);
+            // console.log("useSdkEntities() SUB:", response.data[0]);
             updateEntity(response.data[0]);
           }
         },
@@ -99,7 +106,7 @@ export const useSdkSubscribeEntities = <T,>({
 }
 
 //---------------------------------------
-// Extract one model from a atored entity
+// Extract one model from a stored entity
 //
 export const useEntityModel = <T,>(entity: PistolsEntity, modelName: string) => {
   const model = useMemo(() => (entity?.models.pistols[modelName] as T), [entity, modelName])

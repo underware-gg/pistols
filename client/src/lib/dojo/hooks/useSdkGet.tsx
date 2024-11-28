@@ -10,7 +10,7 @@ export type EntityResult = {
   entityId: BigNumberish,
 } & Partial<PistolsSchemaType['pistols']>
 
-export type UseSdkGetEntitiesResult = {
+export type UseSdkGetResult = {
   entities: EntityResult[] | null
   isLoading: boolean
   refetch: () => void
@@ -21,7 +21,19 @@ export type UseSdkGetEntityResult = {
   refetch: () => void
 }
 
-export type UseSdkGetEntitiesProps = {
+export const filterEntitiesByModel = <T,>(entities: EntityResult[], modelName: string): T[] =>
+  (entities?.map(e => (e[modelName] as T)) ?? [])
+
+
+//---------------------------------------
+// Get entities from torii
+//
+// (ephemeral)
+// stores results at the hook local state
+// as: EntityResult[]
+//
+
+export type UseSdkGetProps = {
   query: PistolsGetQuery
   limit?: number
   offset?: number
@@ -29,13 +41,13 @@ export type UseSdkGetEntitiesProps = {
   enabled?: boolean
 }
 
-export const useSdkGetEntities = <T,>({
+export const useSdkGet = <T,>({
   query,
   limit = 100,
   offset = 0,
   logging = false,
   enabled = true,
-}: UseSdkGetEntitiesProps): UseSdkGetEntitiesResult => {
+}: UseSdkGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [entities, setEntities] = useState<EntityResult[] | null>()
   const [isLoading, setIsLoading] = useState(false)
@@ -43,16 +55,17 @@ export const useSdkGetEntities = <T,>({
   const fetchEntities = useCallback( async () => {
     try {
       setIsLoading(true)
+      console.log('>>>> useSdkGet() query:', query)
       await sdk.getEntities({
         query,
         callback: (resp) => {
           if (resp.error) {
             setEntities(undefined);
-            console.error("useSdkGetEntities() error:", resp.error.message);
+            console.error("useSdkGet() error:", resp.error.message);
             return;
           }
           if (resp.data) {
-            // console.log(`useSdkGetEntities() RESP:`, query, resp)
+            // console.log(`useSdkGet() RESP:`, query, resp)
             setEntities(resp.data.map((e: any) => ({
               entityId: e.entityId,
               ...e.models.pistols,
@@ -64,7 +77,7 @@ export const useSdkGetEntities = <T,>({
         options: { logging },
       });
     } catch (error) {
-      console.error("useSdkGetEntities() exception:", error);
+      console.error("useSdkGet() exception:", error);
     } finally {
       setIsLoading(false)
     }
@@ -86,11 +99,12 @@ export const useSdkGetEntities = <T,>({
   }
 }
 
-//
+//---------------------------------------
 // Single Entity fetch
 // (use only when fetching with a keys)
-export const useSdkGetEntity = (props: UseSdkGetEntitiesProps): UseSdkGetEntityResult => {
-  const { entities, isLoading, refetch } = useSdkGetEntities({
+//
+export const useSdkGetEntity = (props: UseSdkGetProps): UseSdkGetEntityResult => {
+  const { entities, isLoading, refetch } = useSdkGet({
     ...props,
     limit: 1,
   })

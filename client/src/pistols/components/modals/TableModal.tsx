@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal, Dropdown, ButtonGroup, Button } from 'semantic-ui-react'
-import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
+import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useTable, useTableTotals } from '@/pistols/hooks/useTable'
-import { useGetChallengesByTableQuery } from '@/pistols/hooks/useSdkQueries'
+import { useTable } from '@/pistols/hooks/useTable'
+import { useTableTotals, useTableActiveDuelistIds } from '@/pistols/stores/useTable'
 import { Balance } from '@/pistols/components/account/Balance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { RowDivider } from '@/lib/ui/Stack'
@@ -12,8 +12,6 @@ import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { getObjectKeyByValue } from '@/lib/utils/types'
 import { TABLES } from '@/games/pistols/generated/constants'
-import { Challenge } from '@/games/pistols/generated/typescript/models.gen'
-import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -121,15 +119,7 @@ function TableDescription({
     tableType,
   } = useTable(tableId)
   const { liveDuelsCount, pastDuelsCount } = useTableTotals(tableId)
-  const { challenges } = useGetChallengesByTableQuery(tableId)
-  const activeDuelistIds = useMemo(() => (
-    challenges.reduce((acc: BigNumberish[], ch: Challenge) => {
-      if (!acc.includes(ch.duelist_id_a)) acc.push(ch.duelist_id_a)
-      if (!acc.includes(ch.duelist_id_b)) acc.push(ch.duelist_id_b)
-      return acc
-    }, [] as BigNumberish[])
-  ), [challenges])
-
+  const { activeDuelistIds } = useTableActiveDuelistIds(tableId)
 
   return (
     <Grid className='H5'>

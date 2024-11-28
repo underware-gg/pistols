@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk'
-import { useSdkSubscribeEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkSub'
+import { useSdkEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { isPositiveBigint } from '@/lib/utils/types'
@@ -26,7 +26,7 @@ export function DuelistStoreSync() {
 
   const state = useDuelistEntityStore((state) => state)
   
-  useSdkSubscribeEntities({
+  useSdkEntities({
     query,
     setEntities: state.setEntities,
     updateEntity: state.updateEntity,
@@ -37,11 +37,19 @@ export function DuelistStoreSync() {
   return (<></>)
 }
 
-export const useAllDuelistsEntityIds = () => {
+// export const useAllDuelistsEntityIds = () => {
+//   const entities = useDuelistEntityStore((state) => state.entities)
+//   const entityIds = useMemo(() => Object.keys(entities), [entities])
+//   return {
+//     entityIds,
+//   }
+// }
+
+export const useAllDuelistsIds = () => {
   const entities = useDuelistEntityStore((state) => state.entities)
-  const entityIds = useMemo(() => Object.keys(entities), [entities])
+  const duelistIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.Duelist.duelist_id)), [entities])
   return {
-    entityIds,
+    duelistIds,
   }
 }
 
@@ -60,7 +68,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const duelistIdDisplay = useMemo(() => (`Duelist #${isValidDuelistId ? duelist_id : '?'}`), [duelist_id, isValidDuelistId])
   const profilePicType = useMemo(() => (duelist?.profile_pic_type ?? null), [duelist])
   const profilePic = useMemo(() => Number(duelist?.profile_pic_uri ?? 0), [duelist])
-  const timestamp = useMemo(() => (duelist?.timestamp ?? 0), [duelist])
+  const timestamp = useMemo(() => Number(duelist?.timestamp ?? 0), [duelist])
   const exists = useMemo(() => Boolean(timestamp), [timestamp])
 
   //@ts-ignore
@@ -68,7 +76,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   return {
     isValidDuelistId,
-    duelistId: duelist_id,
+    duelistId: BigInt(duelist_id),
     name,
     nameDisplay,
     duelistIdDisplay,

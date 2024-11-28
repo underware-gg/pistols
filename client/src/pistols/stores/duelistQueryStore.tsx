@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
-import { useSdkSubscribeEntities, PistolsQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkSub'
+import { useSdkEntities, PistolsQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { DuelistColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { feltToString } from '@/lib/utils/starknet'
@@ -86,7 +86,7 @@ export function DuelistQueryStoreSync() {
 
   const state = useDuelistQueryStore((state) => state)
 
-  useSdkSubscribeEntities({
+  useSdkEntities({
     query,
     setEntities: state.setEntities,
     updateEntity: state.updateEntity,

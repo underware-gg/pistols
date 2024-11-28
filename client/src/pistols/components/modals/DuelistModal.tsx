@@ -4,7 +4,6 @@ import { useSettings } from '../../hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
 import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
-import { useGetDuelistByIdQuery } from '@/pistols/hooks/useSdkQueries'
 import { useDuelist } from '@/pistols/stores/duelistStore'
 import { usePact } from '@/pistols/hooks/usePact'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
@@ -35,9 +34,6 @@ export default function DuelistModal({
 
   const { profilePic, duelistIdDisplay } = useDuelist(selectedDuelistId)
   const { hasPact, pactDuelId } = usePact(tableId, duelistId, selectedDuelistId)
-
-  // TODO: replace useDuelist with useGetDuelistByIdQuery
-  const { duelist } = useGetDuelistByIdQuery(selectedDuelistId)
 
   const _switch = () => {
     if (isYou) {

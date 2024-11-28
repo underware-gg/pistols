@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk'
-import { useSdkSubscribeEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkSub'
+import { useSdkEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
@@ -33,7 +33,7 @@ export function ChallengeStoreSync() {
 
   const state = useChallengeEntityStore((state) => state)
   
-  useSdkSubscribeEntities({
+  useSdkEntities({
     query,
     setEntities: state.setEntities,
     updateEntity: state.updateEntity,
@@ -44,6 +44,21 @@ export function ChallengeStoreSync() {
   return (<></>)
 }
 
+export const useAllChallengesEntityIds = () => {
+  const entities = useChallengeEntityStore((state) => state.entities)
+  const entityIds = useMemo(() => Object.keys(entities), [entities])
+  return {
+    entityIds,
+  }
+}
+
+export const useAllChallengesIds = () => {
+  const entities = useChallengeEntityStore((state) => state.entities)
+  const duelIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.Challenge.duel_id)), [entities])
+  return {
+    duelIds,
+  }
+}
 
 export const useChallenge = (duelId: BigNumberish) => {
   const entityId = useEntityId([duelId])
