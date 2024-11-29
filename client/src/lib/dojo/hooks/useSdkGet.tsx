@@ -103,15 +103,15 @@ export const useSdkGet = <T,>({
 // Single Entity fetch
 // (use only when fetching with a keys)
 //
-export const useSdkGetEntity = (props: UseSdkGetProps): UseSdkGetEntityResult => {
-  const { entities, isLoading, refetch } = useSdkGet({
-    ...props,
-    limit: 1,
-  })
-  const entity = useMemo(() => (Array.isArray(entities) ? entities[0] : entities), [entities])
-  return {
-    entity,
-    isLoading,
-    refetch,
-  }
-}
+// export const useSdkGetEntity = (props: UseSdkGetProps): UseSdkGetEntityResult => {
+//   const { entities, isLoading, refetch } = useSdkGet({
+//     ...props,
+//     limit: 1,
+//   })
+//   const entity = useMemo(() => (Array.isArray(entities) ? entities[0] : entities), [entities])
+//   return {
+//     entity,
+//     isLoading,
+//     refetch,
+//   }
+// }
