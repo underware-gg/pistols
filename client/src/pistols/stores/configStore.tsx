@@ -3,6 +3,7 @@ import { createDojoStore } from '@dojoengine/sdk'
 import { useSdkEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { CONFIG } from '@/games/pistols/generated/constants'
+import { keysToEntity } from '@/lib/utils/types'
 
 const useStore = createDojoStore<PistolsSchemaType>();
 
@@ -56,4 +57,17 @@ export const useConfig = () => {
     treasuryAddress,
     lordsAddress,
   }
+}
+
+
+//----------------------------------------
+// vanilla getter
+// (non-React)
+//
+export const getConfig = () => {
+  const entities = useStore.getState().entities;
+  const entity = entities[keysToEntity([CONFIG.CONFIG_KEY])]
+  const config = entity?.models.pistols.Config as models.Config
+  console.log(`getConfig() =>`, config)
+  return config
 }
