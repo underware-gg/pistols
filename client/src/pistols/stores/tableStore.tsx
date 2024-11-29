@@ -13,7 +13,7 @@ const useStore = createDojoStore<PistolsSchemaType>();
 // Add only once to a top level component
 export function TableStoreSync() {
   const { tableId } = useSettings()
-  const query = useMemo<PistolsSubQuery>(() => ({
+  const query_sub = useMemo<PistolsSubQuery>(() => ({
     pistols: {
       TableConfig: [],
     },
@@ -22,7 +22,8 @@ export function TableStoreSync() {
   const state = useStore((state) => state)
 
   useSdkEntities({
-    query,
+    query_get: query_sub,
+    query_sub,
     setEntities: state.setEntities,
     updateEntity: state.updateEntity,
   })

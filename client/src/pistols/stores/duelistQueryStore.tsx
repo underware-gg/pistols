@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react'
 import { create } from 'zustand'
-import { useSdkEntities, PistolsQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
+import { useSdkEntities, PistolsGetQuery, PistolsEntity, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkEntities'
 import { DuelistColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { feltToString } from '@/lib/utils/starknet'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
@@ -75,7 +75,7 @@ export const useDuelistQueryStore = createStore();
 // Sync all duelists!
 // Add only once to a top level component
 //
-const query: PistolsQuery  = {
+const query_sub: PistolsSubQuery  = {
   pistols: {
     Duelist: [],
   },
@@ -84,7 +84,8 @@ export function DuelistQueryStoreSync() {
   const state = useDuelistQueryStore((state) => state)
 
   useSdkEntities({
-    query,
+    query_get: query_sub,
+    query_sub,
     setEntities: state.setEntities,
     updateEntity: state.updateEntity,
   })

@@ -135,7 +135,6 @@ export default function ScDuels() {
     // A Set is unnecessary here since we're just iterating through challengeIds
     // and checking if each duel exists in the posters Map
     challengeIds.forEach(duel => {
-      console.log('challengeIds', challengeIds.indexOf(duel))
       if (!posters.has(duel)) {
         posters.set(duel, createPoster(duel))
       }

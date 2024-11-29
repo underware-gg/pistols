@@ -15,7 +15,7 @@ const useStore = createDojoStore<PistolsSchemaType>();
 //
 // Sync all duelists
 // Add only once to a top level component
-const query: PistolsSubQuery = {
+const query_sub: PistolsSubQuery = {
   pistols: {
     Duelist: [],
   },
@@ -24,7 +24,8 @@ export function DuelistStoreSync() {
   const state = useStore((state) => state)
 
   useSdkEntities({
-    query,
+    query_get: query_sub,
+    query_sub,
     setEntities: state.setEntities,
     updateEntity: state.updateEntity,
   })

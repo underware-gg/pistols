@@ -6,8 +6,6 @@ import { PistolsGetQuery, useSdkGet, filterEntitiesByModel } from '@/lib/dojo/ho
 import * as models from '@/games/pistols/generated/typescript/models.gen'
 
 
-let _pact: models.Pact | undefined
-
 export const usePactPair = (duelist_id_or_address_a: BigNumberish, duelist_id_or_address_b: BigNumberish): BigNumberish => {
   const pair = useMemo(() => {
     if (!isPositiveBigint(duelist_id_or_address_a) || !isPositiveBigint(duelist_id_or_address_b)) return 0n
@@ -39,7 +37,7 @@ export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish,
   
   const { entities, isLoading, refetch } = useSdkGet({ query })
   const pacts = useMemo(() => filterEntitiesByModel<models.Pact>(entities, 'Pact'), [entities])
-  useEffect(() => console.log(`usePact()`, pacts), [pacts])
+  // useEffect(() => console.log(`usePact()`, pacts), [pacts])
 
   const pactDuelId = useMemo(() => BigInt(pacts?.[0]?.duel_id ?? 0n), [pacts])
   const hasPact = useMemo(() => (pactDuelId > 0n), [pactDuelId])

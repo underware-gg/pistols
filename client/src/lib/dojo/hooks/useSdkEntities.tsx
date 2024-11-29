@@ -5,12 +5,12 @@ import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { isPositiveBigint } from '@/lib/utils/types'
 import * as models from '@/games/pistols/generated/typescript/models.gen'
 
-type PistolsQuery = QueryType<PistolsSchemaType>
+type PistolsGetQuery = QueryType<PistolsSchemaType>
 type PistolsSubQuery = SubscriptionQueryType<PistolsSchemaType>
 type PistolsEntity = ParsedEntity<PistolsSchemaType>
 export type {
   PistolsSchemaType,
-  PistolsQuery,
+  PistolsGetQuery,
   PistolsSubQuery,
   PistolsEntity,
   models,
@@ -29,7 +29,8 @@ export type UseSdkEntitiesResult = {
 }
 
 export type UseSdkEntitiesProps = {
-  query: PistolsSubQuery | PistolsQuery
+  query_get: PistolsGetQuery
+  query_sub?: PistolsSubQuery
   setEntities: (entities: PistolsEntity[]) => void // stores initial state
   updateEntity?: (entities: PistolsEntity) => void // store updates (if absent, do not subscribe)
   enabled?: boolean
@@ -37,7 +38,8 @@ export type UseSdkEntitiesProps = {
 }
 
 export const useSdkEntities = <T,>({
-  query,
+  query_get,
+  query_sub,
   setEntities,
   updateEntity,
   enabled = true,
@@ -52,7 +54,7 @@ export const useSdkEntities = <T,>({
   useEffect(() => {
     const _get = async () => {
       await sdk.getEntities({
-        query: query as PistolsQuery,
+        query: query_get,
         callback: (response) => {
           if (response.error) {
             console.error("useSdkEntities().getEntities() error:", response.error)
@@ -66,7 +68,7 @@ export const useSdkEntities = <T,>({
     if (enabled) {
       _get()
     }
-  }, [sdk, query, enabled])
+  }, [sdk, query_get, enabled])
 
   //----------------------
   // subscribe for updates
@@ -76,12 +78,12 @@ export const useSdkEntities = <T,>({
 
     const _subscribe = async () => {
       const subscription = await sdk.subscribeEntityQuery({
-        query: query as PistolsSubQuery,
+        query: query_sub,
         callback: (response) => {
           if (response.error) {
             console.error("useSdkEntities().subscribeEntityQuery() error:", response.error)
           } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {
-            // console.log("useSdkEntities() SUB:", response.data[0]);
+            console.log("useSdkEntities() SUB:", response.data[0]);
             updateEntity(response.data[0]);
           }
         },
@@ -92,7 +94,7 @@ export const useSdkEntities = <T,>({
     };
 
     setIsSubscribed(true)
-    if (enabled && updateEntity) {
+    if (enabled && query_sub && updateEntity) {
       _subscribe()
     }
 
@@ -102,7 +104,7 @@ export const useSdkEntities = <T,>({
         unsubscribe()
       }
     }
-  }, [sdk, query, enabled, logging, updateEntity])
+  }, [sdk, query_sub, enabled, logging, updateEntity])
 
   return {
     isSubscribed,

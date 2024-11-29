@@ -1,7 +1,7 @@
 import { useMemo, useEffect } from 'react'
 import { create } from 'zustand'
 import { addAddressPadding } from 'starknet'
-import { useSdkEntities, PistolsQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
+import { useSdkEntities, PistolsGetQuery, PistolsEntity, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkEntities'
 import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { ChallengeColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
@@ -77,36 +77,62 @@ const useStore = createStore();
 //
 export function ChallengeQueryStoreSync() {
   const { tableId } = useSettings()
-  const query = useMemo<PistolsQuery>(() => ({
+
+  //
+  // THIS IS NOT WORKING... (in conjunction with table_id)
+  // but this is ok! better to filter on useQueryChallengeIds()
+  // 
+  // const query_get = useMemo<PistolsGetQuery>(() => ({
+  //   pistols: {
+  //     Challenge: {
+  //       $: {
+  //         where: {
+  //           And: [
+  //             { table_id: { $eq: addAddressPadding(stringToFelt(tableId)) } },
+  //             {
+  //               Or: [
+  //                 //@ts-ignore
+  //                 { state: { $eq: ChallengeState.Resolved } },
+  //                 //@ts-ignore
+  //                 { state: { $eq: ChallengeState.Draw } },
+  //               ],
+  //             },
+  //           ],
+  //         },
+  //       },
+  //     },
+  //   },
+  // }), [tableId])
+  
+  const query_get = useMemo<PistolsGetQuery>(() => ({
     pistols: {
       Challenge: {
         $: {
           where: {
-            And: [
-              { table_id: { $eq: addAddressPadding(stringToFelt(tableId)) } },
-              //
-              // THIS IS NOT WORKING... (in conjunction with table_id)
-              // but this is ok! better to filter on useQueryChallengeIds()
-              // 
-              // {
-              //   Or: [
-              //     //@ts-ignore
-              //     { state: { $eq: ChallengeState.Resolved } },
-              //     //@ts-ignore
-              //     { state: { $eq: ChallengeState.Draw } },
-              //   ],
-              // },
-            ],
+            table_id: { $eq: addAddressPadding(stringToFelt(tableId)) },
+          },
+        },
+      },
+    },
+  }), [tableId])
+  const query_sub = useMemo<PistolsSubQuery>(() => ({
+    pistols: {
+      Challenge: {
+        $: {
+          where: {
+            table_id: { $is: addAddressPadding(stringToFelt(tableId)) },
           },
         },
       },
     },
   }), [tableId])
 
+
   const state = useStore((state) => state)
 
   useSdkEntities({
-    query,
+    query_get,
+    query_sub,
     setEntities: state.setEntities,
     updateEntity: state.updateEntity,
   })

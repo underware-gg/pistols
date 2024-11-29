@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react'
 import { createDojoStore } from '@dojoengine/sdk'
-import { useSdkEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
+import { useSdkEntities, PistolsGetQuery, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { CONFIG } from '@/games/pistols/generated/constants'
 import { keysToEntity } from '@/lib/utils/types'
@@ -11,15 +11,23 @@ const useStore = createDojoStore<PistolsSchemaType>();
 // Sync all tables
 // Add only once to a top level component
 
-const query: PistolsSubQuery = {
+const query_get: PistolsGetQuery = {
   pistols: {
     Config: {
       $: {
         where: {
-          key: {
-            //@ts-ignore
-            $eq: CONFIG.CONFIG_KEY,
-          },
+          key: { $eq: CONFIG.CONFIG_KEY },
+        },
+      },
+    },
+  },
+}
+const query_sub: PistolsSubQuery = {
+  pistols: {
+    Config: {
+      $: {
+        where: {
+          key: { $is: CONFIG.CONFIG_KEY },
         },
       },
     },
@@ -30,7 +38,8 @@ export function ConfigStoreSync() {
   const state = useStore((state) => state)
 
   useSdkEntities({
-    query,
+    query_get,
+    query_sub,
     setEntities: state.setEntities,
     // updateEntity: state.updateEntity, // no need to sync!
     enabled: (Object.keys(state.entities).length == 0),

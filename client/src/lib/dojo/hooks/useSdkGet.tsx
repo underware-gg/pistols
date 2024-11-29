@@ -55,7 +55,7 @@ export const useSdkGet = <T,>({
   const fetchEntities = useCallback( async () => {
     try {
       setIsLoading(true)
-      console.log('>>>> useSdkGet() query:', query)
+      // console.log('>>>> useSdkGet() query:', query)
       await sdk.getEntities({
         query,
         callback: (resp) => {

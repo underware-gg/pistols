@@ -9,7 +9,7 @@ const useStore = createDojoStore<PistolsSchemaType>();
 //
 // Sync all tables
 // Add only once to a top level component
-const query: PistolsSubQuery = {
+const query_sub: PistolsSubQuery = {
   pistols: {
     TokenConfig: []
   },
@@ -19,7 +19,8 @@ export function TokenConfigStoreSync() {
   const state = useStore((state) => state)
 
   useSdkEntities({
-    query,
+    query_get: query_sub,
+    query_sub,
     setEntities: state.setEntities,
     updateEntity: state.updateEntity,
   })

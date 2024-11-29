@@ -1,7 +1,7 @@
 import { useMemo, useEffect } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk'
-import { useSdkEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
+import { useSdkEntities, PistolsGetQuery,PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
@@ -18,13 +18,23 @@ const useStore = createDojoStore<PistolsSchemaType>();
 // Add only once to a top level component
 export function ChallengeStoreSync() {
   const { tableId } = useSettings()
-  const query = useMemo<PistolsSubQuery>(() => ({
+  const query_get = useMemo<PistolsGetQuery>(() => ({
     pistols: {
       Challenge: {
         $: {
           where: {
-            //@ts-ignore
             table_id: { $eq: addAddressPadding(stringToFelt(tableId)) },
+          },
+        },
+      },
+    },
+  }), [tableId])
+  const query_sub = useMemo<PistolsSubQuery>(() => ({
+    pistols: {
+      Challenge: {
+        $: {
+          where: {
+            table_id: { $is: addAddressPadding(stringToFelt(tableId)) },
           },
         },
       },
@@ -34,7 +44,8 @@ export function ChallengeStoreSync() {
   const state = useStore((state) => state)
   
   useSdkEntities({
-    query,
+    query_get,
+    query_sub,
     setEntities: state.setEntities,
     updateEntity: state.updateEntity,
   })
