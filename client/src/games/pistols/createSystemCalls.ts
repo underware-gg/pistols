@@ -1,7 +1,6 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
 import { DojoManifest } from '@/lib/dojo/Dojo'
-import { ClientComponents } from '@/lib/dojo/setup/setup'
 import { arrayClean, bigintToHex, isPositiveBigint, shortAddress } from '@/lib/utils/types'
 import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
 import {
@@ -11,10 +10,6 @@ import {
 import { convert_duel_progress } from '@/games/pistols/duel_progress'
 import { emitter } from '@/pistols/three/game'
 import { getConfig } from '@/pistols/stores/configStore'
-
-// FIX while this is not merged
-// https://github.com/dojoengine/dojo.js/pull/190
-// import { setComponentsFromEvents } from '@/lib/dojo/fix/setComponentsFromEvents'
 
 export const NAMESPACE = 'pistols'
 
@@ -44,7 +39,6 @@ const duelist_token_call = (entrypoint: string, calldata: any[]): DojoCall => ({
 })
 
 export function createSystemCalls(
-  components: ClientComponents,
   manifest: DojoManifest,
   provider: DojoProvider,
 ) {
@@ -79,9 +73,6 @@ export function createSystemCalls(
       const receipt = await signer.waitForTransaction(tx.transaction_hash, { retryInterval: 200 })
       success = getReceiptStatus(receipt);
       (success ? console.log : console.warn)(`execute success:`, success, 'receipt:', receipt, 'calls:', calls)
-
-      // set from events ahead of torii
-      // setComponentsFromEvents(contractComponents, getEvents(receipt));
     } catch (e) {
       console.warn(`execute exception:`, calls, e)
     } finally {
@@ -93,9 +84,6 @@ export function createSystemCalls(
     let results: Result = undefined
     try {
       results = await provider.call(NAMESPACE, call)
-      // result = decodeComponent(contractComponents['Component'], response)
-      // results = Array.isArray(response) ? response.map(v => BigInt(v)) : typeof response == 'boolean' ? response : BigInt(response)
-      // console.log(`call ${system}(${args.length}) success:`, result)
     } catch (e) {
       console.warn(`call ${call.contractName}::${call.entrypoint}(${call.calldata.length}) exception:`, e)
     } finally {

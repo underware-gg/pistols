@@ -1,6 +1,5 @@
-import { getEntityIdFromKeys } from '@dojoengine/utils'
-import { Component, Entity, getComponentValue } from '@dojoengine/recs'
 import { BigNumberish } from 'starknet'
+import { getEntityIdFromKeys } from '@dojoengine/utils'
 
 //
 // Numbers
@@ -25,10 +24,8 @@ export const isPositiveBigint = (v: BigNumberish | null): boolean => {
 }
 export const isNumeric = (v: string | null): boolean => (v != null && /^\d+$/.test(v))
 
-
-export const bigintToEntity = (v: BigNumberish): Entity => (getEntityIdFromKeys([BigInt(v)]) as Entity)
-export const keysToEntity = (keys: BigNumberish[]): Entity => (getEntityIdFromKeys(keys.map(v => BigInt(v ?? 0))) as Entity)
-export const entityIdToKey = (component: Component, keyName: string, entityId: Entity) => (BigInt(getComponentValue(component, entityId)[keyName]))
+export const bigintToEntity = (v: BigNumberish): string => (getEntityIdFromKeys([BigInt(v)]) as string)
+export const keysToEntity = (keys: BigNumberish[]): string => (getEntityIdFromKeys(keys.map(v => BigInt(v ?? 0))) as string)
 
 export const shortAddress = (address: string | null, small: boolean = false) => {
   const addresLength = small ? 7 : 12
