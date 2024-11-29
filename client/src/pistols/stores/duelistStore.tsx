@@ -1,8 +1,7 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk'
 import { useSdkEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
-import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { isPositiveBigint } from '@/lib/utils/types'
 import { CONST } from '@/games/pistols/generated/constants'
@@ -16,16 +15,14 @@ const useStore = createDojoStore<PistolsSchemaType>();
 //
 // Sync all duelists
 // Add only once to a top level component
+const query: PistolsSubQuery = {
+  pistols: {
+    Duelist: [],
+  },
+}
 export function DuelistStoreSync() {
-  const { tableId } = useSettings()
-  const query = useMemo<PistolsSubQuery>(() => ({
-    pistols: {
-      Duelist: [],
-    },
-  }), [tableId])
-
   const state = useStore((state) => state)
-  
+
   useSdkEntities({
     query,
     setEntities: state.setEntities,

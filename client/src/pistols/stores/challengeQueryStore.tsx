@@ -1,6 +1,6 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { create } from 'zustand'
-import { addAddressPadding, BigNumberish } from 'starknet'
+import { addAddressPadding } from 'starknet'
 import { useSdkEntities, PistolsQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
 import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
 import { useSettings } from '@/pistols/hooks/SettingsContext'

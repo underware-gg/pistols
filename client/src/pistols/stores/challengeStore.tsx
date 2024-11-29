@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk'
 import { useSdkEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'

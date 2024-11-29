@@ -2,7 +2,7 @@ import { BigNumberish } from 'starknet'
 import { useDeployedDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
-import { useConfig } from '@/pistols/hooks/useConfig'
+import { useConfig } from '@/pistols/stores/configStore'
 import { bigintEquals } from '@/lib/utils/types'
 
 

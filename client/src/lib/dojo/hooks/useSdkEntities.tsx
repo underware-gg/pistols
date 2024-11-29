@@ -32,6 +32,7 @@ export type UseSdkEntitiesProps = {
   query: PistolsSubQuery | PistolsQuery
   setEntities: (entities: PistolsEntity[]) => void // stores initial state
   updateEntity?: (entities: PistolsEntity) => void // store updates (if absent, do not subscribe)
+  enabled?: boolean
   logging?: boolean
 }
 
@@ -39,6 +40,7 @@ export const useSdkEntities = <T,>({
   query,
   setEntities,
   updateEntity,
+  enabled = true,
   logging = false,
 }: UseSdkEntitiesProps): UseSdkEntitiesResult => {
   const { sdk } = useDojoSetup()
@@ -61,8 +63,10 @@ export const useSdkEntities = <T,>({
         },
       })
     }
-    _get()
-  }, [sdk, query])
+    if (enabled) {
+      _get()
+    }
+  }, [sdk, query, enabled])
 
   //----------------------
   // subscribe for updates
@@ -88,7 +92,7 @@ export const useSdkEntities = <T,>({
     };
 
     setIsSubscribed(true)
-    if (updateEntity) {
+    if (enabled && updateEntity) {
       _subscribe()
     }
 
@@ -98,7 +102,7 @@ export const useSdkEntities = <T,>({
         unsubscribe()
       }
     }
-  }, [sdk, query, logging, updateEntity])
+  }, [sdk, query, enabled, logging, updateEntity])
 
   return {
     isSubscribed,

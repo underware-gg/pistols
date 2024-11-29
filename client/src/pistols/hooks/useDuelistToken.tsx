@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { useTokenConfig } from '@/pistols/hooks/useConfig'
+import { useTokenConfig } from '@/pistols/stores/tokenConfigStore'
 import { useErc721TokensByOwner } from '@/lib/dojo/hooks/useToriiErcTokensQL'
 import { useERC721OwnerOf } from '@/lib/utils/hooks/useERC721'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
-
 
 
 export const useDuelistTokenCount = () => {

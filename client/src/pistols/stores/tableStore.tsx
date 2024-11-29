@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { createDojoStore } from '@dojoengine/sdk'
 import { useSdkEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
@@ -6,8 +6,6 @@ import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { TableType } from '@/games/pistols/generated/constants'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 
-//
-// Stores all tables
 const useStore = createDojoStore<PistolsSchemaType>();
 
 //
