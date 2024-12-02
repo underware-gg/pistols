@@ -1,6 +1,7 @@
 import { useMemo, useEffect } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
-import { createDojoStore } from '@dojoengine/sdk'
+// import { createDojoStore } from '@dojoengine/sdk'
+import { createDojoStore } from '@/lib/dojo/fix/zustand'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { Token, TokenBalance } from '@dojoengine/torii-client'
 

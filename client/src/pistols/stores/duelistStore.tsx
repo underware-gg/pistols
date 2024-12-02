@@ -1,6 +1,7 @@
 import { useMemo, useEffect } from 'react'
 import { BigNumberish } from 'starknet'
-import { createDojoStore } from '@dojoengine/sdk'
+// import { createDojoStore } from '@dojoengine/sdk'
+import { createDojoStore } from '@/lib/dojo/fix/zustand'
 import { useSdkEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { isPositiveBigint } from '@/lib/utils/types'

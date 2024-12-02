@@ -26,6 +26,7 @@
     "@tweenjs/tween.js": "^21.0.0",
     "event-emitter": "^0.3.5",
     "get-starknet-core": "^4.0.0",
+    "immer": "^10.1.1",
     "lil-gui": "^0.19.2",
     "next": "^13.5.6",
     "react": "^18.2.0",

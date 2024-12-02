@@ -1,6 +1,7 @@
 import { useMemo, useEffect } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
-import { createDojoStore } from '@dojoengine/sdk'
+// import { createDojoStore } from '@dojoengine/sdk'
+import { createDojoStore } from '@/lib/dojo/fix/zustand'
 import { useSdkEntities, PistolsGetQuery,PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
