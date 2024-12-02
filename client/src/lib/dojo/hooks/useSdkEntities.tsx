@@ -83,7 +83,7 @@ export const useSdkEntities = <T,>({
           if (response.error) {
             console.error("useSdkEntities().subscribeEntityQuery() error:", response.error)
           } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {
-            console.log("useSdkEntities() SUB:", response.data[0]);
+            // console.log("useSdkEntities() SUB:", response.data[0]);
             updateEntity(response.data[0]);
           }
         },

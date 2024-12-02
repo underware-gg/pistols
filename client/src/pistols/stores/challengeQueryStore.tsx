@@ -137,7 +137,7 @@ export function ChallengeQueryStoreSync() {
     updateEntity: state.updateEntity,
   })
 
-  useEffect(() => console.log("ChallengeQueryStoreSync() =>", state.entities), [state.entities])
+  // useEffect(() => console.log(`ChallengeQueryStoreSync() [${Object.keys(state.entities).length}] =>`, state.entities), [state.entities])
 
   return (<></>)
 }

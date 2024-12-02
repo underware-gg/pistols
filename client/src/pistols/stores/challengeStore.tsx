@@ -51,7 +51,7 @@ export function ChallengeStoreSync() {
     updateEntity: state.updateEntity,
   })
 
-  // useEffect(() => console.log("ChallengeStoreSync() =>", state.entities), [state.entities])
+  // useEffect(() => console.log(`ChallengeStoreSync() [${Object.keys(state.entities).length}] =>`, state.entities), [state.entities])
 
   return (<></>)
 }
@@ -67,6 +67,7 @@ export const useAllChallengesEntityIds = () => {
 export const useAllChallengesIds = () => {
   const entities = useStore((state) => state.entities)
   const duelIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.Challenge.duel_id)), [entities])
+  // useEffect(() => console.log(`useAllChallengesIds() =>`, duelIds.length), [duelIds])
   return {
     duelIds,
   }
@@ -78,6 +79,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const challenge = useEntityModel<models.Challenge>(entity, 'Challenge')
+  // useEffect(() => console.log(`useChallenge(${Number(duelId)}) => [${Object.keys(entities).length}]`, challenge), [challenge])
 
   const tableId = useMemo(() => feltToString(challenge?.table_id ?? 0n), [challenge])
   const duelistAddressA = useMemo(() => BigInt(challenge?.address_a ?? 0), [challenge])
