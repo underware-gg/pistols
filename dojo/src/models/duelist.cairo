@@ -1,6 +1,4 @@
 use starknet::ContractAddress;
-use pistols::types::constants::{CONST, HONOUR};
-
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Archetype {
@@ -82,6 +80,7 @@ pub struct Score {
 //----------------------------------
 // Traits
 //
+use pistols::types::constants::{CONST, HONOUR};
 use pistols::utils::bitwise::{BitwiseU64};
 use pistols::utils::math::{MathU64};
 

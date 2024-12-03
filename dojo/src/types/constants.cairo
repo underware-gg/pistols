@@ -1,5 +1,9 @@
 
 mod CONST {
+    // duelist pack amounts
+    const DUELIST_PACK_AMOUNT_REGISTER: u32 = 5;
+    const DUELIST_PACK_AMOUNT: u32 = 5;
+    
     // number of rounds per duel
     const ROUND_COUNT: u8 = 1;
     

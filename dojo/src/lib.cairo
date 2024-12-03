@@ -37,8 +37,10 @@ mod libs {
 mod models {
     mod challenge;
     mod config;
+    mod consumable;
     mod duelist;
     mod payment;
+    mod player;
     mod table;
 }
 

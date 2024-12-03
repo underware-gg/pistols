@@ -19,6 +19,13 @@ use pistols::systems::{
     },
 };
 use pistols::models::{
+    player::{
+        m_Player, Player,
+        m_PlayerActive, PlayerActive,
+    },
+    consumable::{
+        m_ConsumableBalance, ConsumableBalance,
+    },
     challenge::{
         m_Challenge, Challenge,
         m_ChallengeFameBalance, ChallengeFameBalance,
@@ -123,6 +130,9 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
         namespace: "pistols",
         resources: [
             // pistols models
+            TestResource::Model(m_Player::TEST_CLASS_HASH),
+            TestResource::Model(m_PlayerActive::TEST_CLASS_HASH),
+            TestResource::Model(m_ConsumableBalance::TEST_CLASS_HASH),
             TestResource::Model(m_Challenge::TEST_CLASS_HASH),
             TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
