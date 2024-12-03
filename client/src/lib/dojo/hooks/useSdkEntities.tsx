@@ -118,7 +118,7 @@ export const useSdkEntities = <T,>({
         unsubscribe()
       }
     }
-  }, [sdk, query_sub, enabled, logging, updateEntity])
+  }, [sdk, query_sub, enabled, logging])
 
   const refetch = useCallback(() => {
     console.warn(`useSdkEntities().refetch() not implemented`)

@@ -2,7 +2,7 @@ import { useMemo, useEffect } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
 import { isPositiveBigint } from '@/lib/utils/types'
 import { bigintToU256, poseidon, stringToFelt } from '@/lib/utils/starknet'
-import { PistolsGetQuery, useSdkGet, filterEntitiesByModel } from '@/lib/dojo/hooks/useSdkGet'
+import { PistolsGetQuery, useSdkGet, getEntityMapModels, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkGet'
 import * as models from '@/games/pistols/generated/typescript/models.gen'
 
 
@@ -34,9 +34,21 @@ export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish,
       },
     },
   }), [table_id, pair])
+  const query_sub = useMemo<PistolsSubQuery>(() => ({
+    pistols: {
+      Pact: {
+        $: {
+          where: {
+            table_id: { $is: addAddressPadding(stringToFelt(table_id)) },
+            pair: { $is: addAddressPadding(pair) },
+          },
+        },
+      },
+    },
+  }), [table_id, pair])
   
-  const { entities, isLoading, refetch } = useSdkGet({ query_get })
-  const pacts = useMemo(() => filterEntitiesByModel<models.Pact>(entities, 'Pact'), [entities])
+  const { entities } = useSdkGet({ query_get, query_sub })
+  const pacts = useMemo(() => getEntityMapModels<models.Pact>(entities, 'Pact'), [entities])
   // useEffect(() => console.log(`usePact()`, pacts), [pacts])
 
   const pactDuelId = useMemo(() => BigInt(pacts?.[0]?.duel_id ?? 0n), [pacts])

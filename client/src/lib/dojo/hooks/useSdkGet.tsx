@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
-import { PistolsGetQuery, PistolsSubQuery, useSdkEntities } from '@/lib/dojo/hooks/useSdkEntities'
+import { PistolsEntity, PistolsGetQuery, PistolsSubQuery, useSdkEntities } from '@/lib/dojo/hooks/useSdkEntities'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 
 export type {
@@ -9,19 +9,19 @@ export type {
   PistolsSubQuery,
 }
 
-export type EntityResult = {
-  entityId: BigNumberish,
-} & Partial<PistolsSchemaType['pistols']>
+export type EntityMap = {
+  [entityId: string]: Partial<PistolsSchemaType['pistols']>,
+}
 
 export type UseSdkGetResult = {
-  entities: EntityResult[] | null
+  entities: EntityMap | null
   isLoading: boolean
   isSubscribed: boolean
   refetch: () => void
 }
 
-export const filterEntitiesByModel = <T,>(entities: EntityResult[], modelName: string): T[] =>
-  (entities?.map(e => (e[modelName] as T)) ?? [])
+export const getEntityMapModels = <T,>(entities: EntityMap, modelName: string): T[] =>
+  (Object.values(entities ?? {}).map(e => (e[modelName] as T)) ?? [])
 
 
 //---------------------------------------
@@ -29,7 +29,7 @@ export const filterEntitiesByModel = <T,>(entities: EntityResult[], modelName: s
 //
 // (ephemeral)
 // stores results at the hook local state
-// as: EntityResult[]
+// as: EntityMap
 //
 
 export type UseSdkGetProps = {
@@ -50,7 +50,7 @@ export const useSdkGet = <T,>({
   logging = false,
 }: UseSdkGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
-  const [entities, setEntities] = useState<EntityResult[] | null>()
+  const [entities, setEntities] = useState<EntityMap | null>()
 
   const { isLoading, isSubscribed, refetch } = useSdkEntities({
     query_get,
@@ -59,18 +59,22 @@ export const useSdkGet = <T,>({
     limit,
     offset,
     logging,
-    setEntities: (entities) => {
-      setEntities(entities.map((e: any) => ({
-        entityId: e.entityId,
-        ...e.models.pistols,
-      } as EntityResult)));
+    setEntities: (entities: PistolsEntity[]) => {
+      setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
+        ...acc,
+        [e.entityId]: {
+          ...e.models.pistols
+        } as EntityMap,
+      }), {} as EntityMap));
     },
-    // updateEntity: (e) => {
-    //   setEntities(data.map((e: any) => ({
-    //     entityId: e.entityId,
-    //     ...e.models.pistols,
-    //   } as EntityResult)));
-    // }
+    updateEntity: (e: PistolsEntity) => {
+      setEntities({
+        ...entities,
+        [e.entityId]: {
+          ...e.models.pistols
+        } as EntityMap,
+      });
+    }
   })
 
   return {
