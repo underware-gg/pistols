@@ -13,7 +13,7 @@ import * as models from '@/games/pistols/generated/typescript/models.gen'
 //
 
 const useGetChallengesByTableQuery = (tableId: string) => {
-  const query = useMemo<PistolsGetQuery>(() => ({
+  const query_get = useMemo<PistolsGetQuery>(() => ({
     pistols: {
       Challenge: {
         $: {
@@ -24,7 +24,7 @@ const useGetChallengesByTableQuery = (tableId: string) => {
       },
     },
   }), [tableId])
-  const { entities, isLoading, refetch } = useSdkGet({ query })
+  const { entities, isLoading, refetch } = useSdkGet({ query_get })
   const challenges = useMemo(() => filterEntitiesByModel<models.Challenge>(entities, 'Challenge'), [entities])
   useEffect(() => console.log(`useGetChallengesByTableQuery()`, challenges), [challenges])
   return { challenges, isLoading, refetch }

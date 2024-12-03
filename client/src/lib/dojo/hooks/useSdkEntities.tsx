@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ParsedEntity, SubscriptionQueryType, QueryType } from '@dojoengine/sdk'
 import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
@@ -25,7 +25,9 @@ export type {
 //
 
 export type UseSdkEntitiesResult = {
+  isLoading: boolean
   isSubscribed: boolean
+  refetch: () => void
 }
 
 export type UseSdkEntitiesProps = {
@@ -34,6 +36,10 @@ export type UseSdkEntitiesProps = {
   setEntities: (entities: PistolsEntity[]) => void // stores initial state
   updateEntity?: (entities: PistolsEntity) => void // store updates (if absent, do not subscribe)
   enabled?: boolean
+  // get options
+  limit?: number
+  offset?: number
+  // subscribe options
   logging?: boolean
 }
 
@@ -43,9 +49,12 @@ export const useSdkEntities = <T,>({
   setEntities,
   updateEntity,
   enabled = true,
+  limit = 100,
+  offset = 0,
   logging = false,
 }: UseSdkEntitiesProps): UseSdkEntitiesResult => {
   const { sdk } = useDojoSetup()
+  const [isLoading, setIsLoading] = useState(false)
   const [isSubscribed, setIsSubscribed] = useState(false)
 
   //----------------------
@@ -53,6 +62,7 @@ export const useSdkEntities = <T,>({
   //
   useEffect(() => {
     const _get = async () => {
+      setIsLoading(true)
       await sdk.getEntities({
         query: query_get,
         callback: (response) => {
@@ -62,7 +72,11 @@ export const useSdkEntities = <T,>({
             // console.log("useSdkEntities() GOT:", response.data);
             setEntities(response.data);
           }
+          setIsLoading(false)
         },
+        limit,
+        offset,
+        options: { logging },
       })
     }
     if (enabled) {
@@ -77,6 +91,7 @@ export const useSdkEntities = <T,>({
     let unsubscribe: (() => void) | undefined;
 
     const _subscribe = async () => {
+      setIsSubscribed(undefined)
       const subscription = await sdk.subscribeEntityQuery({
         query: query_sub,
         callback: (response) => {
@@ -93,7 +108,6 @@ export const useSdkEntities = <T,>({
       unsubscribe = () => subscription.cancel()
     };
 
-    setIsSubscribed(true)
     if (enabled && query_sub && updateEntity) {
       _subscribe()
     }
@@ -106,8 +120,14 @@ export const useSdkEntities = <T,>({
     }
   }, [sdk, query_sub, enabled, logging, updateEntity])
 
+  const refetch = useCallback(() => {
+    console.warn(`useSdkEntities().refetch() not implemented`)
+  }, [])
+
   return {
+    isLoading,
     isSubscribed,
+    refetch,
   }
 }
 

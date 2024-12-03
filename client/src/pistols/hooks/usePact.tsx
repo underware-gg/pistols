@@ -22,7 +22,7 @@ export const usePactPair = (duelist_id_or_address_a: BigNumberish, duelist_id_or
 
 export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish, duelist_id_or_address_b: BigNumberish) => {
   const pair = usePactPair(duelist_id_or_address_a, duelist_id_or_address_b)
-  const query = useMemo<PistolsGetQuery>(() => ({
+  const query_get = useMemo<PistolsGetQuery>(() => ({
     pistols: {
       Pact: {
         $: {
@@ -35,7 +35,7 @@ export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish,
     },
   }), [table_id, pair])
   
-  const { entities, isLoading, refetch } = useSdkGet({ query })
+  const { entities, isLoading, refetch } = useSdkGet({ query_get })
   const pacts = useMemo(() => filterEntitiesByModel<models.Pact>(entities, 'Pact'), [entities])
   // useEffect(() => console.log(`usePact()`, pacts), [pacts])
 
