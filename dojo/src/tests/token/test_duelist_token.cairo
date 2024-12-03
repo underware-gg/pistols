@@ -151,12 +151,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
 
     let mut contract_defs: Array<ContractDef> = array![
         ContractDefTrait::new(@"pistols", @"duelist_token")
-            .with_writer_of([
-                // same as config
-                selector_from_tag!("pistols-TokenConfig"),
-                selector_from_tag!("pistols-Payment"),
-                selector_from_tag!("pistols-Duelist"),
-            ].span())
+            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             .with_init_calldata([
                 'pistols.underware.gg',
                 0, // minter_address

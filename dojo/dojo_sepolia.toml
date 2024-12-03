@@ -49,15 +49,9 @@ default = "pistols"
 "pistols" = [
   "pistols-game",
   "pistols-admin",
-] 
-# ERC-721
-"pistols-TokenConfig" = ["pistols-duelist_token","pistols-duel_token"]
-"pistols-Payment"     = ["pistols-duelist_token","pistols-duel_token"]
-"pistols-Duelist"     = ["pistols-duelist_token"]
-"pistols-Challenge"   = ["pistols-duel_token"]
-"pistols-Round"       = ["pistols-duel_token"]
-"pistols-Pact"        = ["pistols-duel_token"]
-"pistols-Scoreboard"  = ["pistols-duel_token"]
+  "pistols-duel_token",
+  "pistols-duelist_token",
+]
 # ERC-20
 "pistols-CoinConfig"        = ["pistols-fame_coin","pistols-lords_mock"]
 "pistols-TokenBoundAddress" = ["pistols-fame_coin"]

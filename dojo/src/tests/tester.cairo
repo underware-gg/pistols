@@ -221,15 +221,7 @@ mod tester {
             resources.append(TestResource::Contract(duel_token::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duel_token")
-                    .with_writer_of([
-                        // same as config
-                        selector_from_tag!("pistols-TokenConfig"),
-                        selector_from_tag!("pistols-Payment"),
-                        selector_from_tag!("pistols-Challenge"),
-                        selector_from_tag!("pistols-Round"),
-                        selector_from_tag!("pistols-Pact"),
-                        selector_from_tag!("pistols-Scoreboard"),
-                    ].span())
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
                     .with_init_calldata([
                         'pistols.underware.gg',
                         0, // minter_address
@@ -244,12 +236,7 @@ mod tester {
             resources.append(TestResource::Contract(duelist_token::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duelist_token")
-                    .with_writer_of([
-                        // same as config
-                        selector_from_tag!("pistols-TokenConfig"),
-                        selector_from_tag!("pistols-Payment"),
-                        selector_from_tag!("pistols-Duelist"),
-                    ].span())
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
                     .with_init_calldata([
                         'pistols.underware.gg',
                         0, // minter_address
