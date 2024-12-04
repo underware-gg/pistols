@@ -3,6 +3,22 @@ schema {
   subscription: World__Subscription
 }
 
+"""
+Indicates that an Input Object is a OneOf Input Object (and thus requires
+                        exactly one of its field be provided)
+"""
+directive @oneOf on INPUT_OBJECT
+
+"""
+Provides a scalar specification URL for specifying the behavior of custom scalar types.
+"""
+directive @specifiedBy(
+  """URL that specifies the behavior of this scalar."""
+  url: String!
+) on SCALAR
+
+scalar bool
+
 scalar ByteArray
 
 scalar ContractAddress
@@ -11,403 +27,40 @@ scalar Cursor
 
 scalar DateTime
 
-type ERC__Balance {
-  balance: String!
-  type: String!
-  tokenMetadata: ERC__Token!
+scalar Enum
+
+union ERC__Token = ERC20__Token | ERC721__Token
+
+type ERC20__Token {
+  name: String!
+  symbol: String!
+  decimals: String!
+  contractAddress: String!
+  amount: String!
 }
 
-type ERC__Token {
+type ERC721__Token {
   name: String!
   symbol: String!
   tokenId: String!
-  decimals: String!
   contractAddress: String!
+  metadata: String!
+  metadataName: String!
+  metadataDescription: String!
+  metadataAttributes: String!
+  imagePath: String!
 }
 
-type ERC__Transfer {
-  from: String!
-  to: String!
-  amount: String!
-  type: String!
-  executedAt: String!
-  tokenMetadata: ERC__Token!
-  transactionHash: String!
-}
+scalar felt252
 
-scalar Enum
+scalar i128
 
-union ModelUnion =
-    pistols_Scoreboard
-  | pistols_TableAdmittance
-  | pistols_CoinConfig
-  | pistols_Duelist
-  | pistols_Config
-  | pistols_TableConfig
-  | pistols_TokenConfig
-  | pistols_TokenBoundAddress
-  | pistols_Pact
-  | pistols_Round
-  | pistols_Challenge
-  | pistols_Payment
+union ModelUnion = pistols_ChallengeFameBalance | pistols_Payment | pistols_TokenBoundAddress | pistols_TableAdmittance | pistols_Round | pistols_Pact | pistols_TokenConfig | pistols_Scoreboard | pistols_TableConfig | pistols_Config | pistols_Challenge | pistols_CoinConfig | pistols_Duelist
 
 enum OrderDirection {
   ASC
   DESC
 }
-
-type World__Content {
-  name: String
-  description: String
-  website: String
-  iconUri: String
-  coverUri: String
-  socials: [World__Social]
-}
-
-type World__Entity {
-  id: ID
-  keys: [String]
-  eventId: String
-  executedAt: DateTime
-  createdAt: DateTime
-  updatedAt: DateTime
-  models: [ModelUnion]
-}
-
-type World__EntityConnection {
-  edges: [World__EntityEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type World__EntityEdge {
-  node: World__Entity
-  cursor: Cursor
-}
-
-type World__Event {
-  id: ID
-  keys: [String]
-  data: [String]
-  executedAt: DateTime
-  createdAt: DateTime
-  transactionHash: String
-}
-
-type World__EventConnection {
-  edges: [World__EventEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type World__EventEdge {
-  node: World__Event
-  cursor: Cursor
-}
-
-type World__EventMessage {
-  id: ID
-  keys: [String]
-  eventId: String
-  executedAt: DateTime
-  createdAt: DateTime
-  updatedAt: DateTime
-  models: [ModelUnion]
-}
-
-type World__EventMessageConnection {
-  edges: [World__EventMessageEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type World__EventMessageEdge {
-  node: World__EventMessage
-  cursor: Cursor
-}
-
-type World__Metadata {
-  id: ID
-  uri: String
-  worldAddress: String!
-  content: World__Content
-  iconImg: String
-  coverImg: String
-  executedAt: DateTime
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-
-type World__MetadataConnection {
-  edges: [World__MetadataEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type World__MetadataEdge {
-  node: World__Metadata
-  cursor: Cursor
-}
-
-type World__Model {
-  id: ID
-  name: String
-  namespace: String
-  classHash: felt252
-  contractAddress: felt252
-  transactionHash: felt252
-  executedAt: DateTime
-  createdAt: DateTime
-}
-
-type World__ModelConnection {
-  edges: [World__ModelEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type World__ModelEdge {
-  node: World__Model
-  cursor: Cursor
-}
-
-input World__ModelOrder {
-  direction: OrderDirection!
-  field: World__ModelOrderField!
-}
-
-enum World__ModelOrderField {
-  NAME
-  CLASS_HASH
-}
-
-type World__PageInfo {
-  hasPreviousPage: Boolean
-  hasNextPage: Boolean
-  startCursor: Cursor
-  endCursor: Cursor
-}
-
-type World__Query {
-  entity(id: ID!): World__Entity!
-  entities(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    keys: [String]
-  ): World__EntityConnection
-  eventMessage(id: ID!): World__EventMessage!
-  eventMessages(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    keys: [String]
-  ): World__EventMessageConnection
-  events(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    keys: [String]
-  ): World__EventConnection
-  metadatas(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-  ): World__MetadataConnection
-  model(id: ID!): World__Model!
-  models(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    order: World__ModelOrder
-  ): World__ModelConnection
-  transaction(transactionHash: ID!): World__Transaction!
-  transactions(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-  ): World__TransactionConnection
-  ercBalance(accountAddress: String!): [ERC__Balance]
-  ercTransfer(accountAddress: String!, limit: Int!): [ERC__Transfer]
-  pistolsScoreboardModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_ScoreboardWhereInput
-    order: pistols_ScoreboardOrder
-  ): pistols_ScoreboardConnection
-  pistolsTableAdmittanceModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_TableAdmittanceWhereInput
-    order: pistols_TableAdmittanceOrder
-  ): pistols_TableAdmittanceConnection
-  pistolsCoinConfigModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_CoinConfigWhereInput
-    order: pistols_CoinConfigOrder
-  ): pistols_CoinConfigConnection
-  pistolsDuelistModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_DuelistWhereInput
-    order: pistols_DuelistOrder
-  ): pistols_DuelistConnection
-  pistolsConfigModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_ConfigWhereInput
-    order: pistols_ConfigOrder
-  ): pistols_ConfigConnection
-  pistolsTableConfigModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_TableConfigWhereInput
-    order: pistols_TableConfigOrder
-  ): pistols_TableConfigConnection
-  pistolsTokenConfigModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_TokenConfigWhereInput
-    order: pistols_TokenConfigOrder
-  ): pistols_TokenConfigConnection
-  pistolsTokenBoundAddressModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_TokenBoundAddressWhereInput
-    order: pistols_TokenBoundAddressOrder
-  ): pistols_TokenBoundAddressConnection
-  pistolsPactModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_PactWhereInput
-    order: pistols_PactOrder
-  ): pistols_PactConnection
-  pistolsRoundModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_RoundWhereInput
-    order: pistols_RoundOrder
-  ): pistols_RoundConnection
-  pistolsChallengeModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_ChallengeWhereInput
-    order: pistols_ChallengeOrder
-  ): pistols_ChallengeConnection
-  pistolsPaymentModels(
-    first: Int
-    last: Int
-    before: Cursor
-    after: Cursor
-    offset: Int
-    limit: Int
-    where: pistols_PaymentWhereInput
-    order: pistols_PaymentOrder
-  ): pistols_PaymentConnection
-}
-
-type World__Social {
-  name: String
-  url: String
-}
-
-type World__Subscription {
-  entityUpdated(id: ID): World__Entity!
-  eventMessageUpdated(id: ID): World__EventMessage!
-  eventEmitted(keys: [String]): World__Event!
-  modelRegistered(id: ID): World__Model!
-}
-
-type World__Transaction {
-  id: ID
-  transactionHash: felt252
-  senderAddress: felt252
-  calldata: [felt252]
-  maxFee: felt252
-  signature: [felt252]
-  nonce: felt252
-  executedAt: DateTime
-  createdAt: DateTime
-}
-
-type World__TransactionConnection {
-  edges: [World__TransactionEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type World__TransactionEdge {
-  node: World__Transaction
-  cursor: Cursor
-}
-
-scalar bool
-
-scalar felt252
 
 type pistols_Challenge {
   duel_id: u128
@@ -435,6 +88,72 @@ type pistols_ChallengeConnection {
 type pistols_ChallengeEdge {
   node: pistols_Challenge
   cursor: Cursor
+}
+
+type pistols_ChallengeFameBalance {
+  duel_id: u128
+  balance_a: i128
+  balance_b: i128
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_ChallengeFameBalanceConnection {
+  edges: [pistols_ChallengeFameBalanceEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_ChallengeFameBalanceEdge {
+  node: pistols_ChallengeFameBalance
+  cursor: Cursor
+}
+
+input pistols_ChallengeFameBalanceOrder {
+  direction: OrderDirection!
+  field: pistols_ChallengeFameBalanceOrderField!
+}
+
+enum pistols_ChallengeFameBalanceOrderField {
+  DUEL_ID
+  BALANCE_A
+  BALANCE_B
+}
+
+input pistols_ChallengeFameBalanceWhereInput {
+  duel_id: u128
+  duel_idGT: u128
+  duel_idGTE: u128
+  duel_idLT: u128
+  duel_idLTE: u128
+  duel_idNEQ: u128
+  duel_idEQ: u128
+  duel_idNOTIN: [u128]
+  duel_idIN: [u128]
+  duel_idNOTLIKE: u128
+  duel_idLIKE: u128
+  balance_a: i128
+  balance_aGT: i128
+  balance_aGTE: i128
+  balance_aLT: i128
+  balance_aLTE: i128
+  balance_aNEQ: i128
+  balance_aEQ: i128
+  balance_aNOTIN: [i128]
+  balance_aIN: [i128]
+  balance_aNOTLIKE: i128
+  balance_aLIKE: i128
+  balance_b: i128
+  balance_bGT: i128
+  balance_bGTE: i128
+  balance_bLT: i128
+  balance_bLTE: i128
+  balance_bNEQ: i128
+  balance_bEQ: i128
+  balance_bNOTIN: [i128]
+  balance_bIN: [i128]
+  balance_bNOTLIKE: i128
+  balance_bLIKE: i128
 }
 
 input pistols_ChallengeOrder {
@@ -731,6 +450,15 @@ type pistols_Duelist {
   eventMessage: World__EventMessage
 }
 
+type pistols_Duelist_Score {
+  honour: u8
+  total_duels: u16
+  total_wins: u16
+  total_losses: u16
+  total_draws: u16
+  honour_history: u64
+}
+
 type pistols_DuelistConnection {
   edges: [pistols_DuelistEdge]
   totalCount: Int!
@@ -802,15 +530,6 @@ input pistols_DuelistWhereInput {
   timestampIN: [u64]
   timestampNOTLIKE: u64
   timestampLIKE: u64
-}
-
-type pistols_Duelist_Score {
-  honour: u8
-  total_duels: u16
-  total_wins: u16
-  total_losses: u16
-  total_draws: u16
-  honour_history: u64
 }
 
 type pistols_Pact {
@@ -1009,6 +728,24 @@ type pistols_Round {
   eventMessage: World__EventMessage
 }
 
+type pistols_Round_DuelistState {
+  chances: u8
+  damage: u8
+  health: u8
+  dice_fire: u8
+  honour: u8
+}
+
+type pistols_Round_Moves {
+  seed: felt252
+  salt: felt252
+  hashed: u128
+  card_1: u8
+  card_2: u8
+  card_3: u8
+  card_4: u8
+}
+
 type pistols_RoundConnection {
   edges: [pistols_RoundEdge]
   totalCount: Int!
@@ -1061,30 +798,21 @@ input pistols_RoundWhereInput {
   final_blowLIKE: felt252
 }
 
-type pistols_Round_DuelistState {
-  chances: u8
-  damage: u8
-  health: u8
-  dice_fire: u8
-  honour: u8
-}
-
-type pistols_Round_Moves {
-  seed: felt252
-  salt: felt252
-  hashed: u128
-  card_1: u8
-  card_2: u8
-  card_3: u8
-  card_4: u8
-}
-
 type pistols_Scoreboard {
   table_id: felt252
   duelist_id: u128
   score: pistols_Scoreboard_Score
   entity: World__Entity
   eventMessage: World__EventMessage
+}
+
+type pistols_Scoreboard_Score {
+  honour: u8
+  total_duels: u16
+  total_wins: u16
+  total_losses: u16
+  total_draws: u16
+  honour_history: u64
 }
 
 type pistols_ScoreboardConnection {
@@ -1132,15 +860,6 @@ input pistols_ScoreboardWhereInput {
   duelist_idIN: [u128]
   duelist_idNOTLIKE: u128
   duelist_idLIKE: u128
-}
-
-type pistols_Scoreboard_Score {
-  honour: u8
-  total_duels: u16
-  total_wins: u16
-  total_losses: u16
-  total_draws: u16
-  honour_history: u64
 }
 
 type pistols_TableAdmittance {
@@ -1420,6 +1139,40 @@ input pistols_TokenConfigWhereInput {
   minted_countLIKE: u128
 }
 
+type Token__Balance {
+  tokenMetadata: ERC__Token!
+}
+
+type Token__BalanceConnection {
+  edges: [Token__BalanceEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type Token__BalanceEdge {
+  node: Token__Balance
+  cursor: Cursor
+}
+
+type Token__Transfer {
+  from: String!
+  to: String!
+  executedAt: String!
+  tokenMetadata: ERC__Token!
+  transactionHash: String!
+}
+
+type Token__TransferConnection {
+  edges: [Token__TransferEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type Token__TransferEdge {
+  node: Token__Transfer
+  cursor: Cursor
+}
+
 scalar u128
 
 scalar u16
@@ -1429,3 +1182,200 @@ scalar u256
 scalar u64
 
 scalar u8
+
+type World__Content {
+  name: String
+  description: String
+  website: String
+  iconUri: String
+  coverUri: String
+  socials: [World__Social]
+}
+
+type World__Entity {
+  id: ID
+  keys: [String]
+  eventId: String
+  executedAt: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+  models: [ModelUnion]
+}
+
+type World__EntityConnection {
+  edges: [World__EntityEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__EntityEdge {
+  node: World__Entity
+  cursor: Cursor
+}
+
+type World__Event {
+  id: ID
+  keys: [String]
+  data: [String]
+  executedAt: DateTime
+  createdAt: DateTime
+  transactionHash: String
+}
+
+type World__EventConnection {
+  edges: [World__EventEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__EventEdge {
+  node: World__Event
+  cursor: Cursor
+}
+
+type World__EventMessage {
+  id: ID
+  keys: [String]
+  eventId: String
+  executedAt: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+  models: [ModelUnion]
+}
+
+type World__EventMessageConnection {
+  edges: [World__EventMessageEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__EventMessageEdge {
+  node: World__EventMessage
+  cursor: Cursor
+}
+
+type World__Metadata {
+  id: ID
+  uri: String
+  worldAddress: String!
+  content: World__Content
+  iconImg: String
+  coverImg: String
+  executedAt: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+type World__MetadataConnection {
+  edges: [World__MetadataEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__MetadataEdge {
+  node: World__Metadata
+  cursor: Cursor
+}
+
+type World__Model {
+  id: ID
+  name: String
+  namespace: String
+  classHash: felt252
+  contractAddress: felt252
+  transactionHash: felt252
+  executedAt: DateTime
+  createdAt: DateTime
+}
+
+type World__ModelConnection {
+  edges: [World__ModelEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__ModelEdge {
+  node: World__Model
+  cursor: Cursor
+}
+
+input World__ModelOrder {
+  direction: OrderDirection!
+  field: World__ModelOrderField!
+}
+
+enum World__ModelOrderField {
+  NAME
+  CLASS_HASH
+}
+
+type World__PageInfo {
+  hasPreviousPage: Boolean
+  hasNextPage: Boolean
+  startCursor: Cursor
+  endCursor: Cursor
+}
+
+type World__Query {
+  entity(id: ID!): World__Entity!
+  entities(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, keys: [String]): World__EntityConnection
+  eventMessage(id: ID!): World__EventMessage!
+  eventMessages(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, keys: [String]): World__EventMessageConnection
+  events(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, keys: [String]): World__EventConnection
+  metadatas(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int): World__MetadataConnection
+  model(id: ID!): World__Model!
+  models(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, order: World__ModelOrder): World__ModelConnection
+  transaction(transactionHash: ID!): World__Transaction!
+  transactions(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int): World__TransactionConnection
+  tokenBalances(accountAddress: String!, first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int): Token__BalanceConnection
+  tokenTransfers(accountAddress: String!, first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int): Token__TransferConnection
+  pistolsChallengeFameBalanceModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ChallengeFameBalanceWhereInput, order: pistols_ChallengeFameBalanceOrder): pistols_ChallengeFameBalanceConnection
+  pistolsPaymentModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PaymentWhereInput, order: pistols_PaymentOrder): pistols_PaymentConnection
+  pistolsTokenBoundAddressModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TokenBoundAddressWhereInput, order: pistols_TokenBoundAddressOrder): pistols_TokenBoundAddressConnection
+  pistolsTableAdmittanceModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TableAdmittanceWhereInput, order: pistols_TableAdmittanceOrder): pistols_TableAdmittanceConnection
+  pistolsRoundModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_RoundWhereInput, order: pistols_RoundOrder): pistols_RoundConnection
+  pistolsPactModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PactWhereInput, order: pistols_PactOrder): pistols_PactConnection
+  pistolsTokenConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TokenConfigWhereInput, order: pistols_TokenConfigOrder): pistols_TokenConfigConnection
+  pistolsScoreboardModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ScoreboardWhereInput, order: pistols_ScoreboardOrder): pistols_ScoreboardConnection
+  pistolsTableConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TableConfigWhereInput, order: pistols_TableConfigOrder): pistols_TableConfigConnection
+  pistolsConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ConfigWhereInput, order: pistols_ConfigOrder): pistols_ConfigConnection
+  pistolsChallengeModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ChallengeWhereInput, order: pistols_ChallengeOrder): pistols_ChallengeConnection
+  pistolsCoinConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_CoinConfigWhereInput, order: pistols_CoinConfigOrder): pistols_CoinConfigConnection
+  pistolsDuelistModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_DuelistWhereInput, order: pistols_DuelistOrder): pistols_DuelistConnection
+}
+
+type World__Social {
+  name: String
+  url: String
+}
+
+type World__Subscription {
+  entityUpdated(id: ID): World__Entity!
+  eventMessageUpdated(id: ID): World__EventMessage!
+  eventEmitted(keys: [String]): World__Event!
+  modelRegistered(id: ID): World__Model!
+}
+
+type World__Transaction {
+  id: ID
+  transactionHash: felt252
+  senderAddress: felt252
+  calldata: [felt252]
+  maxFee: felt252
+  signature: [felt252]
+  nonce: felt252
+  executedAt: DateTime
+  createdAt: DateTime
+}
+
+type World__TransactionConnection {
+  edges: [World__TransactionEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type World__TransactionEdge {
+  node: World__Transaction
+  cursor: Cursor
+}
+
