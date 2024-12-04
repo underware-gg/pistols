@@ -94,16 +94,6 @@ export interface Score {
 	honour_history: BigNumberish;
 }
 
-// Type definition for `pistols::models::duelist::DuelistValue` struct
-export interface DuelistValue {
-	fieldOrder: string[];
-	name: BigNumberish;
-	profile_pic_type: ProfilePicType;
-	profile_pic_uri: string;
-	timestamp: BigNumberish;
-	score: Score;
-}
-
 // Type definition for `pistols::models::duelist::Duelist` struct
 export interface Duelist {
 	fieldOrder: string[];
@@ -115,10 +105,14 @@ export interface Duelist {
 	score: Score;
 }
 
-// Type definition for `pistols::models::duelist::PactValue` struct
-export interface PactValue {
+// Type definition for `pistols::models::duelist::DuelistValue` struct
+export interface DuelistValue {
 	fieldOrder: string[];
-	duel_id: BigNumberish;
+	name: BigNumberish;
+	profile_pic_type: ProfilePicType;
+	profile_pic_uri: string;
+	timestamp: BigNumberish;
+	score: Score;
 }
 
 // Type definition for `pistols::models::duelist::Pact` struct
@@ -129,15 +123,10 @@ export interface Pact {
 	duel_id: BigNumberish;
 }
 
-// Type definition for `pistols::models::payment::PaymentValue` struct
-export interface PaymentValue {
+// Type definition for `pistols::models::duelist::PactValue` struct
+export interface PactValue {
 	fieldOrder: string[];
-	amount: BigNumberish;
-	client_percent: BigNumberish;
-	ranking_percent: BigNumberish;
-	owner_percent: BigNumberish;
-	pool_percent: BigNumberish;
-	treasury_percent: BigNumberish;
+	duel_id: BigNumberish;
 }
 
 // Type definition for `pistols::models::payment::Payment` struct
@@ -152,9 +141,21 @@ export interface Payment {
 	treasury_percent: BigNumberish;
 }
 
-// Type definition for `pistols::models::challenge::RoundValue` struct
-export interface RoundValue {
+// Type definition for `pistols::models::payment::PaymentValue` struct
+export interface PaymentValue {
 	fieldOrder: string[];
+	amount: BigNumberish;
+	client_percent: BigNumberish;
+	ranking_percent: BigNumberish;
+	owner_percent: BigNumberish;
+	pool_percent: BigNumberish;
+	treasury_percent: BigNumberish;
+}
+
+// Type definition for `pistols::models::challenge::Round` struct
+export interface Round {
+	fieldOrder: string[];
+	duel_id: BigNumberish;
 	moves_a: Moves;
 	moves_b: Moves;
 	state_a: DuelistState;
@@ -173,6 +174,17 @@ export interface DuelistState {
 	honour: BigNumberish;
 }
 
+// Type definition for `pistols::models::challenge::RoundValue` struct
+export interface RoundValue {
+	fieldOrder: string[];
+	moves_a: Moves;
+	moves_b: Moves;
+	state_a: DuelistState;
+	state_b: DuelistState;
+	state: RoundState;
+	final_blow: BigNumberish;
+}
+
 // Type definition for `pistols::models::challenge::Moves` struct
 export interface Moves {
 	fieldOrder: string[];
@@ -185,23 +197,17 @@ export interface Moves {
 	card_4: BigNumberish;
 }
 
-// Type definition for `pistols::models::challenge::Round` struct
-export interface Round {
-	fieldOrder: string[];
-	duel_id: BigNumberish;
-	moves_a: Moves;
-	moves_b: Moves;
-	state_a: DuelistState;
-	state_b: DuelistState;
-	state: RoundState;
-	final_blow: BigNumberish;
-}
-
 // Type definition for `pistols::models::duelist::Scoreboard` struct
 export interface Scoreboard {
 	fieldOrder: string[];
 	table_id: BigNumberish;
 	duelist_id: BigNumberish;
+	score: Score;
+}
+
+// Type definition for `pistols::models::duelist::ScoreboardValue` struct
+export interface ScoreboardValue {
+	fieldOrder: string[];
 	score: Score;
 }
 
@@ -216,10 +222,12 @@ export interface Score {
 	honour_history: BigNumberish;
 }
 
-// Type definition for `pistols::models::duelist::ScoreboardValue` struct
-export interface ScoreboardValue {
+// Type definition for `pistols::models::table::TableAdmittance` struct
+export interface TableAdmittance {
 	fieldOrder: string[];
-	score: Score;
+	table_id: BigNumberish;
+	accounts: Array<string>;
+	duelists: Array<BigNumberish>;
 }
 
 // Type definition for `pistols::models::table::TableAdmittanceValue` struct
@@ -229,12 +237,15 @@ export interface TableAdmittanceValue {
 	duelists: Array<BigNumberish>;
 }
 
-// Type definition for `pistols::models::table::TableAdmittance` struct
-export interface TableAdmittance {
+// Type definition for `pistols::models::table::TableConfigValue` struct
+export interface TableConfigValue {
 	fieldOrder: string[];
-	table_id: BigNumberish;
-	accounts: Array<string>;
-	duelists: Array<BigNumberish>;
+	description: BigNumberish;
+	table_type: TableType;
+	deck_type: DeckType;
+	fee_collector_address: string;
+	fee_min: BigNumberish;
+	is_open: boolean;
 }
 
 // Type definition for `pistols::models::table::TableConfig` struct
@@ -249,28 +260,17 @@ export interface TableConfig {
 	is_open: boolean;
 }
 
-// Type definition for `pistols::models::table::TableConfigValue` struct
-export interface TableConfigValue {
+// Type definition for `pistols::systems::components::token_bound::TokenBoundAddress` struct
+export interface TokenBoundAddress {
 	fieldOrder: string[];
-	description: BigNumberish;
-	table_type: TableType;
-	deck_type: DeckType;
-	fee_collector_address: string;
-	fee_min: BigNumberish;
-	is_open: boolean;
+	recipient: string;
+	contract_address: string;
+	token_id: BigNumberish;
 }
 
 // Type definition for `pistols::systems::components::token_bound::TokenBoundAddressValue` struct
 export interface TokenBoundAddressValue {
 	fieldOrder: string[];
-	contract_address: string;
-	token_id: BigNumberish;
-}
-
-// Type definition for `pistols::systems::components::token_bound::TokenBoundAddress` struct
-export interface TokenBoundAddress {
-	fieldOrder: string[];
-	recipient: string;
 	contract_address: string;
 	token_id: BigNumberish;
 }
@@ -357,24 +357,24 @@ export interface PistolsSchemaType extends SchemaType {
 		ConfigValue: ConfigValue,
 		Config: Config,
 		Score: Score,
-		DuelistValue: DuelistValue,
 		Duelist: Duelist,
-		PactValue: PactValue,
+		DuelistValue: DuelistValue,
 		Pact: Pact,
-		PaymentValue: PaymentValue,
+		PactValue: PactValue,
 		Payment: Payment,
-		RoundValue: RoundValue,
-		DuelistState: DuelistState,
-		Moves: Moves,
+		PaymentValue: PaymentValue,
 		Round: Round,
+		DuelistState: DuelistState,
+		RoundValue: RoundValue,
+		Moves: Moves,
 		Scoreboard: Scoreboard,
 		ScoreboardValue: ScoreboardValue,
-		TableAdmittanceValue: TableAdmittanceValue,
 		TableAdmittance: TableAdmittance,
-		TableConfig: TableConfig,
+		TableAdmittanceValue: TableAdmittanceValue,
 		TableConfigValue: TableConfigValue,
-		TokenBoundAddressValue: TokenBoundAddressValue,
+		TableConfig: TableConfig,
 		TokenBoundAddress: TokenBoundAddress,
+		TokenBoundAddressValue: TokenBoundAddressValue,
 		TokenConfigValue: TokenConfigValue,
 		TokenConfig: TokenConfig,
 		ERC__Balance: ERC__Balance,
@@ -459,14 +459,6 @@ export const schema: PistolsSchemaType = {
 			total_draws: 0,
 			honour_history: 0,
 		},
-		DuelistValue: {
-			fieldOrder: ['name', 'profile_pic_type', 'profile_pic_uri', 'timestamp', 'score'],
-			name: 0,
-			profile_pic_type: ProfilePicType.Undefined,
-			profile_pic_uri: "",
-			timestamp: 0,
-			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
-		},
 		Duelist: {
 			fieldOrder: ['duelist_id', 'name', 'profile_pic_type', 'profile_pic_uri', 'timestamp', 'score'],
 			duelist_id: 0,
@@ -476,9 +468,13 @@ export const schema: PistolsSchemaType = {
 			timestamp: 0,
 			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
-		PactValue: {
-			fieldOrder: ['duel_id'],
-			duel_id: 0,
+		DuelistValue: {
+			fieldOrder: ['name', 'profile_pic_type', 'profile_pic_uri', 'timestamp', 'score'],
+			name: 0,
+			profile_pic_type: ProfilePicType.Undefined,
+			profile_pic_uri: "",
+			timestamp: 0,
+			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		Pact: {
 			fieldOrder: ['table_id', 'pair', 'duel_id'],
@@ -486,14 +482,9 @@ export const schema: PistolsSchemaType = {
 			pair: 0,
 			duel_id: 0,
 		},
-		PaymentValue: {
-			fieldOrder: ['amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
-			amount: 0,
-			client_percent: 0,
-			ranking_percent: 0,
-			owner_percent: 0,
-			pool_percent: 0,
-			treasury_percent: 0,
+		PactValue: {
+			fieldOrder: ['duel_id'],
+			duel_id: 0,
 		},
 		Payment: {
 			fieldOrder: ['key', 'amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
@@ -505,8 +496,18 @@ export const schema: PistolsSchemaType = {
 			pool_percent: 0,
 			treasury_percent: 0,
 		},
-		RoundValue: {
-			fieldOrder: ['moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
+		PaymentValue: {
+			fieldOrder: ['amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
+			amount: 0,
+			client_percent: 0,
+			ranking_percent: 0,
+			owner_percent: 0,
+			pool_percent: 0,
+			treasury_percent: 0,
+		},
+		Round: {
+			fieldOrder: ['duel_id', 'moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
+			duel_id: 0,
 			moves_a: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
 			moves_b: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
 			state_a: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
@@ -522,6 +523,15 @@ export const schema: PistolsSchemaType = {
 			dice_fire: 0,
 			honour: 0,
 		},
+		RoundValue: {
+			fieldOrder: ['moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
+			moves_a: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+			moves_b: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+			state_a: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
+			state_b: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
+			state: RoundState.Null,
+			final_blow: 0,
+		},
 		Moves: {
 			fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'],
 			seed: 0,
@@ -531,16 +541,6 @@ export const schema: PistolsSchemaType = {
 			card_2: 0,
 			card_3: 0,
 			card_4: 0,
-		},
-		Round: {
-			fieldOrder: ['duel_id', 'moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
-			duel_id: 0,
-			moves_a: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-			moves_b: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-			state_a: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
-			state_b: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
-			state: RoundState.Null,
-			final_blow: 0,
 		},
 		Scoreboard: {
 			fieldOrder: ['table_id', 'duelist_id', 'score'],
@@ -552,16 +552,25 @@ export const schema: PistolsSchemaType = {
 			fieldOrder: ['score'],
 			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
-		TableAdmittanceValue: {
-			fieldOrder: ['accounts', 'duelists'],
-			accounts: [""],
-			duelists: [0],
-		},
 		TableAdmittance: {
 			fieldOrder: ['table_id', 'accounts', 'duelists'],
 			table_id: 0,
 			accounts: [""],
 			duelists: [0],
+		},
+		TableAdmittanceValue: {
+			fieldOrder: ['accounts', 'duelists'],
+			accounts: [""],
+			duelists: [0],
+		},
+		TableConfigValue: {
+			fieldOrder: ['description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
+			description: 0,
+			table_type: TableType.Undefined,
+			deck_type: DeckType.None,
+			fee_collector_address: "",
+			fee_min: 0,
+			is_open: false,
 		},
 		TableConfig: {
 			fieldOrder: ['table_id', 'description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
@@ -573,23 +582,14 @@ export const schema: PistolsSchemaType = {
 			fee_min: 0,
 			is_open: false,
 		},
-		TableConfigValue: {
-			fieldOrder: ['description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
-			description: 0,
-			table_type: TableType.Undefined,
-			deck_type: DeckType.None,
-			fee_collector_address: "",
-			fee_min: 0,
-			is_open: false,
-		},
-		TokenBoundAddressValue: {
-			fieldOrder: ['contract_address', 'token_id'],
-			contract_address: "",
-			token_id: 0,
-		},
 		TokenBoundAddress: {
 			fieldOrder: ['recipient', 'contract_address', 'token_id'],
 			recipient: "",
+			contract_address: "",
+			token_id: 0,
+		},
+		TokenBoundAddressValue: {
+			fieldOrder: ['contract_address', 'token_id'],
 			contract_address: "",
 			token_id: 0,
 		},
