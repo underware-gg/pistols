@@ -4,7 +4,7 @@ import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
+import { useDuelistsOfPlayer, useNextRandomProfilePic } from '@/pistols/hooks/useDuelistToken'
 import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useCalcFeeDuelist } from '@/pistols/hooks/useContractCalls'
 import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsMock'
@@ -18,7 +18,6 @@ import { FeesToPay } from '@/pistols/components/account/LordsBalance'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
-import { poseidon } from '@/lib/utils/starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -35,7 +34,7 @@ export default function DuelistEditModal({
   const editingDuelistId = (mintNew ? 0n : duelistId)
 
   // watch new mints
-  const { duelistIds } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfPlayer()
 
   // Detect new mints
   const { dispatchSetScene } = usePistolsScene()
@@ -61,7 +60,7 @@ export default function DuelistEditModal({
   const { name, profilePic, score: { archetypeName } } = useDuelist(editingDuelistId)
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
 
-  const randomPic = useMemo(() => (Number(poseidon([address ?? 0n, duelistIds.length ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, duelistIds.length])
+  const { randomPic } = useNextRandomProfilePic()
   const _profilePic = useMemo(() => {
     return (
       selectedProfilePic ? selectedProfilePic

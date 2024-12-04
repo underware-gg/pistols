@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Tab } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
+import { useDuelistsOfPlayer } from '@/pistols/hooks/useDuelistToken'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/components/scenes/ScDoor'
@@ -18,10 +18,10 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function ScProfile() {
-  const { isConnected, address } = useAccount()
+  const { isConnected } = useAccount()
   const { duelistEditOpener } = usePistolsContext()
   const { fromGate } = usePistolsScene()
-  const { duelistIds } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfPlayer()
   // console.log(`DUELIST BALANCE`, duelistIds.length)
 
   const [loaded, setLoaded] = useState(false)
@@ -89,11 +89,10 @@ function DuelistsConnect() {
 
 
 function DuelistsList() {
-  const { address } = useAccount()
   const { duelistId, dispatchDuelistId } = useSettings()
   const { duelistEditOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
-  const { duelistIds } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfPlayer()
   
   const { aspectWidth } = useGameAspect()
 

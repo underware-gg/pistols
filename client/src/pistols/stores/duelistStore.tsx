@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 // import { createDojoStore } from '@dojoengine/sdk'
 import { createDojoStore } from '@/lib/dojo/fix/zustand'

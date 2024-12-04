@@ -1,48 +1,106 @@
 import { useMemo, useEffect } from 'react'
+import { create } from 'zustand'
 import { addAddressPadding, BigNumberish } from 'starknet'
-// import { createDojoStore } from '@dojoengine/sdk'
-import { createDojoStore } from '@/lib/dojo/fix/zustand'
+import { useAccount } from '@starknet-react/core'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
-import { Token, TokenBalance } from '@dojoengine/torii-client'
+import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
+import { useToriiTokenIdsByOwnerQL } from '@/lib/dojo/hooks/useToriiTokensQL'
+import { TokenBalance } from '@dojoengine/torii-client'
+import { bigintToHex } from '@/lib/utils/types'
 
-//
-// Stores all duelists
-const useStore = createDojoStore<any>();
 
+//-----------------------------------------
+// Stores only the entity ids and sorting data from a duelists query
+// to get duelist data, use duelistStore
 //
-// Sync all duelists tokens (ERC-721)
-// Add only once to a top level component
-export function DuelistTokenStoreSync() {
-  const { sdk } = useDojoSetup()
+interface TokenIdsByOwner {
+  [accountAddress: string]: bigint[]
+}
+interface TokenIdsByContract {
+  [contractAddress: string]: TokenIdsByOwner
+}
+interface State {
+  tokenIds: TokenIdsByContract,
+  setTokenIds: (contractAddress: BigNumberish, accountAddress: BigNumberish, ids: bigint[]) => void;
+  getTokenIds: (contractAddress: BigNumberish, accountAddress: BigNumberish) => bigint[];
+}
+
+const createStore = () => {
+  return create<State>()((set, get) => ({
+    tokenIds: {},
+    setTokenIds: (contractAddress: BigNumberish, accountAddress: BigNumberish, ids: bigint[]) => {
+      set((state: State) => ({
+        tokenIds: {
+          ...state.tokenIds,
+          [bigintToHex(contractAddress)]: {
+            ...state.tokenIds[bigintToHex(contractAddress)],
+            [bigintToHex(accountAddress)]: ids,
+          },
+        },
+      }))
+    },
+    getTokenIds: (contractAddress: BigNumberish, accountAddress: BigNumberish): bigint[] => {
+      return get().tokenIds[bigintToHex(contractAddress)]?.[bigintToHex(accountAddress)] ?? []
+    },
+  }))
+}
+
+const useStore = createStore();
+
+
+//----------------------------------------
+// keep connected player's tokens in sync
+//
+export function PlayerDuelistTokensStoreSyncQL() {
+  const { duelistContractAddress } = useDuelistTokenContract()
+  const { address } = useAccount()
   const state = useStore((state) => state)
-
+  const { tokenIds } = useToriiTokenIdsByOwnerQL(duelistContractAddress, address, true)
   useEffect(() => {
-    const _fetch = async () => {
-      // const response: Token[] = await sdk.getTokens([])
-      const response: TokenBalance[] = await sdk.getTokenBalances(
-        [], []
-        // [addAddressPadding('0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f')],
-        // [addAddressPadding('0x1a94113e8fbecb3d62503d27744b7efad4e1f10dbd8dfad16d9ec00f4fc927d')]
-        // [],
-      )
-      console.log("DuelistTokenStoreSync() =>>>>>>>>>", response)
+    if (duelistContractAddress && address) {
+      state.setTokenIds(duelistContractAddress, address, tokenIds)
     }
-    if (sdk) {
-      // _fetch()
-    }
-  }, [sdk])
-
-  // useEffect(() => console.log("DuelistStoreSync() =>", state.entities), [state.entities])
-
+  }, [duelistContractAddress, address, tokenIds])
+  useEffect(() => console.log("PlayerDuelistTokensStoreSyncQL() =>", state.tokenIds), [state.tokenIds])
   return (<></>)
 }
 
-export function useErc721TokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean = false) {
-  const state = useStore()
-  // const token = useMemo(() =>
-  //   tokens.ERC721.find(token => bigintEquals(token.contractAddress, contractAddress)),
-  //   [tokens, contractAddress])
+
+//----------------------------------------
+// TODO: replace QL for this...
+//
+export function PlayerDuelistTokensStoreSync() {
+  // const { duelistContractAddress } = useDuelistTokenContract()
+  // const { address } = useAccount()
+  // const { sdk } = useDojoSetup()
+  // const state = useStore((state) => state)
+  // useEffect(() => {
+  //   const _fetch = async () => {
+  //     // const response: Token[] = await sdk.getTokens([])
+  //     const response: TokenBalance[] = await sdk.getTokenBalances(
+  //       // [], []
+  //       [addAddressPadding(address)],
+  //       [addAddressPadding(duelistContractAddress)]
+  //       // [],  
+  //     )
+  //     console.log("PlayerDuelistTokensStoreSync() =>>>>>>>>>", response)
+  //   }
+  //   if (sdk) {
+  //     _fetch()
+  //   }
+  // }, [sdk])
+  // useEffect(() => console.log("PlayerDuelistTokensStoreSync() =>", state.tokenIds), [state.tokenIds])
+  return (<></>)
+}
+
+
+//----------------------------------------
+// consumer hooks
+//
+export function useTokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
+  const state = useStore((state) => state)
+  const tokenIds = useMemo(() => state.getTokenIds(contractAddress, owner), [contractAddress, owner, state.tokenIds])
   return {
-    // token,
+    tokenIds,
   }
 }

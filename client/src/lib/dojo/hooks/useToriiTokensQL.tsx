@@ -97,7 +97,7 @@ export type ERC_Tokens = {
   },
 }
 
-export function useToriiTokensByOwner(owner: BigNumberish, watch: boolean = false) {
+export function useToriiTokensByOwnerQL(owner: BigNumberish, watch: boolean) {
   const { selectedChainConfig } = useSelectedChain()
   const variables = useMemo(() => ({
     address: bigintToHex(owner).toLowerCase(),
@@ -109,6 +109,7 @@ export function useToriiTokensByOwner(owner: BigNumberish, watch: boolean = fals
     variables,
     !isPositiveBigint(owner),
     watch,
+    1000,
   );
   const tokens = useMemo(() => {
     let tokens: ERC_Tokens = {
@@ -151,12 +152,12 @@ export function useToriiTokensByOwner(owner: BigNumberish, watch: boolean = fals
   }
 }
 
-export function useErc721TokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean = false) {
-  const { tokens, refetch } = useToriiTokensByOwner(owner, watch)
+export function useToriiTokenIdsByOwnerQL(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean) {
+  const { tokens, refetch } = useToriiTokensByOwnerQL(owner, watch)
   const tokenIds = useMemo<bigint[]>(() =>
     tokens.ERC721[bigintToHex(contractAddress)]?.tokenIds ?? [],
   [tokens, contractAddress])
-  // console.log(`>>> useErc721TokenIdsByOwner():`, tokenIds)
+  // console.log(`>>> useToriiTokenIdsByOwnerQL():`, tokenIds)
   return {
     tokenIds,
     refetch,

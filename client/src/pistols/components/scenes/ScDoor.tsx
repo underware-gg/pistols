@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Button, FormInput, Grid } from 'semantic-ui-react'
+import { FormInput, Grid } from 'semantic-ui-react'
 import { VStack } from '@/lib/ui/Stack'
 import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
 import { useDojoStatus, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
@@ -9,32 +9,26 @@ import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/P
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Divider } from '@/lib/ui/Divider'
 import { PACKAGE_VERSION, PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
-import Logo from '@/pistols/components/Logo'
 import { useIsMyDuelist } from '../../hooks/useIsYou'
-import { emitter } from '@/pistols/three/game'
-import { useAccount, useDisconnect } from '@starknet-react/core'
-import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
+import { useAccount } from '@starknet-react/core'
+import { useDuelistsOfPlayer, useNextRandomProfilePic } from '@/pistols/hooks/useDuelistToken'
 import { ProfilePicType } from '@/games/pistols/generated/constants'
-import { poseidon } from '@/lib/utils/starknet'
-import { Archetype } from '@/games/pistols/generated/constants'
 import { IconClick } from '@/lib/ui/Icons'
-import { ProfilePic } from '../account/ProfilePic'
-import { ArchetypeNames } from '@/pistols/utils/pistols'
-import { ArchetypeIcon } from '../ui/PistolsIcon'
+import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import useGameAspect from '@/pistols/hooks/useGameApect'
+import Logo from '@/pistols/components/Logo'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function ScDoor() {
   const { account, address, isConnected } = useAccount()
-  const { disconnect } = useDisconnect()
 
   const { create_duelist } = useDojoSystemCalls()
   const { dispatchSelectDuel } = usePistolsContext()
   const { dispatchDuelistId, duelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
-  const { duelistIds } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfPlayer()
   const isMyDuelist = useIsMyDuelist(duelistId)
 
   const { isReady } = useDojoStatus()
@@ -49,7 +43,7 @@ export default function ScDoor() {
 
   const { aspectWidth } = useGameAspect()
 
-  const randomPic = useMemo(() => (Number(poseidon([address ?? 0n, duelistIds.length ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, duelistIds.length])
+  const { randomPic } = useNextRandomProfilePic()
   const _profilePic = useMemo(() => (selectedProfilePic || randomPic), [selectedProfilePic, randomPic])
 
   const duelists = useRef<bigint[]>(duelistIds)
