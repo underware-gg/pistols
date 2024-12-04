@@ -79,7 +79,7 @@ export const useSdkEntities = <T,>({
         options: { logging },
       })
     }
-    if (enabled) {
+    if (sdk && enabled) {
       _get()
     }
   }, [sdk, query_get, enabled])
@@ -108,7 +108,7 @@ export const useSdkEntities = <T,>({
       unsubscribe = () => subscription.cancel()
     };
 
-    if (enabled && query_sub && updateEntity) {
+    if (sdk && enabled && query_sub && updateEntity) {
       _subscribe()
     }
 

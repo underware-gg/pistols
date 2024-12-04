@@ -102,8 +102,9 @@ export function useToriiTokensByOwner(owner: BigNumberish, watch: boolean = fals
   const variables = useMemo(() => ({
     address: bigintToHex(owner).toLowerCase(),
   }), [owner]);
+  const toriiUrl = useMemo(() => `${selectedChainConfig.toriiUrl}/graphql`, [selectedChainConfig.toriiUrl])
   const { data, refetch } = useGraphQLQuery(
-    `${selectedChainConfig.toriiUrl}/graphql`,
+    toriiUrl,
     tokenBalances,
     variables,
     !isPositiveBigint(owner),

@@ -27,8 +27,10 @@ export function DuelistTokenStoreSync() {
       )
       console.log("DuelistTokenStoreSync() =>>>>>>>>>", response)
     }
-    // _fetch()
-  }, [])
+    if (sdk) {
+      // _fetch()
+    }
+  }, [sdk])
 
   // useEffect(() => console.log("DuelistStoreSync() =>", state.entities), [state.entities])
 

@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { BigNumberish } from 'starknet'
+import { useState } from 'react'
 import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
 import { PistolsEntity, PistolsGetQuery, PistolsSubQuery, useSdkEntities } from '@/lib/dojo/hooks/useSdkEntities'
-import { useDojoSetup } from '@/lib/dojo/DojoContext'
 
 export type {
   PistolsGetQuery,
@@ -49,7 +47,6 @@ export const useSdkGet = <T,>({
   offset = 0,
   logging = false,
 }: UseSdkGetProps): UseSdkGetResult => {
-  const { sdk } = useDojoSetup()
   const [entities, setEntities] = useState<EntityMap | null>()
 
   const { isLoading, isSubscribed, refetch } = useSdkEntities({
