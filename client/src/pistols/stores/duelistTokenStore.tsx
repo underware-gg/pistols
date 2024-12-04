@@ -35,7 +35,7 @@ export function DuelistTokenStoreSync() {
   return (<></>)
 }
 
-export function useErc721TokensByOwner(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean = false) {
+export function useErc721TokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean = false) {
   const state = useStore()
   // const token = useMemo(() =>
   //   tokens.ERC721.find(token => bigintEquals(token.contractAddress, contractAddress)),

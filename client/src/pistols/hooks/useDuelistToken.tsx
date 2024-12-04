@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useTokenConfig } from '@/pistols/stores/tokenConfigStore'
-import { useErc721TokensByOwner } from '@/lib/dojo/hooks/useToriiErcTokensQL'
+import { useErc721TokenIdsByOwner } from '@/lib/dojo/hooks/useToriiErcTokensQL'
 import { useERC721OwnerOf } from '@/lib/utils/hooks/useERC721'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
 
@@ -27,10 +27,9 @@ export const useOwnerOfDuelist = (token_id: BigNumberish) => {
 
 export const useDuelistsOfOwner = (owner: BigNumberish) => {
   const { duelistContractAddress } = useDuelistTokenContract()
-  const { token } = useErc721TokensByOwner(duelistContractAddress, owner, true)
+  const { tokenIds } = useErc721TokenIdsByOwner(duelistContractAddress, owner, true)
   return {
-    duelistBalance: token?.balance ?? 0,
-    duelistIds: token?.tokenIds ?? [],
+    duelistIds: tokenIds,
     isPending: false,
   }
 }
@@ -40,7 +39,7 @@ export const useDuelistsOfOwner = (owner: BigNumberish) => {
 export const useDuelistCalcPrice = (address: BigNumberish) => {
   const [tokenAddress, setTokenAddress] = useState<boolean>()
   const [amount, setAmount] = useState<boolean>()
-  const { duelistBalance } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfOwner(address)
   const { calc_mint_fee_duelist } = useDojoSystemCalls()
   useEffect(() => {
     if (address && calc_mint_fee_duelist) {
@@ -55,7 +54,7 @@ export const useDuelistCalcPrice = (address: BigNumberish) => {
       setTokenAddress(undefined)
       setAmount(undefined)
     }
-  }, [address, duelistBalance, calc_mint_fee_duelist])
+  }, [address, duelistIds.length, calc_mint_fee_duelist])
   return {
     tokenAddress,
     amount,

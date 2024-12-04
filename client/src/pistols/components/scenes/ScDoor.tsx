@@ -34,7 +34,7 @@ export default function ScDoor() {
   const { dispatchSelectDuel } = usePistolsContext()
   const { dispatchDuelistId, duelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
-  const { duelistBalance, duelistIds } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfOwner(address)
   const isMyDuelist = useIsMyDuelist(duelistId)
 
   const { isReady } = useDojoStatus()
@@ -49,7 +49,7 @@ export default function ScDoor() {
 
   const { aspectWidth } = useGameAspect()
 
-  const randomPic = useMemo(() => (Number(poseidon([address ?? 0n, duelistBalance ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, duelistBalance])
+  const randomPic = useMemo(() => (Number(poseidon([address ?? 0n, duelistIds.length ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, duelistIds.length])
   const _profilePic = useMemo(() => (selectedProfilePic || randomPic), [selectedProfilePic, randomPic])
 
   const duelists = useRef<bigint[]>(duelistIds)

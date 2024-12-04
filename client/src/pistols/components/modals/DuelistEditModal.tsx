@@ -35,33 +35,33 @@ export default function DuelistEditModal({
   const editingDuelistId = (mintNew ? 0n : duelistId)
 
   // watch new mints
-  const { duelistBalance } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfOwner(address)
 
   // Detect new mints
   const { dispatchSetScene } = usePistolsScene()
-  const [duelistBalanceBeforeMint, setDuelistBalanceBeforeMint] = useState<number>(null)
+  const [duelistCountBeforeMint, setDuelistCountBeforeMint] = useState<number>(null)
   const { mintLords, hasFaucet } = useLordsFaucet()
   useEffect(() => {
     // minted new! go to Game...
     if (opener.isOpen &&
       mintNew &&
-      duelistBalanceBeforeMint != null &&
-      duelistBalance != duelistBalanceBeforeMint
+      duelistCountBeforeMint != null &&
+      duelistCountBeforeMint != duelistIds.length
     ) {
-      console.log(`NEW DUELIST BALANCE:`, duelistBalance)
-      dispatchDuelistId(duelistBalance)
+      console.log(`NEW DUELIST BALANCE:`, duelistIds.length)
+      dispatchDuelistId(duelistIds.length)
       dispatchSetScene(SceneName.Tavern)
       if (hasFaucet) mintLords(account)
       opener.close()
     }
-  }, [mintNew, duelistBalance])
+  }, [mintNew, duelistIds.length])
 
   const { create_duelist, update_duelist } = useDojoSystemCalls()
 
   const { name, profilePic, score: { archetypeName } } = useDuelist(editingDuelistId)
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
 
-  const randomPic = useMemo(() => (Number(poseidon([address ?? 0n, duelistBalance ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, duelistBalance])
+  const randomPic = useMemo(() => (Number(poseidon([address ?? 0n, duelistIds.length ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, duelistIds.length])
   const _profilePic = useMemo(() => {
     return (
       selectedProfilePic ? selectedProfilePic
@@ -86,7 +86,7 @@ export default function DuelistEditModal({
 
   const _mint = () => {
     if (canSubmit && mintNew) {
-      setDuelistBalanceBeforeMint(duelistBalance ?? 0)
+      setDuelistCountBeforeMint(duelistIds.length ?? 0)
       create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString())
     }
   }

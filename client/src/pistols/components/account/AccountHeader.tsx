@@ -54,7 +54,7 @@ export function DuelistsNavigationMenu({
 }) {
   const { address } = useAccount()
   const { dispatchSetScene } = usePistolsScene()
-  const { duelistBalance, duelistIds } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfOwner(address)
   const { duelistId: selectedDuelistId } = useSettings()
   const { dispatchDuelistId } = useSettings()
   const { aspectWidth } = useGameAspect()
@@ -82,7 +82,7 @@ export function DuelistsNavigationMenu({
         </Dropdown.Item>
       )
     })
-  ), [address, duelistBalance, selectedDuelistId])
+  ), [address, duelistIds.length, selectedDuelistId])
 
   return (
     <Dropdown

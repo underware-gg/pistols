@@ -21,18 +21,18 @@ export default function ScProfile() {
   const { isConnected, address } = useAccount()
   const { duelistEditOpener } = usePistolsContext()
   const { fromGate } = usePistolsScene()
-  const { duelistBalance } = useDuelistsOfOwner(address)
-  // console.log(`DUELIST BALANCE`, duelistBalance)
+  const { duelistIds } = useDuelistsOfOwner(address)
+  // console.log(`DUELIST BALANCE`, duelistIds.length)
 
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     if (!loaded) {
       setLoaded(true)
-      if (fromGate && duelistBalance === 0) {
+      if (fromGate && duelistIds.length === 0) {
         duelistEditOpener.open({ mintNew: true })
       }
     }
-  }, [fromGate, duelistBalance])
+  }, [fromGate, duelistIds.length])
 
   return (
     <div id='Profile'>
@@ -93,7 +93,7 @@ function DuelistsList() {
   const { duelistId, dispatchDuelistId } = useSettings()
   const { duelistEditOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
-  const { duelistBalance, duelistIds } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfOwner(address)
   
   const { aspectWidth } = useGameAspect()
 
@@ -139,7 +139,7 @@ function DuelistsList() {
   return (
     <div className='FillWidth' style={{ marginLeft: aspectWidth(1) }}>
       <Divider hidden />
-      {duelistBalance > 0 ? (
+      {duelistIds.length > 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div className='Title'>Pick A Duelist To Play</div>
           <div style={{

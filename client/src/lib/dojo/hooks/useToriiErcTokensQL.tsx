@@ -9,73 +9,92 @@ import { bigintEquals, bigintToHex, isPositiveBigint } from '@/lib/utils/types'
 //---------------------------
 // Queries
 //
-const ercBalance = gql`
-query erc_balance(
+const tokenBalances = gql`
+query tokenBalances(
   $address: String
 ){
-  ercBalance(
+  tokenBalances(
     accountAddress: $address
   ){
-  	type
-    balance
-    tokenMetadata{
-      name
-      symbol
-      tokenId
-      decimals
-      contractAddress
+    totalCount
+    edges {
+      node {
+        tokenMetadata {
+          __typename
+          ... on ERC20__Token {
+            contractAddress
+            #name
+            symbol
+            decimals
+            amount
+          }
+          ... on ERC721__Token {
+            contractAddress
+            #name
+            symbol
+            tokenId
+            #metadata
+            #metadataName
+            #metadataDescription
+            #metadataAttributes
+            #imagePath
+          }
+        }
+      }
     }
   }
 }
 `;
 
-const ercTransfer = gql`
-query erc_transfer($address: String, $limit: Int){
-  ercTransfer(
-    accountAddress: $address
-    limit: $limit
-  ){
-  	type
-    from
-    to
-    amount
-    executedAt
-    transactionHash
-    tokenMetadata{
-      name
-      symbol
-      tokenId
-      decimals
-      contractAddress
-    }
-  }
-}
-`;
+// const tokenTransfers = gql`
+// query tokenTransfers($address: String, $limit: Int){
+//   tokenTransfers(
+//     accountAddress: $address
+//     limit: $limit
+//   ){
+//   	type
+//     from
+//     to
+//     amount
+//     executedAt
+//     transactionHash
+//     tokenMetadata{
+//       name
+//       symbol
+//       tokenId
+//       decimals
+//       contractAddress
+//     }
+//   }
+// }
+// `;
 
 
 //---------------------------
 // Torii data
 //
 
-export type ERC_Type = 'ERC20' | 'ERC721'
+export type ERC_typename = 'ERC20__Token' | 'ERC721__Token'
 
-export interface ERC_Token {
-  name: string;
+export type ERC20_Token = {
   symbol: string;
-  decimals: number;
-  contractAddress: bigint;
+  decimals: number
+  balance: bigint
+  balance_eth: bigint
 }
-export type ERC20_Token = ERC_Token & {
-  balance: bigint;
-  balance_eth: bigint;
-}
-export type ERC721_Token = ERC_Token & {
-  balance: number
+export type ERC721_Token = {
+  symbol: string;
   tokenIds: bigint[]
 }
+export type ERC_Token = ERC20_Token | ERC721_Token
+
 export type ERC_Tokens = {
-  ERC20: ERC20_Token[],
-  ERC721: ERC721_Token[],
+  ERC20: {
+    [contractAddress: string]: ERC20_Token
+  },
+  ERC721: {
+    [contractAddress: string]: ERC721_Token
+  },
 }
 
 export function useToriiTokensByOwner(owner: BigNumberish, watch: boolean = false) {
@@ -85,51 +104,44 @@ export function useToriiTokensByOwner(owner: BigNumberish, watch: boolean = fals
   }), [owner]);
   const { data, refetch } = useGraphQLQuery(
     `${selectedChainConfig.toriiUrl}/graphql`,
-    ercBalance,
+    tokenBalances,
     variables,
     !isPositiveBigint(owner),
     watch,
   );
   const tokens = useMemo(() => {
     let tokens: ERC_Tokens = {
-      ERC20: [],
-      ERC721: [],
+      ERC20: {},
+      ERC721: {},
     }
-    data?.ercBalance?.forEach((token: any) => {
-      const type = token.type as ERC_Type
-      const contractAddress = BigInt(token.tokenMetadata.contractAddress)
-      let tokenIndex = tokens[type].findIndex(t => t.contractAddress === contractAddress)
-      if (type === 'ERC20') {
-        if (tokenIndex == -1) {
-          tokens[type].push({
-            name: token.tokenMetadata.name,
-            symbol: token.tokenMetadata.symbol,
-            decimals: Number(token.tokenMetadata.decimals),
-            contractAddress,
+    // console.log(`QL_DATA:`, data)
+    data?.tokenBalances?.edges.forEach((e: any, index: number) => {
+      const token = e.node.tokenMetadata
+      const typename = token.__typename as ERC_typename
+      // console.log(`QL_TOKEN[${index}][${typename}]:`, token)
+      const contractAddress = bigintToHex(token.contractAddress)
+      if (typename === 'ERC20__Token') {
+        if (!tokens.ERC20[contractAddress]) {
+          tokens.ERC20[contractAddress] = {
+            symbol: token.symbol,
+            decimals: token.decimals,
             balance: 0n,
             balance_eth: 0n,
-          })
-          tokenIndex = tokens[type].length - 1
+          }
         }
-        tokens[type][tokenIndex].balance += BigInt(token.balance)
-        tokens[type][tokenIndex].balance_eth = (tokens[type][tokenIndex].balance / (10n ** BigInt(tokens[type][tokenIndex].decimals)))
-      } else if (type === 'ERC721') {
-        if (tokenIndex == -1) {
-          tokens[type].push({
-            name: token.tokenMetadata.name,
-            symbol: token.tokenMetadata.symbol,
-            decimals: Number(token.tokenMetadata.decimals),
-            contractAddress,
-            balance: 0,
+        tokens.ERC20[contractAddress].balance += BigInt(token.amount)
+        tokens.ERC20[contractAddress].balance_eth = (tokens.ERC20[contractAddress].balance / (10n ** BigInt(tokens.ERC20[contractAddress].decimals)))
+      } else if (typename === 'ERC721__Token') {
+        if (!tokens.ERC721[contractAddress]) {
+          tokens.ERC721[contractAddress] = {
+            symbol: token.symbol,
             tokenIds: [],
-          })
-          tokenIndex = tokens[type].length - 1
+          }
         }
-        tokens[type][tokenIndex].balance++
-        tokens[type][tokenIndex].tokenIds.push(BigInt(token.tokenMetadata.tokenId))
+        tokens.ERC721[contractAddress].tokenIds.push(BigInt(token.tokenId))
       }
     })
-    // console.log(`>>> TOKENS:`, tokens)
+    // console.log(`>>> QL TOKENS:`, tokens)
     return tokens;
   }, [data])
   return {
@@ -138,13 +150,14 @@ export function useToriiTokensByOwner(owner: BigNumberish, watch: boolean = fals
   }
 }
 
-export function useErc721TokensByOwner(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean = false) {
+export function useErc721TokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean = false) {
   const { tokens, refetch } = useToriiTokensByOwner(owner, watch)
-  const token = useMemo(() => 
-    tokens.ERC721.find(token => bigintEquals(token.contractAddress, contractAddress)),
+  const tokenIds = useMemo<bigint[]>(() =>
+    tokens.ERC721[bigintToHex(contractAddress)]?.tokenIds ?? [],
   [tokens, contractAddress])
+  // console.log(`>>> useErc721TokenIdsByOwner():`, tokenIds)
   return {
-    token,
+    tokenIds,
     refetch,
   }
 }
