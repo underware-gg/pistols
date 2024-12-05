@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { ChallengeState } from '@/games/pistols/generated/constants'
-import { AllChallengeStates } from '@/pistols/utils/pistols'
+import { AllChallengeStates, LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
 
 export enum DuelistColumn {
   Name = 'Name',
@@ -62,8 +62,8 @@ export const useQueryParams = create<State>((set) => ({
   // challenge filters
   filterChallengeSortColumn: ChallengeColumn.Time,
   filterChallengeSortDirection: SortDirection.Descending,
-  filterStatesLiveDuels: AllChallengeStates,
-  filterStatesPastDuels: AllChallengeStates,
+  filterStatesLiveDuels: LiveChallengeStates,
+  filterStatesPastDuels: PastChallengeStates,
   filterStatesDuelistDuels: AllChallengeStates,
   filterShowAllDuels: false,
   // duelist setters
@@ -76,8 +76,8 @@ export const useQueryParams = create<State>((set) => ({
   setFilterChallengeSortColumn: (value: ChallengeColumn) => set({ filterChallengeSortColumn: value }),
   setFilterChallengeSortDirection: (value: SortDirection) => set({ filterChallengeSortDirection: value }),
   setFilterChallengeSortSwitch: () => set((state: State) => ({ filterChallengeSortDirection: _switchDirection(state.filterChallengeSortDirection) })),
-  setFilterStatesLiveDuels: (value: ChallengeState[]) => set({ filterStatesLiveDuels: value }),
-  setFilterStatesPastDuels: (value: ChallengeState[]) => set({ filterStatesPastDuels: value }),
-  setFilterStatesDuelistDuels: (value: ChallengeState[]) => set({ filterStatesDuelistDuels: value }),
+  setFilterStatesLiveDuels: (value: ChallengeState[]) => set({ filterStatesLiveDuels: value.filter(state => LiveChallengeStates.includes(state)) }),
+  setFilterStatesPastDuels: (value: ChallengeState[]) => set({ filterStatesPastDuels: value.filter(state => PastChallengeStates.includes(state)) }),
+  setFilterStatesDuelistDuels: (value: ChallengeState[]) => set({ filterStatesDuelistDuels: value.filter(state => AllChallengeStates.includes(state)) }),
   setFilterShowAllDuels: (value: boolean) => set({ filterShowAllDuels: value }),
 }))
