@@ -1,6 +1,6 @@
 {
   "world": {
-    "class_hash": "0x79d9ce84b97bcc2a631996c3100d57966fc2f5b061fb1ec4dfd0040976bcac6",
+    "class_hash": "0x45575a88cc5cef1e444c77ce60b7b4c9e73a01cbbe20926d5a4c72a94011410",
     "address": "0x4255cc0cdc92f77f2ae9c3ff07060bfb851a0a93e9bea5c2161cf4934c5ffc8",
     "seed": "pistols-0.12.0_2",
     "name": "Pistols at 10 Blocks",
@@ -92,6 +92,10 @@
           {
             "name": "metadata_uri",
             "type": "core::byte_array::ByteArray"
+          },
+          {
+            "name": "metadata_hash",
+            "type": "core::felt252"
           }
         ]
       },
@@ -1001,6 +1005,11 @@
           {
             "name": "uri",
             "type": "core::byte_array::ByteArray",
+            "kind": "data"
+          },
+          {
+            "name": "hash",
+            "type": "core::felt252",
             "kind": "data"
           }
         ]
