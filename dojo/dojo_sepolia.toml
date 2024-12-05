@@ -77,7 +77,7 @@ default = "pistols"
   "0x0", # minter_address
   "0x0", # renderer_address
   # "100000000000000000000", # fee_amount: 100 LORDS
-  "0x0", # fee_amount: 100 LORDS
+  "0x0", # fee_amount
 ]
 
 
