@@ -79,8 +79,8 @@ export function PlayerDuelistTokensStoreSync() {
   //     // const response: Token[] = await sdk.getTokens([])
   //     const response: TokenBalance[] = await sdk.getTokenBalances(
   //       // [], []
-  //       [addAddressPadding(address)],
-  //       [addAddressPadding(duelistContractAddress)]
+  //       [bigintToHex(address)],
+  //       [bigintToHex(duelistContractAddress)]
   //       // [],  
   //     )
   //     console.log("PlayerDuelistTokensStoreSync() =>>>>>>>>>", response)

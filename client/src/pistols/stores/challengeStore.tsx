@@ -39,6 +39,7 @@ export function ChallengeStoreSync() {
           },
         },
       },
+      Round: [],
     },
   }), [tableId])
 
