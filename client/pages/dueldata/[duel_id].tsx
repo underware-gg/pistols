@@ -2,7 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
-import { useChallenge } from '@/pistols/stores/challengeStore'
+import { ChallengeStoreSync, useChallenge } from '@/pistols/stores/challengeStore'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useTable } from '@/pistols/stores/tableStore'
@@ -25,7 +25,8 @@ const HeaderCell = Table.HeaderCell
 
 export default function StatsPage() {
   return (
-    <AppPistols headerData={{ title: 'Duel' }} backgroundImage={null}>
+    <AppPistols headerData={{ title: 'Pistols - Duel Data' }} backgroundImage={null}>
+      <ChallengeStoreSync />
       <StatsLoader />
     </AppPistols>
   );
@@ -92,9 +93,9 @@ function DuelStats({
         <Row>
           <HeaderCell width={4}><h5>Challenge</h5></HeaderCell>
           <HeaderCell>
-            {bigintToHex(duelId)}
-            <br />
             {duelId.toString()}
+            <br />
+            {bigintToHex(duelId)}
           </HeaderCell>
         </Row>
       </Header>
@@ -256,13 +257,13 @@ function MovesStats({
           <Row>
             <Cell>Hash</Cell>
             <Cell className='Smaller'>
-              {bigintToHex(moves.hashed)}
+              {bigintToHex(moves?.hashed)}
             </Cell>
           </Row>
           <Row>
             <Cell>Salt</Cell>
             <Cell className='Smaller'>
-              {bigintToHex(moves.salt)}
+              {bigintToHex(moves?.salt)}
             </Cell>
           </Row>
           {/* <Row>
@@ -284,15 +285,17 @@ function MovesStats({
           </Row>
         </Header>
 
-        <Body>
-          <Row textAlign='center'>
-            <Cell><PacesIcon paces={hand.card_fire} /> {hand.card_fire}
-            </Cell>
-            <Cell><PacesIcon paces={hand.card_dodge} dodge /> {hand.card_dodge}</Cell>
-            <Cell>{hand.card_tactics}</Cell>
-            <Cell><BladesIcon blade={hand.card_blades} /> {hand.card_blades}</Cell>
-          </Row>
-        </Body>
+        {hand &&
+          <Body>
+            <Row textAlign='center'>
+              <Cell><PacesIcon paces={hand.card_fire} /> {hand.card_fire}
+              </Cell>
+              <Cell><PacesIcon paces={hand.card_dodge} dodge /> {hand.card_dodge}</Cell>
+              <Cell>{hand.card_tactics}</Cell>
+              <Cell><BladesIcon blade={hand.card_blades} /> {hand.card_blades}</Cell>
+            </Row>
+          </Body>
+        }
       </Table>
     </>
   )
@@ -322,6 +325,7 @@ function StateRow({
   specials_a?: any
   specials_b?: any
 }) {
+  if (!state_a || !state_b) return <></>
   return (
     <Table attached>
       <Header fullWidth>
