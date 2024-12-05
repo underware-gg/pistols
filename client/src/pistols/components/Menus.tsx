@@ -7,7 +7,7 @@ import { DuelStage } from '@/pistols/hooks/useDuel'
 import { SPRITESHEETS } from '@/pistols/data/assets'
 import { AnimationState } from '@/pistols/three/game'
 import { IconClick } from '@/lib/ui/Icons'
-import { bigintToHex } from '@/lib/utils/types'
+import { makeDuelDataUrl } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -16,6 +16,10 @@ export function MenuDuel({
   duelStage,
   duelId,
   tableId,
+} : {
+  duelStage: DuelStage
+  duelId: bigint
+  tableId: string
 }) {
   const { dispatchSetting, settings, SettingsActions } = useSettings()
   const { dispatchSelectDuel } = usePistolsContext()
@@ -50,7 +54,7 @@ export function MenuDuel({
         {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
 
         <Menu.Item className='button_duel' type='icon'>
-          <IconClick name='database' onClick={() => window?.open(`/dueldata/${bigintToHex(duelId)}`, '_blank')} className='icon-control' />
+          <IconClick name='database' onClick={() => window?.open(makeDuelDataUrl(duelId), '_blank')} className='icon-control' />
         </Menu.Item>
 
         <Menu.Item className='button_duel' type='icon'>

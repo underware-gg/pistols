@@ -1,6 +1,8 @@
+import { BigNumberish } from 'starknet'
 import { Archetype, BladesCard, ChallengeState, getBladesCardFromValue, getPacesCardFromValue, getTacticsCardFromValue, PacesCard, Premise, RoundState, TacticsCard } from '@/games/pistols/generated/constants'
 import { EMOJI } from '@/pistols/data/messages'
 import { SceneName } from '@/pistols/hooks/PistolsContext'
+import { bigintToNumber } from '@/lib/utils/types'
 
 //------------------------------------------
 // must be in sync with CHALLENGE_STATE
@@ -220,4 +222,8 @@ export const movesToHand = (moves: number[]): Hand => {
     card_tactics: getTacticsCardFromValue(moves[2]),
     card_blades: getBladesCardFromValue(moves[3]),
   }
+}
+
+export const makeDuelDataUrl = (duelId: BigNumberish) => {
+  return `/dueldata/${bigintToNumber(duelId)}`
 }

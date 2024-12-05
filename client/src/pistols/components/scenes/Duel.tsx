@@ -46,6 +46,8 @@ export type DuelistState = {
 
 export default function Duel({
   duelId
+} : {
+  duelId: bigint
 }) {
   const { gameImpl } = useThreeJsContext()
   const { animated, dispatchAnimated } = useGameplayContext()

@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEf
 import { useRouter } from 'next/router'
 import { BigNumberish, contractClassResponseToLegacyCompiledContract } from 'starknet'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
-import { bigintToHex } from '@/lib/utils/types'
+import { bigintToHex, bigintToNumber } from '@/lib/utils/types'
 import { useSettings } from './SettingsContext'
 import { TABLES } from '@/games/pistols/generated/constants'
 import { CommitMoveMessage } from '../utils/salt'
@@ -294,7 +294,7 @@ export const usePistolsScene = () => {
       slug = `${slugs?.[0] || tableId || TABLES.LORDS}`
       dispatchTableId(slug)
     } else if (sceneRoutes[newScene].hasDuelId) {
-      slug = `${bigintToHex(slugs?.[0] || selectedDuelId)}`
+      slug = `${bigintToNumber(slugs?.[0] || selectedDuelId)}`
       dispatchSelectDuel(slug)
     }
     url += slug

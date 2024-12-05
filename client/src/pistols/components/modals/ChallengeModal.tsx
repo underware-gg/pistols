@@ -16,9 +16,8 @@ import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
-import { bigintToHex } from '@/lib/utils/types'
 import { ChallengeState } from '@/games/pistols/generated/constants'
-import { PremisePrefix } from '../../utils/pistols'
+import { makeDuelDataUrl, PremisePrefix } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -86,7 +85,7 @@ export default function ChallengeModal() {
               {tableDescription}
             </Col>
             <Col width={4} textAlign='right'>
-              <IconClick name='database' size={'small'} onClick={() => window?.open(`/dueldata/${bigintToHex(selectedDuelId)}`, '_blank')} />
+              <IconClick name='database' size={'small'} onClick={() => window?.open(makeDuelDataUrl(selectedDuelId), '_blank')} />
             </Col>
           </Row>
         </Grid>
