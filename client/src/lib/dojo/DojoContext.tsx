@@ -64,10 +64,3 @@ export const useDojoSystemCalls = () => {
     ...systemCalls,
   }
 }
-
-export const useDojoComponents = () => {
-  const { setup: { components } } = useDojo()
-  return {
-    ...components,
-  }
-}

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Grid, Dropdown, Image, Input, ButtonGroup, Divider } from 'semantic-ui-react'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
-import { useTable } from '@/pistols/hooks/useTable'
+import { useTable } from '@/pistols/stores/tableStore'
 import { BackButton, MusicToggle, FilterButton } from '@/pistols/components/ui/Buttons'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
 import useGameAspect from '../hooks/useGameApect'
@@ -10,7 +10,7 @@ import * as TWEEN from '@tweenjs/tween.js'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '../three/game'
 import WalletHeader from './account/WalletHeader'
 import { useAccount, useDisconnect } from '@starknet-react/core'
-import { useQueryContext, DuelistColumn, SortDirection, ChallengeColumn } from '@/pistols/hooks/QueryContext'
+import { useQueryParams, DuelistColumn, SortDirection, ChallengeColumn } from '@/pistols/stores/queryParamsStore'
 import { AllChallengeStates, ChallengeStateNames, LiveChallengeStates, PastChallengeStates } from '../utils/pistols'
 import { arrayRemoveValue } from '@/lib/utils/types'
 
@@ -164,26 +164,26 @@ function CurtainUI({
     filterShowAllDuels,
     filterChallengeSortColumn,
     filterChallengeSortDirection,
-    dispatchFilterShowAllDuels,
-    dispatchFilterChallengeSortColumn,
-    dispatchFilterChallengeSortDirection,
-    dispatchFilterChallengeSortSwitch,
+    setFilterShowAllDuels,
+    setFilterChallengeSortColumn,
+    setFilterChallengeSortDirection,
+    setFilterChallengeSortSwitch,
 
     filterStatesLiveDuels,
     filterStatesPastDuels,
-    dispatchFilterStatesLiveDuels,
-    dispatchFilterStatesPastDuels,
+    setFilterStatesLiveDuels,
+    setFilterStatesPastDuels,
 
     filterDuelistName,
     filterDuelistActive,
     filterDuelistSortColumn,
     filterDuelistSortDirection,
-    dispatchFilterDuelistActive,
-    dispatchFilterDuelistName,
-    dispatchFilterDuelistSortColumn,
-    dispatchFilterDuelistSortDirection,
-    dispatchFilterDuelistSortSwitch,
-  } = useQueryContext()
+    setFilterDuelistActive,
+    setFilterDuelistName,
+    setFilterDuelistSortColumn,
+    setFilterDuelistSortDirection,
+    setFilterDuelistSortSwitch,
+  } = useQueryParams()
   
   const [ offset, setOffset ] = useState(-18)
   
@@ -211,9 +211,9 @@ function CurtainUI({
     LiveChallengeStates.forEach(state => {
       const _switch = () => {
         if (!filterStatesLiveDuels.includes(state)) {
-          dispatchFilterStatesLiveDuels([...filterStatesLiveDuels, state])
+          setFilterStatesLiveDuels([...filterStatesLiveDuels, state])
         } else {
-          dispatchFilterStatesLiveDuels(arrayRemoveValue(filterStatesLiveDuels, state))
+          setFilterStatesLiveDuels(arrayRemoveValue(filterStatesLiveDuels, state))
         }
       }
       let enabled = filterStatesLiveDuels.includes(state)
@@ -237,9 +237,9 @@ function CurtainUI({
     PastChallengeStates.forEach(state => {
       const _switch = () => {
         if (!filterStatesPastDuels.includes(state)) {
-          dispatchFilterStatesPastDuels([...filterStatesPastDuels, state])
+          setFilterStatesPastDuels([...filterStatesPastDuels, state])
         } else {
-          dispatchFilterStatesPastDuels(arrayRemoveValue(filterStatesPastDuels, state))
+          setFilterStatesPastDuels(arrayRemoveValue(filterStatesPastDuels, state))
         }
       }
       let enabled = filterStatesPastDuels.includes(state)
@@ -268,7 +268,7 @@ function CurtainUI({
             <FilterDuelistName  />
             <div>
               <label style={{marginRight: '10px'}}>Filters:</label>
-              <FilterButton label='Active Only' state={filterDuelistActive} onClick={() => dispatchFilterDuelistActive(!filterDuelistActive)} />
+              <FilterButton label='Active Only' state={filterDuelistActive} onClick={() => setFilterDuelistActive(!filterDuelistActive)} />
               <FilterButton label='Wallets' state={duelistsAnon} onClick={() => dispatchDuelistsAnon(!duelistsAnon)} />
             </div>
           </div>
@@ -285,10 +285,10 @@ function CurtainUI({
                     (filterDuelistSortDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined}
                   onClick={() => {
                     if (filterDuelistSortColumn === DuelistColumn.Name) {
-                      dispatchFilterDuelistSortSwitch()
+                      setFilterDuelistSortSwitch()
                     } else {
-                      dispatchFilterDuelistSortColumn(DuelistColumn.Name)
-                      dispatchFilterDuelistSortDirection(SortDirection.Ascending)
+                      setFilterDuelistSortColumn(DuelistColumn.Name)
+                      setFilterDuelistSortDirection(SortDirection.Ascending)
                     }
                   }} />
                 <FilterButton 
@@ -299,10 +299,10 @@ function CurtainUI({
                     (filterDuelistSortDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined}
                   onClick={() => {
                     if (filterDuelistSortColumn === DuelistColumn.Honour) {
-                      dispatchFilterDuelistSortSwitch()
+                      setFilterDuelistSortSwitch()
                     } else {
-                      dispatchFilterDuelistSortColumn(DuelistColumn.Honour)
-                      dispatchFilterDuelistSortDirection(SortDirection.Descending)
+                      setFilterDuelistSortColumn(DuelistColumn.Honour)
+                      setFilterDuelistSortDirection(SortDirection.Descending)
                     }
                   }} />
                 <FilterButton 
@@ -313,10 +313,10 @@ function CurtainUI({
                     (filterDuelistSortDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined}
                   onClick={() => {
                     if (filterDuelistSortColumn === DuelistColumn.Total) {
-                      dispatchFilterDuelistSortSwitch()
+                      setFilterDuelistSortSwitch()
                     } else {
-                      dispatchFilterDuelistSortColumn(DuelistColumn.Total)
-                      dispatchFilterDuelistSortDirection(SortDirection.Descending)
+                      setFilterDuelistSortColumn(DuelistColumn.Total)
+                      setFilterDuelistSortDirection(SortDirection.Descending)
                     }
                   }} />
                 <FilterButton 
@@ -327,10 +327,10 @@ function CurtainUI({
                     (filterDuelistSortDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined}
                   onClick={() => {
                     if (filterDuelistSortColumn === DuelistColumn.Wins) {
-                      dispatchFilterDuelistSortSwitch()
+                      setFilterDuelistSortSwitch()
                     } else {
-                      dispatchFilterDuelistSortColumn(DuelistColumn.Wins)
-                      dispatchFilterDuelistSortDirection(SortDirection.Descending)
+                      setFilterDuelistSortColumn(DuelistColumn.Wins)
+                      setFilterDuelistSortDirection(SortDirection.Descending)
                     }
                   }} />
                 <FilterButton 
@@ -341,10 +341,10 @@ function CurtainUI({
                     (filterDuelistSortDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined}
                   onClick={() => {
                     if (filterDuelistSortColumn === DuelistColumn.Losses) {
-                      dispatchFilterDuelistSortSwitch()
+                      setFilterDuelistSortSwitch()
                     } else {
-                      dispatchFilterDuelistSortColumn(DuelistColumn.Losses)
-                      dispatchFilterDuelistSortDirection(SortDirection.Descending)
+                      setFilterDuelistSortColumn(DuelistColumn.Losses)
+                      setFilterDuelistSortDirection(SortDirection.Descending)
                     }
                   }} />
                 <FilterButton 
@@ -355,10 +355,10 @@ function CurtainUI({
                     (filterDuelistSortDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined}
                   onClick={() => {
                     if (filterDuelistSortColumn === DuelistColumn.Draws) {
-                      dispatchFilterDuelistSortSwitch()
+                      setFilterDuelistSortSwitch()
                     } else {
-                      dispatchFilterDuelistSortColumn(DuelistColumn.Draws)
-                      dispatchFilterDuelistSortDirection(SortDirection.Descending)
+                      setFilterDuelistSortColumn(DuelistColumn.Draws)
+                      setFilterDuelistSortDirection(SortDirection.Descending)
                     }
                   }} />
                 <FilterButton 
@@ -369,10 +369,10 @@ function CurtainUI({
                     (filterDuelistSortDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined}
                   onClick={() => {
                     if (filterDuelistSortColumn === DuelistColumn.WinRatio) {
-                      dispatchFilterDuelistSortSwitch()
+                      setFilterDuelistSortSwitch()
                     } else {
-                      dispatchFilterDuelistSortColumn(DuelistColumn.WinRatio)
-                      dispatchFilterDuelistSortDirection(SortDirection.Descending)
+                      setFilterDuelistSortColumn(DuelistColumn.WinRatio)
+                      setFilterDuelistSortDirection(SortDirection.Descending)
                     }
                   }} />
               </ButtonGroup>
@@ -382,7 +382,7 @@ function CurtainUI({
         {atDuels && <div style={{width: '90%'}}>
           <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
             <FilterDuelistName  />
-            <FilterButton label='Show All Live Duels' state={filterShowAllDuels} onClick={() => dispatchFilterShowAllDuels(!filterShowAllDuels)} />
+            <FilterButton label='Show All Live Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
           </div>
           <Divider />
           <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
@@ -394,7 +394,7 @@ function CurtainUI({
                   state={false} 
                   disabled={!canAddLive}
                   onClick={() => {
-                    dispatchFilterStatesLiveDuels([...filterStatesLiveDuels, ...AllChallengeStates.filter(state => !filterStatesLiveDuels.includes(state))])
+                    setFilterStatesLiveDuels([...filterStatesLiveDuels, ...AllChallengeStates.filter(state => !filterStatesLiveDuels.includes(state))])
                   }} 
                 />
                 {filtersLive}
@@ -404,7 +404,7 @@ function CurtainUI({
                   state={false} 
                   disabled={!canClearLive}
                   onClick={() => {
-                    dispatchFilterStatesLiveDuels([])
+                    setFilterStatesLiveDuels([])
                   }} 
                 />
               </ButtonGroup>
@@ -420,10 +420,10 @@ function CurtainUI({
                     (filterChallengeSortDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined}
                   onClick={() => {
                     if (filterChallengeSortColumn === ChallengeColumn.Time) {
-                      dispatchFilterChallengeSortSwitch()
+                      setFilterChallengeSortSwitch()
                     } else {
-                      dispatchFilterChallengeSortColumn(ChallengeColumn.Time)
-                      dispatchFilterChallengeSortDirection(SortDirection.Descending)
+                      setFilterChallengeSortColumn(ChallengeColumn.Time)
+                      setFilterChallengeSortDirection(SortDirection.Descending)
                     }
                   }} />
                 <FilterButton 
@@ -434,10 +434,10 @@ function CurtainUI({
                     (filterChallengeSortDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined}
                   onClick={() => {
                     if (filterChallengeSortColumn === ChallengeColumn.Status) {
-                      dispatchFilterChallengeSortSwitch()
+                      setFilterChallengeSortSwitch()
                     } else {
-                      dispatchFilterChallengeSortColumn(ChallengeColumn.Status)
-                      dispatchFilterChallengeSortDirection(SortDirection.Descending)
+                      setFilterChallengeSortColumn(ChallengeColumn.Status)
+                      setFilterChallengeSortDirection(SortDirection.Descending)
                     }
                   }} />
               </ButtonGroup>
@@ -447,7 +447,7 @@ function CurtainUI({
         {atGraveyard && <div style={{width: '90%'}}>
           <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
             <FilterDuelistName  />
-            <FilterButton label='Show All Past Duels' state={filterShowAllDuels} onClick={() => dispatchFilterShowAllDuels(!filterShowAllDuels)} />
+            <FilterButton label='Show All Past Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
           </div>
           <Divider />
           <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
@@ -460,7 +460,7 @@ function CurtainUI({
                   state={false} 
                   disabled={!canAddPast}
                   onClick={() => {
-                    dispatchFilterStatesPastDuels([...filterStatesPastDuels, ...AllChallengeStates.filter(state => !filterStatesPastDuels.includes(state))])
+                    setFilterStatesPastDuels([...filterStatesPastDuels, ...AllChallengeStates.filter(state => !filterStatesPastDuels.includes(state))])
                   }} 
                 />
                 {filtersPast}
@@ -470,7 +470,7 @@ function CurtainUI({
                   state={false} 
                   disabled={!canClearPast}
                   onClick={() => {
-                    dispatchFilterStatesPastDuels([])
+                    setFilterStatesPastDuels([])
                   }} 
                 />
               </ButtonGroup>
@@ -486,10 +486,10 @@ function CurtainUI({
                     (filterChallengeSortDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined}
                   onClick={() => {
                     if (filterChallengeSortColumn === ChallengeColumn.Time) {
-                      dispatchFilterChallengeSortSwitch()
+                      setFilterChallengeSortSwitch()
                     } else {
-                      dispatchFilterChallengeSortColumn(ChallengeColumn.Time)
-                      dispatchFilterChallengeSortDirection(SortDirection.Descending)
+                      setFilterChallengeSortColumn(ChallengeColumn.Time)
+                      setFilterChallengeSortDirection(SortDirection.Descending)
                     }
                   }} />
                 <FilterButton 
@@ -500,10 +500,10 @@ function CurtainUI({
                     (filterChallengeSortDirection === SortDirection.Ascending ? 'arrow up' : 'arrow down') : undefined}
                   onClick={() => {
                     if (filterChallengeSortColumn === ChallengeColumn.Status) {
-                      dispatchFilterChallengeSortSwitch()
+                      setFilterChallengeSortSwitch()
                     } else {
-                      dispatchFilterChallengeSortColumn(ChallengeColumn.Status)
-                      dispatchFilterChallengeSortDirection(SortDirection.Descending)
+                      setFilterChallengeSortColumn(ChallengeColumn.Status)
+                      setFilterChallengeSortDirection(SortDirection.Descending)
                     }
                   }} />
               </ButtonGroup>
@@ -518,17 +518,17 @@ function CurtainUI({
 export function FilterDuelistName() {
   const {
     filterDuelistName,
-    dispatchFilterDuelistName,
-  } = useQueryContext()
+    setFilterDuelistName,
+  } = useQueryParams()
   return (
     <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
       <Input id='FilterByName' placeholder='Filter by Name' size='mini'
         value={filterDuelistName.toUpperCase()}
-        onChange={(e) => dispatchFilterDuelistName(e.target.value)}
+        onChange={(e) => setFilterDuelistName(e.target.value)}
         action={{
           icon: 'close', size: 'mini',
           className: 'FilterButton',
-          onClick: () => dispatchFilterDuelistName('')
+          onClick: () => setFilterDuelistName('')
         }}
       />
     </div>

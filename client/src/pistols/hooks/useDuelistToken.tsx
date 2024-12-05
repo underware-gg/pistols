@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
+import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { useTokenConfig } from '@/pistols/hooks/useConfig'
-import { useErc721TokensByOwner } from '@/lib/dojo/hooks/useToriiErcTokensQL'
+import { useTokenConfig } from '@/pistols/stores/tokenConfigStore'
 import { useERC721OwnerOf } from '@/lib/utils/hooks/useERC721'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
-
+import { useTokenIdsByOwner } from '@/pistols/stores/duelistTokenStore'
+import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
+import { poseidon } from '@/lib/utils/starknet'
 
 
 export const useDuelistTokenCount = () => {
@@ -26,40 +28,33 @@ export const useOwnerOfDuelist = (token_id: BigNumberish) => {
   }
 }
 
-export const useDuelistsOfOwner = (owner: BigNumberish) => {
+export const useDuelistsOfPlayer = () => {
+  const { address } = useAccount()
   const { duelistContractAddress } = useDuelistTokenContract()
-  const { token } = useErc721TokensByOwner(duelistContractAddress, owner, true)
+  const { tokenIds } = useTokenIdsByOwner(duelistContractAddress, address)
   return {
-    duelistBalance: token?.balance ?? 0,
-    duelistIds: token?.tokenIds ?? [],
+    duelistIds: tokenIds,
     isPending: false,
   }
 }
 
-
-
-export const useDuelistCalcPrice = (address: BigNumberish) => {
-  const [tokenAddress, setTokenAddress] = useState<boolean>()
-  const [amount, setAmount] = useState<boolean>()
-  const { duelistBalance } = useDuelistsOfOwner(address)
-  const { calc_mint_fee_duelist } = useDojoSystemCalls()
-  useEffect(() => {
-    if (address && calc_mint_fee_duelist) {
-      calc_mint_fee_duelist(BigInt(address)).then(v => {
-        setTokenAddress(v[0])
-        setAmount(v[1])
-      }).catch(e => {
-        setTokenAddress(undefined)
-        setAmount(undefined)
-      })
-    } else {
-      setTokenAddress(undefined)
-      setAmount(undefined)
-    }
-  }, [address, duelistBalance, calc_mint_fee_duelist])
+export const useDuelistsOfOwner = (owner: BigNumberish) => {
+  const { duelistContractAddress } = useDuelistTokenContract()
+  const { tokenIds } = useTokenIdsByOwner(duelistContractAddress, owner)
+  throw new Error("Not implemented -- need to fetch (once) on the store...")
   return {
-    tokenAddress,
-    amount,
+    duelistIds: tokenIds,
+    isPending: false,
   }
 }
 
+export const useNextRandomProfilePic = () => {
+  const { address } = useAccount()
+  const { duelistIds } = useDuelistsOfPlayer()
+  const randomPic = useMemo(() => 
+    (Number(poseidon([address ?? 0n, duelistIds.length ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1),
+  [address, duelistIds.length])
+  return {
+    randomPic,
+  }
+}

@@ -1,103 +1,83 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { BigNumberish } from 'starknet'
-import { QueryType } from '@dojoengine/sdk'
-import { useDojoSetup } from '@/lib/dojo/DojoContext'
+import { useState } from 'react'
 import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
+import { PistolsEntity, PistolsGetQuery, PistolsSubQuery, useSdkEntities } from '@/lib/dojo/hooks/useSdkEntities'
 
-export type PistolsGetQuery = QueryType<PistolsSchemaType>
-
-export type EntityResult = {
-  entityId: BigNumberish,
-} & Partial<PistolsSchemaType['pistols']>
-
-export type UseSdkGetEntitiesResult = {
-  entities: EntityResult[] | null
-  isLoading: boolean
-  refetch: () => void
-}
-export type UseSdkGetEntityResult = {
-  entity: EntityResult | null
-  isLoading: boolean
-  refetch: () => void
+export type {
+  PistolsGetQuery,
+  PistolsSubQuery,
 }
 
-export type UseSdkGetEntitiesProps = {
-  query: PistolsGetQuery
+export type EntityMap = {
+  [entityId: string]: Partial<PistolsSchemaType['pistols']>,
+}
+
+export type UseSdkGetResult = {
+  entities: EntityMap | null
+  isLoading: boolean
+  isSubscribed: boolean
+  refetch: () => void
+}
+
+export const getEntityMapModels = <T,>(entities: EntityMap, modelName: string): T[] =>
+  (Object.values(entities ?? {}).map(e => (e[modelName] as T)) ?? [])
+
+
+//---------------------------------------
+// Get entities from torii
+//
+// (ephemeral)
+// stores results at the hook local state
+// as: EntityMap
+//
+
+export type UseSdkGetProps = {
+  query_get: PistolsGetQuery
+  query_sub?: PistolsSubQuery
+  enabled?: boolean
   limit?: number
   offset?: number
   logging?: boolean
-  enabled?: boolean
 }
 
-export const useSdkGetEntities = <T,>({
-  query,
+export const useSdkGet = <T,>({
+  query_get,
+  query_sub,
+  enabled = true,
   limit = 100,
   offset = 0,
   logging = false,
-  enabled = true,
-}: UseSdkGetEntitiesProps): UseSdkGetEntitiesResult => {
-  const { sdk } = useDojoSetup()
-  const [entities, setEntities] = useState<EntityResult[] | null>()
-  const [isLoading, setIsLoading] = useState(false)
+}: UseSdkGetProps): UseSdkGetResult => {
+  const [entities, setEntities] = useState<EntityMap | null>()
 
-  const fetchEntities = useCallback( async () => {
-    try {
-      setIsLoading(true)
-      await sdk.getEntities(
-        query,
-        (resp) => {
-          if (resp.error) {
-            setEntities(undefined);
-            console.error("useSdkGetEntities() error:", resp.error.message);
-            return;
-          }
-          if (resp.data) {
-            // console.log(`useSdkGetEntities() RESP:`, query, resp)
-            setEntities(resp.data.map((e: any) => ({
-              entityId: e.entityId,
-              ...e.models.pistols,
-            } as EntityResult)));
-          }
-        },
-        limit,
-        offset,
-        { logging }
-      );
-    } catch (error) {
-      console.error("useSdkGetEntities() exception:", error);
-    } finally {
-      setIsLoading(false)
+  const { isLoading, isSubscribed, refetch } = useSdkEntities({
+    query_get,
+    query_sub,
+    enabled,
+    limit,
+    offset,
+    logging,
+    setEntities: (entities: PistolsEntity[]) => {
+      setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
+        ...acc,
+        [e.entityId]: {
+          ...e.models.pistols
+        } as EntityMap,
+      }), {} as EntityMap));
+    },
+    updateEntity: (e: PistolsEntity) => {
+      setEntities({
+        ...entities,
+        [e.entityId]: {
+          ...e.models.pistols
+        } as EntityMap,
+      });
     }
-  }, [sdk, query, limit, offset, logging])
-
-  useEffect(() => {
-    if (enabled) {
-      fetchEntities();
-    } else {
-      setIsLoading(false)
-      setEntities(null);
-    }
-  }, [fetchEntities, enabled]);
+  })
 
   return {
     entities,
     isLoading,
-    refetch: fetchEntities,
-  }
-}
-
-//
-// Single Entity fetch
-// (use only when fetching with a keys)
-export const useSdkGetEntity = (props: UseSdkGetEntitiesProps): UseSdkGetEntityResult => {
-  const { entities, isLoading, refetch } = useSdkGetEntities({
-    ...props,
-    limit: 1,
-  })
-  const entity = useMemo(() => (Array.isArray(entities) ? entities[0] : entities), [entities])
-  return {
-    entity,
-    isLoading,
+    isSubscribed,
     refetch,
   }
 }

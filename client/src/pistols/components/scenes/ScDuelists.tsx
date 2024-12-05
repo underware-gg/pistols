@@ -1,21 +1,22 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useQueryContext } from '@/pistols/hooks/QueryContext'
+import { useQueryParams } from '@/pistols/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
-import { TavernAudios } from '@/pistols/components/GameContainer'
+import { useQueryDuelistIds } from '@/pistols/stores/duelistQueryStore'
+import { useOpener } from '@/lib/ui/useOpener'
+import useGameAspect from '@/pistols/hooks/useGameApect'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
+import { DuelistCard, DuelistCardHandle } from '@/pistols/components/cards/DuelistCard'
+import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '@/pistols/data/cardConstants'
+import { TavernAudios } from '@/pistols/components/GameContainer'
 import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
 import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
 import DuelistModal from '@/pistols/components/modals/DuelistModal'
-import { DuelistCard, DuelistCardHandle } from '../cards/DuelistCard'
-import useGameAspect from '@/pistols/hooks/useGameApect'
-import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '@/pistols/data/cardConstants'
-import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { useOpener } from '@/lib/ui/useOpener'
 
 export default function ScDuelists() {
-  const { queryDuelists } = useQueryContext()
+  const { filterDuelistName, filterDuelistActive, filterDuelistSortColumn, filterDuelistSortDirection } = useQueryParams()
+  const { duelistIds } = useQueryDuelistIds(filterDuelistName, filterDuelistActive, filterDuelistSortColumn, filterDuelistSortDirection)
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSelectDuelistId } = usePistolsContext()
   const anonOpener = useOpener()
@@ -46,7 +47,7 @@ export default function ScDuelists() {
   const [isAnimating, setIsAnimating] = useState(false)
   const [duelistsChanged, setDuelistsChanged] = useState(false)
   const duelistsPerPage = 7
-  const pageCount = useMemo(() => Math.ceil(queryDuelists.length / duelistsPerPage), [queryDuelists])
+  const pageCount = useMemo(() => Math.ceil(duelistIds.length / duelistsPerPage), [duelistIds])
   const cardRefs = useRef<{[key: number]: DuelistCardHandle}>({})
   const timeoutRef = useRef<NodeJS.Timeout>()
   const initialLoadRef = useRef(true)
@@ -90,12 +91,12 @@ export default function ScDuelists() {
   }
 
   const paginatedDuelists = useMemo(() => (
-    queryDuelists.slice(
+    duelistIds.slice(
       pageNumber * duelistsPerPage,
       (pageNumber + 1) * duelistsPerPage
-    ).map((duelist, index) => {
+    ).map((duelist_id, index) => {
       const newDuelist = {
-        duelist_id: duelist.duelist_id,
+        duelist_id,
         horizontalOffset: 0,
         verticalOffset: 0,
         rotation: 0,
@@ -229,7 +230,7 @@ export default function ScDuelists() {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [queryDuelists])
+  }, [duelistIds])
 
   useEffect(() => {
     paginatedDuelists.forEach((duelist, index) => {
@@ -287,7 +288,7 @@ export default function ScDuelists() {
         transform: 'translateX(-50%)'
       }}>
         {paginatedDuelists.map((duelist, index) => (
-          <div style={{
+          <div key={`duelist-${duelist.duelist_id}`} style={{
             transform: index > 3 && 'translateX(50%)',
             display: 'flex',
             alignItems: 'center',

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Tab } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
+import { useDuelistsOfPlayer } from '@/pistols/hooks/useDuelistToken'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/components/scenes/ScDoor'
@@ -18,21 +18,21 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function ScProfile() {
-  const { isConnected, address } = useAccount()
+  const { isConnected } = useAccount()
   const { duelistEditOpener } = usePistolsContext()
   const { fromGate } = usePistolsScene()
-  const { duelistBalance } = useDuelistsOfOwner(address)
-  // console.log(`DUELIST BALANCE`, duelistBalance)
+  const { duelistIds } = useDuelistsOfPlayer()
+  // console.log(`DUELIST BALANCE`, duelistIds.length)
 
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     if (!loaded) {
       setLoaded(true)
-      if (fromGate && duelistBalance === 0) {
+      if (fromGate && duelistIds.length === 0) {
         duelistEditOpener.open({ mintNew: true })
       }
     }
-  }, [fromGate, duelistBalance])
+  }, [fromGate, duelistIds.length])
 
   return (
     <div id='Profile'>
@@ -89,11 +89,10 @@ function DuelistsConnect() {
 
 
 function DuelistsList() {
-  const { address } = useAccount()
   const { duelistId, dispatchDuelistId } = useSettings()
   const { duelistEditOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
-  const { duelistBalance, duelistIds } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfPlayer()
   
   const { aspectWidth } = useGameAspect()
 
@@ -139,7 +138,7 @@ function DuelistsList() {
   return (
     <div className='FillWidth' style={{ marginLeft: aspectWidth(1) }}>
       <Divider hidden />
-      {duelistBalance > 0 ? (
+      {duelistIds.length > 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div className='Title'>Pick A Duelist To Play</div>
           <div style={{

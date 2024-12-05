@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEf
 import { useRouter } from 'next/router'
 import { BigNumberish, contractClassResponseToLegacyCompiledContract } from 'starknet'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
-import { bigintToHex } from '@/lib/utils/types'
+import { bigintToHex, bigintToNumber } from '@/lib/utils/types'
 import { useSettings } from './SettingsContext'
 import { TABLES } from '@/games/pistols/generated/constants'
 import { CommitMoveMessage } from '../utils/salt'
@@ -29,14 +29,6 @@ export enum SceneName {
   IRLTournament = 'IRL Tournament',
   Duel = 'Duel',
 }
-
-const tavernMenuItems: SceneName[] = [
-  SceneName.Duelists,
-  SceneName.Duels,
-  SceneName.Graveyard,
-  SceneName.Tournament,
-  SceneName.IRLTournament,
-]
 
 //--------------------------------
 // State
@@ -66,7 +58,6 @@ export const initialState = {
 
 const PistolsActions = {
   SET_SIG: 'SET_SIG',
-  SET_ACCOUNT_MENU_KEY: 'SET_ACCOUNT_MENU_KEY',
   SET_SCENE: 'SET_SCENE',
   SELECT_DUEL: 'SELECT_DUEL',
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
@@ -240,7 +231,6 @@ export const usePistolsContext = () => {
   return {
     ...state,
     hasSigned: (state.walletSig.sig > 0n),
-    tavernMenuItems,
     // PistolsActions,
     dispatch,
     dispatchSetSig,
@@ -304,7 +294,7 @@ export const usePistolsScene = () => {
       slug = `${slugs?.[0] || tableId || TABLES.LORDS}`
       dispatchTableId(slug)
     } else if (sceneRoutes[newScene].hasDuelId) {
-      slug = `${bigintToHex(slugs?.[0] || selectedDuelId)}`
+      slug = `${bigintToNumber(slugs?.[0] || selectedDuelId)}`
       dispatchSelectDuel(slug)
     }
     url += slug
@@ -320,7 +310,6 @@ export const usePistolsScene = () => {
     currentScene,
     lastScene,
     sceneTitle,
-    tavernMenuItems,
     // helpers
     atGate: (currentScene == SceneName.Gate),
     atDoor: (currentScene == SceneName.Door),

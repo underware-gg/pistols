@@ -1,7 +1,5 @@
 import { useEffect, useMemo } from 'react'
 import { init } from '@dojoengine/sdk'
-import { overridableComponent } from "@dojoengine/recs";
-import { getSyncEntities } from '@dojoengine/state'
 import { DojoProvider } from '@dojoengine/core'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { useDeployedSystem } from '@/lib/dojo/hooks/useDojoSystem'
@@ -9,15 +7,10 @@ import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { feltToString } from '@/lib/utils/starknet'
 import { DojoChainConfig } from './chainConfig'
-import { world } from "./world";
-import { Subscription } from '@dojoengine/torii-client'
 
 // TODO: move out of lib??
-import {
-  createSystemCalls,
-  defineContractComponents,
-  schema,
-} from './setup'
+import { createSystemCalls } from '../../../games/pistols/createSystemCalls'
+import { schema } from '../../../games/pistols/generated/typescript/models.gen'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
 export type Schema = typeof schema
@@ -87,46 +80,12 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   const { isDeployed } = useDeployedSystem(dojoAppConfig.nameSpace, Object.keys(dojoAppConfig.contractInterfaces)[0], manifest)
 
   //
-  // Initialize components
-  const contractComponents = useMemo(() => defineContractComponents(world), [world])
-
-  const components = useMemo(() => {
-    const overridableComponents = Object.keys(contractComponents).reduce((result: any, key: string) => {
-      result[key] = overridableComponent(contractComponents[key]);
-      return result;
-    }, {}) as typeof contractComponents;
-    return {
-      ...contractComponents,
-      ...overridableComponents,
-    };
-
-  }, [contractComponents])
-
-  //
-  // fetch all existing entities from torii
-  const { value: sync } = useAsyncMemo<Subscription>(async () => {
-    if (!sdk) return (sdk as any) // undefined or null
-    const sync = await getSyncEntities(
-      sdk.client,
-      contractComponents as any,
-      undefined,  // clause
-      [],         // entityKeyClause
-      1000,       // limit
-      true,       // logging
-    )
-    console.log(`SYNC FINISHED!!!`, sync, components)
-    return sync
-  }, [sdk?.client, contractComponents], undefined, null)
-
-  //
   // Establish system calls using the network and components.
   const systemCalls = useMemo<ReturnType<typeof createSystemCalls>>(() => {
     if (!manifest) return null
-    if (!sync) return (sync as any) // undefined or null
-    if (!components) return (components as any) // undefined or null
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
-    return createSystemCalls(components, manifest, dojoProvider) ?? null
-  }, [manifest, sync, components, dojoProvider])
+    return createSystemCalls(manifest, dojoProvider) ?? null
+  }, [manifest, dojoProvider])
 
   //
   // Status
@@ -134,8 +93,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   const isLoading = !(
     (sdk !== undefined) &&
     (dojoProvider !== undefined) &&
-    (components !== undefined) &&
-    (sync !== undefined) &&
     (systemCalls !== undefined)
   )
   const loadingMessage = (isLoading ? 'Loading Pistols...' : null)
@@ -144,9 +101,8 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     !manifest ? 'Game not Deployed'
       : dojoProviderIsError ? 'Chain Provider is Unavailable'
         : sdkIsError ? 'Game Indexer is Unavailable'
-          : sync === null ? 'Sync Error'
-            : isDeployed === null ? 'World not Found'
-              : null
+          : isDeployed === null ? 'World not Found'
+            : null
   const isError = (errorMessage != null)
 
   useEffect(() => {
@@ -159,9 +115,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     // resolved
     dojoProvider,
     sdk,
-    contractComponents,
-    components,
-    sync,
     systemCalls,
     // pass thru
     dojoAppConfig,

@@ -3,10 +3,10 @@ import { Dropdown, Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDuelist } from '@/pistols/stores/duelistStore'
 import { ProfilePicSquare, ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
-import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
+import { useDuelistsOfPlayer } from '@/pistols/hooks/useDuelistToken'
 import { BigNumberish } from 'starknet'
 import { ProfileName } from './ProfileDescription'
 import useGameAspect from '@/pistols/hooks/useGameApect'
@@ -52,9 +52,8 @@ export function DuelistsNavigationMenu({
 }: {
   children: ReactNode,
 }) {
-  const { address } = useAccount()
   const { dispatchSetScene } = usePistolsScene()
-  const { duelistBalance, duelistIds } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfPlayer()
   const { duelistId: selectedDuelistId } = useSettings()
   const { dispatchDuelistId } = useSettings()
   const { aspectWidth } = useGameAspect()
@@ -82,7 +81,7 @@ export function DuelistsNavigationMenu({
         </Dropdown.Item>
       )
     })
-  ), [address, duelistBalance, selectedDuelistId])
+  ), [duelistIds, selectedDuelistId])
 
   return (
     <Dropdown

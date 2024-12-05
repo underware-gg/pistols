@@ -23,7 +23,7 @@ chain_id = "KATANA_LOCAL"
 rpc_url = "http://localhost:5050"
 account_address = "0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec"
 private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
-world_address = "0x1adaf57de23b6d6d43eeb42b6ab6730a022021382fef49eff1f532c21556a5a"
+world_address = "0x3d5489a911389c23b96408ffd94854bd22a3032e2cb81c15e74b228bf39e1a7"
 
 #--------------------------
 # namespaces
@@ -47,15 +47,9 @@ default = "pistols"
 "pistols" = [
   "pistols-game",
   "pistols-admin",
-] 
-# ERC-721
-"pistols-TokenConfig" = ["pistols-duelist_token","pistols-duel_token"]
-"pistols-Payment"     = ["pistols-duelist_token","pistols-duel_token"]
-"pistols-Duelist"     = ["pistols-duelist_token"]
-"pistols-Challenge"   = ["pistols-duel_token"]
-"pistols-Round"       = ["pistols-duel_token"]
-"pistols-Pact"        = ["pistols-duel_token"]
-"pistols-Scoreboard"  = ["pistols-duel_token"]
+  "pistols-duel_token",
+  "pistols-duelist_token",
+]
 # ERC-20
 "pistols-CoinConfig"        = ["pistols-fame_coin","pistols-lords_mock"]
 "pistols-TokenBoundAddress" = ["pistols-fame_coin"]
@@ -79,7 +73,8 @@ default = "pistols"
   "sstr:pistols.stage.underware.gg", # base_uri
   "0x0", # minter_address
   "0x0", # renderer_address
-  "100000000000000000000", # fee_amount: 100 LORDS
+  # "100000000000000000000", # fee_amount: 100 LORDS
+  "0x0", # fee_amount
 ]
 "pistols-lords_mock" = [
   "0x0", # minter_address

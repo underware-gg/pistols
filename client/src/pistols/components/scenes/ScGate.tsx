@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
-import { QueryProvider } from '@/pistols/hooks/QueryContext'
+import React, { useEffect } from 'react'
 import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import { TavernAudios } from '@/pistols/components/GameContainer'
@@ -32,9 +31,7 @@ export default function ScGate() {
   }, [itemClicked, timestamp])
 
   return (
-    <QueryProvider>
-
-      {/* <TavernMenu /> */}
+    <>
 
       <TableModal opener={tableOpener} />
       <DuelistModal />
@@ -45,6 +42,6 @@ export default function ScGate() {
 
       <DojoSetupErrorDetector />
       {/* <ConnectionDetector /> */}
-    </QueryProvider>
+    </>
   )
 }

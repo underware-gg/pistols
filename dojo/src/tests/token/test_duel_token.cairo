@@ -158,15 +158,7 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
             .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
         ContractDefTrait::new(@"pistols", @"vrf_mock"),
         ContractDefTrait::new(@"pistols", @"duel_token")
-            .with_writer_of([
-                // same as config
-                selector_from_tag!("pistols-TokenConfig"),
-                selector_from_tag!("pistols-Payment"),
-                selector_from_tag!("pistols-Challenge"),
-                selector_from_tag!("pistols-Round"),
-                selector_from_tag!("pistols-Pact"),
-                selector_from_tag!("pistols-Scoreboard"),
-            ].span())
+            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             .with_init_calldata([
                 'pistols.underware.gg',
                 0, // minter_address
@@ -174,9 +166,7 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
                 0, // fee_amount
             ].span()),
         ContractDefTrait::new(@"pistols", @"duelist_token")
-            .with_writer_of([
-                selector_from_tag!("pistols-MockDuelistOwners"),
-            ].span()),
+            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
         ContractDefTrait::new(@"pistols", @"lords_mock")
             .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             .with_init_calldata([

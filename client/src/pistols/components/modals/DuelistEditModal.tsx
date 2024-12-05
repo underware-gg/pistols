@@ -4,8 +4,8 @@ import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDuelistsOfPlayer, useNextRandomProfilePic } from '@/pistols/hooks/useDuelistToken'
+import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useCalcFeeDuelist } from '@/pistols/hooks/useContractCalls'
 import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsMock'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
@@ -18,7 +18,6 @@ import { FeesToPay } from '@/pistols/components/account/LordsBalance'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { IconClick } from '@/lib/ui/Icons'
-import { poseidon } from '@/lib/utils/starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -35,33 +34,33 @@ export default function DuelistEditModal({
   const editingDuelistId = (mintNew ? 0n : duelistId)
 
   // watch new mints
-  const { duelistBalance } = useDuelistsOfOwner(address)
+  const { duelistIds } = useDuelistsOfPlayer()
 
   // Detect new mints
   const { dispatchSetScene } = usePistolsScene()
-  const [duelistBalanceBeforeMint, setDuelistBalanceBeforeMint] = useState<number>(null)
+  const [duelistCountBeforeMint, setDuelistCountBeforeMint] = useState<number>(null)
   const { mintLords, hasFaucet } = useLordsFaucet()
   useEffect(() => {
     // minted new! go to Game...
     if (opener.isOpen &&
       mintNew &&
-      duelistBalanceBeforeMint != null &&
-      duelistBalance != duelistBalanceBeforeMint
+      duelistCountBeforeMint != null &&
+      duelistCountBeforeMint != duelistIds.length
     ) {
-      console.log(`NEW DUELIST BALANCE:`, duelistBalance)
-      dispatchDuelistId(duelistBalance)
+      console.log(`NEW DUELIST BALANCE:`, duelistIds.length)
+      dispatchDuelistId(duelistIds.length)
       dispatchSetScene(SceneName.Tavern)
       if (hasFaucet) mintLords(account)
       opener.close()
     }
-  }, [mintNew, duelistBalance])
+  }, [mintNew, duelistIds.length])
 
   const { create_duelist, update_duelist } = useDojoSystemCalls()
 
   const { name, profilePic, score: { archetypeName } } = useDuelist(editingDuelistId)
   const [selectedProfilePic, setSelectedProfilePic] = useState(0)
 
-  const randomPic = useMemo(() => (Number(poseidon([address ?? 0n, duelistBalance ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1), [address, duelistBalance])
+  const { randomPic } = useNextRandomProfilePic()
   const _profilePic = useMemo(() => {
     return (
       selectedProfilePic ? selectedProfilePic
@@ -86,7 +85,7 @@ export default function DuelistEditModal({
 
   const _mint = () => {
     if (canSubmit && mintNew) {
-      setDuelistBalanceBeforeMint(duelistBalance ?? 0)
+      setDuelistCountBeforeMint(duelistIds.length ?? 0)
       create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString())
     }
   }

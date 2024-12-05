@@ -1,19 +1,23 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useQueryContext } from '@/pistols/hooks/QueryContext'
+import { useQueryParams } from '@/pistols/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
+import { useQueryChallengeIds } from '@/pistols/stores/challengeQueryStore'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import useGameAspect from '@/pistols/hooks/useGameApect'
-import { DuelPoster, DuelPosterHandle } from '../DuelPoster'
-import DuelistModal from '../modals/DuelistModal'
-import ChallengeModal from '../modals/ChallengeModal'
-import NewChallengeModal from '../modals/NewChallengeModal'
-import { InteractibleScene } from '@/pistols/three/InteractibleScene'
+import { PosterGrid, PosterGridHandle } from '@/pistols/components/PosterGrid'
+import { DuelPoster, DuelPosterHandle } from '@/pistols/components/DuelPoster'
 import { _currentScene } from '@/pistols/three/game'
-import { PosterGrid, PosterGridHandle } from '../PosterGrid'
+import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
+import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
+import DuelistModal from '@/pistols/components/modals/DuelistModal'
 
 export default function ScDuels() {
-  const { queryLiveDuels: { challengeIds } } = useQueryContext()
+  const { duelistId } = useSettings()
+  const { filterStatesLiveDuels, filterDuelistName, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterDuelistName, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectDuel } = usePistolsContext()
@@ -131,7 +135,6 @@ export default function ScDuels() {
     // A Set is unnecessary here since we're just iterating through challengeIds
     // and checking if each duel exists in the posters Map
     challengeIds.forEach(duel => {
-      console.log('challengeIds', challengeIds.indexOf(duel))
       if (!posters.has(duel)) {
         posters.set(duel, createPoster(duel))
       }

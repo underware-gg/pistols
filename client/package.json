@@ -1,7 +1,7 @@
 {
   "name": "pistols",
   "private": true,
-  "version": "0.12.0",
+  "version": "0.12.1",
   "type": "module",
   "scripts": {
     "dev": "NODE_OPTIONS='--experimental-wasm-modules' next dev",
@@ -15,20 +15,18 @@
   },
   "dependencies": {
     "@apollo/client": "^3.11.8",
-    "@cartridge/connector": "0.5.0-alpha.8",
-    "@cartridge/controller": "0.5.0-alpha.8",
-    "@dojoengine/core": "1.0.0-alpha.30",
-    "@dojoengine/react": "1.0.0-alpha.30",
-    "@dojoengine/recs": "^2.0.13",
-    "@dojoengine/sdk": "1.0.0-alpha.30",
-    "@dojoengine/state": "1.0.0-alpha.30",
-    "@dojoengine/torii-client": "1.0.0-alpha.30",
-    "@dojoengine/utils": "1.0.0-alpha.30",
+    "@cartridge/connector": "0.5.1",
+    "@cartridge/controller": "0.5.1",
+    "@dojoengine/core": "1.0.2",
+    "@dojoengine/sdk": "1.0.2",
+    "@dojoengine/torii-client": "1.0.2",
+    "@dojoengine/utils": "1.0.2",
     "@starknet-react/chains": "3.0.2",
     "@starknet-react/core": "3.0.3",
     "@tweenjs/tween.js": "^21.0.0",
     "event-emitter": "^0.3.5",
     "get-starknet-core": "^4.0.0",
+    "immer": "^10.1.1",
     "lil-gui": "^0.19.2",
     "next": "^13.5.6",
     "react": "^18.2.0",
@@ -43,7 +41,8 @@
     "swr": "^2.2.4",
     "three": "^0.157.0",
     "type-fest": "^2.14.0",
-    "use-local-storage-state": "^19.1.0"
+    "use-local-storage-state": "^19.1.0",
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.0.3",
@@ -59,7 +58,6 @@
     "typescript": "^5.5.4"
   },
   "engines": {
-    "pnpm": ">=9",
-    "node": ">=18"
+    "node": ">=22"
   }
 }

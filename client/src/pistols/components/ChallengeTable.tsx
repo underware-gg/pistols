@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react'
 import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useQueryContext } from '@/pistols/hooks/QueryContext'
-import { useGetChallengesByDuelistQuery } from '@/pistols/hooks/useSdkQueries'
+import { useQueryParams } from '@/pistols/stores/queryParamsStore'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useDuel } from '@/pistols/hooks/useDuel'
+import { useQueryChallengeIds } from '@/pistols/stores/challengeQueryStore'
 import { ProfilePicSquare } from '@/pistols/components/account/ProfilePic'
 import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
@@ -22,29 +22,6 @@ const Col = Grid.Column
 const Cell = Table.Cell
 const HeaderCell = Table.HeaderCell
 
-export function ChallengeTableLive() {
-  const {
-    queryLiveDuels: { challengeIds, states },
-    filterStatesLiveDuels, dispatchFilterStatesLiveDuels
-  } = useQueryContext()
-  return <ChallengeTableByIds challengeIds={challengeIds} color='green' compact existingStates={states} states={filterStatesLiveDuels} setStates={dispatchFilterStatesLiveDuels} />
-}
-
-export function ChallengeTablePast() {
-  const {
-    queryPastDuels: { challengeIds, states },
-    filterStatesPastDuels, dispatchFilterStatesPastDuels
-  } = useQueryContext()
-  return <ChallengeTableByIds challengeIds={challengeIds} color='red' compact existingStates={states} states={filterStatesPastDuels} setStates={dispatchFilterStatesPastDuels} />
-}
-
-// export function ChallengeTableYour() {
-//   const {
-//     queryYourDuels: { challengeIds, states },
-//     filterStatesYourDuels, dispatchFilterStatesYourDuels
-//   } = useQueryContext()
-//   return <ChallengeTableByIds challengeIds={challengeIds} compact existingStates={states} states={filterStatesYourLiveDuels} setStates={dispatchFilterStatesYourLiveDuels} />
-// }
 
 export function ChallengeTableSelectedDuelist({
   compact = false,
@@ -52,7 +29,11 @@ export function ChallengeTableSelectedDuelist({
   compact: boolean
 }) {
   const [statesFilter, setStatesFilter] = useState(AllChallengeStates)
-  const { querySelectedDuelistDuels: { challengeIds, states } } = useQueryContext()
+
+  const { selectedDuelistId } = usePistolsContext()
+  const { filterChallengeSortColumn, filterDuelistName, filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds, states } = useQueryChallengeIds(statesFilter, filterDuelistName, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+
   return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} existingStates={states} states={statesFilter} setStates={setStatesFilter} />
 }
 
@@ -72,7 +53,7 @@ function ChallengeTableByIds({
   states: ChallengeState[]
   setStates: (states: ChallengeState[]) => void
 }) {
-  const { filterDuelistName } = useQueryContext()
+  const { filterDuelistName } = useQueryParams()
 
   const rows = useMemo(() => {
     let result = []

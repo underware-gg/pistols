@@ -1,21 +1,15 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
-import { getComponentValue } from '@dojoengine/recs'
 import { DojoManifest } from '@/lib/dojo/Dojo'
-import { ClientComponents } from '@/lib/dojo/setup/setup'
-import { arrayClean, bigintToEntity, bigintToHex, isPositiveBigint, shortAddress } from '@/lib/utils/types'
+import { arrayClean, bigintToHex, isPositiveBigint, shortAddress } from '@/lib/utils/types'
 import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
 import {
   Premise, getPremiseValue,
   ProfilePicType, getProfilePicTypeValue,
-  CONFIG,
 } from '@/games/pistols/generated/constants'
 import { convert_duel_progress } from '@/games/pistols/duel_progress'
 import { emitter } from '@/pistols/three/game'
-
-// FIX while this is not merged
-// https://github.com/dojoengine/dojo.js/pull/190
-// import { setComponentsFromEvents } from '@/lib/dojo/fix/setComponentsFromEvents'
+import { getConfig } from '@/pistols/stores/configStore'
 
 export const NAMESPACE = 'pistols'
 
@@ -45,15 +39,13 @@ const duelist_token_call = (entrypoint: string, calldata: any[]): DojoCall => ({
 })
 
 export function createSystemCalls(
-  components: ClientComponents,
   manifest: DojoManifest,
   provider: DojoProvider,
 ) {
-  const { TableConfig, TableAdmittance, Config } = components
-
+  
   const approve_call = (approved_value: BigNumberish): Call | undefined => {
     if (!isPositiveBigint(approved_value)) return undefined
-    const config = getComponentValue(Config, bigintToEntity(CONFIG.CONFIG_KEY))
+    const config = getConfig()
     if (!config) throw new Error(`Config does not exist`)
     if (!isPositiveBigint(config.lords_address)) return undefined
     const bank_contract = getContractByName(manifest, NAMESPACE, 'bank')
@@ -81,9 +73,6 @@ export function createSystemCalls(
       const receipt = await signer.waitForTransaction(tx.transaction_hash, { retryInterval: 200 })
       success = getReceiptStatus(receipt);
       (success ? console.log : console.warn)(`execute success:`, success, 'receipt:', receipt, 'calls:', calls)
-
-      // set from events ahead of torii
-      // setComponentsFromEvents(contractComponents, getEvents(receipt));
     } catch (e) {
       console.warn(`execute exception:`, calls, e)
     } finally {
@@ -95,9 +84,6 @@ export function createSystemCalls(
     let results: Result = undefined
     try {
       results = await provider.call(NAMESPACE, call)
-      // result = decodeComponent(contractComponents['Component'], response)
-      // results = Array.isArray(response) ? response.map(v => BigInt(v)) : typeof response == 'boolean' ? response : BigInt(response)
-      // console.log(`call ${system}(${args.length}) success:`, result)
     } catch (e) {
       console.warn(`call ${call.contractName}::${call.entrypoint}(${call.calldata.length}) exception:`, e)
     } finally {
@@ -184,34 +170,40 @@ export function createSystemCalls(
   }
 
   const admin_set_config = async (signer: AccountInterface, values: any): Promise<boolean> => {
-    const args = Object.keys(Config.schema).map(key => {
-      const value = values[key]
-      if (value == null) throw new Error()
-      return value
-    })
-    const calls: DojoCalls = [admin_call('set_config', args)]
-    return await _executeTransaction(signer, calls)
+    // const args = Object.keys(Config.schema).map(key => {
+    //   const value = values[key]
+    //   if (value == null) throw new Error()
+    //   return value
+    // })
+    // const calls: DojoCalls = [admin_call('set_config', args)]
+    // return await _executeTransaction(signer, calls)
+    console.warn(`FUNCTIONALITY DISABLED!`)
+    return false
   }
 
   const admin_set_table = async (signer: AccountInterface, table: any): Promise<boolean> => {
-    const args = Object.keys(TableConfig.schema).map(key => {
-      const value = table[key]
-      if (value == null) throw new Error()
-      return value
-    })
-    // const args = [values]
-    const calls: DojoCalls = [admin_call('set_table', args)]
-    return await _executeTransaction(signer, calls)
+    // const args = Object.keys(TableConfig.schema).map(key => {
+    //   const value = table[key]
+    //   if (value == null) throw new Error()
+    //   return value
+    // })
+    // // const args = [values]
+    // const calls: DojoCalls = [admin_call('set_table', args)]
+    // return await _executeTransaction(signer, calls)
+    console.warn(`FUNCTIONALITY DISABLED!`)
+    return false
   }
 
   const admin_set_table_admittance = async (signer: AccountInterface, table_admittance: any): Promise<boolean | null> => {
-    const args = Object.keys(TableAdmittance.schema).map(key => {
-      const value = table_admittance[key]
-      if (value == null) throw new Error()
-      return value
-    })
-    const calls: DojoCalls = [admin_call('set_table_admittance', args)]
-    return await _executeTransaction(signer, calls)
+    // const args = Object.keys(TableAdmittance.schema).map(key => {
+    //   const value = table_admittance[key]
+    //   if (value == null) throw new Error()
+    //   return value
+    // })
+    // const calls: DojoCalls = [admin_call('set_table_admittance', args)]
+    // return await _executeTransaction(signer, calls)
+    console.warn(`FUNCTIONALITY DISABLED!`)
+    return false
   }
 
 

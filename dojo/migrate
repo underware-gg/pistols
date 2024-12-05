@@ -103,9 +103,9 @@ if [[ "$PROFILE" == "dev" ]]; then
   echo "------------------------------------------------------------------------------"
   echo ">>> Generate sources..."
   cd ../client
-  export CMD="npm run create-components --game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS"
-  echo "command: $CMD"
-  $CMD
+  # export CMD="npm run create-components --game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS"
+  # echo "command: $CMD"
+  # $CMD
   export CMD="npm run create-constants --game=$GAME_SLUG --profile=$PROFILE"
   echo "command: $CMD"
   $CMD

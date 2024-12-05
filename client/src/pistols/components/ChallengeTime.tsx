@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react'
-import { useChallenge } from '@/pistols/hooks/useChallenge'
-import { formatTimestamp, formatTimestampDelta } from '@/lib/utils/timestamp'
+import { useChallenge } from '@/pistols/stores/challengeStore'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { EMOJI } from '../data/messages'
+import { formatTimestamp, formatTimestampDelta } from '@/lib/utils/timestamp'
+import { EMOJI } from '@/pistols/data/messages'
 
 export function ChallengeTime({
   duelId,

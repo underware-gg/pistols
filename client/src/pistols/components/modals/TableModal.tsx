@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal, Dropdown, ButtonGroup, Button } from 'semantic-ui-react'
-import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
+import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useActiveDuelistIds } from '@/pistols/hooks/useChallenge'
-import { useERC20TokenName } from '@/lib/utils/hooks/useERC20'
-import { useTable, useTableTotals } from '@/pistols/hooks/useTable'
+import { useTable } from '@/pistols/stores/tableStore'
+import { useTableTotals, useTableActiveDuelistIds } from '@/pistols/hooks/useTable'
 import { Balance } from '@/pistols/components/account/Balance'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { RowDivider } from '@/lib/ui/Stack'
@@ -115,12 +114,11 @@ function TableDescription({
   const {
     description,
     feeMin,
-    feePct,
     tableIsOpen,
     tableType,
   } = useTable(tableId)
-  const { activeDuelistIdsCount } = useActiveDuelistIds(tableId)
   const { liveDuelsCount, pastDuelsCount } = useTableTotals(tableId)
+  const { activeDuelistIds } = useTableActiveDuelistIds(tableId)
 
   return (
     <Grid className='H5'>
@@ -147,13 +145,7 @@ function TableDescription({
           Fee:
         </Col>
         <Col width={8} className='Bold'>
-          {(Boolean(feePct) && !Boolean(feeMin)) ?
-            <span className='Coin'>{feePct}%</span>
-            : <>
-              <Balance lords wei={feeMin ?? 0} />
-              {Boolean(feePct) && <> (or {feePct}%)</>}
-            </>
-          }
+          <Balance lords wei={feeMin ?? 0} />
         </Col>
       </Row>
 
@@ -162,7 +154,7 @@ function TableDescription({
           Active Duelists:
         </Col>
         <Col width={8} className='Coin PaddedLeft Bold'>
-          {activeDuelistIdsCount}
+          {activeDuelistIds.length}
         </Col>
       </Row>
 

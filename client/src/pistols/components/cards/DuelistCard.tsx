@@ -5,7 +5,7 @@ import { Rarity } from '@/games/pistols/generated/constants'
 import { CardData, FireCardsTextures } from '../../data/assets'
 import * as Constants from '../../data/cardConstants'
 import { AnimationData } from './Cards'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
+import { useDuelist } from '@/pistols/stores/duelistStore'
 import { ArchetypeNames } from '@/pistols/utils/pistols'
 import { useFameBalanceDuelist } from '@/pistols/hooks/useFame'
 import { FameBalance, FameBalanceDuelist } from '../account/LordsBalance'
@@ -513,7 +513,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
               <img className='duelist-card-image-drawing NoMouse NoDrag' src={`/profiles/square/${('00' + profilePic).slice(-2)}.jpg`} alt="Profile Picture" />
               <img className='card-image-front NoMouse NoDrag' src={archetypeImage} alt="Card Front" />
               <div className="duelist-card-details">
-                <div className="duelist-name" data-contentlength={Math.floor(name.length / 10)}>{name}</div>
+                <div className="duelist-name" data-contentlength={name ? Math.floor(name.length / 10) : 31}>{name}</div>
                 <div className="duelist-fame">
                   <FameBalanceDuelist duelistId={props.duelistId} />
                 </div>

@@ -24,6 +24,7 @@
     "**/database.json": true,
     // "**/generated/*": true,
     "**/manifest.json": true,
+    "**/manifest_*.json": true,
     "**/assets": true,
     "client/public/**": true,
     "dojo/manifests/**": true,

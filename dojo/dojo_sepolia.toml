@@ -25,6 +25,7 @@ rpc_url = "https://api.cartridge.gg/x/starknet/sepolia" # or env: STARKNET_RPC_U
 # private_key = ""      # env: DOJO_PRIVATE_KEY
 world_address = "0x4255cc0cdc92f77f2ae9c3ff07060bfb851a0a93e9bea5c2161cf4934c5ffc8"
 lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
+world_block = 309115
 
 #--------------------------
 # namespaces
@@ -48,15 +49,9 @@ default = "pistols"
 "pistols" = [
   "pistols-game",
   "pistols-admin",
-] 
-# ERC-721
-"pistols-TokenConfig" = ["pistols-duelist_token","pistols-duel_token"]
-"pistols-Payment"     = ["pistols-duelist_token","pistols-duel_token"]
-"pistols-Duelist"     = ["pistols-duelist_token"]
-"pistols-Challenge"   = ["pistols-duel_token"]
-"pistols-Round"       = ["pistols-duel_token"]
-"pistols-Pact"        = ["pistols-duel_token"]
-"pistols-Scoreboard"  = ["pistols-duel_token"]
+  "pistols-duel_token",
+  "pistols-duelist_token",
+]
 # ERC-20
 "pistols-CoinConfig"        = ["pistols-fame_coin","pistols-lords_mock"]
 "pistols-TokenBoundAddress" = ["pistols-fame_coin"]
@@ -82,7 +77,7 @@ default = "pistols"
   "0x0", # minter_address
   "0x0", # renderer_address
   # "100000000000000000000", # fee_amount: 100 LORDS
-  "0x0", # fee_amount: 100 LORDS
+  "0x0", # fee_amount
 ]
 
 

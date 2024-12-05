@@ -1,13 +1,14 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { BigNumberish } from 'starknet'
+import { useChallenge } from '@/pistols/stores/challengeStore'
+import { useDuelist } from '@/pistols/stores/duelistStore'
+import { useIsYou } from '@/pistols/hooks/useIsYou'
 import useGameAspect from '@/pistols/hooks/useGameApect'
-import { useChallenge } from '../../hooks/useChallenge'
-import { useDuelist } from '../../hooks/useDuelist'
-import { useIsYou } from '../../hooks/useIsYou'
-import * as TWEEN from '@tweenjs/tween.js'
-import { ProfilePic } from '../account/ProfilePic'
+import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { BladesCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants'
-import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '../../data/assets'
-import { DuelistCardType, CardHandle, Card } from './Cards'
+import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '@/pistols/data/assets'
+import { DuelistCardType, CardHandle, Card } from '@/pistols/components/cards/Cards'
+import * as TWEEN from '@tweenjs/tween.js'
 
 interface DuelistCardsProps {
   isLeft: boolean
@@ -991,7 +992,7 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
   )
 }
 
-const Cards = forwardRef<CardsHandle, { duelId: string }>(({ duelId }, ref) => {
+const Cards = forwardRef<CardsHandle, { duelId: BigNumberish }>(({ duelId }, ref) => {
   const { duelistIdA, duelistIdB } = useChallenge(duelId)
 
   const [isOverlayVisible, setIsOverlayVisible] = useState(false)

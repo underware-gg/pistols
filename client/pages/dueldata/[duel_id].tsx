@@ -2,21 +2,20 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
-import { useChallenge } from '@/pistols/hooks/useChallenge'
+import { ChallengeStoreSync, useChallenge } from '@/pistols/stores/challengeStore'
 import { useDuel } from '@/pistols/hooks/useDuel'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useTable } from '@/pistols/hooks/useTable'
+import { useDuelist } from '@/pistols/stores/duelistStore'
+import { useTable } from '@/pistols/stores/tableStore'
 import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { formatTimestamp } from '@/lib/utils/timestamp'
-import { bigintToHex, shortAddress } from '@/lib/utils/types'
-import { weiToEth } from '@/lib/utils/starknet'
+import { bigintToHex } from '@/lib/utils/types'
 import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
-import AppPistols from '@/pistols/components/AppPistols'
-import { EMOJI } from '@/pistols/data/messages'
-import { ENV_POINTS } from '@/games/pistols/generated/constants'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
+import { ENV_POINTS } from '@/games/pistols/generated/constants'
+import { EMOJI } from '@/pistols/data/messages'
+import AppPistols from '@/pistols/components/AppPistols'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -26,7 +25,8 @@ const HeaderCell = Table.HeaderCell
 
 export default function StatsPage() {
   return (
-    <AppPistols headerData={{ title: 'Duel' }} backgroundImage={null}>
+    <AppPistols headerData={{ title: 'Pistols - Duel Data' }} backgroundImage={null}>
+      <ChallengeStoreSync />
       <StatsLoader />
     </AppPistols>
   );
@@ -93,9 +93,9 @@ function DuelStats({
         <Row>
           <HeaderCell width={4}><h5>Challenge</h5></HeaderCell>
           <HeaderCell>
-            {bigintToHex(duelId)}
-            <br />
             {duelId.toString()}
+            <br />
+            {bigintToHex(duelId)}
           </HeaderCell>
         </Row>
       </Header>
@@ -257,13 +257,13 @@ function MovesStats({
           <Row>
             <Cell>Hash</Cell>
             <Cell className='Smaller'>
-              {bigintToHex(moves.hashed)}
+              {bigintToHex(moves?.hashed)}
             </Cell>
           </Row>
           <Row>
             <Cell>Salt</Cell>
             <Cell className='Smaller'>
-              {bigintToHex(moves.salt)}
+              {bigintToHex(moves?.salt)}
             </Cell>
           </Row>
           {/* <Row>
@@ -285,15 +285,17 @@ function MovesStats({
           </Row>
         </Header>
 
-        <Body>
-          <Row textAlign='center'>
-            <Cell><PacesIcon paces={hand.card_fire} /> {hand.card_fire}
-            </Cell>
-            <Cell><PacesIcon paces={hand.card_dodge} dodge /> {hand.card_dodge}</Cell>
-            <Cell>{hand.card_tactics}</Cell>
-            <Cell><BladesIcon blade={hand.card_blades} /> {hand.card_blades}</Cell>
-          </Row>
-        </Body>
+        {hand &&
+          <Body>
+            <Row textAlign='center'>
+              <Cell><PacesIcon paces={hand.card_fire} /> {hand.card_fire}
+              </Cell>
+              <Cell><PacesIcon paces={hand.card_dodge} dodge /> {hand.card_dodge}</Cell>
+              <Cell>{hand.card_tactics}</Cell>
+              <Cell><BladesIcon blade={hand.card_blades} /> {hand.card_blades}</Cell>
+            </Row>
+          </Body>
+        }
       </Table>
     </>
   )
@@ -323,6 +325,7 @@ function StateRow({
   specials_a?: any
   specials_b?: any
 }) {
+  if (!state_a || !state_b) return <></>
   return (
     <Table attached>
       <Header fullWidth>

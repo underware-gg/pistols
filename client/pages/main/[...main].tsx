@@ -19,7 +19,7 @@ import { SCENE_CHANGE_ANIMATION_DURATION } from '@/pistols/three/game'
 import ScDuels from '@/pistols/components/scenes/ScDuels'
 import ScDuelists from '@/pistols/components/scenes/ScDuelists'
 import ScGraveyard from '@/pistols/components/scenes/ScGraveyard'
-import { QueryProvider } from '@/pistols/hooks/QueryContext'
+import StoreSync from '@/pistols/stores/StoreSync'
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {
@@ -41,13 +41,16 @@ export default function MainPage() {
   return (
     <AppPistols headerData={{ title: sceneTitle }} backgroundImage={null}>
       <Background className={null}>
-        { isInitialized &&  <QueryProvider>
-          <GameContainer isVisible={true} />
-          <MainUI />
-          {overlay}
-          <Header />
-        </QueryProvider> }
-        <MouseToolTip/>
+        {isInitialized &&
+          <>
+            <StoreSync />
+            <GameContainer isVisible={true} />
+            <MainUI />
+            {overlay}
+            <Header />
+          </>
+        }
+        <MouseToolTip />
         {/* ADD NOTRIFICATIONS - how to make them into a hook? */}
       </Background>
     </AppPistols>

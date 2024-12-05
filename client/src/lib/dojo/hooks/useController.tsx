@@ -115,7 +115,7 @@ export const useConnectedController = () => {
 }
 
 
-export const useControllerUser = () => {
+export const useControllerUsername = () => {
   const { address } = useAccount()
   const controllerConnector = useConnectedController()
   

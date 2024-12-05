@@ -4,21 +4,20 @@ import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { useChallenge, useChallengeDescription } from '@/pistols/hooks/useChallenge'
-import { useDuelist } from '@/pistols/hooks/useDuelist'
-import { useTable } from '@/pistols/hooks/useTable'
+import { useChallengeDescription } from '@/pistols/hooks/useChallengeDescription'
+import { useChallenge } from '@/pistols/stores/challengeStore'
+import { useDuelist } from '@/pistols/stores/duelistStore'
+import { useTable } from '@/pistols/stores/tableStore'
 import { useIsMyAccount, useIsYou } from '@/pistols/hooks/useIsYou'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
-import { AddressShort } from '@/lib/ui/AddressShort'
 import { IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
-import { bigintToHex } from '@/lib/utils/types'
 import { ChallengeState } from '@/games/pistols/generated/constants'
-import { PremisePrefix } from '../../utils/pistols'
+import { makeDuelDataUrl, PremisePrefix } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -86,7 +85,7 @@ export default function ChallengeModal() {
               {tableDescription}
             </Col>
             <Col width={4} textAlign='right'>
-              <IconClick name='database' size={'small'} onClick={() => window?.open(`/dueldata/${bigintToHex(selectedDuelId)}`, '_blank')} />
+              <IconClick name='database' size={'small'} onClick={() => window?.open(makeDuelDataUrl(selectedDuelId), '_blank')} />
             </Col>
           </Row>
         </Grid>
