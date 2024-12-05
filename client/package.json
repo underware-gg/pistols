@@ -1,7 +1,7 @@
 {
   "name": "pistols",
   "private": true,
-  "version": "0.12.1",
+  "version": "0.12.2",
   "type": "module",
   "scripts": {
     "dev": "NODE_OPTIONS='--experimental-wasm-modules' next dev",
@@ -45,16 +45,16 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^14.0.3",
+    "@next/eslint-plugin-next": "^14.2.20",
     "@types/node": "^20.8.7",
     "@types/react": "^18.2.30",
     "@types/react-dom": "^18.2.14",
     "@types/three": "^0.157.2",
-    "@typescript-eslint/eslint-plugin": "^6.8.0",
-    "@typescript-eslint/parser": "^6.8.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.57.1",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.3",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.16",
     "typescript": "^5.5.4"
   },
   "engines": {
