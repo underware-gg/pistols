@@ -79,8 +79,8 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
 
   const { healthA, healthB } = useMemo(() => {
     return {
-      healthA: ((currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? CONST.FULL_HEALTH : round1?.state_a.health) ?? null,
-      healthB: ((currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? CONST.FULL_HEALTH : round1?.state_b.health) ?? null,
+      healthA: ((currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? CONST.FULL_HEALTH : round1?.state_a?.health) ?? null,
+      healthB: ((currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? CONST.FULL_HEALTH : round1?.state_b?.health) ?? null,
     }
   }, [currentStage, round1, animatedHealthA, animatedHealthB])
 
@@ -95,13 +95,13 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
   }, [enabled, currentStage])
 
   useEffect(() => {
-    if (enabled && gameImpl && isAnimatingRound1 && audioLoaded) {
+    if (enabled && gameImpl && isAnimatingRound1 && audioLoaded && round1) {
       console.log(`TRIGGER animateDuel(1)`)
       const actionA = getPacesCardFromValue(round1.moves_a.card_1) as unknown as Action
       const actionB = getPacesCardFromValue(round1.moves_b.card_1) as unknown as Action
       gameImpl.animateDuel(AnimationState.Round1, actionA, actionB, round1.state_a.health, round1.state_b.health, round1.state_a.damage, round1.state_b.damage)
     }
-  }, [enabled, gameImpl, isAnimatingRound1, audioLoaded])
+  }, [enabled, gameImpl, isAnimatingRound1, audioLoaded, round1])
 
   const { canAutoRevealA, canAutoRevealB } = useMemo(() => ({
     canAutoRevealA: (result.turnA && (currentStage == DuelStage.Round1Reveal)),
