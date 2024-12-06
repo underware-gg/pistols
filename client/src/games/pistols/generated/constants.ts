@@ -5,6 +5,18 @@ import { BigNumberish } from 'starknet';
 // enums
 //
 
+// from: ../dojo/src/models/consumable.cairo
+export enum ConsumableType {
+  Undefined = 'Undefined',
+  DuelistToken = 'DuelistToken',
+};
+export const ConsumableTypeNameToValue: Record<ConsumableType, number> = {
+  [ConsumableType.Undefined]: 0,
+  [ConsumableType.DuelistToken]: 1,
+};
+export const getConsumableTypeValue = (name: ConsumableType): number => (ConsumableTypeNameToValue[name as string]);
+export const getConsumableTypeFromValue = (value: number): ConsumableType => Object.keys(ConsumableTypeNameToValue).find(key => ConsumableTypeNameToValue[key] === value) as ConsumableType;
+
 // from: ../dojo/src/models/duelist.cairo
 export enum Archetype {
   Undefined = 'Undefined',
@@ -34,6 +46,44 @@ export const ProfilePicTypeNameToValue: Record<ProfilePicType, number> = {
 };
 export const getProfilePicTypeValue = (name: ProfilePicType): number => (ProfilePicTypeNameToValue[name as string]);
 export const getProfilePicTypeFromValue = (value: number): ProfilePicType => Object.keys(ProfilePicTypeNameToValue).find(key => ProfilePicTypeNameToValue[key] === value) as ProfilePicType;
+
+// from: ../dojo/src/models/player.cairo
+export enum Activity {
+  Undefined = 'Undefined',
+  CreatedDuelist = 'CreatedDuelist',
+  CreatedChallenge = 'CreatedChallenge',
+  RepliedChallenge = 'RepliedChallenge',
+  CommittedMoves = 'CommittedMoves',
+  RevealedMoves = 'RevealedMoves',
+  Online = 'Online',
+};
+export const ActivityNameToValue: Record<Activity, number> = {
+  [Activity.Undefined]: 0,
+  [Activity.CreatedDuelist]: 1,
+  [Activity.CreatedChallenge]: 2,
+  [Activity.RepliedChallenge]: 3,
+  [Activity.CommittedMoves]: 4,
+  [Activity.RevealedMoves]: 5,
+  [Activity.Online]: 6,
+};
+export const getActivityValue = (name: Activity): number => (ActivityNameToValue[name as string]);
+export const getActivityFromValue = (value: number): Activity => Object.keys(ActivityNameToValue).find(key => ActivityNameToValue[key] === value) as Activity;
+
+// from: ../dojo/src/models/player.cairo
+export enum TutorialProgress {
+  None = 'None',
+  FinishedFirst = 'FinishedFirst',
+  FinishedSecond = 'FinishedSecond',
+  FinishedFirstDuel = 'FinishedFirstDuel',
+};
+export const TutorialProgressNameToValue: Record<TutorialProgress, number> = {
+  [TutorialProgress.None]: 0,
+  [TutorialProgress.FinishedFirst]: 1,
+  [TutorialProgress.FinishedSecond]: 2,
+  [TutorialProgress.FinishedFirstDuel]: 3,
+};
+export const getTutorialProgressValue = (name: TutorialProgress): number => (TutorialProgressNameToValue[name as string]);
+export const getTutorialProgressFromValue = (value: number): TutorialProgress => Object.keys(TutorialProgressNameToValue).find(key => TutorialProgressNameToValue[key] === value) as TutorialProgress;
 
 // from: ../dojo/src/models/table.cairo
 export enum TableType {
@@ -331,28 +381,22 @@ export const SELECTORS: type_SELECTORS = {
   PAYMENT: '0x017a03e9cb461470b9149f9efbd95ad9b217fca9fdccd3827383904c33da96c1', // 'selector_from_tag!("pistols-Payment")'
 };
 
-// from: ../dojo/src/libs/events.cairo
-type type_EVENT_SELECTOR = {
-  DuelistRegisteredEvent: BigNumberish, // cairo: felt252
-  NewChallengeEvent: BigNumberish, // cairo: felt252
-  ChallengeAcceptedEvent: BigNumberish, // cairo: felt252
-  ChallengeResolvedEvent: BigNumberish, // cairo: felt252
-  DuelistTurnEvent: BigNumberish, // cairo: felt252
-};
-export const EVENT_SELECTOR: type_EVENT_SELECTOR = {
-  DuelistRegisteredEvent: '0x148c3db21a55576bc012023dc4d3b5bd570c519de855849eac52b1c5d6c9e85',
-  NewChallengeEvent: '0x14a0df74df51e02ef8dedabfd1ea9684ea2087bed6370e881b156d7e2e56975',
-  ChallengeAcceptedEvent: '0x31cdbf7ac39747303190a727df1a270ae5e4f05191f6f58e452ce4eb1e98abe',
-  ChallengeResolvedEvent: '0x23dfe05a8414fd8464370e120099be69327b2a52ae6655ff23733651e8281b1',
-  DuelistTurnEvent: '0x19556e1418f1e7a7e6962eff75d1a46abd50bda431139f855ba85c9119754a4',
-};
-
 // from: ../dojo/src/models/config.cairo
 type type_CONFIG = {
   CONFIG_KEY: number, // cairo: u8
 };
 export const CONFIG: type_CONFIG = {
   CONFIG_KEY: 1,
+};
+
+// from: ../dojo/src/models/player.cairo
+type type_PlayerErrors = {
+  PLAYER_NOT_REGISTERED: string, // cairo: felt252
+  INSUFFICIENT_CONSUMABLES: string, // cairo: felt252
+};
+export const PlayerErrors: type_PlayerErrors = {
+  PLAYER_NOT_REGISTERED: 'PLAYER: Not registered',
+  INSUFFICIENT_CONSUMABLES: 'PLAYER: Insufficient consumable',
 };
 
 // from: ../dojo/src/models/table.cairo
@@ -366,11 +410,11 @@ export const TABLES: type_TABLES = {
 };
 
 // from: ../dojo/src/systems/components/erc721_hooks.cairo
-type type_Errors = {
+type type_MetadataErrors = {
   INVALID_ATTRIBUTES: string, // cairo: felt252
   INVALID_METADATA: string, // cairo: felt252
 };
-export const Errors: type_Errors = {
+export const MetadataErrors: type_MetadataErrors = {
   INVALID_ATTRIBUTES: 'METADATA: invalid attributes',
   INVALID_METADATA: 'METADATA: invalid metadata',
 };
@@ -669,6 +713,8 @@ export const CHALLENGE_STATE: type_CHALLENGE_STATE = {
 
 // from: ../dojo/src/types/constants.cairo
 type type_CONST = {
+  DUELIST_PACK_AMOUNT_REGISTER: number, // cairo: u32
+  DUELIST_PACK_AMOUNT: number, // cairo: u32
   ROUND_COUNT: number, // cairo: u8
   MAX_DUELIST_ID: BigNumberish, // cairo: u128
   FULL_HEALTH: number, // cairo: u8
@@ -679,6 +725,8 @@ type type_CONST = {
   ETH_TO_WEI: BigNumberish, // cairo: u256
 };
 export const CONST: type_CONST = {
+  DUELIST_PACK_AMOUNT_REGISTER: 5,
+  DUELIST_PACK_AMOUNT: 5,
   ROUND_COUNT: 1,
   MAX_DUELIST_ID: '0xffff',
   FULL_HEALTH: 3,
