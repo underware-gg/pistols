@@ -6,9 +6,12 @@ mod tests {
 
     use dojo::world::{WorldStorage};
 
-    use pistols::models::challenge::{Round};
-    use pistols::models::duelist::{Duelist};
-    use pistols::models::table::{TABLES};
+    use pistols::models::{
+        player::{Player, PlayerTrait},
+        challenge::{Round},
+        duelist::{Duelist},
+        table::{TABLES},
+    };
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST};
@@ -401,6 +404,13 @@ mod tests {
         let B: ContractAddress = LITTLE_GIRL();
         let ID_A: ContractAddress = OWNED_BY_LITTLE_BOY();
         let ID_B: ContractAddress = OWNED_BY_LITTLE_GIRL();
+
+        // players not registered
+        let player_a: Player = tester::get_Player(sys.world, A);
+        let player_b: Player = tester::get_Player(sys.world, B);
+        assert(!player_a.exists(), 'player_a.exists NOT');
+        assert(!player_b.exists(), 'player_b.exists NOT');
+
         let duel_id: u128 = tester::execute_create_duel_ID(@sys.duels, A, ID(ID_A), B, PREMISE_1, TABLES::COMMONERS, 48);
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
 // ch.address_a.print();
@@ -427,6 +437,12 @@ mod tests {
         assert(ch.duelist_id_b == ID(ID_B), 'challenged_id_ok');   // << UPDATED!!!
 
         _assert_empty_progress(sys, duel_id);
+
+        // players registered automatically
+        let player_a: Player = tester::get_Player(sys.world, A);
+        let player_b: Player = tester::get_Player(sys.world, B);
+        assert(player_a.exists(), 'player_a.exists YES');
+        assert(player_b.exists(), 'player_b.exists YES');
     }
 
     #[test]

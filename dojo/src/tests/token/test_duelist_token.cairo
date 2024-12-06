@@ -21,7 +21,7 @@ use pistols::systems::{
 use pistols::models::{
     player::{
         m_Player, Player,
-        m_PlayerActive, PlayerActive,
+        e_PlayerActivity, PlayerActivity,
     },
     consumable::{
         m_ConsumableBalance, ConsumableBalance,
@@ -131,7 +131,6 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
         resources: [
             // pistols models
             TestResource::Model(m_Player::TEST_CLASS_HASH),
-            TestResource::Model(m_PlayerActive::TEST_CLASS_HASH),
             TestResource::Model(m_ConsumableBalance::TEST_CLASS_HASH),
             TestResource::Model(m_Challenge::TEST_CLASS_HASH),
             TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
@@ -147,7 +146,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
             // events
-            // TestResource::Event(actions::e_Moved::TEST_CLASS_HASH),
+            TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
             //
             // contracts
             TestResource::Contract(duelist_token::TEST_CLASS_HASH),

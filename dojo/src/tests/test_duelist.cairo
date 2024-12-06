@@ -8,7 +8,10 @@ mod tests {
     use dojo::world::{WorldStorage};
 
     use pistols::systems::game::{IGameDispatcherTrait};
-    use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
+    use pistols::models::{
+        player::{Player, PlayerTrait},
+        duelist::{Duelist, ProfilePicType, Archetype},
+    };
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::tests::tester::{
         tester,
@@ -24,6 +27,13 @@ mod tests {
     #[test]
     fn test_create_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::ADMIN | FLAGS::DUELIST);
+        
+        // players not registered
+        let player_a: Player = tester::get_Player(sys.world, OWNER());
+        let player_b: Player = tester::get_Player(sys.world, OTHER());
+        assert(!player_a.exists(), 'player_a.exists NOT');
+        assert(!player_b.exists(), 'player_b.exists NOT');
+
         let duelist1_name: felt252 = 'Player_ONE';
         let duelist2_name: felt252 = 'Player_TWO';
         let duelist1: Duelist = tester::execute_create_duelist(@sys.duelists, OWNER(), duelist1_name, ProfilePicType::Duelist, '1');
@@ -46,6 +56,12 @@ mod tests {
         // test get
         let duelist1 = tester::get_DuelistValue_id(sys.world, duelist1.duelist_id);
         assert(duelist1.name == duelist1_name, 'duelist1_name');
+
+        // players registered automatically
+        let player_a: Player = tester::get_Player(sys.world, OWNER());
+        let player_b: Player = tester::get_Player(sys.world, OTHER());
+        assert(player_a.exists(), 'player_a.exists YES');
+        assert(player_b.exists(), 'player_b.exists YES');
     }
 
     #[test]

@@ -144,6 +144,7 @@ pub mod duel_token {
     };
     use pistols::models::{
         config::{TokenConfig, TokenConfigValue},
+        player::{Player, PlayerTrait, Activity},
         challenge::{Challenge, ChallengeValue, Round, Moves},
         duelist::{Duelist, DuelistValue, DuelistTrait, Pact, ProfilePicType, ProfilePicTypeTrait},
         table::{
@@ -157,7 +158,6 @@ pub mod duel_token {
     use pistols::types::round_state::{RoundState};
     use pistols::types::duel_progress::{DuelistDrawnCard};
     use pistols::types::constants::{CONST, HONOUR};
-    use pistols::libs::events::{emitters};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::pact;
     use pistols::utils::metadata::{MetadataTrait};
@@ -313,7 +313,8 @@ pub mod duel_token {
             // set the pact + assert it does not exist
             pact::set_pact(ref store, challenge);
 
-            emitters::emitNewChallengeEvent(@world, challenge);
+            // events
+            PlayerTrait::check_in(ref store, address_a, Activity::CreatedChallenge, duel_id.into());
 
             (duel_id)
         }
@@ -384,15 +385,10 @@ pub mod duel_token {
                     let mut round: Round = store.get_round(duel_id);
                     round.moves_b.seed = world.vrf_dispatcher().consume_random();
                     store.set_round(@round);
-                    // events
-                    emitters::emitChallengeAcceptedEvent(@world, challenge, accepted);
-                    emitters::emitDuelistTurnEvent(@world, challenge);
                 } else {
                     // Challenged is Refusing
                     challenge.state = ChallengeState::Refused;
                     challenge.timestamp_end = timestamp;
-                    // events
-                    emitters::emitChallengeAcceptedEvent(@world, challenge, accepted);
                 }
             }
 
@@ -403,7 +399,10 @@ pub mod duel_token {
             if (challenge.state.is_canceled()) {
                 pact::unset_pact(ref store, challenge);
             }
-            
+
+            // events
+            PlayerTrait::check_in(ref store, address_b, Activity::RepliedChallenge, duel_id.into());
+
             (challenge.state)
         }
         

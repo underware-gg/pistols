@@ -14,7 +14,6 @@ pub use pistols::models::{
     },
     player::{
         Player, PlayerValue,
-        PlayerActive,
     },
     consumable::{
         ConsumableBalance, ConsumableBalanceValue,
@@ -168,11 +167,6 @@ impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_player(ref self: Store, model: @Player) {
-        self.world.write_model(model);
-    }
-
-    #[inline(always)]
-    fn set_player_active(ref self: Store, model: @PlayerActive) {
         self.world.write_model(model);
     }
 
