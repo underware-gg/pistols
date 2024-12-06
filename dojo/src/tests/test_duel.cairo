@@ -449,7 +449,7 @@ mod tests {
         tester::execute_commit_moves_ID(@sys.game, BUMMER(), ID(OWNER()).into(), duel_id, moves_a.hashed);
         // no panic
         let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
-        assert(challenge.address_a == BUMMER(), 'challenge.address_a_comitted');
+        assert(challenge.address_a == BUMMER(), 'challenge.address_a_committed');
         assert(challenge.address_b == OTHER(), 'challenge.address_b');
     }
 
@@ -467,7 +467,7 @@ mod tests {
         // no panic
         let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
         assert(challenge.address_a == OWNER(), 'challenge.address_a');
-        assert(challenge.address_b == BUMMER(), 'challenge.address_b_comitted');
+        assert(challenge.address_b == BUMMER(), 'challenge.address_b_committed');
     }
 
     #[test]

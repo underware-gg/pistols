@@ -157,7 +157,7 @@ pub mod game {
             }
 
             // events
-            PlayerTrait::check_in(ref store, starknet::get_caller_address(), Activity::CommitedMoves, duel_id.into());
+            PlayerTrait::check_in(ref store, starknet::get_caller_address(), Activity::CommittedMoves, duel_id.into());
 
             store.set_round(@round);
         }

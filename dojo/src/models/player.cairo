@@ -6,7 +6,7 @@ pub enum Activity {
     CreatedDuelist,   // 1
     CreatedChallenge, // 2
     RepliedChallenge, // 3
-    CommitedMoves,    // 4
+    CommittedMoves,   // 4
     RevealedMoves,    // 5
     Online,           // 6
 }

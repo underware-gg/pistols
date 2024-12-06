@@ -113,7 +113,7 @@ export default function Duel({
     gameImpl?.setDuelistSpeedFactor(duelSpeedFactor)
   }, [duelSpeedFactor, gameImpl])
 
-  //spawns cards for all duelists if they commited
+  //spawns cards for all duelists if they committed
   useEffect(() => {
     if (!cardRef.current) return
 
