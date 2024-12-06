@@ -90,7 +90,7 @@ use pistols::models::consumable::{ConsumableType, ConsumableTypeTrait};
 use pistols::utils::arrays::{ArrayUtilsTrait};
 use pistols::types::constants::{CONST};
 
-mod Errors {
+mod PlayerErrors {
     const PLAYER_NOT_REGISTERED: felt252    = 'PLAYER: Not registered';
     const INSUFFICIENT_CONSUMABLES: felt252 = 'PLAYER: Insufficient consumable';
 }
@@ -100,7 +100,7 @@ impl PlayerImpl of PlayerTrait {
     fn check_in(ref store: Store, address: ContractAddress, activity: Activity, identifier: felt252) {
         let mut player: Player = store.get_player(address);
         if (!player.exists()) {
-            assert(activity.can_register_player(), Errors::PLAYER_NOT_REGISTERED);
+            assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
             player.timestamp_registered = get_block_timestamp();
             store.set_player(@player);
             // grant duelists

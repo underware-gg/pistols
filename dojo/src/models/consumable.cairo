@@ -25,7 +25,7 @@ pub struct ConsumableBalance {
 // Traits
 //
 use pistols::libs::store::{Store, StoreTrait};
-use pistols::models::player::{Errors as PlayerErrors};
+use pistols::models::player::{PlayerErrors};
 
 #[generate_trait]
 impl ConsumableTypeTraitImpl of ConsumableTypeTrait {
