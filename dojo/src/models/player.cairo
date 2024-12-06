@@ -112,11 +112,13 @@ impl ActivityImpl of ActivityTrait {
         });
     }
     fn can_register_player(self: Activity) -> bool {
-        match self {
-            Activity::CreatedDuelist |
-            Activity::CreatedChallenge |
-            Activity::RepliedChallenge => true,
-            _ => false,
-        }
+        // match self {
+        //     Activity::CreatedDuelist |
+        //     Activity::CreatedChallenge |
+        //     Activity::RepliedChallenge => true,
+        //     _ => false,
+        // }
+        // TODO: remove this when we do a fresh deployment
+        (true)
     }
 }
