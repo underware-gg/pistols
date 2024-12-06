@@ -7,6 +7,7 @@ import { DuelistQueryStoreSync } from '@/pistols/stores/duelistQueryStore'
 import { ChallengeStoreSync } from '@/pistols/stores/challengeStore'
 import { ChallengeQueryStoreSync } from '@/pistols/stores/challengeQueryStore'
 import { PlayerDuelistTokensStoreSync, PlayerDuelistTokensStoreSyncQL } from '@/pistols/stores/duelistTokenStore'
+import { PlayerActivityStoreSync } from '@/pistols/stores/playerActivityStore'
 
 //
 // Manages all store subscriptions
@@ -24,6 +25,7 @@ export default function StoreSync() {
       <ChallengeQueryStoreSync />
       <PlayerDuelistTokensStoreSyncQL />
       <PlayerDuelistTokensStoreSync />
+      <PlayerActivityStoreSync />
     </>
   )
 }

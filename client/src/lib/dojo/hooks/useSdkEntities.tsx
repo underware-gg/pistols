@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ParsedEntity, SubscriptionQueryType, QueryType } from '@dojoengine/sdk'
-import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { isPositiveBigint } from '@/lib/utils/types'
+import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
 import * as models from '@/games/pistols/generated/typescript/models.gen'
 
 type PistolsGetQuery = QueryType<PistolsSchemaType>
@@ -36,6 +36,7 @@ export type UseSdkEntitiesProps = {
   setEntities: (entities: PistolsEntity[]) => void // stores initial state
   updateEntity?: (entities: PistolsEntity) => void // store updates (if absent, do not subscribe)
   enabled?: boolean
+  events?: boolean
   // get options
   limit?: number
   offset?: number
@@ -43,12 +44,13 @@ export type UseSdkEntitiesProps = {
   logging?: boolean
 }
 
-export const useSdkEntities = <T,>({
+export const useSdkEntities = ({
   query_get,
   query_sub,
   setEntities,
   updateEntity,
   enabled = true,
+  events = false,
   limit = 100,
   offset = 0,
   logging = false,
@@ -63,11 +65,11 @@ export const useSdkEntities = <T,>({
   useEffect(() => {
     const _get = async () => {
       setIsLoading(true)
-      await sdk.getEntities({
+      await (events ? sdk.getEventMessages : sdk.getEntities)({
         query: query_get,
         callback: (response) => {
           if (response.error) {
-            console.error("useSdkEntities().getEntities() error:", response.error)
+            console.error("useSdkEntities().sdk.get() error:", response.error)
           } else if (response.data) {
             // console.log("useSdkEntities() GOT:", response.data);
             setEntities(response.data);
@@ -92,11 +94,11 @@ export const useSdkEntities = <T,>({
 
     const _subscribe = async () => {
       setIsSubscribed(undefined)
-      const subscription = await sdk.subscribeEntityQuery({
+      const subscription = await (events ? sdk.subscribeEventQuery : sdk.subscribeEntityQuery)({
         query: query_sub,
         callback: (response) => {
           if (response.error) {
-            console.error("useSdkEntities().subscribeEntityQuery() error:", response.error)
+            console.error("useSdkEntities().sdk.subscribe() error:", response.error)
           } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {
             // console.log("useSdkEntities() SUB:", response.data[0]);
             updateEntity(response.data[0]);
