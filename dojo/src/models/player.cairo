@@ -35,14 +35,28 @@ pub struct Player {
 //---------------------
 // OFF-CHAIN events
 //
+
+//
+// on-chain activity
 #[derive(Copy, Drop, Serde)]
 #[dojo::event]
 pub struct PlayerActivity {
     #[key]
     pub address: ContractAddress,
     //-----------------------
+    pub timestamp: u64,
     pub activity: Activity,
     pub identifier: felt252,
+}
+
+//
+// off-chain activity
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerOnline {
+    #[key]
+    pub address: ContractAddress,
+    //-----------------------
     pub timestamp: u64,
 }
 // #[derive(Copy, Drop, Serde)]
@@ -106,9 +120,9 @@ impl ActivityImpl of ActivityTrait {
     fn emit(self: Activity, ref world: WorldStorage, address: ContractAddress, identifier: felt252) {
         world.emit_event(@PlayerActivity{
             address,
+            timestamp: get_block_timestamp(),
             activity: self,
             identifier,
-            timestamp: get_block_timestamp(),
         });
     }
     fn can_register_player(self: Activity) -> bool {
