@@ -3,10 +3,6 @@ import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/P
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import { TavernAudios } from '@/pistols/components/GameContainer'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
-import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
-import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
-import DuelistModal from '@/pistols/components/modals/DuelistModal'
-import TableModal from '@/pistols/components/modals/TableModal'
 
 export default function ScGate() {
   const { tableOpener } = usePistolsContext()
@@ -33,10 +29,6 @@ export default function ScGate() {
   return (
     <>
 
-      <TableModal opener={tableOpener} />
-      <DuelistModal />
-      <ChallengeModal />
-      <NewChallengeModal />
       <TavernAudios />
       {/* <BarkeepModal /> */}
 

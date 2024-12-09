@@ -10,9 +10,6 @@ import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionD
 import { DuelistCard, DuelistCardHandle } from '@/pistols/components/cards/DuelistCard'
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '@/pistols/data/cardConstants'
 import { TavernAudios } from '@/pistols/components/GameContainer'
-import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
-import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
-import DuelistModal from '@/pistols/components/modals/DuelistModal'
 
 export default function ScDuelists() {
   const { filterDuelistName, filterDuelistActive, filterDuelistSortColumn, filterDuelistSortDirection } = useQueryParams()
@@ -355,9 +352,6 @@ export default function ScDuelists() {
         }}
       />
 
-      <DuelistModal />
-      <ChallengeModal />
-      <NewChallengeModal />
       <TavernAudios />
 
       <DojoSetupErrorDetector />

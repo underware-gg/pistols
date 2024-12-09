@@ -16,13 +16,9 @@ import { IconClick } from '@/lib/ui/Icons'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function DuelistModal({
-  duelButton = false,
-}: {
-  duelButton?: boolean
-}) {
+export default function DuelistModal() {
   const { tableId, duelistId, isAnon, dispatchDuelistId } = useSettings()
-  const { dispatchSetScene } = usePistolsScene()
+  const { atProfile, dispatchSetScene } = usePistolsScene()
 
   const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
   const { owner } = useOwnerOfDuelist(selectedDuelistId)
@@ -107,7 +103,7 @@ export default function DuelistModal({
                 {!hasPact && <ActionButton large fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(selectedDuelistId)} />}
               </Col>
             }
-            {duelButton &&
+            {atProfile &&
               <Col>
                 <ActionButton large fill important label='Duel!' onClick={() => _duel()} />
               </Col>

@@ -5,14 +5,11 @@ import { useElizaMessage } from '@/pistols/utils/eliza'
 import { useControllerUsername } from '@/lib/dojo/hooks/useController'
 import { TavernAudios } from '@/pistols/components/GameContainer'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
-import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
-import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
-import DuelistModal from '@/pistols/components/modals/DuelistModal'
-import TableModal from '@/pistols/components/modals/TableModal'
-import BarkeepModal from '../modals/BarkeepModal'
 import { _currentScene } from '@/pistols/three/game'
 import { InteractibleScene } from '@/pistols/three/InteractibleScene'
 import { sceneBackgrounds } from '@/pistols/data/assets'
+import BarkeepModal from '../modals/BarkeepModal'
+import TableModal from '@/pistols/components/modals/TableModal'
 
 export default function ScTavern() {
   const { tableOpener } = usePistolsContext()
@@ -62,9 +59,6 @@ export default function ScTavern() {
     <div>
 
       {/* <TableModal opener={tableOpener} /> */}
-      <DuelistModal />
-      <ChallengeModal />
-      <NewChallengeModal />
       <TavernAudios />
       <BarkeepModal open={open} />
 

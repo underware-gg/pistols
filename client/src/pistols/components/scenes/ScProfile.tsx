@@ -55,7 +55,6 @@ export default function ScProfile() {
       </div>
 
       <DuelistEditModal opener={duelistEditOpener} />
-      <DuelistModal duelButton />
       <CurrentChainHint />
     </div>
   )
