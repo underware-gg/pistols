@@ -115,11 +115,23 @@ const localKatanaConfig: DojoChainConfig = {
   lordsFaucet: true,
   predeployedAccounts: [
     {
-      name: 'Predeployed',
+      name: 'Katana 1',
       address: '0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7',
       privateKey: '0x1c9053c053edf324aec366a34c6901b1095b07af69495bffec7d7fe21effb1b',
       active: true,
-    }
+    },
+    {
+      name: 'Katana 2',
+      address: '0x17cc6ca902ed4e8baa8463a7009ff18cc294fa85a94b4ce6ac30a9ebd6057c7',
+      privateKey: '0x14d6672dcb4b77ca36a887e9a11cd9d637d5012468175829e9c6e770c61642',
+      active: false,
+    },
+    {
+      name: 'Katana 3',
+      address: '0x2af9427c5a277474c079a1283c880ee8a6f0f8fbf73ce969c08d88befec1bba',
+      privateKey: '0x1800000000300000180000000000030000000000003006001800006600',
+      active: false,
+    },
   ],
   connectorIds: [
     supportedConnetorIds.PREDEPLOYED,

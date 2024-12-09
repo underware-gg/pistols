@@ -24,7 +24,7 @@ export class PredeployedConnector extends Connector {
 
   constructor(chainConfig: DojoChainConfig) {
     super();
-    const account = chainConfig.predeployedAccounts[0]
+    const account: PredeployedAccount = chainConfig.predeployedAccounts.find((e) => e.active)
     if (!account) {
       throw new Error('PredeployedConnector: missing account')
     }
