@@ -57,8 +57,9 @@ export const useSdkEntities = ({
   logging = false,
 }: UseSdkEntitiesProps): UseSdkEntitiesResult => {
   const { sdk } = useDojoSetup()
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [isLoading, setIsLoading] = useState<boolean>()
+  const [isSubscribed, setIsSubscribed] = useState<boolean>()
+  const isEvent = useMemo(() => (historical !== undefined), [historical])
 
   //----------------------
   // get initial entities
@@ -66,7 +67,7 @@ export const useSdkEntities = ({
   useEffect(() => {
     const _get = async () => {
       setIsLoading(true)
-      await (historical !== undefined ? sdk.getEventMessages : sdk.getEntities)({
+      await (isEvent ? sdk.getEventMessages : sdk.getEntities)({
         query: query_get,
         callback: (response) => {
           if (response.error) {
@@ -84,7 +85,7 @@ export const useSdkEntities = ({
         historical,
       })
     }
-    if (sdk && enabled) {
+    if (sdk && query_get && enabled) {
       _get()
     }
   }, [sdk, query_get, enabled])
@@ -93,11 +94,11 @@ export const useSdkEntities = ({
   // subscribe for updates
   //
   useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
+    let _unsubscribe: (() => void) | undefined;
 
     const _subscribe = async () => {
       setIsSubscribed(undefined)
-      const subscription = await (historical !== undefined ? sdk.subscribeEventQuery : sdk.subscribeEntityQuery)({
+      const subscription = await (isEvent ? sdk.subscribeEventQuery : sdk.subscribeEntityQuery)({
         query: query_sub,
         callback: (response) => {
           if (response.error) {
@@ -112,20 +113,18 @@ export const useSdkEntities = ({
         historical,
       })
       setIsSubscribed(true)
-      unsubscribe = () => subscription.cancel()
+      _unsubscribe = () => subscription.cancel()
     };
 
-    if (sdk && enabled && query_sub && updateEntity) {
+    if (sdk && query_sub && enabled && updateEntity && isLoading === false) {
       _subscribe()
     }
 
     return () => {
       setIsSubscribed(false)
-      if (unsubscribe) {
-        unsubscribe()
-      }
+      _unsubscribe?.()
     }
-  }, [sdk, query_sub, enabled, logging])
+  }, [sdk, query_sub, enabled, isLoading])
 
   const refetch = useCallback(() => {
     console.warn(`useSdkEntities().refetch() not implemented`)
