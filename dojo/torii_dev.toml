@@ -7,7 +7,7 @@ rpc = "http://localhost:5050"
 [events]
 raw = true
 historical = [
-  # "pistols-SomeEvent"
+  "pistols-PlayerActivity"
 ]
 
 [indexing]

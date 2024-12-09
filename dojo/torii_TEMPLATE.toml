@@ -7,7 +7,7 @@ rpc = "$rpc_url"
 [events]
 raw = true
 historical = [
-  # "pistols-SomeEvent"
+  "pistols-PlayerActivity"
 ]
 
 [indexing]

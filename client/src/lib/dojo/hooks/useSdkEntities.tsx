@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ParsedEntity, SubscriptionQueryType, QueryType } from '@dojoengine/sdk'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { isPositiveBigint } from '@/lib/utils/types'
-import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
+import { SchemaType as PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
 import * as models from '@/games/pistols/generated/typescript/models.gen'
 
 type PistolsGetQuery = QueryType<PistolsSchemaType>
@@ -36,7 +36,8 @@ export type UseSdkEntitiesProps = {
   setEntities: (entities: PistolsEntity[]) => void // stores initial state
   updateEntity?: (entities: PistolsEntity) => void // store updates (if absent, do not subscribe)
   enabled?: boolean
-  events?: boolean
+  // events options
+  historical?: boolean // if defined, will fetch for event messages
   // get options
   limit?: number
   offset?: number
@@ -50,7 +51,7 @@ export const useSdkEntities = ({
   setEntities,
   updateEntity,
   enabled = true,
-  events = false,
+  historical = undefined,
   limit = 100,
   offset = 0,
   logging = false,
@@ -65,7 +66,7 @@ export const useSdkEntities = ({
   useEffect(() => {
     const _get = async () => {
       setIsLoading(true)
-      await (events ? sdk.getEventMessages : sdk.getEntities)({
+      await (historical !== undefined ? sdk.getEventMessages : sdk.getEntities)({
         query: query_get,
         callback: (response) => {
           if (response.error) {
@@ -79,6 +80,8 @@ export const useSdkEntities = ({
         limit,
         offset,
         options: { logging },
+        //@ts-ignore
+        historical,
       })
     }
     if (sdk && enabled) {
@@ -94,7 +97,7 @@ export const useSdkEntities = ({
 
     const _subscribe = async () => {
       setIsSubscribed(undefined)
-      const subscription = await (events ? sdk.subscribeEventQuery : sdk.subscribeEntityQuery)({
+      const subscription = await (historical !== undefined ? sdk.subscribeEventQuery : sdk.subscribeEntityQuery)({
         query: query_sub,
         callback: (response) => {
           if (response.error) {
@@ -105,6 +108,8 @@ export const useSdkEntities = ({
           }
         },
         options: { logging },
+        //@ts-ignore
+        historical,
       })
       setIsSubscribed(true)
       unsubscribe = () => subscription.cancel()

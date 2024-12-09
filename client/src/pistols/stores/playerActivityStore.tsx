@@ -1,10 +1,11 @@
-import { useMemo, useEffect } from 'react'
+import { useEffect } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
 import { create } from 'zustand'
-import { useSdkEntities, PistolsEntity, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkEntities'
-import { DuelistColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
+import { useDojoSetup } from '@/lib/dojo/DojoContext'
+import { PistolsEntity, PistolsGetQuery, PistolsSubQuery, useSdkEntities } from '@/lib/dojo/hooks/useSdkEntities'
 import { bigintToNumber } from '@/lib/utils/types'
 import * as models from '@/games/pistols/generated/typescript/models.gen'
+import * as torii from '@dojoengine/torii-client'
 
 
 //-----------------------------------------
@@ -46,6 +47,7 @@ const createStore = () => {
       }))
     },
     updateEvent: (e: PistolsEntity) => {
+      console.log("updateEvent() =>", e)
       set((state: State) => {
         state.activityPerAddress[e.entityId] = _parseEvent(e)
         return state
@@ -61,23 +63,79 @@ const useStore = createStore();
 // Sync all activity events
 // Add only once to a top level component
 //
-const query_sub: PistolsSubQuery  = {
+const query_get: PistolsGetQuery = {
   pistols: {
-    PlayerActivity: []
+    PlayerActivity:
+      []
+    // { $: {} },
+    // { $: { where: { address: { $eq: addAddressPadding('0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7') } } } },
+  },
+}
+const query_sub: PistolsSubQuery = {
+  pistols: {
+    PlayerActivity:
+      []
     // { $: {} },
     // { $: { where: { address: { $is: addAddressPadding('0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7') } } } },
   },
 }
+// const clause = convertQueryToClause(query, schema);
+
+
 export function PlayerActivityStoreSync() {
   const state = useStore((state) => state)
 
   useSdkEntities({
-    events: true,
-    query_get: query_sub,
+    query_get,
     query_sub,
     setEntities: state.setEvents,
     updateEntity: state.updateEvent,
+    historical: true, // events
+    // limit: 3,
   })
+
+  // TESTING raw events from client
+  const { sdk } = useDojoSetup()
+  const clause: torii.Clause = {
+    Keys: {
+      // keys: ['0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7'],
+      keys: [undefined],
+      models: ["pistols-PlayerActivity"],
+      pattern_matching: "FixedLen",
+    },
+  }
+  useEffect(() => {
+    // based on:
+    // https://github.com/cartridge-gg/dopewars/blob/4e52b86c4788beb06d259533aebe5fe5c3b871e3/web/src/dojo/hooks/useGamesByPlayer.tsx#L74
+    const _fetch = async () => {
+      const events = await sdk.client.getEventMessages(
+        {
+          clause,
+          limit: 100,
+          offset: 0,
+          dont_include_hashed_keys: true,
+        },
+        true, // historical
+      );
+      console.log("sdk.client.GET_EVENTS() =>", events)
+    }
+    if (sdk) _fetch()
+  }, [sdk])
+  // useEffect(() => {
+  //   // based on:
+  //   // https://github.com/cartridge-gg/dopewars/blob/4e52b86c4788beb06d259533aebe5fe5c3b871e3/web/src/dojo/stores/game.tsx#L116
+  //   const _subscribe = async () => {
+  //     const subscription = await sdk.client.onEventMessageUpdated(
+  //       [clause],
+  //       true, // historical
+  //       (entityId: string, entityData: any) => {
+  //         console.log("sdk.client.SUB_EVENTS() =>", entityId, entityData)
+  //       }
+  //     );
+  //     console.log("sdk.client.SUBSCRIPTION =>", subscription)
+  //   }
+  //   if (sdk) _subscribe()
+  // }, [sdk])
 
   useEffect(() => console.log("PlayerActivityStoreSync() =>", state.activityPerAddress), [state.activityPerAddress])
 

@@ -33,13 +33,10 @@ pub struct Player {
 
 
 //---------------------
-// OFF-CHAIN events
+// ON-CHAIN events
 //
-
-//
-// on-chain activity
-#[derive(Copy, Drop, Serde)]
-#[dojo::event]
+#[derive(Copy, Drop, Serde, Introspect)]
+#[dojo::event(historical:true)]
 pub struct PlayerActivity {
     #[key]
     pub address: ContractAddress,
@@ -49,8 +46,9 @@ pub struct PlayerActivity {
     pub identifier: felt252,
 }
 
+//---------------------
+// OFF-CHAIN events
 //
-// off-chain activity
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct PlayerOnline {

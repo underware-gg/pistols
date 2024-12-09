@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
+import { SchemaType as PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
 import {
   PistolsGetQuery,
   PistolsSubQuery,
@@ -40,7 +40,7 @@ export const useSdkGet = ({
   query_get,
   query_sub,
   enabled = true,
-  events = false,
+  historical = undefined,
   limit = 100,
   offset = 0,
   logging = false,
@@ -51,7 +51,7 @@ export const useSdkGet = ({
     query_get,
     query_sub,
     enabled,
-    events,
+    historical,
     limit,
     offset,
     logging,
