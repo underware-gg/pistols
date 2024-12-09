@@ -1,8 +1,15 @@
+#
 # torii config for profile [dev]
+#
 world_address = "0x3d5489a911389c23b96408ffd94854bd22a3032e2cb81c15e74b228bf39e1a7"
 rpc = "http://localhost:5050"
+
 [events]
-raw = false
+raw = true
+historical = [
+  # "pistols-SomeEvent"
+]
+
 [indexing]
 index_pending = true
 index_transactions = false
