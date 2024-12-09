@@ -71,29 +71,6 @@ const createStore = () => {
 
 export const useDuelistQueryStore = createStore();
 
-//----------------------------------------
-// Sync all duelists!
-// Add only once to a top level component
-//
-const query_sub: PistolsSubQuery  = {
-  pistols: {
-    Duelist: [],
-  },
-}
-export function DuelistQueryStoreSync() {
-  const state = useDuelistQueryStore((state) => state)
-
-  useSdkEntities({
-    query_get: query_sub,
-    query_sub,
-    setEntities: state.setEntities,
-    updateEntity: state.updateEntity,
-  })
-
-  useEffect(() => console.log("DuelistQueryStoreSync() =>", state.entities), [state.entities])
-
-  return (<></>)
-}
 
 
 //--------------------------------

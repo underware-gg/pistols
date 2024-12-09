@@ -8,6 +8,7 @@ import { isPositiveBigint } from '@/lib/utils/types'
 import { CONST } from '@/games/pistols/generated/constants'
 import { feltToString } from '@/lib/utils/starknet'
 import { useScore } from '../hooks/useScore'
+import { useDuelistQueryStore } from './duelistQueryStore'
 
 //
 // Stores all duelists
@@ -23,12 +24,19 @@ const query_sub: PistolsSubQuery = {
 }
 export function DuelistStoreSync() {
   const state = useStore((state) => state)
+  const queryState = useDuelistQueryStore((state) => state)
 
   useSdkEntities({
     query_get: query_sub,
     query_sub,
-    setEntities: state.setEntities,
-    updateEntity: state.updateEntity,
+    setEntities: (entities) => {
+      state.setEntities(entities)
+      queryState.setEntities(entities)
+    },
+    updateEntity: (entity) => {
+      state.updateEntity(entity)
+      queryState.updateEntity(entity)
+    },
   })
 
   // useEffect(() => console.log("DuelistStoreSync() =>", state.entities), [state.entities])

@@ -3,9 +3,7 @@ import { ConfigStoreSync } from '@/pistols/stores/configStore'
 import { TokenConfigStoreSync } from '@/pistols/stores/tokenConfigStore'
 import { TableStoreSync } from '@/pistols/stores/tableStore'
 import { DuelistStoreSync } from '@/pistols/stores/duelistStore'
-import { DuelistQueryStoreSync } from '@/pistols/stores/duelistQueryStore'
 import { ChallengeStoreSync } from '@/pistols/stores/challengeStore'
-import { ChallengeQueryStoreSync } from '@/pistols/stores/challengeQueryStore'
 import { PlayerDuelistTokensStoreSync, PlayerDuelistTokensStoreSyncQL } from '@/pistols/stores/duelistTokenStore'
 import { PlayerActivityStoreSync } from '@/pistols/stores/playerActivityStore'
 
@@ -20,9 +18,7 @@ export default function StoreSync() {
       <TokenConfigStoreSync />
       <TableStoreSync />
       <DuelistStoreSync />
-      <DuelistQueryStoreSync />
       <ChallengeStoreSync />
-      <ChallengeQueryStoreSync />
       <PlayerDuelistTokensStoreSyncQL />
       <PlayerDuelistTokensStoreSync />
       <PlayerActivityStoreSync />

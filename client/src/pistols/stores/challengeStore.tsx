@@ -9,6 +9,7 @@ import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 import { BladesCard, ChallengeState, getBladesCardValue, Premise, RoundState } from '@/games/pistols/generated/constants'
 import { movesToHand } from '@/pistols/utils/pistols'
+import { useChallengeQueryStore } from './challengeQueryStore'
 
 //
 // Stores all challenges from current table
@@ -44,12 +45,19 @@ export function ChallengeStoreSync() {
   }), [tableId])
 
   const state = useStore((state) => state)
+  const queryState = useChallengeQueryStore((state) => state)
   
   useSdkEntities({
     query_get,
     query_sub,
-    setEntities: state.setEntities,
-    updateEntity: state.updateEntity,
+    setEntities: (entities) => {
+      state.setEntities(entities)
+      queryState.setEntities(entities)
+    },
+    updateEntity: (entity) => {
+      state.updateEntity(entity)
+      queryState.updateEntity(entity)
+    },
   })
 
   // useEffect(() => console.log(`ChallengeStoreSync() [${Object.keys(state.entities).length}] =>`, state.entities), [state.entities])

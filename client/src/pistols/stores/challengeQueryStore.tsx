@@ -69,78 +69,7 @@ const createStore = () => {
   }))
 }
 
-const useStore = createStore();
-
-//-----------------------------------------
-// Sync all challenges from current table
-// Add only once to a top level component
-//
-export function ChallengeQueryStoreSync() {
-  const { tableId } = useSettings()
-
-  //
-  // THIS IS NOT WORKING... (in conjunction with table_id)
-  // but this is ok! better to filter on useQueryChallengeIds()
-  // 
-  // const query_get = useMemo<PistolsGetQuery>(() => ({
-  //   pistols: {
-  //     Challenge: {
-  //       $: {
-  //         where: {
-  //           And: [
-  //             { table_id: { $eq: addAddressPadding(stringToFelt(tableId)) } },
-  //             {
-  //               Or: [
-  //                 //@ts-ignore
-  //                 { state: { $eq: ChallengeState.Resolved } },
-  //                 //@ts-ignore
-  //                 { state: { $eq: ChallengeState.Draw } },
-  //               ],
-  //             },
-  //           ],
-  //         },
-  //       },
-  //     },
-  //   },
-  // }), [tableId])
-  
-  const query_get = useMemo<PistolsGetQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            table_id: { $eq: addAddressPadding(stringToFelt(tableId)) },
-          },
-        },
-      },
-    },
-  }), [tableId])
-  const query_sub = useMemo<PistolsSubQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            table_id: { $is: addAddressPadding(stringToFelt(tableId)) },
-          },
-        },
-      },
-    },
-  }), [tableId])
-
-
-  const state = useStore((state) => state)
-
-  useSdkEntities({
-    query_get,
-    query_sub,
-    setEntities: state.setEntities,
-    updateEntity: state.updateEntity,
-  })
-
-  // useEffect(() => console.log(`ChallengeQueryStoreSync() [${Object.keys(state.entities).length}] =>`, state.entities), [state.entities])
-
-  return (<></>)
-}
+export const useChallengeQueryStore = createStore();
 
 
 //--------------------------------
@@ -154,7 +83,7 @@ export const useQueryChallengeIds = (
   sortColumn: ChallengeColumn,
   sortDirection: SortDirection,
 ) => {
-  const entities = useStore((state) => state.entities);
+  const entities = useChallengeQueryStore((state) => state.entities);
   const duelistEntities = useDuelistQueryStore((state) => state.entities);
 
   const [challengeIds, states] = useMemo(() => {
