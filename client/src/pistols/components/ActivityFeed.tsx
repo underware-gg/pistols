@@ -5,6 +5,7 @@ import { AddressShort } from '@/lib/ui/AddressShort'
 import { Activity } from '@/games/pistols/generated/constants'
 import { bigintToNumber } from '@/lib/utils/types'
 import { IconClick } from '@/lib/ui/Icons'
+import { usePlayer } from '../stores/playerStore'
 
 export const ActivityFeed = () => {
   const [collapsed, setCollapsed] = useState(false)
@@ -31,11 +32,12 @@ const ActivityItem = ({
 }: {
   activity: ActivityState
 }) => {
-  const { dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
+  const { dispatchSelectPlayerAddress, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
+  const { name } = usePlayer(activity.address)
 
   const _playerLink = () => useMemo(() => (
-    <AddressShort address={activity.address} copyLink={false} />
-  ), [activity.address])
+    <span className='Anchor Important' onClick={() => dispatchSelectPlayerAddress(activity.address)}>{name}</span>
+  ), [activity.address, name])
 
   const _duelistLink = () => useMemo(() => (
     <span className='Anchor Important' onClick={() => dispatchSelectDuelistId(activity.identifier)}>duelist #{bigintToNumber(activity.identifier)}</span>

@@ -11,6 +11,7 @@ import { SCENE_CHANGE_ANIMATION_DURATION } from '@/pistols/three/game'
 import AppPistols from '@/pistols/components/AppPistols'
 import GameContainer from '@/pistols/components/GameContainer'
 import Background from '@/pistols/components/Background'
+import PlayerModal from '@/pistols/components/modals/PlayerModal'
 import DuelistModal from '@/pistols/components/modals/DuelistModal'
 import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
 import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
@@ -96,14 +97,16 @@ function MainUI() {
 
 
 function Modals() {
-  const { selectedDuelistId, selectedDuelId, challengingId } = usePistolsContext()
-  const duelistIsOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
+  const { selectedDuelId, selectedDuelistId, selectedPlayerAddress, challengingId } = usePistolsContext()
   const challengeIsOpen = useMemo(() => (selectedDuelId > 0), [selectedDuelId])
+  const duelistIsOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
+  const playerIsOpen = useMemo(() => (selectedPlayerAddress > 0n), [selectedPlayerAddress])
   const newChallengeIsOpen = useMemo(() => (challengingId > 0n), [challengingId])
   return (
     <>
-      {duelistIsOpen && <DuelistModal />}
       {challengeIsOpen && <ChallengeModal />}
+      {duelistIsOpen && <DuelistModal />}
+      {playerIsOpen && <PlayerModal />}
       {newChallengeIsOpen && <NewChallengeModal />}
     </>
   )

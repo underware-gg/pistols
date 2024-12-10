@@ -78,9 +78,9 @@ export function Balance({
 
   const _icon = useMemo(() => {
     if (clean) return <></>
-    if (ether) return <EtherIcon size={'small'} />
-    if (lords) return <LordsBagIcon size={null} />
-    if (fame) return <FameIcon size={'small'} />
+    if (ether) return <><EtherIcon size={'small'} />{' '}</>
+    if (lords) return <><LordsBagIcon size={null} />{' '}</>
+    if (fame) return <><FameIcon size={'small'} />{' '}</>
     return <></>
   }, [clean, lords, fame, ether])
 
