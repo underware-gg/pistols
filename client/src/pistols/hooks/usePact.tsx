@@ -2,7 +2,7 @@ import { useMemo, useEffect } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
 import { isPositiveBigint } from '@/lib/utils/types'
 import { bigintToU256, poseidon, stringToFelt } from '@/lib/utils/starknet'
-import { PistolsGetQuery, useSdkGet, getEntityMapModels, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkGet'
+import { PistolsGetQuery, useSdkState, getEntityMapModels, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkState'
 import * as models from '@/games/pistols/generated/typescript/models.gen'
 
 
@@ -47,7 +47,7 @@ export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish,
     },
   }), [table_id, pair])
   
-  const { entities } = useSdkGet({ query_get, query_sub })
+  const { entities } = useSdkState({ query_get, query_sub })
   const pacts = useMemo(() => getEntityMapModels<models.Pact>(entities, 'Pact'), [entities])
   // useEffect(() => console.log(`usePact()`, pacts), [pacts])
 

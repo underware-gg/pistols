@@ -17,7 +17,7 @@ export type EntityMap = {
   [entityId: string]: Partial<PistolsSchemaType['pistols']>,
 }
 
-export type UseSdkGetResult = {
+export type useSdkStateResult = {
   entities: EntityMap | null
   isLoading: boolean
   isSubscribed: boolean
@@ -36,7 +36,7 @@ export const getEntityMapModels = <T,>(entities: EntityMap, modelName: string): 
 // as: EntityMap
 //
 
-export const useSdkGet = ({
+export const useSdkState = ({
   query_get,
   query_sub,
   enabled = true,
@@ -44,7 +44,7 @@ export const useSdkGet = ({
   limit = 100,
   offset = 0,
   logging = false,
-}: Partial<UseSdkEntitiesProps>): UseSdkGetResult => {
+}: Partial<UseSdkEntitiesProps>): useSdkStateResult => {
   const [entities, setEntities] = useState<EntityMap | null>()
 
   const { isLoading, isSubscribed, refetch } = useSdkEntities({
