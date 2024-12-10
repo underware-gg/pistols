@@ -1244,6 +1244,28 @@ $ui-container-gap: 1em;
   margin: auto;
 }
 
+.ActivityFeed {
+  background-color: rgba($color-darkest, 0.5);
+  height: 50%;
+  width: 20%;
+  position: absolute;
+  top: 16%;
+  right: 10px;
+  border-radius: 10px;
+  border: $border-button-inactive;
+  padding: 5px 10px;
+  z-index: 10;
+}
+.ActivityFeedCollapsed {
+  @extend .ActivityFeed;
+  height: 5%;
+}
+.ActivityFeedIcon {
+  position: absolute;
+  top: 10px;
+  right: 5px;
+}
+
 //
 // <IconXXX>
 //

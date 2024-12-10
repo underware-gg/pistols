@@ -23,6 +23,7 @@ import StoreSync from '@/pistols/stores/StoreSync'
 import Gate from '@/pistols/components/scenes/ScGate'
 import Door from '@/pistols/components/scenes/ScDoor'
 import Duel from '@/pistols/components/scenes/Duel'
+import ActivityFeed from '@/pistols/components/ActivityFeed'
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {
@@ -51,6 +52,7 @@ export default function MainPage() {
             <MainUI />
             <Modals />
             {overlay}
+            <ActivityFeed />
             <Header />
           </>
         }
