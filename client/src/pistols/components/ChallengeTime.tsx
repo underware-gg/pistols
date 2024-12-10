@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useChallenge } from '@/pistols/stores/challengeStore'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { formatTimestamp, formatTimestampDelta } from '@/lib/utils/timestamp'
+import { formatTimestampLocal, formatTimestampDelta } from '@/lib/utils/timestamp'
 import { EMOJI } from '@/pistols/data/messages'
 
 export function ChallengeTime({
@@ -22,10 +22,10 @@ export function ChallengeTime({
   }, [isAwaiting, isLive])
 
   const date = useMemo(() => {
-    if (isAwaiting)  formatTimestampDelta(clientTimestamp, timestamp_end)
-    if (isLive) formatTimestampDelta(timestamp_start, clientTimestamp)
-    if (isCanceled || isFinished) return (prefixed ? 'Finished at ' : '') + formatTimestamp(timestamp_end)
-    return formatTimestamp(timestamp_start)
+    if (isAwaiting) return formatTimestampDelta(clientTimestamp, timestamp_end)
+    if (isLive) return formatTimestampDelta(timestamp_start, clientTimestamp)
+    if (isCanceled || isFinished) return (prefixed ? 'Finished at ' : '') + formatTimestampLocal(timestamp_end)
+    return formatTimestampLocal(timestamp_start)
   }, [isAwaiting, isCanceled, isLive, isFinished, timestamp_start, timestamp_end, clientTimestamp])
 
   return (
@@ -34,4 +34,3 @@ export function ChallengeTime({
     </>
   )
 }
-
