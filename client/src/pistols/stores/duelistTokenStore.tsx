@@ -102,7 +102,7 @@ export function PlayerDuelistTokensStoreSync() {
 //
 export function useTokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
   const state = useStore((state) => state)
-  const tokenIds = useMemo(() => state.getTokenIds(contractAddress, owner), [contractAddress, owner, state.tokenIds])
+  const tokenIds = useMemo(() => state.getTokenIds(contractAddress, owner).sort(), [contractAddress, owner, state.tokenIds])
   return {
     tokenIds,
   }

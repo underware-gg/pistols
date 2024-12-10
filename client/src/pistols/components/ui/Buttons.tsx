@@ -9,6 +9,7 @@ import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
 import { SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
+import { isPositiveBigint } from '@/lib/utils/types'
 
 //-----------------
 // Generic Action button
@@ -115,7 +116,7 @@ export const BalanceRequiredButton = ({
       disabled={disabled}
       important={canSubmit}
       negative={!canSubmit}
-      label={noFundsForFee ? 'No Funds!' : <>{label} <LordsBagIcon /></>}
+      label={noFundsForFee ? 'No Funds!' : isPositiveBigint(fee) ? <>{label} <LordsBagIcon /></> : label}
       onClick={() => (canSubmit ? onClick() : {})}
     />
   )
