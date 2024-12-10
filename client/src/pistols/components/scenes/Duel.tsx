@@ -1,7 +1,7 @@
 import 'react-circular-progressbar/dist/styles.css';
 import 'react-circular-progressbar/dist/styles.css';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Grid, Segment, SemanticFLOATS, Image, Button } from 'semantic-ui-react'
+import { Grid, Segment, SemanticFLOATS, Image, Button, Modal } from 'semantic-ui-react'
 import { BigNumberish, num } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useMounted } from '@/lib/utils/hooks/useMounted'
@@ -35,6 +35,8 @@ import Cards, { CardsHandle, DuelistHand } from '@/pistols/components/cards/Duel
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import * as Constants from '@/pistols/data/cardConstants'
 import * as TWEEN from '@tweenjs/tween.js'
+import DuelistModal from '../modals/DuelistModal';
+
 
 export type DuelistState = {
   damage: number, 
@@ -445,6 +447,8 @@ export default function Duel({
         }} 
         isPlaying={isPlaying} />
 
+      <DuelistModal />
+
       <DojoSetupErrorDetector />
 
       {debugMode && <MenuDebugAnimations />}
@@ -462,6 +466,7 @@ function DuelProfile({
   const { profilePic, name, nameDisplay } = useDuelist(duelistId)
   const { owner } = useOwnerOfDuelist(duelistId)
   const { aspectWidth } = useGameAspect()
+  const { dispatchSelectDuelistId } = usePistolsContext()
 
   const contentLength = useMemo(() => Math.floor(nameDisplay.length/10), [nameDisplay])
 
@@ -469,7 +474,9 @@ function DuelProfile({
     <>
       {floated == 'left' &&
         <>
-          <ProfilePic circle profilePic={profilePic} className='NoMouse NoDrag' />
+          <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)} >
+            <ProfilePic circle profilePic={profilePic} className='NoMouse NoDrag' />
+          </div>
           <Image className='NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), left: aspectWidth(8.3) }}>
             <div className='NoMargin ProfileName' data-contentlength={contentLength}>{nameDisplay}</div>
@@ -483,7 +490,9 @@ function DuelProfile({
             <div className='NoMargin ProfileName' data-contentlength={contentLength}>{nameDisplay}</div>
             <div className='NoMargin ProfileAddress'><FameBalanceDuelist duelistId={duelistId}/></div>
           </div>
-          <ProfilePic circle profilePic={profilePic} className='NoMouse NoDrag'/>
+          <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
+            <ProfilePic circle profilePic={profilePic} className='NoMouse NoDrag' />
+          </div>
           <Image className='FlipHorizontal NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
         </>
       }
@@ -759,3 +768,7 @@ function DuelProgress({
     </>
   )
 }
+
+//TODO on page refresh in duel, automatically pause duel and instead of the ready button call start button so sounds are enabled + duel starts properly
+//TODO on refresh add a black overlay or round overlay with brown background that is shown and animated untill the assets are loaded and duel can be started!
+//TODO on duel end add rechallenge option!

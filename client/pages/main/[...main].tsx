@@ -81,7 +81,7 @@ function MainUI({
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [atGate, atDoor, atDuel, atProfile, atTavern, selectedDuelId]);
+  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuels, atDuelists, atGraveyard]);
 
   if (!gameImpl) return <></>
 

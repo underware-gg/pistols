@@ -83,12 +83,12 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { boxW, boxH, aspectWidth } = useGameAspect()
 
   const [randomOffset] = useState(() => {
-    if (props.isHangingLeft === null) {
-      return aspectWidth(props.width) * (Math.random() * 0.4 - 0.20)
-    } else if (props.isHangingLeft) {
+    if (props.isHangingLeft == true) {
       return aspectWidth(props.width) * (Math.random() * -0.4)
-    } else {
+    } else if (props.isHangingLeft == false) {
       return aspectWidth(props.width) * (Math.random() * 0.4)
+    } else {
+      return aspectWidth(props.width) * (Math.random() * 0.4 - 0.20)
     }
   })
   

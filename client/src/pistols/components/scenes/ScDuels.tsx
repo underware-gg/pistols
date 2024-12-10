@@ -257,7 +257,7 @@ export default function ScDuels() {
         width: '100%',
         height: '100%',
         position: 'absolute',
-        mixBlendMode: 'hard-light',
+        mixBlendMode: 'soft-light',
         pointerEvents: 'none'
       }} />
       <DuelistModal />

@@ -54,7 +54,7 @@ export default function DuelistModal({
       // dimmer='inverted'
       onClose={() => _close()}
       open={isOpen}
-      className=''
+      className='modal'
     >
       <Modal.Header>
         <Grid>

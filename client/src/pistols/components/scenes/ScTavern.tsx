@@ -46,17 +46,18 @@ export default function ScTavern() {
           sendMessage('are you there?')
           break;
       }
-    } else {
-      if (open) {
-        setOpen(false);
-        (_currentScene as InteractibleScene).toggleBlur(false);
-        (_currentScene as InteractibleScene).setClickable(true);
-        setTimeout(() => {
-          (_currentScene as InteractibleScene).excludeItem(null);
-        }, 400)
-      }
     }
   }, [itemClicked, timestamp])
+
+  useEffect(() => {
+    if (!open) {
+      (_currentScene as InteractibleScene).toggleBlur(false);
+      (_currentScene as InteractibleScene).setClickable(true);
+      setTimeout(() => {
+        (_currentScene as InteractibleScene).excludeItem(null);
+      }, 400)
+    }
+  }, [open])
 
   return (
     <div>
@@ -66,7 +67,7 @@ export default function ScTavern() {
       <ChallengeModal />
       <NewChallengeModal />
       <TavernAudios />
-      <BarkeepModal open={open} />
+      <BarkeepModal open={open} setOpen={setOpen} />
 
       <DojoSetupErrorDetector />
       {/* <ConnectionDetector /> */}

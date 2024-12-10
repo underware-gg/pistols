@@ -68,6 +68,13 @@ void main() {
 
   vec2 ps = 1.0 / uResolution;
   vec4 blurTex = blur(uTexture, shiftedUv, ps);
+  // Darken the blurred texture by multiplying RGB values
+  float darkFactor = 1.0;
+  if (uExcludedColor != vec3(0.0) && !excluded) {
+    float t = 1.0 - ((float(uSamples) - 1.0) / 34.0); // Map uSamples from [1,35] to [1,0]
+    darkFactor = mix(0.4, 1.0, t);
+  }
+  blurTex.rgb *= darkFactor;
 
   vec4 texColor = texture2D(uTexture, shiftedUv);
   texColor.rgb = linearToSRGB(texColor.rgb);

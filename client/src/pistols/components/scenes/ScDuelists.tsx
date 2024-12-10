@@ -21,10 +21,7 @@ export default function ScDuelists() {
   const { dispatchSelectDuelistId } = usePistolsContext()
   const anonOpener = useOpener()
 
-  const { dispatchSetScene } = usePistolsScene()
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
-
-  const [open, setOpen] = useState(false)
   
   useEffect(() => {
     if (itemClicked) {
@@ -116,10 +113,12 @@ export default function ScDuelists() {
     })
   }, [aspectWidth, aspectHeight])
 
-  const ANIMATION_DURATION = 1000
-  const ANIMATION_DURATION_HAND = 1750
-  const DELAY = 75
-  const STATIC_DELAY = 575
+
+  //TODO adjust card animations to be more precise and realistic
+  const ANIMATION_DURATION = 650
+  const ANIMATION_DURATION_HAND = 1137.5
+  const DELAY = 48.75
+  const STATIC_DELAY = 373.75
   const EXIT_COMPLETE_DELAY = ANIMATION_DURATION + DELAY * 5 + STATIC_DELAY
 
   const playEnterCardsAnimation = () => {

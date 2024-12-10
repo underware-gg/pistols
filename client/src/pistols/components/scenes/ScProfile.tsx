@@ -90,7 +90,7 @@ function DuelistsConnect() {
 
 function DuelistsList() {
   const { duelistId, dispatchDuelistId } = useSettings()
-  const { duelistEditOpener } = usePistolsContext()
+  const { duelistEditOpener, dispatchSelectDuelistId } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
   const { duelistIds } = useDuelistsOfPlayer()
   
@@ -170,6 +170,8 @@ function DuelistsList() {
                     if (duelistId !== cardDuelistId) {
                       unSelectCard()
                       dispatchDuelistId(cardDuelistId)
+                    } else {
+                      dispatchSelectDuelistId(cardDuelistId)
                     }
                   }}
                 />
