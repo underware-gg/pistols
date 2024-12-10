@@ -5,7 +5,7 @@ import { useAccount } from '@starknet-react/core'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
 import { useToriiTokenIdsByOwnerQL } from '@/lib/dojo/hooks/useToriiTokensQL'
-import { TokenBalance } from '@dojoengine/torii-client'
+import { Token, TokenBalance } from '@dojoengine/torii-client'
 import { bigintToHex } from '@/lib/utils/types'
 
 
@@ -78,18 +78,21 @@ export function PlayerDuelistTokensStoreSync() {
   //   const _fetch = async () => {
   //     // const response: Token[] = await sdk.getTokens([])
   //     const response: TokenBalance[] = await sdk.getTokenBalances(
-  //       // [], []
-  //       [bigintToHex(address)],
-  //       [bigintToHex(duelistContractAddress)]
-  //       // [],  
+  //       // [],
+  //       ['0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7'],
+  //       // [addAddressPadding(bigintToHex(address))],
+  //       // ['0x24ec36b5c19d158e9749d4f2b48afb7b51ce0f5e4a871f53028a601a253fb6e'],
+  //       // [addAddressPadding(bigintToHex(duelistContractAddress))],
+  //       [],
   //     )
-  //     console.log("PlayerDuelistTokensStoreSync() =>>>>>>>>>", response)
+  //     console.log("PlayerDuelistTokensStoreSync_SDK() =>>>>>>>>>", response)
   //   }
-  //   if (sdk) {
+  //   console.log(`____SDK account:`, address, duelistContractAddress, sdk)
+  //   if (sdk && address) {
   //     _fetch()
   //   }
-  // }, [sdk])
-  // useEffect(() => console.log("PlayerDuelistTokensStoreSync() =>", state.tokenIds), [state.tokenIds])
+  // }, [sdk, address])
+  // // useEffect(() => console.log("PlayerDuelistTokensStoreSync() =>", state.tokenIds), [state.tokenIds])
   return (<></>)
 }
 

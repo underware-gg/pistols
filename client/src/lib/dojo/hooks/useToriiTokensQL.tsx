@@ -97,17 +97,14 @@ export type ERC_Tokens = {
   },
 }
 
-export function useToriiTokensByOwnerQL(owner: BigNumberish, watch: boolean) {
+function useToriiTokenBalancesQL(variables: any, skip: boolean, watch: boolean) {
   const { selectedChainConfig } = useSelectedChain()
-  const variables = useMemo(() => ({
-    address: bigintToHex(owner).toLowerCase(),
-  }), [owner]);
   const toriiUrl = useMemo(() => `${selectedChainConfig.toriiUrl}/graphql`, [selectedChainConfig.toriiUrl])
   const { data, refetch } = useGraphQLQuery(
     toriiUrl,
     tokenBalances,
     variables,
-    !isPositiveBigint(owner),
+    skip,
     watch,
     1000,
   );
@@ -152,14 +149,45 @@ export function useToriiTokensByOwnerQL(owner: BigNumberish, watch: boolean) {
   }
 }
 
+
+//----------------------------------------
+// Queries
+//
+
 export function useToriiTokenIdsByOwnerQL(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean) {
-  const { tokens, refetch } = useToriiTokensByOwnerQL(owner, watch)
+  const variables = useMemo(() => ({
+    address: bigintToHex(owner).toLowerCase(),
+  }), [owner]);
+  const skip = useMemo(() => (!isPositiveBigint(owner)), [owner])
+
+  const { tokens, refetch } = useToriiTokenBalancesQL(variables, skip, watch)
+
   const tokenIds = useMemo<bigint[]>(() =>
     tokens.ERC721[bigintToHex(contractAddress)]?.tokenIds ?? [],
   [tokens, contractAddress])
   // console.log(`>>> useToriiTokenIdsByOwnerQL():`, tokenIds)
+  
   return {
     tokenIds,
+    refetch,
+  }
+}
+
+export function useToriiBalancesByContractQL(contractAddress: BigNumberish, watch: boolean) {
+  const variables = useMemo(() => ({
+    contractAddress: bigintToHex(contractAddress).toLowerCase(),
+  }), [contractAddress]);
+  const skip = useMemo(() => (!isPositiveBigint(contractAddress)), [contractAddress])
+
+  const { tokens, refetch } =  useToriiTokenBalancesQL(variables, skip, watch)
+
+  const balances = useMemo(() =>
+    tokens.ERC20[bigintToHex(contractAddress)],
+  [tokens, contractAddress])
+  console.log(`>>> useToriiBalancesByContractQL():`, contractAddress, balances)
+
+  return {
+    balances,
     refetch,
   }
 }
