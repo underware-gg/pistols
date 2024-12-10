@@ -65,24 +65,17 @@ const useStore = createStore();
 //
 const query_get: PistolsGetQuery = {
   pistols: {
-    PlayerActivity:
-      []
-    // { $: {} },
-    // { $: { where: { address: { $eq: addAddressPadding('0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7') } } } },
+    PlayerActivity: []
   },
 }
 const query_sub: PistolsSubQuery = {
   pistols: {
-    PlayerActivity:
-      []
-    // { $: {} },
-    // { $: { where: { address: { $is: addAddressPadding('0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7') } } } },
+    PlayerActivity: []
   },
 }
-// const clause = convertQueryToClause(query, schema);
 
 
-export function PlayerActivityStoreSync() {
+export function HistoricalEventsStoreSync() {
   const state = useStore((state) => state)
 
   useSdkEntities({
@@ -91,7 +84,7 @@ export function PlayerActivityStoreSync() {
     setEntities: state.setEvents,
     updateEntity: state.updateEvent,
     historical: true, // events
-    // limit: 3,
+    limit: 20,
   })
 
   // TESTING raw events from client
@@ -121,23 +114,23 @@ export function PlayerActivityStoreSync() {
     }
     if (sdk) _fetch()
   }, [sdk])
-  // useEffect(() => {
-  //   // based on:
-  //   // https://github.com/cartridge-gg/dopewars/blob/4e52b86c4788beb06d259533aebe5fe5c3b871e3/web/src/dojo/stores/game.tsx#L116
-  //   const _subscribe = async () => {
-  //     const subscription = await sdk.client.onEventMessageUpdated(
-  //       [clause],
-  //       true, // historical
-  //       (entityId: string, entityData: any) => {
-  //         console.log("sdk.client.SUB_EVENTS() =>", entityId, entityData)
-  //       }
-  //     );
-  //     console.log("sdk.client.SUBSCRIPTION =>", subscription)
-  //   }
-  //   if (sdk) _subscribe()
-  // }, [sdk])
+  useEffect(() => {
+    // based on:
+    // https://github.com/cartridge-gg/dopewars/blob/4e52b86c4788beb06d259533aebe5fe5c3b871e3/web/src/dojo/stores/game.tsx#L116
+    const _subscribe = async () => {
+      const subscription = await sdk.client.onEventMessageUpdated(
+        [clause],
+        true, // historical
+        (entityId: string, entityData: any) => {
+          console.log("sdk.client.SUB_EVENTS() =>", entityId, entityData)
+        }
+      );
+      console.log("sdk.client.SUBSCRIPTION =>", subscription)
+    }
+    if (sdk) _subscribe()
+  }, [sdk])
 
-  useEffect(() => console.log("PlayerActivityStoreSync() =>", state.activityPerAddress), [state.activityPerAddress])
+  useEffect(() => console.log("HistoricalEventsStoreSync() =>", state.activityPerAddress), [state.activityPerAddress])
 
   return (<></>)
 }
