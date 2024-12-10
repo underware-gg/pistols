@@ -3,7 +3,7 @@ import { Grid, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useControllerMenu, useControllerUsername } from '@/lib/dojo/hooks/useController'
+import { useConnectedController } from '@/lib/dojo/hooks/useController'
 import { getConnectorIcon } from '@/lib/dojo/setup/connectors'
 import { FameBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
@@ -32,8 +32,7 @@ export default function WalletHeader({
   const name = useMemo(() => (data?.name ?? `Connected to ${connectedChainName}`), [data])
   const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? '/profiles/square/00.jpg'), [data, connector])
 
-  const { username } = useControllerUsername()
-  const { openMenu } = useControllerMenu()
+  const { username, openProfile, openSettings } = useConnectedController()
 
   return (
     <Grid>
@@ -72,7 +71,10 @@ export default function WalletHeader({
             </Col>
           }
           <Col verticalAlign='middle'>
-            <ActionButton fill onClick={() => openMenu()} label='Settings' />
+            <ActionButton fill disabled={!openProfile} onClick={() => openProfile()} label='Profile' />
+          </Col>
+          <Col verticalAlign='middle'>
+            <ActionButton fill disabled={!openSettings} onClick={() => openSettings()} label='Settings' />
           </Col>
           <Col verticalAlign='middle'>
             <ActionButton fill onClick={() => {
