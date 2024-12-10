@@ -10,18 +10,15 @@ import { feltToString } from '@/lib/utils/starknet'
 import { useScore } from '../hooks/useScore'
 import { useDuelistQueryStore } from './duelistQueryStore'
 
-//
-// Stores all duelists
 const useStore = createDojoStore<PistolsSchemaType>();
 
-//
-// Sync all duelists
-// Add only once to a top level component
 const query_sub: PistolsSubQuery = {
   pistols: {
     Duelist: [],
   },
 }
+
+// Sync entities: Add only once to a top level component
 export function DuelistStoreSync() {
   const state = useStore((state) => state)
   const queryState = useDuelistQueryStore((state) => state)

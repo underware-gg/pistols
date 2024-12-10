@@ -8,9 +8,7 @@ import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 
 const useStore = createDojoStore<PistolsSchemaType>();
 
-//
-// Sync all tables
-// Add only once to a top level component
+// Sync entities: Add only once to a top level component
 export function TableStoreSync() {
   const { tableId } = useSettings()
   const query_sub = useMemo<PistolsSubQuery>(() => ({

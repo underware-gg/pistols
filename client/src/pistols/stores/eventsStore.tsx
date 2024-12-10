@@ -55,11 +55,6 @@ const createStore = () => {
 
 const useStore = createStore();
 
-
-//----------------------------------------
-// Sync all activity events
-// Add only once to a top level component
-//
 const query_get: PistolsGetQuery = {
   pistols: {
     PlayerActivity: []
@@ -71,7 +66,7 @@ const query_sub: PistolsSubQuery = {
   },
 }
 
-
+// Sync entities: Add only once to a top level component
 export function HistoricalEventsStoreSync() {
   const state = useStore((state) => state)
 

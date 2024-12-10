@@ -11,13 +11,9 @@ import { BladesCard, ChallengeState, getBladesCardValue, Premise, RoundState } f
 import { movesToHand } from '@/pistols/utils/pistols'
 import { useChallengeQueryStore } from './challengeQueryStore'
 
-//
-// Stores all challenges from current table
 const useStore = createDojoStore<PistolsSchemaType>();
 
-//
-// Sync all challenges from current table
-// Add only once to a top level component
+// Sync entities: Add only once to a top level component
 export function ChallengeStoreSync() {
   const { tableId } = useSettings()
   const query_get = useMemo<PistolsGetQuery>(() => ({

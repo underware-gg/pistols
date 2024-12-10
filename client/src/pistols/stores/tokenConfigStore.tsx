@@ -6,15 +6,13 @@ import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 
 const useStore = createDojoStore<PistolsSchemaType>();
 
-//
-// Sync all tables
-// Add only once to a top level component
 const query_sub: PistolsSubQuery = {
   pistols: {
     TokenConfig: []
   },
 }
 
+// Sync entities: Add only once to a top level component
 export function TokenConfigStoreSync() {
   const state = useStore((state) => state)
 
