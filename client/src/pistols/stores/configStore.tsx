@@ -77,7 +77,7 @@ export const useConfig = () => {
 //
 export const getConfig = () => {
   const entities = useStore.getState().entities
-  const config = useMemo(() => (entities[configKey]?.models.pistols.Config as models.Config), [entities])
+  const config = (entities[configKey]?.models.pistols.Config as models.Config)
   // console.log(`getConfig() =>`, config)
   return config
 }
