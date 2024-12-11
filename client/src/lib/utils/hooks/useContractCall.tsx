@@ -13,9 +13,9 @@ export const useContractCall = <T extends any>({
   defaultValue?: T | null | undefined
 }): {
   value: typeof defaultValue,
-  isPending: boolean,
+  isLoading: boolean,
 } => {
-  const [isPending, setIsPending] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [value, setValue] = useState<T>(defaultValue)
   
   useEffect(() => {
@@ -24,16 +24,16 @@ export const useContractCall = <T extends any>({
       return await call(...args) as T
     }
     if (call && enabled && !arrayHasNullElements(args)) {
-      setIsPending(true)
+      setIsLoading(true)
       _get().then((v) => {
         if (_mounted) {
-          setIsPending(false)
+          setIsLoading(false)
           setValue(v)
         }
       }).catch((e) => {
         console.error(`useContractCall() ERROR:`, call, args, e)
         if (_mounted) {
-          setIsPending(false)
+          setIsLoading(false)
           setValue(defaultValue)
         }
       })
@@ -47,6 +47,6 @@ export const useContractCall = <T extends any>({
   
   return {
     value,
-    isPending,
+    isLoading,
   }
 }

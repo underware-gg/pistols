@@ -100,7 +100,7 @@ export type ERC_Tokens = {
 function useToriiTokenBalancesQL(variables: any, skip: boolean, watch: boolean) {
   const { selectedChainConfig } = useSelectedChain()
   const toriiUrl = useMemo(() => `${selectedChainConfig.toriiUrl}/graphql`, [selectedChainConfig.toriiUrl])
-  const { data, refetch } = useGraphQLQuery(
+  const { data, isLoading, refetch } = useGraphQLQuery(
     toriiUrl,
     tokenBalances,
     variables,
@@ -145,6 +145,7 @@ function useToriiTokenBalancesQL(variables: any, skip: boolean, watch: boolean) 
   }, [data])
   return {
     tokens,
+    isLoading,
     refetch,
   }
 }
@@ -160,15 +161,16 @@ export function useToriiTokenIdsByOwnerQL(contractAddress: BigNumberish, owner: 
   }), [owner]);
   const skip = useMemo(() => (!isPositiveBigint(owner)), [owner])
 
-  const { tokens, refetch } = useToriiTokenBalancesQL(variables, skip, watch)
+  const { tokens, isLoading, refetch } = useToriiTokenBalancesQL(variables, skip, watch)
 
   const tokenIds = useMemo<bigint[]>(() =>
     tokens.ERC721[bigintToHex(contractAddress)]?.tokenIds ?? [],
   [tokens, contractAddress])
-  // console.log(`>>> useToriiTokenIdsByOwnerQL():`, tokenIds)
+  // console.log(`>>> useToriiTokenIdsByOwnerQL():`, bigintToHex(owner), tokenIds)
   
   return {
     tokenIds,
+    isLoading,
     refetch,
   }
 }
@@ -179,7 +181,7 @@ export function useToriiBalancesByContractQL(contractAddress: BigNumberish, watc
   }), [contractAddress]);
   const skip = useMemo(() => (!isPositiveBigint(contractAddress)), [contractAddress])
 
-  const { tokens, refetch } =  useToriiTokenBalancesQL(variables, skip, watch)
+  const { tokens, isLoading, refetch } =  useToriiTokenBalancesQL(variables, skip, watch)
 
   const balances = useMemo(() =>
     tokens.ERC20[bigintToHex(contractAddress)],
@@ -188,6 +190,7 @@ export function useToriiBalancesByContractQL(contractAddress: BigNumberish, watc
 
   return {
     balances,
+    isLoading,
     refetch,
   }
 }

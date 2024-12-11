@@ -16,10 +16,10 @@ export const useCanJoin = () => {
     enabled: isBigint(address),
     defaultValue: null,
   }), [can_join, address])
-  const { value, isPending } = useContractCall(options)
+  const { value, isLoading } = useContractCall(options)
   return {
     fee: value,
-    isPending
+    isLoading
   }
 }
 
@@ -32,10 +32,10 @@ export const useCalcFeeDuelist = () => {
     enabled: isPositiveBigint(address),
     defaultValue: null,
   }), [calc_mint_fee_duelist, address])
-  const { value, isPending } = useContractCall(options)
+  const { value, isLoading } = useContractCall(options)
   return {
     fee: value,
-    isPending,
+    isLoading,
   }
 }
 
@@ -47,10 +47,10 @@ export const useCalcFeeDuel = (table_id: string) => {
     enabled: Boolean(table_id),
     defaultValue: null,
   }), [calc_mint_fee_duel, table_id])
-  const { value, isPending } = useContractCall(options)
+  const { value, isLoading } = useContractCall(options)
   return {
     fee: value,
-    isPending,
+    isLoading,
   }
 }
 
@@ -79,10 +79,10 @@ export const useGetPlayerFullDeck = (tableId: string) => {
     enabled: Boolean(tableId),
     defaultValue: [],
   }), [get_player_card_decks, tableId])
-  const { value, isPending } = useContractCall(options)
+  const { value, isLoading } = useContractCall(options)
   return {
     decks: value,
-    isPending,
+    isLoading,
   }
 }
 
@@ -94,10 +94,10 @@ export const useGetPlayerFullDeck = (tableId: string) => {
 
 export const useAdminAmIOwner = () => {
   const { address } = useAccount()
-  const { isOwner, isPending } = useAdminIsOwner(address)
+  const { isOwner, isLoading } = useAdminIsOwner(address)
   return {
     IAmOwner: isOwner,
-    isPending,
+    isLoading,
   }
 }
 
@@ -108,10 +108,10 @@ export const useAdminIsOwner = (address: BigNumberish) => {
     args: [address],
     enabled: isPositiveBigint(address),
   }), [admin_am_i_admin, address])
-  const { value, isPending } = useContractCall(options)
+  const { value, isLoading } = useContractCall(options)
   return {
     isOwner: value,
-    isPending,
+    isLoading,
   }
 }
 
@@ -133,10 +133,10 @@ export const useTestValidateSignature = () => {
     ],
     defaultValue: false,
   }), [test_validate_commit_message])
-  const { value, isPending } = useContractCall(options)
-  console.log(`useTestValidateSignature()`, isPending ? '...' : value)
+  const { value, isLoading } = useContractCall(options)
+  console.log(`useTestValidateSignature()`, isLoading ? '...' : value)
   return {
     isValidated: value,
-    isPending,
+    isLoading,
   }
 }

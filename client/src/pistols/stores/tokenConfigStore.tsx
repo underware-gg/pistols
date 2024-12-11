@@ -40,6 +40,6 @@ export const useTokenConfig = (contractAddress: BigNumberish) => {
 
   return {
     mintedCount,
-    isPending: (tokenConfig == null),
+    isLoading: (tokenConfig == null),
   }
 }

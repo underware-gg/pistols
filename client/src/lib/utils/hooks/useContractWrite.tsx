@@ -32,7 +32,7 @@ export function useContractWrite(contractAddress: BigNumberish, abi: Abi, functi
     write,
     transactionHash,
     receipt,
-    isPending: (isPending || isLoading),
+    isLoading: (isPending || isLoading),
     isError: (isError || isReverted),
     error,
   }
