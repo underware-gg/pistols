@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useAllPlayersActivityFeed, ActivityState } from '@/pistols/stores/eventsStore'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { usePlayer } from '@/pistols/stores/playerStore'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 import { Activity } from '@/games/pistols/generated/constants'
@@ -20,6 +20,11 @@ export const ActivityFeed = () => {
       activity={a}
     />)
   ), [allPlayersActivity])
+
+  const { atGate, atDoor, atDuel } = usePistolsScene()
+  if (atGate || atDoor || atDuel) {
+    return <></>
+  }
 
   return (
     <div className={`${collapsed ? 'ActivityFeedCollapsed' : 'ActivityFeed'} Relative`}>
