@@ -102,7 +102,7 @@ export function DuelistsNavigationMenu({
   )
 }
 
-function DuelistItem({
+export function DuelistItem({
   duelistId,
 }: {
   duelistId: BigNumberish

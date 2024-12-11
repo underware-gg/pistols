@@ -1268,6 +1268,10 @@ $ui-container-gap: 1em;
   right: 5px;
 }
 
+.DuelistItem:hover {
+  background-color: $color-dark!important;
+}
+
 //
 // <IconXXX>
 //

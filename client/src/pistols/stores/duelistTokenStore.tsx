@@ -55,7 +55,7 @@ export function PlayerDuelistTokensStoreSyncQL() {
   const { duelistContractAddress } = useDuelistTokenContract()
   const { address } = useAccount()
   const state = useStore((state) => state)
-  const { tokenIds } = useToriiTokenIdsByOwnerQL(duelistContractAddress, address, true)
+  const { tokenIds } = useToriiTokenIdsByOwnerQL(duelistContractAddress, address, false)
   useEffect(() => {
     if (duelistContractAddress && address) {
       state.setTokenIds(duelistContractAddress, address, tokenIds)
@@ -100,10 +100,25 @@ export function PlayerDuelistTokensStoreSync() {
 //----------------------------------------
 // consumer hooks
 //
-export function useTokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
+
+// get current players tokens from the store
+export function useTokenIdsOfPlayer(contractAddress: BigNumberish) {
   const state = useStore((state) => state)
-  const tokenIds = useMemo(() => state.getTokenIds(contractAddress, owner).sort(), [contractAddress, owner, state.tokenIds])
+  const { address } = useAccount()
+  const tokenIds = useMemo(() => state.getTokenIds(contractAddress, address).sort(), [contractAddress, address, state.tokenIds])
   return {
     tokenIds,
+  }
+}
+
+// ephemeral hook
+// get and retrive on the fly
+// do not use the store
+export function useTokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
+  const { tokenIds, isLoading } = useToriiTokenIdsByOwnerQL(contractAddress, owner, false)
+  // console.log("useTokenIdsByOwner() =>", isLoading, bigintToHex(owner), tokenIds)
+  return {
+    tokenIds,
+    isLoading,
   }
 }

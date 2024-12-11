@@ -3,12 +3,12 @@ import { Divider, Grid, Modal } from 'semantic-ui-react'
 import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useIsMyAccount } from '@/pistols/hooks/useIsYou'
 import { usePlayer } from '@/pistols/stores/playerStore'
-import { ProfilePic } from '@/pistols/components/account/ProfilePic'
+import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
 import { PlayerDescription } from '@/pistols/components/account/PlayerDescription'
-import { ChallengeTableSelectedDuelist } from '@/pistols/components/ChallengeTable'
+import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
+import { DuelistItem } from '../account/AccountHeader'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -34,11 +34,22 @@ export default function PlayerModal() {
     dispatchSelectDuelistId(duelistId)
   }
 
-  // const { duelistIds } = useDuelistsOfOwner(selectedPlayerAddress)
-  // const duelists = useMemo(() => {
-  //   return []
-  // }, [duelistIds])
-  const duelists = <>DUELISTS...</>
+  const { duelistIds, isLoading } = useDuelistsOfOwner(selectedPlayerAddress)
+  const duelists = useMemo(() => {
+    if (isLoading) {
+      return <h3>Loading duelists...</h3>
+    }
+    if (duelistIds.length === 0) {
+      return <h3>This player has no duelists.</h3>
+    }
+    return duelistIds.map((duelistId) => (
+      <Row columns='equal'>
+        <Col className='H3 Anchor DuelistItem' onClick={() => _gotoDuelist(duelistId)} >
+          <DuelistItem duelistId={duelistId}/>
+        </Col>
+      </Row>
+    ))
+  }, [duelistIds, isLoading])
 
   return (
     <Modal
@@ -67,9 +78,9 @@ export default function PlayerModal() {
             <PlayerDescription address={selectedPlayerAddress} displayFameBalance />
             <Divider />
             <div className='Spacer10' />
-            <div className='TableInModal'>
+            <Grid className='TableInModal'>
               {duelists}
-            </div>
+            </Grid>
           </div>
         </Modal.Description>
       </Modal.Content>
