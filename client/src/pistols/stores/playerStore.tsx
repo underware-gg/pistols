@@ -1,8 +1,8 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { BigNumberish } from 'starknet'
-import { useSdkEntities, PistolsSubQuery, useEntityModel, models, PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
-import { bigintEquals, bigintToHex, shortAddress } from '@/lib/utils/types'
+import { PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
+import { bigintEquals, shortAddress } from '@/lib/utils/types'
 
 export interface ActivityState {
   address: bigint
@@ -44,29 +44,7 @@ const createStore = () => {
   }))
 }
 
-const useStore = createStore();
-
-const query_sub: PistolsSubQuery = {
-  pistols: {
-    Player: [],
-  },
-}
-
-// Sync entities: Add only once to a top level component
-export function PlayerStoreSync() {
-  const state = useStore((state) => state)
-
-  useSdkEntities({
-    query_get: query_sub,
-    query_sub,
-    setEntities: state.setEntities,
-    updateEntity: state.updateEntity,
-  })
-
-  useEffect(() => console.log("PlayerStoreSync() =>", state.players), [state.players])
-
-  return (<></>)
-}
+export const usePlayerStore = createStore();
 
 
 //--------------------------------
@@ -74,7 +52,7 @@ export function PlayerStoreSync() {
 //
 
 export const usePlayer = (address: BigNumberish) => {
-  const players = useStore((state) => state.players);
+  const players = usePlayerStore((state) => state.players);
   const player = useMemo(() => (players.find(p => bigintEquals(p.address, address))), [players, address])
 
   const username = useMemo(() => (player?.username ?? 'unknown'), [player])

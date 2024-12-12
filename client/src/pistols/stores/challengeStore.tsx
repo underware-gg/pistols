@@ -1,68 +1,17 @@
-import { useMemo, useEffect } from 'react'
-import { addAddressPadding, BigNumberish } from 'starknet'
-// import { createDojoStore } from '@dojoengine/sdk'
+import { useMemo } from 'react'
+import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@/lib/dojo/fix/zustand'
-import { useSdkEntities, PistolsGetQuery,PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
-import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { feltToString, stringToFelt } from '@/lib/utils/starknet'
+import { PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
 import { BladesCard, ChallengeState, getBladesCardValue, Premise, RoundState } from '@/games/pistols/generated/constants'
 import { movesToHand } from '@/pistols/utils/pistols'
-import { useChallengeQueryStore } from './challengeQueryStore'
+import { feltToString } from '@/lib/utils/starknet'
 
-const useStore = createDojoStore<PistolsSchemaType>();
-
-// Sync entities: Add only once to a top level component
-export function ChallengeStoreSync() {
-  const { tableId } = useSettings()
-  const query_get = useMemo<PistolsGetQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            table_id: { $eq: addAddressPadding(stringToFelt(tableId)) },
-          },
-        },
-      },
-    },
-  }), [tableId])
-  const query_sub = useMemo<PistolsSubQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            table_id: { $is: addAddressPadding(stringToFelt(tableId)) },
-          },
-        },
-      },
-      Round: [],
-    },
-  }), [tableId])
-
-  const state = useStore((state) => state)
-  const queryState = useChallengeQueryStore((state) => state)
-  
-  useSdkEntities({
-    query_get,
-    query_sub,
-    setEntities: (entities) => {
-      state.setEntities(entities)
-      queryState.setEntities(entities)
-    },
-    updateEntity: (entity) => {
-      state.updateEntity(entity)
-      queryState.updateEntity(entity)
-    },
-  })
-
-  // useEffect(() => console.log(`ChallengeStoreSync() [${Object.keys(state.entities).length}] =>`, state.entities), [state.entities])
-
-  return (<></>)
-}
+export const useChallengeStore = createDojoStore<PistolsSchemaType>();
 
 export const useAllChallengesEntityIds = () => {
-  const entities = useStore((state) => state.entities)
+  const entities = useChallengeStore((state) => state.entities)
   const entityIds = useMemo(() => Object.keys(entities), [entities])
   return {
     entityIds,
@@ -70,7 +19,7 @@ export const useAllChallengesEntityIds = () => {
 }
 
 export const useAllChallengesIds = () => {
-  const entities = useStore((state) => state.entities)
+  const entities = useChallengeStore((state) => state.entities)
   const duelIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.Challenge.duel_id)), [entities])
   // useEffect(() => console.log(`useAllChallengesIds() =>`, duelIds.length), [duelIds])
   return {
@@ -80,7 +29,7 @@ export const useAllChallengesIds = () => {
 
 export const useChallenge = (duelId: BigNumberish) => {
   const entityId = useEntityId([duelId])
-  const entities = useStore((state) => state.entities);
+  const entities = useChallengeStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const challenge = useEntityModel<models.Challenge>(entity, 'Challenge')
@@ -137,7 +86,7 @@ export const useChallenge = (duelId: BigNumberish) => {
 
 export const useRound = (duelId: BigNumberish) => {
   const entityId = useEntityId([duelId])
-  const entities = useStore((state) => state.entities);
+  const entities = useChallengeStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const round = useEntityModel<models.Round>(entity, 'Round')

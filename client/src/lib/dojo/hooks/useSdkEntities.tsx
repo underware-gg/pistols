@@ -137,11 +137,32 @@ export const useSdkEntities = ({
   }
 }
 
+
 //---------------------------------------
+// utils
+//
+
+//
 // Extract one model from a stored entity
 //
+export const getEntityModel = <T,>(entity: PistolsEntity, modelName: string) => (entity?.models.pistols[modelName] as T)
 export const useEntityModel = <T,>(entity: PistolsEntity, modelName: string) => {
-  const model = useMemo(() => (entity?.models.pistols[modelName] as T), [entity, modelName])
+  const model = useMemo(() => getEntityModel<T>(entity, modelName), [entity, modelName])
   return model
 }
 
+//
+// Filter entities by model
+//
+export const filterEntitiesByModel = (entities: PistolsEntity[], modelNames: string | string[]): PistolsEntity[] => {
+  if (Array.isArray(modelNames)) {
+    return entities.filter(e => {
+      for (const m of modelNames) {
+        if (getEntityModel(e, m) != null)
+          return true
+      }
+      return false
+    })
+  }
+  return entities.filter(e => getEntityModel(e, modelNames) != null)
+}

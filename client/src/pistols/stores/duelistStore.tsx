@@ -1,45 +1,14 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-// import { createDojoStore } from '@dojoengine/sdk'
 import { createDojoStore } from '@/lib/dojo/fix/zustand'
-import { useSdkEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
+import { PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { isPositiveBigint } from '@/lib/utils/types'
 import { CONST } from '@/games/pistols/generated/constants'
 import { feltToString } from '@/lib/utils/starknet'
 import { useScore } from '../hooks/useScore'
-import { useDuelistQueryStore } from './duelistQueryStore'
 
-const useStore = createDojoStore<PistolsSchemaType>();
-
-const query_sub: PistolsSubQuery = {
-  pistols: {
-    Duelist: [],
-  },
-}
-
-// Sync entities: Add only once to a top level component
-export function DuelistStoreSync() {
-  const state = useStore((state) => state)
-  const queryState = useDuelistQueryStore((state) => state)
-
-  useSdkEntities({
-    query_get: query_sub,
-    query_sub,
-    setEntities: (entities) => {
-      state.setEntities(entities)
-      queryState.setEntities(entities)
-    },
-    updateEntity: (entity) => {
-      state.updateEntity(entity)
-      queryState.updateEntity(entity)
-    },
-  })
-
-  // useEffect(() => console.log("DuelistStoreSync() =>", state.entities), [state.entities])
-
-  return (<></>)
-}
+export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 
 // export const useAllDuelistsEntityIds = () => {
 //   const entities = useStore((state) => state.entities)
@@ -50,7 +19,7 @@ export function DuelistStoreSync() {
 // }
 
 export const useAllDuelistsIds = () => {
-  const entities = useStore((state) => state.entities)
+  const entities = useDuelistStore((state) => state.entities)
   const duelistIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.Duelist.duelist_id)), [entities])
   return {
     duelistIds,
@@ -59,7 +28,7 @@ export const useAllDuelistsIds = () => {
 
 export const useDuelist = (duelist_id: BigNumberish) => {
   const entityId = useEntityId([duelist_id])
-  const entities = useStore((state) => state.entities);
+  const entities = useDuelistStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const duelist = useEntityModel<models.Duelist>(entity, 'Duelist')

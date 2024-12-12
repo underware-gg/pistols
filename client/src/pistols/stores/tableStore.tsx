@@ -1,38 +1,14 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk'
-import { useSdkEntities, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
-import { useSettings } from '@/pistols/hooks/SettingsContext'
+import { PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { TableType } from '@/games/pistols/generated/constants'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'
 
-const useStore = createDojoStore<PistolsSchemaType>();
-
-// Sync entities: Add only once to a top level component
-export function TableStoreSync() {
-  const { tableId } = useSettings()
-  const query_sub = useMemo<PistolsSubQuery>(() => ({
-    pistols: {
-      TableConfig: [],
-    },
-  }), [tableId])
-
-  const state = useStore((state) => state)
-
-  useSdkEntities({
-    query_get: query_sub,
-    query_sub,
-    setEntities: state.setEntities,
-    updateEntity: state.updateEntity,
-  })
-
-  // useEffect(() => console.log("TableStoreSync() =>", state.entities), [state.entities])
-
-  return (<></>)
-}
+export const useTableConfigStore = createDojoStore<PistolsSchemaType>();
 
 export const useAllTableIds = () => {
-  const entities = useStore((state) => state.entities)
+  const entities = useTableConfigStore((state) => state.entities)
   const tableIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.TableConfig.table_id)), [entities])
   return {
     tableIds,
@@ -41,7 +17,7 @@ export const useAllTableIds = () => {
 
 export const useTable = (table_id: string) => {
   const entityId = useEntityId([stringToFelt(table_id)])
-  const entities = useStore((state) => state.entities);
+  const entities = useTableConfigStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const table = useEntityModel<models.TableConfig>(entity, 'TableConfig')
