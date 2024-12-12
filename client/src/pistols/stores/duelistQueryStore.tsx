@@ -1,6 +1,7 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import { create } from 'zustand'
-import { useSdkEntities, PistolsGetQuery, PistolsEntity, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkEntities'
+import { immer } from 'zustand/middleware/immer'
+import { PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
 import { DuelistColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { feltToString } from '@/lib/utils/starknet'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
@@ -49,24 +50,23 @@ const createStore = () => {
       is_active: (Number(score.total_duels ?? 0) > 0),
     }
   }
-  return create<State>()((set) => ({
+  return create<State>()(immer((set) => ({
     entities: {},
     setEntities: (entities: PistolsEntity[]) => {
       // console.warn("setEntities() =>", entities)
-      set((state: State) => ({
-        entities: entities.reduce((acc, e) => {
+      set((state: State) => {
+        state.entities = entities.reduce((acc, e) => {
           acc[e.entityId] = _parseEntity(e)
           return acc
         }, {} as StateEntities)
-      }))
+      })
     },
     updateEntity: (e: PistolsEntity) => {
       set((state: State) => {
         state.entities[e.entityId] = _parseEntity(e)
-        return state
       });
     },
-  }))
+  })))
 }
 
 export const useDuelistQueryStore = createStore();
@@ -92,7 +92,7 @@ export const useQueryDuelistIds = (
     if (filterName) {
       result = result.filter((e) => e.name.includes(filterName))
     }
-    
+
     // filter by active
     if (filterActive) {
       result = result.filter((e) => (e.is_active))

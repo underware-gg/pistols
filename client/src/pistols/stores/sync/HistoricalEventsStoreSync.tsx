@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { useHistoricalEventsStore } from '@/pistols/stores/eventsStore'
+import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { PistolsGetQuery, PistolsSubQuery, useSdkEntities } from '@/lib/dojo/hooks/useSdkEntities'
 import * as torii from '@dojoengine/torii-client'
 
@@ -18,10 +19,13 @@ const query_sub: PistolsSubQuery = {
 // Sync entities: Add only once to a top level component
 export function HistoricalEventsStoreSync() {
   const historicalEventsState = useHistoricalEventsStore((state) => state)
+  
+  const mounted = useMounted()
 
   useSdkEntities({
     query_get,
     query_sub,
+    enabled: mounted,
     setEntities: historicalEventsState.setEvents,
     updateEntity: historicalEventsState.updateEvent,
     historical: true, // events

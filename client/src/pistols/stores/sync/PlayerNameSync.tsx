@@ -10,7 +10,9 @@ import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 // Add only once to a top level component
 //
 export function PlayerNameSync() {
-  const [players, updateUsernames] = usePlayerStore((state) => [state.players, state.updateUsernames])
+  const players = usePlayerStore((state) => state.players)
+  const updateUsernames = usePlayerStore((state) => state.updateUsernames)
+  
   const newPlayerAddresses = useMemo(() => (
     Object.keys(players).filter(p => players[p].isNew)
   ), [players])

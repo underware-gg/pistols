@@ -5,7 +5,9 @@ import { useTokenConfigStore } from '@/pistols/stores/tokenConfigStore'
 import { usePlayerStore } from '@/pistols/stores/playerStore'
 import { useDuelistStore } from '@/pistols/stores/duelistStore'
 import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
+import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { CONFIG } from '@/games/pistols/generated/constants'
+import { useEffect } from 'react'
 
 const query_get: PistolsGetQuery = {
   pistols: {
@@ -38,9 +40,12 @@ export function EntityStoreSync() {
   const duelistState = useDuelistStore((state) => state)
   const duelistQueryState = useDuelistQueryStore((state) => state)
 
+  const mounted = useMounted()
+
   useSdkEntities({
     query_get,
     query_sub,
+    enabled: mounted,
     setEntities: (entities: PistolsEntity[]) => {
       // console.log("EntityStoreSync() SET =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModel(entities, 'Config'))

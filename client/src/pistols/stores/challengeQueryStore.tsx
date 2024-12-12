@@ -1,11 +1,9 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import { create } from 'zustand'
-import { addAddressPadding } from 'starknet'
-import { useSdkEntities, PistolsGetQuery, PistolsEntity, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkEntities'
+import { immer } from 'zustand/middleware/immer'
+import { PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
 import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
-import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { ChallengeColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
-import { stringToFelt } from '@/lib/utils/starknet'
 import { ChallengeState, getChallengeStateValue } from '@/games/pistols/generated/constants'
 import { keysToEntity } from '@/lib/utils/types'
 
@@ -49,24 +47,23 @@ const createStore = () => {
       duelist_entity_id_b: keysToEntity([e.models.pistols.Challenge.duelist_id_b]),
     }
   }
-  return create<State>()((set) => ({
+  return create<State>()(immer((set) => ({
     entities: {},
     setEntities: (entities: PistolsEntity[]) => {
       // console.warn("setEntities() =>", entities)
-      set((state: State) => ({
-        entities: entities.reduce((acc, e) => {
+      set((state: State) => {
+        state.entities = entities.reduce((acc, e) => {
           acc[e.entityId] = _parseEntity(e)
           return acc
         }, {} as StateEntities)
-      }))
+      })
     },
     updateEntity: (e: PistolsEntity) => {
       set((state: State) => {
         state.entities[e.entityId] = _parseEntity(e)
-        return state
       });
     },
-  }))
+  })))
 }
 
 export const useChallengeQueryStore = createStore();
@@ -105,7 +102,7 @@ export const useQueryChallengeIds = (
     // filter by name
     if (filterName) {
       result = result.filter((e) => (
-        duelistEntities[e.duelist_entity_id_a].name.includes(filterName) || 
+        duelistEntities[e.duelist_entity_id_a].name.includes(filterName) ||
         duelistEntities[e.duelist_entity_id_b].name.includes(filterName)
       ))
     }

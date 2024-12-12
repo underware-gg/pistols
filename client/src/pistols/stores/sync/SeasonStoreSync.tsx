@@ -4,6 +4,7 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useSdkEntities, PistolsGetQuery,PistolsSubQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
 import { useChallengeQueryStore } from '@/pistols/stores/challengeQueryStore'
 import { useChallengeStore } from '@/pistols/stores/challengeStore'
+import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { stringToFelt } from '@/lib/utils/starknet'
 
 
@@ -39,10 +40,13 @@ export function SeasonStoreSync() {
 
   const challengeState = useChallengeStore((state) => state)
   const queryState = useChallengeQueryStore((state) => state)
-  
+
+  const mounted = useMounted()
+
   useSdkEntities({
     query_get,
     query_sub,
+    enabled: mounted,
     setEntities: (entities: PistolsEntity[]) => {
       challengeState.setEntities(entities)
       queryState.setEntities(entities)

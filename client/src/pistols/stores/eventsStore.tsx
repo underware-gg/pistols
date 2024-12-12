@@ -1,5 +1,6 @@
 import { BigNumberish } from 'starknet'
 import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 import { PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
 import { arrayClean, bigintToHex, bigintToNumber } from '@/lib/utils/types'
 import { Activity } from '@/games/pistols/generated/constants'
@@ -31,23 +32,22 @@ const createStore = () => {
       identifier: BigInt(event.identifier),
     } : undefined
   }
-  return create<State>()((set) => ({
+  return create<State>()(immer((set) => ({
     playerActivity: [],
     setEvents: (events: PistolsEntity[]) => {
       console.log("setEvents() =>", events)
-      set((state: State) => ({
-        playerActivity: arrayClean(events.map(e => _parseEvent(e))).sort((a, b) => (a.timestamp - b.timestamp))
-      }))
+      set((state: State) => {
+        state.playerActivity = arrayClean(events.map(e => _parseEvent(e))).sort((a, b) => (a.timestamp - b.timestamp))
+      })
     },
     updateEvent: (e: PistolsEntity) => {
       console.log("updateEvent() =>", e)
       set((state: State) => {
         const activity = _parseEvent(e)
         if (activity) state.playerActivity.push(activity)
-        return state
       });
     },
-  }))
+  })))
 }
 
 export const useHistoricalEventsStore = createStore();
