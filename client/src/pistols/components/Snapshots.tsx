@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
-import { ChallengeStoreSync, useAllChallengesIds, useChallenge } from '@/pistols/stores/challengeStore'
-import { useDuelist, useAllDuelistsIds, DuelistStoreSync } from '@/pistols/stores/duelistStore'
+import { useAllChallengesIds, useChallenge } from '@/pistols/stores/challengeStore'
+import { useDuelist, useAllDuelistsIds } from '@/pistols/stores/duelistStore'
+import { ChallengeStoreSync } from '@/pistols/stores/sync/ChallengeStoreSync'
+import { EntityStoreSync } from '@/pistols/stores/sync/EntityStoreSync'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { CopyIcon } from '@/lib/ui/Icons'
 import { bigintEquals, bigintToHex } from '@/lib/utils/types'
@@ -28,8 +30,8 @@ export function Snapshots() {
 
   return (
     <Container text>
-      <DuelistStoreSync />
       <ChallengeStoreSync />
+      <EntityStoreSync />
       
       <Grid>
         <Row columns={'equal'}>

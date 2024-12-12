@@ -12,7 +12,7 @@ import { stringToFelt } from '@/lib/utils/starknet'
 // Sync everything that depends on current season
 // !!! Add only once to a top level component !!!
 //
-export function SeasonStoreSync() {
+export function ChallengeStoreSync() {
   const { tableId } = useSettings()
   const query_get = useMemo<PistolsGetQuery>(() => ({
     pistols: {
@@ -57,7 +57,7 @@ export function SeasonStoreSync() {
     },
   })
 
-  // useEffect(() => console.log(`SeasonStoreSync() [${Object.keys(state.entities).length}] =>`, state.entities), [state.entities])
+  // useEffect(() => console.log(`ChallengeStoreSync() [${Object.keys(state.entities).length}] =>`, state.entities), [state.entities])
 
   return (<></>)
 }

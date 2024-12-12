@@ -1,6 +1,6 @@
 import React from 'react'
 import { HistoricalEventsStoreSync } from '@/pistols/stores/sync/HistoricalEventsStoreSync'
-import { SeasonStoreSync } from '@/pistols/stores/sync/SeasonStoreSync'
+import { ChallengeStoreSync } from '@/pistols/stores/sync/ChallengeStoreSync'
 import { EntityStoreSync } from '@/pistols/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '@/pistols/stores/sync/PlayerNameSync'
 // QL to be replaced...
@@ -15,7 +15,7 @@ export default function StoreSync() {
   return (
     <>
       <HistoricalEventsStoreSync />
-      <SeasonStoreSync />
+      <ChallengeStoreSync />
       <EntityStoreSync />
       <PlayerNameSync />
       
