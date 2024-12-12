@@ -22,7 +22,7 @@ interface State {
 }
 
 const createStore = () => {
-  const _parseEvent = (e: PistolsEntity) => {
+  const _parseEvent = (e: PistolsEntity): ActivityState => {
     let event = e.models.pistols.PlayerActivity
     return event ? {
       address: bigintToHex(event.address),

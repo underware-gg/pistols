@@ -1,12 +1,17 @@
-import { BigNumberish } from 'starknet'
 import { getEntityIdFromKeys } from '@dojoengine/utils'
+import { BigNumberish } from 'starknet'
 
 //
-// Numbers
+// numbers
 //
 
 export const isNumber = (v: string) => (/^\d+$/.test(v))
 
+//
+// strings
+//
+
+export const capitalize = (v: string) => (v.charAt(0).toUpperCase() + v.slice(1))
 
 //
 // BigNumberish
@@ -64,6 +69,6 @@ export const cleanObject = (obj: any): any => Object.keys(obj).reduce((acc, key)
 //
 // there is no default serializer for BigInt, make one
 (BigInt.prototype as any).toJSON = function () {
-  return (this <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(this) : this.toString())
+  return (this <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(this) : bigintToHex(this))
 }
 export const serialize = (obj: any, space: number | string = null): any => JSON.stringify(obj, null, space);

@@ -37,15 +37,15 @@ export default function PlayerModal() {
   const { duelistIds, isLoading } = useDuelistsOfOwner(selectedPlayerAddress)
   const duelists = useMemo(() => {
     if (isLoading) {
-      return <h3>Loading duelists...</h3>
+      return <h3 key='loading'>Loading duelists...</h3>
     }
     if (duelistIds.length === 0) {
-      return <h3>This player has no duelists.</h3>
+      return <h3 key='no-duelists'>This player has no duelists.</h3>
     }
     return duelistIds.map((duelistId) => (
-      <Row columns='equal'>
+      <Row key={`duelist-${duelistId}`} columns='equal'>
         <Col className='H3 Anchor DuelistItem' onClick={() => _gotoDuelist(duelistId)} >
-          <DuelistItem duelistId={duelistId}/>
+          <DuelistItem duelistId={duelistId} />
         </Col>
       </Row>
     ))

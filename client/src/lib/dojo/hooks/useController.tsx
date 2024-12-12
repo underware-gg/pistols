@@ -7,11 +7,9 @@ import { ContractInterfaces, DojoManifest } from '@/lib/dojo/Dojo'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useContractClassHash } from '@/lib/utils/hooks/useContractClassHash'
 import { BigNumberish } from 'starknet'
-import { bigintEquals, bigintToHex } from '@/lib/utils/types'
+import { bigintEquals, capitalize } from '@/lib/utils/types'
 import { _useConnector } from '../fix/starknet_react_core'
 import { assert } from '@/lib/utils/math'
-import { useLordsContract } from './useLords'
-import { useFameContract } from '@/pistols/hooks/useFame'
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
@@ -111,9 +109,10 @@ export const useConnectedController = () => {
   const { connector } = _useConnector()
   
   // connector
+  const connectorId = useMemo(() => (connector?.id), [connector])
   const controllerConnector = useMemo(() => (
-    connector?.id == supportedConnetorIds.CONTROLLER ? connector as unknown as ControllerConnector : undefined
-  ), [connector])
+    connectorId == supportedConnetorIds.CONTROLLER ? connector as unknown as ControllerConnector : undefined
+  ), [connectorId])
 
   // username
   const [username, setUsername] = useState<string>(undefined)
@@ -123,7 +122,7 @@ export const useConnectedController = () => {
       controllerConnector?.username().then((n) => setUsername(n.toLowerCase())) ?? 'unknown'
     }
   }, [controllerConnector, address])
-  const name = useMemo(() => (username ? `${username.slice(0, 1).toUpperCase()}${username.slice(1)}` : undefined), [username])
+  const name = useMemo(() => (username ? capitalize(username) : undefined), [username])
 
   // callbacks
   const openSettings = useCallback((address && controllerConnector) ? async () => {
@@ -134,6 +133,7 @@ export const useConnectedController = () => {
   } : null, [controllerConnector, address])
 
   return {
+    connectorId,
     controllerConnector,
     username,
     name,
