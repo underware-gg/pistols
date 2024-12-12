@@ -1,7 +1,7 @@
 import { BigNumberish } from 'starknet'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
+import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { arrayClean, bigintToHex, bigintToNumber } from '@/lib/utils/types'
 import { Activity } from '@/games/pistols/generated/constants'
 

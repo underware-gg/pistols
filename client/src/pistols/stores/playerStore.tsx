@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
-import { PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
+import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { bigintToHex, capitalize, shortAddress } from '@/lib/utils/types'
 
 interface PlayerState {

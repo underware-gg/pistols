@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react'
 import { create } from 'zustand'
-import { addAddressPadding, BigNumberish } from 'starknet'
+import { BigNumberish, addAddressPadding } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'

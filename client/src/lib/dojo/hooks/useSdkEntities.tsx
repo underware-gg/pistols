@@ -1,20 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ParsedEntity, SubscriptionQueryType, QueryType } from '@dojoengine/sdk'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { isPositiveBigint } from '@/lib/utils/types'
-import { SchemaType as PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
-import * as models from '@/games/pistols/generated/typescript/models.gen'
-
-type PistolsGetQuery = QueryType<PistolsSchemaType>
-type PistolsSubQuery = SubscriptionQueryType<PistolsSchemaType>
-type PistolsEntity = ParsedEntity<PistolsSchemaType>
-export type {
-  PistolsSchemaType,
+import {
   PistolsGetQuery,
   PistolsSubQuery,
   PistolsEntity,
-  models,
-}
+  PistolsModelType,
+} from '@/lib/dojo/hooks/useSdkTypes'
+
 
 //---------------------------------------
 // Get entities from torii
@@ -145,9 +138,9 @@ export const useSdkEntities = ({
 //
 // Extract one model from a stored entity
 //
-export const getEntityModel = <T,>(entity: PistolsEntity, modelName: string) => (entity?.models.pistols[modelName] as T)
-export const useEntityModel = <T,>(entity: PistolsEntity, modelName: string) => {
-  const model = useMemo(() => getEntityModel<T>(entity, modelName), [entity, modelName])
+export const getEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: string) => (entity?.models.pistols[modelName] as M)
+export const useEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: string) => {
+  const model = useMemo(() => getEntityModel<M>(entity, modelName), [entity, modelName])
   return model
 }
 

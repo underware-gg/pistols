@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
+import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
 import { ChallengeColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { ChallengeState, getChallengeStateValue } from '@/games/pistols/generated/constants'

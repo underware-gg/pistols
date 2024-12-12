@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk'
-import { PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
+import { useEntityModel } from '@/lib/dojo/hooks/useSdkEntities'
+import { PistolsSchemaType, models } from '@/lib/dojo/hooks/useSdkTypes'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { TableType } from '@/games/pistols/generated/constants'
 import { feltToString, stringToFelt } from '@/lib/utils/starknet'

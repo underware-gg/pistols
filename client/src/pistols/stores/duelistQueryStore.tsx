@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { PistolsEntity } from '@/lib/dojo/hooks/useSdkEntities'
+import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { DuelistColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { feltToString } from '@/lib/utils/starknet'
 import { calcWinRatio } from '@/pistols/hooks/useScore'

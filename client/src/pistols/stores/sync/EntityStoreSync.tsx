@@ -1,4 +1,5 @@
-import { useSdkEntities, PistolsGetQuery, PistolsSubQuery, PistolsEntity, getEntityModel, filterEntitiesByModel } from '@/lib/dojo/hooks/useSdkEntities'
+import { useSdkEntities, getEntityModel, filterEntitiesByModel } from '@/lib/dojo/hooks/useSdkEntities'
+import { PistolsGetQuery, PistolsSubQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { useConfigStore } from '@/pistols/stores/configStore'
 import { useTableConfigStore } from '@/pistols/stores/tableStore'
 import { useTokenConfigStore } from '@/pistols/stores/tokenConfigStore'

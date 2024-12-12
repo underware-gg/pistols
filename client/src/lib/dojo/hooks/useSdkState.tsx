@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { SchemaType as PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
+import { useSdkEntities, UseSdkEntitiesProps } from '@/lib/dojo/hooks/useSdkEntities'
 import {
+  PistolsSchemaType,
   PistolsGetQuery,
   PistolsSubQuery,
   PistolsEntity,
-  useSdkEntities,
-  UseSdkEntitiesProps,
-} from '@/lib/dojo/hooks/useSdkEntities'
+  PistolsModelType,
+} from '@/lib/dojo/hooks/useSdkTypes'
 
 export type {
   PistolsGetQuery,
@@ -24,8 +24,8 @@ export type useSdkStateResult = {
   refetch: () => void
 }
 
-export const getEntityMapModels = <T,>(entities: EntityMap, modelName: string): T[] =>
-  (Object.values(entities ?? {}).map(e => (e[modelName] as T)) ?? [])
+export const getEntityMapModels = <M extends PistolsModelType>(entities: EntityMap, modelName: string): M[] =>
+  (Object.values(entities ?? {}).map(e => (e[modelName] as M)) ?? [])
 
 
 //---------------------------------------
