@@ -35,19 +35,20 @@ interface State {
 
 const createStore = () => {
   const _parseEntity = (e: PistolsEntity) => {
-    let score = e.models.pistols.Duelist.score
+    let duelist = e.models.pistols.Duelist
+    if (!duelist) return undefined
     return {
-      duelist_id: BigInt(e.models.pistols.Duelist.duelist_id),
-      timestamp: Number(e.models.pistols.Duelist.timestamp),
-      name: feltToString(e.models.pistols.Duelist.name).toLowerCase(),
+      duelist_id: BigInt(duelist.duelist_id),
+      timestamp: Number(duelist.timestamp),
+      name: feltToString(duelist.name).toLowerCase(),
       fame: 0,
-      honour: Number(score.honour ?? 0),
-      win_ratio: calcWinRatio(Number(score.total_duels ?? 0), Number(score.total_wins ?? 0)),
-      total_duels: Number(score.total_duels ?? 0),
-      total_wins: Number(score.total_wins ?? 0),
-      total_losses: Number(score.total_losses ?? 0),
-      total_draws: Number(score.total_draws ?? 0),
-      is_active: (Number(score.total_duels ?? 0) > 0),
+      honour: Number(duelist.score.honour ?? 0),
+      win_ratio: calcWinRatio(Number(duelist.score.total_duels ?? 0), Number(duelist.score.total_wins ?? 0)),
+      total_duels: Number(duelist.score.total_duels ?? 0),
+      total_wins: Number(duelist.score.total_wins ?? 0),
+      total_losses: Number(duelist.score.total_losses ?? 0),
+      total_draws: Number(duelist.score.total_draws ?? 0),
+      is_active: (Number(duelist.score.total_duels ?? 0) > 0),
     }
   }
   return create<State>()(immer((set) => ({
@@ -56,14 +57,20 @@ const createStore = () => {
       // console.warn("setEntities() =>", entities)
       set((state: State) => {
         state.entities = entities.reduce((acc, e) => {
-          acc[e.entityId] = _parseEntity(e)
+          const value = _parseEntity(e)
+          if (value) {
+            acc[e.entityId] = value
+          }
           return acc
         }, {} as StateEntities)
       })
     },
     updateEntity: (e: PistolsEntity) => {
       set((state: State) => {
-        state.entities[e.entityId] = _parseEntity(e)
+        const value = _parseEntity(e)
+        if (value) {
+          state.entities[e.entityId] = value
+        }
       });
     },
   })))

@@ -33,18 +33,20 @@ interface State {
 
 const createStore = () => {
   const _parseEntity = (e: PistolsEntity) => {
-    const start = Number(e.models.pistols.Challenge.timestamp_start)
-    const end = Number(e.models.pistols.Challenge.timestamp_end)
-    const state = e.models.pistols.Challenge.state as unknown as ChallengeState
+    const challenge = e.models.pistols.Challenge
+    if (!challenge) return undefined
+    const start = Number(challenge.timestamp_start)
+    const end = Number(challenge.timestamp_end)
+    const state = challenge.state as unknown as ChallengeState
     return {
-      duel_id: BigInt(e.models.pistols.Challenge.duel_id),
+      duel_id: BigInt(challenge.duel_id),
       timestamp: end ? end : start,
       state,
       state_value: getChallengeStateValue(state),
-      duelist_id_a: BigInt(e.models.pistols.Challenge.duelist_id_a),
-      duelist_id_b: BigInt(e.models.pistols.Challenge.duelist_id_b),
-      duelist_entity_id_a: keysToEntity([e.models.pistols.Challenge.duelist_id_a]),
-      duelist_entity_id_b: keysToEntity([e.models.pistols.Challenge.duelist_id_b]),
+      duelist_id_a: BigInt(challenge.duelist_id_a),
+      duelist_id_b: BigInt(challenge.duelist_id_b),
+      duelist_entity_id_a: keysToEntity([challenge.duelist_id_a]),
+      duelist_entity_id_b: keysToEntity([challenge.duelist_id_b]),
     }
   }
   return create<State>()(immer((set) => ({
@@ -53,14 +55,20 @@ const createStore = () => {
       // console.warn("setEntities() =>", entities)
       set((state: State) => {
         state.entities = entities.reduce((acc, e) => {
-          acc[e.entityId] = _parseEntity(e)
+          const value = _parseEntity(e)
+          if (value) {
+            acc[e.entityId] = value
+          }
           return acc
         }, {} as StateEntities)
       })
     },
     updateEntity: (e: PistolsEntity) => {
       set((state: State) => {
-        state.entities[e.entityId] = _parseEntity(e)
+        const value = _parseEntity(e)
+        if (value) {
+          state.entities[e.entityId] = value
+        }
       });
     },
   })))
