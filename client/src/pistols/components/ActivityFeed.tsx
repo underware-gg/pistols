@@ -1,16 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { BigNumberish } from 'starknet'
+import React, { useEffect, useMemo } from 'react'
 import { useAllPlayersActivityFeed, ActivityState } from '@/pistols/stores/eventsStore'
-import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
-import { usePlayer } from '@/pistols/stores/playerStore'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { formatTimestampDeltaElapsed } from '@/lib/utils/timestamp'
-import { bigintToNumber } from '@/lib/utils/types'
-import { IconClick } from '@/lib/ui/Icons'
 import { Activity } from '@/games/pistols/generated/constants'
+import { ChallengeLink, DuelistLink, PlayerLink, TimestampDelta } from '@/pistols/components/Links'
 
 export const ActivityFeed = () => {
-  const [collapsed, setCollapsed] = useState(false)
   const { allPlayersActivity } = useAllPlayersActivityFeed()
   const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 60)
 
@@ -25,20 +19,10 @@ export const ActivityFeed = () => {
   useEffect(() => {
     updateTimestamp()
   }, [allPlayersActivity])
-  
-  const { atGate, atDoor, atDuel } = usePistolsScene()
-  if (atGate || atDoor || atDuel) {
-    return <></>
-  }
 
   return (
-    <div className={`${collapsed ? 'ActivityFeedCollapsed' : 'ActivityFeed'} Relative`}>
-      <h3 className='TitleCase'>Activity Log</h3>
-      <IconClick className='ActivityFeedIcon'
-        name={collapsed ? 'chevron left' : 'chevron down'}
-        onClick={() => setCollapsed(!collapsed)}
-      />
-      {!collapsed && items}
+    <div className='FillParent'>
+      {items}
     </div>
   );
 }
@@ -77,89 +61,78 @@ const ActivityItemCreatedDuelist = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
-  const { name } = usePlayer(activity.address)
-  const playerLink = usePlayerLink(activity.address, name)
-  const duelistLink = useDuelistLink(activity.identifier)
-  const timestamp = useTimestampDelta(activity.timestamp, clientSeconds)
-  return <>{playerLink} opened {duelistLink} {timestamp}<br /></>
+  return (
+    <>
+      <PlayerLink address={activity.address} />
+      {' spawned '}
+      <DuelistLink duelistId={activity.identifier} />
+      {' '}
+      <TimestampDelta timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <br />
+    </>
+  )
 }
 
 const ActivityItemCreatedChallenge = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
-  const { name } = usePlayer(activity.address)
-  const playerLink = usePlayerLink(activity.address, name)
-  const challengeLink = useChallengeLink(activity.identifier)
-  const timestamp = useTimestampDelta(activity.timestamp, clientSeconds)
-  return <>{playerLink} challenged ??? in {challengeLink} {timestamp}<br /></>
+  return (
+    <>
+      <PlayerLink address={activity.address} />
+      {' challenged ??? for '}
+      <ChallengeLink duelId={activity.identifier} />
+      {' '}
+      <TimestampDelta timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <br />
+    </>
+  )
 }
 
 const ActivityItemRepliedChallenge = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
-  const { name } = usePlayer(activity.address)
-  const playerLink = usePlayerLink(activity.address, name)
-  const challengeLink = useChallengeLink(activity.identifier)
-  const timestamp = useTimestampDelta(activity.timestamp, clientSeconds)
-  return <>{playerLink} replied ??? in {challengeLink} {timestamp}<br /></>
+  return (
+    <>
+      <PlayerLink address={activity.address} />
+      {' replied ??? to '}
+      <ChallengeLink duelId={activity.identifier} />
+      {' '}
+      <TimestampDelta timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <br />
+    </>
+  )
 }
 
 const ActivityItemCommittedMoves = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
-  const { name } = usePlayer(activity.address)
-  const playerLink = usePlayerLink(activity.address, name)
-  const challengeLink = useChallengeLink(activity.identifier)
-  const timestamp = useTimestampDelta(activity.timestamp, clientSeconds)
-  return <>{playerLink} moved in {challengeLink} {timestamp}<br /></>
+  return (
+    <>
+      <PlayerLink address={activity.address} />
+      {' moved in '}
+      <ChallengeLink duelId={activity.identifier} />
+      {' '}
+      <TimestampDelta timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <br />
+    </>
+  )
 }
 
 const ActivityItemRevealedMoves = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
-  const { name } = usePlayer(activity.address)
-  const playerLink = usePlayerLink(activity.address, name)
-  const challengeLink = useChallengeLink(activity.identifier)
-  const timestamp = useTimestampDelta(activity.timestamp, clientSeconds)
-  return <>{playerLink} revealed in {challengeLink} {timestamp}<br /></>
-}
-
-
-//
-// activity links
-//
-
-const usePlayerLink = (address: BigNumberish, name: string) => {
-  const { dispatchSelectPlayerAddress } = usePistolsContext()
-  const result = useMemo(() => (
-    <span className='Anchor Important' onClick={() => dispatchSelectPlayerAddress(address)}>{name}</span>
-  ), [address, name])
-  return result
-}
-
-const useDuelistLink = (duelistId: BigNumberish) => {
-  const { dispatchSelectDuelistId } = usePistolsContext()
-  const result = useMemo(() => (
-    <span className='Anchor Important' onClick={() => dispatchSelectDuelistId(duelistId)}>duelist #{bigintToNumber(duelistId)}</span>
-  ), [duelistId])
-  return result
-}
-
-const useChallengeLink = (duelId: BigNumberish) => {
-  const { dispatchSelectDuel } = usePistolsContext()
-  const result = useMemo(() => (
-    <span className='Anchor Important' onClick={() => dispatchSelectDuel(duelId)}>duel #{bigintToNumber(duelId)}</span>
-  ), [duelId])
-  return result
-}
-
-const useTimestampDelta = (timestamp: number, clientSeconds: number) => {
-  const result = useMemo(() => (
-    <span className='Inactive' >{formatTimestampDeltaElapsed(timestamp, clientSeconds)}</span>
-  ), [timestamp, clientSeconds])
-  return result
+  return (
+    <>
+      <PlayerLink address={activity.address} />
+      {' revealed in '}
+      <ChallengeLink duelId={activity.identifier} />
+      {' '}
+      <TimestampDelta timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <br />
+    </>
+  )
 }
