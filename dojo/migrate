@@ -13,6 +13,7 @@ if [[
   exit 1
 fi
 
+# export OFFLINE="--offline"
 
 echo "BINDINGS_PATH: $BINDINGS_PATH"
 echo "CLIENT_GAME_PATH: $CLIENT_GAME_PATH"
@@ -25,12 +26,12 @@ echo "--------------------------------------------------------------------------
 sozo --version
 echo "------------------------------------------------------------------------------"
 echo ">>> Cleaning..."
-sozo -P $PROFILE clean
+sozo -P $PROFILE $OFFLINE clean
 echo ">>> Building..."
 if [[ "$PROFILE" == "dev" ]]; then
-  sozo -P $PROFILE build --typescript
+  sozo -P $PROFILE $OFFLINE build --typescript
 else
-  sozo -P $PROFILE build
+  sozo -P $PROFILE $OFFLINE build
 fi
 echo "👍"
 
@@ -39,15 +40,15 @@ echo "👍"
 #
 echo "------------------------------------------------------------------------------"
 echo ">>> Inspect migrations..."
-sozo -P $PROFILE inspect --world $WORLD_ADDRESS
+sozo -P $PROFILE $OFFLINE inspect --world $WORLD_ADDRESS
 
 echo ">>> Do migrations..."
-# sozo -P $PROFILE migrate -vvv --world $WORLD_ADDRESS
-sozo -P $PROFILE migrate --world $WORLD_ADDRESS
+# sozo -P $PROFILE $OFFLINE migrate -vvv --world $WORLD_ADDRESS
+sozo -P $PROFILE $OFFLINE migrate --world $WORLD_ADDRESS
 echo "👍"
 
 echo ">>> Inspect again..."
-sozo -P $PROFILE inspect --world $WORLD_ADDRESS
+sozo -P $PROFILE $OFFLINE inspect --world $WORLD_ADDRESS
 
 #-----------------
 # auth write
