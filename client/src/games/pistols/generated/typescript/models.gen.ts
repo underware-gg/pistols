@@ -226,20 +226,51 @@ export interface PlayerActivityValue {
 }
 export type InputPlayerActivityValue = RemoveFieldOrder<PlayerActivityValue>;
 
-// Type definition for `pistols::models::player::PlayerOnlineValue` struct
-export interface PlayerOnlineValue {
-	fieldOrder: string[];
-	timestamp: BigNumberish;
+// Type definition for `pistols::models::player::PlayerBookmarkValue` struct
+export interface PlayerBookmarkValue {
+  fieldOrder: string[];
+  enabled: boolean;
 }
-export type InputPlayerOnlineValue = RemoveFieldOrder<PlayerOnlineValue>;
+export type InputPlayerBookmarkValue = RemoveFieldOrder<PlayerBookmarkValue>;
+
+// Type definition for `pistols::models::player::PlayerBookmark` struct
+export interface PlayerBookmark {
+  fieldOrder: string[];
+  address: string;
+  bookmark: BigNumberish;
+  enabled: boolean;
+}
+export type InputPlayerBookmark = RemoveFieldOrder<PlayerBookmark>;
 
 // Type definition for `pistols::models::player::PlayerOnline` struct
 export interface PlayerOnline {
-	fieldOrder: string[];
-	address: string;
-	timestamp: BigNumberish;
+  fieldOrder: string[];
+  address: string;
+  timestamp: BigNumberish;
 }
 export type InputPlayerOnline = RemoveFieldOrder<PlayerOnline>;
+
+// Type definition for `pistols::models::player::PlayerOnlineValue` struct
+export interface PlayerOnlineValue {
+  fieldOrder: string[];
+  timestamp: BigNumberish;
+}
+export type InputPlayerOnlineValue = RemoveFieldOrder<PlayerOnlineValue>;
+
+// Type definition for `pistols::models::player::PlayerTutorialProgressValue` struct
+export interface PlayerTutorialProgressValue {
+  fieldOrder: string[];
+  progress: TutorialProgress;
+}
+export type InputPlayerTutorialProgressValue = RemoveFieldOrder<PlayerTutorialProgressValue>;
+
+// Type definition for `pistols::models::player::PlayerTutorialProgress` struct
+export interface PlayerTutorialProgress {
+  fieldOrder: string[];
+  address: string;
+  progress: TutorialProgress;
+}
+export type InputPlayerTutorialProgress = RemoveFieldOrder<PlayerTutorialProgress>;
 
 // Type definition for `pistols::models::challenge::Moves` struct
 export interface Moves {
@@ -422,6 +453,14 @@ export enum ProfilePicType {
 	External,
 }
 
+// Type definition for `pistols::models::player::TutorialProgress` enum
+export enum TutorialProgress {
+  None,
+  FinishedFirst,
+  FinishedSecond,
+  FinishedFirstDuel,
+}
+
 // Type definition for `pistols::models::player::Activity` enum
 export enum Activity {
 	Undefined,
@@ -478,8 +517,12 @@ export interface SchemaType extends ISchemaType {
 		Player: Player,
 		PlayerActivity: PlayerActivity,
 		PlayerActivityValue: PlayerActivityValue,
-		PlayerOnlineValue: PlayerOnlineValue,
-		PlayerOnline: PlayerOnline,
+    PlayerBookmarkValue: PlayerBookmarkValue,
+    PlayerBookmark: PlayerBookmark,
+    PlayerOnline: PlayerOnline,
+    PlayerOnlineValue: PlayerOnlineValue,
+    PlayerTutorialProgressValue: PlayerTutorialProgressValue,
+    PlayerTutorialProgress: PlayerTutorialProgress,
 		Moves: Moves,
 		DuelistState: DuelistState,
 		Round: Round,
@@ -651,15 +694,34 @@ export const schema: SchemaType = {
 			activity: Activity.Undefined,
 			identifier: 0,
 		},
-		PlayerOnlineValue: {
-			fieldOrder: ['timestamp'],
-			timestamp: 0,
-		},
-		PlayerOnline: {
-			fieldOrder: ['address', 'timestamp'],
-			address: "",
-			timestamp: 0,
-		},
+    PlayerBookmarkValue: {
+      fieldOrder: ['enabled'],
+      enabled: false,
+    },
+    PlayerBookmark: {
+      fieldOrder: ['address', 'bookmark', 'enabled'],
+      address: "",
+      bookmark: 0,
+      enabled: false,
+    },
+    PlayerOnline: {
+      fieldOrder: ['address', 'timestamp'],
+      address: "",
+      timestamp: 0,
+    },
+    PlayerOnlineValue: {
+      fieldOrder: ['timestamp'],
+      timestamp: 0,
+    },
+    PlayerTutorialProgressValue: {
+      fieldOrder: ['progress'],
+      progress: TutorialProgress.None,
+    },
+    PlayerTutorialProgress: {
+      fieldOrder: ['address', 'progress'],
+      address: "",
+      progress: TutorialProgress.None,
+    },
 		Moves: {
 			fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'],
 			seed: 0,

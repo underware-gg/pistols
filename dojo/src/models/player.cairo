@@ -35,7 +35,7 @@ pub struct Player {
 //---------------------
 // ON-CHAIN events
 //
-#[derive(Copy, Drop, Serde, Introspect)]
+#[derive(Copy, Drop, Serde)]
 #[dojo::event(historical:true)]
 pub struct PlayerActivity {
     #[key]
@@ -57,24 +57,24 @@ pub struct PlayerOnline {
     //-----------------------
     pub timestamp: u64,     // seconds since epoch
 }
-// #[derive(Copy, Drop, Serde)]
-// #[dojo::model]
-// pub struct PlayerTutorialProgress {
-//     #[key]
-//     pub address: ContractAddress,
-//     //-----------------------
-//     pub progress: TutorialProgress,
-// }
-// #[derive(Copy, Drop, Serde)]
-// #[dojo::model]
-// pub struct PlayerFollows {
-//     #[key]
-//     pub player_a: ContractAddress,
-//     #[key]
-//     pub player_b: ContractAddress,
-//     //-----------------------
-//     pub follows: bool,
-// }
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerBookmark {
+    #[key]
+    pub address: ContractAddress,
+    #[key]
+    pub bookmark: felt252,
+    //-----------------------
+    pub enabled: bool,
+}
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerTutorialProgress {
+    #[key]
+    pub address: ContractAddress,
+    //-----------------------
+    pub progress: TutorialProgress,
+}
 
 
 //----------------------------------
