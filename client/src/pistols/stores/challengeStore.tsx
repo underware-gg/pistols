@@ -47,10 +47,10 @@ export const useChallenge = (duelId: BigNumberish) => {
   const timestamp_start = useMemo(() => Number(challenge?.timestamp_start ?? 0), [challenge])
   const timestamp_end = useMemo(() => Number(challenge?.timestamp_end ?? 0), [challenge])
 
-  const { clientTimestamp } = useClientTimestamp(false)
+  const { clientSeconds } = useClientTimestamp(false)
   let _state = useMemo(() => (challenge?.state as unknown as ChallengeState), [challenge])
   let state = useMemo(() => {
-    if (_state == ChallengeState.Awaiting && (timestamp_end < clientTimestamp)) {
+    if (_state == ChallengeState.Awaiting && (timestamp_end < clientSeconds)) {
       return ChallengeState.Expired
     }
     return _state

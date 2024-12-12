@@ -1,13 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { AccountInterface, typedData } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
-import { useAccount, useNetwork } from '@starknet-react/core'
-import { useTypedMessage } from '@/lib/utils/hooks/useTypedMessage'
-import { Messages, createTypedMessage } from '@/lib/utils/starknet_sign'
-import { bigintToHex, shortAddress } from '@/lib/utils/types'
-import AppPistols from '@/pistols/components/AppPistols'
-import { formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDelta } from '@/lib/utils/timestamp'
+import { formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@/lib/utils/timestamp'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
+import AppPistols from '@/pistols/components/AppPistols'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -28,8 +23,8 @@ export default function IndexPage() {
     setMounted(true)
   }, [])
 
-  const { clientTimestamp } = useClientTimestamp(true)
-  const start = useMemo(() => (mounted ? clientTimestamp : 0), [mounted])
+  const { clientSeconds } = useClientTimestamp(true)
+  const start = useMemo(() => (mounted ? clientSeconds : 0), [mounted, clientSeconds])
 
   return (
     <AppPistols>
@@ -40,7 +35,8 @@ export default function IndexPage() {
               <HeaderCell><h5>Start</h5></HeaderCell>
               <HeaderCell><h5>End</h5></HeaderCell>
               <HeaderCell><h5>Delta</h5></HeaderCell>
-              <HeaderCell><h5>Ago</h5></HeaderCell>
+              <HeaderCell><h5>Elapsed</h5></HeaderCell>
+              <HeaderCell><h5>Countdown</h5></HeaderCell>
             </Row>
           </Header>
           <Body>
@@ -69,28 +65,31 @@ function Timestamp({
   start: number
   end: number
 }) {
-
+  const elapsed = (end - start)
   return (
     <Row className='Code' columns={'equal'} verticalAlign='top'>
       <Cell>
-        <span className='Inactive'>{start}</span>
-        <br />
-        {formatTimestampLocal(start)}
+        <span className='Inactive'>{start}s</span>
+        {/* <br /><span className='Inactive'>{new Date(start * 1000).toISOString()}</span> */}
+        <br />{formatTimestampLocal(start)}
       </Cell>
       <Cell>
-        <span className='Inactive'>{end}</span>
-        <br />
-        {formatTimestampLocal(end)}
+        <span className='Inactive'>{end}s</span>
+        {/* <br /><span className='Inactive'>{new Date(end * 1000).toISOString()}</span> */}
+        <br />{formatTimestampLocal(end)}
       </Cell>
       <Cell>
-        <span className='Inactive'>{end - start}</span>
-        <br />
-        {formatTimestampDeltaTime(start, end)}
+        <span className='Inactive'>{elapsed}s</span>
+        {/* <br /><span className='Inactive'>{new Date(elapsed * 1000).toISOString()}</span> */}
+        <br />{formatTimestampDeltaTime(start, end)}
       </Cell>
       <Cell>
-        <span className='Inactive'>{end - start}</span>
-        <br />
-        {formatTimestampDelta(start, end)}
+        <span className='Inactive'>{elapsed}s</span>
+        <br />{formatTimestampDeltaElapsed(start, end)}
+      </Cell>
+      <Cell>
+        <span className='Inactive'>{elapsed}s</span>
+        <br />{formatTimestampDeltaCountdown(start, end)}
       </Cell>
     </Row>
   )

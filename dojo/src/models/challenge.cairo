@@ -30,8 +30,8 @@ pub struct Challenge {
     pub state: ChallengeState,
     pub winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
-    pub timestamp_start: u64,       // Unix time, started
-    pub timestamp_end: u64,         // Unix time, ended
+    pub timestamp_start: u64,       // seconds since epoch, started
+    pub timestamp_end: u64,         // seconds since epoch, ended
 }
 
 #[derive(Copy, Drop, Serde)]

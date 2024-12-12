@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAllPlayersActivityFeed, ActivityState } from '@/pistols/stores/eventsStore'
 import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { usePlayer } from '@/pistols/stores/playerStore'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { formatTimestampDelta } from '@/lib/utils/timestamp'
+import { formatTimestampDeltaElapsed } from '@/lib/utils/timestamp'
 import { bigintToNumber } from '@/lib/utils/types'
 import { IconClick } from '@/lib/ui/Icons'
 import { Activity } from '@/games/pistols/generated/constants'
@@ -12,16 +12,20 @@ import { Activity } from '@/games/pistols/generated/constants'
 export const ActivityFeed = () => {
   const [collapsed, setCollapsed] = useState(false)
   const { allPlayersActivity } = useAllPlayersActivityFeed()
-  const { clientTimestamp } = useClientTimestamp(true)
+  const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 60)
 
   const items = useMemo(() => ([...allPlayersActivity].reverse().map((a) =>
     <ActivityItem
       key={`${a.address}-${a.timestamp}-${a.activity}-${a.identifier.toString()}`}
-      clientTimestamp={clientTimestamp}
+      clientSeconds={clientSeconds}
       activity={a}
     />)
-  ), [allPlayersActivity])
+  ), [allPlayersActivity, clientSeconds])
 
+  useEffect(() => {
+    updateTimestamp()
+  }, [allPlayersActivity])
+  
   const { atGate, atDoor, atDuel } = usePistolsScene()
   if (atGate || atDoor || atDuel) {
     return <></>
@@ -39,86 +43,88 @@ export const ActivityFeed = () => {
   );
 }
 
+export default ActivityFeed;
+
 
 interface ActivityItemProps {
   activity: ActivityState
-  clientTimestamp: number
+  clientSeconds: number
 }
 
 const ActivityItem = ({
   activity,
-  clientTimestamp,
+  clientSeconds,
 }: ActivityItemProps) => {
   if (activity.activity === Activity.CreatedDuelist) {
-    return <ActivityItemCreatedDuelist activity={activity} clientTimestamp={clientTimestamp} />
+    return <ActivityItemCreatedDuelist activity={activity} clientSeconds={clientSeconds} />
   }
   if (activity.activity === Activity.CreatedChallenge) {
-    return <ActivityItemCreatedChallenge activity={activity} clientTimestamp={clientTimestamp} />
+    return <ActivityItemCreatedChallenge activity={activity} clientSeconds={clientSeconds} />
   }
   if (activity.activity === Activity.RepliedChallenge) {
-    return <ActivityItemRepliedChallenge activity={activity} clientTimestamp={clientTimestamp} />
+    return <ActivityItemRepliedChallenge activity={activity} clientSeconds={clientSeconds} />
   }
   if (activity.activity === Activity.CommittedMoves) {
-    return <ActivityItemCommittedMoves activity={activity} clientTimestamp={clientTimestamp} />
+    return <ActivityItemCommittedMoves activity={activity} clientSeconds={clientSeconds} />
   }
   if (activity.activity === Activity.RevealedMoves) {
-    return <ActivityItemRevealedMoves activity={activity} clientTimestamp={clientTimestamp} />
+    return <ActivityItemRevealedMoves activity={activity} clientSeconds={clientSeconds} />
   }
   return <></>
 }
 
 const ActivityItemCreatedDuelist = ({
   activity,
-  clientTimestamp,
+  clientSeconds,
 }: ActivityItemProps) => {
   const { name } = usePlayer(activity.address)
   const playerLink = usePlayerLink(activity.address, name)
   const duelistLink = useDuelistLink(activity.identifier)
-  const timestamp = useTimestampDelta(activity.timestamp, clientTimestamp)
+  const timestamp = useTimestampDelta(activity.timestamp, clientSeconds)
   return <>{playerLink} opened {duelistLink} {timestamp}<br /></>
 }
 
 const ActivityItemCreatedChallenge = ({
   activity,
-  clientTimestamp,
+  clientSeconds,
 }: ActivityItemProps) => {
   const { name } = usePlayer(activity.address)
   const playerLink = usePlayerLink(activity.address, name)
   const challengeLink = useChallengeLink(activity.identifier)
-  const timestamp = useTimestampDelta(activity.timestamp, clientTimestamp)
+  const timestamp = useTimestampDelta(activity.timestamp, clientSeconds)
   return <>{playerLink} challenged ??? in {challengeLink} {timestamp}<br /></>
 }
 
 const ActivityItemRepliedChallenge = ({
   activity,
-  clientTimestamp,
+  clientSeconds,
 }: ActivityItemProps) => {
   const { name } = usePlayer(activity.address)
   const playerLink = usePlayerLink(activity.address, name)
   const challengeLink = useChallengeLink(activity.identifier)
-  const timestamp = useTimestampDelta(activity.timestamp, clientTimestamp)
+  const timestamp = useTimestampDelta(activity.timestamp, clientSeconds)
   return <>{playerLink} replied ??? in {challengeLink} {timestamp}<br /></>
 }
 
 const ActivityItemCommittedMoves = ({
   activity,
-  clientTimestamp,
+  clientSeconds,
 }: ActivityItemProps) => {
   const { name } = usePlayer(activity.address)
   const playerLink = usePlayerLink(activity.address, name)
   const challengeLink = useChallengeLink(activity.identifier)
-  const timestamp = useTimestampDelta(activity.timestamp, clientTimestamp)
+  const timestamp = useTimestampDelta(activity.timestamp, clientSeconds)
   return <>{playerLink} moved in {challengeLink} {timestamp}<br /></>
 }
 
 const ActivityItemRevealedMoves = ({
   activity,
-  clientTimestamp,
+  clientSeconds,
 }: ActivityItemProps) => {
   const { name } = usePlayer(activity.address)
   const playerLink = usePlayerLink(activity.address, name)
   const challengeLink = useChallengeLink(activity.identifier)
-  const timestamp = useTimestampDelta(activity.timestamp, clientTimestamp)
+  const timestamp = useTimestampDelta(activity.timestamp, clientSeconds)
   return <>{playerLink} revealed in {challengeLink} {timestamp}<br /></>
 }
 
@@ -151,12 +157,9 @@ const useChallengeLink = (duelId: BigNumberish) => {
   return result
 }
 
-const useTimestampDelta = (timestamp: number, clientTimestamp: number) => {
+const useTimestampDelta = (timestamp: number, clientSeconds: number) => {
   const result = useMemo(() => (
-    <span className='Inactive' >{formatTimestampDelta(timestamp, clientTimestamp)}</span>
-  ), [timestamp, clientTimestamp])
+    <span className='Inactive' >{formatTimestampDeltaElapsed(timestamp, clientSeconds)}</span>
+  ), [timestamp, clientSeconds])
   return result
 }
-
-
-export default ActivityFeed;

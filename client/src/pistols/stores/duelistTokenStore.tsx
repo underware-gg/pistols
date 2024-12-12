@@ -55,7 +55,7 @@ export function PlayerDuelistTokensStoreSyncQL() {
   const { duelistContractAddress } = useDuelistTokenContract()
   const { address } = useAccount()
   const state = useStore((state) => state)
-  const { tokenIds } = useToriiTokenIdsByOwnerQL(duelistContractAddress, address, false)
+  const { tokenIds } = useToriiTokenIdsByOwnerQL(duelistContractAddress, address, true)
   useEffect(() => {
     if (duelistContractAddress && address) {
       state.setTokenIds(duelistContractAddress, address, tokenIds)

@@ -41,7 +41,7 @@ pub struct PlayerActivity {
     #[key]
     pub address: ContractAddress,
     //-----------------------
-    pub timestamp: u64,
+    pub timestamp: u64,     // seconds since epoch
     pub activity: Activity,
     pub identifier: felt252,
 }
@@ -55,7 +55,7 @@ pub struct PlayerOnline {
     #[key]
     pub address: ContractAddress,
     //-----------------------
-    pub timestamp: u64,
+    pub timestamp: u64,     // seconds since epoch
 }
 // #[derive(Copy, Drop, Serde)]
 // #[dojo::model]

@@ -73,12 +73,12 @@ export default function Duel({
   }, [gameImpl, mounted, duelSceneStarted, profilePicA, profilePicB, nameA, nameB, isYouA, isYouB])
 
   // setup grass animation
-  const { clientTimestamp } = useClientTimestamp(false)
+  const { clientSeconds } = useClientTimestamp(false)
   useEffect(() => {
-    if (clientTimestamp && timestamp_start) {
-      gameImpl?.setDuelTimePercentage(clientTimestamp - timestamp_start)
+    if (clientSeconds && timestamp_start) {
+      gameImpl?.setDuelTimePercentage(clientSeconds - timestamp_start)
     }
-  }, [gameImpl, clientTimestamp, timestamp_start])
+  }, [gameImpl, clientSeconds, timestamp_start])
 
   // Animated duel is useDuel added with intermediate animation stages
   const {

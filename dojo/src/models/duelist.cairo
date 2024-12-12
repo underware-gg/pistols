@@ -36,7 +36,7 @@ pub struct Duelist {
     pub name: felt252,
     pub profile_pic_type: ProfilePicType,
     pub profile_pic_uri: ByteArray,     // can be anything
-    pub timestamp: u64,                 // date registered
+    pub timestamp: u64,                 // date registered (seconds since epoch)
     pub score: Score,
 }
 
