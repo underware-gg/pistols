@@ -32,7 +32,7 @@ export default function WalletHeader({
   const name = useMemo(() => (data?.name ?? `Connected to ${connectedChainName}`), [data])
   const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? '/profiles/square/00.jpg'), [data, connector])
 
-  const { username, openProfile, openSettings } = useConnectedController()
+  const { username, openProfile } = useConnectedController()
 
   return (
     <Grid>
@@ -71,10 +71,7 @@ export default function WalletHeader({
             </Col>
           }
           <Col verticalAlign='middle'>
-            <ActionButton fill disabled={!openProfile} onClick={() => openProfile()} label='Profile' />
-          </Col>
-          <Col verticalAlign='middle'>
-            <ActionButton fill disabled={!openSettings} onClick={() => openSettings()} label='Settings' />
+            <ActionButton fill disabled={!openProfile} onClick={() => openProfile()} label='Controller' />
           </Col>
           <Col verticalAlign='middle'>
             <ActionButton fill onClick={() => {
