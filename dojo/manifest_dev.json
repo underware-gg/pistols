@@ -4822,8 +4822,8 @@
       ]
     },
     {
-      "address": "0x61b5ff5c8d1616d353cbdb810a1955065cb9f4a49902c7d0ab33f6862b063cc",
-      "class_hash": "0x4b590d61a7265c06f22897e415ca3c347a2334234d0ff2c765fa6919323d5b0",
+      "address": "0x1d0994e6c9c06bcf730ff6f6e0929d7c430175c6bcca69f33ed9249bd3caf7c",
+      "class_hash": "0x685776e21dce73b9670ec26b8e3b07ddeeff87f01089befcc052706b587e30a",
       "abi": [
         {
           "type": "impl",
@@ -6547,9 +6547,21 @@
     },
     {
       "members": [],
+      "class_hash": "0x45c5d77870233203810481d8856385706a48fd8a93a23a5ac77ab450864138c",
+      "tag": "pistols-PlayerBookmark",
+      "selector": "0x46db6150404dd9d739a2cd0c5e5036698ab3cfde3a5626ee798e1f1add13a63"
+    },
+    {
+      "members": [],
       "class_hash": "0x5406f02eab81fd373148cf487f4cc53cfef00ec016b8a5521c6f3a2059aa78f",
       "tag": "pistols-PlayerOnline",
       "selector": "0x6f3391bc3684ea92009be25543fc6cc734c1f756253523354efdf10e2a57dff"
+    },
+    {
+      "members": [],
+      "class_hash": "0x71f6c734aa516e887cd47e914cf04e3887e9d30db80c7bd82b1e22bbaf8ebf",
+      "tag": "pistols-PlayerTutorialProgress",
+      "selector": "0x310c3b7d7f6200fd2ea3cbb9b7ee0782f4d838cdd6edee93b415d5b32337b0"
     },
     {
       "members": [],
