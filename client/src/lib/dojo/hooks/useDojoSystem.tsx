@@ -8,19 +8,19 @@ import { bigintToHex } from '@/lib/utils/types'
 
 
 export const useDojoSystem = (systemName: string) => {
-  const { manifest, nameSpace } = useDojoSetup()
-  return useSystem(nameSpace, systemName, manifest)
+  const { manifest, namespace } = useDojoSetup()
+  return useSystem(namespace, systemName, manifest)
 }
 
 export const useDeployedDojoSystem = (systemName: string) => {
-  const { manifest, nameSpace } = useDojoSetup()
-  return useDeployedSystem(nameSpace, systemName, manifest)
+  const { manifest, namespace } = useDojoSetup()
+  return useDeployedSystem(namespace, systemName, manifest)
 }
 
 
-const useSystem = (nameSpace: string, systemName: string, manifest: DojoManifest) => {
+const useSystem = (namespace: string, systemName: string, manifest: DojoManifest) => {
   const { contractAddress, abi } = useMemo(() => {
-    const contract = manifest ? getContractByName(manifest, nameSpace, systemName) : null
+    const contract = manifest ? getContractByName(manifest, namespace, systemName) : null
     return {
       contractAddress: (contract ? bigintToHex(contract.address) : null) as BigNumberish,
       abi: (contract?.abi ?? null) as Abi,
@@ -32,9 +32,9 @@ const useSystem = (nameSpace: string, systemName: string, manifest: DojoManifest
   }
 }
 
-export const useDeployedSystem = (nameSpace: string, systemName: string, manifest: DojoManifest) => {
+export const useDeployedSystem = (namespace: string, systemName: string, manifest: DojoManifest) => {
   // Find Dojo Contract
-  const { contractAddress, abi } = useSystem(nameSpace, systemName, manifest)
+  const { contractAddress, abi } = useSystem(namespace, systemName, manifest)
 
   // Check if contract exists
   const { isDeployed, cairoVersion } = useDeployedContract(contractAddress, abi)

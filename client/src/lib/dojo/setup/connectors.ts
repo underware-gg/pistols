@@ -4,7 +4,7 @@ import {
   // injected,
   // argent, braavos,
 } from '@starknet-react/core'
-import { useControllerConnector } from '@/lib/dojo/hooks/useController'
+// import { useControllerConnector } from '@/lib/dojo/hooks/useController'
 import { usePredeployedConnector, PREDEPLOYED_ID } from '@/lib/utils/hooks/usePredeployedConnector'
 import { DojoChainConfig } from '@/lib/dojo/setup/chains'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
@@ -29,8 +29,8 @@ export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: Do
   // const { controller } = useControllerConnector(
   //   manifest,
   //   chainConfig.rpcUrl,
-  //   dojoAppConfig.nameSpace,
-  //   dojoAppConfig.contractInterfaces,
+  //   dojoAppConfig.namespace,
+  //   dojoAppConfig.contractPolicyDescriptions,
   // )
 
   // Predeployed Controller

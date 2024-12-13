@@ -1,9 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Connector, useAccount } from '@starknet-react/core'
-import { Policy, ControllerOptions, Tokens } from '@cartridge/controller'
+import {
+  ControllerOptions,
+  SessionPolicies,
+  ContractPolicies,
+  ContractPolicy,
+  SignMessagePolicy,
+  Policy,
+  Tokens,
+  Method,
+} from '@cartridge/controller'
 import { ControllerConnector } from "@cartridge/connector";
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
-import { ContractInterfaces, DojoManifest } from '@/lib/dojo/Dojo'
+import { ContractPolicyDecriptions, DojoManifest } from '@/lib/dojo/Dojo'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useContractClassHash } from '@/lib/utils/hooks/useContractClassHash'
 import { BigNumberish } from 'starknet'
@@ -19,28 +28,31 @@ const exclusions = [
   'dojo_init',
 ]
 
-const _makeControllerPolicies = (manifest: DojoManifest, namespace: string, contractInterfaces: ContractInterfaces): Policy[] => {
+const _makeControllerPolicyArray = (
+  manifest: DojoManifest,
+  namespace: string,
+  descriptions: ContractPolicyDecriptions,
+): Policy[] => {
   const policies: Policy[] = []
-  // contracts
-  manifest?.contracts.forEach((contract) => {
-    const contractName = contract.tag.split(`${namespace}-`).at(-1)
-    const interfaces = contractInterfaces[contractName]
-    if (interfaces) {
-      // abis
-      contract.abi.forEach((abi) => {
-        // interfaces
+  manifest?.contracts.forEach((c) => {
+    const contractName = c.tag.split(`${namespace}-`).at(-1)
+    const contract = descriptions[contractName]
+    if (contract) {
+      // --- abis
+      c.abi.forEach((abi) => {
+        // --- interfaces
         const interfaceName = abi.name.split('::').slice(-1)[0]
         // console.log(`CI:`, contractName, interfaceName)
-        if (abi.type == 'interface' && interfaces.includes(interfaceName)) {
-          abi.items.forEach((item) => {
-            // functions
-            const method = item.name
-            if (item.type == 'function' && item.state_mutability == 'external' && !exclusions.includes(method)) {
+        if (abi.type == 'interface' && contract.interfaces.includes(interfaceName)) {
+          abi.items.forEach((i) => {
+            // --- functions
+            const method = i.name
+            if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(method)) {
               // console.log(`CI:`, item.name, item)
               policies.push({
-                target: contract.address,
+                target: c.address,
                 method,
-                description: `${contract.tag}::${item.name}()`,
+                // description: `${c.tag}::${i.name}()`,
               })
             }
           })
@@ -51,9 +63,62 @@ const _makeControllerPolicies = (manifest: DojoManifest, namespace: string, cont
   return policies
 }
 
+const _makeControllerContractPolicies = (
+  manifest: DojoManifest,
+  namespace: string,
+  descriptions: ContractPolicyDecriptions,
+): ContractPolicies => {
+  const contracts: ContractPolicies = {};
+  manifest?.contracts.forEach((c) => {
+    const contractName = c.tag.split(`${namespace}-`).at(-1)
+    const desc = descriptions[contractName]
+    if (desc) {
+      let methods: Method[] = []
+      // --- abis
+      c.abi.forEach((abi) => {
+        // --- interfaces
+        const interfaceName = abi.name.split('::').slice(-1)[0]
+        // console.log(`CI:`, contractName, interfaceName)
+        if (abi.type == 'interface' && desc.interfaces.includes(interfaceName)) {
+          // --- functions
+          abi.items.forEach((i) => {
+            const entrypoint = i.name
+            if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(entrypoint)) {
+              // console.log(`CI:`, item.name, item)
+              const method = {
+                // name: `${i.name}()`,
+                // description: `${c.tag}::${i.name}()`,
+                entrypoint,
+              }
+              methods.push(method)
+            }
+          })
+        }
+      })
+      if (methods.length > 0) {
+        contracts[c.address] = {
+          name: desc.name,
+          description: desc.description,
+          methods,
+        }
+      }
+    }
+  })
+  return contracts
+}
 
-export const makeControllerConnector = (manifest: DojoManifest, rpcUrl: string, namespace: string, contractInterfaces: ContractInterfaces): Connector => {
-  const policies = _makeControllerPolicies(manifest, namespace, contractInterfaces)
+
+export const makeControllerConnector = (
+  manifest: DojoManifest,
+  rpcUrl: string,
+  namespace: string,
+  descriptions: ContractPolicyDecriptions,
+): Connector => {
+  // const policies = _makeControllerPolicyArray(manifest, namespace, descriptions)
+  const policies: SessionPolicies = {
+    contracts: _makeControllerContractPolicies(manifest, namespace, descriptions),
+    messages: [],
+  }
 
   // tokens to display
   // const tokens: Tokens = {
@@ -65,7 +130,7 @@ export const makeControllerConnector = (manifest: DojoManifest, rpcUrl: string, 
   // }
 
   // extract slot service name from rpcUrl
-  // const slot = /api\.cartridge\.gg\/x\/([^/]+)\/katana/.exec(rpcUrl)?.[1];
+  const slot = /api\.cartridge\.gg\/x\/([^/]+)\/katana/.exec(rpcUrl)?.[1];
 
   const options: ControllerOptions = {
     // ProviderOptions
@@ -74,29 +139,29 @@ export const makeControllerConnector = (manifest: DojoManifest, rpcUrl: string, 
     theme: "pistols",
     colorMode: "dark",
     // KeychainOptions
+    namespace,
     policies,
-    // namespace,
-    // slot,
+    slot,
     // tokens,
   }
-  // console.log(`-------- ControllerOptions:`, options)
+  console.log(`-------- ControllerOptions:`, options)
   const connector = new ControllerConnector(options) as never as Connector
   assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
   return connector
 }
 
-export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, namespace: string, contractInterfaces: ContractInterfaces) => {
-  const connectorRef = useRef<any>(undefined)
-  const controller = useCallback(() => {
-    if (!connectorRef.current) {
-      connectorRef.current = makeControllerConnector(manifest, rpcUrl, namespace, contractInterfaces)
-    }
-    return connectorRef.current
-  }, [manifest, rpcUrl, namespace, contractInterfaces])
-  return {
-    controller,
-  }
-}
+// export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, namespace: string, descriptions: ContractPolicyDecriptions) => {
+//   const connectorRef = useRef<any>(undefined)
+//   const controller = useCallback(() => {
+//     if (!connectorRef.current) {
+//       connectorRef.current = makeControllerConnector(manifest, rpcUrl, namespace, descriptions)
+//     }
+//     return connectorRef.current
+//   }, [manifest, rpcUrl, namespace, descriptions])
+//   return {
+//     controller,
+//   }
+// }
 
 
 

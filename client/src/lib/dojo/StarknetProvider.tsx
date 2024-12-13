@@ -34,7 +34,7 @@ export const StarknetProvider = ({
 
   //
   // Current chain
-  const selectedChainId = useMemo(() => (dojoAppConfig.initialChainId), [dojoAppConfig])
+  const selectedChainId = useMemo(() => (dojoAppConfig.defaultChainId), [dojoAppConfig])
   const selectedChainConfig = useMemo(() => getDojoChainConfig(selectedChainId), [selectedChainId])
   useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainId])
 

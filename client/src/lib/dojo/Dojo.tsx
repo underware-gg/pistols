@@ -11,15 +11,19 @@ import { ChainId } from '@/lib/dojo/setup/chains'
 // export type DojoManifest = Manifest
 export type DojoManifest = Manifest & any
 
-export interface ContractInterfaces {
-  [contractName: string]: string[] 
+export type ContractPolicyDecriptions = {
+  [contract_name: string]: {
+    name?: string
+    description?: string
+    interfaces: string[]
+  }
 }
 
 export interface DojoAppConfig {
-  nameSpace: string
-  contractInterfaces: ContractInterfaces
+  namespace: string
+  contractPolicyDescriptions: ContractPolicyDecriptions
   supportedChainIds: ChainId[]
-  initialChainId: ChainId
+  defaultChainId: ChainId
   starknetDomain: StarknetDomain
   manifests: { [chain_id: string]: DojoManifest | undefined }
   controllerConnector: Connector
