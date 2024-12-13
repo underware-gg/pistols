@@ -46,22 +46,26 @@ pub struct PlayerActivity {
     pub identifier: felt252,
 }
 
-//---------------------
-// OFF-CHAIN events
+//--------------------------
+// OFF-CHAIN signed messages
+//
+// all models need...
+// #[key]
+// pub identity: ContractAddress,
 //
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct PlayerOnline {
+pub struct PPlayerOnline {
     #[key]
-    pub address: ContractAddress,
+    pub identity: ContractAddress,
     //-----------------------
     pub timestamp: u64,     // seconds since epoch
 }
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct PlayerBookmark {
+pub struct PPlayerBookmark {
     #[key]
-    pub address: ContractAddress,
+    pub identity: ContractAddress,
     #[key]
     pub target_address: ContractAddress,    // account or contract address
     #[key]
@@ -71,9 +75,9 @@ pub struct PlayerBookmark {
 }
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct PlayerTutorialProgress {
+pub struct PPlayerTutorialProgress {
     #[key]
-    pub address: ContractAddress,
+    pub identity: ContractAddress,
     //-----------------------
     pub progress: TutorialProgress,
 }

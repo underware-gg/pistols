@@ -22,9 +22,9 @@ const query_get: PistolsGetQuery = {
 const query_get_messages: PistolsGetQuery = {
   pistols: {
     // off-chain signed messages
-    PlayerOnline: { $: { where: { address: { $neq: '' } } } },
-    PlayerBookmark: { $: { where: { address: { $neq: '' } } } },
-    PlayerTutorialProgress: { $: { where: { address: { $neq: '' } } } },
+    PPlayerOnline: { $: { where: { identity: { $neq: '' } } } },
+    PPlayerBookmark: { $: { where: { identity: { $neq: '' } } } },
+    PPlayerTutorialProgress: { $: { where: { identity: { $neq: '' } } } },
   },
 }
 const query_sub: PistolsSubQuery = {
@@ -34,9 +34,9 @@ const query_sub: PistolsSubQuery = {
     TokenConfig: [],
     Duelist: [],
     Player: [],
-    PlayerOnline: [],
-    PlayerBookmark: [],
-    PlayerTutorialProgress: [],
+    PPlayerOnline: [],
+    PPlayerBookmark: [],
+    PPlayerTutorialProgress: [],
   },
 }
 
@@ -90,7 +90,7 @@ export function EntityStoreSync() {
       if (getEntityModel(entity, 'Player')) {
         playerState.updateEntity(entity)
       }
-      if (getEntityModels(entity, ['PlayerOnline', 'PlayerBookmark', 'PlayerTutorialProgress']).length > 0) {
+      if (getEntityModels(entity, ['PPlayerOnline', 'PPlayerBookmark', 'PPlayerTutorialProgress']).length > 0) {
         playerState.updateMessages([entity])
       }
     },
