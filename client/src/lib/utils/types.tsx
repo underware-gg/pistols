@@ -1,12 +1,17 @@
-import { BigNumberish } from 'starknet'
 import { getEntityIdFromKeys } from '@dojoengine/utils'
+import { BigNumberish } from 'starknet'
 
 //
-// Numbers
+// numbers
 //
 
 export const isNumber = (v: string) => (/^\d+$/.test(v))
 
+//
+// strings
+//
+
+export const capitalize = (v: string) => (v.charAt(0).toUpperCase() + v.slice(1))
 
 //
 // BigNumberish
@@ -46,8 +51,8 @@ export const shortAddress = (address: string | null, small: boolean = false) => 
 export const arrayUnique = <T,>(array: T[]): T[] => (array?.filter((value, index, array) => (array.indexOf(value) === index)) ?? [])
 export const arrayLast = <T,>(array: T[]): T => (array?.slice(-1)[0])
 export const arrayRemoveValue = <T,>(array: T[], v: T): T[] => (array?.filter(e => (e !== v)) ?? [] ?? [])
-export const arrayHasNullElements = <T,>(array: T[]): boolean => (array?.reduce((acc, e) => (acc || e == null), false) ?? false)
-export const arrayClean = <T,>(array: T[]): T[] => (array?.reduce((acc, e) => { if (e) acc.push(e); return acc }, []) ?? [])
+export const arrayHasNullElements = <T,>(array: T[]): boolean => (array?.findIndex(e => (e == null)) >= 0)
+export const arrayClean = <T,>(array: T[]): T[] => (array?.filter(e => (e != null)) ?? [])
 
 //
 // dictionaries
@@ -64,6 +69,6 @@ export const cleanObject = (obj: any): any => Object.keys(obj).reduce((acc, key)
 //
 // there is no default serializer for BigInt, make one
 (BigInt.prototype as any).toJSON = function () {
-  return (this <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(this) : this.toString())
+  return (this <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(this) : bigintToHex(this))
 }
 export const serialize = (obj: any, space: number | string = null): any => JSON.stringify(obj, null, space);

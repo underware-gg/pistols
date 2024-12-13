@@ -8,7 +8,7 @@
       "type": "chrome",
       "request": "launch",
       "name": "Launch Chrome against localhost",
-      "url": "https://localhost:3000/",
+      "url": "http://localhost:3000/",
       "webRoot": "${workspaceRoot}/client",
       "runtimeArgs": [
         "--profile-directory=Default"

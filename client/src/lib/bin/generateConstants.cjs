@@ -281,7 +281,7 @@ function buildFileContents(parsed) {
         // cutom types (structs)
         let custom_type_contents = get_custom_type_contents(type, parsed);
         if (custom_type_contents === null) {
-          console.error(`ERROR: Invalid type [${type}] from:`, line);
+          console.error(`❌ ERROR: Invalid type [${type}] from:`, line);
           process.exit(1);
         }
         fileContents += custom_type_contents;
@@ -336,6 +336,7 @@ if (process.argv.length !== 4) {
     "Usage: npm run create-constants <SRC_PATH> <OUTPUT_PATH>",
     "Usage: npm run create-constants --game=<GAME_SLUG> --profile=<PROFILE>"
   );
+  console.error(`❌ ABORTED`)
   process.exit(1);
 }
 
@@ -355,7 +356,7 @@ let parsed = cairoFiles.reduce((acc, filePath) => {
   Object.keys(mods).forEach((key) => {
     if (mods[key].lines.length > 0) {
       if (acc.mods[key]) {
-        console.error(`ERROR: Duplicated mod [${key}]`)
+        console.error(`❌ ERROR: Duplicated mod [${key}]`)
         process.exit(1);
       }
       acc.mods[key] = mods[key];
@@ -364,7 +365,7 @@ let parsed = cairoFiles.reduce((acc, filePath) => {
   Object.keys(enums).forEach((key) => {
     if (enums[key].lines.length > 0) {
       if (acc.enums[key]) {
-        console.error(`ERROR: Duplicated enum [${key}]`)
+        console.error(`❌ ERROR: Duplicated enum [${key}]`)
         process.exit(1);
       }
       acc.enums[key] = enums[key];
@@ -373,7 +374,7 @@ let parsed = cairoFiles.reduce((acc, filePath) => {
   Object.keys(structs).forEach((key) => {
     if (structs[key].lines.length > 0) {
       if (acc.structs[key]) {
-        console.error(`ERROR: Duplicated struct [${key}]`)
+        console.error(`❌ ERROR: Duplicated struct [${key}]`)
         process.exit(1);
       }
       acc.structs[key] = structs[key];

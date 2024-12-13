@@ -10,9 +10,6 @@ import { DuelPoster, DuelPosterHandle } from '@/pistols/components/DuelPoster'
 import { PosterGrid, PosterGridHandle } from '@/pistols/components/PosterGrid'
 import { InteractibleScene } from '@/pistols/three/InteractibleScene'
 import { _currentScene } from '@/pistols/three/game'
-import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
-import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
-import DuelistModal from '@/pistols/components/modals/DuelistModal'
 
 
 export default function ScGraveyard() {
@@ -226,9 +223,6 @@ export default function ScGraveyard() {
   return (
     <>
       {posterGrids}
-      <DuelistModal />
-      <ChallengeModal />
-      <NewChallengeModal />
     </>
   )
 }

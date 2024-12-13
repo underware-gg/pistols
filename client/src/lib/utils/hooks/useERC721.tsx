@@ -15,9 +15,9 @@ export const useERC721OwnerOf = (contractAddress: BigNumberish, tokenId: BigNumb
     blockIdentifier: BlockTag.LATEST,
     // blockIdentifier: BlockTag.PENDING,
   }), [contractAddress, tokenId])
-  const { data, isFetching: isPending } = useReadContract(options);
+  const { data, isFetching: isLoading } = useReadContract(options);
   return {
     owner: data ?? null,
-    isPending,
+    isLoading,
   }
 }

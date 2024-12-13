@@ -1,59 +1,20 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk'
-import { useSdkEntities, PistolsGetQuery, PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
-import { useEntityId } from '@/lib/utils/hooks/useEntityId'
-import { CONFIG } from '@/games/pistols/generated/constants'
+import { useEntityModel, getEntityModel } from '@/lib/dojo/hooks/useSdkEntities'
+import { PistolsSchemaType, models } from '@/lib/dojo/hooks/useSdkTypes'
 import { keysToEntity } from '@/lib/utils/types'
+import { CONFIG } from '@/games/pistols/generated/constants'
 
-const useStore = createDojoStore<PistolsSchemaType>();
+export const useConfigStore = createDojoStore<PistolsSchemaType>();
 
+const configKey = keysToEntity([CONFIG.CONFIG_KEY])
+
+//--------------------------------
+// 'consumer' hooks
 //
-// Sync all tables
-// Add only once to a top level component
-
-const query_get: PistolsGetQuery = {
-  pistols: {
-    Config: {
-      $: {
-        where: {
-          key: { $eq: CONFIG.CONFIG_KEY },
-        },
-      },
-    },
-  },
-}
-const query_sub: PistolsSubQuery = {
-  pistols: {
-    Config: {
-      $: {
-        where: {
-          key: { $is: CONFIG.CONFIG_KEY },
-        },
-      },
-    },
-  },
-}
-
-export function ConfigStoreSync() {
-  const state = useStore((state) => state)
-
-  useSdkEntities({
-    query_get,
-    query_sub,
-    setEntities: state.setEntities,
-    // updateEntity: state.updateEntity, // no need to sync!
-    enabled: (Object.keys(state.entities).length == 0),
-  })
-
-  // useEffect(() => console.log("ConfigStoreSync() =>", state.entities), [state.entities])
-
-  return (<></>)
-}
-
 export const useConfig = () => {
-  const entityId = useEntityId([CONFIG.CONFIG_KEY])
-  const entities = useStore((state) => state.entities);
-  const entity = useMemo(() => entities[entityId], [entities[entityId]])
+  const entities = useConfigStore((state) => state.entities);
+  const entity = useMemo(() => entities[configKey], [entities])
 
   const config = useEntityModel<models.Config>(entity, 'Config')
   // useEffect(() => console.log(`useConfig() =>`, config), [config])
@@ -68,15 +29,13 @@ export const useConfig = () => {
   }
 }
 
-
 //----------------------------------------
 // vanilla getter
 // (non-React)
 //
 export const getConfig = () => {
-  const entities = useStore.getState().entities;
-  const entity = entities[keysToEntity([CONFIG.CONFIG_KEY])]
-  const config = entity?.models.pistols.Config as models.Config
-  console.log(`getConfig() =>`, config)
+  const entities = useConfigStore.getState().entities
+  const config = getEntityModel<models.Config>(entities[configKey], 'Config')
+  // console.log(`getConfig() =>`, config)
   return config
 }

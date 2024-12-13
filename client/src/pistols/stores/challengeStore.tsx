@@ -1,64 +1,18 @@
-import { useMemo, useEffect } from 'react'
-import { addAddressPadding, BigNumberish } from 'starknet'
-// import { createDojoStore } from '@dojoengine/sdk'
+import { useMemo } from 'react'
+import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@/lib/dojo/fix/zustand'
-import { useSdkEntities, PistolsGetQuery,PistolsSubQuery, PistolsSchemaType, useEntityModel, models } from '@/lib/dojo/hooks/useSdkEntities'
-import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useEntityId } from '@/lib/utils/hooks/useEntityId'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { feltToString, stringToFelt } from '@/lib/utils/starknet'
+import { useEntityModel } from '@/lib/dojo/hooks/useSdkEntities'
+import { PistolsSchemaType, models } from '@/lib/dojo/hooks/useSdkTypes'
 import { BladesCard, ChallengeState, getBladesCardValue, Premise, RoundState } from '@/games/pistols/generated/constants'
 import { movesToHand } from '@/pistols/utils/pistols'
+import { feltToString } from '@/lib/utils/starknet'
 
-//
-// Stores all challenges from current table
-const useStore = createDojoStore<PistolsSchemaType>();
-
-//
-// Sync all challenges from current table
-// Add only once to a top level component
-export function ChallengeStoreSync() {
-  const { tableId } = useSettings()
-  const query_get = useMemo<PistolsGetQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            table_id: { $eq: addAddressPadding(stringToFelt(tableId)) },
-          },
-        },
-      },
-    },
-  }), [tableId])
-  const query_sub = useMemo<PistolsSubQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            table_id: { $is: addAddressPadding(stringToFelt(tableId)) },
-          },
-        },
-      },
-      Round: [],
-    },
-  }), [tableId])
-
-  const state = useStore((state) => state)
-  
-  useSdkEntities({
-    query_get,
-    query_sub,
-    setEntities: state.setEntities,
-    updateEntity: state.updateEntity,
-  })
-
-  // useEffect(() => console.log(`ChallengeStoreSync() [${Object.keys(state.entities).length}] =>`, state.entities), [state.entities])
-
-  return (<></>)
-}
+export const useChallengeStore = createDojoStore<PistolsSchemaType>();
 
 export const useAllChallengesEntityIds = () => {
-  const entities = useStore((state) => state.entities)
+  const entities = useChallengeStore((state) => state.entities)
   const entityIds = useMemo(() => Object.keys(entities), [entities])
   return {
     entityIds,
@@ -66,7 +20,7 @@ export const useAllChallengesEntityIds = () => {
 }
 
 export const useAllChallengesIds = () => {
-  const entities = useStore((state) => state.entities)
+  const entities = useChallengeStore((state) => state.entities)
   const duelIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.Challenge.duel_id)), [entities])
   // useEffect(() => console.log(`useAllChallengesIds() =>`, duelIds.length), [duelIds])
   return {
@@ -76,7 +30,7 @@ export const useAllChallengesIds = () => {
 
 export const useChallenge = (duelId: BigNumberish) => {
   const entityId = useEntityId([duelId])
-  const entities = useStore((state) => state.entities);
+  const entities = useChallengeStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const challenge = useEntityModel<models.Challenge>(entity, 'Challenge')
@@ -93,10 +47,10 @@ export const useChallenge = (duelId: BigNumberish) => {
   const timestamp_start = useMemo(() => Number(challenge?.timestamp_start ?? 0), [challenge])
   const timestamp_end = useMemo(() => Number(challenge?.timestamp_end ?? 0), [challenge])
 
-  const { clientTimestamp } = useClientTimestamp(false)
+  const { clientSeconds } = useClientTimestamp(false)
   let _state = useMemo(() => (challenge?.state as unknown as ChallengeState), [challenge])
   let state = useMemo(() => {
-    if (_state == ChallengeState.Awaiting && (timestamp_end < clientTimestamp)) {
+    if (_state == ChallengeState.Awaiting && (timestamp_end < clientSeconds)) {
       return ChallengeState.Expired
     }
     return _state
@@ -133,7 +87,7 @@ export const useChallenge = (duelId: BigNumberish) => {
 
 export const useRound = (duelId: BigNumberish) => {
   const entityId = useEntityId([duelId])
-  const entities = useStore((state) => state.entities);
+  const entities = useChallengeStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const round = useEntityModel<models.Round>(entity, 'Round')

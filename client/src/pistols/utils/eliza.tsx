@@ -51,19 +51,19 @@ export async function elizaMessage({
   }
 }
 
-export const useElizaMessage = (username: string, agentId?: string) => {
+export const useElizaMessage = (userId: string, userName: string, agentId?: string) => {
   const [responses, setResponses] = useState<string[]>([])
 
   const sendMessage = useCallback(async (input: string) => {
     setResponses(['...'])
     const result = await elizaMessage({
       input,
-      userId: username.toLowerCase(),
-      userName: `${username.toUpperCase().slice(0, 1)}${username.toLowerCase().slice(1)}`,
+      userId,
+      userName,
       agentId: agentId || ELIZA_AGENT_ID,
     })
     setResponses(result)
-  }, [username, agentId])
+  }, [userId, userName, agentId])
 
   return {
     sendMessage,

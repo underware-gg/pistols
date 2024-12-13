@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
-import { PistolsGetQuery, useSdkGet, getEntityMapModels } from '@/lib/dojo/hooks/useSdkGet'
+import { PistolsGetQuery, useSdkState, getEntityMapModels } from '@/lib/dojo/hooks/useSdkState'
 import { LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
 import { ChallengeState } from '@/games/pistols/generated/constants'
 import { stringToFelt } from '@/lib/utils/starknet'
@@ -24,7 +24,7 @@ const useGetChallengesByTableQuery = (tableId: string) => {
       },
     },
   }), [tableId])
-  const { entities } = useSdkGet({ query_get })
+  const { entities } = useSdkState({ query_get })
   const challenges = useMemo(() => getEntityMapModels<models.Challenge>(entities, 'Challenge'), [entities])
   useEffect(() => console.log(`useGetChallengesByTableQuery()`, challenges), [challenges])
   return { challenges }

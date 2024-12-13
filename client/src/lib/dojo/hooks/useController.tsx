@@ -7,11 +7,9 @@ import { ContractInterfaces, DojoManifest } from '@/lib/dojo/Dojo'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useContractClassHash } from '@/lib/utils/hooks/useContractClassHash'
 import { BigNumberish } from 'starknet'
-import { bigintEquals, bigintToHex } from '@/lib/utils/types'
+import { bigintEquals, capitalize } from '@/lib/utils/types'
 import { _useConnector } from '../fix/starknet_react_core'
 import { assert } from '@/lib/utils/math'
-import { useLordsContract } from './useLords'
-import { useFameContract } from '@/pistols/hooks/useFame'
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
@@ -87,7 +85,6 @@ export const makeControllerConnector = (manifest: DojoManifest, rpcUrl: string, 
   return connector
 }
 
-
 export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, namespace: string, contractInterfaces: ContractInterfaces) => {
   const connectorRef = useRef<any>(undefined)
   const controller = useCallback(() => {
@@ -103,62 +100,52 @@ export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, n
 
 
 
-
+//-----------------------------------
+// Interact with connected controller
+//
 export const useConnectedController = () => {
-  // const { connector } = useAccount()
+  // const { address, connector } = useAccount()
+  const { address } = useAccount()
   const { connector } = _useConnector()
   
+  // connector
+  const connectorId = useMemo(() => (connector?.id), [connector])
   const controllerConnector = useMemo(() => (
-    connector?.id == supportedConnetorIds.CONTROLLER ? connector as unknown as ControllerConnector : undefined
-  ), [connector])
-  return controllerConnector
-}
+    connectorId == supportedConnetorIds.CONTROLLER ? connector as unknown as ControllerConnector : undefined
+  ), [connectorId])
 
-
-export const useControllerUsername = () => {
-  const { address } = useAccount()
-  const controllerConnector = useConnectedController()
-  
-  // fetch username
+  // username
   const [username, setUsername] = useState<string>(undefined)
   useEffect(() => {
     setUsername(undefined)
     if (address) {
-      controllerConnector?.username().then((n) => setUsername(n))
+      controllerConnector?.username().then((n) => setUsername(n.toLowerCase())) ?? 'unknown'
     }
-  }, [address, controllerConnector])
+  }, [controllerConnector, address])
+  const name = useMemo(() => (username ? capitalize(username) : undefined), [username])
 
-  // fetch delegate account
-  // const [delegateAccount, setDelegateAccount] = useState<BigNumberish>(undefined)
-  // useEffect(() => {
-  //   setDelegateAccount(undefined)
-  //   if (address) {
-  //     controllerConnector?.delegateAccount().then((n) => setDelegateAccount(n as BigNumberish))
-  //   }
-  // }, [address, controllerConnector])
+  // callbacks
+  const openSettings = useCallback((address && controllerConnector) ? async () => {
+    await controllerConnector.controller.openSettings()
+  } : null, [controllerConnector, address])
+  const openProfile = useCallback((address && controllerConnector) ? async () => {
+    await controllerConnector.controller.openProfile()
+  } : null, [controllerConnector, address])
 
   return {
+    connectorId,
+    controllerConnector,
     username,
-    // delegateAccount,
+    name,
+    openSettings,
+    openProfile,
   }
 }
 
 
-export const useControllerMenu = () => {
-  const { account } = useAccount();
-  const controllerConnector = useConnectedController()
-  const openMenu = async () => {
-    if (account) {
-      await controllerConnector?.controller.openSettings()
-      // await controllerConnector?.controller.openProfile()
-    }
-  };
-  return {
-    openMenu,
-  }
-}
-
-
+//-----------------------------------
+// find deployed controller account
+//
 export const useControllerAccount = (contractAddress: BigNumberish) => {
   const { classHash, isDeployed } = useContractClassHash(contractAddress)
   const isControllerAccount = useMemo(() => (classHash && bigintEquals(classHash, CONTROLLER_CLASS_HASH)), [classHash])

@@ -12,6 +12,13 @@ pub use pistols::models::{
         CoinConfig, CoinConfigValue,
         TokenConfig, TokenConfigValue,
     },
+    player::{
+        Player, PlayerValue,
+    },
+    consumable::{
+        ConsumableBalance, ConsumableBalanceValue,
+        ConsumableType,
+    },
     challenge::{
         Challenge, ChallengeValue,
         ChallengeFameBalance, ChallengeFameBalanceValue,
@@ -51,6 +58,24 @@ impl StoreImpl of StoreTrait {
     //
     // Getters
     //
+
+    #[inline(always)]
+    fn get_player(ref self: Store, address: ContractAddress) -> Player {
+        (self.world.read_model(address))
+    }
+    #[inline(always)]
+    fn get_payer_value(ref self: Store, address: ContractAddress) -> PlayerValue {
+        (self.world.read_value(address))
+    }
+
+    #[inline(always)]
+    fn get_consumable_balance(ref self: Store, consumable_type: ConsumableType, address: ContractAddress) -> ConsumableBalance {
+        (self.world.read_model((consumable_type, address),))
+    }
+    #[inline(always)]
+    fn get_consumable_balance_value(ref self: Store, consumable_type: ConsumableType, address: ContractAddress) -> ConsumableBalanceValue {
+        (self.world.read_value((consumable_type, address),))
+    }
 
     #[inline(always)]
     fn get_challenge(ref self: Store, duel_id: u128) -> Challenge {
@@ -139,6 +164,16 @@ impl StoreImpl of StoreTrait {
     //
     // Setters
     //
+
+    #[inline(always)]
+    fn set_player(ref self: Store, model: @Player) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_consumable_balance(ref self: Store, model: @ConsumableBalance) {
+        self.world.write_model(model);
+    }
 
     #[inline(always)]
     fn set_challenge(ref self: Store, model: @Challenge) {

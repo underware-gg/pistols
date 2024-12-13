@@ -13,6 +13,7 @@ if [[
   exit 1
 fi
 
+# export OFFLINE="--offline"
 
 echo "BINDINGS_PATH: $BINDINGS_PATH"
 echo "CLIENT_GAME_PATH: $CLIENT_GAME_PATH"
@@ -25,12 +26,12 @@ echo "--------------------------------------------------------------------------
 sozo --version
 echo "------------------------------------------------------------------------------"
 echo ">>> Cleaning..."
-sozo -P $PROFILE clean
+sozo -P $PROFILE $OFFLINE clean
 echo ">>> Building..."
 if [[ "$PROFILE" == "dev" ]]; then
-  sozo -P $PROFILE build --typescript
+  sozo -P $PROFILE $OFFLINE build --typescript
 else
-  sozo -P $PROFILE build
+  sozo -P $PROFILE $OFFLINE build
 fi
 echo "👍"
 
@@ -39,15 +40,15 @@ echo "👍"
 #
 echo "------------------------------------------------------------------------------"
 echo ">>> Inspect migrations..."
-sozo -P $PROFILE inspect --world $WORLD_ADDRESS
+sozo -P $PROFILE $OFFLINE inspect --world $WORLD_ADDRESS
 
 echo ">>> Do migrations..."
-# sozo -P $PROFILE migrate -vvv --world $WORLD_ADDRESS
-sozo -P $PROFILE migrate --world $WORLD_ADDRESS
+# sozo -P $PROFILE $OFFLINE migrate -vvv --world $WORLD_ADDRESS
+sozo -P $PROFILE $OFFLINE migrate --world $WORLD_ADDRESS
 echo "👍"
 
 echo ">>> Inspect again..."
-sozo -P $PROFILE inspect --world $WORLD_ADDRESS
+sozo -P $PROFILE $OFFLINE inspect --world $WORLD_ADDRESS
 
 #-----------------
 # auth write
@@ -71,20 +72,14 @@ export FAME_TOKEN_ADDRESS=$(get_contract_address "pistols-fame_coin")
 export LORDS_TOKEN_ADDRESS=${LORDS_ADDRESS:-$(get_contract_address "pistols-lords_mock")}
 echo "------------------------------------------------------------------------------"
 echo ">>> Create torii config [$TORII_CONFIG_PATH]..."
-echo "# torii config for profile [$PROFILE]" > $TORII_CONFIG_PATH
-echo "world_address = \"$WORLD_ADDRESS\"" >> $TORII_CONFIG_PATH
-echo "rpc = \"$RPC_URL\"" >> $TORII_CONFIG_PATH
-echo "[events]" >> $TORII_CONFIG_PATH
-echo "raw = false" >> $TORII_CONFIG_PATH
-echo "[indexing]" >> $TORII_CONFIG_PATH
-echo "index_pending = true" >> $TORII_CONFIG_PATH
-echo "index_transactions = false" >> $TORII_CONFIG_PATH
-echo "contracts = [" >> $TORII_CONFIG_PATH
-echo "  \"erc721:$DUEL_TOKEN_ADDRESS\", # duel_token" >> $TORII_CONFIG_PATH
-echo "  \"erc721:$DUELIST_TOKEN_ADDRESS\", # duelist_token" >> $TORII_CONFIG_PATH
-echo "  \"erc20:$FAME_TOKEN_ADDRESS\", # fame_coin" >> $TORII_CONFIG_PATH
-echo "  \"erc20:$LORDS_TOKEN_ADDRESS\", # lords" >> $TORII_CONFIG_PATH
-echo "]" >> $TORII_CONFIG_PATH
+cp $TORII_CONFIG_TEMPLATE_PATH $TORII_CONFIG_PATH
+sed -i '' -e "s|\$profile|$PROFILE|g" $TORII_CONFIG_PATH
+sed -i '' -e "s|\$world_address|$WORLD_ADDRESS|g" $TORII_CONFIG_PATH
+sed -i '' -e "s|\$rpc_url|$RPC_URL|g" $TORII_CONFIG_PATH
+sed -i '' -e "s|\$duel_token|$DUEL_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
+sed -i '' -e "s|\$duelist_token|$DUELIST_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
+sed -i '' -e "s|\$fame_coin|$FAME_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
+sed -i '' -e "s|\$lords|$LORDS_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 cat $TORII_CONFIG_PATH
 echo "👍"
 

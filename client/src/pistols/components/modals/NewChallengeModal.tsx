@@ -168,7 +168,7 @@ function NewChallengeForm({
     setArgs(canSubmit ? {
       premise,
       quote,
-      expire_hours: ((days * 24 * 60 * 60) + hours),
+      expire_hours: ((days * 24) + hours),
       table_id: tableId,
     } : null)
   }, [premise, quote, days, hours])

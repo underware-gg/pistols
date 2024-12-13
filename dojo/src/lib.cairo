@@ -27,7 +27,6 @@ mod systems {
 }
 
 mod libs {
-    mod events;
     mod game_loop;
     mod pact;
     mod seeder;
@@ -37,8 +36,10 @@ mod libs {
 mod models {
     mod challenge;
     mod config;
+    mod consumable;
     mod duelist;
     mod payment;
+    mod player;
     mod table;
 }
 

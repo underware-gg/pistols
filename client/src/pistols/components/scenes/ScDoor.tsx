@@ -205,7 +205,9 @@ export function CurrentChainHint() {
   const { selectedChainId } = useSelectedChain()
   return (
     <>
-      <div className='Code Disabled AbsoluteBottomRight Padded'>
+      <div className='Code Disabled AbsoluteBottomRight Padded AlignRight'>
+        v{PACKAGE_VERSION}
+        <br />
         {selectedChainId}
       </div>
     </>

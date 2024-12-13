@@ -2,17 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import { useElizaMessage } from '@/pistols/utils/eliza'
-import { useControllerUsername } from '@/lib/dojo/hooks/useController'
+import { useConnectedController } from '@/lib/dojo/hooks/useController'
 import { TavernAudios } from '@/pistols/components/GameContainer'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
-import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
-import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
-import DuelistModal from '@/pistols/components/modals/DuelistModal'
-import TableModal from '@/pistols/components/modals/TableModal'
-import BarkeepModal from '../modals/BarkeepModal'
 import { _currentScene } from '@/pistols/three/game'
 import { InteractibleScene } from '@/pistols/three/InteractibleScene'
 import { sceneBackgrounds } from '@/pistols/data/assets'
+import BarkeepModal from '../modals/BarkeepModal'
+import TableModal from '@/pistols/components/modals/TableModal'
 
 export default function ScTavern() {
   const { tableOpener } = usePistolsContext()
@@ -22,8 +19,8 @@ export default function ScTavern() {
 
   const [open, setOpen] = useState(false)
 
-  const { username } = useControllerUsername()
-  const { sendMessage, responses } = useElizaMessage(username)
+  const { username, name } = useConnectedController()
+  const { sendMessage, responses } = useElizaMessage(username, name)
   useEffect(() => console.log(`BARKEEP RESPONSES:`, responses), [responses])
   
   useEffect(() => {
@@ -62,9 +59,6 @@ export default function ScTavern() {
     <div>
 
       {/* <TableModal opener={tableOpener} /> */}
-      <DuelistModal />
-      <ChallengeModal />
-      <NewChallengeModal />
       <TavernAudios />
       <BarkeepModal open={open} />
 

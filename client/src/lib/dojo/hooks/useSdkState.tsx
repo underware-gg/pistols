@@ -1,6 +1,12 @@
 import { useState } from 'react'
-import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
-import { PistolsEntity, PistolsGetQuery, PistolsSubQuery, useSdkEntities } from '@/lib/dojo/hooks/useSdkEntities'
+import { useSdkEntities, UseSdkEntitiesProps } from '@/lib/dojo/hooks/useSdkEntities'
+import {
+  PistolsSchemaType,
+  PistolsGetQuery,
+  PistolsSubQuery,
+  PistolsEntity,
+  PistolsModelType,
+} from '@/lib/dojo/hooks/useSdkTypes'
 
 export type {
   PistolsGetQuery,
@@ -11,48 +17,41 @@ export type EntityMap = {
   [entityId: string]: Partial<PistolsSchemaType['pistols']>,
 }
 
-export type UseSdkGetResult = {
+export type useSdkStateResult = {
   entities: EntityMap | null
   isLoading: boolean
   isSubscribed: boolean
   refetch: () => void
 }
 
-export const getEntityMapModels = <T,>(entities: EntityMap, modelName: string): T[] =>
-  (Object.values(entities ?? {}).map(e => (e[modelName] as T)) ?? [])
+export const getEntityMapModels = <M extends PistolsModelType>(entities: EntityMap, modelName: string): M[] =>
+  (Object.values(entities ?? {}).map(e => (e[modelName] as M)) ?? [])
 
 
 //---------------------------------------
 // Get entities from torii
-//
 // (ephemeral)
+//
 // stores results at the hook local state
 // as: EntityMap
 //
 
-export type UseSdkGetProps = {
-  query_get: PistolsGetQuery
-  query_sub?: PistolsSubQuery
-  enabled?: boolean
-  limit?: number
-  offset?: number
-  logging?: boolean
-}
-
-export const useSdkGet = <T,>({
+export const useSdkState = ({
   query_get,
   query_sub,
   enabled = true,
+  historical = undefined,
   limit = 100,
   offset = 0,
   logging = false,
-}: UseSdkGetProps): UseSdkGetResult => {
+}: Partial<UseSdkEntitiesProps>): useSdkStateResult => {
   const [entities, setEntities] = useState<EntityMap | null>()
 
   const { isLoading, isSubscribed, refetch } = useSdkEntities({
     query_get,
     query_sub,
     enabled,
+    historical,
     limit,
     offset,
     logging,

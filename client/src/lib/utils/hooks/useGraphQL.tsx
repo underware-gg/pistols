@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { ApolloClient, InMemoryCache, useQuery } from "@apollo/client";
 
 //---------------------------
@@ -39,11 +39,11 @@ export const useGraphQLQuery = (
   const client = useMemo(() => {
     return ql_client(toriiUrl);
   }, [toriiUrl]);
-  const { data, refetch } = useQuery(query, {
+  const { data, loading: isLoading, refetch } = useQuery(query, {
     client: client,
     variables: variables,
     skip: skip,
     pollInterval: (watch ? (pollInterval ?? 1000) : undefined),
   });
-  return { data, refetch };
+  return { data, isLoading, refetch };
 };

@@ -73,7 +73,6 @@ fn default_tables() -> Array<TableConfig> {
 //---------------------------
 // TableInitializer
 //
-use dojo::world::{WorldStorage};
 use pistols::libs::store::{Store, StoreTrait};
 
 #[derive(Copy, Drop)]

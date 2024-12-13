@@ -1,20 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ParsedEntity, SubscriptionQueryType, QueryType } from '@dojoengine/sdk'
-import { PistolsSchemaType } from '@/games/pistols/generated/typescript/models.gen'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
-import { isPositiveBigint } from '@/lib/utils/types'
-import * as models from '@/games/pistols/generated/typescript/models.gen'
-
-type PistolsGetQuery = QueryType<PistolsSchemaType>
-type PistolsSubQuery = SubscriptionQueryType<PistolsSchemaType>
-type PistolsEntity = ParsedEntity<PistolsSchemaType>
-export type {
-  PistolsSchemaType,
+import { arrayClean, isPositiveBigint } from '@/lib/utils/types'
+import {
   PistolsGetQuery,
   PistolsSubQuery,
   PistolsEntity,
-  models,
-}
+  PistolsModelType,
+} from '@/lib/dojo/hooks/useSdkTypes'
+
 
 //---------------------------------------
 // Get entities from torii
@@ -36,6 +29,8 @@ export type UseSdkEntitiesProps = {
   setEntities: (entities: PistolsEntity[]) => void // stores initial state
   updateEntity?: (entities: PistolsEntity) => void // store updates (if absent, do not subscribe)
   enabled?: boolean
+  // events options
+  historical?: boolean // if defined, will fetch for event messages
   // get options
   limit?: number
   offset?: number
@@ -43,19 +38,21 @@ export type UseSdkEntitiesProps = {
   logging?: boolean
 }
 
-export const useSdkEntities = <T,>({
+export const useSdkEntities = ({
   query_get,
   query_sub,
   setEntities,
   updateEntity,
   enabled = true,
+  historical = undefined,
   limit = 100,
   offset = 0,
   logging = false,
 }: UseSdkEntitiesProps): UseSdkEntitiesResult => {
   const { sdk } = useDojoSetup()
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [isLoading, setIsLoading] = useState<boolean>()
+  const [isSubscribed, setIsSubscribed] = useState<boolean>()
+  const isEvent = useMemo(() => (historical !== undefined), [historical])
 
   //----------------------
   // get initial entities
@@ -63,11 +60,11 @@ export const useSdkEntities = <T,>({
   useEffect(() => {
     const _get = async () => {
       setIsLoading(true)
-      await sdk.getEntities({
+      await (isEvent ? sdk.getEventMessages : sdk.getEntities)({
         query: query_get,
         callback: (response) => {
           if (response.error) {
-            console.error("useSdkEntities().getEntities() error:", response.error)
+            console.error("useSdkEntities().sdk.get() error:", response.error)
           } else if (response.data) {
             // console.log("useSdkEntities() GOT:", response.data);
             setEntities(response.data);
@@ -77,9 +74,11 @@ export const useSdkEntities = <T,>({
         limit,
         offset,
         options: { logging },
+        //@ts-ignore
+        historical,
       })
     }
-    if (sdk && enabled) {
+    if (sdk && query_get && enabled) {
       _get()
     }
   }, [sdk, query_get, enabled])
@@ -88,37 +87,37 @@ export const useSdkEntities = <T,>({
   // subscribe for updates
   //
   useEffect(() => {
-    let unsubscribe: (() => void) | undefined;
+    let _unsubscribe: (() => void) | undefined;
 
     const _subscribe = async () => {
       setIsSubscribed(undefined)
-      const subscription = await sdk.subscribeEntityQuery({
+      const subscription = await (isEvent ? sdk.subscribeEventQuery : sdk.subscribeEntityQuery)({
         query: query_sub,
         callback: (response) => {
           if (response.error) {
-            console.error("useSdkEntities().subscribeEntityQuery() error:", response.error)
+            console.error("useSdkEntities().sdk.subscribe() error:", response.error)
           } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {
             // console.log("useSdkEntities() SUB:", response.data[0]);
             updateEntity(response.data[0]);
           }
         },
         options: { logging },
+        //@ts-ignore
+        historical,
       })
       setIsSubscribed(true)
-      unsubscribe = () => subscription.cancel()
+      _unsubscribe = () => subscription.cancel()
     };
 
-    if (sdk && enabled && query_sub && updateEntity) {
+    if (sdk && query_sub && enabled && updateEntity && isLoading === false) {
       _subscribe()
     }
 
     return () => {
       setIsSubscribed(false)
-      if (unsubscribe) {
-        unsubscribe()
-      }
+      _unsubscribe?.()
     }
-  }, [sdk, query_sub, enabled, logging])
+  }, [sdk, query_sub, enabled, isLoading])
 
   const refetch = useCallback(() => {
     console.warn(`useSdkEntities().refetch() not implemented`)
@@ -131,11 +130,36 @@ export const useSdkEntities = <T,>({
   }
 }
 
+
 //---------------------------------------
-// Extract one model from a stored entity
+// utils
 //
-export const useEntityModel = <T,>(entity: PistolsEntity, modelName: string) => {
-  const model = useMemo(() => (entity?.models.pistols[modelName] as T), [entity, modelName])
+
+//
+// Extract models from a stored entity
+//
+export const getEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: string): M => (entity?.models.pistols[modelName] as M)
+export const getEntityModels = <M extends PistolsModelType>(entity: PistolsEntity, modelNames: string[]): M[] => (
+  arrayClean(modelNames.map(modelName => getEntityModel<M>(entity, modelName)))
+)
+
+export const useEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: string): M => {
+  const model = useMemo(() => getEntityModel<M>(entity, modelName), [entity, modelName])
   return model
 }
+export const useEntityModels = <M extends PistolsModelType>(entity: PistolsEntity, modelNames: string[]): M[] => {
+  const models = useMemo(() => getEntityModels<M>(entity, modelNames), [entity, modelNames])
+  return models
+}
 
+//
+// Filter entities by model
+//
+export const filterEntitiesByModel = (entities: PistolsEntity[], modelNames: string | string[]): PistolsEntity[] => {
+  if (Array.isArray(modelNames)) {
+    return entities.filter(e => {
+      return (getEntityModels(e, modelNames).length > 0)
+    })
+  }
+  return entities.filter(e => Boolean(getEntityModel(e, modelNames)))
+}

@@ -1,11 +1,9 @@
-import { useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import { create } from 'zustand'
-import { addAddressPadding } from 'starknet'
-import { useSdkEntities, PistolsGetQuery, PistolsEntity, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkEntities'
+import { immer } from 'zustand/middleware/immer'
+import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
-import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { ChallengeColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
-import { stringToFelt } from '@/lib/utils/starknet'
 import { ChallengeState, getChallengeStateValue } from '@/games/pistols/generated/constants'
 import { keysToEntity } from '@/lib/utils/types'
 
@@ -35,112 +33,48 @@ interface State {
 
 const createStore = () => {
   const _parseEntity = (e: PistolsEntity) => {
-    const start = Number(e.models.pistols.Challenge.timestamp_start)
-    const end = Number(e.models.pistols.Challenge.timestamp_end)
-    const state = e.models.pistols.Challenge.state as unknown as ChallengeState
+    const challenge = e.models.pistols.Challenge
+    if (!challenge) return undefined
+    const start = Number(challenge.timestamp_start)
+    const end = Number(challenge.timestamp_end)
+    const state = challenge.state as unknown as ChallengeState
     return {
-      duel_id: BigInt(e.models.pistols.Challenge.duel_id),
+      duel_id: BigInt(challenge.duel_id),
       timestamp: end ? end : start,
       state,
       state_value: getChallengeStateValue(state),
-      duelist_id_a: BigInt(e.models.pistols.Challenge.duelist_id_a),
-      duelist_id_b: BigInt(e.models.pistols.Challenge.duelist_id_b),
-      duelist_entity_id_a: keysToEntity([e.models.pistols.Challenge.duelist_id_a]),
-      duelist_entity_id_b: keysToEntity([e.models.pistols.Challenge.duelist_id_b]),
+      duelist_id_a: BigInt(challenge.duelist_id_a),
+      duelist_id_b: BigInt(challenge.duelist_id_b),
+      duelist_entity_id_a: keysToEntity([challenge.duelist_id_a]),
+      duelist_entity_id_b: keysToEntity([challenge.duelist_id_b]),
     }
   }
-  return create<State>()((set) => ({
+  return create<State>()(immer((set) => ({
     entities: {},
     setEntities: (entities: PistolsEntity[]) => {
       // console.warn("setEntities() =>", entities)
-      set((state: State) => ({
-        entities: entities.reduce((acc, e) => {
-          acc[e.entityId] = _parseEntity(e)
+      set((state: State) => {
+        state.entities = entities.reduce((acc, e) => {
+          const value = _parseEntity(e)
+          if (value) {
+            acc[e.entityId] = value
+          }
           return acc
         }, {} as StateEntities)
-      }))
+      })
     },
     updateEntity: (e: PistolsEntity) => {
       set((state: State) => {
-        state.entities[e.entityId] = _parseEntity(e)
-        return state
+        const value = _parseEntity(e)
+        if (value) {
+          state.entities[e.entityId] = value
+        }
       });
     },
-  }))
+  })))
 }
 
-const useStore = createStore();
-
-//-----------------------------------------
-// Sync all challenges from current table
-// Add only once to a top level component
-//
-export function ChallengeQueryStoreSync() {
-  const { tableId } = useSettings()
-
-  //
-  // THIS IS NOT WORKING... (in conjunction with table_id)
-  // but this is ok! better to filter on useQueryChallengeIds()
-  // 
-  // const query_get = useMemo<PistolsGetQuery>(() => ({
-  //   pistols: {
-  //     Challenge: {
-  //       $: {
-  //         where: {
-  //           And: [
-  //             { table_id: { $eq: addAddressPadding(stringToFelt(tableId)) } },
-  //             {
-  //               Or: [
-  //                 //@ts-ignore
-  //                 { state: { $eq: ChallengeState.Resolved } },
-  //                 //@ts-ignore
-  //                 { state: { $eq: ChallengeState.Draw } },
-  //               ],
-  //             },
-  //           ],
-  //         },
-  //       },
-  //     },
-  //   },
-  // }), [tableId])
-  
-  const query_get = useMemo<PistolsGetQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            table_id: { $eq: addAddressPadding(stringToFelt(tableId)) },
-          },
-        },
-      },
-    },
-  }), [tableId])
-  const query_sub = useMemo<PistolsSubQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            table_id: { $is: addAddressPadding(stringToFelt(tableId)) },
-          },
-        },
-      },
-    },
-  }), [tableId])
-
-
-  const state = useStore((state) => state)
-
-  useSdkEntities({
-    query_get,
-    query_sub,
-    setEntities: state.setEntities,
-    updateEntity: state.updateEntity,
-  })
-
-  // useEffect(() => console.log(`ChallengeQueryStoreSync() [${Object.keys(state.entities).length}] =>`, state.entities), [state.entities])
-
-  return (<></>)
-}
+export const useChallengeQueryStore = createStore();
 
 
 //--------------------------------
@@ -154,7 +88,7 @@ export const useQueryChallengeIds = (
   sortColumn: ChallengeColumn,
   sortDirection: SortDirection,
 ) => {
-  const entities = useStore((state) => state.entities);
+  const entities = useChallengeQueryStore((state) => state.entities);
   const duelistEntities = useDuelistQueryStore((state) => state.entities);
 
   const [challengeIds, states] = useMemo(() => {
@@ -176,7 +110,7 @@ export const useQueryChallengeIds = (
     // filter by name
     if (filterName) {
       result = result.filter((e) => (
-        duelistEntities[e.duelist_entity_id_a].name.includes(filterName) || 
+        duelistEntities[e.duelist_entity_id_a].name.includes(filterName) ||
         duelistEntities[e.duelist_entity_id_b].name.includes(filterName)
       ))
     }

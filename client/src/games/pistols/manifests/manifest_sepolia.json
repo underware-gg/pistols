@@ -1914,7 +1914,7 @@
     },
     {
       "address": "0x1a94113e8fbecb3d62503d27744b7efad4e1f10dbd8dfad16d9ec00f4fc927d",
-      "class_hash": "0x4722382c0b340c06426cc125f6f687d2cac32820dfbc4d8b2ce479422fa7af2",
+      "class_hash": "0x3a5f416e96ed04a40318864ffeb6b9375b5c5b25f4cd9cdb6f0039748f3cdbd",
       "abi": [
         {
           "type": "impl",
@@ -3053,7 +3053,7 @@
     },
     {
       "address": "0x749fdc23f997bacc1f56fc0f6e1d26264ad1b945a12c8345b74d0327595a685",
-      "class_hash": "0x5d4ef7cb00902dfe8e98efc2f07d2dc3f216f40b8753e97e9e48c8af80f98cf",
+      "class_hash": "0x256524909b946daac4e59ab3df36a6d11912a6558676579e94deccda104616a",
       "abi": [
         {
           "type": "impl",
@@ -4823,7 +4823,7 @@
     },
     {
       "address": "0x7f55fe0faa17eb5e785f9a2ba892749c0a0939767b1b8ce22f9c46dd07c399e",
-      "class_hash": "0x4bb11c13b8f98e26f7a7c99354cc00c4a73f93ed3c87ab6f5b5e69979e741ec",
+      "class_hash": "0x685776e21dce73b9670ec26b8e3b07ddeeff87f01089befcc052706b587e30a",
       "abi": [
         {
           "type": "impl",
@@ -6514,6 +6514,12 @@
     },
     {
       "members": [],
+      "class_hash": "0x722d000ead841c6cd6fed20e3d319ab474f56344c1a0641b01b5c3c80f8dc75",
+      "tag": "pistols-ConsumableBalance",
+      "selector": "0x2da96519627a5ed36db04c996e022736f45853881c66009029b201a964ea804"
+    },
+    {
+      "members": [],
       "class_hash": "0x13226522bfb302c0a23d9a747bf4df05d0a37a1ab7eaf404f32c22d3276e410",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
@@ -6529,6 +6535,30 @@
       "class_hash": "0x6a9342896b526de464841f687ff14937042961bf7e848a5fe55a909e3dba001",
       "tag": "pistols-Payment",
       "selector": "0x17a03e9cb461470b9149f9efbd95ad9b217fca9fdccd3827383904c33da96c1"
+    },
+    {
+      "members": [],
+      "class_hash": "0x450b042f741625af929cc1bc1d1828fffe3fc167edce1ee141703dc45f90e1f",
+      "tag": "pistols-Player",
+      "selector": "0x4fc7ed2304172cd24d40e2b967bf3642228eec13547b09e0ffdfb85469f6f86"
+    },
+    {
+      "members": [],
+      "class_hash": "0x1044fcad185fb6bf8884e740abb873f879f2720d6dd9cc7fde54a3308cfac05",
+      "tag": "pistols-PlayerBookmark",
+      "selector": "0x46db6150404dd9d739a2cd0c5e5036698ab3cfde3a5626ee798e1f1add13a63"
+    },
+    {
+      "members": [],
+      "class_hash": "0x5406f02eab81fd373148cf487f4cc53cfef00ec016b8a5521c6f3a2059aa78f",
+      "tag": "pistols-PlayerOnline",
+      "selector": "0x6f3391bc3684ea92009be25543fc6cc734c1f756253523354efdf10e2a57dff"
+    },
+    {
+      "members": [],
+      "class_hash": "0x71f6c734aa516e887cd47e914cf04e3887e9d30db80c7bd82b1e22bbaf8ebf",
+      "tag": "pistols-PlayerTutorialProgress",
+      "selector": "0x310c3b7d7f6200fd2ea3cbb9b7ee0782f4d838cdd6edee93b415d5b32337b0"
     },
     {
       "members": [],
@@ -6567,5 +6597,12 @@
       "selector": "0x56ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed"
     }
   ],
-  "events": []
+  "events": [
+    {
+      "members": [],
+      "class_hash": "0x38f65df8e3eb86af46f9533329c8ab4cd303180a97b5f7c86b7f4ad6140307a",
+      "tag": "pistols-PlayerActivity",
+      "selector": "0x20ac3bc7f231ea11afb0576a200bff82197a6b397f3e5a4299f5a79ab563ff1"
+    }
+  ]
 }

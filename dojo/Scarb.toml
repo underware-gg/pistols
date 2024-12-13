@@ -1,6 +1,6 @@
 [package]
 name = "pistols"
-version = "0.12.2"
+version = "0.12.3"
 cairo-version = "2.8.4"
 
 [cairo]
@@ -14,13 +14,13 @@ sierra = true
 build-external-contracts = ["dojo::world::world_contract::world"]
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.4" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.5" }
 graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
 openzeppelin_token = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
 # openzeppelin_token = { path = "../../cairo-contracts" }
 
 [dev-dependencies]
-dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.0.4" }
+dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.0.5" }
 openzeppelin_test_common = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
 # openzeppelin_test_common = { path = "../../cairo-contracts" }
 

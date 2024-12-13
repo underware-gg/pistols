@@ -9,9 +9,10 @@ use pistols::utils::openzeppelin::snip12::{SNIP12Metadata, StructHash, OffchainM
 // use openzeppelin_account::dual_account::{DualCaseAccount, DualCaseAccountABI};
 
 mod TYPED_DATA {
-    const NAME: felt252 = 'Underware';
-    const VERSION: felt252 = '0.1.0';
+    const NAME: felt252 = 'Underware_gg';
+    const VERSION: felt252 = '1.0.0';
 
+    // TODO: update this!
     // "Message"("duelId":"felt","duelistId":"felt") 
     const COMMIT_MOVE_MESSAGE_TYPE_HASH: felt252 = 0x74fe0c723488214ab442c24761e9b32d30216def5e93d1c110375d993482ae;
 }

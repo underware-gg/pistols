@@ -129,6 +129,7 @@ pub mod duelist_token {
         IFameCoinDispatcher, IFameCoinDispatcherTrait,
     };
     use pistols::models::{
+        player::{Player, PlayerTrait, Activity},
         duelist::{
             Duelist, DuelistValue,
             Score, ScoreTrait,
@@ -146,7 +147,6 @@ pub mod duelist_token {
         table::{TABLES},
     };
     use pistols::types::constants::{CONST, FAME};
-    use pistols::libs::events::{emitters};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::ShortStringTrait;
@@ -249,7 +249,8 @@ pub mod duelist_token {
             let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
             fame_dispatcher.minted_duelist(duelist.duelist_id, payment.amount);
 
-            emitters::emitDuelistRegisteredEvent(@world, recipient, duelist.clone(), true);
+            // events
+            PlayerTrait::check_in(ref store, get_caller_address(), Activity::CreatedDuelist, token_id.into());
 
             (duelist)
         }
@@ -275,8 +276,6 @@ pub mod duelist_token {
             duelist.profile_pic_uri = profile_pic_uri.as_string();
             // save
             store.set_duelist(@duelist);
-
-            emitters::emitDuelistRegisteredEvent(@world, get_caller_address(), duelist.clone(), false);
 
             (duelist)
         }

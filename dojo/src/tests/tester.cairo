@@ -29,6 +29,13 @@ mod tester {
         },
     };
     use pistols::models::{
+        player::{
+            m_Player, Player,
+            e_PlayerActivity, PlayerActivity,
+        },
+        consumable::{
+            m_ConsumableBalance, ConsumableBalance,
+        },
         challenge::{
             m_Challenge, Challenge, ChallengeValue,
             m_ChallengeFameBalance, ChallengeFameBalance, ChallengeFameBalanceValue,
@@ -167,6 +174,8 @@ mod tester {
 // '---- 0'.print();
         let mut resources: Array<TestResource> = array![
             // pistols models
+            TestResource::Model(m_Player::TEST_CLASS_HASH),
+            TestResource::Model(m_ConsumableBalance::TEST_CLASS_HASH),
             TestResource::Model(m_Challenge::TEST_CLASS_HASH),
             TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
@@ -181,7 +190,7 @@ mod tester {
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
             // events
-            // TestResource::Event(actions::e_Moved::TEST_CLASS_HASH),
+            TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
         ];
         if (deploy_mock_rng) {
             resources.append(TestResource::Model(m_SaltValue::TEST_CLASS_HASH));
@@ -530,6 +539,10 @@ mod tester {
     #[inline(always)]
     fn get_TableAdmittance(world: WorldStorage, table_id: felt252) -> TableAdmittance {
         (world.read_model(table_id))
+    }
+    #[inline(always)]
+    fn get_Player(world: WorldStorage, address: ContractAddress) -> Player {
+        (world.read_model(address))
     }
     #[inline(always)]
     fn get_DuelistValue(world: WorldStorage, address: ContractAddress) -> DuelistValue {

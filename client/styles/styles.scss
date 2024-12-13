@@ -232,6 +232,8 @@ canvas {
 .Inactive  { color: $color-inactive!important; }
 .Disabled  { color: $color-inactive!important; }
 
+.ImportantHover:hover { color: $color-important!important; }
+
 .BgBlack     { background-color: #444; }
 .BgImportant { background-color: $color-medium-bg!important; }
 .BgBrightest { background-color: $color-brightest!important; }
@@ -286,6 +288,14 @@ canvas {
   pointer-events: all!important;
   user-select: none;
   z-index: 1000;
+}
+.AnchorLink {
+  @extend .Anchor;
+  color: $color-important;
+}
+.AnchorLink:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
 }
 
 .NoSelection {
@@ -1242,6 +1252,44 @@ $ui-container-gap: 1em;
   left: 0;
   right: 0;
   margin: auto;
+}
+
+.ActivityPanel {
+  @extend .NoMouse;
+  background-color: rgba($color-darkest, 0.5);
+  height: 50%;
+  width: 20%;
+  position: absolute;
+  top: 16%;
+  right: 10px;
+  border-radius: 10px;
+  border: $border-button-inactive;
+  padding: 5px 10px;
+  z-index: 10;
+}
+.ActivityPanelCollapsed {
+  @extend .ActivityPanel;
+  height: 5%;
+}
+.ActivityPanelIcon {
+  @extend .YesMouse;
+  position: absolute;
+  top: 10px;
+  right: 5px;
+}
+.ActivityFeed {
+  // background-color: rgba(#f00, 0.2);
+  height: calc(90% - 5px);
+  width: calc(100% - 20px);
+  position: absolute;
+  bottom: 5px;
+  left: 10px;
+  padding: 0;
+  margin: 0;
+}
+
+.DuelistItem:hover {
+  background-color: $color-dark!important;
 }
 
 //

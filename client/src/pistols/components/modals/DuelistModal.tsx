@@ -6,6 +6,7 @@ import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
 import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
 import { useDuelist } from '@/pistols/stores/duelistStore'
 import { usePact } from '@/pistols/hooks/usePact'
+import { usePlayer } from '@/pistols/stores/playerStore'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTableSelectedDuelist } from '@/pistols/components/ChallengeTable'
@@ -16,16 +17,13 @@ import { IconClick } from '@/lib/ui/Icons'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function DuelistModal({
-  duelButton = false,
-}: {
-  duelButton?: boolean
-}) {
+export default function DuelistModal() {
   const { tableId, duelistId, isAnon, dispatchDuelistId } = useSettings()
-  const { dispatchSetScene } = usePistolsScene()
+  const { atProfile, dispatchSetScene } = usePistolsScene()
 
-  const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
+  const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingDuelistId, dispatchSelectPlayerAddress } = usePistolsContext()
   const { owner } = useOwnerOfDuelist(selectedDuelistId)
+  const { name: ownerName } = usePlayer(owner)
   const isOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
   const { isYou } = useIsYou(selectedDuelistId)
   const isMyDuelist = useIsMyDuelist(selectedDuelistId)
@@ -41,6 +39,10 @@ export default function DuelistModal({
     } else if (isMyDuelist) {
       dispatchDuelistId(selectedDuelistId)
     }
+  }
+
+  const _gotoOwner = () => {
+    dispatchSelectPlayerAddress(owner)
   }
 
   const _duel = () => {
@@ -62,23 +64,17 @@ export default function DuelistModal({
             <Col textAlign='left'>
               {duelistIdDisplay}
             </Col>
-            <Col textAlign='center'>
-              {/* {(isYou || isMyDuelist) &&
-                <div className='Anchor' onClick={() => _switch()} >
-                  <span className='Smaller'>{isYou ? 'Exit to Gate' : 'Switch Duelist'}</span>
-                  &nbsp;
-                  <Icon name={isYou ? 'sign out' : 'sync alternate'} size={'small'} />
-                </div>
-              } */}
-              <span className='Smaller Important'>
-                {isYou ? <>Current</>
-                  : isMyDuelist ? <>Yours <IconClick important name='sync alternate' size='small' onClick={() => _switch()} /></>
-                    : <></>
-                }
-              </span>
-            </Col>
+            {(isYou || isMyDuelist) &&
+              <Col textAlign='center'>
+                <span className='Smaller Important'>
+                  {isYou ? <>Current</>
+                    : <>Yours <IconClick important name='sync alternate' size='small' onClick={() => _switch()} /></>
+                  }
+                </span>
+              </Col>
+            }
             <Col textAlign='right'>
-              <AddressShort address={owner} />
+              <div className='Anchor Important' onClick={() => _gotoOwner()}>{ownerName}</div>
             </Col>
           </Row>
         </Grid>
@@ -107,7 +103,7 @@ export default function DuelistModal({
                 {!hasPact && <ActionButton large fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(selectedDuelistId)} />}
               </Col>
             }
-            {duelButton &&
+            {atProfile &&
               <Col>
                 <ActionButton large fill important label='Duel!' onClick={() => _duel()} />
               </Col>

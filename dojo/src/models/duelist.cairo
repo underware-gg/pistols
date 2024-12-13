@@ -1,6 +1,4 @@
 use starknet::ContractAddress;
-use pistols::types::constants::{CONST, HONOUR};
-
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Archetype {
@@ -38,7 +36,7 @@ pub struct Duelist {
     pub name: felt252,
     pub profile_pic_type: ProfilePicType,
     pub profile_pic_uri: ByteArray,     // can be anything
-    pub timestamp: u64,                 // date registered
+    pub timestamp: u64,                 // date registered (seconds since epoch)
     pub score: Score,
 }
 
@@ -82,6 +80,7 @@ pub struct Score {
 //----------------------------------
 // Traits
 //
+use pistols::types::constants::{CONST, HONOUR};
 use pistols::utils::bitwise::{BitwiseU64};
 use pistols::utils::math::{MathU64};
 

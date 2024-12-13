@@ -30,7 +30,7 @@ pub trait ITokenRenderer<TState> {
     fn get_metadata_pairs(self: @TState, token_id: u256) -> Span<ByteArray>;
 }
 
-mod Errors {
+mod MetadataErrors {
     const INVALID_ATTRIBUTES: felt252 = 'METADATA: invalid attributes';
     const INVALID_METADATA: felt252   = 'METADATA: invalid metadata';
 }
@@ -69,8 +69,8 @@ impl TokenConfigRenderImpl of TokenConfigRenderTrait {
 
         let attributes: Span<ByteArray> = renderer.get_attribute_pairs(token_id);
         let metadata: Span<ByteArray> = renderer.get_metadata_pairs(token_id);
-        assert(attributes.len() % 2 == 0, Errors::INVALID_ATTRIBUTES);
-        assert(metadata.len() % 2 == 0, Errors::INVALID_METADATA);
+        assert(attributes.len() % 2 == 0, MetadataErrors::INVALID_ATTRIBUTES);
+        assert(metadata.len() % 2 == 0, MetadataErrors::INVALID_METADATA);
 
         let json = JsonImpl::new()
             .add("id", format!("{}", token_id))

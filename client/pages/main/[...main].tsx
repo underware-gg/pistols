@@ -5,21 +5,26 @@ import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
-import AppPistols from '@/pistols/components/AppPistols'
-import GameContainer from '@/pistols/components/GameContainer'
-import Background from '@/pistols/components/Background'
-import ScProfile from '@/pistols/components/scenes/ScProfile'
-import ScTavern from '@/pistols/components/scenes/ScTavern'
-import Gate from '@/pistols/components/scenes/ScGate'
-import Door from '@/pistols/components/scenes/ScDoor'
-import Duel from '@/pistols/components/scenes/Duel'
 import { MouseToolTip } from '@/pistols/components/ui/MouseToolTip'
 import { Header } from '@/pistols/components/Header'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '@/pistols/three/game'
+import AppPistols from '@/pistols/components/AppPistols'
+import GameContainer from '@/pistols/components/GameContainer'
+import Background from '@/pistols/components/Background'
+import PlayerModal from '@/pistols/components/modals/PlayerModal'
+import DuelistModal from '@/pistols/components/modals/DuelistModal'
+import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
+import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
+import ScProfile from '@/pistols/components/scenes/ScProfile'
+import ScTavern from '@/pistols/components/scenes/ScTavern'
 import ScDuels from '@/pistols/components/scenes/ScDuels'
 import ScDuelists from '@/pistols/components/scenes/ScDuelists'
 import ScGraveyard from '@/pistols/components/scenes/ScGraveyard'
-import StoreSync from '@/pistols/stores/StoreSync'
+import StoreSync from '@/pistols/stores/sync/StoreSync'
+import Gate from '@/pistols/components/scenes/ScGate'
+import Door from '@/pistols/components/scenes/ScDoor'
+import Duel from '@/pistols/components/scenes/Duel'
+import ActivityPanel from '@/pistols/components/ActivityPanel'
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {
@@ -46,19 +51,19 @@ export default function MainPage() {
             <StoreSync />
             <GameContainer isVisible={true} />
             <MainUI />
+            <Modals />
             {overlay}
+            <ActivityPanel />
             <Header />
           </>
         }
         <MouseToolTip />
-        {/* ADD NOTRIFICATIONS - how to make them into a hook? */}
       </Background>
     </AppPistols>
   )
 }
 
-function MainUI({
-}) {
+function MainUI() {
   useRouterStarter()
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
@@ -88,4 +93,21 @@ function MainUI({
   if (!isInitialized) return <DojoStatus message={'Loading Pistols...'} />
 
   return currentScene || <DojoStatus message={'Loading Pistols...'} />;
+}
+
+
+function Modals() {
+  const { selectedDuelId, selectedDuelistId, selectedPlayerAddress, challengingId } = usePistolsContext()
+  const challengeIsOpen = useMemo(() => (selectedDuelId > 0), [selectedDuelId])
+  const duelistIsOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
+  const playerIsOpen = useMemo(() => (selectedPlayerAddress > 0n), [selectedPlayerAddress])
+  const newChallengeIsOpen = useMemo(() => (challengingId > 0n), [challengingId])
+  return (
+    <>
+      {challengeIsOpen && <ChallengeModal />}
+      {duelistIsOpen && <DuelistModal />}
+      {playerIsOpen && <PlayerModal />}
+      {newChallengeIsOpen && <NewChallengeModal />}
+    </>
+  )
 }

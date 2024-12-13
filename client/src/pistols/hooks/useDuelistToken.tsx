@@ -5,46 +5,44 @@ import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useTokenConfig } from '@/pistols/stores/tokenConfigStore'
 import { useERC721OwnerOf } from '@/lib/utils/hooks/useERC721'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
-import { useTokenIdsByOwner } from '@/pistols/stores/duelistTokenStore'
+import { useTokenIdsByOwner, useTokenIdsOfPlayer } from '@/pistols/stores/duelistTokenStore'
 import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
 import { poseidon } from '@/lib/utils/starknet'
 
 
 export const useDuelistTokenCount = () => {
   const { duelistContractAddress } = useDuelistTokenContract()
-  const { mintedCount, isPending } = useTokenConfig(duelistContractAddress)
+  const { mintedCount, isLoading } = useTokenConfig(duelistContractAddress)
   return {
     tokenCount: mintedCount ?? 0,
-    isPending,
+    isLoading,
   }
 }
 
 export const useOwnerOfDuelist = (token_id: BigNumberish) => {
   const { duelistContractAddress } = useDuelistTokenContract()
-  const { owner, isPending } = useERC721OwnerOf(duelistContractAddress, token_id)
+  const { owner, isLoading } = useERC721OwnerOf(duelistContractAddress, token_id)
   return {
     owner,
-    isPending,
+    isLoading,
   }
 }
 
 export const useDuelistsOfPlayer = () => {
-  const { address } = useAccount()
   const { duelistContractAddress } = useDuelistTokenContract()
-  const { tokenIds } = useTokenIdsByOwner(duelistContractAddress, address)
+  const { tokenIds } = useTokenIdsOfPlayer(duelistContractAddress)
   return {
     duelistIds: tokenIds,
-    isPending: false,
+    isLoading: false,
   }
 }
 
 export const useDuelistsOfOwner = (owner: BigNumberish) => {
   const { duelistContractAddress } = useDuelistTokenContract()
-  const { tokenIds } = useTokenIdsByOwner(duelistContractAddress, owner)
-  throw new Error("Not implemented -- need to fetch (once) on the store...")
+  const { tokenIds, isLoading } = useTokenIdsByOwner(duelistContractAddress, owner)
   return {
     duelistIds: tokenIds,
-    isPending: false,
+    isLoading,
   }
 }
 

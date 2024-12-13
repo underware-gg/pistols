@@ -47,10 +47,13 @@ export default function DuelistEditModal({
       duelistCountBeforeMint != null &&
       duelistCountBeforeMint != duelistIds.length
     ) {
-      console.log(`NEW DUELIST BALANCE:`, duelistIds.length)
-      dispatchDuelistId(duelistIds.length)
-      dispatchSetScene(SceneName.Tavern)
-      if (hasFaucet) mintLords(account)
+      // select duelist
+      dispatchDuelistId(duelistIds.at(-1))
+      // first duelist... go from Gate to Tavern
+      if (duelistIds.length == 1) {
+        dispatchSetScene(SceneName.Tavern)
+        if (hasFaucet) mintLords(account)
+      }
       opener.close()
     }
   }, [mintNew, duelistIds.length])

@@ -9,9 +9,6 @@ import useGameAspect from '@/pistols/hooks/useGameApect'
 import { PosterGrid, PosterGridHandle } from '@/pistols/components/PosterGrid'
 import { DuelPoster, DuelPosterHandle } from '@/pistols/components/DuelPoster'
 import { _currentScene } from '@/pistols/three/game'
-import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
-import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
-import DuelistModal from '@/pistols/components/modals/DuelistModal'
 
 export default function ScDuels() {
   const { duelistId } = useSettings()
@@ -260,9 +257,6 @@ export default function ScDuels() {
         mixBlendMode: 'hard-light',
         pointerEvents: 'none'
       }} />
-      <DuelistModal />
-      <ChallengeModal />
-      <NewChallengeModal />
     </>
   )
 }

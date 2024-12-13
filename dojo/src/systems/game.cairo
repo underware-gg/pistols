@@ -48,6 +48,7 @@ pub mod game {
         IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
     };
     use pistols::models::{
+        player::{Player, PlayerTrait, Activity},
         challenge::{
             Challenge, ChallengeTrait, ChallengeValue,
             ChallengeFameBalance,
@@ -72,7 +73,6 @@ pub mod game {
     use pistols::utils::misc::{ZERO};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::game_loop::{game_loop, make_moves_hash};
-    use pistols::libs::events::{emitters};
     use pistols::libs::pact;
 
     mod Errors {
@@ -156,6 +156,9 @@ pub mod game {
                 round.state = RoundState::Reveal;
             }
 
+            // events
+            PlayerTrait::check_in(ref store, starknet::get_caller_address(), Activity::CommittedMoves, duel_id.into());
+
             store.set_round(@round);
         }
 
@@ -205,6 +208,9 @@ pub mod game {
                 assert(false, Errors::IMPOSSIBLE_ERROR);
             }
 
+            // events
+            PlayerTrait::check_in(ref store, starknet::get_caller_address(), Activity::RevealedMoves, duel_id.into());
+
             //
             // missing reveal, update only and wait for final reveal
             if (round.moves_a.salt == 0 || round.moves_b.salt == 0) {
@@ -240,8 +246,6 @@ pub mod game {
 
             // undo pact
             pact::unset_pact(ref store, challenge);
-
-            emitters::emitPostRevealEvents(@world, challenge);
         }
 
 

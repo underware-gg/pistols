@@ -2,14 +2,15 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
 import { useDojoStatus } from '@/lib/dojo/DojoContext'
-import { ChallengeStoreSync, useChallenge } from '@/pistols/stores/challengeStore'
+import { useChallenge } from '@/pistols/stores/challengeStore'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useTable } from '@/pistols/stores/tableStore'
 import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
+import { ChallengeStoreSync } from '@/pistols/stores/sync/ChallengeStoreSync'
 import { ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
-import { formatTimestamp } from '@/lib/utils/timestamp'
+import { formatTimestampLocal } from '@/lib/utils/timestamp'
 import { bigintToHex } from '@/lib/utils/types'
 import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
@@ -154,13 +155,13 @@ function DuelStats({
         <Row>
           <Cell>Timestamp Start</Cell>
           <Cell>
-            {formatTimestamp(challenge.timestamp_end)}
+            {formatTimestampLocal(challenge.timestamp_end)}
           </Cell>
         </Row>
         <Row>
           <Cell>Timestamp End</Cell>
           <Cell>
-            {formatTimestamp(challenge.timestamp_end)}
+            {formatTimestampLocal(challenge.timestamp_end)}
           </Cell>
         </Row>
         <Row>

@@ -34,7 +34,7 @@ union ERC__Token = ERC20__Token | ERC721__Token
 type ERC20__Token {
   name: String!
   symbol: String!
-  decimals: String!
+  decimals: Int!
   contractAddress: String!
   amount: String!
 }
@@ -45,9 +45,9 @@ type ERC721__Token {
   tokenId: String!
   contractAddress: String!
   metadata: String!
-  metadataName: String!
-  metadataDescription: String!
-  metadataAttributes: String!
+  metadataName: String
+  metadataDescription: String
+  metadataAttributes: String
   imagePath: String!
 }
 
@@ -445,18 +445,9 @@ type pistols_Duelist {
   profile_pic_type: Enum
   profile_pic_uri: ByteArray
   timestamp: u64
-  score: pistols_Duelist_Score
+  score: pistols_Score
   entity: World__Entity
   eventMessage: World__EventMessage
-}
-
-type pistols_Duelist_Score {
-  honour: u8
-  total_duels: u16
-  total_wins: u16
-  total_losses: u16
-  total_draws: u16
-  honour_history: u64
 }
 
 type pistols_DuelistConnection {
@@ -482,6 +473,14 @@ enum pistols_DuelistOrderField {
   PROFILE_PIC_URI
   TIMESTAMP
   SCORE
+}
+
+type pistols_DuelistState {
+  chances: u8
+  damage: u8
+  health: u8
+  dice_fire: u8
+  honour: u8
 }
 
 input pistols_DuelistWhereInput {
@@ -530,6 +529,16 @@ input pistols_DuelistWhereInput {
   timestampIN: [u64]
   timestampNOTLIKE: u64
   timestampLIKE: u64
+}
+
+type pistols_Moves {
+  seed: felt252
+  salt: felt252
+  hashed: u128
+  card_1: u8
+  card_2: u8
+  card_3: u8
+  card_4: u8
 }
 
 type pistols_Pact {
@@ -718,32 +727,14 @@ input pistols_PaymentWhereInput {
 
 type pistols_Round {
   duel_id: u128
-  moves_a: pistols_Round_Moves
-  moves_b: pistols_Round_Moves
-  state_a: pistols_Round_DuelistState
-  state_b: pistols_Round_DuelistState
+  moves_a: pistols_Moves
+  moves_b: pistols_Moves
+  state_a: pistols_DuelistState
+  state_b: pistols_DuelistState
   state: Enum
   final_blow: felt252
   entity: World__Entity
   eventMessage: World__EventMessage
-}
-
-type pistols_Round_DuelistState {
-  chances: u8
-  damage: u8
-  health: u8
-  dice_fire: u8
-  honour: u8
-}
-
-type pistols_Round_Moves {
-  seed: felt252
-  salt: felt252
-  hashed: u128
-  card_1: u8
-  card_2: u8
-  card_3: u8
-  card_4: u8
 }
 
 type pistols_RoundConnection {
@@ -798,21 +789,21 @@ input pistols_RoundWhereInput {
   final_blowLIKE: felt252
 }
 
-type pistols_Scoreboard {
-  table_id: felt252
-  duelist_id: u128
-  score: pistols_Scoreboard_Score
-  entity: World__Entity
-  eventMessage: World__EventMessage
-}
-
-type pistols_Scoreboard_Score {
+type pistols_Score {
   honour: u8
   total_duels: u16
   total_wins: u16
   total_losses: u16
   total_draws: u16
   honour_history: u64
+}
+
+type pistols_Scoreboard {
+  table_id: felt252
+  duelist_id: u128
+  score: pistols_Score
+  entity: World__Entity
+  eventMessage: World__EventMessage
 }
 
 type pistols_ScoreboardConnection {
@@ -1310,8 +1301,8 @@ enum World__ModelOrderField {
 }
 
 type World__PageInfo {
-  hasPreviousPage: Boolean
-  hasNextPage: Boolean
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
   startCursor: Cursor
   endCursor: Cursor
 }
