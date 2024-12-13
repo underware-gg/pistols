@@ -6529,6 +6529,24 @@
     },
     {
       "members": [],
+      "class_hash": "0x7c401f04350f71d4c6d354d067b23afa77dc8025bd8a397d156e01b715cbaf3",
+      "tag": "pistols-PPlayerBookmark",
+      "selector": "0x17b7cbb033e9c2404cdcb0c2873f672076750a56d7645458c4884d6ce2f8fa6"
+    },
+    {
+      "members": [],
+      "class_hash": "0x3f6ba094f51a72e7f8ecd6c977b41b8656a1fb3bef97b4ca3ceb41277dfe294",
+      "tag": "pistols-PPlayerOnline",
+      "selector": "0x58288047b8431d6497578355e9ffdafcb9e5c16b38c2d155ce88531b4cb1fdc"
+    },
+    {
+      "members": [],
+      "class_hash": "0x42e45c2b76cd2b999202081400cda259d06297c23cf9df1b58cb30202a1dbfa",
+      "tag": "pistols-PPlayerTutorialProgress",
+      "selector": "0x4dfd69ee4035368f546cc191300f5e5f377cd1e7fa68a846921249812dec056"
+    },
+    {
+      "members": [],
       "class_hash": "0xe935853433d3e4ae8faaacdc30d43247991f2fca26d551678dcf77b51d4b78",
       "tag": "pistols-Pact",
       "selector": "0x72a33a6586ae24471fdae1c6f3cc9da6629f3fd3dce300a48324617dd511617"
@@ -6544,24 +6562,6 @@
       "class_hash": "0x450b042f741625af929cc1bc1d1828fffe3fc167edce1ee141703dc45f90e1f",
       "tag": "pistols-Player",
       "selector": "0x4fc7ed2304172cd24d40e2b967bf3642228eec13547b09e0ffdfb85469f6f86"
-    },
-    {
-      "members": [],
-      "class_hash": "0x1044fcad185fb6bf8884e740abb873f879f2720d6dd9cc7fde54a3308cfac05",
-      "tag": "pistols-PlayerBookmark",
-      "selector": "0x46db6150404dd9d739a2cd0c5e5036698ab3cfde3a5626ee798e1f1add13a63"
-    },
-    {
-      "members": [],
-      "class_hash": "0x5406f02eab81fd373148cf487f4cc53cfef00ec016b8a5521c6f3a2059aa78f",
-      "tag": "pistols-PlayerOnline",
-      "selector": "0x6f3391bc3684ea92009be25543fc6cc734c1f756253523354efdf10e2a57dff"
-    },
-    {
-      "members": [],
-      "class_hash": "0x71f6c734aa516e887cd47e914cf04e3887e9d30db80c7bd82b1e22bbaf8ebf",
-      "tag": "pistols-PlayerTutorialProgress",
-      "selector": "0x310c3b7d7f6200fd2ea3cbb9b7ee0782f4d838cdd6edee93b415d5b32337b0"
     },
     {
       "members": [],
