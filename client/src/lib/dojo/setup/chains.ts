@@ -207,7 +207,7 @@ const snSepoliaConfig: DojoChainConfig = {
   // rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii',
-  relayUrl: undefined,
+  relayUrl: '/ip4/10.8.74.19/tcp/9090',
   masterAddress: undefined,
   masterPrivateKey: undefined,
   accountClassHash: KATANA_CLASS_HASH,
