@@ -1,17 +1,61 @@
-# Profile
-if [ $# -ge 1 ]; then
-  export PROFILE=$1
-else
-  # export PROFILE="dev"
-  echo "basic usage: $0 <PROFILE>"
-  exit 1
-fi
-export DOJO_PROFILE_FILE="dojo_$PROFILE.toml"
 
-if ! [ -x "$(command -v toml)" ]; then
-  echo 'Error: toml not instlaled! Instal with: cargo install toml-cli'
+#-------------------
+# validate arguments
+#
+if [ $# -lt 1 ]; then
+  echo "❌ Error: Missing profile!"
+  echo "usage: $0 <PROFILE> [--offline] [--inspect]"
   exit 1
 fi
+
+# initialize argument variables
+export PROFILE=
+export BINDINGS="--typescript"
+export OFFLINE=
+export INSPECT=
+
+# parse arguments
+for arg in "$@"
+do
+  echo ":$arg"
+  if [[ -z "$PROFILE" ]]; then
+    # $1: Profile
+    export PROFILE=$1
+    export DOJO_PROFILE_FILE="dojo_$PROFILE.toml"
+    if [ ! -f $DOJO_PROFILE_FILE ]; then
+      echo "❌ Error: Missing profile config file: $DOJO_PROFILE_FILE"
+      exit 1
+    fi
+  elif [[ $arg == "--offline" ]]; then
+    export OFFLINE="--offline"
+  elif [[ $arg == "--inspect" ]]; then
+    export INSPECT="true"
+    export BINDINGS=""
+  else
+    echo "❌ Error: Invalid argument: $arg"
+    exit 1
+  fi
+done
+
+
+#-----------------
+# check tools
+#
+if ! [ -x "$(command -v toml)" ]; then
+  echo '❌ Error: toml not instlaled!'
+  echo 'Instal with: cargo install toml-cli'
+  exit 1
+fi
+if ! [ -x "$(command -v starkli)" ]; then
+  echo '❌ Error: starkli not instlaled!'
+  echo 'Instal with: curl https://get.starkli.sh | sh'
+  exit 1
+fi
+
+
+#-----------------
+# helper functions
+#
 
 get_profile_env () {
   local ENV_NAME=$1
@@ -61,7 +105,7 @@ export PROFILE_CHAIN_ID=$(get_profile_env "chain_id")
 if [[ "$PROFILE_CHAIN_ID" != "$CHAIN_ID" ]]; then
   echo "PROFILE CHAIN ID: [$PROFILE_CHAIN_ID]"
   echo "RPC CHAIN ID: [$CHAIN_ID]"
-  echo "Chain mismatch! 👎"
+  echo "❌ Chain mismatch! 👎"
   exit 1
 fi
 
