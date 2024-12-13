@@ -237,7 +237,8 @@ export type InputPlayerBookmarkValue = RemoveFieldOrder<PlayerBookmarkValue>;
 export interface PlayerBookmark {
   fieldOrder: string[];
   address: string;
-  bookmark: BigNumberish;
+  target_address: BigNumberish;
+  target_id: BigNumberish;
   enabled: boolean;
 }
 export type InputPlayerBookmark = RemoveFieldOrder<PlayerBookmark>;
@@ -699,9 +700,10 @@ export const schema: SchemaType = {
       enabled: false,
     },
     PlayerBookmark: {
-      fieldOrder: ['address', 'bookmark', 'enabled'],
+      fieldOrder: ['address', 'target_address', 'target_id', 'enabled'],
       address: "",
-      bookmark: 0,
+      target_address: "",
+      target_id: 0,
       enabled: false,
     },
     PlayerOnline: {

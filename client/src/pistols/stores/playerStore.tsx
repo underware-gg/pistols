@@ -14,7 +14,10 @@ interface PlayerState {
   // off-chain messages
   timestamp_online: number
   tutorial_progress: TutorialProgress
-  bookmarks: string[]
+  bookmarked_players: string[]
+  bookmarked_tokens: {
+    [address: string]: bigint[]
+  }
 }
 interface PlayersByAddress {
   [address: string]: PlayerState
@@ -38,7 +41,8 @@ const createStore = () => {
       // off-chain messages
       timestamp_online: bigintToNumber(event.timestamp_registered),
       tutorial_progress: TutorialProgress.None,
-      bookmarks: [],
+      bookmarked_players: [],
+      bookmarked_tokens: {},
     }] : [undefined, undefined]
   }
   return create<State>()(immer((set) => ({
@@ -86,6 +90,34 @@ const createStore = () => {
               state.players[address].tutorial_progress = progress.progress as unknown as TutorialProgress
             }
           }
+          const bookmark = e.models.pistols.PlayerBookmark
+          if (bookmark) {
+            const address = bigintToHex(bookmark.address)
+            if (state.players[address]) {
+              const target_address = bigintToHex(bookmark.target_address)
+              const target_id = BigInt(bookmark.target_id)
+              if (target_id == 0n) {
+                // Bookmarking player
+                const isBookmarked = state.players[address].bookmarked_players.includes(target_address)
+                if (bookmark.enabled && !isBookmarked) {
+                  state.players[address].bookmarked_players.push(target_address)
+                } else if (!bookmark.enabled && isBookmarked) {
+                  state.players[address].bookmarked_players = arrayRemoveValue(state.players[address].bookmarked_players, target_address)
+                }
+              } else {
+                // Bookmarking token
+                const isBookmarked = state.players[address].bookmarked_tokens[target_address]?.includes(target_id)
+                if (bookmark.enabled && !isBookmarked) {
+                  if (!state.players[address].bookmarked_tokens[target_address]) {
+                    state.players[address].bookmarked_tokens[target_address] = []
+                  }
+                  state.players[address].bookmarked_tokens[target_address].push(target_id)
+                } else if (!bookmark.enabled && isBookmarked) {
+                  state.players[address].bookmarked_tokens[target_address] = arrayRemoveValue(state.players[address].bookmarked_tokens[target_address], target_id)
+                }
+              }
+            }
+          }
         })
       });
     },
@@ -118,18 +150,26 @@ export const usePlayer = (address: BigNumberish) => {
   const players = usePlayerStore((state) => state.players)
   const player = useMemo(() => (players[key]), [players[key]])
 
+  const isNew = useMemo(() => (player?.isNew ?? false), [player])
   const username = useMemo(() => (player?.username ?? 'unknown'), [player])
   const name = useMemo(() => (player?.name ?? 'Unknown'), [player])
   const timestamp_registered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
-  const isNew = useMemo(() => (player?.isNew ?? false), [player])
+  const timestamp_online = useMemo(() => (player?.timestamp_online ?? 0), [player])
+  const tutorial_progress = useMemo(() => (player?.tutorial_progress ?? TutorialProgress.None), [player])
+  const bookmarked_players = useMemo(() => (player?.bookmarked_players ?? []), [player])
+  const bookmarked_tokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
 
   // useEffect(() => console.log("usePlayer() =>", username, key, player), [player, username])
 
   return {
+    isNew,
     address,
     username,
     name,
     timestamp_registered,
-    isNew,
+    timestamp_online,
+    tutorial_progress,
+    bookmarked_players,
+    bookmarked_tokens,
   }
 }

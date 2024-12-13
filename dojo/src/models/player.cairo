@@ -63,7 +63,9 @@ pub struct PlayerBookmark {
     #[key]
     pub address: ContractAddress,
     #[key]
-    pub bookmark: felt252,
+    pub target_address: ContractAddress,    // account or contract address
+    #[key]
+    pub target_id: u128,                    // (optional) token id
     //-----------------------
     pub enabled: bool,
 }
