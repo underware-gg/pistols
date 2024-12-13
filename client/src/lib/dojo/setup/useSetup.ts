@@ -77,7 +77,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
 
   //
   // Check world deployment
-  const { isDeployed } = useDeployedSystem(dojoAppConfig.nameSpace, Object.keys(dojoAppConfig.contractInterfaces)[0], manifest)
+  const { isDeployed } = useDeployedSystem(dojoAppConfig.namespace, Object.keys(dojoAppConfig.contractPolicyDescriptions)[0], manifest)
 
   //
   // Establish system calls using the network and components.
@@ -119,7 +119,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     // pass thru
     dojoAppConfig,
     selectedChainConfig,
-    nameSpace: dojoAppConfig.nameSpace,
+    namespace: dojoAppConfig.namespace,
     manifest,
     starknetDomain,
     // status

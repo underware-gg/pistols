@@ -10,7 +10,7 @@ export function usePlayerOnlineSignedMessage(timestamp?: number) {
   const { account } = useAccount()
   const { publish, isPublishing } = useSdkPublishSignedMessage(
     'pistols-PPlayerOnline', {
-    address: bigintToHex(account?.address ?? 0),
+    identity: bigintToHex(account?.address ?? 0),
     timestamp: Math.floor(timestamp ?? getClientSeconds()),
   }, account as Account)
   return {
@@ -23,7 +23,7 @@ export function useTutorialProgressSignedMessage(progress: TutorialProgress) {
   const { account } = useAccount()
   const { publish, isPublishing } = useSdkPublishSignedMessage(
     'pistols-PPlayerTutorialProgress', {
-    address: bigintToHex(account?.address ?? 0),
+    identity: bigintToHex(account?.address ?? 0),
     progress: getTutorialProgressValue(progress),
   }, account as Account)
   return {
@@ -36,7 +36,7 @@ export function usePlayerBookmarkSignedMessage(bookmark: BigNumberish, enabled: 
   const { account } = useAccount()
   const { publish, isPublishing } = useSdkPublishSignedMessage(
     'pistols-PPlayerBookmark', {
-    address: bigintToHex(account?.address ?? 0),
+    identity: bigintToHex(account?.address ?? 0),
     bookmark: bigintToHex(bookmark),
     enabled: enabled,
   }, account as Account)
