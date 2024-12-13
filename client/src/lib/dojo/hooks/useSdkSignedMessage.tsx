@@ -14,9 +14,9 @@ export const useSdkPublishSignedMessage = <M extends PistolsModelType>(
   const [isPublishing, setIsPublishing] = useState<boolean>()
 
   const typedData = useMemo<TypedData>(() => (
-    sdk.generateTypedData(modelName, message)
-  ), [modelName, message])
-
+    sdk?.generateTypedData(modelName, message)
+  ), [sdk, modelName, message])
+  
   const publish = useCallback(async () => {
     if (sdk && typedData && account) {
       if (!selectedChainConfig.relayUrl) {
