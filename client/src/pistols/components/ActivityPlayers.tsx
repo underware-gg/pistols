@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { useAllPlayersActivityFeed, ActivityState } from '@/pistols/stores/eventsStore'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { PlayerLink, TimestampDelta } from '@/pistols/components/Links'
+import { PlayerLink, TimestampDeltaElapsed } from '@/pistols/components/Links'
 
 export const ActivityPlayers = () => {
   const { allPlayersActivity } = useAllPlayersActivityFeed()
@@ -42,7 +42,7 @@ const ActivityItem = ({
     <>
       <PlayerLink address={activity.address} />
       {' last seen '}
-      <TimestampDelta timestamp={activity.timestamp} clientSeconds={clientSeconds} className='Brightest' />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} className='Brightest' />
       {' ago'}
       <br />
     </>

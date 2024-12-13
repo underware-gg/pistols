@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react'
 import { useAllPlayersActivityFeed, ActivityState } from '@/pistols/stores/eventsStore'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 import { Activity } from '@/games/pistols/generated/constants'
-import { ChallengeLink, DuelistLink, PlayerLink, TimestampDelta } from '@/pistols/components/Links'
+import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '@/pistols/components/Links'
 
 export const ActivityFeed = () => {
   const { allPlayersActivity } = useAllPlayersActivityFeed()
@@ -68,7 +68,7 @@ const ActivityItemCreatedDuelist = ({
       {' spawned '}
       <DuelistLink duelistId={activity.identifier} />
       {' '}
-      <TimestampDelta timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
       <br />
     </>
   )
@@ -84,7 +84,7 @@ const ActivityItemCreatedChallenge = ({
       {' challenged ??? for '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
-      <TimestampDelta timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
       <br />
     </>
   )
@@ -100,7 +100,7 @@ const ActivityItemRepliedChallenge = ({
       {' replied ??? to '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
-      <TimestampDelta timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
       <br />
     </>
   )
@@ -116,7 +116,7 @@ const ActivityItemCommittedMoves = ({
       {' moved in '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
-      <TimestampDelta timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
       <br />
     </>
   )
@@ -132,7 +132,7 @@ const ActivityItemRevealedMoves = ({
       {' revealed in '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
-      <TimestampDelta timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
       <br />
     </>
   )

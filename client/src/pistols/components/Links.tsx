@@ -45,7 +45,7 @@ export const ChallengeLink = ({
   )
 }
 
-export const TimestampDelta = ({
+export const TimestampDeltaElapsed = ({
   timestamp,
   clientSeconds,
   className = 'Inactive',
