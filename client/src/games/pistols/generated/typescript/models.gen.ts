@@ -226,52 +226,52 @@ export interface PlayerActivityValue {
 }
 export type InputPlayerActivityValue = RemoveFieldOrder<PlayerActivityValue>;
 
-// Type definition for `pistols::models::player::PlayerBookmarkValue` struct
-export interface PlayerBookmarkValue {
+// Type definition for `pistols::models::player::PPlayerBookmarkValue` struct
+export interface PPlayerBookmarkValue {
   fieldOrder: string[];
   enabled: boolean;
 }
-export type InputPlayerBookmarkValue = RemoveFieldOrder<PlayerBookmarkValue>;
+export type InputPPlayerBookmarkValue = RemoveFieldOrder<PPlayerBookmarkValue>;
 
-// Type definition for `pistols::models::player::PlayerBookmark` struct
-export interface PlayerBookmark {
+// Type definition for `pistols::models::player::PPlayerBookmark` struct
+export interface PPlayerBookmark {
   fieldOrder: string[];
   address: string;
   target_address: BigNumberish;
   target_id: BigNumberish;
   enabled: boolean;
 }
-export type InputPlayerBookmark = RemoveFieldOrder<PlayerBookmark>;
+export type InputPPlayerBookmark = RemoveFieldOrder<PPlayerBookmark>;
 
-// Type definition for `pistols::models::player::PlayerOnline` struct
-export interface PlayerOnline {
+// Type definition for `pistols::models::player::PPlayerOnline` struct
+export interface PPlayerOnline {
   fieldOrder: string[];
   address: string;
   timestamp: BigNumberish;
 }
-export type InputPlayerOnline = RemoveFieldOrder<PlayerOnline>;
+export type InputPPlayerOnline = RemoveFieldOrder<PPlayerOnline>;
 
-// Type definition for `pistols::models::player::PlayerOnlineValue` struct
-export interface PlayerOnlineValue {
+// Type definition for `pistols::models::player::PPlayerOnlineValue` struct
+export interface PPlayerOnlineValue {
   fieldOrder: string[];
   timestamp: BigNumberish;
 }
-export type InputPlayerOnlineValue = RemoveFieldOrder<PlayerOnlineValue>;
+export type InputPPlayerOnlineValue = RemoveFieldOrder<PPlayerOnlineValue>;
 
-// Type definition for `pistols::models::player::PlayerTutorialProgressValue` struct
-export interface PlayerTutorialProgressValue {
+// Type definition for `pistols::models::player::PPlayerTutorialProgressValue` struct
+export interface PPlayerTutorialProgressValue {
   fieldOrder: string[];
   progress: TutorialProgress;
 }
-export type InputPlayerTutorialProgressValue = RemoveFieldOrder<PlayerTutorialProgressValue>;
+export type InputPPlayerTutorialProgressValue = RemoveFieldOrder<PPlayerTutorialProgressValue>;
 
-// Type definition for `pistols::models::player::PlayerTutorialProgress` struct
-export interface PlayerTutorialProgress {
+// Type definition for `pistols::models::player::PPlayerTutorialProgress` struct
+export interface PPlayerTutorialProgress {
   fieldOrder: string[];
   address: string;
   progress: TutorialProgress;
 }
-export type InputPlayerTutorialProgress = RemoveFieldOrder<PlayerTutorialProgress>;
+export type InputPPlayerTutorialProgress = RemoveFieldOrder<PPlayerTutorialProgress>;
 
 // Type definition for `pistols::models::challenge::Moves` struct
 export interface Moves {
@@ -518,12 +518,12 @@ export interface SchemaType extends ISchemaType {
 		Player: Player,
 		PlayerActivity: PlayerActivity,
 		PlayerActivityValue: PlayerActivityValue,
-    PlayerBookmarkValue: PlayerBookmarkValue,
-    PlayerBookmark: PlayerBookmark,
-    PlayerOnline: PlayerOnline,
-    PlayerOnlineValue: PlayerOnlineValue,
-    PlayerTutorialProgressValue: PlayerTutorialProgressValue,
-    PlayerTutorialProgress: PlayerTutorialProgress,
+    PPlayerBookmarkValue: PPlayerBookmarkValue,
+    PPlayerBookmark: PPlayerBookmark,
+    PPlayerOnline: PPlayerOnline,
+    PPlayerOnlineValue: PPlayerOnlineValue,
+    PPlayerTutorialProgressValue: PPlayerTutorialProgressValue,
+    PPlayerTutorialProgress: PPlayerTutorialProgress,
 		Moves: Moves,
 		DuelistState: DuelistState,
 		Round: Round,
@@ -695,33 +695,33 @@ export const schema: SchemaType = {
 			activity: Activity.Undefined,
 			identifier: 0,
 		},
-    PlayerBookmarkValue: {
+    PPlayerBookmarkValue: {
       fieldOrder: ['enabled'],
       enabled: false,
     },
-    PlayerBookmark: {
       fieldOrder: ['address', 'target_address', 'target_id', 'enabled'],
       address: "",
+    PPlayerBookmark: {
       target_address: "",
       target_id: 0,
       enabled: false,
     },
-    PlayerOnline: {
       fieldOrder: ['address', 'timestamp'],
       address: "",
+    PPlayerOnline: {
       timestamp: 0,
     },
-    PlayerOnlineValue: {
+    PPlayerOnlineValue: {
       fieldOrder: ['timestamp'],
       timestamp: 0,
     },
-    PlayerTutorialProgressValue: {
+    PPlayerTutorialProgressValue: {
       fieldOrder: ['progress'],
       progress: TutorialProgress.None,
     },
-    PlayerTutorialProgress: {
       fieldOrder: ['address', 'progress'],
       address: "",
+    PPlayerTutorialProgress: {
       progress: TutorialProgress.None,
     },
 		Moves: {

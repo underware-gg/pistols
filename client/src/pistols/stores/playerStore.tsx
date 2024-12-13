@@ -76,21 +76,21 @@ const createStore = () => {
       console.log("updateMessages()[Player] =>", entities)
       set((state: State) => {
         entities.forEach((e) => {
-          const online = e.models.pistols.PlayerOnline
+          const online = e.models.pistols.PPlayerOnline
           if (online) {
             const address = bigintToHex(online.address)
             if (state.players[address]) {
               state.players[address].timestamp_online = bigintToNumber(online.timestamp)
             }
           }
-          const progress = e.models.pistols.PlayerTutorialProgress
+          const progress = e.models.pistols.PPlayerTutorialProgress
           if (progress) {
             const address = bigintToHex(progress.address)
             if (state.players[address]) {
               state.players[address].tutorial_progress = progress.progress as unknown as TutorialProgress
             }
           }
-          const bookmark = e.models.pistols.PlayerBookmark
+          const bookmark = e.models.pistols.PPlayerBookmark
           if (bookmark) {
             const address = bigintToHex(bookmark.address)
             if (state.players[address]) {
