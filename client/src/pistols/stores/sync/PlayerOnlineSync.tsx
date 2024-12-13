@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
-import { Account } from 'starknet'
-import { useSdkPublishSignedMessage } from '@/lib/dojo/hooks/useSdkSignedMessage'
+import { Button } from 'semantic-ui-react'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { useAccount } from '@starknet-react/core'
+import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { usePlayerOnlineSignedMessage } from '@/pistols/hooks/useSignedMessages'
 
 
 //------------------------------------------------------
@@ -15,20 +15,19 @@ export function PlayerOnlineSync() {
     updateTimestamp()
   }, [])
 
-  const { account } = useAccount()
-  const { publish } = useSdkPublishSignedMessage(
-    'pistols-PlayerOnline', {
-      address: account?.address,
-      timestamp: Math.floor(clientSeconds),
-    }, account as Account)
+  const { publish, isPublishing } = usePlayerOnlineSignedMessage(clientSeconds)
 
   useEffect(() => {
     if (publish && clientSeconds > 0) {
+      // TODO: enable this...
       // publish()
     }
   }, [publish, clientSeconds])
 
-  // return (<Button className='AbsoluteBottom' style={{ zIndex: 1000 }} onClick={publish}>Publish Online Status</Button>)
-
   return (<></>)
+}
+
+export function PublishOnlineStatusButton() {
+  const { publish, isPublishing } = usePlayerOnlineSignedMessage()
+  return (<Button className='AbsoluteBottom' disabled={isPublishing} style={{ zIndex: 1000 }} onClick={publish}>Publish Online Status</Button>)
 }

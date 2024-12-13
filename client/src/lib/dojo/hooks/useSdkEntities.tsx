@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
-import { isPositiveBigint } from '@/lib/utils/types'
+import { arrayClean, isPositiveBigint } from '@/lib/utils/types'
 import {
   PistolsGetQuery,
   PistolsSubQuery,
@@ -136,12 +136,20 @@ export const useSdkEntities = ({
 //
 
 //
-// Extract one model from a stored entity
+// Extract models from a stored entity
 //
-export const getEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: string) => (entity?.models.pistols[modelName] as M)
-export const useEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: string) => {
+export const getEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: string): M => (entity?.models.pistols[modelName] as M)
+export const getEntityModels = <M extends PistolsModelType>(entity: PistolsEntity, modelNames: string[]): M[] => (
+  arrayClean(modelNames.map(modelName => getEntityModel<M>(entity, modelName)))
+)
+
+export const useEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: string): M => {
   const model = useMemo(() => getEntityModel<M>(entity, modelName), [entity, modelName])
   return model
+}
+export const useEntityModels = <M extends PistolsModelType>(entity: PistolsEntity, modelNames: string[]): M[] => {
+  const models = useMemo(() => getEntityModels<M>(entity, modelNames), [entity, modelNames])
+  return models
 }
 
 //
@@ -150,12 +158,8 @@ export const useEntityModel = <M extends PistolsModelType>(entity: PistolsEntity
 export const filterEntitiesByModel = (entities: PistolsEntity[], modelNames: string | string[]): PistolsEntity[] => {
   if (Array.isArray(modelNames)) {
     return entities.filter(e => {
-      for (const m of modelNames) {
-        if (getEntityModel(e, m) != null)
-          return true
-      }
-      return false
+      return (getEntityModels(e, modelNames).length > 0)
     })
   }
-  return entities.filter(e => getEntityModel(e, modelNames) != null)
+  return entities.filter(e => Boolean(getEntityModel(e, modelNames)))
 }

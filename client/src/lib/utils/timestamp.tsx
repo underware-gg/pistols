@@ -1,4 +1,8 @@
 
+// get current time in seconds
+export const getClientSeconds = () => {
+  return Math.floor(new Date().getTime() / 1000)
+}
 
 // date is seconds
 const splitDate = (d: Date) => {
@@ -33,12 +37,12 @@ export const formatTimestampLocal = (s: number): string => {
 }
 
 export const formatTimestampElapsed = (s_start: number): string => {
-  const now = new Date().getTime() / 1000
+  const now = getClientSeconds()
   return formatTimestampDeltaElapsed(s_start, now)
 }
 
 export const formatTimestampCountdown = (s_end: number): string => {
-  const now = new Date().getTime() / 1000
+  const now = getClientSeconds()
   return formatTimestampDeltaCountdown(now, s_end)
 }
 

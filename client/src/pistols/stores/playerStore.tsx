@@ -1,42 +1,52 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
-import { bigintToHex, capitalize, shortAddress } from '@/lib/utils/types'
+import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress } from '@/lib/utils/types'
+import { TutorialProgress } from '@/games/pistols/generated/constants'
 
 interface PlayerState {
-  timestamp: number
+  timestamp_registered: number
   username: string
   name: string
   isNew: boolean
+  // off-chain messages
+  timestamp_online: number
+  tutorial_progress: TutorialProgress
+  bookmarks: string[]
 }
 interface PlayersByAddress {
   [address: string]: PlayerState
 }
 interface State {
   players: PlayersByAddress,
-  setEntities: (events: PistolsEntity[]) => void;
+  setEntities: (entities: PistolsEntity[]) => void;
   updateEntity: (event: PistolsEntity) => void;
+  updateMessages: (entities: PistolsEntity[]) => void;
   updateUsernames: (usernames: Map<string, string>) => void;
 }
 
 const createStore = () => {
   const _parseEvent = (e: PistolsEntity): [string, PlayerState] => {
-    let event = e.models.pistols.Player
+    const event = e.models.pistols.Player
     return event ? [bigintToHex(event.address), {
-      timestamp: Number(event.timestamp_registered),
+      timestamp_registered: bigintToNumber(event.timestamp_registered),
       username: shortAddress(event.address),
       name: shortAddress(event.address),
       isNew: true,
+      // off-chain messages
+      timestamp_online: bigintToNumber(event.timestamp_registered),
+      tutorial_progress: TutorialProgress.None,
+      bookmarks: [],
     }] : [undefined, undefined]
   }
   return create<State>()(immer((set) => ({
     players: {},
-    setEntities: (events: PistolsEntity[]) => {
-      // console.log("setEntities()[Player] =>", events)
+    setEntities: (entities: PistolsEntity[]) => {
+      // console.log("setEntities()[Player] =>", entities)
       set((state: State) => {
-        state.players = events.sort((a, b) => (
+        state.players = entities.sort((a, b) => (
           Number(b.models.pistols.Player?.timestamp_registered ?? 0) - Number(a.models.pistols.Player?.timestamp_registered ?? 0)
         )).reduce((acc, e) => {
           const [address, player] = _parseEvent(e)
@@ -56,6 +66,27 @@ const createStore = () => {
         if (!state.players[_key]) {
           state.players[_key] = player
         }
+      });
+    },
+    updateMessages: (entities: PistolsEntity[]) => {
+      console.log("updateMessages()[Player] =>", entities)
+      set((state: State) => {
+        entities.forEach((e) => {
+          const online = e.models.pistols.PlayerOnline
+          if (online) {
+            const address = bigintToHex(online.address)
+            if (state.players[address]) {
+              state.players[address].timestamp_online = bigintToNumber(online.timestamp)
+            }
+          }
+          const progress = e.models.pistols.PlayerTutorialProgress
+          if (progress) {
+            const address = bigintToHex(progress.address)
+            if (state.players[address]) {
+              state.players[address].tutorial_progress = progress.progress as unknown as TutorialProgress
+            }
+          }
+        })
       });
     },
     updateUsernames: (usernames: Map<string, string>) => {
@@ -89,7 +120,7 @@ export const usePlayer = (address: BigNumberish) => {
 
   const username = useMemo(() => (player?.username ?? 'unknown'), [player])
   const name = useMemo(() => (player?.name ?? 'Unknown'), [player])
-  const timestamp = useMemo(() => (player?.timestamp ?? 0), [player])
+  const timestamp_registered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
   const isNew = useMemo(() => (player?.isNew ?? false), [player])
 
   // useEffect(() => console.log("usePlayer() =>", username, key, player), [player, username])
@@ -98,7 +129,7 @@ export const usePlayer = (address: BigNumberish) => {
     address,
     username,
     name,
-    timestamp,
+    timestamp_registered,
     isNew,
   }
 }

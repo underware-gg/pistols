@@ -9,10 +9,10 @@ import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/c
 import { Divider } from '@/lib/ui/Divider'
 import { DuelistCard, DuelistCardHandle } from '../cards/DuelistCard'
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '@/pistols/data/cardConstants'
-import DuelistEditModal from '../modals/DuelistEditModal'
-import DuelistModal from '../modals/DuelistModal'
-import useGameAspect from '@/pistols/hooks/useGameApect'
+import { PublishOnlineStatusButton } from '@/pistols/stores/sync/PlayerOnlineSync'
 import { VStack } from '@/lib/ui/Stack'
+import DuelistEditModal from '@/pistols/components/modals/DuelistEditModal'
+import useGameAspect from '@/pistols/hooks/useGameApect'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -56,6 +56,7 @@ export default function ScProfile() {
 
       <DuelistEditModal opener={duelistEditOpener} />
       <CurrentChainHint />
+      <PublishOnlineStatusButton />
     </div>
   )
 }
