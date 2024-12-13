@@ -78,21 +78,21 @@ const createStore = () => {
         entities.forEach((e) => {
           const online = e.models.pistols.PPlayerOnline
           if (online) {
-            const address = bigintToHex(online.address)
+            const address = bigintToHex(online.identity)
             if (state.players[address]) {
               state.players[address].timestamp_online = bigintToNumber(online.timestamp)
             }
           }
           const progress = e.models.pistols.PPlayerTutorialProgress
           if (progress) {
-            const address = bigintToHex(progress.address)
+            const address = bigintToHex(progress.identity)
             if (state.players[address]) {
               state.players[address].tutorial_progress = progress.progress as unknown as TutorialProgress
             }
           }
           const bookmark = e.models.pistols.PPlayerBookmark
           if (bookmark) {
-            const address = bigintToHex(bookmark.address)
+            const address = bigintToHex(bookmark.identity)
             if (state.players[address]) {
               const target_address = bigintToHex(bookmark.target_address)
               const target_id = BigInt(bookmark.target_id)

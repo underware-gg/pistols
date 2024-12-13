@@ -22,9 +22,9 @@ const query_get: PistolsGetQuery = {
 const query_get_messages: PistolsGetQuery = {
   pistols: {
     // off-chain signed messages
-    PlayerOnline: { $: { where: { address: { $neq: '' } } } },
-    PlayerBookmark: { $: { where: { address: { $neq: '' } } } },
-    PlayerTutorialProgress: { $: { where: { address: { $neq: '' } } } },
+    PPlayerOnline: { $: { where: { identity: { $neq: '' } } } },
+    PPlayerBookmark: { $: { where: { identity: { $neq: '' } } } },
+    PPlayerTutorialProgress: { $: { where: { identity: { $neq: '' } } } },
   },
 }
 const query_sub: PistolsSubQuery = {

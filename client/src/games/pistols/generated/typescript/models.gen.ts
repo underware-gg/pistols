@@ -236,7 +236,7 @@ export type InputPPlayerBookmarkValue = RemoveFieldOrder<PPlayerBookmarkValue>;
 // Type definition for `pistols::models::player::PPlayerBookmark` struct
 export interface PPlayerBookmark {
   fieldOrder: string[];
-  address: string;
+  identity: string;
   target_address: BigNumberish;
   target_id: BigNumberish;
   enabled: boolean;
@@ -246,7 +246,7 @@ export type InputPPlayerBookmark = RemoveFieldOrder<PPlayerBookmark>;
 // Type definition for `pistols::models::player::PPlayerOnline` struct
 export interface PPlayerOnline {
   fieldOrder: string[];
-  address: string;
+  identity: string;
   timestamp: BigNumberish;
 }
 export type InputPPlayerOnline = RemoveFieldOrder<PPlayerOnline>;
@@ -268,7 +268,7 @@ export type InputPPlayerTutorialProgressValue = RemoveFieldOrder<PPlayerTutorial
 // Type definition for `pistols::models::player::PPlayerTutorialProgress` struct
 export interface PPlayerTutorialProgress {
   fieldOrder: string[];
-  address: string;
+  identity: string;
   progress: TutorialProgress;
 }
 export type InputPPlayerTutorialProgress = RemoveFieldOrder<PPlayerTutorialProgress>;
@@ -699,16 +699,16 @@ export const schema: SchemaType = {
       fieldOrder: ['enabled'],
       enabled: false,
     },
-      fieldOrder: ['address', 'target_address', 'target_id', 'enabled'],
-      address: "",
     PPlayerBookmark: {
+      fieldOrder: ['identity', 'target_address', 'target_id', 'enabled'],
+      identity: "",
       target_address: "",
       target_id: 0,
       enabled: false,
     },
-      fieldOrder: ['address', 'timestamp'],
-      address: "",
     PPlayerOnline: {
+      fieldOrder: ['identity', 'timestamp'],
+      identity: "",
       timestamp: 0,
     },
     PPlayerOnlineValue: {
@@ -719,9 +719,9 @@ export const schema: SchemaType = {
       fieldOrder: ['progress'],
       progress: TutorialProgress.None,
     },
-      fieldOrder: ['address', 'progress'],
-      address: "",
     PPlayerTutorialProgress: {
+      fieldOrder: ['identity', 'progress'],
+      identity: "",
       progress: TutorialProgress.None,
     },
 		Moves: {
