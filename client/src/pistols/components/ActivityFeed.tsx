@@ -6,7 +6,11 @@ import { ChallengeLink, DuelistLink, PlayerLink, TimestampDelta } from '@/pistol
 
 export const ActivityFeed = () => {
   const { allPlayersActivity } = useAllPlayersActivityFeed()
+
   const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 60)
+  useEffect(() => {
+    updateTimestamp()
+  }, [allPlayersActivity])
 
   const items = useMemo(() => ([...allPlayersActivity].reverse().map((a) =>
     <ActivityItem
@@ -16,9 +20,6 @@ export const ActivityFeed = () => {
     />)
   ), [allPlayersActivity, clientSeconds])
 
-  useEffect(() => {
-    updateTimestamp()
-  }, [allPlayersActivity])
 
   return (
     <div className='FillParent'>

@@ -10,13 +10,6 @@ const Body = Table.Body
 const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
-const starknetDomain = {
-  name: 'Underware',
-  version: '1.0',
-  chainId: 'UNDERWARE_GG',
-  revision: '1',
-}
-
 export default function IndexPage() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => {

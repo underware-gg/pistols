@@ -3,6 +3,7 @@ import { HistoricalEventsStoreSync } from '@/pistols/stores/sync/HistoricalEvent
 import { ChallengeStoreSync } from '@/pistols/stores/sync/ChallengeStoreSync'
 import { EntityStoreSync } from '@/pistols/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '@/pistols/stores/sync/PlayerNameSync'
+import { PlayerOnlineSync } from '@/pistols/stores/sync/PlayerOnlineSync'
 // QL to be replaced...
 import { FameCoinStoreSyncQL } from '@/pistols/stores/fameCoinStore'
 import { PlayerDuelistTokensStoreSync, PlayerDuelistTokensStoreSyncQL } from '@/pistols/stores/duelistTokenStore'
@@ -14,15 +15,21 @@ import { PlayerDuelistTokensStoreSync, PlayerDuelistTokensStoreSyncQL } from '@/
 export default function StoreSync() {
   return (
     <>
+      {/* Torii */}
       <HistoricalEventsStoreSync />
       <ChallengeStoreSync />
       <EntityStoreSync />
-      <PlayerNameSync />
-      
       {/* QL to be replaced... */}
       <FameCoinStoreSyncQL />
       <PlayerDuelistTokensStoreSyncQL />
       <PlayerDuelistTokensStoreSync />
+
+      {/* Controller */}
+      <PlayerNameSync />
+
+      {/* Other */}
+      <PlayerOnlineSync />
+
     </>
   )
 }
