@@ -58,8 +58,8 @@ export const useElizaMessage = (username: string, agentId?: string) => {
     setResponses(['...'])
     const result = await elizaMessage({
       input,
-      userId: username.toLowerCase(),
-      userName: `${username.toUpperCase().slice(0, 1)}${username.toLowerCase().slice(1)}`,
+      userId: (username ? username : "localhost").toLowerCase(),
+      userName: `${(username ? username : "localhost").toUpperCase().slice(0, 1)}${(username ? username : "localhost").toLowerCase().slice(1)}`,
       agentId: agentId || ELIZA_AGENT_ID,
     })
     setResponses(result)

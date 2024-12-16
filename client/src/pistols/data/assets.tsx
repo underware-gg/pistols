@@ -27,6 +27,14 @@ export enum TextureName {
   duel_water_dudv = 'duel_water_dudv',
   duel_water_map = 'duel_water_map',
   cliffs = 'cliffs',
+  bg_tavern_bar_test = 'bg_tavern_bar_test',
+  bg_tavern_bar_test_mask = 'bg_tavern_bar_test_mask',
+  bg_tavern_bartender_test = 'bg_tavern_bartender_test',
+  bg_tavern_bartender_test_mask = 'bg_tavern_bartender_test_mask',
+  bg_tavern_door_test = 'bg_tavern_door_test',
+  bg_tavern_door_test_mask = 'bg_tavern_door_test_mask',
+  bg_tavern_test = 'bg_tavern_test',
+  bg_tavern_test_mask = 'bg_tavern_test_mask',
 }
 export type TextureAttributes = {
   path: string
@@ -53,6 +61,14 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.duel_water_dudv]: { path: '/textures/waterdudv.jpg' },
   [TextureName.duel_water_map]: { path: '/textures/water_map.ktx2' },
   [TextureName.cliffs]: { path: '/textures/cliffs.png' },
+  [TextureName.bg_tavern_bar_test]: { path: '/images/bg_tavern_bar_test.png' },
+  [TextureName.bg_tavern_bar_test_mask]: { path: '/images/bg_tavern_bar_test_mask.png' },
+  [TextureName.bg_tavern_bartender_test]: { path: '/images/bg_tavern_bartender_test.png' },
+  [TextureName.bg_tavern_bartender_test_mask]: { path: '/images/bg_tavern_bartender_test_mask.png' },
+  [TextureName.bg_tavern_door_test]: { path: '/images/bg_tavern_door_test.png' },
+  [TextureName.bg_tavern_door_test_mask]: { path: '/images/bg_tavern_door_test_mask.png' },
+  [TextureName.bg_tavern_test]: { path: '/images/bg_tavern_test.png' },
+  [TextureName.bg_tavern_test_mask]: { path: '/images/bg_tavern_test_mask.png' },
 }
 
 
@@ -500,66 +516,73 @@ export const BladesCardsTextures: Record<BladesCard, CardData> = {
 }
 
 export interface SceneData {
-  background: TextureName,
-  mask?: TextureName,
+  backgrounds: SceneBackgroundObject[],
   items?: SceneObject[]
+}
+
+export interface SceneBackgroundObject {
+  texture: TextureName,
+  shiftMultiplier: number,
+  renderOrder: number
 }
 
 export interface SceneObject {
   name: string,
   color: string,
   description: string,
+  mask: TextureName,
+  renderOrder: number
 }
 
 export const sceneBackgrounds: Record<SceneName, SceneData> = {
   [SceneName.Gate]: { 
-    background: TextureName.bg_gate,
-    mask: TextureName.bg_gate_mask,
+    backgrounds: [{ texture: TextureName.bg_gate, shiftMultiplier: 0, renderOrder: 0 }],
     items: [
-      { name: 'door', color: 'ff0000', description: 'Knock on door' },        // red
-      { name: 'duel', color: 'ffff00', description: 'Show duel tutorial' },   // yellow
-      { name: 'sign', color: '00ff00', description: 'See more' },             // green
+      { name: 'door', color: 'ff0000', description: 'Knock on door', mask: TextureName.bg_gate_mask, renderOrder: 0 },
+      { name: 'duel', color: 'ffff00', description: 'Show duel tutorial', mask: TextureName.bg_gate_mask, renderOrder: 1 },
+      { name: 'sign', color: '00ff00', description: 'See more', mask: TextureName.bg_gate_mask, renderOrder: 2 },
     ]
   },
-  [SceneName.Door]: { background: TextureName.bg_door },
-  [SceneName.Profile]: { background: TextureName.bg_profile },
+  [SceneName.Door]: { backgrounds: [{ texture: TextureName.bg_door, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.Profile]: { backgrounds: [{ texture: TextureName.bg_profile, shiftMultiplier: 0, renderOrder: 0 }] },
   [SceneName.Tavern]: { 
-    background: TextureName.bg_tavern,
-    mask: TextureName.bg_tavern_mask,
+    backgrounds: [
+      { texture: TextureName.bg_tavern_bar_test, shiftMultiplier: -0.02, renderOrder: 0 },
+      { texture: TextureName.bg_tavern_bartender_test, shiftMultiplier: -0.01, renderOrder: 1 },
+      { texture: TextureName.bg_tavern_test, shiftMultiplier: 0.01, renderOrder: 2 },
+      { texture: TextureName.bg_tavern_door_test, shiftMultiplier: 0.02, renderOrder: 3 },
+    ],
     items: [
-      { name: 'bartender', color: 'ff0000', description: 'Bartender' },   // red
-      { name: 'bottle', color: '00ff00', description: 'All Duelists' },   // green
-      { name: 'pistol', color: '0000ff', description: 'Your Duels' },     // blue
-      { name: 'shovel', color: 'ff00ff', description: 'Past Duels' }      // magenta
+      { name: 'bottle', color: '0000ff', description: 'All Duelists', mask: TextureName.bg_tavern_bar_test_mask, renderOrder: 0 },
+      { name: 'bartender', color: 'ff0000', description: 'Bartender', mask: TextureName.bg_tavern_bartender_test_mask, renderOrder: 1 },
+      { name: 'pistol', color: '00ff00', description: 'Your Duels', mask: TextureName.bg_tavern_test_mask, renderOrder: 2 },
+      { name: 'shovel', color: 'ff00ff', description: 'Past Duels', mask: TextureName.bg_tavern_door_test_mask, renderOrder: 3 }
     ]
   },
   [SceneName.Duelists]: { 
-    background: TextureName.bg_duelists,
-    mask: TextureName.bg_duelists_mask,
+    backgrounds: [{ texture: TextureName.bg_duelists, shiftMultiplier: 0, renderOrder: 0 }],
     items: [
-      { name: 'left arrow', color: '00ff00', description: 'Previous Page' },  // red
-      { name: 'right arrow', color: 'ff0000', description: 'Next Page' },     // green
+      { name: 'left arrow', color: '00ff00', description: 'Previous Page', mask: TextureName.bg_duelists_mask, renderOrder: 1 },
+      { name: 'right arrow', color: 'ff0000', description: 'Next Page', mask: TextureName.bg_duelists_mask, renderOrder: 2 },
     ]
    },
   [SceneName.Duels]: { 
-    background: TextureName.bg_duels,
-    mask: TextureName.bg_duels_mask,
+    backgrounds: [{ texture: TextureName.bg_duels, shiftMultiplier: 0, renderOrder: 0 }],
     items: [
-      { name: 'left arrow', color: '00ff00', description: 'Previous Page' },  // red
-      { name: 'right arrow', color: 'ff0000', description: 'Next Page' },     // green
+      { name: 'left arrow', color: '00ff00', description: 'Previous Page', mask: TextureName.bg_duels_mask, renderOrder: 1 },
+      { name: 'right arrow', color: 'ff0000', description: 'Next Page', mask: TextureName.bg_duels_mask, renderOrder: 2 },
     ]
    },
   [SceneName.Graveyard]: { 
-    background: TextureName.bg_graveyard,
-    mask: TextureName.bg_graveyard_mask,
+    backgrounds: [{ texture: TextureName.bg_graveyard, shiftMultiplier: 0, renderOrder: 0 }],
     items: [
-      { name: 'left arrow', color: '00ff00', description: 'Previous Page' },  // red
-      { name: 'right arrow', color: 'ff0000', description: 'Next Page' },     // green
+      { name: 'left arrow', color: '00ff00', description: 'Previous Page', mask: TextureName.bg_graveyard_mask, renderOrder: 1 },
+      { name: 'right arrow', color: 'ff0000', description: 'Next Page', mask: TextureName.bg_graveyard_mask, renderOrder: 2 },
     ]
    },
-  [SceneName.Tournament]: { background: TextureName.bg_duels_live },
-  [SceneName.IRLTournament]: { background: TextureName.bg_duels_live },
-  [SceneName.Duel]: { background: TextureName.bg_duel },
+  [SceneName.Tournament]: { backgrounds: [{ texture: TextureName.bg_duels_live, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.IRLTournament]: { backgrounds: [{ texture: TextureName.bg_duels_live, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.Duel]: { backgrounds: [{ texture: TextureName.bg_duel, shiftMultiplier: 0, renderOrder: 0 }] },
 }
 
 enum CharacterType {

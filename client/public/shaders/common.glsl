@@ -43,6 +43,14 @@ vec3 GAMMA_TO_LINEAR(vec3 value) {
 	return colour;
 }
 
+bool isLessThanOrEqual(vec3 a, vec3 b) {
+  return (a.x <= b.x) && (a.y <= b.y) && (a.z <= b.z);
+}
+
+vec3 linearToSRGB(vec3 color) {
+    return isLessThanOrEqual(color, vec3(0.0031308)) ? (color * 12.92) : (pow(color, vec3(1.0 / 2.4)) * 1.055 - 0.055);
+}
+
 
 float easeOut(float x, float t) {
 	return 1.0 - pow(1.0 - x, t);

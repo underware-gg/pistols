@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Image } from 'semantic-ui-react'
 import { SceneName, usePistolsScene } from '../../hooks/PistolsContext'
-import { useControllerUser } from '@/lib/dojo/hooks/useController'
+import { useControllerUsername } from '@/lib/dojo/hooks/useController'
 import { useElizaMessage } from '@/pistols/utils/eliza'
 
 export default function BarkeepModal({ open, setOpen }) {
@@ -10,7 +10,7 @@ export default function BarkeepModal({ open, setOpen }) {
   const [displayText, setDisplayText] = useState('')
   const [isAnimating, setIsAnimating] = useState(false)
 
-  const { username } = useControllerUser()
+  const { username } = useControllerUsername()
   const { sendMessage, responses } = useElizaMessage("Fortuna")
 
   useEffect(() => {
