@@ -1,7 +1,7 @@
 import { DojoAppConfig, ContractPolicyDecriptions, DojoManifest } from '@/lib/dojo/Dojo'
 import { StarknetDomain } from 'starknet'
 import { ChainId, defaultChainId } from '@/lib/dojo/setup/chainConfig'
-import { makeControllerConnector } from '@/lib/dojo/hooks/useController'
+import { makeControllerConnector } from '@/lib/dojo/setup/controller'
 import { dojoContextConfig } from '@/lib/dojo/setup/chains'
 import { TYPED_DATA } from './generated/constants'
 import pistols_manifest_dev from './manifests/manifest_dev.json'
@@ -75,7 +75,6 @@ const controllerConnector = makeControllerConnector(
   namespace,
   contractPolicyDescriptions,
 );
-//------------------------
 
 export const makeDojoAppConfig = (): DojoAppConfig => {
   return {
