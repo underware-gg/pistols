@@ -1,4 +1,5 @@
 import { Connector } from '@starknet-react/core'
+import { SchemaType, UnionOfModelData } from '@dojoengine/sdk'
 import {
   ControllerOptions,
   SessionPolicies,
@@ -9,59 +10,81 @@ import {
   Tokens,
   Method,
 } from '@cartridge/controller'
-import { ControllerConnector } from "@cartridge/connector";
-import { ContractPolicyDecriptions, DojoManifest } from '@/lib/dojo/Dojo'
+import { ControllerConnector } from '@cartridge/connector'
+import { ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from '@/lib/dojo/Dojo'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { _useConnector } from '../fix/starknet_react_core'
 import { assert } from '@/lib/utils/math'
+import { StarknetDomain, TypedData } from 'starknet'
 
-// sync from here:
-// https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
-export const CONTROLLER_CLASS_HASH = '0x05f0f2ae9301e0468ca3f9218dadd43a448a71acc66b6ef1a5570bb56cf10c6f'
+
+
+//--------------------------------------
+// create a connector for starknet-react
+//
+// should bever be called twice!
+// (create as global const)
+//
+export const makeControllerConnector = (
+  namespace: string,
+  manifest: DojoManifest,
+  rpcUrl: string,
+  contractPolicyDescriptions: ContractPolicyDescriptions,
+  signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions,
+): Connector => {
+  // const policies = _makeControllerPolicyArray(manifest, namespace, descriptions)
+  const policies: SessionPolicies = {
+    contracts: _makeControllerContractPolicies(manifest, namespace, contractPolicyDescriptions),
+    messages: _makeControllerSignMessagePolicies(signedMessagePolicyDescriptions),
+  }
+
+  // tokens to display
+  // const tokens: Tokens = {
+  //   erc20: [
+  //     // bigintToHex(lordsContractAddress),
+  //     // bigintToHex(fameContractAddress),
+  //   ],
+  //   // erc721: [],
+  // }
+
+  // extract slot service name from rpcUrl
+  const slot = /api\.cartridge\.gg\/x\/([^/]+)\/katana/.exec(rpcUrl)?.[1];
+
+  const options: ControllerOptions = {
+    // ProviderOptions
+    rpc: rpcUrl,
+    // IFrameOptions
+    theme: 'pistols',
+    colorMode: 'dark',
+    // KeychainOptions
+    namespace,
+    policies,
+    slot,
+    // tokens,
+  }
+  console.log(`-------- ControllerOptions:`, options)
+  const connector = new ControllerConnector(options) as never as Connector
+  assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
+  return connector
+}
+
 
 const exclusions = [
   'dojo_init',
 ]
 
-// const _makeControllerPolicyArray = (
-//   manifest: DojoManifest,
-//   namespace: string,
-//   descriptions: ContractPolicyDecriptions,
-// ): Policy[] => {
-//   const policies: Policy[] = []
-//   manifest?.contracts.forEach((c) => {
-//     const contractName = c.tag.split(`${namespace}-`).at(-1)
-//     const contract = descriptions[contractName]
-//     if (contract) {
-//       // --- abis
-//       c.abi.forEach((abi) => {
-//         // --- interfaces
-//         const interfaceName = abi.name.split('::').slice(-1)[0]
-//         // console.log(`CI:`, contractName, interfaceName)
-//         if (abi.type == 'interface' && contract.interfaces.includes(interfaceName)) {
-//           abi.items.forEach((i) => {
-//             // --- functions
-//             const method = i.name
-//             if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(method)) {
-//               // console.log(`CI:`, item.name, item)
-//               policies.push({
-//                 target: c.address,
-//                 method,
-//                 // description: `${c.tag}::${i.name}()`,
-//               })
-//             }
-//           })
-//         }
-//       })
-//     }
-//   })
-//   return policies
-// }
 
+//--------------------------------------
+// contract policies
+//
+// example:
+// https://github.com/cartridge-gg/controller/blob/main/packages/keychain/src/components/connect/CreateSession.stories.tsx
+// https://github.com/cartridge-gg/presets/blob/419dbda4283e4957db8a14ce202a04fabffea673/configs/eternum/config.json#L379
+//
 const _makeControllerContractPolicies = (
   manifest: DojoManifest,
   namespace: string,
-  descriptions: ContractPolicyDecriptions,
+  descriptions: ContractPolicyDescriptions,
 ): ContractPolicies => {
   const contracts: ContractPolicies = {};
   manifest?.contracts.forEach((c) => {
@@ -103,44 +126,57 @@ const _makeControllerContractPolicies = (
 }
 
 
-export const makeControllerConnector = (
-  manifest: DojoManifest,
-  rpcUrl: string,
-  namespace: string,
-  descriptions: ContractPolicyDecriptions,
-): Connector => {
-  // const policies = _makeControllerPolicyArray(manifest, namespace, descriptions)
-  const policies: SessionPolicies = {
-    contracts: _makeControllerContractPolicies(manifest, namespace, descriptions),
-    messages: [],
-  }
+//--------------------------------------
+// sined message policies
+//
 
-  // tokens to display
-  // const tokens: Tokens = {
-  //   erc20: [
-  //     // bigintToHex(lordsContractAddress),
-  //     // bigintToHex(fameContractAddress),
-  //   ],
-  //   // erc721: [],
-  // }
+// same as sdk.generateTypedData()
+export const generateTypedData = <T extends SchemaType, M extends UnionOfModelData<T>>(
+  domain: StarknetDomain,
+  primaryType: string,
+  message: M,
+  types?: { [name: string]: string },
+): TypedData => ({
+  types: {
+    StarknetDomain: [
+      { name: "name", type: "shortstring" },
+      { name: "version", type: "shortstring" },
+      { name: "chainId", type: "shortstring" },
+      { name: "revision", type: "shortstring" },
+    ],
+    [primaryType]: Object.keys(message).map((key) => ({
+      name: key,
+      type: types?.[key] ?? (
+        (typeof message[key] === "bigint" || typeof message[key] === "number" || typeof message[key] === "boolean")
+          ? "felt"
+          : "string"
+      ),
+    })),
+  },
+  primaryType,
+  domain,
+  message,
+})
 
-  // extract slot service name from rpcUrl
-  const slot = /api\.cartridge\.gg\/x\/([^/]+)\/katana/.exec(rpcUrl)?.[1];
 
-  const options: ControllerOptions = {
-    // ProviderOptions
-    rpc: rpcUrl,
-    // IFrameOptions
-    theme: "pistols",
-    colorMode: "dark",
-    // KeychainOptions
-    namespace,
-    policies,
-    slot,
-    // tokens,
-  }
-  console.log(`-------- ControllerOptions:`, options)
-  const connector = new ControllerConnector(options) as never as Connector
-  assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
-  return connector
+const _makeControllerSignMessagePolicies = (
+  descriptions: SignedMessagePolicyDescriptions,
+): SignMessagePolicy[] => {
+  const messages: SignMessagePolicy[] = [];
+  descriptions.forEach(desc => {
+    const msg: SignMessagePolicy = {
+      types: {
+        ...desc.typedData.types
+      },
+      primaryType: desc.typedData.primaryType,
+      domain: {
+        ...desc.typedData.domain
+      },
+      name: desc.name || desc.typedData.primaryType.split('-').at(1),
+      description: desc.description,
+    }
+    messages.push(msg)
+  })
+  return messages
 }
+

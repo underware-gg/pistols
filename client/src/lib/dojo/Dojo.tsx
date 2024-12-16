@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { StarknetDomain } from 'starknet'
+import { StarknetDomain, TypedData } from 'starknet'
 import { Connector } from '@starknet-react/core'
 import { Manifest } from '@dojoengine/core'
 import { StarknetProvider, useStarknetContext } from '@/lib/dojo/StarknetProvider'
@@ -11,7 +11,7 @@ import { ChainId } from '@/lib/dojo/setup/chains'
 // export type DojoManifest = Manifest
 export type DojoManifest = Manifest & any
 
-export type ContractPolicyDecriptions = {
+export type ContractPolicyDescriptions = {
   [contract_name: string]: {
     name?: string
     description?: string
@@ -19,13 +19,19 @@ export type ContractPolicyDecriptions = {
   }
 }
 
+export type SignedMessagePolicyDescriptions = {
+  name?: string
+  description?: string
+  typedData: TypedData
+}[]
+
 export interface DojoAppConfig {
   namespace: string
-  contractPolicyDescriptions: ContractPolicyDecriptions
   supportedChainIds: ChainId[]
   defaultChainId: ChainId
   starknetDomain: StarknetDomain
   manifests: { [chain_id: string]: DojoManifest | undefined }
+  contractPolicyDescriptions: ContractPolicyDescriptions
   controllerConnector: Connector
 }
 

@@ -17,7 +17,7 @@ export const CONTROLLER_CLASS_HASH = '0x05f0f2ae9301e0468ca3f9218dadd43a448a71ac
 // not good to use!!!
 // (React can call it multiple times)
 //
-// export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, namespace: string, descriptions: ContractPolicyDecriptions) => {
+// export const useControllerConnector = (manifest: DojoManifest, rpcUrl: string, namespace: string, descriptions: ContractPolicyDescriptions) => {
 //   const connectorRef = useRef<any>(undefined)
 //   const controller = useCallback(() => {
 //     if (!connectorRef.current) {

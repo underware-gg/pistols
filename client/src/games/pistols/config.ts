@@ -1,13 +1,14 @@
-import { DojoAppConfig, ContractPolicyDecriptions, DojoManifest } from '@/lib/dojo/Dojo'
-import { StarknetDomain } from 'starknet'
+import { DojoAppConfig, ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from '@/lib/dojo/Dojo'
+import { StarknetDomain, TypedData } from 'starknet'
 import { ChainId, defaultChainId } from '@/lib/dojo/setup/chainConfig'
 import { makeControllerConnector } from '@/lib/dojo/setup/controller'
 import { dojoContextConfig } from '@/lib/dojo/setup/chains'
-import { TYPED_DATA } from './generated/constants'
+import { TutorialProgress, TYPED_DATA } from './generated/constants'
 import pistols_manifest_dev from './manifests/manifest_dev.json'
 import pistols_manifest_slot from './manifests/manifest_slot.json'
 import pistols_manifest_staging from './manifests/manifest_staging.json'
 import pistols_manifest_sepolia from './manifests/manifest_sepolia.json'
+import { make_typed_data_PPlayerBookmark, make_typed_data_PPlayerOnline, make_typed_data_PPlayerTutorialProgress } from './signed_messages'
 
 // TODO: move this here!
 // import { defineContractComponents } from './generated/contractComponents'
@@ -29,9 +30,16 @@ const manifests: Record<ChainId, DojoManifest> = {
   [ChainId.SN_MAINNET]: null,
 }
 
-const namespace = 'pistols'
+export const NAMESPACE = 'pistols'
 
-const contractPolicyDescriptions: ContractPolicyDecriptions = {
+export const STARKNET_DOMAIN: StarknetDomain = {
+  name: TYPED_DATA.NAME,
+  version: TYPED_DATA.VERSION,
+  chainId: defaultChainId,
+  revision: '1',
+}
+
+const contractPolicyDescriptions: ContractPolicyDescriptions = {
   game: {
     name: 'Pistols Game Loop',
     description: 'Pistols Game Loop',
@@ -62,28 +70,48 @@ const contractPolicyDescriptions: ContractPolicyDecriptions = {
   // },
 }
 
-const starknetDomain: StarknetDomain = {
-  name: TYPED_DATA.NAME,
-  version: TYPED_DATA.VERSION,
-  chainId: defaultChainId,
-  revision: '1',
-}
+const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
+  {
+    description: 'Notify the server that a player is online',
+    typedData: make_typed_data_PPlayerOnline({
+        identity: '0x0',
+        timestamp: 0,
+      }),
+  },
+  {
+    description: 'Notify the server of a player tutorial progress',
+    typedData: make_typed_data_PPlayerTutorialProgress({
+        identity: '0x0',
+        progress: TutorialProgress.None,
+      }),
+  },
+  {
+    description: 'Notify the server that a player follows another player or token',
+    typedData: make_typed_data_PPlayerBookmark({
+        identity: '0x0',
+        target_address: '0x0',
+        target_id: '0x0',
+        enabled: false,
+      })
+  },
+]
 
 const controllerConnector = makeControllerConnector(
+  NAMESPACE,
   manifests[defaultChainId],
   dojoContextConfig[defaultChainId].rpcUrl,
-  namespace,
   contractPolicyDescriptions,
+  signedMessagePolicyDescriptions,
 );
 
 export const makeDojoAppConfig = (): DojoAppConfig => {
   return {
-    manifests,
+    namespace: NAMESPACE,
     supportedChainIds,
     defaultChainId,
-    namespace,
+    starknetDomain: STARKNET_DOMAIN,
+    manifests,
     contractPolicyDescriptions,
-    starknetDomain,
     controllerConnector,
   }
 }
