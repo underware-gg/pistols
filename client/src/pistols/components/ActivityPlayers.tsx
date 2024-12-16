@@ -1,23 +1,26 @@
 import React, { useEffect, useMemo } from 'react'
-import { useAllPlayersActivityFeed, ActivityState } from '@/pistols/stores/eventsStore'
+import { BigNumberish } from 'starknet'
+import { usePlayersOnline } from '@/pistols/stores/playerStore'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { PlayerLink, TimestampDeltaElapsed } from '@/pistols/components/Links'
+import { formatTimestampDeltaElapsed } from '@/lib/utils/timestamp'
+import { PlayerLink } from '@/pistols/components/Links'
 
 export const ActivityPlayers = () => {
-  const { allPlayersActivity } = useAllPlayersActivityFeed()
+  const { playersOnline } = usePlayersOnline()
   const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 60)
 
-  const items = useMemo(() => ([...allPlayersActivity].reverse().map((a) =>
+  const items = useMemo(() => (Object.keys(playersOnline).map((address) =>
     <ActivityItem
-      key={`${a.address}-${a.timestamp}-${a.activity}-${a.identifier.toString()}`}
+      key={address}
+      address={address}
+      timestamp={playersOnline[address]}
       clientSeconds={clientSeconds}
-      activity={a}
     />)
-  ), [allPlayersActivity, clientSeconds])
+  ), [playersOnline, clientSeconds])
 
   useEffect(() => {
     updateTimestamp()
-  }, [allPlayersActivity])
+  }, [playersOnline])
 
   return (
     <div className='FillParent'>
@@ -30,20 +33,25 @@ export default ActivityPlayers;
 
 
 interface ActivityItemProps {
-  activity: ActivityState
+  address: BigNumberish
+  timestamp: number
   clientSeconds: number
 }
 
 const ActivityItem = ({
-  activity,
+  address,
+  timestamp,
   clientSeconds,
 }: ActivityItemProps) => {
+  const time = formatTimestampDeltaElapsed(timestamp, clientSeconds)
   return (
     <>
-      <PlayerLink address={activity.address} />
-      {' last seen '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} className='Brightest' />
-      {' ago'}
+      <PlayerLink address={address} />
+      {' '}
+      {time === 'now'
+        ? <span className='Brightest'>is online</span>
+        : <>last seen <span className='Brightest'>{time}</span> ago</>
+      }
       <br />
     </>
   )

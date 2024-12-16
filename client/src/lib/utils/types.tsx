@@ -58,11 +58,21 @@ export const arrayClean = <T,>(array: T[]): T[] => (array?.filter(e => (e != nul
 // dictionaries
 //
 
-export const getObjectKeyByValue = (obj: any, value: any) => Object.keys(obj).find(key => obj[key] === value);
-export const cleanObject = (obj: any): any => Object.keys(obj).reduce((acc, key) => {
-  if (obj[key] !== undefined) acc[key] = obj[key]
-  return acc
-}, {} as { [key: string]: any });
+export const getObjectKeyByValue = <T extends any>(obj: T, value: any): string | undefined => Object.keys(obj).find(key => obj[key] === value);
+export const cleanObject = <T extends any>(obj: T): T =>
+  Object.keys(obj)
+    .reduce((acc, key) => {
+      if (obj[key] !== undefined) acc[key] = obj[key]
+      return acc
+    }, {} as T);
+export const sortObjectByValue = <T extends any>(obj: T, sorter: (a: any, b: any) => number): T =>
+  Object.keys(obj)
+    .sort((a, b) => sorter(obj[a], obj[b]))
+    .reduce((acc, key) => {
+      acc[key] = obj[key];
+      return acc;
+    }, {} as T);
+
 
 //
 // serializer

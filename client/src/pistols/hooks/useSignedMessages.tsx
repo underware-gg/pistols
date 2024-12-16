@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { Account, BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSdkPublishTypedData } from '@/lib/dojo/hooks/useSdkSignedMessage'
-import { getClientSeconds } from '@/lib/utils/timestamp'
 import { TutorialProgress } from '@/games/pistols/generated/constants'
 import {
   make_typed_data_PPlayerBookmark,
@@ -11,12 +10,12 @@ import {
 } from '@/games/pistols/signed_messages'
 
 
-export function usePlayerOnlineSignedMessage(timestamp?: number) {
+export function usePlayerOnlineSignedMessage(timestamp: number) {
   const { account } = useAccount()
   const typedData = useMemo(() => (
     make_typed_data_PPlayerOnline({
       identity: account?.address ?? 0,
-      timestamp: Math.floor(timestamp ?? getClientSeconds()),
+      timestamp: Math.floor(timestamp),
     })
   ), [account, timestamp])
   const { publish, isPublishing } = useSdkPublishTypedData(account as Account, typedData)

@@ -1,8 +1,7 @@
 import { useEffect } from 'react'
 import { Button } from 'semantic-ui-react'
-import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { usePlayerOnlineSignedMessage } from '@/pistols/hooks/useSignedMessages'
+import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 
 
 //------------------------------------------------------
@@ -18,8 +17,7 @@ export function PlayerOnlineSync() {
   const { publish, isPublishing } = usePlayerOnlineSignedMessage(clientSeconds)
 
   useEffect(() => {
-    if (publish && clientSeconds > 0) {
-      // TODO: enable this...
+    if (publish && clientSeconds > 0 && !isPublishing) {
       // publish()
     }
   }, [publish, clientSeconds])
@@ -28,6 +26,7 @@ export function PlayerOnlineSync() {
 }
 
 export function PublishOnlineStatusButton() {
-  const { publish, isPublishing } = usePlayerOnlineSignedMessage()
+  const { clientSeconds } = useClientTimestamp(true)
+  const { publish, isPublishing } = usePlayerOnlineSignedMessage(clientSeconds)
   return (<Button className='AbsoluteBottom' disabled={isPublishing} style={{ zIndex: 1000 }} onClick={publish}>Publish Online Status</Button>)
 }

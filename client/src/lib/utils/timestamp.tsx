@@ -16,15 +16,21 @@ const splitTimestamp = (s: number) => {
   const [time, iso3] = iso2.split('.')
   const [fmt_hour, fmt_minutes, fmt_seconds] = time.split(':')
   const days = Math.floor(s / (24 * 60 * 60))
+  const weeks = Math.floor(days / 7)
+  const months = Math.floor(days / 30)
+  const years = Math.floor(days / 365)
   return {
     fmt_date,    // 2024-12-22
     fmt_hour,    // 00..23
     fmt_minutes, // 00..59
     fmt_seconds, // 00..59
-    days: Number(days),
-    hours: Number(fmt_hour),
-    minutes: Number(fmt_minutes),
     seconds: Number(fmt_seconds),
+    minutes: Number(fmt_minutes),
+    hours: Number(fmt_hour),
+    days: days,
+    weeks: weeks,
+    months: months,
+    years: years,
   }
 }
 
@@ -64,7 +70,13 @@ export const formatTimestampDeltaTime = (s_start: number, s_end: number): string
 // ex: now / 30 sec / 1 min / 1 hr / 1 day / 5 days
 export const formatTimestampDeltaElapsed = (s_start: number, s_end: number): string => {
   const s = Math.max(0, s_end - s_start)
-  const { days, hours, minutes } = splitTimestamp(s)
+  const { years, months, weeks, days, hours, minutes } = splitTimestamp(s)
+  if (years > 1) return `${years} years`
+  if (years == 1) return `${years} year`
+  if (months > 1) return `${months} months`
+  if (months == 1) return `${months} month`
+  if (weeks > 1) return `${weeks} weeks`
+  if (weeks == 1) return `${weeks} week`
   if (days > 1) return `${days} days`
   if (days == 1) return `${days} day`
   if (hours > 1) return `${hours} hrs`
@@ -74,7 +86,13 @@ export const formatTimestampDeltaElapsed = (s_start: number, s_end: number): str
 }
 export const formatTimestampDeltaCountdown = (s_start: number, s_end: number): string => {
   const s = Math.max(0, s_end - s_start)
-  const { days, hours, minutes, seconds } = splitTimestamp(s)
+  const { years, months, weeks, days, hours, minutes, seconds } = splitTimestamp(s)
+  if (years > 1) return `${years} years`
+  if (years == 1) return `${years} year`
+  if (months > 1) return `${months} months`
+  if (months == 1) return `${months} month`
+  if (weeks > 1) return `${weeks} weeks`
+  if (weeks == 1) return `${weeks} week`
   if (days > 1) return `${days} days`
   if (days == 1) return `${days} day`
   if (hours > 1) return `${hours} hrs`
