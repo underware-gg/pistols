@@ -1,16 +1,33 @@
 
+export interface TimestampResult {
+  fmt_date: string
+  fmt_hour: string
+  fmt_minutes: string
+  fmt_seconds: string
+  seconds: number
+  minutes: number
+  hours: number
+  days: number
+  weeks: number
+  months: number
+  years: number
+}
+export type FormatTimestampResult = TimestampResult & {
+  result: string
+}
+
 // get current time in seconds
-export const getClientSeconds = () => {
+export const getClientSeconds = (): number => {
   return Math.floor(new Date().getTime() / 1000)
 }
 
 // date is seconds
-const splitDate = (d: Date) => {
+const splitDate = (d: Date): TimestampResult => {
   return splitTimestamp(Math.floor(d.getTime() / 1000))
 }
 
 // timestamp is milliseconds
-const splitTimestamp = (s: number) => {
+const splitTimestamp = (s: number): TimestampResult => {
   const iso = (new Date(s * 1000).toISOString()) // ex: 2011-10-05T14:48:00.000Z
   const [fmt_date, iso2] = iso.split('T')
   const [time, iso3] = iso2.split('.')
@@ -42,62 +59,65 @@ export const formatTimestampLocal = (s: number): string => {
   return `${fmt_date} ${fmt_hour}:${fmt_minutes}`
 }
 
-export const formatTimestampElapsed = (s_start: number): string => {
-  const now = getClientSeconds()
-  return formatTimestampDeltaElapsed(s_start, now)
-}
-
-export const formatTimestampCountdown = (s_end: number): string => {
-  const now = getClientSeconds()
-  return formatTimestampDeltaCountdown(now, s_end)
-}
-
 //
 // format timestamp delta as clock-like time
 // ex: 00m00s / 00m30s / 01m00s / 01h30m00s / 23h00m00s / 1d 00h01m
-export const formatTimestampDeltaTime = (s_start: number, s_end: number): string => {
+export const formatTimestampDeltaTime = (s_start: number, s_end: number): FormatTimestampResult => {
   const s = Math.max(0, s_end - s_start)
-  const { days, hours, fmt_hour, fmt_minutes, fmt_seconds } = splitTimestamp(s)
+  const ts = splitTimestamp(s)
   let result = ''
-  if (days > 0) result += `${days}d `
-  if (days > 0 || (hours) > 0) result += `${fmt_hour}h`
-  result += `${fmt_minutes}m`
-  if (days == 0) result += `${fmt_seconds}s`
-  return result
+  if (ts.days > 0) result += `${ts.days}d `
+  if (ts.days > 0 || (ts.hours) > 0) result += `${ts.hours}h`
+  result += `${ts.minutes}m`
+  if (ts.days == 0) result += `${ts.seconds}s`
+  return {
+    ...ts,
+    result,
+  }
 }
 
 // format timestamp delta as readable time
 // ex: now / 30 sec / 1 min / 1 hr / 1 day / 5 days
-export const formatTimestampDeltaElapsed = (s_start: number, s_end: number): string => {
+export const formatTimestampDeltaElapsed = (s_start: number, s_end: number): FormatTimestampResult => {
   const s = Math.max(0, s_end - s_start)
-  const { years, months, weeks, days, hours, minutes } = splitTimestamp(s)
-  if (years > 1) return `${years} years`
-  if (years == 1) return `${years} year`
-  if (months > 1) return `${months} months`
-  if (months == 1) return `${months} month`
-  if (weeks > 1) return `${weeks} weeks`
-  if (weeks == 1) return `${weeks} week`
-  if (days > 1) return `${days} days`
-  if (days == 1) return `${days} day`
-  if (hours > 1) return `${hours} hrs`
-  if (hours == 1) return `${hours} hr`
-  if (minutes > 0) return `${minutes} min`
-  return `now`
+  const ts = splitTimestamp(s)
+  const result =
+    (ts.years > 1) ? `${ts.years} years`
+      : (ts.years == 1) ? `${ts.years} year`
+        : (ts.months > 1) ? `${ts.months} months`
+          : (ts.months == 1) ? `${ts.months} month`
+            : (ts.weeks > 1) ? `${ts.weeks} weeks`
+              : (ts.weeks == 1) ? `${ts.weeks} week`
+                : (ts.days > 1) ? `${ts.days} days`
+                  : (ts.days == 1) ? `${ts.days} day`
+                    : (ts.hours > 1) ? `${ts.hours} hrs`
+                      : (ts.hours == 1) ? `${ts.hours} hr`
+                        : (ts.minutes > 0) ? `${ts.minutes} min`
+                          : 'now'
+  return {
+    ...ts,
+    result,
+  }
 }
-export const formatTimestampDeltaCountdown = (s_start: number, s_end: number): string => {
+export const formatTimestampDeltaCountdown = (s_start: number, s_end: number): FormatTimestampResult => {
   const s = Math.max(0, s_end - s_start)
-  const { years, months, weeks, days, hours, minutes, seconds } = splitTimestamp(s)
-  if (years > 1) return `${years} years`
-  if (years == 1) return `${years} year`
-  if (months > 1) return `${months} months`
-  if (months == 1) return `${months} month`
-  if (weeks > 1) return `${weeks} weeks`
-  if (weeks == 1) return `${weeks} week`
-  if (days > 1) return `${days} days`
-  if (days == 1) return `${days} day`
-  if (hours > 1) return `${hours} hrs`
-  if (hours == 1) return `${hours} hr`
-  if (minutes > 0) return `${minutes} min`
-  if (seconds > 0) return `${seconds} sec`
-  return `over`
+  const ts = splitTimestamp(s)
+  const result =
+    (ts.years > 1) ? `${ts.years} years`
+      : (ts.years == 1) ? `${ts.years} year`
+        : (ts.months > 1) ? `${ts.months} months`
+          : (ts.months == 1) ? `${ts.months} month`
+            : (ts.weeks > 1) ? `${ts.weeks} weeks`
+              : (ts.weeks == 1) ? `${ts.weeks} week`
+                : (ts.days > 1) ? `${ts.days} days`
+                  : (ts.days == 1) ? `${ts.days} day`
+                    : (ts.hours > 1) ? `${ts.hours} hrs`
+                      : (ts.hours == 1) ? `${ts.hours} hr`
+                        : (ts.minutes > 0) ? `${ts.minutes} min`
+                          : (ts.seconds > 0) ? `${ts.seconds} sec`
+                            : 'over'
+  return {
+    ...ts,
+    result,
+  }
 }
