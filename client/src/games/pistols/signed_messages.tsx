@@ -1,10 +1,20 @@
-import { BigNumberish } from 'starknet'
+import { BigNumberish, typedData } from 'starknet'
 import { generateTypedData } from "@/lib/dojo/setup/controller"
 import { TutorialProgress, getTutorialProgressValue } from '@/games/pistols/generated/constants'
-import { bigintToHex } from "@/lib/utils/types"
+import { bigintToHex, bigintToNumber } from "@/lib/utils/types"
 import { STARKNET_DOMAIN } from './config'
 import { SchemaType as PistolsSchemaType } from './generated/typescript/models.gen'
 import * as models from './generated/typescript/models.gen'
+
+//
+// type examples:
+// https://github.com/cartridge-gg/presets/blob/419dbda4283e4957db8a14ce202a04fabffea673/configs/eternum/config.json#L379
+// https://github.com/starknet-io/starknet.js/blob/6e353d3d50226907ce6b5ad53309d55ed51c6874/__mocks__/typedData/example_baseTypes.json
+//
+// encode examples:
+// https://starknetjs.com/docs/API/namespaces/typedData/#encodevalue
+// const encoded = typedData.encodeValue({}, 'u128', bigintToHex(target_id))
+//
 
 export type OmitFieldOrder<T> = Omit<T, 'fieldOrder'>;
 
@@ -24,6 +34,7 @@ export function make_typed_data_PPlayerOnline({
     },
     {
       identity: 'ContractAddress',
+      timestamp: 'felt',
     },
   )
 }
@@ -44,6 +55,7 @@ export function make_typed_data_PPlayerTutorialProgress({
     },
     {
       identity: 'ContractAddress',
+      progress: 'felt',
     },
   )
 }
@@ -64,12 +76,15 @@ export function make_typed_data_PPlayerBookmark({
     'pistols-PPlayerBookmark',
     {
       identity: bigintToHex(identity),
-      target_address: BigInt(target_address),
-      target_id: BigInt(target_id),
-      enabled: enabled,
+      target_address: bigintToHex(target_address),
+      target_id: bigintToHex(target_id),
+      enabled,
     },
     {
       identity: 'ContractAddress',
+      target_address: 'ContractAddress',
+      target_id: 'u128',
+      enabled: 'bool',
     },
   )
 }
