@@ -15,7 +15,7 @@ import { ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptio
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { _useConnector } from '../fix/starknet_react_core'
 import { assert } from '@/lib/utils/math'
-import { StarknetDomain, TypedData } from 'starknet'
+import { StarknetDomain, StarknetType, TypedData } from 'starknet'
 
 
 
@@ -135,7 +135,8 @@ export const generateTypedData = <T extends SchemaType, M extends UnionOfModelDa
   domain: StarknetDomain,
   primaryType: string,
   message: M,
-  types?: { [name: string]: string },
+  messageFieldTypes: { [name: string]: string },
+  enumTypes?: Record<string, StarknetType[]>,
 ): TypedData => ({
   types: {
     StarknetDomain: [
@@ -144,14 +145,18 @@ export const generateTypedData = <T extends SchemaType, M extends UnionOfModelDa
       { name: "chainId", type: "shortstring" },
       { name: "revision", type: "shortstring" },
     ],
-    [primaryType]: Object.keys(message).map((key) => ({
-      name: key,
-      type: types?.[key] ?? (
-        (typeof message[key] === "bigint" || typeof message[key] === "number" || typeof message[key] === "boolean")
-          ? "felt"
-          : "string"
-      ),
-    })),
+    [primaryType]: Object.keys(message).map((key) => {
+      let result: any = {
+        name: key,
+        type: messageFieldTypes[key],
+      }
+      if (enumTypes?.[result.type]) {
+        result.contains = result.type
+        result.type = "enum"
+      }
+      return result
+    }),
+    ...enumTypes,
   },
   primaryType,
   domain,

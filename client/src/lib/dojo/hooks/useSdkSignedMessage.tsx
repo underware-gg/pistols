@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { Account, TypedData, stark } from 'starknet'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { PistolsModelType } from '@/lib/dojo/hooks/useSdkTypes'
+import { serialize } from '@/lib/utils/types'
 
 // export const useSdkPublishSignedMessage = <M extends PistolsModelType>(
 //   account: Account,
@@ -41,7 +41,7 @@ export const useSdkPublishTypedData = (
       // await sdk.sendMessage(typedData, account)
 
       try {
-        console.log('SIGNED_MESSAGE: sign...', typedData)
+        console.log('SIGNED_MESSAGE: sign...', serialize(typedData), typedData)
         let signature = await account.signMessage(typedData);
         // console.log('SIGNED_MESSAGE: signature:', signature)
         if (!Array.isArray(signature)) {

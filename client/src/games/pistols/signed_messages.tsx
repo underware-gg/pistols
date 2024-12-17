@@ -1,6 +1,6 @@
-import { BigNumberish, typedData } from 'starknet'
+import { BigNumberish, StarknetType, typedData } from 'starknet'
 import { generateTypedData } from "@/lib/dojo/setup/controller"
-import { TutorialProgress, getTutorialProgressValue } from '@/games/pistols/generated/constants'
+import { TutorialProgress, TutorialProgressNameToValue, getTutorialProgressValue } from '@/games/pistols/generated/constants'
 import { bigintToDecimal, bigintToHex, bigintToNumber } from "@/lib/utils/types"
 import { STARKNET_DOMAIN } from './config'
 import { SchemaType as PistolsSchemaType } from './generated/typescript/models.gen'
@@ -39,27 +39,6 @@ export function make_typed_data_PPlayerOnline({
   )
 }
 
-export function make_typed_data_PPlayerTutorialProgress({
-  identity,
-  progress,
-}: {
-  identity: BigNumberish,
-  progress: TutorialProgress,
-}) {
-  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PPlayerTutorialProgress>>(
-    STARKNET_DOMAIN,
-    'pistols-PPlayerTutorialProgress',
-    {
-      identity: bigintToHex(identity),
-      progress: getTutorialProgressValue(progress),
-    },
-    {
-      identity: 'ContractAddress',
-      progress: 'felt',
-    },
-  )
-}
-
 export function make_typed_data_PPlayerBookmark({
   identity,
   target_address,
@@ -83,8 +62,57 @@ export function make_typed_data_PPlayerBookmark({
     {
       identity: 'ContractAddress',
       target_address: 'ContractAddress',
-      target_id: 'u128', // torii required data as bigintToDecimal()
+      target_id: 'u128', // torii required data as decimal string
       enabled: 'bool',
     },
   )
 }
+
+export function make_typed_data_PPlayerTutorialProgress({
+  identity,
+  progress,
+}: {
+  identity: BigNumberish,
+  progress: TutorialProgress,
+}) {
+  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PPlayerTutorialProgress>>(
+    STARKNET_DOMAIN,
+    'pistols-PPlayerTutorialProgress',
+    {
+      identity: bigintToHex(identity),
+      //@ts-ignore
+      progress: { [progress]: [] }, // enum!
+    },
+    {
+      identity: 'ContractAddress',
+      progress: 'TutorialProgress',
+    },
+    {
+      TutorialProgress: makeEnumType(TutorialProgressNameToValue)
+    }
+  )
+}
+
+
+//
+// example: from...
+// export const TutorialProgressNameToValue: Record<TutorialProgress, number> = {
+//   [TutorialProgress.None]: 0,
+//   [TutorialProgress.FinishedFirst]: 1,
+//   [TutorialProgress.FinishedSecond]: 2,
+//   [TutorialProgress.FinishedFirstDuel]: 3,
+// };
+//
+// to...
+// TutorialProgress: [
+//   { name: 'None', type: '()' },
+//   { name: 'FinishedFirst', type: '()' },
+//   { name: 'FinishedSecond', type: '()' },
+//   { name: 'FinishedFirstDuel', type: '()' },
+// ]
+const makeEnumType = (enumValues: Record<string, number>): StarknetType[] => (
+  Object.keys(enumValues).map(name => ({
+    name,
+    type: '()',
+  }))
+)
