@@ -1360,11 +1360,13 @@ $ui-container-gap: 1em;
 	-webkit-animation-timing-function: ease-out;
 	-webkit-animation-fill-mode: forwards;
 }
-.IconClick {
-  @extend .Anchor;
+.IconNoClick {
   color: $color-bright;
 	text-shadow: 0.1rem 0.1rem $color-shadow;
   z-index: 1000;
+}
+.IconClick {
+  @extend .IconNoClick, .Anchor;
   &:hover {
     @extend .IconClick_hover;
   }

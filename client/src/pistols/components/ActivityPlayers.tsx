@@ -6,7 +6,7 @@ import { usePlayerBookmarkSignedMessage } from '@/pistols/hooks/useSignedMessage
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
 import { formatTimestampDeltaElapsed } from '@/lib/utils/timestamp'
 import { PlayerLink } from '@/pistols/components/Links'
-import { Icon, IconClick } from '@/lib/ui/Icons'
+import { BookmarkIcon, OnlineStatusIcon } from '@/lib/ui/Icons'
 
 export const ActivityPlayers = () => {
   const { address } = useAccount()
@@ -22,7 +22,7 @@ export const ActivityPlayers = () => {
       clientSeconds={clientSeconds}
       isBookmarked={bookmarkedPlayers.includes(addr)}
     />)
-  ), [playersOnline, clientSeconds])
+  ), [playersOnline, clientSeconds, bookmarkedPlayers])
 
   useEffect(() => {
     updateTimestamp()
@@ -51,17 +51,12 @@ const ActivityItem = ({
   clientSeconds,
   isBookmarked,
 }: ActivityItemProps) => {
-  const { result: time, minutes } = useMemo(() => formatTimestampDeltaElapsed(timestamp, clientSeconds), [timestamp, clientSeconds])
-  const isOnline = useMemo(() => (time === 'now'), [time])
-  const isAway = useMemo(() => (!isOnline && minutes <= 15), [isOnline, minutes])
-  // const isOffline = useMemo(() => (!isOnline && !isAway), [isOnline, isAway])
-
+  const { result: time, isOnline, isAway } = useMemo(() => formatTimestampDeltaElapsed(timestamp, clientSeconds), [timestamp, clientSeconds])
   const { publish, isPublishing } = usePlayerBookmarkSignedMessage(address, 0, !isBookmarked)
-
   return (
     <>
-      <IconClick name={isBookmarked ? 'bookmark' : 'bookmark outline'} onClick={publish} />
-      <Icon name='circle' className={isOnline ? 'Positive' : isAway ? 'Warning' : 'Canceled'} />
+      <BookmarkIcon isBookmarked={isBookmarked } onClick={publish} />
+      <OnlineStatusIcon isOnline={isOnline} isAway={isAway} />
       <PlayerLink address={address} />
       {' '}
       {isOnline

@@ -1,7 +1,7 @@
 import { BigNumberish, typedData } from 'starknet'
 import { generateTypedData } from "@/lib/dojo/setup/controller"
 import { TutorialProgress, getTutorialProgressValue } from '@/games/pistols/generated/constants'
-import { bigintToHex, bigintToNumber } from "@/lib/utils/types"
+import { bigintToDecimal, bigintToHex, bigintToNumber } from "@/lib/utils/types"
 import { STARKNET_DOMAIN } from './config'
 import { SchemaType as PistolsSchemaType } from './generated/typescript/models.gen'
 import * as models from './generated/typescript/models.gen'
@@ -77,13 +77,13 @@ export function make_typed_data_PPlayerBookmark({
     {
       identity: bigintToHex(identity),
       target_address: bigintToHex(target_address),
-      target_id: bigintToHex(target_id),
+      target_id: bigintToDecimal(target_id),
       enabled,
     },
     {
       identity: 'ContractAddress',
       target_address: 'ContractAddress',
-      target_id: 'u128',
+      target_id: 'u128', // torii required data as bigintToDecimal()
       enabled: 'bool',
     },
   )

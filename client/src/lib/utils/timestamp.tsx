@@ -11,6 +11,8 @@ export interface TimestampResult {
   weeks: number
   months: number
   years: number
+  isOnline?: boolean
+  isAway?: boolean
 }
 export type FormatTimestampResult = TimestampResult & {
   result: string
@@ -90,13 +92,16 @@ export const formatTimestampDeltaElapsed = (s_start: number, s_end: number): For
               : (ts.weeks == 1) ? `${ts.weeks} week`
                 : (ts.days > 1) ? `${ts.days} days`
                   : (ts.days == 1) ? `${ts.days} day`
-                    : (ts.hours > 1) ? `${ts.hours} hrs`
-                      : (ts.hours == 1) ? `${ts.hours} hr`
-                        : (ts.minutes > 0) ? `${ts.minutes} min`
-                          : 'now'
+                    : (ts.hours > 0) ? `${ts.hours}h`
+                      : (ts.minutes > 0) ? `${ts.minutes}m`
+                        : 'now';
+  const isOnline = (result === 'now')
+  const isAway = (!isOnline && ts.hours == 0 && ts.minutes <= 15)
   return {
     ...ts,
     result,
+    isOnline,
+    isAway,
   }
 }
 export const formatTimestampDeltaCountdown = (s_start: number, s_end: number): FormatTimestampResult => {
@@ -111,11 +116,10 @@ export const formatTimestampDeltaCountdown = (s_start: number, s_end: number): F
               : (ts.weeks == 1) ? `${ts.weeks} week`
                 : (ts.days > 1) ? `${ts.days} days`
                   : (ts.days == 1) ? `${ts.days} day`
-                    : (ts.hours > 1) ? `${ts.hours} hrs`
-                      : (ts.hours == 1) ? `${ts.hours} hr`
-                        : (ts.minutes > 0) ? `${ts.minutes} min`
-                          : (ts.seconds > 0) ? `${ts.seconds} sec`
-                            : 'over'
+                    : (ts.hours > 0) ? `${ts.hours}h`
+                      : (ts.minutes > 0) ? `${ts.minutes}m`
+                        : (ts.seconds > 0) ? `${ts.seconds}s`
+                          : 'over'
   return {
     ...ts,
     result,

@@ -121,20 +121,21 @@ export function LoadingIcon({
 // clickable, animated icon
 //
 interface IconClickProps extends IconProps {
-  onClick: Function
+  onClick?: Function
   important?: boolean
   className?: string
   style?: any
 }
 export function IconClick(props: IconClickProps) {
-  const classNames = ['IconClick']
+  const classNames = props.onClick ? ['IconClick'] : ['IconNoClick']
   if (props.important) classNames.push('Important')
   if (props.className) classNames.push(props.className)
   const iconProps = useMemo(() => ({ ...props, important: undefined }), [props])
   return (
-    <Icon {...iconProps} className={classNames.join(' ')} style={props.style} onClick={() => props.onClick()} />
+    <Icon {...iconProps} className={classNames.join(' ')} style={props.style} onClick={() => props.onClick?.()} />
   )
 }
+
 
 //---------------------------------
 // Copy to clipboard
@@ -143,14 +144,51 @@ interface CopyIconProps extends IconProps {
   content: string
 }
 export function CopyIcon(props: CopyIconProps) {
-  function _copy() {
+  const iconProps = useMemo(() => ({ ...props, className: 'NoMargin' }), [props])
+  const _copy = () => {
     navigator?.clipboard?.writeText(props.content)
   }
-
-  const iconProps = useMemo(() => ({ ...props, className: 'NoMargin' }), [props])
-
   return (
     <IconClick {...iconProps} name='copy' onClick={() => _copy()} />
+  )
+}
+
+
+//---------------------------------
+// Bookmarks
+//
+interface BookmarkIconProps extends IconProps {
+  isBookmarked: boolean
+  onClick?: Function
+}
+export function BookmarkIcon(props: BookmarkIconProps) {
+  const iconProps = useMemo(() => ({ ...props, className: 'NoMargin' }), [props])
+  return (
+    <IconClick {...iconProps}
+      name={props.isBookmarked ? 'bookmark' : 'bookmark outline'}
+      onClick={props.onClick}
+    />
+  )
+}
+
+
+//---------------------------------
+// Online status
+//
+interface OnlineStatusIconProps extends IconProps {
+  isOnline?: boolean
+  isAway?: boolean
+  isAvailable?: boolean
+  onClick?: Function
+}
+export function OnlineStatusIcon(props: OnlineStatusIconProps) {
+  const iconProps = useMemo(() => ({ ...props, className: 'NoMargin' }), [props])
+  return (
+    <IconClick {...iconProps}
+      name={props.isAvailable === false ? 'minus circle' : 'circle'}
+      className={props.isOnline ? 'Positive' : props.isAway ? 'Warning' : 'Negative'}
+      onClick={props.onClick}
+    />
   )
 }
 
