@@ -30,6 +30,10 @@ export const useSdkPublishTypedData = (
         console.error('useSdkPublishSignedMessage() failed: relayUrl is not set')
         return
       }
+      if (isPublishing) {
+        console.warn('useSdkPublishSignedMessage() still publishing...')
+        return
+      }
 
       setIsPublishing(true)
 

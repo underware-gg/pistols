@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
+import { useAccount } from '@starknet-react/core'
 import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@/lib/utils/types'
 import { TutorialProgress } from '@/games/pistols/generated/constants'
@@ -171,6 +172,19 @@ export const usePlayer = (address: BigNumberish) => {
     tutorialProgress,
     bookmarkedPlayers,
     bookmarkedTokens,
+  }
+}
+
+export const useIsBookmarked = (target_address: BigNumberish, target_id: BigNumberish = 0) => {
+  const { address } = useAccount()
+  const { bookmarkedPlayers, bookmarkedTokens } = usePlayer(address)
+  const isBookmarked = useMemo(() => (
+    target_id == 0n
+      ? bookmarkedPlayers.includes(bigintToHex(target_address))
+      : bookmarkedTokens[bigintToHex(target_address)]?.includes(BigInt(target_id))
+  ), [bookmarkedPlayers, bookmarkedTokens, target_address, target_id])
+  return {
+    isBookmarked,
   }
 }
 

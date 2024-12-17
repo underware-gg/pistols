@@ -9,12 +9,15 @@ import { useChallenge } from '@/pistols/stores/challengeStore'
 import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useTable } from '@/pistols/stores/tableStore'
 import { useIsMyAccount, useIsYou } from '@/pistols/hooks/useIsYou'
+import { usePlayerBookmarkSignedMessage } from '@/pistols/hooks/useSignedMessages'
+import { useDuelTokenContract } from '@/pistols/hooks/useTokenContract'
+import { useIsBookmarked } from '@/pistols/stores/playerStore'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
-import { IconClick } from '@/lib/ui/Icons'
+import { BookmarkIcon, IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
 import { ChallengeState } from '@/games/pistols/generated/constants'
 import { makeDuelDataUrl, PremisePrefix } from '@/pistols/utils/pistols'
@@ -67,6 +70,11 @@ export default function ChallengeModal() {
     dispatchSetScene(SceneName.Duel)
   }
 
+  // bookmark
+  const { duelContractAddress } = useDuelTokenContract()
+  const { isBookmarked } = useIsBookmarked(duelContractAddress, selectedDuelId)
+  const { publish } = usePlayerBookmarkSignedMessage(duelContractAddress, selectedDuelId, !isBookmarked)
+
   return (
     <Modal
       // size='large'
@@ -78,8 +86,11 @@ export default function ChallengeModal() {
       <Modal.Header>
         <Grid>
           <Row>
-            <Col width={4} textAlign='left'>
-              Challenge #{selectedDuelId.toString()}
+            <Col width={1} textAlign='center'>
+              <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} />
+            </Col>
+            <Col width={3} textAlign='left'>
+              Duel #{selectedDuelId.toString()}
             </Col>
             <Col width={8} textAlign='center' className='NoBreak Important'>
               {tableDescription}

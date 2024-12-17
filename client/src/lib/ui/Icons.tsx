@@ -132,7 +132,7 @@ export function IconClick(props: IconClickProps) {
   if (props.className) classNames.push(props.className)
   const iconProps = useMemo(() => ({ ...props, important: undefined }), [props])
   return (
-    <Icon {...iconProps} className={classNames.join(' ')} style={props.style} onClick={() => props.onClick?.()} />
+    <Icon {...iconProps as IconProps} className={classNames.join(' ')} style={props.style} onClick={() => props.onClick?.()} />
   )
 }
 

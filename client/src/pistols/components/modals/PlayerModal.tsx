@@ -2,13 +2,15 @@ import React, { useMemo } from 'react'
 import { Divider, Grid, Modal } from 'semantic-ui-react'
 import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useIsMyAccount } from '@/pistols/hooks/useIsYou'
-import { usePlayer } from '@/pistols/stores/playerStore'
 import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
+import { usePlayerBookmarkSignedMessage } from '@/pistols/hooks/useSignedMessages'
+import { useIsBookmarked, usePlayer } from '@/pistols/stores/playerStore'
 import { PlayerDescription } from '@/pistols/components/account/PlayerDescription'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { DuelistItem } from '../account/AccountHeader'
+import { DuelistItem } from '@/pistols/components/account/AccountHeader'
+import { BookmarkIcon } from '@/lib/ui/Icons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -51,6 +53,10 @@ export default function PlayerModal() {
     ))
   }, [duelistIds, isLoading])
 
+  // bookmark
+  const { isBookmarked } = useIsBookmarked(selectedPlayerAddress)
+  const { publish } = usePlayerBookmarkSignedMessage(selectedPlayerAddress, 0, !isBookmarked)
+
   return (
     <Modal
       // size='large'
@@ -61,11 +67,14 @@ export default function PlayerModal() {
     >
       <Modal.Header>
         <Grid>
-          <Row columns={'equal'}>
-            <Col textAlign='left'>
+          <Row>
+            <Col width={1} textAlign='center'>
+              <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} />
+            </Col>
+            <Col width={12} textAlign='left'>
               {name}
             </Col>
-            <Col textAlign='right'>
+            <Col width={3} textAlign='right'>
               <AddressShort address={selectedPlayerAddress} />
             </Col>
           </Row>
