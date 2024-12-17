@@ -23,7 +23,7 @@ export const bigintToNumber = (v: BigNumberish): number => (!v ? 0 : Number(BigI
 export const bigintEquals = (a: BigNumberish | null, b: BigNumberish | null): boolean => (a != null && b != null && BigInt(a) == BigInt(b))
 export const bigintAdd = (a: BigNumberish | null, b: BigNumberish | null): bigint => (BigInt(a ?? 0) + BigInt(b ?? 0))
 export const bigintSub = (a: BigNumberish | null, b: BigNumberish | null): bigint => (BigInt(a ?? 0) - BigInt(b ?? 0))
-export const isBigint = (v: BigNumberish | null): boolean => {
+export const isBigint = (v: any | null): boolean => {
   try { return (v != null && BigInt(v) >= 0n) } catch { return false }
 }
 export const isPositiveBigint = (v: BigNumberish | null): boolean => {

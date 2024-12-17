@@ -62,7 +62,7 @@ export const makeControllerConnector = (
     slot,
     // tokens,
   }
-  console.log(`-------- ControllerOptions:`, options)
+  if (typeof window !== 'undefined') console.log(`-------- ControllerOptions:`, options)
   const connector = new ControllerConnector(options) as never as Connector
   assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
   return connector
