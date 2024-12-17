@@ -51,12 +51,13 @@ const ActivityItem = ({
   clientSeconds,
   isBookmarked,
 }: ActivityItemProps) => {
-  const { result: time, isOnline, isAway } = useMemo(() => formatTimestampDeltaElapsed(timestamp, clientSeconds), [timestamp, clientSeconds])
+  const { isAvailable } = usePlayer(address)
   const { publish } = usePlayerBookmarkSignedMessage(address, 0, !isBookmarked)
+  const { result: time, isOnline, isAway } = useMemo(() => formatTimestampDeltaElapsed(timestamp, clientSeconds), [timestamp, clientSeconds])
   return (
     <>
       <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} />
-      <OnlineStatusIcon isOnline={isOnline} isAway={isAway} />
+      <OnlineStatusIcon isOnline={isOnline} isAway={isAway} isAvailable={isAvailable} />
       <PlayerLink address={address} />
       {' '}
       {isOnline

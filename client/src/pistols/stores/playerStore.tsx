@@ -157,9 +157,11 @@ export const usePlayer = (address: BigNumberish) => {
   const username = useMemo(() => (player?.username ?? 'unknown'), [player])
   const name = useMemo(() => (player?.name ?? 'Unknown'), [player])
   const timestampRegistered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
-  const tutorialProgress = useMemo(() => (player?.tutorial_progress ?? TutorialProgress.None), [player])
   const bookmarkedPlayers = useMemo(() => (player?.bookmarked_players ?? []), [player])
   const bookmarkedTokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
+  const tutorialProgress = useMemo(() => (player?.tutorial_progress ?? TutorialProgress.None), [player])
+  const hasCompletedTutorial = useMemo(() => (tutorialProgress === TutorialProgress.FinishedFirstDuel), [tutorialProgress])
+  const isAvailable = useMemo(() => (hasCompletedTutorial), [hasCompletedTutorial])
 
   // useEffect(() => console.log("usePlayer() =>", username, key, player), [player, username])
 
@@ -169,9 +171,11 @@ export const usePlayer = (address: BigNumberish) => {
     username,
     name,
     timestampRegistered,
-    tutorialProgress,
     bookmarkedPlayers,
     bookmarkedTokens,
+    tutorialProgress,
+    hasCompletedTutorial,
+    isAvailable,
   }
 }
 

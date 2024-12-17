@@ -162,9 +162,8 @@ interface BookmarkIconProps extends IconProps {
   onClick?: Function
 }
 export function BookmarkIcon(props: BookmarkIconProps) {
-  const iconProps = useMemo(() => ({ ...props, className: 'NoMargin' }), [props])
   return (
-    <IconClick {...iconProps}
+    <IconClick
       name={props.isBookmarked ? 'bookmark' : 'bookmark outline'}
       onClick={props.onClick}
     />
@@ -182,9 +181,8 @@ interface OnlineStatusIconProps extends IconProps {
   onClick?: Function
 }
 export function OnlineStatusIcon(props: OnlineStatusIconProps) {
-  const iconProps = useMemo(() => ({ ...props, className: 'NoMargin' }), [props])
   return (
-    <IconClick {...iconProps}
+    <IconClick
       name={props.isAvailable === false ? 'minus circle' : 'circle'}
       className={props.isOnline ? 'Positive' : props.isAway ? 'Warning' : 'Negative'}
       onClick={props.onClick}
