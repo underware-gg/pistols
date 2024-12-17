@@ -65,9 +65,9 @@ export function createSystemCalls(
       console.log(`execute...`, calls)
       calls = arrayClean(calls)
       const tx = await provider.execute(signer, calls, NAMESPACE);
-      calls.forEach((param, index) => {
+      calls.forEach((c, index) => {
         //@ts-ignore
-        console.log(`execute[${index}] ${param?.contractAddress ? `(${shortAddress(param.contractAddress)})` : calls?.contractName}::${param.entrypoint}():`, param.calldata, tx)
+        console.log(`execute[${index}] ${c?.contractAddress ? `(${shortAddress(c.contractAddress)})` : c?.contractName}::${c.entrypoint}():`, c.calldata, tx)
       })
 
       const receipt = await signer.waitForTransaction(tx.transaction_hash, { retryInterval: 200 })

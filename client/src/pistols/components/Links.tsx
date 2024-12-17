@@ -56,7 +56,7 @@ export const TimestampDeltaElapsed = ({
 }) => {
   return (
     <span className={className}>
-      {formatTimestampDeltaElapsed(timestamp, clientSeconds)}
+      {formatTimestampDeltaElapsed(timestamp, clientSeconds).result}
     </span>
   )
 }

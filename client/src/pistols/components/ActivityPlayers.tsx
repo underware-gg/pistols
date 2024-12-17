@@ -1,23 +1,32 @@
 import React, { useEffect, useMemo } from 'react'
-import { useAllPlayersActivityFeed, ActivityState } from '@/pistols/stores/eventsStore'
+import { BigNumberish } from 'starknet'
+import { useAccount } from '@starknet-react/core'
+import { usePlayer, usePlayersOnline } from '@/pistols/stores/playerStore'
+import { usePlayerBookmarkSignedMessage } from '@/pistols/hooks/useSignedMessages'
 import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { PlayerLink, TimestampDeltaElapsed } from '@/pistols/components/Links'
+import { formatTimestampDeltaElapsed } from '@/lib/utils/timestamp'
+import { PlayerLink } from '@/pistols/components/Links'
+import { BookmarkIcon, OnlineStatusIcon } from '@/lib/ui/Icons'
 
 export const ActivityPlayers = () => {
-  const { allPlayersActivity } = useAllPlayersActivityFeed()
+  const { address } = useAccount()
+  const { bookmarkedPlayers } = usePlayer(address)
+  const { playersOnline } = usePlayersOnline()
   const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 60)
 
-  const items = useMemo(() => ([...allPlayersActivity].reverse().map((a) =>
+  const items = useMemo(() => (Object.keys(playersOnline).map((addr) =>
     <ActivityItem
-      key={`${a.address}-${a.timestamp}-${a.activity}-${a.identifier.toString()}`}
+      key={addr}
+      address={addr}
+      timestamp={playersOnline[addr]}
       clientSeconds={clientSeconds}
-      activity={a}
+      isBookmarked={bookmarkedPlayers.includes(addr)}
     />)
-  ), [allPlayersActivity, clientSeconds])
+  ), [playersOnline, clientSeconds, bookmarkedPlayers])
 
   useEffect(() => {
     updateTimestamp()
-  }, [allPlayersActivity])
+  }, [playersOnline])
 
   return (
     <div className='FillParent'>
@@ -30,20 +39,31 @@ export default ActivityPlayers;
 
 
 interface ActivityItemProps {
-  activity: ActivityState
+  address: BigNumberish
+  timestamp: number
   clientSeconds: number
+  isBookmarked: boolean
 }
 
 const ActivityItem = ({
-  activity,
+  address,
+  timestamp,
   clientSeconds,
+  isBookmarked,
 }: ActivityItemProps) => {
+  const { isAvailable } = usePlayer(address)
+  const { publish } = usePlayerBookmarkSignedMessage(address, 0, !isBookmarked)
+  const { result: time, isOnline, isAway } = useMemo(() => formatTimestampDeltaElapsed(timestamp, clientSeconds), [timestamp, clientSeconds])
   return (
     <>
-      <PlayerLink address={activity.address} />
-      {' last seen '}
-      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} className='Brightest' />
-      {' ago'}
+      <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} />
+      <OnlineStatusIcon isOnline={isOnline} isAway={isAway} isAvailable={isAvailable} />
+      <PlayerLink address={address} />
+      {' '}
+      {isOnline
+        ? <span className='Brightest'>is online</span>
+        : <>last seen <span className='Brightest'>{time}</span> ago</>
+      }
       <br />
     </>
   )

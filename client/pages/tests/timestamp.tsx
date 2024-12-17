@@ -74,15 +74,15 @@ function Timestamp({
       <Cell>
         <span className='Inactive'>{elapsed}s</span>
         {/* <br /><span className='Inactive'>{new Date(elapsed * 1000).toISOString()}</span> */}
-        <br />{formatTimestampDeltaTime(start, end)}
+        <br />{formatTimestampDeltaTime(start, end).result}
       </Cell>
       <Cell>
         <span className='Inactive'>{elapsed}s</span>
-        <br />{formatTimestampDeltaElapsed(start, end)}
+        <br />{formatTimestampDeltaElapsed(start, end).result}
       </Cell>
       <Cell>
         <span className='Inactive'>{elapsed}s</span>
-        <br />{formatTimestampDeltaCountdown(start, end)}
+        <br />{formatTimestampDeltaCountdown(start, end).result}
       </Cell>
     </Row>
   )

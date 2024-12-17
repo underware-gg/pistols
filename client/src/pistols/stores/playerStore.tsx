@@ -2,17 +2,18 @@ import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
+import { useAccount } from '@starknet-react/core'
 import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
-import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress } from '@/lib/utils/types'
+import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@/lib/utils/types'
 import { TutorialProgress } from '@/games/pistols/generated/constants'
 
 interface PlayerState {
+  address: string
   timestamp_registered: number
   username: string
   name: string
   isNew: boolean
   // off-chain messages
-  timestamp_online: number
   tutorial_progress: TutorialProgress
   bookmarked_players: string[]
   bookmarked_tokens: {
@@ -22,8 +23,12 @@ interface PlayerState {
 interface PlayersByAddress {
   [address: string]: PlayerState
 }
+interface TimestampByAddress {
+  [address: string]: number
+}
 interface State {
   players: PlayersByAddress,
+  players_online: TimestampByAddress,
   setEntities: (entities: PistolsEntity[]) => void;
   updateEntity: (event: PistolsEntity) => void;
   updateMessages: (entities: PistolsEntity[]) => void;
@@ -31,31 +36,32 @@ interface State {
 }
 
 const createStore = () => {
-  const _parseEvent = (e: PistolsEntity): [string, PlayerState] => {
+  const _parseEvent = (e: PistolsEntity): PlayerState => {
     const event = e.models.pistols.Player
-    return event ? [bigintToHex(event.address), {
+    return event ? {
+      address: bigintToHex(event.address),
       timestamp_registered: bigintToNumber(event.timestamp_registered),
       username: shortAddress(event.address),
       name: shortAddress(event.address),
       isNew: true,
       // off-chain messages
-      timestamp_online: bigintToNumber(event.timestamp_registered),
       tutorial_progress: TutorialProgress.None,
       bookmarked_players: [],
       bookmarked_tokens: {},
-    }] : [undefined, undefined]
+    } : undefined
   }
   return create<State>()(immer((set) => ({
     players: {},
+    players_online: {},
     setEntities: (entities: PistolsEntity[]) => {
       // console.log("setEntities()[Player] =>", entities)
       set((state: State) => {
         state.players = entities.sort((a, b) => (
           Number(b.models.pistols.Player?.timestamp_registered ?? 0) - Number(a.models.pistols.Player?.timestamp_registered ?? 0)
         )).reduce((acc, e) => {
-          const [address, player] = _parseEvent(e)
-          if (address && player) {
-            acc[address] = player
+          const player = _parseEvent(e)
+          if (player) {
+            acc[player.address] = player
           }
           return acc
         }, {} as PlayersByAddress)
@@ -64,11 +70,10 @@ const createStore = () => {
     updateEntity: (e: PistolsEntity) => {
       // console.log("updateEntity()[Player] =>", e)
       set((state: State) => {
-        // only insert
-        const [address, player] = _parseEvent(e)
-        const _key = bigintToHex(address)
-        if (!state.players[_key]) {
-          state.players[_key] = player
+        // only insert!
+        const player = _parseEvent(e)
+        if (!state.players[player.address]) {
+          state.players[player.address] = player
         }
       });
     },
@@ -79,9 +84,7 @@ const createStore = () => {
           const online = e.models.pistols.PPlayerOnline
           if (online) {
             const address = bigintToHex(online.identity)
-            if (state.players[address]) {
-              state.players[address].timestamp_online = bigintToNumber(online.timestamp)
-            }
+            state.players_online[address] = bigintToNumber(online.timestamp)
           }
           const progress = e.models.pistols.PPlayerTutorialProgress
           if (progress) {
@@ -153,11 +156,12 @@ export const usePlayer = (address: BigNumberish) => {
   const isNew = useMemo(() => (player?.isNew ?? false), [player])
   const username = useMemo(() => (player?.username ?? 'unknown'), [player])
   const name = useMemo(() => (player?.name ?? 'Unknown'), [player])
-  const timestamp_registered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
-  const timestamp_online = useMemo(() => (player?.timestamp_online ?? 0), [player])
-  const tutorial_progress = useMemo(() => (player?.tutorial_progress ?? TutorialProgress.None), [player])
-  const bookmarked_players = useMemo(() => (player?.bookmarked_players ?? []), [player])
-  const bookmarked_tokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
+  const timestampRegistered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
+  const bookmarkedPlayers = useMemo(() => (player?.bookmarked_players ?? []), [player])
+  const bookmarkedTokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
+  const tutorialProgress = useMemo(() => (player?.tutorial_progress ?? TutorialProgress.None), [player])
+  const hasCompletedTutorial = useMemo(() => (tutorialProgress === TutorialProgress.FinishedFirstDuel), [tutorialProgress])
+  const isAvailable = useMemo(() => (hasCompletedTutorial), [hasCompletedTutorial])
 
   // useEffect(() => console.log("usePlayer() =>", username, key, player), [player, username])
 
@@ -166,10 +170,32 @@ export const usePlayer = (address: BigNumberish) => {
     address,
     username,
     name,
-    timestamp_registered,
-    timestamp_online,
-    tutorial_progress,
-    bookmarked_players,
-    bookmarked_tokens,
+    timestampRegistered,
+    bookmarkedPlayers,
+    bookmarkedTokens,
+    tutorialProgress,
+    hasCompletedTutorial,
+    isAvailable,
+  }
+}
+
+export const useIsBookmarked = (target_address: BigNumberish, target_id: BigNumberish = 0) => {
+  const { address } = useAccount()
+  const { bookmarkedPlayers, bookmarkedTokens } = usePlayer(address)
+  const isBookmarked = useMemo(() => (
+    target_id == 0n
+      ? bookmarkedPlayers.includes(bigintToHex(target_address))
+      : bookmarkedTokens[bigintToHex(target_address)]?.includes(BigInt(target_id))
+  ), [bookmarkedPlayers, bookmarkedTokens, target_address, target_id])
+  return {
+    isBookmarked,
+  }
+}
+
+export const usePlayersOnline = () => {
+  const players_online = usePlayerStore((state) => state.players_online)
+  const playersOnline = useMemo(() => sortObjectByValue(players_online, (a, b) => (b - a)), [players_online])
+  return {
+    playersOnline,
   }
 }

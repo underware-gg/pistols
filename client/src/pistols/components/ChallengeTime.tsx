@@ -22,8 +22,8 @@ export function ChallengeTime({
   }, [isAwaiting, isLive])
 
   const date = useMemo(() => {
-    if (isAwaiting) return formatTimestampDeltaCountdown(clientSeconds, timestamp_end)
-    if (isLive) return formatTimestampDeltaElapsed(timestamp_start, clientSeconds)
+    if (isAwaiting) return formatTimestampDeltaCountdown(clientSeconds, timestamp_end).result
+    if (isLive) return formatTimestampDeltaElapsed(timestamp_start, clientSeconds).result
     if (isCanceled || isFinished) return (prefixed ? 'Finished at ' : '') + formatTimestampLocal(timestamp_end)
     return formatTimestampLocal(timestamp_start)
   }, [isAwaiting, isCanceled, isLive, isFinished, timestamp_start, timestamp_end, clientSeconds])

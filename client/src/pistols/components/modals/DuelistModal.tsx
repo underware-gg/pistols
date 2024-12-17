@@ -6,13 +6,14 @@ import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
 import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
 import { useDuelist } from '@/pistols/stores/duelistStore'
 import { usePact } from '@/pistols/hooks/usePact'
-import { usePlayer } from '@/pistols/stores/playerStore'
+import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
+import { usePlayerBookmarkSignedMessage } from '@/pistols/hooks/useSignedMessages'
+import { useIsBookmarked, usePlayer } from '@/pistols/stores/playerStore'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileDescription } from '@/pistols/components/account/ProfileDescription'
 import { ChallengeTableSelectedDuelist } from '@/pistols/components/ChallengeTable'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { AddressShort } from '@/lib/ui/AddressShort'
-import { IconClick } from '@/lib/ui/Icons'
+import { BookmarkIcon, IconClick } from '@/lib/ui/Icons'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -50,6 +51,11 @@ export default function DuelistModal() {
     _close()
   }
 
+  // bookmark
+  const { duelistContractAddress } = useDuelistTokenContract()
+  const { isBookmarked } = useIsBookmarked(duelistContractAddress, selectedDuelistId)
+  const { publish } = usePlayerBookmarkSignedMessage(duelistContractAddress, selectedDuelistId, !isBookmarked)
+
   return (
     <Modal
       // size='large'
@@ -60,20 +66,22 @@ export default function DuelistModal() {
     >
       <Modal.Header>
         <Grid>
-          <Row columns={'equal'}>
-            <Col textAlign='left'>
-              {duelistIdDisplay}
+          <Row>
+            <Col width={1} textAlign='center'>
+              <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} />
             </Col>
-            {(isYou || isMyDuelist) &&
-              <Col textAlign='center'>
+            <Col width={5} textAlign='left'>
+              {duelistIdDisplay}
+              {' '}
+              {(isYou || isMyDuelist) &&
                 <span className='Smaller Important'>
-                  {isYou ? <>Current</>
-                    : <>Yours <IconClick important name='sync alternate' size='small' onClick={() => _switch()} /></>
+                  {isYou ? <>(Current)</>
+                    : <>(Yours <IconClick important name='sync alternate' size='small' onClick={() => _switch()} />)</>
                   }
                 </span>
-              </Col>
-            }
-            <Col textAlign='right'>
+              }
+            </Col>
+            <Col width={10} textAlign='right'>
               <div className='Anchor Important' onClick={() => _gotoOwner()}>{ownerName}</div>
             </Col>
           </Row>

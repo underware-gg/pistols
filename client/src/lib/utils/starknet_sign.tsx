@@ -145,7 +145,10 @@ export function createTypedMessage({
       })),
     },
     message: Object.keys(_messages).reduce((acc, name) => {
-      acc[name] = (isBigint(_messages[name]) ? bigintToHex(_messages[name]) : _messages[name])
+      acc[name] = (isBigint(_messages[name])
+      //@ts-ignore
+        ? bigintToHex(_messages[name])
+        : _messages[name])
       return acc
     }, {} as { [key: string]: any }),
   } : undefined

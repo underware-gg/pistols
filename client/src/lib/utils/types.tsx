@@ -18,11 +18,12 @@ export const capitalize = (v: string) => (v.charAt(0).toUpperCase() + v.slice(1)
 //
 
 export const bigintToHex = (v: BigNumberish): `0x${string}` => (!v ? '0x0' : `0x${BigInt(v).toString(16)}`)
+export const bigintToDecimal = (v: BigNumberish): string => (!v ? '0' : BigInt(v).toString())
 export const bigintToNumber = (v: BigNumberish): number => (!v ? 0 : Number(BigInt(v)))
 export const bigintEquals = (a: BigNumberish | null, b: BigNumberish | null): boolean => (a != null && b != null && BigInt(a) == BigInt(b))
 export const bigintAdd = (a: BigNumberish | null, b: BigNumberish | null): bigint => (BigInt(a ?? 0) + BigInt(b ?? 0))
 export const bigintSub = (a: BigNumberish | null, b: BigNumberish | null): bigint => (BigInt(a ?? 0) - BigInt(b ?? 0))
-export const isBigint = (v: BigNumberish | null): boolean => {
+export const isBigint = (v: any | null): boolean => {
   try { return (v != null && BigInt(v) >= 0n) } catch { return false }
 }
 export const isPositiveBigint = (v: BigNumberish | null): boolean => {
@@ -58,11 +59,21 @@ export const arrayClean = <T,>(array: T[]): T[] => (array?.filter(e => (e != nul
 // dictionaries
 //
 
-export const getObjectKeyByValue = (obj: any, value: any) => Object.keys(obj).find(key => obj[key] === value);
-export const cleanObject = (obj: any): any => Object.keys(obj).reduce((acc, key) => {
-  if (obj[key] !== undefined) acc[key] = obj[key]
-  return acc
-}, {} as { [key: string]: any });
+export const getObjectKeyByValue = <T extends any>(obj: T, value: any): string | undefined => Object.keys(obj).find(key => obj[key] === value);
+export const cleanObject = <T extends any>(obj: T): T =>
+  Object.keys(obj)
+    .reduce((acc, key) => {
+      if (obj[key] !== undefined) acc[key] = obj[key]
+      return acc
+    }, {} as T);
+export const sortObjectByValue = <T extends any>(obj: T, sorter: (a: any, b: any) => number): T =>
+  Object.keys(obj)
+    .sort((a, b) => sorter(obj[a], obj[b]))
+    .reduce((acc, key) => {
+      acc[key] = obj[key];
+      return acc;
+    }, {} as T);
+
 
 //
 // serializer

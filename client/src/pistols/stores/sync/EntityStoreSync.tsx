@@ -111,7 +111,8 @@ export function EntityStoreSync() {
   // useEffect(() => console.log("EntityStoreSync() [TableConfig] =>", tableState.entities), [tableState.entities])
   // useEffect(() => console.log("EntityStoreSync() [TokenConfig] =>", tokenState.entities), [tokenState.entities])
   // useEffect(() => console.log("EntityStoreSync() [Duelist] =>", duelistState.entities), [duelistState.entities])
-  // useEffect(() => console.log("EntityStoreSync() [Player] =>", playerState.players), [playerState.players])
+  useEffect(() => console.log("EntityStoreSync() [Player] =>", playerState.players), [playerState.players])
+  useEffect(() => console.log("EntityStoreSync() [PlayerOnline] =>", playerState.players_online), [playerState.players_online])
 
   return (<></>)
 }

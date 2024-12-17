@@ -13,12 +13,14 @@ import { PublishOnlineStatusButton } from '@/pistols/stores/sync/PlayerOnlineSyn
 import { VStack } from '@/lib/ui/Stack'
 import DuelistEditModal from '@/pistols/components/modals/DuelistEditModal'
 import useGameAspect from '@/pistols/hooks/useGameApect'
+import { TutorialProgressDebug } from '@/pistols/components/TutorialProgressDebug'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function ScProfile() {
   const { isConnected } = useAccount()
+  const { debugMode } = useSettings()
   const { duelistEditOpener } = usePistolsContext()
   const { fromGate } = usePistolsScene()
   const { duelistIds } = useDuelistsOfPlayer()
@@ -56,7 +58,11 @@ export default function ScProfile() {
 
       <DuelistEditModal opener={duelistEditOpener} />
       <CurrentChainHint />
-      <PublishOnlineStatusButton />
+
+      {(debugMode || true) && <>
+        <PublishOnlineStatusButton />
+        <TutorialProgressDebug />
+      </>}
     </div>
   )
 }

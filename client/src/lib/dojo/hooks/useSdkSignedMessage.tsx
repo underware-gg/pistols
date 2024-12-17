@@ -2,36 +2,48 @@ import { useCallback, useMemo, useState } from 'react'
 import { Account, TypedData, stark } from 'starknet'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { PistolsModelType } from '@/lib/dojo/hooks/useSdkTypes'
+import { serialize } from '@/lib/utils/types'
 
-export const useSdkPublishSignedMessage = <M extends PistolsModelType>(
-  modelName: string,
-  message: M,
+// export const useSdkPublishSignedMessage = <M extends PistolsModelType>(
+//   account: Account,
+//   modelName: string,
+//   message: M,
+// ) => {
+//   const { sdk } = useDojoSetup()
+//   const typedData = useMemo<TypedData>(() => (
+//     sdk?.generateTypedData<M>(modelName, message)
+//   ), [sdk, modelName, message])
+//   return useSdkPublishTypedData(account, typedData)
+// }
+
+export const useSdkPublishTypedData = (
   account: Account,
+  typedData: TypedData,
 ) => {
   const { sdk } = useDojoSetup()
   const { selectedChainConfig } = useSelectedChain()
   const [isPublishing, setIsPublishing] = useState<boolean>()
 
-  const typedData = useMemo<TypedData>(() => (
-    sdk?.generateTypedData(modelName, message)
-  ), [sdk, modelName, message])
-  
   const publish = useCallback(async () => {
     if (sdk && typedData && account) {
       if (!selectedChainConfig.relayUrl) {
         console.error('useSdkPublishSignedMessage() failed: relayUrl is not set')
         return
       }
-      
+      if (isPublishing) {
+        console.warn('useSdkPublishSignedMessage() still publishing...')
+        return
+      }
+
       setIsPublishing(true)
 
       // console.log('ONLINE: publish...', message, typedData)
       // await sdk.sendMessage(typedData, account)
 
       try {
+        console.log('SIGNED_MESSAGE: sign...', serialize(typedData), typedData)
         let signature = await account.signMessage(typedData);
-        console.log('SIGNED_MESSAGE: signature:', typedData, signature)
+        // console.log('SIGNED_MESSAGE: signature:', signature)
         if (!Array.isArray(signature)) {
           signature = stark.formatSignature(signature)
         }
@@ -51,7 +63,7 @@ export const useSdkPublishSignedMessage = <M extends PistolsModelType>(
         console.error("useSdkPublishSignedMessage() failed to sign message:", error, typedData);
       }
 
-      console.log('ONLINE: done!')
+      // console.log('SIGNED: done!')
       setIsPublishing(false)
     }
   }, [sdk, typedData, account])
