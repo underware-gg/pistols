@@ -1,14 +1,20 @@
 import { DojoAppConfig, ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from '@/lib/dojo/Dojo'
-import { StarknetDomain, TypedData } from 'starknet'
+import { StarknetDomain } from 'starknet'
+import { Tokens } from '@cartridge/controller'
 import { ChainId, defaultChainId } from '@/lib/dojo/setup/chainConfig'
 import { makeControllerConnector } from '@/lib/dojo/setup/controller'
 import { dojoContextConfig } from '@/lib/dojo/setup/chains'
 import { TutorialProgress, TYPED_DATA } from './generated/constants'
+import {
+  make_typed_data_PPlayerBookmark,
+  make_typed_data_PPlayerOnline,
+  make_typed_data_PPlayerTutorialProgress,
+} from './signed_messages'
 import pistols_manifest_dev from './manifests/manifest_dev.json'
 import pistols_manifest_slot from './manifests/manifest_slot.json'
 import pistols_manifest_staging from './manifests/manifest_staging.json'
 import pistols_manifest_sepolia from './manifests/manifest_sepolia.json'
-import { make_typed_data_PPlayerBookmark, make_typed_data_PPlayerOnline, make_typed_data_PPlayerTutorialProgress } from './signed_messages'
+import { getContractByName } from '@dojoengine/core'
 
 // TODO: move this here!
 // import { defineContractComponents } from './generated/contractComponents'
@@ -96,12 +102,26 @@ const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
   },
 ]
 
+// tokens to display
+const tokens: Tokens = {
+  erc20: [
+    dojoContextConfig[defaultChainId].lordsAddress || getContractByName(manifests[defaultChainId], NAMESPACE, 'lords_mock').address,
+    getContractByName(manifests[defaultChainId], NAMESPACE, 'fame_coin').address,
+  ],
+  //@ts-ignore
+  erc721: [
+    getContractByName(manifests[defaultChainId], NAMESPACE, 'duelist_token').address,
+    getContractByName(manifests[defaultChainId], NAMESPACE, 'duel_token').address,
+  ],
+}
+
 const controllerConnector = makeControllerConnector(
   NAMESPACE,
   manifests[defaultChainId],
   dojoContextConfig[defaultChainId].rpcUrl,
   contractPolicyDescriptions,
   signedMessagePolicyDescriptions,
+  tokens,
 );
 
 export const makeDojoAppConfig = (): DojoAppConfig => {

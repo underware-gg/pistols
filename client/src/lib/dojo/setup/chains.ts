@@ -35,12 +35,6 @@ const ETH_KATANA: NativeCurrency = {
   symbol: 'ETH',
   decimals: 18,
 }
-const LORDS_REALMS_L3: NativeCurrency = {
-  address: '0x51205c5e6ac3ad5691c28c0c5ffcdd62c70bddb63612f75a4bac9b2a85b9449',
-  name: 'Lords',
-  symbol: 'LORDS',
-  decimals: 18,
-}
 
 //
 // explorers
@@ -67,6 +61,7 @@ export type DojoChainConfig = {
   accountClassHash: string
   etherAddress: string
   lordsFaucet: boolean | string
+  lordsAddress: string,
   predeployedAccounts: PredeployedAccount[]
   connectorIds: string[]
   // starknet Chain
@@ -89,6 +84,7 @@ export const envChainConfig: DojoChainConfig = {
   accountClassHash: undefined,
   etherAddress: undefined,
   lordsFaucet: undefined,
+  lordsAddress: undefined,
   predeployedAccounts: undefined,
   connectorIds: undefined,
 }
@@ -114,6 +110,7 @@ const localKatanaConfig: DojoChainConfig = {
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
+  lordsAddress: undefined,
   predeployedAccounts: [
     {
       name: 'Katana 1',
@@ -155,6 +152,7 @@ const pistolsSlotConfig: DojoChainConfig = {
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
+  lordsAddress: undefined,
   predeployedAccounts: [
     {
       name: 'Predeployed',
@@ -184,6 +182,7 @@ const pistolsStagingConfig: DojoChainConfig = {
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
+  lordsAddress: undefined,
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
@@ -214,6 +213,7 @@ const snSepoliaConfig: DojoChainConfig = {
   etherAddress: sepolia.nativeCurrency.address,
   lordsFaucet: true,
   // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
+  lordsAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
@@ -235,6 +235,7 @@ const snMainnetConfig: DojoChainConfig = {
   accountClassHash: undefined,
   etherAddress: mainnet.nativeCurrency.address,
   lordsFaucet: false,
+  lordsAddress: '0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
