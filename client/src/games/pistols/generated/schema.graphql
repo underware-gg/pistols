@@ -55,7 +55,7 @@ scalar felt252
 
 scalar i128
 
-union ModelUnion = pistols_ChallengeFameBalance | pistols_Payment | pistols_TokenBoundAddress | pistols_TableAdmittance | pistols_Round | pistols_Pact | pistols_TokenConfig | pistols_Scoreboard | pistols_TableConfig | pistols_Config | pistols_Challenge | pistols_CoinConfig | pistols_Duelist
+union ModelUnion = pistols_ChallengeFameBalance | pistols_Payment | pistols_TokenBoundAddress | pistols_TableAdmittance | pistols_Round | pistols_Pact | pistols_TokenConfig | pistols_Scoreboard | pistols_TableConfig | pistols_Config | pistols_Challenge | pistols_CoinConfig | pistols_Duelist | pistols_PPlayerTutorialProgress | pistols_PPlayerBookmark | pistols_PPlayerOnline | pistols_PlayerActivity | pistols_ConsumableBalance | pistols_PlayerBookmark | pistols_PlayerTutorialProgress | pistols_Player | pistols_PlayerOnline
 
 enum OrderDirection {
   ASC
@@ -439,6 +439,62 @@ input pistols_ConfigWhereInput {
   is_paused: bool
 }
 
+type pistols_ConsumableBalance {
+  consumable_type: Enum
+  player_address: ContractAddress
+  balance: u32
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_ConsumableBalanceConnection {
+  edges: [pistols_ConsumableBalanceEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_ConsumableBalanceEdge {
+  node: pistols_ConsumableBalance
+  cursor: Cursor
+}
+
+input pistols_ConsumableBalanceOrder {
+  direction: OrderDirection!
+  field: pistols_ConsumableBalanceOrderField!
+}
+
+enum pistols_ConsumableBalanceOrderField {
+  CONSUMABLE_TYPE
+  PLAYER_ADDRESS
+  BALANCE
+}
+
+input pistols_ConsumableBalanceWhereInput {
+  consumable_type: Enum
+  player_address: ContractAddress
+  player_addressGT: ContractAddress
+  player_addressGTE: ContractAddress
+  player_addressLT: ContractAddress
+  player_addressLTE: ContractAddress
+  player_addressNEQ: ContractAddress
+  player_addressEQ: ContractAddress
+  player_addressNOTIN: [ContractAddress]
+  player_addressIN: [ContractAddress]
+  player_addressNOTLIKE: ContractAddress
+  player_addressLIKE: ContractAddress
+  balance: u32
+  balanceGT: u32
+  balanceGTE: u32
+  balanceLT: u32
+  balanceLTE: u32
+  balanceNEQ: u32
+  balanceEQ: u32
+  balanceNOTIN: [u32]
+  balanceIN: [u32]
+  balanceNOTLIKE: u32
+  balanceLIKE: u32
+}
+
 type pistols_Duelist {
   duelist_id: u128
   name: felt252
@@ -723,6 +779,458 @@ input pistols_PaymentWhereInput {
   treasury_percentIN: [u8]
   treasury_percentNOTLIKE: u8
   treasury_percentLIKE: u8
+}
+
+type pistols_Player {
+  address: ContractAddress
+  timestamp_registered: u64
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_PlayerActivity {
+  address: ContractAddress
+  timestamp: u64
+  activity: Enum
+  identifier: felt252
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_PlayerActivityConnection {
+  edges: [pistols_PlayerActivityEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_PlayerActivityEdge {
+  node: pistols_PlayerActivity
+  cursor: Cursor
+}
+
+input pistols_PlayerActivityOrder {
+  direction: OrderDirection!
+  field: pistols_PlayerActivityOrderField!
+}
+
+enum pistols_PlayerActivityOrderField {
+  ADDRESS
+  TIMESTAMP
+  ACTIVITY
+  IDENTIFIER
+}
+
+input pistols_PlayerActivityWhereInput {
+  address: ContractAddress
+  addressGT: ContractAddress
+  addressGTE: ContractAddress
+  addressLT: ContractAddress
+  addressLTE: ContractAddress
+  addressNEQ: ContractAddress
+  addressEQ: ContractAddress
+  addressNOTIN: [ContractAddress]
+  addressIN: [ContractAddress]
+  addressNOTLIKE: ContractAddress
+  addressLIKE: ContractAddress
+  timestamp: u64
+  timestampGT: u64
+  timestampGTE: u64
+  timestampLT: u64
+  timestampLTE: u64
+  timestampNEQ: u64
+  timestampEQ: u64
+  timestampNOTIN: [u64]
+  timestampIN: [u64]
+  timestampNOTLIKE: u64
+  timestampLIKE: u64
+  activity: Enum
+  identifier: felt252
+  identifierGT: felt252
+  identifierGTE: felt252
+  identifierLT: felt252
+  identifierLTE: felt252
+  identifierNEQ: felt252
+  identifierEQ: felt252
+  identifierNOTIN: [felt252]
+  identifierIN: [felt252]
+  identifierNOTLIKE: felt252
+  identifierLIKE: felt252
+}
+
+type pistols_PlayerBookmark {
+  address: ContractAddress
+  target_address: ContractAddress
+  target_id: u128
+  enabled: bool
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_PlayerBookmarkConnection {
+  edges: [pistols_PlayerBookmarkEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_PlayerBookmarkEdge {
+  node: pistols_PlayerBookmark
+  cursor: Cursor
+}
+
+input pistols_PlayerBookmarkOrder {
+  direction: OrderDirection!
+  field: pistols_PlayerBookmarkOrderField!
+}
+
+enum pistols_PlayerBookmarkOrderField {
+  ADDRESS
+  TARGET_ADDRESS
+  TARGET_ID
+  ENABLED
+}
+
+input pistols_PlayerBookmarkWhereInput {
+  address: ContractAddress
+  addressGT: ContractAddress
+  addressGTE: ContractAddress
+  addressLT: ContractAddress
+  addressLTE: ContractAddress
+  addressNEQ: ContractAddress
+  addressEQ: ContractAddress
+  addressNOTIN: [ContractAddress]
+  addressIN: [ContractAddress]
+  addressNOTLIKE: ContractAddress
+  addressLIKE: ContractAddress
+  target_address: ContractAddress
+  target_addressGT: ContractAddress
+  target_addressGTE: ContractAddress
+  target_addressLT: ContractAddress
+  target_addressLTE: ContractAddress
+  target_addressNEQ: ContractAddress
+  target_addressEQ: ContractAddress
+  target_addressNOTIN: [ContractAddress]
+  target_addressIN: [ContractAddress]
+  target_addressNOTLIKE: ContractAddress
+  target_addressLIKE: ContractAddress
+  target_id: u128
+  target_idGT: u128
+  target_idGTE: u128
+  target_idLT: u128
+  target_idLTE: u128
+  target_idNEQ: u128
+  target_idEQ: u128
+  target_idNOTIN: [u128]
+  target_idIN: [u128]
+  target_idNOTLIKE: u128
+  target_idLIKE: u128
+  enabled: bool
+}
+
+type pistols_PlayerConnection {
+  edges: [pistols_PlayerEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_PlayerEdge {
+  node: pistols_Player
+  cursor: Cursor
+}
+
+type pistols_PlayerOnline {
+  address: ContractAddress
+  timestamp: u64
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_PlayerOnlineConnection {
+  edges: [pistols_PlayerOnlineEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_PlayerOnlineEdge {
+  node: pistols_PlayerOnline
+  cursor: Cursor
+}
+
+input pistols_PlayerOnlineOrder {
+  direction: OrderDirection!
+  field: pistols_PlayerOnlineOrderField!
+}
+
+enum pistols_PlayerOnlineOrderField {
+  ADDRESS
+  TIMESTAMP
+}
+
+input pistols_PlayerOnlineWhereInput {
+  address: ContractAddress
+  addressGT: ContractAddress
+  addressGTE: ContractAddress
+  addressLT: ContractAddress
+  addressLTE: ContractAddress
+  addressNEQ: ContractAddress
+  addressEQ: ContractAddress
+  addressNOTIN: [ContractAddress]
+  addressIN: [ContractAddress]
+  addressNOTLIKE: ContractAddress
+  addressLIKE: ContractAddress
+  timestamp: u64
+  timestampGT: u64
+  timestampGTE: u64
+  timestampLT: u64
+  timestampLTE: u64
+  timestampNEQ: u64
+  timestampEQ: u64
+  timestampNOTIN: [u64]
+  timestampIN: [u64]
+  timestampNOTLIKE: u64
+  timestampLIKE: u64
+}
+
+input pistols_PlayerOrder {
+  direction: OrderDirection!
+  field: pistols_PlayerOrderField!
+}
+
+enum pistols_PlayerOrderField {
+  ADDRESS
+  TIMESTAMP_REGISTERED
+}
+
+type pistols_PlayerTutorialProgress {
+  address: ContractAddress
+  progress: Enum
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_PlayerTutorialProgressConnection {
+  edges: [pistols_PlayerTutorialProgressEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_PlayerTutorialProgressEdge {
+  node: pistols_PlayerTutorialProgress
+  cursor: Cursor
+}
+
+input pistols_PlayerTutorialProgressOrder {
+  direction: OrderDirection!
+  field: pistols_PlayerTutorialProgressOrderField!
+}
+
+enum pistols_PlayerTutorialProgressOrderField {
+  ADDRESS
+  PROGRESS
+}
+
+input pistols_PlayerTutorialProgressWhereInput {
+  address: ContractAddress
+  addressGT: ContractAddress
+  addressGTE: ContractAddress
+  addressLT: ContractAddress
+  addressLTE: ContractAddress
+  addressNEQ: ContractAddress
+  addressEQ: ContractAddress
+  addressNOTIN: [ContractAddress]
+  addressIN: [ContractAddress]
+  addressNOTLIKE: ContractAddress
+  addressLIKE: ContractAddress
+  progress: Enum
+}
+
+input pistols_PlayerWhereInput {
+  address: ContractAddress
+  addressGT: ContractAddress
+  addressGTE: ContractAddress
+  addressLT: ContractAddress
+  addressLTE: ContractAddress
+  addressNEQ: ContractAddress
+  addressEQ: ContractAddress
+  addressNOTIN: [ContractAddress]
+  addressIN: [ContractAddress]
+  addressNOTLIKE: ContractAddress
+  addressLIKE: ContractAddress
+  timestamp_registered: u64
+  timestamp_registeredGT: u64
+  timestamp_registeredGTE: u64
+  timestamp_registeredLT: u64
+  timestamp_registeredLTE: u64
+  timestamp_registeredNEQ: u64
+  timestamp_registeredEQ: u64
+  timestamp_registeredNOTIN: [u64]
+  timestamp_registeredIN: [u64]
+  timestamp_registeredNOTLIKE: u64
+  timestamp_registeredLIKE: u64
+}
+
+type pistols_PPlayerBookmark {
+  identity: ContractAddress
+  target_address: ContractAddress
+  target_id: u128
+  enabled: bool
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_PPlayerBookmarkConnection {
+  edges: [pistols_PPlayerBookmarkEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_PPlayerBookmarkEdge {
+  node: pistols_PPlayerBookmark
+  cursor: Cursor
+}
+
+input pistols_PPlayerBookmarkOrder {
+  direction: OrderDirection!
+  field: pistols_PPlayerBookmarkOrderField!
+}
+
+enum pistols_PPlayerBookmarkOrderField {
+  IDENTITY
+  TARGET_ADDRESS
+  TARGET_ID
+  ENABLED
+}
+
+input pistols_PPlayerBookmarkWhereInput {
+  identity: ContractAddress
+  identityGT: ContractAddress
+  identityGTE: ContractAddress
+  identityLT: ContractAddress
+  identityLTE: ContractAddress
+  identityNEQ: ContractAddress
+  identityEQ: ContractAddress
+  identityNOTIN: [ContractAddress]
+  identityIN: [ContractAddress]
+  identityNOTLIKE: ContractAddress
+  identityLIKE: ContractAddress
+  target_address: ContractAddress
+  target_addressGT: ContractAddress
+  target_addressGTE: ContractAddress
+  target_addressLT: ContractAddress
+  target_addressLTE: ContractAddress
+  target_addressNEQ: ContractAddress
+  target_addressEQ: ContractAddress
+  target_addressNOTIN: [ContractAddress]
+  target_addressIN: [ContractAddress]
+  target_addressNOTLIKE: ContractAddress
+  target_addressLIKE: ContractAddress
+  target_id: u128
+  target_idGT: u128
+  target_idGTE: u128
+  target_idLT: u128
+  target_idLTE: u128
+  target_idNEQ: u128
+  target_idEQ: u128
+  target_idNOTIN: [u128]
+  target_idIN: [u128]
+  target_idNOTLIKE: u128
+  target_idLIKE: u128
+  enabled: bool
+}
+
+type pistols_PPlayerOnline {
+  identity: ContractAddress
+  timestamp: u64
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_PPlayerOnlineConnection {
+  edges: [pistols_PPlayerOnlineEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_PPlayerOnlineEdge {
+  node: pistols_PPlayerOnline
+  cursor: Cursor
+}
+
+input pistols_PPlayerOnlineOrder {
+  direction: OrderDirection!
+  field: pistols_PPlayerOnlineOrderField!
+}
+
+enum pistols_PPlayerOnlineOrderField {
+  IDENTITY
+  TIMESTAMP
+}
+
+input pistols_PPlayerOnlineWhereInput {
+  identity: ContractAddress
+  identityGT: ContractAddress
+  identityGTE: ContractAddress
+  identityLT: ContractAddress
+  identityLTE: ContractAddress
+  identityNEQ: ContractAddress
+  identityEQ: ContractAddress
+  identityNOTIN: [ContractAddress]
+  identityIN: [ContractAddress]
+  identityNOTLIKE: ContractAddress
+  identityLIKE: ContractAddress
+  timestamp: u64
+  timestampGT: u64
+  timestampGTE: u64
+  timestampLT: u64
+  timestampLTE: u64
+  timestampNEQ: u64
+  timestampEQ: u64
+  timestampNOTIN: [u64]
+  timestampIN: [u64]
+  timestampNOTLIKE: u64
+  timestampLIKE: u64
+}
+
+type pistols_PPlayerTutorialProgress {
+  identity: ContractAddress
+  progress: Enum
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_PPlayerTutorialProgressConnection {
+  edges: [pistols_PPlayerTutorialProgressEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_PPlayerTutorialProgressEdge {
+  node: pistols_PPlayerTutorialProgress
+  cursor: Cursor
+}
+
+input pistols_PPlayerTutorialProgressOrder {
+  direction: OrderDirection!
+  field: pistols_PPlayerTutorialProgressOrderField!
+}
+
+enum pistols_PPlayerTutorialProgressOrderField {
+  IDENTITY
+  PROGRESS
+}
+
+input pistols_PPlayerTutorialProgressWhereInput {
+  identity: ContractAddress
+  identityGT: ContractAddress
+  identityGTE: ContractAddress
+  identityLT: ContractAddress
+  identityLTE: ContractAddress
+  identityNEQ: ContractAddress
+  identityEQ: ContractAddress
+  identityNOTIN: [ContractAddress]
+  identityIN: [ContractAddress]
+  identityNOTLIKE: ContractAddress
+  identityLIKE: ContractAddress
+  progress: Enum
 }
 
 type pistols_Round {
@@ -1170,6 +1678,8 @@ scalar u16
 
 scalar u256
 
+scalar u32
+
 scalar u64
 
 scalar u8
@@ -1333,6 +1843,15 @@ type World__Query {
   pistolsChallengeModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ChallengeWhereInput, order: pistols_ChallengeOrder): pistols_ChallengeConnection
   pistolsCoinConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_CoinConfigWhereInput, order: pistols_CoinConfigOrder): pistols_CoinConfigConnection
   pistolsDuelistModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_DuelistWhereInput, order: pistols_DuelistOrder): pistols_DuelistConnection
+  pistolsPPlayerTutorialProgressModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PPlayerTutorialProgressWhereInput, order: pistols_PPlayerTutorialProgressOrder): pistols_PPlayerTutorialProgressConnection
+  pistolsPPlayerBookmarkModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PPlayerBookmarkWhereInput, order: pistols_PPlayerBookmarkOrder): pistols_PPlayerBookmarkConnection
+  pistolsPPlayerOnlineModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PPlayerOnlineWhereInput, order: pistols_PPlayerOnlineOrder): pistols_PPlayerOnlineConnection
+  pistolsPlayerActivityModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerActivityWhereInput, order: pistols_PlayerActivityOrder): pistols_PlayerActivityConnection
+  pistolsConsumableBalanceModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ConsumableBalanceWhereInput, order: pistols_ConsumableBalanceOrder): pistols_ConsumableBalanceConnection
+  pistolsPlayerBookmarkModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerBookmarkWhereInput, order: pistols_PlayerBookmarkOrder): pistols_PlayerBookmarkConnection
+  pistolsPlayerTutorialProgressModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerTutorialProgressWhereInput, order: pistols_PlayerTutorialProgressOrder): pistols_PlayerTutorialProgressConnection
+  pistolsPlayerModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerWhereInput, order: pistols_PlayerOrder): pistols_PlayerConnection
+  pistolsPlayerOnlineModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerOnlineWhereInput, order: pistols_PlayerOnlineOrder): pistols_PlayerOnlineConnection
 }
 
 type World__Social {
