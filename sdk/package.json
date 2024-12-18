@@ -1,0 +1,47 @@
+{
+  "name": "@underware_gg/pistols-sdk",
+  "version": "0.12.3",
+  "description": "Pistols at 10 Blocks SDK",
+  "homepage": "https://underware.gg",
+  "author": "Underware",
+  "license": "CC0",
+  "private": false,
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup --dts-resolve",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "pistols at 10 blocks",
+    "underware",
+    "dojo",
+    "typescript",
+    "library",
+    "sdk"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/underware_gg/pistols/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/underware_gg/pistols/issues"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "catalog:",
+    "vitest": "^2.1.8"
+  }
+}
