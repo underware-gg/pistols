@@ -19,7 +19,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup --dts-resolve",
+    "build": "tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest"
