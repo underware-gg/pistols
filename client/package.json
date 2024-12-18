@@ -1,7 +1,11 @@
 {
   "name": "pistols",
-  "private": true,
   "version": "0.12.3",
+  "description": "Pistols at 10 Blocks JS client",
+  "homepage": "https://underware.gg",
+  "author": "Underware",
+  "license": "CC0",
+  "private": false,
   "type": "module",
   "scripts": {
     "dev": "NODE_OPTIONS='--experimental-wasm-modules' next dev",
@@ -13,26 +17,41 @@
     "create-components": "GAME_PATH=\"./src/games/$npm_config_game\" && echo create-components:[$GAME_PATH] && npx @dojoengine/core $GAME_PATH/manifests/manifest_$npm_config_profile.json $GAME_PATH/generated/contractComponents.ts",
     "create-constants": "GAME_PATH=\"./src/games/$npm_config_game\" && echo create-constants:[$GAME_PATH] && ./src/lib/bin/generateConstants.cjs ../dojo/src $GAME_PATH/generated/constants.ts"
   },
+  "keywords": [
+    "pistols at 10 blocks",
+    "underware",
+    "dojo",
+    "typescript",
+    "client"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/underware_gg/pistols"
+  },
+  "bugs": {
+    "url": "https://github.com/underware_gg/pistols/issues"
+  },
   "dependencies": {
     "@apollo/client": "^3.11.8",
     "@cartridge/connector": "0.5.6",
     "@cartridge/controller": "0.5.6",
-    "@dojoengine/core": "1.0.2",
-    "@dojoengine/sdk": "1.0.2",
-    "@dojoengine/torii-client": "1.0.2",
-    "@dojoengine/utils": "1.0.2",
+    "@dojoengine/core": "catalog:",
+    "@dojoengine/sdk": "catalog:",
+    "@dojoengine/torii-client": "catalog:",
+    "@dojoengine/utils": "catalog:",
     "@starknet-react/chains": "3.0.2",
     "@starknet-react/core": "3.0.3",
     "@tweenjs/tween.js": "^21.0.0",
+    "@underware_gg/pistols-sdk": "workspace:*",
     "event-emitter": "^0.3.5",
     "get-starknet-core": "^4.0.0",
     "immer": "^10.1.1",
     "lil-gui": "^0.19.2",
     "next": "^13.5.6",
-    "react": "^18.2.0",
+    "react": "catalog:",
     "react-circular-progressbar": "^2.1.0",
     "react-cookie": "^6.1.1",
-    "react-dom": "^18.2.0",
+    "react-dom": "catalog:",
     "sass": "^1.69.5",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^3.0.0-beta.2",
@@ -55,7 +74,7 @@
     "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.16",
-    "typescript": "^5.5.4"
+    "typescript": "catalog:"
   },
   "engines": {
     "node": ">=22"

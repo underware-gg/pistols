@@ -30,6 +30,7 @@ export const makeControllerConnector = (
   namespace: string,
   manifest: DojoManifest,
   rpcUrl: string,
+  toriiUrl: string,
   contractPolicyDescriptions: ContractPolicyDescriptions,
   signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions,
   tokens: Tokens,
@@ -41,7 +42,7 @@ export const makeControllerConnector = (
   }
 
   // extract slot service name from rpcUrl
-  const slot = /api\.cartridge\.gg\/x\/([^/]+)\/katana/.exec(rpcUrl)?.[1];
+  const slot = /api\.cartridge\.gg\/x\/([^/]+)\/torii/.exec(toriiUrl)?.[1];
 
   const options: ControllerOptions = {
     // ProviderOptions

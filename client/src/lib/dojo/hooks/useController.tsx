@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Connector, useAccount } from '@starknet-react/core'
-import { ControllerConnector } from "@cartridge/connector";
+import { ControllerConnector } from '@cartridge/connector'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useContractClassHash } from '@/lib/utils/hooks/useContractClassHash'
 import { BigNumberish } from 'starknet'
 import { bigintEquals, capitalize } from '@/lib/utils/types'
 import { _useConnector } from '../fix/starknet_react_core'
+import { ProfileContextTypeVariant } from '@cartridge/controller';
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
@@ -59,8 +60,8 @@ export const useConnectedController = () => {
   const openSettings = useCallback((address && controllerConnector) ? async () => {
     await controllerConnector.controller.openSettings()
   } : null, [controllerConnector, address])
-  const openProfile = useCallback((address && controllerConnector) ? async () => {
-    await controllerConnector.controller.openProfile()
+  const openProfile = useCallback((address && controllerConnector) ? async (tab?: ProfileContextTypeVariant) => {
+    await controllerConnector.controller.openProfile(tab)
   } : null, [controllerConnector, address])
 
   return {
@@ -70,6 +71,10 @@ export const useConnectedController = () => {
     name,
     openSettings,
     openProfile,
+    openInventory: () => openProfile('inventory'),
+    openTrophies: () => openProfile('trophies'),
+    openAchievements: () => openProfile('achievements'),
+    openActivity: () => openProfile('activity'),
   }
 }
 
