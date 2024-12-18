@@ -162,9 +162,11 @@ function CurtainUI({
   } = usePistolsContext()
   const {
     filterShowAllDuels,
+    filterShowBookmarkedDuels,
     filterChallengeSortColumn,
     filterChallengeSortDirection,
     setFilterShowAllDuels,
+    setFilterShowBookmarkedDuels,
     setFilterChallengeSortColumn,
     setFilterChallengeSortDirection,
     setFilterChallengeSortSwitch,
@@ -176,9 +178,11 @@ function CurtainUI({
 
     filterDuelistName,
     filterDuelistActive,
+    filterDuelistBookmarked,
     filterDuelistSortColumn,
     filterDuelistSortDirection,
     setFilterDuelistActive,
+    setFilterDuelistBookmarked,
     setFilterDuelistName,
     setFilterDuelistSortColumn,
     setFilterDuelistSortDirection,
@@ -269,6 +273,7 @@ function CurtainUI({
             <div>
               <label style={{marginRight: '10px'}}>Filters:</label>
               <FilterButton label='Active Only' state={filterDuelistActive} onClick={() => setFilterDuelistActive(!filterDuelistActive)} />
+              <FilterButton label='Bookmarked' state={filterDuelistBookmarked} onClick={() => setFilterDuelistBookmarked(!filterDuelistBookmarked)} />
               <FilterButton label='Wallets' state={duelistsAnon} onClick={() => dispatchDuelistsAnon(!duelistsAnon)} />
             </div>
           </div>
@@ -383,6 +388,7 @@ function CurtainUI({
           <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
             <FilterDuelistName  />
             <FilterButton label='Show All Live Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
+            <FilterButton label='Bookmarked' state={filterShowBookmarkedDuels} onClick={() => setFilterShowBookmarkedDuels(!filterShowBookmarkedDuels)} />
           </div>
           <Divider />
           <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
@@ -448,6 +454,7 @@ function CurtainUI({
           <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
             <FilterDuelistName  />
             <FilterButton label='Show All Past Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
+            <FilterButton label='Bookmarked' state={filterShowBookmarkedDuels} onClick={() => setFilterShowBookmarkedDuels(!filterShowBookmarkedDuels)} />
           </div>
           <Divider />
           <div style={{display: 'flex', justifyContent: 'space-evenly'}}>

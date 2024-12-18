@@ -12,8 +12,8 @@ import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '@/pistols/data/cardCons
 import { TavernAudios } from '@/pistols/components/GameContainer'
 
 export default function ScDuelists() {
-  const { filterDuelistName, filterDuelistActive, filterDuelistSortColumn, filterDuelistSortDirection } = useQueryParams()
-  const { duelistIds } = useQueryDuelistIds(filterDuelistName, filterDuelistActive, filterDuelistSortColumn, filterDuelistSortDirection)
+  const { filterDuelistName, filterDuelistActive, filterDuelistBookmarked, filterDuelistSortColumn, filterDuelistSortDirection } = useQueryParams()
+  const { duelistIds } = useQueryDuelistIds(filterDuelistName, filterDuelistActive, filterDuelistBookmarked, filterDuelistSortColumn, filterDuelistSortDirection)
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSelectDuelistId } = usePistolsContext()
   const anonOpener = useOpener()

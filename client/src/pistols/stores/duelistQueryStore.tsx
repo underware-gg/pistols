@@ -1,10 +1,13 @@
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
+import { useAccount } from '@starknet-react/core'
 import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { DuelistColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { feltToString } from '@/lib/utils/starknet'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
+import { usePlayer } from './playerStore'
+import { bigintEquals } from '@/lib/utils/types'
 
 
 //-----------------------------------------
@@ -87,9 +90,12 @@ export const useDuelistQueryStore = createStore();
 export const useQueryDuelistIds = (
   filterName: string,
   filterActive: boolean,
+  filterBookmarked: boolean,
   sortColumn: DuelistColumn,
   sortDirection: SortDirection,
 ) => {
+  const { address } = useAccount()
+  const { bookmarkedDuelists } = usePlayer(address)
   const entities = useDuelistQueryStore((state) => state.entities);
 
   const duelistIds = useMemo(() => {
@@ -98,6 +104,11 @@ export const useQueryDuelistIds = (
     // filter by name
     if (filterName) {
       result = result.filter((e) => e.name.includes(filterName))
+    }
+
+    // filter by bookmarked duelists
+    if (filterBookmarked) {
+      result = result.filter((e) => (bookmarkedDuelists.find(p => bigintEquals(p, e.duelist_id)) !== undefined))
     }
 
     // filter by active
@@ -135,7 +146,7 @@ export const useQueryDuelistIds = (
 
     // return ids only
     return result.map((e) => e.duelist_id)
-  }, [entities, filterName, filterActive, sortColumn, sortDirection])
+  }, [entities, filterName, filterActive, sortColumn, sortDirection, filterBookmarked, bookmarkedDuelists])
 
   return {
     duelistIds,
