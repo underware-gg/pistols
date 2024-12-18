@@ -28,8 +28,8 @@ import Duel from '@/pistols/components/scenes/Duel'
 import ActivityPanel from '@/pistols/components/ActivityPanel'
 
 // test sdk
-import { helloPistols } from '@underware_gg/pistols-sdk'
-helloPistols()
+// import { helloPistols } from '@underware_gg/pistols-sdk'
+// helloPistols();
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {
