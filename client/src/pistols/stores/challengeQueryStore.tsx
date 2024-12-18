@@ -1,11 +1,13 @@
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
+import { useAccount } from '@starknet-react/core'
 import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
+import { usePlayer } from '@/pistols/stores/playerStore'
+import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { ChallengeColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { ChallengeState, getChallengeStateValue } from '@/games/pistols/generated/constants'
-import { keysToEntity } from '@/lib/utils/types'
+import { bigintEquals, keysToEntity } from '@/lib/utils/types'
 
 
 //-----------------------------------------
@@ -84,10 +86,13 @@ export const useChallengeQueryStore = createStore();
 export const useQueryChallengeIds = (
   filterStates: ChallengeState[],
   filterName: string,
+  filterBookmarked: boolean,
   duelistId: bigint,
   sortColumn: ChallengeColumn,
   sortDirection: SortDirection,
 ) => {
+  const { address } = useAccount()
+  const { bookmarkedDuels } = usePlayer(address)
   const entities = useChallengeQueryStore((state) => state.entities);
   const duelistEntities = useDuelistQueryStore((state) => state.entities);
 
@@ -103,6 +108,11 @@ export const useQueryChallengeIds = (
       if (!acc.includes(e.state)) acc.push(e.state)
       return acc
     }, [] as ChallengeState[])
+
+    // filter by bookmarked duels
+    if (filterBookmarked) {
+      result = result.filter((e) => (bookmarkedDuels.find(p => bigintEquals(p, e.duel_id)) !== undefined))
+    }
 
     // filter by states
     result = result.filter((e) => filterStates.includes(e.state))
@@ -125,7 +135,7 @@ export const useQueryChallengeIds = (
     // return ids only
     const challengeIds = result.map((e) => e.duel_id)
     return [challengeIds, states]
-  }, [entities, filterStates, filterName, duelistId, sortColumn, sortDirection])
+  }, [entities, filterStates, filterName, filterBookmarked, duelistId, sortColumn, sortDirection, bookmarkedDuels])
 
   return {
     challengeIds,

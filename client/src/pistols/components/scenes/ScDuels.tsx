@@ -12,8 +12,8 @@ import { _currentScene } from '@/pistols/three/game'
 
 export default function ScDuels() {
   const { duelistId } = useSettings()
-  const { filterStatesLiveDuels, filterDuelistName, filterShowAllDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterDuelistName, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { filterStatesLiveDuels, filterDuelistName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterDuelistName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()

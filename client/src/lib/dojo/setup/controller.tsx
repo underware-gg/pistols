@@ -16,6 +16,7 @@ import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { _useConnector } from '../fix/starknet_react_core'
 import { assert } from '@/lib/utils/math'
 import { StarknetDomain, StarknetType, TypedData } from 'starknet'
+import { serialize } from '@/lib/utils/types'
 
 
 
@@ -31,21 +32,13 @@ export const makeControllerConnector = (
   rpcUrl: string,
   contractPolicyDescriptions: ContractPolicyDescriptions,
   signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions,
+  tokens: Tokens,
 ): Connector => {
   // const policies = _makeControllerPolicyArray(manifest, namespace, descriptions)
   const policies: SessionPolicies = {
     contracts: _makeControllerContractPolicies(manifest, namespace, contractPolicyDescriptions),
     messages: _makeControllerSignMessagePolicies(signedMessagePolicyDescriptions),
   }
-
-  // tokens to display
-  // const tokens: Tokens = {
-  //   erc20: [
-  //     // bigintToHex(lordsContractAddress),
-  //     // bigintToHex(fameContractAddress),
-  //   ],
-  //   // erc721: [],
-  // }
 
   // extract slot service name from rpcUrl
   const slot = /api\.cartridge\.gg\/x\/([^/]+)\/katana/.exec(rpcUrl)?.[1];
@@ -60,9 +53,9 @@ export const makeControllerConnector = (
     namespace,
     policies,
     slot,
-    // tokens,
+    tokens,
   }
-  if (typeof window !== 'undefined') console.log(`-------- ControllerOptions:`, options)
+  if (typeof window !== 'undefined') console.log(`-------- ControllerOptions:`, options)//, serialize(options))
   const connector = new ControllerConnector(options) as never as Connector
   assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
   return connector

@@ -28,6 +28,7 @@ type State = {
   // duelist filters
   filterDuelistName: string
   filterDuelistActive: boolean
+  filterDuelistBookmarked: boolean
   filterDuelistSortColumn: DuelistColumn
   filterDuelistSortDirection: SortDirection
   //challenge filters
@@ -37,9 +38,11 @@ type State = {
   filterStatesPastDuels: ChallengeState[]
   filterStatesDuelistDuels: ChallengeState[]
   filterShowAllDuels: boolean
+  filterShowBookmarkedDuels: boolean
   // duelist setters
   setFilterDuelistName: (value: string) => void
   setFilterDuelistActive: (value: boolean) => void
+  setFilterDuelistBookmarked: (value: boolean) => void
   setFilterDuelistSortColumn: (value: DuelistColumn) => void
   setFilterDuelistSortDirection: (value: SortDirection) => void
   setFilterDuelistSortSwitch: () => void
@@ -51,12 +54,14 @@ type State = {
   setFilterStatesPastDuels: (value: ChallengeState[]) => void
   setFilterStatesDuelistDuels: (value: ChallengeState[]) => void
   setFilterShowAllDuels: (value: boolean) => void
+  setFilterShowBookmarkedDuels: (value: boolean) => void
 }
 
 export const useQueryParams = create<State>((set) => ({
   // duelist filters
   filterDuelistName: '',
   filterDuelistActive: false,
+  filterDuelistBookmarked: false,
   filterDuelistSortColumn: DuelistColumn.Honour,
   filterDuelistSortDirection: SortDirection.Descending,
   // challenge filters
@@ -66,9 +71,11 @@ export const useQueryParams = create<State>((set) => ({
   filterStatesPastDuels: PastChallengeStates,
   filterStatesDuelistDuels: AllChallengeStates,
   filterShowAllDuels: false,
+  filterShowBookmarkedDuels: false,
   // duelist setters
   setFilterDuelistName: (value: string) => set({ filterDuelistName: value.toLowerCase() }),
   setFilterDuelistActive: (value: boolean) => set({ filterDuelistActive: value }),
+  setFilterDuelistBookmarked: (value: boolean) => set({ filterDuelistBookmarked: value }),
   setFilterDuelistSortColumn: (value: DuelistColumn) => set({ filterDuelistSortColumn: value }),
   setFilterDuelistSortDirection: (value: SortDirection) => set({ filterDuelistSortDirection: value }),
   setFilterDuelistSortSwitch: () => set((state: State) => ({ filterDuelistSortDirection: _switchDirection(state.filterDuelistSortDirection) })),
@@ -80,4 +87,5 @@ export const useQueryParams = create<State>((set) => ({
   setFilterStatesPastDuels: (value: ChallengeState[]) => set({ filterStatesPastDuels: value.filter(state => PastChallengeStates.includes(state)) }),
   setFilterStatesDuelistDuels: (value: ChallengeState[]) => set({ filterStatesDuelistDuels: value.filter(state => AllChallengeStates.includes(state)) }),
   setFilterShowAllDuels: (value: boolean) => set({ filterShowAllDuels: value }),
+  setFilterShowBookmarkedDuels: (value: boolean) => set({ filterShowBookmarkedDuels: value }),
 }))

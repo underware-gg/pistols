@@ -2,18 +2,18 @@ import { BigNumberish } from 'starknet'
 import { useDeployedDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
-import { useConfig } from '@/pistols/stores/configStore'
 import { bigintEquals } from '@/lib/utils/types'
 
 
 export const useLordsContract = () => {
-  const { lordsAddress } = useConfig()
+  const { selectedChainConfig } = useSelectedChain()
+  const lordsAddress = selectedChainConfig.lordsAddress
 
   const { contractAddress: mockAddress, isDeployed, abi } = useDeployedDojoSystem('lords_mock')
   const isMock = bigintEquals(lordsAddress, mockAddress) && isDeployed
 
   return {
-    lordsContractAddress: lordsAddress,
+    lordsContractAddress: lordsAddress || mockAddress,
     isMock,
     abi,
   }

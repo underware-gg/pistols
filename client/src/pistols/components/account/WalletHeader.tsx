@@ -43,11 +43,11 @@ export default function WalletHeader({
         {isConnected &&
           <Col width={12} textAlign='left'>
             <h4>{name}</h4>
-            {username && <span className='H4 Bold'>{username} / </span>} <AddressShort address={address ?? 0n} />
+            {username && <span className='H4 Bold'>{username} <span className='Inactive'>|</span> </span>} <AddressShort address={address ?? 0n} />
             {isConnected &&
               <h5>
                 LORDS: <LordsBalance address={address} />
-                {' / '}
+                <span className='Inactive'> | </span>
                 FAME: <FameBalance address={address} />
                 {/* <EtherBalance address={address} /> */}
               </h5>

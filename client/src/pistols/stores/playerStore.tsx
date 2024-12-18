@@ -3,6 +3,8 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
+import { useDuelTokenContract } from '@/pistols/hooks/useTokenContract'
+import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
 import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@/lib/utils/types'
 import { TutorialProgress } from '@/games/pistols/generated/constants'
@@ -163,6 +165,11 @@ export const usePlayer = (address: BigNumberish) => {
   const hasCompletedTutorial = useMemo(() => (tutorialProgress === TutorialProgress.FinishedFirstDuel), [tutorialProgress])
   const isAvailable = useMemo(() => (hasCompletedTutorial), [hasCompletedTutorial])
 
+  const { duelContractAddress } = useDuelTokenContract()
+  const { duelistContractAddress } = useDuelistTokenContract()
+  const bookmarkedDuels = useMemo(() => (player?.bookmarked_tokens?.[duelContractAddress as string] ?? []), [player])
+  const bookmarkedDuelists = useMemo(() => (player?.bookmarked_tokens?.[duelistContractAddress as string] ?? []), [player])
+
   // useEffect(() => console.log("usePlayer() =>", username, key, player), [player, username])
 
   return {
@@ -173,6 +180,8 @@ export const usePlayer = (address: BigNumberish) => {
     timestampRegistered,
     bookmarkedPlayers,
     bookmarkedTokens,
+    bookmarkedDuels,
+    bookmarkedDuelists,
     tutorialProgress,
     hasCompletedTutorial,
     isAvailable,
