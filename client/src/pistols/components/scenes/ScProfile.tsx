@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Grid, Tab } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelistsOfPlayer } from '@/pistols/hooks/useDuelistToken'
@@ -15,8 +14,6 @@ import DuelistEditModal from '@/pistols/components/modals/DuelistEditModal'
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import { TutorialProgressDebug } from '@/pistols/components/TutorialProgressDebug'
 
-const Row = Grid.Row
-const Col = Grid.Column
 
 export default function ScProfile() {
   const { isConnected } = useAccount()

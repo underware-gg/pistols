@@ -1,6 +1,6 @@
 import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
-import { BigNumberish, contractClassResponseToLegacyCompiledContract } from 'starknet'
+import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
 import { bigintToHex, bigintToNumber } from '@/lib/utils/types'
 import { useSettings } from './SettingsContext'
@@ -49,12 +49,12 @@ export const initialState = {
   challengingId: 0n,
   currentScene: undefined as SceneName,
   lastScene: undefined as SceneName,
-  duelistsAnon: true,
   moves: {} as StoredMoves,
   // injected
   connectOpener: null as Opener,
   duelistEditOpener: null as Opener,
   tableOpener: null as Opener,
+  walletFinderOpener: null as Opener,
 }
 
 const PistolsActions = {
@@ -64,7 +64,6 @@ const PistolsActions = {
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
   SELECT_PLAYER_ADDRESS: 'SELECT_PLAYER_ADDRESS',
   SELECT_CHALLENGING_ID: 'SELECT_CHALLENGING_ID',
-  SELECT_DUELISTS_ANON: 'SELECT_DUELISTS_ANON',
   SET_MOVES: 'SET_MOVES',
 }
 
@@ -81,7 +80,6 @@ type ActionType =
   | { type: 'SELECT_DUELIST_ID', payload: bigint }
   | { type: 'SELECT_PLAYER_ADDRESS', payload: bigint }
   | { type: 'SELECT_CHALLENGING_ID', payload: bigint }
-  | { type: 'SELECT_DUELISTS_ANON', payload: boolean }
   | { type: 'SET_MOVES', payload: StoredMoves }
 
 
@@ -109,6 +107,7 @@ const PistolsProvider = ({
   const connectOpener = useOpener()
   const duelistEditOpener = useOpener()
   const tableOpener = useOpener()
+  const walletFinderOpener = useOpener()
 
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
@@ -153,10 +152,6 @@ const PistolsProvider = ({
         newState.challengingId = action.payload as bigint
         break
       }
-      case PistolsActions.SELECT_DUELISTS_ANON: {
-        newState.duelistsAnon = action.payload as boolean
-        break
-      }
       case PistolsActions.SET_MOVES: {
         const newMove = action.payload as StoredMoves
         newState.moves = { ...state.moves, ...newMove }
@@ -175,6 +170,7 @@ const PistolsProvider = ({
       connectOpener,
       duelistEditOpener,
       tableOpener,
+      walletFinderOpener,
     } }}>
       {children}
     </PistolsContext.Provider>
@@ -224,12 +220,6 @@ export const usePistolsContext = () => {
       payload: BigInt(newId),
     })
   }
-  const dispatchDuelistsAnon = (newAnon: boolean) => {
-    dispatch({
-      type: PistolsActions.SELECT_DUELISTS_ANON,
-      payload: newAnon,
-    })
-  }
   const dispatchSetMoves = (message: CommitMoveMessage, moves: number[], salt: bigint ) => {
     const key = makeStoredMovesKey(message)
     if (!key) {
@@ -257,7 +247,6 @@ export const usePistolsContext = () => {
     dispatchSelectDuelistId,
     dispatchSelectPlayerAddress,
     dispatchChallengingDuelistId,
-    dispatchDuelistsAnon,
     dispatchSetMoves,
     makeStoredMovesKey,
     __dispatchSetScene, // used internally only

@@ -1,18 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Grid, Dropdown, Image, Input, ButtonGroup, Divider } from 'semantic-ui-react'
-import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
-import { useTable } from '@/pistols/stores/tableStore'
-import { BackButton, MusicToggle, FilterButton } from '@/pistols/components/ui/Buttons'
-import AccountHeader from '@/pistols/components/account/AccountHeader'
-import useGameAspect from '../hooks/useGameApect'
-import * as TWEEN from '@tweenjs/tween.js'
-import { SCENE_CHANGE_ANIMATION_DURATION } from '../three/game'
-import WalletHeader from './account/WalletHeader'
+import { Image, Input, ButtonGroup, Divider, Button } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useQueryParams, DuelistColumn, SortDirection, ChallengeColumn } from '@/pistols/stores/queryParamsStore'
-import { AllChallengeStates, ChallengeStateNames, LiveChallengeStates, PastChallengeStates } from '../utils/pistols'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
+import { useTable } from '@/pistols/stores/tableStore'
+import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { AllChallengeStates, ChallengeStateNames, LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
+import { BackButton, MusicToggle, FilterButton } from '@/pistols/components/ui/Buttons'
+import { SCENE_CHANGE_ANIMATION_DURATION } from '@/pistols/three/game'
 import { arrayRemoveValue } from '@/lib/utils/types'
+import WalletHeader from './account/WalletHeader'
+import AccountHeader from '@/pistols/components/account/AccountHeader'
+import useGameAspect from '@/pistols/hooks/useGameApect'
+import * as TWEEN from '@tweenjs/tween.js'
 
 function useExit() {
   const { isConnected } = useAccount()
@@ -73,7 +73,7 @@ export function Header() {
               </>} */}
               {/* //TODO add table name when needed */}
             </div>
-            <div className='YesMouse' style={{ flex: '1', textAlign: 'right' }}>
+            <div style={{ flex: '1', textAlign: 'right' }}>
               {!atProfile &&
                 <AccountHeader />
               }
@@ -157,8 +157,7 @@ function CurtainUI({
   const { atProfile, atDuelists, atDuels, atGraveyard } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
   const {
-    duelistsAnon,
-    dispatchDuelistsAnon,
+    walletFinderOpener,
   } = usePistolsContext()
   const {
     filterShowAllDuels,
@@ -274,7 +273,7 @@ function CurtainUI({
               <label style={{marginRight: '10px'}}>Filters:</label>
               <FilterButton label='Active Only' state={filterDuelistActive} onClick={() => setFilterDuelistActive(!filterDuelistActive)} />
               <FilterButton label='Bookmarked' state={filterDuelistBookmarked} onClick={() => setFilterDuelistBookmarked(!filterDuelistBookmarked)} />
-              <FilterButton label='Wallets' state={duelistsAnon} onClick={() => dispatchDuelistsAnon(!duelistsAnon)} />
+              <FilterButton label='Player Finder' state={walletFinderOpener.isOpen} onClick={() => walletFinderOpener.open()} />
             </div>
           </div>
           <Divider />

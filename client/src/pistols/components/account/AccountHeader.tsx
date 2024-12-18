@@ -28,7 +28,7 @@ export default function AccountHeader() {
 
   return (
      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <div style={{ flex: 1, textAlign: 'right' }}>
+      <div className='NoMouse' style={{ flex: 1, textAlign: 'right' }}>
         {!isConnected ? <h3>Guest</h3>
           : <>
             <h3>{nameDisplay}</h3>
@@ -38,7 +38,7 @@ export default function AccountHeader() {
             {/* //TODO replace with fame */}
           </>}
       </div>
-      <div style={{ padding: aspectWidth(0.6) }}>
+      <div className='YesMouse' style={{ padding: aspectWidth(0.6) }}>
         <DuelistsNavigationMenu>
           <ProfilePicSquareButton profilePic={profilePic ?? 0} onClick={() => _click()} medium />
         </DuelistsNavigationMenu>

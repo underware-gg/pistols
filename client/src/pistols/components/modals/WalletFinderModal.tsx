@@ -19,7 +19,7 @@ import { useStarkName, useStarkProfile } from '@/lib/utils/hooks/useStarkName'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function AnonModal({
+export default function WalletFinderModal({
   opener,
 }: {
   opener: Opener

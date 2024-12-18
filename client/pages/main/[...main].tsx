@@ -15,6 +15,7 @@ import PlayerModal from '@/pistols/components/modals/PlayerModal'
 import DuelistModal from '@/pistols/components/modals/DuelistModal'
 import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
 import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
+import WalletFinderModal from '@/pistols/components/modals/WalletFinderModal'
 import ScProfile from '@/pistols/components/scenes/ScProfile'
 import ScTavern from '@/pistols/components/scenes/ScTavern'
 import ScDuels from '@/pistols/components/scenes/ScDuels'
@@ -97,7 +98,7 @@ function MainUI() {
 
 
 function Modals() {
-  const { selectedDuelId, selectedDuelistId, selectedPlayerAddress, challengingId } = usePistolsContext()
+  const { selectedDuelId, selectedDuelistId, selectedPlayerAddress, challengingId, walletFinderOpener } = usePistolsContext()
   const challengeIsOpen = useMemo(() => (selectedDuelId > 0), [selectedDuelId])
   const duelistIsOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
   const playerIsOpen = useMemo(() => (selectedPlayerAddress > 0n), [selectedPlayerAddress])
@@ -108,6 +109,7 @@ function Modals() {
       {duelistIsOpen && <DuelistModal />}
       {playerIsOpen && <PlayerModal />}
       {newChallengeIsOpen && <NewChallengeModal />}
+      <WalletFinderModal opener={walletFinderOpener} />
     </>
   )
 }
