@@ -119,6 +119,7 @@ const controllerConnector = makeControllerConnector(
   NAMESPACE,
   manifests[defaultChainId],
   dojoContextConfig[defaultChainId].rpcUrl,
+  dojoContextConfig[defaultChainId].toriiUrl,
   contractPolicyDescriptions,
   signedMessagePolicyDescriptions,
   tokens,
