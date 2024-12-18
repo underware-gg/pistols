@@ -139,3 +139,7 @@ dist
 Scarb.lock
 */target
 *.pem
+
+# Turbo
+.turbo
+.vercel

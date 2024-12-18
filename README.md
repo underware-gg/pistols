@@ -129,6 +129,7 @@ starkliup
 curl -fsSL https://get.pnpm.io/install.sh | sh -
 
 # other stuff you will need
+pnpm install -g turbo
 brew install jq
 brew install protobuf
 cargo install toml-cli
@@ -249,11 +250,13 @@ Start the client
 ```sh
 # http server
 # http://localhost:3000
-pnpm run dev
+cd pistols
+turbo dev
 
 # https server (required for Catridge Controller)
 # https://localhost:3000
-pnpm run devs
+cd pistols
+turbo devs
 ```
 
 Open [http://localhost:3000](http://localhost:3000) or [https://localhost:3000](https://localhost:3000)

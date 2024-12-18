@@ -21,6 +21,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "devs": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest"
   },

@@ -11,6 +11,7 @@
     "dev": "next dev",
     "devs": "next dev --experimental-https",
     "start": "next start",
+    "check-types": "npx tsc --noEmit",
     "build": "npx tsc -p tsconfig.json && next build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "print-profile": "echo usage: npm run print-profile --profile=dev && echo \"profile:[$npm_config_profile]\"",
