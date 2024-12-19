@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Account, TypedData, stark } from 'starknet'
-import { serialize } from '../../utils'
-import { useDojoSetup, useSelectedChain } from '../../dojo'
+import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
+import { useSelectedChain } from 'src/dojo/hooks/useChain'
+import { serialize } from 'src/utils/types'
 
 // export const useSdkPublishSignedMessage = <M extends PistolsModelType>(
 //   account: Account,

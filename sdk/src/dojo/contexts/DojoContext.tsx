@@ -1,5 +1,5 @@
-import { ReactNode, createContext, useContext } from 'react'
-import { SetupResult } from '../../dojo'
+import React, { ReactNode, createContext, useContext } from 'react'
+import { SetupResult } from 'src/dojo/setup/useSetup'
 
 interface DojoContextType {
   isInitialized: boolean;

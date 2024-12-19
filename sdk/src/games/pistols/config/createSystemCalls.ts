@@ -1,20 +1,12 @@
 import { DojoCall, DojoProvider } from '@dojoengine/core'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
-import {
-  arrayClean,
-  shortAddress,
-  stringToFelt, bigintToU256, isPositiveBigint,
-} from '../../../utils'
-import {
-  DojoManifest,
-  emitter,
-} from '../../../dojo'
-import {
-  NAMESPACE,
-  constants,
-  getLordsAddress, getBankAddress,
-  convert_duel_progress,
-} from '../../../games/pistols'
+import { stringToFelt, bigintToU256 } from 'src/utils/starknet'
+import { arrayClean, shortAddress, isPositiveBigint } from 'src/utils/types'
+import { DojoManifest } from 'src/dojo/contexts/Dojo'
+import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'
+import { NAMESPACE, getLordsAddress, getBankAddress } from 'src/games/pistols/config/config'
+import { convert_duel_progress } from 'src/games/pistols/config/duel_progress'
+import * as constants from 'src/games/pistols/generated/constants'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 

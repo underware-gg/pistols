@@ -1,11 +1,10 @@
 import { BigNumberish, StarknetType, typedData } from 'starknet'
-import { bigintToDecimal, bigintToHex, bigintToNumber } from '../../../utils'
-import { generateTypedData } from '../../../dojo'
-import {
-  STARKNET_DOMAIN,
-  PistolsSchemaType,
-  models, constants,
-} from '../../../games/pistols'
+import { bigintToDecimal, bigintToHex, bigintToNumber } from 'src/utils/types'
+import { generateTypedData } from 'src/dojo/setup/controller'
+import { STARKNET_DOMAIN } from 'src/games/pistols/config/config'
+import { PistolsSchemaType } from 'src/games/pistols/config/types'
+import * as constants from 'src/games/pistols/generated/constants'
+import * as models from 'src/games/pistols/generated/models.gen'
 
 //
 // type examples:
@@ -111,9 +110,9 @@ export function make_typed_data_PPlayerTutorialProgress({
 //   { name: 'FinishedSecond', type: '()' },
 //   { name: 'FinishedFirstDuel', type: '()' },
 // ]
-const makeEnumType = (enumValues: Record<string, number>): StarknetType[] => (
-  Object.keys(enumValues).map(name => ({
+function makeEnumType(enumValues: Record<string, number>): StarknetType[] {
+  return Object.keys(enumValues).map(name => ({
     name,
     type: '()',
   }))
-)
+}

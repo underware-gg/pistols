@@ -1,11 +1,11 @@
 import { useState } from 'react'
+import { useSdkEntities, UseSdkEntitiesProps } from 'src/dojo/hooks/useSdkEntities'
 import {
   PistolsModelType,
   PistolsSchemaModels,
   PistolsEntity,
   PistolsSchemaModelNames,
-} from '../../games'
-import { useSdkEntities, UseSdkEntitiesProps } from '../../dojo'
+} from 'src/games/pistols/config/types'
 
 export type EntityMap = {
   [entityId: string]: Partial<PistolsSchemaModels>,

@@ -11,8 +11,8 @@ import {
   KATANA_PREFUNDED_PRIVATE_KEY,
   KATANA_ETH_CONTRACT_ADDRESS,
 } from '@dojoengine/core'
-import { supportedConnetorIds } from './connectors'
-import { PredeployedAccount } from '../../utils'
+import { supportedConnetorIds } from 'src/dojo/setup/connectors'
+import { PredeployedAccount } from 'src/utils/predeployed'
 
 //
 // supported chain ids

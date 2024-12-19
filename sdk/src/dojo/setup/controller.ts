@@ -12,12 +12,11 @@ import {
   Method,
 } from '@cartridge/controller'
 import { SchemaType, UnionOfModelData } from '@dojoengine/sdk'
-import { assert, serialize } from '../../utils'
-import {
-  ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions,
-  supportedConnetorIds,
-} from '../../dojo'
-import { _useConnector } from '../../fix'
+import { ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
+import { supportedConnetorIds } from 'src/dojo/setup/connectors'
+import { _useConnector } from 'src/fix/starknet_react_core'
+import { assert } from 'src/utils/math'
+import { serialize } from 'src/utils/types'
 
 
 

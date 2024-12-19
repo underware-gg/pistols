@@ -9,7 +9,8 @@ import {
   TypedDataRevision,
   StarknetDomain,
 } from 'starknet'
-import { bigintToHex, cleanObject, isBigint, poseidon } from '../utils'
+import { bigintToHex, cleanObject, isBigint } from 'src/utils/types'
+import { poseidon } from 'src/utils/starknet'
 
 export type Messages = { [key: string]: string | BigInt }
 export type Revision = 0 | 1

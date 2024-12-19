@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useContract, useBalance } from '@starknet-react/core'
-import { bigintToHex, isPositiveBigint } from '../utils'
-import { erc20_abi } from '../abi'
+import { bigintToHex, isPositiveBigint } from 'src/utils/types'
+import { erc20_abi } from 'src/abis/abis'
 
 export const useERC20Balance = (contractAddress: BigNumberish, ownerAddress: BigNumberish, fee: BigNumberish = 0n) => {
   const { data: balance } = useBalance({

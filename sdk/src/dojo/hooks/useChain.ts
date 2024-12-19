@@ -2,16 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BigNumberish, Provider } from 'starknet'
 import { Connector, useAccount, useConnect, useNetwork } from '@starknet-react/core'
 import { SwitchStarknetChainParameters, AddStarknetChainParameters } from 'get-starknet-core'
-import {
-  feltToString,
-} from '../../utils'
-import {
-  useAddStarknetChain, useSwitchStarknetChain,
-} from '../../hooks'
-import {
-  ChainId, getDojoChainConfig, isChainIdSupported,
-  useStarknetContext,
-} from '../../dojo'
+import { useAddStarknetChain, useSwitchStarknetChain } from 'src/hooks/useWalletRequest'
+import { getDojoChainConfig, isChainIdSupported } from 'src/dojo/setup/chainConfig'
+import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
+import { ChainId } from 'src/dojo/setup/chains'
+import { feltToString } from 'src/utils/starknet'
 
 
 export const useChainConfig = (chain_id: ChainId | BigNumberish) => {

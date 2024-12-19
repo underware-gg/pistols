@@ -1,10 +1,10 @@
 import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo } from 'react'
 import { StarknetConfig, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
 import { Chain } from '@starknet-react/chains'
-import {
-  ChainId, DojoChainConfig, getDojoChainConfig, getStarknetProviderChains, isChainIdSupported,
-  DojoAppConfig, useChainConnectors,
-} from '../../dojo'
+import { useChainConnectors } from 'src/dojo/setup/connectors'
+import { getDojoChainConfig, getStarknetProviderChains, isChainIdSupported } from 'src/dojo/setup/chainConfig'
+import { ChainId, DojoChainConfig } from 'src/dojo/setup/chains'
+import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
 
 
 interface StarknetContextType {

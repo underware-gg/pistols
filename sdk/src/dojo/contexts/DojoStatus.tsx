@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import useSWR from 'swr'
-import { useSelectedChain } from '../../dojo'
+import { useSelectedChain } from 'src/dojo/hooks/useChain'
 
 const textFetcher = (url: string) => fetch(url).then((res) => res.text())
 

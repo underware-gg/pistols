@@ -1,15 +1,14 @@
 import { useEffect, useMemo } from 'react'
 import { init } from '@dojoengine/sdk'
 import { DojoProvider } from '@dojoengine/core'
-import { useAsyncMemo, useMounted } from '../../hooks'
-import { feltToString } from '../../utils'
-import {
-  DojoAppConfig, DojoChainConfig,
-  useDeployedSystem,
- } from '../../dojo'
-import {
-  createSystemCalls, models,
-} from '../../games/pistols'
+import { useAsyncMemo } from 'src/hooks/useAsyncMemo'
+import { useMounted } from 'src/hooks/useMounted'
+import { feltToString } from 'src/utils/starknet'
+import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
+import { DojoChainConfig } from 'src/dojo/setup/chains'
+import { useDeployedSystem } from 'src/dojo/hooks/useDojoSystem'
+import { createSystemCalls } from 'src/games/pistols/config/createSystemCalls'
+import * as models from 'src/games/pistols/generated/models.gen'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
 export type Schema = typeof models.schema

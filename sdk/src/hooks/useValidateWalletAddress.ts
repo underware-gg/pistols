@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useAddressFromStarkName } from '../hooks'
-import { arrayLast, sanitizedAddress, STARKNET_ADDRESS_LENGTHS, ETHEREUM_ADDRESS_LENGTH } from '../utils'
+import { useAddressFromStarkName } from 'src/hooks/useStarkName'
+import { sanitizedAddress, STARKNET_ADDRESS_LENGTHS, ETHEREUM_ADDRESS_LENGTH } from 'src/utils/starknet'
+import { arrayLast } from 'src/utils/types'
 
 export const useValidateWalletAddress = (address: BigNumberish) => {
   const formattedAddress = useMemo(() => (sanitizedAddress(address) ?? ''), [address])

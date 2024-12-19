@@ -1,12 +1,13 @@
-import { Chain } from '@starknet-react/chains'
 import dotenv from 'dotenv'
-import { stringToFelt, cleanObject } from '../../utils'
+import { Chain } from '@starknet-react/chains'
 import {
   ChainId,
   DojoChainConfig,
   dojoContextConfig,
   envChainConfig,
-} from '../../dojo'
+} from 'src/dojo/setup/chains'
+import { stringToFelt } from 'src/utils/starknet'
+import { cleanObject } from 'src/utils/types'
 
 dotenv.config()
 export const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID || undefined) as ChainId

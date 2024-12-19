@@ -1,12 +1,10 @@
 import { useMemo } from 'react'
 import { Abi, BigNumberish } from 'starknet'
 import { getContractByName } from '@dojoengine/core'
-import { useDeployedContract } from '../../hooks'
-import { bigintToHex } from '../../utils'
-import {
-  DojoManifest,
-  useDojoSetup,
-} from '../../dojo'
+import { useDeployedContract } from 'src/hooks/useDeployedContract'
+import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
+import { DojoManifest } from 'src/dojo/contexts/Dojo'
+import { bigintToHex } from 'src/utils/types'
 
 
 export const useDojoSystem = (systemName: string) => {

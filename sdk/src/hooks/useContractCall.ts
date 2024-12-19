@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { arrayHasNullElements } from '../utils'
+import { arrayHasNullElements } from 'src/utils/types'
 
 export const useContractCall = <T extends any>({
   call,

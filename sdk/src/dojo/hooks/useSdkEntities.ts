@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { arrayClean, isPositiveBigint } from '../../utils'
-import { useDojoSetup } from '../../dojo'
+import { arrayClean, isPositiveBigint } from 'src/utils/types'
+import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import {
   PistolsGetQuery,
   PistolsSubQuery,
   PistolsEntity,
   PistolsModelType,
-  PistolsSchemaModels,
   PistolsSchemaModelNames,
-} from '../../games'
+} from 'src/games/pistols/config/types'
 
 
 //---------------------------------------
@@ -64,7 +63,7 @@ export const useSdkEntities = ({
       setIsLoading(true)
       await (isEvent ? sdk.getEventMessages : sdk.getEntities)({
         query: query_get,
-        callback: (response) => {
+        callback: (response: any) => {
           if (response.error) {
             console.error("useSdkEntities().sdk.get() error:", response.error)
           } else if (response.data) {
@@ -95,7 +94,7 @@ export const useSdkEntities = ({
       setIsSubscribed(undefined)
       const subscription = await (isEvent ? sdk.subscribeEventQuery : sdk.subscribeEntityQuery)({
         query: query_sub,
-        callback: (response) => {
+        callback: (response: any) => {
           if (response.error) {
             console.error("useSdkEntities().sdk.subscribe() error:", response.error)
           } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {

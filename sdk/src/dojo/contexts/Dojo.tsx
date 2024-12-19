@@ -2,11 +2,10 @@ import React, { ReactNode } from 'react'
 import { StarknetDomain, TypedData } from 'starknet'
 import { Connector } from '@starknet-react/core'
 import { Manifest } from '@dojoengine/core'
-import {
-  StarknetProvider, useStarknetContext,
-  ChainId, DojoProvider,
-  useSetup,
- } from '../../dojo'
+import { StarknetProvider, useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
+import { DojoProvider } from 'src/dojo/contexts/DojoContext'
+import { useSetup } from 'src/dojo/setup/useSetup'
+import { ChainId } from 'src/dojo/setup/chains'
 
 // TODO: Manifest is outdated???
 // export type DojoManifest = Manifest

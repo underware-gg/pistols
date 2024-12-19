@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useContract } from '@starknet-react/core'
 import { Abi, BigNumberish, CairoVersion, CompilerVersion } from 'starknet'
-import { bigintToHex, isPositiveBigint } from '../utils'
+import { bigintToHex, isPositiveBigint } from 'src/utils/types'
 
 export const useDeployedContract = (contractAddress: BigNumberish, abi: Abi) => {
 

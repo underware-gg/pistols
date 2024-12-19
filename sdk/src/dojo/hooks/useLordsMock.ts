@@ -1,13 +1,10 @@
 import { useCallback, useMemo, useState } from 'react'
 import { Account, AccountInterface } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import {
-  bigintToU256, ethToWei, execute, bigintToHex,
-} from '../../utils'
-import {
-  useStarknetContext,
-  useLordsContract,
-} from '../../dojo'
+import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
+import { useLordsContract } from 'src/dojo/hooks/useLords'
+import { bigintToU256, ethToWei, execute } from 'src/utils/starknet'
+import { bigintToHex } from 'src/utils/types'
 
 export interface FaucetExecuteResult {
   transaction_hash: string

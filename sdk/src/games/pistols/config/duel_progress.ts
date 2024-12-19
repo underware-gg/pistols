@@ -1,5 +1,5 @@
-import { cleanObject } from '../../../utils'
-import { constants } from '../../../games/pistols'
+import { cleanObject } from 'src/utils/types'
+import * as constants from 'src/games/pistols/generated/constants'
 
 const _get_variant = (variant: any): any => {
   const v = cleanObject(variant)

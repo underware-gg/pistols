@@ -13,29 +13,29 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./abi": {
-      "import": "./dist/abi/index.js",
-      "types": "./dist/abi/index.d.ts"
+    "./abis": {
+      "import": "./dist/abis.js",
+      "types": "./dist/abis.d.ts"
     },
     "./dojo": {
-      "import": "./dist/dojo/index.js",
-      "types": "./dist/dojo/index.d.ts"
+      "import": "./dist/dojo.js",
+      "types": "./dist/dojo.d.ts"
     },
     "./fix": {
-      "import": "./dist/fix/index.js",
-      "types": "./dist/fix/index.d.ts"
+      "import": "./dist/fix.js",
+      "types": "./dist/fix.d.ts"
     },
     "./pistols": {
-      "import": "./dist/games/pistols/index.js",
-      "types": "./dist/games/pistols/index.d.ts"
+      "import": "./dist/games_pistols.js",
+      "types": "./dist/games_pistols.d.ts"
     },
     "./hooks": {
-      "import": "./dist/hooks/index.js",
-      "types": "./dist/hooks/index.d.ts"
+      "import": "./dist/hooks.js",
+      "types": "./dist/hooks.d.ts"
     },
     "./utils": {
-      "import": "./dist/utils/index.js",
-      "types": "./dist/utils/index.d.ts"
+      "import": "./dist/utils.js",
+      "types": "./dist/utils.d.ts"
     },
     "./package.json": "./package.json"
   },

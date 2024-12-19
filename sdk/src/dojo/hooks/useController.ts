@@ -3,14 +3,12 @@ import { BigNumberish } from 'starknet'
 import { Connector, useAccount } from '@starknet-react/core'
 import { ControllerConnector } from '@cartridge/connector'
 import { ProfileContextTypeVariant } from '@cartridge/controller'
+import { useContractClassHash } from 'src/hooks/useContractClassHash'
+import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
-import { useContractClassHash } from '../../hooks'
-import { bigintEquals, capitalize } from '../../utils'
-import { _useConnector } from '../../fix'
-import {
-  supportedConnetorIds,
-  useDojoSetup,
-} from '../../dojo'
+import { supportedConnetorIds } from 'src/dojo/setup/connectors'
+import { bigintEquals, capitalize } from 'src/utils/types'
+import { _useConnector } from 'src/fix/starknet_react_core'
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs

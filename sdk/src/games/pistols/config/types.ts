@@ -1,5 +1,5 @@
 import { ParsedEntity, SubscriptionQueryType, QueryType, UnionOfModelData } from '@dojoengine/sdk'
-import { models } from '../../../games/pistols'
+import * as models from 'src/games/pistols/generated/models.gen'
 
 type PistolsSchemaType = models.SchemaType
 type PistolsSchemaModels = PistolsSchemaType['pistols']

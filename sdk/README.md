@@ -6,24 +6,26 @@
 * `@underware_gg/pistols-sdk/dojo`: Dojo utils and hooks
 * `@underware_gg/pistols-sdk/utils`: Misc and Starknet utils
 * `@underware_gg/pistols-sdk/hooks`: Misc and Starknet hooks
-* `@underware_gg/pistols-sdk/abi`: Misc Starknet ABIs
+* `@underware_gg/pistols-sdk/abis`: Misc Starknet ABIs
 * `@underware_gg/pistols-sdk/fix`: Temporary fixes for dependencies
 
 
 ## Dependencies
 
-|                          | `/utils` | `/hooks` | `/abi` | `/dojo` | `/pistols` |
-|--------------------------|:--------:|:--------:|:------:|:-------:|:--------:|
-| `starknet`               | ✅       | ✅       | ✅     |         |  ✅      |
-| `starknetid.js`          |          | ✅       |        |         |          |
-| `get-starknet-core`      |          | ✅       |        | ✅      |          |
-| `react`                  | ✅       | ✅       |        | ✅      |          |
-| `@starknet-react/core`   | ✅       | ✅       |        | ✅      |          |
-| `@starknet-react/chains` | ✅       | ✅       |        | ✅      |          |
-| `@apollo/client`         |          | ✅       |        |         |          |
-| `@dojoengine/utils`      | ✅       |          |        |         |          |
-| `@dojoengine/core`       |          |          |        | ✅      | ✅       |
-| `@cartridge/controller`  |          |          |        |         | ✅       |
+|                          | `/utils` | `/hooks` | `/abis` | `/dojo` | `/pistols` |
+|--------------------------|:--------:|:--------:|:-------:|:-------:|:--------:|
+| `starknet`               | ✅       | ✅       | ✅      | ✅      |  ✅      |
+| `starknetid.js`          |          | ✅       |         |         |          |
+| `get-starknet-core`      |          | ✅       |         | ✅      |          |
+| `react`                  |          | ✅       |         | ✅      |          |
+| `@starknet-react/core`   | ✅       | ✅       |         | ✅      |          |
+| `@starknet-react/chains` |          |          |         | ✅      |          |
+| `@apollo/client`         |          | ✅       |         | ✅      |          |
+| `@cartridge/controller`  |          |          |         | ✅      | ✅       |
+| `@cartridge/connector`   |          |          |         | ✅      |          |
+| `@dojoengine/core`       |          |          |         | ✅      | ✅       |
+| `@dojoengine/sdk`        |          |          |         | ✅      | ✅       |
+| `@dojoengine/utils`      | ✅       |          |         |         |          |
 
 * Environment variables
 
@@ -45,21 +47,12 @@ import { helloPistols } from '@underware_gg/pistols-sdk'
 helloPistols();
 
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
-const address = bigintToHex('0x1234567890')
+const address = bigintToHex(1234567890n)
 ```
 
 
 
 
-
-
-## Dependencies
-
-* `starknet`
-* `@starknet-react/core`
-* `@starknet-react/chains`
-* `@dojoengine/core`
-* `semantic-ui-react` (@/lib/ui)
 
 
 ## Constants Generator

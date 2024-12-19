@@ -1,6 +1,6 @@
 import { Account, AccountInterface, RpcProvider } from 'starknet'
 import { Connector } from '@starknet-react/core'
-import { stringToFelt } from '../utils'
+import { stringToFelt } from 'src/utils/starknet'
 
 export const PREDEPLOYED_ID = 'predeployed';
 export const PREDEPLOYED_NAME = 'Predeployed Account';

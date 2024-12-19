@@ -4,9 +4,10 @@ import {
   // injected,
   // argent, braavos,
 } from '@starknet-react/core'
-import { usePredeployedConnector } from '../../hooks'
-import { PREDEPLOYED_ID } from '../../utils'
-import { DojoChainConfig, DojoAppConfig } from '../../dojo'
+import { usePredeployedConnector } from 'src/hooks/usePredeployedConnector'
+import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
+import { DojoChainConfig } from 'src/dojo/setup/chains'
+import { PREDEPLOYED_ID } from 'src/utils/predeployed'
 
 export const supportedConnetorIds = {
   CONTROLLER: 'controller', // same as ControllerConnector.id

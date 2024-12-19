@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish, constants, Provider } from 'starknet'
 import { StarknetIdNavigator, StarkProfile } from "starknetid.js"
-import { bigintToHex, isPositiveBigint } from '../utils'
+import { bigintToHex, isPositiveBigint } from 'src/utils/types'
 
 export const useAddressFromStarkName = (starkName: string, rpcUrl: string) => {
   const provider = useMemo(() => (rpcUrl ? new Provider({ nodeUrl: rpcUrl }) : null), [rpcUrl])

@@ -22,7 +22,14 @@
     "moduleResolution": "bundler",
     "jsx": "preserve",
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    // allow absolute paths: import {} from 'src/*'
+    "baseUrl": "./",
+    "paths": {
+      "src/*": [
+        "./src/*"
+      ],
+    }
   },
   "include": [
     "src/**/*.ts",

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { formatTimestampLocal } from '../utils'
-import { useMounted } from '../hooks'
+import { formatTimestampLocal } from 'src/utils/timestamp'
+import { useMounted } from 'src/hooks/useMounted'
 
 export const useClientTimestamp = (autoUpdate: boolean = false, updateSeconds: number = 1) => {
   const [clientDate, setClientDate] = useState(new Date(0))

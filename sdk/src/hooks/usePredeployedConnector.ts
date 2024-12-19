@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { PredeployedConnector, PredeployedAccount } from '../utils'
+import { PredeployedConnector, PredeployedAccount } from 'src/utils/predeployed'
 
 export const usePredeployedConnector = (nodeUrl: string, chainId: string, predeployedAccounts: PredeployedAccount[]) => {
   const predeployed = useCallback(() => {

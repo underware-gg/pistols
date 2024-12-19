@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { gql } from '@apollo/client'
-import { bigintToHex, isPositiveBigint } from '../../utils'
-import { useGraphQLQuery } from '../../hooks'
-import { useSelectedChain } from '../../dojo'
+import { useSelectedChain } from 'src/dojo/hooks/useChain'
+import { useGraphQLQuery } from 'src/hooks/useGraphQL'
+import { bigintToHex, isPositiveBigint } from 'src/utils/types'
 
 
 //---------------------------

@@ -1,26 +1,21 @@
 import { StarknetDomain } from 'starknet'
 import { Tokens } from '@cartridge/controller'
 import { getContractByName } from '@dojoengine/core'
-import {
-  DojoAppConfig, ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions,
-  ChainId, defaultChainId,
-  makeControllerConnector,
-  dojoContextConfig,
- } from '../../../dojo'
+import { DojoAppConfig, DojoManifest, ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
+import { ChainId, dojoContextConfig } from 'src/dojo/setup/chains'
+import { defaultChainId } from 'src/dojo/setup/chainConfig'
+import { makeControllerConnector } from 'src/dojo/setup/controller'
 import {
   make_typed_data_PPlayerBookmark,
   make_typed_data_PPlayerOnline,
   make_typed_data_PPlayerTutorialProgress,
 } from './signed_messages'
-import {
-  constants, models, contracts, convert_duel_progress,
-} from '../../../games/pistols'
+import * as constants from '../generated/constants'
 import pistols_manifest_dev from '../manifests/manifest_dev.json'
 import pistols_manifest_slot from '../manifests/manifest_slot.json'
 import pistols_manifest_staging from '../manifests/manifest_staging.json'
 import pistols_manifest_sepolia from '../manifests/manifest_sepolia.json'
 
-console.log(`CONSTANTS........1`, constants)
 
 // TODO: move this here!
 // import { defineContractComponents } from './generated/contractComponents'
