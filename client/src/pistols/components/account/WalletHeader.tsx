@@ -9,7 +9,7 @@ import { FameBalance, LordsBalance } from '@/pistols/components/account/LordsBal
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { _useConnector } from '@/lib/dojo/fix/starknet_react_core'
+import { _useConnector } from '@underware_gg/pistols-sdk/fix'
 import { SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 
 const Row = Grid.Row

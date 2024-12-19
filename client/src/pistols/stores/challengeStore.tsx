@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { createDojoStore } from '@/lib/dojo/fix/zustand'
+import { createDojoStore } from '@underware_gg/pistols-sdk/fix'
 import { useEntityId, useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
 import { useEntityModel } from '@/lib/dojo/hooks/useSdkEntities'
 import { PistolsSchemaType, models } from '@/lib/dojo/hooks/useSdkTypes'

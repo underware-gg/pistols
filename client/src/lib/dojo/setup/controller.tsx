@@ -13,7 +13,7 @@ import {
 import { ControllerConnector } from '@cartridge/connector'
 import { ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from '@/lib/dojo/Dojo'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
-import { _useConnector } from '../fix/starknet_react_core'
+import { _useConnector } from '@underware_gg/pistols-sdk/fix'
 import { assert, serialize } from '@underware_gg/pistols-sdk/utils'
 import { StarknetDomain, StarknetType, TypedData } from 'starknet'
 

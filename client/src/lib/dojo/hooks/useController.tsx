@@ -6,7 +6,7 @@ import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { useContractClassHash } from '@underware_gg/pistols-sdk/hooks'
 import { bigintEquals, capitalize } from '@underware_gg/pistols-sdk/utils'
-import { _useConnector } from '../fix/starknet_react_core'
+import { _useConnector } from '@underware_gg/pistols-sdk/fix'
 import { ProfileContextTypeVariant } from '@cartridge/controller';
 import { useDojoSetup } from '../DojoContext'
 

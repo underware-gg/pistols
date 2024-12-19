@@ -46,7 +46,7 @@
     "@underware_gg/pistols-sdk": "workspace:*",
     "event-emitter": "^0.3.5",
     "get-starknet-core": "^4.0.0",
-    "immer": "^10.1.1",
+    "immer": "catalog:",
     "lil-gui": "^0.19.2",
     "next": "^13.5.6",
     "react": "catalog:",
@@ -62,7 +62,7 @@
     "three": "^0.157.0",
     "type-fest": "^2.14.0",
     "use-local-storage-state": "^19.1.0",
-    "zustand": "^4.5.5"
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.2.20",

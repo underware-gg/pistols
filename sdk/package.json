@@ -17,6 +17,10 @@
       "import": "./dist/abi/index.js",
       "types": "./dist/abi/index.d.ts"
     },
+    "./fix": {
+      "import": "./dist/fix/index.js",
+      "types": "./dist/fix/index.d.ts"
+    },
     "./hooks": {
       "import": "./dist/hooks/index.js",
       "types": "./dist/hooks/index.d.ts"
@@ -54,12 +58,15 @@
   },
   "peerDependencies": {
     "@apollo/client": "catalog:",
+    "@dojoengine/sdk": "catalog:",
     "@dojoengine/utils": "catalog:",
     "@starknet-react/chains": "catalog:",
     "@starknet-react/core": "catalog:",
+    "immer": "catalog:",
     "react": "catalog:",
     "starknet": "catalog:",
-    "starknetid.js": "catalog:"
+    "starknetid.js": "catalog:",
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@types/react": "^18.2.30",

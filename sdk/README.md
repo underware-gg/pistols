@@ -5,6 +5,7 @@
 * `@underware_gg/pistols-sdk/abi`: Misc Starknet ABIs
 * `@underware_gg/pistols-sdk/utils`: Misc and Starknet utils
 * `@underware_gg/pistols-sdk/hooks`: Misc and Starknet hooks
+* `@underware_gg/pistols-sdk/fix`: Temporary fixes for dependencies
 
 
 ## Dependencies

@@ -10,8 +10,10 @@ catalog:
   '@dojoengine/utils': 1.0.2
   '@starknet-react/chains': 3.0.2
   '@starknet-react/core': 3.0.3
+  immer: ^10.1.1
   react: ^18.2.0
   react-dom: ^18.2.0
   starknet: 6.11.0
   starknetid.js: ^4.0.0
   typescript: ^5.5.4
+  zustand: ^4.5.5
