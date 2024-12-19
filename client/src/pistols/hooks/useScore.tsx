@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
 import { ArchetypeNames } from '@/pistols/utils/pistols'
-import { Archetype, HONOUR } from '@/games/pistols/generated/constants'
+import { constants, models } from '@underware_gg/pistols-sdk/pistols'
 import { EMOJI } from '@/pistols/data/messages'
-import * as models from '@/games/pistols/generated/typescript/models.gen'
 
 export const calcWinRatio = (total_duels: number, total_wins: number) => (total_duels > 0 ? (total_wins / total_duels) : null)
 
@@ -16,14 +15,14 @@ export function useScore(score: models.Score | undefined) {
   const honourAndTotal = useMemo(() => (total_duels > 0 && honour > 0 ? <>{honour.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : EMOJI.ZERO), [honour, total_duels])
   const winRatio = useMemo(() => calcWinRatio(total_duels, total_wins), [total_duels, total_wins])
 
-  const isVillainous = useMemo(() => (total_duels > 0 && (honour * 10) < HONOUR.TRICKSTER_START), [honour, total_duels])
-  const isTrickster = useMemo(() => ((honour * 10) >= HONOUR.TRICKSTER_START && (honour * 10) < HONOUR.LORD_START), [honour])
-  const isHonourable = useMemo(() => ((honour * 10) >= HONOUR.LORD_START), [honour])
+  const isVillainous = useMemo(() => (total_duels > 0 && (honour * 10) < constants.HONOUR.TRICKSTER_START), [honour, total_duels])
+  const isTrickster = useMemo(() => ((honour * 10) >= constants.HONOUR.TRICKSTER_START && (honour * 10) < constants.HONOUR.LORD_START), [honour])
+  const isHonourable = useMemo(() => ((honour * 10) >= constants.HONOUR.LORD_START), [honour])
   const archetype = useMemo(() => (
-    isHonourable ? Archetype.Honourable
-      : isTrickster ? Archetype.Trickster
-        : isVillainous ? Archetype.Villainous
-          : Archetype.Undefined), [isVillainous, isTrickster, isHonourable])
+    isHonourable ? constants.Archetype.Honourable
+      : isTrickster ? constants.Archetype.Trickster
+        : isVillainous ? constants.Archetype.Villainous
+          : constants.Archetype.Undefined), [isVillainous, isTrickster, isHonourable])
   const archetypeName = useMemo(() => (ArchetypeNames[archetype]), [archetype])
 
   return {

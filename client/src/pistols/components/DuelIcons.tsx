@@ -7,7 +7,7 @@ import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import { bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
-import { CONST, getBladesCardFromValue, getPacesCardFromValue } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -39,7 +39,7 @@ export function useDuelIcons({
   const dead = useMemo(() => ((isFinished && state1?.health == 0) ? EMOJI.DEAD : null), [state1, isFinished])
   const win1 = useMemo(() => (isWinner ? EMOJI.WINNER : null), [isWinner])
   const bloodCount = useMemo(() => (
-    (isFinished && !dead && state1 && state1.health < CONST.FULL_HEALTH) ? (CONST.FULL_HEALTH - state1.health) : 0
+    (isFinished && !dead && state1 && state1.health < constants.CONST.FULL_HEALTH) ? (constants.CONST.FULL_HEALTH - state1.health) : 0
   ), [state1, isFinished, dead])
 
   // console.log(`ICONS:`, duelistId, dead, win1, bloodCount, state1)
@@ -95,8 +95,8 @@ export function useDuelIcons({
       if (state1 && moves1) {
         const pacesFire = moves1.card_1
         const pacesDodge = moves1.card_2
-        const cardFire = getPacesCardFromValue(pacesFire)
-        const cardDodge = getPacesCardFromValue(pacesDodge)
+        const cardFire = constants.getPacesCardFromValue(pacesFire)
+        const cardDodge = constants.getPacesCardFromValue(pacesDodge)
         if (pacesDodge <= pacesFire) {
           icons.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
           icons.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
@@ -111,7 +111,7 @@ export function useDuelIcons({
       }
 
       if (round1?.endedInBlades) {
-        const cardBlades = getBladesCardFromValue(moves1.card_4)
+        const cardBlades = constants.getBladesCardFromValue(moves1.card_4)
         icons.push(<BladesIcon key='blades' blade={cardBlades} size={iconSize} />)
       }
 

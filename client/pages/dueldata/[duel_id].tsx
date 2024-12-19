@@ -1,7 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/router'
 import { Container, Divider, Table } from 'semantic-ui-react'
-import { useDojoStatus } from '@/lib/dojo/DojoContext'
 import { useChallenge } from '@/pistols/stores/challengeStore'
 import { useDuel } from '@/pistols/hooks/useDuel'
 import { useDuelist } from '@/pistols/stores/duelistStore'
@@ -9,11 +8,11 @@ import { useTable } from '@/pistols/stores/tableStore'
 import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { ChallengeStoreSync } from '@/pistols/stores/sync/ChallengeStoreSync'
 import { ChallengeStateNames, RoundStateNames } from '@/pistols/utils/pistols'
-import { DojoStatus } from '@/lib/dojo/DojoStatus'
+import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { bigintToHex, formatTimestampLocal } from '@underware_gg/pistols-sdk/utils'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
 import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
-import { ENV_POINTS } from '@/games/pistols/generated/constants'
 import { EMOJI } from '@/pistols/data/messages'
 import AppPistols from '@/pistols/components/AppPistols'
 
@@ -307,7 +306,7 @@ function _dice(dice: number) {
 }
 
 function _env_card_name(card: any) {
-  return (card ? ENV_POINTS[card]?.name : '-') ?? '-'
+  return (card ? constants.ENV_POINTS[card]?.name : '-') ?? '-'
 }
 
 function StateRow({

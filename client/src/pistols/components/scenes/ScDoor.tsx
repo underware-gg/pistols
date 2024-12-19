@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { FormInput, Grid } from 'semantic-ui-react'
 import { VStack } from '@/lib/ui/Stack'
 import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
-import { useDojoStatus, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
-import { useSelectedChain, useConnectToSelectedChain } from '@/lib/dojo/hooks/useChain'
+import { useDojoStatus, useDojoSystemCalls, useSelectedChain, useConnectToSelectedChain } from '@underware_gg/pistols-sdk/dojo'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
@@ -12,7 +11,7 @@ import { PACKAGE_VERSION, PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
 import { useIsMyDuelist } from '../../hooks/useIsYou'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistsOfPlayer, useNextRandomProfilePic } from '@/pistols/hooks/useDuelistToken'
-import { ProfilePicType } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { IconClick } from '@/lib/ui/Icons'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import useGameAspect from '@/pistols/hooks/useGameApect'
@@ -109,7 +108,7 @@ export default function ScDoor() {
   const _submit = async () => {
     if (inputIsValid) {
       setIsDuelistBeingCreated(true)
-      await create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString())
+      await create_duelist(account, address, inputName, constants.ProfilePicType.Duelist, _profilePic.toString())
       // dispatchSetScene(SceneName.Tavern)
     }
   }

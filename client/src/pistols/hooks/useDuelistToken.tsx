@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useTokenConfig } from '@/pistols/stores/tokenConfigStore'
 import { useERC721OwnerOf } from '@underware_gg/pistols-sdk/hooks'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'

@@ -26,7 +26,7 @@ import { Action, ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel, MenuDuelControl } from '@/pistols/components/Menus'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import { BladesCard, EnvCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants';
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { DuelistCardType } from '@/pistols/components/cards/Cards'
 import { FameBalanceDuelist } from '../account/LordsBalance';
 import CommitPacesModal from '@/pistols/components/modals/CommitPacesModal'
@@ -121,13 +121,13 @@ export default function Duel({
       if (!isYouA) {
         if (completedStagesA[DuelStage.Round1Commit] && !hasSpawnedCardsA.current) {
           hasSpawnedCardsA.current = true
-          cardRef.current?.spawnCards('A', { fire: PacesCard.None, dodge: PacesCard.None, blade: BladesCard.None, tactics: TacticsCard.None })
+          cardRef.current?.spawnCards('A', { fire: constants.PacesCard.None, dodge: constants.PacesCard.None, blade: constants.BladesCard.None, tactics: constants.TacticsCard.None })
         }
       }
       if (!isYouB) {
         if (completedStagesB[DuelStage.Round1Commit] && !hasSpawnedCardsB.current) {
           hasSpawnedCardsB.current = true
-          cardRef.current?.spawnCards('B', { fire: PacesCard.None, dodge: PacesCard.None, blade: BladesCard.None, tactics: TacticsCard.None })
+          cardRef.current?.spawnCards('B', { fire: constants.PacesCard.None, dodge: constants.PacesCard.None, blade: constants.BladesCard.None, tactics: constants.TacticsCard.None })
         }
       }
     }, 1000);
@@ -153,7 +153,7 @@ export default function Duel({
       resetEverything()
 
       const envCardsList = duelProgress.steps.reduce((acc, step) => {
-        if (step.card_env !== EnvCard.None) {
+        if (step.card_env !== constants.EnvCard.None) {
           acc.push(EnvironmentCardsTextures[step.card_env]);
         }
         return acc;
@@ -219,7 +219,7 @@ export default function Duel({
 
     isAnimatingStepRef.current = true
 
-    if (step.card_env != EnvCard.None) cardRef.current?.drawNextCard(speedRef.current)
+    if (step.card_env != constants.EnvCard.None) cardRef.current?.drawNextCard(speedRef.current)
 
     let shouldDoblePause = false
 
@@ -281,7 +281,7 @@ export default function Duel({
       return newStatsB
     })
 
-    if (currentStep.current > 1 && step.card_env == EnvCard.None) {
+    if (currentStep.current > 1 && step.card_env == constants.EnvCard.None) {
       gameBladeAnimationTimeout.current = setTimeout(() => {
         gameImpl?.prepareActionAnimation()
         gameImpl?.animateDuelistBlade()
@@ -293,12 +293,12 @@ export default function Duel({
 
     gameAnimationTimeout.current = setTimeout(() => {
       cardRef.current?.updateDuelistData(newStatsA?.damage, newStatsB?.damage, newStatsA?.hitChance, newStatsB?.hitChance)
-      if (step.card_env != EnvCard.None) {
+      if (step.card_env != constants.EnvCard.None) {
         gameImpl?.animatePace(currentStep.current, newStatsA, newStatsB)
       } else {
         gameImpl?.animateActions(Action[step.card_a.blades], Action[step.card_b.blades], newStatsA?.health, newStatsB?.health)
       }
-    }, step.card_env != EnvCard.None ? (timeDelay / speedRef.current) : 1000 / speedRef.current);
+    }, step.card_env != constants.EnvCard.None ? (timeDelay / speedRef.current) : 1000 / speedRef.current);
 
     if (currentStep.current < duelProgress.steps.length && isPlayingRef.current) {
       nextStepCallback.current = setTimeout(() => {

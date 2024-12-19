@@ -4,7 +4,7 @@ import { Container, Table } from 'semantic-ui-react'
 import { useAccount, useNetwork } from '@starknet-react/core'
 import { useTypedMessage } from '@underware_gg/pistols-sdk/hooks'
 import { Messages, createTypedMessage, bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
-import { TYPED_DATA } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import AppPistols from '@/pistols/components/AppPistols'
 
 //@ts-ignore
@@ -17,8 +17,8 @@ const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
 const starknetDomain = {
-  name: TYPED_DATA.NAME,
-  version: TYPED_DATA.VERSION,
+  name: constants.TYPED_DATA.NAME,
+  version: constants.TYPED_DATA.VERSION,
   chainId: 'UNDERWARE_GG',
   revision: '1',
 }

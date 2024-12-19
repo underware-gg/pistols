@@ -1,5 +1,5 @@
 import { BigNumberish } from 'starknet'
-import { useDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
+import { useDojoSystem } from '@underware_gg/pistols-sdk/dojo'
 import { useERC20Balance } from '@underware_gg/pistols-sdk/hooks'
 import { useDuelistTokenBoundAddress } from '@/pistols/hooks/useTokenContract'
 

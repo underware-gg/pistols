@@ -14,7 +14,7 @@ import { FilterButton } from '@/pistols/components/ui/Buttons'
 // import { FilterDuelistName } from '@/pistols/components/DuelistTable'
 import { Balance } from '@/pistols/components/account/Balance'
 import { arrayRemoveValue, bigintEquals } from '@underware_gg/pistols-sdk/utils'
-import { ChallengeState } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
 
 const Row = Grid.Row
@@ -49,9 +49,9 @@ function ChallengeTableByIds({
   challengeIds: bigint[]
   color?: SemanticCOLORS
   compact?: boolean
-  existingStates: ChallengeState[]
-  states: ChallengeState[]
-  setStates: (states: ChallengeState[]) => void
+  existingStates: constants.ChallengeState[]
+  states: constants.ChallengeState[]
+  setStates: (states: constants.ChallengeState[]) => void
 }) {
   const { filterDuelistName } = useQueryParams()
 
@@ -202,7 +202,7 @@ function DuelItem({
       </Cell>
 
       <Cell textAlign='center' className='Result'>
-        {state == ChallengeState.Resolved ?
+        {state == constants.ChallengeState.Resolved ?
           <>
             <PositiveResult positive={true}>
               <ProfileName duelistId={winnerIsA ? duelistIdA : duelistIdB} badges={false} />

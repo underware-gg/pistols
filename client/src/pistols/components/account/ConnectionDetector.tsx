@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { useDojoStatus } from '@/lib/dojo/DojoContext'
+import { useDojoStatus, useSelectedChain } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useIsMyDuelist } from '@/pistols/hooks/useIsYou'
-import { AccountChangeDetector, ChainChangeDetector } from '@/lib/dojo/ChangeDetector'
+import { AccountChangeDetector, ChainChangeDetector } from '@/lib/ui/starknet/ChangeDetector'
 
 export function DojoSetupErrorDetector() {
   const { isError } = useDojoStatus()

@@ -3,8 +3,7 @@ import { Grid, Modal, Breadcrumb, Icon } from 'semantic-ui-react'
 import { useMounted, useStarkName, useStarkProfile, useValidateWalletAddressOrName } from '@underware_gg/pistols-sdk/hooks'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useControllerAccount } from '@/lib/dojo/hooks/useController'
-import { useChainConfig } from '@/lib/dojo/hooks/useChain'
+import { useControllerAccount, useChainConfig, ChainId } from '@underware_gg/pistols-sdk/dojo'
 import { useIsMyAccount } from '@/pistols/hooks/useIsYou'
 import { usePact } from '@/pistols/hooks/usePact'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
@@ -14,7 +13,6 @@ import { AddressShort } from '@/lib/ui/AddressShort'
 import { Divider } from '@/lib/ui/Divider'
 import { Opener } from '@/lib/ui/useOpener'
 import { STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
-import { ChainId } from '@/lib/dojo/setup/chains'
 
 const Row = Grid.Row
 const Col = Grid.Column

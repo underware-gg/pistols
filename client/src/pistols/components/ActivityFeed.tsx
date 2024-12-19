@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 import { useAllPlayersActivityFeed, ActivityState } from '@/pistols/stores/eventsStore'
 import { useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
-import { Activity } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '@/pistols/components/Links'
 
 export const ActivityFeed = () => {
@@ -40,19 +40,19 @@ const ActivityItem = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
-  if (activity.activity === Activity.CreatedDuelist) {
+  if (activity.activity === constants.Activity.CreatedDuelist) {
     return <ActivityItemCreatedDuelist activity={activity} clientSeconds={clientSeconds} />
   }
-  if (activity.activity === Activity.CreatedChallenge) {
+  if (activity.activity === constants.Activity.CreatedChallenge) {
     return <ActivityItemCreatedChallenge activity={activity} clientSeconds={clientSeconds} />
   }
-  if (activity.activity === Activity.RepliedChallenge) {
+  if (activity.activity === constants.Activity.RepliedChallenge) {
     return <ActivityItemRepliedChallenge activity={activity} clientSeconds={clientSeconds} />
   }
-  if (activity.activity === Activity.CommittedMoves) {
+  if (activity.activity === constants.Activity.CommittedMoves) {
     return <ActivityItemCommittedMoves activity={activity} clientSeconds={clientSeconds} />
   }
-  if (activity.activity === Activity.RevealedMoves) {
+  if (activity.activity === constants.Activity.RevealedMoves) {
     return <ActivityItemRevealedMoves activity={activity} clientSeconds={clientSeconds} />
   }
   return <></>

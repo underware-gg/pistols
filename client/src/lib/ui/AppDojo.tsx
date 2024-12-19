@@ -1,5 +1,5 @@
 import React from 'react'
-import Dojo, { DojoAppConfig } from '@/lib/dojo/Dojo'
+import { Dojo, DojoAppConfig } from '@underware_gg/pistols-sdk/dojo'
 import App, { AppProps } from '@/lib/ui/App'
 
 export interface AppDojoProps extends AppProps {

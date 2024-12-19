@@ -1,6 +1,6 @@
 import { create } from 'zustand'
-import { ChallengeState } from '@/games/pistols/generated/constants'
 import { AllChallengeStates, LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 export enum DuelistColumn {
   Name = 'Name',
@@ -34,9 +34,9 @@ type State = {
   //challenge filters
   filterChallengeSortColumn: ChallengeColumn
   filterChallengeSortDirection: SortDirection
-  filterStatesLiveDuels: ChallengeState[]
-  filterStatesPastDuels: ChallengeState[]
-  filterStatesDuelistDuels: ChallengeState[]
+  filterStatesLiveDuels: constants.ChallengeState[]
+  filterStatesPastDuels: constants.ChallengeState[]
+  filterStatesDuelistDuels: constants.ChallengeState[]
   filterShowAllDuels: boolean
   filterShowBookmarkedDuels: boolean
   // duelist setters
@@ -50,9 +50,9 @@ type State = {
   setFilterChallengeSortColumn: (value: ChallengeColumn) => void
   setFilterChallengeSortDirection: (value: SortDirection) => void
   setFilterChallengeSortSwitch: () => void
-  setFilterStatesLiveDuels: (value: ChallengeState[]) => void
-  setFilterStatesPastDuels: (value: ChallengeState[]) => void
-  setFilterStatesDuelistDuels: (value: ChallengeState[]) => void
+  setFilterStatesLiveDuels: (value: constants.ChallengeState[]) => void
+  setFilterStatesPastDuels: (value: constants.ChallengeState[]) => void
+  setFilterStatesDuelistDuels: (value: constants.ChallengeState[]) => void
   setFilterShowAllDuels: (value: boolean) => void
   setFilterShowBookmarkedDuels: (value: boolean) => void
 }
@@ -83,9 +83,9 @@ export const useQueryParams = create<State>((set) => ({
   setFilterChallengeSortColumn: (value: ChallengeColumn) => set({ filterChallengeSortColumn: value }),
   setFilterChallengeSortDirection: (value: SortDirection) => set({ filterChallengeSortDirection: value }),
   setFilterChallengeSortSwitch: () => set((state: State) => ({ filterChallengeSortDirection: _switchDirection(state.filterChallengeSortDirection) })),
-  setFilterStatesLiveDuels: (value: ChallengeState[]) => set({ filterStatesLiveDuels: value.filter(state => LiveChallengeStates.includes(state)) }),
-  setFilterStatesPastDuels: (value: ChallengeState[]) => set({ filterStatesPastDuels: value.filter(state => PastChallengeStates.includes(state)) }),
-  setFilterStatesDuelistDuels: (value: ChallengeState[]) => set({ filterStatesDuelistDuels: value.filter(state => AllChallengeStates.includes(state)) }),
+  setFilterStatesLiveDuels: (value: constants.ChallengeState[]) => set({ filterStatesLiveDuels: value.filter(state => LiveChallengeStates.includes(state)) }),
+  setFilterStatesPastDuels: (value: constants.ChallengeState[]) => set({ filterStatesPastDuels: value.filter(state => PastChallengeStates.includes(state)) }),
+  setFilterStatesDuelistDuels: (value: constants.ChallengeState[]) => set({ filterStatesDuelistDuels: value.filter(state => AllChallengeStates.includes(state)) }),
   setFilterShowAllDuels: (value: boolean) => set({ filterShowAllDuels: value }),
   setFilterShowBookmarkedDuels: (value: boolean) => set({ filterShowBookmarkedDuels: value }),
 }))

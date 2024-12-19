@@ -1,62 +1,62 @@
 import { BigNumberish } from 'starknet'
-import { Archetype, BladesCard, ChallengeState, getBladesCardFromValue, getPacesCardFromValue, getTacticsCardFromValue, PacesCard, Premise, RoundState, TacticsCard } from '@/games/pistols/generated/constants'
 import { EMOJI } from '@/pistols/data/messages'
 import { SceneName } from '@/pistols/hooks/PistolsContext'
 import { bigintToNumber } from '@underware_gg/pistols-sdk/utils'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 //------------------------------------------
 // must be in sync with CHALLENGE_STATE
 // (challenge.cairo)
 //
-export const LiveChallengeStates: ChallengeState[] = [
-  ChallengeState.Awaiting,
-  ChallengeState.InProgress,
+export const LiveChallengeStates: constants.ChallengeState[] = [
+  constants.ChallengeState.Awaiting,
+  constants.ChallengeState.InProgress,
 ]
 
-export const PastChallengeStates: ChallengeState[] = [
-  ChallengeState.Resolved,
-  ChallengeState.Draw,
-  ChallengeState.Refused,
-  ChallengeState.Withdrawn,
-  ChallengeState.Expired,
+export const PastChallengeStates: constants.ChallengeState[] = [
+  constants.ChallengeState.Resolved,
+  constants.ChallengeState.Draw,
+  constants.ChallengeState.Refused,
+  constants.ChallengeState.Withdrawn,
+  constants.ChallengeState.Expired,
 ]
 
-export const AllChallengeStates: ChallengeState[] = [
+export const AllChallengeStates: constants.ChallengeState[] = [
   ...LiveChallengeStates,
   ...PastChallengeStates,
 ]
 
-export const ChallengeStateNames: Record<ChallengeState, string> = {
-  [ChallengeState.Null]: 'Null',
-  [ChallengeState.Awaiting]: 'Awaiting',
-  [ChallengeState.Withdrawn]: 'Withdrawn',
-  [ChallengeState.Refused]: 'Refused',
-  [ChallengeState.Expired]: 'Expired',
-  [ChallengeState.InProgress]: 'In Progress',
-  [ChallengeState.Resolved]: 'Resolved',
-  [ChallengeState.Draw]: 'Draw',
+export const ChallengeStateNames: Record<constants.ChallengeState, string> = {
+  [constants.ChallengeState.Null]: 'Null',
+  [constants.ChallengeState.Awaiting]: 'Awaiting',
+  [constants.ChallengeState.Withdrawn]: 'Withdrawn',
+  [constants.ChallengeState.Refused]: 'Refused',
+  [constants.ChallengeState.Expired]: 'Expired',
+  [constants.ChallengeState.InProgress]: 'In Progress',
+  [constants.ChallengeState.Resolved]: 'Resolved',
+  [constants.ChallengeState.Draw]: 'Draw',
 }
 
-export const ChallengeStateDescriptions: Record<ChallengeState, string> = {
-  [ChallengeState.Null]: "Challenge does not exist",
-  [ChallengeState.Awaiting]: "Awaiting for Challenged's response",
-  [ChallengeState.Withdrawn]: "Cowardly withdrawn by Challenger",
-  [ChallengeState.Refused]: "Cowardly refused by Challenged",
-  [ChallengeState.Expired]: "Challenge expired",
-  [ChallengeState.InProgress]: "Challenge in progress",
-  [ChallengeState.Resolved]: "Honour has been satisfied",
-  [ChallengeState.Draw]: "Honour has not been satisfied",
+export const ChallengeStateDescriptions: Record<constants.ChallengeState, string> = {
+  [constants.ChallengeState.Null]: "Challenge does not exist",
+  [constants.ChallengeState.Awaiting]: "Awaiting for Challenged's response",
+  [constants.ChallengeState.Withdrawn]: "Cowardly withdrawn by Challenger",
+  [constants.ChallengeState.Refused]: "Cowardly refused by Challenged",
+  [constants.ChallengeState.Expired]: "Challenge expired",
+  [constants.ChallengeState.InProgress]: "Challenge in progress",
+  [constants.ChallengeState.Resolved]: "Honour has been satisfied",
+  [constants.ChallengeState.Draw]: "Honour has not been satisfied",
 }
 
-export const ChallengeStateClasses: Record<ChallengeState, string> = {
-  [ChallengeState.Null]: '',
-  [ChallengeState.Awaiting]: '',
-  [ChallengeState.Withdrawn]: 'Canceled',
-  [ChallengeState.Refused]: 'Canceled',
-  [ChallengeState.Expired]: 'Canceled',
-  [ChallengeState.InProgress]: 'Bold Important',
-  [ChallengeState.Resolved]: '',
-  [ChallengeState.Draw]: 'Warning',
+export const ChallengeStateClasses: Record<constants.ChallengeState, string> = {
+  [constants.ChallengeState.Null]: '',
+  [constants.ChallengeState.Awaiting]: '',
+  [constants.ChallengeState.Withdrawn]: 'Canceled',
+  [constants.ChallengeState.Refused]: 'Canceled',
+  [constants.ChallengeState.Expired]: 'Canceled',
+  [constants.ChallengeState.InProgress]: 'Bold Important',
+  [constants.ChallengeState.Resolved]: '',
+  [constants.ChallengeState.Draw]: 'Warning',
 }
 
 export const ChallengeQuotes = [
@@ -74,11 +74,11 @@ export const ChallengeQuotes = [
   "For honour!",
 ]
 
-export const RoundStateNames: Record<RoundState, string> = {
-  [RoundState.Null]: 'Null',
-  [RoundState.Commit]: 'Commit',
-  [RoundState.Reveal]: 'Reveal',
-  [RoundState.Finished]: 'Finished',
+export const RoundStateNames: Record<constants.RoundState, string> = {
+  [constants.RoundState.Null]: 'Null',
+  [constants.RoundState.Commit]: 'Commit',
+  [constants.RoundState.Reveal]: 'Reveal',
+  [constants.RoundState.Finished]: 'Finished',
 }
 
 
@@ -86,21 +86,36 @@ export const RoundStateNames: Record<RoundState, string> = {
 // (action.cairo)
 //
 export enum Action {
-  Idle = PacesCard.None,
-  Paces1 = PacesCard.Paces1,
-  Paces2 = PacesCard.Paces2,
-  Paces3 = PacesCard.Paces3,
-  Paces4 = PacesCard.Paces4,
-  Paces5 = PacesCard.Paces5,
-  Paces6 = PacesCard.Paces6,
-  Paces7 = PacesCard.Paces7,
-  Paces8 = PacesCard.Paces8,
-  Paces9 = PacesCard.Paces9,
-  Paces10 = PacesCard.Paces10,
-  Seppuku = BladesCard.Seppuku,
-  PocketPistol = BladesCard.PocketPistol,
-  Behead = BladesCard.Behead,
-  Grapple = BladesCard.Grapple,
+  //@ts-ignore
+  Idle = constants.PacesCard.None,
+  //@ts-ignore
+  Paces1 = constants.PacesCard.Paces1,
+  //@ts-ignore
+  Paces2 = constants.PacesCard.Paces2,
+  //@ts-ignore
+  Paces3 = constants.PacesCard.Paces3,
+  //@ts-ignore
+  Paces4 = constants.PacesCard.Paces4,
+  //@ts-ignore
+  Paces5 = constants.PacesCard.Paces5,
+  //@ts-ignore
+  Paces6 = constants.PacesCard.Paces6,
+  //@ts-ignore
+  Paces7 = constants.PacesCard.Paces7,
+  //@ts-ignore
+  Paces8 = constants.PacesCard.Paces8,
+  //@ts-ignore
+  Paces9 = constants.PacesCard.Paces9,
+  //@ts-ignore
+  Paces10 = constants.PacesCard.Paces10,
+  //@ts-ignore
+  Seppuku = constants.BladesCard.Seppuku,
+  //@ts-ignore
+  PocketPistol = constants.BladesCard.PocketPistol,
+  //@ts-ignore
+  Behead = constants.BladesCard.Behead,
+  //@ts-ignore
+  Grapple = constants.BladesCard.Grapple,
 }
 
 export const ActionNames: Record<Action, string> = {
@@ -180,23 +195,23 @@ export const ActionTypes: Record<string, Action[]> = {
   ]
 }
 
-export const ArchetypeNames: Record<Archetype, string> = {
-  [Archetype.Undefined]: 'Undefined',
-  [Archetype.Villainous]: 'Villainous',
-  [Archetype.Trickster]: 'Trickster',
-  [Archetype.Honourable]: 'Honourable',
+export const ArchetypeNames: Record<constants.Archetype, string> = {
+  [constants.Archetype.Undefined]: 'Undefined',
+  [constants.Archetype.Villainous]: 'Villainous',
+  [constants.Archetype.Trickster]: 'Trickster',
+  [constants.Archetype.Honourable]: 'Honourable',
 }
 
-export const PremisePrefix: Record<Premise, string> = {
-  [Premise.Null]: 'over...?',
-  [Premise.Matter]: 'over the matter of',
-  [Premise.Debt]: 'to discharge a debt',
-  [Premise.Dispute]: 'to satisfy a dispute',
-  [Premise.Honour]: 'to defend their honour',
-  [Premise.Hatred]: 'to satisfy a burning hatred',
-  [Premise.Blood]: 'for the love of death and blood',
-  [Premise.Nothing]: 'for no reason other than',
-  [Premise.Tournament]: 'to be the winner of',
+export const PremisePrefix: Record<constants.Premise, string> = {
+  [constants.Premise.Null]: 'over...?',
+  [constants.Premise.Matter]: 'over the matter of',
+  [constants.Premise.Debt]: 'to discharge a debt',
+  [constants.Premise.Dispute]: 'to satisfy a dispute',
+  [constants.Premise.Honour]: 'to defend their honour',
+  [constants.Premise.Hatred]: 'to satisfy a burning hatred',
+  [constants.Premise.Blood]: 'for the love of death and blood',
+  [constants.Premise.Nothing]: 'for no reason other than',
+  [constants.Premise.Tournament]: 'to be the winner of',
 }
 
 export const MenuLabels: Partial<Record<SceneName, string>> = {
@@ -209,18 +224,18 @@ export const MenuLabels: Partial<Record<SceneName, string>> = {
 }
 
 export type Hand = {
-  card_fire: PacesCard,
-  card_dodge: PacesCard,
-  card_tactics: TacticsCard,
-  card_blades: BladesCard,
+  card_fire: constants.PacesCard,
+  card_dodge: constants.PacesCard,
+  card_tactics: constants.TacticsCard,
+  card_blades: constants.BladesCard,
 }
 
 export const movesToHand = (moves: number[]): Hand => {
   return {
-    card_fire: getPacesCardFromValue(moves[0]),
-    card_dodge: getPacesCardFromValue(moves[1]),
-    card_tactics: getTacticsCardFromValue(moves[2]),
-    card_blades: getBladesCardFromValue(moves[3]),
+    card_fire: constants.getPacesCardFromValue(moves[0]),
+    card_dodge: constants.getPacesCardFromValue(moves[1]),
+    card_tactics: constants.getTacticsCardFromValue(moves[2]),
+    card_blades: constants.getBladesCardFromValue(moves[3]),
   }
 }
 

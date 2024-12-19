@@ -1,5 +1,6 @@
-import { useSdkEntities, getEntityModel, filterEntitiesByModel, getEntityModels } from '@/lib/dojo/hooks/useSdkEntities'
-import { PistolsGetQuery, PistolsSubQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
+import { useEffect, useMemo } from 'react'
+import { useSdkEntities, getEntityModel, filterEntitiesByModel, getEntityModels } from '@underware_gg/pistols-sdk/dojo'
+import { constants, PistolsGetQuery, PistolsSubQuery, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
 import { useConfigStore } from '@/pistols/stores/configStore'
 import { useTableConfigStore } from '@/pistols/stores/tableStore'
 import { useTokenConfigStore } from '@/pistols/stores/tokenConfigStore'
@@ -7,12 +8,10 @@ import { usePlayerStore } from '@/pistols/stores/playerStore'
 import { useDuelistStore } from '@/pistols/stores/duelistStore'
 import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
 import { useMounted } from '@underware_gg/pistols-sdk/hooks'
-import { CONFIG } from '@/games/pistols/generated/constants'
-import { useEffect, useMemo } from 'react'
 
 const query_get: PistolsGetQuery = {
   pistols: {
-    Config: { $: { where: { key: { $eq: CONFIG.CONFIG_KEY } } } },
+    Config: { $: { where: { key: { $eq: constants.CONFIG.CONFIG_KEY } } } },
     TableConfig: { $: { where: { table_id: { $neq: 0 } } } },
     TokenConfig: { $: { where: { token_address: { $neq: '' } } } },
     Duelist: { $: { where: { duelist_id: { $neq: 0 } } } },

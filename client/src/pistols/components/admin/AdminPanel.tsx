@@ -5,7 +5,7 @@ import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { ConfigForm, TableConfigForm } from '@/pistols/components/admin/TableConfigForm'
 import { OwnerForm } from '@/pistols/components/admin/OwnerForm'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
+import StarknetConnectModal from '@/lib/ui/starknet/StarknetConnectModal'
 
 export const AdminPanel = ({
 }) => {

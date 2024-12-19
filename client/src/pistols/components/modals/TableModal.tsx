@@ -11,7 +11,7 @@ import { RowDivider } from '@/lib/ui/Stack'
 import { Opener } from '@/lib/ui/useOpener'
 import { Divider } from '@/lib/ui/Divider'
 import { getObjectKeyByValue } from '@underware_gg/pistols-sdk/utils'
-import { TABLES } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -38,7 +38,7 @@ export default function TableModal({
     }
   }, [opener.isOpen])
 
-  const unknownTable = useMemo(() => (tableId !== undefined && getObjectKeyByValue(TABLES, tableId) === undefined), [tableId])
+  const unknownTable = useMemo(() => (tableId !== undefined && getObjectKeyByValue(constants.TABLES, tableId) === undefined), [tableId])
   useEffect(() => {
     if (unknownTable && !opener.isOpen) {
       opener.open()
@@ -201,10 +201,10 @@ export function TableList({
   const { description } = useTable(selectedTableId)
   return (
     <ButtonGroup vertical className='FillWidth Padded'>
-      {Object.keys(TABLES).map(key => (
-        <TableListItem key={TABLES[key]}
-          tableId={TABLES[key]}
-          active={selectedTableId == TABLES[key]}
+      {Object.keys(constants.TABLES).map(key => (
+        <TableListItem key={constants.TABLES[key]}
+          tableId={constants.TABLES[key]}
+          active={selectedTableId == constants.TABLES[key]}
           setSelectedTableId={setSelectedTableId}
         />
       ))}
@@ -249,8 +249,8 @@ export function TableSwitcher({
       fluid
     >
       <Dropdown.Menu>
-        {Object.keys(TABLES).map(key => (
-          <TableSwitcherItem key={TABLES[key]} tableId={TABLES[key]} setSelectedTableId={setSelectedTableId} />
+        {Object.keys(constants.TABLES).map(key => (
+          <TableSwitcherItem key={constants.TABLES[key]} tableId={constants.TABLES[key]} setSelectedTableId={setSelectedTableId} />
         ))}
       </Dropdown.Menu>
     </Dropdown>

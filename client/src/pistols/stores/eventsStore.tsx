@@ -1,9 +1,8 @@
 import { BigNumberish } from 'starknet'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
+import { constants, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
 import { arrayClean, bigintToHex, bigintToNumber } from '@underware_gg/pistols-sdk/utils'
-import { Activity } from '@/games/pistols/generated/constants'
 
 
 //-----------------------------------------
@@ -13,7 +12,7 @@ import { Activity } from '@/games/pistols/generated/constants'
 export interface ActivityState {
   address: BigNumberish
   timestamp: number
-  activity: Activity
+  activity: constants.Activity
   identifier: bigint
 }
 interface State {
@@ -28,7 +27,7 @@ const createStore = () => {
     return event ? {
       address: bigintToHex(event.address),
       timestamp: bigintToNumber(event.timestamp),
-      activity: event.activity as unknown as Activity,
+      activity: event.activity as unknown as constants.Activity,
       identifier: BigInt(event.identifier),
     } : undefined
   }

@@ -4,9 +4,8 @@ import { immer } from 'zustand/middleware/immer'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
 import { usePlayer } from '@/pistols/stores/playerStore'
-import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { ChallengeColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
-import { ChallengeState, getChallengeStateValue } from '@/games/pistols/generated/constants'
+import { constants, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
 import { bigintEquals, keysToEntity } from '@underware_gg/pistols-sdk/utils'
 
 
@@ -17,7 +16,7 @@ import { bigintEquals, keysToEntity } from '@underware_gg/pistols-sdk/utils'
 interface StateEntity {
   duel_id: bigint
   timestamp: number
-  state: ChallengeState
+  state: constants.ChallengeState
   state_value: number
   duelist_id_a: bigint
   duelist_id_b: bigint
@@ -39,12 +38,12 @@ const createStore = () => {
     if (!challenge) return undefined
     const start = Number(challenge.timestamp_start)
     const end = Number(challenge.timestamp_end)
-    const state = challenge.state as unknown as ChallengeState
+    const state = challenge.state as unknown as constants.ChallengeState
     return {
       duel_id: BigInt(challenge.duel_id),
       timestamp: end ? end : start,
       state,
-      state_value: getChallengeStateValue(state),
+      state_value: constants.getChallengeStateValue(state),
       duelist_id_a: BigInt(challenge.duelist_id_a),
       duelist_id_b: BigInt(challenge.duelist_id_b),
       duelist_entity_id_a: keysToEntity([challenge.duelist_id_a]),
@@ -84,7 +83,7 @@ export const useChallengeQueryStore = createStore();
 // will filter and sort all challenges for each view
 //
 export const useQueryChallengeIds = (
-  filterStates: ChallengeState[],
+  filterStates: constants.ChallengeState[],
   filterName: string,
   filterBookmarked: boolean,
   duelistId: bigint,
@@ -107,7 +106,7 @@ export const useQueryChallengeIds = (
     const states = result.reduce((acc, e) => {
       if (!acc.includes(e.state)) acc.push(e.state)
       return acc
-    }, [] as ChallengeState[])
+    }, [] as constants.ChallengeState[])
 
     // filter by bookmarked duels
     if (filterBookmarked) {

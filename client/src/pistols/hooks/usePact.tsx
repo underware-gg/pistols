@@ -1,8 +1,8 @@
 import { useMemo, useEffect } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
 import { isPositiveBigint, bigintToU256, poseidon, stringToFelt } from '@underware_gg/pistols-sdk/utils'
-import { PistolsGetQuery, useSdkState, getEntityMapModels, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkState'
-import * as models from '@/games/pistols/generated/typescript/models.gen'
+import { useSdkState, getEntityMapModels } from '@underware_gg/pistols-sdk/dojo'
+import { PistolsGetQuery, PistolsSubQuery, models } from '@underware_gg/pistols-sdk/pistols'
 
 
 export const usePactPair = (duelist_id_or_address_a: BigNumberish, duelist_id_or_address_b: BigNumberish): BigNumberish => {

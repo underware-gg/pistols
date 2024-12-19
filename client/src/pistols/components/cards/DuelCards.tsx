@@ -5,7 +5,7 @@ import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useIsYou } from '@/pistols/hooks/useIsYou'
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
-import { BladesCard, PacesCard, TacticsCard } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '@/pistols/data/assets'
 import { DuelistCardType, CardHandle, Card } from '@/pistols/components/cards/Cards'
 import * as TWEEN from '@tweenjs/tween.js'
@@ -1144,10 +1144,10 @@ export interface CardsHandle {
 }
 
 export interface DuelistHand {
-  fire: PacesCard, 
-  dodge: PacesCard, 
-  tactics: TacticsCard, 
-  blade: BladesCard
+  fire: constants.PacesCard, 
+  dodge: constants.PacesCard, 
+  tactics: constants.TacticsCard, 
+  blade: constants.BladesCard
 }
 
 export default Cards;

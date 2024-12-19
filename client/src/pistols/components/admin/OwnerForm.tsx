@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { useAdminAmIOwner, useAdminIsOwner } from '@/pistols/hooks/useContractCalls'
 import { FormInput } from '@/pistols/components/ui/Form'
 import { ActionButton } from '@/pistols/components/ui/Buttons'

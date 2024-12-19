@@ -1,6 +1,6 @@
-import { useMemo } from "react"
-import { BigNumberish } from "starknet"
-import { useDojoSystem } from "@/lib/dojo/hooks/useDojoSystem"
+import { useMemo } from 'react'
+import { BigNumberish } from 'starknet'
+import { useDojoSystem } from '@underware_gg/pistols-sdk/dojo'
 import { poseidon } from '@underware_gg/pistols-sdk/utils'
 
 export const useDuelistTokenContract = () => {

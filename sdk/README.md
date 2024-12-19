@@ -2,22 +2,32 @@
 
 ### Packages
 
-* `@underware_gg/pistols-sdk/abi`: Misc Starknet ABIs
+* `@underware_gg/pistols-sdk/pistols`: Pistols related code
+* `@underware_gg/pistols-sdk/dojo`: Dojo utils and hooks
 * `@underware_gg/pistols-sdk/utils`: Misc and Starknet utils
 * `@underware_gg/pistols-sdk/hooks`: Misc and Starknet hooks
+* `@underware_gg/pistols-sdk/abi`: Misc Starknet ABIs
 * `@underware_gg/pistols-sdk/fix`: Temporary fixes for dependencies
 
 
 ## Dependencies
 
-|                          | `/utils` | `/hooks` | `/abi` |
-|--------------------------|:--------:|:--------:|:------:|
-| `starknet`               | ✅       | ✅       | ✅     |
-| `starknetid.js`          |          | ✅       |        |
-| `react`                  | ✅       | ✅       |        |
-| `@starknet-react/core`   | ✅       | ✅       |        |
-| `@apollo/client`         |          | ✅       |        |
-| `@dojoengine/utils`      | ✅       |          |        |
+|                          | `/utils` | `/hooks` | `/abi` | `/dojo` | `/pistols` |
+|--------------------------|:--------:|:--------:|:------:|:-------:|:--------:|
+| `starknet`               | ✅       | ✅       | ✅     |         |  ✅      |
+| `starknetid.js`          |          | ✅       |        |         |          |
+| `get-starknet-core`      |          | ✅       |        | ✅      |          |
+| `react`                  | ✅       | ✅       |        | ✅      |          |
+| `@starknet-react/core`   | ✅       | ✅       |        | ✅      |          |
+| `@starknet-react/chains` | ✅       | ✅       |        | ✅      |          |
+| `@apollo/client`         |          | ✅       |        |         |          |
+| `@dojoengine/utils`      | ✅       |          |        |         |          |
+| `@dojoengine/core`       |          |          |        | ✅      | ✅       |
+| `@cartridge/controller`  |          |          |        |         | ✅       |
+
+* Environment variables
+
+`NEXT_PUBLIC_CHAIN_ID`: should contain a valid chain from [chains.ts](src/dojo/setup/chains.ts)
 
 
 ## Installation

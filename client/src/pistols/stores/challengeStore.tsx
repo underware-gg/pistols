@@ -2,9 +2,8 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@underware_gg/pistols-sdk/fix'
 import { useEntityId, useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
-import { useEntityModel } from '@/lib/dojo/hooks/useSdkEntities'
-import { PistolsSchemaType, models } from '@/lib/dojo/hooks/useSdkTypes'
-import { BladesCard, ChallengeState, getBladesCardValue, Premise, RoundState } from '@/games/pistols/generated/constants'
+import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
+import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { movesToHand } from '@/pistols/utils/pistols'
 import { feltToString } from '@underware_gg/pistols-sdk/utils'
 
@@ -41,16 +40,16 @@ export const useChallenge = (duelId: BigNumberish) => {
   const duelistIdA = useMemo(() => BigInt(challenge?.duelist_id_a ?? 0), [challenge])
   const duelistIdB = useMemo(() => BigInt(challenge?.duelist_id_b ?? 0), [challenge])
   const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
-  const premise = useMemo(() => (challenge?.premise as unknown as Premise ?? Premise.Null), [challenge])
+  const premise = useMemo(() => (challenge?.premise as unknown as constants.Premise ?? constants.Premise.Null), [challenge])
   const quote = useMemo(() => feltToString(challenge?.quote ?? 0n), [challenge])
   const timestamp_start = useMemo(() => Number(challenge?.timestamp_start ?? 0), [challenge])
   const timestamp_end = useMemo(() => Number(challenge?.timestamp_end ?? 0), [challenge])
 
   const { clientSeconds } = useClientTimestamp(false)
-  let _state = useMemo(() => (challenge?.state as unknown as ChallengeState), [challenge])
+  let _state = useMemo(() => (challenge?.state as unknown as constants.ChallengeState), [challenge])
   let state = useMemo(() => {
-    if (_state == ChallengeState.Awaiting && (timestamp_end < clientSeconds)) {
-      return ChallengeState.Expired
+    if (_state == constants.ChallengeState.Awaiting && (timestamp_end < clientSeconds)) {
+      return constants.ChallengeState.Expired
     }
     return _state
   }, [_state])
@@ -69,15 +68,15 @@ export const useChallenge = (duelId: BigNumberish) => {
     // progress and results
     winner,
     winnerDuelistId: (winner == 1 ? duelistIdA : winner == 2 ? duelistIdB : 0n),
-    isLive: (state == ChallengeState.Awaiting || state == ChallengeState.InProgress),
-    isAwaiting: (state == ChallengeState.Awaiting),
-    isInProgress: (state == ChallengeState.InProgress),
-    isFinished: (state == ChallengeState.Resolved || state == ChallengeState.Draw),
-    isResolved: (state == ChallengeState.Resolved),
-    isDraw: (state == ChallengeState.Draw),
-    isCanceled: (state == ChallengeState.Withdrawn || state == ChallengeState.Refused),
-    isExpired: (state == ChallengeState.Expired),
-    needToSyncExpired: (state == ChallengeState.Expired && state != _state),
+    isLive: (state == constants.ChallengeState.Awaiting || state == constants.ChallengeState.InProgress),
+    isAwaiting: (state == constants.ChallengeState.Awaiting),
+    isInProgress: (state == constants.ChallengeState.InProgress),
+    isFinished: (state == constants.ChallengeState.Resolved || state == constants.ChallengeState.Draw),
+    isResolved: (state == constants.ChallengeState.Resolved),
+    isDraw: (state == constants.ChallengeState.Draw),
+    isCanceled: (state == constants.ChallengeState.Withdrawn || state == constants.ChallengeState.Refused),
+    isExpired: (state == constants.ChallengeState.Expired),
+    needToSyncExpired: (state == constants.ChallengeState.Expired && state != _state),
     // times
     timestamp_start,
     timestamp_end,
@@ -91,9 +90,9 @@ export const useRound = (duelId: BigNumberish) => {
 
   const round = useEntityModel<models.Round>(entity, 'Round')
 
-  const state = useMemo(() => (round?.state as unknown as RoundState ?? null), [round])
+  const state = useMemo(() => (round?.state as unknown as constants.RoundState ?? null), [round])
   const final_blow = useMemo(() => feltToString(round?.final_blow ?? 0n), [round])
-  const endedInBlades = useMemo(() => (round ? (getBladesCardValue(final_blow as unknown as BladesCard) > 0) : false), [final_blow])
+  const endedInBlades = useMemo(() => (round ? (constants.getBladesCardValue(final_blow as unknown as constants.BladesCard) > 0) : false), [final_blow])
 
   const hand_a = useMemo(() => round ? movesToHand(
     //@ts-ignore

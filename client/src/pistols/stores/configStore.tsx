@@ -1,13 +1,12 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk'
-import { useEntityModel, getEntityModel } from '@/lib/dojo/hooks/useSdkEntities'
-import { PistolsSchemaType, models } from '@/lib/dojo/hooks/useSdkTypes'
+import { useEntityModel, getEntityModel } from '@underware_gg/pistols-sdk/dojo'
+import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { keysToEntity } from '@underware_gg/pistols-sdk/utils'
-import { CONFIG } from '@/games/pistols/generated/constants'
 
 export const useConfigStore = createDojoStore<PistolsSchemaType>();
 
-const configKey = keysToEntity([CONFIG.CONFIG_KEY])
+const configKey = keysToEntity([constants.CONFIG.CONFIG_KEY])
 
 //--------------------------------
 // 'consumer' hooks
