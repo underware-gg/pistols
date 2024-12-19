@@ -1,5 +1,5 @@
-import { getEntityIdFromKeys } from '@dojoengine/utils'
 import { BigNumberish } from 'starknet'
+import { getEntityIdFromKeys } from '@dojoengine/utils'
 
 //
 // numbers
@@ -49,6 +49,7 @@ export const shortAddress = (address: string | null, small: boolean = false) => 
 //
 // arrays
 //
+
 export const arrayUnique = <T,>(array: T[]): T[] => (array?.filter((value, index, array) => (array.indexOf(value) === index)) ?? [])
 export const arrayLast = <T,>(array: T[]): T => (array?.slice(-1)[0])
 export const arrayRemoveValue = <T,>(array: T[], v: T): T[] => (array?.filter(e => (e !== v)) ?? [] ?? [])
@@ -59,15 +60,17 @@ export const arrayClean = <T,>(array: T[]): T[] => (array?.filter(e => (e != nul
 // dictionaries
 //
 
-export const getObjectKeyByValue = <T extends any>(obj: T, value: any): string | undefined => Object.keys(obj).find(key => obj[key] === value);
-export const cleanObject = <T extends any>(obj: T): T =>
-  Object.keys(obj)
+export const getObjectKeyByValue = <T extends object>(obj: T, value: any): string | undefined =>
+  (Object.keys(obj) as (keyof T)[])
+    .find(key => obj[key] === value) as string;
+export const cleanObject = <T extends object>(obj: T): T =>
+  (Object.keys(obj) as (keyof T)[])
     .reduce((acc, key) => {
       if (obj[key] !== undefined) acc[key] = obj[key]
       return acc
     }, {} as T);
-export const sortObjectByValue = <T extends any>(obj: T, sorter: (a: any, b: any) => number): T =>
-  Object.keys(obj)
+export const sortObjectByValue = <T extends object>(obj: T, sorter: (a: any, b: any) => number): T =>
+  (Object.keys(obj) as (keyof T)[])
     .sort((a, b) => sorter(obj[a], obj[b]))
     .reduce((acc, key) => {
       acc[key] = obj[key];
@@ -78,8 +81,9 @@ export const sortObjectByValue = <T extends any>(obj: T, sorter: (a: any, b: any
 //
 // serializer
 //
+
 // there is no default serializer for BigInt, make one
 (BigInt.prototype as any).toJSON = function () {
   return (this <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(this) : bigintToHex(this))
 }
-export const serialize = (obj: any, space: number | string = null): any => JSON.stringify(obj, null, space);
+export const serialize = (obj: any, space?: number | string): any => JSON.stringify(obj, null, space);

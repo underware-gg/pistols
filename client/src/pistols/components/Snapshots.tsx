@@ -7,7 +7,7 @@ import { ChallengeStoreSync } from '@/pistols/stores/sync/ChallengeStoreSync'
 import { EntityStoreSync } from '@/pistols/stores/sync/EntityStoreSync'
 import { DojoStatus } from '@/lib/dojo/DojoStatus'
 import { CopyIcon } from '@/lib/ui/Icons'
-import { bigintEquals, bigintToHex } from '@/lib/utils/types'
+import { bigintEquals, bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { TABLES } from '@/games/pistols/generated/constants'
 
 //@ts-ignore

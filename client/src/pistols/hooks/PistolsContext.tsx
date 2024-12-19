@@ -2,11 +2,10 @@ import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEf
 import { useRouter } from 'next/router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
-import { bigintToHex, bigintToNumber } from '@/lib/utils/types'
+import { bigintToHex, bigintToNumber, poseidon } from '@underware_gg/pistols-sdk/utils'
 import { useSettings } from './SettingsContext'
 import { TABLES } from '@/games/pistols/generated/constants'
 import { CommitMoveMessage } from '../utils/salt'
-import { poseidon } from '@/lib/utils/starknet'
 
 //
 // React + Typescript + Context

@@ -1,7 +1,7 @@
 import { BigNumberish, StarknetType, typedData } from 'starknet'
 import { generateTypedData } from "@/lib/dojo/setup/controller"
 import { TutorialProgress, TutorialProgressNameToValue, getTutorialProgressValue } from '@/games/pistols/generated/constants'
-import { bigintToDecimal, bigintToHex, bigintToNumber } from "@/lib/utils/types"
+import { bigintToDecimal, bigintToHex, bigintToNumber } from '@underware_gg/pistols-sdk/utils'
 import { STARKNET_DOMAIN } from './config'
 import { SchemaType as PistolsSchemaType } from './generated/typescript/models.gen'
 import * as models from './generated/typescript/models.gen'

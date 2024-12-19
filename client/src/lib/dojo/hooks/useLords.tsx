@@ -1,8 +1,8 @@
 import { BigNumberish } from 'starknet'
 import { useDeployedDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
-import { bigintEquals } from '@/lib/utils/types'
+import { useERC20Balance } from '@underware_gg/pistols-sdk/hooks'
+import { bigintEquals } from '@underware_gg/pistols-sdk/utils'
 
 
 export const useLordsContract = () => {

@@ -6,7 +6,7 @@ import { useTokenConfigStore } from '@/pistols/stores/tokenConfigStore'
 import { usePlayerStore } from '@/pistols/stores/playerStore'
 import { useDuelistStore } from '@/pistols/stores/duelistStore'
 import { useDuelistQueryStore } from '@/pistols/stores/duelistQueryStore'
-import { useMounted } from '@/lib/utils/hooks/useMounted'
+import { useMounted } from '@underware_gg/pistols-sdk/hooks'
 import { CONFIG } from '@/games/pistols/generated/constants'
 import { useEffect, useMemo } from 'react'
 

@@ -1,6 +1,6 @@
 import { BigNumberish } from 'starknet'
 import { useDojoSystem } from '@/lib/dojo/hooks/useDojoSystem'
-import { useERC20Balance } from '@/lib/utils/hooks/useERC20'
+import { useERC20Balance } from '@underware_gg/pistols-sdk/hooks'
 import { useDuelistTokenBoundAddress } from '@/pistols/hooks/useTokenContract'
 
 export const useFameContract = () => {

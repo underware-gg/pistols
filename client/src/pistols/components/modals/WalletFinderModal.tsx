@@ -1,10 +1,10 @@
 import React, { ReactNode, useEffect, useState } from 'react'
 import { Grid, Modal, Breadcrumb, Icon } from 'semantic-ui-react'
-import { useMounted } from '@/lib/utils/hooks/useMounted'
+import { useMounted, useStarkName, useStarkProfile, useValidateWalletAddressOrName } from '@underware_gg/pistols-sdk/hooks'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useValidateWalletAddressOrName } from '@/lib/utils/hooks/useValidateWalletAddress'
 import { useControllerAccount } from '@/lib/dojo/hooks/useController'
+import { useChainConfig } from '@/lib/dojo/hooks/useChain'
 import { useIsMyAccount } from '@/pistols/hooks/useIsYou'
 import { usePact } from '@/pistols/hooks/usePact'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
@@ -13,8 +13,8 @@ import { FormInput } from '@/pistols/components/ui/Form'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { Divider } from '@/lib/ui/Divider'
 import { Opener } from '@/lib/ui/useOpener'
-import { STARKNET_ADDRESS_LENGTHS } from '@/lib/utils/starknet'
-import { useStarkName, useStarkProfile } from '@/lib/utils/hooks/useStarkName'
+import { STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
+import { ChainId } from '@/lib/dojo/setup/chains'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -36,13 +36,15 @@ export default function WalletFinderModal({
     if (opener.isOpen) setInputAddres('')
   }, [opener.isOpen])
 
-  const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddressOrName(inputAddress)
+  const { chainConfig } = useChainConfig(ChainId.SN_MAINNET)
+  
+  const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddressOrName(inputAddress, chainConfig.rpcUrl)
   const { isDeployed, isControllerAccount, isKatanaAccount } = useControllerAccount(validatedAddress)
   const { isMyAccount, myAcountAddress } = useIsMyAccount(validatedAddress)
   const canSubmit = (isStarknetAddress && !isMyAccount && (isControllerAccount || isKatanaAccount))
 
-  const { starkName } = useStarkName(isStarknetAddress ? validatedAddress : null)
-  const { name: profileName, profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null)
+  const { starkName } = useStarkName(isStarknetAddress ? validatedAddress : null, chainConfig.rpcUrl)
+  const { name: profileName, profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null, chainConfig.rpcUrl)
 
   const { tableId } = useSettings()
   const { dispatchSelectDuel, dispatchChallengingDuelistId } = usePistolsContext()

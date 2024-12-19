@@ -5,8 +5,8 @@ import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useAdminAmIOwner, useAdminIsOwner } from '@/pistols/hooks/useContractCalls'
 import { FormInput } from '@/pistols/components/ui/Form'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { STARKNET_ADDRESS_LENGTHS } from '@/lib/utils/starknet'
-import { useValidateWalletAddress } from '@/lib/utils/hooks/useValidateWalletAddress'
+import { STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
+import { useValidateWalletAddress } from '@underware_gg/pistols-sdk/hooks'
 
 const Row = Table.Row
 const Cell = Table.Cell

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { FormInput, Grid } from 'semantic-ui-react'
 import { VStack } from '@/lib/ui/Stack'
-import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
 import { useDojoStatus, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useSelectedChain, useConnectToSelectedChain } from '@/lib/dojo/hooks/useChain'
 import { useSettings } from '@/pistols/hooks/SettingsContext'

@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { AccountInterface, StarknetDomain, TypedData } from 'starknet'
-import { createTypedMessage, getMessageHash, getTypeHash } from '@/lib/utils/starknet_sign'
-import { chainIdToString } from '@/lib/utils/starknet'
+import { chainIdToString, createTypedMessage, getMessageHash, getTypeHash } from '../utils'
 
 //---------------------------------
 // Create TypedData from messages

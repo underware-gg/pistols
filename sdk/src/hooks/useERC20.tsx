@@ -1,11 +1,8 @@
-import {  useEffect, useMemo, useState } from 'react'
-import {
-  useContract,
-  useBalance,
-} from '@starknet-react/core'
-import { bigintToHex, isPositiveBigint } from '@/lib/utils/types'
+import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
-import { erc20_abi } from '@/lib/abi'
+import { useContract, useBalance } from '@starknet-react/core'
+import { bigintToHex, isPositiveBigint } from '../utils'
+import { erc20_abi } from '../abi'
 
 export const useERC20Balance = (contractAddress: BigNumberish, ownerAddress: BigNumberish, fee: BigNumberish = 0n) => {
   const { data: balance } = useBalance({
@@ -65,12 +62,12 @@ export const useERC20TokenName = (contractAddress: BigNumberish) => {
 
   // try ByteArray
   useEffect(() => {
-    contract?.call('name').then((name) => {
+    contract?.call('name').then((name: string) => {
       if (name) setTokenName(name)
     })
   }, [contract])
   useEffect(() => {
-    contract?.call('symbol').then((symbol) => {
+    contract?.call('symbol').then((symbol: string) => {
       if (symbol) setTokenSymbol(symbol)
     })
   }, [contract])

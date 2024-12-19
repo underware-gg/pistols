@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { useHistoricalEventsStore } from '@/pistols/stores/eventsStore'
-import { useMounted } from '@/lib/utils/hooks/useMounted'
+import { useMounted } from '@underware_gg/pistols-sdk/hooks'
 import { useSdkEntities } from '@/lib/dojo/hooks/useSdkEntities'
 import { PistolsGetQuery, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkTypes'
 import * as torii from '@dojoengine/torii-client'

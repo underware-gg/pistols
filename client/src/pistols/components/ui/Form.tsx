@@ -1,9 +1,9 @@
 
 
 
-import { getObjectKeyByValue } from '@/lib/utils/types'
 import React, { useMemo } from 'react'
 import { Checkbox, Dropdown, Input } from 'semantic-ui-react'
+import { getObjectKeyByValue } from '@underware_gg/pistols-sdk/utils'
 
 export function FormInput({
   label,

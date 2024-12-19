@@ -1,9 +1,8 @@
 import { useMemo } from 'react'
 import { BigNumberish, Account } from 'starknet'
-import { useContractWrite } from '@/lib/utils/hooks/useContractWrite'
-import { bigintToU256 } from '@/lib/utils/starknet'
-import { bigintToHex } from '@/lib/utils/types'
-import { erc20_abi } from '@/lib/abi'
+import { useContractWrite } from '@underware_gg/pistols-sdk/hooks'
+import { bigintToU256, bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { erc20_abi } from '@underware_gg/pistols-sdk/abi'
 
 export function useDojoERC20Transfer(contractAddress: BigNumberish, toAddress: BigNumberish, amount: bigint, fromAccount: Account = null) {
   const { low, high } = useMemo(() => bigintToU256(amount), [amount])

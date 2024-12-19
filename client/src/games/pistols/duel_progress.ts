@@ -1,5 +1,5 @@
 import { BladesCard, DuelistDrawnCard, EnvCard, PacesCard, TacticsCard } from "./generated/constants"
-import { cleanObject } from "@/lib/utils/types"
+import { cleanObject } from '@underware_gg/pistols-sdk/utils'
 
 
 const _get_variant = (variant: any): any => {

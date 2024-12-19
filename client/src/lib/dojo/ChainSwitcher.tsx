@@ -1,7 +1,7 @@
 import React from 'react'
 import { Dropdown } from 'semantic-ui-react'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
-import { feltToString } from '@/lib/utils/starknet'
+import { feltToString } from '@underware_gg/pistols-sdk/utils'
 import { ChainId } from '@/lib/dojo/setup/chains'
 
 export function ChainSwitcher({

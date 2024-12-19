@@ -1,5 +1,3 @@
-import { bigintToHex, cleanObject, isBigint } from '@/lib/utils/types'
-import { poseidon } from '@/lib/utils/starknet'
 import {
   AccountInterface,
   TypedData,
@@ -11,6 +9,7 @@ import {
   TypedDataRevision,
   StarknetDomain,
 } from 'starknet'
+import { bigintToHex, cleanObject, isBigint, poseidon } from '../utils'
 
 export type Messages = { [key: string]: string | BigInt }
 export type Revision = 0 | 1
@@ -115,7 +114,7 @@ export function createTypedMessage({
   messages,
 }: TypedMessageOptions): TypedData {
   const _messages = cleanObject(messages)
-  const revision = starknetDomain ? parseInt(starknetDomain.revision.toString()) : -1
+  const revision = starknetDomain?.revision ? parseInt(starknetDomain.revision.toString()) : -1
   const result = (revision == 0) ? {
     primaryType: 'Message',
     domain: starknetDomain,

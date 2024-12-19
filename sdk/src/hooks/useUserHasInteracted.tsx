@@ -7,7 +7,7 @@ export const useUserHasInteracted = (autoUpdate: boolean = true) => {
 
   useEffect(() => {
     let _mounted = true
-    let _interval = null
+    let _interval: number = undefined
     if (_navigatorHasBeenActive()) {
       setUserHasInteracted(true)
     } else if (autoUpdate) {

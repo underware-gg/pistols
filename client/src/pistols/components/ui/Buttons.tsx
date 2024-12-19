@@ -9,7 +9,7 @@ import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
 import { SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
-import { isPositiveBigint } from '@/lib/utils/types'
+import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 
 //-----------------
 // Generic Action button

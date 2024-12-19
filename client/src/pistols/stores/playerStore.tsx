@@ -6,7 +6,7 @@ import { useAccount } from '@starknet-react/core'
 import { useDuelTokenContract } from '@/pistols/hooks/useTokenContract'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
 import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
-import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@/lib/utils/types'
+import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@underware_gg/pistols-sdk/utils'
 import { TutorialProgress } from '@/games/pistols/generated/constants'
 
 interface PlayerState {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
-import { arrayClean, isPositiveBigint } from '@/lib/utils/types'
+import { arrayClean, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import {
   PistolsGetQuery,
   PistolsSubQuery,

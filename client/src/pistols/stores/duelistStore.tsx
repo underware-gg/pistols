@@ -3,10 +3,9 @@ import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@/lib/dojo/fix/zustand'
 import { useEntityModel } from '@/lib/dojo/hooks/useSdkEntities'
 import { PistolsSchemaType, models } from '@/lib/dojo/hooks/useSdkTypes'
-import { useEntityId } from '@/lib/utils/hooks/useEntityId'
-import { isPositiveBigint } from '@/lib/utils/types'
+import { useEntityId } from '@underware_gg/pistols-sdk/hooks'
+import { isPositiveBigint, feltToString } from '@underware_gg/pistols-sdk/utils'
 import { CONST } from '@/games/pistols/generated/constants'
-import { feltToString } from '@/lib/utils/starknet'
 import { useScore } from '../hooks/useScore'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();

@@ -1,8 +1,7 @@
 import { useCallback, useState } from 'react'
 import { BigNumberish, Abi, Account } from 'starknet'
 import { useAccount, useTransactionReceipt } from '@starknet-react/core'
-import { bigintToHex } from '@/lib/utils/types'
-import { execute } from '@/lib/utils/starknet'
+import { bigintToHex, execute } from '../utils'
 
 export function useContractWrite(contractAddress: BigNumberish, abi: Abi, functionName: string, callData: BigNumberish[], fromAccount: Account = null) {
   const { account } = useAccount()

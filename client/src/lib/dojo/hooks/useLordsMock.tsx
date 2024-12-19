@@ -2,8 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
 import { useLordsContract } from '@/lib/dojo/hooks/useLords'
-import { bigintToU256, ethToWei, execute } from '@/lib/utils/starknet'
-import { bigintToHex } from '@/lib/utils/types'
+import { bigintToU256, ethToWei, execute, bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { Account, AccountInterface } from 'starknet'
 
 export interface FaucetExecuteResult {

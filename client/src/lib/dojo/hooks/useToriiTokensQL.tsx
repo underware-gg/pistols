@@ -2,8 +2,8 @@ import { useMemo } from 'react'
 import { gql } from '@apollo/client'
 import { BigNumberish } from 'starknet'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useGraphQLQuery } from '@/lib/utils/hooks/useGraphQL'
-import { bigintEquals, bigintToHex, isPositiveBigint } from '@/lib/utils/types'
+import { useGraphQLQuery } from '@underware_gg/pistols-sdk/hooks'
+import { bigintEquals, bigintToHex, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 
 
 //---------------------------

@@ -5,7 +5,7 @@ import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDojoSetup, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useGetPlayerFullDeck } from '@/pistols/hooks/useContractCalls'
 import { CommitMoveMessage, signAndRestoreMovesFromHash } from '@/pistols/utils/salt'
-import { isPositiveBigint } from '@/lib/utils/types'
+import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { movesToHand } from '@/pistols/utils/pistols'
 
 export function useSignAndRestoreMovesFromHash(duelId: bigint, tableId: string, hash: bigint) {

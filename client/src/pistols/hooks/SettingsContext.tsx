@@ -1,6 +1,6 @@
 import React, { ReactNode, createContext, useReducer, useContext, useState, useCallback } from 'react'
 import { useCookies } from 'react-cookie'
-import { useEffectOnce } from '@/lib/utils/hooks/useEffectOnce'
+import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
 import { BigNumberish } from 'starknet'
 import { TABLES } from '@/games/pistols/generated/constants'
 

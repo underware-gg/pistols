@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { sanitizedAddress, STARKNET_ADDRESS_LENGTHS, ETHEREUM_ADDRESS_LENGTH } from '@/lib/utils/starknet'
-import { useAddressFromStarkName } from '@/lib/utils/hooks/useStarkName'
-import { arrayLast } from '@/lib/utils/types'
+import { useAddressFromStarkName } from '../hooks'
+import { arrayLast, sanitizedAddress, STARKNET_ADDRESS_LENGTHS, ETHEREUM_ADDRESS_LENGTH } from '../utils'
 
 export const useValidateWalletAddress = (address: BigNumberish) => {
   const formattedAddress = useMemo(() => (sanitizedAddress(address) ?? ''), [address])
@@ -29,14 +28,14 @@ export const useValidateWalletAddress = (address: BigNumberish) => {
   }
 }
 
-export const useValidateWalletName = (stark_or_ens_name: string) => {
+export const useValidateWalletName = (stark_or_ens_name: string, rpcUrl: string) => {
   const extension = useMemo(() => arrayLast(stark_or_ens_name?.split('.')), [stark_or_ens_name])
   const isStarkName = useMemo(() => (extension === 'stark'), [extension])
   const isEnsName = useMemo(() => (extension === 'eth'), [extension])
 
-  const { address: resolvedStarkAddress } = useAddressFromStarkName(isStarkName ? stark_or_ens_name : null)
+  const { address: resolvedStarkAddress } = useAddressFromStarkName(isStarkName ? stark_or_ens_name : null, rpcUrl)
 
-  const resolvedEnsAddress = null // TODO
+  const resolvedEnsAddress: string = null // TODO
   const resolvedAddress = useMemo(() => (resolvedStarkAddress ?? resolvedEnsAddress), [resolvedStarkAddress, resolvedEnsAddress])
 
   return {
@@ -46,7 +45,7 @@ export const useValidateWalletName = (stark_or_ens_name: string) => {
   }
 }
 
-export const useValidateWalletAddressOrName = (address_or_name: BigNumberish | string) => {
+export const useValidateWalletAddressOrName = (address_or_name: BigNumberish | string, rpcUrl: string) => {
   const {
     isStarknetAddress,
     isEthereumAddress,
@@ -57,7 +56,7 @@ export const useValidateWalletAddressOrName = (address_or_name: BigNumberish | s
     isStarkName,
     isEnsName,
     resolvedAddress,
-  } = useValidateWalletName(typeof address_or_name == 'string' ? address_or_name : null)
+  } = useValidateWalletName(typeof address_or_name == 'string' ? address_or_name : null, rpcUrl)
 
   return {
     isStarknetAddress: (isStarknetAddress || (isStarkName && resolvedAddress)),

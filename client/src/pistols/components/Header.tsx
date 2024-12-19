@@ -8,7 +8,7 @@ import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/P
 import { AllChallengeStates, ChallengeStateNames, LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
 import { BackButton, MusicToggle, FilterButton } from '@/pistols/components/ui/Buttons'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '@/pistols/three/game'
-import { arrayRemoveValue } from '@/lib/utils/types'
+import { arrayRemoveValue } from '@underware_gg/pistols-sdk/utils'
 import WalletHeader from './account/WalletHeader'
 import AccountHeader from '@/pistols/components/account/AccountHeader'
 import useGameAspect from '@/pistols/hooks/useGameApect'

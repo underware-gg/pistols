@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk'
 import { useEntityModel } from '@/lib/dojo/hooks/useSdkEntities'
 import { PistolsSchemaType, models } from '@/lib/dojo/hooks/useSdkTypes'
-import { useEntityId } from '@/lib/utils/hooks/useEntityId'
+import { useEntityId } from '@underware_gg/pistols-sdk/hooks'
 
 export const useTokenConfigStore = createDojoStore<PistolsSchemaType>();
 

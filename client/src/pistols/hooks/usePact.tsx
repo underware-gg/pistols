@@ -1,7 +1,6 @@
 import { useMemo, useEffect } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
-import { isPositiveBigint } from '@/lib/utils/types'
-import { bigintToU256, poseidon, stringToFelt } from '@/lib/utils/starknet'
+import { isPositiveBigint, bigintToU256, poseidon, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { PistolsGetQuery, useSdkState, getEntityMapModels, PistolsSubQuery } from '@/lib/dojo/hooks/useSdkState'
 import * as models from '@/games/pistols/generated/typescript/models.gen'
 

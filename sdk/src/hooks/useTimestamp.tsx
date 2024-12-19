@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useMounted } from '@/lib/utils/hooks/useMounted'
-import { formatTimestampLocal } from '@/lib/utils/timestamp'
+import { formatTimestampLocal } from '../utils'
+import { useMounted } from '../hooks'
 
 export const useClientTimestamp = (autoUpdate: boolean = false, updateSeconds: number = 1) => {
   const [clientDate, setClientDate] = useState(new Date(0))
@@ -25,7 +25,7 @@ export const useClientTimestamp = (autoUpdate: boolean = false, updateSeconds: n
 
   useEffect(() => {
     let _mounted = true
-    let _interval = null
+    let _interval = undefined
     // initialize
     if (mounted) {
       _update()

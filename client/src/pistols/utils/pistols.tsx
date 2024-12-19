@@ -2,7 +2,7 @@ import { BigNumberish } from 'starknet'
 import { Archetype, BladesCard, ChallengeState, getBladesCardFromValue, getPacesCardFromValue, getTacticsCardFromValue, PacesCard, Premise, RoundState, TacticsCard } from '@/games/pistols/generated/constants'
 import { EMOJI } from '@/pistols/data/messages'
 import { SceneName } from '@/pistols/hooks/PistolsContext'
-import { bigintToNumber } from '@/lib/utils/types'
+import { bigintToNumber } from '@underware_gg/pistols-sdk/utils'
 
 //------------------------------------------
 // must be in sync with CHALLENGE_STATE

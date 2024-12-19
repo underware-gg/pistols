@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish, RpcProvider } from 'starknet'
-import { useDojoSetup } from '@/lib/dojo/DojoContext'
 
-export const useContractClassHash = (contractAddress: BigNumberish, provider?: RpcProvider) => {
-  const { dojoProvider } = useDojoSetup()
+export const useContractClassHash = (contractAddress: BigNumberish, provider: RpcProvider) => {
 
   const [classHash, setClassHash] = useState<BigNumberish>()
 
@@ -11,7 +9,7 @@ export const useContractClassHash = (contractAddress: BigNumberish, provider?: R
     let _mounted = true
     const _fetch = async () => {
       try {
-        const result = await (provider ?? dojoProvider.provider).getClassHashAt(contractAddress)
+        const result = await provider.getClassHashAt(contractAddress)
         if (_mounted) {
           setClassHash(result)
         }
@@ -22,11 +20,11 @@ export const useContractClassHash = (contractAddress: BigNumberish, provider?: R
       }
     }
     setClassHash(undefined)
-    if (contractAddress && (provider || dojoProvider.provider)) {
+    if (contractAddress && provider) {
       _fetch()
     }
     return () => { _mounted = false }
-  }, [contractAddress, dojoProvider, provider])
+  }, [contractAddress, provider])
 
   const isDeployed = useMemo(() => (contractAddress ? Boolean(classHash) : undefined), [classHash, contractAddress])
 

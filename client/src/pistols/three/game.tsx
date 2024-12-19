@@ -19,7 +19,7 @@ export var emitter = ee()
 
 import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS, sceneBackgrounds, TextureName } from '@/pistols/data/assets'
 import { SceneName } from '@/pistols/hooks/PistolsContext'
-import { map } from '@/lib/utils/math'
+import { map } from '@underware_gg/pistols-sdk/utils'
 import { SpriteSheet } from './SpriteSheetMaker'
 import { DuelistsManager } from './DuelistsManager.tsx'
 import { Action } from '../utils/pistols.tsx'

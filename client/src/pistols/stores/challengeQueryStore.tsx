@@ -7,7 +7,7 @@ import { usePlayer } from '@/pistols/stores/playerStore'
 import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { ChallengeColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { ChallengeState, getChallengeStateValue } from '@/games/pistols/generated/constants'
-import { bigintEquals, keysToEntity } from '@/lib/utils/types'
+import { bigintEquals, keysToEntity } from '@underware_gg/pistols-sdk/utils'
 
 
 //-----------------------------------------

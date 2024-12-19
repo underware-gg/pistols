@@ -4,7 +4,7 @@ import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon
 import { DuelStage, useDuel } from '@/pistols/hooks/useDuel'
 import { CompletedIcon, EmojiIcon, LoadingIcon } from '@/lib/ui/Icons'
 import { BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
-import { bigintEquals } from '@/lib/utils/types'
+import { bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { EMOJI } from '@/pistols/data/messages'
 import { BigNumberish } from 'starknet'
 import { CONST, getBladesCardFromValue, getPacesCardFromValue } from '@/games/pistols/generated/constants'

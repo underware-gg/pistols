@@ -12,7 +12,7 @@ import {
   KATANA_ETH_CONTRACT_ADDRESS,
 } from '@dojoengine/core'
 import { supportedConnetorIds } from './connectors'
-import { PredeployedAccount } from '@/lib/utils/hooks/usePredeployedConnector'
+import { PredeployedAccount } from '@underware_gg/pistols-sdk/utils'
 
 //
 // supported chain ids

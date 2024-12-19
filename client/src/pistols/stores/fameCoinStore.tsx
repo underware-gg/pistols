@@ -5,7 +5,7 @@ import { useAccount } from '@starknet-react/core'
 import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
 import { useToriiBalancesByContractQL } from '@/lib/dojo/hooks/useToriiTokensQL'
-import { bigintToHex } from '@/lib/utils/types'
+import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { useFameContract } from '@/pistols/hooks/useFame'
 
 

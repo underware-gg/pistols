@@ -1,8 +1,6 @@
-import { useCallback } from 'react'
+import { Account, AccountInterface, RpcProvider } from 'starknet'
 import { Connector } from '@starknet-react/core'
-import { Account, AccountInterface, RpcProvider } from 'starknet';
-import { DojoChainConfig } from '@/lib/dojo/setup/chains';
-import { stringToFelt } from '@/lib/utils/starknet'
+import { stringToFelt } from '../utils'
 
 export const PREDEPLOYED_ID = 'predeployed';
 export const PREDEPLOYED_NAME = 'Predeployed Account';
@@ -22,15 +20,15 @@ export class PredeployedConnector extends Connector {
   private _account: AccountInterface;
   private _chainId: bigint;
 
-  constructor(chainConfig: DojoChainConfig) {
+  constructor(rpcUrl: string, chainId: string, predeployedAccounts: PredeployedAccount[]) {
     super();
-    const account: PredeployedAccount = chainConfig.predeployedAccounts.find((e) => e.active)
+    const account: PredeployedAccount = predeployedAccounts.find((e) => e.active)
     if (!account) {
       throw new Error('PredeployedConnector: missing account')
     }
-    this._chainId = BigInt(stringToFelt(chainConfig.chainId))
+    this._chainId = BigInt(stringToFelt(chainId))
     this._account = new Account(
-      new RpcProvider({ nodeUrl: chainConfig.rpcUrl }),
+      new RpcProvider({ nodeUrl: rpcUrl }),
       account.address,
       account.privateKey,
       '1',
@@ -106,14 +104,5 @@ export class PredeployedConnector extends Connector {
       default:
         throw new Error(`PredeployedConnector: request not implemented [${call.type}]`)
     }
-  }
-}
-
-export const usePredeployedConnector = (chainConfig: DojoChainConfig) => {
-  const predeployed = useCallback(() => {
-    return new PredeployedConnector(chainConfig)
-  }, [chainConfig])
-  return {
-    predeployed,
   }
 }

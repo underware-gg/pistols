@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { bigintEquals, bigintToHex } from '@/lib/utils/types'
+import { bigintEquals, bigintToHex } from '@underware_gg/pistols-sdk/utils'
 
 export function AccountChangeDetector({
   onChange,

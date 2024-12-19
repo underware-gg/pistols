@@ -5,8 +5,8 @@ import { useSdkEntities } from '@/lib/dojo/hooks/useSdkEntities'
 import { PistolsGetQuery, PistolsSubQuery, PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { useChallengeQueryStore } from '@/pistols/stores/challengeQueryStore'
 import { useChallengeStore } from '@/pistols/stores/challengeStore'
-import { useMounted } from '@/lib/utils/hooks/useMounted'
-import { stringToFelt } from '@/lib/utils/starknet'
+import { useMounted } from '@underware_gg/pistols-sdk/hooks'
+import { stringToFelt } from '@underware_gg/pistols-sdk/utils'
 
 
 //------------------------------------------------------

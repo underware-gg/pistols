@@ -5,7 +5,7 @@ import { SwitchStarknetChainParameters, AddStarknetChainParameters } from 'get-s
 import { useAddStarknetChain, useSwitchStarknetChain } from '@/lib/dojo/hooks/useWalletRequest'
 import { ChainId, getDojoChainConfig, isChainIdSupported } from '@/lib/dojo/setup/chainConfig'
 import { useStarknetContext } from '@/lib/dojo/StarknetProvider'
-import { feltToString } from '@/lib/utils/starknet'
+import { feltToString } from '@underware_gg/pistols-sdk/utils'
 import { BigNumberish, Provider } from 'starknet'
 
 
@@ -22,12 +22,6 @@ export const useChainConfig = (chain_id: ChainId | BigNumberish) => {
     chainName,
     chainConfig,
   }
-}
-
-export const useChainConfigProvider = (chain_id: ChainId | BigNumberish): Provider => {
-  const { chainConfig } = useChainConfig(chain_id)
-  const provider = useMemo(() => (chainConfig?.rpcUrl ? new Provider({ nodeUrl: chainConfig.rpcUrl }) : null), [chainConfig])
-  return provider
 }
 
 export const useSelectedChain = () => {

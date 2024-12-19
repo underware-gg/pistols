@@ -3,7 +3,7 @@ import { addAddressPadding, BigNumberish } from 'starknet'
 import { PistolsGetQuery, useSdkState, getEntityMapModels } from '@/lib/dojo/hooks/useSdkState'
 import { LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
 import { ChallengeState } from '@/games/pistols/generated/constants'
-import { stringToFelt } from '@/lib/utils/starknet'
+import { stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import * as models from '@/games/pistols/generated/typescript/models.gen'
 
 

@@ -13,6 +13,18 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./abi": {
+      "import": "./dist/abi/index.js",
+      "types": "./dist/abi/index.d.ts"
+    },
+    "./hooks": {
+      "import": "./dist/hooks/index.js",
+      "types": "./dist/hooks/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -40,7 +52,17 @@
   "bugs": {
     "url": "https://github.com/underware_gg/pistols/issues"
   },
+  "peerDependencies": {
+    "@apollo/client": "catalog:",
+    "@dojoengine/utils": "catalog:",
+    "@starknet-react/chains": "catalog:",
+    "@starknet-react/core": "catalog:",
+    "react": "catalog:",
+    "starknet": "catalog:",
+    "starknetid.js": "catalog:"
+  },
   "devDependencies": {
+    "@types/react": "^18.2.30",
     "tsup": "^8.3.5",
     "typescript": "catalog:",
     "vitest": "^2.1.8"

@@ -1,6 +1,5 @@
 import { Chain } from '@starknet-react/chains'
-import { stringToFelt } from '@/lib/utils/starknet'
-import { cleanObject } from '@/lib/utils/types'
+import { stringToFelt, cleanObject } from '@underware_gg/pistols-sdk/utils'
 import {
   ChainId,
   DojoChainConfig,

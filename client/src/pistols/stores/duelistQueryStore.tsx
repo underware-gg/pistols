@@ -4,10 +4,9 @@ import { immer } from 'zustand/middleware/immer'
 import { useAccount } from '@starknet-react/core'
 import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
 import { DuelistColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
-import { feltToString } from '@/lib/utils/starknet'
+import { feltToString, bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
 import { usePlayer } from './playerStore'
-import { bigintEquals } from '@/lib/utils/types'
 
 
 //-----------------------------------------

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { keysToEntity } from '@/lib/utils/types'
+import { keysToEntity } from '../utils'
 
 export const useEntityId = (keys: BigNumberish[]) => {
   const entityId = useMemo(() => keysToEntity(keys), keys)

@@ -6,9 +6,8 @@ import { useAdminAmIOwner } from '@/pistols/hooks/useContractCalls'
 import { FormInput, FormCheckbox, FormSelectFromMap } from '@/pistols/components/ui/Form'
 import { TableSwitcher } from '@/pistols/components/modals/TableModal'
 import { Balance } from '@/pistols/components/account/Balance'
-import { bigintToEntity, bigintToHex, isBigint, isNumeric } from '@/lib/utils/types'
+import { bigintToEntity, bigintToHex, isBigint, isNumeric, feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@/lib/utils/starknet'
 import { TableTypeNameToValue, CONFIG, DeckTypeNameToValue } from '@/games/pistols/generated/constants'
 
 const Row = Table.Row

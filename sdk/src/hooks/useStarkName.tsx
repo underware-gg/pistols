@@ -1,12 +1,10 @@
-import { useEffect, useState } from 'react'
-import { BigNumberish, constants } from 'starknet'
-import { StarknetIdNavigator, StarkProfile } from "starknetid.js";
-import { useChainConfigProvider } from '@/lib/dojo/hooks/useChain'
-import { ChainId } from '@/lib/dojo/setup/chains'
-import { bigintToHex, isPositiveBigint } from '@/lib/utils/types'
+import { useEffect, useMemo, useState } from 'react'
+import { BigNumberish, constants, Provider } from 'starknet'
+import { StarknetIdNavigator, StarkProfile } from "starknetid.js"
+import { bigintToHex, isPositiveBigint } from '../utils'
 
-export const useAddressFromStarkName = (starkName: string) => {
-  const provider = useChainConfigProvider(ChainId.SN_MAINNET)
+export const useAddressFromStarkName = (starkName: string, rpcUrl: string) => {
+  const provider = useMemo(() => (rpcUrl ? new Provider({ nodeUrl: rpcUrl }) : null), [rpcUrl])
 
   const [address, setAddress] = useState<string>()
   useEffect(() => {
@@ -34,8 +32,8 @@ export const useAddressFromStarkName = (starkName: string) => {
 }
 
 
-export const useStarkName = (address: BigNumberish) => {
-  const provider = useChainConfigProvider(ChainId.SN_MAINNET)
+export const useStarkName = (address: BigNumberish, rpcUrl: string) => {
+  const provider = useMemo(() => (rpcUrl ? new Provider({ nodeUrl: rpcUrl }) : null), [rpcUrl])
 
   const [starkName, setStarkName] = useState<string>()
   useEffect(() => {
@@ -63,8 +61,8 @@ export const useStarkName = (address: BigNumberish) => {
 }
 
 
-export const useStarkProfile = (address: BigNumberish): StarkProfile => {
-  const provider = useChainConfigProvider(ChainId.SN_MAINNET)
+export const useStarkProfile = (address: BigNumberish, rpcUrl: string): StarkProfile => {
+  const provider = useMemo(() => (rpcUrl ? new Provider({ nodeUrl: rpcUrl }) : null), [rpcUrl])
 
   const [starkProfile, setStarkProfile] = useState<StarkProfile>()
   useEffect(() => {

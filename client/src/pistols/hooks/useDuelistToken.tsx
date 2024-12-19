@@ -3,11 +3,11 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
 import { useTokenConfig } from '@/pistols/stores/tokenConfigStore'
-import { useERC721OwnerOf } from '@/lib/utils/hooks/useERC721'
+import { useERC721OwnerOf } from '@underware_gg/pistols-sdk/hooks'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
 import { useTokenIdsByOwner, useTokenIdsOfPlayer } from '@/pistols/stores/duelistTokenStore'
 import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
-import { poseidon } from '@/lib/utils/starknet'
+import { poseidon } from '@underware_gg/pistols-sdk/utils'
 
 
 export const useDuelistTokenCount = () => {

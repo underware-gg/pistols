@@ -7,7 +7,7 @@ import useGameAspect from '@/pistols/hooks/useGameApect'
 import { DUEL_CARD_WIDTH, DUEL_CARD_HEIGHT } from '@/pistols/data/cardConstants'
 import { DuelistCard } from './cards/DuelistCard'
 import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
-import { bigintEquals } from '@/lib/utils/types'
+import { bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import * as TWEEN from '@tweenjs/tween.js'
 
 interface DuelPosterProps {

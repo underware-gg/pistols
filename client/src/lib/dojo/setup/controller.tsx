@@ -14,9 +14,8 @@ import { ControllerConnector } from '@cartridge/connector'
 import { ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from '@/lib/dojo/Dojo'
 import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
 import { _useConnector } from '../fix/starknet_react_core'
-import { assert } from '@/lib/utils/math'
+import { assert, serialize } from '@underware_gg/pistols-sdk/utils'
 import { StarknetDomain, StarknetType, TypedData } from 'starknet'
-import { serialize } from '@/lib/utils/types'
 
 
 

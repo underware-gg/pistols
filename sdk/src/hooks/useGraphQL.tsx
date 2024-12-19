@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from "react";
-import { ApolloClient, InMemoryCache, useQuery } from "@apollo/client";
+import { useMemo } from 'react'
+import { ApolloClient, InMemoryCache, useQuery } from '@apollo/client'
 
 //---------------------------
 // QL Client

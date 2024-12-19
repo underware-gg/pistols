@@ -5,7 +5,8 @@ import {
   // argent, braavos,
 } from '@starknet-react/core'
 // import { useControllerConnector } from '@/lib/dojo/hooks/useController'
-import { usePredeployedConnector, PREDEPLOYED_ID } from '@/lib/utils/hooks/usePredeployedConnector'
+import { usePredeployedConnector } from '@underware_gg/pistols-sdk/hooks'
+import { PREDEPLOYED_ID } from '@underware_gg/pistols-sdk/utils'
 import { DojoChainConfig } from '@/lib/dojo/setup/chains'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
 
@@ -34,7 +35,7 @@ export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: Do
   // )
 
   // Predeployed Controller
-  const { predeployed } = usePredeployedConnector(chainConfig)
+  const { predeployed } = usePredeployedConnector(chainConfig.rpcUrl, chainConfig.chainId, chainConfig.predeployedAccounts)
 
   const connectorIds = useMemo<Connector[]>(() => {
     const result = chainConfig.connectorIds.reduce((acc, id) => {

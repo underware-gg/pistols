@@ -3,9 +3,8 @@ import { init } from '@dojoengine/sdk'
 import { DojoProvider } from '@dojoengine/core'
 import { DojoAppConfig } from '@/lib/dojo/Dojo'
 import { useDeployedSystem } from '@/lib/dojo/hooks/useDojoSystem'
-import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
-import { useMounted } from '@/lib/utils/hooks/useMounted'
-import { feltToString } from '@/lib/utils/starknet'
+import { useAsyncMemo, useMounted } from '@underware_gg/pistols-sdk/hooks'
+import { feltToString } from '@underware_gg/pistols-sdk/utils'
 import { DojoChainConfig } from './chainConfig'
 
 // TODO: move out of lib??

@@ -1,13 +1,12 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@/lib/dojo/fix/zustand'
-import { useEntityId } from '@/lib/utils/hooks/useEntityId'
-import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
+import { useEntityId, useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
 import { useEntityModel } from '@/lib/dojo/hooks/useSdkEntities'
 import { PistolsSchemaType, models } from '@/lib/dojo/hooks/useSdkTypes'
 import { BladesCard, ChallengeState, getBladesCardValue, Premise, RoundState } from '@/games/pistols/generated/constants'
 import { movesToHand } from '@/pistols/utils/pistols'
-import { feltToString } from '@/lib/utils/starknet'
+import { feltToString } from '@underware_gg/pistols-sdk/utils'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
 

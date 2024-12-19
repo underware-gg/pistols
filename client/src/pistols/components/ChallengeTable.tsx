@@ -13,7 +13,7 @@ import { DuelIconsAsRow } from '@/pistols/components/DuelIcons'
 import { FilterButton } from '@/pistols/components/ui/Buttons'
 // import { FilterDuelistName } from '@/pistols/components/DuelistTable'
 import { Balance } from '@/pistols/components/account/Balance'
-import { arrayRemoveValue, bigintEquals } from '@/lib/utils/types'
+import { arrayRemoveValue, bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { ChallengeState } from '@/games/pistols/generated/constants'
 import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '@/pistols/utils/pistols'
 

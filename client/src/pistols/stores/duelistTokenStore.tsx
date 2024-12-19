@@ -6,7 +6,7 @@ import { useDojoSetup } from '@/lib/dojo/DojoContext'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
 import { useToriiTokenIdsByOwnerQL } from '@/lib/dojo/hooks/useToriiTokensQL'
 import { Token, TokenBalance } from '@dojoengine/torii-client'
-import { bigintToHex } from '@/lib/utils/types'
+import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 
 
 //-----------------------------------------

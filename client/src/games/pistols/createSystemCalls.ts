@@ -1,8 +1,7 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
 import { DojoManifest } from '@/lib/dojo/Dojo'
-import { arrayClean, bigintToHex, isPositiveBigint, shortAddress } from '@/lib/utils/types'
-import { stringToFelt, bigintToU256 } from '@/lib/utils/starknet'
+import { arrayClean, bigintToHex, isPositiveBigint, shortAddress, stringToFelt, bigintToU256 } from '@underware_gg/pistols-sdk/utils'
 import {
   Premise, getPremiseValue,
   ProfilePicType, getProfilePicTypeValue,
