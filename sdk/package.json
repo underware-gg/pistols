@@ -2,12 +2,26 @@
   "name": "@underware_gg/pistols-sdk",
   "version": "0.12.4",
   "description": "Pistols at 10 Blocks SDK",
-  "homepage": "https://underware.gg",
+  "homepage": "https://github.com/underware-gg/pistols",
   "author": "Underware",
   "license": "CC0",
   "private": false,
   "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "postbuild": "cp -R bin dist/",
+    "dev": "tsup --watch --onSuccess=\"pnpm run postbuild\"",
+    "devs": "tsup --watch --onSuccess=\"pnpm run postbuild\"",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "bin": {
+    "create-constants": "dist/bin/generateConstants.cjs"
+  },
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -39,19 +53,6 @@
     },
     "./package.json": "./package.json"
   },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "tsup && cp -R bin dist/",
-    "dev": "tsup --watch",
-    "devs": "tsup --watch",
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "bin": {
-    "create-constants": "dist/bin/generateConstants.cjs"
-  },
   "keywords": [
     "pistols at 10 blocks",
     "underware",
@@ -60,13 +61,6 @@
     "library",
     "sdk"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/underware_gg/pistols/sdk"
-  },
-  "bugs": {
-    "url": "https://github.com/underware_gg/pistols/issues"
-  },
   "dependencies": {
     "dotenv": "^16.4.7",
     "event-emitter": "^0.3.5",

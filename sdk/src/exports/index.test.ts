@@ -1,6 +1,11 @@
 import { expect, test } from "vitest";
-import { helloPistols } from "./index";
+import { getVersion, helloPistols } from "./index";
 
-test("helloPistols function", () => {
+test("getVersion()", () => {
+  expect(getVersion()).not.toBeNull();
+  expect(getVersion().split('.').length).toBe(3);
+});
+
+test("helloPistols()", () => {
   expect(helloPistols()).toBe("Bang!");
 });

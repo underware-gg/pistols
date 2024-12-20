@@ -1,8 +1,8 @@
 {
-  "name": "pistols",
+  "name": "pistols-client",
   "version": "0.12.4",
   "description": "Pistols at 10 Blocks JS client",
-  "homepage": "https://underware.gg",
+  "homepage": "https://github.com/underware-gg/pistols",
   "author": "Underware",
   "license": "CC0",
   "private": false,
@@ -14,7 +14,8 @@
     "check-types": "npx tsc --noEmit",
     "build": "npx tsc -p tsconfig.json && next build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "print-profile": "echo usage: npm run print-profile --profile=dev && echo \"profile:[$npm_config_profile]\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "create-constants": "npx @underware_gg/pistols-sdk generate-constants --src:\"../dojo/src\" --out:\"$npm_config_sdk/generated/constants.ts\""
   },
   "keywords": [
@@ -24,13 +25,6 @@
     "typescript",
     "client"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/underware_gg/pistols"
-  },
-  "bugs": {
-    "url": "https://github.com/underware_gg/pistols/issues"
-  },
   "dependencies": {
     "@apollo/client": "catalog:",
     "@cartridge/connector": "catalog:",
@@ -73,7 +67,8 @@
     "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.16",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "3.0.0-beta.2"
   },
   "engines": {
     "node": ">=22"
