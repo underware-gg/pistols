@@ -48,7 +48,7 @@ pub trait IDuelToken<TState> {
     // IDuelTokenPublic
     fn create_duel(ref self: TState, duelist_id: u128, challenged_id_or_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64) -> u128;
     fn reply_duel(ref self: TState, duelist_id: u128, duel_id: u128, accepted: bool) -> ChallengeState;
-    fn delete_duel(ref self: TState, duel_id: u128);
+    // fn delete_duel(ref self: TState, duel_id: u128);
     fn transfer_to_winner(ref self: TState, duel_id: u128);
     // view calls
     fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
@@ -74,14 +74,8 @@ pub trait IDuelTokenPublic<TState> {
         duel_id: u128,
         accepted: bool,
     ) -> ChallengeState;
-    fn delete_duel(
-        ref self: TState,
-        duel_id: u128,
-    );
-    fn transfer_to_winner(
-        ref self: TState,
-        duel_id: u128,
-    );
+    // fn delete_duel(ref self: TState, duel_id: u128);
+    fn transfer_to_winner(ref self: TState, duel_id: u128);
 
     // view calls
     fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
@@ -406,13 +400,13 @@ pub mod duel_token {
             (challenge.state)
         }
         
-        fn delete_duel(ref self: ContractState,
-            duel_id: u128,
-        ) {
-            self.token.assert_is_owner_of(get_caller_address(), duel_id.into());
-            assert(false, Errors::NOT_IMPLEMENTED);
-            self.token.burn(duel_id.into());
-        }
+        // fn delete_duel(ref self: ContractState,
+        //     duel_id: u128,
+        // ) {
+        //     self.token.assert_is_owner_of(get_caller_address(), duel_id.into());
+        //     assert(false, Errors::NOT_IMPLEMENTED);
+        //     self.token.burn(duel_id.into());
+        // }
 
         fn transfer_to_winner(ref self: ContractState,
             duel_id: u128,

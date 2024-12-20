@@ -422,15 +422,14 @@ fn test_mint_lords() {
 // burn
 //
 
-#[test]
-#[should_panic(expected: ('DUEL: Not implemented', 'ENTRYPOINT_FAILED'))]
-fn test_burn() {
-    let (world, mut token) = setup(100);
-    _assert_minted_count(world, token, 2, 'invalid total_supply init');
-    // assert(token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
-    tester::impersonate(world.game_address());
-    token.delete_duel(TOKEN_ID_1.low);
-    _assert_minted_count(world, token, 1, 'invalid total_supply');
-    // assert(token.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
-}
-
+// #[test]
+// #[should_panic(expected: ('DUEL: Not implemented', 'ENTRYPOINT_FAILED'))]
+// fn test_burn() {
+//     let (world, mut token) = setup(100);
+//     _assert_minted_count(world, token, 2, 'invalid total_supply init');
+//     // assert(token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
+//     tester::impersonate(world.game_address());
+//     token.delete_duel(TOKEN_ID_1.low);
+//     _assert_minted_count(world, token, 1, 'invalid total_supply');
+//     // assert(token.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
+// }
