@@ -1,4 +1,11 @@
 {
+  "name": "pistols-monorepo",
+  "version": "0.12.4",
+  "description": "Pistols at 10 Blocks monorepo",
+  "homepage": "https://github.com/underware-gg/pistols",
+  "author": "Underware",
+  "license": "CC0",
+  "private": true,
   "scripts": {
     "dev": "turbo watch dev",
     "devs": "turbo watch devs"

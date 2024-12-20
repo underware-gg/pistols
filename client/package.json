@@ -1,8 +1,8 @@
 {
-  "name": "pistols",
+  "name": "pistols-client",
   "version": "0.12.4",
   "description": "Pistols at 10 Blocks JS client",
-  "homepage": "https://underware.gg",
+  "homepage": "https://github.com/underware-gg/pistols",
   "author": "Underware",
   "license": "CC0",
   "private": false,
@@ -24,13 +24,6 @@
     "typescript",
     "client"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/underware_gg/pistols"
-  },
-  "bugs": {
-    "url": "https://github.com/underware_gg/pistols/issues"
-  },
   "dependencies": {
     "@apollo/client": "catalog:",
     "@cartridge/connector": "catalog:",
