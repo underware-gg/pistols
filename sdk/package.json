@@ -43,11 +43,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && cp -R bin dist/",
     "dev": "tsup --watch",
     "devs": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest"
+  },
+  "bin": {
+    "create-constants": "dist/bin/generateConstants.cjs"
   },
   "keywords": [
     "pistols at 10 blocks",

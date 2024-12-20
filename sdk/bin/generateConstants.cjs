@@ -329,25 +329,28 @@ function buildFileContents(parsed) {
 //----------------------
 // Execution
 //
+console.log("executing [generateConstants.cjs]...", process.argv)
 
-// Check for the required arguments
-if (process.argv.length !== 4) {
-  console.log(
-    "Usage: npm run create-constants <SRC_PATH> <OUTPUT_PATH>",
-    "Usage: npm run create-constants --game=<GAME_SLUG> --profile=<PROFILE>"
-  );
+// Check for the required arguments...
+let arg_src = null
+let arg_out = null
+process.argv.forEach(arg => {
+  const parts = arg.split(':')
+  if (parts[0] == '--src') {
+    arg_src = parts[1]
+  } else if (parts[0] == '--out') {
+    arg_out = parts[1]
+  }
+})
+
+if (!arg_src || !arg_out) {
+  console.log("Usage: npm run create-constants --src:<SRC_PATH> --out:<OUTPUT_PATH>");
   console.error(`❌ ABORTED`)
   process.exit(1);
 }
 
-// Extract paths from command-line arguments
-// const srcPath = path.resolve(process.argv[2]);
-const srcPath = (process.argv[2]); // keep relative
-const jsFilePath = path.resolve(process.argv[3]);
-
-// console.log(`process.argv`, process.argv)
-// console.log(`srcPath [${process.argv[2]}] > [${srcPath}]`)
-// console.log(`jsFilePath [${process.argv[3]}] > [${jsFilePath}]`)
+const srcPath = (arg_src); // keep relative
+const jsFilePath = path.resolve(arg_out);
 
 let cairoFiles = getFolderFilesRecursively(srcPath, '.cairo');
 

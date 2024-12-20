@@ -14,8 +14,8 @@ if [[
 fi
 
 echo "BINDINGS_PATH: $BINDINGS_PATH"
-echo "CLIENT_GAME_PATH: $CLIENT_GAME_PATH"
-echo "CLIENT_MANIFEST_PATH: $CLIENT_MANIFEST_PATH"
+echo "SDK_GAME_PATH: $SDK_GAME_PATH"
+echo "SDK_MANIFEST_PATH: $SDK_MANIFEST_PATH"
 
 #-----------------
 # build
@@ -62,9 +62,9 @@ sozo -P $PROFILE $OFFLINE inspect --world $WORLD_ADDRESS
 # copy manifest to client
 #
 echo "------------------------------------------------------------------------------"
-echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$CLIENT_MANIFEST_PATH/]"
-mkdir -p $CLIENT_MANIFEST_PATH
-cp $MANIFEST_FILE_PATH $CLIENT_MANIFEST_PATH/
+echo ">>> Copying manifest [$MANIFEST_FILE_PATH] to [$SDK_MANIFEST_PATH/]"
+mkdir -p $SDK_MANIFEST_PATH
+cp $MANIFEST_FILE_PATH $SDK_MANIFEST_PATH/
 echo "👍"
 
 #
@@ -91,27 +91,21 @@ echo "👍"
 #
 if [[ "$PROFILE" == "dev" ]]; then
   #
-  # TODO: Enable this when bindings are ported
-  # generate and copy bindings
-  # cp -R $BINDINGS_PATH $CLIENT_GAME_PATH/
-  # cp -R $BINDINGS_PATH/typescript_v2 $CLIENT_GAME_PATH/generated/
-  cp -R $BINDINGS_PATH/typescript $CLIENT_GAME_PATH/generated/
+  # copy typescript bindings
+  cp -R $BINDINGS_PATH/typescript/* $SDK_GAME_PATH/generated/
   #
-  # copy to client
+  # constant generator
   echo "------------------------------------------------------------------------------"
   echo ">>> Generate sources..."
   cd ../client
-  # export CMD="npm run create-components --game=$GAME_SLUG --profile=$PROFILE $RPC_URL $WORLD_ADDRESS"
-  # echo "command: $CMD"
-  # $CMD
-  export CMD="npm run create-constants --game=$GAME_SLUG --profile=$PROFILE"
+  export CMD="npm run create-constants --sdk=$SDK_GAME_PATH"
   echo "command: $CMD"
   $CMD
   echo "👍?"
   #
   # list copied files
   echo "------------------------------------------------------------------------------"
-  ls -ld $CLIENT_GAME_PATH/* | grep -E 'ts|json'
+  ls -ld $SDK_GAME_PATH/* | grep -E 'ts|json'
 fi
 
 

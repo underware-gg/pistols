@@ -59,7 +59,7 @@ const address = bigintToHex(1234567890n)
 
 A very simple basic tool that generates a Typescript source containint all constants and enums from your cairo source code.
 
-Usage: `generateConstants.cjs <CAIRO_SRC_PATH> <OUTPUT_FILE>`
+Usage: `npx @underware_gg/pistols-sdk generate-constants --src:<CAIRO_SRC_PATH> --out:<OUTPUT_PATH>`
 
 * All `.cairo` files inside `<CAIRO_SRC_PATH>` will be parsed
 * Only `const` declared inside a `mod` will be extracted
