@@ -3,7 +3,7 @@ import { clamp } from 'three/src/math/MathUtils'
 import {
   WIDTH, HEIGHT,
   _textures,
-  _sceneName, _currentScene,
+  _currentScene,
   emitter,
   ASPECT,
   cameraData,
@@ -42,6 +42,13 @@ export class InteractibleScene extends THREE.Scene {
 
     this.renderer = renderer
     this.camera = camera
+
+    this.setSceneData(sceneName)
+  }
+
+  public setSceneData(sceneName: string) {
+    this.dispose()
+
     this.sceneData = sceneBackgrounds[sceneName]
 
     const bgDistance = -1

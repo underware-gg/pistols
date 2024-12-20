@@ -10,7 +10,8 @@ import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { _useConnector } from '@/lib/dojo/fix/starknet_react_core'
-import { SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { SceneName } from '@/pistols/data/assets'
 
 const Row = Grid.Row
 const Col = Grid.Column

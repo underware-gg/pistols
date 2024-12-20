@@ -19,6 +19,7 @@ import { SCENE_CHANGE_ANIMATION_DURATION } from '@/pistols/three/game'
 import ScDuels from '@/pistols/components/scenes/ScDuels'
 import ScDuelists from '@/pistols/components/scenes/ScDuelists'
 import ScGraveyard from '@/pistols/components/scenes/ScGraveyard'
+import ScTutorial from '@/pistols/components/scenes/ScTutorial'
 import StoreSync from '@/pistols/stores/StoreSync'
 
 // // enable wasm in build (this is for api routes and server issues)
@@ -63,7 +64,7 @@ function MainUI({
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
   const { selectedDuelId } = usePistolsContext()
-  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuels, atDuelists, atGraveyard } = usePistolsScene()
+  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuels, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
   const { isInitialized } = useDojoStatus()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
@@ -72,6 +73,7 @@ function MainUI({
     const timer = setTimeout(() => {
       if (atGate) setCurrentScene(<Gate />);
       else if (atDoor) setCurrentScene(<Door />);
+      else if (atTutorial) setCurrentScene(<TutorialUI />);
       else if (atDuel && selectedDuelId) setCurrentScene(<Duel duelId={selectedDuelId} />);
       else if (atProfile) setCurrentScene(<ScProfile />);
       else if (atDuels) setCurrentScene(<ScDuels />);
@@ -88,4 +90,31 @@ function MainUI({
   if (!isInitialized) return <DojoStatus message={'Loading Pistols...'} />
 
   return currentScene || <DojoStatus message={'Loading Pistols...'} />;
+}
+
+function TutorialUI({
+}) {
+  useRouterStarter()
+  useRouterListener()
+  const { gameImpl } = useThreeJsContext()
+  const { atTutorial, currentScene } = usePistolsScene()
+  const { isInitialized } = useDojoStatus()
+
+  const [currentTutorialScene, setCurrentTutorialScene] = useState<string>("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (atTutorial) {
+        setCurrentTutorialScene(currentScene);
+      }
+    }, SCENE_CHANGE_ANIMATION_DURATION);
+
+    return () => clearTimeout(timer);
+  }, [atTutorial, currentScene]);
+
+  if (!gameImpl) return <></>
+
+  if (!isInitialized) return <DojoStatus message={'Loading Pistols...'} />
+
+  return <ScTutorial currentTutorialScene={currentTutorialScene} />;
 }

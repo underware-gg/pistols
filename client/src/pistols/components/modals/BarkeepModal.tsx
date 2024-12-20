@@ -1,51 +1,36 @@
 import React, { useState, useEffect } from 'react'
-import { Image } from 'semantic-ui-react'
-import { SceneName, usePistolsScene } from '../../hooks/PistolsContext'
+import { usePistolsScene } from '../../hooks/PistolsContext'
+import { SceneName } from '@/pistols/data/assets'
 import { useControllerUsername } from '@/lib/dojo/hooks/useController'
 import { useElizaMessage } from '@/pistols/utils/eliza'
+import AnimatedText from '../ui/AnimatedText'
 
 export default function BarkeepModal({ open, setOpen }) {
   const { dispatchSetScene } = usePistolsScene()
-  const [currentDialog, setCurrentDialog] = useState('initial')
   const [displayText, setDisplayText] = useState('')
   const [isAnimating, setIsAnimating] = useState(false)
 
   const { username } = useControllerUsername()
-  const { sendMessage, responses } = useElizaMessage("Fortuna")
+  const { sendMessage, responses } = useElizaMessage(username)
 
   useEffect(() => {
     if (responses && responses.length > 0) {
-      animateText(responses[0]) // Animate the first response string
+      setDisplayText(responses[0])
     }
   }, [responses])
 
   useEffect(() => {
     if (open) {
-      animateText('Looking for trouble? Or just a drink?')
+      setDisplayText('Looking for trouble? Or just a drink?')
     }
   }, [open])
-
-  const animateText = async (text) => {
-    if (!text) return // Guard against undefined/null text
-    
-    setIsAnimating(true)
-    setDisplayText('')
-    
-    const characters = text.split('')
-    for (const char of characters) {
-      await new Promise(resolve => setTimeout(resolve, 30))
-      setDisplayText(prev => prev + char)
-    }
-    
-    setIsAnimating(false)
-  }
 
   if (!open) return null
 
   return (
     <div className='TempBarkeepOverlay NoMouse NoDrag'>
       <div className='TempBarkeepTalkBalloon Relative'>
-        {displayText}
+        <AnimatedText text={displayText} duration={30} />
       </div>
 
       <div className='DialogOptionsContainer'>
@@ -53,7 +38,6 @@ export default function BarkeepModal({ open, setOpen }) {
         <div className='DialogDivider' />
         <div className='DialogOptionsWrapper YesMouse'>
           {/* <div className='DialogOptionsTitle'>Choose what to do:</div> */}
-          
           <input
               type="text"
               className="DialogInput DialogInput"

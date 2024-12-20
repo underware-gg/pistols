@@ -1,34 +1,19 @@
 import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState, useRef } from 'react'
 import { useRouter } from 'next/router'
-import { BigNumberish, contractClassResponseToLegacyCompiledContract } from 'starknet'
+import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
 import { bigintToHex, bigintToNumber } from '@/lib/utils/types'
 import { useSettings } from './SettingsContext'
 import { TABLES } from '@/games/pistols/generated/constants'
 import { CommitMoveMessage } from '../utils/salt'
 import { poseidon } from '@/lib/utils/starknet'
+import { tutorialScenes } from '../data/tutorialConstants'
+import { SceneName } from '../data/assets'
 
 //
 // React + Typescript + Context
 // https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/context
 //
-
-//--------------------------------
-// Constants
-//
-
-export enum SceneName {
-  Gate = 'Gate',
-  Door = 'Door',
-  Profile = 'Profile',
-  Tavern = 'Tavern',
-  Duelists = 'Duelists',
-  Duels = 'Your Duels',
-  Graveyard = 'Graveyard',
-  Tournament = 'Tournament',
-  IRLTournament = 'IRL Tournament',
-  Duel = 'Duel',
-}
 
 //--------------------------------
 // State
@@ -276,6 +261,11 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   [SceneName.IRLTournament]: { baseUrl: '/tournament/', hasTableId: true, title: 'Pistols - IRL Tournament' },
   // '/' must be the last...
   [SceneName.Gate]: { baseUrl: '/' },
+  [SceneName.Tutorial]: { baseUrl: '/tutorial/entry', hasTableId: true, title: 'Pistols - Tutorial' },
+  [SceneName.TutorialScene2]: { baseUrl: '/tutorial/conflict', hasTableId: true, title: 'Pistols - Tutorial' },
+  [SceneName.TutorialScene3]: { baseUrl: '/tutorial/barkeep', hasTableId: true, title: 'Pistols - Tutorial' },
+  [SceneName.TutorialScene4]: { baseUrl: '/tutorial/demon', hasTableId: true, title: 'Pistols - Tutorial' },
+  [SceneName.TutorialScene5]: { baseUrl: '/tutorial/resurection', hasTableId: true, title: 'Pistols - Tutorial' },
 }
 
 export const usePistolsScene = () => {
@@ -320,6 +310,12 @@ export const usePistolsScene = () => {
     atGraveyard: (currentScene == SceneName.Graveyard),
     atDuel: (currentScene == SceneName.Duel),
     fromGate: (lastScene == SceneName.Gate),
+    atTutorial: tutorialScenes.includes(currentScene as typeof tutorialScenes[number]),
+    atTutorialScene1: (currentScene == SceneName.Tutorial),
+    atTutorialScene2: (currentScene == SceneName.TutorialScene2),
+    atTutorialScene3: (currentScene == SceneName.TutorialScene3),
+    atTutorialScene4: (currentScene == SceneName.TutorialScene4),
+    atTutorialScene5: (currentScene == SceneName.TutorialScene5),
     // PistolsActions,
     dispatchSetScene,
   }

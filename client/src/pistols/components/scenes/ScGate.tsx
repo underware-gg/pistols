@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
-import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { SceneName } from '@/pistols/data/assets'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import { TavernAudios } from '@/pistols/components/GameContainer'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'

@@ -7,8 +7,8 @@ import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useLordsBalance } from '@/lib/dojo/hooks/useLords'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
-import { SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
-import { useGameEvent } from '@/pistols/hooks/useGameEvent'
+import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { SceneName } from '@/pistols/data/assets'
 
 //-----------------
 // Generic Action button
