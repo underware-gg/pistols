@@ -53,7 +53,6 @@ export const useSdkPublishTypedData = (
           await sdk.client.publishMessage(
             JSON.stringify(typedData),
             signature as string[],
-            false
           );
           console.log('SIGNED_MESSAGE: published!')
         } catch (error) {

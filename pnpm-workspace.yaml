@@ -6,10 +6,10 @@ catalog:
   '@apollo/client': ^3.11.8
   '@cartridge/connector': 0.5.7
   '@cartridge/controller': 0.5.7
-  '@dojoengine/core': 1.0.2
-  '@dojoengine/sdk': 1.0.2
-  '@dojoengine/torii-client': 1.0.2
-  '@dojoengine/utils': 1.0.2
+  '@dojoengine/core': 1.0.4-alpha.3.1.2
+  '@dojoengine/sdk': 1.0.4-alpha.3.1.2
+  '@dojoengine/torii-client': 1.0.4-alpha.3.1.2
+  '@dojoengine/utils': 1.0.4-alpha.3.1.2
   '@starknet-react/chains': 3.0.2
   '@starknet-react/core': 3.0.3
   get-starknet-core: ^4.0.0
