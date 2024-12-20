@@ -8,6 +8,7 @@ import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
 import { DojoChainConfig } from 'src/dojo/setup/chains'
 import { useDeployedSystem } from 'src/dojo/hooks/useDojoSystem'
 import { createSystemCalls } from 'src/games/pistols/config/createSystemCalls'
+import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
@@ -47,6 +48,17 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     console.log(`DojoProvider:`, feltToString(await dojoProvider.provider.getChainId()), dojoProvider)
     return dojoProvider
   }, [mounted, selectedChainConfig, manifest], undefined, null)
+
+  //
+  // Contract calls
+  const {
+    value: contractCalls,
+    isError: contractCallsIsError,
+  } = useAsyncMemo(async () => {
+    if (!mounted) return undefined
+    if (!dojoProvider) return null
+    return await setupWorld(dojoProvider)
+  }, [mounted, dojoProvider], undefined, null)
 
   //
   // Torii setup
@@ -113,6 +125,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     // resolved
     dojoProvider,
     sdk,
+    contractCalls,
     systemCalls,
     // pass thru
     dojoAppConfig,

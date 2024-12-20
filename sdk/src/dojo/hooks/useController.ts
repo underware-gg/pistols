@@ -68,6 +68,7 @@ export const useConnectedController = () => {
   return {
     connectorId,
     controllerConnector,
+    isControllerConnected: (controllerConnector != null),
     username,
     name,
     openSettings,

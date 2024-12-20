@@ -64,3 +64,10 @@ export const useDojoSystemCalls = () => {
     ...systemCalls,
   }
 }
+
+export const useDojoContractCalls = () => {
+  const { setup: { contractCalls } } = useDojo()
+  return {
+    ...contractCalls,
+  }
+}
