@@ -95,6 +95,7 @@ if [[ "$PROFILE" == "dev" ]]; then
   cp -R $BINDINGS_PATH/typescript/* $SDK_GAME_PATH/generated/
   #
   # constant generator
+  # npm run create-constants --sdk=../sdk/src/games/pistols
   echo "------------------------------------------------------------------------------"
   echo ">>> Generate sources..."
   cd ../client

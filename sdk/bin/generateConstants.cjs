@@ -235,10 +235,10 @@ function buildFileContents(parsed) {
     fileContents += dictContents;
     
     // converters
-    // export const getArchetypeValue = (name: Archetype): number => (ArchetypeNameToValue[name as string]);
-    // export const getArchetypeFromValue = (value: number): Archetype => Object.keys(ArchetypeNameToValue).find(key => ArchetypeNameToValue[key] === value) as Archetype
-    fileContents += `export const get${enumName}Value = (name: ${enumName}): number => (${enumDictName}[name as string]);\n`
-    fileContents += `export const get${enumName}FromValue = (value: number): ${enumName} => Object.keys(${enumDictName}).find(key => ${enumDictName}[key] === value) as ${enumName};\n`
+    // export const getArchetypeValue = (name: Archetype): number => (ArchetypeNameToValue[name]);
+    // export const getArchetypeFromValue = (value: number): Archetype => Object.keys(ArchetypeNameToValue).find(key => ArchetypeNameToValue[key as Archetype] === value) as Archetype;
+    fileContents += `export const get${enumName}Value = (name: ${enumName}): number => (${enumDictName}[name]);\n`
+    fileContents += `export const get${enumName}FromValue = (value: number): ${enumName} => Object.keys(${enumDictName}).find(key => ${enumDictName}[key as ${enumName}] === value) as ${enumName};\n`
 
 
     // exports
