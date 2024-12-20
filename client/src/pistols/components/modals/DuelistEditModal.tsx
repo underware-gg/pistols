@@ -3,15 +3,14 @@ import { Modal, Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
-import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useDojoSystemCalls, useLordsFaucet } from '@underware_gg/pistols-sdk/dojo'
 import { useDuelistsOfPlayer, useNextRandomProfilePic } from '@/pistols/hooks/useDuelistToken'
 import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useCalcFeeDuelist } from '@/pistols/hooks/useContractCalls'
-import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsMock'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { ProfileBadge } from '@/pistols/components/account/ProfileDescription'
 import { FormInput } from '@/pistols/components/ui/Form'
-import { ProfilePicType } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { PROFILE_PIC_COUNT } from '@/pistols/utils/constants'
 import { ActionButton, BalanceRequiredButton } from '@/pistols/components/ui/Buttons'
 import { FeesToPay } from '@/pistols/components/account/LordsBalance'
@@ -89,13 +88,13 @@ export default function DuelistEditModal({
   const _mint = () => {
     if (canSubmit && mintNew) {
       setDuelistCountBeforeMint(duelistIds.length ?? 0)
-      create_duelist(account, address, inputName, ProfilePicType.Duelist, _profilePic.toString())
+      create_duelist(account, address, inputName, constants.ProfilePicType.Duelist, _profilePic.toString())
     }
   }
 
   const _update = () => {
     if (canSubmit && !mintNew) {
-      update_duelist(account, editingDuelistId, inputName, ProfilePicType.Duelist, _profilePic.toString())
+      update_duelist(account, editingDuelistId, inputName, constants.ProfilePicType.Duelist, _profilePic.toString())
     }
   }
 

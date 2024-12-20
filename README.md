@@ -129,6 +129,7 @@ starkliup
 curl -fsSL https://get.pnpm.io/install.sh | sh -
 
 # other stuff you will need
+pnpm install -g turbo
 brew install jq
 brew install protobuf
 cargo install toml-cli
@@ -141,12 +142,12 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 
 > [Dojo Book](https://book.dojoengine.org/getting-started)
 
-Currenty using Dojo version `v1.0.5`
+Currenty using Dojo version `v1.0.8`
 
 ```sh
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
-dojoup -v v1.0.5
+dojoup -v v1.0.8
 
 # test dojo
 cd dojo
@@ -249,11 +250,13 @@ Start the client
 ```sh
 # http server
 # http://localhost:3000
-pnpm run dev
+cd pistols
+turbo dev
 
 # https server (required for Catridge Controller)
 # https://localhost:3000
-pnpm run devs
+cd pistols
+turbo devs
 ```
 
 Open [http://localhost:3000](http://localhost:3000) or [https://localhost:3000](https://localhost:3000)

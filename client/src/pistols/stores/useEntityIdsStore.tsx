@@ -1,6 +1,6 @@
 import { create } from 'zustand'
-import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
-import { BigNumberish } from 'starknet';
+import { BigNumberish } from 'starknet'
+import { PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
 
 
 //

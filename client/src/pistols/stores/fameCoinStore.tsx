@@ -2,10 +2,9 @@ import { useMemo, useEffect } from 'react'
 import { create } from 'zustand'
 import { addAddressPadding, BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useDojoSetup } from '@/lib/dojo/DojoContext'
+import { useDojoSetup, useToriiBalancesByContractQL } from '@underware_gg/pistols-sdk/dojo'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
-import { useToriiBalancesByContractQL } from '@/lib/dojo/hooks/useToriiTokensQL'
-import { bigintToHex } from '@/lib/utils/types'
+import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { useFameContract } from '@/pistols/hooks/useFame'
 
 

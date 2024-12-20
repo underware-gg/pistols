@@ -2,13 +2,13 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Divider, Grid, Modal } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useDojoSetup, useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useDojoSetup, useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { CommitMoveMessage, signAndGenerateMovesHash } from '@/pistols/utils/salt'
-import { BLADES_POINTS, getBladesCardFromValue, getTacticsCardFromValue, TACTICS_POINTS } from '@/games/pistols/generated/constants'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { Card, CardHandle } from '../cards/Cards'
 import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '../../data/assets'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import useGameAspect from '../../hooks/useGameApect'
 import { emitter } from '../../three/game'
 
@@ -72,11 +72,11 @@ export default function CommitPacesModal({
   const modalHeight = useMemo(() => 90 / aspect, [aspect])
 
   const points = useMemo(() => {
-    const tacticsName = getTacticsCardFromValue(tactics);
-    const tacticsPoints = _points_list(TACTICS_POINTS[tacticsName]);
+    const tacticsName = constants.getTacticsCardFromValue(tactics);
+    const tacticsPoints = _points_list(constants.TACTICS_POINTS[tacticsName]);
 
-    const bladesName = getBladesCardFromValue(blades);
-    const bladesPoints = _points_list(BLADES_POINTS[bladesName]);
+    const bladesName = constants.getBladesCardFromValue(blades);
+    const bladesPoints = _points_list(constants.BLADES_POINTS[bladesName]);
 
     const combinedPoints = {
       self_chances: tacticsPoints.self_chances + bladesPoints.self_chances,

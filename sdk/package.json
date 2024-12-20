@@ -1,6 +1,6 @@
 {
   "name": "@underware_gg/pistols-sdk",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "description": "Pistols at 10 Blocks SDK",
   "homepage": "https://underware.gg",
   "author": "Underware",
@@ -13,16 +13,44 @@
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./abis": {
+      "import": "./dist/abis.js",
+      "types": "./dist/abis.d.ts"
+    },
+    "./dojo": {
+      "import": "./dist/dojo.js",
+      "types": "./dist/dojo.d.ts"
+    },
+    "./fix": {
+      "import": "./dist/fix.js",
+      "types": "./dist/fix.d.ts"
+    },
+    "./pistols": {
+      "import": "./dist/games_pistols.js",
+      "types": "./dist/games_pistols.d.ts"
+    },
+    "./hooks": {
+      "import": "./dist/hooks.js",
+      "types": "./dist/hooks.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils.js",
+      "types": "./dist/utils.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && cp -R bin dist/",
     "dev": "tsup --watch",
+    "devs": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest"
+  },
+  "bin": {
+    "create-constants": "dist/bin/generateConstants.cjs"
   },
   "keywords": [
     "pistols at 10 blocks",
@@ -39,7 +67,30 @@
   "bugs": {
     "url": "https://github.com/underware_gg/pistols/issues"
   },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "event-emitter": "^0.3.5",
+    "swr": "^2.2.4"
+  },
+  "peerDependencies": {
+    "@apollo/client": "catalog:",
+    "@cartridge/connector": "catalog:",
+    "@cartridge/controller": "catalog:",
+    "@dojoengine/core": "catalog:",
+    "@dojoengine/sdk": "catalog:",
+    "@dojoengine/utils": "catalog:",
+    "@starknet-react/chains": "catalog:",
+    "@starknet-react/core": "catalog:",
+    "get-starknet-core": "catalog:",
+    "immer": "catalog:",
+    "react": "catalog:",
+    "starknet": "catalog:",
+    "starknetid.js": "catalog:",
+    "zustand": "catalog:"
+  },
   "devDependencies": {
+    "@types/event-emitter": "^0.3.5",
+    "@types/react": "^18.2.30",
     "tsup": "^8.3.5",
     "typescript": "catalog:",
     "vitest": "^2.1.8"

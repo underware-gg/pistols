@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { clamp } from 'three/src/math/MathUtils'
+import { clamp } from '@underware_gg/pistols-sdk/utils'
 import {
   WIDTH, HEIGHT,
   _textures,

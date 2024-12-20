@@ -4,18 +4,18 @@ import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon
 import { ActionEmojis, ActionNames } from '@/pistols/utils/pistols'
 import { EmojiIcon, _downSize } from '@/lib/ui/Icons'
 import { EMOJI } from '@/pistols/data/messages'
-import { BladesCard, getPacesCardValue, PacesCard } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 export function PacesIcon({
   paces,
   dodge = false,
   size = 'large',
 }: {
-  paces: PacesCard
+  paces: constants.PacesCard
   dodge?: boolean
   size?: IconSizeProp
 }) {
-  let pacesCount = getPacesCardValue(paces)
+  let pacesCount = constants.getPacesCardValue(paces)
   if (pacesCount < 1 || pacesCount > 10) {
     return <Icon name='question circle' size={size} />
   }
@@ -33,7 +33,7 @@ export function BladesIcon({
   blade,
   size = 'large',
 }: {
-  blade: BladesCard
+  blade: constants.BladesCard
   size?: IconSizeProp
 }) {
   if (!ActionNames[blade]) {

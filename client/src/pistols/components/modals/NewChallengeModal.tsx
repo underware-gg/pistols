@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal, Form, Dropdown } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelist } from '@/pistols/stores/duelistStore'
@@ -15,7 +15,7 @@ import { FormInput } from '@/pistols/components/ui/Form'
 import { FameBalanceDuelist, FeesToPay } from '@/pistols/components/account/LordsBalance'
 import { PremisePrefix } from '@/pistols/utils/pistols'
 import { Divider } from '@/lib/ui/Divider'
-import { Premise } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -156,7 +156,7 @@ function NewChallengeForm({
   setArgs,
 }) {
   const { tableId } = useSettings()
-  const [premise, setPremise] = useState(Premise.Honour)
+  const [premise, setPremise] = useState(constants.Premise.Honour)
   const [quote, setQuote] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
@@ -173,7 +173,7 @@ function NewChallengeForm({
     } : null)
   }, [premise, quote, days, hours])
 
-  const premiseOptions: any[] = useMemo(() => Object.keys(Premise).slice(1).map((premise, index) => ({
+  const premiseOptions: any[] = useMemo(() => Object.keys(constants.Premise).slice(1).map((premise, index) => ({
     key: `${premise}`,
     value: `${premise}`,
     text: `${premise}`,
@@ -204,7 +204,7 @@ function NewChallengeForm({
             fluid
             value={premise}
             onChange={(e, { value }) => {
-              setPremise(value as Premise)
+              setPremise(value as constants.Premise)
             }}
           />
         </Form.Field>

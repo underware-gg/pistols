@@ -2,9 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useRouterStarter, useRouterListener } from '@/pistols/hooks/useRouterListener'
 import { usePistolsContext, usePistolsScene, usePistolsSceneRoute } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useDojoStatus } from '@/lib/dojo/DojoContext'
-import { usePlayerId } from '@/lib/dojo/hooks/usePlayerId'
-import { DojoStatus } from '@/lib/dojo/DojoStatus'
+import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
+import { usePlayerId } from '@underware_gg/pistols-sdk/hooks'
 import { MouseToolTip } from '@/pistols/components/ui/MouseToolTip'
 import { Header } from '@/pistols/components/Header'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '@/pistols/three/game'
@@ -16,6 +15,7 @@ import DuelistModal from '@/pistols/components/modals/DuelistModal'
 import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
 import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
 import WalletFinderModal from '@/pistols/components/modals/WalletFinderModal'
+import ActivityPanel from '@/pistols/components/ActivityPanel'
 import ScProfile from '@/pistols/components/scenes/ScProfile'
 import ScTavern from '@/pistols/components/scenes/ScTavern'
 import ScDuels from '@/pistols/components/scenes/ScDuels'
@@ -25,11 +25,10 @@ import StoreSync from '@/pistols/stores/sync/StoreSync'
 import Gate from '@/pistols/components/scenes/ScGate'
 import Door from '@/pistols/components/scenes/ScDoor'
 import Duel from '@/pistols/components/scenes/Duel'
-import ActivityPanel from '@/pistols/components/ActivityPanel'
 
 // test sdk
-// import { helloPistols } from '@underware_gg/pistols-sdk'
-// helloPistols();
+import { helloPistols } from '@underware_gg/pistols-sdk'
+helloPistols();
 
 // // enable wasm in build (this is for api routes and server issues)
 // export const config = {

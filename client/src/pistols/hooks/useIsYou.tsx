@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
-import { bigintEquals, isPositiveBigint } from '@/lib/utils/types'
+import { bigintEquals, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 
 export const useIsMyAccount = (otherAddress: BigNumberish) => {
   const { address } = useAccount()

@@ -1,6 +1,6 @@
 {
   "name": "pistols",
-  "version": "0.12.3",
+  "version": "0.12.4",
   "description": "Pistols at 10 Blocks JS client",
   "homepage": "https://underware.gg",
   "author": "Underware",
@@ -8,14 +8,14 @@
   "private": false,
   "type": "module",
   "scripts": {
-    "dev": "NODE_OPTIONS='--experimental-wasm-modules' next dev",
-    "devs": "NODE_OPTIONS='--experimental-wasm-modules' next dev --experimental-https",
+    "dev": "next dev",
+    "devs": "next dev --experimental-https",
     "start": "next start",
-    "build": "npx tsc -p tsconfig.json && NODE_OPTIONS='--experimental-wasm-modules' next build",
+    "check-types": "npx tsc --noEmit",
+    "build": "npx tsc -p tsconfig.json && next build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "print-profile": "echo usage: npm run print-profile --profile=dev && echo \"profile:[$npm_config_profile]\"",
-    "create-components": "GAME_PATH=\"./src/games/$npm_config_game\" && echo create-components:[$GAME_PATH] && npx @dojoengine/core $GAME_PATH/manifests/manifest_$npm_config_profile.json $GAME_PATH/generated/contractComponents.ts",
-    "create-constants": "GAME_PATH=\"./src/games/$npm_config_game\" && echo create-constants:[$GAME_PATH] && ./src/lib/bin/generateConstants.cjs ../dojo/src $GAME_PATH/generated/constants.ts"
+    "create-constants": "npx @underware_gg/pistols-sdk generate-constants --src:\"../dojo/src\" --out:\"$npm_config_sdk/generated/constants.ts\""
   },
   "keywords": [
     "pistols at 10 blocks",
@@ -32,20 +32,20 @@
     "url": "https://github.com/underware_gg/pistols/issues"
   },
   "dependencies": {
-    "@apollo/client": "^3.11.8",
-    "@cartridge/connector": "0.5.6",
-    "@cartridge/controller": "0.5.6",
+    "@apollo/client": "catalog:",
+    "@cartridge/connector": "catalog:",
+    "@cartridge/controller": "catalog:",
     "@dojoengine/core": "catalog:",
     "@dojoengine/sdk": "catalog:",
     "@dojoengine/torii-client": "catalog:",
     "@dojoengine/utils": "catalog:",
-    "@starknet-react/chains": "3.0.2",
-    "@starknet-react/core": "3.0.3",
+    "@starknet-react/chains": "catalog:",
+    "@starknet-react/core": "catalog:",
     "@tweenjs/tween.js": "^21.0.0",
     "@underware_gg/pistols-sdk": "workspace:*",
     "event-emitter": "^0.3.5",
-    "get-starknet-core": "^4.0.0",
-    "immer": "^10.1.1",
+    "get-starknet-core": "catalog:",
+    "immer": "catalog:",
     "lil-gui": "^0.19.2",
     "next": "^13.5.6",
     "react": "catalog:",
@@ -55,13 +55,12 @@
     "sass": "^1.69.5",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^3.0.0-beta.2",
-    "starknet": "6.11.0",
-    "starknetid.js": "^4.0.0",
-    "swr": "^2.2.4",
+    "starknet": "catalog:",
+    "starknetid.js": "catalog:",
     "three": "^0.157.0",
     "type-fest": "^2.14.0",
     "use-local-storage-state": "^19.1.0",
-    "zustand": "^4.5.5"
+    "zustand": "catalog:"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.2.20",

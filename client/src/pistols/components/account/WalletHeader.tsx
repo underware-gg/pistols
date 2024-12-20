@@ -1,15 +1,12 @@
 import React, { useMemo } from 'react'
 import { Grid, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
-import { useLordsContract } from '@/lib/dojo/hooks/useLords'
-import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useConnectedController } from '@/lib/dojo/hooks/useController'
-import { getConnectorIcon } from '@/lib/dojo/setup/connectors'
+import { useLordsContract, useSelectedChain, useConnectedController, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
 import { FameBalance, LordsBalance } from '@/pistols/components/account/LordsBalance'
 import { LordsFaucet } from '@/pistols/components/account/LordsFaucet'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
-import { _useConnector } from '@/lib/dojo/fix/starknet_react_core'
+import { _useConnector } from '@underware_gg/pistols-sdk/fix'
 import { SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 
 const Row = Grid.Row

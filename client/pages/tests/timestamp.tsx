@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
-import { formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@/lib/utils/timestamp'
-import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
+import { useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
+import { formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@underware_gg/pistols-sdk/utils'
 import AppPistols from '@/pistols/components/AppPistols'
 
 const Row = Table.Row

@@ -2,11 +2,10 @@ import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEf
 import { useRouter } from 'next/router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
-import { bigintToHex, bigintToNumber } from '@/lib/utils/types'
+import { bigintToHex, bigintToNumber, poseidon } from '@underware_gg/pistols-sdk/utils'
 import { useSettings } from './SettingsContext'
-import { TABLES } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { CommitMoveMessage } from '../utils/salt'
-import { poseidon } from '@/lib/utils/starknet'
 
 //
 // React + Typescript + Context
@@ -300,7 +299,7 @@ export const usePistolsScene = () => {
     let url = route.baseUrl
     let slug = ''
     if (sceneRoutes[newScene].hasTableId) {
-      slug = `${slugs?.[0] || tableId || TABLES.LORDS}`
+      slug = `${slugs?.[0] || tableId || constants.TABLES.LORDS}`
       dispatchTableId(slug)
     } else if (sceneRoutes[newScene].hasDuelId) {
       slug = `${bigintToNumber(slugs?.[0] || selectedDuelId)}`
@@ -360,7 +359,7 @@ export const usePistolsSceneRoute = () => {
         const route = sceneRoutes[newScene]
         __dispatchSetScene(newScene)
         if (route.hasTableId) {
-          dispatchTableId(routeSlugs[0] || TABLES.LORDS)
+          dispatchTableId(routeSlugs[0] || constants.TABLES.LORDS)
         } else if (route.hasDuelId) {
           dispatchSelectDuel(routeSlugs[0] || '0x0')
         }

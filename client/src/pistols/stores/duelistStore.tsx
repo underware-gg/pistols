@@ -1,12 +1,10 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { createDojoStore } from '@/lib/dojo/fix/zustand'
-import { useEntityModel } from '@/lib/dojo/hooks/useSdkEntities'
-import { PistolsSchemaType, models } from '@/lib/dojo/hooks/useSdkTypes'
-import { useEntityId } from '@/lib/utils/hooks/useEntityId'
-import { isPositiveBigint } from '@/lib/utils/types'
-import { CONST } from '@/games/pistols/generated/constants'
-import { feltToString } from '@/lib/utils/starknet'
+import { createDojoStore } from '@dojoengine/sdk'
+import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
+import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
+import { useEntityId } from '@underware_gg/pistols-sdk/hooks'
+import { isPositiveBigint, feltToString } from '@underware_gg/pistols-sdk/utils'
 import { useScore } from '../hooks/useScore'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
@@ -35,7 +33,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const duelist = useEntityModel<models.Duelist>(entity, 'Duelist')
   // console.log(`useDuelist() =>`, duelist_id, duelist)
 
-  const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(CONST.MAX_DUELIST_ID)), [duelist_id])
+  const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(constants.CONST.MAX_DUELIST_ID)), [duelist_id])
 
   const duelistId = useMemo(() => BigInt(duelist_id), [duelist_id])
   const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])

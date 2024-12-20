@@ -4,12 +4,12 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
-import { useLordsBalance } from '@/lib/dojo/hooks/useLords'
+import { useLordsBalance } from '@underware_gg/pistols-sdk/dojo'
 import { LordsBagIcon } from '@/pistols/components/account/Balance'
 import { CustomIcon, IconSizeProp } from '@/lib/ui/Icons'
 import { SceneName, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
-import { isPositiveBigint } from '@/lib/utils/types'
+import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 
 //-----------------
 // Generic Action button

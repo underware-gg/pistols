@@ -3,17 +3,14 @@ import { EthSigner, Signature } from 'starknet'
 import { Container, Table, Button, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-import { useDojoSetup, useDojoStatus } from '@/lib/dojo/DojoContext'
-import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useTypedMessage } from '@/lib/utils/hooks/useTypedMessage'
-import { useAsyncMemo } from '@/lib/utils/hooks/useAsyncMemo'
-import { feltToString } from '@/lib/utils/starknet'
-import { DojoStatus } from '@/lib/dojo/DojoStatus'
-import { ChainSwitcher } from '@/lib/dojo/ChainSwitcher'
-import { Messages, Revision, splitSignature } from '@/lib/utils/starknet_sign'
-import { bigintToHex, shortAddress } from '@/lib/utils/types'
-import { getConnectorIcon } from '@/lib/dojo/setup/connectors'
-import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
+import { useTypedMessage, useAsyncMemo } from '@underware_gg/pistols-sdk/hooks'
+import { Messages, Revision, splitSignature,feltToString, bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
+import {
+  useDojoSetup, useDojoStatus, useSelectedChain,
+  DojoStatus, getConnectorIcon,
+} from '@underware_gg/pistols-sdk/dojo'
+import { ChainSwitcher } from '@/lib/ui/starknet/ChainSwitcher'
+import StarknetConnectModal from '@/lib/ui/starknet/StarknetConnectModal'
 import App from '@/lib/ui/App'
 
 //@ts-ignore

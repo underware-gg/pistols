@@ -1,7 +1,7 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import * as TWEEN from '@tweenjs/tween.js'
-import { Rarity } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { CardData, FireCardsTextures } from '../../data/assets'
 import * as Constants from '../../data/cardConstants'
 
@@ -390,7 +390,7 @@ export const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: Re
             ) : (
               <div className="card-details">
                 <div className="card-title">{cardData.title}</div>
-                <div className="card-rarity">{cardData.rarity == Rarity.None ? '   ' : cardData.rarity}</div>
+                <div className="card-rarity">{cardData.rarity == constants.Rarity.None ? '   ' : cardData.rarity}</div>
                 <div className="card-description" dangerouslySetInnerHTML={{ __html: cardData.description }} />
               </div>
             )}

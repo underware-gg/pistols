@@ -2,12 +2,11 @@ import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { useAccount } from '@starknet-react/core'
-import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
+import { PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
 import { DuelistColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
-import { feltToString } from '@/lib/utils/starknet'
+import { feltToString, bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
 import { usePlayer } from './playerStore'
-import { bigintEquals } from '@/lib/utils/types'
 
 
 //-----------------------------------------

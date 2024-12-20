@@ -1,9 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { lookupAddresses } from '@cartridge/controller'
 import { usePlayerStore } from '@/pistols/stores/playerStore'
-import { useSelectedChain } from '@/lib/dojo/hooks/useChain'
-import { useConnectedController } from '@/lib/dojo/hooks/useController'
-import { supportedConnetorIds } from '@/lib/dojo/setup/connectors'
+import { useSelectedChain, useConnectedController, supportedConnetorIds } from '@underware_gg/pistols-sdk/dojo'
 
 
 //------------------------------------------------------

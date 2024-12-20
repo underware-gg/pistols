@@ -1,5 +1,5 @@
 import { Account, AccountInterface } from 'starknet'
-import { useLordsFaucet } from '@/lib/dojo/hooks/useLordsMock'
+import { useLordsFaucet } from '@underware_gg/pistols-sdk/dojo'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 
 export const LordsFaucet = ({

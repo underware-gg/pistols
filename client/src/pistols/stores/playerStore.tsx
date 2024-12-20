@@ -5,9 +5,8 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDuelTokenContract } from '@/pistols/hooks/useTokenContract'
 import { useDuelistTokenContract } from '@/pistols/hooks/useTokenContract'
-import { PistolsEntity } from '@/lib/dojo/hooks/useSdkTypes'
-import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@/lib/utils/types'
-import { TutorialProgress } from '@/games/pistols/generated/constants'
+import { constants, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
+import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@underware_gg/pistols-sdk/utils'
 
 interface PlayerState {
   address: string
@@ -16,7 +15,7 @@ interface PlayerState {
   name: string
   isNew: boolean
   // off-chain messages
-  tutorial_progress: TutorialProgress
+  tutorial_progress: constants.TutorialProgress
   bookmarked_players: string[]
   bookmarked_tokens: {
     [address: string]: bigint[]
@@ -47,7 +46,7 @@ const createStore = () => {
       name: shortAddress(event.address),
       isNew: true,
       // off-chain messages
-      tutorial_progress: TutorialProgress.None,
+      tutorial_progress: constants.TutorialProgress.None,
       bookmarked_players: [],
       bookmarked_tokens: {},
     } : undefined
@@ -92,7 +91,7 @@ const createStore = () => {
           if (progress) {
             const address = bigintToHex(progress.identity)
             if (state.players[address]) {
-              state.players[address].tutorial_progress = progress.progress as unknown as TutorialProgress
+              state.players[address].tutorial_progress = progress.progress as unknown as constants.TutorialProgress
             }
           }
           const bookmark = e.models.pistols.PPlayerBookmark
@@ -161,8 +160,8 @@ export const usePlayer = (address: BigNumberish) => {
   const timestampRegistered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
   const bookmarkedPlayers = useMemo(() => (player?.bookmarked_players ?? []), [player])
   const bookmarkedTokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
-  const tutorialProgress = useMemo(() => (player?.tutorial_progress ?? TutorialProgress.None), [player])
-  const hasCompletedTutorial = useMemo(() => (tutorialProgress === TutorialProgress.FinishedFirstDuel), [tutorialProgress])
+  const tutorialProgress = useMemo(() => (player?.tutorial_progress ?? constants.TutorialProgress.None), [player])
+  const hasCompletedTutorial = useMemo(() => (tutorialProgress === constants.TutorialProgress.FinishedFirstDuel), [tutorialProgress])
   const isAvailable = useMemo(() => (hasCompletedTutorial), [hasCompletedTutorial])
 
   const { duelContractAddress } = useDuelTokenContract()

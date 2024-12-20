@@ -1,13 +1,13 @@
 import { useMemo } from 'react'
 import { Account, BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useSdkPublishTypedData } from '@/lib/dojo/hooks/useSdkSignedMessage'
-import { TutorialProgress } from '@/games/pistols/generated/constants'
+import { useSdkPublishTypedData } from '@underware_gg/pistols-sdk/dojo'
 import {
+  constants,
   make_typed_data_PPlayerBookmark,
   make_typed_data_PPlayerOnline,
   make_typed_data_PPlayerTutorialProgress,
-} from '@/games/pistols/signed_messages'
+} from '@underware_gg/pistols-sdk/pistols'
 
 
 export function usePlayerOnlineSignedMessage(timestamp: number) {
@@ -25,7 +25,7 @@ export function usePlayerOnlineSignedMessage(timestamp: number) {
   }
 }
 
-export function useTutorialProgressSignedMessage(progress: TutorialProgress) {
+export function useTutorialProgressSignedMessage(progress: constants.TutorialProgress) {
   const { account } = useAccount()
   const typedData = useMemo(() => (
     make_typed_data_PPlayerTutorialProgress({

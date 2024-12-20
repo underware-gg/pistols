@@ -14,21 +14,32 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
-    "composite": true,
     "noImplicitThis": true,
     "skipLibCheck": true,
     "strict": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false, // allows return null|undefined for any type
     // "listEmittedFiles": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    // allow absolute paths: import {} from 'src/*'
+    "baseUrl": "./",
+    "paths": {
+      "src/*": [
+        "./src/*"
+      ],
+    }
   },
   "include": [
-    "./src"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.json"
   ],
   "exclude": [
     "**/*.test.ts",
-    "**/test/*.ts"
+    "**/test/*.ts",
+    "node_modules",
+    "dist"
   ]
 }

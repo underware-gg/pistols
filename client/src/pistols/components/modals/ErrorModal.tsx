@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Modal } from 'semantic-ui-react'
-import { useGameEvent } from '@/pistols/hooks/useGameEvent'
+import { useDojoEmitterEvent } from '@underware_gg/pistols-sdk/dojo'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 
 export default function ErrorModal() {
   const [isOpen, setIsOpen] = useState(null)
 
-  const { value: eventData, timestamp } = useGameEvent('transaction_error', null)
+  const { value: eventData, timestamp } = useDojoEmitterEvent('transaction_error', null)
   useEffect(() => {
     if (eventData) {
       setIsOpen(true)

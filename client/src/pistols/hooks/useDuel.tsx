@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { useThreeJsContext } from "./ThreeJsContext"
 import { useGameplayContext } from "@/pistols/hooks/GameplayContext"
 import { useChallenge, useRound } from '@/pistols/stores/challengeStore'
-import { CONST, getPacesCardFromValue, getRoundStateValue } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { AnimationState } from "@/pistols/three/game"
 import { Action } from "@/pistols/utils/pistols"
 
@@ -24,7 +24,7 @@ export const useDuel = (duelId: BigNumberish) => {
 
   //
   // The actual stage of this duel
-  const duelStage = useMemo(() => (round1 ? getRoundStateValue(round1.state) : DuelStage.Null), [round1])
+  const duelStage = useMemo(() => (round1 ? constants.getRoundStateValue(round1.state) : DuelStage.Null), [round1])
 
   //
   // Actions completed by Duelist A
@@ -79,8 +79,8 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
 
   const { healthA, healthB } = useMemo(() => {
     return {
-      healthA: ((currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? CONST.FULL_HEALTH : round1?.state_a?.health) ?? null,
-      healthB: ((currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? CONST.FULL_HEALTH : round1?.state_b?.health) ?? null,
+      healthA: ((currentStage <= DuelStage.Round1Animation && !animatedHealthA) ? constants.CONST.FULL_HEALTH : round1?.state_a?.health) ?? null,
+      healthB: ((currentStage <= DuelStage.Round1Animation && !animatedHealthB) ? constants.CONST.FULL_HEALTH : round1?.state_b?.health) ?? null,
     }
   }, [currentStage, round1, animatedHealthA, animatedHealthB])
 
@@ -97,8 +97,8 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
   useEffect(() => {
     if (enabled && gameImpl && isAnimatingRound1 && audioLoaded && round1) {
       console.log(`TRIGGER animateDuel(1)`)
-      const actionA = getPacesCardFromValue(round1.moves_a.card_1) as unknown as Action
-      const actionB = getPacesCardFromValue(round1.moves_b.card_1) as unknown as Action
+      const actionA = constants.getPacesCardFromValue(round1.moves_a.card_1) as unknown as Action
+      const actionB = constants.getPacesCardFromValue(round1.moves_b.card_1) as unknown as Action
       gameImpl.animateDuel(AnimationState.Round1, actionA, actionB, round1.state_a.health, round1.state_b.health, round1.state_a.damage, round1.state_b.damage)
     }
   }, [enabled, gameImpl, isAnimatingRound1, audioLoaded, round1])

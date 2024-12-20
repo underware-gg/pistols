@@ -5,11 +5,9 @@ import '/styles/cards.scss'
 import React, { useMemo } from 'react'
 import { SettingsProvider } from '@/pistols/hooks/SettingsContext'
 import { PistolsProvider } from '@/pistols/hooks/PistolsContext'
-// import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
-// import StarknetConnectModal from '@/lib/dojo/StarknetConnectModal'
-import { makeDojoAppConfig } from '@/games/pistols/config'
+import { makeDojoAppConfig } from '@underware_gg/pistols-sdk/pistols'
+import { Dojo } from '@underware_gg/pistols-sdk/dojo'
 import ErrorModal from '@/pistols/components/modals/ErrorModal'
-import Dojo from '@/lib/dojo/Dojo'
 
 function _app({ Component, pageProps }) {
   const dojoAppConfig = useMemo(() => makeDojoAppConfig(), [])
@@ -18,20 +16,10 @@ function _app({ Component, pageProps }) {
       <PistolsProvider>
         <Dojo dojoAppConfig={dojoAppConfig}>
           <Component {...pageProps} />
-          <Modals />
+          <ErrorModal />
         </Dojo>
       </PistolsProvider>
     </SettingsProvider>
-  )
-}
-
-function Modals() {
-  // const { connectOpener } = usePistolsContext()
-  return (
-    <>
-      <ErrorModal />
-      {/* <StarknetConnectModal opener={connectOpener} /> */}
-    </>
   )
 }
 

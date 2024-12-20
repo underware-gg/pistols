@@ -5,6 +5,8 @@
     "**/target": true,
     "**/.github": true,
     "**/.next": true,
+    "**/.turbo": true,
+    "**/.vercel": true,
     "**/_bak": true,
     "**/*.tsbuildinfo": true,
     "**/next-env.d.ts": true,

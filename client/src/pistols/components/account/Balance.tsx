@@ -1,7 +1,7 @@
 import { ReactNode, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { CustomIcon, EmojiIcon, IconSizeProp } from '@/lib/ui/Icons'
-import { weiToEthString } from '@/lib/utils/starknet'
+import { weiToEthString } from '@underware_gg/pistols-sdk/utils'
 import { EMOJI } from '@/pistols/data/messages'
 
 type CoinIconProps = {

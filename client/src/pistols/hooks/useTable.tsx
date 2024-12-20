@@ -1,10 +1,9 @@
 import { useEffect, useMemo } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
-import { PistolsGetQuery, useSdkState, getEntityMapModels } from '@/lib/dojo/hooks/useSdkState'
+import { useSdkState, getEntityMapModels } from '@underware_gg/pistols-sdk/dojo'
 import { LiveChallengeStates, PastChallengeStates } from '@/pistols/utils/pistols'
-import { ChallengeState } from '@/games/pistols/generated/constants'
-import { stringToFelt } from '@/lib/utils/starknet'
-import * as models from '@/games/pistols/generated/typescript/models.gen'
+import { constants, models, PistolsGetQuery } from '@underware_gg/pistols-sdk/pistols'
+import { stringToFelt } from '@underware_gg/pistols-sdk/utils'
 
 
 //--------------------------------
@@ -34,12 +33,12 @@ export const useTableTotals = (tableId: string) => {
   const { challenges } = useGetChallengesByTableQuery(tableId)
   const result = useMemo(() => {
     const liveDuelsCount = challenges.reduce((acc: number, ch: models.Challenge) => {
-      const state = (ch.state as unknown as ChallengeState) ?? ChallengeState.Null
+      const state = (ch.state as unknown as constants.ChallengeState) ?? constants.ChallengeState.Null
       if (LiveChallengeStates.includes(state)) acc++
       return acc
     }, 0)
     const pastDuelsCount = challenges.reduce((acc: number, ch: models.Challenge) => {
-      const state = (ch.state as unknown as ChallengeState) ?? ChallengeState.Null
+      const state = (ch.state as unknown as constants.ChallengeState) ?? constants.ChallengeState.Null
       if (PastChallengeStates.includes(state)) acc++
       return acc
     }, 0)

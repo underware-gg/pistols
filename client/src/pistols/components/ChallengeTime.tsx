@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useChallenge } from '@/pistols/stores/challengeStore'
-import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { formatTimestampLocal, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@/lib/utils/timestamp'
+import { useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
+import { formatTimestampLocal, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@underware_gg/pistols-sdk/utils'
 import { EMOJI } from '@/pistols/data/messages'
 
 export function ChallengeTime({

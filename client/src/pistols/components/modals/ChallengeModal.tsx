@@ -3,7 +3,7 @@ import { Grid, Modal } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
-import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { useChallengeDescription } from '@/pistols/hooks/useChallengeDescription'
 import { useChallenge } from '@/pistols/stores/challengeStore'
 import { useDuelist } from '@/pistols/stores/duelistStore'
@@ -19,8 +19,8 @@ import { DuelIconsAsGrid } from '@/pistols/components/DuelIcons'
 import { ChallengeTime } from '@/pistols/components/ChallengeTime'
 import { BookmarkIcon, IconClick } from '@/lib/ui/Icons'
 import { Divider } from '@/lib/ui/Divider'
-import { ChallengeState } from '@/games/pistols/generated/constants'
 import { makeDuelDataUrl, PremisePrefix } from '@/pistols/utils/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -169,7 +169,7 @@ export default function ChallengeModal() {
             <Col>
               <ActionButton large fill label='Close' onClick={() => _close()} />
             </Col>
-            {(state == ChallengeState.Awaiting && isChallenger) &&
+            {(state == constants.ChallengeState.Awaiting && isChallenger) &&
               <>
                 <Col>
                   <ActionButton large fill negative label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
@@ -179,17 +179,17 @@ export default function ChallengeModal() {
                 </Col>
               </>
             }
-            {(state == ChallengeState.Awaiting && isChallenged) &&
+            {(state == constants.ChallengeState.Awaiting && isChallenged) &&
               <Col>
                 <ActionButton large fill negative label='Cowardly Refuse' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
               </Col>
             }
-            {(state == ChallengeState.Awaiting && isChallenged) &&
+            {(state == constants.ChallengeState.Awaiting && isChallenged) &&
               <Col>
                 <BalanceRequiredButton label='Accept Challenge!' disabled={isSubmitting} onClick={() => _reply(true)} fee={0} />
               </Col>
             }
-            {(state == ChallengeState.InProgress) &&
+            {(state == constants.ChallengeState.InProgress) &&
               <Col>
                 <ActionButton large fill important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
               </Col>

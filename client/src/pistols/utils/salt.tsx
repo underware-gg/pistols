@@ -1,8 +1,6 @@
 import { AccountInterface, BigNumberish, StarknetDomain } from 'starknet'
-import { poseidon } from '@/lib/utils/starknet'
-import { signMessages, Messages } from '@/lib/utils/starknet_sign'
-import { bigintToHex } from '@/lib/utils/types'
-import { BITWISE } from '@/games/pistols/generated/constants'
+import { poseidon, bigintToHex, signMessages, Messages } from '@underware_gg/pistols-sdk/utils'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 export interface CommitMoveMessage extends Messages {
   duelId: bigint,
@@ -27,7 +25,7 @@ export const make_moves_hash = (salt: BigNumberish, moves: number[]) => {
   return result
 }
 const make_move_mask = (index: number): bigint => {
-  return (BigInt(BITWISE.MAX_U32) << (BigInt(index) * 32n))
+  return (BigInt(constants.BITWISE.MAX_U32) << (BigInt(index) * 32n))
 }
 const make_move_hash = (salt: BigNumberish, index: number, move: number): bigint => {
   const mask: bigint = make_move_mask(index)

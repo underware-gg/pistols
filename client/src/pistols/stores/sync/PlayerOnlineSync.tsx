@@ -1,8 +1,7 @@
 import { useEffect } from 'react'
 import { Button } from 'semantic-ui-react'
 import { usePlayerOnlineSignedMessage } from '@/pistols/hooks/useSignedMessages'
-import { useClientTimestamp } from '@/lib/utils/hooks/useTimestamp'
-import { useUserHasInteracted } from '@/lib/utils/hooks/useUserHasInteracted'
+import { useClientTimestamp, useUserHasInteracted } from '@underware_gg/pistols-sdk/hooks'
 
 
 //------------------------------------------------------
@@ -21,7 +20,7 @@ export function PlayerOnlineSync() {
 
   useEffect(() => {
     if (publish && clientSeconds > 0 && !isPublishing && userHasInteracted) {
-      // publish()
+      publish()
     }
   }, [publish, clientSeconds, userHasInteracted])
 

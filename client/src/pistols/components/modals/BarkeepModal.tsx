@@ -1,6 +1,5 @@
 import React from 'react'
 import { Grid, Image } from 'semantic-ui-react'
-import { useMounted } from '@/lib/utils/hooks/useMounted'
 import { SceneName, usePistolsScene } from '../../hooks/PistolsContext'
 
 const Row = Grid.Row

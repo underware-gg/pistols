@@ -1,15 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useDojoSystemCalls } from '@/lib/dojo/DojoContext'
+import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { useAdminAmIOwner } from '@/pistols/hooks/useContractCalls'
 import { FormInput, FormCheckbox, FormSelectFromMap } from '@/pistols/components/ui/Form'
 import { TableSwitcher } from '@/pistols/components/modals/TableModal'
 import { Balance } from '@/pistols/components/account/Balance'
-import { bigintToEntity, bigintToHex, isBigint, isNumeric } from '@/lib/utils/types'
+import { bigintToEntity, bigintToHex, isBigint, isNumeric, feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@/lib/utils/starknet'
-import { TableTypeNameToValue, CONFIG, DeckTypeNameToValue } from '@/games/pistols/generated/constants'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -219,7 +218,7 @@ export const Field = ({
             : fieldType == FieldType.TableType ? <>
               {value}
               <FormSelectFromMap
-                map={TableTypeNameToValue}
+                map={constants.TableTypeNameToValue}
                 label={name}
                 disabled={readOnly}
                 value={value}
@@ -228,7 +227,7 @@ export const Field = ({
             </> : fieldType == FieldType.DeckType ? <>
               {value}
               <FormSelectFromMap
-                map={DeckTypeNameToValue}
+                map={constants.DeckTypeNameToValue}
                 label={name}
                 disabled={readOnly}
                 value={value}
