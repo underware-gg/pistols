@@ -3,7 +3,7 @@
     "**/node_modules": true,
     "**/build": true,
     "**/target": true,
-    "**/.github": true,
+    // "**/.github": true,
     "**/.next": true,
     "**/.turbo": true,
     "**/.vercel": true,

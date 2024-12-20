@@ -14,7 +14,8 @@
     "check-types": "npx tsc --noEmit",
     "build": "npx tsc -p tsconfig.json && next build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "print-profile": "echo usage: npm run print-profile --profile=dev && echo \"profile:[$npm_config_profile]\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "create-constants": "npx @underware_gg/pistols-sdk generate-constants --src:\"../dojo/src\" --out:\"$npm_config_sdk/generated/constants.ts\""
   },
   "keywords": [
@@ -66,7 +67,8 @@
     "eslint": "^8.57.1",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.16",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "3.0.0-beta.2"
   },
   "engines": {
     "node": ">=22"
