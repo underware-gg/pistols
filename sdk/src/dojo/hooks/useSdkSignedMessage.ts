@@ -3,6 +3,7 @@ import { Account, TypedData, stark } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { useSelectedChain } from 'src/dojo/hooks/useChain'
 import { serialize } from 'src/utils/types'
+import { useConnectedController } from 'src/exports/dojo'
 
 // export const useSdkPublishSignedMessage = <M extends PistolsModelType>(
 //   account: Account,
@@ -21,11 +22,16 @@ export const useSdkPublishTypedData = (
   typedData: TypedData,
 ) => {
   const { sdk } = useDojoSetup()
+  const { isControllerConnected } = useConnectedController()
   const { selectedChainConfig } = useSelectedChain()
   const [isPublishing, setIsPublishing] = useState<boolean>()
 
   const publish = useCallback(async () => {
     if (sdk && typedData && account) {
+      if (!isControllerConnected) {
+        console.warn('useSdkPublishSignedMessage() needs Cartridge Controller!')
+        return
+      }
       if (!selectedChainConfig.relayUrl) {
         console.error('useSdkPublishSignedMessage() failed: relayUrl is not set')
         return
@@ -65,7 +71,7 @@ export const useSdkPublishTypedData = (
       // console.log('SIGNED: done!')
       setIsPublishing(false)
     }
-  }, [sdk, typedData, account])
+  }, [sdk, typedData, account, isControllerConnected])
 
   return {
     isPublishing,
