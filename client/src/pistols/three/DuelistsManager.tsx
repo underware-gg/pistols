@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import TWEEN from '@tweenjs/tween.js'
 
-import { CharacterType, AudioName, AnimName } from '@/pistols/data/assets'
+import { CharacterType, AnimName } from '@/pistols/data/assets'
+import { AudioName } from '@/pistols/data/audioAssets'
 import { Action, ActionTypes } from '@/pistols/utils/pistols'
 
 import { Actor } from './SpriteSheetMaker'

@@ -3,7 +3,7 @@ import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useUserHasInteracted } from '@underware_gg/pistols-sdk/hooks'
-import { loadAudioAssets, isAudioAssetsLoaded, AudioName } from '@/pistols/data/assets'
+import { loadAudioAssets, isAudioAssetsLoaded, AudioName } from '@/pistols/data/audioAssets'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import GameCanvas from '@/pistols/components/GameCanvas'
 
