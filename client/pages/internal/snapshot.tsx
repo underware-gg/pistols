@@ -1,6 +1,6 @@
 import React from 'react'
-import { Snapshots } from '@/pistols/components/Snapshots'
-import AppPistols from '@/pistols/components/AppPistols'
+import { Snapshots } from '@/components/Snapshots'
+import AppPistols from '@/components/AppPistols'
 
 export default function SnapshotPage() {
   return (

@@ -5,7 +5,7 @@ import { useAccount, useNetwork } from '@starknet-react/core'
 import { useTypedMessage } from '@underware_gg/pistols-sdk/hooks'
 import { Messages, createTypedMessage, bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import AppPistols from '@/pistols/components/AppPistols'
+import AppPistols from '@/components/AppPistols'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
