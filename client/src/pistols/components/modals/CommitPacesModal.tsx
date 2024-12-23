@@ -6,11 +6,11 @@ import { useDojoSetup, useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { CommitMoveMessage, signAndGenerateMovesHash } from '@/pistols/utils/salt'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
-import { Card, CardHandle } from '../cards/Cards'
-import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '../../data/assets'
+import { Card, CardHandle } from '@/pistols/components/cards/Cards'
+import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '@/pistols/data/cardAssets'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import useGameAspect from '../../hooks/useGameApect'
-import { emitter } from '../../three/game'
+import useGameAspect from '@/pistols/hooks/useGameApect'
+import { emitter } from '@/pistols/three/game'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -266,9 +266,8 @@ function CardSelector({
   return (
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'centert', justifyContent: 'left', width: '100%', gap: aspectWidth(1.2) }}>
       {Object.values(cards).slice(1).map((card, index) => (
-        <div style={{ width: aspectWidth(8.5 * 0.66), height: aspectWidth(12 * 0.66), overflow: 'visible' }}>
+        <div key={index} style={{ width: aspectWidth(8.5 * 0.66), height: aspectWidth(12 * 0.66), overflow: 'visible' }}>
           <Card
-            key={index}
             ref={cardRefs[index]}
             isLeft={true}
             isFlipped={true}

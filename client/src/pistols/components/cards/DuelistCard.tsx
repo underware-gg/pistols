@@ -1,11 +1,11 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import useGameAspect from '@/pistols/hooks/useGameApect'
-import * as TWEEN from '@tweenjs/tween.js'
-import * as Constants from '../../data/cardConstants'
-import { AnimationData } from './Cards'
 import { useDuelist } from '@/pistols/stores/duelistStore'
+import useGameAspect from '@/pistols/hooks/useGameApect'
+import { AnimationData } from '@/pistols/components/cards/Cards'
 import { ArchetypeNames } from '@/pistols/utils/pistols'
-import { FameBalanceDuelist } from '../account/LordsBalance'
+import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
+import * as TWEEN from '@tweenjs/tween.js'
+import * as Constants from '@/pistols/data/cardConstants'
 
 interface DuelistCardProps {
   duelistId: number

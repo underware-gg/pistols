@@ -6,7 +6,7 @@ import { useIsYou } from '@/pistols/hooks/useIsYou'
 import useGameAspect from '@/pistols/hooks/useGameApect'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '@/pistols/data/assets'
+import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '@/pistols/data/cardAssets'
 import { DuelistCardType, CardHandle, Card } from '@/pistols/components/cards/Cards'
 import * as TWEEN from '@tweenjs/tween.js'
 
@@ -43,7 +43,7 @@ interface EnvironmentDeckHandle {
   returnActiveCard: () => boolean
   setCardsData: (cardsData: CardData[]) => void
 }
-import * as Constants from '../../data/cardConstants'
+import * as Constants from '@/pistols/data/cardConstants'
 import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 
 const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: DuelistCardsProps, ref: React.Ref<DuelistCardsHandle>) => {

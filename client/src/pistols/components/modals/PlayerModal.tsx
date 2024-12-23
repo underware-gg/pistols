@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Divider, Grid, Modal } from 'semantic-ui-react'
-import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useIsMyAccount } from '@/pistols/hooks/useIsYou'
 import { useDuelistsOfOwner } from '@/pistols/hooks/useDuelistToken'
 import { usePlayerBookmarkSignedMessage } from '@/pistols/hooks/useSignedMessages'
@@ -11,6 +11,7 @@ import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { AddressShort } from '@/lib/ui/AddressShort'
 import { DuelistItem } from '@/pistols/components/account/AccountHeader'
 import { BookmarkIcon } from '@/lib/ui/Icons'
+import { SceneName } from '@/pistols/data/assets'
 
 const Row = Grid.Row
 const Col = Grid.Column

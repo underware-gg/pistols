@@ -3,11 +3,11 @@ import { useRouter } from 'next/router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '@/lib/ui/useOpener'
 import { bigintToHex, bigintToNumber, poseidon } from '@underware_gg/pistols-sdk/utils'
-import { useSettings } from './SettingsContext'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { CommitMoveMessage } from '../utils/salt'
-import { tutorialScenes } from '../data/tutorialConstants'
-import { SceneName } from '../data/assets'
+import { CommitMoveMessage } from '@/pistols/utils/salt'
+import { tutorialScenes } from '@/pistols/data/tutorialConstants'
+import { SceneName } from '@/pistols/data/assets'
 
 //
 // React + Typescript + Context

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useDuelistsOfPlayer } from '@/pistols/hooks/useDuelistToken'
-import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '@/pistols/components/scenes/ScDoor'
 import { Divider } from '@/lib/ui/Divider'
@@ -10,10 +10,10 @@ import { DuelistCard, DuelistCardHandle } from '../cards/DuelistCard'
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '@/pistols/data/cardConstants'
 import { PublishOnlineStatusButton } from '@/pistols/stores/sync/PlayerOnlineSync'
 import { VStack } from '@/lib/ui/Stack'
-import DuelistEditModal from '@/pistols/components/modals/DuelistEditModal'
-import useGameAspect from '@/pistols/hooks/useGameApect'
 import { TutorialProgressDebug } from '@/pistols/components/TutorialProgressDebug'
-
+import { SceneName } from '@/pistols/data/assets'
+import useGameAspect from '@/pistols/hooks/useGameApect'
+import DuelistEditModal from '@/pistols/components/modals/DuelistEditModal'
 
 export default function ScProfile() {
   const { isConnected } = useAccount()

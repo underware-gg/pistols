@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
-import { useSettings } from '../../hooks/SettingsContext'
-import { usePistolsContext, usePistolsScene, SceneName } from '@/pistols/hooks/PistolsContext'
+import { useSettings } from '@/pistols/hooks/SettingsContext'
+import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useIsMyDuelist, useIsYou } from '@/pistols/hooks/useIsYou'
 import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
 import { useDuelist } from '@/pistols/stores/duelistStore'
@@ -14,6 +14,7 @@ import { ProfileDescription } from '@/pistols/components/account/ProfileDescript
 import { ChallengeTableSelectedDuelist } from '@/pistols/components/ChallengeTable'
 import { ActionButton } from '@/pistols/components/ui/Buttons'
 import { BookmarkIcon, IconClick } from '@/lib/ui/Icons'
+import { SceneName } from '@/pistols/data/assets'
 
 const Row = Grid.Row
 const Col = Grid.Column
