@@ -1,16 +1,16 @@
 import React, { ReactNode, useMemo } from 'react'
+import { BigNumberish } from 'starknet'
 import { Dropdown, Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useDuelist } from '@/pistols/stores/duelistStore'
+import { useGameAspect } from '@/pistols/hooks/useGameApect'
 import { ProfilePicSquare, ProfilePicSquareButton } from '@/pistols/components/account/ProfilePic'
 import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
 import { useDuelistsOfPlayer } from '@/pistols/hooks/useDuelistToken'
-import { BigNumberish } from 'starknet'
-import { ProfileName } from './ProfileDescription'
+import { ProfileName } from '@/pistols/components/account/ProfileDescription'
 import { SceneName } from '@/pistols/data/assets'
-import useGameAspect from '@/pistols/hooks/useGameApect'
 
 const Row = Grid.Row
 const Col = Grid.Column

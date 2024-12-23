@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 
-const useGameAspect = () => {
+export const useGameAspect = () => {
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -48,5 +48,3 @@ const useGameAspect = () => {
     aspectHeight,
   };
 };
-
-export default useGameAspect;

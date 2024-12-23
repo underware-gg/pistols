@@ -3,7 +3,7 @@ import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { _currentScene } from '@/pistols/three/game'
 import { InteractibleScene } from '@/pistols/three/InteractibleScene'
 import { sceneBackgrounds } from '@/pistols/data/assets'
-import AnimatedText from '../ui/AnimatedText'
+import AnimatedText from '@/pistols/components/ui/AnimatedText'
 import { ANIMATION_TIME_PER_LETTER, DELAY_BETWEEN_TEXTS, TUTORIAL_SCENE_DATA, TutorialScene } from '@/pistols/data/tutorialConstants'
 
 export default function ScTutorial({ currentTutorialScene }: { currentTutorialScene: string }) {

@@ -1,5 +1,5 @@
-import 'react-circular-progressbar/dist/styles.css';
-import 'react-circular-progressbar/dist/styles.css';
+import 'react-circular-progressbar/dist/styles.css'
+import 'react-circular-progressbar/dist/styles.css'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Segment, SemanticFLOATS, Image, Button, Modal } from 'semantic-ui-react'
 import { BigNumberish, num } from 'starknet'
@@ -10,13 +10,14 @@ import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
 import { useGameplayContext } from '@/pistols/hooks/GameplayContext'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useChallengeDescription } from '@/pistols/hooks/useChallengeDescription'
-import { useChallenge } from '@/pistols/stores/challengeStore';
+import { useChallenge } from '@/pistols/stores/challengeStore'
 import { useFinishedDuelProgress } from '@/pistols/hooks/useContractCalls'
 import { useDuelist } from '@/pistols/stores/duelistStore'
 import { useTable } from '@/pistols/stores/tableStore'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '@/pistols/hooks/useRevealAction'
 import { useIsYou } from '@/pistols/hooks/useIsYou'
-import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken';
+import { useOwnerOfDuelist } from '@/pistols/hooks/useDuelistToken'
+import { useGameAspect } from '@/pistols/hooks/useGameApect'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import { DuelStage, useAnimatedDuel, useDuel } from '@/pistols/hooks/useDuel'
 import { ProfilePic } from '@/pistols/components/account/ProfilePic'
@@ -26,16 +27,15 @@ import { AnimationState } from '@/pistols/three/game'
 import { Action, ArchetypeNames } from '@/pistols/utils/pistols'
 import { MenuDebugAnimations, MenuDuel, MenuDuelControl } from '@/pistols/components/Menus'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { DuelistCardType } from '@/pistols/components/cards/Cards'
-import { FameBalanceDuelist } from '../account/LordsBalance';
+import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'
 import CommitPacesModal from '@/pistols/components/modals/CommitPacesModal'
 import Cards, { CardsHandle, DuelistHand } from '@/pistols/components/cards/DuelCards'
-import useGameAspect from '@/pistols/hooks/useGameApect'
 import * as Constants from '@/pistols/data/cardConstants'
 import * as TWEEN from '@tweenjs/tween.js'
-import DuelistModal from '../modals/DuelistModal';
+import DuelistModal from '@/pistols/components/modals/DuelistModal'
 
 
 export type DuelistState = {

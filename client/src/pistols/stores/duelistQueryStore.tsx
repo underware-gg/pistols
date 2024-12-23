@@ -6,7 +6,7 @@ import { PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
 import { DuelistColumn, SortDirection } from '@/pistols/stores/queryParamsStore'
 import { feltToString, bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { calcWinRatio } from '@/pistols/hooks/useScore'
-import { usePlayer } from './playerStore'
+import { usePlayer } from '@/pistols/stores/playerStore'
 
 
 //-----------------------------------------

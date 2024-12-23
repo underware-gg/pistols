@@ -23,8 +23,8 @@ import { SceneName } from '@/pistols/data/assets'
 import { map } from '@underware_gg/pistols-sdk/utils'
 import { SpriteSheet } from './SpriteSheetMaker'
 import { DuelistsManager } from './DuelistsManager.tsx'
-import { Action } from '../utils/pistols.tsx'
-import { DuelistState } from '../components/scenes/Duel.tsx'
+import { Action } from '@/pistols/utils/pistols'
+import { DuelistState } from '@/pistols/components/scenes/Duel.tsx'
 import { InteractibleScene } from './InteractibleScene.tsx'
 
 

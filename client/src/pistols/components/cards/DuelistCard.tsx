@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useDuelist } from '@/pistols/stores/duelistStore'
-import useGameAspect from '@/pistols/hooks/useGameApect'
+import { useGameAspect } from '@/pistols/hooks/useGameApect'
 import { AnimationData } from '@/pistols/components/cards/Cards'
 import { ArchetypeNames } from '@/pistols/utils/pistols'
 import { FameBalanceDuelist } from '@/pistols/components/account/LordsBalance'

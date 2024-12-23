@@ -5,7 +5,7 @@ import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { useEntityId } from '@underware_gg/pistols-sdk/hooks'
 import { isPositiveBigint, feltToString } from '@underware_gg/pistols-sdk/utils'
-import { useScore } from '../hooks/useScore'
+import { useScore } from '@/pistols/hooks/useScore'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 

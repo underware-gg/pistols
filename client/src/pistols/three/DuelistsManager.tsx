@@ -1,14 +1,11 @@
 import * as THREE from 'three'
-import TWEEN from '@tweenjs/tween.js'
-
 import { CharacterType, AnimName } from '@/pistols/data/assets'
+import { DuelistState } from '@/pistols/components/scenes/Duel'
 import { AudioName } from '@/pistols/data/audioAssets'
-import { Action, ActionTypes } from '@/pistols/utils/pistols'
-
+import { Action } from '@/pistols/utils/pistols'
 import { Actor } from './SpriteSheetMaker'
-import { _sfxEnabled, AnimationState, ASPECT, emitter, playAudio } from './game'
+import { _sfxEnabled, AnimationState, emitter, playAudio } from './game'
 import { ProgressDialogManager } from './ProgressDialog'
-import { DuelistState } from '../components/scenes/Duel'
 
 const ACTOR_WIDTH = 2.5
 const ACTOR_HEIGHT = 1.35

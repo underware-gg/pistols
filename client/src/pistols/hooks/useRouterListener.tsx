@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
 import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
 import { useSettings } from '@/pistols/hooks/SettingsContext'
-import { usePistolsContext } from './PistolsContext'
+import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 
 

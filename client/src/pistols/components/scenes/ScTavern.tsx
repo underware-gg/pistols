@@ -7,7 +7,7 @@ import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionD
 import { _currentScene } from '@/pistols/three/game'
 import { InteractibleScene } from '@/pistols/three/InteractibleScene'
 import { sceneBackgrounds } from '@/pistols/data/assets'
-import BarkeepModal from '../modals/BarkeepModal'
+import BarkeepModal from '@/pistols/components/modals/BarkeepModal'
 import TableModal from '@/pistols/components/modals/TableModal'
 
 export default function ScTavern() {

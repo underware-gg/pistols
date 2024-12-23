@@ -5,7 +5,7 @@ import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsConte
 import { useSettings } from '@/pistols/hooks/SettingsContext'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import { useQueryChallengeIds } from '@/pistols/stores/challengeQueryStore'
-import useGameAspect from '@/pistols/hooks/useGameApect'
+import { useGameAspect } from '@/pistols/hooks/useGameApect'
 import { DuelPoster, DuelPosterHandle } from '@/pistols/components/DuelPoster'
 import { PosterGrid, PosterGridHandle } from '@/pistols/components/PosterGrid'
 import { InteractibleScene } from '@/pistols/three/InteractibleScene'

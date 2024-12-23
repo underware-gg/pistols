@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { usePistolsScene } from '../../hooks/PistolsContext'
-import { SceneName } from '@/pistols/data/assets'
+import { usePistolsScene } from '@/pistols/hooks/PistolsContext'
 import { useConnectedController } from '@underware_gg/pistols-sdk/dojo'
 import { useElizaMessage } from '@/pistols/utils/eliza'
-import AnimatedText from '../ui/AnimatedText'
+import AnimatedText from '@/pistols/components/ui/AnimatedText'
 
 export default function BarkeepModal({ open, setOpen }) {
   const { dispatchSetScene } = usePistolsScene()

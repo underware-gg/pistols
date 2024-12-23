@@ -5,7 +5,7 @@ import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsConte
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
 import { useQueryDuelistIds } from '@/pistols/stores/duelistQueryStore'
 import { useOpener } from '@/lib/ui/useOpener'
-import useGameAspect from '@/pistols/hooks/useGameApect'
+import { useGameAspect } from '@/pistols/hooks/useGameApect'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import { DuelistCard, DuelistCardHandle } from '@/pistols/components/cards/DuelistCard'
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '@/pistols/data/cardConstants'
