@@ -448,16 +448,16 @@ fn test_mint_lords_ok() {
 // burn
 //
 
-#[test]
-#[should_panic(expected: ('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
-fn test_burn() {
-    let mut sys: TestSystems = setup(100);
-    _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
-    assert(sys.token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
-    sys.token.delete_duelist(TOKEN_ID_1.low);
-    _assert_minted_count(sys.world, sys.token, 1, 'invalid total_supply');
-    assert(sys.token.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
-}
+// #[test]
+// #[should_panic(expected: ('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
+// fn test_burn() {
+//     let mut sys: TestSystems = setup(100);
+//     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
+//     assert(sys.token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
+//     sys.token.delete_duelist(TOKEN_ID_1.low);
+//     _assert_minted_count(sys.world, sys.token, 1, 'invalid total_supply');
+//     assert(sys.token.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
+// }
 
 
 //---------------------------------

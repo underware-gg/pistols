@@ -47,7 +47,7 @@ pub trait IDuelistToken<TState> {
     fn calc_mint_fee(self: @TState, recipient: ContractAddress) -> u128;
     fn create_duelist(ref self: TState, recipient: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
     fn update_duelist(ref self: TState, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
-    fn delete_duelist(ref self: TState, duelist_id: u128);
+    // fn delete_duelist(ref self: TState, duelist_id: u128);
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
     fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
@@ -70,7 +70,7 @@ pub trait IDuelistTokenPublic<TState> {
         profile_pic_type: ProfilePicType,
         profile_pic_uri: felt252,
     ) -> Duelist;
-    fn delete_duelist(ref self: TState, duelist_id: u128);
+    // fn delete_duelist(ref self: TState, duelist_id: u128);
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
     fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
@@ -280,15 +280,15 @@ pub mod duelist_token {
             (duelist)
         }
         
-        fn delete_duelist(ref self: ContractState,
-            duelist_id: u128,
-        ) {
-            self.token.assert_is_owner_of(get_caller_address(), duelist_id.into());
-            // duelist burn not supported
-            assert(false, Errors::NOT_IMPLEMENTED);
-            // self.token.burn(duelist_id.into());
-            // burn FAME too
-        }
+        // fn delete_duelist(ref self: ContractState,
+        //     duelist_id: u128,
+        // ) {
+        //     self.token.assert_is_owner_of(get_caller_address(), duelist_id.into());
+        //     // duelist burn not supported
+        //     assert(false, Errors::NOT_IMPLEMENTED);
+        //     // self.token.burn(duelist_id.into());
+        //     // burn FAME too
+        // }
 
         fn is_alive(
             self: @ContractState,
