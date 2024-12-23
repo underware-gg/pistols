@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { usePistolsScene } from '../../hooks/PistolsContext'
 import { SceneName } from '@/pistols/data/assets'
-import { useControllerUsername } from '@/lib/dojo/hooks/useController'
+import { useConnectedController } from '@underware_gg/pistols-sdk/dojo'
 import { useElizaMessage } from '@/pistols/utils/eliza'
 import AnimatedText from '../ui/AnimatedText'
 
@@ -10,8 +10,8 @@ export default function BarkeepModal({ open, setOpen }) {
   const [displayText, setDisplayText] = useState('')
   const [isAnimating, setIsAnimating] = useState(false)
 
-  const { username } = useControllerUsername()
-  const { sendMessage, responses } = useElizaMessage(username)
+  const { username, name } = useConnectedController()
+  const { sendMessage, responses } = useElizaMessage(username, name)
 
   useEffect(() => {
     if (responses && responses.length > 0) {
