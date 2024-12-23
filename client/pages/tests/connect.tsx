@@ -2,16 +2,16 @@ import React, { useMemo, useState } from 'react'
 import { EthSigner, Signature } from 'starknet'
 import { Container, Table, Button, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect, useNetwork } from '@starknet-react/core'
-import { usePistolsContext } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext } from '@/hooks/PistolsContext'
 import { useTypedMessage, useAsyncMemo } from '@underware_gg/pistols-sdk/hooks'
 import { Messages, Revision, splitSignature,feltToString, bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
 import {
   useDojoSetup, useDojoStatus, useSelectedChain,
   DojoStatus, getConnectorIcon,
 } from '@underware_gg/pistols-sdk/dojo'
-import { ChainSwitcher } from '@/lib/ui/starknet/ChainSwitcher'
-import StarknetConnectModal from '@/lib/ui/starknet/StarknetConnectModal'
-import App from '@/lib/ui/App'
+import { ChainSwitcher } from '@/components/starknet/ChainSwitcher'
+import StarknetConnectModal from '@/components/starknet/StarknetConnectModal'
+import App from '@/components/App'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
