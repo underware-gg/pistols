@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { SceneName, usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '@/pistols/hooks/PistolsContext'
+import { SceneName } from '@/pistols/data/assets'
 import { useGameEvent } from '@/pistols/hooks/useGameEvent'
-import { useElizaMessage } from '@/pistols/utils/eliza'
-import { useConnectedController } from '@underware_gg/pistols-sdk/dojo'
 import { TavernAudios } from '@/pistols/components/GameContainer'
 import { DojoSetupErrorDetector } from '@/pistols/components/account/ConnectionDetector'
 import { _currentScene } from '@/pistols/three/game'
@@ -18,10 +17,6 @@ export default function ScTavern() {
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
 
   const [open, setOpen] = useState(false)
-
-  const { username, name } = useConnectedController()
-  const { sendMessage, responses } = useElizaMessage(username, name)
-  useEffect(() => console.log(`BARKEEP RESPONSES:`, responses), [responses])
   
   useEffect(() => {
     if (itemClicked) {
@@ -40,27 +35,27 @@ export default function ScTavern() {
           (_currentScene as InteractibleScene).toggleBlur(true);
           (_currentScene as InteractibleScene).setClickable(false);
           (_currentScene as InteractibleScene).excludeItem(sceneBackgrounds.Tavern.items.find(item => item.name === 'bartender'));
-          sendMessage('are you there?')
           break;
-      }
-    } else {
-      if (open) {
-        setOpen(false);
-        (_currentScene as InteractibleScene).toggleBlur(false);
-        (_currentScene as InteractibleScene).setClickable(true);
-        setTimeout(() => {
-          (_currentScene as InteractibleScene).excludeItem(null);
-        }, 400)
       }
     }
   }, [itemClicked, timestamp])
+
+  useEffect(() => {
+    if (!open) {
+      (_currentScene as InteractibleScene).toggleBlur(false);
+      (_currentScene as InteractibleScene).setClickable(true);
+      setTimeout(() => {
+        (_currentScene as InteractibleScene).excludeItem(null);
+      }, 400)
+    }
+  }, [open])
 
   return (
     <div>
 
       {/* <TableModal opener={tableOpener} /> */}
       <TavernAudios />
-      <BarkeepModal open={open} />
+      <BarkeepModal open={open} setOpen={setOpen} />
 
       <DojoSetupErrorDetector />
       {/* <ConnectionDetector /> */}

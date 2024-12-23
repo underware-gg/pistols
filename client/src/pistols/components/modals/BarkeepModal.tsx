@@ -1,29 +1,61 @@
-import React from 'react'
-import { Grid, Image } from 'semantic-ui-react'
-import { SceneName, usePistolsScene } from '../../hooks/PistolsContext'
+import React, { useState, useEffect } from 'react'
+import { usePistolsScene } from '../../hooks/PistolsContext'
+import { SceneName } from '@/pistols/data/assets'
+import { useControllerUsername } from '@/lib/dojo/hooks/useController'
+import { useElizaMessage } from '@/pistols/utils/eliza'
+import AnimatedText from '../ui/AnimatedText'
 
-const Row = Grid.Row
-const Col = Grid.Column
+export default function BarkeepModal({ open, setOpen }) {
+  const { dispatchSetScene } = usePistolsScene()
+  const [displayText, setDisplayText] = useState('')
+  const [isAnimating, setIsAnimating] = useState(false)
 
-export default function BarkeepModal({ open }) {
-  const { currentScene, dispatchSetScene } = usePistolsScene()
-  // console.log('> BARKEEP', currentScene, atBarkeep)
+  const { username } = useControllerUsername()
+  const { sendMessage, responses } = useElizaMessage(username)
 
-  const _close = () => {
-    dispatchSetScene(SceneName.Tavern)
-  }
+  useEffect(() => {
+    if (responses && responses.length > 0) {
+      setDisplayText(responses[0])
+    }
+  }, [responses])
 
-  if (!open) {
-    return <></>
-  }
+  useEffect(() => {
+    if (open) {
+      setDisplayText('Looking for trouble? Or just a drink?')
+    }
+  }, [open])
+
+  if (!open) return null
 
   return (
-    <div className='TempBarkeepOverlay NoMouse NoDrag' onClick={() => _close()}>
+    <div className='TempBarkeepOverlay NoMouse NoDrag'>
       <div className='TempBarkeepTalkBalloon Relative'>
-        <Image src={'/images/ui/duel/bubble_speech.png'} className='FillParent' />
-        <div className='TempBarkeepTalkBalloonText'>
-          Looking for trouble?
-          <br/>Or just a drink?
+        <AnimatedText text={displayText} duration={30} />
+      </div>
+
+      <div className='DialogOptionsContainer'>
+        <div className='DialogGradient' />
+        <div className='DialogDivider' />
+        <div className='DialogOptionsWrapper YesMouse'>
+          {/* <div className='DialogOptionsTitle'>Choose what to do:</div> */}
+          <input
+              type="text"
+              className="DialogInput DialogInput"
+              placeholder="Type your message..."
+              disabled={isAnimating}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !isAnimating) {
+                  sendMessage(e.currentTarget.value)
+                  e.currentTarget.value = ''
+                }
+              }}
+            />
+            <button
+              onClick={() => setOpen(false)}
+              className="DialogButton"
+            >
+              Exit
+            </button>
         </div>
       </div>
     </div>

@@ -17,8 +17,9 @@ import * as shaders from './shaders.tsx'
 import ee from 'event-emitter'
 export var emitter = ee()
 
-import { AudioName, AUDIO_ASSETS, TEXTURES, SPRITESHEETS, sceneBackgrounds, TextureName } from '@/pistols/data/assets'
-import { SceneName } from '@/pistols/hooks/PistolsContext'
+import { TEXTURES, SPRITESHEETS, TextureName } from '@/pistols/data/assets'
+import { AudioName, AUDIO_ASSETS } from '@/pistols/data/audioAssets'
+import { SceneName } from '@/pistols/data/assets'
 import { map } from '@underware_gg/pistols-sdk/utils'
 import { SpriteSheet } from './SpriteSheetMaker'
 import { DuelistsManager } from './DuelistsManager.tsx'
@@ -410,9 +411,13 @@ export function animate() {
 
 function setupScenes() {
   _scenes = {}
-  Object.keys(sceneBackgrounds).forEach((sceneName) => {
-    if (sceneName == SceneName.Duel) {
+  let hasInstancedTutorial = false
+  Object.values(SceneName).forEach((sceneName) => {
+    if (sceneName === SceneName.Duel) {
       _scenes[sceneName] = setupDuelScene()
+    } else if (sceneName.includes('Tutorial') && !hasInstancedTutorial) {
+      _scenes[sceneName] = setupStaticScene(SceneName.Tutorial)
+      hasInstancedTutorial = true
     } else {
       _scenes[sceneName] = setupStaticScene(sceneName)
     }
@@ -741,7 +746,7 @@ function setupStaticScene(sceneName) {
 export function switchScene(sceneName) {
   if (!_currentScene) {
     _sceneName = sceneName
-    _currentScene = _scenes[sceneName]
+    _currentScene = _scenes[sceneName.includes('Tutorial') ? SceneName.Tutorial : sceneName]
 
     fadeInCurrentScene();
     
@@ -753,7 +758,7 @@ export function switchScene(sceneName) {
   } else {
     fadeOutCurrentScene(() => {
       _sceneName = sceneName
-      _currentScene = _scenes[sceneName]
+      _currentScene = _scenes[sceneName.includes('Tutorial') ? SceneName.Tutorial : sceneName]
 
       fadeInCurrentScene();
       
