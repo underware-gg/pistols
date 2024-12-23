@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Container, Grid, Icon } from 'semantic-ui-react'
-import { CustomIcon, EmojiIcon } from '@/lib/ui/Icons'
-import { ArchetypeIcon, BladesIcon, PacesIcon } from '@/pistols/components/ui/PistolsIcon'
-import { LordsBagIcon } from '@/pistols/components/account/Balance'
+import { CustomIcon, EmojiIcon } from '@/components/ui/Icons'
+import { ArchetypeIcon, BladesIcon, PacesIcon } from '@/components/ui/PistolsIcon'
+import { LordsBagIcon } from '@/components/account/Balance'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import App from '@/lib/ui/App'
+import App from '@/components/App'
 
 const Row = Grid.Row
 const Col = Grid.Column

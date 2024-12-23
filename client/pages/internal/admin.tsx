@@ -1,6 +1,6 @@
 import React from 'react'
-import AppPistols from '@/pistols/components/AppPistols'
-import { AdminPanel } from '@/pistols/components/admin/AdminPanel'
+import AppPistols from '@/components/AppPistols'
+import { AdminPanel } from '@/components/admin/AdminPanel'
 
 export default function SnapshotPage() {
   return (

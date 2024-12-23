@@ -1,30 +1,31 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouterStarter, useRouterListener } from '@/pistols/hooks/useRouterListener'
-import { usePistolsContext, usePistolsScene, usePistolsSceneRoute } from '@/pistols/hooks/PistolsContext'
-import { useThreeJsContext } from '@/pistols/hooks/ThreeJsContext'
+import { useRouterStarter, useRouterListener } from '@/hooks/useRouterListener'
+import { usePistolsContext, usePistolsScene, usePistolsSceneRoute } from '@/hooks/PistolsContext'
+import { useThreeJsContext } from '@/hooks/ThreeJsContext'
 import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { usePlayerId } from '@underware_gg/pistols-sdk/hooks'
-import { MouseToolTip } from '@/pistols/components/ui/MouseToolTip'
-import { Header } from '@/pistols/components/Header'
-import { SCENE_CHANGE_ANIMATION_DURATION } from '@/pistols/three/game'
-import AppPistols from '@/pistols/components/AppPistols'
-import GameContainer from '@/pistols/components/GameContainer'
-import Background from '@/pistols/components/Background'
-import PlayerModal from '@/pistols/components/modals/PlayerModal'
-import DuelistModal from '@/pistols/components/modals/DuelistModal'
-import ChallengeModal from '@/pistols/components/modals/ChallengeModal'
-import NewChallengeModal from '@/pistols/components/modals/NewChallengeModal'
-import WalletFinderModal from '@/pistols/components/modals/WalletFinderModal'
-import ActivityPanel from '@/pistols/components/ActivityPanel'
-import ScProfile from '@/pistols/components/scenes/ScProfile'
-import ScTavern from '@/pistols/components/scenes/ScTavern'
-import ScDuels from '@/pistols/components/scenes/ScDuels'
-import ScDuelists from '@/pistols/components/scenes/ScDuelists'
-import ScGraveyard from '@/pistols/components/scenes/ScGraveyard'
-import StoreSync from '@/pistols/stores/sync/StoreSync'
-import Gate from '@/pistols/components/scenes/ScGate'
-import Door from '@/pistols/components/scenes/ScDoor'
-import Duel from '@/pistols/components/scenes/Duel'
+import { MouseToolTip } from '@/components/ui/MouseToolTip'
+import { Header } from '@/components/Header'
+import { SCENE_CHANGE_ANIMATION_DURATION } from '@/three/game'
+import AppPistols from '@/components/AppPistols'
+import GameContainer from '@/components/GameContainer'
+import Background from '@/components/Background'
+import PlayerModal from '@/components/modals/PlayerModal'
+import DuelistModal from '@/components/modals/DuelistModal'
+import ChallengeModal from '@/components/modals/ChallengeModal'
+import NewChallengeModal from '@/components/modals/NewChallengeModal'
+import WalletFinderModal from '@/components/modals/WalletFinderModal'
+import ActivityPanel from '@/components/ActivityPanel'
+import ScProfile from '@/components/scenes/ScProfile'
+import ScTavern from '@/components/scenes/ScTavern'
+import ScDuels from '@/components/scenes/ScDuels'
+import ScDuelists from '@/components/scenes/ScDuelists'
+import ScGraveyard from '@/components/scenes/ScGraveyard'
+import ScTutorial from '@/components/scenes/ScTutorial'
+import StoreSync from '@/stores/sync/StoreSync'
+import Gate from '@/components/scenes/ScGate'
+import Door from '@/components/scenes/ScDoor'
+import Duel from '@/components/scenes/Duel'
 
 // test sdk
 import { helloPistols } from '@underware_gg/pistols-sdk'
@@ -72,7 +73,7 @@ function MainUI() {
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
   const { selectedDuelId } = usePistolsContext()
-  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuels, atDuelists, atGraveyard } = usePistolsScene()
+  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuels, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
   const { isInitialized } = useDojoStatus()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
@@ -81,6 +82,7 @@ function MainUI() {
     const timer = setTimeout(() => {
       if (atGate) setCurrentScene(<Gate />);
       else if (atDoor) setCurrentScene(<Door />);
+      else if (atTutorial) setCurrentScene(<TutorialUI />);
       else if (atDuel && selectedDuelId) setCurrentScene(<Duel duelId={selectedDuelId} />);
       else if (atProfile) setCurrentScene(<ScProfile />);
       else if (atDuels) setCurrentScene(<ScDuels />);
@@ -90,13 +92,40 @@ function MainUI() {
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [atGate, atDoor, atDuel, atProfile, atTavern, selectedDuelId]);
+  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuels, atDuelists, atGraveyard]);
 
   if (!gameImpl) return <></>
 
   if (!isInitialized) return <DojoStatus message={'Loading Pistols...'} />
 
   return currentScene || <DojoStatus message={'Loading Pistols...'} />;
+}
+
+function TutorialUI({
+}) {
+  useRouterStarter()
+  useRouterListener()
+  const { gameImpl } = useThreeJsContext()
+  const { atTutorial, currentScene } = usePistolsScene()
+  const { isInitialized } = useDojoStatus()
+
+  const [currentTutorialScene, setCurrentTutorialScene] = useState<string>("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (atTutorial) {
+        setCurrentTutorialScene(currentScene);
+      }
+    }, SCENE_CHANGE_ANIMATION_DURATION);
+
+    return () => clearTimeout(timer);
+  }, [atTutorial, currentScene]);
+
+  if (!gameImpl) return <></>
+
+  if (!isInitialized) return <DojoStatus message={'Loading Pistols...'} />
+
+  return <ScTutorial currentTutorialScene={currentTutorialScene} />;
 }
 
 

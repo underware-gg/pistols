@@ -41,7 +41,7 @@ $color-cold: #4d9ad6;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease;
-  z-index: 900;
+  z-index: 500;
   border-radius: inherit;
 
   &.visible {
@@ -169,7 +169,7 @@ $color-cold: #4d9ad6;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease;
-  z-index: 900;
+  z-index: 500;
 
   &.visible {
     opacity: 1;
@@ -197,7 +197,7 @@ $color-cold: #4d9ad6;
   background: url('/images/ui/duel/card_details/environment_card_placeholder.png') no-repeat;
   background-size: cover;
   background-position: center;
-  z-index: 1001;
+  z-index: 901;
 
   &.visible {
     opacity: 1;
@@ -341,6 +341,7 @@ $color-cold: #4d9ad6;
   right: aspect-width(0.3);
   background: url('/images/ui/duel/card_details/button_exit.png') no-repeat;
   background-size: cover;
+  transition: transform 0.2s ease;
 }
 
 .grid-data {
