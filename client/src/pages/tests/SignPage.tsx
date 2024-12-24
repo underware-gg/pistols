@@ -5,7 +5,7 @@ import { useAccount, useNetwork } from '@starknet-react/core'
 import { useTypedMessage } from '@underware_gg/pistols-sdk/hooks'
 import { Messages, createTypedMessage, bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import AppPistols from '/src/components/AppPistols'
+import App from '/src/components/App'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -25,7 +25,7 @@ const starknetDomain = {
 
 export default function SignPage() {
   return (
-    <AppPistols>
+    <App>
       <Container>
         <Table celled striped size='small' color='orange'>
           <Header>
@@ -48,7 +48,7 @@ export default function SignPage() {
         <ConsoleTests />
 
       </Container>
-    </AppPistols>
+    </App>
   )
 }
 

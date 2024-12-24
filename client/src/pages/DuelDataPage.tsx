@@ -14,7 +14,7 @@ import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
 import { DuelIconsAsRow } from '/src/components/DuelIcons'
 import { EMOJI } from '/src/data/messages'
-import AppPistols from '/src/components/AppPistols'
+import App from '/src/components/App'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -24,10 +24,10 @@ const HeaderCell = Table.HeaderCell
 
 export default function DuelDataPage() {
   return (
-    <AppPistols backgroundImage={null}>
+    <App backgroundImage={null}>
       <ChallengeStoreSync />
       <StatsLoader />
-    </AppPistols>
+    </App>
   );
 }
 

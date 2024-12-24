@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
 import { formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@underware_gg/pistols-sdk/utils'
-import AppPistols from '/src/components/AppPistols'
+import App from '/src/components/App'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -20,7 +20,7 @@ export default function TimestampPage() {
   const start = useMemo(() => (mounted ? clientSeconds : 0), [mounted, clientSeconds])
 
   return (
-    <AppPistols>
+    <App>
       <Container>
         <Table celled striped size='small' color='orange'>
           <Header>
@@ -47,7 +47,7 @@ export default function TimestampPage() {
         </Table>
 
       </Container>
-    </AppPistols>
+    </App>
   )
 }
 

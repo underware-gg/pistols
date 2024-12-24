@@ -1,11 +1,11 @@
 import React from 'react'
 import { Snapshots } from '/src/components/Snapshots'
-import AppPistols from '/src/components/AppPistols'
+import App from '/src/components/App'
 
 export default function SnapshotPage() {
   return (
-    <AppPistols>
+    <App>
       <Snapshots />
-    </AppPistols>
+    </App>
   )
 }

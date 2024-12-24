@@ -7,7 +7,7 @@ import { usePlayerId } from '@underware_gg/pistols-sdk/hooks'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { Header } from '/src/components/Header'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
-import AppPistols from '/src/components/AppPistols'
+import AppGame from '/src/components/AppGame'
 import GameContainer from '/src/components/GameContainer'
 import Background from '/src/components/Background'
 import PlayerModal from '/src/components/modals/PlayerModal'
@@ -44,7 +44,7 @@ export default function MainPage() {
   // console.log(`AT scene [${currentScene}]`)
 
   return (
-    <AppPistols backgroundImage={null}>
+    <AppGame backgroundImage={null}>
       <Background className={null}>
         {isInitialized &&
           <>
@@ -59,7 +59,7 @@ export default function MainPage() {
         }
         <MouseToolTip />
       </Background>
-    </AppPistols>
+    </AppGame>
   )
 }
 
