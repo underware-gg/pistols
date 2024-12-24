@@ -17,7 +17,8 @@ import ConnectPage from '/src/pages/tests/ConnectPage'
 import IconsPage from '/src/pages/tests/IconsPage'
 import SignPage from '/src/pages/tests/SignPage'
 import TimestampPage from '/src/pages/tests/TimestampPage'
-import DuelDataPage from './pages/DuelDataPage'
+import DuelDataPage from '/src/pages/DuelDataPage'
+import ErrorPage from '/src/pages/error/ErrorPage'
 
 //
 // REF:
@@ -42,6 +43,7 @@ const router = createBrowserRouter([
       { path: "graveyard/:table_id", element: <MainPage /> },
       { path: "duel/:duel_id", element: <MainPage /> },
     ],
+    errorElement: <ErrorPage />,
   },
   {
     path: '/dueldata/:duel_id',
