@@ -1,5 +1,5 @@
 import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState, useRef } from 'react'
-import { useNavigate, useNavigation } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
 import { bigintToHex, bigintToNumber, poseidon } from '@underware_gg/pistols-sdk/utils'
@@ -265,22 +265,23 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   [SceneName.Duelists]: { baseUrl: '/balcony/', hasTableId: true, title: 'Pistols - Duelists' },
   [SceneName.Duels]: { baseUrl: '/duels/', hasTableId: true, title: 'Pistols - Your Duels' },
   [SceneName.Graveyard]: { baseUrl: '/graveyard/', hasTableId: true, title: 'Pistols - Past Duels' },
-  [SceneName.Tournament]: { baseUrl: '/tournament/', hasTableId: true, title: 'Pistols - Tournament' },
-  [SceneName.IRLTournament]: { baseUrl: '/tournament/', hasTableId: true, title: 'Pistols - IRL Tournament' },
+  [SceneName.Tournament]: { baseUrl: '/__tournament__/', hasTableId: true, title: 'Pistols - Tournament' },
+  [SceneName.IRLTournament]: { baseUrl: '/__irltournament__/', hasTableId: true, title: 'Pistols - IRL Tournament' },
+  // tutorial scenes
+  [SceneName.Tutorial]: { baseUrl: '/tutorial/entry', title: 'Pistols - Tutorial' },
+  [SceneName.TutorialScene2]: { baseUrl: '/tutorial/conflict', title: 'Pistols - Tutorial' },
+  [SceneName.TutorialScene3]: { baseUrl: '/tutorial/barkeep', title: 'Pistols - Tutorial' },
+  [SceneName.TutorialScene4]: { baseUrl: '/tutorial/demon', title: 'Pistols - Tutorial' },
+  [SceneName.TutorialScene5]: { baseUrl: '/tutorial/resurection', title: 'Pistols - Tutorial' },
   // '/' must be the last...
   [SceneName.Gate]: { baseUrl: '/' },
-  [SceneName.Tutorial]: { baseUrl: '/tutorial/entry', hasTableId: true, title: 'Pistols - Tutorial' },
-  [SceneName.TutorialScene2]: { baseUrl: '/tutorial/conflict', hasTableId: true, title: 'Pistols - Tutorial' },
-  [SceneName.TutorialScene3]: { baseUrl: '/tutorial/barkeep', hasTableId: true, title: 'Pistols - Tutorial' },
-  [SceneName.TutorialScene4]: { baseUrl: '/tutorial/demon', hasTableId: true, title: 'Pistols - Tutorial' },
-  [SceneName.TutorialScene5]: { baseUrl: '/tutorial/resurection', hasTableId: true, title: 'Pistols - Tutorial' },
 }
 
 export const usePistolsScene = () => {
   const { currentScene, lastScene, selectedDuelId, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
   const { tableId, dispatchTableId } = useSettings()
 
-  const navigation = useNavigation()
+  const location = useLocation()
   const navigate = useNavigate()
 
   // setting a scene will only the url
@@ -296,11 +297,11 @@ export const usePistolsScene = () => {
       dispatchSelectDuel(slug)
     }
     url += slug
-    if (url != navigation.location?.pathname) {
-      navigate(url, { replace: true })
+    if (url != location.pathname) {
+      navigate(url)
     }
     __dispatchSetScene(newScene)
-  }, [navigation.location, navigate])
+  }, [location.pathname, navigate])
 
   const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at 10 Blocks'), [currentScene])
 
@@ -330,44 +331,38 @@ export const usePistolsScene = () => {
 }
 
 // use only once!!!!
-export const usePistolsSceneRoute = () => {
+export const usePistolsSceneFromRoute = () => {
   const { currentScene, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
   const { dispatchTableId } = useSettings()
 
-  const navigation = useNavigation()
+  const location = useLocation()
+  const params = useParams()
   const navigate = useNavigate()
-
-  const currentRoute = useMemo(() => (navigation.location?.pathname ?? null), [navigation.location])
-  const routeSlugs = useMemo(() => (
-    (navigation.location?.pathname) ? navigation.location.pathname.slice(1) : []
-  ), [navigation.location]) // only when /[slug] changes
 
   //------------------------------
   // Detect scene from route
   // works on page reloads and navigation
   //
-  // console.log(`MAIN???`, mainPage, currentRoute)
   useEffect(() => {
-    if (currentRoute) {
+    // console.log(`ROUTE  >>>>>`, location, location.pathname, params)
+    if (location.pathname) {
       const newScene = Object.keys(sceneRoutes).find(key => {
-        return currentRoute.startsWith(sceneRoutes[key].baseUrl)
+        return location.pathname.startsWith(sceneRoutes[key].baseUrl)
       }) as SceneName
       // console.log(`ROUTE [${currentRoute}] >> SCENE [${newScene}]`, router)
       if (newScene) {
         const route = sceneRoutes[newScene]
         __dispatchSetScene(newScene)
         if (route.hasTableId) {
-          dispatchTableId(routeSlugs[0] || constants.TABLES.LORDS)
+          dispatchTableId(params['table_id'] || constants.TABLES.LORDS)
         } else if (route.hasDuelId) {
-          dispatchSelectDuel(routeSlugs[0] || '0x0')
+          dispatchSelectDuel(params['duel_id'] || '0x0')
         }
       } else {
         navigate('/')
       }
     }
-  }, [currentRoute, routeSlugs])
-
-  const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at 10 Blocks'), [currentScene])
+  }, [location.pathname, params])
 
   return {}
 }

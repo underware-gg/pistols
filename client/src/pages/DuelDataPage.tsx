@@ -1,5 +1,5 @@
 import React from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import { Container, Divider, Table } from 'semantic-ui-react'
 import { useChallenge } from '/src/stores/challengeStore'
 import { useDuel } from '/src/hooks/useDuel'

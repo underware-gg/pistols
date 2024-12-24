@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouterStarter, useRouterListener } from '/src/hooks/useRouterListener'
-import { usePistolsContext, usePistolsScene, usePistolsSceneRoute } from '/src/hooks/PistolsContext'
+import { useRouterListener } from '/src/hooks/useRouterListener'
+import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute } from '/src/hooks/PistolsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
-import { usePlayerId } from '@underware_gg/pistols-sdk/hooks'
+import { useEffectOnce, usePlayerId } from '@underware_gg/pistols-sdk/hooks'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { Header } from '/src/components/Header'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
@@ -32,16 +32,18 @@ import { helloPistols } from '@underware_gg/pistols-sdk'
 helloPistols();
 
 export default function MainPage() {
-  // let's initialzie player id always, it is a random client identifier
+  // let's initialize player id always, it is a random client identifier
   const { playerId } = usePlayerId()
+
   // this hook will parse slugs and manage the current scene
-  usePistolsSceneRoute()
-  const { sceneTitle } = usePistolsScene()
+  usePistolsSceneFromRoute()
   const { isInitialized } = useDojoStatus()
 
   const overlay = useMemo(() => <div id="game-black-overlay" className='NoMouse NoDrag' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'black', opacity: 1, pointerEvents: 'none', zIndex: 5 }}></div>, [])
 
-  // console.log(`AT scene [${currentScene}]`)
+  useEffectOnce(() => {
+    console.log(`---------------- MAIN PAGE MOUNTED`)
+  }, [])
 
   return (
     <AppGame backgroundImage={null}>
@@ -64,7 +66,6 @@ export default function MainPage() {
 }
 
 function MainUI() {
-  useRouterStarter()
   useRouterListener()
   const { gameImpl } = useThreeJsContext()
   const { selectedDuelId } = usePistolsContext()
@@ -98,8 +99,6 @@ function MainUI() {
 
 function TutorialUI({
 }) {
-  useRouterStarter()
-  useRouterListener()
   const { gameImpl } = useThreeJsContext()
   const { atTutorial, currentScene } = usePistolsScene()
   const { isInitialized } = useDojoStatus()

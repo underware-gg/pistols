@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useDojoStatus, useSelectedChain } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext } from '/src/hooks/PistolsContext'

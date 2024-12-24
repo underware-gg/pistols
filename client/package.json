@@ -44,7 +44,7 @@
     "react-circular-progressbar": "^2.1.0",
     "react-cookie": "^6.1.1",
     "react-dom": "catalog:",
-    "react-router-dom": "^6.28.1",
+    "react-router": "^7.1.1",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^3.0.0-beta.2",
     "starknet": "catalog:",

@@ -1,87 +1,59 @@
-import { useEffect, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useSearchParams } from 'react-router'
 import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
-
-
-//
-// read intitial url params and
-// (run once when page stards)
-//
-type PistolsParams = {
-  duel?: string
-  duelist?: string
-  debug?: string
-}
-export const useRouterStarter = () => {
-  const { duel, duelist, debug }: PistolsParams = useParams()
-
-  const { dispatchSelectDuel, dispatchSelectDuelistId } = usePistolsContext()
-  const { dispatchSetting, SettingsActions } = useSettings()
-
-  // select duel if url contains 'duel=0x1234'
-  useEffectOnce(() => {
-    if (typeof duel == 'string') {
-      dispatchSelectDuel(duel)
-    }
-  }, [duel])
-
-  useEffectOnce(() => {
-    if (typeof duelist == 'string') {
-      dispatchSelectDuelistId(duelist)
-    }
-  }, [duelist])
-
-  useEffectOnce(() => {
-    if (typeof debug == 'string') {
-      dispatchSetting(SettingsActions.DEBUG_MODE, parseInt(debug) != 0)
-    }
-  }, [debug])
-
-  return {}
-}
+import { bigintToDecimal, bigintToHex } from '@underware_gg/pistols-sdk/utils'
 
 //
 // listen to game state and shallow route
 // (makes urls linkable)
 //
 export const useRouterListener = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  // TODO: Port to Vite
+  // initialize context from url
+  // (only once when mounted)
+  const { dispatchTableId } = useSettings()
+  const { dispatchSelectDuel, dispatchSelectDuelistId, dispatchSelectPlayerAddress } = usePistolsContext()
+  useEffectOnce(() => {
+    if (searchParams.get('table')) {
+      dispatchTableId(searchParams.get('table'))
+    }
+    if (searchParams.get('duel')) {
+      dispatchSelectDuel(searchParams.get('duel'))
+    }
+    if (searchParams.get('duelist')) {
+      dispatchSelectDuelistId(searchParams.get('duelist'))
+    }
+    if (searchParams.get('player')) {
+      dispatchSelectPlayerAddress(searchParams.get('player'))
+    }
+  }, [])
 
-  // const router = useRouter()
-  // const routerPath = useMemo(() => (router.asPath.split('?')[0]), [router.asPath])
-
-  // // keep settings updated with slug
-  // const { tableId } = useParams()
-  // const { dispatchTableId } = useSettings()
-  // useEffect(() => {
-  //   if (tableId) {
-  //     dispatchTableId(tableId)
-  //   }
-  // }, [tableId])
-
-  // const { selectedDuelId, selectedDuelistId } = usePistolsContext()
-
-  // useEffect(() => {
-  //   _updateRoute(selectedDuelId ? { duel: bigintToHex(selectedDuelId) } : {})
-  // }, [selectedDuelId])
-
-  // useEffect(() => {
-  //   _updateRoute(selectedDuelistId ? { duelist: selectedDuelistId.toString() } : {})
-  // }, [selectedDuelistId])
-
-  // const _updateRoute = (params: PistolsParams) => {
-  //   if (routerPath.startsWith('/tavern/')) {
-  //     const url = routerPath + '?' + new URLSearchParams({
-  //       ...params,
-  //     })
-  //     router.push(url, undefined, { shallow: true })
-  //     // console.log(`ROUTING...`, url)
-  //   }
-  // }
+  // add params to url to make shareable urls
+  const { selectedDuelId, selectedDuelistId, selectedPlayerAddress } = usePistolsContext()
+  useEffect(() => {
+    setSearchParams(prev => {
+      const params = new URLSearchParams(prev)
+      if (selectedDuelId) {
+        params.set('duel', bigintToDecimal(selectedDuelId))
+      } else {
+        params.delete('duel')
+      }
+      if (selectedDuelistId) {
+        params.set('duelist', bigintToDecimal(selectedDuelistId))
+      } else {
+        params.delete('duelist')
+      }
+      if (selectedPlayerAddress) {
+        params.set('player', bigintToHex(selectedPlayerAddress))
+      } else {
+        params.delete('player')
+      }
+      return params
+    })
+  }, [selectedDuelId, selectedDuelistId, selectedPlayerAddress])
 
   return {}
 }
