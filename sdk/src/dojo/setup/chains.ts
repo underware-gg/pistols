@@ -13,6 +13,7 @@ import {
 } from '@dojoengine/core'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
 import { PredeployedAccount } from 'src/utils/predeployed'
+import * as ENV from 'src/dojo/setup/env'
 
 //
 // supported chain ids
@@ -76,11 +77,11 @@ export const envChainConfig: DojoChainConfig = {
   chain: undefined,
   chainId: undefined,
   name: undefined,
-  rpcUrl: import.meta.env.VITE_NODE_URL || undefined,
-  toriiUrl: import.meta.env.VITE_TORII || undefined,
-  relayUrl: import.meta.env.VITE_RELAY_URL || undefined,
-  masterAddress: import.meta.env.VITE_MASTER_ADDRESS || undefined,
-  masterPrivateKey: import.meta.env.VITE_MASTER_PRIVATE_KEY || undefined,
+  rpcUrl: ENV.NODE_URL,
+  toriiUrl: ENV.TORII,
+  relayUrl: ENV.RELAY_URL,
+  masterAddress: ENV.MASTER_ADDRESS,
+  masterPrivateKey: ENV.MASTER_PRIVATE_KEY,
   accountClassHash: undefined,
   etherAddress: undefined,
   lordsFaucet: undefined,
