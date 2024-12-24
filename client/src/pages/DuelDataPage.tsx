@@ -1,5 +1,5 @@
 import React from 'react'
-import { useRouter } from 'next/router'
+import { useParams } from 'react-router-dom'
 import { Container, Divider, Table } from 'semantic-ui-react'
 import { useChallenge } from '@/stores/challengeStore'
 import { useDuel } from '@/hooks/useDuel'
@@ -9,7 +9,7 @@ import { useFinishedDuelProgress } from '@/hooks/useContractCalls'
 import { ChallengeStoreSync } from '@/stores/sync/ChallengeStoreSync'
 import { ChallengeStateNames, RoundStateNames } from '@/utils/pistols'
 import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
-import { bigintToHex, formatTimestampLocal } from '@underware_gg/pistols-sdk/utils'
+import { bigintToDecimal, bigintToHex, formatTimestampLocal } from '@underware_gg/pistols-sdk/utils'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { BladesIcon, PacesIcon } from '@/components/ui/PistolsIcon'
 import { DuelIconsAsRow } from '@/components/DuelIcons'
@@ -22,9 +22,9 @@ const Body = Table.Body
 const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
-export default function StatsPage() {
+export default function DuelDataPage() {
   return (
-    <AppPistols headerData={{ title: 'Pistols - Duel Data' }} backgroundImage={null}>
+    <AppPistols backgroundImage={null}>
       <ChallengeStoreSync />
       <StatsLoader />
     </AppPistols>
@@ -34,8 +34,7 @@ export default function StatsPage() {
 function StatsLoader() {
   const { isInitialized } = useDojoStatus()
 
-  const router = useRouter()
-  const { duel_id } = router.query
+  const { duel_id } = useParams()
 
   return (
     <Container>
@@ -147,7 +146,7 @@ function DuelStats({
         <Row>
           <Cell>Winner</Cell>
           <Cell>
-            {challenge.winner}: {challenge.winner == 1 ? nameA : challenge.winner == 2 ? nameB : '-'}
+            {bigintToDecimal(challenge.winner)}: {challenge.winner == 1 ? nameA : challenge.winner == 2 ? nameB : '-'}
           </Cell>
         </Row>
         <Row>

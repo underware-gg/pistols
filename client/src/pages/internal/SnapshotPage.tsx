@@ -4,7 +4,7 @@ import AppPistols from '@/components/AppPistols'
 
 export default function SnapshotPage() {
   return (
-    <AppPistols headerData={{ title: 'Snapshot' }}>
+    <AppPistols>
       <Snapshots />
     </AppPistols>
   )

@@ -10,7 +10,7 @@ const Body = Table.Body
 const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
-export default function IndexPage() {
+export default function TimestampPage() {
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
     setMounted(true)

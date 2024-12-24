@@ -31,11 +31,6 @@ import Duel from '@/components/scenes/Duel'
 import { helloPistols } from '@underware_gg/pistols-sdk'
 helloPistols();
 
-// // enable wasm in build (this is for api routes and server issues)
-// export const config = {
-//   runtime: 'experimental-edge'
-// }
-
 export default function MainPage() {
   // let's initialzie player id always, it is a random client identifier
   const { playerId } = usePlayerId()
@@ -49,7 +44,7 @@ export default function MainPage() {
   // console.log(`AT scene [${currentScene}]`)
 
   return (
-    <AppPistols headerData={{ title: sceneTitle }} backgroundImage={null}>
+    <AppPistols backgroundImage={null}>
       <Background className={null}>
         {isInitialized &&
           <>

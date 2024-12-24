@@ -7,14 +7,13 @@ export interface AppDojoProps extends AppProps {
 }
 
 export default function AppDojo({
-  headerData = {},
   backgroundImage = null,
   dojoAppConfig,
   children,
 }: AppDojoProps) {
 
   return (
-    <App headerData={headerData} backgroundImage={backgroundImage}>
+    <App backgroundImage={backgroundImage}>
       <Dojo dojoAppConfig={dojoAppConfig}>
         {children}
       </Dojo>

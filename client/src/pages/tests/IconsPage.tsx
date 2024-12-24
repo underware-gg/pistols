@@ -9,7 +9,7 @@ import App from '@/components/App'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function IndexPage() {
+export default function IconsPage() {
   const [state, setState] = useState(false)
   return (
     <App>

@@ -1,5 +1,5 @@
 import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState, useRef } from 'react'
-import { useRouter } from 'next/router'
+import { useNavigate, useNavigation } from 'react-router-dom'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '@/hooks/useOpener'
 import { bigintToHex, bigintToNumber, poseidon } from '@underware_gg/pistols-sdk/utils'
@@ -280,11 +280,11 @@ export const usePistolsScene = () => {
   const { currentScene, lastScene, selectedDuelId, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
   const { tableId, dispatchTableId } = useSettings()
 
-  const router = useRouter()
-  const currentRoute = useMemo(() => (router.isReady ? router.asPath : null), [router])
+  const navigation = useNavigation()
+  const navigate = useNavigate()
 
   // setting a scene will only the url
-  const dispatchSetScene = (newScene: SceneName, slugs?: string[]) => {
+  const dispatchSetScene = useCallback((newScene: SceneName, slugs?: string[]) => {
     let route = sceneRoutes[newScene]
     let url = route.baseUrl
     let slug = ''
@@ -296,11 +296,11 @@ export const usePistolsScene = () => {
       dispatchSelectDuel(slug)
     }
     url += slug
-    if (url != currentRoute) {
-      router.replace(url)
+    if (url != navigation.location?.pathname) {
+      navigate(url, { replace: true })
     }
     __dispatchSetScene(newScene)
-  }
+  }, [navigation.location, navigate])
 
   const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at 10 Blocks'), [currentScene])
 
@@ -334,11 +334,13 @@ export const usePistolsSceneRoute = () => {
   const { currentScene, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
   const { dispatchTableId } = useSettings()
 
-  const router = useRouter()
-  const currentRoute = useMemo(() => (router.isReady ? router.asPath : null), [router])
+  const navigation = useNavigation()
+  const navigate = useNavigate()
+
+  const currentRoute = useMemo(() => (navigation.location?.pathname ?? null), [navigation.location])
   const routeSlugs = useMemo(() => (
-    (router.isReady && router.query.main) ? router.query.main.slice(1) : []
-  ), [router]) // only when /[slug] changes
+    (navigation.location?.pathname) ? navigation.location.pathname.slice(1) : []
+  ), [navigation.location]) // only when /[slug] changes
 
   //------------------------------
   // Detect scene from route
@@ -360,7 +362,7 @@ export const usePistolsSceneRoute = () => {
           dispatchSelectDuel(routeSlugs[0] || '0x0')
         }
       } else {
-        router.push('/')
+        navigate('/')
       }
     }
   }, [currentRoute, routeSlugs])

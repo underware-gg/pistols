@@ -23,7 +23,7 @@ const starknetDomain = {
   revision: '1',
 }
 
-export default function IndexPage() {
+export default function SignPage() {
   return (
     <AppPistols>
       <Container>

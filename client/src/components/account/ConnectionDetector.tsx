@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useNavigate } from 'react-router-dom'
 import { useSettings } from '@/hooks/SettingsContext'
 import { useDojoStatus, useSelectedChain } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext } from '@/hooks/PistolsContext'
@@ -8,10 +8,10 @@ import { AccountChangeDetector, ChainChangeDetector } from '@/components/starkne
 
 export function DojoSetupErrorDetector() {
   const { isError } = useDojoStatus()
-  const router = useRouter()
+  const navigate = useNavigate()
   useEffect(() => {
     if(isError) {
-      router.push('/')
+      navigate('/')
       // location.href = '/'
     }
   }, [isError])
@@ -24,9 +24,9 @@ export function ConnectionDetector() {
   const { duelistId, isAnon, dispatchDuelistId } = useSettings()
   const isMyDuelist = useIsMyDuelist(duelistId)
 
-  // const router = useRouter()
+  // const navigate = useNavigate()
   const _backToGate = () => {
-    // router.push('/')
+    // navigate('/')
     dispatchDuelistId(0n)
   }
 

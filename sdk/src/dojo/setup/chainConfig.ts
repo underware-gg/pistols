@@ -10,7 +10,7 @@ import { stringToFelt } from 'src/utils/starknet'
 import { cleanObject } from 'src/utils/types'
 
 dotenv.config()
-export const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID || undefined) as ChainId
+export const defaultChainId = (import.meta.env.VITE_CHAIN_ID || undefined) as ChainId
 
 export const isChainIdSupported = (chainId: ChainId): boolean => {
   return Object.keys(dojoContextConfig).includes(chainId)

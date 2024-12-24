@@ -1,5 +1,4 @@
 import React from 'react'
-import Link from 'next/link'
 import { Grid } from 'semantic-ui-react'
 
 //
@@ -29,7 +28,7 @@ function ErrorPage({ statusCode }) {
         <hr />
         <Grid columns={2}>
           <Grid.Column className='AlignCenter'>
-            <Link href='/'>Home</Link>
+            <a href='/'>Home</a>
           </Grid.Column>
         </Grid>
       </div>
