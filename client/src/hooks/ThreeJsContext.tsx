@@ -1,5 +1,5 @@
 import React, { ReactNode, createContext, useReducer, useContext } from 'react'
-import * as game from '@/three/game'
+import * as game from '/src/three/game'
 
 type ThreeJsGame = typeof game;
 

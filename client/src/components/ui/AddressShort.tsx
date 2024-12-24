@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
-import { CopyIcon } from '@/components/ui/Icons'
+import { CopyIcon } from '/src/components/ui/Icons'
 
 function AddressShort({
   address,

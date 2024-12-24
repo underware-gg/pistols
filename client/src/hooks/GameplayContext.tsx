@@ -1,5 +1,5 @@
 import React, { ReactNode, createContext, useReducer, useContext } from 'react'
-import { AnimationState } from '@/three/game'
+import { AnimationState } from '/src/three/game'
 
 
 //--------------------------------

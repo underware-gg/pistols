@@ -1,13 +1,13 @@
 import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState, useRef } from 'react'
 import { useNavigate, useNavigation } from 'react-router-dom'
 import { BigNumberish } from 'starknet'
-import { Opener, useOpener } from '@/hooks/useOpener'
+import { Opener, useOpener } from '/src/hooks/useOpener'
 import { bigintToHex, bigintToNumber, poseidon } from '@underware_gg/pistols-sdk/utils'
-import { useSettings } from '@/hooks/SettingsContext'
+import { useSettings } from '/src/hooks/SettingsContext'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { CommitMoveMessage } from '@/utils/salt'
-import { tutorialScenes } from '@/data/tutorialConstants'
-import { SceneName } from '@/data/assets'
+import { CommitMoveMessage } from '/src/utils/salt'
+import { tutorialScenes } from '/src/data/tutorialConstants'
+import { SceneName } from '/src/data/assets'
 
 //
 // React + Typescript + Context

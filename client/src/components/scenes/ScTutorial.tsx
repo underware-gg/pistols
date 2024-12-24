@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { usePistolsScene } from '@/hooks/PistolsContext'
-import { _currentScene } from '@/three/game'
-import { InteractibleScene } from '@/three/InteractibleScene'
-import { sceneBackgrounds } from '@/data/assets'
-import AnimatedText from '@/components/ui/AnimatedText'
-import { ANIMATION_TIME_PER_LETTER, DELAY_BETWEEN_TEXTS, TUTORIAL_SCENE_DATA, TutorialScene } from '@/data/tutorialConstants'
+import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { _currentScene } from '/src/three/game'
+import { InteractibleScene } from '/src/three/InteractibleScene'
+import { sceneBackgrounds } from '/src/data/assets'
+import AnimatedText from '/src/components/ui/AnimatedText'
+import { ANIMATION_TIME_PER_LETTER, DELAY_BETWEEN_TEXTS, TUTORIAL_SCENE_DATA, TutorialScene } from '/src/data/tutorialConstants'
 
 export default function ScTutorial({ currentTutorialScene }: { currentTutorialScene: string }) {
   const { dispatchSetScene } = usePistolsScene()

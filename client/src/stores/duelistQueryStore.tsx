@@ -3,10 +3,10 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { useAccount } from '@starknet-react/core'
 import { PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
-import { DuelistColumn, SortDirection } from '@/stores/queryParamsStore'
+import { DuelistColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { feltToString, bigintEquals } from '@underware_gg/pistols-sdk/utils'
-import { calcWinRatio } from '@/hooks/useScore'
-import { usePlayer } from '@/stores/playerStore'
+import { calcWinRatio } from '/src/hooks/useScore'
+import { usePlayer } from '/src/stores/playerStore'
 
 
 //-----------------------------------------

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
-import { emitter } from '@/three/game'
+import { emitter } from '/src/three/game'
 
 export const useGameEvent = (eventName: string, defaultValue: any = null) => {
   const [value, setValue] = useState(defaultValue)

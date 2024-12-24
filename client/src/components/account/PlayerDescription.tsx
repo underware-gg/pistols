@@ -1,7 +1,7 @@
 import React from 'react'
-import { usePlayer } from '@/stores/playerStore'
-import { FameBalance } from '@/components/account/LordsBalance'
-import { AddressShort } from '@/components/ui/AddressShort'
+import { usePlayer } from '/src/stores/playerStore'
+import { FameBalance } from '/src/components/account/LordsBalance'
+import { AddressShort } from '/src/components/ui/AddressShort'
 import { BigNumberish } from 'starknet'
 
 export function PlayerDescription({

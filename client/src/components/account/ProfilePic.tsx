@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react'
 import { Image, SemanticFLOATS } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
-import { useSettings } from '@/hooks/SettingsContext'
-import { useIsMyDuelist, useIsYou } from '@/hooks/useIsYou'
-import { IconClick } from '@/components/ui/Icons'
+import { useSettings } from '/src/hooks/SettingsContext'
+import { useIsMyDuelist, useIsYou } from '/src/hooks/useIsYou'
+import { IconClick } from '/src/components/ui/Icons'
 
 
 const _makeUrl = (profilePic: number | null, square: boolean) => {

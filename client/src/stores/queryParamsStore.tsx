@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { AllChallengeStates, LiveChallengeStates, PastChallengeStates } from '@/utils/pistols'
+import { AllChallengeStates, LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 export enum DuelistColumn {

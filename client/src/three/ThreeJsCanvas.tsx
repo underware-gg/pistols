@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
-import { useThreeJsContext } from '@/hooks/ThreeJsContext'
-import { useSettings } from '@/hooks/SettingsContext'
+import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
+import { useSettings } from '/src/hooks/SettingsContext'
 
 export const ThreeJsCanvas = ({
   width = 960,

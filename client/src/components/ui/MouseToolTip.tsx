@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Label } from 'semantic-ui-react'
-import { useGameEvent } from '@/hooks/useGameEvent'
+import { useGameEvent } from '/src/hooks/useGameEvent'
 
 
 export function MouseToolTip() {

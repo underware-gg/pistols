@@ -1,6 +1,6 @@
 import React, { ReactElement, useMemo } from 'react'
 import { Grid, GridProps } from 'semantic-ui-react'
-import { Divider, DividerProps } from '@/components/ui/Divider'
+import { Divider, DividerProps } from '/src/components/ui/Divider'
 
 const Row = Grid.Row
 const Col = Grid.Column

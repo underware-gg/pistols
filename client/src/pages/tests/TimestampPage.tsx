@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
 import { formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@underware_gg/pistols-sdk/utils'
-import AppPistols from '@/components/AppPistols'
+import AppPistols from '/src/components/AppPistols'
 
 const Row = Table.Row
 const Cell = Table.Cell

@@ -1,7 +1,7 @@
 import React from 'react'
 import { BigNumberish } from 'starknet'
-import { usePistolsContext } from '@/hooks/PistolsContext'
-import { usePlayer } from '@/stores/playerStore'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { usePlayer } from '/src/stores/playerStore'
 import { formatTimestampDeltaElapsed, bigintToNumber } from '@underware_gg/pistols-sdk/utils'
 
 export const PlayerLink = ({

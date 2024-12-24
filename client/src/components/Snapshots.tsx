@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
 import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
-import { useAllChallengesIds, useChallenge } from '@/stores/challengeStore'
-import { useDuelist, useAllDuelistsIds } from '@/stores/duelistStore'
-import { ChallengeStoreSync } from '@/stores/sync/ChallengeStoreSync'
-import { EntityStoreSync } from '@/stores/sync/EntityStoreSync'
+import { useAllChallengesIds, useChallenge } from '/src/stores/challengeStore'
+import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
+import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
+import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { bigintEquals, bigintToHex } from '@underware_gg/pistols-sdk/utils'
-import { CopyIcon } from '@/components/ui/Icons'
+import { CopyIcon } from '/src/components/ui/Icons'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }

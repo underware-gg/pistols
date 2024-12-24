@@ -1,6 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
-import { useGameAspect } from '@/hooks/useGameApect'
-import { _currentScene } from '@/three/game'
+import { useGameAspect } from '/src/hooks/useGameApect'
+import { _currentScene } from '/src/three/game'
 
 export interface PosterGridHandle {
   setPostersData: (posters: JSX.Element[]) => void

@@ -17,14 +17,14 @@ import * as shaders from './shaders.tsx'
 import ee from 'event-emitter'
 export var emitter = ee()
 
-import { TEXTURES, SPRITESHEETS, TextureName } from '@/data/assets.tsx'
-import { AudioName, AUDIO_ASSETS } from '@/data/audioAssets.tsx'
-import { SceneName } from '@/data/assets.tsx'
+import { TEXTURES, SPRITESHEETS, TextureName } from '/src/data/assets.tsx'
+import { AudioName, AUDIO_ASSETS } from '/src/data/audioAssets.tsx'
+import { SceneName } from '/src/data/assets.tsx'
 import { map } from '@underware_gg/pistols-sdk/utils'
 import { SpriteSheet } from './SpriteSheetMaker.tsx'
 import { DuelistsManager } from './DuelistsManager.tsx'
-import { Action } from '@/utils/pistols.tsx'
-import { DuelistState } from '@/components/scenes/Duel.tsx'
+import { Action } from '/src/utils/pistols.tsx'
+import { DuelistState } from '/src/components/scenes/Duel.tsx'
 import { InteractibleScene } from './InteractibleScene.tsx'
 
 

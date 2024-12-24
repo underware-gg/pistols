@@ -1,14 +1,14 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useQueryParams } from '@/stores/queryParamsStore'
-import { usePistolsContext, usePistolsScene } from '@/hooks/PistolsContext'
-import { useGameEvent } from '@/hooks/useGameEvent'
-import { useQueryChallengeIds } from '@/stores/challengeQueryStore'
-import { useSettings } from '@/hooks/SettingsContext'
-import { useGameAspect } from '@/hooks/useGameApect'
-import { PosterGrid, PosterGridHandle } from '@/components/PosterGrid'
-import { DuelPoster, DuelPosterHandle } from '@/components/DuelPoster'
-import { _currentScene } from '@/three/game'
+import { useQueryParams } from '/src/stores/queryParamsStore'
+import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
+import { useGameEvent } from '/src/hooks/useGameEvent'
+import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
+import { useSettings } from '/src/hooks/SettingsContext'
+import { useGameAspect } from '/src/hooks/useGameApect'
+import { PosterGrid, PosterGridHandle } from '/src/components/PosterGrid'
+import { DuelPoster, DuelPosterHandle } from '/src/components/DuelPoster'
+import { _currentScene } from '/src/three/game'
 
 export default function ScDuels() {
   const { duelistId } = useSettings()

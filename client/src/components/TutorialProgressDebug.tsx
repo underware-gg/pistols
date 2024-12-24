@@ -1,9 +1,9 @@
 import React from 'react'
 import { ButtonGroup, Button } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useTutorialProgressSignedMessage } from '@/hooks/useSignedMessages'
+import { useTutorialProgressSignedMessage } from '/src/hooks/useSignedMessages'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { usePlayer } from '@/stores/playerStore'
+import { usePlayer } from '/src/stores/playerStore'
 
 
 export function TutorialProgressDebug() {

@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { addAddressPadding, BigNumberish } from 'starknet'
 import { useSdkState, getEntityMapModels } from '@underware_gg/pistols-sdk/dojo'
-import { LiveChallengeStates, PastChallengeStates } from '@/utils/pistols'
+import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 import { constants, models, PistolsGetQuery } from '@underware_gg/pistols-sdk/pistols'
 import { stringToFelt } from '@underware_gg/pistols-sdk/utils'
 

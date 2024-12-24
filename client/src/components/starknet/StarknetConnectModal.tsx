@@ -3,9 +3,9 @@ import { Modal, Button, Image } from 'semantic-ui-react'
 import { useConnect, Connector, useAccount } from '@starknet-react/core'
 import { useChainSwitchCallbacks, useSelectedChain, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
 import { useMounted } from '@underware_gg/pistols-sdk/hooks'
-import { Opener } from '@/hooks/useOpener'
-import { VStack } from '@/components/ui/Stack'
-import { Divider } from '@/components/ui/Divider'
+import { Opener } from '/src/hooks/useOpener'
+import { VStack } from '/src/components/ui/Stack'
+import { Divider } from '/src/components/ui/Divider'
 
 export default function StarknetConnectModal({
   opener,

@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
-import { usePistolsContext, usePistolsScene } from '@/hooks/PistolsContext'
-import { SceneName } from '@/data/assets'
-import { useGameEvent } from '@/hooks/useGameEvent'
-import { TavernAudios } from '@/components/GameContainer'
-import { DojoSetupErrorDetector } from '@/components/account/ConnectionDetector'
+import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
+import { SceneName } from '/src/data/assets'
+import { useGameEvent } from '/src/hooks/useGameEvent'
+import { TavernAudios } from '/src/components/GameContainer'
+import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
 
 export default function ScGate() {
   const { tableOpener } = usePistolsContext()

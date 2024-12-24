@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
-import { usePistolsContext } from '@/hooks/PistolsContext'
-import { useSettings } from '@/hooks/SettingsContext'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { useSettings } from '/src/hooks/SettingsContext'
 import { useDojoSetup, useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
-import { useGetPlayerFullDeck } from '@/hooks/useContractCalls'
-import { CommitMoveMessage, signAndRestoreMovesFromHash } from '@/utils/salt'
+import { useGetPlayerFullDeck } from '/src/hooks/useContractCalls'
+import { CommitMoveMessage, signAndRestoreMovesFromHash } from '/src/utils/salt'
 import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
-import { movesToHand } from '@/utils/pistols'
+import { movesToHand } from '/src/utils/pistols'
 
 export function useSignAndRestoreMovesFromHash(duelId: bigint, tableId: string, hash: bigint) {
   const { account } = useAccount()

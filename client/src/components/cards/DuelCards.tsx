@@ -1,13 +1,13 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { BigNumberish } from 'starknet'
-import { useChallenge } from '@/stores/challengeStore'
-import { useDuelist } from '@/stores/duelistStore'
-import { useIsYou } from '@/hooks/useIsYou'
-import { useGameAspect } from '@/hooks/useGameApect'
-import { ProfilePic } from '@/components/account/ProfilePic'
+import { useChallenge } from '/src/stores/challengeStore'
+import { useDuelist } from '/src/stores/duelistStore'
+import { useIsYou } from '/src/hooks/useIsYou'
+import { useGameAspect } from '/src/hooks/useGameApect'
+import { ProfilePic } from '/src/components/account/ProfilePic'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '@/data/cardAssets'
-import { DuelistCardType, CardHandle, Card } from '@/components/cards/Cards'
+import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '/src/data/cardAssets'
+import { DuelistCardType, CardHandle, Card } from '/src/components/cards/Cards'
 import * as TWEEN from '@tweenjs/tween.js'
 
 interface DuelistCardsProps {
@@ -43,8 +43,8 @@ interface EnvironmentDeckHandle {
   returnActiveCard: () => boolean
   setCardsData: (cardsData: CardData[]) => void
 }
-import * as Constants from '@/data/cardConstants'
-import { usePistolsContext } from '@/hooks/PistolsContext'
+import * as Constants from '/src/data/cardConstants'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
 
 const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: DuelistCardsProps, ref: React.Ref<DuelistCardsHandle>) => {
   const { isYou } = useIsYou(props.duelistId)

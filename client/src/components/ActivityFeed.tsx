@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo } from 'react'
-import { useAllPlayersActivityFeed, ActivityState } from '@/stores/eventsStore'
+import { useAllPlayersActivityFeed, ActivityState } from '/src/stores/eventsStore'
 import { useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '@/components/Links'
+import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '/src/components/Links'
 
 export const ActivityFeed = () => {
   const { allPlayersActivity } = useAllPlayersActivityFeed()

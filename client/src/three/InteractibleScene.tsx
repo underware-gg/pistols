@@ -10,7 +10,7 @@ import {
   sizes,
   SCENE_CHANGE_ANIMATION_DURATION,
 } from './game';
-import { sceneBackgrounds, SceneData, SceneObject } from '@/data/assets';
+import { sceneBackgrounds, SceneData, SceneObject } from '/src/data/assets';
 import { ShaderMaterial } from './shaders'
 import TWEEN from '@tweenjs/tween.js'
 

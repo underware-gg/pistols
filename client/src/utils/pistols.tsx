@@ -1,6 +1,6 @@
 import { BigNumberish } from 'starknet'
-import { EMOJI } from '@/data/messages'
-import { SceneName } from '@/data/assets'
+import { EMOJI } from '/src/data/messages'
+import { SceneName } from '/src/data/assets'
 import { bigintToNumber } from '@underware_gg/pistols-sdk/utils'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 

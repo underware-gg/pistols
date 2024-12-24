@@ -1,9 +1,9 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { useGameAspect } from '@/hooks/useGameApect'
-import { CardData, FireCardsTextures } from '@/data/cardAssets'
+import { useGameAspect } from '/src/hooks/useGameApect'
+import { CardData, FireCardsTextures } from '/src/data/cardAssets'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import * as TWEEN from '@tweenjs/tween.js'
-import * as Constants from '@/data/cardConstants'
+import * as Constants from '/src/data/cardConstants'
 
 interface CardProps {
   width?: number

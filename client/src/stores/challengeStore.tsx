@@ -4,7 +4,7 @@ import { createDojoStore } from '@dojoengine/sdk'
 import { useEntityId, useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
-import { movesToHand } from '@/utils/pistols'
+import { movesToHand } from '/src/utils/pistols'
 import { feltToString } from '@underware_gg/pistols-sdk/utils'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();

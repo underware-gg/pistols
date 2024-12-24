@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useTokenConfig } from '@/stores/tokenConfigStore'
+import { useTokenConfig } from '/src/stores/tokenConfigStore'
 import { useERC721OwnerOf } from '@underware_gg/pistols-sdk/hooks'
-import { useDuelistTokenContract } from '@/hooks/useTokenContract'
-import { useTokenIdsByOwner, useTokenIdsOfPlayer } from '@/stores/duelistTokenStore'
-import { PROFILE_PIC_COUNT } from '@/utils/constants'
+import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
+import { useTokenIdsByOwner, useTokenIdsOfPlayer } from '/src/stores/duelistTokenStore'
+import { PROFILE_PIC_COUNT } from '/src/utils/constants'
 import { poseidon } from '@underware_gg/pistols-sdk/utils'
 
 

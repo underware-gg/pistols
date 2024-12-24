@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
-import { useThreeJsContext } from '@/hooks/ThreeJsContext'
-import { useGameplayContext } from '@/hooks/GameplayContext'
-import { useGameEvent } from '@/hooks/useGameEvent'
-import { usePistolsContext } from '@/hooks/PistolsContext'
-import ThreeJsCanvas from '@/three/ThreeJsCanvas'
+import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
+import { useGameplayContext } from '/src/hooks/GameplayContext'
+import { useGameEvent } from '/src/hooks/useGameEvent'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
+import ThreeJsCanvas from '/src/three/ThreeJsCanvas'
 
 const GameCanvas = () => {
   const { gameImpl } = useThreeJsContext()

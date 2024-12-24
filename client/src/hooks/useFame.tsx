@@ -1,7 +1,7 @@
 import { BigNumberish } from 'starknet'
 import { useDojoSystem } from '@underware_gg/pistols-sdk/dojo'
 import { useERC20Balance } from '@underware_gg/pistols-sdk/hooks'
-import { useDuelistTokenBoundAddress } from '@/hooks/useTokenContract'
+import { useDuelistTokenBoundAddress } from '/src/hooks/useTokenContract'
 
 export const useFameContract = () => {
   const { contractAddress: fameContractAddress, abi } = useDojoSystem('fame_coin')

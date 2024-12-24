@@ -1,11 +1,11 @@
 import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useThreeJsContext } from '@/hooks/ThreeJsContext'
-import { useGameplayContext } from '@/hooks/GameplayContext'
-import { useChallenge, useRound } from '@/stores/challengeStore'
+import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
+import { useGameplayContext } from '/src/hooks/GameplayContext'
+import { useChallenge, useRound } from '/src/stores/challengeStore'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { AnimationState } from '@/three/game'
-import { Action } from '@/utils/pistols'
+import { AnimationState } from '/src/three/game'
+import { Action } from '/src/utils/pistols'
 
 export enum DuelStage {
   Null,             // 0

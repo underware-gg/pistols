@@ -3,9 +3,9 @@ import { create } from 'zustand'
 import { addAddressPadding, BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSetup, useToriiBalancesByContractQL } from '@underware_gg/pistols-sdk/dojo'
-import { useDuelistTokenContract } from '@/hooks/useTokenContract'
+import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
-import { useFameContract } from '@/hooks/useFame'
+import { useFameContract } from '/src/hooks/useFame'
 
 
 //-----------------------------------------

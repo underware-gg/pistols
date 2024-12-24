@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
-import { useSettings } from '@/hooks/SettingsContext'
-import { usePistolsContext } from '@/hooks/PistolsContext'
+import { useSettings } from '/src/hooks/SettingsContext'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 
 

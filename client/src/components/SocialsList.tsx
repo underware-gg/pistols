@@ -1,9 +1,9 @@
 import React from 'react'
 import { Grid } from 'semantic-ui-react'
-import { RowDivider, VStack } from '@/components/ui/Stack'
-import { ActionButton } from '@/components/ui/Buttons'
-import { Divider } from '@/components/ui/Divider'
-import { CustomIcon } from '@/components/ui/Icons'
+import { RowDivider, VStack } from '/src/components/ui/Stack'
+import { ActionButton } from '/src/components/ui/Buttons'
+import { Divider } from '/src/components/ui/Divider'
+import { CustomIcon } from '/src/components/ui/Icons'
 import { useAccount } from '@starknet-react/core'
 
 const Row = Grid.Row

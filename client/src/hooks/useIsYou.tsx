@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useSettings } from '@/hooks/SettingsContext'
-import { useOwnerOfDuelist } from '@/hooks/useDuelistToken'
+import { useSettings } from '/src/hooks/SettingsContext'
+import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
 import { bigintEquals, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 
 export const useIsMyAccount = (otherAddress: BigNumberish) => {

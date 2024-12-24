@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react'
-import { usePistolsScene } from '@/hooks/PistolsContext'
-import { IconClick } from '@/components/ui/Icons'
-import ActivityFeed from '@/components/ActivityFeed'
-import ActivityPlayers from '@/components/ActivityPlayers'
+import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { IconClick } from '/src/components/ui/Icons'
+import ActivityFeed from '/src/components/ActivityFeed'
+import ActivityPlayers from '/src/components/ActivityPlayers'
 
 enum PanelType {
   Closed = 'Closed',

@@ -1,14 +1,14 @@
 import React, { useMemo } from 'react'
 import { Grid, Menu } from 'semantic-ui-react'
-import { usePistolsScene, usePistolsContext } from '@/hooks/PistolsContext'
-import { useThreeJsContext } from '@/hooks/ThreeJsContext'
-import { useSettings } from '@/hooks/SettingsContext'
-import { DuelStage } from '@/hooks/useDuel'
-import { SPRITESHEETS } from '@/data/assets'
-import { AnimationState } from '@/three/game'
-import { IconClick } from '@/components/ui/Icons'
-import { makeDuelDataUrl } from '@/utils/pistols'
-import { SceneName } from '@/data/assets'
+import { usePistolsScene, usePistolsContext } from '/src/hooks/PistolsContext'
+import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
+import { useSettings } from '/src/hooks/SettingsContext'
+import { DuelStage } from '/src/hooks/useDuel'
+import { SPRITESHEETS } from '/src/data/assets'
+import { AnimationState } from '/src/three/game'
+import { IconClick } from '/src/components/ui/Icons'
+import { makeDuelDataUrl } from '/src/utils/pistols'
+import { SceneName } from '/src/data/assets'
 
 const Row = Grid.Row
 const Col = Grid.Column

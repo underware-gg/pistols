@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import TWEEN, { update } from '@tweenjs/tween.js'
 import { HTMLMesh } from 'three/examples/jsm/interactive/HTMLMesh.js' 
-import { DuelStage } from '@/hooks/useDuel'
+import { DuelStage } from '/src/hooks/useDuel'
 import { sizes } from './game'
 
 const FADE_ANIMATION_DURATION = 500

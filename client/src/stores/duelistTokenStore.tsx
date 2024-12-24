@@ -4,7 +4,7 @@ import { BigNumberish, addAddressPadding } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { Token, TokenBalance } from '@dojoengine/torii-client'
 import { useDojoSetup, useToriiTokenIdsByOwnerQL } from '@underware_gg/pistols-sdk/dojo'
-import { useDuelistTokenContract } from '@/hooks/useTokenContract'
+import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 
 

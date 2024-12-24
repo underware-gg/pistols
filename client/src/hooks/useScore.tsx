@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { ArchetypeNames } from '@/utils/pistols'
+import { ArchetypeNames } from '/src/utils/pistols'
 import { constants, models } from '@underware_gg/pistols-sdk/pistols'
-import { EMOJI } from '@/data/messages'
+import { EMOJI } from '/src/data/messages'
 
 export const calcWinRatio = (total_duels: number, total_wins: number) => (total_duels > 0 ? (total_wins / total_duels) : null)
 

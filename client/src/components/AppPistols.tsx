@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
-import { ThreeJsProvider } from '@/hooks/ThreeJsContext'
-import { GameplayProvider } from '@/hooks/GameplayContext'
-import App, { AppProps } from '@/components/App'
+import { ThreeJsProvider } from '/src/hooks/ThreeJsContext'
+import { GameplayProvider } from '/src/hooks/GameplayContext'
+import App, { AppProps } from '/src/components/App'
 
 export default function AppPistols({
   backgroundImage = null,

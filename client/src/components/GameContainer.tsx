@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
-import { usePistolsScene } from '@/hooks/PistolsContext'
-import { useThreeJsContext } from '@/hooks/ThreeJsContext'
-import { useSettings } from '@/hooks/SettingsContext'
+import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
+import { useSettings } from '/src/hooks/SettingsContext'
 import { useUserHasInteracted } from '@underware_gg/pistols-sdk/hooks'
-import { loadAudioAssets, isAudioAssetsLoaded, AudioName } from '@/data/audioAssets'
-import { ActionButton } from '@/components/ui/Buttons'
-import GameCanvas from '@/components/GameCanvas'
+import { loadAudioAssets, isAudioAssetsLoaded, AudioName } from '/src/data/audioAssets'
+import { ActionButton } from '/src/components/ui/Buttons'
+import GameCanvas from '/src/components/GameCanvas'
 
 function GameContainer({
   isVisible,
