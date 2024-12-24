@@ -128,9 +128,6 @@ importers:
       react-router-dom:
         specifier: ^6.28.1
         version: 6.28.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      sass:
-        specifier: ^1.69.5
-        version: 1.83.0
       semantic-ui-css:
         specifier: ^2.5.0
         version: 2.5.0
@@ -192,6 +189,9 @@ importers:
       eslint-plugin-react-refresh:
         specifier: ^0.4.16
         version: 0.4.16(eslint@9.17.0)
+      sass:
+        specifier: ^1.83.0
+        version: 1.83.0
       typescript:
         specifier: 'catalog:'
         version: 5.7.2
