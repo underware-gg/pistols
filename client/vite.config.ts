@@ -14,7 +14,11 @@ export const config: UserConfig = {
     preprocessorOptions: {
       scss: {
         api: 'modern-compiler',
-        silenceDeprecations: ['import', 'global-builtin', 'color-functions'],
+        silenceDeprecations: [
+          'import',
+          'global-builtin',
+          'color-functions',
+        ],
         quietDeps: true,
       },
     },
