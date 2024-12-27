@@ -1913,8 +1913,8 @@
       ]
     },
     {
-      "address": "0x155786ed635074dafec6628bc3c1939b356e5abd641a8fc12aba040c2cb3239",
-      "class_hash": "0x3a5f416e96ed04a40318864ffeb6b9375b5c5b25f4cd9cdb6f0039748f3cdbd",
+      "address": "0x42826f4b8657ef121e50415ef3934151559600f61ab7ae0000edff4c244007c",
+      "class_hash": "0x946964197808c20a9c322ee93de2bf7dab5547c42cca8e05d3107eaa9c43e4",
       "abi": [
         {
           "type": "impl",
@@ -2151,18 +2151,6 @@
                   "type": "pistols::types::challenge_state::ChallengeState"
                 }
               ],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "delete_duel",
-              "inputs": [
-                {
-                  "name": "duel_id",
-                  "type": "core::integer::u128"
-                }
-              ],
-              "outputs": [],
               "state_mutability": "external"
             },
             {
@@ -3039,7 +3027,6 @@
         "dojo_init",
         "create_duel",
         "reply_duel",
-        "delete_duel",
         "transfer_to_winner",
         "upgrade",
         "safe_transfer_from",
@@ -3052,8 +3039,8 @@
       ]
     },
     {
-      "address": "0x24ec36b5c19d158e9749d4f2b48afb7b51ce0f5e4a871f53028a601a253fb6e",
-      "class_hash": "0x256524909b946daac4e59ab3df36a6d11912a6558676579e94deccda104616a",
+      "address": "0x358ca45038480663c7f7cbd59d5cbd5f8114223a934b76e8b819c35e40337f2",
+      "class_hash": "0x6042f8be6290ec63013c9b0d89b0e4cabf12853b23d4443d664cf9263a7694f",
       "abi": [
         {
           "type": "impl",
@@ -3300,18 +3287,6 @@
                   "type": "pistols::models::duelist::Duelist"
                 }
               ],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "delete_duelist",
-              "inputs": [
-                {
-                  "name": "duelist_id",
-                  "type": "core::integer::u128"
-                }
-              ],
-              "outputs": [],
               "state_mutability": "external"
             },
             {
@@ -4140,7 +4115,6 @@
         "dojo_init",
         "create_duelist",
         "update_duelist",
-        "delete_duelist",
         "transfer_fame_reward",
         "upgrade",
         "safe_transfer_from",
@@ -4822,8 +4796,8 @@
       ]
     },
     {
-      "address": "0x1d0994e6c9c06bcf730ff6f6e0929d7c430175c6bcca69f33ed9249bd3caf7c",
-      "class_hash": "0x685776e21dce73b9670ec26b8e3b07ddeeff87f01089befcc052706b587e30a",
+      "address": "0x63418f4f6eae9f10d23d4ce980a6ba593d4c9ac70f1dec1da378fbd5173c3ce",
+      "class_hash": "0x1301f9f6464733fe8d86e215992e27bde1c5a31d805ed718bf45d3d1098121a",
       "abi": [
         {
           "type": "impl",
