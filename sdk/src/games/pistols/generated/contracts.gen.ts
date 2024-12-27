@@ -4,7 +4,7 @@ import * as models from "./models.gen";
 
 export async function setupWorld(provider: DojoProvider) {
 
-	const bank_charge = async (snAccount: Account | AccountInterface, payer: string, payment: models.InputPayment) => {
+	const bank_charge = async (snAccount: Account | AccountInterface, payer: string, payment: models.Payment) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -96,7 +96,7 @@ export async function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const admin_setTable = async (snAccount: Account | AccountInterface, table: models.InputTableConfig) => {
+  const admin_setTable = async (snAccount: Account | AccountInterface, table: models.TableConfig) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -112,7 +112,7 @@ export async function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const admin_setTableAdmittance = async (snAccount: Account | AccountInterface, tableAdmittance: models.InputTableAdmittance) => {
+  const admin_setTableAdmittance = async (snAccount: Account | AccountInterface, tableAdmittance: models.TableAdmittance) => {
 		try {
 			return await provider.execute(
 				snAccount,

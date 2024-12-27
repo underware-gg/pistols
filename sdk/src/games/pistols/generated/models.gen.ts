@@ -1,3 +1,4 @@
+//@ts-nocheck
 import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
 import { BigNumberish } from 'starknet';
