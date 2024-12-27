@@ -6,9 +6,7 @@
         "^build"
       ],
       "outputs": [
-        "dist/**",
-        ".next/**",
-        "!.next/cache/**"
+        "dist/**"
       ]
     },
     "check-types": {

@@ -1,4 +1,3 @@
-import dotenv from 'dotenv'
 import { Chain } from '@starknet-react/chains'
 import {
   ChainId,
@@ -8,9 +7,9 @@ import {
 } from 'src/dojo/setup/chains'
 import { stringToFelt } from 'src/utils/starknet'
 import { cleanObject } from 'src/utils/types'
+import * as ENV from 'src/dojo/setup/env'
 
-dotenv.config()
-export const defaultChainId = (process.env.NEXT_PUBLIC_CHAIN_ID || undefined) as ChainId
+export const defaultChainId = (ENV.CHAIN_ID) as ChainId
 
 export const isChainIdSupported = (chainId: ChainId): boolean => {
   return Object.keys(dojoContextConfig).includes(chainId)

@@ -37,9 +37,9 @@
     "baseUrl": ".",
     // import path shortcuts
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "/src/*": [
+        "./src/*"
+      ],
     },
     "strict": false,
     // vscode debugger

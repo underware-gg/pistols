@@ -1,6 +1,6 @@
 {
   "name": "@underware_gg/pistols-sdk",
-  "version": "0.12.4",
+  "version": "0.12.5",
   "description": "Pistols at 10 Blocks SDK",
   "homepage": "https://github.com/underware-gg/pistols",
   "author": "Underware",
@@ -62,7 +62,6 @@
     "sdk"
   ],
   "dependencies": {
-    "dotenv": "^16.4.7",
     "event-emitter": "^0.3.5",
     "swr": "^2.2.4"
   },
@@ -84,6 +83,7 @@
   },
   "devDependencies": {
     "@types/event-emitter": "^0.3.5",
+    "@types/node": "^22.10.2",
     "@types/react": "^18.2.30",
     "tsup": "^8.3.5",
     "typescript": "catalog:",
