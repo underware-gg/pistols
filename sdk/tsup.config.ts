@@ -10,7 +10,7 @@ export default defineConfig({
     "src/exports/hooks.ts",
     "src/exports/utils.ts"
   ],
+  format: ["esm"],
   clean: true,
-  format: ["cjs", "esm"],
   dts: true,
 });
