@@ -266,6 +266,21 @@ export interface PlayerValue {
 	timestamp_registered: BigNumberish;
 }
 
+// Type definition for `pistols::models::player::PlayerActivity` struct
+export interface PlayerActivity {
+  address: string;
+  timestamp: BigNumberish;
+  activity: Activity;
+  identifier: BigNumberish;
+}
+
+// Type definition for `pistols::models::player::PlayerActivityValue` struct
+export interface PlayerActivityValue {
+  timestamp: BigNumberish;
+  activity: Activity;
+  identifier: BigNumberish;
+}
+
 // Type definition for `pistols::models::table::TableAdmittance` struct
 export interface TableAdmittance {
 	table_id: BigNumberish;
@@ -311,6 +326,17 @@ export interface TokenBoundAddress {
 export interface TokenBoundAddressValue {
 	contract_address: string;
 	token_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::player::Activity` enum
+export enum Activity {
+  Undefined,
+  CreatedDuelist,
+  CreatedChallenge,
+  RepliedChallenge,
+  CommittedMoves,
+  RevealedMoves,
+  Online,
 }
 
 // Type definition for `pistols::models::consumable::ConsumableType` enum
@@ -416,6 +442,8 @@ export interface SchemaType extends ISchemaType {
 		PPlayerTutorialProgressValue: WithFieldOrder<PPlayerTutorialProgressValue>,
 		Player: WithFieldOrder<Player>,
 		PlayerValue: WithFieldOrder<PlayerValue>,
+    PlayerActivity: WithFieldOrder<PlayerActivity>,
+    PlayerActivityValue: WithFieldOrder<PlayerActivityValue>,
 		TableAdmittance: WithFieldOrder<TableAdmittance>,
 		TableAdmittanceValue: WithFieldOrder<TableAdmittanceValue>,
 		TableConfig: WithFieldOrder<TableConfig>,
@@ -654,6 +682,19 @@ export const schema: SchemaType = {
 		PlayerValue: {
 			fieldOrder: ['timestamp_registered'],
 			timestamp_registered: 0,
+		},
+		PlayerActivity: {
+			fieldOrder: ['address', 'timestamp', 'activity', 'identifier'],
+			address: "",
+			timestamp: 0,
+			activity: Activity.Undefined,
+			identifier: 0,
+		},
+		PlayerActivityValue: {
+			fieldOrder: ['timestamp', 'activity', 'identifier'],
+			timestamp: 0,
+			activity: Activity.Undefined,
+			identifier: 0,
 		},
 		TableAdmittance: {
 			fieldOrder: ['table_id', 'accounts', 'duelists'],
