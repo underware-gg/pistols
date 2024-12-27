@@ -230,14 +230,14 @@ pub mod game {
             self.finish_challenge(ref store, challenge);
 
             // transfer FAME reward
-            let (_balance_a, _balance_b): (i128, i128) = world.duelist_token_dispatcher().transfer_fame_reward(duel_id);
-            // store.set_challenge_fame_bill(
-            //     @ChallengeFameBalance {
-            //         duel_id,
-            //         balance_a,
-            //         balance_b,
-            //     }
-            // );
+            let (balance_a, balance_b): (i128, i128) = world.duelist_token_dispatcher().transfer_fame_reward(duel_id);
+            store.set_challenge_fame_bill(
+                @ChallengeFameBalance {
+                    duel_id,
+                    balance_a,
+                    balance_b,
+                }
+            );
 
             if (challenge.winner != 0) {
                 // send duel token to winner

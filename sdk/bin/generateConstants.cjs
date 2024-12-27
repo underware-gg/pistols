@@ -153,7 +153,7 @@ function get_cairo_to_typescript_type(cairoType, parsed, value=null) {
     return 'string';
   }
   if (parsed.enums[cairoType]) {
-    console.log(`---gopt ENUM`, parsed.enums[cairoType]);
+    // console.log(`---got ENUM`, parsed.enums[cairoType]);
     return cairoType;
   }
   let result = cairoToTypescriptType[cairoType];

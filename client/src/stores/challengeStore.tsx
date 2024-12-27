@@ -5,7 +5,7 @@ import { useEntityId, useClientTimestamp } from '@underware_gg/pistols-sdk/hooks
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { movesToHand } from '/src/utils/pistols'
-import { feltToString } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex, ETH_TO_WEI, feltToString } from '@underware_gg/pistols-sdk/utils'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
 
@@ -32,6 +32,15 @@ export const useChallenge = (duelId: BigNumberish) => {
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const challenge = useEntityModel<models.Challenge>(entity, 'Challenge')
+  // const fameBalance = useEntityModel<models.ChallengeFameBalance>(entity, 'ChallengeFameBalance')
+  // console.log(`useChallenge(${Number(duelId)}) =>`, 
+  //   fameBalance, 
+  //   BigInt(fameBalance?.balance_a ?? 0) / ETH_TO_WEI,
+  //   BigInt(fameBalance?.balance_b ?? 0) / ETH_TO_WEI,
+  //   BigInt(-1),
+  //   (BigInt(-1).toString()),
+  //   (BigInt(-1).toString(16)),
+  // )
   // useEffect(() => console.log(`useChallenge(${Number(duelId)}) => [${Object.keys(entities).length}]`, challenge), [challenge])
 
   const tableId = useMemo(() => feltToString(challenge?.table_id ?? 0n), [challenge])
