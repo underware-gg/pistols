@@ -283,8 +283,8 @@ mod tests {
         );
         assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
         let start_state_a = progress.steps[0].state_a;
-        let start_state_b = progress.steps[0].state_b;
-        assert(round.state_b.damage < *start_state_b.damage, 'damage');
+        // let start_state_b = progress.steps[0].state_b;
+        assert(round.state_b.damage < CONST::INITIAL_DAMAGE, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
     }
     #[test]
@@ -296,9 +296,9 @@ mod tests {
             false
         );
         assert(round.final_blow == PacesCard::Paces1.variant_name(), 'round.final_blow'); // ended in pistols
-        let start_state_a = progress.steps[0].state_a;
+        // let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
-        assert(round.state_a.damage < *start_state_a.damage, 'damage');
+        assert(round.state_a.damage < CONST::INITIAL_DAMAGE, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
     }
 
@@ -486,13 +486,11 @@ mod tests {
             false
         );
         assert(round.final_blow == BladesCard::Seppuku.variant_name(), 'round.final_blow'); // ended in blades
-        let start_state_a = progress.steps[0].state_a;
+        // let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
         // card effects on player state
-        assert(*start_state_a.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
-        assert(*start_state_a.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
-        assert(round.state_a.chances > *start_state_a.chances, 'chances');
-        assert(round.state_a.damage > *start_state_a.damage, 'damage');
+        assert(round.state_a.chances > CONST::INITIAL_CHANCE, 'chances');
+        assert(round.state_a.damage > CONST::INITIAL_DAMAGE, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // results
         assert(progress.winner == 2, 'progress.winner');
@@ -509,12 +507,10 @@ mod tests {
         );
         assert(round.final_blow == BladesCard::Seppuku.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
-        let start_state_b = progress.steps[0].state_b;
+        // let start_state_b = progress.steps[0].state_b;
         // card effects on player state
-        assert(*start_state_b.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
-        assert(*start_state_b.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
-        assert(round.state_b.chances > *start_state_b.chances, 'chances');
-        assert(round.state_b.damage > *start_state_b.damage, 'damage');
+        assert(round.state_b.chances > CONST::INITIAL_CHANCE, 'chances');
+        assert(round.state_b.damage > CONST::INITIAL_DAMAGE, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // results
         assert(progress.winner == 1, 'progress.winner');
@@ -530,15 +526,13 @@ mod tests {
             false
         );
         assert(round.final_blow == BladesCard::Seppuku.variant_name(), 'round.final_blow'); // ended in blades
-        let start_state_a = progress.steps[0].state_a;
-        let start_state_b = progress.steps[0].state_b;
-        assert(*start_state_b.chances == CONST::INITIAL_CHANCE, 'INITIAL_CHANCE');
-        assert(*start_state_b.damage == CONST::INITIAL_DAMAGE, 'INITIAL_DAMAGE');
+        // let start_state_a = progress.steps[0].state_a;
+        // let start_state_b = progress.steps[0].state_b;
         // card effects on player state
-        assert(round.state_a.chances > *start_state_a.chances, 'chances');
-        assert(round.state_a.damage > *start_state_a.damage, 'damage');
-        assert(round.state_b.chances > *start_state_b.chances, 'chances');
-        assert(round.state_b.damage > *start_state_b.damage, 'damage');
+        assert(round.state_a.chances > CONST::INITIAL_CHANCE, 'chances');
+        assert(round.state_a.damage > CONST::INITIAL_DAMAGE, 'damage');
+        assert(round.state_b.chances > CONST::INITIAL_CHANCE, 'chances');
+        assert(round.state_b.damage > CONST::INITIAL_DAMAGE, 'damage');
         // results
         assert(progress.winner == 0, 'progress.winner');
         _assert_is_dead(round.state_a, 'dead_a');
@@ -574,9 +568,9 @@ mod tests {
         );
         assert(round.final_blow == BladesCard::PocketPistol.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
-        let start_state_b = progress.steps[0].state_b;
+        // let start_state_b = progress.steps[0].state_b;
         // card effects on player state
-        assert(round.state_b.chances < *start_state_b.chances, 'chances');
+        assert(round.state_b.chances < CONST::INITIAL_CHANCE, 'chances');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // blade wins against none
         assert(progress.winner == 1, 'progress.winner');
@@ -592,9 +586,9 @@ mod tests {
             false
         );
         assert(round.final_blow == BladesCard::PocketPistol.variant_name(), 'round.final_blow'); // ended in blades
-        let start_state_a = progress.steps[0].state_a;
+        // let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
-        assert(round.state_a.chances < *start_state_a.chances, 'chances');
+        assert(round.state_a.chances < CONST::INITIAL_CHANCE, 'chances');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // blade wins against none
         assert(progress.winner == 2, 'progress.winner');
@@ -611,9 +605,9 @@ mod tests {
             false
         );
         assert(round.final_blow == BladesCard::Behead.variant_name(), 'round.final_blow'); // ended in blades
-        let start_state_a = progress.steps[0].state_a;
+        // let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
-        assert(round.state_a.damage > *start_state_a.damage, 'damage');
+        assert(round.state_a.damage > CONST::INITIAL_DAMAGE, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // blade wins against none
         assert(progress.winner == 1, 'progress.winner');
@@ -630,8 +624,8 @@ mod tests {
         );
         assert(round.final_blow == BladesCard::Behead.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
-        let start_state_b = progress.steps[0].state_b;
-        assert(round.state_b.damage > *start_state_b.damage, 'damage');
+        // let start_state_b = progress.steps[0].state_b;
+        assert(round.state_b.damage > CONST::INITIAL_DAMAGE, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // blade wins against none
         assert(progress.winner == 2, 'progress.winner');
@@ -649,8 +643,8 @@ mod tests {
         );
         assert(round.final_blow == BladesCard::Grapple.variant_name(), 'round.final_blow'); // ended in blades
         let start_state_a = progress.steps[0].state_a;
-        let start_state_b = progress.steps[0].state_b;
-        assert(round.state_b.damage < *start_state_b.damage, 'damage');
+        // let start_state_b = progress.steps[0].state_b;
+        assert(round.state_b.damage < CONST::INITIAL_DAMAGE, 'damage');
         _assert_not_affected_by_cards(*start_state_a, round.state_a);
         // blade wins against none
         assert(progress.winner == 1, 'progress.winner');
@@ -666,9 +660,9 @@ mod tests {
             false
         );
         assert(round.final_blow == BladesCard::Grapple.variant_name(), 'round.final_blow'); // ended in blades
-        let start_state_a = progress.steps[0].state_a;
+        // let start_state_a = progress.steps[0].state_a;
         let start_state_b = progress.steps[0].state_b;
-        assert(round.state_a.damage < *start_state_a.damage, 'damage');
+        assert(round.state_a.damage < CONST::INITIAL_DAMAGE, 'damage');
         _assert_not_affected_by_cards(*start_state_b, round.state_b);
         // blade wins against none
         assert(progress.winner == 2, 'progress.winner');
