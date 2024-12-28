@@ -10,6 +10,7 @@ use dojo_cairo_test::{
 use pistols::systems::{
     bank::{bank, IBankDispatcher, IBankDispatcherTrait},
     tokens::{
+        duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
         pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
         fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
         lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
@@ -103,6 +104,7 @@ pub struct TestSystems {
     world: WorldStorage,
     lords: ILordsMockDispatcher,
     token: IPackTokenDispatcher,
+    duelists: IDuelistTokenDispatcher,
     bank: IBankDispatcher,
 }
 
@@ -124,7 +126,9 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
             //
             // contracts
+            TestResource::Contract(duelist_token::TEST_CLASS_HASH),
             TestResource::Contract(pack_token::TEST_CLASS_HASH),
+            TestResource::Contract(fame_coin::TEST_CLASS_HASH),
             TestResource::Contract(bank::TEST_CLASS_HASH),
             TestResource::Contract(lords_mock::TEST_CLASS_HASH),
             TestResource::Contract(vrf_mock::TEST_CLASS_HASH),
@@ -134,11 +138,19 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
     let mut world: WorldStorage = spawn_test_world([ndef].span());
 
     let mut contract_defs: Array<ContractDef> = array![
+        ContractDefTrait::new(@"pistols", @"duelist_token")
+            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            .with_init_calldata([
+                'pistols.underware.gg',
+                0, // renderer_address
+            ].span()),
         ContractDefTrait::new(@"pistols", @"pack_token")
             .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             .with_init_calldata([
                 'pistols.underware.gg',
             ].span()),
+        ContractDefTrait::new(@"pistols", @"fame_coin")
+            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
         ContractDefTrait::new(@"pistols", @"bank")
             .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
         ContractDefTrait::new(@"pistols", @"lords_mock")
@@ -166,12 +178,16 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
         world,
         lords: world.lords_mock_dispatcher(),
         token: world.pack_token_dispatcher(),
+        duelists: world.duelist_token_dispatcher(),
         bank: world.bank_dispatcher(),
     }
 }
 
 fn setup(fee_amount: u128) -> TestSystems {
     let mut sys: TestSystems = setup_uninitialized(fee_amount);
+
+    tester::execute_lords_faucet(@sys.lords, OWNER());
+    tester::execute_lords_faucet(@sys.lords, OTHER());
 
     tester::impersonate(OWNER());
 
@@ -186,6 +202,19 @@ fn _assert_minted_count(world: WorldStorage, token: IPackTokenDispatcher, minted
     // assert(token.total_supply() == minted_count, 'msg);
     let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
     assert(token_config.minted_count == minted_count, msg);
+}
+fn _assert_duelist_count(world: WorldStorage, token: IDuelistTokenDispatcher, minted_count: u128, msg: felt252) {
+    // assert(token.total_supply() == minted_count, 'msg);
+    let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
+    assert(token_config.minted_count == minted_count, msg);
+}
+
+fn _purchase(sys: TestSystems, recipient: ContractAddress) {
+    let price: u128 = sys.token.calc_mint_fee(recipient, PackType::Duelists5x);
+    assert(price > 0, 'invalid price');
+    tester::impersonate(recipient);
+    tester::execute_lords_approve(@sys.lords, recipient, sys.bank.contract_address, price);
+    sys.token.purchase(PackType::Duelists5x);
 }
 
 //
@@ -213,17 +242,17 @@ fn test_token_uri() {
         pack_id: TOKEN_ID_1.low,
         pack_type: PackType::Duelists5x,
         seed: 999999,
+        is_open: false,
     };
 
     tester::set_Pack(ref sys.world, pack);
 
     sys.token.claim_duelists();
+    _purchase(sys, OWNER());
 
-    let uri_1 = sys.token.token_uri(TOKEN_ID_1);
-
-    println!("{}", uri_1);
-
-    assert(uri_1.len() > 100, 'Uri 1 should not be empty');
+    let uri = sys.token.token_uri(TOKEN_ID_2);
+    assert(uri.len() > 100, 'Uri 1 should not be empty');
+    println!("{}", uri);
 }
 
 #[test]
@@ -241,15 +270,14 @@ fn test_token_uri_invalid() {
 #[test]
 fn test_claim_mint() {
     let mut sys: TestSystems = setup(0);
-    _assert_minted_count(sys.world, sys.token, 0, 'invalid total_supply init');
+    _assert_minted_count(sys.world, sys.token, 0, 'total_supply init');
 
     let player: Player = tester::get_Player(sys.world, OWNER());
     assert(!player.exists(), '!player.exists()');
 
     sys.token.claim_duelists();
-    _assert_minted_count(sys.world, sys.token, 1, 'invalid total_supply 1');
-    assert(sys.token.balance_of(OWNER()) == 1, 'invalid balance_of 1');
-    assert(sys.token.owner_of(TOKEN_ID_1) == OWNER(), 'owner_of_1');
+    _assert_minted_count(sys.world, sys.token, 1, 'total_supply 1');
+    _assert_duelist_count(sys.world, sys.duelists, 5, 'duelist_supply 5');
 
     let player: Player = tester::get_Player(sys.world, OWNER());
     assert(player.exists(), 'player.exists()');
@@ -257,34 +285,26 @@ fn test_claim_mint() {
     assert(pack_1.pack_id == TOKEN_ID_1.low, 'pack_1.pack_id');
     assert(pack_1.pack_type == PackType::Duelists5x, 'pack_1.pack_type');
     assert(pack_1.seed != 0, 'pack_1.seed');
+    assert(pack_1.is_open == true, 'pack_1.is_open');
 
-    let price: u128 = sys.token.calc_mint_fee(OWNER(), PackType::Duelists5x);
-    assert(price > 0, 'invalid price');
-    tester::execute_lords_faucet(@sys.lords, OWNER());
-    tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, price);
-    sys.token.purchase(PackType::Duelists5x);
-
-    _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply 2');
-    assert(sys.token.balance_of(OWNER()) == 2, 'invalid balance_of 2');
-    assert(sys.token.owner_of(TOKEN_ID_2) == OWNER(), 'owner_of_2');
+    _purchase(sys, OWNER());
+    _assert_minted_count(sys.world, sys.token, 2, 'total_supply 2');
+    assert(sys.token.balance_of(OWNER()) == 1, 'balance_of 1');
+    assert(sys.token.owner_of(TOKEN_ID_2) == OWNER(), 'owner_of_1');
 
     let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
     assert(pack_2.pack_id == TOKEN_ID_2.low, 'pack_2.pack_id');
     assert(pack_2.seed != pack_1.seed, 'pack_2.seed');
+    assert(pack_2.is_open == false, 'pack_2.is_open');
 
     tester::impersonate(OTHER());
     sys.token.claim_duelists();
-    _assert_minted_count(sys.world, sys.token, 3, 'invalid total_supply 3');
-    assert(sys.token.balance_of(OTHER()) == 1, 'invalid balance_of 3');
-    assert(sys.token.owner_of(TOKEN_ID_3) == OTHER(), 'owner_of_3');
-
 }
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance_zero() {
     let mut sys: TestSystems = setup(100);
-    tester::execute_lords_faucet(@sys.lords, OWNER());
     sys.token.claim_duelists();
     sys.token.purchase(PackType::Duelists5x);
 }
@@ -295,7 +315,6 @@ fn test_mint_no_allowance_half() {
     let mut sys: TestSystems = setup(100);
     sys.token.claim_duelists();
     let price: u128 = sys.token.calc_mint_fee(OWNER(), PackType::Duelists5x);
-    tester::execute_lords_faucet(@sys.lords, OWNER());
     tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, price / 2);
     sys.token.purchase(PackType::Duelists5x);
 }
@@ -312,9 +331,62 @@ fn test_claim_twice() {
 #[should_panic(expected: ('PACK: Claim duelists first', 'ENTRYPOINT_FAILED'))]
 fn test_no_claim() {
     let mut sys: TestSystems = setup(100);
-    let price: u128 = sys.token.calc_mint_fee(OWNER(), PackType::Duelists5x);
-    tester::execute_lords_faucet(@sys.lords, OWNER());
-    tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, price / 2);
-    sys.token.purchase(PackType::Duelists5x);
+    _purchase(sys, OWNER());
 }
 
+
+//
+// opening...
+//
+
+#[test]
+fn test_open() {
+    let mut sys: TestSystems = setup(100);
+    sys.token.claim_duelists();
+    assert(sys.token.balance_of(OWNER()) == 0, 'token.balance_of = 0'); // burned!
+    _assert_duelist_count(sys.world, sys.duelists, 5, 'duelist_supply 5');
+    assert(sys.duelists.balance_of(OWNER()) == 5, 'duelists.balance_of = 5');
+
+    _purchase(sys, OWNER());
+    assert(sys.token.balance_of(OWNER()) == 1, 'token.balance_of = 1');
+    assert(sys.duelists.owner_of(TOKEN_ID_1) == OWNER(), 'duelists.owner_of');
+    assert(sys.duelists.balance_of(OWNER()) == 5, 'duelists.balance_of = 5/');
+    _assert_duelist_count(sys.world, sys.duelists, 5, 'duelist_supply 5/');
+
+    sys.token.open(TOKEN_ID_2.low);
+    assert(sys.token.balance_of(OWNER()) == 0, 'token.balance_of = 00');
+    assert(sys.duelists.balance_of(OWNER()) == 10, 'duelists.balance_of = 10');
+    _assert_duelist_count(sys.world, sys.duelists, 10, 'duelist_supply 10');
+}
+
+#[test]
+#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
+fn test_already_opened() {
+    let mut sys: TestSystems = setup(100);
+    sys.token.claim_duelists();
+    sys.token.open(TOKEN_ID_1.low);
+}
+
+#[test]
+#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
+fn test_open_invalid() {
+    let mut sys: TestSystems = setup(100);
+    sys.token.open(TOKEN_ID_2.low);
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Not owner', 'ENTRYPOINT_FAILED'))]
+fn test_open_not_owner() {
+    let mut sys: TestSystems = setup(100);
+    sys.token.claim_duelists();
+    _purchase(sys, OWNER());
+    tester::impersonate(OTHER());
+    sys.token.open(TOKEN_ID_2.low);
+}
+
+#[test]
+#[should_panic(expected: ('TOKEN: caller is not minter', 'ENTRYPOINT_FAILED'))]
+fn test_mint_duelist_not_minter() {
+    let mut sys: TestSystems = setup(100);
+    sys.duelists.mint_duelists(OWNER(), 1);
+}

@@ -18,12 +18,19 @@ pub struct Pack {
     //-----------------------
     pub pack_type: PackType,
     pub seed: felt252,
+    pub is_open: bool,
 }
 
 
 //----------------------------------
 // Traits
 //
+use pistols::systems::tokens::pack_token::pack_token::{Errors as PackErrors};
+use pistols::interfaces::systems::{
+    SystemsTrait,
+    IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+};
+use pistols::libs::store::{Store, StoreTrait};
 use pistols::types::constants::{CONST};
 
 #[generate_trait]
@@ -51,5 +58,21 @@ impl PackTypeImpl of PackTypeTrait {
             PackType::Duelists5x => (100 * CONST::ETH_TO_WEI),
             _ => 0,
         }
+    }
+}
+
+#[generate_trait]
+impl PackImpl of PackTrait {
+    fn open(ref self: Pack, ref store: Store, recipient: ContractAddress) {
+        assert(!self.is_open, PackErrors::ALREADY_OPENED);
+        match self.pack_type {
+            PackType::Duelists5x => {
+                let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
+                duelist_dispatcher.mint_duelists(recipient, 5);
+            },
+            _ => {},
+        };
+        self.is_open = true;
+        store.set_pack(@self);
     }
 }

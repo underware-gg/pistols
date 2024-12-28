@@ -234,7 +234,7 @@ pub mod duel_token {
             }
 
             // mint to game, so it can transfer to winner
-            let duel_id: u128 = self.token.mint(world.game_address());
+            let duel_id: u128 = *self.token.mint(world.game_address(), 1)[0];
 
             // validate challenger
             let address_a: ContractAddress = get_caller_address();

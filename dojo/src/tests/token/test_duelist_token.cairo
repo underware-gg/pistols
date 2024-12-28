@@ -163,9 +163,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             .with_init_calldata([
                 'pistols.underware.gg',
-                0, // minter_address
                 0, // renderer_address
-                (fee_amount * CONST::ETH_TO_WEI.low).into(), // fee_amount
             ].span()),
         ContractDefTrait::new(@"pistols", @"fame_coin")
             .with_writer_of([

@@ -15,7 +15,7 @@ pub trait ITokenComponentInternal<TState> {
         renderer_address: ContractAddress,
         payment: Payment,
     );
-    fn mint(ref self: TState, recipient: ContractAddress) -> u128;
+    fn mint(ref self: TState, recipient: ContractAddress, amount: usize) -> Span<u128>;
     fn burn(ref self: TState, token_id: u128);
     fn assert_exists(self: @TState, token_id: u128);
     fn assert_is_owner_of(self: @TState, address: ContractAddress, token_id: u128);
@@ -130,20 +130,27 @@ pub mod TokenComponent {
 
         fn mint(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
-        ) -> u128 {
+            amount: usize,
+        ) -> Span<u128> {
             assert(self.can_mint(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
 
-            // generate next token id
             let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let mut token_config: TokenConfig = store.get_token_config(get_contract_address());
-            let token_id: u128 = token_config.minted_count + 1;
-            token_config.minted_count = token_id;
+            let mut erc721 = get_dep_component_mut!(ref self, ERC721);
+
+            let mut token_ids: Array<u128> = array![];
+            let mut i: usize = 0;
+            while (i < amount) {
+                token_config.minted_count += 1;
+                token_ids.append(token_config.minted_count);
+                erc721.mint(recipient, token_config.minted_count.into());
+                i += 1;
+            };
+
             store.set_token_config(@token_config);
 
-            let mut erc721 = get_dep_component_mut!(ref self, ERC721);
-            erc721.mint(recipient, token_id.into());
-            (token_id)
+            (token_ids.span())
         }
 
         fn burn(ref self: ComponentState<TContractState>,

@@ -44,16 +44,17 @@ pub trait IPackToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IPackTokenPublic
-    fn claim_duelists(ref self: TState) -> Pack;
+    fn claim_duelists(ref self: TState);
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
-    fn open_pack(ref self: TState, pack_id: u128);
+    fn open(ref self: TState, pack_id: u128);
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
 }
 
 #[starknet::interface]
 pub trait IPackTokenPublic<TState> {
-    fn claim_duelists(ref self: TState) -> Pack;
+    fn claim_duelists(ref self: TState);
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
+    fn open(ref self: TState, pack_id: u128);
     fn can_claim_duelists(self: @TState, recipient: ContractAddress) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
 }
@@ -111,7 +112,7 @@ pub mod pack_token {
         IVrfProviderDispatcher, IVrfProviderDispatcherTrait, Source,
     };
     use pistols::models::{
-        pack::{Pack, PackValue, PackType, PackTypeTrait},
+        pack::{Pack, PackValue, PackTrait, PackType, PackTypeTrait},
         player::{Player, PlayerTrait, Activity},
         config::{TokenConfig, TokenConfigValue},
         payment::{Payment},
@@ -126,6 +127,8 @@ pub mod pack_token {
         const NOT_IMPLEMENTED: felt252      = 'PACK: Not implemented';
         const ALREADY_CLAIMED: felt252      = 'PACK: Already claimed';
         const NOT_CLAIMED: felt252          = 'PACK: Claim duelists first';
+        const ALREADY_OPENED: felt252       = 'PACK: Already opened';
+        const NOT_OWNER: felt252            = 'PACK: Not owner';
     }
 
     //*******************************
@@ -183,7 +186,7 @@ pub mod pack_token {
             (self.get_payment(recipient, pack_type).amount.low)
         }
 
-        fn claim_duelists(ref self: ContractState) -> Pack {
+        fn claim_duelists(ref self: ContractState) {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate
@@ -196,7 +199,8 @@ pub mod pack_token {
             // events
             PlayerTrait::check_in(ref store, recipient, Activity::WelcomePack, 0);
 
-            (pack)
+            // open immediately
+            self.open(pack.pack_id);
         }
 
         fn purchase(ref self: ContractState, pack_type: PackType) -> Pack {
@@ -221,6 +225,20 @@ pub mod pack_token {
             (pack)
         }
 
+        fn open(ref self: ContractState, pack_id: u128) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+
+            // validate owner, will panic if already opened
+            let recipient: ContractAddress = self.owner_of(pack_id.into());
+            assert(recipient == get_caller_address(), Errors::NOT_OWNER);
+
+            // open...
+            let mut pack: Pack = store.get_pack(pack_id);
+            pack.open(ref store, recipient);
+
+            // burn!
+            self.token.burn(pack_id.into());
+        }
     }
 
 
@@ -233,7 +251,7 @@ pub mod pack_token {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // mint!
-            let token_id: u128 = self.token.mint(recipient);
+            let token_id: u128 = *self.token.mint(recipient, 1)[0];
 
             // cretae vrf seed
             let seed: felt252 = store.world.vrf_dispatcher().consume_random(Source::Nonce(get_contract_address()));
@@ -243,6 +261,7 @@ pub mod pack_token {
                 pack_id: token_id,
                 pack_type,
                 seed,
+                is_open: false,
             };
             store.set_pack(@pack);
 

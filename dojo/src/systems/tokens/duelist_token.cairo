@@ -44,6 +44,7 @@ pub trait IDuelistToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IDuelistTokenPublic
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize) -> u128;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress) -> u128;
     fn create_duelist(ref self: TState, recipient: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
     fn update_duelist(ref self: TState, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
@@ -55,6 +56,7 @@ pub trait IDuelistToken<TState> {
 
 #[starknet::interface]
 pub trait IDuelistTokenPublic<TState> {
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize) -> Span<u128>;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress) -> u128;
     fn create_duelist(
         ref self: TState,
@@ -164,28 +166,17 @@ pub mod duelist_token {
     fn dojo_init(
         ref self: ContractState,
         base_uri: felt252,
-        minter_address: ContractAddress,
         renderer_address: ContractAddress,
-        fee_amount: u128,
     ) {
         self.erc721.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
             format!("https://{}",base_uri.as_string()),
         );
-        let payment = Payment {
-            key: get_contract_address().into(),
-            amount: fee_amount.into(),
-            client_percent: 0,
-            ranking_percent: 0,
-            owner_percent: 0,
-            pool_percent: 0,
-            treasury_percent: 100,
-        };
         self.token.initialize(
-            minter_address,
+            self.world(@"pistols").pack_token_address(),
             renderer_address,
-            payment,
+            payment: Default::default(),
         );
     }
 
@@ -203,6 +194,13 @@ pub mod duelist_token {
     use super::{IDuelistTokenPublic};
     #[abi(embed_v0)]
     impl DuelistTokenPublicImpl of IDuelistTokenPublic<ContractState> {
+
+        fn mint_duelists(ref self: ContractState,
+            recipient: ContractAddress,
+            amount: usize,
+        ) -> Span<u128>{
+            (self.token.mint(recipient, amount))
+        }
 
         fn calc_mint_fee(self: @ContractState,
             recipient: ContractAddress,
@@ -225,7 +223,7 @@ pub mod duelist_token {
             }
 
             // mint!
-            let token_id: u128 = self.token.mint(recipient);
+            let token_id: u128 = *self.token.mint(recipient, 1)[0];
 
             // create Duelist
             let mut duelist = Duelist {
