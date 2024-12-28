@@ -10,6 +10,7 @@ pub use pistols::systems::{
     tokens::{
         duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+        pack_token::{IPackTokenDispatcher, IPackTokenDispatcherTrait},
         fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait},
         lords_mock::{ILordsMockDispatcher, ILordsMockDispatcherTrait},
     }
@@ -28,6 +29,7 @@ pub mod SELECTORS {
     // tokens
     const DUEL_TOKEN: felt252 = selector_from_tag!("pistols-duel_token");
     const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
+    const PACK_TOKEN: felt252 = selector_from_tag!("pistols-pack_token");
     const FAME_COIN: felt252 = selector_from_tag!("pistols-fame_coin");
     // mocks
     const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
@@ -88,6 +90,10 @@ pub impl SystemsImpl of SystemsTrait {
         (self.contract_address(@"duelist_token"))
     }
     #[inline(always)]
+    fn pack_token_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"pack_token"))
+    }
+    #[inline(always)]
     fn fame_coin_address(self: @WorldStorage) -> ContractAddress {
         (self.contract_address(@"fame_coin"))
     }
@@ -126,6 +132,10 @@ pub impl SystemsImpl of SystemsTrait {
     #[inline(always)]
     fn duelist_token_dispatcher(self: @WorldStorage) -> IDuelistTokenDispatcher {
         (IDuelistTokenDispatcher{ contract_address: self.duelist_token_address() })
+    }   
+    #[inline(always)]
+    fn pack_token_dispatcher(self: @WorldStorage) -> IPackTokenDispatcher {
+        (IPackTokenDispatcher{ contract_address: self.pack_token_address() })
     }
     #[inline(always)]
     fn fame_coin_dispatcher(self: @WorldStorage) -> IFameCoinDispatcher {

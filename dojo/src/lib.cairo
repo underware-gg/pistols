@@ -12,8 +12,9 @@ mod systems {
     #[cfg(feature:'vrf_mock')]
     mod vrf_mock;
     mod tokens {
-        mod duel_token;
+        mod pack_token;
         mod duelist_token;
+        mod duel_token;
         mod fame_coin;
         #[cfg(feature:'lords_mock')]
         mod lords_mock;
@@ -36,8 +37,8 @@ mod libs {
 mod models {
     mod challenge;
     mod config;
-    mod consumable;
     mod duelist;
+    mod pack;
     mod payment;
     mod player;
     mod table;
@@ -98,6 +99,7 @@ mod tests {
     mod token {
         mod test_duel_token;
         mod test_duelist_token;
+        mod test_pack_token;
         // mocks
         mod mock_duelist;
     }

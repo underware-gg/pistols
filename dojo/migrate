@@ -71,6 +71,7 @@ echo "👍"
 # create torii config
 export DUEL_TOKEN_ADDRESS=$(get_contract_address "pistols-duel_token")
 export DUELIST_TOKEN_ADDRESS=$(get_contract_address "pistols-duelist_token")
+export PACK_TOKEN_ADDRESS=$(get_contract_address "pistols-pack_token")
 export FAME_TOKEN_ADDRESS=$(get_contract_address "pistols-fame_coin")
 export LORDS_TOKEN_ADDRESS=${LORDS_ADDRESS:-$(get_contract_address "pistols-lords_mock")}
 echo "------------------------------------------------------------------------------"
@@ -81,6 +82,7 @@ sed -i '' -e "s|\$world_address|$WORLD_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$rpc_url|$RPC_URL|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$duel_token|$DUEL_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$duelist_token|$DUELIST_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
+sed -i '' -e "s|\$pack_token|$PACK_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$fame_coin|$FAME_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$lords|$LORDS_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 cat $TORII_CONFIG_PATH

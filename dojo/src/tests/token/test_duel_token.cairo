@@ -25,8 +25,8 @@ use pistols::models::{
         m_Player, Player,
         e_PlayerActivity, PlayerActivity,
     },
-    consumable::{
-        m_ConsumableBalance, ConsumableBalance,
+    pack::{
+        m_Pack, Pack,
     },
     challenge::{
         m_Challenge, Challenge,
@@ -131,7 +131,7 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
         resources: [
             // pistols models
             TestResource::Model(m_Player::TEST_CLASS_HASH),
-            TestResource::Model(m_ConsumableBalance::TEST_CLASS_HASH),
+            TestResource::Model(m_Pack::TEST_CLASS_HASH),
             TestResource::Model(m_Challenge::TEST_CLASS_HASH),
             TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),

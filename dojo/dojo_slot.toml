@@ -49,6 +49,7 @@ default = "pistols"
   "pistols-admin",
   "pistols-duel_token",
   "pistols-duelist_token",
+  "pistols-pack_token",
 ]
 # ERC-20
 "pistols-CoinConfig"        = ["pistols-fame_coin","pistols-lords_mock"]
@@ -75,6 +76,9 @@ default = "pistols"
   "0x0", # renderer_address
   # "100000000000000000000", # fee_amount: 100 LORDS
   "0x0", # fee_amount
+]
+"pistols-pack_token" = [
+  "sstr:pistols.stage.underware.gg", # base_uri
 ]
 "pistols-lords_mock" = [
   "0x0", # minter_address

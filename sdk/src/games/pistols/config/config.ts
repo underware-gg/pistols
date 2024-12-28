@@ -62,6 +62,11 @@ const contractPolicyDescriptions: ContractPolicyDescriptions = {
     description: 'Duelist Token',
     interfaces: ['IDuelistTokenPublic'],
   },
+  pack_token: {
+    name: 'Pack Token',
+    description: 'Packs Token',
+    interfaces: ['IPackTokenPublic'],
+  },
   lords_mock: {
     name: 'Fake Lords',
     description: 'Fake Lords',

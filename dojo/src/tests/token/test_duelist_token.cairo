@@ -23,8 +23,8 @@ use pistols::models::{
         m_Player, Player,
         e_PlayerActivity, PlayerActivity,
     },
-    consumable::{
-        m_ConsumableBalance, ConsumableBalance,
+    pack::{
+        m_Pack, Pack,
     },
     challenge::{
         m_Challenge, Challenge,
@@ -131,7 +131,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
         resources: [
             // pistols models
             TestResource::Model(m_Player::TEST_CLASS_HASH),
-            TestResource::Model(m_ConsumableBalance::TEST_CLASS_HASH),
+            TestResource::Model(m_Pack::TEST_CLASS_HASH),
             TestResource::Model(m_Challenge::TEST_CLASS_HASH),
             TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
@@ -415,7 +415,7 @@ fn test_mint_lords_no_allowance_zero() {
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-fn test_mint_lords_no_allowance_half() {
+fn test_mint_no_allowance_half() {
     let mut sys: TestSystems = setup(100);
     let price: u128 = sys.token.calc_mint_fee(OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price / 2);
@@ -424,7 +424,7 @@ fn test_mint_lords_no_allowance_half() {
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient balance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
-fn test_mint_lords_no_balance_zero() {
+fn test_mint_no_balance_zero() {
     let mut sys: TestSystems = setup(100);
     let price: u128 = sys.token.calc_mint_fee(OTHER());
     tester::execute_lords_approve(@sys.lords, OTHER(), sys.bank.contract_address, price);

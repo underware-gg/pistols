@@ -3,7 +3,7 @@ use pistols::models::payment::{Payment};
 
 #[starknet::interface]
 pub trait ITokenComponentPublic<TState> {
-    fn can_mint(self: @TState, caller_address: ContractAddress) -> bool;
+    fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
 }
@@ -71,14 +71,14 @@ pub mod TokenComponent {
     > of ITokenComponentPublic<ComponentState<TContractState>> {
 
         fn can_mint(self: @ComponentState<TContractState>,
-            caller_address: ContractAddress,
+            recipient: ContractAddress,
         ) -> bool {
             let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let token_config: TokenConfigValue = store.get_token_config_value(get_contract_address());
             (
                 token_config.minter_address.is_zero() ||      // anyone can mint
-                caller_address == token_config.minter_address // caller is minter contract
+                recipient == token_config.minter_address // caller is minter contract
             )
         }
 

@@ -36,7 +36,7 @@ pub trait IDuelToken<TState> {
     fn tokenURI(self: @TState, tokenId: u256) -> ByteArray;
 
     // ITokenComponentPublic
-    fn can_mint(self: @TState, caller_address: ContractAddress) -> bool;
+    fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
 

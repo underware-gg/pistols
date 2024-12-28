@@ -2,13 +2,16 @@ use starknet::ContractAddress;
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Activity {
-    Undefined,        // 0
-    CreatedDuelist,   // 1
-    CreatedChallenge, // 2
-    RepliedChallenge, // 3
-    CommittedMoves,   // 4
-    RevealedMoves,    // 5
-    Online,           // 6
+    Undefined,          // 0
+    FinishedTutorial,   // 1
+    WelcomePack,        // 2
+    PurchasedPack,      // 3
+    CreatedDuelist,     // 4
+    CreatedChallenge,   // 5
+    RepliedChallenge,   // 6
+    CommittedMoves,     // 7
+    RevealedMoves,      // 8
+    Online,             // 9
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -90,13 +93,11 @@ use starknet::{get_block_timestamp};
 use dojo::world::{WorldStorage};
 use dojo::event::EventStorage;
 use pistols::libs::store::{Store, StoreTrait};
-use pistols::models::consumable::{ConsumableType, ConsumableTypeTrait};
 use pistols::utils::arrays::{ArrayUtilsTrait};
 use pistols::types::constants::{CONST};
 
 mod PlayerErrors {
     const PLAYER_NOT_REGISTERED: felt252    = 'PLAYER: Not registered';
-    const INSUFFICIENT_CONSUMABLES: felt252 = 'PLAYER: Insufficient consumable';
 }
 
 #[generate_trait]
@@ -107,8 +108,6 @@ impl PlayerImpl of PlayerTrait {
             assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
             player.timestamp_registered = get_block_timestamp();
             store.set_player(@player);
-            // grant duelists
-            ConsumableType::DuelistToken.grant(ref store, address, CONST::DUELIST_PACK_AMOUNT_REGISTER);
         }
         activity.emit(ref store.world, address, identifier);
     }
@@ -130,13 +129,9 @@ impl ActivityImpl of ActivityTrait {
         });
     }
     fn can_register_player(self: Activity) -> bool {
-        // match self {
-        //     Activity::CreatedDuelist |
-        //     Activity::CreatedChallenge |
-        //     Activity::RepliedChallenge => true,
-        //     _ => false,
-        // }
-        // TODO: remove this when we do a fresh deployment
-        (true)
+        match self {
+            Activity::WelcomePack => true,
+            _ => false,
+        }
     }
 }

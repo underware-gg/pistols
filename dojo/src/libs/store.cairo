@@ -15,9 +15,8 @@ pub use pistols::models::{
     player::{
         Player, PlayerValue,
     },
-    consumable::{
-        ConsumableBalance, ConsumableBalanceValue,
-        ConsumableType,
+    pack::{
+        Pack, PackValue,
     },
     challenge::{
         Challenge, ChallengeValue,
@@ -69,12 +68,12 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_consumable_balance(ref self: Store, consumable_type: ConsumableType, address: ContractAddress) -> ConsumableBalance {
-        (self.world.read_model((consumable_type, address),))
+    fn get_pack(ref self: Store, pack_id: u128) -> Pack {
+        (self.world.read_model(pack_id))
     }
     #[inline(always)]
-    fn get_consumable_balance_value(ref self: Store, consumable_type: ConsumableType, address: ContractAddress) -> ConsumableBalanceValue {
-        (self.world.read_value((consumable_type, address),))
+    fn get_pack_value(ref self: Store, pack_id: u128) -> PackValue {
+        (self.world.read_value(pack_id))
     }
 
     #[inline(always)]
@@ -171,7 +170,7 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_consumable_balance(ref self: Store, model: @ConsumableBalance) {
+    fn set_pack(ref self: Store, model: @Pack) {
         self.world.write_model(model);
     }
 

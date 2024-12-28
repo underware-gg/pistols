@@ -15,7 +15,7 @@
     "**/*-lock.json": true,
     "**/*-lock.yaml": true,
     "**/*.lock": true,
-    // "**/*.graphql": true,
+    "**/*.graphql": true,
     "**/artifacts/**/*.json": true,
     "**/contracts/**/*.json": true,
     "**/yarn*.json": true,

@@ -33,8 +33,8 @@ mod tester {
             m_Player, Player,
             e_PlayerActivity, PlayerActivity,
         },
-        consumable::{
-            m_ConsumableBalance, ConsumableBalance,
+        pack::{
+            m_Pack, Pack,
         },
         challenge::{
             m_Challenge, Challenge, ChallengeValue,
@@ -175,7 +175,7 @@ mod tester {
         let mut resources: Array<TestResource> = array![
             // pistols models
             TestResource::Model(m_Player::TEST_CLASS_HASH),
-            TestResource::Model(m_ConsumableBalance::TEST_CLASS_HASH),
+            TestResource::Model(m_Pack::TEST_CLASS_HASH),
             TestResource::Model(m_Challenge::TEST_CLASS_HASH),
             TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
@@ -602,6 +602,9 @@ mod tester {
         world.write_model_test(@model);
     }
     fn set_Challenge(ref world: WorldStorage, model: Challenge) {
+        world.write_model_test(@model);
+    }
+    fn set_Pack(ref world: WorldStorage, model: Pack) {
         world.write_model_test(@model);
     }
 

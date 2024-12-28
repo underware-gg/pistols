@@ -6,13 +6,13 @@ use pistols::utils::bitwise::{BITWISE};
 // https://github.com/smartcontractkit/chainlink-starknet/blob/develop/contracts/src/utils.cairo
 use integer::{u128s_from_felt252, U128sFromFelt252Result};
 
-// consumes a ByteArray to avoid unused variable warnings
+// consumes unused arguments to avoid warnings
 #[inline(always)]
 fn CONSUME_ADDRESS(_value: ContractAddress) {}
-
-// consumes a ByteArray to avoid unused variable warnings
 #[inline(always)]
 fn CONSUME_BYTE_ARRAY(_value: @ByteArray) {}
+#[inline(always)]
+fn CONSUME_U256(_value: u256) {}
 
 #[inline(always)]
 fn ZERO() -> ContractAddress {

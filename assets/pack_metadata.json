@@ -1,0 +1,15 @@
+{
+  "id": "1",
+  "name": "Duelists 5-pack #1",
+  "description": "Pistols at 10 Blocks Pack #1. https://pistols.underware.gg",
+  "image": "https://pistols.underware.gg/tokens/duelists_5x.png",
+  "metadata": {
+    "Type": "Duelists 5-pack"
+  },
+  "attributes": [
+    {
+      "trait": "Type",
+      "value": "Duelists 5-pack"
+    }
+  ]
+}

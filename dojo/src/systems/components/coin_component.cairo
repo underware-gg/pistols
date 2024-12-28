@@ -6,7 +6,7 @@ pub trait ICoinComponentInternal<TState> {
         minter_address: ContractAddress,
         faucet_amount: u128,
     );
-    fn can_mint(self: @TState, caller_address: ContractAddress) -> bool;
+    fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn assert_caller_is_minter(self: @TState) -> ContractAddress;
     fn mint(ref self: TState, recipient: ContractAddress, amount: u256);
     fn faucet(ref self: TState, recipient: ContractAddress);
@@ -73,14 +73,14 @@ pub mod CoinComponent {
         }
 
         fn can_mint(self: @ComponentState<TContractState>,
-            caller_address: ContractAddress,
+            recipient: ContractAddress,
         ) -> bool {
             let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let coin_config: CoinConfigValue = store.get_coin_config_value(get_contract_address());
             (
                 coin_config.minter_address.is_zero() ||      // anyone can mint
-                caller_address == coin_config.minter_address // caller is minter contract
+                recipient == coin_config.minter_address // caller is minter contract
             )
         }
 

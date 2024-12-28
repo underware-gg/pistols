@@ -34,7 +34,7 @@ pub trait IDuelistToken<TState> {
     fn tokenURI(self: @TState, tokenId: u256) -> ByteArray;
 
     // ITokenComponentPublic
-    fn can_mint(self: @TState, caller_address: ContractAddress) -> bool;
+    fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
 
@@ -137,12 +137,8 @@ pub mod duelist_token {
             Archetype,
             ScoreboardValue,
         },
-        challenge::{
-            ChallengeValue,
-        },
-        config::{
-            TokenConfig, TokenConfigValue,
-        },
+        challenge::{ChallengeValue},
+        config::{TokenConfig, TokenConfigValue},
         payment::{Payment},
         table::{TABLES},
     };
@@ -224,7 +220,7 @@ pub mod duelist_token {
 
             // transfer mint fee
             let payment: Payment = self.get_payment(recipient);
-            if (payment.amount != 0) { // avoid bank contract during tests
+            if (payment.amount != 0) {
                 world.bank_dispatcher().charge(recipient, payment);
             }
 
