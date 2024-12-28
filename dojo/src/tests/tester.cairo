@@ -545,6 +545,10 @@ mod tester {
         (world.read_model(address))
     }
     #[inline(always)]
+    fn get_Pack(world: WorldStorage, pack_id: u128) -> Pack {
+        (world.read_model(pack_id))
+    }
+    #[inline(always)]
     fn get_DuelistValue(world: WorldStorage, address: ContractAddress) -> DuelistValue {
         (world.read_value(ID(address)))
     }

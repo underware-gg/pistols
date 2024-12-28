@@ -46,6 +46,7 @@ pub trait IPackToken<TState> {
     // IPackTokenPublic
     fn claim_duelists(ref self: TState) -> Pack;
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
+    fn open_pack(ref self: TState, pack_id: u128);
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
 }
 
@@ -107,7 +108,7 @@ pub mod pack_token {
     use pistols::interfaces::systems::{
         SystemsTrait,
         IBankDispatcher, IBankDispatcherTrait,
-        IFameCoinDispatcher, IFameCoinDispatcherTrait,
+        IVrfProviderDispatcher, IVrfProviderDispatcherTrait, Source,
     };
     use pistols::models::{
         pack::{Pack, PackValue, PackType, PackTypeTrait},
@@ -183,6 +184,8 @@ pub mod pack_token {
         }
 
         fn claim_duelists(ref self: ContractState) -> Pack {
+            let mut store: Store = StoreTrait::new(self.world_default());
+
             // validate
             let recipient: ContractAddress = get_caller_address();
             assert(self.can_claim_duelists(recipient), Errors::ALREADY_CLAIMED);
@@ -191,14 +194,13 @@ pub mod pack_token {
             let pack: Pack = self.mint_pack(PackType::Duelists5x, recipient);
             
             // events
-            let mut store: Store = StoreTrait::new(self.world_default());
             PlayerTrait::check_in(ref store, recipient, Activity::WelcomePack, 0);
 
             (pack)
         }
 
         fn purchase(ref self: ContractState, pack_type: PackType) -> Pack {
-            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate
             let recipient: ContractAddress = get_caller_address();
@@ -207,14 +209,13 @@ pub mod pack_token {
             // transfer mint fee
             let payment: Payment = self.get_payment(recipient, pack_type);
             if (payment.amount != 0) {
-                world.bank_dispatcher().charge(recipient, payment);
+                store.world.bank_dispatcher().charge(recipient, payment);
             }
 
             // mint
             let pack: Pack = self.mint_pack(PackType::Duelists5x, recipient);
             
             // events
-            let mut store: Store = StoreTrait::new(world);
             PlayerTrait::check_in(ref store, recipient, Activity::PurchasedPack, pack.pack_type.id());
 
             (pack)
@@ -229,18 +230,20 @@ pub mod pack_token {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn mint_pack(ref self: ContractState, pack_type: PackType, recipient: ContractAddress) -> Pack {
+            let mut store: Store = StoreTrait::new(self.world_default());
+
             // mint!
             let token_id: u128 = self.token.mint(recipient);
+
+            // cretae vrf seed
+            let seed: felt252 = store.world.vrf_dispatcher().consume_random(Source::Nonce(get_contract_address()));
 
             // create Duelist
             let mut pack = Pack {
                 pack_id: token_id,
                 pack_type,
-                seed: 0,
+                seed,
             };
-            
-            // save
-            let mut store: Store = StoreTrait::new(self.world_default());
             store.set_pack(@pack);
 
             (pack)

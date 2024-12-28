@@ -221,7 +221,7 @@ mod tests {
         assert(lords_fee == 0, 'lords_fee == 0');
         // assert(lords_balance_treasury == 0, 'lords_balance_treasury == 0');
 
-        let (_challenge, round_1, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
+        let (_challenge, _round_1, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
         // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, (lords_fee + PRIZE_VALUE) * 2, 'lords_balance_contract_1');
         // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee + PRIZE_VALUE, 0, 'lords_balance_a_1');
         // tester::assert_balance(sys.lords, OTHER(), lords_balance_b, lords_fee + PRIZE_VALUE, 0, 'lords_balance_b_1');
@@ -239,9 +239,9 @@ mod tests {
         // duel owned by contract
         assert(sys.duels.owner_of(duel_id.into()) == sys.game.contract_address, 'duels.owner_of');
 
-        assert(round_1.moves_a.seed != 0, 'round_1.moves_a.seed');
-        assert(round_1.moves_b.seed != 0, 'round_1.moves_b.seed');
-        assert(round_1.moves_a.seed != round_1.moves_b.seed, 'round_1.moves_a.seed != moves_b');
+        // assert(round_1.moves_a.seed != 0, 'round_1.moves_a.seed');
+        // assert(round_1.moves_b.seed != 0, 'round_1.moves_b.seed');
+        // assert(round_1.moves_a.seed != round_1.moves_b.seed, 'round_1.moves_a.seed != moves_b');
 
         // 1st commit
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
@@ -361,12 +361,12 @@ mod tests {
         assert(fame_reward_a_2 != fame_reward_a, 'fame_reward_a_2 !=');
         assert(fame_reward_b_2 != fame_reward_b, 'fame_reward_b_2 !=');
 
-        let (_challenge, round_2, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
-        assert(round_2.moves_a.seed != 0, 'round_2.moves_a.seed');
-        assert(round_2.moves_b.seed != 0, 'round_2.moves_b.seed');
-        assert(round_2.moves_a.seed != round_2.moves_b.seed, 'round_2.moves_a.seed != moves_b');
-        assert(round_2.moves_a.seed != round_1.moves_a.seed, 'round_2.moves_a.seed != round_1');
-        assert(round_2.moves_b.seed != round_1.moves_b.seed, 'round_2.moves_b.seed != round_1');
+        let (_challenge, _round_2, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
+        // assert(round_2.moves_a.seed != 0, 'round_2.moves_a.seed');
+        // assert(round_2.moves_b.seed != 0, 'round_2.moves_b.seed');
+        // assert(round_2.moves_a.seed != round_2.moves_b.seed, 'round_2.moves_a.seed != moves_b');
+        // assert(round_2.moves_a.seed != round_1.moves_a.seed, 'round_2.moves_a.seed != round_1');
+        // assert(round_2.moves_b.seed != round_1.moves_b.seed, 'round_2.moves_b.seed != round_1');
         // invert player order just for fun, expect same results!
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);

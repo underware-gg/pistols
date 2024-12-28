@@ -6,7 +6,6 @@ pub use pistols::systems::{
     bank::{IBankDispatcher, IBankDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
-    vrf_mock::{IVRFMockDispatcher, IVRFMockDispatcherTrait},
     tokens::{
         duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
@@ -15,7 +14,10 @@ pub use pistols::systems::{
         lords_mock::{ILordsMockDispatcher, ILordsMockDispatcherTrait},
     }
 };
-pub use pistols::interfaces::ierc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
+pub use pistols::interfaces::{
+    ierc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait},
+    vrf::{IVrfProviderDispatcher, IVrfProviderDispatcherTrait, Source},
+};
 pub use pistols::libs::store::{Store, StoreTrait};
 pub use pistols::models::config::{CONFIG, Config, ConfigTrait};
 pub use pistols::utils::misc::{ZERO};
@@ -63,8 +65,9 @@ pub impl SystemsImpl of SystemsTrait {
         (WorldStorageTrait::new(dispatcher, namespace))
     }
 
-    //
+    //--------------------------
     // system addresses
+    //
     #[inline(always)]
     fn admin_address(self: @WorldStorage) -> ContractAddress {
         (self.contract_address(@"admin"))
@@ -107,8 +110,25 @@ pub impl SystemsImpl of SystemsTrait {
         (self.contract_address(@"vrf_mock"))
     }
 
+    //--------------------------
+    // address validators
     //
+    #[inline(always)]
+    fn is_game_contract(self: @WorldStorage, address: ContractAddress) -> bool {
+        (address == self.game_address())
+    }
+    #[inline(always)]
+    fn is_duel_contract(self: @WorldStorage, address: ContractAddress) -> bool {
+        (address == self.duel_token_address())
+    }
+    #[inline(always)]
+    fn is_duelist_contract(self: @WorldStorage, address: ContractAddress) -> bool {
+        (address == self.duelist_token_address())
+    }
+
+    //--------------------------
     // dispatchers
+    //
     #[inline(always)]
     fn admin_dispatcher(self: @WorldStorage) -> IAdminDispatcher {
         (IAdminDispatcher{ contract_address: self.admin_address() })
@@ -147,34 +167,23 @@ pub impl SystemsImpl of SystemsTrait {
         (store.get_config().lords_dispatcher())
     }
     #[inline(always)]
-    fn vrf_dispatcher(self: @WorldStorage) -> IVRFMockDispatcher {
+    fn vrf_dispatcher(self: @WorldStorage) -> IVrfProviderDispatcher {
         let mut store: Store = StoreTrait::new(*self);
         (store.get_config().vrf_dispatcher())
     }
 
-    //
+
+    //--------------------------
     // test dispatchers
+    // (use only in tests)
+    //
     #[inline(always)]
     fn lords_mock_dispatcher(self: @WorldStorage) -> ILordsMockDispatcher {
         (ILordsMockDispatcher{ contract_address: self.lords_mock_address() })
     }
     #[inline(always)]
-    fn vrf_mock_dispatcher(self: @WorldStorage) -> IVRFMockDispatcher {
-        (IVRFMockDispatcher{ contract_address: self.vrf_mock_address() })
+    fn vrf_mock_dispatcher(self: @WorldStorage) -> IVrfProviderDispatcher {
+        (IVrfProviderDispatcher{ contract_address: self.vrf_mock_address() })
     }
 
-    //
-    // validators
-    #[inline(always)]
-    fn is_game_contract(self: @WorldStorage, address: ContractAddress) -> bool {
-        (address == self.game_address())
-    }
-    #[inline(always)]
-    fn is_duel_contract(self: @WorldStorage, address: ContractAddress) -> bool {
-        (address == self.duel_token_address())
-    }
-    #[inline(always)]
-    fn is_duelist_contract(self: @WorldStorage, address: ContractAddress) -> bool {
-        (address == self.duelist_token_address())
-    }
 }

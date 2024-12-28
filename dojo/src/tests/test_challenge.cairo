@@ -373,8 +373,8 @@ mod tests {
 
         let round = tester::get_RoundValue(sys.world, duel_id);
         assert(round.state == RoundState::Commit, 'round.state');
-        assert(round.moves_a.seed != 0, 'round.moves_a.seed');
-        assert(round.moves_b.seed == 0, 'round.moves_b.seed');
+        // assert(round.moves_a.seed != 0, 'round.moves_a.seed');
+        // assert(round.moves_b.seed == 0, 'round.moves_b.seed');
 
         // reply...
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
@@ -391,8 +391,8 @@ mod tests {
         
         let round_2 = tester::get_RoundValue(sys.world, duel_id);
         assert(round_2.state == RoundState::Commit, 'round_2.state');
-        assert(round_2.moves_a.seed == round.moves_a.seed, 'round_2.moves_a.seed');
-        assert(round_2.moves_b.seed != 0, 'round_2.moves_b.seed');
+        // assert(round_2.moves_a.seed == round.moves_a.seed, 'round_2.moves_a.seed');
+        // assert(round_2.moves_b.seed != 0, 'round_2.moves_b.seed');
 
         _assert_empty_progress(sys, duel_id);
     }

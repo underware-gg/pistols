@@ -17,6 +17,7 @@ use pistols::systems::{
     components::{
         token_bound::{m_TokenBoundAddress, TokenBoundAddress},
     },
+    vrf_mock::{vrf_mock},
 };
 use pistols::models::{
     player::{
@@ -126,6 +127,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Contract(pack_token::TEST_CLASS_HASH),
             TestResource::Contract(bank::TEST_CLASS_HASH),
             TestResource::Contract(lords_mock::TEST_CLASS_HASH),
+            TestResource::Contract(vrf_mock::TEST_CLASS_HASH),
         ].span()
     };
 
@@ -145,6 +147,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
                 0, // minter
                 10_000_000_000_000_000_000_000, // 10,000 Lords
             ].span()),
+        ContractDefTrait::new(@"pistols", @"vrf_mock"),
     ];
 
     world.sync_perms_and_inits(contract_defs.span());
@@ -236,7 +239,7 @@ fn test_token_uri_invalid() {
 //
 
 #[test]
-fn test_claim_free() {
+fn test_claim_mint() {
     let mut sys: TestSystems = setup(0);
     _assert_minted_count(sys.world, sys.token, 0, 'invalid total_supply init');
 
@@ -250,6 +253,10 @@ fn test_claim_free() {
 
     let player: Player = tester::get_Player(sys.world, OWNER());
     assert(player.exists(), 'player.exists()');
+    let pack_1: Pack = tester::get_Pack(sys.world, TOKEN_ID_1.low);
+    assert(pack_1.pack_id == TOKEN_ID_1.low, 'pack_1.pack_id');
+    assert(pack_1.pack_type == PackType::Duelists5x, 'pack_1.pack_type');
+    assert(pack_1.seed != 0, 'pack_1.seed');
 
     let price: u128 = sys.token.calc_mint_fee(OWNER(), PackType::Duelists5x);
     assert(price > 0, 'invalid price');
@@ -260,6 +267,10 @@ fn test_claim_free() {
     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply 2');
     assert(sys.token.balance_of(OWNER()) == 2, 'invalid balance_of 2');
     assert(sys.token.owner_of(TOKEN_ID_2) == OWNER(), 'owner_of_2');
+
+    let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
+    assert(pack_2.pack_id == TOKEN_ID_2.low, 'pack_2.pack_id');
+    assert(pack_2.seed != pack_1.seed, 'pack_2.seed');
 
     tester::impersonate(OTHER());
     sys.token.claim_duelists();

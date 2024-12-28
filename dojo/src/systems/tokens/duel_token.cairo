@@ -134,7 +134,6 @@ pub mod duel_token {
     use pistols::interfaces::systems::{
         SystemsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
-        IVRFMockDispatcher, IVRFMockDispatcherTrait,
     };
     use pistols::models::{
         config::{TokenConfig, TokenConfigValue},
@@ -300,8 +299,6 @@ pub mod duel_token {
                 state_b: Default::default(),
                 final_blow: 0,
             };
-            // generate player deck seed
-            round.moves_a.seed = world.vrf_dispatcher().consume_random();
             store.set_round(@round);
 
             // set the pact + assert it does not exist
@@ -377,7 +374,6 @@ pub mod duel_token {
                     challenge.timestamp_end = 0;
                     // generate player deck seed
                     let mut round: Round = store.get_round(duel_id);
-                    round.moves_b.seed = world.vrf_dispatcher().consume_random();
                     store.set_round(@round);
                 } else {
                     // Challenged is Refusing

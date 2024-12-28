@@ -2,6 +2,7 @@ mod interfaces {
     mod systems;
     mod ierc20;
     mod ierc721;
+    mod vrf;
 }
 
 mod systems {

@@ -63,6 +63,7 @@ export type DojoChainConfig = {
   etherAddress: string
   lordsFaucet: boolean | string
   lordsAddress: string,
+  vrfAddress: string,
   predeployedAccounts: PredeployedAccount[]
   connectorIds: string[]
   // starknet Chain
@@ -86,6 +87,7 @@ export const envChainConfig: DojoChainConfig = {
   etherAddress: undefined,
   lordsFaucet: undefined,
   lordsAddress: undefined,
+  vrfAddress: undefined,
   predeployedAccounts: undefined,
   connectorIds: undefined,
 }
@@ -112,6 +114,7 @@ const localKatanaConfig: DojoChainConfig = {
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
   lordsAddress: undefined,
+  vrfAddress: undefined,
   predeployedAccounts: [
     {
       name: 'Katana 1',
@@ -154,6 +157,7 @@ const pistolsSlotConfig: DojoChainConfig = {
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
   lordsAddress: undefined,
+  vrfAddress: undefined,
   predeployedAccounts: [
     {
       name: 'Predeployed',
@@ -171,27 +175,28 @@ const pistolsSlotConfig: DojoChainConfig = {
   explorers: WORLD_EXPLORER,
 } as const
 
-const pistolsStagingConfig: DojoChainConfig = {
-  chain: undefined, // derive from this
-  chainId: ChainId.PISTOLS_STAGING,
-  name: 'Slot Staging',
-  rpcUrl: 'https://api.cartridge.gg/x/pistols-staging/katana',
-  toriiUrl: 'https://api.cartridge.gg/x/pistols-staging/torii',
-  relayUrl: undefined,
-  masterAddress: undefined,
-  masterPrivateKey: undefined,
-  accountClassHash: KATANA_CLASS_HASH,
-  etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
-  lordsFaucet: true,
-  lordsAddress: undefined,
-  predeployedAccounts: [],
-  connectorIds: [
-    supportedConnetorIds.CONTROLLER,
-  ],
-  // starknet Chain
-  nativeCurrency: ETH_KATANA,
-  explorers: WORLD_EXPLORER,
-} as const
+// const pistolsStagingConfig: DojoChainConfig = {
+//   chain: undefined, // derive from this
+//   chainId: ChainId.PISTOLS_STAGING,
+//   name: 'Slot Staging',
+//   rpcUrl: 'https://api.cartridge.gg/x/pistols-staging/katana',
+//   toriiUrl: 'https://api.cartridge.gg/x/pistols-staging/torii',
+//   relayUrl: undefined,
+//   masterAddress: undefined,
+//   masterPrivateKey: undefined,
+//   accountClassHash: KATANA_CLASS_HASH,
+//   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
+//   lordsFaucet: true,
+//   lordsAddress: undefined,
+//   vrfAddress: undefined,
+//   predeployedAccounts: [],
+//   connectorIds: [
+//     supportedConnetorIds.CONTROLLER,
+//   ],
+//   // starknet Chain
+//   nativeCurrency: ETH_KATANA,
+//   explorers: WORLD_EXPLORER,
+// } as const
 
 
 
@@ -215,11 +220,33 @@ const snSepoliaConfig: DojoChainConfig = {
   lordsFaucet: true,
   // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
   lordsAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
+  vrfAddress: '0x00be3edf412dd5982aa102524c0b8a0bcee584c5a627ed1db6a7c36922047257',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
-    // supportedConnetorIds.ARGENT,
-    // supportedConnetorIds.BRAAVOS,
+  ],
+} as const
+
+const pistolsStagingConfig: DojoChainConfig = {
+  chain: { ...sepolia },
+  chainId: ChainId.SN_SEPOLIA,
+  name: 'Sepolia Staging',
+  // rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/v0_6',
+  // rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
+  rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
+  toriiUrl: 'https://api.cartridge.gg/x/pistols-staging/torii',
+  relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-staging%2Ftorii%2Fwss',
+  masterAddress: undefined,
+  masterPrivateKey: undefined,
+  accountClassHash: KATANA_CLASS_HASH,
+  etherAddress: sepolia.nativeCurrency.address,
+  lordsFaucet: true,
+  // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
+  lordsAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
+  vrfAddress: '0x00be3edf412dd5982aa102524c0b8a0bcee584c5a627ed1db6a7c36922047257',
+  predeployedAccounts: [],
+  connectorIds: [
+    supportedConnetorIds.CONTROLLER,
   ],
 } as const
 
@@ -237,11 +264,10 @@ const snMainnetConfig: DojoChainConfig = {
   etherAddress: mainnet.nativeCurrency.address,
   lordsFaucet: false,
   lordsAddress: '0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49',
+  vrfAddress: '0x00be3edf412dd5982aa102524c0b8a0bcee584c5a627ed1db6a7c36922047257',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
-    // supportedConnetorIds.ARGENT,
-    // supportedConnetorIds.BRAAVOS,
   ],
 } as const
 
