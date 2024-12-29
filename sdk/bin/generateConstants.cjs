@@ -9,7 +9,9 @@ function getFolderFilesRecursively(folder, extension = null) {
   fs.readdirSync(folder).forEach(File => {
     const absPath = path.join(folder, File);
     if (fs.statSync(absPath).isDirectory()) {
-      files = files.concat(getFolderFilesRecursively(absPath));
+      if (!absPath.endsWith(`/tests`)) {
+        files = files.concat(getFolderFilesRecursively(absPath, extension));
+      }
     } else if (!extension || absPath.endsWith(extension)) {
       files.push(absPath);
     }
