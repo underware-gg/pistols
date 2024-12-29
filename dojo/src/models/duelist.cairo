@@ -1,42 +1,17 @@
 use starknet::ContractAddress;
-
-#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-pub enum Archetype {
-    Undefined,  // 0
-    Villainous, // 1
-    Trickster,  // 2
-    Honourable, // 3
-}
-
-impl ArchetypeDefault of Default<Archetype> {
-    fn default() -> Archetype {(Archetype::Undefined)}
-}
-
-#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-pub enum ProfilePicType {
-    Undefined,  // 0
-    Duelist,    // 1
-    External,   // 2
-    // StarkId,    // stark.id (ipfs?)
-    // ERC721,     // Owned erc-721 (hard to validate and keep up to date)
-    // Discord,    // Linked account (had to be cloned, or just copy the url)
-}
-
+use pistols::types::profile_type::{ProfileType, ProfileTypeTrait};
 
 //---------------------
 // Duelist
 //
-// #[derive(Copy, Drop, Serde)] // ByteArray is not copiable!
-#[derive(Clone, Drop, Serde, Default)]   // pass to functions using duelist.clone()
+#[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct Duelist {
     #[key]
     pub duelist_id: u128,   // erc721 token_id
     //-----------------------
-    pub name: felt252,
-    pub profile_pic_type: ProfilePicType,
-    pub profile_pic_uri: ByteArray,     // can be anything
-    pub timestamp: u64,                 // date registered (seconds since epoch)
+    pub profile_type: ProfileType,
+    pub timestamp: u64,         // date registered (seconds since epoch)
     pub score: Score,
 }
 
@@ -63,7 +38,7 @@ pub struct Scoreboard {
     pub duelist_id: u128,
     //------------
     pub score: Score,
-} // [160] [128] [128]
+}
 
 #[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
 pub struct Score {
@@ -73,7 +48,7 @@ pub struct Score {
     pub total_losses: u16,
     pub total_draws: u16,
     pub honour_history: u64,    // past 8 duels, each byte holds one duel honour
-} // [160]
+}
 
 
 
@@ -84,6 +59,7 @@ use pistols::types::constants::{CONST, HONOUR};
 use pistols::utils::bitwise::{BitwiseU64};
 use pistols::utils::math::{MathU64};
 
+// TODO: DELETE THIS
 #[generate_trait]
 impl DuelistTraitImpl of DuelistTrait {
     fn is_owner(self: Duelist, address: ContractAddress) -> bool {
@@ -106,6 +82,18 @@ impl DuelistTraitImpl of DuelistTrait {
         let as_u256: u256 = as_felt.into();
         (as_u256.low)
     }
+}
+
+
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum Archetype {
+    Undefined,  // 0
+    Villainous, // 1
+    Trickster,  // 2
+    Honourable, // 3
+}
+impl ArchetypeDefault of Default<Archetype> {
+    fn default() -> Archetype {(Archetype::Undefined)}
 }
 
 #[generate_trait]
@@ -151,30 +139,6 @@ impl ScoreTraitImpl of ScoreTrait {
     }
 }
 
-impl ProfilePicTypeDefault of Default<ProfilePicType> {
-    fn default() -> ProfilePicType {(ProfilePicType::Undefined)}
-}
-
-#[generate_trait]
-impl ProfilePicTypeImpl of ProfilePicTypeTrait {
-    fn get_uri(self: ProfilePicType,
-        base_uri: ByteArray,
-        profile_pic_uri: ByteArray,
-        variant: ByteArray,    
-    ) -> ByteArray {
-        match self {
-            ProfilePicType::Duelist => {
-                let number =
-                    if (profile_pic_uri.len() == 0) {"00"}
-                    else if (profile_pic_uri.len() == 1) {format!("0{}", profile_pic_uri)}
-                    else {profile_pic_uri};
-                (format!("{}/profiles/{}/{}.jpg", base_uri, variant, number))
-            },
-            ProfilePicType::External |
-            ProfilePicType::Undefined => Self::get_uri(ProfilePicType::Duelist, base_uri, "", variant)
-        }
-    }
-}
 
 impl ArchetypeIntoFelt252 of Into<Archetype, felt252> {
     fn into(self: Archetype) -> felt252 {

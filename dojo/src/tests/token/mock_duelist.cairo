@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 
-#[derive(Clone, Drop, Serde)]   // pass to functions using duelist.clone()
+#[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct MockDuelistOwners {
     #[key]

@@ -9,7 +9,7 @@ mod tests {
     use pistols::systems::rng::{Dice, DiceTrait};
     use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
     use pistols::models::challenge::{Challenge, ChallengeValue, Round, RoundValue, Moves, MovesTrait, DuelistState, DuelistStateTrait};
-    use pistols::models::duelist::{Duelist, DuelistValue, ProfilePicType, Archetype};
+    use pistols::models::duelist::{Duelist, DuelistValue, ProfileType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep, DuelistDrawnCard};

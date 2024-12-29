@@ -1,8 +1,8 @@
 
 mod CONST {
-    // duelist pack amounts
-    const DUELIST_PACK_AMOUNT_REGISTER: u32 = 5;
-    const DUELIST_PACK_AMOUNT: u32 = 5;
+    // duelist profiles
+    const DUELIST_PROFILE_COUNT: u8 = 21;
+    const BOT_PROFILE_COUNT: u8 = 2;
     
     // number of rounds per duel
     const ROUND_COUNT: u8 = 1;

@@ -91,8 +91,8 @@ mod tests {
     use debug::PrintTrait;
     use core::traits::Into;
 
+    use super::{RoundState, RoundStateTrait};
     use pistols::models::challenge::{Round};
-    use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::tests::tester::{tester, tester::{TestSystems, FLAGS}};
 
     #[test]

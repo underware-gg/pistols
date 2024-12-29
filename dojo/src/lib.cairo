@@ -51,6 +51,7 @@ mod types {
     mod duel_progress;
     mod misc;
     mod premise;
+    mod profile_type;
     mod round_state;
     mod shuffler;
     mod typed_data;
@@ -88,7 +89,6 @@ mod tests {
     mod test_env_cards;
     mod test_challenge;
     mod test_duel;
-    mod test_duelist;
     mod test_utils;
     mod test_rng;
     // utils

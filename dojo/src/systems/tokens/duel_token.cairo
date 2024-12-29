@@ -139,7 +139,7 @@ pub mod duel_token {
         config::{TokenConfig, TokenConfigValue},
         player::{Player, PlayerTrait, Activity},
         challenge::{Challenge, ChallengeValue, Round, Moves},
-        duelist::{Duelist, DuelistValue, DuelistTrait, Pact, ProfilePicType, ProfilePicTypeTrait},
+        duelist::{Duelist, DuelistValue, DuelistTrait, Pact, ProfileType, ProfileTypeTrait},
         table::{
             TableConfig, TableConfigTrait, TableConfigValue,
             TableAdmittance, TableAdmittanceTrait,
@@ -465,8 +465,8 @@ pub mod duel_token {
             let duelist_a: DuelistValue = store.get_duelist_value(challenge.duelist_id_a);
             let duelist_b: DuelistValue = store.get_duelist_value(challenge.duelist_id_b);
             let base_uri: ByteArray = self.erc721._base_uri();
-            let image_a: ByteArray = duelist_a.profile_pic_type.get_uri(base_uri.clone(), duelist_a.profile_pic_uri, "portrait");
-            let image_b: ByteArray = duelist_b.profile_pic_type.get_uri(base_uri.clone(), duelist_b.profile_pic_uri, "portrait");
+            let image_a: ByteArray = duelist_a.profile_type.get_uri(base_uri.clone(), "portrait");
+            let image_b: ByteArray = duelist_b.profile_type.get_uri(base_uri.clone(), "portrait");
             let result: ByteArray = 
                 "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1942 1024'>" +
                 "<image href='" +

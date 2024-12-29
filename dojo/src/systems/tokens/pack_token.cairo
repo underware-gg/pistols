@@ -44,17 +44,17 @@ pub trait IPackToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IPackTokenPublic
-    fn claim_duelists(ref self: TState);
+    fn claim_duelists(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
-    fn open(ref self: TState, pack_id: u128);
+    fn open(ref self: TState, pack_id: u128) -> Span<u128>;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
 }
 
 #[starknet::interface]
 pub trait IPackTokenPublic<TState> {
-    fn claim_duelists(ref self: TState);
+    fn claim_duelists(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
-    fn open(ref self: TState, pack_id: u128);
+    fn open(ref self: TState, pack_id: u128) -> Span<u128>;
     fn can_claim_duelists(self: @TState, recipient: ContractAddress) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
 }
@@ -186,7 +186,7 @@ pub mod pack_token {
             (self.get_payment(recipient, pack_type).amount.low)
         }
 
-        fn claim_duelists(ref self: ContractState) {
+        fn claim_duelists(ref self: ContractState) -> Span<u128> {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate
@@ -194,13 +194,13 @@ pub mod pack_token {
             assert(self.can_claim_duelists(recipient), Errors::ALREADY_CLAIMED);
 
             // mint
-            let pack: Pack = self.mint_pack(PackType::Duelists5x, recipient);
+            let pack: Pack = self.mint_pack(PackType::Duelists5x, recipient, recipient.into());
             
             // events
             PlayerTrait::check_in(ref store, recipient, Activity::WelcomePack, 0);
 
             // open immediately
-            self.open(pack.pack_id);
+            (self.open(pack.pack_id))
         }
 
         fn purchase(ref self: ContractState, pack_type: PackType) -> Pack {
@@ -216,8 +216,11 @@ pub mod pack_token {
                 store.world.bank_dispatcher().charge(recipient, payment);
             }
 
+            // create vrf seed
+            let seed: felt252 = store.world.vrf_dispatcher().consume_random(Source::Nonce(get_contract_address()));
+
             // mint
-            let pack: Pack = self.mint_pack(PackType::Duelists5x, recipient);
+            let pack: Pack = self.mint_pack(pack_type, recipient, seed);
             
             // events
             PlayerTrait::check_in(ref store, recipient, Activity::PurchasedPack, pack.pack_type.id());
@@ -225,7 +228,7 @@ pub mod pack_token {
             (pack)
         }
 
-        fn open(ref self: ContractState, pack_id: u128) {
+        fn open(ref self: ContractState, pack_id: u128) -> Span<u128> {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate owner, will panic if already opened
@@ -234,10 +237,12 @@ pub mod pack_token {
 
             // open...
             let mut pack: Pack = store.get_pack(pack_id);
-            pack.open(ref store, recipient);
+            let token_ids: Span<u128> = pack.open(ref store, recipient);
 
             // burn!
             self.token.burn(pack_id.into());
+
+            (token_ids)
         }
     }
 
@@ -247,14 +252,15 @@ pub mod pack_token {
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn mint_pack(ref self: ContractState, pack_type: PackType, recipient: ContractAddress) -> Pack {
+        fn mint_pack(ref self: ContractState,
+            pack_type: PackType,
+            recipient: ContractAddress,
+            seed: felt252,
+        ) -> Pack {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // mint!
             let token_id: u128 = *self.token.mint(recipient, 1)[0];
-
-            // cretae vrf seed
-            let seed: felt252 = store.world.vrf_dispatcher().consume_random(Source::Nonce(get_contract_address()));
 
             // create Duelist
             let mut pack = Pack {

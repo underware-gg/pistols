@@ -25,6 +25,9 @@ use pistols::models::{
         m_Player, Player, PlayerTrait,
         e_PlayerActivity, PlayerActivity,
     },
+    duelist::{
+        m_Duelist, Duelist, ProfileType,
+    },
     pack::{
         m_Pack, Pack, PackType, PackTypeTrait,
     },
@@ -118,9 +121,11 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             // pistols models
             TestResource::Model(m_Player::TEST_CLASS_HASH),
             TestResource::Model(m_Pack::TEST_CLASS_HASH),
+            TestResource::Model(m_Duelist::TEST_CLASS_HASH),
             TestResource::Model(m_Payment::TEST_CLASS_HASH),
             TestResource::Model(m_Config::TEST_CLASS_HASH),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
+            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
             // events
             TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
@@ -382,11 +387,4 @@ fn test_open_not_owner() {
     _purchase(sys, OWNER());
     tester::impersonate(OTHER());
     sys.token.open(TOKEN_ID_2.low);
-}
-
-#[test]
-#[should_panic(expected: ('TOKEN: caller is not minter', 'ENTRYPOINT_FAILED'))]
-fn test_mint_duelist_not_minter() {
-    let mut sys: TestSystems = setup(100);
-    sys.duelists.mint_duelists(OWNER(), 1);
 }

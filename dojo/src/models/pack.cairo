@@ -9,8 +9,7 @@ pub enum PackType {
 //------------------------
 // Pack (consumable token)
 //
-// #[derive(Copy, Drop, Serde)] // ByteArray is not copiable!
-#[derive(Clone, Drop, Serde)]   // pass to functions using duelist.clone()
+#[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct Pack {
     #[key]
@@ -30,6 +29,7 @@ use pistols::interfaces::systems::{
     SystemsTrait,
     IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
 };
+use pistols::models::duelist::{ProfileType};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::types::constants::{CONST};
 
@@ -63,16 +63,17 @@ impl PackTypeImpl of PackTypeTrait {
 
 #[generate_trait]
 impl PackImpl of PackTrait {
-    fn open(ref self: Pack, ref store: Store, recipient: ContractAddress) {
+    fn open(ref self: Pack, ref store: Store, recipient: ContractAddress) -> Span<u128> {
         assert(!self.is_open, PackErrors::ALREADY_OPENED);
-        match self.pack_type {
+        let token_ids: Span<u128> = match self.pack_type {
             PackType::Duelists5x => {
                 let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-                duelist_dispatcher.mint_duelists(recipient, 5);
+                (duelist_dispatcher.mint_duelists(recipient, 5, self.seed, ProfileType::Duelist(0)))
             },
-            _ => {},
+            _ => { [].span() },
         };
         self.is_open = true;
         store.set_pack(@self);
+        (token_ids)
     }
 }

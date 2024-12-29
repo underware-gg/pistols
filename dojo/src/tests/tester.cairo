@@ -21,6 +21,7 @@ mod tester {
         tokens::{
             duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
             duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+            pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
             fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
             lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
         },
@@ -46,7 +47,7 @@ mod tester {
             m_Duelist, Duelist, DuelistTrait, DuelistValue,
             m_Pact, Pact, PactValue,
             m_Scoreboard, Scoreboard, ScoreboardValue,
-            Score, ProfilePicType, Archetype
+            Score, ProfileType, Archetype
         },
         payment::{
             m_Payment, Payment,
@@ -150,6 +151,7 @@ mod tester {
         fame: IFameCoinDispatcher,
         duels: IDuelTokenDispatcher,
         duelists: IDuelistTokenDispatcher,
+        pack: IPackTokenDispatcher,
         rng: IRngDispatcher,
     }
 
@@ -243,6 +245,7 @@ mod tester {
         // '---- 3'.print();
         if (deploy_duelist) {
             resources.append(TestResource::Contract(duelist_token::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(pack_token::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duelist_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -250,6 +253,13 @@ mod tester {
                         'pistols.underware.gg',
                         0, // renderer_address
                     ].span())
+            );
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"pack_token")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+                    .with_init_calldata([
+                        'pistols.underware.gg',
+                    ].span()),
             );
         }
         else if (deploy_game) {
@@ -353,6 +363,7 @@ mod tester {
             fame: world.fame_coin_dispatcher(),
             duels: world.duel_token_dispatcher(),
             duelists: world.duelist_token_dispatcher(),
+            pack: world.pack_token_dispatcher(),
             rng: IRngDispatcher{ contract_address: world.rng_address() },
         })
     }
@@ -431,21 +442,12 @@ mod tester {
         _next_block();
     }
 
-    // ::duelist
-    fn execute_create_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
+    // ::pack_token
+    fn execute_claim_duelists(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
         impersonate(sender);
-        let duelist: Duelist = (*system).create_duelist(sender, name, profile_pic_type, profile_pic_uri);
+        let token_ids: Span<u128> = (*system).claim_duelists();
         _next_block();
-        (duelist)
-    }
-    fn execute_update_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
-        (execute_update_duelist_ID(system, sender, ID(sender), name, profile_pic_type, profile_pic_uri))
-    }
-    fn execute_update_duelist_ID(system: @IDuelistTokenDispatcher, sender: ContractAddress, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist {
-        impersonate(sender);
-        let duelist: Duelist = (*system).update_duelist(duelist_id, name, profile_pic_type, profile_pic_uri);
-        _next_block();
-        (duelist)
+        (token_ids)
     }
 
     // ::duel_token

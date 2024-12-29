@@ -57,11 +57,11 @@ const contractPolicyDescriptions: ContractPolicyDescriptions = {
     description: 'Duel Token',
     interfaces: ['IDuelTokenPublic'],
   },
-  duelist_token: {
-    name: 'Duelist Token',
-    description: 'Duelist Token',
-    interfaces: ['IDuelistTokenPublic'],
-  },
+  // duelist_token: {
+  //   name: 'Duelist Token',
+  //   description: 'Duelist Token',
+  //   interfaces: ['IDuelistTokenPublic'],
+  // },
   pack_token: {
     name: 'Pack Token',
     description: 'Packs Token',

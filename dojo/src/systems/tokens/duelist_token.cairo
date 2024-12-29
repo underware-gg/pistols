@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
-use pistols::models::duelist::{Duelist, ProfilePicType, Archetype};
+use pistols::types::profile_type::{ProfileType};
 
 #[starknet::interface]
 pub trait IDuelistToken<TState> {
@@ -44,10 +44,7 @@ pub trait IDuelistToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IDuelistTokenPublic
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize) -> u128;
-    fn calc_mint_fee(self: @TState, recipient: ContractAddress) -> u128;
-    fn create_duelist(ref self: TState, recipient: ContractAddress, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
-    fn update_duelist(ref self: TState, duelist_id: u128, name: felt252, profile_pic_type: ProfilePicType, profile_pic_uri: felt252) -> Duelist;
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252, profile_type: ProfileType) -> Span<u128>;
     // fn delete_duelist(ref self: TState, duelist_id: u128);
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
@@ -56,22 +53,7 @@ pub trait IDuelistToken<TState> {
 
 #[starknet::interface]
 pub trait IDuelistTokenPublic<TState> {
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize) -> Span<u128>;
-    fn calc_mint_fee(self: @TState, recipient: ContractAddress) -> u128;
-    fn create_duelist(
-        ref self: TState,
-        recipient: ContractAddress,
-        name: felt252,
-        profile_pic_type: ProfilePicType,
-        profile_pic_uri: felt252,
-    ) -> Duelist;
-    fn update_duelist(
-        ref self: TState,
-        duelist_id: u128,
-        name: felt252,
-        profile_pic_type: ProfilePicType,
-        profile_pic_uri: felt252,
-    ) -> Duelist;
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252, profile_type: ProfileType) -> Span<u128>;
     // fn delete_duelist(ref self: TState, duelist_id: u128);
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
@@ -135,16 +117,17 @@ pub mod duelist_token {
         duelist::{
             Duelist, DuelistValue,
             Score, ScoreTrait,
-            ProfilePicType, ProfilePicTypeTrait,
             Archetype,
-            ScoreboardValue,
         },
         challenge::{ChallengeValue},
         config::{TokenConfig, TokenConfigValue},
         payment::{Payment},
         table::{TABLES},
     };
-    use pistols::types::constants::{CONST, FAME};
+    use pistols::types::{
+        profile_type::{ProfileType, ProfileTypeTrait},
+        constants::{CONST, FAME},
+    };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::ShortStringTrait;
@@ -198,80 +181,39 @@ pub mod duelist_token {
         fn mint_duelists(ref self: ContractState,
             recipient: ContractAddress,
             amount: usize,
+            seed: felt252,
+            profile_type: ProfileType,
         ) -> Span<u128>{
-            (self.token.mint(recipient, amount))
-        }
+            let mut store: Store = StoreTrait::new(self.world_default());
 
-        fn calc_mint_fee(self: @ContractState,
-            recipient: ContractAddress,
-        ) -> u128 {
-            (self.get_payment(recipient).amount.low)
-        }
+            // mint tokens
+            let duelist_ids: Span<u128> = self.token.mint(recipient, amount);
 
-        fn create_duelist(ref self: ContractState,
-            recipient: ContractAddress,
-            name: felt252,
-            profile_pic_type: ProfilePicType,
-            profile_pic_uri: felt252,
-        ) -> Duelist {
-            let mut world = self.world_default();
+            // create duelists
+            let mut rnd: u256 = seed.into();
+            let mut i: usize = 0;
+            while (i < duelist_ids.len()) {
+                // create Duelist
+                let duelist = Duelist {
+                    duelist_id: *duelist_ids[i],
+                    profile_type: profile_type.randomize(rnd.low.into()),
+                    timestamp: get_block_timestamp(),
+                    score: Default::default(),
+                };
+                store.set_duelist(@duelist);
 
-            // transfer mint fee
-            let payment: Payment = self.get_payment(recipient);
-            if (payment.amount != 0) {
-                world.bank_dispatcher().charge(recipient, payment);
-            }
+                // mint fame
+                let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
+                fame_dispatcher.minted_duelist(duelist.duelist_id, 0);
 
-            // mint!
-            let token_id: u128 = *self.token.mint(recipient, 1)[0];
+                // events
+                PlayerTrait::check_in(ref store, recipient, Activity::CreatedDuelist, duelist.duelist_id.into());
 
-            // create Duelist
-            let mut duelist = Duelist {
-                duelist_id: token_id,
-                timestamp: get_block_timestamp(),
-                name,
-                profile_pic_type,
-                profile_pic_uri: profile_pic_uri.as_string(),
-                score: Default::default(),
+                rnd /= 0x100;
+                i += 1;
             };
-            
-            // save
-            let mut store: Store = StoreTrait::new(world);
-            store.set_duelist(@duelist);
 
-            // mint fame
-            let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
-            fame_dispatcher.minted_duelist(duelist.duelist_id, payment.amount);
-
-            // events
-            PlayerTrait::check_in(ref store, get_caller_address(), Activity::CreatedDuelist, token_id.into());
-
-            (duelist)
-        }
-
-        fn update_duelist(ref self: ContractState,
-            duelist_id: u128,
-            name: felt252,
-            profile_pic_type: ProfilePicType,
-            profile_pic_uri: felt252,
-        ) -> Duelist {
-            // validate owner
-            self.token.assert_is_owner_of(get_caller_address(), duelist_id.into());
-
-            // validate duelist
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
-            let mut duelist: Duelist = store.get_duelist(duelist_id);
-            assert(duelist.timestamp != 0, Errors::INVALID_DUELIST);
-
-            // update
-            duelist.name = name;
-            duelist.profile_pic_type = profile_pic_type;
-            duelist.profile_pic_uri = profile_pic_uri.as_string();
-            // save
-            store.set_duelist(@duelist);
-
-            (duelist)
+            (duelist_ids)
         }
         
         // fn delete_duelist(ref self: ContractState,
@@ -407,7 +349,7 @@ pub mod duelist_token {
             let mut store: Store = StoreTrait::new(world);
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
             (format!("{} #{}",
-                if (duelist.name != '') { duelist.name.as_string() } else { "Duelist" },
+                duelist.profile_type.name().as_string(),
                 token_id
             ))
         }
@@ -421,7 +363,7 @@ pub mod duelist_token {
             let mut store: Store = StoreTrait::new(world);
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
             let base_uri: ByteArray = self.erc721._base_uri();
-            let image_square: ByteArray = duelist.profile_pic_type.get_uri(base_uri.clone(), duelist.profile_pic_uri, "square");
+            let image_square: ByteArray = duelist.profile_type.get_uri(base_uri.clone(), "square");
             let result: ByteArray = 
                 "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1024 1434'>" +
                 "<image href='" + 
@@ -442,9 +384,9 @@ pub mod duelist_token {
             let base_uri: ByteArray = self.erc721._base_uri();
             let mut result: Array<ByteArray> = array![];
             result.append("square");
-            result.append(duelist.profile_pic_type.get_uri(base_uri.clone(), duelist.profile_pic_uri.clone(), "square"));
+            result.append(duelist.profile_type.get_uri(base_uri.clone(), "square"));
             result.append("portrait");
-            result.append(duelist.profile_pic_type.get_uri(base_uri.clone(), duelist.profile_pic_uri.clone(), "portrait"));
+            result.append(duelist.profile_type.get_uri(base_uri.clone(), "portrait"));
             (result.span())
         }
 

@@ -102,11 +102,13 @@ export GAME_ADDRESS=$(get_contract_address "pistols-game")
 export CHAIN_ID=$(starkli chain-id --no-decode --rpc $RPC_URL | xxd -r -p)
 export PROFILE_CHAIN_ID=$(get_profile_env "chain_id")
 
-if [[ "$PROFILE_CHAIN_ID" != "$CHAIN_ID" ]]; then
-  echo "PROFILE CHAIN ID: [$PROFILE_CHAIN_ID]"
-  echo "RPC CHAIN ID: [$CHAIN_ID]"
-  echo "❌ Chain mismatch! 👎"
-  exit 1
+if [[ -z "$OFFLINE" ]]; then
+  if [[ "$PROFILE_CHAIN_ID" != "$CHAIN_ID" ]]; then
+    echo "PROFILE CHAIN ID: [$PROFILE_CHAIN_ID]"
+    echo "RPC CHAIN ID: [$CHAIN_ID]"
+    echo "❌ Chain mismatch! 👎"
+    exit 1
+  fi
 fi
 
 

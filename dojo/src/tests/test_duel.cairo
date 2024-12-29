@@ -7,7 +7,7 @@ mod tests {
     use dojo::world::{WorldStorage};
 
     use pistols::models::challenge::{Challenge, ChallengeValue, ChallengeFameBalanceValue, Round, RoundValue};
-    use pistols::models::duelist::{Duelist, DuelistValue, ProfilePicType, Archetype};
+    use pistols::models::duelist::{Duelist, DuelistValue, ProfileType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::cards::hand::{PacesCard, PacesCardTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
@@ -91,8 +91,8 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(salts.salts, salts.values);
 
-        let duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
-        let duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+        let duelist_id_a: u128 = *tester::execute_claim_duelists(@sys.pack, OWNER())[0];
+        let duelist_id_b: u128 = *tester::execute_claim_duelists(@sys.pack, OTHER())[0];
 
         let table_id: felt252 = TABLES::LORDS;
         // let lords_balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
@@ -209,8 +209,8 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(salts.salts, salts.values);
 
-        let duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
-        let duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+        let duelist_id_a: u128 = *tester::execute_claim_duelists(@sys.pack, OWNER())[0];
+        let duelist_id_b: u128 = *tester::execute_claim_duelists(@sys.pack, OTHER())[0];
 
         let table_id: felt252 = TABLES::LORDS;
         // let lords_balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
@@ -499,8 +499,8 @@ mod tests {
         let (salts, moves_a, moves_b) = prefabs::get_moves_crit_a();
         sys.rng.mock_values(salts.salts, salts.values);
 
-        let _duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
-        let _duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+        let _duelist_id_a: u128 = *tester::execute_claim_duelists(@sys.pack, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_duelists(@sys.pack, OTHER())[0];
 
         // Duel 1
         let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
@@ -540,8 +540,8 @@ mod tests {
         let (salts, moves_a, moves_b) = prefabs::get_moves_crit_a();
         sys.rng.mock_values(salts.salts, salts.values);
 
-        let _duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
-        let _duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+        let _duelist_id_a: u128 = *tester::execute_claim_duelists(@sys.pack, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_duelists(@sys.pack, OTHER())[0];
 
         // Duel 1
         let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
@@ -583,8 +583,8 @@ mod tests {
         let (salts, moves_a, moves_b) = prefabs::get_moves_crit_b();
         sys.rng.mock_values(salts.salts, salts.values);
 
-        let _duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
-        let _duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
+        let _duelist_id_a: u128 = *tester::execute_claim_duelists(@sys.pack, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_duelists(@sys.pack, OTHER())[0];
 
         // Duel 1
         let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
@@ -627,9 +627,9 @@ mod tests {
         let (salts, moves_a, moves_b) = prefabs::get_moves_crit_b();
         sys.rng.mock_values(salts.salts, salts.values);
 
-        let _duelist_id_a: u128 = tester::execute_create_duelist(@sys.duelists, OWNER(), 'OWNER', ProfilePicType::Duelist, '1').duelist_id;
-        let _duelist_id_b: u128 = tester::execute_create_duelist(@sys.duelists, OTHER(), 'OTHER', ProfilePicType::Duelist, '2').duelist_id;
-        let _duelist_id_c: u128 = tester::execute_create_duelist(@sys.duelists, BUMMER(), 'BUMMER', ProfilePicType::Duelist, '3').duelist_id;
+        let _duelist_id_a: u128 = *tester::execute_claim_duelists(@sys.pack, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_duelists(@sys.pack, OTHER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_duelists(@sys.pack, BUMMER())[0];
 
         // Duel 1
         let (_, _, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::LORDS);
