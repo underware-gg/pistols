@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react'
 import { Grid, Image } from 'semantic-ui-react'
+import { _useConnector } from '@underware_gg/pistols-sdk/fix'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useLordsContract, useSelectedChain, useConnectedController, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
+import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { FameBalance, LordsBalance } from '/src/components/account/LordsBalance'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { AddressShort } from '/src/components/ui/AddressShort'
-import { _useConnector } from '@underware_gg/pistols-sdk/fix'
-import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import { SceneName } from '/src/data/assets'
 
 const Row = Grid.Row
@@ -28,7 +29,7 @@ export default function WalletHeader({
   const data = { name: null, profilePicture: null }
 
   const name = useMemo(() => (data?.name ?? `Connected to ${connectedChainName}`), [data])
-  const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? '/profiles/square/00.jpg'), [data, connector])
+  const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0, true)), [data, connector])
 
   const { username, openProfile } = useConnectedController()
 

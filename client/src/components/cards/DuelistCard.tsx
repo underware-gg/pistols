@@ -4,6 +4,7 @@ import { useGameAspect } from '/src/hooks/useGameApect'
 import { AnimationData } from '/src/components/cards/Cards'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
+import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import * as TWEEN from '@tweenjs/tween.js'
 import * as Constants from '/src/data/cardConstants'
 
@@ -507,7 +508,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
               <div id='card-filter-overlay' className={props.isSelected ? 'visible selected' : 'selected'} />
               <img id='card-filter-overlay' className={props.isDisabled ? 'visible' : ''} src='/textures/cards/card_disabled.png' />
               {/* <div id='card-filter-overlay' className={props.isDisabled ? 'visible disabled' : 'disabled'} /> */}
-              <img className='duelist-card-image-drawing NoMouse NoDrag' src={`/profiles/square/${('00' + profilePic).slice(-2)}.jpg`} alt="Profile Picture" />
+              <img className='duelist-card-image-drawing NoMouse NoDrag' src={makeProfilePicUrl(profilePic, true)} alt="Profile Picture" />
               <img className='card-image-front NoMouse NoDrag' src={archetypeImage} alt="Card Front" />
               <div className="duelist-card-details">
                 <div className="duelist-name" data-contentlength={name ? Math.floor(name.length / 10) : 31}>{name}</div>

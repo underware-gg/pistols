@@ -6,10 +6,10 @@ import { useIsMyDuelist, useIsYou } from '/src/hooks/useIsYou'
 import { IconClick } from '/src/components/ui/Icons'
 
 
-const _makeUrl = (profilePic: number | null, square: boolean) => {
+export const makeProfilePicUrl = (profilePic: number | null, square: boolean) => {
   if (profilePic === null) return null
   const variant = (square ? 'square' : 'portrait')
-  return `/profiles/${variant}/${('00' + profilePic).slice(-2)}.jpg`
+  return `/profiles/duelists/${variant}/${('00' + profilePic).slice(-2)}.jpg`
 }
 const _className = ({ small, medium, square, circle, duel, anon }) => (
   small ? 'ProfilePicSmall'
@@ -71,7 +71,7 @@ export function ProfilePic({
     if (disabled || dimmed) result.push('ProfilePicDisabled')
     return result
   }, [className, small, medium, square, circle, duel, anon, disabled, dimmed])
-  const url = useMemo(() => (profilePicUrl ?? _makeUrl(profilePic, square || anon)), [profilePicUrl, profilePic, square])
+  const url = useMemo(() => (profilePicUrl ?? makeProfilePicUrl(profilePic, square || anon)), [profilePicUrl, profilePic, square])
 
   // as Button
   const _click = () => {
