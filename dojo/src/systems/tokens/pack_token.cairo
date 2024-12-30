@@ -54,9 +54,11 @@ pub trait IPackToken<TState> {
 
 #[starknet::interface]
 pub trait IPackTokenPublic<TState> {
+    // view
     fn can_claim_welcome_pack(self: @TState, recipient: ContractAddress) -> bool;
     fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
+    // write
     fn claim_welcome_pack(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
@@ -272,7 +274,7 @@ pub mod pack_token {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // mint!
-            let token_id: u128 = *self.token.mint(recipient, 1)[0];
+            let token_id: u128 = self.token.mint(recipient);
 
             // create Duelist
             let mut pack = Pack {

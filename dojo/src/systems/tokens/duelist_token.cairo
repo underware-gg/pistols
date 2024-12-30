@@ -44,19 +44,21 @@ pub trait IDuelistToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IDuelistTokenPublic
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252, profile_type: ProfileType) -> Span<u128>;
-    // fn delete_duelist(ref self: TState, duelist_id: u128);
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252, profile_type: ProfileType) -> Span<u128>;
+    // fn delete_duelist(ref self: TState, duelist_id: u128);
     fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
 }
 
 #[starknet::interface]
 pub trait IDuelistTokenPublic<TState> {
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252, profile_type: ProfileType) -> Span<u128>;
-    // fn delete_duelist(ref self: TState, duelist_id: u128);
+    // view
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
+    // write
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252, profile_type: ProfileType) -> Span<u128>;
+    // fn delete_duelist(ref self: TState, duelist_id: u128);
     fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
 }
 
@@ -178,6 +180,25 @@ pub mod duelist_token {
     #[abi(embed_v0)]
     impl DuelistTokenPublicImpl of IDuelistTokenPublic<ContractState> {
 
+        fn is_alive(
+            self: @ContractState,
+            duelist_id: u128,
+        ) -> bool {
+            let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
+            let fame_balance: u256 = fame_dispatcher.balance_of_token(get_contract_address(), duelist_id);
+            (fame_balance != 0)
+        }
+
+        fn calc_fame_reward(
+            self: @ContractState,
+            duelist_id: u128,
+        ) -> u128 {
+            let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
+            let fame_balance: u256 = fame_dispatcher.balance_of_token(get_contract_address(), duelist_id);
+            let fame_reward: u256 = (fame_balance / 2);
+            (if (fame_reward >= FAME::MIN_REWARD_AMOUNT) {(fame_reward.low)} else {(fame_balance.low)})
+        }
+
         fn mint_duelists(ref self: ContractState,
             recipient: ContractAddress,
             amount: usize,
@@ -187,7 +208,7 @@ pub mod duelist_token {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // mint tokens
-            let duelist_ids: Span<u128> = self.token.mint(recipient, amount);
+            let duelist_ids: Span<u128> = self.token.mint_multiple(recipient, amount);
 
             // create duelists
             let mut rnd: u256 = seed.into();
@@ -225,25 +246,6 @@ pub mod duelist_token {
         //     // self.token.burn(duelist_id.into());
         //     // burn FAME too
         // }
-
-        fn is_alive(
-            self: @ContractState,
-            duelist_id: u128,
-        ) -> bool {
-            let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
-            let fame_balance: u256 = fame_dispatcher.balance_of_token(get_contract_address(), duelist_id);
-            (fame_balance != 0)
-        }
-
-        fn calc_fame_reward(
-            self: @ContractState,
-            duelist_id: u128,
-        ) -> u128 {
-            let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
-            let fame_balance: u256 = fame_dispatcher.balance_of_token(get_contract_address(), duelist_id);
-            let fame_reward: u256 = (fame_balance / 2);
-            (if (fame_reward >= FAME::MIN_REWARD_AMOUNT) {(fame_reward.low)} else {(fame_balance.low)})
-        }
 
         fn transfer_fame_reward(
             ref self: ContractState,

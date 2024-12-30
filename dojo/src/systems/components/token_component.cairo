@@ -15,7 +15,8 @@ pub trait ITokenComponentInternal<TState> {
         renderer_address: ContractAddress,
         payment: Payment,
     );
-    fn mint(ref self: TState, recipient: ContractAddress, amount: usize) -> Span<u128>;
+    fn mint(ref self: TState, recipient: ContractAddress) -> u128;
+    fn mint_multiple(ref self: TState, recipient: ContractAddress, amount: usize) -> Span<u128>;
     fn burn(ref self: TState, token_id: u128);
     fn assert_exists(self: @TState, token_id: u128);
     fn assert_is_owner_of(self: @TState, address: ContractAddress, token_id: u128);
@@ -129,6 +130,12 @@ pub mod TokenComponent {
         }
 
         fn mint(ref self: ComponentState<TContractState>,
+            recipient: ContractAddress,
+        ) -> u128 {
+            (*self.mint_multiple(recipient, 1)[0])
+        }
+
+        fn mint_multiple(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
             amount: usize,
         ) -> Span<u128> {

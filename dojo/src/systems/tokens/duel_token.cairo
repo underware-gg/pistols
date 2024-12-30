@@ -59,6 +59,12 @@ pub trait IDuelToken<TState> {
 
 #[starknet::interface]
 pub trait IDuelTokenPublic<TState> {
+    // view
+    fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
+    fn get_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
+    fn has_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
+    fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
+    // write
     fn create_duel(
         ref self: TState,
         duelist_id: u128,
@@ -76,12 +82,6 @@ pub trait IDuelTokenPublic<TState> {
     ) -> ChallengeState;
     // fn delete_duel(ref self: TState, duel_id: u128);
     fn transfer_to_winner(ref self: TState, duel_id: u128);
-
-    // view calls
-    fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
-    fn get_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
-    fn has_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
-    fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
 }
 
 #[dojo::contract]
@@ -217,6 +217,33 @@ pub mod duel_token {
     #[abi(embed_v0)]
     impl DuelTokenPublicImpl of IDuelTokenPublic<ContractState> {
 
+        //-----------------------------------
+        // View calls
+        //
+        fn calc_mint_fee(self: @ContractState, table_id: felt252) -> u128 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let table: TableConfig = store.get_table_config(table_id);
+            (table.calc_mint_fee())
+        }
+        
+        fn get_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            (pact::get_pact(ref store, table_id, duelist_id_a, duelist_id_b))
+        }
+        fn has_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool {
+            (self.get_pact(table_id, duelist_id_a, duelist_id_b) != 0)
+        }
+
+        fn can_join(self: @ContractState, table_id: felt252, duelist_id: u128) -> bool {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let table: TableConfigValue = store.get_table_config_value(table_id);
+            let table_admittance: TableAdmittance = store.get_table_admittance(table_id);
+            (table.is_open && table_admittance.can_join(get_caller_address(), duelist_id))
+        }
+
+        //-----------------------------------
+        // Write calls
+        //
         fn create_duel(ref self: ContractState,
             duelist_id: u128,
             challenged_id_or_address: ContractAddress,
@@ -234,7 +261,7 @@ pub mod duel_token {
             }
 
             // mint to game, so it can transfer to winner
-            let duel_id: u128 = *self.token.mint(world.game_address(), 1)[0];
+            let duel_id: u128 = self.token.mint(world.game_address());
 
             // validate challenger
             let address_a: ContractAddress = get_caller_address();
@@ -416,31 +443,6 @@ pub mod duel_token {
             } else if (challenge.winner == 2) {
                 self.transfer_from(owner, challenge.address_b, duel_id.into());
             }
-        }
-
-
-        //-----------------------------------
-        // View calls
-        //
-        fn calc_mint_fee(self: @ContractState, table_id: felt252) -> u128 {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let table: TableConfig = store.get_table_config(table_id);
-            (table.calc_mint_fee())
-        }
-        
-        fn get_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            (pact::get_pact(ref store, table_id, duelist_id_a, duelist_id_b))
-        }
-        fn has_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool {
-            (self.get_pact(table_id, duelist_id_a, duelist_id_b) != 0)
-        }
-
-        fn can_join(self: @ContractState, table_id: felt252, duelist_id: u128) -> bool {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let table: TableConfigValue = store.get_table_config_value(table_id);
-            let table_admittance: TableAdmittance = store.get_table_admittance(table_id);
-            (table.is_open && table_admittance.can_join(get_caller_address(), duelist_id))
         }
     }
 
