@@ -5,17 +5,17 @@ import { BigNumberish } from 'starknet';
 // enums
 //
 
-// from: ../dojo/src/models/consumable.cairo
-export enum ConsumableType {
-  Undefined = 'Undefined',
-  DuelistToken = 'DuelistToken',
+// from: ../dojo/src/interfaces/vrf.cairo
+export enum Source {
+  Nonce = 'Nonce',
+  Salt = 'Salt',
 };
-export const ConsumableTypeNameToValue: Record<ConsumableType, number> = {
-  [ConsumableType.Undefined]: 0,
-  [ConsumableType.DuelistToken]: 1,
+export const SourceNameToValue: Record<Source, number> = {
+  [Source.Nonce]: 0,
+  [Source.Salt]: 1,
 };
-export const getConsumableTypeValue = (name: ConsumableType): number => (ConsumableTypeNameToValue[name]);
-export const getConsumableTypeFromValue = (value: number): ConsumableType => Object.keys(ConsumableTypeNameToValue).find(key => ConsumableTypeNameToValue[key as ConsumableType] === value) as ConsumableType;
+export const getSourceValue = (name: Source): number => (SourceNameToValue[name]);
+export const getSourceFromValue = (value: number): Source => Object.keys(SourceNameToValue).find(key => SourceNameToValue[key as Source] === value) as Source;
 
 // from: ../dojo/src/models/duelist.cairo
 export enum Archetype {
@@ -33,23 +33,26 @@ export const ArchetypeNameToValue: Record<Archetype, number> = {
 export const getArchetypeValue = (name: Archetype): number => (ArchetypeNameToValue[name]);
 export const getArchetypeFromValue = (value: number): Archetype => Object.keys(ArchetypeNameToValue).find(key => ArchetypeNameToValue[key as Archetype] === value) as Archetype;
 
-// from: ../dojo/src/models/duelist.cairo
-export enum ProfilePicType {
+// from: ../dojo/src/models/pack.cairo
+export enum PackType {
   Undefined = 'Undefined',
-  Duelist = 'Duelist',
-  External = 'External',
+  WelcomePack = 'WelcomePack',
+  Duelists5x = 'Duelists5x',
 };
-export const ProfilePicTypeNameToValue: Record<ProfilePicType, number> = {
-  [ProfilePicType.Undefined]: 0,
-  [ProfilePicType.Duelist]: 1,
-  [ProfilePicType.External]: 2,
+export const PackTypeNameToValue: Record<PackType, number> = {
+  [PackType.Undefined]: 0,
+  [PackType.WelcomePack]: 1,
+  [PackType.Duelists5x]: 2,
 };
-export const getProfilePicTypeValue = (name: ProfilePicType): number => (ProfilePicTypeNameToValue[name]);
-export const getProfilePicTypeFromValue = (value: number): ProfilePicType => Object.keys(ProfilePicTypeNameToValue).find(key => ProfilePicTypeNameToValue[key as ProfilePicType] === value) as ProfilePicType;
+export const getPackTypeValue = (name: PackType): number => (PackTypeNameToValue[name]);
+export const getPackTypeFromValue = (value: number): PackType => Object.keys(PackTypeNameToValue).find(key => PackTypeNameToValue[key as PackType] === value) as PackType;
 
 // from: ../dojo/src/models/player.cairo
 export enum Activity {
   Undefined = 'Undefined',
+  FinishedTutorial = 'FinishedTutorial',
+  WelcomePack = 'WelcomePack',
+  PurchasedPack = 'PurchasedPack',
   CreatedDuelist = 'CreatedDuelist',
   CreatedChallenge = 'CreatedChallenge',
   RepliedChallenge = 'RepliedChallenge',
@@ -59,12 +62,15 @@ export enum Activity {
 };
 export const ActivityNameToValue: Record<Activity, number> = {
   [Activity.Undefined]: 0,
-  [Activity.CreatedDuelist]: 1,
-  [Activity.CreatedChallenge]: 2,
-  [Activity.RepliedChallenge]: 3,
-  [Activity.CommittedMoves]: 4,
-  [Activity.RevealedMoves]: 5,
-  [Activity.Online]: 6,
+  [Activity.FinishedTutorial]: 1,
+  [Activity.WelcomePack]: 2,
+  [Activity.PurchasedPack]: 3,
+  [Activity.CreatedDuelist]: 4,
+  [Activity.CreatedChallenge]: 5,
+  [Activity.RepliedChallenge]: 6,
+  [Activity.CommittedMoves]: 7,
+  [Activity.RevealedMoves]: 8,
+  [Activity.Online]: 9,
 };
 export const getActivityValue = (name: Activity): number => (ActivityNameToValue[name]);
 export const getActivityFromValue = (value: number): Activity => Object.keys(ActivityNameToValue).find(key => ActivityNameToValue[key as Activity] === value) as Activity;
@@ -309,6 +315,20 @@ export const PremiseNameToValue: Record<Premise, number> = {
 export const getPremiseValue = (name: Premise): number => (PremiseNameToValue[name]);
 export const getPremiseFromValue = (value: number): Premise => Object.keys(PremiseNameToValue).find(key => PremiseNameToValue[key as Premise] === value) as Premise;
 
+// from: ../dojo/src/types/profile_type.cairo
+export enum ProfileType {
+  Undefined = 'Undefined',
+  Duelist = 'Duelist',
+  Bot = 'Bot',
+};
+export const ProfileTypeNameToValue: Record<ProfileType, number> = {
+  [ProfileType.Undefined]: 0,
+  [ProfileType.Duelist]: 1,
+  [ProfileType.Bot]: 2,
+};
+export const getProfileTypeValue = (name: ProfileType): number => (ProfileTypeNameToValue[name]);
+export const getProfileTypeFromValue = (value: number): ProfileType => Object.keys(ProfileTypeNameToValue).find(key => ProfileTypeNameToValue[key as ProfileType] === value) as ProfileType;
+
 // from: ../dojo/src/types/round_state.cairo
 export enum RoundState {
   Null = 'Null',
@@ -355,6 +375,7 @@ type type_SELECTORS = {
   RNG: BigNumberish, // cairo: felt252
   DUEL_TOKEN: BigNumberish, // cairo: felt252
   DUELIST_TOKEN: BigNumberish, // cairo: felt252
+  PACK_TOKEN: BigNumberish, // cairo: felt252
   FAME_COIN: BigNumberish, // cairo: felt252
   LORDS_MOCK: BigNumberish, // cairo: felt252
   VR_MOCK: BigNumberish, // cairo: felt252
@@ -371,6 +392,7 @@ export const SELECTORS: type_SELECTORS = {
   RNG: '0x013f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504', // 'selector_from_tag!("pistols-rng")'
   DUEL_TOKEN: '0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063', // 'selector_from_tag!("pistols-duel_token")'
   DUELIST_TOKEN: '0x045c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e', // 'selector_from_tag!("pistols-duelist_token")'
+  PACK_TOKEN: '0x03d74e76192285c5a19a63c54a6c2ba5b015a1a25818c2d8f9cf75d7fef2b5c1', // 'selector_from_tag!("pistols-pack_token")'
   FAME_COIN: '0x0371b95cb7056eb2d21819662e973ed32c345c989aa9f6097e7811a5665a0b0a', // 'selector_from_tag!("pistols-fame_coin")'
   LORDS_MOCK: '0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788', // 'selector_from_tag!("pistols-lords_mock")'
   VR_MOCK: '0x07d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e', // 'selector_from_tag!("pistols-vrf_mock")'
@@ -392,11 +414,9 @@ export const CONFIG: type_CONFIG = {
 // from: ../dojo/src/models/player.cairo
 type type_PlayerErrors = {
   PLAYER_NOT_REGISTERED: string, // cairo: felt252
-  INSUFFICIENT_CONSUMABLES: string, // cairo: felt252
 };
 export const PlayerErrors: type_PlayerErrors = {
   PLAYER_NOT_REGISTERED: 'PLAYER: Not registered',
-  INSUFFICIENT_CONSUMABLES: 'PLAYER: Insufficient consumable',
 };
 
 // from: ../dojo/src/models/table.cairo
@@ -713,8 +733,9 @@ export const CHALLENGE_STATE: type_CHALLENGE_STATE = {
 
 // from: ../dojo/src/types/constants.cairo
 type type_CONST = {
-  DUELIST_PACK_AMOUNT_REGISTER: number, // cairo: u32
-  DUELIST_PACK_AMOUNT: number, // cairo: u32
+  DUELIST_PROFILE_COUNT: number, // cairo: u8
+  BOT_PROFILE_COUNT: number, // cairo: u8
+  WELCOME_PACK_DUELIST_COUNT: number, // cairo: usize
   ROUND_COUNT: number, // cairo: u8
   MAX_DUELIST_ID: BigNumberish, // cairo: u128
   FULL_HEALTH: number, // cairo: u8
@@ -725,8 +746,9 @@ type type_CONST = {
   ETH_TO_WEI: BigNumberish, // cairo: u256
 };
 export const CONST: type_CONST = {
-  DUELIST_PACK_AMOUNT_REGISTER: 5,
-  DUELIST_PACK_AMOUNT: 5,
+  DUELIST_PROFILE_COUNT: 21,
+  BOT_PROFILE_COUNT: 2,
+  WELCOME_PACK_DUELIST_COUNT: 5,
   ROUND_COUNT: 1,
   MAX_DUELIST_ID: '0xffff',
   FULL_HEALTH: 3,
@@ -767,6 +789,68 @@ export const FAME: type_FAME = {
   FAME_PER_LORDS: '10',
   MIN_MINT_GRANT_AMOUNT: '1_000 * super.CONST::ETH_TO_WEI',
   MIN_REWARD_AMOUNT: '100 * super.CONST::ETH_TO_WEI',
+};
+
+// from: ../dojo/src/types/profile_type.cairo
+type type_DUELIST_NAMES = {
+  Duelist00: string, // cairo: felt252
+  Duelist01: string, // cairo: felt252
+  Duelist02: string, // cairo: felt252
+  Duelist03: string, // cairo: felt252
+  Duelist04: string, // cairo: felt252
+  Duelist05: string, // cairo: felt252
+  Duelist06: string, // cairo: felt252
+  Duelist07: string, // cairo: felt252
+  Duelist08: string, // cairo: felt252
+  Duelist09: string, // cairo: felt252
+  Duelist10: string, // cairo: felt252
+  Duelist11: string, // cairo: felt252
+  Duelist12: string, // cairo: felt252
+  Duelist13: string, // cairo: felt252
+  Duelist14: string, // cairo: felt252
+  Duelist15: string, // cairo: felt252
+  Duelist16: string, // cairo: felt252
+  Duelist17: string, // cairo: felt252
+  Duelist18: string, // cairo: felt252
+  Duelist19: string, // cairo: felt252
+  Duelist20: string, // cairo: felt252
+  Duelist21: string, // cairo: felt252
+};
+export const DUELIST_NAMES: type_DUELIST_NAMES = {
+  Duelist00: 'Unknown',
+  Duelist01: 'Duke',
+  Duelist02: 'Duella',
+  Duelist03: 'Jameson',
+  Duelist04: 'Pilgrim',
+  Duelist05: 'Jack',
+  Duelist06: 'Pops',
+  Duelist07: 'Ser Walker',
+  Duelist08: 'Bloberto',
+  Duelist09: 'Squiddo',
+  Duelist10: 'Slender Duck',
+  Duelist11: 'Lady Vengeance',
+  Duelist12: 'Breadman',
+  Duelist13: 'Brutus',
+  Duelist14: 'Pistolopher',
+  Duelist15: 'Secreto',
+  Duelist16: 'Shadow Mare',
+  Duelist17: 'Karaku',
+  Duelist18: 'Misty',
+  Duelist19: 'Kenzu',
+  Duelist20: 'Nyn Jah',
+  Duelist21: 'Thrak',
+};
+
+// from: ../dojo/src/types/profile_type.cairo
+type type_BOT_NAMES = {
+  Bot00: string, // cairo: felt252
+  Bot01: string, // cairo: felt252
+  Bot02: string, // cairo: felt252
+};
+export const BOT_NAMES: type_BOT_NAMES = {
+  Bot00: 'Unknown',
+  Bot01: 'Scarecrow',
+  Bot02: 'Tin Man',
 };
 
 // from: ../dojo/src/types/round_state.cairo

@@ -60,7 +60,6 @@ export interface DuelistState {
 
 // Type definition for `pistols::models::challenge::Moves` struct
 export interface Moves {
-	seed: BigNumberish;
 	salt: BigNumberish;
 	hashed: BigNumberish;
 	card_1: BigNumberish;
@@ -135,33 +134,17 @@ export interface TokenConfigValue {
 	minted_count: BigNumberish;
 }
 
-// Type definition for `pistols::models::consumable::ConsumableBalance` struct
-export interface ConsumableBalance {
-	consumable_type: ConsumableType;
-	player_address: string;
-	balance: BigNumberish;
-}
-
-// Type definition for `pistols::models::consumable::ConsumableBalanceValue` struct
-export interface ConsumableBalanceValue {
-	balance: BigNumberish;
-}
-
 // Type definition for `pistols::models::duelist::Duelist` struct
 export interface Duelist {
 	duelist_id: BigNumberish;
-	name: BigNumberish;
-	profile_pic_type: ProfilePicType;
-	profile_pic_uri: string;
+	profile_type: ProfileType;
 	timestamp: BigNumberish;
 	score: Score;
 }
 
 // Type definition for `pistols::models::duelist::DuelistValue` struct
 export interface DuelistValue {
-	name: BigNumberish;
-	profile_pic_type: ProfilePicType;
-	profile_pic_uri: string;
+	profile_type: ProfileType;
 	timestamp: BigNumberish;
 	score: Score;
 }
@@ -198,6 +181,21 @@ export interface Scoreboard {
 // Type definition for `pistols::models::duelist::ScoreboardValue` struct
 export interface ScoreboardValue {
 	score: Score;
+}
+
+// Type definition for `pistols::models::pack::Pack` struct
+export interface Pack {
+	pack_id: BigNumberish;
+	pack_type: PackType;
+	seed: BigNumberish;
+	is_open: boolean;
+}
+
+// Type definition for `pistols::models::pack::PackValue` struct
+export interface PackValue {
+	pack_type: PackType;
+	seed: BigNumberish;
+	is_open: boolean;
 }
 
 // Type definition for `pistols::models::payment::Payment` struct
@@ -340,17 +338,11 @@ export enum Activity {
   Online,
 }
 
-// Type definition for `pistols::models::consumable::ConsumableType` enum
-export enum ConsumableType {
+// Type definition for `pistols::models::pack::PackType` enum
+export enum PackType {
 	Undefined,
-	DuelistToken,
-}
-
-// Type definition for `pistols::models::duelist::ProfilePicType` enum
-export enum ProfilePicType {
-	Undefined,
-	Duelist,
-	External,
+	WelcomePack,
+	Duelists5x,
 }
 
 // Type definition for `pistols::models::player::TutorialProgress` enum
@@ -400,6 +392,13 @@ export enum Premise {
 	Tournament,
 }
 
+// Type definition for `pistols::types::profile_type::ProfileType` enum
+export enum ProfileType {
+	Undefined,
+	Duelist,
+	Bot,
+}
+
 // Type definition for `pistols::types::round_state::RoundState` enum
 export enum RoundState {
 	Null,
@@ -424,8 +423,6 @@ export interface SchemaType extends ISchemaType {
 		ConfigValue: WithFieldOrder<ConfigValue>,
 		TokenConfig: WithFieldOrder<TokenConfig>,
 		TokenConfigValue: WithFieldOrder<TokenConfigValue>,
-		ConsumableBalance: WithFieldOrder<ConsumableBalance>,
-		ConsumableBalanceValue: WithFieldOrder<ConsumableBalanceValue>,
 		Duelist: WithFieldOrder<Duelist>,
 		DuelistValue: WithFieldOrder<DuelistValue>,
 		Pact: WithFieldOrder<Pact>,
@@ -433,6 +430,8 @@ export interface SchemaType extends ISchemaType {
 		Score: WithFieldOrder<Score>,
 		Scoreboard: WithFieldOrder<Scoreboard>,
 		ScoreboardValue: WithFieldOrder<ScoreboardValue>,
+		Pack: WithFieldOrder<Pack>,
+		PackValue: WithFieldOrder<PackValue>,
 		Payment: WithFieldOrder<Payment>,
 		PaymentValue: WithFieldOrder<PaymentValue>,
 		PPlayerBookmark: WithFieldOrder<PPlayerBookmark>,
@@ -504,8 +503,7 @@ export const schema: SchemaType = {
 			honour: 0,
 		},
 		Moves: {
-			fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'],
-			seed: 0,
+			fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'],
 			salt: 0,
 			hashed: 0,
 			card_1: 0,
@@ -516,8 +514,8 @@ export const schema: SchemaType = {
 		Round: {
 			fieldOrder: ['duel_id', 'moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
 			duel_id: 0,
-		moves_a: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-		moves_b: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+		moves_a: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+		moves_b: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
 		state_a: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
 		state_b: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
 		state: RoundState.Null,
@@ -525,8 +523,8 @@ export const schema: SchemaType = {
 		},
 		RoundValue: {
 			fieldOrder: ['moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
-		moves_a: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-		moves_b: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+		moves_a: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+		moves_b: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
 		state_a: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
 		state_b: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
 		state: RoundState.Null,
@@ -571,30 +569,16 @@ export const schema: SchemaType = {
 			renderer_address: "",
 			minted_count: 0,
 		},
-		ConsumableBalance: {
-			fieldOrder: ['consumable_type', 'player_address', 'balance'],
-		consumable_type: ConsumableType.Undefined,
-			player_address: "",
-			balance: 0,
-		},
-		ConsumableBalanceValue: {
-			fieldOrder: ['balance'],
-			balance: 0,
-		},
 		Duelist: {
-			fieldOrder: ['duelist_id', 'name', 'profile_pic_type', 'profile_pic_uri', 'timestamp', 'score'],
+			fieldOrder: ['duelist_id', 'profile_type', 'timestamp', 'score'],
 			duelist_id: 0,
-			name: 0,
-		profile_pic_type: ProfilePicType.Undefined,
-		profile_pic_uri: "",
+		profile_type: ProfileType.Undefined,
 			timestamp: 0,
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		DuelistValue: {
-			fieldOrder: ['name', 'profile_pic_type', 'profile_pic_uri', 'timestamp', 'score'],
-			name: 0,
-		profile_pic_type: ProfilePicType.Undefined,
-		profile_pic_uri: "",
+			fieldOrder: ['profile_type', 'timestamp', 'score'],
+		profile_type: ProfileType.Undefined,
 			timestamp: 0,
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
@@ -626,6 +610,19 @@ export const schema: SchemaType = {
 		ScoreboardValue: {
 			fieldOrder: ['score'],
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
+		},
+		Pack: {
+			fieldOrder: ['pack_id', 'pack_type', 'seed', 'is_open'],
+			pack_id: 0,
+		pack_type: PackType.Undefined,
+			seed: 0,
+			is_open: false,
+		},
+		PackValue: {
+			fieldOrder: ['pack_type', 'seed', 'is_open'],
+		pack_type: PackType.Undefined,
+			seed: 0,
+			is_open: false,
 		},
 		Payment: {
 			fieldOrder: ['key', 'amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
@@ -755,17 +752,16 @@ export enum ModelsMapping {
 	ConfigValue = 'pistols-ConfigValue',
 	TokenConfig = 'pistols-TokenConfig',
 	TokenConfigValue = 'pistols-TokenConfigValue',
-	ConsumableBalance = 'pistols-ConsumableBalance',
-	ConsumableBalanceValue = 'pistols-ConsumableBalanceValue',
-	ConsumableType = 'pistols-ConsumableType',
 	Duelist = 'pistols-Duelist',
 	DuelistValue = 'pistols-DuelistValue',
 	Pact = 'pistols-Pact',
 	PactValue = 'pistols-PactValue',
-	ProfilePicType = 'pistols-ProfilePicType',
 	Score = 'pistols-Score',
 	Scoreboard = 'pistols-Scoreboard',
 	ScoreboardValue = 'pistols-ScoreboardValue',
+	Pack = 'pistols-Pack',
+	PackType = 'pistols-PackType',
+	PackValue = 'pistols-PackValue',
 	Payment = 'pistols-Payment',
 	PaymentValue = 'pistols-PaymentValue',
 	PPlayerBookmark = 'pistols-PPlayerBookmark',
@@ -787,5 +783,6 @@ export enum ModelsMapping {
 	DeckType = 'pistols-DeckType',
 	ChallengeState = 'pistols-ChallengeState',
 	Premise = 'pistols-Premise',
+	ProfileType = 'pistols-ProfileType',
 	RoundState = 'pistols-RoundState',
 }

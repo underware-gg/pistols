@@ -1913,8 +1913,8 @@
       ]
     },
     {
-      "address": "0x42826f4b8657ef121e50415ef3934151559600f61ab7ae0000edff4c244007c",
-      "class_hash": "0x946964197808c20a9c322ee93de2bf7dab5547c42cca8e05d3107eaa9c43e4",
+      "address": "0x2f03f911cf6a5a9452b34ecc5a9547166193a3c1bc9ef9326e991b904b1693c",
+      "class_hash": "0x2e8bd65e5fec2b68e4e9d81c2703cb54d3a6ff71744ae5c9933bfe9f0215f9d",
       "abi": [
         {
           "type": "impl",
@@ -1997,6 +1997,20 @@
         },
         {
           "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
           "name": "pistols::types::premise::Premise",
           "variants": [
             {
@@ -2033,20 +2047,6 @@
             },
             {
               "name": "Tournament",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
               "type": "()"
             }
           ]
@@ -2093,78 +2093,6 @@
           "type": "interface",
           "name": "pistols::systems::tokens::duel_token::IDuelTokenPublic",
           "items": [
-            {
-              "type": "function",
-              "name": "create_duel",
-              "inputs": [
-                {
-                  "name": "duelist_id",
-                  "type": "core::integer::u128"
-                },
-                {
-                  "name": "challenged_id_or_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "premise",
-                  "type": "pistols::types::premise::Premise"
-                },
-                {
-                  "name": "quote",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "table_id",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "expire_hours",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u128"
-                }
-              ],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "reply_duel",
-              "inputs": [
-                {
-                  "name": "duelist_id",
-                  "type": "core::integer::u128"
-                },
-                {
-                  "name": "duel_id",
-                  "type": "core::integer::u128"
-                },
-                {
-                  "name": "accepted",
-                  "type": "core::bool"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "pistols::types::challenge_state::ChallengeState"
-                }
-              ],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "transfer_to_winner",
-              "inputs": [
-                {
-                  "name": "duel_id",
-                  "type": "core::integer::u128"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
             {
               "type": "function",
               "name": "calc_mint_fee",
@@ -2248,6 +2176,78 @@
                 }
               ],
               "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "create_duel",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "challenged_id_or_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "premise",
+                  "type": "pistols::types::premise::Premise"
+                },
+                {
+                  "name": "quote",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "table_id",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "expire_hours",
+                  "type": "core::integer::u64"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "reply_duel",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "accepted",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "pistols::types::challenge_state::ChallengeState"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "transfer_to_winner",
+              "inputs": [
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -2798,7 +2798,7 @@
               "name": "can_mint",
               "inputs": [
                 {
-                  "name": "caller_address",
+                  "name": "recipient",
                   "type": "core::starknet::contract_address::ContractAddress"
                 }
               ],
@@ -3016,7 +3016,7 @@
         }
       ],
       "init_calldata": [
-        "sstr:pistols.stage.underware.gg",
+        "sstr:localhost:5173",
         "0x0",
         "0x0",
         "0"
@@ -3039,8 +3039,8 @@
       ]
     },
     {
-      "address": "0x358ca45038480663c7f7cbd59d5cbd5f8114223a934b76e8b819c35e40337f2",
-      "class_hash": "0x6042f8be6290ec63013c9b0d89b0e4cabf12853b23d4443d664cf9263a7694f",
+      "address": "0x398da4208a7ef404a82ff3da44846656371b77d28a5ec9d01417505cd1b9802",
+      "class_hash": "0x15a747355f30e415d74b35b4ad9a25116e48eee7db7b2db8d5c0cb921a3fcef",
       "abi": [
         {
           "type": "impl",
@@ -3101,16 +3101,8 @@
               "type": "core::felt252"
             },
             {
-              "name": "minter_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
               "name": "renderer_address",
               "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "fee_amount",
-              "type": "core::integer::u128"
             }
           ],
           "outputs": [],
@@ -3120,84 +3112,6 @@
           "type": "impl",
           "name": "DuelistTokenPublicImpl",
           "interface_name": "pistols::systems::tokens::duelist_token::IDuelistTokenPublic"
-        },
-        {
-          "type": "enum",
-          "name": "pistols::models::duelist::ProfilePicType",
-          "variants": [
-            {
-              "name": "Undefined",
-              "type": "()"
-            },
-            {
-              "name": "Duelist",
-              "type": "()"
-            },
-            {
-              "name": "External",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "pistols::models::duelist::Score",
-          "members": [
-            {
-              "name": "honour",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "total_duels",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "total_wins",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "total_losses",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "total_draws",
-              "type": "core::integer::u16"
-            },
-            {
-              "name": "honour_history",
-              "type": "core::integer::u64"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "pistols::models::duelist::Duelist",
-          "members": [
-            {
-              "name": "duelist_id",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "name",
-              "type": "core::felt252"
-            },
-            {
-              "name": "profile_pic_type",
-              "type": "pistols::models::duelist::ProfilePicType"
-            },
-            {
-              "name": "profile_pic_uri",
-              "type": "core::byte_array::ByteArray"
-            },
-            {
-              "name": "timestamp",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "score",
-              "type": "pistols::models::duelist::Score"
-            }
-          ]
         },
         {
           "type": "enum",
@@ -3214,81 +3128,37 @@
           ]
         },
         {
+          "type": "enum",
+          "name": "pistols::types::profile_type::ProfileType",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Duelist",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "Bot",
+              "type": "core::integer::u8"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::integer::u128>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::integer::u128>"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::tokens::duelist_token::IDuelistTokenPublic",
           "items": [
-            {
-              "type": "function",
-              "name": "calc_mint_fee",
-              "inputs": [
-                {
-                  "name": "recipient",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u128"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "create_duelist",
-              "inputs": [
-                {
-                  "name": "recipient",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "name",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "profile_pic_type",
-                  "type": "pistols::models::duelist::ProfilePicType"
-                },
-                {
-                  "name": "profile_pic_uri",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "pistols::models::duelist::Duelist"
-                }
-              ],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "update_duelist",
-              "inputs": [
-                {
-                  "name": "duelist_id",
-                  "type": "core::integer::u128"
-                },
-                {
-                  "name": "name",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "profile_pic_type",
-                  "type": "pistols::models::duelist::ProfilePicType"
-                },
-                {
-                  "name": "profile_pic_uri",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "pistols::models::duelist::Duelist"
-                }
-              ],
-              "state_mutability": "external"
-            },
             {
               "type": "function",
               "name": "is_alive",
@@ -3320,6 +3190,34 @@
                 }
               ],
               "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "mint_duelists",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "amount",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "seed",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "profile_type",
+                  "type": "pistols::types::profile_type::ProfileType"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<core::integer::u128>"
+                }
+              ],
+              "state_mutability": "external"
             },
             {
               "type": "function",
@@ -3886,7 +3784,7 @@
               "name": "can_mint",
               "inputs": [
                 {
-                  "name": "caller_address",
+                  "name": "recipient",
                   "type": "core::starknet::contract_address::ContractAddress"
                 }
               ],
@@ -4104,17 +4002,14 @@
         }
       ],
       "init_calldata": [
-        "sstr:pistols.stage.underware.gg",
-        "0x0",
-        "0x0",
+        "sstr:localhost:5173",
         "0x0"
       ],
       "tag": "pistols-duelist_token",
       "selector": "0x45c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e",
       "systems": [
         "dojo_init",
-        "create_duelist",
-        "update_duelist",
+        "mint_duelists",
         "transfer_fame_reward",
         "upgrade",
         "safe_transfer_from",
@@ -4796,8 +4691,8 @@
       ]
     },
     {
-      "address": "0x63418f4f6eae9f10d23d4ce980a6ba593d4c9ac70f1dec1da378fbd5173c3ce",
-      "class_hash": "0x1301f9f6464733fe8d86e215992e27bde1c5a31d805ed718bf45d3d1098121a",
+      "address": "0x7bf2b0247089348f5027303ad5a0539a5155756eaf600e527059dc1071180df",
+      "class_hash": "0x57734fb4b394c5942c3eb79564a4b8aac5e5936b1f47abc8f1b78e4a44ed06c",
       "abi": [
         {
           "type": "impl",
@@ -5993,6 +5888,1030 @@
       ]
     },
     {
+      "address": "0x3d9531972d50bbd75f6215be2fe60c9dd334233d06ee5c36bf6edd00e5be725",
+      "class_hash": "0x1cbbc0ceddf03ad8e466560f73f926ee6e75d0e4a42f8c9b5fb834fadd6364d",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "pack_token__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "pack_token__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [
+            {
+              "name": "base_uri",
+              "type": "core::felt252"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "impl",
+          "name": "PackTokenPublicImpl",
+          "interface_name": "pistols::systems::tokens::pack_token::IPackTokenPublic"
+        },
+        {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::models::pack::PackType",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "WelcomePack",
+              "type": "()"
+            },
+            {
+              "name": "Duelists5x",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::integer::u128>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::integer::u128>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::models::pack::Pack",
+          "members": [
+            {
+              "name": "pack_id",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "pack_type",
+              "type": "pistols::models::pack::PackType"
+            },
+            {
+              "name": "seed",
+              "type": "core::felt252"
+            },
+            {
+              "name": "is_open",
+              "type": "core::bool"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::tokens::pack_token::IPackTokenPublic",
+          "items": [
+            {
+              "type": "function",
+              "name": "can_claim_welcome_pack",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "can_purchase",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "pack_type",
+                  "type": "pistols::models::pack::PackType"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "calc_mint_fee",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "pack_type",
+                  "type": "pistols::models::pack::PackType"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "claim_welcome_pack",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<core::integer::u128>"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "purchase",
+              "inputs": [
+                {
+                  "name": "pack_type",
+                  "type": "pistols::models::pack::PackType"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "pistols::models::pack::Pack"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "open",
+              "inputs": [
+                {
+                  "name": "pack_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<core::integer::u128>"
+                }
+              ],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "TokenRendererImpl",
+          "interface_name": "pistols::systems::components::erc721_hooks::ITokenRenderer"
+        },
+        {
+          "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::byte_array::ByteArray>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::byte_array::ByteArray>"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::components::erc721_hooks::ITokenRenderer",
+          "items": [
+            {
+              "type": "function",
+              "name": "get_token_name",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_token_description",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_token_image",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_attribute_pairs",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<core::byte_array::ByteArray>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_metadata_pairs",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<core::byte_array::ByteArray>"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "ERC721MixinImpl",
+          "interface_name": "openzeppelin_token::erc721::interface::ERC721ABI"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::felt252>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::felt252>"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "openzeppelin_token::erc721::interface::ERC721ABI",
+          "items": [
+            {
+              "type": "function",
+              "name": "balance_of",
+              "inputs": [
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "owner_of",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "safe_transfer_from",
+              "inputs": [
+                {
+                  "name": "from",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "to",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                },
+                {
+                  "name": "data",
+                  "type": "core::array::Span::<core::felt252>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "transfer_from",
+              "inputs": [
+                {
+                  "name": "from",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "to",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "approve",
+              "inputs": [
+                {
+                  "name": "to",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "set_approval_for_all",
+              "inputs": [
+                {
+                  "name": "operator",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "approved",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "get_approved",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "is_approved_for_all",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "operator",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "supports_interface",
+              "inputs": [
+                {
+                  "name": "interface_id",
+                  "type": "core::felt252"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "symbol",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "token_uri",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "balanceOf",
+              "inputs": [
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "ownerOf",
+              "inputs": [
+                {
+                  "name": "tokenId",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "safeTransferFrom",
+              "inputs": [
+                {
+                  "name": "from",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "to",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "tokenId",
+                  "type": "core::integer::u256"
+                },
+                {
+                  "name": "data",
+                  "type": "core::array::Span::<core::felt252>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "transferFrom",
+              "inputs": [
+                {
+                  "name": "from",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "to",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "tokenId",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "setApprovalForAll",
+              "inputs": [
+                {
+                  "name": "operator",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "approved",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "getApproved",
+              "inputs": [
+                {
+                  "name": "tokenId",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "isApprovedForAll",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "operator",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "tokenURI",
+              "inputs": [
+                {
+                  "name": "tokenId",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "TokenComponentPublicImpl",
+          "interface_name": "pistols::systems::components::token_component::ITokenComponentPublic"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::components::token_component::ITokenComponentPublic",
+          "items": [
+            {
+              "type": "function",
+              "name": "can_mint",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "exists",
+              "inputs": [
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "is_owner_of",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_introspection::src5::SRC5Component::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_token::erc721::erc721::ERC721Component::Transfer",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "from",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "to",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "token_id",
+              "type": "core::integer::u256",
+              "kind": "key"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_token::erc721::erc721::ERC721Component::Approval",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "owner",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "approved",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "token_id",
+              "type": "core::integer::u256",
+              "kind": "key"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_token::erc721::erc721::ERC721Component::ApprovalForAll",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "owner",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "operator",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "approved",
+              "type": "core::bool",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_token::erc721::erc721::ERC721Component::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Transfer",
+              "type": "openzeppelin_token::erc721::erc721::ERC721Component::Transfer",
+              "kind": "nested"
+            },
+            {
+              "name": "Approval",
+              "type": "openzeppelin_token::erc721::erc721::ERC721Component::Approval",
+              "kind": "nested"
+            },
+            {
+              "name": "ApprovalForAll",
+              "type": "openzeppelin_token::erc721::erc721::ERC721Component::ApprovalForAll",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::components::token_component::TokenComponent::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::tokens::pack_token::pack_token::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "SRC5Event",
+              "type": "openzeppelin_introspection::src5::SRC5Component::Event",
+              "kind": "flat"
+            },
+            {
+              "name": "ERC721Event",
+              "type": "openzeppelin_token::erc721::erc721::ERC721Component::Event",
+              "kind": "flat"
+            },
+            {
+              "name": "TokenEvent",
+              "type": "pistols::systems::components::token_component::TokenComponent::Event",
+              "kind": "flat"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [
+        "sstr:localhost:5173"
+      ],
+      "tag": "pistols-pack_token",
+      "selector": "0x3d74e76192285c5a19a63c54a6c2ba5b015a1a25818c2d8f9cf75d7fef2b5c1",
+      "systems": [
+        "dojo_init",
+        "claim_welcome_pack",
+        "purchase",
+        "open",
+        "upgrade",
+        "safe_transfer_from",
+        "transfer_from",
+        "approve",
+        "set_approval_for_all",
+        "safeTransferFrom",
+        "transferFrom",
+        "setApprovalForAll"
+      ]
+    },
+    {
       "address": "0x6e426f831229d84870ab905d75b7e1c44fd57331b436eb0cbf5fdcb140e9dbe",
       "class_hash": "0x1e0ae106c9da1a5e05a33fc938ac17780af86bfd87db6564381331ba0a813a9",
       "abi": [
@@ -6266,8 +7185,8 @@
       ]
     },
     {
-      "address": "0x97f78f811d0b2cef228aa7d82042841acc02a356898f30deb35fb4999949bf",
-      "class_hash": "0x77b4ab14169ee996fcf64bec4532ba22687016728401227559a02f3de0f9e7",
+      "address": "0x7277303966e8302844057f00c7e309ed7f6afea4a0ebc8612c4564d28bbfd0",
+      "class_hash": "0x70f8e91f1a7c5a62bef5aa040063708f0e9aa492e9ab31e7c5253c6a5fc1def",
       "abi": [
         {
           "type": "impl",
@@ -6322,22 +7241,41 @@
         {
           "type": "impl",
           "name": "VRFMockImpl",
-          "interface_name": "pistols::systems::vrf_mock::IVRFMock"
+          "interface_name": "pistols::interfaces::vrf::IVrfProvider"
+        },
+        {
+          "type": "enum",
+          "name": "pistols::interfaces::vrf::Source",
+          "variants": [
+            {
+              "name": "Nonce",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "Salt",
+              "type": "core::felt252"
+            }
+          ]
         },
         {
           "type": "interface",
-          "name": "pistols::systems::vrf_mock::IVRFMock",
+          "name": "pistols::interfaces::vrf::IVrfProvider",
           "items": [
             {
               "type": "function",
               "name": "consume_random",
-              "inputs": [],
+              "inputs": [
+                {
+                  "name": "source",
+                  "type": "pistols::interfaces::vrf::Source"
+                }
+              ],
               "outputs": [
                 {
                   "type": "core::felt252"
                 }
               ],
-              "state_mutability": "view"
+              "state_mutability": "external"
             }
           ]
         },
@@ -6460,6 +7398,7 @@
       "tag": "pistols-vrf_mock",
       "selector": "0x7d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e",
       "systems": [
+        "consume_random",
         "upgrade"
       ]
     }
@@ -6491,13 +7430,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x722d000ead841c6cd6fed20e3d319ab474f56344c1a0641b01b5c3c80f8dc75",
-      "tag": "pistols-ConsumableBalance",
-      "selector": "0x2da96519627a5ed36db04c996e022736f45853881c66009029b201a964ea804"
-    },
-    {
-      "members": [],
-      "class_hash": "0x13226522bfb302c0a23d9a747bf4df05d0a37a1ab7eaf404f32c22d3276e410",
+      "class_hash": "0x91f86b98752dbebc48e5132ed74978b1ca77f80e87d38a64eb12633c28939d",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -6521,6 +7454,12 @@
     },
     {
       "members": [],
+      "class_hash": "0xd5cf1f8ad8f272bd395e5bbaedaa808a83648bb0152bea5e6b21d84dc5b5f5",
+      "tag": "pistols-Pack",
+      "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
+    },
+    {
+      "members": [],
       "class_hash": "0xe935853433d3e4ae8faaacdc30d43247991f2fca26d551678dcf77b51d4b78",
       "tag": "pistols-Pact",
       "selector": "0x72a33a6586ae24471fdae1c6f3cc9da6629f3fd3dce300a48324617dd511617"
@@ -6539,7 +7478,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x6be45c0a7bd0118d6920db187abd982b5c83f931db1554370fb4b1abe6a1957",
+      "class_hash": "0x68f3cce85be759f65f0522d5364f2f2fbf3661f2aec3e589ec74ef12f1df430",
       "tag": "pistols-Round",
       "selector": "0x617e0a3d97aa8cb3f83bbb5341ede98d3e3d825b6424bcab0676933fec52bc2"
     },
@@ -6577,7 +7516,7 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x38f65df8e3eb86af46f9533329c8ab4cd303180a97b5f7c86b7f4ad6140307a",
+      "class_hash": "0x668dab51d1ea9182b128f080bf35c35c9c610d6e6be5295bcaa7f854a4c2f50",
       "tag": "pistols-PlayerActivity",
       "selector": "0x20ac3bc7f231ea11afb0576a200bff82197a6b397f3e5a4299f5a79ab563ff1"
     }
