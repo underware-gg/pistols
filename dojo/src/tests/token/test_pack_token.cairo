@@ -252,7 +252,7 @@ fn test_token_uri() {
 
     tester::set_Pack(ref sys.world, pack);
 
-    sys.token.claim_duelists();
+    sys.token.claim_welcome_pack();
     _purchase(sys, OWNER());
 
     let uri = sys.token.token_uri(TOKEN_ID_2);
@@ -280,7 +280,7 @@ fn test_claim_mint() {
     let player: Player = tester::get_Player(sys.world, OWNER());
     assert(!player.exists(), '!player.exists()');
 
-    sys.token.claim_duelists();
+    sys.token.claim_welcome_pack();
     _assert_minted_count(sys.world, sys.token, 1, 'total_supply 1');
     _assert_duelist_count(sys.world, sys.duelists, 5, 'duelist_supply 5');
 
@@ -288,7 +288,7 @@ fn test_claim_mint() {
     assert(player.exists(), 'player.exists()');
     let pack_1: Pack = tester::get_Pack(sys.world, TOKEN_ID_1.low);
     assert(pack_1.pack_id == TOKEN_ID_1.low, 'pack_1.pack_id');
-    assert(pack_1.pack_type == PackType::Duelists5x, 'pack_1.pack_type');
+    assert(pack_1.pack_type == PackType::WelcomePack, 'pack_1.pack_type');
     assert(pack_1.seed != 0, 'pack_1.seed');
     assert(pack_1.is_open == true, 'pack_1.is_open');
 
@@ -299,18 +299,19 @@ fn test_claim_mint() {
 
     let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
     assert(pack_2.pack_id == TOKEN_ID_2.low, 'pack_2.pack_id');
+    assert(pack_2.pack_type == PackType::Duelists5x, 'pack_2.pack_type');
     assert(pack_2.seed != pack_1.seed, 'pack_2.seed');
     assert(pack_2.is_open == false, 'pack_2.is_open');
 
     tester::impersonate(OTHER());
-    sys.token.claim_duelists();
+    sys.token.claim_welcome_pack();
 }
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance_zero() {
     let mut sys: TestSystems = setup(100);
-    sys.token.claim_duelists();
+    sys.token.claim_welcome_pack();
     sys.token.purchase(PackType::Duelists5x);
 }
 
@@ -318,7 +319,7 @@ fn test_mint_no_allowance_zero() {
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance_half() {
     let mut sys: TestSystems = setup(100);
-    sys.token.claim_duelists();
+    sys.token.claim_welcome_pack();
     let price: u128 = sys.token.calc_mint_fee(OWNER(), PackType::Duelists5x);
     tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, price / 2);
     sys.token.purchase(PackType::Duelists5x);
@@ -328,8 +329,8 @@ fn test_mint_no_allowance_half() {
 #[should_panic(expected: ('PACK: Already claimed', 'ENTRYPOINT_FAILED'))]
 fn test_claim_twice() {
     let mut sys: TestSystems = setup(100);
-    sys.token.claim_duelists();
-    sys.token.claim_duelists();
+    sys.token.claim_welcome_pack();
+    sys.token.claim_welcome_pack();
 }
 
 #[test]
@@ -337,6 +338,14 @@ fn test_claim_twice() {
 fn test_no_claim() {
     let mut sys: TestSystems = setup(100);
     _purchase(sys, OWNER());
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Not for sale', 'ENTRYPOINT_FAILED'))]
+fn test_mint_not_for_sale() {
+    let mut sys: TestSystems = setup(100);
+    sys.token.claim_welcome_pack();
+    sys.token.purchase(PackType::WelcomePack);
 }
 
 
@@ -347,7 +356,7 @@ fn test_no_claim() {
 #[test]
 fn test_open() {
     let mut sys: TestSystems = setup(100);
-    sys.token.claim_duelists();
+    sys.token.claim_welcome_pack();
     assert(sys.token.balance_of(OWNER()) == 0, 'token.balance_of = 0'); // burned!
     _assert_duelist_count(sys.world, sys.duelists, 5, 'duelist_supply 5');
     assert(sys.duelists.balance_of(OWNER()) == 5, 'duelists.balance_of = 5');
@@ -368,7 +377,7 @@ fn test_open() {
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_already_opened() {
     let mut sys: TestSystems = setup(100);
-    sys.token.claim_duelists();
+    sys.token.claim_welcome_pack();
     sys.token.open(TOKEN_ID_1.low);
 }
 
@@ -383,7 +392,7 @@ fn test_open_invalid() {
 #[should_panic(expected: ('PACK: Not owner', 'ENTRYPOINT_FAILED'))]
 fn test_open_not_owner() {
     let mut sys: TestSystems = setup(100);
-    sys.token.claim_duelists();
+    sys.token.claim_welcome_pack();
     _purchase(sys, OWNER());
     tester::impersonate(OTHER());
     sys.token.open(TOKEN_ID_2.low);

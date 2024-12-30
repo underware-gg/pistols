@@ -3,6 +3,7 @@ mod CONST {
     // duelist profiles
     const DUELIST_PROFILE_COUNT: u8 = 21;
     const BOT_PROFILE_COUNT: u8 = 2;
+    const WELCOME_PACK_DUELIST_COUNT: usize = 5;
     
     // number of rounds per duel
     const ROUND_COUNT: u8 = 1;

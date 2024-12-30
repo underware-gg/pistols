@@ -443,9 +443,9 @@ mod tester {
     }
 
     // ::pack_token
-    fn execute_claim_duelists(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
+    fn execute_claim_welcome_pack(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
         impersonate(sender);
-        let token_ids: Span<u128> = (*system).claim_duelists();
+        let token_ids: Span<u128> = (*system).claim_welcome_pack();
         _next_block();
         (token_ids)
     }

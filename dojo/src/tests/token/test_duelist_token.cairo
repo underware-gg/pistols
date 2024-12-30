@@ -220,7 +220,7 @@ fn setup(fee_amount: u128) -> TestSystems {
     let mut sys: TestSystems = setup_uninitialized(fee_amount);
 
     // initialize contracts
-    tester::execute_claim_duelists(@sys.pack, OWNER());
+    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
     
     tester::impersonate(OWNER());
 
@@ -231,10 +231,10 @@ fn setup(fee_amount: u128) -> TestSystems {
     (sys)
 }
 
-fn _assert_minted_count(world: WorldStorage, token: IDuelistTokenDispatcher, minted_count: u128, msg: felt252) {
+fn _assert_minted_count(world: WorldStorage, token: IDuelistTokenDispatcher, minted_count: usize, msg: felt252) {
     // assert(token.total_supply() == minted_count, 'msg);
     let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
-    assert(token_config.minted_count == minted_count, msg);
+    assert(token_config.minted_count == minted_count.into(), msg);
 }
 
 //
@@ -247,8 +247,8 @@ fn test_initializer() {
     // assert(sys.token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(sys.token.symbol() == "DUELIST", 'Symbol is wrong');
 
-    _assert_minted_count(sys.world, sys.token, 5, 'Should eq 5');
-    assert(sys.token.balance_of(OWNER()) == 5, 'Should eq 5 (OWNER)');
+    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, 'Should eq [5]');
+    assert(sys.token.balance_of(OWNER()) == CONST::WELCOME_PACK_DUELIST_COUNT.into(), 'Should eq [5] (OWNER)');
     assert(sys.token.balance_of(OTHER()) == 0, 'Should eq 0 (OTHER)');
 
     assert(sys.token.owner_of(TOKEN_ID_1) == OWNER(), 'owner_of_1');
@@ -346,9 +346,9 @@ fn test_approve() {
 fn test_transfer_from() {
     let mut sys: TestSystems = setup(100);
 
-    assert(sys.token.balance_of(OWNER()) == 5, 'Should eq 5');
+    assert(sys.token.balance_of(OWNER()) == CONST::WELCOME_PACK_DUELIST_COUNT.into(), 'Should eq [5]');
     assert(sys.token.balance_of(OTHER()) == 0, 'Should eq 0');
-    _assert_minted_count(sys.world, sys.token, 5, 'Should eq 5');
+    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, 'Should eq [5]');
 
     tester::impersonate(OWNER());
     sys.token.approve(SPENDER(), TOKEN_ID_1);
@@ -366,7 +366,7 @@ fn test_transfer_from() {
     assert(sys.token.balance_of(OWNER()) == 4, 'Should eq 4');
     assert(sys.token.balance_of(OTHER()) == 1, 'Should eq 1');
     assert(sys.token.get_approved(TOKEN_ID_1) == ZERO(), 'Should eq 0');
-    _assert_minted_count(sys.world, sys.token, 5, 'Should eq 5/');
+    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, 'Should eq [5]/');
     // assert(sys.token.total_supply() == 2, 'Should eq 2');
     // assert(sys.token.token_of_owner_by_index(OTHER(), 1) == TOKEN_ID_1, 'Should eq TOKEN_ID_1');
 }
@@ -403,7 +403,7 @@ fn test_transfer_no_allowance() {
 fn test_fame() {
     let mut sys: TestSystems = setup(0);
 
-    tester::execute_claim_duelists(@sys.pack, OTHER());
+    tester::execute_claim_welcome_pack(@sys.pack, OTHER());
 
     // validate token_bound address
     let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_1.low);
@@ -428,8 +428,8 @@ fn test_fame() {
     // owner balances must match
     let mut balance_owner_initial: u256 = sys.fame.balance_of(OWNER());
     let mut balance_other_initial: u256 = sys.fame.balance_of(OTHER());
-    assert(balance_owner_initial == balance_1_initial * 5, 'balance_owner_initial');
-    assert(balance_other_initial == balance_6_initial * 5, 'balance_other_initial');
+    assert(balance_owner_initial == balance_1_initial * CONST::WELCOME_PACK_DUELIST_COUNT.into(), 'balance_owner_initial');
+    assert(balance_other_initial == balance_6_initial * CONST::WELCOME_PACK_DUELIST_COUNT.into(), 'balance_other_initial');
 
     // transfer duelist
     tester::impersonate(OWNER());

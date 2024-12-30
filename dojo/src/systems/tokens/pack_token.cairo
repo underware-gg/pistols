@@ -44,19 +44,22 @@ pub trait IPackToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IPackTokenPublic
-    fn claim_duelists(ref self: TState) -> Span<u128>;
+    fn can_claim_welcome_pack(self: @TState, recipient: ContractAddress) -> bool;
+    fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
+    fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
+    fn claim_welcome_pack(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
-    fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
 }
 
 #[starknet::interface]
 pub trait IPackTokenPublic<TState> {
-    fn claim_duelists(ref self: TState) -> Span<u128>;
+    fn can_claim_welcome_pack(self: @TState, recipient: ContractAddress) -> bool;
+    fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
+    fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
+    fn claim_welcome_pack(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
-    fn can_claim_duelists(self: @TState, recipient: ContractAddress) -> bool;
-    fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
 }
 
 #[dojo::contract]
@@ -117,6 +120,7 @@ pub mod pack_token {
         config::{TokenConfig, TokenConfigValue},
         payment::{Payment},
     };
+    use pistols::types::constants::{CONST};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::ShortStringTrait;
@@ -126,7 +130,8 @@ pub mod pack_token {
     mod Errors {
         const NOT_IMPLEMENTED: felt252      = 'PACK: Not implemented';
         const ALREADY_CLAIMED: felt252      = 'PACK: Already claimed';
-        const NOT_CLAIMED: felt252          = 'PACK: Claim duelists first';
+        const CLAIM_FIRST: felt252          = 'PACK: Claim duelists first';
+        const NOT_FOR_SALE: felt252         = 'PACK: Not for sale';
         const ALREADY_OPENED: felt252       = 'PACK: Already opened';
         const NOT_OWNER: felt252            = 'PACK: Not owner';
     }
@@ -176,25 +181,29 @@ pub mod pack_token {
     #[abi(embed_v0)]
     impl PackTokenPublicImpl of IPackTokenPublic<ContractState> {
 
-        fn can_claim_duelists(self: @ContractState, recipient: ContractAddress) -> bool {
+        fn can_claim_welcome_pack(self: @ContractState, recipient: ContractAddress) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let player: Player = store.get_player(recipient);
             (!player.exists())
+        }
+
+        fn can_purchase(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> bool {
+            (!self.can_claim_welcome_pack(recipient) && pack_type.can_purchase())
         }
 
         fn calc_mint_fee(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> u128 {
             (self.get_payment(recipient, pack_type).amount.low)
         }
 
-        fn claim_duelists(ref self: ContractState) -> Span<u128> {
+        fn claim_welcome_pack(ref self: ContractState) -> Span<u128> {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate
             let recipient: ContractAddress = get_caller_address();
-            assert(self.can_claim_duelists(recipient), Errors::ALREADY_CLAIMED);
+            assert(self.can_claim_welcome_pack(recipient), Errors::ALREADY_CLAIMED);
 
             // mint
-            let pack: Pack = self.mint_pack(PackType::Duelists5x, recipient, recipient.into());
+            let pack: Pack = self.mint_pack(PackType::WelcomePack, recipient, recipient.into());
             
             // events
             PlayerTrait::check_in(ref store, recipient, Activity::WelcomePack, 0);
@@ -206,9 +215,12 @@ pub mod pack_token {
         fn purchase(ref self: ContractState, pack_type: PackType) -> Pack {
             let mut store: Store = StoreTrait::new(self.world_default());
 
-            // validate
+            // validate pack
+            assert(pack_type.can_purchase(), Errors::NOT_FOR_SALE);
+
+            // validate recipient
             let recipient: ContractAddress = get_caller_address();
-            assert(!self.can_claim_duelists(recipient), Errors::NOT_CLAIMED);
+            assert(!self.can_claim_welcome_pack(recipient), Errors::CLAIM_FIRST);
 
             // transfer mint fee
             let payment: Payment = self.get_payment(recipient, pack_type);
