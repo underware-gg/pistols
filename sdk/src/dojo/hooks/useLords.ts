@@ -19,12 +19,12 @@ export const useLordsContract = () => {
   }
 }
 
-export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
+export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n, watch: boolean = false) => {
   const { lordsContractAddress } = useLordsContract()
-  return useERC20Balance(lordsContractAddress, address, fee)
+  return useERC20Balance(lordsContractAddress, address, fee, watch)
 }
 
-export const useEtherBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
+export const useEtherBalance = (address: BigNumberish, fee: BigNumberish = 0n, watch: boolean = false) => {
   const { selectedChainConfig } = useSelectedChain()
-  return useERC20Balance(selectedChainConfig.etherAddress, address, fee)
+  return useERC20Balance(selectedChainConfig.etherAddress, address, fee, watch)
 }

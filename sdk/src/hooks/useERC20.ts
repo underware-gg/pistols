@@ -4,12 +4,17 @@ import { useContract, useBalance } from '@starknet-react/core'
 import { bigintToHex, isPositiveBigint } from 'src/utils/types'
 import { erc20_abi } from 'src/abis/abis'
 
-export const useERC20Balance = (contractAddress: BigNumberish, ownerAddress: BigNumberish, fee: BigNumberish = 0n) => {
+export const useERC20Balance = (
+  contractAddress: BigNumberish,
+  ownerAddress: BigNumberish,
+  fee: BigNumberish = 0n,
+  watch: boolean = false,
+) => {
   const { data: balance } = useBalance({
     token: bigintToHex(contractAddress),
     address: bigintToHex(ownerAddress),
-    watch: true,
-    refetchInterval: 1_000,
+    watch,
+    refetchInterval: watch ? 1_000 : undefined,
     enabled: (isPositiveBigint(contractAddress) && isPositiveBigint(ownerAddress)),
   })
   // console.log(`BALANCE`, (bigintToHex(contractAddress)), (bigintToHex(ownerAddress)), balance)
