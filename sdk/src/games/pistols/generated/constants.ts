@@ -793,52 +793,52 @@ export const FAME: type_FAME = {
 
 // from: ../dojo/src/types/profile_type.cairo
 type type_DUELIST_NAMES = {
-  Duelist00: string, // cairo: felt252
-  Duelist01: string, // cairo: felt252
-  Duelist02: string, // cairo: felt252
-  Duelist03: string, // cairo: felt252
-  Duelist04: string, // cairo: felt252
-  Duelist05: string, // cairo: felt252
-  Duelist06: string, // cairo: felt252
-  Duelist07: string, // cairo: felt252
-  Duelist08: string, // cairo: felt252
-  Duelist09: string, // cairo: felt252
-  Duelist10: string, // cairo: felt252
-  Duelist11: string, // cairo: felt252
-  Duelist12: string, // cairo: felt252
-  Duelist13: string, // cairo: felt252
-  Duelist14: string, // cairo: felt252
-  Duelist15: string, // cairo: felt252
-  Duelist16: string, // cairo: felt252
-  Duelist17: string, // cairo: felt252
-  Duelist18: string, // cairo: felt252
-  Duelist19: string, // cairo: felt252
-  Duelist20: string, // cairo: felt252
-  Duelist21: string, // cairo: felt252
+  DuelistName00: string, // cairo: felt252
+  DuelistName01: string, // cairo: felt252
+  DuelistName02: string, // cairo: felt252
+  DuelistName03: string, // cairo: felt252
+  DuelistName04: string, // cairo: felt252
+  DuelistName05: string, // cairo: felt252
+  DuelistName06: string, // cairo: felt252
+  DuelistName07: string, // cairo: felt252
+  DuelistName08: string, // cairo: felt252
+  DuelistName09: string, // cairo: felt252
+  DuelistName10: string, // cairo: felt252
+  DuelistName11: string, // cairo: felt252
+  DuelistName12: string, // cairo: felt252
+  DuelistName13: string, // cairo: felt252
+  DuelistName14: string, // cairo: felt252
+  DuelistName15: string, // cairo: felt252
+  DuelistName16: string, // cairo: felt252
+  DuelistName17: string, // cairo: felt252
+  DuelistName18: string, // cairo: felt252
+  DuelistName19: string, // cairo: felt252
+  DuelistName20: string, // cairo: felt252
+  DuelistName21: string, // cairo: felt252
 };
 export const DUELIST_NAMES: type_DUELIST_NAMES = {
-  Duelist00: 'Unknown',
-  Duelist01: 'Duke',
-  Duelist02: 'Duella',
-  Duelist03: 'Jameson',
-  Duelist04: 'Pilgrim',
-  Duelist05: 'Jack',
-  Duelist06: 'Pops',
-  Duelist07: 'Ser Walker',
-  Duelist08: 'Bloberto',
-  Duelist09: 'Squiddo',
-  Duelist10: 'Slender Duck',
-  Duelist11: 'Lady Vengeance',
-  Duelist12: 'Breadman',
-  Duelist13: 'Brutus',
-  Duelist14: 'Pistolopher',
-  Duelist15: 'Secreto',
-  Duelist16: 'Shadow Mare',
-  Duelist17: 'Karaku',
-  Duelist18: 'Misty',
-  Duelist19: 'Kenzu',
-  Duelist20: 'Nyn Jah',
-  Duelist21: 'Thrak',
+  DuelistName00: 'Unknown',
+  DuelistName01: 'Duke',
+  DuelistName02: 'Duella',
+  DuelistName03: 'Jameson',
+  DuelistName04: 'Pilgrim',
+  DuelistName05: 'Jack',
+  DuelistName06: 'Pops',
+  DuelistName07: 'Ser Walker',
+  DuelistName08: 'Bloberto',
+  DuelistName09: 'Squiddo',
+  DuelistName10: 'Slender Duck',
+  DuelistName11: 'Lady Vengeance',
+  DuelistName12: 'Breadman',
+  DuelistName13: 'Brutus',
+  DuelistName14: 'Pistolopher',
+  DuelistName15: 'Secreto',
+  DuelistName16: 'Shadow Mare',
+  DuelistName17: 'Karaku',
+  DuelistName18: 'Misty',
+  DuelistName19: 'Kenzu',
+  DuelistName20: 'Nyn Jah',
+  DuelistName21: 'Thrak',
 };
 
 // from: ../dojo/src/types/profile_type.cairo

@@ -62,7 +62,7 @@ export function EntityStoreSync() {
       // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModel(entities, 'Config'))
       // console.log("EntityStoreSync() SET =======> [TableConfig]:", filterEntitiesByModel(entities, 'TableConfig'))
       // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModel(entities, 'TokenConfig'))
-      // console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
+      console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
       // console.log("EntityStoreSync() SET =======> [Player]:", filterEntitiesByModel(entities, 'Player'))
       configState.setEntities(filterEntitiesByModel(entities, 'Config'))
       tableState.setEntities(filterEntitiesByModel(entities, 'TableConfig'))
@@ -110,8 +110,8 @@ export function EntityStoreSync() {
   // useEffect(() => console.log("EntityStoreSync() [TableConfig] =>", tableState.entities), [tableState.entities])
   // useEffect(() => console.log("EntityStoreSync() [TokenConfig] =>", tokenState.entities), [tokenState.entities])
   // useEffect(() => console.log("EntityStoreSync() [Duelist] =>", duelistState.entities), [duelistState.entities])
-  useEffect(() => console.log("EntityStoreSync() [Player] =>", playerState.players), [playerState.players])
-  useEffect(() => console.log("EntityStoreSync() [PlayerOnline] =>", playerState.players_online), [playerState.players_online])
+  // useEffect(() => console.log("EntityStoreSync() [Player] =>", playerState.players), [playerState.players])
+  // useEffect(() => console.log("EntityStoreSync() [PlayerOnline] =>", playerState.players_online), [playerState.players_online])
 
   return (<></>)
 }

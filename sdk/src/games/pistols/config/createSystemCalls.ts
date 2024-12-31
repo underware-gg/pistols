@@ -273,7 +273,6 @@ export function createSystemCalls(
 
   const can_purchase = async (recipient: BigNumberish, pack_type: constants.PackType): Promise<boolean | null> => {
     const args = [recipient, constants.getPackTypeValue(pack_type)]
-    console.log(`>>>>>>ourchase`, args)
     const results = await _executeCall<boolean>(pack_token_call('can_purchase', args))
     return results ?? null
   }
