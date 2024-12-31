@@ -32,6 +32,7 @@ export default function ScDoor() {
   const [visibleChars, setVisibleChars] = useState<string[]>([])
   const [isFirstDivVisible, setIsFirstDivVisible] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
+  const { isError } = useDojoStatus()
 
   const duelists = useRef<bigint[]>(duelistIds)
 
@@ -61,14 +62,11 @@ export default function ScDoor() {
     addCharacter(0)
   }, [])
 
-  let timeoutId;
   useEffect(() => {
-    if (timeoutId) {
-      clearTimeout(timeoutId)
-    }
+    let timeoutId;
 
-    console.log("CONNECTED", isConnected, isMyDuelist, duelistIds.length)
-    if (isConnected) {
+    console.log("CONNECTED", isConnected, isError, isMyDuelist, duelists.current.length)
+    if (isConnected && !isError) {
       setIsLoading(true)
       timeoutId = setTimeout(() => {
         if (isMyDuelist) {
@@ -89,7 +87,7 @@ export default function ScDoor() {
       }
     }
 
-  }, [isConnected])
+  }, [isConnected, isError, isMyDuelist, duelists.current])
 
   return (
     <div id='Door'>
@@ -239,6 +237,7 @@ export function ClaimDuelistsButton() {
 
   return <ActionButton large fill important disabled={false} onClick={_claim} label='Claim your Duelists' />
 }
+
 export function ConnectStatus() {
   const { isConnecting } = useSelectedChain()
   const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()
