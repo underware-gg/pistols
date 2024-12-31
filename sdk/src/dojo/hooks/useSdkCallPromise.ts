@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
+import { Result } from 'starknet'
 import { arrayHasNullElements } from 'src/utils/misc/types'
 
-export const usePromise = <T extends any>({
+export const useSdkCallPromise = <T extends Result>({
   call,
   args = [],
   enabled = true,
   defaultValue = undefined,
   forceCounter = 0,
 }: {
-  call: (...args: any[]) => Promise<T>,
+  call: (...args: any[]) => Promise<Result>,
   args?: any[],
   enabled?: boolean,
   defaultValue?: T | null | undefined
@@ -33,7 +34,7 @@ export const usePromise = <T extends any>({
           setValue(v)
         }
       }).catch((e) => {
-        console.error(`usePromise() ERROR:`, call, args, e)
+        console.error(`useSdkCallPromise() ERROR:`, call, args, e)
         if (_mounted) {
           setIsLoading(false)
           setValue(defaultValue)

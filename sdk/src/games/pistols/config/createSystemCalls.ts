@@ -5,7 +5,6 @@ import { arrayClean, shortAddress, isPositiveBigint } from 'src/utils/misc/types
 import { DojoManifest } from 'src/dojo/contexts/Dojo'
 import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'
 import { NAMESPACE, getLordsAddress, getBankAddress } from 'src/games/pistols/config/config'
-import { convert_duel_progress } from 'src/games/pistols/config/duel_progress'
 import * as constants from 'src/games/pistols/generated/constants'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
@@ -113,9 +112,9 @@ export function createSystemCalls(
     let calls: DojoCalls = []
     //
     // approve call
-    const approved_value = await calc_mint_fee_duel(table_id)
-    const approve = approve_call(approved_value)
-    if (approve) calls.push(approve)
+    // const approved_value = await calc_mint_fee_duel(table_id)
+    // const approve = approve_call(approved_value)
+    // if (approve) calls.push(approve)
     //
     // game call
     const args = [duelist_id, BigInt(challenged_id_or_address), constants.getPremiseValue(premise), stringToFelt(quote), table_id, expire_hours]
@@ -201,124 +200,15 @@ export function createSystemCalls(
   }
 
 
-
-  //------------------------------------
-  // view calls
-  //
-
-  const get_duel_progress = async (duel_id: BigNumberish): Promise<any | null> => {
-    const args = [duel_id]
-    let results = await _executeCall<any>(game_call('get_duel_progress', args))
-    const duel_progress = convert_duel_progress(results)
-    // console.log(`get_duel_progress{${bigintToHex(duel_id)}}`, results, '>', duel_progress)
-    return duel_progress
-  }
-
-  const get_player_card_decks = async (table_id: string): Promise<number[][] | null> => {
-    const args = [table_id]
-    const results = await _executeCall<any>(game_call('get_player_card_decks', args))
-    if (results == null) return null
-    return results.map((vo: BigNumberish[]) => vo.map((vi: BigNumberish) => Number(vi)))
-  }
-
-  //
-  // duel_token
-  //
-
-  const calc_mint_fee_duel = async (table_id: string): Promise<bigint | null> => {
-    const args = [stringToFelt(table_id)]
-    const results = await _executeCall<bigint>(duel_token_call('calc_mint_fee', args))
-    return results ?? null
-  }
-
-  const can_join = async (table_id: string, duelist_id: BigNumberish): Promise<boolean | null> => {
-    const args = [stringToFelt(table_id), duelist_id]
-    const results = await _executeCall<boolean>(duel_token_call('can_join', args))
-    return results ?? null
-  }
-
-  // const get_pact = async (duelist_id_a: BigNumberish, duelist_id_b: BigNumberish): Promise<bigint | null> => {
-  //   const args = [duelist_id_a, duelist_id_b]
-  //   const results = await _executeCall<bigint>(duel_token_call('get_pact', args))
-  //   return results ?? null
-  // }
-
-  // const has_pact = async (duelist_id_a: BigNumberish, duelist_id_b: BigNumberish): Promise<boolean | null> => {
-  //   const args = [duelist_id_a, duelist_id_b]
-  //   const results = await _executeCall<boolean>(duel_token_call('has_pact', args))
-  //   return results ?? null
-  // }
-
-
-  //
-  // duelist_token
-  //
-
-  const duelist_token_uri = async (token_id: BigNumberish): Promise<string | null> => {
-    const args = [token_id]
-    const results = await _executeCall<string>(duelist_token_call('token_uri', args))
-    return results ?? null
-  }
-
-
-  //
-  // pack_token
-  //
-
-  const can_claim_welcome_pack = async (recipient: BigNumberish): Promise<boolean | null> => {
-    const args = [recipient]
-    const results = await _executeCall<boolean>(pack_token_call('can_claim_welcome_pack', args))
-    return results ?? null
-  }
-
-  const can_purchase = async (recipient: BigNumberish, pack_type: constants.PackType): Promise<boolean | null> => {
-    const args = [recipient, constants.getPackTypeValue(pack_type)]
-    const results = await _executeCall<boolean>(pack_token_call('can_purchase', args))
-    return results ?? null
-  }
-
-  const calc_mint_fee_pack = async (recipient: BigNumberish, pack_type: constants.PackType): Promise<bigint | null> => {
-    const args = [recipient, constants.getPackTypeValue(pack_type)]
-    const results = await _executeCall<bigint>(pack_token_call('calc_mint_fee', args))
-    return results ?? null
-  }
-
-  //
-  // admin
-  //
-
-  const admin_am_i_admin = async (account_address: BigNumberish): Promise<string | null> => {
-    const args = [account_address]
-    const results = await _executeCall<string>(admin_call('am_i_admin', args))
-    return results ?? null
-  }
-
-  // TEST/DEBUG
-  const test_validate_commit_message = async (
-    account: BigNumberish,
-    signature: BigNumberish[],
-    duelId: BigNumberish,
-    duelistId: BigNumberish,
-  ): Promise<boolean | null> => {
-    const args = [account, signature, duelId, duelistId]
-    const results = await _executeCall<boolean>(game_call('test_validate_commit_message', args))
-    return results ?? null
-  }
-
-
   return {
     //
     // game
     commit_moves,
     reveal_moves,
-    get_duel_progress,
-    get_player_card_decks,
     //
     // duel_token
-    calc_mint_fee_duel,
     create_duel,
     reply_duel,
-    can_join,
     // get_pact,
     // has_pact,
     //
@@ -326,22 +216,12 @@ export function createSystemCalls(
     claim_welcome_pack,
     purchase,
     open,
-    can_claim_welcome_pack,
-    can_purchase,
-    calc_mint_fee_pack,
-    //
-    // duelist_token
-    duelist_token_uri,
     //
     // admin
     grant_admin,
     admin_set_config,
     admin_set_table,
     admin_set_table_admittance,
-    admin_am_i_admin,
-    //
-    // TEST/DEBUG
-    test_validate_commit_message,
   }
 }
 

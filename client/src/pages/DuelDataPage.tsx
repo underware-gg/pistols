@@ -5,7 +5,7 @@ import { useChallenge } from '/src/stores/challengeStore'
 import { useDuel } from '/src/hooks/useDuel'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
-import { useFinishedDuelProgress } from '/src/hooks/useContractCalls'
+import { useFinishedDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { ChallengeStateNames, RoundStateNames } from '/src/utils/pistols'
 import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
@@ -384,7 +384,7 @@ function DuelProgress({
 }: {
   duelId: bigint
 }) {
-  const duelProgress = useFinishedDuelProgress(duelId)
+  const { duelProgress } = useFinishedDuelProgress(duelId)
   if (!duelProgress) return <></>
   return (
     <>

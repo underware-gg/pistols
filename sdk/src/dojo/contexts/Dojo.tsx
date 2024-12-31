@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useEffect } from 'react'
 import { StarknetDomain, TypedData } from 'starknet'
 import { Connector } from '@starknet-react/core'
 import { Manifest } from '@dojoengine/core'
@@ -61,6 +61,7 @@ function SetupDojoProvider({
   // Connected wallet or Dojo Predeployed (master)
   const { selectedChainConfig } = useStarknetContext()
   const setupResult = useSetup(dojoAppConfig, selectedChainConfig)
+  useEffect(() => console.log(!Boolean(setupResult) ? '---> DOJO setup...' : '---> DOJO initialized!'), [Boolean(setupResult)])
   return (
     <DojoProvider value={setupResult}>
       {children}

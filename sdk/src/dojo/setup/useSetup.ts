@@ -50,17 +50,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   }, [mounted, selectedChainConfig, manifest], undefined, null)
 
   //
-  // Contract calls
-  const {
-    value: contractCalls,
-    isError: contractCallsIsError,
-  } = useAsyncMemo(async () => {
-    if (!mounted) return undefined
-    if (!dojoProvider) return null
-    return await setupWorld(dojoProvider)
-  }, [mounted, dojoProvider], undefined, null)
-
-  //
   // Torii setup
   const {
     value: sdk,
@@ -98,12 +87,25 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   }, [manifest, dojoProvider])
 
   //
+  // Contract calls
+  const {
+    value: contractCalls,
+    isError: contractCallsIsError,
+  } = useAsyncMemo(async () => {
+    if (!mounted) return undefined
+    if (!dojoProvider) return (dojoProvider as any) // undefined or null
+    return await setupWorld(dojoProvider)
+  }, [mounted, dojoProvider], undefined, null)
+
+
+  //
   // Status
 
-  const isLoading = !(
-    (sdk !== undefined) &&
-    (dojoProvider !== undefined) &&
-    (systemCalls !== undefined)
+  const isLoading = (
+    (sdk === undefined) ||
+    (dojoProvider === undefined) ||
+    (contractCalls === undefined) ||
+    (systemCalls === undefined)
   )
   const loadingMessage = (isLoading ? 'Loading Pistols...' : null)
 

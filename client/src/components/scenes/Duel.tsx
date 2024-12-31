@@ -11,7 +11,7 @@ import { useGameplayContext } from '/src/hooks/GameplayContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
 import { useChallenge } from '/src/stores/challengeStore'
-import { useFinishedDuelProgress } from '/src/hooks/useContractCalls'
+import { useFinishedDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '/src/hooks/useRevealAction'
@@ -141,7 +141,7 @@ export default function Duel({
   const gameBladeAnimationTimeout = useRef(null);
   const gameAnimationTimeout = useRef(null);
 
-  const duelProgress = useFinishedDuelProgress(duelId)
+  const { duelProgress } = useFinishedDuelProgress(duelId)
 
   useEffect(() => {
     return () => {
