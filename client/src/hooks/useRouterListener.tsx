@@ -1,9 +1,8 @@
 import { useEffect } from 'react'
 import { useSearchParams } from 'react-router'
-import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
+import { useEffectOnce, bigintToDecimal, bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { bigintToDecimal, bigintToHex } from '@underware_gg/pistols-sdk/utils'
 
 //
 // listen to game state and shallow route

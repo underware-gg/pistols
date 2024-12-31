@@ -2,9 +2,8 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
-import { usePromise } from '@underware_gg/pistols-sdk/hooks'
+import { usePromise, isBigint, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { useChallenge } from '/src/stores/challengeStore'
-import { isBigint, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { constants, DuelProgress } from '@underware_gg/pistols-sdk/pistols'
 
 export const useCanJoin = () => {

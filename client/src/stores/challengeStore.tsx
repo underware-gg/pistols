@@ -1,11 +1,10 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk'
-import { useEntityId, useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
+import { useEntityId, useClientTimestamp, feltToString } from '@underware_gg/pistols-sdk/utils'
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { movesToHand } from '/src/utils/pistols'
-import { bigintToHex, ETH_TO_WEI, feltToString } from '@underware_gg/pistols-sdk/utils'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
 

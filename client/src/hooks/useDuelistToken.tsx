@@ -1,6 +1,6 @@
 import { BigNumberish } from 'starknet'
 import { useTokenConfig } from '/src/stores/tokenConfigStore'
-import { useERC721OwnerOf } from '@underware_gg/pistols-sdk/hooks'
+import { useERC721OwnerOf } from '@underware_gg/pistols-sdk/utils'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { useTokenIdsByOwner, useTokenIdsOfPlayer } from '/src/stores/duelistTokenStore'
 

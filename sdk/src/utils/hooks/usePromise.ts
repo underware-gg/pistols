@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { arrayHasNullElements } from 'src/utils/types'
+import { arrayHasNullElements } from 'src/utils/misc/types'
 
 export const usePromise = <T extends any>({
   call,

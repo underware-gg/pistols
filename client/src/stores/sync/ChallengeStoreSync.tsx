@@ -2,11 +2,10 @@ import { useMemo } from 'react'
 import { addAddressPadding } from 'starknet'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
+import { useMounted, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { PistolsGetQuery, PistolsSubQuery, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
-import { useMounted } from '@underware_gg/pistols-sdk/hooks'
-import { stringToFelt } from '@underware_gg/pistols-sdk/utils'
 
 
 //------------------------------------------------------

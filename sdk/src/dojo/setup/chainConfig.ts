@@ -5,8 +5,8 @@ import {
   dojoContextConfig,
   envChainConfig,
 } from 'src/dojo/setup/chains'
-import { stringToFelt } from 'src/utils/starknet'
-import { cleanObject } from 'src/utils/types'
+import { stringToFelt } from 'src/utils/misc/starknet'
+import { cleanObject } from 'src/utils/misc/types'
 import * as ENV from 'src/dojo/setup/env'
 
 export const defaultChainId = (ENV.CHAIN_ID) as ChainId

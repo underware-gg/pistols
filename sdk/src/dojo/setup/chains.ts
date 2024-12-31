@@ -12,7 +12,7 @@ import {
   KATANA_ETH_CONTRACT_ADDRESS,
 } from '@dojoengine/core'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
-import { PredeployedAccount } from 'src/utils/predeployed'
+import { PredeployedAccount } from 'src/utils/misc/predeployed'
 import * as ENV from 'src/dojo/setup/env'
 
 //

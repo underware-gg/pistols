@@ -1,9 +1,9 @@
 import React, { ReactNode, useEffect, useState } from 'react'
 import { Grid, Modal, Breadcrumb, Icon } from 'semantic-ui-react'
-import { useMounted, useStarkName, useStarkProfile, useValidateWalletAddressOrName } from '@underware_gg/pistols-sdk/hooks'
+import { useMounted, useStarkName, useStarkProfile, useValidateWalletAddressOrName, STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
+import { useControllerAccount, useChainConfig, ChainId } from '@underware_gg/pistols-sdk/dojo'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { useControllerAccount, useChainConfig, ChainId } from '@underware_gg/pistols-sdk/dojo'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { usePact } from '/src/hooks/usePact'
 import { ProfilePic } from '/src/components/account/ProfilePic'
@@ -12,7 +12,6 @@ import { FormInput } from '/src/components/ui/Form'
 import { AddressShort } from '/src/components/ui/AddressShort'
 import { Divider } from '/src/components/ui/Divider'
 import { Opener } from '/src/hooks/useOpener'
-import { STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
 
 const Row = Grid.Row
 const Col = Grid.Column

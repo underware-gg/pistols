@@ -15,8 +15,8 @@ import { SchemaType, UnionOfModelData } from '@dojoengine/sdk'
 import { ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
 import { _useConnector } from 'src/fix/starknet_react_core'
-import { assert } from 'src/utils/math'
-import { serialize } from 'src/utils/types'
+import { assert } from 'src/utils/misc/math'
+import { serialize } from 'src/utils/misc/types'
 
 
 

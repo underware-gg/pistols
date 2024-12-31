@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Button } from 'semantic-ui-react'
 import { usePlayerOnlineSignedMessage } from '/src/hooks/useSignedMessages'
-import { useClientTimestamp, useUserHasInteracted } from '@underware_gg/pistols-sdk/hooks'
+import { useClientTimestamp, useUserHasInteracted } from '@underware_gg/pistols-sdk/utils'
 
 
 //------------------------------------------------------

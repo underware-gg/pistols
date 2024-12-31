@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { arrayClean, isPositiveBigint } from 'src/utils/types'
+import { arrayClean, isPositiveBigint } from 'src/utils/misc/types'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import {
   PistolsGetQuery,

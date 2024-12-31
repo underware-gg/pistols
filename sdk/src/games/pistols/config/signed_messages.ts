@@ -1,5 +1,5 @@
 import { BigNumberish, StarknetType, typedData } from 'starknet'
-import { bigintToDecimal, bigintToHex, bigintToNumber } from 'src/utils/types'
+import { bigintToDecimal, bigintToHex, bigintToNumber } from 'src/utils/misc/types'
 import { generateTypedData } from 'src/dojo/setup/controller'
 import { STARKNET_DOMAIN } from 'src/games/pistols/config/config'
 import { PistolsSchemaType } from 'src/games/pistols/config/types'

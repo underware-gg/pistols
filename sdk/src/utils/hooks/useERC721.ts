@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish, BlockTag } from 'starknet'
 import { useReadContract } from '@starknet-react/core'
-import { bigintToHex, isPositiveBigint } from 'src/utils/types'
+import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 import { erc721_abi } from 'src/abis/abis'
 
 export const useERC721OwnerOf = (contractAddress: BigNumberish, tokenId: BigNumberish, watch: boolean = true) => {

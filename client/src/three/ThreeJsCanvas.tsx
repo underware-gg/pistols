@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
+import { useEffectOnce } from '@underware_gg/pistols-sdk/utils'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 

@@ -6,7 +6,7 @@ import { AddressShort } from '/src/components/ui/AddressShort'
 import { EMOJI } from '/src/data/messages'
 import { BigNumberish } from 'starknet'
 import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
-import { useValidateWalletAddress } from '@underware_gg/pistols-sdk/hooks'
+import { useValidateWalletAddress } from '@underware_gg/pistols-sdk/utils'
 
 const Row = Grid.Row
 const Col = Grid.Column

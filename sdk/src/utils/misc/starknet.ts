@@ -12,7 +12,7 @@ import {
   Abi,
   ec,
 } from 'starknet'
-import { bigintToHex, isPositiveBigint } from 'src/utils/types'
+import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 
 export const ETH_TO_WEI = 1_000_000_000_000_000_000n
 

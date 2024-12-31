@@ -1,13 +1,13 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useSdkEntities, getEntityModel, filterEntitiesByModel, getEntityModels } from '@underware_gg/pistols-sdk/dojo'
 import { constants, PistolsGetQuery, PistolsSubQuery, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
+import { useMounted } from '@underware_gg/pistols-sdk/utils'
 import { useConfigStore } from '/src/stores/configStore'
 import { useTableConfigStore } from '/src/stores/tableStore'
 import { useTokenConfigStore } from '/src/stores/tokenConfigStore'
 import { usePlayerStore } from '/src/stores/playerStore'
 import { useDuelistStore } from '/src/stores/duelistStore'
 import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
-import { useMounted } from '@underware_gg/pistols-sdk/hooks'
 
 const query_get: PistolsGetQuery = {
   pistols: {

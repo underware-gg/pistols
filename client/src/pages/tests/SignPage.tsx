@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { AccountInterface, typedData } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
-import { useAccount, useNetwork } from '@starknet-react/core'
-import { useTypedMessage } from '@underware_gg/pistols-sdk/hooks'
-import { Messages, createTypedMessage, bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
+import { useAccount } from '@starknet-react/core'
+import { useTypedMessage, Messages, createTypedMessage, bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import App from '/src/components/App'
 

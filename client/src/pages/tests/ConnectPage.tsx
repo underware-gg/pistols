@@ -3,8 +3,10 @@ import { EthSigner, Signature } from 'starknet'
 import { Container, Table, Button, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { useTypedMessage, useAsyncMemo } from '@underware_gg/pistols-sdk/hooks'
-import { Messages, Revision, splitSignature,feltToString, bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
+import {
+  useTypedMessage, useAsyncMemo,
+  Messages, Revision, splitSignature,feltToString, bigintToHex, shortAddress,
+} from '@underware_gg/pistols-sdk/utils'
 import {
   useDojoSetup, useDojoStatus, useSelectedChain,
   DojoStatus, getConnectorIcon,

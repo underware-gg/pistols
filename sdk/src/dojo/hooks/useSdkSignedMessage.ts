@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { Account, TypedData, stark } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { useSelectedChain } from 'src/dojo/hooks/useChain'
-import { serialize } from 'src/utils/types'
+import { serialize } from 'src/utils/misc/types'
 import { useConnectedController } from 'src/exports/dojo'
 
 // export const useSdkPublishSignedMessage = <M extends PistolsModelType>(

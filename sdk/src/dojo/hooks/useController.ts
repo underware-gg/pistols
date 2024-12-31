@@ -3,11 +3,11 @@ import { BigNumberish } from 'starknet'
 import { Connector, useAccount } from '@starknet-react/core'
 import { ControllerConnector } from '@cartridge/connector'
 import { ProfileContextTypeVariant } from '@cartridge/controller'
-import { useContractClassHash } from 'src/hooks/useContractClassHash'
+import { useContractClassHash } from 'src/utils/hooks/useContractClassHash'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
-import { bigintEquals, capitalize } from 'src/utils/types'
+import { bigintEquals, capitalize } from 'src/utils/misc/types'
 import { _useConnector } from 'src/fix/starknet_react_core'
 
 // sync from here:

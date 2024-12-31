@@ -1,16 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal, Dropdown, ButtonGroup, Button } from 'semantic-ui-react'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
-import { useMounted } from '@underware_gg/pistols-sdk/hooks'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useTable } from '/src/stores/tableStore'
 import { useTableTotals, useTableActiveDuelistIds } from '/src/hooks/useTable'
+import { useMounted, getObjectKeyByValue } from '@underware_gg/pistols-sdk/utils'
 import { Balance } from '/src/components/account/Balance'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { RowDivider } from '/src/components/ui/Stack'
 import { Opener } from '/src/hooks/useOpener'
 import { Divider } from '/src/components/ui/Divider'
-import { getObjectKeyByValue } from '@underware_gg/pistols-sdk/utils'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 const Row = Grid.Row

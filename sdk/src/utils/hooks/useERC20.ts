@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useContract, useBalance } from '@starknet-react/core'
-import { bigintToHex, isPositiveBigint } from 'src/utils/types'
+import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 import { erc20_abi } from 'src/abis/abis'
 
 export const useERC20Balance = (
