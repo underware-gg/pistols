@@ -36,7 +36,7 @@ export const initialState = {
   moves: {} as StoredMoves,
   // injected
   connectOpener: null as Opener,
-  duelistEditOpener: null as Opener,
+  shopOpener: null as Opener,
   tableOpener: null as Opener,
   walletFinderOpener: null as Opener,
 }
@@ -89,7 +89,7 @@ const PistolsProvider = ({
   children,
 }: PistolsProviderProps) => {
   const connectOpener = useOpener()
-  const duelistEditOpener = useOpener()
+  const shopOpener = useOpener()
   const tableOpener = useOpener()
   const walletFinderOpener = useOpener()
 
@@ -152,7 +152,7 @@ const PistolsProvider = ({
     <PistolsContext.Provider value={{ dispatch, state: {
       ...state,
       connectOpener,
-      duelistEditOpener,
+      shopOpener,
       tableOpener,
       walletFinderOpener,
     } }}>
@@ -318,7 +318,6 @@ export const usePistolsScene = () => {
     atDuels: (currentScene == SceneName.Duels),
     atGraveyard: (currentScene == SceneName.Graveyard),
     atDuel: (currentScene == SceneName.Duel),
-    fromGate: (lastScene == SceneName.Gate),
     atTutorial: tutorialScenes.includes(currentScene as typeof tutorialScenes[number]),
     atTutorialScene1: (currentScene == SceneName.Tutorial),
     atTutorialScene2: (currentScene == SceneName.TutorialScene2),

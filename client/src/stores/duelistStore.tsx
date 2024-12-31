@@ -36,13 +36,17 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(constants.CONST.MAX_DUELIST_ID)), [duelist_id])
 
   const duelistId = useMemo(() => BigInt(duelist_id), [duelist_id])
-  const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])
-  const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id, isValidDuelistId])
   const duelistIdDisplay = useMemo(() => (`Duelist #${isValidDuelistId ? duelist_id : '?'}`), [duelist_id, isValidDuelistId])
-  const profilePicType = useMemo(() => (duelist?.profile_pic_type ?? null), [duelist])
-  const profilePic = useMemo(() => Number(duelist?.profile_pic_uri ?? 0), [duelist])
   const timestamp = useMemo(() => Number(duelist?.timestamp ?? 0), [duelist])
   const exists = useMemo(() => Boolean(timestamp), [timestamp])
+
+  const profileType = useMemo(() => (duelist?.profile_type ?? null), [duelist])
+  // const profilePic = useMemo(() => Number(duelist?.profile_pic_uri ?? 0), [duelist])
+  // const name = useMemo(() => duelist?.name ? feltToString(duelist.name) : null, [duelist])
+  const profilePic = 0
+  const name = '____DUELIST____????'
+  const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id, isValidDuelistId])
+
 
   //@ts-ignore
   const score = useScore(duelist?.score)
@@ -55,7 +59,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     duelistIdDisplay,
     exists,
     timestamp,
-    profilePicType,
+    profileType,
     profilePic,
     score,
   }

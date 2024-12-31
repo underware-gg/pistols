@@ -126,13 +126,50 @@ const localKatanaConfig: DojoChainConfig = {
       name: 'Katana 2',
       address: '0x17cc6ca902ed4e8baa8463a7009ff18cc294fa85a94b4ce6ac30a9ebd6057c7',
       privateKey: '0x14d6672dcb4b77ca36a887e9a11cd9d637d5012468175829e9c6e770c61642',
-      active: false,
+      active: true,
     },
     {
       name: 'Katana 3',
       address: '0x2af9427c5a277474c079a1283c880ee8a6f0f8fbf73ce969c08d88befec1bba',
       privateKey: '0x1800000000300000180000000000030000000000003006001800006600',
-      active: false,
+      active: true,
+    },
+    {
+      name: 'Katana 4',
+      address: '0x359b9068eadcaaa449c08b79a367c6fdfba9448c29e96934e3552dab0fdd950',
+      privateKey: '0x2bbf4f9fd0bbb2e60b0316c1fe0b76cf7a4d0198bd493ced9b8df2a3a24d68a',
+      active: true,
+    },
+    {
+      name: 'Katana 5',
+      address: '0x4184158a64a82eb982ff702e4041a49db16fa3a18229aac4ce88c832baf56e4',
+      privateKey: '0x6bf3604bcb41fed6c42bcca5436eeb65083a982ff65db0dc123f65358008b51',
+      active: true,
+    },
+
+    {
+      name: 'Katana 6',
+      address: '0x42b249d1633812d903f303d640a4261f58fead5aa24925a9efc1dd9d76fb555',
+      privateKey: '0x283d1e73776cd4ac1ac5f0b879f561bded25eceb2cc589c674af0cec41df441',
+      active: true,
+    },
+    {
+      name: 'Katana 7',
+      address: '0x4e0b838810cb1a355beb7b3d894ca0e98ee524309c3f8b7cccb15a48e6270e2',
+      privateKey: '0x736adbbcdac7cc600f89051db1abbc16b9996b46f6b58a9752a11c1028a8ec8',
+      active: true,
+    },
+    {
+      name: 'Katana 8',
+      address: '0x5b6b8189bb580f0df1e6d6bec509ff0d6c9be7365d10627e0cf222ec1b47a71',
+      privateKey: '0x33003003001800009900180300d206308b0070db00121318d17b5e6262150b',
+      active: true,
+    },
+    {
+      name: 'Katana 9',
+      address: '0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819',
+      privateKey: '0x3e3979c1ed728490308054fe357a9f49cf67f80f9721f44cc57235129e090f4',
+      active: true,
     },
   ],
   connectorIds: [

@@ -42,7 +42,7 @@ const createStore = () => {
     return {
       duelist_id: BigInt(duelist.duelist_id),
       timestamp: Number(duelist.timestamp),
-      name: feltToString(duelist.name).toLowerCase(),
+      name: 'DUELIST_????',
       fame: 0,
       honour: Number(duelist.score.honour ?? 0),
       win_ratio: calcWinRatio(Number(duelist.score.total_duels ?? 0), Number(duelist.score.total_wins ?? 0)),

@@ -118,7 +118,6 @@ export const useRound = (duelId: BigNumberish) => {
       card_2: Number(moves.card_2),
       card_3: Number(moves.card_3),
       card_4: Number(moves.card_4),
-      seed: BigInt(moves.seed),
       salt: BigInt(moves.salt),
       hashed: BigInt(moves.hashed),
     } : null

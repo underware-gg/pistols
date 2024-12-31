@@ -44,14 +44,3 @@ export const useDuelistsOfOwner = (owner: BigNumberish) => {
     isLoading,
   }
 }
-
-export const useNextRandomProfilePic = () => {
-  const { address } = useAccount()
-  const { duelistIds } = useDuelistsOfPlayer()
-  const randomPic = useMemo(() => 
-    (Number(poseidon([address ?? 0n, duelistIds.length ?? 0n]) % BigInt(PROFILE_PIC_COUNT)) + 1),
-  [address, duelistIds.length])
-  return {
-    randomPic,
-  }
-}

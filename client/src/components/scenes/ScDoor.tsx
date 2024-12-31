@@ -5,16 +5,13 @@ import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
 import { useDojoStatus, useDojoSystemCalls, useSelectedChain, useConnectToSelectedChain } from '@underware_gg/pistols-sdk/dojo'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useCanClaimWelcomePack } from '/src/hooks/useContractCalls'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { Divider } from '/src/components/ui/Divider'
-import { PACKAGE_VERSION, PROFILE_PIC_COUNT } from '/src/utils/constants'
+import { PACKAGE_VERSION } from '/src/utils/constants'
 import { useIsMyDuelist } from '/src/hooks/useIsYou'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistsOfPlayer, useNextRandomProfilePic } from '/src/hooks/useDuelistToken'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { IconClick } from '/src/components/ui/Icons'
-import { ProfilePic } from '/src/components/account/ProfilePic'
+import { useDuelistsOfPlayer } from '/src/hooks/useDuelistToken'
 import { SceneName } from '/src/data/assets'
 import Logo from '/src/components/Logo'
 
@@ -22,9 +19,8 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function ScDoor() {
-  const { account, address, isConnected } = useAccount()
+  const { isConnected } = useAccount()
 
-  const { create_duelist } = useDojoSystemCalls()
   const { dispatchSelectDuel } = usePistolsContext()
   const { dispatchDuelistId, duelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
@@ -36,19 +32,8 @@ export default function ScDoor() {
   const [visibleChars, setVisibleChars] = useState<string[]>([])
   const [isFirstDivVisible, setIsFirstDivVisible] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
-  const [isDuelistBeingCreated, setIsDuelistBeingCreated] = useState(false)
-  
-  const [selectedProfilePic, setSelectedProfilePic] = useState(0)
-  const [inputName, setInputName] = useState('')
-
-  const { aspectWidth } = useGameAspect()
-
-  const { randomPic } = useNextRandomProfilePic()
-  const _profilePic = useMemo(() => (selectedProfilePic || randomPic), [selectedProfilePic, randomPic])
 
   const duelists = useRef<bigint[]>(duelistIds)
-
-  const inputIsValid = inputName.length >= 3
 
   // clear tavern state
   useEffectOnce(() => {
@@ -106,24 +91,6 @@ export default function ScDoor() {
 
   }, [isConnected])
 
-  const _submit = async () => {
-    if (inputIsValid) {
-      setIsDuelistBeingCreated(true)
-      await create_duelist(account, address, inputName, constants.ProfilePicType.Duelist, _profilePic.toString())
-      // dispatchSetScene(SceneName.Tavern)
-    }
-  }
-
-  useEffect(() => {
-    duelists.current = duelistIds
-    console.log('isDuelistBeingCreated', isDuelistBeingCreated, duelistIds)
-    if (isDuelistBeingCreated && duelistIds.length > 0) {
-      dispatchDuelistId(duelistIds[duelistIds.length - 1])
-      dispatchSetScene(SceneName.Tavern)
-      setIsDuelistBeingCreated(false)
-    }
-  }, [duelistIds])
-
   return (
     <div id='Door'>
       <div className='UIContainer' >
@@ -147,34 +114,7 @@ export default function ScDoor() {
         </div>
         
         <div className={`UIPage ${!isFirstDivVisible && !isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: !isFirstDivVisible && !isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute' }}>
-          <div style={{ marginTop: aspectWidth(8), marginBottom: aspectWidth(4), textAlign: 'center' }}>
-            <h1 style={{marginBottom: aspectWidth(3), textAlign: 'center' }}>Create Your Duelist</h1>
-            <FormInput
-              placeholder={'Duelist Name'} 
-              value={inputName}
-              onChange={(e) => setInputName(e.target.value)}
-              maxLength={31}
-              disabled={!account || !address}
-              style={{width: '100%', backgroundColor: 'transparent'}}
-            />
-            
-            <div style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-evenly',
-              marginTop: '20px'
-            }}>
-              <IconClick name='angle double left' size={'huge'} important
-                onClick={() => setSelectedProfilePic(selectedProfilePic === 0 ? PROFILE_PIC_COUNT - 1 : selectedProfilePic - 1)}
-              />
-              <ProfilePic profilePic={_profilePic} className='AutoHeight NoBorder DuelistImageSelect' />
-              <IconClick name='angle double right' size={'huge'} important
-                onClick={() => setSelectedProfilePic((selectedProfilePic + 1 % PROFILE_PIC_COUNT))}
-              />
-            </div>
-          </div>
-          <ActionButton large fill important disabled={!inputIsValid} onClick={_submit} label='Create Duelist' />
+          <ClaimDuelistsButton />
         </div>
       </div>
 
@@ -274,6 +214,31 @@ export function ConnectButton({
   return <ActionButton fill large important disabled={!canConnect} onClick={() => _connect()} label={'Connect / Create Account'} />
 }
 
+export function ClaimDuelistsButton() {
+  const { account } = useAccount()
+  const { claim_welcome_pack } = useDojoSystemCalls()
+  const { dispatchDuelistId } = useSettings()
+  const { dispatchSetScene } = usePistolsScene()
+  const { duelistIds } = useDuelistsOfPlayer()
+  const { canClaimWelcomePack } = useCanClaimWelcomePack(duelistIds.length)
+  const [isClaiming, setIsClaiming] = useState(false)
+
+  const _claim = async () => {
+    if (canClaimWelcomePack) {
+      setIsClaiming(true)
+      await claim_welcome_pack(account)
+    }
+  }
+
+  useEffect(() => {
+    if (canClaimWelcomePack === false && isClaiming) {
+      dispatchDuelistId(duelistIds[0])
+      dispatchSetScene(SceneName.Profile)
+    }
+  }, [canClaimWelcomePack, duelistIds, isClaiming])
+
+  return <ActionButton large fill important disabled={false} onClick={_claim} label='Claim your Duelists' />
+}
 export function ConnectStatus() {
   const { isConnecting } = useSelectedChain()
   const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()

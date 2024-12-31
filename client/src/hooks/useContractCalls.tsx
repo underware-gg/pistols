@@ -2,10 +2,10 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
-import { useContractCall } from '@underware_gg/pistols-sdk/hooks'
+import { usePromise } from '@underware_gg/pistols-sdk/hooks'
 import { useChallenge } from '/src/stores/challengeStore'
 import { isBigint, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
-import { DuelProgress } from '@underware_gg/pistols-sdk/pistols'
+import { constants, DuelProgress } from '@underware_gg/pistols-sdk/pistols'
 
 export const useCanJoin = () => {
   const { can_join } = useDojoSystemCalls()
@@ -16,26 +16,10 @@ export const useCanJoin = () => {
     enabled: isBigint(address),
     defaultValue: null,
   }), [can_join, address])
-  const { value, isLoading } = useContractCall(options)
+  const { value, isLoading } = usePromise(options)
   return {
     fee: value,
     isLoading
-  }
-}
-
-export const useCalcFeeDuelist = () => {
-  const { address } = useAccount()
-  const { calc_mint_fee_duelist } = useDojoSystemCalls()
-  const options = useMemo(() => ({
-    call: calc_mint_fee_duelist,
-    args: [address],
-    enabled: isPositiveBigint(address),
-    defaultValue: null,
-  }), [calc_mint_fee_duelist, address])
-  const { value, isLoading } = useContractCall(options)
-  return {
-    fee: value,
-    isLoading,
   }
 }
 
@@ -47,7 +31,7 @@ export const useCalcFeeDuel = (table_id: string) => {
     enabled: Boolean(table_id),
     defaultValue: null,
   }), [calc_mint_fee_duel, table_id])
-  const { value, isLoading } = useContractCall(options)
+  const { value, isLoading } = usePromise(options)
   return {
     fee: value,
     isLoading,
@@ -67,7 +51,7 @@ export const useDuelProgress = (duelId: bigint) => {
     enabled: isPositiveBigint(duelId),
     defaultValue: null,
   }), [get_duel_progress, duelId])
-  const { value } = useContractCall(options)
+  const { value } = usePromise(options)
   return value as Awaited<ReturnType<typeof get_duel_progress>>
 }
 
@@ -79,12 +63,67 @@ export const useGetPlayerFullDeck = (tableId: string) => {
     enabled: Boolean(tableId),
     defaultValue: [],
   }), [get_player_card_decks, tableId])
-  const { value, isLoading } = useContractCall(options)
+  const { value, isLoading } = usePromise(options)
   return {
     decks: value,
     isLoading,
   }
 }
+
+
+//------------------------------------------
+// pack_token
+//
+
+export const useCanClaimWelcomePack = (forceCounter?: number) => {
+  const { address } = useAccount()
+  const { can_claim_welcome_pack } = useDojoSystemCalls()
+  const options = useMemo(() => ({
+    call: can_claim_welcome_pack,
+    args: [address],
+    enabled: isPositiveBigint(address),
+    defaultValue: null,
+    forceCounter,
+  }), [can_claim_welcome_pack, address, forceCounter])
+  const { value, isLoading } = usePromise(options)
+  return {
+    canClaimWelcomePack: value,
+    isLoading,
+  }
+}
+
+export const useCanPurchase = (packType: constants.PackType) => {
+  const { address } = useAccount()
+  const { can_purchase } = useDojoSystemCalls()
+  const options = useMemo(() => ({
+    call: can_purchase,
+    args: [address, packType],
+    enabled: isPositiveBigint(address),
+    defaultValue: null,
+  }), [can_purchase, address, packType])
+  const { value, isLoading } = usePromise(options)
+  return {
+    canPurchase: value,
+    isLoading,
+  }
+}
+
+export const useCalcFeePack = (packType: constants.PackType) => {
+  const { address } = useAccount()
+  const { calc_mint_fee_pack } = useDojoSystemCalls()
+  const options = useMemo(() => ({
+    call: calc_mint_fee_pack,
+    args: [address, packType],
+    enabled: isPositiveBigint(address),
+    defaultValue: null,
+  }), [calc_mint_fee_pack, address, packType])
+  const { value, isLoading } = usePromise(options)
+  return {
+    fee: value,
+    isLoading,
+  }
+}
+
 
 
 
@@ -108,7 +147,7 @@ export const useAdminIsOwner = (address: BigNumberish) => {
     args: [address],
     enabled: isPositiveBigint(address),
   }), [admin_am_i_admin, address])
-  const { value, isLoading } = useContractCall(options)
+  const { value, isLoading } = usePromise(options)
   return {
     isOwner: value,
     isLoading,
@@ -133,7 +172,7 @@ export const useTestValidateSignature = () => {
     ],
     defaultValue: false,
   }), [test_validate_commit_message])
-  const { value, isLoading } = useContractCall(options)
+  const { value, isLoading } = usePromise(options)
   console.log(`useTestValidateSignature()`, isLoading ? '...' : value)
   return {
     isValidated: value,

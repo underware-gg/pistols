@@ -3,9 +3,11 @@ import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useDuelistsOfPlayer } from '/src/hooks/useDuelistToken'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
+import { useCanClaimWelcomePack } from '/src/hooks/useContractCalls'
+import { useMintMockLords } from '/src/hooks/useMintMockLords'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { ConnectButton, CurrentChainHint, EnterAsGuestButton } from '/src/components/scenes/ScDoor'
+import { ClaimDuelistsButton, ConnectButton, CurrentChainHint, EnterAsGuestButton } from '/src/components/scenes/ScDoor'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { PublishOnlineStatusButton } from '/src/stores/sync/PlayerOnlineSync'
@@ -13,25 +15,16 @@ import { TutorialProgressDebug } from '/src/components/TutorialProgressDebug'
 import { SceneName } from '/src/data/assets'
 import { Divider } from '/src/components/ui/Divider'
 import { VStack } from '/src/components/ui/Stack'
-import DuelistEditModal from '/src/components/modals/DuelistEditModal'
+import ShopModal from '/src/components/modals/ShopModal'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 export default function ScProfile() {
   const { isConnected } = useAccount()
   const { debugMode } = useSettings()
-  const { duelistEditOpener } = usePistolsContext()
-  const { fromGate } = usePistolsScene()
-  const { duelistIds } = useDuelistsOfPlayer()
-  // console.log(`DUELIST BALANCE`, duelistIds.length)
+  const { shopOpener } = usePistolsContext()
 
-  const [loaded, setLoaded] = useState(false)
-  useEffect(() => {
-    if (!loaded) {
-      setLoaded(true)
-      if (fromGate && duelistIds.length === 0) {
-        duelistEditOpener.open({ mintNew: true })
-      }
-    }
-  }, [fromGate, duelistIds.length])
+  // auto mint mock lords on testnets
+  useMintMockLords()
 
   return (
     <div id='Profile'>
@@ -53,7 +46,7 @@ export default function ScProfile() {
         {isConnected ? <DuelistsList /> : <DuelistsConnect />}
       </div>
 
-      <DuelistEditModal opener={duelistEditOpener} />
+      <ShopModal opener={shopOpener} />
       <CurrentChainHint />
 
       {(debugMode || true) && <>
@@ -93,17 +86,18 @@ function DuelistsConnect() {
 
 function DuelistsList() {
   const { duelistId, dispatchDuelistId } = useSettings()
-  const { duelistEditOpener, dispatchSelectDuelistId } = usePistolsContext()
+  const { shopOpener, dispatchSelectDuelistId } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
   const { duelistIds } = useDuelistsOfPlayer()
-  
+  const { canClaimWelcomePack } = useCanClaimWelcomePack(duelistIds.length)
+
   const { aspectWidth } = useGameAspect()
 
   const [pageNumber, setPageNumber] = useState(0)
-  const cardRefs = useRef<{[key: number]: DuelistCardHandle}>({})
+  const cardRefs = useRef<{ [key: number]: DuelistCardHandle }>({})
 
-  const _mintDuelist = () => {
-    duelistEditOpener.open({ mintNew: true })
+  const _mintDuelists = () => {
+    shopOpener.open({ packType: constants.PackType.Duelists5x })
   }
 
   const _goToTavern = () => {
@@ -146,7 +140,7 @@ function DuelistsList() {
           <div className='Title'>Pick A Duelist To Play</div>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)', 
+            gridTemplateColumns: 'repeat(4, 1fr)',
             gridTemplateRows: 'repeat(2, 1fr)',
             gap: '20px',
             width: '100%',
@@ -201,9 +195,20 @@ function DuelistsList() {
       )}
       <Divider />
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <ActionButton fill disabled={false} onClick={() => _mintDuelist()} label='Create New Duelist' />
+        {canClaimWelcomePack
+          ? <ClaimDuelistsButton />
+          : <ActionButton fill
+            disabled={false}
+            onClick={() => _mintDuelists()}
+            label='Purchase Duelists'
+          />
+        }
         <div style={{ fontSize: '1.2em', fontWeight: 'bold' }}>OR</div>
-        <ActionButton fill important disabled={!duelistId} onClick={() => _goToTavern()} label={!duelistId ? 'Select A Duelist' : 'Enter Tavern with Duelist'} />
+        <ActionButton fill important
+          disabled={!duelistId}
+          onClick={() => _goToTavern()}
+          label={!duelistId ? 'Select A Duelist' : 'Enter Tavern with Duelist'}
+        />
       </div>
     </div>
   )

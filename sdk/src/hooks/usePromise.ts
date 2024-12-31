@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
 import { arrayHasNullElements } from 'src/utils/types'
 
-export const useContractCall = <T extends any>({
+export const usePromise = <T extends any>({
   call,
   args = [],
   enabled = true,
   defaultValue = undefined,
+  forceCounter = 0,
 }: {
   call: (...args: any[]) => Promise<T>,
   args?: any[],
   enabled?: boolean,
   defaultValue?: T | null | undefined
+  forceCounter?: number
 }): {
   value: typeof defaultValue,
   isLoading: boolean,
@@ -31,7 +33,7 @@ export const useContractCall = <T extends any>({
           setValue(v)
         }
       }).catch((e) => {
-        console.error(`useContractCall() ERROR:`, call, args, e)
+        console.error(`usePromise() ERROR:`, call, args, e)
         if (_mounted) {
           setIsLoading(false)
           setValue(defaultValue)
@@ -43,7 +45,7 @@ export const useContractCall = <T extends any>({
     return () => {
       _mounted = false
     }
-  }, [call, args, enabled])
+  }, [call, args, enabled, forceCounter])
   
   return {
     value,

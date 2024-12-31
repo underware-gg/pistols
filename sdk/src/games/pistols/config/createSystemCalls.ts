@@ -32,6 +32,11 @@ const duelist_token_call = (entrypoint: string, calldata: any[]): DojoCall => ({
   entrypoint,
   calldata,
 })
+const pack_token_call = (entrypoint: string, calldata: any[]): DojoCall => ({
+  contractName: 'pack_token',
+  entrypoint,
+  calldata,
+})
 
 export function createSystemCalls(
   manifest: DojoManifest,
@@ -126,26 +131,24 @@ export function createSystemCalls(
 
 
   //
-  // Duelist token
+  // Pack token
   //
 
-  const create_duelist = async (signer: AccountInterface, recipient: BigNumberish, name: string, profile_pic_type: constants.ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
-    let calls: DojoCalls = []
-    //
-    // approve call
-    const approved_value = await calc_mint_fee_duelist(signer.address)
-    const approve = approve_call(approved_value)
-    if (approve) calls.push(approve)
-    //
-    // game call
-    const args = [recipient, stringToFelt(name), constants.getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
-    calls.push(duelist_token_call('create_duelist', args))
+  const claim_welcome_pack = async (signer: AccountInterface): Promise<boolean> => {
+    const args: any[] = []
+    const calls: DojoCalls = [pack_token_call('claim_welcome_pack', args)]
     return await _executeTransaction(signer, calls)
   }
 
-  const update_duelist = async (signer: AccountInterface, duelist_id: BigNumberish, name: string, profile_pic_type: constants.ProfilePicType, profile_pic_uri: string): Promise<boolean> => {
-    const args = [duelist_id, stringToFelt(name), constants.getProfilePicTypeValue(profile_pic_type), stringToFelt(profile_pic_uri)]
-    const calls: DojoCalls = [duelist_token_call('update_duelist', args)]
+  const purchase = async (signer: AccountInterface, pack_type: constants.PackType): Promise<boolean> => {
+    const args = [constants.getPackTypeValue(pack_type)]
+    const calls: DojoCalls = [pack_token_call('purchase', args)]
+    return await _executeTransaction(signer, calls)
+  }
+
+  const open = async (signer: AccountInterface, pack_id: BigNumberish): Promise<boolean> => {
+    const args = [pack_id]
+    const calls: DojoCalls = [pack_token_call('open', args)]
     return await _executeTransaction(signer, calls)
   }
 
@@ -251,15 +254,33 @@ export function createSystemCalls(
   // duelist_token
   //
 
-  const calc_mint_fee_duelist = async (recipient: BigNumberish): Promise<bigint | null> => {
-    const args = [recipient]
-    const results = await _executeCall<bigint>(duelist_token_call('calc_mint_fee', args))
-    return results ?? null
-  }
-
   const duelist_token_uri = async (token_id: BigNumberish): Promise<string | null> => {
     const args = [token_id]
     const results = await _executeCall<string>(duelist_token_call('token_uri', args))
+    return results ?? null
+  }
+
+
+  //
+  // pack_token
+  //
+
+  const can_claim_welcome_pack = async (recipient: BigNumberish): Promise<boolean | null> => {
+    const args = [recipient]
+    const results = await _executeCall<boolean>(pack_token_call('can_claim_welcome_pack', args))
+    return results ?? null
+  }
+
+  const can_purchase = async (recipient: BigNumberish, pack_type: constants.PackType): Promise<boolean | null> => {
+    const args = [recipient, constants.getPackTypeValue(pack_type)]
+    console.log(`>>>>>>ourchase`, args)
+    const results = await _executeCall<boolean>(pack_token_call('can_purchase', args))
+    return results ?? null
+  }
+
+  const calc_mint_fee_pack = async (recipient: BigNumberish, pack_type: constants.PackType): Promise<bigint | null> => {
+    const args = [recipient, constants.getPackTypeValue(pack_type)]
+    const results = await _executeCall<bigint>(pack_token_call('calc_mint_fee', args))
     return results ?? null
   }
 
@@ -302,10 +323,15 @@ export function createSystemCalls(
     // get_pact,
     // has_pact,
     //
+    // pack
+    claim_welcome_pack,
+    purchase,
+    open,
+    can_claim_welcome_pack,
+    can_purchase,
+    calc_mint_fee_pack,
+    //
     // duelist_token
-    calc_mint_fee_duelist,
-    create_duelist,
-    update_duelist,
     duelist_token_uri,
     //
     // admin
