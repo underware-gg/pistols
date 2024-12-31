@@ -79,24 +79,24 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   const { isDeployed } = useDeployedSystem(dojoAppConfig.namespace, Object.keys(dojoAppConfig.contractPolicyDescriptions)[0], manifest)
 
   //
-  // Establish system calls using the network and components.
-  const systemCalls = useMemo<ReturnType<typeof createSystemCalls>>(() => {
-    if (!manifest) return null
-    if (!dojoProvider) return (dojoProvider as any) // undefined or null
-    return createSystemCalls(manifest, dojoProvider) ?? null
-  }, [manifest, dojoProvider])
-
-  //
   // Contract calls
   const {
     value: contractCalls,
     isError: contractCallsIsError,
-  } = useAsyncMemo(async () => {
+  } = useAsyncMemo<ReturnType<typeof setupWorld>>(async () => {
     if (!mounted) return undefined
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
     return await setupWorld(dojoProvider)
   }, [mounted, dojoProvider], undefined, null)
 
+  //
+  // Establish system calls using the network and components.
+  const systemCalls = useMemo<ReturnType<typeof createSystemCalls>>(() => {
+    if (!manifest) return null
+    if (!dojoProvider) return (dojoProvider as any) // undefined or null
+    if (!contractCalls) return (contractCalls as any) // undefined or null
+    return createSystemCalls(dojoProvider, manifest, contractCalls, selectedChainConfig) ?? null
+  }, [manifest, dojoProvider, contractCalls, selectedChainConfig])
 
   //
   // Status

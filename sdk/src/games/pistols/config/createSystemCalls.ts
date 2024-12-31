@@ -1,10 +1,13 @@
-import { DojoCall, DojoProvider } from '@dojoengine/core'
-import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
+import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
+import { AccountInterface, BigNumberish, Call, CallData } from 'starknet'
 import { stringToFelt, bigintToU256, makeCustomEnum } from 'src/utils/misc/starknet'
 import { arrayClean, shortAddress, isPositiveBigint } from 'src/utils/misc/types'
-import { DojoManifest } from 'src/dojo/contexts/Dojo'
-import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'
 import { NAMESPACE, getLordsAddress, getBankAddress } from 'src/games/pistols/config/config'
+import { DojoChainConfig } from 'src/dojo/setup/chains'
+import { DojoManifest } from 'src/dojo/contexts/Dojo'
+import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
+import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'
+import { models } from 'src/exports/games_pistols'
 import * as constants from 'src/games/pistols/generated/constants'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
@@ -38,22 +41,14 @@ const pack_token_call = (entrypoint: string, calldata: any[]): DojoCall => ({
 })
 
 export function createSystemCalls(
-  manifest: DojoManifest,
   provider: DojoProvider,
+  manifest: DojoManifest,
+  constractCalls: ReturnType<typeof setupWorld>,
+  selectedChainConfig: DojoChainConfig,
 ) {
   
-  const approve_call = (approved_value: BigNumberish): Call | undefined => {
-    if (!isPositiveBigint(approved_value)) return undefined
-    return {
-      contractAddress: getLordsAddress(),
-      entrypoint: 'approve',
-      calldata: [getBankAddress(), bigintToU256(approved_value)],
-    }
-  }
-
   // executeMulti() based on:
   // https://github.com/cartridge-gg/rollyourown/blob/f39bfd7adc866c1a10142f5ce30a3c6f900b467e/web/src/dojo/hooks/useSystems.ts#L178-L190
-
   const _executeTransaction = async (signer: AccountInterface, calls: DojoCalls): Promise<boolean> => {
     let success = false
     try {
@@ -75,19 +70,39 @@ export function createSystemCalls(
     return success
   }
 
-  const _executeCall = async <T extends Result>(call: DojoCall): Promise<T | null> => {
-    let results: Result = undefined
-    try {
-      results = await provider.call(NAMESPACE, call)
-    } catch (e) {
-      console.warn(`call ${call.contractName}::${call.entrypoint}(${call.calldata.length}) exception:`, e)
-    } finally {
+  // const _executeCall = async <T extends Result>(call: DojoCall): Promise<T | null> => {
+  //   let results: Result = undefined
+  //   try {
+  //     results = await provider.call(NAMESPACE, call)
+  //   } catch (e) {
+  //     console.warn(`call ${call.contractName}::${call.entrypoint}(${call.calldata.length}) exception:`, e)
+  //   } finally {
+  //   }
+  //   return results as T
+  // }
+
+  const approve_call = (approved_value: BigNumberish): Call | undefined => {
+    if (!isPositiveBigint(approved_value)) return undefined
+    return {
+      contractAddress: getLordsAddress(),
+      entrypoint: 'approve',
+      calldata: [getBankAddress(), bigintToU256(approved_value)],
     }
-    return results as T
   }
 
-
-
+  // https://docs.cartridge.gg/vrf/overview#executing-vrf-transactions
+  const vrf_request_call = (signer: AccountInterface, contractName: string): Call => {
+    const contract_address = getContractByName(manifest, NAMESPACE, contractName).address
+    const vrf_address = selectedChainConfig.vrfAddress || getContractByName(manifest, NAMESPACE, 'vrf_mock').address
+    return {
+      contractAddress: vrf_address,
+      entrypoint: 'request_random',
+      calldata: CallData.compile({
+        caller: contract_address,
+        source: { type: 0, address: signer.address },
+      }),
+    }
+  }
 
   return {
     //
@@ -110,16 +125,12 @@ export function createSystemCalls(
     //
     duel_token: {
       create_duel: async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, premise: constants.Premise, quote: string, table_id: string, expire_hours: number): Promise<boolean> => {
-        let calls: DojoCalls = []
-        //
-        // approve call
-        // const approved_value = await calc_mint_fee_duel(table_id)
-        // const approve = approve_call(approved_value)
-        // if (approve) calls.push(approve)
-        //
-        // game call
-        const args = [duelist_id, BigInt(challenged_id_or_address), constants.getPremiseValue(premise), stringToFelt(quote), table_id, expire_hours]
-        calls.push(duel_token_call('create_duel', args))
+        // const approved_value = await constractCalls.duel_token.calcMintFee(table_id) as BigNumberish
+        const args = [duelist_id, BigInt(challenged_id_or_address), makeCustomEnum(premise), stringToFelt(quote), table_id, expire_hours]
+        let calls: DojoCalls = [
+          // approve_call(approved_value),
+          duel_token_call('create_duel', args),
+        ]
         return await _executeTransaction(signer, calls)
       },
       reply_duel: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, accepted: boolean): Promise<boolean> => {
@@ -138,16 +149,14 @@ export function createSystemCalls(
         return await _executeTransaction(signer, calls)
       },
       purchase: async (signer: AccountInterface, pack_type: constants.PackType): Promise<boolean> => {
-        let calls: DojoCalls = []
-        //
-        // approve call
-        // const approved_value = await calc_mint_fee_duel(table_id)
-        // const approve = approve_call(approved_value)
-        // if (approve) calls.push(approve)
-        //
-        // token call
-        const args = [makeCustomEnum(pack_type)]
-        calls.push(pack_token_call('purchase', args))
+        const pack_type_enum = makeCustomEnum(pack_type)
+        const approved_value = await constractCalls.pack_token.calcMintFee(signer.address, pack_type_enum as unknown as models.PackType) as BigNumberish
+        const args = [pack_type_enum]
+        let calls: DojoCalls = [
+          approve_call(approved_value),
+          vrf_request_call(signer, 'pack_token'),
+          pack_token_call('purchase', args),
+        ]
         return await _executeTransaction(signer, calls)
       },
       open: async (signer: AccountInterface, pack_id: BigNumberish): Promise<boolean> => {
