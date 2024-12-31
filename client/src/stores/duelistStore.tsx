@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
-import { BigNumberish } from 'starknet'
+import { BigNumberish, CairoCustomEnum } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk'
-import { parseCustomEnum, useEntityModel } from '@underware_gg/pistols-sdk/dojo'
+import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
-import { useEntityId, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
+import { useEntityId, isPositiveBigint, parseCustomEnum } from '@underware_gg/pistols-sdk/utils'
 import { useScore } from '/src/hooks/useScore'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
@@ -39,15 +39,10 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const timestamp = useMemo(() => Number(duelist?.timestamp ?? 0), [duelist])
   const exists = useMemo(() => Boolean(timestamp), [timestamp])
 
-  const {
-    variant: profileType,
-    value: profileTypeValue,
-  }= useMemo(() => parseCustomEnum(duelist?.profile_type), [duelist])
-  const name = useMemo(() => profileTypeValue > 0 ? Object.values(constants.DUELIST_NAMES)[profileTypeValue] : null, [profileTypeValue])
+  const [profileType, profileTypeValue] = useMemo(() => parseCustomEnum<number>(duelist?.profile_type as unknown as CairoCustomEnum), [duelist])
+  const name = useMemo(() => Object.values(constants.DUELIST_NAMES)[profileTypeValue], [profileTypeValue])
   const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id, isValidDuelistId])
-  // console.log(`PROFILE>`, duelist_id, profileType, profileTypeValue)
 
-  //@ts-ignore
   const score = useScore(duelist?.score)
 
   return {

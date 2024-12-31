@@ -166,26 +166,3 @@ export const filterEntitiesByModel = (entities: PistolsEntity[], modelNames: Pis
   }
   return entities.filter(e => Boolean(getEntityModel(e, modelNames)))
 }
-
-//
-// Extract variant and value from a custom enum type
-//
-export const parseCustomEnum = (data: any): {
-  variant: string,
-  value: number,
-} => {
-  if (!data) {
-    return {
-      variant: undefined,
-      value: undefined,
-    }
-  }
-  const kv = Object.entries(data?.variant)[0]
-  return kv ? {
-    variant: kv[0] as string,
-    value: kv[1] as number,
-  } : {
-    variant: data as string,
-    value: 0,
-  }
-}

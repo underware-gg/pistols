@@ -3,7 +3,6 @@ import {
   AccountInterface,
   InvocationsDetails,
   InvokeFunctionResponse,
-  RpcProvider,
   shortString,
   BigNumberish,
   Uint256,
@@ -11,21 +10,48 @@ import {
   encode,
   Abi,
   ec,
+  CairoCustomEnum,
 } from 'starknet'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 
-export const ETH_TO_WEI = 1_000_000_000_000_000_000n
-
-export const STARKNET_ADDRESS_LENGTHS = [66, 64]
+//
+// Lenghts of a Starknet address
+export const STARKNET_ADDRESS_LENGTHS = [66, 64] // [max,min]
 export const ETHEREUM_ADDRESS_LENGTH = 42
 
+//
+// Cairo functions
+export const poseidon = (values: BigNumberish[]): bigint => (BigInt(ec.starkCurve.poseidonHashMany(values.map(v => BigInt(v)))))
+
+//
+// Cairo type conversions
 export const validateCairoString = (v: string): string => (v ? v.slice(0, 31) : '')
 export const sanitizedAddress = (v: BigNumberish): string | null => (isPositiveBigint(v) ? encode.sanitizeHex(bigintToHex(v)) : null)
 export const stringToFelt = (v: string): BigNumberish => (v ? shortString.encodeShortString(v) : '0x0')
 export const feltToString = (v: BigNumberish): string => (BigInt(v) > 0n ? shortString.decodeShortString(bigintToHex(v)) : '')
 export const chainIdToString = (chainId: string | bigint | null | undefined): string | undefined => (chainId ? (typeof chainId === 'string' ? chainId : feltToString(chainId)) : undefined)
 export const chainIdToBigInt = (chainId: string | bigint | null | undefined): bigint | undefined => (chainId ? (typeof chainId === 'bigint' ? chainId : BigInt(chainId.startsWith('0x') ? chainId : stringToFelt(chainId))) : undefined)
-export const poseidon = (values: BigNumberish[]): bigint => (BigInt(ec.starkCurve.poseidonHashMany(values.map(v => BigInt(v)))))
+export const U256ToBigint = (v: Uint256): bigint => (uint256.uint256ToBN(v))
+export const bigintToU256 = (v: BigNumberish): Uint256 => (uint256.bnToUint256(v))
+
+
+//
+// Cairo enums
+// https://starknetjs.com/docs/guides/cairo_enum#cairo-custom-enum
+// https://starknetjs.com/docs/api/classes/cairocustomenum/
+export const parseCustomEnum = <T extends number | BigNumberish>(data: CairoCustomEnum | null): [
+  string | undefined, // variant name
+  T | undefined,      // variant value
+ ] => {
+  return [
+    data?.activeVariant(),
+    data?.unwrap() as T,
+  ]
+}
+
+//
+// ETH conversions
+export const ETH_TO_WEI = 1_000_000_000_000_000_000n
 export const ethToWei = (v: BigNumberish): bigint => (BigInt(v) * ETH_TO_WEI)
 export const weiToEth = (v: BigNumberish): bigint => (BigInt(v) / ETH_TO_WEI)
 export const weiToEthDecimals = (v: BigNumberish): bigint => (BigInt(v) % ETH_TO_WEI)
@@ -42,16 +68,10 @@ export const weiToEthString = (v: BigNumberish, decimals: number = 0, trailingZe
   return result
 }
 
-export const dummyAccount = (provider?: RpcProvider): Account => (new Account(provider ?? {}, '0x0', '0x0'))
-
-export const U256ToBigint = (v: Uint256): bigint => (uint256.uint256ToBN(v))
-export const bigintToU256 = (v: BigNumberish): Uint256 => (uint256.bnToUint256(v))
-
 
 //
-// based on:
+// execute() based on:
 // https://github.com/dojoengine/dojo.js/blob/main/packages/core/src/provider/DojoProvider.ts#L157
-//
 export async function execute(
   account: Account | AccountInterface,
   contractAddress: string,
