@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSdkCallPromise, useDojoContractCalls } from '@underware_gg/pistols-sdk/dojo'
-import { isBigint, isPositiveBigint, stringToFelt } from '@underware_gg/pistols-sdk/utils'
+import { isBigint, isPositiveBigint, makeCustomEnum, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { constants, convert_duel_progress } from '@underware_gg/pistols-sdk/pistols'
 import { useChallenge } from '/src/stores/challengeStore'
 
@@ -11,19 +11,19 @@ import { useChallenge } from '/src/stores/challengeStore'
 // game
 //
 
-export const useFinishedDuelProgress = (duelId: bigint) => {
-  const { isFinished } = useChallenge(duelId)
-  return useDuelProgress(isFinished ? duelId : null)
+export const useFinishedDuelProgress = (duel_id: bigint) => {
+  const { isFinished } = useChallenge(duel_id)
+  return useDuelProgress(isFinished ? duel_id : null)
 }
 
-export const useDuelProgress = (duelId: bigint) => {
+export const useDuelProgress = (duel_id: bigint) => {
   const { game: { getDuelProgress } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: getDuelProgress,
-    args: [duelId],
-    enabled: isPositiveBigint(duelId),
+    args: [duel_id],
+    enabled: isPositiveBigint(duel_id),
     defaultValue: null,
-  }), [duelId])
+  }), [duel_id])
   const { value, isLoading } = useSdkCallPromise<any>(options)
   const duelProgress = useMemo(() => (value ? convert_duel_progress(value) : null), [value])
   return {
@@ -32,14 +32,14 @@ export const useDuelProgress = (duelId: bigint) => {
   }
 }
 
-export const useGetPlayerFullDeck = (tableId: string) => {
+export const useGetPlayerFullDeck = (table_id: string) => {
   const { game: { getPlayerCardDecks } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: getPlayerCardDecks,
-    args: [tableId],
-    enabled: Boolean(tableId),
+    args: [table_id],
+    enabled: Boolean(table_id),
     defaultValue: [],
-  }), [tableId])
+  }), [table_id])
   const { value, isLoading } = useSdkCallPromise<BigNumberish[][]>(options)
   const decks = useMemo(() => (value?.map((vo: BigNumberish[]) => vo.map((vi: BigNumberish) => Number(vi))) ?? null), [value])
   return {
@@ -108,15 +108,15 @@ export const useCanClaimWelcomePack = (forceCounter?: number) => {
   }
 }
 
-export const useCanPurchase = (packType: constants.PackType) => {
+export const useCanPurchase = (pack_type: constants.PackType) => {
   const { address } = useAccount()
   const { pack_token: { canPurchase } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: canPurchase,
-    args: [address, packType],
-    enabled: isPositiveBigint(address),
+    args: [address, makeCustomEnum(pack_type)],
+    enabled: isPositiveBigint(address) && Boolean(pack_type),
     defaultValue: null,
-  }), [address, packType])
+  }), [address, pack_type])
   const { value, isLoading } = useSdkCallPromise<boolean>(options)
   return {
     canPurchase: value,
@@ -124,15 +124,15 @@ export const useCanPurchase = (packType: constants.PackType) => {
   }
 }
 
-export const useCalcFeePack = (packType: constants.PackType) => {
+export const useCalcFeePack = (pack_type: constants.PackType) => {
   const { address } = useAccount()
   const { pack_token: { calcMintFee } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: calcMintFee,
-    args: [address, packType],
-    enabled: isPositiveBigint(address),
+    args: [address, makeCustomEnum(pack_type)],
+    enabled: isPositiveBigint(address) && Boolean(pack_type),
     defaultValue: null,
-  }), [address, packType])
+  }), [address, pack_type])
   const { value, isLoading } = useSdkCallPromise<bigint>(options)
   return {
     fee: value,

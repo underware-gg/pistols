@@ -24,6 +24,7 @@ export const useSdkCallPromise = <T extends Result>({
   useEffect(() => {
     let _mounted = true
     const _get = async (): Promise<T> => {
+      console.log(`useSdkCallPromise():`, call.name, args)
       return await call(...args) as T
     }
     if (call && enabled && !arrayHasNullElements(args)) {

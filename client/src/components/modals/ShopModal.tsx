@@ -46,7 +46,7 @@ export default function DuelistEditModal({
   const { canPurchase } = useCanPurchase(packType)
   const { fee } = useCalcFeePack(packType)
 
-  const canSubmit = (account && canPurchase && duelistCountBeforeMint != null)
+  const canSubmit = (account && canPurchase && duelistCountBeforeMint == null)
 
   const _purchase = () => {
     if (canSubmit) {

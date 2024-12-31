@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { addAddressPadding } from 'starknet'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
@@ -57,7 +57,7 @@ export function ChallengeStoreSync() {
     },
   })
 
-  // useEffect(() => console.log(`ChallengeStoreSync() [${Object.keys(state.entities).length}] =>`, state.entities), [state.entities])
+  // useEffect(() => console.log(`ChallengeStoreSync() [${Object.keys(challengeState.entities).length}] =>`, challengeState.entities), [challengeState.entities])
 
   return (<></>)
 }

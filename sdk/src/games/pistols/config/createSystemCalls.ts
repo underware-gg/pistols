@@ -1,6 +1,6 @@
 import { DojoCall, DojoProvider } from '@dojoengine/core'
 import { AccountInterface, BigNumberish, Call, Result } from 'starknet'
-import { stringToFelt, bigintToU256 } from 'src/utils/misc/starknet'
+import { stringToFelt, bigintToU256, makeCustomEnum } from 'src/utils/misc/starknet'
 import { arrayClean, shortAddress, isPositiveBigint } from 'src/utils/misc/types'
 import { DojoManifest } from 'src/dojo/contexts/Dojo'
 import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'
@@ -140,8 +140,16 @@ export function createSystemCalls(
   }
 
   const purchase = async (signer: AccountInterface, pack_type: constants.PackType): Promise<boolean> => {
-    const args = [constants.getPackTypeValue(pack_type)]
-    const calls: DojoCalls = [pack_token_call('purchase', args)]
+    let calls: DojoCalls = []
+    //
+    // approve call
+    // const approved_value = await calc_mint_fee_duel(table_id)
+    // const approve = approve_call(approved_value)
+    // if (approve) calls.push(approve)
+    //
+    // token call
+    const args = [makeCustomEnum(pack_type)]
+    calls.push(pack_token_call('purchase', args))
     return await _executeTransaction(signer, calls)
   }
 
