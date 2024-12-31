@@ -5,8 +5,7 @@ import { bigintToNumber } from '@underware_gg/pistols-sdk/utils'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 //------------------------------------------
-// must be in sync with CHALLENGE_STATE
-// (challenge.cairo)
+// must be in sync with challenge.cairo
 //
 export const LiveChallengeStates: constants.ChallengeState[] = [
   constants.ChallengeState.Awaiting,

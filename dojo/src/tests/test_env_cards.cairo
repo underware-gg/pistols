@@ -19,7 +19,7 @@ mod tests {
         DuelistHand, DuelistHandTrait, DeckType,
         PacesCard, PacesCardTrait,
         TacticsCard, TacticsCardTrait,
-        BladesCard, BladesCardTrait, BLADES_CARDS,
+        BladesCard, BladesCardTrait,
         EnvCard, EnvCardTrait,
     };
     use pistols::libs::game_loop::{game_loop, make_moves_hash};

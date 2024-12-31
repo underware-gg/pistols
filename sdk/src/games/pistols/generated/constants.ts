@@ -439,21 +439,6 @@ export const MetadataErrors: type_MetadataErrors = {
   INVALID_METADATA: 'METADATA: invalid metadata',
 };
 
-// from: ../dojo/src/types/cards/blades.cairo
-type type_BLADES_CARDS = {
-  None: number, // cairo: u8
-  Seppuku: number, // cairo: u8
-  PocketPistol: number, // cairo: u8
-  Behead: number, // cairo: u8
-  Grapple: number, // cairo: u8
-};
-export const BLADES_CARDS: type_BLADES_CARDS = {
-  None: 0,
-  Seppuku: 1,
-  PocketPistol: 2,
-  Behead: 3,
-  Grapple: 4,
-};
 
 // from: ../dojo/src/types/cards/blades.cairo
 type type_BLADES_POINTS = {
@@ -495,34 +480,6 @@ export const BLADES_POINTS: type_BLADES_POINTS = {
     other_damage: -1,
     special: 'Beats Pocket Pistol',
   },
-};
-
-// from: ../dojo/src/types/cards/env.cairo
-type type_ENV_CARDS = {
-  None: number, // cairo: u8
-  DamageUp: number, // cairo: u8
-  DamageDown: number, // cairo: u8
-  ChancesUp: number, // cairo: u8
-  ChancesDown: number, // cairo: u8
-  DoubleDamageUp: number, // cairo: u8
-  DoubleChancesUp: number, // cairo: u8
-  SpecialAllShotsHit: number, // cairo: u8
-  SpecialAllShotsMiss: number, // cairo: u8
-  SpecialDoubleTactics: number, // cairo: u8
-  SpecialNoTactics: number, // cairo: u8
-};
-export const ENV_CARDS: type_ENV_CARDS = {
-  None: 0,
-  DamageUp: 1,
-  DamageDown: 2,
-  ChancesUp: 3,
-  ChancesDown: 4,
-  DoubleDamageUp: 5,
-  DoubleChancesUp: 7,
-  SpecialAllShotsHit: 9,
-  SpecialAllShotsMiss: 10,
-  SpecialDoubleTactics: 11,
-  SpecialNoTactics: 12,
 };
 
 // from: ../dojo/src/types/cards/env.cairo
@@ -601,54 +558,6 @@ export const ENV_POINTS: type_ENV_POINTS = {
   },
 };
 
-// from: ../dojo/src/types/cards/paces.cairo
-type type_PACES_CARDS = {
-  None: number, // cairo: u8
-  Paces1: number, // cairo: u8
-  Paces2: number, // cairo: u8
-  Paces3: number, // cairo: u8
-  Paces4: number, // cairo: u8
-  Paces5: number, // cairo: u8
-  Paces6: number, // cairo: u8
-  Paces7: number, // cairo: u8
-  Paces8: number, // cairo: u8
-  Paces9: number, // cairo: u8
-  Paces10: number, // cairo: u8
-};
-export const PACES_CARDS: type_PACES_CARDS = {
-  None: 0,
-  Paces1: 1,
-  Paces2: 2,
-  Paces3: 3,
-  Paces4: 4,
-  Paces5: 5,
-  Paces6: 6,
-  Paces7: 7,
-  Paces8: 8,
-  Paces9: 9,
-  Paces10: 10,
-};
-
-// from: ../dojo/src/types/cards/tactics.cairo
-type type_TACTICS_CARDS = {
-  None: number, // cairo: u8
-  Insult: number, // cairo: u8
-  CoinToss: number, // cairo: u8
-  Vengeful: number, // cairo: u8
-  ThickCoat: number, // cairo: u8
-  Reversal: number, // cairo: u8
-  Bananas: number, // cairo: u8
-};
-export const TACTICS_CARDS: type_TACTICS_CARDS = {
-  None: 0,
-  Insult: 1,
-  CoinToss: 2,
-  Vengeful: 3,
-  ThickCoat: 4,
-  Reversal: 5,
-  Bananas: 6,
-};
-
 // from: ../dojo/src/types/cards/tactics.cairo
 type type_TACTICS_POINTS = {
   Insult: CardPoints, // cairo: CardPoints
@@ -707,28 +616,6 @@ export const TACTICS_POINTS: type_TACTICS_POINTS = {
     other_damage: 0,
     special: '',
   },
-};
-
-// from: ../dojo/src/types/challenge_state.cairo
-type type_CHALLENGE_STATE = {
-  NULL: number, // cairo: u8
-  AWAITING: number, // cairo: u8
-  WITHDRAWN: number, // cairo: u8
-  REFUSED: number, // cairo: u8
-  EXPIRED: number, // cairo: u8
-  IN_PROGRESS: number, // cairo: u8
-  RESOLVED: number, // cairo: u8
-  DRAW: number, // cairo: u8
-};
-export const CHALLENGE_STATE: type_CHALLENGE_STATE = {
-  NULL: 0,
-  AWAITING: 1,
-  WITHDRAWN: 2,
-  REFUSED: 3,
-  EXPIRED: 4,
-  IN_PROGRESS: 5,
-  RESOLVED: 6,
-  DRAW: 7,
 };
 
 // from: ../dojo/src/types/constants.cairo
@@ -851,20 +738,6 @@ export const BOT_NAMES: type_BOT_NAMES = {
   BotName00: 'Unknown',
   BotName01: 'Scarecrow',
   BotName02: 'Tin Man',
-};
-
-// from: ../dojo/src/types/round_state.cairo
-type type_ROUND_STATE = {
-  NULL: number, // cairo: u8
-  COMMIT: number, // cairo: u8
-  REVEAL: number, // cairo: u8
-  FINISHED: number, // cairo: u8
-};
-export const ROUND_STATE: type_ROUND_STATE = {
-  NULL: 0,
-  COMMIT: 1,
-  REVEAL: 2,
-  FINISHED: 3,
 };
 
 // from: ../dojo/src/types/typed_data.cairo

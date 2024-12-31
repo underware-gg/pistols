@@ -10,22 +10,13 @@ pub enum BladesCard {
 }
 
 
-
 //--------------------
 // constants
 //
 
-mod BLADES_CARDS {
-    // IMPORTANT: must be in sync with BladesCard
-    const None: u8 = 0;
-    const Seppuku: u8 = 1;
-    const PocketPistol: u8 = 2;
-    const Behead: u8 = 3;
-    const Grapple: u8 = 4;
-}
-
 mod BLADES_POINTS {
     use pistols::types::cards::cards::{CardPoints};
+    // IMPORTANT: names must be in sync with EnvCard
     const Seppuku: CardPoints = CardPoints {
         name: 'Seppuku',
         self_chances: 20,
@@ -181,34 +172,21 @@ impl BladesCardDefault of Default<BladesCard> {
 impl BladesCardIntoU8 of Into<BladesCard, u8> {
     fn into(self: BladesCard) -> u8 {
         match self {
-            BladesCard::Seppuku =>  BLADES_CARDS::Seppuku,
-            BladesCard::PocketPistol =>  BLADES_CARDS::PocketPistol,
-            BladesCard::Behead =>   BLADES_CARDS::Behead,
-            BladesCard::Grapple =>  BLADES_CARDS::Grapple,
-            _ =>                    BLADES_CARDS::None,
+            BladesCard::None =>         0,
+            BladesCard::Seppuku =>      1,
+            BladesCard::PocketPistol => 2,
+            BladesCard::Behead =>       3,
+            BladesCard::Grapple =>      4,
         }
     }
 }
 impl U8IntoBladesCard of Into<u8, BladesCard> {
     fn into(self: u8) -> BladesCard {
-        if self == BLADES_CARDS::Seppuku        { BladesCard::Seppuku }
-        else if self == BLADES_CARDS::PocketPistol  { BladesCard::PocketPistol }
-        else if self == BLADES_CARDS::Behead    { BladesCard::Behead }
-        else if self == BLADES_CARDS::Grapple   { BladesCard::Grapple }
-        else                                    { BladesCard::None }
-    }
-}
-
-impl BladesCardIntoFelt252 of Into<BladesCard, felt252> {
-    fn into(self: BladesCard) -> felt252 {
-        let v: u8 = self.into();
-        (v.into())
-    }
-}
-
-impl BladesCardPrintImpl of PrintTrait<BladesCard> {
-    fn print(self: BladesCard) {
-        self.get_points().name.print();
+        if self == 1        { BladesCard::Seppuku }
+        else if self == 2   { BladesCard::PocketPistol }
+        else if self == 3   { BladesCard::Behead }
+        else if self == 4   { BladesCard::Grapple }
+        else                { BladesCard::None }
     }
 }
 
@@ -216,9 +194,34 @@ impl BladesCardPrintImpl of PrintTrait<BladesCard> {
 impl BladesCardDisplay of Display<BladesCard> {
     fn fmt(self: @BladesCard, ref f: Formatter) -> Result<(), Error> {
         let name: ByteArray = (*self).get_points().name.as_string();
-        let value: felt252 = (*self).into();
+        let value: u8 = (*self).into();
         let str: ByteArray = format!("({}:{})", value, name);
         f.buffer.append(@str);
         Result::Ok(())
+    }
+}
+
+
+//----------------------------------------
+// Unit  tests
+//
+#[cfg(test)]
+mod tests {
+    use core::traits::Into;
+    use super::{BladesCard};
+
+    #[test]
+    fn test_into_u8() {
+        let mut i: u8 = 0;
+        loop {
+            let card: BladesCard = i.into();
+            if (i > 0 && card == BladesCard::None) {
+                break;
+            }
+            let as_u8: u8 = card.into();
+            assert!(i == as_u8, "{} != {}", i, as_u8);
+            // println!("BladesCard {} == {}", i, as_u8);
+            i += 1;
+        };
     }
 }

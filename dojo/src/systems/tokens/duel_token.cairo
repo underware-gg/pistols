@@ -495,7 +495,6 @@ pub mod duel_token {
             let mut result: Array<ByteArray> = array![];
             let duelist_a: ByteArray = format!("Duelist #{}", challenge.duelist_id_a);
             let duelist_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);
-            let state: felt252 = challenge.state.into();
             // Meta
             result.append("Table");
             result.append(challenge.table_id.as_string());
@@ -508,7 +507,7 @@ pub mod duel_token {
             result.append("Quote");
             result.append(challenge.quote.as_string());
             result.append("State");
-            result.append(state.as_string());
+            result.append(challenge.state.into());
             if (challenge.winner != 0) {
                 result.append("Winner");
                 result.append(if(challenge.winner==1){duelist_a}else{duelist_b});

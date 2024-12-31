@@ -16,17 +16,6 @@ pub enum TacticsCard {
 // constants
 //
 
-mod TACTICS_CARDS {
-    // IMPORTANT: must be in sync with TacticsCard
-    const None: u8 = 0;
-    const Insult: u8 = 1;
-    const CoinToss: u8 = 2;
-    const Vengeful: u8 = 3;
-    const ThickCoat: u8 = 4;
-    const Reversal: u8 = 5;
-    const Bananas: u8 = 6;
-}
-
 mod TACTICS_POINTS {
     use pistols::types::cards::cards::{CardPoints};
     const Insult: CardPoints = CardPoints {
@@ -135,32 +124,25 @@ impl TacticsCardDefault of Default<TacticsCard> {
 impl TacticsCardIntoU8 of Into<TacticsCard, u8> {
     fn into(self: TacticsCard) -> u8 {
         match self {
-            TacticsCard::Insult =>      TACTICS_CARDS::Insult,
-            TacticsCard::CoinToss =>    TACTICS_CARDS::CoinToss,
-            TacticsCard::Vengeful =>    TACTICS_CARDS::Vengeful,
-            TacticsCard::ThickCoat =>   TACTICS_CARDS::ThickCoat,
-            TacticsCard::Reversal =>    TACTICS_CARDS::Reversal,
-            TacticsCard::Bananas =>     TACTICS_CARDS::Bananas,
-            _ =>                        TACTICS_CARDS::None,
+            TacticsCard::None =>        0,
+            TacticsCard::Insult =>      1,
+            TacticsCard::CoinToss =>    2,
+            TacticsCard::Vengeful =>    3,
+            TacticsCard::ThickCoat =>   4,
+            TacticsCard::Reversal =>    5,
+            TacticsCard::Bananas =>     6,
         }
     }
 }
 impl U8IntoTacticsCard of Into<u8, TacticsCard> {
     fn into(self: u8) -> TacticsCard {
-        if self == TACTICS_CARDS::Insult            { TacticsCard::Insult }
-        else if self == TACTICS_CARDS::CoinToss     { TacticsCard::CoinToss }
-        else if self == TACTICS_CARDS::Vengeful     { TacticsCard::Vengeful }
-        else if self == TACTICS_CARDS::ThickCoat    { TacticsCard::ThickCoat }
-        else if self == TACTICS_CARDS::Reversal     { TacticsCard::Reversal }
-        else if self == TACTICS_CARDS::Bananas      { TacticsCard::Bananas }
-        else                                        { TacticsCard::None }
-    }
-}
-
-impl TacticsCardIntoFelt252 of Into<TacticsCard, felt252> {
-    fn into(self: TacticsCard) -> felt252 {
-        let v: u8 = self.into();
-        (v.into())
+        if self == 1        { TacticsCard::Insult }
+        else if self == 2   { TacticsCard::CoinToss }
+        else if self == 3   { TacticsCard::Vengeful }
+        else if self == 4   { TacticsCard::ThickCoat }
+        else if self == 5   { TacticsCard::Reversal }
+        else if self == 6   { TacticsCard::Bananas }
+        else                { TacticsCard::None }
     }
 }
 
@@ -174,9 +156,35 @@ impl TacticsCardPrintImpl of PrintTrait<TacticsCard> {
 impl TacticsCardDisplay of Display<TacticsCard> {
     fn fmt(self: @TacticsCard, ref f: Formatter) -> Result<(), Error> {
         let name: ByteArray = (*self).get_points().name.as_string();
-        let value: felt252 = (*self).into();
+        let value: u8 = (*self).into();
         let str: ByteArray = format!("({}:{})", value, name);
         f.buffer.append(@str);
         Result::Ok(())
+    }
+}
+
+
+
+//----------------------------------------
+// Unit  tests
+//
+#[cfg(test)]
+mod tests {
+    use core::traits::Into;
+    use super::{TacticsCard};
+
+    #[test]
+    fn test_into_u8() {
+        let mut i: u8 = 0;
+        loop {
+            let card: TacticsCard = i.into();
+            if (i > 0 && card == TacticsCard::None) {
+                break;
+            }
+            let as_u8: u8 = card.into();
+            assert!(i == as_u8, "{} != {}", i, as_u8);
+            // println!("TacticsCard {} == {}", i, as_u8);
+            i += 1;
+        };
     }
 }

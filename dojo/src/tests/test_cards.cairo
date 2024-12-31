@@ -19,7 +19,7 @@ mod tests {
         DuelistHand, DuelistHandTrait, DeckType,
         PacesCard, PacesCardTrait,
         TacticsCard, TacticsCardTrait,
-        BladesCard, BladesCardTrait, BLADES_CARDS,
+        BladesCard, BladesCardTrait,
         EnvCard, EnvCardTrait,
     };
     use pistols::libs::game_loop::{game_loop, make_moves_hash};
@@ -116,8 +116,8 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
         sys.rng.mock_values(salts.salts, salts.values);
-        let moves_a: Span<u8> = [5, 6, 1, BLADES_CARDS::Grapple].span();
-        let moves_b: Span<u8> = [10, 9, 3, BLADES_CARDS::PocketPistol].span();
+        let moves_a: Span<u8> = [5, 6, 1, BladesCard::Grapple.into()].span();
+        let moves_b: Span<u8> = [10, 9, 3, BladesCard::PocketPistol.into()].span();
         let (round, progress) = execute_game_loop(sys, moves_a, moves_b, true);
         assert(progress.hand_a.card_fire == (*moves_a[0]).into(), 'hand_a.card_fire');
         assert(progress.hand_a.card_dodge == (*moves_a[1]).into(), 'hand_a.card_dodge');

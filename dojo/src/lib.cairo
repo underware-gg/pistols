@@ -46,10 +46,10 @@ mod models {
 }
 
 mod types {
+    mod boolean;
     mod challenge_state;
     mod constants;
     mod duel_progress;
-    mod misc;
     mod premise;
     mod profile_type;
     mod round_state;

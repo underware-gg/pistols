@@ -139,17 +139,6 @@ impl ScoreTraitImpl of ScoreTrait {
     }
 }
 
-
-impl ArchetypeIntoFelt252 of Into<Archetype, felt252> {
-    fn into(self: Archetype) -> felt252 {
-        match self {
-            Archetype::Undefined => 0,
-            Archetype::Villainous => 1,
-            Archetype::Trickster => 2,
-            Archetype::Honourable => 3,
-        }
-    }
-}
 impl ArchetypeIntoByteArray of Into<Archetype, ByteArray> {
     fn into(self: Archetype) -> ByteArray {
         match self {
@@ -160,5 +149,3 @@ impl ArchetypeIntoByteArray of Into<Archetype, ByteArray> {
         }
     }
 }
-
-

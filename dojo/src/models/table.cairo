@@ -126,34 +126,6 @@ impl TableAdmittanceImpl of TableAdmittanceTrait {
 }
 
 
-//---------------------------
-// enum traits
-//
-
-impl TableTypeIntoFelt252 of Into<TableType, felt252> {
-    fn into(self: TableType) -> felt252 {
-        match self {
-            TableType::Undefined => 0,
-            TableType::Classic => 1,
-            TableType::Tournament => 2,
-            TableType::IRLTournament => 3,
-        }
-    }
-}
-impl TableTypeIntoByteArray of Into<TableType, ByteArray> {
-    fn into(self: TableType) -> ByteArray {
-        match self {
-            TableType::Undefined => "Undefined",
-            TableType::Classic => "Classic",
-            TableType::Tournament => "Tournament",
-            TableType::IRLTournament => "IRLTournament",
-        }
-    }
-}
-
-
-
-
 
 //----------------------------------------
 // Unit  tests
