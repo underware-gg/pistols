@@ -17,5 +17,6 @@ pub mod vrf_mock {
             let mut world = self.world(@"pistols");
             (make_seed(get_caller_address(), world.dispatcher.uuid()).into())
         }
+        fn request_random(self: @ContractState, caller: ContractAddress, source: Source) {}
     }
 }
