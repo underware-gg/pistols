@@ -42,7 +42,7 @@ export default function DuelistEditModal({
     }
   }, [duelistCountBeforeMint, duelistIds.length])
 
-  const { purchase } = useDojoSystemCalls()
+  const { pack_token } = useDojoSystemCalls()
   const { canPurchase } = useCanPurchase(packType)
   const { fee } = useCalcFeePack(packType)
 
@@ -51,7 +51,7 @@ export default function DuelistEditModal({
   const _purchase = () => {
     if (canSubmit) {
       setDuelistCountBeforeMint(duelistIds.length ?? 0)
-      purchase(account, packType)
+      pack_token.purchase(account, packType)
     }
   }
 

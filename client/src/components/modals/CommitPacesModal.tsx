@@ -27,7 +27,7 @@ export default function CommitPacesModal({
 }) {
   const { account } = useAccount()
   const { duelistId } = useSettings()
-  const { commit_moves } = useDojoSystemCalls()
+  const { game } = useDojoSystemCalls()
   const { dispatchSetMoves } = usePistolsContext()
   const { starknetDomain } = useDojoSetup()
 
@@ -61,7 +61,7 @@ export default function CommitPacesModal({
       const moves = [firePaces, dodgePaces, tactics, blades]
       const { hash, salt } = await signAndGenerateMovesHash(account, starknetDomain, messageToSign, moves)
       if (hash && salt) {
-        await commit_moves(account, duelistId, duelId, hash)
+        await game.commit_moves(account, duelistId, duelId, hash)
         dispatchSetMoves(messageToSign, moves, salt)
         setIsOpen(false)
       }

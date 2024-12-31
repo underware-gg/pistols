@@ -27,7 +27,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function ChallengeModal() {
-  const { reply_duel } = useDojoSystemCalls()
+  const { duel_token } = useDojoSystemCalls()
   const { duelistId } = useSettings()
   const { account } = useAccount()
 
@@ -60,7 +60,7 @@ export default function ChallengeModal() {
   const _reply = (accepted: boolean) => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await reply_duel(account, duelistId, selectedDuelId, accepted)
+      await duel_token.reply_duel(account, duelistId, selectedDuelId, accepted)
       if (accepted) _gotoDuel()
       setIsSubmitting(false)
     }

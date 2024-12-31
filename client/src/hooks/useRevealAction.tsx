@@ -60,7 +60,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, tableId: string, 
 }
 
 export function useRevealAction(duelId: bigint, tableId: string, hash: bigint, enabled: boolean) {
-  const { reveal_moves } = useDojoSystemCalls()
+  const { game } = useDojoSystemCalls()
   const { account } = useAccount()
   const { duelistId } = useSettings()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -79,7 +79,7 @@ export function useRevealAction(duelId: bigint, tableId: string, hash: bigint, e
     const _reveal = async (salt: bigint, moves: number[]) => {
       if (moves?.length >= 2 && !isSubmitting) {
         setIsSubmitting(true)
-        await reveal_moves(account, duelistId, duelId, salt, moves)
+        await game.reveal_moves(account, duelistId, duelId, salt, moves)
         setIsSubmitting(false)
       }
     }

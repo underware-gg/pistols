@@ -214,7 +214,7 @@ export function ConnectButton({
 
 export function ClaimDuelistsButton() {
   const { account } = useAccount()
-  const { claim_welcome_pack } = useDojoSystemCalls()
+  const { pack_token } = useDojoSystemCalls()
   const { dispatchDuelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
   const { duelistIds } = useDuelistsOfPlayer()
@@ -224,7 +224,7 @@ export function ClaimDuelistsButton() {
   const _claim = async () => {
     if (canClaimWelcomePack) {
       setIsClaiming(true)
-      await claim_welcome_pack(account)
+      await pack_token.claim_welcome_pack(account)
     }
   }
 

@@ -54,9 +54,9 @@ export const ConfigForm = ({
 }: {
   }) => {
   const { account } = useAccount()
-  const { admin_set_config } = useDojoSystemCalls()
+  const { admin } = useDojoSystemCalls()
   const storeComponent = (values: any) => {
-    admin_set_config(account, values)
+    admin.set_config(account, values)
   }
 
   return (
@@ -77,9 +77,9 @@ export const TableConfigForm = ({
   const [tableId, setTableId] = useState<string>()
 
   const { account } = useAccount()
-  const { admin_set_table } = useDojoSystemCalls()
+  const { admin } = useDojoSystemCalls()
   const storeComponent = (values: any) => {
-    admin_set_table(account, values)
+    admin.set_table(account, values)
   }
 
   return (

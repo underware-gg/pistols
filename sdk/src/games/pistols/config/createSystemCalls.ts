@@ -87,149 +87,119 @@ export function createSystemCalls(
   }
 
 
-  //
-  // Game
-  //
-
-  const commit_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, hash: BigNumberish): Promise<boolean> => {
-    const args = [duelist_id, duel_id, hash]
-    const calls: DojoCalls = [game_call('commit_moves', args)]
-    return await _executeTransaction(signer, calls)
-  }
-
-  const reveal_moves = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, salt: BigNumberish, moves: number[]): Promise<boolean> => {
-    const args = [duelist_id, duel_id, salt, moves]
-    const calls: DojoCalls = [game_call('reveal_moves', args)]
-    return await _executeTransaction(signer, calls)
-  }
-
-
-  //
-  // Duel token
-  //
-
-  const create_duel = async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, premise: constants.Premise, quote: string, table_id: string, expire_hours: number): Promise<boolean> => {
-    let calls: DojoCalls = []
-    //
-    // approve call
-    // const approved_value = await calc_mint_fee_duel(table_id)
-    // const approve = approve_call(approved_value)
-    // if (approve) calls.push(approve)
-    //
-    // game call
-    const args = [duelist_id, BigInt(challenged_id_or_address), constants.getPremiseValue(premise), stringToFelt(quote), table_id, expire_hours]
-    calls.push(duel_token_call('create_duel', args))
-    return await _executeTransaction(signer, calls)
-  }
-
-  const reply_duel = async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, accepted: boolean): Promise<boolean> => {
-    const args = [duelist_id, duel_id, accepted]
-    const calls: DojoCalls = [duel_token_call('reply_duel', args)]
-    return await _executeTransaction(signer, calls)
-  }
-
-
-  //
-  // Pack token
-  //
-
-  const claim_welcome_pack = async (signer: AccountInterface): Promise<boolean> => {
-    const args: any[] = []
-    const calls: DojoCalls = [pack_token_call('claim_welcome_pack', args)]
-    return await _executeTransaction(signer, calls)
-  }
-
-  const purchase = async (signer: AccountInterface, pack_type: constants.PackType): Promise<boolean> => {
-    let calls: DojoCalls = []
-    //
-    // approve call
-    // const approved_value = await calc_mint_fee_duel(table_id)
-    // const approve = approve_call(approved_value)
-    // if (approve) calls.push(approve)
-    //
-    // token call
-    const args = [makeCustomEnum(pack_type)]
-    calls.push(pack_token_call('purchase', args))
-    return await _executeTransaction(signer, calls)
-  }
-
-  const open = async (signer: AccountInterface, pack_id: BigNumberish): Promise<boolean> => {
-    const args = [pack_id]
-    const calls: DojoCalls = [pack_token_call('open', args)]
-    return await _executeTransaction(signer, calls)
-  }
-
-
-  //
-  // Admin
-  //
-
-  const grant_admin = async (signer: AccountInterface, address: BigNumberish, granted: boolean): Promise<boolean> => {
-    const args = [address, granted]
-    const calls: DojoCalls = [admin_call('grant_admin', args)]
-    return await _executeTransaction(signer, calls)
-  }
-
-  const admin_set_config = async (signer: AccountInterface, values: any): Promise<boolean> => {
-    // const args = Object.keys(Config.schema).map(key => {
-    //   const value = values[key]
-    //   if (value == null) throw new Error()
-    //   return value
-    // })
-    // const calls: DojoCalls = [admin_call('set_config', args)]
-    // return await _executeTransaction(signer, calls)
-    console.warn(`FUNCTIONALITY DISABLED!`)
-    return false
-  }
-
-  const admin_set_table = async (signer: AccountInterface, table: any): Promise<boolean> => {
-    // const args = Object.keys(TableConfig.schema).map(key => {
-    //   const value = table[key]
-    //   if (value == null) throw new Error()
-    //   return value
-    // })
-    // // const args = [values]
-    // const calls: DojoCalls = [admin_call('set_table', args)]
-    // return await _executeTransaction(signer, calls)
-    console.warn(`FUNCTIONALITY DISABLED!`)
-    return false
-  }
-
-  const admin_set_table_admittance = async (signer: AccountInterface, table_admittance: any): Promise<boolean | null> => {
-    // const args = Object.keys(TableAdmittance.schema).map(key => {
-    //   const value = table_admittance[key]
-    //   if (value == null) throw new Error()
-    //   return value
-    // })
-    // const calls: DojoCalls = [admin_call('set_table_admittance', args)]
-    // return await _executeTransaction(signer, calls)
-    console.warn(`FUNCTIONALITY DISABLED!`)
-    return false
-  }
 
 
   return {
     //
     // game
-    commit_moves,
-    reveal_moves,
+    //
+    game: {
+      commit_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, hash: BigNumberish): Promise<boolean> => {
+        const args = [duelist_id, duel_id, hash]
+        const calls: DojoCalls = [game_call('commit_moves', args)]
+        return await _executeTransaction(signer, calls)
+      },
+      reveal_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, salt: BigNumberish, moves: number[]): Promise<boolean> => {
+        const args = [duelist_id, duel_id, salt, moves]
+        const calls: DojoCalls = [game_call('reveal_moves', args)]
+        return await _executeTransaction(signer, calls)
+      },
+    },
     //
     // duel_token
-    create_duel,
-    reply_duel,
-    // get_pact,
-    // has_pact,
     //
-    // pack
-    claim_welcome_pack,
-    purchase,
-    open,
+    duel_token: {
+      create_duel: async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, premise: constants.Premise, quote: string, table_id: string, expire_hours: number): Promise<boolean> => {
+        let calls: DojoCalls = []
+        //
+        // approve call
+        // const approved_value = await calc_mint_fee_duel(table_id)
+        // const approve = approve_call(approved_value)
+        // if (approve) calls.push(approve)
+        //
+        // game call
+        const args = [duelist_id, BigInt(challenged_id_or_address), constants.getPremiseValue(premise), stringToFelt(quote), table_id, expire_hours]
+        calls.push(duel_token_call('create_duel', args))
+        return await _executeTransaction(signer, calls)
+      },
+      reply_duel: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, accepted: boolean): Promise<boolean> => {
+        const args = [duelist_id, duel_id, accepted]
+        const calls: DojoCalls = [duel_token_call('reply_duel', args)]
+        return await _executeTransaction(signer, calls)
+      },
+    },
+    //
+    // pack_token
+    //
+    pack_token: {
+      claim_welcome_pack: async (signer: AccountInterface): Promise<boolean> => {
+        const args: any[] = []
+        const calls: DojoCalls = [pack_token_call('claim_welcome_pack', args)]
+        return await _executeTransaction(signer, calls)
+      },
+      purchase: async (signer: AccountInterface, pack_type: constants.PackType): Promise<boolean> => {
+        let calls: DojoCalls = []
+        //
+        // approve call
+        // const approved_value = await calc_mint_fee_duel(table_id)
+        // const approve = approve_call(approved_value)
+        // if (approve) calls.push(approve)
+        //
+        // token call
+        const args = [makeCustomEnum(pack_type)]
+        calls.push(pack_token_call('purchase', args))
+        return await _executeTransaction(signer, calls)
+      },
+      open: async (signer: AccountInterface, pack_id: BigNumberish): Promise<boolean> => {
+        const args = [pack_id]
+        const calls: DojoCalls = [pack_token_call('open', args)]
+        return await _executeTransaction(signer, calls)
+      },
+    },
     //
     // admin
-    grant_admin,
-    admin_set_config,
-    admin_set_table,
-    admin_set_table_admittance,
+    //
+    admin: {
+      grant_admin: async (signer: AccountInterface, address: BigNumberish, granted: boolean): Promise<boolean> => {
+        const args = [address, granted]
+        const calls: DojoCalls = [admin_call('grant_admin', args)]
+        return await _executeTransaction(signer, calls)
+      },
+      set_config: async (signer: AccountInterface, values: any): Promise<boolean> => {
+        // const args = Object.keys(Config.schema).map(key => {
+        //   const value = values[key]
+        //   if (value == null) throw new Error()
+        //   return value
+        // })
+        // const calls: DojoCalls = [admin_call('set_config', args)]
+        // return await _executeTransaction(signer, calls)
+        console.warn(`FUNCTIONALITY DISABLED!`)
+        return false
+      },
+      set_table: async (signer: AccountInterface, table: any): Promise<boolean> => {
+        // const args = Object.keys(TableConfig.schema).map(key => {
+        //   const value = table[key]
+        //   if (value == null) throw new Error()
+        //   return value
+        // })
+        // // const args = [values]
+        // const calls: DojoCalls = [admin_call('set_table', args)]
+        // return await _executeTransaction(signer, calls)
+        console.warn(`FUNCTIONALITY DISABLED!`)
+        return false
+      },
+      set_table_admittance: async (signer: AccountInterface, table_admittance: any): Promise<boolean | null> => {
+        // const args = Object.keys(TableAdmittance.schema).map(key => {
+        //   const value = table_admittance[key]
+        //   if (value == null) throw new Error()
+        //   return value
+        // })
+        // const calls: DojoCalls = [admin_call('set_table_admittance', args)]
+        // return await _executeTransaction(signer, calls)
+        console.warn(`FUNCTIONALITY DISABLED!`)
+        return false
+      },
+    },
   }
 }
 

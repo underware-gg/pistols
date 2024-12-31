@@ -21,7 +21,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function NewChallengeModal() {
-  const { create_duel } = useDojoSystemCalls()
+  const { duel_token } = useDojoSystemCalls()
   const { account, address } = useAccount()
   const { tableId, duelistId } = useSettings()
 
@@ -63,7 +63,7 @@ export default function NewChallengeModal() {
   const _create_duel = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await create_duel(account, duelistId, challengingId, args.premise, args.quote, tableId, args.expire_hours)
+      await duel_token.create_duel(account, duelistId, challengingId, args.premise, args.quote, tableId, args.expire_hours)
       setIsSubmitting(false)
     }
     if (args) _submit()
