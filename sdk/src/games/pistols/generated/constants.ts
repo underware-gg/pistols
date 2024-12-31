@@ -843,14 +843,14 @@ export const DUELIST_NAMES: type_DUELIST_NAMES = {
 
 // from: ../dojo/src/types/profile_type.cairo
 type type_BOT_NAMES = {
-  Bot00: string, // cairo: felt252
-  Bot01: string, // cairo: felt252
-  Bot02: string, // cairo: felt252
+  BotName00: string, // cairo: felt252
+  BotName01: string, // cairo: felt252
+  BotName02: string, // cairo: felt252
 };
 export const BOT_NAMES: type_BOT_NAMES = {
-  Bot00: 'Unknown',
-  Bot01: 'Scarecrow',
-  Bot02: 'Tin Man',
+  BotName00: 'Unknown',
+  BotName01: 'Scarecrow',
+  BotName02: 'Tin Man',
 };
 
 // from: ../dojo/src/types/round_state.cairo

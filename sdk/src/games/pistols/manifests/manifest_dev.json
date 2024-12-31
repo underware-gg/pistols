@@ -7186,7 +7186,7 @@
     },
     {
       "address": "0x7277303966e8302844057f00c7e309ed7f6afea4a0ebc8612c4564d28bbfd0",
-      "class_hash": "0x70f8e91f1a7c5a62bef5aa040063708f0e9aa492e9ab31e7c5253c6a5fc1def",
+      "class_hash": "0x3856bc58ede91bf39e6085bb57a0d2c23a6a7bf5174686ef833e2f3d3367c7",
       "abi": [
         {
           "type": "impl",
@@ -7261,6 +7261,22 @@
           "type": "interface",
           "name": "pistols::interfaces::vrf::IVrfProvider",
           "items": [
+            {
+              "type": "function",
+              "name": "request_random",
+              "inputs": [
+                {
+                  "name": "caller",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "source",
+                  "type": "pistols::interfaces::vrf::Source"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "view"
+            },
             {
               "type": "function",
               "name": "consume_random",
