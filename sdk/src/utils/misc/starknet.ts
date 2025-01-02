@@ -39,14 +39,16 @@ export const bigintToU256 = (v: BigNumberish): Uint256 => (uint256.bnToUint256(v
 // Cairo enums
 // https://starknetjs.com/docs/api/classes/cairocustomenum/
 // https://starknetjs.com/docs/guides/cairo_enum#cairo-custom-enum
-export const parseCustomEnum = <T extends number | BigNumberish>(data: CairoCustomEnum | null): [
+export const parseCustomEnum = <T extends number | BigNumberish>(data: CairoCustomEnum | string | null): [
   string | undefined, // variant name
   T | undefined,      // variant value
 ] => (
-  [
-    data?.activeVariant(),
-    data?.unwrap() as T,
-  ]
+  !data ? [undefined, undefined]
+    : typeof data === 'string' ? [data, undefined]
+      : [
+        data.activeVariant(),
+        data.unwrap() as T,
+      ]
 )
 // https://starknetjs.com/docs/guides/cairo_enum#send-cairo-custom-enum
 export const makeCustomEnum = <T extends number | BigNumberish>(name: string | null, value?: T): CairoCustomEnum | undefined => (
