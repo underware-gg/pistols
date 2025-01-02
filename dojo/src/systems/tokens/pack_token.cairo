@@ -78,7 +78,7 @@ pub mod pack_token {
     use openzeppelin_introspection::src5::SRC5Component;
     use openzeppelin_token::erc721::{ERC721Component};
     use pistols::systems::components::token_component::{TokenComponent};
-    use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
+    // use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
     component!(path: TokenComponent, storage: token, event: TokenEvent);
@@ -125,7 +125,8 @@ pub mod pack_token {
     use pistols::types::constants::{CONST};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::metadata::{MetadataTrait};
-    use pistols::utils::short_string::ShortStringTrait;
+    use pistols::utils::short_string::{ShortStringTrait};
+    use pistols::utils::byte_arrays::{BoolToByteArrayTrait};
     use pistols::utils::math::{MathTrait};
     use pistols::utils::misc::{ZERO, CONSUME_U256};
 
@@ -245,16 +246,19 @@ pub mod pack_token {
         fn open(ref self: ContractState, pack_id: u128) -> Span<u128> {
             let mut store: Store = StoreTrait::new(self.world_default());
 
-            // validate owner, will panic if already opened
+            // validate owner
             let recipient: ContractAddress = self.owner_of(pack_id.into());
             assert(recipient == get_caller_address(), Errors::NOT_OWNER);
 
-            // open...
+            // check if already opened
             let mut pack: Pack = store.get_pack(pack_id);
+            assert(!pack.is_open, Errors::ALREADY_OPENED);
+
+            // open...
             let token_ids: Span<u128> = pack.open(ref store, recipient);
 
             // burn!
-            self.token.burn(pack_id.into());
+            // self.token.burn(pack_id.into());
 
             (token_ids)
         }
@@ -298,6 +302,36 @@ pub mod pack_token {
 
 
     //-----------------------------------
+    // ERC721HooksTrait
+    //
+    use pistols::systems::components::erc721_hooks::{TokenRendererTrait};
+    pub impl ERC721HooksImpl of ERC721Component::ERC721HooksTrait<ContractState> {
+        fn before_update(ref self: ERC721Component::ComponentState<ContractState>,
+            to: ContractAddress,
+            token_id: u256,
+            auth: ContractAddress,
+        ) {}
+
+        fn after_update(ref self: ERC721Component::ComponentState<ContractState>,
+            to: ContractAddress,
+            token_id: u256,
+            auth: ContractAddress,
+        ) {
+            // avoid transfer after opened
+            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut store: Store = StoreTrait::new(world);
+            let pack: Pack = store.get_pack(token_id.low);
+            assert(!pack.is_open, Errors::ALREADY_OPENED);
+        }
+
+        // same as ERC721HooksImpl::token_uri()
+        fn token_uri(self: @ERC721Component::ComponentState<ContractState>, token_id: u256) -> ByteArray {
+            (self.get_contract().render_token_uri(token_id))
+        }
+    }
+
+
+    //-----------------------------------
     // ITokenRenderer
     //
     use pistols::systems::components::erc721_hooks::{ITokenRenderer};
@@ -336,9 +370,11 @@ pub mod pack_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             let pack: PackValue = store.get_pack_value(token_id.low);
             let mut result: Array<ByteArray> = array![];
-            // Type
+            // metadata
             result.append("Type");
             result.append(pack.pack_type.name());
+            result.append("Is Open");
+            result.append(pack.is_open.as_string());
             // done!
             (result.span())
         }
