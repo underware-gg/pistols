@@ -14,6 +14,7 @@ export interface ActivityState {
   timestamp: number
   activity: constants.Activity
   identifier: bigint
+  is_public: boolean
 }
 interface State {
   playerActivity: ActivityState[],
@@ -29,6 +30,7 @@ const createStore = () => {
       timestamp: bigintToNumber(event.timestamp),
       activity: event.activity as unknown as constants.Activity,
       identifier: BigInt(event.identifier),
+      is_public: event.is_public,
     } : undefined
   }
   return create<State>()(immer((set) => ({

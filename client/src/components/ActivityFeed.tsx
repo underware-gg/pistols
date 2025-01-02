@@ -40,6 +40,9 @@ const ActivityItem = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
+  if (!activity.is_public) {
+    return <></>
+  }
   if (activity.activity === constants.Activity.CreatedDuelist) {
     return <ActivityItemCreatedDuelist activity={activity} clientSeconds={clientSeconds} />
   }

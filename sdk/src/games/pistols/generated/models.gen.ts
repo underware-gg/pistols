@@ -271,6 +271,7 @@ export interface PlayerActivity {
   timestamp: BigNumberish;
   activity: Activity;
   identifier: BigNumberish;
+  is_public: boolean;
 }
 
 // Type definition for `pistols::models::player::PlayerActivityValue` struct
@@ -278,6 +279,7 @@ export interface PlayerActivityValue {
   timestamp: BigNumberish;
   activity: Activity;
   identifier: BigNumberish;
+  is_public: boolean;
 }
 
 // Type definition for `pistols::models::table::TableAdmittance` struct
@@ -682,17 +684,19 @@ export const schema: SchemaType = {
 			timestamp_registered: 0,
 		},
 		PlayerActivity: {
-			fieldOrder: ['address', 'timestamp', 'activity', 'identifier'],
+			fieldOrder: ['address', 'timestamp', 'activity', 'identifier', 'is_public'],
 			address: "",
 			timestamp: 0,
 			activity: Activity.Undefined,
 			identifier: 0,
+			is_public: true,
 		},
 		PlayerActivityValue: {
-			fieldOrder: ['timestamp', 'activity', 'identifier'],
+			fieldOrder: ['timestamp', 'activity', 'identifier', 'is_public'],
 			timestamp: 0,
 			activity: Activity.Undefined,
 			identifier: 0,
+			is_public: true,
 		},
 		TableAdmittance: {
 			fieldOrder: ['table_id', 'accounts', 'duelists'],

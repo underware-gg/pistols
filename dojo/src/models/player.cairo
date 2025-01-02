@@ -3,15 +3,16 @@ use starknet::ContractAddress;
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Activity {
     Undefined,          // 0
-    FinishedTutorial,   // 1
-    WelcomePack,        // 2
-    PurchasedPack,      // 3
-    CreatedDuelist,     // 4
-    CreatedChallenge,   // 5
-    RepliedChallenge,   // 6
-    CommittedMoves,     // 7
-    RevealedMoves,      // 8
-    Online,             // 9
+    StartedTutorial,    // 1
+    FinishedTutorial,   // 2
+    WelcomePack,        // 3
+    PurchasedPack,      // 4
+    CreatedDuelist,     // 5
+    CreatedChallenge,   // 6
+    RepliedChallenge,   // 7
+    CommittedMoves,     // 8
+    RevealedMoves,      // 9
+    Online,             // 10
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -45,9 +46,10 @@ pub struct PlayerActivity {
     #[key]
     pub address: ContractAddress,
     //-----------------------
-    pub timestamp: u64,     // seconds since epoch
+    pub timestamp: u64,         // seconds since epoch
     pub activity: Activity,
-    pub identifier: felt252,
+    pub identifier: felt252,    // (optional) duel_id, duelist_id, ...
+    pub is_public: bool,        // should be notified in activity log
 }
 
 //--------------------------
@@ -133,6 +135,12 @@ impl ActivityImpl of ActivityTrait {
             identifier,
             is_public: self.is_public(),
         });
+    }
+    fn is_public(self: Activity) -> bool {
+        match self {
+            Activity::StartedTutorial => false,
+            _ => true,
+        }
     }
     fn can_register_player(self: Activity) -> bool {
         match self {
