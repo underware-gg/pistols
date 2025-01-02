@@ -201,18 +201,6 @@ export const ArchetypeNames: Record<constants.Archetype, string> = {
   [constants.Archetype.Honourable]: 'Honourable',
 }
 
-export const PremisePrefix: Record<constants.Premise, string> = {
-  [constants.Premise.Null]: 'over...?',
-  [constants.Premise.Matter]: 'over the matter of',
-  [constants.Premise.Debt]: 'to discharge a debt',
-  [constants.Premise.Dispute]: 'to satisfy a dispute',
-  [constants.Premise.Honour]: 'to defend their honour',
-  [constants.Premise.Hatred]: 'to satisfy a burning hatred',
-  [constants.Premise.Blood]: 'for the love of death and blood',
-  [constants.Premise.Nothing]: 'for no reason other than',
-  [constants.Premise.Tournament]: 'to be the winner of',
-}
-
 export const MenuLabels: Partial<Record<SceneName, string>> = {
   [SceneName.Gate]: 'Exit to Gate',
   [SceneName.Tavern]: 'The Bar',

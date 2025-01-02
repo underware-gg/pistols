@@ -19,7 +19,7 @@ import { DuelIconsAsGrid } from '/src/components/DuelIcons'
 import { ChallengeTime } from '/src/components/ChallengeTime'
 import { BookmarkIcon, IconClick } from '/src/components/ui/Icons'
 import { Divider } from '/src/components/ui/Divider'
-import { makeDuelDataUrl, PremisePrefix } from '/src/utils/pistols'
+import { makeDuelDataUrl } from '/src/utils/pistols'
 import { SceneName } from '/src/data/assets'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 
@@ -124,7 +124,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <Divider content={PremisePrefix[premise]} nomargin />
+                <Divider content={constants.PREMISES[premise].prefix} nomargin />
               </Col>
             </Row>
             <Row columns='equal' textAlign='center'>

@@ -13,7 +13,6 @@ import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ProfileDescription } from '/src/components/account/ProfileDescription'
 import { FormInput } from '/src/components/ui/Form'
 import { FameBalanceDuelist, FeesToPay } from '/src/components/account/LordsBalance'
-import { PremisePrefix } from '/src/utils/pistols'
 import { Divider } from '/src/components/ui/Divider'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 
@@ -202,7 +201,7 @@ function NewChallengeForm({
             placeholder={null}
             selection
             fluid
-            value={premise}
+            value={constants.PREMISES[premise].name}
             onChange={(e, { value }) => {
               setPremise(value as constants.Premise)
             }}
@@ -211,7 +210,7 @@ function NewChallengeForm({
 
         <Form.Field>
           <FormInput
-            label={PremisePrefix[premise]}
+            label={constants.PREMISES[premise].prefix}
             placeholder={'DESCRIBE YOUR REASONING'}
             value={quote}
             setValue={(newValue) => {

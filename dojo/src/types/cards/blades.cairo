@@ -14,9 +14,10 @@ pub enum BladesCard {
 // constants
 //
 
+// to be exported to typescript by generateConstants
+// IMPORTANT: names must be in sync with enum BladesCard
 mod BLADES_POINTS {
     use pistols::types::cards::cards::{CardPoints};
-    // IMPORTANT: names must be in sync with EnvCard
     const Seppuku: CardPoints = CardPoints {
         name: 'Seppuku',
         self_chances: 20,

@@ -48,7 +48,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const duelistIdA = useMemo(() => BigInt(challenge?.duelist_id_a ?? 0), [challenge])
   const duelistIdB = useMemo(() => BigInt(challenge?.duelist_id_b ?? 0), [challenge])
   const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
-  const premise = useMemo(() => (challenge?.premise as unknown as constants.Premise ?? constants.Premise.Null), [challenge])
+  const premise = useMemo(() => (challenge?.premise as unknown as constants.Premise ?? constants.Premise.Undefined), [challenge])
   const quote = useMemo(() => feltToString(challenge?.quote ?? 0n), [challenge])
   const timestamp_start = useMemo(() => Number(challenge?.timestamp_start ?? 0), [challenge])
   const timestamp_end = useMemo(() => Number(challenge?.timestamp_end ?? 0), [challenge])

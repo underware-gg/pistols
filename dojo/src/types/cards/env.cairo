@@ -21,9 +21,10 @@ pub enum EnvCard {
 // constants
 //
 
+// to be exported to typescript by generateConstants
+// IMPORTANT: names must be in sync with enum EnvCard
 mod ENV_POINTS {
     use pistols::types::cards::cards::{EnvCardPoints, Rarity};
-    // IMPORTANT: names must be in sync with EnvCard
     const DamageUp: EnvCardPoints = EnvCardPoints {
         name: 'Damage Up',
         rarity: Rarity::Common,

@@ -50,6 +50,7 @@ export const getPackTypeFromValue = (value: number): PackType => Object.keys(Pac
 // from: ../dojo/src/models/player.cairo
 export enum Activity {
   Undefined = 'Undefined',
+  StartedTutorial = 'StartedTutorial',
   FinishedTutorial = 'FinishedTutorial',
   WelcomePack = 'WelcomePack',
   PurchasedPack = 'PurchasedPack',
@@ -62,15 +63,16 @@ export enum Activity {
 };
 export const ActivityNameToValue: Record<Activity, number> = {
   [Activity.Undefined]: 0,
-  [Activity.FinishedTutorial]: 1,
-  [Activity.WelcomePack]: 2,
-  [Activity.PurchasedPack]: 3,
-  [Activity.CreatedDuelist]: 4,
-  [Activity.CreatedChallenge]: 5,
-  [Activity.RepliedChallenge]: 6,
-  [Activity.CommittedMoves]: 7,
-  [Activity.RevealedMoves]: 8,
-  [Activity.Online]: 9,
+  [Activity.StartedTutorial]: 1,
+  [Activity.FinishedTutorial]: 2,
+  [Activity.WelcomePack]: 3,
+  [Activity.PurchasedPack]: 4,
+  [Activity.CreatedDuelist]: 5,
+  [Activity.CreatedChallenge]: 6,
+  [Activity.RepliedChallenge]: 7,
+  [Activity.CommittedMoves]: 8,
+  [Activity.RevealedMoves]: 9,
+  [Activity.Online]: 10,
 };
 export const getActivityValue = (name: Activity): number => (ActivityNameToValue[name]);
 export const getActivityFromValue = (value: number): Activity => Object.keys(ActivityNameToValue).find(key => ActivityNameToValue[key as Activity] === value) as Activity;
@@ -106,6 +108,20 @@ export const TableTypeNameToValue: Record<TableType, number> = {
 };
 export const getTableTypeValue = (name: TableType): number => (TableTypeNameToValue[name]);
 export const getTableTypeFromValue = (value: number): TableType => Object.keys(TableTypeNameToValue).find(key => TableTypeNameToValue[key as TableType] === value) as TableType;
+
+// from: ../dojo/src/types/boolean.cairo
+export enum Boolean {
+  Undefined = 'Undefined',
+  True = 'True',
+  False = 'False',
+};
+export const BooleanNameToValue: Record<Boolean, number> = {
+  [Boolean.Undefined]: 0,
+  [Boolean.True]: 1,
+  [Boolean.False]: 2,
+};
+export const getBooleanValue = (name: Boolean): number => (BooleanNameToValue[name]);
+export const getBooleanFromValue = (value: number): Boolean => Object.keys(BooleanNameToValue).find(key => BooleanNameToValue[key as Boolean] === value) as Boolean;
 
 // from: ../dojo/src/types/cards/blades.cairo
 export enum BladesCard {
@@ -275,23 +291,9 @@ export const DuelistDrawnCardNameToValue: Record<DuelistDrawnCard, number> = {
 export const getDuelistDrawnCardValue = (name: DuelistDrawnCard): number => (DuelistDrawnCardNameToValue[name]);
 export const getDuelistDrawnCardFromValue = (value: number): DuelistDrawnCard => Object.keys(DuelistDrawnCardNameToValue).find(key => DuelistDrawnCardNameToValue[key as DuelistDrawnCard] === value) as DuelistDrawnCard;
 
-// from: ../dojo/src/types/misc.cairo
-export enum Boolean {
-  Undefined = 'Undefined',
-  True = 'True',
-  False = 'False',
-};
-export const BooleanNameToValue: Record<Boolean, number> = {
-  [Boolean.Undefined]: 0,
-  [Boolean.True]: 1,
-  [Boolean.False]: 2,
-};
-export const getBooleanValue = (name: Boolean): number => (BooleanNameToValue[name]);
-export const getBooleanFromValue = (value: number): Boolean => Object.keys(BooleanNameToValue).find(key => BooleanNameToValue[key as Boolean] === value) as Boolean;
-
 // from: ../dojo/src/types/premise.cairo
 export enum Premise {
-  Null = 'Null',
+  Undefined = 'Undefined',
   Matter = 'Matter',
   Debt = 'Debt',
   Dispute = 'Dispute',
@@ -302,7 +304,7 @@ export enum Premise {
   Tournament = 'Tournament',
 };
 export const PremiseNameToValue: Record<Premise, number> = {
-  [Premise.Null]: 0,
+  [Premise.Undefined]: 0,
   [Premise.Matter]: 1,
   [Premise.Debt]: 2,
   [Premise.Dispute]: 3,
@@ -365,6 +367,12 @@ export type EnvCardPoints = {
   rarity : Rarity,
   chances : number,
   damage : number,
+};
+
+// from: ../dojo/src/types/premise.cairo
+export type PremiseDescription = {
+  name : string,
+  prefix : string,
 };
 
 // from: ../dojo/src/interfaces/systems.cairo
@@ -438,7 +446,6 @@ export const MetadataErrors: type_MetadataErrors = {
   INVALID_ATTRIBUTES: 'METADATA: invalid attributes',
   INVALID_METADATA: 'METADATA: invalid metadata',
 };
-
 
 // from: ../dojo/src/types/cards/blades.cairo
 type type_BLADES_POINTS = {
@@ -676,6 +683,57 @@ export const FAME: type_FAME = {
   FAME_PER_LORDS: '10',
   MIN_MINT_GRANT_AMOUNT: '1_000 * super.CONST::ETH_TO_WEI',
   MIN_REWARD_AMOUNT: '100 * super.CONST::ETH_TO_WEI',
+};
+
+// from: ../dojo/src/types/premise.cairo
+type type_PREMISES = {
+  Undefined: PremiseDescription, // cairo: PremiseDescription
+  Matter: PremiseDescription, // cairo: PremiseDescription
+  Debt: PremiseDescription, // cairo: PremiseDescription
+  Dispute: PremiseDescription, // cairo: PremiseDescription
+  Honour: PremiseDescription, // cairo: PremiseDescription
+  Hatred: PremiseDescription, // cairo: PremiseDescription
+  Blood: PremiseDescription, // cairo: PremiseDescription
+  Nothing: PremiseDescription, // cairo: PremiseDescription
+  Tournament: PremiseDescription, // cairo: PremiseDescription
+};
+export const PREMISES: type_PREMISES = {
+  Undefined: {
+    name: 'Undefined',
+    prefix: 'over...?',
+  },
+  Matter: {
+    name: 'Matter',
+    prefix: 'over the matter of',
+  },
+  Debt: {
+    name: 'Debt',
+    prefix: 'to discharge a debt',
+  },
+  Dispute: {
+    name: 'Dispute',
+    prefix: 'to satisfy a dispute',
+  },
+  Honour: {
+    name: 'Honour',
+    prefix: 'to defend their honour',
+  },
+  Hatred: {
+    name: 'Hatred',
+    prefix: 'to satisfy a burning hatred',
+  },
+  Blood: {
+    name: 'Blood',
+    prefix: 'for the love of death and blood',
+  },
+  Nothing: {
+    name: 'Nothing',
+    prefix: 'for no reason other than',
+  },
+  Tournament: {
+    name: 'Tournament',
+    prefix: 'to be the winner of',
+  },
 };
 
 // from: ../dojo/src/types/profile_type.cairo
