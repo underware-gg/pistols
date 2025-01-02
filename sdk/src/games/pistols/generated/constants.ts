@@ -2,350 +2,238 @@
 import { BigNumberish } from 'starknet';
 
 //
+// helpers
+//
+const _indexOrUndefined = (v: number) => (v >= 0 ? v : undefined);
+
+//
 // enums
 //
 
 // from: ../dojo/src/interfaces/vrf.cairo
 export enum Source {
-  Nonce = 'Nonce',
-  Salt = 'Salt',
+  Nonce = 'Nonce', // 0
+  Salt = 'Salt', // 1
 };
-export const SourceNameToValue: Record<Source, number> = {
-  [Source.Nonce]: 0,
-  [Source.Salt]: 1,
-};
-export const getSourceValue = (name: Source): number => (SourceNameToValue[name]);
-export const getSourceFromValue = (value: number): Source => Object.keys(SourceNameToValue).find(key => SourceNameToValue[key as Source] === value) as Source;
+export const getSourceValue = (name: Source): number | undefined => _indexOrUndefined(Object.keys(Source).indexOf(name));
+export const getSourceFromValue = (value: number): Source | undefined => Object.keys(Source)[value] as Source;
+export const getSourceMap = (): Record<Source, number> => Object.keys(Source).reduce((acc, v, index) => { acc[v as Source] = index; return acc; }, {} as Record<Source, number>);
 
 // from: ../dojo/src/models/duelist.cairo
 export enum Archetype {
-  Undefined = 'Undefined',
-  Villainous = 'Villainous',
-  Trickster = 'Trickster',
-  Honourable = 'Honourable',
+  Undefined = 'Undefined', // 0
+  Villainous = 'Villainous', // 1
+  Trickster = 'Trickster', // 2
+  Honourable = 'Honourable', // 3
 };
-export const ArchetypeNameToValue: Record<Archetype, number> = {
-  [Archetype.Undefined]: 0,
-  [Archetype.Villainous]: 1,
-  [Archetype.Trickster]: 2,
-  [Archetype.Honourable]: 3,
-};
-export const getArchetypeValue = (name: Archetype): number => (ArchetypeNameToValue[name]);
-export const getArchetypeFromValue = (value: number): Archetype => Object.keys(ArchetypeNameToValue).find(key => ArchetypeNameToValue[key as Archetype] === value) as Archetype;
+export const getArchetypeValue = (name: Archetype): number | undefined => _indexOrUndefined(Object.keys(Archetype).indexOf(name));
+export const getArchetypeFromValue = (value: number): Archetype | undefined => Object.keys(Archetype)[value] as Archetype;
+export const getArchetypeMap = (): Record<Archetype, number> => Object.keys(Archetype).reduce((acc, v, index) => { acc[v as Archetype] = index; return acc; }, {} as Record<Archetype, number>);
 
 // from: ../dojo/src/models/pack.cairo
 export enum PackType {
-  Undefined = 'Undefined',
-  WelcomePack = 'WelcomePack',
-  Duelists5x = 'Duelists5x',
+  Undefined = 'Undefined', // 0
+  WelcomePack = 'WelcomePack', // 1
+  Duelists5x = 'Duelists5x', // 2
 };
-export const PackTypeNameToValue: Record<PackType, number> = {
-  [PackType.Undefined]: 0,
-  [PackType.WelcomePack]: 1,
-  [PackType.Duelists5x]: 2,
-};
-export const getPackTypeValue = (name: PackType): number => (PackTypeNameToValue[name]);
-export const getPackTypeFromValue = (value: number): PackType => Object.keys(PackTypeNameToValue).find(key => PackTypeNameToValue[key as PackType] === value) as PackType;
+export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
+export const getPackTypeFromValue = (value: number): PackType | undefined => Object.keys(PackType)[value] as PackType;
+export const getPackTypeMap = (): Record<PackType, number> => Object.keys(PackType).reduce((acc, v, index) => { acc[v as PackType] = index; return acc; }, {} as Record<PackType, number>);
 
 // from: ../dojo/src/models/player.cairo
 export enum Activity {
-  Undefined = 'Undefined',
-  StartedTutorial = 'StartedTutorial',
-  FinishedTutorial = 'FinishedTutorial',
-  WelcomePack = 'WelcomePack',
-  PurchasedPack = 'PurchasedPack',
-  CreatedDuelist = 'CreatedDuelist',
-  CreatedChallenge = 'CreatedChallenge',
-  RepliedChallenge = 'RepliedChallenge',
-  CommittedMoves = 'CommittedMoves',
-  RevealedMoves = 'RevealedMoves',
-  Online = 'Online',
+  Undefined = 'Undefined', // 0
+  StartedTutorial = 'StartedTutorial', // 1
+  FinishedTutorial = 'FinishedTutorial', // 2
+  WelcomePack = 'WelcomePack', // 3
+  PurchasedPack = 'PurchasedPack', // 4
+  CreatedDuelist = 'CreatedDuelist', // 5
+  CreatedChallenge = 'CreatedChallenge', // 6
+  RepliedChallenge = 'RepliedChallenge', // 7
+  CommittedMoves = 'CommittedMoves', // 8
+  RevealedMoves = 'RevealedMoves', // 9
+  Online = 'Online', // 10
 };
-export const ActivityNameToValue: Record<Activity, number> = {
-  [Activity.Undefined]: 0,
-  [Activity.StartedTutorial]: 1,
-  [Activity.FinishedTutorial]: 2,
-  [Activity.WelcomePack]: 3,
-  [Activity.PurchasedPack]: 4,
-  [Activity.CreatedDuelist]: 5,
-  [Activity.CreatedChallenge]: 6,
-  [Activity.RepliedChallenge]: 7,
-  [Activity.CommittedMoves]: 8,
-  [Activity.RevealedMoves]: 9,
-  [Activity.Online]: 10,
-};
-export const getActivityValue = (name: Activity): number => (ActivityNameToValue[name]);
-export const getActivityFromValue = (value: number): Activity => Object.keys(ActivityNameToValue).find(key => ActivityNameToValue[key as Activity] === value) as Activity;
+export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
+export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
+export const getActivityMap = (): Record<Activity, number> => Object.keys(Activity).reduce((acc, v, index) => { acc[v as Activity] = index; return acc; }, {} as Record<Activity, number>);
 
 // from: ../dojo/src/models/player.cairo
 export enum TutorialProgress {
-  None = 'None',
-  FinishedFirst = 'FinishedFirst',
-  FinishedSecond = 'FinishedSecond',
-  FinishedFirstDuel = 'FinishedFirstDuel',
+  None = 'None', // 0
+  FinishedFirst = 'FinishedFirst', // 1
+  FinishedSecond = 'FinishedSecond', // 2
+  FinishedFirstDuel = 'FinishedFirstDuel', // 3
 };
-export const TutorialProgressNameToValue: Record<TutorialProgress, number> = {
-  [TutorialProgress.None]: 0,
-  [TutorialProgress.FinishedFirst]: 1,
-  [TutorialProgress.FinishedSecond]: 2,
-  [TutorialProgress.FinishedFirstDuel]: 3,
-};
-export const getTutorialProgressValue = (name: TutorialProgress): number => (TutorialProgressNameToValue[name]);
-export const getTutorialProgressFromValue = (value: number): TutorialProgress => Object.keys(TutorialProgressNameToValue).find(key => TutorialProgressNameToValue[key as TutorialProgress] === value) as TutorialProgress;
+export const getTutorialProgressValue = (name: TutorialProgress): number | undefined => _indexOrUndefined(Object.keys(TutorialProgress).indexOf(name));
+export const getTutorialProgressFromValue = (value: number): TutorialProgress | undefined => Object.keys(TutorialProgress)[value] as TutorialProgress;
+export const getTutorialProgressMap = (): Record<TutorialProgress, number> => Object.keys(TutorialProgress).reduce((acc, v, index) => { acc[v as TutorialProgress] = index; return acc; }, {} as Record<TutorialProgress, number>);
 
 // from: ../dojo/src/models/table.cairo
 export enum TableType {
-  Undefined = 'Undefined',
-  Classic = 'Classic',
-  Tournament = 'Tournament',
-  IRLTournament = 'IRLTournament',
+  Undefined = 'Undefined', // 0
+  Classic = 'Classic', // 1
+  Tournament = 'Tournament', // 2
+  IRLTournament = 'IRLTournament', // 3
 };
-export const TableTypeNameToValue: Record<TableType, number> = {
-  [TableType.Undefined]: 0,
-  [TableType.Classic]: 1,
-  [TableType.Tournament]: 2,
-  [TableType.IRLTournament]: 3,
-};
-export const getTableTypeValue = (name: TableType): number => (TableTypeNameToValue[name]);
-export const getTableTypeFromValue = (value: number): TableType => Object.keys(TableTypeNameToValue).find(key => TableTypeNameToValue[key as TableType] === value) as TableType;
+export const getTableTypeValue = (name: TableType): number | undefined => _indexOrUndefined(Object.keys(TableType).indexOf(name));
+export const getTableTypeFromValue = (value: number): TableType | undefined => Object.keys(TableType)[value] as TableType;
+export const getTableTypeMap = (): Record<TableType, number> => Object.keys(TableType).reduce((acc, v, index) => { acc[v as TableType] = index; return acc; }, {} as Record<TableType, number>);
 
 // from: ../dojo/src/types/boolean.cairo
 export enum Boolean {
-  Undefined = 'Undefined',
-  True = 'True',
-  False = 'False',
+  Undefined = 'Undefined', // 0
+  True = 'True', // 1
+  False = 'False', // 2
 };
-export const BooleanNameToValue: Record<Boolean, number> = {
-  [Boolean.Undefined]: 0,
-  [Boolean.True]: 1,
-  [Boolean.False]: 2,
-};
-export const getBooleanValue = (name: Boolean): number => (BooleanNameToValue[name]);
-export const getBooleanFromValue = (value: number): Boolean => Object.keys(BooleanNameToValue).find(key => BooleanNameToValue[key as Boolean] === value) as Boolean;
+export const getBooleanValue = (name: Boolean): number | undefined => _indexOrUndefined(Object.keys(Boolean).indexOf(name));
+export const getBooleanFromValue = (value: number): Boolean | undefined => Object.keys(Boolean)[value] as Boolean;
+export const getBooleanMap = (): Record<Boolean, number> => Object.keys(Boolean).reduce((acc, v, index) => { acc[v as Boolean] = index; return acc; }, {} as Record<Boolean, number>);
 
 // from: ../dojo/src/types/cards/blades.cairo
 export enum BladesCard {
-  None = 'None',
-  Seppuku = 'Seppuku',
-  PocketPistol = 'PocketPistol',
-  Behead = 'Behead',
-  Grapple = 'Grapple',
+  None = 'None', // 0
+  Seppuku = 'Seppuku', // 1
+  PocketPistol = 'PocketPistol', // 2
+  Behead = 'Behead', // 3
+  Grapple = 'Grapple', // 4
 };
-export const BladesCardNameToValue: Record<BladesCard, number> = {
-  [BladesCard.None]: 0,
-  [BladesCard.Seppuku]: 1,
-  [BladesCard.PocketPistol]: 2,
-  [BladesCard.Behead]: 3,
-  [BladesCard.Grapple]: 4,
-};
-export const getBladesCardValue = (name: BladesCard): number => (BladesCardNameToValue[name]);
-export const getBladesCardFromValue = (value: number): BladesCard => Object.keys(BladesCardNameToValue).find(key => BladesCardNameToValue[key as BladesCard] === value) as BladesCard;
+export const getBladesCardValue = (name: BladesCard): number | undefined => _indexOrUndefined(Object.keys(BladesCard).indexOf(name));
+export const getBladesCardFromValue = (value: number): BladesCard | undefined => Object.keys(BladesCard)[value] as BladesCard;
+export const getBladesCardMap = (): Record<BladesCard, number> => Object.keys(BladesCard).reduce((acc, v, index) => { acc[v as BladesCard] = index; return acc; }, {} as Record<BladesCard, number>);
 
 // from: ../dojo/src/types/cards/cards.cairo
 export enum Rarity {
-  None = 'None',
-  Common = 'Common',
-  Uncommon = 'Uncommon',
-  Special = 'Special',
+  None = 'None', // 0
+  Common = 'Common', // 1
+  Uncommon = 'Uncommon', // 2
+  Special = 'Special', // 3
 };
-export const RarityNameToValue: Record<Rarity, number> = {
-  [Rarity.None]: 0,
-  [Rarity.Common]: 1,
-  [Rarity.Uncommon]: 2,
-  [Rarity.Special]: 3,
-};
-export const getRarityValue = (name: Rarity): number => (RarityNameToValue[name]);
-export const getRarityFromValue = (value: number): Rarity => Object.keys(RarityNameToValue).find(key => RarityNameToValue[key as Rarity] === value) as Rarity;
+export const getRarityValue = (name: Rarity): number | undefined => _indexOrUndefined(Object.keys(Rarity).indexOf(name));
+export const getRarityFromValue = (value: number): Rarity | undefined => Object.keys(Rarity)[value] as Rarity;
+export const getRarityMap = (): Record<Rarity, number> => Object.keys(Rarity).reduce((acc, v, index) => { acc[v as Rarity] = index; return acc; }, {} as Record<Rarity, number>);
 
 // from: ../dojo/src/types/cards/env.cairo
 export enum EnvCard {
-  None = 'None',
-  DamageUp = 'DamageUp',
-  DamageDown = 'DamageDown',
-  ChancesUp = 'ChancesUp',
-  ChancesDown = 'ChancesDown',
-  DoubleDamageUp = 'DoubleDamageUp',
-  DoubleChancesUp = 'DoubleChancesUp',
-  SpecialAllShotsHit = 'SpecialAllShotsHit',
-  SpecialAllShotsMiss = 'SpecialAllShotsMiss',
-  SpecialDoubleTactics = 'SpecialDoubleTactics',
-  SpecialNoTactics = 'SpecialNoTactics',
+  None = 'None', // 0
+  DamageUp = 'DamageUp', // 1
+  DamageDown = 'DamageDown', // 2
+  ChancesUp = 'ChancesUp', // 3
+  ChancesDown = 'ChancesDown', // 4
+  DoubleDamageUp = 'DoubleDamageUp', // 5
+  DoubleChancesUp = 'DoubleChancesUp', // 6
+  SpecialAllShotsHit = 'SpecialAllShotsHit', // 7
+  SpecialAllShotsMiss = 'SpecialAllShotsMiss', // 8
+  SpecialDoubleTactics = 'SpecialDoubleTactics', // 9
+  SpecialNoTactics = 'SpecialNoTactics', // 10
 };
-export const EnvCardNameToValue: Record<EnvCard, number> = {
-  [EnvCard.None]: 0,
-  [EnvCard.DamageUp]: 1,
-  [EnvCard.DamageDown]: 2,
-  [EnvCard.ChancesUp]: 3,
-  [EnvCard.ChancesDown]: 4,
-  [EnvCard.DoubleDamageUp]: 5,
-  [EnvCard.DoubleChancesUp]: 6,
-  [EnvCard.SpecialAllShotsHit]: 7,
-  [EnvCard.SpecialAllShotsMiss]: 8,
-  [EnvCard.SpecialDoubleTactics]: 9,
-  [EnvCard.SpecialNoTactics]: 10,
-};
-export const getEnvCardValue = (name: EnvCard): number => (EnvCardNameToValue[name]);
-export const getEnvCardFromValue = (value: number): EnvCard => Object.keys(EnvCardNameToValue).find(key => EnvCardNameToValue[key as EnvCard] === value) as EnvCard;
+export const getEnvCardValue = (name: EnvCard): number | undefined => _indexOrUndefined(Object.keys(EnvCard).indexOf(name));
+export const getEnvCardFromValue = (value: number): EnvCard | undefined => Object.keys(EnvCard)[value] as EnvCard;
+export const getEnvCardMap = (): Record<EnvCard, number> => Object.keys(EnvCard).reduce((acc, v, index) => { acc[v as EnvCard] = index; return acc; }, {} as Record<EnvCard, number>);
 
 // from: ../dojo/src/types/cards/hand.cairo
 export enum DeckType {
-  None = 'None',
-  Classic = 'Classic',
+  None = 'None', // 0
+  Classic = 'Classic', // 1
 };
-export const DeckTypeNameToValue: Record<DeckType, number> = {
-  [DeckType.None]: 0,
-  [DeckType.Classic]: 1,
-};
-export const getDeckTypeValue = (name: DeckType): number => (DeckTypeNameToValue[name]);
-export const getDeckTypeFromValue = (value: number): DeckType => Object.keys(DeckTypeNameToValue).find(key => DeckTypeNameToValue[key as DeckType] === value) as DeckType;
+export const getDeckTypeValue = (name: DeckType): number | undefined => _indexOrUndefined(Object.keys(DeckType).indexOf(name));
+export const getDeckTypeFromValue = (value: number): DeckType | undefined => Object.keys(DeckType)[value] as DeckType;
+export const getDeckTypeMap = (): Record<DeckType, number> => Object.keys(DeckType).reduce((acc, v, index) => { acc[v as DeckType] = index; return acc; }, {} as Record<DeckType, number>);
 
 // from: ../dojo/src/types/cards/paces.cairo
 export enum PacesCard {
-  None = 'None',
-  Paces1 = 'Paces1',
-  Paces2 = 'Paces2',
-  Paces3 = 'Paces3',
-  Paces4 = 'Paces4',
-  Paces5 = 'Paces5',
-  Paces6 = 'Paces6',
-  Paces7 = 'Paces7',
-  Paces8 = 'Paces8',
-  Paces9 = 'Paces9',
-  Paces10 = 'Paces10',
+  None = 'None', // 0
+  Paces1 = 'Paces1', // 1
+  Paces2 = 'Paces2', // 2
+  Paces3 = 'Paces3', // 3
+  Paces4 = 'Paces4', // 4
+  Paces5 = 'Paces5', // 5
+  Paces6 = 'Paces6', // 6
+  Paces7 = 'Paces7', // 7
+  Paces8 = 'Paces8', // 8
+  Paces9 = 'Paces9', // 9
+  Paces10 = 'Paces10', // 10
 };
-export const PacesCardNameToValue: Record<PacesCard, number> = {
-  [PacesCard.None]: 0,
-  [PacesCard.Paces1]: 1,
-  [PacesCard.Paces2]: 2,
-  [PacesCard.Paces3]: 3,
-  [PacesCard.Paces4]: 4,
-  [PacesCard.Paces5]: 5,
-  [PacesCard.Paces6]: 6,
-  [PacesCard.Paces7]: 7,
-  [PacesCard.Paces8]: 8,
-  [PacesCard.Paces9]: 9,
-  [PacesCard.Paces10]: 10,
-};
-export const getPacesCardValue = (name: PacesCard): number => (PacesCardNameToValue[name]);
-export const getPacesCardFromValue = (value: number): PacesCard => Object.keys(PacesCardNameToValue).find(key => PacesCardNameToValue[key as PacesCard] === value) as PacesCard;
+export const getPacesCardValue = (name: PacesCard): number | undefined => _indexOrUndefined(Object.keys(PacesCard).indexOf(name));
+export const getPacesCardFromValue = (value: number): PacesCard | undefined => Object.keys(PacesCard)[value] as PacesCard;
+export const getPacesCardMap = (): Record<PacesCard, number> => Object.keys(PacesCard).reduce((acc, v, index) => { acc[v as PacesCard] = index; return acc; }, {} as Record<PacesCard, number>);
 
 // from: ../dojo/src/types/cards/tactics.cairo
 export enum TacticsCard {
-  None = 'None',
-  Insult = 'Insult',
-  CoinToss = 'CoinToss',
-  Vengeful = 'Vengeful',
-  ThickCoat = 'ThickCoat',
-  Reversal = 'Reversal',
-  Bananas = 'Bananas',
+  None = 'None', // 0
+  Insult = 'Insult', // 1
+  CoinToss = 'CoinToss', // 2
+  Vengeful = 'Vengeful', // 3
+  ThickCoat = 'ThickCoat', // 4
+  Reversal = 'Reversal', // 5
+  Bananas = 'Bananas', // 6
 };
-export const TacticsCardNameToValue: Record<TacticsCard, number> = {
-  [TacticsCard.None]: 0,
-  [TacticsCard.Insult]: 1,
-  [TacticsCard.CoinToss]: 2,
-  [TacticsCard.Vengeful]: 3,
-  [TacticsCard.ThickCoat]: 4,
-  [TacticsCard.Reversal]: 5,
-  [TacticsCard.Bananas]: 6,
-};
-export const getTacticsCardValue = (name: TacticsCard): number => (TacticsCardNameToValue[name]);
-export const getTacticsCardFromValue = (value: number): TacticsCard => Object.keys(TacticsCardNameToValue).find(key => TacticsCardNameToValue[key as TacticsCard] === value) as TacticsCard;
+export const getTacticsCardValue = (name: TacticsCard): number | undefined => _indexOrUndefined(Object.keys(TacticsCard).indexOf(name));
+export const getTacticsCardFromValue = (value: number): TacticsCard | undefined => Object.keys(TacticsCard)[value] as TacticsCard;
+export const getTacticsCardMap = (): Record<TacticsCard, number> => Object.keys(TacticsCard).reduce((acc, v, index) => { acc[v as TacticsCard] = index; return acc; }, {} as Record<TacticsCard, number>);
 
 // from: ../dojo/src/types/challenge_state.cairo
 export enum ChallengeState {
-  Null = 'Null',
-  Awaiting = 'Awaiting',
-  Withdrawn = 'Withdrawn',
-  Refused = 'Refused',
-  Expired = 'Expired',
-  InProgress = 'InProgress',
-  Resolved = 'Resolved',
-  Draw = 'Draw',
+  Null = 'Null', // 0
+  Awaiting = 'Awaiting', // 1
+  Withdrawn = 'Withdrawn', // 2
+  Refused = 'Refused', // 3
+  Expired = 'Expired', // 4
+  InProgress = 'InProgress', // 5
+  Resolved = 'Resolved', // 6
+  Draw = 'Draw', // 7
 };
-export const ChallengeStateNameToValue: Record<ChallengeState, number> = {
-  [ChallengeState.Null]: 0,
-  [ChallengeState.Awaiting]: 1,
-  [ChallengeState.Withdrawn]: 2,
-  [ChallengeState.Refused]: 3,
-  [ChallengeState.Expired]: 4,
-  [ChallengeState.InProgress]: 5,
-  [ChallengeState.Resolved]: 6,
-  [ChallengeState.Draw]: 7,
-};
-export const getChallengeStateValue = (name: ChallengeState): number => (ChallengeStateNameToValue[name]);
-export const getChallengeStateFromValue = (value: number): ChallengeState => Object.keys(ChallengeStateNameToValue).find(key => ChallengeStateNameToValue[key as ChallengeState] === value) as ChallengeState;
+export const getChallengeStateValue = (name: ChallengeState): number | undefined => _indexOrUndefined(Object.keys(ChallengeState).indexOf(name));
+export const getChallengeStateFromValue = (value: number): ChallengeState | undefined => Object.keys(ChallengeState)[value] as ChallengeState;
+export const getChallengeStateMap = (): Record<ChallengeState, number> => Object.keys(ChallengeState).reduce((acc, v, index) => { acc[v as ChallengeState] = index; return acc; }, {} as Record<ChallengeState, number>);
 
 // from: ../dojo/src/types/duel_progress.cairo
 export enum DuelistDrawnCard {
-  None = 'None',
-  Fire = 'Fire',
-  Dodge = 'Dodge',
-  Blades = 'Blades',
+  None = 'None', // 0
+  Fire = 'Fire', // 1
+  Dodge = 'Dodge', // 2
+  Blades = 'Blades', // 3
 };
-export const DuelistDrawnCardNameToValue: Record<DuelistDrawnCard, number> = {
-  [DuelistDrawnCard.None]: 0,
-  [DuelistDrawnCard.Fire]: 1,
-  [DuelistDrawnCard.Dodge]: 2,
-  [DuelistDrawnCard.Blades]: 3,
-};
-export const getDuelistDrawnCardValue = (name: DuelistDrawnCard): number => (DuelistDrawnCardNameToValue[name]);
-export const getDuelistDrawnCardFromValue = (value: number): DuelistDrawnCard => Object.keys(DuelistDrawnCardNameToValue).find(key => DuelistDrawnCardNameToValue[key as DuelistDrawnCard] === value) as DuelistDrawnCard;
+export const getDuelistDrawnCardValue = (name: DuelistDrawnCard): number | undefined => _indexOrUndefined(Object.keys(DuelistDrawnCard).indexOf(name));
+export const getDuelistDrawnCardFromValue = (value: number): DuelistDrawnCard | undefined => Object.keys(DuelistDrawnCard)[value] as DuelistDrawnCard;
+export const getDuelistDrawnCardMap = (): Record<DuelistDrawnCard, number> => Object.keys(DuelistDrawnCard).reduce((acc, v, index) => { acc[v as DuelistDrawnCard] = index; return acc; }, {} as Record<DuelistDrawnCard, number>);
 
 // from: ../dojo/src/types/premise.cairo
 export enum Premise {
-  Undefined = 'Undefined',
-  Matter = 'Matter',
-  Debt = 'Debt',
-  Dispute = 'Dispute',
-  Honour = 'Honour',
-  Hatred = 'Hatred',
-  Blood = 'Blood',
-  Nothing = 'Nothing',
-  Tournament = 'Tournament',
+  Undefined = 'Undefined', // 0
+  Matter = 'Matter', // 1
+  Debt = 'Debt', // 2
+  Dispute = 'Dispute', // 3
+  Honour = 'Honour', // 4
+  Hatred = 'Hatred', // 5
+  Blood = 'Blood', // 6
+  Nothing = 'Nothing', // 7
+  Tournament = 'Tournament', // 8
 };
-export const PremiseNameToValue: Record<Premise, number> = {
-  [Premise.Undefined]: 0,
-  [Premise.Matter]: 1,
-  [Premise.Debt]: 2,
-  [Premise.Dispute]: 3,
-  [Premise.Honour]: 4,
-  [Premise.Hatred]: 5,
-  [Premise.Blood]: 6,
-  [Premise.Nothing]: 7,
-  [Premise.Tournament]: 8,
-};
-export const getPremiseValue = (name: Premise): number => (PremiseNameToValue[name]);
-export const getPremiseFromValue = (value: number): Premise => Object.keys(PremiseNameToValue).find(key => PremiseNameToValue[key as Premise] === value) as Premise;
+export const getPremiseValue = (name: Premise): number | undefined => _indexOrUndefined(Object.keys(Premise).indexOf(name));
+export const getPremiseFromValue = (value: number): Premise | undefined => Object.keys(Premise)[value] as Premise;
+export const getPremiseMap = (): Record<Premise, number> => Object.keys(Premise).reduce((acc, v, index) => { acc[v as Premise] = index; return acc; }, {} as Record<Premise, number>);
 
 // from: ../dojo/src/types/profile_type.cairo
 export enum ProfileType {
-  Undefined = 'Undefined',
-  Duelist = 'Duelist',
-  Bot = 'Bot',
+  Undefined = 'Undefined', // 0
+  Duelist = 'Duelist', // 1
+  Bot = 'Bot', // 2
 };
-export const ProfileTypeNameToValue: Record<ProfileType, number> = {
-  [ProfileType.Undefined]: 0,
-  [ProfileType.Duelist]: 1,
-  [ProfileType.Bot]: 2,
-};
-export const getProfileTypeValue = (name: ProfileType): number => (ProfileTypeNameToValue[name]);
-export const getProfileTypeFromValue = (value: number): ProfileType => Object.keys(ProfileTypeNameToValue).find(key => ProfileTypeNameToValue[key as ProfileType] === value) as ProfileType;
+export const getProfileTypeValue = (name: ProfileType): number | undefined => _indexOrUndefined(Object.keys(ProfileType).indexOf(name));
+export const getProfileTypeFromValue = (value: number): ProfileType | undefined => Object.keys(ProfileType)[value] as ProfileType;
+export const getProfileTypeMap = (): Record<ProfileType, number> => Object.keys(ProfileType).reduce((acc, v, index) => { acc[v as ProfileType] = index; return acc; }, {} as Record<ProfileType, number>);
 
 // from: ../dojo/src/types/round_state.cairo
 export enum RoundState {
-  Null = 'Null',
-  Commit = 'Commit',
-  Reveal = 'Reveal',
-  Finished = 'Finished',
+  Null = 'Null', // 0
+  Commit = 'Commit', // 1
+  Reveal = 'Reveal', // 2
+  Finished = 'Finished', // 3
 };
-export const RoundStateNameToValue: Record<RoundState, number> = {
-  [RoundState.Null]: 0,
-  [RoundState.Commit]: 1,
-  [RoundState.Reveal]: 2,
-  [RoundState.Finished]: 3,
-};
-export const getRoundStateValue = (name: RoundState): number => (RoundStateNameToValue[name]);
-export const getRoundStateFromValue = (value: number): RoundState => Object.keys(RoundStateNameToValue).find(key => RoundStateNameToValue[key as RoundState] === value) as RoundState;
+export const getRoundStateValue = (name: RoundState): number | undefined => _indexOrUndefined(Object.keys(RoundState).indexOf(name));
+export const getRoundStateFromValue = (value: number): RoundState | undefined => Object.keys(RoundState)[value] as RoundState;
+export const getRoundStateMap = (): Record<RoundState, number> => Object.keys(RoundState).reduce((acc, v, index) => { acc[v as RoundState] = index; return acc; }, {} as Record<RoundState, number>);
 
 //
 // constants

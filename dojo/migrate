@@ -98,6 +98,7 @@ if [[ "$PROFILE" == "dev" ]]; then
   #
   # constant generator
   # npm run create-constants --sdk=../sdk/src/games/pistols
+  # ../sdk/bin/generateConstants.cjs --src:"../dojo/src" --out:"../sdk/src/games/pistols/generated/constants.ts"
   echo "------------------------------------------------------------------------------"
   echo ">>> Generate sources..."
   cd ../client

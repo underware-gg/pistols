@@ -218,7 +218,7 @@ export const Field = ({
             : fieldType == FieldType.TableType ? <>
               {value}
               <FormSelectFromMap
-                map={constants.TableTypeNameToValue}
+                map={constants.getTableTypeMap()}
                 label={name}
                 disabled={readOnly}
                 value={value}
@@ -227,7 +227,7 @@ export const Field = ({
             </> : fieldType == FieldType.DeckType ? <>
               {value}
               <FormSelectFromMap
-                map={constants.DeckTypeNameToValue}
+                map={constants.getDeckTypeMap()}
                 label={name}
                 disabled={readOnly}
                 value={value}

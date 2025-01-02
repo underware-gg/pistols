@@ -88,7 +88,7 @@ export function make_typed_data_PPlayerTutorialProgress({
       progress: 'TutorialProgress',
     },
     {
-      TutorialProgress: makeEnumType(constants.TutorialProgressNameToValue)
+      TutorialProgress: makeEnumType(Object.keys(constants.TutorialProgress))
     }
   )
 }
@@ -96,11 +96,12 @@ export function make_typed_data_PPlayerTutorialProgress({
 
 //
 // example: from...
-// export const TutorialProgressNameToValue: Record<TutorialProgress, number> = {
-//   [TutorialProgress.None]: 0,
-//   [TutorialProgress.FinishedFirst]: 1,
-//   [TutorialProgress.FinishedSecond]: 2,
-//   [TutorialProgress.FinishedFirstDuel]: 3,
+//
+// export enum TutorialProgress {
+//   None = 'None', // 0
+//   FinishedFirst = 'FinishedFirst', // 1
+//   FinishedSecond = 'FinishedSecond', // 2
+//   FinishedFirstDuel = 'FinishedFirstDuel', // 3
 // };
 //
 // to...
@@ -110,8 +111,9 @@ export function make_typed_data_PPlayerTutorialProgress({
 //   { name: 'FinishedSecond', type: '()' },
 //   { name: 'FinishedFirstDuel', type: '()' },
 // ]
-function makeEnumType(enumValues: Record<string, number>): StarknetType[] {
-  return Object.keys(enumValues).map(name => ({
+//
+function makeEnumType(enumNames: string[]): StarknetType[] {
+  return enumNames.map(name => ({
     name,
     type: '()',
   }))
