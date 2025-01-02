@@ -186,7 +186,7 @@ pub mod pack_token {
         fn can_claim_welcome_pack(self: @ContractState, recipient: ContractAddress) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let player: Player = store.get_player(recipient);
-            (!player.exists())
+            (!player.claimed_welcome_pack)
         }
 
         fn can_purchase(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> bool {

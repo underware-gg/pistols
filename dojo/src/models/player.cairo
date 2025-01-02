@@ -32,6 +32,7 @@ pub struct Player {
     pub address: ContractAddress,   // controller wallet
     //-----------------------
     pub timestamp_registered: u64,
+    pub claimed_welcome_pack: bool,
 }
 
 
@@ -107,6 +108,10 @@ impl PlayerImpl of PlayerTrait {
         if (!player.exists()) {
             assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
             player.timestamp_registered = get_block_timestamp();
+            player.claimed_welcome_pack = (activity == Activity::WelcomePack);
+            store.set_player(@player);
+        } else if (activity == Activity::WelcomePack) {
+            player.claimed_welcome_pack = true;
             store.set_player(@player);
         }
         activity.emit(ref store.world, address, identifier);
@@ -126,11 +131,17 @@ impl ActivityImpl of ActivityTrait {
             timestamp: get_block_timestamp(),
             activity: self,
             identifier,
+            is_public: self.is_public(),
         });
     }
     fn can_register_player(self: Activity) -> bool {
         match self {
             Activity::WelcomePack => true,
+            Activity::StartedTutorial => true,
+            Activity::FinishedTutorial => true,
+            Activity::CreatedDuelist => true,
+            Activity::CreatedChallenge => true,
+            Activity::RepliedChallenge => true,
             _ => false,
         }
     }

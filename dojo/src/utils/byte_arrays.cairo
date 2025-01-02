@@ -52,6 +52,16 @@ impl ByteArraySpanIntoByteArray of Into<@ByteArray, ByteArray> {
 }
 
 
+//---------------------
+// Converters (literal)
+//
+#[generate_trait]
+impl BoolToByteArrayImpl of BoolToByteArrayTrait {
+    #[inline(always)]
+    fn as_string(self: bool) -> ByteArray { if (self) { "True" } else { "False" } }
+}
+
+
 //----------------------------------------
 // Unit  tests
 //

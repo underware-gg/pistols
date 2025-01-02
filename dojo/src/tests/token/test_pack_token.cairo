@@ -279,6 +279,7 @@ fn test_claim_mint() {
 
     let player: Player = tester::get_Player(sys.world, OWNER());
     assert(!player.exists(), '!player.exists()');
+    assert(player.claimed_welcome_pack == false, '!player.claimed_welcome_pack');
 
     sys.token.claim_welcome_pack();
     _assert_minted_count(sys.world, sys.token, 1, 'total_supply 1');
@@ -286,6 +287,7 @@ fn test_claim_mint() {
 
     let player: Player = tester::get_Player(sys.world, OWNER());
     assert(player.exists(), 'player.exists()');
+    assert(player.claimed_welcome_pack == true, 'player.claimed_welcome_pack');
     let pack_1: Pack = tester::get_Pack(sys.world, TOKEN_ID_1.low);
     assert(pack_1.pack_id == TOKEN_ID_1.low, 'pack_1.pack_id');
     assert(pack_1.pack_type == PackType::WelcomePack, 'pack_1.pack_type');
