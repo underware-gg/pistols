@@ -32,7 +32,7 @@ export const getArchetypeMap = (): Record<Archetype, number> => Object.keys(Arch
 
 // from: ../dojo/src/models/pack.cairo
 export enum PackType {
-  Undefined = 'Undefined', // 0
+  Unknown = 'Unknown', // 0
   WelcomePack = 'WelcomePack', // 1
   Duelists5x = 'Duelists5x', // 2
 };
@@ -239,6 +239,16 @@ export const getRoundStateMap = (): Record<RoundState, number> => Object.keys(Ro
 // constants
 //
 
+// from: ../dojo/src/models/pack.cairo
+export type PackDescription = {
+  id : string,
+  name : string,
+  image_url_closed : string,
+  image_url_open : string,
+  can_purchase : boolean,
+  price : BigNumberish,
+};
+
 // from: ../dojo/src/types/cards/cards.cairo
 export type CardPoints = {
   name : string,
@@ -305,6 +315,39 @@ type type_CONFIG = {
 };
 export const CONFIG: type_CONFIG = {
   CONFIG_KEY: 1,
+};
+
+// from: ../dojo/src/models/pack.cairo
+type type_PACK_TYPES = {
+  Unknown: PackDescription, // cairo: PackDescription
+  WelcomePack: PackDescription, // cairo: PackDescription
+  Duelists5x: PackDescription, // cairo: PackDescription
+};
+export const PACK_TYPES: type_PACK_TYPES = {
+  Unknown: {
+    id: 'Unknown',
+    name: 'Unknown',
+    image_url_closed: '/tokens/Unknown.jpg',
+    image_url_open: '/tokens/Unknown.jpg',
+    can_purchase: false,
+    price: 0,
+  },
+  WelcomePack: {
+    id: 'WelcomePack',
+    name: 'Welcome Pack',
+    image_url_closed: '/tokens/WelcomePack.jpg',
+    image_url_open: '/tokens/WelcomePack.jpg',
+    can_purchase: false,
+    price: 0,
+  },
+  Duelists5x: {
+    id: 'Duelists5x',
+    name: 'Duelists 5-pack',
+    image_url_closed: '/tokens/Duelists5x.jpg',
+    image_url_open: '/tokens/Duelists5x.jpg',
+    can_purchase: true,
+      price: 100,
+  },
 };
 
 // from: ../dojo/src/models/player.cairo

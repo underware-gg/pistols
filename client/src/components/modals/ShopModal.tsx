@@ -11,6 +11,7 @@ import { FeesToPay } from '/src/components/account/LordsBalance'
 import { SceneName } from '/src/data/assets'
 import { Opener } from '/src/hooks/useOpener'
 import { Divider } from '/src/components/ui/Divider'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -69,11 +70,11 @@ export default function DuelistEditModal({
         <Grid className='OnboardingProfile'>
           <Row textAlign='center' verticalAlign='top'>
             <Col width={5} textAlign='left' className='PaddedSides'>
-              <Image src={`/tokens/${packType}.png`} />
+              <Image src={constants.PACK_TYPES[packType].image_url_closed} />
             </Col>
             <Col width={9} textAlign='left' className='PaddedSides'>
 
-              <h1>{packType}</h1>
+              <h1>{constants.PACK_TYPES[packType].name}</h1>
 
               <Divider />
 

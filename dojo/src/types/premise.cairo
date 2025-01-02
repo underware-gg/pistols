@@ -68,6 +68,11 @@ mod PREMISES {
     };
 }
 
+
+//--------------------
+// Traits
+//
+
 #[generate_trait]
 impl PremiseTraitImpl of PremiseTrait {
     fn name(self: Premise) -> felt252 {

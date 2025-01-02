@@ -132,7 +132,7 @@ pub mod duelist_token {
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::metadata::{MetadataTrait};
-    use pistols::utils::short_string::ShortStringTrait;
+    use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::math::{MathTrait};
 
     mod Errors {

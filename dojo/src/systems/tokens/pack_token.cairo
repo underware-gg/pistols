@@ -355,7 +355,7 @@ pub mod pack_token {
             let pack: PackValue = store.get_pack_value(token_id.low);
             (format!("{}{}",
                 self.erc721._base_uri(),
-                pack.pack_type.image_url(),
+                pack.pack_type.image_url(pack.is_open),
             ))
         }
 
