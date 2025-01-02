@@ -1,4 +1,12 @@
 // use debug::PrintTrait;
+use pistols::utils::byte_arrays::{
+    U8IntoByteArray,
+    U16IntoByteArray,
+    U32IntoByteArray,
+    U64IntoByteArray,
+    U128IntoByteArray,
+    U256IntoByteArray,
+};
 
 trait MathTrait<T,TI> {
     // absolute value
@@ -9,12 +17,12 @@ trait MathTrait<T,TI> {
     fn max(a: T, b: T) -> T;
     // returns a value clamped between min and max
     fn clamp(v: T, min: T, max: T) -> T;
-    fn clampi(ref self: T, min: T, max: T); // in-place
-    // safe subtraction
+    fn clampi(ref self: T, min: T, max: T); // in-place clamp()
+    // safe substraction
     fn sub(a: T, b: T) -> T;
     fn add(a: T, b: TI) -> T;
-    fn subi(ref self: T, v: T);  // in-place
-    fn addi(ref self: T, v: TI); // in-place
+    fn subi(ref self: T, v: T);  // in-place sub()
+    fn addi(ref self: T, v: TI); // in-place add()
     // returns GDC of two numbers
     fn gdc(a: T, b: T) -> T;
     // map a value form one range to another
@@ -24,8 +32,8 @@ trait MathTrait<T,TI> {
     // quared distance in 2D space
     fn squaredDistance(x1: T, y1: T, x2: T, y2: T) -> T;
     // converters
-    fn as_felt(self: T) -> felt252;
-    fn as_string(self: T) -> ByteArray;
+    fn to_felt(self: T) -> felt252;
+    fn to_string(self: T) -> ByteArray;
 }
 
 impl MathU8 of MathTrait<u8,i8> {
@@ -116,13 +124,13 @@ impl MathU8 of MathTrait<u8,i8> {
         (dx * dx + dy * dy)
     }
 
-    fn as_felt(self: u8) -> felt252 {
+    fn to_felt(self: u8) -> felt252 {
         let result: felt252 = self.into();
         (result)
     }
     #[inline(always)]
-    fn as_string(self: u8) -> ByteArray {
-        (format!("{}", self))
+    fn to_string(self: u8) -> ByteArray {
+        (self.into())
     }
 }
 
@@ -181,13 +189,13 @@ impl MathU16 of MathTrait<u16, i16> {
         (dx * dx + dy * dy)
     }
 
-    fn as_felt(self: u16) -> felt252 {
+    fn to_felt(self: u16) -> felt252 {
         let result: felt252 = self.into();
         (result)
     }
     #[inline(always)]
-    fn as_string(self: u16) -> ByteArray {
-        (format!("{}", self))
+    fn to_string(self: u16) -> ByteArray {
+        (self.into())
     }
 }
 
@@ -245,13 +253,13 @@ impl MathU32 of MathTrait<u32, i32> {
         (dx * dx + dy * dy)
     }
 
-    fn as_felt(self: u32) -> felt252 {
+    fn to_felt(self: u32) -> felt252 {
         let result: felt252 = self.into();
         (result)
     }
     #[inline(always)]
-    fn as_string(self: u32) -> ByteArray {
-        (format!("{}", self))
+    fn to_string(self: u32) -> ByteArray {
+        (self.into())
     }
 }
 
@@ -309,13 +317,13 @@ impl MathU64 of MathTrait<u64, i64> {
         (dx * dx + dy * dy)
     }
 
-    fn as_felt(self: u64) -> felt252 {
+    fn to_felt(self: u64) -> felt252 {
         let result: felt252 = self.into();
         (result)
     }
     #[inline(always)]
-    fn as_string(self: u64) -> ByteArray {
-        (format!("{}", self))
+    fn to_string(self: u64) -> ByteArray {
+        (self.into())
     }
 }
 
@@ -386,13 +394,13 @@ impl MathU128 of MathTrait<u128, i128> {
         (dx * dx + dy * dy)
     }
 
-    fn as_felt(self: u128) -> felt252 {
+    fn to_felt(self: u128) -> felt252 {
         let result: felt252 = self.into();
         (result)
     }
     #[inline(always)]
-    fn as_string(self: u128) -> ByteArray {
-        (format!("{}", self))
+    fn to_string(self: u128) -> ByteArray {
+        (self.into())
     }
 }
 
@@ -456,13 +464,13 @@ impl MathU256 of MathTrait<u256, u256> {
         (dx * dx + dy * dy)
     }
 
-    fn as_felt(self: u256) -> felt252 {
+    fn to_felt(self: u256) -> felt252 {
         let result: felt252 = self.try_into().unwrap();
         (result)
     }
     #[inline(always)]
-    fn as_string(self: u256) -> ByteArray {
-        (format!("{}", self))
+    fn to_string(self: u256) -> ByteArray {
+        (self.into())
     }
 }
 

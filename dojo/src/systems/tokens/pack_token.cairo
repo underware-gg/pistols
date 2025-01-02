@@ -151,7 +151,7 @@ pub mod pack_token {
         self.erc721.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            format!("https://{}",base_uri.as_string()),
+            format!("https://{}",base_uri.to_string()),
         );
         let payment = Payment {
             key: get_contract_address().into(),
@@ -374,7 +374,7 @@ pub mod pack_token {
             result.append("Type");
             result.append(pack.pack_type.name());
             result.append("Is Open");
-            result.append(pack.is_open.as_string());
+            result.append(pack.is_open.to_string());
             // done!
             (result.span())
         }

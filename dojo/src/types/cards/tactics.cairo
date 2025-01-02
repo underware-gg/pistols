@@ -155,7 +155,7 @@ impl TacticsCardPrintImpl of PrintTrait<TacticsCard> {
 // for println! and format!
 impl TacticsCardDisplay of Display<TacticsCard> {
     fn fmt(self: @TacticsCard, ref f: Formatter) -> Result<(), Error> {
-        let name: ByteArray = (*self).get_points().name.as_string();
+        let name: ByteArray = (*self).get_points().name.to_string();
         let value: u8 = (*self).into();
         let str: ByteArray = format!("({}:{})", value, name);
         f.buffer.append(@str);

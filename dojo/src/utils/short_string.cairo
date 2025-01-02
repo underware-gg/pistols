@@ -3,7 +3,7 @@ use pistols::utils::bitwise::{BitwiseU256};
 
 trait ShortStringTrait {
     fn strlen(self: felt252) -> usize;
-    fn as_string(self: felt252) -> ByteArray;
+    fn to_string(self: felt252) -> ByteArray;
     fn concat(self: felt252, value: felt252) -> felt252;
     fn join(self: felt252, value: felt252) -> felt252;
 }
@@ -19,7 +19,7 @@ impl ShortString of ShortStringTrait {
         (result)
     }
 
-    fn as_string(self: felt252) -> ByteArray {
+    fn to_string(self: felt252) -> ByteArray {
         // alternative: core::to_byte_array::FormatAsByteArray
         let mut result: ByteArray = "";
         result.append_word(self, self.strlen());
@@ -77,11 +77,11 @@ mod tests {
     
     #[test]
     fn test_string() {
-        assert(0.as_string() == "", 'not 0');
-        assert(''.as_string() == "", 'not empty');
-        assert('1'.as_string() == "1", 'not 1');
-        assert('Hey'.as_string() == "Hey", 'not Hey');
-        assert('Hey World'.as_string() == "Hey World", 'not Hey World');
-        assert('1234567890123456789012345678901'.as_string() == "1234567890123456789012345678901", 'not 31');
+        assert(0.to_string() == "", 'not 0');
+        assert(''.to_string() == "", 'not empty');
+        assert('1'.to_string() == "1", 'not 1');
+        assert('Hey'.to_string() == "Hey", 'not Hey');
+        assert('Hey World'.to_string() == "Hey World", 'not Hey World');
+        assert('1234567890123456789012345678901'.to_string() == "1234567890123456789012345678901", 'not 31');
     }
 }

@@ -225,7 +225,7 @@ fn mint(token: IDuelTokenDispatcher, recipient: ContractAddress, duelist_a: u256
     tester::impersonate(recipient);
     token.create_duel(
         duelist_id: duelist_a.low,
-        challenged_id_or_address: duelist_b.as_felt().try_into().unwrap(),
+        challenged_id_or_address: duelist_b.to_felt().try_into().unwrap(),
         premise: Premise::Honour,
         quote: 'For honour!!!',
         table_id: TABLES::LORDS,

@@ -193,7 +193,7 @@ pub mod duel_token {
         self.erc721.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            format!("https://{}",base_uri.as_string()),
+            format!("https://{}",base_uri.to_string()),
         );
         self.token.initialize(
             minter_address,
@@ -497,15 +497,15 @@ pub mod duel_token {
             let duelist_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);
             // Meta
             result.append("Table");
-            result.append(challenge.table_id.as_string());
+            result.append(challenge.table_id.to_string());
             result.append("Challenger");
             result.append(duelist_a.clone());
             result.append("Challenged");
             result.append(duelist_b.clone());
             result.append("Premise");
-            result.append(challenge.premise.name().as_string());
+            result.append(challenge.premise.name().to_string());
             result.append("Quote");
-            result.append(challenge.quote.as_string());
+            result.append(challenge.quote.to_string());
             result.append("State");
             result.append(challenge.state.into());
             if (challenge.winner != 0) {

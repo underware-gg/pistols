@@ -64,8 +64,8 @@ use pistols::utils::math::{MathU64};
 impl DuelistTraitImpl of DuelistTrait {
     fn is_owner(self: Duelist, address: ContractAddress) -> bool {
         // for testing
-        let address_felt: felt252 = address.into();
-        if (address_felt == self.duelist_id.into()) { return (true); }
+        let as_felt: felt252 = address.into();
+        if (as_felt == self.duelist_id.into()) { return (true); }
         (false)
     }
     // try to convert a challenged account address to duelist id

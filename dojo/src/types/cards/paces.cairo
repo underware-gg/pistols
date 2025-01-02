@@ -24,7 +24,7 @@ use pistols::types::cards::hand::{DeckType};
 
 #[generate_trait]
 impl PacesCardImpl of PacesCardTrait {
-    fn as_felt(self: PacesCard) -> felt252 {
+    fn to_felt(self: PacesCard) -> felt252 {
         let result: u8 = self.into();
         (result.into())
     }

@@ -256,7 +256,7 @@ impl U8IntoEnvCard of Into<u8, EnvCard> {
 // for println! and format!
 impl EnvCardDisplay of Display<EnvCard> {
     fn fmt(self: @EnvCard, ref f: Formatter) -> Result<(), Error> {
-        let name: ByteArray = (*self).get_points().name.as_string();
+        let name: ByteArray = (*self).get_points().name.to_string();
         let value: u8 = (*self).into();
         let str: ByteArray = format!("({}:{})", value, name);
         f.buffer.append(@str);

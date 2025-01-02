@@ -193,7 +193,7 @@ impl U8IntoBladesCard of Into<u8, BladesCard> {
 // for println! and format!
 impl BladesCardDisplay of Display<BladesCard> {
     fn fmt(self: @BladesCard, ref f: Formatter) -> Result<(), Error> {
-        let name: ByteArray = (*self).get_points().name.as_string();
+        let name: ByteArray = (*self).get_points().name.to_string();
         let value: u8 = (*self).into();
         let str: ByteArray = format!("({}:{})", value, name);
         f.buffer.append(@str);

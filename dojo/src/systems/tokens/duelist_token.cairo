@@ -156,7 +156,7 @@ pub mod duelist_token {
         self.erc721.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            format!("https://{}",base_uri.as_string()),
+            format!("https://{}",base_uri.to_string()),
         );
         self.token.initialize(
             self.world(@"pistols").pack_token_address(),
@@ -349,7 +349,7 @@ pub mod duelist_token {
             let mut store: Store = StoreTrait::new(world);
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
             (format!("{} #{}",
-                duelist.profile_type.name().as_string(),
+                duelist.profile_type.name().to_string(),
                 token_id
             ))
         }
@@ -407,21 +407,21 @@ pub mod duelist_token {
             let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
             let fame_balance: u256 = fame_dispatcher.balance_of_token(get_contract_address(), token_id.low) / CONST::ETH_TO_WEI;
             result.append("Fame");
-            result.append(fame_balance.as_string());
+            result.append(fame_balance.to_string());
             result.append("Alive");
             result.append(if (fame_balance != 0) {"Alive"} else {"Dead"});
             // Totals
             result.append("Total Duels");
-            result.append(duelist.score.total_duels.as_string());
+            result.append(duelist.score.total_duels.to_string());
             if (duelist.score.total_duels != 0) {
                 result.append("Total Wins");
-                result.append(duelist.score.total_wins.as_string());
+                result.append(duelist.score.total_wins.to_string());
 
                 result.append("Total Losses");
-                result.append(duelist.score.total_losses.as_string());
+                result.append(duelist.score.total_losses.to_string());
                 
                 result.append("Total Draws");
-                result.append(duelist.score.total_draws.as_string());
+                result.append(duelist.score.total_draws.to_string());
             }
             // done!
             (result.span())
