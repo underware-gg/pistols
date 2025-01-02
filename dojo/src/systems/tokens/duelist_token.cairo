@@ -311,7 +311,7 @@ pub mod duelist_token {
     //-----------------------------------
     // ERC721HooksTrait
     //
-    use pistols::systems::components::erc721_hooks::{TokenConfigRenderTrait};
+    use pistols::systems::components::erc721_hooks::{TokenRendererTrait};
     pub impl ERC721HooksImpl of ERC721Component::ERC721HooksTrait<ContractState> {
         fn before_update(ref self: ERC721Component::ComponentState<ContractState>,
             to: ContractAddress,
@@ -332,9 +332,7 @@ pub mod duelist_token {
 
         // same as ERC721HooksImpl::token_uri()
         fn token_uri(self: @ERC721Component::ComponentState<ContractState>, token_id: u256) -> ByteArray {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
-            let mut store: Store = StoreTrait::new(world);
-            (store.get_token_config(get_contract_address()).render(token_id))
+            (self.get_contract().render_token_uri(token_id))
         }
     }
 

@@ -47,21 +47,23 @@ pub impl ERC721HooksImpl<
         self: @ERC721Component::ComponentState<TContractState>,
         token_id: u256,
     ) -> ByteArray {
-        let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
-        let mut store: Store = StoreTrait::new(world);
-        let token_config: TokenConfig = store.get_token_config(get_contract_address());
-        (token_config.render(token_id))
+        (self.get_contract().render_token_uri(token_id))
     }
 }
 
 #[generate_trait]
-impl TokenConfigRenderImpl of TokenConfigRenderTrait {
-    fn render(self: TokenConfig,
-        token_id: u256,
-    ) -> ByteArray {
+impl TokenConfigRenderImpl<
+    TContractState,
+    +IWorldProvider<TContractState>,
+    +ITokenRenderer<TContractState>,
+> of TokenRendererTrait<TContractState> {
+    fn render_token_uri(self: @TContractState, token_id: u256) -> ByteArray {
+        let mut world = SystemsTrait::storage(self.world_dispatcher(), @"pistols");
+        let mut store: Store = StoreTrait::new(world);
+        let token_config: TokenConfig = store.get_token_config(get_contract_address());
         let renderer = ITokenRendererDispatcher{
-            contract_address: if (self.renderer_address).is_non_zero() {
-                (self.renderer_address)
+            contract_address: if (token_config.renderer_address).is_non_zero() {
+                (token_config.renderer_address)
             } else {
                 (get_contract_address())
             }
