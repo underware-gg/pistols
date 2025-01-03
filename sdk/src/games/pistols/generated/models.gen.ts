@@ -1,3 +1,4 @@
+//@ts-nocheck
 import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
 import { CairoCustomEnum, BigNumberish } from 'starknet';
@@ -263,6 +264,7 @@ export interface Player {
 // Type definition for `pistols::models::player::PlayerValue` struct
 export interface PlayerValue {
 	timestamp_registered: BigNumberish;
+  claimed_welcome_pack: boolean;
 }
 
 // Type definition for `pistols::models::player::PlayerActivity` struct
@@ -280,7 +282,6 @@ export interface PlayerActivityValue {
   activity: Activity;
   identifier: BigNumberish;
   is_public: boolean;
-	claimed_welcome_pack: boolean;
 }
 
 // Type definition for `pistols::models::table::TableAdmittance` struct
@@ -430,7 +431,7 @@ export enum DuelistProfile {
 
 // Type definition for `pistols::types::profile_type::ProfileType` enum
 export type ProfileType = {
-	Undefined: ();
+	Undefined: string;
 	Duelist: DuelistProfile;
 	Bot: BotProfile;
 }
@@ -610,7 +611,7 @@ export const schema: SchemaType = {
 			fieldOrder: ['duelist_id', 'profile_type', 'timestamp', 'score'],
 			duelist_id: 0,
 		profile_type: new CairoCustomEnum({ 
-					Undefined: (),
+					Undefined: "",
 				duelist: undefined,
 				bot: undefined, }),
 			timestamp: 0,
@@ -619,7 +620,7 @@ export const schema: SchemaType = {
 		DuelistValue: {
 			fieldOrder: ['profile_type', 'timestamp', 'score'],
 		profile_type: new CairoCustomEnum({ 
-					Undefined: (),
+      Undefined: "",
 				duelist: undefined,
 				bot: undefined, }),
 			timestamp: 0,
@@ -724,6 +725,7 @@ export const schema: SchemaType = {
 		PlayerValue: {
 			fieldOrder: ['timestamp_registered', 'claimed_welcome_pack'],
 			timestamp_registered: 0,
+      claimed_welcome_pack: false,
 		},
 		PlayerActivity: {
 			fieldOrder: ['address', 'timestamp', 'activity', 'identifier', 'is_public'],
@@ -739,7 +741,6 @@ export const schema: SchemaType = {
 			activity: Activity.Undefined,
 			identifier: 0,
 			is_public: true,
-			claimed_welcome_pack: false,
 		},
 		TableAdmittance: {
 			fieldOrder: ['table_id', 'accounts', 'duelists'],
