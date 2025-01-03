@@ -1913,8 +1913,8 @@
       ]
     },
     {
-      "address": "0x2f03f911cf6a5a9452b34ecc5a9547166193a3c1bc9ef9326e991b904b1693c",
-      "class_hash": "0x2e8bd65e5fec2b68e4e9d81c2703cb54d3a6ff71744ae5c9933bfe9f0215f9d",
+      "address": "0x381296f6c44b45dc727211345fbc8edb68a27b8b866ac947590930646116655",
+      "class_hash": "0x41cc0f2909e194537650179b9f5600f560b07dd1e945aa2bbf55c8dc5c1b07e",
       "abi": [
         {
           "type": "impl",
@@ -2014,7 +2014,7 @@
           "name": "pistols::types::premise::Premise",
           "variants": [
             {
-              "name": "Null",
+              "name": "Undefined",
               "type": "()"
             },
             {
@@ -3039,8 +3039,8 @@
       ]
     },
     {
-      "address": "0x398da4208a7ef404a82ff3da44846656371b77d28a5ec9d01417505cd1b9802",
-      "class_hash": "0x15a747355f30e415d74b35b4ad9a25116e48eee7db7b2db8d5c0cb921a3fcef",
+      "address": "0x4092b414cfbe6e127628e34f4112e5e8c68a8593b06ce655354cf16bd9e09d2",
+      "class_hash": "0x4c1284471fd3a84319da08cf66c1b87ed86e48d2bd384f7162b370ba8ca97d2",
       "abi": [
         {
           "type": "impl",
@@ -3128,24 +3128,6 @@
           ]
         },
         {
-          "type": "enum",
-          "name": "pistols::types::profile_type::ProfileType",
-          "variants": [
-            {
-              "name": "Undefined",
-              "type": "()"
-            },
-            {
-              "name": "Duelist",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "Bot",
-              "type": "core::integer::u8"
-            }
-          ]
-        },
-        {
           "type": "struct",
           "name": "core::array::Span::<core::integer::u128>",
           "members": [
@@ -3206,10 +3188,6 @@
                 {
                   "name": "seed",
                   "type": "core::felt252"
-                },
-                {
-                  "name": "profile_type",
-                  "type": "pistols::types::profile_type::ProfileType"
                 }
               ],
               "outputs": [
@@ -4691,8 +4669,8 @@
       ]
     },
     {
-      "address": "0x7bf2b0247089348f5027303ad5a0539a5155756eaf600e527059dc1071180df",
-      "class_hash": "0x57734fb4b394c5942c3eb79564a4b8aac5e5936b1f47abc8f1b78e4a44ed06c",
+      "address": "0x1c4f560fa7c293b72eb7e0cad58092f555ae00a115847b0db2da9d2ae22e3e",
+      "class_hash": "0x4c4ebd7b6d45848299782861edb65d7e3118eaae26ef192cacee7facbc7a564",
       "abi": [
         {
           "type": "impl",
@@ -5888,8 +5866,8 @@
       ]
     },
     {
-      "address": "0x3d9531972d50bbd75f6215be2fe60c9dd334233d06ee5c36bf6edd00e5be725",
-      "class_hash": "0x1cbbc0ceddf03ad8e466560f73f926ee6e75d0e4a42f8c9b5fb834fadd6364d",
+      "address": "0x42daf16826afd81943d01eede90f6a923a9d924292474056a63523851889435",
+      "class_hash": "0x74e2aa58bd59ed30d12667e0269c38ec51af0c5929c2b64e36b34eb39baf8dc",
       "abi": [
         {
           "type": "impl",
@@ -5977,7 +5955,7 @@
           "name": "pistols::models::pack::PackType",
           "variants": [
             {
-              "name": "Undefined",
+              "name": "Unknown",
               "type": "()"
             },
             {
@@ -7185,7 +7163,7 @@
       ]
     },
     {
-      "address": "0x7277303966e8302844057f00c7e309ed7f6afea4a0ebc8612c4564d28bbfd0",
+      "address": "0x354ad41e3125939ec898d7fa6add2ed35bfb96b5a416e2f69e5ed9d480bb6b6",
       "class_hash": "0x3856bc58ede91bf39e6085bb57a0d2c23a6a7bf5174686ef833e2f3d3367c7",
       "abi": [
         {
@@ -7422,7 +7400,7 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x2d15685cf3625bd459ea02bf427fa09a033d8d5be46d0cfd8f4aeb34738afa7",
+      "class_hash": "0xb2c9ea7c0d74a9aa1c57765e539573a4b49693c7a64538c4a601b46327b17a",
       "tag": "pistols-Challenge",
       "selector": "0x673267b69d74c703ea86d97b041278944b49f62b52867345a95d3047b11378a"
     },
@@ -7446,7 +7424,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x91f86b98752dbebc48e5132ed74978b1ca77f80e87d38a64eb12633c28939d",
+      "class_hash": "0x47a75c73dd6c078025312fc096932b2f47e6a4735e25515d2e5f850268da776",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -7470,7 +7448,7 @@
     },
     {
       "members": [],
-      "class_hash": "0xd5cf1f8ad8f272bd395e5bbaedaa808a83648bb0152bea5e6b21d84dc5b5f5",
+      "class_hash": "0x5513cd6251456e5ff58dd292383258dd2098d69cb7e0fe70a86021e7ddea796",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
@@ -7488,7 +7466,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x450b042f741625af929cc1bc1d1828fffe3fc167edce1ee141703dc45f90e1f",
+      "class_hash": "0x2fb1fc9dfa52b7b0ac2831d5b2c67afc0c1ef46fe4841f57a003a1a469117b3",
       "tag": "pistols-Player",
       "selector": "0x4fc7ed2304172cd24d40e2b967bf3642228eec13547b09e0ffdfb85469f6f86"
     },
@@ -7532,7 +7510,7 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x668dab51d1ea9182b128f080bf35c35c9c610d6e6be5295bcaa7f854a4c2f50",
+      "class_hash": "0x7febcecce4eccfc5e4425cf7dd5ff96a6003256f19953f9ddf0a25ef83c7827",
       "tag": "pistols-PlayerActivity",
       "selector": "0x20ac3bc7f231ea11afb0576a200bff82197a6b397f3e5a4299f5a79ab563ff1"
     }

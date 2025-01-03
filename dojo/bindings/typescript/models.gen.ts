@@ -1,6 +1,6 @@
 import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
-import { BigNumberish } from 'starknet';
+import { CairoCustomEnum, BigNumberish } from 'starknet';
 
 type WithFieldOrder<T> = T & { fieldOrder: string[] };
 
@@ -136,14 +136,14 @@ export interface TokenConfigValue {
 // Type definition for `pistols::models::duelist::Duelist` struct
 export interface Duelist {
 	duelist_id: BigNumberish;
-	profile_type: ProfileType;
+	profile_type: ProfileTypeEnum;
 	timestamp: BigNumberish;
 	score: Score;
 }
 
 // Type definition for `pistols::models::duelist::DuelistValue` struct
 export interface DuelistValue {
-	profile_type: ProfileType;
+	profile_type: ProfileTypeEnum;
 	timestamp: BigNumberish;
 	score: Score;
 }
@@ -257,11 +257,13 @@ export interface PPlayerTutorialProgressValue {
 export interface Player {
 	address: string;
 	timestamp_registered: BigNumberish;
+	claimed_welcome_pack: boolean;
 }
 
 // Type definition for `pistols::models::player::PlayerValue` struct
 export interface PlayerValue {
 	timestamp_registered: BigNumberish;
+	claimed_welcome_pack: boolean;
 }
 
 // Type definition for `pistols::models::table::TableAdmittance` struct
@@ -313,7 +315,7 @@ export interface TokenBoundAddressValue {
 
 // Type definition for `pistols::models::pack::PackType` enum
 export enum PackType {
-	Undefined,
+	Unknown,
 	WelcomePack,
 	Duelists5x,
 }
@@ -354,7 +356,7 @@ export enum ChallengeState {
 
 // Type definition for `pistols::types::premise::Premise` enum
 export enum Premise {
-	Null,
+	Undefined,
 	Matter,
 	Debt,
 	Dispute,
@@ -365,12 +367,46 @@ export enum Premise {
 	Tournament,
 }
 
-// Type definition for `pistols::types::profile_type::ProfileType` enum
-export enum ProfileType {
-	Undefined,
-	Duelist,
-	Bot,
+// Type definition for `pistols::types::profile_type::BotProfile` enum
+export enum BotProfile {
+	Unknown,
+	Scarecrow,
+	TinMan,
 }
+
+// Type definition for `pistols::types::profile_type::DuelistProfile` enum
+export enum DuelistProfile {
+	Unknown,
+	Duke,
+	Duella,
+	Jameson,
+	Pilgrim,
+	Jack,
+	Pops,
+	SerWalker,
+	Bloberto,
+	Squiddo,
+	SlenderDuck,
+	LadyVengeance,
+	Breadman,
+	Brutus,
+	Pistolopher,
+	Secreto,
+	ShadowMare,
+	Karaku,
+	Misty,
+	Kenzu,
+	NynJah,
+	Thrak,
+}
+
+// Type definition for `pistols::types::profile_type::ProfileType` enum
+export type ProfileType = {
+	Undefined: ();
+	Duelist: DuelistProfile;
+	Bot: BotProfile;
+}
+export type ProfileTypeEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::round_state::RoundState` enum
 export enum RoundState {
@@ -429,7 +465,7 @@ export const schema: SchemaType = {
 			fieldOrder: ['duel_id', 'table_id', 'premise', 'quote', 'address_a', 'address_b', 'duelist_id_a', 'duelist_id_b', 'state', 'winner', 'timestamp_start', 'timestamp_end'],
 			duel_id: 0,
 			table_id: 0,
-		premise: Premise.Null,
+		premise: Premise.Undefined,
 			quote: 0,
 			address_a: "",
 			address_b: "",
@@ -454,7 +490,7 @@ export const schema: SchemaType = {
 		ChallengeValue: {
 			fieldOrder: ['table_id', 'premise', 'quote', 'address_a', 'address_b', 'duelist_id_a', 'duelist_id_b', 'state', 'winner', 'timestamp_start', 'timestamp_end'],
 			table_id: 0,
-		premise: Premise.Null,
+		premise: Premise.Undefined,
 			quote: 0,
 			address_a: "",
 			address_b: "",
@@ -543,13 +579,19 @@ export const schema: SchemaType = {
 		Duelist: {
 			fieldOrder: ['duelist_id', 'profile_type', 'timestamp', 'score'],
 			duelist_id: 0,
-		profile_type: ProfileType.Undefined,
+		profile_type: new CairoCustomEnum({ 
+					Undefined: (),
+				duelist: undefined,
+				bot: undefined, }),
 			timestamp: 0,
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		DuelistValue: {
 			fieldOrder: ['profile_type', 'timestamp', 'score'],
-		profile_type: ProfileType.Undefined,
+		profile_type: new CairoCustomEnum({ 
+					Undefined: (),
+				duelist: undefined,
+				bot: undefined, }),
 			timestamp: 0,
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
@@ -585,13 +627,13 @@ export const schema: SchemaType = {
 		Pack: {
 			fieldOrder: ['pack_id', 'pack_type', 'seed', 'is_open'],
 			pack_id: 0,
-		pack_type: PackType.Undefined,
+		pack_type: PackType.Unknown,
 			seed: 0,
 			is_open: false,
 		},
 		PackValue: {
 			fieldOrder: ['pack_type', 'seed', 'is_open'],
-		pack_type: PackType.Undefined,
+		pack_type: PackType.Unknown,
 			seed: 0,
 			is_open: false,
 		},
@@ -644,13 +686,15 @@ export const schema: SchemaType = {
 		progress: TutorialProgress.None,
 		},
 		Player: {
-			fieldOrder: ['address', 'timestamp_registered'],
+			fieldOrder: ['address', 'timestamp_registered', 'claimed_welcome_pack'],
 			address: "",
 			timestamp_registered: 0,
+			claimed_welcome_pack: false,
 		},
 		PlayerValue: {
-			fieldOrder: ['timestamp_registered'],
+			fieldOrder: ['timestamp_registered', 'claimed_welcome_pack'],
 			timestamp_registered: 0,
+			claimed_welcome_pack: false,
 		},
 		TableAdmittance: {
 			fieldOrder: ['table_id', 'accounts', 'duelists'],
@@ -741,6 +785,8 @@ export enum ModelsMapping {
 	DeckType = 'pistols-DeckType',
 	ChallengeState = 'pistols-ChallengeState',
 	Premise = 'pistols-Premise',
+	BotProfile = 'pistols-BotProfile',
+	DuelistProfile = 'pistols-DuelistProfile',
 	ProfileType = 'pistols-ProfileType',
 	RoundState = 'pistols-RoundState',
 }
