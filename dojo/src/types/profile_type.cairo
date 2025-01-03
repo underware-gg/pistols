@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-enum DuelistProfile {
+pub enum DuelistProfile {
     Unknown,
     Duke,
     Duella,
@@ -27,7 +27,7 @@ enum DuelistProfile {
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-enum BotProfile {
+pub enum BotProfile {
     Unknown,
     Scarecrow,
     TinMan,
