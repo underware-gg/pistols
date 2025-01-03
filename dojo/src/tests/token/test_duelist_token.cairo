@@ -36,7 +36,7 @@ use pistols::models::{
         m_Duelist, Duelist,
         m_Pact, Pact,
         m_Scoreboard, Scoreboard,
-        Score, ProfileType, Archetype
+        Score, ProfileType, DuelistProfile, Archetype
     },
     payment::{
         m_Payment, Payment,
@@ -272,7 +272,7 @@ fn test_token_uri() {
 
     let duelist = Duelist {
         duelist_id: TOKEN_ID_1.low,
-        profile_type: ProfileType::Duelist(1),
+        profile_type: ProfileType::Duelist(DuelistProfile::Duke),
         timestamp: 999999,
         score: Score {
             honour: 99,
@@ -312,7 +312,7 @@ fn test_token_uri_invalid() {
 #[should_panic(expected: ('TOKEN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_mint_duelist_not_minter() {
     let mut sys: TestSystems = setup(100);
-    sys.token.mint_duelists(OWNER(), 1, 0x1234, ProfileType::Duelist(0));
+    sys.token.mint_duelists(OWNER(), 1, 0x1234);
 }
 
 //

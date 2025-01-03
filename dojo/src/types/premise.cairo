@@ -72,33 +72,27 @@ mod PREMISES {
 //--------------------
 // Traits
 //
+use pistols::utils::short_string::{ShortStringTrait};
 
 #[generate_trait]
 impl PremiseTraitImpl of PremiseTrait {
-    fn name(self: Premise) -> felt252 {
+    fn description(self: Premise) -> PremiseDescription {
         match self {
-            Premise::Undefined   => PREMISES::Undefined.name,
-            Premise::Matter      => PREMISES::Matter.name,
-            Premise::Debt        => PREMISES::Debt.name,
-            Premise::Dispute     => PREMISES::Dispute.name,
-            Premise::Honour      => PREMISES::Honour.name,
-            Premise::Hatred      => PREMISES::Hatred.name,
-            Premise::Blood       => PREMISES::Blood.name,
-            Premise::Nothing     => PREMISES::Nothing.name,
-            Premise::Tournament  => PREMISES::Tournament.name,
+            Premise::Undefined   => PREMISES::Undefined,
+            Premise::Matter      => PREMISES::Matter,
+            Premise::Debt        => PREMISES::Debt,
+            Premise::Dispute     => PREMISES::Dispute,
+            Premise::Honour      => PREMISES::Honour,
+            Premise::Hatred      => PREMISES::Hatred,
+            Premise::Blood       => PREMISES::Blood,
+            Premise::Nothing     => PREMISES::Nothing,
+            Premise::Tournament  => PREMISES::Tournament,
         }
     }
-    fn prefix(self: Premise) -> felt252 {
-        match self {
-            Premise::Undefined   => PREMISES::Undefined.prefix,
-            Premise::Matter      => PREMISES::Matter.prefix,
-            Premise::Debt        => PREMISES::Debt.prefix,
-            Premise::Dispute     => PREMISES::Dispute.prefix,
-            Premise::Honour      => PREMISES::Honour.prefix,
-            Premise::Hatred      => PREMISES::Hatred.prefix,
-            Premise::Blood       => PREMISES::Blood.prefix,
-            Premise::Nothing     => PREMISES::Nothing.prefix,
-            Premise::Tournament  => PREMISES::Tournament.prefix,
-        }
+    fn name(self: Premise) -> ByteArray {
+        (self.description().name.to_string())
+    }
+    fn prefix(self: Premise) -> ByteArray {
+        (self.description().prefix.to_string())
     }
 }

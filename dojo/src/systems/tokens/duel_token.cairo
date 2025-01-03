@@ -503,7 +503,7 @@ pub mod duel_token {
             result.append("Challenged");
             result.append(duelist_b.clone());
             result.append("Premise");
-            result.append(challenge.premise.name().to_string());
+            result.append(challenge.premise.name());
             result.append("Quote");
             result.append(challenge.quote.to_string());
             result.append("State");

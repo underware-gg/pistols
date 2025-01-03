@@ -274,6 +274,12 @@ export type PremiseDescription = {
   prefix : string,
 };
 
+// from: ../dojo/src/types/profile_type.cairo
+export type ProfileDescription = {
+  profile_id : number,
+  name : string,
+};
+
 
 //----------------------------------
 // constants
@@ -674,65 +680,140 @@ export const PREMISES: type_PREMISES = {
 };
 
 // from: ../dojo/src/types/profile_type.cairo
-type type_DUELIST_NAMES = {
-  DuelistName00: string, // cairo: felt252
-  DuelistName01: string, // cairo: felt252
-  DuelistName02: string, // cairo: felt252
-  DuelistName03: string, // cairo: felt252
-  DuelistName04: string, // cairo: felt252
-  DuelistName05: string, // cairo: felt252
-  DuelistName06: string, // cairo: felt252
-  DuelistName07: string, // cairo: felt252
-  DuelistName08: string, // cairo: felt252
-  DuelistName09: string, // cairo: felt252
-  DuelistName10: string, // cairo: felt252
-  DuelistName11: string, // cairo: felt252
-  DuelistName12: string, // cairo: felt252
-  DuelistName13: string, // cairo: felt252
-  DuelistName14: string, // cairo: felt252
-  DuelistName15: string, // cairo: felt252
-  DuelistName16: string, // cairo: felt252
-  DuelistName17: string, // cairo: felt252
-  DuelistName18: string, // cairo: felt252
-  DuelistName19: string, // cairo: felt252
-  DuelistName20: string, // cairo: felt252
-  DuelistName21: string, // cairo: felt252
+type type_DUELIST_PROFILES = {
+  Unknown: ProfileDescription, // cairo: ProfileDescription
+  Duke: ProfileDescription, // cairo: ProfileDescription
+  Duella: ProfileDescription, // cairo: ProfileDescription
+  Jameson: ProfileDescription, // cairo: ProfileDescription
+  Pilgrim: ProfileDescription, // cairo: ProfileDescription
+  Jack: ProfileDescription, // cairo: ProfileDescription
+  Pops: ProfileDescription, // cairo: ProfileDescription
+  SerWalker: ProfileDescription, // cairo: ProfileDescription
+  Bloberto: ProfileDescription, // cairo: ProfileDescription
+  Squiddo: ProfileDescription, // cairo: ProfileDescription
+  SlenderDuck: ProfileDescription, // cairo: ProfileDescription
+  LadyVengeance: ProfileDescription, // cairo: ProfileDescription
+  Breadman: ProfileDescription, // cairo: ProfileDescription
+  Brutus: ProfileDescription, // cairo: ProfileDescription
+  Pistolopher: ProfileDescription, // cairo: ProfileDescription
+  Secreto: ProfileDescription, // cairo: ProfileDescription
+  ShadowMare: ProfileDescription, // cairo: ProfileDescription
+  Karaku: ProfileDescription, // cairo: ProfileDescription
+  Misty: ProfileDescription, // cairo: ProfileDescription
+  Kenzu: ProfileDescription, // cairo: ProfileDescription
+  NynJah: ProfileDescription, // cairo: ProfileDescription
+  Thrak: ProfileDescription, // cairo: ProfileDescription
 };
-export const DUELIST_NAMES: type_DUELIST_NAMES = {
-  DuelistName00: 'Unknown',
-  DuelistName01: 'Duke',
-  DuelistName02: 'Duella',
-  DuelistName03: 'Jameson',
-  DuelistName04: 'Pilgrim',
-  DuelistName05: 'Jack',
-  DuelistName06: 'Pops',
-  DuelistName07: 'Ser Walker',
-  DuelistName08: 'Bloberto',
-  DuelistName09: 'Squiddo',
-  DuelistName10: 'Slender Duck',
-  DuelistName11: 'Lady Vengeance',
-  DuelistName12: 'Breadman',
-  DuelistName13: 'Brutus',
-  DuelistName14: 'Pistolopher',
-  DuelistName15: 'Secreto',
-  DuelistName16: 'Shadow Mare',
-  DuelistName17: 'Karaku',
-  DuelistName18: 'Misty',
-  DuelistName19: 'Kenzu',
-  DuelistName20: 'Nyn Jah',
-  DuelistName21: 'Thrak',
+export const DUELIST_PROFILES: type_DUELIST_PROFILES = {
+  Unknown: {
+    profile_id: 0,
+    name: 'Unknown',
+  },
+  Duke: {
+    profile_id: 1,
+    name: 'Duke',
+  },
+  Duella: {
+    profile_id: 2,
+    name: 'Duella',
+  },
+  Jameson: {
+    profile_id: 3,
+    name: 'Jameson',
+  },
+  Pilgrim: {
+    profile_id: 4,
+    name: 'Pilgrim',
+  },
+  Jack: {
+    profile_id: 5,
+    name: 'Jack',
+  },
+  Pops: {
+    profile_id: 6,
+    name: 'Pops',
+  },
+  SerWalker: {
+    profile_id: 7,
+    name: 'Ser Walker',
+  },
+  Bloberto: {
+    profile_id: 8,
+    name: 'Bloberto',
+  },
+  Squiddo: {
+    profile_id: 9,
+    name: 'Squiddo',
+  },
+  SlenderDuck: {
+    profile_id: 10,
+    name: 'Slender Duck',
+  },
+  LadyVengeance: {
+    profile_id: 11,
+    name: 'Lady Vengeance',
+  },
+  Breadman: {
+    profile_id: 12,
+    name: 'Breadman',
+  },
+  Brutus: {
+    profile_id: 13,
+    name: 'Brutus',
+  },
+  Pistolopher: {
+    profile_id: 14,
+    name: 'Pistolopher',
+  },
+  Secreto: {
+    profile_id: 15,
+    name: 'Secreto',
+  },
+  ShadowMare: {
+    profile_id: 16,
+    name: 'Shadow Mare',
+  },
+  Karaku: {
+    profile_id: 17,
+    name: 'Karaku',
+  },
+  Misty: {
+    profile_id: 18,
+    name: 'Misty',
+  },
+  Kenzu: {
+    profile_id: 19,
+    name: 'Kenzu',
+  },
+  NynJah: {
+    profile_id: 20,
+    name: 'Nyn Jah',
+  },
+  Thrak: {
+    profile_id: 21,
+    name: 'Thrak',
+  },
 };
 
 // from: ../dojo/src/types/profile_type.cairo
-type type_BOT_NAMES = {
-  BotName00: string, // cairo: felt252
-  BotName01: string, // cairo: felt252
-  BotName02: string, // cairo: felt252
+type type_BOT_PROFILES = {
+  Unknown: ProfileDescription, // cairo: ProfileDescription
+  Scarecrow: ProfileDescription, // cairo: ProfileDescription
+  TinMan: ProfileDescription, // cairo: ProfileDescription
 };
-export const BOT_NAMES: type_BOT_NAMES = {
-  BotName00: 'Unknown',
-  BotName01: 'Scarecrow',
-  BotName02: 'Tin Man',
+export const BOT_PROFILES: type_BOT_PROFILES = {
+  Unknown: {
+    profile_id: 0,
+    name: 'Unknown',
+  },
+  Scarecrow: {
+    profile_id: 1,
+    name: 'Scarecrow',
+  },
+  TinMan: {
+    profile_id: 2,
+    name: 'Tin Man',
+  },
 };
 
 // from: ../dojo/src/types/typed_data.cairo

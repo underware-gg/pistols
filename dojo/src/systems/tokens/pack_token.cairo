@@ -238,7 +238,7 @@ pub mod pack_token {
             let pack: Pack = self.mint_pack(pack_type, recipient, seed);
             
             // events
-            PlayerTrait::check_in(ref store, recipient, Activity::PurchasedPack, pack.pack_type.id());
+            PlayerTrait::check_in(ref store, recipient, Activity::PurchasedPack, pack.pack_type.identifier());
 
             (pack)
         }

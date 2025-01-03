@@ -1,5 +1,5 @@
 use starknet::ContractAddress;
-use pistols::types::profile_type::{ProfileType, ProfileTypeTrait};
+use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, DuelistProfile, BotProfile};
 
 //---------------------
 // Duelist

@@ -90,11 +90,11 @@ impl PackImpl of PackTrait {
             PackType::Unknown => { [].span() },
             PackType::WelcomePack => {
                 let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-                (duelist_dispatcher.mint_duelists(recipient, CONST::WELCOME_PACK_DUELIST_COUNT, self.seed, ProfileType::Duelist(0)))
+                (duelist_dispatcher.mint_duelists(recipient, CONST::WELCOME_PACK_DUELIST_COUNT, self.seed))
             },
             PackType::Duelists5x => {
                 let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-                (duelist_dispatcher.mint_duelists(recipient, 5, self.seed, ProfileType::Duelist(0)))
+                (duelist_dispatcher.mint_duelists(recipient, 5, self.seed))
             },
         };
         self.is_open = true;
@@ -105,47 +105,30 @@ impl PackImpl of PackTrait {
 
 #[generate_trait]
 impl PackTypeImpl of PackTypeTrait {
-    fn id(self: PackType) -> felt252 {
+    fn description(self: PackType) -> PackDescription {
         match self {
-            PackType::Unknown       => PACK_TYPES::Unknown.id,
-            PackType::WelcomePack   => PACK_TYPES::WelcomePack.id,
-            PackType::Duelists5x    => PACK_TYPES::Duelists5x.id,
+            PackType::Unknown       => PACK_TYPES::Unknown,
+            PackType::WelcomePack   => PACK_TYPES::WelcomePack,
+            PackType::Duelists5x    => PACK_TYPES::Duelists5x,
         }
     }
+    fn identifier(self: PackType) -> felt252 {
+        (self.description().id)
+    }
     fn name(self: PackType) -> ByteArray {
-        match self {
-            PackType::Unknown       => PACK_TYPES::Unknown.name.to_string(),
-            PackType::WelcomePack   => PACK_TYPES::WelcomePack.name.to_string(),
-            PackType::Duelists5x    => PACK_TYPES::Duelists5x.name.to_string(),
-        }
+        (self.description().name.to_string())
     }
     fn image_url(self: PackType, is_open: bool) -> ByteArray {
         if (is_open) {
-            match self {
-                PackType::Unknown       => PACK_TYPES::Unknown.image_url_open.to_string(),
-                PackType::WelcomePack   => PACK_TYPES::WelcomePack.image_url_open.to_string(),
-                PackType::Duelists5x    => PACK_TYPES::Duelists5x.image_url_open.to_string(),
-            }
+            (self.description().image_url_open.to_string())
         } else {
-            match self {
-                PackType::Unknown       => PACK_TYPES::Unknown.image_url_closed.to_string(),
-                PackType::WelcomePack   => PACK_TYPES::WelcomePack.image_url_closed.to_string(),
-                PackType::Duelists5x    => PACK_TYPES::Duelists5x.image_url_closed.to_string(),
-            }
+            (self.description().image_url_closed.to_string())
         }
     }
     fn can_purchase(self: PackType) -> bool {
-        match self {
-            PackType::Unknown       => PACK_TYPES::Unknown.can_purchase,
-            PackType::WelcomePack   => PACK_TYPES::WelcomePack.can_purchase,
-            PackType::Duelists5x    => PACK_TYPES::Duelists5x.can_purchase,
-        }
+        (self.description().can_purchase)
     }
     fn mint_fee(self: PackType) -> u256 {
-        match self {
-            PackType::Unknown       => PACK_TYPES::Unknown.price,
-            PackType::WelcomePack   => PACK_TYPES::WelcomePack.price,
-            PackType::Duelists5x    => PACK_TYPES::Duelists5x.price,
-        }
+        (self.description().price)
     }
 }

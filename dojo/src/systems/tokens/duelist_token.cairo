@@ -46,7 +46,7 @@ pub trait IDuelistToken<TState> {
     // IDuelistTokenPublic
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252, profile_type: ProfileType) -> Span<u128>;
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
     // fn delete_duelist(ref self: TState, duelist_id: u128);
     fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
 }
@@ -57,7 +57,7 @@ pub trait IDuelistTokenPublic<TState> {
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
     // write
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252, profile_type: ProfileType) -> Span<u128>;
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
     // fn delete_duelist(ref self: TState, duelist_id: u128);
     fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
 }
@@ -203,7 +203,6 @@ pub mod duelist_token {
             recipient: ContractAddress,
             amount: usize,
             seed: felt252,
-            profile_type: ProfileType,
         ) -> Span<u128>{
             let mut store: Store = StoreTrait::new(self.world_default());
 
@@ -217,7 +216,7 @@ pub mod duelist_token {
                 // create Duelist
                 let duelist = Duelist {
                     duelist_id: *duelist_ids[i],
-                    profile_type: profile_type.randomize(rnd.low.into()),
+                    profile_type: ProfileTypeTrait::randomize_duelist(rnd.low.into()),
                     timestamp: get_block_timestamp(),
                     score: Default::default(),
                 };
@@ -349,7 +348,7 @@ pub mod duelist_token {
             let mut store: Store = StoreTrait::new(world);
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
             (format!("{} #{}",
-                duelist.profile_type.name().to_string(),
+                duelist.profile_type.name(),
                 token_id
             ))
         }
