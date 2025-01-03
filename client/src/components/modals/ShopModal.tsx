@@ -16,12 +16,12 @@ import { constants } from '@underware_gg/pistols-sdk/pistols'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function DuelistEditModal({
+export default function ShopModal({
   opener,
 }: {
   opener: Opener
 }) {
-  const { packType } = opener.props
+  const packType = opener.props.packType ?? constants.PackType.Unknown
 
   const { account, address } = useAccount()
 
@@ -66,7 +66,7 @@ export default function DuelistEditModal({
         Purchase
       </Modal.Header>
 
-      <Modal.Content className='ModalText DuelistEditModal'>
+      <Modal.Content className='ModalText ShopModal'>
         <Grid className='OnboardingProfile'>
           <Row textAlign='center' verticalAlign='top'>
             <Col width={5} textAlign='left' className='PaddedSides'>
