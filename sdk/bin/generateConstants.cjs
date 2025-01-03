@@ -413,6 +413,13 @@ const jsFilePath = path.resolve(arg_out);
 
 let cairoFiles = getFolderFilesRecursively(srcPath, '.cairo');
 
+// render constants.cairo first
+cairoFiles.sort((a, b) => (
+  a.endsWith('constants.cairo') ? -1
+    : b.endsWith('constants.cairo') ? 1
+      : 0
+));
+
 let parsed = cairoFiles.reduce((acc, filePath) => {
   const { mods, enums, structs } = getConstantsFromCairoFile(filePath)
   Object.keys(mods).forEach((key) => {

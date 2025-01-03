@@ -272,6 +272,66 @@ export type PremiseDescription = {
   prefix : string,
 };
 
+// from: ../dojo/src/types/constants.cairo
+type type_CONST = {
+  DUELIST_PROFILE_COUNT: number, // cairo: u8
+  BOT_PROFILE_COUNT: number, // cairo: u8
+  WELCOME_PACK_DUELIST_COUNT: number, // cairo: usize
+  ROUND_COUNT: number, // cairo: u8
+  MAX_DUELIST_ID: bigint, // cairo: u128
+  FULL_HEALTH: number, // cairo: u8
+  DOUBLE_DAMAGE: number, // cairo: u8
+  SINGLE_DAMAGE: number, // cairo: u8
+  INITIAL_CHANCE: number, // cairo: u8
+  INITIAL_DAMAGE: number, // cairo: u8
+  ETH_TO_WEI: bigint, // cairo: u256
+};
+export const CONST: type_CONST = {
+  DUELIST_PROFILE_COUNT: 21,
+  BOT_PROFILE_COUNT: 2,
+  WELCOME_PACK_DUELIST_COUNT: 5,
+  ROUND_COUNT: 1,
+  MAX_DUELIST_ID: BigInt('0xffff'),
+  FULL_HEALTH: 3,
+  DOUBLE_DAMAGE: 2,
+  SINGLE_DAMAGE: 1,
+  INITIAL_CHANCE: 50,
+  INITIAL_DAMAGE: 1,
+  ETH_TO_WEI: 1000000000000000000n,
+};
+
+// from: ../dojo/src/types/constants.cairo
+type type_HONOUR = {
+  TRICKSTER_START: number, // cairo: u8
+  LORD_START: number, // cairo: u8
+};
+export const HONOUR: type_HONOUR = {
+  TRICKSTER_START: 40,
+  LORD_START: 70,
+};
+
+// from: ../dojo/src/types/constants.cairo
+type type_CHANCES = {
+  NEVER: number, // cairo: u8
+  ALWAYS: number, // cairo: u8
+};
+export const CHANCES: type_CHANCES = {
+  NEVER: 0,
+  ALWAYS: 100,
+};
+
+// from: ../dojo/src/types/constants.cairo
+type type_FAME = {
+  FAME_PER_LORDS: bigint, // cairo: u256
+  MIN_MINT_GRANT_AMOUNT: bigint, // cairo: u256
+  MIN_REWARD_AMOUNT: bigint, // cairo: u256
+};
+export const FAME: type_FAME = {
+  FAME_PER_LORDS: 10n,
+  MIN_MINT_GRANT_AMOUNT: (1000n * CONST.ETH_TO_WEI),
+  MIN_REWARD_AMOUNT: (100n * CONST.ETH_TO_WEI),
+};
+
 // from: ../dojo/src/interfaces/systems.cairo
 type type_SELECTORS = {
   ADMIN: bigint, // cairo: felt252
@@ -553,66 +613,6 @@ export const TACTICS_POINTS: type_TACTICS_POINTS = {
     other_damage: 0,
     special: '',
   },
-};
-
-// from: ../dojo/src/types/constants.cairo
-type type_CONST = {
-  DUELIST_PROFILE_COUNT: number, // cairo: u8
-  BOT_PROFILE_COUNT: number, // cairo: u8
-  WELCOME_PACK_DUELIST_COUNT: number, // cairo: usize
-  ROUND_COUNT: number, // cairo: u8
-  MAX_DUELIST_ID: bigint, // cairo: u128
-  FULL_HEALTH: number, // cairo: u8
-  DOUBLE_DAMAGE: number, // cairo: u8
-  SINGLE_DAMAGE: number, // cairo: u8
-  INITIAL_CHANCE: number, // cairo: u8
-  INITIAL_DAMAGE: number, // cairo: u8
-  ETH_TO_WEI: bigint, // cairo: u256
-};
-export const CONST: type_CONST = {
-  DUELIST_PROFILE_COUNT: 21,
-  BOT_PROFILE_COUNT: 2,
-  WELCOME_PACK_DUELIST_COUNT: 5,
-  ROUND_COUNT: 1,
-  MAX_DUELIST_ID: BigInt('0xffff'),
-  FULL_HEALTH: 3,
-  DOUBLE_DAMAGE: 2,
-  SINGLE_DAMAGE: 1,
-  INITIAL_CHANCE: 50,
-  INITIAL_DAMAGE: 1,
-  ETH_TO_WEI: 1000000000000000000n,
-};
-
-// from: ../dojo/src/types/constants.cairo
-type type_HONOUR = {
-  TRICKSTER_START: number, // cairo: u8
-  LORD_START: number, // cairo: u8
-};
-export const HONOUR: type_HONOUR = {
-  TRICKSTER_START: 40,
-  LORD_START: 70,
-};
-
-// from: ../dojo/src/types/constants.cairo
-type type_CHANCES = {
-  NEVER: number, // cairo: u8
-  ALWAYS: number, // cairo: u8
-};
-export const CHANCES: type_CHANCES = {
-  NEVER: 0,
-  ALWAYS: 100,
-};
-
-// from: ../dojo/src/types/constants.cairo
-type type_FAME = {
-  FAME_PER_LORDS: bigint, // cairo: u256
-  MIN_MINT_GRANT_AMOUNT: bigint, // cairo: u256
-  MIN_REWARD_AMOUNT: bigint, // cairo: u256
-};
-export const FAME: type_FAME = {
-  FAME_PER_LORDS: 10n,
-  MIN_MINT_GRANT_AMOUNT: (1000n * CONST.ETH_TO_WEI),
-  MIN_REWARD_AMOUNT: (100n * CONST.ETH_TO_WEI),
 };
 
 // from: ../dojo/src/types/premise.cairo
