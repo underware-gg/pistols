@@ -3,6 +3,13 @@ import { BigNumberish } from 'starknet'
 import { useDojoSystem } from '@underware_gg/pistols-sdk/dojo'
 import { poseidon } from '@underware_gg/pistols-sdk/utils'
 
+export const usePackTokenContract = () => {
+  const { contractAddress: packContractAddress } = useDojoSystem('pack_token')
+  return {
+    packContractAddress,
+  }
+}
+
 export const useDuelistTokenContract = () => {
   const { contractAddress: duelistContractAddress } = useDojoSystem('duelist_token')
   return {

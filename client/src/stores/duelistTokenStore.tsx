@@ -3,7 +3,7 @@ import { create } from 'zustand'
 import { BigNumberish, addAddressPadding } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { Token, TokenBalance } from '@dojoengine/torii-client'
-import { useDojoSetup, useToriiTokenIdsByOwnerQL } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoSetup, useToriiTokensByOwnerQL, ERC721_Token } from '@underware_gg/pistols-sdk/dojo'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 
@@ -12,34 +12,35 @@ import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 // Stores only the entity ids and sorting data from a duelists query
 // to get duelist data, use duelistStore
 //
+type TokenState = ERC721_Token['tokens'];
 interface TokenIdsByOwner {
-  [accountAddress: string]: bigint[]
+  [accountAddress: string]: TokenState
 }
 interface TokenIdsByContract {
   [contractAddress: string]: TokenIdsByOwner
 }
 interface State {
-  tokenIds: TokenIdsByContract,
-  setTokenIds: (contractAddress: BigNumberish, accountAddress: BigNumberish, ids: bigint[]) => void;
-  getTokenIds: (contractAddress: BigNumberish, accountAddress: BigNumberish) => bigint[];
+  tokens: TokenIdsByContract,
+  setTokens: (contractAddress: BigNumberish, accountAddress: BigNumberish, ids: TokenState) => void;
+  getTokens: (contractAddress: BigNumberish, accountAddress: BigNumberish) => TokenState;
 }
 
 const createStore = () => {
   return create<State>()((set, get) => ({
-    tokenIds: {},
-    setTokenIds: (contractAddress: BigNumberish, accountAddress: BigNumberish, ids: bigint[]) => {
+    tokens: {},
+    setTokens: (contractAddress: BigNumberish, accountAddress: BigNumberish, tokens: TokenState) => {
       set((state: State) => ({
-        tokenIds: {
-          ...state.tokenIds,
+        tokens: {
+          ...state.tokens,
           [bigintToHex(contractAddress)]: {
-            ...state.tokenIds[bigintToHex(contractAddress)],
-            [bigintToHex(accountAddress)]: ids,
+            ...state.tokens[bigintToHex(contractAddress)],
+            [bigintToHex(accountAddress)]: tokens,
           },
         },
       }))
     },
-    getTokenIds: (contractAddress: BigNumberish, accountAddress: BigNumberish): bigint[] => {
-      return get().tokenIds[bigintToHex(contractAddress)]?.[bigintToHex(accountAddress)] ?? []
+    getTokens: (contractAddress: BigNumberish, accountAddress: BigNumberish): TokenState => {
+      return get().tokens[bigintToHex(contractAddress)]?.[bigintToHex(accountAddress)] ?? []
     },
   }))
 }
@@ -54,13 +55,13 @@ export function PlayerDuelistTokensStoreSyncQL() {
   const { duelistContractAddress } = useDuelistTokenContract()
   const { address } = useAccount()
   const state = useStore((state) => state)
-  const { tokenIds } = useToriiTokenIdsByOwnerQL(duelistContractAddress, address, true)
+  const { tokens } = useToriiTokensByOwnerQL(duelistContractAddress, address, true)
   useEffect(() => {
     if (duelistContractAddress && address) {
-      state.setTokenIds(duelistContractAddress, address, tokenIds)
+      state.setTokens(duelistContractAddress, address, tokens)
     }
-  }, [duelistContractAddress, address, tokenIds])
-  useEffect(() => console.log("PlayerDuelistTokensStoreSyncQL() =>", state.tokenIds), [state.tokenIds])
+  }, [duelistContractAddress, address, tokens])
+  // useEffect(() => console.log("PlayerDuelistTokensStoreSyncQL() =>", state.tokens), [state.tokens])
   return (<></>)
 }
 
@@ -104,7 +105,8 @@ export function PlayerDuelistTokensStoreSync() {
 export function useTokenIdsOfPlayer(contractAddress: BigNumberish) {
   const state = useStore((state) => state)
   const { address } = useAccount()
-  const tokenIds = useMemo(() => state.getTokenIds(contractAddress, address).sort((a, b) => Number(b) - Number(a)), [contractAddress, address, state.tokenIds])
+  const tokens = useMemo(() => state.getTokens(contractAddress, address).sort((a, b) => Number(b.tokenId - a.tokenId)), [contractAddress, address, state.tokens])
+  const tokenIds = useMemo(() => tokens.map((token) => token.tokenId), [tokens])
   return {
     tokenIds,
   }
@@ -113,8 +115,17 @@ export function useTokenIdsOfPlayer(contractAddress: BigNumberish) {
 // ephemeral hook
 // get and retrive on the fly
 // do not use the store
+export function useTokensByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
+  const { tokens, isLoading } = useToriiTokensByOwnerQL(contractAddress, owner, false)
+  // console.log("useTokensByOwner() =>", isLoading, bigintToHex(owner), tokens)
+  return {
+    tokens,
+    isLoading,
+  }
+}
 export function useTokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
-  const { tokenIds, isLoading } = useToriiTokenIdsByOwnerQL(contractAddress, owner, false)
+  const { tokens, isLoading } = useToriiTokensByOwnerQL(contractAddress, owner, false)
+  const tokenIds = useMemo(() => tokens.map((token) => token.tokenId), [tokens])
   // console.log("useTokenIdsByOwner() =>", isLoading, bigintToHex(owner), tokenIds)
   return {
     tokenIds,

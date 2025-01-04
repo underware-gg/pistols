@@ -33,7 +33,7 @@ query tokenBalances(
             #name
             symbol
             tokenId
-            #metadata
+            metadata
             #metadataName
             #metadataDescription
             #metadataAttributes
@@ -84,7 +84,10 @@ export type ERC20_Token = {
 }
 export type ERC721_Token = {
   symbol: string;
-  tokenIds: bigint[]
+  tokens: {
+    tokenId: bigint,
+    metadata: string,
+  }[]
 }
 export type ERC_Token = ERC20_Token | ERC721_Token
 
@@ -134,10 +137,13 @@ function useToriiTokenBalancesQL(variables: any, skip: boolean, watch: boolean) 
         if (!tokens.ERC721[contractAddress]) {
           tokens.ERC721[contractAddress] = {
             symbol: token.symbol,
-            tokenIds: [],
+            tokens: [],
           }
         }
-        tokens.ERC721[contractAddress].tokenIds.push(BigInt(token.tokenId))
+        tokens.ERC721[contractAddress].tokens.push({
+          tokenId: BigInt(token.tokenId),
+          metadata: token.metadata,
+        })
       }
     })
     // console.log(`>>> QL TOKENS:`, tokens)
@@ -155,21 +161,21 @@ function useToriiTokenBalancesQL(variables: any, skip: boolean, watch: boolean) 
 // Queries
 //
 
-export function useToriiTokenIdsByOwnerQL(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean) {
+export function useToriiTokensByOwnerQL(contractAddress: BigNumberish, owner: BigNumberish, watch: boolean) {
   const variables = useMemo(() => ({
-    address: bigintToHex(owner).toLowerCase(),
+    address: owner ? bigintToHex(owner).toLowerCase() : undefined,
   }), [owner]);
   const skip = useMemo(() => (!isPositiveBigint(owner)), [owner])
 
-  const { tokens, isLoading, refetch } = useToriiTokenBalancesQL(variables, skip, watch)
+  const { tokens: rawTokens, isLoading, refetch } = useToriiTokenBalancesQL(variables, skip, watch)
 
-  const tokenIds = useMemo<bigint[]>(() =>
-    tokens.ERC721[bigintToHex(contractAddress)]?.tokenIds ?? [],
-  [tokens, contractAddress])
-  // console.log(`>>> useToriiTokenIdsByOwnerQL():`, bigintToHex(owner), tokenIds)
+  const tokens = useMemo(() => (
+    rawTokens.ERC721[bigintToHex(contractAddress)]?.tokens ?? []
+  ), [rawTokens, contractAddress])
+  // console.log(`>>> useToriiTokensByOwnerQL():`, bigintToHex(owner), tokenIds)
   
   return {
-    tokenIds,
+    tokens,
     isLoading,
     refetch,
   }
@@ -186,7 +192,7 @@ export function useToriiBalancesByContractQL(contractAddress: BigNumberish, watc
   const balances = useMemo(() =>
     tokens.ERC20[bigintToHex(contractAddress)],
   [tokens, contractAddress])
-  console.log(`>>> useToriiBalancesByContractQL():`, contractAddress, balances)
+  // console.log(`>>> useToriiBalancesByContractQL():`, contractAddress, balances)
 
   return {
     balances,

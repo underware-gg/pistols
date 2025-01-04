@@ -17,6 +17,7 @@ import ConnectPage from '/src/pages/tests/ConnectPage'
 import IconsPage from '/src/pages/tests/IconsPage'
 import SignPage from '/src/pages/tests/SignPage'
 import TimestampPage from '/src/pages/tests/TimestampPage'
+import TokensPage from '/src/pages/tests/TokensPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
 import ErrorPage from '/src/pages/error/ErrorPage'
 
@@ -65,6 +66,7 @@ const router = createBrowserRouter([
       { path: "icons", element: <IconsPage /> },
       { path: "sign", element: <SignPage /> },
       { path: "timestamp", element: <TimestampPage /> },
+      { path: "tokens", element: <TokensPage /> },
     ],
   },
 ]);

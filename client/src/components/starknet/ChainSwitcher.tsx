@@ -19,7 +19,7 @@ export function ChainSwitcher({
     >
       <Dropdown.Menu>
         {chains.map(chain => (
-          <Dropdown.Item key={chain.name} onClick={() => { selectChainId(feltToString(chain.id) as ChainId) }}>{chain.name}</Dropdown.Item>
+          <Dropdown.Item key={chain.id} onClick={() => { selectChainId(feltToString(chain.id) as ChainId) }}>{chain.name}</Dropdown.Item>
         ))}
       </Dropdown.Menu>
     </Dropdown>

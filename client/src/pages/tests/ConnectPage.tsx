@@ -41,7 +41,7 @@ export default function ConnectPage() {
 }
 
 
-function DojoAccount() {
+export function DojoAccount() {
   const { isInitialized } = useDojoStatus()
   const { address } = useAccount()
   const { selectedChainConfig } = useSelectedChain()
@@ -77,7 +77,7 @@ function DojoAccount() {
 }
 
 
-function Connect() {
+export function Connect() {
   const { address, isConnecting, isConnected, connector } = useAccount()
   const { chain } = useNetwork()
   const { disconnect } = useDisconnect()
@@ -86,7 +86,7 @@ function Connect() {
     <>
       <StarknetConnectModal opener={connectOpener} />
 
-      <ChainSwitcher />
+      {/* <ChainSwitcher /> */}
       &nbsp;&nbsp;
       <Button disabled={isConnected || isConnecting} onClick={() => connectOpener.open()}>Connect</Button>
       &nbsp;&nbsp;
