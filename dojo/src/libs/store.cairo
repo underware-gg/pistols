@@ -25,8 +25,10 @@ pub use pistols::models::{
     },
     duelist::{
         Duelist, DuelistValue,
-        Pact, PactValue,
         Scoreboard, ScoreboardValue,
+    },
+    pact::{
+        Pact, PactValue,
     },
     table::{
         TableConfig, TableConfigValue,

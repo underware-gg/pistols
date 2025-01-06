@@ -45,9 +45,11 @@ mod tester {
         },
         duelist::{
             m_Duelist, Duelist, DuelistValue,
-            m_Pact, Pact, PactValue,
             m_Scoreboard, Scoreboard, ScoreboardValue,
             Score, ProfileType, Archetype
+        },
+        pact::{
+            m_Pact, Pact,
         },
         payment::{
             m_Payment, Payment,

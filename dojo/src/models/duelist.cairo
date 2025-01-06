@@ -15,18 +15,6 @@ pub struct Duelist {
     pub score: Score,
 }
 
-// Current challenge between two Duelists
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct Pact {
-    #[key]
-    pub table_id: felt252,
-    #[key]
-    pub pair: u128,     // xor'd duelists as u256(address).low
-    //------------
-    pub duel_id: u128,  // current Challenge, or 0x0
-}
-
 //
 // Duelist scores per Table
 #[derive(Copy, Drop, Serde)]

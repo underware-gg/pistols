@@ -139,7 +139,8 @@ pub mod duel_token {
         config::{TokenConfig, TokenConfigValue},
         player::{Player, PlayerTrait, Activity},
         challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, Moves},
-        duelist::{Duelist, DuelistValue, Pact, ProfileType, ProfileTypeTrait},
+        duelist::{Duelist, DuelistValue, ProfileType, ProfileTypeTrait},
+        pact::{Pact, PactTrait},
         table::{
             TableConfig, TableConfigTrait, TableConfigValue,
             TableAdmittance, TableAdmittanceTrait,
@@ -152,7 +153,6 @@ pub mod duel_token {
     use pistols::types::duel_progress::{DuelistDrawnCard};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::libs::store::{Store, StoreTrait};
-    use pistols::libs::pact;
     use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::timestamp::{timestamp};
@@ -228,7 +228,7 @@ pub mod duel_token {
         
         fn get_pact(self: @ContractState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
-            (pact::get_pact(ref store, table_id, address_a, address_b))
+            (PactTrait::get_pact(ref store, table_id, address_a, address_b))
         }
         fn has_pact(self: @ContractState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool {
             (self.get_pact(table_id, address_a, address_b) != 0)
@@ -320,7 +320,7 @@ pub mod duel_token {
             store.set_round(@round);
 
             // set the pact + assert it does not exist
-            pact::set_pact(ref store, challenge);
+            challenge.set_pact(ref store);
 
             // events
             PlayerTrait::check_in(ref store, address_a, Activity::CreatedChallenge, duel_id.into());
@@ -388,7 +388,7 @@ pub mod duel_token {
 
             // duel canceled!
             if (challenge.state.is_canceled()) {
-                pact::unset_pact(ref store, challenge);
+                challenge.unset_pact(ref store);
             }
 
             // events

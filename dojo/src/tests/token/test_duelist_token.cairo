@@ -34,9 +34,11 @@ use pistols::models::{
     },
     duelist::{
         m_Duelist, Duelist,
-        m_Pact, Pact,
         m_Scoreboard, Scoreboard,
         Score, ProfileType, DuelistProfile, Archetype
+    },
+    pact::{
+        m_Pact, Pact,
     },
     payment::{
         m_Payment, Payment,

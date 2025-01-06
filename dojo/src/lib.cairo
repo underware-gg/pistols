@@ -30,7 +30,6 @@ mod systems {
 
 mod libs {
     mod game_loop;
-    mod pact;
     mod seeder;
     mod store;
 }
@@ -40,6 +39,7 @@ mod models {
     mod config;
     mod duelist;
     mod pack;
+    mod pact;
     mod payment;
     mod player;
     mod table;

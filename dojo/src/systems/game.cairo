@@ -59,7 +59,9 @@ pub mod game {
             Duelist, DuelistValue,
             Score, ScoreTrait,
             Scoreboard,
-            Pact,
+        },
+        pact::{
+            Pact, PactTrait,
         },
         table::{TableConfig, TableConfigTrait, TableConfigValue},
     };
@@ -73,7 +75,6 @@ pub mod game {
     use pistols::utils::misc::{ZERO};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::game_loop::{game_loop, make_moves_hash};
-    use pistols::libs::pact;
 
     mod Errors {
         const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
@@ -245,7 +246,7 @@ pub mod game {
             }
 
             // undo pact
-            pact::unset_pact(ref store, challenge);
+            challenge.unset_pact(ref store);
         }
 
 
