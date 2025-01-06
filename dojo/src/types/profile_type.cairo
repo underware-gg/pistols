@@ -170,17 +170,17 @@ mod BOT_PROFILES {
 // Traits
 //
 use pistols::utils::short_string::{ShortStringTrait};
-use pistols::utils::misc::{felt_to_u8};
+use pistols::utils::misc::{FeltToLossy};
 use pistols::types::constants::{CONST};
 
 #[generate_trait]
 impl ProfileTypeImpl of ProfileTypeTrait {
     fn randomize_duelist(seed: felt252) -> ProfileType {
-        let profile_id: u8 = (felt_to_u8(seed) % CONST::DUELIST_PROFILE_COUNT) + 1;
+        let profile_id: u8 = (seed.to_u8_lossy() % CONST::DUELIST_PROFILE_COUNT) + 1;
         (ProfileType::Duelist(profile_id.into()))
     }
     fn randomize_bot(seed: felt252) -> ProfileType {
-        let profile_id: u8 = (felt_to_u8(seed) % CONST::BOT_PROFILE_COUNT) + 1;
+        let profile_id: u8 = (seed.to_u8_lossy() % CONST::BOT_PROFILE_COUNT) + 1;
         (ProfileType::Bot(profile_id.into()))
     }
     fn name(self: ProfileType) -> ByteArray {

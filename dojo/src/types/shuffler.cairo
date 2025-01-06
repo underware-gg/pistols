@@ -1,5 +1,5 @@
 use pistols::utils::bitwise::{BitwiseU256};
-use pistols::utils::misc::{felt_to_usize};
+use pistols::utils::misc::{FeltToLossy};
 
 //
 // shuffle max 42 ids, from 1 to size
@@ -57,13 +57,13 @@ impl ShufflerImpl of ShufflerTrait {
         // get next pos
 		self.pos += 1;
         // testing
-        if (self.mocked) { return (felt_to_usize(seed) & Self::MASK.try_into().unwrap()).try_into().unwrap(); }
+        if (self.mocked) { return (seed.to_usize_lossy() & Self::MASK.try_into().unwrap()).try_into().unwrap(); }
         // only 1 id was shuffled
 		if (self.size == 1) { return 1; }
         // it is the last id
 		if (self.pos == self.size) { return self.get_id(self.pos).try_into().unwrap(); }
         // get random pos
-        let rnd: usize = self.pos + (felt_to_usize(seed) % (self.size - self.pos)).try_into().unwrap();
+        let rnd: usize = self.pos + (seed.to_usize_lossy() % (self.size - self.pos)).try_into().unwrap();
 		// swap for current position
 		let swap_pos: usize = rnd + 1;
         let swap_id: u256 = self.get_id(swap_pos);

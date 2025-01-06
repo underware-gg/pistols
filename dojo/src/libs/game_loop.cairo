@@ -25,7 +25,7 @@ use pistols::types::cards::hand::{
 use pistols::types::constants::{CONST};
 use pistols::utils::math::{MathU8, MathU16};
 use pistols::utils::bitwise::{BitwiseU32, BitwiseU128};
-use pistols::utils::hash::{hash_values, felt_to_u128};
+use pistols::utils::hash::{hash_values, FeltToLossy};
 use pistols::libs::store::{Store, StoreTrait};
 
 
@@ -45,7 +45,7 @@ fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
         let move: felt252 = (*moves.at(index)).into();
         if (move != 0) {
             let mask: u128 = BitwiseU128::shl(BitwiseU32::max().into(), index * 32);
-            let hash: u128 = felt_to_u128(hash_values([salt, move].span()));
+            let hash: u128 = hash_values([salt, move].span()).to_u128_lossy();
             result = result | (hash & mask);
         }
         index += 1;

@@ -1,9 +1,8 @@
 use traits::Into;
-
-use pistols::utils::misc::{felt_to_u128};
-
 use core::poseidon::{PoseidonTrait, HashState};
 use core::hash::HashStateTrait;
+
+pub use pistols::utils::misc::{FeltToLossy};
 
 fn hash_values(values: Span<felt252>) -> felt252 {
     assert(values.len() > 0, 'hash_values() has no values!');
@@ -53,15 +52,15 @@ fn make_block_hash() -> felt252 {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use pistols::utils::hash::{
+    use super::{
         hash_values,
         make_block_hash,
-        felt_to_u128,
+        FeltToLossy,
     };
 
     #[test]
-    fn test_felt_to_u128() {
-        assert(0xab9d03074bff6ee2d4dbc374dbf3f846 == felt_to_u128(0x7f25249bc3b57d4a9cb82bd75d25579ab9d03074bff6ee2d4dbc374dbf3f846), 'bump');
+    fn test_felt_to_u128_lossy() {
+        assert(0xab9d03074bff6ee2d4dbc374dbf3f846 == 0x7f25249bc3b57d4a9cb82bd75d25579ab9d03074bff6ee2d4dbc374dbf3f846.to_u128_lossy(), 'bump');
     }
 
     #[test]
