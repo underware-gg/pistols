@@ -1,3 +1,4 @@
+export * from '../utils/misc/decoder'
 export * from '../utils/misc/math'
 export * from '../utils/misc/random'
 export * from '../utils/misc/starknet'

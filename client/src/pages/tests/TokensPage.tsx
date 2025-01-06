@@ -6,7 +6,7 @@ import { PlayerDuelistTokensStoreSyncQL, useTokenIdsByOwner, useTokenIdsOfPlayer
 import { DojoAccount } from './ConnectPage'
 import { Connect } from './ConnectPage'
 import App from '/src/components/App'
-import { bigintToHex, bigintToNumber } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex, bigintToNumber, useERC721TokenUri } from '@underware_gg/pistols-sdk/utils'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { useAccount } from '@starknet-react/core'
 
@@ -56,29 +56,13 @@ function TokenContract({
 
   const rows = useMemo(() => {
     return tokens.sort((a, b) => Number(a.tokenId - b.tokenId)).map((token) => {
-      const { tokenId, metadata } = token
-      const meta = JSON.parse(metadata)
-      // console.log('meta', meta)
-      const { id, name, description, image, metadata: attr } = meta
-      // const img = image.replace('https', 'http')
       return (
-        <Row key={tokenId}>
-          <Cell verticalAlign='top'>
-            <h3>{bigintToNumber(tokenId)}</h3>
-          </Cell>
-          <Cell verticalAlign='top'>
-            <h3>{name}</h3>
-            {attributes.map((a) => (
-              <li key={a}>{a}: <b>{attr[a]}</b></li>
-            ))}
-          </Cell>
-            <Cell>
-            <img src={image} alt={name} style={{ width: '100px', height: '100px' }} />
-          </Cell>
-          <Cell>
-            <embed src={image} style={{ width: '100px', height: '100px' }} />
-          </Cell>
-        </Row>
+        <TokenRow key={token.tokenId}
+          contractAddress={contractAddress}
+          tokenId={token.tokenId}
+          cached_metadata={token.metadata}
+          attributes={attributes}
+        />
       )
     })
   }, [tokens])
@@ -90,8 +74,10 @@ function TokenContract({
           <HeaderCell width={4}><h3 className='Important'>{tokenName}</h3></HeaderCell>
           {/* <HeaderCell width={4}><h3 className='Important'>{bigintToHex(contractAddress)}</h3></HeaderCell> */}
           <HeaderCell><h3 className='Important'>Name</h3></HeaderCell>
-          <HeaderCell><h3 className='Important'>{`<img>`}</h3></HeaderCell>
-          <HeaderCell><h3 className='Important'>{`<embed>`}</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Cached {`<img>`}</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Cached {`<embed>`}</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>RPC {`<img>`}</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>RPC {`<embed>`}</h3></HeaderCell>
         </Row>
       </Header>
 
@@ -101,6 +87,56 @@ function TokenContract({
     </Table>
   )
 }
+
+
+
+function TokenRow({
+  contractAddress,
+  tokenId,
+  cached_metadata,
+  attributes = [],
+}: {
+  contractAddress: BigNumberish,
+  tokenId: bigint,
+  cached_metadata: string,
+  attributes?: string[],
+}) {
+  const { id, name, description, image: cached_image, metadata: attr } = useMemo(() => JSON.parse(cached_metadata), [cached_metadata])
+  // const img = image.replace('https', 'http')
+  const { image: rpc_image } = useERC721TokenUri(contractAddress, tokenId)
+  const style = { width: '100px', height: '100px' }
+  return (
+    <Row key={tokenId}>
+      <Cell verticalAlign='top'>
+        <h3>{bigintToNumber(tokenId)}</h3>
+      </Cell>
+      <Cell verticalAlign='top'>
+        <h3>{name}</h3>
+        {attributes.map((a) => (
+          <li key={a}>{a}: <b>{attr[a]}</b></li>
+        ))}
+      </Cell>
+      <Cell>
+        <img src={cached_image} alt={name} style={style} />
+      </Cell>
+      <Cell>
+        <embed src={cached_image} style={style} />
+      </Cell>
+      <Cell>
+        <img src={rpc_image} alt={name} style={style} />
+      </Cell>
+      <Cell>
+        <embed src={rpc_image} style={style} />
+      </Cell>
+    </Row>
+  )
+
+}
+
+
+
+
+
 
 function TestImages() {
   const style = { width: '100px', height: '100px', backgroundColor: 'black' }
