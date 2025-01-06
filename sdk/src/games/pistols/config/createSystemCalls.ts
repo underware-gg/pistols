@@ -124,9 +124,9 @@ export function createSystemCalls(
     // duel_token
     //
     duel_token: {
-      create_duel: async (signer: AccountInterface, duelist_id: BigNumberish, challenged_id_or_address: BigNumberish, premise: constants.Premise, quote: string, table_id: string, expire_hours: number): Promise<boolean> => {
+      create_duel: async (signer: AccountInterface, duelist_id: BigNumberish, challenged_address: BigNumberish, premise: constants.Premise, quote: string, table_id: string, expire_hours: number): Promise<boolean> => {
         // const approved_value = await constractCalls.duel_token.calcMintFee(table_id) as BigNumberish
-        const args = [duelist_id, BigInt(challenged_id_or_address), makeCustomEnum(premise), stringToFelt(quote), table_id, expire_hours]
+        const args = [duelist_id, BigInt(challenged_address), makeCustomEnum(premise), stringToFelt(quote), table_id, expire_hours]
         let calls: DojoCalls = [
           // approve_call(approved_value),
           duel_token_call('create_duel', args),

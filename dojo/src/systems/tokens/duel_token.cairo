@@ -46,14 +46,14 @@ pub trait IDuelToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IDuelTokenPublic
-    fn create_duel(ref self: TState, duelist_id: u128, challenged_id_or_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64) -> u128;
+    fn create_duel(ref self: TState, duelist_id: u128, challenged_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64) -> u128;
     fn reply_duel(ref self: TState, duelist_id: u128, duel_id: u128, accepted: bool) -> ChallengeState;
     // fn delete_duel(ref self: TState, duel_id: u128);
     fn transfer_to_winner(ref self: TState, duel_id: u128);
     // view calls
     fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
-    fn get_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
-    fn has_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
+    fn get_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128;
+    fn has_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool;
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
 }
 
@@ -61,14 +61,14 @@ pub trait IDuelToken<TState> {
 pub trait IDuelTokenPublic<TState> {
     // view
     fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
-    fn get_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128;
-    fn has_pact(self: @TState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool;
+    fn get_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128;
+    fn has_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool;
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
     // write
     fn create_duel(
         ref self: TState,
         duelist_id: u128,
-        challenged_id_or_address: ContractAddress,
+        challenged_address: ContractAddress,
         premise: Premise,
         quote: felt252,
         table_id: felt252,
@@ -138,8 +138,8 @@ pub mod duel_token {
     use pistols::models::{
         config::{TokenConfig, TokenConfigValue},
         player::{Player, PlayerTrait, Activity},
-        challenge::{Challenge, ChallengeValue, Round, Moves},
-        duelist::{Duelist, DuelistValue, DuelistTrait, Pact, ProfileType, ProfileTypeTrait},
+        challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, Moves},
+        duelist::{Duelist, DuelistValue, Pact, ProfileType, ProfileTypeTrait},
         table::{
             TableConfig, TableConfigTrait, TableConfigValue,
             TableAdmittance, TableAdmittanceTrait,
@@ -226,12 +226,12 @@ pub mod duel_token {
             (table.calc_mint_fee())
         }
         
-        fn get_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> u128 {
+        fn get_pact(self: @ContractState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
-            (pact::get_pact(ref store, table_id, duelist_id_a, duelist_id_b))
+            (pact::get_pact(ref store, table_id, address_a, address_b))
         }
-        fn has_pact(self: @ContractState, table_id: felt252, duelist_id_a: u128, duelist_id_b: u128) -> bool {
-            (self.get_pact(table_id, duelist_id_a, duelist_id_b) != 0)
+        fn has_pact(self: @ContractState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool {
+            (self.get_pact(table_id, address_a, address_b) != 0)
         }
 
         fn can_join(self: @ContractState, table_id: felt252, duelist_id: u128) -> bool {
@@ -246,7 +246,7 @@ pub mod duel_token {
         //
         fn create_duel(ref self: ContractState,
             duelist_id: u128,
-            challenged_id_or_address: ContractAddress,
+            challenged_address: ContractAddress,
             premise: Premise,
             quote: felt252,
             table_id: felt252,
@@ -278,19 +278,10 @@ pub mod duel_token {
             assert(table_admittance.can_join(address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
 
             // validate challenged
-            assert(challenged_id_or_address.is_non_zero(), Errors::INVALID_CHALLENGED_NULL);
-            let duelist_id_b: u128 = DuelistTrait::try_address_to_id(challenged_id_or_address);
-            let address_b: ContractAddress = if (duelist_id_b != 0) {
-                // challenging a duelist...
-                assert(duelist_dispatcher.exists(duelist_id_b) == true, Errors::INVALID_CHALLENGED);
-                assert(duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
-                (ZERO())
-            } else {
-                // challenging a wallet...
-                assert(challenged_id_or_address != address_a, Errors::INVALID_CHALLENGED_SELF);
-                (challenged_id_or_address)
-            };
-            assert(table_admittance.can_join(address_b, duelist_id_b), Errors::CHALLENGED_NOT_ADMITTED);
+            assert(challenged_address.is_non_zero(), Errors::INVALID_CHALLENGED_NULL);
+            let address_b: ContractAddress = challenged_address;
+            assert(challenged_address != address_a, Errors::INVALID_CHALLENGED_SELF);
+            assert(table_admittance.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
 
             // calc expiration
             let timestamp_start: u64 = get_block_timestamp();
@@ -306,7 +297,7 @@ pub mod duel_token {
                 address_a,
                 address_b,
                 duelist_id_a,
-                duelist_id_b,
+                duelist_id_b: 0,
                 // progress
                 state: ChallengeState::Awaiting,
                 winner: 0,
@@ -347,7 +338,7 @@ pub mod duel_token {
             // validate chalenge
             let mut store: Store = StoreTrait::new(world);
             let mut challenge: Challenge = store.get_challenge(duel_id);
-            assert(challenge.state.exists(), Errors::INVALID_CHALLENGE);
+            assert(challenge.exists(), Errors::INVALID_CHALLENGE);
             assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
             let address_b: ContractAddress = get_caller_address();
@@ -366,33 +357,16 @@ pub mod duel_token {
             } else {
                 // validate duelist ownership
                 let duelist_dispatcher = world.duelist_token_dispatcher();
-// address_b.print();
-// duelist_id_b.print();
-// duelist_dispatcher.owner_of(duelist_id_b).print();
                 assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
                 assert(duelist_dispatcher.is_alive(duelist_id_b) == true, Errors::DUELIST_IS_DEAD);
 
                 // validate challenged identity
-                // either wallet ot duelist was challenged, never both
-                if (challenge.duelist_id_b != 0) {
-                    // challenged the duelist...
-                    // can only be accepted by it
-                    assert(challenge.duelist_id_b == duelist_id_b, Errors::NOT_YOUR_CHALLENGE);
-                    // fill missing wallet
-                    challenge.address_b = address_b;
-                } else {
-                    // challenged the wallet...
-                    // can only be accepted by that wallet
-                    assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);
-                    // validate chosen duelist
-                    assert(challenge.duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
-                    // remove pact between wallets
-                    pact::unset_pact(ref store, challenge);
-                    // fil missing duelist
-                    challenge.duelist_id_b = duelist_id_b;
-                    // create pact between duelists
-                    pact::set_pact(ref store, challenge);
-                }
+                assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);
+                // validate chosen duelist
+                assert(challenge.duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
+                // fil missing duelist
+                challenge.duelist_id_b = duelist_id_b;
+
                 // all good!
                 if (accepted) {
                     // Challenged is accepting

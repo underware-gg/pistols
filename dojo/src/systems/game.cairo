@@ -56,7 +56,7 @@ pub mod game {
             MovesTrait,
         },
         duelist::{
-            Duelist, DuelistTrait, DuelistValue,
+            Duelist, DuelistValue,
             Score, ScoreTrait,
             Scoreboard,
             Pact,

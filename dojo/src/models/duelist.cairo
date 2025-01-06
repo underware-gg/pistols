@@ -55,35 +55,9 @@ pub struct Score {
 //----------------------------------
 // Traits
 //
-use pistols::types::constants::{CONST, HONOUR};
+use pistols::types::constants::{HONOUR};
 use pistols::utils::bitwise::{BitwiseU64};
 use pistols::utils::math::{MathU64};
-
-// TODO: DELETE THIS
-#[generate_trait]
-impl DuelistTraitImpl of DuelistTrait {
-    fn is_owner(self: Duelist, address: ContractAddress) -> bool {
-        // for testing
-        let as_felt: felt252 = address.into();
-        if (as_felt == self.duelist_id.into()) { return (true); }
-        (false)
-    }
-    // try to convert a challenged account address to duelist id
-    // retuns 0 if the address is not an id
-    fn try_address_to_id(address: ContractAddress) -> u128 {
-        let as_felt: felt252 = address.into();
-        let as_u256: u256 = as_felt.into();
-        if (as_u256 <= CONST::MAX_DUELIST_ID.into()) {(as_u256.low)} else {(0)}
-    }
-    // "cast" an address to an id for pacts
-    // the low part is good enough
-    fn address_as_id(address: ContractAddress) -> u128 {
-        let as_felt: felt252 = address.into();
-        let as_u256: u256 = as_felt.into();
-        (as_u256.low)
-    }
-}
-
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Archetype {

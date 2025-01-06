@@ -102,6 +102,10 @@ impl ChallengeImpl of ChallengeTrait {
         else if (duelist_id == self.duelist_id_b) {(2)}
         else {(0)})
     }
+    #[inline(always)]
+    fn exists(self: Challenge) -> bool {
+        (self.state.exists())
+    }
 }
 
 #[generate_trait]

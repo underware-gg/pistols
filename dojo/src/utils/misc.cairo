@@ -52,3 +52,15 @@ fn felt_to_u8(value: felt252) -> u8 {
     let as_u256: u256 = value.into();
     ((as_u256.low & BITWISE::MAX_U8.into()).try_into().unwrap())
 }
+
+
+//--------------------------------
+// ContractAddress
+//
+impl ContractAddressIntoU256 of Into<ContractAddress, u256> {
+    #[inline(always)]
+    fn into(self: ContractAddress) -> u256 {
+        let as_felt: felt252 = self.into();
+        (as_felt.into())
+    }
+}

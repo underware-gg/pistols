@@ -5,22 +5,20 @@ import { useSdkState, getEntityMapModels } from '@underware_gg/pistols-sdk/dojo'
 import { PistolsGetQuery, PistolsSubQuery, models } from '@underware_gg/pistols-sdk/pistols'
 
 
-export const usePactPair = (duelist_id_or_address_a: BigNumberish, duelist_id_or_address_b: BigNumberish): BigNumberish => {
+export const usePactPair = (address_a: BigNumberish, address_b: BigNumberish): BigNumberish => {
   const pair = useMemo(() => {
-    if (!isPositiveBigint(duelist_id_or_address_a) || !isPositiveBigint(duelist_id_or_address_b)) return 0n
-    // same as pistols::libs::pact::make_pact_pair()
-    const a_u256 = bigintToU256(duelist_id_or_address_a)
-    const b_u256 = bigintToU256(duelist_id_or_address_b)
-    const aa = poseidon([a_u256.low, a_u256.low])
-    const bb = poseidon([b_u256.low, b_u256.low])
-    const pair = bigintToU256(aa ^ bb).low
+    if (!isPositiveBigint(address_a) || !isPositiveBigint(address_b)) return 0n
+    // same as pistols::models::pact::make_pair()
+    const a_u256 = bigintToU256(address_a)
+    const b_u256 = bigintToU256(address_b)
+    const pair = (BigInt(a_u256.low) ^ BigInt(b_u256.low))
     return pair
-  }, [duelist_id_or_address_a, duelist_id_or_address_b])
+  }, [address_a, address_b])
   return pair
 }
 
-export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish, duelist_id_or_address_b: BigNumberish) => {
-  const pair = usePactPair(duelist_id_or_address_a, duelist_id_or_address_b)
+export const usePact = (table_id: string, address_a: BigNumberish, address_b: BigNumberish) => {
+  const pair = usePactPair(address_a, address_b)
   const query_get = useMemo<PistolsGetQuery>(() => ({
     pistols: {
       Pact: {

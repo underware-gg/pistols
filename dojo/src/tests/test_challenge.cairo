@@ -51,15 +51,6 @@ mod tests {
         let _duel_id: u128 = tester::execute_create_duel(@sys.duels, HIGH, OTHER(), PREMISE_1, TABLE_ID, 0);
     }
 
-    // #[test]
-    // #[should_panic(expected:('DUEL: Challenged unknown', 'ENTRYPOINT_FAILED'))]
-    // fn test_invalid_challenged_unknown() {
-    //     let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-    //     // fill u256.high, empty low > no owner > unknown
-    //     let HIGH: ContractAddress = starknet::contract_address_const::<0x100000000000000000000000000000000000000>();
-    //     let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), HIGH, PREMISE_1, TABLE_ID, 0);
-    // }
-
     #[test]
     #[should_panic(expected:('DUEL: Challenged self', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_self_duelist() {
@@ -143,15 +134,15 @@ mod tests {
     #[test]
     fn test_challenge_address_pact() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        assert(sys.duels.get_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == 0, 'get_pact_0_1');
-        assert(sys.duels.get_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == 0, 'get_pact_0_2');
-        assert(sys.duels.has_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == false, 'has_pact_0_1');
-        assert(sys.duels.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == false, 'has_pact_0_2');
+        assert(sys.duels.get_pact(TABLE_ID, OWNER(), OTHER()) == 0, 'get_pact_0_1');
+        assert(sys.duels.get_pact(TABLE_ID, OTHER(), OWNER()) == 0, 'get_pact_0_2');
+        assert(sys.duels.has_pact(TABLE_ID, OWNER(), OTHER()) == false, 'has_pact_0_1');
+        assert(sys.duels.has_pact(TABLE_ID, OTHER(), OWNER()) == false, 'has_pact_0_2');
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, TABLE_ID, 0);
-        assert(sys.duels.get_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == duel_id, 'get_pact_1_1');
-        assert(sys.duels.get_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == duel_id, 'get_pact_1_2');
-        assert(sys.duels.has_pact(TABLE_ID, ID(OWNER()), ID(OTHER())) == true, 'has_pact_1_1');
-        assert(sys.duels.has_pact(TABLE_ID, ID(OTHER()), ID(OWNER())) == true, 'has_pact_1_2');
+        assert(sys.duels.get_pact(TABLE_ID, OWNER(), OTHER()) == duel_id, 'get_pact_1_1');
+        assert(sys.duels.get_pact(TABLE_ID, OTHER(), OWNER()) == duel_id, 'get_pact_1_2');
+        assert(sys.duels.has_pact(TABLE_ID, OWNER(), OTHER()) == true, 'has_pact_1_1');
+        assert(sys.duels.has_pact(TABLE_ID, OTHER(), OWNER()) == true, 'has_pact_1_2');
     }
 
 
@@ -192,11 +183,11 @@ mod tests {
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::COMMONERS, 24);
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
 
-        assert(sys.duels.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes');
+        assert(sys.duels.has_pact(ch.table_id, B, A) == true, 'has_pact_yes');
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, A, duel_id, true);
         assert(new_state == ChallengeState::Expired, 'expired');
-        assert(sys.duels.has_pact(ch.table_id, ID(B), ID(A)) == false, 'has_pact_no');
+        assert(sys.duels.has_pact(ch.table_id, B, A) == false, 'has_pact_no');
 
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
         assert(ch.state == new_state, 'state');
@@ -221,8 +212,7 @@ mod tests {
         assert(ch.address_b == B, 'challenged');
         assert(ch.duelist_id_a == ID(ID_A), 'challenger_id');
         assert(ch.duelist_id_b == 0, 'challenged_id'); // challenged an address, id is empty
-        assert(sys.duels.has_pact(ch.table_id, ID(A), ID(B)) == true, 'has_pact_addr_true');
-        assert(sys.duels.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false');
+        assert(sys.duels.has_pact(ch.table_id, A, B) == true, 'has_pact_addr_true');
         
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
         let new_state: ChallengeState = tester::execute_reply_duel_ID(@sys.duels, B, ID(ID_B), duel_id, false);
@@ -232,8 +222,7 @@ mod tests {
         assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
-        assert(sys.duels.has_pact(ch.table_id, ID(A), ID(B)) == false, 'has_pact_addr_false');
-        assert(sys.duels.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false_still');
+        assert(sys.duels.has_pact(ch.table_id, A, B) == false, 'has_pact_addr_false');
 
         _assert_empty_progress(sys, duel_id);
     }
@@ -260,10 +249,10 @@ mod tests {
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
 
-        assert(sys.duels.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes');
+        assert(sys.duels.has_pact(ch.table_id, B, A) == true, 'has_pact_yes');
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, A, duel_id, false);
         assert(new_state == ChallengeState::Withdrawn, 'canceled');
-        assert(sys.duels.has_pact(ch.table_id, ID(A), ID(B)) == false, 'has_pact_no');
+        assert(sys.duels.has_pact(ch.table_id, A, B) == false, 'has_pact_no');
 
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
         assert(ch.state == new_state, 'state');
@@ -298,7 +287,7 @@ mod tests {
         assert(ch.address_b == ZERO(), 'challenged');
         assert(ch.duelist_id_a == ID(A), 'challenger_id');
         assert(ch.duelist_id_b == ID(B), 'challenged_id'); // challenged an address, id is empty
-        assert(sys.duels.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes');
+        assert(sys.duels.has_pact(ch.table_id, B, A) == true, 'has_pact_yes');
 
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, B, duel_id, false);
@@ -308,7 +297,7 @@ mod tests {
         assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
-        assert(sys.duels.has_pact(ch.table_id, ID(B), ID(A)) == false, 'has_pact_no');
+        assert(sys.duels.has_pact(ch.table_id, B, A) == false, 'has_pact_no');
 
         _assert_empty_progress(sys, duel_id);
     }
@@ -332,8 +321,7 @@ mod tests {
         assert(ch.address_b == B, 'challenged');
         assert(ch.duelist_id_a == ID(ID_A), 'challenger_id');
         assert(ch.duelist_id_b == 0, 'challenged_id'); // challenged an address, id is empty
-        assert(sys.duels.has_pact(ch.table_id, ID(A), ID(B)) == true, 'has_pact_addr_true');
-        assert(sys.duels.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false');
+        assert(sys.duels.has_pact(ch.table_id, A, B) == true, 'has_pact_addr_true');
 
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_duel_ID(@sys.duels, B, ID(ID_B), duel_id, false);
@@ -343,8 +331,7 @@ mod tests {
         assert(ch.winner == 0, 'winner');
         assert(ch.timestamp_start < timestamp, 'timestamp_start');
         assert(ch.timestamp_end == timestamp, 'timestamp_end');
-        assert(sys.duels.has_pact(ch.table_id, ID(A), ID(B)) == false, 'has_pact_addr_false');
-        assert(sys.duels.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false_still');
+        assert(sys.duels.has_pact(ch.table_id, A, B) == false, 'has_pact_addr_false');
 
         _assert_empty_progress(sys, duel_id);
     }
@@ -360,8 +347,8 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A: ContractAddress = OWNER();
         let B: ContractAddress = OTHER();
-        assert(sys.duels.has_pact(TABLE_ID, ID(A), ID(B)) == false, 'has_pact_no_1');
-        assert(sys.duels.has_pact(TABLE_ID, ID(B), ID(A)) == false, 'has_pact_no_2');
+        assert(sys.duels.has_pact(TABLE_ID, A, B) == false, 'has_pact_no_1');
+        assert(sys.duels.has_pact(TABLE_ID, B, A) == false, 'has_pact_no_2');
 
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLE_ID, 48);
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
@@ -380,8 +367,8 @@ mod tests {
         let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, B, duel_id, true);
         assert(new_state == ChallengeState::InProgress, 'in_progress');
-        assert(sys.duels.has_pact(ch.table_id, ID(A), ID(B)) == true, 'has_pact_yes_1');
-        assert(sys.duels.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_yes_2');
+        assert(sys.duels.has_pact(ch.table_id, A, B) == true, 'has_pact_yes_1');
+        assert(sys.duels.has_pact(ch.table_id, B, A) == true, 'has_pact_yes_2');
 
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
         assert(ch.state == new_state, 'state');
@@ -422,17 +409,13 @@ mod tests {
         assert(ch.address_b == B, 'challenged');
         assert(ch.duelist_id_a == ID(ID_A), 'challenger_id');
         assert(ch.duelist_id_b == 0, 'challenged_id'); // challenged an address, id is empty
-        assert(sys.duels.has_pact(ch.table_id, ID(A), ID(B)) == true, 'has_pact_addr_true_1');
-        assert(sys.duels.has_pact(ch.table_id, ID(B), ID(A)) == true, 'has_pact_addr_true_2');
-        assert(sys.duels.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == false, 'has_pact_id_false_1');
-        assert(sys.duels.has_pact(ch.table_id, ID(ID_B), ID(ID_A)) == false, 'has_pact_id_false_2');
+        assert(sys.duels.has_pact(ch.table_id, A, B) == true, 'has_pact_addr_true_1');
+        assert(sys.duels.has_pact(ch.table_id, B, A) == true, 'has_pact_addr_true_2');
         // reply...
         let new_state: ChallengeState = tester::execute_reply_duel_ID(@sys.duels, B, ID(ID_B), duel_id, true);
         assert(new_state == ChallengeState::InProgress, 'in_progress');
-        assert(sys.duels.has_pact(ch.table_id, ID(A), ID(B)) == false, 'has_pact_addr_false_1');
-        assert(sys.duels.has_pact(ch.table_id, ID(B), ID(A)) == false, 'has_pact_addr_false_2');
-        assert(sys.duels.has_pact(ch.table_id, ID(ID_A), ID(ID_B)) == true, 'has_pact_id_true_1');
-        assert(sys.duels.has_pact(ch.table_id, ID(ID_B), ID(ID_A)) == true, 'has_pact_id_true_2');
+        assert(sys.duels.has_pact(ch.table_id, A, B) == false, 'has_pact_addr_false_1');
+        assert(sys.duels.has_pact(ch.table_id, B, A) == false, 'has_pact_addr_false_2');
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
         assert(ch.duelist_id_b == ID(ID_B), 'challenged_id_ok');   // << UPDATED!!!
 

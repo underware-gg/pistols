@@ -44,7 +44,7 @@ mod tester {
             DuelistState, DuelistStateTrait,
         },
         duelist::{
-            m_Duelist, Duelist, DuelistTrait, DuelistValue,
+            m_Duelist, Duelist, DuelistValue,
             m_Pact, Pact, PactValue,
             m_Scoreboard, Scoreboard, ScoreboardValue,
             Score, ProfileType, Archetype
@@ -78,6 +78,7 @@ mod tester {
     use pistols::types::constants::{CONST};
     use pistols::types::premise::{Premise};
     use pistols::utils::arrays::{ArrayUtilsTrait, SpanUtilsTrait};
+    use pistols::utils::misc::{ContractAddressIntoU256};
     use pistols::utils::short_string::{ShortString};
     use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
 
@@ -106,7 +107,8 @@ mod tester {
     fn OWNED_BY_LITTLE_GIRL() -> ContractAddress { starknet::contract_address_const::<0xaaaa>() }
 
     fn ID(address: ContractAddress) -> u128 {
-        (DuelistTrait::address_as_id(address))
+        let as_u256: u256 = address.into();
+        (as_u256.low)
     }
 
     // set_contract_address : to define the address of the calling contract,

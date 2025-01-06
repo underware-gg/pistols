@@ -17,8 +17,8 @@ mod tests {
 
     #[test]
     fn test_pact_pair() {
-        let a: u128 = 0xb5e186ef2e4ab2762367cd07c8f892a1;
-        let b: u128 = 0x6b86e40118f29ebe393a75469b4d926c;
+        let a: ContractAddress = starknet::contract_address_const::<0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec>();
+        let b: ContractAddress = starknet::contract_address_const::<0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7>();
         let p_a = pact::make_pact_pair(a, b);
         let p_b = pact::make_pact_pair(b, a);
         assert(p_a == p_b, 'test_pact_pair');
