@@ -139,7 +139,7 @@ pub mod duel_token {
         config::{TokenConfig, TokenConfigValue},
         player::{Player, PlayerTrait, Activity},
         challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, Moves},
-        duelist::{Duelist, DuelistValue, ProfileType, ProfileTypeTrait},
+        duelist::{Duelist, DuelistTrait, DuelistValue, ProfileType, ProfileTypeTrait},
         pact::{Pact, PactTrait},
         table::{
             TableConfig, TableConfigTrait, TableConfigValue,
@@ -176,6 +176,7 @@ pub mod duel_token {
         const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
         const TABLE_IS_CLOSED: felt252          = 'DUEL: Table is closed';
         const PACT_EXISTS: felt252              = 'DUEL: Pact exists';
+        const DUELIST_IN_CHALLENGE: felt252     = 'DUEL: Duelist in a challenge';
     }
 
     //*******************************
@@ -252,7 +253,7 @@ pub mod duel_token {
             table_id: felt252,
             expire_hours: u64,
         ) -> u128 {
-            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(self.world_default());
 
             // transfer mint fee
             let fee_amount: u128 = self.calc_mint_fee(table_id);
@@ -261,17 +262,19 @@ pub mod duel_token {
             }
 
             // mint to game, so it can transfer to winner
-            let duel_id: u128 = self.token.mint(world.game_address());
+            let duel_id: u128 = self.token.mint(store.world.game_address());
 
             // validate challenger
             let address_a: ContractAddress = get_caller_address();
             let duelist_id_a: u128 = duelist_id;
-            let duelist_dispatcher: IDuelistTokenDispatcher = world.duelist_token_dispatcher();
+            let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
             assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
             assert(duelist_dispatcher.is_alive(duelist_id_a) == true, Errors::DUELIST_IS_DEAD);
 
+            // assert duelist is not in a challenge
+            store.enter_challenge(duelist_id_a, duel_id);
+
             // validate table
-            let mut store: Store = StoreTrait::new(world);
             let table: TableConfigValue = store.get_table_config_value(table_id);
             assert(table.is_open == true, Errors::TABLE_IS_CLOSED);
             let table_admittance: TableAdmittance = store.get_table_admittance(table_id);
@@ -333,10 +336,9 @@ pub mod duel_token {
             duel_id: u128,
             accepted: bool,
         ) -> ChallengeState {
-            let mut world = self.world_default();
+            let mut store: Store = StoreTrait::new(self.world_default());
             
             // validate chalenge
-            let mut store: Store = StoreTrait::new(world);
             let mut challenge: Challenge = store.get_challenge(duel_id);
             assert(challenge.exists(), Errors::INVALID_CHALLENGE);
             assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
@@ -356,7 +358,7 @@ pub mod duel_token {
                 challenge.timestamp_end = timestamp;
             } else {
                 // validate duelist ownership
-                let duelist_dispatcher = world.duelist_token_dispatcher();
+                let duelist_dispatcher = store.world.duelist_token_dispatcher();
                 assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
                 assert(duelist_dispatcher.is_alive(duelist_id_b) == true, Errors::DUELIST_IS_DEAD);
 
@@ -369,10 +371,15 @@ pub mod duel_token {
 
                 // all good!
                 if (accepted) {
-                    // Challenged is accepting
+                    // Challenged is accepting...
+                    // assert duelist is not in a challenge
+                    store.enter_challenge(duelist_id_b, duel_id);
+
+                    // update timestamps
                     challenge.state = ChallengeState::InProgress;
                     challenge.timestamp_start = timestamp;
                     challenge.timestamp_end = 0;
+
                     // generate player deck seed
                     let mut round: Round = store.get_round(duel_id);
                     store.set_round(@round);
@@ -388,6 +395,7 @@ pub mod duel_token {
 
             // duel canceled!
             if (challenge.state.is_canceled()) {
+                store.exit_challenge(challenge.duelist_id_a);
                 challenge.unset_pact(ref store);
             }
 
@@ -435,8 +443,7 @@ pub mod duel_token {
             (format!("Pistols at 10 Blocks Duel #{}. https://pistols.underware.gg", token_id))
         }
         fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
+            let mut store: Store = StoreTrait::new(self.world_default());
             let challenge: ChallengeValue = store.get_challenge_value(token_id.low);
             let duelist_a: DuelistValue = store.get_duelist_value(challenge.duelist_id_a);
             let duelist_b: DuelistValue = store.get_duelist_value(challenge.duelist_id_b);
@@ -463,8 +470,7 @@ pub mod duel_token {
             ([].span())
         }
         fn get_attribute_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
+            let mut store: Store = StoreTrait::new(self.world_default());
             let challenge: ChallengeValue = store.get_challenge_value(token_id.low);
             let mut result: Array<ByteArray> = array![];
             let duelist_a: ByteArray = format!("Duelist #{}", challenge.duelist_id_a);

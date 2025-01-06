@@ -15,6 +15,15 @@ pub struct Duelist {
     pub score: Score,
 }
 
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct DuelistChallenge {
+    #[key]
+    pub duelist_id: u128,
+    //-----------------------
+    pub duel_id: u128,          // current Challenge a Duelist is in
+}
+
 //
 // Duelist scores per Table
 #[derive(Copy, Drop, Serde)]
@@ -43,9 +52,30 @@ pub struct Score {
 //----------------------------------
 // Traits
 //
-use pistols::types::constants::{HONOUR};
+use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
+use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::bitwise::{BitwiseU64};
 use pistols::utils::math::{MathU64};
+use pistols::types::constants::{HONOUR};
+
+#[generate_trait]
+impl DuelistImpl of DuelistTrait {
+    fn enter_challenge(ref self: Store, duelist_id: u128, duel_id: u128) {
+        let current_challenge: DuelistChallenge = self.get_duelist_challenge(duelist_id);
+        assert(current_challenge.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);
+        self.set_duelist_challenge(@DuelistChallenge{
+            duelist_id,
+            duel_id,
+        });
+    }
+    fn exit_challenge(ref self: Store, duelist_id: u128) {
+        self.set_duelist_challenge(@DuelistChallenge{
+            duelist_id,
+            duel_id: 0,
+        });
+    }
+}
+
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Archetype {

@@ -35,6 +35,7 @@ use pistols::models::{
     },
     duelist::{
         m_Duelist, Duelist,
+        m_DuelistChallenge, DuelistChallenge,
         m_Scoreboard, Scoreboard,
     },
     pact::{
@@ -139,6 +140,7 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
             TestResource::Model(m_Config::TEST_CLASS_HASH),
             TestResource::Model(m_Duelist::TEST_CLASS_HASH),
+            TestResource::Model(m_DuelistChallenge::TEST_CLASS_HASH),
             TestResource::Model(m_Pact::TEST_CLASS_HASH),
             TestResource::Model(m_Payment::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),

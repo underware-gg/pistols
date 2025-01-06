@@ -50,13 +50,13 @@ pub mod game {
     use pistols::models::{
         player::{Player, PlayerTrait, Activity},
         challenge::{
-            Challenge, ChallengeTrait, ChallengeValue,
+            Challenge, ChallengeTrait,
             ChallengeFameBalance,
             Round, RoundTrait, RoundValue,
             MovesTrait,
         },
         duelist::{
-            Duelist, DuelistValue,
+            Duelist, DuelistTrait,
             Score, ScoreTrait,
             Scoreboard,
         },
@@ -245,7 +245,9 @@ pub mod game {
                 world.duel_token_dispatcher().transfer_to_winner(duel_id);
             }
 
-            // undo pact
+            // undo pacts
+            store.exit_challenge(challenge.duelist_id_a);
+            store.exit_challenge(challenge.duelist_id_b);
             challenge.unset_pact(ref store);
         }
 
