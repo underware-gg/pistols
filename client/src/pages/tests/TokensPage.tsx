@@ -26,12 +26,15 @@ export default function TokensPage() {
     <App>
       <Container>
         <Connect />
-        <Images />
+        <TestImages />
         <br />
         <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
+        <br />
         <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists' />
+        <br />
         <TokenContract contractAddress={duelContractAddress} tokenName='Duels' />
-        <PlayerDuelistTokensStoreSyncQL />
+        <br />
+        <PlayerDuelistTokensStoreSyncQL watch={false} />
       </Container>
     </App>
   );
@@ -55,7 +58,7 @@ function TokenContract({
     return tokens.sort((a, b) => Number(a.tokenId - b.tokenId)).map((token) => {
       const { tokenId, metadata } = token
       const meta = JSON.parse(metadata)
-      // console.log("meta", meta)
+      // console.log('meta', meta)
       const { id, name, description, image, metadata: attr } = meta
       // const img = image.replace('https', 'http')
       return (
@@ -69,8 +72,11 @@ function TokenContract({
               <li key={a}>{a}: <b>{attr[a]}</b></li>
             ))}
           </Cell>
-          <Cell>
+            <Cell>
             <img src={image} alt={name} style={{ width: '100px', height: '100px' }} />
+          </Cell>
+          <Cell>
+            <embed src={image} style={{ width: '100px', height: '100px' }} />
           </Cell>
         </Row>
       )
@@ -84,7 +90,8 @@ function TokenContract({
           <HeaderCell width={4}><h3 className='Important'>{tokenName}</h3></HeaderCell>
           {/* <HeaderCell width={4}><h3 className='Important'>{bigintToHex(contractAddress)}</h3></HeaderCell> */}
           <HeaderCell><h3 className='Important'>Name</h3></HeaderCell>
-          <HeaderCell><h3 className='Important'>Image</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>{`<img>`}</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>{`<embed>`}</h3></HeaderCell>
         </Row>
       </Header>
 
@@ -95,40 +102,51 @@ function TokenContract({
   )
 }
 
-function Images() {
+function TestImages() {
   const style = { width: '100px', height: '100px', backgroundColor: 'black' }
 
-  const svg1 = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1024 1434'><image href='https://localhost:5173/profiles/duelists/square/16.jpg' x='0' y='0' width='1024px' height='1024px' /><image href='https://localhost:5173/textures/cards/card_front_brown.png' x='0' y='0' width='1024px' height='1434px' /></svg>`
-  const svg2 = `
-  data:image/svg+xml,
-  <svg
-    xmlns='http://www.w3.org/2000/svg'
-    xmlns:xlink='http://www.w3.org/1999/xlink'
-    preserveAspectRatio='xMinYMin meet'
-    viewBox='0 0 1024 1434'
-    width='1024'
-    height='1434'
-  >
-  <image xlink:href='https://localhost:5173/profiles/duelists/square/16.jpg' x='0' y='0' width='1024px' height='1024px' />
-  <image href='https://localhost:5173/textures/cards/card_front_brown.png' x='0' y='0' width='1024px' height='1434px' />
-  </svg>
-  `
+  const svg_original = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1024 1434'><image href='https://localhost:5173/profiles/duelists/square/16.jpg' x='0' y='0' width='1024px' height='1024px' /><image href='https://localhost:5173/textures/cards/card_front_brown.png' x='0' y='0' width='1024px' height='1434px' /></svg>`
+  const svg_edited = `data:image/svg+xml,
+<svg
+  xmlns='http://www.w3.org/2000/svg'
+  xmlns:xlink='http://www.w3.org/1999/xlink'
+  preserveAspectRatio='xMinYMin meet'
+  viewBox='0 0 1024 1434'
+  width='1024'
+  height='1434'
+>
+  <image href='https://localhost:5173/profiles/duelists/square/16.jpg' x='0' y='0' width='1024px' height='1024px' />
+  <image href='https://localhost:5173/textures/cards/card_front_brown.png' x='0' y='0' width='1024px' height='1434px'/>
+  <foreignObject width='1000' height='1434'>
+    <body xmlns='http://www.w3.org/1999/xhtml'>
+      <p>Here is a paragraph that requires word wrap</p>
+      <p>Here is a paragraph that requires word wrap</p>
+      <p>Here is a paragraph that requires word wrap</p>
+      <p>Here is a paragraph that requires word wrap</p>
+      <p>Here is a paragraph that requires word wrap</p>
+      <p>Here is a paragraph that requires word wrap</p>
+      <p>Here is a paragraph that requires word wrap</p>
+      <img src='https://localhost:5173/textures/cards/card_front_brown.png' x='500' y='500'/>
+    </body>
+  </foreignObject>
+</svg>
+`
 
   return (
     <Table attached>
       <Header fullWidth>
         <Row>
           <HeaderCell>
-            <h3 className='Important'>{`<img>`}<br />(original)</h3>
+            <h3 className='Important'>TEST<br />{`<img>`}<br />(original)</h3>
           </HeaderCell>
           <HeaderCell>
-            <h3 className='Important'>{`<embed>`}<br />(original)</h3>
+            <h3 className='Important'>TEST<br />{`<embed>`}<br />(original)</h3>
           </HeaderCell>
           <HeaderCell>
-            <h3 className='Important'>{`<img>`}<br />(alt)</h3>
+            <h3 className='Important'>TEST<br />{`<img>`}<br />(edited)</h3>
           </HeaderCell>
           <HeaderCell>
-            <h3 className='Important'>{`<embed>`}<br />(alt)</h3>
+            <h3 className='Important'>TEST<br />{`<embed>`}<br />(edited)</h3>
           </HeaderCell>
         </Row>
       </Header>
@@ -136,16 +154,16 @@ function Images() {
       <Body>
         <Row>
           <Cell>
-            <img src={svg1} style={style} />
+            <img src={svg_original} style={style} />
           </Cell>
           <Cell>
-            <embed src={svg1} style={style} />
+            <embed src={svg_original} style={style} />
           </Cell>
           <Cell>
-            <img src={svg2} style={style} />
+            <img src={svg_edited} style={style} />
           </Cell>
           <Cell>
-            <embed src={svg2} style={style} />
+            <embed src={svg_edited} style={style} />
           </Cell>
         </Row>
       </Body>

@@ -51,11 +51,15 @@ const useStore = createStore();
 //----------------------------------------
 // keep connected player's tokens in sync
 //
-export function PlayerDuelistTokensStoreSyncQL() {
+export function PlayerDuelistTokensStoreSyncQL({
+  watch = true,
+}: {
+  watch?: boolean
+}) {
   const { duelistContractAddress } = useDuelistTokenContract()
   const { address } = useAccount()
   const state = useStore((state) => state)
-  const { tokens } = useToriiTokensByOwnerQL(duelistContractAddress, address, true)
+  const { tokens } = useToriiTokensByOwnerQL(duelistContractAddress, address, watch)
   useEffect(() => {
     if (duelistContractAddress && address) {
       state.setTokens(duelistContractAddress, address, tokens)
