@@ -140,6 +140,16 @@ export const getDeckTypeValue = (name: DeckType): number | undefined => _indexOr
 export const getDeckTypeFromValue = (value: number): DeckType | undefined => Object.keys(DeckType)[value] as DeckType;
 export const getDeckTypeMap = (): Record<DeckType, number> => Object.keys(DeckType).reduce((acc, v, index) => { acc[v as DeckType] = index; return acc; }, {} as Record<DeckType, number>);
 
+// from: ../dojo/src/types/cards/hand.cairo
+export enum FinalBlow {
+  Undefined = 'Undefined', // 0
+  Paces = 'Paces', // 1
+  Blades = 'Blades', // 2
+};
+export const getFinalBlowValue = (name: FinalBlow): number | undefined => _indexOrUndefined(Object.keys(FinalBlow).indexOf(name));
+export const getFinalBlowFromValue = (value: number): FinalBlow | undefined => Object.keys(FinalBlow)[value] as FinalBlow;
+export const getFinalBlowMap = (): Record<FinalBlow, number> => Object.keys(FinalBlow).reduce((acc, v, index) => { acc[v as FinalBlow] = index; return acc; }, {} as Record<FinalBlow, number>);
+
 // from: ../dojo/src/types/cards/paces.cairo
 export enum PacesCard {
   None = 'None', // 0
