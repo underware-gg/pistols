@@ -8,6 +8,7 @@ use pistols::types::cards::{
     paces::{PacesCard, PacesCardTrait},
     tactics::{TacticsCard, TacticsCardTrait},
     blades::{BladesCard, BladesCardTrait},
+    hand::{FinalBlow},
 };
 
 //-------------------------
@@ -57,12 +58,12 @@ pub struct Round {
     pub state_a: DuelistState,
     pub state_b: DuelistState,
     pub state: RoundState,
-    pub final_blow: felt252, // Card as string
+    pub final_blow: FinalBlow,
 }
 
 //
 // The shot of each player on a Round
-#[derive(Copy, Drop, Serde, Default, Introspect)]
+#[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
 pub struct Moves {
     // commit/reveal
     pub salt: felt252,      // the player's secret salt
@@ -72,9 +73,9 @@ pub struct Moves {
     pub card_2: u8,         // PacesCard,
     pub card_3: u8,         // TacticsCard,
     pub card_4: u8,         // BladesCard,
-} // [f] + [128 + 112(14*8)]:240
+} // [f] + [128 + 32(4*8)]:160
 
-#[derive(Copy, Drop, Serde, Default, Introspect)]
+#[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
 pub struct DuelistState {
     pub chances: u8,    // 0..100
     pub damage: u8,     // 0..CONST::INITIAL_CHANCE
@@ -82,7 +83,7 @@ pub struct DuelistState {
     pub health: u8,     // 0..CONST::FULL_HEALTH
     pub dice_fire: u8,  // 0..100
     pub honour: u8,     // honour granted
-} // [3*8]:24
+} // [5*8]:40
 
 
 //------------------------------------

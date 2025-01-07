@@ -25,7 +25,6 @@ pub enum Rarity {
     Uncommon,
     Special,
 }
-
 impl RarityDefault of Default<Rarity> {
     fn default() -> Rarity {(Rarity::None)}
 }

@@ -79,7 +79,7 @@ mod tests {
             moves_b: Default::default(),
             state_a: Default::default(),
             state_b: Default::default(),
-            final_blow: 0,
+            final_blow: Default::default(),
         };
         let mut hand_a: DuelistHand = round.moves_a.as_hand();
         let mut hand_b: DuelistHand = round.moves_b.as_hand();

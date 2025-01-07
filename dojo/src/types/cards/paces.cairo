@@ -57,21 +57,6 @@ impl PacesCardImpl of PacesCardTrait {
             PacesCard::Paces10.into(),
         ].span())
     }
-    fn variant_name(self: PacesCard) -> felt252 {
-        match self {
-            PacesCard::Paces1 =>    'Paces1',
-            PacesCard::Paces2 =>    'Paces2',
-            PacesCard::Paces3 =>    'Paces3',
-            PacesCard::Paces4 =>    'Paces4',
-            PacesCard::Paces5 =>    'Paces5',
-            PacesCard::Paces6 =>    'Paces6',
-            PacesCard::Paces7 =>    'Paces7',
-            PacesCard::Paces8 =>    'Paces8',
-            PacesCard::Paces9 =>    'Paces9',
-            PacesCard::Paces10 =>   'Paces10',
-            PacesCard::None => 0,
-        }
-    }
 }
 
 

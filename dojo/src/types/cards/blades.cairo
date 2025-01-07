@@ -147,15 +147,6 @@ impl BladesCardImpl of BladesCardTrait {
             BladesCard::Grapple.into(),
         ].span())
     }
-    fn variant_name(self: BladesCard) -> felt252 {
-        match self {
-            BladesCard::Seppuku =>      'Seppuku',
-            BladesCard::PocketPistol => 'PocketPistol',
-            BladesCard::Behead =>       'Behead',
-            BladesCard::Grapple =>      'Grapple',
-            BladesCard::None =>         0,
-        }
-    }
 }
 
 

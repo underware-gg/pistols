@@ -9,7 +9,7 @@ mod tests {
     use pistols::models::challenge::{Challenge, ChallengeValue, ChallengeFameBalanceValue, Round, RoundValue};
     use pistols::models::duelist::{Duelist, DuelistValue, ProfileType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
-    use pistols::types::cards::hand::{PacesCard, PacesCardTrait};
+    use pistols::types::cards::hand::{PacesCard, PacesCardTrait, FinalBlow};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
@@ -130,7 +130,7 @@ mod tests {
         assert(round.state_a.health == final_health, 'round.moves_a.health');
         assert(round.state_b.health == final_health, 'round.moves_b.health');
         let final_blow: PacesCard = MathU8::max(*moves_a.moves[0], *moves_b.moves[0]).into();
-        assert(round.final_blow == final_blow.variant_name(), 'round.final_blow');
+        assert(round.final_blow == FinalBlow::Paces(final_blow), 'round.final_blow');
         if (final_health == 0) {
             _assert_is_dead(round.state_a, 'dead_a');
             _assert_is_dead(round.state_b, 'dead_b');
@@ -286,7 +286,7 @@ mod tests {
         assert(round.moves_b.card_1.into() == *moves_b.moves[0], '4__card_fire');
         assert(round.moves_b.card_2.into() == *moves_b.moves[1], '4__card_dodge');
         let final_blow: PacesCard = (if(winner == 1){*moves_a.moves[0]}else{*moves_b.moves[0]}.into());
-        assert(round.final_blow == final_blow.variant_name(), 'round.final_blow');
+        assert(round.final_blow == FinalBlow::Paces(final_blow), 'round.final_blow');
 
         let duelist_a = tester::get_DuelistValue(sys.world, ID(OWNER()));
         let duelist_b = tester::get_DuelistValue(sys.world, ID(OTHER()));

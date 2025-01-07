@@ -21,6 +21,16 @@ pub struct DuelistHand {
     card_blades: BladesCard,
 }
 
+#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
+pub enum FinalBlow {
+    Undefined,
+    Paces: PacesCard,   // ended in Pistols round
+    Blades: BladesCard, // ended in Blades round
+}
+impl FinalBlowDefault of Default<FinalBlow> {
+    fn default() -> FinalBlow {(FinalBlow::Undefined)}
+}
+
 
 //--------------------
 // traits

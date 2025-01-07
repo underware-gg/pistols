@@ -318,7 +318,7 @@ pub mod duel_token {
                 moves_b: Default::default(),
                 state_a: Default::default(),
                 state_b: Default::default(),
-                final_blow: 0,
+                final_blow: Default::default(),
             };
             store.set_round(@round);
 
