@@ -51,6 +51,16 @@ pub struct PlayerActivity {
     pub identifier: felt252,    // (optional) duel_id, duelist_id, ...
     pub is_public: bool,        // should be notified in activity log
 }
+#[derive(Copy, Drop, Serde)]
+#[dojo::event(historical:false)]
+pub struct PlayerRequiredAction {
+    #[key]
+    pub address: ContractAddress,
+    #[key]
+    pub duelist_id: u128,
+    //-----------------------
+    pub duel_id: u128,
+}
 
 //--------------------------
 // OFF-CHAIN signed messages

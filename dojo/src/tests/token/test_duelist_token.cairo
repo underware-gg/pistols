@@ -22,7 +22,8 @@ use pistols::systems::{
 use pistols::models::{
     player::{
         m_Player, Player,
-        e_PlayerActivity, PlayerActivity,
+        e_PlayerActivity,
+        e_PlayerRequiredAction,
     },
     pack::{
         m_Pack, Pack,
@@ -158,6 +159,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
             // events
             TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
+            TestResource::Event(e_PlayerRequiredAction::TEST_CLASS_HASH),
             //
             // contracts
             TestResource::Contract(duelist_token::TEST_CLASS_HASH),

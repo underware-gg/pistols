@@ -273,6 +273,7 @@ pub mod duel_token {
 
             // assert duelist is not in a challenge
             store.enter_challenge(duelist_id_a, duel_id);
+            store.emit_required_action(address_a, duelist_id_a, duel_id);
 
             // validate table
             let table: TableConfigValue = store.get_table_config_value(table_id);
@@ -374,6 +375,7 @@ pub mod duel_token {
                     // Challenged is accepting...
                     // assert duelist is not in a challenge
                     store.enter_challenge(challenge.duelist_id_b, duel_id);
+                    store.emit_required_action(address_b, challenge.duelist_id_b, duel_id);
 
                     // update timestamps
                     challenge.state = ChallengeState::InProgress;

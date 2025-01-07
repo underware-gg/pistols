@@ -32,7 +32,8 @@ mod tester {
     use pistols::models::{
         player::{
             m_Player, Player,
-            e_PlayerActivity, PlayerActivity,
+            e_PlayerActivity,
+            e_PlayerRequiredAction,
         },
         pack::{
             m_Pack, Pack,
@@ -196,6 +197,7 @@ mod tester {
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
             // events
             TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
+            TestResource::Event(e_PlayerRequiredAction::TEST_CLASS_HASH),
         ];
         if (deploy_mock_rng) {
             resources.append(TestResource::Model(m_SaltValue::TEST_CLASS_HASH));

@@ -1,9 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::{WorldStorage, WorldStorageTrait};
-use dojo::model::{
-    ModelStorage, ModelValueStorage,
-    // Model, ModelPtr,
-};
+use dojo::model::{ModelStorage, ModelValueStorage};
+use dojo::event::{EventStorage};
 
 pub use pistols::models::{
     config::{
@@ -14,6 +12,7 @@ pub use pistols::models::{
     },
     player::{
         Player, PlayerValue,
+        PlayerRequiredAction,
     },
     pack::{
         Pack, PackValue,
@@ -57,7 +56,7 @@ impl StoreImpl of StoreTrait {
         (Store { world })
     }
 
-    //
+    //----------------------------------
     // Getters
     //
 
@@ -172,7 +171,7 @@ impl StoreImpl of StoreTrait {
         (self.world.read_model(recipient))
     }
 
-    //
+    //----------------------------------
     // Setters
     //
 
@@ -258,5 +257,19 @@ impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn set_token_bound_address(ref self: Store, model: @TokenBoundAddress) {
         self.world.write_model(model);
+    }
+
+
+    //----------------------------------
+    // Emitters
+    //
+
+    #[inline(always)]
+    fn emit_required_action(ref self: Store, address: ContractAddress, duelist_id: u128, duel_id: u128) {
+        self.world.emit_event(@PlayerRequiredAction{
+            address,
+            duelist_id,
+            duel_id,
+        });
     }
 }
