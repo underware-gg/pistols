@@ -40,7 +40,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const lords_mock_transfer = async (snAccount: Account | AccountInterface, recipient: string, amount: U256) => {
+	const lords_mock_transfer = async (snAccount: Account | AccountInterface, recipient: string, amount: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -56,7 +56,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const lords_mock_transferFrom = async (snAccount: Account | AccountInterface, sender: string, recipient: string, amount: U256) => {
+	const lords_mock_transferFrom = async (snAccount: Account | AccountInterface, sender: string, recipient: string, amount: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -72,7 +72,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const lords_mock_approve = async (snAccount: Account | AccountInterface, spender: string, amount: U256) => {
+	const lords_mock_approve = async (snAccount: Account | AccountInterface, spender: string, amount: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -140,7 +140,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const lords_mock_mint = async (snAccount: Account | AccountInterface, recipient: string, amount: U256) => {
+	const lords_mock_mint = async (snAccount: Account | AccountInterface, recipient: string, amount: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -236,7 +236,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const pack_token_ownerOf = async (tokenId: U256) => {
+	const pack_token_ownerOf = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "pack_token",
@@ -248,7 +248,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const pack_token_safeTransferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256, data: Array<BigNumberish>) => {
+	const pack_token_safeTransferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: BigNumberish, data: Array<BigNumberish>) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -264,7 +264,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const pack_token_transferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256) => {
+	const pack_token_transferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -280,7 +280,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const pack_token_approve = async (snAccount: Account | AccountInterface, to: string, tokenId: U256) => {
+	const pack_token_approve = async (snAccount: Account | AccountInterface, to: string, tokenId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -312,7 +312,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const pack_token_getApproved = async (tokenId: U256) => {
+	const pack_token_getApproved = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "pack_token",
@@ -372,7 +372,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const pack_token_tokenUri = async (tokenId: U256) => {
+	const pack_token_tokenUri = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "pack_token",
@@ -420,7 +420,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const pack_token_getTokenName = async (tokenId: U256) => {
+	const pack_token_getTokenName = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "pack_token",
@@ -432,7 +432,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const pack_token_getTokenDescription = async (tokenId: U256) => {
+	const pack_token_getTokenDescription = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "pack_token",
@@ -444,7 +444,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const pack_token_getTokenImage = async (tokenId: U256) => {
+	const pack_token_getTokenImage = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "pack_token",
@@ -456,7 +456,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const pack_token_getAttributePairs = async (tokenId: U256) => {
+	const pack_token_getAttributePairs = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "pack_token",
@@ -468,7 +468,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const pack_token_getMetadataPairs = async (tokenId: U256) => {
+	const pack_token_getMetadataPairs = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "pack_token",
@@ -588,7 +588,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const fame_coin_mintedDuelist = async (snAccount: Account | AccountInterface, duelistId: BigNumberish, amountPaid: U256) => {
+	const fame_coin_mintedDuelist = async (snAccount: Account | AccountInterface, duelistId: BigNumberish, amountPaid: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -656,7 +656,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const fame_coin_transfer = async (snAccount: Account | AccountInterface, recipient: string, amount: U256) => {
+	const fame_coin_transfer = async (snAccount: Account | AccountInterface, recipient: string, amount: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -672,7 +672,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const fame_coin_transferFrom = async (snAccount: Account | AccountInterface, sender: string, recipient: string, amount: U256) => {
+	const fame_coin_transferFrom = async (snAccount: Account | AccountInterface, sender: string, recipient: string, amount: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -688,7 +688,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const fame_coin_approve = async (snAccount: Account | AccountInterface, spender: string, amount: U256) => {
+	const fame_coin_approve = async (snAccount: Account | AccountInterface, spender: string, amount: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -776,7 +776,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const fame_coin_transferFromToken = async (snAccount: Account | AccountInterface, contractAddress: string, senderTokenId: BigNumberish, recipientTokenId: BigNumberish, amount: U256) => {
+	const fame_coin_transferFromToken = async (snAccount: Account | AccountInterface, contractAddress: string, senderTokenId: BigNumberish, recipientTokenId: BigNumberish, amount: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -792,7 +792,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const fame_coin_burnFromToken = async (snAccount: Account | AccountInterface, contractAddress: string, tokenId: BigNumberish, amount: U256) => {
+	const fame_coin_burnFromToken = async (snAccount: Account | AccountInterface, contractAddress: string, tokenId: BigNumberish, amount: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -1048,7 +1048,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_getTokenName = async (tokenId: U256) => {
+	const duel_token_getTokenName = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duel_token",
@@ -1060,7 +1060,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_getTokenDescription = async (tokenId: U256) => {
+	const duel_token_getTokenDescription = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duel_token",
@@ -1072,7 +1072,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_getTokenImage = async (tokenId: U256) => {
+	const duel_token_getTokenImage = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duel_token",
@@ -1084,7 +1084,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_getAttributePairs = async (tokenId: U256) => {
+	const duel_token_getAttributePairs = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duel_token",
@@ -1096,7 +1096,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_getMetadataPairs = async (tokenId: U256) => {
+	const duel_token_getMetadataPairs = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duel_token",
@@ -1120,7 +1120,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_ownerOf = async (tokenId: U256) => {
+	const duel_token_ownerOf = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duel_token",
@@ -1132,7 +1132,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_safeTransferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256, data: Array<BigNumberish>) => {
+	const duel_token_safeTransferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: BigNumberish, data: Array<BigNumberish>) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -1148,7 +1148,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_transferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256) => {
+	const duel_token_transferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -1164,7 +1164,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_approve = async (snAccount: Account | AccountInterface, to: string, tokenId: U256) => {
+	const duel_token_approve = async (snAccount: Account | AccountInterface, to: string, tokenId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -1196,7 +1196,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_getApproved = async (tokenId: U256) => {
+	const duel_token_getApproved = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duel_token",
@@ -1256,7 +1256,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duel_token_tokenUri = async (tokenId: U256) => {
+	const duel_token_tokenUri = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duel_token",
@@ -1268,33 +1268,33 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const vrf_mock_requestRandom = async (caller: string, source: models.Source) => {
-		try {
-			return await provider.call("pistols", {
-				contractName: "vrf_mock",
-				entrypoint: "request_random",
-				calldata: [caller, source],
-			});
-		} catch (error) {
-			console.error(error);
-		}
-	};
+	// const vrf_mock_requestRandom = async (caller: string, source: models.Source) => {
+	// 	try {
+	// 		return await provider.call("pistols", {
+	// 			contractName: "vrf_mock",
+	// 			entrypoint: "request_random",
+	// 			calldata: [caller, source],
+	// 		});
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// };
 
-	const vrf_mock_consumeRandom = async (snAccount: Account | AccountInterface, source: models.Source) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				{
-					contractName: "vrf_mock",
-					entrypoint: "consume_random",
-					calldata: [source],
-				},
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-		}
-	};
+	// const vrf_mock_consumeRandom = async (snAccount: Account | AccountInterface, source: models.Source) => {
+	// 	try {
+	// 		return await provider.execute(
+	// 			snAccount,
+	// 			{
+	// 				contractName: "vrf_mock",
+	// 				entrypoint: "consume_random",
+	// 				calldata: [source],
+	// 			},
+	// 			"pistols",
+	// 		);
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// };
 
 	const duelist_token_balanceOf = async (account: string) => {
 		try {
@@ -1308,7 +1308,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_ownerOf = async (tokenId: U256) => {
+	const duelist_token_ownerOf = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duelist_token",
@@ -1320,7 +1320,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_safeTransferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256, data: Array<BigNumberish>) => {
+	const duelist_token_safeTransferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: BigNumberish, data: Array<BigNumberish>) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -1336,7 +1336,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_transferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256) => {
+	const duelist_token_transferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -1352,7 +1352,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_approve = async (snAccount: Account | AccountInterface, to: string, tokenId: U256) => {
+	const duelist_token_approve = async (snAccount: Account | AccountInterface, to: string, tokenId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
@@ -1384,7 +1384,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_getApproved = async (tokenId: U256) => {
+	const duelist_token_getApproved = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duelist_token",
@@ -1444,7 +1444,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_tokenUri = async (tokenId: U256) => {
+	const duelist_token_tokenUri = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duelist_token",
@@ -1492,7 +1492,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_getTokenName = async (tokenId: U256) => {
+	const duelist_token_getTokenName = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duelist_token",
@@ -1504,7 +1504,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_getTokenDescription = async (tokenId: U256) => {
+	const duelist_token_getTokenDescription = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duelist_token",
@@ -1516,7 +1516,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_getTokenImage = async (tokenId: U256) => {
+	const duelist_token_getTokenImage = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duelist_token",
@@ -1528,7 +1528,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_getAttributePairs = async (tokenId: U256) => {
+	const duelist_token_getAttributePairs = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duelist_token",
@@ -1540,7 +1540,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const duelist_token_getMetadataPairs = async (tokenId: U256) => {
+	const duelist_token_getMetadataPairs = async (tokenId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", {
 				contractName: "duelist_token",
@@ -1733,10 +1733,10 @@ export function setupWorld(provider: DojoProvider) {
 			symbol: duel_token_symbol,
 			tokenUri: duel_token_tokenUri,
 		},
-		vrf_mock: {
-			requestRandom: vrf_mock_requestRandom,
-			consumeRandom: vrf_mock_consumeRandom,
-		},
+		// vrf_mock: {
+		// 	requestRandom: vrf_mock_requestRandom,
+		// 	consumeRandom: vrf_mock_consumeRandom,
+		// },
 		duelist_token: {
 			balanceOf: duelist_token_balanceOf,
 			ownerOf: duelist_token_ownerOf,
