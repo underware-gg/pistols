@@ -228,7 +228,7 @@ fn _purchase(sys: TestSystems, recipient: ContractAddress) {
 
 #[test]
 fn test_initializer() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     // assert(sys.token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(sys.token.symbol() == "PACK", 'Symbol is wrong');
 
@@ -241,7 +241,7 @@ fn test_initializer() {
 
 #[test]
 fn test_token_uri() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
 
     let pack = Pack {
         pack_id: TOKEN_ID_1.low,
@@ -263,7 +263,7 @@ fn test_token_uri() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.token_uri(999);
 }
 
@@ -315,7 +315,7 @@ fn test_claim_mint() {
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance_zero() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     sys.token.purchase(PackType::Duelists5x);
 }
@@ -323,7 +323,7 @@ fn test_mint_no_allowance_zero() {
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance_half() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     let price: u128 = sys.token.calc_mint_fee(OWNER(), PackType::Duelists5x);
     tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, price / 2);
@@ -333,7 +333,7 @@ fn test_mint_no_allowance_half() {
 #[test]
 #[should_panic(expected: ('PACK: Already claimed', 'ENTRYPOINT_FAILED'))]
 fn test_claim_twice() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     sys.token.claim_welcome_pack();
 }
@@ -341,14 +341,14 @@ fn test_claim_twice() {
 #[test]
 #[should_panic(expected: ('PACK: Claim duelists first', 'ENTRYPOINT_FAILED'))]
 fn test_no_claim() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     _purchase(sys, OWNER());
 }
 
 #[test]
 #[should_panic(expected: ('PACK: Not for sale', 'ENTRYPOINT_FAILED'))]
 fn test_mint_not_for_sale() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     sys.token.purchase(PackType::WelcomePack);
 }
@@ -360,7 +360,7 @@ fn test_mint_not_for_sale() {
 
 #[test]
 fn test_open() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     _assert_duelist_count(sys.world, sys.duelists, 5, 'duelist_supply 5');
     let pack_1: Pack = tester::get_Pack(sys.world, TOKEN_ID_1.low);
@@ -380,7 +380,7 @@ fn test_open() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_open_invalid() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     tester::impersonate(OWNER());
     sys.token.open(TOKEN_ID_2.low);
 }
@@ -388,7 +388,7 @@ fn test_open_invalid() {
 #[test]
 #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))]
 fn test_already_opened() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     tester::impersonate(OWNER());
     sys.token.open(TOKEN_ID_1.low);
@@ -397,7 +397,7 @@ fn test_already_opened() {
 #[test]
 #[should_panic(expected: ('PACK: Not owner', 'ENTRYPOINT_FAILED'))]
 fn test_open_not_owner() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     _purchase(sys, OWNER());
     tester::impersonate(OTHER());
@@ -412,7 +412,7 @@ fn test_open_not_owner() {
 #[test]
 #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))]
 fn test_transfer_opened() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     // try to transfer already opened
     utils::impersonate(OWNER());
@@ -422,7 +422,7 @@ fn test_transfer_opened() {
 #[test]
 #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))]
 fn test_transfer_opened_allowed() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     // approve
     tester::impersonate(OWNER());
@@ -435,7 +435,7 @@ fn test_transfer_opened_allowed() {
 #[test]
 #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
 fn test_transfer_opened_no_allowance() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     // try to transfer from unauthorized
     utils::impersonate(SPENDER());
@@ -444,7 +444,7 @@ fn test_transfer_opened_no_allowance() {
 
 #[test]
 fn test_transfer_unopened_ok() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     _purchase(sys, OWNER());
     assert(sys.token.balance_of(OWNER()) == 2, 'balance_of(OWNER) 2');
@@ -461,7 +461,7 @@ fn test_transfer_unopened_ok() {
 
 #[test]
 fn test_transfer_unopened_allowed_ok() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     _purchase(sys, OWNER());
     assert(sys.token.balance_of(OWNER()) == 2, 'balance_of(OWNER) 2');
@@ -482,7 +482,7 @@ fn test_transfer_unopened_allowed_ok() {
 #[test]
 #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
 fn test_transfer_unopened_no_allowance() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     _purchase(sys, OWNER());
     // try to transfer from unauthorized

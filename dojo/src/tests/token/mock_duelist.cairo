@@ -34,8 +34,8 @@ pub mod duelist_token {
     use pistols::types::constants::{FAME};
     use pistols::utils::misc::{ZERO};
     use pistols::tests::tester::tester::{
-        LITTLE_BOY, LITTLE_GIRL,
-        OWNED_BY_LITTLE_BOY, OWNED_BY_LITTLE_GIRL,
+        OWNER, OWNED_BY_OWNER,
+        OTHER, OWNED_BY_OTHER,
     };
 
     #[abi(embed_v0)]
@@ -52,19 +52,19 @@ pub mod duelist_token {
 
         fn owner_of(self: @ContractState, token_id: u256) -> ContractAddress {
             let mut world = self.world(@"pistols");
+
+            // transfered tokens
             let owner: MockDuelistOwners = world.read_model(token_id.low);
             if (owner.address != ZERO()) {
                 return owner.address;
             }
 
-            let as_felt: felt252 = token_id.low.into();
-            let as_addr: ContractAddress = as_felt.try_into().unwrap();
-            
-            // known owners...
-            if (as_addr == OWNED_BY_LITTLE_BOY()) { return LITTLE_BOY(); }
-            if (as_addr == OWNED_BY_LITTLE_GIRL()) { return LITTLE_GIRL(); }
+            // hard-coded owners
+            if (token_id.low == OWNED_BY_OWNER()) { return OWNER(); }
+            if (token_id.low == OWNED_BY_OTHER()) { return OTHER(); }
 
             // low part is always the owner address
+            let as_felt: felt252 = token_id.low.into();
             (as_felt.try_into().unwrap())
         }
         fn exists(self: @ContractState, token_id: u128) -> bool {

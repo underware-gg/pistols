@@ -31,10 +31,7 @@ mod tests {
         tester::{
             TestSystems,
             FLAGS, ID, ZERO,
-            OWNER, OTHER, BUMMER, TREASURY,
-            BIG_BOY, LITTLE_BOY, LITTLE_GIRL,
-            OWNED_BY_LITTLE_BOY, OWNED_BY_LITTLE_GIRL,
-            FAKE_OWNER_1_1, FAKE_OWNER_2_2,
+            OWNER, OTHER,
             _assert_is_alive, _assert_is_dead,
         }
     };

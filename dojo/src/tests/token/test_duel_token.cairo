@@ -68,7 +68,7 @@ use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{ArrayUtilsTrait, SpanUtilsTrait};
 use pistols::utils::math::{MathTrait};
 
-use pistols::tests::tester::{tester, tester::{OWNER, OTHER, BUMMER, TREASURY, ZERO}};
+use pistols::tests::tester::{tester, tester::{ID, OWNER, OTHER, BUMMER, RECIPIENT, TREASURY, ZERO}};
 use pistols::tests::{utils};
 
 use openzeppelin_token::erc721::interface;
@@ -120,10 +120,10 @@ fn assert_only_event_approval(
 // Setup
 //
 
-const TOKEN_ID_1: u256 = 1; // owned by OWNER()
-const TOKEN_ID_2: u256 = 2; // owned by OTHER()
-const TOKEN_ID_3: u256 = 3; // owned by BUMMER()
-const TOKEN_ID_4: u256 = 4; // owned by RECIPIENT()
+const DUEL_ID_1: u256 = 1; // owned by OWNER()
+const DUEL_ID_2: u256 = 2; // owned by OTHER()
+const DUEL_ID_3: u256 = 3; // owned by BUMMER()
+const DUEL_ID_4: u256 = 4; // owned by RECIPIENT()
 
 fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher) {
     testing::set_block_number(1);
@@ -212,8 +212,8 @@ fn setup(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher) {
     let (mut world, mut token) = setup_uninitialized(fee_amount);
 
     // initialize contracts
-    mint(token, OWNER(), TOKEN_ID_1, TOKEN_ID_2);
-    mint(token, OTHER(), TOKEN_ID_2, TOKEN_ID_3);
+    create_duel(token, OWNER(), OTHER());
+    create_duel(token, OTHER(), BUMMER());
 
     tester::impersonate(OWNER());
 
@@ -224,12 +224,12 @@ fn setup(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher) {
     (world, token)
 }
 
-fn mint(token: IDuelTokenDispatcher, recipient: ContractAddress, duelist_a: u256, duelist_b: u256) {
+fn create_duel(token: IDuelTokenDispatcher, recipient: ContractAddress, challenged_address: ContractAddress) {
 // '---AA'.print();
     tester::impersonate(recipient);
     token.create_duel(
-        duelist_id: duelist_a.low,
-        challenged_address: duelist_b.to_felt().try_into().unwrap(),
+        duelist_id: ID(recipient),
+        challenged_address: challenged_address,
         premise: Premise::Honour,
         quote: 'For honour!!!',
         table_id: TABLES::LORDS,
@@ -250,30 +250,30 @@ fn _assert_minted_count(world: WorldStorage, token: IDuelTokenDispatcher, minted
 
 #[test]
 fn test_initializer() {
-    let (world, mut token) = setup(100);
+    let (world, mut token) = setup(0);
     // assert(token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(token.symbol() == "DUEL", 'Symbol is wrong');
     _assert_minted_count(world, token, 2, 'Should eq 2');
 
-    assert(token.owner_of(TOKEN_ID_1).is_non_zero(), 'owner_of_1_non_zero');
-    assert(token.owner_of(TOKEN_ID_2).is_non_zero(), 'owner_of_2_non_zero');
-    assert(token.owner_of(TOKEN_ID_1) == world.game_address(), 'owner_of_1');
-    assert(token.owner_of(TOKEN_ID_2) == world.game_address(), 'owner_of_2');
+    assert(token.owner_of(DUEL_ID_1).is_non_zero(), 'owner_of_1_non_zero');
+    assert(token.owner_of(DUEL_ID_2).is_non_zero(), 'owner_of_2_non_zero');
+    assert(token.owner_of(DUEL_ID_1) == world.game_address(), 'owner_of_1');
+    assert(token.owner_of(DUEL_ID_2) == world.game_address(), 'owner_of_2');
 
     // owned by game now
     // assert(token.balance_of(OWNER()) == 1, 'Should eq 1 (OWNER)');
     // assert(token.balance_of(OTHER()) == 1, 'Should eq 1 (OTHER)');
-    // assert(token.owner_of(TOKEN_ID_1) == OWNER(), 'owner_of_1');
-    // assert(token.owner_of(TOKEN_ID_2) == OTHER(), 'owner_of_2');
+    // assert(token.owner_of(DUEL_ID_1) == OWNER(), 'owner_of_1');
+    // assert(token.owner_of(DUEL_ID_2) == OTHER(), 'owner_of_2');
 
     // enumberable
-    // assert(token.token_of_owner_by_index(OWNER(), 0) == TOKEN_ID_1, 'token_of_owner_by_index_OWNER');
-    // assert(token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_REC');
-    // assert(token.token_by_index(0) == TOKEN_ID_1, 'token_by_index_0');
-    // assert(token.token_by_index(1) == TOKEN_ID_2, 'token_by_index_1');
+    // assert(token.token_of_owner_by_index(OWNER(), 0) == DUEL_ID_1, 'token_of_owner_by_index_OWNER');
+    // assert(token.token_of_owner_by_index(OTHER(), 0) == DUEL_ID_2, 'token_of_owner_by_index_REC');
+    // assert(token.token_by_index(0) == DUEL_ID_1, 'token_by_index_0');
+    // assert(token.token_by_index(1) == DUEL_ID_2, 'token_by_index_1');
     
-    assert(token.token_uri(TOKEN_ID_1) != "", 'Uri should not be empty');
-    assert(token.tokenURI(TOKEN_ID_1) != "", 'Uri should not be empty Camel');
+    assert(token.token_uri(DUEL_ID_1) != "", 'Uri should not be empty');
+    assert(token.tokenURI(DUEL_ID_1) != "", 'Uri should not be empty Camel');
 
     assert(token.supports_interface(interface::IERC721_ID) == true, 'should support IERC721_ID');
     assert(token.supports_interface(interface::IERC721_METADATA_ID) == true, 'should support METADATA');
@@ -282,20 +282,20 @@ fn test_initializer() {
 
 #[test]
 fn test_token_component() {
-    let (mut _world, mut token) = setup(100);
+    let (mut _world, mut token) = setup(0);
     // should not panic
     // token.contract_address.print();
-    token.owner_of(TOKEN_ID_1);//.print();
+    token.owner_of(DUEL_ID_1);//.print();
     token.calc_mint_fee(TABLES::LORDS);//.print();
-    token.is_owner_of(OWNER(), TOKEN_ID_1.low);//.print();
+    token.is_owner_of(OWNER(), DUEL_ID_1.low);//.print();
 }
 
 #[test]
 fn test_token_uri() {
-    let (mut world, mut token) = setup(100);
+    let (mut world, mut token) = setup(0);
 
     let challenge = Challenge {
-        duel_id: TOKEN_ID_1.low,
+        duel_id: DUEL_ID_1.low,
         table_id: TABLES::LORDS,
         premise: Premise::Honour,
         quote: 'For honour!!!',
@@ -314,9 +314,8 @@ fn test_token_uri() {
 
     tester::set_Challenge(ref world, challenge);
 
-    let uri_1 = token.token_uri(TOKEN_ID_1);
-    let uri_2 = token.token_uri(TOKEN_ID_2);
-    
+    let uri_1 = token.token_uri(DUEL_ID_1);
+    let uri_2 = token.token_uri(DUEL_ID_2);
     println!("{}", uri_1);
     println!("{}", uri_2);
 
@@ -328,7 +327,7 @@ fn test_token_uri() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
-    let (_world, mut token) = setup(100);
+    let (_world, mut token) = setup(0);
     token.token_uri(999);
 }
 
@@ -340,12 +339,12 @@ fn test_token_uri_invalid() {
 #[test]
 #[ignore] // owned by game now
 fn test_approve() {
-    let (world, mut token) = setup(100);
+    let (world, mut token) = setup(0);
 
     utils::impersonate(OWNER());
 
-    token.approve(BUMMER(), TOKEN_ID_1);
-    assert(token.get_approved(TOKEN_ID_1) == BUMMER(), 'Spender not approved correctly');
+    token.approve(BUMMER(), DUEL_ID_1);
+    assert(token.get_approved(DUEL_ID_1) == BUMMER(), 'Spender not approved correctly');
 
     // drop StoreSetRecord ERC721TokenApprovalModel
     utils::drop_event(world.dispatcher.contract_address);
@@ -353,8 +352,8 @@ fn test_approve() {
     // TODO: fix events
     // // drop StoreSetRecord ERC721TokenApprovalModel
     // utils::drop_event(world.dispatcher.contract_address);
-    // assert_only_event_approval(token.contract_address, OWNER(), BUMMER(), TOKEN_ID_1);
-    // assert_only_event_approval(world.dispatcher.contract_address, OWNER(), BUMMER(), TOKEN_ID_1);
+    // assert_only_event_approval(token.contract_address, OWNER(), BUMMER(), DUEL_ID_1);
+    // assert_only_event_approval(world.dispatcher.contract_address, OWNER(), BUMMER(), DUEL_ID_1);
 }
 
 //
@@ -364,35 +363,35 @@ fn test_approve() {
 #[test]
 #[ignore] // owned by game now// owned by game now
 fn test_transfer_from() {
-    let (world, mut token) = setup(100);
+    let (world, mut token) = setup(0);
 
     tester::impersonate(OWNER());
-    token.approve(BUMMER(), TOKEN_ID_1);
+    token.approve(BUMMER(), DUEL_ID_1);
 
     utils::drop_all_events(token.contract_address);
     utils::drop_all_events(world.dispatcher.contract_address);
     utils::assert_no_events_left(token.contract_address);
 
     tester::impersonate(BUMMER());
-    token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    token.transfer_from(OWNER(), OTHER(), DUEL_ID_1);
 
     // TODO: fix events
-    // assert_only_event_transfer(token.contract_address, OWNER(), OTHER(), TOKEN_ID_1);
+    // assert_only_event_transfer(token.contract_address, OWNER(), OTHER(), DUEL_ID_1);
 
     assert(token.balance_of(OTHER()) == 2, 'Should eq 1');
     assert(token.balance_of(OWNER()) == 0, 'Should eq 1');
-    assert(token.get_approved(TOKEN_ID_1) == ZERO(), 'Should eq 0');
+    assert(token.get_approved(DUEL_ID_1) == ZERO(), 'Should eq 0');
     _assert_minted_count(world, token, 2, 'Should eq 2');
     // assert(token.total_supply() == 2, 'Should eq 2');
-    // assert(token.token_of_owner_by_index(OTHER(), 1) == TOKEN_ID_1, 'Should eq TOKEN_ID_1');
+    // assert(token.token_of_owner_by_index(OTHER(), 1) == DUEL_ID_1, 'Should eq DUEL_ID_1');
 }
 
 #[test]
 #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance() {
-    let (_world, mut token) = setup(100);
+    let (_world, mut token) = setup(0);
     utils::impersonate(BUMMER());
-    token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    token.transfer_from(OWNER(), OTHER(), DUEL_ID_1);
 }
 
 
@@ -405,19 +404,20 @@ fn test_mint_free() {
     let (world, mut token) = setup(0);
     _assert_minted_count(world, token, 2, 'invalid total_supply init');
     // assert(token.balance_of(OTHER()) == 1, 'invalid balance_of == 1');
-    // assert(token.token_of_owner_by_index(OTHER(), 0) == TOKEN_ID_2, 'token_of_owner_by_index_2');
-    mint(token, OTHER(), TOKEN_ID_2, TOKEN_ID_4);
+    // assert(token.token_of_owner_by_index(OTHER(), 0) == DUEL_ID_2, 'token_of_owner_by_index_2');
+    create_duel(token, BUMMER(), RECIPIENT());
     _assert_minted_count(world, token, 3, 'invalid total_supply');
     // assert(token.balance_of(OTHER()) == 2, 'invalid balance_of == 2');
-    // assert(token.token_of_owner_by_index(OTHER(), 1) == TOKEN_ID_3, 'token_of_owner_by_index_3');
+    // assert(token.token_of_owner_by_index(OTHER(), 1) == DUEL_ID_3, 'token_of_owner_by_index_3');
 }
 
 #[test]
+#[ignore] // we dont charge for duels
 fn test_mint_lords() {
     let (world, mut token) = setup(100);
     _assert_minted_count(world, token, 2, 'invalid total_supply init');
     // TODO: set allowance
-    mint(token, BUMMER(), TOKEN_ID_3, TOKEN_ID_4);
+    create_duel(token, BUMMER(), RECIPIENT());
     _assert_minted_count(world, token, 3, 'invalid total_supply');
 }
 
@@ -429,11 +429,11 @@ fn test_mint_lords() {
 // #[test]
 // #[should_panic(expected: ('DUEL: Not implemented', 'ENTRYPOINT_FAILED'))]
 // fn test_burn() {
-//     let (world, mut token) = setup(100);
+//     let (world, mut token) = setup(0);
 //     _assert_minted_count(world, token, 2, 'invalid total_supply init');
 //     // assert(token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
 //     tester::impersonate(world.game_address());
-//     token.delete_duel(TOKEN_ID_1.low);
+//     token.delete_duel(DUEL_ID_1.low);
 //     _assert_minted_count(world, token, 1, 'invalid total_supply');
 //     // assert(token.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
 // }

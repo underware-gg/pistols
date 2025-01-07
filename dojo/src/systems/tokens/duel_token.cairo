@@ -366,14 +366,14 @@ pub mod duel_token {
                 assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);
                 // validate chosen duelist
                 assert(challenge.duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
-                // fil missing duelist
+                // fill missing duelist
                 challenge.duelist_id_b = duelist_id_b;
 
                 // all good!
                 if (accepted) {
                     // Challenged is accepting...
                     // assert duelist is not in a challenge
-                    store.enter_challenge(duelist_id_b, duel_id);
+                    store.enter_challenge(challenge.duelist_id_b, duel_id);
 
                     // update timestamps
                     challenge.state = ChallengeState::InProgress;
@@ -395,8 +395,8 @@ pub mod duel_token {
 
             // duel canceled!
             if (challenge.state.is_canceled()) {
-                store.exit_challenge(challenge.duelist_id_a);
                 challenge.unset_pact(ref store);
+                store.exit_challenge(challenge.duelist_id_a);
             }
 
             // events

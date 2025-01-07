@@ -247,7 +247,7 @@ fn _assert_minted_count(world: WorldStorage, token: IDuelistTokenDispatcher, min
 
 #[test]
 fn test_initializer() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     // assert(sys.token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
     assert(sys.token.symbol() == "DUELIST", 'Symbol is wrong');
 
@@ -264,7 +264,7 @@ fn test_initializer() {
 
 #[test]
 fn test_token_component() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     // should not panic
     sys.token.owner_of(TOKEN_ID_1);//.print();
     sys.token.is_owner_of(OWNER(), TOKEN_ID_1.low);//.print();
@@ -272,7 +272,7 @@ fn test_token_component() {
 
 #[test]
 fn test_token_uri() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
 
     let duelist = Duelist {
         duelist_id: TOKEN_ID_1.low,
@@ -303,7 +303,7 @@ fn test_token_uri() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.token_uri(999);
 }
 
@@ -315,7 +315,7 @@ fn test_token_uri_invalid() {
 #[test]
 #[should_panic(expected: ('TOKEN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_mint_duelist_not_minter() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     sys.token.mint_duelists(OWNER(), 1, 0x1234);
 }
 
@@ -325,7 +325,7 @@ fn test_mint_duelist_not_minter() {
 
 #[test]
 fn test_approve() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
 
     utils::impersonate(OWNER());
 
@@ -348,7 +348,7 @@ fn test_approve() {
 
 #[test]
 fn test_transfer_from() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
 
     assert(sys.token.balance_of(OWNER()) == CONST::WELCOME_PACK_DUELIST_COUNT.into(), 'Should eq [5]');
     assert(sys.token.balance_of(OTHER()) == 0, 'Should eq 0');
@@ -378,7 +378,7 @@ fn test_transfer_from() {
 #[test]
 #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
 fn test_transfer_no_allowance() {
-    let mut sys: TestSystems = setup(100);
+    let mut sys: TestSystems = setup(0);
     utils::impersonate(SPENDER());
     sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
 }
@@ -390,7 +390,7 @@ fn test_transfer_no_allowance() {
 // #[test]
 // #[should_panic(expected: ('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
 // fn test_burn() {
-//     let mut sys: TestSystems = setup(100);
+//     let mut sys: TestSystems = setup(0);
 //     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
 //     assert(sys.token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
 //     sys.token.delete_duelist(TOKEN_ID_1.low);

@@ -28,10 +28,7 @@ mod tests {
             IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
             IFameCoinDispatcher, IFameCoinDispatcherTrait,
             FLAGS, ID, ZERO,
-            OWNER, OTHER, BUMMER, TREASURY,
-            BIG_BOY, LITTLE_BOY, LITTLE_GIRL,
-            OWNED_BY_LITTLE_BOY, OWNED_BY_LITTLE_GIRL,
-            FAKE_OWNER_1_1, FAKE_OWNER_2_2,
+            OWNER, OTHER, BUMMER, TREASURY, FAKE_OWNER_OF_1,
             _assert_is_alive, _assert_is_dead,
         }
     };
@@ -108,7 +105,8 @@ mod tests {
         assert(fame_balance_a > 0, 'fame_balance_a_init');
         assert(fame_balance_b > 0, 'fame_balance_b_init');
 
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
+        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
+        tester::assert_pact(sys, duel_id, challenge, true, true, "started");
         // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, (lords_fee + PRIZE_VALUE) * 2, 'lords_balance_contract_1');
         // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee + PRIZE_VALUE, 0, 'lords_balance_a_1');
         // tester::assert_balance(sys.lords, OTHER(), lords_balance_b, lords_fee + PRIZE_VALUE, 0, 'lords_balance_b_1');
@@ -122,6 +120,7 @@ mod tests {
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
+        tester::assert_pact(sys, duel_id, challenge, false, false, "ended");
 // challenge.winner.print();
 // round.state_a.health.print();
 // round.state_b.health.print();
@@ -140,8 +139,8 @@ mod tests {
             _assert_is_alive(round.state_b, 'alive_b');
         }
 
-        let duelist_a = tester::get_DuelistValue(sys.world, OWNER());
-        let duelist_b = tester::get_DuelistValue(sys.world, OTHER());
+        let duelist_a = tester::get_DuelistValue(sys.world, ID(OWNER()));
+        let duelist_b = tester::get_DuelistValue(sys.world, ID(OTHER()));
         assert(duelist_a.score.total_duels == 1, 'duelist_a.total_duels');
         assert(duelist_b.score.total_duels == 1, 'duelist_b.total_duels');
         assert(duelist_a.score.total_draws == 1, 'duelist_a.total_draws');
@@ -221,11 +220,12 @@ mod tests {
         assert(lords_fee == 0, 'lords_fee == 0');
         // assert(lords_balance_treasury == 0, 'lords_balance_treasury == 0');
 
-        let (_challenge, _round_1, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
+        let (challenge, _round_1, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
         // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, (lords_fee + PRIZE_VALUE) * 2, 'lords_balance_contract_1');
         // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee + PRIZE_VALUE, 0, 'lords_balance_a_1');
         // tester::assert_balance(sys.lords, OTHER(), lords_balance_b, lords_fee + PRIZE_VALUE, 0, 'lords_balance_b_1');
         // tester::assert_balance(sys.lords, TREASURY(), 0, 0, 0, 'lords_balance_treasury_1');
+        tester::assert_pact(sys, duel_id, challenge, true, true, "started");
 
         let fame_reward_a: u128 = sys.duelists.calc_fame_reward(duelist_id_a);
         let fame_reward_b: u128 = sys.duelists.calc_fame_reward(duelist_id_b);
@@ -268,6 +268,7 @@ mod tests {
         // 2nd reveal > Finished
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
+        tester::assert_pact(sys, duel_id, challenge, false, false, "ended");
 // challenge.winner.print();
 // // challenge.state.print();
 // round.state_a.health.print();
@@ -287,8 +288,8 @@ mod tests {
         let final_blow: PacesCard = (if(winner == 1){*moves_a.moves[0]}else{*moves_b.moves[0]}.into());
         assert(round.final_blow == final_blow.variant_name(), 'round.final_blow');
 
-        let duelist_a = tester::get_DuelistValue(sys.world, OWNER());
-        let duelist_b = tester::get_DuelistValue(sys.world, OTHER());
+        let duelist_a = tester::get_DuelistValue(sys.world, ID(OWNER()));
+        let duelist_b = tester::get_DuelistValue(sys.world, ID(OTHER()));
         assert(duelist_a.score.total_duels == 1, 'duelist_a.total_duels');
         assert(duelist_b.score.total_duels == 1, 'duelist_b.total_duels');
         assert(duelist_a.score.total_draws == 0, 'duelist_a.total_draws');
@@ -362,6 +363,7 @@ mod tests {
         assert(fame_reward_b_2 != fame_reward_b, 'fame_reward_b_2 !=');
 
         let (_challenge, _round_2, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
+        tester::assert_pact(sys, duel_id, challenge, true, true, "started_2");
         // assert(round_2.moves_a.seed != 0, 'round_2.moves_a.seed');
         // assert(round_2.moves_b.seed != 0, 'round_2.moves_b.seed');
         // assert(round_2.moves_a.seed != round_2.moves_b.seed, 'round_2.moves_a.seed != moves_b');
@@ -372,13 +374,14 @@ mod tests {
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::assert_pact(sys, duel_id, challenge, false, false, "ended_2");
         let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
         assert(challenge.state == ChallengeState::Resolved, 'challenge.state ++');
         assert(challenge.winner != 0, 'challenge.winner ++');
         assert(challenge.timestamp_end > 0, 'challenge.timestamp_end ++');
         assert(round.state == RoundState::Finished, 'state ++');
-        let duelist_a = tester::get_DuelistValue(sys.world, OWNER());
-        let duelist_b = tester::get_DuelistValue(sys.world, OTHER());
+        let duelist_a = tester::get_DuelistValue(sys.world, ID(OWNER()));
+        let duelist_b = tester::get_DuelistValue(sys.world, ID(OTHER()));
         assert(duelist_a.score.total_duels == 2, 'duelist_a.total_duels ++');
         assert(duelist_b.score.total_duels == 2, 'duelist_b.total_duels ++');
         assert(duelist_a.score.total_draws == 0, 'duelist_a.total_draws ++');
@@ -677,11 +680,11 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE, TABLES::COMMONERS, 48);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 0x1212112);
-        // no panic
+        // no panic!
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Challenge not ongoing', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Accept challenge first', 'ENTRYPOINT_FAILED'))]
     fn test_commit_before_reply_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE, TABLES::COMMONERS, 48);
@@ -706,7 +709,7 @@ mod tests {
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
         // try to commmit with another account
         let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
-        tester::execute_commit_moves(@sys.game, FAKE_OWNER_1_1(), duel_id, hashed);
+        tester::execute_commit_moves(@sys.game, FAKE_OWNER_OF_1(), duel_id, hashed);
     }
 
     #[test]

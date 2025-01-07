@@ -144,13 +144,14 @@ impl ActivityImpl of ActivityTrait {
     }
     fn can_register_player(self: Activity) -> bool {
         match self {
-            Activity::WelcomePack => true,
-            Activity::StartedTutorial => true,
-            Activity::FinishedTutorial => true,
-            Activity::CreatedDuelist => true,
-            Activity::CreatedChallenge => true,
-            Activity::RepliedChallenge => true,
-            _ => false,
+            // Activity::WelcomePack => true,
+            // Activity::StartedTutorial => true,
+            // Activity::FinishedTutorial => true,
+            // Activity::CreatedDuelist => true,
+            // Activity::CreatedChallenge => true,
+            // Activity::RepliedChallenge => true,
+            // _ => false,
+            _ => true,
         }
     }
 }

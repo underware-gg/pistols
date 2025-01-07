@@ -79,6 +79,7 @@ pub mod game {
     mod Errors {
         const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
         const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not ongoing';
+        const NOT_ACCEPTED: felt252              = 'PISTOLS: Accept challenge first';
         const NOT_YOUR_DUEL: felt252             = 'PISTOLS: Not your duel';
         const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
         const ROUND_NOT_IN_COMMIT: felt252       = 'PISTOLS: Round not in commit';
@@ -125,7 +126,7 @@ pub mod game {
                 // validate challenge: challenged needs to accept first
                 assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
             } else {
-                assert(false, Errors::NOT_YOUR_DUEL);
+                assert(false, if (starknet::get_caller_address() == challenge.address_b) {Errors::NOT_ACCEPTED} else {Errors::NOT_YOUR_DUEL});
             }
 
             // validate Round

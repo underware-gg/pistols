@@ -81,6 +81,7 @@ mod tester {
     use pistols::types::constants::{CONST};
     use pistols::types::premise::{Premise};
     use pistols::utils::arrays::{ArrayUtilsTrait, SpanUtilsTrait};
+    use pistols::utils::byte_arrays::{BoolToByteArray};
     use pistols::utils::misc::{ContractAddressIntoU256};
     use pistols::utils::short_string::{ShortString};
     use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
@@ -91,23 +92,19 @@ mod tester {
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
     //
 
-    fn ZERO() -> ContractAddress { starknet::contract_address_const::<0x0>() }
-    fn OWNER() -> ContractAddress { starknet::contract_address_const::<0x1>() }
-    fn OTHER() -> ContractAddress { starknet::contract_address_const::<0x2>() }
-    fn BUMMER() -> ContractAddress { starknet::contract_address_const::<0x3>() }
-    fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x4>() }
-    fn SPENDER() -> ContractAddress { starknet::contract_address_const::<0x5>() }
-    fn TREASURY() -> ContractAddress { starknet::contract_address_const::<0x444>() }
-    fn BIG_BOY() -> ContractAddress { starknet::contract_address_const::<0x54f650fb5e1fb61d7b429ae728a365b69e5aff9a559a05de70f606aaea1a243>() }
-    fn LITTLE_BOY()  -> ContractAddress { starknet::contract_address_const::<0xffff00000000000ee>() }
-    fn LITTLE_GIRL() -> ContractAddress { starknet::contract_address_const::<0xaaaa00000000000bb>() }
-    fn FAKE_OWNER_1_1() -> ContractAddress { starknet::contract_address_const::<0x1000000000000000000000000000000001>() }
-    fn FAKE_OWNER_1_2() -> ContractAddress { starknet::contract_address_const::<0x1000000000000000000000000000000002>() }
-    fn FAKE_OWNER_2_1() -> ContractAddress { starknet::contract_address_const::<0x2000000000000000000000000000000001>() }
-    fn FAKE_OWNER_2_2() -> ContractAddress { starknet::contract_address_const::<0x2000000000000000000000000000000002>() }
-    // always owned tokens: 0xffff, 0xaaaa
-    fn OWNED_BY_LITTLE_BOY()-> ContractAddress { starknet::contract_address_const::<0xffff>() }
-    fn OWNED_BY_LITTLE_GIRL() -> ContractAddress { starknet::contract_address_const::<0xaaaa>() }
+    fn ZERO()      -> ContractAddress { starknet::contract_address_const::<0x0>() }
+    fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // welcome 1-5
+    fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x6>() } // welcome 6-10
+    fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x111>() }
+    fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x222>() }
+    fn SPENDER()   -> ContractAddress { starknet::contract_address_const::<0x333>() }
+    fn TREASURY()  -> ContractAddress { starknet::contract_address_const::<0x444>() }
+    // low part is owned token, but different address
+    fn FAKE_OWNER_OF_1() -> starknet::ContractAddress { starknet::contract_address_const::<0x1234000000000000000000000000000000001>() }
+    fn FAKE_OWNER_OF_2() -> starknet::ContractAddress { starknet::contract_address_const::<0x2234000000000000000000000000000000002>() }
+    // hard-coded owners
+    fn OWNED_BY_OWNER() -> u128 { 0xeeee }
+    fn OWNED_BY_OTHER() -> u128 { 0xdddd }
 
     fn ID(address: ContractAddress) -> u128 {
         let as_u256: u256 = address.into();
@@ -480,12 +477,6 @@ mod tester {
         (duel_id)
     }
     fn execute_reply_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
-        duel_id: u128,
-        accepted: bool,
-    ) -> ChallengeState {
-        (execute_reply_duel_ID(system, sender, ID(sender), duel_id, accepted))
-    }
-    fn execute_reply_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
         token_id: u128,
         duel_id: u128,
         accepted: bool,
@@ -555,12 +546,13 @@ mod tester {
         (world.read_model(pack_id))
     }
     #[inline(always)]
-    fn get_DuelistValue(world: WorldStorage, address: ContractAddress) -> DuelistValue {
-        (world.read_value(ID(address)))
+    fn get_DuelistValue(world: WorldStorage, duelist_id: u128) -> DuelistValue {
+        (world.read_value(duelist_id))
     }
     #[inline(always)]
-    fn get_DuelistValue_id(world: WorldStorage, duelist_id: u128) -> DuelistValue {
-        (world.read_value(duelist_id))
+    fn get_DuelistChallengeId(world: WorldStorage, duelist_id: u128) -> u128 {
+        let duelist_challenge : DuelistChallenge = world.read_model(duelist_id);
+        (duelist_challenge.duel_id)
     }
     #[inline(always)]
     fn get_Scoreboard(world: WorldStorage, table_id: felt252, address: ContractAddress) -> Scoreboard {
@@ -662,6 +654,24 @@ mod tester {
         }
     }
 
+    fn assert_pact(sys: TestSystems, duel_id: u128, ch: ChallengeValue, has_pact: bool, accepted: bool, prefix: ByteArray) {
+        assert!(sys.duels.has_pact(ch.table_id, ch.address_a, ch.address_b) == has_pact,
+            "[{}] _assert_pact() not [{}]", prefix, has_pact.to_string()
+        );
+        assert!(sys.duels.has_pact(ch.table_id, ch.address_b, ch.address_a) == has_pact,
+            "[{}] __assert_pact() not [{}]", prefix, has_pact.to_string()
+        );
+        let expected_duel_id: u128 = if (has_pact) {duel_id} else {0};
+        let duelist_duel_id: u128 = get_DuelistChallengeId(sys.world, ch.duelist_id_a);
+        assert!(duelist_duel_id == expected_duel_id,
+            "[{}] duelist_challenge_a: [{}] not [{}]", prefix, duelist_duel_id, expected_duel_id
+        );
+        let expected_duel_id: u128 = if (has_pact && accepted) {duel_id} else {0};
+        let duelist_duel_id: u128 = get_DuelistChallengeId(sys.world, ch.duelist_id_b);
+        assert!(duelist_duel_id == expected_duel_id,
+            "[{}] duelist_challenge_b: [{}] not [{}]", prefix, duelist_duel_id, expected_duel_id
+        );
+    }
 
 }
 

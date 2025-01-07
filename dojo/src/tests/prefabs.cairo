@@ -19,10 +19,6 @@ mod prefabs {
         tester::{
             TestSystems,
             FLAGS, ID, ZERO,
-            OWNER, OTHER, BUMMER, TREASURY,
-            BIG_BOY, LITTLE_BOY, LITTLE_GIRL,
-            OWNED_BY_LITTLE_BOY, OWNED_BY_LITTLE_GIRL,
-            FAKE_OWNER_1_1, FAKE_OWNER_2_2,
         }
     };
     use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait, mock_shuffle_values};
@@ -77,7 +73,7 @@ mod prefabs {
     fn start_new_challenge(sys: TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> u128 {
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, duelist_a, duelist_b, MESSAGE, table_id, 48);
         tester::elapse_timestamp(timestamp::from_days(1));
-        tester::execute_reply_duel(@sys.duels, duelist_b, duel_id, true);
+        tester::execute_reply_duel(@sys.duels, duelist_b, ID(duelist_b), duel_id, true);
         (duel_id)
     }
 
