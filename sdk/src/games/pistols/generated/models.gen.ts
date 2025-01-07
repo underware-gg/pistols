@@ -267,23 +267,6 @@ export interface PlayerValue {
   claimed_welcome_pack: boolean;
 }
 
-// Type definition for `pistols::models::player::PlayerActivity` struct
-export interface PlayerActivity {
-  address: string;
-  timestamp: BigNumberish;
-  activity: Activity;
-  identifier: BigNumberish;
-  is_public: boolean;
-}
-
-// Type definition for `pistols::models::player::PlayerActivityValue` struct
-export interface PlayerActivityValue {
-  timestamp: BigNumberish;
-  activity: Activity;
-  identifier: BigNumberish;
-  is_public: boolean;
-}
-
 // Type definition for `pistols::models::table::TableAdmittance` struct
 export interface TableAdmittance {
 	table_id: BigNumberish;
@@ -329,17 +312,6 @@ export interface TokenBoundAddress {
 export interface TokenBoundAddressValue {
 	contract_address: string;
 	token_id: BigNumberish;
-}
-
-// Type definition for `pistols::models::player::Activity` enum
-export enum Activity {
-  Undefined,
-  CreatedDuelist,
-  CreatedChallenge,
-  RepliedChallenge,
-  CommittedMoves,
-  RevealedMoves,
-  Online,
 }
 
 // Type definition for `pistols::models::pack::PackType` enum
@@ -445,6 +417,33 @@ export enum RoundState {
 	Finished,
 }
 
+
+//----------------------------------
+// Events
+//
+// Type definition for `pistols::models::player::Activity` enum
+export enum Activity {
+  Undefined,
+  CreatedDuelist,
+  CreatedChallenge,
+  RepliedChallenge,
+  CommittedMoves,
+  RevealedMoves,
+  Online,
+}
+// Type definition for `pistols::models::player::PlayerActivity` struct
+export interface PlayerActivity {
+  address: string;
+  timestamp: BigNumberish;
+  activity: Activity;
+  identifier: BigNumberish;
+  is_public: boolean;
+}
+//
+//----------------------------------
+
+
+
 export interface SchemaType extends ISchemaType {
 	pistols: {
 		Challenge: WithFieldOrder<Challenge>,
@@ -481,7 +480,6 @@ export interface SchemaType extends ISchemaType {
 		Player: WithFieldOrder<Player>,
 		PlayerValue: WithFieldOrder<PlayerValue>,
     PlayerActivity: WithFieldOrder<PlayerActivity>,
-    PlayerActivityValue: WithFieldOrder<PlayerActivityValue>,
 		TableAdmittance: WithFieldOrder<TableAdmittance>,
 		TableAdmittanceValue: WithFieldOrder<TableAdmittanceValue>,
 		TableConfig: WithFieldOrder<TableConfig>,
@@ -730,13 +728,6 @@ export const schema: SchemaType = {
 		PlayerActivity: {
 			fieldOrder: ['address', 'timestamp', 'activity', 'identifier', 'is_public'],
 			address: "",
-			timestamp: 0,
-			activity: Activity.Undefined,
-			identifier: 0,
-			is_public: true,
-		},
-		PlayerActivityValue: {
-			fieldOrder: ['timestamp', 'activity', 'identifier', 'is_public'],
 			timestamp: 0,
 			activity: Activity.Undefined,
 			identifier: 0,
