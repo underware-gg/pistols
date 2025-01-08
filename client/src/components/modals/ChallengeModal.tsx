@@ -11,7 +11,8 @@ import { useTable } from '/src/stores/tableStore'
 import { useIsMyAccount, useIsYou } from '/src/hooks/useIsYou'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
-import { useIsBookmarked } from '/src/stores/playerStore'
+import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
+import { useIsBookmarked, usePlayer } from '/src/stores/playerStore'
 import { ProfileDescription } from '/src/components/account/ProfileDescription'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
@@ -42,6 +43,7 @@ export default function ChallengeModal() {
     duelistIdA, duelistIdB, duelistAddressA, duelistAddressB,
     isLive, isFinished, needToSyncExpired,
   } = useChallenge(selectedDuelId)
+  const { name: ownerNameB } = usePlayer(duelistAddressB)
   const { description: tableDescription } = useTable(tableId)
 
   const { challengeDescription } = useChallengeDescription(selectedDuelId)
@@ -109,7 +111,7 @@ export default function ChallengeModal() {
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} />
+                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} displayFameBalance />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -119,7 +121,10 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} />
+                {duelistIdB
+                  ? <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} displayFameBalance/>
+                  : <h1>{ownerNameB}</h1>
+                }
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>

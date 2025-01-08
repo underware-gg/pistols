@@ -1,6 +1,8 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameApect'
+import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
+import { usePlayer } from '/src/stores/playerStore'
 import { AnimationData } from '/src/components/cards/Cards'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
@@ -49,6 +51,8 @@ export interface DuelistCardHandle {
 
 export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((props: DuelistCardProps, ref: React.Ref<DuelistCardHandle>) => {
   const { name, nameDisplay, profilePic, score } = useDuelist(props.duelistId)
+  const { owner } = useOwnerOfDuelist(props.duelistId)
+  const { name: ownerName } = usePlayer(owner)
 
   const [spring, setSpring] = useState<AnimationData>({ dataField1: [], dataField2: [], duration: 0, easing: TWEEN.Easing.Quadratic.InOut, interpolation: TWEEN.Interpolation.Linear })
   const [rotation, setRotation] = useState<AnimationData>({ dataField1: [], dataField2: [], duration: 0, easing: TWEEN.Easing.Quadratic.InOut, interpolation: TWEEN.Interpolation.Linear })
@@ -512,6 +516,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
               <img className='card-image-front NoMouse NoDrag' src={archetypeImage} alt="Card Front" />
               <div className="duelist-card-details">
                 <div className="duelist-name" data-contentlength={name ? Math.floor(name.length / 10) : 31}>{name}</div>
+                <div className="duelist-name Smaller" data-contentlength={ownerName ? Math.floor(ownerName.length / 10) : 31}>({ownerName})</div>
                 <div className="duelist-fame">
                   <FameBalanceDuelist duelistId={props.duelistId} />
                 </div>

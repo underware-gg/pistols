@@ -220,7 +220,7 @@ function RoundStats({
           <Row>
             <Cell>Final Blow</Cell>
             <Cell>
-              {round.final_blow}: {round.endedInBlades ? <BladesIcon blade={round.final_blow} /> : round.final_blow ? <PacesIcon paces={round.final_blow} /> : '-'}
+              {round.finalBlow}: {round.endedInBlades ? <BladesIcon blade={round.finalBlow} /> : round.finalBlow ? <PacesIcon paces={round.finalBlow} /> : '-'}
             </Cell>
           </Row>
         </Body>

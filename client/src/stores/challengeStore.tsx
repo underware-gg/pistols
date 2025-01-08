@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { BigNumberish } from 'starknet'
+import { BigNumberish, CairoCustomEnum } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk'
-import { useEntityId, useClientTimestamp, feltToString } from '@underware_gg/pistols-sdk/utils'
+import { useEntityId, useClientTimestamp, feltToString, parseCustomEnum } from '@underware_gg/pistols-sdk/utils'
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { movesToHand } from '/src/utils/pistols'
@@ -99,8 +99,9 @@ export const useRound = (duelId: BigNumberish) => {
   const round = useEntityModel<models.Round>(entity, 'Round')
 
   const state = useMemo(() => (round?.state as unknown as constants.RoundState ?? null), [round])
-  const final_blow = useMemo(() => feltToString(round?.final_blow ?? 0n), [round])
-  const endedInBlades = useMemo(() => (round ? (constants.getBladesCardValue(final_blow as unknown as constants.BladesCard) > 0) : false), [final_blow])
+
+  const [finalBlowType, finalBlow] = useMemo(() => parseCustomEnum<constants.FinalBlow>(round?.final_blow as unknown as CairoCustomEnum), [round])
+  const endedInBlades = useMemo(() => (finalBlowType === constants.FinalBlow.Blades), [finalBlowType])
 
   const hand_a = useMemo(() => round ? movesToHand(
     //@ts-ignore
@@ -138,7 +139,7 @@ export const useRound = (duelId: BigNumberish) => {
 
   return {
     state,
-    final_blow,
+    finalBlow,
     endedInBlades,
     hand_a,
     hand_b,

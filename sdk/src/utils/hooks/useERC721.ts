@@ -18,7 +18,7 @@ export const useERC721OwnerOf = (contractAddress: BigNumberish, tokenId: BigNumb
   }), [contractAddress, tokenId])
   const { data, isFetching: isLoading } = useReadContract(options);
   return {
-    owner: data ?? null,
+    owner: (data ?? null) as BigNumberish,
     isLoading,
   }
 }

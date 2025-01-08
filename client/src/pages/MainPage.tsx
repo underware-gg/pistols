@@ -124,11 +124,11 @@ function TutorialUI({
 
 
 function Modals() {
-  const { selectedDuelId, selectedDuelistId, selectedPlayerAddress, challengingId, walletFinderOpener } = usePistolsContext()
+  const { selectedDuelId, selectedDuelistId, selectedPlayerAddress, challengingAddress, walletFinderOpener } = usePistolsContext()
   const challengeIsOpen = useMemo(() => (selectedDuelId > 0), [selectedDuelId])
   const duelistIsOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
   const playerIsOpen = useMemo(() => (selectedPlayerAddress > 0n), [selectedPlayerAddress])
-  const newChallengeIsOpen = useMemo(() => (challengingId > 0n), [challengingId])
+  const newChallengeIsOpen = useMemo(() => (challengingAddress > 0n), [challengingAddress])
   return (
     <>
       {challengeIsOpen && <ChallengeModal />}

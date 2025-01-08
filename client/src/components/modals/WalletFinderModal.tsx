@@ -44,7 +44,7 @@ export default function WalletFinderModal({
   const { name: profileName, profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null, chainConfig.rpcUrl)
 
   const { tableId } = useSettings()
-  const { dispatchSelectDuel, dispatchChallengingDuelistId } = usePistolsContext()
+  const { dispatchSelectDuel, dispatchChallengingPlayerAddress } = usePistolsContext()
   const { hasPact, pactDuelId } = usePact(tableId, myAcountAddress, validatedAddress)
 
   return (
@@ -116,7 +116,7 @@ export default function WalletFinderModal({
             <Col>
               {isMyAccount ? <ActionButton large fill disabled={true} label='Challenge yourself?' onClick={() => { }} />
                 : hasPact ? <ActionButton large fill important label='Existing Challenge' onClick={() => dispatchSelectDuel(pactDuelId)} />
-                  : <ActionButton large fill important disabled={!canSubmit} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(validatedAddress)} />
+                  : <ActionButton large fill important disabled={!canSubmit} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(validatedAddress)} />
               }
             </Col>
           </Row>

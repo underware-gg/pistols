@@ -5,6 +5,7 @@ import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useDuelist } from '/src/stores/duelistStore'
+import { usePlayer } from '/src/stores/playerStore'
 import { useTable } from '/src/stores/tableStore'
 import { usePact } from '/src/hooks/usePact'
 import { useCalcFeeDuel } from '/src/hooks/usePistolsContractCalls'
@@ -12,7 +13,7 @@ import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ProfileDescription } from '/src/components/account/ProfileDescription'
 import { FormInput } from '/src/components/ui/Form'
-import { FameBalanceDuelist, FeesToPay } from '/src/components/account/LordsBalance'
+import { FeesToPay } from '/src/components/account/LordsBalance'
 import { Divider } from '/src/components/ui/Divider'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 
@@ -24,19 +25,20 @@ export default function NewChallengeModal() {
   const { account, address } = useAccount()
   const { tableId, duelistId } = useSettings()
 
-  const { challengingId, dispatchChallengingDuelistId, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
-  const isOpen = useMemo(() => (challengingId > 0n), [challengingId])
+  const { challengingAddress, dispatchChallengingPlayerAddress, dispatchSelectDuelistId, dispatchSelectPlayerAddress, dispatchSelectDuel } = usePistolsContext()
+  const isOpen = useMemo(() => (challengingAddress > 0n), [challengingAddress])
   const duelistIdA = duelistId
-  const duelistIdB = challengingId
+  const duelistIdB = challengingAddress
   const addressA = address
-  const addressB = challengingId
+  const addressB = challengingAddress
 
-  const _close = () => { dispatchChallengingDuelistId(0n) }
+  const _close = () => { dispatchChallengingPlayerAddress(0n) }
 
   const { profilePic: profilePicA } = useDuelist(duelistIdA)
   const { profilePic: profilePicB } = useDuelist(duelistIdB)
-  const { hasPact: hasPactDuelist, pactDuelId: pactDuelIdDuelist } = usePact(tableId, duelistIdA, duelistIdB)
-  const { hasPact: hasPactAddress, pactDuelId: pactDuelIdAddress } = usePact(tableId, addressA, addressB)
+  const { name: ownerName } = usePlayer(challengingAddress)
+
+  const { hasPact, pactDuelId } = usePact(tableId, addressA, addressB)
 
   const { description: tableDescription } = useTable(tableId)
 
@@ -52,17 +54,15 @@ export default function NewChallengeModal() {
   }, [isOpen])
 
   useEffect(() => {
-    if (hasPactDuelist) {
-      dispatchSelectDuel(pactDuelIdDuelist)
-    } else if (hasPactAddress) {
-      dispatchSelectDuel(pactDuelIdAddress)
+    if (hasPact) {
+      dispatchSelectDuel(pactDuelId)
     }
-  }, [hasPactDuelist, hasPactAddress])
+  }, [hasPact])
 
   const _create_duel = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await duel_token.create_duel(account, duelistId, challengingId, args.premise, args.quote, tableId, args.expire_hours)
+      await duel_token.create_duel(account, duelistId, challengingAddress, args.premise, args.quote, tableId, args.expire_hours)
       setIsSubmitting(false)
     }
     if (args) _submit()
@@ -97,8 +97,7 @@ export default function NewChallengeModal() {
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} />
-                <h5><FameBalanceDuelist duelistId={duelistIdA} /></h5>
+                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} displayFameBalance />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -108,8 +107,8 @@ export default function NewChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} />
-                <h5><FameBalanceDuelist duelistId={duelistIdB} /></h5>
+                {/* <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} displayFameBalance /> */}
+                <h1>{ownerName}</h1>
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -125,7 +124,7 @@ export default function NewChallengeModal() {
           </Grid>
         </Modal.Description>
 
-        <ProfilePic profilePic={profilePicB} onClick={() => dispatchSelectDuelistId(duelistIdB)} displayBountyValue={0} />
+        <ProfilePic profilePic={profilePicB} onClick={() => dispatchSelectPlayerAddress(challengingAddress)} displayBountyValue={0} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>

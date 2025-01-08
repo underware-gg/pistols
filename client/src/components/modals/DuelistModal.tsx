@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
+import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useIsMyDuelist, useIsYou } from '/src/hooks/useIsYou'
@@ -23,17 +24,20 @@ export default function DuelistModal() {
   const { tableId, duelistId, isAnon, dispatchDuelistId } = useSettings()
   const { atProfile, dispatchSetScene } = usePistolsScene()
 
-  const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingDuelistId, dispatchSelectPlayerAddress } = usePistolsContext()
+  const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingPlayerAddress, dispatchSelectPlayerAddress } = usePistolsContext()
   const { owner } = useOwnerOfDuelist(selectedDuelistId)
   const { name: ownerName } = usePlayer(owner)
   const isOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
   const { isYou } = useIsYou(selectedDuelistId)
   const isMyDuelist = useIsMyDuelist(selectedDuelistId)
-
-  const _close = () => { dispatchSelectDuelistId(0n) }
-
   const { profilePic, duelistIdDisplay } = useDuelist(selectedDuelistId)
-  const { hasPact, pactDuelId } = usePact(tableId, duelistId, selectedDuelistId)
+
+  const { address } = useAccount()
+  const { hasPact, pactDuelId } = usePact(tableId, address, owner)
+
+  const _close = () => {
+    dispatchSelectDuelistId(0n)
+  }
 
   const _switch = () => {
     if (isYou) {
@@ -109,7 +113,7 @@ export default function DuelistModal() {
             {!isYou &&
               <Col>
                 {hasPact && <ActionButton large fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />}
-                {!hasPact && <ActionButton large fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(selectedDuelistId)} />}
+                {!hasPact && <ActionButton large fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(owner)} />}
               </Col>
             }
             {atProfile &&
