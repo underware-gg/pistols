@@ -1,8 +1,10 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { BigNumberish } from 'starknet'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
 import { usePlayer } from '/src/stores/playerStore'
+import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { AnimationData } from '/src/components/cards/Cards'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
@@ -12,6 +14,7 @@ import * as Constants from '/src/data/cardConstants'
 
 interface DuelistCardProps {
   duelistId: number
+  address?: BigNumberish
   width?: number
   height?: number
   classes?: string
@@ -52,7 +55,7 @@ export interface DuelistCardHandle {
 export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((props: DuelistCardProps, ref: React.Ref<DuelistCardHandle>) => {
   const { name, nameDisplay, profilePic, score } = useDuelist(props.duelistId)
   const { owner } = useOwnerOfDuelist(props.duelistId)
-  const { name: ownerName } = usePlayer(owner)
+  const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
 
   const [spring, setSpring] = useState<AnimationData>({ dataField1: [], dataField2: [], duration: 0, easing: TWEEN.Easing.Quadratic.InOut, interpolation: TWEEN.Interpolation.Linear })
   const [rotation, setRotation] = useState<AnimationData>({ dataField1: [], dataField2: [], duration: 0, easing: TWEEN.Easing.Quadratic.InOut, interpolation: TWEEN.Interpolation.Linear })
@@ -467,6 +470,10 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
     document.addEventListener('mouseup', handleMouseUp)
   }, [props.isDraggable, spring, boxW, boxH, props.width, props.height, scale, rotation, props.onClick])
 
+  const _nameLength = (name: string) => {
+    return name ? Math.floor(name.length / 10) : 31
+  }
+
   const testName = '1234567890123456789012345678901'
 
   return (
@@ -515,8 +522,14 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
               <img className='duelist-card-image-drawing NoMouse NoDrag' src={makeProfilePicUrl(profilePic, true)} alt="Profile Picture" />
               <img className='card-image-front NoMouse NoDrag' src={archetypeImage} alt="Card Front" />
               <div className="duelist-card-details">
-                <div className="duelist-name" data-contentlength={name ? Math.floor(name.length / 10) : 31}>{name}</div>
-                <div className="duelist-name Smaller" data-contentlength={ownerName ? Math.floor(ownerName.length / 10) : 31}>({ownerName})</div>
+                {
+                  props.duelistId ?
+                    <>
+                      <div className="duelist-name" data-contentlength={_nameLength(name)}>{name}</div>
+                      <div className="duelist-name Smaller" data-contentlength={_nameLength(playerName)}>({playerName})</div>
+                    </>
+                    : <div className="duelist-name" data-contentlength={_nameLength(playerName)}>{playerName}</div>
+                }
                 <div className="duelist-fame">
                   <FameBalanceDuelist duelistId={props.duelistId} />
                 </div>

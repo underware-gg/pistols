@@ -5,7 +5,6 @@ import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useDuelist } from '/src/stores/duelistStore'
-import { usePlayer } from '/src/stores/playerStore'
 import { useTable } from '/src/stores/tableStore'
 import { usePact } from '/src/hooks/usePact'
 import { useCalcFeeDuel } from '/src/hooks/usePistolsContractCalls'
@@ -25,18 +24,17 @@ export default function NewChallengeModal() {
   const { account, address } = useAccount()
   const { tableId, duelistId } = useSettings()
 
-  const { challengingAddress, dispatchChallengingPlayerAddress, dispatchSelectDuelistId, dispatchSelectPlayerAddress, dispatchSelectDuel } = usePistolsContext()
+  const { challengingAddress, dispatchChallengingPlayerAddress, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
   const isOpen = useMemo(() => (challengingAddress > 0n), [challengingAddress])
   const duelistIdA = duelistId
-  const duelistIdB = challengingAddress
   const addressA = address
   const addressB = challengingAddress
 
   const _close = () => { dispatchChallengingPlayerAddress(0n) }
 
   const { profilePic: profilePicA } = useDuelist(duelistIdA)
-  const { profilePic: profilePicB } = useDuelist(duelistIdB)
-  const { name: ownerName } = usePlayer(challengingAddress)
+  // const { profilePic: profilePicB } = useDuelist(duelistIdB)
+  const profilePicB = 0
 
   const { hasPact, pactDuelId } = usePact(tableId, addressA, addressB)
 
@@ -107,8 +105,7 @@ export default function NewChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                {/* <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} displayFameBalance /> */}
-                <h1>{ownerName}</h1>
+                <ProfileDescription duelistId={0} address={challengingAddress} displayOwnerAddress={false} displayFameBalance />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -124,7 +121,7 @@ export default function NewChallengeModal() {
           </Grid>
         </Modal.Description>
 
-        <ProfilePic profilePic={profilePicB} onClick={() => dispatchSelectPlayerAddress(challengingAddress)} displayBountyValue={0} />
+        <ProfilePic profilePic={profilePicB} onClick={() => dispatchSelectDuelistId(0, challengingAddress)} displayBountyValue={0} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>

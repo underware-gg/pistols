@@ -11,8 +11,7 @@ import { useTable } from '/src/stores/tableStore'
 import { useIsMyAccount, useIsYou } from '/src/hooks/useIsYou'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
-import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
-import { useIsBookmarked, usePlayer } from '/src/stores/playerStore'
+import { useIsBookmarked } from '/src/stores/playerStore'
 import { ProfileDescription } from '/src/components/account/ProfileDescription'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
@@ -43,7 +42,6 @@ export default function ChallengeModal() {
     duelistIdA, duelistIdB, duelistAddressA, duelistAddressB,
     isLive, isFinished, needToSyncExpired,
   } = useChallenge(selectedDuelId)
-  const { name: ownerNameB } = usePlayer(duelistAddressB)
   const { description: tableDescription } = useTable(tableId)
 
   const { challengeDescription } = useChallengeDescription(selectedDuelId)
@@ -121,10 +119,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                {duelistIdB
-                  ? <ProfileDescription duelistId={duelistIdB} displayOwnerAddress={false} displayFameBalance/>
-                  : <h1>{ownerNameB}</h1>
-                }
+                <ProfileDescription duelistId={duelistIdB} address={duelistAddressB} displayOwnerAddress={false} displayFameBalance/>
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -167,7 +162,7 @@ export default function ChallengeModal() {
           </Grid>
         </Modal.Description>
 
-        <ProfilePic profilePic={profilePicB} duelistId={duelistIdB} floated='right' onClick={() => dispatchSelectDuelistId(duelistIdB)} />
+        <ProfilePic profilePic={profilePicB} duelistId={duelistIdB} floated='right' onClick={() => dispatchSelectDuelistId(duelistIdB, duelistAddressB)} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>

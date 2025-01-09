@@ -3,13 +3,15 @@ import { Grid, Image } from 'semantic-ui-react'
 import { _useConnector } from '@underware_gg/pistols-sdk/fix'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useLordsContract, useSelectedChain, useConnectedController, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
-import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
+import { usePlayer } from '/src/stores/playerStore'
 import { FameBalance, LordsBalance } from '/src/components/account/LordsBalance'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { AddressShort } from '/src/components/ui/AddressShort'
 import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import { SceneName } from '/src/data/assets'
+import { useSettings } from '/src/hooks/SettingsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -21,6 +23,7 @@ export default function WalletHeader({
   const { connectedChainName } = useSelectedChain()
   const { lordsContractAddress } = useLordsContract()
   const { dispatchSetScene } = usePistolsScene()
+  const { dispatchSelectPlayerAddress } = usePistolsContext()
   const { connector } = _useConnector()
 
   // BUG: https://github.com/apibara/starknet-react/issues/419
@@ -31,7 +34,8 @@ export default function WalletHeader({
   const name = useMemo(() => (data?.name ?? `Connected to ${connectedChainName}`), [data])
   const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0, true)), [data, connector])
 
-  const { username, openProfile } = useConnectedController()
+  const { openProfile } = useConnectedController()
+  const { username } = usePlayer(address)
 
   return (
     <Grid>
@@ -70,7 +74,10 @@ export default function WalletHeader({
             </Col>
           }
           <Col verticalAlign='middle'>
-            <ActionButton fill disabled={!openProfile} onClick={() => openProfile()} label='Controller' />
+            <ActionButton fill onClick={() => dispatchSelectPlayerAddress(address)} label='Profile' />
+          </Col>
+          <Col verticalAlign='middle'>
+            <ActionButton fill disabled={!openProfile} onClick={() => openProfile()} label='Account' />
           </Col>
           <Col verticalAlign='middle'>
             <ActionButton fill onClick={() => {

@@ -47,6 +47,17 @@ export const ChallengeStateDescriptions: Record<constants.ChallengeState, string
   [constants.ChallengeState.Draw]: "Honour has not been satisfied",
 }
 
+export const ChallengeStateReplyVerbs: Record<constants.ChallengeState, string> = {
+  [constants.ChallengeState.Null]: '---',
+  [constants.ChallengeState.Awaiting]: '---',
+  [constants.ChallengeState.Withdrawn]: 'withdrew from',
+  [constants.ChallengeState.Refused]: 'refused',
+  [constants.ChallengeState.Expired]: 'collected',
+  [constants.ChallengeState.InProgress]: 'accepted',
+  [constants.ChallengeState.Resolved]: '---',
+  [constants.ChallengeState.Draw]: '---',
+}
+
 export const ChallengeStateClasses: Record<constants.ChallengeState, string> = {
   [constants.ChallengeState.Null]: '',
   [constants.ChallengeState.Awaiting]: '',
@@ -85,35 +96,20 @@ export const RoundStateNames: Record<constants.RoundState, string> = {
 // (action.cairo)
 //
 export enum Action {
-  //@ts-ignore
   Idle = constants.PacesCard.None,
-  //@ts-ignore
   Paces1 = constants.PacesCard.Paces1,
-  //@ts-ignore
   Paces2 = constants.PacesCard.Paces2,
-  //@ts-ignore
   Paces3 = constants.PacesCard.Paces3,
-  //@ts-ignore
   Paces4 = constants.PacesCard.Paces4,
-  //@ts-ignore
   Paces5 = constants.PacesCard.Paces5,
-  //@ts-ignore
   Paces6 = constants.PacesCard.Paces6,
-  //@ts-ignore
   Paces7 = constants.PacesCard.Paces7,
-  //@ts-ignore
   Paces8 = constants.PacesCard.Paces8,
-  //@ts-ignore
   Paces9 = constants.PacesCard.Paces9,
-  //@ts-ignore
   Paces10 = constants.PacesCard.Paces10,
-  //@ts-ignore
   Seppuku = constants.BladesCard.Seppuku,
-  //@ts-ignore
   PocketPistol = constants.BladesCard.PocketPistol,
-  //@ts-ignore
   Behead = constants.BladesCard.Behead,
-  //@ts-ignore
   Grapple = constants.BladesCard.Grapple,
 }
 

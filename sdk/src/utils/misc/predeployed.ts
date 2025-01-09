@@ -10,7 +10,7 @@ export type PredeployedAccount = {
   name?: string;
   address: string;
   privateKey: string;
-  active: boolean;
+  active?: boolean;
 };
 
 export class PredeployedConnector extends Connector {
@@ -22,7 +22,7 @@ export class PredeployedConnector extends Connector {
 
   constructor(rpcUrl: string, chainId: string, predeployedAccounts: PredeployedAccount[]) {
     super();
-    const account: PredeployedAccount = predeployedAccounts.find((e) => e.active)
+    const account: PredeployedAccount = predeployedAccounts.find((e) => e.active === true)
     if (!account) {
       throw new Error('PredeployedConnector: missing account')
     }

@@ -33,6 +33,8 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const {
     state,
     tableId,
+    duelistAddressA,
+    duelistAddressB,
     duelistIdA,
     duelistIdB,
     isLive,
@@ -285,6 +287,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
         }}>
           <div style={{ width: aspectWidth(DUEL_CARD_WIDTH), height: aspectWidth(DUEL_CARD_HEIGHT), transform: cardTransforms.leftCard }}>
             <DuelistCard
+              address={duelistAddressA}
               duelistId={Number(duelistIdA)}
               isLeft={true}
               isDisabled={isDead(Number(duelistIdA))}
@@ -300,6 +303,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
           </div>
           <div style={{ width: aspectWidth(DUEL_CARD_WIDTH), height: aspectWidth(DUEL_CARD_HEIGHT), transform: cardTransforms.rightCard }}>
             <DuelistCard
+              address={duelistAddressA}
               duelistId={Number(duelistIdB)}
               isLeft={false}
               isDisabled={isDead(Number(duelistIdB))}

@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEf
 import { useNavigate, useLocation, useParams } from 'react-router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
-import { bigintToHex, bigintToNumber, poseidon } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex, bigintToNumber, isPositiveBigint, poseidon } from '@underware_gg/pistols-sdk/utils'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { CommitMoveMessage } from '/src/utils/salt'
@@ -180,11 +180,18 @@ export const usePistolsContext = () => {
       payload: [BigInt(address ?? 0n), BigInt(sig ?? 0n)]
     })
   }
-  const dispatchSelectDuelistId = (newId: BigNumberish) => {
-    dispatch({
-      type: PistolsActions.SELECT_DUELIST_ID,
-      payload: BigInt(newId),
-    })
+  const dispatchSelectDuelistId = (newId: BigNumberish, playerAddress?: BigNumberish) => {
+    if (!isPositiveBigint(newId) && isPositiveBigint(playerAddress)) {
+      dispatch({
+        type: PistolsActions.SELECT_PLAYER_ADDRESS,
+        payload: BigInt(playerAddress),
+      })
+    } else {
+      dispatch({
+        type: PistolsActions.SELECT_DUELIST_ID,
+        payload: BigInt(newId),
+      })
+    }
   }
   const dispatchSelectPlayerAddress = (newId: BigNumberish) => {
     dispatch({

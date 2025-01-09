@@ -6,7 +6,8 @@ import { AddressShort } from '/src/components/ui/AddressShort'
 import { EMOJI } from '/src/data/messages'
 import { BigNumberish } from 'starknet'
 import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
-import { useValidateWalletAddress } from '@underware_gg/pistols-sdk/utils'
+import { isPositiveBigint, useValidateWalletAddress } from '@underware_gg/pistols-sdk/utils'
+import { usePlayer } from '/src/stores/playerStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -65,11 +66,21 @@ export function ProfileDescription({
   const { owner } = useOwnerOfDuelist(duelistId)
   
   // if its a wallet...
-  const { isStarknetAddress } = useValidateWalletAddress(address)
-  const _owner = isStarknetAddress ? address : owner
+  const { name: playerName } = usePlayer(address)
+  // const { isStarknetAddress } = useValidateWalletAddress(address)
+
+  if (!isPositiveBigint(duelistId)) {
+    return (
+      <div className='FillParent'>
+        <h1>{playerName}</h1>
+      </div>
+    )
+  }
   
   return (
-    <div className='FillParent' style={{ display: 'flex', justifyContent: 'space-between' }}>
+    <div className='FillParent'
+      // style={{ display: 'flex', justifyContent: 'space-between' }}
+    >
       <div>
         {displayNameSmall ? 
           (<h2 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h2>)

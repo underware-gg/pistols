@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo } from 'react'
 import { useAllPlayersActivityFeed, ActivityState } from '/src/stores/eventsStore'
 import { useClientTimestamp } from '@underware_gg/pistols-sdk/utils'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { useChallenge } from '/src/stores/challengeStore'
 import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '/src/components/Links'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { ChallengeStateReplyVerbs } from '../utils/pistols'
 
 export const ActivityFeed = () => {
   const { allPlayersActivity } = useAllPlayersActivityFeed()
@@ -81,10 +83,13 @@ const ActivityItemCreatedChallenge = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
+  const { duelistAddressB } = useChallenge(activity.identifier)
   return (
     <>
       <PlayerLink address={activity.address} />
-      {' challenged ??? for '}
+      {' challenged '}
+      <PlayerLink address={duelistAddressB} />
+      {' for '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
       <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
@@ -97,10 +102,13 @@ const ActivityItemRepliedChallenge = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
+  const { state } = useChallenge(activity.identifier)
   return (
     <>
       <PlayerLink address={activity.address} />
-      {' replied ??? to '}
+      {' '}
+      {ChallengeStateReplyVerbs[state]}
+      {' '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
       <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />

@@ -30,7 +30,9 @@ export default function PlayerModal() {
 
   const isOpen = useMemo(() => (selectedPlayerAddress > 0), [selectedPlayerAddress])
 
-  const _close = () => { dispatchSelectPlayerAddress(0n) }
+  const _close = () => {
+    dispatchSelectPlayerAddress(0n)
+  }
 
   const _gotoProfile = () => {
     dispatchSetScene(SceneName.Profile)
