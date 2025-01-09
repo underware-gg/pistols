@@ -6,7 +6,8 @@ import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { constants, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
-import { bigintEquals, keysToEntity } from '@underware_gg/pistols-sdk/utils'
+import { bigintEquals, isPositiveBigint, keysToEntity } from '@underware_gg/pistols-sdk/utils'
+import { BigNumberish } from 'starknet'
 
 
 //-----------------------------------------
@@ -18,6 +19,8 @@ interface StateEntity {
   timestamp: number
   state: constants.ChallengeState
   state_value: number
+  address_a: bigint
+  address_b: bigint
   duelist_id_a: bigint
   duelist_id_b: bigint
   duelist_entity_id_a: string
@@ -44,6 +47,8 @@ const createStore = () => {
       timestamp: end ? end : start,
       state,
       state_value: constants.getChallengeStateValue(state),
+      address_a: BigInt(challenge.address_a),
+      address_b: BigInt(challenge.address_b),
       duelist_id_a: BigInt(challenge.duelist_id_a),
       duelist_id_b: BigInt(challenge.duelist_id_b),
       duelist_entity_id_a: keysToEntity([challenge.duelist_id_a]),
@@ -86,7 +91,7 @@ export const useQueryChallengeIds = (
   filterStates: constants.ChallengeState[],
   filterName: string,
   filterBookmarked: boolean,
-  duelistId: bigint,
+  playerAddressOrDuelistId: BigNumberish,
   sortColumn: ChallengeColumn,
   sortDirection: SortDirection,
 ) => {
@@ -94,12 +99,13 @@ export const useQueryChallengeIds = (
   const { bookmarkedDuels } = usePlayer(address)
   const entities = useChallengeQueryStore((state) => state.entities);
   const duelistEntities = useDuelistQueryStore((state) => state.entities);
+  const targetId = useMemo(() => (isPositiveBigint(playerAddressOrDuelistId) ? BigInt(playerAddressOrDuelistId) : 0n), [playerAddressOrDuelistId, duelistEntities])
 
   const [challengeIds, states] = useMemo(() => {
     // get all challenges, by duelist (or all)
     let result =
-      (duelistId > 0n) ?
-        Object.values(entities).filter((e) => e.duelist_id_a === duelistId || e.duelist_id_b === duelistId)
+      (targetId > 0n) ?
+        Object.values(entities).filter((e) => e.duelist_id_a === targetId || e.duelist_id_b === targetId || e.address_a === targetId || e.address_b === targetId)
         : Object.values(entities)
 
     // get all current states by duelist
@@ -134,7 +140,7 @@ export const useQueryChallengeIds = (
     // return ids only
     const challengeIds = result.map((e) => e.duel_id)
     return [challengeIds, states]
-  }, [entities, filterStates, filterName, filterBookmarked, duelistId, sortColumn, sortDirection, bookmarkedDuels])
+  }, [entities, filterStates, filterName, filterBookmarked, targetId, sortColumn, sortDirection, bookmarkedDuels])
 
   return {
     challengeIds,

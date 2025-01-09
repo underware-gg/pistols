@@ -303,7 +303,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
           </div>
           <div style={{ width: aspectWidth(DUEL_CARD_WIDTH), height: aspectWidth(DUEL_CARD_HEIGHT), transform: cardTransforms.rightCard }}>
             <DuelistCard
-              address={duelistAddressA}
+              address={duelistAddressB}
               duelistId={Number(duelistIdB)}
               isLeft={false}
               isDisabled={isDead(Number(duelistIdB))}

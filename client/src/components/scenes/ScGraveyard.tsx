@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
+import { useAccount } from '@starknet-react/core'
 import { useQueryParams } from '/src/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { useSettings } from '/src/hooks/SettingsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
 import { useGameAspect } from '/src/hooks/useGameApect'
@@ -13,9 +13,9 @@ import { _currentScene } from '/src/three/game'
 
 
 export default function ScGraveyard() {
-  const { duelistId } = useSettings()
+  const { address } = useAccount()
   const { filterStatesPastDuels, filterDuelistName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds } = useQueryChallengeIds(filterStatesPastDuels, filterDuelistName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { challengeIds } = useQueryChallengeIds(filterStatesPastDuels, filterDuelistName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : address, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()

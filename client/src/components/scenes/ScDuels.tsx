@@ -1,19 +1,19 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
+import { useAccount } from '@starknet-react/core'
 import { useQueryParams } from '/src/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
-import { useSettings } from '/src/hooks/SettingsContext'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { PosterGrid, PosterGridHandle } from '/src/components/PosterGrid'
 import { DuelPoster, DuelPosterHandle } from '/src/components/DuelPoster'
 import { _currentScene } from '/src/three/game'
 
 export default function ScDuels() {
-  const { duelistId } = useSettings()
+  const { address } = useAccount()
   const { filterStatesLiveDuels, filterDuelistName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterDuelistName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterDuelistName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : address, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
