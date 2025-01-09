@@ -39,21 +39,21 @@ export default function ChallengeModal() {
 
   const {
     state, tableId, premise, quote,
-    duelistIdA, duelistIdB, duelistAddressA, duelistAddressB,
+    duelistIdA, duelistIdB: challengeDuelistIdB, duelistAddressA, duelistAddressB,
     isLive, isFinished, needToSyncExpired,
   } = useChallenge(selectedDuelId)
   const { description: tableDescription } = useTable(tableId)
 
+  const { isYou: isChallenger } = useIsYou(duelistIdA)
+  const { isMyAccount: isChallenged } = useIsMyAccount(duelistAddressB)
+  // before challenge is accepted, duelistIdB is null, use selected duelist
+  const duelistIdB = useMemo(() => ((!challengeDuelistIdB && isChallenged) ? duelistId : challengeDuelistIdB), [duelistId, challengeDuelistIdB, isChallenged])
+  // const isYou = (isChallenger || isChallenged)
+
   const { challengeDescription } = useChallengeDescription(selectedDuelId)
 
   const { profilePic: profilePicA } = useDuelist(duelistIdA)
-  const { profilePic: profilePicB } = useDuelist(duelistIdB)
-
-  const { isYou: isChallenger } = useIsYou(duelistIdA)
-  const { isYou: isChallengedDuelist } = useIsYou(duelistIdB)
-  const { isMyAccount: isChallengedAccount } = useIsMyAccount(duelistAddressB)
-  const isChallenged = (isChallengedDuelist || isChallengedAccount)
-  const isYou = (isChallenger || isChallenged)
+  const { profilePic: profilePicB, isInAction } = useDuelist(duelistIdB)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -186,9 +186,15 @@ export default function ChallengeModal() {
               </Col>
             }
             {(state == constants.ChallengeState.Awaiting && isChallenged) &&
-              <Col>
-                <BalanceRequiredButton label='Accept Challenge!' disabled={isSubmitting} onClick={() => _reply(true)} fee={0} />
-              </Col>
+              (!isInAction ?
+                <Col>
+                  <BalanceRequiredButton label='Accept Challenge!' disabled={isSubmitting} onClick={() => _reply(true)} fee={0} />
+                </Col>
+                :
+                <Col>
+                  <ActionButton large fill label='Select another duelist!' disabled={true} onClick={() => { }} />
+                </Col>
+              )
             }
             {(state == constants.ChallengeState.InProgress) &&
               <Col>

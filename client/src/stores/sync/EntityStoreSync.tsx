@@ -15,6 +15,7 @@ const query_get: PistolsGetQuery = {
     TableConfig: { $: { where: { table_id: { $neq: 0 } } } },
     TokenConfig: { $: { where: { token_address: { $neq: '' } } } },
     Duelist: { $: { where: { duelist_id: { $neq: 0 } } } },
+    DuelistChallenge: { $: { where: { duelist_id: { $neq: 0 } } } },
     Player: { $: { where: { address: { $neq: '' } } } },
   },
 }
@@ -32,6 +33,7 @@ const query_sub: PistolsSubQuery = {
     TableConfig: [],
     TokenConfig: [],
     Duelist: [],
+    DuelistChallenge: [],
     Player: [],
     PPlayerOnline: [],
     PPlayerBookmark: [],
@@ -85,6 +87,9 @@ export function EntityStoreSync() {
       if (getEntityModel(entity, 'Duelist')) {
         duelistState.updateEntity(entity)
         duelistQueryState.updateEntity(entity)
+      }
+      if (getEntityModel(entity, 'DuelistChallenge')) {
+        duelistState.updateEntity(entity)
       }
       if (getEntityModel(entity, 'Player')) {
         playerState.updateEntity(entity)
