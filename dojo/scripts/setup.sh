@@ -4,7 +4,7 @@
 #
 if [ $# -lt 1 ]; then
   echo "❌ Error: Missing profile!"
-  echo "usage: $0 <PROFILE> [--offline] [--inspect]"
+  echo "usage: $0 <PROFILE> [--offline] [--inspect] [--no-bindings]"
   exit 1
 fi
 
@@ -18,7 +18,7 @@ export INSPECT=
 for arg in "$@"
 do
   echo ":$arg"
-  if [[ -z "$PROFILE" ]]; then
+  if [[ -z "$PROFILE" ]]; then # if not set
     # $1: Profile
     export PROFILE=$1
     export DOJO_PROFILE_FILE="dojo_$PROFILE.toml"
@@ -30,6 +30,8 @@ do
     export OFFLINE="--offline"
   elif [[ $arg == "--inspect" ]]; then
     export INSPECT="true"
+    export BINDINGS=""
+  elif [[ $arg == "--no-bindings" ]]; then
     export BINDINGS=""
   else
     echo "❌ Error: Invalid argument: $arg"
@@ -60,7 +62,7 @@ fi
 get_profile_env () {
   local ENV_NAME=$1
   local RESULT=$(toml get $DOJO_PROFILE_FILE --raw env.$ENV_NAME)
-  if [[ -z "$RESULT" ]]; then
+  if [[ -z "$RESULT" ]]; then # if not set
     >&2 echo "get_profile_env($ENV_NAME) not found! 👎"
   fi
   echo $RESULT
@@ -69,7 +71,7 @@ get_profile_env () {
 get_contract_address () {
   local TAG=$1
   local RESULT=$(cat $MANIFEST_FILE_PATH | jq -r ".contracts[] | select(.tag == \"$TAG\" ).address")
-  if [[ -z "$RESULT" ]]; then
+  if [[ -z "$RESULT" ]]; then # if not set
     >&2 echo "get_contract_address($TAG) not found! 👎"
   fi
   echo $RESULT
@@ -102,7 +104,7 @@ export GAME_ADDRESS=$(get_contract_address "pistols-game")
 export CHAIN_ID=$(starkli chain-id --no-decode --rpc $RPC_URL | xxd -r -p)
 export PROFILE_CHAIN_ID=$(get_profile_env "chain_id")
 
-if [[ -z "$OFFLINE" ]]; then
+if [[ -z "$OFFLINE" ]]; then # if not set
   if [[ "$PROFILE_CHAIN_ID" != "$CHAIN_ID" ]]; then
     echo "PROFILE CHAIN ID: [$PROFILE_CHAIN_ID]"
     echo "RPC CHAIN ID: [$CHAIN_ID]"

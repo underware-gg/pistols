@@ -40,7 +40,7 @@ echo "--------------------------------------------------------------------------
 echo ">>> Inspect migrations..."
 sozo -P $PROFILE $OFFLINE inspect --world $WORLD_ADDRESS
 
-if [[ -n "$INSPECT" ]]; then
+if [[ -n "$INSPECT" ]]; then # if is set
   echo "--- INSPECTED! 👍"
   exit 0
 fi
@@ -94,7 +94,9 @@ echo "👍"
 if [[ "$PROFILE" == "dev" ]]; then
   #
   # copy typescript bindings
-  cp -R $BINDINGS_PATH/typescript/* $SDK_GAME_PATH/generated/
+  if [[ -n "$BINDINGS" ]]; then # if is set
+    cp -R $BINDINGS_PATH/typescript/* $SDK_GAME_PATH/generated/
+  fi
   #
   # constant generator
   # npm run create-constants --sdk=../sdk/src/games/pistols
