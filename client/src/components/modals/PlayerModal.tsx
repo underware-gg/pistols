@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { BigNumberish } from 'starknet'
 import { Divider, Grid, Modal } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
@@ -15,15 +16,14 @@ import { AddressShort } from '/src/components/ui/AddressShort'
 import { DuelistItem } from '/src/components/account/AccountHeader'
 import { BookmarkIcon } from '/src/components/ui/Icons'
 import { SceneName } from '/src/data/assets'
+import { bigintEquals } from '@underware_gg/pistols-sdk/utils'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function PlayerModal() {
   const { dispatchSetScene } = usePistolsScene()
-
-  const { tableId, isAnon } = useSettings()
-  const { selectedPlayerAddress, dispatchSelectPlayerAddress, dispatchSelectDuelistId, dispatchChallengingPlayerAddress, dispatchSelectDuel } = usePistolsContext()
+  const { selectedPlayerAddress, dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext()
   const { name } = usePlayer(selectedPlayerAddress)
   const { isMyAccount } = useIsMyAccount(selectedPlayerAddress)
   const profilePic = 0
@@ -42,9 +42,6 @@ export default function PlayerModal() {
   const _gotoDuelist = (duelistId: bigint) => {
     dispatchSelectDuelistId(duelistId)
   }
-
-  const { address } = useAccount()
-  const { hasPact, pactDuelId } = usePact(tableId, address, selectedPlayerAddress)
 
   const { duelistIds, isLoading } = useDuelistsOfOwner(selectedPlayerAddress)
   const duelists = useMemo(() => {
@@ -109,18 +106,33 @@ export default function PlayerModal() {
             <Col>
               <ActionButton large fill label='Close' onClick={() => _close()} />
             </Col>
-            {isMyAccount 
-              ? <Col>
-                <ActionButton large fill important label='Manage Profile' onClick={() => _gotoProfile()} />
-              </Col>
-              : <Col>
-                {hasPact && <ActionButton large fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />}
-                {!hasPact && <ActionButton large fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(selectedPlayerAddress)} />}
-              </Col>
-            }
+            <Col>
+              {isMyAccount ? <ActionButton large fill important label='Manage Profile' onClick={() => _gotoProfile()} />
+                : <ChallengeButton challengedPlayerAddress={selectedPlayerAddress} />
+              }
+            </Col>
           </Row>
         </Grid>
       </Modal.Actions>
     </Modal>
   )
+}
+
+export function ChallengeButton({
+  challengedPlayerAddress,
+}: {
+  challengedPlayerAddress: BigNumberish,
+}) {
+  const { dispatchChallengingPlayerAddress, dispatchSelectDuel } = usePistolsContext()
+  const { address } = useAccount()
+  const { tableId, isAnon } = useSettings()
+  const { isMyAccount } = useIsMyAccount(challengedPlayerAddress)
+  const { hasPact, pactDuelId } = usePact(tableId, address, challengedPlayerAddress)
+  const canChallenge = (!isAnon && !hasPact && !isMyAccount)
+
+  if (!hasPact) {
+    return <ActionButton large fill disabled={canChallenge} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(challengedPlayerAddress)} />
+  } else {
+    return <ActionButton large fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />
+  }
 }

@@ -2,12 +2,10 @@ import React, { ReactNode, useEffect, useState } from 'react'
 import { Grid, Modal, Breadcrumb, Icon } from 'semantic-ui-react'
 import { useMounted, useStarkName, useStarkProfile, useValidateWalletAddressOrName, STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
 import { useControllerAccount, useChainConfig, ChainId } from '@underware_gg/pistols-sdk/dojo'
-import { useSettings } from '/src/hooks/SettingsContext'
-import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
-import { usePact } from '/src/hooks/usePact'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ActionButton } from '/src/components/ui/Buttons'
+import { ChallengeButton } from './PlayerModal'
 import { FormInput } from '/src/components/ui/Form'
 import { AddressShort } from '/src/components/ui/AddressShort'
 import { Divider } from '/src/components/ui/Divider'
@@ -42,10 +40,6 @@ export default function WalletFinderModal({
 
   const { starkName } = useStarkName(isStarknetAddress ? validatedAddress : null, chainConfig.rpcUrl)
   const { name: profileName, profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null, chainConfig.rpcUrl)
-
-  const { tableId } = useSettings()
-  const { dispatchSelectDuel, dispatchChallengingPlayerAddress } = usePistolsContext()
-  const { hasPact, pactDuelId } = usePact(tableId, myAcountAddress, validatedAddress)
 
   return (
     <Modal
@@ -114,10 +108,7 @@ export default function WalletFinderModal({
               <ActionButton large fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              {isMyAccount ? <ActionButton large fill disabled={true} label='Challenge yourself?' onClick={() => { }} />
-                : hasPact ? <ActionButton large fill important label='Existing Challenge' onClick={() => dispatchSelectDuel(pactDuelId)} />
-                  : <ActionButton large fill important disabled={!canSubmit} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(validatedAddress)} />
-              }
+              <ChallengeButton challengedPlayerAddress={validatedAddress} />
             </Col>
           </Row>
         </Grid>

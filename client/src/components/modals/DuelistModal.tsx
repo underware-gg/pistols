@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react'
 import { Grid, Modal } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useIsMyDuelist, useIsYou } from '/src/hooks/useIsYou'
 import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
 import { useDuelist } from '/src/stores/duelistStore'
-import { usePact } from '/src/hooks/usePact'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useIsBookmarked, usePlayer } from '/src/stores/playerStore'
@@ -14,6 +12,7 @@ import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ProfileDescription } from '/src/components/account/ProfileDescription'
 import { ChallengeTableSelectedDuelist } from '/src/components/ChallengeTable'
 import { ActionButton } from '/src/components/ui/Buttons'
+import { ChallengeButton } from './PlayerModal'
 import { BookmarkIcon, IconClick } from '/src/components/ui/Icons'
 import { SceneName } from '/src/data/assets'
 
@@ -21,19 +20,16 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function DuelistModal() {
-  const { tableId, duelistId, isAnon, dispatchDuelistId } = useSettings()
+  const { dispatchDuelistId } = useSettings()
   const { atProfile, dispatchSetScene } = usePistolsScene()
 
-  const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingPlayerAddress, dispatchSelectPlayerAddress } = usePistolsContext()
+  const { selectedDuelistId, dispatchSelectDuelistId, dispatchSelectPlayerAddress } = usePistolsContext()
   const { owner } = useOwnerOfDuelist(selectedDuelistId)
   const { name: ownerName } = usePlayer(owner)
   const isOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
   const { isYou } = useIsYou(selectedDuelistId)
   const isMyDuelist = useIsMyDuelist(selectedDuelistId)
   const { profilePic, duelistIdDisplay } = useDuelist(selectedDuelistId)
-
-  const { address } = useAccount()
-  const { hasPact, pactDuelId } = usePact(tableId, address, owner)
 
   const _close = () => {
     dispatchSelectDuelistId(0n)
@@ -112,8 +108,7 @@ export default function DuelistModal() {
             </Col>
             {!isYou &&
               <Col>
-                {hasPact && <ActionButton large fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />}
-                {!hasPact && <ActionButton large fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(owner)} />}
+                <ChallengeButton challengedPlayerAddress={owner} />
               </Col>
             }
             {atProfile &&
