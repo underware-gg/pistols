@@ -207,3 +207,12 @@ export const usePlayersOnline = () => {
     playersOnline,
   }
 }
+
+//----------------------------------------
+// vanilla getter
+// (non-React)
+//
+export const getPlayerName = (address: BigNumberish): string  | undefined => {
+  const players = usePlayerStore.getState().players
+  return players[bigintToHex(address)]?.name
+}

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRouterParams } from '/src/hooks/PistolsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
+import { useSetPageTitle } from '/src/hooks/useSetPageTitle'
 import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { useEffectOnce, usePlayerId } from '@underware_gg/pistols-sdk/utils'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
@@ -37,6 +38,7 @@ export default function MainPage() {
 
   // this hook will parse slugs and manage the current scene
   usePistolsSceneFromRoute()
+  useSetPageTitle()
 
   // wait for Dojo to be initialized before loading the UI
   const { isInitialized } = useDojoStatus()
