@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 import { useAccount } from '@starknet-react/core'
 import { PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
 import { DuelistColumn, SortDirection } from '/src/stores/queryParamsStore'
-import { feltToString, bigintEquals } from '@underware_gg/pistols-sdk/utils'
+import { feltToString, bigintEquals, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { calcWinRatio } from '/src/hooks/useScore'
 import { usePlayer } from '/src/stores/playerStore'
 
@@ -38,6 +38,7 @@ interface State {
 const createStore = () => {
   const _parseEntity = (e: PistolsEntity) => {
     let duelist = e.models.pistols.Duelist
+    let currentChallenge = e.models.pistols.DuelistChallenge
     if (!duelist) return undefined
     return {
       duelist_id: BigInt(duelist.duelist_id),
@@ -50,7 +51,7 @@ const createStore = () => {
       total_wins: Number(duelist.score.total_wins ?? 0),
       total_losses: Number(duelist.score.total_losses ?? 0),
       total_draws: Number(duelist.score.total_draws ?? 0),
-      is_active: (Number(duelist.score.total_duels ?? 0) > 0),
+      is_active: (Number(duelist.score.total_duels ?? 0) > 0 || isPositiveBigint(currentChallenge?.duel_id ?? 0n)),
     }
   }
   return create<State>()(immer((set) => ({
