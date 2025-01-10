@@ -71,7 +71,7 @@ pub struct PlayerRequiredAction {
 //
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct PPlayerOnline {
+pub struct PlayerOnline {
     #[key]
     pub identity: ContractAddress,
     //-----------------------
@@ -79,7 +79,7 @@ pub struct PPlayerOnline {
 }
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct PPlayerBookmark {
+pub struct PlayerBookmark {
     #[key]
     pub identity: ContractAddress,
     #[key]
@@ -91,7 +91,7 @@ pub struct PPlayerBookmark {
 }
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct PPlayerTutorialProgress {
+pub struct PlayerTutorialProgress {
     #[key]
     pub identity: ContractAddress,
     //-----------------------

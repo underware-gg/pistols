@@ -4,16 +4,16 @@ import { useAccount } from '@starknet-react/core'
 import { useSdkPublishTypedData } from '@underware_gg/pistols-sdk/dojo'
 import {
   constants,
-  make_typed_data_PPlayerBookmark,
-  make_typed_data_PPlayerOnline,
-  make_typed_data_PPlayerTutorialProgress,
+  make_typed_data_PlayerBookmark,
+  make_typed_data_PlayerOnline,
+  make_typed_data_PlayerTutorialProgress,
 } from '@underware_gg/pistols-sdk/pistols'
 
 
 export function usePlayerOnlineSignedMessage(timestamp: number) {
   const { account } = useAccount()
   const typedData = useMemo(() => (
-    make_typed_data_PPlayerOnline({
+    make_typed_data_PlayerOnline({
       identity: account?.address ?? 0,
       timestamp: Math.floor(timestamp),
     })
@@ -28,7 +28,7 @@ export function usePlayerOnlineSignedMessage(timestamp: number) {
 export function useTutorialProgressSignedMessage(progress: constants.TutorialProgress) {
   const { account } = useAccount()
   const typedData = useMemo(() => (
-    make_typed_data_PPlayerTutorialProgress({
+    make_typed_data_PlayerTutorialProgress({
       identity: account?.address ?? 0,
       progress,
     })
@@ -43,7 +43,7 @@ export function useTutorialProgressSignedMessage(progress: constants.TutorialPro
 export function usePlayerBookmarkSignedMessage(target_address: BigNumberish, target_id: BigNumberish, enabled: boolean) {
   const { account } = useAccount()
   const typedData = useMemo(() => (
-    make_typed_data_PPlayerBookmark({
+    make_typed_data_PlayerBookmark({
       identity: account?.address ?? 0,
       target_address,
       target_id,

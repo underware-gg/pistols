@@ -229,38 +229,38 @@ export interface PaymentValue {
 	treasury_percent: BigNumberish;
 }
 
-// Type definition for `pistols::models::player::PPlayerBookmark` struct
-export interface PPlayerBookmark {
+// Type definition for `pistols::models::player::PlayerBookmark` struct
+export interface PlayerBookmark {
 	identity: string;
 	target_address: string;
 	target_id: BigNumberish;
 	enabled: boolean;
 }
 
-// Type definition for `pistols::models::player::PPlayerBookmarkValue` struct
-export interface PPlayerBookmarkValue {
+// Type definition for `pistols::models::player::PlayerBookmarkValue` struct
+export interface PlayerBookmarkValue {
 	enabled: boolean;
 }
 
-// Type definition for `pistols::models::player::PPlayerOnline` struct
-export interface PPlayerOnline {
+// Type definition for `pistols::models::player::PlayerOnline` struct
+export interface PlayerOnline {
 	identity: string;
 	timestamp: BigNumberish;
 }
 
-// Type definition for `pistols::models::player::PPlayerOnlineValue` struct
-export interface PPlayerOnlineValue {
+// Type definition for `pistols::models::player::PlayerOnlineValue` struct
+export interface PlayerOnlineValue {
 	timestamp: BigNumberish;
 }
 
-// Type definition for `pistols::models::player::PPlayerTutorialProgress` struct
-export interface PPlayerTutorialProgress {
+// Type definition for `pistols::models::player::PlayerTutorialProgress` struct
+export interface PlayerTutorialProgress {
 	identity: string;
 	progress: TutorialProgress;
 }
 
-// Type definition for `pistols::models::player::PPlayerTutorialProgressValue` struct
-export interface PPlayerTutorialProgressValue {
+// Type definition for `pistols::models::player::PlayerTutorialProgressValue` struct
+export interface PlayerTutorialProgressValue {
 	progress: TutorialProgress;
 }
 
@@ -520,12 +520,12 @@ export interface SchemaType extends ISchemaType {
 		PactValue: WithFieldOrder<PactValue>,
 		Payment: WithFieldOrder<Payment>,
 		PaymentValue: WithFieldOrder<PaymentValue>,
-		PPlayerBookmark: WithFieldOrder<PPlayerBookmark>,
-		PPlayerBookmarkValue: WithFieldOrder<PPlayerBookmarkValue>,
-		PPlayerOnline: WithFieldOrder<PPlayerOnline>,
-		PPlayerOnlineValue: WithFieldOrder<PPlayerOnlineValue>,
-		PPlayerTutorialProgress: WithFieldOrder<PPlayerTutorialProgress>,
-		PPlayerTutorialProgressValue: WithFieldOrder<PPlayerTutorialProgressValue>,
+		PlayerBookmark: WithFieldOrder<PlayerBookmark>,
+		PlayerBookmarkValue: WithFieldOrder<PlayerBookmarkValue>,
+		PlayerOnline: WithFieldOrder<PlayerOnline>,
+		PlayerOnlineValue: WithFieldOrder<PlayerOnlineValue>,
+		PlayerTutorialProgress: WithFieldOrder<PlayerTutorialProgress>,
+		PlayerTutorialProgressValue: WithFieldOrder<PlayerTutorialProgressValue>,
 		Player: WithFieldOrder<Player>,
 		PlayerValue: WithFieldOrder<PlayerValue>,
 		TableAdmittance: WithFieldOrder<TableAdmittance>,
@@ -765,32 +765,32 @@ export const schema: SchemaType = {
 			pool_percent: 0,
 			treasury_percent: 0,
 		},
-		PPlayerBookmark: {
+		PlayerBookmark: {
 			fieldOrder: ['identity', 'target_address', 'target_id', 'enabled'],
 			identity: "",
 			target_address: "",
 			target_id: 0,
 			enabled: false,
 		},
-		PPlayerBookmarkValue: {
+		PlayerBookmarkValue: {
 			fieldOrder: ['enabled'],
 			enabled: false,
 		},
-		PPlayerOnline: {
+		PlayerOnline: {
 			fieldOrder: ['identity', 'timestamp'],
 			identity: "",
 			timestamp: 0,
 		},
-		PPlayerOnlineValue: {
+		PlayerOnlineValue: {
 			fieldOrder: ['timestamp'],
 			timestamp: 0,
 		},
-		PPlayerTutorialProgress: {
+		PlayerTutorialProgress: {
 			fieldOrder: ['identity', 'progress'],
 			identity: "",
 		progress: TutorialProgress.None,
 		},
-		PPlayerTutorialProgressValue: {
+		PlayerTutorialProgressValue: {
 			fieldOrder: ['progress'],
 		progress: TutorialProgress.None,
 		},
@@ -894,12 +894,12 @@ export enum ModelsMapping {
 	PactValue = 'pistols-PactValue',
 	Payment = 'pistols-Payment',
 	PaymentValue = 'pistols-PaymentValue',
-	PPlayerBookmark = 'pistols-PPlayerBookmark',
-	PPlayerBookmarkValue = 'pistols-PPlayerBookmarkValue',
-	PPlayerOnline = 'pistols-PPlayerOnline',
-	PPlayerOnlineValue = 'pistols-PPlayerOnlineValue',
-	PPlayerTutorialProgress = 'pistols-PPlayerTutorialProgress',
-	PPlayerTutorialProgressValue = 'pistols-PPlayerTutorialProgressValue',
+	PlayerBookmark = 'pistols-PlayerBookmark',
+	PlayerBookmarkValue = 'pistols-PlayerBookmarkValue',
+	PlayerOnline = 'pistols-PlayerOnline',
+	PlayerOnlineValue = 'pistols-PlayerOnlineValue',
+	PlayerTutorialProgress = 'pistols-PlayerTutorialProgress',
+	PlayerTutorialProgressValue = 'pistols-PlayerTutorialProgressValue',
 	Player = 'pistols-Player',
 	PlayerValue = 'pistols-PlayerValue',
 	TutorialProgress = 'pistols-TutorialProgress',

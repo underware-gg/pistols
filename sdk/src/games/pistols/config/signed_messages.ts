@@ -18,16 +18,16 @@ import * as models from 'src/games/pistols/generated/models.gen'
 
 export type OmitFieldOrder<T> = Omit<T, 'fieldOrder'>;
 
-export function make_typed_data_PPlayerOnline({
+export function make_typed_data_PlayerOnline({
   identity,
   timestamp,
 }: {
   identity: BigNumberish,
   timestamp: number,
 }) {
-  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PPlayerOnline>>(
+  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PlayerOnline>>(
     STARKNET_DOMAIN,
-    'pistols-PPlayerOnline',
+    'pistols-PlayerOnline',
     {
       identity: bigintToHex(identity),
       timestamp,
@@ -39,7 +39,7 @@ export function make_typed_data_PPlayerOnline({
   )
 }
 
-export function make_typed_data_PPlayerBookmark({
+export function make_typed_data_PlayerBookmark({
   identity,
   target_address,
   target_id,
@@ -50,9 +50,9 @@ export function make_typed_data_PPlayerBookmark({
   target_id: BigNumberish,
   enabled: boolean,
 }) {
-  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PPlayerBookmark>>(
+  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PlayerBookmark>>(
     STARKNET_DOMAIN,
-    'pistols-PPlayerBookmark',
+    'pistols-PlayerBookmark',
     {
       identity: bigintToHex(identity),
       target_address: bigintToHex(target_address),
@@ -68,16 +68,16 @@ export function make_typed_data_PPlayerBookmark({
   )
 }
 
-export function make_typed_data_PPlayerTutorialProgress({
+export function make_typed_data_PlayerTutorialProgress({
   identity,
   progress,
 }: {
   identity: BigNumberish,
   progress: constants.TutorialProgress,
 }) {
-  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PPlayerTutorialProgress>>(
+  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PlayerTutorialProgress>>(
     STARKNET_DOMAIN,
-    'pistols-PPlayerTutorialProgress',
+    'pistols-PlayerTutorialProgress',
     {
       identity: bigintToHex(identity),
       //@ts-ignore
