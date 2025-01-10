@@ -6,7 +6,7 @@ import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '/
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { ChallengeStateReplyVerbs } from '../utils/pistols'
 
-export const ActivityFeed = () => {
+export default function ActivityFeed() {
   const { allPlayersActivity } = useAllPlayersActivityFeed()
 
   const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 60)
@@ -29,8 +29,6 @@ export const ActivityFeed = () => {
     </div>
   );
 }
-
-export default ActivityFeed;
 
 
 interface ActivityItemProps {
