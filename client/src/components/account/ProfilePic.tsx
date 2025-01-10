@@ -6,10 +6,11 @@ import { useIsMyDuelist, useIsYou } from '/src/hooks/useIsYou'
 import { IconClick } from '/src/components/ui/Icons'
 
 
-export const makeProfilePicUrl = (profilePic: number | null, square: boolean) => {
+export const makeProfilePicUrl = (profilePic: number | null, square: boolean, bot?: boolean) => {
   if (profilePic === null) return null
   const variant = (square ? 'square' : 'portrait')
-  return `/profiles/duelists/${variant}/${('00' + profilePic).slice(-2)}.jpg`
+  const type = (bot ? 'bots' : 'duelists')
+  return `/profiles/${type}/${variant}/${('00' + profilePic).slice(-2)}.jpg`
 }
 const _className = ({ small, medium, square, circle, duel, anon }) => (
   small ? 'ProfilePicSmall'
