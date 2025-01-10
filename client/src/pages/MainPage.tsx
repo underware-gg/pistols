@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRouterParams } from '/src/hooks/PistolsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
+import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRouterParams } from '/src/hooks/PistolsContext'
+import { useSyncSelectedDuelist } from '/src/hooks/useSyncDuelist'
 import { useSetPageTitle } from '/src/hooks/useSetPageTitle'
 import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { useEffectOnce, usePlayerId } from '@underware_gg/pistols-sdk/utils'
@@ -73,13 +74,15 @@ function MainUI() {
   // sync game context with url params
   useSyncRouterParams()
 
+  // switch duelist after wallet change
+  useSyncSelectedDuelist()
+
   const { gameImpl } = useThreeJsContext()
   const { selectedDuelId } = usePistolsContext()
   const { atGate, atProfile, atTavern, atDuel, atDoor, atDuels, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
   const { isInitialized } = useDojoStatus()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
-
   useEffect(() => {
     const timer = setTimeout(() => {
       if (atGate) setCurrentScene(<Gate />);
