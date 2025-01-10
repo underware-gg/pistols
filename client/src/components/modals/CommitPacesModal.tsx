@@ -3,7 +3,6 @@ import { Divider, Grid, Modal } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDojoSetup, useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
-import { useSettings } from '/src/hooks/SettingsContext'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { CommitMoveMessage, signAndGenerateMovesHash } from '/src/utils/salt'
 import { ActionButton } from '/src/components/ui/Buttons'
@@ -16,17 +15,17 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function CommitPacesModal({
+  duelId,
+  duelistId,
   isOpen,
   setIsOpen,
-  duelId,
 }: {
+  duelId: bigint
+  duelistId: bigint
   isOpen: boolean
   setIsOpen: Function
-  duelId: bigint
-  roundNumber?: number
 }) {
   const { account } = useAccount()
-  const { duelistId } = useSettings()
   const { game } = useDojoSystemCalls()
   const { dispatchSetMoves } = usePistolsContext()
   const { starknetDomain } = useDojoSetup()

@@ -15,7 +15,8 @@ import { useFinishedDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '/src/hooks/useRevealAction'
-import { useIsYou } from '/src/hooks/useIsYou'
+import { useIsMyDuelist, useIsYou } from '/src/hooks/useIsYou'
+import { useSyncToActiveDuelist } from '/src/hooks/useSyncDuelist'
 import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
@@ -31,11 +32,11 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { DuelistCardType } from '/src/components/cards/Cards'
 import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
+import DuelistModal from '/src/components/modals/DuelistModal'
 import CommitPacesModal from '/src/components/modals/CommitPacesModal'
 import Cards, { CardsHandle, DuelistHand } from '/src/components/cards/DuelCards'
 import * as Constants from '/src/data/cardConstants'
 import * as TWEEN from '@tweenjs/tween.js'
-import DuelistModal from '/src/components/modals/DuelistModal'
 
 
 export type DuelistState = {
@@ -57,6 +58,10 @@ export default function Duel({
   const { challengeDescription } = useChallengeDescription(duelId)
   const { tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start } = useChallenge(duelId)
   const { description } = useTable(tableId)
+
+  // switch to active duelist, if owned by player
+  useSyncToActiveDuelist(duelistIdA)
+  useSyncToActiveDuelist(duelistIdB)
 
   // guarantee to run only once when this component mounts
   const mounted = useMounted()
@@ -683,7 +688,7 @@ function DuelProgress({
   // Duelist interaction
   //
   const { isConnected } = useAccount()
-  const { isYou } = useIsYou(duelistId)
+  const isMyDuelist = useIsMyDuelist(duelistId)
 
   // Commit modal control
   const [didReveal, setDidReveal] = useState(false)
@@ -692,7 +697,7 @@ function DuelProgress({
 
   const onClick = useCallback(() => {
     if (!isConnected) console.warn(`onClickReveal: not connected!`)
-    if (isYou && isConnected && completedStages[duelStage] === false) {
+    if (isMyDuelist && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit) {
         setCommitModalIsOpen(true)
       } else if (duelStage == DuelStage.Round1Reveal) {
@@ -703,7 +708,7 @@ function DuelProgress({
         }
       }
     }
-  }, [isYou, isConnected, duelStage, completedStages, canReveal])
+  }, [isMyDuelist, isConnected, duelStage, completedStages, canReveal])
 
   // auto-reveal
   useEffect(() => {
@@ -731,13 +736,13 @@ function DuelProgress({
   const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, tableId, round1Moves?.hashed)
 
   useEffect(() =>{
-    if (isYou && canSign) {
+    if (isMyDuelist && canSign) {
       sign_and_restore()
     }
-  }, [canSign, isYou])
+  }, [canSign, isMyDuelist])
 
   useEffect(() =>{
-    if (isYou && hand && hand.card_fire && hand.card_dodge && hand.card_tactics && hand.card_blades) {
+    if (isMyDuelist && hand && hand.card_fire && hand.card_dodge && hand.card_tactics && hand.card_blades) {
       setTimeout(() => {
         revealCards({
           fire: hand.card_fire,
@@ -747,12 +752,12 @@ function DuelProgress({
         })
       }, 1000);
     }
-  }, [hand, isYou])
+  }, [hand, isMyDuelist])
 
   //------------------------------
   return (
     <>
-      <CommitPacesModal duelId={duelId} isOpen={commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
+      <CommitPacesModal duelId={duelId} duelistId={duelistId} isOpen={commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />
       <div id={id} className='dialog-container NoMouse NoDrag' ref={duelProgressRef}>
         <Image className='dialog-background' />
         <div className='dialog-data'>
