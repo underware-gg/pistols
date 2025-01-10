@@ -229,46 +229,46 @@ export interface PaymentValue {
 	treasury_percent: BigNumberish;
 }
 
-// Type definition for `pistols::models::player::PPlayerBookmark` struct
-export interface PPlayerBookmark {
+// Type definition for `pistols::models::player::Player` struct
+export interface Player {
+	address: string;
+	timestamp_registered: BigNumberish;
+	claimed_welcome_pack: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerBookmark` struct
+export interface PlayerBookmark {
 	identity: string;
 	target_address: string;
 	target_id: BigNumberish;
 	enabled: boolean;
 }
 
-// Type definition for `pistols::models::player::PPlayerBookmarkValue` struct
-export interface PPlayerBookmarkValue {
+// Type definition for `pistols::models::player::PlayerBookmarkValue` struct
+export interface PlayerBookmarkValue {
 	enabled: boolean;
 }
 
-// Type definition for `pistols::models::player::PPlayerOnline` struct
-export interface PPlayerOnline {
+// Type definition for `pistols::models::player::PlayerOnline` struct
+export interface PlayerOnline {
 	identity: string;
 	timestamp: BigNumberish;
 }
 
-// Type definition for `pistols::models::player::PPlayerOnlineValue` struct
-export interface PPlayerOnlineValue {
+// Type definition for `pistols::models::player::PlayerOnlineValue` struct
+export interface PlayerOnlineValue {
 	timestamp: BigNumberish;
 }
 
-// Type definition for `pistols::models::player::PPlayerTutorialProgress` struct
-export interface PPlayerTutorialProgress {
+// Type definition for `pistols::models::player::PlayerTutorialProgress` struct
+export interface PlayerTutorialProgress {
 	identity: string;
 	progress: TutorialProgress;
 }
 
-// Type definition for `pistols::models::player::PPlayerTutorialProgressValue` struct
-export interface PPlayerTutorialProgressValue {
+// Type definition for `pistols::models::player::PlayerTutorialProgressValue` struct
+export interface PlayerTutorialProgressValue {
 	progress: TutorialProgress;
-}
-
-// Type definition for `pistols::models::player::Player` struct
-export interface Player {
-	address: string;
-	timestamp_registered: BigNumberish;
-	claimed_welcome_pack: boolean;
 }
 
 // Type definition for `pistols::models::player::PlayerValue` struct
@@ -322,6 +322,35 @@ export interface TokenBoundAddress {
 export interface TokenBoundAddressValue {
 	contract_address: string;
 	token_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::player::PlayerActivity` struct
+export interface PlayerActivity {
+	address: string;
+	timestamp: BigNumberish;
+	activity: Activity;
+	identifier: BigNumberish;
+	is_public: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerActivityValue` struct
+export interface PlayerActivityValue {
+	timestamp: BigNumberish;
+	activity: Activity;
+	identifier: BigNumberish;
+	is_public: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerRequiredAction` struct
+export interface PlayerRequiredAction {
+	address: string;
+	duelist_id: BigNumberish;
+	duel_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::player::PlayerRequiredActionValue` struct
+export interface PlayerRequiredActionValue {
+	duel_id: BigNumberish;
 }
 
 // Type definition for `pistols::models::pack::PackType` enum
@@ -459,6 +488,21 @@ export enum RoundState {
 	Finished,
 }
 
+// Type definition for `pistols::models::player::Activity` enum
+export enum Activity {
+	Undefined,
+	StartedTutorial,
+	FinishedTutorial,
+	WelcomePack,
+	PurchasedPack,
+	CreatedDuelist,
+	CreatedChallenge,
+	RepliedChallenge,
+	CommittedMoves,
+	RevealedMoves,
+	Online,
+}
+
 export interface SchemaType extends ISchemaType {
 	pistols: {
 		Challenge: WithFieldOrder<Challenge>,
@@ -488,13 +532,13 @@ export interface SchemaType extends ISchemaType {
 		PactValue: WithFieldOrder<PactValue>,
 		Payment: WithFieldOrder<Payment>,
 		PaymentValue: WithFieldOrder<PaymentValue>,
-		PPlayerBookmark: WithFieldOrder<PPlayerBookmark>,
-		PPlayerBookmarkValue: WithFieldOrder<PPlayerBookmarkValue>,
-		PPlayerOnline: WithFieldOrder<PPlayerOnline>,
-		PPlayerOnlineValue: WithFieldOrder<PPlayerOnlineValue>,
-		PPlayerTutorialProgress: WithFieldOrder<PPlayerTutorialProgress>,
-		PPlayerTutorialProgressValue: WithFieldOrder<PPlayerTutorialProgressValue>,
 		Player: WithFieldOrder<Player>,
+		PlayerBookmark: WithFieldOrder<PlayerBookmark>,
+		PlayerBookmarkValue: WithFieldOrder<PlayerBookmarkValue>,
+		PlayerOnline: WithFieldOrder<PlayerOnline>,
+		PlayerOnlineValue: WithFieldOrder<PlayerOnlineValue>,
+		PlayerTutorialProgress: WithFieldOrder<PlayerTutorialProgress>,
+		PlayerTutorialProgressValue: WithFieldOrder<PlayerTutorialProgressValue>,
 		PlayerValue: WithFieldOrder<PlayerValue>,
 		TableAdmittance: WithFieldOrder<TableAdmittance>,
 		TableAdmittanceValue: WithFieldOrder<TableAdmittanceValue>,
@@ -502,6 +546,10 @@ export interface SchemaType extends ISchemaType {
 		TableConfigValue: WithFieldOrder<TableConfigValue>,
 		TokenBoundAddress: WithFieldOrder<TokenBoundAddress>,
 		TokenBoundAddressValue: WithFieldOrder<TokenBoundAddressValue>,
+		PlayerActivity: WithFieldOrder<PlayerActivity>,
+		PlayerActivityValue: WithFieldOrder<PlayerActivityValue>,
+		PlayerRequiredAction: WithFieldOrder<PlayerRequiredAction>,
+		PlayerRequiredActionValue: WithFieldOrder<PlayerRequiredActionValue>,
 	},
 }
 export const schema: SchemaType = {
@@ -716,40 +764,40 @@ export const schema: SchemaType = {
 			pool_percent: 0,
 			treasury_percent: 0,
 		},
-		PPlayerBookmark: {
+		Player: {
+			fieldOrder: ['address', 'timestamp_registered', 'claimed_welcome_pack'],
+			address: "",
+			timestamp_registered: 0,
+			claimed_welcome_pack: false,
+		},
+		PlayerBookmark: {
 			fieldOrder: ['identity', 'target_address', 'target_id', 'enabled'],
 			identity: "",
 			target_address: "",
 			target_id: 0,
 			enabled: false,
 		},
-		PPlayerBookmarkValue: {
+		PlayerBookmarkValue: {
 			fieldOrder: ['enabled'],
 			enabled: false,
 		},
-		PPlayerOnline: {
+		PlayerOnline: {
 			fieldOrder: ['identity', 'timestamp'],
 			identity: "",
 			timestamp: 0,
 		},
-		PPlayerOnlineValue: {
+		PlayerOnlineValue: {
 			fieldOrder: ['timestamp'],
 			timestamp: 0,
 		},
-		PPlayerTutorialProgress: {
+		PlayerTutorialProgress: {
 			fieldOrder: ['identity', 'progress'],
 			identity: "",
 		progress: TutorialProgress.None,
 		},
-		PPlayerTutorialProgressValue: {
+		PlayerTutorialProgressValue: {
 			fieldOrder: ['progress'],
 		progress: TutorialProgress.None,
-		},
-		Player: {
-			fieldOrder: ['address', 'timestamp_registered', 'claimed_welcome_pack'],
-			address: "",
-			timestamp_registered: 0,
-			claimed_welcome_pack: false,
 		},
 		PlayerValue: {
 			fieldOrder: ['timestamp_registered', 'claimed_welcome_pack'],
@@ -797,6 +845,31 @@ export const schema: SchemaType = {
 			contract_address: "",
 			token_id: 0,
 		},
+		PlayerActivity: {
+			fieldOrder: ['address', 'timestamp', 'activity', 'identifier', 'is_public'],
+			address: "",
+			timestamp: 0,
+		activity: Activity.Undefined,
+			identifier: 0,
+			is_public: false,
+		},
+		PlayerActivityValue: {
+			fieldOrder: ['timestamp', 'activity', 'identifier', 'is_public'],
+			timestamp: 0,
+		activity: Activity.Undefined,
+			identifier: 0,
+			is_public: false,
+		},
+		PlayerRequiredAction: {
+			fieldOrder: ['address', 'duelist_id', 'duel_id'],
+			address: "",
+			duelist_id: 0,
+			duel_id: 0,
+		},
+		PlayerRequiredActionValue: {
+			fieldOrder: ['duel_id'],
+			duel_id: 0,
+		},
 	},
 };
 export enum ModelsMapping {
@@ -828,13 +901,13 @@ export enum ModelsMapping {
 	PactValue = 'pistols-PactValue',
 	Payment = 'pistols-Payment',
 	PaymentValue = 'pistols-PaymentValue',
-	PPlayerBookmark = 'pistols-PPlayerBookmark',
-	PPlayerBookmarkValue = 'pistols-PPlayerBookmarkValue',
-	PPlayerOnline = 'pistols-PPlayerOnline',
-	PPlayerOnlineValue = 'pistols-PPlayerOnlineValue',
-	PPlayerTutorialProgress = 'pistols-PPlayerTutorialProgress',
-	PPlayerTutorialProgressValue = 'pistols-PPlayerTutorialProgressValue',
 	Player = 'pistols-Player',
+	PlayerBookmark = 'pistols-PlayerBookmark',
+	PlayerBookmarkValue = 'pistols-PlayerBookmarkValue',
+	PlayerOnline = 'pistols-PlayerOnline',
+	PlayerOnlineValue = 'pistols-PlayerOnlineValue',
+	PlayerTutorialProgress = 'pistols-PlayerTutorialProgress',
+	PlayerTutorialProgressValue = 'pistols-PlayerTutorialProgressValue',
 	PlayerValue = 'pistols-PlayerValue',
 	TutorialProgress = 'pistols-TutorialProgress',
 	TableAdmittance = 'pistols-TableAdmittance',
@@ -854,4 +927,9 @@ export enum ModelsMapping {
 	DuelistProfile = 'pistols-DuelistProfile',
 	ProfileType = 'pistols-ProfileType',
 	RoundState = 'pistols-RoundState',
+	Activity = 'pistols-Activity',
+	PlayerActivity = 'pistols-PlayerActivity',
+	PlayerActivityValue = 'pistols-PlayerActivityValue',
+	PlayerRequiredAction = 'pistols-PlayerRequiredAction',
+	PlayerRequiredActionValue = 'pistols-PlayerRequiredActionValue',
 }

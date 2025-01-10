@@ -229,6 +229,13 @@ export interface PaymentValue {
 	treasury_percent: BigNumberish;
 }
 
+// Type definition for `pistols::models::player::Player` struct
+export interface Player {
+	address: string;
+	timestamp_registered: BigNumberish;
+	claimed_welcome_pack: boolean;
+}
+
 // Type definition for `pistols::models::player::PlayerBookmark` struct
 export interface PlayerBookmark {
 	identity: string;
@@ -262,13 +269,6 @@ export interface PlayerTutorialProgress {
 // Type definition for `pistols::models::player::PlayerTutorialProgressValue` struct
 export interface PlayerTutorialProgressValue {
 	progress: TutorialProgress;
-}
-
-// Type definition for `pistols::models::player::Player` struct
-export interface Player {
-	address: string;
-	timestamp_registered: BigNumberish;
-	claimed_welcome_pack: boolean;
 }
 
 // Type definition for `pistols::models::player::PlayerValue` struct
@@ -324,6 +324,35 @@ export interface TokenBoundAddressValue {
 	token_id: BigNumberish;
 }
 
+// Type definition for `pistols::models::player::PlayerActivity` struct
+export interface PlayerActivity {
+	address: string;
+	timestamp: BigNumberish;
+	activity: Activity;
+	identifier: BigNumberish;
+	is_public: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerActivityValue` struct
+export interface PlayerActivityValue {
+	timestamp: BigNumberish;
+	activity: Activity;
+	identifier: BigNumberish;
+	is_public: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerRequiredAction` struct
+export interface PlayerRequiredAction {
+	address: string;
+	duelist_id: BigNumberish;
+	duel_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::player::PlayerRequiredActionValue` struct
+export interface PlayerRequiredActionValue {
+	duel_id: BigNumberish;
+}
+
 // Type definition for `pistols::models::pack::PackType` enum
 export enum PackType {
 	Unknown,
@@ -364,7 +393,7 @@ export enum DeckType {
 
 // Type definition for `pistols::types::cards::hand::FinalBlow` enum
 export type FinalBlow = {
-	Undefined: string;
+	Undefined: ();
 	Paces: PacesCard;
 	Blades: BladesCard;
 }
@@ -445,7 +474,7 @@ export enum DuelistProfile {
 
 // Type definition for `pistols::types::profile_type::ProfileType` enum
 export type ProfileType = {
-	Undefined: string;
+	Undefined: ();
 	Duelist: DuelistProfile;
 	Bot: BotProfile;
 }
@@ -459,37 +488,20 @@ export enum RoundState {
 	Finished,
 }
 
-
-//----------------------------------
-// Events
-//
 // Type definition for `pistols::models::player::Activity` enum
 export enum Activity {
-  Undefined,
-  CreatedDuelist,
-  CreatedChallenge,
-  RepliedChallenge,
-  CommittedMoves,
-  RevealedMoves,
-  Online,
+	Undefined,
+	StartedTutorial,
+	FinishedTutorial,
+	WelcomePack,
+	PurchasedPack,
+	CreatedDuelist,
+	CreatedChallenge,
+	RepliedChallenge,
+	CommittedMoves,
+	RevealedMoves,
+	Online,
 }
-// Type definition for `pistols::models::player::PlayerActivity` struct
-export interface PlayerActivity {
-  address: string;
-  timestamp: BigNumberish;
-  activity: Activity;
-  identifier: BigNumberish;
-  is_public: boolean;
-}
-// Type definition for `pistols::models::player::PlayerRequiredAction` struct
-export interface PlayerRequiredAction {
-  address: string;
-  duelist_id: BigNumberish;
-  duel_id: BigNumberish;
-}
-//----------------------------------
-
-
 
 export interface SchemaType extends ISchemaType {
 	pistols: {
@@ -520,13 +532,13 @@ export interface SchemaType extends ISchemaType {
 		PactValue: WithFieldOrder<PactValue>,
 		Payment: WithFieldOrder<Payment>,
 		PaymentValue: WithFieldOrder<PaymentValue>,
+		Player: WithFieldOrder<Player>,
 		PlayerBookmark: WithFieldOrder<PlayerBookmark>,
 		PlayerBookmarkValue: WithFieldOrder<PlayerBookmarkValue>,
 		PlayerOnline: WithFieldOrder<PlayerOnline>,
 		PlayerOnlineValue: WithFieldOrder<PlayerOnlineValue>,
 		PlayerTutorialProgress: WithFieldOrder<PlayerTutorialProgress>,
 		PlayerTutorialProgressValue: WithFieldOrder<PlayerTutorialProgressValue>,
-		Player: WithFieldOrder<Player>,
 		PlayerValue: WithFieldOrder<PlayerValue>,
 		TableAdmittance: WithFieldOrder<TableAdmittance>,
 		TableAdmittanceValue: WithFieldOrder<TableAdmittanceValue>,
@@ -534,11 +546,10 @@ export interface SchemaType extends ISchemaType {
 		TableConfigValue: WithFieldOrder<TableConfigValue>,
 		TokenBoundAddress: WithFieldOrder<TokenBoundAddress>,
 		TokenBoundAddressValue: WithFieldOrder<TokenBoundAddressValue>,
-    //----------------------------------
-    // Events
-    PlayerActivity: WithFieldOrder<PlayerActivity>,
-    PlayerRequiredAction: WithFieldOrder<PlayerRequiredAction>,
-    //----------------------------------
+		PlayerActivity: WithFieldOrder<PlayerActivity>,
+		PlayerActivityValue: WithFieldOrder<PlayerActivityValue>,
+		PlayerRequiredAction: WithFieldOrder<PlayerRequiredAction>,
+		PlayerRequiredActionValue: WithFieldOrder<PlayerRequiredActionValue>,
 	},
 }
 export const schema: SchemaType = {
@@ -603,33 +614,25 @@ export const schema: SchemaType = {
 		Round: {
 			fieldOrder: ['duel_id', 'moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
 			duel_id: 0,
-      //@ts-ignore
 		moves_a: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-      //@ts-ignore
 		moves_b: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-      //@ts-ignore
 		state_a: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
-      //@ts-ignore
 		state_b: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
 		state: RoundState.Null,
 		final_blow: new CairoCustomEnum({ 
-					Undefined: {},
+					Undefined: (),
 				paces: undefined,
 				blades: undefined, }),
 		},
 		RoundValue: {
 			fieldOrder: ['moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
-      //@ts-ignore
 		moves_a: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-      //@ts-ignore
 		moves_b: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-      //@ts-ignore
 		state_a: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
-      //@ts-ignore
 		state_b: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
 		state: RoundState.Null,
 		final_blow: new CairoCustomEnum({ 
-					Undefined: {},
+					Undefined: (),
 				paces: undefined,
 				blades: undefined, }),
 		},
@@ -676,11 +679,10 @@ export const schema: SchemaType = {
 			fieldOrder: ['duelist_id', 'profile_type', 'timestamp', 'score'],
 			duelist_id: 0,
 		profile_type: new CairoCustomEnum({ 
-					Undefined: {},
+					Undefined: (),
 				duelist: undefined,
 				bot: undefined, }),
 			timestamp: 0,
-      //@ts-ignore
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		DuelistChallenge: {
@@ -695,11 +697,10 @@ export const schema: SchemaType = {
 		DuelistValue: {
 			fieldOrder: ['profile_type', 'timestamp', 'score'],
 		profile_type: new CairoCustomEnum({ 
-					Undefined: {},
+					Undefined: (),
 				duelist: undefined,
 				bot: undefined, }),
 			timestamp: 0,
-      //@ts-ignore
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		Score: {
@@ -715,12 +716,10 @@ export const schema: SchemaType = {
 			fieldOrder: ['table_id', 'duelist_id', 'score'],
 			table_id: 0,
 			duelist_id: 0,
-      //@ts-ignore
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		ScoreboardValue: {
 			fieldOrder: ['score'],
-      //@ts-ignore
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		Pack: {
@@ -765,6 +764,12 @@ export const schema: SchemaType = {
 			pool_percent: 0,
 			treasury_percent: 0,
 		},
+		Player: {
+			fieldOrder: ['address', 'timestamp_registered', 'claimed_welcome_pack'],
+			address: "",
+			timestamp_registered: 0,
+			claimed_welcome_pack: false,
+		},
 		PlayerBookmark: {
 			fieldOrder: ['identity', 'target_address', 'target_id', 'enabled'],
 			identity: "",
@@ -794,17 +799,11 @@ export const schema: SchemaType = {
 			fieldOrder: ['progress'],
 		progress: TutorialProgress.None,
 		},
-		Player: {
-			fieldOrder: ['address', 'timestamp_registered', 'claimed_welcome_pack'],
-			address: "",
-			timestamp_registered: 0,
-			claimed_welcome_pack: false,
-		},
 		PlayerValue: {
 			fieldOrder: ['timestamp_registered', 'claimed_welcome_pack'],
 			timestamp_registered: 0,
 			claimed_welcome_pack: false,
-    },
+		},
 		TableAdmittance: {
 			fieldOrder: ['table_id', 'accounts', 'duelists'],
 			table_id: 0,
@@ -846,23 +845,31 @@ export const schema: SchemaType = {
 			contract_address: "",
 			token_id: 0,
 		},
-    //----------------------------------
-    // Events
-    PlayerActivity: {
-      fieldOrder: ['address', 'timestamp', 'activity', 'identifier', 'is_public'],
-      address: "",
-      timestamp: 0,
-      activity: Activity.Undefined,
-      identifier: 0,
-      is_public: true,
-    },
-    PlayerRequiredAction: {
-      fieldOrder: ['address', 'duelist_id', 'duel_id'],
-      address: "",
-      duelist_id: 0,
-      duel_id: 0,
-    },
-    //----------------------------------
+		PlayerActivity: {
+			fieldOrder: ['address', 'timestamp', 'activity', 'identifier', 'is_public'],
+			address: "",
+			timestamp: 0,
+		activity: Activity.Undefined,
+			identifier: 0,
+			is_public: false,
+		},
+		PlayerActivityValue: {
+			fieldOrder: ['timestamp', 'activity', 'identifier', 'is_public'],
+			timestamp: 0,
+		activity: Activity.Undefined,
+			identifier: 0,
+			is_public: false,
+		},
+		PlayerRequiredAction: {
+			fieldOrder: ['address', 'duelist_id', 'duel_id'],
+			address: "",
+			duelist_id: 0,
+			duel_id: 0,
+		},
+		PlayerRequiredActionValue: {
+			fieldOrder: ['duel_id'],
+			duel_id: 0,
+		},
 	},
 };
 export enum ModelsMapping {
@@ -894,13 +901,13 @@ export enum ModelsMapping {
 	PactValue = 'pistols-PactValue',
 	Payment = 'pistols-Payment',
 	PaymentValue = 'pistols-PaymentValue',
+	Player = 'pistols-Player',
 	PlayerBookmark = 'pistols-PlayerBookmark',
 	PlayerBookmarkValue = 'pistols-PlayerBookmarkValue',
 	PlayerOnline = 'pistols-PlayerOnline',
 	PlayerOnlineValue = 'pistols-PlayerOnlineValue',
 	PlayerTutorialProgress = 'pistols-PlayerTutorialProgress',
 	PlayerTutorialProgressValue = 'pistols-PlayerTutorialProgressValue',
-	Player = 'pistols-Player',
 	PlayerValue = 'pistols-PlayerValue',
 	TutorialProgress = 'pistols-TutorialProgress',
 	TableAdmittance = 'pistols-TableAdmittance',
@@ -920,4 +927,9 @@ export enum ModelsMapping {
 	DuelistProfile = 'pistols-DuelistProfile',
 	ProfileType = 'pistols-ProfileType',
 	RoundState = 'pistols-RoundState',
+	Activity = 'pistols-Activity',
+	PlayerActivity = 'pistols-PlayerActivity',
+	PlayerActivityValue = 'pistols-PlayerActivityValue',
+	PlayerRequiredAction = 'pistols-PlayerRequiredAction',
+	PlayerRequiredActionValue = 'pistols-PlayerRequiredActionValue',
 }
