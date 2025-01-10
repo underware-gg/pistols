@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useRouterListener } from '/src/hooks/useRouterListener'
-import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute } from '/src/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRouterParams } from '/src/hooks/PistolsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { useEffectOnce, usePlayerId } from '@underware_gg/pistols-sdk/utils'
@@ -32,11 +31,14 @@ import { helloPistols } from '@underware_gg/pistols-sdk'
 helloPistols();
 
 export default function MainPage() {
-  // let's initialize player id always, it is a random client identifier
+  // let's initialize player id always
+  // (random client identifier, useful for off-chain tracking)
   const { playerId } = usePlayerId()
 
   // this hook will parse slugs and manage the current scene
   usePistolsSceneFromRoute()
+
+  // wait for Dojo to be initialized before loading the UI
   const { isInitialized } = useDojoStatus()
 
   const overlay = useMemo(() => <div id="game-black-overlay" className='NoMouse NoDrag' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'black', opacity: 1, pointerEvents: 'none', zIndex: 5 }}></div>, [])
@@ -66,7 +68,9 @@ export default function MainPage() {
 }
 
 function MainUI() {
-  useRouterListener()
+  // sync game context with url params
+  useSyncRouterParams()
+
   const { gameImpl } = useThreeJsContext()
   const { selectedDuelId } = usePistolsContext()
   const { atGate, atProfile, atTavern, atDuel, atDoor, atDuels, atDuelists, atGraveyard, atTutorial } = usePistolsScene()

@@ -52,7 +52,7 @@ export const usePact = (table_id: string, address_a: BigNumberish, address_b: Bi
     enabled: (Boolean(table_id) && isPositiveBigint(pair)),
   })
   const pacts = useMemo(() => getEntityMapModels<models.Pact>(entities, 'Pact'), [entities])
-  useEffect(() => console.log(`usePact()`, bigintToHex(stringToFelt(table_id)), bigintToHex(pair), pacts), [table_id, pair, pacts])
+  // useEffect(() => console.log(`usePact()`, bigintToHex(stringToFelt(table_id)), bigintToHex(pair), pacts), [table_id, pair, pacts])
 
   const pactDuelId = useMemo(() => BigInt(pacts?.[0]?.duel_id ?? 0n), [pacts])
   const hasPact = useMemo(() => (pactDuelId > 0n), [pactDuelId])

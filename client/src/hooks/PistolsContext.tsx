@@ -1,8 +1,8 @@
-import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState, useRef } from 'react'
-import { useNavigate, useLocation, useParams } from 'react-router'
+import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback } from 'react'
+import { useNavigate, useSearchParams, useLocation, useParams } from 'react-router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
-import { bigintToHex, bigintToNumber, isPositiveBigint, poseidon } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex, bigintToNumber, bigintToDecimal, isPositiveBigint, poseidon } from '@underware_gg/pistols-sdk/utils'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { CommitMoveMessage } from '/src/utils/salt'
@@ -249,7 +249,7 @@ export const usePistolsContext = () => {
 
 
 //-------------------------------------
-// Scenes
+// Scene management
 //
 
 type SceneRoute = {
@@ -284,6 +284,20 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   [SceneName.Gate]: { baseUrl: '/' },
 }
 
+
+//
+// Scene <> URL sync
+//
+// A: Game loads from URL > read URL PATH and PARAMS to game context
+//    > usePistolsSceneFromRoute()
+//    > useSyncRouterParams()
+// B: Game SCENE changes > update URL PATH
+//    > usePistolsScene()
+// C: Game CONTEXT changes (selected duel, etc.) > update URL params
+//    > useSyncRouterParams()
+// D: Browser BACK button > same as A
+//
+
 export const usePistolsScene = () => {
   const { currentScene, lastScene, selectedDuelId, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
   const { tableId, dispatchTableId } = useSettings()
@@ -305,6 +319,7 @@ export const usePistolsScene = () => {
     }
     url += slug
     if (url != location.pathname) {
+      console.log(`navigate >>>>> [${location.pathname}] > [${url}]`)
       navigate(url)
     }
     __dispatchSetScene(newScene)
@@ -341,9 +356,12 @@ export const usePistolsSceneFromRoute = () => {
   const { currentScene, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
   const { dispatchTableId } = useSettings()
 
-  const location = useLocation()
+  // URL slugs (/path/slug)
+  // https://api.reactrouter.com/v7/functions/react_router.useParams.html
   const params = useParams()
-  const navigate = useNavigate()
+  
+  const location = useLocation()
+  // useEffect(() => console.log(`location >>>>>`, location.key, location), [location])
 
   //------------------------------
   // Detect scene from route
@@ -356,7 +374,7 @@ export const usePistolsSceneFromRoute = () => {
         return location.pathname.startsWith(sceneRoutes[key].baseUrl)
       }) as SceneName
       // console.log(`ROUTE [${currentRoute}] >> SCENE [${newScene}]`, router)
-      if (newScene) {
+      if (newScene && newScene != currentScene) {
         const route = sceneRoutes[newScene]
         __dispatchSetScene(newScene)
         if (route.hasTableId) {
@@ -364,11 +382,59 @@ export const usePistolsSceneFromRoute = () => {
         } else if (route.hasDuelId) {
           dispatchSelectDuel(params['duel_id'] || '0x0')
         }
-      } else {
-        navigate('/')
       }
     }
   }, [location.pathname, params])
+
+  return {}
+}
+
+// use only once!!!!
+export const useSyncRouterParams = () => {
+  // URL params (/path?param=value)
+  // https://api.reactrouter.com/v7/functions/react_router.useSearchParams.html
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  //--------------------------------------------
+  // URL Params > Game Context
+  // cases: A, D
+  const { dispatchSelectDuel, dispatchSelectDuelistId, dispatchSelectPlayerAddress } = usePistolsContext()
+  useEffect(() => {
+    if (searchParams.get('duel')) {
+      dispatchSelectDuel(searchParams.get('duel'))
+    } else if (searchParams.get('duelist')) {
+      dispatchSelectDuelistId(searchParams.get('duelist'))
+    } else if (searchParams.get('player')) {
+      dispatchSelectPlayerAddress(searchParams.get('player'))
+    } else {
+      // deselect
+      dispatchSelectDuel(0n)
+    }
+  }, [searchParams])
+
+  //--------------------------------------------
+  // Game Context > URL params
+  // (for shareable urls, back button support)
+  // cases: C
+  //
+  const { currentScene, selectedDuelId, selectedDuelistId, selectedPlayerAddress } = usePistolsContext()
+  useEffect(() => {
+    setSearchParams((prev) => {
+      // const params = new URLSearchParams(prev)
+      const params = new URLSearchParams()
+      if (selectedDuelId) {
+        if (currentScene != SceneName.Duel) {
+          params.set('duel', bigintToDecimal(selectedDuelId))
+        }
+      } else if (selectedDuelistId) {
+        params.set('duelist', bigintToDecimal(selectedDuelistId))
+      } else if (selectedPlayerAddress) {
+        params.set('player', bigintToHex(selectedPlayerAddress))
+      }
+      // console.log(`params >>>>>`, params)
+      return params
+    })
+  }, [selectedDuelId, selectedDuelistId, selectedPlayerAddress])
 
   return {}
 }
