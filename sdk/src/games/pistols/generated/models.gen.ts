@@ -393,7 +393,7 @@ export enum DeckType {
 
 // Type definition for `pistols::types::cards::hand::FinalBlow` enum
 export type FinalBlow = {
-	Undefined: ();
+  Undefined: string;
 	Paces: PacesCard;
 	Blades: BladesCard;
 }
@@ -474,7 +474,7 @@ export enum DuelistProfile {
 
 // Type definition for `pistols::types::profile_type::ProfileType` enum
 export type ProfileType = {
-	Undefined: ();
+	Undefined: string;
 	Duelist: DuelistProfile;
 	Bot: BotProfile;
 }
@@ -614,25 +614,33 @@ export const schema: SchemaType = {
 		Round: {
 			fieldOrder: ['duel_id', 'moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
 			duel_id: 0,
+      // @ts-ignore
 		moves_a: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+      // @ts-ignore
 		moves_b: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+      // @ts-ignore
 		state_a: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
+      // @ts-ignore
 		state_b: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
 		state: RoundState.Null,
 		final_blow: new CairoCustomEnum({ 
-					Undefined: (),
+      Undefined: '',
 				paces: undefined,
 				blades: undefined, }),
 		},
 		RoundValue: {
 			fieldOrder: ['moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
+      // @ts-ignore
 		moves_a: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+      // @ts-ignore
 		moves_b: { fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+      // @ts-ignore
 		state_a: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
+      // @ts-ignore
 		state_b: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
 		state: RoundState.Null,
 		final_blow: new CairoCustomEnum({ 
-					Undefined: (),
+      Undefined: '',
 				paces: undefined,
 				blades: undefined, }),
 		},
@@ -679,10 +687,11 @@ export const schema: SchemaType = {
 			fieldOrder: ['duelist_id', 'profile_type', 'timestamp', 'score'],
 			duelist_id: 0,
 		profile_type: new CairoCustomEnum({ 
-					Undefined: (),
+      Undefined: '',
 				duelist: undefined,
 				bot: undefined, }),
 			timestamp: 0,
+      // @ts-ignore
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		DuelistChallenge: {
@@ -697,10 +706,11 @@ export const schema: SchemaType = {
 		DuelistValue: {
 			fieldOrder: ['profile_type', 'timestamp', 'score'],
 		profile_type: new CairoCustomEnum({ 
-					Undefined: (),
+      Undefined: '',
 				duelist: undefined,
 				bot: undefined, }),
 			timestamp: 0,
+      // @ts-ignore
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		Score: {
@@ -716,10 +726,12 @@ export const schema: SchemaType = {
 			fieldOrder: ['table_id', 'duelist_id', 'score'],
 			table_id: 0,
 			duelist_id: 0,
+      // @ts-ignore
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		ScoreboardValue: {
 			fieldOrder: ['score'],
+      // @ts-ignore
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		Pack: {
