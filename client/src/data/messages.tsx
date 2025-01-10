@@ -25,6 +25,7 @@ export const EMOJI = {
   BOUNTY: '💰',
   WINNER: '🏅',
   DICE: '🎲',
+  IN_ACTION: '🔫',
   //
   // badges
   FAME: '⭐️',

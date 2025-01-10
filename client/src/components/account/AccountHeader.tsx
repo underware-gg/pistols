@@ -11,6 +11,8 @@ import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
 import { useDuelistsOfPlayer } from '/src/hooks/useDuelistToken'
 import { ProfileName } from '/src/components/account/ProfileDescription'
 import { SceneName } from '/src/data/assets'
+import { EmojiIcon } from '/src/components/ui/Icons'
+import { EMOJI } from '/src/data/messages'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -108,9 +110,9 @@ export function DuelistItem({
 }: {
   duelistId: BigNumberish
 }) {
-  const { duelistId: selectedDuelistId } = useSettings()
-  const { profilePic } = useDuelist(duelistId)
-  const isSelected = (duelistId && duelistId == selectedDuelistId)
+  // const { duelistId: selectedDuelistId } = useSettings()
+  // const isSelected = (duelistId && duelistId == selectedDuelistId)
+  const { profilePic, isInAction } = useDuelist(duelistId)
 
   return (
     <div className={'FlexInline'}>
@@ -121,6 +123,11 @@ export function DuelistItem({
         <div className='Smaller'>
           <FameBalanceDuelist duelistId={duelistId} />
         </div>
+        {isInAction &&
+          <div className='AbsoluteRight Padded'>
+            <EmojiIcon emoji={EMOJI.IN_ACTION} />
+          </div>
+        }
       </div>
     </div>
   )

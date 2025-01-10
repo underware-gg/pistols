@@ -9,8 +9,10 @@ import { AnimationData } from '/src/components/cards/Cards'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
 import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
-import * as TWEEN from '@tweenjs/tween.js'
+import { EmojiIcon } from '/src/components/ui/Icons'
+import { EMOJI } from '/src/data/messages'
 import * as Constants from '/src/data/cardConstants'
+import * as TWEEN from '@tweenjs/tween.js'
 
 interface DuelistCardProps {
   duelistId: number
@@ -53,7 +55,7 @@ export interface DuelistCardHandle {
 }
 
 export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((props: DuelistCardProps, ref: React.Ref<DuelistCardHandle>) => {
-  const { name, nameDisplay, profilePic, score } = useDuelist(props.duelistId)
+  const { name, nameDisplay, profilePic, score, isInAction } = useDuelist(props.duelistId)
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
 
@@ -533,6 +535,11 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                 <div className="duelist-fame">
                   <FameBalanceDuelist duelistId={props.duelistId} />
                 </div>
+                {isInAction &&
+                  <div className='AbsoluteRight'>
+                    <EmojiIcon emoji={EMOJI.IN_ACTION} />
+                  </div>
+                }
               </div>
             </div>
             <div className="card-back NoMouse NoDrag"></div>
