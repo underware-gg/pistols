@@ -22,7 +22,7 @@ import { useGameAspect } from '/src/hooks/useGameApect'
 import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
 import { DuelStage, useAnimatedDuel, useDuel } from '/src/hooks/useDuel'
 import { ProfilePic } from '/src/components/account/ProfilePic'
-import { ProfileModels } from '/src/data/assets'
+import { CharacterType, ProfileModels } from '/src/data/assets'
 import { EnvironmentCardsTextures } from '/src/data/cardAssets'
 import { AnimationState } from '/src/three/game'
 import { Action, ArchetypeNames } from '/src/utils/pistols'
@@ -59,6 +59,8 @@ export default function Duel({
   const { tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start } = useChallenge(duelId)
   const { description } = useTable(tableId)
 
+  console.log('Duel', duelId, tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start)
+
   // switch to active duelist, if owned by player
   useSyncToActiveDuelist(duelistIdA)
   useSyncToActiveDuelist(duelistIdB)
@@ -72,7 +74,7 @@ export default function Duel({
   const { isYou: isYouB } = useIsYou(duelistIdB)
   
   useEffect(() => {
-    if (gameImpl && mounted && !duelSceneStarted && profilePicA && profilePicB && nameA && nameB) {
+    if (gameImpl && mounted && !duelSceneStarted && nameA && nameB) {
       gameImpl.startDuelWithPlayers(nameA, ProfileModels[profilePicA], isYouA, isYouB, nameB, ProfileModels[profilePicB])
       setDuelSceneStarted(true)
       dispatchAnimated(AnimationState.None)

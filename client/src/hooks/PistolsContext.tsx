@@ -406,9 +406,6 @@ export const useSyncRouterParams = () => {
       dispatchSelectDuelistId(searchParams.get('duelist'))
     } else if (searchParams.get('player')) {
       dispatchSelectPlayerAddress(searchParams.get('player'))
-    } else {
-      // deselect
-      dispatchSelectDuel(0n)
     }
   }, [searchParams])
 

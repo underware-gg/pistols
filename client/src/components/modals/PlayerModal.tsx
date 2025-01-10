@@ -16,7 +16,7 @@ import { AddressShort } from '/src/components/ui/AddressShort'
 import { DuelistItem } from '/src/components/account/AccountHeader'
 import { BookmarkIcon } from '/src/components/ui/Icons'
 import { SceneName } from '/src/data/assets'
-import { bigintEquals } from '@underware_gg/pistols-sdk/utils'
+import { bigintEquals, bigintToHex } from '@underware_gg/pistols-sdk/utils'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -131,7 +131,7 @@ export function ChallengeButton({
   const canChallenge = (!isAnon && !hasPact && !isMyAccount)
 
   if (!hasPact) {
-    return <ActionButton large fill disabled={canChallenge} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(challengedPlayerAddress)} />
+    return <ActionButton large fill disabled={!canChallenge} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(challengedPlayerAddress)} />
   } else {
     return <ActionButton large fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />
   }
