@@ -39,6 +39,11 @@ export type UseSdkEntitiesProps = {
   logging?: boolean
 }
 
+export type SdkCallbackResponse = {
+  data?: PistolsEntity[] | PistolsEntity[][]
+  error?: Error
+}
+
 export const useSdkEntities = ({
   query_get,
   query_sub,
@@ -55,6 +60,16 @@ export const useSdkEntities = ({
   const [isSubscribed, setIsSubscribed] = useState<boolean>()
   const isEvent = useMemo(() => (historical !== undefined), [historical])
 
+  const _parseResponseData = (data: SdkCallbackResponse['data']): PistolsEntity[] => {
+    return !data ? []
+      // PistolsEntity[]
+      : !Array.isArray(data[0]) ? data as PistolsEntity[] :
+        // historical events from getEventMessages: PistolsEntity[][]
+        (data as PistolsEntity[][]).reduce((acc: PistolsEntity[], e: PistolsEntity[]) => (
+          acc.concat(e)
+        ), [] as PistolsEntity[])
+  }
+
   //----------------------
   // get initial entities
   //
@@ -63,12 +78,12 @@ export const useSdkEntities = ({
       setIsLoading(true)
       await (isEvent ? sdk.getEventMessages : sdk.getEntities)({
         query: query_get,
-        callback: (response: any) => {
+        callback: (response: SdkCallbackResponse) => {
           if (response.error) {
             console.error("useSdkEntities().sdk.get() error:", response.error)
           } else if (response.data) {
-            // console.log("useSdkEntities() GOT:", response.data);
-            setEntities(response.data);
+            // console.log("useSdkEntities() GOT:", isEvent, response.data)
+            setEntities(_parseResponseData(response.data))
           }
           setIsLoading(false)
         },
@@ -94,12 +109,15 @@ export const useSdkEntities = ({
       setIsSubscribed(undefined)
       const subscription = await (isEvent ? sdk.subscribeEventQuery : sdk.subscribeEntityQuery)({
         query: query_sub,
-        callback: (response: any) => {
+        callback: (response: SdkCallbackResponse) => {
           if (response.error) {
             console.error("useSdkEntities().sdk.subscribe() error:", response.error)
-          } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {
-            // console.log("useSdkEntities() SUB:", response.data[0]);
-            updateEntity(response.data[0]);
+          } else {
+            const data = _parseResponseData(response.data)
+            if (isPositiveBigint(data?.[0]?.entityId ?? 0)) {
+              console.log("useSdkEntities() SUB:", data[0]);
+              updateEntity(data[0]);
+            }
           }
         },
         options: { logging },

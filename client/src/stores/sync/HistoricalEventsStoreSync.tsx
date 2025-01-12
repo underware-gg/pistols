@@ -7,12 +7,12 @@ import * as torii from '@dojoengine/torii-client'
 
 const query_get: PistolsGetQuery = {
   pistols: {
-    PlayerActivity: []
+    PlayerActivity: [],
   },
 }
 const query_sub: PistolsSubQuery = {
   pistols: {
-    PlayerActivity: []
+    PlayerActivity: [],
   },
 }
 
@@ -52,6 +52,9 @@ export function HistoricalEventsStoreSync() {
   //         limit: 100,
   //         offset: 0,
   //         dont_include_hashed_keys: true,
+  //         order_by: [],
+  //         entity_models: ["pistols-PlayerActivity"],
+  //         entity_updated_after: 0,
   //       },
   //       true, // historical
   //     );
