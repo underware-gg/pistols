@@ -144,10 +144,10 @@ pub mod game {
                 }
                 if (round.moves_b.hashed == 0) {
                     // other duelist did not commit: clear self action flag
-                    store.emit_required_action(challenge.address_a, challenge.duelist_id_a, 0);
+                    store.emit_required_action(challenge.duelist_id_a, 0);
                 } else {
                     // other duelist committed: call for action (keep self flag for reveal)
-                    store.emit_required_action(challenge.address_b, challenge.duelist_id_b, duel_id);
+                    store.emit_required_action(challenge.duelist_id_b, duel_id);
                 }
             } else if (duelist_number == 2) {
                 // validate and store hash
@@ -160,10 +160,10 @@ pub mod game {
                 }
                 if (round.moves_a.hashed == 0) {
                     // other duelist did not commit: clear self action flag
-                    store.emit_required_action(challenge.address_b, challenge.duelist_id_b, 0);
+                    store.emit_required_action(challenge.duelist_id_b, 0);
                 } else {
                     // other duelist committed: call for action (keep self flag for reveal)
-                    store.emit_required_action(challenge.address_a, challenge.duelist_id_a, duel_id);
+                    store.emit_required_action(challenge.duelist_id_a, duel_id);
                 }
             }
 
@@ -216,12 +216,12 @@ pub mod game {
                 assert(round.moves_a.salt == 0, Errors::ALREADY_REVEALED);
                 assert(round.moves_a.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_a.initialize(salt, moves);
-                store.emit_required_action(challenge.address_a, challenge.duelist_id_a, 0);
+                store.emit_required_action(challenge.duelist_id_a, 0);
             } else if (duelist_number == 2) {
                 assert(round.moves_b.salt == 0, Errors::ALREADY_REVEALED);
                 assert(round.moves_b.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_b.initialize(salt, moves);
-                store.emit_required_action(challenge.address_b, challenge.duelist_id_b, 0);
+                store.emit_required_action(challenge.duelist_id_b, 0);
             } else {
                 assert(false, Errors::IMPOSSIBLE_ERROR);
             }

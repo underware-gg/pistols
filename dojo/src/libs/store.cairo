@@ -265,9 +265,8 @@ impl StoreImpl of StoreTrait {
     //
 
     #[inline(always)]
-    fn emit_required_action(ref self: Store, address: ContractAddress, duelist_id: u128, duel_id: u128) {
+    fn emit_required_action(ref self: Store, duelist_id: u128, duel_id: u128) {
         self.world.emit_event(@PlayerRequiredAction{
-            address,
             duelist_id,
             duel_id,
         });
