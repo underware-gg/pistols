@@ -216,7 +216,7 @@ mod tests {
         tester::assert_pact(sys, duel_id, ch, true, false, "created");
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, A, ID(A), duel_id, false);
         assert(new_state == ChallengeState::Withdrawn, 'canceled');
-        tester::assert_pact(sys, duel_id, ch, false, false, "replied");
+        tester::assert_pact(sys, duel_id, ch, false, false, "withdrew");
 
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
         assert(ch.state == new_state, 'state');

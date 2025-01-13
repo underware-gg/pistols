@@ -399,6 +399,7 @@ pub mod duel_token {
             if (challenge.state.is_canceled()) {
                 challenge.unset_pact(ref store);
                 store.exit_challenge(challenge.duelist_id_a);
+                store.emit_required_action(challenge.duelist_id_a, 0);
             }
 
             // events
