@@ -14,7 +14,7 @@ historical = [
 index_pending = true
 index_transactions = false
 contracts = [
-  "erc721:0x2be866517f815d16a76e4aaac8306b79b764ed3301f3369481fc776b4430b03", # duel_token
+  "erc721:0x1912b9ab63b64905a4f12a1585e73b0928ff4e455ca55ab721e4ee3e9627cc6", # duel_token
   "erc721:0x67a4ba72d03574dca7de8f951fafe360a5abfa3942f439a92fdeebc12a2364d", # duelist_token
   "erc721:0x2e2bc3d15e3c425bef2e9ae44d4505ed4e37d720ebd891d1369ffec96430b6a", # pack_token
   "erc20:0x18301575378f0cb5d6e0d7111a30ab2a4fa01572a2afa3e53a9086dd1c4c48c", # fame_coin

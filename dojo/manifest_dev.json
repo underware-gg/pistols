@@ -1913,8 +1913,8 @@
       ]
     },
     {
-      "address": "0x2be866517f815d16a76e4aaac8306b79b764ed3301f3369481fc776b4430b03",
-      "class_hash": "0x117c2673dd5d570f3e4e2c1a864a0e3781b88757f33db1f5c356bf0cb0c3937",
+      "address": "0x1912b9ab63b64905a4f12a1585e73b0928ff4e455ca55ab721e4ee3e9627cc6",
+      "class_hash": "0x615af8b0c2640b21ed3d3784fbc96f16004b786f626944786fd32cc5713b222",
       "abi": [
         {
           "type": "impl",
@@ -4669,8 +4669,8 @@
       ]
     },
     {
-      "address": "0x2e84ded58fddffc33a5f2fd65dc75c5126264b4b6c6d3c47cd553507481baed",
-      "class_hash": "0x51b51a1d719b32fa5907bcf80d1a267894586e03d13b621ca489c3cfb257db2",
+      "address": "0xb7e5ef66a7964259f65c51ed92fc85d9399a1290cda79db330e25b2e5faef8",
+      "class_hash": "0x8eed9b7d40c9faee6aad18a96616a834b761bca692e4db1aa3eca82dee7d75",
       "abi": [
         {
           "type": "impl",
@@ -7522,7 +7522,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x6e84c7e0029b06b70fcb04b331b5ed45845968886b7052093e7b35809306902",
+      "class_hash": "0x1800717ddfaa981f410c5f6eba890abe80a3c67d9c70876442c92e15226e528",
       "tag": "pistols-PlayerRequiredAction",
       "selector": "0x7a8a6e4891353356c5c6a727ca9998890e212fb06e892e08f0344973a6c7b4b"
     }

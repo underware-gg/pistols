@@ -72,6 +72,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_pack_token_approve_calldata = (to: string, tokenId: U256) => {
+		return {
+			contractName: "pack_token",
+			entrypoint: "approve",
+			calldata: [to, tokenId],
+		};
+	};
+
+	const pack_token_approve = async (snAccount: Account | AccountInterface, to: string, tokenId: U256) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_pack_token_approve_calldata(to, tokenId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_lords_mock_approve_calldata = (spender: string, amount: U256) => {
 		return {
 			contractName: "lords_mock",
@@ -114,27 +135,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_approve_calldata = (to: string, tokenId: U256) => {
-		return {
-			contractName: "duel_token",
-			entrypoint: "approve",
-			calldata: [to, tokenId],
-		};
-	};
-
-	const duel_token_approve = async (snAccount: Account | AccountInterface, to: string, tokenId: U256) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_duel_token_approve_calldata(to, tokenId),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_duelist_token_approve_calldata = (to: string, tokenId: U256) => {
 		return {
 			contractName: "duelist_token",
@@ -156,21 +156,38 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_approve_calldata = (to: string, tokenId: U256) => {
+	const build_duel_token_approve_calldata = (to: string, tokenId: U256) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "approve",
 			calldata: [to, tokenId],
 		};
 	};
 
-	const pack_token_approve = async (snAccount: Account | AccountInterface, to: string, tokenId: U256) => {
+	const duel_token_approve = async (snAccount: Account | AccountInterface, to: string, tokenId: U256) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_pack_token_approve_calldata(to, tokenId),
+				build_duel_token_approve_calldata(to, tokenId),
 				"pistols",
 			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_pack_token_balanceOf_calldata = (account: string) => {
+		return {
+			contractName: "pack_token",
+			entrypoint: "balanceOf",
+			calldata: [account],
+		};
+	};
+
+	const pack_token_balanceOf = async (account: string) => {
+		try {
+			return await provider.call("pistols", build_pack_token_balanceOf_calldata(account);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -211,23 +228,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_balanceOf_calldata = (account: string) => {
-		return {
-			contractName: "duel_token",
-			entrypoint: "balanceOf",
-			calldata: [account],
-		};
-	};
-
-	const duel_token_balanceOf = async (account: string) => {
-		try {
-			return await provider.call("pistols", build_duel_token_balanceOf_calldata(account);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_duelist_token_balanceOf_calldata = (account: string) => {
 		return {
 			contractName: "duelist_token",
@@ -245,17 +245,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_balanceOf_calldata = (account: string) => {
+	const build_duel_token_balanceOf_calldata = (account: string) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "balanceOf",
 			calldata: [account],
 		};
 	};
 
-	const pack_token_balanceOf = async (account: string) => {
+	const duel_token_balanceOf = async (account: string) => {
 		try {
-			return await provider.call("pistols", build_pack_token_balanceOf_calldata(account);
+			return await provider.call("pistols", build_duel_token_balanceOf_calldata(account);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -317,23 +317,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_calcMintFee_calldata = (tableId: BigNumberish) => {
-		return {
-			contractName: "duel_token",
-			entrypoint: "calc_mint_fee",
-			calldata: [tableId],
-		};
-	};
-
-	const duel_token_calcMintFee = async (tableId: BigNumberish) => {
-		try {
-			return await provider.call("pistols", build_duel_token_calcMintFee_calldata(tableId);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_pack_token_calcMintFee_calldata = (recipient: string, packType: models.PackType) => {
 		return {
 			contractName: "pack_token",
@@ -345,6 +328,23 @@ export function setupWorld(provider: DojoProvider) {
 	const pack_token_calcMintFee = async (recipient: string, packType: models.PackType) => {
 		try {
 			return await provider.call("pistols", build_pack_token_calcMintFee_calldata(recipient, packType);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_duel_token_calcMintFee_calldata = (tableId: BigNumberish) => {
+		return {
+			contractName: "duel_token",
+			entrypoint: "calc_mint_fee",
+			calldata: [tableId],
+		};
+	};
+
+	const duel_token_calcMintFee = async (tableId: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_duel_token_calcMintFee_calldata(tableId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -385,17 +385,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_canMint_calldata = (recipient: string) => {
+	const build_pack_token_canMint_calldata = (recipient: string) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "can_mint",
 			calldata: [recipient],
 		};
 	};
 
-	const duel_token_canMint = async (recipient: string) => {
+	const pack_token_canMint = async (recipient: string) => {
 		try {
-			return await provider.call("pistols", build_duel_token_canMint_calldata(recipient);
+			return await provider.call("pistols", build_pack_token_canMint_calldata(recipient);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -419,17 +419,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_canMint_calldata = (recipient: string) => {
+	const build_duel_token_canMint_calldata = (recipient: string) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "can_mint",
 			calldata: [recipient],
 		};
 	};
 
-	const pack_token_canMint = async (recipient: string) => {
+	const duel_token_canMint = async (recipient: string) => {
 		try {
-			return await provider.call("pistols", build_pack_token_canMint_calldata(recipient);
+			return await provider.call("pistols", build_duel_token_canMint_calldata(recipient);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -592,17 +592,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_exists_calldata = (tokenId: BigNumberish) => {
+	const build_pack_token_exists_calldata = (tokenId: BigNumberish) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "exists",
 			calldata: [tokenId],
 		};
 	};
 
-	const duel_token_exists = async (tokenId: BigNumberish) => {
+	const pack_token_exists = async (tokenId: BigNumberish) => {
 		try {
-			return await provider.call("pistols", build_duel_token_exists_calldata(tokenId);
+			return await provider.call("pistols", build_pack_token_exists_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -626,17 +626,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_exists_calldata = (tokenId: BigNumberish) => {
+	const build_duel_token_exists_calldata = (tokenId: BigNumberish) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "exists",
 			calldata: [tokenId],
 		};
 	};
 
-	const pack_token_exists = async (tokenId: BigNumberish) => {
+	const duel_token_exists = async (tokenId: BigNumberish) => {
 		try {
-			return await provider.call("pistols", build_pack_token_exists_calldata(tokenId);
+			return await provider.call("pistols", build_duel_token_exists_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -664,17 +664,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_getApproved_calldata = (tokenId: U256) => {
+	const build_pack_token_getApproved_calldata = (tokenId: U256) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "getApproved",
 			calldata: [tokenId],
 		};
 	};
 
-	const duel_token_getApproved = async (tokenId: U256) => {
+	const pack_token_getApproved = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_duel_token_getApproved_calldata(tokenId);
+			return await provider.call("pistols", build_pack_token_getApproved_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -698,51 +698,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_getApproved_calldata = (tokenId: U256) => {
+	const build_duel_token_getApproved_calldata = (tokenId: U256) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "getApproved",
 			calldata: [tokenId],
 		};
 	};
 
-	const pack_token_getApproved = async (tokenId: U256) => {
+	const duel_token_getApproved = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_pack_token_getApproved_calldata(tokenId);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_duel_token_getAttributePairs_calldata = (tokenId: U256) => {
-		return {
-			contractName: "duel_token",
-			entrypoint: "get_attribute_pairs",
-			calldata: [tokenId],
-		};
-	};
-
-	const duel_token_getAttributePairs = async (tokenId: U256) => {
-		try {
-			return await provider.call("pistols", build_duel_token_getAttributePairs_calldata(tokenId);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_duelist_token_getAttributePairs_calldata = (tokenId: U256) => {
-		return {
-			contractName: "duelist_token",
-			entrypoint: "get_attribute_pairs",
-			calldata: [tokenId],
-		};
-	};
-
-	const duelist_token_getAttributePairs = async (tokenId: U256) => {
-		try {
-			return await provider.call("pistols", build_duelist_token_getAttributePairs_calldata(tokenId);
+			return await provider.call("pistols", build_duel_token_getApproved_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -766,6 +732,40 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_duelist_token_getAttributePairs_calldata = (tokenId: U256) => {
+		return {
+			contractName: "duelist_token",
+			entrypoint: "get_attribute_pairs",
+			calldata: [tokenId],
+		};
+	};
+
+	const duelist_token_getAttributePairs = async (tokenId: U256) => {
+		try {
+			return await provider.call("pistols", build_duelist_token_getAttributePairs_calldata(tokenId);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_duel_token_getAttributePairs_calldata = (tokenId: U256) => {
+		return {
+			contractName: "duel_token",
+			entrypoint: "get_attribute_pairs",
+			calldata: [tokenId],
+		};
+	};
+
+	const duel_token_getAttributePairs = async (tokenId: U256) => {
+		try {
+			return await provider.call("pistols", build_duel_token_getAttributePairs_calldata(tokenId);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_game_getDuelProgress_calldata = (duelId: BigNumberish) => {
 		return {
 			contractName: "game",
@@ -783,17 +783,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_getMetadataPairs_calldata = (tokenId: U256) => {
+	const build_pack_token_getMetadataPairs_calldata = (tokenId: U256) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "get_metadata_pairs",
 			calldata: [tokenId],
 		};
 	};
 
-	const duel_token_getMetadataPairs = async (tokenId: U256) => {
+	const pack_token_getMetadataPairs = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_duel_token_getMetadataPairs_calldata(tokenId);
+			return await provider.call("pistols", build_pack_token_getMetadataPairs_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -817,17 +817,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_getMetadataPairs_calldata = (tokenId: U256) => {
+	const build_duel_token_getMetadataPairs_calldata = (tokenId: U256) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "get_metadata_pairs",
 			calldata: [tokenId],
 		};
 	};
 
-	const pack_token_getMetadataPairs = async (tokenId: U256) => {
+	const duel_token_getMetadataPairs = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_pack_token_getMetadataPairs_calldata(tokenId);
+			return await provider.call("pistols", build_duel_token_getMetadataPairs_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -868,17 +868,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_getTokenDescription_calldata = (tokenId: U256) => {
+	const build_pack_token_getTokenDescription_calldata = (tokenId: U256) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "get_token_description",
 			calldata: [tokenId],
 		};
 	};
 
-	const duel_token_getTokenDescription = async (tokenId: U256) => {
+	const pack_token_getTokenDescription = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_duel_token_getTokenDescription_calldata(tokenId);
+			return await provider.call("pistols", build_pack_token_getTokenDescription_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -902,51 +902,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_getTokenDescription_calldata = (tokenId: U256) => {
+	const build_duel_token_getTokenDescription_calldata = (tokenId: U256) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "get_token_description",
 			calldata: [tokenId],
 		};
 	};
 
-	const pack_token_getTokenDescription = async (tokenId: U256) => {
+	const duel_token_getTokenDescription = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_pack_token_getTokenDescription_calldata(tokenId);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_duel_token_getTokenImage_calldata = (tokenId: U256) => {
-		return {
-			contractName: "duel_token",
-			entrypoint: "get_token_image",
-			calldata: [tokenId],
-		};
-	};
-
-	const duel_token_getTokenImage = async (tokenId: U256) => {
-		try {
-			return await provider.call("pistols", build_duel_token_getTokenImage_calldata(tokenId);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_duelist_token_getTokenImage_calldata = (tokenId: U256) => {
-		return {
-			contractName: "duelist_token",
-			entrypoint: "get_token_image",
-			calldata: [tokenId],
-		};
-	};
-
-	const duelist_token_getTokenImage = async (tokenId: U256) => {
-		try {
-			return await provider.call("pistols", build_duelist_token_getTokenImage_calldata(tokenId);
+			return await provider.call("pistols", build_duel_token_getTokenDescription_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -970,17 +936,51 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_getTokenName_calldata = (tokenId: U256) => {
+	const build_duelist_token_getTokenImage_calldata = (tokenId: U256) => {
+		return {
+			contractName: "duelist_token",
+			entrypoint: "get_token_image",
+			calldata: [tokenId],
+		};
+	};
+
+	const duelist_token_getTokenImage = async (tokenId: U256) => {
+		try {
+			return await provider.call("pistols", build_duelist_token_getTokenImage_calldata(tokenId);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_duel_token_getTokenImage_calldata = (tokenId: U256) => {
 		return {
 			contractName: "duel_token",
+			entrypoint: "get_token_image",
+			calldata: [tokenId],
+		};
+	};
+
+	const duel_token_getTokenImage = async (tokenId: U256) => {
+		try {
+			return await provider.call("pistols", build_duel_token_getTokenImage_calldata(tokenId);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_pack_token_getTokenName_calldata = (tokenId: U256) => {
+		return {
+			contractName: "pack_token",
 			entrypoint: "get_token_name",
 			calldata: [tokenId],
 		};
 	};
 
-	const duel_token_getTokenName = async (tokenId: U256) => {
+	const pack_token_getTokenName = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_duel_token_getTokenName_calldata(tokenId);
+			return await provider.call("pistols", build_pack_token_getTokenName_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1004,17 +1004,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_getTokenName_calldata = (tokenId: U256) => {
+	const build_duel_token_getTokenName_calldata = (tokenId: U256) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "get_token_name",
 			calldata: [tokenId],
 		};
 	};
 
-	const pack_token_getTokenName = async (tokenId: U256) => {
+	const duel_token_getTokenName = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_pack_token_getTokenName_calldata(tokenId);
+			return await provider.call("pistols", build_duel_token_getTokenName_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1059,17 +1059,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_isApprovedForAll_calldata = (owner: string, operator: string) => {
+	const build_pack_token_isApprovedForAll_calldata = (owner: string, operator: string) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "isApprovedForAll",
 			calldata: [owner, operator],
 		};
 	};
 
-	const duel_token_isApprovedForAll = async (owner: string, operator: string) => {
+	const pack_token_isApprovedForAll = async (owner: string, operator: string) => {
 		try {
-			return await provider.call("pistols", build_duel_token_isApprovedForAll_calldata(owner, operator);
+			return await provider.call("pistols", build_pack_token_isApprovedForAll_calldata(owner, operator);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1093,17 +1093,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_isApprovedForAll_calldata = (owner: string, operator: string) => {
+	const build_duel_token_isApprovedForAll_calldata = (owner: string, operator: string) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "isApprovedForAll",
 			calldata: [owner, operator],
 		};
 	};
 
-	const pack_token_isApprovedForAll = async (owner: string, operator: string) => {
+	const duel_token_isApprovedForAll = async (owner: string, operator: string) => {
 		try {
-			return await provider.call("pistols", build_pack_token_isApprovedForAll_calldata(owner, operator);
+			return await provider.call("pistols", build_duel_token_isApprovedForAll_calldata(owner, operator);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1127,17 +1127,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_isOwnerOf_calldata = (address: string, tokenId: BigNumberish) => {
+	const build_pack_token_isOwnerOf_calldata = (address: string, tokenId: BigNumberish) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "is_owner_of",
 			calldata: [address, tokenId],
 		};
 	};
 
-	const duel_token_isOwnerOf = async (address: string, tokenId: BigNumberish) => {
+	const pack_token_isOwnerOf = async (address: string, tokenId: BigNumberish) => {
 		try {
-			return await provider.call("pistols", build_duel_token_isOwnerOf_calldata(address, tokenId);
+			return await provider.call("pistols", build_pack_token_isOwnerOf_calldata(address, tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1161,17 +1161,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_isOwnerOf_calldata = (address: string, tokenId: BigNumberish) => {
+	const build_duel_token_isOwnerOf_calldata = (address: string, tokenId: BigNumberish) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "is_owner_of",
 			calldata: [address, tokenId],
 		};
 	};
 
-	const pack_token_isOwnerOf = async (address: string, tokenId: BigNumberish) => {
+	const duel_token_isOwnerOf = async (address: string, tokenId: BigNumberish) => {
 		try {
-			return await provider.call("pistols", build_pack_token_isOwnerOf_calldata(address, tokenId);
+			return await provider.call("pistols", build_duel_token_isOwnerOf_calldata(address, tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1241,6 +1241,23 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_pack_token_name_calldata = () => {
+		return {
+			contractName: "pack_token",
+			entrypoint: "name",
+			calldata: [],
+		};
+	};
+
+	const pack_token_name = async () => {
+		try {
+			return await provider.call("pistols", build_pack_token_name_calldata();
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_lords_mock_name_calldata = () => {
 		return {
 			contractName: "lords_mock",
@@ -1275,23 +1292,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_name_calldata = () => {
-		return {
-			contractName: "duel_token",
-			entrypoint: "name",
-			calldata: [],
-		};
-	};
-
-	const duel_token_name = async () => {
-		try {
-			return await provider.call("pistols", build_duel_token_name_calldata();
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_duelist_token_name_calldata = () => {
 		return {
 			contractName: "duelist_token",
@@ -1309,17 +1309,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_name_calldata = () => {
+	const build_duel_token_name_calldata = () => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "name",
 			calldata: [],
 		};
 	};
 
-	const pack_token_name = async () => {
+	const duel_token_name = async () => {
 		try {
-			return await provider.call("pistols", build_pack_token_name_calldata();
+			return await provider.call("pistols", build_duel_token_name_calldata();
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1385,17 +1385,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_ownerOf_calldata = (tokenId: U256) => {
+	const build_pack_token_ownerOf_calldata = (tokenId: U256) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "ownerOf",
 			calldata: [tokenId],
 		};
 	};
 
-	const duel_token_ownerOf = async (tokenId: U256) => {
+	const pack_token_ownerOf = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_duel_token_ownerOf_calldata(tokenId);
+			return await provider.call("pistols", build_pack_token_ownerOf_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1419,17 +1419,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_ownerOf_calldata = (tokenId: U256) => {
+	const build_duel_token_ownerOf_calldata = (tokenId: U256) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "ownerOf",
 			calldata: [tokenId],
 		};
 	};
 
-	const pack_token_ownerOf = async (tokenId: U256) => {
+	const duel_token_ownerOf = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_pack_token_ownerOf_calldata(tokenId);
+			return await provider.call("pistols", build_duel_token_ownerOf_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1533,19 +1533,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_safeTransferFrom_calldata = (from: string, to: string, tokenId: U256, data: Array<BigNumberish>) => {
+	const build_pack_token_safeTransferFrom_calldata = (from: string, to: string, tokenId: U256, data: Array<BigNumberish>) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "safeTransferFrom",
 			calldata: [from, to, tokenId, data],
 		};
 	};
 
-	const duel_token_safeTransferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256, data: Array<BigNumberish>) => {
+	const pack_token_safeTransferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256, data: Array<BigNumberish>) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_duel_token_safeTransferFrom_calldata(from, to, tokenId, data),
+				build_pack_token_safeTransferFrom_calldata(from, to, tokenId, data),
 				"pistols",
 			);
 		} catch (error) {
@@ -1575,19 +1575,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_safeTransferFrom_calldata = (from: string, to: string, tokenId: U256, data: Array<BigNumberish>) => {
+	const build_duel_token_safeTransferFrom_calldata = (from: string, to: string, tokenId: U256, data: Array<BigNumberish>) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "safeTransferFrom",
 			calldata: [from, to, tokenId, data],
 		};
 	};
 
-	const pack_token_safeTransferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256, data: Array<BigNumberish>) => {
+	const duel_token_safeTransferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256, data: Array<BigNumberish>) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_pack_token_safeTransferFrom_calldata(from, to, tokenId, data),
+				build_duel_token_safeTransferFrom_calldata(from, to, tokenId, data),
 				"pistols",
 			);
 		} catch (error) {
@@ -1596,19 +1596,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_setApprovalForAll_calldata = (operator: string, approved: boolean) => {
+	const build_pack_token_setApprovalForAll_calldata = (operator: string, approved: boolean) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "setApprovalForAll",
 			calldata: [operator, approved],
 		};
 	};
 
-	const duel_token_setApprovalForAll = async (snAccount: Account | AccountInterface, operator: string, approved: boolean) => {
+	const pack_token_setApprovalForAll = async (snAccount: Account | AccountInterface, operator: string, approved: boolean) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_duel_token_setApprovalForAll_calldata(operator, approved),
+				build_pack_token_setApprovalForAll_calldata(operator, approved),
 				"pistols",
 			);
 		} catch (error) {
@@ -1638,19 +1638,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_setApprovalForAll_calldata = (operator: string, approved: boolean) => {
+	const build_duel_token_setApprovalForAll_calldata = (operator: string, approved: boolean) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "setApprovalForAll",
 			calldata: [operator, approved],
 		};
 	};
 
-	const pack_token_setApprovalForAll = async (snAccount: Account | AccountInterface, operator: string, approved: boolean) => {
+	const duel_token_setApprovalForAll = async (snAccount: Account | AccountInterface, operator: string, approved: boolean) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_pack_token_setApprovalForAll_calldata(operator, approved),
+				build_duel_token_setApprovalForAll_calldata(operator, approved),
 				"pistols",
 			);
 		} catch (error) {
@@ -1743,17 +1743,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_supportsInterface_calldata = (interfaceId: BigNumberish) => {
+	const build_pack_token_supportsInterface_calldata = (interfaceId: BigNumberish) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "supports_interface",
 			calldata: [interfaceId],
 		};
 	};
 
-	const duel_token_supportsInterface = async (interfaceId: BigNumberish) => {
+	const pack_token_supportsInterface = async (interfaceId: BigNumberish) => {
 		try {
-			return await provider.call("pistols", build_duel_token_supportsInterface_calldata(interfaceId);
+			return await provider.call("pistols", build_pack_token_supportsInterface_calldata(interfaceId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1777,17 +1777,34 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_supportsInterface_calldata = (interfaceId: BigNumberish) => {
+	const build_duel_token_supportsInterface_calldata = (interfaceId: BigNumberish) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "supports_interface",
 			calldata: [interfaceId],
 		};
 	};
 
-	const pack_token_supportsInterface = async (interfaceId: BigNumberish) => {
+	const duel_token_supportsInterface = async (interfaceId: BigNumberish) => {
 		try {
-			return await provider.call("pistols", build_pack_token_supportsInterface_calldata(interfaceId);
+			return await provider.call("pistols", build_duel_token_supportsInterface_calldata(interfaceId);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_pack_token_symbol_calldata = () => {
+		return {
+			contractName: "pack_token",
+			entrypoint: "symbol",
+			calldata: [],
+		};
+	};
+
+	const pack_token_symbol = async () => {
+		try {
+			return await provider.call("pistols", build_pack_token_symbol_calldata();
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1828,23 +1845,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_symbol_calldata = () => {
-		return {
-			contractName: "duel_token",
-			entrypoint: "symbol",
-			calldata: [],
-		};
-	};
-
-	const duel_token_symbol = async () => {
-		try {
-			return await provider.call("pistols", build_duel_token_symbol_calldata();
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_duelist_token_symbol_calldata = () => {
 		return {
 			contractName: "duelist_token",
@@ -1862,17 +1862,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_symbol_calldata = () => {
+	const build_duel_token_symbol_calldata = () => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "symbol",
 			calldata: [],
 		};
 	};
 
-	const pack_token_symbol = async () => {
+	const duel_token_symbol = async () => {
 		try {
-			return await provider.call("pistols", build_pack_token_symbol_calldata();
+			return await provider.call("pistols", build_duel_token_symbol_calldata();
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1896,17 +1896,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_tokenUri_calldata = (tokenId: U256) => {
+	const build_pack_token_tokenUri_calldata = (tokenId: U256) => {
 		return {
-			contractName: "duel_token",
+			contractName: "pack_token",
 			entrypoint: "tokenURI",
 			calldata: [tokenId],
 		};
 	};
 
-	const duel_token_tokenUri = async (tokenId: U256) => {
+	const pack_token_tokenUri = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_duel_token_tokenUri_calldata(tokenId);
+			return await provider.call("pistols", build_pack_token_tokenUri_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1930,17 +1930,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_tokenUri_calldata = (tokenId: U256) => {
+	const build_duel_token_tokenUri_calldata = (tokenId: U256) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "tokenURI",
 			calldata: [tokenId],
 		};
 	};
 
-	const pack_token_tokenUri = async (tokenId: U256) => {
+	const duel_token_tokenUri = async (tokenId: U256) => {
 		try {
-			return await provider.call("pistols", build_pack_token_tokenUri_calldata(tokenId);
+			return await provider.call("pistols", build_duel_token_tokenUri_calldata(tokenId);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -2040,6 +2040,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_pack_token_transferFrom_calldata = (from: string, to: string, tokenId: U256) => {
+		return {
+			contractName: "pack_token",
+			entrypoint: "transferFrom",
+			calldata: [from, to, tokenId],
+		};
+	};
+
+	const pack_token_transferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_pack_token_transferFrom_calldata(from, to, tokenId),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_lords_mock_transferFrom_calldata = (sender: string, recipient: string, amount: U256) => {
 		return {
 			contractName: "lords_mock",
@@ -2082,27 +2103,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_transferFrom_calldata = (from: string, to: string, tokenId: U256) => {
-		return {
-			contractName: "duel_token",
-			entrypoint: "transferFrom",
-			calldata: [from, to, tokenId],
-		};
-	};
-
-	const duel_token_transferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_duel_token_transferFrom_calldata(from, to, tokenId),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_duelist_token_transferFrom_calldata = (from: string, to: string, tokenId: U256) => {
 		return {
 			contractName: "duelist_token",
@@ -2124,19 +2124,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_transferFrom_calldata = (from: string, to: string, tokenId: U256) => {
+	const build_duel_token_transferFrom_calldata = (from: string, to: string, tokenId: U256) => {
 		return {
-			contractName: "pack_token",
+			contractName: "duel_token",
 			entrypoint: "transferFrom",
 			calldata: [from, to, tokenId],
 		};
 	};
 
-	const pack_token_transferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256) => {
+	const duel_token_transferFrom = async (snAccount: Account | AccountInterface, from: string, to: string, tokenId: U256) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_pack_token_transferFrom_calldata(from, to, tokenId),
+				build_duel_token_transferFrom_calldata(from, to, tokenId),
 				"pistols",
 			);
 		} catch (error) {
@@ -2306,6 +2306,110 @@ export function setupWorld(provider: DojoProvider) {
 			setTreasury: admin_setTreasury,
 			buildSetTreasuryCalldata: build_admin_setTreasury_calldata,
 		},
+		pack_token: {
+			approve: pack_token_approve,
+			buildApproveCalldata: build_pack_token_approve_calldata,
+			balanceOf: pack_token_balanceOf,
+			buildBalanceOfCalldata: build_pack_token_balanceOf_calldata,
+			calcMintFee: pack_token_calcMintFee,
+			buildCalcMintFeeCalldata: build_pack_token_calcMintFee_calldata,
+			canClaimWelcomePack: pack_token_canClaimWelcomePack,
+			buildCanClaimWelcomePackCalldata: build_pack_token_canClaimWelcomePack_calldata,
+			canMint: pack_token_canMint,
+			buildCanMintCalldata: build_pack_token_canMint_calldata,
+			canPurchase: pack_token_canPurchase,
+			buildCanPurchaseCalldata: build_pack_token_canPurchase_calldata,
+			claimWelcomePack: pack_token_claimWelcomePack,
+			buildClaimWelcomePackCalldata: build_pack_token_claimWelcomePack_calldata,
+			exists: pack_token_exists,
+			buildExistsCalldata: build_pack_token_exists_calldata,
+			getApproved: pack_token_getApproved,
+			buildGetApprovedCalldata: build_pack_token_getApproved_calldata,
+			getAttributePairs: pack_token_getAttributePairs,
+			buildGetAttributePairsCalldata: build_pack_token_getAttributePairs_calldata,
+			getMetadataPairs: pack_token_getMetadataPairs,
+			buildGetMetadataPairsCalldata: build_pack_token_getMetadataPairs_calldata,
+			getTokenDescription: pack_token_getTokenDescription,
+			buildGetTokenDescriptionCalldata: build_pack_token_getTokenDescription_calldata,
+			getTokenImage: pack_token_getTokenImage,
+			buildGetTokenImageCalldata: build_pack_token_getTokenImage_calldata,
+			getTokenName: pack_token_getTokenName,
+			buildGetTokenNameCalldata: build_pack_token_getTokenName_calldata,
+			isApprovedForAll: pack_token_isApprovedForAll,
+			buildIsApprovedForAllCalldata: build_pack_token_isApprovedForAll_calldata,
+			isOwnerOf: pack_token_isOwnerOf,
+			buildIsOwnerOfCalldata: build_pack_token_isOwnerOf_calldata,
+			name: pack_token_name,
+			buildNameCalldata: build_pack_token_name_calldata,
+			open: pack_token_open,
+			buildOpenCalldata: build_pack_token_open_calldata,
+			ownerOf: pack_token_ownerOf,
+			buildOwnerOfCalldata: build_pack_token_ownerOf_calldata,
+			purchase: pack_token_purchase,
+			buildPurchaseCalldata: build_pack_token_purchase_calldata,
+			safeTransferFrom: pack_token_safeTransferFrom,
+			buildSafeTransferFromCalldata: build_pack_token_safeTransferFrom_calldata,
+			setApprovalForAll: pack_token_setApprovalForAll,
+			buildSetApprovalForAllCalldata: build_pack_token_setApprovalForAll_calldata,
+			supportsInterface: pack_token_supportsInterface,
+			buildSupportsInterfaceCalldata: build_pack_token_supportsInterface_calldata,
+			symbol: pack_token_symbol,
+			buildSymbolCalldata: build_pack_token_symbol_calldata,
+			tokenUri: pack_token_tokenUri,
+			buildTokenUriCalldata: build_pack_token_tokenUri_calldata,
+			transferFrom: pack_token_transferFrom,
+			buildTransferFromCalldata: build_pack_token_transferFrom_calldata,
+		},
+		duelist_token: {
+			approve: duelist_token_approve,
+			buildApproveCalldata: build_duelist_token_approve_calldata,
+			balanceOf: duelist_token_balanceOf,
+			buildBalanceOfCalldata: build_duelist_token_balanceOf_calldata,
+			calcFameReward: duelist_token_calcFameReward,
+			buildCalcFameRewardCalldata: build_duelist_token_calcFameReward_calldata,
+			canMint: duelist_token_canMint,
+			buildCanMintCalldata: build_duelist_token_canMint_calldata,
+			exists: duelist_token_exists,
+			buildExistsCalldata: build_duelist_token_exists_calldata,
+			getApproved: duelist_token_getApproved,
+			buildGetApprovedCalldata: build_duelist_token_getApproved_calldata,
+			getAttributePairs: duelist_token_getAttributePairs,
+			buildGetAttributePairsCalldata: build_duelist_token_getAttributePairs_calldata,
+			getMetadataPairs: duelist_token_getMetadataPairs,
+			buildGetMetadataPairsCalldata: build_duelist_token_getMetadataPairs_calldata,
+			getTokenDescription: duelist_token_getTokenDescription,
+			buildGetTokenDescriptionCalldata: build_duelist_token_getTokenDescription_calldata,
+			getTokenImage: duelist_token_getTokenImage,
+			buildGetTokenImageCalldata: build_duelist_token_getTokenImage_calldata,
+			getTokenName: duelist_token_getTokenName,
+			buildGetTokenNameCalldata: build_duelist_token_getTokenName_calldata,
+			isApprovedForAll: duelist_token_isApprovedForAll,
+			buildIsApprovedForAllCalldata: build_duelist_token_isApprovedForAll_calldata,
+			isAlive: duelist_token_isAlive,
+			buildIsAliveCalldata: build_duelist_token_isAlive_calldata,
+			isOwnerOf: duelist_token_isOwnerOf,
+			buildIsOwnerOfCalldata: build_duelist_token_isOwnerOf_calldata,
+			mintDuelists: duelist_token_mintDuelists,
+			buildMintDuelistsCalldata: build_duelist_token_mintDuelists_calldata,
+			name: duelist_token_name,
+			buildNameCalldata: build_duelist_token_name_calldata,
+			ownerOf: duelist_token_ownerOf,
+			buildOwnerOfCalldata: build_duelist_token_ownerOf_calldata,
+			safeTransferFrom: duelist_token_safeTransferFrom,
+			buildSafeTransferFromCalldata: build_duelist_token_safeTransferFrom_calldata,
+			setApprovalForAll: duelist_token_setApprovalForAll,
+			buildSetApprovalForAllCalldata: build_duelist_token_setApprovalForAll_calldata,
+			supportsInterface: duelist_token_supportsInterface,
+			buildSupportsInterfaceCalldata: build_duelist_token_supportsInterface_calldata,
+			symbol: duelist_token_symbol,
+			buildSymbolCalldata: build_duelist_token_symbol_calldata,
+			tokenUri: duelist_token_tokenUri,
+			buildTokenUriCalldata: build_duelist_token_tokenUri_calldata,
+			transferFrom: duelist_token_transferFrom,
+			buildTransferFromCalldata: build_duelist_token_transferFrom_calldata,
+			transferFameReward: duelist_token_transferFameReward,
+			buildTransferFameRewardCalldata: build_duelist_token_transferFameReward_calldata,
+		},
 		duel_token: {
 			approve: duel_token_approve,
 			buildApproveCalldata: build_duel_token_approve_calldata,
@@ -2361,110 +2465,6 @@ export function setupWorld(provider: DojoProvider) {
 			buildTransferFromCalldata: build_duel_token_transferFrom_calldata,
 			transferToWinner: duel_token_transferToWinner,
 			buildTransferToWinnerCalldata: build_duel_token_transferToWinner_calldata,
-		},
-		duelist_token: {
-			approve: duelist_token_approve,
-			buildApproveCalldata: build_duelist_token_approve_calldata,
-			balanceOf: duelist_token_balanceOf,
-			buildBalanceOfCalldata: build_duelist_token_balanceOf_calldata,
-			calcFameReward: duelist_token_calcFameReward,
-			buildCalcFameRewardCalldata: build_duelist_token_calcFameReward_calldata,
-			canMint: duelist_token_canMint,
-			buildCanMintCalldata: build_duelist_token_canMint_calldata,
-			exists: duelist_token_exists,
-			buildExistsCalldata: build_duelist_token_exists_calldata,
-			getApproved: duelist_token_getApproved,
-			buildGetApprovedCalldata: build_duelist_token_getApproved_calldata,
-			getAttributePairs: duelist_token_getAttributePairs,
-			buildGetAttributePairsCalldata: build_duelist_token_getAttributePairs_calldata,
-			getMetadataPairs: duelist_token_getMetadataPairs,
-			buildGetMetadataPairsCalldata: build_duelist_token_getMetadataPairs_calldata,
-			getTokenDescription: duelist_token_getTokenDescription,
-			buildGetTokenDescriptionCalldata: build_duelist_token_getTokenDescription_calldata,
-			getTokenImage: duelist_token_getTokenImage,
-			buildGetTokenImageCalldata: build_duelist_token_getTokenImage_calldata,
-			getTokenName: duelist_token_getTokenName,
-			buildGetTokenNameCalldata: build_duelist_token_getTokenName_calldata,
-			isApprovedForAll: duelist_token_isApprovedForAll,
-			buildIsApprovedForAllCalldata: build_duelist_token_isApprovedForAll_calldata,
-			isAlive: duelist_token_isAlive,
-			buildIsAliveCalldata: build_duelist_token_isAlive_calldata,
-			isOwnerOf: duelist_token_isOwnerOf,
-			buildIsOwnerOfCalldata: build_duelist_token_isOwnerOf_calldata,
-			mintDuelists: duelist_token_mintDuelists,
-			buildMintDuelistsCalldata: build_duelist_token_mintDuelists_calldata,
-			name: duelist_token_name,
-			buildNameCalldata: build_duelist_token_name_calldata,
-			ownerOf: duelist_token_ownerOf,
-			buildOwnerOfCalldata: build_duelist_token_ownerOf_calldata,
-			safeTransferFrom: duelist_token_safeTransferFrom,
-			buildSafeTransferFromCalldata: build_duelist_token_safeTransferFrom_calldata,
-			setApprovalForAll: duelist_token_setApprovalForAll,
-			buildSetApprovalForAllCalldata: build_duelist_token_setApprovalForAll_calldata,
-			supportsInterface: duelist_token_supportsInterface,
-			buildSupportsInterfaceCalldata: build_duelist_token_supportsInterface_calldata,
-			symbol: duelist_token_symbol,
-			buildSymbolCalldata: build_duelist_token_symbol_calldata,
-			tokenUri: duelist_token_tokenUri,
-			buildTokenUriCalldata: build_duelist_token_tokenUri_calldata,
-			transferFrom: duelist_token_transferFrom,
-			buildTransferFromCalldata: build_duelist_token_transferFrom_calldata,
-			transferFameReward: duelist_token_transferFameReward,
-			buildTransferFameRewardCalldata: build_duelist_token_transferFameReward_calldata,
-		},
-		pack_token: {
-			approve: pack_token_approve,
-			buildApproveCalldata: build_pack_token_approve_calldata,
-			balanceOf: pack_token_balanceOf,
-			buildBalanceOfCalldata: build_pack_token_balanceOf_calldata,
-			calcMintFee: pack_token_calcMintFee,
-			buildCalcMintFeeCalldata: build_pack_token_calcMintFee_calldata,
-			canClaimWelcomePack: pack_token_canClaimWelcomePack,
-			buildCanClaimWelcomePackCalldata: build_pack_token_canClaimWelcomePack_calldata,
-			canMint: pack_token_canMint,
-			buildCanMintCalldata: build_pack_token_canMint_calldata,
-			canPurchase: pack_token_canPurchase,
-			buildCanPurchaseCalldata: build_pack_token_canPurchase_calldata,
-			claimWelcomePack: pack_token_claimWelcomePack,
-			buildClaimWelcomePackCalldata: build_pack_token_claimWelcomePack_calldata,
-			exists: pack_token_exists,
-			buildExistsCalldata: build_pack_token_exists_calldata,
-			getApproved: pack_token_getApproved,
-			buildGetApprovedCalldata: build_pack_token_getApproved_calldata,
-			getAttributePairs: pack_token_getAttributePairs,
-			buildGetAttributePairsCalldata: build_pack_token_getAttributePairs_calldata,
-			getMetadataPairs: pack_token_getMetadataPairs,
-			buildGetMetadataPairsCalldata: build_pack_token_getMetadataPairs_calldata,
-			getTokenDescription: pack_token_getTokenDescription,
-			buildGetTokenDescriptionCalldata: build_pack_token_getTokenDescription_calldata,
-			getTokenImage: pack_token_getTokenImage,
-			buildGetTokenImageCalldata: build_pack_token_getTokenImage_calldata,
-			getTokenName: pack_token_getTokenName,
-			buildGetTokenNameCalldata: build_pack_token_getTokenName_calldata,
-			isApprovedForAll: pack_token_isApprovedForAll,
-			buildIsApprovedForAllCalldata: build_pack_token_isApprovedForAll_calldata,
-			isOwnerOf: pack_token_isOwnerOf,
-			buildIsOwnerOfCalldata: build_pack_token_isOwnerOf_calldata,
-			name: pack_token_name,
-			buildNameCalldata: build_pack_token_name_calldata,
-			open: pack_token_open,
-			buildOpenCalldata: build_pack_token_open_calldata,
-			ownerOf: pack_token_ownerOf,
-			buildOwnerOfCalldata: build_pack_token_ownerOf_calldata,
-			purchase: pack_token_purchase,
-			buildPurchaseCalldata: build_pack_token_purchase_calldata,
-			safeTransferFrom: pack_token_safeTransferFrom,
-			buildSafeTransferFromCalldata: build_pack_token_safeTransferFrom_calldata,
-			setApprovalForAll: pack_token_setApprovalForAll,
-			buildSetApprovalForAllCalldata: build_pack_token_setApprovalForAll_calldata,
-			supportsInterface: pack_token_supportsInterface,
-			buildSupportsInterfaceCalldata: build_pack_token_supportsInterface_calldata,
-			symbol: pack_token_symbol,
-			buildSymbolCalldata: build_pack_token_symbol_calldata,
-			tokenUri: pack_token_tokenUri,
-			buildTokenUriCalldata: build_pack_token_tokenUri_calldata,
-			transferFrom: pack_token_transferFrom,
-			buildTransferFromCalldata: build_pack_token_transferFrom_calldata,
 		},
 		bank: {
 			charge: bank_charge,

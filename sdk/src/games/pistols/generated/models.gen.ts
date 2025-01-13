@@ -343,7 +343,6 @@ export interface PlayerActivityValue {
 
 // Type definition for `pistols::models::player::PlayerRequiredAction` struct
 export interface PlayerRequiredAction {
-	address: string;
 	duelist_id: BigNumberish;
 	duel_id: BigNumberish;
 }
@@ -873,8 +872,7 @@ export const schema: SchemaType = {
 			is_public: false,
 		},
 		PlayerRequiredAction: {
-			fieldOrder: ['address', 'duelist_id', 'duel_id'],
-			address: "",
+			fieldOrder: ['duelist_id', 'duel_id'],
 			duelist_id: 0,
 			duel_id: 0,
 		},
