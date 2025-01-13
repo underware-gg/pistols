@@ -1,9 +1,7 @@
 import { useMemo, useEffect } from 'react'
 import { create } from 'zustand'
-import { addAddressPadding, BigNumberish } from 'starknet'
-import { useAccount } from '@starknet-react/core'
-import { useDojoSetup, useToriiBalancesByContractQL } from '@underware_gg/pistols-sdk/dojo'
-import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
+import { BigNumberish } from 'starknet'
+import { useToriiBalancesByContractQL } from '@underware_gg/pistols-sdk/dojo'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { useFameContract } from '/src/hooks/useFame'
 

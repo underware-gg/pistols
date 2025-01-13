@@ -1,7 +1,7 @@
 import { useMemo, useEffect } from 'react'
-import { addAddressPadding, BigNumberish } from 'starknet'
+import { BigNumberish } from 'starknet'
 import { isPositiveBigint, bigintToU256, stringToFelt, bigintToHex } from '@underware_gg/pistols-sdk/utils'
-import { useSdkState, getEntityMapModels } from '@underware_gg/pistols-sdk/dojo'
+import { useSdkState, getEntityMapModels, formatQueryValue } from '@underware_gg/pistols-sdk/dojo'
 import { PistolsGetQuery, PistolsSubQuery, models } from '@underware_gg/pistols-sdk/pistols'
 
 
@@ -26,8 +26,8 @@ export const usePact = (table_id: string, address_a: BigNumberish, address_b: Bi
       Pact: {
         $: {
           where: {
-            table_id: { $eq: addAddressPadding(stringToFelt(table_id)) },
-            pair: { $eq: addAddressPadding(bigintToHex(pair)) },
+            table_id: { $eq: formatQueryValue(stringToFelt(table_id)) },
+            pair: { $eq: formatQueryValue(pair) },
           },
         },
       },
@@ -38,8 +38,8 @@ export const usePact = (table_id: string, address_a: BigNumberish, address_b: Bi
       Pact: {
         $: {
           where: {
-            table_id: { $is: addAddressPadding(stringToFelt(table_id)) },
-            pair: { $is: addAddressPadding(bigintToHex(pair)) },
+            table_id: { $is: formatQueryValue(stringToFelt(table_id)) },
+            pair: { $is: formatQueryValue(pair) },
           },
         },
       },

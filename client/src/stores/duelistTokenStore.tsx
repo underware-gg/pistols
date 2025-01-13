@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react'
 import { create } from 'zustand'
-import { BigNumberish, addAddressPadding } from 'starknet'
+import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { Token, TokenBalance } from '@dojoengine/torii-client'
 import { useDojoSetup, useToriiTokensByOwnerQL, ERC721_Token } from '@underware_gg/pistols-sdk/dojo'
@@ -84,9 +84,9 @@ export function PlayerDuelistTokensStoreSync() {
   //     const response: TokenBalance[] = await sdk.getTokenBalances(
   //       // [],
   //       ['0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7'],
-  //       // [addAddressPadding(bigintToHex(address))],
+  //       // [formatQueryValue(address)],
   //       // ['0x24ec36b5c19d158e9749d4f2b48afb7b51ce0f5e4a871f53028a601a253fb6e'],
-  //       // [addAddressPadding(bigintToHex(duelistContractAddress))],
+  //       // [formatQueryValue(duelistContractAddress)],
   //       [],
   //     )
   //     console.log("PlayerDuelistTokensStoreSync_SDK() =>>>>>>>>>", response)

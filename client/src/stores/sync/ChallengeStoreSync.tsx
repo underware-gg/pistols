@@ -1,7 +1,6 @@
-import { useEffect, useMemo } from 'react'
-import { addAddressPadding } from 'starknet'
+import { useMemo } from 'react'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
+import { formatQueryValue, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
 import { useMounted, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { PistolsGetQuery, PistolsSubQuery, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
@@ -19,7 +18,7 @@ export function ChallengeStoreSync() {
       Challenge: {
         $: {
           where: {
-            table_id: { $eq: addAddressPadding(stringToFelt(tableId)) },
+            table_id: { $eq: formatQueryValue(stringToFelt(tableId)) },
           },
         },
       },
@@ -30,7 +29,7 @@ export function ChallengeStoreSync() {
       Challenge: {
         $: {
           where: {
-            table_id: { $is: addAddressPadding(stringToFelt(tableId)) },
+            table_id: { $is: formatQueryValue(stringToFelt(tableId)) },
           },
         },
       },

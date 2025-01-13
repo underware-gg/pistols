@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
-import { addAddressPadding, BigNumberish } from 'starknet'
-import { useSdkState, getEntityMapModels } from '@underware_gg/pistols-sdk/dojo'
+import { BigNumberish } from 'starknet'
+import { useSdkState, getEntityMapModels, formatQueryValue } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsGetQuery } from '@underware_gg/pistols-sdk/pistols'
 import { stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
@@ -17,7 +17,7 @@ const useGetChallengesByTableQuery = (tableId: string) => {
       Challenge: {
         $: {
           where: {
-            table_id: { $eq: addAddressPadding(stringToFelt(tableId)) },
+            table_id: { $eq: formatQueryValue(stringToFelt(tableId)) },
           },
         },
       },

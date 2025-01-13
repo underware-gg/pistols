@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { arrayClean, isPositiveBigint } from 'src/utils/misc/types'
+import { BigNumberish, addAddressPadding } from 'starknet'
+import { bigintToHex, isPositiveBigint, arrayClean } from 'src/utils/misc/types'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import {
   PistolsGetQuery,
@@ -152,6 +153,12 @@ export const useSdkEntities = ({
 //---------------------------------------
 // utils
 //
+
+//
+// Format Bignumberish value for operators
+export const formatQueryValue = (value: BigNumberish): string => {
+  return addAddressPadding(bigintToHex(value))
+}
 
 //
 // Extract models from a stored entity
