@@ -7,19 +7,27 @@ import { usePlayer } from '/src/stores/playerStore'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { useRequiredActions } from '/src/stores/eventsStore'
-import { BookmarkIcon, Icon, OnlineStatusIcon } from '/src/components/ui/Icons'
+import { BookmarkIcon, EmojiIcon, Icon, OnlineStatusIcon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink, PlayerLink } from '/src/components/Links'
 import { bigintEquals, bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
+import { usePendingChallengesIds } from '../stores/challengeStore'
 
 export const ActionIcon = (active: boolean) => {
+  const { address } = useAccount()
   const { duelistIds } = useDuelistsOfPlayer()
   const { duelsPerDuelist } = useRequiredActions(duelistIds)
+  const { pendingDuelIds } = usePendingChallengesIds(address)
   const requiresAction = useMemo(() => (Object.keys(duelsPerDuelist).length > 0), [duelsPerDuelist])
   const name = useMemo(() => (active ? 'circle' : 'circle outline'), [active])
+  const className = useMemo(() => (
+    requiresAction ? 'Positive'
+      : pendingDuelIds.length > 0 ? 'Warning'
+        : ''
+  ), [requiresAction, pendingDuelIds])
   return (
     <Icon size='small'
       name={name}
-      className={requiresAction ? 'Positive' : ''}
+      className={className}
     />
   )
 }
@@ -30,14 +38,13 @@ export default function ActivityAction() {
 
   const { duelistIds } = useDuelistsOfPlayer()
   const { duelsPerDuelist } = useRequiredActions(duelistIds)
-  console.log("ActivityAction() duelsPerDuelist >>>>>", duelistIds, duelsPerDuelist)
   const sortedDuelistIds = useMemo(() => (
     duelistIds.sort((a, b) => {
       return Number(b - a)
     })
   ), [duelistIds])
 
-  const items = useMemo(() => (sortedDuelistIds.map((duelistId) =>
+  const actionItems = useMemo(() => (sortedDuelistIds.map((duelistId) =>
     <ActionItem
       key={duelistId}
       duelistId={duelistId}
@@ -46,11 +53,37 @@ export default function ActivityAction() {
     />)
   ), [duelistIds])
 
+  const { pendingDuelIds } = usePendingChallengesIds(address)
+  const pendingItems = useMemo(() => (pendingDuelIds.map((duelId) =>
+    <PendingItem
+      key={duelId}
+      duelId={duelId}
+    />)
+  ), [duelistIds])
+
   return (
     <div className='FillParent'>
-      {items}
+      {pendingItems}
+      {actionItems}
     </div>
   );
+}
+
+
+const PendingItem = ({
+  duelId,
+}: {
+  duelId: BigNumberish
+}) => {
+  return (
+    <>
+      <Icon name='circle' className='Invisible' />
+      <Icon name='circle' className='Warning' />
+      {'Reply to  '}
+      <ChallengeLink duelId={duelId} />
+      <br />
+    </>
+  )
 }
 
 

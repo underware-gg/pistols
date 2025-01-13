@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish, CairoCustomEnum } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk'
-import { useEntityId, useClientTimestamp, feltToString, parseCustomEnum } from '@underware_gg/pistols-sdk/utils'
+import { useEntityId, useClientTimestamp, feltToString, parseCustomEnum, bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { movesToHand } from '/src/utils/pistols'
@@ -22,6 +22,20 @@ export const useAllChallengesIds = () => {
   // useEffect(() => console.log(`useAllChallengesIds() =>`, duelIds.length), [duelIds])
   return {
     duelIds,
+  }
+}
+
+export const usePendingChallengesIds = (address: BigNumberish) => {
+  const entities = useChallengeStore((state) => state.entities)
+  const pendingDuelIds = useMemo(() => (
+    Object.values(entities)
+      .filter(e => e.models.pistols.Challenge.state as unknown as constants.ChallengeState == constants.ChallengeState.Awaiting)
+      .filter(e => bigintEquals(e.models.pistols.Challenge.address_b, address))
+      .map(e => BigInt(e.models.pistols.Challenge.duel_id))
+  ), [address, entities])
+  // useEffect(() => console.log(`useAllChallengesIds() =>`, duelIds.length), [duelIds])
+  return {
+    pendingDuelIds,
   }
 }
 

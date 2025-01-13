@@ -12,6 +12,25 @@ enum PanelType {
   Action = 'Duel',
 }
 
+const PanelTitle = ({
+  panelType,
+  isActive,
+  setPanelType,
+}: {
+  panelType: PanelType
+  isActive: boolean
+  setPanelType: (type: PanelType) => void
+}) => {
+  const className = (isActive ? 'Active Anchor' : 'Inactive Anchor ImportantHover')
+  const name = (panelType == PanelType.Action ? ActionIcon(isActive) : panelType)
+  // const name = type
+  return (
+    <span className={className} onClick={() => setPanelType(panelType)}>
+      {name}
+    </span>
+  )
+}
+
 export const ActivityPanel = () => {
   const [panelType, setPanelType] = useState(PanelType.Activity)
 
@@ -39,11 +58,11 @@ export const ActivityPanel = () => {
   return (
     <div className={`${isClosed ? 'ActivityPanelCollapsed' : 'ActivityPanel'} Relative`}>
       <h3 className='TitleCase'>
-        {_panelTitle(PanelType.Action)}
+        {<PanelTitle panelType={PanelType.Action} isActive={isAction} setPanelType={setPanelType} />}
         <span className={'Inactive'}>{` | `}</span>
-        {_panelTitle(PanelType.Activity)}
+        {<PanelTitle panelType={PanelType.Activity} isActive={isActivity} setPanelType={setPanelType} />}
         <span className={'Inactive'}>{` | `}</span>
-        {_panelTitle(PanelType.Online)}
+        {<PanelTitle panelType={PanelType.Online} isActive={isPlayers} setPanelType={setPanelType} />}
         {/* <span className={'Inactive'}>{` | `}</span> */}
         {/* {_panelTitle(PanelType.Action)} */}
       </h3>
