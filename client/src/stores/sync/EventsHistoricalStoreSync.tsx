@@ -29,7 +29,7 @@ export function EventsHistoricalStoreSync() {
     setEntities: historicalEventsState.setEvents,
     updateEntity: historicalEventsState.updateEvent,
     historical: true, // historical events
-    limit: 100,
+    limit: 20,
   })
 
   // // TESTING raw events from client

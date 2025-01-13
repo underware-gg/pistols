@@ -1274,6 +1274,7 @@ $ui-container-gap: 1em;
   right: 5px;
 }
 .ActivityFeed {
+  @extend .Scroller;
   // background-color: rgba(#f00, 0.2);
   height: calc(90% - 5px);
   width: calc(100% - 20px);
