@@ -32,7 +32,7 @@ export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: Do
       // if (id == supportedConnetorIds.ARGENT) acc.push(argent())
       // if (id == supportedConnetorIds.BRAAVOS) acc.push(braavos())
       // if (id == supportedConnetorIds.CONTROLLER) acc.push(controller())
-      if (id == supportedConnetorIds.CONTROLLER) acc.push(dojoAppConfig.controllerConnector)
+      if (id == supportedConnetorIds.CONTROLLER && dojoAppConfig.controllerConnector) acc.push(dojoAppConfig.controllerConnector)
       if (id == supportedConnetorIds.PREDEPLOYED && typeof window !== 'undefined') acc.push(predeployed())
       return acc
     }, [])

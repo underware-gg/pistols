@@ -129,6 +129,7 @@ const tokens: Tokens = {
 
 const controllerConnector = makeControllerConnector(
   NAMESPACE,
+  defaultChainId,
   manifests[defaultChainId],
   dojoContextConfig[defaultChainId].rpcUrl,
   dojoContextConfig[defaultChainId].toriiUrl,

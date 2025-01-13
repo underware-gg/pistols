@@ -15,8 +15,9 @@ import { SchemaType, UnionOfModelData } from '@dojoengine/sdk'
 import { ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
 import { _useConnector } from 'src/fix/starknet_react_core'
+import { stringToFelt } from 'src/utils/misc/starknet'
+import { bigintToHex } from 'src/utils/misc/types'
 import { assert } from 'src/utils/misc/math'
-import { serialize } from 'src/utils/misc/types'
 
 
 
@@ -28,6 +29,7 @@ import { serialize } from 'src/utils/misc/types'
 //
 export const makeControllerConnector = (
   namespace: string,
+  chainId: string,
   manifest: DojoManifest,
   rpcUrl: string,
   toriiUrl: string,
@@ -46,7 +48,8 @@ export const makeControllerConnector = (
 
   const options: ControllerOptions = {
     // ProviderOptions
-    rpc: rpcUrl,
+    defaultChainId: bigintToHex(stringToFelt(chainId)),
+    chains: [{ rpcUrl }],
     // IFrameOptions
     theme: 'pistols',
     colorMode: 'dark',
@@ -57,8 +60,15 @@ export const makeControllerConnector = (
     tokens,
   }
   if (typeof window !== 'undefined') console.log(`-------- ControllerOptions:`, options)//, serialize(options))
-  const connector = new ControllerConnector(options) as never as Connector
-  assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
+  
+  // create connector
+  let connector: Connector | undefined
+  try {
+    const connector = new ControllerConnector(options) as never as Connector
+    assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
+  } catch(e) {
+    console.error(`makeControllerConnector() ERROR:`, e)
+  }
   return connector
 }
 

@@ -10,11 +10,11 @@ catalogs:
       specifier: ^3.11.8
       version: 3.12.4
     '@cartridge/connector':
-      specifier: 0.5.7
-      version: 0.5.7
+      specifier: 0.5.8
+      version: 0.5.8
     '@cartridge/controller':
-      specifier: 0.5.7
-      version: 0.5.7
+      specifier: 0.5.8
+      version: 0.5.8
     '@dojoengine/core':
       specifier: 1.0.9
       version: 1.0.9
@@ -73,10 +73,10 @@ importers:
         version: 3.12.4(@types/react@18.3.18)(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@cartridge/connector':
         specifier: 'catalog:'
-        version: 0.5.7(get-starknet-core@4.0.0)(react@18.3.1)(typescript@5.7.2)
+        version: 0.5.8(get-starknet-core@4.0.0)(react@18.3.1)(typescript@5.7.2)
       '@cartridge/controller':
         specifier: 'catalog:'
-        version: 0.5.7
+        version: 0.5.8
       '@dojoengine/core':
         specifier: 'catalog:'
         version: 1.0.9(starknet@6.21.0)(typescript@5.7.2)
@@ -212,10 +212,10 @@ importers:
         version: 3.12.4(@types/react@18.3.18)(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@cartridge/connector':
         specifier: 'catalog:'
-        version: 0.5.7(get-starknet-core@4.0.0)(react@18.3.1)(typescript@5.7.2)
+        version: 0.5.8(get-starknet-core@4.0.0)(react@18.3.1)(typescript@5.7.2)
       '@cartridge/controller':
         specifier: 'catalog:'
-        version: 0.5.7
+        version: 0.5.8
       '@dojoengine/core':
         specifier: 'catalog:'
         version: 1.0.9(starknet@6.21.0)(typescript@5.7.2)
@@ -391,14 +391,14 @@ packages:
     resolution: {integrity: sha512-vN5p+1kl59GVKMvTHt55NzzmYVxprfJD+ql7U9NFIfKCBkYE55LYtS+WtPlaYOyzydrKI8Nezd+aZextrd+FMA==}
     engines: {node: '>=6.9.0'}
 
-  '@cartridge/account-wasm@0.5.7':
-    resolution: {integrity: sha512-tUz3fUOAI9RkZPBQ3+ylm4CcVISB0oWTWHeKvm4hmWk2nX7ROxgvLrhxnTH87mRKijma6QRZUhDzEKYsxZTCjQ==}
+  '@cartridge/account-wasm@0.5.8':
+    resolution: {integrity: sha512-DuD/18rdywTpMlDMSILSvyMAYE2Tk2qUxTVru8io+fSzzba5xvyBxngpIjGpossu+H0lvsph1Q/ZZS7Xpnq0Uw==}
 
-  '@cartridge/connector@0.5.7':
-    resolution: {integrity: sha512-fW0hCOVkEopOtExceXSi/lssA7ox7rjdnsAzQVVRRuuSnWbyJ8973+mGHSqKzGFsvaVXzSaowpN4FUbizzIE5g==}
+  '@cartridge/connector@0.5.8':
+    resolution: {integrity: sha512-fv7bZOjSnJHPOKy6D8Ua+BISoD1oUUQQYweI4WskQvDCAovdy12iZ3f4bbbZUu5TXYlH7+/JDRoRudaDcz34og==}
 
-  '@cartridge/controller@0.5.7':
-    resolution: {integrity: sha512-54+PmRA8nVGCzzAKqHt6NEELa5t/b7ZCE/+nKjEAiO5Pe8qZC9844/RpZY170lerOJYdLouGwB4afgfxpJLs3Q==}
+  '@cartridge/controller@0.5.8':
+    resolution: {integrity: sha512-TananeGPCNcS6NMC9Ik2OnT2av7n1cfCs5c97ugOh6Xu1Ocgo9zw380ca7XAhHSnH6iZ1nrKNqAMVRFhE8bffA==}
 
   '@cartridge/penpal@6.2.3':
     resolution: {integrity: sha512-K8h9VqBfFPXcAFQNnvgBnejF/dp7249pS4jXu3NhNYR6JqMQxtcrDqfnPmJvbF4ECEBs+8Z2UiwlRQiKt5nNsg==}
@@ -3319,11 +3319,11 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@cartridge/account-wasm@0.5.7': {}
+  '@cartridge/account-wasm@0.5.8': {}
 
-  '@cartridge/connector@0.5.7(get-starknet-core@4.0.0)(react@18.3.1)(typescript@5.7.2)':
+  '@cartridge/connector@0.5.8(get-starknet-core@4.0.0)(react@18.3.1)(typescript@5.7.2)':
     dependencies:
-      '@cartridge/controller': 0.5.7
+      '@cartridge/controller': 0.5.8
       '@starknet-react/core': 3.6.3(get-starknet-core@4.0.0)(react@18.3.1)(starknet@6.21.0)(typescript@5.7.2)
       starknet: 6.21.0
     transitivePeerDependencies:
@@ -3334,9 +3334,9 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@cartridge/controller@0.5.7':
+  '@cartridge/controller@0.5.8':
     dependencies:
-      '@cartridge/account-wasm': 0.5.7
+      '@cartridge/account-wasm': 0.5.8
       '@cartridge/penpal': 6.2.3
       '@starknet-io/types-js': 0.7.10
       '@telegram-apps/sdk': 2.11.0
