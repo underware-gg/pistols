@@ -7,17 +7,17 @@ import { usePlayer } from '/src/stores/playerStore'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { useRequiredActions } from '/src/stores/eventsStore'
-import { BookmarkIcon, EmojiIcon, Icon, OnlineStatusIcon } from '/src/components/ui/Icons'
-import { ChallengeLink, DuelistLink, PlayerLink } from '/src/components/Links'
+import { BookmarkIcon, Icon } from '/src/components/ui/Icons'
+import { ChallengeLink, DuelistLink } from '/src/components/Links'
 import { bigintEquals, bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 import { usePendingChallengesIds } from '../stores/challengeStore'
 
 export const ActionIcon = (active: boolean) => {
   const { address } = useAccount()
   const { duelistIds } = useDuelistsOfPlayer()
-  const { duelsPerDuelist } = useRequiredActions(duelistIds)
+  const { duelIds } = useRequiredActions(duelistIds)
   const { pendingDuelIds } = usePendingChallengesIds(address)
-  const requiresAction = useMemo(() => (Object.keys(duelsPerDuelist).length > 0), [duelsPerDuelist])
+  const requiresAction = useMemo(() => (duelIds.length > 0), [duelIds])
   const name = useMemo(() => (active ? 'circle' : 'circle outline'), [active])
   const className = useMemo(() => (
     requiresAction ? 'Positive'
@@ -37,7 +37,7 @@ export default function ActivityAction() {
   const { bookmarkedDuelists } = usePlayer(address)
 
   const { duelistIds } = useDuelistsOfPlayer()
-  const { duelsPerDuelist } = useRequiredActions(duelistIds)
+  const { duelIds } = useRequiredActions(duelistIds)
   const sortedDuelistIds = useMemo(() => (
     duelistIds.sort((a, b) => {
       return Number(b - a)
@@ -49,7 +49,7 @@ export default function ActivityAction() {
       key={duelistId}
       duelistId={duelistId}
       isBookmarked={bookmarkedDuelists.includes(duelistId)}
-      requiredActionDuelId={duelsPerDuelist[bigintToDecimal(duelistId)]}
+      requiredActionDuelIds={duelIds}
     />)
   ), [duelistIds])
 
@@ -90,14 +90,14 @@ const PendingItem = ({
 const ActionItem = ({
   duelistId,
   isBookmarked,
-  requiredActionDuelId,
+  requiredActionDuelIds,
 }: {
   duelistId: BigNumberish
   isBookmarked: boolean
-  requiredActionDuelId: bigint
+    requiredActionDuelIds: bigint[]
 }) => {
   const { isInAction, currentDuelId } = useDuelist(duelistId)
-  const requiresAction = useMemo(() => bigintEquals(currentDuelId, requiredActionDuelId), [currentDuelId, requiredActionDuelId])
+  const requiresAction = useMemo(() => requiredActionDuelIds.includes(currentDuelId), [currentDuelId, requiredActionDuelIds])
   const { duelistContractAddress } = useDuelistTokenContract()
   const { publish } = usePlayerBookmarkSignedMessage(duelistContractAddress, duelistId, !isBookmarked)
 

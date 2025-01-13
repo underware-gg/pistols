@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
-import { filterEntitiesByModel, getEntityModel, useDojoSetup, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoSetup, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
 import { useEventsStore } from '/src/stores/eventsStore'
 import { useMounted } from '@underware_gg/pistols-sdk/utils'
-import { PistolsEntity, PistolsGetQuery, PistolsSubQuery } from '@underware_gg/pistols-sdk/pistols'
+import { PistolsGetQuery, PistolsSubQuery } from '@underware_gg/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
 
 const query_get: PistolsGetQuery = {
@@ -26,16 +26,8 @@ export function EventsModelStoreSync() {
     query_get,
     query_sub,
     enabled: mounted,
-    setEntities: (entities: PistolsEntity[]) => {
-      // console.log("EventsModelStoreSync() SET =======> [PlayerRequiredAction]:", filterEntitiesByModel(entities, 'PlayerRequiredAction'))
-      eventsState.setEvents(filterEntitiesByModel(entities, 'PlayerRequiredAction'))
-    },
-    updateEntity: (entity: PistolsEntity) => {
-      // console.log("EventsModelStoreSync() UPDATE =======> [entity]:", entity)
-      if (getEntityModel(entity, 'PlayerRequiredAction')) {
-        eventsState.updateEvent(entity)
-      }      
-    },
+    setEntities: eventsState.setEntities,
+    updateEntity: eventsState.updateEntity,
     historical: false, // historical events
     limit: 100,
   })
@@ -71,7 +63,7 @@ export function EventsModelStoreSync() {
   //   if (sdk) _fetch()
   // }, [sdk])
 
-  // useEffect(() => console.log("EventsModelStoreSync() =>", historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
+  useEffect(() => console.log("EventsModelStoreSync() =>", eventsState.entities), [eventsState.entities])
 
   return (<></>)
 }

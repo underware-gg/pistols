@@ -90,8 +90,8 @@ export const useSdkEntities = ({
         limit,
         offset,
         options: { logging },
-        //@ts-ignore
         historical,
+        dontIncludeHashedKeys: false,
       })
     }
     if (sdk && query_get && enabled) {
@@ -121,7 +121,6 @@ export const useSdkEntities = ({
           }
         },
         options: { logging },
-        //@ts-ignore
         historical,
       })
       setIsSubscribed(true)
