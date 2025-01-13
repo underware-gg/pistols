@@ -1914,7 +1914,7 @@
     },
     {
       "address": "0x1912b9ab63b64905a4f12a1585e73b0928ff4e455ca55ab721e4ee3e9627cc6",
-      "class_hash": "0x615af8b0c2640b21ed3d3784fbc96f16004b786f626944786fd32cc5713b222",
+      "class_hash": "0x4983129207a5fe6fce285f8bbeddf87ee8f4ecdc99d0e725693016e501791d0",
       "abi": [
         {
           "type": "impl",
