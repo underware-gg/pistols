@@ -22,7 +22,7 @@ export const ActivityPanel = () => {
 
   const _panelTitle = useCallback((type: PanelType) => {
     const className = (panelType == type ? 'Active Anchor' : 'Inactive Anchor ImportantHover')
-    const name = (type == PanelType.Action ? ActionIcon() : type)
+    const name = (type == PanelType.Action ? ActionIcon(isAction) : type)
     // const name = type
     return (
       <span className={className} onClick={() => setPanelType(type)}>

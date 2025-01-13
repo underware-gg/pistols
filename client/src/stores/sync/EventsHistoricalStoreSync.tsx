@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useDojoSetup, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
-import { useHistoricalEventsStore } from '/src/stores/eventsStore'
+import { useHistoricalEventsStore } from '/src/stores/historicalEventsStore'
 import { useMounted } from '@underware_gg/pistols-sdk/utils'
 import { PistolsGetQuery, PistolsSubQuery } from '@underware_gg/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
@@ -17,7 +17,7 @@ const query_sub: PistolsSubQuery = {
 }
 
 // Sync entities: Add only once to a top level component
-export function HistoricalEventsStoreSync() {
+export function EventsHistoricalStoreSync() {
   const historicalEventsState = useHistoricalEventsStore((state) => state)
   
   const mounted = useMounted()
@@ -28,7 +28,7 @@ export function HistoricalEventsStoreSync() {
     enabled: mounted,
     setEntities: historicalEventsState.setEvents,
     updateEntity: historicalEventsState.updateEvent,
-    historical: true, // events
+    historical: true, // historical events
     limit: 100,
   })
 
@@ -37,7 +37,7 @@ export function HistoricalEventsStoreSync() {
   // const clause: torii.Clause = {
   //   Keys: {
   //     // keys: ['0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7'],
-  //     keys: [undefined],
+  //     keys: [undefined, undefined],
   //     models: ["pistols-PlayerActivity"],
   //     pattern_matching: "FixedLen",
   //   },
@@ -58,7 +58,7 @@ export function HistoricalEventsStoreSync() {
   //       },
   //       true, // historical
   //     );
-  //     console.log("sdk.client.GET_EVENTS() =>", events)
+  //     console.log("sdk.client.GET_EVENTS(true) =>", events)
   //   }
   //   if (sdk) _fetch()
   // }, [sdk])
@@ -70,15 +70,14 @@ export function HistoricalEventsStoreSync() {
   //       [clause],
   //       true, // historical
   //       (entityId: string, entityData: any) => {
-  //         console.log("sdk.client.SUB_EVENTS() =>", entityId, entityData)
+  //         console.log("sdk.client.SUB_EVENTS(true) =>", entityId, entityData)
   //       }
   //     );
-  //     console.log("sdk.client.SUBSCRIPTION =>", subscription)
   //   }
   //   if (sdk) _subscribe()
   // }, [sdk])
 
-  useEffect(() => console.log("HistoricalEventsStoreSync() =>", historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
+  useEffect(() => console.log("EventsHistoricalStoreSync() =>", historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
 
   return (<></>)
 }

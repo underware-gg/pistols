@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react'
-import { useAllPlayersActivityFeed, ActivityState } from '/src/stores/eventsStore'
+import { useAllPlayersActivityFeed, ActivityState } from '/src/stores/historicalEventsStore'
 import { useClientTimestamp } from '@underware_gg/pistols-sdk/utils'
 import { useChallenge } from '/src/stores/challengeStore'
 import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '/src/components/Links'
