@@ -31,6 +31,7 @@ import Duel from '/src/components/scenes/Duel'
 
 // test sdk
 import { helloPistols } from '@underware_gg/pistols-sdk'
+import { SceneName } from '../data/assets'
 helloPistols();
 
 export default function MainPage() {
@@ -53,8 +54,8 @@ export default function MainPage() {
         <GameContainer isVisible={true} />
         <MainUI />
         <Modals />
-        {overlay}
         <ActivityPanel />
+        {overlay}
         <Header />
         <CurrentChainHint />
         <MouseToolTip />
@@ -99,17 +100,22 @@ function MainUI() {
 function TutorialUI({
 }) {
   const { gameImpl } = useThreeJsContext()
-  const { atTutorial, currentScene } = usePistolsScene()
+  const { atTutorial, currentScene, lastScene } = usePistolsScene()
 
   const [currentTutorialScene, setCurrentTutorialScene] = useState<string>("");
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (atTutorial) {
+    let timer
+    if (atTutorial && currentScene == SceneName.Tutorial) {
+      timer = setTimeout(() => {
         setCurrentTutorialScene(currentScene);
-      }
-    }, SCENE_CHANGE_ANIMATION_DURATION);
-
+      }, SCENE_CHANGE_ANIMATION_DURATION / 5);
+    } else if (atTutorial) {
+      timer = setTimeout(() => {
+        setCurrentTutorialScene(currentScene);
+      }, SCENE_CHANGE_ANIMATION_DURATION);
+    }
+    
     return () => clearTimeout(timer);
   }, [atTutorial, currentScene]);
 
@@ -125,6 +131,7 @@ function Modals() {
   const duelistIsOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
   const playerIsOpen = useMemo(() => (selectedPlayerAddress > 0n), [selectedPlayerAddress])
   const newChallengeIsOpen = useMemo(() => (challengingAddress > 0n), [challengingAddress])
+  
   return (
     <>
       {challengeIsOpen && <ChallengeModal />}

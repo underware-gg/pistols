@@ -1,36 +1,60 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
-const AnimatedText = ({ text, duration, onAnimationComplete }: { text: string, duration: number, onAnimationComplete?: () => void }) => {
-  const [displayText, setDisplayText] = useState('');
-  const [isAnimating, setIsAnimating] = useState(false);
+interface AnimatedTextProps {
+  text: string;
+  delayPerCharacter: number;
+  onAnimationComplete?: () => void;
+}
+
+const AnimatedText: React.FC<AnimatedTextProps> = ({ text, delayPerCharacter, onAnimationComplete }) => {
+  const [spans, setSpans] = useState<JSX.Element[]>([]);
+
+  const lastText = useRef(text)
 
   useEffect(() => {
-    const animateText = async (text) => {
-      if (!text) return;
+    if (!text || lastText.current === text) return;
 
-      setIsAnimating(true);
-      setDisplayText('');
+    lastText.current = text
 
-      const characters = text.split('');
-      for (const char of characters) {
-        await new Promise(resolve => setTimeout(resolve, duration));
-        setDisplayText(prev => prev + char);
+    setSpans([])
+
+    const totalCharacters = text.length;
+
+    const newSpans = [];
+    for (let i = 0; i < totalCharacters; i++) {
+      const char = text[i];
+      if (char === ' ') {
+        newSpans.push(char);
+      } else {
+        newSpans.push(
+          <span
+            key={i}
+            className="animated-character fadeIn"
+            style={{
+              animationDelay: `${i * delayPerCharacter}ms`,
+              WebkitAnimationDelay: `${i * delayPerCharacter}ms`,
+              opacity: 0
+            }}
+          >
+            {char}
+          </span>
+        );
       }
+    }
 
-      setIsAnimating(false);
-      if (onAnimationComplete) {
-        onAnimationComplete();
-      }
-    };
+    setTimeout(() => {
+      setSpans(newSpans);
+    }, 50)
 
-    animateText(text);
-  }, [text, onAnimationComplete]);
+    // Trigger `onComplete` when the last animation is done
+    const animationTimeout = setTimeout(() => {
+      if (onAnimationComplete) onAnimationComplete();
+    }, totalCharacters * delayPerCharacter);
 
-  return (
-    <div>
-      {displayText}
-    </div>
-  );
+    return () => clearTimeout(animationTimeout); // Cleanup timeout on unmount or when text changes
+  }, [text]);
+
+  return <div>{spans}</div>;
 };
 
 export default AnimatedText;
