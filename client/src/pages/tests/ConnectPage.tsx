@@ -136,7 +136,7 @@ function Sign({
   revision: Revision
 }) {
   const { account, isConnected } = useAccount()
-  const { starknetDomain } = useDojoSetup()
+  const { starknetDomain, dojoProvider } = useDojoSetup()
 
   const messages: Messages = useMemo(() => ({
     game: 'PISTOLS_AT_10_BLOCKS',
@@ -164,7 +164,7 @@ function Sign({
   const { value: isVerified } = useAsyncMemo(async () => {
     if (!signature || signature.length == 0) return undefined
     console.log(`V${revision} verifying...`)
-    const result = await account.verifyMessage(typedMessage, signature)
+    const result = await dojoProvider.provider.verifyMessageInStarknet(typedMessage, signature, account.address)
     console.log(`V${revision} verifyed:`, result)
     return result
   }, [signature, typedMessage], undefined, false)

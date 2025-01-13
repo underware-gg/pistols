@@ -8,6 +8,7 @@ import {
   BigNumberish,
   TypedDataRevision,
   StarknetDomain,
+  RpcProvider,
 } from 'starknet'
 import { bigintToHex, cleanObject, isBigint } from 'src/utils/misc/types'
 import { poseidon } from 'src/utils/misc/starknet'
@@ -80,9 +81,9 @@ export const signMessages = async (account: AccountInterface, starknetDomain: St
     signatureHash,
   }
 }
-export const verifyMessages = async (account: AccountInterface, starknetDomain: StarknetDomain, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
+export const verifyMessages = async (account: AccountInterface, provider: RpcProvider, starknetDomain: StarknetDomain, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
   const typedMessage = createTypedMessage({ starknetDomain, messages })
-  return account.verifyMessage(typedMessage, signature)
+  return provider.verifyMessageInStarknet(typedMessage, signature, account.address)
 }
 
 // ref:

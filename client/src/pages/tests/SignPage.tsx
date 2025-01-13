@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { AccountInterface, typedData } from 'starknet'
+import { AccountInterface, RpcProvider, typedData } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useTypedMessage, Messages, createTypedMessage, bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
+import { useDojoSetup } from '@underware_gg/pistols-sdk/dojo'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import App from '/src/components/App'
 
@@ -53,10 +54,11 @@ export default function SignPage() {
 
 function ConsoleTests() {
   const { account, address } = useAccount()
+  const { dojoProvider } = useDojoSetup()
   useEffect(() => {
     if (!BigInt(address ?? 0)) return
     const _test = async () => {
-      await testTypedData(account)
+      await testTypedData(account, dojoProvider.provider)
     }
     _test()
   }, [account])
@@ -69,6 +71,7 @@ function ValidateMessage({
   messages: Messages
 }) {
   const { account } = useAccount()
+  const { dojoProvider } = useDojoSetup()
 
   const [signature, setSignature] = useState(null)
   const [verified, setVerifyed] = useState('...')
@@ -84,7 +87,7 @@ function ValidateMessage({
       try {
         const _sig = await account.signMessage(typedMessage)
         setSignature(_sig)
-        const _valid = await account.verifyMessage(typedMessage, _sig)
+        const _valid = await dojoProvider.provider.verifyMessageInStarknet(typedMessage, _sig, account.address)
         setVerifyed(_valid ? 'OK' : 'failed')
       } catch {
         setVerifyed('ERROR')
@@ -116,7 +119,7 @@ function ValidateMessage({
 }
 
 
-export async function testTypedData(account: AccountInterface) {
+export async function testTypedData(account: AccountInterface, provider: RpcProvider) {
   const typedMessage0 = createTypedMessage({ starknetDomain, messages: { key: '0x01111' } })
   const typedMessage1 = createTypedMessage({ starknetDomain, messages: { key: '0x1111' } })
   const typedMessage2 = createTypedMessage({ starknetDomain, messages: { key: '0x1112' } })
@@ -132,15 +135,15 @@ export async function testTypedData(account: AccountInterface) {
   console.log(`signature0`, signature0)
   console.log(`signature1`, signature1)
   console.log(`signature2`, signature2)
-  console.log(`verifyMessage 0 > 0 (true)`, await account.verifyMessage(typedMessage0, signature0))
-  console.log(`verifyMessage 0 > 1 (true)`, await account.verifyMessage(typedMessage0, signature1))
-  console.log(`verifyMessage 0 > 2 (false)`, await account.verifyMessage(typedMessage0, signature2))
-  console.log(`verifyMessage 1 > 0 (true)`, await account.verifyMessage(typedMessage1, signature0))
-  console.log(`verifyMessage 1 > 1 (true)`, await account.verifyMessage(typedMessage1, signature1))
-  console.log(`verifyMessage 1 > 2 (false)`, await account.verifyMessage(typedMessage1, signature2))
-  console.log(`verifyMessage 2 > 0 (false)`, await account.verifyMessage(typedMessage2, signature0))
-  console.log(`verifyMessage 2 > 1 (false)`, await account.verifyMessage(typedMessage2, signature1))
-  console.log(`verifyMessage 2 > 2 (true)`, await account.verifyMessage(typedMessage2, signature2))
-  let result: boolean = await account.verifyMessage(typedMessage1, signature1)
+  console.log(`verifyMessage 0 > 0 (true)`, await provider.verifyMessageInStarknet(typedMessage0, signature0, account.address))
+  console.log(`verifyMessage 0 > 1 (true)`, await provider.verifyMessageInStarknet(typedMessage0, signature1, account.address))
+  console.log(`verifyMessage 0 > 2 (false)`, await provider.verifyMessageInStarknet(typedMessage0, signature2, account.address))
+  console.log(`verifyMessage 1 > 0 (true)`, await provider.verifyMessageInStarknet(typedMessage1, signature0, account.address))
+  console.log(`verifyMessage 1 > 1 (true)`, await provider.verifyMessageInStarknet(typedMessage1, signature1, account.address))
+  console.log(`verifyMessage 1 > 2 (false)`, await provider.verifyMessageInStarknet(typedMessage1, signature2, account.address))
+  console.log(`verifyMessage 2 > 0 (false)`, await provider.verifyMessageInStarknet(typedMessage2, signature0, account.address))
+  console.log(`verifyMessage 2 > 1 (false)`, await provider.verifyMessageInStarknet(typedMessage2, signature1, account.address))
+  console.log(`verifyMessage 2 > 2 (true)`, await provider.verifyMessageInStarknet(typedMessage2, signature2, account.address))
+  let result: boolean = await provider.verifyMessageInStarknet(typedMessage1, signature1, account.address)
   return result
 }
