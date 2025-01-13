@@ -8,14 +8,14 @@ export const useEventsStore = createDojoStore<PistolsSchemaType>();
 //--------------------------------
 // 'consumer' hooks
 //
-export function useRequiredActions(duelistIds: bigint[]) {
+export function useRequiredActions() {
   const entities = useEventsStore((state) => state.entities)
   const duelIds = useMemo(() => (
     Object.values(entities)
-      .map(e => BigInt(e.models.pistols.PlayerRequiredAction.duel_id))
+      .map(e => BigInt(e.models.pistols.PlayerRequiredAction?.duel_id ?? 0))
       .filter(id => id > 0n)
   ), [entities])
-  console.log(`useRequiredActions() =================>`, duelIds)
+  // console.log(`useRequiredActions() =================>`, duelIds)
   return {
     duelIds,
   }

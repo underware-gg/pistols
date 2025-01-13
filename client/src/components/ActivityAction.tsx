@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { BigNumberish } from 'starknet'
 import { useDuelistsOfPlayer } from '/src/hooks/useDuelistToken'
@@ -9,13 +9,11 @@ import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { useRequiredActions } from '/src/stores/eventsStore'
 import { BookmarkIcon, Icon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink } from '/src/components/Links'
-import { bigintEquals, bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 import { usePendingChallengesIds } from '../stores/challengeStore'
 
 export const ActionIcon = (active: boolean) => {
   const { address } = useAccount()
-  const { duelistIds } = useDuelistsOfPlayer()
-  const { duelIds } = useRequiredActions(duelistIds)
+  const { duelIds } = useRequiredActions()
   const { pendingDuelIds } = usePendingChallengesIds(address)
   const requiresAction = useMemo(() => (duelIds.length > 0), [duelIds])
   const name = useMemo(() => (active ? 'circle' : 'circle outline'), [active])
@@ -37,13 +35,13 @@ export default function ActivityAction() {
   const { bookmarkedDuelists } = usePlayer(address)
 
   const { duelistIds } = useDuelistsOfPlayer()
-  const { duelIds } = useRequiredActions(duelistIds)
   const sortedDuelistIds = useMemo(() => (
     duelistIds.sort((a, b) => {
       return Number(b - a)
     })
   ), [duelistIds])
 
+  const { duelIds } = useRequiredActions()
   const actionItems = useMemo(() => (sortedDuelistIds.map((duelistId) =>
     <ActionItem
       key={duelistId}
@@ -77,7 +75,7 @@ const PendingItem = ({
 }) => {
   return (
     <>
-      <Icon name='circle' className='Invisible' />
+      {/* <Icon name='circle' className='Invisible' /> */}
       <Icon name='circle' className='Warning' />
       {'Reply to  '}
       <ChallengeLink duelId={duelId} />
@@ -113,7 +111,7 @@ const ActionItem = ({
 
   return (
     <>
-      <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} />
+      {/* <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} /> */}
       {icon}
       <DuelistLink duelistId={duelistId} useName />
       {' '}

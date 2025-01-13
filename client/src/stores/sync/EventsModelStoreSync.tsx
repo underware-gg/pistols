@@ -1,33 +1,56 @@
-import { useEffect } from 'react'
-import { useDojoSetup, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
+import { useEffect, useMemo } from 'react'
+import { formatQueryValue, getEntityModel, useDojoSetup, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
 import { useEventsStore } from '/src/stores/eventsStore'
 import { useMounted } from '@underware_gg/pistols-sdk/utils'
-import { PistolsGetQuery, PistolsSubQuery } from '@underware_gg/pistols-sdk/pistols'
+import { PistolsEntity, PistolsGetQuery, PistolsSubQuery } from '@underware_gg/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
+import { useDuelistsOfPlayer } from '/src/hooks/useDuelistToken'
 
-const query_get: PistolsGetQuery = {
-  pistols: {
-    PlayerRequiredAction: { $: { where: { duelist_id: { $neq: 0 } } } },
-  },
-}
-const query_sub: PistolsSubQuery = {
-  pistols: {
-    PlayerRequiredAction: [],
-  },
-}
 
 // Sync entities: Add only once to a top level component
 export function EventsModelStoreSync() {
   const eventsState = useEventsStore((state) => state)
-
   const mounted = useMounted()
+
+  const { duelistIds } = useDuelistsOfPlayer()
+
+  const query_get = useMemo<PistolsGetQuery>(() => ({
+    pistols: {
+      PlayerRequiredAction: {
+        $: {
+          where: {
+            duelist_id: { $in: duelistIds.map(id => formatQueryValue(id)) }
+          },
+        },
+      },
+    },
+  }), [duelistIds])
+  const query_sub = useMemo<PistolsSubQuery>(() => ({
+    pistols: {
+      PlayerRequiredAction: [],
+    },
+  }), [])
+
+  console.log(`EventsModelStoreSync() =>`, duelistIds, query_get)
 
   useSdkEntities({
     query_get,
     query_sub,
-    enabled: mounted,
-    setEntities: eventsState.setEntities,
-    updateEntity: eventsState.updateEntity,
+    enabled: (mounted && duelistIds.length > 0),
+    setEntities: (entities: PistolsEntity[]) => {
+      // console.log(`GET PlayerRequiredAction() ======>`, entities)
+      eventsState.setEntities(entities)
+    },
+    updateEntity: (entity: PistolsEntity) => {
+      // console.log(`SUB PlayerRequiredAction() ======>`, entity)
+      const requiresAction = getEntityModel(entity, 'PlayerRequiredAction')
+      // console.log(`SUB PlayerRequiredAction() ======> model:`, requiresAction, duelistIds.includes(BigInt(requiresAction.duelist_id)))
+      if (requiresAction) {
+        if (duelistIds.includes(BigInt(requiresAction.duelist_id))) {
+          eventsState.updateEntity(entity)
+        }
+      }
+    },
     historical: false, // historical events
     limit: 100,
   })
