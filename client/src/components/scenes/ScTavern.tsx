@@ -41,7 +41,7 @@ export default function ScTavern() {
   }, [itemClicked, timestamp])
 
   useEffect(() => {
-    if (!open && _currentScene) {
+    if (!open && _currentScene && _currentScene instanceof InteractibleScene) {
       (_currentScene as InteractibleScene).toggleBlur?.(false);
       (_currentScene as InteractibleScene).setClickable?.(true);
       setTimeout(() => {

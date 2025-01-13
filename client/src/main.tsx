@@ -36,6 +36,19 @@ const router = createBrowserRouter([
       { path: "door", element: <MainPage /> },
       { path: "profile", element: <MainPage /> },
       { path: "tavern", element: <MainPage /> },
+      { 
+        path: "tutorial", 
+        children: [
+          { path: "entry", element: <MainPage /> },
+          { path: "conflict", element: <MainPage /> },
+          { path: "honour", element: <MainPage /> },
+          { path: "barkeep", element: <MainPage /> },
+          { path: "lection", element: <MainPage /> },
+          { path: "demon", element: <MainPage /> },
+          { path: "resurection", element: <MainPage /> },
+          { path: "duel", element: <MainPage /> },
+        ] 
+      },
       { path: "tavern/:table_id", element: <MainPage /> },
       { path: "balcony", element: <MainPage /> },
       { path: "balcony/:table_id", element: <MainPage /> },
