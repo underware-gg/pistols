@@ -1,10 +1,6 @@
-import 'react-circular-progressbar/dist/styles.css'
-import 'react-circular-progressbar/dist/styles.css'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Segment, SemanticFLOATS, Image } from 'semantic-ui-react'
-import { BigNumberish, num } from 'starknet'
-import { useAccount } from '@starknet-react/core'
-import { useMounted, useClientTimestamp } from '@underware_gg/pistols-sdk/utils/hooks'
+import React, { useEffect, useRef, useState } from 'react'
+import { Segment } from 'semantic-ui-react'
+import { useMounted, useClientTimestamp } from '@underware_gg/pistols-sdk/utils'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useGameplayContext } from '/src/hooks/GameplayContext'
@@ -24,20 +20,17 @@ import { DuelStage, useAnimatedDuel, useDuel } from '/src/hooks/useDuel'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { EnvironmentCardsTextures } from '/src/data/cardAssets'
 import { AnimationState } from '/src/three/game'
-import { Action, ArchetypeNames } from '/src/utils/pistols'
+import { Action } from '/src/utils/pistols'
 import { MenuDuel, MenuDuelControl } from '/src/components/Menus'
 import { MenuDebugAnimations } from '/src/components/MenusDebug'
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
-import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { DuelistCardType } from '/src/components/cards/Cards'
-import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
-import DuelistModal from '/src/components/modals/DuelistModal'
-import CommitPacesModal from '/src/components/modals/CommitPacesModal'
 import Cards, { CardsHandle, DuelistHand } from '/src/components/cards/DuelCards'
 import * as Constants from '/src/data/cardConstants'
-import * as TWEEN from '@tweenjs/tween.js'
-
+import DuelProgress from '/src/components/ui/tutorial/DuelProgress'
+import DuelistProfile from '/src/components/ui/tutorial/DuelistProfile'
+import DuelProfile from '/src/components/ui/tutorial/DuelProfile'
+import { DuelTutorial } from '/src/data/tutorialConstants'
 
 export type DuelistState = {
   damage: number, 
@@ -48,9 +41,11 @@ export type DuelistState = {
 }
 
 export default function Duel({
-  duelId
+  duelId,
+  tutorial = DuelTutorial.NONE
 } : {
-  duelId: bigint
+  duelId: bigint,
+  tutorial: DuelTutorial
 }) {
   const { gameImpl } = useThreeJsContext()
   const { animated, dispatchAnimated } = useGameplayContext()
@@ -457,8 +452,6 @@ export default function Duel({
           resetDuel()
         }} 
         isPlaying={isPlaying} />
-
-      <DuelistModal />
 
       <DojoSetupErrorDetector />
 

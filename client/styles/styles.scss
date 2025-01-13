@@ -2239,3 +2239,148 @@ a.active.step:hover,
   position: fixed; /* Ensures the modal is fixed to the viewport */
   z-index: 9999 !important; /* High z-index to ensure it is on top */
 }
+
+.animated-character {
+  opacity: 0;
+  animation: bounceInDown 1s forwards;
+}
+
+.fadeIn{
+  opacity: 0;
+  -webkit-animation: fadeIn 0.2s;
+  animation: fadeIn 0.2s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+
+
+
+
+
+
+.tutorialContainer {
+  position: absolute;
+  bottom: 0;
+  width: aspect-width(100);
+  height: aspect-height(25);
+  display: flex;
+  flex-direction: column;
+  background-color: #000a;
+}
+
+.tutorialBackground {
+  position: absolute;
+  top: 0;
+  width: aspect-width(80);
+  height: aspect-height(30);
+  margin: 0 aspect-width(10);
+  background: radial-gradient(ellipse 70% 150% at 50% -10%, rgba(0,0,0,0.7) 0%, transparent 70%);
+  mask-image: linear-gradient(to top, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
+  z-index: 0;
+}
+
+.tutorialContent {
+  z-index: 1;
+}
+
+.speakerName {
+  height: aspect-height(7);
+  color: $color-warning;
+  font-weight: bold;
+  font-size: aspect-width(1.7);
+  padding: aspect-width(1);
+  text-align: center;
+}
+
+.tutorialDivider {
+  width: aspect-width(50);
+  height: aspect-height(0.1);
+  margin: 0 aspect-width(25);
+  background: $color-warning;
+}
+
+.textContainer {
+  max-width: aspect-width(60);
+  // background-color: #000;
+  font-size: aspect-width(1.5);
+  font-weight: 500;
+  margin: 0 auto;
+  text-align: center;
+  padding: aspect-width(1);
+}
+
+.indicator {
+  text-align: center;
+  font-size: aspect-width(1.5);
+  color: $color-warning;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  animation: blink 1s infinite;
+}
+
+.nextButton {
+  position: absolute;
+  bottom: aspect-width(1);
+  right: aspect-width(1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: aspect-width(0.5);
+  cursor: pointer;
+  transition: all 200ms ease;
+  transform: scale(1);
+}
+
+.nextButton:hover {
+  transform: scale(1.1);
+}
+
+.nextText {
+  font-size: calc(0.8vw + 0.8vh);
+  text-transform: uppercase;
+  color: white;
+}
+
+.nextIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: aspect-width(2);
+  height: aspect-height(2);
+  background-color: #333;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+  }
+}
+
+.nextIcon .svg {
+  width: 90%;
+  height: 90%;
+  fill: white;
+}
+
+
+@keyframes blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}

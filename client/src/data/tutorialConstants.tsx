@@ -1,8 +1,9 @@
 import { SceneName } from "./assets";
 import { AudioName } from "./audioAssets";
 
-const ANIMATION_TIME_PER_LETTER = 50
-const DELAY_BETWEEN_TEXTS = 1000
+const ANIMATION_TIME_PER_LETTER = 20
+const DELAY_BETWEEN_TEXTS = 3000
+const DELAY_BETWEEN_SPEECH = 1000
 
 interface TutorialScene {
   texts: TutorialText[],
@@ -122,12 +123,19 @@ const TUTORIAL_SCENE_DATA: Record<TutorialScenes, TutorialScene> = {
   },
   [SceneName.TutorialScene4]: {
     texts: [],
-    hasSkipButton: true
+    hasSkipButton: false
   },
   [SceneName.TutorialScene5]: {
     texts: [],
-    hasSkipButton: true
+    hasSkipButton: false
   }
+}
+
+enum DuelTutorial {
+  NONE = 'NONE',
+  SIMPLE = 'SIMPLE',
+  FULL = 'FULL',
+  DUELISTS = 'DUELISTS'
 }
 
 export type {
@@ -139,6 +147,8 @@ export type {
 export {
   ANIMATION_TIME_PER_LETTER,
   DELAY_BETWEEN_TEXTS,
+  DELAY_BETWEEN_SPEECH,
   TUTORIAL_SCENE_DATA,
-  tutorialScenes
+  tutorialScenes,
+  DuelTutorial
 }

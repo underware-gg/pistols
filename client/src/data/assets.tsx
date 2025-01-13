@@ -49,6 +49,11 @@ enum TextureName {
   bg_tavern_door_test_mask = 'bg_tavern_door_test_mask',
   bg_tavern_test = 'bg_tavern_test',
   bg_tavern_test_mask = 'bg_tavern_test_mask',
+  bg_tutorial_1 = 'bg_tutorial_1',
+  bg_tutorial_2 = 'bg_tutorial_2',
+  bg_tutorial_3 = 'bg_tutorial_3',
+  bg_tutorial_4 = 'bg_tutorial_4',
+  bg_tutorial_5 = 'bg_tutorial_5',
 }
 type TextureAttributes = {
   path: string
@@ -82,6 +87,11 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_tavern_door_test_mask]: { path: '/images/bg_tavern_door_test_mask.png' },
   [TextureName.bg_tavern_test]: { path: '/images/bg_tavern_test.png' },
   [TextureName.bg_tavern_test_mask]: { path: '/images/bg_tavern_test_mask.png' },
+  [TextureName.bg_tutorial_1]: { path: '/images/bg_tutorial_1.png' },
+  [TextureName.bg_tutorial_2]: { path: '/images/bg_tutorial_2.png' },
+  [TextureName.bg_tutorial_3]: { path: '/images/bg_tutorial_3.png' },
+  [TextureName.bg_tutorial_4]: { path: '/images/bg_tutorial_4.png' },
+  [TextureName.bg_tutorial_5]: { path: '/images/bg_tutorial_5.png' },
 }
 
 interface SceneData {
@@ -158,11 +168,11 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
   [SceneName.IRLTournament]: { backgrounds: [{ texture: TextureName.bg_duels_live, shiftMultiplier: 0, renderOrder: 0 }] },
   [SceneName.Duel]: { backgrounds: [{ texture: TextureName.bg_duel, shiftMultiplier: 0, renderOrder: 0 }] },
   //Tutorial Scenes
-  [SceneName.Tutorial]: { backgrounds: [{ texture: TextureName.bg_tavern, shiftMultiplier: 0, renderOrder: 0 }] },
-  [SceneName.TutorialScene2]: { backgrounds: [{ texture: TextureName.bg_tavern, shiftMultiplier: 0, renderOrder: 0 }] },
-  [SceneName.TutorialScene3]: { backgrounds: [{ texture: TextureName.bg_tavern, shiftMultiplier: 0, renderOrder: 0 }] },
-  [SceneName.TutorialScene4]: { backgrounds: [{ texture: TextureName.bg_tavern, shiftMultiplier: 0, renderOrder: 0 }] },
-  [SceneName.TutorialScene5]: { backgrounds: [{ texture: TextureName.bg_tavern, shiftMultiplier: 0, renderOrder: 0 }] }
+  [SceneName.Tutorial]: { backgrounds: [{ texture: TextureName.bg_tutorial_1, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.TutorialScene2]: { backgrounds: [{ texture: TextureName.bg_tutorial_2, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.TutorialScene3]: { backgrounds: [{ texture: TextureName.bg_tutorial_3, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.TutorialScene4]: { backgrounds: [{ texture: TextureName.bg_tutorial_4, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.TutorialScene5]: { backgrounds: [{ texture: TextureName.bg_tutorial_5, shiftMultiplier: 0, renderOrder: 0 }] }
 }
 
 enum CharacterType {
