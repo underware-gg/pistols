@@ -29,7 +29,10 @@ function ErrorPage() {
         <hr />
         <Grid columns={1}>
           <Grid.Column className='AlignCenter' align='left'>
-            <a href='/'>Back to the Gate</a>
+            <a href='/' onClick={(e) => {
+              e.preventDefault()
+              window.location.href = '/'
+            }}>Back to the Gate</a>
           </Grid.Column>
         </Grid>
       </div>
