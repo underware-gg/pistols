@@ -43,7 +43,7 @@ export default function MainPage() {
   usePistolsSceneFromRoute()
   useSetPageTitle()
 
-  const overlay = useMemo(() => <div id="game-black-overlay" className='NoMouse NoDrag' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'black', opacity: 1, pointerEvents: 'none', zIndex: 5 }}></div>, [])
+  const overlay = useMemo(() => <div id="game-black-overlay" className='NoMouse NoDrag' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'black', opacity: 1, pointerEvents: 'none', zIndex: 981 }}></div>, [])
 
   useEffectOnce(() => console.log(`---------------- MAIN PAGE MOUNTED`), [])
 
