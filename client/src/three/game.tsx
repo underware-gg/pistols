@@ -862,7 +862,7 @@ export function animatePace(pace: number, statsA: DuelistState, statsB: DuelistS
   _duelistManager.animatePace(pace, statsA, statsB)
 }
 
-export function animateDuel(state: AnimationState, actionA: Action, actionB: Action, healthA: number, healthB: number, damageA: number, damageB: number) {
+export function animateDuel(state: AnimationState) {
   //only animated once per entry safety
   if (state == AnimationState.Round1 && !_round1Animated) {
     _round1Animated = true

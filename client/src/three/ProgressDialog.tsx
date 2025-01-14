@@ -578,28 +578,6 @@ export class ProgressDialogManager {
   private isDialogAYou: boolean = true
 
   constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, duelistAPosition: THREE.Vector3, duelistBPosition: THREE.Vector3) {
-    // const originalElement = document.getElementById('player-bubble') as HTMLElement
-    // const elementLeft = originalElement.cloneNode(true) as HTMLElement
-    // const elementRight = originalElement.cloneNode(true) as HTMLElement
-
-    // const hiddenContainer = document.getElementById('hidden-container')
-    // hiddenContainer.appendChild(elementLeft)
-    // hiddenContainer.appendChild(elementRight)
-
-    // setTimeout(() => {
-    //   console.log(elementLeft.getBoundingClientRect())
-    //   console.log(elementRight.getBoundingClientRect())
-
-    //   this.dialogA.setElement(elementLeft)
-    //   this.dialogB.setElement(elementRight)
-
-    //   hiddenContainer.removeChild(elementLeft)
-    //   hiddenContainer.removeChild(elementRight)
-
-    //   // scene.add(this.dialogA)
-    //   // scene.add(this.dialogB)
-    // }, 50)
-
     this.dialogA = new ProgressDialogMesh(camera, duelistAPosition, true)
     this.dialogB = new ProgressDialogMesh(camera, duelistBPosition, false)
   }
