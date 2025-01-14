@@ -196,6 +196,8 @@ mod tester {
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
             // events
+            TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
+            TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
             TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
             TestResource::Event(e_PlayerRequiredAction::TEST_CLASS_HASH),
         ];

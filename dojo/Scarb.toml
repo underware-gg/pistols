@@ -11,10 +11,16 @@ migrate = "./migrate"
 
 [[target.starknet-contract]]
 sierra = true
-build-external-contracts = ["dojo::world::world_contract::world"]
+build-external-contracts = [
+  "dojo::world::world_contract::world",
+  "achievement::events::index::e_TrophyCreation", 
+  "achievement::events::index::e_TrophyProgression", 
+]
 
 [dependencies]
 dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.10" }
+# achievement = { git = "https://github.com/cartridge-gg/arcade", tag = "v1.0.11" }
+achievement = { git = "https://github.com/rsodre/arcade", branch = "pistols" }
 # cartridge_vrf = { git = "https://github.com/cartridge-gg/vrf" }
 graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
 openzeppelin_token = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }

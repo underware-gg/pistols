@@ -153,6 +153,8 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
             // test models
             TestResource::Model(m_MockDuelistOwners::TEST_CLASS_HASH),
             // events
+            TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
+            TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
             TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
             TestResource::Event(e_PlayerRequiredAction::TEST_CLASS_HASH),
             //

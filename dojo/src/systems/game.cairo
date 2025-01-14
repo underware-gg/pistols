@@ -42,6 +42,28 @@ pub mod game {
     use dojo::world::{WorldStorage};
     use dojo::model::{ModelStorage, ModelValueStorage};
 
+    //-------------------------------------
+    // components
+    //
+    use achievement::components::achievable::AchievableComponent;
+    use achievement::types::task::{Task, TaskTrait};
+    component!(path: AchievableComponent, storage: achievable, event: AchievableEvent);
+    impl AchievableInternalImpl = AchievableComponent::InternalImpl<ContractState>;
+    #[storage]
+    struct Storage {
+        #[substorage(v0)]
+        achievable: AchievableComponent::Storage,
+    }
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        #[flat]
+        AchievableEvent: AchievableComponent::Event,
+    }
+
+    //-------------------------------------
+    // pistols
+    //
     use pistols::interfaces::systems::{
         SystemsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
@@ -70,6 +92,7 @@ pub mod game {
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::cards::hand::DuelistHandTrait;
     use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
+    use pistols::types::trophies::{Trophy, TrophyTrait, TROPHY};
     use pistols::types::constants::{CONST};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::misc::{ZERO};
@@ -90,6 +113,31 @@ pub mod game {
         const INVALID_MOVES_COUNT: felt252       = 'PISTOLS: Invalid moves count';
         const MOVES_HASH_MISMATCH: felt252       = 'PISTOLS: Moves hash mismatch';
         const IMPOSSIBLE_ERROR: felt252          = 'PISTOLS: Impossible error';
+    }
+
+    fn dojo_init(ref self: ContractState) {
+        let mut world = self.world(@"pistols");
+
+        let mut trophy_id: u8 = 1;
+        while trophy_id <= TROPHY::COUNT {
+            let trophy: Trophy = trophy_id.into();
+            self.achievable.create(
+                world,
+                id: trophy.identifier(),
+                hidden: trophy.hidden(),
+                index: trophy.index(),
+                points: trophy.points(),
+                start: trophy.start(),
+                end: trophy.end(),
+                group: trophy.group(),
+                icon: trophy.icon(),
+                title: trophy.title(),
+                description: trophy.description(),
+                tasks: trophy.tasks(),
+                data: trophy.data(),
+            );
+            trophy_id += 1;
+        }
     }
 
     #[generate_trait]
@@ -245,7 +293,7 @@ pub mod game {
             challenge.winner = progress.winner;
             challenge.state = if (progress.winner == 0) {ChallengeState::Draw} else {ChallengeState::Resolved};
             challenge.timestamp_end = get_block_timestamp();
-            self.finish_challenge(ref store, challenge);
+            self.finish_challenge(ref store, challenge, round);
 
             // transfer FAME reward
             let (balance_a, balance_b): (i128, i128) = world.duelist_token_dispatcher().transfer_fame_reward(duel_id);
@@ -322,7 +370,7 @@ pub mod game {
             (owner)
         }
 
-        fn finish_challenge(self: @ContractState, ref store: Store, challenge: Challenge) {
+        fn finish_challenge(self: @ContractState, ref store: Store, challenge: Challenge, round: Round) {
             store.set_challenge(@challenge);
 
             // get duelist as Entity, as we know they exist
@@ -348,6 +396,15 @@ pub mod game {
             store.set_duelist(@duelist_b);
             store.set_scoreboard(@scoreboard_a);
             store.set_scoreboard(@scoreboard_b);
+
+            // unlock achievements
+            if (challenge.winner != 0) {
+                let winner_address: ContractAddress = challenge.winner_address();
+
+                // TODO: check win count first!
+                Trophy::FirstBlood.progress(store.world, winner_address, 1);
+            }
         }
     }
 }
+

@@ -94,6 +94,7 @@ use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
 use pistols::utils::math::{MathTrait};
+use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
 impl ChallengeImpl of ChallengeTrait {
@@ -102,6 +103,12 @@ impl ChallengeImpl of ChallengeTrait {
         (if (duelist_id == self.duelist_id_a) {(1)}
         else if (duelist_id == self.duelist_id_b) {(2)}
         else {(0)})
+    }
+    #[inline(always)]
+    fn winner_address(self: Challenge) -> ContractAddress {
+        (if (self.winner == 1) {self.address_a}
+        else if (self.winner == 2) {self.address_b}
+        else {ZERO()})
     }
     #[inline(always)]
     fn exists(self: Challenge) -> bool {

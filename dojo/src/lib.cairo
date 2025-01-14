@@ -55,6 +55,7 @@ mod types {
     mod round_state;
     mod shuffler;
     mod typed_data;
+    mod trophies;
     mod cards {
         mod cards;
         mod hand;
