@@ -29,7 +29,7 @@ export default function BarkeepModal({ open, setOpen }) {
   return (
     <div className='TempBarkeepOverlay NoMouse NoDrag'>
       <div className='TempBarkeepTalkBalloon Relative'>
-        <AnimatedText text={displayText} duration={30} />
+        <AnimatedText text={displayText} delayPerCharacter={30} />
       </div>
 
       <div className='DialogOptionsContainer'>

@@ -7,6 +7,7 @@ import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { useEffectOnce, usePlayerId } from '@underware_gg/pistols-sdk/utils'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { Header } from '/src/components/Header'
+import { SceneName } from '/src/data/assets'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import AppGame from '/src/components/AppGame'
 import GameContainer from '/src/components/GameContainer'
@@ -30,7 +31,7 @@ import Duel from '/src/components/scenes/Duel'
 
 // test sdk
 import { helloPistols } from '@underware_gg/pistols-sdk'
-import { SceneName } from '../data/assets'
+
 helloPistols();
 
 export default function MainPage() {
