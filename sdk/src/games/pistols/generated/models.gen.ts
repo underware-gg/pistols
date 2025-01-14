@@ -231,7 +231,7 @@ export interface PaymentValue {
 
 // Type definition for `pistols::models::player::Player` struct
 export interface Player {
-	address: string;
+  player_address: string;
 	timestamp_registered: BigNumberish;
 	claimed_welcome_pack: boolean;
 }
@@ -326,7 +326,7 @@ export interface TokenBoundAddressValue {
 
 // Type definition for `pistols::models::player::PlayerActivity` struct
 export interface PlayerActivity {
-	address: string;
+  player_address: string;
 	timestamp: BigNumberish;
 	activity: Activity;
 	identifier: BigNumberish;
@@ -776,8 +776,8 @@ export const schema: SchemaType = {
 			treasury_percent: 0,
 		},
 		Player: {
-			fieldOrder: ['address', 'timestamp_registered', 'claimed_welcome_pack'],
-			address: "",
+      fieldOrder: ['player_address', 'timestamp_registered', 'claimed_welcome_pack'],
+      player_address: "",
 			timestamp_registered: 0,
 			claimed_welcome_pack: false,
 		},
@@ -857,8 +857,8 @@ export const schema: SchemaType = {
 			token_id: 0,
 		},
 		PlayerActivity: {
-			fieldOrder: ['address', 'timestamp', 'activity', 'identifier', 'is_public'],
-			address: "",
+			fieldOrder: ['player_address', 'timestamp', 'activity', 'identifier', 'is_public'],
+			player_address: "",
 			timestamp: 0,
 		activity: Activity.Undefined,
 			identifier: 0,

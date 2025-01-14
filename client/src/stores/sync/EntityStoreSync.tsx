@@ -16,7 +16,7 @@ const query_get: PistolsGetQuery = {
     TokenConfig: { $: { where: { token_address: { $neq: '' } } } },
     Duelist: { $: { where: { duelist_id: { $neq: 0 } } } },
     DuelistChallenge: { $: { where: { duelist_id: { $neq: 0 } } } },
-    Player: { $: { where: { address: { $neq: '' } } } },
+    Player: { $: { where: { player_address: { $neq: '' } } } },
   },
 }
 const query_get_messages: PistolsGetQuery = {

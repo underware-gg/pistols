@@ -10,7 +10,7 @@ import { arrayClean, bigintToHex, bigintToNumber } from '@underware_gg/pistols-s
 // to get duelist data, use duelistStore
 //
 export interface ActivityState {
-  address: BigNumberish
+  player_address: BigNumberish
   timestamp: number
   activity: constants.Activity
   identifier: bigint
@@ -26,7 +26,7 @@ const createStore = () => {
   const _parseEvent = (e: PistolsEntity): ActivityState => {
     let event = e.models.pistols.PlayerActivity
     return event ? {
-      address: bigintToHex(event.address),
+      player_address: bigintToHex(event.player_address),
       timestamp: bigintToNumber(event.timestamp),
       activity: event.activity as unknown as constants.Activity,
       identifier: BigInt(event.identifier),

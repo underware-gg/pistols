@@ -9,7 +9,7 @@ import { constants, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
 import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@underware_gg/pistols-sdk/utils'
 
 interface PlayerState {
-  address: string
+  player_address: string
   timestamp_registered: number
   username: string
   name: string
@@ -40,10 +40,10 @@ const createStore = () => {
   const _parseEvent = (e: PistolsEntity): PlayerState => {
     const event = e.models.pistols.Player
     return event ? {
-      address: bigintToHex(event.address),
+      player_address: bigintToHex(event.player_address),
       timestamp_registered: bigintToNumber(event.timestamp_registered),
-      username: shortAddress(event.address),
-      name: shortAddress(event.address),
+      username: shortAddress(event.player_address),
+      name: shortAddress(event.player_address),
       isNew: true,
       // off-chain messages
       tutorial_progress: constants.TutorialProgress.None,
@@ -62,7 +62,7 @@ const createStore = () => {
         )).reduce((acc, e) => {
           const player = _parseEvent(e)
           if (player) {
-            acc[player.address] = player
+            acc[player.player_address] = player
           }
           return acc
         }, {} as PlayersByAddress)
@@ -73,8 +73,8 @@ const createStore = () => {
       set((state: State) => {
         // only insert!
         const player = _parseEvent(e)
-        if (!state.players[player.address]) {
-          state.players[player.address] = player
+        if (!state.players[player.player_address]) {
+          state.players[player.player_address] = player
         }
       });
     },

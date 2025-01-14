@@ -16,7 +16,7 @@ export default function ActivityFeed() {
 
   const items = useMemo(() => ([...allPlayersActivity].reverse().map((a) =>
     <ActivityItem
-      key={`${a.address}-${a.timestamp}-${a.activity}-${a.identifier.toString()}`}
+      key={`${a.player_address}-${a.timestamp}-${a.activity}-${a.identifier.toString()}`}
       clientSeconds={clientSeconds}
       activity={a}
     />)
@@ -67,7 +67,7 @@ const ActivityItemCreatedDuelist = ({
 }: ActivityItemProps) => {
   return (
     <>
-      <PlayerLink address={activity.address} />
+      <PlayerLink address={activity.player_address} />
       {' spawned '}
       <DuelistLink duelistId={activity.identifier} />
       {' '}
@@ -84,7 +84,7 @@ const ActivityItemCreatedChallenge = ({
   const { duelistAddressB } = useChallenge(activity.identifier)
   return (
     <>
-      <PlayerLink address={activity.address} />
+      <PlayerLink address={activity.player_address} />
       {' challenged '}
       <PlayerLink address={duelistAddressB} />
       {' for '}
@@ -103,7 +103,7 @@ const ActivityItemRepliedChallenge = ({
   const { state } = useChallenge(activity.identifier)
   return (
     <>
-      <PlayerLink address={activity.address} />
+      <PlayerLink address={activity.player_address} />
       {' '}
       {ChallengeStateReplyVerbs[state]}
       {' '}
@@ -121,7 +121,7 @@ const ActivityItemCommittedMoves = ({
 }: ActivityItemProps) => {
   return (
     <>
-      <PlayerLink address={activity.address} />
+      <PlayerLink address={activity.player_address} />
       {' moved in '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
@@ -137,7 +137,7 @@ const ActivityItemRevealedMoves = ({
 }: ActivityItemProps) => {
   return (
     <>
-      <PlayerLink address={activity.address} />
+      <PlayerLink address={activity.player_address} />
       {' revealed in '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}

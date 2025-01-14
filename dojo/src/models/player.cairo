@@ -30,7 +30,7 @@ pub enum TutorialProgress {
 #[dojo::model]
 pub struct Player {
     #[key]
-    pub address: ContractAddress,   // controller wallet
+    pub player_address: ContractAddress,   // controller wallet
     //-----------------------
     pub timestamp_registered: u64,
     pub claimed_welcome_pack: bool,
@@ -44,7 +44,7 @@ pub struct Player {
 #[dojo::event(historical:true)]
 pub struct PlayerActivity {
     #[key]
-    pub address: ContractAddress,
+    pub player_address: ContractAddress,
     //-----------------------
     pub timestamp: u64,         // seconds since epoch
     pub activity: Activity,
@@ -113,8 +113,8 @@ mod PlayerErrors {
 
 #[generate_trait]
 impl PlayerImpl of PlayerTrait {
-    fn check_in(ref store: Store, address: ContractAddress, activity: Activity, identifier: felt252) {
-        let mut player: Player = store.get_player(address);
+    fn check_in(ref store: Store, player_address: ContractAddress, activity: Activity, identifier: felt252) {
+        let mut player: Player = store.get_player(player_address);
         if (!player.exists()) {
             assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
             player.timestamp_registered = get_block_timestamp();
@@ -124,7 +124,7 @@ impl PlayerImpl of PlayerTrait {
             player.claimed_welcome_pack = true;
             store.set_player(@player);
         }
-        activity.emit(ref store.world, address, identifier);
+        activity.emit(ref store.world, player_address, identifier);
     }
     #[inline(always)]
     fn exists(self: Player) -> bool {
@@ -135,9 +135,9 @@ impl PlayerImpl of PlayerTrait {
 
 #[generate_trait]
 impl ActivityImpl of ActivityTrait {
-    fn emit(self: Activity, ref world: WorldStorage, address: ContractAddress, identifier: felt252) {
+    fn emit(self: Activity, ref world: WorldStorage, player_address: ContractAddress, identifier: felt252) {
         world.emit_event(@PlayerActivity{
-            address,
+            player_address,
             timestamp: get_block_timestamp(),
             activity: self,
             identifier,
