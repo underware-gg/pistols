@@ -415,11 +415,11 @@ function setupScenes() {
   Object.values(SceneName).forEach((sceneName) => {
     if (sceneName === SceneName.Duel) {
       _scenes[sceneName] = setupDuelScene()
-    } else if (sceneName.includes('Tutorial') && !hasInstancedTutorial) {
-      _scenes[sceneName] = setupStaticScene(SceneName.Tutorial)
-      hasInstancedTutorial = true
-    } else {
+    } else if (!sceneName.includes('Tutorial')) {
       _scenes[sceneName] = setupStaticScene(sceneName)
+    } else if (!hasInstancedTutorial){
+      hasInstancedTutorial = true
+      _scenes[sceneName] = setupStaticScene(SceneName.Tutorial)
     }
   })
 }
