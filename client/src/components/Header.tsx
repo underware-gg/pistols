@@ -66,7 +66,7 @@ export function Header() {
             </div>
             <div className='TitleCase NoBreak Relative' style={{ flex: '1', textAlign: 'center', height: '1px' }}>
               {/* {showTable && <>
-                <h1>Pistols at 10 Blocks</h1>
+                <h1>Pistols at Dawn</h1>
                 <p className='AlignTop'>
                   <IconClick name='ticket' size={'big'} onClick={() => _changeTable()} style={{ marginBottom: '0.4em' }} />
                   {' '}<b className='Important H3 Anchor' onClick={() => _changeTable()}>{description}</b>

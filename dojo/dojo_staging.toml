@@ -5,7 +5,7 @@
 #
 
 [world]
-name = "Pistols at 10 Blocks"
+name = "Pistols at Dawn"
 description = "An on-chain pistol duelling game of honour and betrayal."
 icon_uri = "https://pistols.underware.gg/images/logo.png"
 cover_uri = "https://pistols.underware.gg/images/splash.png"

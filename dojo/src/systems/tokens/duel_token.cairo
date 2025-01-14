@@ -180,7 +180,7 @@ pub mod duel_token {
     }
 
     //*******************************
-    fn TOKEN_NAME()   -> ByteArray {("Pistols at 10 Blocks Duels")}
+    fn TOKEN_NAME()   -> ByteArray {("Pistols at Dawn Duels")}
     fn TOKEN_SYMBOL() -> ByteArray {("DUEL")}
     //*******************************
 
@@ -443,7 +443,7 @@ pub mod duel_token {
             (format!("Duel #{}", token_id))
         }
         fn get_token_description(self: @ContractState, token_id: u256) -> ByteArray {
-            (format!("Pistols at 10 Blocks Duel #{}. https://pistols.underware.gg", token_id))
+            (format!("Pistols at Dawn Duel #{}. https://pistols.underware.gg", token_id))
         }
         fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {
             let mut store: Store = StoreTrait::new(self.world_default());

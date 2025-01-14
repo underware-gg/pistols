@@ -325,7 +325,7 @@ export const usePistolsScene = () => {
     __dispatchSetScene(newScene)
   }, [location.pathname, navigate])
 
-  const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at 10 Blocks'), [currentScene])
+  const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at Dawn'), [currentScene])
 
   return {
     currentScene,

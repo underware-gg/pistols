@@ -12,7 +12,7 @@ pub enum Activity {
     RepliedChallenge,   // 7
     CommittedMoves,     // 8
     RevealedMoves,      // 9
-    Online,             // 10
+    Achievement,        // 10
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]

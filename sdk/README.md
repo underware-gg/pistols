@@ -1,4 +1,4 @@
-# Pistols at 10 Blocks SDK
+# Pistols at Dawn SDK
 
 ### Packages
 

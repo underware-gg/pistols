@@ -252,7 +252,7 @@ fn _assert_minted_count(world: WorldStorage, token: IDuelistTokenDispatcher, min
 #[test]
 fn test_initializer() {
     let mut sys: TestSystems = setup(0);
-    // assert(sys.token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
+    // assert(sys.token.name() == "Pistols at Dawn Duelists", 'Name is wrong');
     assert(sys.token.symbol() == "DUELIST", 'Symbol is wrong');
 
     _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, 'Should eq [5]');

@@ -140,7 +140,7 @@ pub mod pack_token {
     }
 
     //*******************************
-    fn TOKEN_NAME()   -> ByteArray {("Pistols at 10 Blocks Packs")}
+    fn TOKEN_NAME()   -> ByteArray {("Pistols at Dawn Packs")}
     fn TOKEN_SYMBOL() -> ByteArray {("PACK")}
     //*******************************
 
@@ -347,7 +347,7 @@ pub mod pack_token {
         }
 
         fn get_token_description(self: @ContractState, token_id: u256) -> ByteArray {
-            (format!("Pistols at 10 Blocks Pack #{}. https://pistols.underware.gg", token_id))
+            (format!("Pistols at Dawn Pack #{}. https://pistols.underware.gg", token_id))
         }
 
         fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {

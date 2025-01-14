@@ -255,7 +255,7 @@ fn _assert_minted_count(world: WorldStorage, token: IDuelTokenDispatcher, minted
 #[test]
 fn test_initializer() {
     let (world, mut token) = setup(0);
-    // assert(token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
+    // assert(token.name() == "Pistols at Dawn Duelists", 'Name is wrong');
     assert(token.symbol() == "DUEL", 'Symbol is wrong');
     _assert_minted_count(world, token, 2, 'Should eq 2');
 

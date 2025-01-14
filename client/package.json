@@ -1,7 +1,7 @@
 {
   "name": "pistols-client",
   "version": "0.12.5",
-  "description": "Pistols at 10 Blocks JS client",
+  "description": "Pistols at Dawn JS client",
   "homepage": "https://github.com/underware-gg/pistols",
   "author": "Underware",
   "license": "CC0",
@@ -18,6 +18,7 @@
     "create-constants": "npx @underware_gg/pistols-sdk generate-constants --src:\"../dojo/src\" --out:\"$npm_config_sdk/generated/constants.ts\""
   },
   "keywords": [
+    "pistols at dawn",
     "pistols at 10 blocks",
     "underware",
     "dojo",

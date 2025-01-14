@@ -233,7 +233,7 @@ fn _purchase(sys: TestSystems, recipient: ContractAddress) {
 #[test]
 fn test_initializer() {
     let mut sys: TestSystems = setup(0);
-    // assert(sys.token.name() == "Pistols at 10 Blocks Duelists", 'Name is wrong');
+    // assert(sys.token.name() == "Pistols at Dawn Duelists", 'Name is wrong');
     assert(sys.token.symbol() == "PACK", 'Symbol is wrong');
 
     _assert_minted_count(sys.world, sys.token, 0, 'Should eq 0');

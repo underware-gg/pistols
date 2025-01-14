@@ -144,7 +144,7 @@ pub mod duelist_token {
     }
 
     //*******************************
-    fn TOKEN_NAME()   -> ByteArray {("Pistols at 10 Blocks Duelists")}
+    fn TOKEN_NAME()   -> ByteArray {("Pistols at Dawn Duelists")}
     fn TOKEN_SYMBOL() -> ByteArray {("DUELIST")}
     //*******************************
 
@@ -354,7 +354,7 @@ pub mod duelist_token {
         }
 
         fn get_token_description(self: @ContractState, token_id: u256) -> ByteArray {
-            (format!("Pistols at 10 Blocks Duelist #{}. https://pistols.underware.gg", token_id))
+            (format!("Pistols at Dawn Duelist #{}. https://pistols.underware.gg", token_id))
         }
 
         fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {

@@ -1,6 +1,8 @@
-# Pistols at 10 Blocks
+# Pistols at Dawn
 
-A fully on-chain game, made with love, by Loot Underworld, with Dojo, for Realms, on Starknet.
+> Formerly known as **Pistols at 10 Blocks**
+
+A fully on-chain game, made with love, by Underware, with Dojo, for Realms, on Starknet.
 
 Winner of the [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059)
 
@@ -34,7 +36,7 @@ Winner of the [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/174762644
 ## Overview
 Thou art an offence to all that is decent, dog. I challenge you... to a duel!
 
-Pistols at 10 Blocks is an onchain game, in which you face off against another Lord in a pistol duel to defend your honour.
+Pistols at Dawn is an onchain game, in which you face off against another Lord in a pistol duel to defend your honour.
 
 > **A righteous smoulder in your eye and your smoothbore, flintlock pistol held lightly at your side, cocked and ready, you stand
 > in the misty morning field. Holding back the gorge rising in your throat, you shake that mongrel's hand and turn, taking your
@@ -49,13 +51,16 @@ Pistols at 10 Blocks is an onchain game, in which you face off against another L
 
 ## Team
 
-* Recipromancer — Lead, Renaissance Chaos Mode
-* Mataleone — Engineering
+* Recipromancer — Lead, Renaissance Chaos Mode - [@recipromancer](https://x.com/recipromancer)
+* Mataleone — Engineering - [@matalecode](https://x.com/matalecode)
+* FortunaRegem - Engineering, Frontend, UI & Animations - [@FortunaRegem](https://x.com/FortunaRegem)
+* Amaro — Art, Design, UI & Animations - [@AmaroKoberle](https://x.com/AmaroKoberle)
+* Jubilee - Technical 3D systems
+
+## Contributors
+
 * Voltrevo — Engineering, Hidden information mechanism
-* FortunaRegem - Engineering, Frontend, UI & Animations
-* Amaro — Art, Design, UI & Animations
 * Mononoke — Logo & Art
-* Jubiliee - Technical 3D systems
 
 ## Assets
 
@@ -66,7 +71,7 @@ Pistols at 10 Blocks is an onchain game, in which you face off against another L
 * sfx/body-fall.mp3 — https://freesound.org/people/leonelmail/sounds/504626/
 
 
-## Gameplay Logic 
+## Original Game Jam Gameplay Logic
 
 ### Pistols Round
 
@@ -91,14 +96,6 @@ If no execution occurs...
 2) `Light` blades do 1 dmg, `Block` prevents 1 damage, and each use one strike. They have a chance to **crit**, doubling their effect.
 
 3) All other strikes happen at the same time, and `Block` only prevents damage against strikes that happen at the same time as it.
-
-
-
-### Bonus and Damage penalty
-
-Honourable duelists, with Honour > 9.0, get a bonus to crit or execution on every Hit
-
-Injured duelists suffer a penalty to Hit
 
 
 ## Development notes

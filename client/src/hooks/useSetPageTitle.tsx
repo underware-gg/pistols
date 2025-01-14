@@ -31,7 +31,7 @@ export const useSetPageTitle = () => {
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      let title = `Pistosl at 10 Blocks`
+      let title = `Pistols at Dawn`
       if (suffix) {
         title += ' | ' + suffix
       }

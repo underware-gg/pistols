@@ -1,7 +1,7 @@
 {
   "name": "@underware_gg/pistols-sdk",
   "version": "0.12.5",
-  "description": "Pistols at 10 Blocks SDK",
+  "description": "Pistols at Dawn SDK",
   "homepage": "https://github.com/underware-gg/pistols",
   "author": "Underware",
   "license": "CC0",
@@ -54,6 +54,7 @@
     "./package.json": "./package.json"
   },
   "keywords": [
+    "pistols at dawn",
     "pistols at 10 blocks",
     "underware",
     "dojo",
