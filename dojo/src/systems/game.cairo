@@ -79,8 +79,8 @@ pub mod game {
         },
         duelist::{
             Duelist, DuelistTrait,
+            Scoreboard, ScoreboardTable,
             Score, ScoreTrait,
-            Scoreboard,
         },
         pact::{
             Pact, PactTrait,
@@ -373,29 +373,29 @@ pub mod game {
         fn finish_challenge(self: @ContractState, ref store: Store, challenge: Challenge, round: Round) {
             store.set_challenge(@challenge);
 
-            // get duelist as Entity, as we know they exist
-            let mut duelist_a: Duelist = store.get_duelist(challenge.duelist_id_a);
-            let mut duelist_b: Duelist = store.get_duelist(challenge.duelist_id_b);
-            // Scoreboards we need the model, since they may not exist yet
-            let mut scoreboard_a: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_a);
-            let mut scoreboard_b: Scoreboard = store.get_scoreboard(challenge.table_id, challenge.duelist_id_b);
+            // player score (per table)
+            let mut score_player_a: ScoreboardTable = store.get_scoreboard_table(challenge.address_a.into(), challenge.table_id);
+            let mut score_player_b: ScoreboardTable = store.get_scoreboard_table(challenge.address_b.into(), challenge.table_id);
+            // duelist score (global)
+            let mut score_duelist_a: Scoreboard = store.get_scoreboard(challenge.duelist_id_a.into());
+            let mut score_duelist_b: Scoreboard = store.get_scoreboard(challenge.duelist_id_b.into());
             
             // update totals
-            ScoreTrait::update_totals(ref duelist_a.score, ref duelist_b.score, challenge.winner);
-            ScoreTrait::update_totals(ref scoreboard_a.score, ref scoreboard_b.score, challenge.winner);
+            ScoreTrait::update_totals(ref score_player_a.score, ref score_player_b.score, challenge.winner);
+            ScoreTrait::update_totals(ref score_duelist_a.score, ref score_duelist_b.score, challenge.winner);
 
             // compute honour from final round
             let round: RoundValue = store.get_round_value(challenge.duel_id);
-            duelist_a.score.update_honour(round.state_a.honour);
-            duelist_b.score.update_honour(round.state_b.honour);
-            scoreboard_a.score.update_honour(round.state_a.honour);
-            scoreboard_b.score.update_honour(round.state_b.honour);
+            score_player_a.score.update_honour(round.state_a.honour);
+            score_player_b.score.update_honour(round.state_b.honour);
+            score_duelist_a.score.update_honour(round.state_a.honour);
+            score_duelist_b.score.update_honour(round.state_b.honour);
             
             // save
-            store.set_duelist(@duelist_a);
-            store.set_duelist(@duelist_b);
-            store.set_scoreboard(@scoreboard_a);
-            store.set_scoreboard(@scoreboard_b);
+            store.set_scoreboard_table(@score_player_a);
+            store.set_scoreboard_table(@score_player_b);
+            store.set_scoreboard(@score_duelist_a);
+            store.set_scoreboard(@score_duelist_b);
 
             // unlock achievements
             if (challenge.winner != 0) {

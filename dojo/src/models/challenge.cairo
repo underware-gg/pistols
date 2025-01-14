@@ -1,5 +1,4 @@
 use starknet::ContractAddress;
-use pistols::models::duelist::{Score};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState, RoundStateTrait};
 use pistols::types::premise::{Premise, PremiseTrait};

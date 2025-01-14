@@ -38,6 +38,7 @@ use pistols::models::{
         m_Duelist, Duelist,
         m_DuelistChallenge, DuelistChallenge,
         m_Scoreboard, Scoreboard,
+        m_ScoreboardTable, ScoreboardTable,
     },
     pact::{
         m_Pact, Pact,
@@ -146,6 +147,7 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
             TestResource::Model(m_Payment::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
+            TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
             TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),

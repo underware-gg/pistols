@@ -47,8 +47,9 @@ mod tester {
         duelist::{
             m_Duelist, Duelist, DuelistValue,
             m_DuelistChallenge, DuelistChallenge,
-            m_Scoreboard, Scoreboard, ScoreboardValue,
-            Score, ProfileType, Archetype
+            m_Scoreboard, Scoreboard,
+            m_ScoreboardTable, ScoreboardTable,
+            ProfileType, Archetype
         },
         pact::{
             m_Pact, Pact,
@@ -191,6 +192,7 @@ mod tester {
             TestResource::Model(m_Payment::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
+            TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
             TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
@@ -559,12 +561,12 @@ mod tester {
         (duelist_challenge.duel_id)
     }
     #[inline(always)]
-    fn get_Scoreboard(world: WorldStorage, table_id: felt252, address: ContractAddress) -> Scoreboard {
-        (world.read_model((table_id, ID(address)),))
+    fn get_Scoreboard(world: WorldStorage, holder: felt252) -> Scoreboard {
+        (world.read_model(holder))
     }
     #[inline(always)]
-    fn get_Scoreboard_id(world: WorldStorage, table_id: felt252, duelist_id: u128) -> Scoreboard {
-        (world.read_model((table_id, duelist_id),))
+    fn get_ScoreboardTable(world: WorldStorage, holder: felt252, table_id: felt252) -> ScoreboardTable {
+        (world.read_model((holder, table_id),))
     }
     #[inline(always)]
     fn get_ChallengeValue(world: WorldStorage, duel_id: u128) -> ChallengeValue {

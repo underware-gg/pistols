@@ -6,7 +6,7 @@ use dojo::world::{WorldStorage};
 use pistols::systems::rng::{Dice, DiceTrait, Shuffle, ShuffleTrait};
 use pistols::models::{
     challenge::{Round, RoundTrait, DuelistState, DuelistStateTrait, Moves, MovesTrait},
-    duelist::{Duelist, Score},
+    duelist::{Duelist},
 };
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::round_state::{RoundState};

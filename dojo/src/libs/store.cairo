@@ -26,6 +26,7 @@ pub use pistols::models::{
         Duelist, DuelistValue,
         DuelistChallenge, DuelistChallengeValue,
         Scoreboard, ScoreboardValue,
+        ScoreboardTable, ScoreboardTableValue,
     },
     pact::{
         Pact, PactValue,
@@ -120,8 +121,13 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_scoreboard(ref self: Store, table_id: felt252, duelist_id: u128) -> Scoreboard {
-        (self.world.read_model((table_id, duelist_id),))
+    fn get_scoreboard(ref self: Store, holder: felt252) -> Scoreboard {
+        (self.world.read_model(holder))
+    }
+
+    #[inline(always)]
+    fn get_scoreboard_table(ref self: Store, holder: felt252, table_id: felt252) -> ScoreboardTable {
+        (self.world.read_model((holder, table_id),))
     }
 
     #[inline(always)]
@@ -220,6 +226,11 @@ impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_scoreboard(ref self: Store, model: @Scoreboard) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_scoreboard_table(ref self: Store, model: @ScoreboardTable) {
         self.world.write_model(model);
     }
 

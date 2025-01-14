@@ -11,8 +11,7 @@ pub struct Duelist {
     pub duelist_id: u128,   // erc721 token_id
     //-----------------------
     pub profile_type: ProfileType,
-    pub timestamp: u64,         // date registered (seconds since epoch)
-    pub score: Score,
+    pub timestamp: u64,     // date registered (seconds since epoch)
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -21,18 +20,27 @@ pub struct DuelistChallenge {
     #[key]
     pub duelist_id: u128,
     //-----------------------
-    pub duel_id: u128,          // current Challenge a Duelist is in
+    pub duel_id: u128,      // current Challenge a Duelist is in
 }
 
-//
-// Duelist scores per Table
+// player/duelist scoreboards
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct Scoreboard {
     #[key]
-    pub table_id: felt252,
+    pub holder: felt252,    // duelist_id or player_address
+    //------------
+    pub score: Score,
+}
+
+// Per table scoreboard
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct ScoreboardTable {
     #[key]
-    pub duelist_id: u128,
+    pub holder: felt252,    // duelist_id or player_address
+    #[key]
+    pub table_id: felt252,
     //------------
     pub score: Score,
 }
@@ -46,7 +54,6 @@ pub struct Score {
     pub total_draws: u16,
     pub honour_history: u64,    // past 8 duels, each byte holds one duel honour
 }
-
 
 
 //----------------------------------
@@ -91,11 +98,17 @@ impl ArchetypeDefault of Default<Archetype> {
 #[generate_trait]
 impl ScoreTraitImpl of ScoreTrait {
     #[inline(always)]
-    fn is_villain(self: Score) -> bool { (self.total_duels > 0 && self.honour < HONOUR::TRICKSTER_START) }
+    fn is_villain(self: Score) -> bool {
+        (self.total_duels > 0 && self.honour < HONOUR::TRICKSTER_START)
+    }
     #[inline(always)]
-    fn is_trickster(self: Score) -> bool { (self.honour >= HONOUR::TRICKSTER_START && self.honour < HONOUR::LORD_START) }
+    fn is_trickster(self: Score) -> bool {
+        (self.honour >= HONOUR::TRICKSTER_START && self.honour < HONOUR::LORD_START)
+    }
     #[inline(always)]
-    fn is_lord(self: Score) -> bool { (self.honour >= HONOUR::LORD_START) }
+    fn is_lord(self: Score) -> bool {
+        (self.honour >= HONOUR::LORD_START)
+    }
     #[inline(always)]
     fn get_archetype(self: Score) -> Archetype {
         if (self.is_lord()) {(Archetype::Honourable)}
@@ -104,7 +117,9 @@ impl ScoreTraitImpl of ScoreTrait {
         else {(Archetype::Undefined)}
     }
     #[inline(always)]
-    fn format_honour(value: u8) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
+    fn get_honour(self: Score) -> ByteArray {
+        (format!("{}.{}", self.honour/10, self.honour%10))
+    }
 
     // update duel totals only
     fn update_totals(ref score_a: Score, ref score_b: Score, winner: u8) {

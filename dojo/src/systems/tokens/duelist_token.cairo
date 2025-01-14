@@ -118,7 +118,7 @@ pub mod duelist_token {
         player::{Player, PlayerTrait, Activity},
         duelist::{
             Duelist, DuelistValue,
-            Score, ScoreTrait,
+            Scoreboard, Score, ScoreTrait,
             Archetype,
         },
         challenge::{ChallengeValue},
@@ -218,7 +218,6 @@ pub mod duelist_token {
                     duelist_id: *duelist_ids[i],
                     profile_type: ProfileTypeTrait::randomize_duelist(rnd.low.into()),
                     timestamp: get_block_timestamp(),
-                    score: Default::default(),
                 };
                 store.set_duelist(@duelist);
 
@@ -394,12 +393,16 @@ pub mod duelist_token {
             let mut world = self.world_default();
             let mut store: Store = StoreTrait::new(world);
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
+            let scoreboard: Scoreboard = store.get_scoreboard(token_id.low.into());
             let mut result: Array<ByteArray> = array![];
+            // Name
+            result.append("Name");
+            result.append(duelist.profile_type.name());
             // Honour
             result.append("Honour");
-            result.append(ScoreTrait::format_honour(duelist.score.honour));
+            result.append(scoreboard.score.get_honour());
             // Archetype
-            let archetype: Archetype = duelist.score.get_archetype();
+            let archetype: Archetype = scoreboard.score.get_archetype();
             result.append("Archetype");
             result.append(archetype.into());
             // Fame
@@ -411,16 +414,16 @@ pub mod duelist_token {
             result.append(if (fame_balance != 0) {"Alive"} else {"Dead"});
             // Totals
             result.append("Total Duels");
-            result.append(duelist.score.total_duels.to_string());
-            if (duelist.score.total_duels != 0) {
+            result.append(scoreboard.score.total_duels.to_string());
+            if (scoreboard.score.total_duels != 0) {
                 result.append("Total Wins");
-                result.append(duelist.score.total_wins.to_string());
+                result.append(scoreboard.score.total_wins.to_string());
 
                 result.append("Total Losses");
-                result.append(duelist.score.total_losses.to_string());
+                result.append(scoreboard.score.total_losses.to_string());
                 
                 result.append("Total Draws");
-                result.append(duelist.score.total_draws.to_string());
+                result.append(scoreboard.score.total_draws.to_string());
             }
             // done!
             (result.span())

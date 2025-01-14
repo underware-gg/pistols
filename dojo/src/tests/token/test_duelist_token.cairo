@@ -36,8 +36,9 @@ use pistols::models::{
     duelist::{
         m_Duelist, Duelist,
         m_DuelistChallenge, DuelistChallenge,
-        m_Scoreboard, Scoreboard,
-        Score, ProfileType, DuelistProfile, Archetype
+        m_Scoreboard, Scoreboard, Score,
+        m_ScoreboardTable, ScoreboardTable,
+        ProfileType, DuelistProfile, Archetype
     },
     pact::{
         m_Pact, Pact,
@@ -153,6 +154,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Model(m_Payment::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
+            TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
             TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
@@ -282,6 +284,11 @@ fn test_token_uri() {
         duelist_id: TOKEN_ID_1.low,
         profile_type: ProfileType::Duelist(DuelistProfile::Duke),
         timestamp: 999999,
+    };
+    tester::set_Duelist(ref sys.world, duelist);
+
+    let scoreboard = Scoreboard {
+        holder: TOKEN_ID_1.low.into(),
         score: Score {
             honour: 99,
             total_duels: 6,
@@ -291,7 +298,7 @@ fn test_token_uri() {
             honour_history: 0,
         },
     };
-    tester::set_Duelist(ref sys.world, duelist);
+    tester::set_Scoreboard(ref sys.world, scoreboard);
 
     let uri_1 = sys.token.token_uri(TOKEN_ID_1);
     let uri_2 = sys.token.token_uri(TOKEN_ID_2);

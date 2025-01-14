@@ -139,28 +139,28 @@ mod tests {
             _assert_is_alive(round.state_b, 'alive_b');
         }
 
-        let duelist_a = tester::get_DuelistValue(sys.world, ID(OWNER()));
-        let duelist_b = tester::get_DuelistValue(sys.world, ID(OTHER()));
-        assert(duelist_a.score.total_duels == 1, 'duelist_a.total_duels');
-        assert(duelist_b.score.total_duels == 1, 'duelist_b.total_duels');
-        assert(duelist_a.score.total_draws == 1, 'duelist_a.total_draws');
-        assert(duelist_b.score.total_draws == 1, 'duelist_b.total_draws');
-        assert(duelist_a.score.total_wins == 0, 'duelist_a.total_wins');
-        assert(duelist_b.score.total_wins == 0, 'duelist_b.total_wins');
-        assert(duelist_a.score.total_losses == 0, 'duelist_a.total_losses');
-        assert(duelist_b.score.total_losses == 0, 'duelist_b.total_losses');
+        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into());
+        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into());
+        assert(score_a.score.total_duels == 1, 'score_a.score.total_duels');
+        assert(score_b.score.total_duels == 1, 'score_b.score.total_duels');
+        assert(score_a.score.total_draws == 1, 'score_a.score.total_draws');
+        assert(score_b.score.total_draws == 1, 'score_b.score.total_draws');
+        assert(score_a.score.total_wins == 0, 'score_a.score.total_wins');
+        assert(score_b.score.total_wins == 0, 'score_b.score.total_wins');
+        assert(score_a.score.total_losses == 0, 'score_a.score.total_losses');
+        assert(score_b.score.total_losses == 0, 'score_b.score.total_losses');
 
-        assert(round.state_a.honour == (*moves_a.moves[0] * 10).try_into().unwrap(), 'duelist_a.score.honour');
-        assert(round.state_a.honour == (*moves_b.moves[0] * 10).try_into().unwrap(), 'duelist_b.score.honour');
-        assert(duelist_a.score.honour == round.state_a.honour, 'duelist_a.score.honour');
-        assert(duelist_b.score.honour == round.state_b.honour, 'duelist_b.score.honour');
+        assert(round.state_a.honour == (*moves_a.moves[0] * 10).try_into().unwrap(), 'score_a.score.honour');
+        assert(round.state_a.honour == (*moves_b.moves[0] * 10).try_into().unwrap(), 'score_b.score.honour');
+        assert(score_a.score.honour == round.state_a.honour, 'score_a.score.honour');
+        assert(score_b.score.honour == round.state_b.honour, 'score_b.score.honour');
 
-        let mut scoreboard_a = tester::get_Scoreboard(sys.world, table_id, OWNER());
-        let mut scoreboard_b = tester::get_Scoreboard(sys.world, table_id, OTHER());
-        assert(duelist_a.score.total_duels == scoreboard_a.score.total_duels, 'scoreboard_a.total_duels');
-        assert(duelist_b.score.total_duels == scoreboard_b.score.total_duels, 'scoreboard_b.total_duels');
-        assert(duelist_a.score.honour == scoreboard_a.score.honour, 'scoreboard_a.score.honour');
-        assert(duelist_b.score.honour == scoreboard_b.score.honour, 'scoreboard_b.score.honour');
+        let mut scoreboard_a = tester::get_ScoreboardTable(sys.world, OWNER().into(), table_id);
+        let mut scoreboard_b = tester::get_ScoreboardTable(sys.world, OTHER().into(), table_id);
+        assert(score_a.score.total_duels == scoreboard_a.score.total_duels, 'scoreboard_a.score.total_duels');
+        assert(score_b.score.total_duels == scoreboard_b.score.total_duels, 'scoreboard_b.score.total_duels');
+        assert(score_a.score.honour == scoreboard_a.score.honour, 'scoreboard_a.score.honour');
+        assert(score_b.score.honour == scoreboard_b.score.honour, 'scoreboard_b.score.honour');
 
         // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, 0, 'lords_balance_contract_2');
         // tester::assert_balance(sys.lords, TREASURY(), 0, 0, lords_fee * 2, 'lords_balance_treasury_2');
@@ -288,17 +288,17 @@ mod tests {
         let final_blow: PacesCard = (if(winner == 1){*moves_a.moves[0]}else{*moves_b.moves[0]}.into());
         assert(round.final_blow == FinalBlow::Paces(final_blow), 'round.final_blow');
 
-        let duelist_a = tester::get_DuelistValue(sys.world, ID(OWNER()));
-        let duelist_b = tester::get_DuelistValue(sys.world, ID(OTHER()));
-        assert(duelist_a.score.total_duels == 1, 'duelist_a.total_duels');
-        assert(duelist_b.score.total_duels == 1, 'duelist_b.total_duels');
-        assert(duelist_a.score.total_draws == 0, 'duelist_a.total_draws');
-        assert(duelist_b.score.total_draws == 0, 'duelist_b.total_draws');
+        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into());
+        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into());
+        assert(score_a.score.total_duels == 1, 'score_a.score.total_duels');
+        assert(score_b.score.total_duels == 1, 'score_b.score.total_duels');
+        assert(score_a.score.total_draws == 0, 'score_a.score.total_draws');
+        assert(score_b.score.total_draws == 0, 'score_b.score.total_draws');
 
-        assert(round.state_a.honour == (*moves_a.moves[0] * 10).try_into().unwrap(), 'duelist_a.score.honour');
-        assert(round.state_b.honour == (*moves_b.moves[0] * 10).try_into().unwrap(), 'duelist_b.score.honour');
-        assert(duelist_a.score.honour == round.state_a.honour, 'duelist_a.score.honour');
-        assert(duelist_b.score.honour == round.state_b.honour, 'duelist_b.score.honour');
+        assert(round.state_a.honour == (*moves_a.moves[0] * 10).try_into().unwrap(), 'score_a.score.honour');
+        assert(round.state_b.honour == (*moves_b.moves[0] * 10).try_into().unwrap(), 'score_b.score.honour');
+        assert(score_a.score.honour == round.state_a.honour, 'score_a.score.honour');
+        assert(score_b.score.honour == round.state_b.honour, 'score_b.score.honour');
 
         assert(challenge.winner == winner, 'winner');
 
@@ -315,10 +315,10 @@ mod tests {
 // println!("fame_balance_b_now: {}", tester::fame_balance_of_token(@sys, duelist_id_b) / CONST::ETH_TO_WEI.low);
             fame_balance_a = tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, 0, reward, 'a_fame_balance_a_end');
             fame_balance_b = tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, reward, 0, 'a_fame_balance_b_end');
-            assert(duelist_a.score.total_wins == 1, 'a_win_duelist_a.total_wins');
-            assert(duelist_b.score.total_wins == 0, 'a_win_duelist_b.total_wins');
-            assert(duelist_a.score.total_losses == 0, 'a_win_duelist_a.total_losses');
-            assert(duelist_b.score.total_losses == 1, 'a_win_duelist_b.total_losses');
+            assert(score_a.score.total_wins == 1, 'a_win_duelist_a.total_wins');
+            assert(score_b.score.total_wins == 0, 'a_win_duelist_b.total_wins');
+            assert(score_a.score.total_losses == 0, 'a_win_duelist_a.total_losses');
+            assert(score_b.score.total_losses == 1, 'a_win_duelist_b.total_losses');
             assert(round.state_a.damage == CONST::FULL_HEALTH, 'a_win_damage_a');
             assert(round.state_a.health == CONST::FULL_HEALTH, 'a_win_health_a');
             assert(round.state_b.health == 0, 'a_win_health_b');
@@ -331,10 +331,10 @@ mod tests {
             assert(challenge_balance.balance_b == (reward).try_into().unwrap(), 'challenge_balance.balance_b');
             fame_balance_a = tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, reward, 0, 'b_fame_balance_a_end');
             fame_balance_b = tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, 0, reward, 'b_fame_balance_b_end');
-            assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins');
-            assert(duelist_b.score.total_wins == 1, 'b_win_duelist_b.total_wins');
-            assert(duelist_a.score.total_losses == 1, 'b_win_duelist_a.total_losses');
-            assert(duelist_b.score.total_losses == 0, 'b_win_duelist_b.total_losses');
+            assert(score_a.score.total_wins == 0, 'b_win_duelist_a.total_wins');
+            assert(score_b.score.total_wins == 1, 'b_win_duelist_b.total_wins');
+            assert(score_a.score.total_losses == 1, 'b_win_duelist_a.total_losses');
+            assert(score_b.score.total_losses == 0, 'b_win_duelist_b.total_losses');
             assert(round.state_b.damage == CONST::FULL_HEALTH, 'b_win_damage_b');
             assert(round.state_b.health == CONST::FULL_HEALTH, 'b_win_health_b');
             assert(round.state_a.health == 0, 'b_win_health_a');
@@ -380,15 +380,15 @@ mod tests {
         assert(challenge.winner != 0, 'challenge.winner ++');
         assert(challenge.timestamp_end > 0, 'challenge.timestamp_end ++');
         assert(round.state == RoundState::Finished, 'state ++');
-        let duelist_a = tester::get_DuelistValue(sys.world, ID(OWNER()));
-        let duelist_b = tester::get_DuelistValue(sys.world, ID(OTHER()));
-        assert(duelist_a.score.total_duels == 2, 'duelist_a.total_duels ++');
-        assert(duelist_b.score.total_duels == 2, 'duelist_b.total_duels ++');
-        assert(duelist_a.score.total_draws == 0, 'duelist_a.total_draws ++');
-        assert(duelist_b.score.total_draws == 0, 'duelist_b.total_draws ++');
+        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into());
+        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into());
+        assert(score_a.score.total_duels == 2, 'score_a.score.total_duels ++');
+        assert(score_b.score.total_duels == 2, 'score_b.score.total_duels ++');
+        assert(score_a.score.total_draws == 0, 'score_a.score.total_draws ++');
+        assert(score_b.score.total_draws == 0, 'score_b.score.total_draws ++');
 
-        assert(round.state_a.honour == (*moves_a.moves[0] * 10).try_into().unwrap(), 'duelist_a.score.honour ++');
-        assert(round.state_b.honour == (*moves_b.moves[0] * 10).try_into().unwrap(), 'duelist_b.score.honour ++');
+        assert(round.state_a.honour == (*moves_a.moves[0] * 10).try_into().unwrap(), 'score_a.score.honour ++');
+        assert(round.state_b.honour == (*moves_b.moves[0] * 10).try_into().unwrap(), 'score_b.score.honour ++');
 
         let challenge_balance: ChallengeFameBalanceValue = tester::get_ChallengeFameBalanceValue(sys.world, duel_id);
 
@@ -398,20 +398,20 @@ mod tests {
             assert(challenge_balance.balance_b == -(reward).try_into().unwrap(), 'challenge_balance.balance_b');
             fame_balance_a = tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, 0, reward, 'a_fame_balance_a_end');
             fame_balance_b = tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, reward, 0, 'a_fame_balance_b_end');
-            assert(duelist_a.score.total_wins == 2, 'a_win_duelist_a.total_wins ++');
-            assert(duelist_b.score.total_wins == 0, 'a_win_duelist_b.total_wins ++');
-            assert(duelist_a.score.total_losses == 0, 'a_win_duelist_a.total_losses ++');
-            assert(duelist_b.score.total_losses == 2, 'a_win_duelist_b.total_losses ++');
+            assert(score_a.score.total_wins == 2, 'a_win_duelist_a.total_wins ++');
+            assert(score_b.score.total_wins == 0, 'a_win_duelist_b.total_wins ++');
+            assert(score_a.score.total_losses == 0, 'a_win_duelist_a.total_losses ++');
+            assert(score_b.score.total_losses == 2, 'a_win_duelist_b.total_losses ++');
         } else if (winner == 2) {
             let reward = fame_reward_a_2;
             assert(challenge_balance.balance_a == -(reward).try_into().unwrap(), 'challenge_balance.balance_a');
             assert(challenge_balance.balance_b == (reward).try_into().unwrap(), 'challenge_balance.balance_b');
             fame_balance_a = tester::assert_balance_token(@sys, duelist_id_a, fame_balance_a, reward, 0, 'b_fame_balance_a_end');
             fame_balance_b = tester::assert_balance_token(@sys, duelist_id_b, fame_balance_b, 0, reward, 'b_fame_balance_b_end');
-            assert(duelist_a.score.total_wins == 0, 'b_win_duelist_a.total_wins ++');
-            assert(duelist_b.score.total_wins == 2, 'b_win_duelist_b.total_wins ++');
-            assert(duelist_a.score.total_losses == 2, 'b_win_duelist_a.total_losses ++');
-            assert(duelist_b.score.total_losses == 0, 'b_win_duelist_b.total_losses ++');
+            assert(score_a.score.total_wins == 0, 'b_win_duelist_a.total_wins ++');
+            assert(score_b.score.total_wins == 2, 'b_win_duelist_b.total_wins ++');
+            assert(score_a.score.total_losses == 2, 'b_win_duelist_a.total_losses ++');
+            assert(score_b.score.total_losses == 0, 'b_win_duelist_b.total_losses ++');
         } else {
             assert(false, 'bad winner')
         }
