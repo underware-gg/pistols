@@ -3,7 +3,7 @@
     "class_hash": "0x45575a88cc5cef1e444c77ce60b7b4c9e73a01cbbe20926d5a4c72a94011410",
     "address": "0x3d5489a911389c23b96408ffd94854bd22a3032e2cb81c15e74b228bf39e1a7",
     "seed": "pistols",
-    "name": "Pistols at 10 Blocks",
+    "name": "Pistols at Dawn",
     "entrypoints": [
       "uuid",
       "set_metadata",
@@ -1913,8 +1913,8 @@
       ]
     },
     {
-      "address": "0x1912b9ab63b64905a4f12a1585e73b0928ff4e455ca55ab721e4ee3e9627cc6",
-      "class_hash": "0x4983129207a5fe6fce285f8bbeddf87ee8f4ecdc99d0e725693016e501791d0",
+      "address": "0x271caa81bdfb92d3f72e3e293056429a980df91cc7f59f99f52992df96d0018",
+      "class_hash": "0x669513c53f7659ea40b9ecb95fe3f8fb6a62196e6b22dd7a18db926ed2d88db",
       "abi": [
         {
           "type": "impl",
@@ -3039,8 +3039,8 @@
       ]
     },
     {
-      "address": "0x67a4ba72d03574dca7de8f951fafe360a5abfa3942f439a92fdeebc12a2364d",
-      "class_hash": "0x5ff68140831e3c63601a33732c22957c5a3aa0708417e0ba1578a36198ac764",
+      "address": "0x7ed7793f51b234b91a8add65b2538759759e3750c08fa17ee404d9ee2bc6051",
+      "class_hash": "0x1ed93cb3bf3cf81759f932410d770dd772b85b3feca9183c6c7b134112703cb",
       "abi": [
         {
           "type": "impl",
@@ -4669,8 +4669,8 @@
       ]
     },
     {
-      "address": "0xb7e5ef66a7964259f65c51ed92fc85d9399a1290cda79db330e25b2e5faef8",
-      "class_hash": "0x8eed9b7d40c9faee6aad18a96616a834b761bca692e4db1aa3eca82dee7d75",
+      "address": "0x4c2f2a2d0b8f4541917064e6ee5faabfed8875e4145485159a48596925d9e63",
+      "class_hash": "0x4286fea96124f164fc1f31a65f2f490547532f906351bb0ca3372e68921da57",
       "abi": [
         {
           "type": "impl",
@@ -4721,6 +4721,13 @@
               "state_mutability": "view"
             }
           ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
         },
         {
           "type": "impl",
@@ -5202,13 +5209,6 @@
           ]
         },
         {
-          "type": "function",
-          "name": "dojo_init",
-          "inputs": [],
-          "outputs": [],
-          "state_mutability": "view"
-        },
-        {
           "type": "impl",
           "name": "WorldProviderImpl",
           "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
@@ -5300,6 +5300,12 @@
         },
         {
           "type": "event",
+          "name": "achievement::components::achievable::AchievableComponent::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
           "name": "pistols::systems::game::game::Event",
           "kind": "enum",
           "variants": [
@@ -5312,6 +5318,11 @@
               "name": "WorldProviderEvent",
               "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
               "kind": "nested"
+            },
+            {
+              "name": "AchievableEvent",
+              "type": "achievement::components::achievable::AchievableComponent::Event",
+              "kind": "flat"
             }
           ]
         }
@@ -5320,6 +5331,7 @@
       "tag": "pistols-game",
       "selector": "0x32c102830cbffaddecbdce7ef85735e6f08da08ee762a2d7b09304b6533dd57",
       "systems": [
+        "dojo_init",
         "commit_moves",
         "reveal_moves",
         "upgrade"
@@ -5866,8 +5878,8 @@
       ]
     },
     {
-      "address": "0x2e2bc3d15e3c425bef2e9ae44d4505ed4e37d720ebd891d1369ffec96430b6a",
-      "class_hash": "0x3f3418a07a99f826d193f6b101c29026a4915d0c790b3e22ac7fa144165b84d",
+      "address": "0x2da06eb8a28fb22aaaaaaf577e3d446be5c8b46cd8aaa42381572fbc5503af3",
+      "class_hash": "0xf0f8380f3a2fade7c91bb3a4f7876859445d8da0504bcea3d78396ee1aa67e",
       "abi": [
         {
           "type": "impl",
@@ -7454,7 +7466,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x2fb1fc9dfa52b7b0ac2831d5b2c67afc0c1ef46fe4841f57a003a1a469117b3",
+      "class_hash": "0x75d862f577ab986d4e352f910f28b11d2a5e816e12c6e7c426f88cf22baed85",
       "tag": "pistols-Player",
       "selector": "0x4fc7ed2304172cd24d40e2b967bf3642228eec13547b09e0ffdfb85469f6f86"
     },
@@ -7516,7 +7528,7 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x7febcecce4eccfc5e4425cf7dd5ff96a6003256f19953f9ddf0a25ef83c7827",
+      "class_hash": "0x63d90b3e839c518792efb51ce67a2d97d0ac32f43f603dcac0fc8589a8a3734",
       "tag": "pistols-PlayerActivity",
       "selector": "0x20ac3bc7f231ea11afb0576a200bff82197a6b397f3e5a4299f5a79ab563ff1"
     },
@@ -7525,6 +7537,18 @@
       "class_hash": "0x1800717ddfaa981f410c5f6eba890abe80a3c67d9c70876442c92e15226e528",
       "tag": "pistols-PlayerRequiredAction",
       "selector": "0x7a8a6e4891353356c5c6a727ca9998890e212fb06e892e08f0344973a6c7b4b"
+    },
+    {
+      "members": [],
+      "class_hash": "0x6b38999d987627835d4c20e7e571c73d32ddc856786d9790a131bdb3372a246",
+      "tag": "pistols-TrophyCreation",
+      "selector": "0x193f7990b65fed69ab857fd2526961d796fc50b6a72287c5be68f32415ad80c"
+    },
+    {
+      "members": [],
+      "class_hash": "0xf05f290a704ad2671544b391f0c33d50d6d43d468d52791282852a833a00c7",
+      "tag": "pistols-TrophyProgression",
+      "selector": "0x528aee6e1c2ad2e0f603b1bfe15e3aefc1ded821cd118e5eab5092b704c79b0"
     }
   ]
 }

@@ -52,7 +52,7 @@ export enum Activity {
   RepliedChallenge = 'RepliedChallenge', // 7
   CommittedMoves = 'CommittedMoves', // 8
   RevealedMoves = 'RevealedMoves', // 9
-  Online = 'Online', // 10
+  Achievement = 'Achievement', // 10
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
@@ -863,6 +863,26 @@ export const BOT_PROFILES: type_BOT_PROFILES = {
     profile_id: 2,
     name: 'Tin Man',
   },
+};
+
+// from: ../dojo/src/types/trophies.cairo
+type type_TROPHY = {
+  COUNT: number, // cairo: u8
+};
+export const TROPHY: type_TROPHY = {
+  COUNT: 2,
+};
+
+// from: ../dojo/src/types/trophies.cairo
+type type_TROPHY_ID = {
+  None: string, // cairo: felt252
+  FirstBlood: string, // cairo: felt252
+  Collector: string, // cairo: felt252
+};
+export const TROPHY_ID: type_TROPHY_ID = {
+  None: '',
+  FirstBlood: 'FIRST_BLOOD',
+  Collector: 'COLLECTOR',
 };
 
 // from: ../dojo/src/types/typed_data.cairo

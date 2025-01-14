@@ -231,7 +231,7 @@ export interface PaymentValue {
 
 // Type definition for `pistols::models::player::Player` struct
 export interface Player {
-	address: string;
+	player_address: string;
 	timestamp_registered: BigNumberish;
 	claimed_welcome_pack: boolean;
 }
@@ -324,9 +324,61 @@ export interface TokenBoundAddressValue {
 	token_id: BigNumberish;
 }
 
+// Type definition for `achievement::events::index::TrophyCreation` struct
+export interface TrophyCreation {
+	id: BigNumberish;
+	hidden: boolean;
+	index: BigNumberish;
+	points: BigNumberish;
+	start: BigNumberish;
+	end: BigNumberish;
+	group: BigNumberish;
+	icon: BigNumberish;
+	title: BigNumberish;
+	description: string;
+	tasks: Array<Task>;
+	data: string;
+}
+
+// Type definition for `achievement::events::index::TrophyCreationValue` struct
+export interface TrophyCreationValue {
+	hidden: boolean;
+	index: BigNumberish;
+	points: BigNumberish;
+	start: BigNumberish;
+	end: BigNumberish;
+	group: BigNumberish;
+	icon: BigNumberish;
+	title: BigNumberish;
+	description: string;
+	tasks: Array<Task>;
+	data: string;
+}
+
+// Type definition for `achievement::events::index::TrophyProgression` struct
+export interface TrophyProgression {
+	player_id: BigNumberish;
+	task_id: BigNumberish;
+	count: BigNumberish;
+	time: BigNumberish;
+}
+
+// Type definition for `achievement::events::index::TrophyProgressionValue` struct
+export interface TrophyProgressionValue {
+	count: BigNumberish;
+	time: BigNumberish;
+}
+
+// Type definition for `achievement::types::index::Task` struct
+export interface Task {
+	id: BigNumberish;
+	total: BigNumberish;
+	description: string;
+}
+
 // Type definition for `pistols::models::player::PlayerActivity` struct
 export interface PlayerActivity {
-	address: string;
+	player_address: string;
 	timestamp: BigNumberish;
 	activity: Activity;
 	identifier: BigNumberish;
@@ -499,7 +551,7 @@ export enum Activity {
 	RepliedChallenge,
 	CommittedMoves,
 	RevealedMoves,
-	Online,
+	Achievement,
 }
 
 export interface SchemaType extends ISchemaType {
@@ -545,6 +597,13 @@ export interface SchemaType extends ISchemaType {
 		TableConfigValue: WithFieldOrder<TableConfigValue>,
 		TokenBoundAddress: WithFieldOrder<TokenBoundAddress>,
 		TokenBoundAddressValue: WithFieldOrder<TokenBoundAddressValue>,
+	},
+	achievement: {
+		TrophyCreation: WithFieldOrder<TrophyCreation>,
+		TrophyCreationValue: WithFieldOrder<TrophyCreationValue>,
+		TrophyProgression: WithFieldOrder<TrophyProgression>,
+		TrophyProgressionValue: WithFieldOrder<TrophyProgressionValue>,
+		Task: WithFieldOrder<Task>,
 		PlayerActivity: WithFieldOrder<PlayerActivity>,
 		PlayerActivityValue: WithFieldOrder<PlayerActivityValue>,
 		PlayerRequiredAction: WithFieldOrder<PlayerRequiredAction>,
@@ -764,8 +823,8 @@ export const schema: SchemaType = {
 			treasury_percent: 0,
 		},
 		Player: {
-			fieldOrder: ['address', 'timestamp_registered', 'claimed_welcome_pack'],
-			address: "",
+			fieldOrder: ['player_address', 'timestamp_registered', 'claimed_welcome_pack'],
+			player_address: "",
 			timestamp_registered: 0,
 			claimed_welcome_pack: false,
 		},
@@ -844,9 +903,56 @@ export const schema: SchemaType = {
 			contract_address: "",
 			token_id: 0,
 		},
+		TrophyCreation: {
+			fieldOrder: ['id', 'hidden', 'index', 'points', 'start', 'end', 'group', 'icon', 'title', 'description', 'tasks', 'data'],
+			id: 0,
+			hidden: false,
+			index: 0,
+			points: 0,
+			start: 0,
+			end: 0,
+			group: 0,
+			icon: 0,
+			title: 0,
+		description: "",
+			tasks: [{ fieldOrder: ['id', 'total', 'description'], id: 0, total: 0, description: "", }],
+		data: "",
+		},
+		TrophyCreationValue: {
+			fieldOrder: ['hidden', 'index', 'points', 'start', 'end', 'group', 'icon', 'title', 'description', 'tasks', 'data'],
+			hidden: false,
+			index: 0,
+			points: 0,
+			start: 0,
+			end: 0,
+			group: 0,
+			icon: 0,
+			title: 0,
+		description: "",
+			tasks: [{ fieldOrder: ['id', 'total', 'description'], id: 0, total: 0, description: "", }],
+		data: "",
+		},
+		TrophyProgression: {
+			fieldOrder: ['player_id', 'task_id', 'count', 'time'],
+			player_id: 0,
+			task_id: 0,
+			count: 0,
+			time: 0,
+		},
+		TrophyProgressionValue: {
+			fieldOrder: ['count', 'time'],
+			count: 0,
+			time: 0,
+		},
+		Task: {
+			fieldOrder: ['id', 'total', 'description'],
+			id: 0,
+			total: 0,
+		description: "",
+		},
 		PlayerActivity: {
-			fieldOrder: ['address', 'timestamp', 'activity', 'identifier', 'is_public'],
-			address: "",
+			fieldOrder: ['player_address', 'timestamp', 'activity', 'identifier', 'is_public'],
+			player_address: "",
 			timestamp: 0,
 		activity: Activity.Undefined,
 			identifier: 0,
@@ -925,6 +1031,11 @@ export enum ModelsMapping {
 	DuelistProfile = 'pistols-DuelistProfile',
 	ProfileType = 'pistols-ProfileType',
 	RoundState = 'pistols-RoundState',
+	TrophyCreation = 'achievement-TrophyCreation',
+	TrophyCreationValue = 'achievement-TrophyCreationValue',
+	TrophyProgression = 'achievement-TrophyProgression',
+	TrophyProgressionValue = 'achievement-TrophyProgressionValue',
+	Task = 'achievement-Task',
 	Activity = 'pistols-Activity',
 	PlayerActivity = 'pistols-PlayerActivity',
 	PlayerActivityValue = 'pistols-PlayerActivityValue',

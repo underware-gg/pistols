@@ -7,16 +7,17 @@ rpc = "http://localhost:5050"
 [events]
 raw = true
 historical = [
-  "pistols-PlayerActivity"
+  "pistols-PlayerActivity",
+  "pistols-TrophyProgression",
 ]
 
 [indexing]
 index_pending = true
 index_transactions = false
 contracts = [
-  "erc721:0x1912b9ab63b64905a4f12a1585e73b0928ff4e455ca55ab721e4ee3e9627cc6", # duel_token
-  "erc721:0x67a4ba72d03574dca7de8f951fafe360a5abfa3942f439a92fdeebc12a2364d", # duelist_token
-  "erc721:0x2e2bc3d15e3c425bef2e9ae44d4505ed4e37d720ebd891d1369ffec96430b6a", # pack_token
+  "erc721:0x271caa81bdfb92d3f72e3e293056429a980df91cc7f59f99f52992df96d0018", # duel_token
+  "erc721:0x7ed7793f51b234b91a8add65b2538759759e3750c08fa17ee404d9ee2bc6051", # duelist_token
+  "erc721:0x2da06eb8a28fb22aaaaaaf577e3d446be5c8b46cd8aaa42381572fbc5503af3", # pack_token
   "erc20:0x18301575378f0cb5d6e0d7111a30ab2a4fa01572a2afa3e53a9086dd1c4c48c", # fame_coin
   # "erc20:0x651975902d4e9d753097b0789ae5c4f23219482dc6f9abee5bec9314dee5206", # lords
 ]
