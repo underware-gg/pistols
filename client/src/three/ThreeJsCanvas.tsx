@@ -49,8 +49,6 @@ export const ThreeJsCanvas = ({
 
   return (
     <div>
-      <div id='hidden-container' style={{ position: 'absolute', visibility: 'hidden'}}></div>
-
       <canvas
         id='gameCanvas'
         className='GameCanvas'

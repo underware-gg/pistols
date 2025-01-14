@@ -96,10 +96,7 @@ export const useAnimatedDuel = (duelId: BigNumberish, enabled: boolean) => {
 
   useEffect(() => {
     if (enabled && gameImpl && isAnimatingRound1 && audioLoaded && round1) {
-      console.log(`TRIGGER animateDuel(1)`)
-      const actionA = constants.getPacesCardFromValue(round1.moves_a.card_1) as unknown as Action
-      const actionB = constants.getPacesCardFromValue(round1.moves_b.card_1) as unknown as Action
-      gameImpl.animateDuel(AnimationState.Round1, actionA, actionB, round1.state_a.health, round1.state_b.health, round1.state_a.damage, round1.state_b.damage)
+      gameImpl.animateDuel(AnimationState.Round1)
     }
   }, [enabled, gameImpl, isAnimatingRound1, audioLoaded, round1])
 
