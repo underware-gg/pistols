@@ -944,7 +944,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
   );
 });
 
-const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
+const PlayerStats = ({ duelistId, isLeft, damage, hitChance, visible }) => {
 
   const { name, profilePic, profileType } = useDuelist(duelistId)
   const { isYou } = useIsYou(duelistId)
@@ -973,7 +973,7 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
         
       </div>
       <div className={ isLeft ? 'data-window left' : 'data-window right' }>
-        <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)} >
+        <div className={visible ? 'YesMouse NoDrag' : 'NoMouse NoDrag'} onClick={() => dispatchSelectDuelistId(duelistId)} >
           <ProfilePic className='NoMouse NoDrag profile-picture' duel profilePic={profilePic} profileType={profileType} />
           <img className='NoMouse NoDrag profile-outline' src='/images/ui/duel/card_details/profile_border.png' />
         </div>
@@ -1121,11 +1121,11 @@ const Cards = forwardRef<CardsHandle, { duelId: BigNumberish }>(({ duelId }, ref
     <>
       <div id="overlay" className={isOverlayVisible ? 'visible' : ''} ref={overlayRef}>
         <div className='background'/>
-        <PlayerStats duelistId={duelistIdA} isLeft={true} damage={statsA.damage} hitChance={statsA.hitChance} />
-        <PlayerStats duelistId={duelistIdB} isLeft={false} damage={statsB.damage} hitChance={statsB.hitChance} />
+        <PlayerStats duelistId={duelistIdA} isLeft={true} damage={statsA.damage} hitChance={statsA.hitChance} visible={isOverlayVisible} />
+        <PlayerStats duelistId={duelistIdB} isLeft={false} damage={statsB.damage} hitChance={statsB.hitChance} visible={isOverlayVisible} />
         <div className='env-divider' />
         <div 
-          className='YesMouse NoDrag close-button' 
+          className={isOverlayVisible ? 'YesMouse NoDrag close-button' : 'NoMouse NoDrag close-button'} 
           onClick={collapse}
           onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.25)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
