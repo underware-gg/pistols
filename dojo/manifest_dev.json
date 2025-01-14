@@ -1913,8 +1913,8 @@
       ]
     },
     {
-      "address": "0x271caa81bdfb92d3f72e3e293056429a980df91cc7f59f99f52992df96d0018",
-      "class_hash": "0x669513c53f7659ea40b9ecb95fe3f8fb6a62196e6b22dd7a18db926ed2d88db",
+      "address": "0x5219c1ecb53e1ddba91508bf61c76afb1e38a5f72b150ca6345c73649ac5ad6",
+      "class_hash": "0x6b34259d76c06f077360adc2262010fd8757e1a63f882ceb5094efbe01b61ce",
       "abi": [
         {
           "type": "impl",
@@ -3039,8 +3039,8 @@
       ]
     },
     {
-      "address": "0x7ed7793f51b234b91a8add65b2538759759e3750c08fa17ee404d9ee2bc6051",
-      "class_hash": "0x1ed93cb3bf3cf81759f932410d770dd772b85b3feca9183c6c7b134112703cb",
+      "address": "0x6882b14b449bc07a77044dfb686993f5835d7971de095a713f75f0c9162d978",
+      "class_hash": "0x61065f26154b0b1545471288b60d2385dfacb8dc3a1a48825ee16deb9227eef",
       "abi": [
         {
           "type": "impl",
@@ -4669,8 +4669,8 @@
       ]
     },
     {
-      "address": "0x4c2f2a2d0b8f4541917064e6ee5faabfed8875e4145485159a48596925d9e63",
-      "class_hash": "0x4286fea96124f164fc1f31a65f2f490547532f906351bb0ca3372e68921da57",
+      "address": "0x4b5e9d9334559811550019499900e9301f2113a338ac7bd91c26c580f915186",
+      "class_hash": "0x43cc7cb07a47e7eb51079365d3627f8905ae277ec2f93230d0aa961562a2441",
       "abi": [
         {
           "type": "impl",
@@ -7436,7 +7436,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x47a75c73dd6c078025312fc096932b2f47e6a4735e25515d2e5f850268da776",
+      "class_hash": "0x7520b52f41d94d40b982a4de1b526f9fbabb1b09463b37706fb720c716a9541",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -7496,9 +7496,15 @@
     },
     {
       "members": [],
-      "class_hash": "0x5437bb6d2ec8771f73ce2f3dc5942a91600874ab7aef0f707f0186a9d9c2c77",
+      "class_hash": "0x7b57640355bde4403ffbfd7e0d8161ba626c9565aafd8dd4ea11ad95257488",
       "tag": "pistols-Scoreboard",
       "selector": "0x18889906443a52ec3b3fd07ba7108bcf2b0067bdec842953530710a9dfdb728"
+    },
+    {
+      "members": [],
+      "class_hash": "0x6d4be07910253fbd0d1cba608ac0fc3999ac8d84fecff727292c0a4f20ad60e",
+      "tag": "pistols-ScoreboardTable",
+      "selector": "0x27c4d05ef5265e1457b48f7ec6151c190f11a3159bbb13322c27c285f7ecc1c"
     },
     {
       "members": [],

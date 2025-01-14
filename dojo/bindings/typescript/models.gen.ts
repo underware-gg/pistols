@@ -138,7 +138,6 @@ export interface Duelist {
 	duelist_id: BigNumberish;
 	profile_type: ProfileTypeEnum;
 	timestamp: BigNumberish;
-	score: Score;
 }
 
 // Type definition for `pistols::models::duelist::DuelistChallenge` struct
@@ -156,7 +155,6 @@ export interface DuelistChallengeValue {
 export interface DuelistValue {
 	profile_type: ProfileTypeEnum;
 	timestamp: BigNumberish;
-	score: Score;
 }
 
 // Type definition for `pistols::models::duelist::Score` struct
@@ -171,8 +169,19 @@ export interface Score {
 
 // Type definition for `pistols::models::duelist::Scoreboard` struct
 export interface Scoreboard {
+	holder: BigNumberish;
+	score: Score;
+}
+
+// Type definition for `pistols::models::duelist::ScoreboardTable` struct
+export interface ScoreboardTable {
+	holder: BigNumberish;
 	table_id: BigNumberish;
-	duelist_id: BigNumberish;
+	score: Score;
+}
+
+// Type definition for `pistols::models::duelist::ScoreboardTableValue` struct
+export interface ScoreboardTableValue {
 	score: Score;
 }
 
@@ -576,6 +585,8 @@ export interface SchemaType extends ISchemaType {
 		DuelistValue: WithFieldOrder<DuelistValue>,
 		Score: WithFieldOrder<Score>,
 		Scoreboard: WithFieldOrder<Scoreboard>,
+		ScoreboardTable: WithFieldOrder<ScoreboardTable>,
+		ScoreboardTableValue: WithFieldOrder<ScoreboardTableValue>,
 		ScoreboardValue: WithFieldOrder<ScoreboardValue>,
 		Pack: WithFieldOrder<Pack>,
 		PackValue: WithFieldOrder<PackValue>,
@@ -734,14 +745,13 @@ export const schema: SchemaType = {
 			minted_count: 0,
 		},
 		Duelist: {
-			fieldOrder: ['duelist_id', 'profile_type', 'timestamp', 'score'],
+			fieldOrder: ['duelist_id', 'profile_type', 'timestamp'],
 			duelist_id: 0,
 		profile_type: new CairoCustomEnum({ 
 					Undefined: (),
 				duelist: undefined,
 				bot: undefined, }),
 			timestamp: 0,
-		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		DuelistChallenge: {
 			fieldOrder: ['duelist_id', 'duel_id'],
@@ -753,13 +763,12 @@ export const schema: SchemaType = {
 			duel_id: 0,
 		},
 		DuelistValue: {
-			fieldOrder: ['profile_type', 'timestamp', 'score'],
+			fieldOrder: ['profile_type', 'timestamp'],
 		profile_type: new CairoCustomEnum({ 
 					Undefined: (),
 				duelist: undefined,
 				bot: undefined, }),
 			timestamp: 0,
-		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		Score: {
 			fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'],
@@ -771,9 +780,18 @@ export const schema: SchemaType = {
 			honour_history: 0,
 		},
 		Scoreboard: {
-			fieldOrder: ['table_id', 'duelist_id', 'score'],
+			fieldOrder: ['holder', 'score'],
+			holder: 0,
+		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
+		},
+		ScoreboardTable: {
+			fieldOrder: ['holder', 'table_id', 'score'],
+			holder: 0,
 			table_id: 0,
-			duelist_id: 0,
+		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
+		},
+		ScoreboardTableValue: {
+			fieldOrder: ['score'],
 		score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		ScoreboardValue: {
@@ -997,6 +1015,8 @@ export enum ModelsMapping {
 	DuelistValue = 'pistols-DuelistValue',
 	Score = 'pistols-Score',
 	Scoreboard = 'pistols-Scoreboard',
+	ScoreboardTable = 'pistols-ScoreboardTable',
+	ScoreboardTableValue = 'pistols-ScoreboardTableValue',
 	ScoreboardValue = 'pistols-ScoreboardValue',
 	Pack = 'pistols-Pack',
 	PackType = 'pistols-PackType',
