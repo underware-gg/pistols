@@ -1701,27 +1701,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_admin_setTableAdmittance_calldata = (tableAdmittance: models.TableAdmittance) => {
-		return {
-			contractName: "admin",
-			entrypoint: "set_table_admittance",
-			calldata: [tableAdmittance],
-		};
-	};
-
-	const admin_setTableAdmittance = async (snAccount: Account | AccountInterface, tableAdmittance: models.TableAdmittance) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_admin_setTableAdmittance_calldata(tableAdmittance),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_admin_setTreasury_calldata = (treasuryAddress: string) => {
 		return {
 			contractName: "admin",
@@ -2301,8 +2280,6 @@ export function setupWorld(provider: DojoProvider) {
 			buildSetPausedCalldata: build_admin_setPaused_calldata,
 			setTable: admin_setTable,
 			buildSetTableCalldata: build_admin_setTable_calldata,
-			setTableAdmittance: admin_setTableAdmittance,
-			buildSetTableAdmittanceCalldata: build_admin_setTableAdmittance_calldata,
 			setTreasury: admin_setTreasury,
 			buildSetTreasuryCalldata: build_admin_setTreasury_calldata,
 		},

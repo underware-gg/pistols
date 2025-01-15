@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use pistols::models::config::{Config};
-use pistols::models::table::{TableConfig, TableAdmittance};
+use pistols::models::table::{TableConfig};
 
 // based on RYO
 // https://github.com/cartridge-gg/rollyourown/blob/market_packed/src/systems/ryo.cairo
@@ -17,7 +17,6 @@ pub trait IAdmin<TState> {
 
     fn open_table(ref self: TState, table_id: felt252, is_open: bool);
     fn set_table(ref self: TState, table: TableConfig);
-    fn set_table_admittance(ref self: TState, table_admittance: TableAdmittance);
 }
 
 #[dojo::contract]
@@ -30,7 +29,7 @@ pub mod admin {
     use dojo::model::{ModelStorage, ModelValueStorage};
 
     use pistols::models::config::{Config, ConfigTrait};
-    use pistols::models::table::{TableConfig, TableConfigTrait, TableAdmittance, TableInitializer, TableInitializerTrait};
+    use pistols::models::table::{TableConfig, TableConfigTrait, TableInitializer, TableInitializerTrait};
     use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::misc::{ZERO};
@@ -135,18 +134,6 @@ pub mod admin {
             let mut world = self.world_default();
             let mut store: Store = StoreTrait::new(world);
             store.set_table_config(@table);
-        }
-
-        fn set_table_admittance(ref self: ContractState, table_admittance: TableAdmittance) {
-            self.assert_caller_is_admin();
-            assert(table_admittance.table_id != 0, Errors::INVALID_TABLE);
-            // check table
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
-            let mut table: TableConfig = store.get_table_config(table_admittance.table_id);
-            assert(table.exists(), Errors::INVALID_TABLE);
-            // update
-            store.set_table_admittance(@table_admittance);
         }
 
         fn open_table(ref self: ContractState, table_id: felt252, is_open: bool) {

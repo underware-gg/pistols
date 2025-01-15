@@ -8,7 +8,7 @@ mod tests {
 
     use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
     use pistols::models::config::{Config};
-    use pistols::models::table::{TableConfig, TableAdmittance, TABLES};
+    use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::constants::{CONST};
     use pistols::tests::tester::{tester, tester::{TestSystems, FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
     use pistols::interfaces::systems::{SELECTORS};
@@ -219,65 +219,4 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         tester::execute_admin_open_table(@sys.admin, OWNER(), INVALID_TABLE, false);
     }
-
-
-    //
-    // admittance
-    //
-
-    #[test]
-    fn test_set_table_admittance() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        let mut admittance: TableAdmittance = tester::get_TableAdmittance(sys.world, TABLES::LORDS);
-        assert(admittance.accounts.len() == 0, 'accounts_default');
-        assert(admittance.duelists.len() == 0, 'duelists_default');
-        admittance.accounts = array![OWNER(), OTHER()];
-        tester::execute_admin_set_table_admittance(@sys.admin, OWNER(), admittance);
-        let mut admittance: TableAdmittance = tester::get_TableAdmittance(sys.world, TABLES::LORDS);
-        assert(admittance.accounts.len() == 2, 'accounts_2');
-        assert(admittance.duelists.len() == 0, 'duelists_0');
-        admittance.duelists = array![1, 2, 3];
-        tester::execute_admin_set_table_admittance(@sys.admin, OWNER(), admittance);
-        let mut admittance: TableAdmittance = tester::get_TableAdmittance(sys.world, TABLES::LORDS);
-        assert(admittance.accounts.len() == 2, 'accounts_22');
-        assert(admittance.duelists.len() == 3, 'duelists_3');
-        admittance.accounts = array![];
-        tester::execute_admin_set_table_admittance(@sys.admin, OWNER(), admittance);
-        let mut admittance: TableAdmittance = tester::get_TableAdmittance(sys.world, TABLES::LORDS);
-        assert(admittance.accounts.len() == 0, 'accounts_00');
-        assert(admittance.duelists.len() == 3, 'duelists_0');
-        admittance.duelists = array![];
-        tester::execute_admin_set_table_admittance(@sys.admin, OWNER(), admittance);
-        let mut admittance: TableAdmittance = tester::get_TableAdmittance(sys.world, TABLES::LORDS);
-        assert(admittance.accounts.len() == 0, 'accounts_00');
-        assert(admittance.duelists.len() == 0, 'duelists_00');
-    }
-
-    #[test]
-    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
-    fn test_set_table_admittance_not_owner() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        let mut admittance: TableAdmittance = tester::get_TableAdmittance(sys.world, TABLES::LORDS);
-        tester::execute_admin_set_table_admittance(@sys.admin, OTHER(), admittance);
-    }
-
-    #[test]
-    #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
-    fn test_set_table_admittance_zero() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        let mut admittance: TableAdmittance = tester::get_TableAdmittance(sys.world, TABLES::LORDS);
-        admittance.table_id = 0;
-        tester::execute_admin_set_table_admittance(@sys.admin, OWNER(), admittance);
-    }
-
-    #[test]
-    #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
-    fn test_set_table_admittance_invalid() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        let mut admittance: TableAdmittance = tester::get_TableAdmittance(sys.world, TABLES::LORDS);
-        admittance.table_id = INVALID_TABLE;
-        tester::execute_admin_set_table_admittance(@sys.admin, OWNER(), admittance);
-    }
-
-
 }

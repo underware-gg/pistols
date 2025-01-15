@@ -65,7 +65,6 @@ mod tester {
         },
         table::{
             m_TableConfig, TableConfig, TableConfigValue,
-            m_TableAdmittance, TableAdmittance, TableAdmittanceValue,
         },
         table::{TABLES},
     };
@@ -193,7 +192,6 @@ mod tester {
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
             TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
-            TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
@@ -428,11 +426,6 @@ mod tester {
         (*system).set_table(table);
         _next_block();
     }
-    fn execute_admin_set_table_admittance(system: @IAdminDispatcher, sender: ContractAddress, table_admittance: TableAdmittance) {
-        impersonate(sender);
-        (*system).set_table_admittance(table_admittance);
-        _next_block();
-    }
     fn execute_admin_open_table(system: @IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
         impersonate(sender);
         (*system).open_table(table_id, enabled);
@@ -537,10 +530,6 @@ mod tester {
     }
     #[inline(always)]
     fn get_Table(world: WorldStorage, table_id: felt252) -> TableConfig {
-        (world.read_model(table_id))
-    }
-    #[inline(always)]
-    fn get_TableAdmittance(world: WorldStorage, table_id: felt252) -> TableAdmittance {
         (world.read_model(table_id))
     }
     #[inline(always)]

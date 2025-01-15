@@ -197,17 +197,6 @@ export function createSystemCalls(
         console.warn(`FUNCTIONALITY DISABLED!`)
         return false
       },
-      set_table_admittance: async (signer: AccountInterface, table_admittance: any): Promise<boolean | null> => {
-        // const args = Object.keys(TableAdmittance.schema).map(key => {
-        //   const value = table_admittance[key]
-        //   if (value == null) throw new Error()
-        //   return value
-        // })
-        // const calls: DojoCalls = [admin_call('set_table_admittance', args)]
-        // return await _executeTransaction(signer, calls)
-        console.warn(`FUNCTIONALITY DISABLED!`)
-        return false
-      },
     },
   }
 }

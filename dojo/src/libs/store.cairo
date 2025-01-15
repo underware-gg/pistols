@@ -33,7 +33,6 @@ pub use pistols::models::{
     },
     table::{
         TableConfig, TableConfigValue,
-        TableAdmittance, TableAdmittanceValue,
     },
     payment::{
         Payment, PaymentTrait, PaymentValue,
@@ -140,11 +139,6 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_table_admittance(ref self: Store, table_id: felt252) -> TableAdmittance {
-        (self.world.read_model(table_id))
-    }
-
-    #[inline(always)]
     fn get_coin_config(ref self: Store, contract_address: ContractAddress) -> CoinConfig {
         (self.world.read_model(contract_address))
     }
@@ -236,11 +230,6 @@ impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_table_config(ref self: Store, model: @TableConfig) {
-        self.world.write_model(model);
-    }
-
-    #[inline(always)]
-    fn set_table_admittance(ref self: Store, model: @TableAdmittance) {
         self.world.write_model(model);
     }
 

@@ -54,7 +54,6 @@ use pistols::models::{
     },
     table::{
         m_TableConfig, TableConfig,
-        m_TableAdmittance, TableAdmittance,
     },
     table::{TABLES},
 };
@@ -155,7 +154,6 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
             TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
-            TestResource::Model(m_TableAdmittance::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),

@@ -143,7 +143,6 @@ pub mod duel_token {
         pact::{Pact, PactTrait},
         table::{
             TableConfig, TableConfigTrait, TableConfigValue,
-            TableAdmittance, TableAdmittanceTrait,
             TableType, TABLES,
         },
     };
@@ -237,9 +236,8 @@ pub mod duel_token {
 
         fn can_join(self: @ContractState, table_id: felt252, duelist_id: u128) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
-            let table: TableConfigValue = store.get_table_config_value(table_id);
-            let table_admittance: TableAdmittance = store.get_table_admittance(table_id);
-            (table.is_open && table_admittance.can_join(get_caller_address(), duelist_id))
+            let table: TableConfig = store.get_table_config(table_id);
+            (table.can_join(get_caller_address(), duelist_id))
         }
 
         //-----------------------------------
@@ -276,16 +274,15 @@ pub mod duel_token {
             store.emit_required_action(duelist_id_a, duel_id);
 
             // validate table
-            let table: TableConfigValue = store.get_table_config_value(table_id);
+            let table: TableConfig = store.get_table_config(table_id);
             assert(table.is_open == true, Errors::TABLE_IS_CLOSED);
-            let table_admittance: TableAdmittance = store.get_table_admittance(table_id);
-            assert(table_admittance.can_join(address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
+            assert(table.can_join(address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
 
             // validate challenged
             assert(challenged_address.is_non_zero(), Errors::INVALID_CHALLENGED_NULL);
             let address_b: ContractAddress = challenged_address;
             assert(challenged_address != address_a, Errors::INVALID_CHALLENGED_SELF);
-            assert(table_admittance.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
+            assert(table.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
 
             // calc expiration
             let timestamp_start: u64 = get_block_timestamp();

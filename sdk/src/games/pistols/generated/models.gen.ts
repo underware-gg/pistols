@@ -286,19 +286,6 @@ export interface PlayerValue {
 	claimed_welcome_pack: boolean;
 }
 
-// Type definition for `pistols::models::table::TableAdmittance` struct
-export interface TableAdmittance {
-	table_id: BigNumberish;
-	accounts: Array<string>;
-	duelists: Array<BigNumberish>;
-}
-
-// Type definition for `pistols::models::table::TableAdmittanceValue` struct
-export interface TableAdmittanceValue {
-	accounts: Array<string>;
-	duelists: Array<BigNumberish>;
-}
-
 // Type definition for `pistols::models::table::TableConfig` struct
 export interface TableConfig {
 	table_id: BigNumberish;
@@ -602,8 +589,6 @@ export interface SchemaType extends ISchemaType {
 		PlayerTutorialProgress: WithFieldOrder<PlayerTutorialProgress>,
 		PlayerTutorialProgressValue: WithFieldOrder<PlayerTutorialProgressValue>,
 		PlayerValue: WithFieldOrder<PlayerValue>,
-		TableAdmittance: WithFieldOrder<TableAdmittance>,
-		TableAdmittanceValue: WithFieldOrder<TableAdmittanceValue>,
 		TableConfig: WithFieldOrder<TableConfig>,
 		TableConfigValue: WithFieldOrder<TableConfigValue>,
 		TokenBoundAddress: WithFieldOrder<TokenBoundAddress>,
@@ -890,17 +875,6 @@ export const schema: SchemaType = {
 			timestamp_registered: 0,
 			claimed_welcome_pack: false,
 		},
-		TableAdmittance: {
-			fieldOrder: ['table_id', 'accounts', 'duelists'],
-			table_id: 0,
-			accounts: [""],
-			duelists: [0],
-		},
-		TableAdmittanceValue: {
-			fieldOrder: ['accounts', 'duelists'],
-			accounts: [""],
-			duelists: [0],
-		},
 		TableConfig: {
 			fieldOrder: ['table_id', 'description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
 			table_id: 0,
@@ -1046,8 +1020,6 @@ export enum ModelsMapping {
 	PlayerTutorialProgressValue = 'pistols-PlayerTutorialProgressValue',
 	PlayerValue = 'pistols-PlayerValue',
 	TutorialProgress = 'pistols-TutorialProgress',
-	TableAdmittance = 'pistols-TableAdmittance',
-	TableAdmittanceValue = 'pistols-TableAdmittanceValue',
 	TableConfig = 'pistols-TableConfig',
 	TableConfigValue = 'pistols-TableConfigValue',
 	TableType = 'pistols-TableType',
