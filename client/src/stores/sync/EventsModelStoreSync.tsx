@@ -31,8 +31,6 @@ export function EventsModelStoreSync() {
     },
   }), [])
 
-  console.log(`EventsModelStoreSync() =>`, duelistIds, query_get)
-
   useSdkEntities({
     query_get,
     query_sub,

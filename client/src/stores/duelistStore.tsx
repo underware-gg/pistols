@@ -31,6 +31,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   const duelist = useEntityModel<models.Duelist>(entity, 'Duelist')
   const duelistChallenge = useEntityModel<models.DuelistChallenge>(entity, 'DuelistChallenge')
+  const scoreboard = useEntityModel<models.Scoreboard>(entity, 'Scoreboard')
   // console.log(`useDuelist() =>`, duelist_id, duelist)
 
   const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(constants.CONST.MAX_DUELIST_ID)), [duelist_id])
@@ -52,7 +53,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id, isValidDuelistId])
   const profilePic = useMemo(() => (profileDescription.profile_id), [profileDescription])
 
-  const score = useScore(duelist?.score)
+  const score = useScore(scoreboard?.score)
 
   const currentDuelId = useMemo(() => BigInt(duelistChallenge?.duel_id ?? 0), [duelistChallenge])
   const isInAction = useMemo(() => (currentDuelId > 0n), [currentDuelId])

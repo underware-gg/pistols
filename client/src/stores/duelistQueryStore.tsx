@@ -39,19 +39,20 @@ const createStore = () => {
   const _parseEntity = (e: PistolsEntity) => {
     let duelist = e.models.pistols.Duelist
     let currentChallenge = e.models.pistols.DuelistChallenge
+    let scoreboard = e.models.pistols.Scoreboard
     if (!duelist) return undefined
     return {
       duelist_id: BigInt(duelist.duelist_id),
       timestamp: Number(duelist.timestamp),
       name: 'DUELIST_????',
       fame: 0,
-      honour: Number(duelist.score.honour ?? 0),
-      win_ratio: calcWinRatio(Number(duelist.score.total_duels ?? 0), Number(duelist.score.total_wins ?? 0)),
-      total_duels: Number(duelist.score.total_duels ?? 0),
-      total_wins: Number(duelist.score.total_wins ?? 0),
-      total_losses: Number(duelist.score.total_losses ?? 0),
-      total_draws: Number(duelist.score.total_draws ?? 0),
-      is_active: (Number(duelist.score.total_duels ?? 0) > 0 || isPositiveBigint(currentChallenge?.duel_id ?? 0n)),
+      honour: Number(scoreboard?.score.honour ?? 0),
+      win_ratio: calcWinRatio(Number(scoreboard?.score.total_duels ?? 0), Number(scoreboard?.score.total_wins ?? 0)),
+      total_duels: Number(scoreboard?.score.total_duels ?? 0),
+      total_wins: Number(scoreboard?.score.total_wins ?? 0),
+      total_losses: Number(scoreboard?.score.total_losses ?? 0),
+      total_draws: Number(scoreboard?.score.total_draws ?? 0),
+      is_active: (Number(scoreboard?.score.total_duels ?? 0) > 0 || isPositiveBigint(currentChallenge?.duel_id ?? 0n)),
     }
   }
   return create<State>()(immer((set) => ({

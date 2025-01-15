@@ -11,12 +11,14 @@ import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
 
 const query_get: PistolsGetQuery = {
   pistols: {
+    // models
     Config: { $: { where: { key: { $eq: constants.CONFIG.CONFIG_KEY } } } },
     TableConfig: { $: { where: { table_id: { $neq: 0 } } } },
     TokenConfig: { $: { where: { token_address: { $neq: '' } } } },
+    Player: { $: { where: { player_address: { $neq: '' } } } },
     Duelist: { $: { where: { duelist_id: { $neq: 0 } } } },
     DuelistChallenge: { $: { where: { duelist_id: { $neq: 0 } } } },
-    Player: { $: { where: { player_address: { $neq: '' } } } },
+    Scoreboard: { $: { where: { holder: { $neq: 0 } } } },
   },
 }
 const query_get_messages: PistolsGetQuery = {
@@ -29,12 +31,15 @@ const query_get_messages: PistolsGetQuery = {
 }
 const query_sub: PistolsSubQuery = {
   pistols: {
+    // models
     Config: [],
     TableConfig: [],
     TokenConfig: [],
+    Player: [],
     Duelist: [],
     DuelistChallenge: [],
-    Player: [],
+    Scoreboard: [],
+    // off-chain signed messages
     PlayerOnline: [],
     PlayerBookmark: [],
     PlayerTutorialProgress: [],
@@ -69,9 +74,13 @@ export function EntityStoreSync() {
       configState.setEntities(filterEntitiesByModel(entities, 'Config'))
       tableState.setEntities(filterEntitiesByModel(entities, 'TableConfig'))
       tokenState.setEntities(filterEntitiesByModel(entities, 'TokenConfig'))
-      duelistState.setEntities(filterEntitiesByModel(entities, 'Duelist'))
-      duelistQueryState.setEntities(filterEntitiesByModel(entities, 'Duelist'))
       playerState.setEntities(filterEntitiesByModel(entities, 'Player'))
+      const duelistEntities = []
+        .concat(filterEntitiesByModel(entities, 'Duelist'))
+        .concat(filterEntitiesByModel(entities, 'DuelistChallenge'))
+        .concat(filterEntitiesByModel(entities, 'Scoreboard'))
+      duelistState.setEntities(duelistEntities)
+      duelistQueryState.setEntities(duelistEntities)
     },
     updateEntity: (entity: PistolsEntity) => {
       console.log("EntityStoreSync() UPDATE =======> [entity]:", entity)
@@ -84,18 +93,15 @@ export function EntityStoreSync() {
       if (getEntityModel(entity, 'TokenConfig')) {
         tokenState.updateEntity(entity)
       }
-      if (getEntityModel(entity, 'Duelist')) {
-        duelistState.updateEntity(entity)
-        duelistQueryState.updateEntity(entity)
-      }
-      if (getEntityModel(entity, 'DuelistChallenge')) {
-        duelistState.updateEntity(entity)
-      }
       if (getEntityModel(entity, 'Player')) {
         playerState.updateEntity(entity)
       }
       if (getEntityModels(entity, ['PlayerOnline', 'PlayerBookmark', 'PlayerTutorialProgress']).length > 0) {
         playerState.updateMessages([entity])
+      }
+      if (getEntityModel(entity, 'Duelist') || getEntityModel(entity, 'Scoreboard') || getEntityModel(entity, 'DuelistChallenge')) {
+        duelistState.updateEntity(entity)
+        duelistQueryState.updateEntity(entity)
       }
     },
   })
