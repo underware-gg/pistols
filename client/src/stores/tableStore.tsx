@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk'
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
-import { useEntityId, feltToString, stringToFelt } from '@underware_gg/pistols-sdk/utils'
+import { useEntityId, feltToString, stringToFelt, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 
 export const useTableConfigStore = createDojoStore<PistolsSchemaType>();
@@ -24,12 +24,12 @@ export const useTable = (table_id: string) => {
 
   const description = useMemo(() => (table ? feltToString(table.description) : '?'), [table])
   const feeMin = useMemo(() => BigInt(table?.fee_min ?? 0), [table])
-  const tableType = useMemo(() => ((table?.table_type as unknown as constants.TableType) ?? null), [table])
+  const tableType = useMemo(() => (parseEnumVariant<constants.TableType>(table?.table_type) ?? null), [table])
   const tableTypeDescription = useMemo(() => (table?.table_type ? {
     [constants.TableType.Classic]: 'Classic',
     [constants.TableType.Tournament]: 'Tournament',
     [constants.TableType.IRLTournament]: 'IRL Tournamment',
-  }[table.table_type] : null), [table])
+  }[tableType] : null), [table])
 
   return {
     tableId: table_id,

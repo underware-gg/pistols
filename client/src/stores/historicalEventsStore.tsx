@@ -2,7 +2,7 @@ import { BigNumberish } from 'starknet'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { constants, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
-import { arrayClean, bigintToHex, bigintToNumber } from '@underware_gg/pistols-sdk/utils'
+import { arrayClean, bigintToHex, bigintToNumber, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
 
 
 //-----------------------------------------
@@ -28,7 +28,7 @@ const createStore = () => {
     return event ? {
       player_address: bigintToHex(event.player_address),
       timestamp: bigintToNumber(event.timestamp),
-      activity: event.activity as unknown as constants.Activity,
+      activity: parseEnumVariant<constants.Activity>(event.activity),
       identifier: BigInt(event.identifier),
       is_public: event.is_public,
     } : undefined

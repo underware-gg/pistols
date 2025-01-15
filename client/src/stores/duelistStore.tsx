@@ -41,13 +41,16 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const timestamp = useMemo(() => Number(duelist?.timestamp ?? 0), [duelist])
   const exists = useMemo(() => Boolean(timestamp), [timestamp])
 
-  const [profileType, profileTypeValue] = useMemo(() => parseCustomEnum<constants.DuelistProfile>(duelist?.profile_type as unknown as CairoCustomEnum), [duelist])
-  // console.log(`!!!!!!!!!!! duelist profileType >>>>>`, duelist_id, profileType, profileTypeValue, constants.DUELIST_PROFILES[profileTypeValue])
+  const {
+    variant: profileType,
+    value: profileValue,
+  } = useMemo(() => parseCustomEnum<constants.DuelistProfile>(duelist?.profile_type), [duelist])
+  // console.log(`!!!!!!!!!!! duelist profileType >>>>>`, duelist_id, profileType, profileValue, constants.DUELIST_PROFILES[profileValue])
   const profileDescription = useMemo(() => (
-    profileType == constants.ProfileType.Duelist ? constants.DUELIST_PROFILES[profileTypeValue]
-      : profileType == constants.ProfileType.Bot ? constants.BOT_PROFILES[profileTypeValue]
+    profileType == constants.ProfileType.Duelist ? constants.DUELIST_PROFILES[profileValue]
+      : profileType == constants.ProfileType.Bot ? constants.BOT_PROFILES[profileValue]
         : constants.DUELIST_PROFILES[constants.DuelistProfile.Unknown]
-  ), [profileType, profileTypeValue])
+  ), [profileType, profileValue])
 
   const name = useMemo(() => (profileDescription.name), [profileDescription])
   const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id, isValidDuelistId])
@@ -67,7 +70,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     exists,
     timestamp,
     profileType,
-    profileTypeValue,
+    profileValue,
     profilePic,
     currentDuelId,
     isInAction,

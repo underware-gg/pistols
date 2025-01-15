@@ -6,7 +6,7 @@ import { useAccount } from '@starknet-react/core'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { constants, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
-import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@underware_gg/pistols-sdk/utils'
+import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, parseEnumVariant, shortAddress, sortObjectByValue } from '@underware_gg/pistols-sdk/utils'
 
 interface PlayerState {
   player_address: string
@@ -91,7 +91,7 @@ const createStore = () => {
           if (progress) {
             const address = bigintToHex(progress.identity)
             if (state.players[address]) {
-              state.players[address].tutorial_progress = progress.progress as unknown as constants.TutorialProgress
+              state.players[address].tutorial_progress = parseEnumVariant<constants.TutorialProgress>(progress.progress)
             }
           }
           const bookmark = e.models.pistols.PlayerBookmark

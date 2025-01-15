@@ -10,7 +10,6 @@ import {
   encode,
   Abi,
   ec,
-  CairoCustomEnum,
 } from 'starknet'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 
@@ -34,31 +33,6 @@ export const chainIdToBigInt = (chainId: string | bigint | null | undefined): bi
 export const U256ToBigint = (v: Uint256): bigint => (uint256.uint256ToBN(v))
 export const bigintToU256 = (v: BigNumberish): Uint256 => (uint256.bnToUint256(v))
 
-
-//
-// Cairo enums
-// https://starknetjs.com/docs/api/classes/cairocustomenum/
-// https://starknetjs.com/docs/guides/cairo_enum#cairo-custom-enum
-export const parseCustomEnum = <T extends number | BigNumberish | string>(data: CairoCustomEnum | string | null): [
-  string | undefined, // variant name
-  T | undefined,      // variant value
-] => (
-  !data ? [undefined, undefined]
-    : typeof data === 'string' ? [data, undefined]
-      : [
-        data.activeVariant(),
-        data.unwrap() as T,
-      ]
-)
-// https://starknetjs.com/docs/guides/cairo_enum#send-cairo-custom-enum
-export const makeCustomEnum = <T extends number | BigNumberish>(name: string | null, value?: T): CairoCustomEnum | undefined => (
-  (name) ? new CairoCustomEnum({
-    [name]:
-      typeof value === 'undefined' ? {} // Empty:()
-        : typeof value === 'number' ? value
-          : bigintToHex(value)
-  }) : undefined
-)
 
 //
 // ETH conversions

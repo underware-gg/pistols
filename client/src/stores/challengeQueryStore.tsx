@@ -6,7 +6,7 @@ import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { constants, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
-import { bigintEquals, isPositiveBigint, keysToEntity } from '@underware_gg/pistols-sdk/utils'
+import { bigintEquals, isPositiveBigint, keysToEntity, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
 import { BigNumberish } from 'starknet'
 
 
@@ -41,7 +41,7 @@ const createStore = () => {
     if (!challenge) return undefined
     const start = Number(challenge.timestamp_start)
     const end = Number(challenge.timestamp_end)
-    const state = challenge.state as unknown as constants.ChallengeState
+    const state = parseEnumVariant<constants.ChallengeState>(challenge.state)
     return {
       duel_id: BigInt(challenge.duel_id),
       timestamp: end ? end : start,

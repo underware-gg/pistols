@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useSdkState, getEntityMapModels, formatQueryValue } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsGetQuery } from '@underware_gg/pistols-sdk/pistols'
-import { stringToFelt } from '@underware_gg/pistols-sdk/utils'
+import { parseEnumVariant, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 
 
@@ -33,12 +33,12 @@ export const useTableTotals = (tableId: string) => {
   const { challenges } = useGetChallengesByTableQuery(tableId)
   const result = useMemo(() => {
     const liveDuelsCount = challenges.reduce((acc: number, ch: models.Challenge) => {
-      const state = (ch.state as unknown as constants.ChallengeState) ?? constants.ChallengeState.Null
+      const state = parseEnumVariant<constants.ChallengeState>(ch.state) ?? constants.ChallengeState.Null
       if (LiveChallengeStates.includes(state)) acc++
       return acc
     }, 0)
     const pastDuelsCount = challenges.reduce((acc: number, ch: models.Challenge) => {
-      const state = (ch.state as unknown as constants.ChallengeState) ?? constants.ChallengeState.Null
+      const state = parseEnumVariant<constants.ChallengeState>(ch.state) ?? constants.ChallengeState.Null
       if (PastChallengeStates.includes(state)) acc++
       return acc
     }, 0)

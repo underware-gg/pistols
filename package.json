@@ -8,7 +8,8 @@
   "private": true,
   "scripts": {
     "dev": "turbo watch dev",
-    "devs": "turbo watch devs"
+    "devs": "turbo watch devs",
+    "test": "cd sdk && pnpm test"
   },
   "devDependencies": {
     "turbo": "^2.3.3"

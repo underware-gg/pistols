@@ -1,8 +1,9 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
 import { AccountInterface, BigNumberish, Call, CallData } from 'starknet'
-import { stringToFelt, bigintToU256, makeCustomEnum } from 'src/utils/misc/starknet'
 import { arrayClean, shortAddress, isPositiveBigint } from 'src/utils/misc/types'
 import { NAMESPACE, getLordsAddress, getBankAddress } from 'src/games/pistols/config/config'
+import { stringToFelt, bigintToU256 } from 'src/utils/misc/starknet'
+import { makeCustomEnum } from 'src/utils/misc/starknet_enum'
 import { DojoChainConfig } from 'src/dojo/setup/chains'
 import { DojoManifest } from 'src/dojo/contexts/Dojo'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
@@ -150,7 +151,7 @@ export function createSystemCalls(
       },
       purchase: async (signer: AccountInterface, pack_type: constants.PackType): Promise<boolean> => {
         const pack_type_enum = makeCustomEnum(pack_type)
-        const approved_value = await constractCalls.pack_token.calcMintFee(signer.address, pack_type_enum as unknown as models.PackType) as BigNumberish
+        const approved_value = await constractCalls.pack_token.calcMintFee(signer.address, pack_type_enum) as BigNumberish
         const args = [pack_type_enum]
         let calls: DojoCalls = [
           approve_call(approved_value),

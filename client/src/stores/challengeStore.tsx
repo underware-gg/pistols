@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish, CairoCustomEnum } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk'
-import { useEntityId, useClientTimestamp, feltToString, parseCustomEnum, bigintEquals } from '@underware_gg/pistols-sdk/utils'
+import { useEntityId, useClientTimestamp, feltToString, parseCustomEnum, bigintEquals, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { movesToHand } from '/src/utils/pistols'
@@ -29,7 +29,7 @@ export const usePendingChallengesIds = (address: BigNumberish) => {
   const entities = useChallengeStore((state) => state.entities)
   const pendingDuelIds = useMemo(() => (
     Object.values(entities)
-      .filter(e => e.models.pistols.Challenge.state as unknown as constants.ChallengeState == constants.ChallengeState.Awaiting)
+      .filter(e => parseEnumVariant<constants.ChallengeState>(e.models.pistols.Challenge.state) == constants.ChallengeState.Awaiting)
       .filter(e => bigintEquals(e.models.pistols.Challenge.address_b, address))
       .map(e => BigInt(e.models.pistols.Challenge.duel_id))
   ), [address, entities])
@@ -62,13 +62,13 @@ export const useChallenge = (duelId: BigNumberish) => {
   const duelistIdA = useMemo(() => BigInt(challenge?.duelist_id_a ?? 0), [challenge])
   const duelistIdB = useMemo(() => BigInt(challenge?.duelist_id_b ?? 0), [challenge])
   const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
-  const premise = useMemo(() => (challenge?.premise as unknown as constants.Premise ?? constants.Premise.Undefined), [challenge])
+  const premise = useMemo(() => (parseEnumVariant<constants.Premise>(challenge?.premise) ?? constants.Premise.Undefined), [challenge])
   const quote = useMemo(() => feltToString(challenge?.quote ?? 0n), [challenge])
   const timestamp_start = useMemo(() => Number(challenge?.timestamp_start ?? 0), [challenge])
   const timestamp_end = useMemo(() => Number(challenge?.timestamp_end ?? 0), [challenge])
 
   const { clientSeconds } = useClientTimestamp(false)
-  let _state = useMemo(() => (challenge?.state as unknown as constants.ChallengeState), [challenge])
+  let _state = useMemo(() => parseEnumVariant<constants.ChallengeState>(challenge?.state), [challenge])
   let state = useMemo(() => {
     if (_state == constants.ChallengeState.Awaiting && (timestamp_end < clientSeconds)) {
       return constants.ChallengeState.Expired
@@ -112,9 +112,12 @@ export const useRound = (duelId: BigNumberish) => {
 
   const round = useEntityModel<models.Round>(entity, 'Round')
 
-  const state = useMemo(() => (round?.state as unknown as constants.RoundState ?? null), [round])
+  const state = useMemo(() => (parseEnumVariant<constants.RoundState>(round?.state) ?? null), [round])
 
-  const [finalBlowType, finalBlow] = useMemo(() => parseCustomEnum<constants.FinalBlow>(round?.final_blow as unknown as CairoCustomEnum), [round])
+  const {
+    variant: finalBlowType,
+    value: finalBlow
+  } = useMemo(() => parseCustomEnum<constants.FinalBlow>(round?.final_blow), [round])
   const endedInBlades = useMemo(() => (finalBlowType === constants.FinalBlow.Blades), [finalBlowType])
 
   const hand_a = useMemo(() => round ? movesToHand(
