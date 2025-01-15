@@ -1252,8 +1252,8 @@
   },
   "contracts": [
     {
-      "address": "0x2ab0a9b9191e67e235b12aa482b45be3bccf186ce912413d0adf5a062bd7f9e",
-      "class_hash": "0x73f7dea9bca8fa814813a92f2c670e58a04249caf01e137dd641d6373412e6b",
+      "address": "0x2d29010c707a523acf786861153a3ecbec16b490acff9ca9a026e228ca3f465",
+      "class_hash": "0x4963bd7b655e72a7c7c8b6de9e5228db5dfbb54843eac8fdc66c3bb7b3dd6b4",
       "abi": [
         {
           "type": "impl",
@@ -1415,24 +1415,6 @@
           ]
         },
         {
-          "type": "struct",
-          "name": "pistols::models::table::TableAdmittance",
-          "members": [
-            {
-              "name": "table_id",
-              "type": "core::felt252"
-            },
-            {
-              "name": "accounts",
-              "type": "core::array::Array::<core::starknet::contract_address::ContractAddress>"
-            },
-            {
-              "name": "duelists",
-              "type": "core::array::Array::<core::integer::u128>"
-            }
-          ]
-        },
-        {
           "type": "interface",
           "name": "pistols::systems::admin::IAdmin",
           "items": [
@@ -1515,18 +1497,6 @@
                 {
                   "name": "table",
                   "type": "pistols::models::table::TableConfig"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "set_table_admittance",
-              "inputs": [
-                {
-                  "name": "table_admittance",
-                  "type": "pistols::models::table::TableAdmittance"
                 }
               ],
               "outputs": [],
@@ -1656,7 +1626,6 @@
         "set_paused",
         "open_table",
         "set_table",
-        "set_table_admittance",
         "upgrade"
       ]
     },
@@ -1913,8 +1882,8 @@
       ]
     },
     {
-      "address": "0x5219c1ecb53e1ddba91508bf61c76afb1e38a5f72b150ca6345c73649ac5ad6",
-      "class_hash": "0x6b34259d76c06f077360adc2262010fd8757e1a63f882ceb5094efbe01b61ce",
+      "address": "0x5bcd2033896b0dc37b8f97f4f4a0eb7b72f518541cda4a338c91feceab8ad95",
+      "class_hash": "0x20e08986713f0eb63683a61de8c7c2c30ce280e1cc37fcb7eab146f3b1611b9",
       "abi": [
         {
           "type": "impl",
@@ -7505,12 +7474,6 @@
       "class_hash": "0x6d4be07910253fbd0d1cba608ac0fc3999ac8d84fecff727292c0a4f20ad60e",
       "tag": "pistols-ScoreboardTable",
       "selector": "0x27c4d05ef5265e1457b48f7ec6151c190f11a3159bbb13322c27c285f7ecc1c"
-    },
-    {
-      "members": [],
-      "class_hash": "0x70c3e14451ef528f94d2fe0ae370d151d7c4aa739033c742d68ef2736e85907",
-      "tag": "pistols-TableAdmittance",
-      "selector": "0x1b01f43d448ff74f466c59d93552263dc1b4c214ca8a1bf19b80ca2e6105136"
     },
     {
       "members": [],
