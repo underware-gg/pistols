@@ -41,11 +41,11 @@ export default function ScTavern() {
   }, [itemClicked, timestamp])
 
   useEffect(() => {
-    if (!open) {
-      (_currentScene as InteractibleScene).toggleBlur(false);
-      (_currentScene as InteractibleScene).setClickable(true);
+    if (!open && _currentScene) {
+      (_currentScene as InteractibleScene).toggleBlur?.(false);
+      (_currentScene as InteractibleScene).setClickable?.(true);
       setTimeout(() => {
-        (_currentScene as InteractibleScene).excludeItem(null);
+        (_currentScene as InteractibleScene).excludeItem?.(null);
       }, 400)
     }
   }, [open])
