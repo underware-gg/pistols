@@ -605,8 +605,6 @@ export interface SchemaType extends ISchemaType {
 		TableConfigValue: WithFieldOrder<TableConfigValue>,
 		TokenBoundAddress: WithFieldOrder<TokenBoundAddress>,
 		TokenBoundAddressValue: WithFieldOrder<TokenBoundAddressValue>,
-	},
-	achievement: {
 		TrophyCreation: WithFieldOrder<TrophyCreation>,
 		TrophyCreationValue: WithFieldOrder<TrophyCreationValue>,
 		TrophyProgression: WithFieldOrder<TrophyProgression>,
