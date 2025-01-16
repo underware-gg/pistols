@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { BigNumberish, CairoCustomEnum } from 'starknet'
-import { createDojoStore } from '@dojoengine/sdk'
+import { BigNumberish } from 'starknet'
+import { createDojoStore } from '@dojoengine/sdk/state'
 import { useEntityId, useClientTimestamp, feltToString, parseCustomEnum, bigintEquals, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'

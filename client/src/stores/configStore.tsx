@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { createDojoStore } from '@dojoengine/sdk'
+import { createDojoStore } from '@dojoengine/sdk/state'
 import { useEntityModel, getEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { keysToEntity } from '@underware_gg/pistols-sdk/utils'

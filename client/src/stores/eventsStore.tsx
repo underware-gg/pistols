@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { createDojoStore } from '@dojoengine/sdk'
+import { createDojoStore } from '@dojoengine/sdk/state'
 import { PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 
 export const useEventsStore = createDojoStore<PistolsSchemaType>();

@@ -8,7 +8,6 @@ import { DojoChainConfig } from 'src/dojo/setup/chains'
 import { DojoManifest } from 'src/dojo/contexts/Dojo'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'
-import { models } from 'src/exports/games_pistols'
 import * as constants from 'src/games/pistols/generated/constants'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
