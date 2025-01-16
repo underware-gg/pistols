@@ -24,12 +24,12 @@ echo "--------------------------------------------------------------------------
 sozo --version
 echo "------------------------------------------------------------------------------"
 echo ">>> Cleaning..."
-sozo -P $PROFILE $OFFLINE clean
+sozo -P $PROFILE $ARG_OFFLINE clean
 echo ">>> Building..."
 if [[ "$PROFILE" == "dev" ]]; then
-  sozo -P $PROFILE $OFFLINE build $BINDINGS
+  sozo -P $PROFILE $ARG_OFFLINE build $ARG_BINDINGS
 else
-  sozo -P $PROFILE $OFFLINE build
+  sozo -P $PROFILE $ARG_OFFLINE build
 fi
 echo "👍"
 
@@ -38,20 +38,20 @@ echo "👍"
 #
 echo "------------------------------------------------------------------------------"
 echo ">>> Inspect migrations..."
-sozo -P $PROFILE $OFFLINE inspect --world $WORLD_ADDRESS
+sozo -P $PROFILE $ARG_OFFLINE inspect --world $WORLD_ADDRESS
 
-if [[ -n "$INSPECT" ]]; then # if is set
+if [[ -n "$ARG_INSPECT" ]]; then # if is set
   echo "--- INSPECTED! 👍"
   exit 0
 fi
 
 echo ">>> Do migrations..."
-# sozo -P $PROFILE $OFFLINE migrate -vvv --world $WORLD_ADDRESS
-sozo -P $PROFILE $OFFLINE migrate --world $WORLD_ADDRESS
+# sozo -P $PROFILE $ARG_OFFLINE migrate -vvv --world $WORLD_ADDRESS
+sozo -P $PROFILE $ARG_OFFLINE migrate --world $WORLD_ADDRESS
 echo "👍"
 
 echo ">>> Inspect again..."
-sozo -P $PROFILE $OFFLINE inspect --world $WORLD_ADDRESS
+sozo -P $PROFILE $ARG_OFFLINE inspect --world $WORLD_ADDRESS
 
 #-----------------
 # auth write
@@ -94,7 +94,7 @@ echo "👍"
 if [[ "$PROFILE" == "dev" ]]; then
   #
   # copy typescript bindings
-  if [[ -n "$BINDINGS" ]]; then # if is set
+  if [[ -n "$ARG_BINDINGS" ]]; then # if is set
     cp -R $BINDINGS_PATH/typescript/* $SDK_GAME_PATH/generated/
   fi
   #
@@ -113,7 +113,6 @@ if [[ "$PROFILE" == "dev" ]]; then
   echo "------------------------------------------------------------------------------"
   ls -ld $SDK_GAME_PATH/* | grep -E 'ts|json'
 fi
-
 
 #------------------
 echo "--- DONE! 👍"

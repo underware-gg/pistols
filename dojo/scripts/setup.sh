@@ -4,15 +4,15 @@
 #
 if [ $# -lt 1 ]; then
   echo "❌ Error: Missing profile!"
-  echo "usage: $0 <PROFILE> [--offline] [--inspect] [--no-bindings]"
+  echo "usage: $0 <PROFILE> [--offline] [--inspect] [--bindings]"
   exit 1
 fi
 
 # initialize argument variables
 export PROFILE=
-export BINDINGS="--typescript"
-export OFFLINE=
-export INSPECT=
+export ARG_BINDINGS=
+export ARG_OFFLINE=
+export ARG_INSPECT=
 
 # parse arguments
 for arg in "$@"
@@ -27,12 +27,11 @@ do
       exit 1
     fi
   elif [[ $arg == "--offline" ]]; then
-    export OFFLINE="--offline"
+    export ARG_OFFLINE="--offline"
   elif [[ $arg == "--inspect" ]]; then
-    export INSPECT="true"
-    export BINDINGS=""
-  elif [[ $arg == "--no-bindings" ]]; then
-    export BINDINGS=""
+    export ARG_INSPECT="true"
+  elif [[ $arg == "--bindings" ]]; then
+    export ARG_BINDINGS="--typescript"
   else
     echo "❌ Error: Invalid argument: $arg"
     exit 1
@@ -104,7 +103,7 @@ export GAME_ADDRESS=$(get_contract_address "pistols-game")
 export CHAIN_ID=$(starkli chain-id --no-decode --rpc $RPC_URL | xxd -r -p)
 export PROFILE_CHAIN_ID=$(get_profile_env "chain_id")
 
-if [[ -z "$OFFLINE" ]]; then # if not set
+if [[ -z "$ARG_OFFLINE" ]]; then # if not set
   if [[ "$PROFILE_CHAIN_ID" != "$CHAIN_ID" ]]; then
     echo "PROFILE CHAIN ID: [$PROFILE_CHAIN_ID]"
     echo "RPC CHAIN ID: [$CHAIN_ID]"
