@@ -12,7 +12,8 @@ pub enum Activity {
     RepliedChallenge,   // 7
     CommittedMoves,     // 8
     RevealedMoves,      // 9
-    Achievement,        // 10
+    DuelResolved,       // 10
+    DuelDraw,           // 11
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -113,7 +114,7 @@ mod PlayerErrors {
 
 #[generate_trait]
 impl PlayerImpl of PlayerTrait {
-    fn check_in(ref store: Store, player_address: ContractAddress, activity: Activity, identifier: felt252) {
+    fn check_in(ref store: Store, activity: Activity, player_address: ContractAddress, identifier: felt252) {
         let mut player: Player = store.get_player(player_address);
         if (!player.exists()) {
             assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
@@ -147,6 +148,7 @@ impl ActivityImpl of ActivityTrait {
     fn is_public(self: Activity) -> bool {
         match self {
             Activity::StartedTutorial => false,
+            Activity::PurchasedPack => false,
             _ => true,
         }
     }

@@ -70,7 +70,7 @@ pub mod game {
         IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
     };
     use pistols::models::{
-        player::{Player, PlayerTrait, Activity},
+        player::{Player, PlayerTrait, Activity, ActivityTrait},
         challenge::{
             Challenge, ChallengeTrait,
             ChallengeFameBalance,
@@ -221,7 +221,7 @@ pub mod game {
             }
 
             // events
-            PlayerTrait::check_in(ref store, starknet::get_caller_address(), Activity::CommittedMoves, duel_id.into());
+            PlayerTrait::check_in(ref store, Activity::CommittedMoves, starknet::get_caller_address(), duel_id.into());
 
             store.set_round(@round);
         }
@@ -275,7 +275,7 @@ pub mod game {
             }
 
             // events
-            PlayerTrait::check_in(ref store, starknet::get_caller_address(), Activity::RevealedMoves, duel_id.into());
+            Activity::RevealedMoves.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
 
             //
             // missing reveal, update only and wait for final reveal
@@ -308,6 +308,11 @@ pub mod game {
             if (challenge.winner != 0) {
                 // send duel token to winner
                 world.duel_token_dispatcher().transfer_to_winner(duel_id);
+                // winning event
+                Activity::DuelResolved.emit(ref store.world, challenge.winner_address(), duel_id.into());
+            } else {
+                // draw event
+                Activity::DuelDraw.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
             }
 
             // undo pacts

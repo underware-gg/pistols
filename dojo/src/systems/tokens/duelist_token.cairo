@@ -226,7 +226,7 @@ pub mod duelist_token {
                 fame_dispatcher.minted_duelist(duelist.duelist_id, 0);
 
                 // events
-                PlayerTrait::check_in(ref store, recipient, Activity::CreatedDuelist, duelist.duelist_id.into());
+                PlayerTrait::check_in(ref store, Activity::CreatedDuelist, recipient, duelist.duelist_id.into());
 
                 rnd /= 0x100;
                 i += 1;
