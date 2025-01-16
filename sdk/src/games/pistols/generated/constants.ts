@@ -52,7 +52,8 @@ export enum Activity {
   RepliedChallenge = 'RepliedChallenge', // 7
   CommittedMoves = 'CommittedMoves', // 8
   RevealedMoves = 'RevealedMoves', // 9
-  Achievement = 'Achievement', // 10
+  DuelResolved = 'DuelResolved', // 10
+  DuelDraw = 'DuelDraw', // 11
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;

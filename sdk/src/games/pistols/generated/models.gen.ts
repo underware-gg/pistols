@@ -558,7 +558,8 @@ export type Activity = {
 	RepliedChallenge: string;
 	CommittedMoves: string;
 	RevealedMoves: string;
-	Achievement: string;
+	DuelResolved: string;
+	DuelDraw: string;
 }
 export type ActivityEnum = CairoCustomEnum;
 
@@ -1035,7 +1036,8 @@ export const schema: SchemaType = {
 				RepliedChallenge: undefined,
 				CommittedMoves: undefined,
 				RevealedMoves: undefined,
-				Achievement: undefined, }),
+				DuelResolved: undefined,
+				DuelDraw: undefined, }),
 			identifier: 0,
 			is_public: false,
 		},
@@ -1053,7 +1055,8 @@ export const schema: SchemaType = {
 				RepliedChallenge: undefined,
 				CommittedMoves: undefined,
 				RevealedMoves: undefined,
-				Achievement: undefined, }),
+				DuelResolved: undefined,
+				DuelDraw: undefined, }),
 			identifier: 0,
 			is_public: false,
 		},

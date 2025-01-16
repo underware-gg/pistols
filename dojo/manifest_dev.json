@@ -1882,8 +1882,8 @@
       ]
     },
     {
-      "address": "0x5bcd2033896b0dc37b8f97f4f4a0eb7b72f518541cda4a338c91feceab8ad95",
-      "class_hash": "0x20e08986713f0eb63683a61de8c7c2c30ce280e1cc37fcb7eab146f3b1611b9",
+      "address": "0x7a0fac669037984b3113e377e3be65a0c5eb8e234dcad746b5457056d506bdd",
+      "class_hash": "0x3c8f69e36c183b2499ebeb3176878072018e9d04737fe910a5a9a2286e7a2ad",
       "abi": [
         {
           "type": "impl",
@@ -3008,8 +3008,8 @@
       ]
     },
     {
-      "address": "0x6882b14b449bc07a77044dfb686993f5835d7971de095a713f75f0c9162d978",
-      "class_hash": "0x61065f26154b0b1545471288b60d2385dfacb8dc3a1a48825ee16deb9227eef",
+      "address": "0x71a1c67b3370e743430f63e5ae92a9b3ffce18bae028790b1b4a5dbbf6d9402",
+      "class_hash": "0x638a0d8a2873ea82543c231e016fd41114561d27c941d9a2f9e7f97105c0a5a",
       "abi": [
         {
           "type": "impl",
@@ -4638,8 +4638,8 @@
       ]
     },
     {
-      "address": "0x4b5e9d9334559811550019499900e9301f2113a338ac7bd91c26c580f915186",
-      "class_hash": "0x43cc7cb07a47e7eb51079365d3627f8905ae277ec2f93230d0aa961562a2441",
+      "address": "0x1105f82b0febe47551bc5dd1204a9bc9670c80cbbd7dc7eee92c06acc7543a6",
+      "class_hash": "0xb6a8675d0133367267aae74f599511e7d8e9f85da72943b5af6dad5e501c20",
       "abi": [
         {
           "type": "impl",
@@ -5847,8 +5847,8 @@
       ]
     },
     {
-      "address": "0x2da06eb8a28fb22aaaaaaf577e3d446be5c8b46cd8aaa42381572fbc5503af3",
-      "class_hash": "0xf0f8380f3a2fade7c91bb3a4f7876859445d8da0504bcea3d78396ee1aa67e",
+      "address": "0x68925bcd5f040cb9db8906d319287a10dab0e8f5de1454548bfecb54a7cadc8",
+      "class_hash": "0x200c68ace90215f7db7355cf32d19ee7da74e09cf4d5a18488bdcfd50320b8b",
       "abi": [
         {
           "type": "impl",
@@ -7497,7 +7497,7 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x63d90b3e839c518792efb51ce67a2d97d0ac32f43f603dcac0fc8589a8a3734",
+      "class_hash": "0x66ff59e9facc9387570acaffc839eb9888912f90491d104807827e614a58661",
       "tag": "pistols-PlayerActivity",
       "selector": "0x20ac3bc7f231ea11afb0576a200bff82197a6b397f3e5a4299f5a79ab563ff1"
     },
