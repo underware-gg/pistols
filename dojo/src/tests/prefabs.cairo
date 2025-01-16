@@ -26,7 +26,7 @@ mod prefabs {
     const NAME_A: felt252 = 'Sensei';
     const NAME_B: felt252 = 'Senpai';
     const MESSAGE: felt252 = 'For honour!!!';
-    const TABLE_ID: felt252 = TABLES::COMMONERS;
+    const TABLE_ID: felt252 = TABLES::PRACTICE;
     const PRIZE_VALUE: u128 = 0;
     // const PRIZE_VALUE: u128 = 20_000_000_000_000_000_000;
 

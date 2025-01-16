@@ -31,7 +31,7 @@ mod tests {
     const PLAYER_NAME: felt252 = 'Sensei';
     const OTHER_NAME: felt252 = 'Senpai';
     const PREMISE_1: felt252 = 'For honour!!!';
-    const TABLE_ID: felt252 = TABLES::LORDS;
+    const TABLE_ID: felt252 = TABLES::PRACTICE;
 
 
     fn _assert_empty_progress(sys: TestSystems, duel_id: u128) {
@@ -173,7 +173,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let A = OWNER();
         let B = OTHER();
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::COMMONERS, 24);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, 24);
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
 
         tester::assert_pact(sys, duel_id, ch, true, false, "created");
@@ -244,7 +244,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let A = OWNER();
         let B = OTHER();
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::COMMONERS, 48);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, 48);
 
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
 // ch.address_a.print();
@@ -289,7 +289,7 @@ mod tests {
         assert(!player_a.exists(), 'player_a.exists NOT');
         assert(!player_b.exists(), 'player_b.exists NOT');
 
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::COMMONERS, 48);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, 48);
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
 // ch.address_a.print();
 // ch.address_b.print();

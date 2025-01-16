@@ -7,6 +7,10 @@ use pistols::utils::byte_arrays::{
     U128IntoByteArray,
     U256IntoByteArray,
 };
+use pistols::utils::bitwise::{
+    BitwiseU128,
+    BitwiseU256,
+};
 
 trait MathTrait<T,TI> {
     // absolute value
@@ -34,7 +38,10 @@ trait MathTrait<T,TI> {
     // converters
     fn to_felt(self: T) -> felt252;
     fn to_string(self: T) -> ByteArray;
+    fn to_short_string(self: T) -> felt252;
 }
+
+const MAX_SHORT_STRING_NUMBER: u128 = 9999999999999999999999999999999; // 31 algarisms
 
 impl MathU8 of MathTrait<u8,i8> {
     fn abs(v: i8) -> u8 {
@@ -128,9 +135,14 @@ impl MathU8 of MathTrait<u8,i8> {
         let result: felt252 = self.into();
         (result)
     }
+    
     #[inline(always)]
     fn to_string(self: u8) -> ByteArray {
         (self.into())
+    }
+
+    fn to_short_string(self: u8) -> felt252 {
+        (MathU128::to_short_string(self.into()))
     }
 }
 
@@ -193,9 +205,14 @@ impl MathU16 of MathTrait<u16, i16> {
         let result: felt252 = self.into();
         (result)
     }
+    
     #[inline(always)]
     fn to_string(self: u16) -> ByteArray {
         (self.into())
+    }
+
+    fn to_short_string(self: u16) -> felt252 {
+        (MathU128::to_short_string(self.into()))
     }
 }
 
@@ -257,9 +274,27 @@ impl MathU32 of MathTrait<u32, i32> {
         let result: felt252 = self.into();
         (result)
     }
+
     #[inline(always)]
     fn to_string(self: u32) -> ByteArray {
         (self.into())
+    }
+
+    fn to_short_string(self: u32) -> felt252 {
+        if (self == 0) {
+            ('0')
+        } else {
+            let mut result: u128 = 0;
+            let mut n: u128 = self.into();
+            let mut i: usize = 0;
+            while (n != 0) {
+                let c: u128 = 48 + (n % 10);    // '0' + n
+                result = result | BitwiseU128::shl(c, i * 8);  // (c << 8) | result
+                n /= 10;
+                i += 1;
+            };
+            (result.to_felt())
+        }
     }
 }
 
@@ -321,9 +356,14 @@ impl MathU64 of MathTrait<u64, i64> {
         let result: felt252 = self.into();
         (result)
     }
+
     #[inline(always)]
     fn to_string(self: u64) -> ByteArray {
         (self.into())
+    }
+
+    fn to_short_string(self: u64) -> felt252 {
+        (MathU128::to_short_string(self.into()))
     }
 }
 
@@ -398,9 +438,29 @@ impl MathU128 of MathTrait<u128, i128> {
         let result: felt252 = self.into();
         (result)
     }
+
     #[inline(always)]
     fn to_string(self: u128) -> ByteArray {
         (self.into())
+    }
+    
+    fn to_short_string(self: u128) -> felt252 {
+        if (self == 0) {
+            ('0')
+        } else {
+            // no more than 31 algarisms
+            assert(self <= MAX_SHORT_STRING_NUMBER, 'to_short_string(u128) Overflow');
+            let mut result: u256 = 0;
+            let mut n: u256 = self.into();
+            let mut i: usize = 0;
+            while (n != 0) {
+                let c: u256 = 48 + (n % 10);    // '0' + n
+                result = result | BitwiseU256::shl(c, i * 8);  // (c << 8) | result
+                n /= 10;
+                i += 1;
+            };
+            (result.to_felt())
+        }
     }
 }
 
@@ -468,9 +528,15 @@ impl MathU256 of MathTrait<u256, u256> {
         let result: felt252 = self.try_into().unwrap();
         (result)
     }
+
     #[inline(always)]
     fn to_string(self: u256) -> ByteArray {
         (self.into())
+    }
+
+    fn to_short_string(self: u256) -> felt252 {
+        assert(self <= MAX_SHORT_STRING_NUMBER.into(), 'to_short_string(u256) Overflow');
+        (self.low.to_short_string())
     }
 }
 
@@ -481,7 +547,11 @@ impl MathU256 of MathTrait<u256, u256> {
 #[cfg(test)]
 mod tests {
     use debug::PrintTrait;
-    use pistols::utils::math::{MathU8,MathU16,MathU32,MathU128};
+    use super::{
+        MathU8,MathU16,MathU32,MathU128,MathU256,
+        MAX_SHORT_STRING_NUMBER,
+    };
+    use pistols::utils::bitwise::{BITWISE};
 
     #[test]
     fn test_abs() {
@@ -648,5 +718,58 @@ mod tests {
         assert(MathU8::map(5, 3, 8, 20, 20) == 20, 'edge_out_5');
         assert(MathU8::map(8, 3, 8, 20, 20) == 20, 'edge_out_8');
         assert(MathU8::map(10, 3, 8, 20, 20) == 20, 'edge_out_10');
+    }
+
+    #[test]
+    fn test_to_short_string_u32() {
+        assert(0_u32.to_short_string() == '0', 'not 0');
+        assert(1_u32.to_short_string() == '1', 'not 1');
+        assert(01_u32.to_short_string() == '1', 'not 01');
+        assert(12_u32.to_short_string() == '12', 'not 12');
+        assert(123_u32.to_short_string() == '123', 'not 123');
+        assert(10_u32.to_short_string() == '10', 'not 10');
+        assert(100_u32.to_short_string() == '100', 'not 100');
+        assert(1001_u32.to_short_string() == '1001', 'not 1001');
+        assert(1234567890_u32.to_short_string() == '1234567890', 'not 1234567890');
+        assert(01234567890_u32.to_short_string() == '1234567890', 'not 01234567890');
+        assert(BITWISE::MAX_U32.to_short_string() != 0, 'any u32 should be safe');
+        assert(BITWISE::MAX_U16.to_short_string() != 0, 'any u16 should be safe');
+        assert(BITWISE::MAX_U8.to_short_string() != 0, 'any u8 should be safe');
+    }
+
+    #[test]
+    fn test_to_short_string_u64() {
+        assert(0_u64.to_short_string() == '0', 'not 0');
+        assert(1_u64.to_short_string() == '1', 'not 1');
+        assert(01_u64.to_short_string() == '1', 'not 01');
+        assert(12_u64.to_short_string() == '12', 'not 12');
+        assert(123_u64.to_short_string() == '123', 'not 123');
+        assert(10_u64.to_short_string() == '10', 'not 10');
+        assert(100_u64.to_short_string() == '100', 'not 100');
+        assert(1001_u64.to_short_string() == '1001', 'not 1001');
+        assert(1234567890_u64.to_short_string() == '1234567890', 'not 1234567890');
+        assert(01234567890_u64.to_short_string() == '1234567890', 'not 01234567890');
+        assert(18446744073709551615_u64.to_short_string() == '18446744073709551615', 'not 18446744073709551615');
+        assert(BITWISE::MAX_U64.to_short_string() != 0, 'any u64 should be safe');
+    }
+
+    #[test]
+    fn test_to_short_string_u128() {
+        assert(1234567890_u128.to_short_string() == '1234567890', 'not 1234567890');
+        assert(1234567890123456789012345678901_u128.to_short_string() == '1234567890123456789012345678901', '1234567890123456789012345678901');
+        assert(MAX_SHORT_STRING_NUMBER.to_short_string() == '9999999999999999999999999999999', '9999999999999999999999999999999');
+    }
+
+    #[test]
+    #[should_panic(expected: 'to_short_string(u128) Overflow')]
+    fn test_to_short_string_overflow_u128() {
+        let v: u128 = (MAX_SHORT_STRING_NUMBER + 1).into();
+        v.to_short_string(); // panic!
+    }
+    #[test]
+    #[should_panic(expected: 'to_short_string(u256) Overflow')]
+    fn test_to_short_string_overflow_u256() {
+        let v: u256 = (MAX_SHORT_STRING_NUMBER + 1).into();
+        v.to_short_string(); // panic!
     }
 }

@@ -96,7 +96,7 @@ impl ArchetypeDefault of Default<Archetype> {
 }
 
 #[generate_trait]
-impl ScoreTraitImpl of ScoreTrait {
+impl ScoreImpl of ScoreTrait {
     #[inline(always)]
     fn is_villain(self: Score) -> bool {
         (self.total_duels > 0 && self.honour < HONOUR::TRICKSTER_START)

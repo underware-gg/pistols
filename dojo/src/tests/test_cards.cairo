@@ -52,7 +52,7 @@ mod tests {
     fn test_game_loop() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        let duel_id = prefabs::start_new_challenge(sys, OWNER(), OTHER(), TABLES::COMMONERS);
+        let duel_id = prefabs::start_new_challenge(sys, OWNER(), OTHER(), TABLES::PRACTICE);
         let (challenge, round) = prefabs::commit_reveal_get(sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
         assert(round.state_a.damage > CONST::INITIAL_DAMAGE, 'final_damage_a');
         assert(round.state_b.damage > CONST::INITIAL_DAMAGE, 'final_damage_b');

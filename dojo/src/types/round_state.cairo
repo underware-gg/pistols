@@ -13,7 +13,7 @@ trait RoundStateTrait {
     fn is_finished(self: RoundState) -> bool;
 }
 
-impl RoundStateTraitImpl of RoundStateTrait {
+impl RoundStateImpl of RoundStateTrait {
     fn is_finished(self: RoundState) -> bool {
         match self {
             RoundState::Null        => true,

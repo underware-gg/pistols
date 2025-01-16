@@ -58,15 +58,18 @@ mod tester {
             m_Payment, Payment,
         },
         config::{
-            m_Config, Config, ConfigValue,
-            m_TokenConfig, TokenConfig, TokenConfigValue,
-            m_CoinConfig, CoinConfig, CoinConfigValue,
+            m_Config, Config,
+            m_TokenConfig, TokenConfig,
+            m_CoinConfig, CoinConfig,
             CONFIG,
         },
-        table::{
-            m_TableConfig, TableConfig, TableConfigValue,
+        season::{
+            m_SeasonConfig, SeasonConfig,
         },
-        table::{TABLES},
+        table::{
+            m_TableConfig, TableConfig,
+            TABLES,
+        },
     };
     use pistols::tests::token::mock_duelist::{
         duelist_token as mock_duelist,
@@ -192,6 +195,7 @@ mod tester {
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
             TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
+            TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),

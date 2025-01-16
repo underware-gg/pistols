@@ -34,6 +34,9 @@ pub use pistols::models::{
     table::{
         TableConfig, TableConfigValue,
     },
+    season::{
+        SeasonConfig, SeasonConfigValue,
+    },
     payment::{
         Payment, PaymentTrait, PaymentValue,
     },
@@ -139,6 +142,15 @@ impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
+    fn get_season_config(ref self: Store, table_id: felt252) -> SeasonConfig {
+        (self.world.read_model(table_id))
+    }
+    #[inline(always)]
+    fn get_season_config_value(ref self: Store, table_id: felt252) -> SeasonConfigValue {
+        (self.world.read_value(table_id))
+    }
+
+    #[inline(always)]
     fn get_coin_config(ref self: Store, contract_address: ContractAddress) -> CoinConfig {
         (self.world.read_model(contract_address))
     }
@@ -230,6 +242,11 @@ impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_table_config(ref self: Store, model: @TableConfig) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_season_config(ref self: Store, model: @SeasonConfig) {
         self.world.write_model(model);
     }
 

@@ -41,6 +41,7 @@ use pistols::models::{
         m_CoinConfig, CoinConfig,
         CONFIG,
     },
+    table::{TABLES},
 };
 
 use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
@@ -180,6 +181,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
         treasury_address: TREASURY(),
         lords_address: world.lords_mock_address(),
         vrf_address: world.vrf_mock_address(),
+        season_table_id: TABLES::PRACTICE,
         is_paused: false,
     });
 

@@ -28,8 +28,11 @@ pub mod admin {
     use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
     use dojo::model::{ModelStorage, ModelValueStorage};
 
-    use pistols::models::config::{Config, ConfigTrait};
-    use pistols::models::table::{TableConfig, TableConfigTrait, TableInitializer, TableInitializerTrait};
+    use pistols::models::{
+        config::{Config, ConfigTrait, ConfigManagerTrait},
+        table::{TableConfig, TableConfigTrait, TableManagerTrait},
+        season::{SeasonConfig, SeasonConfigTrait, SeasonManagerTrait},
+    };
     use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::misc::{ZERO};
@@ -50,16 +53,17 @@ pub mod admin {
     ) {
         let mut world = self.world_default();
         let mut store: Store = StoreTrait::new(world);
+        // initialize tables
+        TableManagerTrait::initialize(ref store);
+        let season_table_id: felt252 = SeasonManagerTrait::initialize(ref store);
         // initialize Config
-        let mut config: Config = ConfigTrait::new();
-        config.treasury_address = if (treasury_address.is_zero()) { get_caller_address() } else { treasury_address };
+        let mut config: Config = ConfigManagerTrait::initialize();
+        config.treasury_address = if (treasury_address.is_non_zero()) { treasury_address } else { get_caller_address() };
         config.lords_address = if (lords_address.is_non_zero()) { lords_address } else { world.lords_mock_address() };
         config.vrf_address = if (vrf_address.is_non_zero()) { vrf_address } else { world.vrf_mock_address() };
+        config.season_table_id = season_table_id;
         config.is_paused = false;
         store.set_config(@config);
-        // initialize tables
-        let mut initializer: TableInitializer = TableInitializerTrait::new(store);
-        initializer.initialize();
     }
 
     #[generate_trait]
@@ -107,40 +111,27 @@ pub mod admin {
         fn set_treasury(ref self: ContractState, treasury_address: ContractAddress) {
             self.assert_caller_is_admin();
             assert(treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
-            // get current
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
-            let mut config: Config = store.get_config();
-            config.treasury_address = treasury_address;
-            store.set_config(@config);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            ConfigManagerTrait::set_treasury(ref store, treasury_address);
         }
 
         fn set_paused(ref self: ContractState, paused: bool) {
             self.assert_caller_is_admin();
-            // get current
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
-            let mut config: Config = store.get_config();
-            // update
-            config.is_paused = paused;
-            store.set_config(@config);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            ConfigManagerTrait::set_is_paused(ref store, paused);
         }
 
         fn set_table(ref self: ContractState, table: TableConfig) {
             self.assert_caller_is_admin();
-            // check table
             assert(table.table_id != 0, Errors::INVALID_TABLE);
-            // update table
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
+            let mut store: Store = StoreTrait::new(self.world_default());
             store.set_table_config(@table);
         }
 
         fn open_table(ref self: ContractState, table_id: felt252, is_open: bool) {
             self.assert_caller_is_admin();
             // check table
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
+            let mut store: Store = StoreTrait::new(self.world_default());
             let mut table: TableConfig = store.get_table_config(table_id);
             assert(table.exists(), Errors::INVALID_TABLE);
             // update

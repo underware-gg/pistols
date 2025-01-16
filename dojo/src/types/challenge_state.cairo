@@ -20,7 +20,7 @@ trait ChallengeStateTrait {
     fn is_finished(self: ChallengeState) -> bool;
 }
 
-impl ChallengeStateTraitImpl of ChallengeStateTrait {
+impl ChallengeStateImpl of ChallengeStateTrait {
     fn exists(self: ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,

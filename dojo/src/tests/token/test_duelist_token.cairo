@@ -52,10 +52,13 @@ use pistols::models::{
         m_CoinConfig, CoinConfig,
         CONFIG,
     },
+    season::{
+        m_SeasonConfig, SeasonConfig,
+    },
     table::{
         m_TableConfig, TableConfig,
+        TABLES,
     },
-    table::{TABLES},
 };
 
 use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
@@ -154,6 +157,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
             TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
+            TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
@@ -211,6 +215,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
         treasury_address: TREASURY(),
         lords_address: world.lords_mock_address(),
         vrf_address: world.vrf_mock_address(),
+        season_table_id: TABLES::PRACTICE,
         is_paused: false,
     });
 

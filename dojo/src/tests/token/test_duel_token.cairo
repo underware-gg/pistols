@@ -8,6 +8,7 @@ use dojo_cairo_test::{
 };
 
 use pistols::systems::{
+    admin::{admin},
     game::{game},
     bank::{bank},
     vrf_mock::{vrf_mock},
@@ -52,10 +53,13 @@ use pistols::models::{
         m_CoinConfig, CoinConfig,
         CONFIG,
     },
+    season::{
+        m_SeasonConfig, SeasonConfig,
+    },
     table::{
         m_TableConfig, TableConfig,
+        TABLES, TableType, DeckType,
     },
-    table::{TABLES, default_tables},
 };
 use pistols::tests::token::mock_duelist::{
     duelist_token as mock_duelist,
@@ -147,6 +151,7 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
             TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
+            TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
@@ -163,6 +168,7 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
             TestResource::Contract(mock_duelist::TEST_CLASS_HASH),
             TestResource::Contract(lords_mock::TEST_CLASS_HASH),
             // needed to mint duels
+            TestResource::Contract(admin::TEST_CLASS_HASH),
             TestResource::Contract(game::TEST_CLASS_HASH),
             TestResource::Contract(vrf_mock::TEST_CLASS_HASH)
         ].span()
@@ -171,6 +177,13 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
     let mut world: WorldStorage = spawn_test_world([ndef].span());
 
     let mut contract_defs: Array<ContractDef> = array![
+        ContractDefTrait::new(@"pistols", @"admin")
+            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            .with_init_calldata([
+                TREASURY().into(), // treasury_address
+                0, // lords_address
+                0, // vrf_address
+            ].span()),
         ContractDefTrait::new(@"pistols", @"game")
             .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
         ContractDefTrait::new(@"pistols", @"vrf_mock"),
@@ -196,13 +209,22 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
 
     tester::impersonate(OWNER());
 
-    tester::set_TableConfig(ref world, *default_tables()[0]);
+    tester::set_TableConfig(ref world, TableConfig {
+        table_id: TABLES::TUTORIAL,
+        description: 'The Training Grounds',
+        table_type: TableType::Tutorial,
+        deck_type: DeckType::Classic,
+        fee_collector_address: ZERO(),
+        fee_min: 0,
+        is_open: true,
+    });
 
     tester::set_Config(ref world, Config {
         key: CONFIG::CONFIG_KEY,
         treasury_address: TREASURY(),
         lords_address: world.lords_mock_address(),
         vrf_address: world.vrf_mock_address(),
+        season_table_id: TABLES::PRACTICE,
         is_paused: false,
     });
 
@@ -236,7 +258,7 @@ fn create_duel(token: IDuelTokenDispatcher, recipient: ContractAddress, challeng
         challenged_address: challenged_address,
         premise: Premise::Honour,
         quote: 'For honour!!!',
-        table_id: TABLES::LORDS,
+        table_id: TABLES::PRACTICE,
         expire_hours: 1,
     );
 // '---BB'.print();
@@ -290,7 +312,7 @@ fn test_token_component() {
     // should not panic
     // token.contract_address.print();
     token.owner_of(DUEL_ID_1);//.print();
-    token.calc_mint_fee(TABLES::LORDS);//.print();
+    token.calc_mint_fee(TABLES::PRACTICE);//.print();
     token.is_owner_of(OWNER(), DUEL_ID_1.low);//.print();
 }
 
@@ -300,7 +322,7 @@ fn test_token_uri() {
 
     let challenge = Challenge {
         duel_id: DUEL_ID_1.low,
-        table_id: TABLES::LORDS,
+        table_id: TABLES::PRACTICE,
         premise: Premise::Honour,
         quote: 'For honour!!!',
         // duelists

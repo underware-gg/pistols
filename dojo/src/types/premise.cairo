@@ -75,7 +75,7 @@ mod PREMISES {
 use pistols::utils::short_string::{ShortStringTrait};
 
 #[generate_trait]
-impl PremiseTraitImpl of PremiseTrait {
+impl PremiseImpl of PremiseTrait {
     fn description(self: Premise) -> PremiseDescription {
         match self {
             Premise::Undefined   => PREMISES::Undefined,

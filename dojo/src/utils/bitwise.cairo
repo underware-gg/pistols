@@ -1,20 +1,20 @@
 use traits::Into;
 
 mod BITWISE {
-    const MAX_U8: u8 = 0xff;
-    const MAX_U16: u16 = 0xffff;
-    const MAX_U32: u32 = 0xffffffff;
-    const MAX_U64: u64 = 0xffffffffffffffff;
-    const MAX_U128: u128 = 0xffffffffffffffffffffffffffffffff;
-    const MAX_U256: u256 = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+    const MAX_U8: u8 = 0xff; // 255
+    const MAX_U16: u16 = 0xffff; // 65535
+    const MAX_U32: u32 = 0xffffffff; // 4294967295
+    const MAX_U64: u64 = 0xffffffffffffffff; // 18446744073709551615
+    const MAX_U128: u128 = 0xffffffffffffffffffffffffffffffff; // 340282366920938463463374607431768211455
+    const MAX_U256: u256 = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff; // 115792089237316195423570985008687907853269984665640564039457584007913129639935
 
     // most significant bit (e.g u8: 0b10000000, or 0x80)
-    const MSB_U8: u8     = 0x80;
-    const MSB_U16: u16   = 0x8000;
-    const MSB_U32: u32   = 0x80000000;
-    const MSB_U64: u64   = 0x8000000000000000;
-    const MSB_U128: u128 = 0x80000000000000000000000000000000;
-    const MSB_U256: u256 = 0x8000000000000000000000000000000000000000000000000000000000000000;
+    const MSB_U8: u8     = 0x80; // 128
+    const MSB_U16: u16   = 0x8000; // 32768
+    const MSB_U32: u32   = 0x80000000; // 2147483648
+    const MSB_U64: u64   = 0x8000000000000000; // 9223372036854775808
+    const MSB_U128: u128 = 0x80000000000000000000000000000000; // 170141183460469231731687303715884105728
+    const MSB_U256: u256 = 0x8000000000000000000000000000000000000000000000000000000000000000; // 57896044618658097711785492504343953926634992332820282019728792003956564819968
 }
 
 

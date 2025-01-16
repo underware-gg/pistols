@@ -482,12 +482,12 @@ export const PlayerErrors: type_PlayerErrors = {
 
 // from: ../dojo/src/models/table.cairo
 type type_TABLES = {
-  LORDS: string, // cairo: felt252
-  COMMONERS: string, // cairo: felt252
+  TUTORIAL: string, // cairo: felt252
+  PRACTICE: string, // cairo: felt252
 };
 export const TABLES: type_TABLES = {
-  LORDS: 'Lords',
-  COMMONERS: 'Commoners',
+  TUTORIAL: 'Tutorial',
+  PRACTICE: 'Practice',
 };
 
 // from: ../dojo/src/systems/components/erc721_hooks.cairo

@@ -1,23 +1,13 @@
 // use debug::PrintTrait;
 use starknet::ContractAddress;
-use pistols::systems::game::game::{Errors as GameErrors};
 use pistols::types::cards::hand::{DeckType};
-use pistols::types::constants::{CONST};
-use pistols::utils::arrays::{ArrayUtilsTrait};
-use pistols::utils::math::{MathTrait};
-use pistols::utils::misc::{ZERO};
-
-mod TABLES {
-    const LORDS: felt252 = 'Lords';
-    const COMMONERS: felt252 = 'Commoners';
-}
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum TableType {
     Undefined,      // 0
-    Classic,        // 1
-    Tournament,     // 2
-    IRLTournament,  // 3
+    Season,         // 1
+    Tutorial,       // 2
+    Practice,       // 3
 }
 
 // Temporarily renamed to TableConfig while this bug exists:
@@ -36,57 +26,43 @@ pub struct TableConfig {
     pub is_open: bool,
 }
 
-fn default_tables() -> Array<TableConfig> {
-    (array![
-        (TableConfig {
-            table_id: TABLES::LORDS,
-            description: 'The Lords Table',
-            table_type: TableType::Classic,
-            deck_type: DeckType::Classic,
-            fee_collector_address: ZERO(),
-            fee_min: 0, //60 * CONST::ETH_TO_WEI.low,
-            is_open: true,
-        }),
-        (TableConfig {
-            table_id: TABLES::COMMONERS,
-            description: 'The Commoners Table',
-            table_type: TableType::Classic,
-            deck_type: DeckType::Classic,
-            fee_collector_address: ZERO(),
-            fee_min: 0,
-            is_open: true,
-        }),
-    ])
+// fixed tables
+mod TABLES {
+    const TUTORIAL: felt252 = 'Tutorial';   // player tutorials
+    const PRACTICE: felt252 = 'Practice';   // bot practice
 }
 
 
 //---------------------------
-// TableInitializer
+// Table Manager
 //
 use pistols::libs::store::{Store, StoreTrait};
-
-#[derive(Copy, Drop)]
-pub struct TableInitializer {
-    store: Store
-}
+use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
-impl TableInitializerTraitImpl of TableInitializerTrait {
-    fn new(store: Store) -> TableInitializer {
-        TableInitializer { store }
-    }
-    fn initialize(ref self: TableInitializer) {
-        self.set_array(@default_tables());
-    }
-    fn set_array(ref self: TableInitializer, tables: @Array<TableConfig>) {
-        let mut n: usize = 0;
-        loop {
-            if (n == tables.len()) { break; }
-            self.store.set_table_config(tables.at(n));
-            n += 1;
-        };
+impl TableManagerImpl of TableManagerTrait {
+    fn initialize(ref store: Store) {
+        store.set_table_config(@TableConfig {
+            table_id: TABLES::TUTORIAL,
+            description: 'The Training Grounds',
+            table_type: TableType::Tutorial,
+            deck_type: DeckType::Classic,
+            fee_collector_address: ZERO(),
+            fee_min: 0,
+            is_open: true,
+        });
+        store.set_table_config(@TableConfig {
+            table_id: TABLES::PRACTICE,
+            description: 'Bot Shooting Range',
+            table_type: TableType::Practice,
+            deck_type: DeckType::Classic,
+            fee_collector_address: ZERO(),
+            fee_min: 0,
+            is_open: true,
+        });
     }
 }
+
 
 //---------------------------
 // TableConfig Traits

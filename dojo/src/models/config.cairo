@@ -13,6 +13,7 @@ pub struct Config {
     pub treasury_address: ContractAddress,
     pub lords_address: ContractAddress,
     pub vrf_address: ContractAddress,
+    pub season_table_id: felt252,
     pub is_paused: bool,
 }
 
@@ -44,19 +45,40 @@ pub struct CoinConfig {
 //
 pub use pistols::interfaces::ierc20::{ierc20, ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 pub use pistols::interfaces::vrf::{IVrfProviderDispatcher, IVrfProviderDispatcherTrait};
+use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
-impl ConfigImpl of ConfigTrait {
-    fn new() -> Config {
+impl ConfigManagerImpl of ConfigManagerTrait {
+    fn initialize() -> Config {
         (Config {
             key: CONFIG::CONFIG_KEY,
             treasury_address: ZERO(),
             lords_address: ZERO(),
             vrf_address: ZERO(),
+            season_table_id: 0,
             is_paused: false,
         })
     }
+    fn set_is_paused(ref store: Store, is_paused: bool) {
+        let mut config: Config = store.get_config();
+        config.is_paused = is_paused;
+        store.set_config(@config);
+    }
+    fn set_season(ref store: Store, season_table_id: felt252) {
+        let mut config: Config = store.get_config();
+        config.season_table_id = season_table_id;
+        store.set_config(@config);
+    }
+    fn set_treasury(ref store: Store, treasury_address: ContractAddress) {
+        let mut config: Config = store.get_config();
+        config.treasury_address = treasury_address;
+        store.set_config(@config);
+    }
+}
+
+#[generate_trait]
+impl ConfigImpl of ConfigTrait {
     fn lords_dispatcher(self: @Config) -> ERC20ABIDispatcher {
         (ierc20(*self.lords_address))
     }

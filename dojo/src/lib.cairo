@@ -42,6 +42,7 @@ mod models {
     mod pact;
     mod payment;
     mod player;
+    mod season;
     mod table;
 }
 
