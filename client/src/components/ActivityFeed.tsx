@@ -43,6 +43,9 @@ const ActivityItem = ({
   if (!activity.is_public) {
     return <></>
   }
+  if (activity.activity === constants.Activity.WelcomePack) {
+    return <ActivityItemWelcomePack activity={activity} clientSeconds={clientSeconds} />
+  }
   if (activity.activity === constants.Activity.CreatedDuelist) {
     return <ActivityItemCreatedDuelist activity={activity} clientSeconds={clientSeconds} />
   }
@@ -58,7 +61,27 @@ const ActivityItem = ({
   if (activity.activity === constants.Activity.RevealedMoves) {
     return <ActivityItemRevealedMoves activity={activity} clientSeconds={clientSeconds} />
   }
+  if (activity.activity === constants.Activity.DuelResolved) {
+    return <ActivityItemDuelResolved activity={activity} clientSeconds={clientSeconds} />
+  }
+  if (activity.activity === constants.Activity.DuelDraw) {
+    return <ActivityItemDuelDraw activity={activity} clientSeconds={clientSeconds} />
+  }
   return <></>
+}
+
+const ActivityItemWelcomePack = ({
+  activity,
+  clientSeconds,
+}: ActivityItemProps) => {
+  return (
+    <>
+      <PlayerLink address={activity.player_address} />
+      {' entered the game! '}
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <br />
+    </>
+  )
 }
 
 const ActivityItemCreatedDuelist = ({
@@ -141,6 +164,36 @@ const ActivityItemRevealedMoves = ({
       {' revealed in '}
       <ChallengeLink duelId={activity.identifier} />
       {' '}
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <br />
+    </>
+  )
+}
+
+const ActivityItemDuelResolved = ({
+  activity,
+  clientSeconds,
+}: ActivityItemProps) => {
+  return (
+    <>
+      <PlayerLink address={activity.player_address} />
+      {' won '}
+      <ChallengeLink duelId={activity.identifier} />
+      {'! '}
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <br />
+    </>
+  )
+}
+
+const ActivityItemDuelDraw = ({
+  activity,
+  clientSeconds,
+}: ActivityItemProps) => {
+  return (
+    <>
+      <ChallengeLink duelId={activity.identifier} />
+      {' ended in a draw! '}
       <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
       <br />
     </>

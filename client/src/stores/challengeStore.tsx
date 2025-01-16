@@ -62,6 +62,8 @@ export const useChallenge = (duelId: BigNumberish) => {
   const duelistIdA = useMemo(() => BigInt(challenge?.duelist_id_a ?? 0), [challenge])
   const duelistIdB = useMemo(() => BigInt(challenge?.duelist_id_b ?? 0), [challenge])
   const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
+  const winnerAddress = useMemo(() => (winner == 1 ? duelistAddressA : winner == 2 ? duelistAddressB : 0n), [winner, duelistAddressA, duelistAddressB])
+  const winnerDuelistId = useMemo(() => (winner == 1 ? duelistIdA : winner == 2 ? duelistIdB : 0n), [winner, duelistIdA, duelistIdB])
   const premise = useMemo(() => (parseEnumVariant<constants.Premise>(challenge?.premise) ?? constants.Premise.Undefined), [challenge])
   const quote = useMemo(() => feltToString(challenge?.quote ?? 0n), [challenge])
   const timestamp_start = useMemo(() => Number(challenge?.timestamp_start ?? 0), [challenge])
@@ -89,7 +91,8 @@ export const useChallenge = (duelId: BigNumberish) => {
     quote,
     // progress and results
     winner,
-    winnerDuelistId: (winner == 1 ? duelistIdA : winner == 2 ? duelistIdB : 0n),
+    winnerAddress,
+    winnerDuelistId,
     isLive: (state == constants.ChallengeState.Awaiting || state == constants.ChallengeState.InProgress),
     isAwaiting: (state == constants.ChallengeState.Awaiting),
     isInProgress: (state == constants.ChallengeState.InProgress),

@@ -54,8 +54,8 @@ export const ChallengeStateReplyVerbs: Record<constants.ChallengeState, string> 
   [constants.ChallengeState.Refused]: 'refused',
   [constants.ChallengeState.Expired]: 'collected',
   [constants.ChallengeState.InProgress]: 'accepted',
-  [constants.ChallengeState.Resolved]: '---',
-  [constants.ChallengeState.Draw]: '---',
+  [constants.ChallengeState.Resolved]: 'accepted',
+  [constants.ChallengeState.Draw]: 'accepted',
 }
 
 export const ChallengeStateClasses: Record<constants.ChallengeState, string> = {
