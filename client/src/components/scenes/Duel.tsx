@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Segment } from 'semantic-ui-react'
 import { useMounted, useClientTimestamp } from '@underware_gg/pistols-sdk/utils'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
@@ -27,10 +26,13 @@ import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { DuelistCardType } from '/src/components/cards/Cards'
 import Cards, { CardsHandle, DuelistHand } from '/src/components/cards/DuelCards'
 import * as Constants from '/src/data/cardConstants'
-import DuelProgress from '/src/components/ui/tutorial/DuelProgress'
-import DuelistProfile from '/src/components/ui/tutorial/DuelistProfile'
-import DuelProfile from '/src/components/ui/tutorial/DuelProfile'
+import DuelProgress from '../ui/duel/DuelProgress'
+import DuelistProfile from '../ui/duel/DuelistProfile'
+import DuelProfile from '../ui/duel/DuelProfile'
 import { DuelTutorial } from '/src/data/tutorialConstants'
+import DuelHeader from '../ui/duel/DuelHeader'
+import DuelStateDisplay from '../ui/duel/DuelStateDispaly'
+import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
 
 export type DuelistState = {
   damage: number, 
@@ -48,7 +50,7 @@ export default function Duel({
   tutorial: DuelTutorial
 }) {
   const { gameImpl } = useThreeJsContext()
-  const { animated, dispatchAnimated } = useGameplayContext()
+  const { dispatchAnimated } = useGameplayContext()
 
   const { challengeDescription } = useChallengeDescription(duelId)
   const { tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start } = useGetChallenge(duelId)
@@ -78,7 +80,7 @@ export default function Duel({
   }, [gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, isSynced, isYouA, isYouB])
   // console.log('DUEL_SCENE_STARTED', duelSceneStarted, isSynced, `[${duelistId}]`, duelistIdA, duelistIdB, isYouA, isYouB, characterTypeA, characterTypeB, nameA, nameB)
 
-  // setup grass animation
+  // setup grass animation 
   const { clientSeconds } = useClientTimestamp(false)
   useEffect(() => {
     if (clientSeconds && timestamp_start) {
@@ -397,17 +399,10 @@ export default function Duel({
         revealCards={(cards: DuelistHand) => cardRef.current?.spawnCards('B', cards)}
       />
       <Cards duelId={duelId} ref={cardRef} />
-      <div className='TavernBoard NoMouse NoDrag' style={{ backgroundImage: 'url(/images/ui/duel/wager_main.png)', backgroundSize: '100% 100%' }}>
-        <div className='TavernTitle' data-contentlength={1}>Settling the matter of:</div>
-        <div className='TavernQuote' data-contentlength={Math.floor(quote.length / 10)}>{`"${quote}"`}</div>
-        <div className='TavernTable' data-contentlength={Math.floor(description.length / 10)}>{description}</div>
-      </div>
+      
+      <DuelHeader duelId={duelId} />
 
-      {(isFinished && animated == AnimationState.Finished) &&  /*TODO add a modal? or something where the winner and wager will be displayed!  */
-        <Segment style={{ position: 'absolute', top: '50%' }}>
-          <h3 className='Important' style={{ fontSize: aspectWidth(1.3) }}>{challengeDescription}</h3>
-        </Segment>
-      }
+      <DuelStateDisplay duelId={duelId} />
 
       <div>
         <div className='DuelProfileA NoMouse NoDrag'>
@@ -434,7 +429,7 @@ export default function Duel({
         </div>
       } */}
 
-      <MenuDuel duelStage={duelStage} duelId={duelId} tableId={tableId} />
+      <MenuDuel duelId={duelId} />
       <MenuDuelControl 
         clickPlay={() => {
           isPlayingRef.current = !isPlayingRef.current
@@ -452,6 +447,8 @@ export default function Duel({
           resetDuel()
         }} 
         isPlaying={isPlaying} />
+
+      <DuelTutorialOverlay tutorialType={tutorial} />
 
       <DojoSetupErrorDetector />
 
