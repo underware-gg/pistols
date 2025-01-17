@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { FormInput, Grid } from 'semantic-ui-react'
+import React, { useEffect, useRef, useState } from 'react'
+import { Grid } from 'semantic-ui-react'
 import { VStack } from '/src/components/ui/Stack'
 import { useEffectOnce } from '@underware_gg/pistols-sdk/utils'
 import { useDojoStatus, useDojoSystemCalls, useSelectedChain, useConnectToSelectedChain } from '@underware_gg/pistols-sdk/dojo'
@@ -132,23 +132,7 @@ export default function ScDoor() {
           ))}
         </div>
       </div>
-        
-
-      <CurrentChainHint />
     </div>
-  )
-}
-
-export function CurrentChainHint() {
-  const { selectedChainId } = useSelectedChain()
-  return (
-    <>
-      <div className='Code Disabled AbsoluteBottomRight Padded AlignRight'>
-        v{PACKAGE_VERSION}
-        <br />
-        {selectedChainId}
-      </div>
-    </>
   )
 }
 

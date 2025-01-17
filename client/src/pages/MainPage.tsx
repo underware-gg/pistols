@@ -8,6 +8,7 @@ import { useEffectOnce, usePlayerId } from '@underware_gg/pistols-sdk/utils'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { Header } from '/src/components/Header'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
+import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppGame from '/src/components/AppGame'
 import GameContainer from '/src/components/GameContainer'
 import Background from '/src/components/Background'
@@ -62,6 +63,7 @@ export default function MainPage() {
             {overlay}
             <ActivityPanel />
             <Header />
+            <CurrentChainHint />
           </>
         }
         <MouseToolTip />

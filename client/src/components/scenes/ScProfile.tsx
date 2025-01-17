@@ -7,7 +7,7 @@ import { useCanClaimWelcomePack } from '/src/hooks/usePistolsContractCalls'
 import { useMintMockLords } from '/src/hooks/useMintMockLords'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { ClaimDuelistsButton, ConnectButton, CurrentChainHint, EnterAsGuestButton } from '/src/components/scenes/ScDoor'
+import { ClaimDuelistsButton, ConnectButton, EnterAsGuestButton } from '/src/components/scenes/ScDoor'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { PublishOnlineStatusButton } from '/src/stores/sync/PlayerOnlineSync'
@@ -47,7 +47,6 @@ export default function ScProfile() {
       </div>
 
       <ShopModal opener={shopOpener} />
-      <CurrentChainHint />
 
       {(debugMode || true) && <>
         <PublishOnlineStatusButton />
