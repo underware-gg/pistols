@@ -88,11 +88,12 @@ mod utils {
 mod tests {
     mod test_admin;
     mod test_cards;
-    mod test_env_cards;
     mod test_challenge;
     mod test_duel;
-    mod test_utils;
+    mod test_env_cards;
     mod test_rng;
+    mod test_season;
+    mod test_utils;
     // utils
     mod tester;
     mod prefabs;

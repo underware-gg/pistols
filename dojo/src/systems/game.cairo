@@ -21,17 +21,17 @@ pub trait IGame<TState> {
         salt: felt252,
         moves: Span<u8>,
     );
+    // end season and start next
+    fn collect(ref self: TState) -> felt252;
 
     //
     // view calls
     fn get_player_card_decks(self: @TState, table_id: felt252) -> Span<Span<u8>>;
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
-    fn test_validate_commit_message(self: @TState,
-        account: ContractAddress,
-        signature: Array<felt252>,
-        duelId: felt252,
-        duelistId: felt252,
-    ) -> bool;
+    fn can_collect(self: @TState) -> bool;
+    
+    // test calls
+    fn test_validate_commit_message(self: @TState, account: ContractAddress, signature: Array<felt252>, duelId: felt252, duelistId: felt252) -> bool;
 }
 
 #[dojo::contract]
@@ -85,7 +85,15 @@ pub mod game {
         pact::{
             Pact, PactTrait,
         },
-        table::{TableConfig, TableConfigTrait, TableConfigValue},
+        table::{
+            TableConfig, TableConfigTrait, TableConfigValue,
+        },
+        season::{
+            SeasonConfig, SeasonConfigTrait,
+        },
+        config::{
+            ConfigManagerTrait,
+        },
     };
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelistDrawnCard};
@@ -113,6 +121,9 @@ pub mod game {
         const INVALID_MOVES_COUNT: felt252       = 'PISTOLS: Invalid moves count';
         const MOVES_HASH_MISMATCH: felt252       = 'PISTOLS: Moves hash mismatch';
         const IMPOSSIBLE_ERROR: felt252          = 'PISTOLS: Impossible error';
+        const SEASON_ENDED: felt252              = 'PISTOLS: Season ended';
+        const SEASON_IS_ACTIVE: felt252          = 'PISTOLS: Season is active';
+        const SEASON_NOT_ENDGAME: felt252        = 'PISTOLS: Not endgame';
     }
 
     fn dojo_init(ref self: ContractState) {
@@ -160,8 +171,7 @@ pub mod game {
             duel_id: u128,
             hashed: u128,
         ) {
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
+            let mut store: Store = StoreTrait::new(self.world_default());
             let mut challenge: Challenge = store.get_challenge(duel_id);
 
             // validate duelist
@@ -232,8 +242,7 @@ pub mod game {
             salt: felt252,
             moves: Span<u8>,
         ) {
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
+            let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate challenge
             let mut challenge: Challenge = store.get_challenge(duel_id);
@@ -286,7 +295,7 @@ pub mod game {
 
             // execute game loop...
             let table: TableConfigValue = store.get_table_config_value(challenge.table_id);
-            let progress: DuelProgress = game_loop(@world, table.deck_type, ref round);
+            let progress: DuelProgress = game_loop(@store.world, table.deck_type, ref round);
             store.set_round(@round);
 
             // end challenge
@@ -296,7 +305,7 @@ pub mod game {
             self.finish_challenge(ref store, challenge, round);
 
             // transfer FAME reward
-            let (balance_a, balance_b): (i128, i128) = world.duelist_token_dispatcher().transfer_fame_reward(duel_id);
+            let (balance_a, balance_b): (i128, i128) = store.world.duelist_token_dispatcher().transfer_fame_reward(duel_id);
             store.set_challenge_fame_bill(
                 @ChallengeFameBalance {
                     duel_id,
@@ -307,7 +316,7 @@ pub mod game {
 
             if (challenge.winner != 0) {
                 // send duel token to winner
-                world.duel_token_dispatcher().transfer_to_winner(duel_id);
+                store.world.duel_token_dispatcher().transfer_to_winner(duel_id);
                 // winning event
                 Activity::DuelResolved.emit(ref store.world, challenge.winner_address(), duel_id.into());
             } else {
@@ -321,6 +330,20 @@ pub mod game {
             challenge.unset_pact(ref store);
         }
 
+        fn collect(ref self: ContractState) -> felt252 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            // collect season if permitted
+            let mut season: SeasonConfig = store.get_current_season();
+            let new_season_table_id: felt252 = season.collect(ref store);
+            ConfigManagerTrait::set_season(ref store, new_season_table_id);
+            // all hail the collector
+            Trophy::Collector.progress(store.world, starknet::get_caller_address(), 1);
+            // TODO: transfer fees
+            // TODO: transfer prizes
+            // TODO: transfer FAME
+            // TODO: transfer DUEL
+            (new_season_table_id)
+        }
 
 
         //------------------------------------
@@ -328,23 +351,27 @@ pub mod game {
         //
 
         fn get_player_card_decks(self: @ContractState, table_id: felt252) -> Span<Span<u8>> {
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
+            let mut store: Store = StoreTrait::new(self.world_default());
             let table: TableConfigValue = store.get_table_config_value(table_id);
             (DuelistHandTrait::get_table_player_decks(table.deck_type))
         }
 
         fn get_duel_progress(self: @ContractState, duel_id: u128) -> DuelProgress {
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
+            let mut store: Store = StoreTrait::new(self.world_default());
             let challenge: Challenge = store.get_challenge(duel_id);
             if (challenge.state.is_finished()) {
                 let table: TableConfigValue = store.get_table_config_value(challenge.table_id);
                 let mut round: Round = store.get_round(duel_id);
-                (game_loop(@world, table.deck_type, ref round))
+                (game_loop(@store.world, table.deck_type, ref round))
             } else {
                 {Default::default()}
             }
+        }
+
+        fn can_collect(self: @ContractState) -> bool {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let season: SeasonConfig = store.get_current_season();
+            (season.can_collect())
         }
 
         fn test_validate_commit_message(self: @ContractState,

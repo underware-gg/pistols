@@ -17,7 +17,7 @@ mod tests {
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST};
     use pistols::types::duel_progress::{DuelProgress};
-    use pistols::utils::timestamp::{timestamp};
+    use pistols::utils::timestamp::{TimestampTrait};
     use pistols::tests::tester::{tester,
         tester::{
             IGameDispatcher, IGameDispatcherTrait,
@@ -120,7 +120,7 @@ mod tests {
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, TABLE_ID, expire_hours);
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
-        assert(ch.timestamp_end == ch.timestamp_start + timestamp::from_hours(expire_hours), 'timestamp_end');
+        assert(ch.timestamp_end == ch.timestamp_start + TimestampTrait::from_hours(expire_hours), 'timestamp_end');
         _assert_empty_progress(sys, duel_id);
     }
 
@@ -150,7 +150,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLE_ID, 48);
-        tester::elapse_timestamp(timestamp::from_days(1));
+        tester::elapse_timestamp(TimestampTrait::from_days(1));
         tester::execute_reply_duel(@sys.duels, A, ID(A), duel_id + 1, true);
     }
 
@@ -162,7 +162,7 @@ mod tests {
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLE_ID, 48);
         let _ch = tester::get_ChallengeValue(sys.world, duel_id);
-        let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_days(3));
+        let (_block_number, _timestamp) = tester::elapse_timestamp(TimestampTrait::from_days(3));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, B, ID(B), duel_id, false);
         assert(new_state != ChallengeState::Awaiting, '!awaiting');
         tester::execute_reply_duel(@sys.duels, B, ID(B), duel_id, true);
@@ -177,7 +177,7 @@ mod tests {
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
 
         tester::assert_pact(sys, duel_id, ch, true, false, "created");
-        let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_date(1, 0, 1));
+        let (_block_number, timestamp) = tester::elapse_timestamp(TimestampTrait::from_datetime(1, 0, 1));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, A, ID(A), duel_id, true);
         assert(new_state == ChallengeState::Expired, 'expired');
         tester::assert_pact(sys, duel_id, ch, false, false, "replied");
@@ -200,7 +200,7 @@ mod tests {
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLE_ID, 48);
         let _ch = tester::get_ChallengeValue(sys.world, duel_id);
 
-        tester::elapse_timestamp(timestamp::from_days(1));
+        tester::elapse_timestamp(TimestampTrait::from_days(1));
         tester::execute_reply_duel(@sys.duels, A, ID(A), duel_id, true);
     }
 
@@ -211,7 +211,7 @@ mod tests {
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLE_ID, 48);
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
-        let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
+        let (_block_number, timestamp) = tester::elapse_timestamp(TimestampTrait::from_days(1));
 
         tester::assert_pact(sys, duel_id, ch, true, false, "created");
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, A, ID(A), duel_id, false);
@@ -235,7 +235,7 @@ mod tests {
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLE_ID, 48);
         let _ch = tester::get_ChallengeValue(sys.world, duel_id);
-        let (_block_number, _timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
+        let (_block_number, _timestamp) = tester::elapse_timestamp(TimestampTrait::from_days(1));
         tester::execute_reply_duel(@sys.duels, BUMMER(), ID(BUMMER()), duel_id, false);
     }
 
@@ -258,7 +258,7 @@ mod tests {
         assert(ch.duelist_id_b == 0, 'challenged_id'); // challenged an address, id is empty
         tester::assert_pact(sys, duel_id, ch, true, false, "created");
 
-        let (_block_number, timestamp) = tester::elapse_timestamp(timestamp::from_days(1));
+        let (_block_number, timestamp) = tester::elapse_timestamp(TimestampTrait::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, B, ID(B), duel_id, false);
         assert(new_state == ChallengeState::Refused, 'refused');
         let ch = tester::get_ChallengeValue(sys.world, duel_id);

@@ -70,12 +70,22 @@ export const getTutorialProgressValue = (name: TutorialProgress): number | undef
 export const getTutorialProgressFromValue = (value: number): TutorialProgress | undefined => Object.keys(TutorialProgress)[value] as TutorialProgress;
 export const getTutorialProgressMap = (): Record<TutorialProgress, number> => Object.keys(TutorialProgress).reduce((acc, v, index) => { acc[v as TutorialProgress] = index; return acc; }, {} as Record<TutorialProgress, number>);
 
+// from: ../dojo/src/models/season.cairo
+export enum SeasonPhase {
+  None = 'None', // 0
+  Single = 'Single', // 1
+  Ended = 'Ended', // 2
+};
+export const getSeasonPhaseValue = (name: SeasonPhase): number | undefined => _indexOrUndefined(Object.keys(SeasonPhase).indexOf(name));
+export const getSeasonPhaseFromValue = (value: number): SeasonPhase | undefined => Object.keys(SeasonPhase)[value] as SeasonPhase;
+export const getSeasonPhaseMap = (): Record<SeasonPhase, number> => Object.keys(SeasonPhase).reduce((acc, v, index) => { acc[v as SeasonPhase] = index; return acc; }, {} as Record<SeasonPhase, number>);
+
 // from: ../dojo/src/models/table.cairo
 export enum TableType {
   Undefined = 'Undefined', // 0
-  Classic = 'Classic', // 1
-  Tournament = 'Tournament', // 2
-  IRLTournament = 'IRLTournament', // 3
+  Season = 'Season', // 1
+  Tutorial = 'Tutorial', // 2
+  Practice = 'Practice', // 3
 };
 export const getTableTypeValue = (name: TableType): number | undefined => _indexOrUndefined(Object.keys(TableType).indexOf(name));
 export const getTableTypeFromValue = (value: number): TableType | undefined => Object.keys(TableType)[value] as TableType;
@@ -926,4 +936,24 @@ export const BITWISE: type_BITWISE = {
   MSB_U64: BigInt('0x8000000000000000'),
   MSB_U128: BigInt('0x80000000000000000000000000000000'),
   MSB_U256: BigInt('0x8000000000000000000000000000000000000000000000000000000000000000'),
+};
+
+// from: ../dojo/src/utils/timestamp.cairo
+type type_TIMESTAMP = {
+  ONE_MINUTE: bigint, // cairo: u64
+  ONE_HOUR: bigint, // cairo: u64
+  ONE_DAY: bigint, // cairo: u64
+  ONE_WEEK: bigint, // cairo: u64
+  TWO_WEEKS: bigint, // cairo: u64
+  THREE_WEEKS: bigint, // cairo: u64
+  FOUR_WEEKS: bigint, // cairo: u64
+};
+export const TIMESTAMP: type_TIMESTAMP = {
+  ONE_MINUTE: 60n,
+  ONE_HOUR: (60n * 60n),
+  ONE_DAY: (60n * 60n * 24n),
+  ONE_WEEK: (60n * 60n * 24n * 7n),
+  TWO_WEEKS: (60n * 60n * 24n * 14n),
+  THREE_WEEKS: (60n * 60n * 24n * 21n),
+  FOUR_WEEKS: (60n * 60n * 24n * 28n),
 };

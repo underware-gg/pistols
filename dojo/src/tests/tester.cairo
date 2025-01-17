@@ -136,7 +136,7 @@ mod tester {
     // Test world
 
     const INITIAL_TIMESTAMP: u64 = 0x100000000;
-    const INITIAL_STEP: u64 = 0x10;
+    const TIMESTEP: u64 = 0x1;
 
     mod FLAGS {
         const GAME: u8       = 0b0000001;
@@ -333,6 +333,10 @@ mod tester {
             resources: resources.span(),
         };
 
+        // setup block
+        testing::set_block_number(1);
+        testing::set_block_timestamp(INITIAL_TIMESTAMP);
+
 // '---- 1'.print();
         let mut world: WorldStorage = spawn_test_world([namespace_def].span());
 // '---- 2'.print();
@@ -360,9 +364,6 @@ mod tester {
         }
 // '---- 7'.print();
 
-        // setup testing
-        testing::set_block_number(1);
-        testing::set_block_timestamp(INITIAL_TIMESTAMP);
         impersonate(OWNER());
 
 // '---- READY!'.print();
@@ -379,14 +380,6 @@ mod tester {
         })
     }
 
-    fn elapse_timestamp(delta: u64) -> (u64, u64) {
-        let block_info = starknet::get_block_info().unbox();
-        let new_block_number = block_info.block_number + 1;
-        let new_block_timestamp = block_info.block_timestamp + delta;
-        testing::set_block_number(new_block_number);
-        testing::set_block_timestamp(new_block_timestamp);
-        (new_block_number, new_block_timestamp)
-    }
 
     #[inline(always)]
     fn get_block_number() -> u64 {
@@ -402,7 +395,19 @@ mod tester {
 
     #[inline(always)]
     fn _next_block() -> (u64, u64) {
-        elapse_timestamp(INITIAL_STEP)
+        (elapse_timestamp(TIMESTEP))
+    }
+
+    fn elapse_timestamp(delta: u64) -> (u64, u64) {
+        let new_timestamp = get_block_timestamp() + delta;
+        (set_timestamp(new_timestamp))
+    }
+
+    fn set_timestamp(new_timestamp: u64) -> (u64, u64) {
+        let new_block_number = get_block_number() + 1;
+        testing::set_block_number(new_block_number);
+        testing::set_block_timestamp(new_timestamp);
+        (new_block_number, new_timestamp)
     }
 
     //
@@ -515,6 +520,12 @@ mod tester {
         (*system).reveal_moves(ID(sender), duel_id, salt, moves);
         _next_block();
     }
+    fn execute_collect(system: @IGameDispatcher, sender: ContractAddress) -> felt252 {
+        impersonate(sender);
+        let new_table_id: felt252 = (*system).collect();
+        _next_block();
+        (new_table_id)
+    }
 
     //
     // getters
@@ -535,6 +546,14 @@ mod tester {
     #[inline(always)]
     fn get_Table(world: WorldStorage, table_id: felt252) -> TableConfig {
         (world.read_model(table_id))
+    }
+    #[inline(always)]
+    fn get_Season(world: WorldStorage, table_id: felt252) -> SeasonConfig {
+        (world.read_model(table_id))
+    }
+    #[inline(always)]
+    fn get_current_Season(world: WorldStorage) -> SeasonConfig {
+        (world.read_model(get_Config(world).season_table_id))
     }
     #[inline(always)]
     fn get_Player(world: WorldStorage, address: ContractAddress) -> Player {

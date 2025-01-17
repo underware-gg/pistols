@@ -149,6 +149,10 @@ impl StoreImpl of StoreTrait {
     fn get_season_config_value(ref self: Store, table_id: felt252) -> SeasonConfigValue {
         (self.world.read_value(table_id))
     }
+    #[inline(always)]
+    fn get_current_season(ref self: Store) -> SeasonConfig {
+        (self.world.read_model(self.get_config().season_table_id))
+    }
 
     #[inline(always)]
     fn get_coin_config(ref self: Store, contract_address: ContractAddress) -> CoinConfig {

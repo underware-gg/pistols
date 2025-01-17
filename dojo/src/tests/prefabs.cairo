@@ -13,7 +13,7 @@ mod prefabs {
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::libs::game_loop::{make_moves_hash};
-    use pistols::utils::timestamp::{timestamp};
+    use pistols::utils::timestamp::{TimestampTrait};
     use pistols::utils::math::{MathTrait};
     use pistols::tests::tester::{tester,
         tester::{
@@ -72,7 +72,7 @@ mod prefabs {
 
     fn start_new_challenge(sys: TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> u128 {
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, duelist_a, duelist_b, MESSAGE, table_id, 48);
-        tester::elapse_timestamp(timestamp::from_days(1));
+        tester::elapse_timestamp(TimestampTrait::from_days(1));
         tester::execute_reply_duel(@sys.duels, duelist_b, ID(duelist_b), duel_id, true);
         (duel_id)
     }

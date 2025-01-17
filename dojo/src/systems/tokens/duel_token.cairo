@@ -154,7 +154,7 @@ pub mod duel_token {
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::{ShortStringTrait};
-    use pistols::utils::timestamp::{timestamp};
+    use pistols::utils::timestamp::{TimestampTrait};
     use pistols::utils::math::{MathTrait};
     use pistols::utils::misc::{ZERO, CONSUME_ADDRESS};
 
@@ -286,7 +286,7 @@ pub mod duel_token {
 
             // calc expiration
             let timestamp_start: u64 = get_block_timestamp();
-            let timestamp_end: u64 = if (expire_hours == 0) { 0 } else { timestamp_start + timestamp::from_hours(expire_hours) };
+            let timestamp_end: u64 = if (expire_hours == 0) { 0 } else { timestamp_start + TimestampTrait::from_hours(expire_hours) };
 
             // create challenge
             let challenge = Challenge {
