@@ -4,13 +4,20 @@ import { BigNumberish } from 'starknet'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useIsMyDuelist, useIsYou } from '/src/hooks/useIsYou'
 import { IconClick } from '/src/components/ui/Icons'
+import { constants } from '@underware_gg/pistols-sdk/pistols'
 
+export const ProfileTypeFolder: Record<constants.ProfileType, string> = {
+  [constants.ProfileType.Undefined]: 'duelists',
+  [constants.ProfileType.Duelist]: 'duelists',
+  [constants.ProfileType.Character]: 'characters',
+  [constants.ProfileType.Bot]: 'bots',
+}
 
-export const makeProfilePicUrl = (profilePic: number | null, square: boolean, bot?: boolean) => {
+export const makeProfilePicUrl = (profilePic: number | null, square: boolean, profileType = constants.ProfileType.Duelist) => {
   if (profilePic === null) return null
   const variant = (square ? 'square' : 'portrait')
-  const type = (bot ? 'bots' : 'duelists')
-  return `/profiles/${type}/${variant}/${('00' + profilePic).slice(-2)}.jpg`
+  const folder = ProfileTypeFolder[profileType]
+  return `/profiles/${folder}/${variant}/${('00' + profilePic).slice(-2)}.jpg`
 }
 const _className = ({ small, medium, square, circle, duel, anon }) => (
   small ? 'ProfilePicSmall'

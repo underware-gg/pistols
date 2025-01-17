@@ -1,6 +1,15 @@
 use starknet::ContractAddress;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
+pub enum ProfileType {
+    Undefined,
+    Duelist: DuelistProfile,        // Duelist(profile)
+    Character: CharacterProfile,    // Character(profile)
+    Bot: BotProfile,                // Bot(profile)
+    // Eternum: u16,   // Eternum(realm id)
+}
+
+#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum DuelistProfile {
     Unknown,
     Duke,
@@ -27,18 +36,18 @@ pub enum DuelistProfile {
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
+pub enum CharacterProfile {
+    Unknown,
+    Bartender,
+    Drunken,
+    Devil,
+}
+
+#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum BotProfile {
     Unknown,
     Scarecrow,
     TinMan,
-}
-
-#[derive(Copy, Drop, Serde, Introspect)]
-pub enum ProfileType {
-    Undefined,
-    Duelist: DuelistProfile,    // Duelist(profile)
-    Bot: BotProfile,            // Bot(profile)
-    // Eternum: u16,   // Eternum(realm id)
 }
 
 
@@ -146,7 +155,27 @@ mod DUELIST_PROFILES {
     };
 }
 
-// to be exported to typescript by generateConstants
+// IMPORTANT: names must be in sync with enum CharacterProfile
+mod CHARACTER_PROFILES {
+    use super::{ProfileDescription};
+    const Unknown: ProfileDescription = ProfileDescription {
+        profile_id: 0,
+        name: 'Unknown',
+    };
+    const Bartender: ProfileDescription = ProfileDescription {
+        profile_id: 1,
+        name: 'Bartender',
+    };
+    const Drunken: ProfileDescription = ProfileDescription {
+        profile_id: 2,
+        name: 'Drunken',
+    };
+    const Devil: ProfileDescription = ProfileDescription {
+        profile_id: 3,
+        name: 'Devil',
+    };
+}
+
 // IMPORTANT: names must be in sync with enum BotProfile
 mod BOT_PROFILES {
     use super::{ProfileDescription};
@@ -169,12 +198,27 @@ mod BOT_PROFILES {
 //----------------------------------
 // Traits
 //
+use pistols::models::duelist::{Duelist};
+use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::utils::misc::{FeltToLossy};
 use pistols::types::constants::{CONST};
 
 #[generate_trait]
-impl ProfileTypeImpl of ProfileTypeTrait {
+impl ProfileManagerImpl of ProfileManagerTrait {
+    fn initialize(ref store: Store, sample: ProfileType) {
+        let profiles: Span<ProfileType> = Self::get_all_profiles_by_type(sample);
+        let mut i: u8 = 0;
+        while (i.into() < profiles.len()) {
+            let profile_type: ProfileType = *profiles.at((i).into());
+            store.set_duelist(@Duelist {
+                duelist_id: profile_type.duelist_id(),
+                profile_type,
+                timestamp: starknet::get_block_timestamp(),
+            });
+            i += 1;
+        };
+    }
     fn randomize_duelist(seed: felt252) -> ProfileType {
         let profile_id: u8 = (seed.to_u8_lossy() % CONST::DUELIST_PROFILE_COUNT) + 1;
         (ProfileType::Duelist(profile_id.into()))
@@ -183,36 +227,79 @@ impl ProfileTypeImpl of ProfileTypeTrait {
         let profile_id: u8 = (seed.to_u8_lossy() % CONST::BOT_PROFILE_COUNT) + 1;
         (ProfileType::Bot(profile_id.into()))
     }
+    fn get_all_profiles_by_type(sample: ProfileType) -> Span<ProfileType> {
+        let mut result: Array<ProfileType> = array![];
+        let mut i: u8 =     1;
+        loop {
+            let profile: ProfileType = match sample {
+                ProfileType::Undefined =>     ProfileType::Undefined,
+                ProfileType::Duelist(_) =>    ProfileType::Duelist(i.into()),
+                ProfileType::Character(_) =>  ProfileType::Character(i.into()),
+                ProfileType::Bot(_) =>        ProfileType::Bot(i.into()),
+            };
+            if (!profile.exists()) {
+                break;
+            };
+            result.append(profile);
+            i += 1;
+        };
+        (result.span())
+    }
+    fn get_all_descriptions_by_type(sample: ProfileType) -> Span<ProfileDescription> {
+        let mut result: Array<ProfileDescription> = array![];
+        let mut i: u8 = 1;
+        loop {
+            let profile: ProfileType = match sample {
+                ProfileType::Undefined =>     ProfileType::Undefined,
+                ProfileType::Duelist(_) =>    ProfileType::Duelist(i.into()),
+                ProfileType::Character(_) =>  ProfileType::Character(i.into()),
+                ProfileType::Bot(_) =>        ProfileType::Bot(i.into()),
+            };
+            if (!profile.exists()) {
+                break;
+            };
+            result.append(profile.description());
+            i += 1;
+        };
+        (result.span())
+    }
+}
+
+#[generate_trait]
+impl ProfileTypeImpl of ProfileTypeTrait {
+    fn description(self: ProfileType) -> ProfileDescription {
+        (match self {
+            ProfileType::Undefined =>           DUELIST_PROFILES::Unknown,
+            ProfileType::Duelist(profile) =>    profile.into(),
+            ProfileType::Character(profile) =>  profile.into(),
+            ProfileType::Bot(profile) =>        profile.into(),
+        })
+    }
+    fn exists(self: ProfileType) -> bool {
+        let desc: ProfileDescription = self.description();
+        (desc.profile_id != 0)
+    }
+    fn duelist_id(self: ProfileType) -> u128 {
+        let desc: ProfileDescription = self.description();
+        (desc.name.to_u128_lossy())
+    }
     fn name(self: ProfileType) -> ByteArray {
-        match self {
-            ProfileType::Undefined => 'Unknown',
-            ProfileType::Duelist(profile) => {
-                let desc: ProfileDescription = profile.into();
-                (desc.name)
-            },
-            ProfileType::Bot(profile) => {
-                let desc: ProfileDescription = profile.into();
-                (desc.name)
-            },
-        }.to_string()
+        let desc: ProfileDescription = self.description();
+        (desc.name.to_string())
     }
     fn get_uri(self: ProfileType,
         base_uri: ByteArray,
         variant: ByteArray,    
     ) -> ByteArray {
-        match self {
-            ProfileType::Duelist(profile) => {
-                let desc: ProfileDescription = profile.into();
-                let number = if (desc.profile_id < 10) {format!("0{}", desc.profile_id)} else {format!("{}", desc.profile_id)};
-                (format!("{}/profiles/duelists/{}/{}.jpg", base_uri, variant, number))
-            },
-            ProfileType::Bot(profile) => {
-                let desc: ProfileDescription = profile.into();
-                let number = if (desc.profile_id < 10) {format!("0{}", desc.profile_id)} else {format!("{}", desc.profile_id)};
-                (format!("{}/profiles/bots/{}/{}.jpg", base_uri, variant, number))
-            },
-            _ => Self::get_uri(ProfileType::Duelist(DuelistProfile::Unknown), base_uri, variant)
-        }
+        let desc: ProfileDescription = self.description();
+        let number = if (desc.profile_id < 10) {format!("0{}", desc.profile_id)} else {format!("{}", desc.profile_id)};
+        let folder: ByteArray = match self {
+            ProfileType::Undefined =>       "duelists",
+            ProfileType::Duelist(_) =>      "duelists",
+            ProfileType::Character(_) =>    "characters",
+            ProfileType::Bot(_) =>          "bots",
+        };
+        (format!("{}/profiles/{}/{}/{}.jpg", base_uri, folder, variant, number))
     }
 }
 
@@ -241,6 +328,16 @@ impl DuelistProfileIntoDescription of Into<DuelistProfile, ProfileDescription> {
             DuelistProfile::Kenzu =>            DUELIST_PROFILES::Kenzu,
             DuelistProfile::NynJah =>           DUELIST_PROFILES::NynJah,
             DuelistProfile::Thrak =>            DUELIST_PROFILES::Thrak,
+        }
+    }
+}
+impl CharacterProfileIntoDescription of Into<CharacterProfile, ProfileDescription> {
+    fn into(self: CharacterProfile) -> ProfileDescription {
+        match self {
+            CharacterProfile::Unknown =>    CHARACTER_PROFILES::Unknown,
+            CharacterProfile::Bartender =>  CHARACTER_PROFILES::Bartender,
+            CharacterProfile::Drunken =>    CHARACTER_PROFILES::Drunken,
+            CharacterProfile::Devil =>      CHARACTER_PROFILES::Devil,
         }
     }
 }
@@ -280,6 +377,14 @@ impl U8IntoDuelistProfile of Into<u8, DuelistProfile> {
         else                { DuelistProfile::Unknown }
     }
 }
+impl U8IntoCharacterProfile of Into<u8, CharacterProfile> {
+    fn into(self: u8) -> CharacterProfile {
+        if self == 1        { CharacterProfile::Bartender }
+        else if self == 2   { CharacterProfile::Drunken }
+        else if self == 3   { CharacterProfile::Devil }
+        else                { CharacterProfile::Unknown }
+    }
+}
 impl U8IntoBotProfile of Into<u8, BotProfile> {
     fn into(self: u8) -> BotProfile {
         if self == 1        { BotProfile::Scarecrow }
@@ -299,52 +404,107 @@ mod tests {
 
     use super::{
         ProfileType, ProfileTypeTrait,
-        DuelistProfile, BotProfile,
+        DuelistProfile, CharacterProfile, BotProfile,
         ProfileDescription,
-        // U8IntoDuelistProfile, U8IntoBotProfile,
+        ProfileManagerTrait,
     };
     use pistols::types::constants::{CONST};
 
+
+    #[test]
+    fn test_get_all_profiles_by_type() {
+        let profiles: Span<ProfileType> = ProfileManagerTrait::get_all_profiles_by_type(ProfileType::Undefined);
+        assert(profiles.len() == 0, '0');
+        let profiles: Span<ProfileType> = ProfileManagerTrait::get_all_profiles_by_type(ProfileType::Duelist(0_u8.into()));
+        assert(profiles.len() == CONST::DUELIST_PROFILE_COUNT.into(), 'DUELIST_PROFILE_COUNT');
+        let profiles: Span<ProfileType> = ProfileManagerTrait::get_all_profiles_by_type(ProfileType::Character(0_u8.into()));
+        assert(profiles.len() == CONST::CHARACTER_PROFILE_COUNT.into(), 'CHARACTER_PROFILE_COUNT');
+        let profiles: Span<ProfileType> = ProfileManagerTrait::get_all_profiles_by_type(ProfileType::Bot(0_u8.into()));
+        assert(profiles.len() == CONST::BOT_PROFILE_COUNT.into(), 'BOT_PROFILE_COUNT');
+    }
+
+    #[test]
+    fn test_get_all_descriptions_by_type() {
+        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::get_all_descriptions_by_type(ProfileType::Undefined);
+        assert(descriptions.len() == 0, '0');
+        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::get_all_descriptions_by_type(ProfileType::Duelist(0_u8.into()));
+        assert(descriptions.len() == CONST::DUELIST_PROFILE_COUNT.into(), 'DUELIST_PROFILE_COUNT');
+        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::get_all_descriptions_by_type(ProfileType::Character(0_u8.into()));
+        assert(descriptions.len() == CONST::CHARACTER_PROFILE_COUNT.into(), 'CHARACTER_PROFILE_COUNT');
+        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::get_all_descriptions_by_type(ProfileType::Bot(0_u8.into()));
+        assert(descriptions.len() == CONST::BOT_PROFILE_COUNT.into(), 'BOT_PROFILE_COUNT');
+    }
+
     #[test]
     fn test_duelist_profiles() {
-        // validate count
-        let profile: DuelistProfile = (CONST::DUELIST_PROFILE_COUNT+1).into();
-        assert!(profile == DuelistProfile::Unknown, "DUELIST_PROFILE_COUNT({}) is wrong", CONST::DUELIST_PROFILE_COUNT);
+        // invalid
+        let invalid_profile: ProfileType = ProfileType::Duelist(0_u8.into());
+        assert!(invalid_profile.exists() == false, "(0) ! exists");
+        let desc: ProfileDescription = invalid_profile.description();
+        assert!(desc.profile_id == 0, "(0) bad profile_id: {}", desc.profile_id);
+        assert!(desc.name == 'Unknown', "(0) bad name: {}", desc.name);
         // validate profiles
-        let mut i: u8 = 0;
+        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::get_all_descriptions_by_type(invalid_profile);
+        let mut i: u8 = 1;
         let mut last_desc: ProfileDescription = Default::default();
-        while (i <= CONST::DUELIST_PROFILE_COUNT) {
-            let profile: DuelistProfile = i.into();
-            let desc: ProfileDescription = profile.into();
-            if (i == 0) {
-                assert!(profile == DuelistProfile::Unknown, "Duelist(0)");
-            } else {
-                assert!(profile != DuelistProfile::Unknown, "Duelist({}) is Unknown", i);
-                assert!(desc.name != last_desc.name, "Duelist({}) == Duelist({}): {}", i, i-1, desc.name);
-                assert!(desc.profile_id == i, "Duelist({}) bad profile_id: {}", i, desc.profile_id);
-            };
+        while (i.into() <= descriptions.len()) {
+            let profile: ProfileType = ProfileType::Duelist(i.into());
+            assert!(profile.exists() == true, "({}) exists", i);
+            assert!(profile != ProfileType::Duelist(DuelistProfile::Unknown), "Duelist({}) is Unknown", i);
+            let desc: ProfileDescription = *descriptions.at((i-1).into());
+            assert!(desc.profile_id == i, "({}) bad profile_id: {}", i, desc.profile_id);
+            assert!(desc.name != last_desc.name, "({}) == ({}): {}", i, i-1, desc.name);
+// desc.name.print();
             last_desc = desc;
             i += 1;
         };
     }
+
+    #[test]
+    fn test_character_profiles() {
+        // invalid
+        let invalid_profile: ProfileType = ProfileType::Character(0_u8.into());
+        assert!(invalid_profile.exists() == false, "(0) ! exists");
+        let desc: ProfileDescription = invalid_profile.description();
+        assert!(desc.profile_id == 0, "(0) bad profile_id: {}", desc.profile_id);
+        assert!(desc.name == 'Unknown', "(0) bad name: {}", desc.name);
+        // validate profiles
+        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::get_all_descriptions_by_type(invalid_profile);
+        let mut i: u8 = 1;
+        let mut last_desc: ProfileDescription = Default::default();
+        while (i.into() <= descriptions.len()) {
+            let profile: ProfileType = ProfileType::Character(i.into());
+            assert!(profile.exists() == true, "({}) exists", i);
+            assert!(profile != ProfileType::Character(CharacterProfile::Unknown), "({}) is Unknown", i);
+            let desc: ProfileDescription = *descriptions.at((i-1).into());
+            assert!(desc.profile_id == i, "({}) bad profile_id: {}", i, desc.profile_id);
+            assert!(desc.name != last_desc.name, "({}) == ({}): {}", i, i-1, desc.name);
+// desc.name.print();
+            last_desc = desc;
+            i += 1;
+        };
+    }
+
     #[test]
     fn test_bot_profiles() {
-        // validate count
-        let profile: BotProfile = (CONST::BOT_PROFILE_COUNT+1).into();
-        assert!(profile == BotProfile::Unknown, "BOT_PROFILE_COUNT({}) is wrong", CONST::BOT_PROFILE_COUNT);
+        // invalid
+        let invalid_profile: ProfileType = ProfileType::Bot(0_u8.into());
+        assert!(invalid_profile.exists() == false, "(0) ! exists");
+        let desc: ProfileDescription = invalid_profile.description();
+        assert!(desc.profile_id == 0, "(0) bad profile_id: {}", desc.profile_id);
+        assert!(desc.name == 'Unknown', "(0) bad name: {}", desc.name);
         // validate profiles
-        let mut i: u8 = 0;
+        let descriptions: Span<ProfileDescription> = ProfileManagerTrait::get_all_descriptions_by_type(invalid_profile);
+        let mut i: u8 = 1;
         let mut last_desc: ProfileDescription = Default::default();
-        while (i <= CONST::BOT_PROFILE_COUNT) {
-            let profile: BotProfile = i.into();
-            let desc: ProfileDescription = profile.into();
-            if (i == 0) {
-                assert!(profile == BotProfile::Unknown, "Bot(0)");
-            } else {
-                assert!(profile != BotProfile::Unknown, "Bot({}) is Unknown", i);
-                assert!(desc.name != last_desc.name, "Bot({}) == Bot({}): {}", i, i-1, desc.name);
-                assert!(desc.profile_id == i, "Bot({}) bad profile_id: {}", i, desc.profile_id);
-            };
+        while (i.into() <= descriptions.len()) {
+            let profile: ProfileType = ProfileType::Bot(i.into());
+            assert!(profile.exists() == true, "({}) exists", i);
+            assert!(profile != ProfileType::Bot(BotProfile::Unknown), "({}) is Unknown", i);
+            let desc: ProfileDescription = *descriptions.at((i-1).into());
+            assert!(desc.profile_id == i, "({}) bad profile_id: {}", i, desc.profile_id);
+            assert!(desc.name != last_desc.name, "({}) == ({}): {}", i, i-1, desc.name);
+// desc.name.print();
             last_desc = desc;
             i += 1;
         };

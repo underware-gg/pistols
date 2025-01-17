@@ -56,6 +56,7 @@ pub mod tutorial {
     };
     use pistols::types::{
         premise::{Premise, PremiseTrait},
+        profile_type::{ProfileType, ProfileTypeTrait, CharacterProfile, BotProfile, ProfileManagerTrait},
         challenge_state::{ChallengeState, ChallengeStateTrait},
         duel_progress::{DuelProgress, DuelistDrawnCard},
         round_state::{RoundState, RoundStateTrait},
@@ -65,7 +66,7 @@ pub mod tutorial {
     use pistols::utils::misc::{ZERO};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::game_loop::{game_loop, make_moves_hash};
-    use pistols::libs::tut::{TutTrait};
+    use pistols::libs::tut::{TutorialTrait, TutorialLevel, TutorialLevelTrait};
 
     mod Errors {
         const UNKNOWN_PLAYER: felt252               = 'TUTORIAL: Unknown player';
@@ -74,6 +75,13 @@ pub mod tutorial {
         const ROUND_NOT_IN_COMMIT: felt252          = 'TUTORIAL: Round not in commit';
         const ROUND_NOT_IN_REVEAL: felt252          = 'TUTORIAL: Round not in reveal';
         const INVALID_MOVES_COUNT: felt252          = 'TUTORIAL: Invalid moves count';
+    }
+
+    fn dojo_init(ref self: ContractState) {
+        let mut store: Store = StoreTrait::new(self.world(@"pistols"));
+        // create agent profiles
+        ProfileManagerTrait::initialize(ref store, ProfileType::Character(CharacterProfile::Unknown));
+        ProfileManagerTrait::initialize(ref store, ProfileType::Bot(BotProfile::Unknown));
     }
 
     #[generate_trait]
@@ -93,9 +101,12 @@ pub mod tutorial {
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
+            let level: TutorialLevel = tutorial_id.into();
+            let opponent: ProfileType = level.opponent_profile();
+
             // create Challenge
             let challenge = Challenge {
-                duel_id: TutTrait::make_duel_id(starknet::get_caller_address(), tutorial_id),
+                duel_id: TutorialTrait::make_duel_id(starknet::get_caller_address(), tutorial_id),
                 table_id: TABLES::TUTORIAL,
                 premise: Premise::Tutorial,
                 quote: 0,
@@ -103,7 +114,7 @@ pub mod tutorial {
                 address_a: starknet::get_caller_address(),
                 address_b: starknet::get_caller_address(),
                 duelist_id_a: player_id,
-                duelist_id_b: TutTrait::opponent_duelist_id(),
+                duelist_id_b: opponent.duelist_id(),
                 // progress
                 state: ChallengeState::InProgress,
                 winner: 0,
@@ -136,7 +147,7 @@ pub mod tutorial {
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
 
-            let duel_id: u128 = TutTrait::make_duel_id(starknet::get_caller_address(), tutorial_id);
+            let duel_id: u128 = TutorialTrait::make_duel_id(starknet::get_caller_address(), tutorial_id);
             let challenge: Challenge = store.get_challenge(duel_id);
             let mut round: Round = store.get_round(duel_id);
 
@@ -157,7 +168,7 @@ pub mod tutorial {
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
 
-            let duel_id: u128 = TutTrait::make_duel_id(starknet::get_caller_address(), tutorial_id);
+            let duel_id: u128 = TutorialTrait::make_duel_id(starknet::get_caller_address(), tutorial_id);
             let mut challenge: Challenge = store.get_challenge(duel_id);
             let mut round: Round = store.get_round(duel_id);
 

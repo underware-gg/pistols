@@ -230,10 +230,23 @@ export enum Premise {
   Blood = 'Blood', // 6
   Nothing = 'Nothing', // 7
   Tournament = 'Tournament', // 8
+  Training = 'Training', // 9
+  Tutorial = 'Tutorial', // 10
 };
 export const getPremiseValue = (name: Premise): number | undefined => _indexOrUndefined(Object.keys(Premise).indexOf(name));
 export const getPremiseFromValue = (value: number): Premise | undefined => Object.keys(Premise)[value] as Premise;
 export const getPremiseMap = (): Record<Premise, number> => Object.keys(Premise).reduce((acc, v, index) => { acc[v as Premise] = index; return acc; }, {} as Record<Premise, number>);
+
+// from: ../dojo/src/types/profile_type.cairo
+export enum ProfileType {
+  Undefined = 'Undefined', // 0
+  Duelist = 'Duelist', // 1
+  Character = 'Character', // 2
+  Bot = 'Bot', // 3
+};
+export const getProfileTypeValue = (name: ProfileType): number | undefined => _indexOrUndefined(Object.keys(ProfileType).indexOf(name));
+export const getProfileTypeFromValue = (value: number): ProfileType | undefined => Object.keys(ProfileType)[value] as ProfileType;
+export const getProfileTypeMap = (): Record<ProfileType, number> => Object.keys(ProfileType).reduce((acc, v, index) => { acc[v as ProfileType] = index; return acc; }, {} as Record<ProfileType, number>);
 
 // from: ../dojo/src/types/profile_type.cairo
 export enum DuelistProfile {
@@ -265,6 +278,17 @@ export const getDuelistProfileFromValue = (value: number): DuelistProfile | unde
 export const getDuelistProfileMap = (): Record<DuelistProfile, number> => Object.keys(DuelistProfile).reduce((acc, v, index) => { acc[v as DuelistProfile] = index; return acc; }, {} as Record<DuelistProfile, number>);
 
 // from: ../dojo/src/types/profile_type.cairo
+export enum CharacterProfile {
+  Unknown = 'Unknown', // 0
+  Bartender = 'Bartender', // 1
+  Drunken = 'Drunken', // 2
+  Devil = 'Devil', // 3
+};
+export const getCharacterProfileValue = (name: CharacterProfile): number | undefined => _indexOrUndefined(Object.keys(CharacterProfile).indexOf(name));
+export const getCharacterProfileFromValue = (value: number): CharacterProfile | undefined => Object.keys(CharacterProfile)[value] as CharacterProfile;
+export const getCharacterProfileMap = (): Record<CharacterProfile, number> => Object.keys(CharacterProfile).reduce((acc, v, index) => { acc[v as CharacterProfile] = index; return acc; }, {} as Record<CharacterProfile, number>);
+
+// from: ../dojo/src/types/profile_type.cairo
 export enum BotProfile {
   Unknown = 'Unknown', // 0
   Scarecrow = 'Scarecrow', // 1
@@ -273,16 +297,6 @@ export enum BotProfile {
 export const getBotProfileValue = (name: BotProfile): number | undefined => _indexOrUndefined(Object.keys(BotProfile).indexOf(name));
 export const getBotProfileFromValue = (value: number): BotProfile | undefined => Object.keys(BotProfile)[value] as BotProfile;
 export const getBotProfileMap = (): Record<BotProfile, number> => Object.keys(BotProfile).reduce((acc, v, index) => { acc[v as BotProfile] = index; return acc; }, {} as Record<BotProfile, number>);
-
-// from: ../dojo/src/types/profile_type.cairo
-export enum ProfileType {
-  Undefined = 'Undefined', // 0
-  Duelist = 'Duelist', // 1
-  Bot = 'Bot', // 2
-};
-export const getProfileTypeValue = (name: ProfileType): number | undefined => _indexOrUndefined(Object.keys(ProfileType).indexOf(name));
-export const getProfileTypeFromValue = (value: number): ProfileType | undefined => Object.keys(ProfileType)[value] as ProfileType;
-export const getProfileTypeMap = (): Record<ProfileType, number> => Object.keys(ProfileType).reduce((acc, v, index) => { acc[v as ProfileType] = index; return acc; }, {} as Record<ProfileType, number>);
 
 // from: ../dojo/src/types/round_state.cairo
 export enum RoundState {
@@ -348,6 +362,7 @@ export type ProfileDescription = {
 // from: ../dojo/src/types/constants.cairo
 type type_CONST = {
   DUELIST_PROFILE_COUNT: number, // cairo: u8
+  CHARACTER_PROFILE_COUNT: number, // cairo: u8
   BOT_PROFILE_COUNT: number, // cairo: u8
   WELCOME_PACK_DUELIST_COUNT: number, // cairo: usize
   ROUND_COUNT: number, // cairo: u8
@@ -361,6 +376,7 @@ type type_CONST = {
 };
 export const CONST: type_CONST = {
   DUELIST_PROFILE_COUNT: 21,
+  CHARACTER_PROFILE_COUNT: 3,
   BOT_PROFILE_COUNT: 2,
   WELCOME_PACK_DUELIST_COUNT: 5,
   ROUND_COUNT: 1,
@@ -699,6 +715,8 @@ type type_PREMISES = {
   Blood: PremiseDescription, // cairo: PremiseDescription
   Nothing: PremiseDescription, // cairo: PremiseDescription
   Tournament: PremiseDescription, // cairo: PremiseDescription
+  Tutorial: PremiseDescription, // cairo: PremiseDescription
+  Training: PremiseDescription, // cairo: PremiseDescription
 };
 export const PREMISES: type_PREMISES = {
   Undefined: {
@@ -736,6 +754,14 @@ export const PREMISES: type_PREMISES = {
   Tournament: {
     name: 'Tournament',
     prefix: 'to be the winner of',
+  },
+  Tutorial: {
+    name: 'Tutorial',
+    prefix: 'to learn the ropes',
+  },
+  Training: {
+    name: 'Training',
+    prefix: 'to train for',
   },
 };
 
@@ -852,6 +878,32 @@ export const DUELIST_PROFILES: type_DUELIST_PROFILES = {
   Thrak: {
     profile_id: 21,
     name: 'Thrak',
+  },
+};
+
+// from: ../dojo/src/types/profile_type.cairo
+type type_CHARACTER_PROFILES = {
+  Unknown: ProfileDescription, // cairo: ProfileDescription
+  Bartender: ProfileDescription, // cairo: ProfileDescription
+  Drunken: ProfileDescription, // cairo: ProfileDescription
+  Devil: ProfileDescription, // cairo: ProfileDescription
+};
+export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
+  Unknown: {
+    profile_id: 0,
+    name: 'Unknown',
+  },
+  Bartender: {
+    profile_id: 1,
+    name: 'Bartender',
+  },
+  Drunken: {
+    profile_id: 2,
+    name: 'Drunken',
+  },
+  Devil: {
+    profile_id: 3,
+    name: 'Devil',
   },
 };
 

@@ -48,8 +48,9 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   // console.log(`!!!!!!!!!!! duelist profileType >>>>>`, duelist_id, profileType, profileValue, constants.DUELIST_PROFILES[profileValue])
   const profileDescription = useMemo(() => (
     profileType == constants.ProfileType.Duelist ? constants.DUELIST_PROFILES[profileValue]
-      : profileType == constants.ProfileType.Bot ? constants.BOT_PROFILES[profileValue]
-        : constants.DUELIST_PROFILES[constants.DuelistProfile.Unknown]
+      : profileType == constants.ProfileType.Character ? constants.CHARACTER_PROFILES[profileValue]
+        : profileType == constants.ProfileType.Bot ? constants.BOT_PROFILES[profileValue]
+          : constants.DUELIST_PROFILES[constants.DuelistProfile.Unknown]
   ), [profileType, profileValue])
 
   const name = useMemo(() => (profileDescription.name), [profileDescription])

@@ -127,7 +127,7 @@ pub mod duelist_token {
         table::{TABLES},
     };
     use pistols::types::{
-        profile_type::{ProfileType, ProfileTypeTrait},
+        profile_type::{ProfileType, ProfileTypeTrait, ProfileManagerTrait},
         constants::{CONST, FAME},
     };
     use pistols::libs::store::{Store, StoreTrait};
@@ -216,7 +216,7 @@ pub mod duelist_token {
                 // create Duelist
                 let duelist = Duelist {
                     duelist_id: *duelist_ids[i],
-                    profile_type: ProfileTypeTrait::randomize_duelist(rnd.low.into()),
+                    profile_type: ProfileManagerTrait::randomize_duelist(rnd.low.into()),
                     timestamp: get_block_timestamp(),
                 };
                 store.set_duelist(@duelist);

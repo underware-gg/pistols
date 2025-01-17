@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react'
 import { Container, Table } from 'semantic-ui-react'
+import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import App from '/src/components/App'
-import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -21,9 +21,11 @@ export default function DuelistProfilesPage() {
     <App>
       <Container>
         <br />
-        <Profiles name='Duelists' profiles={constants.DUELIST_PROFILES as unknown as Profiles} />
+        <Profiles name='Duelists' profiles={constants.DUELIST_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Duelist} />
         <br />
-        <Profiles name='Bots' profiles={constants.BOT_PROFILES as unknown as Profiles} isBot />
+        <Profiles name='Characters' profiles={constants.CHARACTER_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Character} />
+        <br />
+        <Profiles name='Bots' profiles={constants.BOT_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Bot} />
         <br />
       </Container>
     </App>
@@ -34,11 +36,11 @@ export default function DuelistProfilesPage() {
 function Profiles({
   name,
   profiles,
-  isBot = false,
+  profileType,
 }: {
   name: string,
   profiles: Profiles,
-  isBot?: boolean,
+  profileType: constants.ProfileType,
 }) {
   const style = { width: 'auto', height: '100px', backgroundColor: 'black' }
 
@@ -56,9 +58,9 @@ function Profiles({
             {profile.name}
           </Cell>
           <Cell>
-            <img src={makeProfilePicUrl(profile.profile_id, false, isBot)} style={style} />
+            <img src={makeProfilePicUrl(profile.profile_id, false, profileType)} style={style} />
             {` `}
-            <img src={makeProfilePicUrl(profile.profile_id, true, isBot)} style={style} />
+            <img src={makeProfilePicUrl(profile.profile_id, true, profileType)} style={style} />
           </Cell>
         </Row>
       )
