@@ -94,9 +94,9 @@ export default function Duel({
   } = useAnimatedDuel(duelId, duelSceneStarted)
 
   const { debugMode, duelSpeedFactor } = useSettings()
-  const { dispatchSelectDuel } = usePistolsContext()
+  const { dispatchSetDuel } = usePistolsContext()
 
-  useEffect(() => dispatchSelectDuel(duelId), [duelId])
+  useEffect(() => dispatchSetDuel(duelId), [duelId])
 
   const [statsA, setStatsA] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined })
   const [statsB, setStatsB] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined })

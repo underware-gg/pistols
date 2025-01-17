@@ -73,7 +73,7 @@ function MainUI() {
   useSyncSelectedDuelist()
 
   const { gameImpl } = useThreeJsContext()
-  const { selectedDuelId } = usePistolsContext()
+  const { currentDuel } = usePistolsContext()
   const { atGate, atProfile, atTavern, atDuel, atDoor, atDuels, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
@@ -82,7 +82,7 @@ function MainUI() {
       if (atGate) setCurrentScene(<Gate />);
       else if (atDoor) setCurrentScene(<Door />);
       else if (atTutorial) setCurrentScene(<TutorialUI />);
-      else if (atDuel && selectedDuelId) setCurrentScene(<Duel duelId={selectedDuelId} />);
+      else if (atDuel && currentDuel) setCurrentScene(<Duel duelId={currentDuel} />);
       else if (atProfile) setCurrentScene(<ScProfile />);
       else if (atDuels) setCurrentScene(<ScDuels />);
       else if (atDuelists) setCurrentScene(<ScDuelists />);
