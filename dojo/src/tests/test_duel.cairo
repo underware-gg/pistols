@@ -797,7 +797,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Challenge not ongoing', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Challenge not active', 'ENTRYPOINT_FAILED'))]
     fn test_commit_challenge_finished_commit() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::PRACTICE);
@@ -810,7 +810,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('PISTOLS: Challenge not ongoing', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('PISTOLS: Challenge not active', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_challenge_finished_reveal() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
         let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), TABLES::PRACTICE);

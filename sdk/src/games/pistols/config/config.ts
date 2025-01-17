@@ -48,9 +48,14 @@ export const STARKNET_DOMAIN: StarknetDomain = {
 
 const contractPolicyDescriptions: ContractPolicyDescriptions = {
   game: {
-    name: 'Pistols Game Loop',
-    description: 'Pistols Game Loop',
+    name: 'Game',
+    description: 'Game loop contract',
     interfaces: ['IGame'],
+  },
+  tutorial: {
+    name: 'Tutorial',
+    description: 'Tutorial game contract',
+    interfaces: ['ITutorial'],
   },
   duel_token: {
     name: 'Duel Token',

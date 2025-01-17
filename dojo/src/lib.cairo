@@ -10,6 +10,7 @@ mod systems {
     mod bank;
     mod game;
     mod rng;
+    mod tutorial;
     #[cfg(feature:'vrf_mock')]
     mod vrf_mock;
     mod tokens {
@@ -32,6 +33,7 @@ mod libs {
     mod game_loop;
     mod seeder;
     mod store;
+    mod tut;
 }
 
 mod models {

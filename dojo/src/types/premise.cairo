@@ -13,6 +13,8 @@ pub enum Premise {
     Blood,      // 6
     Nothing,    // 7
     Tournament, // 8
+    Training,   // 9
+    Tutorial,   // 10
 }
 
 
@@ -66,6 +68,14 @@ mod PREMISES {
         name: 'Tournament',
         prefix: 'to be the winner of',
     };
+    const Tutorial: PremiseDescription = PremiseDescription {
+        name: 'Tutorial',
+        prefix: 'to learn the ropes',
+    };
+    const Training: PremiseDescription = PremiseDescription {
+        name: 'Training',
+        prefix: 'to train for',
+    };
 }
 
 
@@ -87,6 +97,8 @@ impl PremiseImpl of PremiseTrait {
             Premise::Blood       => PREMISES::Blood,
             Premise::Nothing     => PREMISES::Nothing,
             Premise::Tournament  => PREMISES::Tournament,
+            Premise::Tutorial    => PREMISES::Tutorial,
+            Premise::Training    => PREMISES::Training, 
         }
     }
     fn name(self: Premise) -> ByteArray {

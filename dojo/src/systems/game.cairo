@@ -95,11 +95,13 @@ pub mod game {
             ConfigManagerTrait,
         },
     };
-    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::duel_progress::{DuelProgress, DuelistDrawnCard};
-    use pistols::types::round_state::{RoundState, RoundStateTrait};
-    use pistols::types::cards::hand::DuelistHandTrait;
-    use pistols::types::typed_data::{CommitMoveMessage, CommitMoveMessageTrait};
+    use pistols::types::{
+        challenge_state::{ChallengeState, ChallengeStateTrait},
+        duel_progress::{DuelProgress, DuelistDrawnCard},
+        round_state::{RoundState, RoundStateTrait},
+        cards::hand::DuelistHandTrait,
+        typed_data::{CommitMoveMessage, CommitMoveMessageTrait},
+    };
     use pistols::types::trophies::{Trophy, TrophyTrait, TROPHY};
     use pistols::types::constants::{CONST};
     use pistols::utils::short_string::{ShortStringTrait};
@@ -109,7 +111,7 @@ pub mod game {
 
     mod Errors {
         const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
-        const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not ongoing';
+        const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not active';
         const NOT_ACCEPTED: felt252              = 'PISTOLS: Accept challenge first';
         const NOT_YOUR_DUEL: felt252             = 'PISTOLS: Not your duel';
         const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
