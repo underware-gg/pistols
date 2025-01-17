@@ -7,6 +7,7 @@ import { CommitMoveMessage } from '/src/utils/salt'
 import { tutorialScenes } from '/src/data/tutorialConstants'
 import { SceneName } from '/src/data/assets'
 import { useTableId } from '../stores/configStore'
+import { SCENE_CHANGE_ANIMATION_DURATION } from '../three/game'
 
 //
 // React + Typescript + Context
@@ -30,6 +31,7 @@ export const initialState = {
   selectedDuelistId: 0n,
   selectedPlayerAddress: 0n,
   challengingAddress: 0n,
+  currentDuel: 0n,
   currentScene: undefined as SceneName,
   lastScene: undefined as SceneName,
   moves: {} as StoredMoves,
@@ -43,11 +45,13 @@ export const initialState = {
 const PistolsActions = {
   SET_SIG: 'SET_SIG',
   SET_SCENE: 'SET_SCENE',
+  SET_DUEL: 'SET_DUEL',
   SELECT_DUEL: 'SELECT_DUEL',
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
   SELECT_PLAYER_ADDRESS: 'SELECT_PLAYER_ADDRESS',
   SELECT_CHALLENGING_ADDRESS: 'SELECT_CHALLENGING_ADDRESS',
   SET_MOVES: 'SET_MOVES',
+  RESET_VALUES: 'RESET_VALUES',
 }
 
 
@@ -59,12 +63,13 @@ type PistolsContextStateType = typeof initialState
 type ActionType =
   | { type: 'SET_SIG', payload: bigint[] }
   | { type: 'SET_SCENE', payload: SceneName }
+  | { type: 'SET_DUEL', payload: bigint }
   | { type: 'SELECT_DUEL', payload: bigint }
   | { type: 'SELECT_DUELIST_ID', payload: bigint }
   | { type: 'SELECT_PLAYER_ADDRESS', payload: bigint }
   | { type: 'SELECT_CHALLENGING_ADDRESS', payload: bigint }
   | { type: 'SET_MOVES', payload: StoredMoves }
-
+  | { type: 'RESET_VALUES', payload: null }
 
 
 //--------------------------------
@@ -95,6 +100,13 @@ const PistolsProvider = ({
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
     switch (action.type) {
+      case PistolsActions.RESET_VALUES: {
+        newState.selectedDuelId = 0n
+        newState.selectedDuelistId = 0n
+        newState.selectedPlayerAddress = 0n
+        newState.challengingAddress = 0n
+        break
+      }
       case PistolsActions.SET_SIG: {
         newState.walletSig = {
           address: action.payload[0] as bigint,
@@ -105,6 +117,10 @@ const PistolsProvider = ({
       case PistolsActions.SET_SCENE: {
         newState.lastScene = state.currentScene
         newState.currentScene = action.payload as SceneName
+        break
+      }
+      case PistolsActions.SET_DUEL: {
+        newState.currentDuel = action.payload as bigint
         break
       }
       case PistolsActions.SELECT_DUEL: {
@@ -179,6 +195,14 @@ export const usePistolsContext = () => {
       payload: [BigInt(address ?? 0n), BigInt(sig ?? 0n)]
     })
   }
+
+  const dispatchSetDuel = (newId: BigNumberish) => {
+    dispatch({
+      type: PistolsActions.SET_DUEL,
+      payload: BigInt(newId),
+    })
+  }
+
   const dispatchSelectDuelistId = (newId: BigNumberish, playerAddress?: BigNumberish) => {
     if (!isPositiveBigint(newId) && isPositiveBigint(playerAddress)) {
       dispatch({
@@ -227,12 +251,19 @@ export const usePistolsContext = () => {
       payload: newScene,
     })
   }
+  const __dispatchResetValues = () => {
+    dispatch({
+      type: PistolsActions.RESET_VALUES,
+      payload: null,
+    })
+  }
   return {
     ...state,
     hasSigned: (state.walletSig.sig > 0n),
     // PistolsActions,
     dispatch,
     dispatchSetSig,
+    dispatchSetDuel,
     dispatchSelectDuel,
     dispatchSelectDuelistId,
     dispatchSelectPlayerAddress,
@@ -240,6 +271,7 @@ export const usePistolsContext = () => {
     dispatchSetMoves,
     makeStoredMovesKey,
     __dispatchSetScene, // used internally only
+    __dispatchResetValues,  // used internally only
   }
 }
 
@@ -300,7 +332,7 @@ type SceneSlug = {
   duelId?: BigNumberish,
 }
 export const usePistolsScene = () => {
-  const { currentScene, lastScene, selectedDuelId, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
+  const { currentScene, lastScene, selectedDuelId, dispatchSetDuel, __dispatchSetScene, __dispatchResetValues } = usePistolsContext()
   const { tableId, isSeason, isTutorial } = useTableId()
 
   const location = useLocation()
@@ -316,7 +348,7 @@ export const usePistolsScene = () => {
     } else if (sceneRoutes[newScene].hasDuelId) {
       slug = `${bigintToDecimal(setSlug.duelId || selectedDuelId)}`
       if (!bigintEquals(slug, selectedDuelId)) {
-        dispatchSelectDuel(slug)
+        dispatchSetDuel(slug)
       }
     }
     url += slug ? `/${slug}` : ''
@@ -324,6 +356,9 @@ export const usePistolsScene = () => {
       console.log(`navigate >>>>> [${location.pathname}] > [${url}]`)
       navigate(url)
     }
+    setTimeout(() => {
+      __dispatchResetValues()
+    }, SCENE_CHANGE_ANIMATION_DURATION)
     __dispatchSetScene(newScene)
   }, [location.pathname, navigate, selectedDuelId, tableId, isSeason])
 
@@ -355,7 +390,7 @@ export const usePistolsScene = () => {
 
 // use only once!!!!
 export const usePistolsSceneFromRoute = () => {
-  const { currentScene, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
+  const { dispatchSetDuel, __dispatchSetScene, currentScene } = usePistolsContext()
 
   // URL slugs (/path/slug)
   // https://api.reactrouter.com/v7/functions/react_router.useParams.html
@@ -374,12 +409,13 @@ export const usePistolsSceneFromRoute = () => {
       const newScene = Object.keys(sceneRoutes).find(key => {
         return location.pathname.startsWith(sceneRoutes[key].baseUrl)
       }) as SceneName
-      // console.log(`ROUTE [${currentRoute}] >> SCENE [${newScene}]`, router)
       if (newScene && newScene != currentScene) {
         const route = sceneRoutes[newScene]
-        __dispatchSetScene(newScene)
-       if (route.hasDuelId) {
-          dispatchSelectDuel(params['duel_id'] || '0x0')
+        if (route.baseUrl != currentScene) {
+          __dispatchSetScene(newScene)
+          if (route.hasDuelId) {
+            dispatchSetDuel(params['duel_id'] || '0x0')
+          }
         }
       }
     }

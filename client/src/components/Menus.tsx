@@ -2,30 +2,23 @@ import React from 'react'
 import { Grid, Menu } from 'semantic-ui-react'
 import { usePistolsScene, usePistolsContext } from '/src/hooks/PistolsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { DuelStage } from '/src/hooks/useDuel'
 import { IconClick } from '/src/components/ui/Icons'
 import { makeDuelDataUrl } from '/src/utils/pistols'
 import { SceneName } from '/src/data/assets'
 
-const Row = Grid.Row
-const Col = Grid.Column
 
 export function MenuDuel({
-  duelStage,
   duelId,
-  tableId,
 } : {
-  duelStage: DuelStage
   duelId: bigint
-  tableId: string
 }) {
   const { dispatchSetting, settings, SettingsActions } = useSettings()
-  const { dispatchSelectDuel } = usePistolsContext()
+  const { dispatchSetDuel } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
 
   const _backToTavern = () => {
-    dispatchSelectDuel(0n)
     dispatchSetScene(SceneName.Tavern)
+    dispatchSetDuel(0n)
   }
 
   const _switchSfx = () => {
