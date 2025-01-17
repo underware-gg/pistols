@@ -18,8 +18,8 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function AccountHeader() {
-  const { address, isConnected } = useAccount()
-  const { isAnon, duelistId } = useSettings()
+  const { isConnected } = useAccount()
+  const { duelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
 

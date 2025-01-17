@@ -72,13 +72,10 @@ export function EntityStoreSync() {
       // console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
       // console.log("EntityStoreSync() SET =======> [Player]:", filterEntitiesByModel(entities, 'Player'))
       configState.setEntities(filterEntitiesByModel(entities, 'Config'))
-      tableState.setEntities(filterEntitiesByModel(entities, 'TableConfig'))
+      tableState.setEntities(filterEntitiesByModel(entities, ['TableConfig', 'SeasonConfig']))
       tokenState.setEntities(filterEntitiesByModel(entities, 'TokenConfig'))
       playerState.setEntities(filterEntitiesByModel(entities, 'Player'))
-      const duelistEntities = []
-        .concat(filterEntitiesByModel(entities, 'Duelist'))
-        .concat(filterEntitiesByModel(entities, 'DuelistChallenge'))
-        .concat(filterEntitiesByModel(entities, 'Scoreboard'))
+      const duelistEntities = filterEntitiesByModel(entities, ['Duelist', 'DuelistChallenge', 'Scoreboard'])
       duelistState.setEntities(duelistEntities)
       duelistQueryState.setEntities(duelistEntities)
     },
@@ -87,7 +84,7 @@ export function EntityStoreSync() {
       if (getEntityModel(entity, 'Config')) {
         configState.updateEntity(entity)
       }
-      if (getEntityModel(entity, 'TableConfig')) {
+      if (getEntityModel(entity, 'TableConfig') || getEntityModel(entity, 'SeasonConfig')) {
         tableState.updateEntity(entity)
       }
       if (getEntityModel(entity, 'TokenConfig')) {

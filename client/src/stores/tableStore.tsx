@@ -14,6 +14,14 @@ export const useAllTableIds = () => {
   }
 }
 
+export const useAllSeasonIds = () => {
+  const entities = useTableConfigStore((state) => state.entities)
+  const seasonIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.SeasonConfig.season_id)), [entities])
+  return {
+    seasonIds,
+  }
+}
+
 export const useTable = (table_id: string) => {
   const entityId = useEntityId([stringToFelt(table_id)])
   const entities = useTableConfigStore((state) => state.entities);
@@ -26,9 +34,9 @@ export const useTable = (table_id: string) => {
   const feeMin = useMemo(() => BigInt(table?.fee_min ?? 0), [table])
   const tableType = useMemo(() => (parseEnumVariant<constants.TableType>(table?.table_type) ?? null), [table])
   const tableTypeDescription = useMemo(() => (table?.table_type ? {
-    [constants.TableType.Classic]: 'Classic',
-    [constants.TableType.Tournament]: 'Tournament',
-    [constants.TableType.IRLTournament]: 'IRL Tournamment',
+    [constants.TableType.Practice]: 'Practice',
+    [constants.TableType.Tutorial]: 'Tutorial',
+    [constants.TableType.Season]: 'Season',
   }[tableType] : null), [table])
 
   return {
@@ -37,7 +45,8 @@ export const useTable = (table_id: string) => {
     feeMin,
     tableType: tableTypeDescription ?? '?',
     tableIsOpen: table?.is_open ?? false,
-    isTournament: (tableType == constants.TableType.Tournament),
-    isIRLTournament: (tableType == constants.TableType.IRLTournament),
+    isPractice: (tableType == constants.TableType.Practice),
+    isTutorial: (tableType == constants.TableType.Tutorial),
+    isSeason: (tableType == constants.TableType.Season),
   }
 }

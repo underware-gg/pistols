@@ -3,11 +3,10 @@ import { useNavigate, useSearchParams, useLocation, useParams } from 'react-rout
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
 import { bigintToHex, bigintToNumber, bigintToDecimal, isPositiveBigint, poseidon } from '@underware_gg/pistols-sdk/utils'
-import { useSettings } from '/src/hooks/SettingsContext'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { CommitMoveMessage } from '/src/utils/salt'
 import { tutorialScenes } from '/src/data/tutorialConstants'
 import { SceneName } from '/src/data/assets'
+import { useTableId } from '../stores/configStore'
 
 //
 // React + Typescript + Context
@@ -260,20 +259,19 @@ type SceneRoute = {
   // makeRoute: (state: PistolsContextStateType) => string
 }
 
+// !!! all routes need to be configured in main.tsx
 export const sceneRoutes: Record<SceneName, SceneRoute> = {
-  // !!! all routes need to be redirected in next.config.js
-  [SceneName.Door]: { baseUrl: '/door' },
-  // standalone scenes
-  [SceneName.Profile]: { baseUrl: '/profile', title: 'Pistols - Profile' },
+  // scenes with tableId (optional)
+  [SceneName.Door]: { baseUrl: '/door', hasTableId: true },
+  [SceneName.Tavern]: { baseUrl: '/tavern', hasTableId: true },
+  [SceneName.Profile]: { baseUrl: '/profile', hasTableId: true, title: 'Pistols - Profile' },
+  [SceneName.Duelists]: { baseUrl: '/balcony', hasTableId: true, title: 'Pistols - Duelists' },
+  [SceneName.Duels]: { baseUrl: '/duels', hasTableId: true, title: 'Pistols - Your Duels' },
+  [SceneName.Graveyard]: { baseUrl: '/graveyard', hasTableId: true, title: 'Pistols - Past Duels' },
+  [SceneName.Tournament]: { baseUrl: '/__tournament__', hasTableId: true, title: 'Pistols - Tournament' },
+  [SceneName.IRLTournament]: { baseUrl: '/__irltournament__', hasTableId: true, title: 'Pistols - IRL Tournament' },
   // scenes with duelId
-  [SceneName.Duel]: { baseUrl: '/duel/', hasDuelId: true, title: 'Pistols - Duel!' },
-  // scenes with tableId
-  [SceneName.Tavern]: { baseUrl: '/tavern/', hasTableId: true },
-  [SceneName.Duelists]: { baseUrl: '/balcony/', hasTableId: true, title: 'Pistols - Duelists' },
-  [SceneName.Duels]: { baseUrl: '/duels/', hasTableId: true, title: 'Pistols - Your Duels' },
-  [SceneName.Graveyard]: { baseUrl: '/graveyard/', hasTableId: true, title: 'Pistols - Past Duels' },
-  [SceneName.Tournament]: { baseUrl: '/__tournament__/', hasTableId: true, title: 'Pistols - Tournament' },
-  [SceneName.IRLTournament]: { baseUrl: '/__irltournament__/', hasTableId: true, title: 'Pistols - IRL Tournament' },
+  [SceneName.Duel]: { baseUrl: '/duel', hasDuelId: true, title: 'Pistols - Duel!' },
   // tutorial scenes
   [SceneName.Tutorial]: { baseUrl: '/tutorial/entry', title: 'Pistols - Tutorial' },
   [SceneName.TutorialScene2]: { baseUrl: '/tutorial/conflict', title: 'Pistols - Tutorial' },
@@ -297,27 +295,29 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
 //    > useSyncRouterParams()
 // D: Browser BACK button > same as A
 //
-
+type SceneSlug = {
+  tableId?: string,
+  duelId?: string,
+}
 export const usePistolsScene = () => {
   const { currentScene, lastScene, selectedDuelId, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
-  const { tableId, dispatchTableId } = useSettings()
+  const { tableId, isSeason, isTutorial } = useTableId()
 
   const location = useLocation()
   const navigate = useNavigate()
 
   // setting a scene will only the url
-  const dispatchSetScene = useCallback((newScene: SceneName, slugs?: string[]) => {
+  const dispatchSetScene = useCallback((newScene: SceneName, setSlug: SceneSlug = {}) => {
     let route = sceneRoutes[newScene]
     let url = route.baseUrl
     let slug = ''
     if (sceneRoutes[newScene].hasTableId) {
-      slug = `${slugs?.[0] || tableId || constants.TABLES.LORDS}`
-      dispatchTableId(slug)
+      slug = setSlug.tableId ?? (tableId && !isSeason ? tableId : '')
     } else if (sceneRoutes[newScene].hasDuelId) {
-      slug = `${bigintToNumber(slugs?.[0] || selectedDuelId)}`
+      slug = `${bigintToNumber(setSlug.duelId || selectedDuelId)}`
       dispatchSelectDuel(slug)
     }
-    url += slug
+    url += slug ? `/${slug}` : ''
     if (url != location.pathname) {
       console.log(`navigate >>>>> [${location.pathname}] > [${url}]`)
       navigate(url)
@@ -354,7 +354,6 @@ export const usePistolsScene = () => {
 // use only once!!!!
 export const usePistolsSceneFromRoute = () => {
   const { currentScene, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
-  const { dispatchTableId } = useSettings()
 
   // URL slugs (/path/slug)
   // https://api.reactrouter.com/v7/functions/react_router.useParams.html
@@ -377,9 +376,7 @@ export const usePistolsSceneFromRoute = () => {
       if (newScene && newScene != currentScene) {
         const route = sceneRoutes[newScene]
         __dispatchSetScene(newScene)
-        if (route.hasTableId) {
-          dispatchTableId(params['table_id'] || constants.TABLES.LORDS)
-        } else if (route.hasDuelId) {
+       if (route.hasDuelId) {
           dispatchSelectDuel(params['duel_id'] || '0x0')
         }
       }

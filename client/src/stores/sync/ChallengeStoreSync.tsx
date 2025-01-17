@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useSettings } from '/src/hooks/SettingsContext'
+import { useTableId } from '/src/stores/configStore'
 import { formatQueryValue, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
 import { useMounted, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { PistolsGetQuery, PistolsSubQuery, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
@@ -12,7 +12,7 @@ import { useChallengeStore } from '/src/stores/challengeStore'
 // !!! Add only once to a top level component !!!
 //
 export function ChallengeStoreSync() {
-  const { tableId } = useSettings()
+  const { tableId } = useTableId()
   const query_get = useMemo<PistolsGetQuery>(() => ({
     pistols: {
       Challenge: {

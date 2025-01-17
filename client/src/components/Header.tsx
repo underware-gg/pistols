@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Image, Input, ButtonGroup, Divider, Button } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useQueryParams, DuelistColumn, SortDirection, ChallengeColumn } from '/src/stores/queryParamsStore'
-import { useSettings } from '/src/hooks/SettingsContext'
+import { useTableId } from '/src/stores/configStore'
 import { useTable } from '/src/stores/tableStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameAspect } from '/src/hooks/useGameApect'
@@ -32,7 +32,7 @@ function useExit() {
 
 export function Header() {
 
-  const { tableId } = useSettings()
+  const { tableId, isSeason, isTutorial } = useTableId()
   const { tableOpener } = usePistolsContext()
   const { description } = useTable(tableId)
 

@@ -1,12 +1,14 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/state'
 import { useEntityModel, getEntityModel } from '@underware_gg/pistols-sdk/dojo'
+import { useRouteSlugs } from '/src/hooks/useRoute'
+import { feltToString, keysToEntity } from '@underware_gg/pistols-sdk/utils'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
-import { keysToEntity } from '@underware_gg/pistols-sdk/utils'
 
 export const useConfigStore = createDojoStore<PistolsSchemaType>();
 
 const configKey = keysToEntity([constants.CONFIG.CONFIG_KEY])
+
 
 //--------------------------------
 // 'consumer' hooks
@@ -18,13 +20,33 @@ export const useConfig = () => {
   const config = useEntityModel<models.Config>(entity, 'Config')
   // useEffect(() => console.log(`useConfig() =>`, config), [config])
 
-  const isPaused = useMemo(() => config?.is_paused ?? false, [config])
-  const treasuryAddress = useMemo(() => config ? BigInt(config.treasury_address) : null, [config])
-  const lordsAddress = useMemo(() => config ? BigInt(config.lords_address) : null, [config])
+  const isPaused = useMemo(() => (config?.is_paused ?? false), [config])
+  const seasonTableId = useMemo(() => (config ? feltToString(config.season_table_id) : null), [config])
+
+  const treasuryAddress = useMemo(() => (config ? BigInt(config.treasury_address) : null), [config])
+  const lordsAddress = useMemo(() => (config ? BigInt(config.lords_address) : null), [config])
+  const vrfAddress = useMemo(() => (config ? BigInt(config.vrf_address) : null), [config])
+
   return {
     isPaused,
+    seasonTableId,
+    // accounts
     treasuryAddress,
     lordsAddress,
+    vrfAddress,
+  }
+}
+
+export const useTableId = () => {
+  const { seasonTableId } = useConfig()
+  const { table_id } = useRouteSlugs()
+  const tableId = useMemo(() => (table_id || seasonTableId), [table_id, seasonTableId])
+  const isSeason = useMemo(() => (seasonTableId && tableId === seasonTableId), [tableId, seasonTableId])
+  const isTutorial = useMemo(() => (tableId === constants.TABLES.TUTORIAL), [tableId])
+  return {
+    tableId,
+    isSeason,
+    isTutorial,
   }
 }
 

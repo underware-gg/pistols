@@ -17,6 +17,7 @@ import { DuelistItem } from '/src/components/account/AccountHeader'
 import { BookmarkIcon } from '/src/components/ui/Icons'
 import { SceneName } from '/src/data/assets'
 import { bigintEquals, bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { useTableId } from '/src/stores/configStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -125,10 +126,11 @@ export function ChallengeButton({
 }) {
   const { dispatchChallengingPlayerAddress, dispatchSelectDuel } = usePistolsContext()
   const { address } = useAccount()
-  const { tableId, isAnon } = useSettings()
+  const { duelistId } = useSettings()
+  const { tableId } = useTableId()
   const { isMyAccount } = useIsMyAccount(challengedPlayerAddress)
   const { hasPact, pactDuelId } = usePact(tableId, address, challengedPlayerAddress)
-  const canChallenge = (!isAnon && !hasPact && !isMyAccount)
+  const canChallenge = (duelistId > 0n && !hasPact && !isMyAccount)
 
   if (!hasPact) {
     return <ActionButton large fill disabled={!canChallenge} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(challengedPlayerAddress)} />

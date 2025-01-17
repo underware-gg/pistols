@@ -21,7 +21,7 @@ export function DojoSetupErrorDetector() {
 export function ConnectionDetector() {
   const { isConnected } = useSelectedChain()
   const { connectOpener } = usePistolsContext()
-  const { duelistId, isAnon, dispatchDuelistId } = useSettings()
+  const { duelistId, dispatchDuelistId } = useSettings()
   const isMyDuelist = useIsMyDuelist(duelistId)
 
   // const navigate = useNavigate()
@@ -38,7 +38,7 @@ export function ConnectionDetector() {
   const [askedToConnect, setAskedToConnect] = useState<boolean>(undefined)
   useEffect(() => {
     if (isConnected !== undefined && askedToConnect === undefined) {
-      if (!isConnected && !isAnon) {
+      if (!isConnected) {
         setAskedToConnect(true)
         connectOpener.open()
       } else {

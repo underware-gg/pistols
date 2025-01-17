@@ -1,10 +1,10 @@
 import React from 'react'
-import { useParams } from 'react-router'
 import { Container, Divider, Table } from 'semantic-ui-react'
 import { useChallenge } from '/src/stores/challengeStore'
 import { useDuel } from '/src/hooks/useDuel'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
+import { useRouteSlugs } from '/src/hooks/useRoute'
 import { useFinishedDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { ChallengeStateNames, RoundStateNames } from '/src/utils/pistols'
@@ -33,8 +33,7 @@ export default function DuelDataPage() {
 
 function StatsLoader() {
   const { isInitialized } = useDojoStatus()
-
-  const { duel_id } = useParams()
+  const { duel_id } = useRouteSlugs()
 
   return (
     <Container>

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal, Dropdown, ButtonGroup, Button } from 'semantic-ui-react'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
-import { useSettings } from '/src/hooks/SettingsContext'
+import { useTableId } from '/src/stores/configStore'
 import { useTable } from '/src/stores/tableStore'
 import { useTableTotals, useTableActiveDuelistIds } from '/src/hooks/useTable'
 import { useMounted, getObjectKeyByValue } from '@underware_gg/pistols-sdk/utils'
@@ -20,7 +20,7 @@ export default function TableModal({
 }: {
   opener: Opener
 }) {
-  const { tableId, dispatchTableId } = useSettings()
+  const { tableId } = useTableId()
   const { currentScene, dispatchSetScene } = usePistolsScene()
   const [selectedTableId, setSelectedTableId] = useState('')
   const { tableIsOpen } = useTable(selectedTableId)
@@ -46,8 +46,7 @@ export default function TableModal({
   // console.log(unknownTable, tableId, selectedTableId)
 
   const _joinTable = () => {
-    dispatchTableId(selectedTableId)
-    dispatchSetScene(currentScene, [selectedTableId])
+    dispatchSetScene(currentScene, { tableId: selectedTableId })
     opener.close()
   }
 

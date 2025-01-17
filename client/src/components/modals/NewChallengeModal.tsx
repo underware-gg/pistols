@@ -4,6 +4,7 @@ import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
+import { useTableId } from '/src/stores/configStore'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
 import { usePact } from '/src/hooks/usePact'
@@ -22,7 +23,8 @@ const Col = Grid.Column
 export default function NewChallengeModal() {
   const { duel_token } = useDojoSystemCalls()
   const { account, address } = useAccount()
-  const { tableId, duelistId } = useSettings()
+  const { tableId } = useTableId()
+  const { duelistId } = useSettings()
 
   const { challengingAddress, dispatchChallengingPlayerAddress, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
   const isOpen = useMemo(() => (challengingAddress > 0n), [challengingAddress])
@@ -150,7 +152,7 @@ export default function NewChallengeModal() {
 function NewChallengeForm({
   setArgs,
 }) {
-  const { tableId } = useSettings()
+  const { tableId } = useTableId()
   const [premise, setPremise] = useState(constants.Premise.Honour)
   const [quote, setQuote] = useState('')
   const [days, setDays] = useState(7)

@@ -13,7 +13,6 @@ export const initialState = {
   framerate: 60,
   musicEnabled: true,
   sfxEnabled: true,
-  tableId: '',
   duelistId: 0n,
   duelSpeedFactor: 1.0,
   // internal
@@ -26,7 +25,6 @@ const SettingsActions = {
   FRAMERATE: 'settings.FRAMERATE',
   MUSIC_ENABLED: 'settings.MUSIC_ENABLED',
   SFX_ENABLED: 'settings.SFX_ENABLED',
-  TABLE_ID: 'settings.TABLE_ID',
   DUELIST_ID: 'settings.DUELIST_ID',
   DUEL_SPEED_FACTOR: 'settings.DUEL_SPEED_FACTOR'
 }
@@ -42,7 +40,6 @@ type ActionType =
   | { type: 'FRAMERATE', payload: number }
   | { type: 'MUSIC_ENABLED', payload: boolean }
   | { type: 'SFX_ENABLED', payload: boolean }
-  | { type: 'TABLE_ID', payload: string }
   | { type: 'DUELIST_ID', payload: bigint }
   | { type: 'DUEL_SPEED_FACTOR', payload: number }
   // internal
@@ -80,7 +77,6 @@ const SettingsProvider = ({
       [SettingsActions.FRAMERATE]: () => setCookie(cookieName, state.framerate, _options),
       [SettingsActions.MUSIC_ENABLED]: () => setCookie(cookieName, state.musicEnabled, _options),
       [SettingsActions.SFX_ENABLED]: () => setCookie(cookieName, state.sfxEnabled, _options),
-      [SettingsActions.TABLE_ID]: () => setCookie(cookieName, state.tableId, _options),
       [SettingsActions.DUELIST_ID]: () => setCookie(cookieName, Number(state.duelistId), _options),
       [SettingsActions.DUEL_SPEED_FACTOR]: () => setCookie(cookieName, Number(state.duelSpeedFactor), _options),
     }
@@ -122,11 +118,6 @@ const SettingsProvider = ({
       case SettingsActions.DUEL_SPEED_FACTOR: {
         newState.duelSpeedFactor = action.payload as number
         cookieSetter(SettingsActions.DUEL_SPEED_FACTOR, newState)
-        break
-      }
-      case SettingsActions.TABLE_ID: {
-        newState.tableId = action.payload as string
-        cookieSetter(SettingsActions.TABLE_ID, newState)
         break
       }
       case SettingsActions.DUELIST_ID: {
@@ -183,13 +174,6 @@ export const useSettings = () => {
     })
   }
 
-  const dispatchTableId = (newId: string) => {
-    dispatch({
-      type: SettingsActions.TABLE_ID,
-      payload: newId,
-    })
-  }
-
   const dispatchDuelistId = (newId: BigNumberish) => {
     dispatch({
       type: SettingsActions.DUELIST_ID,
@@ -199,12 +183,9 @@ export const useSettings = () => {
 
   return {
     ...state,   // expose individual settings values
-    tableId: (state.tableId || constants.TABLES.LORDS),
-    isAnon: (state.duelistId == 0n),
     settings: { ...state },  // expose settings as object {}
     SettingsActions,
     dispatchSetting,
-    dispatchTableId,
     dispatchDuelistId,
   }
 }
