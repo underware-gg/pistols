@@ -107,6 +107,7 @@ export interface Config {
 	treasury_address: string;
 	lords_address: string;
 	vrf_address: string;
+	season_table_id: BigNumberish;
 	is_paused: boolean;
 }
 
@@ -115,6 +116,7 @@ export interface ConfigValue {
 	treasury_address: string;
 	lords_address: string;
 	vrf_address: string;
+	season_table_id: BigNumberish;
 	is_paused: boolean;
 }
 
@@ -286,6 +288,23 @@ export interface PlayerValue {
 	claimed_welcome_pack: boolean;
 }
 
+// Type definition for `pistols::models::season::SeasonConfig` struct
+export interface SeasonConfig {
+	table_id: BigNumberish;
+	season_id: BigNumberish;
+	timestamp_start: BigNumberish;
+	timestamp_end: BigNumberish;
+	phase: SeasonPhaseEnum;
+}
+
+// Type definition for `pistols::models::season::SeasonConfigValue` struct
+export interface SeasonConfigValue {
+	season_id: BigNumberish;
+	timestamp_start: BigNumberish;
+	timestamp_end: BigNumberish;
+	phase: SeasonPhaseEnum;
+}
+
 // Type definition for `pistols::models::table::TableConfig` struct
 export interface TableConfig {
 	table_id: BigNumberish;
@@ -417,12 +436,20 @@ export type TutorialProgress = {
 }
 export type TutorialProgressEnum = CairoCustomEnum;
 
+// Type definition for `pistols::models::season::SeasonPhase` enum
+export type SeasonPhase = {
+	None: string;
+	Single: string;
+	Ended: string;
+}
+export type SeasonPhaseEnum = CairoCustomEnum;
+
 // Type definition for `pistols::models::table::TableType` enum
 export type TableType = {
 	Undefined: string;
-	Classic: string;
-	Tournament: string;
-	IRLTournament: string;
+	Season: string;
+	Tutorial: string;
+	Practice: string;
 }
 export type TableTypeEnum = CairoCustomEnum;
 
@@ -602,6 +629,8 @@ export interface SchemaType extends ISchemaType {
 		PlayerTutorialProgress: WithFieldOrder<PlayerTutorialProgress>,
 		PlayerTutorialProgressValue: WithFieldOrder<PlayerTutorialProgressValue>,
 		PlayerValue: WithFieldOrder<PlayerValue>,
+		SeasonConfig: WithFieldOrder<SeasonConfig>,
+		SeasonConfigValue: WithFieldOrder<SeasonConfigValue>,
 		TableConfig: WithFieldOrder<TableConfig>,
 		TableConfigValue: WithFieldOrder<TableConfigValue>,
 		TokenBoundAddress: WithFieldOrder<TokenBoundAddress>,
@@ -757,18 +786,20 @@ export const schema: SchemaType = {
 			faucet_amount: 0,
 		},
 		Config: {
-			fieldOrder: ['key', 'treasury_address', 'lords_address', 'vrf_address', 'is_paused'],
+			fieldOrder: ['key', 'treasury_address', 'lords_address', 'vrf_address', 'season_table_id', 'is_paused'],
 			key: 0,
 			treasury_address: "",
 			lords_address: "",
 			vrf_address: "",
+			season_table_id: 0,
 			is_paused: false,
 		},
 		ConfigValue: {
-			fieldOrder: ['treasury_address', 'lords_address', 'vrf_address', 'is_paused'],
+			fieldOrder: ['treasury_address', 'lords_address', 'vrf_address', 'season_table_id', 'is_paused'],
 			treasury_address: "",
 			lords_address: "",
 			vrf_address: "",
+			season_table_id: 0,
 			is_paused: false,
 		},
 		TokenConfig: {
@@ -934,15 +965,36 @@ export const schema: SchemaType = {
 			timestamp_registered: 0,
 			claimed_welcome_pack: false,
 		},
+		SeasonConfig: {
+			fieldOrder: ['table_id', 'season_id', 'timestamp_start', 'timestamp_end', 'phase'],
+			table_id: 0,
+			season_id: 0,
+			timestamp_start: 0,
+			timestamp_end: 0,
+		phase: new CairoCustomEnum({ 
+					None: "",
+				Single: undefined,
+				Ended: undefined, }),
+		},
+		SeasonConfigValue: {
+			fieldOrder: ['season_id', 'timestamp_start', 'timestamp_end', 'phase'],
+			season_id: 0,
+			timestamp_start: 0,
+			timestamp_end: 0,
+		phase: new CairoCustomEnum({ 
+					None: "",
+				Single: undefined,
+				Ended: undefined, }),
+		},
 		TableConfig: {
 			fieldOrder: ['table_id', 'description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
 			table_id: 0,
 			description: 0,
 		table_type: new CairoCustomEnum({ 
 					Undefined: "",
-				Classic: undefined,
-				Tournament: undefined,
-				IRLTournament: undefined, }),
+				Season: undefined,
+				Tutorial: undefined,
+				Practice: undefined, }),
 		deck_type: new CairoCustomEnum({ 
 					None: "",
 				Classic: undefined, }),
@@ -955,9 +1007,9 @@ export const schema: SchemaType = {
 			description: 0,
 		table_type: new CairoCustomEnum({ 
 					Undefined: "",
-				Classic: undefined,
-				Tournament: undefined,
-				IRLTournament: undefined, }),
+				Season: undefined,
+				Tutorial: undefined,
+				Practice: undefined, }),
 		deck_type: new CairoCustomEnum({ 
 					None: "",
 				Classic: undefined, }),
@@ -1113,6 +1165,9 @@ export enum ModelsMapping {
 	PlayerTutorialProgressValue = 'pistols-PlayerTutorialProgressValue',
 	PlayerValue = 'pistols-PlayerValue',
 	TutorialProgress = 'pistols-TutorialProgress',
+	SeasonConfig = 'pistols-SeasonConfig',
+	SeasonConfigValue = 'pistols-SeasonConfigValue',
+	SeasonPhase = 'pistols-SeasonPhase',
 	TableConfig = 'pistols-TableConfig',
 	TableConfigValue = 'pistols-TableConfigValue',
 	TableType = 'pistols-TableType',

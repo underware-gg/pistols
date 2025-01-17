@@ -1252,8 +1252,8 @@
   },
   "contracts": [
     {
-      "address": "0x2d29010c707a523acf786861153a3ecbec16b490acff9ca9a026e228ca3f465",
-      "class_hash": "0x4963bd7b655e72a7c7c8b6de9e5228db5dfbb54843eac8fdc66c3bb7b3dd6b4",
+      "address": "0x3676d5918541f0738b2cb38eac70e7c0af9ea2b9bd07b52ebc5f11eb3616f8e",
+      "class_hash": "0x5f3aaf3a38d1c20f42d7a427d0093fa540b4e97672a6dc6f68165902664a02b",
       "abi": [
         {
           "type": "impl",
@@ -1353,15 +1353,15 @@
               "type": "()"
             },
             {
-              "name": "Classic",
+              "name": "Season",
               "type": "()"
             },
             {
-              "name": "Tournament",
+              "name": "Tutorial",
               "type": "()"
             },
             {
-              "name": "IRLTournament",
+              "name": "Practice",
               "type": "()"
             }
           ]
@@ -1630,8 +1630,8 @@
       ]
     },
     {
-      "address": "0x6b70d83c2bd2bc417eeb1fafdef80341cb905abb68ea861dfccc71541bdb89e",
-      "class_hash": "0x4270f635a55613840ec80ae79c3143f4bb0bae76fc82ca96b3732b3e3770007",
+      "address": "0x407c721df1c22761f9c76cb882b1d235cbcf04111a899aa802dc8f86395aaec",
+      "class_hash": "0x33c13996f322bf2cb26646378398841ab110d3d93abf2a3a6c5441b3b1ee1c6",
       "abi": [
         {
           "type": "impl",
@@ -1882,8 +1882,8 @@
       ]
     },
     {
-      "address": "0x7a0fac669037984b3113e377e3be65a0c5eb8e234dcad746b5457056d506bdd",
-      "class_hash": "0x3c8f69e36c183b2499ebeb3176878072018e9d04737fe910a5a9a2286e7a2ad",
+      "address": "0x766757a438b8a995e7c1db85c708562d778c2af655b9d5db2eb64b9940bdca",
+      "class_hash": "0x46c963d7fc6f45c68b1353647c6f06e6885fdcb7067788b2aef8a1a1779bb86",
       "abi": [
         {
           "type": "impl",
@@ -4638,8 +4638,8 @@
       ]
     },
     {
-      "address": "0x1105f82b0febe47551bc5dd1204a9bc9670c80cbbd7dc7eee92c06acc7543a6",
-      "class_hash": "0xb6a8675d0133367267aae74f599511e7d8e9f85da72943b5af6dad5e501c20",
+      "address": "0x698a4522d96042b0153c4ff5f4fe2cd7643882638ca082fe1a81bdc3106663",
+      "class_hash": "0x340fe3bce35c71e726a730df29cb46536ac9664ebb82f97807f9d4c33851e11",
       "abi": [
         {
           "type": "impl",
@@ -5117,6 +5117,17 @@
             },
             {
               "type": "function",
+              "name": "collect",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::felt252"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
               "name": "get_player_card_decks",
               "inputs": [
                 {
@@ -5143,6 +5154,17 @@
               "outputs": [
                 {
                   "type": "pistols::types::duel_progress::DuelProgress"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "can_collect",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::bool"
                 }
               ],
               "state_mutability": "view"
@@ -5303,6 +5325,7 @@
         "dojo_init",
         "commit_moves",
         "reveal_moves",
+        "collect",
         "upgrade"
       ]
     },
@@ -5847,8 +5870,8 @@
       ]
     },
     {
-      "address": "0x68925bcd5f040cb9db8906d319287a10dab0e8f5de1454548bfecb54a7cadc8",
-      "class_hash": "0x200c68ace90215f7db7355cf32d19ee7da74e09cf4d5a18488bdcfd50320b8b",
+      "address": "0x310384d4135556d10c474ceda1f4fff48b1f42e42a037573e54022e684eb7f",
+      "class_hash": "0x5f4fb612b2bb5eb8812612f23e35942959870c9f97430132c15e2384d237a0b",
       "abi": [
         {
           "type": "impl",
@@ -7399,7 +7422,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x1bc62b4c3eb0dea46f4851d52c65412988deaf34778c90576f0e30fa5e2809f",
+      "class_hash": "0x377fac14779fd5c37e89afe32076fd2306840e6478a9b7afd6daef792c8e1c5",
       "tag": "pistols-Config",
       "selector": "0x60742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392"
     },
@@ -7477,7 +7500,13 @@
     },
     {
       "members": [],
-      "class_hash": "0x2a3817a6fe0b221ca51730be0591172b7a943649bddd8020ab3b0b3c64b3c2e",
+      "class_hash": "0x6a8e7d4a65c6bf7da058309ded479933b2a4963ddabd86f275c2829024a1c38",
+      "tag": "pistols-SeasonConfig",
+      "selector": "0x407b92d935dd7193931243082059cb7180309a73de27eea948ffa0649f6ebf3"
+    },
+    {
+      "members": [],
+      "class_hash": "0x3ae7c1c4044b3b021419203684040fcc3dbf8f701fdff78e989cd91f0412d5d",
       "tag": "pistols-TableConfig",
       "selector": "0x1e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138"
     },
