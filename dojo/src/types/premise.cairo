@@ -1,7 +1,7 @@
 // use debug::PrintTrait;
 use traits::Into;
 
-#[derive(Copy, Drop, Serde, Introspect)]
+#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum Premise {
     Undefined,  // 0
     //-----

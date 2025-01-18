@@ -5,6 +5,7 @@ pub use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
     bank::{IBankDispatcher, IBankDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
+    tutorial::{ITutorialDispatcher, ITutorialDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     tokens::{
         duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
@@ -81,6 +82,10 @@ pub impl SystemsImpl of SystemsTrait {
         (self.contract_address(@"game"))
     }
     #[inline(always)]
+    fn tutorial_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"tutorial"))
+    }
+    #[inline(always)]
     fn rng_address(self: @WorldStorage) -> ContractAddress {
         (self.contract_address(@"rng"))
     }
@@ -140,6 +145,10 @@ pub impl SystemsImpl of SystemsTrait {
     #[inline(always)]
     fn game_dispatcher(self: @WorldStorage) -> IGameDispatcher {
         (IGameDispatcher{ contract_address: self.game_address() })
+    }
+    #[inline(always)]
+    fn tutorial_dispatcher(self: @WorldStorage) -> ITutorialDispatcher {
+        (ITutorialDispatcher{ contract_address: self.tutorial_address() })
     }
     #[inline(always)]
     fn rng_dispatcher(self: @WorldStorage) -> IRngDispatcher {

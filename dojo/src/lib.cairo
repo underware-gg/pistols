@@ -95,6 +95,7 @@ mod tests {
     mod test_env_cards;
     mod test_rng;
     mod test_season;
+    mod test_tutorial;
     mod test_utils;
     // utils
     mod tester;

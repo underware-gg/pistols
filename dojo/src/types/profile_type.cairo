@@ -286,7 +286,13 @@ impl ProfileTypeImpl of ProfileTypeTrait {
     }
     fn duelist_id(self: ProfileType) -> u128 {
         let desc: ProfileDescription = self.description();
-        (desc.name.to_u128_lossy())
+        let base: u128 = match self {
+            ProfileType::Duelist(_) =>      0x100000000,
+            ProfileType::Character(_) =>    0x200000000,
+            ProfileType::Bot(_) =>          0x300000000,
+            ProfileType::Undefined =>       0xf00000000,
+        };
+        (base + desc.profile_id.into())
     }
     fn name(self: ProfileType) -> ByteArray {
         let desc: ProfileDescription = self.description();
@@ -457,6 +463,7 @@ mod tests {
         while (i.into() <= descriptions.len()) {
             let profile: ProfileType = ProfileType::Duelist(i.into());
             assert!(profile.exists() == true, "({}) exists", i);
+            assert!(profile.duelist_id() > 0x100000000, "({}) short duelist_id: {}", i, profile.duelist_id());
             assert!(profile != ProfileType::Duelist(DuelistProfile::Unknown), "Duelist({}) is Unknown", i);
             let desc: ProfileDescription = *descriptions.at((i-1).into());
             assert!(desc.profile_id == i, "({}) bad profile_id: {}", i, desc.profile_id);
@@ -483,6 +490,7 @@ mod tests {
         while (i.into() <= descriptions.len()) {
             let profile: ProfileType = ProfileType::Character(i.into());
             assert!(profile.exists() == true, "({}) exists", i);
+            assert!(profile.duelist_id() > 0x100000000, "({}) short duelist_id: {}", i, profile.duelist_id());
             assert!(profile != ProfileType::Character(CharacterProfile::Unknown), "({}) is Unknown", i);
             let desc: ProfileDescription = *descriptions.at((i-1).into());
             assert!(desc.profile_id == i, "({}) bad profile_id: {}", i, desc.profile_id);
@@ -509,6 +517,7 @@ mod tests {
         while (i.into() <= descriptions.len()) {
             let profile: ProfileType = ProfileType::Bot(i.into());
             assert!(profile.exists() == true, "({}) exists", i);
+            assert!(profile.duelist_id() > 0x100000000, "({}) short duelist_id: {}", i, profile.duelist_id());
             assert!(profile != ProfileType::Bot(BotProfile::Unknown), "({}) is Unknown", i);
             let desc: ProfileDescription = *descriptions.at((i-1).into());
             assert!(desc.profile_id == i, "({}) bad profile_id: {}", i, desc.profile_id);

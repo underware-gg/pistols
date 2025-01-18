@@ -46,6 +46,7 @@ default = "pistols"
 [writers]
 "pistols" = [
   "pistols-game",
+  "pistols-tutorial",
   "pistols-admin",
   "pistols-duel_token",
   "pistols-duelist_token",

@@ -16,6 +16,7 @@ mod tester {
         bank::{bank, IBankDispatcher, IBankDispatcherTrait},
         admin::{admin, IAdminDispatcher, IAdminDispatcherTrait},
         game::{game, IGameDispatcher, IGameDispatcherTrait},
+        tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
         rng::{rng},
         vrf_mock::{vrf_mock},
         tokens::{
@@ -139,19 +140,21 @@ mod tester {
     const TIMESTEP: u64 = 0x1;
 
     mod FLAGS {
-        const GAME: u8       = 0b0000001;
-        const ADMIN: u8      = 0b0000010;
-        const LORDS: u8      = 0b0000100;
-        const DUEL: u8       = 0b0001000;
-        const DUELIST: u8    = 0b0010000;
-        const APPROVE: u8    = 0b0100000;
+        const GAME: u8       = 0b1;
+        const ADMIN: u8      = 0b10;
+        const LORDS: u8      = 0b100;
+        const DUEL: u8       = 0b1000;
+        const DUELIST: u8    = 0b10000;
+        const APPROVE: u8    = 0b100000;
         const MOCK_RNG: u8   = 0b1000000;
+        const TUTORIAL: u8   = 0b10000000;
     }
 
     #[derive(Copy, Drop)]
     pub struct TestSystems {
         world: WorldStorage,
         game: IGameDispatcher,
+        tut: ITutorialDispatcher,
         admin: IAdminDispatcher,
         lords: ILordsMockDispatcher,
         fame: IFameCoinDispatcher,
@@ -163,6 +166,7 @@ mod tester {
 
     fn setup_world(flags: u8) -> TestSystems {
         let mut deploy_game: bool = (flags & FLAGS::GAME) != 0;
+        let mut deploy_tutorial: bool = (flags & FLAGS::TUTORIAL) != 0;
         let mut deploy_admin: bool = (flags & FLAGS::ADMIN) != 0;
         let mut deploy_lords: bool = (flags & FLAGS::LORDS) != 0;
         let mut deploy_duel: bool = (flags & FLAGS::DUEL) != 0;
@@ -178,6 +182,7 @@ mod tester {
         deploy_duel = deploy_duel || deploy_game;
         deploy_bank = deploy_bank || deploy_lords || deploy_duelist;
         deploy_fame = deploy_fame || deploy_game || deploy_duelist;
+        deploy_mock_rng = deploy_mock_rng || deploy_tutorial;
         
 // '---- 0'.print();
         let mut resources: Array<TestResource> = array![
@@ -223,6 +228,14 @@ mod tester {
             resources.append(TestResource::Contract(vrf_mock::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"vrf_mock")
+            );
+        }
+
+        if (deploy_tutorial) {
+            resources.append(TestResource::Contract(tutorial::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"tutorial")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         }
 
@@ -370,6 +383,7 @@ mod tester {
         (TestSystems {
             world,
             game: world.game_dispatcher(),
+            tut: world.tutorial_dispatcher(),
             admin: world.admin_dispatcher(),
             lords: world.lords_mock_dispatcher(),
             fame: world.fame_coin_dispatcher(),
@@ -525,6 +539,35 @@ mod tester {
         let new_table_id: felt252 = (*system).collect();
         _next_block();
         (new_table_id)
+    }
+
+    // ::game
+    fn execute_create_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
+        tutorial_id: u128,
+    ) -> u128 {
+        impersonate(sender);
+        let duel_id: u128 = (*system).create_tutorial(ID(sender), tutorial_id);
+        _next_block();
+        (duel_id)
+    }
+    fn execute_commit_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
+        player_id: u128,
+        tutorial_id: u128,
+        hashed: u128,
+    ) {
+        impersonate(sender);
+        (*system).commit_moves(player_id, tutorial_id, hashed);
+        _next_block();
+    }
+    fn execute_reveal_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
+        player_id: u128,
+        tutorial_id: u128,
+        salt: felt252,
+        moves: Span<u8>,
+    ) {
+        impersonate(sender);
+        (*system).reveal_moves(player_id, tutorial_id, salt, moves);
+        _next_block();
     }
 
     //
