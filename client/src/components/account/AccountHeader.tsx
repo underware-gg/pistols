@@ -23,7 +23,7 @@ export default function AccountHeader() {
   const { dispatchSetScene } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
 
-  const { nameDisplay, profilePic } = useDuelist(duelistId)
+  const { nameAndId, profilePic } = useDuelist(duelistId)
 
   const _click = () => {
     dispatchSetScene(SceneName.Profile)
@@ -34,7 +34,7 @@ export default function AccountHeader() {
       <div className='NoMouse' style={{ flex: 1, textAlign: 'right' }}>
         {!isConnected ? <h3>Guest</h3>
           : <>
-            <h3>{nameDisplay}</h3>
+            <h3>{nameAndId}</h3>
             <div style={{ lineHeight: 0 }}>
               <h5><FameBalanceDuelist duelistId={duelistId} big /></h5>
             </div>

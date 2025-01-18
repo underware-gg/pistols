@@ -81,8 +81,8 @@ function DuelStats({
 }) {
   const { challenge } = useDuel(duelId)
   const { description } = useTable(challenge.tableId)
-  const { nameDisplay: nameA } = useDuelist(challenge.duelistIdA)
-  const { nameDisplay: nameB } = useDuelist(challenge.duelistIdB)
+  const { nameAndId: nameA } = useDuelist(challenge.duelistIdA)
+  const { nameAndId: nameB } = useDuelist(challenge.duelistIdB)
 
   return (
     <Table celled striped color='red'>
@@ -196,8 +196,8 @@ function RoundStats({
   round: any
 }) {
   const { challenge } = useDuel(duelId)
-  const { nameDisplay: nameA } = useDuelist(challenge.duelistIdA)
-  const { nameDisplay: nameB } = useDuelist(challenge.duelistIdB)
+  const { nameAndId: nameA } = useDuelist(challenge.duelistIdA)
+  const { nameAndId: nameB } = useDuelist(challenge.duelistIdB)
   // console.log('round', round)
   return (
     <>

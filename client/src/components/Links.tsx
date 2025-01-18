@@ -26,11 +26,11 @@ export const DuelistLink = ({
   duelistId: BigNumberish
   useName?: boolean
 }) => {
-  const { nameDisplay } = useDuelist(useName ? duelistId : 0)
+  const { nameAndId } = useDuelist(useName ? duelistId : 0)
   const { dispatchSelectDuelistId } = usePistolsContext()
   return (
     <span className='AnchorLink' onClick={() => dispatchSelectDuelistId(duelistId)}>
-      {useName ? nameDisplay : `Duelist #${bigintToNumber(duelistId)}`}
+      {useName ? nameAndId : `Duelist #${bigintToNumber(duelistId)}`}
     </span>
   )
 }

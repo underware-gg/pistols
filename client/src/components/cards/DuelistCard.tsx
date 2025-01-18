@@ -55,7 +55,7 @@ export interface DuelistCardHandle {
 }
 
 export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((props: DuelistCardProps, ref: React.Ref<DuelistCardHandle>) => {
-  const { name, nameDisplay, profilePic, score, isInAction } = useDuelist(props.duelistId)
+  const { name, profilePic, score, isInAction } = useDuelist(props.duelistId)
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
 

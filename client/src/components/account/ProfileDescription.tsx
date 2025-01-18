@@ -21,9 +21,9 @@ export function ProfileName({
   badges?: boolean
   displayId?: boolean
 }) {
-  const { name, nameDisplay } = useDuelist(duelistId)
+  const { name, nameAndId } = useDuelist(duelistId)
   return (
-    <span className='BreakWord'>{displayId ? nameDisplay : name} {badges && <ProfileBadge duelistId={duelistId} />}</span>
+    <span className='BreakWord'>{displayId ? nameAndId : name} {badges && <ProfileBadge duelistId={duelistId} />}</span>
   )
 }
 

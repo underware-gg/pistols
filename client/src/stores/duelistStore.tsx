@@ -35,11 +35,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   // console.log(`useDuelist() =>`, duelist_id, duelist)
 
   const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(constants.CONST.MAX_DUELIST_ID)), [duelist_id])
-
   const duelistId = useMemo(() => BigInt(duelist_id), [duelist_id])
-  const duelistIdDisplay = useMemo(() => (`Duelist #${isValidDuelistId ? duelist_id : '?'}`), [duelist_id, isValidDuelistId])
-  const timestamp = useMemo(() => Number(duelist?.timestamp ?? 0), [duelist])
-  const exists = useMemo(() => Boolean(timestamp), [timestamp])
 
   const {
     variant: profileType,
@@ -52,9 +48,18 @@ export const useDuelist = (duelist_id: BigNumberish) => {
         : profileType == constants.ProfileType.Bot ? constants.BOT_PROFILES[profileValue]
           : constants.DUELIST_PROFILES[constants.DuelistProfile.Unknown]
   ), [profileType, profileValue])
+  const isNpc = useMemo(() => (profileType != constants.ProfileType.Duelist), [profileType])
+
+  const duelistIdDisplay = useMemo(() => (
+    isNpc ? 'NPC' : `Duelist #${isValidDuelistId ? duelist_id : '?'}`
+  ), [duelist_id, isValidDuelistId, isNpc])
+  const timestamp = useMemo(() => Number(duelist?.timestamp ?? 0), [duelist])
+  const exists = useMemo(() => Boolean(timestamp), [timestamp])
 
   const name = useMemo(() => (profileDescription.name), [profileDescription])
-  const nameDisplay = useMemo(() => (`${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`), [name, duelist_id, isValidDuelistId])
+  const nameAndId = useMemo(() => (
+    isNpc ? (name || 'NPC') : `${name || 'Duelist'} #${isValidDuelistId ? duelist_id : '?'}`
+  ), [name, duelist_id, isValidDuelistId, isNpc])
   const profilePic = useMemo(() => (profileDescription.profile_id), [profileDescription])
 
   const score = useScore(scoreboard?.score)
@@ -66,13 +71,14 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     isValidDuelistId,
     duelistId,
     name,
-    nameDisplay,
+    nameAndId,
     duelistIdDisplay,
     exists,
     timestamp,
     profileType,
     profileValue,
     profilePic,
+    isNpc,
     currentDuelId,
     isInAction,
     score,
