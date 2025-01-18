@@ -46,8 +46,9 @@ pub enum CharacterProfile {
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum BotProfile {
     Unknown,
-    Scarecrow,
     TinMan,
+    Scarecrow,
+    Leon,
 }
 
 
@@ -183,13 +184,17 @@ mod BOT_PROFILES {
         profile_id: 0,
         name: 'Unknown',
     };
-    const Scarecrow: ProfileDescription = ProfileDescription {
+    const TinMan: ProfileDescription = ProfileDescription {
         profile_id: 1,
+        name: 'Tin Man',
+    };
+    const Scarecrow: ProfileDescription = ProfileDescription {
+        profile_id: 2,
         name: 'Scarecrow',
     };
-    const TinMan: ProfileDescription = ProfileDescription {
-        profile_id: 2,
-        name: 'Tin Man',
+    const Leon: ProfileDescription = ProfileDescription {
+        profile_id: 3,
+        name: 'Leon',
     };
 }
 
@@ -345,8 +350,9 @@ impl BotProfileIntoDescription of Into<BotProfile, ProfileDescription> {
     fn into(self: BotProfile) -> ProfileDescription {
         match self {
             BotProfile::Unknown =>      BOT_PROFILES::Unknown,
-            BotProfile::Scarecrow =>    BOT_PROFILES::Scarecrow,
             BotProfile::TinMan =>       BOT_PROFILES::TinMan,
+            BotProfile::Scarecrow =>    BOT_PROFILES::Scarecrow,
+            BotProfile::Leon =>         BOT_PROFILES::Leon,
         }
     }
 }
@@ -387,8 +393,9 @@ impl U8IntoCharacterProfile of Into<u8, CharacterProfile> {
 }
 impl U8IntoBotProfile of Into<u8, BotProfile> {
     fn into(self: u8) -> BotProfile {
-        if self == 1        { BotProfile::Scarecrow }
-        else if self == 2   { BotProfile::TinMan }
+        if self == 1        { BotProfile::TinMan }
+        else if self == 2   { BotProfile::Scarecrow }
+        else if self == 3   { BotProfile::Leon }
         else                { BotProfile::Unknown }
     }
 }
@@ -453,7 +460,8 @@ mod tests {
             assert!(profile != ProfileType::Duelist(DuelistProfile::Unknown), "Duelist({}) is Unknown", i);
             let desc: ProfileDescription = *descriptions.at((i-1).into());
             assert!(desc.profile_id == i, "({}) bad profile_id: {}", i, desc.profile_id);
-            assert!(desc.name != last_desc.name, "({}) == ({}): {}", i, i-1, desc.name);
+            assert!(desc.profile_id == last_desc.profile_id + 1, "({}) == ({}): profile_id {}", i, i-1, desc.profile_id);
+            assert!(desc.name != last_desc.name, "({}) == ({}): name {}", i, i-1, desc.name);
 // desc.name.print();
             last_desc = desc;
             i += 1;
@@ -478,7 +486,8 @@ mod tests {
             assert!(profile != ProfileType::Character(CharacterProfile::Unknown), "({}) is Unknown", i);
             let desc: ProfileDescription = *descriptions.at((i-1).into());
             assert!(desc.profile_id == i, "({}) bad profile_id: {}", i, desc.profile_id);
-            assert!(desc.name != last_desc.name, "({}) == ({}): {}", i, i-1, desc.name);
+            assert!(desc.profile_id == last_desc.profile_id + 1, "({}) == ({}): profile_id {}", i, i-1, desc.profile_id);
+            assert!(desc.name != last_desc.name, "({}) == ({}): name {}", i, i-1, desc.name);
 // desc.name.print();
             last_desc = desc;
             i += 1;
@@ -503,7 +512,8 @@ mod tests {
             assert!(profile != ProfileType::Bot(BotProfile::Unknown), "({}) is Unknown", i);
             let desc: ProfileDescription = *descriptions.at((i-1).into());
             assert!(desc.profile_id == i, "({}) bad profile_id: {}", i, desc.profile_id);
-            assert!(desc.name != last_desc.name, "({}) == ({}): {}", i, i-1, desc.name);
+            assert!(desc.profile_id == last_desc.profile_id + 1, "({}) == ({}): profile_id {}", i, i-1, desc.profile_id);
+            assert!(desc.name != last_desc.name, "({}) == ({}): name {}", i, i-1, desc.name);
 // desc.name.print();
             last_desc = desc;
             i += 1;

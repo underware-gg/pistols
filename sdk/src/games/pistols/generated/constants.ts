@@ -19,6 +19,16 @@ export const getSourceValue = (name: Source): number | undefined => _indexOrUnde
 export const getSourceFromValue = (value: number): Source | undefined => Object.keys(Source)[value] as Source;
 export const getSourceMap = (): Record<Source, number> => Object.keys(Source).reduce((acc, v, index) => { acc[v as Source] = index; return acc; }, {} as Record<Source, number>);
 
+// from: ../dojo/src/libs/tut.cairo
+export enum TutorialLevel {
+  Undefined = 'Undefined', // 0
+  Level1 = 'Level1', // 1
+  Level2 = 'Level2', // 2
+};
+export const getTutorialLevelValue = (name: TutorialLevel): number | undefined => _indexOrUndefined(Object.keys(TutorialLevel).indexOf(name));
+export const getTutorialLevelFromValue = (value: number): TutorialLevel | undefined => Object.keys(TutorialLevel)[value] as TutorialLevel;
+export const getTutorialLevelMap = (): Record<TutorialLevel, number> => Object.keys(TutorialLevel).reduce((acc, v, index) => { acc[v as TutorialLevel] = index; return acc; }, {} as Record<TutorialLevel, number>);
+
 // from: ../dojo/src/models/duelist.cairo
 export enum Archetype {
   Undefined = 'Undefined', // 0
@@ -291,8 +301,9 @@ export const getCharacterProfileMap = (): Record<CharacterProfile, number> => Ob
 // from: ../dojo/src/types/profile_type.cairo
 export enum BotProfile {
   Unknown = 'Unknown', // 0
-  Scarecrow = 'Scarecrow', // 1
-  TinMan = 'TinMan', // 2
+  TinMan = 'TinMan', // 1
+  Scarecrow = 'Scarecrow', // 2
+  Leon = 'Leon', // 3
 };
 export const getBotProfileValue = (name: BotProfile): number | undefined => _indexOrUndefined(Object.keys(BotProfile).indexOf(name));
 export const getBotProfileFromValue = (value: number): BotProfile | undefined => Object.keys(BotProfile)[value] as BotProfile;
@@ -377,7 +388,7 @@ type type_CONST = {
 export const CONST: type_CONST = {
   DUELIST_PROFILE_COUNT: 21,
   CHARACTER_PROFILE_COUNT: 3,
-  BOT_PROFILE_COUNT: 2,
+  BOT_PROFILE_COUNT: 3,
   WELCOME_PACK_DUELIST_COUNT: 5,
   ROUND_COUNT: 1,
   MAX_DUELIST_ID: BigInt('0xffff'),
@@ -910,21 +921,26 @@ export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
 // from: ../dojo/src/types/profile_type.cairo
 type type_BOT_PROFILES = {
   Unknown: ProfileDescription, // cairo: ProfileDescription
-  Scarecrow: ProfileDescription, // cairo: ProfileDescription
   TinMan: ProfileDescription, // cairo: ProfileDescription
+  Scarecrow: ProfileDescription, // cairo: ProfileDescription
+  Leon: ProfileDescription, // cairo: ProfileDescription
 };
 export const BOT_PROFILES: type_BOT_PROFILES = {
   Unknown: {
     profile_id: 0,
     name: 'Unknown',
   },
-  Scarecrow: {
+  TinMan: {
     profile_id: 1,
+    name: 'Tin Man',
+  },
+  Scarecrow: {
+    profile_id: 2,
     name: 'Scarecrow',
   },
-  TinMan: {
-    profile_id: 2,
-    name: 'Tin Man',
+  Leon: {
+    profile_id: 3,
+    name: 'Leon',
   },
 };
 
