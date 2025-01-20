@@ -452,20 +452,6 @@ const TUTORIAL_DATA: Record<TutorialParts, TutorialData> = {
       imagePath: '/images/tutorial/full_duel.png',
       tutorialDescriptions: 'Ready for a real challenge?\nLet\'s explore the full depth of dueling - tactics, blade combat, and all the intricate strategies that separate the legends from the common folk.\nKeep your wits sharp and your blade sharper. This is where things get interesting!'
     }]
-  },
-  [TutorialParts.COMMITING]: {
-    tutorialName: 'Committing Actions',
-    slides: [{
-      imagePath: '/images/tutorial/full_duel.png',
-      tutorialDescriptions: 'Once you\'ve selected your cards, click the commit button to lock in your choices for the round. After committing, you cannot change your selections until the next round.'
-    }]
-  },
-  [TutorialParts.REVEALING]: {
-    tutorialName: 'Card Reveal Phase',
-    slides: [{
-      imagePath: '/images/tutorial/full_duel.png',
-      tutorialDescriptions: 'After both players commit their cards, they are revealed step by step. Watch carefully as each action unfolds to see who emerges victorious.'
-    }]
   }
 }
 
