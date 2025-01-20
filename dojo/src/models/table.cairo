@@ -1,6 +1,5 @@
 // use debug::PrintTrait;
 use starknet::ContractAddress;
-use pistols::types::cards::deck::{DeckType};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum TableType {
@@ -20,7 +19,6 @@ pub struct TableConfig {
     //------
     pub description: felt252,
     pub table_type: TableType,
-    pub deck_type: DeckType,
     pub fee_collector_address: ContractAddress, // if 0x0: use default treasury
     pub fee_min: u128,
     pub is_open: bool,
@@ -46,7 +44,6 @@ impl TableManagerImpl of TableManagerTrait {
             table_id: TABLES::TUTORIAL,
             description: 'The Training Grounds',
             table_type: TableType::Tutorial,
-            deck_type: DeckType::Classic,
             fee_collector_address: ZERO(),
             fee_min: 0,
             is_open: true,
@@ -55,7 +52,6 @@ impl TableManagerImpl of TableManagerTrait {
             table_id: TABLES::PRACTICE,
             description: 'Bot Shooting Range',
             table_type: TableType::Practice,
-            deck_type: DeckType::Classic,
             fee_collector_address: ZERO(),
             fee_min: 0,
             is_open: true,

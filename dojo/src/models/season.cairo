@@ -28,7 +28,6 @@ pub enum SeasonPhase {
 //
 use pistols::systems::game::game::{Errors as ErrorsGame};
 use pistols::models::table::{TableConfig, TableConfigTrait, TableType};
-use pistols::types::cards::deck::{DeckType};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::utils::timestamp::{TIMESTAMP};
@@ -58,7 +57,6 @@ impl SeasonManagerImpl of SeasonManagerTrait {
             table_id,
             description: 'Season '.concat(season_id.to_short_string()),
             table_type: TableType::Season,
-            deck_type: DeckType::Classic,
             fee_collector_address: ZERO(),
             fee_min: 0,
             is_open: true,

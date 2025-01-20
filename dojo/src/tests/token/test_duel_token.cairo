@@ -58,7 +58,7 @@ use pistols::models::{
     },
     table::{
         m_TableConfig, TableConfig,
-        TABLES, TableType, DeckType,
+        TABLES, TableType,
     },
 };
 use pistols::tests::token::mock_duelist::{
@@ -213,7 +213,6 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
         table_id: TABLES::TUTORIAL,
         description: 'The Training Grounds',
         table_type: TableType::Tutorial,
-        deck_type: DeckType::Classic,
         fee_collector_address: ZERO(),
         fee_min: 0,
         is_open: true,

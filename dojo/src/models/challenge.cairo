@@ -89,6 +89,8 @@ use pistols::types::cards::{
     blades::{BladesCard, BladesCardTrait},
     hand::{FinalBlow},
 };
+use pistols::models::table::{TABLES};
+use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, CharacterProfile};
 use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
@@ -114,8 +116,14 @@ impl ChallengeImpl of ChallengeTrait {
         (self.state.exists())
     }
     fn get_deck_type(self: Challenge) -> DeckType {
-        // TODO: THIS!!!!
-        (DeckType::Classic)
+        if (
+            self.table_id == TABLES::TUTORIAL &&
+            (self.duelist_id_a.into() == CharacterProfile::Drunken || self.duelist_id_b.into() == CharacterProfile::Drunken)
+        ) {
+            (DeckType::PacesOnly)
+        } else {
+            (DeckType::Classic)
+        }
     }
     #[inline(always)]
     fn get_deck(self: Challenge) -> Deck {

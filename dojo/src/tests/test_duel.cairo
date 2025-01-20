@@ -6,10 +6,10 @@ mod tests {
 
     use dojo::world::{WorldStorage};
 
-    use pistols::models::challenge::{Challenge, ChallengeValue, ChallengeFameBalanceValue, Round, RoundValue};
+    use pistols::models::challenge::{Challenge, ChallengeTrait, ChallengeValue, ChallengeFameBalanceValue, Round, RoundValue};
     use pistols::models::duelist::{Duelist, DuelistValue, ProfileType, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
-    use pistols::types::cards::hand::{PacesCard, PacesCardTrait, FinalBlow};
+    use pistols::types::cards::hand::{PacesCard, PacesCardTrait, FinalBlow, DeckType, DeckTypeTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
@@ -106,6 +106,7 @@ mod tests {
         assert(fame_balance_b > 0, 'fame_balance_b_init');
 
         let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
+        assert(tester::get_Challenge(sys.world, duel_id).get_deck_type() == DeckType::Classic, 'challenge.deck_type');
         tester::assert_pact(sys, duel_id, challenge, true, true, "started");
         // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, (lords_fee + PRIZE_VALUE) * 2, 'lords_balance_contract_1');
         // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee + PRIZE_VALUE, 0, 'lords_balance_a_1');
@@ -221,6 +222,7 @@ mod tests {
         // assert(lords_balance_treasury == 0, 'lords_balance_treasury == 0');
 
         let (challenge, _round_1, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
+        assert(tester::get_Challenge(sys.world, duel_id).get_deck_type() == DeckType::Classic, 'challenge.deck_type');
         // tester::assert_balance(sys.lords, sys.game.contract_address, lords_balance_contract, 0, (lords_fee + PRIZE_VALUE) * 2, 'lords_balance_contract_1');
         // tester::assert_balance(sys.lords, OWNER(), lords_balance_a, lords_fee + PRIZE_VALUE, 0, 'lords_balance_a_1');
         // tester::assert_balance(sys.lords, OTHER(), lords_balance_b, lords_fee + PRIZE_VALUE, 0, 'lords_balance_b_1');

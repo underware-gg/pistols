@@ -44,7 +44,6 @@ const table_config_schema: FormSchema = {
   table_id: { type: FieldType.ShortString, isKey: true },
   description: { type: FieldType.ShortString },
   table_type: { type: FieldType.TableType },
-  deck_type: { type: FieldType.DeckType },
   fee_collector_address: { type: FieldType.Address },
   fee_min: { type: FieldType.Wei },
   is_open: { type: FieldType.Boolean },

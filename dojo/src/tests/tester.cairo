@@ -622,6 +622,10 @@ mod tester {
         (world.read_model((holder, table_id),))
     }
     #[inline(always)]
+    fn get_Challenge(world: WorldStorage, duel_id: u128) -> Challenge {
+        (world.read_model(duel_id))
+    }
+    #[inline(always)]
     fn get_ChallengeValue(world: WorldStorage, duel_id: u128) -> ChallengeValue {
         (world.read_value(duel_id))
     }

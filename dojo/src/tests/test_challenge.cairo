@@ -7,12 +7,13 @@ mod tests {
     use dojo::world::{WorldStorage};
 
     use pistols::models::{
-        challenge::{Challenge, ChallengeValue},
+        challenge::{Challenge, ChallengeTrait, ChallengeValue},
         player::{Player, PlayerTrait},
         challenge::{Round},
         duelist::{Duelist},
         table::{TABLES},
     };
+    use pistols::types::cards::hand::{DeckType, DeckTypeTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::constants::{CONST};
@@ -110,6 +111,8 @@ mod tests {
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == 0, 'timestamp_end');
         _assert_empty_progress(sys, duel_id);
+        // deck type
+        assert(tester::get_Challenge(sys.world, duel_id).get_deck_type() == DeckType::Classic, 'challenge.deck_type');
     }
 
     #[test]

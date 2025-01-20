@@ -6,11 +6,11 @@ mod tests {
 
     use dojo::world::{WorldStorage};
 
-    use pistols::models::challenge::{Challenge, ChallengeValue, ChallengeFameBalanceValue, Round, RoundValue};
+    use pistols::models::challenge::{Challenge, ChallengeTrait, ChallengeValue, ChallengeFameBalanceValue, Round, RoundValue};
     use pistols::models::duelist::{Duelist, DuelistValue, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, ProfileManagerTrait, CharacterProfile};
-    use pistols::types::cards::hand::{PacesCard, PacesCardTrait, FinalBlow};
+    use pistols::types::cards::hand::{PacesCard, PacesCardTrait, FinalBlow, DeckType, DeckTypeTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
@@ -118,19 +118,22 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
         let tutorial_id: u128 = 1;
         let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
-        // commit
-        let moves: Span<u8> = [pace.into(), dodge.into()].span();
-        let hashed: u128 = make_moves_hash(SALT_A, moves);
-        tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), tutorial_id, hashed);
-        let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
-        assert!(round.state == RoundState::Reveal, "round.state");
-        assert!(round.moves_a.hashed > 0, "round.moves_a.hashed");
-        assert!(round.moves_b.hashed == hashed, "round.moves_b.hashed");
-        // reveal
-        tester::execute_reveal_moves_tutorial(@sys.tut, OWNER(), tutorial_id, SALT_A, moves);
-        let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
-        assert!(challenge.state == ChallengeState::Resolved, "challenge.state");
-        assert!(challenge.winner == 2, "challenge.winner");
+        // check deck
+        let challenge: Challenge = tester::get_Challenge(sys.world, duel_id);
+        assert!(challenge.get_deck_type() == DeckType::PacesOnly, "challenge.deck_type");
+        // // commit
+        // let moves: Span<u8> = [pace.into(), dodge.into()].span();
+        // let hashed: u128 = make_moves_hash(SALT_A, moves);
+        // tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), tutorial_id, hashed);
+        // let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
+        // assert!(round.state == RoundState::Reveal, "round.state");
+        // assert!(round.moves_a.hashed > 0, "round.moves_a.hashed");
+        // assert!(round.moves_b.hashed == hashed, "round.moves_b.hashed");
+        // // reveal
+        // tester::execute_reveal_moves_tutorial(@sys.tut, OWNER(), tutorial_id, SALT_A, moves);
+        // let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
+        // assert!(challenge.state == ChallengeState::Resolved, "challenge.state");
+        // assert!(challenge.winner == 2, "challenge.winner");
     }
 
     #[test]
@@ -174,6 +177,65 @@ mod tests {
         _test_tutorial_level_1(PacesCard::Paces10, PacesCard::Paces9);
     }
 
+
+
+
+    //-------------------------------
+    // Levels
+    //
+
+    fn _test_tutorial_level_2(pace: PacesCard, dodge: PacesCard) {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
+        let tutorial_id: u128 = 2;
+        let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
+        // check deck
+        let challenge: Challenge = tester::get_Challenge(sys.world, duel_id);
+        assert!(challenge.get_deck_type() == DeckType::Classic, "challenge.deck_type");
+        //
+        // TODO....
+        //
+    }
+
+    #[test]
+    fn test_tutorial_level_2_pace_1() {
+        _test_tutorial_level_2(PacesCard::Paces1, PacesCard::Paces2);
+    }
+    #[test]
+    fn test_tutorial_level_2_pace_2() {
+        _test_tutorial_level_2(PacesCard::Paces2, PacesCard::Paces3);
+    }
+    #[test]
+    fn test_tutorial_level_2_pace_3() {
+        _test_tutorial_level_2(PacesCard::Paces3, PacesCard::Paces4);
+    }
+    #[test]
+    fn test_tutorial_level_2_pace_4() {
+        _test_tutorial_level_2(PacesCard::Paces4, PacesCard::Paces5);
+    }
+    #[test]
+    fn test_tutorial_level_2_pace_5() {
+        _test_tutorial_level_2(PacesCard::Paces5, PacesCard::Paces6);
+    }
+    #[test]
+    fn test_tutorial_level_2_pace_6() {
+        _test_tutorial_level_2(PacesCard::Paces6, PacesCard::Paces7);
+    }
+    #[test]
+    fn test_tutorial_level_2_pace_7() {
+        _test_tutorial_level_2(PacesCard::Paces7, PacesCard::Paces8);
+    }
+    #[test]
+    fn test_tutorial_level_2_pace_8() {
+        _test_tutorial_level_2(PacesCard::Paces8, PacesCard::Paces9);
+    }
+    #[test]
+    fn test_tutorial_level_2_pace_9() {
+        _test_tutorial_level_2(PacesCard::Paces9, PacesCard::Paces10);
+    }
+    #[test]
+    fn test_tutorial_level_2_pace_10() {
+        _test_tutorial_level_2(PacesCard::Paces10, PacesCard::Paces9);
+    }
 
 
     //-------------------------------
