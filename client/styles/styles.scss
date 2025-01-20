@@ -2279,7 +2279,7 @@ a.active.step:hover,
   background-color: #000a;
 }
 
-.tutorialBackground {
+.tutorialTextBackground {
   position: absolute;
   top: 0;
   width: aspect-width(80);
@@ -2383,4 +2383,131 @@ a.active.step:hover,
 @keyframes blink {
   0%, 100% { opacity: 0; }
   50% { opacity: 1; }
+}
+
+
+// client/src/components/ui/duel/DuelTutorialOverlay.module.scss
+
+.tutorialOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.tutorialBackground {
+  position: absolute;
+  width: aspect-width(100);
+  height: aspect-height(100);
+  background-color: rgba(39, 17, 11, 0.7);
+  filter: brightness(0) saturate(100%) invert(0) sepia(1) hue-rotate(0deg) brightness(0.6) contrast(1);
+}
+
+.tutorialContainer {
+  width: aspect-width(80);
+  height: aspect-height(80);
+  background: url('/images/ui/duel/card_details/box_left.png') no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+  background-color: rgba(0, 0, 0, 0);
+  padding: aspect-width(2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tutorialTitle {
+  min-height: aspect-height(5);
+  font-size: aspect-width(1.8);
+  font-weight: 600;
+  color: $color-warning;
+  transition: opacity 0.3s ease;
+  text-transform: uppercase;
+  margin: 0 0;
+}
+
+.tutorialImage {
+  width: aspect-width(50);
+  height: aspect-height(50);
+  transition: opacity 0.3s ease;
+}
+
+.tutorialText {
+  max-width: aspect-width(60);
+  min-height: aspect-height(12);
+  max-height: aspect-height(12);
+  font-size: aspect-width(1.1);
+  overflow-y: hidden;
+  color: white;
+  text-align: center;
+  transition: opacity 0.3s ease;
+  margin: aspect-width(0.6) 0;
+  // -webkit-line-clamp: 4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.tutorialNavigationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+}
+
+.tutorialDotsContainer {
+  display: flex;
+  gap: aspect-width(0.5);
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.tutorialDot {
+  width: aspect-width(1.2);
+  height: aspect-width(1.2);
+  transition: background-color 0.3s ease;
+  border-radius: 50%;
+}
+
+.tutorialDotActive {
+  background-color: $color-warning;
+  border: aspect-width(0.2) solid #ff8c00;
+}
+
+.tutorialDotPassed {
+  background-color: #b8860b;
+}
+
+.tutorialDotFuture {
+  background-color: #4a4a4a;
+}
+
+.tutorialButton {
+  color: $color-warning;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: aspect-width(1);
+  transition: color 0.3s ease, transform 0.3s ease;
+  outline: none;
+  &:focus {
+    outline: none;
+    border: none;
+  }
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.tutorialButtonDisabled {
+  color: #4a4a4a;
+  cursor: not-allowed;
 }
