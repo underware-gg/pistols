@@ -6,7 +6,7 @@ import { useIsYou } from '/src/hooks/useIsYou'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
-import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '/src/data/cardAssets'
+import { BladesCardsTextures, CardData, DodgeCardsTextures, EnvironmentCardsTextures, FireCardsTextures, TacticsCardsTextures } from '/src/data/cardAssets'
 import { DuelistCardType, CardHandle, Card } from '/src/components/cards/Cards'
 import * as TWEEN from '@tweenjs/tween.js'
 
@@ -515,6 +515,7 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
 const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>((props: EnvironmentDeckProps, ref: React.Ref<EnvironmentDeckHandle>) => {
   const [cards,  setCards] = useState<{ ref: React.RefObject<CardHandle>, id: number, isDrawn: boolean }[]>([]);
   const [drawnCardsCount, setDrawnCardsCount] = useState(0);
+  const [showDeckInfo, setShowDeckInfo] = useState(false);
 
   const [ expanded, setExpanded ] = useState(false)
   
@@ -849,6 +850,18 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
     })
   }
 
+  const handleDeckHover = (isHovered: boolean) => {
+    if (!isHovered || expanded || isAnimatingCardsRef.current) {
+      setShowDeckInfo(false)
+      return
+    }
+
+    const undrawnCards = cards.filter(card => !card.isDrawn)
+    if (undrawnCards.length > 0) {
+      setShowDeckInfo(true)
+    }
+  }
+
   const handleCardClick = (cardId: number, e: React.MouseEvent) => {
     const cardRef = cards.find((card) => card.id == cardId)
     if (!cardRef.isDrawn) return
@@ -932,7 +945,13 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
           width={Constants.CARD_WIDTH}
           height={Constants.CARD_HEIGHT}
           isVisible={false}
-          onHover={(isHovered) => handleCardHover(isHovered, card.id)}
+          onHover={(isHovered) => {
+            if (card.isDrawn) {
+              handleCardHover(isHovered, card.id)
+            } else {
+              handleDeckHover(isHovered)
+            }
+          }}
           onClick={(e) => handleCardClick(card.id, e)}
         />
       ))}
@@ -940,6 +959,31 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
       {emptyCards.map((card, index) => (
         <div id='dashed-outline' className={expanded && drawnCardsCount < (index + 1) ? 'visible' : ''} ref={card} key={`empty-card-${index}`} />
       ))}
+
+      <div 
+        className={`DeckInfoBubble ${showDeckInfo ? 'visible' : ''}`}
+      >
+        {Object.entries(EnvironmentCardsTextures).reduce((acc, [_, cardData]) => acc + cardData.cardAmount, 0)} cards total
+        <br/>
+        Types: 
+        <div className="deck-info-grid">
+          {Object.entries(EnvironmentCardsTextures)
+            .filter((_, index) => index > 0)
+            .map(([cardName, cardData], index) => (
+              <div key={`row-${index}`} className="deck-info-row">
+                <div className="deck-info-cell deck-card-title">
+                  {cardData.title}
+                </div>
+                <div className={`deck-info-cell deck-card-rarity ${cardData.rarity.toLowerCase()}`}>
+                  {cardData.rarity}
+                </div>
+                <div className="deck-info-cell deck-card-count">
+                  x{cardData.cardAmount}
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
     </>
   );
 });
