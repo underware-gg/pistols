@@ -17,6 +17,7 @@ interface CardData {
   description: string,
   descriptionDark?: string,
   titleShort?: string,
+  cardAmount?: number
 }
 
 function getTextSpan(color: CardColor, text: string) {
@@ -30,7 +31,8 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.WHITE, 
     title: 'No Tactics', 
     rarity: constants.Rarity.Common, 
-    description: 'NONE' 
+    description: 'NONE',
+    cardAmount: 0
   },
   [constants.EnvCard.DamageUp]: { 
     path: '/textures/cards/illustrations/Pistol_Shot.png', 
@@ -38,7 +40,8 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.RED, 
     title: 'Damage Up', 
     rarity: constants.Rarity.Common, 
-    description: `Increases your damage by ${getTextSpan(CardColor.RED, '+1')}` 
+    description: `Increases your damage by ${getTextSpan(CardColor.RED, '+1')}`,
+    cardAmount: 7
   },
   [constants.EnvCard.DamageDown]: { 
     path: '/textures/cards/illustrations/Pistol_Closeup.png', 
@@ -46,7 +49,8 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.RED, 
     title: 'Damage Down', 
     rarity: constants.Rarity.Common, 
-    description: `Decrease your damage by ${getTextSpan(CardColor.RED, '-1')}` 
+    description: `Decrease your damage by ${getTextSpan(CardColor.RED, '-1')}`,
+    cardAmount: 5
   },
   [constants.EnvCard.ChancesUp]: { 
     path: '/textures/cards/illustrations/Face_Closeup_Smirk.png', 
@@ -54,7 +58,8 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.YELLOW, 
     title: 'Hit Chance Up', 
     rarity: constants.Rarity.Common, 
-    description: `Increases your hit chance by ${getTextSpan(CardColor.YELLOW, '+10%')}` 
+    description: `Increases your hit chance by ${getTextSpan(CardColor.YELLOW, '+10%')}`,
+    cardAmount: 7
   },
   [constants.EnvCard.ChancesDown]: { 
     path: '/textures/cards/illustrations/Face_Closeup.png', 
@@ -62,7 +67,8 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.YELLOW, 
     title: 'Hit Chance Down', 
     rarity: constants.Rarity.Common, 
-    description: `Decrease your hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}` 
+    description: `Decrease your hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`,
+    cardAmount: 5
   },
   [constants.EnvCard.DoubleDamageUp]: { 
     path: '/textures/cards/illustrations/Pistol_Shot.png', 
@@ -70,7 +76,8 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.RED, 
     title: 'Double Damage Up', 
     rarity: constants.Rarity.Uncommon, 
-    description: `Increases your damage by ${getTextSpan(CardColor.RED, '+2')}` 
+    description: `Increases your damage by ${getTextSpan(CardColor.RED, '+2')}`,
+    cardAmount: 3
   },
   [constants.EnvCard.DoubleChancesUp]: { 
     path: '/textures/cards/illustrations/Face_Closeup_Smirk.png', 
@@ -78,7 +85,8 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.YELLOW, 
     title: 'Double Hit Chance Up', 
     rarity: constants.Rarity.Uncommon, 
-    description: `Increases your hit chance by ${getTextSpan(CardColor.YELLOW, '+20%')}` 
+    description: `Increases your hit chance by ${getTextSpan(CardColor.YELLOW, '+20%')}`,
+    cardAmount: 3
   },
   [constants.EnvCard.SpecialAllShotsHit]: { 
     path: '/textures/cards/illustrations/Duelist_Shooting.png', 
@@ -86,7 +94,8 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.BLUE, 
     title: 'All Hit', 
     rarity: constants.Rarity.Special, 
-    description: `Every shot taken from this point forward will ${getTextSpan(CardColor.BLUE, 'KILL')} the opponent` 
+    description: `Every shot taken from this point forward will ${getTextSpan(CardColor.BLUE, 'KILL')} the opponent`,
+    cardAmount: 1
   },
   [constants.EnvCard.SpecialAllShotsMiss]: { 
     path: '/textures/cards/illustrations/Duelist_Desperate.png', 
@@ -94,7 +103,8 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.BLUE, 
     title: 'All Miss', 
     rarity: constants.Rarity.Special, 
-    description: `Every shot taken from this point forward will ${getTextSpan(CardColor.BLUE, 'MISS')} the opponent` 
+    description: `Every shot taken from this point forward will ${getTextSpan(CardColor.BLUE, 'MISS')} the opponent`,
+    cardAmount: 1
   },
   [constants.EnvCard.SpecialDoubleTactics]: { 
     path: '/textures/cards/illustrations/Successful_Block.png', 
@@ -102,7 +112,8 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.BLUE, 
     title: 'Double Tactics', 
     rarity: constants.Rarity.Special, 
-    description: `Doubles the effect of your ${getTextSpan(CardColor.BLUE, 'TACTICS')} card`
+    description: `Doubles the effect of your ${getTextSpan(CardColor.BLUE, 'TACTICS')} card`,
+    cardAmount: 1
   },
   [constants.EnvCard.SpecialNoTactics]: { 
     path: '/textures/cards/illustrations/Glancing_Hit.png', 
@@ -110,7 +121,8 @@ const EnvironmentCardsTextures: Record<constants.EnvCard, CardData> = {
     color: CardColor.BLUE, 
     title: 'No Tactics', 
     rarity: constants.Rarity.Special, 
-    description: `Removes the effect of your ${getTextSpan(CardColor.BLUE, 'TACTICS')} card`
+    description: `Removes the effect of your ${getTextSpan(CardColor.BLUE, 'TACTICS')} card`,
+    cardAmount: 1
   }
 }
 
