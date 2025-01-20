@@ -3,16 +3,16 @@ import { useAccount } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useDojoSetup, useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
-import { useGetPlayerFullDeck } from '/src/hooks/usePistolsContractCalls'
+import { useGetDuelDeck } from '/src/hooks/usePistolsContractCalls'
 import { CommitMoveMessage, signAndRestoreMovesFromHash } from '/src/utils/salt'
 import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { movesToHand } from '/src/utils/pistols'
 
-export function useSignAndRestoreMovesFromHash(duelId: bigint, tableId: string, hash: bigint) {
+export function useSignAndRestoreMovesFromHash(duelId: bigint, hash: bigint) {
   const { account } = useAccount()
   const { duelistId } = useSettings()
   const { starknetDomain } = useDojoSetup()
-  const { decks } = useGetPlayerFullDeck(tableId)
+  const { decks } = useGetDuelDeck(duelId)
 
   const messageToSign = useMemo<CommitMoveMessage>(() => ((duelId && duelistId) ? {
     duelId: BigInt(duelId),
@@ -59,7 +59,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, tableId: string, 
   }
 }
 
-export function useRevealAction(duelId: bigint, tableId: string, hash: bigint, enabled: boolean) {
+export function useRevealAction(duelId: bigint, hash: bigint, enabled: boolean) {
   const { game } = useDojoSystemCalls()
   const { account } = useAccount()
   const { duelistId } = useSettings()
@@ -68,7 +68,7 @@ export function useRevealAction(duelId: bigint, tableId: string, hash: bigint, e
   const {
     canSign, sign_and_restore,
     moves: storedMoves, salt: storedSalt,
-  } = useSignAndRestoreMovesFromHash(duelId, tableId, hash)
+  } = useSignAndRestoreMovesFromHash(duelId, hash)
 
   const canReveal = useMemo(() =>
     (account && enabled && duelId && (canSign || (storedSalt && storedMoves)) && !isSubmitting),

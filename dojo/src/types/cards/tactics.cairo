@@ -72,9 +72,11 @@ mod TACTICS_POINTS {
 //--------------------
 // traits
 //
-use pistols::types::cards::cards::{CardPoints, CardPointsTrait};
-use pistols::types::cards::hand::{DeckType};
-use pistols::types::cards::env::{EnvCard, EnvCardTrait};
+use pistols::types::cards::{
+    deck::{DeckType},
+    cards::{CardPoints, CardPointsTrait},
+    env::{EnvCard, EnvCardTrait},
+};
 use pistols::models::challenge::{DuelistState};
 
 #[generate_trait]
@@ -96,15 +98,19 @@ impl TacticsCardImpl of TacticsCardTrait {
             self.get_points().apply(ref state_self, ref state_other, multiplier, shots_modifier);
         }
     }
-    fn get_deck(_deck_type: DeckType) -> Span<u8> {
-        (array![
-            TacticsCard::Insult.into(),
-            TacticsCard::CoinToss.into(),
-            TacticsCard::Vengeful.into(),
-            TacticsCard::ThickCoat.into(),
-            TacticsCard::Reversal.into(),
-            TacticsCard::Bananas.into(),
-        ].span())
+    fn build_deck(deck_type: DeckType) -> Span<u8> {
+        (match deck_type {
+            DeckType::None => array![],
+            DeckType::Classic => array![
+                TacticsCard::Insult.into(),
+                TacticsCard::CoinToss.into(),
+                TacticsCard::Vengeful.into(),
+                TacticsCard::ThickCoat.into(),
+                TacticsCard::Reversal.into(),
+                TacticsCard::Bananas.into(),
+            ],
+            DeckType::PacesOnly => array![],
+        }.span())
     }
 }
 

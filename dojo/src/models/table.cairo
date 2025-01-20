@@ -1,6 +1,6 @@
 // use debug::PrintTrait;
 use starknet::ContractAddress;
-use pistols::types::cards::hand::{DeckType};
+use pistols::types::cards::deck::{DeckType};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum TableType {

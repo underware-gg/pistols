@@ -16,6 +16,8 @@ mod tests {
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::duel_progress::{DuelistDrawnCard};
     use pistols::types::premise::{Premise, PremiseTrait};
+    use pistols::libs::tut::{TutorialLevel, TutorialTrait};
+    use pistols::libs::game_loop::{make_moves_hash};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::utils::arrays::{SpanUtilsTrait};
     use pistols::utils::math::{MathU8};
@@ -70,6 +72,7 @@ mod tests {
     fn _test_tutorial_create(tutorial_id: u128, profile: ProfileType) {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
         let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
+        assert!(duel_id == TutorialTrait::make_duel_id(OWNER(), tutorial_id), "duel_id");
         let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
         let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
         assert!(challenge.state == ChallengeState::InProgress, "challenge.state");
@@ -94,7 +97,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('TUTORIAL: Invalid level', 'ENTRYPOINT_FAILED'))]
-    fn test_tutorial_create_level_3() {
+    fn test_tutorial_create_level_3_NO() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
         tester::execute_create_tutorial(@sys.tut, OWNER(), 3);
     }
@@ -105,5 +108,92 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
         tester::execute_create_tutorial(@sys.tut, ZERO(), 1);
     }
+
+    
+    //-------------------------------
+    // Levels
+    //
+
+    fn _test_tutorial_level_1(pace: PacesCard, dodge: PacesCard) {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
+        let tutorial_id: u128 = 1;
+        let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
+        // commit
+        let moves: Span<u8> = [pace.into(), dodge.into()].span();
+        let hashed: u128 = make_moves_hash(SALT_A, moves);
+        tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), tutorial_id, hashed);
+        let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
+        assert!(round.state == RoundState::Reveal, "round.state");
+        assert!(round.moves_a.hashed > 0, "round.moves_a.hashed");
+        assert!(round.moves_b.hashed == hashed, "round.moves_b.hashed");
+        // reveal
+        tester::execute_reveal_moves_tutorial(@sys.tut, OWNER(), tutorial_id, SALT_A, moves);
+        let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
+        assert!(challenge.state == ChallengeState::Resolved, "challenge.state");
+        assert!(challenge.winner == 2, "challenge.winner");
+    }
+
+    #[test]
+    fn test_tutorial_level_1_pace_1() {
+        _test_tutorial_level_1(PacesCard::Paces1, PacesCard::Paces2);
+    }
+    #[test]
+    fn test_tutorial_level_1_pace_2() {
+        _test_tutorial_level_1(PacesCard::Paces2, PacesCard::Paces3);
+    }
+    #[test]
+    fn test_tutorial_level_1_pace_3() {
+        _test_tutorial_level_1(PacesCard::Paces3, PacesCard::Paces4);
+    }
+    #[test]
+    fn test_tutorial_level_1_pace_4() {
+        _test_tutorial_level_1(PacesCard::Paces4, PacesCard::Paces5);
+    }
+    #[test]
+    fn test_tutorial_level_1_pace_5() {
+        _test_tutorial_level_1(PacesCard::Paces5, PacesCard::Paces6);
+    }
+    #[test]
+    fn test_tutorial_level_1_pace_6() {
+        _test_tutorial_level_1(PacesCard::Paces6, PacesCard::Paces7);
+    }
+    #[test]
+    fn test_tutorial_level_1_pace_7() {
+        _test_tutorial_level_1(PacesCard::Paces7, PacesCard::Paces8);
+    }
+    #[test]
+    fn test_tutorial_level_1_pace_8() {
+        _test_tutorial_level_1(PacesCard::Paces8, PacesCard::Paces9);
+    }
+    #[test]
+    fn test_tutorial_level_1_pace_9() {
+        _test_tutorial_level_1(PacesCard::Paces9, PacesCard::Paces10);
+    }
+    #[test]
+    fn test_tutorial_level_1_pace_10() {
+        _test_tutorial_level_1(PacesCard::Paces10, PacesCard::Paces9);
+    }
+
+
+
+    //-------------------------------
+    // Fails
+    //
+
+    // #[test]
+    // #[should_panic(expected:('TUTORIAL: Not your duel', 'ENTRYPOINT_FAILED'))]
+    // fn test_tutorial_commit_invalid_duel() {
+    //     let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
+    //     tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
+    //     tester::execute_commit_moves_tutorial(@sys.tut, OTHER(), tutorial_id, 0x1234);
+    // }
+
+    // #[test]
+    // #[should_panic(expected:('TUTORIAL: Not your duel', 'ENTRYPOINT_FAILED'))]
+    // fn test_tutorial_commit_invalid_player() {
+    //     let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
+    //     tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
+    //     tester::execute_commit_moves_tutorial(@sys.tut, OTHER(), tutorial_id, 0x1234);
+    // }
 
 }

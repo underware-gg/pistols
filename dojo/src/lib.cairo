@@ -61,6 +61,7 @@ mod types {
     mod trophies;
     mod cards {
         mod cards;
+        mod deck;
         mod hand;
         mod paces;
         mod tactics;

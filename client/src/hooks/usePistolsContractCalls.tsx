@@ -32,14 +32,14 @@ export const useDuelProgress = (duel_id: bigint) => {
   }
 }
 
-export const useGetPlayerFullDeck = (table_id: string) => {
-  const { game: { getPlayerCardDecks } } = useDojoContractCalls()
+export const useGetDuelDeck = (duel_id: BigNumberish) => {
+  const { game: { getDuelDeck } } = useDojoContractCalls()
   const options = useMemo(() => ({
-    call: getPlayerCardDecks,
-    args: [table_id],
-    enabled: Boolean(table_id),
+    call: getDuelDeck,
+    args: [duel_id],
+    enabled: isPositiveBigint(duel_id),
     defaultValue: [],
-  }), [table_id])
+  }), [duel_id])
   const { value, isLoading } = useSdkCallPromise<BigNumberish[][]>(options)
   const decks = useMemo(() => (value?.map((vo: BigNumberish[]) => vo.map((vi: BigNumberish) => Number(vi))) ?? null), [value])
   return {

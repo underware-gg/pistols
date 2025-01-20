@@ -15,7 +15,8 @@ use pistols::types::duel_progress::{
     SpecialsDrawn, SpecialsDrawnTrait,
 };
 use pistols::types::cards::hand::{
-    DuelistHand, DuelistHandTrait, DeckType,
+    Deck, DeckTrait,
+    DuelistHand, DuelistHandTrait,
     PacesCard, PacesCardTrait,
     TacticsCard, TacticsCardTrait,
     BladesCard, BladesCardTrait,
@@ -60,7 +61,7 @@ fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
 //
 
 // testable loop
-fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> DuelProgress {
+fn game_loop(world: @WorldStorage, deck: @Deck, ref round: Round) -> DuelProgress {
     // let _table_type: TableType = store.get_table_config_value(challenge.table_id).table_type;
 
     let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
@@ -70,8 +71,8 @@ fn game_loop(world: @WorldStorage, deck_type: DeckType, ref round: Round) -> Due
     
     let mut hand_a: DuelistHand = round.moves_a.as_hand();
     let mut hand_b: DuelistHand = round.moves_b.as_hand();
-    hand_a.validate(deck_type);
-    hand_b.validate(deck_type);
+    (*deck).validate_hand(ref hand_a);
+    (*deck).validate_hand(ref hand_b);
 
     let mut specials_a: SpecialsDrawn = SpecialsDrawnTrait::initialize(hand_a.card_tactics, hand_b.card_tactics);
     let mut specials_b: SpecialsDrawn = SpecialsDrawnTrait::initialize(hand_b.card_tactics, hand_a.card_tactics);

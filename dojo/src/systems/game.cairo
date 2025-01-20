@@ -26,7 +26,7 @@ pub trait IGame<TState> {
 
     //
     // view calls
-    fn get_player_card_decks(self: @TState, table_id: felt252) -> Span<Span<u8>>;
+    fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
     fn can_collect(self: @TState) -> bool;
     
@@ -99,7 +99,7 @@ pub mod game {
         challenge_state::{ChallengeState, ChallengeStateTrait},
         duel_progress::{DuelProgress, DuelistDrawnCard},
         round_state::{RoundState, RoundStateTrait},
-        cards::hand::DuelistHandTrait,
+        cards::deck::{ Deck, DeckTrait},
         typed_data::{CommitMoveMessage, CommitMoveMessageTrait},
     };
     use pistols::types::trophies::{Trophy, TrophyTrait, TROPHY};
@@ -296,8 +296,7 @@ pub mod game {
             }
 
             // execute game loop...
-            let table: TableConfigValue = store.get_table_config_value(challenge.table_id);
-            let progress: DuelProgress = game_loop(@store.world, table.deck_type, ref round);
+            let progress: DuelProgress = game_loop(@store.world, @challenge.get_deck(), ref round);
             store.set_round(@round);
 
             // end challenge
@@ -352,19 +351,18 @@ pub mod game {
         // view calls
         //
 
-        fn get_player_card_decks(self: @ContractState, table_id: felt252) -> Span<Span<u8>> {
+        fn get_duel_deck(self: @ContractState, duel_id: u128) -> Span<Span<u8>> {
             let mut store: Store = StoreTrait::new(self.world_default());
-            let table: TableConfigValue = store.get_table_config_value(table_id);
-            (DuelistHandTrait::get_table_player_decks(table.deck_type))
+            let challenge: Challenge = store.get_challenge(duel_id);
+            (challenge.get_deck().to_span())
         }
 
         fn get_duel_progress(self: @ContractState, duel_id: u128) -> DuelProgress {
             let mut store: Store = StoreTrait::new(self.world_default());
             let challenge: Challenge = store.get_challenge(duel_id);
             if (challenge.state.is_finished()) {
-                let table: TableConfigValue = store.get_table_config_value(challenge.table_id);
                 let mut round: Round = store.get_round(duel_id);
-                (game_loop(@store.world, table.deck_type, ref round))
+                (game_loop(@store.world, @challenge.get_deck(), ref round))
             } else {
                 {Default::default()}
             }

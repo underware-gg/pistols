@@ -680,7 +680,7 @@ function DuelProgress({
   canAutoReveal = false
 }) {
   const { gameImpl } = useThreeJsContext()
-  const { round1, challenge: { tableId } } = useDuel(duelId)
+  const { round1 } = useDuel(duelId)
   const round1Moves = useMemo(() => (isA ? round1?.moves_a : round1?.moves_b), [isA, round1])
 
   const duelProgressRef = useRef(null)
@@ -695,7 +695,7 @@ function DuelProgress({
   // Commit modal control
   const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal, canReveal } = useRevealAction(duelId, tableId, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
+  const { reveal, canReveal } = useRevealAction(duelId, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
 
   const onClick = useCallback(() => {
     if (!isConnected) console.warn(`onClickReveal: not connected!`)
@@ -735,7 +735,7 @@ function DuelProgress({
 
   const id = isA ? 'player-bubble-left' : 'player-bubble-right'
 
-  const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, tableId, round1Moves?.hashed)
+  const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, round1Moves?.hashed)
 
   useEffect(() =>{
     if (isMyDuelist && canSign) {

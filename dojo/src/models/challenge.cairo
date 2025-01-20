@@ -2,13 +2,6 @@ use starknet::ContractAddress;
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState, RoundStateTrait};
 use pistols::types::premise::{Premise, PremiseTrait};
-use pistols::types::duel_progress::{DuelistDrawnCard};
-use pistols::types::cards::{
-    paces::{PacesCard, PacesCardTrait},
-    tactics::{TacticsCard, TacticsCardTrait},
-    blades::{BladesCard, BladesCardTrait},
-    hand::{FinalBlow},
-};
 
 //-------------------------
 // Challenge lifecycle
@@ -88,7 +81,14 @@ pub struct DuelistState {
 //------------------------------------
 // Traits
 //
-use pistols::types::cards::hand::{DuelistHand};
+use pistols::types::cards::{
+    deck::{Deck, DeckTrait, DeckType, DeckTypeTrait},
+    hand::{DuelistHand},
+    paces::{PacesCard, PacesCardTrait},
+    tactics::{TacticsCard, TacticsCardTrait},
+    blades::{BladesCard, BladesCardTrait},
+    hand::{FinalBlow},
+};
 use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
@@ -112,6 +112,14 @@ impl ChallengeImpl of ChallengeTrait {
     #[inline(always)]
     fn exists(self: Challenge) -> bool {
         (self.state.exists())
+    }
+    fn get_deck_type(self: Challenge) -> DeckType {
+        // TODO: THIS!!!!
+        (DeckType::Classic)
+    }
+    #[inline(always)]
+    fn get_deck(self: Challenge) -> Deck {
+        (self.get_deck_type().build_deck())
     }
 }
 

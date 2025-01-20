@@ -20,7 +20,7 @@ pub enum PacesCard {
 //--------------------
 // traits
 //
-use pistols::types::cards::hand::{DeckType};
+use pistols::types::cards::deck::{DeckType};
 
 #[generate_trait]
 impl PacesCardImpl of PacesCardTrait {
@@ -43,7 +43,7 @@ impl PacesCardImpl of PacesCardTrait {
             PacesCard::None => 0,
         }
     }
-    fn get_deck(_deck_type: DeckType) -> Span<u8> {
+    fn build_deck(deck_type: DeckType) -> Span<u8> {
         (array![
             PacesCard::Paces1.into(),
             PacesCard::Paces2.into(),

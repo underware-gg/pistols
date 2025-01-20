@@ -28,7 +28,7 @@ pub enum SeasonPhase {
 //
 use pistols::systems::game::game::{Errors as ErrorsGame};
 use pistols::models::table::{TableConfig, TableConfigTrait, TableType};
-use pistols::types::cards::hand::{DeckType};
+use pistols::types::cards::deck::{DeckType};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::utils::timestamp::{TIMESTAMP};

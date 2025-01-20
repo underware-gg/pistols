@@ -60,8 +60,10 @@ pub mod tutorial {
         challenge_state::{ChallengeState, ChallengeStateTrait},
         duel_progress::{DuelProgress, DuelistDrawnCard},
         round_state::{RoundState, RoundStateTrait},
-        cards::hand::DuelistHandTrait,
         constants::{CONST},
+    };
+    use pistols::types::cards::{
+        deck::{Deck, DeckTrait},
     };
     use pistols::utils::misc::{ZERO};
     use pistols::libs::store::{Store, StoreTrait};
@@ -195,8 +197,8 @@ pub mod tutorial {
             // TODO: set vrf moves
 
             // execute game loop...
-            let table: TableConfigValue = store.get_table_config_value(challenge.table_id);
-            let progress: DuelProgress = game_loop(@store.world, table.deck_type, ref round);
+            let deck: Deck = challenge.get_deck();
+            let progress: DuelProgress = game_loop(@store.world, @deck, ref round);
             store.set_round(@round);
 
             // end challenge

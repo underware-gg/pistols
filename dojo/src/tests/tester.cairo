@@ -551,22 +551,20 @@ mod tester {
         (duel_id)
     }
     fn execute_commit_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
-        player_id: u128,
         tutorial_id: u128,
         hashed: u128,
     ) {
         impersonate(sender);
-        (*system).commit_moves(player_id, tutorial_id, hashed);
+        (*system).commit_moves(ID(sender), tutorial_id, hashed);
         _next_block();
     }
     fn execute_reveal_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
-        player_id: u128,
         tutorial_id: u128,
         salt: felt252,
         moves: Span<u8>,
     ) {
         impersonate(sender);
-        (*system).reveal_moves(player_id, tutorial_id, salt, moves);
+        (*system).reveal_moves(ID(sender), tutorial_id, salt, moves);
         _next_block();
     }
 
