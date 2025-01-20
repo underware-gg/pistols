@@ -446,3 +446,84 @@ $color-cold: #4d9ad6;
 .duelist-name[data-contentlength="3"] {
   font-size: calc(var(--card-width) * 0.1);;
 }
+
+.DeckInfoBubble {
+  position: absolute;
+  bottom: aspect-height(28);
+  right: aspect-width(18);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: aspect-width(1);
+  border-radius: aspect-width(0.6);
+  font-size: aspect-width(1.2);
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  visibility: hidden;
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: aspect-height(-1.18);
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: aspect-width(0.8) solid transparent;
+    border-right: aspect-width(0.8) solid transparent;
+    border-top: aspect-height(1.2) solid rgba(0, 0, 0, 0.8);
+  }
+}
+
+.deck-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: aspect-height(0.4);
+  padding: aspect-width(0.5);
+}
+
+.deck-info-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr aspect-width(2.5);
+  align-items: center;
+  gap: aspect-width(0.5);
+}
+
+.deck-info-cell {
+  display: flex;
+  align-items: center;
+}
+
+.deck-card-title {
+  font-size: aspect-width(0.9);
+  color: #ffffff;
+  padding-right: aspect-width(0.5);
+}
+
+.deck-card-rarity {
+  font-size: aspect-width(0.9);
+  color: #ffffff;
+  text-transform: uppercase;
+
+  &.common {
+    color: $color-positive;
+  }
+
+  &.uncommon {
+    color: $color-warning; 
+  }
+
+  &.special {
+    color: $color-cold;
+  }
+}
+
+.deck-card-count {
+  font-size: aspect-width(0.9);
+  color: #ffffff;
+  justify-content: flex-end;
+}
