@@ -112,7 +112,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
 
   return (
     <div className="tutorialContainer NoMouse NoDrag" >
-      <div className="tutorialBackground" />
+      <div className="tutorialTextBackground" />
       <div className="tutorialContent">
         <div className="speakerName">
           {displayText?.characterName}

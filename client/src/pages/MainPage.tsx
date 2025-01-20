@@ -31,6 +31,7 @@ import Duel from '/src/components/scenes/Duel'
 
 // test sdk
 import { helloPistols } from '@underware_gg/pistols-sdk'
+import { DuelTutorialLevel } from '../data/tutorialConstants'
 
 helloPistols();
 
@@ -90,7 +91,7 @@ function MainUI() {
       if (atGate) setCurrentScene(<Gate />);
       else if (atDoor) setCurrentScene(<Door />);
       else if (atTutorial) setCurrentScene(<TutorialUI />);
-      else if (atDuel && currentDuel) setCurrentScene(<Duel duelId={currentDuel} />);
+      else if (atDuel && currentDuel) setCurrentScene(<Duel duelId={currentDuel} tutorial={DuelTutorialLevel.SIMPLE} />);
       else if (atProfile) setCurrentScene(<ScProfile />);
       else if (atDuels) setCurrentScene(<ScDuels />);
       else if (atDuelists) setCurrentScene(<ScDuelists />);
