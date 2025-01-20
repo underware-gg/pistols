@@ -1,95 +1,124 @@
 import React, { useState, useEffect } from 'react'
-import { DuelTutorial } from '/src/data/tutorialConstants'
+import { Modal } from 'semantic-ui-react'
+import { DuelTutorialLevel, DUEL_TUTORIAL_LIST, TUTORIAL_DATA } from '/src/data/tutorialConstants'
 
-export enum BartenderPosition {
-  Left = 'left',
-  Center = 'center', 
-  Right = 'right'
+interface DuelTutorialOverlayProps {
+  tutorialType: DuelTutorialLevel
+  open: boolean
 }
 
-type TutorialStep = {
-  text: string,
-  bartenderPosition: BartenderPosition,
-  overlayImage?: string // Path to overlay image
-}
+export default function DuelTutorialOverlay({ tutorialType, open }: DuelTutorialOverlayProps) {
+  const [isOpen, setIsOpen] = useState(open)
 
-const TUTORIAL_STEPS: Record<DuelTutorial, TutorialStep[]> = {
-  [DuelTutorial.NONE]: [],
-  [DuelTutorial.SIMPLE]: [
-    {
-      text: "Welcome to your first duel! Let me show you around.",
-      bartenderPosition: BartenderPosition.Center
-    },
-    {
-      text: "These are your cards. You'll use them to plan your moves.",
-      bartenderPosition: BartenderPosition.Left,
-      overlayImage: '/assets/tutorials/cards-highlight.png'
-    },
-    {
-      text: "Your opponent's stats are shown here. Keep an eye on their health!",
-      bartenderPosition: BartenderPosition.Right,
-      overlayImage: '/assets/tutorials/opponent-stats.png'
-    }
-  ],
-  [DuelTutorial.FULL]: [
-    {
-      text: "Time to commit your moves! Click the cards in the order you want to play them.",
-      bartenderPosition: BartenderPosition.Left,
-      overlayImage: '/assets/tutorials/commit-cards.png'
-    },
-    {
-      text: "Once you're happy with your selection, click commit to lock in your moves.",
-      bartenderPosition: BartenderPosition.Center,
-      overlayImage: '/assets/tutorials/commit-button.png'
-    }
-  ],
-  [DuelTutorial.DUELISTS]: [
-    {
-      text: "Both duelists have committed their moves. Time for the reveal!",
-      bartenderPosition: BartenderPosition.Center
-    },
-    {
-      text: "Click reveal to show your cards and see how the duel plays out.",
-      bartenderPosition: BartenderPosition.Right,
-      overlayImage: '/assets/tutorials/reveal-button.png'
-    }
-  ]
-}
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [currentTutorialIndex, setCurrentTutorialIndex] = useState(0)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [currentDot, setCurrentDot] = useState(0)
 
-export default function DuelTutorialOverlay({ tutorialType }: { tutorialType: DuelTutorial }) {
-  const [currentStep, setCurrentStep] = useState(0)
-  const steps = TUTORIAL_STEPS[tutorialType]
+  const tutorialParts = DUEL_TUTORIAL_LIST[tutorialType]
+  const currentTutorial = TUTORIAL_DATA[tutorialParts[currentTutorialIndex]]
+  const totalSlides = currentTutorial?.slides?.length || 0
+  const totalDots = tutorialParts.reduce((total, tutorialId) => total + (TUTORIAL_DATA[tutorialId]?.slides?.length || 0), 0)
 
   useEffect(() => {
-    setCurrentStep(0)
+    setCurrentSlide(0)
+    setCurrentTutorialIndex(0)
   }, [tutorialType])
 
-  if (tutorialType === DuelTutorial.NONE || !steps.length || currentStep >= steps.length) {
+  if (tutorialType === DuelTutorialLevel.NONE || !tutorialParts.length) {
     return null
   }
 
-  const currentTutorial = steps[currentStep]
+  const handleNext = () => {
+    if (isTransitioning) return
+
+    setIsTransitioning(true)
+    setTimeout(() => {
+      if (currentSlide < totalSlides - 1) {
+        setCurrentSlide(prev => prev + 1)
+        setCurrentDot(prev => prev + 1)
+      } else if (currentTutorialIndex < tutorialParts.length - 1) {
+        setCurrentTutorialIndex(prev => prev + 1)
+        setCurrentSlide(0)
+        setCurrentDot(prev => prev + 1)
+      }
+      setIsTransitioning(false)
+    }, 300)
+  }
+
+  const handlePrevious = () => {
+    if (isTransitioning) return
+
+    setIsTransitioning(true)
+    setTimeout(() => {
+      if (currentSlide > 0) {
+        setCurrentSlide(prev => prev - 1)
+        setCurrentDot(prev => prev - 1)
+      } else if (currentTutorialIndex > 0) {
+        setCurrentTutorialIndex(prev => prev - 1)
+        setCurrentSlide(TUTORIAL_DATA[tutorialParts[currentTutorialIndex - 1]].slides.length - 1)
+        setCurrentDot(prev => prev - 1)
+      }
+      setIsTransitioning(false)
+    }, 300)
+  }
+
+  const _close = () => {
+    setIsOpen(false)
+  }
+
+  const isLastSlide = currentTutorialIndex === tutorialParts.length - 1 && currentSlide === totalSlides - 1
 
   return (
-    <div className="TutorialOverlay">
-      {currentTutorial.overlayImage && (
-        <div className="TutorialMask">
-          <img src={currentTutorial.overlayImage} alt="Tutorial highlight" />
-        </div>
-      )}
-      
-      <div className={`TutorialBartender ${currentTutorial.bartenderPosition}`}>
-        {/* <Bartender /> */}
-        <div className="TutorialText">
-          {currentTutorial.text}
-          <button 
-            className="TutorialNext"
-            onClick={() => setCurrentStep(prev => prev + 1)}
+    <Modal
+      open={isOpen}
+      onClose={_close}
+      className="modal"
+      closeOnDimmerClick={false}
+      closeOnDocumentClick={false}
+    >
+      <div className="tutorialContainer">
+        <h2 className="tutorialTitle">
+          {currentTutorial.tutorialName}
+        </h2>
+
+        <img
+          src={currentTutorial.slides[currentSlide].imagePath}
+          alt="Tutorial"
+          className="tutorialImage"
+        />
+
+        <p className="tutorialText">
+          {currentTutorial.slides[currentSlide].tutorialDescriptions}          
+        </p>
+
+        <div className="tutorialNavigationContainer">
+          <button
+            onClick={handlePrevious}
+            disabled={currentTutorialIndex === 0 && currentSlide === 0}
+            className={`tutorialButton YesMouse ${currentTutorialIndex === 0 && currentSlide === 0 ? 'tutorialButtonDisabled' : ''}`}
           >
-            {currentStep === steps.length - 1 ? 'Got it!' : 'Next'}
+            ← Previous
+          </button>
+
+          <div className="tutorialDotsContainer">
+            {Array.from({length: totalDots}).map((_, index) => (
+              <div 
+                key={index}
+                className={`tutorialDot ${index === currentDot ? 'tutorialDotActive' : 
+                     index < currentDot ? 'tutorialDotPassed' : 'tutorialDotFuture'}`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={isLastSlide ? _close : handleNext}
+            className="tutorialButton YesMouse"
+          >
+            {isLastSlide ? 'Finish' : 'Next →'}
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   )
 }

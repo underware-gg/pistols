@@ -5,6 +5,7 @@ import { SPRITESHEETS } from '/src/data/assets'
 import { AnimationState } from '/src/three/game'
 
 
+//TODO redo to reflect new duel logic
 export function MenuDebugAnimations() {
   return (
     <div>
@@ -19,11 +20,11 @@ function MenuDebugTriggers() {
   const { gameImpl } = useThreeJsContext()
 
   const _paces = (pacesCountA, paceCountB, healthA, healthB) => {
-    gameImpl?.animateDuel(AnimationState.Round1, pacesCountA, paceCountB, healthA, healthB, healthA, healthB)
+    gameImpl?.animateDuel(AnimationState.Round1)
   }
 
   const _blades = (bladeA, bladeB, healthA, healthB) => {
-    gameImpl?.animateDuel(AnimationState.Round2, bladeA, bladeB, healthA, healthB, healthA, healthB)
+    gameImpl?.animateDuel(AnimationState.Round2)
   }
 
   const className = 'PaddedHalf Important ResetSize'

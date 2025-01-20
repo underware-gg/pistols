@@ -29,7 +29,7 @@ import * as Constants from '/src/data/cardConstants'
 import DuelProgress from '../ui/duel/DuelProgress'
 import DuelistProfile from '../ui/duel/DuelistProfile'
 import DuelProfile from '../ui/duel/DuelProfile'
-import { DuelTutorial } from '/src/data/tutorialConstants'
+import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 import DuelHeader from '../ui/duel/DuelHeader'
 import DuelStateDisplay from '../ui/duel/DuelStateDispaly'
 import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
@@ -44,10 +44,10 @@ export type DuelistState = {
 
 export default function Duel({
   duelId,
-  tutorial = DuelTutorial.NONE
+  tutorial = DuelTutorialLevel.NONE
 } : {
   duelId: bigint,
-  tutorial: DuelTutorial
+  tutorial: DuelTutorialLevel
 }) {
   const { gameImpl } = useThreeJsContext()
   const { dispatchAnimated } = useGameplayContext()
@@ -421,6 +421,8 @@ export default function Duel({
         </div>
       </div>
 
+      <DuelTutorialOverlay tutorialType={tutorial} open={true} />
+
       {/* {duelProgress &&
         <div className='CenteredPanel'>
           <pre className='Code FillParent Scroller NoMargin'>
@@ -447,8 +449,6 @@ export default function Duel({
           resetDuel()
         }} 
         isPlaying={isPlaying} />
-
-      <DuelTutorialOverlay tutorialType={tutorial} />
 
       <DojoSetupErrorDetector />
 
