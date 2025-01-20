@@ -1,14 +1,12 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
+import { useAccount } from '@starknet-react/core'
 import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
-import { PlayerDuelistTokensStoreSyncQL, useTokenIdsByOwner, useTokenIdsOfPlayer, useTokensByOwner } from '/src/stores/duelistTokenStore'
-import { DojoAccount } from './ConnectPage'
+import { PlayerDuelistTokensStoreSyncQL, useTokensByOwner } from '/src/stores/duelistTokenStore'
+import { bigintToNumber, useERC721TokenUri } from '@underware_gg/pistols-sdk/utils'
 import { Connect } from './ConnectPage'
 import App from '/src/components/App'
-import { bigintToHex, bigintToNumber, useERC721TokenUri } from '@underware_gg/pistols-sdk/utils'
-import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
-import { useAccount } from '@starknet-react/core'
 
 // const Row = Grid.Row
 // const Col = Grid.Column

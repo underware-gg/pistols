@@ -16,16 +16,16 @@ type Profiles = {
   [key: string]: constants.ProfileDescription,
 }
 
-export default function DuelistProfilesPage() {
+export default function ProfilesPage() {
   return (
     <App>
       <Container>
         <br />
-        <Profiles name='Duelists' profiles={constants.DUELIST_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Duelist} />
+        <Profiles profiles={constants.DUELIST_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Duelist} />
         <br />
-        <Profiles name='Characters' profiles={constants.CHARACTER_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Character} />
+        <Profiles profiles={constants.CHARACTER_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Character} />
         <br />
-        <Profiles name='Bots' profiles={constants.BOT_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Bot} />
+        <Profiles profiles={constants.BOT_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Bot} />
         <br />
       </Container>
     </App>
@@ -34,11 +34,9 @@ export default function DuelistProfilesPage() {
 
 
 function Profiles({
-  name,
   profiles,
   profileType,
 }: {
-  name: string,
   profiles: Profiles,
   profileType: constants.ProfileType,
 }) {
@@ -75,7 +73,7 @@ function Profiles({
             <h3 className='Important'>#</h3>
           </HeaderCell>
           <HeaderCell>
-            <h3 className='Important'>Key</h3>
+            <h3 className='Important'>{profileType}</h3>
           </HeaderCell>
           <HeaderCell>
             <h3 className='Important'>Name</h3>
