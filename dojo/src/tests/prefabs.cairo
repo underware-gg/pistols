@@ -21,7 +21,7 @@ mod prefabs {
             FLAGS, ID, ZERO,
         }
     };
-    use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait, mock_shuffle_values};
+    use pistols::systems::rng_mock::{IRngDispatcher, IRngDispatcherTrait, mock_shuffle_values};
 
     const NAME_A: felt252 = 'Sensei';
     const NAME_B: felt252 = 'Senpai';

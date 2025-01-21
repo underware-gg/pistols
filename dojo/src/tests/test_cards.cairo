@@ -29,7 +29,7 @@ mod tests {
     use pistols::utils::short_string::{ShortString};
 
     use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait, mock_shuffle_values};
+    use pistols::systems::rng_mock::{IRngDispatcher, IRngDispatcherTrait, mock_shuffle_values};
     use pistols::tests::tester::{tester,
         tester::{
             TestSystems,

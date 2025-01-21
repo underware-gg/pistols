@@ -18,6 +18,11 @@ mod tester {
         game::{game, IGameDispatcher, IGameDispatcherTrait},
         tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
         rng::{rng},
+        rng_mock::{
+            rng as rng_mock,
+            IRngDispatcher, IRngDispatcherTrait,
+            m_SaltValue,
+        },
         vrf_mock::{vrf_mock},
         tokens::{
             duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
@@ -75,11 +80,6 @@ mod tester {
     use pistols::tests::token::mock_duelist::{
         duelist_token as mock_duelist,
         m_MockDuelistOwners,
-    };
-    use pistols::tests::mock_rng::{
-        rng as mock_rng,
-        IRngDispatcher, IRngDispatcherTrait,
-        m_SaltValue,
     };
 
     use pistols::types::challenge_state::{ChallengeState};
@@ -171,7 +171,7 @@ mod tester {
         let mut deploy_lords: bool = (flags & FLAGS::LORDS) != 0;
         let mut deploy_duel: bool = (flags & FLAGS::DUEL) != 0;
         let mut deploy_duelist: bool = (flags & FLAGS::DUELIST) != 0;
-        let mut deploy_mock_rng = (flags & FLAGS::MOCK_RNG) != 0;
+        let mut deploy_rng_mock = (flags & FLAGS::MOCK_RNG) != 0;
         let mut approve: bool = (flags & FLAGS::APPROVE) != 0;
         let mut deploy_bank: bool = false;
         let mut deploy_fame: bool = false;
@@ -182,7 +182,7 @@ mod tester {
         deploy_duel = deploy_duel || deploy_game;
         deploy_bank = deploy_bank || deploy_lords || deploy_duelist;
         deploy_fame = deploy_fame || deploy_game || deploy_duelist;
-        deploy_mock_rng = deploy_mock_rng || deploy_tutorial;
+        deploy_rng_mock = deploy_rng_mock || deploy_tutorial;
         
 // '---- 0'.print();
         let mut resources: Array<TestResource> = array![
@@ -210,7 +210,7 @@ mod tester {
             TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
             TestResource::Event(e_PlayerRequiredAction::TEST_CLASS_HASH),
         ];
-        if (deploy_mock_rng) {
+        if (deploy_rng_mock) {
             resources.append(TestResource::Model(m_SaltValue::TEST_CLASS_HASH));
         }
         if (!deploy_duelist && deploy_game) {
@@ -327,8 +327,8 @@ mod tester {
             );
         }
 
-        if (deploy_mock_rng) {
-            resources.append(TestResource::Contract(mock_rng::TEST_CLASS_HASH));
+        if (deploy_rng_mock) {
+            resources.append(TestResource::Contract(rng_mock::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"rng")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())

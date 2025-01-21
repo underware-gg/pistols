@@ -8,7 +8,7 @@ mod tests {
     use core::traits::{Into, TryInto};
     use starknet::{ContractAddress};
 
-    use pistols::tests::mock_rng::{IRngDispatcher, IRngDispatcherTrait, mock_shuffle_values};
+    use pistols::systems::rng_mock::{IRngDispatcher, IRngDispatcherTrait, mock_shuffle_values};
     use pistols::systems::rng::{Dice, DiceTrait, Shuffle, ShuffleTrait};
     use pistols::types::shuffler::{ShufflerTrait};
     use pistols::tests::tester::{tester, tester::{TestSystems, FLAGS}};
@@ -97,7 +97,7 @@ mod tests {
     //
 
     #[test]
-    fn test_mock_rng_dice() {
+    fn test_rng_mock_dice() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         sys.rng.mock_values(
             ['dice_1', 'dice_2', 'dice_3'].span(),
@@ -113,7 +113,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mock_rng_shuffle() {
+    fn test_rng_mock_shuffle() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         sys.rng.mock_values(
             ['shuffle'].span(),

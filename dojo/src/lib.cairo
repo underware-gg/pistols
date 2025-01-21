@@ -10,6 +10,7 @@ mod systems {
     mod bank;
     mod game;
     mod rng;
+    mod rng_mock;
     mod tutorial;
     #[cfg(feature:'vrf_mock')]
     mod vrf_mock;
@@ -101,7 +102,6 @@ mod tests {
     // utils
     mod tester;
     mod prefabs;
-    mod mock_rng;
     mod utils;
     // tokens
     mod token {
