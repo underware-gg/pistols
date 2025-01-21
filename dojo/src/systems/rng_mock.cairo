@@ -18,7 +18,7 @@ pub struct SaltValue {
 pub trait IRngMock<TState> {
     // IRng
     fn reseed(self: @TState, seed: felt252, salt: felt252) -> felt252;
-    fn new_shuffler(self: @TState, shuffle_size: u8) -> Shuffler;
+    fn is_mocked(self: @TState) -> bool;
     // IMocker
     fn mock_values(ref self: TState, salts: Span<felt252>, values: Span<felt252>);
 }
@@ -54,8 +54,8 @@ pub mod rng_mock {
                 (new_seed)
             }
         }
-        fn new_shuffler(self: @ContractState, shuffle_size: u8) -> Shuffler {
-            (ShufflerTrait::new_mocked(shuffle_size))
+        fn is_mocked(self: @ContractState) -> bool {
+            (true)
         }
     }
 

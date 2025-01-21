@@ -4,7 +4,7 @@ use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 #[starknet::interface]
 pub trait IRng<TState> {
     fn reseed(self: @TState, seed: felt252, salt: felt252) -> felt252;
-    fn new_shuffler(self: @TState, shuffle_size: u8) -> Shuffler;
+    fn is_mocked(self: @TState) -> bool;
 }
 
 #[dojo::contract]
@@ -22,8 +22,8 @@ pub mod rng {
             let new_seed: felt252 = hash_values([seed.into(), salt].span());
             (new_seed)
         }
-        fn new_shuffler(self: @ContractState, shuffle_size: u8) -> Shuffler {
-            (ShufflerTrait::new(shuffle_size))
+        fn is_mocked(self: @ContractState) -> bool {
+            (false)
         }
     }
 }
@@ -90,11 +90,13 @@ pub struct Shuffle {
 impl ShuffleImpl of ShuffleTrait {
     fn new(rng_address: ContractAddress, initial_seed: felt252, shuffle_size: u8, salt: felt252) -> Shuffle {
         let rng = IRngDispatcher{ contract_address: rng_address };
+        let mut shuffler = ShufflerTrait::new(shuffle_size);
+        shuffler.mocked = rng.is_mocked();
         (Shuffle {
             rng,
             seed: rng.reseed(initial_seed, salt),
             last_card: 0,
-            shuffler: rng.new_shuffler(shuffle_size),
+            shuffler,
         })
     }
 

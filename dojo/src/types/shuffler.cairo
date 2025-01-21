@@ -39,15 +39,6 @@ impl ShufflerImpl of ShufflerTrait {
         })
     }
 
-    fn new_mocked(size: u8) -> Shuffler {
-        (Shuffler {
-            ids: 0,
-            size: size.into(),
-            pos: 0,
-            mocked: true,
-        })
-    }
-
 	// Return next shuffled id
 	// Ids keys and values range from 1..size
 	// Returns 0 when all ids have been used
