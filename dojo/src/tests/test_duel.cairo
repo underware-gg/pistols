@@ -39,7 +39,7 @@ mod tests {
             PlayerMoves, PlayerMovesTrait,
         },
     };
-    use pistols::systems::rng_mock::{IRngDispatcher, IRngDispatcherTrait};
+    use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait};
 
 
 

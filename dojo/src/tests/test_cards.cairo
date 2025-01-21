@@ -29,7 +29,7 @@ mod tests {
     use pistols::utils::short_string::{ShortString};
 
     use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::systems::rng_mock::{IRngDispatcher, IRngDispatcherTrait, mock_shuffle_values};
+    use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait, mock_shuffle_values};
     use pistols::tests::tester::{tester,
         tester::{
             TestSystems,
@@ -95,7 +95,7 @@ mod tests {
         round.moves_b.initialize(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let progress: DuelProgress = game_loop(@sys.world, @DeckType::Classic.build_deck(), ref round);
+        let progress: DuelProgress = game_loop(sys.rng.contract_address, @DeckType::Classic.build_deck(), ref round);
         (round, progress)
     }
 

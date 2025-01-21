@@ -1,6 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
-use pistols::types::shuffler::{Shuffler, ShufflerTrait};
+pub use pistols::systems::rng::{IRngDispatcher, IRngDispatcherTrait};
+pub use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -14,22 +15,29 @@ pub struct SaltValue {
 }
 
 #[starknet::interface]
-pub trait IRng<TState> {
+pub trait IRngMock<TState> {
+    // IRng
     fn reseed(self: @TState, seed: felt252, salt: felt252) -> felt252;
-    fn new_shuffler(self: @TState, shuffle_size: usize) -> Shuffler;
-    // mocker
+    fn new_shuffler(self: @TState, shuffle_size: u8) -> Shuffler;
+    // IMocker
+    fn mock_values(ref self: TState, salts: Span<felt252>, values: Span<felt252>);
+}
+
+#[starknet::interface]
+pub trait IMocker<TState> {
     fn mock_values(ref self: TState, salts: Span<felt252>, values: Span<felt252>);
 }
 
 #[dojo::contract]
 // #[dojo::contract(namespace:"mock", nomapping: true)]
-pub mod rng {
+pub mod rng_mock {
     use debug::PrintTrait;
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
     use dojo::model::{ModelStorage, ModelValueStorage};
 
-    use super::{IRng, SaltValue};
+    use super::{IRngMock, IMocker, SaltValue};
+    use pistols::systems::rng::{IRng};
     use pistols::utils::hash::{hash_values};
     use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
@@ -46,9 +54,13 @@ pub mod rng {
                 (new_seed)
             }
         }
-        fn new_shuffler(self: @ContractState, shuffle_size: usize) -> Shuffler {
+        fn new_shuffler(self: @ContractState, shuffle_size: u8) -> Shuffler {
             (ShufflerTrait::new_mocked(shuffle_size))
         }
+    }
+
+    #[abi(embed_v0)]
+    impl MockerImpl of IMocker<ContractState> {
         fn mock_values(ref self: ContractState, salts: Span<felt252>, values: Span<felt252>) {
             let mut world = self.world(@"pistols");
             let mut index: usize = 0;

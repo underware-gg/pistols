@@ -296,7 +296,7 @@ pub mod game {
             }
 
             // execute game loop...
-            let progress: DuelProgress = game_loop(@store.world, @challenge.get_deck(), ref round);
+            let progress: DuelProgress = game_loop(store.world.rng_address(), @challenge.get_deck(), ref round);
             store.set_round(@round);
 
             // end challenge
@@ -362,7 +362,7 @@ pub mod game {
             let challenge: Challenge = store.get_challenge(duel_id);
             if (challenge.state.is_finished()) {
                 let mut round: Round = store.get_round(duel_id);
-                (game_loop(@store.world, @challenge.get_deck(), ref round))
+                (game_loop(store.world.rng_address(), @challenge.get_deck(), ref round))
             } else {
                 {Default::default()}
             }

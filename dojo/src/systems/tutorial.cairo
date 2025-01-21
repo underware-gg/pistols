@@ -40,6 +40,7 @@ pub mod tutorial {
     //
     use pistols::interfaces::systems::{
         SystemsTrait,
+        IRngMockDispatcher, IRngMockDispatcherTrait,
     };
     use pistols::models::{
         challenge::{
@@ -195,10 +196,11 @@ pub mod tutorial {
             round.moves_b.initialize(salt, moves);
 
             // TODO: set vrf moves
+            let rng: IRngMockDispatcher = store.world.rng_mock_dispatcher();
 
             // execute game loop...
             let deck: Deck = challenge.get_deck();
-            let progress: DuelProgress = game_loop(@store.world, @deck, ref round);
+            let progress: DuelProgress = game_loop(rng.contract_address, @deck, ref round);
             store.set_round(@round);
 
             // end challenge

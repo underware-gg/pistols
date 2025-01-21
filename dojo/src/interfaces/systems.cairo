@@ -7,6 +7,7 @@ pub use pistols::systems::{
     game::{IGameDispatcher, IGameDispatcherTrait},
     tutorial::{ITutorialDispatcher, ITutorialDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
+    rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait},
     tokens::{
         duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
@@ -29,6 +30,7 @@ pub mod SELECTORS {
     const BANK: felt252 = selector_from_tag!("pistols-bank");
     const GAME: felt252 = selector_from_tag!("pistols-game");
     const RNG: felt252 = selector_from_tag!("pistols-rng");
+    const RNG_MOCK: felt252 = selector_from_tag!("pistols-rng_mock");
     // tokens
     const DUEL_TOKEN: felt252 = selector_from_tag!("pistols-duel_token");
     const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
@@ -87,7 +89,13 @@ pub impl SystemsImpl of SystemsTrait {
     }
     #[inline(always)]
     fn rng_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"rng"))
+        let result = self.contract_address(@"rng");
+        if (result.is_non_zero()) {result} // deployments always have the rng contract
+        else {self.rng_mock_address()}     // but for testing, we can skip it and deploy this
+    }
+    #[inline(always)]
+    fn rng_mock_address(self: @WorldStorage) -> ContractAddress {
+        (self.contract_address(@"rng_mock"))
     }
     #[inline(always)]
     fn duel_token_address(self: @WorldStorage) -> ContractAddress {
@@ -153,6 +161,10 @@ pub impl SystemsImpl of SystemsTrait {
     #[inline(always)]
     fn rng_dispatcher(self: @WorldStorage) -> IRngDispatcher {
         (IRngDispatcher{ contract_address: self.rng_address() })
+    }
+    #[inline(always)]
+    fn rng_mock_dispatcher(self: @WorldStorage) -> IRngMockDispatcher {
+        (IRngMockDispatcher{ contract_address: self.rng_mock_address() })
     }
     #[inline(always)]
     fn duel_token_dispatcher(self: @WorldStorage) -> IDuelTokenDispatcher {

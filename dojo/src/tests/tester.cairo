@@ -18,11 +18,7 @@ mod tester {
         game::{game, IGameDispatcher, IGameDispatcherTrait},
         tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
         rng::{rng},
-        rng_mock::{
-            rng as rng_mock,
-            IRngDispatcher, IRngDispatcherTrait,
-            m_SaltValue,
-        },
+        rng_mock::{rng_mock, m_SaltValue, IRngMockDispatcher, IRngMockDispatcherTrait},
         vrf_mock::{vrf_mock},
         tokens::{
             duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
@@ -161,7 +157,7 @@ mod tester {
         duels: IDuelTokenDispatcher,
         duelists: IDuelistTokenDispatcher,
         pack: IPackTokenDispatcher,
-        rng: IRngDispatcher,
+        rng: IRngMockDispatcher,
     }
 
     fn setup_world(flags: u8) -> TestSystems {
@@ -330,7 +326,7 @@ mod tester {
         if (deploy_rng_mock) {
             resources.append(TestResource::Contract(rng_mock::TEST_CLASS_HASH));
             contract_defs.append(
-                ContractDefTrait::new(@"pistols", @"rng")
+                ContractDefTrait::new(@"pistols", @"rng_mock")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         } else {
@@ -390,7 +386,7 @@ mod tester {
             duels: world.duel_token_dispatcher(),
             duelists: world.duelist_token_dispatcher(),
             pack: world.pack_token_dispatcher(),
-            rng: IRngDispatcher{ contract_address: world.rng_address() },
+            rng: IRngMockDispatcher{ contract_address: world.rng_address() },
         })
     }
 

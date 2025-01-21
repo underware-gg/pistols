@@ -11,7 +11,6 @@ pub trait IRng<TState> {
 pub mod rng {
     use super::IRng;
     use starknet::{ContractAddress};
-    use dojo::world::{WorldStorage};
     use dojo::model::{ModelStorage, ModelValueStorage};
 
     use pistols::utils::hash::{hash_values};
@@ -34,7 +33,6 @@ pub mod rng {
 //--------------------------------
 // Public dice trait
 //
-use dojo::world::{WorldStorage};
 use pistols::interfaces::systems::{SystemsTrait};
 
 #[derive(Copy, Drop)]
@@ -46,10 +44,9 @@ pub struct Dice {
 
 #[generate_trait]
 impl DiceImpl of DiceTrait {
-    fn new(world: @WorldStorage, initial_seed: felt252) -> Dice {
-        let rng: IRngDispatcher = world.rng_dispatcher();
+    fn new(rng_address: ContractAddress, initial_seed: felt252) -> Dice {
         (Dice {
-            rng,
+            rng: IRngDispatcher{ contract_address: rng_address },
             seed: initial_seed,
             last_dice: 0,
         })
@@ -91,8 +88,8 @@ pub struct Shuffle {
 
 #[generate_trait]
 impl ShuffleImpl of ShuffleTrait {
-    fn new(world: @WorldStorage, initial_seed: felt252, shuffle_size: u8, salt: felt252) -> Shuffle {
-        let rng: IRngDispatcher = world.rng_dispatcher();
+    fn new(rng_address: ContractAddress, initial_seed: felt252, shuffle_size: u8, salt: felt252) -> Shuffle {
+        let rng = IRngDispatcher{ contract_address: rng_address };
         (Shuffle {
             rng,
             seed: rng.reseed(initial_seed, salt),

@@ -115,9 +115,17 @@ impl ChallengeImpl of ChallengeTrait {
     fn exists(self: Challenge) -> bool {
         (self.state.exists())
     }
+    #[inline(always)]
+    fn is_tutorial(self: Challenge) -> bool {
+        (self.table_id == TABLES::TUTORIAL)
+    }
+    #[inline(always)]
+    fn is_practice(self: Challenge) -> bool {
+        (self.table_id == TABLES::PRACTICE)
+    }
     fn get_deck_type(self: Challenge) -> DeckType {
         if (
-            self.table_id == TABLES::TUTORIAL &&
+            self.is_tutorial() &&
             (self.duelist_id_a.into() == CharacterProfile::Drunken || self.duelist_id_b.into() == CharacterProfile::Drunken)
         ) {
             (DeckType::PacesOnly)

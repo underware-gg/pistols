@@ -39,10 +39,10 @@ impl ShufflerImpl of ShufflerTrait {
         })
     }
 
-    fn new_mocked(size: usize) -> Shuffler {
+    fn new_mocked(size: u8) -> Shuffler {
         (Shuffler {
             ids: 0,
-            size,
+            size: size.into(),
             pos: 0,
             mocked: true,
         })
