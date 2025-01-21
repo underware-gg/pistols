@@ -78,6 +78,19 @@ impl ShufflerImpl of ShufflerTrait {
         value = BitwiseU256::shl(value, index * Self::BITS);
         self.ids = (self.ids & mask) | value;
     }
+
+    // convert an array of values into a mocked seed
+    fn mocked_seed(values: Span<felt252>) -> felt252 {
+        let mut result: u256 = 0;
+        let mut index: usize = 0;
+        while (index < values.len()) {
+            let v: u256 = (*values[index]).into();
+            result = result | BitwiseU256::shl(v, Self::BITS * index);
+            index += 1;
+        };
+        result += 1; // rng_mock::reseed() will subtract 1
+        (result.try_into().unwrap())
+    }
 }
 
 

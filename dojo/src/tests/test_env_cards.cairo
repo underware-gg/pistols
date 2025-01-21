@@ -6,7 +6,7 @@ mod tests {
 
     use dojo::world::{WorldStorage};
 
-    use pistols::systems::rng::{Dice, DiceTrait};
+    use pistols::systems::rng::{Dice, DiceTrait, RngWrapTrait};
     use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
     use pistols::models::challenge::{Challenge, ChallengeValue, Round, RoundValue, Moves, MovesTrait, DuelistState, DuelistStateTrait};
     use pistols::models::duelist::{Duelist, DuelistValue, ProfileType, Archetype};
@@ -28,7 +28,7 @@ mod tests {
     use pistols::utils::short_string::{ShortString};
 
     use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait, mock_shuffle_values};
+    use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait, ShufflerTrait};
     use pistols::tests::tester::{tester,
         tester::{
             TestSystems,
@@ -66,13 +66,13 @@ mod tests {
         env_cards: Span<felt252>,
         fire_dices: Span<felt252>,
     ) -> (Round, DuelProgress) {
-        sys.rng.mock_values(
+        sys.rng.set_mocked_values(
             ['shoot_a', 'shoot_b'].span(),
             fire_dices,
         );
-        sys.rng.mock_values(
+        sys.rng.set_mocked_values(
             ['env'].span(),
-            [mock_shuffle_values(env_cards)].span(),
+            [ShufflerTrait::mocked_seed(env_cards)].span(),
         );
         let mut round = Round {
             duel_id: 0x1234,
@@ -89,7 +89,7 @@ mod tests {
         round.moves_b.initialize(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let progress: DuelProgress = game_loop(sys.rng.contract_address, @DeckType::Classic.build_deck(), ref round);
+        let progress: DuelProgress = game_loop(RngWrapTrait::new(sys.rng.contract_address), @DeckType::Classic.build_deck(), ref round);
         (round, progress)
     }
 

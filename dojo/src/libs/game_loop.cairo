@@ -2,7 +2,7 @@
 use core::traits::TryInto;
 use starknet::{ContractAddress, get_block_timestamp};
 
-use pistols::systems::rng::{Dice, DiceTrait, Shuffle, ShuffleTrait};
+use pistols::systems::rng::{RngWrap, Dice, DiceTrait, Shuffle, ShuffleTrait};
 use pistols::models::{
     challenge::{Round, RoundTrait, DuelistState, DuelistStateTrait, Moves, MovesTrait},
     duelist::{Duelist},
@@ -60,14 +60,14 @@ fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
 //
 
 // testable loop
-fn game_loop(rng_address: ContractAddress, deck: @Deck, ref round: Round) -> DuelProgress {
+fn game_loop(wrapped: @RngWrap, deck: @Deck, ref round: Round) -> DuelProgress {
     // let _table_type: TableType = store.get_table_config_value(challenge.table_id).table_type;
 
     let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
 
     let seed: felt252 = round.make_seed();
-    let mut dice: Dice = DiceTrait::new(rng_address, seed);
-    let mut shuffle: Shuffle = ShuffleTrait::new(rng_address, seed, env_deck.len().try_into().unwrap(), 'env');
+    let mut dice: Dice = DiceTrait::new(wrapped, seed);
+    let mut shuffle: Shuffle = ShuffleTrait::new(wrapped, seed, env_deck.len().try_into().unwrap(), 'env');
     
     let mut hand_a: DuelistHand = round.moves_a.as_hand();
     let mut hand_b: DuelistHand = round.moves_b.as_hand();

@@ -42,6 +42,7 @@ pub mod tutorial {
         SystemsTrait,
         IRngMockDispatcher, IRngMockDispatcherTrait,
     };
+    use pistols::systems::rng::{RngWrap, RngWrapTrait, MockedValue};
     use pistols::models::{
         challenge::{
             Challenge, ChallengeTrait,
@@ -192,15 +193,18 @@ pub mod tutorial {
             assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
 
             // TODO: calculate salts and moves
-            round.moves_a.initialize(salt, moves);
-            round.moves_b.initialize(salt, moves);
-
             // TODO: set vrf moves
-            let rng: IRngMockDispatcher = store.world.rng_mock_dispatcher();
+            let vrf_map: Span<MockedValue> = [].span();
+            let npc_moves: Span<u8> = [].span();
+
+            // store salts and moves
+            round.moves_a.initialize(0xffff, npc_moves);
+            round.moves_b.initialize(0xffff, moves);
 
             // execute game loop...
             let deck: Deck = challenge.get_deck();
-            let progress: DuelProgress = game_loop(rng.contract_address, @deck, ref round);
+            let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), vrf_map);
+            let progress: DuelProgress = game_loop(wrapped, @deck, ref round);
             store.set_round(@round);
 
             // end challenge

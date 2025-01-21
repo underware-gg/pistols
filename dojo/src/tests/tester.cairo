@@ -18,7 +18,7 @@ mod tester {
         game::{game, IGameDispatcher, IGameDispatcherTrait},
         tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
         rng::{rng},
-        rng_mock::{rng_mock, m_SaltValue, IRngMockDispatcher, IRngMockDispatcherTrait},
+        rng_mock::{rng_mock, m_MockedValue, IRngMockDispatcher, IRngMockDispatcherTrait},
         vrf_mock::{vrf_mock},
         tokens::{
             duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
@@ -207,7 +207,7 @@ mod tester {
             TestResource::Event(e_PlayerRequiredAction::TEST_CLASS_HASH),
         ];
         if (deploy_rng_mock) {
-            resources.append(TestResource::Model(m_SaltValue::TEST_CLASS_HASH));
+            resources.append(TestResource::Model(m_MockedValue::TEST_CLASS_HASH));
         }
         if (!deploy_duelist && deploy_game) {
             resources.append(TestResource::Model(m_MockDuelistOwners::TEST_CLASS_HASH));

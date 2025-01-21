@@ -6,7 +6,7 @@ mod tests {
 
     use dojo::world::{WorldStorage};
 
-    use pistols::systems::rng::{Dice, DiceTrait};
+    use pistols::systems::rng::{Dice, DiceTrait, RngWrapTrait};
     use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
     use pistols::models::challenge::{Challenge, ChallengeValue, Round, RoundValue, Moves, MovesTrait, DuelistState, DuelistStateTrait};
     use pistols::models::duelist::{Duelist, DuelistValue, ProfileType, Archetype};
@@ -29,7 +29,7 @@ mod tests {
     use pistols::utils::short_string::{ShortString};
 
     use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait, mock_shuffle_values};
+    use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait, ShufflerTrait};
     use pistols::tests::tester::{tester,
         tester::{
             TestSystems,
@@ -72,9 +72,9 @@ mod tests {
 
     fn execute_game_loop(sys: TestSystems, moves_a: Span<u8>, moves_b: Span<u8>, shuffle: bool) -> (Round, DuelProgress) {
         if (!shuffle) {
-            sys.rng.mock_values(
+            sys.rng.set_mocked_values(
                 ['env'].span(),
-                [mock_shuffle_values(
+                [ShufflerTrait::mocked_seed(
                     [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
                     ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()
                 )].span()
@@ -95,7 +95,7 @@ mod tests {
         round.moves_b.initialize(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let progress: DuelProgress = game_loop(sys.rng.contract_address, @DeckType::Classic.build_deck(), ref round);
+        let progress: DuelProgress = game_loop(RngWrapTrait::new(sys.rng.contract_address), @DeckType::Classic.build_deck(), ref round);
         (round, progress)
     }
 
@@ -115,7 +115,7 @@ mod tests {
     fn test_hand_progress() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
-        sys.rng.mock_values(salts.salts, salts.values);
+        sys.rng.set_mocked_values(salts.salts, salts.values);
         let moves_a: Span<u8> = [5, 6, 1, BladesCard::Grapple.into()].span();
         let moves_b: Span<u8> = [10, 9, 3, BladesCard::PocketPistol.into()].span();
         let (round, progress) = execute_game_loop(sys, moves_a, moves_b, true);
@@ -197,7 +197,7 @@ mod tests {
     fn test_fire_no_dodge() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
-        sys.rng.mock_values(salts.salts, salts.values);
+        sys.rng.set_mocked_values(salts.salts, salts.values);
         let (round, progress) = execute_game_loop(sys,
             [1, 1].span(),
             [2, 2].span(),

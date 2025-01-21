@@ -21,7 +21,7 @@ mod prefabs {
             FLAGS, ID, ZERO,
         }
     };
-    use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait, mock_shuffle_values};
+    use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait, ShufflerTrait};
 
     const NAME_A: felt252 = 'Sensei';
     const NAME_B: felt252 = 'Senpai';
@@ -87,7 +87,7 @@ mod prefabs {
     }
 
     fn commit_reveal_get(sys: TestSystems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeValue, RoundValue) {
-        @sys.rng.mock_values(salts.salts, salts.values);
+        @sys.rng.set_mocked_values(salts.salts, salts.values);
         tester::execute_commit_moves(@sys.game, duelist_a, duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, duelist_b, duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys.game, duelist_a, duel_id, moves_a.salt, moves_a.moves);
@@ -101,7 +101,7 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [1, 1, mock_shuffle_values(
+                values: [1, 1, ShufflerTrait::mocked_seed(
                     [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
                     ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()
                 )].span(),
@@ -117,7 +117,7 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [100, 100, mock_shuffle_values(
+                values: [100, 100, ShufflerTrait::mocked_seed(
                     [ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,
                     ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,].span()
                 )].span(),
@@ -133,7 +133,7 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [1, 1, mock_shuffle_values([ENV_CARD_CRIT].span())].span(),
+                values: [1, 1, ShufflerTrait::mocked_seed([ENV_CARD_CRIT].span())].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
@@ -146,7 +146,7 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [1, 1, mock_shuffle_values([ENV_CARD_CRIT].span())].span(),
+                values: [1, 1, ShufflerTrait::mocked_seed([ENV_CARD_CRIT].span())].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
@@ -159,7 +159,7 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [100, 1, mock_shuffle_values([ENV_CARD_CRIT].span())].span(),
+                values: [100, 1, ShufflerTrait::mocked_seed([ENV_CARD_CRIT].span())].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),

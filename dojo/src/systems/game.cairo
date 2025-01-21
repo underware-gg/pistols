@@ -69,6 +69,7 @@ pub mod game {
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
         IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
     };
+    use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
         player::{Player, PlayerTrait, Activity, ActivityTrait},
         challenge::{
@@ -296,7 +297,8 @@ pub mod game {
             }
 
             // execute game loop...
-            let progress: DuelProgress = game_loop(store.world.rng_address(), @challenge.get_deck(), ref round);
+            let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
+            let progress: DuelProgress = game_loop(wrapped, @challenge.get_deck(), ref round);
             store.set_round(@round);
 
             // end challenge
@@ -362,7 +364,8 @@ pub mod game {
             let challenge: Challenge = store.get_challenge(duel_id);
             if (challenge.state.is_finished()) {
                 let mut round: Round = store.get_round(duel_id);
-                (game_loop(store.world.rng_address(), @challenge.get_deck(), ref round))
+                let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
+                (game_loop(wrapped, @challenge.get_deck(), ref round))
             } else {
                 {Default::default()}
             }

@@ -86,7 +86,7 @@ mod tests {
 
     fn _test_resolved_draw(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, final_health: u8) {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        sys.rng.mock_values(salts.salts, salts.values);
+        sys.rng.set_mocked_values(salts.salts, salts.values);
 
         let duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
         let duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
@@ -207,7 +207,7 @@ mod tests {
 
     fn _test_resolved_win(salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves, winner: u8) {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        sys.rng.mock_values(salts.salts, salts.values);
+        sys.rng.set_mocked_values(salts.salts, salts.values);
 
         let duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
         let duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
@@ -502,7 +502,7 @@ mod tests {
     fn test_duelist_is_dead_a_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_crit_a();
-        sys.rng.mock_values(salts.salts, salts.values);
+        sys.rng.set_mocked_values(salts.salts, salts.values);
 
         let _duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
@@ -543,7 +543,7 @@ mod tests {
     fn test_duelist_is_dead_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_crit_a();
-        sys.rng.mock_values(salts.salts, salts.values);
+        sys.rng.set_mocked_values(salts.salts, salts.values);
 
         let _duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
@@ -586,7 +586,7 @@ mod tests {
     fn test_duelist_is_dead_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_crit_b();
-        sys.rng.mock_values(salts.salts, salts.values);
+        sys.rng.set_mocked_values(salts.salts, salts.values);
 
         let _duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
@@ -630,7 +630,7 @@ mod tests {
     fn test_duelist_is_dead_b_XXX() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_crit_b();
-        sys.rng.mock_values(salts.salts, salts.values);
+        sys.rng.set_mocked_values(salts.salts, salts.values);
 
         let _duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];

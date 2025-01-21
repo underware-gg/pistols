@@ -1,24 +1,24 @@
 use starknet::{ContractAddress};
-use pistols::types::shuffler::{Shuffler, ShufflerTrait};
+use pistols::systems::rng_mock::{MockedValue, RngWrap, RngWrapTrait};
 
 #[starknet::interface]
 pub trait IRng<TState> {
-    fn reseed(self: @TState, seed: felt252, salt: felt252) -> felt252;
+    fn reseed(self: @TState, seed: felt252, salt: felt252, map: Span<MockedValue>) -> felt252;
     fn is_mocked(self: @TState) -> bool;
 }
 
 #[dojo::contract]
 pub mod rng {
     use super::IRng;
-    use starknet::{ContractAddress};
+    use starknet::{ContractAddress, get_contract_address};
     use dojo::model::{ModelStorage, ModelValueStorage};
 
     use pistols::utils::hash::{hash_values};
-    use pistols::types::shuffler::{Shuffler, ShufflerTrait};
+    use pistols::systems::rng_mock::{MockedValue};
 
     #[abi(embed_v0)]
     impl RngImpl of IRng<ContractState> {
-        fn reseed(self: @ContractState, seed: felt252, salt: felt252) -> felt252 {
+        fn reseed(self: @ContractState, seed: felt252, salt: felt252, map: Span<MockedValue>) -> felt252 {
             let new_seed: felt252 = hash_values([seed.into(), salt].span());
             (new_seed)
         }
@@ -27,7 +27,6 @@ pub mod rng {
         }
     }
 }
-
 
 
 //--------------------------------
@@ -40,21 +39,23 @@ pub struct Dice {
     rng: IRngDispatcher,
     seed: felt252,
     last_dice: u8,
+    map: Span<MockedValue>,
 }
 
 #[generate_trait]
 impl DiceImpl of DiceTrait {
-    fn new(rng_address: ContractAddress, initial_seed: felt252) -> Dice {
+    fn new(wrapped: @RngWrap, initial_seed: felt252) -> Dice {
         (Dice {
-            rng: IRngDispatcher{ contract_address: rng_address },
+            rng: IRngDispatcher{ contract_address: *wrapped.rng_address },
             seed: initial_seed,
             last_dice: 0,
+            map: *wrapped.map,
         })
     }
 
     // returns a random number between 1 and <faces>
     fn reseed(ref self: Dice, salt: felt252) {
-        self.seed = self.rng.reseed(self.seed, salt);
+        self.seed = self.rng.reseed(self.seed, salt, self.map);
     }
 
     // returns a random number between 1 and <faces>
@@ -77,10 +78,10 @@ impl DiceImpl of DiceTrait {
 // Public deck shuffler trait
 //
 use pistols::utils::bitwise::{BitwiseU256};
+use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
 #[derive(Copy, Drop)]
 pub struct Shuffle {
-    rng: IRngDispatcher,
     seed: felt252,
     last_card: u8,
     shuffler: Shuffler,
@@ -88,13 +89,13 @@ pub struct Shuffle {
 
 #[generate_trait]
 impl ShuffleImpl of ShuffleTrait {
-    fn new(rng_address: ContractAddress, initial_seed: felt252, shuffle_size: u8, salt: felt252) -> Shuffle {
-        let rng = IRngDispatcher{ contract_address: rng_address };
+    fn new(wrapped: @RngWrap, initial_seed: felt252, shuffle_size: u8, salt: felt252) -> Shuffle {
+        let rng = IRngDispatcher{ contract_address: *wrapped.rng_address };
+        let seed: felt252 = rng.reseed(initial_seed, salt, *wrapped.map);
         let mut shuffler = ShufflerTrait::new(shuffle_size);
         shuffler.mocked = rng.is_mocked();
         (Shuffle {
-            rng,
-            seed: rng.reseed(initial_seed, salt),
+            seed,
             last_card: 0,
             shuffler,
         })
