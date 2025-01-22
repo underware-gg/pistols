@@ -49,6 +49,25 @@ export const useGetDuelDeck = (duel_id: BigNumberish) => {
 }
 
 
+//------------------------------------------
+// tutorial
+//
+
+export const useTutorialDuelId = (player_id: BigNumberish, tutorial_id: BigNumberish) => {
+  const { tutorial: { calcDuelId } } = useDojoContractCalls()
+  const options = useMemo(() => ({
+    call: calcDuelId,
+    args: [player_id, tutorial_id],
+    enabled: isPositiveBigint(player_id) && isPositiveBigint(tutorial_id),
+    defaultValue: 0n,
+  }), [player_id, tutorial_id])
+  const { value, isLoading } = useSdkCallPromise<bigint>(options)
+  return {
+    duelId: value,
+    isLoading,
+  }
+}
+
 
 //------------------------------------------
 // duel_token

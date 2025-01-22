@@ -15,6 +15,7 @@ export const initialState = {
   sfxEnabled: true,
   duelistId: 0n,
   duelSpeedFactor: 1.0,
+  tutorialProgress: constants.TutorialProgress.None,
   // internal
   initialized: false,
 }
@@ -26,7 +27,8 @@ const SettingsActions = {
   MUSIC_ENABLED: 'settings.MUSIC_ENABLED',
   SFX_ENABLED: 'settings.SFX_ENABLED',
   DUELIST_ID: 'settings.DUELIST_ID',
-  DUEL_SPEED_FACTOR: 'settings.DUEL_SPEED_FACTOR'
+  DUEL_SPEED_FACTOR: 'settings.DUEL_SPEED_FACTOR',
+  TUTORIAL_PROGRESS: 'settings.TUTORIAL_PROGRESS',
 }
 
 //--------------------------------
@@ -42,6 +44,7 @@ type ActionType =
   | { type: 'SFX_ENABLED', payload: boolean }
   | { type: 'DUELIST_ID', payload: bigint }
   | { type: 'DUEL_SPEED_FACTOR', payload: number }
+  | { type: 'TUTORIAL_PROGRESS', payload: constants.TutorialProgress }
   // internal
   | { type: 'INITIALIZED', payload: boolean }
 
@@ -79,6 +82,7 @@ const SettingsProvider = ({
       [SettingsActions.SFX_ENABLED]: () => setCookie(cookieName, state.sfxEnabled, _options),
       [SettingsActions.DUELIST_ID]: () => setCookie(cookieName, Number(state.duelistId), _options),
       [SettingsActions.DUEL_SPEED_FACTOR]: () => setCookie(cookieName, Number(state.duelSpeedFactor), _options),
+      [SettingsActions.TUTORIAL_PROGRESS]: () => setCookie(cookieName, state.tutorialProgress, _options),
     }
     _setters[cookieName]?.()
   }, [setCookie])
@@ -118,6 +122,11 @@ const SettingsProvider = ({
       case SettingsActions.DUEL_SPEED_FACTOR: {
         newState.duelSpeedFactor = action.payload as number
         cookieSetter(SettingsActions.DUEL_SPEED_FACTOR, newState)
+        break
+      }
+      case SettingsActions.TUTORIAL_PROGRESS: {
+        newState.tutorialProgress = action.payload as constants.TutorialProgress
+        cookieSetter(SettingsActions.TUTORIAL_PROGRESS, newState)
         break
       }
       case SettingsActions.DUELIST_ID: {

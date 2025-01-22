@@ -21,6 +21,7 @@ import SignTestPage from '/src/pages/tests/SignTestPage'
 import TimestampTestPage from '/src/pages/tests/TimestampTestPage'
 import TokensTestPage from '/src/pages/tests/TokensTestPage'
 import ProfilesTestPage from './pages/tests/ProfilesTestPage'
+import TutorialTestPage from './pages/tests/TutorialTestPage'
 
 //
 // REF:
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
       { path: "sign", element: <SignTestPage /> },
       { path: "timestamp", element: <TimestampTestPage /> },
       { path: "tokens", element: <TokensTestPage /> },
+      { path: "tutorial", element: <TutorialTestPage /> },
     ],
   },
 ]);

@@ -30,7 +30,7 @@ export default function ConnectTestPage() {
   return (
     <App>
       <Container>
-        <DojoAccount />
+        {/* <DojoAccount /> */}
         <Connect />
         {/* <Sign revision={0} /> */}
         <Sign revision={1} />
@@ -86,12 +86,6 @@ export function Connect() {
     <>
       <StarknetConnectModal opener={connectOpener} />
 
-      {/* <ChainSwitcher /> */}
-      &nbsp;&nbsp;
-      <Button disabled={isConnected || isConnecting} onClick={() => connectOpener.open()}>Connect</Button>
-      &nbsp;&nbsp;
-      <Button disabled={!isConnected || isConnecting} onClick={() => disconnect()}>Disconnect</Button>
-
       <Table celled striped color={isConnected ? 'green' : 'red'} size='small'>
         <Body>
           <Row>
@@ -121,6 +115,16 @@ export function Connect() {
             <Cell>Starknet Account</Cell>
             <Cell className='Code'>
               {address}
+            </Cell>
+          </Row>
+          <Row>
+            <Cell></Cell>
+            <Cell className='Code'>
+              {/* <ChainSwitcher /> */}
+              {/* &nbsp;&nbsp; */}
+              <Button disabled={isConnected || isConnecting} onClick={() => connectOpener.open()}>Connect</Button>
+              &nbsp;&nbsp;
+              <Button disabled={!isConnected || isConnecting} onClick={() => disconnect()}>Disconnect</Button>
             </Cell>
           </Row>
         </Body>
