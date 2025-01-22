@@ -1,3 +1,4 @@
+// use debug::PrintTrait;
 use starknet::{ContractAddress};
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
@@ -51,8 +52,6 @@ impl TutorialLevelImpl of TutorialLevelTrait {
                 //---------------------------------
                 // Level 1: Paces only, player wins
                 //
-                mocked.append(MockedValueTrait::new('shoot_a', 99)); // NPC always misses
-                mocked.append(MockedValueTrait::new('shoot_b', 1));  // Player always hits
                 // respond based on player's fire pace
                 match player_hand.card_fire {
                     PacesCard::Paces1 => {
@@ -83,19 +82,50 @@ impl TutorialLevelImpl of TutorialLevelTrait {
                             ENV_DICES::DOUBLE_TACTICS,
                             ENV_DICES::DAMAGE_DOWN,
                             ENV_DICES::DAMAGE_UP,
-                            ENV_DICES::NO_TACTICS,
+                            ENV_DICES::DOUBLE_TACTICS,
                             ENV_DICES::DAMAGE_UP,
                             ENV_DICES::DAMAGE_UP,
                         ].span().slice((10 - pace).into(), pace.into()));
                     },
                 };
+                // mocked dices
+                mocked.append(MockedValueTrait::new('shoot_a', 99)); // NPC always misses
+                mocked.append(MockedValueTrait::new('shoot_b', 1));  // Player always hits
             },
             TutorialLevel::Level2 => {
                 //---------------------------------
                 // Level 2: Full deck, player loses
                 //
-                mocked.append(MockedValueTrait::new('shoot_a', 1)); // NPC always hits
-                mocked.append(MockedValueTrait::new('shoot_b', 99));  // Player always misses
+                // NPC dodges when player fires
+                npc_hand.card_dodge = npc_hand.card_fire;
+                // NPC shoots afer dodge or just before player
+                let pace: u8 = player_hand.card_fire.into();
+                npc_hand.card_fire = if (player_hand.card_fire == PacesCard::Paces10) {PacesCard::Paces9} else {(pace + 1).into()};
+                // Tactics whatever
+                npc_hand.card_tactics = TacticsCard::ThickCoat;
+                // Blades always win
+                npc_hand.card_blades = match player_hand.card_blades {
+                    BladesCard::PocketPistol => BladesCard::Grapple,
+                    BladesCard::Behead =>       BladesCard::PocketPistol,
+                    BladesCard::Grapple =>      BladesCard::Behead,
+                    _ => BladesCard::None,
+                };
+                // env: cancel player's tactics, never let lethal damage
+                env_cards.extend_from_span(array![
+                    ENV_DICES::NO_TACTICS,
+                    ENV_DICES::DAMAGE_UP,
+                    ENV_DICES::CHANCES_UP,
+                    ENV_DICES::CHANCES_UP,
+                    ENV_DICES::DOUBLE_TACTICS,
+                    ENV_DICES::CHANCES_DOWN,
+                    ENV_DICES::CHANCES_UP,
+                    ENV_DICES::DAMAGE_DOWN,
+                    ENV_DICES::DAMAGE_UP,
+                    ENV_DICES::ALL_SHOTS_HIT,
+                ].span());
+                // mocked dices
+                mocked.append(MockedValueTrait::new('shoot_a', 1));  // NPC always hits
+                mocked.append(MockedValueTrait::new('shoot_b', 99)); // Player always misses
             },
             _ => {},
         };

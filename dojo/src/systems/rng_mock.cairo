@@ -116,18 +116,18 @@ pub mod rng_mock {
                 };
                 i += 1;
             };
-            if (found.exists) {
-                return found.value - 1; // throw_dice() adds 1
+            if (found.exists && found.value != 0) {
+                return (found.value - 1); // throw_dice() adds 1
             };
 
             //
             // look for value in stored models
             // (used on tests)
             let mut world = self.world(@"pistols");
-            let value: MockedValue = world.read_model(salt);
-            if (value.exists) {
+            let found: MockedValue = world.read_model(salt);
+            if (found.exists && found.value != 0) {
                 // println!("-- get_salt {} {} {}", salt, value.exists, value.value);
-                return value.value - 1; // throw_dice() adds 1
+                return (found.value - 1); // throw_dice() adds 1
             }
 
             //

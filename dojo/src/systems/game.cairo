@@ -127,6 +127,7 @@ pub mod game {
         const SEASON_ENDED: felt252              = 'PISTOLS: Season ended';
         const SEASON_IS_ACTIVE: felt252          = 'PISTOLS: Season is active';
         const SEASON_NOT_ENDGAME: felt252        = 'PISTOLS: Not endgame';
+        const BAD_SHUFFLE_SEED: felt252          = 'PISTOLS: Bad shuffle seed';
     }
 
     fn dojo_init(ref self: ContractState) {

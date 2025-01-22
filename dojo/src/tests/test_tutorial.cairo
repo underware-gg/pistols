@@ -10,7 +10,13 @@ mod tests {
     use pistols::models::duelist::{Duelist, DuelistValue, Archetype};
     use pistols::models::table::{TableConfig, TABLES};
     use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, ProfileManagerTrait, CharacterProfile};
-    use pistols::types::cards::hand::{PacesCard, PacesCardTrait, FinalBlow, DeckType, DeckTypeTrait};
+    use pistols::types::cards::hand::{
+        PacesCard, PacesCardTrait,
+        TacticsCard, TacticsCardTrait,
+        BladesCard, BladesCardTrait,
+        DeckType, DeckTypeTrait,
+        FinalBlow, FinalBlowTrait,
+    };
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
     use pistols::types::round_state::{RoundState, RoundStateTrait};
@@ -114,7 +120,7 @@ mod tests {
     // Levels
     //
 
-    fn _test_tutorial_level_1(pace: PacesCard, dodge: PacesCard) {
+    fn _test_tutorial_level_1(fire: PacesCard, dodge: PacesCard) {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
         let tutorial_id: u128 = 1;
         let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
@@ -122,18 +128,23 @@ mod tests {
         let challenge: Challenge = tester::get_Challenge(sys.world, duel_id);
         assert!(challenge.get_deck_type() == DeckType::PacesOnly, "challenge.deck_type");
         // commit
-        let moves: Span<u8> = [pace.into(), dodge.into()].span();
+        let moves: Span<u8> = [fire.into(), dodge.into()].span();
         let hashed: u128 = make_moves_hash(SALT_A, moves);
         tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), tutorial_id, hashed);
         let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
         assert!(round.state == RoundState::Reveal, "round.state");
         assert!(round.moves_a.hashed > 0, "round.moves_a.hashed");
         assert!(round.moves_b.hashed == hashed, "round.moves_b.hashed");
-        // reveal
-        tester::execute_reveal_moves_tutorial(@sys.tut, OWNER(), tutorial_id, SALT_A, moves);
+        // reveal -- different salt as it does not matter
+        tester::execute_reveal_moves_tutorial(@sys.tut, OWNER(), tutorial_id, SALT_B, moves);
         let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
+        let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
         assert!(challenge.state == ChallengeState::Resolved, "challenge.state");
         assert!(challenge.winner == 2, "challenge.winner");
+        assert!(round.state == RoundState::Finished, "round.state");
+        assert!(round.final_blow == FinalBlow::Paces(fire), "round.final_blow");
+        assert!(round.final_blow.ended_in_paces() == true, "round.ended_in_paces");
+        assert!(round.final_blow.ended_in_blades() == false, "round.ended_in_blades");
     }
 
     #[test]
@@ -184,57 +195,71 @@ mod tests {
     // Levels
     //
 
-    fn _test_tutorial_level_2(pace: PacesCard, dodge: PacesCard) {
+    fn _test_tutorial_level_2(fire: PacesCard, dodge: PacesCard, tactics: TacticsCard, blades: BladesCard) {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
         let tutorial_id: u128 = 2;
         let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
         // check deck
         let challenge: Challenge = tester::get_Challenge(sys.world, duel_id);
         assert!(challenge.get_deck_type() == DeckType::Classic, "challenge.deck_type");
-        //
-        // TODO....
-        //
+        // commit
+        let moves: Span<u8> = [fire.into(), dodge.into(), tactics.into(), blades.into()].span();
+        let hashed: u128 = make_moves_hash(SALT_A, moves);
+        tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), tutorial_id, hashed);
+        let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
+        assert!(round.state == RoundState::Reveal, "round.state");
+        assert!(round.moves_a.hashed > 0, "round.moves_a.hashed");
+        assert!(round.moves_b.hashed == hashed, "round.moves_b.hashed");
+        // reveal -- different salt as it does not matter
+        tester::execute_reveal_moves_tutorial(@sys.tut, OWNER(), tutorial_id, SALT_B, moves);
+        let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
+        let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
+        assert!(challenge.state == ChallengeState::Resolved, "challenge.state");
+        assert!(challenge.winner == 1, "challenge.winner");
+        assert!(round.state == RoundState::Finished, "round.state");
+        assert!(round.final_blow.ended_in_paces() == false, "round.ended_in_paces");
+        assert!(round.final_blow.ended_in_blades() == true, "round.ended_in_blades");
     }
 
     #[test]
     fn test_tutorial_level_2_pace_1() {
-        _test_tutorial_level_2(PacesCard::Paces1, PacesCard::Paces2);
+        _test_tutorial_level_2(PacesCard::Paces1, PacesCard::Paces2, TacticsCard::ThickCoat, BladesCard::PocketPistol);
     }
     #[test]
     fn test_tutorial_level_2_pace_2() {
-        _test_tutorial_level_2(PacesCard::Paces2, PacesCard::Paces3);
+        _test_tutorial_level_2(PacesCard::Paces2, PacesCard::Paces1, TacticsCard::ThickCoat, BladesCard::Behead);
     }
     #[test]
     fn test_tutorial_level_2_pace_3() {
-        _test_tutorial_level_2(PacesCard::Paces3, PacesCard::Paces4);
+        _test_tutorial_level_2(PacesCard::Paces3, PacesCard::Paces2, TacticsCard::ThickCoat, BladesCard::Grapple);
     }
     #[test]
     fn test_tutorial_level_2_pace_4() {
-        _test_tutorial_level_2(PacesCard::Paces4, PacesCard::Paces5);
+        _test_tutorial_level_2(PacesCard::Paces4, PacesCard::Paces3, TacticsCard::ThickCoat, BladesCard::Seppuku);
     }
     #[test]
     fn test_tutorial_level_2_pace_5() {
-        _test_tutorial_level_2(PacesCard::Paces5, PacesCard::Paces6);
+        _test_tutorial_level_2(PacesCard::Paces5, PacesCard::Paces4, TacticsCard::ThickCoat, BladesCard::PocketPistol);
     }
     #[test]
     fn test_tutorial_level_2_pace_6() {
-        _test_tutorial_level_2(PacesCard::Paces6, PacesCard::Paces7);
+        _test_tutorial_level_2(PacesCard::Paces6, PacesCard::Paces5, TacticsCard::ThickCoat, BladesCard::Behead);
     }
     #[test]
     fn test_tutorial_level_2_pace_7() {
-        _test_tutorial_level_2(PacesCard::Paces7, PacesCard::Paces8);
+        _test_tutorial_level_2(PacesCard::Paces7, PacesCard::Paces6, TacticsCard::ThickCoat, BladesCard::Grapple);
     }
     #[test]
     fn test_tutorial_level_2_pace_8() {
-        _test_tutorial_level_2(PacesCard::Paces8, PacesCard::Paces9);
+        _test_tutorial_level_2(PacesCard::Paces8, PacesCard::Paces7, TacticsCard::ThickCoat, BladesCard::Seppuku);
     }
     #[test]
     fn test_tutorial_level_2_pace_9() {
-        _test_tutorial_level_2(PacesCard::Paces9, PacesCard::Paces10);
+        _test_tutorial_level_2(PacesCard::Paces9, PacesCard::Paces8, TacticsCard::ThickCoat, BladesCard::PocketPistol);
     }
     #[test]
     fn test_tutorial_level_2_pace_10() {
-        _test_tutorial_level_2(PacesCard::Paces10, PacesCard::Paces9);
+        _test_tutorial_level_2(PacesCard::Paces10, PacesCard::Paces9, TacticsCard::ThickCoat, BladesCard::Behead);
     }
 
 

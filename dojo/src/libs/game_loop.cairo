@@ -2,6 +2,7 @@
 use core::traits::TryInto;
 use starknet::{ContractAddress, get_block_timestamp};
 
+use pistols::systems::game::game::{Errors as GameErrors};
 use pistols::systems::rng::{RngWrap, Dice, DiceTrait, Shuffle, ShuffleTrait};
 use pistols::models::{
     challenge::{Round, RoundTrait, DuelistState, DuelistStateTrait, Moves, MovesTrait},
@@ -219,6 +220,7 @@ fn game_loop(wrapped: @RngWrap, deck: @Deck, ref round: Round) -> DuelProgress {
 
 fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref shuffle: Shuffle) -> (EnvCard, u8) {
     let dice: u8 = shuffle.draw_next();
+    assert(dice > 0, GameErrors::BAD_SHUFFLE_SEED);
     let env_card: EnvCard = *env_deck[(dice - 1).into()];
     (env_card, dice)
 }

@@ -49,6 +49,22 @@ impl DuelistHandImpl of DuelistHandTrait {
     }
 }
 
+#[generate_trait]
+impl FinalBlowImpl of FinalBlowTrait {
+    fn ended_in_paces(self: FinalBlow) -> bool {
+        (match self {
+            FinalBlow::Paces(_) => true,
+            _ => false,
+        })
+    }
+    fn ended_in_blades(self: FinalBlow) -> bool {
+        (match self {
+            FinalBlow::Blades(_) => true,
+            _ => false,
+        })
+    }
+}
+
 
 
 //----------------------------------------
