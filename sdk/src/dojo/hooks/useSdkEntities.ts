@@ -83,8 +83,13 @@ export const useSdkEntities = ({
           if (response.error) {
             console.error("useSdkEntities().sdk.get() error:", response.error)
           } else if (response.data) {
-            // console.log("useSdkEntities() GOT:", isEvent, response.data)
-            setEntities(_parseResponseData(response.data))
+            console.log("useSdkEntities() GOT:", isEvent, response.data)
+            // FIX dojo.js 1.0.11... (data is an object, not an array anymore)
+            // setEntities(_parseResponseData(response.data))
+            setEntities(_parseResponseData(
+              (isEvent && Array.isArray(response.data)) ? response.data.map(e => Object.values(e)[0])
+                : Object.values(response.data)
+            ))
           }
           setIsLoading(false)
         },
