@@ -310,7 +310,6 @@ export interface TableConfig {
 	table_id: BigNumberish;
 	description: BigNumberish;
 	table_type: TableTypeEnum;
-	deck_type: DeckTypeEnum;
 	fee_collector_address: string;
 	fee_min: BigNumberish;
 	is_open: boolean;
@@ -320,7 +319,6 @@ export interface TableConfig {
 export interface TableConfigValue {
 	description: BigNumberish;
 	table_type: TableTypeEnum;
-	deck_type: DeckTypeEnum;
 	fee_collector_address: string;
 	fee_min: BigNumberish;
 	is_open: boolean;
@@ -337,6 +335,19 @@ export interface TokenBoundAddress {
 export interface TokenBoundAddressValue {
 	contract_address: string;
 	token_id: BigNumberish;
+}
+
+// Type definition for `pistols::systems::rng_mock::MockedValue` struct
+export interface MockedValue {
+	salt: BigNumberish;
+	value: BigNumberish;
+	exists: boolean;
+}
+
+// Type definition for `pistols::systems::rng_mock::MockedValueValue` struct
+export interface MockedValueValue {
+	value: BigNumberish;
+	exists: boolean;
 }
 
 // Type definition for `achievement::events::index::TrophyCreation` struct
@@ -463,13 +474,6 @@ export type BladesCard = {
 }
 export type BladesCardEnum = CairoCustomEnum;
 
-// Type definition for `pistols::types::cards::hand::DeckType` enum
-export type DeckType = {
-	None: string;
-	Classic: string;
-}
-export type DeckTypeEnum = CairoCustomEnum;
-
 // Type definition for `pistols::types::cards::hand::FinalBlow` enum
 export type FinalBlow = {
 	Undefined: string;
@@ -518,16 +522,28 @@ export type Premise = {
 	Blood: string;
 	Nothing: string;
 	Tournament: string;
+	Training: string;
+	Tutorial: string;
 }
 export type PremiseEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::profile_type::BotProfile` enum
 export type BotProfile = {
 	Unknown: string;
-	Scarecrow: string;
 	TinMan: string;
+	Scarecrow: string;
+	Leon: string;
 }
 export type BotProfileEnum = CairoCustomEnum;
+
+// Type definition for `pistols::types::profile_type::CharacterProfile` enum
+export type CharacterProfile = {
+	Unknown: string;
+	Bartender: string;
+	Drunken: string;
+	Devil: string;
+}
+export type CharacterProfileEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::profile_type::DuelistProfile` enum
 export type DuelistProfile = {
@@ -560,6 +576,7 @@ export type DuelistProfileEnum = CairoCustomEnum;
 export type ProfileType = {
 	Undefined: string;
 	Duelist: DuelistProfileEnum;
+	Character: CharacterProfileEnum;
 	Bot: BotProfileEnum;
 }
 export type ProfileTypeEnum = CairoCustomEnum;
@@ -635,6 +652,8 @@ export interface SchemaType extends ISchemaType {
 		TableConfigValue: WithFieldOrder<TableConfigValue>,
 		TokenBoundAddress: WithFieldOrder<TokenBoundAddress>,
 		TokenBoundAddressValue: WithFieldOrder<TokenBoundAddressValue>,
+		MockedValue: WithFieldOrder<MockedValue>,
+		MockedValueValue: WithFieldOrder<MockedValueValue>,
 		TrophyCreation: WithFieldOrder<TrophyCreation>,
 		TrophyCreationValue: WithFieldOrder<TrophyCreationValue>,
 		TrophyProgression: WithFieldOrder<TrophyProgression>,
@@ -661,7 +680,9 @@ export const schema: SchemaType = {
 				Hatred: undefined,
 				Blood: undefined,
 				Nothing: undefined,
-				Tournament: undefined, }),
+				Tournament: undefined,
+				Training: undefined,
+				Tutorial: undefined, }),
 			quote: 0,
 			address_a: "",
 			address_b: "",
@@ -703,7 +724,9 @@ export const schema: SchemaType = {
 				Hatred: undefined,
 				Blood: undefined,
 				Nothing: undefined,
-				Tournament: undefined, }),
+				Tournament: undefined,
+				Training: undefined,
+				Tutorial: undefined, }),
 			quote: 0,
 			address_a: "",
 			address_b: "",
@@ -819,6 +842,7 @@ export const schema: SchemaType = {
 		profile_type: new CairoCustomEnum({ 
 					Undefined: "",
 				Duelist: undefined,
+				Character: undefined,
 				Bot: undefined, }),
 			timestamp: 0,
 		},
@@ -836,6 +860,7 @@ export const schema: SchemaType = {
 		profile_type: new CairoCustomEnum({ 
 					Undefined: "",
 				Duelist: undefined,
+				Character: undefined,
 				Bot: undefined, }),
 			timestamp: 0,
 		},
@@ -985,7 +1010,7 @@ export const schema: SchemaType = {
 				Ended: undefined, }),
 		},
 		TableConfig: {
-			fieldOrder: ['table_id', 'description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
+			fieldOrder: ['table_id', 'description', 'table_type', 'fee_collector_address', 'fee_min', 'is_open'],
 			table_id: 0,
 			description: 0,
 		table_type: new CairoCustomEnum({ 
@@ -993,24 +1018,18 @@ export const schema: SchemaType = {
 				Season: undefined,
 				Tutorial: undefined,
 				Practice: undefined, }),
-		deck_type: new CairoCustomEnum({ 
-					None: "",
-				Classic: undefined, }),
 			fee_collector_address: "",
 			fee_min: 0,
 			is_open: false,
 		},
 		TableConfigValue: {
-			fieldOrder: ['description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
+			fieldOrder: ['description', 'table_type', 'fee_collector_address', 'fee_min', 'is_open'],
 			description: 0,
 		table_type: new CairoCustomEnum({ 
 					Undefined: "",
 				Season: undefined,
 				Tutorial: undefined,
 				Practice: undefined, }),
-		deck_type: new CairoCustomEnum({ 
-					None: "",
-				Classic: undefined, }),
 			fee_collector_address: "",
 			fee_min: 0,
 			is_open: false,
@@ -1025,6 +1044,17 @@ export const schema: SchemaType = {
 			fieldOrder: ['contract_address', 'token_id'],
 			contract_address: "",
 			token_id: 0,
+		},
+		MockedValue: {
+			fieldOrder: ['salt', 'value', 'exists'],
+			salt: 0,
+			value: 0,
+			exists: false,
+		},
+		MockedValueValue: {
+			fieldOrder: ['value', 'exists'],
+			value: 0,
+			exists: false,
 		},
 		TrophyCreation: {
 			fieldOrder: ['id', 'hidden', 'index', 'points', 'start', 'end', 'group', 'icon', 'title', 'description', 'tasks', 'data'],
@@ -1171,13 +1201,15 @@ export enum ModelsMapping {
 	TableType = 'pistols-TableType',
 	TokenBoundAddress = 'pistols-TokenBoundAddress',
 	TokenBoundAddressValue = 'pistols-TokenBoundAddressValue',
+	MockedValue = 'pistols-MockedValue',
+	MockedValueValue = 'pistols-MockedValueValue',
 	BladesCard = 'pistols-BladesCard',
-	DeckType = 'pistols-DeckType',
 	FinalBlow = 'pistols-FinalBlow',
 	PacesCard = 'pistols-PacesCard',
 	ChallengeState = 'pistols-ChallengeState',
 	Premise = 'pistols-Premise',
 	BotProfile = 'pistols-BotProfile',
+	CharacterProfile = 'pistols-CharacterProfile',
 	DuelistProfile = 'pistols-DuelistProfile',
 	ProfileType = 'pistols-ProfileType',
 	RoundState = 'pistols-RoundState',

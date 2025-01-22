@@ -1252,8 +1252,8 @@
   },
   "contracts": [
     {
-      "address": "0x3676d5918541f0738b2cb38eac70e7c0af9ea2b9bd07b52ebc5f11eb3616f8e",
-      "class_hash": "0x5f3aaf3a38d1c20f42d7a427d0093fa540b4e97672a6dc6f68165902664a02b",
+      "address": "0x5af264dc8ec679cdc89e96e7ee9b0e41c43e8b02a83abe37e4f6bbf4bb335e8",
+      "class_hash": "0x6ac5c82db47f3dfa3d5875933d4d810ba72e047017695f465bc2e0555e67955",
       "abi": [
         {
           "type": "impl",
@@ -1367,20 +1367,6 @@
           ]
         },
         {
-          "type": "enum",
-          "name": "pistols::types::cards::hand::DeckType",
-          "variants": [
-            {
-              "name": "None",
-              "type": "()"
-            },
-            {
-              "name": "Classic",
-              "type": "()"
-            }
-          ]
-        },
-        {
           "type": "struct",
           "name": "pistols::models::table::TableConfig",
           "members": [
@@ -1395,10 +1381,6 @@
             {
               "name": "table_type",
               "type": "pistols::models::table::TableType"
-            },
-            {
-              "name": "deck_type",
-              "type": "pistols::types::cards::hand::DeckType"
             },
             {
               "name": "fee_collector_address",
@@ -1882,8 +1864,8 @@
       ]
     },
     {
-      "address": "0x766757a438b8a995e7c1db85c708562d778c2af655b9d5db2eb64b9940bdca",
-      "class_hash": "0x46c963d7fc6f45c68b1353647c6f06e6885fdcb7067788b2aef8a1a1779bb86",
+      "address": "0x14dca39196b5026afbf1fef48426baed1a0eed198129d71d1087ef2a2990183",
+      "class_hash": "0x685998b77ecdf5f6cc4e6ee06f5c351d48830049bd340b31e29b48eaec49005",
       "abi": [
         {
           "type": "impl",
@@ -2016,6 +1998,14 @@
             },
             {
               "name": "Tournament",
+              "type": "()"
+            },
+            {
+              "name": "Training",
+              "type": "()"
+            },
+            {
+              "name": "Tutorial",
               "type": "()"
             }
           ]
@@ -3008,8 +2998,8 @@
       ]
     },
     {
-      "address": "0x71a1c67b3370e743430f63e5ae92a9b3ffce18bae028790b1b4a5dbbf6d9402",
-      "class_hash": "0x638a0d8a2873ea82543c231e016fd41114561d27c941d9a2f9e7f97105c0a5a",
+      "address": "0x5ee662a1ca1f2446d06b2a68af090c980d396653db4da1a70f9e9919b5b1771",
+      "class_hash": "0x2dea0c00b81812bbaa61835fb57c68fe4ca2c26161f3b5adde8f5a382edeb32",
       "abi": [
         {
           "type": "impl",
@@ -4638,8 +4628,8 @@
       ]
     },
     {
-      "address": "0x698a4522d96042b0153c4ff5f4fe2cd7643882638ca082fe1a81bdc3106663",
-      "class_hash": "0x340fe3bce35c71e726a730df29cb46536ac9664ebb82f97807f9d4c33851e11",
+      "address": "0x1b9e22e1611281d76cd46b508a05e4fabc175412d6dce5e81b1103e7514613d",
+      "class_hash": "0x5a53ffb62bca6a2376f123eae86e770f406f26488bab3ad5eb229b4face49a2",
       "abi": [
         {
           "type": "impl",
@@ -5128,11 +5118,11 @@
             },
             {
               "type": "function",
-              "name": "get_player_card_decks",
+              "name": "get_duel_deck",
               "inputs": [
                 {
-                  "name": "table_id",
-                  "type": "core::felt252"
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
                 }
               ],
               "outputs": [
@@ -6894,8 +6884,8 @@
       ]
     },
     {
-      "address": "0x6e426f831229d84870ab905d75b7e1c44fd57331b436eb0cbf5fdcb140e9dbe",
-      "class_hash": "0x1e0ae106c9da1a5e05a33fc938ac17780af86bfd87db6564381331ba0a813a9",
+      "address": "0x51fcea64d97baff2b7bf7a2ef2cbaf90ab75ce830de9001f5dc90a8214c22a6",
+      "class_hash": "0x2ceb5dc2a29ba3205a461d5c9c5f396579f91bb333003f6e3026c92b03b102b",
       "abi": [
         {
           "type": "impl",
@@ -6953,20 +6943,6 @@
           "interface_name": "pistols::systems::rng::IRng"
         },
         {
-          "type": "struct",
-          "name": "core::integer::u256",
-          "members": [
-            {
-              "name": "low",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "high",
-              "type": "core::integer::u128"
-            }
-          ]
-        },
-        {
           "type": "enum",
           "name": "core::bool",
           "variants": [
@@ -6982,23 +6958,29 @@
         },
         {
           "type": "struct",
-          "name": "pistols::types::shuffler::Shuffler",
+          "name": "pistols::systems::rng_mock::MockedValue",
           "members": [
             {
-              "name": "ids",
-              "type": "core::integer::u256"
+              "name": "salt",
+              "type": "core::felt252"
             },
             {
-              "name": "size",
-              "type": "core::integer::u32"
+              "name": "value",
+              "type": "core::felt252"
             },
             {
-              "name": "pos",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "mocked",
+              "name": "exists",
               "type": "core::bool"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<pistols::systems::rng_mock::MockedValue>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<pistols::systems::rng_mock::MockedValue>"
             }
           ]
         },
@@ -7017,6 +6999,10 @@
                 {
                   "name": "salt",
                   "type": "core::felt252"
+                },
+                {
+                  "name": "mocked",
+                  "type": "core::array::Span::<pistols::systems::rng_mock::MockedValue>"
                 }
               ],
               "outputs": [
@@ -7028,16 +7014,11 @@
             },
             {
               "type": "function",
-              "name": "new_shuffler",
-              "inputs": [
-                {
-                  "name": "shuffle_size",
-                  "type": "core::integer::u8"
-                }
-              ],
+              "name": "is_mocked",
+              "inputs": [],
               "outputs": [
                 {
-                  "type": "pistols::types::shuffler::Shuffler"
+                  "type": "core::bool"
                 }
               ],
               "state_mutability": "view"
@@ -7163,6 +7144,589 @@
       "tag": "pistols-rng",
       "selector": "0x13f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504",
       "systems": [
+        "upgrade"
+      ]
+    },
+    {
+      "address": "0x21c71787e7f1597cbb8748b4339901178e6df7eb18e4cd193fbaf76c225d937",
+      "class_hash": "0x26a795efee71670c69098944244c1a520c7aad6c8d6e15a70fc08f6a2127ed4",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "rng_mock__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "rng_mock__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "RngImpl",
+          "interface_name": "pistols::systems::rng::IRng"
+        },
+        {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::systems::rng_mock::MockedValue",
+          "members": [
+            {
+              "name": "salt",
+              "type": "core::felt252"
+            },
+            {
+              "name": "value",
+              "type": "core::felt252"
+            },
+            {
+              "name": "exists",
+              "type": "core::bool"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<pistols::systems::rng_mock::MockedValue>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<pistols::systems::rng_mock::MockedValue>"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::rng::IRng",
+          "items": [
+            {
+              "type": "function",
+              "name": "reseed",
+              "inputs": [
+                {
+                  "name": "seed",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "salt",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "mocked",
+                  "type": "core::array::Span::<pistols::systems::rng_mock::MockedValue>"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::felt252"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "is_mocked",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "MockerImpl",
+          "interface_name": "pistols::systems::rng_mock::IMocker"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::felt252>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::felt252>"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::rng_mock::IMocker",
+          "items": [
+            {
+              "type": "function",
+              "name": "set_mocked_values",
+              "inputs": [
+                {
+                  "name": "salts",
+                  "type": "core::array::Span::<core::felt252>"
+                },
+                {
+                  "name": "values",
+                  "type": "core::array::Span::<core::felt252>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "view"
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::rng_mock::rng_mock::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [],
+      "tag": "pistols-rng_mock",
+      "selector": "0xfbd28ccd9cffb9b1783a0bf7cdf42a9b88c49d4568116cd1f7ee70ba415705",
+      "systems": [
+        "set_mocked_values",
+        "upgrade"
+      ]
+    },
+    {
+      "address": "0x5b6575c50b602179bfb8833dc2f8547d6eba9ba61a9c1637ed1a95cff8a919e",
+      "class_hash": "0x75cc51fc3b67768d9e7d169b9bde1b215d556991cce92e624f78128e3dfe98f",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "tutorial__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "tutorial__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "impl",
+          "name": "ActionsImpl",
+          "interface_name": "pistols::systems::tutorial::ITutorial"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::integer::u8>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::integer::u8>"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::tutorial::ITutorial",
+          "items": [
+            {
+              "type": "function",
+              "name": "create_tutorial",
+              "inputs": [
+                {
+                  "name": "player_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "tutorial_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "commit_moves",
+              "inputs": [
+                {
+                  "name": "player_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "tutorial_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "hashed",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "reveal_moves",
+              "inputs": [
+                {
+                  "name": "player_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "tutorial_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "salt",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "moves",
+                  "type": "core::array::Span::<core::integer::u8>"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "calc_duel_id",
+              "inputs": [
+                {
+                  "name": "tutorial_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::tutorial::tutorial::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [],
+      "tag": "pistols-tutorial",
+      "selector": "0x32f1e04dc2117bb6f46da72734a3910bcaca0e887025d5b1126fd804c256d24",
+      "systems": [
+        "dojo_init",
+        "create_tutorial",
+        "commit_moves",
+        "reveal_moves",
         "upgrade"
       ]
     },
@@ -7404,7 +7968,7 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0xb2c9ea7c0d74a9aa1c57765e539573a4b49693c7a64538c4a601b46327b17a",
+      "class_hash": "0x42a6e5dd9f0a8209511401e10cd3f9c5222f7a1e9eeaba023548af071a8cbe3",
       "tag": "pistols-Challenge",
       "selector": "0x673267b69d74c703ea86d97b041278944b49f62b52867345a95d3047b11378a"
     },
@@ -7428,7 +7992,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x7520b52f41d94d40b982a4de1b526f9fbabb1b09463b37706fb720c716a9541",
+      "class_hash": "0x185fc296aa7bd7739ff717243ce7e842100934315060e56058b4ca3900db5e4",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -7437,6 +8001,12 @@
       "class_hash": "0x56f9791c24fe0ff2f34b0f0965c440a56fa16ff44ae69c67c1861510f012e8",
       "tag": "pistols-DuelistChallenge",
       "selector": "0x4f1193fa385154f58ce9408156cc7812f4424d57dd8ed2b04ca1b980db2ffec"
+    },
+    {
+      "members": [],
+      "class_hash": "0x602939526ecc715433af6623561ea714970a35e9f085eca061b93eb73689f51",
+      "tag": "pistols-MockedValue",
+      "selector": "0x8deb0b9e5cc0c6c2089ee6a4bfdd306444147a869b6179c4e22b283a5176dc"
     },
     {
       "members": [],
@@ -7506,7 +8076,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x3ae7c1c4044b3b021419203684040fcc3dbf8f701fdff78e989cd91f0412d5d",
+      "class_hash": "0x2516c1db01af8cf1b727bf04195d572a2e45eabf92725787af691c2ec176e50",
       "tag": "pistols-TableConfig",
       "selector": "0x1e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138"
     },

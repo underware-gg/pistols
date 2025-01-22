@@ -134,6 +134,16 @@ export const getRarityValue = (name: Rarity): number | undefined => _indexOrUnde
 export const getRarityFromValue = (value: number): Rarity | undefined => Object.keys(Rarity)[value] as Rarity;
 export const getRarityMap = (): Record<Rarity, number> => Object.keys(Rarity).reduce((acc, v, index) => { acc[v as Rarity] = index; return acc; }, {} as Record<Rarity, number>);
 
+// from: ../dojo/src/types/cards/deck.cairo
+export enum DeckType {
+  None = 'None', // 0
+  Classic = 'Classic', // 1
+  PacesOnly = 'PacesOnly', // 2
+};
+export const getDeckTypeValue = (name: DeckType): number | undefined => _indexOrUndefined(Object.keys(DeckType).indexOf(name));
+export const getDeckTypeFromValue = (value: number): DeckType | undefined => Object.keys(DeckType)[value] as DeckType;
+export const getDeckTypeMap = (): Record<DeckType, number> => Object.keys(DeckType).reduce((acc, v, index) => { acc[v as DeckType] = index; return acc; }, {} as Record<DeckType, number>);
+
 // from: ../dojo/src/types/cards/env.cairo
 export enum EnvCard {
   None = 'None', // 0
@@ -151,15 +161,6 @@ export enum EnvCard {
 export const getEnvCardValue = (name: EnvCard): number | undefined => _indexOrUndefined(Object.keys(EnvCard).indexOf(name));
 export const getEnvCardFromValue = (value: number): EnvCard | undefined => Object.keys(EnvCard)[value] as EnvCard;
 export const getEnvCardMap = (): Record<EnvCard, number> => Object.keys(EnvCard).reduce((acc, v, index) => { acc[v as EnvCard] = index; return acc; }, {} as Record<EnvCard, number>);
-
-// from: ../dojo/src/types/cards/hand.cairo
-export enum DeckType {
-  None = 'None', // 0
-  Classic = 'Classic', // 1
-};
-export const getDeckTypeValue = (name: DeckType): number | undefined => _indexOrUndefined(Object.keys(DeckType).indexOf(name));
-export const getDeckTypeFromValue = (value: number): DeckType | undefined => Object.keys(DeckType)[value] as DeckType;
-export const getDeckTypeMap = (): Record<DeckType, number> => Object.keys(DeckType).reduce((acc, v, index) => { acc[v as DeckType] = index; return acc; }, {} as Record<DeckType, number>);
 
 // from: ../dojo/src/types/cards/hand.cairo
 export enum FinalBlow {
@@ -372,9 +373,6 @@ export type ProfileDescription = {
 
 // from: ../dojo/src/types/constants.cairo
 type type_CONST = {
-  DUELIST_PROFILE_COUNT: number, // cairo: u8
-  CHARACTER_PROFILE_COUNT: number, // cairo: u8
-  BOT_PROFILE_COUNT: number, // cairo: u8
   WELCOME_PACK_DUELIST_COUNT: number, // cairo: usize
   ROUND_COUNT: number, // cairo: u8
   MAX_DUELIST_ID: bigint, // cairo: u128
@@ -386,9 +384,6 @@ type type_CONST = {
   ETH_TO_WEI: bigint, // cairo: u256
 };
 export const CONST: type_CONST = {
-  DUELIST_PROFILE_COUNT: 21,
-  CHARACTER_PROFILE_COUNT: 3,
-  BOT_PROFILE_COUNT: 3,
   WELCOME_PACK_DUELIST_COUNT: 5,
   ROUND_COUNT: 1,
   MAX_DUELIST_ID: BigInt('0xffff'),
@@ -438,6 +433,7 @@ type type_SELECTORS = {
   BANK: bigint, // cairo: felt252
   GAME: bigint, // cairo: felt252
   RNG: bigint, // cairo: felt252
+  RNG_MOCK: bigint, // cairo: felt252
   DUEL_TOKEN: bigint, // cairo: felt252
   DUELIST_TOKEN: bigint, // cairo: felt252
   PACK_TOKEN: bigint, // cairo: felt252
@@ -455,6 +451,7 @@ export const SELECTORS: type_SELECTORS = {
   BANK: BigInt('0x07a683ab68bc70300995da8de5781002e781f22ba246fe239ebeff02b2230375'), // selector_from_tag!("pistols-bank")
   GAME: BigInt('0x032c102830cbffaddecbdce7ef85735e6f08da08ee762a2d7b09304b6533dd57'), // selector_from_tag!("pistols-game")
   RNG: BigInt('0x013f1a6a9ae118440a997d6624230b59f43516220a1208526c3f66e202910504'), // selector_from_tag!("pistols-rng")
+  RNG_MOCK: BigInt('0x00fbd28ccd9cffb9b1783a0bf7cdf42a9b88c49d4568116cd1f7ee70ba415705'), // selector_from_tag!("pistols-rng_mock")
   DUEL_TOKEN: BigInt('0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063'), // selector_from_tag!("pistols-duel_token")
   DUELIST_TOKEN: BigInt('0x045c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e'), // selector_from_tag!("pistols-duelist_token")
   PACK_TOKEN: BigInt('0x03d74e76192285c5a19a63c54a6c2ba5b015a1a25818c2d8f9cf75d7fef2b5c1'), // selector_from_tag!("pistols-pack_token")
@@ -655,6 +652,32 @@ export const ENV_POINTS: type_ENV_POINTS = {
   },
 };
 
+// from: ../dojo/src/types/cards/env.cairo
+type type_ENV_DICES = {
+  DAMAGE_UP: bigint, // cairo: felt252
+  DAMAGE_DOWN: bigint, // cairo: felt252
+  CHANCES_UP: bigint, // cairo: felt252
+  CHANCES_DOWN: bigint, // cairo: felt252
+  DOUBLE_DAMAGE_UP: bigint, // cairo: felt252
+  DOUBLE_CHANCES_UP: bigint, // cairo: felt252
+  ALL_SHOTS_HIT: bigint, // cairo: felt252
+  ALL_SHOTS_MISS: bigint, // cairo: felt252
+  DOUBLE_TACTICS: bigint, // cairo: felt252
+  NO_TACTICS: bigint, // cairo: felt252
+};
+export const ENV_DICES: type_ENV_DICES = {
+  DAMAGE_UP: 1n,
+  DAMAGE_DOWN: 8n,
+  CHANCES_UP: 13n,
+  CHANCES_DOWN: 20n,
+  DOUBLE_DAMAGE_UP: 25n,
+  DOUBLE_CHANCES_UP: 28n,
+  ALL_SHOTS_HIT: 31n,
+  ALL_SHOTS_MISS: 32n,
+  DOUBLE_TACTICS: 33n,
+  NO_TACTICS: 34n,
+};
+
 // from: ../dojo/src/types/cards/tactics.cairo
 type type_TACTICS_POINTS = {
   Insult: CardPoints, // cairo: CardPoints
@@ -774,6 +797,26 @@ export const PREMISES: type_PREMISES = {
     name: 'Training',
     prefix: 'to train for',
   },
+};
+
+// from: ../dojo/src/types/profile_type.cairo
+type type_PROFILES = {
+  DUELIST_PROFILE_COUNT: number, // cairo: u8
+  CHARACTER_PROFILE_COUNT: number, // cairo: u8
+  BOT_PROFILE_COUNT: number, // cairo: u8
+  DUELIST_ID_BASE: bigint, // cairo: u128
+  CHARACTER_ID_BASE: bigint, // cairo: u128
+  BOT_ID_BASE: bigint, // cairo: u128
+  UNDEFINED_ID_BASE: bigint, // cairo: u128
+};
+export const PROFILES: type_PROFILES = {
+  DUELIST_PROFILE_COUNT: 21,
+  CHARACTER_PROFILE_COUNT: 3,
+  BOT_PROFILE_COUNT: 3,
+  DUELIST_ID_BASE: BigInt('0x100000000'),
+  CHARACTER_ID_BASE: BigInt('0x200000000'),
+  BOT_ID_BASE: BigInt('0x300000000'),
+  UNDEFINED_ID_BASE: BigInt('0xf00000000'),
 };
 
 // from: ../dojo/src/types/profile_type.cairo
