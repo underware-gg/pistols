@@ -27,8 +27,8 @@ catalog:
   #--------------------------------
   # misc
   #
-  "@cartridge/connector": 0.5.8
-  "@cartridge/controller": 0.5.8
+  "@cartridge/connector": 0.6.0
+  "@cartridge/controller": 0.6.0
   "@apollo/client": ^3.11.8
   immer: ^10.1.1
   react: ^18.2.0
