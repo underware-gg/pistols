@@ -1609,7 +1609,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+	const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>): DojoCall => {
 		return {
 			contractName: "rng_mock",
 			entrypoint: "reseed",
@@ -1617,7 +1617,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+  const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
 		try {
 			return await provider.call("pistols", build_rng_mock_reseed_calldata(seed, salt, mocked));
 		} catch (error) {
@@ -1626,7 +1626,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+  const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>): DojoCall => {
 		return {
 			contractName: "rng",
 			entrypoint: "reseed",
@@ -1634,7 +1634,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+  const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
 		try {
 			return await provider.call("pistols", build_rng_reseed_calldata(seed, salt, mocked));
 		} catch (error) {
