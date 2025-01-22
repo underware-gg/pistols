@@ -4,15 +4,15 @@ pub use pistols::systems::rng::{IRngDispatcher, IRngDispatcherTrait};
 pub use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
 //
-// Alternative version of the rng.cairo
+// mocked version of rng.cairo
 // it has two use cases:
 //
-// 1. for game testing:
+// 1. game testing:
 //    - deploy test world with this contract instead of rng.cairo
 //    - store MockedValues on-chain by calling set_mocked_values()
-//    - game_loop() will use these values instead of the real rng
+//    - game_loop() will use these values instead of seeded rng
 //
-// 2. for tutorial scripting:
+// 2. tutorial scripting:
 //    - wrap MockedValues for game_loop()
 //
 
@@ -40,8 +40,8 @@ impl MockedValueImpl of MockedValueTrait {
             exists: true,
         })
     }
-    fn new_shuffled(salt: felt252, values: Span<felt252>) -> MockedValue {
-        (Self::new(salt, ShufflerTrait::mocked_seed(values)))
+    fn shuffled(salt: felt252, values: Span<felt252>) -> MockedValue {
+        (Self::new(salt, ShufflerTrait::mock_to_seed(values)))
     }
 }
 
@@ -94,7 +94,7 @@ pub mod rng_mock {
     use dojo::world::{WorldStorage};
     use dojo::model::{ModelStorage, ModelValueStorage};
 
-    use super::{IRngMock, IMocker, MockedValue};
+    use super::{IRngMock, IMocker, MockedValue, MockedValueTrait};
     use pistols::systems::rng::{IRng};
     use pistols::utils::hash::{hash_values};
     use pistols::types::shuffler::{Shuffler, ShufflerTrait};
@@ -124,10 +124,10 @@ pub mod rng_mock {
             // look for value in stored models
             // (used on tests)
             let mut world = self.world(@"pistols");
-            let salt_value: MockedValue = world.read_model(salt);
-            if (salt_value.exists) {
-                // println!("-- get_salt {} {} {}", salt, salt_value.exists, salt_value.value);
-                return salt_value.value - 1; // throw_dice() adds 1
+            let value: MockedValue = world.read_model(salt);
+            if (value.exists) {
+                // println!("-- get_salt {} {} {}", salt, value.exists, value.value);
+                return value.value - 1; // throw_dice() adds 1
             }
 
             //
@@ -152,11 +152,10 @@ pub mod rng_mock {
                 assert(v > 0, 'salt value > 0');
                 // assert(v < 256, 'salt value < 256');
                 world.write_model(
-                    @MockedValue{
-                        salt: *salts[index],
-                        value: *values[index],
-                        exists: true,
-                    }
+                    @MockedValueTrait::new(
+                        *salts[index],
+                        *values[index],
+                    )
                 );
                 index += 1;
             }

@@ -1,6 +1,9 @@
 use starknet::{ContractAddress};
 use pistols::systems::rng_mock::{MockedValue, RngWrap, RngWrapTrait};
 
+//--------------------------------
+// rng contract
+//
 #[starknet::interface]
 pub trait IRng<TState> {
     fn reseed(self: @TState, seed: felt252, salt: felt252, mocked: Span<MockedValue>) -> felt252;
@@ -92,8 +95,7 @@ impl ShuffleImpl of ShuffleTrait {
     fn new(wrapped: @RngWrap, initial_seed: felt252, shuffle_size: u8, salt: felt252) -> Shuffle {
         let rng = IRngDispatcher{ contract_address: *wrapped.rng_address };
         let seed: felt252 = rng.reseed(initial_seed, salt, *wrapped.mocked);
-        let mut shuffler = ShufflerTrait::new(shuffle_size);
-        shuffler.mocked = rng.is_mocked();
+        let shuffler = ShufflerTrait::new(shuffle_size, rng.is_mocked());
         (Shuffle {
             seed,
             last_card: 0,

@@ -29,13 +29,13 @@ impl ShufflerImpl of ShufflerTrait {
 
 	// size is the total number of Ids to be suffled
 	// allows get_next() to be called <size> times
-    fn new(size: u8) -> Shuffler {
+    fn new(size: u8, mocked: bool) -> Shuffler {
         assert(size <= Self::MAX, 'SHUFFLE: too many elements');
         (Shuffler {
             ids: 0,
             size: size.into(),
             pos: 0,
-            mocked: false,
+            mocked,
         })
     }
 
@@ -47,8 +47,8 @@ impl ShufflerImpl of ShufflerTrait {
 		if (self.pos == self.size) { return 0; }
         // get next pos
 		self.pos += 1;
-        // testing
-        if (self.mocked) { return (seed.to_usize_lossy() & Self::MASK.try_into().unwrap()).try_into().unwrap(); }
+        // seed contains mocked values
+        if (self.mocked) { return (seed.into() & Self::MASK).try_into().unwrap(); }
         // only 1 id was shuffled
 		if (self.size == 1) { return 1; }
         // it is the last id
@@ -80,7 +80,7 @@ impl ShufflerImpl of ShufflerTrait {
     }
 
     // convert an array of values into a mocked seed
-    fn mocked_seed(values: Span<felt252>) -> felt252 {
+    fn mock_to_seed(values: Span<felt252>) -> felt252 {
         let mut result: u256 = 0;
         let mut index: usize = 0;
         while (index < values.len()) {
@@ -123,7 +123,7 @@ mod tests {
     }
     
     fn _test_shuffler(size: u8) {
-        let mut shuffler: Shuffler = ShufflerTrait::new(size.into());
+        let mut shuffler: Shuffler = ShufflerTrait::new(size.into(), false);
         let mut seed: u256 = size.into();
         let mut sum: usize = 0;
         let mut n: u8 = 1;

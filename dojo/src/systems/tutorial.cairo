@@ -199,7 +199,7 @@ pub mod tutorial {
             assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
             round.moves_b.initialize(0xffff, moves);
 
-            // make NP moves
+            // store NPC moves
             let (npc_moves, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(round.moves_b.as_hand());
             round.moves_a.initialize(0xffff, npc_moves);
 
@@ -207,13 +207,13 @@ pub mod tutorial {
             let deck: Deck = challenge.get_deck();
             let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), mocked);
             let progress: DuelProgress = game_loop(wrapped, @deck, ref round);
-            store.set_round(@round);
 
             // end challenge
             challenge.winner = progress.winner;
             challenge.state = if (progress.winner == 0) {ChallengeState::Draw} else {ChallengeState::Resolved};
             challenge.timestamp_end = get_block_timestamp();
             store.set_challenge(@challenge);
+            store.set_round(@round);
         }
     }
 }

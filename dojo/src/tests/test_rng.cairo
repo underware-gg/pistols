@@ -124,7 +124,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         sys.rng.set_mocked_values(
             ['shuffle'].span(),
-            [ShufflerTrait::mocked_seed([1, 22, 34].span())].span(),
+            [ShufflerTrait::mock_to_seed([1, 22, 34].span())].span(),
         );
         let mut shuffle: Shuffle = ShuffleTrait::new(RngWrapTrait::new(sys.rng.contract_address), 0x1212121212, 34, 'shuffle');
         let s1 = shuffle.draw_next();
@@ -158,7 +158,7 @@ mod tests {
     fn test_rng_mock_shuffle_wrapped() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let map: Span<MockedValue> = [
-            MockedValueTrait::new_shuffled('shuffle', [1, 22, 34].span()),
+            MockedValueTrait::shuffled('shuffle', [1, 22, 34].span()),
         ].span();
         let mut shuffle: Shuffle = ShuffleTrait::new(RngWrapTrait::wrap(sys.rng.contract_address, map), 0x1212121212, 34, 'shuffle');
         let s1 = shuffle.draw_next();

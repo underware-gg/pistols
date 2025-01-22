@@ -74,7 +74,7 @@ mod tests {
         if (!shuffle) {
             sys.rng.set_mocked_values(
                 ['env'].span(),
-                [ShufflerTrait::mocked_seed(
+                [ShufflerTrait::mock_to_seed(
                     [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
                     ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()
                 )].span()

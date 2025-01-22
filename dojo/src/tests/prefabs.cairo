@@ -102,7 +102,7 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [1, 1, ShufflerTrait::mocked_seed(
+                values: [1, 1, ShufflerTrait::mock_to_seed(
                     [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
                     ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()
                 )].span(),
@@ -118,7 +118,7 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [100, 100, ShufflerTrait::mocked_seed(
+                values: [100, 100, ShufflerTrait::mock_to_seed(
                     [ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,
                     ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,].span()
                 )].span(),
@@ -134,7 +134,7 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [1, 1, ShufflerTrait::mocked_seed([ENV_CARD_CRIT].span())].span(),
+                values: [1, 1, ShufflerTrait::mock_to_seed([ENV_CARD_CRIT].span())].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
@@ -147,7 +147,7 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [1, 1, ShufflerTrait::mocked_seed([ENV_CARD_CRIT].span())].span(),
+                values: [1, 1, ShufflerTrait::mock_to_seed([ENV_CARD_CRIT].span())].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
@@ -160,7 +160,7 @@ mod prefabs {
         (
             SaltsValues{
                 salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [100, 1, ShufflerTrait::mocked_seed([ENV_CARD_CRIT].span())].span(),
+                values: [100, 1, ShufflerTrait::mock_to_seed([ENV_CARD_CRIT].span())].span(),
             },
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),

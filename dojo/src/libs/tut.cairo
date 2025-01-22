@@ -48,12 +48,15 @@ impl TutorialLevelImpl of TutorialLevelTrait {
         let mut env_cards: Array<felt252> = array![];
         match self {
             TutorialLevel::Level1 => {
-                //
+                //---------------------------------
                 // Level 1: Paces only, player wins
                 //
+                mocked.append(MockedValueTrait::new('shoot_a', 99)); // NPC always misses
+                mocked.append(MockedValueTrait::new('shoot_b', 1));  // Player always hits
+                // respond based on player's fire pace
                 match player_hand.card_fire {
                     PacesCard::Paces1 => {
-                        // NPC never shoots
+                        // NPC never gets a chance to shoot
                         npc_hand.card_dodge = PacesCard::Paces2;
                         npc_hand.card_fire = PacesCard::Paces3;
                         env_cards.append(ENV_DICES::DOUBLE_DAMAGE_UP);
@@ -69,9 +72,9 @@ impl TutorialLevelImpl of TutorialLevelTrait {
                         // NPC fires when player dodges
                         // else trips and shoot!
                         npc_hand.card_fire = if (player_hand.card_dodge.is_before(player_hand.card_fire)) {player_hand.card_dodge} else {PacesCard::Paces2};
-                        npc_hand.card_dodge = if (npc_hand.card_fire == PacesCard::Paces1) {PacesCard::Paces2} else {PacesCard::Paces1};
+                        npc_hand.card_dodge = if (npc_hand.card_fire == PacesCard::Paces2) {PacesCard::Paces1} else {PacesCard::Paces2};
                         let pace: u8 = player_hand.card_fire.into();
-                        // use last <paces> cards from...
+                        // use the last <paces> cards from...
                         env_cards.extend_from_span(array![
                             ENV_DICES::CHANCES_DOWN,
                             ENV_DICES::CHANCES_UP,
@@ -86,22 +89,19 @@ impl TutorialLevelImpl of TutorialLevelTrait {
                         ].span().slice((10 - pace).into(), pace.into()));
                     },
                 };
-                // fire dices
-                mocked.append(MockedValueTrait::new('shoot_a', 99)); // NPC always misses
-                mocked.append(MockedValueTrait::new('shoot_b', 1));  // Player always hits
             },
             TutorialLevel::Level2 => {
-                //
+                //---------------------------------
                 // Level 2: Full deck, player loses
                 //
-
-                // fire dices
                 mocked.append(MockedValueTrait::new('shoot_a', 1)); // NPC always hits
                 mocked.append(MockedValueTrait::new('shoot_b', 99));  // Player always misses
             },
             _ => {},
         };
-        mocked.append(MockedValueTrait::new_shuffled('env', env_cards.span()));
+        //---------------------------------
+        // finish
+        mocked.append(MockedValueTrait::shuffled('env', env_cards.span()));
         (npc_hand.to_span(), mocked.span())
     }
 }

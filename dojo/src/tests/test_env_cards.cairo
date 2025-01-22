@@ -72,7 +72,7 @@ mod tests {
         );
         sys.rng.set_mocked_values(
             ['env'].span(),
-            [ShufflerTrait::mocked_seed(env_cards)].span(),
+            [ShufflerTrait::mock_to_seed(env_cards)].span(),
         );
         let mut round = Round {
             duel_id: 0x1234,
