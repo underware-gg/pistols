@@ -28,7 +28,7 @@ pub trait ITutorial<TState> {
 
     //
     // view calls
-    fn calc_duel_id(self: @TState, tutorial_id: u128) -> u128;
+    fn calc_duel_id(self: @TState, player_id: u128, tutorial_id: u128) -> u128;
 }
 
 #[dojo::contract]
@@ -79,7 +79,7 @@ pub mod tutorial {
     mod Errors {
         const INVALID_TUTORIAL_LEVEL: felt252       = 'TUTORIAL: Invalid level';
         const INVALID_PLAYER: felt252               = 'TUTORIAL: Invalid player';
-        const NOT_YOUR_DUEL: felt252                = 'TUTORIAL: Not your duel';
+        // const NOT_YOUR_DUEL: felt252                = 'TUTORIAL: Not your duel';
         const CHALLENGE_NOT_IN_PROGRESS: felt252    = 'TUTORIAL: Challenge not active';
         const ROUND_NOT_IN_COMMIT: felt252          = 'TUTORIAL: Round not in commit';
         const ROUND_NOT_IN_REVEAL: felt252          = 'TUTORIAL: Round not in reveal';
@@ -104,11 +104,12 @@ pub mod tutorial {
     impl ActionsImpl of super::ITutorial<ContractState> {
 
         fn calc_duel_id(self: @ContractState,
+            player_id: u128,
             tutorial_id: u128,
         ) -> u128 {
             let level: TutorialLevel = tutorial_id.into();
             assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
-            let duel_id: u128 = level.make_duel_id(starknet::get_caller_address());
+            let duel_id: u128 = level.make_duel_id(player_id);
             (duel_id)
         }
 
@@ -122,10 +123,12 @@ pub mod tutorial {
             assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
             assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
 
-            let duel_id: u128 = level.make_duel_id(starknet::get_caller_address());
+            let player_profile: ProfileType = ProfileType::Character(CharacterProfile::UnknownPlayer);
+            let opponent_profile: ProfileType = level.opponent_profile();
+
+            let duel_id: u128 = level.make_duel_id(player_id);
 
             // create Challenge
-            let opponent: ProfileType = level.opponent_profile();
             let challenge = Challenge {
                 duel_id,
                 table_id: TABLES::TUTORIAL,
@@ -134,8 +137,8 @@ pub mod tutorial {
                 // duelists
                 address_a: starknet::get_caller_address(),
                 address_b: starknet::get_caller_address(),
-                duelist_id_a: opponent.duelist_id(), // NPC
-                duelist_id_b: player_id,             // Player  
+                duelist_id_a: opponent_profile.duelist_id(),
+                duelist_id_b: player_profile.duelist_id(),
                 // progress
                 state: ChallengeState::InProgress,
                 winner: 0,
@@ -172,11 +175,10 @@ pub mod tutorial {
             assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
             assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
 
-            let duel_id: u128 = level.make_duel_id(starknet::get_caller_address());
+            let duel_id: u128 = level.make_duel_id(player_id);
             let challenge: Challenge = store.get_challenge(duel_id);
             let mut round: Round = store.get_round(duel_id);
 
-            assert(challenge.duelist_id_b == player_id, Errors::NOT_YOUR_DUEL);
             assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
             assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
 
@@ -199,11 +201,10 @@ pub mod tutorial {
             assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
             assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
 
-            let duel_id: u128 = level.make_duel_id(starknet::get_caller_address());
+            let duel_id: u128 = level.make_duel_id(player_id);
             let mut challenge: Challenge = store.get_challenge(duel_id);
             let mut round: Round = store.get_round(duel_id);
 
-            assert(challenge.duelist_id_b == player_id, Errors::NOT_YOUR_DUEL);
             assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
             assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 

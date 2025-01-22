@@ -28,12 +28,12 @@ use pistols::utils::hash::{hash_values};
 #[generate_trait]
 impl TutorialLevelImpl of TutorialLevelTrait {
     #[inline(always)]
-    fn make_duel_id(self: TutorialLevel, player_address: ContractAddress) -> u128 {
+    fn make_duel_id(self: TutorialLevel, player_id: u128) -> u128 {
         let tutorial_id: u128 = self.into();
         (hash_values([
-            player_address.into(),
+            player_id.into(),
             tutorial_id.into(),
-        ].span()).to_u32_lossy().into())
+        ].span()).to_u128_lossy())
     }
     #[inline(always)]
     fn opponent_profile(self: TutorialLevel) -> ProfileType {

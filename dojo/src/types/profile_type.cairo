@@ -42,6 +42,7 @@ pub enum CharacterProfile {
     Bartender,
     Drunken,
     Devil,
+    UnknownPlayer,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
@@ -60,7 +61,7 @@ pub enum BotProfile {
 mod PROFILES {
     // profile counts
     const DUELIST_PROFILE_COUNT: u8 = 21;
-    const CHARACTER_PROFILE_COUNT: u8 = 3;
+    const CHARACTER_PROFILE_COUNT: u8 = 4;
     const BOT_PROFILE_COUNT: u8 = 3;
 
     // profile base duelist ids
@@ -188,6 +189,10 @@ mod CHARACTER_PROFILES {
     const Devil: ProfileDescription = ProfileDescription {
         profile_id: 3,
         name: 'Devil',
+    };
+    const UnknownPlayer: ProfileDescription = ProfileDescription {
+        profile_id: 4,
+        name: 'Stranger',
     };
 }
 
@@ -357,10 +362,11 @@ impl DuelistProfileIntoDescription of Into<DuelistProfile, ProfileDescription> {
 impl CharacterProfileIntoDescription of Into<CharacterProfile, ProfileDescription> {
     fn into(self: CharacterProfile) -> ProfileDescription {
         match self {
-            CharacterProfile::Unknown =>    CHARACTER_PROFILES::Unknown,
-            CharacterProfile::Bartender =>  CHARACTER_PROFILES::Bartender,
-            CharacterProfile::Drunken =>    CHARACTER_PROFILES::Drunken,
-            CharacterProfile::Devil =>      CHARACTER_PROFILES::Devil,
+            CharacterProfile::Unknown =>       CHARACTER_PROFILES::Unknown,
+            CharacterProfile::Bartender =>     CHARACTER_PROFILES::Bartender,
+            CharacterProfile::Drunken =>       CHARACTER_PROFILES::Drunken,
+            CharacterProfile::Devil =>         CHARACTER_PROFILES::Devil,
+            CharacterProfile::UnknownPlayer => CHARACTER_PROFILES::UnknownPlayer,
         }
     }
 }
@@ -410,6 +416,7 @@ impl U8IntoCharacterProfile of Into<u8, CharacterProfile> {
         if self == 1        { CharacterProfile::Bartender }
         else if self == 2   { CharacterProfile::Drunken }
         else if self == 3   { CharacterProfile::Devil }
+        else if self == 4   { CharacterProfile::UnknownPlayer }
         else                { CharacterProfile::Unknown }
     }
 }
