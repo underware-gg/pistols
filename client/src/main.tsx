@@ -13,14 +13,14 @@ import ErrorModal from '/src/components/modals/ErrorModal'
 import MainPage from '/src/pages/MainPage'
 import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import AdminPage from '/src/pages/internal/AdminPage'
-import ConnectPage from '/src/pages/tests/ConnectPage'
-import IconsPage from '/src/pages/tests/IconsPage'
-import SignPage from '/src/pages/tests/SignPage'
-import TimestampPage from '/src/pages/tests/TimestampPage'
-import TokensPage from '/src/pages/tests/TokensPage'
-import ProfilesPage from './pages/tests/ProfilesPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
 import ErrorPage from '/src/pages/error/ErrorPage'
+import ConnectTestPage from '/src/pages/tests/ConnectTestPage'
+import IconsTestPage from '/src/pages/tests/IconsTestPage'
+import SignTestPage from '/src/pages/tests/SignTestPage'
+import TimestampTestPage from '/src/pages/tests/TimestampTestPage'
+import TokensTestPage from '/src/pages/tests/TokensTestPage'
+import ProfilesTestPage from './pages/tests/ProfilesTestPage'
 
 //
 // REF:
@@ -65,12 +65,12 @@ const router = createBrowserRouter([
   {
     path: '/tests',
     children: [
-      { path: "connect", element: <ConnectPage /> },
-      { path: "icons", element: <IconsPage /> },
-      { path: "sign", element: <SignPage /> },
-      { path: "timestamp", element: <TimestampPage /> },
-      { path: "tokens", element: <TokensPage /> },
-      { path: "profiles", element: <ProfilesPage /> },
+      { path: "connect", element: <ConnectTestPage /> },
+      { path: "icons", element: <IconsTestPage /> },
+      { path: "profiles", element: <ProfilesTestPage /> },
+      { path: "sign", element: <SignTestPage /> },
+      { path: "timestamp", element: <TimestampTestPage /> },
+      { path: "tokens", element: <TokensTestPage /> },
     ],
   },
 ]);

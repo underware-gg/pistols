@@ -16,7 +16,7 @@ type Profiles = {
   [key: string]: constants.ProfileDescription,
 }
 
-export default function ProfilesPage() {
+export default function ProfilesTestPage() {
   return (
     <App>
       <Container>

@@ -5,7 +5,7 @@ import { useAccount } from '@starknet-react/core'
 import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
 import { PlayerDuelistTokensStoreSyncQL, useTokensByOwner } from '/src/stores/duelistTokenStore'
 import { bigintToNumber, useERC721TokenUri } from '@underware_gg/pistols-sdk/utils'
-import { Connect } from './ConnectPage'
+import { Connect } from './ConnectTestPage'
 import App from '/src/components/App'
 
 // const Row = Grid.Row
@@ -16,7 +16,7 @@ const Body = Table.Body
 const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
-export default function TokensPage() {
+export default function TokensTestPage() {
   const { packContractAddress } = usePackTokenContract()
   const { duelistContractAddress } = useDuelistTokenContract()
   const { duelContractAddress } = useDuelTokenContract()

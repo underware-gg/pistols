@@ -26,7 +26,7 @@ const Body = Table.Body
 const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
-export default function ConnectPage() {
+export default function ConnectTestPage() {
   return (
     <App>
       <Container>

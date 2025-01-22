@@ -23,7 +23,7 @@ const starknetDomain = {
   revision: '1',
 }
 
-export default function SignPage() {
+export default function SignTestPage() {
   return (
     <App>
       <Container>
