@@ -25,6 +25,10 @@ pub trait ITutorial<TState> {
         salt: felt252,
         moves: Span<u8>,
     );
+
+    //
+    // view calls
+    fn calc_duel_id(self: @TState, tutorial_id: u128) -> u128;
 }
 
 #[dojo::contract]
@@ -96,9 +100,17 @@ pub mod tutorial {
         }
     }
 
-    // impl: implement functions specified in trait
     #[abi(embed_v0)]
     impl ActionsImpl of super::ITutorial<ContractState> {
+
+        fn calc_duel_id(self: @ContractState,
+            tutorial_id: u128,
+        ) -> u128 {
+            let level: TutorialLevel = tutorial_id.into();
+            assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
+            let duel_id: u128 = level.make_duel_id(starknet::get_caller_address());
+            (duel_id)
+        }
 
         fn create_tutorial(ref self: ContractState,
             player_id: u128,

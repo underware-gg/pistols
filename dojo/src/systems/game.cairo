@@ -161,7 +161,6 @@ pub mod game {
         }
     }
 
-    // impl: implement functions specified in trait
     #[abi(embed_v0)]
     impl ActionsImpl of super::IGame<ContractState> {
 

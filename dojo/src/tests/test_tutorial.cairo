@@ -26,13 +26,9 @@ mod tests {
     use pistols::tests::tester::{tester,
         tester::{
             TestSystems,
-            IGameDispatcher, IGameDispatcherTrait,
-            IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
-            IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
-            IFameCoinDispatcher, IFameCoinDispatcherTrait,
+            ITutorialDispatcher, ITutorialDispatcherTrait,
             FLAGS, ID, ZERO,
             OWNER, OTHER, BUMMER, TREASURY, FAKE_OWNER_OF_1,
-            _assert_is_alive, _assert_is_dead,
         }
     };
     use pistols::tests::prefabs::{prefabs,
@@ -71,9 +67,12 @@ mod tests {
 
     fn _test_tutorial_create(tutorial_id: u128, profile: ProfileType) {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
+        tester::impersonate(OWNER());
+        let calc_duel_id: u128 = sys.tut.calc_duel_id(tutorial_id);
         let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
         let level: TutorialLevel = tutorial_id.into();
-        assert!(duel_id == level.make_duel_id(OWNER()), "duel_id");
+        assert!(duel_id == calc_duel_id, "calc_duel_id");
+        assert!(duel_id == level.make_duel_id(OWNER()), "level.make_duel_id");
         let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
         let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
         assert!(challenge.state == ChallengeState::InProgress, "challenge.state");
