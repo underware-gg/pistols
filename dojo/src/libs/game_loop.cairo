@@ -63,7 +63,7 @@ fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
 fn game_loop(wrapped: @RngWrap, deck: @Deck, ref round: Round) -> DuelProgress {
     // let _table_type: TableType = store.get_table_config_value(challenge.table_id).table_type;
 
-    let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck().span();
+    let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck();
 
     let seed: felt252 = round.make_seed();
     let mut dice: Dice = DiceTrait::new(wrapped, seed);

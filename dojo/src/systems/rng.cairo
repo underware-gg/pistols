@@ -3,7 +3,7 @@ use pistols::systems::rng_mock::{MockedValue, RngWrap, RngWrapTrait};
 
 #[starknet::interface]
 pub trait IRng<TState> {
-    fn reseed(self: @TState, seed: felt252, salt: felt252, map: Span<MockedValue>) -> felt252;
+    fn reseed(self: @TState, seed: felt252, salt: felt252, mocked: Span<MockedValue>) -> felt252;
     fn is_mocked(self: @TState) -> bool;
 }
 
@@ -18,7 +18,7 @@ pub mod rng {
 
     #[abi(embed_v0)]
     impl RngImpl of IRng<ContractState> {
-        fn reseed(self: @ContractState, seed: felt252, salt: felt252, map: Span<MockedValue>) -> felt252 {
+        fn reseed(self: @ContractState, seed: felt252, salt: felt252, mocked: Span<MockedValue>) -> felt252 {
             let new_seed: felt252 = hash_values([seed.into(), salt].span());
             (new_seed)
         }
@@ -39,7 +39,7 @@ pub struct Dice {
     rng: IRngDispatcher,
     seed: felt252,
     last_dice: u8,
-    map: Span<MockedValue>,
+    mocked: Span<MockedValue>,
 }
 
 #[generate_trait]
@@ -49,13 +49,13 @@ impl DiceImpl of DiceTrait {
             rng: IRngDispatcher{ contract_address: *wrapped.rng_address },
             seed: initial_seed,
             last_dice: 0,
-            map: *wrapped.map,
+            mocked: *wrapped.mocked,
         })
     }
 
     // returns a random number between 1 and <faces>
     fn reseed(ref self: Dice, salt: felt252) {
-        self.seed = self.rng.reseed(self.seed, salt, self.map);
+        self.seed = self.rng.reseed(self.seed, salt, self.mocked);
     }
 
     // returns a random number between 1 and <faces>
@@ -91,7 +91,7 @@ pub struct Shuffle {
 impl ShuffleImpl of ShuffleTrait {
     fn new(wrapped: @RngWrap, initial_seed: felt252, shuffle_size: u8, salt: felt252) -> Shuffle {
         let rng = IRngDispatcher{ contract_address: *wrapped.rng_address };
-        let seed: felt252 = rng.reseed(initial_seed, salt, *wrapped.map);
+        let seed: felt252 = rng.reseed(initial_seed, salt, *wrapped.mocked);
         let mut shuffler = ShufflerTrait::new(shuffle_size);
         shuffler.mocked = rng.is_mocked();
         (Shuffle {

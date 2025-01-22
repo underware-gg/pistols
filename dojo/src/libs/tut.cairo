@@ -11,23 +11,29 @@ pub enum TutorialLevel {
 //--------------------------------
 // Traits
 //
+use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
 use pistols::types::profile_type::{ProfileType,CharacterProfile};
+use pistols::types::cards::{
+    hand::{DuelistHand, DuelistHandTrait},
+    paces::{PacesCard, PacesCardTrait},
+    tactics::{TacticsCard, TacticsCardTrait},
+    blades::{BladesCard, BladesCardTrait},
+    env::{ENV_DICES},
+};
+use pistols::utils::arrays::{ArrayUtilsTrait};
 use pistols::utils::misc::{FeltToLossy};
 use pistols::utils::hash::{hash_values};
 
 #[generate_trait]
-impl TutorialImpl of TutorialTrait {
+impl TutorialLevelImpl of TutorialLevelTrait {
     #[inline(always)]
-    fn make_duel_id(player_address: ContractAddress, tutorial_id: u128) -> u128 {
+    fn make_duel_id(self: TutorialLevel, player_address: ContractAddress) -> u128 {
+        let tutorial_id: u128 = self.into();
         (hash_values([
             player_address.into(),
             tutorial_id.into(),
         ].span()).to_u32_lossy().into())
     }
-}
-
-#[generate_trait]
-impl TutorialLevelImpl of TutorialLevelTrait {
     #[inline(always)]
     fn opponent_profile(self: TutorialLevel) -> ProfileType {
         match self {
@@ -36,12 +42,87 @@ impl TutorialLevelImpl of TutorialLevelTrait {
             _ => ProfileType::Undefined,
         }
     }
+    fn make_moves(self: TutorialLevel, player_hand: DuelistHand) -> (Span<u8>, Span<MockedValue>) {
+        let mut npc_hand: DuelistHand = Default::default();
+        let mut mocked: Array<MockedValue> = array![];
+        let mut env_cards: Array<felt252> = array![];
+        match self {
+            TutorialLevel::Level1 => {
+                //
+                // Level 1: Paces only, player wins
+                //
+                match player_hand.card_fire {
+                    PacesCard::Paces1 => {
+                        // NPC never shoots
+                        npc_hand.card_dodge = PacesCard::Paces2;
+                        npc_hand.card_fire = PacesCard::Paces3;
+                        env_cards.append(ENV_DICES::DOUBLE_DAMAGE_UP);
+                    },
+                    PacesCard::Paces2 => {
+                        // NPC just trips and die
+                        npc_hand.card_dodge = PacesCard::Paces1;
+                        npc_hand.card_fire = PacesCard::Paces3;
+                        env_cards.append(ENV_DICES::CHANCES_DOWN);
+                        env_cards.append(ENV_DICES::DOUBLE_DAMAGE_UP);
+                    },
+                    _ => {
+                        // NPC fires when player dodges
+                        // else trips and shoot!
+                        npc_hand.card_fire = if (player_hand.card_dodge.is_before(player_hand.card_fire)) {player_hand.card_dodge} else {PacesCard::Paces2};
+                        npc_hand.card_dodge = if (npc_hand.card_fire == PacesCard::Paces1) {PacesCard::Paces2} else {PacesCard::Paces1};
+                        let pace: u8 = player_hand.card_fire.into();
+                        // use last <paces> cards from...
+                        env_cards.extend_from_span(array![
+                            ENV_DICES::CHANCES_DOWN,
+                            ENV_DICES::CHANCES_UP,
+                            ENV_DICES::CHANCES_DOWN,
+                            ENV_DICES::CHANCES_UP,
+                            ENV_DICES::DOUBLE_TACTICS,
+                            ENV_DICES::DAMAGE_DOWN,
+                            ENV_DICES::DAMAGE_UP,
+                            ENV_DICES::NO_TACTICS,
+                            ENV_DICES::DAMAGE_UP,
+                            ENV_DICES::DAMAGE_UP,
+                        ].span().slice((10 - pace).into(), pace.into()));
+                    },
+                };
+                // fire dices
+                mocked.append(MockedValueTrait::new('shoot_a', 99)); // NPC always misses
+                mocked.append(MockedValueTrait::new('shoot_b', 1));  // Player always hits
+            },
+            TutorialLevel::Level2 => {
+                //
+                // Level 2: Full deck, player loses
+                //
+
+                // fire dices
+                mocked.append(MockedValueTrait::new('shoot_a', 1)); // NPC always hits
+                mocked.append(MockedValueTrait::new('shoot_b', 99));  // Player always misses
+            },
+            _ => {},
+        };
+        mocked.append(MockedValueTrait::new_shuffled('env', env_cards.span()));
+        (npc_hand.to_span(), mocked.span())
+    }
 }
 
+
+//--------------------------------
+// converters
+//
 impl U128IntoTutorialLevel of Into<u128, TutorialLevel> {
     fn into(self: u128) -> TutorialLevel {
         if self == 1        { TutorialLevel::Level1 }
         else if self == 2   { TutorialLevel::Level2 }
         else                { TutorialLevel::Undefined }
+    }
+}
+impl TutorialLevelIntoU128 of Into<TutorialLevel, u128> {
+    fn into(self: TutorialLevel) -> u128 {
+        match self {
+            TutorialLevel::Level1       => 1,
+            TutorialLevel::Level2       => 2,
+            TutorialLevel::Undefined    => 0,
+        }
     }
 }

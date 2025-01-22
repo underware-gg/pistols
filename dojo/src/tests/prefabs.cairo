@@ -22,6 +22,7 @@ mod prefabs {
         }
     };
     use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait, ShufflerTrait};
+    use pistols::types::cards::env::{ENV_DICES};
 
     const NAME_A: felt252 = 'Sensei';
     const NAME_B: felt252 = 'Senpai';
@@ -33,10 +34,10 @@ mod prefabs {
     const SALT_A: felt252 = 0xa6f099b756a87e62;
     const SALT_B: felt252 = 0xf9a978e92309da78;
 
-    // from EnvCard::get_full_deck()
-    const ENV_CARD_NEUTRAL: felt252 = 33;   // EnvCard::SpecialDoubleTactics
-    const ENV_CARD_MISS: felt252 = 8;       // EnvCard::DamageDown
-    const ENV_CARD_CRIT: felt252 = 25;      // EnvCard::DoubleDamageUp
+    // sync from EnvCard::get_full_deck()
+    const ENV_CARD_NEUTRAL: felt252 = ENV_DICES::DOUBLE_TACTICS;
+    const ENV_CARD_MISS: felt252 = ENV_DICES::DAMAGE_DOWN;
+    const ENV_CARD_CRIT: felt252 = ENV_DICES::DOUBLE_DAMAGE_UP;
 
 
     #[derive(Copy, Drop)]

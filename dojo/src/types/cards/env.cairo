@@ -165,7 +165,7 @@ impl EnvCardImpl of EnvCardTrait {
             }
         }
     }
-    fn get_full_deck() -> Array<EnvCard> {
+    fn get_full_deck() -> Span<EnvCard> {
         (array![
             // 7
             EnvCard::DamageUp, // dice: 1
@@ -208,10 +208,24 @@ impl EnvCardImpl of EnvCardTrait {
             EnvCard::SpecialAllShotsMiss,  // dice: 32
             EnvCard::SpecialDoubleTactics, // dice: 33
             EnvCard::SpecialNoTactics,     // dice: 34
-        ])
+        ].span())
     }
 }
 
+pub mod ENV_DICES {
+    // dice positions for tutorial and testing
+    // sync from EnvCard::get_full_deck()
+    const DAMAGE_UP: felt252 = 1;
+    const DAMAGE_DOWN: felt252 = 8;
+    const CHANCES_UP: felt252 = 13;
+    const CHANCES_DOWN: felt252 = 20;
+    const DOUBLE_DAMAGE_UP: felt252 = 25;
+    const DOUBLE_CHANCES_UP: felt252 = 28;
+    const ALL_SHOTS_HIT: felt252 = 31;
+    const ALL_SHOTS_MISS: felt252 = 32;
+    const DOUBLE_TACTICS: felt252 = 33;
+    const NO_TACTICS: felt252 = 34;
+}
 
 //--------------------
 // converters

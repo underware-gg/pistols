@@ -32,12 +32,20 @@ impl FinalBlowDefault of Default<FinalBlow> {
 
 #[generate_trait]
 impl DuelistHandImpl of DuelistHandTrait {
-    fn draw_card(self:DuelistHand, pace: PacesCard) -> DuelistDrawnCard {
+    fn draw_card(self: DuelistHand, pace: PacesCard) -> DuelistDrawnCard {
         (
             if (self.card_fire == pace) {DuelistDrawnCard::Fire(pace)}
             else if (self.card_dodge == pace) {DuelistDrawnCard::Dodge(pace)}
             else {DuelistDrawnCard::None}
         )
+    }
+    fn to_span(self: DuelistHand) -> Span<u8> {
+        ([
+            self.card_fire.into(),
+            self.card_dodge.into(),
+            self.card_tactics.into(),
+            self.card_blades.into(),
+        ].span())
     }
 }
 

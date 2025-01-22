@@ -24,9 +24,20 @@ use pistols::types::cards::deck::{DeckType};
 
 #[generate_trait]
 impl PacesCardImpl of PacesCardTrait {
+    #[inline(always)]
     fn to_felt(self: PacesCard) -> felt252 {
         let result: u8 = self.into();
         (result.into())
+    }
+    #[inline(always)]
+    fn is_before(self: PacesCard, other: PacesCard) -> bool {
+        let pace: u8 = self.into();
+        (pace < other.into())
+    }
+    #[inline]
+    fn is_after(self: PacesCard, other: PacesCard) -> bool {
+        let pace: u8 = self.into();
+        (pace > other.into())
     }
     fn honour(self: PacesCard) -> u8 {
         match self {
@@ -43,6 +54,7 @@ impl PacesCardImpl of PacesCardTrait {
             PacesCard::None => 0,
         }
     }
+    #[inline(always)]
     fn build_deck(deck_type: DeckType) -> Span<u8> {
         (array![
             PacesCard::Paces1.into(),

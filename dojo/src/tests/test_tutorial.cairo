@@ -16,7 +16,7 @@ mod tests {
     use pistols::types::round_state::{RoundState, RoundStateTrait};
     use pistols::types::duel_progress::{DuelistDrawnCard};
     use pistols::types::premise::{Premise, PremiseTrait};
-    use pistols::libs::tut::{TutorialLevel, TutorialTrait};
+    use pistols::libs::tut::{TutorialLevel, TutorialLevelTrait};
     use pistols::libs::game_loop::{make_moves_hash};
     use pistols::types::constants::{CONST, HONOUR};
     use pistols::utils::arrays::{SpanUtilsTrait};
@@ -72,7 +72,8 @@ mod tests {
     fn _test_tutorial_create(tutorial_id: u128, profile: ProfileType) {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
         let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
-        assert!(duel_id == TutorialTrait::make_duel_id(OWNER(), tutorial_id), "duel_id");
+        let level: TutorialLevel = tutorial_id.into();
+        assert!(duel_id == level.make_duel_id(OWNER()), "duel_id");
         let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
         let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
         assert!(challenge.state == ChallengeState::InProgress, "challenge.state");
@@ -121,19 +122,19 @@ mod tests {
         // check deck
         let challenge: Challenge = tester::get_Challenge(sys.world, duel_id);
         assert!(challenge.get_deck_type() == DeckType::PacesOnly, "challenge.deck_type");
-        // // commit
-        // let moves: Span<u8> = [pace.into(), dodge.into()].span();
-        // let hashed: u128 = make_moves_hash(SALT_A, moves);
-        // tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), tutorial_id, hashed);
-        // let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
-        // assert!(round.state == RoundState::Reveal, "round.state");
-        // assert!(round.moves_a.hashed > 0, "round.moves_a.hashed");
-        // assert!(round.moves_b.hashed == hashed, "round.moves_b.hashed");
-        // // reveal
-        // tester::execute_reveal_moves_tutorial(@sys.tut, OWNER(), tutorial_id, SALT_A, moves);
-        // let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
-        // assert!(challenge.state == ChallengeState::Resolved, "challenge.state");
-        // assert!(challenge.winner == 2, "challenge.winner");
+        // commit
+        let moves: Span<u8> = [pace.into(), dodge.into()].span();
+        let hashed: u128 = make_moves_hash(SALT_A, moves);
+        tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), tutorial_id, hashed);
+        let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
+        assert!(round.state == RoundState::Reveal, "round.state");
+        assert!(round.moves_a.hashed > 0, "round.moves_a.hashed");
+        assert!(round.moves_b.hashed == hashed, "round.moves_b.hashed");
+        // reveal
+        tester::execute_reveal_moves_tutorial(@sys.tut, OWNER(), tutorial_id, SALT_A, moves);
+        let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
+        assert!(challenge.state == ChallengeState::Resolved, "challenge.state");
+        assert!(challenge.winner == 2, "challenge.winner");
     }
 
     #[test]

@@ -17,6 +17,9 @@ pub use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 //
 
 
+//--------------------------------
+// mocked values
+//
 #[derive(Copy, Drop, Serde, Default)]
 #[dojo::model]
 // #[dojo::model(namespace:"mock", nomapping: true)]
@@ -27,13 +30,29 @@ pub struct MockedValue {
     pub value: felt252,
     pub exists: bool,
 }
+#[generate_trait]
+impl MockedValueImpl of MockedValueTrait {
+    #[inline(always)]
+    fn new(salt: felt252, value: felt252) -> MockedValue {
+        (MockedValue {
+            salt,
+            value,
+            exists: true,
+        })
+    }
+    fn new_shuffled(salt: felt252, values: Span<felt252>) -> MockedValue {
+        (Self::new(salt, ShufflerTrait::mocked_seed(values)))
+    }
+}
 
+//--------------------------------
+// rng wrapper
+//
 #[derive(Copy, Drop, Serde)]
 pub struct RngWrap {
     pub rng_address: ContractAddress,
-    pub map: Span<MockedValue>,
+    pub mocked: Span<MockedValue>,
 }
-
 #[generate_trait]
 impl RngWrapImpl of RngWrapTrait {
     #[inline(always)]
@@ -41,18 +60,21 @@ impl RngWrapImpl of RngWrapTrait {
         (Self::wrap(rng_address, [].span()))
     }
     #[inline(always)]
-    fn wrap(rng_address: ContractAddress, map: Span<MockedValue>) -> @RngWrap {
+    fn wrap(rng_address: ContractAddress, mocked: Span<MockedValue>) -> @RngWrap {
         (@RngWrap {
             rng_address,
-            map,
+            mocked,
         })
     }
 }
 
+//--------------------------------
+// rng_mock contract
+//
 #[starknet::interface]
 pub trait IRngMock<TState> {
     // IRng
-    fn reseed(self: @TState, seed: felt252, salt: felt252, map: Span<MockedValue>) -> felt252;
+    fn reseed(self: @TState, seed: felt252, salt: felt252, mocked: Span<MockedValue>) -> felt252;
     fn is_mocked(self: @TState) -> bool;
     // IMocker
     fn set_mocked_values(ref self: TState, salts: Span<felt252>, values: Span<felt252>);
@@ -79,14 +101,14 @@ pub mod rng_mock {
 
     #[abi(embed_v0)]
     impl RngImpl of IRng<ContractState> {
-        fn reseed(self: @ContractState, seed: felt252, salt: felt252, map: Span<MockedValue>) -> felt252 {
+        fn reseed(self: @ContractState, seed: felt252, salt: felt252, mocked: Span<MockedValue>) -> felt252 {
             //
-            // look for value in map
+            // look for value in mocked map
             // (used on tutorials)
             let mut found: MockedValue = Default::default();
             let mut i: usize = 0;
-            while (i < map.len()) {
-                let v: MockedValue = *map.at(i);
+            while (i < mocked.len()) {
+                let v: MockedValue = *mocked.at(i);
                 if (v.salt == salt) {
                     found = v;
                     found.exists = true;

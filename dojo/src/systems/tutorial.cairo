@@ -70,7 +70,7 @@ pub mod tutorial {
     use pistols::utils::misc::{ZERO};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::game_loop::{game_loop, make_moves_hash};
-    use pistols::libs::tut::{TutorialTrait, TutorialLevel, TutorialLevelTrait};
+    use pistols::libs::tut::{TutorialLevel, TutorialLevelTrait};
 
     mod Errors {
         const INVALID_TUTORIAL_LEVEL: felt252       = 'TUTORIAL: Invalid level';
@@ -106,15 +106,16 @@ pub mod tutorial {
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
-            assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
-
             let level: TutorialLevel = tutorial_id.into();
             assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
+            assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
+
+            let duel_id: u128 = level.make_duel_id(starknet::get_caller_address());
 
             // create Challenge
             let opponent: ProfileType = level.opponent_profile();
             let challenge = Challenge {
-                duel_id: TutorialTrait::make_duel_id(starknet::get_caller_address(), tutorial_id),
+                duel_id,
                 table_id: TABLES::TUTORIAL,
                 premise: Premise::Tutorial,
                 quote: 0,
@@ -155,7 +156,11 @@ pub mod tutorial {
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
 
-            let duel_id: u128 = TutorialTrait::make_duel_id(starknet::get_caller_address(), tutorial_id);
+            let level: TutorialLevel = tutorial_id.into();
+            assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
+            assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
+
+            let duel_id: u128 = level.make_duel_id(starknet::get_caller_address());
             let challenge: Challenge = store.get_challenge(duel_id);
             let mut round: Round = store.get_round(duel_id);
 
@@ -178,7 +183,11 @@ pub mod tutorial {
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
 
-            let duel_id: u128 = TutorialTrait::make_duel_id(starknet::get_caller_address(), tutorial_id);
+            let level: TutorialLevel = tutorial_id.into();
+            assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
+            assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
+
+            let duel_id: u128 = level.make_duel_id(starknet::get_caller_address());
             let mut challenge: Challenge = store.get_challenge(duel_id);
             let mut round: Round = store.get_round(duel_id);
 
@@ -186,24 +195,17 @@ pub mod tutorial {
             assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
             assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
-            // validate moves
-            // since the hash was validated
-            // we should not validate the actual moves
-            // all we can do is skip if they are invalid
+            // store player moves
             assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
-
-            // TODO: calculate salts and moves
-            // TODO: set vrf moves
-            let vrf_map: Span<MockedValue> = [].span();
-            let npc_moves: Span<u8> = [].span();
-
-            // store salts and moves
-            round.moves_a.initialize(0xffff, npc_moves);
             round.moves_b.initialize(0xffff, moves);
+
+            // make NP moves
+            let (npc_moves, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(round.moves_b.as_hand());
+            round.moves_a.initialize(0xffff, npc_moves);
 
             // execute game loop...
             let deck: Deck = challenge.get_deck();
-            let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), vrf_map);
+            let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), mocked);
             let progress: DuelProgress = game_loop(wrapped, @deck, ref round);
             store.set_round(@round);
 
