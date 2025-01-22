@@ -1864,8 +1864,8 @@
       ]
     },
     {
-      "address": "0x14dca39196b5026afbf1fef48426baed1a0eed198129d71d1087ef2a2990183",
-      "class_hash": "0x685998b77ecdf5f6cc4e6ee06f5c351d48830049bd340b31e29b48eaec49005",
+      "address": "0x631c2cfd3ebb511e8589663195bdf9ab110a29364e9859dfd7ff79ffb852fdf",
+      "class_hash": "0x1f580de874a49707039ea75bb6fd1a2473ffda96ff20fb40a71a7a38ff9e2a",
       "abi": [
         {
           "type": "impl",
@@ -2998,8 +2998,8 @@
       ]
     },
     {
-      "address": "0x5ee662a1ca1f2446d06b2a68af090c980d396653db4da1a70f9e9919b5b1771",
-      "class_hash": "0x2dea0c00b81812bbaa61835fb57c68fe4ca2c26161f3b5adde8f5a382edeb32",
+      "address": "0x4e190a941fc84ea144c073e5aac97512bcc1f1f82cb71b611b64c4026fbbf34",
+      "class_hash": "0x666561a9d735da3e7073510ca8b8533722693caf728e916ad0b46baa73e91fc",
       "abi": [
         {
           "type": "impl",
@@ -4628,8 +4628,8 @@
       ]
     },
     {
-      "address": "0x1b9e22e1611281d76cd46b508a05e4fabc175412d6dce5e81b1103e7514613d",
-      "class_hash": "0x5a53ffb62bca6a2376f123eae86e770f406f26488bab3ad5eb229b4face49a2",
+      "address": "0x7ed13e270feaab02d71c1e29ad0b1542e6cf002301463a3e43412a9091d6cd",
+      "class_hash": "0xe947adce25a1879eb41af5a2c8255663d123b3aadba84296cd672e05bb650e",
       "abi": [
         {
           "type": "impl",
@@ -7450,8 +7450,8 @@
       ]
     },
     {
-      "address": "0x5b6575c50b602179bfb8833dc2f8547d6eba9ba61a9c1637ed1a95cff8a919e",
-      "class_hash": "0x75cc51fc3b67768d9e7d169b9bde1b215d556991cce92e624f78128e3dfe98f",
+      "address": "0x3a09d44abee9dc77af06a19e0740b5b4e1da79f5dcd9d2b818b90c7e8d1b3a",
+      "class_hash": "0x3c2157930e604bd3b9d773513c2485463f833cc7968e71a6b844770248f9f70",
       "abi": [
         {
           "type": "impl",
@@ -7597,6 +7597,10 @@
               "type": "function",
               "name": "calc_duel_id",
               "inputs": [
+                {
+                  "name": "player_id",
+                  "type": "core::integer::u128"
+                },
                 {
                   "name": "tutorial_id",
                   "type": "core::integer::u128"
@@ -7992,7 +7996,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x185fc296aa7bd7739ff717243ce7e842100934315060e56058b4ca3900db5e4",
+      "class_hash": "0x7c0d5c908f9a2e2bd8efd59428779bc74aba795254e41b85aaa1bd21c87fe08",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
