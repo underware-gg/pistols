@@ -294,7 +294,7 @@ export enum CharacterProfile {
   Bartender = 'Bartender', // 1
   Drunken = 'Drunken', // 2
   Devil = 'Devil', // 3
-  UnknownPlayer = 'UnknownPlayer', // 4
+  Player = 'Player', // 4
 };
 export const getCharacterProfileValue = (name: CharacterProfile): number | undefined => _indexOrUndefined(Object.keys(CharacterProfile).indexOf(name));
 export const getCharacterProfileFromValue = (value: number): CharacterProfile | undefined => Object.keys(CharacterProfile)[value] as CharacterProfile;
@@ -942,7 +942,7 @@ type type_CHARACTER_PROFILES = {
   Bartender: ProfileDescription, // cairo: ProfileDescription
   Drunken: ProfileDescription, // cairo: ProfileDescription
   Devil: ProfileDescription, // cairo: ProfileDescription
-  UnknownPlayer: ProfileDescription, // cairo: ProfileDescription
+  Player: ProfileDescription, // cairo: ProfileDescription
 };
 export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
   Unknown: {
@@ -961,7 +961,7 @@ export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
     profile_id: 3,
     name: 'Devil',
   },
-  UnknownPlayer: {
+  Player: {
     profile_id: 4,
     name: 'Stranger',
   },

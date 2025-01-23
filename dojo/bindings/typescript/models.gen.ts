@@ -542,7 +542,7 @@ export type CharacterProfile = {
 	Bartender: string;
 	Drunken: string;
 	Devil: string;
-	UnknownPlayer: string;
+	Player: string;
 }
 export type CharacterProfileEnum = CairoCustomEnum;
 

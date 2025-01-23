@@ -50,8 +50,8 @@ echo ">>> Do migrations..."
 sozo -P $PROFILE $ARG_OFFLINE migrate --world $WORLD_ADDRESS
 echo "👍"
 
-echo ">>> Inspect again..."
-sozo -P $PROFILE $ARG_OFFLINE inspect --world $WORLD_ADDRESS
+# echo ">>> Inspect again..."
+# sozo -P $PROFILE $ARG_OFFLINE inspect --world $WORLD_ADDRESS
 
 #-----------------
 # auth write

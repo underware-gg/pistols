@@ -21,23 +21,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_fame_coin_allowance_calldata = (owner: string, spender: string): DojoCall => {
-		return {
-			contractName: "fame_coin",
-			entrypoint: "allowance",
-			calldata: [owner, spender],
-		};
-	};
-
-	const fame_coin_allowance = async (owner: string, spender: string) => {
-		try {
-			return await provider.call("pistols", build_fame_coin_allowance_calldata(owner, spender));
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_lords_mock_allowance_calldata = (owner: string, spender: string): DojoCall => {
 		return {
 			contractName: "lords_mock",
@@ -55,6 +38,23 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_fame_coin_allowance_calldata = (owner: string, spender: string): DojoCall => {
+		return {
+			contractName: "fame_coin",
+			entrypoint: "allowance",
+			calldata: [owner, spender],
+		};
+	};
+
+	const fame_coin_allowance = async (owner: string, spender: string) => {
+		try {
+			return await provider.call("pistols", build_fame_coin_allowance_calldata(owner, spender));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_admin_amIAdmin_calldata = (accountAddress: string): DojoCall => {
 		return {
 			contractName: "admin",
@@ -66,6 +66,48 @@ export function setupWorld(provider: DojoProvider) {
 	const admin_amIAdmin = async (accountAddress: string) => {
 		try {
 			return await provider.call("pistols", build_admin_amIAdmin_calldata(accountAddress));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_lords_mock_approve_calldata = (spender: string, amount: BigNumberish): DojoCall => {
+		return {
+			contractName: "lords_mock",
+			entrypoint: "approve",
+			calldata: [spender, amount],
+		};
+	};
+
+	const lords_mock_approve = async (snAccount: Account | AccountInterface, spender: string, amount: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_lords_mock_approve_calldata(spender, amount),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_fame_coin_approve_calldata = (spender: string, amount: BigNumberish): DojoCall => {
+		return {
+			contractName: "fame_coin",
+			entrypoint: "approve",
+			calldata: [spender, amount],
+		};
+	};
+
+	const fame_coin_approve = async (snAccount: Account | AccountInterface, spender: string, amount: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_fame_coin_approve_calldata(spender, amount),
+				"pistols",
+			);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -135,42 +177,34 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_fame_coin_approve_calldata = (spender: string, amount: BigNumberish): DojoCall => {
+	const build_lords_mock_balanceOf_calldata = (account: string): DojoCall => {
 		return {
-			contractName: "fame_coin",
-			entrypoint: "approve",
-			calldata: [spender, amount],
+			contractName: "lords_mock",
+			entrypoint: "balanceOf",
+			calldata: [account],
 		};
 	};
 
-	const fame_coin_approve = async (snAccount: Account | AccountInterface, spender: string, amount: BigNumberish) => {
+	const lords_mock_balanceOf = async (account: string) => {
 		try {
-			return await provider.execute(
-				snAccount,
-				build_fame_coin_approve_calldata(spender, amount),
-				"pistols",
-			);
+			return await provider.call("pistols", build_lords_mock_balanceOf_calldata(account));
 		} catch (error) {
 			console.error(error);
 			throw error;
 		}
 	};
 
-	const build_lords_mock_approve_calldata = (spender: string, amount: BigNumberish): DojoCall => {
+	const build_fame_coin_balanceOf_calldata = (account: string): DojoCall => {
 		return {
-			contractName: "lords_mock",
-			entrypoint: "approve",
-			calldata: [spender, amount],
+			contractName: "fame_coin",
+			entrypoint: "balanceOf",
+			calldata: [account],
 		};
 	};
 
-	const lords_mock_approve = async (snAccount: Account | AccountInterface, spender: string, amount: BigNumberish) => {
+	const fame_coin_balanceOf = async (account: string) => {
 		try {
-			return await provider.execute(
-				snAccount,
-				build_lords_mock_approve_calldata(spender, amount),
-				"pistols",
-			);
+			return await provider.call("pistols", build_fame_coin_balanceOf_calldata(account));
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -222,40 +256,6 @@ export function setupWorld(provider: DojoProvider) {
 	const duelist_token_balanceOf = async (account: string) => {
 		try {
 			return await provider.call("pistols", build_duelist_token_balanceOf_calldata(account));
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_fame_coin_balanceOf_calldata = (account: string): DojoCall => {
-		return {
-			contractName: "fame_coin",
-			entrypoint: "balanceOf",
-			calldata: [account],
-		};
-	};
-
-	const fame_coin_balanceOf = async (account: string) => {
-		try {
-			return await provider.call("pistols", build_fame_coin_balanceOf_calldata(account));
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_lords_mock_balanceOf_calldata = (account: string): DojoCall => {
-		return {
-			contractName: "lords_mock",
-			entrypoint: "balanceOf",
-			calldata: [account],
-		};
-	};
-
-	const lords_mock_balanceOf = async (account: string) => {
-		try {
-			return await provider.call("pistols", build_lords_mock_balanceOf_calldata(account));
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -550,19 +550,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_tutorial_commitMoves_calldata = (playerId: BigNumberish, tutorialId: BigNumberish, hashed: BigNumberish): DojoCall => {
+	const build_tutorial_commitMoves_calldata = (duelistId: BigNumberish, duelId: BigNumberish, hashed: BigNumberish): DojoCall => {
 		return {
 			contractName: "tutorial",
 			entrypoint: "commit_moves",
-			calldata: [playerId, tutorialId, hashed],
+			calldata: [duelistId, duelId, hashed],
 		};
 	};
 
-	const tutorial_commitMoves = async (snAccount: Account | AccountInterface, playerId: BigNumberish, tutorialId: BigNumberish, hashed: BigNumberish) => {
+	const tutorial_commitMoves = async (snAccount: Account | AccountInterface, duelistId: BigNumberish, duelId: BigNumberish, hashed: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_tutorial_commitMoves_calldata(playerId, tutorialId, hashed),
+				build_tutorial_commitMoves_calldata(duelistId, duelId, hashed),
 				"pistols",
 			);
 		} catch (error) {
@@ -655,23 +655,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_fame_coin_decimals_calldata = (): DojoCall => {
-		return {
-			contractName: "fame_coin",
-			entrypoint: "decimals",
-			calldata: [],
-		};
-	};
-
-	const fame_coin_decimals = async () => {
-		try {
-			return await provider.call("pistols", build_fame_coin_decimals_calldata());
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_lords_mock_decimals_calldata = (): DojoCall => {
 		return {
 			contractName: "lords_mock",
@@ -683,6 +666,23 @@ export function setupWorld(provider: DojoProvider) {
 	const lords_mock_decimals = async () => {
 		try {
 			return await provider.call("pistols", build_lords_mock_decimals_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_fame_coin_decimals_calldata = (): DojoCall => {
+		return {
+			contractName: "fame_coin",
+			entrypoint: "decimals",
+			calldata: [],
+		};
+	};
+
+	const fame_coin_decimals = async () => {
+		try {
+			return await provider.call("pistols", build_fame_coin_decimals_calldata());
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -874,6 +874,23 @@ export function setupWorld(provider: DojoProvider) {
 	const game_getDuelDeck = async (duelId: BigNumberish) => {
 		try {
 			return await provider.call("pistols", build_game_getDuelDeck_calldata(duelId));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_tutorial_getDuelProgress_calldata = (duelId: BigNumberish): DojoCall => {
+		return {
+			contractName: "tutorial",
+			entrypoint: "get_duel_progress",
+			calldata: [duelId],
+		};
+	};
+
+	const tutorial_getDuelProgress = async (duelId: BigNumberish) => {
+		try {
+			return await provider.call("pistols", build_tutorial_getDuelProgress_calldata(duelId));
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1372,6 +1389,40 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_lords_mock_name_calldata = (): DojoCall => {
+		return {
+			contractName: "lords_mock",
+			entrypoint: "name",
+			calldata: [],
+		};
+	};
+
+	const lords_mock_name = async () => {
+		try {
+			return await provider.call("pistols", build_lords_mock_name_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_fame_coin_name_calldata = (): DojoCall => {
+		return {
+			contractName: "fame_coin",
+			entrypoint: "name",
+			calldata: [],
+		};
+	};
+
+	const fame_coin_name = async () => {
+		try {
+			return await provider.call("pistols", build_fame_coin_name_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_duel_token_name_calldata = (): DojoCall => {
 		return {
 			contractName: "duel_token",
@@ -1417,40 +1468,6 @@ export function setupWorld(provider: DojoProvider) {
 	const duelist_token_name = async () => {
 		try {
 			return await provider.call("pistols", build_duelist_token_name_calldata());
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_fame_coin_name_calldata = (): DojoCall => {
-		return {
-			contractName: "fame_coin",
-			entrypoint: "name",
-			calldata: [],
-		};
-	};
-
-	const fame_coin_name = async () => {
-		try {
-			return await provider.call("pistols", build_fame_coin_name_calldata());
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_lords_mock_name_calldata = (): DojoCall => {
-		return {
-			contractName: "lords_mock",
-			entrypoint: "name",
-			calldata: [],
-		};
-	};
-
-	const lords_mock_name = async () => {
-		try {
-			return await provider.call("pistols", build_lords_mock_name_calldata());
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -1643,19 +1660,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_tutorial_revealMoves_calldata = (playerId: BigNumberish, tutorialId: BigNumberish, salt: BigNumberish, moves: Array<BigNumberish>): DojoCall => {
+	const build_tutorial_revealMoves_calldata = (duelistId: BigNumberish, duelId: BigNumberish, salt: BigNumberish, moves: Array<BigNumberish>): DojoCall => {
 		return {
 			contractName: "tutorial",
 			entrypoint: "reveal_moves",
-			calldata: [playerId, tutorialId, salt, moves],
+			calldata: [duelistId, duelId, salt, moves],
 		};
 	};
 
-	const tutorial_revealMoves = async (snAccount: Account | AccountInterface, playerId: BigNumberish, tutorialId: BigNumberish, salt: BigNumberish, moves: Array<BigNumberish>) => {
+	const tutorial_revealMoves = async (snAccount: Account | AccountInterface, duelistId: BigNumberish, duelId: BigNumberish, salt: BigNumberish, moves: Array<BigNumberish>) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_tutorial_revealMoves_calldata(playerId, tutorialId, salt, moves),
+				build_tutorial_revealMoves_calldata(duelistId, duelId, salt, moves),
 				"pistols",
 			);
 		} catch (error) {
@@ -1946,6 +1963,40 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_lords_mock_symbol_calldata = (): DojoCall => {
+		return {
+			contractName: "lords_mock",
+			entrypoint: "symbol",
+			calldata: [],
+		};
+	};
+
+	const lords_mock_symbol = async () => {
+		try {
+			return await provider.call("pistols", build_lords_mock_symbol_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_fame_coin_symbol_calldata = (): DojoCall => {
+		return {
+			contractName: "fame_coin",
+			entrypoint: "symbol",
+			calldata: [],
+		};
+	};
+
+	const fame_coin_symbol = async () => {
+		try {
+			return await provider.call("pistols", build_fame_coin_symbol_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_duel_token_symbol_calldata = (): DojoCall => {
 		return {
 			contractName: "duel_token",
@@ -1991,40 +2042,6 @@ export function setupWorld(provider: DojoProvider) {
 	const duelist_token_symbol = async () => {
 		try {
 			return await provider.call("pistols", build_duelist_token_symbol_calldata());
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_fame_coin_symbol_calldata = (): DojoCall => {
-		return {
-			contractName: "fame_coin",
-			entrypoint: "symbol",
-			calldata: [],
-		};
-	};
-
-	const fame_coin_symbol = async () => {
-		try {
-			return await provider.call("pistols", build_fame_coin_symbol_calldata());
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_lords_mock_symbol_calldata = (): DojoCall => {
-		return {
-			contractName: "lords_mock",
-			entrypoint: "symbol",
-			calldata: [],
-		};
-	};
-
-	const lords_mock_symbol = async () => {
-		try {
-			return await provider.call("pistols", build_lords_mock_symbol_calldata());
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -2116,6 +2133,23 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_lords_mock_totalSupply_calldata = (): DojoCall => {
+		return {
+			contractName: "lords_mock",
+			entrypoint: "totalSupply",
+			calldata: [],
+		};
+	};
+
+	const lords_mock_totalSupply = async () => {
+		try {
+			return await provider.call("pistols", build_lords_mock_totalSupply_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_fame_coin_totalSupply_calldata = (): DojoCall => {
 		return {
 			contractName: "fame_coin",
@@ -2133,17 +2167,21 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_lords_mock_totalSupply_calldata = (): DojoCall => {
+	const build_lords_mock_transfer_calldata = (recipient: string, amount: BigNumberish): DojoCall => {
 		return {
 			contractName: "lords_mock",
-			entrypoint: "totalSupply",
-			calldata: [],
+			entrypoint: "transfer",
+			calldata: [recipient, amount],
 		};
 	};
 
-	const lords_mock_totalSupply = async () => {
+	const lords_mock_transfer = async (snAccount: Account | AccountInterface, recipient: string, amount: BigNumberish) => {
 		try {
-			return await provider.call("pistols", build_lords_mock_totalSupply_calldata());
+			return await provider.execute(
+				snAccount,
+				build_lords_mock_transfer_calldata(recipient, amount),
+				"pistols",
+			);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -2171,19 +2209,40 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_lords_mock_transfer_calldata = (recipient: string, amount: BigNumberish): DojoCall => {
+	const build_lords_mock_transferFrom_calldata = (sender: string, recipient: string, amount: BigNumberish): DojoCall => {
 		return {
 			contractName: "lords_mock",
-			entrypoint: "transfer",
-			calldata: [recipient, amount],
+			entrypoint: "transferFrom",
+			calldata: [sender, recipient, amount],
 		};
 	};
 
-	const lords_mock_transfer = async (snAccount: Account | AccountInterface, recipient: string, amount: BigNumberish) => {
+	const lords_mock_transferFrom = async (snAccount: Account | AccountInterface, sender: string, recipient: string, amount: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_lords_mock_transfer_calldata(recipient, amount),
+				build_lords_mock_transferFrom_calldata(sender, recipient, amount),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_fame_coin_transferFrom_calldata = (sender: string, recipient: string, amount: BigNumberish): DojoCall => {
+		return {
+			contractName: "fame_coin",
+			entrypoint: "transferFrom",
+			calldata: [sender, recipient, amount],
+		};
+	};
+
+	const fame_coin_transferFrom = async (snAccount: Account | AccountInterface, sender: string, recipient: string, amount: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_fame_coin_transferFrom_calldata(sender, recipient, amount),
 				"pistols",
 			);
 		} catch (error) {
@@ -2247,48 +2306,6 @@ export function setupWorld(provider: DojoProvider) {
 			return await provider.execute(
 				snAccount,
 				build_duelist_token_transferFrom_calldata(from, to, tokenId),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_fame_coin_transferFrom_calldata = (sender: string, recipient: string, amount: BigNumberish): DojoCall => {
-		return {
-			contractName: "fame_coin",
-			entrypoint: "transferFrom",
-			calldata: [sender, recipient, amount],
-		};
-	};
-
-	const fame_coin_transferFrom = async (snAccount: Account | AccountInterface, sender: string, recipient: string, amount: BigNumberish) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_fame_coin_transferFrom_calldata(sender, recipient, amount),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_lords_mock_transferFrom_calldata = (sender: string, recipient: string, amount: BigNumberish): DojoCall => {
-		return {
-			contractName: "lords_mock",
-			entrypoint: "transferFrom",
-			calldata: [sender, recipient, amount],
-		};
-	};
-
-	const lords_mock_transferFrom = async (snAccount: Account | AccountInterface, sender: string, recipient: string, amount: BigNumberish) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_lords_mock_transferFrom_calldata(sender, recipient, amount),
 				"pistols",
 			);
 		} catch (error) {
@@ -2623,6 +2640,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildCommitMovesCalldata: build_tutorial_commitMoves_calldata,
 			createTutorial: tutorial_createTutorial,
 			buildCreateTutorialCalldata: build_tutorial_createTutorial_calldata,
+			getDuelProgress: tutorial_getDuelProgress,
+			buildGetDuelProgressCalldata: build_tutorial_getDuelProgress_calldata,
 			revealMoves: tutorial_revealMoves,
 			buildRevealMovesCalldata: build_tutorial_revealMoves_calldata,
 		},

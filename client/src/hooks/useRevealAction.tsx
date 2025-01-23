@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { useSettings } from '/src/hooks/SettingsContext'
 import { useDojoSetup, useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { useGetDuelDeck } from '/src/hooks/usePistolsContractCalls'
 import { CommitMoveMessage, signAndRestoreMovesFromHash } from '/src/utils/salt'
