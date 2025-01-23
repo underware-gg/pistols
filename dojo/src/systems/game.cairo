@@ -1,6 +1,4 @@
 use starknet::{ContractAddress};
-use pistols::models::challenge::{Challenge};
-use pistols::models::duelist::{Duelist};
 use pistols::types::duel_progress::{DuelProgress};
 
 // define the interface
@@ -68,6 +66,7 @@ pub mod game {
         SystemsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
         IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
+        ITutorialDispatcher, ITutorialDispatcherTrait,
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
@@ -177,7 +176,13 @@ pub mod game {
             let mut store: Store = StoreTrait::new(self.world_default());
             let mut challenge: Challenge = store.get_challenge(duel_id);
 
-            // validate duelist
+            // route to tutorial
+            if (challenge.is_tutorial()) {
+                store.world.tutorial_dispatcher().commit_moves(duelist_id, duel_id, hashed);
+                return;
+            }
+
+            // validate challenge
             let owner: ContractAddress = self.validate_ownership(duelist_id);
             let duelist_number: u8 = challenge.duelist_number(duelist_id);
             if (duelist_number == 1) {
@@ -246,11 +251,17 @@ pub mod game {
             moves: Span<u8>,
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
+            let mut challenge: Challenge = store.get_challenge(duel_id);
+
+            // route to tutorial
+            if (challenge.is_tutorial()) {
+                store.world.tutorial_dispatcher().reveal_moves(duelist_id, duel_id, salt, moves);
+                return;
+            }
 
             // validate challenge
-            let mut challenge: Challenge = store.get_challenge(duel_id);
             assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
-            
+
             // validate Round
             let mut round: Round = store.get_round( duel_id);
             assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
@@ -362,7 +373,9 @@ pub mod game {
         fn get_duel_progress(self: @ContractState, duel_id: u128) -> DuelProgress {
             let mut store: Store = StoreTrait::new(self.world_default());
             let challenge: Challenge = store.get_challenge(duel_id);
-            if (challenge.state.is_finished()) {
+            if (challenge.is_tutorial()) {
+                (store.world.tutorial_dispatcher().get_duel_progress(duel_id))
+            } else if (challenge.state.is_finished()) {
                 let mut round: Round = store.get_round(duel_id);
                 let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
                 (game_loop(wrapped, @challenge.get_deck(), ref round))

@@ -1,6 +1,4 @@
 use starknet::{ContractAddress};
-use pistols::models::challenge::{Challenge};
-use pistols::models::duelist::{Duelist};
 use pistols::types::duel_progress::{DuelProgress};
 
 // define the interface
@@ -14,14 +12,14 @@ pub trait ITutorial<TState> {
     // same as game.cairo
     fn commit_moves(
         ref self: TState,
-        player_id: u128,
-        tutorial_id: u128,
+        duelist_id: u128,
+        duel_id: u128,
         hashed: u128,
     );
     fn reveal_moves(
         ref self: TState,
-        player_id: u128,
-        tutorial_id: u128,
+        duelist_id: u128,
+        duel_id: u128,
         salt: felt252,
         moves: Span<u8>,
     );
@@ -29,6 +27,7 @@ pub trait ITutorial<TState> {
     //
     // view calls
     fn calc_duel_id(self: @TState, player_id: u128, tutorial_id: u128) -> u128;
+    fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
 }
 
 #[dojo::contract]
@@ -123,7 +122,7 @@ pub mod tutorial {
             assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
             assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
 
-            let player_profile: ProfileType = ProfileType::Character(CharacterProfile::UnknownPlayer);
+            let player_profile: ProfileType = ProfileType::Character(CharacterProfile::Player);
             let opponent_profile: ProfileType = level.opponent_profile();
 
             let duel_id: u128 = level.make_duel_id(player_id);
@@ -133,7 +132,7 @@ pub mod tutorial {
                 duel_id,
                 table_id: TABLES::TUTORIAL,
                 premise: Premise::Tutorial,
-                quote: 0,
+                quote: level.quote(),
                 // duelists
                 address_a: starknet::get_caller_address(),
                 address_b: starknet::get_caller_address(),
@@ -165,20 +164,20 @@ pub mod tutorial {
         }
 
         fn commit_moves(ref self: ContractState,
-            player_id: u128,
-            tutorial_id: u128,
+            duelist_id: u128,
+            duel_id: u128,
             hashed: u128,
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
-
-            let level: TutorialLevel = tutorial_id.into();
-            assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
-            assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
-
-            let duel_id: u128 = level.make_duel_id(player_id);
             let challenge: Challenge = store.get_challenge(duel_id);
-            let mut round: Round = store.get_round(duel_id);
 
+            // find level
+            let level: TutorialLevel = challenge.into();
+            assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
+
+            // validate challenge
+            let mut round: Round = store.get_round(duel_id);
+            assert(challenge.duelist_id_b == duelist_id, Errors::INVALID_PLAYER);
             assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
             assert(round.state == RoundState::Commit, Errors::ROUND_NOT_IN_COMMIT);
 
@@ -190,21 +189,21 @@ pub mod tutorial {
         }
 
         fn reveal_moves(ref self: ContractState,
-            player_id: u128,
-            tutorial_id: u128,
+            duelist_id: u128,
+            duel_id: u128,
             salt: felt252,
             moves: Span<u8>,
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
-
-            let level: TutorialLevel = tutorial_id.into();
-            assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
-            assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
-
-            let duel_id: u128 = level.make_duel_id(player_id);
             let mut challenge: Challenge = store.get_challenge(duel_id);
-            let mut round: Round = store.get_round(duel_id);
 
+            // find level
+            let level: TutorialLevel = challenge.into();
+            assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
+
+            // validate challenge
+            let mut round: Round = store.get_round(duel_id);
+            assert(challenge.duelist_id_b == duelist_id, Errors::INVALID_PLAYER);
             assert(challenge.state == ChallengeState::InProgress, Errors::CHALLENGE_NOT_IN_PROGRESS);
             assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
@@ -228,6 +227,21 @@ pub mod tutorial {
             store.set_challenge(@challenge);
             store.set_round(@round);
         }
+
+        fn get_duel_progress(self: @ContractState, duel_id: u128) -> DuelProgress {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let challenge: Challenge = store.get_challenge(duel_id);
+            if (challenge.state.is_finished()) {
+                let level: TutorialLevel = challenge.into();
+                let mut round: Round = store.get_round(duel_id);
+                let (_, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(round.moves_b.as_hand());
+                let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), mocked);
+                (game_loop(wrapped, @challenge.get_deck(), ref round))
+            } else {
+                {Default::default()}
+            }
+        }
+
     }
 }
 

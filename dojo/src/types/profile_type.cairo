@@ -42,7 +42,7 @@ pub enum CharacterProfile {
     Bartender,
     Drunken,
     Devil,
-    UnknownPlayer,
+    Player,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
@@ -190,7 +190,7 @@ mod CHARACTER_PROFILES {
         profile_id: 3,
         name: 'Devil',
     };
-    const UnknownPlayer: ProfileDescription = ProfileDescription {
+    const Player: ProfileDescription = ProfileDescription {
         profile_id: 4,
         name: 'Stranger',
     };
@@ -366,7 +366,7 @@ impl CharacterProfileIntoDescription of Into<CharacterProfile, ProfileDescriptio
             CharacterProfile::Bartender =>     CHARACTER_PROFILES::Bartender,
             CharacterProfile::Drunken =>       CHARACTER_PROFILES::Drunken,
             CharacterProfile::Devil =>         CHARACTER_PROFILES::Devil,
-            CharacterProfile::UnknownPlayer => CHARACTER_PROFILES::UnknownPlayer,
+            CharacterProfile::Player => CHARACTER_PROFILES::Player,
         }
     }
 }
@@ -416,7 +416,7 @@ impl U8IntoCharacterProfile of Into<u8, CharacterProfile> {
         if self == 1        { CharacterProfile::Bartender }
         else if self == 2   { CharacterProfile::Drunken }
         else if self == 3   { CharacterProfile::Devil }
-        else if self == 4   { CharacterProfile::UnknownPlayer }
+        else if self == 4   { CharacterProfile::Player }
         else                { CharacterProfile::Unknown }
     }
 }

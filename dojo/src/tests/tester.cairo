@@ -526,8 +526,16 @@ mod tester {
         salt: felt252,
         moves: Span<u8>,
     ) {
+        execute_reveal_moves_ID(system, sender, ID(sender), duel_id, salt, moves);
+    }
+    fn execute_reveal_moves_ID(system: @IGameDispatcher, sender: ContractAddress,
+        token_id: u128,
+        duel_id: u128,
+        salt: felt252,
+        moves: Span<u8>,
+    ) {
         impersonate(sender);
-        (*system).reveal_moves(ID(sender), duel_id, salt, moves);
+        (*system).reveal_moves(token_id, duel_id, salt, moves);
         _next_block();
     }
     fn execute_collect(system: @IGameDispatcher, sender: ContractAddress) -> felt252 {
@@ -547,20 +555,22 @@ mod tester {
         (duel_id)
     }
     fn execute_commit_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
-        tutorial_id: u128,
+        duelist_id: u128,
+        duel_id: u128,
         hashed: u128,
     ) {
         impersonate(sender);
-        (*system).commit_moves(ID(sender), tutorial_id, hashed);
+        (*system).commit_moves(duelist_id, duel_id, hashed);
         _next_block();
     }
     fn execute_reveal_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
-        tutorial_id: u128,
+        duelist_id: u128,
+        duel_id: u128,
         salt: felt252,
         moves: Span<u8>,
     ) {
         impersonate(sender);
-        (*system).reveal_moves(ID(sender), tutorial_id, salt, moves);
+        (*system).reveal_moves(duelist_id, duel_id, salt, moves);
         _next_block();
     }
 

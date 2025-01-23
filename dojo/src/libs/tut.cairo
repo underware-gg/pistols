@@ -13,6 +13,7 @@ pub enum TutorialLevel {
 // Traits
 //
 use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
+use pistols::models::challenge::{Challenge};
 use pistols::types::profile_type::{ProfileType,CharacterProfile};
 use pistols::types::cards::{
     hand::{DuelistHand, DuelistHandTrait},
@@ -27,20 +28,28 @@ use pistols::utils::hash::{hash_values};
 
 #[generate_trait]
 impl TutorialLevelImpl of TutorialLevelTrait {
-    #[inline(always)]
     fn make_duel_id(self: TutorialLevel, player_id: u128) -> u128 {
         let tutorial_id: u128 = self.into();
-        (hash_values([
+        let mut duel_id: u128 = hash_values([
             player_id.into(),
             tutorial_id.into(),
-        ].span()).to_u128_lossy())
+        ].span()).to_u128_lossy();
+        // stamp tutorial ID at the end
+        duel_id = (duel_id & ~0xff) | tutorial_id;
+        (duel_id)
     }
-    #[inline(always)]
     fn opponent_profile(self: TutorialLevel) -> ProfileType {
         match self {
             TutorialLevel::Level1 => ProfileType::Character(CharacterProfile::Drunken),
             TutorialLevel::Level2 => ProfileType::Character(CharacterProfile::Bartender),
             _ => ProfileType::Undefined,
+        }
+    }
+    fn quote(self: TutorialLevel) -> felt252 {
+        match self {
+            TutorialLevel::Level1 => 'I challenge you, SCUM!!',
+            TutorialLevel::Level2 => 'Prepare for a real duel!',
+            _ => 0,
         }
     }
     fn make_moves(self: TutorialLevel, player_hand: DuelistHand) -> (Span<u8>, Span<MockedValue>) {
@@ -56,14 +65,14 @@ impl TutorialLevelImpl of TutorialLevelTrait {
                 match player_hand.card_fire {
                     PacesCard::Paces1 => {
                         // NPC never gets a chance to shoot
-                        npc_hand.card_dodge = PacesCard::Paces2;
-                        npc_hand.card_fire = PacesCard::Paces3;
+                        npc_hand.card_dodge = PacesCard::Paces9;
+                        npc_hand.card_fire = PacesCard::Paces10;
                         env_cards.append(ENV_DICES::DOUBLE_DAMAGE_UP);
                     },
                     PacesCard::Paces2 => {
                         // NPC just trips and die
                         npc_hand.card_dodge = PacesCard::Paces1;
-                        npc_hand.card_fire = PacesCard::Paces3;
+                        npc_hand.card_fire = PacesCard::Paces10;
                         env_cards.append(ENV_DICES::CHANCES_DOWN);
                         env_cards.append(ENV_DICES::DOUBLE_DAMAGE_UP);
                     },
@@ -154,5 +163,12 @@ impl TutorialLevelIntoU128 of Into<TutorialLevel, u128> {
             TutorialLevel::Level2       => 2,
             TutorialLevel::Undefined    => 0,
         }
+    }
+}
+impl ChallengeIntoTutorialLevel of Into<Challenge, TutorialLevel> {
+    fn into(self: Challenge) -> TutorialLevel {
+        if self.quote == TutorialLevel::Level1.quote()        { TutorialLevel::Level1 }
+        else if self.quote == TutorialLevel::Level2.quote()   { TutorialLevel::Level2 }
+        else                                                  { TutorialLevel::Undefined }
     }
 }
