@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/state'
-import { useEntityId, useClientTimestamp, feltToString, parseCustomEnum, bigintEquals, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
-import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
-import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
+import { useEntityId, useClientTimestamp, feltToString, parseCustomEnum, bigintEquals, parseEnumVariant, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
+import { formatQueryValue, useEntityModel, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
+import { constants, models, PistolsGetQuery, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { movesToHand } from '/src/utils/pistols'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
@@ -57,6 +57,9 @@ export const useChallenge = (duelId: BigNumberish) => {
   // useEffect(() => console.log(`useChallenge(${Number(duelId)}) => [${Object.keys(entities).length}]`, challenge), [challenge])
 
   const tableId = useMemo(() => feltToString(challenge?.table_id ?? 0n), [challenge])
+  const isTutorial = useMemo(() => (tableId === constants.TABLES.TUTORIAL), [tableId])
+  const tutorialLevel = useMemo(() => (isTutorial ? Number(BigInt(duelId) & 0xffn) : null), [isTutorial, duelId])
+
   const duelistAddressA = useMemo(() => BigInt(challenge?.address_a ?? 0), [challenge])
   const duelistAddressB = useMemo(() => BigInt(challenge?.address_b ?? 0), [challenge])
   const duelistIdA = useMemo(() => BigInt(challenge?.duelist_id_a ?? 0), [challenge])
@@ -82,6 +85,8 @@ export const useChallenge = (duelId: BigNumberish) => {
     challengeExists: (challenge != null),
     duelId,
     tableId,
+    isTutorial,
+    tutorialLevel,
     state,
     duelistAddressA,
     duelistAddressB,
@@ -169,3 +174,35 @@ export const useRound = (duelId: BigNumberish) => {
     state_b,
   }
 }
+
+//--------------------------------
+// Fetch new challenge and add to the store
+// (for non default tables, like tutorials)
+//
+
+export const useAddChallenge = (duel_id: BigNumberish) => {
+  const result = useChallenge(duel_id)
+
+  const query_get = useMemo<PistolsGetQuery>(() => ({
+    pistols: {
+      Challenge: {
+        $: {
+          where: {
+            duel_id: { $eq: formatQueryValue(duel_id) },
+          },
+        },
+      },
+    },
+  }), [duel_id])
+
+  const setEntities = useChallengeStore((state) => state.setEntities)
+
+  useSdkEntities({
+    query_get,
+    enabled: (isPositiveBigint(duel_id) && !result.challengeExists),
+    setEntities,
+  })
+
+  return result
+}
+

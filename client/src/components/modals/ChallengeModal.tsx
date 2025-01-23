@@ -42,7 +42,10 @@ export default function ChallengeModal() {
     duelistIdA, duelistIdB: challengeDuelistIdB, duelistAddressA, duelistAddressB,
     isLive, isFinished, needToSyncExpired,
   } = useChallenge(selectedDuelId)
-  const { description: tableDescription } = useTable(tableId)
+  const { description: tableDescription, isSeason, isTutorial } = useTable(tableId)
+  const displayDuelId = (!isTutorial)
+  const displayFameBalance = (!isTutorial)
+  const linkToDuelist = (!isTutorial)
 
   const { isYou: isChallenger } = useIsYou(duelistIdA)
   const { isMyAccount: isChallenged } = useIsMyAccount(duelistAddressB)
@@ -88,10 +91,10 @@ export default function ChallengeModal() {
         <Grid>
           <Row>
             <Col width={1} textAlign='center'>
-              <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} />
+              {displayDuelId && <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} />}
             </Col>
             <Col width={3} textAlign='left'>
-              Duel #{selectedDuelId.toString()}
+              {displayDuelId && <>Duel #{selectedDuelId.toString()}</>}
             </Col>
             <Col width={8} textAlign='center' className='NoBreak Important'>
               {tableDescription}
@@ -114,7 +117,7 @@ export default function ChallengeModal() {
           <Grid style={{ width: '350px' }}>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} displayFameBalance />
+                <ProfileDescription duelistId={duelistIdA} displayOwnerAddress={false} displayFameBalance={displayFameBalance} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>
@@ -124,7 +127,7 @@ export default function ChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='right'>
               <Col>
-                <ProfileDescription duelistId={duelistIdB} address={duelistAddressB} displayOwnerAddress={false} displayFameBalance/>
+                <ProfileDescription duelistId={duelistIdB} address={duelistAddressB} displayOwnerAddress={false} displayFameBalance={displayFameBalance} />
               </Col>
             </Row>
             <Row columns='equal' textAlign='right'>

@@ -2,7 +2,7 @@ import React from 'react'
 import { BigNumberish } from 'starknet'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { usePlayer } from '/src/stores/playerStore'
-import { formatTimestampDeltaElapsed, bigintToNumber } from '@underware_gg/pistols-sdk/utils'
+import { formatTimestampDeltaElapsed, bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 import { useDuelist } from '../stores/duelistStore'
 
 export const PlayerLink = ({
@@ -30,7 +30,7 @@ export const DuelistLink = ({
   const { dispatchSelectDuelistId } = usePistolsContext()
   return (
     <span className='AnchorLink' onClick={() => dispatchSelectDuelistId(duelistId)}>
-      {useName ? nameAndId : `Duelist #${bigintToNumber(duelistId)}`}
+      {useName ? nameAndId : `Duelist #${bigintToDecimal(duelistId)}`}
     </span>
   )
 }
@@ -43,7 +43,7 @@ export const ChallengeLink = ({
   const { dispatchSelectDuel } = usePistolsContext()
   return (
     <span className='AnchorLink' onClick={() => dispatchSelectDuel(duelId)}>
-      Duel #{bigintToNumber(duelId)}
+      Duel #{bigintToDecimal(duelId)}
     </span>
   )
 }

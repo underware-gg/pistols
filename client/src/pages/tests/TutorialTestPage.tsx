@@ -3,8 +3,12 @@ import { Container, Table } from 'semantic-ui-react'
 import { useTutorialLevel, useTutorialPlayerId, useTutorialProgress } from '/src/hooks/useTutorial'
 import { useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { CreateTutorialChallengeButton, OpenTutorialChallengeButton } from '/src/components/TutorialButtons'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
+import ChallengeModal from '/src/components/modals/ChallengeModal'
+import StoreSync from '/src/stores/sync/StoreSync'
 import App from '/src/components/App'
+import { useChallenge } from '/src/stores/challengeStore'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -22,11 +26,17 @@ export default function TutorialTestPage() {
         <Connect />
         {isInitialized &&
           <>
+            <br />
             <TutorialProgress />
+            <br />
             <TutorialLevel tutorial_id={1} />
+            <br />
             <TutorialLevel tutorial_id={2} />
+            <br />
           </>
         }
+        <StoreSync />
+        <ChallengeModal />
       </Container>
     </App>
   );
@@ -38,7 +48,7 @@ function TutorialProgress() {
   return (
     <>
       <Table celled striped size='small'>
-        <Body className='ModalText'>
+        <Body className='H5'>
           <Row>
             <Cell>Progress</Cell>
             <Cell className='Code'>
@@ -64,13 +74,14 @@ function TutorialLevel({
 }) {
   const { currentTutorialId } = useTutorialProgress()
   const { duelId } = useTutorialLevel(tutorial_id)
+  const { state } = useChallenge(duelId)
   const isCurrent = (currentTutorialId == tutorial_id)
   const isCompleted = false
   return (
     <>
-      <Table celled striped color={isCompleted ? 'green' : isCurrent ? 'yellow' : 'red'} size='small'>
+      <Table celled striped color={isCompleted ? 'green' : isCurrent ? 'yellow' : null} size='small'>
         <Body className='H5'>
-          <Row>
+          <Row className='ModalText'>
             <Cell>Tutorial Level</Cell>
             <Cell className='Code'>
               {tutorial_id}
@@ -80,6 +91,19 @@ function TutorialLevel({
             <Cell>Duel ID</Cell>
             <Cell className='Code'>
               {bigintToHex(duelId)}
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>Duel State</Cell>
+            <Cell className='Code'>
+              {state}
+            </Cell>
+          </Row>
+          <Row>
+            <Cell></Cell>
+            <Cell>
+              <CreateTutorialChallengeButton tutorial_id={tutorial_id} />
+              <OpenTutorialChallengeButton tutorial_id={tutorial_id} />
             </Cell>
           </Row>
         </Body>

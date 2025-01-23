@@ -11,19 +11,15 @@ import { useChallenge } from '/src/stores/challengeStore'
 // game
 //
 
-export const useFinishedDuelProgress = (duel_id: bigint) => {
-  const { isFinished } = useChallenge(duel_id)
-  return useDuelProgress(isFinished ? duel_id : null)
-}
-
 export const useDuelProgress = (duel_id: bigint) => {
+  const { isFinished } = useChallenge(duel_id)
   const { game: { getDuelProgress } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: getDuelProgress,
     args: [duel_id],
-    enabled: isPositiveBigint(duel_id),
+    enabled: isFinished,
     defaultValue: null,
-  }), [duel_id])
+  }), [duel_id, isFinished])
   const { value, isLoading } = useSdkCallPromise<any>(options)
   const duelProgress = useMemo(() => (value ? convert_duel_progress(value) : null), [value])
   return {

@@ -1,11 +1,11 @@
 import React from 'react'
 import { Container, Divider, Table } from 'semantic-ui-react'
-import { useChallenge } from '/src/stores/challengeStore'
+import { useAddChallenge } from '/src/stores/challengeStore'
 import { useDuel } from '/src/hooks/useDuel'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
 import { useRouteSlugs } from '/src/hooks/useRoute'
-import { useFinishedDuelProgress } from '/src/hooks/usePistolsContractCalls'
+import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { ChallengeStateNames, RoundStateNames } from '/src/utils/pistols'
 import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
@@ -53,7 +53,7 @@ function Stats({
 }) {
   const { challenge: { tableId }, round1 } = useDuel(duelId)
 
-  const challenge = useChallenge(duelId)
+  const challenge = useAddChallenge(duelId)
 
   return (
     <>
@@ -205,7 +205,7 @@ function RoundStats({
         <Header>
           <Row>
             <HeaderCell width={4}><h5>Round</h5></HeaderCell>
-            <HeaderCell><h2>1 and only</h2></HeaderCell>
+            <HeaderCell><h2>Single Round</h2></HeaderCell>
           </Row>
         </Header>
 
@@ -383,7 +383,7 @@ function DuelProgress({
 }: {
   duelId: bigint
 }) {
-  const { duelProgress } = useFinishedDuelProgress(duelId)
+  const { duelProgress } = useDuelProgress(duelId)
   if (!duelProgress) return <></>
   return (
     <>

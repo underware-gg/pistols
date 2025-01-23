@@ -75,7 +75,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     duelistIdDisplay,
     exists,
     timestamp,
-    profileType,
+    profileType: profileType as constants.ProfileType,
     profileValue,
     profilePic,
     isNpc,

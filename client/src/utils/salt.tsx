@@ -84,23 +84,29 @@ export const signAndRestoreMovesFromHash = async (
 ): Promise<{ salt: bigint, moves: number[] }> => {
   const salt = await signAndGenerateSalt(account, starknetDomain, messageToSign)
   let moves = []
-  console.log(`DECKS:`, decks)
+  console.log(`___RESTORE decks:`, decks)
   console.log(`___RESTORE message:`, messageToSign, '\nsalt:', bigintToHex(salt), '\nhash:', bigintToHex(hash))
   if (salt > 0n) {
     // there are 2 to 4 decks...
     for (let di = 0; di < decks.length; ++di) {
       const deck = decks[di]
       const mask = make_move_mask(di)
+      // is deck is empty, no move
+      if (deck.length == 0) {
+        console.log(`___RESTORE D${di}: SKIP`)
+        moves.push(0) // did not move here
+        continue
+      }
       // each deck can contain up to 10 cards/moves...
       for (let mi = 0; mi < deck.length; ++mi) {
         const move = deck[mi]
         const move_hash = make_move_hash(salt, di, move)
         const stored_hash = (hash & mask)
         if (stored_hash == 0n) {
-          moves.push(0)
+          moves.push(0) // did not move here
           break
         } else {
-          console.log(`___RESTORE D${di}/M${mi}:`, bigintToHex(stored_hash), '>', bigintToHex(move_hash), '?', move)
+          // console.log(`___RESTORE D${di}/M${mi}:`, bigintToHex(stored_hash), '>', bigintToHex(move_hash), '?', move)
           if (stored_hash == move_hash) {
             moves.push(Number(move))
             console.log(`___RESTORE D${di}/M${mi}: FOUND!`, move)
@@ -114,9 +120,14 @@ export const signAndRestoreMovesFromHash = async (
       }
     }
   }
+  if (moves.length != decks.length) {
+    moves = []
+  } else {
+    console.log(`___RESTORED ALL MOVES:`, moves)
+  }
   return {
     salt,
-    moves: (moves.length == decks.length) ? moves : [],
+    moves,
   }
 }
 

@@ -19,8 +19,8 @@ const game_call = (entrypoint: string, calldata: any[]): DojoCall => ({
   entrypoint,
   calldata,
 })
-const admin_call = (entrypoint: string, calldata: any[]): DojoCall => ({
-  contractName: 'admin',
+const tutorial_call = (entrypoint: string, calldata: any[]): DojoCall => ({
+  contractName: 'tutorial',
   entrypoint,
   calldata,
 })
@@ -36,6 +36,11 @@ const duelist_token_call = (entrypoint: string, calldata: any[]): DojoCall => ({
 })
 const pack_token_call = (entrypoint: string, calldata: any[]): DojoCall => ({
   contractName: 'pack_token',
+  entrypoint,
+  calldata,
+})
+const admin_call = (entrypoint: string, calldata: any[]): DojoCall => ({
+  contractName: 'admin',
   entrypoint,
   calldata,
 })
@@ -106,7 +111,7 @@ export function createSystemCalls(
 
   return {
     //
-    // game
+    // game.cairo
     //
     game: {
       commit_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, hash: BigNumberish): Promise<boolean> => {
@@ -117,6 +122,26 @@ export function createSystemCalls(
       reveal_moves: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, salt: BigNumberish, moves: number[]): Promise<boolean> => {
         const args = [duelist_id, duel_id, salt, moves]
         const calls: DojoCalls = [game_call('reveal_moves', args)]
+        return await _executeTransaction(signer, calls)
+      },
+    },
+    //
+    // tutorial.cairo
+    //
+    tutorial: {
+      create_tutorial: async (signer: AccountInterface, player_id: BigNumberish, tutorial_id: BigNumberish): Promise<boolean> => {
+        const args = [player_id, tutorial_id]
+        const calls: DojoCalls = [tutorial_call('create_tutorial', args)]
+        return await _executeTransaction(signer, calls)
+      },
+      commit_moves: async (signer: AccountInterface, player_id: BigNumberish, tutorial_id: BigNumberish, hash: BigNumberish): Promise<boolean> => {
+        const args = [player_id, tutorial_id, hash]
+        const calls: DojoCalls = [tutorial_call('commit_moves', args)]
+        return await _executeTransaction(signer, calls)
+      },
+      reveal_moves: async (signer: AccountInterface, player_id: BigNumberish, tutorial_id: BigNumberish, salt: BigNumberish, moves: number[]): Promise<boolean> => {
+        const args = [player_id, tutorial_id, salt, moves]
+        const calls: DojoCalls = [tutorial_call('reveal_moves', args)]
         return await _executeTransaction(signer, calls)
       },
     },

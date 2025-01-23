@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEf
 import { useNavigate, useSearchParams, useLocation, useParams } from 'react-router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
-import { bigintToHex, bigintToNumber, bigintToDecimal, isPositiveBigint, poseidon } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex, bigintToDecimal, isPositiveBigint, poseidon, bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { CommitMoveMessage } from '/src/utils/salt'
 import { tutorialScenes } from '/src/data/tutorialConstants'
 import { SceneName } from '/src/data/assets'
@@ -297,7 +297,7 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
 //
 type SceneSlug = {
   tableId?: string,
-  duelId?: string,
+  duelId?: BigNumberish,
 }
 export const usePistolsScene = () => {
   const { currentScene, lastScene, selectedDuelId, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
@@ -314,8 +314,10 @@ export const usePistolsScene = () => {
     if (sceneRoutes[newScene].hasTableId) {
       slug = setSlug.tableId ?? (tableId && !isSeason ? tableId : '')
     } else if (sceneRoutes[newScene].hasDuelId) {
-      slug = `${bigintToNumber(setSlug.duelId || selectedDuelId)}`
-      dispatchSelectDuel(slug)
+      slug = `${bigintToDecimal(setSlug.duelId || selectedDuelId)}`
+      if (!bigintEquals(slug, selectedDuelId)) {
+        dispatchSelectDuel(slug)
+      }
     }
     url += slug ? `/${slug}` : ''
     if (url != location.pathname) {
@@ -323,7 +325,7 @@ export const usePistolsScene = () => {
       navigate(url)
     }
     __dispatchSetScene(newScene)
-  }, [location.pathname, navigate])
+  }, [location.pathname, navigate, selectedDuelId, tableId, isSeason])
 
   const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at Dawn'), [currentScene])
 

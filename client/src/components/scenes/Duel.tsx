@@ -10,8 +10,8 @@ import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useGameplayContext } from '/src/hooks/GameplayContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
-import { useChallenge } from '/src/stores/challengeStore'
-import { useFinishedDuelProgress } from '/src/hooks/usePistolsContractCalls'
+import { useAddChallenge } from '/src/stores/challengeStore'
+import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '/src/hooks/useRevealAction'
@@ -56,7 +56,7 @@ export default function Duel({
   const { animated, dispatchAnimated } = useGameplayContext()
 
   const { challengeDescription } = useChallengeDescription(duelId)
-  const { tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start } = useChallenge(duelId)
+  const { tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start } = useAddChallenge(duelId)
   const { description } = useTable(tableId)
 
   console.log('Duel', duelId, tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start)
@@ -72,14 +72,16 @@ export default function Duel({
   const { name: nameB, profilePic: profilePicB } = useDuelist(duelistIdB)
   const { isYou: isYouA } = useIsYou(duelistIdA)
   const { isYou: isYouB } = useIsYou(duelistIdB)
+  // console.log('>>> IS__YOU????', isYouA, isYouB, duelistIdA, duelistIdB)
   
   useEffect(() => {
-    if (gameImpl && mounted && !duelSceneStarted && nameA && nameB) {
+    if (gameImpl && mounted && !duelSceneStarted && nameA && nameB && duelistIdA > 0n && duelistIdB > 0n) {
       gameImpl.startDuelWithPlayers(nameA, ProfileModels[profilePicA], isYouA, isYouB, nameB, ProfileModels[profilePicB])
       setDuelSceneStarted(true)
       dispatchAnimated(AnimationState.None)
     }
-  }, [gameImpl, mounted, duelSceneStarted, profilePicA, profilePicB, nameA, nameB, isYouA, isYouB])
+  }, [gameImpl, mounted, duelSceneStarted, profilePicA, profilePicB, nameA, nameB, duelistIdA, duelistIdB])
+  // console.log('DUEL_SCENE_STARTED', gameImpl, mounted, duelSceneStarted, profilePicA, profilePicB, nameA, nameB, duelistIdA, duelistIdB, isYouA, isYouB)
 
   // setup grass animation
   const { clientSeconds } = useClientTimestamp(false)
@@ -149,7 +151,7 @@ export default function Duel({
   const gameBladeAnimationTimeout = useRef(null);
   const gameAnimationTimeout = useRef(null);
 
-  const { duelProgress } = useFinishedDuelProgress(duelId)
+  const { duelProgress } = useDuelProgress(duelId)
 
   useEffect(() => {
     return () => {
@@ -385,6 +387,7 @@ export default function Duel({
         duelistId={duelistIdA}
         completedStages={completedStagesA}
         canAutoReveal={canAutoRevealA}
+        isYou={isYouA}
         revealCards={(cards: DuelistHand) => cardRef.current?.spawnCards('A', cards)}
       />
       <DuelProgress
@@ -395,6 +398,7 @@ export default function Duel({
         duelistId={duelistIdB}
         completedStages={completedStagesB}
         canAutoReveal={canAutoRevealB}
+        isYou={isYouB}
         revealCards={(cards: DuelistHand) => cardRef.current?.spawnCards('B', cards)}
       />
       <Cards duelId={duelId} ref={cardRef} />
@@ -677,7 +681,8 @@ function DuelProgress({
   duelistId,
   completedStages,
   revealCards,
-  canAutoReveal = false
+  canAutoReveal,
+  isYou,
 }) {
   const { gameImpl } = useThreeJsContext()
   const { round1 } = useDuel(duelId)
@@ -695,7 +700,7 @@ function DuelProgress({
   // Commit modal control
   const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal, canReveal } = useRevealAction(duelId, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
+  const { reveal, canReveal } = useRevealAction(duelId, isYou ? duelistId : 0n, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
 
   const onClick = useCallback(() => {
     if (!isConnected) console.warn(`onClickReveal: not connected!`)
@@ -714,10 +719,10 @@ function DuelProgress({
 
   // auto-reveal
   useEffect(() => {
-    if (canAutoReveal && canReveal) {
+    if (canAutoReveal && canReveal && isYou) {
       onClick?.()
     }
-  }, [onClick, canAutoReveal, canReveal])
+  }, [onClick, canAutoReveal, canReveal, isYou])
 
 
   //-------------------------
@@ -735,7 +740,7 @@ function DuelProgress({
 
   const id = isA ? 'player-bubble-left' : 'player-bubble-right'
 
-  const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, round1Moves?.hashed)
+  const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, duelistId, round1Moves?.hashed)
 
   useEffect(() =>{
     if (isMyDuelist && canSign) {

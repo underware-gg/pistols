@@ -4,7 +4,7 @@ import { Container, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
 import { PlayerDuelistTokensStoreSyncQL, useTokensByOwner } from '/src/stores/duelistTokenStore'
-import { bigintToNumber, useERC721TokenUri } from '@underware_gg/pistols-sdk/utils'
+import { bigintToDecimal, useERC721TokenUri } from '@underware_gg/pistols-sdk/utils'
 import { Connect } from './ConnectTestPage'
 import App from '/src/components/App'
 
@@ -106,7 +106,7 @@ function TokenRow({
   return (
     <Row key={tokenId}>
       <Cell verticalAlign='top'>
-        <h3>{bigintToNumber(tokenId)}</h3>
+        <h3>{bigintToDecimal(tokenId)}</h3>
       </Cell>
       <Cell verticalAlign='top'>
         <h3>{name}</h3>

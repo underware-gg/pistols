@@ -1,7 +1,7 @@
 import { BigNumberish } from 'starknet'
 import { EMOJI } from '/src/data/messages'
 import { SceneName } from '/src/data/assets'
-import { bigintToNumber } from '@underware_gg/pistols-sdk/utils'
+import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 //------------------------------------------
@@ -223,5 +223,17 @@ export const movesToHand = (moves: number[]): Hand => {
 }
 
 export const makeDuelDataUrl = (duelId: BigNumberish) => {
-  return `/dueldata/${bigintToNumber(duelId)}`
+  return `/dueldata/${bigintToDecimal(duelId)}`
 }
+
+export const makeCharacterDuelistId = (profileType: constants.ProfileType, profileName: string) => {
+  const base = profileType == constants.ProfileType.Character ? constants.PROFILES.CHARACTER_ID_BASE
+    : profileType == constants.ProfileType.Bot ? constants.PROFILES.BOT_ID_BASE
+      : constants.PROFILES.UNDEFINED_ID_BASE
+  const profileId = profileType == constants.ProfileType.Character ? constants.CHARACTER_PROFILES[profileName].profile_id
+    : profileType == constants.ProfileType.Bot ? constants.BOT_PROFILES[profileName].profile_id
+      : 0n
+  return (base | BigInt(profileId ?? 0))
+}
+
+export const PLAYER_CHARACTER_ID = makeCharacterDuelistId(constants.ProfileType.Character, constants.CharacterProfile.Player)
