@@ -29,7 +29,7 @@ export default function DuelistModal() {
   const isOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
   const { isYou } = useIsYou(selectedDuelistId)
   const isMyDuelist = useIsMyDuelist(selectedDuelistId)
-  const { profilePic, duelistIdDisplay } = useDuelist(selectedDuelistId)
+  const { profilePic, profileType, duelistIdDisplay } = useDuelist(selectedDuelistId)
 
   const _close = () => {
     dispatchSelectDuelistId(0n)
@@ -89,7 +89,7 @@ export default function DuelistModal() {
         </Grid>
       </Modal.Header>
       <Modal.Content image className='DuelistModal Relative'>
-        <ProfilePic profilePic={profilePic} duelistId={selectedDuelistId} />
+        <ProfilePic profilePic={profilePic} profileType={profileType} duelistId={selectedDuelistId} />
         <Modal.Description className='FillParent'>
           <div className='DuelistModalDescription'>
             <ProfileDescription duelistId={selectedDuelistId} displayFameBalance displayStats />

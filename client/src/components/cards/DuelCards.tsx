@@ -946,7 +946,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
 
 const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
 
-  const { name, profilePic } = useDuelist(duelistId)
+  const { name, profilePic, profileType } = useDuelist(duelistId)
   const { isYou } = useIsYou(duelistId)
   const { dispatchSelectDuelistId } = usePistolsContext()
 
@@ -974,7 +974,7 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
       </div>
       <div className={ isLeft ? 'data-window left' : 'data-window right' }>
         <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)} >
-          <ProfilePic className='NoMouse NoDrag profile-picture' duel profilePic={profilePic} />
+          <ProfilePic className='NoMouse NoDrag profile-picture' duel profilePic={profilePic} profileType={profileType} />
           <img className='NoMouse NoDrag profile-outline' src='/images/ui/duel/card_details/profile_border.png' />
         </div>
         <div className='value-name' data-contentlength={contentLength}>{name}</div>

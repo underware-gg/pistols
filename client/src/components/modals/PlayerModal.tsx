@@ -27,7 +27,6 @@ export default function PlayerModal() {
   const { selectedPlayerAddress, dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext()
   const { name } = usePlayer(selectedPlayerAddress)
   const { isMyAccount } = useIsMyAccount(selectedPlayerAddress)
-  const profilePic = 0
 
   const isOpen = useMemo(() => (selectedPlayerAddress > 0), [selectedPlayerAddress])
 
@@ -89,7 +88,7 @@ export default function PlayerModal() {
         </Grid>
       </Modal.Header>
       <Modal.Content image className='DuelistModal Relative'>
-        <ProfilePic profilePic={profilePic} duelistId={0n} />
+        <ProfilePic profilePic={0} duelistId={0n} />
         <Modal.Description className='FillParent'>
           <div className='DuelistModalDescription'>
             <PlayerDescription address={selectedPlayerAddress} displayFameBalance />

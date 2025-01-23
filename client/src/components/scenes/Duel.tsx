@@ -68,8 +68,8 @@ export default function Duel({
   // guarantee to run only once when this component mounts
   const mounted = useMounted()
   const [duelSceneStarted, setDuelSceneStarted] = useState(false)
-  const { profilePic: profilePicA, name: nameA } = useDuelist(duelistIdA)
-  const { profilePic: profilePicB, name: nameB } = useDuelist(duelistIdB)
+  const { name: nameA, profilePic: profilePicA } = useDuelist(duelistIdA)
+  const { name: nameB, profilePic: profilePicB } = useDuelist(duelistIdB)
   const { isYou: isYouA } = useIsYou(duelistIdA)
   const { isYou: isYouB } = useIsYou(duelistIdB)
   
@@ -470,7 +470,7 @@ function DuelProfile({
   duelistId: BigNumberish,
   floated: SemanticFLOATS
 }) {
-  const { profilePic, name, nameAndId } = useDuelist(duelistId)
+  const { profilePic, profileType, name, nameAndId } = useDuelist(duelistId)
   const { owner } = useOwnerOfDuelist(duelistId)
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectDuelistId } = usePistolsContext()
@@ -482,7 +482,7 @@ function DuelProfile({
       {floated == 'left' &&
         <>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)} >
-            <ProfilePic circle profilePic={profilePic} className='NoMouse NoDrag' />
+          <ProfilePic circle profilePic={profilePic} profileType={profileType} className='NoMouse NoDrag' />
           </div>
           <Image className='NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), left: aspectWidth(8.3) }}>
@@ -498,7 +498,7 @@ function DuelProfile({
             <div className='NoMargin ProfileAddress'><FameBalanceDuelist duelistId={duelistId}/></div>
           </div>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
-            <ProfilePic circle profilePic={profilePic} className='NoMouse NoDrag' />
+          <ProfilePic circle profilePic={profilePic} profileType={profileType} className='NoMouse NoDrag' />
           </div>
           <Image className='FlipHorizontal NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
         </>

@@ -52,8 +52,8 @@ export default function ChallengeModal() {
 
   const { challengeDescription } = useChallengeDescription(selectedDuelId)
 
-  const { profilePic: profilePicA } = useDuelist(duelistIdA)
-  const { profilePic: profilePicB, isInAction } = useDuelist(duelistIdB)
+  const { profilePic: profilePicA, profileType: profileTypeA } = useDuelist(duelistIdA)
+  const { profilePic: profilePicB, profileType: profileTypeB, isInAction } = useDuelist(duelistIdB)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -103,7 +103,12 @@ export default function ChallengeModal() {
         </Grid>
       </Modal.Header>
       <Modal.Content image className='Relative'>
-        <ProfilePic profilePic={profilePicA} duelistId={duelistIdA} floated='left' onClick={() => dispatchSelectDuelistId(duelistIdA)} />
+        <ProfilePic floated='left'
+          profilePic={profilePicA}
+          profileType={profileTypeA}
+          duelistId={duelistIdA}
+          onClick={linkToDuelist ? () => dispatchSelectDuelistId(duelistIdA) : undefined}
+        />
 
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
@@ -162,7 +167,12 @@ export default function ChallengeModal() {
           </Grid>
         </Modal.Description>
 
-        <ProfilePic profilePic={profilePicB} duelistId={duelistIdB} floated='right' onClick={() => dispatchSelectDuelistId(duelistIdB, duelistAddressB)} />
+        <ProfilePic floated='right'
+          duelistId={duelistIdB}
+          profilePic={profilePicB}
+          profileType={profileTypeB}
+          onClick={linkToDuelist ? () => dispatchSelectDuelistId(duelistIdB, duelistAddressB) : undefined}
+        />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>

@@ -34,9 +34,7 @@ export default function NewChallengeModal() {
 
   const _close = () => { dispatchChallengingPlayerAddress(0n) }
 
-  const { profilePic: profilePicA } = useDuelist(duelistIdA)
-  // const { profilePic: profilePicB } = useDuelist(duelistIdB)
-  const profilePicB = 0
+  const { profilePic: profilePicA, profileType: profileTypeA } = useDuelist(duelistIdA)
 
   const { hasPact, pactDuelId } = usePact(tableId, addressA, addressB)
 
@@ -91,7 +89,7 @@ export default function NewChallengeModal() {
         </Grid>
       </Modal.Header>
       <Modal.Content image>
-        <ProfilePic profilePic={profilePicA} onClick={() => dispatchSelectDuelistId(duelistIdA)} displayBountyValue={0} />
+        <ProfilePic profilePic={profilePicA} profileType={profileTypeA} onClick={() => dispatchSelectDuelistId(duelistIdA)} displayBountyValue={0} />
 
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
@@ -123,7 +121,7 @@ export default function NewChallengeModal() {
           </Grid>
         </Modal.Description>
 
-        <ProfilePic profilePic={profilePicB} onClick={() => dispatchSelectDuelistId(0, challengingAddress)} displayBountyValue={0} />
+        <ProfilePic profilePic={0} profileType={profileTypeA} onClick={() => dispatchSelectDuelistId(0, challengingAddress)} displayBountyValue={0} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>

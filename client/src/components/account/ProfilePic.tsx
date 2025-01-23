@@ -36,6 +36,7 @@ const _className = ({ small, medium, square, circle, duel, anon }) => (
 export function ProfilePic({
   profilePic = null,
   profilePicUrl = null,
+  profileType = constants.ProfileType.Duelist,
   small = false,
   medium = false,
   square = false,
@@ -54,6 +55,7 @@ export function ProfilePic({
 }: {
   profilePic?: number
   profilePicUrl?: string
+  profileType?: constants.ProfileType
   small?: boolean
   medium?: boolean
   square?: boolean
@@ -79,7 +81,7 @@ export function ProfilePic({
     if (disabled || dimmed) result.push('ProfilePicDisabled')
     return result
   }, [className, small, medium, square, circle, duel, anon, disabled, dimmed])
-  const url = useMemo(() => (profilePicUrl ?? makeProfilePicUrl(profilePic, square || anon)), [profilePicUrl, profilePic, square])
+  const url = useMemo(() => (profilePicUrl ?? makeProfilePicUrl(profilePic, square || anon, profileType)), [profilePicUrl, profilePic, square, profileType])
 
   // as Button
   const _click = () => {
