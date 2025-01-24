@@ -29,10 +29,10 @@ pub struct Pack {
 
 #[derive(Copy, Drop, Serde, Default)]
 pub struct PackDescription {
-    id: felt252, // @generateContants_type: shortstring
-    name: felt252, // @generateContants_type: shortstring
-    image_url_closed: felt252, // @generateContants_type: shortstring
-    image_url_open: felt252, // @generateContants_type: shortstring
+    id: felt252, // @generateContants:shortstring
+    name: felt252, // @generateContants:shortstring
+    image_url_closed: felt252, // @generateContants:shortstring
+    image_url_open: felt252, // @generateContants:shortstring
     can_purchase: bool,
     price: u256,
 }

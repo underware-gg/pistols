@@ -13,14 +13,7 @@ export const makeDuelDataUrl = (duelId: BigNumberish) => {
   return `/dueldata/${bigintToDecimal(duelId)}`
 }
 
-export type Hand = {
-  card_fire: constants.PacesCard,
-  card_dodge: constants.PacesCard,
-  card_tactics: constants.TacticsCard,
-  card_blades: constants.BladesCard,
-}
-
-export const movesToHand = (moves: number[]): Hand => {
+export const movesToHand = (moves: number[]): constants.DuelistHand => {
   return {
     card_fire: constants.getPacesCardFromValue(moves[0]),
     card_dodge: constants.getPacesCardFromValue(moves[1]),

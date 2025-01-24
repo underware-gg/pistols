@@ -1,17 +1,17 @@
 
 #[derive(Copy, Drop, Serde, Default)]
 pub struct CardPoints {
-    name: felt252, // @generateContants_type: shortstring
+    name: felt252, // @generateContants:shortstring
     self_chances: i8,
     self_damage: i8,
     other_chances: i8,
     other_damage: i8,
-    special: felt252, // @generateContants_type: shortstring
+    special: felt252, // @generateContants:shortstring
 }
 
 #[derive(Copy, Drop, Serde, Default)]
 pub struct EnvCardPoints {
-    name: felt252, // @generateContants_type: shortstring
+    name: felt252, // @generateContants:shortstring
     rarity: Rarity,
     chances: i8,
     damage: i8,

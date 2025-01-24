@@ -68,7 +68,7 @@ pub enum BotProfile {
 pub struct ProfileDescription {
     profile_id: u8,
     gender: Gender,
-    name: felt252, // @generateContants_type: shortstring
+    name: felt252, // @generateContants:shortstring
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]

@@ -325,6 +325,14 @@ export const getRoundStateMap = (): Record<RoundState, number> => Object.keys(Ro
 // custom types
 //
 
+// from: ../dojo/src/types/cards/hand.cairo
+export type DuelistHand = {
+  card_fire : PacesCard,
+  card_dodge : PacesCard,
+  card_tactics : TacticsCard,
+  card_blades : BladesCard,
+};
+
 // from: ../dojo/src/models/pack.cairo
 export type PackDescription = {
   id : string,

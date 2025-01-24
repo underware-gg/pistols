@@ -23,17 +23,22 @@ function getFolderFilesRecursively(folder, extension = null) {
 }
 
 function cleanLine(line) {
-  let result = '';
-  const commentParts = line.split('//');
-  result = commentParts[0].trim();
-  return result;
+  const parts = line.split('//');
+  const contents = parts[0].trim();
+  const comment = parts[1]?.trim();
+  return {
+    contents,
+    comment,
+  };
 }
 
 function getConstantsFromCairoFile(filePath) {
   const mods = {}; // constants
   const enums = {};
   const structs = {};
+  const custom_types = {};
   const contents = fs.readFileSync(filePath, "utf8");
+  const fileName = filePath.split('/').at(-1);
   const lines = contents.split('\n');
   // parse contents
   let is_test = false;
@@ -42,11 +47,11 @@ function getConstantsFromCairoFile(filePath) {
   let current_enum = null;
   let current_struct = null;
   lines.forEach((line, index) => {
+    let { contents: l, comment } = cleanLine(line);
     if (current_mod || current_enum || current_struct) {
       // inside mod
-      let l = cleanLine(line);
       // console.log(`${current_mod}:[${l}]`)
-      if (line[0] == '}') {
+      if (l == '}') {
         // end mod
         current_mod = null;
         current_enum = null;
@@ -66,7 +71,7 @@ function getConstantsFromCairoFile(filePath) {
           if (current_mod && l.startsWith('const ')) {
             if (l.endsWith('{')) {
               for (let i = index + 1; i < lines.length; i++) {
-                const ll = cleanLine(lines[i]);
+                const { contents: ll } = cleanLine(lines[i]);
                 if (ll.endsWith('};')) {
                   l += ' };';
                   break;
@@ -83,7 +88,7 @@ function getConstantsFromCairoFile(filePath) {
             if (l.endsWith(',')) {
               l = l.slice(0, -1); // remove ','
             }
-            if (l.endsWith('felt252') && line.endsWith('shortstring')) {
+            if (comment == '@generateContants:shortstring') {
               l = l.replace('felt252', 'shortstring');
             }
             // console.log(l)
@@ -91,41 +96,62 @@ function getConstantsFromCairoFile(filePath) {
           }
         }
       }
-    } else if (line == '#[cfg(test)]') {
+    } else if (l == '#[cfg(test)]') {
       is_test = true;
     } else {
       // outside mod/enum
-      if ((line.startsWith('mod ') || line.startsWith('pub mod ')) && line.endsWith(' {')) {
-        current_mod = line.split(' ').at(-2);
-        // console.log(`MOD!!`, current_mod, line)
+      if ((line.startsWith('mod ') || line.startsWith('pub mod ')) && l.endsWith('{')) {
+        current_mod = l.split(' ').at(-2);
+        // console.log(`[${fileName}] MOD: [${current_mod}] @`, line)
         if (!is_test) {
           mods[current_mod] = {
             filePath,
             lines: [],
           }
         }
-      } else if (line.startsWith('pub enum ') && line.endsWith(' {') && !is_test) {
-        current_enum = line.split(' ').at(-2);
-        // console.log(`ENUM!!`, current_enum, line)
+      } else if (line.startsWith('pub enum ') && l.endsWith('{') && !is_test) {
+        current_enum = l.split(' ').at(-2);
+        // console.log(`[${fileName}] ENUM: [${current_enum}] @`, line)
         enums[current_enum] = {
           filePath,
           lines: [],
         }
-      } else if (line.startsWith('pub struct ') && line.endsWith(' {') && !is_test) {
-        current_struct = line.split(' ').at(-2);
-        // console.log(`STRUCT!!`, current_struct, ':', line)
+      } else if (line.startsWith('pub struct ') && l.endsWith('{') && !is_test) {
+        current_struct = l.split(' ').at(-2);
+        // console.log(`[${fileName}] STRUCT: [${current_struct}] @`, line)
         structs[current_struct] = {
           filePath,
           lines: [],
+          force: (comment == '@generateContants:force'),
         }
       }
     }
+  })
+  // parse custom types
+  Object.keys(structs).forEach((custom_type) => {
+    const str = structs[custom_type];
+    custom_types[custom_type] = {};
+    // console.log(`>>> typeName [${typeName}] :`, str.lines);
+    str.lines.forEach(line => {
+      if (line.startsWith('#')) return;
+      let [name, cairo_type] = line.split(':');
+      name = name.trim();
+      name = name.replace('pub ', '');
+      cairo_type = cairo_type.trim();
+      let ts_type = get_cairo_to_typescript_type(cairo_type, enums);
+      // console.log(`>>> typeName [${typeName}]>`, ts_type);
+      // if (!ts_type) {
+      //   console.error(`ERROR: Unknown value type for type [${custom_type}] [${cairo_type}]`)
+      // }
+      custom_types[custom_type][name] = { name, cairo_type, ts_type };
+    });
   })
   // console.log(mods)
   return {
     mods,
     enums,
     structs,
+    custom_types,
   }
 }
 
@@ -149,51 +175,18 @@ const cairoToTypescriptType = {
   enum: "string",
   shortstring: "string",
 };
-let customTypeMap = {
-}
 
-function get_cairo_to_typescript_type(cairoType, parsed, value=null) {
+function get_cairo_to_typescript_type(cairoType, enums, value=null) {
   // felt252 as string
   if (value != null && cairoType == 'felt252' && value.startsWith("'")) {
     return 'string';
   }
-  if (parsed.enums[cairoType]) {
-    // console.log(`---got ENUM`, parsed.enums[cairoType]);
+  if (enums[cairoType]) {
+    // console.log(`---got ENUM`, enums[cairoType]);
     return cairoType;
   }
   let result = cairoToTypescriptType[cairoType];
   return result;
-}
-
-// returns [typeMap, contents]
-function get_custom_type_contents(custom_type, parsed) {
-  if (customTypeMap[custom_type]) {
-    // already parsed
-    return [customTypeMap[custom_type], ''];
-  }
-  let str = parsed.structs[custom_type];
-  if (str) {
-    customTypeMap[custom_type] = {};
-    let contents = `\n// from: ${str.filePath}\n`;
-    contents += `export type ${custom_type} = {\n`;
-    // console.log(`>>> typeName [${typeName}] :`, str.lines);
-    str.lines.forEach(line => {
-      let [name, cairo_type] = line.split(':');
-      name = name.trim();
-      cairo_type = cairo_type.trim();
-      let ts_type = get_cairo_to_typescript_type(cairo_type, parsed);
-      // console.log(`>>> typeName [${typeName}]>`, ts_type);
-      if (!ts_type) {
-        console.error(`ERROR: Unknown value type for type [${custom_type}] [${cairo_type}]`)
-      }
-      contents += `  ${name} : ${ts_type},\n`;
-      customTypeMap[custom_type][name] = [cairo_type, ts_type];
-    });
-    contents += `};\n`;
-    return [customTypeMap[custom_type], contents];
-  }
-  // not parsed / error
-  return [null, null];
 }
 
 function format_ts_value(value, cairo_type, ts_type) {
@@ -266,6 +259,7 @@ function buildFileContents(parsed) {
   //
   // enums
   //
+  console.log(`>>> enums:`, Object.keys(parsed.enums))
   fileContents += `\n\n`;
   fileContents += `//----------------------------------\n`;
   fileContents += `// enums\n`;
@@ -309,13 +303,10 @@ function buildFileContents(parsed) {
   })
   
   //
-  // constants
+  // types + constants
   //
-  fileContents += `\n\n`;
-  fileContents += `//----------------------------------\n`;
-  fileContents += `// custom types\n`;
-  fileContents += `//\n`;
-
+  console.log(`>>> constants:`, Object.keys(parsed.mods))
+  let custom_types_to_export = new Set(Object.keys(parsed.structs).filter(v => parsed.structs[v].force));
   let constantsContents = '';
   const mods = parsed.mods
   Object.keys(mods).forEach((key) => {
@@ -331,20 +322,20 @@ function buildFileContents(parsed) {
       const name = _name.trim();
       const cairo_type = _type.trim();
       const value = _value.trim();
-      let ts_type = get_cairo_to_typescript_type(cairo_type, parsed, value);
+      let ts_type = get_cairo_to_typescript_type(cairo_type, parsed.enums, value);
       let ts_value = '';
       let comment;
       if (ts_type) {
         [ts_value, comment] = format_ts_value(value, cairo_type, ts_type);
       } else {
         // cutom types (structs)
-        let [custom_type_map, custom_type_contents] = get_custom_type_contents(cairo_type, parsed);
+        let custom_type_map = parsed.custom_types[cairo_type];
         // console.log(`mod [${modName}] type [${typeName}]:`, value)
-        if (custom_type_contents === null) {
+        if (custom_type_map === null) {
           console.error(`❌ ERROR: Invalid type [${cairo_type}] from:`, line);
           process.exit(1);
         }
-        fileContents += custom_type_contents;
+        custom_types_to_export.add(cairo_type);
         // separate values
         // value ex: EnvCardPoints { name: 'No Tactics', rarity: Rarity::Special, chances: 0, damage: 0, }
         ts_type = cairo_type; // struct name
@@ -358,7 +349,7 @@ function buildFileContents(parsed) {
             if (sep >= 0) {
               let _name = l.slice(0, sep).trim();
               let _value = l.slice(sep + 1).trim();
-              let [_cairo_type, _ts_type] = custom_type_map[_name];
+              let { cairo_type: _cairo_type, ts_type: _ts_type } = custom_type_map[_name];
               let [_ts_value, _comment] = format_ts_value(_value, _cairo_type, _ts_type);
               // console.log(`----- [${l}] k:[${_name}] v:[${_value}], _cairo_type:[${_cairo_type}] _ts_type:[${_ts_type}] = [${_ts_value}]`)
               ts_value += `    ${_name}: ${_ts_value},${_comment ? ` // ${_comment}` : ''}\n`;
@@ -379,6 +370,29 @@ function buildFileContents(parsed) {
     constantsContents += valuesContents;
     // exports
     exports.push(modName);
+  })
+
+  fileContents += `\n\n`;
+  fileContents += `//----------------------------------\n`;
+  fileContents += `// custom types\n`;
+  fileContents += `//\n`;
+  console.log(`>>> custom_types:`, custom_types_to_export)
+  custom_types_to_export.forEach(custom_type => {
+    let str = parsed.structs[custom_type];
+    if (str) {
+      fileContents += `\n// from: ${str.filePath}\n`;
+      fileContents += `export type ${custom_type} = {\n`;
+      Object.keys(parsed.custom_types[custom_type]).forEach(name => {
+        let { cairo_type, ts_type } = parsed.custom_types[custom_type][name];
+        if (!ts_type && !Object.keys(parsed.enums).includes(cairo_type)) {
+          console.error(`ERROR: Unknown type [${cairo_type}] on [${custom_type}]:\n${str.filePath}`)
+          console.error(`❌ ABORTED`);
+          process.exit(1);
+        }
+        fileContents += `  ${name} : ${ts_type ?? cairo_type},\n`;
+      });
+      fileContents += `};\n`;
+    }
   })
 
   fileContents += `\n\n`;
@@ -409,7 +423,7 @@ process.argv.forEach(arg => {
 
 if (!arg_src || !arg_out) {
   console.log("Usage: npm run create-constants --src:<SRC_PATH> --out:<OUTPUT_PATH>");
-  console.error(`❌ ABORTED`)
+  console.error(`❌ ABORTED`);
   process.exit(1);
 }
 
@@ -426,7 +440,7 @@ cairoFiles.sort((a, b) => (
 ));
 
 let parsed = cairoFiles.reduce((acc, filePath) => {
-  const { mods, enums, structs } = getConstantsFromCairoFile(filePath)
+  const { mods, enums, structs, custom_types } = getConstantsFromCairoFile(filePath)
   Object.keys(mods).forEach((key) => {
     if (mods[key].lines.length > 0) {
       if (acc.mods[key]) {
@@ -454,8 +468,17 @@ let parsed = cairoFiles.reduce((acc, filePath) => {
       acc.structs[key] = structs[key];
     }
   })
+  Object.keys(custom_types).forEach((key) => {
+    if (Object.keys(custom_types[key]).length > 0) {
+      if (acc.custom_types[key]) {
+        console.error(`❌ ERROR: Duplicated custom_types [${key}]`)
+        process.exit(1);
+      }
+      acc.custom_types[key] = custom_types[key];
+    }
+  })
   return acc;
-}, { mods: {}, enums: {}, structs: {} })
+}, { mods: {}, enums: {}, structs: {}, custom_types: {} })
 // console.log(parsed)
 
 const fileContents = buildFileContents(parsed)

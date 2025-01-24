@@ -24,8 +24,8 @@ pub enum Premise {
 
 #[derive(Copy, Drop, Serde, Default)]
 pub struct PremiseDescription {
-    name: felt252, // @generateContants_type: shortstring
-    prefix: felt252, // @generateContants_type: shortstring
+    name: felt252, // @generateContants:shortstring
+    prefix: felt252, // @generateContants:shortstring
 }
 
 // to be exported to typescript by generateConstants
