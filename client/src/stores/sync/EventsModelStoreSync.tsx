@@ -84,7 +84,7 @@ export function EventsModelStoreSync() {
   //   if (sdk) _fetch()
   // }, [sdk])
 
-  useEffect(() => console.log("EventsModelStoreSync() =>", eventsState.entities), [eventsState.entities])
+  // useEffect(() => console.log("EventsModelStoreSync() =>", eventsState.entities), [eventsState.entities])
 
   return (<></>)
 }

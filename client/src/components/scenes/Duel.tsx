@@ -58,7 +58,7 @@ export default function Duel({
   const { tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start } = useAddChallenge(duelId)
   const { description } = useTable(tableId)
 
-  console.log('Duel', duelId, tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start)
+  // console.log('Duel', duelId, tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start)
 
   // switch to active duelist, if owned by player
   const { isSynced } = useSyncToActiveDuelists([duelistIdA, duelistIdB])

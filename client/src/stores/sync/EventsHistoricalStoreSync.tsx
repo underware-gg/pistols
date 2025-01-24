@@ -77,7 +77,7 @@ export function EventsHistoricalStoreSync() {
   //   if (sdk) _subscribe()
   // }, [sdk])
 
-  useEffect(() => console.log("EventsHistoricalStoreSync() =>", historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
+  // useEffect(() => console.log("EventsHistoricalStoreSync() =>", historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
 
   return (<></>)
 }

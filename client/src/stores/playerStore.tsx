@@ -77,7 +77,7 @@ const createStore = () => {
       });
     },
     updateMessages: (entities: PistolsEntity[]) => {
-      console.log("updateMessages()[Player] =>", entities)
+      // console.log("updateMessages()[Player] =>", entities)
       set((state: State) => {
         entities.forEach((e) => {
           const online = e.models.pistols.PlayerOnline

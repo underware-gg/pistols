@@ -46,7 +46,7 @@ export function ChallengeStoreSync() {
     // query_sub,
     enabled: mounted,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log("ChallengeStoreSync() SET =======> [entities]:", entities)
+      // console.log("ChallengeStoreSync() SET =======> [entities]:", entities)
       challengeState.setEntities(entities)
       queryState.setEntities(entities)
     },
@@ -57,7 +57,7 @@ export function ChallengeStoreSync() {
     // },
   })
 
-  useEffect(() => console.log(`ChallengeStoreSync() [${Object.keys(challengeState.entities).length}] =>`, challengeState.entities), [challengeState.entities])
+  // useEffect(() => console.log(`ChallengeStoreSync() [${Object.keys(challengeState.entities).length}] =>`, challengeState.entities), [challengeState.entities])
 
   return (<></>)
 }
