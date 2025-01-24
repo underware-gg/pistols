@@ -21,15 +21,14 @@ import WalletFinderModal from '/src/components/modals/WalletFinderModal'
 import ActivityPanel from '/src/components/ActivityPanel'
 import ScProfile from '/src/components/scenes/ScProfile'
 import ScTavern from '/src/components/scenes/ScTavern'
-import ScDuels from '/src/components/scenes/ScDuels'
+import ScDuelsBoard from '/src/components/scenes/ScDuelsBoard'
 import ScDuelists from '/src/components/scenes/ScDuelists'
 import ScGraveyard from '/src/components/scenes/ScGraveyard'
 import ScTutorial from '/src/components/scenes/ScTutorial'
 import StoreSync from '/src/stores/sync/StoreSync'
 import Gate from '/src/components/scenes/ScGate'
 import Door from '/src/components/scenes/ScDoor'
-import Duel from '/src/components/scenes/Duel'
-
+import ScDuel from '/src/components/scenes/ScDuel'
 // test sdk
 import { helloPistols } from '@underware_gg/pistols-sdk'
 import { DuelTutorialLevel } from '../data/tutorialConstants'
@@ -74,8 +73,7 @@ function MainUI() {
   useSyncSelectedDuelist()
 
   const { gameImpl } = useThreeJsContext()
-  const { currentDuel } = usePistolsContext()
-  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuels, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
+  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
   useEffect(() => {
@@ -83,16 +81,16 @@ function MainUI() {
       if (atGate) setCurrentScene(<Gate />);
       else if (atDoor) setCurrentScene(<Door />);
       else if (atTutorial) setCurrentScene(<TutorialUI />);
-      else if (atDuel && currentDuel) setCurrentScene(<Duel duelId={currentDuel} tutorial={DuelTutorialLevel.SIMPLE} />);
+      else if (atDuel) setCurrentScene(<ScDuel />);
       else if (atProfile) setCurrentScene(<ScProfile />);
-      else if (atDuels) setCurrentScene(<ScDuels />);
+      else if (atDuelsBoard) setCurrentScene(<ScDuelsBoard />);
       else if (atDuelists) setCurrentScene(<ScDuelists />);
       else if (atGraveyard) setCurrentScene(<ScGraveyard />);
       else setCurrentScene(<ScTavern />);
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [atGate, atDoor, atTutorial, atDuel, selectedDuelId, atProfile, atDuels, atDuelists, atGraveyard, atTavern]);
+  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atGraveyard]);
 
   if (!gameImpl) return <></>
 

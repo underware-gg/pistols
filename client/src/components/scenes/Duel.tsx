@@ -81,40 +81,11 @@ export default function Duel({
   // console.log('DUEL_SCENE_STARTED', duelSceneStarted, isSynced, `[${duelistId}]`, duelistIdA, duelistIdB, isYouA, isYouB, characterTypeA, characterTypeB, nameA, nameB)
 
   // setup grass animation 
-  const { clientSeconds } = useClientTimestamp(false)
   useEffect(() => {
     if (clientSeconds && timestamp_start) {
       gameImpl?.setDuelTimePercentage(clientSeconds - timestamp_start)
     }
   }, [gameImpl, clientSeconds, timestamp_start])
-
-  // Animated duel is useDuel added with intermediate animation stages
-  const {
-    duelStage,
-    completedStagesA, completedStagesB,
-    canAutoRevealA, canAutoRevealB,
-  } = useAnimatedDuel(duelId, duelSceneStarted)
-
-  const { debugMode, duelSpeedFactor } = useSettings()
-  const { dispatchSetDuel } = usePistolsContext()
-
-  useEffect(() => dispatchSetDuel(duelId), [duelId])
-
-  const [statsA, setStatsA] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined })
-  const [statsB, setStatsB] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined })
-
-  const [ isPlaying, setIsPlaying ] = useState(true)
-  const [ triggerReset, setTriggerReset ] = useState(false)
-  
-  const cardRef = useRef<CardsHandle>(null)
-  const currentStep = useRef(0)
-
-  const isPlayingRef = useRef(true)
-  const speedRef = useRef(duelSpeedFactor)
-  const isAnimatingStepRef = useRef(false)
-  const hasSpawnedCardsA = useRef(false)
-  const hasSpawnedCardsB = useRef(false)
-  const hasUnmounted = useRef(false)
 
   useEffect(() => {
     speedRef.current = duelSpeedFactor
@@ -216,8 +187,6 @@ export default function Duel({
         hasUnmounted.current = true
     };
   }, [duelProgress, triggerReset])
-  
-  const { aspectWidth } = useGameAspect()
 
   const playStep = () => {
     currentStep.current += 1
@@ -232,10 +201,10 @@ export default function Duel({
 
     let shouldDoblePause = false
 
-    // Reveal all cards in hand A
     let revealCardsA = [];
     let revealCardsB = [];
-
+    
+    // Reveal all cards in hand A
     if (step.card_a.fire) {
       shouldDoblePause = true;
       revealCardsA.push({ type: DuelistCardType.FIRE, delay: Constants.DRAW_CARD_BASE_DURATION + 200 });
@@ -262,8 +231,8 @@ export default function Duel({
     }
 
     cardRevealTimeout.current = setTimeout(() => {
-      revealCardsA.forEach(card => cardRef.current?.revealCard("A", card.type, speedRef.current));
-      revealCardsB.forEach(card => cardRef.current?.revealCard("B", card.type, speedRef.current));
+      revealCardsA.forEach(card => cardRef.current?.revealCard("A", card.type, speedRef.current, step.state_a.health > 0));
+      revealCardsB.forEach(card => cardRef.current?.revealCard("B", card.type, speedRef.current, step.state_b.health > 0));
     }, Math.max(...[...revealCardsA, ...revealCardsB].map(card => card.delay || 0), 0) / speedRef.current);
 
     let newStatsA: DuelistState;
@@ -307,7 +276,7 @@ export default function Duel({
       } else {
         gameImpl?.animateActions(Action[step.card_a.blades], Action[step.card_b.blades], newStatsA?.health, newStatsB?.health)
       }
-    }, step.card_env != constants.EnvCard.None ? (timeDelay / speedRef.current) : 1000 / speedRef.current);
+    }, step.card_env != constants.EnvCard.None ? (timeDelay / speedRef.current) : 3000 / speedRef.current);
 
     if (currentStep.current < duelProgress.steps.length && isPlayingRef.current) {
       nextStepCallback.current = setTimeout(() => {
@@ -421,7 +390,7 @@ export default function Duel({
         </div>
       </div>
 
-      <DuelTutorialOverlay tutorialType={tutorial} open={true} />
+      <DuelTutorialOverlay tutorialType={tutorial} open={tutorial != DuelTutorialLevel.NONE} />
 
       {/* {duelProgress &&
         <div className='CenteredPanel'>

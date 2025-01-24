@@ -45,7 +45,6 @@ export default function DuelProgress({
         setCommitModalIsOpen(true)
       } else if (duelStage == DuelStage.Round1Reveal) {
         if (canReveal && !didReveal) {
-          console.log(`reveal(${isA ? 'A' : 'B'}) hash:`, bigintToHex(round1Moves?.hashed ?? 0))
           setDidReveal(true)
           reveal()
         }
