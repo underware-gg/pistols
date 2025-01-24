@@ -271,17 +271,6 @@ export interface PlayerOnlineValue {
 	timestamp: BigNumberish;
 }
 
-// Type definition for `pistols::models::player::PlayerTutorialProgress` struct
-export interface PlayerTutorialProgress {
-	identity: string;
-	progress: TutorialProgressEnum;
-}
-
-// Type definition for `pistols::models::player::PlayerTutorialProgressValue` struct
-export interface PlayerTutorialProgressValue {
-	progress: TutorialProgressEnum;
-}
-
 // Type definition for `pistols::models::player::PlayerValue` struct
 export interface PlayerValue {
 	timestamp_registered: BigNumberish;
@@ -438,15 +427,6 @@ export type PackType = {
 }
 export type PackTypeEnum = CairoCustomEnum;
 
-// Type definition for `pistols::models::player::TutorialProgress` enum
-export type TutorialProgress = {
-	None: string;
-	FinishedFirst: string;
-	FinishedSecond: string;
-	FinishedFirstDuel: string;
-}
-export type TutorialProgressEnum = CairoCustomEnum;
-
 // Type definition for `pistols::models::season::SeasonPhase` enum
 export type SeasonPhase = {
 	None: string;
@@ -594,7 +574,6 @@ export type RoundStateEnum = CairoCustomEnum;
 // Type definition for `pistols::models::player::Activity` enum
 export type Activity = {
 	Undefined: string;
-	StartedTutorial: string;
 	FinishedTutorial: string;
 	WelcomePack: string;
 	PurchasedPack: string;
@@ -644,8 +623,6 @@ export interface SchemaType extends ISchemaType {
 		PlayerBookmarkValue: WithFieldOrder<PlayerBookmarkValue>,
 		PlayerOnline: WithFieldOrder<PlayerOnline>,
 		PlayerOnlineValue: WithFieldOrder<PlayerOnlineValue>,
-		PlayerTutorialProgress: WithFieldOrder<PlayerTutorialProgress>,
-		PlayerTutorialProgressValue: WithFieldOrder<PlayerTutorialProgressValue>,
 		PlayerValue: WithFieldOrder<PlayerValue>,
 		SeasonConfig: WithFieldOrder<SeasonConfig>,
 		SeasonConfigValue: WithFieldOrder<SeasonConfigValue>,
@@ -969,23 +946,6 @@ export const schema: SchemaType = {
 			fieldOrder: ['timestamp'],
 			timestamp: 0,
 		},
-		PlayerTutorialProgress: {
-			fieldOrder: ['identity', 'progress'],
-			identity: "",
-		progress: new CairoCustomEnum({ 
-					None: "",
-				FinishedFirst: undefined,
-				FinishedSecond: undefined,
-				FinishedFirstDuel: undefined, }),
-		},
-		PlayerTutorialProgressValue: {
-			fieldOrder: ['progress'],
-		progress: new CairoCustomEnum({ 
-					None: "",
-				FinishedFirst: undefined,
-				FinishedSecond: undefined,
-				FinishedFirstDuel: undefined, }),
-		},
 		PlayerValue: {
 			fieldOrder: ['timestamp_registered', 'claimed_welcome_pack'],
 			timestamp_registered: 0,
@@ -1112,7 +1072,6 @@ export const schema: SchemaType = {
 			timestamp: 0,
 		activity: new CairoCustomEnum({ 
 					Undefined: "",
-				StartedTutorial: undefined,
 				FinishedTutorial: undefined,
 				WelcomePack: undefined,
 				PurchasedPack: undefined,
@@ -1131,7 +1090,6 @@ export const schema: SchemaType = {
 			timestamp: 0,
 		activity: new CairoCustomEnum({ 
 					Undefined: "",
-				StartedTutorial: undefined,
 				FinishedTutorial: undefined,
 				WelcomePack: undefined,
 				PurchasedPack: undefined,
@@ -1192,10 +1150,7 @@ export enum ModelsMapping {
 	PlayerBookmarkValue = 'pistols-PlayerBookmarkValue',
 	PlayerOnline = 'pistols-PlayerOnline',
 	PlayerOnlineValue = 'pistols-PlayerOnlineValue',
-	PlayerTutorialProgress = 'pistols-PlayerTutorialProgress',
-	PlayerTutorialProgressValue = 'pistols-PlayerTutorialProgressValue',
 	PlayerValue = 'pistols-PlayerValue',
-	TutorialProgress = 'pistols-TutorialProgress',
 	SeasonConfig = 'pistols-SeasonConfig',
 	SeasonConfigValue = 'pistols-SeasonConfigValue',
 	SeasonPhase = 'pistols-SeasonPhase',

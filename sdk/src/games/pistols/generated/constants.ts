@@ -53,32 +53,20 @@ export const getPackTypeMap = (): Record<PackType, number> => Object.keys(PackTy
 // from: ../dojo/src/models/player.cairo
 export enum Activity {
   Undefined = 'Undefined', // 0
-  StartedTutorial = 'StartedTutorial', // 1
-  FinishedTutorial = 'FinishedTutorial', // 2
-  WelcomePack = 'WelcomePack', // 3
-  PurchasedPack = 'PurchasedPack', // 4
-  CreatedDuelist = 'CreatedDuelist', // 5
-  CreatedChallenge = 'CreatedChallenge', // 6
-  RepliedChallenge = 'RepliedChallenge', // 7
-  CommittedMoves = 'CommittedMoves', // 8
-  RevealedMoves = 'RevealedMoves', // 9
-  DuelResolved = 'DuelResolved', // 10
-  DuelDraw = 'DuelDraw', // 11
+  FinishedTutorial = 'FinishedTutorial', // 1
+  WelcomePack = 'WelcomePack', // 2
+  PurchasedPack = 'PurchasedPack', // 3
+  CreatedDuelist = 'CreatedDuelist', // 4
+  CreatedChallenge = 'CreatedChallenge', // 5
+  RepliedChallenge = 'RepliedChallenge', // 6
+  CommittedMoves = 'CommittedMoves', // 7
+  RevealedMoves = 'RevealedMoves', // 8
+  DuelResolved = 'DuelResolved', // 9
+  DuelDraw = 'DuelDraw', // 10
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
 export const getActivityMap = (): Record<Activity, number> => Object.keys(Activity).reduce((acc, v, index) => { acc[v as Activity] = index; return acc; }, {} as Record<Activity, number>);
-
-// from: ../dojo/src/models/player.cairo
-export enum TutorialProgress {
-  None = 'None', // 0
-  FinishedFirst = 'FinishedFirst', // 1
-  FinishedSecond = 'FinishedSecond', // 2
-  FinishedFirstDuel = 'FinishedFirstDuel', // 3
-};
-export const getTutorialProgressValue = (name: TutorialProgress): number | undefined => _indexOrUndefined(Object.keys(TutorialProgress).indexOf(name));
-export const getTutorialProgressFromValue = (value: number): TutorialProgress | undefined => Object.keys(TutorialProgress)[value] as TutorialProgress;
-export const getTutorialProgressMap = (): Record<TutorialProgress, number> => Object.keys(TutorialProgress).reduce((acc, v, index) => { acc[v as TutorialProgress] = index; return acc; }, {} as Record<TutorialProgress, number>);
 
 // from: ../dojo/src/models/season.cairo
 export enum SeasonPhase {
@@ -311,6 +299,16 @@ export const getBotProfileValue = (name: BotProfile): number | undefined => _ind
 export const getBotProfileFromValue = (value: number): BotProfile | undefined => Object.keys(BotProfile)[value] as BotProfile;
 export const getBotProfileMap = (): Record<BotProfile, number> => Object.keys(BotProfile).reduce((acc, v, index) => { acc[v as BotProfile] = index; return acc; }, {} as Record<BotProfile, number>);
 
+// from: ../dojo/src/types/profile_type.cairo
+export enum Gender {
+  Undefined = 'Undefined', // 0
+  Male = 'Male', // 1
+  Female = 'Female', // 2
+};
+export const getGenderValue = (name: Gender): number | undefined => _indexOrUndefined(Object.keys(Gender).indexOf(name));
+export const getGenderFromValue = (value: number): Gender | undefined => Object.keys(Gender)[value] as Gender;
+export const getGenderMap = (): Record<Gender, number> => Object.keys(Gender).reduce((acc, v, index) => { acc[v as Gender] = index; return acc; }, {} as Record<Gender, number>);
+
 // from: ../dojo/src/types/round_state.cairo
 export enum RoundState {
   Null = 'Null', // 0
@@ -364,6 +362,7 @@ export type PremiseDescription = {
 // from: ../dojo/src/types/profile_type.cairo
 export type ProfileDescription = {
   profile_id : number,
+  gender : Gender,
   name : string,
 };
 
@@ -801,26 +800,6 @@ export const PREMISES: type_PREMISES = {
 };
 
 // from: ../dojo/src/types/profile_type.cairo
-type type_PROFILES = {
-  DUELIST_PROFILE_COUNT: number, // cairo: u8
-  CHARACTER_PROFILE_COUNT: number, // cairo: u8
-  BOT_PROFILE_COUNT: number, // cairo: u8
-  DUELIST_ID_BASE: bigint, // cairo: u128
-  CHARACTER_ID_BASE: bigint, // cairo: u128
-  BOT_ID_BASE: bigint, // cairo: u128
-  UNDEFINED_ID_BASE: bigint, // cairo: u128
-};
-export const PROFILES: type_PROFILES = {
-  DUELIST_PROFILE_COUNT: 21,
-  CHARACTER_PROFILE_COUNT: 4,
-  BOT_PROFILE_COUNT: 3,
-  DUELIST_ID_BASE: BigInt('0x100000000'),
-  CHARACTER_ID_BASE: BigInt('0x200000000'),
-  BOT_ID_BASE: BigInt('0x300000000'),
-  UNDEFINED_ID_BASE: BigInt('0xf00000000'),
-};
-
-// from: ../dojo/src/types/profile_type.cairo
 type type_DUELIST_PROFILES = {
   Unknown: ProfileDescription, // cairo: ProfileDescription
   Duke: ProfileDescription, // cairo: ProfileDescription
@@ -848,90 +827,112 @@ type type_DUELIST_PROFILES = {
 export const DUELIST_PROFILES: type_DUELIST_PROFILES = {
   Unknown: {
     profile_id: 0,
+    gender: Gender.Undefined,
     name: 'Unknown',
   },
   Duke: {
     profile_id: 1,
+    gender: Gender.Male,
     name: 'Duke',
   },
   Duella: {
     profile_id: 2,
+    gender: Gender.Female,
     name: 'Duella',
   },
   Jameson: {
     profile_id: 3,
+    gender: Gender.Male,
     name: 'Jameson',
   },
   Pilgrim: {
     profile_id: 4,
+    gender: Gender.Male,
     name: 'Pilgrim',
   },
   Jack: {
     profile_id: 5,
+    gender: Gender.Male,
     name: 'Jack',
   },
   Pops: {
     profile_id: 6,
+    gender: Gender.Male,
     name: 'Pops',
   },
   SerWalker: {
     profile_id: 7,
+    gender: Gender.Male,
     name: 'Ser Walker',
   },
   Bloberto: {
     profile_id: 8,
+    gender: Gender.Male,
     name: 'Bloberto',
   },
   Squiddo: {
     profile_id: 9,
+    gender: Gender.Male,
     name: 'Squiddo',
   },
   SlenderDuck: {
     profile_id: 10,
+    gender: Gender.Male,
     name: 'Slender Duck',
   },
   LadyVengeance: {
     profile_id: 11,
+    gender: Gender.Female,
     name: 'Lady Vengeance',
   },
   Breadman: {
     profile_id: 12,
+    gender: Gender.Male,
     name: 'Breadman',
   },
   Brutus: {
     profile_id: 13,
+    gender: Gender.Male,
     name: 'Brutus',
   },
   Pistolopher: {
     profile_id: 14,
+    gender: Gender.Male,
     name: 'Pistolopher',
   },
   Secreto: {
     profile_id: 15,
+    gender: Gender.Male,
     name: 'Secreto',
   },
   ShadowMare: {
     profile_id: 16,
+    gender: Gender.Female,
     name: 'Shadow Mare',
   },
   Karaku: {
     profile_id: 17,
+    gender: Gender.Male,
     name: 'Karaku',
   },
   Misty: {
     profile_id: 18,
+    gender: Gender.Female,
     name: 'Misty',
   },
   Kenzu: {
     profile_id: 19,
+    gender: Gender.Female,
     name: 'Kenzu',
   },
   NynJah: {
     profile_id: 20,
+    gender: Gender.Male,
     name: 'Nyn Jah',
   },
   Thrak: {
     profile_id: 21,
+    gender: Gender.Male,
     name: 'Thrak',
   },
 };
@@ -947,22 +948,27 @@ type type_CHARACTER_PROFILES = {
 export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
   Unknown: {
     profile_id: 0,
+    gender: Gender.Undefined,
     name: 'Unknown',
   },
   Bartender: {
     profile_id: 1,
+    gender: Gender.Male,
     name: 'Bartender',
   },
   Drunken: {
     profile_id: 2,
+    gender: Gender.Male,
     name: 'Drunken',
   },
   Devil: {
     profile_id: 3,
+    gender: Gender.Male,
     name: 'Devil',
   },
   Player: {
     profile_id: 4,
+    gender: Gender.Male,
     name: 'Stranger',
   },
 };
@@ -977,20 +983,44 @@ type type_BOT_PROFILES = {
 export const BOT_PROFILES: type_BOT_PROFILES = {
   Unknown: {
     profile_id: 0,
+    gender: Gender.Undefined,
     name: 'Unknown',
   },
   TinMan: {
     profile_id: 1,
+    gender: Gender.Male,
     name: 'Tin Man',
   },
   Scarecrow: {
     profile_id: 2,
+    gender: Gender.Male,
     name: 'Scarecrow',
   },
   Leon: {
     profile_id: 3,
+    gender: Gender.Male,
     name: 'Leon',
   },
+};
+
+// from: ../dojo/src/types/profile_type.cairo
+type type_PROFILES = {
+  DUELIST_PROFILE_COUNT: number, // cairo: u8
+  CHARACTER_PROFILE_COUNT: number, // cairo: u8
+  BOT_PROFILE_COUNT: number, // cairo: u8
+  DUELIST_ID_BASE: bigint, // cairo: u128
+  CHARACTER_ID_BASE: bigint, // cairo: u128
+  BOT_ID_BASE: bigint, // cairo: u128
+  UNDEFINED_ID_BASE: bigint, // cairo: u128
+};
+export const PROFILES: type_PROFILES = {
+  DUELIST_PROFILE_COUNT: 21,
+  CHARACTER_PROFILE_COUNT: 4,
+  BOT_PROFILE_COUNT: 3,
+  DUELIST_ID_BASE: BigInt('0x100000000'),
+  CHARACTER_ID_BASE: BigInt('0x200000000'),
+  BOT_ID_BASE: BigInt('0x300000000'),
+  UNDEFINED_ID_BASE: BigInt('0xf00000000'),
 };
 
 // from: ../dojo/src/types/trophies.cairo

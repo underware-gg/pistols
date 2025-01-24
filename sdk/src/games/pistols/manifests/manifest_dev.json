@@ -1864,8 +1864,8 @@
       ]
     },
     {
-      "address": "0x617a3b297cd7d5d890bc330b544a6650e14fcbede17844cdae25d97998f6b1c",
-      "class_hash": "0x1f580de874a49707039ea75bb6fd1a2473ffda96ff20fb40a71a7a38ff9e2a",
+      "address": "0x762c4b9a908fcfa7723ea82e467d7958f115ae68ecab1cef82630517e4fec5a",
+      "class_hash": "0x40ebabfd6ab423e079b54121a247d5f8ccc7cf024e09703ab54499150ead92e",
       "abi": [
         {
           "type": "impl",
@@ -2998,8 +2998,8 @@
       ]
     },
     {
-      "address": "0x772ff0dc02461db29356466910d40c054fe65770834300cbb74663b2615bc08",
-      "class_hash": "0x666561a9d735da3e7073510ca8b8533722693caf728e916ad0b46baa73e91fc",
+      "address": "0x1c31bc88d2bec8f70399462597ed17fdb4f9c235bb34cdaba2dfef3644dfe9d",
+      "class_hash": "0x378bae68045701230a42fbc50cb61de37997ae42a6503511d729adf34c13b61",
       "abi": [
         {
           "type": "impl",
@@ -4628,8 +4628,8 @@
       ]
     },
     {
-      "address": "0x7b0d62132d3eed16547aa1cd69c6c0db232f3bee4b5478d9692de26d1542cc4",
-      "class_hash": "0x2349ad6adde47b286aa033a5bb741162342435819133c2809f1009809c47f4d",
+      "address": "0x478dc8140b2c3f50afa1dc3c1870478eb6ffd9990ef0e78a8b817f955429d06",
+      "class_hash": "0x37bd304d169da274450232735b3a81b9f988dff0250240ee348014fdbd04086",
       "abi": [
         {
           "type": "impl",
@@ -5860,8 +5860,8 @@
       ]
     },
     {
-      "address": "0x310384d4135556d10c474ceda1f4fff48b1f42e42a037573e54022e684eb7f",
-      "class_hash": "0x5f4fb612b2bb5eb8812612f23e35942959870c9f97430132c15e2384d237a0b",
+      "address": "0xf5ee7fc9a123bdb2836cf476129d84a53ca93928b23d3906c66b62fb03d6ae",
+      "class_hash": "0x6278e4659e4e56a1975f2a03a96dd0ecca8c5bb7e3dbb040427476ce5f49739",
       "abi": [
         {
           "type": "impl",
@@ -7450,8 +7450,8 @@
       ]
     },
     {
-      "address": "0x6259c7d96b95d37088cfbdb2e0ede1257f69a834428f864a75ad38e787cef00",
-      "class_hash": "0x7f2166607069b3923a03185805444a7e60ae5b769b8e1f9e34d3d426b071460",
+      "address": "0x19a35ef2ab5baa2f90fbee9fbb96acd453ba94318c93965c09cec715d25f10",
+      "class_hash": "0x15014f3f661621205b1314bef0b2c77279060efc7b076f050abe998da357c33",
       "abi": [
         {
           "type": "impl",
@@ -8410,12 +8410,6 @@
     },
     {
       "members": [],
-      "class_hash": "0x6dbb679d9ef5cb9f54688d1533ef11c6a92d6080bd9c70dd781466508229d41",
-      "tag": "pistols-PlayerTutorialProgress",
-      "selector": "0x310c3b7d7f6200fd2ea3cbb9b7ee0782f4d838cdd6edee93b415d5b32337b0"
-    },
-    {
-      "members": [],
       "class_hash": "0x23f5c5e422e41439069bc71471d76e8f037abb477a6129a9f41db716988d636",
       "tag": "pistols-Round",
       "selector": "0x617e0a3d97aa8cb3f83bbb5341ede98d3e3d825b6424bcab0676933fec52bc2"
@@ -8460,7 +8454,7 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x66ff59e9facc9387570acaffc839eb9888912f90491d104807827e614a58661",
+      "class_hash": "0x2bef7f47e4cdb0b05c496cfe502f10d7ec14a087b6b69c74c4288997ca79aca",
       "tag": "pistols-PlayerActivity",
       "selector": "0x20ac3bc7f231ea11afb0576a200bff82197a6b397f3e5a4299f5a79ab563ff1"
     },
