@@ -3,25 +3,16 @@ use starknet::ContractAddress;
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Activity {
     Undefined,          // 0
-    StartedTutorial,    // 1
-    FinishedTutorial,   // 2
-    WelcomePack,        // 3
-    PurchasedPack,      // 4
-    CreatedDuelist,     // 5
-    CreatedChallenge,   // 6
-    RepliedChallenge,   // 7
-    CommittedMoves,     // 8
-    RevealedMoves,      // 9
-    DuelResolved,       // 10
-    DuelDraw,           // 11
-}
-
-#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-pub enum TutorialProgress {
-    None,               // 0
-    FinishedFirst,      // 1
-    FinishedSecond,     // 2
-    FinishedFirstDuel,  // 3
+    FinishedTutorial,   // 1
+    WelcomePack,        // 2
+    PurchasedPack,      // 3
+    CreatedDuelist,     // 4
+    CreatedChallenge,   // 5
+    RepliedChallenge,   // 6
+    CommittedMoves,     // 7
+    RevealedMoves,      // 8
+    DuelResolved,       // 9
+    DuelDraw,           // 10
 }
 
 //---------------------
@@ -88,14 +79,6 @@ pub struct PlayerBookmark {
     //-----------------------
     pub enabled: bool,
 }
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct PlayerTutorialProgress {
-    #[key]
-    pub identity: ContractAddress,
-    //-----------------------
-    pub progress: TutorialProgress,
-}
 
 
 //----------------------------------
@@ -147,7 +130,6 @@ impl ActivityImpl of ActivityTrait {
     }
     fn is_public(self: Activity) -> bool {
         match self {
-            Activity::StartedTutorial => false,
             Activity::PurchasedPack => false,
             _ => true,
         }
@@ -155,7 +137,6 @@ impl ActivityImpl of ActivityTrait {
     fn can_register_player(self: Activity) -> bool {
         match self {
             // Activity::WelcomePack => true,
-            // Activity::StartedTutorial => true,
             // Activity::FinishedTutorial => true,
             // Activity::CreatedDuelist => true,
             // Activity::CreatedChallenge => true,

@@ -208,7 +208,7 @@ mod tests {
     }
 
     #[test]
-    fn test_challenge_owner_cancel() {
+    fn test_challenge_owner_withdraw() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A = OWNER();
         let B = OTHER();
