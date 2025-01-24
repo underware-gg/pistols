@@ -1,6 +1,9 @@
 use debug::PrintTrait;
 use starknet::ContractAddress;
 
+//--------------------------
+// ProfileType
+//
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum ProfileType {
     Undefined,
@@ -10,6 +13,9 @@ pub enum ProfileType {
     // Eternum: u16,   // Eternum(realm id)
 }
 
+//--------------------------
+// Profiles
+//
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum DuelistProfile {
     Unknown,
@@ -54,6 +60,199 @@ pub enum BotProfile {
 }
 
 
+
+//--------------------------
+// Profile Descriptions
+//
+#[derive(Copy, Drop, Serde, Default)]
+pub struct ProfileDescription {
+    profile_id: u8,
+    gender: Gender,
+    name: felt252, // @generateContants_type: shortstring
+}
+
+#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
+pub enum Gender {
+    Undefined,
+    Male,
+    Female,
+}
+impl GenderDefault of Default<Gender> {
+    fn default() -> Gender {(Gender::Undefined)}
+}
+
+// to be exported to typescript by generateConstants
+// IMPORTANT: names must be in sync with enum DuelistProfile
+mod DUELIST_PROFILES {
+    use super::{ProfileDescription, Gender};
+    const Unknown: ProfileDescription = ProfileDescription {
+        profile_id: 0,
+        gender: Gender::Undefined,
+        name: 'Unknown',
+    };
+    const Duke: ProfileDescription = ProfileDescription {
+        profile_id: 1,
+        gender: Gender::Male,
+        name: 'Duke',
+    };
+    const Duella: ProfileDescription = ProfileDescription {
+        profile_id: 2,
+        gender: Gender::Female,
+        name: 'Duella',
+    };
+    const Jameson: ProfileDescription = ProfileDescription {
+        profile_id: 3,
+        gender: Gender::Male,
+        name: 'Jameson',
+    };
+    const Pilgrim: ProfileDescription = ProfileDescription {
+        profile_id: 4,
+        gender: Gender::Male,
+        name: 'Pilgrim',
+    };
+    const Jack: ProfileDescription = ProfileDescription {
+        profile_id: 5,
+        gender: Gender::Male,
+        name: 'Jack',
+    };
+    const Pops: ProfileDescription = ProfileDescription {
+        profile_id: 6,
+        gender: Gender::Male,
+        name: 'Pops',
+    };
+    const SerWalker: ProfileDescription = ProfileDescription {
+        profile_id: 7,
+        gender: Gender::Male,
+        name: 'Ser Walker',
+    };
+    const Bloberto: ProfileDescription = ProfileDescription {
+        profile_id: 8,
+        gender: Gender::Male,
+        name: 'Bloberto',
+    };
+    const Squiddo: ProfileDescription = ProfileDescription {
+        profile_id: 9,
+        gender: Gender::Male,
+        name: 'Squiddo',
+    };
+    const SlenderDuck: ProfileDescription = ProfileDescription {
+        profile_id: 10,
+        gender: Gender::Male,
+        name: 'Slender Duck',
+    };
+    const LadyVengeance: ProfileDescription = ProfileDescription {
+        profile_id: 11,
+        gender: Gender::Female,
+        name: 'Lady Vengeance',
+    };
+    const Breadman: ProfileDescription = ProfileDescription {
+        profile_id: 12,
+        gender: Gender::Male,
+        name: 'Breadman',
+    };
+    const Brutus: ProfileDescription = ProfileDescription {
+        profile_id: 13,
+        gender: Gender::Male,
+        name: 'Brutus',
+    };
+    const Pistolopher: ProfileDescription = ProfileDescription {
+        profile_id: 14,
+        gender: Gender::Male,
+        name: 'Pistolopher',
+    };
+    const Secreto: ProfileDescription = ProfileDescription {
+        profile_id: 15,
+        gender: Gender::Male,
+        name: 'Secreto',
+    };
+    const ShadowMare: ProfileDescription = ProfileDescription {
+        profile_id: 16,
+        gender: Gender::Female,
+        name: 'Shadow Mare',
+    };
+    const Karaku: ProfileDescription = ProfileDescription {
+        profile_id: 17,
+        gender: Gender::Male,
+        name: 'Karaku',
+    };
+    const Misty: ProfileDescription = ProfileDescription {
+        profile_id: 18,
+        gender: Gender::Female,
+        name: 'Misty',
+    };
+    const Kenzu: ProfileDescription = ProfileDescription {
+        profile_id: 19,
+        gender: Gender::Female,
+        name: 'Kenzu',
+    };
+    const NynJah: ProfileDescription = ProfileDescription {
+        profile_id: 20,
+        gender: Gender::Male,
+        name: 'Nyn Jah',
+    };
+    const Thrak: ProfileDescription = ProfileDescription {
+        profile_id: 21,
+        gender: Gender::Male,
+        name: 'Thrak',
+    };
+}
+
+// IMPORTANT: names must be in sync with enum CharacterProfile
+mod CHARACTER_PROFILES {
+    use super::{ProfileDescription, Gender};
+    const Unknown: ProfileDescription = ProfileDescription {
+        profile_id: 0,
+        gender: Gender::Undefined,
+        name: 'Unknown',
+    };
+    const Bartender: ProfileDescription = ProfileDescription {
+        profile_id: 1,
+        gender: Gender::Male,
+        name: 'Bartender',
+    };
+    const Drunken: ProfileDescription = ProfileDescription {
+        profile_id: 2,
+        gender: Gender::Male,
+        name: 'Drunken',
+    };
+    const Devil: ProfileDescription = ProfileDescription {
+        profile_id: 3,
+        gender: Gender::Male,
+        name: 'Devil',
+    };
+    const Player: ProfileDescription = ProfileDescription {
+        profile_id: 4,
+        gender: Gender::Male,
+        name: 'Stranger',
+    };
+}
+
+// IMPORTANT: names must be in sync with enum BotProfile
+mod BOT_PROFILES {
+    use super::{ProfileDescription, Gender};
+    const Unknown: ProfileDescription = ProfileDescription {
+        profile_id: 0,
+        gender: Gender::Undefined,
+        name: 'Unknown',
+    };
+    const TinMan: ProfileDescription = ProfileDescription {
+        profile_id: 1,
+        gender: Gender::Male,
+        name: 'Tin Man',
+    };
+    const Scarecrow: ProfileDescription = ProfileDescription {
+        profile_id: 2,
+        gender: Gender::Male,
+        name: 'Scarecrow',
+    };
+    const Leon: ProfileDescription = ProfileDescription {
+        profile_id: 3,
+        gender: Gender::Male,
+        name: 'Leon',
+    };
+}
+
+
 //--------------------
 // constants
 //
@@ -71,151 +270,6 @@ mod PROFILES {
     const UNDEFINED_ID_BASE: u128  = 0xf00000000;
 }
 
-#[derive(Copy, Drop, Serde, Default)]
-pub struct ProfileDescription {
-    profile_id: u8,
-    name: felt252, // @generateContants_type: shortstring
-}
-
-// to be exported to typescript by generateConstants
-// IMPORTANT: names must be in sync with enum DuelistProfile
-mod DUELIST_PROFILES {
-    use super::{ProfileDescription};
-    const Unknown: ProfileDescription = ProfileDescription {
-        profile_id: 0,
-        name: 'Unknown',
-    };
-    const Duke: ProfileDescription = ProfileDescription {
-        profile_id: 1,
-        name: 'Duke',
-    };
-    const Duella: ProfileDescription = ProfileDescription {
-        profile_id: 2,
-        name: 'Duella',
-    };
-    const Jameson: ProfileDescription = ProfileDescription {
-        profile_id: 3,
-        name: 'Jameson',
-    };
-    const Pilgrim: ProfileDescription = ProfileDescription {
-        profile_id: 4,
-        name: 'Pilgrim',
-    };
-    const Jack: ProfileDescription = ProfileDescription {
-        profile_id: 5,
-        name: 'Jack',
-    };
-    const Pops: ProfileDescription = ProfileDescription {
-        profile_id: 6,
-        name: 'Pops',
-    };
-    const SerWalker: ProfileDescription = ProfileDescription {
-        profile_id: 7,
-        name: 'Ser Walker',
-    };
-    const Bloberto: ProfileDescription = ProfileDescription {
-        profile_id: 8,
-        name: 'Bloberto',
-    };
-    const Squiddo: ProfileDescription = ProfileDescription {
-        profile_id: 9,
-        name: 'Squiddo',
-    };
-    const SlenderDuck: ProfileDescription = ProfileDescription {
-        profile_id: 10,
-        name: 'Slender Duck',
-    };
-    const LadyVengeance: ProfileDescription = ProfileDescription {
-        profile_id: 11,
-        name: 'Lady Vengeance',
-    };
-    const Breadman: ProfileDescription = ProfileDescription {
-        profile_id: 12,
-        name: 'Breadman',
-    };
-    const Brutus: ProfileDescription = ProfileDescription {
-        profile_id: 13,
-        name: 'Brutus',
-    };
-    const Pistolopher: ProfileDescription = ProfileDescription {
-        profile_id: 14,
-        name: 'Pistolopher',
-    };
-    const Secreto: ProfileDescription = ProfileDescription {
-        profile_id: 15,
-        name: 'Secreto',
-    };
-    const ShadowMare: ProfileDescription = ProfileDescription {
-        profile_id: 16,
-        name: 'Shadow Mare',
-    };
-    const Karaku: ProfileDescription = ProfileDescription {
-        profile_id: 17,
-        name: 'Karaku',
-    };
-    const Misty: ProfileDescription = ProfileDescription {
-        profile_id: 18,
-        name: 'Misty',
-    };
-    const Kenzu: ProfileDescription = ProfileDescription {
-        profile_id: 19,
-        name: 'Kenzu',
-    };
-    const NynJah: ProfileDescription = ProfileDescription {
-        profile_id: 20,
-        name: 'Nyn Jah',
-    };
-    const Thrak: ProfileDescription = ProfileDescription {
-        profile_id: 21,
-        name: 'Thrak',
-    };
-}
-
-// IMPORTANT: names must be in sync with enum CharacterProfile
-mod CHARACTER_PROFILES {
-    use super::{ProfileDescription};
-    const Unknown: ProfileDescription = ProfileDescription {
-        profile_id: 0,
-        name: 'Unknown',
-    };
-    const Bartender: ProfileDescription = ProfileDescription {
-        profile_id: 1,
-        name: 'Bartender',
-    };
-    const Drunken: ProfileDescription = ProfileDescription {
-        profile_id: 2,
-        name: 'Drunken',
-    };
-    const Devil: ProfileDescription = ProfileDescription {
-        profile_id: 3,
-        name: 'Devil',
-    };
-    const Player: ProfileDescription = ProfileDescription {
-        profile_id: 4,
-        name: 'Stranger',
-    };
-}
-
-// IMPORTANT: names must be in sync with enum BotProfile
-mod BOT_PROFILES {
-    use super::{ProfileDescription};
-    const Unknown: ProfileDescription = ProfileDescription {
-        profile_id: 0,
-        name: 'Unknown',
-    };
-    const TinMan: ProfileDescription = ProfileDescription {
-        profile_id: 1,
-        name: 'Tin Man',
-    };
-    const Scarecrow: ProfileDescription = ProfileDescription {
-        profile_id: 2,
-        name: 'Scarecrow',
-    };
-    const Leon: ProfileDescription = ProfileDescription {
-        profile_id: 3,
-        name: 'Leon',
-    };
-}
 
 
 
