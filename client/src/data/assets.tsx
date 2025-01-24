@@ -387,34 +387,6 @@ const SPRITESHEETS: Spritesheets = {
   },
 }
 
-//----------------------------
-// Profile Picture to animation model
-//
-const ProfileModels: Record<number, CharacterType> = {
-  [0]: CharacterType.MALE,
-  [1]: CharacterType.MALE,
-  [2]: CharacterType.FEMALE,
-  [3]: CharacterType.MALE,
-  [4]: CharacterType.MALE,
-  [5]: CharacterType.MALE,
-  [6]: CharacterType.MALE,
-  [7]: CharacterType.MALE,
-  [8]: CharacterType.MALE,
-  [9]: CharacterType.MALE,
-  [10]: CharacterType.MALE,
-  [11]: CharacterType.FEMALE,
-  [12]: CharacterType.MALE,
-  [13]: CharacterType.MALE,
-  [14]: CharacterType.MALE,
-  [15]: CharacterType.MALE,
-  [16]: CharacterType.FEMALE,
-  [17]: CharacterType.MALE,
-  [18]: CharacterType.FEMALE,
-  [19]: CharacterType.FEMALE,
-  [20]: CharacterType.MALE,
-  [21]: CharacterType.MALE,
-}
-
 
 export type {
   TextureAttributes,
@@ -430,6 +402,5 @@ export {
   AnimName,
   TEXTURES,
   SPRITESHEETS,
-  ProfileModels,
   sceneBackgrounds,
 }

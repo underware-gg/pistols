@@ -22,7 +22,6 @@ import { useGameAspect } from '/src/hooks/useGameApect'
 import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
 import { DuelStage, useAnimatedDuel, useDuel } from '/src/hooks/useDuel'
 import { ProfilePic } from '/src/components/account/ProfilePic'
-import { CharacterType, ProfileModels } from '/src/data/assets'
 import { EnvironmentCardsTextures } from '/src/data/cardAssets'
 import { AnimationState } from '/src/three/game'
 import { Action, ArchetypeNames } from '/src/utils/pistols'
@@ -68,20 +67,20 @@ export default function Duel({
   // guarantee to run only once when this component mounts
   const mounted = useMounted()
   const [duelSceneStarted, setDuelSceneStarted] = useState(false)
-  const { name: nameA, profilePic: profilePicA } = useDuelist(duelistIdA)
-  const { name: nameB, profilePic: profilePicB } = useDuelist(duelistIdB)
+  const { name: nameA, characterType: characterTypeA } = useDuelist(duelistIdA)
+  const { name: nameB, characterType: characterTypeB } = useDuelist(duelistIdB)
   const { isYou: isYouA } = useIsYou(duelistIdA)
   const { isYou: isYouB } = useIsYou(duelistIdB)
   // console.log('>>> IS__YOU????', isYouA, isYouB, duelistIdA, duelistIdB)
   
   useEffect(() => {
     if (gameImpl && mounted && !duelSceneStarted && nameA && nameB && duelistIdA > 0n && duelistIdB > 0n) {
-      gameImpl.startDuelWithPlayers(nameA, ProfileModels[profilePicA], isYouA, isYouB, nameB, ProfileModels[profilePicB])
+      gameImpl.startDuelWithPlayers(nameA, characterTypeA, isYouA, isYouB, nameB, characterTypeB)
       setDuelSceneStarted(true)
       dispatchAnimated(AnimationState.None)
     }
-  }, [gameImpl, mounted, duelSceneStarted, profilePicA, profilePicB, nameA, nameB, duelistIdA, duelistIdB])
-  // console.log('DUEL_SCENE_STARTED', gameImpl, mounted, duelSceneStarted, profilePicA, profilePicB, nameA, nameB, duelistIdA, duelistIdB, isYouA, isYouB)
+  }, [gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, duelistIdA, duelistIdB])
+  // console.log('DUEL_SCENE_STARTED', gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, duelistIdA, duelistIdB, isYouA, isYouB)
 
   // setup grass animation
   const { clientSeconds } = useClientTimestamp(false)
@@ -532,7 +531,6 @@ function DuelistProfile({
   const [lastHitChance, setLastHitChance] = useState(0)
 
   useEffect(() => {
-    // let imageName = 'duelist_' + ProfileModels[profilePic].toLowerCase() + '_' + ArchetypeNames[score.archetype].toLowerCase()
     let imageName = 'duelist_female_' + (ArchetypeNames[score.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[score.archetype].toLowerCase())
     setArchetypeImage('/images/' + imageName + '.png')
   }, [score])

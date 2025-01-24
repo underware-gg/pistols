@@ -4,8 +4,63 @@ import { SceneName } from '/src/data/assets'
 import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 
+
 //------------------------------------------
-// must be in sync with challenge.cairo
+// misc helpers
+//
+
+export const makeDuelDataUrl = (duelId: BigNumberish) => {
+  return `/dueldata/${bigintToDecimal(duelId)}`
+}
+
+export type Hand = {
+  card_fire: constants.PacesCard,
+  card_dodge: constants.PacesCard,
+  card_tactics: constants.TacticsCard,
+  card_blades: constants.BladesCard,
+}
+
+export const movesToHand = (moves: number[]): Hand => {
+  return {
+    card_fire: constants.getPacesCardFromValue(moves[0]),
+    card_dodge: constants.getPacesCardFromValue(moves[1]),
+    card_tactics: constants.getTacticsCardFromValue(moves[2]),
+    card_blades: constants.getBladesCardFromValue(moves[3]),
+  }
+}
+
+
+//------------------------------------------
+// (profile_type.cairo)
+//
+
+export const getProfileDescription = (profileType: constants.ProfileType, profileValue: string): constants.ProfileDescription => {
+  switch (profileType) {
+    case constants.ProfileType.Duelist:   return constants.DUELIST_PROFILES[profileValue]
+    case constants.ProfileType.Character: return constants.CHARACTER_PROFILES[profileValue]
+    case constants.ProfileType.Bot:       return constants.BOT_PROFILES[profileValue]
+    default:                              return constants.DUELIST_PROFILES[constants.DuelistProfile.Unknown]
+  }
+}
+
+export const makeCharacterDuelistId = (profileType: constants.ProfileType, profileValue: string): bigint => {
+  const _baseId = (profileType: constants.ProfileType): bigint => {
+    switch (profileType) {
+      case constants.ProfileType.Duelist:   return constants.PROFILES.DUELIST_ID_BASE
+      case constants.ProfileType.Character: return constants.PROFILES.CHARACTER_ID_BASE
+      case constants.ProfileType.Bot:       return constants.PROFILES.BOT_ID_BASE
+      default:                              return constants.PROFILES.UNDEFINED_ID_BASE
+    }
+  }
+  const profileId = getProfileDescription(profileType, profileValue).profile_id
+  return (_baseId(profileType) | BigInt(profileId ?? 0))
+}
+
+export const PLAYER_CHARACTER_ID = makeCharacterDuelistId(constants.ProfileType.Character, constants.CharacterProfile.Player)
+
+
+//------------------------------------------
+// (challenge.cairo)
 //
 export const LiveChallengeStates: constants.ChallengeState[] = [
   constants.ChallengeState.Awaiting,
@@ -167,29 +222,6 @@ export const ActionEmojis: Record<Action, string> = {
   [Action.Grapple]: EMOJI.GRAPPLE,
 }
 
-export const ActionTypes: Record<string, Action[]> = {
-  paces: [
-    Action.Paces1,
-    Action.Paces2,
-    Action.Paces3,
-    Action.Paces4,
-    Action.Paces5,
-    Action.Paces6,
-    Action.Paces7,
-    Action.Paces8,
-    Action.Paces9,
-    Action.Paces10,
-  ],
-  melee: [
-    Action.Behead,
-    Action.Grapple,
-  ],
-  runner: [
-    Action.Seppuku,
-    Action.PocketPistol,
-  ]
-}
-
 export const ArchetypeNames: Record<constants.Archetype, string> = {
   [constants.Archetype.Undefined]: 'Undefined',
   [constants.Archetype.Villainous]: 'Villainous',
@@ -206,34 +238,4 @@ export const MenuLabels: Partial<Record<SceneName, string>> = {
   [SceneName.Profile]: 'Account & Duelists',
 }
 
-export type Hand = {
-  card_fire: constants.PacesCard,
-  card_dodge: constants.PacesCard,
-  card_tactics: constants.TacticsCard,
-  card_blades: constants.BladesCard,
-}
 
-export const movesToHand = (moves: number[]): Hand => {
-  return {
-    card_fire: constants.getPacesCardFromValue(moves[0]),
-    card_dodge: constants.getPacesCardFromValue(moves[1]),
-    card_tactics: constants.getTacticsCardFromValue(moves[2]),
-    card_blades: constants.getBladesCardFromValue(moves[3]),
-  }
-}
-
-export const makeDuelDataUrl = (duelId: BigNumberish) => {
-  return `/dueldata/${bigintToDecimal(duelId)}`
-}
-
-export const makeCharacterDuelistId = (profileType: constants.ProfileType, profileName: string) => {
-  const base = profileType == constants.ProfileType.Character ? constants.PROFILES.CHARACTER_ID_BASE
-    : profileType == constants.ProfileType.Bot ? constants.PROFILES.BOT_ID_BASE
-      : constants.PROFILES.UNDEFINED_ID_BASE
-  const profileId = profileType == constants.ProfileType.Character ? constants.CHARACTER_PROFILES[profileName].profile_id
-    : profileType == constants.ProfileType.Bot ? constants.BOT_PROFILES[profileName].profile_id
-      : 0n
-  return (base | BigInt(profileId ?? 0))
-}
-
-export const PLAYER_CHARACTER_ID = makeCharacterDuelistId(constants.ProfileType.Character, constants.CharacterProfile.Player)
