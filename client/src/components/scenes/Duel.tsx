@@ -16,7 +16,7 @@ import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '/src/hooks/useRevealAction'
 import { useIsMyDuelist, useIsYou } from '/src/hooks/useIsYou'
-import { useSyncToActiveDuelist } from '/src/hooks/useSyncDuelist'
+import { useSyncToActiveDuelists } from '/src/hooks/useSyncDuelist'
 import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
@@ -61,8 +61,7 @@ export default function Duel({
   console.log('Duel', duelId, tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start)
 
   // switch to active duelist, if owned by player
-  useSyncToActiveDuelist(duelistIdA)
-  useSyncToActiveDuelist(duelistIdB)
+  const { isSynced } = useSyncToActiveDuelists([duelistIdA, duelistIdB])
 
   // guarantee to run only once when this component mounts
   const mounted = useMounted()
@@ -71,16 +70,17 @@ export default function Duel({
   const { name: nameB, characterType: characterTypeB } = useDuelist(duelistIdB)
   const { isYou: isYouA } = useIsYou(duelistIdA)
   const { isYou: isYouB } = useIsYou(duelistIdB)
-  // console.log('>>> IS__YOU????', isYouA, isYouB, duelistIdA, duelistIdB)
-  
+  // const { duelistId } = useSettings()
+
   useEffect(() => {
-    if (gameImpl && mounted && !duelSceneStarted && nameA && nameB && duelistIdA > 0n && duelistIdB > 0n) {
+    if (gameImpl && mounted && !duelSceneStarted && isSynced && nameA && nameB && characterTypeA && characterTypeB) {
+      // console.log('>>>>>>>>>>>>>>>>> START!!!', isSynced, duelistIdA, duelistIdB, isYouA, isYouB)
       gameImpl.startDuelWithPlayers(nameA, characterTypeA, isYouA, isYouB, nameB, characterTypeB)
       setDuelSceneStarted(true)
       dispatchAnimated(AnimationState.None)
     }
-  }, [gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, duelistIdA, duelistIdB])
-  // console.log('DUEL_SCENE_STARTED', gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, duelistIdA, duelistIdB, isYouA, isYouB)
+  }, [gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, isSynced, isYouA, isYouB])
+  // console.log('DUEL_SCENE_STARTED', duelSceneStarted, isSynced, `[${duelistId}]`, duelistIdA, duelistIdB, isYouA, isYouB, characterTypeA, characterTypeB, nameA, nameB)
 
   // setup grass animation
   const { clientSeconds } = useClientTimestamp(false)

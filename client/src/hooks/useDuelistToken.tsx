@@ -1,6 +1,6 @@
 import { BigNumberish } from 'starknet'
 import { useTokenConfig } from '/src/stores/tokenConfigStore'
-import { useERC721OwnerOf } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex, useERC721OwnerOf } from '@underware_gg/pistols-sdk/utils'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { useTokenIdsByOwner, useTokenIdsOfPlayer } from '/src/stores/duelistTokenStore'
 
@@ -25,10 +25,10 @@ export const useOwnerOfDuelist = (token_id: BigNumberish) => {
 
 export const useDuelistsOfPlayer = () => {
   const { duelistContractAddress } = useDuelistTokenContract()
-  const { tokenIds } = useTokenIdsOfPlayer(duelistContractAddress)
+  const { tokenIds, isLoading } = useTokenIdsOfPlayer(duelistContractAddress)
   return {
     duelistIds: tokenIds,
-    isLoading: false,
+    isLoading,
   }
 }
 

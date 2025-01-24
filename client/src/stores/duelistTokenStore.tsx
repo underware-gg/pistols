@@ -5,7 +5,7 @@ import { useAccount } from '@starknet-react/core'
 import { Token, TokenBalance } from '@dojoengine/torii-client'
 import { useDojoSetup, useToriiTokensByOwnerQL, ERC721_Token } from '@underware_gg/pistols-sdk/dojo'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
-import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 
 
 //-----------------------------------------
@@ -21,6 +21,7 @@ interface TokenIdsByContract {
 }
 interface State {
   tokens: TokenIdsByContract,
+  isLoading: boolean,
   setTokens: (contractAddress: BigNumberish, accountAddress: BigNumberish, ids: TokenState) => void;
   getTokens: (contractAddress: BigNumberish, accountAddress: BigNumberish) => TokenState;
 }
@@ -28,6 +29,7 @@ interface State {
 const createStore = () => {
   return create<State>()((set, get) => ({
     tokens: {},
+    isLoading: true,
     setTokens: (contractAddress: BigNumberish, accountAddress: BigNumberish, tokens: TokenState) => {
       set((state: State) => ({
         tokens: {
@@ -37,6 +39,7 @@ const createStore = () => {
             [bigintToHex(accountAddress)]: tokens,
           },
         },
+        isLoading: false,
       }))
     },
     getTokens: (contractAddress: BigNumberish, accountAddress: BigNumberish): TokenState => {
@@ -59,12 +62,12 @@ export function PlayerDuelistTokensStoreSyncQL({
   const { duelistContractAddress } = useDuelistTokenContract()
   const { address } = useAccount()
   const state = useStore((state) => state)
-  const { tokens } = useToriiTokensByOwnerQL(duelistContractAddress, address, watch)
+  const { tokens, isLoading } = useToriiTokensByOwnerQL(duelistContractAddress, address, watch)
   useEffect(() => {
-    if (duelistContractAddress && address) {
+    if (duelistContractAddress && address && !isLoading) {
       state.setTokens(duelistContractAddress, address, tokens)
     }
-  }, [duelistContractAddress, address, tokens])
+  }, [duelistContractAddress, address, tokens, isLoading])
   // useEffect(() => console.log("PlayerDuelistTokensStoreSyncQL() =>", state.tokens), [state.tokens])
   return (<></>)
 }
@@ -113,6 +116,7 @@ export function useTokenIdsOfPlayer(contractAddress: BigNumberish) {
   const tokenIds = useMemo(() => tokens.map((token) => token.tokenId), [tokens])
   return {
     tokenIds,
+    isLoading: (!isPositiveBigint(address) || state.isLoading),
   }
 }
 

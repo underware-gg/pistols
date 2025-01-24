@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useDuelistsOfPlayer } from '/src/hooks/useDuelistToken'
 
@@ -19,20 +19,29 @@ export const useSyncSelectedDuelist = () => {
 
 //
 // Switch to active duelist if it belongs to player
-export const useSyncToActiveDuelist = (activeDuelistId: bigint) => {
+export const useSyncToActiveDuelists = (activeDuelistIds: bigint[]) => {
   const { duelistId, dispatchDuelistId } = useSettings()
   const { duelistIds, isLoading } = useDuelistsOfPlayer()
 
+  const [isSynced, setIsSynced] = useState(false)
   useEffect(() => {
-    if (
-      !isLoading &&
-      activeDuelistId &&
-      duelistIds.includes(activeDuelistId) &&
-      duelistId != activeDuelistId
-    ) {
-      dispatchDuelistId(activeDuelistId)
+    // sync only once when duelistIds is loaded
+    if (!isLoading && !isSynced) {
+      // if not using an active duelist...
+      if (!activeDuelistIds.includes(duelistId)) {
+        // ...switch to the first active duelist
+        for (const id of activeDuelistIds) {
+          if (duelistIds.includes(id) && duelistId != id) {
+            dispatchDuelistId(id)
+            break;
+          }
+        }
+      }
+      setIsSynced(true)
     }
-  }, [activeDuelistId, duelistId, duelistIds, isLoading])
+  }, [activeDuelistIds, duelistId, duelistIds, isLoading])
 
-  return {}
+  return {
+    isSynced
+  }
 }
