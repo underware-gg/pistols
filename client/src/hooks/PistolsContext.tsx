@@ -4,7 +4,7 @@ import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
 import { bigintToHex, bigintToDecimal, isPositiveBigint, poseidon, bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { CommitMoveMessage } from '/src/utils/salt'
-import { tutorialScenes } from '/src/data/tutorialConstants'
+import { DuelTutorialLevel, tutorialScenes } from '/src/data/tutorialConstants'
 import { SceneName } from '/src/data/assets'
 import { useTableId } from '../stores/configStore'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '../three/game'
@@ -33,6 +33,7 @@ export const initialState = {
   challengingAddress: 0n,
   currentDuel: 0n,
   currentScene: undefined as SceneName,
+  tutorialLevel: undefined as DuelTutorialLevel,
   lastScene: undefined as SceneName,
   moves: {} as StoredMoves,
   // injected
@@ -51,6 +52,7 @@ const PistolsActions = {
   SELECT_PLAYER_ADDRESS: 'SELECT_PLAYER_ADDRESS',
   SELECT_CHALLENGING_ADDRESS: 'SELECT_CHALLENGING_ADDRESS',
   SET_MOVES: 'SET_MOVES',
+  SET_TUTORIAL_LEVEL: 'SET_TUTORIAL_LEVEL',
   RESET_VALUES: 'RESET_VALUES',
 }
 
@@ -70,7 +72,7 @@ type ActionType =
   | { type: 'SELECT_CHALLENGING_ADDRESS', payload: bigint }
   | { type: 'SET_MOVES', payload: StoredMoves }
   | { type: 'RESET_VALUES', payload: null }
-
+  | { type: 'SET_TUTORIAL_LEVEL', payload: DuelTutorialLevel }
 
 //--------------------------------
 // Context
@@ -156,6 +158,10 @@ const PistolsProvider = ({
         newState.moves = { ...state.moves, ...newMove }
         break
       }
+      case PistolsActions.SET_TUTORIAL_LEVEL: {
+        newState.tutorialLevel = action.payload as DuelTutorialLevel
+        break
+      }
       default:
         console.warn(`PistolsProvider: Unknown action [${action.type}]`)
         return state
@@ -234,6 +240,12 @@ export const usePistolsContext = () => {
       payload: BigInt(newId),
     })
   }
+  const dispatchSetTutorialLevel = (newLevel: DuelTutorialLevel) => {
+    dispatch({
+      type: PistolsActions.SET_TUTORIAL_LEVEL,
+      payload: newLevel,
+    })
+  }
   const dispatchSetMoves = (message: CommitMoveMessage, moves: number[], salt: bigint ) => {
     const key = makeStoredMovesKey(message)
     if (!key) {
@@ -272,6 +284,7 @@ export const usePistolsContext = () => {
     makeStoredMovesKey,
     __dispatchSetScene, // used internally only
     __dispatchResetValues,  // used internally only
+    dispatchSetTutorialLevel,
   }
 }
 
@@ -374,7 +387,7 @@ export const usePistolsScene = () => {
     atTavern: (currentScene == SceneName.Tavern),
     atProfile: (currentScene == SceneName.Profile),
     atDuelists: (currentScene == SceneName.Duelists),
-    atDuels: (currentScene == SceneName.Duels),
+    atDuelsBoard: (currentScene == SceneName.Duels),
     atGraveyard: (currentScene == SceneName.Graveyard),
     atDuel: (currentScene == SceneName.Duel),
     atTutorial: tutorialScenes.includes(currentScene as typeof tutorialScenes[number]),

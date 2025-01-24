@@ -10,7 +10,7 @@ import { PosterGrid, PosterGridHandle } from '/src/components/PosterGrid'
 import { DuelPoster, DuelPosterHandle } from '/src/components/DuelPoster'
 import { _currentScene } from '/src/three/game'
 
-export default function ScDuels() {
+export default function ScDuelsBoard() {
   const { address } = useAccount()
   const { filterStatesLiveDuels, filterDuelistName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
   const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterDuelistName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : address, filterChallengeSortColumn, filterChallengeSortDirection)

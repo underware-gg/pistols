@@ -30,6 +30,7 @@ export interface CardHandle {
   setCardData: (data: CardData) => void
   toggleVisibility: (isVisible: boolean) => void
   toggleHighlight: (isHighlighted: boolean, shouldBeWhite?: boolean, color?: string) => void
+  toggleDefeated: (isDefeated: boolean) => void
   toggleIdle: (isPlaying) => void
   getStyle: () => {
     translateX: number
@@ -61,7 +62,7 @@ export const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: Re
   const [scale, setScale] = useState<AnimationData>({dataField1: [], duration: 0})
   const [cardData, setCardData] = useState<CardData>(FireCardsTextures.None)
   const [isDragging, setIsDragging] = useState(false)
-  
+  const [isDefeated, setIsDefeated] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
   const cardBackgroundRef = useRef<HTMLDivElement>(null)
   const springRef = useRef({ x: 0, y: 0 })
@@ -87,6 +88,7 @@ export const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: Re
     setCardData,
     toggleVisibility,
     toggleHighlight,
+    toggleDefeated,
     toggleIdle,
     getStyle: () => ({
       translateX: springRef.current.x,
@@ -200,14 +202,18 @@ export const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: Re
     setFlipRotation({ dataField1: [flipped ? degree : 0], duration: duration, easing: easing, interpolation: interpolation })
   }
 
-  const toggleHighlight = (isHighlighted: boolean, shouldBeWhite?: boolean)  => {
+  const toggleHighlight = (isHighlighted: boolean, shouldBeWhite?: boolean, color?: string)  => {
     if (cardRef.current?.style.opacity != '1') return
     if (isHighlighted) {
       cardBackgroundRef.current.style.opacity = '1'
-      cardBackgroundRef.current.style.setProperty('--background-color', cardData.color ? (shouldBeWhite ? 'white' : cardData.color) : 'white')
+      cardBackgroundRef.current.style.setProperty('--background-color', color ? color : (cardData.color ? (shouldBeWhite ? 'white' : cardData.color) : 'white'))
     } else {
       cardBackgroundRef.current.style.opacity = '0'
     }
+  }
+  
+  const toggleDefeated = (isDefeated: boolean) => {
+    setIsDefeated(isDefeated)
   }
 
   const toggleVisibility = (isVisible)  => {
@@ -381,6 +387,7 @@ export const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: Re
           <div className="card-front NoMouse NoDrag">
             <div id='card-filter-overlay' className={props.isDisabled ? 'visible disabled' : 'disabled'} />
             <div id='card-filter-overlay' className={props.isSelected ? 'visible selected' : 'selected'} />
+            <div id='card-filter-overlay' className={isDefeated ? 'visible defeated' : 'defeated'} />
             <img className='card-image-drawing NoMouse NoDrag' src={cardData.path} alt="Card Background" />
             <img className='card-image-front NoMouse NoDrag' src={cardData.cardFrontPath} alt="Card Front" />
             {props.isMiniature ? (

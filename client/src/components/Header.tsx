@@ -169,7 +169,7 @@ function CurtainUI({
   visible?: boolean
 }) {
 
-  const { atProfile, atDuelists, atDuels, atGraveyard } = usePistolsScene()
+  const { atProfile, atDuelists, atDuelsBoard, atGraveyard } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
   const {
     walletFinderOpener,
@@ -398,7 +398,7 @@ function CurtainUI({
             </div>
           </div>
         </div>}
-        {atDuels && <div style={{width: '90%'}}>
+        {atDuelsBoard && <div style={{width: '90%'}}>
           <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
             <FilterDuelistName  />
             <FilterButton label='Show All Live Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />

@@ -57,6 +57,11 @@ $color-cold: #4d9ad6;
     background-color: rgb(255, 255, 200, 0.1);
     filter: brightness(1) saturate(100%) invert(0) sepia(0) hue-rotate(0deg) brightness(0.6) contrast(1);
   }
+
+  &.defeated {
+    background-color: rgba(200, 0, 0, 0.5);
+    filter: brightness(1.2) saturate(250%) invert(0) sepia(0.8) hue-rotate(345deg) brightness(0.6) contrast(1.6);
+  }
 }
 
 .card-inner {
