@@ -68,31 +68,6 @@ export function make_typed_data_PlayerBookmark({
   )
 }
 
-export function make_typed_data_PlayerTutorialProgress({
-  identity,
-  progress,
-}: {
-  identity: BigNumberish,
-  progress: constants.TutorialProgress,
-}) {
-  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PlayerTutorialProgress>>(
-    STARKNET_DOMAIN,
-    'pistols-PlayerTutorialProgress',
-    {
-      identity: bigintToHex(identity),
-      //@ts-ignore
-      progress: { [progress]: [] }, // enum!
-    },
-    {
-      identity: 'ContractAddress',
-      progress: 'TutorialProgress',
-    },
-    {
-      TutorialProgress: makeEnumType(Object.keys(constants.TutorialProgress))
-    }
-  )
-}
-
 
 //
 // example: from...

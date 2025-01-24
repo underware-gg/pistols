@@ -13,19 +13,14 @@ export const useTutorialPlayerId = () => {
 }
 
 export const useTutorialProgress = () => {
-  const { tutorialProgress } = useSettings()
+  const { completedTutorialLevel, hasFinishedTutorial } = useSettings()
   const currentTutorialId = useMemo(() => (
-    tutorialProgress == constants.TutorialProgress.None ? 1
-      : tutorialProgress == constants.TutorialProgress.FinishedFirst ? 2
-        : 0
-  ), [tutorialProgress])
-  const isFinished = useMemo(() => (
-    tutorialProgress == constants.TutorialProgress.FinishedSecond
-  ), [tutorialProgress])
+    !hasFinishedTutorial ? (completedTutorialLevel + 1) : 0
+  ), [completedTutorialLevel, hasFinishedTutorial])
   return {
-    tutorialProgress,
+    completedTutorialLevel,
     currentTutorialId,
-    isFinished,
+    hasFinishedTutorial,
   }
 }
 

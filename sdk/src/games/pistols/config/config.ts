@@ -8,7 +8,6 @@ import { makeControllerConnector } from 'src/dojo/setup/controller'
 import {
   make_typed_data_PlayerBookmark,
   make_typed_data_PlayerOnline,
-  make_typed_data_PlayerTutorialProgress,
 } from './signed_messages'
 import * as constants from '../generated/constants'
 import pistols_manifest_dev from '../manifests/manifest_dev.json'
@@ -93,13 +92,6 @@ const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
     typedData: make_typed_data_PlayerOnline({
         identity: '0x0',
         timestamp: 0,
-      }),
-  },
-  {
-    description: 'Notify the server of a player tutorial progress',
-    typedData: make_typed_data_PlayerTutorialProgress({
-        identity: '0x0',
-        progress: constants.TutorialProgress.None,
       }),
   },
   {

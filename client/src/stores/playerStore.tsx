@@ -15,7 +15,6 @@ interface PlayerState {
   name: string
   isNew: boolean
   // off-chain messages
-  tutorial_progress: constants.TutorialProgress
   bookmarked_players: string[]
   bookmarked_tokens: {
     [address: string]: bigint[]
@@ -46,7 +45,6 @@ const createStore = () => {
       name: shortAddress(event.player_address),
       isNew: true,
       // off-chain messages
-      tutorial_progress: constants.TutorialProgress.None,
       bookmarked_players: [],
       bookmarked_tokens: {},
     } : undefined
@@ -86,13 +84,6 @@ const createStore = () => {
           if (online) {
             const address = bigintToHex(online.identity)
             state.players_online[address] = bigintToNumber(online.timestamp)
-          }
-          const progress = e.models.pistols.PlayerTutorialProgress
-          if (progress) {
-            const address = bigintToHex(progress.identity)
-            if (state.players[address]) {
-              state.players[address].tutorial_progress = parseEnumVariant<constants.TutorialProgress>(progress.progress)
-            }
           }
           const bookmark = e.models.pistols.PlayerBookmark
           if (bookmark) {
@@ -160,9 +151,10 @@ export const usePlayer = (address: BigNumberish) => {
   const timestampRegistered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
   const bookmarkedPlayers = useMemo(() => (player?.bookmarked_players ?? []), [player])
   const bookmarkedTokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
-  const tutorialProgress = useMemo(() => (player?.tutorial_progress ?? constants.TutorialProgress.None), [player])
-  const hasCompletedTutorial = useMemo(() => (tutorialProgress === constants.TutorialProgress.FinishedFirstDuel), [tutorialProgress])
-  const isAvailable = useMemo(() => (hasCompletedTutorial), [hasCompletedTutorial])
+
+  // TODO... check if completed tutorial from Activity events
+  const hasFinishedTutorial = false
+  const isAvailable = false
 
   const { duelContractAddress } = useDuelTokenContract()
   const { duelistContractAddress } = useDuelistTokenContract()
@@ -181,8 +173,7 @@ export const usePlayer = (address: BigNumberish) => {
     bookmarkedTokens,
     bookmarkedDuels,
     bookmarkedDuelists,
-    tutorialProgress,
-    hasCompletedTutorial,
+    hasFinishedTutorial,
     isAvailable,
   }
 }

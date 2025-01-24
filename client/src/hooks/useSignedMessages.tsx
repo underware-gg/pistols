@@ -6,7 +6,6 @@ import {
   constants,
   make_typed_data_PlayerBookmark,
   make_typed_data_PlayerOnline,
-  make_typed_data_PlayerTutorialProgress,
 } from '@underware_gg/pistols-sdk/pistols'
 
 
@@ -18,21 +17,6 @@ export function usePlayerOnlineSignedMessage(timestamp: number) {
       timestamp: Math.floor(timestamp),
     })
   ), [account, timestamp])
-  const { publish, isPublishing } = useSdkPublishTypedData(account as Account, typedData)
-  return {
-    publish,
-    isPublishing,
-  }
-}
-
-export function useTutorialProgressSignedMessage(progress: constants.TutorialProgress) {
-  const { account } = useAccount()
-  const typedData = useMemo(() => (
-    make_typed_data_PlayerTutorialProgress({
-      identity: account?.address ?? 0,
-      progress,
-    })
-  ), [account, progress])
   const { publish, isPublishing } = useSdkPublishTypedData(account as Account, typedData)
   return {
     publish,

@@ -15,7 +15,8 @@ export const initialState = {
   sfxEnabled: true,
   duelistId: 0n,
   duelSpeedFactor: 1.0,
-  tutorialProgress: constants.TutorialProgress.None,
+  completedTutorialLevel: 0,
+  hasFinishedTutorial: false,
   // internal
   initialized: false,
 }
@@ -28,7 +29,7 @@ const SettingsActions = {
   SFX_ENABLED: 'settings.SFX_ENABLED',
   DUELIST_ID: 'settings.DUELIST_ID',
   DUEL_SPEED_FACTOR: 'settings.DUEL_SPEED_FACTOR',
-  TUTORIAL_PROGRESS: 'settings.TUTORIAL_PROGRESS',
+  TUTORIAL_LEVEL: 'settings.TUTORIAL_LEVEL',
 }
 
 //--------------------------------
@@ -44,7 +45,7 @@ type ActionType =
   | { type: 'SFX_ENABLED', payload: boolean }
   | { type: 'DUELIST_ID', payload: bigint }
   | { type: 'DUEL_SPEED_FACTOR', payload: number }
-  | { type: 'TUTORIAL_PROGRESS', payload: constants.TutorialProgress }
+  | { type: 'TUTORIAL_LEVEL', payload: number }
   // internal
   | { type: 'INITIALIZED', payload: boolean }
 
@@ -82,7 +83,7 @@ const SettingsProvider = ({
       [SettingsActions.SFX_ENABLED]: () => setCookie(cookieName, state.sfxEnabled, _options),
       [SettingsActions.DUELIST_ID]: () => setCookie(cookieName, Number(state.duelistId), _options),
       [SettingsActions.DUEL_SPEED_FACTOR]: () => setCookie(cookieName, Number(state.duelSpeedFactor), _options),
-      [SettingsActions.TUTORIAL_PROGRESS]: () => setCookie(cookieName, state.tutorialProgress, _options),
+      [SettingsActions.TUTORIAL_LEVEL]: () => setCookie(cookieName, state.completedTutorialLevel, _options),
     }
     _setters[cookieName]?.()
   }, [setCookie])
@@ -124,9 +125,10 @@ const SettingsProvider = ({
         cookieSetter(SettingsActions.DUEL_SPEED_FACTOR, newState)
         break
       }
-      case SettingsActions.TUTORIAL_PROGRESS: {
-        newState.tutorialProgress = action.payload as constants.TutorialProgress
-        cookieSetter(SettingsActions.TUTORIAL_PROGRESS, newState)
+      case SettingsActions.TUTORIAL_LEVEL: {
+        newState.completedTutorialLevel = action.payload as number
+        newState.hasFinishedTutorial = (newState.completedTutorialLevel >= 2)
+        cookieSetter(SettingsActions.TUTORIAL_LEVEL, newState)
         break
       }
       case SettingsActions.DUELIST_ID: {

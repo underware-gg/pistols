@@ -43,20 +43,26 @@ export default function TutorialTestPage() {
 }
 
 function TutorialProgress() {
-  const { tutorialProgress } = useTutorialProgress()
+  const { completedTutorialLevel, hasFinishedTutorial } = useTutorialProgress()
   const { playerId } = useTutorialPlayerId()
   return (
     <>
       <Table celled striped size='small'>
         <Body className='H5'>
-          <Row>
-            <Cell>Progress</Cell>
+          <Row className='ModalText'>
+            <Cell>Completed Level:</Cell>
             <Cell className='Code'>
-              {tutorialProgress}
+              {completedTutorialLevel}
+            </Cell>
+          </Row>
+          <Row className='ModalText'>
+            <Cell>Finished:</Cell>
+            <Cell className='Code'>
+              {hasFinishedTutorial ? 'Yes' : 'No'}
             </Cell>
           </Row>
           <Row>
-            <Cell>Player ID</Cell>
+            <Cell>Player ID:</Cell>
             <Cell className='Code'>
               {bigintToHex(playerId)}
             </Cell>
@@ -82,19 +88,19 @@ function TutorialLevel({
       <Table celled striped color={isCompleted ? 'green' : isCurrent ? 'yellow' : null} size='small'>
         <Body className='H5'>
           <Row className='ModalText'>
-            <Cell>Tutorial Level</Cell>
+            <Cell>Tutorial Level:</Cell>
             <Cell className='Code'>
               {tutorial_id}
             </Cell>
           </Row>
           <Row>
-            <Cell>Duel ID</Cell>
+            <Cell>Duel ID:</Cell>
             <Cell className='Code'>
               {bigintToHex(duelId)}
             </Cell>
           </Row>
           <Row>
-            <Cell>Duel State</Cell>
+            <Cell>Duel State:</Cell>
             <Cell className='Code'>
               {state}
             </Cell>

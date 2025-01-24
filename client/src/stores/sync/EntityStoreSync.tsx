@@ -28,7 +28,6 @@ const query_get_messages: PistolsGetQuery = {
     // off-chain signed messages
     PlayerOnline: { $: { where: { identity: { $neq: '' } } } },
     PlayerBookmark: { $: { where: { identity: { $neq: '' } } } },
-    PlayerTutorialProgress: { $: { where: { identity: { $neq: '' } } } },
   },
 }
 const query_sub: PistolsSubQuery = {
@@ -46,7 +45,6 @@ const query_sub: PistolsSubQuery = {
     // off-chain signed messages
     PlayerOnline: [],
     PlayerBookmark: [],
-    PlayerTutorialProgress: [],
   },
 }
 
@@ -89,7 +87,7 @@ export function EntityStoreSync() {
       challengeQueryState.setEntities(challengeEntities)
     },
     updateEntity: (entity: PistolsEntity) => {
-      console.log("EntityStoreSync() UPDATE =======> [entity]:", entity)
+      console.log("EntityStoreSync() SUB UPDATE =======> [entity]:", entity)
       if (getEntityModel(entity, 'Config')) {
         configState.updateEntity(entity)
       }
@@ -102,7 +100,7 @@ export function EntityStoreSync() {
       if (getEntityModel(entity, 'Player')) {
         playerState.updateEntity(entity)
       }
-      if (getEntityModels(entity, ['PlayerOnline', 'PlayerBookmark', 'PlayerTutorialProgress']).length > 0) {
+      if (getEntityModels(entity, ['PlayerOnline', 'PlayerBookmark']).length > 0) {
         playerState.updateMessages([entity])
       }
       if (getEntityModel(entity, 'Duelist') || getEntityModel(entity, 'Scoreboard') || getEntityModel(entity, 'DuelistChallenge')) {
