@@ -24,19 +24,17 @@ export function ChallengeStoreSync() {
       },
     },
   }), [tableId])
-  const query_sub = useMemo<PistolsSubQuery>(() => ({
-    pistols: {
-      // Challenge: {
-      //   $: {
-      //     where: {
-      //       table_id: { $is: formatQueryValue(stringToFelt(tableId)) },
-      //     },
-      //   },
-      // },
-      Challenge: [],
-      Round: [],
-    },
-  }), [tableId])
+  // const query_sub = useMemo<PistolsSubQuery>(() => ({
+  //   pistols: {
+  //     Challenge: {
+  //       $: {
+  //         where: {
+  //           table_id: { $is: formatQueryValue(stringToFelt(tableId)) },
+  //         },
+  //       },
+  //     },
+  //   },
+  // }), [tableId])
 
   const challengeState = useChallengeStore((state) => state)
   const queryState = useChallengeQueryStore((state) => state)
@@ -45,18 +43,18 @@ export function ChallengeStoreSync() {
 
   useSdkEntities({
     query_get,
-    query_sub,
+    // query_sub,
     enabled: mounted,
     setEntities: (entities: PistolsEntity[]) => {
       console.log("ChallengeStoreSync() SET =======> [entities]:", entities)
       challengeState.setEntities(entities)
       queryState.setEntities(entities)
     },
-    updateEntity: (entity: PistolsEntity) => {
-      console.log("ChallengeStoreSync() UPDATE =======> [entity]:", entity)
-      challengeState.updateEntity(entity)
-      queryState.updateEntity(entity)
-    },
+    // updateEntity: (entity: PistolsEntity) => {
+    //   console.log("ChallengeStoreSync() UPDATE =======> [entity]:", entity)
+    //   challengeState.updateEntity(entity)
+    //   queryState.updateEntity(entity)
+    // },
   })
 
   useEffect(() => console.log(`ChallengeStoreSync() [${Object.keys(challengeState.entities).length}] =>`, challengeState.entities), [challengeState.entities])

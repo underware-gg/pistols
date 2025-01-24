@@ -8,6 +8,8 @@ import { useTokenConfigStore } from '/src/stores/tokenConfigStore'
 import { usePlayerStore } from '/src/stores/playerStore'
 import { useDuelistStore } from '/src/stores/duelistStore'
 import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
+import { useChallengeStore } from '/src/stores/challengeStore'
+import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 
 const query_get: PistolsGetQuery = {
   pistols: {
@@ -39,6 +41,8 @@ const query_sub: PistolsSubQuery = {
     Duelist: [],
     DuelistChallenge: [],
     Scoreboard: [],
+    Challenge: [],
+    Round: [],
     // off-chain signed messages
     PlayerOnline: [],
     PlayerBookmark: [],
@@ -57,6 +61,8 @@ export function EntityStoreSync() {
   const playerState = usePlayerStore((state) => state)
   const duelistState = useDuelistStore((state) => state)
   const duelistQueryState = useDuelistQueryStore((state) => state)
+  const challengeState = useChallengeStore((state) => state)
+  const challengeQueryState = useChallengeQueryStore((state) => state)
 
   const mounted = useMounted()
 
@@ -78,6 +84,9 @@ export function EntityStoreSync() {
       const duelistEntities = filterEntitiesByModel(entities, ['Duelist', 'DuelistChallenge', 'Scoreboard'])
       duelistState.setEntities(duelistEntities)
       duelistQueryState.setEntities(duelistEntities)
+      const challengeEntities = filterEntitiesByModel(entities, ['Challenge', 'Round'])
+      challengeState.setEntities(challengeEntities)
+      challengeQueryState.setEntities(challengeEntities)
     },
     updateEntity: (entity: PistolsEntity) => {
       console.log("EntityStoreSync() UPDATE =======> [entity]:", entity)
@@ -99,6 +108,10 @@ export function EntityStoreSync() {
       if (getEntityModel(entity, 'Duelist') || getEntityModel(entity, 'Scoreboard') || getEntityModel(entity, 'DuelistChallenge')) {
         duelistState.updateEntity(entity)
         duelistQueryState.updateEntity(entity)
+      }
+      if (getEntityModel(entity, 'Challenge') || getEntityModel(entity, 'Round')) {
+        challengeState.updateEntity(entity)
+        challengeQueryState.updateEntity(entity)
       }
     },
   })
