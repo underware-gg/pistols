@@ -13,9 +13,8 @@ export type EntityMap = {
 
 export type useSdkStateResult = {
   entities: EntityMap | null
-  isLoading: boolean
-  isSubscribed: boolean
-  refetch: () => void
+  isLoading: boolean | undefined
+  isSubscribed: boolean | undefined
 }
 
 export const getEntityMapModels = <M extends PistolsModelType>(entities: EntityMap, modelName: PistolsSchemaModelNames): M[] =>
@@ -34,18 +33,16 @@ export const useSdkState = ({
   query_get,
   query_sub,
   enabled = true,
-  historical = undefined,
   limit = 100,
   offset = 0,
   logging = false,
 }: Partial<UseSdkEntitiesProps>): useSdkStateResult => {
   const [entities, setEntities] = useState<EntityMap | null>()
 
-  const { isLoading, isSubscribed, refetch } = useSdkEntities({
+  const { isLoading, isSubscribed } = useSdkEntities({
     query_get,
     query_sub,
     enabled,
-    historical,
     limit,
     offset,
     logging,
@@ -71,6 +68,5 @@ export const useSdkState = ({
     entities,
     isLoading,
     isSubscribed,
-    refetch,
   }
 }

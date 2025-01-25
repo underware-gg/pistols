@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useDojoSetup, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoSetup, useSdkEvents } from '@underware_gg/pistols-sdk/dojo'
 import { useHistoricalEventsStore } from '/src/stores/historicalEventsStore'
 import { useMounted } from '@underware_gg/pistols-sdk/utils'
 import { PistolsGetQuery, PistolsSubQuery } from '@underware_gg/pistols-sdk/pistols'
@@ -22,7 +22,7 @@ export function EventsHistoricalStoreSync() {
   
   const mounted = useMounted()
 
-  useSdkEntities({
+  useSdkEvents({
     query_get,
     query_sub,
     enabled: mounted,

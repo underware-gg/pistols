@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { formatQueryValue, getEntityModel, useDojoSetup, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
+import { formatQueryValue, getEntityModel, useDojoSetup, useSdkEvents } from '@underware_gg/pistols-sdk/dojo'
 import { useEventsStore } from '/src/stores/eventsStore'
 import { useMounted } from '@underware_gg/pistols-sdk/utils'
 import { PistolsEntity, PistolsGetQuery, PistolsSubQuery } from '@underware_gg/pistols-sdk/pistols'
@@ -31,7 +31,7 @@ export function EventsModelStoreSync() {
     },
   }), [])
 
-  useSdkEntities({
+  useSdkEvents({
     query_get,
     query_sub,
     enabled: (mounted && duelistIds.length > 0),
