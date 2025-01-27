@@ -14,10 +14,10 @@ export const useMintMockLords = () => {
 
   useEffect(() => {
     // minted new! go to Game...
-    if (address && balance === 0n && hasFaucet && mintLords) {
+    if (account && balance === 0n && hasFaucet && mintLords) {
       mintLords(account)
     }
-  }, [address, balance, hasFaucet, mintLords])
+  }, [account, balance, hasFaucet, mintLords])
 
   return <></>
 }
