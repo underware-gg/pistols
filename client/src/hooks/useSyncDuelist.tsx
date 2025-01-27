@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { useDuelistsOfPlayer } from '/src/hooks/useDuelistToken'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 
 //
 // Switch selected duelist if not owned by player

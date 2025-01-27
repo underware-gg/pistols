@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { BigNumberish } from 'starknet'
-import { useDuelistsOfPlayer } from '/src/hooks/useDuelistToken'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { useDuelist } from '/src/stores/duelistStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'

@@ -2,7 +2,7 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo
 import { BigNumberish } from 'starknet'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameApect'
-import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
+import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { usePlayer } from '/src/stores/playerStore'
 import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { AnimationData } from '/src/components/cards/Cards'

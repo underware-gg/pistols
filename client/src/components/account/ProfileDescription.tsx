@@ -5,7 +5,7 @@ import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
 import { AddressShort } from '/src/components/ui/AddressShort'
 import { EMOJI } from '/src/data/messages'
 import { BigNumberish } from 'starknet'
-import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
+import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { isPositiveBigint, useValidateWalletAddress } from '@underware_gg/pistols-sdk/utils'
 import { usePlayer } from '/src/stores/playerStore'
 

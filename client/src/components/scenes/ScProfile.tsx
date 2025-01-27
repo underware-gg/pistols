@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { useDuelistsOfPlayer } from '/src/hooks/useDuelistToken'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useCanClaimWelcomePack } from '/src/hooks/usePistolsContractCalls'
 import { useMintMockLords } from '/src/hooks/useMintMockLords'

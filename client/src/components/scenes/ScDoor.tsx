@@ -11,7 +11,7 @@ import { Divider } from '/src/components/ui/Divider'
 import { PACKAGE_VERSION } from '/src/utils/constants'
 import { useIsMyDuelist } from '/src/hooks/useIsYou'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistsOfPlayer } from '/src/hooks/useDuelistToken'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { SceneName } from '/src/data/assets'
 import Logo from '/src/components/Logo'
 

@@ -1,8 +1,8 @@
 import { BigNumberish } from 'starknet'
 import { useTokenConfig } from '/src/stores/tokenConfigStore'
-import { bigintToHex, useERC721OwnerOf } from '@underware_gg/pistols-sdk/utils'
+import { useERC721OwnerOf } from '@underware_gg/pistols-sdk/utils'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
-import { useTokenIdsByOwner, useTokenIdsOfPlayer } from '/src/stores/duelistTokenStore'
+import { useTokenIdsByOwner, useTokenIdsOfPlayer } from '/src/stores/tokenStore'
 
 
 export const useDuelistTokenCount = () => {
