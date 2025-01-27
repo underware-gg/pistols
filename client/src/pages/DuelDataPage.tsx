@@ -1,6 +1,6 @@
 import React from 'react'
 import { Container, Divider, Table } from 'semantic-ui-react'
-import { useAddChallenge } from '/src/stores/challengeStore'
+import { useGetChallenge } from '/src/stores/challengeStore'
 import { useDuel } from '/src/hooks/useDuel'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
@@ -53,7 +53,7 @@ function Stats({
 }) {
   const { challenge: { tableId }, round1 } = useDuel(duelId)
 
-  const challenge = useAddChallenge(duelId)
+  const challenge = useGetChallenge(duelId)
 
   return (
     <>

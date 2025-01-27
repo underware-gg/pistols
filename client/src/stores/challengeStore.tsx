@@ -183,7 +183,7 @@ export const useRound = (duelId: BigNumberish) => {
 // (for non default tables, like tutorials)
 //
 
-export const useAddChallenge = (duel_id: BigNumberish) => {
+export const useGetChallenge = (duel_id: BigNumberish) => {
   const result = useChallenge(duel_id)
 
   const query_get = useMemo<PistolsGetQuery>(() => ({

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { useTutorialLevel, useTutorialPlayerId, useTutorialProgress } from '/src/hooks/useTutorial'
-import { useAddChallenge } from '/src/stores/challengeStore'
+import { useGetChallenge } from '/src/stores/challengeStore'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { usePistolsContext } from '../hooks/PistolsContext'
 
@@ -42,7 +42,7 @@ export function OpenTutorialChallengeButton({
   label?: string,
 }) {
   const { duelId } = useTutorialLevel(tutorial_id)
-  const { isInProgress } = useAddChallenge(duelId)
+  const { isInProgress } = useGetChallenge(duelId)
 
   const { dispatchSelectDuel } = usePistolsContext()
   const _open = () => {

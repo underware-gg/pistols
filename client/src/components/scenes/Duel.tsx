@@ -10,7 +10,7 @@ import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useGameplayContext } from '/src/hooks/GameplayContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
-import { useAddChallenge } from '/src/stores/challengeStore'
+import { useGetChallenge } from '/src/stores/challengeStore'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
@@ -55,7 +55,7 @@ export default function Duel({
   const { animated, dispatchAnimated } = useGameplayContext()
 
   const { challengeDescription } = useChallengeDescription(duelId)
-  const { tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start } = useAddChallenge(duelId)
+  const { tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start } = useGetChallenge(duelId)
   const { description } = useTable(tableId)
 
   // console.log('Duel', duelId, tableId, isFinished, quote, duelistIdA, duelistIdB, timestamp_start)
