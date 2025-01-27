@@ -74,7 +74,7 @@ export const useSdkEntities = ({
             console.error("useSdkEntities().sdk.get() error:", response.error)
           } else if (response.data) {
             // console.log("useSdkEntities() GOT:", response.data)
-            setEntities(Object.values(response.data))
+            setEntities(response.data as PistolsEntity[])
           }
           setIsLoading(false)
         },
@@ -100,8 +100,10 @@ export const useSdkEntities = ({
           if (response.error) {
             console.error("useSdkEntities().sdk.subscribe() error:", response.error)
           } else {
-            // console.log("useSdkEntities() SUB:", response.data);
-            updateEntity(Object.values(response.data)[0])
+            console.log("useSdkEntities() SUB:", response.data);
+            if (response.data[0]) {
+              updateEntity(response.data[0] as PistolsEntity)
+            }
           }
         },
         options: { logging },
@@ -145,9 +147,9 @@ export const useSdkEvents = ({
 
   const _parseEvents = (data: SdkCallbackResponse['data']): PistolsEntity[] => {
     return !data ? []
-      : !historical ? Object.values(data)
+      : !historical ? (data as PistolsEntity[])
         : (data as PistolsEntity[][]).reduce((acc: PistolsEntity[], e: PistolsEntity[]) => (
-          acc.concat(Object.values(e))
+          acc.concat(e)
         ), [] as PistolsEntity[])
   }
 
