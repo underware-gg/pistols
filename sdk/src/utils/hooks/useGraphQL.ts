@@ -28,22 +28,29 @@ export const ql_client = (GQLUrl: string) => {
 
 type Variables = Record<string, string | number | number[] | boolean | null | undefined | Date>;
 
-export const useGraphQLQuery = (
+export const useGraphQLQuery = ({
+  toriiUrl,
+  query,
+  variables,
+  enabled = true,
+  watch = false,
+  pollInterval = 1000,
+}: {
   toriiUrl: string,
   query: any,
-  variables?: Variables,
-  skip?: boolean,
+  variables: Variables,
+  enabled?: boolean,
   watch?: boolean,
   pollInterval?: number,
-) => {
+}) => {
   const client = useMemo(() => {
     return ql_client(toriiUrl);
   }, [toriiUrl]);
   const { data, loading: isLoading, refetch } = useQuery(query, {
-    client: client,
-    variables: variables,
-    skip: skip,
-    pollInterval: (watch ? (pollInterval ?? 1000) : undefined),
+    client,
+    variables,
+    skip: !enabled,
+    pollInterval: (watch ? pollInterval : undefined),
   });
   return { data, isLoading, refetch };
 };

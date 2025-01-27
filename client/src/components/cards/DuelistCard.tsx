@@ -4,7 +4,7 @@ import { useDuelist } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { usePlayer } from '/src/stores/playerStore'
-import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
+import { bigintToDecimal, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { AnimationData } from '/src/components/cards/Cards'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
@@ -528,7 +528,8 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                   props.duelistId ?
                     <>
                       <div className="duelist-name" data-contentlength={_nameLength(name)}>{name}</div>
-                      <div className="duelist-name Smaller" data-contentlength={_nameLength(playerName)}>({playerName})</div>
+                      <div className="duelist-name Smaller" data-contentlength={12}>Duelist #{bigintToDecimal(props.duelistId)} </div>
+                      <div className="duelist-name Smaller" data-contentlength={_nameLength(playerName)}>{playerName}</div>
                     </>
                     : <div className="duelist-name" data-contentlength={_nameLength(playerName)}>{playerName}</div>
                 }
