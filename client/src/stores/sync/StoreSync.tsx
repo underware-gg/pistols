@@ -7,7 +7,7 @@ import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { PlayerOnlineSync } from '/src/stores/sync/PlayerOnlineSync'
 // QL to be replaced...
 import { FameCoinStoreSyncQL } from '/src/stores/fameCoinStore'
-import { PlayerDuelistTokensStoreSync, PlayerDuelistTokensStoreSyncQL } from '/src/stores/duelistTokenStore'
+import { TokensOfPlayerStoreSync, TokensOfPlayerStoreSyncQL } from '/src/stores/sync/TokenStoreSync'
 
 //
 // Manages all store subscriptions
@@ -23,8 +23,8 @@ export default function StoreSync() {
       <EntityStoreSync />
       {/* QL to be replaced... */}
       <FameCoinStoreSyncQL />
-      <PlayerDuelistTokensStoreSyncQL />
-      <PlayerDuelistTokensStoreSync />
+      <TokensOfPlayerStoreSyncQL />
+      <TokensOfPlayerStoreSync />
 
       {/* Controller */}
       <PlayerNameSync />

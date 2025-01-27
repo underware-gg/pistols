@@ -3,7 +3,8 @@ import { BigNumberish } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
-import { PlayerDuelistTokensStoreSyncQL, useTokensByOwner } from '/src/stores/duelistTokenStore'
+import { useTokensByOwner } from '/src/stores/tokenStore'
+import { TokensOfPlayerStoreSyncQL } from '/src/stores/sync/TokenStoreSync'
 import { bigintToDecimal, useERC721TokenUri } from '@underware_gg/pistols-sdk/utils'
 import { Connect } from './ConnectTestPage'
 import App from '/src/components/App'
@@ -32,7 +33,7 @@ export default function TokensTestPage() {
         <br />
         <TokenContract contractAddress={duelContractAddress} tokenName='Duels' />
         <br />
-        <PlayerDuelistTokensStoreSyncQL watch={false} />
+        <TokensOfPlayerStoreSyncQL watch={false} />
       </Container>
     </App>
   );

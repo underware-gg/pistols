@@ -10,6 +10,7 @@ import { useDuelistStore } from '/src/stores/duelistStore'
 import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
+import { usePackStore } from '/src/stores/packStore'
 
 const query_get: PistolsGetQuery = {
   pistols: {
@@ -42,6 +43,7 @@ const query_sub: PistolsSubQuery = {
     Scoreboard: [],
     Challenge: [],
     Round: [],
+    Pack: [],
     // off-chain signed messages
     PlayerOnline: [],
     PlayerBookmark: [],
@@ -61,6 +63,7 @@ export function EntityStoreSync() {
   const duelistQueryState = useDuelistQueryStore((state) => state)
   const challengeState = useChallengeStore((state) => state)
   const challengeQueryState = useChallengeQueryStore((state) => state)
+  const packState = usePackStore((state) => state)
 
   const mounted = useMounted()
 
@@ -110,6 +113,9 @@ export function EntityStoreSync() {
       if (getEntityModel(entity, 'Challenge') || getEntityModel(entity, 'Round')) {
         challengeState.updateEntity(entity)
         challengeQueryState.updateEntity(entity)
+      }
+      if (getEntityModels(entity, ['Pack']).length > 0) {
+        packState.updateEntity(entity)
       }
     },
   })

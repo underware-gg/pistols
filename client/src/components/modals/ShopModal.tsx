@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import { Modal, Grid, Image } from 'semantic-ui-react'
+import React, { useState } from 'react'
+import { Modal, Grid, Image, ButtonGroup, Button } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useSettings } from '/src/hooks/SettingsContext'
-import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
-import { useDuelistsOfPlayer } from '/src/hooks/useDuelistToken'
 import { useCalcFeePack, useCanPurchase } from '/src/hooks/usePistolsContractCalls'
+import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { FeesToPay } from '/src/components/account/LordsBalance'
-import { SceneName } from '/src/data/assets'
 import { Opener } from '/src/hooks/useOpener'
 import { Divider } from '/src/components/ui/Divider'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { useGetPack } from '/src/stores/packStore'
+import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -23,36 +22,24 @@ export default function ShopModal({
 }) {
   const packType = opener.props.packType ?? constants.PackType.Unknown
 
-  const { account, address } = useAccount()
-
-  // Detect new mints
-  const { duelistIds } = useDuelistsOfPlayer()
-  const { dispatchSetScene } = usePistolsScene()
-  const { dispatchDuelistId } = useSettings()
-  const [duelistCountBeforeMint, setDuelistCountBeforeMint] = useState<number>(null)
-
-  useEffect(() => {
-    // minted new! go to Game...
-    if (opener.isOpen &&
-      duelistCountBeforeMint != null &&
-      duelistCountBeforeMint != duelistIds.length
-    ) {
-      dispatchDuelistId(duelistIds.at(duelistCountBeforeMint))
-      dispatchSetScene(SceneName.Profile)
-      opener.close()
-    }
-  }, [duelistCountBeforeMint, duelistIds.length])
+  const { account } = useAccount()
+  const [selectedPackId, setSelectedPackId] = useState(0n)
 
   const { pack_token } = useDojoSystemCalls()
   const { canPurchase } = useCanPurchase(packType)
   const { fee } = useCalcFeePack(packType)
 
-  const canSubmit = (account && canPurchase && duelistCountBeforeMint == null)
+  const canSubmit = (account && canPurchase)
 
   const _purchase = () => {
     if (canSubmit) {
-      setDuelistCountBeforeMint(duelistIds.length ?? 0)
       pack_token.purchase(account, packType)
+    }
+  }
+
+  const _openPack = () => {
+    if (selectedPackId) {
+      pack_token.open(account, selectedPackId)
     }
   }
 
@@ -60,7 +47,7 @@ export default function ShopModal({
     <Modal
       onClose={() => opener.close()}
       open={opener.isOpen}
-      size='tiny'
+      size='small'
     >
       <Modal.Header>
         Purchase
@@ -68,17 +55,23 @@ export default function ShopModal({
 
       <Modal.Content className='ModalText ShopModal'>
         <Grid className='OnboardingProfile'>
-          <Row textAlign='center' verticalAlign='top'>
-            <Col width={5} textAlign='left' className='PaddedSides'>
+          <Row columns='equal' textAlign='center' verticalAlign='top'>
+            <Col textAlign='left' className='PaddedSides'>
               <Image src={constants.PACK_TYPES[packType].image_url_closed} />
             </Col>
-            <Col width={9} textAlign='left' className='PaddedSides'>
+            <Col textAlign='left' className='PaddedSides'>
 
               <h1>{constants.PACK_TYPES[packType].name}</h1>
-
               <Divider />
 
               <FeesToPay value={0} fee={fee} prefixed />
+            </Col>
+            <Col>
+              <h1>Your Packs</h1>
+              <Divider />
+              <div className='Scroller' style={{ height: '200px' }}>
+                <PacksList selectedPackId={selectedPackId} setSelectedPackId={setSelectedPackId} />
+              </div>
             </Col>
           </Row>
         </Grid>
@@ -98,9 +91,58 @@ export default function ShopModal({
                 onClick={() => _purchase()}
               />
             </Col>
+            <Col>
+              <ActionButton large fill disabled={!selectedPackId} label={`Open Pack #${bigintToDecimal(selectedPackId)}`} onClick={() => _openPack()} />
+            </Col>
           </Row>
         </Grid>
       </Modal.Actions>
     </Modal>
+  )
+}
+
+
+//--------------------
+// Tables list 
+//
+export function PacksList({
+  selectedPackId,
+  setSelectedPackId,
+}: {
+  selectedPackId: bigint
+  setSelectedPackId: (packId: bigint) => void
+}) {
+  const { packIds } = usePacksOfPlayer()
+  return (
+    <ButtonGroup vertical className='FillWidth Padded'>
+      {packIds.map(packId => (
+        <PacksListItem key={packId}
+          packId={packId}
+          active={selectedPackId == packId}
+          setSelectedPackId={setSelectedPackId}
+        />
+      ))}
+    </ButtonGroup >
+  )
+}
+
+function PacksListItem({
+  packId,
+  active,
+  setSelectedPackId,
+}: {
+  packId: bigint
+  active: boolean
+  setSelectedPackId: (packId: bigint) => void
+}) {
+  const { packExists, packType, name, isOpen } = useGetPack(packId)
+  return (
+    <Button size='big'
+      active={active}
+      disabled={!packExists || isOpen}
+      onClick={() => { setSelectedPackId(packId) }}
+    >
+      {name} #{bigintToDecimal(packId)}{isOpen ? ' (Opened)' : ''}
+    </Button>
   )
 }
