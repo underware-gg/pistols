@@ -1,12 +1,15 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { createDojoStore } from '@dojoengine/sdk/state'
+import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityId, useClientTimestamp, feltToString, parseCustomEnum, bigintEquals, parseEnumVariant, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { formatQueryValue, useEntityModel, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsGetQuery, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { movesToHand } from '/src/utils/pistols'
+// FIX: dojo.js 1.0.12 createDojoStore()
+import type { GameState } from '@dojoengine/sdk/state'
+import { StoreApi, UseBoundStore } from 'zustand'
 
-export const useChallengeStore = createDojoStore<PistolsSchemaType>();
+export const useChallengeStore = createDojoStore<PistolsSchemaType>() as UseBoundStore<StoreApi<GameState<PistolsSchemaType>>>;
 
 export const useAllChallengesEntityIds = () => {
   const entities = useChallengeStore((state) => state.entities)

@@ -6,10 +6,10 @@ catalog:
   #--------------------------------
   # dojo.js
   #
-  "@dojoengine/core": 1.0.11
-  "@dojoengine/sdk": 1.0.11
-  "@dojoengine/torii-client": 1.0.11
-  "@dojoengine/utils": 1.0.11
+  "@dojoengine/core": 1.0.12
+  "@dojoengine/sdk": 1.0.12
+  "@dojoengine/torii-client": 1.0.12
+  "@dojoengine/utils": 1.0.12
   # "@dojoengine/core": ../../dojo.js/packages/core
   # "@dojoengine/sdk": ../../dojo.js/packages/sdk
   # "@dojoengine/torii-client": ../../dojo.js/packages/torii-client
@@ -19,10 +19,12 @@ catalog:
   # same as dojo.js
   # https://github.com/dojoengine/dojo.js/blob/main/pnpm-workspace.yaml
   #
-  starknet: 6.21.0
-  get-starknet-core: ^4.0.0
   "@starknet-react/core": ^3.6.2
   "@starknet-react/chains": ^3.1.0
+  get-starknet-core: ^4.0.0
+  starknet: 6.21.0
+  immer: ^10.1.1
+  zustand: ^4.5.5
   
   #--------------------------------
   # misc
@@ -30,10 +32,7 @@ catalog:
   "@cartridge/connector": 0.6.0
   "@cartridge/controller": 0.6.0
   "@apollo/client": ^3.11.8
-  immer: ^10.1.1
   react: ^18.2.0
   react-dom: ^18.2.0
   starknetid.js: ^4.0.0
   typescript: ^5.5.4
-  zustand: ^4.5.5
-

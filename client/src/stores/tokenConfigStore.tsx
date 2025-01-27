@@ -1,11 +1,14 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { createDojoStore } from '@dojoengine/sdk/state'
+import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { PistolsSchemaType, models } from '@underware_gg/pistols-sdk/pistols'
 import { useEntityId } from '@underware_gg/pistols-sdk/utils'
+// FIX: dojo.js 1.0.12 createDojoStore()
+import type { GameState } from '@dojoengine/sdk/state'
+import { StoreApi, UseBoundStore } from 'zustand'
 
-export const useTokenConfigStore = createDojoStore<PistolsSchemaType>();
+export const useTokenConfigStore = createDojoStore<PistolsSchemaType>() as UseBoundStore<StoreApi<GameState<PistolsSchemaType>>>;
 
 export const useTokenConfig = (contractAddress: BigNumberish) => {
   const entityId = useEntityId([contractAddress])

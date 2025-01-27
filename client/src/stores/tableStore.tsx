@@ -1,10 +1,13 @@
 import { useMemo } from 'react'
-import { createDojoStore } from '@dojoengine/sdk/state'
+import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { useEntityId, feltToString, stringToFelt, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
 import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
+// FIX: dojo.js 1.0.12 createDojoStore()
+import type { GameState } from '@dojoengine/sdk/state'
+import { StoreApi, UseBoundStore } from 'zustand'
 
-export const useTableConfigStore = createDojoStore<PistolsSchemaType>();
+export const useTableConfigStore = createDojoStore<PistolsSchemaType>() as UseBoundStore<StoreApi<GameState<PistolsSchemaType>>>;
 
 export const useAllTableIds = () => {
   const entities = useTableConfigStore((state) => state.entities)

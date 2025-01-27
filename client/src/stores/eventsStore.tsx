@@ -1,8 +1,11 @@
 import { useMemo } from 'react'
-import { createDojoStore } from '@dojoengine/sdk/state'
+import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
+// FIX: dojo.js 1.0.12 createDojoStore()
+import type { GameState } from '@dojoengine/sdk/state'
+import { StoreApi, UseBoundStore } from 'zustand'
 
-export const useEventsStore = createDojoStore<PistolsSchemaType>();
+export const useEventsStore = createDojoStore<PistolsSchemaType>() as UseBoundStore<StoreApi<GameState<PistolsSchemaType>>>;
 
 
 //--------------------------------
