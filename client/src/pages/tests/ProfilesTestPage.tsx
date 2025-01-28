@@ -2,6 +2,8 @@ import React, { useMemo } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import CurrentChainHint from '/src/components/CurrentChainHint'
 import App from '/src/components/App'
 
 // const Row = Grid.Row
@@ -20,6 +22,8 @@ export default function ProfilesTestPage() {
   return (
     <App>
       <Container>
+        <BackToTestPageIndex />
+        <CurrentChainHint />
         <br />
         <Profiles profiles={constants.DUELIST_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Duelist} />
         <br />

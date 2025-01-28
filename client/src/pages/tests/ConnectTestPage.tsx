@@ -12,7 +12,9 @@ import {
   DojoStatus, getConnectorIcon,
 } from '@underware_gg/pistols-sdk/dojo'
 import { ChainSwitcher } from '/src/components/starknet/ChainSwitcher'
+import { BackToTestPageIndex } from './TestPageIndex'
 import StarknetConnectModal from '/src/components/starknet/StarknetConnectModal'
+import CurrentChainHint from '/src/components/CurrentChainHint'
 import App from '/src/components/App'
 
 //@ts-ignore
@@ -30,6 +32,8 @@ export default function ConnectTestPage() {
   return (
     <App>
       <Container>
+        <BackToTestPageIndex />
+        <CurrentChainHint />
         {/* <DojoAccount /> */}
         <Connect />
         {/* <Sign revision={0} /> */}

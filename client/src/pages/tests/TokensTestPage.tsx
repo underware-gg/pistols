@@ -7,6 +7,8 @@ import { useTokensByOwner } from '/src/stores/tokenStore'
 import { TokensOfPlayerStoreSyncQL } from '/src/stores/sync/TokenStoreSync'
 import { bigintToDecimal, useERC721TokenUri } from '@underware_gg/pistols-sdk/utils'
 import { Connect } from './ConnectTestPage'
+import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import CurrentChainHint from '/src/components/CurrentChainHint'
 import App from '/src/components/App'
 
 // const Row = Grid.Row
@@ -24,6 +26,9 @@ export default function TokensTestPage() {
   return (
     <App>
       <Container>
+        <BackToTestPageIndex />
+        <CurrentChainHint />
+
         <Connect />
         <TestImages />
         <br />

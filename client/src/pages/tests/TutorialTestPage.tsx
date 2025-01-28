@@ -2,13 +2,15 @@ import React from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { useTutorialLevel, useTutorialPlayerId, useTutorialProgress } from '/src/hooks/useTutorial'
 import { useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
-import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { useChallenge } from '/src/stores/challengeStore'
 import { CreateTutorialChallengeButton, OpenTutorialChallengeButton } from '/src/components/TutorialButtons'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
+import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import CurrentChainHint from '/src/components/CurrentChainHint'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
 import App from '/src/components/App'
-import { useChallenge } from '/src/stores/challengeStore'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -23,6 +25,9 @@ export default function TutorialTestPage() {
   return (
     <App>
       <Container>
+        <BackToTestPageIndex />
+        <CurrentChainHint />
+
         <Connect />
         {isInitialized &&
           <>

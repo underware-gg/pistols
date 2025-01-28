@@ -4,6 +4,8 @@ import { CustomIcon, EmojiIcon } from '/src/components/ui/Icons'
 import { ArchetypeIcon, BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
 import { LordsBagIcon } from '/src/components/account/Balance'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import CurrentChainHint from '/src/components/CurrentChainHint'
 import App from '/src/components/App'
 
 const Row = Grid.Row
@@ -14,6 +16,8 @@ export default function IconsTestPage() {
   return (
     <App>
       <Container text>
+        <BackToTestPageIndex />
+        <CurrentChainHint />
 
         <h5>Icons</h5>
         <Grid celled>
@@ -103,7 +107,6 @@ export default function IconsTestPage() {
               <LordsBagIcon size='massive' />
             </Col>
           </Row>
-
 
         </Grid>
       </Container>

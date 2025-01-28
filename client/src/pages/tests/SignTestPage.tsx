@@ -5,6 +5,8 @@ import { useAccount } from '@starknet-react/core'
 import { useTypedMessage, Messages, createTypedMessage, bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
 import { useDojoSetup } from '@underware_gg/pistols-sdk/dojo'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import CurrentChainHint from '/src/components/CurrentChainHint'
 import App from '/src/components/App'
 
 //@ts-ignore
@@ -27,6 +29,9 @@ export default function SignTestPage() {
   return (
     <App>
       <Container>
+        <BackToTestPageIndex />
+        <CurrentChainHint />
+
         <Table celled striped size='small' color='orange'>
           <Header>
             <Row>
@@ -46,7 +51,6 @@ export default function SignTestPage() {
         </Table>
 
         <ConsoleTests />
-
       </Container>
     </App>
   )

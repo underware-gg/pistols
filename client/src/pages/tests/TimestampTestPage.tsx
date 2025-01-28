@@ -4,6 +4,8 @@ import {
   useClientTimestamp,
   formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown,
 } from '@underware_gg/pistols-sdk/utils'
+import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import CurrentChainHint from '/src/components/CurrentChainHint'
 import App from '/src/components/App'
 
 const Row = Table.Row
@@ -24,6 +26,9 @@ export default function TimestampTestPage() {
   return (
     <App>
       <Container>
+        <BackToTestPageIndex />
+        <CurrentChainHint />
+
         <Table celled striped size='small' color='orange'>
           <Header>
             <Row>
@@ -47,7 +52,6 @@ export default function TimestampTestPage() {
             <Timestamp start={start} end={start + 5 *24 * 60 * 60 + 60} />
           </Body>
         </Table>
-
       </Container>
     </App>
   )
