@@ -78,7 +78,7 @@ pub mod pack_token {
     use openzeppelin_introspection::src5::SRC5Component;
     use openzeppelin_token::erc721::{ERC721Component};
     use pistols::systems::components::token_component::{TokenComponent};
-    // use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
+    use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
     component!(path: TokenComponent, storage: token, event: TokenEvent);
@@ -258,7 +258,7 @@ pub mod pack_token {
             let token_ids: Span<u128> = pack.open(ref store, recipient);
 
             // burn!
-            // self.token.burn(pack_id.into());
+            self.token.burn(pack_id.into());
 
             (token_ids)
         }
@@ -304,31 +304,31 @@ pub mod pack_token {
     //-----------------------------------
     // ERC721HooksTrait
     //
-    use pistols::systems::components::erc721_hooks::{TokenRendererTrait};
-    pub impl ERC721HooksImpl of ERC721Component::ERC721HooksTrait<ContractState> {
-        fn before_update(ref self: ERC721Component::ComponentState<ContractState>,
-            to: ContractAddress,
-            token_id: u256,
-            auth: ContractAddress,
-        ) {}
+    // use pistols::systems::components::erc721_hooks::{TokenRendererTrait};
+    // pub impl ERC721HooksImpl of ERC721Component::ERC721HooksTrait<ContractState> {
+    //     fn before_update(ref self: ERC721Component::ComponentState<ContractState>,
+    //         to: ContractAddress,
+    //         token_id: u256,
+    //         auth: ContractAddress,
+    //     ) {}
 
-        fn after_update(ref self: ERC721Component::ComponentState<ContractState>,
-            to: ContractAddress,
-            token_id: u256,
-            auth: ContractAddress,
-        ) {
-            // avoid transfer after opened
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
-            let mut store: Store = StoreTrait::new(world);
-            let pack: Pack = store.get_pack(token_id.low);
-            assert(!pack.is_open, Errors::ALREADY_OPENED);
-        }
+    //     fn after_update(ref self: ERC721Component::ComponentState<ContractState>,
+    //         to: ContractAddress,
+    //         token_id: u256,
+    //         auth: ContractAddress,
+    //     ) {
+    //         // avoid transfer after opened
+    //         let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+    //         let mut store: Store = StoreTrait::new(world);
+    //         let pack: Pack = store.get_pack(token_id.low);
+    //         assert(!pack.is_open, Errors::ALREADY_OPENED);
+    //     }
 
-        // same as ERC721HooksImpl::token_uri()
-        fn token_uri(self: @ERC721Component::ComponentState<ContractState>, token_id: u256) -> ByteArray {
-            (self.get_contract().render_token_uri(token_id))
-        }
-    }
+    //     // same as ERC721HooksImpl::token_uri()
+    //     fn token_uri(self: @ERC721Component::ComponentState<ContractState>, token_id: u256) -> ByteArray {
+    //         (self.get_contract().render_token_uri(token_id))
+    //     }
+    // }
 
 
     //-----------------------------------

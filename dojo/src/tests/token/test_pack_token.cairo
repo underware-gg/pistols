@@ -291,8 +291,9 @@ fn test_claim_mint() {
     sys.token.claim_welcome_pack();
     _assert_minted_count(sys.world, sys.token, 1, 'total_supply 1');
     _assert_duelist_count(sys.world, sys.duelists, 5, 'duelist_supply 5');
-    assert(sys.token.balance_of(OWNER()) == 1, 'balance_of 1');
-    assert(sys.token.owner_of(TOKEN_ID_1) == OWNER(), 'owner_of_1');
+    // assert(sys.token.balance_of(OWNER()) == 1, 'balance_of 1'); // no burn
+    assert(sys.token.balance_of(OWNER()) == 0, 'balance_of 0'); // burn!
+    // assert(sys.token.owner_of(TOKEN_ID_1) == OWNER(), 'owner_of_1'); // no burn
 
     let player: Player = tester::get_Player(sys.world, OWNER());
     assert(player.exists(), 'player.exists()');
@@ -305,7 +306,8 @@ fn test_claim_mint() {
 
     _purchase(sys, OWNER());
     _assert_minted_count(sys.world, sys.token, 2, 'total_supply 2');
-    assert(sys.token.balance_of(OWNER()) == 2, 'balance_of 2');
+    // assert(sys.token.balance_of(OWNER()) == 2, 'balance_of 2'); // no burn
+    assert(sys.token.balance_of(OWNER()) == 1, 'balance_of 1'); // burn!
     assert(sys.token.owner_of(TOKEN_ID_2) == OWNER(), 'owner_of_2');
 
     let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
@@ -392,7 +394,8 @@ fn test_open_invalid() {
 }
 
 #[test]
-#[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
+// #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_already_opened() {
     let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
@@ -416,7 +419,8 @@ fn test_open_not_owner() {
 //
 
 #[test]
-#[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
+// #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_transfer_opened() {
     let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
@@ -426,7 +430,8 @@ fn test_transfer_opened() {
 }
 
 #[test]
-#[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
+// #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_transfer_opened_allowed() {
     let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
@@ -439,7 +444,8 @@ fn test_transfer_opened_allowed() {
 }
 
 #[test]
-#[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))] // burn!
+// #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_transfer_opened_no_allowance() {
     let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
@@ -453,14 +459,16 @@ fn test_transfer_unopened_ok() {
     let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     _purchase(sys, OWNER());
-    assert(sys.token.balance_of(OWNER()) == 2, 'balance_of(OWNER) 2');
+    // assert(sys.token.balance_of(OWNER()) == 2, 'balance_of(OWNER) 2'); // no burn
+    assert(sys.token.balance_of(OWNER()) == 1, 'balance_of(OWNER) 1'); // burn!
     assert(sys.token.balance_of(OTHER()) == 0, 'balance_of(OTHER) 0');
     assert(sys.token.owner_of(TOKEN_ID_2) == OWNER(), 'owner_of(OWNER)');
     // transfer
     tester::impersonate(OWNER());
     sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
     // check ownership
-    assert(sys.token.balance_of(OWNER()) == 1, 'balance_of(OWNER) 1');
+    // assert(sys.token.balance_of(OWNER()) == 1, 'balance_of(OWNER) 1'); // no burn
+    assert(sys.token.balance_of(OWNER()) == 0, 'balance_of(OWNER) 0'); // burn!
     assert(sys.token.balance_of(OTHER()) == 1, 'balance_of(OTHER) 1');
     assert(sys.token.owner_of(TOKEN_ID_2) == OTHER(), 'owner_of(OTHER)');
 }
@@ -470,7 +478,8 @@ fn test_transfer_unopened_allowed_ok() {
     let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     _purchase(sys, OWNER());
-    assert(sys.token.balance_of(OWNER()) == 2, 'balance_of(OWNER) 2');
+    // assert(sys.token.balance_of(OWNER()) == 2, 'balance_of(OWNER) 2'); // no burn
+    assert(sys.token.balance_of(OWNER()) == 1, 'balance_of(OWNER) 1'); // burn!
     assert(sys.token.balance_of(OTHER()) == 0, 'balance_of(OTHER) 0');
     assert(sys.token.owner_of(TOKEN_ID_2) == OWNER(), 'owner_of(OWNER)');
     // approve
@@ -480,7 +489,8 @@ fn test_transfer_unopened_allowed_ok() {
     tester::impersonate(SPENDER());
     sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
     // check ownership
-    assert(sys.token.balance_of(OWNER()) == 1, 'balance_of(OWNER) 1');
+    // assert(sys.token.balance_of(OWNER()) == 1, 'balance_of(OWNER) 1'); // no burn
+    assert(sys.token.balance_of(OWNER()) == 0, 'balance_of(OWNER) 0'); // burn!
     assert(sys.token.balance_of(OTHER()) == 1, 'balance_of(OTHER) 1');
     assert(sys.token.owner_of(TOKEN_ID_2) == OTHER(), 'owner_of(OTHER)');
 }
