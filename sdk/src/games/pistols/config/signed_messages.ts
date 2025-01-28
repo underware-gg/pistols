@@ -1,8 +1,9 @@
 import { BigNumberish, StarknetType, typedData } from 'starknet'
 import { bigintToDecimal, bigintToHex } from 'src/utils/misc/types'
-import { generateTypedData } from 'src/dojo/setup/controller'
-import { STARKNET_DOMAIN } from 'src/games/pistols/config/config'
 import { PistolsSchemaType } from 'src/games/pistols/config/types'
+import { generateTypedData } from 'src/dojo/setup/controller'
+import { makeStarknetDomain } from 'src/games/pistols/config/config'
+import { ChainId } from 'src/dojo/setup/chains'
 import * as constants from 'src/games/pistols/generated/constants'
 import * as models from 'src/games/pistols/generated/models.gen'
 
@@ -19,14 +20,16 @@ import * as models from 'src/games/pistols/generated/models.gen'
 export type OmitFieldOrder<T> = Omit<T, 'fieldOrder'>;
 
 export function make_typed_data_PlayerOnline({
+  chainId,
   identity,
   timestamp,
 }: {
+  chainId: ChainId,
   identity: BigNumberish,
   timestamp: number,
 }) {
   return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PlayerOnline>>(
-    STARKNET_DOMAIN,
+    makeStarknetDomain(chainId),
     'pistols-PlayerOnline',
     {
       identity: bigintToHex(identity),
@@ -40,18 +43,20 @@ export function make_typed_data_PlayerOnline({
 }
 
 export function make_typed_data_PlayerBookmark({
+  chainId,
   identity,
   target_address,
   target_id,
   enabled,
 }: {
+  chainId: ChainId,
   identity: BigNumberish,
   target_address: BigNumberish,
   target_id: BigNumberish,
   enabled: boolean,
 }) {
   return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PlayerBookmark>>(
-    STARKNET_DOMAIN,
+    makeStarknetDomain(chainId),
     'pistols-PlayerBookmark',
     {
       identity: bigintToHex(identity),

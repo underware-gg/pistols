@@ -26,11 +26,11 @@ export type SignedMessagePolicyDescriptions = {
 }[]
 
 export interface DojoAppConfig {
-  namespace: string
+  selectedChainId: ChainId
   supportedChainIds: ChainId[]
-  defaultChainId: ChainId
+  namespace: string
   starknetDomain: StarknetDomain
-  manifests: { [chain_id: string]: DojoManifest | undefined }
+  manifest: DojoManifest,
   contractPolicyDescriptions: ContractPolicyDescriptions
   controllerConnector: Connector
 }

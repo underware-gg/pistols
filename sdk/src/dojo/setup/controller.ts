@@ -64,7 +64,7 @@ export const makeControllerConnector = (
   // create connector
   let connector: Connector | undefined
   try {
-    const connector = new ControllerConnector(options) as never as Connector
+    connector = new ControllerConnector(options) as never as Connector
     assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
   } catch(e) {
     console.error(`makeControllerConnector() ERROR:`, e)

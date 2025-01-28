@@ -34,7 +34,7 @@ export const StarknetProvider = ({
 
   //
   // Current chain
-  const selectedChainId = useMemo(() => (dojoAppConfig.defaultChainId), [dojoAppConfig])
+  const selectedChainId = useMemo(() => (dojoAppConfig.selectedChainId), [dojoAppConfig])
   const selectedChainConfig = useMemo(() => getDojoChainConfig(selectedChainId), [selectedChainId])
   useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainId])
 
@@ -42,7 +42,7 @@ export const StarknetProvider = ({
     if (!isChainIdSupported(chainId)) {
       throw `selectChainId() Invalid chain [${chainId}]`
     }
-    throw `selectChainId() not supported!`
+    throw `selectChainId() not implemented!`
   }, [])
 
   // Build chain connectors form selectedChainConfig

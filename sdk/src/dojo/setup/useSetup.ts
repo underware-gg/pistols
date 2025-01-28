@@ -29,8 +29,8 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   const chainId = useMemo(() => (selectedChainConfig.chainId), [selectedChainConfig])
 
   const manifest = useMemo(() => {
-    return dojoAppConfig.manifests[chainId] ?? null
-  }, [dojoAppConfig, chainId])
+    return dojoAppConfig.manifest ?? null
+  }, [dojoAppConfig])
 
   const starknetDomain = useMemo(() => {
     return dojoAppConfig.starknetDomain ?? null
@@ -95,8 +95,8 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     if (!manifest) return null
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
     if (!contractCalls) return (contractCalls as any) // undefined or null
-    return createSystemCalls(dojoProvider, manifest, contractCalls, selectedChainConfig) ?? null
-  }, [manifest, dojoProvider, contractCalls, selectedChainConfig])
+    return createSystemCalls(dojoProvider, manifest, contractCalls, selectedChainConfig, chainId) ?? null
+  }, [manifest, dojoProvider, contractCalls, selectedChainConfig, chainId])
 
   //
   // Status

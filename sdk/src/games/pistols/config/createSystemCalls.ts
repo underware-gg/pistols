@@ -4,7 +4,7 @@ import { arrayClean, shortAddress, isPositiveBigint } from 'src/utils/misc/types
 import { NAMESPACE, getLordsAddress, getBankAddress } from 'src/games/pistols/config/config'
 import { stringToFelt, bigintToU256 } from 'src/utils/misc/starknet'
 import { makeCustomEnum } from 'src/utils/misc/starknet_enum'
-import { DojoChainConfig } from 'src/dojo/setup/chains'
+import { DojoChainConfig, ChainId } from 'src/dojo/setup/chains'
 import { DojoManifest } from 'src/dojo/contexts/Dojo'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'
@@ -50,6 +50,7 @@ export function createSystemCalls(
   manifest: DojoManifest,
   constractCalls: ReturnType<typeof setupWorld>,
   selectedChainConfig: DojoChainConfig,
+  chainId: ChainId,
 ) {
   
   // executeMulti() based on:
@@ -89,9 +90,9 @@ export function createSystemCalls(
   const approve_call = (approved_value: BigNumberish): Call | undefined => {
     if (!isPositiveBigint(approved_value)) return undefined
     return {
-      contractAddress: getLordsAddress(),
+      contractAddress: getLordsAddress(chainId),
       entrypoint: 'approve',
-      calldata: [getBankAddress(), bigintToU256(approved_value)],
+      calldata: [getBankAddress(chainId), bigintToU256(approved_value)],
     }
   }
 

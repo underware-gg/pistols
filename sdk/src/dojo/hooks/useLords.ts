@@ -7,7 +7,8 @@ import { bigintEquals } from 'src/utils/misc/types'
 
 
 export const useLordsContract = () => {
-  const lordsAddress = getLordsAddress()
+  const { selectedChainId } = useSelectedChain()
+  const lordsAddress = getLordsAddress(selectedChainId)
 
   const { contractAddress: mockAddress, isDeployed, abi } = useDeployedDojoSystem('lords_mock')
   const isMock = bigintEquals(lordsAddress, mockAddress) && isDeployed
