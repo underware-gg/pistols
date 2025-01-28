@@ -4,7 +4,7 @@ enum SceneName {
   Profile = 'Profile',
   Tavern = 'Tavern',
   Duelists = 'Duelists',
-  Duels = 'Your Duels',
+  DuelsBoard = 'Your Duels',
   Graveyard = 'Graveyard',
   Tournament = 'Tournament',
   IRLTournament = 'IRL Tournament',
@@ -150,7 +150,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { name: 'right arrow', color: 'ff0000', description: 'Next Page', mask: TextureName.bg_duelists_mask, renderOrder: 0 },
     ]
    },
-  [SceneName.Duels]: { 
+  [SceneName.DuelsBoard]: { 
     backgrounds: [{ texture: TextureName.bg_duels, shiftMultiplier: 0, renderOrder: 0 }],
     items: [
       { name: 'left arrow', color: '00ff00', description: 'Previous Page', mask: TextureName.bg_duels_mask, renderOrder: 0 },

@@ -8,7 +8,7 @@ export const MenuLabels: Partial<Record<SceneName, string>> = {
   [SceneName.Door]: 'Door',
   [SceneName.Tavern]: 'Tavern',
   [SceneName.Duelists]: 'Duelists',
-  [SceneName.Duels]: 'Duels',
+  [SceneName.DuelsBoard]: 'Duels',
   [SceneName.Graveyard]: 'Catacombs',
   [SceneName.Profile]: 'Profile',
 }

@@ -18,10 +18,11 @@ export default function DuelProgress({
   duelistId,
   completedStages,
   revealCards,
-  canAutoReveal = false
+  isYou,
+  canAutoReveal
 }) {
   const { gameImpl } = useThreeJsContext()
-  const { round1, challenge: { tableId } } = useDuel(duelId)
+  const { round1 } = useDuel(duelId)
   const round1Moves = useMemo(() => (isA ? round1?.moves_a : round1?.moves_b), [isA, round1])
 
   const duelProgressRef = useRef(null)
@@ -36,7 +37,7 @@ export default function DuelProgress({
   // Commit modal control
   const [didReveal, setDidReveal] = useState(false)
   const [commitModalIsOpen, setCommitModalIsOpen] = useState(false)
-  const { reveal, canReveal } = useRevealAction(duelId, tableId, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
+  const { reveal, canReveal } = useRevealAction(duelId, isYou ? duelistId : 0n, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
 
   const onClick = useCallback(() => {
     if (!isConnected) console.warn(`onClickReveal: not connected!`)
@@ -54,10 +55,10 @@ export default function DuelProgress({
 
   // auto-reveal
   useEffect(() => {
-    if (canAutoReveal && canReveal) {
+    if (canAutoReveal && canReveal && isYou) {
       onClick?.()
     }
-  }, [onClick, canAutoReveal, canReveal])
+  }, [onClick, canAutoReveal, canReveal, isYou])
 
 
   //-------------------------
@@ -75,7 +76,7 @@ export default function DuelProgress({
 
   const id = isA ? 'player-bubble-left' : 'player-bubble-right'
 
-  const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, tableId, round1Moves?.hashed)
+  const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, duelistId, round1Moves?.hashed)
 
   useEffect(() =>{
     if (isMyDuelist && canSign) {
