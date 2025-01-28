@@ -31,7 +31,6 @@ import Door from '/src/components/scenes/ScDoor'
 import ScDuel from '/src/components/scenes/ScDuel'
 // test sdk
 import { helloPistols } from '@underware_gg/pistols-sdk'
-import { DuelTutorialLevel } from '../data/tutorialConstants'
 
 helloPistols();
 
@@ -73,6 +72,7 @@ function MainUI() {
   useSyncSelectedDuelist()
 
   const { gameImpl } = useThreeJsContext()
+  const { currentDuel } = usePistolsContext()
   const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
@@ -81,7 +81,7 @@ function MainUI() {
       if (atGate) setCurrentScene(<Gate />);
       else if (atDoor) setCurrentScene(<Door />);
       else if (atTutorial) setCurrentScene(<TutorialUI />);
-      else if (atDuel) setCurrentScene(<ScDuel />);
+      else if (atDuel && currentDuel > 0n) setCurrentScene(<ScDuel />);
       else if (atProfile) setCurrentScene(<ScProfile />);
       else if (atDuelsBoard) setCurrentScene(<ScDuelsBoard />);
       else if (atDuelists) setCurrentScene(<ScDuelists />);
@@ -90,7 +90,7 @@ function MainUI() {
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atGraveyard]);
+  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atGraveyard, currentDuel]);
 
   if (!gameImpl) return <></>
 

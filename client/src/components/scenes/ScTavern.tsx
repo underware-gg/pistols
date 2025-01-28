@@ -22,7 +22,7 @@ export default function ScTavern() {
     if (itemClicked) {
       switch (itemClicked) {
         case 'pistol':
-          dispatchSetScene(SceneName.Duels)
+          dispatchSetScene(SceneName.DuelsBoard)
           break
         case 'bottle':
           dispatchSetScene(SceneName.Duelists)
