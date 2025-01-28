@@ -11,6 +11,17 @@ katana \
   --dev.no-fee \
   | grep -v \
   -e starknet_call \
+  -e starknet_chainId \
+  -e starknet_getNonce \
+  -e starknet_getEvents \
+  -e starknet_getClassAt \
+  -e starknet_estimateFee \
+  -e starknet_specVersion \
+  -e starknet_getStateUpdate \
   -e starknet_blockHashAndNumber \
   -e starknet_getBlockWithTxs \
-  -e starknet_getBlockWithReceipts
+  -e starknet_getBlockWithTxHashes \
+  -e starknet_getBlockWithReceipts \
+  -e starknet_getTransactionStatus \
+  -e starknet_getTransactionReceipt \
+  -e starknet_addInvokeTransaction \

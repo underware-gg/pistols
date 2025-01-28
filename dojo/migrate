@@ -24,12 +24,12 @@ echo "--------------------------------------------------------------------------
 sozo --version
 echo "------------------------------------------------------------------------------"
 echo ">>> Cleaning..."
-sozo -P $PROFILE $ARG_OFFLINE clean
+execute_command "sozo -P $PROFILE $ARG_OFFLINE clean"
 echo ">>> Building..."
 if [[ "$PROFILE" == "dev" ]]; then
-  sozo -P $PROFILE $ARG_OFFLINE build $ARG_BINDINGS
+  execute_command "sozo -P $PROFILE $ARG_OFFLINE build $ARG_BINDINGS"
 else
-  sozo -P $PROFILE $ARG_OFFLINE build
+  execute_command "sozo -P $PROFILE $ARG_OFFLINE build"
 fi
 echo "👍"
 
@@ -38,7 +38,7 @@ echo "👍"
 #
 echo "------------------------------------------------------------------------------"
 echo ">>> Inspect migrations..."
-sozo -P $PROFILE $ARG_OFFLINE inspect --world $WORLD_ADDRESS
+execute_command "sozo -P $PROFILE $ARG_OFFLINE inspect --world $WORLD_ADDRESS"
 
 if [[ -n "$ARG_INSPECT" ]]; then # if is set
   echo "--- INSPECTED! 👍"
@@ -46,12 +46,12 @@ if [[ -n "$ARG_INSPECT" ]]; then # if is set
 fi
 
 echo ">>> Do migrations..."
-# sozo -P $PROFILE $ARG_OFFLINE migrate -vvv --world $WORLD_ADDRESS
-sozo -P $PROFILE $ARG_OFFLINE migrate --world $WORLD_ADDRESS
+# execute_command "sozo -P $PROFILE $ARG_OFFLINE migrate -vvv --world $WORLD_ADDRESS"
+execute_command "sozo -P $PROFILE $ARG_OFFLINE migrate --world $WORLD_ADDRESS"
 echo "👍"
 
 # echo ">>> Inspect again..."
-# sozo -P $PROFILE $ARG_OFFLINE inspect --world $WORLD_ADDRESS
+# execute_command "sozo -P $PROFILE $ARG_OFFLINE inspect --world $WORLD_ADDRESS"
 
 #-----------------
 # auth write
@@ -104,9 +104,7 @@ if [[ "$PROFILE" == "dev" ]]; then
   echo "------------------------------------------------------------------------------"
   echo ">>> Generate sources..."
   cd ../client
-  export CMD="npm run create-constants --sdk=$SDK_GAME_PATH"
-  echo "command: $CMD"
-  $CMD
+  execute_command "npm run create-constants --sdk=$SDK_GAME_PATH"
   echo "👍?"
   #
   # list copied files

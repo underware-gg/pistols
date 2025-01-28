@@ -11,7 +11,7 @@ import {
 } from './signed_messages'
 import * as constants from '../generated/constants'
 import pistols_manifest_dev from '../manifests/manifest_dev.json'
-import pistols_manifest_slot from '../manifests/manifest_slot.json'
+import pistols_manifest_katana from '../manifests/manifest_katana.json'
 import pistols_manifest_staging from '../manifests/manifest_staging.json'
 import pistols_manifest_sepolia from '../manifests/manifest_sepolia.json'
 
@@ -21,7 +21,7 @@ import pistols_manifest_sepolia from '../manifests/manifest_sepolia.json'
 // import { createSystemCalls } from './createSystemCalls'
 
 const supportedChainIds: ChainId[] = [
-  ChainId.PISTOLS_SLOT,
+  ChainId.KATANA_SLOT,
   ChainId.PISTOLS_STAGING,
   ChainId.SN_SEPOLIA,
   ChainId.KATANA_LOCAL,
@@ -30,7 +30,7 @@ const supportedChainIds: ChainId[] = [
 
 const manifests: Record<ChainId, DojoManifest> = {
   [ChainId.KATANA_LOCAL]: pistols_manifest_dev as DojoManifest,
-  [ChainId.PISTOLS_SLOT]: pistols_manifest_slot as DojoManifest,
+  [ChainId.KATANA_SLOT]: pistols_manifest_katana as DojoManifest,
   [ChainId.PISTOLS_STAGING]: pistols_manifest_staging as DojoManifest,
   [ChainId.SN_SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
   [ChainId.SN_MAINNET]: null,

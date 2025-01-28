@@ -19,11 +19,11 @@ github = "https://github.com/underware-gg/pistols"
 # telegram = "https://t.me/dojoengine"
 
 [env]
-chain_id = "WP_PISTOLS"
-rpc_url = "https://api.cartridge.gg/x/pistols/katana"
+chain_id = "WP_PISTOLS_KATANA"
+rpc_url = "https://api.cartridge.gg/x/pistols-katana/katana"
 account_address = "0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec"
 private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
-world_address = "0x1adaf57de23b6d6d43eeb42b6ab6730a022021382fef49eff1f532c21556a5a"
+world_address = "0x3d5489a911389c23b96408ffd94854bd22a3032e2cb81c15e74b228bf39e1a7"
 
 #--------------------------
 # namespaces

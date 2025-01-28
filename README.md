@@ -239,7 +239,7 @@ Configure default chain id in a `.env` file:
 VITE_DEBUG=0
 VITE_CHAIN_ID=KATANA_LOCAL
 #VITE_CHAIN_ID=SN_SEPOLIA
-#VITE_CHAIN_ID=WP_PISTOLS_SLOT
+#VITE_CHAIN_ID=WP_PISTOLS_KATANA
 ```
 
 Start the client

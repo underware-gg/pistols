@@ -76,6 +76,13 @@ get_contract_address () {
   echo $RESULT
 }
 
+execute_command () {
+  local COMMAND=$1
+  echo "🚦 execute: $COMMAND"
+  $COMMAND
+}
+
+
 #-----------------
 # env setup
 #
