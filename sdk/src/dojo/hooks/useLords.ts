@@ -1,17 +1,20 @@
 import { BigNumberish } from 'starknet'
 import { useERC20Balance } from 'src/utils/hooks/useERC20'
-import { useDeployedDojoSystem } from 'src/dojo/hooks/useDojoSystem'
+import { useDojoSystem } from 'src/dojo/hooks/useDojoSystem'
 import { useSelectedChain } from 'src/dojo/hooks/useChain'
 import { getLordsAddress } from 'src/games/pistols/config/config'
-import { bigintEquals } from 'src/utils/misc/types'
+import { bigintEquals, isPositiveBigint } from 'src/utils/misc/types'
+import { useMemo } from 'react'
 
 
 export const useLordsContract = () => {
   const { selectedChainId } = useSelectedChain()
   const lordsAddress = getLordsAddress(selectedChainId)
 
-  const { contractAddress: mockAddress, isDeployed, abi } = useDeployedDojoSystem('lords_mock')
-  const isMock = bigintEquals(lordsAddress, mockAddress) && isDeployed
+  const { contractAddress: mockAddress, abi } = useDojoSystem('lords_mock')
+  const isMock = useMemo(() => (
+    isPositiveBigint(mockAddress) && bigintEquals(lordsAddress, mockAddress)
+  ), [lordsAddress, mockAddress])
 
   return {
     lordsContractAddress: lordsAddress || mockAddress,

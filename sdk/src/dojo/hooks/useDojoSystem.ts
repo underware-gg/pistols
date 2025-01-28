@@ -12,12 +12,6 @@ export const useDojoSystem = (systemName: string) => {
   return useSystem(namespace, systemName, manifest)
 }
 
-export const useDeployedDojoSystem = (systemName: string) => {
-  const { manifest, namespace } = useDojoSetup()
-  return useDeployedSystem(namespace, systemName, manifest)
-}
-
-
 const useSystem = (namespace: string, systemName: string, manifest: DojoManifest) => {
   const { contractAddress, abi } = useMemo(() => {
     const contract = manifest ? getContractByName(manifest, namespace, systemName) : null
@@ -30,6 +24,11 @@ const useSystem = (namespace: string, systemName: string, manifest: DojoManifest
     contractAddress,
     abi,
   }
+}
+
+export const useDeployedDojoSystem = (systemName: string) => {
+  const { manifest, namespace } = useDojoSetup()
+  return useDeployedSystem(namespace, systemName, manifest)
 }
 
 export const useDeployedSystem = (namespace: string, systemName: string, manifest: DojoManifest) => {

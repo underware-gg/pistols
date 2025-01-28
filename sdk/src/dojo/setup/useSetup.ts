@@ -44,8 +44,9 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   } = useAsyncMemo<DojoProvider>(async () => {
     if (!mounted) return undefined
     if (!manifest) return null
+    console.log(`DojoProvider...`, selectedChainConfig.rpcUrl)
     const dojoProvider = new DojoProvider(manifest, selectedChainConfig.rpcUrl)
-    console.log(`DojoProvider:`, feltToString(await dojoProvider.provider.getChainId()), dojoProvider)
+    console.log(`DojoProvider:`, dojoProvider)
     return dojoProvider
   }, [mounted, selectedChainConfig, manifest], undefined, null)
 
@@ -56,8 +57,10 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     isError: sdkIsError,
   } = useAsyncMemo(async () => {
     if (!mounted) return undefined
+    if (!dojoProvider) return undefined
     if (!starknetDomain) return undefined
     if (!manifest) return null
+    console.log(`TORII CLIENT...`, selectedChainConfig.toriiUrl)
     const sdk = await init<Schema>(
       {
         client: {
@@ -70,9 +73,9 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
       },
       models.schema
     );
-    // console.log(`TORII CLIENT OK!`)
+    console.log(`TORII CLIENT OK!`)
     return sdk
-  }, [mounted, selectedChainConfig, manifest, starknetDomain], undefined, null)
+  }, [mounted, selectedChainConfig, manifest, starknetDomain, dojoProvider], undefined, null)
 
   //
   // Check world deployment

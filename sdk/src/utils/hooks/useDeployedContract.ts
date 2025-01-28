@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useContract } from '@starknet-react/core'
+import { useAccount, useContract } from '@starknet-react/core'
 import { Abi, BigNumberish, CairoVersion, CompilerVersion } from 'starknet'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 
@@ -14,6 +14,7 @@ export const useDeployedContract = (contractAddress: BigNumberish, abi: Abi) => 
     address: isPositiveBigint(contractAddress) ? bigintToHex(contractAddress) : null,
   }), [contractAddress, abi])
   const { contract } = useContract(options)
+  const { account } = useAccount()
 
   useEffect(() => {
     let _mounted = true
@@ -33,9 +34,11 @@ export const useDeployedContract = (contractAddress: BigNumberish, abi: Abi) => 
         }
       }
     }
-    _fetch()
+    if (contract && account) {
+      _fetch()
+    }
     return () => { _mounted = false }
-  }, [contract])
+  }, [contract, account])
 
   return {
     isDeployed,

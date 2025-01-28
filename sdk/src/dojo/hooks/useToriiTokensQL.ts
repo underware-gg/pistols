@@ -193,7 +193,7 @@ export function useToriiBalancesByContractQL(contractAddress: BigNumberish, watc
   const balances = useMemo(() =>
     tokens.ERC20[bigintToHex(contractAddress)],
   [tokens, contractAddress])
-  // console.log(`>>> useToriiBalancesByContractQL():`, contractAddress, balances)
+  // console.log(`>>> useToriiBalancesByContractQL():`, watch, contractAddress, balances)
 
   return {
     balances,

@@ -21,7 +21,7 @@ export interface FaucetInterface {
 export const useLordsFaucet = (): FaucetInterface => {
   const { account } = useAccount()
   const { selectedChainConfig } = useStarknetContext()
-  const { lordsContractAddress, isMock, abi } = useLordsContract()
+  const { lordsContractAddress, abi } = useLordsContract()
   const faucetUrl = useMemo(() => (typeof selectedChainConfig.lordsFaucet === 'string' ? selectedChainConfig.lordsFaucet : null), [selectedChainConfig])
   const hasFaucet = useMemo(() => (selectedChainConfig.lordsFaucet === true), [selectedChainConfig])
 

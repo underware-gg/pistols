@@ -33,7 +33,7 @@ export default function TokensTestPage() {
         <br />
         <TokenContract contractAddress={duelContractAddress} tokenName='Duels' />
         <br />
-        <TokensOfPlayerStoreSyncQL watch={false} />
+        <TokensOfPlayerStoreSyncQL />
       </Container>
     </App>
   );

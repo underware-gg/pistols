@@ -51,7 +51,7 @@ const useStore = createStore();
 export function FameCoinStoreSyncQL() {
   // const { fameContractAddress } = useFameContract()
   // const state = useStore((state) => state)
-  // const { balances } = useToriiBalancesByContractQL(fameContractAddress, true)
+  // const { balances } = useToriiBalancesByContractQL(fameContractAddress, false)
   // useEffect(() => {
   //   if (duelistContractAddress && address) {
   //     state.setTokenIds(duelistContractAddress, address, tokenIds)

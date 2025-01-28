@@ -11,7 +11,7 @@ import { useTokenConfig } from '../tokenConfigStore'
 // keep connected player's tokens in sync
 //
 export function TokensOfPlayerStoreSyncQL({
-  watch = true,
+  watch = false,
 }: {
   watch?: boolean
 }) {
