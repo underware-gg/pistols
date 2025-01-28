@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { gql } from '@apollo/client'
 import { useSelectedChain } from 'src/dojo/hooks/useChain'
@@ -147,9 +147,9 @@ function useToriiTokenBalancesQL(variables: any, enabled: boolean, watch: boolea
         })
       }
     })
-    console.log(`>>> QL TOKENS:`, tokens)
     return tokens;
   }, [data])
+  useEffect(() => console.log(`>>> QL TOKENS:`, tokens), [tokens])
   return {
     tokens,
     isLoading,
@@ -173,7 +173,7 @@ export function useToriiTokensByOwnerQL(contractAddress: BigNumberish, owner: Bi
   const tokens = useMemo(() => (
     rawTokens.ERC721[bigintToHex(contractAddress)]?.tokens ?? []
   ), [rawTokens, contractAddress])
-  // console.log(`>>> useToriiTokensByOwnerQL():`, bigintToHex(owner), tokens)
+  // console.log(`>>> useToriiTokensByOwnerQL():`, bigintToHex(contractAddress), rawTokens, tokens)
   
   return {
     tokens,

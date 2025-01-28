@@ -6,6 +6,7 @@ import { Token, TokenBalance } from '@dojoengine/torii-client'
 import { useDojoSetup, useToriiTokensByOwnerQL, ERC721_Token } from '@underware_gg/pistols-sdk/dojo'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { bigintToHex, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
+import { useTokenConfig } from './tokenConfigStore'
 
 
 //-----------------------------------------
@@ -71,19 +72,32 @@ export function useTokenIdsOfPlayer(contractAddress: BigNumberish) {
 // get and retrive on the fly
 // do not use the store
 export function useTokensByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
-  const { tokens, isLoading } = useToriiTokensByOwnerQL(contractAddress, owner, false)
+  const { tokens, isLoading, refetch } = useToriiTokensByOwnerQL(contractAddress, owner, false)
   // console.log("useTokensByOwner() =>", isLoading, bigintToHex(owner), tokens)
+
+  const { mintedCount } = useTokenConfig(contractAddress)
+  useEffect(() => {
+    setTimeout(() => { refetch() }, 500);
+  }, [mintedCount, refetch])
+
   return {
     tokens,
     isLoading,
   }
 }
 export function useTokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
-  const { tokens, isLoading } = useToriiTokensByOwnerQL(contractAddress, owner, false)
+  const { tokens, isLoading, refetch } = useToriiTokensByOwnerQL(contractAddress, owner, false)
   const tokenIds = useMemo(() => tokens.map((token) => token.tokenId), [tokens])
   // console.log("useTokenIdsByOwner() =>", isLoading, bigintToHex(owner), tokenIds)
+
+  const { mintedCount } = useTokenConfig(contractAddress)
+  useEffect(() => {
+    setTimeout(() => { refetch() }, 500);
+  }, [mintedCount, refetch])
+
   return {
     tokenIds,
     isLoading,
+    refetch,
   }
 }

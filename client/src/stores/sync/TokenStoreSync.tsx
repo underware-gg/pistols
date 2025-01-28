@@ -4,6 +4,7 @@ import { TokenBalance } from '@dojoengine/torii-client'
 import { useDojoSetup, useToriiTokensByOwnerQL } from '@underware_gg/pistols-sdk/dojo'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { useTokenStore } from '/src/stores/tokenStore'
+import { useTokenConfig } from '../tokenConfigStore'
 
 
 //----------------------------------------
@@ -17,7 +18,13 @@ export function TokensOfPlayerStoreSyncQL({
   const { duelistContractAddress } = useDuelistTokenContract()
   const { address } = useAccount()
   const state = useTokenStore((state) => state)
-  const { tokens, isLoading } = useToriiTokensByOwnerQL(duelistContractAddress, address, watch)
+  const { tokens, isLoading, refetch } = useToriiTokensByOwnerQL(duelistContractAddress, address, watch)
+
+  const { mintedCount } = useTokenConfig(duelistContractAddress)
+  useEffect(() => {
+    setTimeout(() => { refetch() }, 500);
+  }, [mintedCount, refetch])
+
   useEffect(() => {
     if (duelistContractAddress && address && !isLoading) {
       state.setTokens(duelistContractAddress, address, tokens)
