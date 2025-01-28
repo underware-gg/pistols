@@ -6,8 +6,9 @@
 # npm install -g get-graphql-schema
 #
 
-export TORII_URL="https://api.cartridge.gg/x/pistols-sepolia/torii/graphql"
+# export TORII_URL="https://api.cartridge.gg/x/pistols-sepolia/torii/graphql"
+export TORII_URL="http://0.0.0.0:8080/graphql"
 
 echo "> GraphQL shema from: $TORII_URL"
 
-get-graphql-schema "$TORII_URL" > ../../client/src/games/pistols/generated/schema.graphql
+get-graphql-schema "$TORII_URL" > ../../sdk/src/games/pistols/generated/schema.graphql
