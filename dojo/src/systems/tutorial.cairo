@@ -86,7 +86,7 @@ pub mod tutorial {
     }
 
     fn dojo_init(ref self: ContractState) {
-        let mut store: Store = StoreTrait::new(self.world(@"pistols"));
+        let mut store: Store = StoreTrait::new(self.world_default());
         // create agent profiles
         ProfileManagerTrait::initialize(ref store, ProfileType::Character(CharacterProfile::Unknown));
         ProfileManagerTrait::initialize(ref store, ProfileType::Bot(BotProfile::Unknown));
@@ -94,8 +94,9 @@ pub mod tutorial {
 
     #[generate_trait]
     impl WorldDefaultImpl of WorldDefaultTrait {
+        #[inline(always)]
         fn world_default(self: @ContractState) -> WorldStorage {
-            self.world(@"pistols")
+            (self.world(@"pistols"))
         }
     }
 

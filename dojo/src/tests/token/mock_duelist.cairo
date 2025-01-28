@@ -38,10 +38,18 @@ pub mod duelist_token {
         OTHER, OWNED_BY_OTHER,
     };
 
+    #[generate_trait]
+    impl WorldDefaultImpl of WorldDefaultTrait {
+        #[inline(always)]
+        fn world_default(self: @ContractState) -> WorldStorage {
+            (self.world(@"pistols"))
+        }
+    }
+
     #[abi(embed_v0)]
     impl ERC721MockImpl of IDuelistToken<ContractState> {
         fn transfer_from(ref self: ContractState, from: ContractAddress, to: ContractAddress, token_id: u256) {
-            let mut world = self.world(@"pistols");
+            let mut world = self.world_default();
             world.write_model(
                 @MockDuelistOwners {
                     token_id: token_id.low,
@@ -51,7 +59,7 @@ pub mod duelist_token {
         }
 
         fn owner_of(self: @ContractState, token_id: u256) -> ContractAddress {
-            let mut world = self.world(@"pistols");
+            let mut world = self.world_default();
 
             // transfered tokens
             let owner: MockDuelistOwners = world.read_model(token_id.low);

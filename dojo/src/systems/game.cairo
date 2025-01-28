@@ -130,7 +130,7 @@ pub mod game {
     }
 
     fn dojo_init(ref self: ContractState) {
-        let mut world = self.world(@"pistols");
+        let mut world = self.world_default();
 
         let mut trophy_id: u8 = 1;
         while trophy_id <= TROPHY::COUNT {
@@ -156,8 +156,9 @@ pub mod game {
 
     #[generate_trait]
     impl WorldDefaultImpl of WorldDefaultTrait {
+        #[inline(always)]
         fn world_default(self: @ContractState) -> WorldStorage {
-            self.world(@"pistols")
+            (self.world(@"pistols"))
         }
     }
 

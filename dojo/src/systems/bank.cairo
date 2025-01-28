@@ -40,8 +40,9 @@ pub mod bank {
 
     #[generate_trait]
     impl WorldDefaultImpl of WorldDefaultTrait {
+        #[inline(always)]
         fn world_default(self: @ContractState) -> WorldStorage {
-            self.world(@"pistols")
+            (self.world(@"pistols"))
         }
     }
 

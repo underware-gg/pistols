@@ -108,15 +108,23 @@ pub mod fame_coin {
     //*******************************************
 
     fn dojo_init(ref self: ContractState) {
+        let mut world = self.world_default();
         self.erc20.initializer(
             COIN_NAME(),
             COIN_SYMBOL(),
         );
-        let mut world = self.world(@"pistols");
         self.coin.initialize(
             world.duelist_token_address(),
             faucet_amount: 0,
         );
+    }
+    
+    #[generate_trait]
+    impl WorldDefaultImpl of WorldDefaultTrait {
+        #[inline(always)]
+        fn world_default(self: @ContractState) -> WorldStorage {
+            (self.world(@"pistols"))
+        }
     }
 
     //-----------------------------------

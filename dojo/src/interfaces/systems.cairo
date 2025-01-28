@@ -50,6 +50,7 @@ pub mod SELECTORS {
 #[generate_trait]
 pub impl SystemsImpl of SystemsTrait {
     fn contract_address(self: @WorldStorage, contract_name: @ByteArray) -> ContractAddress {
+        // let (contract_address, _) = self.dns(contract_name).unwrap(); // will panic if not found
         match self.dns(contract_name) {
             Option::Some((contract_address, _)) => {
                 (contract_address)

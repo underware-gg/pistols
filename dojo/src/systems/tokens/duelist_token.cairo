@@ -153,13 +153,14 @@ pub mod duelist_token {
         base_uri: felt252,
         renderer_address: ContractAddress,
     ) {
+        let mut world = self.world_default();
         self.erc721.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
             format!("https://{}",base_uri.to_string()),
         );
         self.token.initialize(
-            self.world(@"pistols").pack_token_address(),
+            world.pack_token_address(),
             renderer_address,
             payment: Default::default(),
         );
@@ -167,8 +168,9 @@ pub mod duelist_token {
 
     #[generate_trait]
     impl WorldDefaultImpl of WorldDefaultTrait {
+        #[inline(always)]
         fn world_default(self: @ContractState) -> WorldStorage {
-            self.world(@"pistols")
+            (self.world(@"pistols"))
         }
     }
 

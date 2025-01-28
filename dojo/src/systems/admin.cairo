@@ -51,16 +51,15 @@ pub mod admin {
         lords_address: ContractAddress,
         vrf_address: ContractAddress,
     ) {
-        let mut world = self.world_default();
-        let mut store: Store = StoreTrait::new(world);
+        let mut store: Store = StoreTrait::new(self.world_default());
         // initialize tables
         TableManagerTrait::initialize(ref store);
         let season_table_id: felt252 = SeasonManagerTrait::initialize(ref store);
         // initialize Config
         let mut config: Config = ConfigManagerTrait::initialize();
         config.treasury_address = if (treasury_address.is_non_zero()) { treasury_address } else { get_caller_address() };
-        config.lords_address = if (lords_address.is_non_zero()) { lords_address } else { world.lords_mock_address() };
-        config.vrf_address = if (vrf_address.is_non_zero()) { vrf_address } else { world.vrf_mock_address() };
+        config.lords_address = if (lords_address.is_non_zero()) { lords_address } else { store.world.lords_mock_address() };
+        config.vrf_address = if (vrf_address.is_non_zero()) { vrf_address } else { store.world.vrf_mock_address() };
         config.season_table_id = season_table_id;
         config.is_paused = false;
         store.set_config(@config);
@@ -68,8 +67,9 @@ pub mod admin {
 
     #[generate_trait]
     impl WorldDefaultImpl of WorldDefaultTrait {
+        #[inline(always)]
         fn world_default(self: @ContractState) -> WorldStorage {
-            self.world(@"pistols")
+            (self.world(@"pistols"))
         }
     }
 
