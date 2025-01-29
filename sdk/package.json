@@ -16,7 +16,8 @@
     "test:watch": "vitest"
   },
   "bin": {
-    "create-constants": "dist/bin/generateConstants.cjs"
+    "generate-constants": "dist/bin/generateConstants.cjs",
+    "generate-controller-preset": "dist/bin/generateControllerPreset.mjs"
   },
   "main": "dist/index.js",
   "files": [

@@ -14,10 +14,12 @@ import {
 import { SchemaType, UnionOfModelData } from '@dojoengine/sdk'
 import { ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
+import { formatQueryValue } from 'src/dojo/hooks/useSdkEntities'
 import { _useConnector } from 'src/fix/starknet_react_core'
 import { stringToFelt } from 'src/utils/misc/starknet'
 import { bigintToHex } from 'src/utils/misc/types'
 import { assert } from 'src/utils/misc/math'
+import { getContractByName } from '@dojoengine/core'
 
 
 
@@ -28,21 +30,14 @@ import { assert } from 'src/utils/misc/math'
 // (create as global const)
 //
 export const makeControllerConnector = (
+  theme: string,
   namespace: string,
   chainId: string,
-  manifest: DojoManifest,
   rpcUrl: string,
   toriiUrl: string,
-  contractPolicyDescriptions: ContractPolicyDescriptions,
-  signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions,
+  policies: SessionPolicies | undefined, // if undefined, use preset 
   tokens: Tokens,
 ): Connector => {
-  // const policies = _makeControllerPolicyArray(manifest, namespace, descriptions)
-  const policies: SessionPolicies = {
-    contracts: _makeControllerContractPolicies(manifest, namespace, contractPolicyDescriptions),
-    messages: _makeControllerSignMessagePolicies(signedMessagePolicyDescriptions),
-  }
-
   // extract slot service name from rpcUrl
   const slot = /api\.cartridge\.gg\/x\/([^/]+)\/torii/.exec(toriiUrl)?.[1];
 
@@ -51,8 +46,9 @@ export const makeControllerConnector = (
     defaultChainId: bigintToHex(stringToFelt(chainId)),
     chains: [{ rpcUrl }],
     // IFrameOptions
-    theme: 'pistols',
+    theme,
     colorMode: 'dark',
+    preset: !policies ? theme : undefined,
     // KeychainOptions
     namespace,
     policies,
@@ -85,44 +81,55 @@ const exclusions = [
 // https://github.com/cartridge-gg/controller/blob/main/packages/keychain/src/components/connect/CreateSession.stories.tsx
 // https://github.com/cartridge-gg/presets/blob/419dbda4283e4957db8a14ce202a04fabffea673/configs/eternum/config.json#L379
 //
+export const makeControllerPolicies = (
+  namespace: string,
+  manifest: DojoManifest,
+  contractPolicyDescriptions: ContractPolicyDescriptions,
+  signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions,
+): SessionPolicies => {
+  const policies: SessionPolicies = {
+    contracts: _makeControllerContractPolicies(manifest, namespace, contractPolicyDescriptions),
+    messages: _makeControllerSignMessagePolicies(signedMessagePolicyDescriptions),
+  }
+  return policies
+}
+
 const _makeControllerContractPolicies = (
   manifest: DojoManifest,
   namespace: string,
   descriptions: ContractPolicyDescriptions,
 ): ContractPolicies => {
   const contracts: ContractPolicies = {};
-  manifest?.contracts.forEach((c: any) => {
-    const contractName = c.tag.split(`${namespace}-`).at(-1)
-    const desc = descriptions[contractName]
-    if (desc) {
-      let methods: Method[] = []
-      // --- abis
-      c.abi.forEach((abi: InterfaceAbi) => {
-        // --- interfaces
-        const interfaceName = abi.name.split('::').slice(-1)[0]
-        // console.log(`CI:`, contractName, interfaceName)
-        if (abi.type == 'interface' && desc.interfaces.includes(interfaceName)) {
-          // --- functions
-          abi.items.forEach((i) => {
-            const entrypoint = i.name
-            if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(entrypoint)) {
-              // console.log(`CI:`, item.name, item)
-              const method = {
-                // name: `${i.name}()`,
-                // description: `${c.tag}::${i.name}()`,
-                entrypoint,
-              }
-              methods.push(method)
+  Object.keys(descriptions).forEach((name) => {
+    const desc = descriptions[name]
+    const c = getContractByName(manifest, namespace, name)
+    let methods: Method[] = []
+    // --- abis
+    c.abi.forEach((abi: InterfaceAbi) => {
+      // --- interfaces
+      const interfaceName = abi.name.split('::').slice(-1)[0]
+      // console.log(`CI:`, contractName, interfaceName)
+      if (abi.type == 'interface' && desc.interfaces.includes(interfaceName)) {
+        // --- functions
+        abi.items.forEach((i) => {
+          const entrypoint = i.name
+          if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(entrypoint)) {
+            // console.log(`CI:`, item.name, item)
+            const method = {
+              // name: `${i.name}()`,
+              // description: `${c.tag}::${i.name}()`,
+              entrypoint,
             }
-          })
-        }
-      })
-      if (methods.length > 0) {
-        contracts[c.address] = {
-          name: desc.name,
-          description: desc.description,
-          methods,
-        }
+            methods.push(method)
+          }
+        })
+      }
+    })
+    if (methods.length > 0) {
+      contracts[formatQueryValue(c.address)] = {
+        name: desc.name,
+        description: desc.description,
+        methods,
       }
     }
   })

@@ -98,13 +98,22 @@ if [[ "$PROFILE" == "dev" ]]; then
     cp -R $BINDINGS_PATH/typescript/* $SDK_GAME_PATH/generated/
   fi
   #
-  # constant generator
-  # npm run create-constants --sdk=../sdk/src/games/pistols
-  # ../sdk/bin/generateConstants.cjs --src:"../dojo/src" --out:"../sdk/src/games/pistols/generated/constants.ts"
-  echo "------------------------------------------------------------------------------"
-  echo ">>> Generate sources..."
+  # run generators...
   cd ../client
-  execute_command "npm run create-constants --sdk=$SDK_GAME_PATH"
+  echo "------------------------------------------------------------------------------"
+  echo ">>> Generate constants..."
+  # npm run generate-constants --sdk=../sdk/src/games/pistols
+  # npx --package=@underware_gg/pistols-sdk generate-constants --src:"../dojo/src" --out:"../sdk/src/games/pistols/generated/constants.ts"
+  # ../sdk/bin/generateConstants.cjs --src:"../dojo/src" --out:"../sdk/src/games/pistols/generated/constants.ts"
+  execute_command "npm run generate-constants --sdk=$SDK_GAME_PATH"
+  echo "👍?"
+
+  echo "------------------------------------------------------------------------------"
+  echo ">>> Generate controller preset..."
+  # npm run generate-controller-preset --sdk=../sdk/src/games/pistols
+  # npx --package=@underware_gg/pistols-sdk generate-controller-preset --out:"../sdk/src/games/pistols/generated/config.json"
+  # ../sdk/dist/bin/generateControllerPreset.mjs --out:"../sdk/src/games/pistols/generated/config.json"
+  execute_command "npm run generate-controller-preset --sdk=$SDK_GAME_PATH"
   echo "👍?"
   #
   # list copied files

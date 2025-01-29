@@ -32,7 +32,7 @@ export interface DojoAppConfig {
   namespace: string
   starknetDomain: StarknetDomain
   manifest: DojoManifest,
-  contractPolicyDescriptions: ContractPolicyDescriptions
+  mainContractName: string
   controllerConnector: Connector
 }
 

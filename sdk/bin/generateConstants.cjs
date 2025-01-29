@@ -422,7 +422,7 @@ process.argv.forEach(arg => {
 })
 
 if (!arg_src || !arg_out) {
-  console.log("Usage: npm run create-constants --src:<SRC_PATH> --out:<OUTPUT_PATH>");
+  console.log("Usage: npm run generate-constants --src:<SRC_PATH> --out:<OUTPUT_PATH>");
   console.error(`❌ ABORTED`);
   process.exit(1);
 }

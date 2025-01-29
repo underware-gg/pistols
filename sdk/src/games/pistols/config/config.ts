@@ -1,10 +1,10 @@
 import { StarknetDomain } from 'starknet'
-import { Tokens } from '@cartridge/controller'
+import { SessionPolicies, Tokens } from '@cartridge/controller'
 import { getContractByName } from '@dojoengine/core'
 import { DojoAppConfig, DojoManifest, ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
 import { ChainId, dojoContextConfig } from 'src/dojo/setup/chains'
 import { DEFAULT_CHAIN_ID } from 'src/dojo/setup/chainConfig'
-import { makeControllerConnector } from 'src/dojo/setup/controller'
+import { makeControllerConnector, makeControllerPolicies } from 'src/dojo/setup/controller'
 import {
   make_typed_data_PlayerBookmark,
   make_typed_data_PlayerOnline,
@@ -38,7 +38,7 @@ const manifests: Record<ChainId, DojoManifest> = {
 
 export const NAMESPACE = 'pistols'
 
-const contractPolicyDescriptions: ContractPolicyDescriptions = {
+const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   game: {
     name: 'Game',
     description: 'Game loop contract',
@@ -49,35 +49,51 @@ const contractPolicyDescriptions: ContractPolicyDescriptions = {
     description: 'Tutorial game contract',
     interfaces: ['ITutorial'],
   },
+  pack_token: {
+    name: 'Pack token',
+    description: 'Packs ERC721 contract',
+    interfaces: ['IPackTokenPublic'],
+  },
   duel_token: {
-    name: 'Duel Token',
-    description: 'Duel Token',
+    name: 'Duel token',
+    description: 'Duel ERC721 contract',
     interfaces: ['IDuelTokenPublic'],
   },
   // duelist_token: {
-  //   name: 'Duelist Token',
-  //   description: 'Duelist Token',
+  //   name: 'Duelist token',
+  //   description: 'Duelist ERC721 contract',
   //   interfaces: ['IDuelistTokenPublic'],
   // },
-  pack_token: {
-    name: 'Pack Token',
-    description: 'Packs Token',
-    interfaces: ['IPackTokenPublic'],
-  },
+}
+const contractPolicyDescriptions_mock: ContractPolicyDescriptions = {
   lords_mock: {
     name: 'Fake Lords',
-    description: 'Fake Lords',
+    description: 'Fake Lords ERC20 contract',
     interfaces: [
-      'ILordsMockFaucet',
+      'ILordsMockPublic',
       // 'IERC20Allowance',
     ],
   },
-  // admin: {
-  //   name: 'Admin',
-  //   description: 'Admin',
-  //   interfaces: ['IAdmin'],
-  // },
 }
+const contractPolicyDescriptions_admin: ContractPolicyDescriptions = {
+  admin: {
+    name: 'Admin',
+    description: 'Admin',
+    interfaces: ['IAdmin'],
+  },
+}
+export const makePistolsPolicies = (chainId: ChainId, mock: boolean, admin: boolean): SessionPolicies => {
+  return makeControllerPolicies(
+    NAMESPACE,
+    manifests[chainId],
+    {
+      ...contractPolicyDescriptions_pistols,
+      ...(mock ? contractPolicyDescriptions_mock : {}),
+      ...(admin ? contractPolicyDescriptions_admin : {}),
+    },
+    signedMessagePolicyDescriptions,
+  );
+};
 
 // starknet domain
 export const makeStarknetDomain = (chainId: ChainId): StarknetDomain => ({
@@ -88,11 +104,16 @@ export const makeStarknetDomain = (chainId: ChainId): StarknetDomain => ({
 })
 
 // contract addresses
-export const getLordsAddress = (chainId: ChainId) => (dojoContextConfig[chainId].lordsAddress || getContractByName(manifests[chainId], NAMESPACE, 'lords_mock').address)
-export const getFameAddress = (chainId: ChainId) => (getContractByName(manifests[chainId], NAMESPACE, 'fame_coin').address)
-export const getDuelistTokenAddress = (chainId: ChainId) => (getContractByName(manifests[chainId], NAMESPACE, 'duelist_token').address)
-export const getDuelTokenAddress = (chainId: ChainId) => (getContractByName(manifests[chainId], NAMESPACE, 'duel_token').address)
-export const getBankAddress = (chainId: ChainId) => (getContractByName(manifests[chainId], NAMESPACE, 'bank').address)
+// erc-20
+export const getLordsAddress = (chainId: ChainId): string => (dojoContextConfig[chainId].lordsAddress || (getContractByName(manifests[chainId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
+export const getFameAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'fame_coin')?.address ?? '0x0')
+// export const getFoolsAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
+// erc-721
+export const getDuelistTokenAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'duelist_token')?.address ?? '0x0')
+export const getDuelTokenAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'duel_token')?.address ?? '0x0')
+export const getPackTokenAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'pack_token')?.address ?? '0x0')
+// contracts
+export const getBankAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'bank')?.address ?? '0x0')
 
 
 //------------------------------------------
@@ -103,10 +124,12 @@ const tokens: Tokens = {
   erc20: [
     getLordsAddress(DEFAULT_CHAIN_ID),
     getFameAddress(DEFAULT_CHAIN_ID),
+    // getFoolsAddress(DEFAULT_CHAIN_ID),
   ],
   //@ts-ignore
   erc721: [
     getDuelistTokenAddress(DEFAULT_CHAIN_ID),
+    getDuelTokenAddress(DEFAULT_CHAIN_ID),
     getDuelTokenAddress(DEFAULT_CHAIN_ID),
   ],
 }
@@ -134,14 +157,16 @@ const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
 ]
 //
 // controller connector
+const policies = (DEFAULT_CHAIN_ID === ChainId.SN_MAIN ? undefined
+  : makePistolsPolicies(DEFAULT_CHAIN_ID, !Boolean(dojoContextConfig[DEFAULT_CHAIN_ID].lordsAddress), false)
+)
 const controllerConnector = makeControllerConnector(
+  'pistols', // theme
   NAMESPACE,
   DEFAULT_CHAIN_ID,
-  manifests[DEFAULT_CHAIN_ID],
   dojoContextConfig[DEFAULT_CHAIN_ID].rpcUrl,
   dojoContextConfig[DEFAULT_CHAIN_ID].toriiUrl,
-  contractPolicyDescriptions,
-  signedMessagePolicyDescriptions,
+  policies,
   tokens,
 );
 //
@@ -157,7 +182,7 @@ export const makeDojoAppConfig = (chainId?: ChainId): DojoAppConfig => {
     namespace: NAMESPACE,
     starknetDomain: makeStarknetDomain(selectedChainId),
     manifest: manifests[selectedChainId],
-    contractPolicyDescriptions,
+    mainContractName: Object.keys(contractPolicyDescriptions_pistols)[0],
     controllerConnector: (selectedChainId == DEFAULT_CHAIN_ID ? controllerConnector : undefined),
   }
 }
