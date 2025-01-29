@@ -14,14 +14,14 @@ import pistols_manifest_dev from '../manifests/manifest_dev.json'
 import pistols_manifest_katana from '../manifests/manifest_katana.json'
 import pistols_manifest_staging from '../manifests/manifest_staging.json'
 import pistols_manifest_sepolia from '../manifests/manifest_sepolia.json'
-
+import pistols_manifest_mainnet from '../manifests/manifest_mainnet.json'
 
 // TODO: move this here!
 // import { defineContractComponents } from './generated/contractComponents'
 // import { createSystemCalls } from './createSystemCalls'
 
 const supportedChainIds: ChainId[] = [
-  // ChainId.SN_MAINNET,
+  // ChainId.SN_MAIN,
   ChainId.SN_SEPOLIA,
   ChainId.PISTOLS_STAGING,
   ChainId.KATANA_SLOT,
@@ -33,7 +33,7 @@ const manifests: Record<ChainId, DojoManifest> = {
   [ChainId.KATANA_SLOT]: pistols_manifest_katana as DojoManifest,
   [ChainId.PISTOLS_STAGING]: pistols_manifest_staging as DojoManifest,
   [ChainId.SN_SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
-  [ChainId.SN_MAINNET]: null,
+  [ChainId.SN_MAIN]: pistols_manifest_mainnet as DojoManifest,
 }
 
 export const NAMESPACE = 'pistols'

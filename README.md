@@ -202,7 +202,7 @@ sozo build
 ./migrate slot
 ```
 
-For Starknet chains, create env files for `SN_SEPOLIA` (`.env.sepolia`) and/or `SN_MAINNET` (`.env.mainnet`)
+For Starknet chains, create env files for `SN_SEPOLIA` (`.env.sepolia`) and/or `SN_MAIN` (`.env.mainnet`)
 
 ```sh
 export STARKNET_RPC_URL=https://sepolia.your-favorite-rpc-provider.com/xxx/

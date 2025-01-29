@@ -31,7 +31,7 @@ export default function WalletFinderModal({
     if (opener.isOpen) setInputAddres('')
   }, [opener.isOpen])
 
-  const { chainConfig } = useChainConfig(ChainId.SN_MAINNET)
+  const { chainConfig } = useChainConfig(ChainId.SN_MAIN)
   
   const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddressOrName(inputAddress, chainConfig.rpcUrl)
   const { isDeployed, isControllerAccount, isKatanaAccount } = useControllerAccount(validatedAddress)

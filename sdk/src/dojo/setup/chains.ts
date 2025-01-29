@@ -20,7 +20,7 @@ import * as ENV from 'src/dojo/setup/env'
 //
 
 export enum ChainId {
-  SN_MAINNET = 'SN_MAINNET',
+  SN_MAIN = 'SN_MAIN',
   SN_SEPOLIA = 'SN_SEPOLIA',
   KATANA_LOCAL = 'KATANA_LOCAL',
   KATANA_SLOT = 'WP_PISTOLS_KATANA',
@@ -264,7 +264,7 @@ const pistolsStagingConfig: DojoChainConfig = {
 
 const snMainnetConfig: DojoChainConfig = {
   chain: { ...mainnet },
-  chainId: ChainId.SN_MAINNET,
+  chainId: ChainId.SN_MAIN,
   name: 'Mainnet',
   // rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/mainnet',
@@ -293,5 +293,5 @@ export const dojoContextConfig: Record<ChainId, DojoChainConfig> = {
   [ChainId.KATANA_SLOT]: katanaSlotConfig,
   [ChainId.PISTOLS_STAGING]: pistolsStagingConfig,
   [ChainId.SN_SEPOLIA]: snSepoliaConfig,
-  [ChainId.SN_MAINNET]: snMainnetConfig,
+  [ChainId.SN_MAIN]: snMainnetConfig,
 }
