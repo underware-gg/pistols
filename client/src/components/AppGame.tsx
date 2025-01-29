@@ -6,10 +6,11 @@ import AppDojo, { AppDojoProps } from '/src/components/AppDojo'
 export default function AppGame({
   backgroundImage,
   chainId,
+  autoConnect,
   children,
 }: AppDojoProps) {
   return (
-    <AppDojo chainId={chainId} backgroundImage={backgroundImage}>
+    <AppDojo chainId={chainId} backgroundImage={backgroundImage} autoConnect={autoConnect}>
       <ThreeJsProvider>
         <GameplayProvider>
           {children}

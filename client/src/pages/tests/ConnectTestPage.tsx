@@ -74,6 +74,7 @@ export function DojoAccount() {
 
 export function Connect() {
   const { address, isConnecting, isConnected, connector } = useAccount()
+  const { selectedChainId } = useSelectedChain()
   const { chain } = useNetwork()
   const { disconnect } = useDisconnect()
   const { connectOpener } = usePistolsContext()
@@ -83,31 +84,30 @@ export function Connect() {
 
       <Table celled striped color={isConnected ? 'green' : 'red'} size='small'>
         <Body>
-          <Row>
-            <Cell>isConnected</Cell>
-            <Cell className='Code'>
-              {isConnected ? 'true' : 'false'}
+          <Row className='H4'>
+            <Cell>Connected?</Cell>
+            <Cell className='TitleCase'>
+              {isConnected ? <span className='Positive'>Connected</span> : <span className='Negative'>Disconnected</span>}
             </Cell>
           </Row>
-          <Row>
+          <Row className='H4'>
+            <Cell>Chain Id</Cell>
+            <Cell className='Code Important'>
+              {/* {chain && <>{bigintToHex(chain.id)} : {feltToString(chain.id)}</>} */}
+              {isConnected && feltToString(chain.id)}
+              {!isConnected && selectedChainId}
+            </Cell>
+          </Row>
+          <Row className='H4'>
             <Cell>wallet</Cell>
-            <Cell className='Code'>
+            <Cell className='TitleCase'>
               {connector && <>
                 <Image className='ProfilePicSmall' spaced src={getConnectorIcon(connector)} /> {connector.name}
               </>}
-
             </Cell>
           </Row>
           <Row>
-            <Cell>Chain Id</Cell>
-            <Cell className='Code'>
-              {chain && <>
-                {bigintToHex(chain.id)} : {feltToString(chain.id)}
-              </>}
-            </Cell>
-          </Row>
-          <Row>
-            <Cell>Starknet Account</Cell>
+            <Cell>Account</Cell>
             <Cell className='Code'>
               {address}
             </Cell>

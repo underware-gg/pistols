@@ -27,7 +27,7 @@ export default function TutorialPage() {
   useEffectOnce(() => console.log(`---------------- MAIN PAGE MOUNTED`), [])
 
   return (
-    <AppGame backgroundImage={null} chainId={TUTORIAL_CHAIN_ID}>
+    <AppGame backgroundImage={null} chainId={TUTORIAL_CHAIN_ID} autoConnect>
       <Background className={null}>
         <StoreSync />
         <GameContainer isVisible={true} />

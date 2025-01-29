@@ -22,7 +22,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function TutorialTestPage() {
   return (
-    <AppDojo chainId={TUTORIAL_CHAIN_ID}>
+    <AppDojo chainId={TUTORIAL_CHAIN_ID} autoConnect>
       <Container>
         <TestPageMenu />
         <CurrentChainHint />
