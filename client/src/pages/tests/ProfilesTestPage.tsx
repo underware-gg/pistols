@@ -4,7 +4,7 @@ import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
-import App from '/src/components/App'
+import AppDojo from '/src/components/AppDojo'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -20,7 +20,7 @@ type Profiles = {
 
 export default function ProfilesTestPage() {
   return (
-    <App>
+    <AppDojo>
       <Container>
         <BackToTestPageIndex />
         <CurrentChainHint />
@@ -32,7 +32,7 @@ export default function ProfilesTestPage() {
         <Profiles profiles={constants.BOT_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Bot} />
         <br />
       </Container>
-    </App>
+    </AppDojo>
   );
 }
 

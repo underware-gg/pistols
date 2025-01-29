@@ -1,11 +1,12 @@
-import React, { ReactNode, useEffect } from 'react'
+import React, { ReactNode, useEffect, useMemo } from 'react'
 import { StarknetDomain, TypedData } from 'starknet'
 import { Connector } from '@starknet-react/core'
+import { ChainId } from 'src/dojo/setup/chains'
 import { Manifest } from '@dojoengine/core'
 import { StarknetProvider, useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { DojoProvider } from 'src/dojo/contexts/DojoContext'
+import { DojoStatus } from 'src/exports/dojo'
 import { useSetup } from 'src/dojo/setup/useSetup'
-import { ChainId } from 'src/dojo/setup/chains'
 
 // TODO: Manifest is outdated???
 // export type DojoManifest = Manifest
@@ -61,10 +62,12 @@ function SetupDojoProvider({
   // Connected wallet or Dojo Predeployed (master)
   const { selectedChainConfig } = useStarknetContext()
   const setupResult = useSetup(dojoAppConfig, selectedChainConfig)
-  useEffect(() => console.log(!Boolean(setupResult) ? '---> DOJO setup...' : '---> DOJO initialized!'), [Boolean(setupResult)])
+  const isInitialized = useMemo(() => Boolean(setupResult), [setupResult])
+  useEffect(() => console.log(!isInitialized ? '---> DOJO setup...' : '---> DOJO initialized!'), [isInitialized])
   return (
     <DojoProvider value={setupResult}>
-      {children}
+      {!isInitialized && <DojoStatus message={'Loading Pistols...'} />}
+      {isInitialized && children}
     </DojoProvider>
   )
 }

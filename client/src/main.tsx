@@ -5,10 +5,8 @@ import '/styles/cards.scss'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router'
-import { makeDojoAppConfig } from '@underware_gg/pistols-sdk/pistols'
 import { SettingsProvider } from '/src/hooks/SettingsContext'
 import { PistolsProvider } from '/src/hooks/PistolsContext'
-import { Dojo } from '@underware_gg/pistols-sdk/dojo'
 import ErrorModal from '/src/components/modals/ErrorModal'
 import MainPage from '/src/pages/MainPage'
 import SnapshotPage from '/src/pages/internal/SnapshotPage'
@@ -84,16 +82,12 @@ async function init() {
   if (!rootElement) throw new Error('React root not found');
   const root = ReactDOM.createRoot(rootElement as HTMLElement);
 
-  const dojoAppConfig = makeDojoAppConfig();
-
   root.render(
     <React.StrictMode>
       <SettingsProvider>
         <PistolsProvider>
-          <Dojo dojoAppConfig={dojoAppConfig}>
-            <RouterProvider router={router} />
-            <ErrorModal />
-          </Dojo>
+          <RouterProvider router={router} />
+          <ErrorModal />
         </PistolsProvider>
       </SettingsProvider>
     </React.StrictMode>

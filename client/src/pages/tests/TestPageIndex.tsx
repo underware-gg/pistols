@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Button, Container, Icon, Menu, MenuItem } from 'semantic-ui-react'
-import CurrentChainHint from '/src/components/CurrentChainHint'
+import { Button, Container, Menu, MenuItem } from 'semantic-ui-react'
 import App from '/src/components/App'
 
 const testPages = [
@@ -24,7 +23,6 @@ export default function TestPageIndex() {
   return (
     <App>
       <Container text>
-        <CurrentChainHint />
         <Menu inverted vertical>
           {testPages.map(name => (
             <MenuItem

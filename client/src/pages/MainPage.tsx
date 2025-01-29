@@ -42,30 +42,21 @@ export default function MainPage() {
   usePistolsSceneFromRoute()
   useSetPageTitle()
 
-  // wait for Dojo to be initialized before loading the UI
-  const { isInitialized } = useDojoStatus()
-
   const overlay = useMemo(() => <div id="game-black-overlay" className='NoMouse NoDrag' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'black', opacity: 1, pointerEvents: 'none', zIndex: 5 }}></div>, [])
 
-  useEffectOnce(() => {
-    console.log(`---------------- MAIN PAGE MOUNTED`)
-  }, [])
+  useEffectOnce(() => console.log(`---------------- MAIN PAGE MOUNTED`), [])
 
   return (
     <AppGame backgroundImage={null}>
       <Background className={null}>
-        {isInitialized &&
-          <>
-            <StoreSync />
-            <GameContainer isVisible={true} />
-            <MainUI />
-            <Modals />
-            {overlay}
-            <ActivityPanel />
-            <Header />
-            <CurrentChainHint />
-          </>
-        }
+        <StoreSync />
+        <GameContainer isVisible={true} />
+        <MainUI />
+        <Modals />
+        {overlay}
+        <ActivityPanel />
+        <Header />
+        <CurrentChainHint />
         <MouseToolTip />
       </Background>
     </AppGame>
@@ -82,7 +73,6 @@ function MainUI() {
   const { gameImpl } = useThreeJsContext()
   const { selectedDuelId } = usePistolsContext()
   const { atGate, atProfile, atTavern, atDuel, atDoor, atDuels, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
-  const { isInitialized } = useDojoStatus()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
   useEffect(() => {
@@ -99,11 +89,9 @@ function MainUI() {
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuels, atDuelists, atGraveyard]);
+  }, [atGate, atDoor, atTutorial, atDuel, selectedDuelId, atProfile, atDuels, atDuelists, atGraveyard, atTavern]);
 
   if (!gameImpl) return <></>
-
-  if (!isInitialized) return <DojoStatus message={'Loading Pistols...'} />
 
   return currentScene || <DojoStatus message={'Loading Pistols...'} />;
 }
@@ -112,7 +100,6 @@ function TutorialUI({
 }) {
   const { gameImpl } = useThreeJsContext()
   const { atTutorial, currentScene } = usePistolsScene()
-  const { isInitialized } = useDojoStatus()
 
   const [currentTutorialScene, setCurrentTutorialScene] = useState<string>("");
 
@@ -127,8 +114,6 @@ function TutorialUI({
   }, [atTutorial, currentScene]);
 
   if (!gameImpl) return <></>
-
-  if (!isInitialized) return <DojoStatus message={'Loading Pistols...'} />
 
   return <ScTutorial currentTutorialScene={currentTutorialScene} />;
 }

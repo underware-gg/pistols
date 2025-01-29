@@ -7,9 +7,10 @@ import {
 } from 'src/dojo/setup/chains'
 import { stringToFelt } from 'src/utils/misc/starknet'
 import { cleanObject } from 'src/utils/misc/types'
-import * as ENV from 'src/dojo/setup/env'
+import * as ENV from './env'
 
 export const DEFAULT_CHAIN_ID = (ENV.CHAIN_ID) as ChainId
+export const TUTORIAL_CHAIN_ID = (ENV.TUTORIAL_CHAIN_ID) as ChainId
 
 export const isChainIdSupported = (chainId: ChainId): boolean => {
   return Object.keys(dojoContextConfig).includes(chainId)

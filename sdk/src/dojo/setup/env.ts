@@ -7,6 +7,7 @@
 export const CHAIN_ID = (import.meta.env.VITE_CHAIN_ID || undefined);
 
 // optional
+export const TUTORIAL_CHAIN_ID = (import.meta.env.VITE_TUTORIAL_CHAIN_ID || undefined);
 export const NODE_URL = (import.meta.env.VITE_NODE_URL || undefined);
 export const TORII = (import.meta.env.VITE_TORII || undefined);
 export const RELAY_URL = (import.meta.env.VITE_RELAY_URL || undefined);

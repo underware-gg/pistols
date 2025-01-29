@@ -5,7 +5,6 @@ import {
   formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown,
 } from '@underware_gg/pistols-sdk/utils'
 import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
-import CurrentChainHint from '/src/components/CurrentChainHint'
 import App from '/src/components/App'
 
 const Row = Table.Row
@@ -27,7 +26,6 @@ export default function TimestampTestPage() {
     <App>
       <Container>
         <BackToTestPageIndex />
-        <CurrentChainHint />
 
         <Table celled striped size='small' color='orange'>
           <Header>

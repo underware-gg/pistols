@@ -1,16 +1,16 @@
 import React from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { useTutorialLevel, useTutorialPlayerId, useTutorialProgress } from '/src/hooks/useTutorial'
-import { useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { useChallenge } from '/src/stores/challengeStore'
 import { CreateTutorialChallengeButton, OpenTutorialChallengeButton } from '/src/components/TutorialButtons'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import { TUTORIAL_CHAIN_ID } from '@underware_gg/pistols-sdk/dojo'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
-import App from '/src/components/App'
+import AppDojo from '/src/components/AppDojo'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -21,29 +21,25 @@ const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
 export default function TutorialTestPage() {
-  const { isInitialized } = useDojoStatus()
   return (
-    <App>
+    <AppDojo chainId={TUTORIAL_CHAIN_ID}>
       <Container>
         <BackToTestPageIndex />
         <CurrentChainHint />
 
         <Connect />
-        {isInitialized &&
-          <>
-            <br />
-            <TutorialProgress />
-            <br />
-            <TutorialLevel tutorial_id={1} />
-            <br />
-            <TutorialLevel tutorial_id={2} />
-            <br />
-          </>
-        }
+        <br />
+        <TutorialProgress />
+        <br />
+        <TutorialLevel tutorial_id={1} />
+        <br />
+        <TutorialLevel tutorial_id={2} />
+        <br />
+
         <StoreSync />
         <ChallengeModal />
       </Container>
-    </App>
+    </AppDojo>
   );
 }
 

@@ -9,7 +9,7 @@ import { bigintToDecimal, useERC721TokenUri } from '@underware_gg/pistols-sdk/ut
 import { Connect } from './ConnectTestPage'
 import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
-import App from '/src/components/App'
+import AppDojo from '/src/components/AppDojo'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -20,30 +20,37 @@ const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
 export default function TokensTestPage() {
+  return (
+    <AppDojo>
+      <Container>
+        <BackToTestPageIndex />
+        <CurrentChainHint />
+        <Connect />
+
+        <TestImages />
+        <Tokens />
+      </Container>
+    </AppDojo>
+  );
+}
+
+function Tokens() {
   const { packContractAddress } = usePackTokenContract()
   const { duelistContractAddress } = useDuelistTokenContract()
   const { duelContractAddress } = useDuelTokenContract()
   return (
-    <App>
-      <Container>
-        <BackToTestPageIndex />
-        <CurrentChainHint />
-
-        <Connect />
-        <TestImages />
-        <br />
-        <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
-        <br />
-        <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists' />
-        <br />
-        <TokenContract contractAddress={duelContractAddress} tokenName='Duels' />
-        <br />
-        <TokensOfPlayerStoreSyncQL />
-      </Container>
-    </App>
+    <>
+      <br />
+      <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
+      <br />
+      <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists' />
+      <br />
+      <TokenContract contractAddress={duelContractAddress} tokenName='Duels' />
+      <br />
+      <TokensOfPlayerStoreSyncQL />
+    </>
   );
 }
-
 
 function TokenContract({
   contractAddress,

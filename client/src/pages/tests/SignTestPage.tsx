@@ -7,7 +7,7 @@ import { useDojoSetup } from '@underware_gg/pistols-sdk/dojo'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
-import App from '/src/components/App'
+import AppDojo from '/src/components/AppDojo'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -27,7 +27,7 @@ const starknetDomain = {
 
 export default function SignTestPage() {
   return (
-    <App>
+    <AppDojo>
       <Container>
         <BackToTestPageIndex />
         <CurrentChainHint />
@@ -52,7 +52,7 @@ export default function SignTestPage() {
 
         <ConsoleTests />
       </Container>
-    </App>
+    </AppDojo>
   )
 }
 

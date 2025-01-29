@@ -3,19 +3,15 @@ import { EthSigner, Signature } from 'starknet'
 import { Container, Table, Button, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { useDojoSetup, useSelectedChain, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
 import {
   useTypedMessage, useAsyncMemo,
   Messages, Revision, splitSignature,feltToString, bigintToHex, shortAddress,
 } from '@underware_gg/pistols-sdk/utils'
-import {
-  useDojoSetup, useDojoStatus, useSelectedChain,
-  DojoStatus, getConnectorIcon,
-} from '@underware_gg/pistols-sdk/dojo'
-import { ChainSwitcher } from '/src/components/starknet/ChainSwitcher'
-import { BackToTestPageIndex } from './TestPageIndex'
+import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
 import StarknetConnectModal from '/src/components/starknet/StarknetConnectModal'
 import CurrentChainHint from '/src/components/CurrentChainHint'
-import App from '/src/components/App'
+import AppDojo from '/src/components/AppDojo'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -30,7 +26,7 @@ const HeaderCell = Table.HeaderCell
 
 export default function ConnectTestPage() {
   return (
-    <App>
+    <AppDojo>
       <Container>
         <BackToTestPageIndex />
         <CurrentChainHint />
@@ -40,19 +36,14 @@ export default function ConnectTestPage() {
         <Sign revision={1} />
         <EthSign />
       </Container>
-    </App>
+    </AppDojo>
   );
 }
 
 
 export function DojoAccount() {
-  const { isInitialized } = useDojoStatus()
   const { address } = useAccount()
   const { selectedChainConfig } = useSelectedChain()
-
-  if (!isInitialized) {
-    return <DojoStatus message={'Loading Pistols...'} />
-  }
 
   return (
     <Table celled striped color='orange' size='small'>

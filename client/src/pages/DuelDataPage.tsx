@@ -8,13 +8,12 @@ import { useRouteSlugs } from '/src/hooks/useRoute'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { ChallengeStateNames, RoundStateNames } from '/src/utils/pistols'
-import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { bigintToDecimal, bigintToHex, formatTimestampLocal } from '@underware_gg/pistols-sdk/utils'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
 import { BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
 import { DuelIconsAsRow } from '/src/components/DuelIcons'
 import { EMOJI } from '/src/data/messages'
-import App from '/src/components/App'
+import AppDojo from '/src/components/AppDojo'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -24,23 +23,19 @@ const HeaderCell = Table.HeaderCell
 
 export default function DuelDataPage() {
   return (
-    <App backgroundImage={null}>
+    <AppDojo backgroundImage={null}>
       <ChallengeStoreSync />
       <StatsLoader />
-    </App>
+    </AppDojo>
   );
 }
 
 function StatsLoader() {
-  const { isInitialized } = useDojoStatus()
   const { duel_id } = useRouteSlugs()
 
   return (
     <Container>
-      {(isInitialized && duel_id)
-        ? <Stats duelId={BigInt(duel_id as string)} />
-        : <DojoStatus />
-      }
+      {Boolean(duel_id) && <Stats duelId={BigInt(duel_id as string)} />}
     </Container>
   )
 }

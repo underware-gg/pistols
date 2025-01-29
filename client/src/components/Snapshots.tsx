@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
-import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { useAllChallengesIds, useChallenge } from '/src/stores/challengeStore'
 import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
@@ -15,12 +14,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export function Snapshots() {
-  const { isInitialized } = useDojoStatus()
   const [data, setData] = useState('')
-
-  if (!isInitialized) {
-    return <DojoStatus message={'Loading Pistols...'} />
-  }
 
   const _update = (newData: any[]) => {
     setData(JSON.stringify(newData, null, '  '))

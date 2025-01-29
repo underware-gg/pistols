@@ -1,11 +1,11 @@
 import React from 'react'
-import App from '/src/components/App'
 import { AdminPanel } from '/src/components/admin/AdminPanel'
+import AppDojo from '/src/components/AppDojo'
 
 export default function AdminPage() {
   return (
-    <App>
+    <AppDojo>
       <AdminPanel />
-    </App>
+    </AppDojo>
   )
 }

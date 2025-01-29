@@ -11,7 +11,6 @@ interface StarknetContextType {
   supportedChainIds: ChainId[],
   selectedChainId: ChainId
   selectedChainConfig: DojoChainConfig
-  selectChainId: (chainId: ChainId) => void
   chains: Chain[]
 }
 
@@ -27,40 +26,18 @@ export const StarknetProvider = ({
   const currentValue = useContext(StarknetContext)
   if (currentValue) throw new Error('StarknetProvider can only be used once')
 
-  //
   // Initial state
-  //
   const chains: Chain[] = useMemo(() => getStarknetProviderChains(dojoAppConfig.supportedChainIds), [dojoAppConfig])
 
-  //
   // Current chain
   const selectedChainId = useMemo(() => (dojoAppConfig.selectedChainId), [dojoAppConfig])
   const selectedChainConfig = useMemo(() => getDojoChainConfig(selectedChainId), [selectedChainId])
   useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainId])
 
-  const selectChainId = useCallback((chainId: ChainId) => {
-    if (!isChainIdSupported(chainId)) {
-      throw `selectChainId() Invalid chain [${chainId}]`
-    }
-    throw `selectChainId() not implemented!`
-  }, [])
-
-  // Build chain connectors form selectedChainConfig
+  // Build chain connectors from selectedChainConfig
   const chainConnectors = useChainConnectors(dojoAppConfig, selectedChainConfig);
 
-  // // connectors to be used by starknet-react
-  // const { connectors } = useInjectedConnectors({
-  //   // Show these connectors if the user has no connector installed.
-  //   recommended: chainConnectors,
-  //   // Hide recommended connectors if the user has any connector installed.
-  //   includeRecommended: 'always',
-  //   // Randomize the order of the connectors.
-  //   // order: 'random',
-  // });
-
-  //
   // RPC
-  //
   function rpc(chain: Chain) {
     const nodeUrl = chain.rpcUrls.default.http[0]
     return {
@@ -75,7 +52,6 @@ export const StarknetProvider = ({
         supportedChainIds: dojoAppConfig.supportedChainIds,
         selectedChainId,
         selectedChainConfig,
-        selectChainId,
         chains,
       }}
     >

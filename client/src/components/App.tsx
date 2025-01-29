@@ -2,13 +2,11 @@ import React, { ReactNode, useMemo } from 'react'
 
 export interface AppProps {
   backgroundImage?: string
-  className?: string
   children: ReactNode
 }
 
 export default function App({
-  backgroundImage = null,
-  className = '',
+  backgroundImage,
   children
 }: AppProps) {
   const style = useMemo(() => (backgroundImage ? {
@@ -16,9 +14,8 @@ export default function App({
     backgroundSize: `cover`,
   } : {}), [backgroundImage])
   return (
-    <div className={`App ${className}`} style={style}>
+    <div className='App' style={style}>
       {children}
-      {/* <button className='DebuggerButton' onClick={() => setTimeout(() => { debugger; }, 2000)}>debugger</button> */}
     </div>
   );
 }
