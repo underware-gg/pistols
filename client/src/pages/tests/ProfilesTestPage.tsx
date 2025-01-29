@@ -2,9 +2,9 @@ import React, { useMemo } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
-import AppDojo from '/src/components/AppDojo'
+import App from '/src/components/App'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -20,10 +20,9 @@ type Profiles = {
 
 export default function ProfilesTestPage() {
   return (
-    <AppDojo>
+    <App>
       <Container>
-        <BackToTestPageIndex />
-        <CurrentChainHint />
+        <TestPageMenu />
         <br />
         <Profiles profiles={constants.DUELIST_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Duelist} />
         <br />
@@ -32,7 +31,7 @@ export default function ProfilesTestPage() {
         <Profiles profiles={constants.BOT_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Bot} />
         <br />
       </Container>
-    </AppDojo>
+    </App>
   );
 }
 

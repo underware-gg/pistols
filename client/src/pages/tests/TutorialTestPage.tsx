@@ -5,7 +5,7 @@ import { useChallenge } from '/src/stores/challengeStore'
 import { CreateTutorialChallengeButton, OpenTutorialChallengeButton } from '/src/components/TutorialButtons'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
-import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import { TUTORIAL_CHAIN_ID } from '@underware_gg/pistols-sdk/dojo'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
@@ -24,7 +24,7 @@ export default function TutorialTestPage() {
   return (
     <AppDojo chainId={TUTORIAL_CHAIN_ID}>
       <Container>
-        <BackToTestPageIndex />
+        <TestPageMenu />
         <CurrentChainHint />
 
         <Connect />

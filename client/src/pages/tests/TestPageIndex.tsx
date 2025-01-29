@@ -1,16 +1,16 @@
 import React, { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { Button, Container, Menu, MenuItem } from 'semantic-ui-react'
 import App from '/src/components/App'
 
 const testPages = [
-  'tokens',
-  'profiles',
-  'tutorial',
   'connect',
+  'tokens',
+  'tutorial',
+  'profiles',
   'timestamp',
   'icons',
-  'sign',
+  // 'sign',
 ]
 
 export default function TestPageIndex() {
@@ -45,4 +45,28 @@ export function BackToTestPageIndex() {
     navigate('/tests')
   }
   return <Button onClick={_click} icon='arrow left' content='Tests' />
+}
+
+export function TestPageMenu() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const _click = (name: string) => {
+    navigate(`/tests/${name}`)
+  }
+  return (
+    <Menu inverted>
+      <MenuItem
+        icon='arrow left'
+        onClick={() => navigate('/tests')}
+      />
+      {testPages.map(name => (
+        <MenuItem
+          key={name}
+          name={name}
+          active={location.pathname.endsWith(name)}
+          onClick={() => _click(name)}
+        />
+      ))}
+    </Menu>
+  )
 }

@@ -4,7 +4,7 @@ import {
   useClientTimestamp,
   formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown,
 } from '@underware_gg/pistols-sdk/utils'
-import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import App from '/src/components/App'
 
 const Row = Table.Row
@@ -25,7 +25,7 @@ export default function TimestampTestPage() {
   return (
     <App>
       <Container>
-        <BackToTestPageIndex />
+        <TestPageMenu />
 
         <Table celled striped size='small' color='orange'>
           <Header>

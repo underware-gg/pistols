@@ -8,7 +8,7 @@ import {
   useTypedMessage, useAsyncMemo,
   Messages, Revision, splitSignature,feltToString, bigintToHex, shortAddress,
 } from '@underware_gg/pistols-sdk/utils'
-import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import StarknetConnectModal from '/src/components/starknet/StarknetConnectModal'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
@@ -28,7 +28,7 @@ export default function ConnectTestPage() {
   return (
     <AppDojo>
       <Container>
-        <BackToTestPageIndex />
+        <TestPageMenu />
         <CurrentChainHint />
         {/* <DojoAccount /> */}
         <Connect />

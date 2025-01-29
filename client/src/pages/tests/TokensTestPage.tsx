@@ -7,7 +7,7 @@ import { useTokensByOwner } from '/src/stores/tokenStore'
 import { TokensOfPlayerStoreSyncQL } from '/src/stores/sync/TokenStoreSync'
 import { bigintToDecimal, useERC721TokenUri } from '@underware_gg/pistols-sdk/utils'
 import { Connect } from './ConnectTestPage'
-import { BackToTestPageIndex } from '/src/pages/tests/TestPageIndex'
+import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 
@@ -23,7 +23,7 @@ export default function TokensTestPage() {
   return (
     <AppDojo>
       <Container>
-        <BackToTestPageIndex />
+        <TestPageMenu />
         <CurrentChainHint />
         <Connect />
 
