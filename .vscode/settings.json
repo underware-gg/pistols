@@ -9,7 +9,6 @@
     "**/_bak": true,
     "**/*.tsbuildinfo": true,
     "**/next-env.d.ts": true,
-    "lords_mock": true,
   },
   "search.exclude": {
     "**/*-lock.json": true,
