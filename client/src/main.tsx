@@ -9,6 +9,7 @@ import { SettingsProvider } from '/src/hooks/SettingsContext'
 import { PistolsProvider } from '/src/hooks/PistolsContext'
 import ErrorModal from '/src/components/modals/ErrorModal'
 import MainPage from '/src/pages/MainPage'
+import TutorialPage from '/src/pages/TutorialPage'
 import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import AdminPage from '/src/pages/internal/AdminPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
@@ -46,12 +47,24 @@ const router = createBrowserRouter([
       { path: "graveyard", element: <MainPage /> },
       { path: "graveyard/:table_id", element: <MainPage /> },
       { path: "duel/:duel_id", element: <MainPage /> },
+      { path: "dueldata/:duel_id", element: <DuelDataPage /> },
     ],
     errorElement: <ErrorPage />,
   },
+  // tutorial pages
   {
-    path: '/dueldata/:duel_id',
-    element: <DuelDataPage />,
+    path: '/tutorial',
+    children: [
+      { path: "entry", element: <TutorialPage /> },
+      { path: "conflict", element: <TutorialPage /> },
+      { path: "honour", element: <TutorialPage /> },
+      { path: "barkeep", element: <TutorialPage /> },
+      { path: "lection", element: <TutorialPage /> },
+      { path: "demon", element: <TutorialPage /> },
+      { path: "resurection", element: <TutorialPage /> },
+      { path: "duel", element: <TutorialPage /> },
+      { path: "duel/:duel_id", element: <TutorialPage /> },
+    ],
   },
   // internal pages
   {
