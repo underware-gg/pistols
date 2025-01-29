@@ -23,7 +23,7 @@ chain_id = "WP_PISTOLS_KATANA"
 rpc_url = "https://api.cartridge.gg/x/pistols-katana/katana"
 account_address = "0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec"
 private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
-world_address = "0x3d5489a911389c23b96408ffd94854bd22a3032e2cb81c15e74b228bf39e1a7"
+world_address = "0x96b34d54cdb8b7e9cd70f3696836aee77a8aba856ce297659e21173b2dd75e"
 
 #--------------------------
 # namespaces
