@@ -1,0 +1,171 @@
+{
+  "origin": [
+    "pistols.underware.gg",
+    "pistols.stage.underware.gg",
+    "play.pistols.gg"
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#EF9758"
+    },
+    "cover": "cover.png",
+    "icon": "icon.png",
+    "name": "Pistols at Dawn"
+  },
+  "policies": {
+    "contracts": {
+      "0x01445d46f1ba32c4f91eb61e161ffcb7ce70598649ad72e5405eaee5a2afba71": {
+        "name": "Game",
+        "description": "Game loop contract",
+        "methods": [
+          {
+            "entrypoint": "commit_moves"
+          },
+          {
+            "entrypoint": "reveal_moves"
+          },
+          {
+            "entrypoint": "collect"
+          }
+        ]
+      },
+      "0x042b5966ef49614c78ca1577f617634ff3dbfee1cb811f1386cd9518b2cedd9e": {
+        "name": "Tutorial",
+        "description": "Tutorial game contract",
+        "methods": [
+          {
+            "entrypoint": "create_tutorial"
+          },
+          {
+            "entrypoint": "commit_moves"
+          },
+          {
+            "entrypoint": "reveal_moves"
+          }
+        ]
+      },
+      "0x05f3df8d2895ab76f21f13114ee33292356a009900ed32e2ab5f280ac932546a": {
+        "name": "Pack token",
+        "description": "Packs ERC721 contract",
+        "methods": [
+          {
+            "entrypoint": "claim_welcome_pack"
+          },
+          {
+            "entrypoint": "purchase"
+          },
+          {
+            "entrypoint": "open"
+          }
+        ]
+      },
+      "0x06afa7f3d4ddce0426572b0c2a91df17399997e2f44cc3586535ae9639939e67": {
+        "name": "Duel token",
+        "description": "Duel ERC721 contract",
+        "methods": [
+          {
+            "entrypoint": "create_duel"
+          },
+          {
+            "entrypoint": "reply_duel"
+          },
+          {
+            "entrypoint": "transfer_to_winner"
+          }
+        ]
+      }
+    },
+    "messages": [
+      {
+        "types": {
+          "StarknetDomain": [
+            {
+              "name": "name",
+              "type": "shortstring"
+            },
+            {
+              "name": "version",
+              "type": "shortstring"
+            },
+            {
+              "name": "chainId",
+              "type": "shortstring"
+            },
+            {
+              "name": "revision",
+              "type": "shortstring"
+            }
+          ],
+          "pistols-PlayerOnline": [
+            {
+              "name": "identity",
+              "type": "ContractAddress"
+            },
+            {
+              "name": "timestamp",
+              "type": "felt"
+            }
+          ]
+        },
+        "primaryType": "pistols-PlayerOnline",
+        "domain": {
+          "name": "Underware_gg",
+          "version": "1.0.0",
+          "chainId": "SN_MAIN",
+          "revision": "1"
+        },
+        "name": "PlayerOnline",
+        "description": "Notify the server that a player is online"
+      },
+      {
+        "types": {
+          "StarknetDomain": [
+            {
+              "name": "name",
+              "type": "shortstring"
+            },
+            {
+              "name": "version",
+              "type": "shortstring"
+            },
+            {
+              "name": "chainId",
+              "type": "shortstring"
+            },
+            {
+              "name": "revision",
+              "type": "shortstring"
+            }
+          ],
+          "pistols-PlayerBookmark": [
+            {
+              "name": "identity",
+              "type": "ContractAddress"
+            },
+            {
+              "name": "target_address",
+              "type": "ContractAddress"
+            },
+            {
+              "name": "target_id",
+              "type": "u128"
+            },
+            {
+              "name": "enabled",
+              "type": "bool"
+            }
+          ]
+        },
+        "primaryType": "pistols-PlayerBookmark",
+        "domain": {
+          "name": "Underware_gg",
+          "version": "1.0.0",
+          "chainId": "SN_MAIN",
+          "revision": "1"
+        },
+        "name": "PlayerBookmark",
+        "description": "Notify the server that a player follows another player or token"
+      }
+    ]
+  }
+}
