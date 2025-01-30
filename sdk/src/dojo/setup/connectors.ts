@@ -6,7 +6,7 @@ import {
 } from '@starknet-react/core'
 import { usePredeployedConnector } from 'src/utils/hooks/usePredeployedConnector'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
-import { DojoChainConfig } from 'src/dojo/setup/chains'
+import { DojoNetworkConfig } from 'src/dojo/setup/networks'
 import { PREDEPLOYED_ID } from 'src/utils/misc/predeployed'
 
 export const supportedConnetorIds = {
@@ -22,7 +22,7 @@ export const getConnectorIcon = (connector: Connector): string  => {
   return connector.icon.dark
 }
 
-export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: DojoChainConfig) => {
+export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: DojoNetworkConfig) => {
 
   // Predeployed connector
   const { predeployed } = usePredeployedConnector(chainConfig.rpcUrl, chainConfig.chainId, chainConfig.predeployedAccounts)

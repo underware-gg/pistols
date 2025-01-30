@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react'
 import { EthSigner, Signature } from 'starknet'
 import { Container, Table, Button, Image } from 'semantic-ui-react'
-import { useAccount, useDisconnect, useNetwork } from '@starknet-react/core'
+import { useAccount, useConnect, useDisconnect, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { useDojoSetup, useSelectedChain, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoSetup, useStarknetContext, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
 import {
   useTypedMessage, useAsyncMemo,
-  Messages, Revision, splitSignature,feltToString, bigintToHex, shortAddress,
+  Messages, Revision, splitSignature, feltToString, bigintToHex, shortAddress,
 } from '@underware_gg/pistols-sdk/utils'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import StarknetConnectModal from '/src/components/starknet/StarknetConnectModal'
@@ -43,7 +43,7 @@ export default function ConnectTestPage() {
 
 export function DojoAccount() {
   const { address } = useAccount()
-  const { selectedChainConfig } = useSelectedChain()
+  const { selectedNetworkConfig } = useStarknetContext()
 
   return (
     <Table celled striped color='orange' size='small'>
@@ -57,7 +57,7 @@ export function DojoAccount() {
         <Row>
           <Cell>VITE_MASTER_ADDRESS</Cell>
           <Cell className='Code'>
-            {selectedChainConfig.masterAddress}
+            {selectedNetworkConfig.masterAddress}
           </Cell>
         </Row>
         <Row>
@@ -74,7 +74,8 @@ export function DojoAccount() {
 
 export function Connect() {
   const { address, isConnecting, isConnected, connector } = useAccount()
-  const { selectedChainId } = useSelectedChain()
+  const { selectedNetworkConfig } = useStarknetContext()
+  const { connectors } = useConnect();
   const { chain } = useNetwork()
   const { disconnect } = useDisconnect()
   const { connectOpener } = usePistolsContext()
@@ -83,30 +84,35 @@ export function Connect() {
       <StarknetConnectModal opener={connectOpener} />
 
       <Table celled striped color={isConnected ? 'green' : 'red'} size='small'>
-        <Body>
-          <Row className='H4'>
-            <Cell>Connected?</Cell>
-            <Cell className='TitleCase'>
-              {isConnected ? <span className='Positive'>Connected</span> : <span className='Negative'>Disconnected</span>}
-            </Cell>
-          </Row>
-          <Row className='H4'>
-            <Cell>Chain Id</Cell>
+        <Body className='H4'>
+          <Row>
+            <Cell>Network : Chain</Cell>
             <Cell className='Code Important'>
               {/* {chain && <>{bigintToHex(chain.id)} : {feltToString(chain.id)}</>} */}
-              {isConnected && feltToString(chain.id)}
-              {!isConnected && selectedChainId}
+              {selectedNetworkConfig.networkId}
+              {' : '}
+              {selectedNetworkConfig.chainId}
             </Cell>
           </Row>
-          <Row className='H4'>
-            <Cell>wallet</Cell>
+          <Row>
+            <Cell>Connected</Cell>
+            <Cell className='Code'>
+              {isConnected
+                ? <span className='Important'>{feltToString(chain.id)}</span>
+                : <span className='Negative'>Disconnected</span>
+              }
+            </Cell>
+          </Row>
+          <Row>
+            <Cell>Connector</Cell>
             <Cell className='TitleCase'>
               {connector && <>
                 <Image className='ProfilePicSmall' spaced src={getConnectorIcon(connector)} /> {connector.name}
               </>}
+              {!connector && JSON.stringify(connectors.map(c => c.id))}
             </Cell>
           </Row>
-          <Row>
+          <Row className='H5'>
             <Cell>Account</Cell>
             <Cell className='Code'>
               {address}
@@ -114,7 +120,7 @@ export function Connect() {
           </Row>
           <Row>
             <Cell></Cell>
-            <Cell className='Code'>
+            <Cell>
               {/* <ChainSwitcher /> */}
               {/* &nbsp;&nbsp; */}
               <Button disabled={isConnected || isConnecting} onClick={() => connectOpener.open()}>Connect</Button>

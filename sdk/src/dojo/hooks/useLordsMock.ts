@@ -20,10 +20,10 @@ export interface FaucetInterface {
 
 export const useLordsFaucet = (): FaucetInterface => {
   const { account } = useAccount()
-  const { selectedChainConfig } = useStarknetContext()
+  const { selectedNetworkConfig } = useStarknetContext()
   const { lordsContractAddress, abi } = useLordsContract()
-  const faucetUrl = useMemo(() => (typeof selectedChainConfig.lordsFaucet === 'string' ? selectedChainConfig.lordsFaucet : null), [selectedChainConfig])
-  const hasFaucet = useMemo(() => (selectedChainConfig.lordsFaucet === true), [selectedChainConfig])
+  const faucetUrl = useMemo(() => (typeof selectedNetworkConfig.lordsFaucet === 'string' ? selectedNetworkConfig.lordsFaucet : null), [selectedNetworkConfig])
+  const hasFaucet = useMemo(() => (selectedNetworkConfig.lordsFaucet === true), [selectedNetworkConfig])
 
   const [isMinting, setIsMinting] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)

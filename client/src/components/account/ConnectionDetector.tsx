@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
+import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { useDojoStatus, useSelectedChain } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useIsMyDuelist } from '/src/hooks/useIsYou'
 import { AccountChangeDetector, ChainChangeDetector } from '/src/components/starknet/ChangeDetector'
@@ -19,7 +20,7 @@ export function DojoSetupErrorDetector() {
 }
 
 export function ConnectionDetector() {
-  const { isConnected } = useSelectedChain()
+  const { isConnected } = useAccount()
   const { connectOpener } = usePistolsContext()
   const { duelistId, dispatchDuelistId } = useSettings()
   const isMyDuelist = useIsMyDuelist(duelistId)

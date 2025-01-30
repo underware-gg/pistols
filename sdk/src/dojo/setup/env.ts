@@ -6,8 +6,8 @@
 const _env = (name: string) => (import.meta.env?.[name] || undefined);
 
 // required
-export const DEFAULT_CHAIN_ID = _env('VITE_CHAIN_ID') || 'SN_MAIN';
-export const TUTORIAL_CHAIN_ID = _env('VITE_TUTORIAL_CHAIN_ID') || 'WP_PISTOLS_KATANA';
+export const DEFAULT_NETWORK_ID = _env('VITE_NETWORK_ID') || _env('VITE_NETWORK_ID') || 'MAINNET';
+export const ACADEMY_NETWORK_ID = _env('VITE_ACADEMY_NETWORK_ID') || 'ACADEMY';
 
 // optional
 export const NODE_URL = _env('VITE_NODE_URL');

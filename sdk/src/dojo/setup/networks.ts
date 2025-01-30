@@ -13,18 +13,33 @@ import {
 } from '@dojoengine/core'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
 import { PredeployedAccount } from 'src/utils/misc/predeployed'
+import { stringToFelt } from 'src/utils/misc/starknet'
+import { cleanObject } from 'src/utils/misc/types'
 import * as ENV from 'src/dojo/setup/env'
+
+export const DEFAULT_NETWORK_ID = (ENV.DEFAULT_NETWORK_ID) as NetworkId
+export const ACADEMY_NETWORK_ID = (ENV.ACADEMY_NETWORK_ID) as NetworkId
+
+//
+// supported networks
+//
+export enum NetworkId {
+  MAINNET = 'MAINNET',
+  SEPOLIA = 'SEPOLIA',
+  ACADEMY = 'ACADEMY',
+  STAGING = 'STAGING',
+  KATANA_LOCAL = 'KATANA_LOCAL',
+}
 
 //
 // supported chain ids
 //
-
-export enum ChainId {
+export enum XainId {
   SN_MAIN = 'SN_MAIN',
   SN_SEPOLIA = 'SN_SEPOLIA',
-  KATANA_LOCAL = 'KATANA_LOCAL',
-  KATANA_SLOT = 'WP_PISTOLS_KATANA',
+  PISTOLS_KATANA = 'WP_PISTOLS_KATANA',
   PISTOLS_STAGING = 'WP_PISTOLS_STAGING',
+  KATANA_LOCAL = 'KATANA_LOCAL',
 }
 
 //
@@ -50,9 +65,10 @@ const WORLD_EXPLORER: ChainExplorers = {
 //
 // chain config
 //
-export type DojoChainConfig = {
+export type DojoNetworkConfig = {
+  networkId: NetworkId
+  chainId: XainId
   chain: Chain
-  chainId: ChainId
   name: string
   rpcUrl: string
   toriiUrl: string
@@ -73,8 +89,9 @@ export type DojoChainConfig = {
   explorers?: ChainExplorers
 }
 
-// environment overrides, will be applied over default chain only
-export const envChainConfig: DojoChainConfig = {
+// environment overrides, will be applied over default network only
+export const envNetworkConfig: DojoNetworkConfig = {
+  networkId: undefined,
   chain: undefined,
   chainId: undefined,
   name: undefined,
@@ -93,12 +110,12 @@ export const envChainConfig: DojoChainConfig = {
 }
 
 //--------------------------------
-// Chain definitions
+// Local Katana
 //
-
-const localKatanaConfig: DojoChainConfig = {
+const localKatanaConfig: DojoNetworkConfig = {
+  networkId: undefined, // derive from this
   chain: undefined, // derive from this
-  chainId: ChainId.KATANA_LOCAL,
+  chainId: XainId.KATANA_LOCAL,
   name: 'Katana Local',
   rpcUrl: LOCAL_KATANA,
   // toriiUrl: LOCAL_TORII,
@@ -180,10 +197,15 @@ const localKatanaConfig: DojoChainConfig = {
   explorers: WORLD_EXPLORER,
 } as const
 
-const katanaSlotConfig: DojoChainConfig = {
+
+//--------------------------------
+// Slot Katana
+//
+const academySlotConfig: DojoNetworkConfig = {
+  networkId: undefined, // derive from this
   chain: undefined, // derive from this
-  chainId: ChainId.KATANA_SLOT,
-  name: 'Katana Testnet',
+  chainId: XainId.PISTOLS_KATANA,
+  name: 'Katana Academy',
   rpcUrl: 'https://api.cartridge.gg/x/pistols-katana/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-katana/torii',
   relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-katana%2Ftorii%2Fwss',
@@ -200,7 +222,13 @@ const katanaSlotConfig: DojoChainConfig = {
       address: '0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7',
       privateKey: '0x1c9053c053edf324aec366a34c6901b1095b07af69495bffec7d7fe21effb1b',
       active: true,
-    }
+    },
+    {
+      name: 'Katana 2',
+      address: '0x17cc6ca902ed4e8baa8463a7009ff18cc294fa85a94b4ce6ac30a9ebd6057c7',
+      privateKey: '0x14d6672dcb4b77ca36a887e9a11cd9d637d5012468175829e9c6e770c61642',
+      active: true,
+    },
   ],
   connectorIds: [
     // supportedConnetorIds.CONTROLLER,
@@ -216,9 +244,10 @@ const katanaSlotConfig: DojoChainConfig = {
 // Starknet
 //
 
-const snSepoliaConfig: DojoChainConfig = {
+const snSepoliaConfig: DojoNetworkConfig = {
+  networkId: undefined, // derive from this
   chain: { ...sepolia },
-  chainId: ChainId.SN_SEPOLIA,
+  chainId: XainId.SN_SEPOLIA,
   name: 'Sepolia Testnet',
   // rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/v0_6',
   // rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
@@ -239,9 +268,10 @@ const snSepoliaConfig: DojoChainConfig = {
   ],
 } as const
 
-const pistolsStagingConfig: DojoChainConfig = {
+const pistolsStagingConfig: DojoNetworkConfig = {
+  networkId: undefined, // derive from this
   chain: { ...sepolia },
-  chainId: ChainId.SN_SEPOLIA,
+  chainId: XainId.SN_SEPOLIA,
   name: 'Sepolia Staging',
   // rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/v0_6',
   // rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
@@ -262,9 +292,10 @@ const pistolsStagingConfig: DojoChainConfig = {
   ],
 } as const
 
-const snMainnetConfig: DojoChainConfig = {
+const snMainnetConfig: DojoNetworkConfig = {
+  networkId: undefined, // derive from this
   chain: { ...mainnet },
-  chainId: ChainId.SN_MAIN,
+  chainId: XainId.SN_MAIN,
   name: 'Mainnet',
   // rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/mainnet',
@@ -288,10 +319,50 @@ const snMainnetConfig: DojoChainConfig = {
 // Available chains
 //
 
-export const dojoContextConfig: Record<ChainId, DojoChainConfig> = {
-  [ChainId.KATANA_LOCAL]: localKatanaConfig,
-  [ChainId.KATANA_SLOT]: katanaSlotConfig,
-  [ChainId.PISTOLS_STAGING]: pistolsStagingConfig,
-  [ChainId.SN_SEPOLIA]: snSepoliaConfig,
-  [ChainId.SN_MAIN]: snMainnetConfig,
+const makeDojoNetworkConfig = (networkId: NetworkId, config: DojoNetworkConfig): DojoNetworkConfig => {
+  let network = { ...config }
+  //
+  // set networkId
+  network.networkId = networkId
+  //
+  // derive starknet Chain
+  if (!network.chain) {
+    network.chain = {
+      id: BigInt(stringToFelt(network.chainId)),
+      name: network.name,
+      network: network.network ?? 'katana',
+      testnet: network.testnet ?? true,
+      nativeCurrency: network.nativeCurrency,
+      rpcUrls: {
+        default: { http: [] },
+        public: { http: [] },
+      },
+      explorers: network.explorers,
+    } as Chain
+  }
+  //
+  // override env (default network only)
+  if (networkId == DEFAULT_NETWORK_ID) {
+    network = {
+      ...network,
+      ...cleanObject(envNetworkConfig),
+    }
+  }
+  //
+  // use Cartridge RPCs
+  if (network.rpcUrl) {
+    network.chain.rpcUrls.default.http = [network.rpcUrl]
+    network.chain.rpcUrls.public.http = [network.rpcUrl]
+  }
+  // console.log(networkConfig)
+
+  return network
+}
+
+export const dojoNetworkConfigs: Record<NetworkId, DojoNetworkConfig> = {
+  [NetworkId.MAINNET]: makeDojoNetworkConfig(NetworkId.MAINNET, snMainnetConfig),
+  [NetworkId.SEPOLIA]: makeDojoNetworkConfig(NetworkId.SEPOLIA, snSepoliaConfig),
+  [NetworkId.ACADEMY]: makeDojoNetworkConfig(NetworkId.ACADEMY, academySlotConfig),
+  [NetworkId.STAGING]: makeDojoNetworkConfig(NetworkId.STAGING, pistolsStagingConfig),
+  [NetworkId.KATANA_LOCAL]: makeDojoNetworkConfig(NetworkId.KATANA_LOCAL, localKatanaConfig),
 }

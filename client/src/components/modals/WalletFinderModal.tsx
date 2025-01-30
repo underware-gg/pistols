@@ -1,7 +1,7 @@
-import React, { ReactNode, useEffect, useState } from 'react'
+import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Grid, Modal, Breadcrumb, Icon } from 'semantic-ui-react'
 import { useMounted, useStarkName, useStarkProfile, useValidateWalletAddressOrName, STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
-import { useControllerAccount, useChainConfig, ChainId } from '@underware_gg/pistols-sdk/dojo'
+import { useControllerAccount, NetworkId, dojoNetworkConfigs } from '@underware_gg/pistols-sdk/dojo'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ActionButton } from '/src/components/ui/Buttons'
@@ -31,15 +31,15 @@ export default function WalletFinderModal({
     if (opener.isOpen) setInputAddres('')
   }, [opener.isOpen])
 
-  const { chainConfig } = useChainConfig(ChainId.SN_MAIN)
+  const networkConfig = useMemo(() => dojoNetworkConfigs[NetworkId.MAINNET], [])
   
-  const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddressOrName(inputAddress, chainConfig.rpcUrl)
+  const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddressOrName(inputAddress, networkConfig.rpcUrl)
   const { isDeployed, isControllerAccount, isKatanaAccount } = useControllerAccount(validatedAddress)
   const { isMyAccount, myAcountAddress } = useIsMyAccount(validatedAddress)
   const canSubmit = (isStarknetAddress && !isMyAccount && (isControllerAccount || isKatanaAccount))
 
-  const { starkName } = useStarkName(isStarknetAddress ? validatedAddress : null, chainConfig.rpcUrl)
-  const { name: profileName, profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null, chainConfig.rpcUrl)
+  const { starkName } = useStarkName(isStarknetAddress ? validatedAddress : null, networkConfig.rpcUrl)
+  const { name: profileName, profilePicture: starkProfilePic } = useStarkProfile(isStarknetAddress ? validatedAddress : null, networkConfig.rpcUrl)
 
   return (
     <Modal

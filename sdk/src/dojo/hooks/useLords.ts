@@ -1,15 +1,15 @@
 import { BigNumberish } from 'starknet'
 import { useERC20Balance } from 'src/utils/hooks/useERC20'
 import { useDojoSystem } from 'src/dojo/hooks/useDojoSystem'
-import { useSelectedChain } from 'src/dojo/hooks/useChain'
+import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { getLordsAddress } from 'src/games/pistols/config/config'
 import { bigintEquals, isPositiveBigint } from 'src/utils/misc/types'
 import { useMemo } from 'react'
 
 
 export const useLordsContract = () => {
-  const { selectedChainId } = useSelectedChain()
-  const lordsAddress = getLordsAddress(selectedChainId)
+  const { selectedNetworkId } = useStarknetContext()
+  const lordsAddress = getLordsAddress(selectedNetworkId)
 
   const { contractAddress: mockAddress, abi } = useDojoSystem('lords_mock')
   const isMock = useMemo(() => (
@@ -29,6 +29,6 @@ export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n, w
 }
 
 export const useEtherBalance = (address: BigNumberish, fee: BigNumberish = 0n, watch: boolean = false) => {
-  const { selectedChainConfig } = useSelectedChain()
-  return useERC20Balance(selectedChainConfig.etherAddress, address, fee, watch)
+  const { selectedNetworkConfig } = useStarknetContext()
+  return useERC20Balance(selectedNetworkConfig.etherAddress, address, fee, watch)
 }

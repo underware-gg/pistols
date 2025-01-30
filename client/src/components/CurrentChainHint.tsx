@@ -1,10 +1,10 @@
 import React from 'react'
-import { useSelectedChain } from '@underware_gg/pistols-sdk/dojo'
+import { useStarknetContext } from '@underware_gg/pistols-sdk/dojo'
 import { PACKAGE_VERSION } from '/src/utils/constants'
 import { useTableId } from '/src/stores/configStore'
 
 export default function CurrentChainHint() {
-  const { selectedChainId } = useSelectedChain()
+  const { selectedNetworkId } = useStarknetContext()
   const { tableId } = useTableId()
   return (
     <>
@@ -13,7 +13,7 @@ export default function CurrentChainHint() {
         <br />
         ({tableId})
         <br />
-        {selectedChainId}
+        {selectedNetworkId}
       </div>
     </>
   )

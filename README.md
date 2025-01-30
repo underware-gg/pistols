@@ -233,13 +233,14 @@ cd client
 pnpm i
 ```
 
-Configure default chain id in a `.env` file:
+Configure default [NetworkId](/sdk/src/dojo/setup/chains.ts)id in a `.env` file:
 
 ```sh
 VITE_DEBUG=0
-VITE_CHAIN_ID=KATANA_LOCAL
-#VITE_CHAIN_ID=SN_SEPOLIA
-#VITE_CHAIN_ID=WP_PISTOLS_KATANA
+VITE_NETWORK_ID=KATANA_LOCAL
+#VITE_NETWORK_ID=STAGING
+#VITE_NETWORK_ID=SEPOLIA
+#VITE_NETWORK_ID=MAINNET
 ```
 
 Start the client

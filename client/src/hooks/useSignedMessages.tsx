@@ -1,20 +1,19 @@
 import { useMemo } from 'react'
 import { Account, BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useSdkPublishTypedData, useSelectedChain } from '@underware_gg/pistols-sdk/dojo'
+import { useSdkPublishTypedData, useStarknetContext } from '@underware_gg/pistols-sdk/dojo'
 import {
-  constants,
   make_typed_data_PlayerBookmark,
   make_typed_data_PlayerOnline,
 } from '@underware_gg/pistols-sdk/pistols'
 
 
 export function usePlayerOnlineSignedMessage(timestamp: number) {
-  const { selectedChainId } = useSelectedChain()
+  const { selectedNetworkId } = useStarknetContext()
   const { account } = useAccount()
   const typedData = useMemo(() => (
     make_typed_data_PlayerOnline({
-      chainId: selectedChainId,
+      networkId: selectedNetworkId,
       identity: account?.address ?? 0,
       timestamp: Math.floor(timestamp),
     })
@@ -27,11 +26,11 @@ export function usePlayerOnlineSignedMessage(timestamp: number) {
 }
 
 export function usePlayerBookmarkSignedMessage(target_address: BigNumberish, target_id: BigNumberish, enabled: boolean) {
-  const { selectedChainId } = useSelectedChain()
+  const { selectedNetworkId } = useStarknetContext()
   const { account } = useAccount()
   const typedData = useMemo(() => (
     make_typed_data_PlayerBookmark({
-      chainId: selectedChainId,
+      networkId: selectedNetworkId,
       identity: account?.address ?? 0,
       target_address,
       target_id,

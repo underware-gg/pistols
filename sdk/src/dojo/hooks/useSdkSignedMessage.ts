@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { Account, TypedData, stark } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
-import { useSelectedChain } from 'src/dojo/hooks/useChain'
+import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { serialize } from 'src/utils/misc/types'
 import { useConnectedController } from 'src/exports/dojo'
 
@@ -23,7 +23,7 @@ export const useSdkPublishTypedData = (
 ) => {
   const { sdk } = useDojoSetup()
   const { isControllerConnected } = useConnectedController()
-  const { selectedChainConfig } = useSelectedChain()
+  const { selectedNetworkConfig } = useStarknetContext()
   const [isPublishing, setIsPublishing] = useState<boolean>()
 
   const publish = useCallback(async () => {
@@ -32,7 +32,7 @@ export const useSdkPublishTypedData = (
         console.warn('useSdkPublishSignedMessage() needs Cartridge Controller!')
         return
       }
-      if (!selectedChainConfig.relayUrl) {
+      if (!selectedNetworkConfig.relayUrl) {
         console.error('useSdkPublishSignedMessage() failed: relayUrl is not set')
         return
       }

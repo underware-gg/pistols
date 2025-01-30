@@ -4,7 +4,7 @@ import { arrayClean, shortAddress, isPositiveBigint } from 'src/utils/misc/types
 import { NAMESPACE, getLordsAddress, getBankAddress } from 'src/games/pistols/config/config'
 import { stringToFelt, bigintToU256 } from 'src/utils/misc/starknet'
 import { makeCustomEnum } from 'src/utils/misc/starknet_enum'
-import { DojoChainConfig, ChainId } from 'src/dojo/setup/chains'
+import { DojoNetworkConfig } from 'src/dojo/setup/networks'
 import { DojoManifest } from 'src/dojo/contexts/Dojo'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'
@@ -49,8 +49,7 @@ export function createSystemCalls(
   provider: DojoProvider,
   manifest: DojoManifest,
   constractCalls: ReturnType<typeof setupWorld>,
-  selectedChainConfig: DojoChainConfig,
-  chainId: ChainId,
+  selectedNetworkConfig: DojoNetworkConfig,
 ) {
   
   // executeMulti() based on:
@@ -90,16 +89,16 @@ export function createSystemCalls(
   const approve_call = (approved_value: BigNumberish): Call | undefined => {
     if (!isPositiveBigint(approved_value)) return undefined
     return {
-      contractAddress: getLordsAddress(chainId),
+      contractAddress: getLordsAddress(selectedNetworkConfig.networkId),
       entrypoint: 'approve',
-      calldata: [getBankAddress(chainId), bigintToU256(approved_value)],
+      calldata: [getBankAddress(selectedNetworkConfig.networkId), bigintToU256(approved_value)],
     }
   }
 
   // https://docs.cartridge.gg/vrf/overview#executing-vrf-transactions
   const vrf_request_call = (signer: AccountInterface, contractName: string): Call => {
     const contract_address = getContractByName(manifest, NAMESPACE, contractName).address
-    const vrf_address = selectedChainConfig.vrfAddress || getContractByName(manifest, NAMESPACE, 'vrf_mock').address
+    const vrf_address = selectedNetworkConfig.vrfAddress || getContractByName(manifest, NAMESPACE, 'vrf_mock').address
     return {
       contractAddress: vrf_address,
       entrypoint: 'request_random',

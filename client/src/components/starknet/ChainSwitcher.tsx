@@ -7,10 +7,10 @@
 //   disabled = false,
 //   fluid = false,
 // }) {
-//   const { chains, selectedChainConfig, selectChainId } = useStarknetContext()
+//   const { chains, selectedNetworkConfig, selectChainId } = useStarknetContext()
 //   return (
 //     <Dropdown
-//       text={`Server:  ${selectedChainConfig.name}`}
+//       text={`Server:  ${selectedNetworkConfig.name}`}
 //       disabled={disabled}
 //       className='icon AlignCenter Padded'
 //       // icon='chain'

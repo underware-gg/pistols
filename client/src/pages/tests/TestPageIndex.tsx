@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
-import { Button, Container, Menu, MenuItem } from 'semantic-ui-react'
+import { Button, Container, Divider, Menu, MenuItem } from 'semantic-ui-react'
 import App from '/src/components/App'
 
 const testPages = [
@@ -54,19 +54,22 @@ export function TestPageMenu() {
     navigate(`/tests/${name}`)
   }
   return (
-    <Menu inverted>
-      <MenuItem
-        icon='arrow left'
-        onClick={() => navigate('/tests')}
-      />
-      {testPages.map(name => (
+    <>
+      <br />
+      <Menu inverted>
         <MenuItem
-          key={name}
-          name={name}
-          active={location.pathname.endsWith(name)}
-          onClick={() => _click(name)}
+          icon='arrow left'
+          onClick={() => navigate('/tests')}
         />
-      ))}
-    </Menu>
+        {testPages.map(name => (
+          <MenuItem
+            key={name}
+            name={name}
+            active={location.pathname.endsWith(name)}
+            onClick={() => _click(name)}
+          />
+        ))}
+      </Menu>
+    </>
   )
 }

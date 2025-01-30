@@ -2,8 +2,7 @@ import { StarknetDomain } from 'starknet'
 import { SessionPolicies, Tokens } from '@cartridge/controller'
 import { getContractByName } from '@dojoengine/core'
 import { DojoAppConfig, DojoManifest, ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
-import { ChainId, dojoContextConfig } from 'src/dojo/setup/chains'
-import { DEFAULT_CHAIN_ID } from 'src/dojo/setup/chainConfig'
+import { NetworkId, dojoNetworkConfigs, DEFAULT_NETWORK_ID } from 'src/dojo/setup/networks'
 import { makeControllerConnector, makeControllerPolicies } from 'src/dojo/setup/controller'
 import {
   make_typed_data_PlayerBookmark,
@@ -11,7 +10,7 @@ import {
 } from './signed_messages'
 import * as constants from '../generated/constants'
 import pistols_manifest_dev from '../manifests/manifest_dev.json'
-import pistols_manifest_katana from '../manifests/manifest_katana.json'
+import pistols_manifest_academy from '../manifests/manifest_academy.json'
 import pistols_manifest_staging from '../manifests/manifest_staging.json'
 import pistols_manifest_sepolia from '../manifests/manifest_sepolia.json'
 import pistols_manifest_mainnet from '../manifests/manifest_mainnet.json'
@@ -20,20 +19,12 @@ import pistols_manifest_mainnet from '../manifests/manifest_mainnet.json'
 // import { defineContractComponents } from './generated/contractComponents'
 // import { createSystemCalls } from './createSystemCalls'
 
-const supportedChainIds: ChainId[] = [
-  // ChainId.SN_MAIN,
-  ChainId.SN_SEPOLIA,
-  ChainId.PISTOLS_STAGING,
-  ChainId.KATANA_SLOT,
-  ChainId.KATANA_LOCAL,
-]
-
-const manifests: Record<ChainId, DojoManifest> = {
-  [ChainId.KATANA_LOCAL]: pistols_manifest_dev as DojoManifest,
-  [ChainId.KATANA_SLOT]: pistols_manifest_katana as DojoManifest,
-  [ChainId.PISTOLS_STAGING]: pistols_manifest_staging as DojoManifest,
-  [ChainId.SN_SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
-  [ChainId.SN_MAIN]: pistols_manifest_mainnet as DojoManifest,
+const manifests: Record<NetworkId, DojoManifest> = {
+  [NetworkId.KATANA_LOCAL]: pistols_manifest_dev as DojoManifest,
+  [NetworkId.ACADEMY]: pistols_manifest_academy as DojoManifest,
+  [NetworkId.STAGING]: pistols_manifest_staging as DojoManifest,
+  [NetworkId.SEPOLIA]: pistols_manifest_sepolia as DojoManifest,
+  [NetworkId.MAINNET]: pistols_manifest_mainnet as DojoManifest,
 }
 
 export const NAMESPACE = 'pistols'
@@ -82,10 +73,10 @@ const contractPolicyDescriptions_admin: ContractPolicyDescriptions = {
     interfaces: ['IAdmin'],
   },
 }
-export const makePistolsPolicies = (chainId: ChainId, mock: boolean, admin: boolean): SessionPolicies => {
+export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: boolean): SessionPolicies => {
   return makeControllerPolicies(
     NAMESPACE,
-    manifests[chainId],
+    manifests[networkId],
     {
       ...contractPolicyDescriptions_pistols,
       ...(mock ? contractPolicyDescriptions_mock : {}),
@@ -96,41 +87,44 @@ export const makePistolsPolicies = (chainId: ChainId, mock: boolean, admin: bool
 };
 
 // starknet domain
-export const makeStarknetDomain = (chainId: ChainId): StarknetDomain => ({
+export const makeStarknetDomain = (networkId: NetworkId): StarknetDomain => ({
   name: constants.TYPED_DATA.NAME,
   version: constants.TYPED_DATA.VERSION,
-  chainId,
+  chainId: dojoNetworkConfigs[networkId].chainId,
   revision: '1',
 })
 
 // contract addresses
 // erc-20
-export const getLordsAddress = (chainId: ChainId): string => (dojoContextConfig[chainId].lordsAddress || (getContractByName(manifests[chainId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
-export const getFameAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'fame_coin')?.address ?? '0x0')
-// export const getFoolsAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
+export const getLordsAddress = (networkId: NetworkId): string => (dojoNetworkConfigs[networkId].lordsAddress || (getContractByName(manifests[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
+export const getFameAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fame_coin')?.address ?? '0x0')
+// export const getFoolsAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
 // erc-721
-export const getDuelistTokenAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'duelist_token')?.address ?? '0x0')
-export const getDuelTokenAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'duel_token')?.address ?? '0x0')
-export const getPackTokenAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'pack_token')?.address ?? '0x0')
+export const getDuelistTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duelist_token')?.address ?? '0x0')
+export const getDuelTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duel_token')?.address ?? '0x0')
+export const getPackTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'pack_token')?.address ?? '0x0')
 // contracts
-export const getBankAddress = (chainId: ChainId): string => (getContractByName(manifests[chainId], NAMESPACE, 'bank')?.address ?? '0x0')
+export const getBankAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'bank')?.address ?? '0x0')
 
 
 //------------------------------------------
-// config Controller for default chain only!
+// config Controller for default network only!
 //
+if (!dojoNetworkConfigs[DEFAULT_NETWORK_ID]) {
+  throw new Error(`Network config not found for DEFAULT_NETWORK_ID: [${DEFAULT_NETWORK_ID}]`)
+}
 // tokens to display
 const tokens: Tokens = {
   erc20: [
-    getLordsAddress(DEFAULT_CHAIN_ID),
-    getFameAddress(DEFAULT_CHAIN_ID),
-    // getFoolsAddress(DEFAULT_CHAIN_ID),
+    getLordsAddress(DEFAULT_NETWORK_ID),
+    getFameAddress(DEFAULT_NETWORK_ID),
+    // getFoolsAddress(DEFAULT_NETWORK_ID),
   ],
   //@ts-ignore
   erc721: [
-    getDuelistTokenAddress(DEFAULT_CHAIN_ID),
-    getDuelTokenAddress(DEFAULT_CHAIN_ID),
-    getDuelTokenAddress(DEFAULT_CHAIN_ID),
+    getDuelistTokenAddress(DEFAULT_NETWORK_ID),
+    getDuelTokenAddress(DEFAULT_NETWORK_ID),
+    getDuelTokenAddress(DEFAULT_NETWORK_ID),
   ],
 }
 //
@@ -139,7 +133,7 @@ const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
   {
     description: 'Notify the server that a player is online',
     typedData: make_typed_data_PlayerOnline({
-      chainId: DEFAULT_CHAIN_ID,
+      networkId: DEFAULT_NETWORK_ID,
       identity: '0x0',
       timestamp: 0,
     }),
@@ -147,7 +141,7 @@ const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
   {
     description: 'Notify the server that a player follows another player or token',
     typedData: make_typed_data_PlayerBookmark({
-      chainId: DEFAULT_CHAIN_ID,
+      networkId: DEFAULT_NETWORK_ID,
       identity: '0x0',
       target_address: '0x0',
       target_id: '0x0',
@@ -157,15 +151,15 @@ const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
 ]
 //
 // controller connector
-const policies = (DEFAULT_CHAIN_ID === ChainId.SN_MAIN ? undefined
-  : makePistolsPolicies(DEFAULT_CHAIN_ID, !Boolean(dojoContextConfig[DEFAULT_CHAIN_ID].lordsAddress), false)
+const policies = (DEFAULT_NETWORK_ID === NetworkId.MAINNET ? undefined
+  : makePistolsPolicies(DEFAULT_NETWORK_ID, !Boolean(dojoNetworkConfigs[DEFAULT_NETWORK_ID].lordsAddress), false)
 )
 const controllerConnector = makeControllerConnector(
   'pistols', // theme
   NAMESPACE,
-  DEFAULT_CHAIN_ID,
-  dojoContextConfig[DEFAULT_CHAIN_ID].rpcUrl,
-  dojoContextConfig[DEFAULT_CHAIN_ID].toriiUrl,
+  dojoNetworkConfigs[DEFAULT_NETWORK_ID].chainId,
+  dojoNetworkConfigs[DEFAULT_NETWORK_ID].rpcUrl,
+  dojoNetworkConfigs[DEFAULT_NETWORK_ID].toriiUrl,
   policies,
   tokens,
 );
@@ -174,15 +168,14 @@ const controllerConnector = makeControllerConnector(
 //--------------------------------
 
 
-export const makeDojoAppConfig = (chainId?: ChainId): DojoAppConfig => {
-  const selectedChainId = chainId ?? DEFAULT_CHAIN_ID
+export const makeDojoAppConfig = (networkId?: NetworkId): DojoAppConfig => {
+  const selectedNetworkId = networkId ?? DEFAULT_NETWORK_ID
   return {
-    selectedChainId,
-    supportedChainIds,
+    selectedNetworkId,
     namespace: NAMESPACE,
-    starknetDomain: makeStarknetDomain(selectedChainId),
-    manifest: manifests[selectedChainId],
+    starknetDomain: makeStarknetDomain(selectedNetworkId),
+    manifest: manifests[selectedNetworkId],
     mainContractName: Object.keys(contractPolicyDescriptions_pistols)[0],
-    controllerConnector: (selectedChainId == DEFAULT_CHAIN_ID ? controllerConnector : undefined),
+    controllerConnector: (selectedNetworkId == DEFAULT_NETWORK_ID ? controllerConnector : undefined),
   }
 }

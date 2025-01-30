@@ -28,7 +28,7 @@
 
 * Environment variables
 
-`VITE_CHAIN_ID`: should contain a valid chain from [chains.ts](src/dojo/setup/chains.ts)
+`VITE_NETWORK_ID`: should contain a valid [NetworkId](/sdk/src/dojo/setup/chains.ts)
 
 
 ## Installation

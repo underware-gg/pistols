@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { usePistolsScene, usePistolsSceneFromRoute } from '/src/hooks/PistolsContext'
 import { useSetPageTitle } from '/src/hooks/useSetPageTitle'
-import { TUTORIAL_CHAIN_ID } from '@underware_gg/pistols-sdk/dojo'
+import { ACADEMY_NETWORK_ID } from '@underware_gg/pistols-sdk/dojo'
 import { useEffectOnce, usePlayerId } from '@underware_gg/pistols-sdk/utils'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
@@ -27,7 +27,7 @@ export default function TutorialPage() {
   useEffectOnce(() => console.log(`---------------- MAIN PAGE MOUNTED`), [])
 
   return (
-    <AppGame backgroundImage={null} chainId={TUTORIAL_CHAIN_ID} autoConnect>
+    <AppGame backgroundImage={null} networkId={ACADEMY_NETWORK_ID} autoConnect>
       <Background className={null}>
         <StoreSync />
         <GameContainer isVisible={true} />

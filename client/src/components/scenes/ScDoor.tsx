@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { VStack } from '/src/components/ui/Stack'
 import { useEffectOnce } from '@underware_gg/pistols-sdk/utils'
-import { useDojoStatus, useDojoSystemCalls, useSelectedChain, useConnectToSelectedChain } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoStatus, useDojoSystemCalls, useConnectToSelectedNetwork } from '@underware_gg/pistols-sdk/dojo'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useCanClaimWelcomePack } from '/src/hooks/usePistolsContractCalls'
@@ -178,9 +178,9 @@ export function ConnectButton({
 }: {
   onConnect?: Function
 }) {
-  const { isConnecting } = useSelectedChain()
+  const { isConnecting } = useAccount()
   const { isLoading, isError } = useDojoStatus()
-  const { connect } = useConnectToSelectedChain(() => {
+  const { connect } = useConnectToSelectedNetwork(() => {
     onConnect?.()
   })
 
@@ -223,7 +223,7 @@ export function ClaimDuelistsButton() {
 }
 
 export function ConnectStatus() {
-  const { isConnecting } = useSelectedChain()
+  const { isConnecting } = useAccount()
   const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()
 
   if (isConnecting) {

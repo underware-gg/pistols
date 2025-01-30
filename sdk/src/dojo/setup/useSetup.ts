@@ -3,9 +3,8 @@ import { init } from '@dojoengine/sdk'
 import { DojoProvider } from '@dojoengine/core'
 import { useAsyncMemo } from 'src/utils/hooks/useAsyncMemo'
 import { useMounted } from 'src/utils/hooks/useMounted'
-import { feltToString } from 'src/utils/misc/starknet'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
-import { DojoChainConfig } from 'src/dojo/setup/chains'
+import { DojoNetworkConfig } from 'src/dojo/setup/networks'
 import { useDeployedSystem } from 'src/dojo/hooks/useDojoSystem'
 import { createSystemCalls } from 'src/games/pistols/config/createSystemCalls'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
@@ -14,7 +13,7 @@ import * as models from 'src/games/pistols/generated/models.gen'
 export type SetupResult = ReturnType<typeof useSetup> | null
 export type Schema = typeof models.schema
 
-export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: DojoChainConfig) {
+export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: DojoNetworkConfig) {
 
   // avoid double effects
   const mounted = useMounted()
@@ -26,7 +25,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   // - object or true: when success
   //
 
-  const chainId = useMemo(() => (selectedChainConfig.chainId), [selectedChainConfig])
+  const chainId = useMemo(() => (selectedNetworkConfig.chainId), [selectedNetworkConfig])
 
   const manifest = useMemo(() => {
     return dojoAppConfig.manifest ?? null
@@ -44,11 +43,11 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   } = useAsyncMemo<DojoProvider>(async () => {
     if (!mounted) return undefined
     if (!manifest) return null
-    console.log(`DojoProvider...`, selectedChainConfig.rpcUrl)
-    const dojoProvider = new DojoProvider(manifest, selectedChainConfig.rpcUrl)
+    console.log(`DojoProvider...`, selectedNetworkConfig.rpcUrl)
+    const dojoProvider = new DojoProvider(manifest, selectedNetworkConfig.rpcUrl)
     console.log(`DojoProvider:`, dojoProvider)
     return dojoProvider
-  }, [mounted, selectedChainConfig, manifest], undefined, null)
+  }, [mounted, selectedNetworkConfig, manifest], undefined, null)
 
   //
   // Torii setup
@@ -60,13 +59,13 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     if (!dojoProvider) return undefined
     if (!starknetDomain) return undefined
     if (!manifest) return null
-    console.log(`TORII CLIENT...`, selectedChainConfig.toriiUrl)
+    console.log(`TORII CLIENT...`, selectedNetworkConfig.toriiUrl)
     const sdk = await init<Schema>(
       {
         client: {
-          rpcUrl: selectedChainConfig.rpcUrl,
-          toriiUrl: selectedChainConfig.toriiUrl,
-          relayUrl: selectedChainConfig.relayUrl ?? '',
+          rpcUrl: selectedNetworkConfig.rpcUrl,
+          toriiUrl: selectedNetworkConfig.toriiUrl,
+          relayUrl: selectedNetworkConfig.relayUrl ?? '',
           worldAddress: manifest.world.address ?? '',
         },
         domain: starknetDomain,
@@ -75,7 +74,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     );
     console.log(`TORII CLIENT OK!`)
     return sdk
-  }, [mounted, selectedChainConfig, manifest, starknetDomain, dojoProvider], undefined, null)
+  }, [mounted, selectedNetworkConfig, manifest, starknetDomain, dojoProvider], undefined, null)
 
   //
   // Check world deployment
@@ -98,8 +97,8 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     if (!manifest) return null
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
     if (!contractCalls) return (contractCalls as any) // undefined or null
-    return createSystemCalls(dojoProvider, manifest, contractCalls, selectedChainConfig, chainId) ?? null
-  }, [manifest, dojoProvider, contractCalls, selectedChainConfig, chainId])
+    return createSystemCalls(dojoProvider, manifest, contractCalls, selectedNetworkConfig) ?? null
+  }, [manifest, dojoProvider, contractCalls, selectedNetworkConfig, chainId])
 
   //
   // Status
@@ -134,7 +133,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     systemCalls,
     // pass thru
     dojoAppConfig,
-    selectedChainConfig,
+    selectedNetworkConfig,
     namespace: dojoAppConfig.namespace,
     manifest,
     starknetDomain,

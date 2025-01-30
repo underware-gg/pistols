@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useMemo } from 'react'
 import { StarknetDomain, TypedData } from 'starknet'
 import { Connector } from '@starknet-react/core'
-import { ChainId } from 'src/dojo/setup/chains'
+import { NetworkId } from 'src/dojo/setup/networks'
 import { Manifest } from '@dojoengine/core'
 import { StarknetProvider, useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { DojoProvider } from 'src/dojo/contexts/DojoContext'
@@ -27,12 +27,11 @@ export type SignedMessagePolicyDescriptions = {
 }[]
 
 export interface DojoAppConfig {
-  selectedChainId: ChainId
-  supportedChainIds: ChainId[]
+  selectedNetworkId: NetworkId
   namespace: string
-  starknetDomain: StarknetDomain
   manifest: DojoManifest,
   mainContractName: string
+  starknetDomain: StarknetDomain
   controllerConnector: Connector
 }
 
@@ -60,8 +59,8 @@ function SetupDojoProvider({
   children: ReactNode
 }) {
   // Connected wallet or Dojo Predeployed (master)
-  const { selectedChainConfig } = useStarknetContext()
-  const setupResult = useSetup(dojoAppConfig, selectedChainConfig)
+  const { selectedNetworkConfig } = useStarknetContext()
+  const setupResult = useSetup(dojoAppConfig, selectedNetworkConfig)
   const isInitialized = useMemo(() => Boolean(setupResult), [setupResult])
   useEffect(() => console.log(!isInitialized ? '---> DOJO setup...' : '---> DOJO initialized!'), [isInitialized])
   return (

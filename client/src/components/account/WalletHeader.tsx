@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { Grid, Image } from 'semantic-ui-react'
 import { _useConnector } from '@underware_gg/pistols-sdk/fix'
 import { useAccount, useDisconnect } from '@starknet-react/core'
-import { useLordsContract, useSelectedChain, useConnectedController, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
+import { useLordsContract, useStarknetContext, useConnectedController, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { usePlayer } from '/src/stores/playerStore'
 import { FameBalance, LordsBalance } from '/src/components/account/LordsBalance'
@@ -11,7 +11,6 @@ import { ActionButton } from '/src/components/ui/Buttons'
 import { AddressShort } from '/src/components/ui/AddressShort'
 import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import { SceneName } from '/src/data/assets'
-import { useSettings } from '/src/hooks/SettingsContext'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -20,7 +19,7 @@ export default function WalletHeader({
 }) {
   const { disconnect } = useDisconnect()
   const { account, address, isConnected } = useAccount()
-  const { connectedChainName } = useSelectedChain()
+  const { selectedNetworkConfig } = useStarknetContext()
   const { lordsContractAddress } = useLordsContract()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
@@ -31,7 +30,7 @@ export default function WalletHeader({
   // console.log(data)
   const data = { name: null, profilePicture: null }
 
-  const name = useMemo(() => (data?.name ?? `Connected to ${connectedChainName}`), [data])
+  const name = useMemo(() => (data?.name ?? `Connected to ${selectedNetworkConfig.name}`), [data])
   const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0, true)), [data, connector])
 
   const { openProfile } = useConnectedController()

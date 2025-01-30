@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { gql } from '@apollo/client'
-import { useSelectedChain } from 'src/dojo/hooks/useChain'
+import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { useGraphQLQuery } from 'src/utils/hooks/useGraphQL'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 
@@ -102,8 +102,8 @@ export type ERC_Tokens = {
 }
 
 function useToriiTokenBalancesQL(variables: any, enabled: boolean, watch: boolean) {
-  const { selectedChainConfig } = useSelectedChain()
-  const toriiUrl = useMemo(() => `${selectedChainConfig.toriiUrl}/graphql`, [selectedChainConfig.toriiUrl])
+  const { selectedNetworkConfig } = useStarknetContext()
+  const toriiUrl = useMemo(() => `${selectedNetworkConfig.toriiUrl}/graphql`, [selectedNetworkConfig.toriiUrl])
   const { data, isLoading, refetch } = useGraphQLQuery({
     toriiUrl,
     query: tokenBalances,

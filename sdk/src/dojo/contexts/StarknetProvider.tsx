@@ -1,16 +1,14 @@
-import React, { ReactNode, createContext, useCallback, useContext, useEffect, useMemo } from 'react'
-import { StarknetConfig, jsonRpcProvider, useInjectedConnectors } from '@starknet-react/core'
+import React, { ReactNode, createContext, useContext, useEffect, useMemo } from 'react'
 import { Chain } from '@starknet-react/chains'
+import { StarknetConfig, jsonRpcProvider } from '@starknet-react/core'
 import { useChainConnectors } from 'src/dojo/setup/connectors'
-import { getDojoChainConfig, getStarknetProviderChains, isChainIdSupported } from 'src/dojo/setup/chainConfig'
-import { ChainId, DojoChainConfig } from 'src/dojo/setup/chains'
+import { NetworkId, DojoNetworkConfig, dojoNetworkConfigs } from 'src/dojo/setup/networks'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
 
 
 interface StarknetContextType {
-  supportedChainIds: ChainId[],
-  selectedChainId: ChainId
-  selectedChainConfig: DojoChainConfig
+  selectedNetworkId: NetworkId
+  selectedNetworkConfig: DojoNetworkConfig
   chains: Chain[]
 }
 
@@ -27,15 +25,17 @@ export const StarknetProvider = ({
   if (currentValue) throw new Error('StarknetProvider can only be used once')
 
   // Initial state
-  const chains: Chain[] = useMemo(() => getStarknetProviderChains(dojoAppConfig.supportedChainIds), [dojoAppConfig])
+  const chains: Chain[] = useMemo(() => (
+    Object.values(dojoNetworkConfigs).map(networkConfig => networkConfig.chain)
+  ), [])
 
   // Current chain
-  const selectedChainId = useMemo(() => (dojoAppConfig.selectedChainId), [dojoAppConfig])
-  const selectedChainConfig = useMemo(() => getDojoChainConfig(selectedChainId), [selectedChainId])
-  useEffect(() => console.log(`Selected chain:`, selectedChainId, selectedChainConfig), [selectedChainId])
+  const selectedNetworkId = useMemo(() => (dojoAppConfig.selectedNetworkId), [dojoAppConfig])
+  const selectedNetworkConfig = useMemo(() => dojoNetworkConfigs[selectedNetworkId], [selectedNetworkId])
+  useEffect(() => console.log(`Selected network:`, selectedNetworkId, selectedNetworkConfig), [selectedNetworkId])
 
-  // Build chain connectors from selectedChainConfig
-  const chainConnectors = useChainConnectors(dojoAppConfig, selectedChainConfig);
+  // Build chain connectors from selectedNetworkConfig
+  const chainConnectors = useChainConnectors(dojoAppConfig, selectedNetworkConfig);
 
   // RPC
   function rpc(chain: Chain) {
@@ -49,15 +49,14 @@ export const StarknetProvider = ({
   return (
     <StarknetContext.Provider
       value={{
-        supportedChainIds: dojoAppConfig.supportedChainIds,
-        selectedChainId,
-        selectedChainConfig,
+        selectedNetworkId,
+        selectedNetworkConfig,
         chains,
       }}
     >
       <StarknetConfig
         chains={chains}
-        provider={() => provider(selectedChainConfig.chain)}
+        provider={() => provider(selectedNetworkConfig.chain)}
         connectors={chainConnectors}
         autoConnect={true}
       // explorer={explorer}

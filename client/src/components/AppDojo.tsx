@@ -1,24 +1,24 @@
 import React, { ReactNode, useMemo } from 'react'
 import { useConnect } from '@starknet-react/core'
-import { Dojo, ChainId } from '@underware_gg/pistols-sdk/dojo'
+import { useEffectOnce } from '@underware_gg/pistols-sdk/utils'
+import { Dojo, NetworkId } from '@underware_gg/pistols-sdk/dojo'
 import { makeDojoAppConfig } from '@underware_gg/pistols-sdk/pistols'
 import App from '/src/components/App'
-import { useEffectOnce } from '@underware_gg/pistols-sdk/utils'
 
 export interface AppDojoProps {
   backgroundImage?: string
-  chainId?: ChainId
+  networkId?: NetworkId
   autoConnect?: boolean
   children: ReactNode
 }
 
 export default function AppDojo({
   backgroundImage,
-  chainId,
+  networkId,
   autoConnect,
   children
 }: AppDojoProps) {
-  const dojoAppConfig = useMemo(() => makeDojoAppConfig(chainId), [chainId])
+  const dojoAppConfig = useMemo(() => makeDojoAppConfig(networkId), [networkId])
   return (
     <App backgroundImage={backgroundImage}>
       <Dojo dojoAppConfig={dojoAppConfig}>

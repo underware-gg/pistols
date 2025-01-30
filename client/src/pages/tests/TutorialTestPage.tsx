@@ -6,7 +6,7 @@ import { CreateTutorialChallengeButton, OpenTutorialChallengeButton } from '/src
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
-import { TUTORIAL_CHAIN_ID } from '@underware_gg/pistols-sdk/dojo'
+import { ACADEMY_NETWORK_ID } from '@underware_gg/pistols-sdk/dojo'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
@@ -17,12 +17,10 @@ import AppDojo from '/src/components/AppDojo'
 const Row = Table.Row
 const Cell = Table.Cell
 const Body = Table.Body
-const Header = Table.Header
-const HeaderCell = Table.HeaderCell
 
 export default function TutorialTestPage() {
   return (
-    <AppDojo chainId={TUTORIAL_CHAIN_ID} autoConnect>
+    <AppDojo networkId={ACADEMY_NETWORK_ID} autoConnect>
       <Container>
         <TestPageMenu />
         <CurrentChainHint />
