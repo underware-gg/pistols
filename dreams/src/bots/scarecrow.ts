@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 
 // based on 
 // https://github.com/daydreamsai/daydreams/blob/f558745f1a6ff9f1e7fafcc6c1af7141a4932b65/examples/example-basic.ts
@@ -20,15 +20,11 @@ import {
   Chains,
   Types,
 } from "@daydreamsai/core";
-import { PISTOLS_CONTEXT, PROVIDER_GUIDE } from "../context/pistols-context";
+import { PISTOLS_CONTEXT, PROVIDER_GUIDE } from "../context/pistols";
+import { env } from "./env";
 import { z } from "zod";
 import chalk from "chalk";
 import * as readline from "readline";
-
-const STARKNET_RPC_URL = process.env.STARKNET_RPC_URL || "http://127.0.0.1:5050";
-const STARKNET_ADDRESS = process.env.STARKNET_ADDRESS || "0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819";
-const STARKNET_PRIVATE_KEY = process.env.STARKNET_PRIVATE_KEY || "0x3e3979c1ed728490308054fe357a9f49cf67f80f9721f44cc57235129e090f4";
-const GRAPHQL_URL = process.env.GRAPHQL_URL || "http://0.0.0.0:8080/graphql";
 
 /**
  * Helper function to get user input from CLI
@@ -59,9 +55,9 @@ async function main() {
   await memory.purge(); // Clear previous session data
 
   const starknetChain = new Chains.StarknetChain({
-    rpcUrl: STARKNET_RPC_URL,
-    address: STARKNET_ADDRESS,
-    privateKey: STARKNET_PRIVATE_KEY,
+    rpcUrl: env.STARKNET_RPC_URL,
+    address: env.STARKNET_ADDRESS,
+    privateKey: env.STARKNET_PRIVATE_KEY,
   });
 
   // Load initial context documents
@@ -126,7 +122,7 @@ async function main() {
     execute: async (data: any) => {
       const { query, variables } = data.payload ?? {};
       const result = await Providers.fetchGraphQL(
-        GRAPHQL_URL + "/graphql",
+        env.GRAPHQL_URL + "/graphql",
         query,
         variables
       );

@@ -23,11 +23,11 @@
   "dependencies": {
     "@daydreamsai/core": "catalog:",
     "chalk": "^5.4.1",
+    "dotenv": "^16.4.7",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
-    "ts-node": "^10.9.2",
     "tsup": "^8.3.5",
     "typescript": "catalog:"
   },

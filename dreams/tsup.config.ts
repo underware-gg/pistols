@@ -2,8 +2,7 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
   entry: [
-    "src/hello.ts",
-    "src/bots/",
+    "src/",
   ],
   format: ["esm"],
   clean: true,
