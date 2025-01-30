@@ -143,3 +143,6 @@ Scarb.lock
 # Turbo
 .turbo
 .vercel
+
+# Pistols
+.chroma

@@ -6,6 +6,13 @@
 
 * Get an **OpenRouter** [API Key](https://openrouter.ai/settings/keys) and setup yout [integrations](https://openrouter.ai/settings/integrations).
 
+* [Install](https://docs.trychroma.com/docs/overview/getting-started) and [start](https://docs.trychroma.com/docs/run-chroma/client-server?lang=typescript) **ChromaDB**, or setup [Chroma Cloud](https://trychroma.com/signup)
+
+```bash
+pip install chromadb
+pnpm run chromadb
+```
+
 * Edit `.env`
 
 ```bash
