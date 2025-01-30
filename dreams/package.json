@@ -8,10 +8,11 @@
   "private": false,
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
+    "scarecrow": "./dist/bots/scarecrow.js",
     "hello": "./dist/hello.js"
   },
   "main": "dist/index.js",
@@ -20,12 +21,14 @@
   ],
   "keywords": [],
   "dependencies": {
-    "@daydreamsai/core": "^0.0.3",
-    "chalk": "^5.4.1"
+    "@daydreamsai/core": "catalog:",
+    "chalk": "^5.4.1",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
     "ts-node": "^10.9.2",
+    "tsup": "^8.3.5",
     "typescript": "catalog:"
   },
   "engines": {
