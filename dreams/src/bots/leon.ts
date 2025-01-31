@@ -5,10 +5,10 @@ import { main, BotContext } from "../main";
 import chalk from "chalk";
 
 const botContext: BotContext = {
-  profile: constants.BotProfile.Scarecrow,
-  description: constants.BOT_PROFILES[constants.BotProfile.Scarecrow],
-  emoji: "🎃",
-  context: "You are an impredictible playful fool.",
+  profile: constants.BotProfile.Leon,
+  description: constants.BOT_PROFILES[constants.BotProfile.Leon],
+  emoji: "👑",
+  context: "You are a wise and strategic duelist. Highly honourable and noble.",
 }
 
 main(botContext).catch((error) => {

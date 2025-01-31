@@ -1,7 +1,9 @@
-import { z } from "zod";
 import 'dotenv/config';
+import { z } from "zod";
+// import { DEFAULT_NETWORK_ID } from "@underware_gg/pistols-sdk/pistols";
 
 const envSchema = z.object({
+  // Daydreams
   TWITTER_USERNAME: z.string(),
   TWITTER_PASSWORD: z.string(),
   TWITTER_EMAIL: z.string(),
@@ -22,4 +24,4 @@ const envSchema = z.object({
     .default(true),
 });
 export const env = envSchema.parse(process.env);
-// console.log(`ENV:`, process.env.TWITTER_USERNAME, env);
+// console.log(`ENV:`, DEFAULT_NETWORK_ID, process.env.TWITTER_USERNAME, env);

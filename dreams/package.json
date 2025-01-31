@@ -16,7 +16,9 @@
   "bin": {
     "chromadb": "./dist/misc/chromadb.js",
     "scarecrow": "./dist/bots/scarecrow.js",
-    "hello": "./dist/hello.js"
+    "tinman": "./dist/bots/tinman.js",
+    "leon": "./dist/bots/leon.js",
+    "hello": "./dist/bots/hello.js"
   },
   "main": "dist/index.js",
   "files": [
@@ -25,6 +27,7 @@
   "keywords": [],
   "dependencies": {
     "@daydreamsai/core": "catalog:",
+    "@underware_gg/pistols-sdk": "workspace:*",
     "chalk": "^5.4.1",
     "dotenv": "^16.4.7",
     "zod": "^3.24.1"

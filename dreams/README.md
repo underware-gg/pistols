@@ -1,6 +1,6 @@
 # Pistols at Dawn Daydreams Agents
 
-## Usage
+## Setup and Usage
 
 * Get your preferred LLM provider API Key, from [OpenAI](https://openai.com/index/openai-api/), [DeepSeek](https://api-docs.deepseek.com/) or wherever.
 
@@ -9,18 +9,22 @@
 * [Install](https://docs.trychroma.com/docs/overview/getting-started) and [start](https://docs.trychroma.com/docs/run-chroma/client-server?lang=typescript) **ChromaDB**, or setup [Chroma Cloud](https://trychroma.com/signup)
 
 ```bash
+# install (once, needs Python)
 pip install chromadb
+# start the server
 pnpm run chromadb
 ```
 
-* Edit `.env`
+* Environment variables
 
 ```bash
+# create template .env file
 cp .env.example .env
 ```
 
 | Variable                 | Defaults                     |
 |--------------------------|------------------------------|
+| DEFAULT_NETWORK_ID       | <[NetworkId](/sdk/src/dojo/setup/networks.ts)> |
 | OPENROUTER_API_KEY       | <required>                   |
 | GRAPHQL_URL              | http://0.0.0.0:8080/graphql  |
 | STARKNET_RPC_URL         | http://127.0.0.1:5050        |
@@ -34,6 +38,7 @@ cp .env.example .env
 cd dreams
 pnpm install
 pnpm build
+# test build
 npx hello
 ```
 
@@ -41,4 +46,6 @@ npx hello
 
 ```bash
 npx scarecrow
+npx tinman
+npx leon
 ```
