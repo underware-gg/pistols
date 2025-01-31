@@ -103,9 +103,8 @@ export type ERC_Tokens = {
 
 function useToriiTokenBalancesQL(variables: any, enabled: boolean, watch: boolean) {
   const { selectedNetworkConfig } = useStarknetContext()
-  const toriiUrl = useMemo(() => `${selectedNetworkConfig.toriiUrl}/graphql`, [selectedNetworkConfig.toriiUrl])
   const { data, isLoading, refetch } = useGraphQLQuery({
-    toriiUrl,
+    graphqlUrl: selectedNetworkConfig.graphqlUrl,
     query: tokenBalances,
     variables,
     enabled,

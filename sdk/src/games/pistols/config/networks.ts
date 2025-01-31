@@ -72,6 +72,7 @@ export type DojoNetworkConfig = {
   name: string
   rpcUrl: string
   toriiUrl: string
+  graphqlUrl: string
   relayUrl: string
   masterAddress: string,
   masterPrivateKey: string
@@ -97,6 +98,7 @@ export const envNetworkConfig: DojoNetworkConfig = {
   name: undefined,
   rpcUrl: ENV.NODE_URL,
   toriiUrl: ENV.TORII,
+  graphqlUrl: (ENV.TORII ? `${ENV.TORII}/graphql` : undefined),
   relayUrl: ENV.RELAY_URL,
   masterAddress: ENV.MASTER_ADDRESS,
   masterPrivateKey: ENV.MASTER_PRIVATE_KEY,
@@ -121,6 +123,7 @@ const localKatanaConfig: DojoNetworkConfig = {
   // toriiUrl: LOCAL_TORII,
   // toriiUrl: 'http://127.0.0.1:8080',
   toriiUrl: 'http://0.0.0.0:8080',
+  graphqlUrl: 'http://0.0.0.0:8080/graphql',
   relayUrl: '/ip4/127.0.0.1/tcp/9090',
   // relayUrl: '/ip4/127.0.0.1/tcp/9090/tcp/80',
   // masterAddress: KATANA_PREFUNDED_ADDRESS,
@@ -208,6 +211,7 @@ const academySlotConfig: DojoNetworkConfig = {
   name: 'Katana Academy',
   rpcUrl: 'https://api.cartridge.gg/x/pistols-katana/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-katana/torii',
+  graphqlUrl: 'https://api.cartridge.gg/x/pistols-katana/torii/graphql',
   relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-katana%2Ftorii%2Fwss',
   masterAddress: undefined,
   masterPrivateKey: undefined,
@@ -227,6 +231,12 @@ const academySlotConfig: DojoNetworkConfig = {
       name: 'Katana 2',
       address: '0x17cc6ca902ed4e8baa8463a7009ff18cc294fa85a94b4ce6ac30a9ebd6057c7',
       privateKey: '0x14d6672dcb4b77ca36a887e9a11cd9d637d5012468175829e9c6e770c61642',
+      active: true,
+    },
+    {
+      name: 'Local Katana 9',
+      address: '0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819',
+      privateKey: '0x3e3979c1ed728490308054fe357a9f49cf67f80f9721f44cc57235129e090f4',
       active: true,
     },
   ],
@@ -253,6 +263,7 @@ const snSepoliaConfig: DojoNetworkConfig = {
   // rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii',
+  graphqlUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii/graphql',
   relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-sepolia%2Ftorii%2Fwss',
   masterAddress: undefined,
   masterPrivateKey: undefined,
@@ -277,6 +288,7 @@ const pistolsStagingConfig: DojoNetworkConfig = {
   // rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-staging/torii',
+  graphqlUrl: 'https://api.cartridge.gg/x/pistols-staging/torii/graphql',
   relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-staging%2Ftorii%2Fwss',
   masterAddress: undefined,
   masterPrivateKey: undefined,
@@ -300,6 +312,7 @@ const snMainnetConfig: DojoNetworkConfig = {
   // rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/mainnet',
   toriiUrl: undefined,
+  graphqlUrl: undefined,
   relayUrl: undefined,
   masterAddress: undefined,
   masterPrivateKey: undefined,

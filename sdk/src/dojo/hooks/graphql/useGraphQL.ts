@@ -29,23 +29,21 @@ export const ql_client = (GQLUrl: string) => {
 type Variables = Record<string, string | number | number[] | boolean | null | undefined | Date>;
 
 export const useGraphQLQuery = ({
-  toriiUrl,
+  graphqlUrl,
   query,
   variables,
   enabled = true,
   watch = false,
   pollInterval = 1000,
 }: {
-  toriiUrl: string,
+  graphqlUrl: string,
   query: any,
   variables: Variables,
   enabled?: boolean,
   watch?: boolean,
   pollInterval?: number,
 }) => {
-  const client = useMemo(() => {
-    return ql_client(toriiUrl);
-  }, [toriiUrl]);
+  const client = useMemo(() => ql_client(graphqlUrl), [graphqlUrl]);
   const { data, loading: isLoading, refetch } = useQuery(query, {
     client,
     variables,
