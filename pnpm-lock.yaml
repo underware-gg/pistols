@@ -213,6 +213,9 @@ importers:
       '@daydreamsai/core':
         specifier: 'catalog:'
         version: link:../../daydreams/packages/core
+      '@dojoengine/core':
+        specifier: 'catalog:'
+        version: 1.0.12(bufferutil@4.0.9)(typescript@5.7.2)(utf-8-validate@5.0.10)
       '@underware_gg/pistols-sdk':
         specifier: workspace:*
         version: link:../sdk

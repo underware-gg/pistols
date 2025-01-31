@@ -26,6 +26,7 @@
   ],
   "keywords": [],
   "dependencies": {
+    "@dojoengine/core": "catalog:",
     "@daydreamsai/core": "catalog:",
     "@underware_gg/pistols-sdk": "workspace:*",
     "chalk": "^5.4.1",
