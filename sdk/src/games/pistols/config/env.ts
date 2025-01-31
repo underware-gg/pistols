@@ -3,7 +3,12 @@
 // import { loadEnv } from 'vite'
 // const env = loadEnv(mode, process.cwd(), '')
 
-const _env = (name: string) => (import.meta.env?.[name] || process.env?.[name] || undefined);
+const _env = (name: string) => (
+  // vite
+  import.meta.env ? import.meta.env[name]
+    // node
+    : process.env?.[name]
+);
 
 // required
 export const DEFAULT_NETWORK_ID = _env('VITE_NETWORK_ID') || _env('DEFAULT_NETWORK_ID') || 'MAINNET';
