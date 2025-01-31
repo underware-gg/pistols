@@ -57,6 +57,10 @@
       "import": "./dist/pistols_gen.js",
       "types": "./dist/pistols_gen.d.ts"
     },
+    "./pistols/controller": {
+      "import": "./dist/pistols_controller.js",
+      "types": "./dist/pistols_controller.d.ts"
+    },
     "./utils": {
       "import": "./dist/utils.js",
       "types": "./dist/utils.d.ts"

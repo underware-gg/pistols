@@ -4,6 +4,7 @@
 
 * `@underware_gg/pistols-sdk/pistols`: Pistols config and utils
 * `@underware_gg/pistols-sdk/pistols/gen`: Pistols generated code
+* `@underware_gg/pistols-sdk/pistols/controller`: Controller connector instance
 * `@underware_gg/pistols-sdk/dojo`: Dojo utils and hooks
 * `@underware_gg/pistols-sdk/dojo/graphql`: Dojo GraphQL utils and hooks
 * `@underware_gg/pistols-sdk/utils`: Misc and Starknet utils

@@ -84,12 +84,12 @@ const exclusions = [
 export const makeControllerPolicies = (
   namespace: string,
   manifest: DojoManifest,
-  contractPolicyDescriptions: ContractPolicyDescriptions,
-  signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions,
+  policyDescriptions: ContractPolicyDescriptions,
+  messageDescriptions: SignedMessagePolicyDescriptions,
 ): SessionPolicies => {
   const policies: SessionPolicies = {
-    contracts: _makeControllerContractPolicies(manifest, namespace, contractPolicyDescriptions),
-    messages: _makeControllerSignMessagePolicies(signedMessagePolicyDescriptions),
+    contracts: _makeControllerContractPolicies(manifest, namespace, policyDescriptions),
+    messages: _makeControllerSignMessagePolicies(messageDescriptions),
   }
   return policies
 }
@@ -97,11 +97,11 @@ export const makeControllerPolicies = (
 const _makeControllerContractPolicies = (
   manifest: DojoManifest,
   namespace: string,
-  descriptions: ContractPolicyDescriptions,
+  policyDescriptions: ContractPolicyDescriptions,
 ): ContractPolicies => {
   const contracts: ContractPolicies = {};
-  Object.keys(descriptions).forEach((name) => {
-    const desc = descriptions[name]
+  Object.keys(policyDescriptions).forEach((name) => {
+    const desc = policyDescriptions[name]
     const c = getContractByName(manifest, namespace, name)
     let methods: Method[] = []
     // --- abis
@@ -176,10 +176,10 @@ export const generateTypedData = <T extends SchemaType, M extends UnionOfModelDa
 
 
 const _makeControllerSignMessagePolicies = (
-  descriptions: SignedMessagePolicyDescriptions,
+  messageDescriptions: SignedMessagePolicyDescriptions,
 ): SignMessagePolicy[] => {
   const messages: SignMessagePolicy[] = [];
-  descriptions.forEach(desc => {
+  messageDescriptions.forEach(desc => {
     const msg: SignMessagePolicy = {
       types: {
         ...desc.typedData.types

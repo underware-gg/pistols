@@ -1,9 +1,9 @@
 import { StarknetDomain } from 'starknet'
 import { getContractByName } from '@dojoengine/core'
-import type { SessionPolicies, Tokens } from '@cartridge/controller'
+import type { SessionPolicies } from '@cartridge/controller'
 import type { DojoAppConfig, DojoManifest, ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
 import { NetworkId, pistolsNetworkConfigs, DEFAULT_NETWORK_ID } from 'src/games/pistols/config/networks'
-import { makeControllerConnector, makeControllerPolicies } from 'src/dojo/setup/controller'
+import { makeControllerPolicies } from 'src/dojo/setup/controller'
 import {
   make_typed_data_PlayerBookmark,
   make_typed_data_PlayerOnline,
@@ -14,6 +14,7 @@ import pistols_manifest_academy from '../manifests/manifest_academy.json'
 import pistols_manifest_staging from '../manifests/manifest_staging.json'
 import pistols_manifest_sepolia from '../manifests/manifest_sepolia.json'
 import pistols_manifest_mainnet from '../manifests/manifest_mainnet.json'
+import { Connector } from '@starknet-react/core'
 
 // TODO: move this here!
 // import { defineContractComponents } from './generated/contractComponents'
@@ -73,7 +74,28 @@ const contractPolicyDescriptions_admin: ContractPolicyDescriptions = {
     interfaces: ['IAdmin'],
   },
 }
+
 export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: boolean): SessionPolicies => {
+  const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
+    {
+      description: 'Notify the server that a player is online',
+      typedData: make_typed_data_PlayerOnline({
+        networkId: networkId,
+        identity: '0x0',
+        timestamp: 0,
+      }),
+    },
+    {
+      description: 'Notify the server that a player follows another player or token',
+      typedData: make_typed_data_PlayerBookmark({
+        networkId: networkId,
+        identity: '0x0',
+        target_address: '0x0',
+        target_id: '0x0',
+        enabled: false,
+      })
+    },
+  ]
   return makeControllerPolicies(
     NAMESPACE,
     manifests[networkId],
@@ -107,75 +129,16 @@ export const getPackTokenAddress = (networkId: NetworkId): string => (getContrac
 export const getBankAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'bank')?.address ?? '0x0')
 
 
-//------------------------------------------
-// config Controller for default network only!
-//
-if (!pistolsNetworkConfigs[DEFAULT_NETWORK_ID]) {
-  throw new Error(`Network config not found for DEFAULT_NETWORK_ID: [${DEFAULT_NETWORK_ID}]`)
-}
-// tokens to display
-const tokens: Tokens = {
-  erc20: [
-    getLordsAddress(DEFAULT_NETWORK_ID),
-    getFameAddress(DEFAULT_NETWORK_ID),
-    // getFoolsAddress(DEFAULT_NETWORK_ID),
-  ],
-  //@ts-ignore
-  erc721: [
-    getDuelistTokenAddress(DEFAULT_NETWORK_ID),
-    getDuelTokenAddress(DEFAULT_NETWORK_ID),
-    getDuelTokenAddress(DEFAULT_NETWORK_ID),
-  ],
-}
-//
-// Signed messages
-const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
-  {
-    description: 'Notify the server that a player is online',
-    typedData: make_typed_data_PlayerOnline({
-      networkId: DEFAULT_NETWORK_ID,
-      identity: '0x0',
-      timestamp: 0,
-    }),
-  },
-  {
-    description: 'Notify the server that a player follows another player or token',
-    typedData: make_typed_data_PlayerBookmark({
-      networkId: DEFAULT_NETWORK_ID,
-      identity: '0x0',
-      target_address: '0x0',
-      target_id: '0x0',
-      enabled: false,
-    })
-  },
-]
-//
-// controller connector
-const policies = (DEFAULT_NETWORK_ID === NetworkId.MAINNET ? undefined
-  : makePistolsPolicies(DEFAULT_NETWORK_ID, !Boolean(pistolsNetworkConfigs[DEFAULT_NETWORK_ID].lordsAddress), false)
-)
-const controllerConnector = makeControllerConnector(
-  'pistols', // theme
-  NAMESPACE,
-  pistolsNetworkConfigs[DEFAULT_NETWORK_ID].chainId,
-  pistolsNetworkConfigs[DEFAULT_NETWORK_ID].rpcUrl,
-  pistolsNetworkConfigs[DEFAULT_NETWORK_ID].toriiUrl,
-  policies,
-  tokens,
-);
-//
-// END: Controller config
-//--------------------------------
 
-
-export const makeDojoAppConfig = (networkId?: NetworkId): DojoAppConfig => {
-  const selectedNetworkId = networkId ?? DEFAULT_NETWORK_ID
+export const makeDojoAppConfig = (networkId: NetworkId | undefined, controllerConnector: Connector | undefined): DojoAppConfig => {
+  const selectedNetworkId = networkId || DEFAULT_NETWORK_ID
   return {
     selectedNetworkId,
     namespace: NAMESPACE,
     starknetDomain: makeStarknetDomain(selectedNetworkId),
     manifest: manifests[selectedNetworkId],
     mainContractName: Object.keys(contractPolicyDescriptions_pistols)[0],
+    // constroller connector is built for DEFAULT_NETWORK_ID only
     controllerConnector: (selectedNetworkId == DEFAULT_NETWORK_ID ? controllerConnector : undefined),
   }
 }
