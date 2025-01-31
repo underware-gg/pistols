@@ -37,6 +37,10 @@
       "import": "./dist/dojo.js",
       "types": "./dist/dojo.d.ts"
     },
+    "./dojo/graphql": {
+      "import": "./dist/dojo_graphql.js",
+      "types": "./dist/dojo_graphql.d.ts"
+    },
     "./fix": {
       "import": "./dist/fix.js",
       "types": "./dist/fix.d.ts"

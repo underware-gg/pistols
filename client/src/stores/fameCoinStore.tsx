@@ -1,7 +1,7 @@
 import { useMemo, useEffect } from 'react'
 import { create } from 'zustand'
 import { BigNumberish } from 'starknet'
-import { useToriiBalancesByContractQL } from '@underware_gg/pistols-sdk/dojo'
+import { useToriiBalancesByContractQL } from '@underware_gg/pistols-sdk/dojo/graphql'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { useFameContract } from '/src/hooks/useFame'
 

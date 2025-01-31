@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { gql } from '@apollo/client'
 import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
-import { useGraphQLQuery } from 'src/utils/hooks/useGraphQL'
+import { useGraphQLQuery } from 'src/dojo/hooks/graphql/useGraphQL'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 
 

@@ -14,7 +14,6 @@ export * from '../dojo/hooks/useSdkCallPromise'
 export * from '../dojo/hooks/useSdkEntities'
 export * from '../dojo/hooks/useSdkSignedMessage'
 export * from '../dojo/hooks/useSdkState'
-export * from '../dojo/hooks/useToriiTokensQL'
 
 export * from '../dojo/setup/connectors'
 export * from '../dojo/setup/controller'

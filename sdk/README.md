@@ -2,29 +2,32 @@
 
 ### Packages
 
-* `@underware_gg/pistols-sdk/pistols`: Pistols related code
+* `@underware_gg/pistols-sdk/pistols`: Pistols config and utils
+* `@underware_gg/pistols-sdk/pistols/gen`: Pistols generated code
 * `@underware_gg/pistols-sdk/dojo`: Dojo utils and hooks
-* `@underware_gg/pistols-sdk/utils`: Misc and Starknet utils and hooks
+* `@underware_gg/pistols-sdk/dojo/graphql`: Dojo GraphQL utils and hooks
+* `@underware_gg/pistols-sdk/utils`: Misc and Starknet utils
+* `@underware_gg/pistols-sdk/utils/hooks`: Misc and Starknet utility hooks
 * `@underware_gg/pistols-sdk/abis`: Misc Starknet ABIs
 * `@underware_gg/pistols-sdk/fix`: Temporary fixes for dependencies
 
 
 ## Dependencies
 
-|                          | `/utils` | `/abis`  | `/dojo` | `/pistols` |
-|--------------------------|:--------:|:--------:|:-------:|:----------:|
-| `starknet`               | ✅       | ✅        | ✅      |  ✅      |
-| `starknetid.js`          | ✅       |           |        |          |
-| `get-starknet-core`      | ✅       |           | ✅      |          |
-| `react`                  | ✅       |           | ✅      |          |
-| `@starknet-react/core`   | ✅       |           | ✅      |          |
-| `@starknet-react/chains` |          |           | ✅      |          |
-| `@apollo/client`         | ✅       |           | ✅      |          |
-| `@cartridge/controller`  |          |           | ✅      | ✅       |
-| `@cartridge/connector`   |          |           | ✅      |          |
-| `@dojoengine/core`       |          |           | ✅      | ✅       |
-| `@dojoengine/sdk`        |          |           | ✅      | ✅       |
-| `@dojoengine/utils`      | ✅       |           |         |          |
+|                          | `/utils` | `/abis`  | `/dojo` | `/dojo/graphql` | `/pistols` |
+|--------------------------|:--------:|:--------:|:-------:|:---------------:|:----------:|
+| `starknet`               | ✅       | ✅        | ✅      | ✅             |  ✅        |
+| `starknetid.js`          | ✅       |           |         |                |            |
+| `get-starknet-core`      | ✅       |           | ✅      |                |            |
+| `react`                  | ✅       |           | ✅      | ✅             |            |
+| `@starknet-react/core`   | ✅       |           | ✅      | ✅             |            |
+| `@starknet-react/chains` |          |           | ✅      |                |            |
+| `@cartridge/controller`  |          |           | ✅      |                | ✅         |
+| `@cartridge/connector`   |          |           | ✅      |                |            |
+| `@dojoengine/core`       |          |           | ✅      |                | ✅         |
+| `@dojoengine/sdk`        |          |           | ✅      |                | ✅         |
+| `@dojoengine/utils`      | ✅       |           |         |                |            |
+| `@apollo/client`         |          |           |         | ✅             |            |
 
 * Environment variables
 
