@@ -1,19 +1,23 @@
 import 'dotenv/config';
 import { z } from "zod";
-// import { DEFAULT_NETWORK_ID } from "@underware_gg/pistols-sdk/pistols";
+import { DEFAULT_NETWORK_ID, pistolsNetworkConfigs } from "@underware_gg/pistols-sdk/pistols";
+import chalk from "chalk";
+
+const networkConfig = pistolsNetworkConfigs[DEFAULT_NETWORK_ID];
+const account = networkConfig.predeployedAccounts.at(-1);
 
 const envSchema = z.object({
-  // Daydreams
+  CHROMA_URL: z.string().transform(v => v || "http://localhost:8000"),
+  STARKNET_RPC_URL: z.string().transform(v => v || networkConfig.rpcUrl),
+  STARKNET_ADDRESS: z.string().transform(v => v || account?.address || '0x0'),
+  STARKNET_PRIVATE_KEY: z.string().transform(v => v || account?.privateKey || '0x0'),
+  GRAPHQL_URL: z.string().transform(v => v || networkConfig.graphqlUrl),
+  //
   TWITTER_USERNAME: z.string(),
   TWITTER_PASSWORD: z.string(),
   TWITTER_EMAIL: z.string(),
   OPENAI_API_KEY: z.string(),
-  CHROMA_URL: z.string().default("http://localhost:8000"),
-  STARKNET_RPC_URL: z.string().default("http://127.0.0.1:5050"),
-  STARKNET_ADDRESS: z.string().default("0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819"),
-  STARKNET_PRIVATE_KEY: z.string().default("0x3e3979c1ed728490308054fe357a9f49cf67f80f9721f44cc57235129e090f4"),
   OPENROUTER_API_KEY: z.string(),
-  GRAPHQL_URL: z.string().default("http://0.0.0.0:8080/graphql"),
   DISCORD_TOKEN: z.string(),
   HYPERLIQUID_MAIN_ADDRESS: z.string(),
   HYPERLIQUID_WALLET_ADDRESS: z.string(),
@@ -24,4 +28,10 @@ const envSchema = z.object({
     .default(true),
 });
 export const env = envSchema.parse(process.env);
-// console.log(`ENV:`, DEFAULT_NETWORK_ID, process.env.TWITTER_USERNAME, env);
+console.log(`DEFAULT_NETWORK_ID:`, chalk.cyan(DEFAULT_NETWORK_ID));
+console.log(`env.STARKNET_RPC_URL:`, chalk.green(env.STARKNET_RPC_URL));
+console.log(`env.STARKNET_ADDRESS:`, chalk.green(env.STARKNET_ADDRESS));
+console.log(`env.STARKNET_PRIVATE_KEY:`, chalk.green(env.STARKNET_PRIVATE_KEY ? 'Yes': 'No'));
+console.log(`env.GRAPHQL_URL:`, chalk.green(env.GRAPHQL_URL));
+console.log(`env.CHROMA_URL:`, chalk.green(env.CHROMA_URL));
+// console.log(`env:`, process.env.TWITTER_USERNAME, env);
