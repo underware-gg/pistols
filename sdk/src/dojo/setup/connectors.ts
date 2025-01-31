@@ -6,7 +6,7 @@ import {
 } from '@starknet-react/core'
 import { usePredeployedConnector } from 'src/utils/hooks/usePredeployedConnector'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
-import { DojoNetworkConfig } from 'src/dojo/setup/networks'
+import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
 import { PREDEPLOYED_ID } from 'src/utils/misc/predeployed'
 
 export const supportedConnetorIds = {

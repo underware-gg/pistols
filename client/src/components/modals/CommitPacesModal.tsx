@@ -8,7 +8,7 @@ import { CommitMoveMessage, signAndGenerateMovesHash } from '/src/utils/salt'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { Card, CardHandle } from '/src/components/cards/Cards'
 import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '/src/data/cardAssets'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { emitter } from '/src/three/game'
 
 const Row = Grid.Row

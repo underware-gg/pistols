@@ -4,7 +4,7 @@ import { arrayClean, shortAddress, isPositiveBigint } from 'src/utils/misc/types
 import { NAMESPACE, getLordsAddress, getBankAddress } from 'src/games/pistols/config/config'
 import { stringToFelt, bigintToU256 } from 'src/utils/misc/starknet'
 import { makeCustomEnum } from 'src/utils/misc/starknet_enum'
-import { DojoNetworkConfig } from 'src/dojo/setup/networks'
+import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
 import { DojoManifest } from 'src/dojo/contexts/Dojo'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import { emitter } from 'src/dojo/hooks/useDojoEmitterEvent'

@@ -2,7 +2,8 @@ import { useMemo, useEffect } from 'react'
 import { BigNumberish } from 'starknet'
 import { isPositiveBigint, bigintToU256, stringToFelt, bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { useSdkState, getEntityMapModels, formatQueryValue } from '@underware_gg/pistols-sdk/dojo'
-import { PistolsGetQuery, PistolsSubQuery, models } from '@underware_gg/pistols-sdk/pistols'
+import { PistolsGetQuery, PistolsSubQuery } from '@underware_gg/pistols-sdk/pistols'
+import { models } from '@underware_gg/pistols-sdk/pistols/gen'
 
 
 // IMPORTANT!!!

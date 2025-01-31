@@ -1,8 +1,8 @@
 import { StarknetDomain } from 'starknet'
-import { SessionPolicies, Tokens } from '@cartridge/controller'
 import { getContractByName } from '@dojoengine/core'
-import { DojoAppConfig, DojoManifest, ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
-import { NetworkId, dojoNetworkConfigs, DEFAULT_NETWORK_ID } from 'src/dojo/setup/networks'
+import type { SessionPolicies, Tokens } from '@cartridge/controller'
+import type { DojoAppConfig, DojoManifest, ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
+import { NetworkId, pistolsNetworkConfigs, DEFAULT_NETWORK_ID } from 'src/games/pistols/config/networks'
 import { makeControllerConnector, makeControllerPolicies } from 'src/dojo/setup/controller'
 import {
   make_typed_data_PlayerBookmark,
@@ -90,13 +90,13 @@ export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: 
 export const makeStarknetDomain = (networkId: NetworkId): StarknetDomain => ({
   name: constants.TYPED_DATA.NAME,
   version: constants.TYPED_DATA.VERSION,
-  chainId: dojoNetworkConfigs[networkId].chainId,
+  chainId: pistolsNetworkConfigs[networkId].chainId,
   revision: '1',
 })
 
 // contract addresses
 // erc-20
-export const getLordsAddress = (networkId: NetworkId): string => (dojoNetworkConfigs[networkId].lordsAddress || (getContractByName(manifests[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
+export const getLordsAddress = (networkId: NetworkId): string => (pistolsNetworkConfigs[networkId].lordsAddress || (getContractByName(manifests[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
 export const getFameAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fame_coin')?.address ?? '0x0')
 // export const getFoolsAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
 // erc-721
@@ -110,7 +110,7 @@ export const getBankAddress = (networkId: NetworkId): string => (getContractByNa
 //------------------------------------------
 // config Controller for default network only!
 //
-if (!dojoNetworkConfigs[DEFAULT_NETWORK_ID]) {
+if (!pistolsNetworkConfigs[DEFAULT_NETWORK_ID]) {
   throw new Error(`Network config not found for DEFAULT_NETWORK_ID: [${DEFAULT_NETWORK_ID}]`)
 }
 // tokens to display
@@ -152,14 +152,14 @@ const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
 //
 // controller connector
 const policies = (DEFAULT_NETWORK_ID === NetworkId.MAINNET ? undefined
-  : makePistolsPolicies(DEFAULT_NETWORK_ID, !Boolean(dojoNetworkConfigs[DEFAULT_NETWORK_ID].lordsAddress), false)
+  : makePistolsPolicies(DEFAULT_NETWORK_ID, !Boolean(pistolsNetworkConfigs[DEFAULT_NETWORK_ID].lordsAddress), false)
 )
 const controllerConnector = makeControllerConnector(
   'pistols', // theme
   NAMESPACE,
-  dojoNetworkConfigs[DEFAULT_NETWORK_ID].chainId,
-  dojoNetworkConfigs[DEFAULT_NETWORK_ID].rpcUrl,
-  dojoNetworkConfigs[DEFAULT_NETWORK_ID].toriiUrl,
+  pistolsNetworkConfigs[DEFAULT_NETWORK_ID].chainId,
+  pistolsNetworkConfigs[DEFAULT_NETWORK_ID].rpcUrl,
+  pistolsNetworkConfigs[DEFAULT_NETWORK_ID].toriiUrl,
   policies,
   tokens,
 );

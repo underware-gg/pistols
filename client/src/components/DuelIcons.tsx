@@ -7,7 +7,7 @@ import { BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
 import { bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { EMOJI } from '/src/data/messages'
 import { BigNumberish } from 'starknet'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 const Row = Grid.Row
 const Col = Grid.Column

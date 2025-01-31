@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { usePlayerId } from '@underware_gg/pistols-sdk/utils/hooks'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useTutorialDuelId } from '/src/hooks/usePistolsContractCalls'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 export const useTutorialPlayerId = () => {
   const { playerId } = usePlayerId()

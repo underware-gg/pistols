@@ -3,7 +3,8 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSdkCallPromise, useDojoContractCalls } from '@underware_gg/pistols-sdk/dojo'
 import { isBigint, isPositiveBigint, makeCustomEnum, stringToFelt } from '@underware_gg/pistols-sdk/utils'
-import { constants, convert_duel_progress } from '@underware_gg/pistols-sdk/pistols'
+import { convert_duel_progress } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { useChallenge } from '/src/stores/challengeStore'
 
 

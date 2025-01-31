@@ -21,7 +21,7 @@ import { BookmarkIcon, IconClick } from '/src/components/ui/Icons'
 import { Divider } from '/src/components/ui/Divider'
 import { makeDuelDataUrl } from '/src/utils/pistols'
 import { SceneName } from '/src/data/assets'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 const Row = Grid.Row
 const Col = Grid.Column

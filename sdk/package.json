@@ -41,13 +41,17 @@
       "import": "./dist/fix.js",
       "types": "./dist/fix.d.ts"
     },
-    "./pistols": {
-      "import": "./dist/games_pistols.js",
-      "types": "./dist/games_pistols.d.ts"
-    },
     "./hooks": {
       "import": "./dist/hooks.js",
       "types": "./dist/hooks.d.ts"
+    },
+    "./pistols": {
+      "import": "./dist/pistols.js",
+      "types": "./dist/pistols.d.ts"
+    },
+    "./pistols/gen": {
+      "import": "./dist/pistols_gen.js",
+      "types": "./dist/pistols_gen.d.ts"
     },
     "./utils": {
       "import": "./dist/utils.js",

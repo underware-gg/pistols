@@ -6,7 +6,7 @@ import { CreateTutorialChallengeButton, OpenTutorialChallengeButton } from '/src
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
-import { ACADEMY_NETWORK_ID } from '@underware_gg/pistols-sdk/dojo'
+import { ACADEMY_NETWORK_ID } from '@underware_gg/pistols-sdk/pistols'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'

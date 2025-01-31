@@ -14,7 +14,7 @@ import { FilterButton } from '/src/components/ui/Buttons'
 // import { FilterDuelistName } from '/src/pistols/components/DuelistTable'
 import { Balance } from '/src/components/account/Balance'
 import { arrayRemoveValue, bigintEquals } from '@underware_gg/pistols-sdk/utils'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '/src/utils/pistols'
 
 const Row = Grid.Row

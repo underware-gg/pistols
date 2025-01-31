@@ -1,7 +1,8 @@
 import { BigNumberish } from 'starknet'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import { constants, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
+import { PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { arrayClean, bigintToHex, bigintToNumber, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
 
 

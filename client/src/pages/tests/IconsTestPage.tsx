@@ -3,7 +3,7 @@ import { Container, Grid, Icon } from 'semantic-ui-react'
 import { CustomIcon, EmojiIcon } from '/src/components/ui/Icons'
 import { ArchetypeIcon, BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
 import { LordsBagIcon } from '/src/components/account/Balance'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import App from '/src/components/App'
 

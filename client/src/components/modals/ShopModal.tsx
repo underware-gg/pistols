@@ -8,7 +8,7 @@ import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { FeesToPay } from '/src/components/account/LordsBalance'
 import { Opener } from '/src/hooks/useOpener'
 import { Divider } from '/src/components/ui/Divider'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { useGetPack } from '/src/stores/packStore'
 import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 

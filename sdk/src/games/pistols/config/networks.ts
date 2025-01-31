@@ -15,7 +15,7 @@ import { supportedConnetorIds } from 'src/dojo/setup/connectors'
 import { PredeployedAccount } from 'src/utils/misc/predeployed'
 import { stringToFelt } from 'src/utils/misc/starknet'
 import { cleanObject } from 'src/utils/misc/types'
-import * as ENV from 'src/dojo/setup/env'
+import * as ENV from 'src/games/pistols/config/env'
 
 export const DEFAULT_NETWORK_ID = (ENV.DEFAULT_NETWORK_ID) as NetworkId
 export const ACADEMY_NETWORK_ID = (ENV.ACADEMY_NETWORK_ID) as NetworkId
@@ -359,7 +359,7 @@ const makeDojoNetworkConfig = (networkId: NetworkId, config: DojoNetworkConfig):
   return network
 }
 
-export const dojoNetworkConfigs: Record<NetworkId, DojoNetworkConfig> = {
+export const pistolsNetworkConfigs: Record<NetworkId, DojoNetworkConfig> = {
   [NetworkId.MAINNET]: makeDojoNetworkConfig(NetworkId.MAINNET, snMainnetConfig),
   [NetworkId.SEPOLIA]: makeDojoNetworkConfig(NetworkId.SEPOLIA, snSepoliaConfig),
   [NetworkId.ACADEMY]: makeDojoNetworkConfig(NetworkId.ACADEMY, academySlotConfig),

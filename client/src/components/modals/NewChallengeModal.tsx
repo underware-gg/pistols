@@ -15,7 +15,7 @@ import { ProfileDescription } from '/src/components/account/ProfileDescription'
 import { FormInput } from '/src/components/ui/Form'
 import { FeesToPay } from '/src/components/account/LordsBalance'
 import { Divider } from '/src/components/ui/Divider'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 const Row = Grid.Row
 const Col = Grid.Column

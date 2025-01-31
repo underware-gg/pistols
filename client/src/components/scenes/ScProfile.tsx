@@ -16,7 +16,7 @@ import { SceneName } from '/src/data/assets'
 import { Divider } from '/src/components/ui/Divider'
 import { VStack } from '/src/components/ui/Stack'
 import ShopModal from '/src/components/modals/ShopModal'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 export default function ScProfile() {
   const { isConnected } = useAccount()

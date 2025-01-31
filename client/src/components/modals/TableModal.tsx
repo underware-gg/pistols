@@ -11,7 +11,7 @@ import { ActionButton } from '/src/components/ui/Buttons'
 import { RowDivider } from '/src/components/ui/Stack'
 import { Opener } from '/src/hooks/useOpener'
 import { Divider } from '/src/components/ui/Divider'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 const Row = Grid.Row
 const Col = Grid.Column

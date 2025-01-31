@@ -6,8 +6,9 @@ export default defineConfig({
     "src/exports/abis.ts",
     "src/exports/dojo.ts",
     "src/exports/fix.ts",
-    "src/exports/games_pistols.ts",
     "src/exports/hooks.ts",
+    "src/exports/pistols.ts",
+    "src/exports/pistols_gen.ts",
     "src/exports/utils.ts",
     "src/exports/utils_hooks.ts"
   ],

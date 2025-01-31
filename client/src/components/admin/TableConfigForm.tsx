@@ -8,7 +8,7 @@ import { TableSwitcher } from '/src/components/modals/TableModal'
 import { Balance } from '/src/components/account/Balance'
 import { bigintToEntity, bigintToHex, isBigint, isNumeric, feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 const Row = Table.Row
 const Cell = Table.Cell

@@ -4,7 +4,7 @@ import { BigNumberish } from 'starknet'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useIsMyDuelist, useIsYou } from '/src/hooks/useIsYou'
 import { IconClick } from '/src/components/ui/Icons'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 export const ProfileTypeFolder: Record<constants.ProfileType, string> = {
   [constants.ProfileType.Undefined]: 'duelists',

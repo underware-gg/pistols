@@ -3,7 +3,7 @@ import { useAllPlayersActivityFeed, ActivityState } from '/src/stores/historical
 import { useClientTimestamp } from '@underware_gg/pistols-sdk/utils/hooks'
 import { useChallenge } from '/src/stores/challengeStore'
 import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '/src/components/Links'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { ChallengeStateReplyVerbs } from '../utils/pistols'
 
 export default function ActivityFeed() {

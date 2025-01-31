@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useReducer, useContext, useState, useC
 import { useCookies } from 'react-cookie'
 import { BigNumberish } from 'starknet'
 import { useEffectOnce } from '@underware_gg/pistols-sdk/utils/hooks'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 //--------------------------------
 // Constants

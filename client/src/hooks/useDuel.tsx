@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useGameplayContext } from '/src/hooks/GameplayContext'
 import { useChallenge, useRound } from '/src/stores/challengeStore'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { AnimationState } from '/src/three/game'
 import { Action } from '/src/utils/pistols'
 

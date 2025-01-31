@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import App from '/src/components/App'

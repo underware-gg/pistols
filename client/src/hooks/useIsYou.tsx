@@ -5,7 +5,7 @@ import { useSettings } from '/src/hooks/SettingsContext'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { bigintEquals, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { PLAYER_CHARACTER_ID } from '/src/utils/pistols'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 export const useIsMyAccount = (otherAddress: BigNumberish) => {
   const { address } = useAccount()

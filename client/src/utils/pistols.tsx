@@ -2,7 +2,8 @@ import { BigNumberish } from 'starknet'
 import { EMOJI } from '/src/data/messages'
 import { SceneName } from '/src/data/assets'
 import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
-import { constants, makeCharacterDuelistId } from '@underware_gg/pistols-sdk/pistols'
+import { makeCharacterDuelistId } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 
 //------------------------------------------
@@ -108,25 +109,26 @@ export const RoundStateNames: Record<constants.RoundState, string> = {
 // (action.cairo)
 //
 export enum Action {
-  Idle = constants.PacesCard.None,
-  Paces1 = constants.PacesCard.Paces1,
-  Paces2 = constants.PacesCard.Paces2,
-  Paces3 = constants.PacesCard.Paces3,
-  Paces4 = constants.PacesCard.Paces4,
-  Paces5 = constants.PacesCard.Paces5,
-  Paces6 = constants.PacesCard.Paces6,
-  Paces7 = constants.PacesCard.Paces7,
-  Paces8 = constants.PacesCard.Paces8,
-  Paces9 = constants.PacesCard.Paces9,
-  Paces10 = constants.PacesCard.Paces10,
-  Seppuku = constants.BladesCard.Seppuku,
-  PocketPistol = constants.BladesCard.PocketPistol,
-  Behead = constants.BladesCard.Behead,
-  Grapple = constants.BladesCard.Grapple,
+  // Idle = Action_None,
+  None = 'None', // constants.PacesCard.None,
+  Paces1 = 'Paces1', // constants.PacesCard.Paces1,
+  Paces2 = 'Paces2', // constants.PacesCard.Paces2,
+  Paces3 = 'Paces3', // constants.PacesCard.Paces3,
+  Paces4 = 'Paces4', // constants.PacesCard.Paces4,
+  Paces5 = 'Paces5', // constants.PacesCard.Paces5,
+  Paces6 = 'Paces6', // constants.PacesCard.Paces6,
+  Paces7 = 'Paces7', // constants.PacesCard.Paces7,
+  Paces8 = 'Paces8', // constants.PacesCard.Paces8,
+  Paces9 = 'Paces9', // constants.PacesCard.Paces9,
+  Paces10 = 'Paces10', // constants.PacesCard.Paces10,
+  Seppuku = 'Seppuku', // constants.BladesCard.Seppuku,
+  PocketPistol = 'PocketPistol', // constants.BladesCard.PocketPistol,
+  Behead = 'Behead', // constants.BladesCard.Behead,
+  Grapple = 'Grapple', // constants.BladesCard.Grapple,
 }
 
 export const ActionNames: Record<Action, string> = {
-  [Action.Idle]: 'Idle',
+  [Action.None]: 'Idle',
   [Action.Paces1]: '1 Pace',
   [Action.Paces2]: '2 Paces',
   [Action.Paces3]: '3 Paces',
@@ -144,7 +146,7 @@ export const ActionNames: Record<Action, string> = {
 }
 
 export const ActionVerbs: Record<Action, string> = {
-  [Action.Idle]: 'Stays',
+  [Action.None]: 'Stays',
   [Action.Paces1]: 'Fires at',
   [Action.Paces2]: 'Fires at',
   [Action.Paces3]: 'Fires at',
@@ -162,7 +164,7 @@ export const ActionVerbs: Record<Action, string> = {
 }
 
 export const ActionEmojis: Record<Action, string> = {
-  [Action.Idle]: EMOJI.IDLE,
+  [Action.None]: EMOJI.IDLE,
   [Action.Paces1]: EMOJI.PACES,
   [Action.Paces2]: EMOJI.PACES,
   [Action.Paces3]: EMOJI.PACES,

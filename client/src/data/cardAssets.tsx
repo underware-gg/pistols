@@ -1,4 +1,4 @@
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 enum CardColor {
   WHITE = 'white',

@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useSdkState, getEntityMapModels, formatQueryValue } from '@underware_gg/pistols-sdk/dojo'
-import { constants, models, PistolsGetQuery } from '@underware_gg/pistols-sdk/pistols'
+import { PistolsGetQuery } from '@underware_gg/pistols-sdk/pistols'
+import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
 import { parseEnumVariant, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 

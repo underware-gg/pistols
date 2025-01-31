@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useMemo } from 'react'
 import { StarknetDomain, TypedData } from 'starknet'
 import { Connector } from '@starknet-react/core'
-import { NetworkId } from 'src/dojo/setup/networks'
+import { NetworkId } from 'src/games/pistols/config/networks'
 import { Manifest } from '@dojoengine/core'
 import { StarknetProvider, useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { DojoProvider } from 'src/dojo/contexts/DojoContext'

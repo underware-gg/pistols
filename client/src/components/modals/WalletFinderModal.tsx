@@ -1,7 +1,8 @@
 import React, { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Grid, Modal, Breadcrumb, Icon } from 'semantic-ui-react'
-import { useControllerAccount, NetworkId, dojoNetworkConfigs } from '@underware_gg/pistols-sdk/dojo'
+import { useControllerAccount } from '@underware_gg/pistols-sdk/dojo'
 import { useMounted, useStarkName, useStarkProfile, useValidateWalletAddressOrName } from '@underware_gg/pistols-sdk/utils/hooks'
+import { NetworkId, pistolsNetworkConfigs } from '@underware_gg/pistols-sdk/pistols'
 import { STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { ProfilePic } from '/src/components/account/ProfilePic'
@@ -32,7 +33,7 @@ export default function WalletFinderModal({
     if (opener.isOpen) setInputAddres('')
   }, [opener.isOpen])
 
-  const networkConfig = useMemo(() => dojoNetworkConfigs[NetworkId.MAINNET], [])
+  const networkConfig = useMemo(() => pistolsNetworkConfigs[NetworkId.MAINNET], [])
   
   const { validatedAddress, isStarknetAddress, isEthereumAddress } = useValidateWalletAddressOrName(inputAddress, networkConfig.rpcUrl)
   const { isDeployed, isControllerAccount, isKatanaAccount } = useControllerAccount(validatedAddress)

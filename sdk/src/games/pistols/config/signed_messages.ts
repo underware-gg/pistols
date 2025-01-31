@@ -3,7 +3,7 @@ import { bigintToDecimal, bigintToHex } from 'src/utils/misc/types'
 import { PistolsSchemaType } from 'src/games/pistols/config/types'
 import { generateTypedData } from 'src/dojo/setup/controller'
 import { makeStarknetDomain } from 'src/games/pistols/config/config'
-import { NetworkId } from 'src/dojo/setup/networks'
+import { NetworkId } from 'src/games/pistols/config/networks'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 //

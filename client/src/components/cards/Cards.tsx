@@ -1,7 +1,7 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { CardData, FireCardsTextures } from '/src/data/cardAssets'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import * as TWEEN from '@tweenjs/tween.js'
 import * as Constants from '/src/data/cardConstants'
 

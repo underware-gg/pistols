@@ -18,5 +18,4 @@ export * from '../dojo/hooks/useToriiTokensQL'
 
 export * from '../dojo/setup/connectors'
 export * from '../dojo/setup/controller'
-export * from '../dojo/setup/networks'
 export * from '../dojo/setup/useSetup'
