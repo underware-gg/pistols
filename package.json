@@ -7,6 +7,7 @@
   "license": "CC0",
   "private": true,
   "scripts": {
+    "sync": "turbo watch watch",
     "dev": "turbo watch dev",
     "devs": "turbo watch devs",
     "test": "cd sdk && pnpm test"

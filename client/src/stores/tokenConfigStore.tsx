@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
 import { PistolsSchemaType, models } from '@underware_gg/pistols-sdk/pistols'
-import { useEntityId } from '@underware_gg/pistols-sdk/utils'
+import { useEntityId } from '@underware_gg/pistols-sdk/utils/hooks'
 // FIX: dojo.js 1.0.12 createDojoStore()
 import type { GameState } from '@dojoengine/sdk/state'
 import { StoreApi, UseBoundStore } from 'zustand'

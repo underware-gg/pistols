@@ -16,7 +16,6 @@ import { AddressShort } from '/src/components/ui/AddressShort'
 import { DuelistItem } from '/src/components/account/AccountHeader'
 import { BookmarkIcon } from '/src/components/ui/Icons'
 import { SceneName } from '/src/data/assets'
-import { bigintEquals, bigintToHex } from '@underware_gg/pistols-sdk/utils'
 import { useTableId } from '/src/stores/configStore'
 
 const Row = Grid.Row

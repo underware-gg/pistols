@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from 'react'
 import { useConnect } from '@starknet-react/core'
-import { useEffectOnce } from '@underware_gg/pistols-sdk/utils'
+import { useEffectOnce } from '@underware_gg/pistols-sdk/utils/hooks'
 import { Dojo, NetworkId } from '@underware_gg/pistols-sdk/dojo'
 import { makeDojoAppConfig } from '@underware_gg/pistols-sdk/pistols'
 import App from '/src/components/App'

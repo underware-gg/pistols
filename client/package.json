@@ -11,6 +11,7 @@
     "dev": "vite",
     "devs": "vite -c vite_https.config",
     "build": "npx tsc -p tsconfig.json && vite build",
+    "sync": "npx tsc -watch",
     "check-types": "npx tsc --noEmit",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest run",

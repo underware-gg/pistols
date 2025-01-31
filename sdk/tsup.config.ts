@@ -8,7 +8,8 @@ export default defineConfig({
     "src/exports/fix.ts",
     "src/exports/games_pistols.ts",
     "src/exports/hooks.ts",
-    "src/exports/utils.ts"
+    "src/exports/utils.ts",
+    "src/exports/utils_hooks.ts"
   ],
   format: ["esm"],
   clean: true,

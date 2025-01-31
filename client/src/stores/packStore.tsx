@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityId, useClientTimestamp, feltToString, parseCustomEnum, bigintEquals, parseEnumVariant, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
+import { useEntityId, useClientTimestamp } from '@underware_gg/pistols-sdk/utils/hooks'
+import { feltToString, parseCustomEnum, bigintEquals, parseEnumVariant, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { formatQueryValue, useEntityModel, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models, PistolsGetQuery, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 // FIX: dojo.js 1.0.12 createDojoStore()

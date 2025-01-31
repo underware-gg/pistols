@@ -4,10 +4,8 @@ import { Container, Table, Button, Image } from 'semantic-ui-react'
 import { useAccount, useConnect, useDisconnect, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDojoSetup, useStarknetContext, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
-import {
-  useTypedMessage, useAsyncMemo,
-  Messages, Revision, splitSignature, feltToString, bigintToHex, shortAddress,
-} from '@underware_gg/pistols-sdk/utils'
+import { useTypedMessage, useAsyncMemo } from '@underware_gg/pistols-sdk/utils/hooks'
+import { Messages, Revision, splitSignature, feltToString, bigintToHex, shortAddress } from '@underware_gg/pistols-sdk/utils'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import StarknetConnectModal from '/src/components/starknet/StarknetConnectModal'
 import CurrentChainHint from '/src/components/CurrentChainHint'

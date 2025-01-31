@@ -3,9 +3,10 @@ import { Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { useAdminAmIOwner, useAdminIsOwner } from '/src/hooks/usePistolsContractCalls'
-import { FormInput } from '/src/components/ui/Form'
+import { useValidateWalletAddress } from '@underware_gg/pistols-sdk/utils/hooks'
+import { STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { useValidateWalletAddress, STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
+import { FormInput } from '/src/components/ui/Form'
 
 const Row = Table.Row
 const Cell = Table.Cell

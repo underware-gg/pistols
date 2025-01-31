@@ -3,6 +3,7 @@ export * from '../games/pistols/config/createSystemCalls'
 export * from '../games/pistols/config/duel_progress'
 export * from '../games/pistols/config/signed_messages'
 export * from '../games/pistols/config/types'
+export * from '../games/pistols/helpers'
 
 export * as contracts from '../games/pistols/generated/contracts.gen'
 export * as models from '../games/pistols/generated/models.gen'

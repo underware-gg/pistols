@@ -3,11 +3,11 @@
 // import { loadEnv } from 'vite'
 // const env = loadEnv(mode, process.cwd(), '')
 
-const _env = (name: string) => (import.meta.env?.[name] || undefined);
+const _env = (name: string) => (import.meta.env?.[name] || process.env?.[name] || undefined);
 
 // required
-export const DEFAULT_NETWORK_ID = _env('VITE_NETWORK_ID') || _env('VITE_NETWORK_ID') || 'MAINNET';
-export const ACADEMY_NETWORK_ID = _env('VITE_ACADEMY_NETWORK_ID') || 'ACADEMY';
+export const DEFAULT_NETWORK_ID = _env('VITE_NETWORK_ID') || _env('DEFAULT_NETWORK_ID') || 'MAINNET';
+export const ACADEMY_NETWORK_ID = _env('VITE_ACADEMY_NETWORK_ID') || _env('ACADEMY_NETWORK_ID') || 'ACADEMY';
 
 // optional
 export const NODE_URL = _env('VITE_NODE_URL');

@@ -9,6 +9,7 @@
   "type": "module",
   "scripts": {
     "build": "tsup",
+    "sync": "tsup --watch",
     "postbuild": "cp -R bin dist/",
     "dev": "tsup --watch --onSuccess=\"pnpm run postbuild\"",
     "devs": "tsup --watch --onSuccess=\"pnpm run postbuild\"",
@@ -51,6 +52,10 @@
     "./utils": {
       "import": "./dist/utils.js",
       "types": "./dist/utils.d.ts"
+    },
+    "./utils/hooks": {
+      "import": "./dist/utils_hooks.js",
+      "types": "./dist/utils_hooks.d.ts"
     },
     "./package.json": "./package.json"
   },

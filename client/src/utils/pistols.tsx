@@ -2,7 +2,7 @@ import { BigNumberish } from 'starknet'
 import { EMOJI } from '/src/data/messages'
 import { SceneName } from '/src/data/assets'
 import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants, makeCharacterDuelistId } from '@underware_gg/pistols-sdk/pistols'
 
 
 //------------------------------------------
@@ -11,42 +11,6 @@ import { constants } from '@underware_gg/pistols-sdk/pistols'
 
 export const makeDuelDataUrl = (duelId: BigNumberish) => {
   return `/dueldata/${bigintToDecimal(duelId)}`
-}
-
-export const movesToHand = (moves: number[]): constants.DuelistHand => {
-  return {
-    card_fire: constants.getPacesCardFromValue(moves[0]),
-    card_dodge: constants.getPacesCardFromValue(moves[1]),
-    card_tactics: constants.getTacticsCardFromValue(moves[2]),
-    card_blades: constants.getBladesCardFromValue(moves[3]),
-  }
-}
-
-
-//------------------------------------------
-// (profile_type.cairo)
-//
-
-export const getProfileDescription = (profileType: constants.ProfileType, profileValue: string): constants.ProfileDescription => {
-  switch (profileType) {
-    case constants.ProfileType.Duelist:   return constants.DUELIST_PROFILES[profileValue]
-    case constants.ProfileType.Character: return constants.CHARACTER_PROFILES[profileValue]
-    case constants.ProfileType.Bot:       return constants.BOT_PROFILES[profileValue]
-    default:                              return constants.DUELIST_PROFILES[constants.DuelistProfile.Unknown]
-  }
-}
-
-export const makeCharacterDuelistId = (profileType: constants.ProfileType, profileValue: string): bigint => {
-  const _baseId = (profileType: constants.ProfileType): bigint => {
-    switch (profileType) {
-      case constants.ProfileType.Duelist:   return constants.PROFILES.DUELIST_ID_BASE
-      case constants.ProfileType.Character: return constants.PROFILES.CHARACTER_ID_BASE
-      case constants.ProfileType.Bot:       return constants.PROFILES.BOT_ID_BASE
-      default:                              return constants.PROFILES.UNDEFINED_ID_BASE
-    }
-  }
-  const profileId = getProfileDescription(profileType, profileValue).profile_id
-  return (_baseId(profileType) | BigInt(profileId ?? 0))
 }
 
 export const PLAYER_CHARACTER_ID = makeCharacterDuelistId(constants.ProfileType.Character, constants.CharacterProfile.Player)

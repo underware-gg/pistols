@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Grid } from 'semantic-ui-react'
 import { VStack } from '/src/components/ui/Stack'
-import { useEffectOnce } from '@underware_gg/pistols-sdk/utils'
+import { useEffectOnce } from '@underware_gg/pistols-sdk/utils/hooks'
 import { useDojoStatus, useDojoSystemCalls, useConnectToSelectedNetwork } from '@underware_gg/pistols-sdk/dojo'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'

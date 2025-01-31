@@ -1,13 +1,14 @@
 import React from 'react'
 import { Grid } from 'semantic-ui-react'
+import { BigNumberish } from 'starknet'
+import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
+import { useValidateWalletAddress } from '@underware_gg/pistols-sdk/utils/hooks'
 import { useDuelist } from '/src/stores/duelistStore'
+import { usePlayer } from '/src/stores/playerStore'
+import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
 import { AddressShort } from '/src/components/ui/AddressShort'
 import { EMOJI } from '/src/data/messages'
-import { BigNumberish } from 'starknet'
-import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
-import { isPositiveBigint, useValidateWalletAddress } from '@underware_gg/pistols-sdk/utils'
-import { usePlayer } from '/src/stores/playerStore'
 
 const Row = Grid.Row
 const Col = Grid.Column

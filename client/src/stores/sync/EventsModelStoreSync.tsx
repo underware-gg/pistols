@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { formatQueryValue, getEntityModel, useDojoSetup, useSdkEvents } from '@underware_gg/pistols-sdk/dojo'
+import { useMounted } from '@underware_gg/pistols-sdk/utils/hooks'
 import { useEventsStore } from '/src/stores/eventsStore'
-import { useMounted } from '@underware_gg/pistols-sdk/utils'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { PistolsEntity, PistolsGetQuery, PistolsSubQuery } from '@underware_gg/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'

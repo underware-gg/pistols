@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import { useAllPlayersActivityFeed, ActivityState } from '/src/stores/historicalEventsStore'
-import { useClientTimestamp } from '@underware_gg/pistols-sdk/utils'
+import { useClientTimestamp } from '@underware_gg/pistols-sdk/utils/hooks'
 import { useChallenge } from '/src/stores/challengeStore'
 import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '/src/components/Links'
 import { constants } from '@underware_gg/pistols-sdk/pistols'

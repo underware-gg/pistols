@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useSdkEntities, getEntityModel, filterEntitiesByModel, getEntityModels } from '@underware_gg/pistols-sdk/dojo'
 import { constants, PistolsGetQuery, PistolsSubQuery, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
-import { useMounted } from '@underware_gg/pistols-sdk/utils'
+import { useMounted } from '@underware_gg/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
 import { useTableConfigStore } from '/src/stores/tableStore'
 import { useTokenConfigStore } from '/src/stores/tokenConfigStore'

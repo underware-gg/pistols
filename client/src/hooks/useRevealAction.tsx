@@ -5,7 +5,8 @@ import { useDojoSetup, useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo
 import { useGetDuelDeck } from '/src/hooks/usePistolsContractCalls'
 import { CommitMoveMessage, signAndRestoreMovesFromHash } from '/src/utils/salt'
 import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
-import { movesToHand, PLAYER_CHARACTER_ID } from '/src/utils/pistols'
+import { movesToHand } from '@underware_gg/pistols-sdk/pistols'
+import { PLAYER_CHARACTER_ID } from '/src/utils/pistols'
 
 export function useSignAndRestoreMovesFromHash(duelId: bigint, duelistId: bigint, hash: bigint) {
   const { account } = useAccount()

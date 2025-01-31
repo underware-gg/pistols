@@ -15,6 +15,9 @@ catalogs:
     '@cartridge/controller':
       specifier: 0.6.0
       version: 0.6.0
+    '@daydreamsai/core':
+      specifier: ../../daydreams/packages/core
+      version: 0.0.3
     '@dojoengine/core':
       specifier: 1.0.12
       version: 1.0.12
@@ -210,6 +213,9 @@ importers:
       '@daydreamsai/core':
         specifier: 'catalog:'
         version: link:../../daydreams/packages/core
+      '@underware_gg/pistols-sdk':
+        specifier: workspace:*
+        version: link:../sdk
       chalk:
         specifier: ^5.4.1
         version: 5.4.1

@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
-import {
-  useClientTimestamp,
-  formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown,
-} from '@underware_gg/pistols-sdk/utils'
+import { useClientTimestamp } from '@underware_gg/pistols-sdk/utils/hooks'
+import { formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@underware_gg/pistols-sdk/utils'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import App from '/src/components/App'
 

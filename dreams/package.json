@@ -9,6 +9,7 @@
   "type": "module",
   "scripts": {
     "build": "tsup",
+    "sync": "tsup --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
     "chromadb": "chroma run --path ./.chroma"
   },

@@ -233,7 +233,7 @@ cd client
 pnpm i
 ```
 
-Configure default [NetworkId](/sdk/src/dojo/setup/chains.ts)id in a `.env` file:
+Configure default [NetworkId](/sdk/src/dojo/setup/networks.ts) in your `.env` file:
 
 ```sh
 VITE_DEBUG=0
