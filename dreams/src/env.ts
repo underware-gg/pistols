@@ -1,16 +1,21 @@
 import 'dotenv/config';
 import { z } from "zod";
-import { DEFAULT_NETWORK_ID, pistolsNetworkConfigs } from "@underware_gg/pistols-sdk/pistols";
+import { NETWORKS, NetworkId } from "@underware_gg/pistols-sdk/pistols";
 import chalk from "chalk";
 
-const networkConfig = pistolsNetworkConfigs[DEFAULT_NETWORK_ID];
+const DEFAULT_NETWORK_ID = process.env.DEFAULT_NETWORK_ID as NetworkId;
+const networkConfig = NETWORKS[DEFAULT_NETWORK_ID];
+if (!networkConfig) {
+  throw new Error(`Network config not found for DEFAULT_NETWORK_ID: [${DEFAULT_NETWORK_ID}]`)
+}
 const account = networkConfig.predeployedAccounts.at(-1);
 
 const envSchema = z.object({
+  DEFAULT_NETWORK_ID: z.string().optional().default(DEFAULT_NETWORK_ID),
   CHROMA_URL: z.string().transform(v => v || "http://localhost:8000"),
   STARKNET_RPC_URL: z.string().transform(v => v || networkConfig.rpcUrl),
-  STARKNET_ADDRESS: z.string().transform(v => v || account?.address || '0x0'),
-  STARKNET_PRIVATE_KEY: z.string().transform(v => v || account?.privateKey || '0x0'),
+  STARKNET_ADDRESS: z.string().transform(v => v || account?.address || ''),
+  STARKNET_PRIVATE_KEY: z.string().transform(v => v || account?.privateKey || ''),
   GRAPHQL_URL: z.string().transform(v => v || networkConfig.graphqlUrl),
   //
   TWITTER_USERNAME: z.string(),
@@ -33,7 +38,7 @@ const envSchema = z.object({
     .default(true),
 });
 export const env = envSchema.parse(process.env);
-console.log(`DEFAULT_NETWORK_ID:`, chalk.cyan(DEFAULT_NETWORK_ID));
+console.log(`DEFAULT_NETWORK_ID:`, chalk.cyan(DEFAULT_NETWORK_ID), '=', chalk.cyan(env.DEFAULT_NETWORK_ID));
 console.log(`env.STARKNET_RPC_URL:`, chalk.green(env.STARKNET_RPC_URL));
 console.log(`env.STARKNET_ADDRESS:`, chalk.green(env.STARKNET_ADDRESS));
 console.log(`env.STARKNET_PRIVATE_KEY:`, chalk.green(env.STARKNET_PRIVATE_KEY ? 'Yes': 'No'));

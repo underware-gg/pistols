@@ -3,9 +3,16 @@ import { useConnect } from '@starknet-react/core'
 import { useEffectOnce } from '@underware_gg/pistols-sdk/utils/hooks'
 import { Dojo } from '@underware_gg/pistols-sdk/dojo'
 import { NetworkId } from '@underware_gg/pistols-sdk/pistols'
-import { makeDojoAppConfig } from '@underware_gg/pistols-sdk/pistols'
-import { controllerConnector } from '@underware_gg/pistols-sdk/pistols/controller'
+import { makeDojoAppConfig, NETWORKS } from '@underware_gg/pistols-sdk/pistols'
+import { makePistolsControllerConnector } from '@underware_gg/pistols-sdk/pistols/controller'
 import App from '/src/components/App'
+import * as ENV from '/src/utils/env'
+
+if (!NETWORKS[ENV.DEFAULT_NETWORK_ID]) {
+  throw new Error(`Network config not found for DEFAULT_NETWORK_ID: [${ENV.DEFAULT_NETWORK_ID}]`)
+}
+
+const controllerConnector = makePistolsControllerConnector(ENV.DEFAULT_NETWORK_ID)
 
 export interface AppDojoProps {
   backgroundImage?: string
@@ -20,7 +27,9 @@ export default function AppDojo({
   autoConnect,
   children
 }: AppDojoProps) {
-  const dojoAppConfig = useMemo(() => makeDojoAppConfig(networkId, controllerConnector), [networkId])
+  const dojoAppConfig = useMemo(() => (
+    makeDojoAppConfig(networkId || ENV.DEFAULT_NETWORK_ID, networkId == ENV.DEFAULT_NETWORK_ID ? controllerConnector : undefined)
+  ), [networkId])
   return (
     <App backgroundImage={backgroundImage}>
       <Dojo dojoAppConfig={dojoAppConfig}>

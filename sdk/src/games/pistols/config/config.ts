@@ -2,7 +2,7 @@ import { StarknetDomain } from 'starknet'
 import { getContractByName } from '@dojoengine/core'
 import type { SessionPolicies } from '@cartridge/controller'
 import type { DojoAppConfig, DojoManifest, ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
-import { NetworkId, pistolsNetworkConfigs, DEFAULT_NETWORK_ID } from 'src/games/pistols/config/networks'
+import { NetworkId, NETWORKS } from 'src/games/pistols/config/networks'
 import { makeControllerPolicies } from 'src/dojo/setup/controller'
 import {
   make_typed_data_PlayerBookmark,
@@ -112,13 +112,13 @@ export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: 
 export const makeStarknetDomain = (networkId: NetworkId): StarknetDomain => ({
   name: constants.TYPED_DATA.NAME,
   version: constants.TYPED_DATA.VERSION,
-  chainId: pistolsNetworkConfigs[networkId].chainId,
+  chainId: NETWORKS[networkId].chainId,
   revision: '1',
 })
 
 // contract addresses
 // erc-20
-export const getLordsAddress = (networkId: NetworkId): string => (pistolsNetworkConfigs[networkId].lordsAddress || (getContractByName(manifests[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
+export const getLordsAddress = (networkId: NetworkId): string => (NETWORKS[networkId].lordsAddress || (getContractByName(manifests[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
 export const getFameAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fame_coin')?.address ?? '0x0')
 // export const getFoolsAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
 // erc-721
@@ -130,15 +130,13 @@ export const getBankAddress = (networkId: NetworkId): string => (getContractByNa
 
 
 
-export const makeDojoAppConfig = (networkId: NetworkId | undefined, controllerConnector: Connector | undefined): DojoAppConfig => {
-  const selectedNetworkId = networkId || DEFAULT_NETWORK_ID
+export const makeDojoAppConfig = (networkId: NetworkId, controllerConnector: Connector | undefined): DojoAppConfig => {
   return {
-    selectedNetworkId,
+    selectedNetworkId: networkId,
     namespace: NAMESPACE,
-    starknetDomain: makeStarknetDomain(selectedNetworkId),
-    manifest: manifests[selectedNetworkId],
+    starknetDomain: makeStarknetDomain(networkId),
+    manifest: manifests[networkId],
     mainContractName: Object.keys(contractPolicyDescriptions_pistols)[0],
-    // constroller connector is built for DEFAULT_NETWORK_ID only
-    controllerConnector: (selectedNetworkId == DEFAULT_NETWORK_ID ? controllerConnector : undefined),
+    controllerConnector,
   }
 }

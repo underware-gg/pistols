@@ -30,10 +30,6 @@
 | `@dojoengine/utils`      | ✅       |           |         |                |            |
 | `@apollo/client`         |          |           |         | ✅             |            |
 
-* Environment variables
-
-`VITE_NETWORK_ID`: should contain a valid [NetworkId](/sdk/src/dojo/setup/networks.ts)
-
 
 ## Installation
 

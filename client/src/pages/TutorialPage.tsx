@@ -3,7 +3,6 @@ import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useEffectOnce, usePlayerId } from '@underware_gg/pistols-sdk/utils/hooks'
 import { usePistolsScene, usePistolsSceneFromRoute } from '/src/hooks/PistolsContext'
 import { useSetPageTitle } from '/src/hooks/useSetPageTitle'
-import { ACADEMY_NETWORK_ID } from '@underware_gg/pistols-sdk/pistols'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import CurrentChainHint from '/src/components/CurrentChainHint'
@@ -13,6 +12,7 @@ import Background from '/src/components/Background'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import ScTutorial from '/src/components/scenes/ScTutorial'
 import StoreSync from '/src/stores/sync/StoreSync'
+import * as ENV from '/src/utils/env'
 
 export default function TutorialPage() {
   // tutorials use playerId to id the players
@@ -27,7 +27,7 @@ export default function TutorialPage() {
   useEffectOnce(() => console.log(`---------------- MAIN PAGE MOUNTED`), [])
 
   return (
-    <AppGame backgroundImage={null} networkId={ACADEMY_NETWORK_ID} autoConnect>
+    <AppGame backgroundImage={null} networkId={ENV.ACADEMY_NETWORK_ID} autoConnect>
       <Background className={null}>
         <StoreSync />
         <GameContainer isVisible={true} />

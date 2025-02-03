@@ -53,12 +53,6 @@ export function DojoAccount() {
           </Cell>
         </Row>
         <Row>
-          <Cell>VITE_MASTER_ADDRESS</Cell>
-          <Cell className='Code'>
-            {selectedNetworkConfig.masterAddress}
-          </Cell>
-        </Row>
-        <Row>
           <Cell>Dojo.account</Cell>
           <Cell className='Code'>
             {address ?? 'none'}

@@ -1,12 +1,12 @@
 // import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 import { getContractByName } from '@dojoengine/core';
-import { makeDojoAppConfig } from '@underware_gg/pistols-sdk/pistols';
+import { makeDojoAppConfig, NetworkId } from '@underware_gg/pistols-sdk/pistols';
 import { bigintToHex, stringToFelt } from '@underware_gg/pistols-sdk/utils';
-import { DEFAULT_NETWORK_ID } from '@underware_gg/pistols-sdk/pistols';
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen';
+import { env } from '../env';
 
-const dojoAppConfig = makeDojoAppConfig(DEFAULT_NETWORK_ID, undefined);
+const dojoAppConfig = makeDojoAppConfig(env.DEFAULT_NETWORK_ID as NetworkId, undefined);
 
 const game_contract = getContractByName(dojoAppConfig.manifest, dojoAppConfig.namespace, 'game');
 const duel_contract = getContractByName(dojoAppConfig.manifest, dojoAppConfig.namespace, 'duel_token');

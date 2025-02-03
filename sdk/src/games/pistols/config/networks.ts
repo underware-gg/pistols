@@ -14,11 +14,6 @@ import {
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
 import { PredeployedAccount } from 'src/utils/misc/predeployed'
 import { stringToFelt } from 'src/utils/misc/starknet'
-import { cleanObject } from 'src/utils/misc/types'
-import * as ENV from 'src/games/pistols/config/env'
-
-export const DEFAULT_NETWORK_ID = (ENV.DEFAULT_NETWORK_ID) as NetworkId
-export const ACADEMY_NETWORK_ID = (ENV.ACADEMY_NETWORK_ID) as NetworkId
 
 //
 // supported networks
@@ -88,27 +83,6 @@ export type DojoNetworkConfig = {
   testnet?: boolean
   nativeCurrency?: NativeCurrency
   explorers?: ChainExplorers
-}
-
-// environment overrides, will be applied over default network only
-export const envNetworkConfig: DojoNetworkConfig = {
-  networkId: undefined,
-  chain: undefined,
-  chainId: undefined,
-  name: undefined,
-  rpcUrl: ENV.NODE_URL,
-  toriiUrl: ENV.TORII,
-  graphqlUrl: (ENV.TORII ? `${ENV.TORII}/graphql` : undefined),
-  relayUrl: ENV.RELAY_URL,
-  masterAddress: ENV.MASTER_ADDRESS,
-  masterPrivateKey: ENV.MASTER_PRIVATE_KEY,
-  accountClassHash: undefined,
-  etherAddress: undefined,
-  lordsFaucet: undefined,
-  lordsAddress: undefined,
-  vrfAddress: undefined,
-  predeployedAccounts: undefined,
-  connectorIds: undefined,
 }
 
 //--------------------------------
@@ -354,14 +328,6 @@ const makeDojoNetworkConfig = (networkId: NetworkId, config: DojoNetworkConfig):
     } as Chain
   }
   //
-  // override env (default network only)
-  if (networkId == DEFAULT_NETWORK_ID) {
-    network = {
-      ...network,
-      ...cleanObject(envNetworkConfig),
-    }
-  }
-  //
   // use Cartridge RPCs
   if (network.rpcUrl) {
     network.chain.rpcUrls.default.http = [network.rpcUrl]
@@ -372,7 +338,7 @@ const makeDojoNetworkConfig = (networkId: NetworkId, config: DojoNetworkConfig):
   return network
 }
 
-export const pistolsNetworkConfigs: Record<NetworkId, DojoNetworkConfig> = {
+export const NETWORKS: Record<NetworkId, DojoNetworkConfig> = {
   [NetworkId.MAINNET]: makeDojoNetworkConfig(NetworkId.MAINNET, snMainnetConfig),
   [NetworkId.SEPOLIA]: makeDojoNetworkConfig(NetworkId.SEPOLIA, snSepoliaConfig),
   [NetworkId.ACADEMY]: makeDojoNetworkConfig(NetworkId.ACADEMY, academySlotConfig),

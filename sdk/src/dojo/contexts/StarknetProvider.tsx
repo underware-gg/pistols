@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useContext, useEffect, useMemo } from 
 import { Chain } from '@starknet-react/chains'
 import { StarknetConfig, jsonRpcProvider } from '@starknet-react/core'
 import { useChainConnectors } from 'src/dojo/setup/connectors'
-import { NetworkId, DojoNetworkConfig, pistolsNetworkConfigs } from 'src/games/pistols/config/networks'
+import { NetworkId, DojoNetworkConfig, NETWORKS } from 'src/games/pistols/config/networks'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
 
 
@@ -26,12 +26,12 @@ export const StarknetProvider = ({
 
   // Initial state
   const chains: Chain[] = useMemo(() => (
-    Object.values(pistolsNetworkConfigs).map(networkConfig => networkConfig.chain)
+    Object.values(NETWORKS).map(networkConfig => networkConfig.chain)
   ), [])
 
   // Current chain
   const selectedNetworkId = useMemo(() => (dojoAppConfig.selectedNetworkId), [dojoAppConfig])
-  const selectedNetworkConfig = useMemo(() => pistolsNetworkConfigs[selectedNetworkId], [selectedNetworkId])
+  const selectedNetworkConfig = useMemo(() => NETWORKS[selectedNetworkId], [selectedNetworkId])
   useEffect(() => console.log(`Selected network:`, selectedNetworkId, selectedNetworkConfig), [selectedNetworkId])
 
   // Build chain connectors from selectedNetworkConfig
