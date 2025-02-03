@@ -8,19 +8,22 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import * as Constants from '/src/data/cardConstants'
 import * as TWEEN from '@tweenjs/tween.js'
+import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 
 export default function DuelistProfile({
   duelistId,
   floated,
   damage,
   hitChance,
-  speedFactor
+  speedFactor,
+  tutorialLevel
 }: {
   duelistId: BigNumberish,
   floated: SemanticFLOATS
   damage: number
   hitChance: number
   speedFactor: number
+  tutorialLevel: DuelTutorialLevel
 }) {
   const { score } = useDuelist(duelistId)
   const { aspectWidth } = useGameAspect()
@@ -52,6 +55,8 @@ export default function DuelistProfile({
   }, [hitChance])
 
   const animateNumber = (referenceContainer, referenceText) => {
+    if (tutorialLevel === DuelTutorialLevel.SIMPLE) return
+    
     const endRotation = Math.random() * 10 * (floated == "left" ? 1 : -1);
     const startRotationText = Math.random() * 20 - 10;
     const endRotationText = Math.random() * 20 - 10;
@@ -91,6 +96,8 @@ export default function DuelistProfile({
   const hitChanceNumberRef = useRef<HTMLDivElement>(null)
   const damageContainerRef = useRef<HTMLDivElement>(null)
   const damageNumberRef = useRef<HTMLDivElement>(null)
+
+  if (tutorialLevel === DuelTutorialLevel.SIMPLE) return null
 
   return (
     <>

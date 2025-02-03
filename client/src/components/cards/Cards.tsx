@@ -165,6 +165,9 @@ export const Card = forwardRef<CardHandle, CardProps>((props: CardProps, ref: Re
         .onUpdate((value) => {
           const innerElement = cardRef.current?.querySelector('.card-inner') as HTMLElement
           innerElement?.style.setProperty('--card-flip-rotation', `${value.rotation}deg`);
+
+          const cardOutline = cardBackgroundRef.current?.querySelector('.card-outline') as HTMLElement
+          cardOutline?.style.setProperty('--card-flip-rotation', `${value.rotation}deg`);
         })
         .start()
     }

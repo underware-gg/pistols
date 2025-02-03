@@ -21,7 +21,6 @@ vec4 blur(sampler2D sp[5], vec2 U[5], vec2 scale, int samples) {
     texColor = mix(texColor, textureLod( sp[3], U[3] + scale * d, float(LOD) ), 1.0 - texColor.a);
     texColor = mix(texColor, textureLod( sp[4], U[4] + scale * d, float(LOD) ), 1.0 - texColor.a);
 
-    texColor.rgb = linearToSRGB(texColor.rgb);
     O += gaussian(d, samples) * texColor;
   }
   

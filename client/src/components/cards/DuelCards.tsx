@@ -9,6 +9,10 @@ import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { BladesCardsTextures, CardData, DodgeCardsTextures, EnvironmentCardsTextures, FireCardsTextures, TacticsCardsTextures } from '/src/data/cardAssets'
 import { DuelistCardType, CardHandle, Card } from '/src/components/cards/Cards'
 import * as TWEEN from '@tweenjs/tween.js'
+import * as Constants from '/src/data/cardConstants'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { shakeCamera } from '/src/three/game'
+import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 
 interface DuelistCardsProps {
   isLeft: boolean
@@ -43,8 +47,6 @@ interface EnvironmentDeckHandle {
   returnActiveCard: () => boolean
   setCardsData: (cardsData: CardData[]) => void
 }
-import * as Constants from '/src/data/cardConstants'
-import { usePistolsContext } from '/src/hooks/PistolsContext'
 
 const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: DuelistCardsProps, ref: React.Ref<DuelistCardsHandle>) => {
   const { isYou } = useIsYou(props.duelistId)
@@ -339,6 +341,9 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
                 TWEEN.Interpolation.CatmullRom
               )
             }, Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME_DELAY / speedFactor)
+            setTimeout(() => {
+              shakeCamera(150, 0.01)
+            }, Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME_DELAY / speedFactor + (Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME / speedFactor) * 0.2)
             setTimeout(() => {
               card.toggleHighlight(true, false, "red")
               card.toggleDefeated(true)
@@ -1125,7 +1130,7 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance, visible }) => {
   )
 }
 
-const Cards = forwardRef<CardsHandle, { duelId: BigNumberish }>(({ duelId }, ref) => {
+const Cards = forwardRef<CardsHandle, { duelId: BigNumberish, tutorialLevel: DuelTutorialLevel }>(({ duelId, tutorialLevel }, ref) => {
   const { duelistIdA, duelistIdB } = useChallenge(duelId)
 
   const [isOverlayVisible, setIsOverlayVisible] = useState(false)
@@ -1148,28 +1153,28 @@ const Cards = forwardRef<CardsHandle, { duelId: BigNumberish }>(({ duelId }, ref
   }));
 
   const resetCards = () => {
-    environmentDeck.current.shuffle()
-    duelistAHand.current.resetCards()
-    duelistBHand.current.resetCards()
+    environmentDeck.current?.shuffle()
+    duelistAHand.current?.resetCards()
+    duelistBHand.current?.resetCards()
   }
 
   const spawnCards = (duelist: string, cards: DuelistHand) => {
     if (duelist == 'A') {
-      duelistAHand.current.spawnCards(cards)
+      duelistAHand.current?.spawnCards(cards)
     } else {
-      duelistBHand.current.spawnCards(cards)
+      duelistBHand.current?.spawnCards(cards)
     }
   }
 
   const drawNextCard = (speedFactor: number) => {
-    environmentDeck.current.drawCard(speedFactor)
+    environmentDeck.current?.drawCard(speedFactor)
   }
 
   const revealCard = (duelist: string, type: DuelistCardType, speedFactor: number, alive?: boolean) => {
     if (duelist == 'A') {
-      duelistAHand.current.revealCard(type, speedFactor, alive)
+      duelistAHand.current?.revealCard(type, speedFactor, alive)
     } else {
-      duelistBHand.current.revealCard(type, speedFactor, alive)
+      duelistBHand.current?.revealCard(type, speedFactor, alive)
     }
   }
 
@@ -1198,55 +1203,57 @@ const Cards = forwardRef<CardsHandle, { duelId: BigNumberish }>(({ duelId }, ref
   }, []);
 
   const setAllEnvCards = (cardsData: CardData[]) => {
-    environmentDeck.current.setCardsData(cardsData)
+    environmentDeck.current?.setCardsData(cardsData)
   }
 
   const handleClick = (isLeft?: boolean, shouldClose?: boolean) => {
     if (shouldClose) {
       if (isLeft == true) {
-        duelistBHand.current.returnActiveCard()
-        environmentDeck.current.returnActiveCard()
+        duelistBHand.current?.returnActiveCard()
+        environmentDeck.current?.returnActiveCard()
       } else if (isLeft == false) {
-        duelistAHand.current.returnActiveCard()
-        environmentDeck.current.returnActiveCard()
+        duelistAHand.current?.returnActiveCard()
+        environmentDeck.current?.returnActiveCard()
       } else {
-        duelistBHand.current.returnActiveCard()
-        duelistAHand.current.returnActiveCard()
+        duelistBHand.current?.returnActiveCard()
+        duelistAHand.current?.returnActiveCard()
       }
     } else {
-      if (!duelistAHand.current.isReadyToShow() || !duelistBHand.current.isReadyToShow() || !environmentDeck.current.isReadyToShow()) return
-      duelistBHand.current.showHandDetails()
-      duelistAHand.current.showHandDetails()
-      environmentDeck.current.expand()
+      if (!duelistAHand.current?.isReadyToShow() || !duelistBHand.current?.isReadyToShow() || !environmentDeck.current?.isReadyToShow()) return
+      duelistBHand.current?.showHandDetails()
+      duelistAHand.current?.showHandDetails()
+      environmentDeck.current?.expand()
       
       setTimeout(() => {
         setIsOverlayVisible(true)
       }, 600)
 
       setTimeout(() => {
-        overlayRef.current.addEventListener('click', handleGlobalClick)
+        overlayRef.current?.addEventListener('click', handleGlobalClick)
       }, 100)
     }
   }
 
   const handleGlobalClick = useCallback((event: MouseEvent) => {
-    duelistAHand.current.returnActiveCard()
-    duelistBHand.current.returnActiveCard()
-    environmentDeck.current.returnActiveCard()
+    duelistAHand.current?.returnActiveCard()
+    duelistBHand.current?.returnActiveCard()
+    environmentDeck.current?.returnActiveCard()
 
   }, [duelistAHand, duelistBHand, overlayRef, environmentDeck])
 
   const collapse = () => {
-    if (!duelistAHand.current.isReadyToCollapse() || !duelistBHand.current.isReadyToCollapse() || !environmentDeck.current.isReadyToCollapse()) return
-    duelistAHand.current.hideHandDetails()
-    duelistBHand.current.hideHandDetails()
+    if (!duelistAHand.current?.isReadyToCollapse() || !duelistBHand.current?.isReadyToCollapse() || !environmentDeck.current?.isReadyToCollapse()) return
+    duelistAHand.current?.hideHandDetails()
+    duelistBHand.current?.hideHandDetails()
 
-    environmentDeck.current.collapse()
+    environmentDeck.current?.collapse()
 
     setIsOverlayVisible(false)
 
-    overlayRef.current.removeEventListener('click', handleGlobalClick)
+    overlayRef.current?.removeEventListener('click', handleGlobalClick)
   }
+
+  if (tutorialLevel === DuelTutorialLevel.SIMPLE) return null
 
   return (
     <>
@@ -1262,6 +1269,7 @@ const Cards = forwardRef<CardsHandle, { duelId: BigNumberish }>(({ duelId }, ref
           onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         />
       </div>
+
 
       <EnvironmentDeck onClick={handleClick} ref={environmentDeck}/>
       <DuelistCards duelistId={duelistIdA} isLeft={true} onClick={handleClick} ref={duelistAHand}/>

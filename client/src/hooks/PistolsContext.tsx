@@ -345,7 +345,7 @@ type SceneSlug = {
   duelId?: BigNumberish,
 }
 export const usePistolsScene = () => {
-  const { currentScene, lastScene, selectedDuelId, dispatchSetDuel, __dispatchSetScene, __dispatchResetValues } = usePistolsContext()
+  const { currentScene, lastScene, selectedDuelId, currentDuel, dispatchSetDuel, __dispatchSetScene, __dispatchResetValues } = usePistolsContext()
   const { tableId, isSeason, isTutorial } = useTableId()
 
   const location = useLocation()
@@ -359,8 +359,8 @@ export const usePistolsScene = () => {
     if (sceneRoutes[newScene].hasTableId) {
       slug = setSlug.tableId ?? (tableId && !isSeason ? tableId : '')
     } else if (sceneRoutes[newScene].hasDuelId) {
-      slug = `${bigintToDecimal(setSlug.duelId || selectedDuelId)}`
-      if (!bigintEquals(slug, selectedDuelId)) {
+      slug = `${bigintToDecimal(setSlug.duelId || currentDuel)}`
+      if (!bigintEquals(slug, currentDuel)) {
         dispatchSetDuel(slug)
       }
     }

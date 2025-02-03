@@ -28,9 +28,10 @@ import ScTutorial from '/src/components/scenes/ScTutorial'
 import StoreSync from '/src/stores/sync/StoreSync'
 import Gate from '/src/components/scenes/ScGate'
 import Door from '/src/components/scenes/ScDoor'
-import ScDuel from '/src/components/scenes/ScDuel'
+
 // test sdk
 import { helloPistols } from '@underware_gg/pistols-sdk'
+import Duel from '../components/scenes/Duel'
 
 helloPistols();
 
@@ -72,7 +73,7 @@ function MainUI() {
   useSyncSelectedDuelist()
 
   const { gameImpl } = useThreeJsContext()
-  const { currentDuel } = usePistolsContext()
+  const { currentDuel, tutorialLevel } = usePistolsContext()
   const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
@@ -81,7 +82,7 @@ function MainUI() {
       if (atGate) setCurrentScene(<Gate />);
       else if (atDoor) setCurrentScene(<Door />);
       else if (atTutorial) setCurrentScene(<TutorialUI />);
-      else if (atDuel && currentDuel > 0n) setCurrentScene(<ScDuel />);
+      else if (atDuel && currentDuel > 0n) setCurrentScene(<Duel duelId={currentDuel} tutorial={tutorialLevel} />);
       else if (atProfile) setCurrentScene(<ScProfile />);
       else if (atDuelsBoard) setCurrentScene(<ScDuelsBoard />);
       else if (atDuelists) setCurrentScene(<ScDuelists />);

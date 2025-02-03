@@ -1501,51 +1501,72 @@ $logo-url: '/logos/logo_avante.svg';
   @extend .AboveAll;
 }
 
-.TempBarkeepTalkBalloon {
+.DialogBalloon {
   width: aspect-width(25);
   height: auto;
   min-height: aspect-width(6.25);
-  border: aspect-width(0.1875) solid $color-dark;
-  background-color: $color-bright;
+  border: aspect-width(0.1875) solid var(--border-color);
+  background-color: var(--bg-color);
   color: $color-darkest;
   position: absolute;
-  top: 20%;
-  left: 25%;
+  top: 10%;
+  left: 20%;
   padding: aspect-width(0.4);
   font-size: aspect-width(1.6);
   text-shadow: $text-shadow;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -moz-border-radius: aspect-width(0.625);
-  -webkit-border-radius: aspect-width(0.625);
   border-radius: aspect-width(0.625);
+  z-index: 999;
+
+  &:before {
+    content:"";
+    position: absolute;
+    right: aspect-width(-1.875);
+    top: aspect-width(4.8125);
+    border-top: aspect-width(0.9375) solid transparent;
+    border-left: aspect-width(1.875) solid var(--border-color);
+    border-bottom: aspect-width(0) solid transparent;
+  }
+  
+  &:after {
+    content:"";
+    position: absolute;
+    right: aspect-width(-1.24);
+    top: aspect-width(5);
+    border-top: aspect-width(0.625) solid transparent;
+    border-left: aspect-width(1.25) solid var(--bg-color);
+    border-bottom: aspect-width(0) solid transparent;
+  }
+
+  .DialogBalloonText {
+    margin: aspect-width(2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 0;
+  }
 }
 
-.TempBarkeepTalkBalloon:before {
-  content:"";
-  position: absolute;
-  right: aspect-width(-1.875);
-  top: aspect-width(4.8125);
-  border-top: aspect-width(0.9375) solid transparent;
-  border-left: aspect-width(1.875) solid $color-dark;
-  border-bottom: aspect-width(0) solid transparent;
-}
-
-.TempBarkeepTalkBalloon:after {
-  content:"";
-  position: absolute;
-  right: aspect-width(-1.24);
-  top: aspect-width(5);
-  border-top: aspect-width(0.625) solid transparent;
-  border-left: aspect-width(1.25) solid $color-bright;
-  border-bottom: aspect-width(0) solid transparent;
+// For backwards compatibility
+.TempBarkeepTalkBalloon {
+  @extend .DialogBalloon;
+  --bg-color: #{$color-bright};
+  --border-color: #{$color-dark};
 }
 
 .TempBarkeepTalkBalloonText {
-  margin: aspect-width(2);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-height: 0;
+  @extend .DialogBalloonText;
+}
+
+.DemonTalkBaloon {
+  @extend .DialogBalloon;
+  top: 20%;
+  left: 5%;
+  font-size: aspect-width(2);
+  color: $color-bright;
+  z-index: 800;
+  --bg-color: #{$color-dark};
+  --border-color: #{$color-darkest};
 }
 
 .DialogOptionsContainer {
@@ -2269,7 +2290,7 @@ a.active.step:hover,
 
 
 
-.tutorialContainer {
+.tutorialDialogContainer {
   position: absolute;
   bottom: 0;
   width: aspect-width(100);

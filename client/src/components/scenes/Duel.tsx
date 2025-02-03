@@ -50,11 +50,8 @@ export default function Duel({
   const { debugMode, duelSpeedFactor } = useSettings()
   const { clientSeconds } = useClientTimestamp(false)
 
-  const { duelistIdA, duelistIdB, timestamp_start } = useChallenge(duelId)
-
-  useEffect(() => {
-    console.log('>>>>>>>>>>>>>>>>> DUEL!!!', duelId, duelistIdA, duelistIdB)
-  }, [duelId, duelistIdA, duelistIdB])
+  const { duelistIdA, duelistIdB, timestamp_start } = tutorial === DuelTutorialLevel.NONE ? useChallenge(duelId) : useAddChallenge(duelId)
+  const { isTutorial } = useAddChallenge(duelId)
 
   // switch to active duelist, if owned by player
   const { isSynced } = useSyncToActiveDuelists([duelistIdA, duelistIdB])
@@ -161,7 +158,7 @@ export default function Duel({
       setTimeout(() => {
         cardRef.current?.spawnCards('A', { fire: duelProgress.hand_a.card_fire, dodge: duelProgress.hand_a.card_dodge, blade: duelProgress.hand_a.card_blades, tactics: duelProgress.hand_a.card_tactics })
         cardRef.current?.spawnCards('B', { fire: duelProgress.hand_b.card_fire, dodge: duelProgress.hand_b.card_dodge, blade: duelProgress.hand_b.card_blades, tactics: duelProgress.hand_b.card_tactics })
-      }, 1500)
+      }, tutorial === DuelTutorialLevel.NONE ? 1500 : 0)
 
       setTimeout(() => {
         const step = duelProgress.steps[currentStep.current]
@@ -184,7 +181,7 @@ export default function Duel({
             dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_b.dodge ? currentStep.current : undefined),
           }
         })
-      }, 2500);
+      }, tutorial === DuelTutorialLevel.NONE ? 2500 : 500);
 
       setTimeout(() => {
         gameImpl?.hideDialogs()
@@ -195,15 +192,15 @@ export default function Duel({
         if (isPlayingRef.current) {
           nextStepCallback.current = setTimeout(() => {
             playStep()
-          }, (Constants.BASE_CARD_REVEAL_DURATION * 1.2) / speedRef.current)
+          }, tutorial === DuelTutorialLevel.NONE ? (Constants.BASE_CARD_REVEAL_DURATION * 1.2) / speedRef.current : 200)
         }
-      }, 4000)
+      }, tutorial === DuelTutorialLevel.NONE ? 4000 : 1000)
     }
 
     return () => {
         hasUnmounted.current = true
     };
-  }, [duelProgress, triggerReset])
+  }, [duelProgress, triggerReset, tutorial])
 
   const playStep = () => {
     currentStep.current += 1
@@ -384,9 +381,10 @@ export default function Duel({
         isYou={isYouB}
         revealCards={(cards: DuelistHand) => cardRef.current?.spawnCards('B', cards)}
       />
-      <Cards duelId={duelId} ref={cardRef} />
+
+      <Cards duelId={duelId} ref={cardRef} tutorialLevel={tutorial} />
       
-      <DuelHeader duelId={duelId} />
+      <DuelHeader duelId={duelId} tutorialLevel={tutorial} />
 
       <DuelStateDisplay duelId={duelId} />
 
@@ -395,7 +393,7 @@ export default function Duel({
           <DuelProfile floated='left' duelistId={duelistIdA} />
         </div>
         <div className='DuelistProfileA NoMouse NoDrag'>
-          <DuelistProfile floated='left' duelistId={duelistIdA} damage={statsA.damage} hitChance={statsA.hitChance} speedFactor={duelSpeedFactor} />
+          <DuelistProfile floated='left' duelistId={duelistIdA} damage={statsA.damage} hitChance={statsA.hitChance} speedFactor={duelSpeedFactor} tutorialLevel={tutorial} />
         </div>
       </div>
       <div>
@@ -403,11 +401,11 @@ export default function Duel({
           <DuelProfile floated='right' duelistId={duelistIdB} />
         </div>
         <div className='DuelistProfileB NoMouse NoDrag' >
-          <DuelistProfile floated='right' duelistId={duelistIdB} damage={statsB.damage} hitChance={statsB.hitChance} speedFactor={duelSpeedFactor} />
+          <DuelistProfile floated='right' duelistId={duelistIdB} damage={statsB.damage} hitChance={statsB.hitChance} speedFactor={duelSpeedFactor} tutorialLevel={tutorial} />
         </div>
       </div>
 
-      <DuelTutorialOverlay tutorialType={tutorial} open={tutorial != DuelTutorialLevel.NONE} />
+      {isTutorial && <DuelTutorialOverlay tutorialType={tutorial} open={tutorial != DuelTutorialLevel.NONE} />}
 
       {/* {duelProgress &&
         <div className='CenteredPanel'>

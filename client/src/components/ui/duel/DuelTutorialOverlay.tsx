@@ -113,7 +113,7 @@ export default function DuelTutorialOverlay({ tutorialType, open }: DuelTutorial
 
           <button
             onClick={isLastSlide ? _close : handleNext}
-            className="tutorialButton YesMouse"
+            className="tutorialButton YesMouse NoDrag"
           >
             {isLastSlide ? 'Finish' : 'Next →'}
           </button>

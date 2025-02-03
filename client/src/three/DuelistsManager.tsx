@@ -246,6 +246,8 @@ export class DuelistsManager {
           }
         }
       }
+    } else {
+      _updateB()
     }
 
     if (hasDuelistBShotThisRound) {
@@ -264,10 +266,13 @@ export class DuelistsManager {
           }
         }
       }
+    } else {
+      _updateA()
     }
   }
 
   private finishAnimation(healthA, healthB) {
+    console.log('finishAnimation', healthA, healthB)
     emitter.emit('animated', AnimationState.Finished)
     this.duelProgressDialogManger.hideDialogs()
     this.duelProgressDialogManger.showDialogEnd(healthA, healthB)
@@ -276,44 +281,47 @@ export class DuelistsManager {
   public animateActions(actionA: Action, actionB: Action, healthA: number, healthB: number) {
     if(this.showDialogsTimeout) clearTimeout(this.showDialogsTimeout)
     
-      const animA = this.getActionAnimName(actionA)
-      const animB = this.getActionAnimName(actionB)
+    const animA = this.getActionAnimName(actionA)
+    const animB = this.getActionAnimName(actionB)
 
-    // animate sprites
-    if (animB != AnimName.SEPPUKU || animA == AnimName.SEPPUKU) {
-      // this.playActorAnimation(this.duelistA, animA, () => {
-        
-      // })
-      let survived = 0
-        if (animA != AnimName.SEPPUKU) {
-          if (healthB == 0) {
-            this.playActorAnimation(this.duelistB, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
-          } else if (healthB < 3) {
-            this.playActorAnimation(this.duelistB, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
-          } else {
-            survived++
-          }
-
-          if (healthA == 0) {
-            this.playActorAnimation(this.duelistA, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
-          } else if (healthA < 3) {
-            this.playActorAnimation(this.duelistA, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
-          } else {
-            survived++
-          }
-        } else {
-          this.playActorAnimation(this.duelistA, AnimName.SEPPUKU, () => this.finishAnimation(healthA, healthB))
-        }
-        if (survived == 2) emitter.emit('animated', AnimationState.Finished)
+    let survivedCount = 0
+    const checkBothSurvived = () => {
+      survivedCount++
+      if (survivedCount === 2) {
+        emitter.emit('animated', AnimationState.Finished)
+      }
     }
 
-    if (animA != AnimName.SEPPUKU || animB == AnimName.SEPPUKU) {
-      // this.playActorAnimation(this.duelistB, this.getActionAnimName(actionB), () => {
-        
-      // })
-      if (animB == AnimName.SEPPUKU) {
-        this.playActorAnimation(this.duelistB, AnimName.SEPPUKU, () => this.finishAnimation(healthA, healthB))
-      }
+    // Handle seppuku cases first
+    if (animA === AnimName.SEPPUKU) {
+      this.playActorAnimation(this.duelistA, AnimName.SEPPUKU, () => this.finishAnimation(healthA, healthB))
+    }
+
+    if (animB === AnimName.SEPPUKU) {
+      this.playActorAnimation(this.duelistB, AnimName.SEPPUKU, () => this.finishAnimation(healthA, healthB))
+    }
+
+    if (animA == AnimName.SEPPUKU || animB == AnimName.SEPPUKU) {
+      return
+    }
+
+    // Handle normal combat animations
+    if (healthA === 0) {
+      this.playActorAnimation(this.duelistA, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
+    } else if (healthA < 3) {
+      this.playActorAnimation(this.duelistA, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
+      checkBothSurvived()
+    } else {
+      checkBothSurvived()
+    }
+
+    if (healthB === 0) {
+      this.playActorAnimation(this.duelistB, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
+    } else if (healthB < 3) {
+      this.playActorAnimation(this.duelistB, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
+      checkBothSurvived()
+    } else {
+      checkBothSurvived()
     }
   }
 

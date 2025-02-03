@@ -10,6 +10,7 @@ import { Card, CardHandle } from '/src/components/cards/Cards'
 import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '/src/data/cardAssets'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { emitter } from '/src/three/game'
+import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -27,7 +28,7 @@ export default function CommitPacesModal({
 }) {
   const { account } = useAccount()
   const { game } = useDojoSystemCalls()
-  const { dispatchSetMoves } = usePistolsContext()
+  const { dispatchSetMoves, tutorialLevel } = usePistolsContext()
   const { starknetDomain } = useDojoSetup()
 
   const [firePaces, setFirePaces] = useState(0)
@@ -37,6 +38,9 @@ export default function CommitPacesModal({
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const { aspectWidth, boxW, boxH, aspect } = useGameAspect()
+
+  const isSimpleTutorial = tutorialLevel === DuelTutorialLevel.SIMPLE
+  // const isSimpleTutorial = true
 
   useEffect(() => {
     setFirePaces(0)
@@ -50,14 +54,17 @@ export default function CommitPacesModal({
     duelistId: BigInt(duelistId),
   } : null), [duelId, duelistId])
 
-  const canSubmit = useMemo(() =>
-    (account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && tactics && blades && !isSubmitting),
-    [account, messageToSign, firePaces, dodgePaces, tactics, blades, isSubmitting])
+  const canSubmit = useMemo(() => {
+    if (isSimpleTutorial) {
+      return account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && !isSubmitting
+    }
+    return account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && tactics && blades && !isSubmitting
+  }, [account, messageToSign, firePaces, dodgePaces, tactics, blades, isSubmitting, isSimpleTutorial])
 
   const _submit = useCallback(async () => {
     if (canSubmit) {
       setIsSubmitting(true)
-      const moves = [firePaces, dodgePaces, tactics, blades]
+      const moves = isSimpleTutorial ? [firePaces, dodgePaces, 0, 0] : [firePaces, dodgePaces, tactics, blades]
       const { hash, salt } = await signAndGenerateMovesHash(account, starknetDomain, messageToSign, moves)
       if (hash && salt) {
         await game.commit_moves(account, duelistId, duelId, hash)
@@ -66,11 +73,22 @@ export default function CommitPacesModal({
       }
       setIsSubmitting(false)
     }
-  }, [canSubmit, firePaces, dodgePaces, tactics, blades])
+  }, [canSubmit, firePaces, dodgePaces, tactics, blades, isSimpleTutorial])
 
-  const modalHeight = useMemo(() => 90 / aspect, [aspect])
+  const totalHeight = isSimpleTutorial ? 50 : 90
+  const modalHeight = useMemo(() => totalHeight / aspect, [aspect])
 
   const points = useMemo(() => {
+    if (isSimpleTutorial) {
+      return {
+        self_chances: '-',
+        self_damage: '-',
+        other_chances: '-',
+        other_damage: '-',
+        special: '-'
+      }
+    }
+
     const tacticsName = constants.getTacticsCardFromValue(tactics);
     const tacticsPoints = _points_list(constants.TACTICS_POINTS[tacticsName]);
 
@@ -105,7 +123,7 @@ export default function CommitPacesModal({
     if (isBladesEmpty) return formattedPoints;
 
     return formattedPoints;
-  }, [tactics, blades]);
+  }, [tactics, blades, isSimpleTutorial]);
 
 
   return (
@@ -115,71 +133,76 @@ export default function CommitPacesModal({
         width: aspectWidth(80),
         height: aspectWidth(modalHeight),
         position: 'absolute',
-        top: aspectWidth(5 / aspect) + boxH,
+        top: aspectWidth(((100 - totalHeight) / 2) / aspect) + boxH,
         left: aspectWidth(10) + boxW,
         display: 'flex',
         flexDirection: 'column',
         alignContent: 'space'
       }}
       onClose={() => {
-        emitter.emit('hover_scene', null)
+        emitter.emit('hover_description', null)
         setIsOpen(false)
       }}
       open={isOpen}
     >
-      <Modal.Header className='AlignCenter NoPadding' style={{ height: aspectWidth(modalHeight * 0.06), lineHeight: `${aspectWidth(modalHeight * 0.06)}px` }}>Choose your cards...</Modal.Header>
+      <Modal.Header className='AlignCenter NoPadding' style={{ height: aspectWidth(modalHeight * (isSimpleTutorial ? 0.16 : 0.06)), lineHeight: `${aspectWidth(modalHeight * (isSimpleTutorial ? 0.16 : 0.06))}px` }}>Choose your cards...</Modal.Header>
 
       <Modal.Content className='NoPadding' style={{ height: aspectWidth(modalHeight * 0.76) }}>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', height: aspectWidth(modalHeight * 0.189) }}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', height: aspectWidth(modalHeight * (isSimpleTutorial ? 0.378 : 0.189)) }}>
           <h5 className='ModalTextSteps'>Fire:</h5>
           <CardSelector cards={FireCardsTextures} currentCard={firePaces} disabledCard={dodgePaces} onSelect={(value: number) => setFirePaces(value)} />
         </div>
 
         <Divider className='NoPadding' style={{ marginTop: 0, marginBottom: 0, marginLeft: aspectWidth(1), marginRight: aspectWidth(1) }}/>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', height: aspectWidth(modalHeight * 0.189) }}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', height: aspectWidth(modalHeight * (isSimpleTutorial ? 0.378 : 0.189)) }}>
           <h5 className='ModalTextSteps'>Dodge:</h5>
           <CardSelector cards={DodgeCardsTextures} currentCard={dodgePaces} disabledCard={firePaces} onSelect={(value: number) => setDodgePaces(value)} />
         </div>
 
-        <Divider className='NoPadding' style={{ marginTop: 0, marginBottom: 0, marginLeft: aspectWidth(1), marginRight: aspectWidth(1) }}/>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', height: aspectWidth(modalHeight * 0.189) }}>
-          <h5 className='ModalTextSteps'>Tactics:</h5>
-          <CardSelector cards={TacticsCardsTextures} currentCard={tactics} onSelect={(value: number) => setTactics(value)} />
-        </div>
+        {!isSimpleTutorial && (
+          <>
+            <Divider className='NoPadding' style={{ marginTop: 0, marginBottom: 0, marginLeft: aspectWidth(1), marginRight: aspectWidth(1) }}/>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', height: aspectWidth(modalHeight * 0.189) }}>
+              <h5 className='ModalTextSteps'>Tactics:</h5>
+              <CardSelector cards={TacticsCardsTextures} currentCard={tactics} onSelect={(value: number) => setTactics(value)} />
+            </div>
 
-        <Divider className='NoPadding' style={{ marginTop: 0, marginBottom: 0, marginLeft: aspectWidth(1), marginRight: aspectWidth(1) }}/>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', height: aspectWidth(modalHeight * 0.189) }}>
-          <h5 className='ModalTextSteps'>Blades:</h5>
-          <CardSelector cards={BladesCardsTextures} currentCard={blades} onSelect={(value: number) => setBlades(value)} />
-        </div>
+            <Divider className='NoPadding' style={{ marginTop: 0, marginBottom: 0, marginLeft: aspectWidth(1), marginRight: aspectWidth(1) }}/>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', height: aspectWidth(modalHeight * 0.189) }}>
+              <h5 className='ModalTextSteps'>Blades:</h5>
+              <CardSelector cards={BladesCardsTextures} currentCard={blades} onSelect={(value: number) => setBlades(value)} />
+            </div>
+          </>
+        )}
       </Modal.Content>
 
-      <Modal.Content className='NoMargin NoPadding' style={{ height: aspectWidth(modalHeight * 0.10) }}>
-        <Divider className='NoPadding' style={{ marginTop: 0, marginBottom: 0, marginLeft: aspectWidth(1), marginRight: aspectWidth(1) }}/>
-        <div style={{ display: 'flex', flexDirection: 'row', width: '100%', height: '100%' }}>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div className='ModalTextBuffs You'>Self Chances:</div>
-            <div className='ModalTextBuffsNumber You'>{points.self_chances}</div>
+      {!isSimpleTutorial && (
+        <Modal.Content className='NoMargin NoPadding' style={{ height: aspectWidth(modalHeight * 0.10) }}>
+          <Divider className='NoPadding' style={{ marginTop: 0, marginBottom: 0, marginLeft: aspectWidth(1), marginRight: aspectWidth(1) }}/>
+          <div style={{ display: 'flex', flexDirection: 'row', width: '100%', height: '100%' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className='ModalTextBuffs You'>Self Chances:</div>
+              <div className='ModalTextBuffsNumber You'>{points.self_chances}</div>
+            </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className='ModalTextBuffs You'>Self Damage:</div>
+              <div className='ModalTextBuffsNumber You'>{points.self_damage}</div>
+            </div>
+            <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className='ModalTextBuffs'>Specials:</div>
+              <div className='ModalTextBuffsNumber' dangerouslySetInnerHTML={{ __html: points.special }}></div>
+            </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className='ModalTextBuffs Opponent'>Other Chances:</div>
+              <div className='ModalTextBuffsNumber Opponent'>{points.other_chances}</div>
+            </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div className='ModalTextBuffs Opponent'>Other Damage:</div>
+              <div className='ModalTextBuffsNumber Opponent'>{points.other_damage}</div>
+            </div>
           </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div className='ModalTextBuffs You'>Self Damage:</div>
-            <div className='ModalTextBuffsNumber You'>{points.self_damage}</div>
-          </div>
-          <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div className='ModalTextBuffs'>Specials:</div>
-            <div className='ModalTextBuffsNumber' dangerouslySetInnerHTML={{ __html: points.special }}></div>
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div className='ModalTextBuffs Opponent'>Other Chances:</div>
-            <div className='ModalTextBuffsNumber Opponent'>{points.other_chances}</div>
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <div className='ModalTextBuffs Opponent'>Other Damage:</div>
-            <div className='ModalTextBuffsNumber Opponent'>{points.other_damage}</div>
-          </div>
-        </div>
-
-      </Modal.Content>
+        </Modal.Content>
+      )}
 
       <Modal.Actions className='NoPadding' style={{ backgroundColor: '' }}>
         <Grid className='FillParent Padded' textAlign='center'>
@@ -281,12 +304,12 @@ function CardSelector({
             onHover={(isHovered) => {
               if (isHovered) {
                 cardRefs[index].current.setCardScale(1.1, 200)
-                emitter.emit('hover_scene', Object.values(cards)[index + 1].descriptionDark ?? Object.values(cards)[index + 1].description)
+                emitter.emit('hover_description', Object.values(cards)[index + 1].descriptionDark ?? Object.values(cards)[index + 1].description)
               } else {
                 if (currentCard - 1 != index) {
                   cardRefs[index].current.setCardScale(1.0, 200)
                 }
-                emitter.emit('hover_scene', null)
+                emitter.emit('hover_description', null)
               }
             }}
             onClick={(e) => {
