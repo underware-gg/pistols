@@ -39,5 +39,5 @@ catalog:
   typescript: ^5.5.4
 
   # daydreams
-  # "@daydreamsai/core": ^0.0.3
-  "@daydreamsai/core": ../../daydreams/packages/core
+  "@daydreamsai/core": ^0.0.4
+  # "@daydreamsai/core": ../../daydreams/packages/core

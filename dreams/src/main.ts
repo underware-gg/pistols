@@ -18,14 +18,14 @@ import {
   Chains,
   Types,
 } from "@daydreamsai/core";
-import { PISTOLS_CONTEXT } from "./context/pistols-context";
-import { PROVIDER_GUIDE } from "./context/pistols-provider";
-import { buildCharacter } from "./context/pistols-character";
-import { env } from "./env";
 import { z } from "zod";
 import chalk from "chalk";
 import * as readline from "readline";
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen';
+import { env } from "./env";
+import { PISTOLS_CONTEXT } from "./context/pistols-context";
+import { PROVIDER_GUIDE } from "./context/pistols-provider";
+import { buildCharacter } from "./context/pistols-character";
 
 export type BotContext = {
   profile: constants.BotProfile
@@ -58,6 +58,11 @@ export async function main(botContext: BotContext) {
 
   const CONTEXT = PISTOLS_CONTEXT.replace("<character/>", buildCharacter(botContext));
   // console.log(CONTEXT);
+  // console.log(PROVIDER_GUIDE);
+
+  //---------------------------------
+  // example-basic.ts
+  //
 
   // Initialize core components
   const llmClient = new LLMClient({
@@ -108,7 +113,9 @@ export async function main(botContext: BotContext) {
     role: Types.HandlerRole.OUTPUT,
     execute: async (data: any) => {
       const result = await starknetChain.write(data.payload);
-      return `Transaction: ${JSON.stringify(result, null, 2)}`;
+      return {
+        content: `Transaction: ${JSON.stringify(result, null, 2)}`,
+      };
     },
     outputSchema: z
       .object({
@@ -143,7 +150,9 @@ export async function main(botContext: BotContext) {
         `query: ${query}`,
         `result: ${JSON.stringify(result, null, 2)}`,
       ].join("\n\n");
-      return `GraphQL data fetched successfully: ${resultStr}`;
+      return {
+        content: `GraphQL data fetched successfully: ${resultStr}`,
+      };
     },
     outputSchema: z
       .object({
