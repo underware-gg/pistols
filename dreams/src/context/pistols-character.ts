@@ -1,5 +1,5 @@
 import { makeCharacterDuelistId } from '@underware_gg/pistols-sdk/pistols';
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen';
 import { BotContext } from "../main";
 
 export const buildCharacter = (botContext: BotContext) => (`

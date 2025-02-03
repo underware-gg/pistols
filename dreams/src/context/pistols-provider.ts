@@ -1,14 +1,16 @@
 // import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
-import { makeDojoAppConfig } from '@underware_gg/pistols-sdk/pistols'
-import { DEFAULT_NETWORK_ID } from '@underware_gg/pistols-sdk/pistols'
-import { getContractByName } from '@dojoengine/core'
+import { getContractByName } from '@dojoengine/core';
+import { makeDojoAppConfig } from '@underware_gg/pistols-sdk/pistols';
+import { bigintToHex, stringToFelt } from '@underware_gg/pistols-sdk/utils';
+import { DEFAULT_NETWORK_ID } from '@underware_gg/pistols-sdk/pistols';
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen';
 
 const dojoAppConfig = makeDojoAppConfig(DEFAULT_NETWORK_ID, undefined);
 
 const game_contract = getContractByName(dojoAppConfig.manifest, dojoAppConfig.namespace, 'game');
 const duel_contract = getContractByName(dojoAppConfig.manifest, dojoAppConfig.namespace, 'duel_token');
-const duelist_contract = getContractByName(dojoAppConfig.manifest, dojoAppConfig.namespace, 'duelist_token');
+// const duelist_contract = getContractByName(dojoAppConfig.manifest, dojoAppConfig.namespace, 'duelist_token');
 
 export const PROVIDER_GUIDE = `
 
@@ -20,230 +22,97 @@ Use these to call functions with graphql
     1. If you receive an error, you may need to try again, the error message should tell you what went wrong.
     2. To verify a successful transaction, read the response you get back. You don't need to query anything.
     3. Never include slashes in your calldata.
+    4. If some function has a contractAddress equals to '0x0', there is a context error, you can avort and inform the user to contact support.
   </IMPORTANT_RULES>
 
+  <PREMISE_VALUES>
+    ${Object.keys(constants.Premise).slice(1).map(key => `${key} : ${constants.getPremiseValue(key as constants.Premise)}`).join('\n    ')}
+  </PREMISE_VALUES>
+
+  <MOVES_HASH>
+    - Calculate it using your secret salt and moves using the starknet ec.starkCurve.poseidonHashMany() function.
+    - The salt is a random number you generate. You must remember it to reveal your moves later.
+    - The moves is a number composed by the numeric values of the cards you have selected, from left to right (least significant byte first)
+    - Example: the moves [1,2,3,4] becomes 0x04030201
+    - hash your salt and moves by calling ec.starkCurve.poseidonHashMany(['0x12345678','0x04030201'])
+    - use only 32 bits of the resulting hash (value & 0xffffffff)
+  </MOVES_HASH>
+
   <FUNCTIONS>
-    <CREATE_ORDER>
+    <CREATE_CHALLENGE>
       <DESCRIPTION>
-        Creates a new trade order between realms.
+        Creates a new Challenge to another player.
       </DESCRIPTION>
       <PARAMETERS>
-        - maker_id: ID of the realm creating the trade
-        - maker_gives_resources: Resources the maker is offering
-        - taker_id: ID of the realm that can accept the trade
-        - taker_gives_resources: Resources requested from the taker
-        - signer: Account executing the transaction
-        - expires_at: When the trade expires
+        - duelist_id: Your duelist ID (the Challenger)
+        - challenged_address: The challenged player's wallet address
+        - premise: The premise of the challenge see <PREMISE_VALUES>. Always use the "Training" code
+        - quote: The quote of the challenge, a string of 31 characters max, encoded as a fetlt252 short string
+        - table_id: The table ID of the challenge. Bots always duel in the "${bigintToHex(stringToFelt(constants.TABLES.PRACTICE))}" table
+        - expire_hours: The number of hours before the challenge expires, from 1 to 24
       </PARAMETERS>
       <EXAMPLE>
-     
           {
-            "contractAddress": "<eternum-trade_systems>",
-            "entrypoint": "create_order",
+            "contractAddress": "${duel_contract?.address ?? '0x0'}",
+            "entrypoint": "create_duel",
             "calldata": [
-              123,         
-              1,           
-              1,           
-              100,         
-              456,         
-              1,           
-              2,           
-              50,          
-              1704067200   
+              "0x300000001",
+              "0x123",
+              ${constants.Premise.Training},
+              "${bigintToHex(stringToFelt("The Quote"))}",
+              "${bigintToHex(stringToFelt(constants.TABLES.PRACTICE))}",
+              24
             ]
           }
-  
       </EXAMPLE>
-    </CREATE_ORDER>
+    </CREATE_CHALLENGE>
 
-    <ACCEPT_ORDER>
+    <COMMIT_MOVES>
       <DESCRIPTION>
-        Accepts an existing trade order.
+        Commit the moves of the Challenger player.
       </DESCRIPTION>
       <PARAMETERS>
-        - taker_id: ID of the realm accepting the trade
-        - trade_id: ID of the trade being accepted
-        - maker_gives_resources: Resources the maker is offering
-        - taker_gives_resources: Resources requested from the taker
-        - signer: Account executing the transaction
+        - duelist_id: Your duelist ID (the Challenged)
+        - duel_id: The duel ID of the challenge
+        - hashed: Your hashed moves. Calculate it according to the <MOVES_HASH> section.
       </PARAMETERS>
       <EXAMPLE>
-        <JSON>
           {
-            "contractAddress": "<eternum-trade_systems>",
-            "entrypoint": "accept_order",
+            "contractAddress": "${game_contract?.address ?? '0x0'}",
+            "entrypoint": "commit_moves",
             "calldata": [
-              123,
-              789,
-              1,
-              1,
-              100,
-              1,
-              2,
-              50
+              "0x300000001",
+              "0x123",
+              "0x44332211"
             ]
           }
-        </JSON>
       </EXAMPLE>
-    </ACCEPT_ORDER>
+    </COMMIT_MOVES>
 
-    <ACCEPT_PARTIAL_ORDER>
+    <REVEAL_MOVES>
       <DESCRIPTION>
-        Accepts a portion of an existing trade order.
+        Reveal the moves of the Challenger player.
       </DESCRIPTION>
       <PARAMETERS>
-        - taker_id: ID of the realm accepting the trade
-        - trade_id: ID of the trade being accepted
-        - maker_gives_resources: Resources the maker is offering
-        - taker_gives_resources: Resources requested from the taker
-        - taker_gives_actual_amount: Actual amount taker will give
-        - signer: Account executing the transaction
+        - duelist_id: Your duelist ID (the Challenged)
+        - duel_id: The duel ID of the challenge
+        - salt: The salt of the challenge. MUST be the same salt used to create "hashed" in the commit_moves() function.
+        - moves: The moves of the Challenger player. MUST be the same moves used to create "hashed" in the commit_moves() function.
       </PARAMETERS>
       <EXAMPLE>
-        <JSON>
           {
-            "contractAddress": "<eternum-trade_systems>",
-            "entrypoint": "accept_partial_order",
+            "contractAddress": "${game_contract?.address ?? '0x0'}",
+            "entrypoint": "reveal_moves",
             "calldata": [
-              123,
-              789,
-              1,
-              1,
-              100,
-              1,
-              2,
-              50,
-              25
+              "0x300000001",
+              "0x123",
+              "0x12345678",
+              [1,2,3,4]
             ]
           }
-        </JSON>
       </EXAMPLE>
-    </ACCEPT_PARTIAL_ORDER>
+    </REVEAL_MOVES>
 
-    <CANCEL_ORDER>
-      <DESCRIPTION>
-        Cancels an existing trade order.
-      </DESCRIPTION>
-      <PARAMETERS>
-        - trade_id: ID of the trade to cancel
-        - return_resources: Resources to return
-        - signer: Account executing the transaction
-      </PARAMETERS>
-      <EXAMPLE>
-        <JSON>
-          {
-            "contractAddress": "<eternum-trade_systems>",
-            "entrypoint": "cancel_order",
-            "calldata": [
-              789,
-              1,
-              1,
-              100
-            ]
-          }
-        </JSON>
-      </EXAMPLE>
-    </CANCEL_ORDER>
-
-    <CREATE_BUILDING>
-      <DESCRIPTION>
-        Creates a new building for a realm on the hexagonal grid map.
-      </DESCRIPTION>
-      <PARAMETERS>
-        - entity_id: ID of the realm creating the building (required)
-        - directions: Array of directions from castle to building location (required)
-        - building_category: Type of building (required)
-        - produce_resource_type: Resource type ID this building will produce (required for resource buildings)
-      </PARAMETERS>
-      <NOTES>
-        Never use 0 for produce_resource_type, always use the resource type ID - eg: fish is 1, wheat is 1, etc.
-      </NOTES>
-      
-      <PLACEMENT_GUIDE>
-        <DESCRIPTION>
-          The map uses a hexagonal grid with your realm's castle at the center (0,0). 
-          Buildings are placed by specifying directions outward from the castle.
-        </DESCRIPTION>
-        
-        <DIRECTION_IDS>
-          0 = East (→)
-          1 = Northeast (↗) 
-          2 = Northwest (↖)
-          3 = West (←)
-          4 = Southwest (↙) 
-          5 = Southeast (↘)
-        </DIRECTION_IDS>
-
-        <KEY_RULES>
-          1. Cannot build on castle location (0,0)
-          2. Building distance from castle is limited by realm level
-          3. Each direction in the array represents one hex step from castle
-          4. Location is determined by following directions sequentially
-        </KEY_RULES>
-
-        <RESOURCE_TYPES>
-          <BASIC_RESOURCES>
-            Stone (1)
-            Coal (2) 
-            Wood (3)
-            Copper (4)
-            Ironwood (5)
-            Obsidian (6)
-          </BASIC_RESOURCES>
-
-          <PRECIOUS_RESOURCES>
-            Gold (7)
-            Silver (8)
-            Mithral (9)
-            AlchemicalSilver (10)
-            ColdIron (11)
-          </PRECIOUS_RESOURCES>
-
-          <RARE_RESOURCES>
-            DeepCrystal (12)
-            Ruby (13)
-            Diamonds (14)
-            Hartwood (15)
-            Ignium (16)
-            TwilightQuartz (17)
-            TrueIce (18)
-            Adamantine (19)
-            Sapphire (20)
-            EtherealSilica (21)
-            Dragonhide (22)
-          </RARE_RESOURCES>
-
-          <SPECIAL_RESOURCES>
-            AncientFragment (29)
-            Donkey (249)
-            Knight (250)
-            Crossbowman (251)
-            Paladin (252)
-            Lords (253)
-            Wheat (1)
-            Fish (1)
-          </SPECIAL_RESOURCES>
-        </RESOURCE_TYPES>
-      </PLACEMENT_GUIDE>
-
-      <EXAMPLE>
-        <DESCRIPTION>
-          Create a wood production building one hex northeast of castle:
-        </DESCRIPTION>
-        <JSON>
-          {
-            "contractAddress": "<eternum-building_systems>",
-            "entrypoint": "create",
-            "calldata": [
-              123,
-              [1],
-              1,
-              3
-            ]
-          }
-        </JSON>
-      </EXAMPLE>
-    </CREATE_BUILDING>
   </FUNCTIONS>
 </PROVIDER_GUIDE>
 `;
