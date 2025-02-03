@@ -6,8 +6,11 @@
 export const CARD_WIDTH = 8.5
 export const CARD_HEIGHT = 12
 
-export const DUELIST_CARD_WIDTH = 8.5 * 1.1
-export const DUELIST_CARD_HEIGHT = 12 * 1.1
+export const DUELIST_CARD_WIDTH = CARD_WIDTH * 1.1
+export const DUELIST_CARD_HEIGHT = CARD_HEIGHT * 1.1
+
+export const CARD_PACK_CARD_SIZE_WIDTH = CARD_WIDTH * 1.4
+export const CARD_PACK_CARD_SIZE_HEIGHT = CARD_HEIGHT * 1.4
 
 export const DUEL_CARD_WIDTH = 8.5 * 0.7
 export const DUEL_CARD_HEIGHT = 12 * 0.7

@@ -78,14 +78,14 @@ $color-cold: #4d9ad6;
   position: absolute;
   width: 110%;
   height: 110%;
-  transition: transform 0.8s;
+  transition: transform 0.8s translate 0.6s;
   transform-style: preserve-3d;
   background-color: var(--background-color, white);;
   box-shadow: aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) rgba(20, 20, 20, 0.6);
   filter: blur(4px);
   top: -5%;
   left: -5%;
-  transform: translate(var(--idle-translate-x, 0px), var(--idle-translate-y, 0px));
+  transform: translate(var(--idle-translate-x, 0px), var(--idle-translate-y, 0px)) rotateY(var(--card-flip-rotation, 0deg));
 }
 
 .card-front {
@@ -531,4 +531,273 @@ $color-cold: #4d9ad6;
   font-size: aspect-width(0.9);
   color: #ffffff;
   justify-content: flex-end;
+}
+
+
+
+//card pack
+.card-pack {
+  --front-bag-image: url('/images/ui/card_pack_outter.png');
+  --inner-bag-image: url('/images/ui/card_pack_inner.png');
+  --card-pack-edge-image: url('/images/ui/card_pack_edge.png');
+  --seal-image: url('/images/ui/card_pack_seal.png');
+  --seal-background: url('/images/ui/card_pack_seal_background.png');
+  --front-cover-image: url('/images/ui/card_pack_flap_outter.png');
+  --cover-background: url('/images/ui/card_pack_flap_background.png');
+  --back-cover-image: url('/images/ui/card_pack_flap_inner.png');
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  perspective: aspect-width(calc(var(--card-pack-size) * 3));
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+
+  .inner-bag {
+    position: absolute;
+    top: calc(50% - aspect-width(calc(var(--card-pack-size) * 0.5)));
+    left: calc(50% - aspect-width(calc(var(--card-pack-size) * 0.75 * 0.5)));
+    width: aspect-width(calc(var(--card-pack-size) * 0.75));
+    height: aspect-width(var(--card-pack-size));
+    z-index: 1;
+    transform: translateZ(aspect-width(-1));
+    background: var(--inner-bag-image) no-repeat center;
+    background-size: contain;
+    transition: transform 0.1s ease-out;
+  }
+  
+  .front-bag {
+    position: absolute;
+    top: calc(50% - aspect-width(calc(var(--card-pack-size) * 0.5)));
+    left: calc(50% - aspect-width(calc(var(--card-pack-size) * 0.75 * 0.5)));
+    width: aspect-width(calc(var(--card-pack-size) * 0.75));
+    height: aspect-width(var(--card-pack-size));
+    z-index: 100;
+    transform-style: preserve-3d;
+    transform: translateZ(0); // Main front bag at z=0
+    background: var(--front-bag-image) no-repeat center;
+    background-size: contain;
+    transition: transform 0.1s ease-out;
+  }
+
+  .front-bag-layer-1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--card-pack-edge-image) no-repeat center;
+    background-size: contain;
+    transform: translateZ(aspect-width(-0.25)); // First layer behind
+  }
+
+  .front-bag-layer-2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--card-pack-edge-image) no-repeat center;
+    background-size: contain;
+    transform: translateZ(aspect-width(-0.5)); // Second layer behind
+  }
+
+  .front-bag-layer-3 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--card-pack-edge-image) no-repeat center;
+    background-size: contain;
+    transform: translateZ(aspect-width(-0.75)); // Third layer behind
+  }
+
+  .front-bag-layer-4 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--card-pack-edge-image) no-repeat center;
+    background-size: contain;
+    transform: translateZ(aspect-width(-1)); // Fourth layer behind
+  }
+  
+  .flip-container {
+    position: absolute;
+    top: calc(50% - aspect-width(calc(var(--card-pack-size) * 0.5)));
+    left: calc(50% - aspect-width(calc(var(--card-pack-size) * 0.75 * 0.5)));
+    width: aspect-width(calc(var(--card-pack-size) * 0.75));
+    height: aspect-width(calc(var(--card-pack-size) * 0.5));
+    z-index: 101;
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out;
+    
+    img {
+      object-fit: fill;
+    }
+  }
+  
+  .flipper {
+    position: absolute;
+    width: aspect-width(calc(var(--card-pack-size) * 0.75));
+    height: aspect-width(calc(var(--card-pack-size) * 0.5));
+    transform-style: preserve-3d;
+    transform-origin: 50% 0.1% aspect-width(-1);
+  }
+  
+  .front-cover, .back-cover {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+    top: aspect-width(-0.2);
+    transform: translateZ(aspect-width(0.1));
+  }
+
+  .front-cover {
+    background: var(--front-cover-image) no-repeat center;
+    background-size: 100% 100%;
+  }
+
+  .front-cover-layer-1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--cover-background) no-repeat center;
+    background-size: 100% 100%;
+    transform: translateZ(aspect-width(-0.25));
+    backface-visibility: hidden;
+  }
+
+  .front-cover-layer-2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--cover-background) no-repeat center;
+    background-size: 100% 100%;
+    transform: translateZ(aspect-width(-0.5));
+    backface-visibility: hidden;
+  }
+
+  .front-cover-layer-3 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--cover-background) no-repeat center;
+    background-size: 100% 100%;
+    transform: translateZ(aspect-width(-0.75));
+    backface-visibility: hidden;
+  }
+
+  .front-cover-layer-4 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--cover-background) no-repeat center;
+    background-size: 100% 100%;
+    transform: translateZ(aspect-width(-1));
+    backface-visibility: hidden;
+  }
+  .back-cover {
+    background: var(--back-cover-image) no-repeat center;
+    background-size: 100% 100%;
+    top: aspect-width(-0.2);
+    transform: rotateX(-180deg) translateZ(aspect-width(1));
+    z-index: 1;
+  }
+  
+  .seal {
+    position: absolute;
+    top: calc(50% - aspect-width(calc(var(--card-pack-size) * 0.2)));
+    left: 50%;
+    translate: -50% -50%;
+    z-index: 300;
+    cursor: pointer;
+    transition: scale 0.2s ease-out, transform 0.2s ease-out;
+    width: aspect-width(calc(var(--card-pack-size) * 0.25));
+    height: aspect-width(calc(var(--card-pack-size) * 0.25));
+    transform-style: preserve-3d;
+    background: var(--seal-image) no-repeat center;
+    background-size: contain;
+    transform: translateZ(aspect-width(0.5));
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--seal-background) no-repeat center;
+      background-size: contain;
+      transform: translateZ(aspect-width(-0.1)) scale(1.03);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--seal-background) no-repeat center;
+      background-size: contain;
+      transform: translateZ(aspect-width(-0.2)) scale(1.06);
+    }
+
+    &:nth-child(1) {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--seal-background) no-repeat center;
+      background-size: contain;
+      transform: translateZ(aspect-width(-0.3)) scale(1.09);
+    }
+
+    &:nth-child(2) {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--seal-background) no-repeat center;
+      background-size: contain;
+      transform: translateZ(aspect-width(-0.4)) scale(1.12);
+    }
+    
+    &.hover {
+      scale: 1.15;
+      animation: wobble 0.3s infinite;
+    }
+  }
+  
+  @keyframes wobble {
+    0% { rotate: 0deg; }
+    25% { rotate: -5deg; }
+    75% { rotate: 5deg; }
+    100% { rotate: 0deg; }
+  }
+
+  
+  .card-pack-cards {
+    position: absolute;
+    top: calc(50% - var(--card-height) / 2);
+    left: calc(50% - var(--card-width) / 2);
+  }
 }

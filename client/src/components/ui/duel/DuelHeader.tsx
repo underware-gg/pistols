@@ -1,14 +1,17 @@
 import React from 'react'
-import { useChallenge } from '/src/stores/challengeStore'
+import { useAddChallenge, useChallenge } from '/src/stores/challengeStore'
 import { useTable } from '/src/stores/tableStore'
+import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 
 export default function DuelHeader({
   duelId,
+  tutorialLevel
 } : {
   duelId: bigint,
+  tutorialLevel: DuelTutorialLevel
 }) {
 
-  const { tableId, quote } = useChallenge(duelId)
+  const { tableId, quote } = tutorialLevel === DuelTutorialLevel.NONE ? useChallenge(duelId) : useAddChallenge(duelId)
   const { description } = useTable(tableId)
 
 

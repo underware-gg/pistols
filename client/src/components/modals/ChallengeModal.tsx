@@ -71,8 +71,7 @@ export default function ChallengeModal() {
   }
 
   const _gotoDuel = () => {
-    dispatchSetDuel(selectedDuelId)
-    dispatchSetScene(SceneName.Duel)
+    dispatchSetScene(SceneName.Duel, { duelId: selectedDuelId })
   }
 
   // bookmark

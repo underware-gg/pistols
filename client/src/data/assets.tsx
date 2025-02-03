@@ -54,6 +54,13 @@ enum TextureName {
   bg_tutorial_3 = 'bg_tutorial_3',
   bg_tutorial_4 = 'bg_tutorial_4',
   bg_tutorial_5 = 'bg_tutorial_5',
+  bg_demon = 'bg_demon',
+  bg_demon_person = 'bg_demon_person',
+  bg_demon_background = 'bg_demon_background',
+  bg_demon_left_hand = 'bg_demon_left_hand',
+  bg_demon_right_hand = 'bg_demon_right_hand',
+  bg_demon_left_hand_mask = 'bg_demon_left_hand_mask',
+  bg_demon_right_hand_mask = 'bg_demon_right_hand_mask',
 }
 type TextureAttributes = {
   path: string
@@ -92,6 +99,13 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_tutorial_3]: { path: '/images/bg_tutorial_3.png' },
   [TextureName.bg_tutorial_4]: { path: '/images/bg_tutorial_4.png' },
   [TextureName.bg_tutorial_5]: { path: '/images/bg_tutorial_5.png' },
+  [TextureName.bg_demon]: { path: '/images/bg_demon.png' },
+  [TextureName.bg_demon_person]: { path: '/images/bg_demon_person.png' },
+  [TextureName.bg_demon_background]: { path: '/images/bg_demon_background.png' },
+  [TextureName.bg_demon_left_hand]: { path: '/images/bg_demon_left_hand.png' },
+  [TextureName.bg_demon_right_hand]: { path: '/images/bg_demon_right_hand.png' },
+  [TextureName.bg_demon_left_hand_mask]: { path: '/images/bg_demon_left_hand_mask.png' },
+  [TextureName.bg_demon_right_hand_mask]: { path: '/images/bg_demon_right_hand_mask.png' },
 }
 
 interface SceneData {
@@ -102,7 +116,8 @@ interface SceneData {
 interface SceneBackgroundObject {
   texture: TextureName,
   shiftMultiplier: number,
-  renderOrder: number
+  renderOrder: number,
+  animatedIdle?: number
 }
 
 interface SceneObject {
@@ -110,7 +125,7 @@ interface SceneObject {
   color: string,
   description: string,
   mask: TextureName,
-  renderOrder: number
+  renderOrder: number,
 }
 
 const sceneBackgrounds: Record<SceneName, SceneData> = {
@@ -126,21 +141,21 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
   [SceneName.Profile]: { backgrounds: [{ texture: TextureName.bg_profile, shiftMultiplier: 0, renderOrder: 0 }] },
   [SceneName.Tavern]: { 
     backgrounds: [
-      // { texture: TextureName.bg_tavern_bar_test, shiftMultiplier: -0.02, renderOrder: 0 },
-      // { texture: TextureName.bg_tavern_bartender_test, shiftMultiplier: -0.01, renderOrder: 1 },
-      // { texture: TextureName.bg_tavern_test, shiftMultiplier: 0.01, renderOrder: 2 },
-      // { texture: TextureName.bg_tavern_door_test, shiftMultiplier: 0.02, renderOrder: 3 },
-      { texture: TextureName.bg_tavern, shiftMultiplier: -0.001, renderOrder: 0 },
+      { texture: TextureName.bg_tavern_bar_test, shiftMultiplier: -0.02, renderOrder: 0 },
+      { texture: TextureName.bg_tavern_bartender_test, shiftMultiplier: -0.01, renderOrder: 1 },
+      { texture: TextureName.bg_tavern_test, shiftMultiplier: 0.01, renderOrder: 2 },
+      { texture: TextureName.bg_tavern_door_test, shiftMultiplier: 0.02, renderOrder: 3 },
+      // { texture: TextureName.bg_tavern, shiftMultiplier: -0.001, renderOrder: 0 },
     ],
     items: [
-      // { name: 'bottle', color: '0000ff', description: 'All Duelists', mask: TextureName.bg_tavern_bar_test_mask, renderOrder: 0 },
-      // { name: 'bartender', color: 'ff0000', description: 'Bartender', mask: TextureName.bg_tavern_bartender_test_mask, renderOrder: 1 },
-      // { name: 'pistol', color: '00ff00', description: 'Your Duels', mask: TextureName.bg_tavern_test_mask, renderOrder: 2 },
-      // { name: 'shovel', color: 'ff00ff', description: 'Past Duels', mask: TextureName.bg_tavern_door_test_mask, renderOrder: 3 }
-      { name: 'bottle', color: '0000ff', description: 'All Duelists', mask: TextureName.bg_tavern_mask, renderOrder: 0 },
-      { name: 'bartender', color: 'ff0000', description: 'Bartender', mask: TextureName.bg_tavern_mask, renderOrder: 0 },
-      { name: 'pistol', color: '00ff00', description: 'Your Duels', mask: TextureName.bg_tavern_mask, renderOrder: 0 },
-      { name: 'shovel', color: 'ff00ff', description: 'Past Duels', mask: TextureName.bg_tavern_mask, renderOrder: 0 }
+      { name: 'bottle', color: '0000ff', description: 'All Duelists', mask: TextureName.bg_tavern_bar_test_mask, renderOrder: 0 },
+      { name: 'bartender', color: 'ff0000', description: 'Bartender', mask: TextureName.bg_tavern_bartender_test_mask, renderOrder: 1 },
+      { name: 'pistol', color: '00ff00', description: 'Your Duels', mask: TextureName.bg_tavern_test_mask, renderOrder: 2 },
+      { name: 'shovel', color: 'ff00ff', description: 'Past Duels', mask: TextureName.bg_tavern_door_test_mask, renderOrder: 3 }
+      // { name: 'bottle', color: '0000ff', description: 'All Duelists', mask: TextureName.bg_tavern_mask, renderOrder: 0 },
+      // { name: 'bartender', color: 'ff0000', description: 'Bartender', mask: TextureName.bg_tavern_mask, renderOrder: 0 },
+      // { name: 'pistol', color: '00ff00', description: 'Your Duels', mask: TextureName.bg_tavern_mask, renderOrder: 0 },
+      // { name: 'shovel', color: 'ff00ff', description: 'Past Duels', mask: TextureName.bg_tavern_mask, renderOrder: 0 }
     ]
   },
   [SceneName.Duelists]: { 
@@ -171,7 +186,19 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
   [SceneName.Tutorial]: { backgrounds: [{ texture: TextureName.bg_tutorial_1, shiftMultiplier: 0, renderOrder: 0 }] },
   [SceneName.TutorialScene2]: { backgrounds: [{ texture: TextureName.bg_tutorial_2, shiftMultiplier: 0, renderOrder: 0 }] },
   [SceneName.TutorialScene3]: { backgrounds: [{ texture: TextureName.bg_tutorial_3, shiftMultiplier: 0, renderOrder: 0 }] },
-  [SceneName.TutorialScene4]: { backgrounds: [{ texture: TextureName.bg_tutorial_4, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.TutorialScene4]: { 
+    backgrounds: [
+      { texture: TextureName.bg_demon_right_hand, shiftMultiplier: -0.01, renderOrder: 0, animatedIdle: 0.01 },
+      { texture: TextureName.bg_demon_left_hand, shiftMultiplier: -0.01, renderOrder: 1, animatedIdle: 0.01 },
+      { texture: TextureName.bg_demon, shiftMultiplier: 0.01, renderOrder: 2 },
+      { texture: TextureName.bg_demon_person, shiftMultiplier: 0.02, renderOrder: 3 },
+      { texture: TextureName.bg_demon_background, shiftMultiplier: 0, renderOrder: 4 },
+    ],
+    items: [
+      { name: 'demon_right', color: '0000ff', description: 'Take the gun, become my patron', mask: TextureName.bg_demon_right_hand_mask, renderOrder: 0 },
+      { name: 'demon_left', color: '00ff00', description: 'Drink, forget this happened', mask: TextureName.bg_demon_left_hand_mask, renderOrder: 1 },
+    ]
+  },
   [SceneName.TutorialScene5]: { backgrounds: [{ texture: TextureName.bg_tutorial_5, shiftMultiplier: 0, renderOrder: 0 }] }
 }
 

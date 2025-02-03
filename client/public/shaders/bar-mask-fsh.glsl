@@ -10,6 +10,7 @@ uniform int uTexturesRenderOrder[5];
 uniform vec2 uResolution;
 uniform vec3 uHighlightColor;
 uniform float uHighlightOpacity;
+uniform float uHiddenOpacities[5];
 
 // varying
 uniform float uTime;
@@ -25,25 +26,30 @@ uniform vec2 uTextureShift1;
 uniform vec2 uTextureShift2;
 uniform vec2 uTextureShift3;
 uniform vec2 uTextureShift4;
+uniform float uRandomShift0;
+uniform float uRandomShift1;
+uniform float uRandomShift2;
+uniform float uRandomShift3;
+uniform float uRandomShift4;
 
 int MAX_ELEMENTS = 5;
 
 int findFirstUsed(sampler2D elements[5], vec2 uvs[5]) {
-  if (texture2D(elements[0], uvs[0]).a == 1.0) return 0;
-  if (texture2D(elements[1], uvs[1]).a == 1.0) return 1;
-  if (texture2D(elements[2], uvs[2]).a == 1.0) return 2;
-  if (texture2D(elements[3], uvs[3]).a == 1.0) return 3;
-  if (texture2D(elements[4], uvs[4]).a == 1.0) return 4;
+  if (texture2D(elements[0], uvs[0]).a > 0.0) return 0;
+  if (texture2D(elements[1], uvs[1]).a > 0.0) return 1;
+  if (texture2D(elements[2], uvs[2]).a > 0.0) return 2;
+  if (texture2D(elements[3], uvs[3]).a > 0.0) return 3;
+  if (texture2D(elements[4], uvs[4]).a > 0.0) return 4;
   
   return -1;
 }
 
 vec2 findShift(int index) {
-  if (index == 0) return uTextureShift0;
-  if (index == 1) return uTextureShift1;
-  if (index == 2) return uTextureShift2;
-  if (index == 3) return uTextureShift3;
-  if (index == 4) return uTextureShift4;
+  if (index == 0) return uTextureShift0 + uRandomShift0;
+  if (index == 1) return uTextureShift1 + uRandomShift1;
+  if (index == 2) return uTextureShift2 + uRandomShift2;
+  if (index == 3) return uTextureShift3 + uRandomShift3;
+  if (index == 4) return uTextureShift4 + uRandomShift4;
   
   return vec2(0.0);
 }
@@ -147,20 +153,63 @@ void main() {
   }
 
   vec4 combinedTex = vec4(0.0);
+  if (uHiddenOpacities[0] == 1.0) combinedTex = texture2D(uTextures[0], shiftedUvs[0]);
+  if (uHiddenOpacities[1] == 1.0) combinedTex = mix(combinedTex, texture2D(uTextures[1], shiftedUvs[1]), 1.0 - combinedTex.a);
+  if (uHiddenOpacities[2] == 1.0) combinedTex = mix(combinedTex, texture2D(uTextures[2], shiftedUvs[2]), 1.0 - combinedTex.a);
+  if (uHiddenOpacities[3] == 1.0) combinedTex = mix(combinedTex, texture2D(uTextures[3], shiftedUvs[3]), 1.0 - combinedTex.a);
+  if (uHiddenOpacities[4] == 1.0) combinedTex = mix(combinedTex, texture2D(uTextures[4], shiftedUvs[4]), 1.0 - combinedTex.a);
+
+  // gl_FragColor = texture2D(uTextures[0], shiftedUvs[0]);
+  // return;
+  // Hide item
+  bool hide = false;
+  if (usedTexture == 0) {
+    if (uHiddenOpacities[0] < 1.0) {
+      hide = true;
+    }
+    texColor = mix(texColor, combinedTex, 1.0 - uHiddenOpacities[0]);
+    blurTex = mix(blurTex, combinedTex, 1.0 - uHiddenOpacities[0]);
+  } else if (usedTexture == 1) {
+    if (uHiddenOpacities[1] < 1.0) {
+      hide = true;
+    }
+    texColor = mix(texColor, combinedTex, 1.0 - uHiddenOpacities[1]);
+    blurTex = mix(blurTex, combinedTex, 1.0 - uHiddenOpacities[1]);
+  } else if (usedTexture == 2) {
+    if (uHiddenOpacities[2] < 1.0) {
+      hide = true;
+    }
+    texColor = mix(texColor, combinedTex, 1.0 - uHiddenOpacities[2]);
+    blurTex = mix(blurTex, combinedTex, 1.0 - uHiddenOpacities[2]);
+  } else if (usedTexture == 3) {
+    if (uHiddenOpacities[3] < 1.0) {
+      hide = true;
+    }
+    texColor = mix(texColor, combinedTex, 1.0 - uHiddenOpacities[3]);
+    blurTex = mix(blurTex, combinedTex, 1.0 - uHiddenOpacities[3]);
+  } else if (usedTexture == 4) {
+    if (uHiddenOpacities[4] < 1.0) {
+      hide = true;
+    }
+    texColor = mix(texColor, combinedTex, 1.0 - uHiddenOpacities[4]);
+    blurTex = mix(blurTex, combinedTex, 1.0 - uHiddenOpacities[4]);
+  }
+
+  vec4 combinedTexNoMask = vec4(0.0);
   if (uTexturesSize > 0 && uTexturesRenderOrder[0] < maskOrder) {
-    combinedTex = texture2D(uTextures[0], shiftedUvs[0]);
+    combinedTexNoMask = texture2D(uTextures[0], shiftedUvs[0]);
   }
   if (uTexturesSize > 1 && uTexturesRenderOrder[1] < maskOrder) {
-    combinedTex = mix(combinedTex, texture2D(uTextures[1], shiftedUvs[1]), 1.0 - combinedTex.a);
+    combinedTexNoMask = mix(combinedTexNoMask, texture2D(uTextures[1], shiftedUvs[1]), 1.0 - combinedTexNoMask.a);
   }
   if (uTexturesSize > 2 && uTexturesRenderOrder[2] < maskOrder) {
-    combinedTex = mix(combinedTex, texture2D(uTextures[2], shiftedUvs[2]), 1.0 - combinedTex.a);
+    combinedTexNoMask = mix(combinedTexNoMask, texture2D(uTextures[2], shiftedUvs[2]), 1.0 - combinedTexNoMask.a);
   }
   if (uTexturesSize > 3 && uTexturesRenderOrder[3] < maskOrder) {
-    combinedTex = mix(combinedTex, texture2D(uTextures[3], shiftedUvs[3]), 1.0 - combinedTex.a);
+    combinedTexNoMask = mix(combinedTexNoMask, texture2D(uTextures[3], shiftedUvs[3]), 1.0 - combinedTexNoMask.a);
   }
   if (uTexturesSize > 4 && uTexturesRenderOrder[4] < maskOrder) {
-    combinedTex = mix(combinedTex, texture2D(uTextures[4], shiftedUvs[4]), 1.0 - combinedTex.a);
+    combinedTexNoMask = mix(combinedTexNoMask, texture2D(uTextures[4], shiftedUvs[4]), 1.0 - combinedTexNoMask.a);
   }
 
   // bool selected = maskValue.a > 0.0;
@@ -168,30 +217,31 @@ void main() {
   bool excluded = (maskValue.a > 0.0 && maskValue.rgb == uExcludedColor);
 
   float glowAlpha = 0.0;
-  if (combinedTex.a == 0.0) {
+  if (combinedTexNoMask.a == 0.0) {
     glowAlpha = (sin(clamp(mod((uTime * 2.0 + maskUv.y * 2.0), 8.0), 0.0, 1.0) * PI * 2.0));
     glowAlpha *= (uHighlightOpacity * 0.5) * maskValue.a;
   }
 
-  if (selected && uClickable && combinedTex.a == 0.0) {
+  if (selected && uClickable && combinedTexNoMask.a == 0.0) {
     alpha = uHighlightOpacity;
   }
   // Darken the blurred texture by multiplying RGB values
   float darkFactor = 1.0;
-  if ((uExcludedColor != vec3(0.0) && !excluded) || combinedTex.a != 0.0) {
+  if ((uExcludedColor != vec3(0.0) && !excluded) || combinedTexNoMask.a != 0.0) {
     float t = 1.0 - ((float(uSamples) - 1.0) / 34.0); // Map uSamples from [1,35] to [1,0]
     darkFactor = mix(0.4, 1.0, t);
   }
   blurTex.rgb *= darkFactor;
 
+  blurTex.rgb = linearToSRGB(blurTex.rgb);
   texColor.rgb = linearToSRGB(texColor.rgb);
 
-  if (uClickable) {
+  if (uClickable && !hide) {
     blurTex = mix(blurTex, vec4(uHighlightColor, 1.0), max(alpha, glowAlpha));
     texColor = vec4(mix(texColor.rgb, uHighlightColor, max(alpha, glowAlpha)), texColor.a);
   }
 
-  if (excluded && combinedTex.a == 0.0) {
+  if (excluded && combinedTexNoMask.a == 0.0) {
     gl_FragColor = texColor;
   } else {
     gl_FragColor = blurTex;
