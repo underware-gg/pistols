@@ -520,7 +520,7 @@ export type BotProfileEnum = CairoCustomEnum;
 export type CharacterProfile = {
 	Unknown: string;
 	Bartender: string;
-	Drunken: string;
+	Drunkard: string;
 	Devil: string;
 	Player: string;
 }

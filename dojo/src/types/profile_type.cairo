@@ -46,7 +46,7 @@ pub enum DuelistProfile {
 pub enum CharacterProfile {
     Unknown,
     Bartender,
-    Drunken,
+    Drunkard,
     Devil,
     Player,
 }
@@ -210,10 +210,10 @@ mod CHARACTER_PROFILES {
         gender: Gender::Male,
         name: 'Bartender',
     };
-    const Drunken: ProfileDescription = ProfileDescription {
+    const Drunkard: ProfileDescription = ProfileDescription {
         profile_id: 2,
         gender: Gender::Male,
-        name: 'Drunken',
+        name: 'Drunkard',
     };
     const Devil: ProfileDescription = ProfileDescription {
         profile_id: 3,
@@ -418,7 +418,7 @@ impl CharacterProfileIntoDescription of Into<CharacterProfile, ProfileDescriptio
         match self {
             CharacterProfile::Unknown =>       CHARACTER_PROFILES::Unknown,
             CharacterProfile::Bartender =>     CHARACTER_PROFILES::Bartender,
-            CharacterProfile::Drunken =>       CHARACTER_PROFILES::Drunken,
+            CharacterProfile::Drunkard =>       CHARACTER_PROFILES::Drunkard,
             CharacterProfile::Devil =>         CHARACTER_PROFILES::Devil,
             CharacterProfile::Player => CHARACTER_PROFILES::Player,
         }
@@ -468,7 +468,7 @@ impl U8IntoDuelistProfile of Into<u8, DuelistProfile> {
 impl U8IntoCharacterProfile of Into<u8, CharacterProfile> {
     fn into(self: u8) -> CharacterProfile {
         if self == 1        { CharacterProfile::Bartender }
-        else if self == 2   { CharacterProfile::Drunken }
+        else if self == 2   { CharacterProfile::Drunkard }
         else if self == 3   { CharacterProfile::Devil }
         else if self == 4   { CharacterProfile::Player }
         else                { CharacterProfile::Unknown }

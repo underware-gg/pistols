@@ -126,7 +126,7 @@ impl ChallengeImpl of ChallengeTrait {
     fn get_deck_type(self: Challenge) -> DeckType {
         if (
             self.is_tutorial() &&
-            (self.duelist_id_a.into() == CharacterProfile::Drunken || self.duelist_id_b.into() == CharacterProfile::Drunken)
+            (self.duelist_id_a.into() == CharacterProfile::Drunkard || self.duelist_id_b.into() == CharacterProfile::Drunkard)
         ) {
             (DeckType::PacesOnly)
         } else {

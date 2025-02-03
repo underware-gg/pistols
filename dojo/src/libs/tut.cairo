@@ -40,7 +40,7 @@ impl TutorialLevelImpl of TutorialLevelTrait {
     }
     fn opponent_profile(self: TutorialLevel) -> ProfileType {
         match self {
-            TutorialLevel::Level1 => ProfileType::Character(CharacterProfile::Drunken),
+            TutorialLevel::Level1 => ProfileType::Character(CharacterProfile::Drunkard),
             TutorialLevel::Level2 => ProfileType::Character(CharacterProfile::Bartender),
             _ => ProfileType::Undefined,
         }

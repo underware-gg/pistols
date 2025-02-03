@@ -61,12 +61,12 @@ const TUTORIAL_SCENE_DATA: Record<TutorialScenes, TutorialScene> = {
   [SceneName.TutorialScene2]: {
     texts: [
       {
-        text: 'A few drinks in, the room grows rowdier. A drunken patron stumbles your way, ale sloshing over his hand and onto the floor.',
+        text: 'A few drinks in, the room grows rowdier. A drunkard patron stumbles your way, ale sloshing over his hand and onto the floor.',
         characterName: 'Narrator'
       },
       {
         text: 'HEY YOU! hic I CHAlleNGE YOU TO a DUel you SCUM!!',
-        characterName: 'Drunken Patron'
+        characterName: 'Drunkard Patron'
       },
       {
         text: 'The tavern falls silent, all eyes on you. The tension thickens as the challenge hangs in the air.',

@@ -99,7 +99,7 @@ mod tests {
 
     #[test]
     fn test_tutorial_create_level_1() {
-        _test_tutorial_create(1, ProfileType::Character(CharacterProfile::Drunken));
+        _test_tutorial_create(1, ProfileType::Character(CharacterProfile::Drunkard));
     }
 
     #[test]

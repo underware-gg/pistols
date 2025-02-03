@@ -280,7 +280,7 @@ export const getDuelistProfileMap = (): Record<DuelistProfile, number> => Object
 export enum CharacterProfile {
   Unknown = 'Unknown', // 0
   Bartender = 'Bartender', // 1
-  Drunken = 'Drunken', // 2
+  Drunkard = 'Drunkard', // 2
   Devil = 'Devil', // 3
   Player = 'Player', // 4
 };
@@ -949,7 +949,7 @@ export const DUELIST_PROFILES: type_DUELIST_PROFILES = {
 type type_CHARACTER_PROFILES = {
   Unknown: ProfileDescription, // cairo: ProfileDescription
   Bartender: ProfileDescription, // cairo: ProfileDescription
-  Drunken: ProfileDescription, // cairo: ProfileDescription
+  Drunkard: ProfileDescription, // cairo: ProfileDescription
   Devil: ProfileDescription, // cairo: ProfileDescription
   Player: ProfileDescription, // cairo: ProfileDescription
 };
@@ -964,10 +964,10 @@ export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
     gender: Gender.Male,
     name: 'Bartender',
   },
-  Drunken: {
+  Drunkard: {
     profile_id: 2,
     gender: Gender.Male,
-    name: 'Drunken',
+    name: 'Drunkard',
   },
   Devil: {
     profile_id: 3,
