@@ -6,7 +6,7 @@ pub enum Boolean {
     False: (),
 }
 
-impl BooleanIntoByteArray of Into<Boolean, ByteArray> {
+impl BooleanIntoByteArray of core::traits::Into<Boolean, ByteArray> {
     fn into(self: Boolean) -> ByteArray {
         match self {
             Boolean::Undefined =>   "Undefined",

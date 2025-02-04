@@ -1,5 +1,6 @@
-use starknet::{ContractAddress, ClassHash};
-use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcher, IWorldDispatcherTrait, Resource};
+use starknet::{ContractAddress};
+use core::num::traits::Zero;
+use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcher};
 
 pub use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
@@ -26,25 +27,25 @@ pub use pistols::utils::misc::{ZERO};
 
 pub mod SELECTORS {
     // systems
-    const ADMIN: felt252 = selector_from_tag!("pistols-admin");
-    const BANK: felt252 = selector_from_tag!("pistols-bank");
-    const GAME: felt252 = selector_from_tag!("pistols-game");
-    const RNG: felt252 = selector_from_tag!("pistols-rng");
-    const RNG_MOCK: felt252 = selector_from_tag!("pistols-rng_mock");
+    pub const ADMIN: felt252 = selector_from_tag!("pistols-admin");
+    pub const BANK: felt252 = selector_from_tag!("pistols-bank");
+    pub const GAME: felt252 = selector_from_tag!("pistols-game");
+    pub const RNG: felt252 = selector_from_tag!("pistols-rng");
+    pub const RNG_MOCK: felt252 = selector_from_tag!("pistols-rng_mock");
     // tokens
-    const DUEL_TOKEN: felt252 = selector_from_tag!("pistols-duel_token");
-    const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
-    const PACK_TOKEN: felt252 = selector_from_tag!("pistols-pack_token");
-    const FAME_COIN: felt252 = selector_from_tag!("pistols-fame_coin");
+    pub const DUEL_TOKEN: felt252 = selector_from_tag!("pistols-duel_token");
+    pub const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
+    pub const PACK_TOKEN: felt252 = selector_from_tag!("pistols-pack_token");
+    pub const FAME_COIN: felt252 = selector_from_tag!("pistols-fame_coin");
     // mocks
-    const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
-    const VR_MOCK: felt252 = selector_from_tag!("pistols-vrf_mock");
+    pub const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
+    pub const VR_MOCK: felt252 = selector_from_tag!("pistols-vrf_mock");
     // models
-    const CONFIG: felt252 = selector_from_tag!("pistols-Config");
-    const TABLE_CONFIG: felt252 = selector_from_tag!("pistols-TableConfig");
-    const TOKEN_CONFIG: felt252 = selector_from_tag!("pistols-TokenConfig");
-    const COIN_CONFIG: felt252 = selector_from_tag!("pistols-CoinConfig");
-    const PAYMENT: felt252 = selector_from_tag!("pistols-Payment");
+    pub const CONFIG: felt252 = selector_from_tag!("pistols-Config");
+    pub const TABLE_CONFIG: felt252 = selector_from_tag!("pistols-TableConfig");
+    pub const TOKEN_CONFIG: felt252 = selector_from_tag!("pistols-TokenConfig");
+    pub const COIN_CONFIG: felt252 = selector_from_tag!("pistols-CoinConfig");
+    pub const PAYMENT: felt252 = selector_from_tag!("pistols-Payment");
 }
 
 #[generate_trait]

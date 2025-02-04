@@ -18,7 +18,7 @@ pub enum TacticsCard {
 
 mod TACTICS_POINTS {
     use pistols::types::cards::cards::{CardPoints};
-    const Insult: CardPoints = CardPoints {
+    pub const Insult: CardPoints = CardPoints {
         name: 'Insult',
         self_chances: 0,
         self_damage: 0,
@@ -26,7 +26,7 @@ mod TACTICS_POINTS {
         other_damage: 1,
         special: '',
     };
-    const CoinToss: CardPoints = CardPoints {
+    pub const CoinToss: CardPoints = CardPoints {
         name: 'Coin Toss',
         self_chances: 0,
         self_damage: 0,
@@ -34,7 +34,7 @@ mod TACTICS_POINTS {
         other_damage: 0,
         special: 'First special doesnt affect you',
     };
-    const Vengeful: CardPoints = CardPoints {
+    pub const Vengeful: CardPoints = CardPoints {
         name: 'Vengeful',
         self_chances: 0,
         self_damage: 1,
@@ -42,7 +42,7 @@ mod TACTICS_POINTS {
         other_damage: 0,
         special: '',
     };
-    const ThickCoat: CardPoints = CardPoints {
+    pub const ThickCoat: CardPoints = CardPoints {
         name: 'Thick Coat',
         self_chances: 0,
         self_damage: 0,
@@ -50,7 +50,7 @@ mod TACTICS_POINTS {
         other_damage: -1,
         special: '',
     };
-    const Reversal: CardPoints = CardPoints {
+    pub const Reversal: CardPoints = CardPoints {
         name: 'Reversal',
         self_chances: 0,
         self_damage: 0,
@@ -58,7 +58,7 @@ mod TACTICS_POINTS {
         other_damage: 0,
         special: 'Next decrease increases both',
     };
-    const Bananas: CardPoints = CardPoints {
+    pub const Bananas: CardPoints = CardPoints {
         name: 'Bananas',
         self_chances: -10,
         self_damage: 0,
@@ -75,12 +75,12 @@ mod TACTICS_POINTS {
 use pistols::types::cards::{
     deck::{DeckType},
     cards::{CardPoints, CardPointsTrait},
-    env::{EnvCard, EnvCardTrait},
+    env::{EnvCard},
 };
 use pistols::models::challenge::{DuelistState};
 
 #[generate_trait]
-impl TacticsCardImpl of TacticsCardTrait {
+pub impl TacticsCardImpl of TacticsCardTrait {
     fn get_points(self: TacticsCard) -> CardPoints {
         match self {
             TacticsCard::Insult =>      TACTICS_POINTS::Insult,
@@ -118,7 +118,6 @@ impl TacticsCardImpl of TacticsCardTrait {
 //--------------------
 // converters
 //
-use debug::PrintTrait;
 use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortStringTrait};
 
@@ -127,7 +126,7 @@ impl TacticsCardDefault of Default<TacticsCard> {
 }
 
 
-impl TacticsCardIntoU8 of Into<TacticsCard, u8> {
+impl TacticsCardIntoU8 of core::traits::Into<TacticsCard, u8> {
     fn into(self: TacticsCard) -> u8 {
         match self {
             TacticsCard::None =>        0,
@@ -140,7 +139,7 @@ impl TacticsCardIntoU8 of Into<TacticsCard, u8> {
         }
     }
 }
-impl U8IntoTacticsCard of Into<u8, TacticsCard> {
+impl U8IntoTacticsCard of core::traits::Into<u8, TacticsCard> {
     fn into(self: u8) -> TacticsCard {
         if self == 1        { TacticsCard::Insult }
         else if self == 2   { TacticsCard::CoinToss }
@@ -152,11 +151,11 @@ impl U8IntoTacticsCard of Into<u8, TacticsCard> {
     }
 }
 
-impl TacticsCardPrintImpl of PrintTrait<TacticsCard> {
-    fn print(self: TacticsCard) {
-        self.get_points().name.print();
-    }
-}
+// impl TacticsCardPrintImpl of core::debug::PrintTrait<TacticsCard> {
+//     fn print(self: TacticsCard) {
+//         self.get_points().name.print();
+//     }
+// }
 
 // for println! and format!
 impl TacticsCardDisplay of Display<TacticsCard> {
@@ -176,7 +175,6 @@ impl TacticsCardDisplay of Display<TacticsCard> {
 //
 #[cfg(test)]
 mod tests {
-    use core::traits::Into;
     use super::{TacticsCard};
 
     #[test]

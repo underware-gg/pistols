@@ -15,8 +15,6 @@ pub struct Pact {
 //----------------------------------
 // Traits
 //
-// use debug::PrintTrait;
-use core::option::OptionTrait;
 use starknet::{ContractAddress};
 
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
@@ -25,7 +23,7 @@ use pistols::utils::misc::{ContractAddressIntoU256};
 use pistols::libs::store::{Store, StoreTrait};
 
 #[generate_trait]
-impl PactImpl of PactTrait {
+pub impl PactImpl of PactTrait {
     //
     // misc
     //

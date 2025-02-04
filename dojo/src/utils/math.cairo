@@ -1,4 +1,3 @@
-// use debug::PrintTrait;
 use pistols::utils::byte_arrays::{
     U8IntoByteArray,
     U16IntoByteArray,
@@ -12,7 +11,7 @@ use pistols::utils::bitwise::{
     BitwiseU256,
 };
 
-trait MathTrait<T,TI> {
+pub trait MathTrait<T,TI> {
     // absolute value
     fn abs(v: TI) -> T;
     // returns minimum value
@@ -43,7 +42,7 @@ trait MathTrait<T,TI> {
 
 const MAX_SHORT_STRING_NUMBER: u128 = 9999999999999999999999999999999; // 31 algarisms
 
-impl MathU8 of MathTrait<u8,i8> {
+pub impl MathU8 of MathTrait<u8,i8> {
     fn abs(v: i8) -> u8 {
         if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
     }
@@ -146,7 +145,7 @@ impl MathU8 of MathTrait<u8,i8> {
     }
 }
 
-impl MathU16 of MathTrait<u16, i16> {
+pub impl MathU16 of MathTrait<u16, i16> {
     fn abs(v: i16) -> u16 {
         if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
     }
@@ -216,7 +215,7 @@ impl MathU16 of MathTrait<u16, i16> {
     }
 }
 
-impl MathU32 of MathTrait<u32, i32> {
+pub impl MathU32 of MathTrait<u32, i32> {
     fn abs(v: i32) -> u32 {
         if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
     }
@@ -298,7 +297,7 @@ impl MathU32 of MathTrait<u32, i32> {
     }
 }
 
-impl MathU64 of MathTrait<u64, i64> {
+pub impl MathU64 of MathTrait<u64, i64> {
     fn abs(v: i64) -> u64 {
         if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
     }
@@ -367,7 +366,7 @@ impl MathU64 of MathTrait<u64, i64> {
     }
 }
 
-impl MathU128 of MathTrait<u128, i128> {
+pub impl MathU128 of MathTrait<u128, i128> {
     fn abs(v: i128) -> u128 {
         if (v < 0) { (-v).try_into().unwrap() } else { (v).try_into().unwrap() }
     }
@@ -464,7 +463,7 @@ impl MathU128 of MathTrait<u128, i128> {
     }
 }
 
-impl MathU256 of MathTrait<u256, u256> {
+pub impl MathU256 of MathTrait<u256, u256> {
     // there si no i256!
     fn abs(v: u256) -> u256 {
         (v)
@@ -546,7 +545,6 @@ impl MathU256 of MathTrait<u256, u256> {
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
     use super::{
         MathU8,MathU16,MathU32,MathU128,MathU256,
         MAX_SHORT_STRING_NUMBER,

@@ -8,6 +8,12 @@
 ///                 e.g. "aGVsbG8gd29ybGQ="
 ///
 
+pub fn bytes_base64_encode(_bytes: ByteArray) -> ByteArray {
+    let mut char_set = get_base64_char_set();
+    char_set.append('+');
+    char_set.append('/');
+    encode_bytes(_bytes, char_set.span())
+}
 
 // from:
 // alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git", tag = "cairo-v2.6.0" }
@@ -15,14 +21,6 @@
 fn get_base64_char_set() -> Array<u8> {
     (array!['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','0','1','2','3','4','5','6','7','8','9'])
 }
-
-fn bytes_base64_encode(_bytes: ByteArray) -> ByteArray {
-    let mut char_set = get_base64_char_set();
-    char_set.append('+');
-    char_set.append('/');
-    encode_bytes(_bytes, char_set.span())
-}
-
 
 fn encode_bytes(mut bytes: ByteArray, base64_chars: Span<u8>) -> ByteArray {
     let mut result: ByteArray = "";

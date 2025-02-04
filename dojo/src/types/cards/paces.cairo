@@ -1,4 +1,3 @@
-use pistols::utils::math::{MathTrait};
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum PacesCard {
@@ -23,7 +22,7 @@ pub enum PacesCard {
 use pistols::types::cards::deck::{DeckType};
 
 #[generate_trait]
-impl PacesCardImpl of PacesCardTrait {
+pub impl PacesCardImpl of PacesCardTrait {
     #[inline(always)]
     fn to_felt(self: PacesCard) -> felt252 {
         let result: u8 = self.into();
@@ -75,7 +74,6 @@ impl PacesCardImpl of PacesCardTrait {
 //--------------------
 // converters
 //
-use debug::PrintTrait;
 use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortString};
 
@@ -83,7 +81,7 @@ impl PacesCardDefault of Default<PacesCard> {
     fn default() -> PacesCard {(PacesCard::None)}
 }
 
-impl PacesCardIntoU8 of Into<PacesCard, u8> {
+impl PacesCardIntoU8 of core::traits::Into<PacesCard, u8> {
     fn into(self: PacesCard) -> u8 {
         match self {
             PacesCard::None =>      0,
@@ -100,7 +98,7 @@ impl PacesCardIntoU8 of Into<PacesCard, u8> {
         }
     }
 }
-impl U8IntoPacesCard of Into<u8, PacesCard> {
+impl U8IntoPacesCard of core::traits::Into<u8, PacesCard> {
     fn into(self: u8) -> PacesCard {
         if self == 1        { PacesCard::Paces1 }
         else if self == 2   { PacesCard::Paces2 }
@@ -116,12 +114,12 @@ impl U8IntoPacesCard of Into<u8, PacesCard> {
     }
 }
 
-impl PacesCardPrintImpl of PrintTrait<PacesCard> {
-    fn print(self: PacesCard) {
-        let p: u8 = self.into();
-        ShortString::concat('Paces::', ('0' + p.into())).print();
-    }
-}
+// impl PacesCardPrintImpl of core::debug::PrintTrait<PacesCard> {
+//     fn print(self: PacesCard) {
+//         let p: u8 = self.into();
+//         ShortString::concat('Paces::', ('0' + p.into())).print();
+//     }
+// }
 
 // for println! and format!
 impl PacesCardDisplay of Display<PacesCard> {
@@ -139,7 +137,6 @@ impl PacesCardDisplay of Display<PacesCard> {
 //
 #[cfg(test)]
 mod tests {
-    use core::traits::Into;
     use super::{PacesCard};
 
     #[test]

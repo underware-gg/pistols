@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Activity {
@@ -84,24 +84,21 @@ pub struct PlayerBookmark {
 //----------------------------------
 // Traits
 //
-use starknet::{get_block_timestamp};
 use dojo::world::{WorldStorage};
 use dojo::event::EventStorage;
 use pistols::libs::store::{Store, StoreTrait};
-use pistols::utils::arrays::{ArrayUtilsTrait};
-use pistols::types::constants::{CONST};
 
 mod PlayerErrors {
-    const PLAYER_NOT_REGISTERED: felt252    = 'PLAYER: Not registered';
+    pub const PLAYER_NOT_REGISTERED: felt252    = 'PLAYER: Not registered';
 }
 
 #[generate_trait]
-impl PlayerImpl of PlayerTrait {
+pub impl PlayerImpl of PlayerTrait {
     fn check_in(ref store: Store, activity: Activity, player_address: ContractAddress, identifier: felt252) {
         let mut player: Player = store.get_player(player_address);
         if (!player.exists()) {
             assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
-            player.timestamp_registered = get_block_timestamp();
+            player.timestamp_registered = starknet::get_block_timestamp();
             player.claimed_welcome_pack = (activity == Activity::WelcomePack);
             store.set_player(@player);
         } else if (activity == Activity::WelcomePack) {
@@ -118,11 +115,11 @@ impl PlayerImpl of PlayerTrait {
 
 
 #[generate_trait]
-impl ActivityImpl of ActivityTrait {
+pub impl ActivityImpl of ActivityTrait {
     fn emit(self: Activity, ref world: WorldStorage, player_address: ContractAddress, identifier: felt252) {
         world.emit_event(@PlayerActivity{
             player_address,
-            timestamp: get_block_timestamp(),
+            timestamp: starknet::get_block_timestamp(),
             activity: self,
             identifier,
             is_public: self.is_public(),

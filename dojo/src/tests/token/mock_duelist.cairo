@@ -24,11 +24,10 @@ pub trait IDuelistToken<TState> {
 
 #[dojo::contract]
 pub mod duelist_token {
-    use debug::PrintTrait;
-    use core::traits::Into;
-    use starknet::{ContractAddress, get_contract_address, get_caller_address, get_tx_info};
+    use core::num::traits::Zero;
+    use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    use dojo::model::{ModelStorage};
 
     use super::{IDuelistToken, MockDuelistOwners};
     use pistols::types::constants::{FAME};

@@ -1,4 +1,3 @@
-use starknet::{ContractAddress};
 use pistols::types::duel_progress::{DuelProgress};
 
 // define the interface
@@ -32,57 +31,42 @@ pub trait ITutorial<TState> {
 
 #[dojo::contract]
 pub mod tutorial {
-    // use debug::PrintTrait;
-    use traits::{Into, TryInto};
-    use starknet::{ContractAddress, get_block_timestamp, get_block_info};
+    use core::num::traits::Zero;
     use dojo::world::{WorldStorage};
-    use dojo::model::{ModelStorage, ModelValueStorage};
 
     //-------------------------------------
     // pistols
     //
-    use pistols::interfaces::systems::{
-        SystemsTrait,
-        IRngMockDispatcher, IRngMockDispatcherTrait,
-    };
-    use pistols::systems::rng::{RngWrap, RngWrapTrait, MockedValue};
+    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::systems::rng::{RngWrapTrait, MockedValue};
     use pistols::models::{
         challenge::{
             Challenge, ChallengeTrait,
-            Round, RoundTrait, RoundValue,
+            Round,
             MovesTrait,
         },
-        duelist::{
-            Duelist, DuelistTrait,
-        },
-        table::{
-            TableConfigValue, TABLES,
-        },
+        table::{TABLES},
     };
     use pistols::types::{
-        premise::{Premise, PremiseTrait},
+        premise::{Premise},
         profile_type::{ProfileType, ProfileTypeTrait, CharacterProfile, BotProfile, ProfileManagerTrait},
         challenge_state::{ChallengeState, ChallengeStateTrait},
-        duel_progress::{DuelProgress, DuelistDrawnCard},
-        round_state::{RoundState, RoundStateTrait},
-        constants::{CONST},
+        duel_progress::{DuelProgress},
+        round_state::{RoundState},
+        cards::deck::{Deck},
     };
-    use pistols::types::cards::{
-        deck::{Deck, DeckTrait},
-    };
-    use pistols::utils::misc::{ZERO};
     use pistols::libs::store::{Store, StoreTrait};
-    use pistols::libs::game_loop::{game_loop, make_moves_hash};
+    use pistols::libs::game_loop::{game_loop};
     use pistols::libs::tut::{TutorialLevel, TutorialLevelTrait};
 
     mod Errors {
-        const INVALID_TUTORIAL_LEVEL: felt252       = 'TUTORIAL: Invalid level';
-        const INVALID_PLAYER: felt252               = 'TUTORIAL: Invalid player';
+        pub const INVALID_TUTORIAL_LEVEL: felt252       = 'TUTORIAL: Invalid level';
+        pub const INVALID_PLAYER: felt252               = 'TUTORIAL: Invalid player';
         // const NOT_YOUR_DUEL: felt252                = 'TUTORIAL: Not your duel';
-        const CHALLENGE_NOT_IN_PROGRESS: felt252    = 'TUTORIAL: Challenge not active';
-        const ROUND_NOT_IN_COMMIT: felt252          = 'TUTORIAL: Round not in commit';
-        const ROUND_NOT_IN_REVEAL: felt252          = 'TUTORIAL: Round not in reveal';
-        const INVALID_MOVES_COUNT: felt252          = 'TUTORIAL: Invalid moves count';
+        pub const CHALLENGE_NOT_IN_PROGRESS: felt252    = 'TUTORIAL: Challenge not active';
+        pub const ROUND_NOT_IN_COMMIT: felt252          = 'TUTORIAL: Round not in commit';
+        pub const ROUND_NOT_IN_REVEAL: felt252          = 'TUTORIAL: Round not in reveal';
+        pub const INVALID_MOVES_COUNT: felt252          = 'TUTORIAL: Invalid moves count';
     }
 
     fn dojo_init(ref self: ContractState) {
@@ -143,7 +127,7 @@ pub mod tutorial {
                 state: ChallengeState::InProgress,
                 winner: 0,
                 // times
-                timestamp_start: get_block_timestamp(),
+                timestamp_start: starknet::get_block_timestamp(),
                 timestamp_end: 0,
             };
 
@@ -224,7 +208,7 @@ pub mod tutorial {
             // end challenge
             challenge.winner = progress.winner;
             challenge.state = if (progress.winner == 0) {ChallengeState::Draw} else {ChallengeState::Resolved};
-            challenge.timestamp_end = get_block_timestamp();
+            challenge.timestamp_end = starknet::get_block_timestamp();
             store.set_challenge(@challenge);
             store.set_round(@round);
         }

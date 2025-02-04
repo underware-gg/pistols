@@ -1,5 +1,4 @@
-use starknet::ContractAddress;
-use pistols::models::config::{Config};
+use starknet::{ContractAddress};
 use pistols::models::table::{TableConfig};
 
 // based on RYO
@@ -21,28 +20,24 @@ pub trait IAdmin<TState> {
 
 #[dojo::contract]
 pub mod admin {
-    // use debug::PrintTrait;
-    use core::traits::Into;
-    use starknet::ContractAddress;
-    use starknet::{get_caller_address, get_contract_address};
-    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    use core::num::traits::Zero;
+    use starknet::{ContractAddress};
+    use dojo::world::{WorldStorage, IWorldDispatcherTrait};
 
     use pistols::models::{
-        config::{Config, ConfigTrait, ConfigManagerTrait},
+        config::{Config, ConfigManagerTrait},
         table::{TableConfig, TableConfigTrait, TableManagerTrait},
-        season::{SeasonConfig, SeasonConfigTrait, SeasonManagerTrait},
+        season::{SeasonManagerTrait},
     };
     use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
     use pistols::libs::store::{Store, StoreTrait};
-    use pistols::utils::misc::{ZERO};
 
     mod Errors {
-        const INVALID_OWNER: felt252        = 'ADMIN: Invalid account_address';
-        const INVALID_TREASURY: felt252     = 'ADMIN: Invalid treasury_address';
-        const INVALID_TABLE: felt252        = 'ADMIN: Invalid table';
-        const INVALID_DESCRIPTION: felt252  = 'ADMIN: Invalid description';
-        const NOT_ADMIN: felt252            = 'ADMIN: not admin';
+        pub const INVALID_OWNER: felt252        = 'ADMIN: Invalid account_address';
+        pub const INVALID_TREASURY: felt252     = 'ADMIN: Invalid treasury_address';
+        pub const INVALID_TABLE: felt252        = 'ADMIN: Invalid table';
+        pub const INVALID_DESCRIPTION: felt252  = 'ADMIN: Invalid description';
+        pub const NOT_ADMIN: felt252            = 'ADMIN: not admin';
     }
 
     fn dojo_init(
@@ -57,7 +52,7 @@ pub mod admin {
         let season_table_id: felt252 = SeasonManagerTrait::initialize(ref store);
         // initialize Config
         let mut config: Config = ConfigManagerTrait::initialize();
-        config.treasury_address = if (treasury_address.is_non_zero()) { treasury_address } else { get_caller_address() };
+        config.treasury_address = if (treasury_address.is_non_zero()) { treasury_address } else { starknet::get_caller_address() };
         config.lords_address = if (lords_address.is_non_zero()) { lords_address } else { store.world.lords_mock_address() };
         config.vrf_address = if (vrf_address.is_non_zero()) { vrf_address } else { store.world.vrf_mock_address() };
         config.season_table_id = season_table_id;
@@ -144,11 +139,11 @@ pub mod admin {
     impl InternalImpl of InternalTrait {
         #[inline(always)]
         fn assert_caller_is_admin(self: @ContractState) {
-            assert(self.am_i_admin(get_caller_address()) == true, Errors::NOT_ADMIN);
+            assert(self.am_i_admin(starknet::get_caller_address()) == true, Errors::NOT_ADMIN);
         }
         // #[inline(always)]
         // fn assert_caller_is_owner(self: @ContractState) {
-        //     assert(world.is_owner(SELECTORS::ADMIN, get_caller_address()) == true, Errors::NOT_ADMIN);
+        //     assert(world.is_owner(SELECTORS::ADMIN, starknet::get_caller_address()) == true, Errors::NOT_ADMIN);
         // }
     }
 }

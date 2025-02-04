@@ -1,10 +1,10 @@
 use pistols::models::challenge::{DuelistState};
 use pistols::types::cards::hand::{
-    DuelistHand, DuelistHandTrait,
-    PacesCard, PacesCardTrait,
-    TacticsCard, TacticsCardTrait,
-    BladesCard, BladesCardTrait,
-    EnvCard, EnvCardTrait,
+    DuelistHand,
+    PacesCard,
+    TacticsCard,
+    BladesCard,
+    EnvCard,
 };
 use pistols::utils::arrays::{SpanDefault};
 
@@ -14,38 +14,38 @@ use pistols::utils::arrays::{SpanDefault};
 #[derive(Copy, Drop, Serde, Default)]
 pub struct DuelProgress {
     // results
-    steps: Span<DuelStep>,
-    winner: u8,
+    pub steps: Span<DuelStep>,
+    pub winner: u8,
     // duelists hands
-    hand_a: DuelistHand,
-    hand_b: DuelistHand,
+    pub hand_a: DuelistHand,
+    pub hand_b: DuelistHand,
 }
 
 #[derive(Copy, Drop, Serde)]
 pub struct DuelStep {
     // current pace
-    pace: PacesCard,
+    pub pace: PacesCard,
     // env card
-    card_env: EnvCard,
-    dice_env: u8,
+    pub card_env: EnvCard,
+    pub dice_env: u8,
     // active specials
-    specials_a: SpecialsDrawn,
-    specials_b: SpecialsDrawn,
+    pub specials_a: SpecialsDrawn,
+    pub specials_b: SpecialsDrawn,
     // duelist draw
-    card_a: DuelistDrawnCard,
-    card_b: DuelistDrawnCard,
+    pub card_a: DuelistDrawnCard,
+    pub card_b: DuelistDrawnCard,
     // duelist states
-    state_a: DuelistState,  // Duelist A current state
-    state_b: DuelistState,  // Duelist B current state
+    pub state_a: DuelistState,  // Duelist A current state
+    pub state_b: DuelistState,  // Duelist B current state
 }
 
 #[derive(Copy, Drop, Serde, Default)]
 pub struct SpecialsDrawn {
-    tactics: TacticsCard,
-    coin_toss: bool,
-    reversal: bool,
-    shots_modifier: EnvCard,
-    tactics_modifier: EnvCard,
+    pub tactics: TacticsCard,
+    pub coin_toss: bool,
+    pub reversal: bool,
+    pub shots_modifier: EnvCard,
+    pub tactics_modifier: EnvCard,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
@@ -63,7 +63,7 @@ pub enum DuelistDrawnCard {
 //
 
 #[generate_trait]
-impl SpecialsDrawnImpl of SpecialsDrawnTrait {
+pub impl SpecialsDrawnImpl of SpecialsDrawnTrait {
     fn initialize(tactics_self: TacticsCard, tactics_other: TacticsCard) -> SpecialsDrawn {
         (SpecialsDrawn {
             tactics: tactics_self,

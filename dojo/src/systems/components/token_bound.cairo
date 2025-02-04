@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 use pistols::utils::hash::{hash_values};
 use pistols::utils::misc::{ZERO};
 
@@ -37,7 +37,7 @@ pub struct TokenBoundAddress {
 }
 
 #[generate_trait]
-impl TokenBoundAddressImpl of TokenBoundAddressTrait {
+pub impl TokenBoundAddressImpl of TokenBoundAddressTrait {
     #[inline(always)]
     fn address(contract_address: ContractAddress, token_id: u128) -> ContractAddress {
         if (token_id != 0) {hash_values([contract_address.into(), token_id.into()].span()).try_into().unwrap()}
@@ -47,9 +47,8 @@ impl TokenBoundAddressImpl of TokenBoundAddressTrait {
 
 #[starknet::component]
 pub mod TokenBoundComponent {
-    use zeroable::Zeroable;
-    use starknet::{ContractAddress, get_contract_address, get_caller_address};
-    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+    use core::num::traits::Zero;
+    use starknet::{ContractAddress};
     use dojo::contract::components::world_provider::{IWorldProvider};
     
     use openzeppelin_token::erc20::{
@@ -64,16 +63,16 @@ pub mod TokenBoundComponent {
     };
 
     #[storage]
-    struct Storage {}
+    pub struct Storage {}
 
     #[event]
     #[derive(Drop, PartialEq, starknet::Event)]
     pub enum Event {}
 
     mod Errors {
-        const ALREADY_REGISTERED: felt252       = 'TOKEN_BOUND: already registered';
-        const INVALID_CONTRACT_ADDRESS: felt252 = 'TOKEN_BOUND: invalid contract';
-        // const INVALID_TOKEN_ID: felt252         = 'TOKEN_BOUND: invalid token id';
+        pub const ALREADY_REGISTERED: felt252       = 'TOKEN_BOUND: already registered';
+        pub const INVALID_CONTRACT_ADDRESS: felt252 = 'TOKEN_BOUND: invalid contract';
+        // pub const INVALID_TOKEN_ID: felt252         = 'TOKEN_BOUND: invalid token id';
     }
 
 

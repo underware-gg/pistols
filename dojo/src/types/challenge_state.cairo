@@ -1,5 +1,3 @@
-// use debug::PrintTrait;
-use traits::Into;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum ChallengeState {
@@ -13,7 +11,7 @@ pub enum ChallengeState {
     Draw,       // 7
 }
 
-trait ChallengeStateTrait {
+pub trait ChallengeStateTrait {
     fn exists(self: ChallengeState) -> bool;
     fn is_canceled(self: ChallengeState) -> bool;
     fn is_live(self: ChallengeState) -> bool;
@@ -65,7 +63,7 @@ impl ChallengeStateImpl of ChallengeStateTrait {
     }
 }
 
-impl ChallengeStateIntoByteArray of Into<ChallengeState, ByteArray> {
+impl ChallengeStateIntoByteArray of core::traits::Into<ChallengeState, ByteArray> {
     fn into(self: ChallengeState) -> ByteArray {
         match self {
             ChallengeState::Null =>       "Undefined",

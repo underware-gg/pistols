@@ -4,12 +4,8 @@
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
-    use core::traits::{Into, TryInto};
-    use starknet::{ContractAddress};
-
     use pistols::systems::rng_mock::{
-        IRngMockDispatcher, IRngMockDispatcherTrait,
+        IRngMockDispatcherTrait,
         ShufflerTrait, RngWrapTrait,
         MockedValue, MockedValueTrait,
     };

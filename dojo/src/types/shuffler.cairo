@@ -15,14 +15,14 @@ use pistols::utils::misc::{FeltToLossy};
 
 #[derive(Copy, Drop, Serde)]
 pub struct Shuffler {
-    ids: u256,      // 1..MAX
-    size : usize,
-    pos : usize,
-    mocked: bool,   // for testing
+    pub ids: u256,      // 1..MAX
+    pub size : usize,
+    pub pos : usize,
+    pub mocked: bool,   // for testing
 }
 
 #[generate_trait]
-impl ShufflerImpl of ShufflerTrait {
+pub impl ShufflerImpl of ShufflerTrait {
     const MAX: u8 = 42;
     const BITS: usize = 6;
     const MASK: u256 = 0b111111;
@@ -99,7 +99,6 @@ impl ShufflerImpl of ShufflerTrait {
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
     use super::{Shuffler, ShufflerTrait};
 
     fn _fact(value: usize) -> usize {
@@ -128,7 +127,7 @@ mod tests {
         let mut sum: usize = 0;
         let mut n: u8 = 1;
         while (n <= size) {
-            seed = pedersen::pedersen(seed.low.into(), seed.high.into()).into();
+            seed = core::pedersen::pedersen(seed.low.into(), seed.high.into()).into();
             let id: u8 = shuffler.get_next((seed & 0xff).try_into().unwrap());
             assert(id >= 1, 'id >= 1');
             assert(id <= size, 'id <= size');

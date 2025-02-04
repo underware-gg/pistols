@@ -1,18 +1,18 @@
-use pistols::types::cards::{
+pub use pistols::types::cards::{
     deck::{Deck, DeckTrait, DeckType, DeckTypeTrait},
     paces::{PacesCard, PacesCardTrait},
     tactics::{TacticsCard, TacticsCardTrait},
     blades::{BladesCard, BladesCardTrait},
     env::{EnvCard, EnvCardTrait},
 };
-use pistols::types::duel_progress::{DuelistDrawnCard};
+pub use pistols::types::duel_progress::{DuelistDrawnCard};
 
 #[derive(Copy, Drop, Serde, Default)]
 pub struct DuelistHand { // @generateContants:force
-    card_fire: PacesCard,
-    card_dodge: PacesCard,
-    card_tactics: TacticsCard,
-    card_blades: BladesCard,
+    pub card_fire: PacesCard,
+    pub card_dodge: PacesCard,
+    pub card_tactics: TacticsCard,
+    pub card_blades: BladesCard,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
@@ -31,7 +31,7 @@ impl FinalBlowDefault of Default<FinalBlow> {
 //
 
 #[generate_trait]
-impl DuelistHandImpl of DuelistHandTrait {
+pub impl DuelistHandImpl of DuelistHandTrait {
     fn draw_card(self: DuelistHand, pace: PacesCard) -> DuelistDrawnCard {
         (
             if (self.card_fire == pace) {DuelistDrawnCard::Fire(pace)}
@@ -50,7 +50,7 @@ impl DuelistHandImpl of DuelistHandTrait {
 }
 
 #[generate_trait]
-impl FinalBlowImpl of FinalBlowTrait {
+pub impl FinalBlowImpl of FinalBlowTrait {
     fn ended_in_paces(self: FinalBlow) -> bool {
         (match self {
             FinalBlow::Paces(_) => true,
@@ -72,14 +72,12 @@ impl FinalBlowImpl of FinalBlowTrait {
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
-    use core::traits::Into;
 
     use pistols::types::cards::{
-        paces::{PacesCard, PacesCardTrait},
+        paces::{PacesCard},
         hand::{DuelistHand, DuelistHandTrait},
-        tactics::{TacticsCard, TacticsCardTrait},
-        blades::{BladesCard, BladesCardTrait},
+        tactics::{TacticsCard},
+        blades::{BladesCard},
     };
     use pistols::types::duel_progress::{DuelistDrawnCard};
 

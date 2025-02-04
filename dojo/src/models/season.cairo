@@ -1,5 +1,3 @@
-// use debug::PrintTrait;
-use starknet::ContractAddress;
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -27,7 +25,7 @@ pub enum SeasonPhase {
 // Season Manager
 //
 use pistols::systems::game::game::{Errors as ErrorsGame};
-use pistols::models::table::{TableConfig, TableConfigTrait, TableType};
+use pistols::models::table::{TableConfig, TableType};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::utils::timestamp::{TIMESTAMP};
@@ -35,7 +33,7 @@ use pistols::utils::math::{MathU64};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
-impl SeasonManagerImpl of SeasonManagerTrait {
+pub impl SeasonManagerImpl of SeasonManagerTrait {
     #[inline(always)]
     fn initialize(ref store: Store) -> felt252 {
         (Self::create_next_season(ref store, 0))
@@ -81,7 +79,7 @@ impl SeasonManagerImpl of SeasonManagerTrait {
 // Traits
 //
 #[generate_trait]
-impl SeasonConfigImpl of SeasonConfigTrait {
+pub impl SeasonConfigImpl of SeasonConfigTrait {
     fn collect(ref self: SeasonConfig, ref store: Store) -> felt252 {
         // must sync with Self::collect()
         assert(self.phase != SeasonPhase::Ended, ErrorsGame::SEASON_ENDED);

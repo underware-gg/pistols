@@ -1,21 +1,20 @@
-// use debug::PrintTrait;
 use starknet::{ContractAddress};
 use pistols::utils::bitwise::{BITWISE};
 
 // https://github.com/starkware-libs/cairo/blob/main/corelib/src/integer.cairo
 // https://github.com/smartcontractkit/chainlink-starknet/blob/develop/contracts/src/utils.cairo
-use integer::{u128s_from_felt252, U128sFromFelt252Result};
+// use core::integer::{u128s_from_felt252, U128sFromFelt252Result};
 
 // consumes unused arguments to avoid warnings
 #[inline(always)]
-fn CONSUME_ADDRESS(_value: ContractAddress) {}
+pub fn CONSUME_ADDRESS(_value: ContractAddress) {}
 #[inline(always)]
-fn CONSUME_BYTE_ARRAY(_value: @ByteArray) {}
+pub fn CONSUME_BYTE_ARRAY(_value: @ByteArray) {}
 #[inline(always)]
-fn CONSUME_U256(_value: u256) {}
+pub fn CONSUME_U256(_value: u256) {}
 
 #[inline(always)]
-fn ZERO() -> ContractAddress {
+pub fn ZERO() -> ContractAddress {
     (starknet::contract_address_const::<0x0>())
 }
 
@@ -26,7 +25,7 @@ fn ZERO() -> ContractAddress {
 
 // lossy conversions
 #[generate_trait]
-impl FeltToLossy of FeltToLossyTrait {
+pub impl FeltToLossy of FeltToLossyTrait {
     fn to_u128_lossy(self: felt252) -> u128 {
         // match u128s_from_felt252(self) {
         //     U128sFromFelt252Result::Narrow(x) => x,
@@ -61,7 +60,7 @@ impl FeltToLossy of FeltToLossyTrait {
 //--------------------------------
 // ContractAddress
 //
-impl ContractAddressIntoU256 of Into<ContractAddress, u256> {
+pub impl ContractAddressIntoU256 of core::traits::Into<ContractAddress, u256> {
     #[inline(always)]
     fn into(self: ContractAddress) -> u256 {
         let as_felt: felt252 = self.into();

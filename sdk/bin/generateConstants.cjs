@@ -62,12 +62,13 @@ function getConstantsFromCairoFile(filePath) {
         // end errors
         is_errors = false;
       } else if (!is_test) {
-        if (l == 'mod Errors {') {
+        if (l == 'mod Errors {' || l == 'pub mod Errors {') {
           // start error
           is_errors = true;
         }
         // can find consts        
         if (!is_errors) {
+          l = l.replace('pub ', '');
           if (current_mod && l.startsWith('const ')) {
             if (l.endsWith('{')) {
               for (let i = index + 1; i < lines.length; i++) {

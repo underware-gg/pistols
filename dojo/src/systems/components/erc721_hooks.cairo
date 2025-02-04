@@ -1,14 +1,12 @@
-use starknet::{ContractAddress, get_contract_address};
-use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+use starknet::{ContractAddress};
+use core::num::traits::Zero;
 use dojo::contract::components::world_provider::{IWorldProvider};
 use openzeppelin_token::erc721::{ERC721Component};
 use graffiti::json::JsonImpl;
 
 use pistols::interfaces::systems::{SystemsTrait};
-use pistols::systems::tokens::duelist_token::{IDuelistToken, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait};
 use pistols::models::{
     config::{TokenConfig},
-    duelist::{Duelist},
 };
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::arrays::{SpanUtilsTrait};
@@ -31,8 +29,8 @@ pub trait ITokenRenderer<TState> {
 }
 
 mod MetadataErrors {
-    const INVALID_ATTRIBUTES: felt252 = 'METADATA: invalid attributes';
-    const INVALID_METADATA: felt252   = 'METADATA: invalid metadata';
+    pub const INVALID_ATTRIBUTES: felt252 = 'METADATA: invalid attributes';
+    pub const INVALID_METADATA: felt252   = 'METADATA: invalid metadata';
 }
 
 pub impl ERC721HooksImpl<
@@ -52,7 +50,7 @@ pub impl ERC721HooksImpl<
 }
 
 #[generate_trait]
-impl TokenConfigRenderImpl<
+pub impl TokenConfigRenderImpl<
     TContractState,
     +IWorldProvider<TContractState>,
     +ITokenRenderer<TContractState>,
@@ -60,12 +58,12 @@ impl TokenConfigRenderImpl<
     fn render_token_uri(self: @TContractState, token_id: u256) -> ByteArray {
         let mut world = SystemsTrait::storage(self.world_dispatcher(), @"pistols");
         let mut store: Store = StoreTrait::new(world);
-        let token_config: TokenConfig = store.get_token_config(get_contract_address());
+        let token_config: TokenConfig = store.get_token_config(starknet::get_contract_address());
         let renderer = ITokenRendererDispatcher{
             contract_address: if (token_config.renderer_address).is_non_zero() {
                 (token_config.renderer_address)
             } else {
-                (get_contract_address())
+                (starknet::get_contract_address())
             }
         };
 

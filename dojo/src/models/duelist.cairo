@@ -1,5 +1,4 @@
-use starknet::ContractAddress;
-use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, DuelistProfile, BotProfile};
+pub use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, DuelistProfile, BotProfile};
 
 //---------------------
 // Duelist
@@ -66,7 +65,7 @@ use pistols::utils::math::{MathU64};
 use pistols::types::constants::{HONOUR};
 
 #[generate_trait]
-impl DuelistImpl of DuelistTrait {
+pub impl DuelistImpl of DuelistTrait {
     fn enter_challenge(ref self: Store, duelist_id: u128, duel_id: u128) {
         let current_challenge: DuelistChallenge = self.get_duelist_challenge(duelist_id);
         assert(current_challenge.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);
@@ -96,7 +95,7 @@ impl ArchetypeDefault of Default<Archetype> {
 }
 
 #[generate_trait]
-impl ScoreImpl of ScoreTrait {
+pub impl ScoreImpl of ScoreTrait {
     #[inline(always)]
     fn is_villain(self: Score) -> bool {
         (self.total_duels > 0 && self.honour < HONOUR::TRICKSTER_START)
@@ -146,7 +145,7 @@ impl ScoreImpl of ScoreTrait {
     }
 }
 
-impl ArchetypeIntoByteArray of Into<Archetype, ByteArray> {
+impl ArchetypeIntoByteArray of core::traits::Into<Archetype, ByteArray> {
     fn into(self: Archetype) -> ByteArray {
         match self {
             Archetype::Undefined => "Undefined",

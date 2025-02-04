@@ -1,7 +1,13 @@
 use starknet::{ContractAddress};
-use dojo::world::{WorldStorage, WorldStorageTrait};
-use achievement::types::task::{Task as ArcadeTask, TaskTrait as ArcadeTaskTrait};
-use achievement::store::{Store as ArcadeStore, StoreTrait as ArcadeStoreTrait};
+use dojo::world::{WorldStorage};
+use achievement::types::task::{
+    Task as ArcadeTask,
+    TaskTrait as ArcadeTaskTrait,
+};
+use achievement::store::{
+    // Store as ArcadeStore,
+    StoreTrait as ArcadeStoreTrait
+};
 
 //
 // REF
@@ -26,24 +32,24 @@ use achievement::store::{Store as ArcadeStore, StoreTrait as ArcadeStoreTrait};
 //
 
 #[derive(Copy, Drop)]
-enum Trophy {
+pub enum Trophy {
     None,
     FirstBlood,
     Collector,
 }
 
 pub mod TROPHY {
-    const COUNT: u8 = 2;
+    pub const COUNT: u8 = 2;
 }
 
 pub mod TROPHY_ID {
-    const None: felt252 = '';
-    const FirstBlood: felt252 = 'FIRST_BLOOD';
-    const Collector: felt252 = 'COLLECTOR';
+    pub const None: felt252 = '';
+    pub const FirstBlood: felt252 = 'FIRST_BLOOD';
+    pub const Collector: felt252 = 'COLLECTOR';
 }
 
 #[generate_trait]
-impl TrophyImpl of TrophyTrait {
+pub impl TrophyImpl of TrophyTrait {
     #[inline]
     fn identifier(self: Trophy) -> felt252 {
         match self {
@@ -184,7 +190,7 @@ impl TrophyImpl of TrophyTrait {
 // Converters
 //
 
-impl IntoTrophyU8 of core::Into<Trophy, u8> {
+pub impl IntoTrophyU8 of core::traits::Into<Trophy, u8> {
     #[inline]
     fn into(self: Trophy) -> u8 {
         match self {
@@ -195,7 +201,7 @@ impl IntoTrophyU8 of core::Into<Trophy, u8> {
     }
 }
 
-impl IntoU8Trophy of core::Into<u8, Trophy> {
+pub impl IntoU8Trophy of core::traits::Into<u8, Trophy> {
     #[inline]
     fn into(self: u8) -> Trophy {
         let card: felt252 = self.into();
@@ -208,9 +214,9 @@ impl IntoU8Trophy of core::Into<u8, Trophy> {
     }
 }
 
-impl TrophyPrint of core::debug::PrintTrait<Trophy> {
-    #[inline]
-    fn print(self: Trophy) {
-        self.identifier().print();
-    }
-}
+// pub impl TrophyPrint of core::debug::PrintTrait<Trophy> {
+//     #[inline]
+//     fn print(self: Trophy) {
+//         self.identifier().print();
+//     }
+// }

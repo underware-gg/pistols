@@ -1,5 +1,5 @@
-use starknet::{ContractAddress};
-use pistols::systems::rng_mock::{MockedValue, RngWrap, RngWrapTrait};
+// use starknet::{ContractAddress};
+pub use pistols::systems::rng_mock::{MockedValue, RngWrap, RngWrapTrait};
 
 //--------------------------------
 // rng contract
@@ -13,8 +13,6 @@ pub trait IRng<TState> {
 #[dojo::contract]
 pub mod rng {
     use super::IRng;
-    use starknet::{ContractAddress, get_contract_address};
-    use dojo::model::{ModelStorage, ModelValueStorage};
 
     use pistols::utils::hash::{hash_values};
     use pistols::systems::rng_mock::{MockedValue};
@@ -35,18 +33,17 @@ pub mod rng {
 //--------------------------------
 // Public dice trait
 //
-use pistols::interfaces::systems::{SystemsTrait};
 
 #[derive(Copy, Drop)]
 pub struct Dice {
-    rng: IRngDispatcher,
-    seed: felt252,
-    last_dice: u8,
-    mocked: Span<MockedValue>,
+    pub rng: IRngDispatcher,
+    pub seed: felt252,
+    pub last_dice: u8,
+    pub mocked: Span<MockedValue>,
 }
 
 #[generate_trait]
-impl DiceImpl of DiceTrait {
+pub impl DiceImpl of DiceTrait {
     fn new(wrapped: @RngWrap, initial_seed: felt252) -> Dice {
         (Dice {
             rng: IRngDispatcher{ contract_address: *wrapped.rng_address },
@@ -85,13 +82,13 @@ use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
 #[derive(Copy, Drop)]
 pub struct Shuffle {
-    seed: felt252,
-    last_card: u8,
-    shuffler: Shuffler,
+    pub seed: felt252,
+    pub last_card: u8,
+    pub shuffler: Shuffler,
 }
 
 #[generate_trait]
-impl ShuffleImpl of ShuffleTrait {
+pub impl ShuffleImpl of ShuffleTrait {
     fn new(wrapped: @RngWrap, initial_seed: felt252, shuffle_size: u8, salt: felt252) -> Shuffle {
         let rng = IRngDispatcher{ contract_address: *wrapped.rng_address };
         let seed: felt252 = rng.reseed(initial_seed, salt, *wrapped.mocked);

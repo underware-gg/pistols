@@ -1,9 +1,8 @@
-use core::byte_array::ByteArrayTrait;
 use pistols::utils::encoding::bytes_base64_encode;
 use graffiti::json::JsonImpl;
 // use graffiti::{Tag, TagImpl};
 
-trait MetadataTrait {
+pub trait MetadataTrait {
     fn format_metadata(attributes: Span<ByteArray>) -> ByteArray;
     fn create_traits_array(attributes: Span<ByteArray>) -> Span<ByteArray>;
     fn encode_json(data: ByteArray, base64_encode: bool) -> ByteArray;

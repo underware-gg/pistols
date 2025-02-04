@@ -18,7 +18,7 @@ pub enum BladesCard {
 // IMPORTANT: names must be in sync with enum BladesCard
 mod BLADES_POINTS {
     use pistols::types::cards::cards::{CardPoints};
-    const Seppuku: CardPoints = CardPoints {
+    pub const Seppuku: CardPoints = CardPoints {
         name: 'Seppuku',
         self_chances: 20,
         self_damage: 1,
@@ -26,7 +26,7 @@ mod BLADES_POINTS {
         other_damage: 0,
         special: 'Suicide if survives',
     };
-    const PocketPistol: CardPoints = CardPoints {
+    pub const PocketPistol: CardPoints = CardPoints {
         name: 'Pocket Pistol',
         self_chances: 0,
         self_damage: 0,
@@ -34,7 +34,7 @@ mod BLADES_POINTS {
         other_damage: 0,
         special: 'Beats Behead',
     };
-    const Behead: CardPoints = CardPoints {
+    pub const Behead: CardPoints = CardPoints {
         name: 'Behead',
         self_chances: 0,
         self_damage: 1,
@@ -42,7 +42,7 @@ mod BLADES_POINTS {
         other_damage: 0,
         special: 'Beats Grapple',
     };
-    const Grapple: CardPoints = CardPoints {
+    pub const Grapple: CardPoints = CardPoints {
         name: 'Grapple',
         self_chances: 0,
         self_damage: 0,
@@ -59,12 +59,12 @@ mod BLADES_POINTS {
 use pistols::types::cards::{
     deck::{DeckType},
     cards::{CardPoints, CardPointsTrait},
-    env::{EnvCard, EnvCardTrait},
+    env::{EnvCard},
 };
 use pistols::models::challenge::{DuelistState};
 
 #[generate_trait]
-impl BladesCardImpl of BladesCardTrait {
+pub impl BladesCardImpl of BladesCardTrait {
     fn get_points(self: BladesCard) -> CardPoints {
         match self {
             BladesCard::Seppuku =>      BLADES_POINTS::Seppuku,
@@ -159,7 +159,6 @@ impl BladesCardImpl of BladesCardTrait {
 //--------------------
 // converters
 //
-use debug::PrintTrait;
 use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortStringTrait};
 
@@ -167,7 +166,7 @@ impl BladesCardDefault of Default<BladesCard> {
     fn default() -> BladesCard {(BladesCard::None)}
 }
 
-impl BladesCardIntoU8 of Into<BladesCard, u8> {
+impl BladesCardIntoU8 of core::traits::Into<BladesCard, u8> {
     fn into(self: BladesCard) -> u8 {
         match self {
             BladesCard::None =>         0,
@@ -178,7 +177,7 @@ impl BladesCardIntoU8 of Into<BladesCard, u8> {
         }
     }
 }
-impl U8IntoBladesCard of Into<u8, BladesCard> {
+impl U8IntoBladesCard of core::traits::Into<u8, BladesCard> {
     fn into(self: u8) -> BladesCard {
         if self == 1        { BladesCard::Seppuku }
         else if self == 2   { BladesCard::PocketPistol }
@@ -205,7 +204,6 @@ impl BladesCardDisplay of Display<BladesCard> {
 //
 #[cfg(test)]
 mod tests {
-    use core::traits::Into;
     use super::{BladesCard};
 
     #[test]

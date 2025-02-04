@@ -1,5 +1,3 @@
-// use debug::PrintTrait;
-use traits::Into;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum RoundState {
@@ -9,7 +7,7 @@ pub enum RoundState {
     Finished,   // 3
 }
 
-trait RoundStateTrait {
+pub trait RoundStateTrait {
     fn is_finished(self: RoundState) -> bool;
 }
 

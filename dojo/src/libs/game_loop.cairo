@@ -1,34 +1,30 @@
-// use debug::PrintTrait;
-use core::traits::TryInto;
-use starknet::{ContractAddress, get_block_timestamp};
-
 use pistols::systems::game::game::{Errors as GameErrors};
 use pistols::systems::rng::{RngWrap, Dice, DiceTrait, Shuffle, ShuffleTrait};
 use pistols::models::{
-    challenge::{Round, RoundTrait, DuelistState, DuelistStateTrait, Moves, MovesTrait},
-    duelist::{Duelist},
+    challenge::{Round, RoundTrait, DuelistState, DuelistStateTrait, MovesTrait},
+    // duelist::{Duelist},
 };
-use pistols::types::challenge_state::{ChallengeState};
-use pistols::types::round_state::{RoundState};
-use pistols::types::duel_progress::{
-    DuelProgress, DuelStep,
-    SpecialsDrawn, SpecialsDrawnTrait,
+use pistols::types::{
+    // challenge_state::{ChallengeState},
+    round_state::{RoundState},
+    duel_progress::{
+        DuelProgress, DuelStep,
+        SpecialsDrawn, SpecialsDrawnTrait,
+    },
 };
 use pistols::types::cards::hand::{
     Deck, DeckTrait,
     DuelistHand, DuelistHandTrait,
-    PacesCard, PacesCardTrait,
-    TacticsCard, TacticsCardTrait,
+    PacesCard,
+    TacticsCardTrait,
     BladesCard, BladesCardTrait,
     EnvCard, EnvCardTrait,
     DuelistDrawnCard,
     FinalBlow,
 };
-use pistols::types::constants::{CONST};
 use pistols::utils::math::{MathU8, MathU16};
 use pistols::utils::bitwise::{BitwiseU32, BitwiseU128};
 use pistols::utils::hash::{hash_values, FeltToLossy};
-use pistols::libs::store::{Store, StoreTrait};
 
 
 // a moves hash is composed of a hash of each move
@@ -40,7 +36,7 @@ use pistols::libs::store::{Store, StoreTrait};
 // move 4: 0x44444444000000000000000000000000
 // * finally composed into a single u128
 // hash  : 0x44444444333333332222222211111111
-fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
+pub fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
     let mut result: u128 = 0;
     let mut index: usize = 0;
     while (index < moves.len()) {
@@ -61,7 +57,7 @@ fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
 //
 
 // testable loop
-fn game_loop(wrapped: @RngWrap, deck: @Deck, ref round: Round) -> DuelProgress {
+pub fn game_loop(wrapped: @RngWrap, deck: @Deck, ref round: Round) -> DuelProgress {
     // let _table_type: TableType = store.get_table_config_value(challenge.table_id).table_type;
 
     let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck();

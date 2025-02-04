@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 
 //
 // VRF consumer
@@ -15,7 +15,7 @@ pub enum Source {
 }
 
 #[starknet::interface]
-trait IVrfProvider<TState> {
+pub trait IVrfProvider<TState> {
     // called before game transaction
     fn request_random(self: @TState, caller: ContractAddress, source: Source);
     // called in game transaction

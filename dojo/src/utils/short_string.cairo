@@ -1,14 +1,13 @@
-use core::byte_array::ByteArrayTrait;
 use pistols::utils::bitwise::{BitwiseU256};
 
-trait ShortStringTrait {
+pub trait ShortStringTrait {
     fn strlen(self: felt252) -> usize;
     fn to_string(self: felt252) -> ByteArray;
     fn concat(self: felt252, value: felt252) -> felt252;
     fn join(self: felt252, value: felt252) -> felt252;
 }
 
-impl ShortString of ShortStringTrait {
+pub impl ShortString of ShortStringTrait {
     fn strlen(self: felt252) -> usize {
         let mut result: usize = 0;
         let mut v: u256 = self.into();
@@ -44,7 +43,6 @@ impl ShortString of ShortStringTrait {
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
     use super::{ShortString};
     
     #[test]

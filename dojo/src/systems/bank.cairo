@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 use pistols::models::payment::{Payment};
 
 #[starknet::interface]
@@ -11,31 +11,27 @@ pub trait IBank<TState> {
 
 #[dojo::contract]
 pub mod bank {
-    // use debug::PrintTrait;
-    use core::traits::Into;
-    use starknet::ContractAddress;
-    use starknet::{get_caller_address, get_contract_address};
+    use core::num::traits::Zero;
+    use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    // use dojo::model::{ModelStorage, ModelValueStorage};
 
-    use pistols::interfaces::systems::{SystemsTrait};
     use pistols::interfaces::ierc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use pistols::models::{
         config::{Config, ConfigTrait},
-        payment::{Payment, PaymentTrait},
+        payment::{Payment},
     };
     use pistols::libs::store::{Store, StoreTrait};
-    use pistols::utils::misc::{ZERO};
 
-    mod Errors {
-        const INVALID_SHARES: felt252           = 'BANK: invalid shares';
-        const INVALID_TREASURY: felt252         = 'BANK: invalid treasury';
-        const INVALID_CLIENT: felt252           = 'BANK: invalid client';
-        const INVALID_RANKING: felt252          = 'BANK: invalid ranking';
-        const INVALID_OWNER: felt252            = 'BANK: invalid owner';
-        const INVALID_POOL: felt252             = 'BANK: invalid pool';
-        const INSUFFICIENT_ALLOWANCE: felt252   = 'BANK: insufficient allowance';
-        const INSUFFICIENT_BALANCE: felt252     = 'BANK: insufficient balance';
+    pub mod Errors {
+        pub const INVALID_SHARES: felt252           = 'BANK: invalid shares';
+        pub const INVALID_TREASURY: felt252         = 'BANK: invalid treasury';
+        pub const INVALID_CLIENT: felt252           = 'BANK: invalid client';
+        pub const INVALID_RANKING: felt252          = 'BANK: invalid ranking';
+        pub const INVALID_OWNER: felt252            = 'BANK: invalid owner';
+        pub const INVALID_POOL: felt252             = 'BANK: invalid pool';
+        pub const INSUFFICIENT_ALLOWANCE: felt252   = 'BANK: insufficient allowance';
+        pub const INSUFFICIENT_BALANCE: felt252     = 'BANK: insufficient balance';
     }
 
     #[generate_trait]
@@ -93,7 +89,7 @@ pub mod bank {
             payer: ContractAddress,
             amount: u256,
         ) {
-            let allowance: u256 = lords.allowance(payer, get_contract_address());
+            let allowance: u256 = lords.allowance(payer, starknet::get_contract_address());
             assert(allowance >= amount, Errors::INSUFFICIENT_ALLOWANCE);
             let balance: u256 = lords.balance_of(payer);
             assert(balance >= amount, Errors::INSUFFICIENT_BALANCE);

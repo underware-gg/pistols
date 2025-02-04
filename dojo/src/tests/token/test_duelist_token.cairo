@@ -1,74 +1,73 @@
-use debug::PrintTrait;
-use starknet::{ContractAddress, get_contract_address, get_caller_address, testing};
-use dojo::world::{WorldStorage, WorldStorageTrait};
-use dojo::model::{Model, ModelIndex};
+use core::num::traits::Zero;
+use starknet::{ContractAddress, testing};
+use dojo::world::{WorldStorage};
 use dojo_cairo_test::{
     spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
     WorldStorageTestTrait,
 };
 
 use pistols::systems::{
-    bank::{bank, IBankDispatcher, IBankDispatcherTrait},
+    bank::{IBankDispatcher},
     tokens::{
-        pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
+        pack_token::{pack_token, IPackTokenDispatcher},
         duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
         fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
-        lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
+        lords_mock::{ILordsMockDispatcher},
     },
     components::{
-        token_bound::{m_TokenBoundAddress, TokenBoundAddress},
+        token_bound::{m_TokenBoundAddress},
     },
 };
 use pistols::models::{
     player::{
-        m_Player, Player,
+        m_Player,
         e_PlayerActivity,
         e_PlayerRequiredAction,
     },
     pack::{
-        m_Pack, Pack,
+        m_Pack,
     },
     challenge::{
-        m_Challenge, Challenge,
-        m_ChallengeFameBalance, ChallengeFameBalance,
-        m_Round, Round,
+        m_Challenge,
+        m_ChallengeFameBalance,
+        m_Round,
     },
     duelist::{
         m_Duelist, Duelist,
-        m_DuelistChallenge, DuelistChallenge,
+        m_DuelistChallenge,
         m_Scoreboard, Scoreboard, Score,
-        m_ScoreboardTable, ScoreboardTable,
-        ProfileType, DuelistProfile, Archetype
+        m_ScoreboardTable,
+        ProfileType, DuelistProfile
     },
     pact::{
-        m_Pact, Pact,
+        m_Pact,
     },
     payment::{
-        m_Payment, Payment,
+        m_Payment,
     },
     config::{
         m_Config, Config,
         m_TokenConfig, TokenConfig,
-        m_CoinConfig, CoinConfig,
+        m_CoinConfig,
         CONFIG,
     },
     season::{
-        m_SeasonConfig, SeasonConfig,
+        m_SeasonConfig,
     },
     table::{
-        m_TableConfig, TableConfig,
+        m_TableConfig,
         TABLES,
     },
 };
 
-use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
+use pistols::interfaces::systems::{SystemsTrait};
 use pistols::types::constants::{CONST, FAME};
 use pistols::tests::tester::{tester, tester::{OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO}};
 use pistols::tests::{utils};
 
 use openzeppelin_token::erc721::interface;
 use openzeppelin_token::erc721::{
-    ERC721Component,
+    // ERC721Component,
     ERC721Component::{
         Transfer, Approval,
     }
@@ -128,12 +127,12 @@ const TOKEN_ID_10: u256 = 10;
 
 #[derive(Copy, Drop)]
 pub struct TestSystems {
-    world: WorldStorage,
-    lords: ILordsMockDispatcher,
-    token: IDuelistTokenDispatcher,
-    pack: IPackTokenDispatcher,
-    fame: IFameCoinDispatcher,
-    bank: IBankDispatcher,
+    pub world: WorldStorage,
+    pub lords: ILordsMockDispatcher,
+    pub token: IDuelistTokenDispatcher,
+    pub pack: IPackTokenDispatcher,
+    pub fame: IFameCoinDispatcher,
+    pub bank: IBankDispatcher,
 }
 
 fn setup_uninitialized(fee_amount: u128) -> TestSystems {

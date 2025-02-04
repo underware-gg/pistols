@@ -34,17 +34,13 @@ pub trait IGame<TState> {
 
 #[dojo::contract]
 pub mod game {
-    // use debug::PrintTrait;
-    use traits::{Into, TryInto};
-    use starknet::{ContractAddress, get_block_timestamp, get_block_info};
+    use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
-    use dojo::model::{ModelStorage, ModelValueStorage};
 
     //-------------------------------------
     // components
     //
     use achievement::components::achievable::AchievableComponent;
-    use achievement::types::task::{Task, TaskTrait};
     component!(path: AchievableComponent, storage: achievable, event: AchievableEvent);
     impl AchievableInternalImpl = AchievableComponent::InternalImpl<ContractState>;
     #[storage]
@@ -65,28 +61,25 @@ pub mod game {
     use pistols::interfaces::systems::{
         SystemsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
-        IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
-        ITutorialDispatcher, ITutorialDispatcherTrait,
+        IDuelTokenDispatcherTrait,
+        ITutorialDispatcherTrait,
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
-        player::{Player, PlayerTrait, Activity, ActivityTrait},
+        player::{PlayerTrait, Activity, ActivityTrait},
         challenge::{
             Challenge, ChallengeTrait,
             ChallengeFameBalance,
-            Round, RoundTrait, RoundValue,
+            Round, RoundValue,
             MovesTrait,
         },
         duelist::{
-            Duelist, DuelistTrait,
+            DuelistTrait,
             Scoreboard, ScoreboardTable,
-            Score, ScoreTrait,
+            ScoreTrait,
         },
         pact::{
-            Pact, PactTrait,
-        },
-        table::{
-            TableConfig, TableConfigTrait, TableConfigValue,
+            PactTrait,
         },
         season::{
             SeasonConfig, SeasonConfigTrait,
@@ -97,36 +90,33 @@ pub mod game {
     };
     use pistols::types::{
         challenge_state::{ChallengeState, ChallengeStateTrait},
-        duel_progress::{DuelProgress, DuelistDrawnCard},
-        round_state::{RoundState, RoundStateTrait},
-        cards::deck::{ Deck, DeckTrait},
+        duel_progress::{DuelProgress},
+        round_state::{RoundState},
         typed_data::{CommitMoveMessage, CommitMoveMessageTrait},
+        cards::deck::{DeckTrait},
     };
     use pistols::types::trophies::{Trophy, TrophyTrait, TROPHY};
-    use pistols::types::constants::{CONST};
-    use pistols::utils::short_string::{ShortStringTrait};
-    use pistols::utils::misc::{ZERO};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::game_loop::{game_loop, make_moves_hash};
 
-    mod Errors {
-        const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
-        const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not active';
-        const NOT_ACCEPTED: felt252              = 'PISTOLS: Accept challenge first';
-        const NOT_YOUR_DUEL: felt252             = 'PISTOLS: Not your duel';
-        const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
-        const ROUND_NOT_IN_COMMIT: felt252       = 'PISTOLS: Round not in commit';
-        const ROUND_NOT_IN_REVEAL: felt252       = 'PISTOLS: Round not in reveal';
-        const ALREADY_COMMITTED: felt252         = 'PISTOLS: Already committed';
-        const ALREADY_REVEALED: felt252          = 'PISTOLS: Already revealed';
-        const INVALID_SALT: felt252              = 'PISTOLS: Invalid salt';
-        const INVALID_MOVES_COUNT: felt252       = 'PISTOLS: Invalid moves count';
-        const MOVES_HASH_MISMATCH: felt252       = 'PISTOLS: Moves hash mismatch';
-        const IMPOSSIBLE_ERROR: felt252          = 'PISTOLS: Impossible error';
-        const SEASON_ENDED: felt252              = 'PISTOLS: Season ended';
-        const SEASON_IS_ACTIVE: felt252          = 'PISTOLS: Season is active';
-        const SEASON_NOT_ENDGAME: felt252        = 'PISTOLS: Not endgame';
-        const BAD_SHUFFLE_SEED: felt252          = 'PISTOLS: Bad shuffle seed';
+    pub mod Errors {
+        pub const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
+        pub const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not active';
+        pub const NOT_ACCEPTED: felt252              = 'PISTOLS: Accept challenge first';
+        pub const NOT_YOUR_DUEL: felt252             = 'PISTOLS: Not your duel';
+        pub const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
+        pub const ROUND_NOT_IN_COMMIT: felt252       = 'PISTOLS: Round not in commit';
+        pub const ROUND_NOT_IN_REVEAL: felt252       = 'PISTOLS: Round not in reveal';
+        pub const ALREADY_COMMITTED: felt252         = 'PISTOLS: Already committed';
+        pub const ALREADY_REVEALED: felt252          = 'PISTOLS: Already revealed';
+        pub const INVALID_SALT: felt252              = 'PISTOLS: Invalid salt';
+        pub const INVALID_MOVES_COUNT: felt252       = 'PISTOLS: Invalid moves count';
+        pub const MOVES_HASH_MISMATCH: felt252       = 'PISTOLS: Moves hash mismatch';
+        pub const IMPOSSIBLE_ERROR: felt252          = 'PISTOLS: Impossible error';
+        pub const SEASON_ENDED: felt252              = 'PISTOLS: Season ended';
+        pub const SEASON_IS_ACTIVE: felt252          = 'PISTOLS: Season is active';
+        pub const SEASON_NOT_ENDGAME: felt252        = 'PISTOLS: Not endgame';
+        pub const BAD_SHUFFLE_SEED: felt252          = 'PISTOLS: Bad shuffle seed';
     }
 
     fn dojo_init(ref self: ContractState) {
@@ -316,7 +306,7 @@ pub mod game {
             // end challenge
             challenge.winner = progress.winner;
             challenge.state = if (progress.winner == 0) {ChallengeState::Draw} else {ChallengeState::Resolved};
-            challenge.timestamp_end = get_block_timestamp();
+            challenge.timestamp_end = starknet::get_block_timestamp();
             self.finish_challenge(ref store, challenge, round);
 
             // transfer FAME reward

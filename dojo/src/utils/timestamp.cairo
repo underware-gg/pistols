@@ -3,17 +3,17 @@
 //
 
 pub mod TIMESTAMP {
-    const ONE_MINUTE: u64   = 60;
-    const ONE_HOUR: u64     = 60 * 60;
-    const ONE_DAY: u64      = 60 * 60 * 24;
-    const ONE_WEEK: u64     = 60 * 60 * 24 * 7;
-    const TWO_WEEKS: u64    = 60 * 60 * 24 * 14;
-    const THREE_WEEKS: u64  = 60 * 60 * 24 * 21;
-    const FOUR_WEEKS: u64   = 60 * 60 * 24 * 28;
+    pub const ONE_MINUTE: u64   = 60;
+    pub const ONE_HOUR: u64     = 60 * 60;
+    pub const ONE_DAY: u64      = 60 * 60 * 24;
+    pub const ONE_WEEK: u64     = 60 * 60 * 24 * 7;
+    pub const TWO_WEEKS: u64    = 60 * 60 * 24 * 14;
+    pub const THREE_WEEKS: u64  = 60 * 60 * 24 * 21;
+    pub const FOUR_WEEKS: u64   = 60 * 60 * 24 * 28;
 }
 
 #[generate_trait]
-impl TimestampImpl of TimestampTrait {
+pub impl TimestampImpl of TimestampTrait {
     #[inline(always)]
     fn from_minutes(minutes: u64) -> u64 {
         (minutes * TIMESTAMP::ONE_MINUTE)
@@ -38,7 +38,6 @@ impl TimestampImpl of TimestampTrait {
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
     use super::{TimestampTrait, TIMESTAMP};
 
     #[test]

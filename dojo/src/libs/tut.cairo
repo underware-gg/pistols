@@ -1,5 +1,3 @@
-// use debug::PrintTrait;
-use starknet::{ContractAddress};
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum TutorialLevel {
@@ -18,8 +16,8 @@ use pistols::types::profile_type::{ProfileType,CharacterProfile};
 use pistols::types::cards::{
     hand::{DuelistHand, DuelistHandTrait},
     paces::{PacesCard, PacesCardTrait},
-    tactics::{TacticsCard, TacticsCardTrait},
-    blades::{BladesCard, BladesCardTrait},
+    tactics::{TacticsCard},
+    blades::{BladesCard},
     env::{ENV_DICES},
 };
 use pistols::utils::arrays::{ArrayUtilsTrait};
@@ -27,7 +25,7 @@ use pistols::utils::misc::{FeltToLossy};
 use pistols::utils::hash::{hash_values};
 
 #[generate_trait]
-impl TutorialLevelImpl of TutorialLevelTrait {
+pub impl TutorialLevelImpl of TutorialLevelTrait {
     fn make_duel_id(self: TutorialLevel, player_id: u128) -> u128 {
         let tutorial_id: u128 = self.into();
         let mut duel_id: u128 = hash_values([
@@ -149,14 +147,14 @@ impl TutorialLevelImpl of TutorialLevelTrait {
 //--------------------------------
 // converters
 //
-impl U128IntoTutorialLevel of Into<u128, TutorialLevel> {
+impl U128IntoTutorialLevel of core::traits::Into<u128, TutorialLevel> {
     fn into(self: u128) -> TutorialLevel {
         if self == 1        { TutorialLevel::Level1 }
         else if self == 2   { TutorialLevel::Level2 }
         else                { TutorialLevel::Undefined }
     }
 }
-impl TutorialLevelIntoU128 of Into<TutorialLevel, u128> {
+impl TutorialLevelIntoU128 of core::traits::Into<TutorialLevel, u128> {
     fn into(self: TutorialLevel) -> u128 {
         match self {
             TutorialLevel::Level1       => 1,
@@ -165,7 +163,7 @@ impl TutorialLevelIntoU128 of Into<TutorialLevel, u128> {
         }
     }
 }
-impl ChallengeIntoTutorialLevel of Into<Challenge, TutorialLevel> {
+impl ChallengeIntoTutorialLevel of core::traits::Into<Challenge, TutorialLevel> {
     fn into(self: Challenge) -> TutorialLevel {
         if self.quote == TutorialLevel::Level1.quote()        { TutorialLevel::Level1 }
         else if self.quote == TutorialLevel::Level2.quote()   { TutorialLevel::Level2 }

@@ -1,10 +1,9 @@
-use traits::Into;
 use core::poseidon::{PoseidonTrait, HashState};
 use core::hash::HashStateTrait;
 
 pub use pistols::utils::misc::{FeltToLossy};
 
-fn hash_values(values: Span<felt252>) -> felt252 {
+pub fn hash_values(values: Span<felt252>) -> felt252 {
     assert(values.len() > 0, 'hash_values() has no values!');
     let mut state: HashState = PoseidonTrait::new();
     state = state.update(*values[0]);
@@ -34,9 +33,8 @@ fn hash_values(values: Span<felt252>) -> felt252 {
 //     /// The Starknet address of the sequencer that created the block.
 //     pub sequencer_address: ContractAddress,
 // }
-use starknet::get_block_info;
-fn make_block_hash() -> felt252 {
-    let block_info = get_block_info().unbox();
+pub fn make_block_hash() -> felt252 {
+    let block_info = starknet::get_block_info().unbox();
     let hash: felt252 = hash_values([
         block_info.block_number.into(),
         block_info.block_timestamp.into(),
@@ -51,7 +49,6 @@ fn make_block_hash() -> felt252 {
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
     use super::{
         hash_values,
         make_block_hash,

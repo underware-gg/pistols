@@ -1,22 +1,20 @@
-use debug::PrintTrait;
-use starknet::{ContractAddress, get_contract_address, get_caller_address, testing};
-use dojo::world::{WorldStorage, WorldStorageTrait};
-use dojo::model::{Model, ModelIndex};
+use starknet::{ContractAddress, testing};
+use dojo::world::{WorldStorage};
 use dojo_cairo_test::{
     spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
     WorldStorageTestTrait,
 };
 
 use pistols::systems::{
-    bank::{bank, IBankDispatcher, IBankDispatcherTrait},
+    bank::{bank, IBankDispatcher},
     tokens::{
-        duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+        duelist_token::{duelist_token, IDuelistTokenDispatcher},
         pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
-        fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
-        lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
+        fame_coin::{fame_coin},
+        lords_mock::{lords_mock, ILordsMockDispatcher},
     },
     components::{
-        token_bound::{m_TokenBoundAddress, TokenBoundAddress},
+        token_bound::{m_TokenBoundAddress},
     },
     vrf_mock::{vrf_mock},
 };
@@ -26,32 +24,25 @@ use pistols::models::{
         e_PlayerActivity,
         e_PlayerRequiredAction,
     },
-    duelist::{
-        m_Duelist, Duelist, ProfileType,
-    },
-    pack::{
-        m_Pack, Pack, PackType, PackTypeTrait,
-    },
-    payment::{
-        m_Payment, Payment,
-    },
+    duelist::{m_Duelist},
+    pack::{m_Pack, Pack, PackType},
+    payment::{m_Payment},
     config::{
         m_Config, Config,
         m_TokenConfig, TokenConfig,
-        m_CoinConfig, CoinConfig,
+        m_CoinConfig,
         CONFIG,
     },
     table::{TABLES},
 };
 
-use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
-use pistols::types::constants::{CONST, FAME};
-use pistols::tests::tester::{tester, tester::{OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO}};
+use pistols::interfaces::systems::{SystemsTrait};
+use pistols::tests::tester::{tester, tester::{OWNER, OTHER, SPENDER, TREASURY}};
 use pistols::tests::{utils};
 
 use openzeppelin_token::erc721::interface;
 use openzeppelin_token::erc721::{
-    ERC721Component,
+    // ERC721Component,
     ERC721Component::{
         Transfer, Approval,
     }
@@ -106,11 +97,11 @@ const TOKEN_ID_5: u256 = 5;
 
 #[derive(Copy, Drop)]
 pub struct TestSystems {
-    world: WorldStorage,
-    lords: ILordsMockDispatcher,
-    token: IPackTokenDispatcher,
-    duelists: IDuelistTokenDispatcher,
-    bank: IBankDispatcher,
+    pub world: WorldStorage,
+    pub lords: ILordsMockDispatcher,
+    pub token: IPackTokenDispatcher,
+    pub duelists: IDuelistTokenDispatcher,
+    pub bank: IBankDispatcher,
 }
 
 fn setup_uninitialized(fee_amount: u128) -> TestSystems {

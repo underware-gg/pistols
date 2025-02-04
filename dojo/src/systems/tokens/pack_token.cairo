@@ -66,11 +66,8 @@ pub trait IPackTokenPublic<TState> {
 
 #[dojo::contract]
 pub mod pack_token {    
-    // use debug::PrintTrait;
-    use openzeppelin_account::interface::ISRC6;
-    use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
-    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    use starknet::{ContractAddress};
+    use dojo::world::{WorldStorage};
 
     //-----------------------------------
     // ERC-721 Start
@@ -113,30 +110,26 @@ pub mod pack_token {
 
     use pistols::interfaces::systems::{
         SystemsTrait,
-        IBankDispatcher, IBankDispatcherTrait,
-        IVrfProviderDispatcher, IVrfProviderDispatcherTrait, Source,
+        IBankDispatcherTrait,
+        IVrfProviderDispatcherTrait, Source,
     };
     use pistols::models::{
-        pack::{Pack, PackValue, PackTrait, PackType, PackTypeTrait},
+        pack::{Pack, PackTrait, PackValue, PackType, PackTypeTrait},
         player::{Player, PlayerTrait, Activity},
-        config::{TokenConfig, TokenConfigValue},
         payment::{Payment},
     };
-    use pistols::types::constants::{CONST};
     use pistols::libs::store::{Store, StoreTrait};
-    use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::{ShortStringTrait};
-    use pistols::utils::byte_arrays::{BoolToByteArrayTrait};
-    use pistols::utils::math::{MathTrait};
+    use pistols::utils::byte_arrays::{BoolToStringTrait};
     use pistols::utils::misc::{ZERO, CONSUME_U256};
 
-    mod Errors {
-        const NOT_IMPLEMENTED: felt252      = 'PACK: Not implemented';
-        const ALREADY_CLAIMED: felt252      = 'PACK: Already claimed';
-        const CLAIM_FIRST: felt252          = 'PACK: Claim duelists first';
-        const NOT_FOR_SALE: felt252         = 'PACK: Not for sale';
-        const ALREADY_OPENED: felt252       = 'PACK: Already opened';
-        const NOT_OWNER: felt252            = 'PACK: Not owner';
+    pub mod Errors {
+        pub const NOT_IMPLEMENTED: felt252      = 'PACK: Not implemented';
+        pub const ALREADY_CLAIMED: felt252      = 'PACK: Already claimed';
+        pub const CLAIM_FIRST: felt252          = 'PACK: Claim duelists first';
+        pub const NOT_FOR_SALE: felt252         = 'PACK: Not for sale';
+        pub const ALREADY_OPENED: felt252       = 'PACK: Already opened';
+        pub const NOT_OWNER: felt252            = 'PACK: Not owner';
     }
 
     //*******************************
@@ -154,7 +147,7 @@ pub mod pack_token {
             format!("https://{}",base_uri.to_string()),
         );
         let payment = Payment {
-            key: get_contract_address().into(),
+            key: starknet::get_contract_address().into(),
             amount: 0,
             client_percent: 0,
             ranking_percent: 0,
@@ -203,7 +196,7 @@ pub mod pack_token {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate
-            let recipient: ContractAddress = get_caller_address();
+            let recipient: ContractAddress = starknet::get_caller_address();
             assert(self.can_claim_welcome_pack(recipient), Errors::ALREADY_CLAIMED);
 
             // mint
@@ -223,7 +216,7 @@ pub mod pack_token {
             assert(pack_type.can_purchase(), Errors::NOT_FOR_SALE);
 
             // validate recipient
-            let recipient: ContractAddress = get_caller_address();
+            let recipient: ContractAddress = starknet::get_caller_address();
             assert(!self.can_claim_welcome_pack(recipient), Errors::CLAIM_FIRST);
 
             // transfer mint fee
@@ -233,7 +226,7 @@ pub mod pack_token {
             }
 
             // create vrf seed
-            let seed: felt252 = store.world.vrf_dispatcher().consume_random(Source::Nonce(get_contract_address()));
+            let seed: felt252 = store.world.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_contract_address()));
 
             // mint
             let pack: Pack = self.mint_pack(pack_type, recipient, seed);
@@ -249,7 +242,7 @@ pub mod pack_token {
 
             // validate owner
             let recipient: ContractAddress = self.owner_of(pack_id.into());
-            assert(recipient == get_caller_address(), Errors::NOT_OWNER);
+            assert(recipient == starknet::get_caller_address(), Errors::NOT_OWNER);
 
             // check if already opened
             let mut pack: Pack = store.get_pack(pack_id);
@@ -295,7 +288,7 @@ pub mod pack_token {
         
         fn get_payment(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> Payment {
             let mut store: Store = StoreTrait::new(self.world_default());
-            let mut payment: Payment = store.get_payment(get_contract_address().into());
+            let mut payment: Payment = store.get_payment(starknet::get_contract_address().into());
             payment.amount = pack_type.mint_fee();
             (payment)
         }

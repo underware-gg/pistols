@@ -25,61 +25,61 @@ pub enum EnvCard {
 // IMPORTANT: names must be in sync with enum EnvCard
 mod ENV_POINTS {
     use pistols::types::cards::cards::{EnvCardPoints, Rarity};
-    const DamageUp: EnvCardPoints = EnvCardPoints {
+    pub const DamageUp: EnvCardPoints = EnvCardPoints {
         name: 'Damage Up',
         rarity: Rarity::Common,
         chances: 0,
         damage: 1,
     };
-    const DamageDown: EnvCardPoints = EnvCardPoints {
+    pub const DamageDown: EnvCardPoints = EnvCardPoints {
         name: 'Damage Down',
         rarity: Rarity::Common,
         chances: 0,
         damage: -1,
     };
-    const ChancesUp: EnvCardPoints = EnvCardPoints {
+    pub const ChancesUp: EnvCardPoints = EnvCardPoints {
         name: 'Chances Up',
         rarity: Rarity::Common,
         chances: 10,
         damage: 0,
     };
-    const ChancesDown: EnvCardPoints = EnvCardPoints {
+    pub const ChancesDown: EnvCardPoints = EnvCardPoints {
         name: 'Chances Down',
         rarity: Rarity::Common,
         chances: -10, 
         damage: 0,
     };
-    const DoubleDamageUp: EnvCardPoints = EnvCardPoints {
+    pub const DoubleDamageUp: EnvCardPoints = EnvCardPoints {
         name: 'Double Damage Up',
         rarity: Rarity::Uncommon,
         chances: 0,
         damage: 2,
     };
-    const DoubleChancesUp: EnvCardPoints = EnvCardPoints {
+    pub const DoubleChancesUp: EnvCardPoints = EnvCardPoints {
         name: 'Double Chances Up',
         rarity: Rarity::Uncommon,
         chances: 20,
         damage: 0,
     };
-    const SpecialAllShotsHit: EnvCardPoints = EnvCardPoints {
+    pub const SpecialAllShotsHit: EnvCardPoints = EnvCardPoints {
         name: 'All Shots Hit',
         rarity: Rarity::Special,
         chances: 100,
         damage: 0,
     };
-    const SpecialAllShotsMiss: EnvCardPoints = EnvCardPoints {
+    pub const SpecialAllShotsMiss: EnvCardPoints = EnvCardPoints {
         name: 'All Shots Miss',
         rarity: Rarity::Special,
         chances: -100,
         damage: 0,
     };
-    const SpecialDoubleTactics: EnvCardPoints = EnvCardPoints {
+    pub const SpecialDoubleTactics: EnvCardPoints = EnvCardPoints {
         name: 'Double Tactics',
         rarity: Rarity::Special,
         chances: 0,
         damage: 0,
     };
-    const SpecialNoTactics: EnvCardPoints = EnvCardPoints {
+    pub const SpecialNoTactics: EnvCardPoints = EnvCardPoints {
         name: 'No Tactics',
         rarity: Rarity::Special,
         chances: 0,
@@ -91,19 +91,18 @@ mod ENV_POINTS {
 // traits
 //
 use pistols::types::cards::{
-    cards::{EnvCardPoints, EnvCardPointsTrait, Rarity},
-    tactics::{TacticsCard, TacticsCardTrait},
+    cards::{EnvCardPoints, EnvCardPointsTrait},
+    tactics::{TacticsCardTrait},
 };
 use pistols::types::duel_progress::{SpecialsDrawn};
 use pistols::models::challenge::{DuelistState, DuelistStateTrait};
-use pistols::utils::math::{MathTrait};
 
 impl EnvCardDefault of Default<EnvCard> {
     fn default() -> EnvCard {(EnvCard::None)}
 }
 
 #[generate_trait]
-impl EnvCardImpl of EnvCardTrait {
+pub impl EnvCardImpl of EnvCardTrait {
     fn is_shots_modifier(self: EnvCard) -> bool {
         (match self {
             EnvCard::SpecialAllShotsHit | EnvCard::SpecialAllShotsMiss => true,
@@ -215,26 +214,25 @@ impl EnvCardImpl of EnvCardTrait {
 pub mod ENV_DICES {
     // dice positions for tutorial and testing
     // sync from EnvCard::get_full_deck()
-    const DAMAGE_UP: felt252 = 1;
-    const DAMAGE_DOWN: felt252 = 8;
-    const CHANCES_UP: felt252 = 13;
-    const CHANCES_DOWN: felt252 = 20;
-    const DOUBLE_DAMAGE_UP: felt252 = 25;
-    const DOUBLE_CHANCES_UP: felt252 = 28;
-    const ALL_SHOTS_HIT: felt252 = 31;
-    const ALL_SHOTS_MISS: felt252 = 32;
-    const DOUBLE_TACTICS: felt252 = 33;
-    const NO_TACTICS: felt252 = 34;
+    pub const DAMAGE_UP: felt252 = 1;
+    pub const DAMAGE_DOWN: felt252 = 8;
+    pub const CHANCES_UP: felt252 = 13;
+    pub const CHANCES_DOWN: felt252 = 20;
+    pub const DOUBLE_DAMAGE_UP: felt252 = 25;
+    pub const DOUBLE_CHANCES_UP: felt252 = 28;
+    pub const ALL_SHOTS_HIT: felt252 = 31;
+    pub const ALL_SHOTS_MISS: felt252 = 32;
+    pub const DOUBLE_TACTICS: felt252 = 33;
+    pub const NO_TACTICS: felt252 = 34;
 }
 
 //--------------------
 // converters
 //
-use debug::PrintTrait;
 use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortStringTrait};
 
-impl EnvCardIntoU8 of Into<EnvCard, u8> {
+impl EnvCardIntoU8 of core::traits::Into<EnvCard, u8> {
     fn into(self: EnvCard) -> u8 {
         match self {
             EnvCard::None =>                    0,
@@ -252,7 +250,7 @@ impl EnvCardIntoU8 of Into<EnvCard, u8> {
     }
 }
 
-impl U8IntoEnvCard of Into<u8, EnvCard> {
+impl U8IntoEnvCard of core::traits::Into<u8, EnvCard> {
     fn into(self: u8) -> EnvCard {
         if self == 1        { EnvCard::DamageUp }
         else if self == 2   { EnvCard::DamageDown }
@@ -285,7 +283,6 @@ impl EnvCardDisplay of Display<EnvCard> {
 //
 #[cfg(test)]
 mod tests {
-    use core::traits::Into;
     use super::{EnvCard};
 
     #[test]

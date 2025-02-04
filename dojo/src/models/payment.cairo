@@ -1,4 +1,3 @@
-use starknet::ContractAddress;
 
 #[derive(Copy, Drop, Serde, Default)]
 #[dojo::model]
@@ -32,7 +31,7 @@ pub struct Payment {
 use pistols::systems::bank::bank::{Errors as BankErrors};
 
 #[generate_trait]
-impl PaymentImpl of PaymentTrait {
+pub impl PaymentImpl of PaymentTrait {
     fn is_valid(self: Payment) -> bool {
         (self.amount == 0 || (
             self.client_percent +

@@ -42,12 +42,9 @@ pub trait IFameCoinPublic<TState> {
 
 #[dojo::contract]
 pub mod fame_coin {
-    // use debug::PrintTrait;
-    use core::num::traits::Bounded;
-    use core::byte_array::ByteArrayTrait;
-    use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
-    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    use core::num::traits::{Zero, Bounded};
+    use starknet::{ContractAddress};
+    use dojo::world::{WorldStorage};
 
     //-----------------------------------
     // ERC-20 Start
@@ -57,7 +54,7 @@ pub mod fame_coin {
     use pistols::systems::components::token_bound::{TokenBoundComponent};
     use pistols::systems::components::coin_component::{
         CoinComponent,
-        CoinComponent::{Errors as CoinErrors},
+        // CoinComponent::{Errors as CoinErrors},
     };
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
     component!(path: CoinComponent, storage: coin, event: CoinEvent);
@@ -93,13 +90,13 @@ pub mod fame_coin {
     //-----------------------------------
 
     use pistols::interfaces::systems::{SystemsTrait};
-    use pistols::interfaces::ierc721::{ierc721, ERC721ABIDispatcher, ERC721ABIDispatcherTrait};
+    use pistols::interfaces::ierc721::{ierc721, ERC721ABIDispatcherTrait};
     use pistols::utils::math::{MathU128, MathU256};
     use pistols::utils::misc::{ZERO};
-    use pistols::types::constants::{CONST, FAME};
+    use pistols::types::constants::{FAME};
 
     mod Errors {
-        const NOT_IMPLEMENTED: felt252          = 'FAME: Not implemented';
+        pub const NOT_IMPLEMENTED: felt252          = 'FAME: Not implemented';
     }
 
     //*******************************************

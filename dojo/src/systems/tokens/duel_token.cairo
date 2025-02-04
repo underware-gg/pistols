@@ -1,6 +1,5 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
-use pistols::models::challenge::{Challenge};
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::premise::{Premise};
 
@@ -86,11 +85,9 @@ pub trait IDuelTokenPublic<TState> {
 
 #[dojo::contract]
 pub mod duel_token {    
-    // use debug::PrintTrait;
-    use openzeppelin_account::interface::ISRC6;
-    use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
-    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    use core::num::traits::Zero;
+    use starknet::{ContractAddress};
+    use dojo::world::{WorldStorage};
 
     //-----------------------------------
     // ERC-721 Start
@@ -136,46 +133,38 @@ pub mod duel_token {
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
     };
     use pistols::models::{
-        config::{TokenConfig, TokenConfigValue},
-        player::{Player, PlayerTrait, Activity},
-        challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, Moves},
-        duelist::{Duelist, DuelistTrait, DuelistValue, ProfileType, ProfileTypeTrait},
-        pact::{Pact, PactTrait},
-        table::{
-            TableConfig, TableConfigTrait, TableConfigValue,
-            TableType, TABLES,
-        },
+        player::{PlayerTrait, Activity},
+        challenge::{Challenge, ChallengeTrait, ChallengeValue, Round},
+        duelist::{DuelistTrait, DuelistValue, ProfileTypeTrait},
+        pact::{PactTrait},
+        table::{TableConfig, TableConfigTrait},
     };
     use pistols::types::premise::{Premise, PremiseTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
     use pistols::types::round_state::{RoundState};
-    use pistols::types::duel_progress::{DuelistDrawnCard};
-    use pistols::types::constants::{CONST, HONOUR};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::timestamp::{TimestampTrait};
-    use pistols::utils::math::{MathTrait};
-    use pistols::utils::misc::{ZERO, CONSUME_ADDRESS};
 
-    mod Errors {
-        const NOT_IMPLEMENTED: felt252          = 'DUEL: Not implemented';
-        const INVALID_DUEL: felt252             = 'DUEL: Invalid duel';
-        const NOT_YOUR_DUEL: felt252            = 'DUEL: Not your duel';
-        const INVALID_CHALLENGED: felt252       = 'DUEL: Challenged unknown';
-        const INVALID_CHALLENGED_NULL: felt252  = 'DUEL: Challenged null';
-        const INVALID_CHALLENGED_SELF: felt252  = 'DUEL: Challenged self';
-        const INVALID_REPLY_SELF: felt252       = 'DUEL: Reply self';
-        const INVALID_CHALLENGE: felt252        = 'DUEL: Invalid challenge';
-        const NOT_YOUR_CHALLENGE: felt252       = 'DUEL: Not your challenge';
-        const NOT_YOUR_DUELIST: felt252         = 'DUEL: Not your duelist';
-        const DUELIST_IS_DEAD: felt252          = 'DUEL: Duelist is dead!';
-        const CHALLENGER_NOT_ADMITTED: felt252  = 'DUEL: Challenger not allowed';
-        const CHALLENGED_NOT_ADMITTED: felt252  = 'DUEL: Challenged not allowed';
-        const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
-        const TABLE_IS_CLOSED: felt252          = 'DUEL: Table is closed';
-        const PACT_EXISTS: felt252              = 'DUEL: Pact exists';
-        const DUELIST_IN_CHALLENGE: felt252     = 'DUEL: Duelist in a challenge';
+    pub mod Errors {
+        pub const NOT_IMPLEMENTED: felt252          = 'DUEL: Not implemented';
+        pub const INVALID_DUEL: felt252             = 'DUEL: Invalid duel';
+        pub const NOT_YOUR_DUEL: felt252            = 'DUEL: Not your duel';
+        pub const INVALID_CHALLENGED: felt252       = 'DUEL: Challenged unknown';
+        pub const INVALID_CHALLENGED_NULL: felt252  = 'DUEL: Challenged null';
+        pub const INVALID_CHALLENGED_SELF: felt252  = 'DUEL: Challenged self';
+        pub const INVALID_REPLY_SELF: felt252       = 'DUEL: Reply self';
+        pub const INVALID_CHALLENGE: felt252        = 'DUEL: Invalid challenge';
+        pub const NOT_YOUR_CHALLENGE: felt252       = 'DUEL: Not your challenge';
+        pub const NOT_YOUR_DUELIST: felt252         = 'DUEL: Not your duelist';
+        pub const DUELIST_IS_DEAD: felt252          = 'DUEL: Duelist is dead!';
+        pub const CHALLENGER_NOT_ADMITTED: felt252  = 'DUEL: Challenger not allowed';
+        pub const CHALLENGED_NOT_ADMITTED: felt252  = 'DUEL: Challenged not allowed';
+        pub const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
+        pub const TABLE_IS_CLOSED: felt252          = 'DUEL: Table is closed';
+        pub const PACT_EXISTS: felt252              = 'DUEL: Pact exists';
+        pub const DUELIST_IN_CHALLENGE: felt252     = 'DUEL: Duelist in a challenge';
     }
 
     //*******************************
@@ -238,7 +227,7 @@ pub mod duel_token {
         fn can_join(self: @ContractState, table_id: felt252, duelist_id: u128) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let table: TableConfig = store.get_table_config(table_id);
-            (table.can_join(get_caller_address(), duelist_id))
+            (table.can_join(starknet::get_caller_address(), duelist_id))
         }
 
         //-----------------------------------
@@ -264,7 +253,7 @@ pub mod duel_token {
             let duel_id: u128 = self.token.mint(store.world.game_address());
 
             // validate challenger
-            let address_a: ContractAddress = get_caller_address();
+            let address_a: ContractAddress = starknet::get_caller_address();
             let duelist_id_a: u128 = duelist_id;
             let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
             assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
@@ -286,7 +275,7 @@ pub mod duel_token {
             assert(table.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
 
             // calc expiration
-            let timestamp_start: u64 = get_block_timestamp();
+            let timestamp_start: u64 = starknet::get_block_timestamp();
             let timestamp_end: u64 = if (expire_hours == 0) { 0 } else { timestamp_start + TimestampTrait::from_hours(expire_hours) };
 
             // create challenge
@@ -342,9 +331,9 @@ pub mod duel_token {
             assert(challenge.exists(), Errors::INVALID_CHALLENGE);
             assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
-            let address_b: ContractAddress = get_caller_address();
+            let address_b: ContractAddress = starknet::get_caller_address();
             let duelist_id_b: u128 = duelist_id;
-            let timestamp: u64 = get_block_timestamp();
+            let timestamp: u64 = starknet::get_block_timestamp();
 
             if (challenge.timestamp_end != 0 && timestamp > challenge.timestamp_end) {
                 // Expired, close it!
@@ -409,7 +398,7 @@ pub mod duel_token {
         // fn delete_duel(ref self: ContractState,
         //     duel_id: u128,
         // ) {
-        //     self.token.assert_is_owner_of(get_caller_address(), duel_id.into());
+        //     self.token.assert_is_owner_of(starknet::get_caller_address(), duel_id.into());
         //     assert(false, Errors::NOT_IMPLEMENTED);
         //     self.token.burn(duel_id.into());
         // }
@@ -420,7 +409,7 @@ pub mod duel_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             let challenge: ChallengeValue = store.get_challenge_value(duel_id);
             // let owner: ContractAddress = self.owner_of(duel_id.into());
-            let owner: ContractAddress = get_caller_address(); // pistols-game is the owner
+            let owner: ContractAddress = starknet::get_caller_address(); // pistols-game is the owner
             if (challenge.winner == 1) {
                 self.transfer_from(owner, challenge.address_a, duel_id.into());
             } else if (challenge.winner == 2) {

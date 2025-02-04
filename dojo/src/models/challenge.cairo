@@ -1,7 +1,7 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-use pistols::types::round_state::{RoundState, RoundStateTrait};
-use pistols::types::premise::{Premise, PremiseTrait};
+use pistols::types::round_state::{RoundState};
+use pistols::types::premise::{Premise};
 
 //-------------------------
 // Challenge lifecycle
@@ -82,15 +82,13 @@ pub struct DuelistState {
 // Traits
 //
 use pistols::types::cards::{
-    deck::{Deck, DeckTrait, DeckType, DeckTypeTrait},
+    deck::{Deck, DeckType, DeckTypeTrait},
     hand::{DuelistHand},
-    paces::{PacesCard, PacesCardTrait},
-    tactics::{TacticsCard, TacticsCardTrait},
-    blades::{BladesCard, BladesCardTrait},
+    paces::{PacesCardTrait},
     hand::{FinalBlow},
 };
 use pistols::models::table::{TABLES};
-use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, CharacterProfile};
+use pistols::types::profile_type::{CharacterProfile};
 use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
@@ -98,7 +96,7 @@ use pistols::utils::math::{MathTrait};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
-impl ChallengeImpl of ChallengeTrait {
+pub impl ChallengeImpl of ChallengeTrait {
     #[inline(always)]
     fn duelist_number(self: Challenge, duelist_id: u128) -> u8 {
         (if (duelist_id == self.duelist_id_a) {(1)}
@@ -140,7 +138,7 @@ impl ChallengeImpl of ChallengeTrait {
 }
 
 #[generate_trait]
-impl RoundImpl of RoundTrait {
+pub impl RoundImpl of RoundTrait {
     #[inline(always)]
     fn make_seed(self: Round) -> felt252 {
         (hash_values([self.moves_a.salt, self.moves_b.salt].span()))
@@ -148,7 +146,7 @@ impl RoundImpl of RoundTrait {
 }
 
 #[generate_trait]
-impl MovesImpl of MovesTrait {
+pub impl MovesImpl of MovesTrait {
     fn initialize(ref self: Moves, salt: felt252, moves: Span<u8>) {
         self.salt = salt;
         self.card_1 = moves.value_or_zero(0);
@@ -167,7 +165,7 @@ impl MovesImpl of MovesTrait {
 }
 
 #[generate_trait]
-impl DuelistStateImpl of DuelistStateTrait {
+pub impl DuelistStateImpl of DuelistStateTrait {
     fn initialize(ref self: DuelistState, hand: DuelistHand) {
         self = Default::default();
         self.chances = CONST::INITIAL_CHANCE;

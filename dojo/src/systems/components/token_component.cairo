@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 use pistols::models::payment::{Payment};
 
 #[starknet::interface]
@@ -24,9 +24,8 @@ pub trait ITokenComponentInternal<TState> {
 
 #[starknet::component]
 pub mod TokenComponent {
-    use zeroable::Zeroable;
-    use starknet::{ContractAddress, get_contract_address, get_caller_address};
-    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+    use core::num::traits::Zero;
+    use starknet::{ContractAddress};
     use dojo::contract::components::world_provider::{IWorldProvider};
     
     use openzeppelin_introspection::src5::SRC5Component;
@@ -43,16 +42,16 @@ pub mod TokenComponent {
     };
 
     #[storage]
-    struct Storage {}
+    pub struct Storage {}
 
     #[event]
     #[derive(Drop, PartialEq, starknet::Event)]
     pub enum Event {}
 
     mod Errors {
-        const CALLER_IS_NOT_MINTER: felt252 = 'TOKEN: caller is not minter';
-        const CALLER_IS_NOT_OWNER: felt252  = 'TOKEN: caller is not owner';
-        const INVALID_TOKEN_ID: felt252     = 'TOKEN: invalid token ID';
+        pub const CALLER_IS_NOT_MINTER: felt252 = 'TOKEN: caller is not minter';
+        pub const CALLER_IS_NOT_OWNER: felt252  = 'TOKEN: caller is not owner';
+        pub const INVALID_TOKEN_ID: felt252     = 'TOKEN: invalid token ID';
     }
 
 
@@ -76,7 +75,7 @@ pub mod TokenComponent {
         ) -> bool {
             let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
-            let token_config: TokenConfigValue = store.get_token_config_value(get_contract_address());
+            let token_config: TokenConfigValue = store.get_token_config_value(starknet::get_contract_address());
             (
                 token_config.minter_address.is_zero() ||      // anyone can mint
                 recipient == token_config.minter_address // caller is minter contract
@@ -120,7 +119,7 @@ pub mod TokenComponent {
             let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let token_config: TokenConfig = TokenConfig {
-                token_address: get_contract_address(),
+                token_address: starknet::get_contract_address(),
                 minter_address,
                 renderer_address,
                 minted_count: 0,
@@ -139,11 +138,11 @@ pub mod TokenComponent {
             recipient: ContractAddress,
             amount: usize,
         ) -> Span<u128> {
-            assert(self.can_mint(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
+            assert(self.can_mint(starknet::get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
 
             let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
-            let mut token_config: TokenConfig = store.get_token_config(get_contract_address());
+            let mut token_config: TokenConfig = store.get_token_config(starknet::get_contract_address());
             let mut erc721 = get_dep_component_mut!(ref self, ERC721);
 
             let mut token_ids: Array<u128> = array![];
@@ -163,7 +162,7 @@ pub mod TokenComponent {
         fn burn(ref self: ComponentState<TContractState>,
             token_id: u128,
         ) {
-            assert(self.can_mint(get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
+            assert(self.can_mint(starknet::get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
             let mut erc721 = get_dep_component_mut!(ref self, ERC721);
             erc721.burn(token_id.into());
         }

@@ -4,15 +4,10 @@
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
-    use core::traits::{Into, TryInto};
     use starknet::{ContractAddress};
 
-    use pistols::models::challenge::{Round};
-    use pistols::models::duelist::{Duelist, Score, ScoreTrait};
-    use pistols::models::pact::{Pact, PactTrait};
-    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::round_state::{RoundState, RoundStateTrait};
+    use pistols::models::duelist::{Score, ScoreTrait};
+    use pistols::models::pact::{PactTrait};
     use pistols::utils::short_string::{ShortString};
 
     #[test]

@@ -28,7 +28,7 @@ use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::types::cards::hand::{DuelistHand};
 
 #[generate_trait]
-impl DeckTypeImpl of DeckTypeTrait {
+pub impl DeckTypeImpl of DeckTypeTrait {
     fn build_deck(self: DeckType) -> Deck {
         (Deck {
             fire_cards: PacesCardTrait::build_deck(self),
@@ -40,7 +40,7 @@ impl DeckTypeImpl of DeckTypeTrait {
 }
 
 #[generate_trait]
-impl DeckImpl of DeckTrait {
+pub impl DeckImpl of DeckTrait {
     fn validate_hand(self: Deck, ref hand: DuelistHand) {
         // Paces
         if (!self.fire_cards.contains(@hand.card_fire.into())) {
@@ -79,7 +79,6 @@ impl DeckImpl of DeckTrait {
 //
 #[cfg(test)]
 mod tests {
-    use core::traits::Into;
     use super::{Deck, DeckTrait, DeckType, DeckTypeTrait};
     use pistols::types::cards::hand::{
         DuelistHand,

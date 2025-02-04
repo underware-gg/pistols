@@ -1,5 +1,4 @@
-// use debug::PrintTrait;
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum TableType {
@@ -25,9 +24,9 @@ pub struct TableConfig {
 }
 
 // fixed tables
-mod TABLES {
-    const TUTORIAL: felt252 = 'Tutorial';   // player tutorials
-    const PRACTICE: felt252 = 'Practice';   // bot practice
+pub mod TABLES {
+    pub const TUTORIAL: felt252 = 'Tutorial';   // player tutorials
+    pub const PRACTICE: felt252 = 'Practice';   // bot practice
 }
 
 
@@ -38,7 +37,7 @@ use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
-impl TableManagerImpl of TableManagerTrait {
+pub impl TableManagerImpl of TableManagerTrait {
     fn initialize(ref store: Store) {
         store.set_table_config(@TableConfig {
             table_id: TABLES::TUTORIAL,
@@ -64,7 +63,7 @@ impl TableManagerImpl of TableManagerTrait {
 // TableConfig Traits
 //
 #[generate_trait]
-impl TableConfigImpl of TableConfigTrait {
+pub impl TableConfigImpl of TableConfigTrait {
     fn exists(self: @TableConfig) -> bool {
         (*self.table_type != TableType::Undefined)
     }

@@ -1,17 +1,13 @@
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
-    use core::traits::Into;
     use starknet::{ContractAddress};
 
-    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::{IWorldDispatcherTrait};
 
-    use pistols::systems::admin::{IAdminDispatcher, IAdminDispatcherTrait};
+    use pistols::systems::admin::{IAdminDispatcherTrait};
     use pistols::models::config::{Config};
     use pistols::models::table::{TableConfig, TABLES};
-    use pistols::types::constants::{CONST};
     use pistols::tests::tester::{tester, tester::{TestSystems, FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
-    use pistols::interfaces::systems::{SELECTORS};
 
     const INVALID_TABLE: felt252 = 'TheBookIsOnTheTable';
     const CONFIG_HASH: felt252 = selector_from_tag!("pistols-Config");

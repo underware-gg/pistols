@@ -1,47 +1,26 @@
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
-    use core::traits::{TryInto, Into};
-    use starknet::{ContractAddress};
-
-    use dojo::world::{WorldStorage};
-
-    use pistols::systems::rng::{Dice, DiceTrait, RngWrapTrait};
-    use pistols::systems::game::{game, IGameDispatcher, IGameDispatcherTrait};
-    use pistols::models::challenge::{Challenge, ChallengeValue, Round, RoundValue, Moves, MovesTrait, DuelistState, DuelistStateTrait};
-    use pistols::models::duelist::{Duelist, DuelistValue, ProfileType, Archetype};
-    use pistols::models::table::{TableConfig, TABLES};
-    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::duel_progress::{DuelProgress, DuelStep, DuelistDrawnCard};
-    use pistols::types::round_state::{RoundState, RoundStateTrait};
-    use pistols::types::constants::{CONST, HONOUR};
+    use pistols::systems::rng::{RngWrapTrait};
+    use pistols::models::challenge::{Round, MovesTrait, DuelistStateTrait};
+    use pistols::types::duel_progress::{DuelProgress, DuelStep};
+    use pistols::types::round_state::{RoundState};
+    use pistols::types::constants::{CONST};
     use pistols::types::cards::hand::{
-        Deck, DeckTrait,
         DeckType, DeckTypeTrait,
-        DuelistHand, DuelistHandTrait,
-        PacesCard, PacesCardTrait,
-        TacticsCard, TacticsCardTrait,
-        BladesCard, BladesCardTrait,
-        EnvCard, EnvCardTrait,
+        DuelistHand,
+        TacticsCard,
     };
-    use pistols::libs::game_loop::{game_loop, make_moves_hash};
+    use pistols::libs::game_loop::{game_loop};
     use pistols::utils::short_string::{ShortString};
 
-    use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
-    use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait, ShufflerTrait};
+    use pistols::systems::rng_mock::{IRngMockDispatcherTrait, ShufflerTrait};
     use pistols::tests::tester::{tester,
         tester::{
-            TestSystems,
-            FLAGS, ID, ZERO,
+            TestSystems, FLAGS,
         }
     };
-    use pistols::tests::prefabs::{prefabs,
-        prefabs::{
-            SALT_A, SALT_B, TABLE_ID, MESSAGE,
-            ENV_CARD_NEUTRAL,
-            SaltsValues, SaltsValuesTrait,
-            PlayerMoves, PlayerMovesTrait,
-        },
+    use pistols::tests::prefabs::prefabs::{
+        SALT_A, SALT_B
     };
 
 

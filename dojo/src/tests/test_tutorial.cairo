@@ -1,51 +1,35 @@
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
-    use core::traits::{TryInto, Into};
-    use starknet::{ContractAddress};
-
-    use dojo::world::{WorldStorage};
-
-    use pistols::models::challenge::{Challenge, ChallengeTrait, ChallengeValue, ChallengeFameBalanceValue, Round, RoundValue};
-    use pistols::models::duelist::{Duelist, DuelistValue, Archetype};
-    use pistols::models::table::{TableConfig, TABLES};
+    use pistols::models::challenge::{Challenge, ChallengeTrait, ChallengeValue, RoundValue};
+    use pistols::models::duelist::{DuelistValue};
+    use pistols::models::table::{TABLES};
     use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, ProfileManagerTrait, CharacterProfile};
     use pistols::types::cards::hand::{
-        PacesCard, PacesCardTrait,
-        TacticsCard, TacticsCardTrait,
-        BladesCard, BladesCardTrait,
-        DeckType, DeckTypeTrait,
+        PacesCard,
+        TacticsCard,
+        BladesCard,
+        DeckType,
         FinalBlow, FinalBlowTrait,
     };
-    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::duel_progress::{DuelProgress, DuelStep};
-    use pistols::types::round_state::{RoundState, RoundStateTrait};
-    use pistols::types::duel_progress::{DuelistDrawnCard};
-    use pistols::types::premise::{Premise, PremiseTrait};
+    use pistols::types::challenge_state::{ChallengeState};
+    use pistols::types::duel_progress::{DuelProgress};
+    use pistols::types::round_state::{RoundState};
+    use pistols::types::premise::{Premise};
     use pistols::libs::tut::{TutorialLevel, TutorialLevelTrait};
     use pistols::libs::game_loop::{make_moves_hash};
-    use pistols::types::constants::{CONST, HONOUR};
-    use pistols::utils::arrays::{SpanUtilsTrait};
     use pistols::utils::math::{MathU8};
 
-    use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::tests::tester::{tester,
         tester::{
-            TestSystems,
-            IGameDispatcher, IGameDispatcherTrait,
-            ITutorialDispatcher, ITutorialDispatcherTrait,
-            FLAGS, ID, ZERO,
-            OWNER, OTHER, BUMMER, TREASURY, FAKE_OWNER_OF_1,
+            TestSystems, FLAGS,
+             IGameDispatcherTrait,
+            ITutorialDispatcherTrait,
+            ID, ZERO, OWNER,
         }
     };
-    use pistols::tests::prefabs::{prefabs,
-        prefabs::{
-            SALT_A, SALT_B, TABLE_ID, MESSAGE, PRIZE_VALUE,
-            SaltsValues, SaltsValuesTrait,
-            PlayerMoves, PlayerMovesTrait,
-        },
+    use pistols::tests::prefabs::prefabs::{
+        SALT_A, SALT_B,
     };
-    use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait};
 
 
 

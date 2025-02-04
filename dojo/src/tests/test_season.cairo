@@ -1,32 +1,15 @@
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
-    use core::traits::Into;
-    use starknet::{ContractAddress};
-
-    use dojo::world::{WorldStorage};
-
     use pistols::models::{
-        challenge::{Challenge, ChallengeValue},
-        player::{Player, PlayerTrait},
-        challenge::{Round},
-        duelist::{Duelist},
         season::{SeasonConfig, SeasonConfigTrait, SeasonPhase},
-        table::{TableConfig, TableConfigTrait, TableType, TABLES},
-        config::{Config, ConfigTrait},
+        table::{TableConfig, TableType, TABLES},
+        config::{Config},
     };
-    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::round_state::{RoundState, RoundStateTrait};
-    use pistols::types::constants::{CONST};
-    use pistols::types::duel_progress::{DuelProgress};
-    use pistols::utils::timestamp::{TimestampTrait};
     use pistols::tests::tester::{tester,
         tester::{
-            IGameDispatcher, IGameDispatcherTrait,
-            IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
-            TestSystems,
-            FLAGS, ID, ZERO,
-            OWNER, OTHER, BUMMER, TREASURY, FAKE_OWNER_OF_1, OWNED_BY_OWNER,
+            IGameDispatcherTrait,
+            TestSystems, FLAGS,
+            OWNER,
         }
     };
 

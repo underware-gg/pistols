@@ -1,7 +1,7 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 
-mod CONFIG {
-    const CONFIG_KEY: u8 = 1;
+pub mod CONFIG {
+    pub const CONFIG_KEY: u8 = 1;
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -49,7 +49,7 @@ use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
-impl ConfigManagerImpl of ConfigManagerTrait {
+pub impl ConfigManagerImpl of ConfigManagerTrait {
     fn initialize() -> Config {
         (Config {
             key: CONFIG::CONFIG_KEY,
@@ -78,7 +78,7 @@ impl ConfigManagerImpl of ConfigManagerTrait {
 }
 
 #[generate_trait]
-impl ConfigImpl of ConfigTrait {
+pub impl ConfigImpl of ConfigTrait {
     fn lords_dispatcher(self: @Config) -> ERC20ABIDispatcher {
         (ierc20(*self.lords_address))
     }

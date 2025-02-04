@@ -1,5 +1,3 @@
-// use debug::PrintTrait;
-use traits::Into;
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum Premise {
@@ -24,55 +22,55 @@ pub enum Premise {
 
 #[derive(Copy, Drop, Serde, Default)]
 pub struct PremiseDescription {
-    name: felt252, // @generateContants:shortstring
-    prefix: felt252, // @generateContants:shortstring
+    pub name: felt252, // @generateContants:shortstring
+    pub prefix: felt252, // @generateContants:shortstring
 }
 
 // to be exported to typescript by generateConstants
 // IMPORTANT: names must be in sync with enum Premise
 mod PREMISES {
     use super::{PremiseDescription};
-    const Undefined: PremiseDescription = PremiseDescription {
+    pub const Undefined: PremiseDescription = PremiseDescription {
         name: 'Undefined',
         prefix: 'over...?',
     };
-    const Matter: PremiseDescription = PremiseDescription {
+    pub const Matter: PremiseDescription = PremiseDescription {
         name: 'Matter',
         prefix: 'over the matter of',
     };
-    const Debt: PremiseDescription = PremiseDescription {
+    pub const Debt: PremiseDescription = PremiseDescription {
         name: 'Debt',
         prefix: 'to discharge a debt',
     };
-    const Dispute: PremiseDescription = PremiseDescription {
+    pub const Dispute: PremiseDescription = PremiseDescription {
         name: 'Dispute',
         prefix: 'to satisfy a dispute',
     };
-    const Honour: PremiseDescription = PremiseDescription {
+    pub const Honour: PremiseDescription = PremiseDescription {
         name: 'Honour',
         prefix: 'to defend their honour',
     };
-    const Hatred: PremiseDescription = PremiseDescription {
+    pub const Hatred: PremiseDescription = PremiseDescription {
         name: 'Hatred',
         prefix: 'to satisfy a burning hatred',
     };
-    const Blood: PremiseDescription = PremiseDescription {
+    pub const Blood: PremiseDescription = PremiseDescription {
         name: 'Blood',
         prefix: 'for the love of death and blood',
     };
-    const Nothing: PremiseDescription = PremiseDescription {
+    pub const Nothing: PremiseDescription = PremiseDescription {
         name: 'Nothing',
         prefix: 'for no reason other than',
     };
-    const Tournament: PremiseDescription = PremiseDescription {
+    pub const Tournament: PremiseDescription = PremiseDescription {
         name: 'Tournament',
         prefix: 'to be the winner of',
     };
-    const Tutorial: PremiseDescription = PremiseDescription {
+    pub const Tutorial: PremiseDescription = PremiseDescription {
         name: 'Tutorial',
         prefix: 'to learn the ropes',
     };
-    const Training: PremiseDescription = PremiseDescription {
+    pub const Training: PremiseDescription = PremiseDescription {
         name: 'Training',
         prefix: 'to train for',
     };
@@ -85,7 +83,7 @@ mod PREMISES {
 use pistols::utils::short_string::{ShortStringTrait};
 
 #[generate_trait]
-impl PremiseImpl of PremiseTrait {
+pub impl PremiseImpl of PremiseTrait {
     fn description(self: Premise) -> PremiseDescription {
         match self {
             Premise::Undefined   => PREMISES::Undefined,

@@ -1,11 +1,8 @@
 #[cfg(test)]
-mod tester {
-    use starknet::{ContractAddress, testing, get_caller_address};
-    use core::traits::Into;
-    use array::ArrayTrait;
-    use debug::PrintTrait;
+pub mod tester {
+    use starknet::{ContractAddress, testing};
 
-    use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::{WorldStorage, IWorldDispatcherTrait};
     use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
     use dojo_cairo_test::{
         spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
@@ -42,22 +39,21 @@ mod tester {
         },
         challenge::{
             m_Challenge, Challenge, ChallengeValue,
-            m_ChallengeFameBalance, ChallengeFameBalance, ChallengeFameBalanceValue,
-            m_Round, Round, RoundValue,
-            DuelistState, DuelistStateTrait,
+            m_ChallengeFameBalance, ChallengeFameBalanceValue,
+            m_Round, RoundValue,
+            DuelistState,
         },
         duelist::{
             m_Duelist, Duelist, DuelistValue,
             m_DuelistChallenge, DuelistChallenge,
             m_Scoreboard, Scoreboard,
             m_ScoreboardTable, ScoreboardTable,
-            ProfileType, Archetype
         },
         pact::{
-            m_Pact, Pact,
+            m_Pact,
         },
         payment::{
-            m_Payment, Payment,
+            m_Payment,
         },
         config::{
             m_Config, Config,
@@ -70,7 +66,6 @@ mod tester {
         },
         table::{
             m_TableConfig, TableConfig,
-            TABLES,
         },
     };
     use pistols::tests::token::mock_duelist::{
@@ -81,11 +76,10 @@ mod tester {
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::constants::{CONST};
     use pistols::types::premise::{Premise};
-    use pistols::utils::arrays::{ArrayUtilsTrait, SpanUtilsTrait};
-    use pistols::utils::byte_arrays::{BoolToByteArray};
+    use pistols::utils::byte_arrays::{BoolToString};
     use pistols::utils::misc::{ContractAddressIntoU256};
     use pistols::utils::short_string::{ShortString};
-    use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
+    use pistols::interfaces::systems::{SystemsTrait};
 
     
     //
@@ -93,38 +87,38 @@ mod tester {
     // https://github.com/starkware-libs/cairo/blob/main/corelib/src/starknet/testing.cairo
     //
 
-    fn ZERO()      -> ContractAddress { starknet::contract_address_const::<0x0>() }
-    fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // welcome 1-5
-    fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x6>() } // welcome 6-10
-    fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x111>() }
-    fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x222>() }
-    fn SPENDER()   -> ContractAddress { starknet::contract_address_const::<0x333>() }
-    fn TREASURY()  -> ContractAddress { starknet::contract_address_const::<0x444>() }
+    pub fn ZERO()      -> ContractAddress { starknet::contract_address_const::<0x0>() }
+    pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // welcome 1-5
+    pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x6>() } // welcome 6-10
+    pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x111>() }
+    pub fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x222>() }
+    pub fn SPENDER()   -> ContractAddress { starknet::contract_address_const::<0x333>() }
+    pub fn TREASURY()  -> ContractAddress { starknet::contract_address_const::<0x444>() }
     // low part is owned token, but different address
-    fn FAKE_OWNER_OF_1() -> starknet::ContractAddress { starknet::contract_address_const::<0x1234000000000000000000000000000000001>() }
-    fn FAKE_OWNER_OF_2() -> starknet::ContractAddress { starknet::contract_address_const::<0x2234000000000000000000000000000000002>() }
+    pub fn FAKE_OWNER_OF_1() -> ContractAddress { starknet::contract_address_const::<0x1234000000000000000000000000000000001>() }
+    pub fn FAKE_OWNER_OF_2() -> ContractAddress { starknet::contract_address_const::<0x2234000000000000000000000000000000002>() }
     // hard-coded owners
-    fn OWNED_BY_OWNER() -> u128 { 0xeeee }
-    fn OWNED_BY_OTHER() -> u128 { 0xdddd }
+    pub fn OWNED_BY_OWNER() -> u128 { 0xeeee }
+    pub fn OWNED_BY_OTHER() -> u128 { 0xdddd }
 
-    fn ID(address: ContractAddress) -> u128 {
+    pub fn ID(address: ContractAddress) -> u128 {
         let as_u256: u256 = address.into();
         (as_u256.low)
     }
 
     // set_contract_address : to define the address of the calling contract,
     // set_account_contract_address : to define the address of the account used for the current transaction.
-    fn impersonate(address: ContractAddress) {
+    pub fn impersonate(address: ContractAddress) {
         testing::set_contract_address(address);
         testing::set_account_contract_address(address);
     }
 
     #[inline(always)]
-    fn _assert_is_alive(state: DuelistState, msg: felt252) {
+    pub fn _assert_is_alive(state: DuelistState, msg: felt252) {
         assert(state.health > 0, msg);
     }
     #[inline(always)]
-    fn _assert_is_dead(state: DuelistState, msg: felt252) {
+    pub fn _assert_is_dead(state: DuelistState, msg: felt252) {
         assert(state.health == 0, msg);
     }
 
@@ -135,32 +129,32 @@ mod tester {
     const INITIAL_TIMESTAMP: u64 = 0x100000000;
     const TIMESTEP: u64 = 0x1;
 
-    mod FLAGS {
-        const GAME: u8       = 0b1;
-        const ADMIN: u8      = 0b10;
-        const LORDS: u8      = 0b100;
-        const DUEL: u8       = 0b1000;
-        const DUELIST: u8    = 0b10000;
-        const APPROVE: u8    = 0b100000;
-        const MOCK_RNG: u8   = 0b1000000;
-        const TUTORIAL: u8   = 0b10000000;
+    pub mod FLAGS {
+        pub const GAME: u8       = 0b1;
+        pub const ADMIN: u8      = 0b10;
+        pub const LORDS: u8      = 0b100;
+        pub const DUEL: u8       = 0b1000;
+        pub const DUELIST: u8    = 0b10000;
+        pub const APPROVE: u8    = 0b100000;
+        pub const MOCK_RNG: u8   = 0b1000000;
+        pub const TUTORIAL: u8   = 0b10000000;
     }
 
     #[derive(Copy, Drop)]
     pub struct TestSystems {
-        world: WorldStorage,
-        game: IGameDispatcher,
-        tut: ITutorialDispatcher,
-        admin: IAdminDispatcher,
-        lords: ILordsMockDispatcher,
-        fame: IFameCoinDispatcher,
-        duels: IDuelTokenDispatcher,
-        duelists: IDuelistTokenDispatcher,
-        pack: IPackTokenDispatcher,
-        rng: IRngMockDispatcher,
+        pub world: WorldStorage,
+        pub game: IGameDispatcher,
+        pub tut: ITutorialDispatcher,
+        pub admin: IAdminDispatcher,
+        pub lords: ILordsMockDispatcher,
+        pub fame: IFameCoinDispatcher,
+        pub duels: IDuelTokenDispatcher,
+        pub duelists: IDuelistTokenDispatcher,
+        pub pack: IPackTokenDispatcher,
+        pub rng: IRngMockDispatcher,
     }
 
-    fn setup_world(flags: u8) -> TestSystems {
+    pub fn setup_world(flags: u8) -> TestSystems {
         let mut deploy_game: bool = (flags & FLAGS::GAME) != 0;
         let mut deploy_tutorial: bool = (flags & FLAGS::TUTORIAL) != 0;
         let mut deploy_admin: bool = (flags & FLAGS::ADMIN) != 0;
@@ -392,28 +386,28 @@ mod tester {
 
 
     #[inline(always)]
-    fn get_block_number() -> u64 {
+    pub fn get_block_number() -> u64 {
         let block_info = starknet::get_block_info().unbox();
         (block_info.block_number)
     }
 
     #[inline(always)]
-    fn get_block_timestamp() -> u64 {
+    pub fn get_block_timestamp() -> u64 {
         let block_info = starknet::get_block_info().unbox();
         (block_info.block_timestamp)
     }
 
     #[inline(always)]
-    fn _next_block() -> (u64, u64) {
+    pub fn _next_block() -> (u64, u64) {
         (elapse_timestamp(TIMESTEP))
     }
 
-    fn elapse_timestamp(delta: u64) -> (u64, u64) {
-        let new_timestamp = get_block_timestamp() + delta;
+    pub fn elapse_timestamp(delta: u64) -> (u64, u64) {
+        let new_timestamp = starknet::get_block_timestamp() + delta;
         (set_timestamp(new_timestamp))
     }
 
-    fn set_timestamp(new_timestamp: u64) -> (u64, u64) {
+    pub fn set_timestamp(new_timestamp: u64) -> (u64, u64) {
         let new_block_number = get_block_number() + 1;
         testing::set_block_number(new_block_number);
         testing::set_block_timestamp(new_timestamp);
@@ -425,46 +419,46 @@ mod tester {
     //
 
     // ::admin
-    fn execute_admin_grant_admin(system: @IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, granted: bool) {
+    pub fn execute_admin_grant_admin(system: @IAdminDispatcher, sender: ContractAddress, owner_address: ContractAddress, granted: bool) {
         impersonate(sender);
         (*system).grant_admin(owner_address, granted);
         _next_block();
     }
-    fn execute_admin_set_treasury(system: @IAdminDispatcher, sender: ContractAddress, new_treasury_address: ContractAddress) {
+    pub fn execute_admin_set_treasury(system: @IAdminDispatcher, sender: ContractAddress, new_treasury_address: ContractAddress) {
         impersonate(sender);
         (*system).set_treasury(new_treasury_address);
         _next_block();
     }
-    fn execute_admin_set_paused(system: @IAdminDispatcher, sender: ContractAddress, paused: bool) {
+    pub fn execute_admin_set_paused(system: @IAdminDispatcher, sender: ContractAddress, paused: bool) {
         impersonate(sender);
         (*system).set_paused(paused);
         _next_block();
     }
-    fn execute_admin_set_table(system: @IAdminDispatcher, sender: ContractAddress, table: TableConfig) {
+    pub fn execute_admin_set_table(system: @IAdminDispatcher, sender: ContractAddress, table: TableConfig) {
         impersonate(sender);
         (*system).set_table(table);
         _next_block();
     }
-    fn execute_admin_open_table(system: @IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
+    pub fn execute_admin_open_table(system: @IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
         impersonate(sender);
         (*system).open_table(table_id, enabled);
         _next_block();
     }
 
     // ::ierc20
-    fn execute_lords_faucet(system: @ILordsMockDispatcher, sender: ContractAddress) {
+    pub fn execute_lords_faucet(system: @ILordsMockDispatcher, sender: ContractAddress) {
         impersonate(sender);
         (*system).faucet();
         _next_block();
     }
-    fn execute_lords_approve(system: @ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u128) {
+    pub fn execute_lords_approve(system: @ILordsMockDispatcher, owner: ContractAddress, spender: ContractAddress, value: u128) {
         impersonate(owner);
         (*system).approve(spender, value.into());
         _next_block();
     }
 
     // ::pack_token
-    fn execute_claim_welcome_pack(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
+    pub fn execute_claim_welcome_pack(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
         impersonate(sender);
         let token_ids: Span<u128> = (*system).claim_welcome_pack();
         _next_block();
@@ -472,7 +466,7 @@ mod tester {
     }
 
     // ::duel_token
-    fn execute_create_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
+    pub fn execute_create_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
         // premise: Premise,
         quote: felt252,
@@ -481,7 +475,7 @@ mod tester {
     ) -> u128 {
         (execute_create_duel_ID(system, sender, ID(sender), challenged, quote, table_id, expire_hours))
     }
-    fn execute_create_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
+    pub fn execute_create_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
         token_id: u128,
         challenged: ContractAddress,
         // premise: Premise,
@@ -494,7 +488,7 @@ mod tester {
         _next_block();
         (duel_id)
     }
-    fn execute_reply_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
+    pub fn execute_reply_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
         token_id: u128,
         duel_id: u128,
         accepted: bool,
@@ -506,13 +500,13 @@ mod tester {
     }
 
     // ::game
-    fn execute_commit_moves(system: @IGameDispatcher, sender: ContractAddress,
+    pub fn execute_commit_moves(system: @IGameDispatcher, sender: ContractAddress,
         duel_id: u128,
         hash: u128,
     ) {
         execute_commit_moves_ID(system, sender, ID(sender), duel_id, hash);
     }
-    fn execute_commit_moves_ID(system: @IGameDispatcher, sender: ContractAddress,
+    pub fn execute_commit_moves_ID(system: @IGameDispatcher, sender: ContractAddress,
         token_id: u128,
         duel_id: u128,
         hash: u128,
@@ -521,14 +515,14 @@ mod tester {
         (*system).commit_moves(token_id, duel_id, hash);
         _next_block();
     }
-    fn execute_reveal_moves(system: @IGameDispatcher, sender: ContractAddress,
+    pub fn execute_reveal_moves(system: @IGameDispatcher, sender: ContractAddress,
         duel_id: u128,
         salt: felt252,
         moves: Span<u8>,
     ) {
         execute_reveal_moves_ID(system, sender, ID(sender), duel_id, salt, moves);
     }
-    fn execute_reveal_moves_ID(system: @IGameDispatcher, sender: ContractAddress,
+    pub fn execute_reveal_moves_ID(system: @IGameDispatcher, sender: ContractAddress,
         token_id: u128,
         duel_id: u128,
         salt: felt252,
@@ -538,7 +532,7 @@ mod tester {
         (*system).reveal_moves(token_id, duel_id, salt, moves);
         _next_block();
     }
-    fn execute_collect(system: @IGameDispatcher, sender: ContractAddress) -> felt252 {
+    pub fn execute_collect(system: @IGameDispatcher, sender: ContractAddress) -> felt252 {
         impersonate(sender);
         let new_table_id: felt252 = (*system).collect();
         _next_block();
@@ -546,7 +540,7 @@ mod tester {
     }
 
     // ::game
-    fn execute_create_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
+    pub fn execute_create_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
         tutorial_id: u128,
     ) -> u128 {
         impersonate(sender);
@@ -554,7 +548,7 @@ mod tester {
         _next_block();
         (duel_id)
     }
-    fn execute_commit_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
+    pub fn execute_commit_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
         duelist_id: u128,
         duel_id: u128,
         hashed: u128,
@@ -563,7 +557,7 @@ mod tester {
         (*system).commit_moves(duelist_id, duel_id, hashed);
         _next_block();
     }
-    fn execute_reveal_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
+    pub fn execute_reveal_moves_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
         duelist_id: u128,
         duel_id: u128,
         salt: felt252,
@@ -579,79 +573,79 @@ mod tester {
     //
 
     #[inline(always)]
-    fn get_Config(world: WorldStorage) -> Config {
+    pub fn get_Config(world: WorldStorage) -> Config {
         (world.read_model(CONFIG::CONFIG_KEY))
     }
     #[inline(always)]
-    fn get_TokenConfig(world: WorldStorage, contract_address: ContractAddress) -> TokenConfig {
+    pub fn get_TokenConfig(world: WorldStorage, contract_address: ContractAddress) -> TokenConfig {
         (world.read_model(contract_address))
     }
     #[inline(always)]
-    fn get_CoinConfig(world: WorldStorage, contract_address: ContractAddress) -> CoinConfig {
+    pub fn get_CoinConfig(world: WorldStorage, contract_address: ContractAddress) -> CoinConfig {
         (world.read_model(contract_address))
     }
     #[inline(always)]
-    fn get_Table(world: WorldStorage, table_id: felt252) -> TableConfig {
+    pub fn get_Table(world: WorldStorage, table_id: felt252) -> TableConfig {
         (world.read_model(table_id))
     }
     #[inline(always)]
-    fn get_Season(world: WorldStorage, table_id: felt252) -> SeasonConfig {
+    pub fn get_Season(world: WorldStorage, table_id: felt252) -> SeasonConfig {
         (world.read_model(table_id))
     }
     #[inline(always)]
-    fn get_current_Season(world: WorldStorage) -> SeasonConfig {
+    pub fn get_current_Season(world: WorldStorage) -> SeasonConfig {
         (world.read_model(get_Config(world).season_table_id))
     }
     #[inline(always)]
-    fn get_Player(world: WorldStorage, address: ContractAddress) -> Player {
+    pub fn get_Player(world: WorldStorage, address: ContractAddress) -> Player {
         (world.read_model(address))
     }
     #[inline(always)]
-    fn get_Pack(world: WorldStorage, pack_id: u128) -> Pack {
+    pub fn get_Pack(world: WorldStorage, pack_id: u128) -> Pack {
         (world.read_model(pack_id))
     }
     #[inline(always)]
-    fn get_DuelistValue(world: WorldStorage, duelist_id: u128) -> DuelistValue {
+    pub fn get_DuelistValue(world: WorldStorage, duelist_id: u128) -> DuelistValue {
         (world.read_value(duelist_id))
     }
     #[inline(always)]
-    fn get_DuelistChallengeId(world: WorldStorage, duelist_id: u128) -> u128 {
+    pub fn get_DuelistChallengeId(world: WorldStorage, duelist_id: u128) -> u128 {
         let duelist_challenge : DuelistChallenge = world.read_model(duelist_id);
         (duelist_challenge.duel_id)
     }
     #[inline(always)]
-    fn get_Scoreboard(world: WorldStorage, holder: felt252) -> Scoreboard {
+    pub fn get_Scoreboard(world: WorldStorage, holder: felt252) -> Scoreboard {
         (world.read_model(holder))
     }
     #[inline(always)]
-    fn get_ScoreboardTable(world: WorldStorage, holder: felt252, table_id: felt252) -> ScoreboardTable {
+    pub fn get_ScoreboardTable(world: WorldStorage, holder: felt252, table_id: felt252) -> ScoreboardTable {
         (world.read_model((holder, table_id),))
     }
     #[inline(always)]
-    fn get_Challenge(world: WorldStorage, duel_id: u128) -> Challenge {
+    pub fn get_Challenge(world: WorldStorage, duel_id: u128) -> Challenge {
         (world.read_model(duel_id))
     }
     #[inline(always)]
-    fn get_ChallengeValue(world: WorldStorage, duel_id: u128) -> ChallengeValue {
+    pub fn get_ChallengeValue(world: WorldStorage, duel_id: u128) -> ChallengeValue {
         (world.read_value(duel_id))
     }
     #[inline(always)]
-    fn get_ChallengeFameBalanceValue(world: WorldStorage, duel_id: u128) -> ChallengeFameBalanceValue {
+    pub fn get_ChallengeFameBalanceValue(world: WorldStorage, duel_id: u128) -> ChallengeFameBalanceValue {
         (world.read_value(duel_id))
     }
     #[inline(always)]
-    fn get_RoundValue(world: WorldStorage, duel_id: u128) -> RoundValue {
+    pub fn get_RoundValue(world: WorldStorage, duel_id: u128) -> RoundValue {
         (world.read_value(duel_id))
     }
     #[inline(always)]
-    fn get_Challenge_Round_Entity(world: WorldStorage, duel_id: u128) -> (ChallengeValue, RoundValue) {
+    pub fn get_Challenge_Round_Entity(world: WorldStorage, duel_id: u128) -> (ChallengeValue, RoundValue) {
         let challenge = get_ChallengeValue(world, duel_id);
         let round = get_RoundValue(world, duel_id);
         (challenge, round)
     }
 
     #[inline(always)]
-    fn fame_balance_of_token(sys: @TestSystems, duel_id: u128) -> u128 {
+    pub fn fame_balance_of_token(sys: @TestSystems, duel_id: u128) -> u128 {
         ((*sys.fame).balance_of_token((*sys.duelists).contract_address, duel_id).low)
     }
 
@@ -660,22 +654,22 @@ mod tester {
     //
 
     // depends on use dojo::model::{Model};
-    fn set_Config(ref world: WorldStorage, model: Config) {
+    pub fn set_Config(ref world: WorldStorage, model: Config) {
         world.write_model_test(@model);
     }
-    fn set_TableConfig(ref world: WorldStorage, model: TableConfig) {
+    pub fn set_TableConfig(ref world: WorldStorage, model: TableConfig) {
         world.write_model_test(@model);
     }
-    fn set_Duelist(ref world: WorldStorage, model: Duelist) {
+    pub fn set_Duelist(ref world: WorldStorage, model: Duelist) {
         world.write_model_test(@model);
     }
-    fn set_Scoreboard(ref world: WorldStorage, model: Scoreboard) {
+    pub fn set_Scoreboard(ref world: WorldStorage, model: Scoreboard) {
         world.write_model_test(@model);
     }
-    fn set_Challenge(ref world: WorldStorage, model: Challenge) {
+    pub fn set_Challenge(ref world: WorldStorage, model: Challenge) {
         world.write_model_test(@model);
     }
-    fn set_Pack(ref world: WorldStorage, model: Pack) {
+    pub fn set_Pack(ref world: WorldStorage, model: Pack) {
         world.write_model_test(@model);
     }
 
@@ -683,7 +677,7 @@ mod tester {
     // Asserts
     //
 
-    fn assert_balance_token(sys: @TestSystems, duelist_id: u128, balance_before: u128, subtract: u128, add: u128, prefix: felt252) -> u128 {
+    pub fn assert_balance_token(sys: @TestSystems, duelist_id: u128, balance_before: u128, subtract: u128, add: u128, prefix: felt252) -> u128 {
         let address: ContractAddress = TokenBoundAddressTrait::address((*sys.duelists).contract_address, duelist_id);
         (assert_balance(
             ILordsMockDispatcher{ contract_address: (*sys.fame).contract_address },
@@ -691,7 +685,7 @@ mod tester {
         ))
     }
 
-    fn assert_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: felt252) -> u128 {
+    pub fn assert_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: felt252) -> u128 {
         let balance: u128 = lords.balance_of(address).low;
         if (subtract > add) {
             assert(balance < balance_before, ShortString::concat(prefix, ' <'));
@@ -704,7 +698,7 @@ mod tester {
         (balance)
     }
 
-    fn assert_winner_balance(lords: ILordsMockDispatcher,
+    pub fn assert_winner_balance(lords: ILordsMockDispatcher,
         winner: u8,
         duelist_a: ContractAddress, duelist_b: ContractAddress,
         balance_a: u128, balance_b: u128,
@@ -723,7 +717,7 @@ mod tester {
         }
     }
 
-    fn assert_pact(sys: TestSystems, duel_id: u128, ch: ChallengeValue, has_pact: bool, accepted: bool, prefix: ByteArray) {
+    pub fn assert_pact(sys: TestSystems, duel_id: u128, ch: ChallengeValue, has_pact: bool, accepted: bool, prefix: ByteArray) {
         assert!(sys.duels.has_pact(ch.table_id, ch.address_a, ch.address_b) == has_pact,
             "[{}] _assert_pact() not [{}]", prefix, has_pact.to_string()
         );
@@ -742,15 +736,4 @@ mod tester {
         );
     }
 
-}
-
-#[cfg(test)]
-mod tests {
-    use debug::PrintTrait;
-    use starknet::{ContractAddress};
-
-    #[test]
-    fn test_tester() {
-        assert(true, 'so very true');
-    }
 }

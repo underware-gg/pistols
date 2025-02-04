@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum PackType {
@@ -42,7 +42,7 @@ pub struct PackDescription {
 mod PACK_TYPES {
     use super::{PackDescription};
     use pistols::types::constants::{CONST};
-    const Unknown: PackDescription = PackDescription {
+    pub const Unknown: PackDescription = PackDescription {
         id: 'Unknown',
         name: 'Unknown',
         image_url_closed: '/tokens/Unknown.jpg',
@@ -50,7 +50,7 @@ mod PACK_TYPES {
         can_purchase: false,
         price: 0,
     };
-    const WelcomePack: PackDescription = PackDescription {
+    pub const WelcomePack: PackDescription = PackDescription {
         id: 'WelcomePack',
         name: 'Welcome Pack',
         image_url_closed: '/tokens/WelcomePack.jpg',
@@ -58,7 +58,7 @@ mod PACK_TYPES {
         can_purchase: false,
         price: 0,
     };  
-    const Duelists5x: PackDescription = PackDescription {
+    pub const Duelists5x: PackDescription = PackDescription {
         id: 'Duelists5x',
         name: 'Duelists 5-pack',
         image_url_closed: '/tokens/Duelists5x.jpg',
@@ -77,13 +77,12 @@ use pistols::interfaces::systems::{
     SystemsTrait,
     IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
 };
-use pistols::models::duelist::{ProfileType};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::types::constants::{CONST};
 
 #[generate_trait]
-impl PackImpl of PackTrait {
+pub impl PackImpl of PackTrait {
     fn open(ref self: Pack, ref store: Store, recipient: ContractAddress) -> Span<u128> {
         assert(!self.is_open, PackErrors::ALREADY_OPENED);
         let token_ids: Span<u128> = match self.pack_type {
@@ -104,7 +103,7 @@ impl PackImpl of PackTrait {
 }
 
 #[generate_trait]
-impl PackTypeImpl of PackTypeTrait {
+pub impl PackTypeImpl of PackTypeTrait {
     fn description(self: PackType) -> PackDescription {
         match self {
             PackType::Unknown       => PACK_TYPES::Unknown,

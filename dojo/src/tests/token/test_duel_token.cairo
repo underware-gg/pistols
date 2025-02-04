@@ -1,7 +1,6 @@
-use debug::PrintTrait;
-use starknet::{ContractAddress, get_contract_address, get_caller_address, testing};
-use dojo::world::{WorldStorage, WorldStorageTrait};
-use dojo::model::{Model, ModelIndex};
+use core::num::traits::Zero;
+use starknet::{ContractAddress, testing};
+use dojo::world::{WorldStorage};
 use dojo_cairo_test::{
     spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
     WorldStorageTestTrait,
@@ -10,51 +9,51 @@ use dojo_cairo_test::{
 use pistols::systems::{
     admin::{admin},
     game::{game},
-    bank::{bank},
+    // bank::{bank},
     vrf_mock::{vrf_mock},
     tokens::{
         duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
-        duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
-        lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
+        // duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+        lords_mock::{lords_mock}, //, ILordsMockDispatcher, ILordsMockDispatcherTrait},
     },
     components::{
-        token_bound::{m_TokenBoundAddress, TokenBoundAddress},
+        token_bound::{m_TokenBoundAddress},
     },
 };
 use pistols::models::{
     player::{
-        m_Player, Player,
+        m_Player,
         e_PlayerActivity,
         e_PlayerRequiredAction,
     },
     pack::{
-        m_Pack, Pack,
+        m_Pack,
     },
     challenge::{
         m_Challenge, Challenge,
-        m_ChallengeFameBalance, ChallengeFameBalance,
-        m_Round, Round,
+        m_ChallengeFameBalance,
+        m_Round,
     },
     duelist::{
-        m_Duelist, Duelist,
-        m_DuelistChallenge, DuelistChallenge,
-        m_Scoreboard, Scoreboard,
-        m_ScoreboardTable, ScoreboardTable,
+        m_Duelist,
+        m_DuelistChallenge,
+        m_Scoreboard,
+        m_ScoreboardTable,
     },
     pact::{
-        m_Pact, Pact,
+        m_Pact,
     },
     payment::{
-        m_Payment, Payment,
+        m_Payment,
     },
     config::{
         m_Config, Config,
         m_TokenConfig, TokenConfig,
-        m_CoinConfig, CoinConfig,
+        m_CoinConfig,
         CONFIG,
     },
     season::{
-        m_SeasonConfig, SeasonConfig,
+        m_SeasonConfig,
     },
     table::{
         m_TableConfig, TableConfig,
@@ -66,19 +65,16 @@ use pistols::tests::token::mock_duelist::{
     m_MockDuelistOwners,
 };
 
-use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
-use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-use pistols::types::premise::{Premise, PremiseTrait};
-use pistols::types::constants::{CONST};
-use pistols::utils::arrays::{ArrayUtilsTrait, SpanUtilsTrait};
-use pistols::utils::math::{MathTrait};
+use pistols::interfaces::systems::{SystemsTrait};
+use pistols::types::challenge_state::{ChallengeState};
+use pistols::types::premise::{Premise};
 
 use pistols::tests::tester::{tester, tester::{ID, OWNER, OTHER, BUMMER, RECIPIENT, TREASURY, ZERO}};
 use pistols::tests::{utils};
 
 use openzeppelin_token::erc721::interface;
 use openzeppelin_token::erc721::{
-    ERC721Component,
+    // ERC721Component,
     ERC721Component::{
         Transfer, Approval,
     }

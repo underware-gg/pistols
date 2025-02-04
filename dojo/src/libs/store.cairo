@@ -1,5 +1,5 @@
 use starknet::{ContractAddress};
-use dojo::world::{WorldStorage, WorldStorageTrait};
+use dojo::world::{WorldStorage};
 use dojo::model::{ModelStorage, ModelValueStorage};
 use dojo::event::{EventStorage};
 
@@ -49,11 +49,11 @@ pub use pistols::systems::components::{
 
 #[derive(Copy, Drop)]
 pub struct Store {
-    world: WorldStorage,
+    pub world: WorldStorage,
 }
 
 #[generate_trait]
-impl StoreImpl of StoreTrait {
+pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn new(world: WorldStorage) -> Store {
         (Store { world })

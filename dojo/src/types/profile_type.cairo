@@ -1,5 +1,3 @@
-use debug::PrintTrait;
-use starknet::ContractAddress;
 
 //--------------------------
 // ProfileType
@@ -66,9 +64,9 @@ pub enum BotProfile {
 //
 #[derive(Copy, Drop, Serde, Default)]
 pub struct ProfileDescription {
-    profile_id: u8,
-    gender: Gender,
-    name: felt252, // @generateContants:shortstring
+    pub profile_id: u8,
+    pub gender: Gender,
+    pub name: felt252, // @generateContants:shortstring
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
@@ -85,112 +83,112 @@ impl GenderDefault of Default<Gender> {
 // IMPORTANT: names must be in sync with enum DuelistProfile
 mod DUELIST_PROFILES {
     use super::{ProfileDescription, Gender};
-    const Unknown: ProfileDescription = ProfileDescription {
+    pub const Unknown: ProfileDescription = ProfileDescription {
         profile_id: 0,
         gender: Gender::Undefined,
         name: 'Unknown',
     };
-    const Duke: ProfileDescription = ProfileDescription {
+    pub const Duke: ProfileDescription = ProfileDescription {
         profile_id: 1,
         gender: Gender::Male,
         name: 'Duke',
     };
-    const Duella: ProfileDescription = ProfileDescription {
+    pub const Duella: ProfileDescription = ProfileDescription {
         profile_id: 2,
         gender: Gender::Female,
         name: 'Duella',
     };
-    const Jameson: ProfileDescription = ProfileDescription {
+    pub const Jameson: ProfileDescription = ProfileDescription {
         profile_id: 3,
         gender: Gender::Male,
         name: 'Jameson',
     };
-    const Pilgrim: ProfileDescription = ProfileDescription {
+    pub const Pilgrim: ProfileDescription = ProfileDescription {
         profile_id: 4,
         gender: Gender::Male,
         name: 'Pilgrim',
     };
-    const Jack: ProfileDescription = ProfileDescription {
+    pub const Jack: ProfileDescription = ProfileDescription {
         profile_id: 5,
         gender: Gender::Male,
         name: 'Jack',
     };
-    const Pops: ProfileDescription = ProfileDescription {
+    pub const Pops: ProfileDescription = ProfileDescription {
         profile_id: 6,
         gender: Gender::Male,
         name: 'Pops',
     };
-    const SerWalker: ProfileDescription = ProfileDescription {
+    pub const SerWalker: ProfileDescription = ProfileDescription {
         profile_id: 7,
         gender: Gender::Male,
         name: 'Ser Walker',
     };
-    const Bloberto: ProfileDescription = ProfileDescription {
+    pub const Bloberto: ProfileDescription = ProfileDescription {
         profile_id: 8,
         gender: Gender::Male,
         name: 'Bloberto',
     };
-    const Squiddo: ProfileDescription = ProfileDescription {
+    pub const Squiddo: ProfileDescription = ProfileDescription {
         profile_id: 9,
         gender: Gender::Male,
         name: 'Squiddo',
     };
-    const SlenderDuck: ProfileDescription = ProfileDescription {
+    pub const SlenderDuck: ProfileDescription = ProfileDescription {
         profile_id: 10,
         gender: Gender::Male,
         name: 'Slender Duck',
     };
-    const LadyVengeance: ProfileDescription = ProfileDescription {
+    pub const LadyVengeance: ProfileDescription = ProfileDescription {
         profile_id: 11,
         gender: Gender::Female,
         name: 'Lady Vengeance',
     };
-    const Breadman: ProfileDescription = ProfileDescription {
+    pub const Breadman: ProfileDescription = ProfileDescription {
         profile_id: 12,
         gender: Gender::Male,
         name: 'Breadman',
     };
-    const Brutus: ProfileDescription = ProfileDescription {
+    pub const Brutus: ProfileDescription = ProfileDescription {
         profile_id: 13,
         gender: Gender::Male,
         name: 'Brutus',
     };
-    const Pistolopher: ProfileDescription = ProfileDescription {
+    pub const Pistolopher: ProfileDescription = ProfileDescription {
         profile_id: 14,
         gender: Gender::Male,
         name: 'Pistolopher',
     };
-    const Secreto: ProfileDescription = ProfileDescription {
+    pub const Secreto: ProfileDescription = ProfileDescription {
         profile_id: 15,
         gender: Gender::Male,
         name: 'Secreto',
     };
-    const ShadowMare: ProfileDescription = ProfileDescription {
+    pub const ShadowMare: ProfileDescription = ProfileDescription {
         profile_id: 16,
         gender: Gender::Female,
         name: 'Shadow Mare',
     };
-    const Karaku: ProfileDescription = ProfileDescription {
+    pub const Karaku: ProfileDescription = ProfileDescription {
         profile_id: 17,
         gender: Gender::Male,
         name: 'Karaku',
     };
-    const Misty: ProfileDescription = ProfileDescription {
+    pub const Misty: ProfileDescription = ProfileDescription {
         profile_id: 18,
         gender: Gender::Female,
         name: 'Misty',
     };
-    const Kenzu: ProfileDescription = ProfileDescription {
+    pub const Kenzu: ProfileDescription = ProfileDescription {
         profile_id: 19,
         gender: Gender::Female,
         name: 'Kenzu',
     };
-    const NynJah: ProfileDescription = ProfileDescription {
+    pub const NynJah: ProfileDescription = ProfileDescription {
         profile_id: 20,
         gender: Gender::Male,
         name: 'Nyn Jah',
     };
-    const Thrak: ProfileDescription = ProfileDescription {
+    pub const Thrak: ProfileDescription = ProfileDescription {
         profile_id: 21,
         gender: Gender::Male,
         name: 'Thrak',
@@ -200,27 +198,27 @@ mod DUELIST_PROFILES {
 // IMPORTANT: names must be in sync with enum CharacterProfile
 mod CHARACTER_PROFILES {
     use super::{ProfileDescription, Gender};
-    const Unknown: ProfileDescription = ProfileDescription {
+    pub const Unknown: ProfileDescription = ProfileDescription {
         profile_id: 0,
         gender: Gender::Undefined,
         name: 'Unknown',
     };
-    const Bartender: ProfileDescription = ProfileDescription {
+    pub const Bartender: ProfileDescription = ProfileDescription {
         profile_id: 1,
         gender: Gender::Male,
         name: 'Bartender',
     };
-    const Drunkard: ProfileDescription = ProfileDescription {
+    pub const Drunkard: ProfileDescription = ProfileDescription {
         profile_id: 2,
         gender: Gender::Male,
         name: 'Drunkard',
     };
-    const Devil: ProfileDescription = ProfileDescription {
+    pub const Devil: ProfileDescription = ProfileDescription {
         profile_id: 3,
         gender: Gender::Male,
         name: 'Devil',
     };
-    const Player: ProfileDescription = ProfileDescription {
+    pub const Player: ProfileDescription = ProfileDescription {
         profile_id: 4,
         gender: Gender::Male,
         name: 'Stranger',
@@ -230,22 +228,22 @@ mod CHARACTER_PROFILES {
 // IMPORTANT: names must be in sync with enum BotProfile
 mod BOT_PROFILES {
     use super::{ProfileDescription, Gender};
-    const Unknown: ProfileDescription = ProfileDescription {
+    pub const Unknown: ProfileDescription = ProfileDescription {
         profile_id: 0,
         gender: Gender::Undefined,
         name: 'Unknown',
     };
-    const TinMan: ProfileDescription = ProfileDescription {
+    pub const TinMan: ProfileDescription = ProfileDescription {
         profile_id: 1,
         gender: Gender::Male,
         name: 'Tin Man',
     };
-    const Scarecrow: ProfileDescription = ProfileDescription {
+    pub const Scarecrow: ProfileDescription = ProfileDescription {
         profile_id: 2,
         gender: Gender::Male,
         name: 'Scarecrow',
     };
-    const Leon: ProfileDescription = ProfileDescription {
+    pub const Leon: ProfileDescription = ProfileDescription {
         profile_id: 3,
         gender: Gender::Male,
         name: 'Leon',
@@ -259,15 +257,15 @@ mod BOT_PROFILES {
 
 mod PROFILES {
     // profile counts
-    const DUELIST_PROFILE_COUNT: u8 = 21;
-    const CHARACTER_PROFILE_COUNT: u8 = 4;
-    const BOT_PROFILE_COUNT: u8 = 3;
+    pub const DUELIST_PROFILE_COUNT: u8 = 21;
+    pub const CHARACTER_PROFILE_COUNT: u8 = 4;
+    pub const BOT_PROFILE_COUNT: u8 = 3;
 
     // profile base duelist ids
-    const DUELIST_ID_BASE: u128    = 0x100000000;
-    const CHARACTER_ID_BASE: u128  = 0x200000000;
-    const BOT_ID_BASE: u128        = 0x300000000;
-    const UNDEFINED_ID_BASE: u128  = 0xf00000000;
+    pub const DUELIST_ID_BASE: u128    = 0x100000000;
+    pub const CHARACTER_ID_BASE: u128  = 0x200000000;
+    pub const BOT_ID_BASE: u128        = 0x300000000;
+    pub const UNDEFINED_ID_BASE: u128  = 0xf00000000;
 }
 
 
@@ -280,10 +278,9 @@ use pistols::models::duelist::{Duelist};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::utils::misc::{FeltToLossy};
-use pistols::types::constants::{CONST};
 
 #[generate_trait]
-impl ProfileManagerImpl of ProfileManagerTrait {
+pub impl ProfileManagerImpl of ProfileManagerTrait {
     fn initialize(ref store: Store, sample: ProfileType) {
         let profiles: Span<ProfileType> = Self::get_all_profiles_by_type(sample);
         let mut i: u8 = 0;
@@ -344,7 +341,7 @@ impl ProfileManagerImpl of ProfileManagerTrait {
 }
 
 #[generate_trait]
-impl ProfileTypeImpl of ProfileTypeTrait {
+pub impl ProfileTypeImpl of ProfileTypeTrait {
     fn description(self: ProfileType) -> ProfileDescription {
         (match self {
             ProfileType::Undefined =>           DUELIST_PROFILES::Unknown,
@@ -385,7 +382,7 @@ impl ProfileTypeImpl of ProfileTypeTrait {
     }
 }
 
-impl DuelistProfileIntoDescription of Into<DuelistProfile, ProfileDescription> {
+impl DuelistProfileIntoDescription of core::traits::Into<DuelistProfile, ProfileDescription> {
     fn into(self: DuelistProfile) -> ProfileDescription {
         match self {
             DuelistProfile::Unknown =>          DUELIST_PROFILES::Unknown,
@@ -413,7 +410,7 @@ impl DuelistProfileIntoDescription of Into<DuelistProfile, ProfileDescription> {
         }
     }
 }
-impl CharacterProfileIntoDescription of Into<CharacterProfile, ProfileDescription> {
+impl CharacterProfileIntoDescription of core::traits::Into<CharacterProfile, ProfileDescription> {
     fn into(self: CharacterProfile) -> ProfileDescription {
         match self {
             CharacterProfile::Unknown =>       CHARACTER_PROFILES::Unknown,
@@ -424,7 +421,7 @@ impl CharacterProfileIntoDescription of Into<CharacterProfile, ProfileDescriptio
         }
     }
 }
-impl BotProfileIntoDescription of Into<BotProfile, ProfileDescription> {
+impl BotProfileIntoDescription of core::traits::Into<BotProfile, ProfileDescription> {
     fn into(self: BotProfile) -> ProfileDescription {
         match self {
             BotProfile::Unknown =>      BOT_PROFILES::Unknown,
@@ -439,7 +436,7 @@ impl BotProfileIntoDescription of Into<BotProfile, ProfileDescription> {
 //----------------------------------------
 // Profile id converters
 //
-impl U8IntoDuelistProfile of Into<u8, DuelistProfile> {
+impl U8IntoDuelistProfile of core::traits::Into<u8, DuelistProfile> {
     fn into(self: u8) -> DuelistProfile {
         if self == 1        { DuelistProfile::Duke }
         else if self == 2   { DuelistProfile::Duella }
@@ -465,7 +462,7 @@ impl U8IntoDuelistProfile of Into<u8, DuelistProfile> {
         else                { DuelistProfile::Unknown }
     }
 }
-impl U8IntoCharacterProfile of Into<u8, CharacterProfile> {
+impl U8IntoCharacterProfile of core::traits::Into<u8, CharacterProfile> {
     fn into(self: u8) -> CharacterProfile {
         if self == 1        { CharacterProfile::Bartender }
         else if self == 2   { CharacterProfile::Drunkard }
@@ -474,7 +471,7 @@ impl U8IntoCharacterProfile of Into<u8, CharacterProfile> {
         else                { CharacterProfile::Unknown }
     }
 }
-impl U8IntoBotProfile of Into<u8, BotProfile> {
+impl U8IntoBotProfile of core::traits::Into<u8, BotProfile> {
     fn into(self: u8) -> BotProfile {
         if self == 1        { BotProfile::TinMan }
         else if self == 2   { BotProfile::Scarecrow }
@@ -486,37 +483,37 @@ impl U8IntoBotProfile of Into<u8, BotProfile> {
 //----------------------------------------
 // Duelist id converters
 //
-impl DuelistProfileIntoDuelistId of Into<DuelistProfile, u128> {
+impl DuelistProfileIntoDuelistId of core::traits::Into<DuelistProfile, u128> {
     fn into(self: DuelistProfile) -> u128 {
         (PROFILES::DUELIST_ID_BASE + ProfileType::Duelist(self).description().profile_id.into())
     }
 }
-impl CharacterProfileIntoDuelistId of Into<CharacterProfile, u128> {
+impl CharacterProfileIntoDuelistId of core::traits::Into<CharacterProfile, u128> {
     fn into(self: CharacterProfile) -> u128 {
         (PROFILES::CHARACTER_ID_BASE + ProfileType::Character(self).description().profile_id.into())
     }
 }
-impl BotProfileIntoDuelistId of Into<BotProfile, u128> {
+impl BotProfileIntoDuelistId of core::traits::Into<BotProfile, u128> {
     fn into(self: BotProfile) -> u128 {
         (PROFILES::BOT_ID_BASE + ProfileType::Bot(self).description().profile_id.into())
     }
 }
 
-impl DuelistIdIntoDuelistProfile of Into<u128, DuelistProfile> {
+impl DuelistIdIntoDuelistProfile of core::traits::Into<u128, DuelistProfile> {
     fn into(self: u128) -> DuelistProfile {
         let zero: u128 = self ^ PROFILES::DUELIST_ID_BASE;
         let id: u8 = if (zero < 0xff) { (self & 0xff).try_into().unwrap() } else { 0 };
         (id.into())
     }
 }
-impl DuelistIdIntoCharacterProfile of Into<u128, CharacterProfile> {
+impl DuelistIdIntoCharacterProfile of core::traits::Into<u128, CharacterProfile> {
     fn into(self: u128) -> CharacterProfile {
         let id: u128 = self ^ PROFILES::CHARACTER_ID_BASE;
         let id: u8 = if (id < 0xff) { (self & 0xff).try_into().unwrap() } else { 0 };
         (id.into())
     }
 }
-impl DuelistIdIntoBotProfile of Into<u128, BotProfile> {
+impl DuelistIdIntoBotProfile of core::traits::Into<u128, BotProfile> {
     fn into(self: u128) -> BotProfile {
         let zero: u128 = self ^ PROFILES::BOT_ID_BASE;
         let id: u8 = if (zero < 0xff) { (self & 0xff).try_into().unwrap() } else { 0 };
@@ -530,8 +527,6 @@ impl DuelistIdIntoBotProfile of Into<u128, BotProfile> {
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
-    use core::traits::Into;
 
     use super::{
         ProfileType, ProfileTypeTrait,

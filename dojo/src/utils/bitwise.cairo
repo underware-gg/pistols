@@ -1,24 +1,23 @@
-use traits::Into;
 
-mod BITWISE {
-    const MAX_U8: u8 = 0xff; // 255
-    const MAX_U16: u16 = 0xffff; // 65535
-    const MAX_U32: u32 = 0xffffffff; // 4294967295
-    const MAX_U64: u64 = 0xffffffffffffffff; // 18446744073709551615
-    const MAX_U128: u128 = 0xffffffffffffffffffffffffffffffff; // 340282366920938463463374607431768211455
-    const MAX_U256: u256 = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff; // 115792089237316195423570985008687907853269984665640564039457584007913129639935
+pub mod BITWISE {
+    pub const MAX_U8: u8 = 0xff; // 255
+    pub const MAX_U16: u16 = 0xffff; // 65535
+    pub const MAX_U32: u32 = 0xffffffff; // 4294967295
+    pub const MAX_U64: u64 = 0xffffffffffffffff; // 18446744073709551615
+    pub const MAX_U128: u128 = 0xffffffffffffffffffffffffffffffff; // 340282366920938463463374607431768211455
+    pub const MAX_U256: u256 = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff; // 115792089237316195423570985008687907853269984665640564039457584007913129639935
 
     // most significant bit (e.g u8: 0b10000000, or 0x80)
-    const MSB_U8: u8     = 0x80; // 128
-    const MSB_U16: u16   = 0x8000; // 32768
-    const MSB_U32: u32   = 0x80000000; // 2147483648
-    const MSB_U64: u64   = 0x8000000000000000; // 9223372036854775808
-    const MSB_U128: u128 = 0x80000000000000000000000000000000; // 170141183460469231731687303715884105728
-    const MSB_U256: u256 = 0x8000000000000000000000000000000000000000000000000000000000000000; // 57896044618658097711785492504343953926634992332820282019728792003956564819968
+    pub const MSB_U8: u8     = 0x80; // 128
+    pub const MSB_U16: u16   = 0x8000; // 32768
+    pub const MSB_U32: u32   = 0x80000000; // 2147483648
+    pub const MSB_U64: u64   = 0x8000000000000000; // 9223372036854775808
+    pub const MSB_U128: u128 = 0x80000000000000000000000000000000; // 170141183460469231731687303715884105728
+    pub const MSB_U256: u256 = 0x8000000000000000000000000000000000000000000000000000000000000000; // 57896044618658097711785492504343953926634992332820282019728792003956564819968
 }
 
 
-trait BitwiseTrait<T> {
+pub trait BitwiseTrait<T> {
     fn bit_count() -> usize;
     fn byte_count() -> usize;
     fn max() -> T;
@@ -33,7 +32,7 @@ trait BitwiseTrait<T> {
     fn sum_bytes(x: T) -> T;
 }
 
-impl BitwiseU8 of BitwiseTrait<u8> {
+pub impl BitwiseU8 of BitwiseTrait<u8> {
     #[inline(always)]
     fn bit_count() -> usize {(8)}
     #[inline(always)]
@@ -86,7 +85,7 @@ impl BitwiseU8 of BitwiseTrait<u8> {
     fn sum_bytes(x: u8) -> u8 {(x)}
 }
 
-impl BitwiseU16 of BitwiseTrait<u16> {
+pub impl BitwiseU16 of BitwiseTrait<u16> {
     #[inline(always)]
     fn bit_count() -> usize {(16)}
     #[inline(always)]
@@ -141,7 +140,7 @@ impl BitwiseU16 of BitwiseTrait<u16> {
     }
 }
 
-impl BitwiseU32 of BitwiseTrait<u32> {
+pub impl BitwiseU32 of BitwiseTrait<u32> {
     #[inline(always)]
     fn bit_count() -> usize {(32)}
     #[inline(always)]
@@ -196,7 +195,7 @@ impl BitwiseU32 of BitwiseTrait<u32> {
     }
 }
 
-impl BitwiseU64 of BitwiseTrait<u64> {
+pub impl BitwiseU64 of BitwiseTrait<u64> {
     #[inline(always)]
     fn bit_count() -> usize {(64)}
     #[inline(always)]
@@ -251,7 +250,7 @@ impl BitwiseU64 of BitwiseTrait<u64> {
     }
 }
 
-impl BitwiseU128 of BitwiseTrait<u128> {
+pub impl BitwiseU128 of BitwiseTrait<u128> {
     #[inline(always)]
     fn bit_count() -> usize {(128)}
     #[inline(always)]
@@ -306,7 +305,7 @@ impl BitwiseU128 of BitwiseTrait<u128> {
     }
 }
 
-impl BitwiseU256 of BitwiseTrait<u256> {
+pub impl BitwiseU256 of BitwiseTrait<u256> {
     #[inline(always)]
     fn bit_count() -> usize {(256)}
     #[inline(always)]
@@ -367,7 +366,6 @@ impl BitwiseU256 of BitwiseTrait<u256> {
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
     use super::{
         BitwiseU8, BitwiseU16, BitwiseU32, BitwiseU64, BitwiseU128, BitwiseU256,
     };

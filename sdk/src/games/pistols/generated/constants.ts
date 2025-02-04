@@ -320,6 +320,16 @@ export const getRoundStateValue = (name: RoundState): number | undefined => _ind
 export const getRoundStateFromValue = (value: number): RoundState | undefined => Object.keys(RoundState)[value] as RoundState;
 export const getRoundStateMap = (): Record<RoundState, number> => Object.keys(RoundState).reduce((acc, v, index) => { acc[v as RoundState] = index; return acc; }, {} as Record<RoundState, number>);
 
+// from: ../dojo/src/types/trophies.cairo
+export enum Trophy {
+  None = 'None', // 0
+  FirstBlood = 'FirstBlood', // 1
+  Collector = 'Collector', // 2
+};
+export const getTrophyValue = (name: Trophy): number | undefined => _indexOrUndefined(Object.keys(Trophy).indexOf(name));
+export const getTrophyFromValue = (value: number): Trophy | undefined => Object.keys(Trophy)[value] as Trophy;
+export const getTrophyMap = (): Record<Trophy, number> => Object.keys(Trophy).reduce((acc, v, index) => { acc[v as Trophy] = index; return acc; }, {} as Record<Trophy, number>);
+
 
 //----------------------------------
 // custom types

@@ -1,5 +1,4 @@
 use starknet::{ContractAddress};
-use dojo::world::IWorldDispatcher;
 pub use pistols::systems::rng::{IRngDispatcher, IRngDispatcherTrait};
 pub use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
@@ -31,7 +30,7 @@ pub struct MockedValue {
     pub exists: bool,
 }
 #[generate_trait]
-impl MockedValueImpl of MockedValueTrait {
+pub impl MockedValueImpl of MockedValueTrait {
     #[inline(always)]
     fn new(salt: felt252, value: felt252) -> MockedValue {
         (MockedValue {
@@ -54,7 +53,7 @@ pub struct RngWrap {
     pub mocked: Span<MockedValue>,
 }
 #[generate_trait]
-impl RngWrapImpl of RngWrapTrait {
+pub impl RngWrapImpl of RngWrapTrait {
     #[inline(always)]
     fn new(rng_address: ContractAddress) -> @RngWrap {
         (Self::wrap(rng_address, [].span()))
@@ -89,15 +88,12 @@ pub trait IMocker<TState> {
 #[dojo::contract]
 // #[dojo::contract(namespace:"mock", nomapping: true)]
 pub mod rng_mock {
-    // use debug::PrintTrait;
-    use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    use dojo::model::{ModelStorage};
 
-    use super::{IRngMock, IMocker, MockedValue, MockedValueTrait};
+    use super::{IMocker, MockedValue, MockedValueTrait};
     use pistols::systems::rng::{IRng};
     use pistols::utils::hash::{hash_values};
-    use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 
     #[generate_trait]
     impl WorldDefaultImpl of WorldDefaultTrait {

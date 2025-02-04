@@ -1,20 +1,20 @@
 
 #[derive(Copy, Drop, Serde, Default)]
 pub struct CardPoints {
-    name: felt252, // @generateContants:shortstring
-    self_chances: i8,
-    self_damage: i8,
-    other_chances: i8,
-    other_damage: i8,
-    special: felt252, // @generateContants:shortstring
+    pub name: felt252, // @generateContants:shortstring
+    pub self_chances: i8,
+    pub self_damage: i8,
+    pub other_chances: i8,
+    pub other_damage: i8,
+    pub special: felt252, // @generateContants:shortstring
 }
 
 #[derive(Copy, Drop, Serde, Default)]
 pub struct EnvCardPoints {
-    name: felt252, // @generateContants:shortstring
-    rarity: Rarity,
-    chances: i8,
-    damage: i8,
+    pub name: felt252, // @generateContants:shortstring
+    pub rarity: Rarity,
+    pub chances: i8,
+    pub damage: i8,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq)]
@@ -37,7 +37,7 @@ use pistols::models::challenge::{DuelistState, DuelistStateTrait};
 use pistols::types::cards::env::{EnvCard, EnvCardTrait};
 
 #[generate_trait]
-impl CardPointsImpl of CardPointsTrait {
+pub impl CardPointsImpl of CardPointsTrait {
     fn apply(self: CardPoints, ref state_a: DuelistState, ref state_b: DuelistState, multiplier: i8, shots_modifier: EnvCard) {
         if (!shots_modifier.is_shots_modifier()) {
             state_a.apply_chances(self.self_chances * multiplier);
@@ -49,7 +49,7 @@ impl CardPointsImpl of CardPointsTrait {
 }
 
 #[generate_trait]
-impl EnvCardPointsImpl of EnvCardPointsTrait {
+pub impl EnvCardPointsImpl of EnvCardPointsTrait {
     fn apply(self: EnvCardPoints, ref state: DuelistState, multiplier: i8, shots_modifier: EnvCard) {
         if (!shots_modifier.is_shots_modifier()) {
             state.apply_chances(self.chances * multiplier);

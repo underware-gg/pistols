@@ -1,45 +1,37 @@
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
-    use core::traits::{TryInto, Into};
     use starknet::{ContractAddress};
 
-    use dojo::world::{WorldStorage};
-
-    use pistols::models::challenge::{Challenge, ChallengeTrait, ChallengeValue, ChallengeFameBalanceValue, Round, RoundValue};
-    use pistols::models::duelist::{Duelist, DuelistValue, ProfileType, Archetype};
-    use pistols::models::table::{TableConfig, TABLES};
-    use pistols::types::cards::hand::{PacesCard, PacesCardTrait, FinalBlow, DeckType, DeckTypeTrait};
-    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
+    use pistols::models::challenge::{ChallengeTrait, ChallengeValue, ChallengeFameBalanceValue, RoundValue};
+    use pistols::models::table::{TABLES};
+    use pistols::types::cards::hand::{PacesCard, FinalBlow, DeckType};
+    use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
-    use pistols::types::round_state::{RoundState, RoundStateTrait};
-    use pistols::types::duel_progress::{DuelistDrawnCard};
-    use pistols::types::constants::{CONST, HONOUR};
+    use pistols::types::round_state::{RoundState};
+    use pistols::types::constants::{CONST};
     use pistols::libs::game_loop::{make_moves_hash};
     use pistols::utils::arrays::{SpanUtilsTrait};
     use pistols::utils::math::{MathU8};
 
-    use pistols::systems::tokens::lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait};
     use pistols::tests::tester::{tester,
         tester::{
-            TestSystems,
-            IGameDispatcher, IGameDispatcherTrait,
-            IDuelTokenDispatcher, IDuelTokenDispatcherTrait,
-            IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
-            IFameCoinDispatcher, IFameCoinDispatcherTrait,
-            FLAGS, ID, ZERO,
-            OWNER, OTHER, BUMMER, TREASURY, FAKE_OWNER_OF_1,
+            TestSystems, FLAGS,
+            IGameDispatcherTrait,
+            IDuelTokenDispatcherTrait,
+            IDuelistTokenDispatcherTrait,
+            ID, OWNER, OTHER, BUMMER, FAKE_OWNER_OF_1,
             _assert_is_alive, _assert_is_dead,
         }
     };
     use pistols::tests::prefabs::{prefabs,
         prefabs::{
-            SALT_A, SALT_B, TABLE_ID, MESSAGE, PRIZE_VALUE,
-            SaltsValues, SaltsValuesTrait,
-            PlayerMoves, PlayerMovesTrait,
+            // SALT_A, SALT_B, TABLE_ID, PRIZE_VALUE,
+            MESSAGE,
+            SaltsValues,
+            PlayerMoves,
         },
     };
-    use pistols::systems::rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait};
+    use pistols::systems::rng_mock::{IRngMockDispatcherTrait};
 
 
 
