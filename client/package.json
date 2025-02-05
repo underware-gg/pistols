@@ -74,7 +74,7 @@
     "typescript": "catalog:",
     "vite": "^6.0.5",
     "vite-plugin-mkcert": "^1.17.6",
-    "vitest": "3.0.0-beta.2"
+    "vitest": "^3.0.5"
   },
   "engines": {
     "node": ">=22"
