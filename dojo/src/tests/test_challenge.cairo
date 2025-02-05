@@ -89,6 +89,9 @@ mod tests {
     fn test_challenge_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let timestamp = tester::get_block_timestamp();
+        let game_timestamp = sys.game.get_timestamp();
+        assert(timestamp > 0, 'timestamp > 0');
+        assert(timestamp == game_timestamp, 'game_timestamp');
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, TABLE_ID, 0);
         let ch = tester::get_ChallengeValue(sys.world, duel_id);
         assert(ch.state == ChallengeState::Awaiting, 'state');
@@ -100,6 +103,8 @@ mod tests {
         assert(ch.timestamp_start == timestamp, 'timestamp_start');
         assert(ch.timestamp_end == 0, 'timestamp_end');
         _assert_empty_progress(sys, duel_id);
+        let game_timestamp = sys.game.get_timestamp();
+        assert_gt!(game_timestamp, ch.timestamp_start, "game_timestamp > timestamp_start");
         // deck type
         assert(tester::get_Challenge(sys.world, duel_id).get_deck_type() == DeckType::Classic, 'challenge.deck_type');
     }

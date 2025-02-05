@@ -27,6 +27,7 @@ pub trait IGame<TState> {
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
     fn can_collect(self: @TState) -> bool;
+    fn get_timestamp(self: @TState) -> u64;
     
     // test calls
     fn test_validate_commit_message(self: @TState, account: ContractAddress, signature: Array<felt252>, duelId: felt252, duelistId: felt252) -> bool;
@@ -392,6 +393,10 @@ pub mod game {
                 duelistId,
             };
             (msg.validate(account, signature))
+        }
+
+        fn get_timestamp(self: @ContractState) -> u64 {
+            (starknet::get_block_timestamp())
         }
     }
 
