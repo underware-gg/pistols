@@ -39,13 +39,13 @@ cd dreams
 pnpm install
 pnpm build
 # test build
-npx hello
+pnpm hello
 ```
 
 * Run agents
 
 ```bash
-npx scarecrow
-npx tinman
-npx leon
+pnpm scarecrow
+pnpm tinman
+pnpm leon
 ```

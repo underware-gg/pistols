@@ -11,10 +11,7 @@
     "build": "tsup",
     "sync": "tsup --watch",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "chromadb": "chroma run --path ./.chroma"
-  },
-  "bin": {
-    "chromadb": "./dist/misc/chromadb.js",
+    "chromadb": "chroma run --path ./.chroma",
     "scarecrow": "./dist/bots/scarecrow.js",
     "tinman": "./dist/bots/tinman.js",
     "leon": "./dist/bots/leon.js",
