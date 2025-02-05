@@ -57,13 +57,13 @@ mod tests {
 
     #[test]
     fn test_felt_to_u128_lossy() {
-        assert(0xab9d03074bff6ee2d4dbc374dbf3f846 == 0x7f25249bc3b57d4a9cb82bd75d25579ab9d03074bff6ee2d4dbc374dbf3f846.to_u128_lossy(), 'bump');
+        assert_eq!(0xab9d03074bff6ee2d4dbc374dbf3f846, 0x7f25249bc3b57d4a9cb82bd75d25579ab9d03074bff6ee2d4dbc374dbf3f846.to_u128_lossy(), "bump");
     }
 
     #[test]
     fn test_make_block_hash() {
         let h = make_block_hash();
-        assert(h != 0, 'block hash');
+        assert_ne!(h, 0, "block hash");
     }
 
     #[test]
@@ -74,12 +74,12 @@ mod tests {
         let h21: felt252 = hash_values([222, 111].span());
         let h123: felt252 = hash_values([111, 222, 333].span());
         let h1234: felt252 = hash_values([111, 222, 333, 444].span());
-        assert(h1 != 0,  'h1');
-        assert(h1 == h11,  'h1 == h11');
-        assert(h1 != h12, 'h1 != h12');
-        assert(h12 != h123, 'h12 != h123');
-        assert(h123 != h1234, 'h3 != h4');
-        assert(h12 != h21, 'h12 != h21');
+        assert_ne!(h1, 0, "h1");
+        assert_eq!(h1, h11, "h1 == h11");
+        assert_ne!(h1, h12, "h1 != h12");
+        assert_ne!(h12, h123, "h12 != h123");
+        assert_ne!(h123, h1234, "h3 != h4");
+        assert_ne!(h12, h21, "h12 != h21");
     }
 
     #[test]
@@ -87,9 +87,9 @@ mod tests {
         let h1: felt252 = hash_values([111].span());
         let h2: felt252 = hash_values([h1].span());
         let h3: felt252 = hash_values([h2].span());
-        assert(h1 != 0,  'h1');
-        assert(h1 != h2, 'h1 != h2');
-        assert(h2 != h3, 'h2 != h3');
+        assert_ne!(h1, 0, "h1");
+        assert_ne!(h1, h2, "h1 != h2");
+        assert_ne!(h2, h3, "h2 != h3");
     }
 
     #[test]
@@ -101,6 +101,6 @@ mod tests {
         let a_b = aa ^ bb;
         let b_a = bb ^ aa;
         // xor hashes are EQUAL for (a,b) and (b,a)
-        assert(a_b == b_a, 'felt_to_u128');
+        assert_eq!(a_b, b_a, "felt_to_u128");
     }
 }

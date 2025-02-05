@@ -21,3 +21,30 @@ impl RoundStateImpl of RoundStateTrait {
         }
     }
 }
+
+impl RoundStateIntoByteArray of core::traits::Into<RoundState, ByteArray> {
+    fn into(self: RoundState) -> ByteArray {
+        match self {
+            RoundState::Null =>       "Undefined",
+            RoundState::Commit =>   "Commit",
+            RoundState::Reveal =>  "Reveal",
+            RoundState::Finished => "Finished",
+        }
+    }
+}
+
+// for println! and format! 
+// pub impl RoundStateDisplay of core::fmt::Display<RoundState> {
+//     fn fmt(self: @RoundState, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+//         let result: ByteArray = (*self).into();
+//         f.buffer.append(@result);
+//         Result::Ok(())
+//     }
+// }
+pub impl RoundStateDebug of core::fmt::Debug<RoundState> {
+    fn fmt(self: @RoundState, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}

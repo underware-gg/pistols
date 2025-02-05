@@ -72,6 +72,31 @@ pub impl DeckImpl of DeckTrait {
     }
 }
 
+impl DeckTypeIntoByteArray of core::traits::Into<DeckType, ByteArray> {
+    fn into(self: DeckType) -> ByteArray {
+        match self {
+            DeckType::None =>       "Undefined",
+            DeckType::Classic =>    "Classic",
+            DeckType::PacesOnly =>  "PacesOnly",
+        }
+    }
+}
+
+// for println! and format! 
+// pub impl DeckTypeDisplay of core::fmt::Display<DeckType> {
+//     fn fmt(self: @DeckType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+//         let result: ByteArray = (*self).into();
+//         f.buffer.append(@result);
+//         Result::Ok(())
+//     }
+// }
+pub impl DeckTypeDebug of core::fmt::Debug<DeckType> {
+    fn fmt(self: @DeckType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
 
 
 //----------------------------------------
@@ -90,19 +115,19 @@ mod tests {
     #[test]
     fn test_deck_classic() {
         let deck: Deck = DeckType::Classic.build_deck();
-        assert(deck.fire_cards.len() == 10, 'deck.fire_cards.len()');
-        assert(deck.dodge_cards.len() == 10, 'deck.dodge_cards.len()');
-        assert(deck.tactics_cards.len() == 6, 'deck.tactics_cards.len()');
-        assert(deck.blades_cards.len() == 4, 'deck.blades_cards.len()');
+        assert_eq!(deck.fire_cards.len(), 10, "deck.fire_cards.len()");
+        assert_eq!(deck.dodge_cards.len(), 10, "deck.dodge_cards.len()");
+        assert_eq!(deck.tactics_cards.len(), 6, "deck.tactics_cards.len()");
+        assert_eq!(deck.blades_cards.len(), 4, "deck.blades_cards.len()");
     }
 
     #[test]
     fn test_deck_paces_only() {
         let deck: Deck = DeckType::PacesOnly.build_deck();
-        assert(deck.fire_cards.len() == 10, 'deck.fire_cards.len()');
-        assert(deck.dodge_cards.len() == 10, 'deck.dodge_cards.len()');
-        assert(deck.tactics_cards.len() == 0, 'deck.tactics_cards.len()');
-        assert(deck.blades_cards.len() == 0, 'deck.blades_cards.len()');
+        assert_eq!(deck.fire_cards.len(), 10, "deck.fire_cards.len()");
+        assert_eq!(deck.dodge_cards.len(), 10, "deck.dodge_cards.len()");
+        assert_eq!(deck.tactics_cards.len(), 0, "deck.tactics_cards.len()");
+        assert_eq!(deck.blades_cards.len(), 0, "deck.blades_cards.len()");
     }
 
     #[test]
@@ -115,10 +140,10 @@ mod tests {
         };
         let deck: Deck = DeckType::Classic.build_deck();
         deck.validate_hand(ref hand);
-        assert(hand.card_fire == PacesCard::Paces10, 'hand.card_fire');
-        assert(hand.card_dodge == PacesCard::Paces1, 'hand.card_dodge');
-        assert(hand.card_tactics == TacticsCard::Insult, 'hand.card_tactics');
-        assert(hand.card_blades == BladesCard::Seppuku, 'hand.card_blades');
+        assert_eq!(hand.card_fire, PacesCard::Paces10, "hand.card_fire");
+        assert_eq!(hand.card_dodge, PacesCard::Paces1, "hand.card_dodge");
+        assert_eq!(hand.card_tactics, TacticsCard::Insult, "hand.card_tactics");
+        assert_eq!(hand.card_blades, BladesCard::Seppuku, "hand.card_blades");
     }
 
     #[test]
@@ -131,10 +156,10 @@ mod tests {
         };
         let deck: Deck = DeckType::Classic.build_deck();
         deck.validate_hand(ref hand);
-        assert(hand.card_fire == PacesCard::Paces10, 'hand.card_fire');
-        assert(hand.card_dodge == PacesCard::None, 'hand.card_dodge');
-        assert(hand.card_tactics == TacticsCard::Insult, 'hand.card_tactics');
-        assert(hand.card_blades == BladesCard::Seppuku, 'hand.card_blades');
+        assert_eq!(hand.card_fire, PacesCard::Paces10, "hand.card_fire");
+        assert_eq!(hand.card_dodge, PacesCard::None, "hand.card_dodge");
+        assert_eq!(hand.card_tactics, TacticsCard::Insult, "hand.card_tactics");
+        assert_eq!(hand.card_blades, BladesCard::Seppuku, "hand.card_blades");
     }
 
     #[test]
@@ -147,10 +172,10 @@ mod tests {
         };
         let deck: Deck = DeckType::PacesOnly.build_deck();
         deck.validate_hand(ref hand);
-        assert(hand.card_fire == PacesCard::Paces1, 'hand.card_fire');
-        assert(hand.card_dodge == PacesCard::Paces2, 'hand.card_dodge');
-        assert(hand.card_tactics == TacticsCard::None, 'hand.card_tactics');
-        assert(hand.card_blades == BladesCard::None, 'hand.card_blades');
+        assert_eq!(hand.card_fire, PacesCard::Paces1, "hand.card_fire");
+        assert_eq!(hand.card_dodge, PacesCard::Paces2, "hand.card_dodge");
+        assert_eq!(hand.card_tactics, TacticsCard::None, "hand.card_tactics");
+        assert_eq!(hand.card_blades, BladesCard::None, "hand.card_blades");
     }
 }
 

@@ -89,10 +89,10 @@ mod tests {
             [ENV_DAMAGE_UP].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE + 1 + 1, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE + 1, 'state_b.damage');
-        assert(round.state_a.chances == CONST::INITIAL_CHANCE, 'state_a.chances');
-        assert(round.state_b.chances == CONST::INITIAL_CHANCE, 'state_b.chances');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE + 1 + 1, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE + 1, "state_b.damage");
+        assert_eq!(round.state_a.chances, CONST::INITIAL_CHANCE, "state_a.chances");
+        assert_eq!(round.state_b.chances, CONST::INITIAL_CHANCE, "state_b.chances");
     }
     #[test]
     fn test_env_damage_up_b() {
@@ -103,10 +103,10 @@ mod tests {
             [ENV_DAMAGE_UP].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE + 1, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE + 1 + 1, 'state_b.damage');
-        assert(round.state_a.chances == CONST::INITIAL_CHANCE, 'state_a.chances');
-        assert(round.state_b.chances == CONST::INITIAL_CHANCE, 'state_b.chances');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE + 1, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE + 1 + 1, "state_b.damage");
+        assert_eq!(round.state_a.chances, CONST::INITIAL_CHANCE, "state_a.chances");
+        assert_eq!(round.state_b.chances, CONST::INITIAL_CHANCE, "state_b.chances");
     }
     #[test]
     fn test_env_double_damage_up_a() {
@@ -117,10 +117,10 @@ mod tests {
             [ENV_DOUBLE_DAMAGE_UP].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE + 2, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE + 2, 'state_b.damage');
-        assert(round.state_a.chances == CONST::INITIAL_CHANCE, 'state_a.chances');
-        assert(round.state_b.chances == CONST::INITIAL_CHANCE, 'state_b.chances');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE + 2, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE + 2, "state_b.damage");
+        assert_eq!(round.state_a.chances, CONST::INITIAL_CHANCE, "state_a.chances");
+        assert_eq!(round.state_b.chances, CONST::INITIAL_CHANCE, "state_b.chances");
     }
     #[test]
     fn test_env_double_damage_up_b() {
@@ -131,10 +131,10 @@ mod tests {
             [ENV_DOUBLE_DAMAGE_UP].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE + 2, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE + 2, 'state_b.damage');
-        assert(round.state_a.chances == CONST::INITIAL_CHANCE, 'state_a.chances');
-        assert(round.state_b.chances == CONST::INITIAL_CHANCE, 'state_b.chances');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE + 2, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE + 2, "state_b.damage");
+        assert_eq!(round.state_a.chances, CONST::INITIAL_CHANCE, "state_a.chances");
+        assert_eq!(round.state_b.chances, CONST::INITIAL_CHANCE, "state_b.chances");
     }
     
     #[test]
@@ -146,10 +146,10 @@ mod tests {
             [ENV_DAMAGE_DOWN].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE - 1, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE - 1, 'state_b.damage');
-        assert(round.state_a.chances == CONST::INITIAL_CHANCE, 'state_a.chances');
-        assert(round.state_b.chances == CONST::INITIAL_CHANCE, 'state_b.chances');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE - 1, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE - 1, "state_b.damage");
+        assert_eq!(round.state_a.chances, CONST::INITIAL_CHANCE, "state_a.chances");
+        assert_eq!(round.state_b.chances, CONST::INITIAL_CHANCE, "state_b.chances");
     }
     #[test]
     fn test_env_damage_down_no_overflow() {
@@ -160,8 +160,8 @@ mod tests {
             [ENV_DAMAGE_DOWN, ENV_DAMAGE_DOWN, ENV_DAMAGE_DOWN, ENV_DAMAGE_DOWN].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == 0, 'state_a.damage');
-        assert(round.state_b.damage == 0, 'state_b.damage');
+        assert_eq!(round.state_a.damage, 0, "state_a.damage");
+        assert_eq!(round.state_b.damage, 0, "state_b.damage");
     }
 
     #[test]
@@ -173,8 +173,8 @@ mod tests {
             [ENV_DAMAGE_UP, ENV_DAMAGE_DOWN].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE, 'state_b.damage');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE, "state_b.damage");
     }
     #[test]
     fn test_env_damage_cancels_2() {
@@ -185,8 +185,8 @@ mod tests {
             [ENV_DAMAGE_DOWN, ENV_DAMAGE_UP].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE, 'state_b.damage');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE, "state_b.damage");
     }
 
 
@@ -202,10 +202,10 @@ mod tests {
             [ENV_CHANCES_UP].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE, 'state_b.damage');
-        assert(round.state_a.chances > CONST::INITIAL_CHANCE, 'state_a.chances');
-        assert(round.state_b.chances > CONST::INITIAL_CHANCE, 'state_b.chances');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE, "state_b.damage");
+        assert_gt!(round.state_a.chances, CONST::INITIAL_CHANCE, "state_a.chances");
+        assert_gt!(round.state_b.chances, CONST::INITIAL_CHANCE, "state_b.chances");
         // double chances
         let (round_double, _progress) = execute_game_loop(sys,
             [1, 10, 0].span(),
@@ -213,12 +213,12 @@ mod tests {
             [ENV_DOUBLE_CHANCES_UP].span(),
             [60, 60].span(),
         );
-        assert(round_double.state_a.damage == CONST::INITIAL_DAMAGE, 'state_a.damage_double');
-        assert(round_double.state_b.damage == CONST::INITIAL_DAMAGE, 'state_b.damage_double');
-        assert(round_double.state_a.chances > CONST::INITIAL_CHANCE, 'state_a.chances_double');
-        assert(round_double.state_b.chances > CONST::INITIAL_CHANCE, 'state_b.chances_double');
-        assert(round_double.state_a.chances > round.state_a.chances, 'state_a.greater');
-        assert(round_double.state_b.chances > round.state_b.chances, 'state_b.greater');
+        assert_eq!(round_double.state_a.damage, CONST::INITIAL_DAMAGE, "state_a.damage_double");
+        assert_eq!(round_double.state_b.damage, CONST::INITIAL_DAMAGE, "state_b.damage_double");
+        assert_gt!(round_double.state_a.chances, CONST::INITIAL_CHANCE, "state_a.chances_double");
+        assert_gt!(round_double.state_b.chances, CONST::INITIAL_CHANCE, "state_b.chances_double");
+        assert_gt!(round_double.state_a.chances, round.state_a.chances, "state_a.greater");
+        assert_gt!(round_double.state_b.chances, round.state_b.chances, "state_b.greater");
     }
     #[test]
     fn test_env_chances_down() {
@@ -229,10 +229,10 @@ mod tests {
             [ENV_CHANCES_DOWN].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE, 'state_b.damage');
-        assert(round.state_a.chances < CONST::INITIAL_CHANCE, 'state_a.chances');
-        assert(round.state_b.chances < CONST::INITIAL_CHANCE, 'state_b.chances');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE, "state_b.damage");
+        assert_lt!(round.state_a.chances, CONST::INITIAL_CHANCE, "state_a.chances");
+        assert_lt!(round.state_b.chances, CONST::INITIAL_CHANCE, "state_b.chances");
     }
     #[test]
     fn test_env_chances_down_no_overflow() {
@@ -244,8 +244,8 @@ mod tests {
             ENV_CHANCES_DOWN, ENV_CHANCES_DOWN, ENV_CHANCES_DOWN, ENV_CHANCES_DOWN].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.chances == 0, 'state_a.chances');
-        assert(round.state_b.chances == 0, 'state_b.chances');
+        assert_eq!(round.state_a.chances, 0, "state_a.chances");
+        assert_eq!(round.state_b.chances, 0, "state_b.chances");
     }
     #[test]
     fn test_env_chances_cancels_1() {
@@ -256,8 +256,8 @@ mod tests {
             [ENV_CHANCES_UP, ENV_CHANCES_DOWN].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.chances == CONST::INITIAL_CHANCE, 'state_a.chances');
-        assert(round.state_b.chances == CONST::INITIAL_CHANCE, 'state_b.chances');
+        assert_eq!(round.state_a.chances, CONST::INITIAL_CHANCE, "state_a.chances");
+        assert_eq!(round.state_b.chances, CONST::INITIAL_CHANCE, "state_b.chances");
     }
     #[test]
     fn test_env_chances_cancels_2() {
@@ -268,8 +268,8 @@ mod tests {
             [ENV_CHANCES_DOWN, ENV_CHANCES_UP].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.chances == CONST::INITIAL_CHANCE, 'state_a.chances');
-        assert(round.state_b.chances == CONST::INITIAL_CHANCE, 'state_b.chances');
+        assert_eq!(round.state_a.chances, CONST::INITIAL_CHANCE, "state_a.chances");
+        assert_eq!(round.state_b.chances, CONST::INITIAL_CHANCE, "state_b.chances");
     }
 
     //
@@ -285,10 +285,10 @@ mod tests {
             [ENV_SPECIAL_ALL_SHOTS_HIT].span(),
             [99, 99].span(), // miss
         );
-        assert(round.state_a.health < CONST::FULL_HEALTH, 'state_a.health');
-        assert(round.state_b.health < CONST::FULL_HEALTH, 'state_b.health');
-        assert(round.state_a.chances == 100, 'state_a.chances');
-        assert(round.state_b.chances == 100, 'state_b.chances');
+        assert_lt!(round.state_a.health, CONST::FULL_HEALTH, "state_a.health");
+        assert_lt!(round.state_b.health, CONST::FULL_HEALTH, "state_b.health");
+        assert_eq!(round.state_a.chances, 100, "state_a.chances");
+        assert_eq!(round.state_b.chances, 100, "state_b.chances");
     }
     #[test]
     fn test_special_all_shots_hit_chances_down() {
@@ -299,15 +299,15 @@ mod tests {
             [ENV_SPECIAL_ALL_SHOTS_HIT, ENV_CHANCES_DOWN].span(),
             [99, 99].span(), // miss
         );
-        assert(round.state_a.health < CONST::FULL_HEALTH, 'state_a.health');
-        assert(round.state_b.health < CONST::FULL_HEALTH, 'state_b.health');
-        assert(round.state_a.chances == 100, 'state_a.chances');
-        assert(round.state_b.chances == 100, 'state_b.chances');
+        assert_lt!(round.state_a.health, CONST::FULL_HEALTH, "state_a.health");
+        assert_lt!(round.state_b.health, CONST::FULL_HEALTH, "state_b.health");
+        assert_eq!(round.state_a.chances, 100, "state_a.chances");
+        assert_eq!(round.state_b.chances, 100, "state_b.chances");
         // not affected by chances card
-        assert(progress.steps.len() == 3, 'progress.steps.len');
+        assert_eq!(progress.steps.len(), 3, "progress.steps.len");
         let final_step: DuelStep = *progress.steps[progress.steps.len() - 1];
-        assert(final_step.state_a.chances == 100, 'state_final_a.chances');
-        assert(final_step.state_b.chances == 100, 'state_final_b.chances');
+        assert_eq!(final_step.state_a.chances, 100, "state_final_a.chances");
+        assert_eq!(final_step.state_b.chances, 100, "state_final_b.chances");
     }
     #[test]
     fn test_special_all_shots_hit_no_tactics() {
@@ -318,15 +318,15 @@ mod tests {
             [ENV_SPECIAL_ALL_SHOTS_HIT, ENV_SPECIAL_NO_TACTICS].span(),
             [1, 1].span(), // hit
         );
-        assert(round.state_a.health < CONST::FULL_HEALTH, 'state_a.health');
-        assert(round.state_b.health < CONST::FULL_HEALTH, 'state_b.health');
-        assert(round.state_a.chances == 100, 'state_a.chances');
-        assert(round.state_b.chances == 100, 'state_b.chances');
+        assert_lt!(round.state_a.health, CONST::FULL_HEALTH, "state_a.health");
+        assert_lt!(round.state_b.health, CONST::FULL_HEALTH, "state_b.health");
+        assert_eq!(round.state_a.chances, 100, "state_a.chances");
+        assert_eq!(round.state_b.chances, 100, "state_b.chances");
         // not affected by chances card
-        assert(progress.steps.len() == 3, 'progress.steps.len');
+        assert_eq!(progress.steps.len(), 3, "progress.steps.len");
         let final_step: DuelStep = *progress.steps[progress.steps.len() - 1];
-        assert(final_step.state_a.chances == 100, 'state_final_a.chances');
-        assert(final_step.state_b.chances == 100, 'state_final_b.chances');
+        assert_eq!(final_step.state_a.chances, 100, "state_final_a.chances");
+        assert_eq!(final_step.state_b.chances, 100, "state_final_b.chances");
     }
 
     #[test]
@@ -338,10 +338,10 @@ mod tests {
             [ENV_SPECIAL_ALL_SHOTS_MISS].span(),
             [1, 1].span(), // hit
         );
-        assert(round.state_a.health == CONST::FULL_HEALTH, 'state_a.health');
-        assert(round.state_b.health == CONST::FULL_HEALTH, 'state_b.health');
-        assert(round.state_a.chances == 0, 'state_a.chances');
-        assert(round.state_b.chances == 0, 'state_b.chances');
+        assert_eq!(round.state_a.health, CONST::FULL_HEALTH, "state_a.health");
+        assert_eq!(round.state_b.health, CONST::FULL_HEALTH, "state_b.health");
+        assert_eq!(round.state_a.chances, 0, "state_a.chances");
+        assert_eq!(round.state_b.chances, 0, "state_b.chances");
     }
     #[test]
     fn test_special_all_shots_miss_chances_up() {
@@ -352,15 +352,15 @@ mod tests {
             [ENV_SPECIAL_ALL_SHOTS_MISS, ENV_CHANCES_UP].span(),
             [1, 1].span(), // hit
         );
-        assert(round.state_a.health == CONST::FULL_HEALTH, 'state_a.health');
-        assert(round.state_b.health == CONST::FULL_HEALTH, 'state_b.health');
-        assert(round.state_a.chances == 0, 'state_a.chances');
-        assert(round.state_b.chances == 0, 'state_b.chances');
+        assert_eq!(round.state_a.health, CONST::FULL_HEALTH, "state_a.health");
+        assert_eq!(round.state_b.health, CONST::FULL_HEALTH, "state_b.health");
+        assert_eq!(round.state_a.chances, 0, "state_a.chances");
+        assert_eq!(round.state_b.chances, 0, "state_b.chances");
         // not affected by chances card
-        assert(progress.steps.len() == 3, 'progress.steps.len');
+        assert_eq!(progress.steps.len(), 3, "progress.steps.len");
         let final_step: DuelStep = *progress.steps[progress.steps.len() - 1];
-        assert(final_step.state_a.chances == 0, 'state_final_a.chances');
-        assert(final_step.state_b.chances == 0, 'state_final_b.chances');
+        assert_eq!(final_step.state_a.chances, 0, "state_final_a.chances");
+        assert_eq!(final_step.state_b.chances, 0, "state_final_b.chances");
     }
 
 
@@ -377,8 +377,8 @@ mod tests {
             [ENV_SPECIAL_DOUBLE_TACTICS].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE + 2, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE + 2, 'state_b.damage');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE + 2, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE + 2, "state_b.damage");
     }
     #[test]
     fn test_special_no_double_tactics() {
@@ -389,8 +389,8 @@ mod tests {
             [ENV_SPECIAL_NO_TACTICS, ENV_SPECIAL_DOUBLE_TACTICS].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE + 2, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE + 2, 'state_b.damage');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE + 2, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE + 2, "state_b.damage");
     }
 
     #[test]
@@ -402,8 +402,8 @@ mod tests {
             [ENV_SPECIAL_NO_TACTICS].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE, 'state_b.damage');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE, "state_b.damage");
     }
     #[test]
     fn test_special_double_no_tactics() {
@@ -414,8 +414,8 @@ mod tests {
             [ENV_SPECIAL_DOUBLE_TACTICS, ENV_SPECIAL_NO_TACTICS].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE, 'state_b.damage');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE, "state_b.damage");
     }
 
 
@@ -438,8 +438,8 @@ mod tests {
             [ENV_SPECIAL_ALL_SHOTS_MISS].span(),
             [1, 1].span(),
         );
-        assert(round.state_a.health == CONST::FULL_HEALTH, 'state_a.health');
-        assert(round.state_b.health < CONST::FULL_HEALTH, 'state_b.health');
+        assert_eq!(round.state_a.health, CONST::FULL_HEALTH, "state_a.health");
+        assert_lt!(round.state_b.health, CONST::FULL_HEALTH, "state_b.health");
     }
     #[test]
     fn test_coin_toss_a_once() {
@@ -450,8 +450,8 @@ mod tests {
             [ENV_SPECIAL_ALL_SHOTS_HIT, ENV_SPECIAL_ALL_SHOTS_MISS].span(),
             [1, 1].span(),
         );
-        assert(round.state_a.health == CONST::FULL_HEALTH, 'state_a.health');
-        assert(round.state_b.health == CONST::FULL_HEALTH, 'state_b.health');
+        assert_eq!(round.state_a.health, CONST::FULL_HEALTH, "state_a.health");
+        assert_eq!(round.state_b.health, CONST::FULL_HEALTH, "state_b.health");
     }
     #[test]
     fn test_coin_toss_b() {
@@ -462,8 +462,8 @@ mod tests {
             [ENV_SPECIAL_ALL_SHOTS_MISS].span(),
             [1, 1].span(),
         );
-        assert(round.state_a.health < CONST::FULL_HEALTH, 'state_a.health');
-        assert(round.state_b.health == CONST::FULL_HEALTH, 'state_b.health');
+        assert_lt!(round.state_a.health, CONST::FULL_HEALTH, "state_a.health");
+        assert_eq!(round.state_b.health, CONST::FULL_HEALTH, "state_b.health");
     }
     #[test]
     fn test_coin_toss_b_once() {
@@ -474,8 +474,8 @@ mod tests {
             [ENV_SPECIAL_ALL_SHOTS_HIT, ENV_SPECIAL_ALL_SHOTS_MISS].span(),
             [1, 1].span(),
         );
-        assert(round.state_a.health == CONST::FULL_HEALTH, 'state_a.health');
-        assert(round.state_b.health == CONST::FULL_HEALTH, 'state_b.health');
+        assert_eq!(round.state_a.health, CONST::FULL_HEALTH, "state_a.health");
+        assert_eq!(round.state_b.health, CONST::FULL_HEALTH, "state_b.health");
     }
 
     #[test]
@@ -487,8 +487,8 @@ mod tests {
             [ENV_DAMAGE_UP].span(),
             [60, 60].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE + 1, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE + 1, 'state_b.damage');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE + 1, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE + 1, "state_b.damage");
     }
 
     //
@@ -504,8 +504,8 @@ mod tests {
             [ENV_DAMAGE_DOWN].span(),
             [1, 1].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE + 1, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE + 1, 'state_b.damage');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE + 1, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE + 1, "state_b.damage");
     }
     #[test]
     fn test_reversal_b() {
@@ -516,8 +516,8 @@ mod tests {
             [ENV_DAMAGE_DOWN].span(),
             [1, 1].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE + 1, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE + 1, 'state_b.damage');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE + 1, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE + 1, "state_b.damage");
     }
     #[test]
     fn test_reversal_a_b() {
@@ -528,8 +528,8 @@ mod tests {
             [ENV_DAMAGE_DOWN].span(),
             [1, 1].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE + 1, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE + 1, 'state_b.damage');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE + 1, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE + 1, "state_b.damage");
     }
     #[test]
     fn test_reversal_once() {
@@ -540,8 +540,8 @@ mod tests {
             [ENV_DAMAGE_DOWN, ENV_DAMAGE_DOWN].span(),
             [1, 1].span(),
         );
-        assert(round.state_a.damage == CONST::INITIAL_DAMAGE, 'state_a.damage');
-        assert(round.state_b.damage == CONST::INITIAL_DAMAGE, 'state_b.damage');
+        assert_eq!(round.state_a.damage, CONST::INITIAL_DAMAGE, "state_a.damage");
+        assert_eq!(round.state_b.damage, CONST::INITIAL_DAMAGE, "state_b.damage");
     }
 
 

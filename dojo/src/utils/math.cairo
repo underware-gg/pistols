@@ -553,219 +553,219 @@ mod tests {
 
     #[test]
     fn test_abs() {
-        assert(MathU128::abs(0) == 0, 'abs_0');
-        assert(MathU128::abs(1) == 1, 'abs_1');
-        assert(MathU128::abs(-1) == 1, 'abs_-_1');
-        assert(MathU128::abs(111) == 111, 'abs_111');
-        assert(MathU128::abs(-111) == 111, 'abs_-_111');
-        assert(MathU128::abs(0x8756876876f57f6576f) == 0x8756876876f57f6576f, 'abs_0x');
-        assert(MathU128::abs(-0x8756876876f57f6576f) == 0x8756876876f57f6576f, 'abs_-_0x');
+        assert_eq!(MathU128::abs(0), 0, "abs_0");
+        assert_eq!(MathU128::abs(1), 1, "abs_1");
+        assert_eq!(MathU128::abs(-1), 1, "abs_-_1");
+        assert_eq!(MathU128::abs(111), 111, "abs_111");
+        assert_eq!(MathU128::abs(-111), 111, "abs_-_111");
+        assert_eq!(MathU128::abs(0x8756876876f57f6576f), 0x8756876876f57f6576f, "abs_0x");
+        assert_eq!(MathU128::abs(-0x8756876876f57f6576f), 0x8756876876f57f6576f, "abs_-_0x");
     }
 
     #[test]
     fn test_min_max() {
-        assert(MathU128::min(0,0) == 0, 'min_0,0');
-        assert(MathU128::min(0,1) == 0, 'min_0,1');
-        assert(MathU128::min(1,0) == 0, 'min_1,0');
-        assert(MathU128::min(1,2) == 1, 'min_1,2');
-        assert(MathU128::min(2,1) == 1, 'min_2,1');
+        assert_eq!(MathU128::min(0,0), 0, "min_0,0");
+        assert_eq!(MathU128::min(0,1), 0, "min_0,1");
+        assert_eq!(MathU128::min(1,0), 0, "min_1,0");
+        assert_eq!(MathU128::min(1,2), 1, "min_1,2");
+        assert_eq!(MathU128::min(2,1), 1, "min_2,1");
 
-        assert(MathU128::max(0,0) == 0, 'max_0,0');
-        assert(MathU128::max(0,1) == 1, 'max_0,1');
-        assert(MathU128::max(1,0) == 1, 'max_1,0');
-        assert(MathU128::max(1,2) == 2, 'max_1,2');
-        assert(MathU128::max(2,1) == 2, 'max_2,1');
+        assert_eq!(MathU128::max(0,0), 0, "max_0,0");
+        assert_eq!(MathU128::max(0,1), 1, "max_0,1");
+        assert_eq!(MathU128::max(1,0), 1, "max_1,0");
+        assert_eq!(MathU128::max(1,2), 2, "max_1,2");
+        assert_eq!(MathU128::max(2,1), 2, "max_2,1");
     }
 
     #[test]
     fn test_clamp() {
-        assert(MathU128::clamp(0, 10, 100) == 10, 'clamp_0');
-        assert(MathU128::clamp(10, 10, 100) == 10, 'clamp_10');
-        assert(MathU128::clamp(50, 10, 100) == 50, 'clamp_50');
-        assert(MathU128::clamp(100, 10, 100) == 100, 'clamp_100');
-        assert(MathU128::clamp(101, 10, 100) == 100, 'clamp_101');
+        assert_eq!(MathU128::clamp(0, 10, 100), 10, "clamp_0");
+        assert_eq!(MathU128::clamp(10, 10, 100), 10, "clamp_10");
+        assert_eq!(MathU128::clamp(50, 10, 100), 50, "clamp_50");
+        assert_eq!(MathU128::clamp(100, 10, 100), 100, "clamp_100");
+        assert_eq!(MathU128::clamp(101, 10, 100), 100, "clamp_101");
     }
 
     #[test]
     fn test_sub() {
-        assert(MathU8::sub(10, 0) == 10, 'sub_10_0');
-        assert(MathU8::sub(10, 2) == 8, 'sub_10_2');
-        assert(MathU8::sub(10, 9) == 1, 'sub_10_9');
-        assert(MathU8::sub(10, 10) == 0, 'sub_10_10');
-        assert(MathU8::sub(10, 11) == 0, 'sub_10_11');
-        assert(MathU8::sub(10, 255) == 0, 'sub_10_155');
+        assert_eq!(MathU8::sub(10, 0), 10, "sub_10_0");
+        assert_eq!(MathU8::sub(10, 2), 8, "sub_10_2");
+        assert_eq!(MathU8::sub(10, 9), 1, "sub_10_9");
+        assert_eq!(MathU8::sub(10, 10), 0, "sub_10_10");
+        assert_eq!(MathU8::sub(10, 11), 0, "sub_10_11");
+        assert_eq!(MathU8::sub(10, 255), 0, "sub_10_155");
         let mut v: u8 = 10; v.subi(0);
-        assert(v == 10, 'subi_10_0');
+        assert_eq!(v, 10, "subi_10_0");
         let mut v: u8 = 10; v.subi(2);
-        assert(v == 8, 'subi_10_2');
+        assert_eq!(v, 8, "subi_10_2");
         let mut v: u8 = 10; v.subi(9);
-        assert(v == 1, 'subi_10_9');
+        assert_eq!(v, 1, "subi_10_9");
         let mut v: u8 = 10; v.subi(10);
-        assert(v == 0, 'subi_10_10');
+        assert_eq!(v, 0, "subi_10_10");
         let mut v: u8 = 10; v.subi(11);
-        assert(v == 0, 'subi_10_11');
+        assert_eq!(v, 0, "subi_10_11");
         let mut v: u8 = 10; v.subi(255);
-        assert(v == 0, 'subi_10_155');
+        assert_eq!(v, 0, "subi_10_155");
     }
 
     #[test]
     fn test_add() {
-        assert(MathU8::add(10, 0) == 10, 'add_10_0');
-        assert(MathU8::add(10, 2) == 12, 'add_10_2');
-        assert(MathU8::add(10, -2) == 8, 'add_10_-2');
-        assert(MathU8::add(10, -10) == 0, 'add_10_-10');
-        assert(MathU8::add(10, 15) == 25, 'add_10_15');
-        assert(MathU8::add(10, -15) == 0, 'add_10_-15');
+        assert_eq!(MathU8::add(10, 0), 10, "add_10_0");
+        assert_eq!(MathU8::add(10, 2), 12, "add_10_2");
+        assert_eq!(MathU8::add(10, -2), 8, "add_10_-2");
+        assert_eq!(MathU8::add(10, -10), 0, "add_10_-10");
+        assert_eq!(MathU8::add(10, 15), 25, "add_10_15");
+        assert_eq!(MathU8::add(10, -15), 0, "add_10_-15");
         let mut v: u8 = 10; v.addi(0);
-        assert(v == 10, 'addi_10_0');
+        assert_eq!(v, 10, "addi_10_0");
         let mut v: u8 = 10; v.addi(2);
-        assert(v == 12, 'addi_10_2');
+        assert_eq!(v, 12, "addi_10_2");
         let mut v: u8 = 10; v.addi(-2);
-        assert(v == 8, 'addi_10_-2');
+        assert_eq!(v, 8, "addi_10_-2");
         let mut v: u8 = 10; v.addi(-10);
-        assert(v == 0, 'addi_10_-10');
+        assert_eq!(v, 0, "addi_10_-10");
         let mut v: u8 = 10; v.addi(15);
-        assert(v == 25, 'addi_10_15');
+        assert_eq!(v, 25, "addi_10_15");
         let mut v: u8 = 10; v.addi(-15);
-        assert(v == 0, 'addi_10_-15');
+        assert_eq!(v, 0, "addi_10_-15");
     }
 
     #[test]
     fn test_gdc() {
-        assert(MathU8::gdc(4, 4) == 4, 'gdc_4_4');
-        assert(MathU8::gdc(4, 2) == 2, 'gdc_4_2');
-        assert(MathU8::gdc(2, 4) == 2, 'gdc_2_4');
-        assert(MathU8::gdc(4, 1) == 1, 'gdc_4_1');
-        assert(MathU8::gdc(1, 4) == 1, 'gdc_1_4');
-        assert(MathU8::gdc(6, 3) == 3, 'gdc_6_3');
-        assert(MathU8::gdc(40, 2) == 2, 'gdc_40_2');
-        assert(MathU8::gdc(40, 16) == 8, 'gdc_40_16');
-        assert(MathU8::gdc(24, 36) == 12, 'gdc_24_36');
+        assert_eq!(MathU8::gdc(4, 4), 4, "gdc_4_4");
+        assert_eq!(MathU8::gdc(4, 2), 2, "gdc_4_2");
+        assert_eq!(MathU8::gdc(2, 4), 2, "gdc_2_4");
+        assert_eq!(MathU8::gdc(4, 1), 1, "gdc_4_1");
+        assert_eq!(MathU8::gdc(1, 4), 1, "gdc_1_4");
+        assert_eq!(MathU8::gdc(6, 3), 3, "gdc_6_3");
+        assert_eq!(MathU8::gdc(40, 2), 2, "gdc_40_2");
+        assert_eq!(MathU8::gdc(40, 16), 8, "gdc_40_16");
+        assert_eq!(MathU8::gdc(24, 36), 12, "gdc_24_36");
     }
 
     #[test]
     fn test_pow() {
-        assert(MathU128::pow(0,0) == 1, 'test_math_pow_0,0');
-        assert(MathU128::pow(0,1) == 0, 'test_math_pow_0,1');
-        assert(MathU128::pow(0,2) == 0, 'test_math_pow_0,2');
-        assert(MathU128::pow(0,8) == 0, 'test_math_pow_0,8');
-        assert(MathU128::pow(1,0) == 1, 'test_math_pow_1,0');
-        assert(MathU128::pow(1,1) == 1, 'test_math_pow_1,1');
-        assert(MathU128::pow(1,2) == 1, 'test_math_pow_1,2');
-        assert(MathU128::pow(1,8) == 1, 'test_math_pow_1,8');
-        assert(MathU128::pow(2,0) == 1, 'test_math_pow_2,0');
-        assert(MathU128::pow(2,1) == 2, 'test_math_pow_2,1`');
-        assert(MathU128::pow(2,2) == 4, 'test_math_pow_2,2');
-        assert(MathU128::pow(2,8) == 256, 'test_math_pow_2,8');
-        assert(MathU128::pow(10,0) == 1, 'test_math_pow_10,0');
-        assert(MathU128::pow(10,1) == 10, 'test_math_pow_10,1`');
-        assert(MathU128::pow(10,2) == 100, 'test_math_pow_10,2');
-        assert(MathU128::pow(10,8) == 100_000_000, 'test_math_pow_10,8');
+        assert_eq!(MathU128::pow(0,0), 1, "test_math_pow_0,0");
+        assert_eq!(MathU128::pow(0,1), 0, "test_math_pow_0,1");
+        assert_eq!(MathU128::pow(0,2), 0, "test_math_pow_0,2");
+        assert_eq!(MathU128::pow(0,8), 0, "test_math_pow_0,8");
+        assert_eq!(MathU128::pow(1,0), 1, "test_math_pow_1,0");
+        assert_eq!(MathU128::pow(1,1), 1, "test_math_pow_1,1");
+        assert_eq!(MathU128::pow(1,2), 1, "test_math_pow_1,2");
+        assert_eq!(MathU128::pow(1,8), 1, "test_math_pow_1,8");
+        assert_eq!(MathU128::pow(2,0), 1, "test_math_pow_2,0");
+        assert_eq!(MathU128::pow(2,1), 2, "test_math_pow_2,1");
+        assert_eq!(MathU128::pow(2,2), 4, "test_math_pow_2,2");
+        assert_eq!(MathU128::pow(2,8), 256, "test_math_pow_2,8");
+        assert_eq!(MathU128::pow(10,0), 1, "test_math_pow_10,0");
+        assert_eq!(MathU128::pow(10,1), 10, "test_math_pow_10,1");
+        assert_eq!(MathU128::pow(10,2), 100, "test_math_pow_10,2");
+        assert_eq!(MathU128::pow(10,8), 100_000_000, "test_math_pow_10,8");
     }
 
     #[test]
     fn test_map() {
-        assert(MathU8::map(0, 1, 5, 20, 40) == 20, 'map_0_clamped');
-        assert(MathU8::map(1, 1, 5, 20, 40) == 20, 'map_1');
-        assert(MathU8::map(2, 1, 5, 20, 40) == 25, 'map_2');
-        assert(MathU8::map(3, 1, 5, 20, 40) == 30, 'map_3');
-        assert(MathU8::map(4, 1, 5, 20, 40) == 35, 'map_4');
-        assert(MathU8::map(5, 1, 5, 20, 40) == 40, 'map_5');
-        assert(MathU8::map(6, 1, 5, 20, 40) == 40, 'map_6_clamped');
+        assert_eq!(MathU8::map(0, 1, 5, 20, 40), 20, "map_0_clamped");
+        assert_eq!(MathU8::map(1, 1, 5, 20, 40), 20, "map_1");
+        assert_eq!(MathU8::map(2, 1, 5, 20, 40), 25, "map_2");
+        assert_eq!(MathU8::map(3, 1, 5, 20, 40), 30, "map_3");
+        assert_eq!(MathU8::map(4, 1, 5, 20, 40), 35, "map_4");
+        assert_eq!(MathU8::map(5, 1, 5, 20, 40), 40, "map_5");
+        assert_eq!(MathU8::map(6, 1, 5, 20, 40), 40, "map_6_clamped");
         // output values can be inverted
-        assert(MathU8::map(1, 1, 5, 40, 20) == 40, 'map_i_1');
-        assert(MathU8::map(2, 1, 5, 40, 20) == 35, 'map_i_2');
-        assert(MathU8::map(3, 1, 5, 40, 20) == 30, 'map_i_3');
-        assert(MathU8::map(4, 1, 5, 40, 20) == 25, 'map_i_4');
-        assert(MathU8::map(5, 1, 5, 40, 20) == 20, 'map_i_5');
+        assert_eq!(MathU8::map(1, 1, 5, 40, 20), 40, "map_i_1");
+        assert_eq!(MathU8::map(2, 1, 5, 40, 20), 35, "map_i_2");
+        assert_eq!(MathU8::map(3, 1, 5, 40, 20), 30, "map_i_3");
+        assert_eq!(MathU8::map(4, 1, 5, 40, 20), 25, "map_i_4");
+        assert_eq!(MathU8::map(5, 1, 5, 40, 20), 20, "map_i_5");
         // compressed output
-        assert(MathU8::map(10, 10, 50, 1, 5) == 1, 'map___1');
-        assert(MathU8::map(20, 10, 50, 1, 5) == 2, 'map___2');
-        assert(MathU8::map(30, 10, 50, 1, 5) == 3, 'map___3');
-        assert(MathU8::map(40, 10, 50, 1, 5) == 4, 'map___4');
-        assert(MathU8::map(50, 10, 50, 1, 5) == 5, 'map___5');
+        assert_eq!(MathU8::map(10, 10, 50, 1, 5), 1, "map___1");
+        assert_eq!(MathU8::map(20, 10, 50, 1, 5), 2, "map___2");
+        assert_eq!(MathU8::map(30, 10, 50, 1, 5), 3, "map___3");
+        assert_eq!(MathU8::map(40, 10, 50, 1, 5), 4, "map___4");
+        assert_eq!(MathU8::map(50, 10, 50, 1, 5), 5, "map___5");
         // bad cases
-        assert(MathU8::map(1, 1, 100, 1, 50) == 1, 'map_bad_1');
-        assert(MathU8::map(20, 1, 100, 1, 50) == 10, 'map_bad_20');
-        assert(MathU8::map(40, 1, 100, 1, 50) == 20, 'map_bad_40');
-        assert(MathU8::map(60, 1, 100, 1, 50) == 30, 'map_bad_60');
-        assert(MathU8::map(80, 1, 100, 1, 50) == 40, 'map_bad_80');
-        assert(MathU8::map(100, 1, 100, 1, 50) == 50, 'map_bad_100');
+        assert_eq!(MathU8::map(1, 1, 100, 1, 50), 1, "map_bad_1");
+        assert_eq!(MathU8::map(20, 1, 100, 1, 50), 10, "map_bad_20");
+        assert_eq!(MathU8::map(40, 1, 100, 1, 50), 20, "map_bad_40");
+        assert_eq!(MathU8::map(60, 1, 100, 1, 50), 30, "map_bad_60");
+        assert_eq!(MathU8::map(80, 1, 100, 1, 50), 40, "map_bad_80");
+        assert_eq!(MathU8::map(100, 1, 100, 1, 50), 50, "map_bad_100");
         // precision
-        assert(MathU8::map(0, 0, 6, 10, 30) == 10, 'prec_0');
-        assert(MathU8::map(1, 0, 6, 10, 30) == 13, 'prec_1');
-        assert(MathU8::map(2, 0, 6, 10, 30) == 16, 'prec_2');
-        assert(MathU8::map(3, 0, 6, 10, 30) == 20, 'prec_3');
-        assert(MathU8::map(4, 0, 6, 10, 30) == 23, 'prec_4');
-        assert(MathU8::map(5, 0, 6, 10, 30) == 26, 'prec_5');
-        assert(MathU8::map(6, 0, 6, 10, 30) == 30, 'prec_6');
+        assert_eq!(MathU8::map(0, 0, 6, 10, 30), 10, "prec_0");
+        assert_eq!(MathU8::map(1, 0, 6, 10, 30), 13, "prec_1");
+        assert_eq!(MathU8::map(2, 0, 6, 10, 30), 16, "prec_2");
+        assert_eq!(MathU8::map(3, 0, 6, 10, 30), 20, "prec_3");
+        assert_eq!(MathU8::map(4, 0, 6, 10, 30), 23, "prec_4");
+        assert_eq!(MathU8::map(5, 0, 6, 10, 30), 26, "prec_5");
+        assert_eq!(MathU8::map(6, 0, 6, 10, 30), 30, "prec_6");
         // precision inv
-        assert(MathU8::map(10, 10, 30, 0, 6) == 0, 'prec_i_0');
-        assert(MathU8::map(14, 10, 30, 0, 6) == 1, 'prec_i_1');
-        assert(MathU8::map(17, 10, 30, 0, 6) == 2, 'prec_i_2');
-        assert(MathU8::map(20, 10, 30, 0, 6) == 3, 'prec_i_3');
-        assert(MathU8::map(24, 10, 30, 0, 6) == 4, 'prec_i_4');
-        assert(MathU8::map(27, 10, 30, 0, 6) == 5, 'prec_i_5');
-        assert(MathU8::map(30, 10, 30, 0, 6) == 6, 'prec_i_6');
+        assert_eq!(MathU8::map(10, 10, 30, 0, 6), 0, "prec_i_0");
+        assert_eq!(MathU8::map(14, 10, 30, 0, 6), 1, "prec_i_1");
+        assert_eq!(MathU8::map(17, 10, 30, 0, 6), 2, "prec_i_2");
+        assert_eq!(MathU8::map(20, 10, 30, 0, 6), 3, "prec_i_3");
+        assert_eq!(MathU8::map(24, 10, 30, 0, 6), 4, "prec_i_4");
+        assert_eq!(MathU8::map(27, 10, 30, 0, 6), 5, "prec_i_5");
+        assert_eq!(MathU8::map(30, 10, 30, 0, 6), 6, "prec_i_6");
         // no gaps
-        assert(MathU8::map(1, 5, 5, 1, 50) == 1, 'edge_in_1');      // under is in
-        assert(MathU8::map(5, 5, 5, 1, 50) == 1, 'edge_in_5');      // any is in
-        assert(MathU8::map(10, 5, 5, 1, 50) == 50, 'edge_in_10');   // over is max
-        assert(MathU8::map(1, 3, 8, 20, 20) == 20, 'edge_out_1');
-        assert(MathU8::map(3, 3, 8, 20, 20) == 20, 'edge_out_3');
-        assert(MathU8::map(5, 3, 8, 20, 20) == 20, 'edge_out_5');
-        assert(MathU8::map(8, 3, 8, 20, 20) == 20, 'edge_out_8');
-        assert(MathU8::map(10, 3, 8, 20, 20) == 20, 'edge_out_10');
+        assert_eq!(MathU8::map(1, 5, 5, 1, 50), 1, "edge_in_1");      // under is in
+        assert_eq!(MathU8::map(5, 5, 5, 1, 50), 1, "edge_in_5");      // any is in
+        assert_eq!(MathU8::map(10, 5, 5, 1, 50), 50, "edge_in_10");   // over is max
+        assert_eq!(MathU8::map(1, 3, 8, 20, 20), 20, "edge_out_1");
+        assert_eq!(MathU8::map(3, 3, 8, 20, 20), 20, "edge_out_3");
+        assert_eq!(MathU8::map(5, 3, 8, 20, 20), 20, "edge_out_5");
+        assert_eq!(MathU8::map(8, 3, 8, 20, 20), 20, "edge_out_8");
+        assert_eq!(MathU8::map(10, 3, 8, 20, 20), 20, "edge_out_10");
     }
 
     #[test]
     fn test_to_short_string_u32() {
-        assert(0_u32.to_short_string() == '0', 'not 0');
-        assert(1_u32.to_short_string() == '1', 'not 1');
-        assert(01_u32.to_short_string() == '1', 'not 01');
-        assert(12_u32.to_short_string() == '12', 'not 12');
-        assert(123_u32.to_short_string() == '123', 'not 123');
-        assert(10_u32.to_short_string() == '10', 'not 10');
-        assert(100_u32.to_short_string() == '100', 'not 100');
-        assert(1001_u32.to_short_string() == '1001', 'not 1001');
-        assert(1234567890_u32.to_short_string() == '1234567890', 'not 1234567890');
-        assert(01234567890_u32.to_short_string() == '1234567890', 'not 01234567890');
-        assert(BITWISE::MAX_U32.to_short_string() != 0, 'any u32 should be safe');
-        assert(BITWISE::MAX_U16.to_short_string() != 0, 'any u16 should be safe');
-        assert(BITWISE::MAX_U8.to_short_string() != 0, 'any u8 should be safe');
+        assert_eq!(0_u32.to_short_string(), '0', "not 0");
+        assert_eq!(1_u32.to_short_string(), '1', "not 1");
+        assert_eq!(01_u32.to_short_string(), '1', "not 01");
+        assert_eq!(12_u32.to_short_string(), '12', "not 12");
+        assert_eq!(123_u32.to_short_string(), '123', "not 123");
+        assert_eq!(10_u32.to_short_string(), '10', "not 10");
+        assert_eq!(100_u32.to_short_string(), '100', "not 100");
+        assert_eq!(1001_u32.to_short_string(), '1001', "not 1001");
+        assert_eq!(1234567890_u32.to_short_string(), '1234567890', "not 1234567890");
+        assert_eq!(01234567890_u32.to_short_string(), '1234567890', "not 01234567890");
+        assert_ne!(BITWISE::MAX_U32.to_short_string(), 0, "any u32 should be safe");
+        assert_ne!(BITWISE::MAX_U16.to_short_string(), 0, "any u16 should be safe");
+        assert_ne!(BITWISE::MAX_U8.to_short_string(), 0, "any u8 should be safe");
     }
 
     #[test]
     fn test_to_short_string_u64() {
-        assert(0_u64.to_short_string() == '0', 'not 0');
-        assert(1_u64.to_short_string() == '1', 'not 1');
-        assert(01_u64.to_short_string() == '1', 'not 01');
-        assert(12_u64.to_short_string() == '12', 'not 12');
-        assert(123_u64.to_short_string() == '123', 'not 123');
-        assert(10_u64.to_short_string() == '10', 'not 10');
-        assert(100_u64.to_short_string() == '100', 'not 100');
-        assert(1001_u64.to_short_string() == '1001', 'not 1001');
-        assert(1234567890_u64.to_short_string() == '1234567890', 'not 1234567890');
-        assert(01234567890_u64.to_short_string() == '1234567890', 'not 01234567890');
-        assert(18446744073709551615_u64.to_short_string() == '18446744073709551615', 'not 18446744073709551615');
-        assert(BITWISE::MAX_U64.to_short_string() != 0, 'any u64 should be safe');
+        assert_eq!(0_u64.to_short_string(), '0', "not 0");
+        assert_eq!(1_u64.to_short_string(), '1', "not 1");
+        assert_eq!(01_u64.to_short_string(), '1', "not 01");
+        assert_eq!(12_u64.to_short_string(), '12', "not 12");
+        assert_eq!(123_u64.to_short_string(), '123', "not 123");
+        assert_eq!(10_u64.to_short_string(), '10', "not 10");
+        assert_eq!(100_u64.to_short_string(), '100', "not 100");
+        assert_eq!(1001_u64.to_short_string(), '1001', "not 1001");
+        assert_eq!(1234567890_u64.to_short_string(), '1234567890', "not 1234567890");
+        assert_eq!(01234567890_u64.to_short_string(), '1234567890', "not 01234567890");
+        assert_eq!(18446744073709551615_u64.to_short_string(), '18446744073709551615', "not 18446744073709551615");
+        assert_ne!(BITWISE::MAX_U64.to_short_string(), 0, "any u64 should be safe");
     }
 
     #[test]
     fn test_to_short_string_u128() {
-        assert(1234567890_u128.to_short_string() == '1234567890', 'not 1234567890');
-        assert(1234567890123456789012345678901_u128.to_short_string() == '1234567890123456789012345678901', '1234567890123456789012345678901');
-        assert(MAX_SHORT_STRING_NUMBER.to_short_string() == '9999999999999999999999999999999', '9999999999999999999999999999999');
+        assert_eq!(1234567890_u128.to_short_string(), '1234567890', "not 1234567890");
+        assert_eq!(1234567890123456789012345678901_u128.to_short_string(), '1234567890123456789012345678901', "1234567890123456789012345678901");
+        assert_eq!(MAX_SHORT_STRING_NUMBER.to_short_string(), '9999999999999999999999999999999', "9999999999999999999999999999999");
     }
 
     #[test]
-    #[should_panic(expected: 'to_short_string(u128) Overflow')]
+    #[should_panic(expected:('to_short_string(u128) Overflow',))]
     fn test_to_short_string_overflow_u128() {
         let v: u128 = (MAX_SHORT_STRING_NUMBER + 1).into();
         v.to_short_string(); // panic!
     }
     #[test]
-    #[should_panic(expected: 'to_short_string(u256) Overflow')]
+    #[should_panic(expected:('to_short_string(u256) Overflow',))]
     fn test_to_short_string_overflow_u256() {
         let v: u256 = (MAX_SHORT_STRING_NUMBER + 1).into();
         v.to_short_string(); // panic!

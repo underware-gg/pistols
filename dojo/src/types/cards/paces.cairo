@@ -74,7 +74,6 @@ pub impl PacesCardImpl of PacesCardTrait {
 //--------------------
 // converters
 //
-use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortString};
 
 impl PacesCardDefault of Default<PacesCard> {
@@ -122,11 +121,19 @@ impl U8IntoPacesCard of core::traits::Into<u8, PacesCard> {
 // }
 
 // for println! and format!
-impl PacesCardDisplay of Display<PacesCard> {
-    fn fmt(self: @PacesCard, ref f: Formatter) -> Result<(), Error> {
+// impl PacesCardDisplay of core::fmt::Display<PacesCard> {
+//     fn fmt(self: @PacesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+//         let p: u8 = (*self).into();
+//         let result: ByteArray = format!("Paces::{}", p);
+//         f.buffer.append(@result);
+//         Result::Ok(())
+//     }
+// }
+impl PacesCardDebug of core::fmt::Debug<PacesCard> {
+    fn fmt(self: @PacesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let p: u8 = (*self).into();
-        let str: ByteArray = format!("Paces::{}", p);
-        f.buffer.append(@str);
+        let result: ByteArray = format!("Paces::{}", p);
+        f.buffer.append(@result);
         Result::Ok(())
     }
 }

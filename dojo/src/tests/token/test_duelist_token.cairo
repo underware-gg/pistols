@@ -81,9 +81,9 @@ fn assert_event_transfer(
     emitter: ContractAddress, from: ContractAddress, to: ContractAddress, token_id: u256
 ) {
     let event = utils::pop_log::<Transfer>(emitter).unwrap();
-    assert(event.from == from, 'Invalid `from`');
-    assert(event.to == to, 'Invalid `to`');
-    assert(event.token_id == token_id, 'Invalid `token_id`');
+    assert_eq!(event.from, from, "Invalid `from`");
+    assert_eq!(event.to, to, "Invalid `to`");
+    assert_eq!(event.token_id, token_id, "Invalid `token_id`");
 }
 
 fn assert_only_event_transfer(
@@ -97,9 +97,9 @@ fn assert_event_approval(
     emitter: ContractAddress, owner: ContractAddress, spender: ContractAddress, token_id: u256
 ) {
     let event = utils::pop_log::<Approval>(emitter).unwrap();
-    assert(event.owner == owner, 'Invalid `owner`');
-    assert(event.approved == spender, 'Invalid `spender`');
-    assert(event.token_id == token_id, 'Invalid `token_id`');
+    assert_eq!(event.owner, owner, "Invalid `owner`");
+    assert_eq!(event.approved, spender, "Invalid `spender`");
+    assert_eq!(event.token_id, token_id, "Invalid `token_id`");
 }
 
 fn assert_only_event_approval(
@@ -243,10 +243,9 @@ fn setup(fee_amount: u128) -> TestSystems {
     (sys)
 }
 
-fn _assert_minted_count(world: WorldStorage, token: IDuelistTokenDispatcher, minted_count: usize, msg: felt252) {
-    // assert(token.total_supply() == minted_count, 'msg);
+fn _assert_minted_count(world: WorldStorage, token: IDuelistTokenDispatcher, minted_count: usize, msg: ByteArray) {
     let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
-    assert(token_config.minted_count == minted_count.into(), msg);
+    assert_eq!(token_config.minted_count, minted_count.into(), "{}", msg);
 }
 
 //
@@ -256,18 +255,16 @@ fn _assert_minted_count(world: WorldStorage, token: IDuelistTokenDispatcher, min
 #[test]
 fn test_initializer() {
     let mut sys: TestSystems = setup(0);
-    // assert(sys.token.name() == "Pistols at Dawn Duelists", 'Name is wrong');
-    assert(sys.token.symbol() == "DUELIST", 'Symbol is wrong');
+    assert_eq!(sys.token.symbol(), "DUELIST", "Symbol is wrong");
 
-    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, 'Should eq [5]');
-    assert(sys.token.balance_of(OWNER()) == CONST::WELCOME_PACK_DUELIST_COUNT.into(), 'Should eq [5] (OWNER)');
-    assert(sys.token.balance_of(OTHER()) == 0, 'Should eq 0 (OTHER)');
+    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, "Should eq [5]");
+    assert_eq!(sys.token.balance_of(OWNER()), CONST::WELCOME_PACK_DUELIST_COUNT.into(), "Should eq [5]");
+    assert_eq!(sys.token.balance_of(OTHER()), 0, "Should eq 0");
 
-    assert(sys.token.owner_of(TOKEN_ID_1) == OWNER(), 'owner_of_1');
+    assert_eq!(sys.token.owner_of(TOKEN_ID_1), OWNER(), "owner_of_1");
 
-    assert(sys.token.supports_interface(interface::IERC721_ID) == true, 'should support IERC721_ID');
-    assert(sys.token.supports_interface(interface::IERC721_METADATA_ID) == true, 'should support METADATA');
-    // assert(sys.token.supports_interface(interface::IERC721_ENUMERABLE_ID) == true, 'should support ENUMERABLE');
+    assert!(sys.token.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
+    assert!(sys.token.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
 }
 
 #[test]
@@ -308,9 +305,8 @@ fn test_token_uri() {
     println!("{}", uri_1);
     println!("{}", uri_2);
 
-    assert(uri_1.len() > 100, 'Uri 1 should not be empty');
-    assert(uri_2.len() > 100, 'Uri 2 should not be empty');
-    // assert(uri_1.len() > uri_2.len(), 'uri_1 > uri_2');
+    assert_gt!(uri_1.len(), 100, "Uri 1 should not be empty");
+    assert_gt!(uri_2.len(), 100, "Uri 2 should not be empty");
 }
 
 #[test]
@@ -343,16 +339,10 @@ fn test_approve() {
     utils::impersonate(OWNER());
 
     sys.token.approve(SPENDER(), TOKEN_ID_1);
-    assert(sys.token.get_approved(TOKEN_ID_1) == SPENDER(), 'Spender not approved correctly');
+    assert_eq!(sys.token.get_approved(TOKEN_ID_1), SPENDER(), "Spender not approved correctly");
 
     // drop StoreSetRecord ERC721TokenApprovalModel
     utils::drop_event(sys.world.dispatcher.contract_address);
-
-    // TODO: fix events
-    // // drop StoreSetRecord ERC721TokenApprovalModel
-    // utils::drop_event(sys.world.dispatcher.contract_address);
-    // assert_only_event_approval(sys.token.contract_address, OWNER(), SPENDER(), TOKEN_ID_1);
-    // assert_only_event_approval(sys.world.dispatcher.contract_address, OWNER(), SPENDER(), TOKEN_ID_1);
 }
 
 //
@@ -363,9 +353,9 @@ fn test_approve() {
 fn test_transfer_from() {
     let mut sys: TestSystems = setup(0);
 
-    assert(sys.token.balance_of(OWNER()) == CONST::WELCOME_PACK_DUELIST_COUNT.into(), 'Should eq [5]');
-    assert(sys.token.balance_of(OTHER()) == 0, 'Should eq 0');
-    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, 'Should eq [5]');
+    assert_eq!(sys.token.balance_of(OWNER()), CONST::WELCOME_PACK_DUELIST_COUNT.into(), "Should eq [5]");
+    assert_eq!(sys.token.balance_of(OTHER()), 0, "Should eq 0");
+    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, "Should eq [5]");
 
     tester::impersonate(OWNER());
     sys.token.approve(SPENDER(), TOKEN_ID_1);
@@ -377,15 +367,10 @@ fn test_transfer_from() {
     tester::impersonate(SPENDER());
     sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
 
-    // TODO: fix events
-    // assert_only_event_transfer(sys.token.contract_address, OWNER(), OTHER(), TOKEN_ID_1);
-
-    assert(sys.token.balance_of(OWNER()) == 4, 'Should eq 4');
-    assert(sys.token.balance_of(OTHER()) == 1, 'Should eq 1');
-    assert(sys.token.get_approved(TOKEN_ID_1) == ZERO(), 'Should eq 0');
-    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, 'Should eq [5]/');
-    // assert(sys.token.total_supply() == 2, 'Should eq 2');
-    // assert(sys.token.token_of_owner_by_index(OTHER(), 1) == TOKEN_ID_1, 'Should eq TOKEN_ID_1');
+    assert_eq!(sys.token.balance_of(OWNER()), 4, "Should eq 4");
+    assert_eq!(sys.token.balance_of(OTHER()), 1, "Should eq 1");
+    assert_eq!(sys.token.get_approved(TOKEN_ID_1), ZERO(), "Should eq 0");
+    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, "Should eq [5]");
 }
 
 #[test]
@@ -425,28 +410,28 @@ fn test_fame() {
     // validate token_bound address
     let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_1.low);
     let token_bound_address_6: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_6.low);
-    assert(token_bound_address_1.is_non_zero(), 'token_bound_address_1');
-    assert(token_bound_address_6.is_non_zero(), 'token_bound_address_6');
-    assert(token_bound_address_1 != token_bound_address_6, 'token_bound_address_1 != 2');
+    assert!(token_bound_address_1.is_non_zero(), "token_bound_address_1");
+    assert!(token_bound_address_6.is_non_zero(), "token_bound_address_6");
+    assert_ne!(token_bound_address_1, token_bound_address_6, "token_bound_address_1 != 2");
     let (token_contract_1, token_id_1) = sys.fame.token_of_address(token_bound_address_1);
     let (token_contract_6, token_id_6) = sys.fame.token_of_address(token_bound_address_6);
-    assert(token_contract_1 == sys.token.contract_address, 'token_contract_1');
-    assert(token_contract_6 == sys.token.contract_address, 'token_contract_6');
-    assert(token_id_1 == TOKEN_ID_1.low, 'token_id_1');
-    assert(token_id_6 == TOKEN_ID_6.low, 'token_id_6');
+    assert_eq!(token_contract_1, sys.token.contract_address, "token_contract_1");
+    assert_eq!(token_contract_6, sys.token.contract_address, "token_contract_6");
+    assert_eq!(token_id_1, TOKEN_ID_1.low, "token_id_1");
+    assert_eq!(token_id_6, TOKEN_ID_6.low, "token_id_6");
 
     // initial token balances
     let balance_1_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
     let balance_6_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_6.low);
-    assert(FAME::MIN_MINT_GRANT_AMOUNT > 0, 'FAME::MIN_MINT_GRANT_AMOUNT > 0');
-    assert(balance_1_initial == FAME::MIN_MINT_GRANT_AMOUNT, 'balance_1_initial');
-    assert(balance_6_initial == FAME::MIN_MINT_GRANT_AMOUNT, 'balance_6_initial');
+    assert_gt!(FAME::MIN_MINT_GRANT_AMOUNT, 0, "FAME::MIN_MINT_GRANT_AMOUNT > 0");
+    assert_eq!(balance_1_initial, FAME::MIN_MINT_GRANT_AMOUNT, "balance_1_initial");
+    assert_eq!(balance_6_initial, FAME::MIN_MINT_GRANT_AMOUNT, "balance_6_initial");
 
     // owner balances must match
     let mut balance_owner_initial: u256 = sys.fame.balance_of(OWNER());
     let mut balance_other_initial: u256 = sys.fame.balance_of(OTHER());
-    assert(balance_owner_initial == balance_1_initial * CONST::WELCOME_PACK_DUELIST_COUNT.into(), 'balance_owner_initial');
-    assert(balance_other_initial == balance_6_initial * CONST::WELCOME_PACK_DUELIST_COUNT.into(), 'balance_other_initial');
+    assert_eq!(balance_owner_initial, balance_1_initial * CONST::WELCOME_PACK_DUELIST_COUNT.into(), "balance_owner_initial");
+    assert_eq!(balance_other_initial, balance_6_initial * CONST::WELCOME_PACK_DUELIST_COUNT.into(), "balance_other_initial");
 
     // transfer duelist
     tester::impersonate(OWNER());
@@ -457,11 +442,11 @@ fn test_fame() {
     let balance_owner: u256 = sys.fame.balance_of(OWNER());
     let balance_other: u256 = sys.fame.balance_of(OTHER());
     let balance_recipient: u256 = sys.fame.balance_of(RECIPIENT());
-    assert(balance_1 == balance_1_initial, 'balance_1 (1)');
-    assert(balance_6 == balance_6_initial, 'balance_6 (1)');
-    assert(balance_owner == balance_owner_initial - balance_1, 'balance_owner (1)');
-    assert(balance_other == balance_other_initial + balance_1, 'balance_other (1)');
-    assert(balance_recipient == 0, 'balance_recipient (1)');
+    assert_eq!(balance_1, balance_1_initial, "balance_1 (1)");
+    assert_eq!(balance_6, balance_6_initial, "balance_6 (1)");
+    assert_eq!(balance_owner, balance_owner_initial - balance_1, "balance_owner (1)");
+    assert_eq!(balance_other, balance_other_initial + balance_1, "balance_other (1)");
+    assert_eq!(balance_recipient, 0, "balance_recipient (1)");
     let balance_owner_last = balance_owner;
     let balance_other_last = balance_other;
 
@@ -471,10 +456,10 @@ fn test_fame() {
     let balance_owner: u256 = sys.fame.balance_of(OWNER());
     let balance_other: u256 = sys.fame.balance_of(OTHER());
     let balance_recipient: u256 = sys.fame.balance_of(RECIPIENT());
-    assert(balance_6 == balance_6_initial, 'balance_6 (2)');
-    assert(balance_owner == balance_owner_last, 'balance_owner (2)');
-    assert(balance_other == balance_other_last - balance_6, 'balance_other (2)');
-    assert(balance_recipient == balance_6, 'balance_recipient (2)');
+    assert_eq!(balance_6, balance_6_initial, "balance_6 (2)");
+    assert_eq!(balance_owner, balance_owner_last, "balance_owner (2)");
+    assert_eq!(balance_other, balance_other_last - balance_6, "balance_other (2)");
+    assert_eq!(balance_recipient, balance_6, "balance_recipient (2)");
 
     // transfer all
     tester::impersonate(OTHER());
@@ -486,9 +471,9 @@ fn test_fame() {
     let balance_owner: u256 = sys.fame.balance_of(OWNER());
     let balance_other: u256 = sys.fame.balance_of(OTHER());
     let balance_recipient: u256 = sys.fame.balance_of(RECIPIENT());
-    assert(balance_owner == balance_owner_initial, 'balance_owner (3)');
-    assert(balance_other == 0, 'balance_other (3)');
-    assert(balance_recipient == balance_other_initial, 'balance_recipient (3)');
+    assert_eq!(balance_owner, balance_owner_initial, "balance_owner (3)");
+    assert_eq!(balance_other, 0, "balance_other (3)");
+    assert_eq!(balance_recipient, balance_other_initial, "balance_recipient (3)");
 }
 
 #[test]

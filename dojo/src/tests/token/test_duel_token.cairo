@@ -88,9 +88,9 @@ fn assert_event_transfer(
     emitter: ContractAddress, from: ContractAddress, to: ContractAddress, token_id: u256
 ) {
     let event = utils::pop_log::<Transfer>(emitter).unwrap();
-    assert(event.from == from, 'Invalid `from`');
-    assert(event.to == to, 'Invalid `to`');
-    assert(event.token_id == token_id, 'Invalid `token_id`');
+    assert_eq!(event.from, from, "Invalid `from`");
+    assert_eq!(event.to, to, "Invalid `to`");
+    assert_eq!(event.token_id, token_id, "Invalid `token_id`");
 }
 
 fn assert_only_event_transfer(
@@ -104,9 +104,9 @@ fn assert_event_approval(
     emitter: ContractAddress, owner: ContractAddress, spender: ContractAddress, token_id: u256
 ) {
     let event = utils::pop_log::<Approval>(emitter).unwrap();
-    assert(event.owner == owner, 'Invalid `owner`');
-    assert(event.approved == spender, 'Invalid `spender`');
-    assert(event.token_id == token_id, 'Invalid `token_id`');
+    assert_eq!(event.owner, owner, "Invalid `owner`");
+    assert_eq!(event.approved, spender, "Invalid `spender`");
+    assert_eq!(event.token_id, token_id, "Invalid `token_id`");
 }
 
 fn assert_only_event_approval(
@@ -259,10 +259,9 @@ fn create_duel(token: IDuelTokenDispatcher, recipient: ContractAddress, challeng
 // '---BB'.print();
 }
 
-fn _assert_minted_count(world: WorldStorage, token: IDuelTokenDispatcher, minted_count: u128, msg: felt252) {
-    // assert(token.total_supply() == minted_count, 'msg);
+fn _assert_minted_count(world: WorldStorage, token: IDuelTokenDispatcher, minted_count: u128, msg: ByteArray) {
     let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
-    assert(token_config.minted_count == minted_count, msg);
+    assert_eq!(token_config.minted_count, minted_count, "{}", msg);
 }
 
 //
@@ -272,33 +271,19 @@ fn _assert_minted_count(world: WorldStorage, token: IDuelTokenDispatcher, minted
 #[test]
 fn test_initializer() {
     let (world, mut token) = setup(0);
-    // assert(token.name() == "Pistols at Dawn Duelists", 'Name is wrong');
-    assert(token.symbol() == "DUEL", 'Symbol is wrong');
-    _assert_minted_count(world, token, 2, 'Should eq 2');
+    assert_eq!(token.symbol(), "DUEL", "Symbol is wrong");
+    _assert_minted_count(world, token, 2, "Should eq 2");
 
-    assert(token.owner_of(DUEL_ID_1).is_non_zero(), 'owner_of_1_non_zero');
-    assert(token.owner_of(DUEL_ID_2).is_non_zero(), 'owner_of_2_non_zero');
-    assert(token.owner_of(DUEL_ID_1) == world.game_address(), 'owner_of_1');
-    assert(token.owner_of(DUEL_ID_2) == world.game_address(), 'owner_of_2');
+    assert!(token.owner_of(DUEL_ID_1).is_non_zero(), "owner_of_1_non_zero");
+    assert!(token.owner_of(DUEL_ID_2).is_non_zero(), "owner_of_2_non_zero");
+    assert_eq!(token.owner_of(DUEL_ID_1), world.game_address(), "owner_of_1");
+    assert_eq!(token.owner_of(DUEL_ID_2), world.game_address(), "owner_of_2");
 
-    // owned by game now
-    // assert(token.balance_of(OWNER()) == 1, 'Should eq 1 (OWNER)');
-    // assert(token.balance_of(OTHER()) == 1, 'Should eq 1 (OTHER)');
-    // assert(token.owner_of(DUEL_ID_1) == OWNER(), 'owner_of_1');
-    // assert(token.owner_of(DUEL_ID_2) == OTHER(), 'owner_of_2');
+    assert_ne!(token.token_uri(DUEL_ID_1), "", "Uri should not be empty");
+    assert_ne!(token.tokenURI(DUEL_ID_1), "", "Uri should not be empty Camel");
 
-    // enumberable
-    // assert(token.token_of_owner_by_index(OWNER(), 0) == DUEL_ID_1, 'token_of_owner_by_index_OWNER');
-    // assert(token.token_of_owner_by_index(OTHER(), 0) == DUEL_ID_2, 'token_of_owner_by_index_REC');
-    // assert(token.token_by_index(0) == DUEL_ID_1, 'token_by_index_0');
-    // assert(token.token_by_index(1) == DUEL_ID_2, 'token_by_index_1');
-    
-    assert(token.token_uri(DUEL_ID_1) != "", 'Uri should not be empty');
-    assert(token.tokenURI(DUEL_ID_1) != "", 'Uri should not be empty Camel');
-
-    assert(token.supports_interface(interface::IERC721_ID) == true, 'should support IERC721_ID');
-    assert(token.supports_interface(interface::IERC721_METADATA_ID) == true, 'should support METADATA');
-    // assert(token.supports_interface(interface::IERC721_ENUMERABLE_ID) == true, 'should support ENUMERABLE');
+    assert!(token.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
+    assert!(token.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
 }
 
 #[test]
@@ -308,7 +293,7 @@ fn test_token_component() {
     // token.contract_address.print();
     token.owner_of(DUEL_ID_1);//.print();
     token.calc_mint_fee(TABLES::PRACTICE);//.print();
-    token.is_owner_of(OWNER(), DUEL_ID_1.low);//.print();
+    token.is_owner_of(OWNER(), DUEL_ID_1.low);//.print();test_duel_token.cairo
 }
 
 #[test]
@@ -340,9 +325,8 @@ fn test_token_uri() {
     println!("{}", uri_1);
     println!("{}", uri_2);
 
-    assert(uri_1.len() > 100, 'Uri 1 should not be empty');
-    assert(uri_2.len() > 100, 'Uri 2 should not be empty');
-    // assert(uri_1.len() > uri_2.len(), 'uri_1 > uri_2');
+    assert_gt!(uri_1.len(), 100, "Uri 1 should not be empty");
+    assert_gt!(uri_2.len(), 100, "Uri 2 should not be empty");
 }
 
 #[test]
@@ -365,7 +349,7 @@ fn test_approve() {
     utils::impersonate(OWNER());
 
     token.approve(BUMMER(), DUEL_ID_1);
-    assert(token.get_approved(DUEL_ID_1) == BUMMER(), 'Spender not approved correctly');
+    assert_eq!(token.get_approved(DUEL_ID_1), BUMMER(), "Spender not approved correctly");
 
     // drop StoreSetRecord ERC721TokenApprovalModel
     utils::drop_event(world.dispatcher.contract_address);
@@ -399,10 +383,10 @@ fn test_transfer_from() {
     // TODO: fix events
     // assert_only_event_transfer(token.contract_address, OWNER(), OTHER(), DUEL_ID_1);
 
-    assert(token.balance_of(OTHER()) == 2, 'Should eq 1');
-    assert(token.balance_of(OWNER()) == 0, 'Should eq 1');
-    assert(token.get_approved(DUEL_ID_1) == ZERO(), 'Should eq 0');
-    _assert_minted_count(world, token, 2, 'Should eq 2');
+    assert_eq!(token.balance_of(OTHER()), 2, "Should eq 1");
+    assert_eq!(token.balance_of(OWNER()), 0, "Should eq 1");
+    assert_eq!(token.get_approved(DUEL_ID_1), ZERO(), "Should eq 0");
+    _assert_minted_count(world, token, 2, "Should eq 2");
     // assert(token.total_supply() == 2, 'Should eq 2');
     // assert(token.token_of_owner_by_index(OTHER(), 1) == DUEL_ID_1, 'Should eq DUEL_ID_1');
 }
@@ -423,11 +407,11 @@ fn test_mint_no_allowance() {
 #[test]
 fn test_mint_free() {
     let (world, mut token) = setup(0);
-    _assert_minted_count(world, token, 2, 'invalid total_supply init');
+    _assert_minted_count(world, token, 2, "invalid total_supply init");
     // assert(token.balance_of(OTHER()) == 1, 'invalid balance_of == 1');
     // assert(token.token_of_owner_by_index(OTHER(), 0) == DUEL_ID_2, 'token_of_owner_by_index_2');
     create_duel(token, BUMMER(), RECIPIENT());
-    _assert_minted_count(world, token, 3, 'invalid total_supply');
+    _assert_minted_count(world, token, 3, "invalid total_supply");
     // assert(token.balance_of(OTHER()) == 2, 'invalid balance_of == 2');
     // assert(token.token_of_owner_by_index(OTHER(), 1) == DUEL_ID_3, 'token_of_owner_by_index_3');
 }
@@ -436,10 +420,10 @@ fn test_mint_free() {
 #[ignore] // we dont charge for duels
 fn test_mint_lords() {
     let (world, mut token) = setup(100);
-    _assert_minted_count(world, token, 2, 'invalid total_supply init');
+    _assert_minted_count(world, token, 2, "invalid total_supply init");
     // TODO: set allowance
     create_duel(token, BUMMER(), RECIPIENT());
-    _assert_minted_count(world, token, 3, 'invalid total_supply');
+    _assert_minted_count(world, token, 3, "invalid total_supply");
 }
 
 

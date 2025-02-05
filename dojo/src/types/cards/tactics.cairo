@@ -118,7 +118,6 @@ pub impl TacticsCardImpl of TacticsCardTrait {
 //--------------------
 // converters
 //
-use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortStringTrait};
 
 impl TacticsCardDefault of Default<TacticsCard> {
@@ -158,12 +157,19 @@ impl U8IntoTacticsCard of core::traits::Into<u8, TacticsCard> {
 // }
 
 // for println! and format!
-impl TacticsCardDisplay of Display<TacticsCard> {
-    fn fmt(self: @TacticsCard, ref f: Formatter) -> Result<(), Error> {
+// impl TacticsCardDisplay of core::fmt::Display<TacticsCard> {
+//     fn fmt(self: @TacticsCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+//         let result: ByteArray = (*self).get_points().name.to_string();
+//         f.buffer.append(@result);
+//         Result::Ok(())
+//     }
+// }
+impl TacticsCardDebug of core::fmt::Debug<TacticsCard> {
+    fn fmt(self: @TacticsCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let name: ByteArray = (*self).get_points().name.to_string();
         let value: u8 = (*self).into();
-        let str: ByteArray = format!("({}:{})", value, name);
-        f.buffer.append(@str);
+        let result: ByteArray = format!("({}:{})", value, name);
+        f.buffer.append(@result);
         Result::Ok(())
     }
 }

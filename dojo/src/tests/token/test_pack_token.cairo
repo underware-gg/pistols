@@ -56,9 +56,9 @@ fn assert_event_transfer(
     emitter: ContractAddress, from: ContractAddress, to: ContractAddress, token_id: u256
 ) {
     let event = utils::pop_log::<Transfer>(emitter).unwrap();
-    assert(event.from == from, 'Invalid `from`');
-    assert(event.to == to, 'Invalid `to`');
-    assert(event.token_id == token_id, 'Invalid `token_id`');
+    assert_eq!(event.from, from, "Invalid `from`");
+    assert_eq!(event.to, to, "Invalid `to`");
+    assert_eq!(event.token_id, token_id, "Invalid `token_id`");
 }
 
 fn assert_only_event_transfer(
@@ -72,9 +72,9 @@ fn assert_event_approval(
     emitter: ContractAddress, owner: ContractAddress, spender: ContractAddress, token_id: u256
 ) {
     let event = utils::pop_log::<Approval>(emitter).unwrap();
-    assert(event.owner == owner, 'Invalid `owner`');
-    assert(event.approved == spender, 'Invalid `spender`');
-    assert(event.token_id == token_id, 'Invalid `token_id`');
+    assert_eq!(event.owner, owner, "Invalid `owner`");
+    assert_eq!(event.approved, spender, "Invalid `spender`");
+    assert_eq!(event.token_id, token_id, "Invalid `token_id`");
 }
 
 fn assert_only_event_approval(
@@ -200,20 +200,18 @@ fn setup(fee_amount: u128) -> TestSystems {
     (sys)
 }
 
-fn _assert_minted_count(world: WorldStorage, token: IPackTokenDispatcher, minted_count: u128, msg: felt252) {
-    // assert(token.total_supply() == minted_count, 'msg);
+fn _assert_minted_count(world: WorldStorage, token: IPackTokenDispatcher, minted_count: u128, msg: ByteArray) {
     let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
-    assert(token_config.minted_count == minted_count, msg);
+    assert_eq!(token_config.minted_count, minted_count, "{}", msg);
 }
-fn _assert_duelist_count(world: WorldStorage, token: IDuelistTokenDispatcher, minted_count: u128, msg: felt252) {
-    // assert(token.total_supply() == minted_count, 'msg);
+fn _assert_duelist_count(world: WorldStorage, token: IDuelistTokenDispatcher, minted_count: u128, msg: ByteArray) {
     let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
-    assert(token_config.minted_count == minted_count, msg);
+    assert_eq!(token_config.minted_count, minted_count, "{}", msg);
 }
 
 fn _purchase(sys: TestSystems, recipient: ContractAddress) {
     let price: u128 = sys.token.calc_mint_fee(recipient, PackType::Duelists5x);
-    assert(price > 0, 'invalid price');
+    assert_gt!(price, 0, "invalid price");
     tester::impersonate(recipient);
     tester::execute_lords_approve(@sys.lords, recipient, sys.bank.contract_address, price);
     sys.token.purchase(PackType::Duelists5x);
@@ -226,14 +224,12 @@ fn _purchase(sys: TestSystems, recipient: ContractAddress) {
 #[test]
 fn test_initializer() {
     let mut sys: TestSystems = setup(0);
-    // assert(sys.token.name() == "Pistols at Dawn Duelists", 'Name is wrong');
-    assert(sys.token.symbol() == "PACK", 'Symbol is wrong');
+    assert_eq!(sys.token.symbol(), "PACK", "Symbol is wrong");
 
-    _assert_minted_count(sys.world, sys.token, 0, 'Should eq 0');
+    _assert_minted_count(sys.world, sys.token, 0, "Should eq 0");
 
-    assert(sys.token.supports_interface(interface::IERC721_ID) == true, 'should support IERC721_ID');
-    assert(sys.token.supports_interface(interface::IERC721_METADATA_ID) == true, 'should support METADATA');
-    // assert(sys.token.supports_interface(interface::IERC721_ENUMERABLE_ID) == true, 'should support ENUMERABLE');
+    assert!(sys.token.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
+    assert!(sys.token.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
 }
 
 #[test]
@@ -253,7 +249,7 @@ fn test_token_uri() {
     _purchase(sys, OWNER());
 
     let uri = sys.token.token_uri(TOKEN_ID_2);
-    assert(uri.len() > 100, 'Uri 1 should not be empty');
+    assert_gt!(uri.len(), 100, "Uri 1 should not be empty");
     println!("{}", uri);
 }
 
@@ -272,40 +268,37 @@ fn test_token_uri_invalid() {
 #[test]
 fn test_claim_mint() {
     let mut sys: TestSystems = setup(0);
-    _assert_minted_count(sys.world, sys.token, 0, 'total_supply init');
-    assert(sys.token.balance_of(OWNER()) == 0, 'balance_of 0');
+    _assert_minted_count(sys.world, sys.token, 0, "total_supply init");
+    assert_eq!(sys.token.balance_of(OWNER()), 0, "balance_of 0");
 
     let player: Player = tester::get_Player(sys.world, OWNER());
-    assert(!player.exists(), '!player.exists()');
-    assert(player.claimed_welcome_pack == false, '!player.claimed_welcome_pack');
+    assert!(!player.exists(), "!player.exists()");
+    assert!(!player.claimed_welcome_pack, "!player.claimed_welcome_pack");
 
     sys.token.claim_welcome_pack();
-    _assert_minted_count(sys.world, sys.token, 1, 'total_supply 1');
-    _assert_duelist_count(sys.world, sys.duelists, 5, 'duelist_supply 5');
-    // assert(sys.token.balance_of(OWNER()) == 1, 'balance_of 1'); // no burn
-    assert(sys.token.balance_of(OWNER()) == 0, 'balance_of 0'); // burn!
-    // assert(sys.token.owner_of(TOKEN_ID_1) == OWNER(), 'owner_of_1'); // no burn
+    _assert_minted_count(sys.world, sys.token, 1, "total_supply 1");
+    _assert_duelist_count(sys.world, sys.duelists, 5, "duelist_supply 5");
+    assert_eq!(sys.token.balance_of(OWNER()), 0, "balance_of 0");
 
     let player: Player = tester::get_Player(sys.world, OWNER());
-    assert(player.exists(), 'player.exists()');
-    assert(player.claimed_welcome_pack == true, 'player.claimed_welcome_pack');
+    assert!(player.exists(), "player.exists()");
+    assert!(player.claimed_welcome_pack, "player.claimed_welcome_pack");
     let pack_1: Pack = tester::get_Pack(sys.world, TOKEN_ID_1.low);
-    assert(pack_1.pack_id == TOKEN_ID_1.low, 'pack_1.pack_id');
-    assert(pack_1.pack_type == PackType::WelcomePack, 'pack_1.pack_type');
-    assert(pack_1.seed != 0, 'pack_1.seed');
-    assert(pack_1.is_open == true, 'pack_1.is_open');
+    assert_eq!(pack_1.pack_id, TOKEN_ID_1.low, "pack_1.pack_id");
+    assert_eq!(pack_1.pack_type, PackType::WelcomePack, "pack_1.pack_type");
+    assert_ne!(pack_1.seed, 0, "pack_1.seed");
+    assert!(pack_1.is_open, "pack_1.is_open");
 
     _purchase(sys, OWNER());
-    _assert_minted_count(sys.world, sys.token, 2, 'total_supply 2');
-    // assert(sys.token.balance_of(OWNER()) == 2, 'balance_of 2'); // no burn
-    assert(sys.token.balance_of(OWNER()) == 1, 'balance_of 1'); // burn!
-    assert(sys.token.owner_of(TOKEN_ID_2) == OWNER(), 'owner_of_2');
+    _assert_minted_count(sys.world, sys.token, 2, "total_supply 2");
+    assert_eq!(sys.token.balance_of(OWNER()), 1, "balance_of 1");
+    assert!(sys.token.owner_of(TOKEN_ID_2) == OWNER(), "owner_of_2");
 
     let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
-    assert(pack_2.pack_id == TOKEN_ID_2.low, 'pack_2.pack_id');
-    assert(pack_2.pack_type == PackType::Duelists5x, 'pack_2.pack_type');
-    assert(pack_2.seed != pack_1.seed, 'pack_2.seed');
-    assert(pack_2.is_open == false, 'pack_2.is_open');
+    assert_eq!(pack_2.pack_id, TOKEN_ID_2.low, "pack_2.pack_id");
+    assert_eq!(pack_2.pack_type, PackType::Duelists5x, "pack_2.pack_type");
+    assert_ne!(pack_2.seed, pack_1.seed, "pack_2.seed");
+    assert!(!pack_2.is_open, "pack_2.is_open");
 
     tester::impersonate(OTHER());
     sys.token.claim_welcome_pack();
@@ -361,19 +354,19 @@ fn test_mint_not_for_sale() {
 fn test_open() {
     let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
-    _assert_duelist_count(sys.world, sys.duelists, 5, 'duelist_supply 5');
+    _assert_duelist_count(sys.world, sys.duelists, 5, "duelist_supply 5");
     let pack_1: Pack = tester::get_Pack(sys.world, TOKEN_ID_1.low);
-    assert(pack_1.is_open == true, 'pack_1.is_open == true');
+    assert!(pack_1.is_open, "pack_1.is_open == true");
 
     _purchase(sys, OWNER());
-    _assert_duelist_count(sys.world, sys.duelists, 5, 'duelist_supply 5/');
+    _assert_duelist_count(sys.world, sys.duelists, 5, "duelist_supply 5/");
     let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
-    assert(pack_2.is_open == false, 'pack_2.is_open == false');
+    assert!(!pack_2.is_open, "pack_2.is_open == false");
 
     sys.token.open(TOKEN_ID_2.low);
-    _assert_duelist_count(sys.world, sys.duelists, 10, 'duelist_supply 10');
+    _assert_duelist_count(sys.world, sys.duelists, 10, "duelist_supply 10");
     let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
-    assert(pack_2.is_open == true, 'pack_2.is_open == false');
+    assert!(pack_2.is_open, "pack_2.is_open == false");
 }
 
 #[test]
@@ -450,18 +443,15 @@ fn test_transfer_unopened_ok() {
     let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     _purchase(sys, OWNER());
-    // assert(sys.token.balance_of(OWNER()) == 2, 'balance_of(OWNER) 2'); // no burn
-    assert(sys.token.balance_of(OWNER()) == 1, 'balance_of(OWNER) 1'); // burn!
-    assert(sys.token.balance_of(OTHER()) == 0, 'balance_of(OTHER) 0');
-    assert(sys.token.owner_of(TOKEN_ID_2) == OWNER(), 'owner_of(OWNER)');
+    assert_eq!(sys.token.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
+    assert_eq!(sys.token.balance_of(OTHER()), 0, "balance_of(OTHER) 0");
+    assert!(sys.token.owner_of(TOKEN_ID_2) == OWNER(), "owner_of(OWNER)");
     // transfer
     tester::impersonate(OWNER());
     sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
-    // check ownership
-    // assert(sys.token.balance_of(OWNER()) == 1, 'balance_of(OWNER) 1'); // no burn
-    assert(sys.token.balance_of(OWNER()) == 0, 'balance_of(OWNER) 0'); // burn!
-    assert(sys.token.balance_of(OTHER()) == 1, 'balance_of(OTHER) 1');
-    assert(sys.token.owner_of(TOKEN_ID_2) == OTHER(), 'owner_of(OTHER)');
+    assert_eq!(sys.token.balance_of(OWNER()), 0, "balance_of(OWNER) 0");
+    assert_eq!(sys.token.balance_of(OTHER()), 1, "balance_of(OTHER) 1");
+    assert!(sys.token.owner_of(TOKEN_ID_2) == OTHER(), "owner_of(OTHER)");
 }
 
 #[test]
@@ -469,21 +459,18 @@ fn test_transfer_unopened_allowed_ok() {
     let mut sys: TestSystems = setup(0);
     sys.token.claim_welcome_pack();
     _purchase(sys, OWNER());
-    // assert(sys.token.balance_of(OWNER()) == 2, 'balance_of(OWNER) 2'); // no burn
-    assert(sys.token.balance_of(OWNER()) == 1, 'balance_of(OWNER) 1'); // burn!
-    assert(sys.token.balance_of(OTHER()) == 0, 'balance_of(OTHER) 0');
-    assert(sys.token.owner_of(TOKEN_ID_2) == OWNER(), 'owner_of(OWNER)');
+    assert_eq!(sys.token.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
+    assert_eq!(sys.token.balance_of(OTHER()), 0, "balance_of(OTHER) 0");
+    assert!(sys.token.owner_of(TOKEN_ID_2) == OWNER(), "owner_of(OWNER)");
     // approve
     tester::impersonate(OWNER());
     sys.token.approve(SPENDER(), TOKEN_ID_2);
     // transfer
     tester::impersonate(SPENDER());
     sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
-    // check ownership
-    // assert(sys.token.balance_of(OWNER()) == 1, 'balance_of(OWNER) 1'); // no burn
-    assert(sys.token.balance_of(OWNER()) == 0, 'balance_of(OWNER) 0'); // burn!
-    assert(sys.token.balance_of(OTHER()) == 1, 'balance_of(OTHER) 1');
-    assert(sys.token.owner_of(TOKEN_ID_2) == OTHER(), 'owner_of(OTHER)');
+    assert_eq!(sys.token.balance_of(OWNER()), 0, "balance_of(OWNER) 0");
+    assert_eq!(sys.token.balance_of(OTHER()), 1, "balance_of(OTHER) 1");
+    assert!(sys.token.owner_of(TOKEN_ID_2) == OTHER(), "owner_of(OTHER)");
 }
 
 #[test]

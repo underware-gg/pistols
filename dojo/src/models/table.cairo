@@ -58,6 +58,33 @@ pub impl TableManagerImpl of TableManagerTrait {
     }
 }
 
+impl TableTypeIntoByteArray of core::traits::Into<TableType, ByteArray> {
+    fn into(self: TableType) -> ByteArray {
+        match self {
+            TableType::Undefined   =>  "Undefined",
+            TableType::Season      =>  "Season",
+            TableType::Tutorial    =>  "Tutorial",
+            TableType::Practice    =>  "Practice",
+        }
+    }
+}
+
+// for println! and format! 
+// pub impl TableTypeDisplay of core::fmt::Display<TableType> {
+//     fn fmt(self: @TableType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+//         let result: ByteArray = (*self).into();
+//         f.buffer.append(@result);
+//         Result::Ok(())
+//     }
+// }
+pub impl TableTypeDebug of core::fmt::Debug<TableType> {
+    fn fmt(self: @TableType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
+
 
 //---------------------------
 // TableConfig Traits

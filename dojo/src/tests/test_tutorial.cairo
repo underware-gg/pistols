@@ -63,22 +63,22 @@ mod tests {
         let level: TutorialLevel = tutorial_id.into();
         let tut_duel_id: u128 = sys.tut.calc_duel_id(ID(OWNER()), tutorial_id);
         let tutorial_id_from_duel_id: u128 = (tut_duel_id & 0xff).into();
-        assert!(tutorial_id_from_duel_id == tutorial_id, "tutorial_id_from_duel_id");
-        assert!(tut_duel_id == level.make_duel_id(ID(OWNER())), "level.make_duel_id");
+        assert_eq!(tutorial_id_from_duel_id, tutorial_id, "tutorial_id_from_duel_id");
+        assert_eq!(tut_duel_id, level.make_duel_id(ID(OWNER())), "level.make_duel_id");
         // create tutorial
         let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
-        assert!(duel_id == tut_duel_id, "tut_duel_id");
+        assert_eq!(duel_id, tut_duel_id, "tut_duel_id");
         let challenge: Challenge = tester::get_Challenge(sys.world, duel_id);
         let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
-        assert!(challenge.state == ChallengeState::InProgress, "challenge.state");
+        assert_eq!(challenge.state, ChallengeState::InProgress, "challenge.state");
         assert!(challenge.is_tutorial(), "challenge.is_tutorial()");
-        assert!(challenge.table_id == TABLES::TUTORIAL, "challenge.table_id");
-        assert!(challenge.premise == Premise::Tutorial, "challenge.premise");
-        assert!(challenge.address_a == OWNER(), "challenge.address_a");
-        assert!(challenge.address_b == OWNER(), "challenge.address_b");
-        assert!(challenge.duelist_id_a == profile.duelist_id(), "challenge.duelist_id_a");
-        assert!(challenge.duelist_id_b == ProfileType::Character(CharacterProfile::Player).duelist_id(), "challenge.duelist_id_b");
-        assert!(round.state == RoundState::Commit, "round.state");
+        assert_eq!(challenge.table_id, TABLES::TUTORIAL, "challenge.table_id");
+        assert_eq!(challenge.premise, Premise::Tutorial, "challenge.premise");
+        assert_eq!(challenge.address_a, OWNER(), "challenge.address_a");
+        assert_eq!(challenge.address_b, OWNER(), "challenge.address_b");
+        assert_eq!(challenge.duelist_id_a, profile.duelist_id(), "challenge.duelist_id_a");
+        assert_eq!(challenge.duelist_id_b, ProfileType::Character(CharacterProfile::Player).duelist_id(), "challenge.duelist_id_b");
+        assert_eq!(round.state, RoundState::Commit, "round.state");
     }
 
     #[test]
@@ -116,40 +116,40 @@ mod tests {
         let duel_id: u128 = tester::execute_create_tutorial(@sys.tut, OWNER(), tutorial_id);
         // check deck
         let challenge: Challenge = tester::get_Challenge(sys.world, duel_id);
-        assert!(challenge.get_deck_type() == DeckType::PacesOnly, "challenge.deck_type");
+        assert_eq!(challenge.get_deck_type(), DeckType::PacesOnly, "challenge.deck_type");
         // commit
         let moves: Span<u8> = [fire.into(), dodge.into()].span();
         let hashed: u128 = make_moves_hash(SALT_A, moves);
         tester::execute_commit_moves_tutorial(@sys.tut, OWNER(), challenge.duelist_id_b, duel_id, hashed);
         let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
-        assert!(round.state == RoundState::Reveal, "round.state");
+        assert_eq!(round.state, RoundState::Reveal, "round.state");
         assert!(round.moves_a.hashed > 0, "round.moves_a.hashed");
-        assert!(round.moves_b.hashed == hashed, "round.moves_b.hashed");
+        assert_eq!(round.moves_b.hashed, hashed, "round.moves_b.hashed");
         // reveal -- different salt as it does not matter
         tester::execute_reveal_moves_tutorial(@sys.tut, OWNER(), challenge.duelist_id_b, duel_id, SALT_B, moves);
         let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
         let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
-        assert!(challenge.state == ChallengeState::Resolved, "challenge.state");
-        assert!(challenge.winner == 2, "challenge.winner");
-        assert!(round.state == RoundState::Finished, "round.state");
-        assert!(round.final_blow == FinalBlow::Paces(fire), "round.final_blow");
-        assert!(round.final_blow.ended_in_paces() == true, "round.ended_in_paces");
-        assert!(round.final_blow.ended_in_blades() == false, "round.ended_in_blades");
+        assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state");
+        assert_eq!(challenge.winner, 2, "challenge.winner");
+        assert_eq!(round.state, RoundState::Finished, "round.state");
+        assert_eq!(round.final_blow, FinalBlow::Paces(fire), "round.final_blow");
+        assert!(round.final_blow.ended_in_paces(), "round.ended_in_paces");
+        assert!(!round.final_blow.ended_in_blades(), "round.ended_in_blades");
         // progress
         let progress: DuelProgress = sys.tut.get_duel_progress(duel_id);
         let final_pace: u8 = fire.into();
-        assert(progress.winner == challenge.winner, 'winner');
-        assert(progress.steps.len() >= final_pace.into() + 1, 'steps.len()');
+        assert_eq!(progress.winner, challenge.winner, "winner");
+        assert_ge!(progress.steps.len(), final_pace.into() + 1, "steps.len()");
         // NPC hand
-        assert(progress.hand_a.card_fire != fire, 'hand_a.card_fire');
-        assert(progress.hand_a.card_dodge != dodge, 'hand_a.card_dodge');
-        assert(progress.hand_a.card_tactics == TacticsCard::None, 'hand_a.card_tactics');
-        assert(progress.hand_a.card_blades == BladesCard::None, 'hand_a.card_blades');
+        assert_ne!(progress.hand_a.card_fire, fire, "hand_a.card_fire");
+        assert_ne!(progress.hand_a.card_dodge, dodge, "hand_a.card_dodge");
+        assert_eq!(progress.hand_a.card_tactics, TacticsCard::None, "hand_a.card_tactics");
+        assert_eq!(progress.hand_a.card_blades, BladesCard::None, "hand_a.card_blades");
         // player hand
-        assert(progress.hand_b.card_fire == fire, 'hand_b.card_fire');
-        assert(progress.hand_b.card_dodge == dodge, 'hand_b.card_dodge');
-        assert(progress.hand_b.card_tactics == TacticsCard::None, 'hand_b.card_tactics');
-        assert(progress.hand_b.card_blades == BladesCard::None, 'hand_b.card_blades');
+        assert_eq!(progress.hand_b.card_fire, fire, "hand_b.card_fire");
+        assert_eq!(progress.hand_b.card_dodge, dodge, "hand_b.card_dodge");
+        assert_eq!(progress.hand_b.card_tactics, TacticsCard::None, "hand_b.card_tactics");
+        assert_eq!(progress.hand_b.card_blades, BladesCard::None, "hand_b.card_blades");
     }
 
     #[test]
@@ -205,39 +205,39 @@ mod tests {
         let duel_id: u128 = tester::execute_create_tutorial(sys.tut, OWNER(), tutorial_id);
         // check deck
         let challenge: Challenge = tester::get_Challenge(*sys.world, duel_id);
-        assert!(challenge.get_deck_type() == DeckType::Classic, "challenge.deck_type");
+        assert_eq!(challenge.get_deck_type(), DeckType::Classic, "challenge.deck_type");
         // commit
         let moves: Span<u8> = [fire.into(), dodge.into(), tactics.into(), blades.into()].span();
         let hashed: u128 = make_moves_hash(SALT_A, moves);
         tester::execute_commit_moves_tutorial(sys.tut, OWNER(), challenge.duelist_id_b, duel_id, hashed);
         let round: RoundValue = tester::get_RoundValue(*sys.world, duel_id);
-        assert!(round.state == RoundState::Reveal, "round.state");
+        assert_eq!(round.state, RoundState::Reveal, "round.state");
         assert!(round.moves_a.hashed > 0, "round.moves_a.hashed");
-        assert!(round.moves_b.hashed == hashed, "round.moves_b.hashed");
+        assert_eq!(round.moves_b.hashed, hashed, "round.moves_b.hashed");
         // reveal -- different salt as it does not matter
         tester::execute_reveal_moves_tutorial(sys.tut, OWNER(), challenge.duelist_id_b, duel_id, SALT_B, moves);
         let challenge: ChallengeValue = tester::get_ChallengeValue(*sys.world, duel_id);
         let round: RoundValue = tester::get_RoundValue(*sys.world, duel_id);
-        assert!(challenge.state == ChallengeState::Resolved, "challenge.state");
-        assert!(challenge.winner == 1, "challenge.winner");
-        assert!(round.state == RoundState::Finished, "round.state");
+        assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state");
+        assert_eq!(challenge.winner, 1, "challenge.winner");
+        assert_eq!(round.state, RoundState::Finished, "round.state");
         assert!(round.final_blow.ended_in_paces() == false, "round.ended_in_paces");
         assert!(round.final_blow.ended_in_blades() == true, "round.ended_in_blades");
         // progress
         let progress: DuelProgress = (*sys.tut).get_duel_progress(duel_id);
         let final_pace: u8 = progress.hand_a.card_fire.into();
-        assert(progress.winner == challenge.winner, 'winner');
-        assert(progress.steps.len() >= final_pace.into() + 1, 'steps.len()');
+        assert_eq!(progress.winner, challenge.winner, "winner");
+        assert_ge!(progress.steps.len(), final_pace.into() + 1, "steps.len()");
         // NPC hand
-        assert(progress.hand_a.card_fire != fire, 'hand_a.card_fire');
-        assert(progress.hand_a.card_dodge != dodge, 'hand_a.card_dodge');
-        assert(progress.hand_a.card_tactics == TacticsCard::ThickCoat, 'hand_a.card_tactics');
-        assert(progress.hand_a.card_blades != blades, 'hand_a.card_blades');
+        assert_ne!(progress.hand_a.card_fire, fire, "hand_a.card_fire");
+        assert_ne!(progress.hand_a.card_dodge, dodge, "hand_a.card_dodge");
+        assert_eq!(progress.hand_a.card_tactics, TacticsCard::ThickCoat, "hand_a.card_tactics");
+        assert_ne!(progress.hand_a.card_blades, blades, "hand_a.card_blades");
         // player hand
-        assert(progress.hand_b.card_fire == fire, 'hand_b.card_fire');
-        assert(progress.hand_b.card_dodge == dodge, 'hand_b.card_dodge');
-        assert(progress.hand_b.card_tactics == tactics, 'hand_b.card_tactics');
-        assert(progress.hand_b.card_blades == blades, 'hand_b.card_blades');
+        assert_eq!(progress.hand_b.card_fire, fire, "hand_b.card_fire");
+        assert_eq!(progress.hand_b.card_dodge, dodge, "hand_b.card_dodge");
+        assert_eq!(progress.hand_b.card_tactics, tactics, "hand_b.card_tactics");
+        assert_eq!(progress.hand_b.card_blades, blades, "hand_b.card_blades");
         (progress)
     }
 
@@ -252,26 +252,26 @@ mod tests {
         // check challenge
         let challenge: ChallengeValue = tester::get_ChallengeValue(*sys.world, duel_id);
         let round: RoundValue = tester::get_RoundValue(*sys.world, duel_id);
-        assert!(challenge.state == ChallengeState::Resolved, "challenge.state");
-        assert!(challenge.winner == 1, "challenge.winner");
-        assert!(round.state == RoundState::Finished, "round.state");
+        assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state");
+        assert_eq!(challenge.winner, 1, "challenge.winner");
+        assert_eq!(round.state, RoundState::Finished, "round.state");
         assert!(round.final_blow.ended_in_paces() == false, "round.ended_in_paces");
         assert!(round.final_blow.ended_in_blades() == true, "round.ended_in_blades");
         // progress
         let progress: DuelProgress = (*sys.game).get_duel_progress(duel_id);
         let final_pace: u8 = progress.hand_a.card_fire.into();
-        assert(progress.winner == challenge.winner, 'winner');
-        assert(progress.steps.len() >= final_pace.into() + 1, 'steps.len()');
+        assert_eq!(progress.winner, challenge.winner, "winner");
+        assert_ge!(progress.steps.len(), final_pace.into() + 1, "steps.len()");
         // NPC hand
-        assert(progress.hand_a.card_fire != fire, 'hand_a.card_fire');
-        assert(progress.hand_a.card_dodge != dodge, 'hand_a.card_dodge');
-        assert(progress.hand_a.card_tactics == TacticsCard::ThickCoat, 'hand_a.card_tactics');
-        assert(progress.hand_a.card_blades != blades, 'hand_a.card_blades');
+        assert_ne!(progress.hand_a.card_fire, fire, "hand_a.card_fire");
+        assert_ne!(progress.hand_a.card_dodge, dodge, "hand_a.card_dodge");
+        assert_eq!(progress.hand_a.card_tactics, TacticsCard::ThickCoat, "hand_a.card_tactics");
+        assert_ne!(progress.hand_a.card_blades, blades, "hand_a.card_blades");
         // player hand
-        assert(progress.hand_b.card_fire == fire, 'hand_b.card_fire');
-        assert(progress.hand_b.card_dodge == dodge, 'hand_b.card_dodge');
-        assert(progress.hand_b.card_tactics == tactics, 'hand_b.card_tactics');
-        assert(progress.hand_b.card_blades == blades, 'hand_b.card_blades');
+        assert_eq!(progress.hand_b.card_fire, fire, "hand_b.card_fire");
+        assert_eq!(progress.hand_b.card_dodge, dodge, "hand_b.card_dodge");
+        assert_eq!(progress.hand_b.card_tactics, tactics, "hand_b.card_tactics");
+        assert_eq!(progress.hand_b.card_blades, blades, "hand_b.card_blades");
         (progress)
     }
 
@@ -337,16 +337,16 @@ mod tests {
         let progress_tut: DuelProgress = _test_tutorial_level_2(@sys, PacesCard::Paces10, PacesCard::Paces9, TacticsCard::ThickCoat, BladesCard::Behead);
         let progress_game: DuelProgress = _test_tutorial_level_2_game(@sys, PacesCard::Paces10, PacesCard::Paces9, TacticsCard::ThickCoat, BladesCard::Behead);
         // compare progress
-        assert(progress_tut.winner == progress_game.winner, 'winner');
-        assert(progress_tut.steps.len() == progress_game.steps.len(), 'steps.len()');
-        assert(progress_tut.hand_a.card_fire == progress_game.hand_a.card_fire, 'hand_a.card_fire');
-        assert(progress_tut.hand_a.card_dodge == progress_game.hand_a.card_dodge, 'hand_a.card_dodge');
-        assert(progress_tut.hand_a.card_tactics == progress_game.hand_a.card_tactics, 'hand_a.card_tactics');
-        assert(progress_tut.hand_a.card_blades == progress_game.hand_a.card_blades, 'hand_a.card_blades');
-        assert(progress_tut.hand_b.card_fire == progress_game.hand_b.card_fire, 'hand_b.card_fire');
-        assert(progress_tut.hand_b.card_dodge == progress_game.hand_b.card_dodge, 'hand_b.card_dodge');
-        assert(progress_tut.hand_b.card_tactics == progress_game.hand_b.card_tactics, 'hand_b.card_tactics');
-        assert(progress_tut.hand_b.card_blades == progress_game.hand_b.card_blades, 'hand_b.card_blades');
+        assert_eq!(progress_tut.winner, progress_game.winner, "winner");
+        assert_eq!(progress_tut.steps.len(), progress_game.steps.len(), "steps.len()");
+        assert_eq!(progress_tut.hand_a.card_fire, progress_game.hand_a.card_fire, "hand_a.card_fire");
+        assert_eq!(progress_tut.hand_a.card_dodge, progress_game.hand_a.card_dodge, "hand_a.card_dodge");
+        assert_eq!(progress_tut.hand_a.card_tactics, progress_game.hand_a.card_tactics, "hand_a.card_tactics");
+        assert_eq!(progress_tut.hand_a.card_blades, progress_game.hand_a.card_blades, "hand_a.card_blades");
+        assert_eq!(progress_tut.hand_b.card_fire, progress_game.hand_b.card_fire, "hand_b.card_fire");
+        assert_eq!(progress_tut.hand_b.card_dodge, progress_game.hand_b.card_dodge, "hand_b.card_dodge");
+        assert_eq!(progress_tut.hand_b.card_tactics, progress_game.hand_b.card_tactics, "hand_b.card_tactics");
+        assert_eq!(progress_tut.hand_b.card_blades, progress_game.hand_b.card_blades, "hand_b.card_blades");
     }
 
 

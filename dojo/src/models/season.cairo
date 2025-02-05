@@ -113,3 +113,29 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
         )
     }
 }
+
+impl SeasonPhaseIntoByteArray of core::traits::Into<SeasonPhase, ByteArray> {
+    fn into(self: SeasonPhase) -> ByteArray {
+        match self {
+            SeasonPhase::None =>    "Undefined",
+            SeasonPhase::Single =>  "Single",
+            SeasonPhase::Ended =>   "Ended",
+        }
+    }
+}
+
+// for println! and format! 
+// pub impl SeasonPhaseDisplay of core::fmt::Display<SeasonPhase> {
+//     fn fmt(self: @SeasonPhase, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+//         let result: ByteArray = (*self).into();
+//         f.buffer.append(@result);
+//         Result::Ok(())
+//     }
+// }
+pub impl SeasonPhaseDebug of core::fmt::Debug<SeasonPhase> {
+    fn fmt(self: @SeasonPhase, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}

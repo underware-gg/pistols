@@ -106,3 +106,37 @@ pub impl PremiseImpl of PremiseTrait {
         (self.description().prefix.to_string())
     }
 }
+
+impl PremiseIntoByteArray of core::traits::Into<Premise, ByteArray> {
+    fn into(self: Premise) -> ByteArray {
+        match self {
+            Premise::Undefined   =>  "Undefined",
+            Premise::Matter      =>  "Matter",
+            Premise::Debt        =>  "Debt",
+            Premise::Dispute     =>  "Dispute",
+            Premise::Honour      =>  "Honour",
+            Premise::Hatred      =>  "Hatred",
+            Premise::Blood       =>  "Blood",
+            Premise::Nothing     =>  "Nothing",
+            Premise::Tournament  =>  "Tournament",
+            Premise::Tutorial    =>  "Tutorial",
+            Premise::Training    =>  "Training",
+        }
+    }
+}
+
+// for println! and format! 
+// pub impl PremiseDisplay of core::fmt::Display<Premise> {
+//     fn fmt(self: @Premise, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+//         let result: ByteArray = (*self).into();
+//         f.buffer.append(@result);
+//         Result::Ok(())
+//     }
+// }
+pub impl PremiseDebug of core::fmt::Debug<Premise> {
+    fn fmt(self: @Premise, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}

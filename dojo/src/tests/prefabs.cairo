@@ -77,8 +77,8 @@ pub mod prefabs {
         let duel_id: u128 = start_new_challenge(sys, duelist_a, duelist_b, table_id);
         let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
         let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
-        assert(challenge.state == ChallengeState::InProgress, 'challenge.state');
-        assert(round.state == RoundState::Commit, 'round.state');
+        assert_eq!(challenge.state, ChallengeState::InProgress, "challenge.state");
+        assert_eq!(round.state, RoundState::Commit, "round.state");
         (challenge, round, duel_id)
     }
 

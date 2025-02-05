@@ -18,7 +18,7 @@ pub trait ChallengeStateTrait {
     fn is_finished(self: ChallengeState) -> bool;
 }
 
-impl ChallengeStateImpl of ChallengeStateTrait {
+pub impl ChallengeStateImpl of ChallengeStateTrait {
     fn exists(self: ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
@@ -75,5 +75,21 @@ impl ChallengeStateIntoByteArray of core::traits::Into<ChallengeState, ByteArray
             ChallengeState::Resolved =>   "Resolved",
             ChallengeState::Draw =>       "Draw",
         }
+    }
+}
+
+// for println! and format! 
+// pub impl ChallengeStateDisplay of core::fmt::Display<ChallengeState> {
+//     fn fmt(self: @ChallengeState, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+//         let result: ByteArray = (*self).into();
+//         f.buffer.append(@result);
+//         Result::Ok(())
+//     }
+// }
+pub impl ChallengeStateDebug of core::fmt::Debug<ChallengeState> {
+    fn fmt(self: @ChallengeState, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
     }
 }

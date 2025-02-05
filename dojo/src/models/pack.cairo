@@ -131,3 +131,29 @@ pub impl PackTypeImpl of PackTypeTrait {
         (self.description().price)
     }
 }
+
+impl PackTypeIntoByteArray of core::traits::Into<PackType, ByteArray> {
+    fn into(self: PackType) -> ByteArray {
+        match self {
+            PackType::Unknown =>        "Unknown",
+            PackType::WelcomePack =>    "WelcomePack",
+            PackType::Duelists5x =>     "Duelists5x",
+        }
+    }
+}
+
+// for println! and format! 
+// pub impl PackTypeDisplay of core::fmt::Display<PackType> {
+//     fn fmt(self: @PackType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+//         let result: ByteArray = (*self).into();
+//         f.buffer.append(@result);
+//         Result::Ok(())
+//     }
+// }
+pub impl PackTypeDebug of core::fmt::Debug<PackType> {
+    fn fmt(self: @PackType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}

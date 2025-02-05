@@ -229,7 +229,6 @@ pub mod ENV_DICES {
 //--------------------
 // converters
 //
-use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortStringTrait};
 
 impl EnvCardIntoU8 of core::traits::Into<EnvCard, u8> {
@@ -267,12 +266,19 @@ impl U8IntoEnvCard of core::traits::Into<u8, EnvCard> {
 }
 
 // for println! and format!
-impl EnvCardDisplay of Display<EnvCard> {
-    fn fmt(self: @EnvCard, ref f: Formatter) -> Result<(), Error> {
+// impl EnvCardDisplay of core::fmt::Display<EnvCard> {
+//     fn fmt(self: @EnvCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+//         let result: ByteArray = (*self).get_points().name.to_string();
+//         f.buffer.append(@result);
+//         Result::Ok(())
+//     }
+// }
+impl EnvCardDebug of core::fmt::Debug<EnvCard> {
+    fn fmt(self: @EnvCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let name: ByteArray = (*self).get_points().name.to_string();
         let value: u8 = (*self).into();
-        let str: ByteArray = format!("({}:{})", value, name);
-        f.buffer.append(@str);
+        let result: ByteArray = format!("({}:{})", value, name);
+        f.buffer.append(@result);
         Result::Ok(())
     }
 }

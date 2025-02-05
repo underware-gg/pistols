@@ -1,4 +1,3 @@
-
 //------------------------------------------------------
 // libs::utils tests
 //
@@ -23,10 +22,10 @@ mod tests {
         let r2 = dice.throw('salt_1', 100);
         let r3 = dice.throw('salt_1', 100);
         let r32 = dice.throw('salt_2', 100);
-        assert(r1 != 0, 'rng_1_0');
-        assert(r1 != r2, 'rng_1_2');
-        assert(r2 != r3, 'rng_2_3');
-        assert(r3 != r32, 'rng_3_32');
+        assert_ne!(r1, 0, "rng_1_0");
+        assert_ne!(r1, r2, "rng_1_2");
+        assert_ne!(r2, r3, "rng_2_3");
+        assert_ne!(r3, r32, "rng_3_32");
     }
 
     #[test]
@@ -43,7 +42,7 @@ mod tests {
             }
             index += 1;
         };
-        assert(counter > 10 && counter < 40, 'dices_25');
+        assert!(counter > 10 && counter < 40, "dices_25");
         // higher limit
         let mut counter: u8 = 0;
         let mut index: usize = 0;
@@ -54,7 +53,7 @@ mod tests {
             }
             index += 1;
         };
-        assert(counter > 60 && counter < 90, 'dices_75');
+        assert!(counter > 60 && counter < 90, "dices_75");
     }
 
     #[test]
@@ -64,9 +63,9 @@ mod tests {
         let mut index: usize = 0;
         while (index < 20) {
             let (_, win) = dice.throw_decide('salt', 10, 0);
-            assert(win == false, 'bottom');
+            assert_eq!(win, false, "bottom");
             let (_, win) = dice.throw_decide('salt', 10, 10);
-            assert(win == true, 'bottom');
+            assert_eq!(win, true, "bottom");
             index += 1;
         };
     }
@@ -83,11 +82,9 @@ mod tests {
         let mut n: usize = 1;
         while (n <= size) {
             let value = shuffle.draw_next();
-// println!("shuffle {}:{}", n, s);
-// shuffle.seed.print();
-            assert(last_seed != shuffle.seed, 'shuffle_seed');
-            assert(last_card != shuffle.last_card, 'last_card');
-            assert(last_card != value, 'value');
+            assert_ne!(last_seed, shuffle.seed, "shuffle_seed");
+            assert_ne!(last_card, shuffle.last_card, "last_card");
+            assert_ne!(last_card, value, "value");
             last_seed = shuffle.seed;
             last_card = shuffle.last_card;
             n += 1;
@@ -109,10 +106,9 @@ mod tests {
         let d1 = dice.throw('dice_1', 100);
         let d2 = dice.throw('dice_2', 100);
         let d3 = dice.throw('dice_3', 100);
-        // println!("dices: {} {} {}", d1, d2, d3);
-        assert(d1 == 1, 'dice_1');
-        assert(d2 == 22, 'dice_2');
-        assert(d3 == 34, 'dice_3');
+        assert_eq!(d1, 1, "dice_1");
+        assert_eq!(d2, 22, "dice_2");
+        assert_eq!(d3, 34, "dice_3");
     }
 
     #[test]
@@ -126,10 +122,9 @@ mod tests {
         let s1 = shuffle.draw_next();
         let s2 = shuffle.draw_next();
         let s3 = shuffle.draw_next();
-        // println!("shuffle: {} {} {}", s1, s2, s3);
-        assert(s1 == 1, 'shuffle_1');
-        assert(s2 == 22, 'shuffle_2');
-        assert(s3 == 34, 'shuffle_3');
+        assert_eq!(s1, 1, "shuffle_1");
+        assert_eq!(s2, 22, "shuffle_2");
+        assert_eq!(s3, 34, "shuffle_3");
     }
 
     #[test]
@@ -144,10 +139,9 @@ mod tests {
         let d1 = dice.throw('dice_1', 100);
         let d2 = dice.throw('dice_2', 100);
         let d3 = dice.throw('dice_3', 100);
-        // println!("dices: {} {} {}", d1, d2, d3);
-        assert(d1 == 1, 'dice_1');
-        assert(d2 == 22, 'dice_2');
-        assert(d3 == 34, 'dice_3');
+        assert_eq!(d1, 1, "dice_1");
+        assert_eq!(d2, 22, "dice_2");
+        assert_eq!(d3, 34, "dice_3");
     }
 
     #[test]
@@ -160,9 +154,8 @@ mod tests {
         let s1 = shuffle.draw_next();
         let s2 = shuffle.draw_next();
         let s3 = shuffle.draw_next();
-        // println!("shuffle: {} {} {}", s1, s2, s3);
-        assert(s1 == 1, 'shuffle_1');
-        assert(s2 == 22, 'shuffle_2');
-        assert(s3 == 34, 'shuffle_3');
+        assert_eq!(s1, 1, "shuffle_1");
+        assert_eq!(s2, 22, "shuffle_2");
+        assert_eq!(s3, 34, "shuffle_3");
     }
 }

@@ -114,12 +114,12 @@ pub mod tester {
     }
 
     #[inline(always)]
-    pub fn _assert_is_alive(state: DuelistState, msg: felt252) {
-        assert(state.health > 0, msg);
+    pub fn _assert_is_alive(state: DuelistState, msg: ByteArray) {
+        assert_gt!(state.health, 0, "{}", msg);
     }
     #[inline(always)]
-    pub fn _assert_is_dead(state: DuelistState, msg: felt252) {
-        assert(state.health == 0, msg);
+    pub fn _assert_is_dead(state: DuelistState, msg: ByteArray) {
+        assert_eq!(state.health, 0, "{}", msg);
     }
 
 
@@ -677,7 +677,7 @@ pub mod tester {
     // Asserts
     //
 
-    pub fn assert_balance_token(sys: @TestSystems, duelist_id: u128, balance_before: u128, subtract: u128, add: u128, prefix: felt252) -> u128 {
+    pub fn assert_balance_token(sys: @TestSystems, duelist_id: u128, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
         let address: ContractAddress = TokenBoundAddressTrait::address((*sys.duelists).contract_address, duelist_id);
         (assert_balance(
             ILordsMockDispatcher{ contract_address: (*sys.fame).contract_address },
@@ -685,16 +685,16 @@ pub mod tester {
         ))
     }
 
-    pub fn assert_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: felt252) -> u128 {
+    pub fn assert_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = lords.balance_of(address).low;
         if (subtract > add) {
-            assert(balance < balance_before, ShortString::concat(prefix, ' <'));
+            assert_lt!(balance, balance_before, "{}_<", prefix);
         } else if (add > subtract) {
-            assert(balance > balance_before, ShortString::concat(prefix, ' >'));
+            assert_gt!(balance, balance_before, "{}_>", prefix);
         } else {
-            assert(balance == balance_before, ShortString::concat(prefix, ' =='));
+            assert_eq!(balance, balance_before, "{}_==", prefix);
         }
-        assert(balance == balance_before - subtract + add, ShortString::concat(prefix, ' =>'));
+        assert_eq!(balance, balance_before - subtract + add, "{}_=>", prefix);
         (balance)
     }
 
@@ -703,17 +703,17 @@ pub mod tester {
         duelist_a: ContractAddress, duelist_b: ContractAddress,
         balance_a: u128, balance_b: u128,
         fee: u128, prize_value: u128,
-        prefix: felt252,
+        prefix: ByteArray,
     ) {
         if (winner == 1) {
-            assert_balance(lords, duelist_a, balance_a, fee, prize_value, ShortString::concat('A_A_', prefix));
-            assert_balance(lords, duelist_b, balance_b, fee + prize_value, 0, ShortString::concat('A_B_', prefix));
+            assert_balance(lords, duelist_a, balance_a, fee, prize_value, format!("A_A_{}", prefix));
+            assert_balance(lords, duelist_b, balance_b, fee + prize_value, 0, format!("A_B_{}", prefix));
         } else if (winner == 2) {
-            assert_balance(lords, duelist_a, balance_a, fee + prize_value, 0, ShortString::concat('B_A_', prefix));
-            assert_balance(lords, duelist_b, balance_b, fee, prize_value, ShortString::concat('B_B_', prefix));
+            assert_balance(lords, duelist_a, balance_a, fee + prize_value, 0, format!("B_A_{}", prefix));
+            assert_balance(lords, duelist_b, balance_b, fee, prize_value, format!("B_B_{}", prefix));
         } else {
-            assert_balance(lords, duelist_a, balance_a, fee, 0, ShortString::concat('D_A_', prefix));
-            assert_balance(lords, duelist_b, balance_b, fee, 0, ShortString::concat('D_B_', prefix));
+            assert_balance(lords, duelist_a, balance_a, fee, 0, format!("D_A_{}", prefix));
+            assert_balance(lords, duelist_b, balance_b, fee, 0, format!("D_B_{}", prefix));
         }
     }
 

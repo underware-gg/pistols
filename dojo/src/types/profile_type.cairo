@@ -432,6 +432,47 @@ impl BotProfileIntoDescription of core::traits::Into<BotProfile, ProfileDescript
     }
 }
 
+impl ProfileTypeIntoByteArray of core::traits::Into<ProfileType, ByteArray> {
+    fn into(self: ProfileType) -> ByteArray {
+        match self {
+            ProfileType::Undefined =>       "Undefined",
+            ProfileType::Duelist(_) =>      "Duelist",
+            ProfileType::Character(_) =>    "Character",
+            ProfileType::Bot(_) =>          "Bot",
+        }
+    }
+}
+
+// for println! and format! 
+pub impl ProfileTypeDebug of core::fmt::Debug<ProfileType> {
+    fn fmt(self: @ProfileType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
+pub impl DuelistProfileDebug of core::fmt::Debug<DuelistProfile> {
+    fn fmt(self: @DuelistProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = ProfileType::Duelist(*self).name();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
+pub impl CharacterProfileDebug of core::fmt::Debug<CharacterProfile> {
+    fn fmt(self: @CharacterProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = ProfileType::Character(*self).name();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
+pub impl BotProfileDebug of core::fmt::Debug<BotProfile> {
+    fn fmt(self: @BotProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = ProfileType::Bot(*self).name();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
+
 
 //----------------------------------------
 // Profile id converters
@@ -540,35 +581,35 @@ mod tests {
     #[test]
     fn test_get_all_profiles_by_type() {
         let profiles: Span<ProfileType> = ProfileManagerTrait::get_all_profiles_by_type(ProfileType::Undefined);
-        assert(profiles.len() == 0, '0');
+        assert_eq!(profiles.len(), 0, "0");
         let profiles: Span<ProfileType> = ProfileManagerTrait::get_all_profiles_by_type(ProfileType::Duelist(0_u8.into()));
-        assert(profiles.len() == PROFILES::DUELIST_PROFILE_COUNT.into(), 'DUELIST_PROFILE_COUNT');
+        assert_eq!(profiles.len(), PROFILES::DUELIST_PROFILE_COUNT.into(), "DUELIST_PROFILE_COUNT");
         let profiles: Span<ProfileType> = ProfileManagerTrait::get_all_profiles_by_type(ProfileType::Character(0_u8.into()));
-        assert(profiles.len() == PROFILES::CHARACTER_PROFILE_COUNT.into(), 'CHARACTER_PROFILE_COUNT');
+        assert_eq!(profiles.len(), PROFILES::CHARACTER_PROFILE_COUNT.into(), "CHARACTER_PROFILE_COUNT");
         let profiles: Span<ProfileType> = ProfileManagerTrait::get_all_profiles_by_type(ProfileType::Bot(0_u8.into()));
-        assert(profiles.len() == PROFILES::BOT_PROFILE_COUNT.into(), 'BOT_PROFILE_COUNT');
+        assert_eq!(profiles.len(), PROFILES::BOT_PROFILE_COUNT.into(), "BOT_PROFILE_COUNT");
     }
 
     #[test]
     fn test_get_all_descriptions_by_type() {
         let descriptions: Span<ProfileDescription> = ProfileManagerTrait::get_all_descriptions_by_type(ProfileType::Undefined);
-        assert(descriptions.len() == 0, '0');
+        assert_eq!(descriptions.len(), 0, "0");
         let descriptions: Span<ProfileDescription> = ProfileManagerTrait::get_all_descriptions_by_type(ProfileType::Duelist(0_u8.into()));
-        assert(descriptions.len() == PROFILES::DUELIST_PROFILE_COUNT.into(), 'DUELIST_PROFILE_COUNT');
+        assert_eq!(descriptions.len(), PROFILES::DUELIST_PROFILE_COUNT.into(), "DUELIST_PROFILE_COUNT");
         let descriptions: Span<ProfileDescription> = ProfileManagerTrait::get_all_descriptions_by_type(ProfileType::Character(0_u8.into()));
-        assert(descriptions.len() == PROFILES::CHARACTER_PROFILE_COUNT.into(), 'CHARACTER_PROFILE_COUNT');
+        assert_eq!(descriptions.len(), PROFILES::CHARACTER_PROFILE_COUNT.into(), "CHARACTER_PROFILE_COUNT");
         let descriptions: Span<ProfileDescription> = ProfileManagerTrait::get_all_descriptions_by_type(ProfileType::Bot(0_u8.into()));
-        assert(descriptions.len() == PROFILES::BOT_PROFILE_COUNT.into(), 'BOT_PROFILE_COUNT');
+        assert_eq!(descriptions.len(), PROFILES::BOT_PROFILE_COUNT.into(), "BOT_PROFILE_COUNT");
     }
 
     //
     // test profiles
     //
     fn _test_invalid_profile(profile: ProfileType) {
-        assert!(profile.exists() == false, "(0) ! exists");
+        assert_eq!(profile.exists(), false, "(0) ! exists");
         let desc: ProfileDescription = profile.description();
-        assert!(desc.profile_id == 0, "(0) bad profile_id: {}", desc.profile_id);
-        assert!(desc.name == 'Unknown', "(0) bad name: {}", desc.name);
+        assert_eq!(desc.profile_id, 0, "(0) bad profile_id: {}", desc.profile_id);
+        assert_eq!(desc.name, 'Unknown', "(0) bad name: {}", desc.name);
     }
 
     #[test]
@@ -582,14 +623,13 @@ mod tests {
         let mut last_desc: ProfileDescription = Default::default();
         while (profile_id.into() <= descriptions.len()) {
             let profile: ProfileType = ProfileType::Duelist(profile_id.into());
-            assert!(profile.exists() == true, "({}) exists", profile_id);
-            assert!(profile.duelist_id() > 0x100000000, "({}) short duelist_id: {}", profile_id, profile.duelist_id());
-            assert!(profile != ProfileType::Duelist(DuelistProfile::Unknown), "Duelist({}) is Unknown", profile_id);
+            assert!(profile.exists(), "({}) exists", profile_id);
+            assert_gt!(profile.duelist_id(), 0x100000000, "({}) short duelist_id: {}", profile_id, profile.duelist_id());
+            assert_ne!(profile, ProfileType::Duelist(DuelistProfile::Unknown), "Duelist({}) is Unknown", profile_id);
             let desc: ProfileDescription = *descriptions.at((profile_id-1).into());
-            assert!(desc.profile_id == profile_id, "({}) bad profile_id: {}", profile_id, desc.profile_id);
-            assert!(desc.profile_id == last_desc.profile_id + 1, "({}) == ({}): profile_id {}", profile_id, profile_id-1, desc.profile_id);
-            assert!(desc.name != last_desc.name, "({}) == ({}): name {}", profile_id, profile_id-1, desc.name);
-// desc.name.print();
+            assert_eq!(desc.profile_id, profile_id, "({}) bad profile_id: {}", profile_id, desc.profile_id);
+            assert_eq!(desc.profile_id, last_desc.profile_id + 1, "({}) == ({}): profile_id {}", profile_id, profile_id-1, desc.profile_id);
+            assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", profile_id, profile_id-1, desc.name);
             last_desc = desc;
             profile_id += 1;
         };
@@ -606,14 +646,13 @@ mod tests {
         let mut last_desc: ProfileDescription = Default::default();
         while (profile_id.into() <= descriptions.len()) {
             let profile: ProfileType = ProfileType::Character(profile_id.into());
-            assert!(profile.exists() == true, "({}) exists", profile_id);
-            assert!(profile.duelist_id() > 0x100000000, "({}) short duelist_id: {}", profile_id, profile.duelist_id());
-            assert!(profile != ProfileType::Character(CharacterProfile::Unknown), "({}) is Unknown", profile_id);
+            assert!(profile.exists(), "({}) exists", profile_id);
+            assert_gt!(profile.duelist_id(), 0x100000000, "({}) short duelist_id: {}", profile_id, profile.duelist_id());
+            assert_ne!(profile, ProfileType::Character(CharacterProfile::Unknown), "({}) is Unknown", profile_id);
             let desc: ProfileDescription = *descriptions.at((profile_id-1).into());
-            assert!(desc.profile_id == profile_id, "({}) bad profile_id: {}", profile_id, desc.profile_id);
-            assert!(desc.profile_id == last_desc.profile_id + 1, "({}) == ({}): profile_id {}", profile_id, profile_id-1, desc.profile_id);
-            assert!(desc.name != last_desc.name, "({}) == ({}): name {}", profile_id, profile_id-1, desc.name);
-// desc.name.print();
+            assert_eq!(desc.profile_id, profile_id, "({}) bad profile_id: {}", profile_id, desc.profile_id);
+            assert_eq!(desc.profile_id, last_desc.profile_id + 1, "({}) == ({}): profile_id {}", profile_id, profile_id-1, desc.profile_id);
+            assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", profile_id, profile_id-1, desc.name);
             last_desc = desc;
             profile_id += 1;
         };
@@ -630,14 +669,13 @@ mod tests {
         let mut last_desc: ProfileDescription = Default::default();
         while (profile_id.into() <= descriptions.len()) {
             let profile: ProfileType = ProfileType::Bot(profile_id.into());
-            assert!(profile.exists() == true, "({}) exists", profile_id);
-            assert!(profile.duelist_id() > 0x100000000, "({}) short duelist_id: {}", profile_id, profile.duelist_id());
-            assert!(profile != ProfileType::Bot(BotProfile::Unknown), "({}) is Unknown", profile_id);
+            assert!(profile.exists(), "({}) exists", profile_id);
+            assert_gt!(profile.duelist_id(), 0x100000000, "({}) short duelist_id: {}", profile_id, profile.duelist_id());
+            assert_ne!(profile, ProfileType::Bot(BotProfile::Unknown), "({}) is Unknown", profile_id);
             let desc: ProfileDescription = *descriptions.at((profile_id-1).into());
-            assert!(desc.profile_id == profile_id, "({}) bad profile_id: {}", profile_id, desc.profile_id);
-            assert!(desc.profile_id == last_desc.profile_id + 1, "({}) == ({}): profile_id {}", profile_id, profile_id-1, desc.profile_id);
-            assert!(desc.name != last_desc.name, "({}) == ({}): name {}", profile_id, profile_id-1, desc.name);
-// desc.name.print();
+            assert_eq!(desc.profile_id, profile_id, "({}) bad profile_id: {}", profile_id, desc.profile_id);
+            assert_eq!(desc.profile_id, last_desc.profile_id + 1, "({}) == ({}): profile_id {}", profile_id, profile_id-1, desc.profile_id);
+            assert_ne!(desc.name, last_desc.name, "({}) == ({}): name {}", profile_id, profile_id-1, desc.name);
             last_desc = desc;
             profile_id += 1;
         };
@@ -649,11 +687,10 @@ mod tests {
         while (profile_id <= PROFILES::DUELIST_PROFILE_COUNT) {
             let profile: DuelistProfile = profile_id.into();
             let expected_id: u128 = (PROFILES::DUELIST_ID_BASE | profile_id.into());
-// expected_id.print();
-            assert!(expected_id > PROFILES::DUELIST_ID_BASE, "({}) low id: {}", profile_id, expected_id);
-            assert!(expected_id == profile.into(), "({}) bad id: {}", profile_id, expected_id);
-            assert!(expected_id == ProfileType::Duelist(profile).duelist_id(), "({}) bad type_id: {}", profile_id, expected_id);
-            assert!(expected_id.into() == profile, "({}) bad profile: {}", profile_id, expected_id);
+            assert_gt!(expected_id, PROFILES::DUELIST_ID_BASE, "({}) low id: {}", profile_id, expected_id);
+            assert_eq!(expected_id, profile.into(), "({}) bad id: {}", profile_id, expected_id);
+            assert_eq!(expected_id, ProfileType::Duelist(profile).duelist_id(), "({}) bad type_id: {}", profile_id, expected_id);
+            assert_eq!(expected_id.into(), profile, "({}) bad profile: {}", profile_id, expected_id);
             profile_id += 1;
         };
     }
@@ -664,11 +701,10 @@ mod tests {
         while (profile_id <= PROFILES::CHARACTER_PROFILE_COUNT) {
             let profile: CharacterProfile = profile_id.into();
             let expected_id: u128 = (PROFILES::CHARACTER_ID_BASE | profile_id.into());
-// expected_id.print();
-            assert!(expected_id > PROFILES::CHARACTER_ID_BASE, "({}) low id: {}", profile_id, expected_id);
-            assert!(expected_id == profile.into(), "({}) bad id: {}", profile_id, expected_id);
-            assert!(expected_id == ProfileType::Character(profile).duelist_id(), "({}) bad type_id: {}", profile_id, expected_id);
-            assert!(expected_id.into() == profile, "({}) bad profile: {}", profile_id, expected_id);
+            assert_gt!(expected_id, PROFILES::CHARACTER_ID_BASE, "({}) low id: {}", profile_id, expected_id);
+            assert_eq!(expected_id, profile.into(), "({}) bad id: {}", profile_id, expected_id);
+            assert_eq!(expected_id, ProfileType::Character(profile).duelist_id(), "({}) bad type_id: {}", profile_id, expected_id);
+            assert_eq!(expected_id.into(), profile, "({}) bad profile: {}", profile_id, expected_id);
             profile_id += 1;
         };
     }
@@ -679,11 +715,10 @@ mod tests {
         while (profile_id <= PROFILES::BOT_PROFILE_COUNT) {
             let profile: BotProfile = profile_id.into();
             let expected_id: u128 = (PROFILES::BOT_ID_BASE | profile_id.into());
-// expected_id.print();
-            assert!(expected_id > PROFILES::BOT_ID_BASE, "({}) low id: {}", profile_id, expected_id);
-            assert!(expected_id == profile.into(), "({}) bad id: {}", profile_id, expected_id);
-            assert!(expected_id == ProfileType::Bot(profile).duelist_id(), "({}) bad type_id: {}", profile_id, expected_id);
-            assert!(expected_id.into() == profile, "({}) bad profile: {}", profile_id, expected_id);
+            assert_gt!(expected_id, PROFILES::BOT_ID_BASE, "({}) low id: {}", profile_id, expected_id);
+            assert_eq!(expected_id, profile.into(), "({}) bad id: {}", profile_id, expected_id);
+            assert_eq!(expected_id, ProfileType::Bot(profile).duelist_id(), "({}) bad type_id: {}", profile_id, expected_id);
+            assert_eq!(expected_id.into(), profile, "({}) bad profile: {}", profile_id, expected_id);
             profile_id += 1;
         };
     }
@@ -691,26 +726,26 @@ mod tests {
     #[test]
     fn test_profile_duelist_ids_misc() {
         // duelist
-        assert(0_u128.into() == CharacterProfile::Unknown, 'Character 0');
-        assert(1_u128.into() == CharacterProfile::Unknown, 'Character 1');
-        assert(1000_u128.into() == CharacterProfile::Unknown, 'Character 1000');
-        assert(0x121212121231231231241212_u128.into() == CharacterProfile::Unknown, 'Character 1000');
-        assert(PROFILES::CHARACTER_ID_BASE.into() == CharacterProfile::Unknown, 'Character CHAR_ID');
-        assert(PROFILES::BOT_ID_BASE.into() == CharacterProfile::Unknown, 'Character BOT_ID');
-        assert((PROFILES::BOT_ID_BASE + 1).into() == CharacterProfile::Unknown, 'Character BOT_ID+1');
-        assert((PROFILES::CHARACTER_ID_BASE + 1).into() != CharacterProfile::Unknown, 'Character CHAR_ID+1');
-        assert((PROFILES::CHARACTER_ID_BASE + PROFILES::CHARACTER_PROFILE_COUNT.into()).into() != CharacterProfile::Unknown, 'Character CHAR_ID+COUNT');
-        assert((PROFILES::CHARACTER_ID_BASE + PROFILES::CHARACTER_PROFILE_COUNT.into() + 1).into() == CharacterProfile::Unknown, 'Character CHAR_ID+COUNT+1');
+        assert_eq!(0_u128.into(), CharacterProfile::Unknown, "Character 0");
+        assert_eq!(1_u128.into(), CharacterProfile::Unknown, "Character 1");
+        assert_eq!(1000_u128.into(), CharacterProfile::Unknown, "Character 1000");
+        assert_eq!(0x121212121231231231241212_u128.into(), CharacterProfile::Unknown, "Character 1000");
+        assert_eq!(PROFILES::CHARACTER_ID_BASE.into(), CharacterProfile::Unknown, "Character CHAR_ID");
+        assert_eq!(PROFILES::BOT_ID_BASE.into(), CharacterProfile::Unknown, "Character BOT_ID");
+        assert_eq!((PROFILES::BOT_ID_BASE + 1).into(), CharacterProfile::Unknown, "Character BOT_ID+1");
+        assert_ne!((PROFILES::CHARACTER_ID_BASE + 1).into(), CharacterProfile::Unknown, "Character CHAR_ID+1");
+        assert_ne!((PROFILES::CHARACTER_ID_BASE + PROFILES::CHARACTER_PROFILE_COUNT.into()).into(), CharacterProfile::Unknown, "Character CHAR_ID+COUNT");
+        assert_eq!((PROFILES::CHARACTER_ID_BASE + PROFILES::CHARACTER_PROFILE_COUNT.into() + 1).into(), CharacterProfile::Unknown, "Character CHAR_ID+COUNT+1");
         // bot
-        assert(0_u128.into() == BotProfile::Unknown, 'Bot 0');
-        assert(1_u128.into() == BotProfile::Unknown, 'Bot 1');
-        assert(1000_u128.into() == BotProfile::Unknown, 'Bot 1000');
-        assert(0x121212121231231231241212_u128.into() == BotProfile::Unknown, 'Bot 1000');
-        assert(PROFILES::BOT_ID_BASE.into() == BotProfile::Unknown, 'Bot BOT_ID');
-        assert(PROFILES::CHARACTER_ID_BASE.into() == BotProfile::Unknown, 'Bot CHAR_ID');
-        assert((PROFILES::CHARACTER_ID_BASE + 1).into() == BotProfile::Unknown, 'Bot CHAR_ID+1');
-        assert((PROFILES::BOT_ID_BASE + 1).into() != BotProfile::Unknown, 'Bot BOT_ID+1');
-        assert((PROFILES::BOT_ID_BASE + PROFILES::BOT_PROFILE_COUNT.into()).into() != BotProfile::Unknown, 'Bot BOT_ID+COUNT');
-        assert((PROFILES::BOT_ID_BASE + PROFILES::BOT_PROFILE_COUNT.into() + 1).into() == BotProfile::Unknown, 'Bot BOT_ID+COUNT+1');
+        assert_eq!(0_u128.into(), BotProfile::Unknown, "Bot 0");
+        assert_eq!(1_u128.into(), BotProfile::Unknown, "Bot 1");
+        assert_eq!(1000_u128.into(), BotProfile::Unknown, "Bot 1000");
+        assert_eq!(0x121212121231231231241212_u128.into(), BotProfile::Unknown, "Bot 1000");
+        assert_eq!(PROFILES::BOT_ID_BASE.into(), BotProfile::Unknown, "Bot BOT_ID");
+        assert_eq!(PROFILES::CHARACTER_ID_BASE.into(), BotProfile::Unknown, "Bot CHAR_ID");
+        assert_eq!((PROFILES::CHARACTER_ID_BASE + 1).into(), BotProfile::Unknown, "Bot CHAR_ID+1");
+        assert_ne!((PROFILES::BOT_ID_BASE + 1).into(), BotProfile::Unknown, "Bot BOT_ID+1");
+        assert_ne!((PROFILES::BOT_ID_BASE + PROFILES::BOT_PROFILE_COUNT.into()).into(), BotProfile::Unknown, "Bot BOT_ID+COUNT");
+        assert_eq!((PROFILES::BOT_ID_BASE + PROFILES::BOT_PROFILE_COUNT.into() + 1).into(), BotProfile::Unknown, "Bot BOT_ID+COUNT+1");
     }
 }

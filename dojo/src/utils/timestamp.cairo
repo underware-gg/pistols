@@ -42,13 +42,13 @@ mod tests {
 
     #[test]
     fn test_timestamp() {
-        assert(TimestampTrait::from_minutes(1) == TIMESTAMP::ONE_MINUTE, 'ONE_MINUTE');
-        assert(TimestampTrait::from_hours(1) == TIMESTAMP::ONE_HOUR, 'ONE_HOUR');
-        assert(TimestampTrait::from_days(1) == TIMESTAMP::ONE_DAY, 'ONE_DAY');
-        assert(TimestampTrait::from_days(7) == TIMESTAMP::ONE_WEEK, 'ONE_WEEK');
-        assert(TimestampTrait::from_days(14) == TIMESTAMP::TWO_WEEKS, 'TWO_WEEKS');
-        assert(TimestampTrait::from_days(21) == TIMESTAMP::THREE_WEEKS, 'THREE_WEEKS');
-        assert(TimestampTrait::from_days(28) == TIMESTAMP::FOUR_WEEKS, 'FOUR_WEEKS');
-        assert(TimestampTrait::from_datetime(1, 1, 1) == TIMESTAMP::ONE_DAY + TIMESTAMP::ONE_HOUR + TIMESTAMP::ONE_MINUTE, 'from_datetime');
+        assert_eq!(TimestampTrait::from_minutes(1), TIMESTAMP::ONE_MINUTE, "ONE_MINUTE");
+        assert_eq!(TimestampTrait::from_hours(1), TIMESTAMP::ONE_HOUR, "ONE_HOUR");
+        assert_eq!(TimestampTrait::from_days(1), TIMESTAMP::ONE_DAY, "ONE_DAY");
+        assert_eq!(TimestampTrait::from_days(7), TIMESTAMP::ONE_WEEK, "ONE_WEEK");
+        assert_eq!(TimestampTrait::from_days(14), TIMESTAMP::TWO_WEEKS, "TWO_WEEKS");
+        assert_eq!(TimestampTrait::from_days(21), TIMESTAMP::THREE_WEEKS, "THREE_WEEKS");
+        assert_eq!(TimestampTrait::from_days(28), TIMESTAMP::FOUR_WEEKS, "FOUR_WEEKS");
+        assert_eq!(TimestampTrait::from_datetime(1, 1, 1), TIMESTAMP::ONE_DAY + TIMESTAMP::ONE_HOUR + TIMESTAMP::ONE_MINUTE, "from_datetime");
     }
 }

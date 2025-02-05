@@ -113,12 +113,12 @@ mod tests {
 
     #[test]
     fn test_factorial() {
-        assert(_fact(0) == 0, 'fact_0');
-        assert(_fact(1) == 1, 'fact_1');
-        assert(_fact(2) == 3, 'fact_2');
-        assert(_fact(3) == 6, 'fact_3');
-        assert(_fact(4) == 10, 'fact_4');
-        assert(_fact(5) == 15, 'fact_5');
+        assert_eq!(_fact(0), 0, "fact_0");
+        assert_eq!(_fact(1), 1, "fact_1");
+        assert_eq!(_fact(2), 3, "fact_2");
+        assert_eq!(_fact(3), 6, "fact_3");
+        assert_eq!(_fact(4), 10, "fact_4");
+        assert_eq!(_fact(5), 15, "fact_5");
     }
     
     fn _test_shuffler(size: u8) {
@@ -129,14 +129,14 @@ mod tests {
         while (n <= size) {
             seed = core::pedersen::pedersen(seed.low.into(), seed.high.into()).into();
             let id: u8 = shuffler.get_next((seed & 0xff).try_into().unwrap());
-            assert(id >= 1, 'id >= 1');
-            assert(id <= size, 'id <= size');
+            assert_ge!(id, 1, "id >= 1");
+            assert_le!(id, size, "id <= size");
             sum += id.into();
             n += 1;
         };
         let not_id: u8 = shuffler.get_next(99);
-        assert(not_id == 0, 'not_id');
-        assert(sum == _fact(size.into()), 'factorial');
+        assert_eq!(not_id, 0, "not_id");
+        assert_eq!(sum, _fact(size.into()), "factorial");
     }
 
     #[test]

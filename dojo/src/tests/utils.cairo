@@ -1,4 +1,3 @@
-
 //
 // from Origami:
 // https://github.com/dojoengine/origami/blob/main/crates/token/src/tests/utils.cairo
@@ -19,12 +18,12 @@ pub fn pop_log<T, impl TDrop: Drop<T>, impl TEvent: starknet::Event<T>>(
 ) -> Option<T> {
     let (mut keys, mut data) = testing::pop_log_raw(address)?;
     let ret = starknet::Event::deserialize(ref keys, ref data);
-    assert(data.is_empty(), 'Event has extra data');
+    assert!(data.is_empty(), "Event has extra data");
     ret
 }
 
 pub fn assert_no_events_left(address: ContractAddress) {
-    assert(testing::pop_log_raw(address).is_none(), 'Events remaining on queue');
+    assert!(testing::pop_log_raw(address).is_none(), "Events remaining on queue");
 }
 
 pub fn drop_event(address: ContractAddress) {

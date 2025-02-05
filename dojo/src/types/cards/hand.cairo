@@ -65,6 +65,32 @@ pub impl FinalBlowImpl of FinalBlowTrait {
     }
 }
 
+impl FinalBlowIntoByteArray of core::traits::Into<FinalBlow, ByteArray> {
+    fn into(self: FinalBlow) -> ByteArray {
+        match self {
+            FinalBlow::Undefined => "Undefined",
+            FinalBlow::Paces(_) =>  "Paces",
+            FinalBlow::Blades(_) => "Blades",
+        }
+    }
+}
+
+// for println! and format! 
+// pub impl FinalBlowDisplay of core::fmt::Display<FinalBlow> {
+//     fn fmt(self: @FinalBlow, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+//         let result: ByteArray = (*self).into();
+//         f.buffer.append(@result);
+//         Result::Ok(())
+//     }
+// }
+pub impl FinalBlowDebug of core::fmt::Debug<FinalBlow> {
+    fn fmt(self: @FinalBlow, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
+
 
 
 //----------------------------------------
@@ -95,9 +121,9 @@ mod tests {
             card_tactics: TacticsCard::None,
             card_blades: BladesCard::None,
         };
-        assert(hand_1_2.draw_card(PacesCard::Paces1) == DuelistDrawnCard::Fire(PacesCard::Paces1), '1_2 > shoot');
-        assert(hand_1_2.draw_card(PacesCard::Paces2) == DuelistDrawnCard::Dodge(PacesCard::Paces2), '1_2 > dodge');
-        assert(hand_1_2.draw_card(PacesCard::Paces3) == DuelistDrawnCard::None, '1_2 > none');
-        assert(hand_2_2.draw_card(PacesCard::Paces2) == DuelistDrawnCard::Fire(PacesCard::Paces2), '2_2 > shoot');
+        assert_eq!(hand_1_2.draw_card(PacesCard::Paces1), DuelistDrawnCard::Fire(PacesCard::Paces1), "1_2 > shoot");
+        assert_eq!(hand_1_2.draw_card(PacesCard::Paces2), DuelistDrawnCard::Dodge(PacesCard::Paces2), "1_2 > dodge");
+        assert_eq!(hand_1_2.draw_card(PacesCard::Paces3), DuelistDrawnCard::None, "1_2 > none");
+        assert_eq!(hand_2_2.draw_card(PacesCard::Paces2), DuelistDrawnCard::Fire(PacesCard::Paces2), "2_2 > shoot");
     }
 }
