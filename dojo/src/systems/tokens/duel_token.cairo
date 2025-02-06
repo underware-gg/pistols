@@ -187,7 +187,6 @@ pub mod duel_token {
         self.token.initialize(
             minter_address,
             renderer_address,
-            payment: Default::default(),
         );
     }
 

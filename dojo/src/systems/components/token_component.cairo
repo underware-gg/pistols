@@ -1,5 +1,4 @@
 use starknet::{ContractAddress};
-use pistols::models::payment::{Payment};
 
 #[starknet::interface]
 pub trait ITokenComponentPublic<TState> {
@@ -13,7 +12,6 @@ pub trait ITokenComponentInternal<TState> {
     fn initialize(ref self: TState,
         minter_address: ContractAddress,
         renderer_address: ContractAddress,
-        payment: Payment,
     );
     fn mint(ref self: TState, recipient: ContractAddress) -> u128;
     fn mint_multiple(ref self: TState, recipient: ContractAddress, amount: usize) -> Span<u128>;
@@ -38,7 +36,6 @@ pub mod TokenComponent {
     use pistols::libs::store::{
         Store, StoreTrait,
         TokenConfig, TokenConfigValue,
-        Payment,
     };
 
     #[storage]
@@ -114,7 +111,6 @@ pub mod TokenComponent {
         fn initialize(ref self: ComponentState<TContractState>,
             minter_address: ContractAddress,
             renderer_address: ContractAddress,
-            payment: Payment,
         ) {
             let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
@@ -125,7 +121,6 @@ pub mod TokenComponent {
                 minted_count: 0,
             };
             store.set_token_config(@token_config);
-            store.set_payment(@payment);
         }
 
         fn mint(ref self: ComponentState<TContractState>,

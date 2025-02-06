@@ -41,9 +41,6 @@ use pistols::models::{
     pact::{
         m_Pact,
     },
-    payment::{
-        m_Payment,
-    },
     config::{
         m_Config, Config,
         m_TokenConfig, TokenConfig,
@@ -146,7 +143,6 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Model(m_Duelist::TEST_CLASS_HASH),
             TestResource::Model(m_DuelistChallenge::TEST_CLASS_HASH),
             TestResource::Model(m_Pact::TEST_CLASS_HASH),
-            TestResource::Model(m_Payment::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
             TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),

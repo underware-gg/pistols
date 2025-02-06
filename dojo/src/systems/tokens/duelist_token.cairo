@@ -117,7 +117,6 @@ pub mod duelist_token {
             Archetype,
         },
         challenge::{ChallengeValue},
-        payment::{Payment},
         // table::{TABLES},
     };
     use pistols::types::{
@@ -156,7 +155,6 @@ pub mod duelist_token {
         self.token.initialize(
             world.pack_token_address(),
             renderer_address,
-            payment: Default::default(),
         );
     }
 
@@ -280,25 +278,6 @@ pub mod duelist_token {
             }
         }
 
-    }
-
-
-    //-----------------------------------
-    // Internal
-    //
-    #[generate_trait]
-    impl InternalImpl of InternalTrait {
-        fn get_payment(self: @ContractState,
-            recipient: ContractAddress,
-        ) -> Payment {
-            if (self.erc721.balance_of(recipient) == 0) {
-                (Default::default()) // first is free
-            } else {
-                let mut world = self.world_default();
-                let mut store: Store = StoreTrait::new(world);
-                (store.get_payment(starknet::get_contract_address().into()))
-            }
-        }
     }
 
 

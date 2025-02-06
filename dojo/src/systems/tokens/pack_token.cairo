@@ -116,7 +116,6 @@ pub mod pack_token {
     use pistols::models::{
         pack::{Pack, PackTrait, PackValue, PackType, PackTypeTrait},
         player::{Player, PlayerTrait, Activity},
-        payment::{Payment},
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
@@ -146,19 +145,9 @@ pub mod pack_token {
             TOKEN_SYMBOL(),
             format!("https://{}",base_uri.to_string()),
         );
-        let payment = Payment {
-            key: starknet::get_contract_address().into(),
-            amount: 0,
-            client_percent: 0,
-            ranking_percent: 0,
-            owner_percent: 0,
-            pool_percent: 0,
-            treasury_percent: 100,
-        };
         self.token.initialize(
             ZERO(),
             ZERO(),
-            payment,
         );
     }
 
@@ -189,7 +178,7 @@ pub mod pack_token {
         }
 
         fn calc_mint_fee(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> u128 {
-            (self.get_payment(recipient, pack_type).amount.low)
+            (pack_type.mint_fee().low)
         }
 
         fn claim_welcome_pack(ref self: ContractState) -> Span<u128> {
@@ -220,9 +209,9 @@ pub mod pack_token {
             assert(!self.can_claim_welcome_pack(recipient), Errors::CLAIM_FIRST);
 
             // transfer mint fee
-            let payment: Payment = self.get_payment(recipient, pack_type);
-            if (payment.amount != 0) {
-                store.world.bank_dispatcher().charge(recipient, payment);
+            let amount: u128 = self.calc_mint_fee(recipient, pack_type);
+            if (amount != 0) {
+                store.world.bank_dispatcher().charge(recipient, amount.into());
             }
 
             // create vrf seed
@@ -284,13 +273,6 @@ pub mod pack_token {
             store.set_pack(@pack);
 
             (pack)
-        }
-        
-        fn get_payment(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> Payment {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let mut payment: Payment = store.get_payment(starknet::get_contract_address().into());
-            payment.amount = pack_type.mint_fee();
-            (payment)
         }
     }
 

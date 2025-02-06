@@ -36,9 +36,6 @@ pub use pistols::models::{
     season::{
         SeasonConfig, SeasonConfigValue,
     },
-    payment::{
-        Payment, PaymentTrait, PaymentValue,
-    },
 };
 pub use pistols::systems::components::{
     token_bound::{
@@ -177,11 +174,6 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_payment(ref self: Store, key: felt252) -> Payment {
-        (self.world.read_model(key))
-    }
-
-    #[inline(always)]
     fn get_token_bound_address(ref self: Store, recipient: ContractAddress) -> TokenBoundAddress {
         (self.world.read_model(recipient))
     }
@@ -261,12 +253,6 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_config(ref self: Store, model: @Config) {
-        self.world.write_model(model);
-    }
-
-    #[inline(always)]
-    fn set_payment(ref self: Store, model: @Payment) {
-        (*model).assert_is_valid();
         self.world.write_model(model);
     }
 

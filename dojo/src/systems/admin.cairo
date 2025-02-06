@@ -78,8 +78,7 @@ pub mod admin {
                     world.dispatcher.is_writer(SELECTORS::CONFIG, account_address) &&
                     world.dispatcher.is_writer(SELECTORS::TABLE_CONFIG, account_address) &&
                     world.dispatcher.is_writer(SELECTORS::TOKEN_CONFIG, account_address) &&
-                    world.dispatcher.is_writer(SELECTORS::COIN_CONFIG, account_address) &&
-                    world.dispatcher.is_writer(SELECTORS::PAYMENT, account_address)
+                    world.dispatcher.is_writer(SELECTORS::COIN_CONFIG, account_address)
                 )
             )
         }
@@ -93,13 +92,11 @@ pub mod admin {
                 world.dispatcher.grant_writer(SELECTORS::TABLE_CONFIG, account_address);
                 world.dispatcher.grant_writer(SELECTORS::TOKEN_CONFIG, account_address);
                 world.dispatcher.grant_writer(SELECTORS::COIN_CONFIG, account_address);
-                world.dispatcher.grant_writer(SELECTORS::PAYMENT, account_address);
             } else {
                 world.dispatcher.revoke_writer(SELECTORS::CONFIG, account_address);
                 world.dispatcher.revoke_writer(SELECTORS::TABLE_CONFIG, account_address);
                 world.dispatcher.revoke_writer(SELECTORS::TOKEN_CONFIG, account_address);
                 world.dispatcher.revoke_writer(SELECTORS::COIN_CONFIG, account_address);
-                world.dispatcher.revoke_writer(SELECTORS::PAYMENT, account_address);
             }
         }
 
