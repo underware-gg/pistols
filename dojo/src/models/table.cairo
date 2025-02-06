@@ -80,14 +80,7 @@ impl TableTypeIntoByteArray of core::traits::Into<TableType, ByteArray> {
         }
     }
 }
-// for println! and format! 
-// pub impl TableTypeDisplay of core::fmt::Display<TableType> {
-//     fn fmt(self: @TableType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).into();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl TableTypeDebug of core::fmt::Debug<TableType> {
     fn fmt(self: @TableType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();

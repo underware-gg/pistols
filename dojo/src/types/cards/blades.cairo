@@ -160,11 +160,9 @@ pub impl BladesCardImpl of BladesCardTrait {
 // converters
 //
 use pistols::utils::short_string::{ShortStringTrait};
-
 impl BladesCardDefault of Default<BladesCard> {
     fn default() -> BladesCard {(BladesCard::None)}
 }
-
 impl BladesCardIntoU8 of core::traits::Into<BladesCard, u8> {
     fn into(self: BladesCard) -> u8 {
         match self {
@@ -185,15 +183,7 @@ impl U8IntoBladesCard of core::traits::Into<u8, BladesCard> {
         else                { BladesCard::None }
     }
 }
-
-// for println! and format!
-// impl BladesCardDisplay of core::fmt::Display<BladesCard> {
-//     fn fmt(self: @BladesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).get_points().name.to_string();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 impl BladesCardDebug of core::fmt::Debug<BladesCard> {
     fn fmt(self: @BladesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let name: ByteArray = (*self).get_points().name.to_string();

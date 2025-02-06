@@ -213,10 +213,3 @@ pub impl IntoU8Trophy of core::traits::Into<u8, Trophy> {
         }
     }
 }
-
-// pub impl TrophyPrint of core::debug::PrintTrait<Trophy> {
-//     #[inline]
-//     fn print(self: Trophy) {
-//         self.identifier().print();
-//     }
-// }

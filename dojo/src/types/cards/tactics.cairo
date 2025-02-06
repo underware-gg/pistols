@@ -119,12 +119,9 @@ pub impl TacticsCardImpl of TacticsCardTrait {
 // converters
 //
 use pistols::utils::short_string::{ShortStringTrait};
-
 impl TacticsCardDefault of Default<TacticsCard> {
     fn default() -> TacticsCard {(TacticsCard::None)}
 }
-
-
 impl TacticsCardIntoU8 of core::traits::Into<TacticsCard, u8> {
     fn into(self: TacticsCard) -> u8 {
         match self {
@@ -149,21 +146,7 @@ impl U8IntoTacticsCard of core::traits::Into<u8, TacticsCard> {
         else                { TacticsCard::None }
     }
 }
-
-// impl TacticsCardPrintImpl of core::debug::PrintTrait<TacticsCard> {
-//     fn print(self: TacticsCard) {
-//         self.get_points().name.print();
-//     }
-// }
-
-// for println! and format!
-// impl TacticsCardDisplay of core::fmt::Display<TacticsCard> {
-//     fn fmt(self: @TacticsCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).get_points().name.to_string();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 impl TacticsCardDebug of core::fmt::Debug<TacticsCard> {
     fn fmt(self: @TacticsCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let name: ByteArray = (*self).get_points().name.to_string();
