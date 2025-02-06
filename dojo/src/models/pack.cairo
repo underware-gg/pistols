@@ -64,7 +64,7 @@ mod PACK_TYPES {
         image_url_closed: '/tokens/Duelists5x.jpg',
         image_url_open: '/tokens/Duelists5x.jpg',
         can_purchase: true,
-        price: 100 * CONST::ETH_TO_WEI,
+        price: 50 * CONST::ETH_TO_WEI,
     };
 }
 

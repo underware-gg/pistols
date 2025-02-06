@@ -89,8 +89,8 @@ pub mod tester {
     //
 
     pub fn ZERO()      -> ContractAddress { starknet::contract_address_const::<0x0>() }
-    pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // welcome 1-5
-    pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x6>() } // welcome 6-10
+    pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // duelists 1-2
+    pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x3>() } // duelists 3-4
     pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x111>() }
     pub fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x222>() }
     pub fn SPENDER()   -> ContractAddress { starknet::contract_address_const::<0x333>() }

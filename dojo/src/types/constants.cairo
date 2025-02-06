@@ -1,7 +1,7 @@
 
 pub mod CONST {
     // packs
-    pub const WELCOME_PACK_DUELIST_COUNT: usize = 5;
+    pub const WELCOME_PACK_DUELIST_COUNT: usize = 2;
     
     // number of rounds per duel
     pub const ROUND_COUNT: u8 = 1;
@@ -33,6 +33,6 @@ pub mod CHANCES {
 }
 
 pub mod FAME {
-    pub const MINT_GRANT_AMOUNT: u256 = 1000 * super::CONST::ETH_TO_WEI;
-    pub const LIFE_AMOUNT: u256 = 100 * super::CONST::ETH_TO_WEI;
+    pub const MINT_GRANT_AMOUNT: u256 = 3000 * super::CONST::ETH_TO_WEI;
+    pub const LIFE_AMOUNT: u256 = 1000 * super::CONST::ETH_TO_WEI;
 }
