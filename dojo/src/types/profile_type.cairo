@@ -432,6 +432,11 @@ impl BotProfileIntoDescription of core::traits::Into<BotProfile, ProfileDescript
     }
 }
 
+
+
+//---------------------------
+// Converters
+//
 impl ProfileTypeIntoByteArray of core::traits::Into<ProfileType, ByteArray> {
     fn into(self: ProfileType) -> ByteArray {
         match self {
@@ -442,8 +447,7 @@ impl ProfileTypeIntoByteArray of core::traits::Into<ProfileType, ByteArray> {
         }
     }
 }
-
-// for println! and format! 
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl ProfileTypeDebug of core::fmt::Debug<ProfileType> {
     fn fmt(self: @ProfileType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();

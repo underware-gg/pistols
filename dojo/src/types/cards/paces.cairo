@@ -75,11 +75,9 @@ pub impl PacesCardImpl of PacesCardTrait {
 // converters
 //
 use pistols::utils::short_string::{ShortString};
-
 impl PacesCardDefault of Default<PacesCard> {
     fn default() -> PacesCard {(PacesCard::None)}
 }
-
 impl PacesCardIntoU8 of core::traits::Into<PacesCard, u8> {
     fn into(self: PacesCard) -> u8 {
         match self {
@@ -112,23 +110,7 @@ impl U8IntoPacesCard of core::traits::Into<u8, PacesCard> {
         else                { PacesCard::None }
     }
 }
-
-// impl PacesCardPrintImpl of core::debug::PrintTrait<PacesCard> {
-//     fn print(self: PacesCard) {
-//         let p: u8 = self.into();
-//         ShortString::concat('Paces::', ('0' + p.into())).print();
-//     }
-// }
-
-// for println! and format!
-// impl PacesCardDisplay of core::fmt::Display<PacesCard> {
-//     fn fmt(self: @PacesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let p: u8 = (*self).into();
-//         let result: ByteArray = format!("Paces::{}", p);
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 impl PacesCardDebug of core::fmt::Debug<PacesCard> {
     fn fmt(self: @PacesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let p: u8 = (*self).into();

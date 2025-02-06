@@ -75,25 +75,22 @@ pub impl SpecialsDrawnImpl of SpecialsDrawnTrait {
     }
 }
 
+
+
+//---------------------------
+// Converters
+//
 impl DuelistDrawnCardIntoByteArray of core::traits::Into<DuelistDrawnCard, ByteArray> {
     fn into(self: DuelistDrawnCard) -> ByteArray {
         match self {
-            DuelistDrawnCard::None =>       "None",
+            DuelistDrawnCard::None =>   "None",
             DuelistDrawnCard::Fire =>   "Fire",
             DuelistDrawnCard::Dodge =>  "Dodge",
-            DuelistDrawnCard::Blades =>    "Blades",
+            DuelistDrawnCard::Blades => "Blades",
         }
     }
 }
-
-// for println! and format! 
-// pub impl DuelistDrawnCardDisplay of core::fmt::Display<DuelistDrawnCard> {
-//     fn fmt(self: @DuelistDrawnCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).into();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl DuelistDrawnCardDebug of core::fmt::Debug<DuelistDrawnCard> {
     fn fmt(self: @DuelistDrawnCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();

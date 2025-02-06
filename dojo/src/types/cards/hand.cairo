@@ -74,15 +74,7 @@ impl FinalBlowIntoByteArray of core::traits::Into<FinalBlow, ByteArray> {
         }
     }
 }
-
-// for println! and format! 
-// pub impl FinalBlowDisplay of core::fmt::Display<FinalBlow> {
-//     fn fmt(self: @FinalBlow, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).into();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl FinalBlowDebug of core::fmt::Debug<FinalBlow> {
     fn fmt(self: @FinalBlow, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();

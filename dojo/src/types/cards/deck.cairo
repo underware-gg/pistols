@@ -72,6 +72,10 @@ pub impl DeckImpl of DeckTrait {
     }
 }
 
+
+//---------------------------
+// Converters
+//
 impl DeckTypeIntoByteArray of core::traits::Into<DeckType, ByteArray> {
     fn into(self: DeckType) -> ByteArray {
         match self {
@@ -81,15 +85,7 @@ impl DeckTypeIntoByteArray of core::traits::Into<DeckType, ByteArray> {
         }
     }
 }
-
-// for println! and format! 
-// pub impl DeckTypeDisplay of core::fmt::Display<DeckType> {
-//     fn fmt(self: @DeckType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).into();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl DeckTypeDebug of core::fmt::Debug<DeckType> {
     fn fmt(self: @DeckType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();
