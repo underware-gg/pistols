@@ -261,8 +261,8 @@ fn test_initializer() {
 fn test_token_component() {
     let mut sys: TestSystems = setup(0);
     // should not panic
-    sys.token.owner_of(TOKEN_ID_1_1);//.print();
-    sys.token.is_owner_of(OWNER(), TOKEN_ID_1_1.low);//.print();
+    sys.token.owner_of(TOKEN_ID_1_1);
+    sys.token.is_owner_of(OWNER(), TOKEN_ID_1_1.low);
 }
 
 #[test]

@@ -29,7 +29,7 @@ mod tests {
         assert_ne!(season.timestamp_start, 0, "timestamp_start != 0");
         assert_lt!(season.timestamp_start, timestamp, "timestamp_start");
         assert_gt!(season.timestamp_end, season.timestamp_start, "timestamp_end");
-        assert_eq!(season.phase, SeasonPhase::Single, "phase");
+        assert_eq!(season.phase, SeasonPhase::InProgress, "phase");
         //  table was created
         let table: TableConfig = tester::get_Table(sys.world, season.table_id);
         assert_eq!(table.table_type, TableType::Season, "table_type");
@@ -46,7 +46,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let season: SeasonConfig = tester::get_current_Season(sys.world);
         assert_eq!(season.season_id, 1, "season_id");
-        assert_eq!(season.phase, SeasonPhase::Single, "phase");
+        assert_eq!(season.phase, SeasonPhase::InProgress, "phase");
         //  time travel
         assert!(!season.can_collect(), "!season.can_collect");
         assert!(!sys.game.can_collect(), "!sys.game.can_collect");
@@ -63,7 +63,7 @@ mod tests {
         // get new season
         let new_season: SeasonConfig = tester::get_current_Season(sys.world);
         assert_eq!(new_season.table_id, new_table_id, "new_season.table_id");
-        assert_eq!(new_season.phase, SeasonPhase::Single, "new_season.phase");
+        assert_eq!(new_season.phase, SeasonPhase::InProgress, "new_season.phase");
         assert_eq!(new_season.season_id, 2, "new_season.season_id");
         assert!(!new_season.can_collect(), "!new_season.can_collect");
         assert!(!sys.game.can_collect(), "!sys.game.can_collect_NEW");

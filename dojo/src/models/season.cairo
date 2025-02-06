@@ -14,7 +14,7 @@ pub struct SeasonConfig {
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum SeasonPhase {
     Undefined,  // 0
-    Single,     // 1
+    InProgress, // 1
     Ended,      // 2
 }
 
@@ -46,7 +46,7 @@ pub impl SeasonManagerImpl of SeasonManagerTrait {
             season_id,
             timestamp_start,
             timestamp_end,
-            phase: SeasonPhase::Single,
+            phase: SeasonPhase::InProgress,
         });
         store.set_table_config(@TableConfig {
             table_id,
@@ -91,6 +91,10 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
     // info
     //
     #[inline(always)]
+    fn can_join(self: SeasonConfig) -> bool {
+        (self.phase == SeasonPhase::InProgress)
+    }
+    #[inline(always)]
     fn seconds_to_collect(self: SeasonConfig) -> u64 {
         (MathU64::sub(self.timestamp_end, starknet::get_block_timestamp()))
     }
@@ -112,7 +116,7 @@ impl SeasonPhaseIntoByteArray of core::traits::Into<SeasonPhase, ByteArray> {
     fn into(self: SeasonPhase) -> ByteArray {
         match self {
             SeasonPhase::Undefined =>   "Undefined",
-            SeasonPhase::Single =>      "Single",
+            SeasonPhase::InProgress =>   "InProgress",
             SeasonPhase::Ended =>       "Ended",
         }
     }
