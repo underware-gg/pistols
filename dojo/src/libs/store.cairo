@@ -19,7 +19,6 @@ pub use pistols::models::{
     },
     challenge::{
         Challenge, ChallengeValue,
-        ChallengeFameBalance, ChallengeFameBalanceValue,
         Round, RoundValue,
     },
     duelist::{
@@ -203,10 +202,6 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_challenge(ref self: Store, model: @Challenge) {
-        self.world.write_model(model);
-    }
-    #[inline(always)]
-    fn set_challenge_fame_bill(ref self: Store, model: @ChallengeFameBalance) {
         self.world.write_model(model);
     }
 

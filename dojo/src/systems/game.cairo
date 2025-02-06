@@ -70,7 +70,6 @@ pub mod game {
         player::{PlayerTrait, Activity, ActivityTrait},
         challenge::{
             Challenge, ChallengeTrait,
-            ChallengeFameBalance,
             Round, RoundValue,
             MovesTrait,
         },
@@ -311,14 +310,7 @@ pub mod game {
             self.finish_challenge(ref store, challenge, round);
 
             // transfer FAME reward
-            let (balance_a, balance_b): (i128, i128) = store.world.duelist_token_dispatcher().transfer_fame_reward(duel_id);
-            store.set_challenge_fame_bill(
-                @ChallengeFameBalance {
-                    duel_id,
-                    balance_a,
-                    balance_b,
-                }
-            );
+            let (_balance_a, _balance_b): (i128, i128) = store.world.duelist_token_dispatcher().transfer_fame_reward(duel_id);
 
             if (challenge.winner != 0) {
                 // send duel token to winner

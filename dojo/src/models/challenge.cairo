@@ -27,16 +27,6 @@ pub struct Challenge {
     pub timestamp_end: u64,         // seconds since epoch, ended
 }
 
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct ChallengeFameBalance {
-    #[key]
-    pub duel_id: u128,
-    //-------------------------
-    pub balance_a: i128,    // Challenger FAME balance change
-    pub balance_b: i128,    // Challenged FAME balance change
-}
-
 //
 // Each duel round
 #[derive(Copy, Drop, Serde)]

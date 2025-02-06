@@ -31,7 +31,6 @@ use pistols::models::{
     },
     challenge::{
         m_Challenge, Challenge,
-        m_ChallengeFameBalance,
         m_Round,
     },
     duelist::{
@@ -137,7 +136,6 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
             TestResource::Model(m_Player::TEST_CLASS_HASH),
             TestResource::Model(m_Pack::TEST_CLASS_HASH),
             TestResource::Model(m_Challenge::TEST_CLASS_HASH),
-            TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
             TestResource::Model(m_Config::TEST_CLASS_HASH),
             TestResource::Model(m_Duelist::TEST_CLASS_HASH),
