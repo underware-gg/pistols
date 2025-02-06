@@ -116,7 +116,7 @@ pub mod tutorial {
             let challenge = Challenge {
                 duel_id,
                 table_id: TABLES::TUTORIAL,
-                premise: Premise::Tutorial,
+                premise: Premise::Lesson,
                 quote: level.quote(),
                 // duelists
                 address_a: starknet::get_caller_address(),
