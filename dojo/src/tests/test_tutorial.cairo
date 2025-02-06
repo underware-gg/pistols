@@ -73,7 +73,7 @@ mod tests {
         assert_eq!(challenge.state, ChallengeState::InProgress, "challenge.state");
         assert!(challenge.is_tutorial(), "challenge.is_tutorial()");
         assert_eq!(challenge.table_id, TABLES::TUTORIAL, "challenge.table_id");
-        assert_eq!(challenge.premise, Premise::Tutorial, "challenge.premise");
+        assert_eq!(challenge.premise, Premise::Lesson, "challenge.premise");
         assert_eq!(challenge.address_a, OWNER(), "challenge.address_a");
         assert_eq!(challenge.address_b, OWNER(), "challenge.address_b");
         assert_eq!(challenge.duelist_id_a, profile.duelist_id(), "challenge.duelist_id_a");
