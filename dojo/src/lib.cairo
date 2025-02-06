@@ -19,6 +19,7 @@ mod systems {
         pub mod duelist_token;
         pub mod duel_token;
         pub mod fame_coin;
+        pub mod fools_coin;
         #[cfg(feature:'lords_mock')]
         pub mod lords_mock;
     }
