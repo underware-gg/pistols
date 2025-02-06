@@ -31,18 +31,16 @@ pub trait IFameCoin<TState> {
     
     // IFameCoinPublic
     fn minted_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);
-    fn updated_duelist(ref self: TState, from: ContractAddress, to: ContractAddress, duelist_id: u128);
 }
 
 #[starknet::interface]
 pub trait IFameCoinPublic<TState> {
     fn minted_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);
-    fn updated_duelist(ref self: TState, from: ContractAddress, to: ContractAddress, duelist_id: u128);
 }
 
 #[dojo::contract]
 pub mod fame_coin {
-    use core::num::traits::{Zero, Bounded};
+    use core::num::traits::{Bounded};
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
 
@@ -90,13 +88,11 @@ pub mod fame_coin {
     //-----------------------------------
 
     use pistols::interfaces::systems::{SystemsTrait};
-    use pistols::interfaces::ierc721::{ierc721, ERC721ABIDispatcherTrait};
     use pistols::utils::math::{MathU128, MathU256};
-    use pistols::utils::misc::{ZERO};
     use pistols::types::constants::{FAME};
 
     mod Errors {
-        pub const NOT_IMPLEMENTED: felt252          = 'FAME: Not implemented';
+        pub const NOT_IMPLEMENTED: felt252 = 'FAME: Not implemented';
     }
 
     //*******************************************
@@ -135,39 +131,18 @@ pub mod fame_coin {
             amount_paid: u256,
         ) {
             // validate minter
-            let duelist_contract_address: ContractAddress = self.coin.assert_caller_is_minter();
+            self.coin.assert_caller_is_minter();
 
             // register token_bound token
-            let token_address: ContractAddress = self.token_bound.register_token(duelist_contract_address, duelist_id);
+            let mut world = self.world_default();
+            let duelist_token_address: ContractAddress = world.duelist_token_address();
+            let token_address: ContractAddress = self.token_bound.register_token(duelist_token_address, duelist_id);
 
-            // pre-approve minter as spender
-            self.erc20._approve(token_address, duelist_contract_address, Bounded::MAX);
+            // pre-approve owner contract as spender
+            self.erc20._approve(token_address, duelist_token_address, Bounded::MAX);
 
             // mint FAME to token
-            let amount: u256 = MathU256::max(FAME::MIN_MINT_GRANT_AMOUNT, amount_paid * FAME::FAME_PER_LORDS);
-            self.coin.mint(token_address, amount);
-        }
-
-        fn updated_duelist(ref self: ContractState,
-            from: ContractAddress,
-            to: ContractAddress,
-            duelist_id: u128,
-        ) {
-            // validate caller
-            let duelist_contract_address: ContractAddress = self.coin.assert_caller_is_minter();
-
-            // mint is handled in minted_duelist()
-            if (from.is_zero()) {
-                return;
-            }
-
-            // duelist changed owner, transfer its FAME
-            if (from != to) {
-                let balance: u256 = self.balance_of_token(duelist_contract_address, duelist_id);
-                if (balance > 0) {
-                    self.erc20.update(from, to, balance);
-                }
-            }
+            self.coin.mint(token_address, FAME::MINT_GRANT_AMOUNT);
         }
     }
 
@@ -181,7 +156,7 @@ pub mod fame_coin {
             recipient: ContractAddress,
             amount: u256
         ) {
-            // validate caller
+            // only minter can transfer
             let mut contract_state = ERC20Component::HasComponent::get_contract_mut(ref self);
             contract_state.coin.assert_caller_is_minter();
         }
@@ -192,24 +167,6 @@ pub mod fame_coin {
             recipient: ContractAddress,
             amount: u256
         ) {
-            let mut contract_state = ERC20Component::HasComponent::get_contract_mut(ref self);
-            
-            let (from_contract_address, from_token_id): (ContractAddress, u128) = contract_state.token_bound.token_of_address(from);
-            let (to_contract_address, to_token_id): (ContractAddress, u128) = contract_state.token_bound.token_of_address(recipient);
-            
-            let from_owner: ContractAddress = 
-                if (from_contract_address.is_non_zero()) {
-                    ierc721(from_contract_address).owner_of(from_token_id.into())
-                } else {ZERO()};
-            let to_owner: ContractAddress = 
-                if (to_contract_address.is_non_zero()) {
-                    ierc721(to_contract_address).owner_of(to_token_id.into())
-                } else {ZERO()};
-
-            // transfer between tokens, repeat for owners
-            if ((from_owner.is_non_zero() || to_owner.is_non_zero()) && from_owner != to_owner) {
-                contract_state.erc20.update(from_owner, to_owner, amount);
-            }
         }
     }
 
