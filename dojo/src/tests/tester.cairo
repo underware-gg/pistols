@@ -22,6 +22,7 @@ pub mod tester {
             duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
             pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
             fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
+            fools_coin::{fools_coin, IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait},
             lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
         },
         components::{
@@ -148,6 +149,7 @@ pub mod tester {
         pub admin: IAdminDispatcher,
         pub lords: ILordsMockDispatcher,
         pub fame: IFameCoinDispatcher,
+        pub fools: IFoolsCoinDispatcher,
         pub duels: IDuelTokenDispatcher,
         pub duelists: IDuelistTokenDispatcher,
         pub pack: IPackTokenDispatcher,
@@ -165,13 +167,15 @@ pub mod tester {
         let mut approve: bool = (flags & FLAGS::APPROVE) != 0;
         let mut deploy_bank: bool = false;
         let mut deploy_fame: bool = false;
+        let mut deploy_fools: bool = false;
 
-        deploy_game = deploy_game || approve;
-        deploy_admin = deploy_admin || deploy_game;
-        deploy_lords = deploy_lords || deploy_game || deploy_duelist || approve;
-        deploy_duel = deploy_duel || deploy_game;
-        deploy_bank = deploy_bank || deploy_lords || deploy_duelist;
-        deploy_fame = deploy_fame || deploy_game || deploy_duelist;
+        deploy_game     = deploy_game || approve;
+        deploy_admin    = deploy_admin || deploy_game;
+        deploy_lords    = deploy_lords || deploy_game || deploy_duelist || approve;
+        deploy_duel     = deploy_duel || deploy_game;
+        deploy_bank     = deploy_bank || deploy_lords || deploy_duelist;
+        deploy_fame     = deploy_fame || deploy_game || deploy_duelist;
+        deploy_fools    = deploy_fools || deploy_game;
         deploy_rng_mock = deploy_rng_mock || deploy_tutorial;
         
 // '---- 0'.print();
@@ -316,6 +320,13 @@ pub mod tester {
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         }
+        if (deploy_fools) {
+            resources.append(TestResource::Contract(fools_coin::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"fools_coin")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            );
+        }
 
         if (deploy_rng_mock) {
             resources.append(TestResource::Contract(rng_mock::TEST_CLASS_HASH));
@@ -377,6 +388,7 @@ pub mod tester {
             admin: world.admin_dispatcher(),
             lords: world.lords_mock_dispatcher(),
             fame: world.fame_coin_dispatcher(),
+            fools: world.fools_coin_dispatcher(),
             duels: world.duel_token_dispatcher(),
             duelists: world.duelist_token_dispatcher(),
             pack: world.pack_token_dispatcher(),
