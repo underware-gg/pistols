@@ -1,4 +1,9 @@
-use starknet::{ContractAddress};
+
+// permanent tables
+pub mod TABLES {
+    pub const TUTORIAL: felt252 = 'Tutorial';   // player tutorials
+    pub const PRACTICE: felt252 = 'Practice';   // bot practice
+}
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum TableType {
@@ -20,11 +25,6 @@ pub struct TableConfig {
     pub table_type: TableType,
 }
 
-// fixed tables
-pub mod TABLES {
-    pub const TUTORIAL: felt252 = 'Tutorial';   // player tutorials
-    pub const PRACTICE: felt252 = 'Practice';   // bot practice
-}
 
 
 //---------------------------
@@ -35,6 +35,7 @@ use pistols::libs::store::{Store, StoreTrait};
 #[generate_trait]
 pub impl TableManagerImpl of TableManagerTrait {
     fn initialize(ref store: Store) {
+        // create permanent tables
         store.set_table_config(@TableConfig {
             table_id: TABLES::TUTORIAL,
             description: 'The Training Grounds',
@@ -48,6 +49,27 @@ pub impl TableManagerImpl of TableManagerTrait {
     }
 }
 
+
+//---------------------------
+// Traits
+//
+#[generate_trait]
+pub impl TableTypeImpl of TableTypeTrait {
+    #[inline(always)]
+    fn exists(self: @TableType) -> bool {
+        (*self != TableType::Undefined)
+    }
+    #[inline(always)]
+    fn is_season(self: @TableType) -> bool {
+        (*self == TableType::Season)
+    }
+}
+
+
+
+//---------------------------
+// Converters
+//
 impl TableTypeIntoByteArray of core::traits::Into<TableType, ByteArray> {
     fn into(self: TableType) -> ByteArray {
         match self {
@@ -58,7 +80,6 @@ impl TableTypeIntoByteArray of core::traits::Into<TableType, ByteArray> {
         }
     }
 }
-
 // for println! and format! 
 // pub impl TableTypeDisplay of core::fmt::Display<TableType> {
 //     fn fmt(self: @TableType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
@@ -72,23 +93,6 @@ pub impl TableTypeDebug of core::fmt::Debug<TableType> {
         let result: ByteArray = (*self).into();
         f.buffer.append(@result);
         Result::Ok(())
-    }
-}
-
-
-//---------------------------
-// TableConfig Traits
-//
-#[generate_trait]
-pub impl TableConfigImpl of TableConfigTrait {
-    fn exists(self: @TableConfig) -> bool {
-        (*self.table_type != TableType::Undefined)
-    }
-    fn can_join(self: @TableConfig, _zaccount_address: ContractAddress, _duelist_id: u128) -> bool {
-        (true)
-    }
-    fn calc_mint_fee(self: @TableConfig) -> u128 {
-        (0)
     }
 }
 

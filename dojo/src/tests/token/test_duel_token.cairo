@@ -281,10 +281,8 @@ fn test_initializer() {
 fn test_token_component() {
     let (mut _world, mut token) = setup(0);
     // should not panic
-    // token.contract_address.print();
-    token.owner_of(DUEL_ID_1);//.print();
-    token.calc_mint_fee(TABLES::PRACTICE);//.print();
-    token.is_owner_of(OWNER(), DUEL_ID_1.low);//.print();test_duel_token.cairo
+    token.owner_of(DUEL_ID_1);
+    token.is_owner_of(OWNER(), DUEL_ID_1.low);
 }
 
 #[test]

@@ -84,11 +84,6 @@ mod tests {
         let duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
 
         let table_id: felt252 = TABLES::PRACTICE;
-        // let lords_balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
-        // let lords_balance_a: u128 = sys.lords.balance_of(OWNER()).low;
-        // let lords_balance_b: u128 = sys.lords.balance_of(OTHER()).low;
-        let lords_fee: u128 = sys.duels.calc_mint_fee(table_id);
-        assert_eq!(lords_fee, 0, "lords_fee == 0");
 
         let _fame_reward_a: u128 = sys.duelists.calc_fame_reward(duelist_id_a);
         let _fame_reward_b: u128 = sys.duelists.calc_fame_reward(duelist_id_b);
@@ -199,13 +194,6 @@ mod tests {
         let duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
 
         let table_id: felt252 = TABLES::PRACTICE;
-        // let lords_balance_contract: u128 = sys.lords.balance_of(sys.game.contract_address).low;
-        // let lords_balance_treasury: u128 = sys.lords.balance_of(TREASURY()).low;
-        // let lords_balance_a: u128 = sys.lords.balance_of(OWNER()).low;
-        // let lords_balance_b: u128 = sys.lords.balance_of(OTHER()).low;
-        let lords_fee: u128 = sys.duels.calc_mint_fee(table_id);
-        assert_eq!(lords_fee, 0, "lords_fee == 0");
-        // assert(lords_balance_treasury == 0, 'lords_balance_treasury == 0');
 
         let (challenge, _round_1, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
         assert_eq!(tester::get_Challenge(sys.world, duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");

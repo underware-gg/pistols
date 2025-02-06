@@ -50,7 +50,6 @@ pub trait IDuelToken<TState> {
     // fn delete_duel(ref self: TState, duel_id: u128);
     fn transfer_to_winner(ref self: TState, duel_id: u128);
     // view calls
-    fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
     fn get_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128;
     fn has_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool;
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
@@ -59,7 +58,6 @@ pub trait IDuelToken<TState> {
 #[starknet::interface]
 pub trait IDuelTokenPublic<TState> {
     // view
-    fn calc_mint_fee(self: @TState, table_id: felt252) -> u128;
     fn get_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128;
     fn has_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool;
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
@@ -137,7 +135,8 @@ pub mod duel_token {
         challenge::{Challenge, ChallengeTrait, ChallengeValue, Round},
         duelist::{DuelistTrait, DuelistValue, ProfileTypeTrait},
         pact::{PactTrait},
-        table::{TableConfig, TableConfigTrait},
+        table::{TableConfig, TableTypeTrait},
+        season::{SeasonConfig, SeasonConfigTrait},
     };
     use pistols::types::premise::{Premise, PremiseTrait};
     use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
@@ -151,6 +150,8 @@ pub mod duel_token {
         pub const NOT_IMPLEMENTED: felt252          = 'DUEL: Not implemented';
         pub const INVALID_DUEL: felt252             = 'DUEL: Invalid duel';
         pub const NOT_YOUR_DUEL: felt252            = 'DUEL: Not your duel';
+        pub const INVALID_TABLE: felt252            = 'DUEL: Invalid table';
+        pub const INVALID_SEASON: felt252           = 'DUEL: Invalid season';
         pub const INVALID_CHALLENGED: felt252       = 'DUEL: Challenged unknown';
         pub const INVALID_CHALLENGED_NULL: felt252  = 'DUEL: Challenged null';
         pub const INVALID_CHALLENGED_SELF: felt252  = 'DUEL: Challenged self';
@@ -162,7 +163,6 @@ pub mod duel_token {
         pub const CHALLENGER_NOT_ADMITTED: felt252  = 'DUEL: Challenger not allowed';
         pub const CHALLENGED_NOT_ADMITTED: felt252  = 'DUEL: Challenged not allowed';
         pub const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
-        pub const TABLE_IS_CLOSED: felt252          = 'DUEL: Table is closed';
         pub const PACT_EXISTS: felt252              = 'DUEL: Pact exists';
         pub const DUELIST_IN_CHALLENGE: felt252     = 'DUEL: Duelist in a challenge';
     }
@@ -209,12 +209,6 @@ pub mod duel_token {
         //-----------------------------------
         // View calls
         //
-        fn calc_mint_fee(self: @ContractState, table_id: felt252) -> u128 {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let table: TableConfig = store.get_table_config(table_id);
-            (table.calc_mint_fee())
-        }
-        
         fn get_pact(self: @ContractState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
             (PactTrait::get_pact(ref store, table_id, address_a, address_b))
@@ -222,11 +216,15 @@ pub mod duel_token {
         fn has_pact(self: @ContractState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool {
             (self.get_pact(table_id, address_a, address_b) != 0)
         }
-
         fn can_join(self: @ContractState, table_id: felt252, duelist_id: u128) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let table: TableConfig = store.get_table_config(table_id);
-            (table.can_join(starknet::get_caller_address(), duelist_id))
+            if (table.table_type.is_season()) {
+                let season: SeasonConfig = store.get_season_config(table_id);
+                (season.can_join())
+            } else {
+                (table.table_type.exists())
+            }
         }
 
         //-----------------------------------
@@ -241,12 +239,6 @@ pub mod duel_token {
             expire_hours: u64,
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
-
-            // transfer mint fee
-            let fee_amount: u128 = self.calc_mint_fee(table_id);
-            if (fee_amount != 0) {
-                assert(false, Errors::NOT_IMPLEMENTED);
-            }
 
             // mint to game, so it can transfer to winner
             let duel_id: u128 = self.token.mint(store.world.game_address());
@@ -264,13 +256,23 @@ pub mod duel_token {
 
             // validate table
             let table: TableConfig = store.get_table_config(table_id);
-            assert(table.can_join(address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
+            if (table.table_type.is_season()) {
+                let season: SeasonConfig = store.get_season_config(table_id);
+                assert(season.can_join(), Errors::INVALID_SEASON);
+            } else {
+                assert(table.table_type.exists(), Errors::INVALID_TABLE);
+            }
 
             // validate challenged
-            assert(challenged_address.is_non_zero(), Errors::INVALID_CHALLENGED_NULL);
             let address_b: ContractAddress = challenged_address;
-            assert(challenged_address != address_a, Errors::INVALID_CHALLENGED_SELF);
-            assert(table.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
+            assert(address_b.is_non_zero(), Errors::INVALID_CHALLENGED_NULL);
+            assert(address_b != address_a, Errors::INVALID_CHALLENGED_SELF);
+
+            // TODO...
+            // if (tournament) {
+            //     assert(tournament.can_join(address_a, 0), Errors::CHALLENGED_NOT_ADMITTED);
+            //     assert(tournament.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
+            // }
 
             // calc expiration
             let timestamp_start: u64 = starknet::get_block_timestamp();
