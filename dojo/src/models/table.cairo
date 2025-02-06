@@ -11,6 +11,7 @@ pub enum TableType {
     Season,         // 1
     Tutorial,       // 2
     Practice,       // 3
+    Eternum,        // 4
 }
 
 // Temporarily renamed to TableConfig while this bug exists:
@@ -30,6 +31,7 @@ pub struct TableConfig {
 //---------------------------
 // Table Manager
 //
+use starknet::{ContractAddress};
 use pistols::libs::store::{Store, StoreTrait};
 
 #[generate_trait]
@@ -46,6 +48,11 @@ pub impl TableManagerImpl of TableManagerTrait {
             description: 'Bot Shooting Range',
             table_type: TableType::Practice,
         });
+        // store.set_table_config(@TableConfig {
+        //     table_id: 'EternumS1', // example
+        //     description: 'Eternum Season 1',
+        //     table_type: TableType::Eternum,
+        // });
     }
 }
 
@@ -63,6 +70,10 @@ pub impl TableTypeImpl of TableTypeTrait {
     fn is_season(self: @TableType) -> bool {
         (*self == TableType::Season)
     }
+    #[inline(always)]
+    fn can_join(self: @TableType, _account_address: ContractAddress, _duelist_id: u128) -> bool {
+        (true)
+    }
 }
 
 
@@ -77,6 +88,7 @@ impl TableTypeIntoByteArray of core::traits::Into<TableType, ByteArray> {
             TableType::Season      =>  "Season",
             TableType::Tutorial    =>  "Tutorial",
             TableType::Practice    =>  "Practice",
+            TableType::Eternum     =>  "Eternum",
         }
     }
 }
