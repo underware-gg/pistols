@@ -445,11 +445,6 @@ pub mod tester {
         (*system).set_table(table);
         _next_block();
     }
-    pub fn execute_admin_open_table(system: @IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
-        impersonate(sender);
-        (*system).open_table(table_id, enabled);
-        _next_block();
-    }
 
     // ::ierc20
     pub fn execute_lords_faucet(system: @ILordsMockDispatcher, sender: ContractAddress) {

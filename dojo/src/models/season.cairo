@@ -3,7 +3,7 @@
 #[dojo::model]
 pub struct SeasonConfig {
     #[key]
-    pub table_id: felt252,
+    pub table_id: felt252,      // short string
     //------
     pub season_id: u16,         // sequential
     pub timestamp_start: u64,   // start of season
@@ -13,11 +13,9 @@ pub struct SeasonConfig {
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum SeasonPhase {
-    None,       // 0
+    Undefined,  // 0
     Single,     // 1
-    // Grooming,   // 2
-    // Finals,     // 3
-    Ended,      // 4
+    Ended,      // 2
 }
 
 
@@ -30,7 +28,6 @@ use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::utils::timestamp::{TIMESTAMP};
 use pistols::utils::math::{MathU64};
-use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
 pub impl SeasonManagerImpl of SeasonManagerTrait {
@@ -55,9 +52,6 @@ pub impl SeasonManagerImpl of SeasonManagerTrait {
             table_id,
             description: 'Season '.concat(season_id.to_short_string()),
             table_type: TableType::Season,
-            fee_collector_address: ZERO(),
-            fee_min: 0,
-            is_open: true,
         });
         (table_id)
     }
@@ -117,9 +111,9 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
 impl SeasonPhaseIntoByteArray of core::traits::Into<SeasonPhase, ByteArray> {
     fn into(self: SeasonPhase) -> ByteArray {
         match self {
-            SeasonPhase::None =>    "Undefined",
-            SeasonPhase::Single =>  "Single",
-            SeasonPhase::Ended =>   "Ended",
+            SeasonPhase::Undefined =>   "Undefined",
+            SeasonPhase::Single =>      "Single",
+            SeasonPhase::Ended =>       "Ended",
         }
     }
 }

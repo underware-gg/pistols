@@ -14,7 +14,6 @@ pub trait IAdmin<TState> {
     fn set_treasury(ref self: TState, treasury_address: ContractAddress);
     fn set_paused(ref self: TState, paused: bool);
 
-    fn open_table(ref self: TState, table_id: felt252, is_open: bool);
     fn set_table(ref self: TState, table: TableConfig);
 }
 
@@ -26,7 +25,7 @@ pub mod admin {
 
     use pistols::models::{
         config::{Config, ConfigManagerTrait},
-        table::{TableConfig, TableConfigTrait, TableManagerTrait},
+        table::{TableConfig, TableManagerTrait},
         season::{SeasonManagerTrait},
     };
     use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
@@ -117,17 +116,6 @@ pub mod admin {
             self.assert_caller_is_admin();
             assert(table.table_id != 0, Errors::INVALID_TABLE);
             let mut store: Store = StoreTrait::new(self.world_default());
-            store.set_table_config(@table);
-        }
-
-        fn open_table(ref self: ContractState, table_id: felt252, is_open: bool) {
-            self.assert_caller_is_admin();
-            // check table
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let mut table: TableConfig = store.get_table_config(table_id);
-            assert(table.exists(), Errors::INVALID_TABLE);
-            // update
-            table.is_open = is_open;
             store.set_table_config(@table);
         }
     }
