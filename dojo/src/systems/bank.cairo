@@ -1,17 +1,16 @@
 use starknet::{ContractAddress};
-use pistols::models::payment::{Payment};
 
 #[starknet::interface]
 pub trait IBank<TState> {
     fn charge(ref self: TState,
         payer: ContractAddress,
-        payment: Payment,
+        amount: u256,
     );
 }
 
 #[dojo::contract]
 pub mod bank {
-    use core::num::traits::Zero;
+    // use core::num::traits::Zero;
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
     // use dojo::model::{ModelStorage, ModelValueStorage};
@@ -19,17 +18,12 @@ pub mod bank {
     use pistols::interfaces::ierc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use pistols::models::{
         config::{Config, ConfigTrait},
-        payment::{Payment},
     };
     use pistols::libs::store::{Store, StoreTrait};
 
     pub mod Errors {
         pub const INVALID_SHARES: felt252           = 'BANK: invalid shares';
         pub const INVALID_TREASURY: felt252         = 'BANK: invalid treasury';
-        pub const INVALID_CLIENT: felt252           = 'BANK: invalid client';
-        pub const INVALID_RANKING: felt252          = 'BANK: invalid ranking';
-        pub const INVALID_OWNER: felt252            = 'BANK: invalid owner';
-        pub const INVALID_POOL: felt252             = 'BANK: invalid pool';
         pub const INSUFFICIENT_ALLOWANCE: felt252   = 'BANK: insufficient allowance';
         pub const INSUFFICIENT_BALANCE: felt252     = 'BANK: insufficient balance';
     }
@@ -46,39 +40,18 @@ pub mod bank {
     impl BankImpl of super::IBank<ContractState> {
         fn charge(ref self: ContractState,
             payer: ContractAddress,
-            payment: Payment,
+            amount: u256,
         ) {
-            if (payment.amount == 0) { return; }
-
             let mut world = self.world_default();
             let mut store: Store = StoreTrait::new(world);
             let config: Config = store.get_config();
 
             // assert balance/allowance
             let lords: ERC20ABIDispatcher = config.lords_dispatcher();
-            self.assert_balance_allowance(lords, payer, payment.amount);
+            self.assert_balance_allowance(lords, payer, amount);
 
-            // make payments
-            let mut amount_due: u256 = payment.amount;
-            if (payment.client_percent > 0) {
-                // TODO: find client_address
-                assert(false, Errors::INVALID_CLIENT);
-            }
-            if (payment.ranking_percent > 0) {
-                // TODO: find ranking_address
-                assert(false, Errors::INVALID_RANKING);
-            }
-            if (payment.owner_percent > 0) {
-                // TODO: find owner_address
-                assert(false, Errors::INVALID_OWNER);
-            }
-            if (payment.pool_percent > 0) {
-                // TODO: implement prize pools
-                assert(false, Errors::INVALID_POOL);
-            }
-            // remaining to the treasury
-            assert(config.treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
-            lords.transfer_from(payer, config.treasury_address, amount_due);
+            // store here until FAME release
+            lords.transfer_from(payer, starknet::get_contract_address(), amount);
         }
     }
 

@@ -47,7 +47,6 @@ pub mod SELECTORS {
     pub const TABLE_CONFIG: felt252 = selector_from_tag!("pistols-TableConfig");
     pub const TOKEN_CONFIG: felt252 = selector_from_tag!("pistols-TokenConfig");
     pub const COIN_CONFIG: felt252 = selector_from_tag!("pistols-CoinConfig");
-    pub const PAYMENT: felt252 = selector_from_tag!("pistols-Payment");
 }
 
 #[generate_trait]

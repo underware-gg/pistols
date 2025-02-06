@@ -44,7 +44,6 @@ mod models {
     pub mod duelist;
     pub mod pack;
     pub mod pact;
-    pub mod payment;
     pub mod player;
     pub mod season;
     pub mod table;

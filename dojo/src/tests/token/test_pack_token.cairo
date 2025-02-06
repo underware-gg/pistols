@@ -11,7 +11,7 @@ use pistols::systems::{
         duelist_token::{duelist_token, IDuelistTokenDispatcher},
         pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
         fame_coin::{fame_coin},
-        lords_mock::{lords_mock, ILordsMockDispatcher},
+        lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
     },
     components::{
         token_bound::{m_TokenBoundAddress},
@@ -26,7 +26,6 @@ use pistols::models::{
     },
     duelist::{m_Duelist},
     pack::{m_Pack, Pack, PackType},
-    payment::{m_Payment},
     config::{
         m_Config, Config,
         m_TokenConfig, TokenConfig,
@@ -37,6 +36,7 @@ use pistols::models::{
 };
 
 use pistols::interfaces::systems::{SystemsTrait};
+use pistols::types::constants::{CONST};
 use pistols::tests::tester::{tester, tester::{OWNER, OTHER, SPENDER, TREASURY}};
 use pistols::tests::{utils};
 
@@ -115,7 +115,6 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Model(m_Player::TEST_CLASS_HASH),
             TestResource::Model(m_Pack::TEST_CLASS_HASH),
             TestResource::Model(m_Duelist::TEST_CLASS_HASH),
-            TestResource::Model(m_Payment::TEST_CLASS_HASH),
             TestResource::Model(m_Config::TEST_CLASS_HASH),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
@@ -209,12 +208,13 @@ fn _assert_duelist_count(world: WorldStorage, token: IDuelistTokenDispatcher, mi
     assert_eq!(token_config.minted_count, minted_count, "{}", msg);
 }
 
-fn _purchase(sys: TestSystems, recipient: ContractAddress) {
+fn _purchase(sys: TestSystems, recipient: ContractAddress) -> u128 {
     let price: u128 = sys.token.calc_mint_fee(recipient, PackType::Duelists5x);
-    assert_gt!(price, 0, "invalid price");
+    assert_ne!(price, 0, "invalid price");
     tester::impersonate(recipient);
     tester::execute_lords_approve(@sys.lords, recipient, sys.bank.contract_address, price);
     sys.token.purchase(PackType::Duelists5x);
+    (price)
 }
 
 //
@@ -266,7 +266,7 @@ fn test_token_uri_invalid() {
 //
 
 #[test]
-fn test_claim_mint() {
+fn test_claim_purchase() {
     let mut sys: TestSystems = setup(0);
     _assert_minted_count(sys.world, sys.token, 0, "total_supply init");
     assert_eq!(sys.token.balance_of(OWNER()), 0, "balance_of 0");
@@ -277,7 +277,7 @@ fn test_claim_mint() {
 
     sys.token.claim_welcome_pack();
     _assert_minted_count(sys.world, sys.token, 1, "total_supply 1");
-    _assert_duelist_count(sys.world, sys.duelists, 5, "duelist_supply 5");
+    _assert_duelist_count(sys.world, sys.duelists, CONST::WELCOME_PACK_DUELIST_COUNT.into(), "duelist_supply [WELCOME_PACK_DUELIST_COUNT]");
     assert_eq!(sys.token.balance_of(OWNER()), 0, "balance_of 0");
 
     let player: Player = tester::get_Player(sys.world, OWNER());
@@ -289,7 +289,13 @@ fn test_claim_mint() {
     assert_ne!(pack_1.seed, 0, "pack_1.seed");
     assert!(pack_1.is_open, "pack_1.is_open");
 
-    _purchase(sys, OWNER());
+    // balances before purchase
+    let balance_owner_initial: u128 = sys.lords.balance_of(OWNER()).low;
+    let balance_bank_initial: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
+    assert_ne!(balance_owner_initial, 0, "balance_owner_initial");
+    assert_eq!(balance_bank_initial, 0, "balance_bank_initial");
+
+    let price: u128 = _purchase(sys, OWNER());
     _assert_minted_count(sys.world, sys.token, 2, "total_supply 2");
     assert_eq!(sys.token.balance_of(OWNER()), 1, "balance_of 1");
     assert!(sys.token.owner_of(TOKEN_ID_2) == OWNER(), "owner_of_2");
@@ -299,6 +305,12 @@ fn test_claim_mint() {
     assert_eq!(pack_2.pack_type, PackType::Duelists5x, "pack_2.pack_type");
     assert_ne!(pack_2.seed, pack_1.seed, "pack_2.seed");
     assert!(!pack_2.is_open, "pack_2.is_open");
+
+    // balances after purchase
+    let balance_owner: u128 = sys.lords.balance_of(OWNER()).low;
+    let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
+    assert_eq!(balance_owner, balance_owner_initial - price, "balance_owner");
+    assert_eq!(balance_bank, balance_bank_initial + price, "balance_bank");
 
     tester::impersonate(OTHER());
     sys.token.claim_welcome_pack();
@@ -353,18 +365,22 @@ fn test_mint_not_for_sale() {
 #[test]
 fn test_open() {
     let mut sys: TestSystems = setup(0);
+
+    // claiming opens and mint duelists
     sys.token.claim_welcome_pack();
-    _assert_duelist_count(sys.world, sys.duelists, 5, "duelist_supply 5");
+    _assert_duelist_count(sys.world, sys.duelists, CONST::WELCOME_PACK_DUELIST_COUNT.into(), "duelist_supply");
     let pack_1: Pack = tester::get_Pack(sys.world, TOKEN_ID_1.low);
     assert!(pack_1.is_open, "pack_1.is_open == true");
 
+    // purchase, minted count does not change
     _purchase(sys, OWNER());
-    _assert_duelist_count(sys.world, sys.duelists, 5, "duelist_supply 5/");
+    _assert_duelist_count(sys.world, sys.duelists, CONST::WELCOME_PACK_DUELIST_COUNT.into(), "duelist_supply_after_purchase");
     let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
     assert!(!pack_2.is_open, "pack_2.is_open == false");
 
+    // open, minted count +5
     sys.token.open(TOKEN_ID_2.low);
-    _assert_duelist_count(sys.world, sys.duelists, 10, "duelist_supply 10");
+    _assert_duelist_count(sys.world, sys.duelists, CONST::WELCOME_PACK_DUELIST_COUNT.into() + 5, "duelist_supply_after_open");
     let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
     assert!(pack_2.is_open, "pack_2.is_open == false");
 }

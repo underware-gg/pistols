@@ -26,7 +26,6 @@ pub struct TokenConfig {
     pub minter_address: ContractAddress,
     pub renderer_address: ContractAddress,
     pub minted_count: u128,
-    // use the Payment model for pricing
 }
 
 #[derive(Copy, Drop, Serde)]
