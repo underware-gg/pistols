@@ -6,7 +6,7 @@ mod tests {
 
     use pistols::systems::admin::{IAdminDispatcherTrait};
     use pistols::models::config::{Config};
-    use pistols::models::table::{TableConfig, TABLES};
+    use pistols::models::table::{TableConfig, TableType, TABLES};
     use pistols::tests::tester::{tester, tester::{TestSystems, FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 
     const INVALID_TABLE: felt252 = 'TheBookIsOnTheTable';
@@ -124,58 +124,24 @@ mod tests {
     #[test]
     fn test_initialize_table_defaults() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::LORDS);
+        let table: TableConfig = tester::get_Table(sys.world, TABLES::TUTORIAL);
+        assert_eq!(table.table_type, TableType::Tutorial, "TUTORIAL_table_type");
         let table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
-        assert!(table.is_open, "LORDS_is_open");
-        let table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
-        assert!(table.is_open, "COMMONERS_is_open");
-    }
-
-    #[test]
-    fn test_initialize_table() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::LORDS);
-        let table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
-        assert_eq!(table.fee_min, 0, "fee_min");
-        // assert(table.fee_min >= 4 * CONST::ETH_TO_WEI.low, 'fee_min');
-        // assert(table.fee_pct == 10, 'fee_pct');
-        // assert(table.is_open == true, 'is_open');
+        assert_eq!(table.table_type, TableType::Practice, "PRACTICE_table_type");
     }
 
     #[test]
     fn test_set_table() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         let mut table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
-        assert!(table.is_open, "zero");
         table.description = 'LORDS+';
-        table.fee_min = 5;
-        table.is_open = true;
         tester::execute_admin_set_table(@sys.admin, OWNER(), table);
         let mut table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
         assert_eq!(table.description, 'LORDS+', "description_1");
-        assert_eq!(table.fee_min, 5, "fee_min_1");
-        // assert(table.fee_pct == 10, 'fee_pct_1');
-        assert!(table.is_open, "is_open_1");
         table.description = 'LORDS+++';
-        table.fee_min = 22;
-        table.is_open = false;
         tester::execute_admin_set_table(@sys.admin, OWNER(), table);
         let mut table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
         assert_eq!(table.description, 'LORDS+++', "description_2");
-        assert_eq!(table.fee_min, 22, "fee_min_2");
-        assert!(!table.is_open, "is_open_2");
-    }
-
-    #[test]
-    fn test_open_table() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        tester::execute_admin_open_table(@sys.admin, OWNER(), TABLES::PRACTICE, true);
-        let table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
-        assert!(table.is_open, "is_open_true");
-        tester::execute_admin_open_table(@sys.admin, OWNER(), TABLES::PRACTICE, false);
-        let table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
-        assert!(!table.is_open, "is_open_false");
-        tester::execute_admin_open_table(@sys.admin, OWNER(), TABLES::PRACTICE, true);
-        let table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
-        assert!(table.is_open, "is_open_true");
     }
 
     #[test]
@@ -187,32 +153,11 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
-    fn test_open_table_not_owner() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        tester::execute_admin_open_table(@sys.admin, OTHER(), TABLES::PRACTICE, true);
-    }
-
-    #[test]
     #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
     fn test_set_table_zero() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         let mut table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
         table.table_id = 0;
         tester::execute_admin_set_table(@sys.admin, OWNER(), table);
-    }
-
-    #[test]
-    #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
-    fn test_open_table_zero() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        tester::execute_admin_open_table(@sys.admin, OWNER(), 0_felt252, false);
-    }
-
-    #[test]
-    #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
-    fn test_open_table_invalid() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        tester::execute_admin_open_table(@sys.admin, OWNER(), INVALID_TABLE, false);
     }
 }

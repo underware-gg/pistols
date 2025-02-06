@@ -264,7 +264,6 @@ pub mod duel_token {
 
             // validate table
             let table: TableConfig = store.get_table_config(table_id);
-            assert(table.is_open == true, Errors::TABLE_IS_CLOSED);
             assert(table.can_join(address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
 
             // validate challenged

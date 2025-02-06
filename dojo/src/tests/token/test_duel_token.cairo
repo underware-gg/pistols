@@ -203,9 +203,6 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
         table_id: TABLES::TUTORIAL,
         description: 'The Training Grounds',
         table_type: TableType::Tutorial,
-        fee_collector_address: ZERO(),
-        fee_min: 0,
-        is_open: true,
     });
 
     tester::set_Config(ref world, Config {

@@ -14,13 +14,10 @@ pub enum TableType {
 #[dojo::model]
 pub struct TableConfig {
     #[key]
-    pub table_id: felt252,
+    pub table_id: felt252,      // short string
     //------
-    pub description: felt252,
+    pub description: felt252,   // short string
     pub table_type: TableType,
-    pub fee_collector_address: ContractAddress, // if 0x0: use default treasury
-    pub fee_min: u128,
-    pub is_open: bool,
 }
 
 // fixed tables
@@ -34,7 +31,6 @@ pub mod TABLES {
 // Table Manager
 //
 use pistols::libs::store::{Store, StoreTrait};
-use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
 pub impl TableManagerImpl of TableManagerTrait {
@@ -43,17 +39,11 @@ pub impl TableManagerImpl of TableManagerTrait {
             table_id: TABLES::TUTORIAL,
             description: 'The Training Grounds',
             table_type: TableType::Tutorial,
-            fee_collector_address: ZERO(),
-            fee_min: 0,
-            is_open: true,
         });
         store.set_table_config(@TableConfig {
             table_id: TABLES::PRACTICE,
             description: 'Bot Shooting Range',
             table_type: TableType::Practice,
-            fee_collector_address: ZERO(),
-            fee_min: 0,
-            is_open: true,
         });
     }
 }
@@ -95,7 +85,7 @@ pub impl TableConfigImpl of TableConfigTrait {
         (*self.table_type != TableType::Undefined)
     }
     fn can_join(self: @TableConfig, _zaccount_address: ContractAddress, _duelist_id: u128) -> bool {
-        (*self.is_open)
+        (true)
     }
     fn calc_mint_fee(self: @TableConfig) -> u128 {
         (0)
