@@ -40,7 +40,6 @@ pub mod tester {
         },
         challenge::{
             m_Challenge, Challenge, ChallengeValue,
-            m_ChallengeFameBalance, ChallengeFameBalanceValue,
             m_Round, RoundValue,
             DuelistState,
         },
@@ -184,7 +183,6 @@ pub mod tester {
             TestResource::Model(m_Player::TEST_CLASS_HASH),
             TestResource::Model(m_Pack::TEST_CLASS_HASH),
             TestResource::Model(m_Challenge::TEST_CLASS_HASH),
-            TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
             TestResource::Model(m_Config::TEST_CLASS_HASH),
             TestResource::Model(m_Duelist::TEST_CLASS_HASH),
@@ -639,10 +637,6 @@ pub mod tester {
     }
     #[inline(always)]
     pub fn get_ChallengeValue(world: WorldStorage, duel_id: u128) -> ChallengeValue {
-        (world.read_value(duel_id))
-    }
-    #[inline(always)]
-    pub fn get_ChallengeFameBalanceValue(world: WorldStorage, duel_id: u128) -> ChallengeFameBalanceValue {
         (world.read_value(duel_id))
     }
     #[inline(always)]
