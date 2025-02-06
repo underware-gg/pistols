@@ -423,15 +423,9 @@ fn test_fame() {
     // initial token balances
     let balance_1_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
     let balance_6_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_6.low);
-    assert_gt!(FAME::MIN_MINT_GRANT_AMOUNT, 0, "FAME::MIN_MINT_GRANT_AMOUNT > 0");
-    assert_eq!(balance_1_initial, FAME::MIN_MINT_GRANT_AMOUNT, "balance_1_initial");
-    assert_eq!(balance_6_initial, FAME::MIN_MINT_GRANT_AMOUNT, "balance_6_initial");
-
-    // owner balances must match
-    let mut balance_owner_initial: u256 = sys.fame.balance_of(OWNER());
-    let mut balance_other_initial: u256 = sys.fame.balance_of(OTHER());
-    assert_eq!(balance_owner_initial, balance_1_initial * CONST::WELCOME_PACK_DUELIST_COUNT.into(), "balance_owner_initial");
-    assert_eq!(balance_other_initial, balance_6_initial * CONST::WELCOME_PACK_DUELIST_COUNT.into(), "balance_other_initial");
+    assert_gt!(FAME::MINT_GRANT_AMOUNT, 0, "FAME::MINT_GRANT_AMOUNT > 0");
+    assert_eq!(balance_1_initial, FAME::MINT_GRANT_AMOUNT, "balance_1_initial");
+    assert_eq!(balance_6_initial, FAME::MINT_GRANT_AMOUNT, "balance_6_initial");
 
     // transfer duelist
     tester::impersonate(OWNER());
@@ -439,27 +433,13 @@ fn test_fame() {
     // check balances
     let balance_1: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
     let balance_6: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_6.low);
-    let balance_owner: u256 = sys.fame.balance_of(OWNER());
-    let balance_other: u256 = sys.fame.balance_of(OTHER());
-    let balance_recipient: u256 = sys.fame.balance_of(RECIPIENT());
     assert_eq!(balance_1, balance_1_initial, "balance_1 (1)");
     assert_eq!(balance_6, balance_6_initial, "balance_6 (1)");
-    assert_eq!(balance_owner, balance_owner_initial - balance_1, "balance_owner (1)");
-    assert_eq!(balance_other, balance_other_initial + balance_1, "balance_other (1)");
-    assert_eq!(balance_recipient, 0, "balance_recipient (1)");
-    let balance_owner_last = balance_owner;
-    let balance_other_last = balance_other;
 
     // transfer to new owner
     tester::impersonate(OTHER());
     sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_6);
-    let balance_owner: u256 = sys.fame.balance_of(OWNER());
-    let balance_other: u256 = sys.fame.balance_of(OTHER());
-    let balance_recipient: u256 = sys.fame.balance_of(RECIPIENT());
     assert_eq!(balance_6, balance_6_initial, "balance_6 (2)");
-    assert_eq!(balance_owner, balance_owner_last, "balance_owner (2)");
-    assert_eq!(balance_other, balance_other_last - balance_6, "balance_other (2)");
-    assert_eq!(balance_recipient, balance_6, "balance_recipient (2)");
 
     // transfer all
     tester::impersonate(OTHER());
@@ -468,12 +448,6 @@ fn test_fame() {
     sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_8);
     sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_9);
     sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_10);
-    let balance_owner: u256 = sys.fame.balance_of(OWNER());
-    let balance_other: u256 = sys.fame.balance_of(OTHER());
-    let balance_recipient: u256 = sys.fame.balance_of(RECIPIENT());
-    assert_eq!(balance_owner, balance_owner_initial, "balance_owner (3)");
-    assert_eq!(balance_other, 0, "balance_other (3)");
-    assert_eq!(balance_recipient, balance_other_initial, "balance_recipient (3)");
 }
 
 #[test]
@@ -482,7 +456,7 @@ fn test_fame_transfer_between_owners_not_allowed() {
     let mut sys: TestSystems = setup(0);
     // transfer FAME
     tester::impersonate(sys.token.contract_address);
-    sys.fame.transfer_from(OWNER(), OTHER(), FAME::MIN_MINT_GRANT_AMOUNT / 2);
+    sys.fame.transfer_from(OWNER(), OTHER(), FAME::MINT_GRANT_AMOUNT / 2);
 }
 
 #[test]
@@ -491,7 +465,7 @@ fn test_fame_transfer_from_owner_not_allowed() {
     let mut sys: TestSystems = setup(0);
     // transfer FAME
     tester::impersonate(OWNER());
-    sys.fame.transfer(OTHER(), FAME::MIN_MINT_GRANT_AMOUNT / 2);
+    sys.fame.transfer(OTHER(), FAME::MINT_GRANT_AMOUNT / 2);
 }
 
 #[test]
@@ -499,13 +473,6 @@ fn test_fame_transfer_from_owner_not_allowed() {
 fn test_fame_mint_not_minter() {
     let mut sys: TestSystems = setup(0);
     sys.fame.minted_duelist(TOKEN_ID_3.low, 0);
-}
-
-#[test]
-#[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
-fn test_fame_update_not_minter() {
-    let mut sys: TestSystems = setup(0);
-    sys.fame.updated_duelist(OWNER(), OTHER(), TOKEN_ID_1.low);
 }
 
 #[test]

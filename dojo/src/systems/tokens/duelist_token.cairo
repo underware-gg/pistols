@@ -72,7 +72,7 @@ pub mod duelist_token {
     use openzeppelin_introspection::src5::SRC5Component;
     use openzeppelin_token::erc721::{ERC721Component};
     use pistols::systems::components::token_component::{TokenComponent};
-    // use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
+    use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
     component!(path: TokenComponent, storage: token, event: TokenEvent);
@@ -192,7 +192,7 @@ pub mod duelist_token {
             let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
             let fame_balance: u256 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), duelist_id);
             let fame_reward: u256 = (fame_balance / 2);
-            (if (fame_reward >= FAME::MIN_REWARD_AMOUNT) {(fame_reward.low)} else {(fame_balance.low)})
+            (if (fame_reward >= FAME::LIFE_AMOUNT) {(fame_reward.low)} else {(fame_balance.low)})
         }
 
         fn mint_duelists(ref self: ContractState,
@@ -305,30 +305,26 @@ pub mod duelist_token {
     //-----------------------------------
     // ERC721HooksTrait
     //
-    use pistols::systems::components::erc721_hooks::{TokenRendererTrait};
-    pub impl ERC721HooksImpl of ERC721Component::ERC721HooksTrait<ContractState> {
-        fn before_update(ref self: ERC721Component::ComponentState<ContractState>,
-            to: ContractAddress,
-            token_id: u256,
-            auth: ContractAddress,
-        ) {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
-            let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
-            let owner: ContractAddress = self._owner_of(token_id);
-            fame_dispatcher.updated_duelist(owner, to, token_id.low);
-        }
+    // use pistols::systems::components::erc721_hooks::{TokenRendererTrait};
+    // pub impl ERC721HooksImpl of ERC721Component::ERC721HooksTrait<ContractState> {
+    //     fn before_update(ref self: ERC721Component::ComponentState<ContractState>,
+    //         to: ContractAddress,
+    //         token_id: u256,
+    //         auth: ContractAddress,
+    //     ) {
+    //     }
 
-        fn after_update(ref self: ERC721Component::ComponentState<ContractState>,
-            to: ContractAddress,
-            token_id: u256,
-            auth: ContractAddress,
-        ) {}
+    //     fn after_update(ref self: ERC721Component::ComponentState<ContractState>,
+    //         to: ContractAddress,
+    //         token_id: u256,
+    //         auth: ContractAddress,
+    //     ) {}
 
-        // same as ERC721HooksImpl::token_uri()
-        fn token_uri(self: @ERC721Component::ComponentState<ContractState>, token_id: u256) -> ByteArray {
-            (self.get_contract().render_token_uri(token_id))
-        }
-    }
+    //     // same as ERC721HooksImpl::token_uri()
+    //     fn token_uri(self: @ERC721Component::ComponentState<ContractState>, token_id: u256) -> ByteArray {
+    //         (self.get_contract().render_token_uri(token_id))
+    //     }
+    // }
 
 
 

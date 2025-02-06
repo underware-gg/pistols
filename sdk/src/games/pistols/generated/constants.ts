@@ -436,13 +436,13 @@ export const CHANCES: type_CHANCES = {
 // from: ../dojo/src/types/constants.cairo
 type type_FAME = {
   FAME_PER_LORDS: bigint, // cairo: u256
-  MIN_MINT_GRANT_AMOUNT: bigint, // cairo: u256
-  MIN_REWARD_AMOUNT: bigint, // cairo: u256
+  MINT_GRANT_AMOUNT: bigint, // cairo: u256
+  LIFE_AMOUNT: bigint, // cairo: u256
 };
 export const FAME: type_FAME = {
   FAME_PER_LORDS: 10n,
-  MIN_MINT_GRANT_AMOUNT: (1000n * CONST.ETH_TO_WEI),
-  MIN_REWARD_AMOUNT: (100n * CONST.ETH_TO_WEI),
+  MINT_GRANT_AMOUNT: (1000n * CONST.ETH_TO_WEI),
+  LIFE_AMOUNT: (100n * CONST.ETH_TO_WEI),
 };
 
 // from: ../dojo/src/interfaces/systems.cairo

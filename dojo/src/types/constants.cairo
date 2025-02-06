@@ -33,8 +33,6 @@ pub mod CHANCES {
 }
 
 pub mod FAME {
-    use super::{CONST};
-    pub const FAME_PER_LORDS: u256 = 10;
-    pub const MIN_MINT_GRANT_AMOUNT: u256 = 1000 * CONST::ETH_TO_WEI;
-    pub const MIN_REWARD_AMOUNT: u256 = 100 * CONST::ETH_TO_WEI;
+    pub const MINT_GRANT_AMOUNT: u256 = 1000 * super::CONST::ETH_TO_WEI;
+    pub const LIFE_AMOUNT: u256 = 100 * super::CONST::ETH_TO_WEI;
 }
