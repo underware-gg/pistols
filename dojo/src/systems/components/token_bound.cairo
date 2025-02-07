@@ -10,8 +10,15 @@ pub trait ITokenBoundPublic<TState> {
     fn token_of_address(self: @TState, address: ContractAddress) -> (ContractAddress, u128);
     // balance of a token
     fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
-    // transfer between tokens
+    // transfer form token to account
     fn transfer_from_token(ref self: TState,
+        contract_address: ContractAddress,
+        sender_token_id: u128,
+        recipient: ContractAddress,
+        amount: u256,
+    ) -> bool;
+    // transfer between tokens
+    fn transfer_from_token_to_token(ref self: TState,
         contract_address: ContractAddress,
         sender_token_id: u128,
         recipient_token_id: u128,
@@ -117,6 +124,20 @@ pub mod TokenBoundComponent {
         }
 
         fn transfer_from_token(ref self: ComponentState<TContractState>,
+            contract_address: ContractAddress,
+            sender_token_id: u128,
+            recipient: ContractAddress,
+            amount: u256,
+        ) -> bool {
+            let mut erc20 = get_dep_component_mut!(ref self, ERC20);
+            (erc20.transfer_from(
+                self.address_of_token(contract_address, sender_token_id),
+                recipient,
+                amount)
+            )
+        }
+        
+        fn transfer_from_token_to_token(ref self: ComponentState<TContractState>,
             contract_address: ContractAddress,
             sender_token_id: u128,
             recipient_token_id: u128,

@@ -42,7 +42,7 @@ pub struct CoinConfig {
 //---------------------------
 // Traits
 //
-pub use pistols::interfaces::ierc20::{ierc20, ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
+pub use pistols::interfaces::ierc20::{ierc20, Erc20Dispatcher, Erc20DispatcherTrait};
 pub use pistols::interfaces::vrf::{IVrfProviderDispatcher, IVrfProviderDispatcherTrait};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::misc::{ZERO};
@@ -78,7 +78,7 @@ pub impl ConfigManagerImpl of ConfigManagerTrait {
 
 #[generate_trait]
 pub impl ConfigImpl of ConfigTrait {
-    fn lords_dispatcher(self: @Config) -> ERC20ABIDispatcher {
+    fn lords_dispatcher(self: @Config) -> Erc20Dispatcher {
         (ierc20(*self.lords_address))
     }
     fn vrf_dispatcher(self: @Config) -> IVrfProviderDispatcher {

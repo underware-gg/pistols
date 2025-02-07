@@ -1,4 +1,6 @@
 use starknet::{ContractAddress};
+use pistols::models::challenge::{Challenge};
+use pistols::models::table::{FeeValues};
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -18,8 +20,7 @@ pub trait IDuelistToken<TState> {
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
     // Duelist
     fn is_alive(self: @TState, token_id: u128) -> bool;
-    fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
-    fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
+    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
 }
 
 #[dojo::contract]
@@ -30,7 +31,8 @@ pub mod duelist_token {
     use dojo::model::{ModelStorage};
 
     use super::{IDuelistToken, MockDuelistOwners};
-    use pistols::types::constants::{FAME};
+    use pistols::models::challenge::{Challenge};
+    use pistols::models::table::{FeeValues};
     use pistols::utils::misc::{ZERO};
     use pistols::tests::tester::tester::{
         OWNER, OWNED_BY_OWNER,
@@ -83,11 +85,8 @@ pub mod duelist_token {
         fn is_alive(self: @ContractState, token_id: u128) -> bool {
             (true)
         }
-        fn calc_fame_reward(self: @ContractState, duelist_id: u128) -> u128 {
-            (FAME::LIFE_AMOUNT.low / 2)
-        }
-        fn transfer_fame_reward(ref self: ContractState, duel_id: u128) -> (i128, i128) {
-            (0, 0)
+        fn transfer_rewards(ref self: ContractState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues) {
+            (Default::default(), Default::default())
         }
     }
 

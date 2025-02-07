@@ -19,7 +19,7 @@ pub use pistols::systems::{
     }
 };
 pub use pistols::interfaces::{
-    ierc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait},
+    ierc20::{Erc20Dispatcher, Erc20DispatcherTrait},
     vrf::{IVrfProviderDispatcher, IVrfProviderDispatcherTrait, Source},
 };
 pub use pistols::libs::store::{Store, StoreTrait};
@@ -193,15 +193,14 @@ pub impl SystemsImpl of SystemsTrait {
     fn fools_coin_dispatcher(self: @WorldStorage) -> IFoolsCoinDispatcher {
         (IFoolsCoinDispatcher{ contract_address: self.fools_coin_address() })
     }
+    // need access to store...
     #[inline(always)]
-    fn lords_dispatcher(self: @WorldStorage) -> ERC20ABIDispatcher {
-        let mut store: Store = StoreTrait::new(*self);
-        (store.get_config().lords_dispatcher())
+    fn lords_dispatcher(ref self: Store) -> Erc20Dispatcher {
+        (self.get_config().lords_dispatcher())
     }
     #[inline(always)]
-    fn vrf_dispatcher(self: @WorldStorage) -> IVrfProviderDispatcher {
-        let mut store: Store = StoreTrait::new(*self);
-        (store.get_config().vrf_dispatcher())
+    fn vrf_dispatcher(ref self: Store) -> IVrfProviderDispatcher {
+        (self.get_config().vrf_dispatcher())
     }
 
 

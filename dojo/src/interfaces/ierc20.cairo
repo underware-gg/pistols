@@ -1,8 +1,11 @@
 use starknet::{ContractAddress};
 use core::num::traits::Zero;
-pub use openzeppelin_token::erc20::interface::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
+pub use openzeppelin_token::erc20::interface::{
+    ERC20ABIDispatcher as Erc20Dispatcher,
+    ERC20ABIDispatcherTrait as Erc20DispatcherTrait,
+};
 
-pub fn ierc20(contract_address: ContractAddress) -> ERC20ABIDispatcher {
+pub fn ierc20(contract_address: ContractAddress) -> Erc20Dispatcher {
     assert(contract_address.is_non_zero(), 'ierc20(): null address');
-    (ERC20ABIDispatcher{contract_address})
+    (Erc20Dispatcher{contract_address})
 }

@@ -1,5 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
+use pistols::models::challenge::{Challenge};
+use pistols::models::table::{FeeValues};
 
 #[starknet::interface]
 pub trait IDuelistToken<TState> {
@@ -44,25 +46,24 @@ pub trait IDuelistToken<TState> {
 
     // IDuelistTokenPublic
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
-    fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
     fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
+    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
     // fn delete_duelist(ref self: TState, duelist_id: u128);
-    fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
 }
 
 #[starknet::interface]
 pub trait IDuelistTokenPublic<TState> {
     // view
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
-    fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
     // write
     fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
+    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
     // fn delete_duelist(ref self: TState, duelist_id: u128);
-    fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
 }
 
 #[dojo::contract]
 pub mod duelist_token {    
+    use core::num::traits::Zero;
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
 
@@ -108,25 +109,33 @@ pub mod duelist_token {
     use pistols::interfaces::systems::{
         SystemsTrait,
         IFameCoinDispatcher, IFameCoinDispatcherTrait,
+        IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait,
+        IBankDispatcher, IBankDispatcherTrait,
     };
     use pistols::models::{
+        config::{Config},
         player::{PlayerTrait, Activity},
         duelist::{
             Duelist, DuelistValue,
             Scoreboard, ScoreTrait,
             Archetype,
         },
-        challenge::{ChallengeValue},
-        // table::{TABLES},
+        challenge::{Challenge},
+        table::{
+            TableType, TableTypeTrait,
+            FeeDistribution, FeeDistributionTrait,
+            FeeValues,
+        },
     };
     use pistols::types::{
         profile_type::{ProfileTypeTrait, ProfileManagerTrait},
-        constants::{CONST, FAME},
+        constants::{CONST},
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::math::{MathTrait};
+    use pistols::utils::misc::{ZERO};
 
     mod Errors {
         pub const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
@@ -183,16 +192,6 @@ pub mod duelist_token {
             (fame_balance != 0)
         }
 
-        fn calc_fame_reward(
-            self: @ContractState,
-            duelist_id: u128,
-        ) -> u128 {
-            let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
-            let fame_balance: u256 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), duelist_id);
-            let fame_reward: u256 = (fame_balance / 2);
-            (if (fame_reward >= FAME::LIFE_AMOUNT) {(fame_reward.low)} else {(fame_balance.low)})
-        }
-
         fn mint_duelists(ref self: ContractState,
             recipient: ContractAddress,
             amount: usize,
@@ -217,7 +216,7 @@ pub mod duelist_token {
 
                 // mint fame
                 let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
-                fame_dispatcher.minted_duelist(duelist.duelist_id, 0);
+                fame_dispatcher.minted_duelist(duelist.duelist_id);
 
                 // events
                 PlayerTrait::check_in(ref store, Activity::CreatedDuelist, recipient, duelist.duelist_id.into());
@@ -239,45 +238,106 @@ pub mod duelist_token {
         //     // burn FAME too
         // }
 
-        fn transfer_fame_reward(
+        fn transfer_rewards(
             ref self: ContractState,
-            duel_id: u128,
-        ) -> (i128, i128) {
-            let mut world = self.world_default();
-            assert(world.is_game_contract(starknet::get_caller_address()), Errors::DUEL_INVALID_CALLER);
-            
-            // calculate penalty of each duelist
-            let mut store: Store = StoreTrait::new(world);
-            let challenge: ChallengeValue = store.get_challenge_value(duel_id);
-            let due_amount_a: u128 = if (challenge.winner == 0 || challenge.winner == 2) {
-                let amount: u128 = self.calc_fame_reward(challenge.duelist_id_a);
-                assert(amount != 0, Errors::DUELIST_A_IS_DEAD);
-                (amount)
-            } else {0};
-            let due_amount_b: u128 = if (challenge.winner == 0 || challenge.winner == 1) {
-                let amount: u128 = self.calc_fame_reward(challenge.duelist_id_b);
-                assert(amount != 0, Errors::DUELIST_B_IS_DEAD);
-                (amount)
-            } else {0};
+            challenge: Challenge,
+            tournament_id: u128,
+        ) -> (FeeValues, FeeValues) {
+            // validate caller (game contract only)
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.is_game_contract(starknet::get_caller_address()), Errors::DUEL_INVALID_CALLER);
 
-            // transfer
-            let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
-            if (due_amount_a != 0 && due_amount_b != 0) {
-                // draw, burn half of each
-                fame_dispatcher.burn_from_token(starknet::get_contract_address(), challenge.duelist_id_a, (due_amount_a / 2).into());
-                fame_dispatcher.burn_from_token(starknet::get_contract_address(), challenge.duelist_id_b, (due_amount_b / 2).into());
-                (due_amount_a.try_into().unwrap() / -2, due_amount_b.try_into().unwrap() / -2)
-            } else if (due_amount_a != 0) {
-                fame_dispatcher.transfer_from_token(starknet::get_contract_address(), challenge.duelist_id_a, challenge.duelist_id_b, due_amount_a.into());
-                (-due_amount_a.try_into().unwrap(), due_amount_a.try_into().unwrap())
-            } else if (due_amount_b != 0) {
-                fame_dispatcher.transfer_from_token(starknet::get_contract_address(), challenge.duelist_id_b, challenge.duelist_id_a, due_amount_b.into());
-                (due_amount_b.try_into().unwrap(), -due_amount_b.try_into().unwrap())
-            } else {
-                (0, 0) // should never happen!
+            let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
+            let fools_dispatcher: IFoolsCoinDispatcher = store.world.fools_coin_dispatcher();
+            let bank_dispatcher: IBankDispatcher = store.world.bank_dispatcher();
+
+            // get current balances
+            let balance_a: u128 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), challenge.duelist_id_a).low;
+            let balance_b: u128 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), challenge.duelist_id_b).low;
+
+            // get fees distribution
+            let table_type: TableType = store.get_table_config(challenge.table_id).table_type;
+            let distribution: @FeeDistribution = table_type.get_fame_distribution(tournament_id);
+            if (!distribution.is_payable()) {
+                return (Default::default(), Default::default());
             }
+
+            // calculate fees
+            let mut values_a: FeeValues = table_type.calc_fame_fees(balance_a, challenge.winner == 1);
+            let mut values_b: FeeValues = table_type.calc_fame_fees(balance_b, challenge.winner == 2);
+
+            // transfer gains
+            let pool_address: ContractAddress = ZERO();
+            let creator_address: ContractAddress = ZERO();
+            let config: Config = store.get_config();
+            self.transfer_gains(fame_dispatcher, fools_dispatcher, values_a, challenge.duelist_id_a);
+            self.transfer_gains(fame_dispatcher, fools_dispatcher, values_b, challenge.duelist_id_b);
+            self.transfer_losses(fame_dispatcher, bank_dispatcher, distribution, values_a, challenge.duelist_id_a, pool_address, creator_address, config.treasury_address);
+            self.transfer_losses(fame_dispatcher, bank_dispatcher, distribution, values_b, challenge.duelist_id_b, pool_address, creator_address, config.treasury_address);
+
+            (values_a, values_b)
         }
 
+    }
+
+    //-----------------------------------
+    // Internal
+    //
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        #[inline(always)]
+        fn transfer_gains(ref self: ContractState,
+            fame_dispatcher: IFameCoinDispatcher,
+            fools_dispatcher: IFoolsCoinDispatcher,
+            values: FeeValues,
+            duelist_id: u128,
+        ) {
+            // reward 100% FAME to duelist
+            if (values.fame_gained != 0) {
+                fame_dispatcher.reward_duelist(duelist_id, values.fame_gained.into());
+            }
+            // reward 100% FOOLS to owner
+            if (values.fools_gained != 0) {
+                let owner: ContractAddress = self.owner_of(duelist_id.into());
+                fools_dispatcher.reward_player(owner, values.fools_gained.into());
+            }
+        }
+        #[inline(always)]
+        fn transfer_losses(ref self: ContractState,
+            fame_dispatcher: IFameCoinDispatcher,
+            bank_dispatcher: IBankDispatcher,
+            distribution: @FeeDistribution,
+            values: FeeValues,
+            duelist_id: u128,
+            pool_address: ContractAddress,
+            creator_address: ContractAddress,
+            underware_address: ContractAddress,
+        ) {
+            // Burn FAME from duelist
+            if (values.fame_lost != 0) {
+                let mut due_amount: u128 = values.fame_lost;
+                // transfer to pool
+                if (*distribution.winners_percent != 0 && pool_address.is_non_zero()) {
+                    let amount: u128 = MathTrait::percentage(due_amount, *distribution.winners_percent);
+                    // fame_dispatcher.transfer_from_token(
+                    //     starknet::get_contract_address(), duelist_id,
+                    //     pool_address,
+                    //     amount.into(),
+                    // );
+                    due_amount -= amount;
+                }
+                // remaining is burned before unlocking
+                fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, due_amount.into());
+                // reward tournament creator
+                if (*distribution.creator_percent != 0 && creator_address.is_non_zero()) {
+                    let amount: u128 = MathTrait::percentage(due_amount, *distribution.creator_percent);
+                    bank_dispatcher.burned_fame(creator_address, amount.into());
+                    due_amount -= amount;
+                }
+                // remaining to underware
+                bank_dispatcher.burned_fame(underware_address, due_amount.into());
+            }
+        }
     }
 
 

@@ -85,8 +85,6 @@ mod tests {
 
         let table_id: felt252 = TABLES::PRACTICE;
 
-        let _fame_reward_a: u128 = sys.duelists.calc_fame_reward(duelist_id_a);
-        let _fame_reward_b: u128 = sys.duelists.calc_fame_reward(duelist_id_b);
         let fame_balance_a: u128 = tester::fame_balance_of_token(@sys, duelist_id_a);
         let fame_balance_b: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);
         assert_gt!(fame_balance_a, 0, "fame_balance_a_init");
