@@ -68,10 +68,22 @@ export const getActivityValue = (name: Activity): number | undefined => _indexOr
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
 export const getActivityMap = (): Record<Activity, number> => Object.keys(Activity).reduce((acc, v, index) => { acc[v as Activity] = index; return acc; }, {} as Record<Activity, number>);
 
+// from: ../dojo/src/models/pool.cairo
+export enum PoolType {
+  Undefined = 'Undefined', // 0
+  Bank = 'Bank', // 1
+  Season = 'Season', // 2
+  Tournament = 'Tournament', // 3
+  SacredFlame = 'SacredFlame', // 4
+};
+export const getPoolTypeValue = (name: PoolType): number | undefined => _indexOrUndefined(Object.keys(PoolType).indexOf(name));
+export const getPoolTypeFromValue = (value: number): PoolType | undefined => Object.keys(PoolType)[value] as PoolType;
+export const getPoolTypeMap = (): Record<PoolType, number> => Object.keys(PoolType).reduce((acc, v, index) => { acc[v as PoolType] = index; return acc; }, {} as Record<PoolType, number>);
+
 // from: ../dojo/src/models/season.cairo
 export enum SeasonPhase {
-  None = 'None', // 0
-  Single = 'Single', // 1
+  Undefined = 'Undefined', // 0
+  InProgress = 'InProgress', // 1
   Ended = 'Ended', // 2
 };
 export const getSeasonPhaseValue = (name: SeasonPhase): number | undefined => _indexOrUndefined(Object.keys(SeasonPhase).indexOf(name));
@@ -84,6 +96,7 @@ export enum TableType {
   Season = 'Season', // 1
   Tutorial = 'Tutorial', // 2
   Practice = 'Practice', // 3
+  Eternum = 'Eternum', // 4
 };
 export const getTableTypeValue = (name: TableType): number | undefined => _indexOrUndefined(Object.keys(TableType).indexOf(name));
 export const getTableTypeFromValue = (value: number): TableType | undefined => Object.keys(TableType)[value] as TableType;
@@ -229,8 +242,8 @@ export enum Premise {
   Blood = 'Blood', // 6
   Nothing = 'Nothing', // 7
   Tournament = 'Tournament', // 8
-  Training = 'Training', // 9
-  Tutorial = 'Tutorial', // 10
+  Treaty = 'Treaty', // 9
+  Lesson = 'Lesson', // 10
 };
 export const getPremiseValue = (name: Premise): number | undefined => _indexOrUndefined(Object.keys(Premise).indexOf(name));
 export const getPremiseFromValue = (value: number): Premise | undefined => Object.keys(Premise)[value] as Premise;
@@ -402,7 +415,7 @@ type type_CONST = {
   ETH_TO_WEI: bigint, // cairo: u256
 };
 export const CONST: type_CONST = {
-  WELCOME_PACK_DUELIST_COUNT: 5,
+  WELCOME_PACK_DUELIST_COUNT: 2,
   ROUND_COUNT: 1,
   MAX_DUELIST_ID: BigInt('0xffff'),
   FULL_HEALTH: 3,
@@ -435,14 +448,12 @@ export const CHANCES: type_CHANCES = {
 
 // from: ../dojo/src/types/constants.cairo
 type type_FAME = {
-  FAME_PER_LORDS: bigint, // cairo: u256
   MINT_GRANT_AMOUNT: bigint, // cairo: u256
   ONE_LIFE: bigint, // cairo: u256
 };
 export const FAME: type_FAME = {
-  FAME_PER_LORDS: 10n,
-  MINT_GRANT_AMOUNT: (1000n * CONST.ETH_TO_WEI),
-  ONE_LIFE: (100n * CONST.ETH_TO_WEI),
+  MINT_GRANT_AMOUNT: (3000n * CONST.ETH_TO_WEI),
+  ONE_LIFE: (1000n * CONST.ETH_TO_WEI),
 };
 
 // from: ../dojo/src/interfaces/systems.cairo
@@ -456,13 +467,13 @@ type type_SELECTORS = {
   DUELIST_TOKEN: bigint, // cairo: felt252
   PACK_TOKEN: bigint, // cairo: felt252
   FAME_COIN: bigint, // cairo: felt252
+  FOOLS_COIN: bigint, // cairo: felt252
   LORDS_MOCK: bigint, // cairo: felt252
   VR_MOCK: bigint, // cairo: felt252
   CONFIG: bigint, // cairo: felt252
   TABLE_CONFIG: bigint, // cairo: felt252
   TOKEN_CONFIG: bigint, // cairo: felt252
   COIN_CONFIG: bigint, // cairo: felt252
-  PAYMENT: bigint, // cairo: felt252
 };
 export const SELECTORS: type_SELECTORS = {
   ADMIN: BigInt('0x036fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497'), // selector_from_tag!("pistols-admin")
@@ -474,13 +485,13 @@ export const SELECTORS: type_SELECTORS = {
   DUELIST_TOKEN: BigInt('0x045c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e'), // selector_from_tag!("pistols-duelist_token")
   PACK_TOKEN: BigInt('0x03d74e76192285c5a19a63c54a6c2ba5b015a1a25818c2d8f9cf75d7fef2b5c1'), // selector_from_tag!("pistols-pack_token")
   FAME_COIN: BigInt('0x0371b95cb7056eb2d21819662e973ed32c345c989aa9f6097e7811a5665a0b0a'), // selector_from_tag!("pistols-fame_coin")
+  FOOLS_COIN: BigInt('0x058070034702ab2b03c2911459d7299e63048e70e3d41f77e1d806b4cb8f2dcd'), // selector_from_tag!("pistols-fools_coin")
   LORDS_MOCK: BigInt('0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788'), // selector_from_tag!("pistols-lords_mock")
   VR_MOCK: BigInt('0x07d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e'), // selector_from_tag!("pistols-vrf_mock")
   CONFIG: BigInt('0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392'), // selector_from_tag!("pistols-Config")
   TABLE_CONFIG: BigInt('0x01e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138'), // selector_from_tag!("pistols-TableConfig")
   TOKEN_CONFIG: BigInt('0x056ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed'), // selector_from_tag!("pistols-TokenConfig")
   COIN_CONFIG: BigInt('0x026fad4dff063a4f2c3b3889723194b9bdbbbf833e44ff2d573af01741b966ac'), // selector_from_tag!("pistols-CoinConfig")
-  PAYMENT: BigInt('0x017a03e9cb461470b9149f9efbd95ad9b217fca9fdccd3827383904c33da96c1'), // selector_from_tag!("pistols-Payment")
 };
 
 // from: ../dojo/src/models/config.cairo
@@ -520,7 +531,7 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_url_closed: '/tokens/Duelists5x.jpg',
     image_url_open: '/tokens/Duelists5x.jpg',
     can_purchase: true,
-    price: (100n * CONST.ETH_TO_WEI),
+    price: (50n * CONST.ETH_TO_WEI),
   },
 };
 
@@ -767,8 +778,8 @@ type type_PREMISES = {
   Blood: PremiseDescription, // cairo: PremiseDescription
   Nothing: PremiseDescription, // cairo: PremiseDescription
   Tournament: PremiseDescription, // cairo: PremiseDescription
-  Tutorial: PremiseDescription, // cairo: PremiseDescription
-  Training: PremiseDescription, // cairo: PremiseDescription
+  Treaty: PremiseDescription, // cairo: PremiseDescription
+  Lesson: PremiseDescription, // cairo: PremiseDescription
 };
 export const PREMISES: type_PREMISES = {
   Undefined: {
@@ -807,13 +818,13 @@ export const PREMISES: type_PREMISES = {
     name: 'Tournament',
     prefix: 'to be the winner of',
   },
-  Tutorial: {
-    name: 'Tutorial',
-    prefix: 'to learn the ropes',
+  Treaty: {
+    name: 'Treaty',
+    prefix: 'to settle the terms of',
   },
-  Training: {
-    name: 'Training',
-    prefix: 'to train for',
+  Lesson: {
+    name: 'Lesson',
+    prefix: 'to learn about',
   },
 };
 
