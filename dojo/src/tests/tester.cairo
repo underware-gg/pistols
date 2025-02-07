@@ -59,7 +59,7 @@ pub mod tester {
             CONFIG,
         },
         season::{
-            m_SeasonConfig, SeasonConfig,
+            m_SeasonConfig, SeasonConfig, SeasonManagerTrait,
         },
         table::{
             m_TableConfig, TableConfig,
@@ -101,6 +101,10 @@ pub mod tester {
     pub fn ID(address: ContractAddress) -> u128 {
         let as_u256: u256 = address.into();
         (as_u256.low)
+    }
+
+    pub fn SEASON_1_TABLE() -> felt252 {
+        (SeasonManagerTrait::make_table_id(1))
     }
 
     // set_contract_address : to define the address of the calling contract,

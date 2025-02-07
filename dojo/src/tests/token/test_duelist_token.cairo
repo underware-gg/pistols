@@ -397,44 +397,51 @@ fn test_fame() {
 
     tester::execute_claim_welcome_pack(@sys.pack, OTHER());
 
-    // validate token_bound address
-    let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_1_1.low);
-    let token_bound_address_6: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_2_1.low);
-    assert!(token_bound_address_1.is_non_zero(), "token_bound_address_1");
-    assert!(token_bound_address_6.is_non_zero(), "token_bound_address_6");
-    assert_ne!(token_bound_address_1, token_bound_address_6, "token_bound_address_1 != 2");
-    let (token_contract_1, token_id_1_1) = sys.fame.token_of_address(token_bound_address_1);
-    let (token_contract_6, token_id_2_1) = sys.fame.token_of_address(token_bound_address_6);
-    assert_eq!(token_contract_1, sys.token.contract_address, "token_contract_1");
-    assert_eq!(token_contract_6, sys.token.contract_address, "token_contract_6");
-    assert_eq!(token_id_1_1, TOKEN_ID_1_1.low, "token_id_1_1");
-    assert_eq!(token_id_2_1, TOKEN_ID_2_1.low, "token_id_2_1");
-
     // initial token balances
     let balance_1_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1_1.low);
-    let balance_6_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2_1.low);
+    let balance_2_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2_1.low);
     assert_gt!(FAME::MINT_GRANT_AMOUNT, 0, "FAME::MINT_GRANT_AMOUNT > 0");
     assert_eq!(balance_1_initial, FAME::MINT_GRANT_AMOUNT, "balance_1_initial");
-    assert_eq!(balance_6_initial, FAME::MINT_GRANT_AMOUNT, "balance_6_initial");
+    assert_eq!(balance_2_initial, FAME::MINT_GRANT_AMOUNT, "balance_2_initial");
 
     // transfer duelist
     tester::impersonate(OWNER());
     sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1_1);
     // check balances
     let balance_1: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1_1.low);
-    let balance_6: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2_1.low);
+    let balance_2: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_2_1.low);
     assert_eq!(balance_1, balance_1_initial, "balance_1 (1)");
-    assert_eq!(balance_6, balance_6_initial, "balance_6 (1)");
+    assert_eq!(balance_2, balance_2_initial, "balance_2 (1)");
 
     // transfer to new owner
     tester::impersonate(OTHER());
     sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_2_1);
-    assert_eq!(balance_6, balance_6_initial, "balance_6 (2)");
+    assert_eq!(balance_2, balance_2_initial, "balance_2 (2)");
 
     // transfer all
     tester::impersonate(OTHER());
     sys.token.transfer_from(OTHER(), OWNER(), TOKEN_ID_1_1);
     sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_2_2);
+}
+
+#[test]
+fn test_token_bound_address() {
+    let mut sys: TestSystems = setup(0);
+
+    tester::execute_claim_welcome_pack(@sys.pack, OTHER());
+
+    // validate token_bound address
+    let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_1_1.low);
+    let token_bound_address_2: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_2_1.low);
+    assert!(token_bound_address_1.is_non_zero(), "token_bound_address_1");
+    assert!(token_bound_address_2.is_non_zero(), "token_bound_address_2");
+    assert_ne!(token_bound_address_1, token_bound_address_2, "token_bound_address_1 != 2");
+    let (token_contract_1, token_id_1_1) = sys.fame.token_of_address(token_bound_address_1);
+    let (token_contract_2, token_id_2_1) = sys.fame.token_of_address(token_bound_address_2);
+    assert_eq!(token_contract_1, sys.token.contract_address, "token_contract_1");
+    assert_eq!(token_contract_2, sys.token.contract_address, "token_contract_2");
+    assert_eq!(token_id_1_1, TOKEN_ID_1_1.low, "token_id_1_1");
+    assert_eq!(token_id_2_1, TOKEN_ID_2_1.low, "token_id_2_1");
 }
 
 #[test]

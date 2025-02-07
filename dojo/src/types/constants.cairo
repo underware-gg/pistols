@@ -34,5 +34,5 @@ pub mod CHANCES {
 
 pub mod FAME {
     pub const MINT_GRANT_AMOUNT: u256 = 3000 * super::CONST::ETH_TO_WEI;
-    pub const LIFE_AMOUNT: u256 = 1000 * super::CONST::ETH_TO_WEI;
+    pub const ONE_LIFE: u256 = 1000 * super::CONST::ETH_TO_WEI;
 }
