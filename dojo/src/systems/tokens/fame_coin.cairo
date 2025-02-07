@@ -136,7 +136,7 @@ pub mod fame_coin {
             let minter_address: ContractAddress = self.coin.assert_caller_is_minter();
 
             // register token_bound token
-            let token_address: ContractAddress = self.token_bound.address_of_token(minter_address, duelist_id);
+            let token_address: ContractAddress = self.token_bound.register_token(minter_address, duelist_id);
 
             // pre-approve minter as spender
             self.erc20._approve(token_address, minter_address, Bounded::MAX);

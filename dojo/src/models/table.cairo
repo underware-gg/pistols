@@ -48,7 +48,7 @@ pub struct FeeValues {
 //
 use starknet::{ContractAddress};
 use pistols::libs::store::{Store, StoreTrait};
-use pistols::types::constants::{FAME};
+use pistols::types::constants::{CONST, FAME};
 
 #[generate_trait]
 pub impl TableManagerImpl of TableManagerTrait {
@@ -112,12 +112,12 @@ pub impl TableTypeImpl of TableTypeTrait {
         let mut result: FeeValues = match self {
             TableType::Season => {
                 let mut result: FeeValues = Default::default();
-                let one_life: u128 = FAME::LIFE_AMOUNT.low;
+                let one_life: u128 = FAME::ONE_LIFE.low;
                 if (is_winner) {
                     let k_fame: u128 = 1;
                     result.fame_gained = (one_life / (((balance / one_life) + 1) / k_fame));
                     let k_fools: u128 = 10;
-                    result.fools_gained = (k_fools * ((one_life / 2) / result.fame_gained));
+                    result.fools_gained = (k_fools * ((one_life / 2) / result.fame_gained)) * CONST::ETH_TO_WEI.low;
                     result.lords_gained = 0; // calculated at the bank
                 } else {
                     result.fame_lost = one_life;

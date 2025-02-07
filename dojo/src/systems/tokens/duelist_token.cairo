@@ -129,7 +129,7 @@ pub mod duelist_token {
     };
     use pistols::types::{
         profile_type::{ProfileTypeTrait, ProfileManagerTrait},
-        constants::{CONST},
+        constants::{CONST, FAME},
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::metadata::{MetadataTrait};
@@ -189,7 +189,7 @@ pub mod duelist_token {
         ) -> bool {
             let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
             let fame_balance: u256 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), duelist_id);
-            (fame_balance != 0)
+            (fame_balance >= FAME::ONE_LIFE)
         }
 
         fn mint_duelists(ref self: ContractState,

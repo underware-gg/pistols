@@ -89,7 +89,7 @@ pub mod fools_coin {
             COIN_SYMBOL(),
         );
         self.coin.initialize(
-            world.fame_coin_address(),
+            world.duelist_token_address(),
             faucet_amount: 0,
         );
     }
