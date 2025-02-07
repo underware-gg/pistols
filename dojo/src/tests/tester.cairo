@@ -678,15 +678,22 @@ pub mod tester {
     // Asserts
     //
 
-    pub fn assert_balance_token(sys: @TestSystems, duelist_id: u128, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
+    pub fn assert_fame_token_balance(sys: @TestSystems, duelist_id: u128, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
         let address: ContractAddress = TokenBoundAddressTrait::address((*sys.duelists).contract_address, duelist_id);
-        (assert_balance(
+        (assert_lords_balance(
             ILordsMockDispatcher{ contract_address: (*sys.fame).contract_address },
             address, balance_before, subtract, add, prefix,
         ))
     }
 
-    pub fn assert_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
+    pub fn assert_fools_balance(sys: @TestSystems, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
+        (assert_lords_balance(
+            ILordsMockDispatcher{ contract_address: (*sys.fools).contract_address },
+            address, balance_before, subtract, add, prefix,
+        ))
+    }
+
+    pub fn assert_lords_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = lords.balance_of(address).low;
         if (subtract > add) {
             assert_lt!(balance, balance_before, "{}_<", prefix);
@@ -707,14 +714,14 @@ pub mod tester {
         prefix: ByteArray,
     ) {
         if (winner == 1) {
-            assert_balance(lords, duelist_a, balance_a, fee, prize_value, format!("A_A_{}", prefix));
-            assert_balance(lords, duelist_b, balance_b, fee + prize_value, 0, format!("A_B_{}", prefix));
+            assert_lords_balance(lords, duelist_a, balance_a, fee, prize_value, format!("A_A_{}", prefix));
+            assert_lords_balance(lords, duelist_b, balance_b, fee + prize_value, 0, format!("A_B_{}", prefix));
         } else if (winner == 2) {
-            assert_balance(lords, duelist_a, balance_a, fee + prize_value, 0, format!("B_A_{}", prefix));
-            assert_balance(lords, duelist_b, balance_b, fee, prize_value, format!("B_B_{}", prefix));
+            assert_lords_balance(lords, duelist_a, balance_a, fee + prize_value, 0, format!("B_A_{}", prefix));
+            assert_lords_balance(lords, duelist_b, balance_b, fee, prize_value, format!("B_B_{}", prefix));
         } else {
-            assert_balance(lords, duelist_a, balance_a, fee, 0, format!("D_A_{}", prefix));
-            assert_balance(lords, duelist_b, balance_b, fee, 0, format!("D_B_{}", prefix));
+            assert_lords_balance(lords, duelist_a, balance_a, fee, 0, format!("D_A_{}", prefix));
+            assert_lords_balance(lords, duelist_b, balance_b, fee, 0, format!("D_B_{}", prefix));
         }
     }
 

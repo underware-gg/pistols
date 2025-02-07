@@ -46,6 +46,7 @@ pub trait IDuelistToken<TState> {
 
     // IDuelistTokenPublic
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
+    fn calc_season_reward(self: @TState, duelist_id: u128) -> FeeValues;
     fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
     // fn delete_duelist(ref self: TState, duelist_id: u128);
@@ -55,6 +56,7 @@ pub trait IDuelistToken<TState> {
 pub trait IDuelistTokenPublic<TState> {
     // view
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
+    fn calc_season_reward(self: @TState, duelist_id: u128) -> FeeValues;
     // write
     fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
@@ -122,6 +124,7 @@ pub mod duelist_token {
         },
         challenge::{Challenge},
         table::{
+            TableConfig,
             TableType, TableTypeTrait,
             FeeDistribution, FeeDistributionTrait,
             FeeValues,
@@ -192,6 +195,20 @@ pub mod duelist_token {
             (fame_balance >= FAME::ONE_LIFE)
         }
 
+        fn calc_season_reward(self: @ContractState, duelist_id: u128) -> FeeValues {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let table: TableConfig = store.get_current_season_table();
+            let balance: u128 = store.world.fame_coin_dispatcher().balance_of_token(starknet::get_contract_address(), duelist_id).low;
+            let fees_win: FeeValues = table.table_type.calc_fame_fees(balance, true);
+            let fees_loss: FeeValues = table.table_type.calc_fame_fees(balance, false);
+            (FeeValues{
+                fame_lost: fees_loss.fame_lost,
+                fame_gained: fees_win.fame_gained,
+                fools_gained: fees_win.fools_gained,
+                lords_gained: fees_win.lords_gained,
+            })
+        }
+
         fn mint_duelists(ref self: ContractState,
             recipient: ContractAddress,
             amount: usize,
@@ -247,6 +264,13 @@ pub mod duelist_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.is_game_contract(starknet::get_caller_address()), Errors::DUEL_INVALID_CALLER);
 
+            // get fees distribution
+            let table_type: TableType = store.get_table_config(challenge.table_id).table_type;
+            let distribution: @FeeDistribution = table_type.get_fame_distribution(tournament_id);
+            if (!distribution.is_payable()) {
+                return (Default::default(), Default::default());
+            }
+
             let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
             let fools_dispatcher: IFoolsCoinDispatcher = store.world.fools_coin_dispatcher();
             let bank_dispatcher: IBankDispatcher = store.world.bank_dispatcher();
@@ -254,13 +278,6 @@ pub mod duelist_token {
             // get current balances
             let balance_a: u128 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), challenge.duelist_id_a).low;
             let balance_b: u128 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), challenge.duelist_id_b).low;
-
-            // get fees distribution
-            let table_type: TableType = store.get_table_config(challenge.table_id).table_type;
-            let distribution: @FeeDistribution = table_type.get_fame_distribution(tournament_id);
-            if (!distribution.is_payable()) {
-                return (Default::default(), Default::default());
-            }
 
             // calculate fees
             let mut values_a: FeeValues = table_type.calc_fame_fees(balance_a, challenge.winner == 1);
