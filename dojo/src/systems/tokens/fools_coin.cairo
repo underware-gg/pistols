@@ -23,12 +23,12 @@ pub trait IFoolsCoin<TState> {
     fn transferFrom(ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
 
     // IFoolsCoinPublic
-    fn mint_fools(ref self: TState, recipient: ContractAddress, amount: u256);
+    fn reward_player(ref self: TState, recipient: ContractAddress, amount: u256);
 }
 
 #[starknet::interface]
 pub trait IFoolsCoinPublic<TState> {
-    fn mint_fools(ref self: TState, recipient: ContractAddress, amount: u256);
+    fn reward_player(ref self: TState, recipient: ContractAddress, amount: u256);
 }
 
 #[dojo::contract]
@@ -108,7 +108,7 @@ pub mod fools_coin {
     use super::{IFoolsCoinPublic};
     #[abi(embed_v0)]
     impl FoolsPublicImpl of IFoolsCoinPublic<ContractState> {
-        fn mint_fools(ref self: ContractState,
+        fn reward_player(ref self: ContractState,
             recipient: ContractAddress,
             amount: u256,
         ) {

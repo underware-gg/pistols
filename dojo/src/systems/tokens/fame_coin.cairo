@@ -26,16 +26,19 @@ pub trait IFameCoin<TState> {
     fn address_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> ContractAddress;
     fn token_of_address(self: @TState, address: ContractAddress) -> (ContractAddress, u128);
     fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
-    fn transfer_from_token(ref self: TState, contract_address: ContractAddress, sender_token_id: u128, recipient_token_id: u128, amount: u256) -> bool;
+    fn transfer_from_token(ref self: TState, contract_address: ContractAddress, sender_token_id: u128, recipient: ContractAddress, amount: u256) -> bool;
+    fn transfer_from_token_to_token(ref self: TState, contract_address: ContractAddress, sender_token_id: u128, recipient_token_id: u128, amount: u256) -> bool;
     fn burn_from_token(ref self: TState, contract_address: ContractAddress, token_id: u128, amount: u256);
     
     // IFameCoinPublic
-    fn minted_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);
+    fn minted_duelist(ref self: TState, duelist_id: u128);
+    fn reward_duelist(ref self: TState, duelist_id: u128, amount: u256);
 }
 
 #[starknet::interface]
 pub trait IFameCoinPublic<TState> {
-    fn minted_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);
+    fn minted_duelist(ref self: TState, duelist_id: u128);
+    fn reward_duelist(ref self: TState, duelist_id: u128, amount: u256);
 }
 
 #[dojo::contract]
@@ -128,21 +131,30 @@ pub mod fame_coin {
     impl FamePublicImpl of IFameCoinPublic<ContractState> {
         fn minted_duelist(ref self: ContractState,
             duelist_id: u128,
-            amount_paid: u256,
         ) {
-            // validate minter
-            self.coin.assert_caller_is_minter();
+            // validate minter (duelist token contract)
+            let minter_address: ContractAddress = self.coin.assert_caller_is_minter();
 
             // register token_bound token
-            let mut world = self.world_default();
-            let duelist_token_address: ContractAddress = world.duelist_token_address();
-            let token_address: ContractAddress = self.token_bound.register_token(duelist_token_address, duelist_id);
+            let token_address: ContractAddress = self.token_bound.address_of_token(minter_address, duelist_id);
 
-            // pre-approve owner contract as spender
-            self.erc20._approve(token_address, duelist_token_address, Bounded::MAX);
+            // pre-approve minter as spender
+            self.erc20._approve(token_address, minter_address, Bounded::MAX);
 
             // mint FAME to token
             self.coin.mint(token_address, FAME::MINT_GRANT_AMOUNT);
+        }
+
+        fn reward_duelist(ref self: ContractState,
+            duelist_id: u128,
+            amount: u256,
+        ) {
+            // validate minter (duelist token contract)
+            let minter_address: ContractAddress = self.coin.assert_caller_is_minter();
+
+            // mint FAME to token
+            let token_address: ContractAddress = self.token_bound.address_of_token(minter_address, duelist_id);
+            self.coin.mint(token_address, amount);
         }
     }
 

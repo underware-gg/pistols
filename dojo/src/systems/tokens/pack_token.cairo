@@ -215,7 +215,7 @@ pub mod pack_token {
             }
 
             // create vrf seed
-            let seed: felt252 = store.world.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_contract_address()));
+            let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_contract_address()));
 
             // mint
             let pack: Pack = self.mint_pack(pack_type, recipient, seed);

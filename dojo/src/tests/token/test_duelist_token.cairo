@@ -459,7 +459,7 @@ fn test_fame_transfer_from_owner_not_allowed() {
 #[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_fame_mint_not_minter() {
     let mut sys: TestSystems = setup(0);
-    sys.fame.minted_duelist(123, 0);
+    sys.fame.minted_duelist(123);
 }
 
 #[test]
@@ -467,5 +467,12 @@ fn test_fame_mint_not_minter() {
 fn test_fame_mint_already_registered() {
     let mut sys: TestSystems = setup(0);
     utils::impersonate(sys.token.contract_address);
-    sys.fame.minted_duelist(TOKEN_ID_1_1.low, 0);
+    sys.fame.minted_duelist(TOKEN_ID_1_1.low);
+}
+
+#[test]
+#[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
+fn test_fame_reward_not_minter() {
+    let mut sys: TestSystems = setup(0);
+    sys.fame.reward_duelist(123, 0);
 }

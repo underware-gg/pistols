@@ -26,10 +26,11 @@ pub trait MathTrait<T,TI> {
     fn add(a: T, b: TI) -> T;
     fn subi(ref self: T, v: T);  // in-place sub()
     fn addi(ref self: T, v: TI); // in-place add()
-    // returns GDC of two numbers
-    fn gdc(a: T, b: T) -> T;
     // map a value form one range to another
     fn map(v: T, in_min: T, in_max: T, out_min: T, out_max: T) -> T;
+    fn percentage(v: T, percent: u8) -> T;
+    // returns GDC of two numbers
+    fn gdc(a: T, b: T) -> T;
     // power
     fn pow(base: T, exp: T) -> T;
     // quared distance in 2D space
@@ -65,7 +66,7 @@ pub impl MathU8 of MathTrait<u8,i8> {
     fn add(a: u8, b: i8) -> u8 {
         if (b < 0) { Self::sub(a, (-b).try_into().unwrap()) }
         else if (b > 0) { (a + b.try_into().unwrap()) }
-        else {{a}}
+        else { (a) }
     }
     fn subi(ref self: u8, v: u8) {
         self = Self::sub(self, v);
@@ -74,19 +75,9 @@ pub impl MathU8 of MathTrait<u8,i8> {
         self = Self::add(self, v);
     }
 
-    fn gdc(mut a: u8, mut b: u8) -> u8 {
-        // recursive (not fastest)
-        // if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
-        // iterative: https://stackoverflow.com/a/17445322/360930
-        if (b > a) { return Self::gdc(b, a); }
-        let mut result: u8 = 0;
-        loop {
-            if (b == 0) { result = a; break; }
-            a = a % b;
-            if (a == 0) { result = b; break; }
-            b = b % a;
-        };
-        (result)
+    fn percentage(v: u8, percent: u8) -> u8 {
+        let result: u128 = MathU128::percentage(v.into(), percent);
+        (result.try_into().unwrap())
     }
 
     fn map(v: u8, in_min: u8, in_max: u8, out_min: u8, out_max: u8) -> u8 {
@@ -116,6 +107,21 @@ pub impl MathU8 of MathTrait<u8,i8> {
     //         // (out_min + (((out_max - out_min) / (in_max - in_min)) * (v - in_min)))
     //     }
     // }
+
+    fn gdc(mut a: u8, mut b: u8) -> u8 {
+        // recursive (not fastest)
+        // if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
+        // iterative: https://stackoverflow.com/a/17445322/360930
+        if (b > a) { return Self::gdc(b, a); }
+        let mut result: u8 = 0;
+        loop {
+            if (b == 0) { result = a; break; }
+            a = a % b;
+            if (a == 0) { result = b; break; }
+            b = b % a;
+        };
+        (result)
+    }
 
     fn pow(base: u8, exp: u8) -> u8 {
         if exp == 0 { 1 }
@@ -168,7 +174,7 @@ pub impl MathU16 of MathTrait<u16, i16> {
     fn add(a: u16, b: i16) -> u16 {
         if (b < 0) { Self::sub(a, (-b).try_into().unwrap()) }
         else if (b > 0) { (a + b.try_into().unwrap()) }
-        else {{a}}
+        else { (a) }
     }
     fn subi(ref self: u16, v: u16) {
         self = Self::sub(self, v);
@@ -177,14 +183,19 @@ pub impl MathU16 of MathTrait<u16, i16> {
         self = Self::add(self, v);
     }
 
-    fn gdc(a: u16, b: u16) -> u16 {
-        // recursive (not fastest)
-        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
+    fn percentage(v: u16, percent: u8) -> u16 {
+        let result: u128 = MathU128::percentage(v.into(), percent);
+        (result.try_into().unwrap())
     }
 
     fn map(v: u16, in_min: u16, in_max: u16, out_min: u16, out_max: u16) -> u16 {
         let result: u128 = MathU128::map(v.into(), in_min.into(), in_max.into(), out_min.into(), out_max.into());
         (result.try_into().unwrap())
+    }
+
+    fn gdc(a: u16, b: u16) -> u16 {
+        // recursive (not fastest)
+        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
     }
 
     fn pow(base: u16, exp: u16) -> u16 {
@@ -238,7 +249,7 @@ pub impl MathU32 of MathTrait<u32, i32> {
     fn add(a: u32, b: i32) -> u32 {
         if (b < 0) { Self::sub(a, (-b).try_into().unwrap()) }
         else if (b > 0) { (a + b.try_into().unwrap()) }
-        else {{a}}
+        else { (a) }
     }
     fn subi(ref self: u32, v: u32) {
         self = Self::sub(self, v);
@@ -247,13 +258,18 @@ pub impl MathU32 of MathTrait<u32, i32> {
         self = Self::add(self, v);
     }
 
-    fn gdc(a: u32, b: u32) -> u32 {
-        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
+    fn percentage(v: u32, percent: u8) -> u32 {
+        let result: u128 = MathU128::percentage(v.into(), percent);
+        (result.try_into().unwrap())
     }
 
     fn map(v: u32, in_min: u32, in_max: u32, out_min: u32, out_max: u32) -> u32 {
         let result: u128 = MathU128::map(v.into(), in_min.into(), in_max.into(), out_min.into(), out_max.into());
         (result.try_into().unwrap())
+    }
+
+    fn gdc(a: u32, b: u32) -> u32 {
+        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
     }
 
     fn pow(base: u32, exp: u32) -> u32 {
@@ -320,7 +336,7 @@ pub impl MathU64 of MathTrait<u64, i64> {
     fn add(a: u64, b: i64) -> u64 {
         if (b < 0) { Self::sub(a, (-b).try_into().unwrap()) }
         else if (b > 0) { (a + b.try_into().unwrap()) }
-        else {{a}}
+        else { (a) }
     }
     fn subi(ref self: u64, v: u64) {
         self = Self::sub(self, v);
@@ -329,13 +345,18 @@ pub impl MathU64 of MathTrait<u64, i64> {
         self = Self::add(self, v);
     }
 
-    fn gdc(a: u64, b: u64) -> u64 {
-        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
+    fn percentage(v: u64, percent: u8) -> u64 {
+        let result: u128 = MathU128::percentage(v.into(), percent);
+        (result.try_into().unwrap())
     }
 
     fn map(v: u64, in_min: u64, in_max: u64, out_min: u64, out_max: u64) -> u64 {
         let result: u128 = MathU128::map(v.into(), in_min.into(), in_max.into(), out_min.into(), out_max.into());
         (result.try_into().unwrap())
+    }
+
+    fn gdc(a: u64, b: u64) -> u64 {
+        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
     }
 
     fn pow(base: u64, exp: u64) -> u64 {
@@ -389,7 +410,7 @@ pub impl MathU128 of MathTrait<u128, i128> {
     fn add(a: u128, b: i128) -> u128 {
         if (b < 0) { Self::sub(a, (-b).try_into().unwrap()) }
         else if (b > 0) { (a + b.try_into().unwrap()) }
-        else {{a}}
+        else { (a) }
     }
     fn subi(ref self: u128, v: u128) {
         self = Self::sub(self, v);
@@ -398,8 +419,10 @@ pub impl MathU128 of MathTrait<u128, i128> {
         self = Self::add(self, v);
     }
 
-    fn gdc(a: u128, b: u128) -> u128 {
-        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
+    fn percentage(v: u128, percent: u8) -> u128 {
+        assert(percent <= 100, 'percentage(u128) percent > 100');
+        if (percent == 0) { (0) }
+        else { ((((v * 1_000_000) / 100) * percent.into()) / 1_000_000) } // possible overflow on high values
     }
 
     fn map(v: u128, in_min: u128, in_max: u128, out_min: u128, out_max: u128) -> u128 {
@@ -412,6 +435,10 @@ pub impl MathU128 of MathTrait<u128, i128> {
         } else {
             (out_min + ((((v * 1_000_000 - in_min * 1_000_000) / (in_max - in_min)) * (out_max - out_min)) / 1_000_000))
         }
+    }
+
+    fn gdc(a: u128, b: u128) -> u128 {
+        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
     }
 
     /// Raise a number to a power.
@@ -494,8 +521,10 @@ pub impl MathU256 of MathTrait<u256, u256> {
         self += v;
     }
 
-    fn gdc(a: u256, b: u256) -> u256 {
-        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
+    fn percentage(v: u256, percent: u8) -> u256 {
+        assert(percent <= 100, 'percentage(u256) percent > 100');
+        if (percent == 0) { (0) }
+        else { ((((v * 1_000_000) / 100) * percent.into()) / 1_000_000) } // possible overflow on high values
     }
 
     fn map(v: u256, in_min: u256, in_max: u256, out_min: u256, out_max: u256) -> u256 {
@@ -508,6 +537,10 @@ pub impl MathU256 of MathTrait<u256, u256> {
         } else {
             (out_min + ((((v * 1_000_000 - in_min * 1_000_000) / (in_max - in_min)) * (out_max - out_min)) / 1_000_000))
         }
+    }
+
+    fn gdc(a: u256, b: u256) -> u256 {
+        if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
     }
 
     fn pow(base: u256, exp: u256) -> u256 {
@@ -550,6 +583,7 @@ mod tests {
         MAX_SHORT_STRING_NUMBER,
     };
     use pistols::utils::bitwise::{BITWISE};
+    use pistols::types::constants::{CONST};
 
     #[test]
     fn test_abs() {
@@ -631,40 +665,22 @@ mod tests {
     }
 
     #[test]
-    fn test_gdc() {
-        assert_eq!(MathU8::gdc(4, 4), 4, "gdc_4_4");
-        assert_eq!(MathU8::gdc(4, 2), 2, "gdc_4_2");
-        assert_eq!(MathU8::gdc(2, 4), 2, "gdc_2_4");
-        assert_eq!(MathU8::gdc(4, 1), 1, "gdc_4_1");
-        assert_eq!(MathU8::gdc(1, 4), 1, "gdc_1_4");
-        assert_eq!(MathU8::gdc(6, 3), 3, "gdc_6_3");
-        assert_eq!(MathU8::gdc(40, 2), 2, "gdc_40_2");
-        assert_eq!(MathU8::gdc(40, 16), 8, "gdc_40_16");
-        assert_eq!(MathU8::gdc(24, 36), 12, "gdc_24_36");
+    fn test_percentage() {
+        assert_eq!(MathU8::percentage(0, 0), 0, "percent_0_0");
+        assert_eq!(MathU8::percentage(1, 0), 0, "percent_1_0");
+        assert_eq!(MathU8::percentage(100, 0), 0, "percent_100_0");
+        assert_eq!(MathU8::percentage(255, 0), 0, "percent_255_0");
+        assert_eq!(MathU8::percentage(0, 100), 0, "percent_0_100");
+        assert_eq!(MathU8::percentage(1, 100), 1, "percent_1_100");
+        assert_eq!(MathU8::percentage(100, 100), 100, "percent_100_100");
+        assert_eq!(MathU8::percentage(255, 100), 255, "percent_255_100");
+        assert_eq!(MathU8::percentage(200, 10), 20, "percent_200_10");
+        assert_eq!(MathU8::percentage(200, 50), 100, "percent_200_50");
+        assert_eq!(MathU8::percentage(50, 50), 25, "percent_50_50");
     }
 
     #[test]
-    fn test_pow() {
-        assert_eq!(MathU128::pow(0,0), 1, "test_math_pow_0,0");
-        assert_eq!(MathU128::pow(0,1), 0, "test_math_pow_0,1");
-        assert_eq!(MathU128::pow(0,2), 0, "test_math_pow_0,2");
-        assert_eq!(MathU128::pow(0,8), 0, "test_math_pow_0,8");
-        assert_eq!(MathU128::pow(1,0), 1, "test_math_pow_1,0");
-        assert_eq!(MathU128::pow(1,1), 1, "test_math_pow_1,1");
-        assert_eq!(MathU128::pow(1,2), 1, "test_math_pow_1,2");
-        assert_eq!(MathU128::pow(1,8), 1, "test_math_pow_1,8");
-        assert_eq!(MathU128::pow(2,0), 1, "test_math_pow_2,0");
-        assert_eq!(MathU128::pow(2,1), 2, "test_math_pow_2,1");
-        assert_eq!(MathU128::pow(2,2), 4, "test_math_pow_2,2");
-        assert_eq!(MathU128::pow(2,8), 256, "test_math_pow_2,8");
-        assert_eq!(MathU128::pow(10,0), 1, "test_math_pow_10,0");
-        assert_eq!(MathU128::pow(10,1), 10, "test_math_pow_10,1");
-        assert_eq!(MathU128::pow(10,2), 100, "test_math_pow_10,2");
-        assert_eq!(MathU128::pow(10,8), 100_000_000, "test_math_pow_10,8");
-    }
-
-    #[test]
-    fn test_map() {
+    fn test_map_u8() {
         assert_eq!(MathU8::map(0, 1, 5, 20, 40), 20, "map_0_clamped");
         assert_eq!(MathU8::map(1, 1, 5, 20, 40), 20, "map_1");
         assert_eq!(MathU8::map(2, 1, 5, 20, 40), 25, "map_2");
@@ -716,6 +732,48 @@ mod tests {
         assert_eq!(MathU8::map(5, 3, 8, 20, 20), 20, "edge_out_5");
         assert_eq!(MathU8::map(8, 3, 8, 20, 20), 20, "edge_out_8");
         assert_eq!(MathU8::map(10, 3, 8, 20, 20), 20, "edge_out_10");
+    }
+
+    #[test]
+    fn test_map_u128() {
+        let wei: u256 = CONST::ETH_TO_WEI;
+        assert_eq!(MathU256::map(1 * wei, 0, 100 * wei, 0, 500_000 * wei), 5_000 * wei, "u256: 1 > 5_000");
+        assert_eq!(MathU128::map(1 * wei.low, 0, 100 * wei.low, 0, 500_000 * wei.low), 5_000 * wei.low, "u128: 1 > 5_000");
+        assert_eq!(MathU256::map(5_000 * wei, 0, 500_000 * wei, 0, 100 * wei), 1 * wei, "u256: 5_000 > 1");
+        assert_eq!(MathU128::map(5_000 * wei.low, 0, 500_000 * wei.low, 0, 100 * wei.low), 1 * wei.low, "u128: 5_000 > 1");
+    }
+
+    #[test]
+    fn test_gdc() {
+        assert_eq!(MathU8::gdc(4, 4), 4, "gdc_4_4");
+        assert_eq!(MathU8::gdc(4, 2), 2, "gdc_4_2");
+        assert_eq!(MathU8::gdc(2, 4), 2, "gdc_2_4");
+        assert_eq!(MathU8::gdc(4, 1), 1, "gdc_4_1");
+        assert_eq!(MathU8::gdc(1, 4), 1, "gdc_1_4");
+        assert_eq!(MathU8::gdc(6, 3), 3, "gdc_6_3");
+        assert_eq!(MathU8::gdc(40, 2), 2, "gdc_40_2");
+        assert_eq!(MathU8::gdc(40, 16), 8, "gdc_40_16");
+        assert_eq!(MathU8::gdc(24, 36), 12, "gdc_24_36");
+    }
+
+    #[test]
+    fn test_pow() {
+        assert_eq!(MathU128::pow(0,0), 1, "test_math_pow_0,0");
+        assert_eq!(MathU128::pow(0,1), 0, "test_math_pow_0,1");
+        assert_eq!(MathU128::pow(0,2), 0, "test_math_pow_0,2");
+        assert_eq!(MathU128::pow(0,8), 0, "test_math_pow_0,8");
+        assert_eq!(MathU128::pow(1,0), 1, "test_math_pow_1,0");
+        assert_eq!(MathU128::pow(1,1), 1, "test_math_pow_1,1");
+        assert_eq!(MathU128::pow(1,2), 1, "test_math_pow_1,2");
+        assert_eq!(MathU128::pow(1,8), 1, "test_math_pow_1,8");
+        assert_eq!(MathU128::pow(2,0), 1, "test_math_pow_2,0");
+        assert_eq!(MathU128::pow(2,1), 2, "test_math_pow_2,1");
+        assert_eq!(MathU128::pow(2,2), 4, "test_math_pow_2,2");
+        assert_eq!(MathU128::pow(2,8), 256, "test_math_pow_2,8");
+        assert_eq!(MathU128::pow(10,0), 1, "test_math_pow_10,0");
+        assert_eq!(MathU128::pow(10,1), 10, "test_math_pow_10,1");
+        assert_eq!(MathU128::pow(10,2), 100, "test_math_pow_10,2");
+        assert_eq!(MathU128::pow(10,8), 100_000_000, "test_math_pow_10,8");
     }
 
     #[test]

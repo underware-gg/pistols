@@ -81,6 +81,9 @@ pub mod game {
         pact::{
             PactTrait,
         },
+        table::{
+            FeeValues,
+        },
         season::{
             SeasonConfig, SeasonConfigTrait,
         },
@@ -309,23 +312,26 @@ pub mod game {
             challenge.timestamp_end = starknet::get_block_timestamp();
             self.finish_challenge(ref store, challenge, round);
 
-            // transfer FAME reward
-            let (_balance_a, _balance_b): (i128, i128) = store.world.duelist_token_dispatcher().transfer_fame_reward(duel_id);
-
-            if (challenge.winner != 0) {
-                // send duel token to winner
-                store.world.duel_token_dispatcher().transfer_to_winner(duel_id);
-                // winning event
-                Activity::DuelResolved.emit(ref store.world, challenge.winner_address(), duel_id.into());
-            } else {
-                // draw event
-                Activity::DuelDraw.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
-            }
-
             // undo pacts
             store.exit_challenge(challenge.duelist_id_a);
             store.exit_challenge(challenge.duelist_id_b);
             challenge.unset_pact(ref store);
+
+            // transfer rewards
+            let tournament_id: u128 = 0;
+            let (_rewards_a, _rewards_b): (FeeValues, FeeValues) = store.world.duelist_token_dispatcher().transfer_rewards(challenge, tournament_id);
+
+            // send duel token to winner
+            if (challenge.winner != 0) {
+                store.world.duel_token_dispatcher().transfer_to_winner(duel_id);
+            }
+
+            // events
+            if (challenge.winner != 0) {
+                Activity::DuelResolved.emit(ref store.world, challenge.winner_address(), duel_id.into());
+            } else {
+                Activity::DuelDraw.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
+            }
         }
 
         fn collect(ref self: ContractState) -> felt252 {

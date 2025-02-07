@@ -27,12 +27,28 @@ pub struct TableConfig {
 }
 
 
+#[derive(Copy, Drop, Serde, Introspect, Default)]
+pub struct FeeDistribution {
+    pub underware_percent: u8,
+    pub creator_percent: u8,
+    pub winners_percent: u8,
+}
+
+#[derive(Copy, Drop, Serde, Introspect, Default)]
+pub struct FeeValues {
+    pub fame_lost: u128,
+    pub fame_gained: u128,
+    pub fools_gained: u128,
+    pub lords_gained: u128,
+}
+
 
 //---------------------------
 // Table Manager
 //
 use starknet::{ContractAddress};
 use pistols::libs::store::{Store, StoreTrait};
+use pistols::types::constants::{FAME};
 
 #[generate_trait]
 pub impl TableManagerImpl of TableManagerTrait {
@@ -74,6 +90,54 @@ pub impl TableTypeImpl of TableTypeTrait {
     fn can_join(self: @TableType, _account_address: ContractAddress, _duelist_id: u128) -> bool {
         (true)
     }
+    // end game calculations
+    fn get_fame_distribution(self: @TableType, tournament_id: u128) -> @FeeDistribution {
+        let mut result: FeeDistribution = match self {
+            TableType::Season => FeeDistribution {
+                underware_percent: 30,
+                creator_percent: 30,
+                winners_percent: 40,
+            },
+            _ => Default::default()
+        };
+        // if not a tournament, creator is underware
+        if (tournament_id == 0 && result.creator_percent != 0) {
+            result.underware_percent += result.creator_percent;
+            result.creator_percent = 0;
+        };
+        (@result)
+    }
+    // end game calculations
+    fn calc_fame_fees(self: @TableType, balance: u128, is_winner: bool) -> FeeValues {
+        let mut result: FeeValues = match self {
+            TableType::Season => {
+                let mut result: FeeValues = Default::default();
+                let one_life: u128 = FAME::LIFE_AMOUNT.low;
+                if (is_winner) {
+                    let k_fame: u128 = 1;
+                    result.fame_gained = (one_life / (((balance / one_life) + 1) / k_fame));
+                    let k_fools: u128 = 10;
+                    result.fools_gained = (k_fools * ((one_life / 2) / result.fame_gained));
+                    result.lords_gained = 0; // calculated at the bank
+                } else {
+                    result.fame_lost = one_life;
+                }
+                (result)
+            },
+            _ => Default::default()
+        };
+        (result)
+    }
+}
+
+
+
+#[generate_trait]
+pub impl FeeDistributionImpl of FeeDistributionTrait {
+    #[inline(always)]
+    fn is_payable(self: @FeeDistribution) -> bool {
+        (*self.underware_percent != 0 || *self.creator_percent != 0 || *self.winners_percent != 0)
+    }
 }
 
 
@@ -100,4 +164,3 @@ pub impl TableTypeDebug of core::fmt::Debug<TableType> {
         Result::Ok(())
     }
 }
-
