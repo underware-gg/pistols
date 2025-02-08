@@ -221,7 +221,7 @@ pub mod duel_token {
             let table: TableConfig = store.get_table_config(table_id);
             if (table.table_type.is_season()) {
                 let season: SeasonConfig = store.get_season_config(table_id);
-                (season.can_join())
+                (season.is_active())
             } else {
                 (table.table_type.exists() && table.table_type.can_join(starknet::get_caller_address(), duelist_id))
             }
@@ -258,7 +258,7 @@ pub mod duel_token {
             let table: TableConfig = store.get_table_config(table_id);
             if (table.table_type.is_season()) {
                 let season: SeasonConfig = store.get_season_config(table_id);
-                assert(season.can_join(), Errors::INVALID_SEASON);
+                assert(season.is_active(), Errors::INVALID_SEASON);
             } else {
                 assert(table.table_type.exists(), Errors::INVALID_TABLE);
             }
@@ -400,14 +400,6 @@ pub mod duel_token {
 
             (challenge.state)
         }
-        
-        // fn delete_duel(ref self: ContractState,
-        //     duel_id: u128,
-        // ) {
-        //     self.token.assert_is_owner_of(starknet::get_caller_address(), duel_id.into());
-        //     assert(false, Errors::NOT_IMPLEMENTED);
-        //     self.token.burn(duel_id.into());
-        // }
 
         fn transfer_to_winner(ref self: ContractState,
             duel_id: u128,
@@ -422,6 +414,14 @@ pub mod duel_token {
                 self.transfer_from(owner, challenge.address_b, duel_id.into());
             }
         }
+        
+        // fn delete_duel(ref self: ContractState,
+        //     duel_id: u128,
+        // ) {
+        //     self.token.assert_is_owner_of(starknet::get_caller_address(), duel_id.into());
+        //     assert(false, Errors::NOT_IMPLEMENTED);
+        //     self.token.burn(duel_id.into());
+        // }
     }
 
 

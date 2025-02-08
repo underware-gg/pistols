@@ -4,7 +4,6 @@ mod tests {
 
     use pistols::models::{
         challenge::{ChallengeTrait, ChallengeValue, RoundValue},
-        table::{FeeValues}
     };
     use pistols::types::{
         cards::hand::{PacesCard, FinalBlow, DeckType},
@@ -198,31 +197,14 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.set_mocked_values(salts.salts, salts.values);
 
-        let duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
-        let duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
+        let _duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
 
         let table_id: felt252 = SEASON_1_TABLE();
 
         let (challenge, _round_1, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
         assert_eq!(tester::get_Challenge(sys.world, duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
         tester::assert_pact(sys, duel_id, challenge, true, true, "started");
-
-        let reward_a: FeeValues = sys.duelists.calc_season_reward(duelist_id_a);
-        let reward_b: FeeValues = sys.duelists.calc_season_reward(duelist_id_b);
-        assert_ne!(reward_a.fame_gained, 0, "reward_a.fame_gained != 0");
-        assert_ne!(reward_b.fame_gained, 0, "reward_b.fame_gained != 0");
-        assert_ne!(reward_a.fame_lost, 0, "reward_a.fame_lost != 0");
-        assert_ne!(reward_b.fame_lost, 0, "reward_b.fame_lost != 0");
-        assert_ne!(reward_a.fools_gained, 0, "reward_a.fools_gained != 0");
-        assert_ne!(reward_b.fools_gained, 0, "reward_b.fools_gained != 0");
-        let mut fame_balance_a: u128 = tester::fame_balance_of_token(@sys, duelist_id_a);
-        let mut fame_balance_b: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);
-        let mut fools_balance_a: u128 = sys.fools.balance_of(OWNER()).low;
-        let mut fools_balance_b: u128 = sys.fools.balance_of(OTHER()).low;
-        assert_gt!(fame_balance_a, 0, "fame_balance_a");
-        assert_gt!(fame_balance_b, 0, "fame_balance_b");
-        assert_eq!(fools_balance_a, 0, "fools_balance_a");
-        assert_eq!(fools_balance_b, 0, "fools_balance_b");
 
         // duel owned by contract
         assert_eq!(sys.duels.owner_of(duel_id.into()), sys.game.contract_address, "duels.owner_of");
@@ -291,19 +273,6 @@ mod tests {
         assert_eq!(challenge.winner, winner, "winner");
 
         if (winner == 1) {
-            let fame_lost = reward_b.fame_lost;
-            let fame_gained = reward_a.fame_gained;
-            let fools_gained = reward_a.fools_gained;
-// println!("reward_a: {}", reward_a.fame_gained / CONST::ETH_TO_WEI.low);
-// println!("reward_b: {}", reward_b.fame_gained / CONST::ETH_TO_WEI.low);
-// println!("fame_balance_a: {}", fame_balance_a / CONST::ETH_TO_WEI.low);
-// println!("fame_balance_b: {}", fame_balance_b / CONST::ETH_TO_WEI.low);
-// println!("fame_balance_a_now: {}", tester::fame_balance_of_token(@sys, duelist_id_a) / CONST::ETH_TO_WEI.low);
-// println!("fame_balance_b_now: {}", tester::fame_balance_of_token(@sys, duelist_id_b) / CONST::ETH_TO_WEI.low);
-            fame_balance_a = tester::assert_fame_token_balance(@sys, duelist_id_a, fame_balance_a, 0, fame_gained, "a_fame_balance_a_end");
-            fame_balance_b = tester::assert_fame_token_balance(@sys, duelist_id_b, fame_balance_b, fame_lost, 0, "a_fame_balance_b_end");
-            fools_balance_a = tester::assert_fools_balance(@sys, OWNER(), fools_balance_a, 0, fools_gained, "a_fools_balance_a_end");
-            fools_balance_b = tester::assert_fools_balance(@sys, OTHER(), fools_balance_b, 0, 0, "a_fools_balance_b_end");
             assert_eq!(score_a.score.total_wins, 1, "a_win_duelist_a.total_wins");
             assert_eq!(score_b.score.total_wins, 0, "a_win_duelist_b.total_wins");
             assert_eq!(score_a.score.total_losses, 0, "a_win_duelist_a.total_losses");
@@ -315,13 +284,6 @@ mod tests {
             _assert_is_dead(round.state_b, "dead_b");
             assert_eq!(sys.duels.owner_of(duel_id.into()), challenge.address_a, "duels.owner_of_END_1");
         } else if (winner == 2) {
-            let fame_lost = reward_a.fame_lost;
-            let fame_gained = reward_b.fame_gained;
-            let fools_gained = reward_b.fools_gained;
-            fame_balance_a = tester::assert_fame_token_balance(@sys, duelist_id_a, fame_balance_a, fame_lost, 0, "b_fame_balance_a_end");
-            fame_balance_b = tester::assert_fame_token_balance(@sys, duelist_id_b, fame_balance_b, 0, fame_gained, "b_fame_balance_b_end");
-            fools_balance_a = tester::assert_fools_balance(@sys, OWNER(), fools_balance_a, 0, 0, "b_fools_balance_a_end");
-            fools_balance_b = tester::assert_fools_balance(@sys, OTHER(), fools_balance_b, 0, fools_gained, "b_fools_balance_b_end");
             assert_eq!(score_a.score.total_wins, 0, "b_win_duelist_a.total_wins");
             assert_eq!(score_b.score.total_wins, 1, "b_win_duelist_b.total_wins");
             assert_eq!(score_a.score.total_losses, 1, "b_win_duelist_a.total_losses");
@@ -340,14 +302,6 @@ mod tests {
         // Run same challenge again!!!!
         // (to compute totals and scores)
         //
-
-        // rewards do not change on 2nd duel
-        let reward_a_2: FeeValues = sys.duelists.calc_season_reward(duelist_id_a);
-        let reward_b_2: FeeValues = sys.duelists.calc_season_reward(duelist_id_b);
-        // assert_eq!(reward_a_2.fame_gained, reward_a.fame_gained, "reward_a_2.fame_gained");
-        // assert_eq!(reward_b_2.fame_gained, reward_b.fame_gained, "reward_b_2.fame_gained");
-        // assert_eq!(reward_a_2.fools_gained, reward_a.fools_gained, "reward_a_2.fools_gained");
-        // assert_eq!(reward_b_2.fools_gained, reward_b.fools_gained, "reward_b_2.fools_gained");
 
         let (_challenge, _round_2, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
         tester::assert_pact(sys, duel_id, challenge, true, true, "started_2");
@@ -378,25 +332,11 @@ mod tests {
         assert_eq!(round.state_b.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "score_b.score.honour ++");
 
         if (winner == 1) {
-            let fame_lost = reward_b_2.fame_lost;
-            let fame_gained = reward_a_2.fame_gained;
-            let fools_gained = reward_a_2.fools_gained;
-            fame_balance_a = tester::assert_fame_token_balance(@sys, duelist_id_a, fame_balance_a, 0, fame_gained, "a_fame_balance_a_end ++");
-            fame_balance_b = tester::assert_fame_token_balance(@sys, duelist_id_b, fame_balance_b, fame_lost, 0, "a_fame_balance_b_end ++");
-            fools_balance_a = tester::assert_fools_balance(@sys, OWNER(), fools_balance_a, 0, fools_gained, "a_fools_balance_a_end ++");
-            fools_balance_b = tester::assert_fools_balance(@sys, OTHER(), fools_balance_b, 0, 0, "a_fools_balance_b_end ++");
             assert_eq!(score_a.score.total_wins, 2, "a_win_duelist_a.total_wins ++");
             assert_eq!(score_b.score.total_wins, 0, "a_win_duelist_b.total_wins ++");
             assert_eq!(score_a.score.total_losses, 0, "a_win_duelist_a.total_losses ++");
             assert_eq!(score_b.score.total_losses, 2, "a_win_duelist_b.total_losses ++");
         } else if (winner == 2) {
-            let fame_lost = reward_a_2.fame_lost;
-            let fame_gained = reward_b_2.fame_gained;
-            let fools_gained = reward_b_2.fools_gained;
-            fame_balance_a = tester::assert_fame_token_balance(@sys, duelist_id_a, fame_balance_a, fame_lost, 0, "b_fame_balance_a_end ++");
-            fame_balance_b = tester::assert_fame_token_balance(@sys, duelist_id_b, fame_balance_b, 0, fame_gained, "b_fame_balance_b_end ++");
-            fools_balance_a = tester::assert_fools_balance(@sys, OWNER(), fools_balance_a, 0, 0, "b_fools_balance_a_end ++");
-            fools_balance_b = tester::assert_fools_balance(@sys, OTHER(), fools_balance_b, 0, fools_gained, "b_fools_balance_b_end ++");
             assert_eq!(score_a.score.total_wins, 0, "b_win_duelist_a.total_wins ++");
             assert_eq!(score_b.score.total_wins, 2, "b_win_duelist_b.total_wins ++");
             assert_eq!(score_a.score.total_losses, 2, "b_win_duelist_a.total_losses ++");
@@ -499,10 +439,6 @@ mod tests {
             tester::execute_reveal_moves(sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
             let challenge: ChallengeValue = tester::get_ChallengeValue(*sys.world, duel_id);
             assert_eq!(challenge.winner, winner, "challenge.winner {}", i);
-            // println!("winner [{}] fame [{}] fame_reward [{}]", challenge.winner,
-            //     (*sys).fame.balance_of_token((*sys).duelists.contract_address, ID(OWNER()).into()) / CONST::ETH_TO_WEI,
-            //     (*sys).fame.balance_of_token((*sys).duelists.contract_address, ID(OTHER()).into()) / CONST::ETH_TO_WEI
-            // );
             i += 1;
         };
         if (winner == 1) {

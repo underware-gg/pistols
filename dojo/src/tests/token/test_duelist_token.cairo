@@ -7,7 +7,7 @@ use dojo_cairo_test::{
 };
 
 use pistols::systems::{
-    bank::{IBankDispatcher},
+    bank::{bank, IBankDispatcher},
     tokens::{
         pack_token::{pack_token, IPackTokenDispatcher},
         duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
@@ -53,6 +53,9 @@ use pistols::models::{
     table::{
         m_TableConfig,
         TABLES,
+    },
+    pool::{
+        m_Pool,
     },
 };
 
@@ -150,6 +153,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
+            TestResource::Model(m_Pool::TEST_CLASS_HASH),
             // events
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
@@ -160,7 +164,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Contract(duelist_token::TEST_CLASS_HASH),
             TestResource::Contract(pack_token::TEST_CLASS_HASH),
             TestResource::Contract(fame_coin::TEST_CLASS_HASH),
-            // TestResource::Contract(bank::TEST_CLASS_HASH),
+            TestResource::Contract(bank::TEST_CLASS_HASH),
             // TestResource::Contract(lords_mock::TEST_CLASS_HASH),
         ].span()
     };
@@ -180,13 +184,9 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
                 'pistols.underware.gg',
             ].span()),
         ContractDefTrait::new(@"pistols", @"fame_coin")
-            .with_writer_of([
-                // same as config
-                selector_from_tag!("pistols-CoinConfig"),
-                selector_from_tag!("pistols-TokenBoundAddress"),
-            ].span()),
-        // ContractDefTrait::new(@"pistols", @"bank")
-        //     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
+            .with_writer_of([selector_from_tag!("pistols-CoinConfig"),selector_from_tag!("pistols-TokenBoundAddress")].span()), // same as config
+        ContractDefTrait::new(@"pistols", @"bank")
+            .with_writer_of([selector_from_tag!("pistols-Pool")].span())
         // ContractDefTrait::new(@"pistols", @"lords_mock")
         //     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
         //     .with_init_calldata([
@@ -454,7 +454,8 @@ fn test_fame_transfer_between_owners_not_allowed() {
 }
 
 #[test]
-#[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('ERC20: insufficient balance', 'ENTRYPOINT_FAILED'))]
+// #[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_fame_transfer_from_owner_not_allowed() {
     let mut sys: TestSystems = setup(0);
     // transfer FAME

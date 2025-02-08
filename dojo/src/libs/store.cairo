@@ -10,6 +10,9 @@ pub use pistols::models::{
         CoinConfig, CoinConfigValue,
         TokenConfig, TokenConfigValue,
     },
+    pool::{
+        Pool, PoolType,
+    },
     player::{
         Player, PlayerValue,
         PlayerRequiredAction,
@@ -178,6 +181,27 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
+    fn get_pool(ref self: Store, pool_id: PoolType) -> Pool {
+        (self.world.read_model(pool_id))
+    }
+    // #[inline(always)]
+    // fn get_bank_pool(ref self: Store) -> Pool {
+    //     self.get_pool(PoolType::Bank)
+    // }
+    // #[inline(always)]
+    // fn get_season_pool(ref self: Store, table_id: felt252) -> Pool {
+    //     self.get_pool(PoolType::Season(table_id))
+    // }
+    // #[inline(always)]
+    // fn get_tournament_pool(ref self: Store, tournament_id: felt252) -> Pool {
+    //     self.get_pool(PoolType::Tournament(tournament_id))
+    // }
+    // #[inline(always)]
+    // fn get_sacred_flame_pool(ref self: Store) -> Pool {
+    //     self.get_pool(PoolType::SacredFlame)
+    // }
+
+    #[inline(always)]
     fn get_token_bound_address(ref self: Store, recipient: ContractAddress) -> TokenBoundAddress {
         (self.world.read_model(recipient))
     }
@@ -257,6 +281,11 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_config(ref self: Store, model: @Config) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_pool(ref self: Store, model: @Pool) {
         self.world.write_model(model);
     }
 

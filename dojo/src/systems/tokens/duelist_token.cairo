@@ -116,6 +116,7 @@ pub mod duelist_token {
     };
     use pistols::models::{
         config::{Config},
+        pool::{PoolTypeTrait},
         player::{PlayerTrait, Activity},
         duelist::{
             Duelist, DuelistValue,
@@ -138,7 +139,6 @@ pub mod duelist_token {
     use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::math::{MathTrait};
-    use pistols::utils::misc::{ZERO};
 
     mod Errors {
         pub const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
@@ -205,7 +205,7 @@ pub mod duelist_token {
                 fame_lost: fees_loss.fame_lost,
                 fame_gained: fees_win.fame_gained,
                 fools_gained: fees_win.fools_gained,
-                lords_gained: fees_win.lords_gained,
+                lords_unlocked: fees_win.lords_unlocked,
             })
         }
 
@@ -245,16 +245,6 @@ pub mod duelist_token {
             (duelist_ids)
         }
         
-        // fn delete_duelist(ref self: ContractState,
-        //     duelist_id: u128,
-        // ) {
-        //     self.token.assert_is_owner_of(starknet::get_caller_address(), duelist_id.into());
-        //     // duelist burn not supported
-        //     assert(false, Errors::NOT_IMPLEMENTED);
-        //     // self.token.burn(duelist_id.into());
-        //     // burn FAME too
-        // }
-
         fn transfer_rewards(
             ref self: ContractState,
             challenge: Challenge,
@@ -266,7 +256,7 @@ pub mod duelist_token {
 
             // get fees distribution
             let table_type: TableType = store.get_table_config(challenge.table_id).table_type;
-            let distribution: @FeeDistribution = table_type.get_fame_distribution(tournament_id);
+            let distribution: @FeeDistribution = table_type.get_fame_distribution(challenge.table_id, tournament_id);
             if (!distribution.is_payable()) {
                 return (Default::default(), Default::default());
             }
@@ -284,16 +274,24 @@ pub mod duelist_token {
             let mut values_b: FeeValues = table_type.calc_fame_fees(balance_b, challenge.winner == 2);
 
             // transfer gains
-            let pool_address: ContractAddress = ZERO();
-            let creator_address: ContractAddress = ZERO();
             let config: Config = store.get_config();
             self.transfer_gains(fame_dispatcher, fools_dispatcher, values_a, challenge.duelist_id_a);
             self.transfer_gains(fame_dispatcher, fools_dispatcher, values_b, challenge.duelist_id_b);
-            self.transfer_losses(fame_dispatcher, bank_dispatcher, distribution, values_a, challenge.duelist_id_a, pool_address, creator_address, config.treasury_address);
-            self.transfer_losses(fame_dispatcher, bank_dispatcher, distribution, values_b, challenge.duelist_id_b, pool_address, creator_address, config.treasury_address);
+            self.transfer_losses(fame_dispatcher, bank_dispatcher, distribution, ref values_a, challenge.duelist_id_a, config.treasury_address);
+            self.transfer_losses(fame_dispatcher, bank_dispatcher, distribution, ref values_b, challenge.duelist_id_b, config.treasury_address);
 
             (values_a, values_b)
         }
+
+        // fn delete_duelist(ref self: ContractState,
+        //     duelist_id: u128,
+        // ) {
+        //     self.token.assert_is_owner_of(starknet::get_caller_address(), duelist_id.into());
+        //     // duelist burn not supported
+        //     assert(false, Errors::NOT_IMPLEMENTED);
+        //     // self.token.burn(duelist_id.into());
+        //     // burn FAME too
+        // }
 
     }
 
@@ -302,7 +300,6 @@ pub mod duelist_token {
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        #[inline(always)]
         fn transfer_gains(ref self: ContractState,
             fame_dispatcher: IFameCoinDispatcher,
             fools_dispatcher: IFoolsCoinDispatcher,
@@ -319,40 +316,33 @@ pub mod duelist_token {
                 fools_dispatcher.reward_player(owner, values.fools_gained.into());
             }
         }
-        #[inline(always)]
         fn transfer_losses(ref self: ContractState,
             fame_dispatcher: IFameCoinDispatcher,
             bank_dispatcher: IBankDispatcher,
             distribution: @FeeDistribution,
-            values: FeeValues,
+            ref values: FeeValues,
             duelist_id: u128,
-            pool_address: ContractAddress,
-            creator_address: ContractAddress,
             underware_address: ContractAddress,
         ) {
             // Burn FAME from duelist
             if (values.fame_lost != 0) {
                 let mut due_amount: u128 = values.fame_lost;
                 // transfer to pool
-                if (*distribution.winners_percent != 0 && pool_address.is_non_zero()) {
+                if (*distribution.winners_percent != 0 && distribution.pool_id.exists()) {
                     let amount: u128 = MathTrait::percentage(due_amount, *distribution.winners_percent);
-                    // fame_dispatcher.transfer_from_token(
-                    //     starknet::get_contract_address(), duelist_id,
-                    //     pool_address,
-                    //     amount.into(),
-                    // );
+                    bank_dispatcher.duelist_lost_fame(starknet::get_contract_address(), duelist_id, amount.into(), *distribution.pool_id);
                     due_amount -= amount;
                 }
                 // remaining is burned before unlocking
                 fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, due_amount.into());
                 // reward tournament creator
-                if (*distribution.creator_percent != 0 && creator_address.is_non_zero()) {
+                if (*distribution.creator_percent != 0 && distribution.creator_address.is_non_zero()) {
                     let amount: u128 = MathTrait::percentage(due_amount, *distribution.creator_percent);
-                    bank_dispatcher.burned_fame(creator_address, amount.into());
+                    values.lords_unlocked += bank_dispatcher.burned_fame_release_lords(*distribution.creator_address, amount.into()).low;
                     due_amount -= amount;
                 }
                 // remaining to underware
-                bank_dispatcher.burned_fame(underware_address, due_amount.into());
+                values.lords_unlocked += bank_dispatcher.burned_fame_release_lords(underware_address, due_amount.into()).low;
             }
         }
     }

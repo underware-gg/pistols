@@ -64,6 +64,9 @@ pub mod tester {
         table::{
             m_TableConfig, TableConfig,
         },
+        pool::{
+            m_Pool, Pool, PoolType,
+        },
     };
     use pistols::tests::token::mock_duelist::{
         duelist_token as mock_duelist,
@@ -147,6 +150,7 @@ pub mod tester {
         pub game: IGameDispatcher,
         pub tut: ITutorialDispatcher,
         pub admin: IAdminDispatcher,
+        pub bank: IBankDispatcher,
         pub lords: ILordsMockDispatcher,
         pub fame: IFameCoinDispatcher,
         pub fools: IFoolsCoinDispatcher,
@@ -173,10 +177,10 @@ pub mod tester {
         deploy_admin    = deploy_admin || deploy_game;
         deploy_lords    = deploy_lords || deploy_game || deploy_duelist || approve;
         deploy_duel     = deploy_duel || deploy_game;
-        deploy_bank     = deploy_bank || deploy_lords || deploy_duelist;
         deploy_fame     = deploy_fame || deploy_game || deploy_duelist;
         deploy_fools    = deploy_fools || deploy_game;
         deploy_rng_mock = deploy_rng_mock || deploy_tutorial;
+        deploy_bank     = deploy_bank || deploy_fame || deploy_lords || deploy_duelist;
         
 // '---- 0'.print();
         let mut resources: Array<TestResource> = array![
@@ -196,6 +200,7 @@ pub mod tester {
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
+            TestResource::Model(m_Pool::TEST_CLASS_HASH),
             // events
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
@@ -282,9 +287,7 @@ pub mod tester {
             resources.append(TestResource::Contract(mock_duelist::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duelist_token")
-                    .with_writer_of([
-                        selector_from_tag!("pistols-MockDuelistOwners"),
-                    ].span())
+                    .with_writer_of([selector_from_tag!("pistols-MockDuelistOwners")].span())
             );
         }
 
@@ -292,9 +295,7 @@ pub mod tester {
             resources.append(TestResource::Contract(lords_mock::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"lords_mock")
-                    .with_writer_of([
-                        selector_from_tag!("pistols-CoinConfig"),
-                    ].span())
+                    .with_writer_of([selector_from_tag!("pistols-CoinConfig")].span())
                     .with_init_calldata([
                         // game.contract_address.into(), // minter
                         0, // minter
@@ -307,7 +308,7 @@ pub mod tester {
             resources.append(TestResource::Contract(bank::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"bank")
-                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+                    .with_writer_of([selector_from_tag!("pistols-Pool")].span())
             );
         }
 
@@ -315,7 +316,7 @@ pub mod tester {
             resources.append(TestResource::Contract(fame_coin::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"fame_coin")
-                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+                    .with_writer_of([selector_from_tag!("pistols-CoinConfig"),selector_from_tag!("pistols-TokenBoundAddress")].span()), // same as config
             );
         }
         if (deploy_fools) {
@@ -384,6 +385,7 @@ pub mod tester {
             game: world.game_dispatcher(),
             tut: world.tutorial_dispatcher(),
             admin: world.admin_dispatcher(),
+            bank: world.bank_dispatcher(),
             lords: world.lords_mock_dispatcher(),
             fame: world.fame_coin_dispatcher(),
             fools: world.fools_coin_dispatcher(),
@@ -590,6 +592,10 @@ pub mod tester {
         (world.read_model(contract_address))
     }
     #[inline(always)]
+    pub fn get_Pool(world: WorldStorage, pool_id: PoolType) -> Pool {
+        (world.read_model(pool_id))
+    }
+    #[inline(always)]
     pub fn get_Table(world: WorldStorage, table_id: felt252) -> TableConfig {
         (world.read_model(table_id))
     }
@@ -696,34 +702,58 @@ pub mod tester {
     pub fn assert_lords_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = lords.balance_of(address).low;
         if (subtract > add) {
-            assert_lt!(balance, balance_before, "{}_<", prefix);
+            assert_lt!(balance, balance_before, "{}_lt", prefix);
         } else if (add > subtract) {
-            assert_gt!(balance, balance_before, "{}_>", prefix);
+            assert_gt!(balance, balance_before, "{}_gt", prefix);
         } else {
-            assert_eq!(balance, balance_before, "{}_==", prefix);
+            assert_eq!(balance, balance_before, "{}_eq", prefix);
         }
-        assert_eq!(balance, balance_before - subtract + add, "{}_=>", prefix);
+        assert_eq!(balance, balance_before - subtract + add, "{}_sum", prefix);
         (balance)
     }
 
-    pub fn assert_winner_balance(lords: ILordsMockDispatcher,
-        winner: u8,
-        duelist_a: ContractAddress, duelist_b: ContractAddress,
-        balance_a: u128, balance_b: u128,
-        fee: u128, prize_value: u128,
-        prefix: ByteArray,
-    ) {
-        if (winner == 1) {
-            assert_lords_balance(lords, duelist_a, balance_a, fee, prize_value, format!("A_A_{}", prefix));
-            assert_lords_balance(lords, duelist_b, balance_b, fee + prize_value, 0, format!("A_B_{}", prefix));
-        } else if (winner == 2) {
-            assert_lords_balance(lords, duelist_a, balance_a, fee + prize_value, 0, format!("B_A_{}", prefix));
-            assert_lords_balance(lords, duelist_b, balance_b, fee, prize_value, format!("B_B_{}", prefix));
-        } else {
-            assert_lords_balance(lords, duelist_a, balance_a, fee, 0, format!("D_A_{}", prefix));
-            assert_lords_balance(lords, duelist_b, balance_b, fee, 0, format!("D_B_{}", prefix));
-        }
+    pub fn assert_lords_balance_increased(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = lords.balance_of(address).low;
+        assert_gt!(balance, balance_before, "{}_indreased", prefix);
+        (balance)
     }
+
+    pub fn assert_lords_balance_decreased(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = lords.balance_of(address).low;
+        assert_lt!(balance, balance_before, "{}_decreased", prefix);
+        (balance)
+    }
+
+    pub fn assert_fame_balance_increased(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = fame.balance_of(address).low;
+        assert_gt!(balance, balance_before, "{}_indreased", prefix);
+        (balance)
+    }
+
+    pub fn assert_fame_balance_decreased(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = fame.balance_of(address).low;
+        assert_lt!(balance, balance_before, "{}_decreased", prefix);
+        (balance)
+    }
+
+    // pub fn assert_winner_balance(lords: ILordsMockDispatcher,
+    //     winner: u8,
+    //     duelist_a: ContractAddress, duelist_b: ContractAddress,
+    //     balance_a: u128, balance_b: u128,
+    //     fee: u128, prize_value: u128,
+    //     prefix: ByteArray,
+    // ) {
+    //     if (winner == 1) {
+    //         assert_lords_balance(lords, duelist_a, balance_a, fee, prize_value, format!("A_A_{}", prefix));
+    //         assert_lords_balance(lords, duelist_b, balance_b, fee + prize_value, 0, format!("A_B_{}", prefix));
+    //     } else if (winner == 2) {
+    //         assert_lords_balance(lords, duelist_a, balance_a, fee + prize_value, 0, format!("B_A_{}", prefix));
+    //         assert_lords_balance(lords, duelist_b, balance_b, fee, prize_value, format!("B_B_{}", prefix));
+    //     } else {
+    //         assert_lords_balance(lords, duelist_a, balance_a, fee, 0, format!("D_A_{}", prefix));
+    //         assert_lords_balance(lords, duelist_b, balance_b, fee, 0, format!("D_B_{}", prefix));
+    //     }
+    // }
 
     pub fn assert_pact(sys: TestSystems, duel_id: u128, ch: ChallengeValue, has_pact: bool, accepted: bool, prefix: ByteArray) {
         assert!(sys.duels.has_pact(ch.table_id, ch.address_a, ch.address_b) == has_pact,
