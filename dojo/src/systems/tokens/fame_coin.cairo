@@ -132,14 +132,17 @@ pub mod fame_coin {
         fn minted_duelist(ref self: ContractState,
             duelist_id: u128,
         ) {
+            let mut world = self.world_default();
+
             // validate minter (duelist token contract)
             let minter_address: ContractAddress = self.coin.assert_caller_is_minter();
 
             // register token_bound token
             let token_address: ContractAddress = self.token_bound.register_token(minter_address, duelist_id);
 
-            // pre-approve minter as spender
+            // pre-approve minter (duelist) and bank as spenders
             self.erc20._approve(token_address, minter_address, Bounded::MAX);
+            self.erc20._approve(token_address, world.bank_address(), Bounded::MAX);
 
             // mint FAME to token
             self.coin.mint(token_address, FAME::MINT_GRANT_AMOUNT);
@@ -168,9 +171,9 @@ pub mod fame_coin {
             recipient: ContractAddress,
             amount: u256
         ) {
-            // only minter can transfer
-            let mut contract_state = ERC20Component::HasComponent::get_contract_mut(ref self);
-            contract_state.coin.assert_caller_is_minter();
+            // // only minter can transfer
+            // let mut contract_state = ERC20Component::HasComponent::get_contract_mut(ref self);
+            // contract_state.coin.assert_caller_is_minter();
         }
 
         fn after_update(

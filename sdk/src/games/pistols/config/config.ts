@@ -36,11 +36,11 @@ const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
     description: 'Game loop contract',
     interfaces: ['IGame'],
   },
-  tutorial: {
-    name: 'Tutorial',
-    description: 'Tutorial game contract',
-    interfaces: ['ITutorial'],
-  },
+  // tutorial: {
+  //   name: 'Tutorial',
+  //   description: 'Tutorial game contract',
+  //   interfaces: ['ITutorial'],
+  // },
   pack_token: {
     name: 'Pack token',
     description: 'Packs ERC721 contract',
@@ -56,6 +56,11 @@ const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   //   description: 'Duelist ERC721 contract',
   //   interfaces: ['IDuelistTokenPublic'],
   // },
+  bank: {
+    name: 'Bank',
+    description: 'Bank contract',
+    interfaces: ['IBankPublic'],
+  },
 }
 const contractPolicyDescriptions_mock: ContractPolicyDescriptions = {
   lords_mock: {

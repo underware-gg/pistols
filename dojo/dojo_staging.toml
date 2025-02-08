@@ -59,6 +59,7 @@ default = "pistols"
   "pistols-lords_mock",
 ]
 "pistols-TokenBoundAddress" = ["pistols-fame_coin"]
+"pistols-Pool" = ["pistols-bank"]
 # arcade trophies
 "pistols-TrophyCreation" = ["pistols-game"]
 "pistols-TrophyProgression" = ["pistols-game"]

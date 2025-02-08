@@ -91,7 +91,7 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
     // info
     //
     #[inline(always)]
-    fn can_join(self: SeasonConfig) -> bool {
+    fn is_active(self: SeasonConfig) -> bool {
         (self.phase == SeasonPhase::InProgress)
     }
     #[inline(always)]

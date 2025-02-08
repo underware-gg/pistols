@@ -45,6 +45,7 @@ mod models {
     pub mod pack;
     pub mod pact;
     pub mod player;
+    pub mod pool;
     pub mod season;
     pub mod table;
 }
@@ -91,6 +92,7 @@ mod utils {
 #[cfg(test)]
 mod tests {
     pub mod test_admin;
+    pub mod test_bank;
     pub mod test_cards;
     pub mod test_challenge;
     pub mod test_duel;

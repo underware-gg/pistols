@@ -32,6 +32,7 @@ use pistols::models::{
         m_CoinConfig,
         CONFIG,
     },
+    pool::{m_Pool},
     table::{TABLES},
 };
 
@@ -119,6 +120,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
+            TestResource::Model(m_Pool::TEST_CLASS_HASH),
             // events
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
@@ -150,9 +152,9 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
                 'pistols.underware.gg',
             ].span()),
         ContractDefTrait::new(@"pistols", @"fame_coin")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
+            .with_writer_of([selector_from_tag!("pistols-CoinConfig"),selector_from_tag!("pistols-TokenBoundAddress")].span()), // same as config
         ContractDefTrait::new(@"pistols", @"bank")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
+            .with_writer_of([selector_from_tag!("pistols-Pool"),].span()),
         ContractDefTrait::new(@"pistols", @"lords_mock")
             .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             .with_init_calldata([
