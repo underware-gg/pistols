@@ -8,11 +8,8 @@ import { PistolsSchemaType, getProfileDescription } from '@underware_gg/pistols-
 import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
 import { useScore } from '/src/hooks/useScore'
 import { CharacterType } from '/src/data/assets'
-// FIX: dojo.js 1.0.12 createDojoStore()
-import type { GameState } from '@dojoengine/sdk/state'
-import { StoreApi, UseBoundStore } from 'zustand'
 
-export const useDuelistStore = createDojoStore<PistolsSchemaType>() as UseBoundStore<StoreApi<GameState<PistolsSchemaType>>>;
+export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 
 // export const useAllDuelistsEntityIds = () => {
 //   const entities = useStore((state) => state.entities)

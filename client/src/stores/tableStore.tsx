@@ -5,11 +5,8 @@ import { useEntityId } from '@underware_gg/pistols-sdk/utils/hooks'
 import { feltToString, stringToFelt, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
 import { PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
-// FIX: dojo.js 1.0.12 createDojoStore()
-import type { GameState } from '@dojoengine/sdk/state'
-import { StoreApi, UseBoundStore } from 'zustand'
 
-export const useTableConfigStore = createDojoStore<PistolsSchemaType>() as UseBoundStore<StoreApi<GameState<PistolsSchemaType>>>;
+export const useTableConfigStore = createDojoStore<PistolsSchemaType>();
 
 export const useAllTableIds = () => {
   const entities = useTableConfigStore((state) => state.entities)

@@ -94,7 +94,7 @@ export const useSdkEntities = ({
     let _unsubscribe: (() => void) | undefined;
     const _subscribe = async () => {
       setIsSubscribed(undefined)
-      const subscription = await sdk.subscribeEntityQuery({
+      const [initialEntities, sub] = await sdk.subscribeEntityQuery({
         query: query_sub,
         callback: (response: SdkCallbackResponse) => {
           if (response.error) {
@@ -109,7 +109,7 @@ export const useSdkEntities = ({
         options: { logging },
       })
       setIsSubscribed(true)
-      _unsubscribe = () => subscription.cancel()
+      _unsubscribe = () => sub.cancel()
     };
     // subscribe
     if (sdk && enabled && query_sub && isLoading === false) _subscribe()
@@ -187,7 +187,7 @@ export const useSdkEvents = ({
 
     const _subscribe = async () => {
       setIsSubscribed(undefined)
-      const subscription = await sdk.subscribeEventQuery({
+      const [initialEntities, sub] = await sdk.subscribeEventQuery({
         query: query_sub,
         callback: (response: SdkCallbackResponse) => {
           if (response.error) {
@@ -202,7 +202,7 @@ export const useSdkEvents = ({
         historical,
       })
       setIsSubscribed(true)
-      _unsubscribe = () => subscription.cancel()
+      _unsubscribe = () => sub.cancel()
     };
 
     if (sdk && enabled && query_sub && isLoading === false) {

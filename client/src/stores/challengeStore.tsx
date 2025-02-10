@@ -6,11 +6,8 @@ import { formatQueryValue, useEntityModel, useSdkEntities } from '@underware_gg/
 import { feltToString, parseCustomEnum, bigintEquals, parseEnumVariant, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
 import { PistolsGetQuery, PistolsSchemaType, movesToHand } from '@underware_gg/pistols-sdk/pistols'
 import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
-// FIX: dojo.js 1.0.12 createDojoStore()
-import type { GameState } from '@dojoengine/sdk/state'
-import { StoreApi, UseBoundStore } from 'zustand'
 
-export const useChallengeStore = createDojoStore<PistolsSchemaType>() as UseBoundStore<StoreApi<GameState<PistolsSchemaType>>>;
+export const useChallengeStore = createDojoStore<PistolsSchemaType>();
 
 export const useAllChallengesEntityIds = () => {
   const entities = useChallengeStore((state) => state.entities)

@@ -11,7 +11,6 @@ import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
-export type Schema = typeof models.schema
 
 export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: DojoNetworkConfig) {
 
@@ -60,7 +59,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
     if (!starknetDomain) return undefined
     if (!manifest) return null
     console.log(`TORII CLIENT...`, selectedNetworkConfig.toriiUrl)
-    const sdk = await init<Schema>(
+    const sdk = await init<models.SchemaType>(
       {
         client: {
           rpcUrl: selectedNetworkConfig.rpcUrl,
@@ -70,7 +69,6 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
         },
         domain: starknetDomain,
       },
-      models.schema
     );
     console.log(`TORII CLIENT OK!`)
     return sdk

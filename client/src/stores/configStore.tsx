@@ -5,11 +5,8 @@ import { useRouteSlugs } from '/src/hooks/useRoute'
 import { feltToString, keysToEntity } from '@underware_gg/pistols-sdk/utils'
 import { PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
-// FIX: dojo.js 1.0.12 createDojoStore()
-import type { GameState } from '@dojoengine/sdk/state'
-import { StoreApi, UseBoundStore } from 'zustand'
 
-export const useConfigStore = createDojoStore<PistolsSchemaType>() as UseBoundStore<StoreApi<GameState<PistolsSchemaType>>>;
+export const useConfigStore = createDojoStore<PistolsSchemaType>();
 
 const configKey = keysToEntity([constants.CONFIG.CONFIG_KEY])
 
