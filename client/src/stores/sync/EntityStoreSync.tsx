@@ -1,7 +1,5 @@
-import { useMemo } from 'react'
-import { useSdkEntities, getEntityModel, filterEntitiesByModel, getEntityModels } from '@underware_gg/pistols-sdk/dojo'
-import { PistolsGetQuery, PistolsSubQuery, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { useSdkEntitiesSub, getEntityModel, filterEntitiesByModel, getEntityModels } from '@underware_gg/pistols-sdk/dojo'
+import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
 import { useMounted } from '@underware_gg/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
 import { useTableConfigStore } from '/src/stores/tableStore'
@@ -13,45 +11,79 @@ import { useChallengeStore } from '/src/stores/challengeStore'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { usePackStore } from '/src/stores/packStore'
 
-const query_get: PistolsGetQuery = {
-  pistols: {
-    // models
-    Config: { $: { where: { key: { $eq: constants.CONFIG.CONFIG_KEY } } } },
-    TableConfig: { $: { where: { table_id: { $neq: 0 } } } },
-    TokenConfig: { $: { where: { token_address: { $neq: '' } } } },
-    Player: { $: { where: { player_address: { $neq: '' } } } },
-    Duelist: { $: { where: { duelist_id: { $neq: 0 } } } },
-    DuelistChallenge: { $: { where: { duelist_id: { $neq: 0 } } } },
-    Scoreboard: { $: { where: { holder: { $neq: 0 } } } },
-  },
-}
-const query_get_messages: PistolsGetQuery = {
-  pistols: {
+// const query_get: PistolsQueryBuilder = {
+//   pistols: {
+//     // models
+//     Config: { $: { where: { key: { $eq: constants.CONFIG.CONFIG_KEY } } } },
+//     TableConfig: { $: { where: { table_id: { $neq: 0 } } } },
+//     TokenConfig: { $: { where: { token_address: { $neq: '' } } } },
+//     Player: { $: { where: { player_address: { $neq: '' } } } },
+//     Duelist: { $: { where: { duelist_id: { $neq: 0 } } } },
+//     DuelistChallenge: { $: { where: { duelist_id: { $neq: 0 } } } },
+//     Scoreboard: { $: { where: { holder: { $neq: 0 } } } },
+//   },
+// }
+// const query_get_messages: PistolsQueryBuilder = {
+//   pistols: {
+//     // off-chain signed messages
+//     PlayerOnline: { $: { where: { identity: { $neq: '' } } } },
+//     PlayerBookmark: { $: { where: { identity: { $neq: '' } } } },
+//   },
+// }
+// const query_sub: PistolsQueryBuilder = {
+//   pistols: {
+//     // models
+//     Config: [],
+//     TableConfig: [],
+//     TokenConfig: [],
+//     Player: [],
+//     Duelist: [],
+//     DuelistChallenge: [],
+//     Scoreboard: [],
+//     Challenge: [],
+//     Round: [],
+//     Pack: [],
+//     // off-chain signed messages
+//     PlayerOnline: [],
+//     PlayerBookmark: [],
+//   },
+// }
+const query: PistolsQueryBuilder = new PistolsQueryBuilder()
+  .withClause(
+    new PistolsClauseBuilder().keys([
+      "pistols-Config",
+      "pistols-TableConfig",
+      "pistols-TokenConfig",
+      "pistols-Player",
+      "pistols-Duelist",
+      "pistols-DuelistChallenge",
+      "pistols-Scoreboard",
+      "pistols-Challenge",
+      "pistols-Round",
+      "pistols-Pack",
+      // off-chain signed messages
+      "pistols-PlayerOnline",
+      "pistols-PlayerBookmark",
+    ], []).build()
+  ).withEntityModels([
+    "pistols-Config",
+    "pistols-TableConfig",
+    "pistols-TokenConfig",
+    "pistols-Player",
+    "pistols-Duelist",
+    "pistols-DuelistChallenge",
+    "pistols-Scoreboard",
+    "pistols-Challenge",
+    "pistols-Round",
+    "pistols-Pack",
     // off-chain signed messages
-    PlayerOnline: { $: { where: { identity: { $neq: '' } } } },
-    PlayerBookmark: { $: { where: { identity: { $neq: '' } } } },
-  },
-}
-const query_sub: PistolsSubQuery = {
-  pistols: {
-    // models
-    Config: [],
-    TableConfig: [],
-    TokenConfig: [],
-    Player: [],
-    Duelist: [],
-    DuelistChallenge: [],
-    Scoreboard: [],
-    Challenge: [],
-    Round: [],
-    Pack: [],
-    // off-chain signed messages
-    PlayerOnline: [],
-    PlayerBookmark: [],
-  },
-}
+    "pistols-PlayerOnline",
+    "pistols-PlayerBookmark",
+  ])
+  .includeHashedKeys()
 
 
+  
 //------------------------------------------------------
 // Sync entities: Add only once to a top level component
 //
@@ -68,27 +100,28 @@ export function EntityStoreSync() {
 
   const mounted = useMounted()
 
-  useSdkEntities({
-    query_get,
-    query_sub,
+  useSdkEntitiesSub({
+    query,
     enabled: mounted,
     setEntities: (entities: PistolsEntity[]) => {
       // console.log("EntityStoreSync() SET =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModel(entities, 'Config'))
       // console.log("EntityStoreSync() SET =======> [TableConfig]:", filterEntitiesByModel(entities, 'TableConfig'))
       // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModel(entities, 'TokenConfig'))
-      // console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
+      console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
       // console.log("EntityStoreSync() SET =======> [Player]:", filterEntitiesByModel(entities, 'Player'))
       configState.setEntities(filterEntitiesByModel(entities, 'Config'))
       tableState.setEntities(filterEntitiesByModel(entities, ['TableConfig', 'SeasonConfig']))
       tokenState.setEntities(filterEntitiesByModel(entities, 'TokenConfig'))
       playerState.setEntities(filterEntitiesByModel(entities, 'Player'))
+      playerState.updateMessages(filterEntitiesByModel(entities, ['PlayerOnline', 'PlayerBookmark']))
       const duelistEntities = filterEntitiesByModel(entities, ['Duelist', 'DuelistChallenge', 'Scoreboard'])
       duelistState.setEntities(duelistEntities)
       duelistQueryState.setEntities(duelistEntities)
-      const challengeEntities = filterEntitiesByModel(entities, ['Challenge', 'Round'])
-      challengeState.setEntities(challengeEntities)
-      challengeQueryState.setEntities(challengeEntities)
+      // challenge initial state is handled by <ChallengeStoreSync>
+      // const challengeEntities = filterEntitiesByModel(entities, ['Challenge', 'Round'])
+      // challengeState.setEntities(challengeEntities)
+      // challengeQueryState.setEntities(challengeEntities)
     },
     updateEntity: (entity: PistolsEntity) => {
       console.log("EntityStoreSync() SUB UPDATE =======> [entity]:", entity)
@@ -118,17 +151,6 @@ export function EntityStoreSync() {
       if (getEntityModels(entity, ['Pack']).length > 0) {
         packState.updateEntity(entity)
       }
-    },
-  })
-
-  // off-chain signed messages
-  // fetch only after players have been fetched
-  const playersLoaded = useMemo(() => (Object.keys(playerState.players).length > 0), [playerState.players])
-  useSdkEntities({
-    query_get: query_get_messages,
-    enabled: (mounted && playersLoaded),
-    setEntities: (entities: PistolsEntity[]) => {
-      playerState.updateMessages(entities)
     },
   })
 

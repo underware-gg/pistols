@@ -1,9 +1,9 @@
 import { useEffect, useMemo } from 'react'
-import { formatQueryValue, getEntityModel, useDojoSetup, useSdkEvents } from '@underware_gg/pistols-sdk/dojo'
+import { formatQueryValue, getEntityModel, useDojoSetup, useSdkEventsSub } from '@underware_gg/pistols-sdk/dojo'
 import { useMounted } from '@underware_gg/pistols-sdk/utils/hooks'
 import { useEventsStore } from '/src/stores/eventsStore'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
-import { PistolsEntity, PistolsGetQuery, PistolsSubQuery } from '@underware_gg/pistols-sdk/pistols'
+import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
 
 
@@ -14,26 +14,40 @@ export function EventsModelStoreSync() {
 
   const { duelistIds } = useDuelistsOfPlayer()
 
-  const query_get = useMemo<PistolsGetQuery>(() => ({
-    pistols: {
-      PlayerRequiredAction: {
-        $: {
-          where: {
-            duelist_id: { $in: duelistIds.map(id => formatQueryValue(id)) }
-          },
-        },
-      },
-    },
-  }), [duelistIds])
-  const query_sub = useMemo<PistolsSubQuery>(() => ({
-    pistols: {
-      PlayerRequiredAction: [],
-    },
-  }), [])
+  // const query = useMemo<PistolsQueryBuilder>(() => ({
+  //   pistols: {
+  //     PlayerRequiredAction: {
+  //       $: {
+  //         where: {
+  //           duelist_id: { $in: duelistIds.map(id => formatQueryValue(id)) }
+  //         },
+  //       },
+  //     },
+  //   },
+  // }), [duelistIds])
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    new PistolsQueryBuilder()
+      .withClause(
+        // new PistolsClauseBuilder().where(
+        //   "pistols-PlayerRequiredAction",
+        //   "duelist_id",
+        //   "In", duelistIds.map(id => formatQueryValue(id))
+        // ).build()
+        new PistolsClauseBuilder().keys(
+          ["pistols-PlayerRequiredAction"],
+          [],
+          "FixedLen"
+        ).build()
+      )
+      .withLimit(50)
+      .withEntityModels([
+        "pistols-PlayerRequiredAction",
+      ])
+      .includeHashedKeys()
+  ), [duelistIds])
 
-  useSdkEvents({
-    query_get,
-    query_sub,
+  useSdkEventsSub({
+    query,
     enabled: (mounted && duelistIds.length > 0),
     setEntities: (entities: PistolsEntity[]) => {
       // console.log(`GET PlayerRequiredAction() ======>`, entities)
@@ -50,7 +64,6 @@ export function EventsModelStoreSync() {
       }
     },
     historical: false, // historical events
-    limit: 100,
   })
 
   // // TESTING raw events from client

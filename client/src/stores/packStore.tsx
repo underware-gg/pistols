@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityId, useClientTimestamp } from '@underware_gg/pistols-sdk/utils/hooks'
-import { feltToString, parseCustomEnum, bigintEquals, parseEnumVariant, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
-import { formatQueryValue, useEntityModel, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
-import { PistolsGetQuery, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
+import { useEntityId } from '@underware_gg/pistols-sdk/utils/hooks'
+import { parseEnumVariant, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
+import { formatQueryValue, useEntityModel, useSdkEntitiesGet } from '@underware_gg/pistols-sdk/dojo'
+import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
 import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
 
 export const usePackStore = createDojoStore<PistolsSchemaType>();
@@ -42,32 +42,49 @@ export const usePack = (duelId: BigNumberish) => {
 
 
 
-//--------------------------------
-// Fetch new challenge and add to the store
+//-----------------------------------------
+// Fetch new Pack and add to the store
 // (for non default tables, like tutorials)
 //
 
 export const useGetPack = (pack_id: BigNumberish) => {
   const result = usePack(pack_id)
 
-  const query_get = useMemo<PistolsGetQuery>(() => ({
-    pistols: {
-      Pack: {
-        $: {
-          where: {
-            pack_id: { $eq: formatQueryValue(pack_id) },
-          },
-        },
-      },
+  // const query_get = useMemo<PistolsQueryBuilder>(() => ({
+  //   pistols: {
+  //     Pack: {
+  //       $: {
+  //         where: {
+  //           pack_id: { $eq: formatQueryValue(pack_id) },
+  //         },
+  //       },
+  //     },
+  //   },
+  // }), [pack_id])
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    isPositiveBigint(pack_id)
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().keys(
+            ["pistols-Pack"],
+            [formatQueryValue(pack_id)]
+          ).build()
+        )
+        .includeHashedKeys()
+      : null
+  ), [pack_id])
+
+  const updateEntity = usePackStore((state) => state.updateEntity)
+
+  useSdkEntitiesGet({
+    query,
+    enabled: !result.packExists,
+    setEntities: (entities: PistolsEntity[]) => {
+      entities.forEach(e => {
+        console.log(`useGetPack() SET =======> [entity]:`, e)
+        updateEntity(e)
+      })
     },
-  }), [pack_id])
-
-  const setEntities = usePackStore((state) => state.setEntities)
-
-  useSdkEntities({
-    query_get,
-    enabled: (isPositiveBigint(pack_id) && !result.packExists),
-    setEntities,
   })
 
   return result

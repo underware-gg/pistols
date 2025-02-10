@@ -1,9 +1,9 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useTableId } from '/src/stores/configStore'
-import { formatQueryValue, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
+import { formatQueryValue, useSdkEntitiesGet } from '@underware_gg/pistols-sdk/dojo'
 import { useMounted } from '@underware_gg/pistols-sdk/utils/hooks'
 import { stringToFelt } from '@underware_gg/pistols-sdk/utils'
-import { PistolsGetQuery, PistolsSubQuery, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
+import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
 
@@ -14,40 +14,37 @@ import { useChallengeStore } from '/src/stores/challengeStore'
 //
 export function ChallengeStoreSync() {
   const { tableId } = useTableId()
-  const query_get = useMemo<PistolsGetQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            table_id: { $eq: formatQueryValue(stringToFelt(tableId)) },
-          },
-        },
-      },
-    },
-  }), [tableId])
-  // const query_sub = useMemo<PistolsSubQuery>(() => ({
+  // const query_get = useMemo<PistolsQueryBuilder>(() => ({
   //   pistols: {
   //     Challenge: {
   //       $: {
   //         where: {
-  //           table_id: { $is: formatQueryValue(stringToFelt(tableId)) },
+  //           table_id: { $eq: formatQueryValue(stringToFelt(tableId)) },
   //         },
   //       },
   //     },
   //   },
   // }), [tableId])
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    new PistolsQueryBuilder()
+      .withClause(
+        new PistolsClauseBuilder().keys(
+          ["pistols-Challenge"],
+          [formatQueryValue(stringToFelt(tableId))]
+        ).build()
+      )
+      .includeHashedKeys()
+  ), [tableId])
 
   const challengeState = useChallengeStore((state) => state)
   const queryState = useChallengeQueryStore((state) => state)
 
   const mounted = useMounted()
 
-  useSdkEntities({
-    query_get,
-    // query_sub,
+  useSdkEntitiesGet({
+    query,
     enabled: mounted,
     setEntities: (entities: PistolsEntity[]) => {
-      // console.log("ChallengeStoreSync() SET =======> [entities]:", entities)
       challengeState.setEntities(entities)
       queryState.setEntities(entities)
     },

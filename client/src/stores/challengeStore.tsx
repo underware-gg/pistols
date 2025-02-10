@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityId, useClientTimestamp } from '@underware_gg/pistols-sdk/utils/hooks'
-import { formatQueryValue, useEntityModel, useSdkEntities } from '@underware_gg/pistols-sdk/dojo'
+import { formatQueryValue, useEntityModel, useSdkEntitiesGet } from '@underware_gg/pistols-sdk/dojo'
 import { feltToString, parseCustomEnum, bigintEquals, parseEnumVariant, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
-import { PistolsGetQuery, PistolsSchemaType, movesToHand } from '@underware_gg/pistols-sdk/pistols'
+import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder, PistolsEntity, movesToHand } from '@underware_gg/pistols-sdk/pistols'
 import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
@@ -184,24 +184,41 @@ export const useRound = (duelId: BigNumberish) => {
 export const useGetChallenge = (duel_id: BigNumberish) => {
   const result = useChallenge(duel_id)
 
-  const query_get = useMemo<PistolsGetQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            duel_id: { $eq: formatQueryValue(duel_id) },
-          },
-        },
-      },
+  // const query_get = useMemo<PistolsQueryBuilder>(() => ({
+  //   pistols: {
+  //     Challenge: {
+  //       $: {
+  //         where: {
+  //           duel_id: { $eq: formatQueryValue(duel_id) },
+  //         },
+  //       },
+  //     },
+  //   },
+  // }), [duel_id])
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    isPositiveBigint(duel_id)
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().keys(
+            ["pistols-Challenge"],
+            [formatQueryValue(duel_id)]
+          ).build()
+        )
+        .includeHashedKeys()
+      : null
+  ), [duel_id])
+
+  const updateEntity = useChallengeStore((state) => state.updateEntity)
+
+  useSdkEntitiesGet({
+    query,
+    enabled: !result.challengeExists,
+    setEntities: (entities: PistolsEntity[]) => {
+      entities.forEach(e => {
+        console.log(`useGetChallenge() SET =======> [entity]:`, e)
+        updateEntity(e)
+      })
     },
-  }), [duel_id])
-
-  const setEntities = useChallengeStore((state) => state.setEntities)
-
-  useSdkEntities({
-    query_get,
-    enabled: (isPositiveBigint(duel_id) && !result.challengeExists),
-    setEntities,
   })
 
   return result

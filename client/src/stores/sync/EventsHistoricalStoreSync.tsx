@@ -1,20 +1,25 @@
 import { useEffect } from 'react'
-import { useDojoSetup, useSdkEvents } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoSetup, useSdkEventsSub } from '@underware_gg/pistols-sdk/dojo'
 import { useMounted } from '@underware_gg/pistols-sdk/utils/hooks'
 import { useHistoricalEventsStore } from '/src/stores/historicalEventsStore'
-import { PistolsGetQuery, PistolsSubQuery } from '@underware_gg/pistols-sdk/pistols'
+import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
 
-const query_get: PistolsGetQuery = {
-  pistols: {
-    PlayerActivity: [],
-  },
-}
-const query_sub: PistolsSubQuery = {
-  pistols: {
-    PlayerActivity: [],
-  },
-}
+// const query: PistolsQueryBuilder = {
+//   pistols: {
+//     PlayerActivity: [],
+//   },
+//   limit: 20,
+// }
+const query: PistolsQueryBuilder = new PistolsQueryBuilder()
+  .withClause(
+    new PistolsClauseBuilder().keys(["pistols-PlayerActivity"], [], "FixedLen").build()
+  )
+  .withEntityModels([
+    "pistols-PlayerActivity",
+  ])
+  .withLimit(30)
+  // .includeHashedKeys() // historical events are sequential
 
 // Sync entities: Add only once to a top level component
 export function EventsHistoricalStoreSync() {
@@ -22,14 +27,12 @@ export function EventsHistoricalStoreSync() {
   
   const mounted = useMounted()
 
-  useSdkEvents({
-    query_get,
-    query_sub,
+  useSdkEventsSub({
+    query,
     enabled: mounted,
     setEntities: historicalEventsState.setEvents,
     updateEntity: historicalEventsState.updateEvent,
     historical: true, // historical events
-    limit: 20,
   })
 
   // // TESTING raw events from client

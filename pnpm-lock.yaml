@@ -1302,8 +1302,8 @@ packages:
   '@latticexyz/utils@2.0.12':
     resolution: {integrity: sha512-AwniovUlWY7YL92Mjz/3R0V9g8c5wYg5t3agRmMZ9wgktUB6BYZC65n+sKp88wUuN3DrMLb51UFZOycGh0JD2w==}
 
-  '@latticexyz/utils@2.2.16':
-    resolution: {integrity: sha512-HnVCKs2oRkNSLnLPx/9+k8wLRqS3OUVHnOhHEX1h9SG7nv+X9Q6ATEkomUoOiKBAtmjJ/fv75eML0dq4uaZSvA==}
+  '@latticexyz/utils@2.2.19':
+    resolution: {integrity: sha512-s1ngJ1lKlVTqqicjDnMh1QfiEcr0yajgJ2XwKUbn9gVNTuiB/7Gy43AVSY8EFTYcZZBTd6pjsHQ69jn+bcKAzA==}
 
   '@mongodb-js/saslprep@1.1.9':
     resolution: {integrity: sha512-tVkljjeEaAhCqTzajSdgbQ6gE6f3oneVwa3iXR6csiEwXXOFsiC6Uh9iAjAhXPtqa/XMDHWjjeNH/77m/Yq2dw==}
@@ -1323,10 +1323,6 @@ packages:
 
   '@noble/hashes@1.3.2':
     resolution: {integrity: sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==}
-    engines: {node: '>= 16'}
-
-  '@noble/hashes@1.3.3':
-    resolution: {integrity: sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==}
     engines: {node: '>= 16'}
 
   '@noble/hashes@1.6.0':
@@ -3368,8 +3364,8 @@ packages:
   mkdirp-classic@0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
 
-  mobx@6.13.5:
-    resolution: {integrity: sha512-/HTWzW2s8J1Gqt+WmUj5Y0mddZk+LInejADc79NJadrWla3rHzmRHki/mnEUH1AvOmbNTZ1BRbKxr8DSgfdjMA==}
+  mobx@6.13.6:
+    resolution: {integrity: sha512-r19KNV0uBN4b+ER8Z0gA4y+MzDYIQ2SvOmn3fUrqPnWXdQfakd9yfbPBDBF/p5I+bd3N5Rk1fHONIvMay+bJGA==}
 
   mongodb-connection-string-url@3.0.2:
     resolution: {integrity: sha512-rMO7CGo/9BFwyZABcKAWL8UJwH/Kc2x0g72uhDWzG48URRax5TCIcJ7Rc3RZqffZzO/Gwff/jyKwCU9TN8gehA==}
@@ -5327,7 +5323,7 @@ snapshots:
     dependencies:
       '@latticexyz/schema-type': 2.0.12(bufferutil@4.0.9)(typescript@5.7.2)(utf-8-validate@5.0.10)(zod@3.24.1)
       '@latticexyz/utils': 2.0.12
-      mobx: 6.13.5
+      mobx: 6.13.6
       rxjs: 7.5.5
     transitivePeerDependencies:
       - bufferutil
@@ -5362,7 +5358,7 @@ snapshots:
   '@dojoengine/utils@1.1.0(bufferutil@4.0.9)(starknet@6.21.0)(typescript@5.7.2)(utf-8-validate@5.0.10)(zod@3.24.1)':
     dependencies:
       '@dojoengine/recs': 2.0.13(bufferutil@4.0.9)(typescript@5.7.2)(utf-8-validate@5.0.10)(zod@3.24.1)
-      '@latticexyz/utils': 2.2.16
+      '@latticexyz/utils': 2.2.19
       mathjs: 12.4.3
       micro-starknet: 0.2.3
       starknet: 6.21.0
@@ -5714,13 +5710,13 @@ snapshots:
 
   '@latticexyz/utils@2.0.12':
     dependencies:
-      mobx: 6.13.5
+      mobx: 6.13.6
       proxy-deep: 3.1.1
       rxjs: 7.5.5
 
-  '@latticexyz/utils@2.2.16':
+  '@latticexyz/utils@2.2.19':
     dependencies:
-      mobx: 6.13.5
+      mobx: 6.13.6
       proxy-deep: 3.1.1
       rxjs: 7.5.5
 
@@ -5743,8 +5739,6 @@ snapshots:
   '@noble/hashes@1.3.0': {}
 
   '@noble/hashes@1.3.2': {}
-
-  '@noble/hashes@1.3.3': {}
 
   '@noble/hashes@1.6.0': {}
 
@@ -5990,7 +5984,7 @@ snapshots:
   '@scure/bip32@1.3.2':
     dependencies:
       '@noble/curves': 1.2.0
-      '@noble/hashes': 1.3.3
+      '@noble/hashes': 1.3.2
       '@scure/base': 1.1.9
 
   '@scure/bip32@1.6.0':
@@ -6001,7 +5995,7 @@ snapshots:
 
   '@scure/bip39@1.2.1':
     dependencies:
-      '@noble/hashes': 1.3.3
+      '@noble/hashes': 1.3.2
       '@scure/base': 1.1.9
 
   '@scure/bip39@1.5.0':
@@ -7934,7 +7928,7 @@ snapshots:
   micro-starknet@0.2.3:
     dependencies:
       '@noble/curves': 1.0.0
-      '@noble/hashes': 1.3.3
+      '@noble/hashes': 1.3.2
 
   micromatch@4.0.8:
     dependencies:
@@ -7963,7 +7957,7 @@ snapshots:
 
   mkdirp-classic@0.5.3: {}
 
-  mobx@6.13.5: {}
+  mobx@6.13.6: {}
 
   mongodb-connection-string-url@3.0.2:
     dependencies:

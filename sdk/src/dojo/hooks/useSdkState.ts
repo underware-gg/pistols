@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useSdkEntities, UseSdkEntitiesProps } from 'src/dojo/hooks/useSdkEntities'
+import { useSdkEntitiesGet, useSdkEntitiesSub, UseSdkEntitiesProps } from 'src/dojo/hooks/useSdkEntities'
 import {
   PistolsModelType,
   PistolsSchemaModels,
@@ -14,7 +14,6 @@ export type EntityMap = {
 export type useSdkStateResult = {
   entities: EntityMap | null
   isLoading: boolean | undefined
-  isSubscribed: boolean | undefined
 }
 
 export const getEntityMapModels = <M extends PistolsModelType>(entities: EntityMap, modelName: PistolsSchemaModelNames): M[] =>
@@ -29,23 +28,40 @@ export const getEntityMapModels = <M extends PistolsModelType>(entities: EntityM
 // as: EntityMap
 //
 
-export const useSdkState = ({
-  query_get,
-  query_sub,
+export const useSdkStateGet = ({
+  query,
   enabled = true,
-  limit = 100,
-  offset = 0,
-  logging = false,
-}: Partial<UseSdkEntitiesProps>): useSdkStateResult => {
+}: UseSdkEntitiesProps): useSdkStateResult => {
   const [entities, setEntities] = useState<EntityMap | null>()
 
-  const { isLoading, isSubscribed } = useSdkEntities({
-    query_get,
-    query_sub,
+  const { isLoading } = useSdkEntitiesGet({
+    query,
     enabled,
-    limit,
-    offset,
-    logging,
+    setEntities: (entities: PistolsEntity[]) => {
+      setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
+        ...acc,
+        [e.entityId]: {
+          ...e.models.pistols
+        } as EntityMap,
+      }), {} as EntityMap));
+    },
+  })
+
+  return {
+    entities,
+    isLoading,
+  }
+}
+
+export const useSdkStateSub = ({
+  query,
+  enabled = true,
+}: UseSdkEntitiesProps): useSdkStateResult => {
+  const [entities, setEntities] = useState<EntityMap | null>()
+
+  const { isLoading } = useSdkEntitiesSub({
+    query,
+    enabled,
     setEntities: (entities: PistolsEntity[]) => {
       setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
         ...acc,
@@ -67,6 +83,5 @@ export const useSdkState = ({
   return {
     entities,
     isLoading,
-    isSubscribed,
   }
 }

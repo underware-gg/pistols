@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useSdkState, getEntityMapModels, formatQueryValue } from '@underware_gg/pistols-sdk/dojo'
-import { PistolsGetQuery } from '@underware_gg/pistols-sdk/pistols'
+import { getEntityMapModels, formatQueryValue, useSdkStateGet } from '@underware_gg/pistols-sdk/dojo'
+import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
 import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
 import { parseEnumVariant, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
@@ -13,18 +13,30 @@ import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 //
 
 const useGetChallengesByTableQuery = (tableId: string) => {
-  const query_get = useMemo<PistolsGetQuery>(() => ({
-    pistols: {
-      Challenge: {
-        $: {
-          where: {
-            table_id: { $eq: formatQueryValue(stringToFelt(tableId)) },
-          },
-        },
-      },
-    },
-  }), [tableId])
-  const { entities } = useSdkState({ query_get })
+  // const query_get = useMemo<PistolsQueryBuilder>(() => ({
+  //   pistols: {
+  //     Challenge: {
+  //       $: {
+  //         where: {
+  //           table_id: { $eq: formatQueryValue(stringToFelt(tableId)) },
+  //         },
+  //       },
+  //     },
+  //   },
+  // }), [tableId])
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    tableId
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().keys(
+            ["pistols-Challenge"],
+            [formatQueryValue(stringToFelt(tableId))]
+          ).build()
+        )
+        .includeHashedKeys()
+      : null
+  ), [tableId])
+  const { entities } = useSdkStateGet({ query })
   const challenges = useMemo(() => getEntityMapModels<models.Challenge>(entities, 'Challenge'), [entities])
   useEffect(() => console.log(`useGetChallengesByTableQuery()`, challenges), [challenges])
   return { challenges }
