@@ -1,6 +1,6 @@
 use pistols::types::duel_progress::{DuelProgress};
 
-// define the interface
+// Exposed to clients
 #[starknet::interface]
 pub trait ITutorial<TState> {
     fn create_tutorial(

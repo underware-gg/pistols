@@ -49,9 +49,11 @@ pub trait IDuelistToken<TState> {
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
     fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> FeeValues;
+    // fn delete_duelist(ref self: TState, duelist_id: u128);
+
+    // IDuelistTokenProtected
     fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
-    // fn delete_duelist(ref self: TState, duelist_id: u128);
 }
 
 #[starknet::interface]
@@ -61,9 +63,13 @@ pub trait IDuelistTokenPublic<TState> {
     fn life_count(self: @TState, duelist_id: u128) -> u8;
     fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> FeeValues;
     // write
+    // fn delete_duelist(ref self: TState, duelist_id: u128);
+}
+
+#[starknet::interface]
+pub trait IDuelistTokenProtected<TState> {
     fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
-    // fn delete_duelist(ref self: TState, duelist_id: u128);
 }
 
 #[dojo::contract]
@@ -185,10 +191,8 @@ pub mod duelist_token {
     //-----------------------------------
     // Public
     //
-    use super::{IDuelistTokenPublic};
     #[abi(embed_v0)]
-    impl DuelistTokenPublicImpl of IDuelistTokenPublic<ContractState> {
-
+    impl DuelistTokenPublicImpl of super::IDuelistTokenPublic<ContractState> {
         fn is_alive(
             self: @ContractState,
             duelist_id: u128,
@@ -218,6 +222,23 @@ pub mod duelist_token {
             })
         }
 
+        // fn delete_duelist(ref self: ContractState,
+        //     duelist_id: u128,
+        // ) {
+        //     self.token.assert_is_owner_of(starknet::get_caller_address(), duelist_id.into());
+        //     // duelist burn not supported
+        //     assert(false, Errors::NOT_IMPLEMENTED);
+        //     // self.token.burn(duelist_id.into());
+        //     // burn FAME too
+        // }
+
+    }
+
+    //-----------------------------------
+    // Protected
+    //
+    #[abi(embed_v0)]
+    impl DuelistTokenProtectedImpl of super::IDuelistTokenProtected<ContractState> {
         fn mint_duelists(ref self: ContractState,
             recipient: ContractAddress,
             amount: usize,
@@ -291,17 +312,6 @@ pub mod duelist_token {
 
             (values_a, values_b)
         }
-
-        // fn delete_duelist(ref self: ContractState,
-        //     duelist_id: u128,
-        // ) {
-        //     self.token.assert_is_owner_of(starknet::get_caller_address(), duelist_id.into());
-        //     // duelist burn not supported
-        //     assert(false, Errors::NOT_IMPLEMENTED);
-        //     // self.token.burn(duelist_id.into());
-        //     // burn FAME too
-        // }
-
     }
 
     //-----------------------------------

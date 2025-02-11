@@ -30,13 +30,14 @@ pub trait IFameCoin<TState> {
     fn transfer_from_token_to_token(ref self: TState, contract_address: ContractAddress, sender_token_id: u128, recipient_token_id: u128, amount: u256) -> bool;
     fn burn_from_token(ref self: TState, contract_address: ContractAddress, token_id: u128, amount: u256);
     
-    // IFameCoinPublic
+    // IFameCoinProtected
     fn minted_duelist(ref self: TState, duelist_id: u128);
     fn reward_duelist(ref self: TState, duelist_id: u128, amount: u256);
 }
 
+// Exposed to world
 #[starknet::interface]
-pub trait IFameCoinPublic<TState> {
+pub trait IFameCoinProtected<TState> {
     fn minted_duelist(ref self: TState, duelist_id: u128);
     fn reward_duelist(ref self: TState, duelist_id: u128, amount: u256);
 }
@@ -126,9 +127,8 @@ pub mod fame_coin {
     //-----------------------------------
     // Public
     //
-    use super::{IFameCoinPublic};
     #[abi(embed_v0)]
-    impl FamePublicImpl of IFameCoinPublic<ContractState> {
+    impl FamePublicImpl of super::IFameCoinProtected<ContractState> {
         fn minted_duelist(ref self: ContractState,
             duelist_id: u128,
         ) {

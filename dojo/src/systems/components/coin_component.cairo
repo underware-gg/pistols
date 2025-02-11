@@ -46,7 +46,6 @@ pub mod CoinComponent {
     //-----------------------------------------
     // Internal
     //
-    use super::{ICoinComponentInternal};
     #[embeddable_as(CoinComponentInternalImpl)]
     pub impl CoinComponentInternal<
         TContractState,
@@ -55,7 +54,7 @@ pub mod CoinComponent {
         +ERC20Component::ERC20HooksTrait<TContractState>,
         impl ERC20: ERC20Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ICoinComponentInternal<ComponentState<TContractState>> {
+    > of super::ICoinComponentInternal<ComponentState<TContractState>> {
         fn initialize(ref self: ComponentState<TContractState>,
             minter_address: ContractAddress,
             faucet_amount: u128,

@@ -46,16 +46,18 @@ pub trait IDuelToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IDuelTokenPublic
-    fn create_duel(ref self: TState, duelist_id: u128, challenged_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64, lives_staked: u8) -> u128;
-    fn reply_duel(ref self: TState, duelist_id: u128, duel_id: u128, accepted: bool) -> ChallengeState;
-    // fn delete_duel(ref self: TState, duel_id: u128);
-    fn transfer_to_winner(ref self: TState, duel_id: u128);
-    // view calls
     fn get_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128;
     fn has_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool;
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
+    fn create_duel(ref self: TState, duelist_id: u128, challenged_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64, lives_staked: u8) -> u128;
+    fn reply_duel(ref self: TState, duelist_id: u128, duel_id: u128, accepted: bool) -> ChallengeState;
+    // fn delete_duel(ref self: TState, duel_id: u128);
+
+    // IDuelTokenProtected
+    fn transfer_to_winner(ref self: TState, duel_id: u128);
 }
 
+// Exposed to clients
 #[starknet::interface]
 pub trait IDuelTokenPublic<TState> {
     // view
@@ -80,6 +82,11 @@ pub trait IDuelTokenPublic<TState> {
         accepted: bool,
     ) -> ChallengeState;
     // fn delete_duel(ref self: TState, duel_id: u128);
+}
+
+// Exposed to world
+#[starknet::interface]
+pub trait IDuelTokenProtected<TState> {
     fn transfer_to_winner(ref self: TState, duel_id: u128);
 }
 
@@ -205,9 +212,8 @@ pub mod duel_token {
     //-----------------------------------
     // Public
     //
-    use super::{IDuelTokenPublic};
     #[abi(embed_v0)]
-    impl DuelTokenPublicImpl of IDuelTokenPublic<ContractState> {
+    impl DuelTokenPublicImpl of super::IDuelTokenPublic<ContractState> {
 
         //-----------------------------------
         // View calls
@@ -410,6 +416,21 @@ pub mod duel_token {
             (challenge.state)
         }
 
+        // fn delete_duel(ref self: ContractState,
+        //     duel_id: u128,
+        // ) {
+        //     self.token.assert_is_owner_of(starknet::get_caller_address(), duel_id.into());
+        //     assert(false, Errors::NOT_IMPLEMENTED);
+        //     self.token.burn(duel_id.into());
+        // }
+    }
+
+    
+    //-----------------------------------
+    // Protected
+    //
+    #[abi(embed_v0)]
+    impl DuelTokenProtectedImpl of super::IDuelTokenProtected<ContractState> {
         fn transfer_to_winner(ref self: ContractState,
             duel_id: u128,
         ) {
@@ -423,14 +444,6 @@ pub mod duel_token {
                 self.transfer_from(owner, challenge.address_b, duel_id.into());
             }
         }
-        
-        // fn delete_duel(ref self: ContractState,
-        //     duel_id: u128,
-        // ) {
-        //     self.token.assert_is_owner_of(starknet::get_caller_address(), duel_id.into());
-        //     assert(false, Errors::NOT_IMPLEMENTED);
-        //     self.token.burn(duel_id.into());
-        // }
     }
 
 
