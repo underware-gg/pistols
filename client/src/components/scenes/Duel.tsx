@@ -405,7 +405,7 @@ export default function Duel({
         </div>
       </div>
 
-      {isTutorial && <DuelTutorialOverlay tutorialType={tutorial} open={tutorial != DuelTutorialLevel.NONE} />}
+      {isTutorial && <DuelTutorialOverlay tutorialType={tutorial} isOpen={tutorial != DuelTutorialLevel.NONE} setIsOpen={() => {}} />}
 
       {/* {duelProgress &&
         <div className='CenteredPanel'>

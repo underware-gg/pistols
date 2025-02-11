@@ -172,7 +172,6 @@ enum DuelTutorialLevel { //Used to group info specific for the dueling tutorials
   SIMPLE = 'SIMPLE',
   FULL = 'FULL',
   DUELIST_PACKS = 'DUELIST_PACKS',
-  DUELISTS = 'DUELISTS',
 }
 
 enum TutorialGroups { //Used to display groups for all tutorials later in the game for players to revisit
@@ -264,10 +263,8 @@ const DUEL_TUTORIAL_LIST: Record<DuelTutorialLevel, TutorialParts[]> = {
     TutorialParts.DUELIST,
     TutorialParts.DUELIST_ARCHETYPE,
     TutorialParts.DUELIST_FAME,
-  ],
-  [DuelTutorialLevel.DUELISTS]: [
     TutorialParts.DUELIST_INFO, //TODO is this needed?
-  ]
+  ],
 }
 
 interface TutorialSlide {

@@ -380,6 +380,7 @@ export const usePistolsScene = () => {
   return {
     currentScene,
     lastScene,
+    wasLastSceneTutorial: tutorialScenes.includes(lastScene as typeof tutorialScenes[number]),
     sceneTitle,
     // helpers
     atGate: (currentScene == SceneName.Gate),

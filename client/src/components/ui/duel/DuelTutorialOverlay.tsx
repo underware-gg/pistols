@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Modal } from 'semantic-ui-react'
 import { DuelTutorialLevel, DUEL_TUTORIAL_LIST, TUTORIAL_DATA } from '/src/data/tutorialConstants'
 
 interface DuelTutorialOverlayProps {
   tutorialType: DuelTutorialLevel
-  open: boolean
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
+  onComplete?: () => void
 }
 
-export default function DuelTutorialOverlay({ tutorialType, open }: DuelTutorialOverlayProps) {
-  const [isOpen, setIsOpen] = useState(open)
-
+export default function DuelTutorialOverlay({ tutorialType, isOpen, setIsOpen, onComplete }: DuelTutorialOverlayProps) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentTutorialIndex, setCurrentTutorialIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -65,6 +65,9 @@ export default function DuelTutorialOverlay({ tutorialType, open }: DuelTutorial
 
   const _close = () => {
     setIsOpen(false)
+    if (isLastSlide && onComplete) {
+      onComplete()
+    }
   }
 
   const isLastSlide = currentTutorialIndex === tutorialParts.length - 1 && currentSlide === totalSlides - 1
@@ -106,7 +109,7 @@ export default function DuelTutorialOverlay({ tutorialType, open }: DuelTutorial
               <div 
                 key={index}
                 className={`tutorialDot ${index === currentDot ? 'tutorialDotActive' : 
-                     index < currentDot ? 'tutorialDotPassed' : 'tutorialDotFuture'}`}
+                    index < currentDot ? 'tutorialDotPassed' : 'tutorialDotFuture'}`}
               />
             ))}
           </div>

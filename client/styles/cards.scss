@@ -78,14 +78,18 @@ $color-cold: #4d9ad6;
   position: absolute;
   width: 110%;
   height: 110%;
-  transition: transform 0.8s translate 0.6s;
+  transition: 
+    // transform 0.8s,
+    translate 0.6s,
+    rotateY 0.8s;
   transform-style: preserve-3d;
-  background-color: var(--background-color, white);;
+  background-color: var(--background-color, white);
   box-shadow: aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) aspect-width(0.01) rgba(20, 20, 20, 0.6);
   filter: blur(4px);
   top: -5%;
   left: -5%;
-  transform: translate(var(--idle-translate-x, 0px), var(--idle-translate-y, 0px)) rotateY(var(--card-flip-rotation, 0deg));
+  translate: var(--idle-translate-x, 0px) var(--idle-translate-y, 0px);
+  transform: rotateY(var(--card-flip-rotation, 0deg));
 }
 
 .card-front {
@@ -534,7 +538,6 @@ $color-cold: #4d9ad6;
 }
 
 
-
 //card pack
 .card-pack {
   --front-bag-image: url('/images/ui/card_pack_outter.png');
@@ -545,6 +548,16 @@ $color-cold: #4d9ad6;
   --front-cover-image: url('/images/ui/card_pack_flap_outter.png');
   --cover-background: url('/images/ui/card_pack_flap_background.png');
   --back-cover-image: url('/images/ui/card_pack_flap_inner.png');
+  --inner-bag-translate-y: 0;
+  --front-bag-translate-y: 0;
+  --flip-container-translate-y: 0;
+  --seal-translate-x: 0;
+  --seal-translate-y: 0;
+  --seal-rotation: 0deg;
+  --flipper-rotation: 0deg;
+  --card-pack-opacity: 0;
+  --card-pack-rotate-x: 0deg;
+  --card-pack-rotate-y: 0deg;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -553,6 +566,8 @@ $color-cold: #4d9ad6;
   perspective: aspect-width(calc(var(--card-pack-size) * 3));
   transform-style: preserve-3d;
   transition: transform 0.1s ease-out;
+  transform: translate(-50%, -50%) rotateX(var(--card-pack-rotate-x)) rotateY(var(--card-pack-rotate-y));
+
 
   .inner-bag {
     position: absolute;
@@ -561,7 +576,7 @@ $color-cold: #4d9ad6;
     width: aspect-width(calc(var(--card-pack-size) * 0.75));
     height: aspect-width(var(--card-pack-size));
     z-index: 1;
-    transform: translateZ(aspect-width(-1));
+    transform: translateZ(aspect-width(-1)) translateY(var(--inner-bag-translate-y));
     background: var(--inner-bag-image) no-repeat center;
     background-size: contain;
     transition: transform 0.1s ease-out;
@@ -575,7 +590,7 @@ $color-cold: #4d9ad6;
     height: aspect-width(var(--card-pack-size));
     z-index: 100;
     transform-style: preserve-3d;
-    transform: translateZ(0); // Main front bag at z=0
+    transform: translateZ(0) translateY(var(--front-bag-translate-y));
     background: var(--front-bag-image) no-repeat center;
     background-size: contain;
     transition: transform 0.1s ease-out;
@@ -589,7 +604,7 @@ $color-cold: #4d9ad6;
     height: 100%;
     background: var(--card-pack-edge-image) no-repeat center;
     background-size: contain;
-    transform: translateZ(aspect-width(-0.25)); // First layer behind
+    transform: translateZ(aspect-width(-0.25));
   }
 
   .front-bag-layer-2 {
@@ -600,7 +615,7 @@ $color-cold: #4d9ad6;
     height: 100%;
     background: var(--card-pack-edge-image) no-repeat center;
     background-size: contain;
-    transform: translateZ(aspect-width(-0.5)); // Second layer behind
+    transform: translateZ(aspect-width(-0.5));
   }
 
   .front-bag-layer-3 {
@@ -611,7 +626,7 @@ $color-cold: #4d9ad6;
     height: 100%;
     background: var(--card-pack-edge-image) no-repeat center;
     background-size: contain;
-    transform: translateZ(aspect-width(-0.75)); // Third layer behind
+    transform: translateZ(aspect-width(-0.75));
   }
 
   .front-bag-layer-4 {
@@ -622,7 +637,7 @@ $color-cold: #4d9ad6;
     height: 100%;
     background: var(--card-pack-edge-image) no-repeat center;
     background-size: contain;
-    transform: translateZ(aspect-width(-1)); // Fourth layer behind
+    transform: translateZ(aspect-width(-1));
   }
   
   .flip-container {
@@ -633,6 +648,7 @@ $color-cold: #4d9ad6;
     height: aspect-width(calc(var(--card-pack-size) * 0.5));
     z-index: 101;
     transform-style: preserve-3d;
+    transform: translateY(var(--flip-container-translate-y));
     transition: transform 0.1s ease-out;
     
     img {
@@ -646,6 +662,7 @@ $color-cold: #4d9ad6;
     height: aspect-width(calc(var(--card-pack-size) * 0.5));
     transform-style: preserve-3d;
     transform-origin: 50% 0.1% aspect-width(-1);
+    transform: rotateX(var(--flipper-rotation));
   }
   
   .front-cover, .back-cover {
@@ -710,6 +727,7 @@ $color-cold: #4d9ad6;
     transform: translateZ(aspect-width(-1));
     backface-visibility: hidden;
   }
+
   .back-cover {
     background: var(--back-cover-image) no-repeat center;
     background-size: 100% 100%;
@@ -731,7 +749,10 @@ $color-cold: #4d9ad6;
     transform-style: preserve-3d;
     background: var(--seal-image) no-repeat center;
     background-size: contain;
-    transform: translateZ(aspect-width(0.5));
+    transform: translateX(var(--seal-translate-x)) 
+               translateY(var(--seal-translate-y))
+               translateZ(aspect-width(0.5))
+               rotate(var(--seal-rotation));
 
     &::before {
       content: '';
@@ -799,5 +820,24 @@ $color-cold: #4d9ad6;
     position: absolute;
     top: calc(50% - var(--card-height) / 2);
     left: calc(50% - var(--card-width) / 2);
+  }
+}
+
+.reveal-button-container {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
   }
 }

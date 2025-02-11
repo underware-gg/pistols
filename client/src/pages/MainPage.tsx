@@ -101,17 +101,17 @@ function MainUI() {
 function TutorialUI({
 }) {
   const { gameImpl } = useThreeJsContext()
-  const { atTutorial, currentScene, lastScene } = usePistolsScene()
+  const { atTutorial, currentScene, wasLastSceneTutorial } = usePistolsScene()
 
   const [currentTutorialScene, setCurrentTutorialScene] = useState<string>("");
 
   useEffect(() => {
     let timer
-    if (atTutorial && currentScene == SceneName.Tutorial) {
+    if (!wasLastSceneTutorial && atTutorial) {
       timer = setTimeout(() => {
         setCurrentTutorialScene(currentScene);
       }, SCENE_CHANGE_ANIMATION_DURATION / 5);
-    } else if (atTutorial) {
+    } else if (atTutorial && wasLastSceneTutorial) {
       timer = setTimeout(() => {
         setCurrentTutorialScene(currentScene);
       }, SCENE_CHANGE_ANIMATION_DURATION);
