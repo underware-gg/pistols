@@ -66,15 +66,15 @@ pub mod prefabs {
     }
 
 
-    pub fn start_new_challenge(sys: TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> u128 {
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, duelist_a, duelist_b, MESSAGE, table_id, 48);
+    pub fn start_new_challenge(sys: TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252, lives_staked: u8) -> u128 {
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, duelist_a, duelist_b, MESSAGE, table_id, 48, lives_staked);
         tester::elapse_timestamp(TimestampTrait::from_days(1));
         tester::execute_reply_duel(@sys.duels, duelist_b, ID(duelist_b), duel_id, true);
         (duel_id)
     }
 
-    pub fn start_get_new_challenge(sys: TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> (ChallengeValue, RoundValue, u128) {
-        let duel_id: u128 = start_new_challenge(sys, duelist_a, duelist_b, table_id);
+    pub fn start_get_new_challenge(sys: TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252, lives_staked: u8) -> (ChallengeValue, RoundValue, u128) {
+        let duel_id: u128 = start_new_challenge(sys, duelist_a, duelist_b, table_id, lives_staked);
         let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
         let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
         assert_eq!(challenge.state, ChallengeState::InProgress, "challenge.state");

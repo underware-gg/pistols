@@ -38,6 +38,7 @@ pub trait IDuelToken<TState> {
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
+    fn minted_count(self: @TState) -> u128;
 
     // ITokenRenderer
     fn get_token_name(self: @TState, token_id: u256) -> ByteArray;
@@ -45,7 +46,7 @@ pub trait IDuelToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IDuelTokenPublic
-    fn create_duel(ref self: TState, duelist_id: u128, challenged_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64) -> u128;
+    fn create_duel(ref self: TState, duelist_id: u128, challenged_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64, lives_staked: u8) -> u128;
     fn reply_duel(ref self: TState, duelist_id: u128, duel_id: u128, accepted: bool) -> ChallengeState;
     // fn delete_duel(ref self: TState, duel_id: u128);
     fn transfer_to_winner(ref self: TState, duel_id: u128);
@@ -70,6 +71,7 @@ pub trait IDuelTokenPublic<TState> {
         quote: felt252,
         table_id: felt252,
         expire_hours: u64,
+        lives_staked: u8,
     ) -> u128;
     fn reply_duel(
         ref self: TState,
@@ -160,6 +162,7 @@ pub mod duel_token {
         pub const NOT_YOUR_CHALLENGE: felt252       = 'DUEL: Not your challenge';
         pub const NOT_YOUR_DUELIST: felt252         = 'DUEL: Not your duelist';
         pub const DUELIST_IS_DEAD: felt252          = 'DUEL: Duelist is dead!';
+        pub const INSUFFICIENT_LIVES: felt252       = 'DUEL: Insufficient lives';
         pub const CHALLENGER_NOT_ADMITTED: felt252  = 'DUEL: Challenger not allowed';
         pub const CHALLENGED_NOT_ADMITTED: felt252  = 'DUEL: Challenged not allowed';
         pub const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
@@ -237,6 +240,7 @@ pub mod duel_token {
             quote: felt252,
             table_id: felt252,
             expire_hours: u64,
+            lives_staked: u8,
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
@@ -248,7 +252,9 @@ pub mod duel_token {
             let duelist_id_a: u128 = duelist_id;
             let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
             assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
-            assert(duelist_dispatcher.is_alive(duelist_id_a) == true, Errors::DUELIST_IS_DEAD);
+            let lives: u8 = duelist_dispatcher.life_count(duelist_id_a);
+            assert(lives > 0, Errors::DUELIST_IS_DEAD);
+            assert(lives >= lives_staked, Errors::INSUFFICIENT_LIVES);
 
             // assert duelist is not in a challenge
             store.enter_challenge(duelist_id_a, duel_id);
@@ -286,6 +292,7 @@ pub mod duel_token {
                 table_id,
                 premise,
                 quote,
+                lives_staked: core::cmp::max(lives_staked, 1),
                 // duelists
                 address_a,
                 address_b,
@@ -354,7 +361,9 @@ pub mod duel_token {
                 // validate duelist ownership
                 let duelist_dispatcher = store.world.duelist_token_dispatcher();
                 assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
-                assert(duelist_dispatcher.is_alive(duelist_id_b) == true, Errors::DUELIST_IS_DEAD);
+                let lives: u8 = duelist_dispatcher.life_count(duelist_id_b);
+                assert(lives > 0, Errors::DUELIST_IS_DEAD);
+                assert(lives >= challenge.lives_staked, Errors::INSUFFICIENT_LIVES);
 
                 // validate challenged identity
                 assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);

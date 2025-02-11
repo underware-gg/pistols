@@ -141,7 +141,7 @@ pub impl ScoreImpl of ScoreTrait {
         self.honour_history =
             (self.honour_history & ~BitwiseU64::shl(0xff, history_pos)) |
             BitwiseU64::shl(duel_honour.into(), history_pos);
-        self.honour = (BitwiseU64::sum_bytes(self.honour_history) / MathU64::min(self.total_duels.into(), 8)).try_into().unwrap();
+        self.honour = (BitwiseU64::sum_bytes(self.honour_history) / core::cmp::min(self.total_duels.into(), 8)).try_into().unwrap();
     }
 }
 

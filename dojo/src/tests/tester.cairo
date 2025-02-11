@@ -479,8 +479,9 @@ pub mod tester {
         quote: felt252,
         table_id: felt252,
         expire_hours: u64,
+        lives_staked: u8,
     ) -> u128 {
-        (execute_create_duel_ID(system, sender, ID(sender), challenged, quote, table_id, expire_hours))
+        (execute_create_duel_ID(system, sender, ID(sender), challenged, quote, table_id, expire_hours, lives_staked))
     }
     pub fn execute_create_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
         token_id: u128,
@@ -489,9 +490,10 @@ pub mod tester {
         quote: felt252,
         table_id: felt252,
         expire_hours: u64,
+        lives_staked: u8,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*system).create_duel(token_id, challenged, Premise::Nothing, quote, table_id, expire_hours);
+        let duel_id: u128 = (*system).create_duel(token_id, challenged, Premise::Nothing, quote, table_id, expire_hours, lives_staked);
         _next_block();
         (duel_id)
     }

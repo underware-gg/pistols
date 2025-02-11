@@ -246,6 +246,7 @@ fn create_duel(token: IDuelTokenDispatcher, recipient: ContractAddress, challeng
         quote: 'For honour!!!',
         table_id: TABLES::PRACTICE,
         expire_hours: 1,
+        lives_staked: 1,
     );
 // '---BB'.print();
 }
@@ -294,6 +295,7 @@ fn test_token_uri() {
         table_id: TABLES::PRACTICE,
         premise: Premise::Honour,
         quote: 'For honour!!!',
+        lives_staked: 1,
         // duelists
         address_a: OWNER(),
         address_b: OTHER()  ,

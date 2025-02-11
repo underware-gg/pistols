@@ -43,7 +43,7 @@ mod tests {
         sys.rng.set_mocked_values(salts.salts, salts.values);
 
         let table_id: felt252 = SEASON_1_TABLE();
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id);
+        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), table_id, 1);
 
         let mut fame_balance_bank: u128 = sys.lords.balance_of(sys.fame.contract_address).low;
         let mut lords_balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
@@ -63,8 +63,8 @@ mod tests {
         assert_eq!(pool_season.balance_lords, 0, "pool_season.balance_lords");
         assert_eq!(pool_season.balance_fame, 0, "pool_season.balance_fame");
 
-        let reward_a: FeeValues = sys.duelists.calc_season_reward(duelist_id_a);
-        let reward_b: FeeValues = sys.duelists.calc_season_reward(duelist_id_b);
+        let reward_a: FeeValues = sys.duelists.calc_season_reward(duelist_id_a, challenge.lives_staked);
+        let reward_b: FeeValues = sys.duelists.calc_season_reward(duelist_id_b, challenge.lives_staked);
         assert_ne!(reward_a.fame_lost, 0, "reward_a.fame_lost != 0");
         assert_ne!(reward_b.fame_lost, 0, "reward_b.fame_lost != 0");
         assert_ne!(reward_a.fame_gained, 0, "reward_a.fame_gained != 0");

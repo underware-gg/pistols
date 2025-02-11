@@ -116,19 +116,19 @@ pub impl TableTypeImpl of TableTypeTrait {
         (@result)
     }
     // end game calculations
-    fn calc_fame_fees(self: @TableType, balance: u128, is_winner: bool) -> FeeValues {
+    fn calc_fame_fees(self: @TableType, balance: u128, lives_staked: u8, is_winner: bool) -> FeeValues {
         let mut result: FeeValues = match self {
             TableType::Season => {
                 let mut result: FeeValues = Default::default();
                 let one_life: u128 = FAME::ONE_LIFE.low;
                 if (is_winner) {
                     let k_fame: u128 = 1;
-                    result.fame_gained = (one_life / (((balance / one_life) + 1) / k_fame));
+                    result.fame_gained = (one_life / (((balance / one_life) + 1) / k_fame)) * lives_staked.into();
                     let k_fools: u128 = 10;
                     result.fools_gained = (k_fools * ((one_life / 2) / result.fame_gained)) * CONST::ETH_TO_WEI.low;
                     result.lords_unlocked = 0; // calculated at the bank
                 } else {
-                    result.fame_lost = one_life;
+                    result.fame_lost = one_life * lives_staked.into();
                 }
                 (result)
             },
