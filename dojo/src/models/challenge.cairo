@@ -15,6 +15,8 @@ pub struct Challenge {
     pub table_id: felt252,
     pub premise: Premise,           // premise of the dispute
     pub quote: felt252,             // message to challenged
+    pub lives_staked: u8,           // lives staked by challenger
+    // duelists
     pub address_a: ContractAddress, // Challenger wallet
     pub address_b: ContractAddress, // Challenged wallet
     pub duelist_id_a: u128,         // Challenger duelist

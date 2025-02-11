@@ -38,6 +38,7 @@ pub trait IDuelistToken<TState> {
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
+    fn minted_count(self: @TState) -> u128;
 
     // ITokenRenderer
     fn get_token_name(self: @TState, token_id: u256) -> ByteArray;
@@ -46,7 +47,8 @@ pub trait IDuelistToken<TState> {
 
     // IDuelistTokenPublic
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
-    fn calc_season_reward(self: @TState, duelist_id: u128) -> FeeValues;
+    fn life_count(self: @TState, duelist_id: u128) -> u8;
+    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> FeeValues;
     fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
     // fn delete_duelist(ref self: TState, duelist_id: u128);
@@ -56,7 +58,8 @@ pub trait IDuelistToken<TState> {
 pub trait IDuelistTokenPublic<TState> {
     // view
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
-    fn calc_season_reward(self: @TState, duelist_id: u128) -> FeeValues;
+    fn life_count(self: @TState, duelist_id: u128) -> u8;
+    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> FeeValues;
     // write
     fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
@@ -190,17 +193,23 @@ pub mod duelist_token {
             self: @ContractState,
             duelist_id: u128,
         ) -> bool {
+            (self.life_count(duelist_id) > 0)
+        }
+        
+        fn life_count(self: @ContractState,
+            duelist_id: u128,
+        ) -> u8 {
             let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
             let fame_balance: u256 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), duelist_id);
-            (fame_balance >= FAME::ONE_LIFE)
+            ((fame_balance / FAME::ONE_LIFE).try_into().unwrap())
         }
 
-        fn calc_season_reward(self: @ContractState, duelist_id: u128) -> FeeValues {
+        fn calc_season_reward(self: @ContractState, duelist_id: u128, lives_staked: u8) -> FeeValues {
             let mut store: Store = StoreTrait::new(self.world_default());
             let table: TableConfig = store.get_current_season_table();
             let balance: u128 = store.world.fame_coin_dispatcher().balance_of_token(starknet::get_contract_address(), duelist_id).low;
-            let fees_win: FeeValues = table.table_type.calc_fame_fees(balance, true);
-            let fees_loss: FeeValues = table.table_type.calc_fame_fees(balance, false);
+            let fees_win: FeeValues = table.table_type.calc_fame_fees(balance, lives_staked, true);
+            let fees_loss: FeeValues = table.table_type.calc_fame_fees(balance, lives_staked, false);
             (FeeValues{
                 fame_lost: fees_loss.fame_lost,
                 fame_gained: fees_win.fame_gained,
@@ -270,8 +279,8 @@ pub mod duelist_token {
             let balance_b: u128 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), challenge.duelist_id_b).low;
 
             // calculate fees
-            let mut values_a: FeeValues = table_type.calc_fame_fees(balance_a, challenge.winner == 1);
-            let mut values_b: FeeValues = table_type.calc_fame_fees(balance_b, challenge.winner == 2);
+            let mut values_a: FeeValues = table_type.calc_fame_fees(balance_a, challenge.lives_staked, challenge.winner == 1);
+            let mut values_b: FeeValues = table_type.calc_fame_fees(balance_b, challenge.lives_staked, challenge.winner == 2);
 
             // transfer gains
             let config: Config = store.get_config();
@@ -448,6 +457,8 @@ pub mod duelist_token {
             let fame_balance: u256 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), token_id.low) / CONST::ETH_TO_WEI;
             result.append("Fame");
             result.append(fame_balance.to_string());
+            result.append("Lives");
+            result.append((fame_balance / FAME::ONE_LIFE).to_string());
             result.append("Alive");
             result.append(if (fame_balance != 0) {"Alive"} else {"Dead"});
             // Totals

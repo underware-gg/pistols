@@ -20,6 +20,7 @@ pub trait IDuelistToken<TState> {
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
     // Duelist
     fn is_alive(self: @TState, token_id: u128) -> bool;
+    fn life_count(self: @TState, duelist_id: u128) -> u8;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
 }
 
@@ -84,6 +85,9 @@ pub mod duelist_token {
         }
         fn is_alive(self: @ContractState, token_id: u128) -> bool {
             (true)
+        }
+        fn life_count(self: @ContractState, duelist_id: u128) -> u8 {
+            (3)
         }
         fn transfer_rewards(ref self: ContractState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues) {
             (Default::default(), Default::default())

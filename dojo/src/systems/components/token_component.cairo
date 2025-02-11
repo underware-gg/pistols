@@ -5,6 +5,7 @@ pub trait ITokenComponentPublic<TState> {
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
+    fn minted_count(self: @TState) -> u128;
 }
 
 #[starknet::interface]
@@ -90,6 +91,13 @@ pub mod TokenComponent {
         ) -> bool {
             let erc721 = get_dep_component!(self, ERC721);
             (erc721._owner_of(token_id.into()) == address)
+        }
+
+        fn minted_count(self: @ComponentState<TContractState>) -> u128 {
+            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut store: Store = StoreTrait::new(world);
+            let token_config: TokenConfigValue = store.get_token_config_value(starknet::get_contract_address());
+            (token_config.minted_count)
         }
     }
 

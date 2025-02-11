@@ -42,6 +42,9 @@
   "[cairo]": {
     "editor.tabSize": 4,
   },
+  "[python]": {
+    "editor.tabSize": 4,
+  },
   "cairo1.languageServerPath": "${userHome}/.dojo/bin/dojo-language-server",
   "cairo1.enableLanguageServer": true,
   "cairo1.enableScarb": true
