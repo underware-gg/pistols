@@ -184,22 +184,6 @@ pub impl StoreImpl of StoreTrait {
     fn get_pool(ref self: Store, pool_id: PoolType) -> Pool {
         (self.world.read_model(pool_id))
     }
-    // #[inline(always)]
-    // fn get_bank_pool(ref self: Store) -> Pool {
-    //     self.get_pool(PoolType::Bank)
-    // }
-    // #[inline(always)]
-    // fn get_season_pool(ref self: Store, table_id: felt252) -> Pool {
-    //     self.get_pool(PoolType::Season(table_id))
-    // }
-    // #[inline(always)]
-    // fn get_tournament_pool(ref self: Store, tournament_id: felt252) -> Pool {
-    //     self.get_pool(PoolType::Tournament(tournament_id))
-    // }
-    // #[inline(always)]
-    // fn get_sacred_flame_pool(ref self: Store) -> Pool {
-    //     self.get_pool(PoolType::SacredFlame)
-    // }
 
     #[inline(always)]
     fn get_token_bound_address(ref self: Store, recipient: ContractAddress) -> TokenBoundAddress {

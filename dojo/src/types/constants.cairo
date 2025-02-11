@@ -1,8 +1,5 @@
 
 pub mod CONST {
-    // packs
-    pub const WELCOME_PACK_DUELIST_COUNT: usize = 2;
-    
     // number of rounds per duel
     pub const ROUND_COUNT: u8 = 1;
     

@@ -18,6 +18,7 @@ pub struct Pack {
     //-----------------------
     pub pack_type: PackType,
     pub seed: felt252,
+    pub lords_amount: u128,
     pub is_open: bool,
 }
 
@@ -29,12 +30,13 @@ pub struct Pack {
 
 #[derive(Copy, Drop, Serde, Default)]
 pub struct PackDescription {
-    id: felt252, // @generateContants:shortstring
-    name: felt252, // @generateContants:shortstring
-    image_url_closed: felt252, // @generateContants:shortstring
-    image_url_open: felt252, // @generateContants:shortstring
-    can_purchase: bool,
-    price: u256,
+    pub id: felt252, // @generateContants:shortstring
+    pub name: felt252, // @generateContants:shortstring
+    pub image_url_closed: felt252, // @generateContants:shortstring
+    pub image_url_open: felt252, // @generateContants:shortstring
+    pub can_purchase: bool,
+    pub lords_price: u256,
+    pub quantity: usize,
 }
 
 // to be exported to typescript by generateConstants
@@ -48,7 +50,8 @@ mod PACK_TYPES {
         image_url_closed: '/tokens/Unknown.jpg',
         image_url_open: '/tokens/Unknown.jpg',
         can_purchase: false,
-        price: 0,
+        lords_price: 0,
+        quantity: 0,
     };
     pub const WelcomePack: PackDescription = PackDescription {
         id: 'WelcomePack',
@@ -56,7 +59,8 @@ mod PACK_TYPES {
         image_url_closed: '/tokens/WelcomePack.jpg',
         image_url_open: '/tokens/WelcomePack.jpg',
         can_purchase: false,
-        price: 0,
+        lords_price: 20 * CONST::ETH_TO_WEI,
+        quantity: 2,
     };  
     pub const Duelists5x: PackDescription = PackDescription {
         id: 'Duelists5x',
@@ -64,7 +68,8 @@ mod PACK_TYPES {
         image_url_closed: '/tokens/Duelists5x.jpg',
         image_url_open: '/tokens/Duelists5x.jpg',
         can_purchase: true,
-        price: 50 * CONST::ETH_TO_WEI,
+        lords_price: 50 * CONST::ETH_TO_WEI,
+        quantity: 5,
     };
 }
 
@@ -79,7 +84,6 @@ use pistols::interfaces::systems::{
 };
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::libs::store::{Store, StoreTrait};
-use pistols::types::constants::{CONST};
 
 #[generate_trait]
 pub impl PackImpl of PackTrait {
@@ -87,13 +91,10 @@ pub impl PackImpl of PackTrait {
         assert(!self.is_open, PackErrors::ALREADY_OPENED);
         let token_ids: Span<u128> = match self.pack_type {
             PackType::Unknown => { [].span() },
-            PackType::WelcomePack => {
-                let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-                (duelist_dispatcher.mint_duelists(recipient, CONST::WELCOME_PACK_DUELIST_COUNT, self.seed))
-            },
+            PackType::WelcomePack |
             PackType::Duelists5x => {
                 let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-                (duelist_dispatcher.mint_duelists(recipient, 5, self.seed))
+                (duelist_dispatcher.mint_duelists(recipient, self.pack_type.description().quantity, self.seed))
             },
         };
         self.is_open = true;
@@ -128,7 +129,7 @@ pub impl PackTypeImpl of PackTypeTrait {
         (self.description().can_purchase)
     }
     fn mint_fee(self: PackType) -> u256 {
-        (self.description().price)
+        (self.description().lords_price)
     }
 }
 

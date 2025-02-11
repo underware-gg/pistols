@@ -3,23 +3,28 @@ use pistols::models::pool::{PoolType};
 
 #[starknet::interface]
 pub trait IBank<TState> {
-    // transfer LORDS from payer, adding to the Bank pool
+    // transfer LORDS from payer, adding to Pool::Purchases
     // (called by pack_token)
     fn charge_purchase(ref self: TState, payer: ContractAddress, lords_amount: u256);
-    // transfer LORDS to recipient, removing from the Bank pool
+    // transfer LORDS from Pool::Purchases to Pool::FamePeg
+    // (called by pack_token)
+    fn minted_fame(ref self: TState, payer: ContractAddress, lords_amount: u256);
+    // transfer LORDS to recipient, removing from Pool::Purchases
     // (called by duelist_token)
     fn burned_fame_release_lords(ref self: TState, recipient: ContractAddress, fame_amount: u256) -> u256;
-    // transfer FAME to payer, adding to the Season pool
+    // transfer FAME to payer, adding to Pool::Season(table_id)
     // (called by duelist_token)
     fn duelist_lost_fame(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u256, pool_id: PoolType);
 
     // IBankPublic
+    fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u256);
     fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u256);
     fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u256, tournament_id: felt252);
 }
 
 #[starknet::interface]
 pub trait IBankPublic<TState> {
+    fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u256);
     fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u256);
     fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u256, tournament_id: felt252);
 }
@@ -74,6 +79,29 @@ pub mod bank {
             self.transfer_lords_to_pool(store, payer, lords_amount, PoolType::Bank);
         }
 
+        fn minted_fame(ref self: ContractState,
+            payer: ContractAddress,
+            lords_amount: u256,
+        ) {
+            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut purchases_pool: Pool = store.get_pool(PoolType::Bank);
+            let mut fame_peg_pool: Pool = store.get_pool(PoolType::FamePeg);
+            purchases_pool.withdraw_lords(lords_amount.low);
+            fame_peg_pool.deposit_lords(lords_amount.low);
+            store.set_pool(@purchases_pool);
+            store.set_pool(@fame_peg_pool);
+        }
+
+        fn sponsor_duelists(ref self: ContractState,
+            payer: ContractAddress,
+            lords_amount: u256,
+        ) {
+            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            self.transfer_lords_to_pool(store, payer, lords_amount, PoolType::Bank);
+        }
+
         fn sponsor_season(ref self: ContractState,
             payer: ContractAddress,
             lords_amount: u256,
@@ -92,6 +120,7 @@ pub mod bank {
         ) {
             assert(lords_amount != 0, Errors::INVALID_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
+            // TODO...
             // let tournament: TournamentConfig = store.get_tournament(tournament_id);
             // assert(tournament.is_active(), Errors::INVALID_TOURNAMENT);
             self.transfer_lords_to_pool(store, payer, lords_amount, PoolType::Tournament(tournament_id));
@@ -106,7 +135,7 @@ pub mod bank {
             let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
             let fame_supply: u256 = fame_dispatcher.total_supply() + fame_amount;
             // release proportionally
-            let mut pool: Pool = store.get_pool(PoolType::Bank);
+            let mut pool: Pool = store.get_pool(PoolType::FamePeg);
             let lords_amount: u256 = MathTrait::map(fame_amount, 0, fame_supply, 0, pool.balance_lords.into());
 // println!("fame_amount: {} / {}", fame_amount/pistols::types::constants::CONST::ETH_TO_WEI, fame_supply/pistols::types::constants::CONST::ETH_TO_WEI);
 // println!("lords_amount: {} / {}", lords_amount/pistols::types::constants::CONST::ETH_TO_WEI, pool.balance_lords/pistols::types::constants::CONST::ETH_TO_WEI.low);
@@ -154,7 +183,7 @@ pub mod bank {
             // payer must approve() first
             let lords_dispatcher: Erc20Dispatcher = store.lords_dispatcher();
             self.assert_payer_allowance(lords_dispatcher, payer, amount);
-            // transfer here
+            // transfer to bank
             lords_dispatcher.transfer_from(payer, starknet::get_contract_address(), amount);
             // add to pool
             let mut pool: Pool = store.get_pool(pool_id);
@@ -169,7 +198,7 @@ pub mod bank {
             amount: u256,
             pool_id: PoolType,
         ) {
-            // payer must approve() first
+            // bank is pre-approved for FAME
             let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
             fame_dispatcher.transfer_from_token(contract_address, token_id, starknet::get_contract_address(), amount);
             // add to pool

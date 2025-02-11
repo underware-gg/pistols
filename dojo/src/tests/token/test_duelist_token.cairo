@@ -12,7 +12,7 @@ use pistols::systems::{
         pack_token::{pack_token, IPackTokenDispatcher},
         duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
         fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
-        lords_mock::{ILordsMockDispatcher},
+        lords_mock::{lords_mock, ILordsMockDispatcher},
     },
     components::{
         token_bound::{m_TokenBoundAddress},
@@ -25,7 +25,7 @@ use pistols::models::{
         e_PlayerRequiredAction,
     },
     pack::{
-        m_Pack,
+        m_Pack, PackType, PackTypeTrait,
     },
     challenge::{
         m_Challenge,
@@ -60,7 +60,7 @@ use pistols::models::{
 };
 
 use pistols::interfaces::systems::{SystemsTrait};
-use pistols::types::constants::{CONST, FAME};
+use pistols::types::constants::{FAME};
 use pistols::tests::tester::{tester, tester::{OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO}};
 use pistols::tests::{utils};
 
@@ -165,7 +165,7 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Contract(pack_token::TEST_CLASS_HASH),
             TestResource::Contract(fame_coin::TEST_CLASS_HASH),
             TestResource::Contract(bank::TEST_CLASS_HASH),
-            // TestResource::Contract(lords_mock::TEST_CLASS_HASH),
+            TestResource::Contract(lords_mock::TEST_CLASS_HASH),
         ].span()
     };
 
@@ -186,13 +186,13 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
         ContractDefTrait::new(@"pistols", @"fame_coin")
             .with_writer_of([selector_from_tag!("pistols-CoinConfig"),selector_from_tag!("pistols-TokenBoundAddress")].span()), // same as config
         ContractDefTrait::new(@"pistols", @"bank")
-            .with_writer_of([selector_from_tag!("pistols-Pool")].span())
-        // ContractDefTrait::new(@"pistols", @"lords_mock")
-        //     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-        //     .with_init_calldata([
-        //         0, // minter
-        //         10_000_000_000_000_000_000_000, // 10,000 Lords
-        //     ].span()),
+            .with_writer_of([selector_from_tag!("pistols-Pool")].span()),
+        ContractDefTrait::new(@"pistols", @"lords_mock")
+            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+            .with_init_calldata([
+                0, // minter
+                10_000_000_000_000_000_000_000, // 10,000 Lords
+            ].span()),
     ];
 
     world.sync_perms_and_inits(contract_defs.span());
@@ -221,6 +221,8 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
 fn setup(fee_amount: u128) -> TestSystems {
     let mut sys: TestSystems = setup_uninitialized(fee_amount);
 
+    tester::fund_duelists_pool(@sys.lords, @sys.bank, 2);
+
     // initialize contracts
     tester::execute_claim_welcome_pack(@sys.pack, OWNER());
     
@@ -247,8 +249,10 @@ fn test_initializer() {
     let mut sys: TestSystems = setup(0);
     assert_eq!(sys.token.symbol(), "DUELIST", "Symbol is wrong");
 
-    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, "Should eq [5]");
-    assert_eq!(sys.token.balance_of(OWNER()), CONST::WELCOME_PACK_DUELIST_COUNT.into(), "Should eq [5]");
+    let welcome_pack_duelist_count: usize = PackType::WelcomePack.description().quantity;
+
+    _assert_minted_count(sys.world, sys.token, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
+    assert_eq!(sys.token.balance_of(OWNER()), welcome_pack_duelist_count.into(), "Should eq [welcome_pack_duelist_count]");
     assert_eq!(sys.token.balance_of(OTHER()), 0, "Should eq 0");
 
     assert_eq!(sys.token.owner_of(TOKEN_ID_1_1), OWNER(), "owner_of_1");
@@ -343,9 +347,11 @@ fn test_approve() {
 fn test_transfer_from() {
     let mut sys: TestSystems = setup(0);
 
-    assert_eq!(sys.token.balance_of(OWNER()), CONST::WELCOME_PACK_DUELIST_COUNT.into(), "Should eq [WELCOME_PACK_DUELIST_COUNT]");
+    let welcome_pack_duelist_count: usize = PackType::WelcomePack.description().quantity;
+
+    assert_eq!(sys.token.balance_of(OWNER()), welcome_pack_duelist_count.into(), "Should eq [welcome_pack_duelist_count]");
     assert_eq!(sys.token.balance_of(OTHER()), 0, "Should eq 0");
-    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, "Should eq [WELCOME_PACK_DUELIST_COUNT]");
+    _assert_minted_count(sys.world, sys.token, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
 
     tester::impersonate(OWNER());
     sys.token.approve(SPENDER(), TOKEN_ID_1_1);
@@ -357,10 +363,10 @@ fn test_transfer_from() {
     tester::impersonate(SPENDER());
     sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1_1);
 
-    assert_eq!(sys.token.balance_of(OWNER()), (CONST::WELCOME_PACK_DUELIST_COUNT - 1).into(), "Should eq [WELCOME_PACK_DUELIST_COUNT - 1]");
+    assert_eq!(sys.token.balance_of(OWNER()), (welcome_pack_duelist_count - 1).into(), "Should eq [welcome_pack_duelist_count - 1]");
     assert_eq!(sys.token.balance_of(OTHER()), 1, "Should eq 1");
     assert_eq!(sys.token.get_approved(TOKEN_ID_1_1), ZERO(), "Should eq 0");
-    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, "Should eq [WELCOME_PACK_DUELIST_COUNT]");
+    _assert_minted_count(sys.world, sys.token, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
 }
 
 #[test]

@@ -36,7 +36,7 @@ pub mod tester {
             e_PlayerRequiredAction,
         },
         pack::{
-            m_Pack, Pack,
+            m_Pack, Pack, PackType, PackTypeTrait,
         },
         challenge::{
             m_Challenge, Challenge, ChallengeValue,
@@ -575,6 +575,26 @@ pub mod tester {
         _next_block();
     }
 
+    // ::bank
+    pub fn execute_sponsor_duelists(system: @IBankDispatcher, sender: ContractAddress,
+        amount: u256,
+    ) {
+        impersonate(sender);
+        (*system).sponsor_duelists(sender, amount);
+        _next_block();
+    }
+    pub fn fund_duelists_pool(lords: @ILordsMockDispatcher, bank: @IBankDispatcher, quantity: u8) {
+        // mint lords
+        let sponsor: ContractAddress = starknet::contract_address_const::<0x12178517312>();
+        execute_lords_faucet(lords, sponsor);
+        // approve lords
+        let balance: u256 = (*lords).balance_of(sponsor);
+        execute_lords_approve(lords, sponsor, *bank.contract_address, balance.low);
+        // fund pool
+        let price: u256 = PackType::WelcomePack.description().lords_price;
+        execute_sponsor_duelists(bank, sponsor, price * quantity.into());
+    }
+
     //
     // getters
     //
@@ -699,8 +719,7 @@ pub mod tester {
         ))
     }
 
-    pub fn assert_lords_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
-        let balance: u128 = lords.balance_of(address).low;
+    pub fn assert_balance(balance: u128, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
         if (subtract > add) {
             assert_lt!(balance, balance_before, "{}_lt", prefix);
         } else if (add > subtract) {
@@ -712,9 +731,20 @@ pub mod tester {
         (balance)
     }
 
+    pub fn assert_lords_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = lords.balance_of(address).low;
+        (assert_balance(balance, balance_before, subtract, add, prefix))
+    }
+
+    pub fn assert_lords_balance_same(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = lords.balance_of(address).low;
+        assert_eq!(balance, balance_before, "{}_same", prefix);
+        (balance)
+    }
+
     pub fn assert_lords_balance_increased(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = lords.balance_of(address).low;
-        assert_gt!(balance, balance_before, "{}_indreased", prefix);
+        assert_gt!(balance, balance_before, "{}_increased", prefix);
         (balance)
     }
 
@@ -724,9 +754,15 @@ pub mod tester {
         (balance)
     }
 
+    pub fn assert_fame_balance_same(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = fame.balance_of(address).low;
+        assert_eq!(balance, balance_before, "{}_same", prefix);
+        (balance)
+    }
+
     pub fn assert_fame_balance_increased(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = fame.balance_of(address).low;
-        assert_gt!(balance, balance_before, "{}_indreased", prefix);
+        assert_gt!(balance, balance_before, "{}_increased", prefix);
         (balance)
     }
 

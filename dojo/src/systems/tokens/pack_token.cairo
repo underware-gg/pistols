@@ -189,7 +189,8 @@ pub mod pack_token {
             assert(self.can_claim_welcome_pack(recipient), Errors::ALREADY_CLAIMED);
 
             // mint
-            let pack: Pack = self.mint_pack(PackType::WelcomePack, recipient, recipient.into());
+            let lords_amount: u128 = self.calc_mint_fee(recipient, PackType::WelcomePack);
+            let pack: Pack = self.mint_pack(PackType::WelcomePack, recipient, recipient.into(), lords_amount);
             
             // events
             PlayerTrait::check_in(ref store, Activity::WelcomePack, recipient, 0);
@@ -209,16 +210,16 @@ pub mod pack_token {
             assert(!self.can_claim_welcome_pack(recipient), Errors::CLAIM_FIRST);
 
             // transfer mint fee
-            let amount: u128 = self.calc_mint_fee(recipient, pack_type);
-            if (amount != 0) {
-                store.world.bank_dispatcher().charge_purchase(recipient, amount.into());
+            let lords_amount: u128 = self.calc_mint_fee(recipient, pack_type);
+            if (lords_amount != 0) {
+                store.world.bank_dispatcher().charge_purchase(recipient, lords_amount.into());
             }
 
             // create vrf seed
             let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_contract_address()));
 
             // mint
-            let pack: Pack = self.mint_pack(pack_type, recipient, seed);
+            let pack: Pack = self.mint_pack(pack_type, recipient, seed, lords_amount);
             
             // events
             PlayerTrait::check_in(ref store, Activity::PurchasedPack, recipient, pack.pack_type.identifier());
@@ -240,6 +241,9 @@ pub mod pack_token {
             // open...
             let token_ids: Span<u128> = pack.open(ref store, recipient);
 
+            // minted fame, peg to paid LORDS
+            store.world.bank_dispatcher().minted_fame(recipient, pack.lords_amount.into());
+
             // burn!
             self.token.burn(pack_id.into());
 
@@ -257,6 +261,7 @@ pub mod pack_token {
             pack_type: PackType,
             recipient: ContractAddress,
             seed: felt252,
+            lords_amount: u128,
         ) -> Pack {
             let mut store: Store = StoreTrait::new(self.world_default());
 
@@ -268,6 +273,7 @@ pub mod pack_token {
                 pack_id: token_id,
                 pack_type,
                 seed,
+                lords_amount,
                 is_open: false,
             };
             store.set_pack(@pack);

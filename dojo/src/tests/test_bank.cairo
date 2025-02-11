@@ -1,10 +1,11 @@
 #[cfg(test)]
 mod tests {
-    // use starknet::{ContractAddress};
+    use starknet::{ContractAddress};
 
     use pistols::models::{
         pool::{Pool, PoolType},
         table::{FeeValues},
+        pack::{Pack, PackType, PackTypeTrait},
     };
     use pistols::utils::math::{MathU8};
 
@@ -15,8 +16,9 @@ mod tests {
             // IFameCoinDispatcherTrait,
             IFoolsCoinDispatcherTrait,
             ILordsMockDispatcherTrait,
-            IBankDispatcherTrait,
-            OWNER, OTHER, TREASURY, BUMMER,
+            IPackTokenDispatcherTrait,
+            // IBankDispatcherTrait,
+            OWNER, OTHER, TREASURY,
             SEASON_1_TABLE,
         }
     };
@@ -28,25 +30,12 @@ mod tests {
     };
     use pistols::systems::rng_mock::{IRngMockDispatcherTrait};
     use pistols::utils::math::{MathU128};
-    // use pistols::types::constants::{CONST};
 
-    fn _fund_bank_pool(sys: @TestSystems) {
-        // fund someone
-        tester::execute_lords_faucet(sys.lords, BUMMER());
-        let balance: u256 = (*sys.lords).balance_of(BUMMER());
-        tester::execute_lords_approve(sys.lords, BUMMER(), *sys.bank.contract_address, balance.low);
-        // move to pool
-        tester::impersonate(*sys.duelists.contract_address);
-        (*sys.bank).charge_purchase(BUMMER(), balance);
-        // let balance: u256 = (*sys.lords).balance_of(*sys.bank.contract_address);
-        // println!("charged! {}", balance);
-        tester::impersonate(OWNER());
-    }
 
     //-----------------------------------------
     // Challenge results
     //
-    fn _test_bank_challenge(sys: TestSystems, duelist_id_a: u128, duelist_id_b: u128, winner: u8) {
+    fn _test_bank_resolved(sys: TestSystems, duelist_id_a: u128, duelist_id_b: u128, winner: u8) {
         let (salts, moves_a, moves_b): (SaltsValues, PlayerMoves, PlayerMoves) = 
             if (winner == 1) {prefabs::get_moves_crit_a()}
             else if (winner == 2) {prefabs::get_moves_crit_b()}
@@ -65,9 +54,11 @@ mod tests {
 // println!("lords_balance_bank: {}", lords_balance_bank/CONST::ETH_TO_WEI.low);
 // println!("fame_supply: {}", sys.fame.total_supply()/CONST::ETH_TO_WEI);
 
-        let pool_bank: Pool = tester::get_Pool(sys.world, PoolType::Bank);
-        assert_eq!(pool_bank.balance_lords, lords_balance_bank, "pool_bank.balance_lords");
-        assert_eq!(pool_bank.balance_fame, 0, "pool_bank.balance_fame");
+        // PoolType::FamePeg == bank balance
+        let pool_peg: Pool = tester::get_Pool(sys.world, PoolType::FamePeg);
+        assert_eq!(pool_peg.balance_lords, lords_balance_bank, "pool_peg.balance_lords");
+        assert_eq!(pool_peg.balance_fame, 0, "pool_peg.balance_fame");
+        // PoolType::Season() == zero
         let pool_season: Pool = tester::get_Pool(sys.world, PoolType::Season(table_id));
         assert_eq!(pool_season.balance_lords, 0, "pool_season.balance_lords");
         assert_eq!(pool_season.balance_fame, 0, "pool_season.balance_fame");
@@ -127,12 +118,12 @@ mod tests {
         lords_balance_treasury = tester::assert_lords_balance_increased(sys.lords, TREASURY(), lords_balance_treasury, format!("lords_balance_treasury [{}]", duel_id));
         fame_balance_bank = tester::assert_fame_balance_increased(sys.fame, sys.bank.contract_address, fame_balance_bank, format!("fame_balance_bank [{}]", duel_id));
 
-        // bank lords decreased
-        let pool_bank: Pool = tester::get_Pool(sys.world, PoolType::Bank);
-        assert_eq!(pool_bank.balance_lords, lords_balance_bank - lords_balance_treasury, "pool_bank.balance_lords END");
-        assert_eq!(pool_bank.balance_fame, 0, "pool_bank.balance_fame END");
+        // PoolType::FamePeg decreased
+        let pool_peg: Pool = tester::get_Pool(sys.world, PoolType::FamePeg);
+        assert_eq!(pool_peg.balance_lords, lords_balance_bank - lords_balance_treasury, "pool_peg.balance_lords END");
+        assert_eq!(pool_peg.balance_fame, 0, "pool_peg.balance_fame END");
 
-        // fame went to season pool
+        // FAME >> PoolType::Season()
         let pool_season: Pool = tester::get_Pool(sys.world, PoolType::Season(table_id));
         assert_eq!(pool_season.balance_lords, 0, "pool_season.balance_lords END");
         assert_eq!(pool_season.balance_fame, fame_balance_bank, "pool_season.balance_fame END");
@@ -141,29 +132,83 @@ mod tests {
     #[test]
     fn test_bank_resolved_draw() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        tester::fund_duelists_pool(@sys.lords, @sys.bank, 2);
         let duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
         let duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
-        _fund_bank_pool(@sys);
-        _test_bank_challenge(sys, duelist_id_a, duelist_id_b, 0);
+        _test_bank_resolved(sys, duelist_id_a, duelist_id_b, 0);
     }
 
     #[test]
     fn test_bank_resolved_win_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        tester::fund_duelists_pool(@sys.lords, @sys.bank, 2);
         let duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
         let duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
-        _fund_bank_pool(@sys);
-        _test_bank_challenge(sys, duelist_id_a, duelist_id_b, 1);
+        _test_bank_resolved(sys, duelist_id_a, duelist_id_b, 1);
     }
 
     #[test]
     fn test_bank_resolved_win_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        tester::fund_duelists_pool(@sys.lords, @sys.bank, 2);
         let duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
         let duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
-        _fund_bank_pool(@sys);
-        _test_bank_challenge(sys, duelist_id_a, duelist_id_b, 2);
+        _test_bank_resolved(sys, duelist_id_a, duelist_id_b, 2);
     }
 
+
+    //-----------------------------------------
+    // Bank / Peg pools
+    //
+    #[test]
+    fn test_bank_peg_pool() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE);
+
+        let bank_address: ContractAddress = sys.bank.contract_address;
+        let price_welcome: u128 = PackType::WelcomePack.description().lords_price.low;
+        let price_pack: u128 = PackType::Duelists5x.description().lords_price.low;
+        assert_ne!(price_welcome, 0, "price_welcome");
+        assert_ne!(price_pack, 0, "price_pack");
+
+        // initial balances
+        let mut balance_bank: u128 = sys.lords.balance_of(bank_address).low;
+        let mut pool_bank: u128 = tester::get_Pool(sys.world, PoolType::Bank).balance_lords;
+        let mut pool_peg: u128 = tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords;
+        assert_eq!(balance_bank, 0, "balance_bank INIT");
+        assert_eq!(pool_bank, 0, "pool_bank INIT");
+        assert_eq!(pool_peg, 0, "pool_peg INIT");
+
+        // fund PoolType::Bank
+        tester::fund_duelists_pool(@sys.lords, @sys.bank, 1);
+        balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, price_welcome, "balance_bank FUND");
+        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Bank).balance_lords, pool_bank, 0, price_welcome, "pool_bank FUND");
+        pool_peg = tester::assert_balance(tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords, pool_peg, 0, 0, "pool_peg FUND");
+
+        // claim duelists -- transfered to PoolType::FamePeg
+        tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+        balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, 0, "balance_bank CLAIM");
+        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Bank).balance_lords, pool_bank, price_welcome, 0, "pool_bank CLAIM");
+        pool_peg = tester::assert_balance(tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords, pool_peg, 0, price_welcome, "pool_peg CLAIM");
+
+        // purchase to PoolType::Bank
+        let pack: Pack = sys.pack.purchase(PackType::Duelists5x);
+        balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, price_pack, "balance_bank PURCHASE");
+        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Bank).balance_lords, pool_bank, 0, price_pack, "pool_bank PURCHASE");
+        pool_peg = tester::assert_balance(tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords, pool_peg, 0, 0, "pool_peg PURCHASE");
+
+        // open pack
+        sys.pack.open(pack.pack_id);
+        balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, 0, "balance_bank PURCHASE");
+        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Bank).balance_lords, pool_bank, price_pack, 0, "pool_bank PURCHASE");
+        pool_peg = tester::assert_balance(tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords, pool_peg, 0, price_pack, "pool_peg PURCHASE");
+
+        // final balances
+        let mut balance_bank: u128 = sys.lords.balance_of(bank_address).low;
+        let mut pool_bank: u128 = tester::get_Pool(sys.world, PoolType::Bank).balance_lords;
+        let mut pool_peg: u128 = tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords;
+        assert_eq!(balance_bank, (price_welcome + price_pack), "balance_bank END");
+        assert_eq!(pool_bank, 0, "pool_bank END");
+        assert_eq!(pool_peg, (price_welcome + price_pack), "pool_peg END");
+    }
 
 }
