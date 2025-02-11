@@ -142,7 +142,7 @@ export class InteractibleScene extends THREE.Scene {
     })
 
     this.resetRandomInterpolation()
-    this.currentOpacities = this.currentOpacities.map(() => 1);
+    this.currentOpacities = this.currentOpacities.map((_, i) => this.sceneData.backgrounds[i] ? (this.sceneData.backgrounds[i].hidden ? 0 : 1) : 1);
     this.opacityTweens = this.opacityTweens.map(tween => {
       tween?.stop();
       return tween;
@@ -151,7 +151,7 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uTime', 0.0)
     this.maskShader.setUniformValue('uPickedColor', this.pickedColor)
     this.maskShader.setUniformValue('uExcludedColor', new THREE.Color(0, 0, 0))
-    this.maskShader.setUniformValue('uHiddenOpacities', this.sceneData.backgrounds.map(() => 1.0))
+    this.maskShader.setUniformValue('uHiddenOpacities', this.sceneData.backgrounds.map(background => background.hidden ? 0.0 : 1.0))
     this.maskShader.setUniformValue('uClickable', this.isClickable)
     this.maskShader.setUniformValue('uSamples', 1)
     this.maskShader.setUniformValue('uShiftAmount', 0.0)

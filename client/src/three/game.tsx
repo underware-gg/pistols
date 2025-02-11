@@ -772,6 +772,9 @@ export function switchScene(sceneName) {
   if (!_currentScene) {
     _sceneName = sceneName
     _currentScene = _scenes[sceneName.includes('Tutorial') ? SceneName.Tutorial : sceneName]
+    if (sceneName.includes('Tutorial')) {
+      (_currentScene as InteractibleScene).setSceneData(sceneName)
+    }
 
     fadeInCurrentScene();
     
@@ -784,6 +787,9 @@ export function switchScene(sceneName) {
     fadeOutCurrentScene(() => {
       _sceneName = sceneName
       _currentScene = _scenes[sceneName.includes('Tutorial') ? SceneName.Tutorial : sceneName]
+      if (sceneName.includes('Tutorial')) {
+        (_currentScene as InteractibleScene).setSceneData(sceneName)
+      }
 
       fadeInCurrentScene();
       

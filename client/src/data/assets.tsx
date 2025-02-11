@@ -117,7 +117,8 @@ interface SceneBackgroundObject {
   texture: TextureName,
   shiftMultiplier: number,
   renderOrder: number,
-  animatedIdle?: number
+  animatedIdle?: number,
+  hidden?: boolean
 }
 
 interface SceneObject {
@@ -191,7 +192,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { texture: TextureName.bg_demon_right_hand, shiftMultiplier: -0.01, renderOrder: 0, animatedIdle: 0.01 },
       { texture: TextureName.bg_demon_left_hand, shiftMultiplier: -0.01, renderOrder: 1, animatedIdle: 0.01 },
       { texture: TextureName.bg_demon, shiftMultiplier: 0.01, renderOrder: 2 },
-      { texture: TextureName.bg_demon_person, shiftMultiplier: 0.02, renderOrder: 3 },
+      { texture: TextureName.bg_demon_person, shiftMultiplier: 0.02, renderOrder: 3, hidden: true },
       { texture: TextureName.bg_demon_background, shiftMultiplier: 0, renderOrder: 4 },
     ],
     items: [
