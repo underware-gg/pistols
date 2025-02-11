@@ -3,6 +3,29 @@ use pistols::models::pool::{PoolType};
 
 #[starknet::interface]
 pub trait IBank<TState> {
+    // IBankPublic
+    fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u256);
+    fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u256);
+    fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u256, tournament_id: felt252);
+
+    // IBankProtected
+    fn charge_purchase(ref self: TState, payer: ContractAddress, lords_amount: u256);
+    fn minted_fame(ref self: TState, payer: ContractAddress, lords_amount: u256);
+    fn burned_fame_release_lords(ref self: TState, recipient: ContractAddress, fame_amount: u256) -> u256;
+    fn duelist_lost_fame(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u256, pool_id: PoolType);
+}
+
+// Exposed to clients
+#[starknet::interface]
+trait IBankPublic<TState> {
+    fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u256);
+    fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u256);
+    fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u256, tournament_id: felt252);
+}
+
+// Exposed to world
+#[starknet::interface]
+trait IBankProtected<TState> {
     // transfer LORDS from payer, adding to Pool::Purchases
     // (called by pack_token)
     fn charge_purchase(ref self: TState, payer: ContractAddress, lords_amount: u256);
@@ -15,18 +38,6 @@ pub trait IBank<TState> {
     // transfer FAME to payer, adding to Pool::Season(table_id)
     // (called by duelist_token)
     fn duelist_lost_fame(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u256, pool_id: PoolType);
-
-    // IBankPublic
-    fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u256);
-    fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u256);
-    fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u256, tournament_id: felt252);
-}
-
-#[starknet::interface]
-pub trait IBankPublic<TState> {
-    fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u256);
-    fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u256);
-    fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u256, tournament_id: felt252);
 }
 
 #[dojo::contract]
@@ -69,30 +80,7 @@ pub mod bank {
     }
 
     #[abi(embed_v0)]
-    impl BankImpl of super::IBank<ContractState> {
-        fn charge_purchase(ref self: ContractState,
-            payer: ContractAddress,
-            lords_amount: u256,
-        ) {
-            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
-            let mut store: Store = StoreTrait::new(self.world_default());
-            self.transfer_lords_to_pool(store, payer, lords_amount, PoolType::Bank);
-        }
-
-        fn minted_fame(ref self: ContractState,
-            payer: ContractAddress,
-            lords_amount: u256,
-        ) {
-            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let mut purchases_pool: Pool = store.get_pool(PoolType::Bank);
-            let mut fame_peg_pool: Pool = store.get_pool(PoolType::FamePeg);
-            purchases_pool.withdraw_lords(lords_amount.low);
-            fame_peg_pool.deposit_lords(lords_amount.low);
-            store.set_pool(@purchases_pool);
-            store.set_pool(@fame_peg_pool);
-        }
-
+    impl BankPublicImpl of super::IBankPublic<ContractState> {
         fn sponsor_duelists(ref self: ContractState,
             payer: ContractAddress,
             lords_amount: u256,
@@ -124,6 +112,32 @@ pub mod bank {
             // let tournament: TournamentConfig = store.get_tournament(tournament_id);
             // assert(tournament.is_active(), Errors::INVALID_TOURNAMENT);
             self.transfer_lords_to_pool(store, payer, lords_amount, PoolType::Tournament(tournament_id));
+        }
+    }
+
+    #[abi(embed_v0)]
+    impl BankProtectedImpl of super::IBankProtected<ContractState> {
+        fn charge_purchase(ref self: ContractState,
+            payer: ContractAddress,
+            lords_amount: u256,
+        ) {
+            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            self.transfer_lords_to_pool(store, payer, lords_amount, PoolType::Bank);
+        }
+
+        fn minted_fame(ref self: ContractState,
+            payer: ContractAddress,
+            lords_amount: u256,
+        ) {
+            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut purchases_pool: Pool = store.get_pool(PoolType::Bank);
+            let mut fame_peg_pool: Pool = store.get_pool(PoolType::FamePeg);
+            purchases_pool.withdraw_lords(lords_amount.low);
+            fame_peg_pool.deposit_lords(lords_amount.low);
+            store.set_pool(@purchases_pool);
+            store.set_pool(@fame_peg_pool);
         }
 
         fn burned_fame_release_lords(ref self: ContractState,

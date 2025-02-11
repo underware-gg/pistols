@@ -31,7 +31,7 @@ pub mod duelist_token {
     use dojo::world::{WorldStorage};
     use dojo::model::{ModelStorage};
 
-    use super::{IDuelistToken, MockDuelistOwners};
+    use super::{MockDuelistOwners};
     use pistols::models::challenge::{Challenge};
     use pistols::models::table::{FeeValues};
     use pistols::utils::misc::{ZERO};
@@ -49,7 +49,7 @@ pub mod duelist_token {
     }
 
     #[abi(embed_v0)]
-    impl ERC721MockImpl of IDuelistToken<ContractState> {
+    impl ERC721MockImpl of super::IDuelistToken<ContractState> {
         fn transfer_from(ref self: ContractState, from: ContractAddress, to: ContractAddress, token_id: u256) {
             let mut world = self.world_default();
             world.write_model(

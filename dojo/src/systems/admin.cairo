@@ -6,14 +6,13 @@ use pistols::models::table::{TableConfig};
 // https://github.com/cartridge-gg/rollyourown/blob/market_packed/src/config/ryo.cairo
 
 
+// Exposed to clients
 #[starknet::interface]
 pub trait IAdmin<TState> {
     fn am_i_admin(self: @TState, account_address: ContractAddress) -> bool;
     fn grant_admin(ref self: TState, account_address: ContractAddress, granted: bool);
-
     fn set_treasury(ref self: TState, treasury_address: ContractAddress);
     fn set_paused(ref self: TState, paused: bool);
-
     fn set_table(ref self: TState, table: TableConfig);
 }
 

@@ -22,12 +22,13 @@ pub trait IFoolsCoin<TState> {
     fn balanceOf(self: @TState, account: ContractAddress) -> u256;
     fn transferFrom(ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
 
-    // IFoolsCoinPublic
+    // IFoolsCoinProtected
     fn reward_player(ref self: TState, recipient: ContractAddress, amount: u256);
 }
 
+// Exposed to world
 #[starknet::interface]
-pub trait IFoolsCoinPublic<TState> {
+trait IFoolsCoinProtected<TState> {
     fn reward_player(ref self: TState, recipient: ContractAddress, amount: u256);
 }
 
@@ -105,9 +106,8 @@ pub mod fools_coin {
     //-----------------------------------
     // Public
     //
-    use super::{IFoolsCoinPublic};
     #[abi(embed_v0)]
-    impl FoolsPublicImpl of IFoolsCoinPublic<ContractState> {
+    impl FoolsPublicImpl of super::IFoolsCoinProtected<ContractState> {
         fn reward_player(ref self: ContractState,
             recipient: ContractAddress,
             amount: u256,

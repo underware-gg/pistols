@@ -1,10 +1,9 @@
 use starknet::{ContractAddress};
 use pistols::types::duel_progress::{DuelProgress};
 
-// define the interface
+// Exposed to clients
 #[starknet::interface]
 pub trait IGame<TState> {
-    //
     // Game actions
     fn commit_moves(
         ref self: TState,
@@ -22,7 +21,6 @@ pub trait IGame<TState> {
     // end season and start next
     fn collect(ref self: TState) -> felt252;
 
-    //
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;

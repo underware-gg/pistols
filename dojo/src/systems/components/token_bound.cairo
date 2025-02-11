@@ -86,7 +86,6 @@ pub mod TokenBoundComponent {
     //-----------------------------------------
     // Public
     //
-    use super::{ITokenBoundPublic};
     #[embeddable_as(TokenBoundPublicImpl)]
     pub impl TokenBoundPublic<
         TContractState,
@@ -95,7 +94,7 @@ pub mod TokenBoundComponent {
         +ERC20Component::ERC20HooksTrait<TContractState>,
         impl ERC20: ERC20Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ITokenBoundPublic<ComponentState<TContractState>> {
+    > of super::ITokenBoundPublic<ComponentState<TContractState>> {
         fn address_of_token(self: @ComponentState<TContractState>,
             contract_address: ContractAddress,
             token_id: u128,
@@ -166,7 +165,6 @@ pub mod TokenBoundComponent {
     //-----------------------------------------
     // Internal
     //
-    use super::{ITokenBoundInternal};
     #[embeddable_as(TokenBoundInternalImpl)]
     pub impl InternalImpl<
         TContractState,
@@ -175,7 +173,7 @@ pub mod TokenBoundComponent {
         +ERC20Component::ERC20HooksTrait<TContractState>,
         impl ERC20: ERC20Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ITokenBoundInternal<ComponentState<TContractState>> {
+    > of super::ITokenBoundInternal<ComponentState<TContractState>> {
         fn register_token(self: @ComponentState<TContractState>,
             contract_address: ContractAddress,
             token_id: u128,

@@ -56,7 +56,6 @@ pub mod TokenComponent {
     //-----------------------------------------
     // Public
     //
-    use super::{ITokenComponentPublic};
     #[embeddable_as(TokenComponentPublicImpl)]
     pub impl TokenComponentPublic<
         TContractState,
@@ -66,7 +65,7 @@ pub mod TokenComponent {
         +ERC721Component::ERC721HooksTrait<TContractState>,
         impl ERC721: ERC721Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ITokenComponentPublic<ComponentState<TContractState>> {
+    > of super::ITokenComponentPublic<ComponentState<TContractState>> {
 
         fn can_mint(self: @ComponentState<TContractState>,
             recipient: ContractAddress,
@@ -105,7 +104,6 @@ pub mod TokenComponent {
     //-----------------------------------------
     // Internal
     //
-    use super::{ITokenComponentInternal};
     #[embeddable_as(TokenComponentInternalImpl)]
     pub impl InternalImpl<
         TContractState,
@@ -115,7 +113,7 @@ pub mod TokenComponent {
         +ERC721Component::ERC721HooksTrait<TContractState>,
         impl ERC721: ERC721Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ITokenComponentInternal<ComponentState<TContractState>> {
+    > of super::ITokenComponentInternal<ComponentState<TContractState>> {
         fn initialize(ref self: ComponentState<TContractState>,
             minter_address: ContractAddress,
             renderer_address: ContractAddress,

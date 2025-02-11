@@ -53,6 +53,7 @@ pub trait IPackToken<TState> {
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
 }
 
+// Exposed to clients
 #[starknet::interface]
 pub trait IPackTokenPublic<TState> {
     // view
@@ -164,9 +165,8 @@ pub mod pack_token {
     //-----------------------------------
     // Public
     //
-    use super::{IPackTokenPublic};
     #[abi(embed_v0)]
-    impl PackTokenPublicImpl of IPackTokenPublic<ContractState> {
+    impl PackTokenPublicImpl of super::IPackTokenPublic<ContractState> {
 
         fn can_claim_welcome_pack(self: @ContractState, recipient: ContractAddress) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
