@@ -5,15 +5,19 @@
 // Everything that is deposited to pistols-bank contract must be assigned to a pool!
 // 
 // PoolType::Bank
-//  - LORDS from purchases, pegged to FAME in circulation
+//  - LORDS from purchases
+//  - FAME: not used
+//
+// PoolType::FamePeg
+//  - LORDS from PoolType::Bank, pegged to FAME in circulation
 //  - FAME: not used
 //
 // PoolType::Season / PoolType::Tournament
-//  - FAME lost in duels, will be burned to release LORDS from PoolType::Bank
+//  - FAME lost in duels, will be burned to release LORDS from PoolType::FamePeg
 //  - LORDS from sponsors, distributed directly to winners
 //
 // PoolType::SacredFlame
-//  - FAME from dead and sacrificed duelists, burned to release LORDS from PoolType::Bank
+//  - FAME from dead and sacrificed duelists, burned to release LORDS from PoolType::FamePeg
 //  - LORDS: not used
 //
 
@@ -22,9 +26,10 @@
 pub enum PoolType {
     Undefined,              // 0
     Bank,                   // 1
-    Season: felt252,        // 2
-    Tournament: felt252,    // 3
-    SacredFlame,            // 4
+    FamePeg,                // 2
+    Season: felt252,        // 3
+    Tournament: felt252,    // 4
+    SacredFlame,            // 5
 }
 impl PoolTypeDefault of Default<PoolType> {
     fn default() -> PoolType {(PoolType::Undefined)}
@@ -87,6 +92,7 @@ impl PoolTypeIntoByteArray of core::traits::Into<PoolType, ByteArray> {
         match self {
             PoolType::Undefined     =>  "Undefined",
             PoolType::Bank          =>  "Bank",
+            PoolType::FamePeg       =>  "FamePeg",
             PoolType::Season        =>  "Season",
             PoolType::Tournament    =>  "Tournament",
             PoolType::SacredFlame   =>  "SacredFlame",
