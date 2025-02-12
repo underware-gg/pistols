@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
 import { Segment } from 'semantic-ui-react'
 import { useGameplayContext } from '/src/hooks/GameplayContext'
-import { useAddChallenge, useChallenge } from '/src/stores/challengeStore'
+import { useGetChallenge } from '/src/stores/challengeStore'
 import { AnimationState } from '/src/three/game'
 import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
 import { useGameAspect } from '/src/hooks/useGameApect'
@@ -22,8 +22,8 @@ export default function DuelStateDisplay({
   const { dispatchSetTutorialLevel } = usePistolsContext()
 
   const { challengeDescription } = useChallengeDescription(duelId)
-  const { isFinished: isFinishedTutorial, isTutorial, tutorialLevel } = useAddChallenge(duelId)
-  const { isFinished } = useChallenge(duelId)
+  const { isFinished: isFinishedTutorial, isTutorial, tutorialLevel } = useGetChallenge(duelId)
+  const { isFinished } = useGetChallenge(duelId)
 
   const { aspectWidth } = useGameAspect()
 

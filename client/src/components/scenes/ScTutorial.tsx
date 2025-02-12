@@ -5,7 +5,7 @@ import { InteractibleScene } from '/src/three/InteractibleScene'
 import { SceneName, TextureName } from '/src/data/assets'
 import { ANIMATION_TIME_PER_LETTER, DELAY_BETWEEN_TEXTS, DELAY_BETWEEN_SPEECH, TUTORIAL_SCENE_DATA, TutorialScene, TutorialText, DuelTutorialLevel } from '/src/data/tutorialConstants'
 import { AUDIO_ASSETS } from '/src/data/audioAssets'
-import { useConnectToSelectedChain, useDojoStatus, useDojoSystemCalls, useSelectedChain } from '@underware_gg/pistols-sdk/dojo'
+import { useConnectToSelectedNetwork, useDojoStatus, useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { useTutorialLevel, useTutorialPlayerId } from '/src/hooks/useTutorial'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useGameEvent } from '/src/hooks/useGameEvent'
@@ -24,11 +24,11 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
 
   // Web3 Hooks
-  const { isConnecting } = useSelectedChain()
+  const { isConnecting } = useAccount()
   const { isLoading, isError } = useDojoStatus()
   const { disconnect } = useDisconnect()
   const { account } = useAccount()
-  const { connect } = useConnectToSelectedChain(handleConnectionSuccess)
+  const { connect } = useConnectToSelectedNetwork(handleConnectionSuccess)
   const { tutorial } = useDojoSystemCalls()
 
   // Tutorial State

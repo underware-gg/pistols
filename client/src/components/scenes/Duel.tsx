@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useMounted, useClientTimestamp } from '@underware_gg/pistols-sdk/utils'
+import { useMounted, useClientTimestamp } from '@underware_gg/pistols-sdk/utils/hooks'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useGameplayContext } from '/src/hooks/GameplayContext'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { useAddChallenge, useChallenge } from '/src/stores/challengeStore'
+import { useGetChallenge } from '/src/stores/challengeStore'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useIsYou } from '/src/hooks/useIsYou'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
@@ -16,7 +16,7 @@ import { AnimationState } from '/src/three/game'
 import { Action } from '/src/utils/pistols'
 import { MenuDuel, MenuDuelControl } from '/src/components/Menus'
 import { MenuDebugAnimations } from '/src/components/MenusDebug'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { DuelistCardType } from '/src/components/cards/Cards'
 import Cards, { CardsHandle, DuelistHand } from '/src/components/cards/DuelCards'
 import * as Constants from '/src/data/cardConstants'
@@ -50,8 +50,8 @@ export default function Duel({
   const { debugMode, duelSpeedFactor } = useSettings()
   const { clientSeconds } = useClientTimestamp(false)
 
-  const { duelistIdA, duelistIdB, timestamp_start } = tutorial === DuelTutorialLevel.NONE ? useChallenge(duelId) : useAddChallenge(duelId)
-  const { isTutorial } = useAddChallenge(duelId)
+  const { duelistIdA, duelistIdB, timestamp_start } = useGetChallenge(duelId)
+  const { isTutorial } = useGetChallenge(duelId)
 
   // switch to active duelist, if owned by player
   const { isSynced } = useSyncToActiveDuelists([duelistIdA, duelistIdB])
