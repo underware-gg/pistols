@@ -313,7 +313,7 @@ pub mod duel_token {
             };
             store.set_challenge(@challenge);
 
-            // create Round, readu for player A to 
+            // create Round, ready for player A to commit
             let mut round = Round {
                 duel_id: challenge.duel_id,
                 state: RoundState::Commit,
@@ -358,7 +358,7 @@ pub mod duel_token {
                 // Expired, close it!
                 challenge.state = ChallengeState::Expired;
                 challenge.timestamp_end = timestamp;
-            } else if (challenge.duelist_id_a == duelist_id_b) {
+            } else if (address_b == challenge.address_a) {
                 // same duelist, can only withdraw...
                 assert(accepted == false, Errors::INVALID_REPLY_SELF);
                 challenge.state = ChallengeState::Withdrawn;

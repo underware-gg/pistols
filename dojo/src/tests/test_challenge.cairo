@@ -237,7 +237,7 @@ mod tests {
         let (_block_number, timestamp) = tester::elapse_timestamp(TimestampTrait::from_days(1));
 
         tester::assert_pact(sys, duel_id, ch, true, false, "created");
-        let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, A, ID(A), duel_id, false);
+        let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, A, 0, duel_id, false);
         assert_eq!(new_state, ChallengeState::Withdrawn, "canceled");
         tester::assert_pact(sys, duel_id, ch, false, false, "withdrew");
 
