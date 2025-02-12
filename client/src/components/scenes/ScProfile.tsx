@@ -50,7 +50,7 @@ export default function ScProfile() {
 
       {(debugMode || true) && <>
         <PublishOnlineStatusButton />
-        <TutorialProgressDebug />
+        {/* <TutorialProgressDebug /> */}
       </>}
     </div>
   )

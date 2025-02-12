@@ -306,32 +306,24 @@ export class InteractibleScene extends THREE.Scene {
 
     const domElement = this.renderer?.domElement
     const elements = document.elementsFromPoint(event.clientX, event.clientY)
-    const isHoveringBarMenu = (domElement && elements[0] === domElement)
 
-    if (isHoveringBarMenu) {
-      var rect = domElement.getBoundingClientRect();
-      let x = (event.clientX - rect.left) / rect.width
-      let y = (event.clientY - rect.top) / rect.height
-      x = (clamp(x, 0, 1) * WIDTH)
-      y = HEIGHT - (clamp(y, 0, 1) * HEIGHT)
+    var rect = domElement.getBoundingClientRect();
+    let x = (event.clientX - rect.left) / rect.width
+    let y = (event.clientY - rect.top) / rect.height
+    x = (clamp(x, 0, 1) * WIDTH)
+    y = HEIGHT - (clamp(y, 0, 1) * HEIGHT)
 
-      // apply bg animation scale, from the center of the screen
-      const scale = this.maskOverlay.parent.scale.x
-      x = Math.floor((WIDTH / 2) + (x - WIDTH / 2) / scale)
-      y = Math.floor((HEIGHT / 2) + (y - HEIGHT / 2) / scale)
+    // apply bg animation scale, from the center of the screen
+    const scale = this.maskOverlay.parent.scale.x
+    x = Math.floor((WIDTH / 2) + (x - WIDTH / 2) / scale)
+    y = Math.floor((HEIGHT / 2) + (y - HEIGHT / 2) / scale)
 
-      this.mousePos.set(x, y)
+    this.mousePos.set(x, y)
 
-      // Calculate normalized screen coordinates (-1 to 1)
-      const screenX = ((event.clientX - rect.left) / rect.width) * 2 - 1
-      const screenY = -((event.clientY - rect.top) / rect.height) * 2 + 1
-      this.mouseScreenPos.set(screenX, screenY)
-
-      return
-    }
-
-    // element not found our blocked
-    this.mousePos.set(0, 0)
+    // Calculate normalized screen coordinates (-1 to 1)
+    const screenX = ((event.clientX - rect.left) / rect.width) * 2 - 1
+    const screenY = -((event.clientY - rect.top) / rect.height) * 2 + 1
+    this.mouseScreenPos.set(screenX, screenY)
   }
 
   onMouseClick(event: PointerEvent) {

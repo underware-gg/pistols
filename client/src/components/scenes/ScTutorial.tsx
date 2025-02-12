@@ -13,6 +13,7 @@ import AnimatedText from '../ui/AnimatedText'
 import * as TWEEN from '@tweenjs/tween.js'
 import { CardPack } from '../ui/CardPack'
 import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
+import { CARD_PACK_SIZE, MAX_TILT } from '/src/data/cardConstants'
 
 export default function ScTutorial({ currentTutorialScene }: { currentTutorialScene: string }) {
   // Scene & Context
@@ -328,9 +329,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       />
 
       {showCardPack && (
-        <div className={!cardPackClickable ? 'NoMouse' : ''}>
-          <CardPack isOpen={showCardPack} />
-        </div>
+        <CardPack isOpen={showCardPack} clickable={cardPackClickable} cardPackSize={CARD_PACK_SIZE} maxTilt={MAX_TILT} />
       )}
     </>
   )
