@@ -90,7 +90,7 @@ pub mod tester {
     pub fn ZERO()      -> ContractAddress { starknet::contract_address_const::<0x0>() }
     pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // duelists 1-2
     pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x3>() } // duelists 3-4
-    pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x111>() }
+    pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x5>() } // duelists 5-6
     pub fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x222>() }
     pub fn SPENDER()   -> ContractAddress { starknet::contract_address_const::<0x333>() }
     pub fn TREASURY()  -> ContractAddress { starknet::contract_address_const::<0x444>() }
@@ -732,46 +732,47 @@ pub mod tester {
         assert_eq!(balance, balance_before - subtract + add, "{}_sum", prefix);
         (balance)
     }
+    pub fn assert_balance_up(balance: u128, balance_before: u128, prefix: ByteArray) -> u128 {
+        assert_gt!(balance, balance_before, "{}_up", prefix);
+        (balance)
+    }
+    pub fn assert_balance_down(balance: u128, balance_before: u128, prefix: ByteArray) -> u128 {
+        assert_lt!(balance, balance_before, "{}_down", prefix);
+        (balance)
+    }
+    pub fn assert_balance_equal(balance: u128, balance_before: u128, prefix: ByteArray) -> u128 {
+        assert_eq!(balance, balance_before, "{}_equal", prefix);
+        (balance)
+    }
 
     pub fn assert_lords_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = lords.balance_of(address).low;
         (assert_balance(balance, balance_before, subtract, add, prefix))
     }
-
-    pub fn assert_lords_balance_same(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+    pub fn assert_lords_balance_up(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = lords.balance_of(address).low;
-        assert_eq!(balance, balance_before, "{}_same", prefix);
-        (balance)
+        (assert_balance_up(balance, balance_before, prefix))
     }
-
-    pub fn assert_lords_balance_increased(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+    pub fn assert_lords_balance_down(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = lords.balance_of(address).low;
-        assert_gt!(balance, balance_before, "{}_increased", prefix);
-        (balance)
+        (assert_balance_down(balance, balance_before, prefix))
     }
-
-    pub fn assert_lords_balance_decreased(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+    pub fn assert_lords_balance_equal(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = lords.balance_of(address).low;
-        assert_lt!(balance, balance_before, "{}_decreased", prefix);
-        (balance)
+        (assert_balance_equal(balance, balance_before, prefix))
     }
 
-    pub fn assert_fame_balance_same(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+    pub fn assert_fame_balance_up(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = fame.balance_of(address).low;
-        assert_eq!(balance, balance_before, "{}_same", prefix);
-        (balance)
+        (assert_balance_up(balance, balance_before, prefix))
     }
-
-    pub fn assert_fame_balance_increased(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+    pub fn assert_fame_balance_down(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = fame.balance_of(address).low;
-        assert_gt!(balance, balance_before, "{}_increased", prefix);
-        (balance)
+        (assert_balance_down(balance, balance_before, prefix))
     }
-
-    pub fn assert_fame_balance_decreased(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+    pub fn assert_fame_balance_equal(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
         let balance: u128 = fame.balance_of(address).low;
-        assert_lt!(balance, balance_before, "{}_decreased", prefix);
-        (balance)
+        (assert_balance_equal(balance, balance_before, prefix))
     }
 
     // pub fn assert_winner_balance(lords: ILordsMockDispatcher,
