@@ -309,7 +309,7 @@ export const CardPack = ({ onComplete, style, isOpen = false }: CardPack) => {
               height={CARD_PACK_CARD_SIZE_HEIGHT}
               isLeft={false}
               isVisible={true}
-              cardData={FireCardsTextures.None}
+              // cardData={FireCardsTextures.None}
               onHover={(isHovered) => {
                 if (cardRefs.current[i]) {
                   cardRefs.current[i].setCardScale(isHovered ? 1.1 : 1, CARD_PACK_CARD_SCALE_DURATION);
