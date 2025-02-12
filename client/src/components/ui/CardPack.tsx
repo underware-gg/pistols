@@ -21,17 +21,18 @@ import {
   CARD_PACK_FLIP_DURATION,
   CARD_PACK_CARD_SCALE_DURATION,
   CARD_PACK_REVEAL_DELAY,
-  CARD_PACK_SIZE,
-  MAX_TILT
 } from '/src/data/cardConstants';
 
 interface CardPack {
   onComplete?: () => void
   style?: React.CSSProperties
   isOpen?: boolean
+  clickable?: boolean,
+  cardPackSize: number,
+  maxTilt: number
 }
 
-export const CardPack = ({ onComplete, style, isOpen = false }: CardPack) => {
+export const CardPack = ({ onComplete, style, isOpen = false, clickable = true, cardPackSize, maxTilt }: CardPack) => {
   const [isOpening, setIsOpening] = useState(false)
   const [sealClicked, setSealClicked] = useState(false)
   const [cardsSpawned, setCardsSpawned] = useState(false)
@@ -76,8 +77,8 @@ export const CardPack = ({ onComplete, style, isOpen = false }: CardPack) => {
     const relativeX = (e.clientX - centerX) / (window.innerWidth / 2);
     const relativeY = (e.clientY - centerY) / (window.innerHeight / 2);
 
-    const rotateY = relativeX * MAX_TILT;
-    const rotateX = -relativeY * MAX_TILT;
+    const rotateY = relativeX * maxTilt;
+    const rotateX = -relativeY * maxTilt;
 
     cardPackRef.current.style.setProperty('--card-pack-rotate-x', `${rotateX}deg`)
     cardPackRef.current.style.setProperty('--card-pack-rotate-y', `${rotateY}deg`)
@@ -176,7 +177,7 @@ export const CardPack = ({ onComplete, style, isOpen = false }: CardPack) => {
   }
   
   const handleSealClick = () => {
-    if (sealClicked) return
+    if (sealClicked || !clickable) return
     setSealClicked(true)
     
     if (!sealRef.current || !cardPackRef.current) return
@@ -229,7 +230,7 @@ export const CardPack = ({ onComplete, style, isOpen = false }: CardPack) => {
   useEffect(() => {
     if (!cardPackRef.current) return;
 
-    cardPackRef.current.style.setProperty('--card-pack-size', `${CARD_PACK_SIZE}`);
+    cardPackRef.current.style.setProperty('--card-pack-size', `${cardPackSize}`);
 
     return () => {
       const pack = cardPackRef.current;
@@ -239,6 +240,7 @@ export const CardPack = ({ onComplete, style, isOpen = false }: CardPack) => {
   }, []);
 
   const handleRevealAll = () => {
+    if (!clickable) return
     setShowRevealButton(false)
 
     const numCards = cardRefs.current.length;
@@ -263,7 +265,7 @@ export const CardPack = ({ onComplete, style, isOpen = false }: CardPack) => {
 
   return (
     <>
-      <div className="card-pack" ref={cardPackRef}>
+      <div className={`card-pack ${clickable ? 'YesMouse' : 'NoMouse'}`} ref={cardPackRef}>
         {/* Inner bag */}
         <div className="inner-bag" ref={innerBagRef} />
 

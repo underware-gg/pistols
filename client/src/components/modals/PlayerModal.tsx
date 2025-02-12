@@ -13,7 +13,7 @@ import { PlayerDescription } from '/src/components/account/PlayerDescription'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { AddressShort } from '/src/components/ui/AddressShort'
-import { DuelistItem } from '/src/components/account/AccountHeader'
+// import { DuelistItem } from '/src/components/account/AccountHeader'
 import { BookmarkIcon } from '/src/components/ui/Icons'
 import { SceneName } from '/src/data/assets'
 import { useTableId } from '/src/stores/configStore'
@@ -53,7 +53,7 @@ export default function PlayerModal() {
     return duelistIds.map((duelistId) => (
       <Row key={`duelist-${duelistId}`} columns='equal'>
         <Col className='H3 Anchor DuelistItem' onClick={() => _gotoDuelist(duelistId)} >
-          <DuelistItem duelistId={duelistId} />
+          {/* <DuelistItem duelistId={duelistId} /> */}
         </Col>
       </Row>
     ))

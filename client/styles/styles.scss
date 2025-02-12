@@ -859,6 +859,7 @@ $ui-container-gap: 1em;
 }
 .ProfilePicSquare {
   max-width: aspect-width(6)!important; // avoids not taking space in flex
+  max-height: aspect-width(6)!important;
   width: aspect-width(6);
   height: aspect-width(6);
   // border: $border-button-inactive;
@@ -867,13 +868,14 @@ $ui-container-gap: 1em;
 }
 .ProfilePicMedium {
   @extend .ProfilePicSquare;
-  max-width: 60px!important;
+  max-width: aspect-width(4) !important;
+  max-height: aspect-width(4) !important;
   width: aspect-width(4);
   height: aspect-width(4);
   border: none;
 }
 .ProfilePicMediumWidth {
-  width: 60px!important;
+  width: aspect-width(4)!important;
 }
 .ProfilePicCircle {
   width: aspect-width(7.5);

@@ -11,6 +11,7 @@ import { Divider } from '/src/components/ui/Divider'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { useGetPack } from '/src/stores/packStore'
 import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
+import { CardPack } from '../ui/CardPack'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -55,9 +56,10 @@ export default function ShopModal({
 
       <Modal.Content className='ModalText ShopModal'>
         <Grid className='OnboardingProfile'>
-          <Row columns='equal' textAlign='center' verticalAlign='top'>
+          <Row columns='equal' textAlign='center' verticalAlign='middle'>
             <Col textAlign='left' className='PaddedSides'>
-              <Image src={constants.PACK_TYPES[packType].image_url_closed} />
+              {/* <Image src={constants.PACK_TYPES[packType].image_url_closed} /> */}
+              <CardPack isOpen={true} clickable={false} cardPackSize={6} maxTilt={30} />
             </Col>
             <Col textAlign='left' className='PaddedSides'>
 

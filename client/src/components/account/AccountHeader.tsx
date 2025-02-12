@@ -1,135 +1,130 @@
 import React, { ReactNode, useMemo } from 'react'
-import { BigNumberish } from 'starknet'
-import { Dropdown, Grid } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
-import { useDuelist } from '/src/stores/duelistStore'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { usePlayer } from '/src/stores/playerStore'
 import { ProfilePicSquare, ProfilePicSquareButton } from '/src/components/account/ProfilePic'
-import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
-import { ProfileName } from '/src/components/account/ProfileDescription'
 import { SceneName } from '/src/data/assets'
-import { EmojiIcon } from '/src/components/ui/Icons'
-import { EMOJI } from '/src/data/messages'
-
-const Row = Grid.Row
-const Col = Grid.Column
+import { useGameAspect } from '/src/hooks/useGameApect'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 
 export default function AccountHeader() {
   const { isConnected } = useAccount()
-  const { duelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
+  const { address } = useAccount()
+  const { username } = usePlayer(address)
+  const { duelistIds } = useDuelistsOfPlayer()
+  
   const { aspectWidth } = useGameAspect()
-
-  const { nameAndId, profilePic } = useDuelist(duelistId)
 
   const _click = () => {
     dispatchSetScene(SceneName.Profile)
   }
 
   return (
-     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <div className='NoMouse' style={{ flex: 1, textAlign: 'right' }}>
         {!isConnected ? <h3>Guest</h3>
           : <>
-            <h3>{nameAndId}</h3>
-            <div style={{ lineHeight: 0 }}>
-              <h5><FameBalanceDuelist duelistId={duelistId} big /></h5>
-            </div>
-            {/* //TODO replace with fame */}
+            <h3>{username}</h3>
+            <h5>
+              Total Alive Duelists: {duelistIds.length}
+              {/* TODO: Replace this with other info preferably multiple of them, ideas:
+              - Total Duelists icon + number
+              - FOOLS amount earned
+              - Profile lvl once introduced
+              - Total dead duelists?
+              - IDEA: We could create special user flares, like earnable tags ex. "Pistol FLinger", "FOOLS Collector", "Blade Master", etc., that players could unlock with achievements or leveling up and we show it here and on profiles
+              */}
+            </h5>
           </>}
       </div>
       <div className='YesMouse' style={{ padding: aspectWidth(0.6) }}>
-        <DuelistsNavigationMenu>
-          <ProfilePicSquareButton profilePic={profilePic ?? 0} onClick={() => _click()} medium />
-        </DuelistsNavigationMenu>
+        <ProfilePicSquareButton profilePic={0} onClick={() => _click()} medium />
       </div>
     </div>
   );
 }
 
-export function DuelistsNavigationMenu({
-  children,
-}: {
-  children: ReactNode,
-}) {
-  const { dispatchSetScene } = usePistolsScene()
-  const { duelistIds } = useDuelistsOfPlayer()
-  const { duelistId: selectedDuelistId } = useSettings()
-  const { dispatchDuelistId } = useSettings()
-  const { aspectWidth } = useGameAspect()
+// export function DuelistsNavigationMenu({
+//   children,
+// }: {
+//   children: ReactNode,
+// }) {
+//   const { dispatchSetScene } = usePistolsScene()
+//   const { duelistIds } = useDuelistsOfPlayer()
+//   const { duelistId: selectedDuelistId } = useSettings()
+//   const { dispatchDuelistId } = useSettings()
+//   const { aspectWidth } = useGameAspect()
 
-  const _goToProfile = () => {
-    dispatchSetScene(SceneName.Profile)
-  }
+//   const _goToProfile = () => {
+//     dispatchSetScene(SceneName.Profile)
+//   }
 
-  const _switchDuelist = (duelistId: BigNumberish) => {
-    dispatchDuelistId(duelistId)
-  }
+//   const _switchDuelist = (duelistId: BigNumberish) => {
+//     dispatchDuelistId(duelistId)
+//   }
 
-  const maxItems = 6
+//   const maxItems = 6
 
-  const rows = useMemo(() => (
-    duelistIds.map((duelistId, index) => {
-      if (index > maxItems) return undefined
-      if (index == maxItems) return <Dropdown.Item key='more' text={'More Duelists...'} onClick={() => _goToProfile()} />
-      return (
-        <Dropdown.Item key={`i${duelistId}`}
-          onClick={() => _switchDuelist(duelistId)}
-          className={`NoPadding ${duelistId == selectedDuelistId ? 'BgImportant' : ''}`}
-        >
-          <DuelistItem duelistId={duelistId} />
-        </Dropdown.Item>
-      )
-    })
-  ), [duelistIds, selectedDuelistId])
+//   const rows = useMemo(() => (
+//     duelistIds.map((duelistId, index) => {
+//       if (index > maxItems) return undefined
+//       if (index == maxItems) return <Dropdown.Item key='more' text={'More Duelists...'} onClick={() => _goToProfile()} />
+//       return (
+//         <Dropdown.Item key={`i${duelistId}`}
+//           onClick={() => _switchDuelist(duelistId)}
+//           className={`NoPadding ${duelistId == selectedDuelistId ? 'BgImportant' : ''}`}
+//         >
+//           <DuelistItem duelistId={duelistId} />
+//         </Dropdown.Item>
+//       )
+//     })
+//   ), [duelistIds, selectedDuelistId])
 
-  return (
-    <Dropdown
-      className='NoPadding NoMargin'
-      direction='left'
-      simple
-      icon={null}
-      closeOnEscape
-      fluid
-      trigger={children}
-      style={{ width: aspectWidth(4), height: aspectWidth(4) }}
-    >
-      <Dropdown.Menu>
-        {rows}
-        <Dropdown.Item icon={'setting'} text={'Profile...'} onClick={() => _goToProfile()} />
-      </Dropdown.Menu>
-    </Dropdown>
-  )
-}
+//   return (
+//     <Dropdown
+//       className='NoPadding NoMargin'
+//       direction='left'
+//       simple
+//       icon={null}
+//       closeOnEscape
+//       fluid
+//       trigger={children}
+//       style={{ width: aspectWidth(4), height: aspectWidth(4) }}
+//     >
+//       <Dropdown.Menu>
+//         {rows}
+//         <Dropdown.Item icon={'setting'} text={'Profile...'} onClick={() => _goToProfile()} />
+//       </Dropdown.Menu>
+//     </Dropdown>
+//   )
+// }
 
-export function DuelistItem({
-  duelistId,
-}: {
-  duelistId: BigNumberish
-}) {
-  // const { duelistId: selectedDuelistId } = useSettings()
-  // const isSelected = (duelistId && duelistId == selectedDuelistId)
-  const { profilePic, isInAction } = useDuelist(duelistId)
+// export function DuelistItem({
+//   duelistId,
+// }: {
+//   duelistId: BigNumberish
+// }) {
+//   // const { duelistId: selectedDuelistId } = useSettings()
+//   // const isSelected = (duelistId && duelistId == selectedDuelistId)
+//   const { profilePic, isInAction } = useDuelist(duelistId)
 
-  return (
-    <div className={'FlexInline'}>
-      <ProfilePicSquare small profilePic={profilePic ?? 0} />
-      <div className='PaddedSides'>
-        <ProfileName duelistId={duelistId} />
-        <br/>
-        <div className='Smaller'>
-          <FameBalanceDuelist duelistId={duelistId} />
-        </div>
-        {isInAction &&
-          <div className='AbsoluteRight Padded'>
-            <EmojiIcon emoji={EMOJI.IN_ACTION} />
-          </div>
-        }
-      </div>
-    </div>
-  )
-}
+//   return (
+//     <div className={'FlexInline'}>
+//       <ProfilePicSquare small profilePic={profilePic ?? 0} />
+//       <div className='PaddedSides'>
+//         <ProfileName duelistId={duelistId} />
+//         <br/>
+//         <div className='Smaller'>
+//           {/* //TODO replace with fame */}
+//         </div>
+//         {isInAction &&
+//           <div className='AbsoluteRight Padded'>
+//             <EmojiIcon emoji={EMOJI.IN_ACTION} />
+//           </div>
+//         }
+//       </div>
+//     </div>
+//   )
+// }
 
