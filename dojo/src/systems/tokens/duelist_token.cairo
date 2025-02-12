@@ -125,7 +125,7 @@ pub mod duelist_token {
     };
     use pistols::models::{
         config::{Config},
-        pool::{PoolTypeTrait},
+        pool::{PoolType, PoolTypeTrait},
         player::{PlayerTrait, Activity},
         duelist::{
             Duelist, DuelistValue,
@@ -211,9 +211,9 @@ pub mod duelist_token {
         fn calc_season_reward(self: @ContractState, duelist_id: u128, lives_staked: u8) -> FeeValues {
             let mut store: Store = StoreTrait::new(self.world_default());
             let table: TableConfig = store.get_current_season_table();
-            let balance: u128 = store.world.fame_coin_dispatcher().balance_of_token(starknet::get_contract_address(), duelist_id).low;
-            let fees_win: FeeValues = table.table_type.calc_fame_fees(balance, lives_staked, true);
-            let fees_loss: FeeValues = table.table_type.calc_fame_fees(balance, lives_staked, false);
+            let fame_balance: u128 = store.world.fame_coin_dispatcher().balance_of_token(starknet::get_contract_address(), duelist_id).low;
+            let fees_loss: FeeValues = table.table_type.calc_fame_fees(fame_balance, lives_staked, false);
+            let fees_win: FeeValues = table.table_type.calc_fame_fees(fame_balance, lives_staked, true);
             (FeeValues{
                 fame_lost: fees_loss.fame_lost,
                 fame_gained: fees_win.fame_gained,
@@ -307,6 +307,7 @@ pub mod duelist_token {
             let config: Config = store.get_config();
             self.transfer_gains(fame_dispatcher, fools_dispatcher, values_a, challenge.duelist_id_a);
             self.transfer_gains(fame_dispatcher, fools_dispatcher, values_b, challenge.duelist_id_b);
+            // TODO... optimize, combine LORDS releases into one
             self.transfer_losses(fame_dispatcher, bank_dispatcher, distribution, ref values_a, challenge.duelist_id_a, config.treasury_address);
             self.transfer_losses(fame_dispatcher, bank_dispatcher, distribution, ref values_b, challenge.duelist_id_b, config.treasury_address);
 
@@ -345,15 +346,29 @@ pub mod duelist_token {
         ) {
             // Burn FAME from duelist
             if (values.fame_lost != 0) {
+                // if duelist died, residual fame is also burned
+                let fame_balance: u128 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), duelist_id).low;
+                let mut residual_fame: u128 = (fame_balance - values.fame_lost);
+                if (residual_fame < FAME::ONE_LIFE.low && residual_fame != 0) {
+                    // 50% residual goes to PoolType::SacredFlame
+                    let amount: u128 = (residual_fame / 2);
+                    bank_dispatcher.duelist_lost_fame(starknet::get_contract_address(), duelist_id, amount.into(), PoolType::SacredFlame);
+                    // 50% for underware
+                    residual_fame -= amount;
+                } else {
+                    // not dead yet
+                    residual_fame = 0;
+                }
+                // distribute fame lost...
                 let mut due_amount: u128 = values.fame_lost;
-                // transfer to pool
+                // transfer lost FAME to PoolType::Season()
                 if (*distribution.winners_percent != 0 && distribution.pool_id.exists()) {
                     let amount: u128 = MathTrait::percentage(due_amount, *distribution.winners_percent);
                     bank_dispatcher.duelist_lost_fame(starknet::get_contract_address(), duelist_id, amount.into(), *distribution.pool_id);
                     due_amount -= amount;
                 }
                 // remaining is burned before unlocking
-                fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, due_amount.into());
+                fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, (due_amount + residual_fame).into());
                 // reward tournament creator
                 if (*distribution.creator_percent != 0 && distribution.creator_address.is_non_zero()) {
                     let amount: u128 = MathTrait::percentage(due_amount, *distribution.creator_percent);
@@ -361,7 +376,7 @@ pub mod duelist_token {
                     due_amount -= amount;
                 }
                 // remaining to underware
-                values.lords_unlocked += bank_dispatcher.burned_fame_release_lords(underware_address, due_amount.into()).low;
+                values.lords_unlocked += bank_dispatcher.burned_fame_release_lords(underware_address, (due_amount + residual_fame).into()).low;
             }
         }
     }
