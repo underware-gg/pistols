@@ -15,7 +15,7 @@ pub trait ITokenComponentInternal<TState> {
         renderer_address: ContractAddress,
     );
     fn mint(ref self: TState, recipient: ContractAddress) -> u128;
-    fn mint_multiple(ref self: TState, recipient: ContractAddress, amount: usize) -> Span<u128>;
+    fn mint_multiple(ref self: TState, recipient: ContractAddress, quantity: usize) -> Span<u128>;
     fn burn(ref self: TState, token_id: u128);
     fn assert_exists(self: @TState, token_id: u128);
     fn assert_is_owner_of(self: @TState, address: ContractAddress, token_id: u128);
@@ -137,7 +137,7 @@ pub mod TokenComponent {
 
         fn mint_multiple(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
-            amount: usize,
+            quantity: usize,
         ) -> Span<u128> {
             assert(self.can_mint(starknet::get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
 
@@ -148,7 +148,7 @@ pub mod TokenComponent {
 
             let mut token_ids: Array<u128> = array![];
             let mut i: usize = 0;
-            while (i < amount) {
+            while (i < quantity) {
                 token_config.minted_count += 1;
                 token_ids.append(token_config.minted_count);
                 erc721.mint(recipient, token_config.minted_count.into());

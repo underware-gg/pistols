@@ -52,7 +52,7 @@ pub trait IDuelistToken<TState> {
     // fn delete_duelist(ref self: TState, duelist_id: u128);
 
     // IDuelistTokenProtected
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, seed: felt252) -> Span<u128>;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
 }
 
@@ -68,7 +68,7 @@ pub trait IDuelistTokenPublic<TState> {
 
 #[starknet::interface]
 pub trait IDuelistTokenProtected<TState> {
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, amount: usize, seed: felt252) -> Span<u128>;
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, seed: felt252) -> Span<u128>;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
 }
 
@@ -241,13 +241,13 @@ pub mod duelist_token {
     impl DuelistTokenProtectedImpl of super::IDuelistTokenProtected<ContractState> {
         fn mint_duelists(ref self: ContractState,
             recipient: ContractAddress,
-            amount: usize,
+            quantity: usize,
             seed: felt252,
         ) -> Span<u128>{
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // mint tokens
-            let duelist_ids: Span<u128> = self.token.mint_multiple(recipient, amount);
+            let duelist_ids: Span<u128> = self.token.mint_multiple(recipient, quantity);
 
             // create duelists
             let mut rnd: u256 = seed.into();
@@ -350,10 +350,10 @@ pub mod duelist_token {
                 let fame_balance: u128 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), duelist_id).low;
                 let mut residual_fame: u128 = (fame_balance - values.fame_lost);
                 if (residual_fame < FAME::ONE_LIFE.low && residual_fame != 0) {
-                    // 50% residual goes to PoolType::SacredFlame
-                    let amount: u128 = (residual_fame / 2);
+                    // 60% residual goes to PoolType::SacredFlame
+                    let amount: u128 = MathTrait::percentage(residual_fame, 60);
                     bank_dispatcher.duelist_lost_fame(starknet::get_contract_address(), duelist_id, amount.into(), PoolType::SacredFlame);
-                    // 50% for underware
+                    // remaining for underware
                     residual_fame -= amount;
                 } else {
                     // not dead yet
