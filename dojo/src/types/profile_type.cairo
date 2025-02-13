@@ -286,10 +286,12 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
         let mut i: u8 = 0;
         while (i.into() < profiles.len()) {
             let profile_type: ProfileType = *profiles.at((i).into());
+            let timestamp: u64 = starknet::get_block_timestamp();
             store.set_duelist(@Duelist {
                 duelist_id: profile_type.duelist_id(),
                 profile_type,
-                timestamp: starknet::get_block_timestamp(),
+                timestamp_registered: timestamp,
+                timestamp_active: timestamp,
             });
             i += 1;
         };

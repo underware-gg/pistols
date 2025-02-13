@@ -10,7 +10,8 @@ pub struct Duelist {
     pub duelist_id: u128,   // erc721 token_id
     //-----------------------
     pub profile_type: ProfileType,
-    pub timestamp: u64,     // date registered (seconds since epoch)
+    pub timestamp_registered: u64,  // date registered (seconds since epoch)
+    pub timestamp_active: u64,      // last active (seconds since epoch)
 }
 
 #[derive(Copy, Drop, Serde)]

@@ -44,7 +44,6 @@ pub struct CoinConfig {
 //
 pub use pistols::interfaces::ierc20::{ierc20, Erc20Dispatcher, Erc20DispatcherTrait};
 pub use pistols::interfaces::vrf::{IVrfProviderDispatcher, IVrfProviderDispatcherTrait};
-use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
@@ -58,21 +57,6 @@ pub impl ConfigManagerImpl of ConfigManagerTrait {
             season_table_id: 0,
             is_paused: false,
         })
-    }
-    fn set_is_paused(ref store: Store, is_paused: bool) {
-        let mut config: Config = store.get_config();
-        config.is_paused = is_paused;
-        store.set_config(@config);
-    }
-    fn set_season(ref store: Store, season_table_id: felt252) {
-        let mut config: Config = store.get_config();
-        config.season_table_id = season_table_id;
-        store.set_config(@config);
-    }
-    fn set_treasury(ref store: Store, treasury_address: ContractAddress) {
-        let mut config: Config = store.get_config();
-        config.treasury_address = treasury_address;
-        store.set_config(@config);
     }
 }
 

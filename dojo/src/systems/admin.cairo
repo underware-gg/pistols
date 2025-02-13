@@ -102,13 +102,13 @@ pub mod admin {
             self.assert_caller_is_admin();
             assert(treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
             let mut store: Store = StoreTrait::new(self.world_default());
-            ConfigManagerTrait::set_treasury(ref store, treasury_address);
+            store.set_config_treasury_address(treasury_address);
         }
 
         fn set_paused(ref self: ContractState, paused: bool) {
             self.assert_caller_is_admin();
             let mut store: Store = StoreTrait::new(self.world_default());
-            ConfigManagerTrait::set_is_paused(ref store, paused);
+            store.set_config_is_paused(paused);
         }
 
         fn set_table(ref self: ContractState, table: TableConfig) {

@@ -50,7 +50,7 @@ mod tests {
         //  time travel
         assert!(!season.can_collect(), "!season.can_collect");
         assert!(!sys.game.can_collect(), "!sys.game.can_collect");
-        tester::set_timestamp(season.timestamp_end);
+        tester::set_block_timestamp(season.timestamp_end);
         assert!(season.can_collect(), "season.can_collect");
         assert!(sys.game.can_collect(), "sys.game.can_collect");
         // collect
@@ -77,7 +77,7 @@ mod tests {
     fn test_collect_season_baseline() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let season: SeasonConfig = tester::get_current_Season(sys.world);
-        tester::set_timestamp(season.timestamp_end);
+        tester::set_block_timestamp(season.timestamp_end);
         tester::execute_collect(@sys.game, OWNER());
         // no panic!
     }
@@ -95,7 +95,7 @@ mod tests {
     fn test_collect_season_ended() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let season: SeasonConfig = tester::get_current_Season(sys.world);
-        tester::set_timestamp(season.timestamp_end);
+        tester::set_block_timestamp(season.timestamp_end);
         tester::execute_collect(@sys.game, OWNER());
         // panic! >>>> will collect new season
         tester::execute_collect(@sys.game, OWNER());
@@ -106,7 +106,7 @@ mod tests {
     // fn test_collect_season_ended() {
     //     let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
     //     let season: SeasonConfig = tester::get_current_Season(sys.world);
-    //     tester::set_timestamp(season.timestamp_end);
+    //     tester::set_block_timestamp(season.timestamp_end);
     //     tester::execute_collect(@sys.game, OWNER());
     //     // panic! >>>> will collect new season
     //     tester::execute_collect(@sys.game, OWNER());

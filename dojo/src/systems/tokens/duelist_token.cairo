@@ -48,12 +48,16 @@ pub trait IDuelistToken<TState> {
     // IDuelistTokenPublic
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
+    fn is_inactive(self: @TState, duelist_id: u128) -> bool;
+    fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
+    fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
     fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> FeeValues;
     // fn delete_duelist(ref self: TState, duelist_id: u128);
 
     // IDuelistTokenProtected
     fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, seed: felt252) -> Span<u128>;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
+    fn reactivate(ref self: TState, duelist_id: u128) -> bool;
 }
 
 #[starknet::interface]
@@ -61,6 +65,9 @@ pub trait IDuelistTokenPublic<TState> {
     // view
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
+    fn is_inactive(self: @TState, duelist_id: u128) -> bool;
+    fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
+    fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
     fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> FeeValues;
     // write
     // fn delete_duelist(ref self: TState, duelist_id: u128);
@@ -70,6 +77,7 @@ pub trait IDuelistTokenPublic<TState> {
 pub trait IDuelistTokenProtected<TState> {
     fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, seed: felt252) -> Span<u128>;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
+    fn reactivate(ref self: TState, duelist_id: u128) -> bool;
 }
 
 #[dojo::contract]
@@ -193,11 +201,12 @@ pub mod duelist_token {
     //
     #[abi(embed_v0)]
     impl DuelistTokenPublicImpl of super::IDuelistTokenPublic<ContractState> {
+        #[inline(always)]
         fn is_alive(
             self: @ContractState,
             duelist_id: u128,
         ) -> bool {
-            (self.life_count(duelist_id) > 0)
+            (self.life_count(duelist_id) != 0)
         }
         
         fn life_count(self: @ContractState,
@@ -208,6 +217,31 @@ pub mod duelist_token {
             ((fame_balance / FAME::ONE_LIFE).try_into().unwrap())
         }
 
+        #[inline(always)]
+        fn is_inactive(self: @ContractState,
+            duelist_id: u128,
+        ) -> bool {
+            ((self.inactive_timestamp(duelist_id)) > FAME::MAX_INACTIVE_TIMESTAMP)
+        }
+        
+        fn inactive_timestamp(self: @ContractState,
+            duelist_id: u128,
+        ) -> u64 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let timestamp_active: u64 = store.get_duelist_value(duelist_id).timestamp_active;
+            let timestamp: u64 = starknet::get_block_timestamp();
+            (timestamp - timestamp_active)
+        }
+
+        #[inline(always)]
+        fn inactive_fame_dripped(self: @ContractState,
+            duelist_id: u128,
+        ) -> u128 {
+            let inactive_timestamp: u64 = self.inactive_timestamp(duelist_id);
+            let fame_dripped: u128 = (MathTrait::sub(inactive_timestamp, FAME::MAX_INACTIVE_TIMESTAMP) / FAME::TIMESTAMP_TO_DRIP_ONE_FAME).into();
+            (fame_dripped * CONST::ETH_TO_WEI.low)
+        }
+        
         fn calc_season_reward(self: @ContractState, duelist_id: u128, lives_staked: u8) -> FeeValues {
             let mut store: Store = StoreTrait::new(self.world_default());
             let table: TableConfig = store.get_current_season_table();
@@ -250,6 +284,7 @@ pub mod duelist_token {
             let duelist_ids: Span<u128> = self.token.mint_multiple(recipient, quantity);
 
             // create duelists
+            let timestamp: u64 = starknet::get_block_timestamp();
             let mut rnd: u256 = seed.into();
             let mut i: usize = 0;
             while (i < duelist_ids.len()) {
@@ -257,7 +292,8 @@ pub mod duelist_token {
                 let duelist = Duelist {
                     duelist_id: *duelist_ids[i],
                     profile_type: ProfileManagerTrait::randomize_duelist(rnd.low.into()),
-                    timestamp: starknet::get_block_timestamp(),
+                    timestamp_registered: timestamp,
+                    timestamp_active: timestamp,
                 };
                 store.set_duelist(@duelist);
 
@@ -275,6 +311,36 @@ pub mod duelist_token {
             (duelist_ids)
         }
         
+        fn reactivate(ref self: ContractState, duelist_id: u128) -> bool {
+            let mut is_alive: bool = true;
+            let mut fame_dripped: u128 = self.inactive_fame_dripped(duelist_id);
+            if (fame_dripped != 0) {
+                let mut store: Store = StoreTrait::new(self.world_default());
+                let config: Config = store.get_config();
+                let bank_dispatcher: IBankDispatcher = store.world.bank_dispatcher();
+                let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
+                // do not drip more than actual balance
+                let fame_balance: u128 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), duelist_id).low;
+                is_alive = (MathTrait::sub(fame_balance, fame_dripped) >= FAME::ONE_LIFE.low);
+                if (fame_balance != 0) {
+                    if (!is_alive) {
+                        // 60% of a life goes to PoolType::SacredFlame 
+                        let amount: u128 = MathTrait::percentage(FAME::ONE_LIFE.low, FAME::SACRED_FLAME_PERCENTAGE);
+                        bank_dispatcher.duelist_lost_fame(starknet::get_contract_address(), duelist_id, amount.into(), PoolType::SacredFlame);
+                        // burn the whole balance
+                        fame_dripped = (fame_balance - amount);
+                    }
+                    // fame is burned before unlocking
+                    fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, fame_dripped.into());
+                    // remaining to underware
+                    bank_dispatcher.burned_fame_release_lords(config.treasury_address, fame_dripped.into());
+                    // update duelist timestamp
+                    store.set_duelist_timestamp_active(duelist_id);
+                }
+            }
+            (is_alive)
+        }
+
         fn transfer_rewards(
             ref self: ContractState,
             challenge: Challenge,
@@ -351,7 +417,7 @@ pub mod duelist_token {
                 let mut residual_fame: u128 = (fame_balance - values.fame_lost);
                 if (residual_fame < FAME::ONE_LIFE.low && residual_fame != 0) {
                     // 60% residual goes to PoolType::SacredFlame
-                    let amount: u128 = MathTrait::percentage(residual_fame, 60);
+                    let amount: u128 = MathTrait::percentage(residual_fame, FAME::SACRED_FLAME_PERCENTAGE);
                     bank_dispatcher.duelist_lost_fame(starknet::get_contract_address(), duelist_id, amount.into(), PoolType::SacredFlame);
                     // remaining for underware
                     residual_fame -= amount;

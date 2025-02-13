@@ -12,7 +12,7 @@ use pistols::systems::{
         pack_token::{pack_token, IPackTokenDispatcher},
         duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
         fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
-        lords_mock::{lords_mock, ILordsMockDispatcher},
+        lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
     },
     components::{
         token_bound::{m_TokenBoundAddress},
@@ -55,12 +55,13 @@ use pistols::models::{
         TABLES,
     },
     pool::{
-        m_Pool,
+        m_Pool, Pool, PoolType,
     },
 };
 
 use pistols::interfaces::systems::{SystemsTrait};
 use pistols::types::constants::{FAME};
+use pistols::utils::misc::{WEI};
 use pistols::tests::tester::{tester, tester::{OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO}};
 use pistols::tests::{utils};
 
@@ -276,7 +277,8 @@ fn test_token_uri() {
     let duelist = Duelist {
         duelist_id: TOKEN_ID_1_1.low,
         profile_type: ProfileType::Duelist(DuelistProfile::Duke),
-        timestamp: 999999,
+        timestamp_registered: 999999,
+        timestamp_active: 999999,
     };
     tester::set_Duelist(ref sys.world, duelist);
 
@@ -489,4 +491,149 @@ fn test_fame_mint_already_registered() {
 fn test_fame_reward_not_minter() {
     let mut sys: TestSystems = setup(0);
     sys.fame.reward_duelist(123, 0);
+}
+
+
+
+//---------------------------------
+// INACTIVE
+//
+
+#[test]
+fn test_duelist_inactive() {
+    let mut sys: TestSystems = setup(0);
+
+    let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
+    assert_eq!(intial_fame, WEI(3000).low, "intial_fame");
+
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    let timestamp_registered: u64 = tester::get_DuelistValue(sys.world, token_id).timestamp_registered;
+    assert_eq!(tester::get_block_timestamp(), timestamp_registered + 1, "timestamp_registered");
+
+    let fame_supply: u128 = sys.fame.total_supply().low;
+    assert_eq!(fame_supply, (intial_fame * 2), "INIT_fame_supply");
+
+    let pool_flame: Pool = tester::get_Pool(sys.world, PoolType::SacredFlame);
+    assert_eq!(pool_flame.balance_fame, 0, "pool_flame.balance_fame");
+
+    let balance_initial: u128 = sys.fame.balance_of_token(sys.token.contract_address, token_id).low;
+    assert_eq!(balance_initial, intial_fame, "INIT_balance");
+    assert!(!sys.token.is_inactive(token_id), "INIT_is_inactive");
+    assert_eq!(sys.token.inactive_timestamp(token_id), 1, "INIT_inactive_timestamp");
+    assert_eq!(sys.token.inactive_fame_dripped(token_id), 0, "INIT_inactive_fame_dripped");
+
+    // on the edge...
+    let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP;
+    tester::set_block_timestamp(timestamp_registered + elapsed);
+    assert!(!sys.token.is_inactive(token_id), "EDGE_is_inactive");
+    assert_eq!(sys.token.inactive_timestamp(token_id), elapsed, "EDGE_inactive_timestamp");
+    assert_eq!(sys.token.inactive_fame_dripped(token_id), 0, "EDGE_inactive_fame_dripped");
+
+    // inactivated
+    let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + 1;
+    tester::set_block_timestamp(timestamp_registered + elapsed);
+    assert!(sys.token.is_inactive(token_id), "INACTIVATED_is_inactive");
+    assert_eq!(sys.token.inactive_timestamp(token_id), elapsed, "INACTIVATED_inactive_timestamp");
+    assert_eq!(sys.token.inactive_fame_dripped(token_id), 0, "INACTIVATED_inactive_fame_dripped");
+
+    // dripped
+    let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + FAME::TIMESTAMP_TO_DRIP_ONE_FAME;
+    tester::set_block_timestamp(timestamp_registered + elapsed);
+    assert!(sys.token.is_inactive(token_id), "DRIPPED_is_inactive");
+    assert_eq!(sys.token.inactive_timestamp(token_id), elapsed, "DRIPPED_inactive_timestamp");
+    assert_eq!(sys.token.inactive_fame_dripped(token_id), WEI(1).low, "DRIPPED_inactive_fame_dripped");
+
+    // dripped more!
+    let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + (FAME::TIMESTAMP_TO_DRIP_ONE_FAME * 111);
+    tester::set_block_timestamp(timestamp_registered + elapsed);
+    assert!(sys.token.is_inactive(token_id), "DRIPPED_MORE_is_inactive");
+    assert_eq!(sys.token.inactive_timestamp(token_id), elapsed, "DRIPPED_MORE_inactive_timestamp");
+    assert_eq!(sys.token.inactive_fame_dripped(token_id), WEI(111).low, "DRIPPED_MORE_inactive_fame_dripped");
+}
+
+// reactivate()
+
+fn _test_duelist_reactivate(sys: TestSystems, token_id: u128, dripped_fame: u64, is_alive: bool) {
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    let lords_balance_treasury: u128 = sys.lords.balance_of(TREASURY()).low;
+    let fame_balance_start: u128 = sys.fame.balance_of_token(sys.token.contract_address, token_id).low;
+    let fame_supply_start: u128 = sys.fame.total_supply().low;
+    // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
+
+    // dripped...
+    tester::make_duelist_inactive(sys.world, token_id, dripped_fame);
+    let dripped_fame_wei: u128 = WEI(dripped_fame.into()).low;
+    assert!(sys.token.is_inactive(token_id), "is_inactive");
+    assert_eq!(sys.token.inactive_fame_dripped(token_id), dripped_fame_wei, "inactive_fame_dripped");
+
+    // reactivate
+    let is_alive: bool = sys.token.reactivate(token_id);
+    assert!(is_alive == is_alive, "AFTER_is_alive");
+    assert!(!sys.token.is_inactive(token_id), "AFTER_is_inactive");
+    assert_eq!(sys.token.inactive_timestamp(token_id), 0, "AFTER_inactive_timestamp");
+    assert_eq!(sys.token.inactive_fame_dripped(token_id), 0, "AFTER_inactive_fame_dripped");
+
+    // duelist lost fame...
+    let fame_balance: u128 = sys.fame.balance_of_token(sys.token.contract_address, token_id).low;
+    // Fame supply down
+    let fame_supply: u128 = sys.fame.total_supply().low;
+    // Flames up?
+    let pool_flame: Pool = tester::get_Pool(sys.world, PoolType::SacredFlame);
+    let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
+    if (is_alive) {
+        assert_eq!(fame_balance, fame_balance_start - dripped_fame_wei, "AFTER_fame_balance_ALIVE");
+        assert_eq!(fame_supply, fame_supply_start - dripped_fame_wei, "AFTER_fame_supply_ALIVE");
+        assert_eq!(pool_flame.balance_fame, 0, "AFTER_pool_flame.balance_fame_ALIVE");
+    } else {
+        assert_eq!(fame_balance, 0, "AFTER_fame_balance_DEAD");
+        assert_eq!(fame_supply, fame_supply_start - fame_balance_start + pool_amount, "AFTER_fame_supply_DEAD");
+        assert_eq!(pool_flame.balance_fame, pool_amount, "AFTER_pool_flame.balance_fame_DEAD");
+    }
+
+    // underware up
+    tester::assert_lords_balance_up(sys.lords, TREASURY(), lords_balance_treasury, "AFTER_treasury_up");
+}
+
+#[test]
+fn test_duelist_reactivate_OK_alive() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(sys, token_id, 100, true);
+}
+
+#[test]
+fn test_duelist_reactivate_OK_edge() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(sys, token_id, 2000, true);
+}
+
+#[test]
+fn test_duelist_reactivate_DEAD() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(sys, token_id, 2100, false);
+}
+
+#[test]
+fn test_duelist_reactivate_DEAD_empty() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(sys, token_id, 3000, false);
+}
+
+#[test]
+fn test_duelist_reactivate_DEAD_over() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(sys, token_id, 4000, false);
+}
+
+#[test]
+fn test_duelist_reactivate_DEAD_thrice() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(sys, token_id, 1000, true);
+    _test_duelist_reactivate(sys, token_id, 1000, true);
+    _test_duelist_reactivate(sys, token_id, 1, false);
 }

@@ -253,11 +253,14 @@ pub mod duel_token {
             // mint to game, so it can transfer to winner
             let duel_id: u128 = self.token.mint(store.world.game_address());
 
-            // validate challenger
+            // validate duelist ownership
             let address_a: ContractAddress = starknet::get_caller_address();
             let duelist_id_a: u128 = duelist_id;
             let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
             assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
+
+            // validate duelist health
+            duelist_dispatcher.reactivate(duelist_id_a);
             let lives: u8 = duelist_dispatcher.life_count(duelist_id_a);
             assert(lives > 0, Errors::DUELIST_IS_DEAD);
             assert(lives >= lives_staked, Errors::INSUFFICIENT_LIVES);
@@ -367,6 +370,9 @@ pub mod duel_token {
                 // validate duelist ownership
                 let duelist_dispatcher = store.world.duelist_token_dispatcher();
                 assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
+
+                // validate duelist health
+                duelist_dispatcher.reactivate(duelist_id_b);
                 let lives: u8 = duelist_dispatcher.life_count(duelist_id_b);
                 assert(lives > 0, Errors::DUELIST_IS_DEAD);
                 assert(lives >= challenge.lives_staked, Errors::INSUFFICIENT_LIVES);

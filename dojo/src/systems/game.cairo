@@ -5,13 +5,13 @@ use pistols::types::duel_progress::{DuelProgress};
 #[starknet::interface]
 pub trait IGame<TState> {
     // Game actions
-    fn commit_moves(
+    fn commit_moves( //@description:Commit moves of a Duelist into a Duel
         ref self: TState,
         duelist_id: u128,
         duel_id: u128,
         hashed: u128,
     );
-    fn reveal_moves(
+    fn reveal_moves( //@description:Reveal moves of a Duelist into a Duel
         ref self: TState,
         duelist_id: u128,
         duel_id: u128,
@@ -19,7 +19,7 @@ pub trait IGame<TState> {
         moves: Span<u8>,
     );
     // end season and start next
-    fn collect(ref self: TState) -> felt252;
+    fn collect(ref self: TState) -> felt252; // @description:Close the current season and start the next one
 
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
@@ -84,9 +84,6 @@ pub mod game {
         },
         season::{
             SeasonConfig, SeasonConfigTrait,
-        },
-        config::{
-            ConfigManagerTrait,
         },
     };
     use pistols::types::{
@@ -230,6 +227,9 @@ pub mod game {
                 round.state = RoundState::Reveal;
             }
 
+            // update duelist timestamp
+            store.set_duelist_timestamp_active(duelist_id);
+
             // events
             PlayerTrait::check_in(ref store, Activity::CommittedMoves, starknet::get_caller_address(), duel_id.into());
 
@@ -289,6 +289,9 @@ pub mod game {
                 assert(false, Errors::IMPOSSIBLE_ERROR);
             }
 
+            // update duelist timestamp
+            store.set_duelist_timestamp_active(duelist_id);
+
             // events
             Activity::RevealedMoves.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
 
@@ -337,7 +340,7 @@ pub mod game {
             // collect season if permitted
             let mut season: SeasonConfig = store.get_current_season();
             let new_season_table_id: felt252 = season.collect(ref store);
-            ConfigManagerTrait::set_season(ref store, new_season_table_id);
+            store.set_config_season_table_id(new_season_table_id);
             // all hail the collector
             Trophy::Collector.progress(store.world, starknet::get_caller_address(), 1);
             // TODO: transfer fees

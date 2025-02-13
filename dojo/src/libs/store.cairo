@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use dojo::world::{WorldStorage};
-use dojo::model::{ModelStorage, ModelValueStorage};
+use dojo::model::{Model, ModelStorage, ModelValueStorage};
 use dojo::event::{EventStorage};
 
 pub use pistols::models::{
@@ -59,7 +59,7 @@ pub impl StoreImpl of StoreTrait {
     }
 
     //----------------------------------
-    // Getters
+    // Model Getters
     //
 
     #[inline(always)]
@@ -191,7 +191,7 @@ pub impl StoreImpl of StoreTrait {
     }
 
     //----------------------------------
-    // Setters
+    // Model Setters
     //
 
     #[inline(always)]
@@ -276,6 +276,29 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn set_token_bound_address(ref self: Store, model: @TokenBoundAddress) {
         self.world.write_model(model);
+    }
+
+    //----------------------------------
+    // Single member setters
+    // https://book.dojoengine.org/framework/world/api#write_member-and-write_member_of_models
+    //
+
+    #[inline(always)]
+    fn set_config_is_paused(ref self: Store, is_paused: bool) {
+        self.world.write_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("is_paused"), is_paused);
+    }
+    #[inline(always)]
+    fn set_config_season_table_id(ref self: Store, season_table_id: felt252) {
+        self.world.write_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("season_table_id"), season_table_id);
+    }
+    #[inline(always)]
+    fn set_config_treasury_address(ref self: Store, treasury_address: ContractAddress) {
+        self.world.write_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address"), treasury_address);
+    }
+
+    #[inline(always)]
+    fn set_duelist_timestamp_active(ref self: Store, duelist_id: u128) {
+        self.world.write_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("timestamp_active"), starknet::get_block_timestamp());
     }
 
 

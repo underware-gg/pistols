@@ -31,6 +31,18 @@ pub mod CHANCES {
 
 pub mod FAME {
     use super::CONST;
+    use pistols::utils::timestamp::{TIMESTAMP};
+
+    // amount of FAME minted to every new Duelist
     pub const MINT_GRANT_AMOUNT: u256 = 3000 * CONST::ETH_TO_WEI;
+    // amount of FAME lost in a duel
     pub const ONE_LIFE: u256 = 1000 * CONST::ETH_TO_WEI;
+
+    // inactivity timestamps in seconds
+    pub const MAX_INACTIVE_TIMESTAMP: u64 = TIMESTAMP::FOUR_WEEKS;
+    // how long it takes to drip 1 FAME
+    pub const TIMESTAMP_TO_DRIP_ONE_FAME: u64 = (10 * TIMESTAMP::ONE_MINUTE);
+
+    // residual FAME (<1000) that goes to PoolType::SacredFlame
+    pub const SACRED_FLAME_PERCENTAGE: u8 = 60;
 }

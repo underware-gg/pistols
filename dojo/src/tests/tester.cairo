@@ -74,7 +74,7 @@ pub mod tester {
     };
 
     use pistols::types::challenge_state::{ChallengeState};
-    use pistols::types::constants::{CONST};
+    use pistols::types::constants::{CONST, FAME};
     use pistols::types::premise::{Premise};
     use pistols::utils::byte_arrays::{BoolToString};
     use pistols::utils::misc::{ContractAddressIntoU256};
@@ -411,15 +411,15 @@ pub mod tester {
 
     #[inline(always)]
     pub fn _next_block() -> (u64, u64) {
-        (elapse_timestamp(TIMESTEP))
+        (elapse_block_timestamp(TIMESTEP))
     }
 
-    pub fn elapse_timestamp(delta: u64) -> (u64, u64) {
+    pub fn elapse_block_timestamp(delta: u64) -> (u64, u64) {
         let new_timestamp = starknet::get_block_timestamp() + delta;
-        (set_timestamp(new_timestamp))
+        (set_block_timestamp(new_timestamp))
     }
 
-    pub fn set_timestamp(new_timestamp: u64) -> (u64, u64) {
+    pub fn set_block_timestamp(new_timestamp: u64) -> (u64, u64) {
         let new_block_number = get_block_number() + 1;
         testing::set_block_number(new_block_number);
         testing::set_block_timestamp(new_timestamp);
@@ -548,7 +548,7 @@ pub mod tester {
         (new_table_id)
     }
 
-    // ::game
+    // ::tutorial
     pub fn execute_create_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
         tutorial_id: u128,
     ) -> u128 {
@@ -700,6 +700,12 @@ pub mod tester {
     }
     pub fn set_Pack(ref world: WorldStorage, model: Pack) {
         world.write_model_test(@model);
+    }
+
+    pub fn make_duelist_inactive(world: WorldStorage, token_id: u128, dripped_fame: u64) {
+        let timestamp_active: u64 = get_DuelistValue(world, token_id).timestamp_active;
+        let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + (FAME::TIMESTAMP_TO_DRIP_ONE_FAME * dripped_fame);
+        set_block_timestamp(timestamp_active + elapsed);
     }
 
     //
