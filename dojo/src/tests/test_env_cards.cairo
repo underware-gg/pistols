@@ -39,17 +39,17 @@ mod tests {
     // game_loop
     //
 
-    fn execute_game_loop(sys: TestSystems,
+    fn execute_game_loop(sys: @TestSystems,
         moves_a: Span<u8>,
         moves_b: Span<u8>,
         env_cards: Span<felt252>,
         fire_dices: Span<felt252>,
     ) -> (Round, DuelProgress) {
-        sys.rng.set_mocked_values(
+        (*sys.rng).set_mocked_values(
             ['shoot_a', 'shoot_b'].span(),
             fire_dices,
         );
-        sys.rng.set_mocked_values(
+        (*sys.rng).set_mocked_values(
             ['env'].span(),
             [ShufflerTrait::mock_to_seed(env_cards)].span(),
         );
@@ -68,7 +68,7 @@ mod tests {
         round.moves_b.initialize(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let progress: DuelProgress = game_loop(RngWrapTrait::new(sys.rng.contract_address), @DeckType::Classic.build_deck(), ref round);
+        let progress: DuelProgress = game_loop(RngWrapTrait::new((*sys.rng).contract_address), @DeckType::Classic.build_deck(), ref round);
         (round, progress)
     }
 
@@ -83,7 +83,7 @@ mod tests {
     #[test]
     fn test_env_damage_up_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, TacticsCard::Vengeful.into()].span(),
             [1, 10, 0].span(),
             [ENV_DAMAGE_UP].span(),
@@ -97,7 +97,7 @@ mod tests {
     #[test]
     fn test_env_damage_up_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, 0].span(),
             [1, 10, TacticsCard::Vengeful.into()].span(),
             [ENV_DAMAGE_UP].span(),
@@ -111,7 +111,7 @@ mod tests {
     #[test]
     fn test_env_double_damage_up_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, 0].span(),
             [1, 10, 0].span(),
             [ENV_DOUBLE_DAMAGE_UP].span(),
@@ -125,7 +125,7 @@ mod tests {
     #[test]
     fn test_env_double_damage_up_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, 0].span(),
             [1, 10, 0].span(),
             [ENV_DOUBLE_DAMAGE_UP].span(),
@@ -140,7 +140,7 @@ mod tests {
     #[test]
     fn test_env_damage_down() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10].span(),
             [1, 10].span(),
             [ENV_DAMAGE_DOWN].span(),
@@ -154,7 +154,7 @@ mod tests {
     #[test]
     fn test_env_damage_down_no_overflow() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [4, 10].span(),
             [4, 10].span(),
             [ENV_DAMAGE_DOWN, ENV_DAMAGE_DOWN, ENV_DAMAGE_DOWN, ENV_DAMAGE_DOWN].span(),
@@ -167,7 +167,7 @@ mod tests {
     #[test]
     fn test_env_damage_cancels_1() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [2, 10].span(),
             [2, 10].span(),
             [ENV_DAMAGE_UP, ENV_DAMAGE_DOWN].span(),
@@ -179,7 +179,7 @@ mod tests {
     #[test]
     fn test_env_damage_cancels_2() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [2, 10].span(),
             [2, 10].span(),
             [ENV_DAMAGE_DOWN, ENV_DAMAGE_UP].span(),
@@ -196,7 +196,7 @@ mod tests {
     #[test]
     fn test_env_chances_up() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, 0].span(),
             [1, 10, 0].span(),
             [ENV_CHANCES_UP].span(),
@@ -207,7 +207,7 @@ mod tests {
         assert_gt!(round.state_a.chances, CONST::INITIAL_CHANCE, "state_a.chances");
         assert_gt!(round.state_b.chances, CONST::INITIAL_CHANCE, "state_b.chances");
         // double chances
-        let (round_double, _progress) = execute_game_loop(sys,
+        let (round_double, _progress) = execute_game_loop(@sys,
             [1, 10, 0].span(),
             [1, 10, 0].span(),
             [ENV_DOUBLE_CHANCES_UP].span(),
@@ -223,7 +223,7 @@ mod tests {
     #[test]
     fn test_env_chances_down() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, 0].span(),
             [1, 10, 0].span(),
             [ENV_CHANCES_DOWN].span(),
@@ -237,7 +237,7 @@ mod tests {
     #[test]
     fn test_env_chances_down_no_overflow() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [8, 10, 0].span(),
             [8, 10, 0].span(),
             [ENV_CHANCES_DOWN, ENV_CHANCES_DOWN, ENV_CHANCES_DOWN, ENV_CHANCES_DOWN,
@@ -250,7 +250,7 @@ mod tests {
     #[test]
     fn test_env_chances_cancels_1() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [2, 10, 0].span(),
             [2, 10, 0].span(),
             [ENV_CHANCES_UP, ENV_CHANCES_DOWN].span(),
@@ -262,7 +262,7 @@ mod tests {
     #[test]
     fn test_env_chances_cancels_2() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [2, 10, 0].span(),
             [2, 10, 0].span(),
             [ENV_CHANCES_DOWN, ENV_CHANCES_UP].span(),
@@ -279,7 +279,7 @@ mod tests {
     #[test]
     fn test_special_all_shots_hit() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, TacticsCard::Bananas.into()].span(),
             [1, 10, TacticsCard::Bananas.into()].span(),
             [ENV_SPECIAL_ALL_SHOTS_HIT].span(),
@@ -293,7 +293,7 @@ mod tests {
     #[test]
     fn test_special_all_shots_hit_chances_down() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(@sys,
             [2, 10, TacticsCard::Bananas.into()].span(),
             [2, 10, TacticsCard::Bananas.into()].span(),
             [ENV_SPECIAL_ALL_SHOTS_HIT, ENV_CHANCES_DOWN].span(),
@@ -312,7 +312,7 @@ mod tests {
     #[test]
     fn test_special_all_shots_hit_no_tactics() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(@sys,
             [2, 10, TacticsCard::Bananas.into()].span(),
             [2, 10, TacticsCard::Bananas.into()].span(),
             [ENV_SPECIAL_ALL_SHOTS_HIT, ENV_SPECIAL_NO_TACTICS].span(),
@@ -332,7 +332,7 @@ mod tests {
     #[test]
     fn test_special_all_shots_miss() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, TacticsCard::Bananas.into()].span(),
             [1, 10, TacticsCard::Bananas.into()].span(),
             [ENV_SPECIAL_ALL_SHOTS_MISS].span(),
@@ -346,7 +346,7 @@ mod tests {
     #[test]
     fn test_special_all_shots_miss_chances_up() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, progress) = execute_game_loop(sys,
+        let (round, progress) = execute_game_loop(@sys,
             [2, 10, TacticsCard::Bananas.into()].span(),
             [2, 10, TacticsCard::Bananas.into()].span(),
             [ENV_SPECIAL_ALL_SHOTS_MISS, ENV_CHANCES_UP].span(),
@@ -371,7 +371,7 @@ mod tests {
     #[test]
     fn test_special_double_tactics() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, TacticsCard::Vengeful.into()].span(),
             [1, 10, TacticsCard::Vengeful.into()].span(),
             [ENV_SPECIAL_DOUBLE_TACTICS].span(),
@@ -383,7 +383,7 @@ mod tests {
     #[test]
     fn test_special_no_double_tactics() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [2, 10, TacticsCard::Vengeful.into()].span(),
             [2, 10, TacticsCard::Vengeful.into()].span(),
             [ENV_SPECIAL_NO_TACTICS, ENV_SPECIAL_DOUBLE_TACTICS].span(),
@@ -396,7 +396,7 @@ mod tests {
     #[test]
     fn test_special_no_tactics() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, TacticsCard::Vengeful.into()].span(),
             [1, 10, TacticsCard::Vengeful.into()].span(),
             [ENV_SPECIAL_NO_TACTICS].span(),
@@ -408,7 +408,7 @@ mod tests {
     #[test]
     fn test_special_double_no_tactics() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [2, 10, TacticsCard::Vengeful.into()].span(),
             [2, 10, TacticsCard::Vengeful.into()].span(),
             [ENV_SPECIAL_DOUBLE_TACTICS, ENV_SPECIAL_NO_TACTICS].span(),
@@ -432,7 +432,7 @@ mod tests {
     #[test]
     fn test_coin_toss_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, TacticsCard::CoinToss.into()].span(),
             [1, 10, 0].span(),
             [ENV_SPECIAL_ALL_SHOTS_MISS].span(),
@@ -444,7 +444,7 @@ mod tests {
     #[test]
     fn test_coin_toss_a_once() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [2, 10, TacticsCard::CoinToss.into()].span(),
             [2, 10, 0].span(),
             [ENV_SPECIAL_ALL_SHOTS_HIT, ENV_SPECIAL_ALL_SHOTS_MISS].span(),
@@ -456,7 +456,7 @@ mod tests {
     #[test]
     fn test_coin_toss_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, 0].span(),
             [1, 10, TacticsCard::CoinToss.into()].span(),
             [ENV_SPECIAL_ALL_SHOTS_MISS].span(),
@@ -468,7 +468,7 @@ mod tests {
     #[test]
     fn test_coin_toss_b_once() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [2, 10, 0].span(),
             [2, 10, TacticsCard::CoinToss.into()].span(),
             [ENV_SPECIAL_ALL_SHOTS_HIT, ENV_SPECIAL_ALL_SHOTS_MISS].span(),
@@ -481,7 +481,7 @@ mod tests {
     #[test]
     fn test_coin_toss_specials_only() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, TacticsCard::CoinToss.into()].span(),
             [1, 10, 0].span(),
             [ENV_DAMAGE_UP].span(),
@@ -498,7 +498,7 @@ mod tests {
     #[test]
     fn test_reversal_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, TacticsCard::Reversal.into()].span(),
             [1, 10, 0].span(),
             [ENV_DAMAGE_DOWN].span(),
@@ -510,7 +510,7 @@ mod tests {
     #[test]
     fn test_reversal_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, 0].span(),
             [1, 10, TacticsCard::Reversal.into()].span(),
             [ENV_DAMAGE_DOWN].span(),
@@ -522,7 +522,7 @@ mod tests {
     #[test]
     fn test_reversal_a_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [1, 10, TacticsCard::Reversal.into()].span(),
             [1, 10, TacticsCard::Reversal.into()].span(),
             [ENV_DAMAGE_DOWN].span(),
@@ -534,7 +534,7 @@ mod tests {
     #[test]
     fn test_reversal_once() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (round, _progress) = execute_game_loop(sys,
+        let (round, _progress) = execute_game_loop(@sys,
             [2, 10, TacticsCard::Reversal.into()].span(),
             [2, 10, TacticsCard::Reversal.into()].span(),
             [ENV_DAMAGE_DOWN, ENV_DAMAGE_DOWN].span(),

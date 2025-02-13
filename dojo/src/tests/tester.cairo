@@ -160,6 +160,27 @@ pub mod tester {
         pub rng: IRngMockDispatcher,
     }
 
+    #[generate_trait]
+    pub impl TestSystemsImpl of TestSystemsTrait {
+        #[inline(always)]
+        fn from_world(world: WorldStorage) -> TestSystems {
+            (TestSystems {
+                world,
+                game: world.game_dispatcher(),
+                tut: world.tutorial_dispatcher(),
+                admin: world.admin_dispatcher(),
+                bank: world.bank_dispatcher(),
+                lords: world.lords_mock_dispatcher(),
+                fame: world.fame_coin_dispatcher(),
+                fools: world.fools_coin_dispatcher(),
+                duels: world.duel_token_dispatcher(),
+                duelists: world.duelist_token_dispatcher(),
+                pack: world.pack_token_dispatcher(),
+                rng: IRngMockDispatcher{ contract_address: world.rng_address() },
+            })
+        }
+    }
+
     pub fn setup_world(flags: u8) -> TestSystems {
         let mut deploy_game: bool = (flags & FLAGS::GAME) != 0;
         let mut deploy_tutorial: bool = (flags & FLAGS::TUTORIAL) != 0;
@@ -380,20 +401,7 @@ pub mod tester {
         impersonate(OWNER());
 
 // '---- READY!'.print();
-        (TestSystems {
-            world,
-            game: world.game_dispatcher(),
-            tut: world.tutorial_dispatcher(),
-            admin: world.admin_dispatcher(),
-            bank: world.bank_dispatcher(),
-            lords: world.lords_mock_dispatcher(),
-            fame: world.fame_coin_dispatcher(),
-            fools: world.fools_coin_dispatcher(),
-            duels: world.duel_token_dispatcher(),
-            duelists: world.duelist_token_dispatcher(),
-            pack: world.pack_token_dispatcher(),
-            rng: IRngMockDispatcher{ contract_address: world.rng_address() },
-        })
+        (TestSystemsTrait::from_world(world))
     }
 
 
@@ -800,20 +808,20 @@ pub mod tester {
     //     }
     // }
 
-    pub fn assert_pact(sys: TestSystems, duel_id: u128, ch: ChallengeValue, has_pact: bool, accepted: bool, prefix: ByteArray) {
-        assert!(sys.duels.has_pact(ch.table_id, ch.address_a, ch.address_b) == has_pact,
+    pub fn assert_pact(sys: @TestSystems, duel_id: u128, ch: ChallengeValue, has_pact: bool, accepted: bool, prefix: ByteArray) {
+        assert!((*sys.duels).has_pact(ch.table_id, ch.address_a, ch.address_b) == has_pact,
             "[{}] _assert_pact() not [{}]", prefix, has_pact.to_string()
         );
-        assert!(sys.duels.has_pact(ch.table_id, ch.address_b, ch.address_a) == has_pact,
+        assert!((*sys.duels).has_pact(ch.table_id, ch.address_b, ch.address_a) == has_pact,
             "[{}] __assert_pact() not [{}]", prefix, has_pact.to_string()
         );
         let expected_duel_id: u128 = if (has_pact) {duel_id} else {0};
-        let duelist_duel_id: u128 = get_DuelistChallengeId(sys.world, ch.duelist_id_a);
+        let duelist_duel_id: u128 = get_DuelistChallengeId(*sys.world, ch.duelist_id_a);
         assert!(duelist_duel_id == expected_duel_id,
             "[{}] duelist_challenge_a: [{}] not [{}]", prefix, duelist_duel_id, expected_duel_id
         );
         let expected_duel_id: u128 = if (has_pact && accepted) {duel_id} else {0};
-        let duelist_duel_id: u128 = get_DuelistChallengeId(sys.world, ch.duelist_id_b);
+        let duelist_duel_id: u128 = get_DuelistChallengeId(*sys.world, ch.duelist_id_b);
         assert!(duelist_duel_id == expected_duel_id,
             "[{}] duelist_challenge_b: [{}] not [{}]", prefix, duelist_duel_id, expected_duel_id
         );
