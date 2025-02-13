@@ -260,7 +260,7 @@ pub mod duel_token {
             assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
 
             // validate duelist health
-            duelist_dispatcher.reactivate(duelist_id_a);
+            duelist_dispatcher.poke(duelist_id_a);
             let lives: u8 = duelist_dispatcher.life_count(duelist_id_a);
             assert(lives > 0, Errors::DUELIST_IS_DEAD);
             assert(lives >= lives_staked, Errors::INSUFFICIENT_LIVES);
@@ -372,7 +372,7 @@ pub mod duel_token {
                 assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
 
                 // validate duelist health
-                duelist_dispatcher.reactivate(duelist_id_b);
+                duelist_dispatcher.poke(duelist_id_b);
                 let lives: u8 = duelist_dispatcher.life_count(duelist_id_b);
                 assert(lives > 0, Errors::DUELIST_IS_DEAD);
                 assert(lives >= challenge.lives_staked, Errors::INSUFFICIENT_LIVES);

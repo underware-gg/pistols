@@ -23,6 +23,7 @@ mod tests {
             IDuelTokenDispatcherTrait,
             IDuelistTokenDispatcherTrait,
             IFoolsCoinDispatcherTrait,
+            // IFameCoinDispatcherTrait,
             ID, OWNER, OTHER, BUMMER, FAKE_OWNER_OF_1,
             _assert_is_alive, _assert_is_dead,
             SEASON_1_TABLE,
@@ -39,6 +40,8 @@ mod tests {
     use pistols::systems::rng_mock::{IRngMockDispatcherTrait};
 
     const MAX_LIVES: u8 = 3;
+    const WIN_1: u8 = 1;
+    const WIN_2: u8 = 2;
 
 
     //-----------------------------------------
@@ -466,8 +469,7 @@ mod tests {
     fn test_duel_until_death_a_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let challenge_count: u8 = MAX_LIVES;
-        let lives_staked: u8 = 1;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
+        _duel_until_death(@sys, WIN_1, challenge_count, 1);
         // no panic!
     }
 
@@ -475,8 +477,7 @@ mod tests {
     fn test_duel_until_death_b_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let challenge_count: u8 = MAX_LIVES;
-        let lives_staked: u8 = 1;
-        _duel_until_death(@sys, 2, challenge_count, lives_staked);
+        _duel_until_death(@sys, WIN_2, challenge_count, 1);
         // no panic!
     }
 
@@ -485,8 +486,7 @@ mod tests {
     fn test_duel_until_death_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let challenge_count: u8 = MAX_LIVES + 1;
-        let lives_staked: u8 = 1;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
+        _duel_until_death(@sys, WIN_1, challenge_count, 1);
     }
 
     #[test]
@@ -494,82 +494,110 @@ mod tests {
     fn test_duel_until_death_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let challenge_count: u8 = MAX_LIVES + 1;
-        let lives_staked: u8 = 1;
-        _duel_until_death(@sys, 2, challenge_count, lives_staked);
+        _duel_until_death(@sys, WIN_2, challenge_count, 1);
     }
 
     #[test]
     fn test_duel_until_death_1_1_1_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let challenge_count: u8 = 1;
-        let lives_staked: u8 = 1;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
+        _duel_until_death(@sys, WIN_1, 1, 1);
+        _duel_until_death(@sys, WIN_1, 1, 1);
+        _duel_until_death(@sys, WIN_1, 1, 1);
     }
     #[test]
     #[should_panic(expected:('DUEL: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_1_1_1_dead() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let challenge_count: u8 = 1;
-        let lives_staked: u8 = 1;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
+        _duel_until_death(@sys, WIN_1, 1, 1);
+        _duel_until_death(@sys, WIN_1, 1, 1);
+        _duel_until_death(@sys, WIN_1, 1, 1);
+        _duel_until_death(@sys, WIN_1, 1, 1);
     }
 
     #[test]
     fn test_duel_until_death_1_2_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let challenge_count: u8 = 1;
-        let lives_staked: u8 = 1;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        let lives_staked: u8 = 2;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
+        _duel_until_death(@sys, WIN_1, 1, 1);
+        _duel_until_death(@sys, WIN_1, 1, 2);
     }
     #[test]
     #[should_panic(expected:('DUEL: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_1_2_dead() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let challenge_count: u8 = 1;
-        let lives_staked: u8 = 1;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        let lives_staked: u8 = 2;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        let lives_staked: u8 = 1;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
+        _duel_until_death(@sys, WIN_1, 1, 1);
+        _duel_until_death(@sys, WIN_1, 1, 2);
+        _duel_until_death(@sys, WIN_1, 1, 1);
     }
 
     #[test]
     fn test_duel_until_death_2_1_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let challenge_count: u8 = 1;
-        let lives_staked: u8 = 2;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        let lives_staked: u8 = 1;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
+        _duel_until_death(@sys, WIN_1, 1, 2);
+        _duel_until_death(@sys, WIN_1, 1, 1);
     }
     #[test]
     #[should_panic(expected:('DUEL: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_2_1_dead() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let challenge_count: u8 = 1;
-        let lives_staked: u8 = 2;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        let lives_staked: u8 = 1;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
+        _duel_until_death(@sys, WIN_1, 1, 2);
+        _duel_until_death(@sys, WIN_1, 1, 1);
+        _duel_until_death(@sys, WIN_1, 1, 1);
     }
 
     #[test]
     #[should_panic(expected:('DUEL: Insufficient lives', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_2_2() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        let challenge_count: u8 = 1;
-        let lives_staked: u8 = 2;
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
-        _duel_until_death(@sys, 1, challenge_count, lives_staked);
+        _duel_until_death(@sys, WIN_1, 1, 2);
+        _duel_until_death(@sys, WIN_1, 1, 2);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Insufficient lives', 'ENTRYPOINT_FAILED'))]
+    fn test_duel_until_death_inactive_alive_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        // duel once to create duelists
+        _duel_until_death(@sys, WIN_2, 1, 1);
+        // drip fame
+        tester::make_duelist_inactive(sys.world, ID(OWNER()), 1000);
+        _duel_until_death(@sys, WIN_2, 1, 2);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+    fn test_duel_until_death_inactive_dead_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        // duel once to create duelists
+        _duel_until_death(@sys, WIN_2, 1, 1);
+        // drip fame
+        tester::make_duelist_inactive(sys.world, ID(OWNER()), 1500);
+        _duel_until_death(@sys, WIN_2, 1, 2);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Insufficient lives', 'ENTRYPOINT_FAILED'))]
+    fn test_duel_until_death_inactive_alive_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        // duel once to create duelists
+        _duel_until_death(@sys, WIN_1, 1, 1);
+        // drip fame
+        tester::make_duelist_inactive(sys.world, ID(OTHER()), 1000);
+        _duel_until_death(@sys, WIN_1, 1, 2);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+    fn test_duel_until_death_inactive_dead_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        // duel once to create duelists
+        _duel_until_death(@sys, WIN_1, 1, 1);
+// println!("balance [{}]: {}", ID(OWNER()), sys.fame.balance_of_token(sys.duelists.contract_address, ID(OWNER())));
+// println!("balance [{}]: {}", ID(OTHER()), sys.fame.balance_of_token(sys.duelists.contract_address, ID(OTHER())));
+        // drip fame
+        tester::make_duelist_inactive(sys.world, ID(OTHER()), 1200);
+// println!("dripped [{}]: {}", ID(OWNER()), sys.duelists.inactive_fame_dripped(ID(OWNER())));
+// println!("dripped [{}]: {}", ID(OTHER()), sys.duelists.inactive_fame_dripped(ID(OTHER())));
+        _duel_until_death(@sys, WIN_1, 1, 2);
     }
 
 

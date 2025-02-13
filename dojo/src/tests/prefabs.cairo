@@ -68,7 +68,7 @@ pub mod prefabs {
 
     pub fn start_new_challenge(sys: @TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252, lives_staked: u8) -> u128 {
         let duel_id: u128 = tester::execute_create_duel(sys.duels, duelist_a, duelist_b, MESSAGE, table_id, 48, lives_staked);
-        tester::elapse_block_timestamp(TimestampTrait::from_days(1));
+        tester::elapse_block_timestamp(TimestampTrait::from_minutes(2));
         tester::execute_reply_duel(sys.duels, duelist_b, ID(duelist_b), duel_id, true);
         (duel_id)
     }
