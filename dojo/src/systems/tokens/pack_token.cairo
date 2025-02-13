@@ -194,7 +194,7 @@ pub mod pack_token {
             let pack: Pack = self.mint_pack(PackType::WelcomePack, recipient, recipient.into(), lords_amount);
             
             // events
-            PlayerTrait::check_in(ref store, Activity::WelcomePack, recipient, 0);
+            PlayerTrait::check_in(ref store, Activity::WelcomePack, recipient, pack.pack_id.into());
 
             // open immediately
             (self.open(pack.pack_id))
@@ -223,7 +223,7 @@ pub mod pack_token {
             let pack: Pack = self.mint_pack(pack_type, recipient, seed, lords_amount);
             
             // events
-            PlayerTrait::check_in(ref store, Activity::PurchasedPack, recipient, pack.pack_type.identifier());
+            PlayerTrait::check_in(ref store, Activity::PurchasedPack, recipient, pack.pack_id.into());
 
             (pack)
         }
@@ -238,6 +238,9 @@ pub mod pack_token {
             // check if already opened
             let mut pack: Pack = store.get_pack(pack_id);
             assert(!pack.is_open, Errors::ALREADY_OPENED);
+
+            // events
+            PlayerTrait::check_in(ref store, Activity::OpenedPack, recipient, pack_id.into());
 
             // open...
             let token_ids: Span<u128> = pack.open(ref store, recipient);

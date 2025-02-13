@@ -6,13 +6,14 @@ pub enum Activity {
     FinishedTutorial,   // 1
     WelcomePack,        // 2
     PurchasedPack,      // 3
-    CreatedDuelist,     // 4
-    CreatedChallenge,   // 5
-    RepliedChallenge,   // 6
-    CommittedMoves,     // 7
-    RevealedMoves,      // 8
-    DuelResolved,       // 9
-    DuelDraw,           // 10
+    OpenedPack,         // 4
+    CreatedDuelist,     // 5
+    CreatedChallenge,   // 6
+    RepliedChallenge,   // 7
+    CommittedMoves,     // 8
+    RevealedMoves,      // 9
+    DuelResolved,       // 10
+    DuelDraw,           // 11
 }
 
 //---------------------
@@ -127,7 +128,8 @@ pub impl ActivityImpl of ActivityTrait {
     }
     fn is_public(self: Activity) -> bool {
         match self {
-            Activity::PurchasedPack => false,
+            Activity::PurchasedPack |
+            Activity::OpenedPack => false,
             _ => true,
         }
     }

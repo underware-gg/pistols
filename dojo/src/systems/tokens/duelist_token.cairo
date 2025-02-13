@@ -126,7 +126,7 @@ pub mod duelist_token {
     use pistols::models::{
         config::{Config},
         pool::{PoolType, PoolTypeTrait},
-        player::{PlayerTrait, Activity},
+        player::{Activity, ActivityTrait},
         duelist::{
             Duelist, DuelistValue,
             Scoreboard, ScoreTrait,
@@ -266,7 +266,7 @@ pub mod duelist_token {
                 fame_dispatcher.minted_duelist(duelist.duelist_id);
 
                 // events
-                PlayerTrait::check_in(ref store, Activity::CreatedDuelist, recipient, duelist.duelist_id.into());
+                Activity::CreatedDuelist.emit(ref store.world, recipient, duelist.duelist_id.into());
 
                 rnd /= 0x100;
                 i += 1;
