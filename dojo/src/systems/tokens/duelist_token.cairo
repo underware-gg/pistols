@@ -313,7 +313,7 @@ pub mod duelist_token {
                 fame_dispatcher.minted_duelist(duelist.duelist_id);
 
                 // events
-                Activity::CreatedDuelist.emit(ref store.world, recipient, duelist.duelist_id.into());
+                Activity::DuelistSpawned.emit(ref store.world, recipient, duelist.duelist_id.into());
 
                 rnd /= 0x100;
                 i += 1;

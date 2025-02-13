@@ -332,7 +332,7 @@ pub mod duel_token {
             challenge.set_pact(ref store);
 
             // events
-            PlayerTrait::check_in(ref store, Activity::CreatedChallenge, address_a, duel_id.into());
+            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, address_a, duel_id.into());
 
             (duel_id)
         }
@@ -417,7 +417,7 @@ pub mod duel_token {
             }
 
             // events
-            PlayerTrait::check_in(ref store, Activity::RepliedChallenge, address_b, duel_id.into());
+            PlayerTrait::check_in(ref store, Activity::ChallengeReplied, address_b, duel_id.into());
 
             (challenge.state)
         }

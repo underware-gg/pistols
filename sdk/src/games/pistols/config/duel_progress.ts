@@ -6,7 +6,7 @@ const _get_variant = (variant: any): any => {
   return Object.keys(v)[0]
 }
 
-type DuelDrawnCard = {
+type DuelistDrawnCard = {
   fire: constants.PacesCard;
   dodge: constants.PacesCard;
   blades: constants.BladesCard;
@@ -38,8 +38,8 @@ export type DuelProgress = {
     pace: constants.PacesCard;
     card_env: constants.EnvCard;
     dice_env: number;
-    card_a: DuelDrawnCard
-    card_b: DuelDrawnCard
+    card_a: DuelistDrawnCard
+    card_b: DuelistDrawnCard
     state_a: DuelState
     state_b: DuelState
     specials_a: DuelSpecials

@@ -3,17 +3,17 @@ use starknet::{ContractAddress};
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Activity {
     Undefined,          // 0
-    FinishedTutorial,   // 1
-    WelcomePack,        // 2
-    PurchasedPack,      // 3
-    OpenedPack,         // 4
-    CreatedDuelist,     // 5
-    CreatedChallenge,   // 6
-    RepliedChallenge,   // 7
-    CommittedMoves,     // 8
-    RevealedMoves,      // 9
-    DuelResolved,       // 10
-    DuelDraw,           // 11
+    TutorialFinished,   // 1
+    PackWelcome,        // 2
+    PackPurchased,      // 3
+    PackOpened,         // 4
+    DuelistSpawned,     // 5
+    ChallengeCreated,   // 6
+    ChallengeReplied,   // 7
+    MovesCommitted,     // 8
+    MovesRevealed,      // 9
+    ChallengeResolved,  // 10
+    ChallengeDraw,      // 11
 }
 
 //---------------------
@@ -100,9 +100,9 @@ pub impl PlayerImpl of PlayerTrait {
         if (!player.exists()) {
             assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
             player.timestamp_registered = starknet::get_block_timestamp();
-            player.claimed_welcome_pack = (activity == Activity::WelcomePack);
+            player.claimed_welcome_pack = (activity == Activity::PackWelcome);
             store.set_player(@player);
-        } else if (activity == Activity::WelcomePack) {
+        } else if (activity == Activity::PackWelcome) {
             player.claimed_welcome_pack = true;
             store.set_player(@player);
         }
@@ -128,18 +128,18 @@ pub impl ActivityImpl of ActivityTrait {
     }
     fn is_public(self: Activity) -> bool {
         match self {
-            Activity::PurchasedPack |
-            Activity::OpenedPack => false,
+            Activity::PackPurchased |
+            Activity::PackOpened => false,
             _ => true,
         }
     }
     fn can_register_player(self: Activity) -> bool {
         match self {
-            // Activity::WelcomePack => true,
-            // Activity::FinishedTutorial => true,
-            // Activity::CreatedDuelist => true,
-            // Activity::CreatedChallenge => true,
-            // Activity::RepliedChallenge => true,
+            // Activity::PackWelcome => true,
+            // Activity::TutorialFinished => true,
+            // Activity::DuelistSpawned => true,
+            // Activity::ChallengeCreated => true,
+            // Activity::ChallengeReplied => true,
             // _ => false,
             _ => true,
         }

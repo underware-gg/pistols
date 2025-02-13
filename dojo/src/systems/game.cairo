@@ -231,7 +231,7 @@ pub mod game {
             store.set_duelist_timestamp_active(duelist_id);
 
             // events
-            PlayerTrait::check_in(ref store, Activity::CommittedMoves, starknet::get_caller_address(), duel_id.into());
+            PlayerTrait::check_in(ref store, Activity::MovesCommitted, starknet::get_caller_address(), duel_id.into());
 
             store.set_round(@round);
         }
@@ -293,7 +293,7 @@ pub mod game {
             store.set_duelist_timestamp_active(duelist_id);
 
             // events
-            Activity::RevealedMoves.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
+            Activity::MovesRevealed.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
 
             //
             // missing reveal, update only and wait for final reveal
@@ -329,9 +329,9 @@ pub mod game {
 
             // events
             if (challenge.winner != 0) {
-                Activity::DuelResolved.emit(ref store.world, challenge.winner_address(), duel_id.into());
+                Activity::ChallengeResolved.emit(ref store.world, challenge.winner_address(), duel_id.into());
             } else {
-                Activity::DuelDraw.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
+                Activity::ChallengeDraw.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
             }
         }
 
