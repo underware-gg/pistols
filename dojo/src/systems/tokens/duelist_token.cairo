@@ -383,6 +383,8 @@ pub mod duelist_token {
                 is_alive = (MathTrait::sub(fame_balance, fame_dripped) >= FAME::ONE_LIFE.low);
                 if (fame_balance != 0) {
                     if (!is_alive) {
+                        // DEAD!!!
+                        Activity::DuelistDied.emit(ref store.world, starknet::get_caller_address(), duelist_id.into());
                         // 60% of a life goes to PoolType::SacredFlame 
                         let amount: u128 = MathTrait::percentage(FAME::ONE_LIFE.low, FAME::SACRED_FLAME_PERCENTAGE);
                         bank_dispatcher.duelist_lost_fame(starknet::get_contract_address(), duelist_id, amount.into(), PoolType::SacredFlame);
@@ -430,6 +432,9 @@ pub mod duelist_token {
                 let fame_balance: u128 = fame_dispatcher.balance_of_token(starknet::get_contract_address(), duelist_id).low;
                 let mut residual_fame: u128 = (fame_balance - values.fame_lost);
                 if (residual_fame < FAME::ONE_LIFE.low && residual_fame != 0) {
+                    // DEAD!!!
+                    let mut world = self.world_default();
+                    Activity::DuelistDied.emit(ref world, starknet::get_caller_address(), duelist_id.into());
                     // 60% residual goes to PoolType::SacredFlame
                     let amount: u128 = MathTrait::percentage(residual_fame, FAME::SACRED_FLAME_PERCENTAGE);
                     bank_dispatcher.duelist_lost_fame(starknet::get_contract_address(), duelist_id, amount.into(), PoolType::SacredFlame);

@@ -8,12 +8,13 @@ pub enum Activity {
     PackPurchased,      // 3
     PackOpened,         // 4
     DuelistSpawned,     // 5
-    ChallengeCreated,   // 6
-    ChallengeReplied,   // 7
-    MovesCommitted,     // 8
-    MovesRevealed,      // 9
-    ChallengeResolved,  // 10
-    ChallengeDraw,      // 11
+    DuelistDied,        // 6
+    ChallengeCreated,   // 7
+    ChallengeReplied,   // 8
+    MovesCommitted,     // 9
+    MovesRevealed,      // 10
+    ChallengeResolved,  // 11
+    ChallengeDraw,      // 12
 }
 
 //---------------------
