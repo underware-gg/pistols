@@ -28,15 +28,10 @@ export function EventsModelStoreSync() {
   const query = useMemo<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
       .withClause(
-        // new PistolsClauseBuilder().where(
-        //   "pistols-PlayerRequiredAction",
-        //   "duelist_id",
-        //   "In", duelistIds.map(id => formatQueryValue(id))
-        // ).build()
-        new PistolsClauseBuilder().keys(
-          ["pistols-PlayerRequiredAction"],
-          [],
-          "FixedLen"
+        new PistolsClauseBuilder().where(
+          "pistols-PlayerRequiredAction",
+          "duelist_id",
+          "In", duelistIds.map(id => formatQueryValue(id))
         ).build()
       )
       .withLimit(50)

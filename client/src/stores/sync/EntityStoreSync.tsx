@@ -49,23 +49,7 @@ import { usePackStore } from '/src/stores/packStore'
 //   },
 // }
 const query: PistolsQueryBuilder = new PistolsQueryBuilder()
-  .withClause(
-    new PistolsClauseBuilder().keys([
-      "pistols-Config",
-      "pistols-TableConfig",
-      "pistols-TokenConfig",
-      "pistols-Player",
-      "pistols-Duelist",
-      "pistols-DuelistChallenge",
-      "pistols-Scoreboard",
-      "pistols-Challenge",
-      "pistols-Round",
-      "pistols-Pack",
-      // off-chain signed messages
-      "pistols-PlayerOnline",
-      "pistols-PlayerBookmark",
-    ], []).build()
-  ).withEntityModels([
+  .withEntityModels([
     "pistols-Config",
     "pistols-TableConfig",
     "pistols-TokenConfig",
@@ -108,7 +92,7 @@ export function EntityStoreSync() {
       // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModel(entities, 'Config'))
       // console.log("EntityStoreSync() SET =======> [TableConfig]:", filterEntitiesByModel(entities, 'TableConfig'))
       // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModel(entities, 'TokenConfig'))
-      console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
+      // console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
       // console.log("EntityStoreSync() SET =======> [Player]:", filterEntitiesByModel(entities, 'Player'))
       configState.setEntities(filterEntitiesByModel(entities, 'Config'))
       tableState.setEntities(filterEntitiesByModel(entities, ['TableConfig', 'SeasonConfig']))

@@ -33,6 +33,9 @@ const useGetChallengesByTableQuery = (tableId: string) => {
             [formatQueryValue(stringToFelt(tableId))]
           ).build()
         )
+        .withEntityModels(
+          ["pistols-Challenge"]
+        )
         .includeHashedKeys()
       : null
   ), [tableId])

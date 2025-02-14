@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityId, useClientTimestamp } from '@underware_gg/pistols-sdk/utils/hooks'
@@ -203,6 +203,9 @@ export const useGetChallenge = (duel_id: BigNumberish) => {
             ["pistols-Challenge"],
             [formatQueryValue(duel_id)]
           ).build()
+        )
+        .withEntityModels(
+          ["pistols-Challenge"]
         )
         .includeHashedKeys()
       : null

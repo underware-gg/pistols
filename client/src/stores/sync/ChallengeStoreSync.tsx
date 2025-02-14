@@ -28,10 +28,14 @@ export function ChallengeStoreSync() {
   const query = useMemo<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
       .withClause(
-        new PistolsClauseBuilder().keys(
-          ["pistols-Challenge"],
-          [formatQueryValue(stringToFelt(tableId))]
+        new PistolsClauseBuilder().where(
+          "pistols-Challenge",
+          "table_id",
+          "Eq", formatQueryValue(stringToFelt(tableId)),
         ).build()
+      )
+      .withEntityModels(
+        ['pistols-Challenge']
       )
       .includeHashedKeys()
   ), [tableId])
@@ -45,6 +49,7 @@ export function ChallengeStoreSync() {
     query,
     enabled: mounted,
     setEntities: (entities: PistolsEntity[]) => {
+      console.log("ChallengeStoreSync() SET =======> [entity]:", entities)
       challengeState.setEntities(entities)
       queryState.setEntities(entities)
     },

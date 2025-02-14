@@ -70,6 +70,9 @@ export const useGetPack = (pack_id: BigNumberish) => {
             [formatQueryValue(pack_id)]
           ).build()
         )
+        .withEntityModels(
+          ["pistols-Pack"]
+        )
         .includeHashedKeys()
       : null
   ), [pack_id])

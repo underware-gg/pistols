@@ -67,8 +67,8 @@ export const useSdkEntitiesGet = ({
       await sdk.getEntities({
         query,
       }).then((data: PistolsEntity[]) => {
-        // console.log("useSdkEntitiesGet() GOT:", response.data)
-        setEntities(_parseEntities(data))
+        console.log("useSdkEntitiesGet() GOT:", data)
+        setEntities(_filterEntities(data))
       }).catch((error: Error) => {
         console.error("useSdkEntitiesGet().sdk.get() error:", error, query)
       }).finally(() => {
@@ -105,9 +105,7 @@ export const useSdkEntitiesSub = ({
             console.error("useSdkEntitiesSub() callback error:", response.error, query)
           } else {
             console.log("useSdkEntitiesSub() SUB:", response.data);
-            if (response.data[0]) {
-              updateEntity(_parseEntities(response.data)[0] as PistolsEntity)
-            }
+            _filterEntities(response.data).forEach(entity => updateEntity(entity) )
           }
         },
       }).then(response => {
@@ -115,7 +113,7 @@ export const useSdkEntitiesSub = ({
         // console.log("ENTITIES SUB ====== initialEntities:", initialEntities);
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
-          setEntities(initialEntities)
+          setEntities(_filterEntities(initialEntities))
         }
       }).catch(error => {
         console.error("useSdkEntitiesSub() promise error:", error, query)
@@ -135,10 +133,6 @@ export const useSdkEntitiesSub = ({
   return {
     isLoading,
   }
-}
-
-const _parseEntities = (data: PistolsEntity[]): PistolsEntity[] => {
-  return (data ?? []).filter(e => e.entityId != '0x0')
 }
 
 
@@ -201,8 +195,7 @@ export const useSdkEventsSub = ({
             console.error("useSdkEventsSub() callback error:", response.error, query)
           } else {
             // console.log("useSdkEventsSub() SUB:", historical, response.data);
-            const entity = _parseEvents(response.data, historical)[0]
-            if (entity) updateEntity(entity)
+            _parseEvents(response.data, historical).forEach(entity => updateEntity(entity))
           }
         },
       }).then(response => {
@@ -233,14 +226,18 @@ export const useSdkEventsSub = ({
   }
 }
 
+const _filterEntities = (data: PistolsEntity[]): PistolsEntity[] => {
+  return (data ?? []).filter(e => e && e.entityId != '0x0')
+}
+
 const _parseEvents = (data: PistolsEntity[] | PistolsEntity[][], historical: boolean): PistolsEntity[] => {
-  return (
+  return _filterEntities(
     !data ? []
       : !historical ? (data as PistolsEntity[])
         : (data as PistolsEntity[][]).reduce((acc: PistolsEntity[], e: PistolsEntity[]) => (
           acc.concat(e)
         ), [] as PistolsEntity[])
-  ).filter(e => e.entityId != '0x0')
+  )
 }
 
 

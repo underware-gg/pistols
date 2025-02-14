@@ -89,7 +89,6 @@ export function useTokensByOwner(contractAddress: BigNumberish, owner: BigNumber
 export function useTokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
   const { tokens, isLoading, refetch } = useToriiTokensByOwnerQL(contractAddress, owner, false)
   const tokenIds = useMemo(() => tokens.map((token) => token.tokenId), [tokens])
-  // console.log("useTokenIdsByOwner() =>", isLoading, bigintToHex(owner), tokenIds)
 
   const { mintedCount } = useTokenConfig(contractAddress)
   useEffect(() => {

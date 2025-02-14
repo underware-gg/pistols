@@ -111,6 +111,7 @@ function useToriiTokenBalancesQL(variables: any, enabled: boolean, watch: boolea
     watch,
     pollInterval: 1000,
   });
+  // console.log(`QL_QUERY:`, isLoading, variables, data)
   const tokens = useMemo(() => {
     let tokens: ERC_Tokens = {
       ERC20: {},
@@ -172,7 +173,6 @@ export function useToriiTokensByOwnerQL(contractAddress: BigNumberish, owner: Bi
   const tokens = useMemo(() => (
     rawTokens.ERC721[bigintToHex(contractAddress)]?.tokens ?? []
   ), [rawTokens, contractAddress])
-  // console.log(`>>> useToriiTokensByOwnerQL():`, bigintToHex(contractAddress), rawTokens, tokens)
   
   return {
     tokens,

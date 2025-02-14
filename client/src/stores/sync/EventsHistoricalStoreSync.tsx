@@ -13,7 +13,10 @@ import * as torii from '@dojoengine/torii-client'
 // }
 const query: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withClause(
-    new PistolsClauseBuilder().keys(["pistols-PlayerActivity"], [], "FixedLen").build()
+    new PistolsClauseBuilder().keys(
+      ["pistols-PlayerActivity"],
+      [],
+    ).build()
   )
   .withEntityModels([
     "pistols-PlayerActivity",

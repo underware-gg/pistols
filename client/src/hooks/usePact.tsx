@@ -43,6 +43,9 @@ export const usePact = (table_id: string, address_a: BigNumberish, address_b: Bi
             [formatQueryValue(stringToFelt(table_id)), formatQueryValue(pair)]
           ).build()
         )
+        .withEntityModels(
+          ["pistols-Pact"]
+        )
         .includeHashedKeys()
       : null
   ), [table_id, pair])
