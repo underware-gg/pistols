@@ -488,7 +488,7 @@ fn test_fame_reward_not_minter() {
 
 
 //---------------------------------
-// INACTIVE
+// inactivity / poke()
 //
 
 #[test]
@@ -543,15 +543,18 @@ fn test_duelist_inactive() {
     assert_eq!(sys.duelists.inactive_fame_dripped(token_id), WEI(111).low, "DRIPPED_MORE_inactive_fame_dripped");
 }
 
-// reactivate()
+// poke()
 
-fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64, is_alive: bool) {
+fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64, should_survive: bool) {
     let token_id: u128 = TOKEN_ID_1_1.low;
+    let lords_balance_bank: u128 = (*sys.lords).balance_of((*sys.bank).contract_address).low;
     let lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
     let fame_balance_start: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
     let fame_supply_start: u128 = (*sys.fame).total_supply().low;
     let timestamp_active_start: u64 = tester::get_DuelistValue(*sys.world, token_id).timestamp_active;
     // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
+// println!("[] balance     : {}", fame_balance_start/CONST::ETH_TO_WEI.low);
+// println!("[] fame_to_burn: {}", dripped_fame);
 
     // dripped...
     tester::make_duelist_inactive(*sys.world, token_id, dripped_fame);
@@ -560,9 +563,9 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
     assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), dripped_fame_wei, "inactive_fame_dripped");
 
     // reactivate
-    tester::impersonate(OWNER());
     let is_alive: bool = (*sys.duelists).poke(token_id);
-    assert!(is_alive == is_alive, "AFTER_is_alive");
+    assert_eq!(is_alive, should_survive, "AFTER_should_survive");
+    assert_eq!((*sys.duelists).is_alive(token_id), is_alive, "AFTER_is_alive()");
     assert!(!(*sys.duelists).is_inactive(token_id), "AFTER_is_inactive");
     assert_eq!((*sys.duelists).inactive_timestamp(token_id), 0, "AFTER_inactive_timestamp");
     assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), 0, "AFTER_inactive_fame_dripped");
@@ -588,6 +591,8 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
         assert_eq!(pool_flame.balance_fame, pool_amount, "AFTER_pool_flame.balance_fame_DEAD");
     }
 
+    // bank down
+    tester::assert_lords_balance_down(*sys.lords, (*sys.bank).contract_address, lords_balance_bank, "AFTER_bank_down");
     // underware up
     tester::assert_lords_balance_up(*sys.lords, TREASURY(), lords_balance_treasury, "AFTER_treasury_up");
 }
@@ -596,6 +601,15 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
 fn test_duelist_reactivate_OK_alive() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 100, true);
+}
+
+#[test]
+#[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_reactivate_OK_alive_not_owner() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    tester::impersonate(OTHER());
     _test_duelist_reactivate(@sys, token_id, 100, true);
 }
 
@@ -610,7 +624,7 @@ fn test_duelist_reactivate_OK_edge() {
 fn test_duelist_reactivate_DEAD() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
-    _test_duelist_reactivate(@sys, token_id, 2100, false);
+    _test_duelist_reactivate(@sys, token_id, 2001, false);
 }
 
 #[test]
@@ -621,9 +635,25 @@ fn test_duelist_reactivate_DEAD_empty() {
 }
 
 #[test]
+fn test_duelist_reactivate_DEAD_empty_not_owner() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    tester::impersonate(OTHER());
+    _test_duelist_reactivate(@sys, token_id, 3000, false);
+}
+
+#[test]
 fn test_duelist_reactivate_DEAD_over() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 4000, false);
+}
+
+#[test]
+fn test_duelist_reactivate_DEAD_over_not_owner() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    tester::impersonate(OTHER());
     _test_duelist_reactivate(@sys, token_id, 4000, false);
 }
 
@@ -637,17 +667,80 @@ fn test_duelist_reactivate_DEAD_thrice() {
 }
 
 #[test]
-#[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
-fn test_duelist_reactivate_not_owner() {
+#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_reactivate_already_dead() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
-    tester::make_duelist_inactive(sys.world, token_id, 5000);
-    tester::impersonate(OTHER());
-    sys.duelists.poke(token_id);
+    _test_duelist_reactivate(@sys, token_id, 3000, false);
+    _test_duelist_reactivate(@sys, token_id, 1, false);
 }
 
-// #[test]
-// #[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
-// fn test_duelist_reactivate_invalid_id() {
-//     let mut sys: TestSystems = setup(0);
-// }
+
+
+//---------------------------------
+// sacrifice()
+//
+
+fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128) {
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    let lords_balance_bank: u128 = (*sys.lords).balance_of((*sys.bank).contract_address).low;
+    let lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
+    let fame_balance_start: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
+    let fame_supply_start: u128 = (*sys.fame).total_supply().low;
+    let timestamp_active_start: u64 = tester::get_DuelistValue(*sys.world, token_id).timestamp_active;
+    // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
+// println!("[] balance     : {}", fame_balance_start/CONST::ETH_TO_WEI.low);
+// println!("[] fame_to_burn: {}", dripped_fame);
+
+    // reactivate
+    (*sys.duelists).sacrifice(token_id);
+    assert!(!(*sys.duelists).is_alive(token_id), "AFTER_is_alive()");
+    assert!(!(*sys.duelists).is_inactive(token_id), "AFTER_is_inactive");
+    assert_eq!((*sys.duelists).inactive_timestamp(token_id), 0, "AFTER_inactive_timestamp");
+    assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), 0, "AFTER_inactive_fame_dripped");
+
+    // timestamp_active updated
+    let timestamp_active: u64 = tester::get_DuelistValue(*sys.world, token_id).timestamp_active;
+    assert_gt!(timestamp_active, timestamp_active_start, "AFTER_timestamp_active");
+
+    // duelist lost fame...
+    let fame_balance: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
+    // Fame supply down
+    let fame_supply: u128 = (*sys.fame).total_supply().low;
+    // Flames up?
+    let pool_flame: Pool = tester::get_Pool(*sys.world, PoolType::SacredFlame);
+    let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
+    assert_eq!(fame_balance, 0, "AFTER_fame_balance_DEAD");
+    assert_eq!(fame_supply, fame_supply_start - fame_balance_start + pool_amount, "AFTER_fame_supply_DEAD");
+    assert_eq!(pool_flame.balance_fame, pool_amount, "AFTER_pool_flame.balance_fame_DEAD");
+
+    // bank down
+    tester::assert_lords_balance_down(*sys.lords, (*sys.bank).contract_address, lords_balance_bank, "AFTER_bank_down");
+    // underware up
+    tester::assert_lords_balance_up(*sys.lords, TREASURY(), lords_balance_treasury, "AFTER_treasury_up");
+}
+
+#[test]
+fn test_duelist_sacrifice_OK() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_sacrifice(@sys, token_id);
+}
+
+#[test]
+#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_sacrifice_already_dead() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 3000, false);
+    _test_duelist_sacrifice(@sys, token_id);
+}
+
+#[test]
+#[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_sacrifice_not_owner() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    tester::impersonate(OTHER());
+    _test_duelist_sacrifice(@sys, token_id);
+}

@@ -570,7 +570,7 @@ mod tests {
         // duel once to create duelists
         _duel_until_death(@sys, WIN_2, 1, 1);
         // drip fame
-        tester::make_duelist_inactive(sys.world, ID(OWNER()), 1500);
+        tester::make_duelist_inactive(sys.world, ID(OWNER()), 1100);
         _duel_until_death(@sys, WIN_2, 1, 2);
     }
 
@@ -594,7 +594,7 @@ mod tests {
 // println!("balance [{}]: {}", ID(OWNER()), sys.fame.balance_of_token(sys.duelists.contract_address, ID(OWNER())));
 // println!("balance [{}]: {}", ID(OTHER()), sys.fame.balance_of_token(sys.duelists.contract_address, ID(OTHER())));
         // drip fame
-        tester::make_duelist_inactive(sys.world, ID(OTHER()), 1200);
+        tester::make_duelist_inactive(sys.world, ID(OTHER()), 1100);
 // println!("dripped [{}]: {}", ID(OWNER()), sys.duelists.inactive_fame_dripped(ID(OWNER())));
 // println!("dripped [{}]: {}", ID(OTHER()), sys.duelists.inactive_fame_dripped(ID(OTHER())));
         _duel_until_death(@sys, WIN_1, 1, 2);
