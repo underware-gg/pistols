@@ -19,11 +19,11 @@ pub use pistols::systems::{
     }
 };
 pub use pistols::interfaces::{
-    ierc20::{Erc20Dispatcher, Erc20DispatcherTrait},
+    ierc20::{ierc20, Erc20Dispatcher, Erc20DispatcherTrait},
     vrf::{IVrfProviderDispatcher, IVrfProviderDispatcherTrait, Source},
 };
 pub use pistols::libs::store::{Store, StoreTrait};
-pub use pistols::models::config::{CONFIG, Config, ConfigTrait};
+pub use pistols::models::config::{CONFIG, Config};
 pub use pistols::utils::misc::{ZERO};
 
 pub mod SELECTORS {
@@ -196,11 +196,12 @@ pub impl SystemsImpl of SystemsTrait {
     // need access to store...
     #[inline(always)]
     fn lords_dispatcher(ref self: Store) -> Erc20Dispatcher {
-        (self.get_config().lords_dispatcher())
+        (Erc20Dispatcher{ contract_address: self.get_config_lords_address() })
+        // (ierc20(self.get_config_lords_address()))
     }
     #[inline(always)]
     fn vrf_dispatcher(ref self: Store) -> IVrfProviderDispatcher {
-        (self.get_config().vrf_dispatcher())
+        (IVrfProviderDispatcher{ contract_address: self.get_config_vrf_address() })
     }
 
 

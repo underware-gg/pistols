@@ -134,7 +134,6 @@ pub mod duelist_token {
         IBankDispatcher, IBankDispatcherTrait,
     };
     use pistols::models::{
-        config::{Config},
         pool::{PoolType, PoolTypeTrait},
         player::{Activity, ActivityTrait},
         duelist::{
@@ -373,12 +372,12 @@ pub mod duelist_token {
             let mut values_b: FeeValues = table_type.calc_fame_fees(balance_b, challenge.lives_staked, challenge.winner == 2);
 
             // transfer gains
-            let config: Config = store.get_config();
+            let treasury_address: ContractAddress = store.get_config_treasury_address();
             self.process_rewards(fame_dispatcher, fools_dispatcher, challenge.duelist_id_a, values_a);
             self.process_rewards(fame_dispatcher, fools_dispatcher, challenge.duelist_id_b, values_b);
             // TODO... optimize, combine LORDS releases into one
-            self.process_lost_fame(fame_dispatcher, bank_dispatcher, config.treasury_address, distribution, balance_a, challenge.duelist_id_a, ref values_a);
-            self.process_lost_fame(fame_dispatcher, bank_dispatcher, config.treasury_address, distribution, balance_b, challenge.duelist_id_b, ref values_b);
+            self.process_lost_fame(fame_dispatcher, bank_dispatcher, treasury_address, distribution, balance_a, challenge.duelist_id_a, ref values_a);
+            self.process_lost_fame(fame_dispatcher, bank_dispatcher, treasury_address, distribution, balance_b, challenge.duelist_id_b, ref values_b);
 
             (values_a, values_b)
         }
@@ -405,7 +404,6 @@ pub mod duelist_token {
             let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
             let bank_dispatcher: IBankDispatcher = store.world.bank_dispatcher();
             let distribution: FeeDistribution = Default::default();
-            let config: Config = store.get_config();
 
             // must be alive!
             let fame_balance: u128 = self.fame_balance(fame_dispatcher, duelist_id);
@@ -423,7 +421,7 @@ pub mod duelist_token {
             self.process_lost_fame(
                 fame_dispatcher,
                 bank_dispatcher,
-                config.treasury_address,
+                store.get_config_treasury_address(),
                 @distribution,
                 fame_balance,
                 duelist_id,

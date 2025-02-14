@@ -6,7 +6,7 @@ use dojo::event::{EventStorage};
 pub use pistols::models::{
     config::{
         CONFIG,
-        Config, ConfigTrait, ConfigValue,
+        Config, ConfigValue,
         CoinConfig, CoinConfigValue,
         TokenConfig, TokenConfigValue,
     },
@@ -150,11 +150,11 @@ pub impl StoreImpl of StoreTrait {
     }
     #[inline(always)]
     fn get_current_season(ref self: Store) -> SeasonConfig {
-        (self.world.read_model(self.get_config().season_table_id))
+        (self.world.read_model(self.get_config_season_table_id()))
     }
     #[inline(always)]
     fn get_current_season_table(ref self: Store) -> TableConfig {
-        (self.world.read_model(self.get_config().season_table_id))
+        (self.world.read_model(self.get_config_season_table_id()))
     }
 
     #[inline(always)]
@@ -280,8 +280,28 @@ pub impl StoreImpl of StoreTrait {
 
     //----------------------------------
     // Single member setters
+    // https://book.dojoengine.org/framework/world/api#read_member-and-read_member_of_models
     // https://book.dojoengine.org/framework/world/api#write_member-and-write_member_of_models
     //
+
+    #[inline(always)]
+    fn get_config_season_table_id(ref self: Store) -> felt252 {
+        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("season_table_id")))
+    }
+    #[inline(always)]
+    fn get_config_lords_address(ref self: Store) -> ContractAddress {
+        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("lords_address")))
+    }
+    #[inline(always)]
+    fn get_config_vrf_address(ref self: Store) -> ContractAddress {
+        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("vrf_address")))
+    }
+    #[inline(always)]
+    fn get_config_treasury_address(ref self: Store) -> ContractAddress {
+        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address")))
+    }
+
+    // setters
 
     #[inline(always)]
     fn set_config_is_paused(ref self: Store, is_paused: bool) {

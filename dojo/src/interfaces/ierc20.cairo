@@ -5,6 +5,7 @@ pub use openzeppelin_token::erc20::interface::{
     ERC20ABIDispatcherTrait as Erc20DispatcherTrait,
 };
 
+#[inline(always)]
 pub fn ierc20(contract_address: ContractAddress) -> Erc20Dispatcher {
     assert(contract_address.is_non_zero(), 'ierc20(): null address');
     (Erc20Dispatcher{contract_address})

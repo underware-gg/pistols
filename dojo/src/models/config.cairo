@@ -42,8 +42,6 @@ pub struct CoinConfig {
 //---------------------------
 // Traits
 //
-pub use pistols::interfaces::ierc20::{ierc20, Erc20Dispatcher, Erc20DispatcherTrait};
-pub use pistols::interfaces::vrf::{IVrfProviderDispatcher, IVrfProviderDispatcherTrait};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
@@ -57,15 +55,5 @@ pub impl ConfigManagerImpl of ConfigManagerTrait {
             season_table_id: 0,
             is_paused: false,
         })
-    }
-}
-
-#[generate_trait]
-pub impl ConfigImpl of ConfigTrait {
-    fn lords_dispatcher(self: @Config) -> Erc20Dispatcher {
-        (ierc20(*self.lords_address))
-    }
-    fn vrf_dispatcher(self: @Config) -> IVrfProviderDispatcher {
-        (IVrfProviderDispatcher{ contract_address: *self.vrf_address })
     }
 }
