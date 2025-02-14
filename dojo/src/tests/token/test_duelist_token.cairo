@@ -563,9 +563,8 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
     assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), dripped_fame_wei, "inactive_fame_dripped");
 
     // reactivate
-    let is_alive: bool = (*sys.duelists).poke(token_id);
-    assert_eq!(is_alive, should_survive, "AFTER_should_survive");
-    assert_eq!((*sys.duelists).is_alive(token_id), is_alive, "AFTER_is_alive()");
+    (*sys.duelists).poke(token_id);
+    assert_eq!((*sys.duelists).is_alive(token_id), should_survive, "AFTER_is_alive()");
     assert!(!(*sys.duelists).is_inactive(token_id), "AFTER_is_inactive");
     assert_eq!((*sys.duelists).inactive_timestamp(token_id), 0, "AFTER_inactive_timestamp");
     assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), 0, "AFTER_inactive_fame_dripped");
@@ -581,7 +580,7 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
     // Flames up?
     let pool_flame: Pool = tester::get_Pool(*sys.world, PoolType::SacredFlame);
     let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
-    if (is_alive) {
+    if (should_survive) {
         assert_eq!(fame_balance, fame_balance_start - dripped_fame_wei, "AFTER_fame_balance_ALIVE");
         assert_eq!(fame_supply, fame_supply_start - dripped_fame_wei, "AFTER_fame_supply_ALIVE");
         assert_eq!(pool_flame.balance_fame, 0, "AFTER_pool_flame.balance_fame_ALIVE");

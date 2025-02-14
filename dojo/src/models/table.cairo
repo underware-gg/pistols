@@ -34,8 +34,8 @@ pub struct TableConfig {
 pub struct FeeDistribution {
     pub underware_percent: u8,
     pub creator_percent: u8,
-    pub winners_percent: u8,
     pub creator_address: ContractAddress,
+    pub pool_percent: u8,
     pub pool_id: PoolType,
 }
 
@@ -44,7 +44,10 @@ pub struct FeeValues {
     pub fame_lost: u128,
     pub fame_gained: u128,
     pub fools_gained: u128,
+    // calculated at the bank
+    pub fame_burned: u128,
     pub lords_unlocked: u128,
+    pub survived: bool,
 }
 
 
@@ -96,14 +99,13 @@ pub impl TableTypeImpl of TableTypeTrait {
     fn can_join(self: @TableType, _account_address: ContractAddress, _duelist_id: u128) -> bool {
         (true)
     }
-    // end game calculations
-    fn get_fame_distribution(self: @TableType, table_id: felt252, tournament_id: u128) -> @FeeDistribution {
+    fn get_rewards_distribution(self: @TableType, table_id: felt252, tournament_id: u128) -> @FeeDistribution {
         let mut result: FeeDistribution = match self {
             TableType::Season => FeeDistribution {
                 underware_percent: 30,
                 creator_percent: 30,
-                winners_percent: 40,
                 creator_address: ZERO(), // TODO: find from tournament_id
+                pool_percent: 40,
                 pool_id: PoolType::Season(table_id),
             },
             _ => Default::default()
@@ -122,11 +124,11 @@ pub impl TableTypeImpl of TableTypeTrait {
                 let mut result: FeeValues = Default::default();
                 let one_life: u128 = FAME::ONE_LIFE.low;
                 if (is_winner) {
+                    result.survived = true;
                     let k_fame: u128 = 1;
                     result.fame_gained = (one_life / (((balance / one_life) + 1) / k_fame));
                     let k_fools: u128 = 10;
                     result.fools_gained = (k_fools * ((one_life / 2) / result.fame_gained)) * CONST::ETH_TO_WEI.low;
-                    result.lords_unlocked = 0; // calculated at the bank
                     // apply stakes
                     result.fame_gained *= lives_staked.into();
                     result.fools_gained *= lives_staked.into();
@@ -147,7 +149,7 @@ pub impl TableTypeImpl of TableTypeTrait {
 pub impl FeeDistributionImpl of FeeDistributionTrait {
     #[inline(always)]
     fn is_payable(self: @FeeDistribution) -> bool {
-        (*self.underware_percent != 0 || *self.creator_percent != 0 || *self.winners_percent != 0)
+        (*self.underware_percent != 0 || *self.creator_percent != 0 || *self.pool_percent != 0)
     }
 }
 

@@ -12,7 +12,7 @@ pub trait IBank<TState> {
     fn charge_purchase(ref self: TState, payer: ContractAddress, lords_amount: u256);
     fn minted_fame(ref self: TState, payer: ContractAddress, lords_amount: u256);
     fn burned_fame_release_lords(ref self: TState, recipient: ContractAddress, fame_amount: u256) -> u256;
-    fn duelist_lost_fame(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u256, pool_id: PoolType);
+    fn duelist_lost_fame_to_pool(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u256, pool_id: PoolType);
 }
 
 // Exposed to clients
@@ -37,7 +37,7 @@ trait IBankProtected<TState> {
     fn burned_fame_release_lords(ref self: TState, recipient: ContractAddress, fame_amount: u256) -> u256;
     // transfer FAME to payer, adding to Pool::Season(table_id)
     // (called by duelist_token)
-    fn duelist_lost_fame(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u256, pool_id: PoolType);
+    fn duelist_lost_fame_to_pool(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u256, pool_id: PoolType);
 }
 
 #[dojo::contract]
@@ -164,7 +164,7 @@ pub mod bank {
             (lords_amount)
         }
 
-        fn duelist_lost_fame(ref self: ContractState,
+        fn duelist_lost_fame_to_pool(ref self: ContractState,
             contract_address: ContractAddress,
             token_id: u128,
             fame_amount: u256,
