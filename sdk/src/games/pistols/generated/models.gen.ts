@@ -630,8 +630,6 @@ export interface SchemaType extends ISchemaType {
 		TokenBoundAddressValue: TokenBoundAddressValue,
 		MockedValue: MockedValue,
 		MockedValueValue: MockedValueValue,
-	},
-	achievement: {
 		TrophyCreation: TrophyCreation,
 		TrophyCreationValue: TrophyCreationValue,
 		TrophyProgression: TrophyProgression,
