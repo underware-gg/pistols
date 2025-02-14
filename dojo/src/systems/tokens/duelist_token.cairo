@@ -264,6 +264,7 @@ pub mod duelist_token {
                 // or else, only the owner
                 self.token.assert_is_owner_of(caller, duelist_id.into());
             }
+            // returns (is_alive)
             (self.reactivate(duelist_id))
         }
 

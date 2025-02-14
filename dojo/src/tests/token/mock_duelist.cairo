@@ -22,6 +22,7 @@ pub trait IDuelistToken<TState> {
     fn is_alive(self: @TState, token_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
+    fn poke(ref self: TState, duelist_id: u128) -> bool;
 }
 
 #[dojo::contract]
@@ -91,6 +92,9 @@ pub mod duelist_token {
         }
         fn transfer_rewards(ref self: ContractState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues) {
             (Default::default(), Default::default())
+        }
+        fn poke(ref self: ContractState, duelist_id: u128) -> bool {
+            (true)
         }
     }
 
