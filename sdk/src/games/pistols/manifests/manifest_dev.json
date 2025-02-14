@@ -1,7 +1,7 @@
 {
   "world": {
-    "class_hash": "0x4b767fda48530353c2e44e4b9433f4d75c6c9974aaff43ecc00de9455eb71b8",
-    "address": "0x96b34d54cdb8b7e9cd70f3696836aee77a8aba856ce297659e21173b2dd75e",
+    "class_hash": "0x7c9469d45a9cdbab775035afb48e1fa73fb35ab059fcb9dfb0a301aa973e783",
+    "address": "0xbee2bb53422762f6c51fb478a8a5da41a64ad678860d02800e0dbdac23dc36",
     "seed": "pistols",
     "name": "Pistols at Dawn",
     "entrypoints": [
@@ -11,6 +11,7 @@
       "register_event",
       "register_model",
       "register_contract",
+      "register_library",
       "init_contract",
       "upgrade_event",
       "upgrade_model",
@@ -78,6 +79,10 @@
           {
             "name": "Unregistered",
             "type": "()"
+          },
+          {
+            "name": "Library",
+            "type": "(core::starknet::class_hash::ClassHash, core::felt252)"
           }
         ]
       },
@@ -358,6 +363,34 @@
             "outputs": [
               {
                 "type": "core::starknet::contract_address::ContractAddress"
+              }
+            ],
+            "state_mutability": "external"
+          },
+          {
+            "type": "function",
+            "name": "register_library",
+            "inputs": [
+              {
+                "name": "namespace",
+                "type": "core::byte_array::ByteArray"
+              },
+              {
+                "name": "class_hash",
+                "type": "core::starknet::class_hash::ClassHash"
+              },
+              {
+                "name": "name",
+                "type": "core::byte_array::ByteArray"
+              },
+              {
+                "name": "version",
+                "type": "core::byte_array::ByteArray"
+              }
+            ],
+            "outputs": [
+              {
+                "type": "core::starknet::class_hash::ClassHash"
               }
             ],
             "state_mutability": "external"
@@ -967,6 +1000,28 @@
       },
       {
         "type": "event",
+        "name": "dojo::world::world_contract::world::LibraryRegistered",
+        "kind": "struct",
+        "members": [
+          {
+            "name": "name",
+            "type": "core::byte_array::ByteArray",
+            "kind": "key"
+          },
+          {
+            "name": "namespace",
+            "type": "core::byte_array::ByteArray",
+            "kind": "key"
+          },
+          {
+            "name": "class_hash",
+            "type": "core::starknet::class_hash::ClassHash",
+            "kind": "data"
+          }
+        ]
+      },
+      {
+        "type": "event",
         "name": "dojo::world::world_contract::world::EventEmitted",
         "kind": "struct",
         "members": [
@@ -1207,6 +1262,11 @@
             "kind": "nested"
           },
           {
+            "name": "LibraryRegistered",
+            "type": "dojo::world::world_contract::world::LibraryRegistered",
+            "kind": "nested"
+          },
+          {
             "name": "EventEmitted",
             "type": "dojo::world::world_contract::world::EventEmitted",
             "kind": "nested"
@@ -1252,8 +1312,8 @@
   },
   "contracts": [
     {
-      "address": "0x407afe3b3089a1f6fe8b40344a37904510c605a422588dfd338fb6fc0a3e057",
-      "class_hash": "0x73e1de8918adb65b79ece21cb907767b092d100e8987af918ceb684e7cc6c0b",
+      "address": "0x67bb8480d73dc126edce256fc6ff452a5a880514130c77b9daf23f7f216872b",
+      "class_hash": "0x4fa4f89df96ee1aac06e94b8a92fb3216dd76a180bcab486424d14aadc4899b",
       "abi": [
         {
           "type": "impl",
@@ -1612,7 +1672,7 @@
       ]
     },
     {
-      "address": "0x5795ce918b6821dae1fd466fa718cc0709dd4ac7616c869c11edf082d077307",
+      "address": "0x49eb463d71d4d7e1035c8a4f709ba0f161a59caa335c5b508ec8c1d76263e74",
       "class_hash": "0x3495ebdc3248fb51b08c4779b8214f7c6377daafadc7e8111f1dac4132abc69",
       "abi": [
         {
@@ -1864,8 +1924,8 @@
       ]
     },
     {
-      "address": "0x2027ea72a85cd4dce1b17c81ce7d6dd17ff55ddfa9ea464a8cdad5055126d4f",
-      "class_hash": "0x59f57979516a7daca5286d186f8ff3cc9bc3a9aef430c93be3a47841e40eb25",
+      "address": "0x738ce44319e86b73bd0b9006e2609b549e53c7330bb97dec3bfc160d95bbf13",
+      "class_hash": "0x3f33fa24e8d0372539b955864c6fcc79c9732d2a15c2a116686eea3a72f48c5",
       "abi": [
         {
           "type": "impl",
@@ -2998,8 +3058,8 @@
       ]
     },
     {
-      "address": "0xe37c9ab655ab77ffd473e09ea7d229193e4375dcc7ab1f13247cc1fdd8e1c0",
-      "class_hash": "0x57ff9bc53a20760463d2b1b0815b58cc2a7e19aabe91c8c114c8cfedcd94037",
+      "address": "0x14be0714dfbfda333245dcc9fe6e56f8deb8c88fdfb2d71720155af98d11354",
+      "class_hash": "0x879cc2149e9d841810821be3776f9627cea0f5ad726184ea6139c9ca37d1e2",
       "abi": [
         {
           "type": "impl",
@@ -3959,8 +4019,8 @@
       ]
     },
     {
-      "address": "0x57b3ce3c1be85d4e2fa33465c7547a21d14cb786912ddff4022b32c7a981edf",
-      "class_hash": "0x639e1c117466ae7907988f3831d750acd754e901bf82361d172df8ebaf85fcb",
+      "address": "0x49f0e0908f3994e9b72b410f26b22a44e988ba3cd50e715ca4572040b4ce2ee",
+      "class_hash": "0x1d32e402a5bc33c56f2daa3b03958d553f4958011db9164e6068cc9bd022b1b",
       "abi": [
         {
           "type": "impl",
@@ -4628,8 +4688,8 @@
       ]
     },
     {
-      "address": "0xe1cfc1306ea07cac5774bf228069f80997b66abc8351dd25005f21c24b0688",
-      "class_hash": "0x790be7b8bd1cd70841556db00885a90b7f44a5447e3f84a65bc254dad180b2a",
+      "address": "0x83d17b50f055aa563709ca793fc2131bed0503da090f2ce7828382a2fe8042",
+      "class_hash": "0x41f04e91733c457e7ad7306ac06cac9617ba5301a4d869bc5d09462c49212a",
       "abi": [
         {
           "type": "impl",
@@ -5161,6 +5221,17 @@
             },
             {
               "type": "function",
+              "name": "get_timestamp",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u64"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "test_validate_commit_message",
               "inputs": [
                 {
@@ -5320,7 +5391,7 @@
       ]
     },
     {
-      "address": "0x4c512e2f9cc7bbbfd0af7dc382fcf89128bdfd7c56810975121e3a065bc3ff2",
+      "address": "0x15fc023cf50caf702414a3fcd4a7217182fa891aef405be2d34e1943b6c8435",
       "class_hash": "0x4b686a8c94e9b5b047e9183b14bd0c4f7d625141f5de27e5c43054ca8531b57",
       "abi": [
         {
@@ -5860,8 +5931,8 @@
       ]
     },
     {
-      "address": "0x7b7e11ef93818f7cff65ad1c96a8cb99d587d3944cbfb4c343fdbc1ade52ab3",
-      "class_hash": "0x222f1c93c639943794ac96f1ccd61539acb575d11c32b9552f162e69740284",
+      "address": "0x361f8b20465186029ac361ac7448210543607b47bfdc268e75ef889ad67d621",
+      "class_hash": "0x3ac115000fca77cb30fc19f55f6f8b041220503f944de916a07af6bc6d6775b",
       "abi": [
         {
           "type": "impl",
@@ -6884,7 +6955,7 @@
       ]
     },
     {
-      "address": "0x2e30d4869565f08b0694b2a8c582aa439e95b195ab5e30bd4221583786a1241",
+      "address": "0x57b08e3b0fd9d012120ef5988eb204aae557e8c120dcbe486e3ffab9a6c1ca4",
       "class_hash": "0xa58d186898c09006f40f550b222ceb74e84b7af1ae0e75f176466dd64a8aa8",
       "abi": [
         {
@@ -7148,7 +7219,7 @@
       ]
     },
     {
-      "address": "0x5bea0e2a9e7f3d5e4c224d263e479470b5ba0fb4290e7096d8bc17bbfb2a0d6",
+      "address": "0x254cddca814d4380c53c545a725a6f2fde1bbffc96a2d6b4e0330bc0af11c3c",
       "class_hash": "0x5fca4b692c9e4cea7deb5a27d947deded036ce53ad6c0f169c0bf51a0f47610",
       "abi": [
         {
@@ -7450,8 +7521,8 @@
       ]
     },
     {
-      "address": "0x1504352d3dcfab8fcba31d143dca58321897667b4b954f2e81f1f91f81602db",
-      "class_hash": "0x25d82fb3a7912c02bc991893a2ca823fd12f3e7fc08a27378ca7fa0e591f603",
+      "address": "0x532539b4f53628e9843be4572f68f4b52c09a2e6089735386b56c28bdda502",
+      "class_hash": "0x76cb0c41e1d02c845367668ecd4fcb8d137dedab79c41f91b10d18fa6121179",
       "abi": [
         {
           "type": "impl",
@@ -8095,7 +8166,7 @@
       ]
     },
     {
-      "address": "0x2ba57dcc8c93fe36e3a3960ec7e5a00fa891778886e08739b5cc91daa88c193",
+      "address": "0x5355768013cba6f96d985d189c0a69362d1a79a962e0d595ba7ea114ead720c",
       "class_hash": "0x3e14a5e235a049cb64d3c1cfcf7c4740b5137d9949bef51f7f9fbd107e3824e",
       "abi": [
         {
@@ -8329,6 +8400,7 @@
       ]
     }
   ],
+  "libraries": [],
   "models": [
     {
       "members": [],
@@ -8476,5 +8548,6 @@
       "tag": "pistols-TrophyProgression",
       "selector": "0x528aee6e1c2ad2e0f603b1bfe15e3aefc1ded821cd118e5eab5092b704c79b0"
     }
-  ]
+  ],
+  "external_contracts": []
 }

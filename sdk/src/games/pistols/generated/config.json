@@ -14,7 +14,7 @@
   },
   "policies": {
     "contracts": {
-      "0x00e1cfc1306ea07cac5774bf228069f80997b66abc8351dd25005f21c24b0688": {
+      "0x0083d17b50f055aa563709ca793fc2131bed0503da090f2ce7828382a2fe8042": {
         "name": "Game",
         "description": "Game loop contract",
         "methods": [
@@ -29,7 +29,7 @@
           }
         ]
       },
-      "0x028a89a83b51e9355749e3de3e30d7da949fbe0dde59240ce1f148dfe21d6ee9": {
+      "0x00532539b4f53628e9843be4572f68f4b52c09a2e6089735386b56c28bdda502": {
         "name": "Tutorial",
         "description": "Tutorial game contract",
         "methods": [
@@ -44,7 +44,7 @@
           }
         ]
       },
-      "0x07b7e11ef93818f7cff65ad1c96a8cb99d587d3944cbfb4c343fdbc1ade52ab3": {
+      "0x0361f8b20465186029ac361ac7448210543607b47bfdc268e75ef889ad67d621": {
         "name": "Pack token",
         "description": "Packs ERC721 contract",
         "methods": [
@@ -59,7 +59,7 @@
           }
         ]
       },
-      "0x04be15880565d54e4a984027f4e7da4594e98aa32d768d0bf0bca8e2764adab7": {
+      "0x0738ce44319e86b73bd0b9006e2609b549e53c7330bb97dec3bfc160d95bbf13": {
         "name": "Duel token",
         "description": "Duel ERC721 contract",
         "methods": [
@@ -111,7 +111,7 @@
         "domain": {
           "name": "Underware_gg",
           "version": "1.0.0",
-          "chainId": "SN_MAIN",
+          "chainId": "KATANA_LOCAL",
           "revision": "1"
         },
         "name": "PlayerOnline",
@@ -160,7 +160,7 @@
         "domain": {
           "name": "Underware_gg",
           "version": "1.0.0",
-          "chainId": "SN_MAIN",
+          "chainId": "KATANA_LOCAL",
           "revision": "1"
         },
         "name": "PlayerBookmark",

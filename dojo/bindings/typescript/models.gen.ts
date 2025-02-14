@@ -2,8 +2,6 @@ import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
 import { CairoCustomEnum, BigNumberish } from 'starknet';
 
-type WithFieldOrder<T> = T & { fieldOrder: string[] };
-
 // Type definition for `pistols::models::challenge::Challenge` struct
 export interface Challenge {
 	duel_id: BigNumberish;
@@ -520,7 +518,7 @@ export type BotProfileEnum = CairoCustomEnum;
 export type CharacterProfile = {
 	Unknown: string;
 	Bartender: string;
-	Drunken: string;
+	Drunkard: string;
 	Devil: string;
 	Player: string;
 }
@@ -589,66 +587,65 @@ export type ActivityEnum = CairoCustomEnum;
 
 export interface SchemaType extends ISchemaType {
 	pistols: {
-		Challenge: WithFieldOrder<Challenge>,
-		ChallengeFameBalance: WithFieldOrder<ChallengeFameBalance>,
-		ChallengeFameBalanceValue: WithFieldOrder<ChallengeFameBalanceValue>,
-		ChallengeValue: WithFieldOrder<ChallengeValue>,
-		DuelistState: WithFieldOrder<DuelistState>,
-		Moves: WithFieldOrder<Moves>,
-		Round: WithFieldOrder<Round>,
-		RoundValue: WithFieldOrder<RoundValue>,
-		CoinConfig: WithFieldOrder<CoinConfig>,
-		CoinConfigValue: WithFieldOrder<CoinConfigValue>,
-		Config: WithFieldOrder<Config>,
-		ConfigValue: WithFieldOrder<ConfigValue>,
-		TokenConfig: WithFieldOrder<TokenConfig>,
-		TokenConfigValue: WithFieldOrder<TokenConfigValue>,
-		Duelist: WithFieldOrder<Duelist>,
-		DuelistChallenge: WithFieldOrder<DuelistChallenge>,
-		DuelistChallengeValue: WithFieldOrder<DuelistChallengeValue>,
-		DuelistValue: WithFieldOrder<DuelistValue>,
-		Score: WithFieldOrder<Score>,
-		Scoreboard: WithFieldOrder<Scoreboard>,
-		ScoreboardTable: WithFieldOrder<ScoreboardTable>,
-		ScoreboardTableValue: WithFieldOrder<ScoreboardTableValue>,
-		ScoreboardValue: WithFieldOrder<ScoreboardValue>,
-		Pack: WithFieldOrder<Pack>,
-		PackValue: WithFieldOrder<PackValue>,
-		Pact: WithFieldOrder<Pact>,
-		PactValue: WithFieldOrder<PactValue>,
-		Payment: WithFieldOrder<Payment>,
-		PaymentValue: WithFieldOrder<PaymentValue>,
-		Player: WithFieldOrder<Player>,
-		PlayerBookmark: WithFieldOrder<PlayerBookmark>,
-		PlayerBookmarkValue: WithFieldOrder<PlayerBookmarkValue>,
-		PlayerOnline: WithFieldOrder<PlayerOnline>,
-		PlayerOnlineValue: WithFieldOrder<PlayerOnlineValue>,
-		PlayerValue: WithFieldOrder<PlayerValue>,
-		SeasonConfig: WithFieldOrder<SeasonConfig>,
-		SeasonConfigValue: WithFieldOrder<SeasonConfigValue>,
-		TableConfig: WithFieldOrder<TableConfig>,
-		TableConfigValue: WithFieldOrder<TableConfigValue>,
-		TokenBoundAddress: WithFieldOrder<TokenBoundAddress>,
-		TokenBoundAddressValue: WithFieldOrder<TokenBoundAddressValue>,
-		MockedValue: WithFieldOrder<MockedValue>,
-		MockedValueValue: WithFieldOrder<MockedValueValue>,
+		Challenge: Challenge,
+		ChallengeFameBalance: ChallengeFameBalance,
+		ChallengeFameBalanceValue: ChallengeFameBalanceValue,
+		ChallengeValue: ChallengeValue,
+		DuelistState: DuelistState,
+		Moves: Moves,
+		Round: Round,
+		RoundValue: RoundValue,
+		CoinConfig: CoinConfig,
+		CoinConfigValue: CoinConfigValue,
+		Config: Config,
+		ConfigValue: ConfigValue,
+		TokenConfig: TokenConfig,
+		TokenConfigValue: TokenConfigValue,
+		Duelist: Duelist,
+		DuelistChallenge: DuelistChallenge,
+		DuelistChallengeValue: DuelistChallengeValue,
+		DuelistValue: DuelistValue,
+		Score: Score,
+		Scoreboard: Scoreboard,
+		ScoreboardTable: ScoreboardTable,
+		ScoreboardTableValue: ScoreboardTableValue,
+		ScoreboardValue: ScoreboardValue,
+		Pack: Pack,
+		PackValue: PackValue,
+		Pact: Pact,
+		PactValue: PactValue,
+		Payment: Payment,
+		PaymentValue: PaymentValue,
+		Player: Player,
+		PlayerBookmark: PlayerBookmark,
+		PlayerBookmarkValue: PlayerBookmarkValue,
+		PlayerOnline: PlayerOnline,
+		PlayerOnlineValue: PlayerOnlineValue,
+		PlayerValue: PlayerValue,
+		SeasonConfig: SeasonConfig,
+		SeasonConfigValue: SeasonConfigValue,
+		TableConfig: TableConfig,
+		TableConfigValue: TableConfigValue,
+		TokenBoundAddress: TokenBoundAddress,
+		TokenBoundAddressValue: TokenBoundAddressValue,
+		MockedValue: MockedValue,
+		MockedValueValue: MockedValueValue,
 	},
 	achievement: {
-		TrophyCreation: WithFieldOrder<TrophyCreation>,
-		TrophyCreationValue: WithFieldOrder<TrophyCreationValue>,
-		TrophyProgression: WithFieldOrder<TrophyProgression>,
-		TrophyProgressionValue: WithFieldOrder<TrophyProgressionValue>,
-		Task: WithFieldOrder<Task>,
-		PlayerActivity: WithFieldOrder<PlayerActivity>,
-		PlayerActivityValue: WithFieldOrder<PlayerActivityValue>,
-		PlayerRequiredAction: WithFieldOrder<PlayerRequiredAction>,
-		PlayerRequiredActionValue: WithFieldOrder<PlayerRequiredActionValue>,
+		TrophyCreation: TrophyCreation,
+		TrophyCreationValue: TrophyCreationValue,
+		TrophyProgression: TrophyProgression,
+		TrophyProgressionValue: TrophyProgressionValue,
+		Task: Task,
+		PlayerActivity: PlayerActivity,
+		PlayerActivityValue: PlayerActivityValue,
+		PlayerRequiredAction: PlayerRequiredAction,
+		PlayerRequiredActionValue: PlayerRequiredActionValue,
 	},
 }
 export const schema: SchemaType = {
 	pistols: {
 		Challenge: {
-			fieldOrder: ['duel_id', 'table_id', 'premise', 'quote', 'address_a', 'address_b', 'duelist_id_a', 'duelist_id_b', 'state', 'winner', 'timestamp_start', 'timestamp_end'],
 			duel_id: 0,
 			table_id: 0,
 		premise: new CairoCustomEnum({ 
@@ -682,18 +679,15 @@ export const schema: SchemaType = {
 			timestamp_end: 0,
 		},
 		ChallengeFameBalance: {
-			fieldOrder: ['duel_id', 'balance_a', 'balance_b'],
 			duel_id: 0,
 			balance_a: 0,
 			balance_b: 0,
 		},
 		ChallengeFameBalanceValue: {
-			fieldOrder: ['balance_a', 'balance_b'],
 			balance_a: 0,
 			balance_b: 0,
 		},
 		ChallengeValue: {
-			fieldOrder: ['table_id', 'premise', 'quote', 'address_a', 'address_b', 'duelist_id_a', 'duelist_id_b', 'state', 'winner', 'timestamp_start', 'timestamp_end'],
 			table_id: 0,
 		premise: new CairoCustomEnum({ 
 					Undefined: "",
@@ -726,7 +720,6 @@ export const schema: SchemaType = {
 			timestamp_end: 0,
 		},
 		DuelistState: {
-			fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'],
 			chances: 0,
 			damage: 0,
 			health: 0,
@@ -734,7 +727,6 @@ export const schema: SchemaType = {
 			honour: 0,
 		},
 		Moves: {
-			fieldOrder: ['salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'],
 			salt: 0,
 			hashed: 0,
 			card_1: 0,
@@ -743,7 +735,6 @@ export const schema: SchemaType = {
 			card_4: 0,
 		},
 		Round: {
-			fieldOrder: ['duel_id', 'moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
 			duel_id: 0,
 		moves_a: { salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
 		moves_b: { salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
@@ -760,7 +751,6 @@ export const schema: SchemaType = {
 				Blades: undefined, }),
 		},
 		RoundValue: {
-			fieldOrder: ['moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
 		moves_a: { salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
 		moves_b: { salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
 		state_a: { chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
@@ -776,18 +766,15 @@ export const schema: SchemaType = {
 				Blades: undefined, }),
 		},
 		CoinConfig: {
-			fieldOrder: ['coin_address', 'minter_address', 'faucet_amount'],
 			coin_address: "",
 			minter_address: "",
 			faucet_amount: 0,
 		},
 		CoinConfigValue: {
-			fieldOrder: ['minter_address', 'faucet_amount'],
 			minter_address: "",
 			faucet_amount: 0,
 		},
 		Config: {
-			fieldOrder: ['key', 'treasury_address', 'lords_address', 'vrf_address', 'season_table_id', 'is_paused'],
 			key: 0,
 			treasury_address: "",
 			lords_address: "",
@@ -796,7 +783,6 @@ export const schema: SchemaType = {
 			is_paused: false,
 		},
 		ConfigValue: {
-			fieldOrder: ['treasury_address', 'lords_address', 'vrf_address', 'season_table_id', 'is_paused'],
 			treasury_address: "",
 			lords_address: "",
 			vrf_address: "",
@@ -804,20 +790,17 @@ export const schema: SchemaType = {
 			is_paused: false,
 		},
 		TokenConfig: {
-			fieldOrder: ['token_address', 'minter_address', 'renderer_address', 'minted_count'],
 			token_address: "",
 			minter_address: "",
 			renderer_address: "",
 			minted_count: 0,
 		},
 		TokenConfigValue: {
-			fieldOrder: ['minter_address', 'renderer_address', 'minted_count'],
 			minter_address: "",
 			renderer_address: "",
 			minted_count: 0,
 		},
 		Duelist: {
-			fieldOrder: ['duelist_id', 'profile_type', 'timestamp'],
 			duelist_id: 0,
 		profile_type: new CairoCustomEnum({ 
 					Undefined: "",
@@ -827,16 +810,13 @@ export const schema: SchemaType = {
 			timestamp: 0,
 		},
 		DuelistChallenge: {
-			fieldOrder: ['duelist_id', 'duel_id'],
 			duelist_id: 0,
 			duel_id: 0,
 		},
 		DuelistChallengeValue: {
-			fieldOrder: ['duel_id'],
 			duel_id: 0,
 		},
 		DuelistValue: {
-			fieldOrder: ['profile_type', 'timestamp'],
 		profile_type: new CairoCustomEnum({ 
 					Undefined: "",
 				Duelist: undefined,
@@ -845,7 +825,6 @@ export const schema: SchemaType = {
 			timestamp: 0,
 		},
 		Score: {
-			fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'],
 			honour: 0,
 			total_duels: 0,
 			total_wins: 0,
@@ -854,26 +833,21 @@ export const schema: SchemaType = {
 			honour_history: 0,
 		},
 		Scoreboard: {
-			fieldOrder: ['holder', 'score'],
 			holder: 0,
 		score: { honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		ScoreboardTable: {
-			fieldOrder: ['holder', 'table_id', 'score'],
 			holder: 0,
 			table_id: 0,
 		score: { honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		ScoreboardTableValue: {
-			fieldOrder: ['score'],
 		score: { honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		ScoreboardValue: {
-			fieldOrder: ['score'],
 		score: { honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		Pack: {
-			fieldOrder: ['pack_id', 'pack_type', 'seed', 'is_open'],
 			pack_id: 0,
 		pack_type: new CairoCustomEnum({ 
 					Unknown: "",
@@ -883,7 +857,6 @@ export const schema: SchemaType = {
 			is_open: false,
 		},
 		PackValue: {
-			fieldOrder: ['pack_type', 'seed', 'is_open'],
 		pack_type: new CairoCustomEnum({ 
 					Unknown: "",
 				WelcomePack: undefined,
@@ -892,17 +865,14 @@ export const schema: SchemaType = {
 			is_open: false,
 		},
 		Pact: {
-			fieldOrder: ['table_id', 'pair', 'duel_id'],
 			table_id: 0,
 			pair: 0,
 			duel_id: 0,
 		},
 		PactValue: {
-			fieldOrder: ['duel_id'],
 			duel_id: 0,
 		},
 		Payment: {
-			fieldOrder: ['key', 'amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
 			key: 0,
 		amount: 0,
 			client_percent: 0,
@@ -912,7 +882,6 @@ export const schema: SchemaType = {
 			treasury_percent: 0,
 		},
 		PaymentValue: {
-			fieldOrder: ['amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
 		amount: 0,
 			client_percent: 0,
 			ranking_percent: 0,
@@ -921,38 +890,31 @@ export const schema: SchemaType = {
 			treasury_percent: 0,
 		},
 		Player: {
-			fieldOrder: ['player_address', 'timestamp_registered', 'claimed_welcome_pack'],
 			player_address: "",
 			timestamp_registered: 0,
 			claimed_welcome_pack: false,
 		},
 		PlayerBookmark: {
-			fieldOrder: ['identity', 'target_address', 'target_id', 'enabled'],
 			identity: "",
 			target_address: "",
 			target_id: 0,
 			enabled: false,
 		},
 		PlayerBookmarkValue: {
-			fieldOrder: ['enabled'],
 			enabled: false,
 		},
 		PlayerOnline: {
-			fieldOrder: ['identity', 'timestamp'],
 			identity: "",
 			timestamp: 0,
 		},
 		PlayerOnlineValue: {
-			fieldOrder: ['timestamp'],
 			timestamp: 0,
 		},
 		PlayerValue: {
-			fieldOrder: ['timestamp_registered', 'claimed_welcome_pack'],
 			timestamp_registered: 0,
 			claimed_welcome_pack: false,
 		},
 		SeasonConfig: {
-			fieldOrder: ['table_id', 'season_id', 'timestamp_start', 'timestamp_end', 'phase'],
 			table_id: 0,
 			season_id: 0,
 			timestamp_start: 0,
@@ -963,7 +925,6 @@ export const schema: SchemaType = {
 				Ended: undefined, }),
 		},
 		SeasonConfigValue: {
-			fieldOrder: ['season_id', 'timestamp_start', 'timestamp_end', 'phase'],
 			season_id: 0,
 			timestamp_start: 0,
 			timestamp_end: 0,
@@ -973,7 +934,6 @@ export const schema: SchemaType = {
 				Ended: undefined, }),
 		},
 		TableConfig: {
-			fieldOrder: ['table_id', 'description', 'table_type', 'fee_collector_address', 'fee_min', 'is_open'],
 			table_id: 0,
 			description: 0,
 		table_type: new CairoCustomEnum({ 
@@ -986,7 +946,6 @@ export const schema: SchemaType = {
 			is_open: false,
 		},
 		TableConfigValue: {
-			fieldOrder: ['description', 'table_type', 'fee_collector_address', 'fee_min', 'is_open'],
 			description: 0,
 		table_type: new CairoCustomEnum({ 
 					Undefined: "",
@@ -998,29 +957,24 @@ export const schema: SchemaType = {
 			is_open: false,
 		},
 		TokenBoundAddress: {
-			fieldOrder: ['recipient', 'contract_address', 'token_id'],
 			recipient: "",
 			contract_address: "",
 			token_id: 0,
 		},
 		TokenBoundAddressValue: {
-			fieldOrder: ['contract_address', 'token_id'],
 			contract_address: "",
 			token_id: 0,
 		},
 		MockedValue: {
-			fieldOrder: ['salt', 'value', 'exists'],
 			salt: 0,
 			value: 0,
 			exists: false,
 		},
 		MockedValueValue: {
-			fieldOrder: ['value', 'exists'],
 			value: 0,
 			exists: false,
 		},
 		TrophyCreation: {
-			fieldOrder: ['id', 'hidden', 'index', 'points', 'start', 'end', 'group', 'icon', 'title', 'description', 'tasks', 'data'],
 			id: 0,
 			hidden: false,
 			index: 0,
@@ -1035,7 +989,6 @@ export const schema: SchemaType = {
 		data: "",
 		},
 		TrophyCreationValue: {
-			fieldOrder: ['hidden', 'index', 'points', 'start', 'end', 'group', 'icon', 'title', 'description', 'tasks', 'data'],
 			hidden: false,
 			index: 0,
 			points: 0,
@@ -1049,25 +1002,21 @@ export const schema: SchemaType = {
 		data: "",
 		},
 		TrophyProgression: {
-			fieldOrder: ['player_id', 'task_id', 'count', 'time'],
 			player_id: 0,
 			task_id: 0,
 			count: 0,
 			time: 0,
 		},
 		TrophyProgressionValue: {
-			fieldOrder: ['count', 'time'],
 			count: 0,
 			time: 0,
 		},
 		Task: {
-			fieldOrder: ['id', 'total', 'description'],
 			id: 0,
 			total: 0,
 		description: "",
 		},
 		PlayerActivity: {
-			fieldOrder: ['player_address', 'timestamp', 'activity', 'identifier', 'is_public'],
 			player_address: "",
 			timestamp: 0,
 		activity: new CairoCustomEnum({ 
@@ -1086,7 +1035,6 @@ export const schema: SchemaType = {
 			is_public: false,
 		},
 		PlayerActivityValue: {
-			fieldOrder: ['timestamp', 'activity', 'identifier', 'is_public'],
 			timestamp: 0,
 		activity: new CairoCustomEnum({ 
 					Undefined: "",
@@ -1104,12 +1052,10 @@ export const schema: SchemaType = {
 			is_public: false,
 		},
 		PlayerRequiredAction: {
-			fieldOrder: ['duelist_id', 'duel_id'],
 			duelist_id: 0,
 			duel_id: 0,
 		},
 		PlayerRequiredActionValue: {
-			fieldOrder: ['duel_id'],
 			duel_id: 0,
 		},
 	},
