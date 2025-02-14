@@ -17,7 +17,7 @@ import * as path from 'path';
 // const { makePistolsPolicies } = config
 // import { ChainId } from '../src/dojo/setup/chains'
 
-import { makePistolsPolicies } from '../games_pistols.js'
+import { makePistolsPolicies } from '../pistols.js'
 
 function buildFileContents() {
   // use development manifest (KATANA_LOCAL)
