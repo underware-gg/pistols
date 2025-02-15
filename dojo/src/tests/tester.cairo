@@ -79,7 +79,7 @@ pub mod tester {
     use pistols::utils::byte_arrays::{BoolToString};
     use pistols::utils::misc::{ContractAddressIntoU256};
     use pistols::utils::short_string::{ShortString};
-    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::interfaces::dns::{DnsTrait};
 
     
     //

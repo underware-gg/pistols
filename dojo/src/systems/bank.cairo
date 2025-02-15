@@ -47,8 +47,8 @@ pub mod bank {
     use dojo::world::{WorldStorage};
     // use dojo::model::{ModelStorage, ModelValueStorage};
 
-    use pistols::interfaces::systems::{
-        SystemsTrait,
+    use pistols::interfaces::dns::{
+        DnsTrait,
         IFameCoinDispatcher, IFameCoinDispatcherTrait,
         Erc20Dispatcher, Erc20DispatcherTrait,
     };

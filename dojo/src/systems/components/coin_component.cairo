@@ -24,7 +24,7 @@ pub mod CoinComponent {
         ERC20Component::{InternalImpl as ERC20InternalImpl},
     };
 
-    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::interfaces::dns::{DnsTrait};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::models::config::{
         CoinConfig, CoinConfigValue,
@@ -59,7 +59,7 @@ pub mod CoinComponent {
             minter_address: ContractAddress,
             faucet_amount: u128,
         ) {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let coin_config: CoinConfig = CoinConfig{
                 coin_address: starknet::get_contract_address(),
@@ -72,7 +72,7 @@ pub mod CoinComponent {
         fn can_mint(self: @ComponentState<TContractState>,
             recipient: ContractAddress,
         ) -> bool {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let coin_config: CoinConfigValue = store.get_coin_config_value(starknet::get_contract_address());
             (
@@ -99,7 +99,7 @@ pub mod CoinComponent {
         fn faucet(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
         ) {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let coin_config: CoinConfigValue = store.get_coin_config_value(starknet::get_contract_address());
             assert(coin_config.faucet_amount > 0, Errors::FAUCET_UNAVAILABLE);

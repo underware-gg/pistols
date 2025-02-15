@@ -61,7 +61,7 @@ use pistols::tests::token::mock_duelist::{
     m_MockDuelistOwners,
 };
 
-use pistols::interfaces::systems::{SystemsTrait};
+use pistols::interfaces::dns::{DnsTrait};
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::premise::{Premise};
 

@@ -57,8 +57,8 @@ pub mod game {
     //-------------------------------------
     // pistols
     //
-    use pistols::interfaces::systems::{
-        SystemsTrait,
+    use pistols::interfaces::dns::{
+        DnsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
         IDuelTokenDispatcherTrait,
         ITutorialDispatcherTrait,

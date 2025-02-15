@@ -110,8 +110,8 @@ pub mod pack_token {
     // ERC-721 End
     //-----------------------------------
 
-    use pistols::interfaces::systems::{
-        SystemsTrait,
+    use pistols::interfaces::dns::{
+        DnsTrait,
         IBankDispatcherTrait,
         IVrfProviderDispatcherTrait, Source,
     };
@@ -304,7 +304,7 @@ pub mod pack_token {
     //         auth: ContractAddress,
     //     ) {
     //         // avoid transfer after opened
-    //         let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+    //         let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
     //         let mut store: Store = StoreTrait::new(world);
     //         let pack: Pack = store.get_pack(token_id.low);
     //         assert(!pack.is_open, Errors::ALREADY_OPENED);

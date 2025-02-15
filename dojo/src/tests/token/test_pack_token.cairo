@@ -36,7 +36,7 @@ use pistols::models::{
     table::{TABLES},
 };
 
-use pistols::interfaces::systems::{SystemsTrait};
+use pistols::interfaces::dns::{DnsTrait};
 use pistols::types::constants::{CONST};
 use pistols::tests::tester::{
     tester,

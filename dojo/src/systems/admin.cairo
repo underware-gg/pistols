@@ -27,7 +27,7 @@ pub mod admin {
         table::{TableConfig, TableManagerTrait},
         season::{SeasonManagerTrait},
     };
-    use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
+    use pistols::interfaces::dns::{DnsTrait, SELECTORS};
     use pistols::libs::store::{Store, StoreTrait};
 
     mod Errors {

@@ -33,7 +33,7 @@ pub mod TokenComponent {
         ERC721Component::{InternalImpl as ERC721InternalImpl},
     };
 
-    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::interfaces::dns::{DnsTrait};
     use pistols::libs::store::{
         Store, StoreTrait,
         TokenConfig, TokenConfigValue,
@@ -70,7 +70,7 @@ pub mod TokenComponent {
         fn can_mint(self: @ComponentState<TContractState>,
             recipient: ContractAddress,
         ) -> bool {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let token_config: TokenConfigValue = store.get_token_config_value(starknet::get_contract_address());
             (
@@ -93,7 +93,7 @@ pub mod TokenComponent {
         }
 
         fn minted_count(self: @ComponentState<TContractState>) -> u128 {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let token_config: TokenConfigValue = store.get_token_config_value(starknet::get_contract_address());
             (token_config.minted_count)
@@ -118,7 +118,7 @@ pub mod TokenComponent {
             minter_address: ContractAddress,
             renderer_address: ContractAddress,
         ) {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let token_config: TokenConfig = TokenConfig {
                 token_address: starknet::get_contract_address(),
@@ -141,7 +141,7 @@ pub mod TokenComponent {
         ) -> Span<u128> {
             assert(self.can_mint(starknet::get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
 
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let mut token_config: TokenConfig = store.get_token_config(starknet::get_contract_address());
             let mut erc721 = get_dep_component_mut!(ref self, ERC721);

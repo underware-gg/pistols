@@ -59,7 +59,7 @@ use pistols::models::{
     },
 };
 
-use pistols::interfaces::systems::{SystemsTrait};
+use pistols::interfaces::dns::{DnsTrait};
 use pistols::types::constants::{FAME};
 use pistols::utils::misc::{WEI};
 use pistols::tests::tester::{

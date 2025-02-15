@@ -135,8 +135,8 @@ pub mod duel_token {
     // ERC-721 End
     //-----------------------------------
 
-    use pistols::interfaces::systems::{
-        SystemsTrait,
+    use pistols::interfaces::dns::{
+        DnsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
     };
     use pistols::models::{

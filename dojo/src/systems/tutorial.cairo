@@ -37,7 +37,7 @@ pub mod tutorial {
     //-------------------------------------
     // pistols
     //
-    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::interfaces::dns::{DnsTrait};
     use pistols::systems::rng::{RngWrapTrait, MockedValue};
     use pistols::models::{
         challenge::{

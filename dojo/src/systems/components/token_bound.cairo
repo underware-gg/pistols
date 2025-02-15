@@ -64,7 +64,7 @@ pub mod TokenBoundComponent {
     };
 
     use super::{TokenBoundAddress, TokenBoundAddressTrait};
-    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::interfaces::dns::{DnsTrait};
     use pistols::libs::store::{
         Store, StoreTrait,
     };
@@ -107,7 +107,7 @@ pub mod TokenBoundComponent {
         fn token_of_address(self: @ComponentState<TContractState>,
             address: ContractAddress,
         ) -> (ContractAddress, u128) {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let token_bound_address: TokenBoundAddress = store.get_token_bound_address(address);
             (token_bound_address.contract_address, token_bound_address.token_id)
@@ -178,7 +178,7 @@ pub mod TokenBoundComponent {
             contract_address: ContractAddress,
             token_id: u128,
         ) -> ContractAddress {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             // validate address
             let recipient: ContractAddress = self.address_of_token(contract_address, token_id);

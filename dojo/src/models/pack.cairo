@@ -78,8 +78,8 @@ mod PACK_TYPES {
 // Traits
 //
 use pistols::systems::tokens::pack_token::pack_token::{Errors as PackErrors};
-use pistols::interfaces::systems::{
-    SystemsTrait,
+use pistols::interfaces::dns::{
+    DnsTrait,
     IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
 };
 use pistols::utils::short_string::{ShortStringTrait};

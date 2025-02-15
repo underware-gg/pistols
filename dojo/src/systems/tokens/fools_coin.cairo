@@ -71,7 +71,7 @@ pub mod fools_coin {
     // ERC-20 End
     //-----------------------------------
 
-    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::interfaces::dns::{DnsTrait};
     use pistols::utils::math::{MathU128, MathU256};
 
     mod Errors {

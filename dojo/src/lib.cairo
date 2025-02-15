@@ -1,5 +1,5 @@
 mod interfaces {
-    pub mod systems;
+    pub mod dns;
     pub mod ierc20;
     pub mod ierc721;
     pub mod vrf;
