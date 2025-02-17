@@ -32,7 +32,7 @@ pub impl PactImpl of PactTrait {
         let bb: u256 = address_b.into();
         (aa.low ^ bb.low)
     }
-    fn get_pact(ref store: Store, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128 {
+    fn get_pact(store: @Store, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128 {
         let pair: u128 = Self::make_pair(address_a, address_b);
         (store.get_pact(table_id, pair).duel_id)
     }

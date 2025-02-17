@@ -221,7 +221,7 @@ pub mod duel_token {
         //
         fn get_pact(self: @ContractState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
-            (PactTrait::get_pact(ref store, table_id, address_a, address_b))
+            (PactTrait::get_pact(@store, table_id, address_a, address_b))
         }
         fn has_pact(self: @ContractState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool {
             (self.get_pact(table_id, address_a, address_b) != 0)
@@ -229,7 +229,7 @@ pub mod duel_token {
         fn can_join(self: @ContractState, table_id: felt252, duelist_id: u128) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let table: TableConfig = store.get_table_config(table_id);
-            (table.can_join(ref store))
+            (table.can_join(@store))
         }
 
         //-----------------------------------
@@ -263,7 +263,7 @@ pub mod duel_token {
 
             // validate table
             let table: TableConfig = store.get_table_config(table_id);
-            table.assert_can_join(ref store);
+            table.assert_can_join(@store);
 
             // validate challenged
             let address_b: ContractAddress = challenged_address;
@@ -344,7 +344,7 @@ pub mod duel_token {
             
             // validate table
             let table: TableConfig = store.get_table_config(challenge.table_id);
-            table.assert_can_join(ref store);
+            table.assert_can_join(@store);
 
             if (challenge.timestamp_end != 0 && timestamp > challenge.timestamp_end) {
                 // Expired, close it!

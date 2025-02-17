@@ -138,7 +138,7 @@ pub mod duelist_token {
         player::{Activity, ActivityTrait},
         duelist::{
             Duelist, DuelistValue,
-            Scoreboard, ScoreTrait,
+            ScoreboardValue, ScoreTrait,
             Archetype,
         },
         challenge::{Challenge},
@@ -584,7 +584,7 @@ pub mod duelist_token {
             let mut world = self.world_default();
             let mut store: Store = StoreTrait::new(world);
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
-            let scoreboard: Scoreboard = store.get_scoreboard(token_id.low.into());
+            let scoreboard: ScoreboardValue = store.get_scoreboard_value(token_id.low.into());
             let mut result: Array<ByteArray> = array![];
             // Name
             result.append("Name");

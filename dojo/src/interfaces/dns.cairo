@@ -195,12 +195,12 @@ pub impl DnsImpl of DnsTrait {
     }
     // need access to store...
     #[inline(always)]
-    fn lords_dispatcher(ref self: Store) -> Erc20Dispatcher {
+    fn lords_dispatcher(self: @Store) -> Erc20Dispatcher {
         (Erc20Dispatcher{ contract_address: self.get_config_lords_address() })
         // (ierc20(self.get_config_lords_address()))
     }
     #[inline(always)]
-    fn vrf_dispatcher(ref self: Store) -> IVrfProviderDispatcher {
+    fn vrf_dispatcher(self: @Store) -> IVrfProviderDispatcher {
         (IVrfProviderDispatcher{ contract_address: self.get_config_vrf_address() })
     }
 

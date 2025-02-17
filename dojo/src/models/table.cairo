@@ -56,17 +56,17 @@ use pistols::models::season::{SeasonConfig, SeasonConfigTrait};
 
 #[generate_trait]
 pub impl TableConfigImpl of TableConfigTrait {
-    fn can_join(self: @TableConfig, ref store: Store) -> bool {
+    fn can_join(self: @TableConfig, store: @Store) -> bool {
         (
             (*self).rules.exists() &&
-            (*self).validate_season(ref store)
+            (*self).validate_season(store)
         )
     }
-    fn assert_can_join(self: @TableConfig, ref store: Store) {
+    fn assert_can_join(self: @TableConfig, store: @Store) {
         assert(self.rules.exists(), DuelErrors::INVALID_TABLE);
-        assert(self.validate_season(ref store), DuelErrors::INVALID_SEASON);
+        assert(self.validate_season(store), DuelErrors::INVALID_SEASON);
     }
-    fn validate_season(self: @TableConfig, ref store: Store) -> bool {
+    fn validate_season(self: @TableConfig, store: @Store) -> bool {
         (match self.rules {
             RulesType::Season => {
                 let season: SeasonConfig = store.get_season_config(*self.table_id);

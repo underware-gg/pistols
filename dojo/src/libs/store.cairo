@@ -64,130 +64,134 @@ pub impl StoreImpl of StoreTrait {
     //
 
     #[inline(always)]
-    fn get_player(ref self: Store, address: ContractAddress) -> Player {
+    fn get_player(self: @Store, address: ContractAddress) -> Player {
         (self.world.read_model(address))
     }
     #[inline(always)]
-    fn get_payer_value(ref self: Store, address: ContractAddress) -> PlayerValue {
+    fn get_payer_value(self: @Store, address: ContractAddress) -> PlayerValue {
         (self.world.read_value(address))
     }
 
     #[inline(always)]
-    fn get_pack(ref self: Store, pack_id: u128) -> Pack {
+    fn get_pack(self: @Store, pack_id: u128) -> Pack {
         (self.world.read_model(pack_id))
     }
     #[inline(always)]
-    fn get_pack_value(ref self: Store, pack_id: u128) -> PackValue {
+    fn get_pack_value(self: @Store, pack_id: u128) -> PackValue {
         (self.world.read_value(pack_id))
     }
 
     #[inline(always)]
-    fn get_challenge(ref self: Store, duel_id: u128) -> Challenge {
+    fn get_challenge(self: @Store, duel_id: u128) -> Challenge {
         (self.world.read_model(duel_id))
     }
     #[inline(always)]
-    fn get_challenge_value(ref self: Store, duel_id: u128) -> ChallengeValue {
+    fn get_challenge_value(self: @Store, duel_id: u128) -> ChallengeValue {
         (self.world.read_value(duel_id))
     }
 
     #[inline(always)]
-    fn get_round(ref self: Store, duel_id: u128) -> Round {
+    fn get_round(self: @Store, duel_id: u128) -> Round {
         (self.world.read_model(duel_id))
     }
     #[inline(always)]
-    fn get_round_value(ref self: Store, duel_id: u128) -> RoundValue {
+    fn get_round_value(self: @Store, duel_id: u128) -> RoundValue {
         (self.world.read_value(duel_id))
     }
 
+    // #[inline(always)]
+    // fn get_duelist(self: @Store, duelist_id: u128) -> Duelist {
+    //     (self.world.read_model(duelist_id))
+    // }
     #[inline(always)]
-    fn get_duelist(ref self: Store, duelist_id: u128) -> Duelist {
-        (self.world.read_model(duelist_id))
-    }
-    #[inline(always)]
-    fn get_duelist_value(ref self: Store, duelist_id: u128) -> DuelistValue {
+    fn get_duelist_value(self: @Store, duelist_id: u128) -> DuelistValue {
         (self.world.read_value(duelist_id))
     }
 
     #[inline(always)]
-    fn get_duelist_challenge(ref self: Store, duelist_id: u128) -> DuelistChallenge {
+    fn get_duelist_challenge(self: @Store, duelist_id: u128) -> DuelistChallenge {
         (self.world.read_model(duelist_id))
     }
     #[inline(always)]
-    fn get_duelist_challenge_value(ref self: Store, duelist_id: u128) -> DuelistChallengeValue {
+    fn get_duelist_challenge_value(self: @Store, duelist_id: u128) -> DuelistChallengeValue {
         (self.world.read_value(duelist_id))
     }
 
     #[inline(always)]
-    fn get_pact(ref self: Store, table_id: felt252, pair: u128) -> Pact {
+    fn get_pact(self: @Store, table_id: felt252, pair: u128) -> Pact {
         (self.world.read_model((table_id, pair),))
     }
 
     #[inline(always)]
-    fn get_scoreboard(ref self: Store, holder: felt252) -> Scoreboard {
+    fn get_scoreboard(self: @Store, holder: felt252) -> Scoreboard {
         (self.world.read_model(holder))
+    }
+    #[inline(always)]
+    fn get_scoreboard_value(self: @Store, holder: felt252) -> ScoreboardValue {
+        (self.world.read_value(holder))
     }
 
     #[inline(always)]
-    fn get_scoreboard_table(ref self: Store, holder: felt252, table_id: felt252) -> ScoreboardTable {
+    fn get_scoreboard_table(self: @Store, holder: felt252, table_id: felt252) -> ScoreboardTable {
         (self.world.read_model((holder, table_id),))
     }
 
     #[inline(always)]
-    fn get_table_config(ref self: Store, table_id: felt252) -> TableConfig {
+    fn get_table_config(self: @Store, table_id: felt252) -> TableConfig {
         (self.world.read_model(table_id))
     }
     #[inline(always)]
-    fn get_table_config_value(ref self: Store, table_id: felt252) -> TableConfigValue {
+    fn get_table_config_value(self: @Store, table_id: felt252) -> TableConfigValue {
         (self.world.read_value(table_id))
     }
 
     #[inline(always)]
-    fn get_season_config(ref self: Store, table_id: felt252) -> SeasonConfig {
+    fn get_season_config(self: @Store, table_id: felt252) -> SeasonConfig {
         (self.world.read_model(table_id))
     }
     #[inline(always)]
-    fn get_season_config_value(ref self: Store, table_id: felt252) -> SeasonConfigValue {
+    fn get_season_config_value(self: @Store, table_id: felt252) -> SeasonConfigValue {
         (self.world.read_value(table_id))
     }
     #[inline(always)]
-    fn get_current_season(ref self: Store) -> SeasonConfig {
+    fn get_current_season(self: @Store) -> SeasonConfig {
         (self.world.read_model(self.get_config_season_table_id()))
     }
     #[inline(always)]
-    fn get_current_season_value(ref self: Store) -> SeasonConfigValue {
+    fn get_current_season_value(self: @Store) -> SeasonConfigValue {
         (self.world.read_value(self.get_config_season_table_id()))
     }
 
     #[inline(always)]
-    fn get_coin_config(ref self: Store, contract_address: ContractAddress) -> CoinConfig {
+    fn get_coin_config(self: @Store, contract_address: ContractAddress) -> CoinConfig {
         (self.world.read_model(contract_address))
     }
     #[inline(always)]
-    fn get_coin_config_value(ref self: Store, contract_address: ContractAddress) -> CoinConfigValue {
+    fn get_coin_config_value(self: @Store, contract_address: ContractAddress) -> CoinConfigValue {
         (self.world.read_value(contract_address))
     }
 
     #[inline(always)]
-    fn get_token_config(ref self: Store, contract_address: ContractAddress) -> TokenConfig {
+    fn get_token_config(self: @Store, contract_address: ContractAddress) -> TokenConfig {
         (self.world.read_model(contract_address))
     }
     #[inline(always)]
-    fn get_token_config_value(ref self: Store, contract_address: ContractAddress) -> TokenConfigValue {
+    fn get_token_config_value(self: @Store, contract_address: ContractAddress) -> TokenConfigValue {
         (self.world.read_value(contract_address))
     }
 
     #[inline(always)]
-    fn get_config(ref self: Store) -> Config {
+    fn get_config(self: @Store) -> Config {
         (self.world.read_model(CONFIG::CONFIG_KEY))
     }
 
     #[inline(always)]
-    fn get_pool(ref self: Store, pool_id: PoolType) -> Pool {
+    fn get_pool(self: @Store, pool_id: PoolType) -> Pool {
         (self.world.read_model(pool_id))
     }
 
     #[inline(always)]
-    fn get_token_bound_address(ref self: Store, recipient: ContractAddress) -> TokenBoundAddress {
+    fn get_token_bound_address(self: @Store, recipient: ContractAddress) -> TokenBoundAddress {
         (self.world.read_model(recipient))
     }
 
@@ -286,28 +290,28 @@ pub impl StoreImpl of StoreTrait {
     //
 
     #[inline(always)]
-    fn get_config_season_table_id(ref self: Store) -> felt252 {
+    fn get_config_season_table_id(self: @Store) -> felt252 {
         (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("season_table_id")))
     }
     #[inline(always)]
-    fn get_config_lords_address(ref self: Store) -> ContractAddress {
+    fn get_config_lords_address(self: @Store) -> ContractAddress {
         (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("lords_address")))
     }
     #[inline(always)]
-    fn get_config_vrf_address(ref self: Store) -> ContractAddress {
+    fn get_config_vrf_address(self: @Store) -> ContractAddress {
         (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("vrf_address")))
     }
     #[inline(always)]
-    fn get_config_treasury_address(ref self: Store) -> ContractAddress {
+    fn get_config_treasury_address(self: @Store) -> ContractAddress {
         (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address")))
     }
 
     #[inline(always)]
-    fn get_current_season_rules(ref self: Store) -> RulesType {
+    fn get_current_season_rules(self: @Store) -> RulesType {
         (self.get_table_rules(self.get_config_season_table_id()))
     }
     #[inline(always)]
-    fn get_table_rules(ref self: Store, table_id: felt252) -> RulesType {
+    fn get_table_rules(self: @Store, table_id: felt252) -> RulesType {
         (self.world.read_member(Model::<TableConfig>::ptr_from_keys(table_id), selector!("rules")))
     }
 
