@@ -23,7 +23,8 @@ pub enum SeasonPhase {
 // Season Manager
 //
 use pistols::systems::game::game::{Errors as ErrorsGame};
-use pistols::models::table::{TableConfig, TableType};
+use pistols::models::table::{TableConfig};
+use pistols::types::rules::{RulesType};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::utils::timestamp::{TIMESTAMP};
@@ -51,7 +52,7 @@ pub impl SeasonManagerImpl of SeasonManagerTrait {
         store.set_table_config(@TableConfig {
             table_id,
             description: 'Season '.concat(season_id.to_short_string()),
-            table_type: TableType::Season,
+            rules: RulesType::Season,
         });
         (table_id)
     }
@@ -76,9 +77,8 @@ pub impl SeasonManagerImpl of SeasonManagerTrait {
 pub impl SeasonConfigImpl of SeasonConfigTrait {
     fn collect(ref self: SeasonConfig, ref store: Store) -> felt252 {
         // must sync with Self::collect()
-        assert(self.phase != SeasonPhase::Ended, ErrorsGame::SEASON_ENDED);
+        assert(self.phase == SeasonPhase::InProgress, ErrorsGame::SEASON_IS_NOT_ACTIVE);
         assert(self.seconds_to_collect() == 0, ErrorsGame::SEASON_IS_ACTIVE);
-        assert(self.is_endgame(), ErrorsGame::SEASON_NOT_ENDGAME);
         // collect!
         self.phase = SeasonPhase::Ended;
         self.timestamp_end = starknet::get_block_timestamp();
@@ -87,9 +87,6 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
         let table_id: felt252 = SeasonManagerTrait::create_next_season(ref store, self.season_id);
         (table_id)
     }
-    //-----------------
-    // info
-    //
     #[inline(always)]
     fn is_active(self: SeasonConfig) -> bool {
         (self.phase == SeasonPhase::InProgress)
@@ -99,15 +96,10 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
         (MathU64::sub(self.timestamp_end, starknet::get_block_timestamp()))
     }
     #[inline(always)]
-    fn is_endgame(self: SeasonConfig) -> bool {
-        (true)
-    }
-    #[inline(always)]
     fn can_collect(self: SeasonConfig) -> bool {
         (
             self.phase != SeasonPhase::Ended &&
-            self.seconds_to_collect() == 0 &&
-            self.is_endgame()
+            self.seconds_to_collect() == 0
         )
     }
 }

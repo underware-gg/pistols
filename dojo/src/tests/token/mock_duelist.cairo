@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::models::challenge::{Challenge};
-use pistols::models::table::{FeeValues};
+use pistols::types::rules::{FeeValues};
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -35,7 +35,7 @@ pub mod duelist_token {
 
     use super::{MockDuelistOwners};
     use pistols::models::challenge::{Challenge};
-    use pistols::models::table::{FeeValues};
+    use pistols::types::rules::{FeeValues};
     use pistols::utils::misc::{ZERO};
     use pistols::tests::tester::tester::{
         OWNER, OWNED_BY_OWNER,

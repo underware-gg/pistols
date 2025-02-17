@@ -79,9 +79,6 @@ pub mod game {
         pact::{
             PactTrait,
         },
-        table::{
-            FeeValues,
-        },
         season::{
             SeasonConfig, SeasonConfigTrait,
         },
@@ -92,6 +89,7 @@ pub mod game {
         round_state::{RoundState},
         typed_data::{CommitMoveMessage, CommitMoveMessageTrait},
         cards::deck::{DeckTrait},
+        rules::{FeeValues},
     };
     use pistols::types::trophies::{Trophy, TrophyTrait, TROPHY};
     use pistols::libs::store::{Store, StoreTrait};
@@ -111,7 +109,7 @@ pub mod game {
         pub const INVALID_MOVES_COUNT: felt252       = 'PISTOLS: Invalid moves count';
         pub const MOVES_HASH_MISMATCH: felt252       = 'PISTOLS: Moves hash mismatch';
         pub const IMPOSSIBLE_ERROR: felt252          = 'PISTOLS: Impossible error';
-        pub const SEASON_ENDED: felt252              = 'PISTOLS: Season ended';
+        pub const SEASON_IS_NOT_ACTIVE: felt252      = 'PISTOLS: Season is not active';
         pub const SEASON_IS_ACTIVE: felt252          = 'PISTOLS: Season is active';
         pub const SEASON_NOT_ENDGAME: felt252        = 'PISTOLS: Not endgame';
         pub const BAD_SHUFFLE_SEED: felt252          = 'PISTOLS: Bad shuffle seed';

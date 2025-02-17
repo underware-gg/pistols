@@ -6,7 +6,7 @@ mod tests {
 
     use pistols::systems::admin::{IAdminDispatcherTrait};
     use pistols::models::config::{Config};
-    use pistols::models::table::{TableConfig, TableType, TABLES};
+    use pistols::models::table::{TableConfig, TABLES, RulesTypeTrait};
     use pistols::tests::tester::{tester, tester::{TestSystems, FLAGS, ZERO, OWNER, OTHER, BUMMER, TREASURY}};
 
     const INVALID_TABLE: felt252 = 'TheBookIsOnTheTable';
@@ -125,9 +125,9 @@ mod tests {
     fn test_initialize_table_defaults() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::LORDS);
         let table: TableConfig = tester::get_Table(sys.world, TABLES::TUTORIAL);
-        assert_eq!(table.table_type, TableType::Tutorial, "TUTORIAL_table_type");
+        assert!(table.rules.exists(), "TUTORIAL_exists");
         let table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
-        assert_eq!(table.table_type, TableType::Practice, "PRACTICE_table_type");
+        assert!(table.rules.exists(), "PRACTICE_exists");
     }
 
     #[test]

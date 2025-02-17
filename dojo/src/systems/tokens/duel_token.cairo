@@ -144,12 +144,13 @@ pub mod duel_token {
         challenge::{Challenge, ChallengeTrait, ChallengeValue, Round},
         duelist::{DuelistTrait, DuelistValue, ProfileTypeTrait},
         pact::{PactTrait},
-        table::{TableConfig, TableTypeTrait},
-        season::{SeasonConfig, SeasonConfigTrait},
+        table::{TableConfig, TableConfigTrait},
     };
-    use pistols::types::premise::{Premise, PremiseTrait};
-    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::round_state::{RoundState};
+    use pistols::types::{
+        challenge_state::{ChallengeState, ChallengeStateTrait},
+        round_state::{RoundState},
+        premise::{Premise, PremiseTrait},
+    };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::{ShortStringTrait};
@@ -228,12 +229,7 @@ pub mod duel_token {
         fn can_join(self: @ContractState, table_id: felt252, duelist_id: u128) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let table: TableConfig = store.get_table_config(table_id);
-            if (table.table_type.is_season()) {
-                let season: SeasonConfig = store.get_season_config(table_id);
-                (season.is_active())
-            } else {
-                (table.table_type.exists() && table.table_type.can_join(starknet::get_caller_address(), duelist_id))
-            }
+            (table.can_join(ref store))
         }
 
         //-----------------------------------
@@ -265,31 +261,24 @@ pub mod duel_token {
             assert(lives > 0, Errors::DUELIST_IS_DEAD);
             assert(lives >= lives_staked, Errors::INSUFFICIENT_LIVES);
 
-            // assert duelist is not in a challenge
-            store.enter_challenge(duelist_id_a, duel_id);
-            store.emit_required_action(duelist_id_a, duel_id);
-
             // validate table
             let table: TableConfig = store.get_table_config(table_id);
-            if (table.table_type.is_season()) {
-                let season: SeasonConfig = store.get_season_config(table_id);
-                assert(season.is_active(), Errors::INVALID_SEASON);
-            } else {
-                assert(table.table_type.exists(), Errors::INVALID_TABLE);
-            }
-            assert(table.table_type.can_join(address_a, duelist_id_a), Errors::CHALLENGER_NOT_ADMITTED);
+            table.assert_can_join(ref store);
 
             // validate challenged
             let address_b: ContractAddress = challenged_address;
             assert(address_b.is_non_zero(), Errors::INVALID_CHALLENGED_NULL);
             assert(address_b != address_a, Errors::INVALID_CHALLENGED_SELF);
-            assert(table.table_type.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
 
             // TODO...
             // if (tournament) {
             //     assert(tournament.can_join(address_a, 0), Errors::CHALLENGED_NOT_ADMITTED);
             //     assert(tournament.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
             // }
+
+            // assert duelist is not in a challenge
+            store.enter_challenge(duelist_id_a, duel_id);
+            store.emit_required_action(duelist_id_a, duel_id);
 
             // calc expiration
             let timestamp_start: u64 = starknet::get_block_timestamp();
@@ -355,7 +344,7 @@ pub mod duel_token {
             
             // validate table
             let table: TableConfig = store.get_table_config(challenge.table_id);
-            assert(table.table_type.can_join(address_b, duelist_id_b), Errors::CHALLENGED_NOT_ADMITTED);
+            table.assert_can_join(ref store);
 
             if (challenge.timestamp_end != 0 && timestamp > challenge.timestamp_end) {
                 // Expired, close it!

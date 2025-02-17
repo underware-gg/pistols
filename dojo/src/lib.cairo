@@ -58,6 +58,7 @@ mod types {
     pub mod premise;
     pub mod profile_type;
     pub mod round_state;
+    pub mod rules;
     pub mod shuffler;
     pub mod typed_data;
     pub mod trophies;

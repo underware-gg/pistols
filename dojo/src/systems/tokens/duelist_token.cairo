@@ -1,7 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 use pistols::models::challenge::{Challenge};
-use pistols::models::table::{FeeValues};
+use pistols::types::rules::{FeeValues};
 
 #[starknet::interface]
 pub trait IDuelistToken<TState> {
@@ -142,15 +142,14 @@ pub mod duelist_token {
             Archetype,
         },
         challenge::{Challenge},
-        table::{
-            TableConfig,
-            TableType, TableTypeTrait,
-            FeeDistribution, FeeDistributionTrait,
-            FeeValues,
-        },
     };
     use pistols::types::{
         profile_type::{ProfileTypeTrait, ProfileManagerTrait},
+        rules::{
+            RulesType, RulesTypeTrait,
+            FeeDistribution, FeeDistributionTrait,
+            FeeValues,
+        },
         constants::{CONST, FAME},
     };
     use pistols::libs::store::{Store, StoreTrait};
@@ -249,10 +248,10 @@ pub mod duelist_token {
             lives_staked: u8,
         ) -> FeeValues {
             let mut store: Store = StoreTrait::new(self.world_default());
-            let table: TableConfig = store.get_current_season_table();
+            let rules: RulesType = store.get_current_season_rules();
             let fame_balance: u128 = store.world.fame_coin_dispatcher().balance_of_token(starknet::get_contract_address(), duelist_id).low;
-            let fees_loss: FeeValues = table.table_type.calc_fame_fees(fame_balance, lives_staked, false);
-            let fees_win: FeeValues = table.table_type.calc_fame_fees(fame_balance, lives_staked, true);
+            let fees_loss: FeeValues = rules.calc_fame_fees(fame_balance, lives_staked, false);
+            let fees_win: FeeValues = rules.calc_fame_fees(fame_balance, lives_staked, true);
             (FeeValues{
                 // if you win...
                 fame_gained: fees_win.fame_gained,
@@ -353,8 +352,8 @@ pub mod duelist_token {
             assert(store.world.is_game_contract(starknet::get_caller_address()), Errors::DUEL_INVALID_CALLER);
 
             // get fees distribution
-            let table_type: TableType = store.get_table_config(challenge.table_id).table_type;
-            let distribution: @FeeDistribution = table_type.get_rewards_distribution(challenge.table_id, tournament_id);
+            let rules: RulesType = store.get_table_rules(challenge.table_id);
+            let distribution: @FeeDistribution = rules.get_rewards_distribution(challenge.table_id, tournament_id);
             if (!distribution.is_payable()) {
                 return (Default::default(), Default::default());
             }
@@ -368,8 +367,8 @@ pub mod duelist_token {
             let balance_b: u128 = self.fame_balance(fame_dispatcher, challenge.duelist_id_b);
 
             // calculate fees
-            let mut values_a: FeeValues = table_type.calc_fame_fees(balance_a, challenge.lives_staked, challenge.winner == 1);
-            let mut values_b: FeeValues = table_type.calc_fame_fees(balance_b, challenge.lives_staked, challenge.winner == 2);
+            let mut values_a: FeeValues = rules.calc_fame_fees(balance_a, challenge.lives_staked, challenge.winner == 1);
+            let mut values_b: FeeValues = rules.calc_fame_fees(balance_b, challenge.lives_staked, challenge.winner == 2);
 
             // transfer gains
             let treasury_address: ContractAddress = store.get_config_treasury_address();

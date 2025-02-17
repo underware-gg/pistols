@@ -2,10 +2,8 @@ use pistols::systems::game::game::{Errors as GameErrors};
 use pistols::systems::rng::{RngWrap, Dice, DiceTrait, Shuffle, ShuffleTrait};
 use pistols::models::{
     challenge::{Round, RoundTrait, DuelistState, DuelistStateTrait, MovesTrait},
-    // duelist::{Duelist},
 };
 use pistols::types::{
-    // challenge_state::{ChallengeState},
     round_state::{RoundState},
     duel_progress::{
         DuelProgress, DuelStep,
@@ -58,7 +56,6 @@ pub fn make_moves_hash(salt: felt252, moves: Span<u8>) -> u128 {
 
 // testable loop
 pub fn game_loop(wrapped: @RngWrap, deck: @Deck, ref round: Round) -> DuelProgress {
-    // let _table_type: TableType = store.get_table_config_value(challenge.table_id).table_type;
 
     let env_deck: Span<EnvCard> = EnvCardTrait::get_full_deck();
 

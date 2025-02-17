@@ -2,7 +2,7 @@
 mod tests {
     use pistols::models::{
         season::{SeasonConfig, SeasonConfigTrait, SeasonPhase},
-        table::{TableConfig, TableType, TABLES},
+        table::{TableConfig, RulesType},
         config::{Config},
     };
     use pistols::tests::tester::{tester,
@@ -32,13 +32,8 @@ mod tests {
         assert_eq!(season.phase, SeasonPhase::InProgress, "phase");
         //  table was created
         let table: TableConfig = tester::get_Table(sys.world, season.table_id);
-        assert_eq!(table.table_type, TableType::Season, "table_type");
+        assert_eq!(table.rules, RulesType::Season, "table_type");
         assert_eq!(table.table_id, season.table_id, "table_id");
-        // other tables
-        let table: TableConfig = tester::get_Table(sys.world, TABLES::TUTORIAL);
-        assert_eq!(table.table_type, TableType::Tutorial, "table_type");
-        let table: TableConfig = tester::get_Table(sys.world, TABLES::PRACTICE);
-        assert_eq!(table.table_type, TableType::Practice, "table_type");
     }
 
     #[test]
@@ -69,7 +64,7 @@ mod tests {
         assert!(!sys.game.can_collect(), "!sys.game.can_collect_NEW");
         // get new table
         let new_table: TableConfig = tester::get_Table(sys.world, new_table_id);
-        assert_eq!(new_table.table_type, TableType::Season, "table_type");
+        assert_eq!(new_table.rules, RulesType::Season, "table_type");
         assert_eq!(new_table.table_id, new_season.table_id, "table_id");
     }
 
@@ -102,7 +97,7 @@ mod tests {
     }
 
     // #[test]
-    // #[should_panic(expected:('PISTOLS: Season ended', 'ENTRYPOINT_FAILED'))]
+    // #[should_panic(expected:('PISTOLS: Season is not active', 'ENTRYPOINT_FAILED'))]
     // fn test_collect_season_ended() {
     //     let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
     //     let season: SeasonConfig = tester::get_current_Season(sys.world);

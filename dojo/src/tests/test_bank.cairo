@@ -4,9 +4,9 @@ mod tests {
 
     use pistols::models::{
         pool::{Pool, PoolType},
-        table::{FeeValues},
         pack::{Pack, PackType, PackTypeTrait},
     };
+    use pistols::types::rules::{FeeValues};
     use pistols::utils::math::{MathU8};
 
     use pistols::tests::tester::{tester,

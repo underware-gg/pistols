@@ -53,7 +53,7 @@ use pistols::models::{
     },
     table::{
         m_TableConfig, TableConfig,
-        TABLES, TableType,
+        TABLES, RulesType,
     },
 };
 use pistols::tests::token::mock_duelist::{
@@ -202,7 +202,7 @@ fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher)
     tester::set_TableConfig(ref world, TableConfig {
         table_id: TABLES::TUTORIAL,
         description: 'The Training Grounds',
-        table_type: TableType::Tutorial,
+        rules: RulesType::Academia,
     });
 
     tester::set_Config(ref world, Config {

@@ -35,6 +35,7 @@ pub use pistols::models::{
     },
     table::{
         TableConfig, TableConfigValue,
+        RulesType,
     },
     season::{
         SeasonConfig, SeasonConfigValue,
@@ -153,8 +154,8 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_model(self.get_config_season_table_id()))
     }
     #[inline(always)]
-    fn get_current_season_table(ref self: Store) -> TableConfig {
-        (self.world.read_model(self.get_config_season_table_id()))
+    fn get_current_season_value(ref self: Store) -> SeasonConfigValue {
+        (self.world.read_value(self.get_config_season_table_id()))
     }
 
     #[inline(always)]
@@ -299,6 +300,15 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_config_treasury_address(ref self: Store) -> ContractAddress {
         (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("treasury_address")))
+    }
+
+    #[inline(always)]
+    fn get_current_season_rules(ref self: Store) -> RulesType {
+        (self.get_table_rules(self.get_config_season_table_id()))
+    }
+    #[inline(always)]
+    fn get_table_rules(ref self: Store, table_id: felt252) -> RulesType {
+        (self.world.read_member(Model::<TableConfig>::ptr_from_keys(table_id), selector!("rules")))
     }
 
     // setters
