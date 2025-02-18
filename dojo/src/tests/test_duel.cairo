@@ -4,6 +4,7 @@ mod tests {
 
     use pistols::models::{
         challenge::{ChallengeTrait, ChallengeValue, RoundValue},
+        leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
     };
     use pistols::types::{
         cards::hand::{PacesCard, FinalBlow, DeckType},
@@ -157,6 +158,14 @@ mod tests {
         assert_eq!(score_a.score.honour, scoreboard_a.score.honour, "scoreboard_a.score.honour");
         assert_eq!(score_b.score.honour, scoreboard_b.score.honour, "scoreboard_b.score.honour");
 
+        let leaderboard: Leaderboard = tester::get_Leaderboard(sys.world, table_id);
+        let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
+        assert_eq!(positions.len(), 2, "leaderboard_positions.len");
+        assert_eq!(*positions[0].duelist_id, ID(OWNER()).into(), "draw_leaderboards[0].pos");
+        assert_eq!(*positions[1].duelist_id, ID(OTHER()).into(), "draw_leaderboards[1].pos");
+        assert_gt!(*positions[0].score, 0, "draw_leaderboards[0].score");
+        assert_gt!(*positions[1].score, 0, "draw_leaderboards[1].score");
+
         // duel nft still owned by contract
         assert_eq!(sys.duels.owner_of(duel_id.into()), sys.game.contract_address, "duels.owner_of_END");
 
@@ -275,8 +284,13 @@ mod tests {
         assert_eq!(score_a.score.honour, round.state_a.honour, "score_a.score.honour");
         assert_eq!(score_b.score.honour, round.state_b.honour, "score_b.score.honour");
 
-        assert_eq!(challenge.winner, winner, "winner");
+        let leaderboard: Leaderboard = tester::get_Leaderboard(sys.world, table_id);
+        let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
+        assert_eq!(positions.len(), 2, "leaderboard_positions.len");
+        assert_gt!(*positions[0].score, 0, "b_win_leaderboards[0].score");
+        assert_gt!(*positions[1].score, 0, "b_win_leaderboards[1].score");
 
+        assert_eq!(challenge.winner, winner, "winner");
         if (winner == 1) {
             assert_eq!(score_a.score.total_wins, 1, "a_win_duelist_a.total_wins");
             assert_eq!(score_b.score.total_wins, 0, "a_win_duelist_b.total_wins");
@@ -285,6 +299,8 @@ mod tests {
             assert_eq!(round.state_a.damage, CONST::FULL_HEALTH, "a_win_damage_a");
             assert_eq!(round.state_a.health, CONST::FULL_HEALTH, "a_win_health_a");
             assert_eq!(round.state_b.health, 0, "a_win_health_b");
+            assert_eq!(*positions[0].duelist_id, ID(OWNER()).into(), "a_win_leaderboards[0].pos");
+            assert_eq!(*positions[1].duelist_id, ID(OTHER()).into(), "a_win_leaderboards[1].pos");
             _assert_is_alive(round.state_a, "alive_a");
             _assert_is_dead(round.state_b, "dead_b");
             assert_eq!(sys.duels.owner_of(duel_id.into()), challenge.address_a, "duels.owner_of_END_1");
@@ -296,6 +312,8 @@ mod tests {
             assert_eq!(round.state_b.damage, CONST::FULL_HEALTH, "b_win_damage_b");
             assert_eq!(round.state_b.health, CONST::FULL_HEALTH, "b_win_health_b");
             assert_eq!(round.state_a.health, 0, "b_win_health_a");
+            assert_eq!(*positions[0].duelist_id, ID(OTHER()).into(), "b_win_leaderboards[0].pos");
+            assert_eq!(*positions[1].duelist_id, ID(OWNER()).into(), "b_win_leaderboards[1].pos");
             _assert_is_alive(round.state_b, "alive_b");
             _assert_is_dead(round.state_a, "dead_a");
             assert_eq!(sys.duels.owner_of(duel_id.into()), challenge.address_b, "duels.owner_of_END_1");
@@ -326,6 +344,9 @@ mod tests {
         assert_ne!(challenge.winner, 0, "challenge.winner ++");
         assert_gt!(challenge.timestamp_end, 0, "challenge.timestamp_end ++");
         assert_eq!(round.state, RoundState::Finished, "state ++");
+        assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "score_a.score.honour ++");
+        assert_eq!(round.state_b.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "score_b.score.honour ++");
+
         let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into(), table_id);
         let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into(), table_id);
         assert_eq!(score_a.score.total_duels, 2, "score_a.score.total_duels ++");
@@ -333,19 +354,24 @@ mod tests {
         assert_eq!(score_a.score.total_draws, 0, "score_a.score.total_draws ++");
         assert_eq!(score_b.score.total_draws, 0, "score_b.score.total_draws ++");
 
-        assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "score_a.score.honour ++");
-        assert_eq!(round.state_b.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "score_b.score.honour ++");
+        let leaderboard: Leaderboard = tester::get_Leaderboard(sys.world, table_id);
+        let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
+        assert_eq!(positions.len(), 2, "leaderboard_positions.len() ++");
 
         if (winner == 1) {
             assert_eq!(score_a.score.total_wins, 2, "a_win_duelist_a.total_wins ++");
             assert_eq!(score_b.score.total_wins, 0, "a_win_duelist_b.total_wins ++");
             assert_eq!(score_a.score.total_losses, 0, "a_win_duelist_a.total_losses ++");
             assert_eq!(score_b.score.total_losses, 2, "a_win_duelist_b.total_losses ++");
+            assert_eq!(*positions[0].duelist_id, ID(OWNER()).into(), "a_win_leaderboards[0].pos ++");
+            assert_eq!(*positions[1].duelist_id, ID(OTHER()).into(), "a_win_leaderboards[1].pos ++");
         } else if (winner == 2) {
             assert_eq!(score_a.score.total_wins, 0, "b_win_duelist_a.total_wins ++");
             assert_eq!(score_b.score.total_wins, 2, "b_win_duelist_b.total_wins ++");
             assert_eq!(score_a.score.total_losses, 2, "b_win_duelist_a.total_losses ++");
             assert_eq!(score_b.score.total_losses, 0, "b_win_duelist_b.total_losses ++");
+            assert_eq!(*positions[0].duelist_id, ID(OTHER()).into(), "b_win_leaderboards[0].pos ++");
+            assert_eq!(*positions[1].duelist_id, ID(OWNER()).into(), "b_win_leaderboards[1].pos ++");
         } else {
             assert!(false, "bad winner")
         }

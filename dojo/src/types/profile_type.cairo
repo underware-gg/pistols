@@ -261,7 +261,7 @@ mod PROFILES {
     pub const CHARACTER_PROFILE_COUNT: u8 = 4;
     pub const BOT_PROFILE_COUNT: u8 = 3;
 
-    // profile base duelist ids
+    // profile base duelist ids (> u32)
     pub const DUELIST_ID_BASE: u128    = 0x100000000;
     pub const CHARACTER_ID_BASE: u128  = 0x200000000;
     pub const BOT_ID_BASE: u128        = 0x300000000;

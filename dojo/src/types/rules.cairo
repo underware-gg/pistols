@@ -25,7 +25,8 @@ pub struct RewardValues {
     pub fame_gained: u128,
     pub fools_gained: u128,
     pub points_scored: u16,
-    // calculated at the bank
+    pub position: u8,        // position on the leaderboard
+    // after burning fame...
     pub fame_burned: u128,
     pub lords_unlocked: u128,
     pub survived: bool,
@@ -79,9 +80,10 @@ pub impl RulesTypeImpl of RulesTypeTrait {
                     result.fame_gained *= lives_staked.into();
                     result.fools_gained *= lives_staked.into();
                     // calc score
-                    result.points_scored = 555;
+                    result.points_scored = 100;
                 } else {
                     result.fame_lost = one_life * lives_staked.into();
+                    result.points_scored = 10;
                 }
                 (result)
             },

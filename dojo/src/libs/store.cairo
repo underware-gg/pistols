@@ -29,6 +29,9 @@ pub use pistols::models::{
         DuelistChallenge, DuelistChallengeValue,
         Scoreboard, ScoreboardValue,
     },
+    leaderboard::{
+        Leaderboard, LeaderboardValue,
+    },
     pact::{
         Pact, PactValue,
     },
@@ -129,6 +132,15 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_scoreboard(self: @Store, holder: felt252, table_id: felt252) -> Scoreboard {
         (self.world.read_model((holder, table_id),))
+    }
+
+    #[inline(always)]
+    fn get_leaderboard_value(self: @Store, table_id: felt252) -> LeaderboardValue {
+        (self.world.read_value(table_id))
+    }
+    #[inline(always)]
+    fn get_leaderboard(self: @Store, table_id: felt252) -> Leaderboard {
+        (self.world.read_model(table_id))
     }
 
     #[inline(always)]
@@ -235,6 +247,11 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_scoreboard(ref self: Store, model: @Scoreboard) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_leaderboard(ref self: Store, model: @Leaderboard) {
         self.world.write_model(model);
     }
 

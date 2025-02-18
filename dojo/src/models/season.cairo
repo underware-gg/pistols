@@ -23,6 +23,7 @@ pub enum SeasonPhase {
 // Season Manager
 //
 use pistols::systems::game::game::{Errors as ErrorsGame};
+use pistols::models::leaderboard::{LeaderboardTrait};
 use pistols::models::table::{TableConfig};
 use pistols::types::rules::{RulesType};
 use pistols::libs::store::{Store, StoreTrait};
@@ -32,6 +33,8 @@ use pistols::utils::math::{MathU64};
 
 #[generate_trait]
 pub impl SeasonManagerImpl of SeasonManagerTrait {
+    const LEADERBOARD_POSITIONS: u8 = 10;
+
     #[inline(always)]
     fn initialize(ref store: Store) -> felt252 {
         (Self::create_next_season(ref store, 0))
@@ -54,6 +57,9 @@ pub impl SeasonManagerImpl of SeasonManagerTrait {
             description: 'Season '.concat(season_id.to_short_string()),
             rules: RulesType::Season,
         });
+        store.set_leaderboard(
+            @LeaderboardTrait::new(table_id, Self::LEADERBOARD_POSITIONS)
+        );
         (table_id)
     }
     //-----------------

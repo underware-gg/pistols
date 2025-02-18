@@ -22,6 +22,7 @@ pub trait BitwiseTrait<T> {
     fn max() -> T;
     fn msb() -> T;
     fn bit(n: usize) -> T;
+    fn bit_fill(n: usize) -> T;
     fn set(x: T, n: usize) -> T;
     fn unset(x: T, n: usize) -> T;
     fn shl(x: T, n: usize) -> T;
@@ -50,6 +51,12 @@ pub impl BitwiseU8 of BitwiseTrait<u8> {
         else if (n == 6) { (0b01000000) }
         else if (n == 7) { (0b10000000) }
         else { (0) }
+    }
+    #[inline(always)]
+    fn bit_fill(n: usize) -> u8 {
+        if (n == 0) { (0) }
+        else if (n >= Self::bit_count()) { (Self::max()) }
+        else { (Self::shr(Self::max(), Self::bit_count() - n)) }
     }
     #[inline(always)]
     fn set(x: u8, n: usize) -> u8 {
@@ -97,6 +104,12 @@ pub impl BitwiseU16 of BitwiseTrait<u16> {
         if n < 8 { (BitwiseU8::bit(n).into()) }
         else if n < 16 { (BitwiseU8::bit(n-8).into() * 0x100) }
         else { (0) }
+    }
+    #[inline(always)]
+    fn bit_fill(n: usize) -> u16 {
+        if (n == 0) { (0) }
+        else if (n >= Self::bit_count()) { (Self::max()) }
+        else { (Self::shr(Self::max(), Self::bit_count() - n)) }
     }
     #[inline(always)]
     fn set(x: u16, n: usize) -> u16 {
@@ -154,6 +167,12 @@ pub impl BitwiseU32 of BitwiseTrait<u32> {
         else { (0) }
     }
     #[inline(always)]
+    fn bit_fill(n: usize) -> u32 {
+        if (n == 0) { (0) }
+        else if (n >= Self::bit_count()) { (Self::max()) }
+        else { (Self::shr(Self::max(), Self::bit_count() - n)) }
+    }
+    #[inline(always)]
     fn set(x: u32, n: usize) -> u32 {
         x | Self::bit(n)
     }
@@ -207,6 +226,12 @@ pub impl BitwiseU64 of BitwiseTrait<u64> {
         if n < 32 { (BitwiseU32::bit(n).into()) }
         else if n < 64 { (BitwiseU32::bit(n-32).into() * 0x100000000) }
         else { (0) }
+    }
+    #[inline(always)]
+    fn bit_fill(n: usize) -> u64 {
+        if (n == 0) { (0) }
+        else if (n >= Self::bit_count()) { (Self::max()) }
+        else { (Self::shr(Self::max(), Self::bit_count() - n)) }
     }
     #[inline(always)]
     fn set(x: u64, n: usize) -> u64 {
@@ -264,6 +289,12 @@ pub impl BitwiseU128 of BitwiseTrait<u128> {
         else { (0) }
     }
     #[inline(always)]
+    fn bit_fill(n: usize) -> u128 {
+        if (n == 0) { (0) }
+        else if (n >= Self::bit_count()) { (Self::max()) }
+        else { (Self::shr(Self::max(), Self::bit_count() - n)) }
+    }
+    #[inline(always)]
     fn set(x: u128, n: usize) -> u128 {
         x | Self::bit(n)
     }
@@ -319,6 +350,12 @@ pub impl BitwiseU256 of BitwiseTrait<u256> {
         else { (0) }
     }
     #[inline(always)]
+    fn bit_fill(n: usize) -> u256 {
+        if (n == 0) { (0) }
+        else if (n >= Self::bit_count()) { (Self::max()) }
+        else { (Self::shr(Self::max(), Self::bit_count() - n)) }
+    }
+    #[inline(always)]
     fn set(x: u256, n: usize) -> u256 {
         x | Self::bit(n)
     }
@@ -366,6 +403,7 @@ pub impl BitwiseU256 of BitwiseTrait<u256> {
 #[cfg(test)]
 mod unit {
     use super::{
+        BITWISE,
         BitwiseU8, BitwiseU16, BitwiseU32, BitwiseU64, BitwiseU128, BitwiseU256,
     };
 
@@ -382,32 +420,32 @@ mod unit {
         let mut bit: u256 = 0x1;
         let mut n: usize = 0;
         loop {
-            if n < 8 {
+            if (n < 8) {
                 assert_eq!(BitwiseU8::bit(n), bit.try_into().unwrap(), "test_bit_8_8");
                 assert_eq!(BitwiseU16::bit(n), bit.try_into().unwrap(), "test_bit_8_16");
                 assert_eq!(BitwiseU32::bit(n), bit.try_into().unwrap(), "test_bit_8_32");
                 assert_eq!(BitwiseU64::bit(n), bit.try_into().unwrap(), "test_bit_8_64");
                 assert_eq!(BitwiseU128::bit(n), bit.try_into().unwrap(), "test_bit_8_128");
                 assert_eq!(BitwiseU256::bit(n), bit, "test_bit_8_256");
-            } else if n < 16 {
+            } else if (n < 16) {
                 assert_eq!(BitwiseU8::bit(n), 0x0, "test_bit_16_8");
                 assert_eq!(BitwiseU16::bit(n), bit.try_into().unwrap(), "test_bit_16_16");
                 assert_eq!(BitwiseU32::bit(n), bit.try_into().unwrap(), "test_bit_16_32");
                 assert_eq!(BitwiseU64::bit(n), bit.try_into().unwrap(), "test_bit_16_64");
                 assert_eq!(BitwiseU128::bit(n), bit.try_into().unwrap(), "test_bit_16_128");
                 assert_eq!(BitwiseU256::bit(n), bit, "test_bit_16_256");
-            } else if n < 32 {
+            } else if (n < 32) {
                 assert_eq!(BitwiseU16::bit(n), 0x0, "test_bit_32_16");
                 assert_eq!(BitwiseU32::bit(n), bit.try_into().unwrap(), "test_bit_16_32");
                 assert_eq!(BitwiseU64::bit(n), bit.try_into().unwrap(), "test_bit_16_64");
                 assert_eq!(BitwiseU128::bit(n), bit.try_into().unwrap(), "test_bit_16_128");
                 assert_eq!(BitwiseU256::bit(n), bit, "test_bit_16_256");
-            } else if n < 64 {
+            } else if (n < 64) {
                 assert_eq!(BitwiseU32::bit(n), 0x0, "test_bit_64_32");
                 assert_eq!(BitwiseU64::bit(n), bit.try_into().unwrap(), "test_bit_64_64");
                 assert_eq!(BitwiseU128::bit(n), bit.try_into().unwrap(), "test_bit_64_128");
                 assert_eq!(BitwiseU256::bit(n), bit, "test_bit_64_256");
-            } else if n < 128 {
+            } else if (n < 128) {
                 assert_eq!(BitwiseU64::bit(n), 0x0, "test_bit_128_64");
                 assert_eq!(BitwiseU128::bit(n), bit.try_into().unwrap(), "test_bit_128_128");
                 assert_eq!(BitwiseU256::bit(n), bit, "test_bit_128_256");
@@ -424,8 +462,7 @@ mod unit {
     #[test]
     fn test_shift_u8() {
         let mut n: usize = 0;
-        loop {
-            if n == 8 { break; }
+        while (n < 8) {
             let bit = BitwiseU8::bit(n);
             assert_eq!(bit, BitwiseU8::shl(1, n), "test_shl_u8");
             assert_eq!(bit, BitwiseU8::shr(BitwiseU8::msb(), 7-n), "test_shr_u8");
@@ -436,8 +473,7 @@ mod unit {
     #[test]
     fn test_shift_u16() {
         let mut n: usize = 0;
-        loop {
-            if n == 16 { break; }
+        while (n < 16) {
             let bit = BitwiseU16::bit(n);
             assert_eq!(bit, BitwiseU16::shl(1, n), "test_shl_u16");
             assert_eq!(bit, BitwiseU16::shr(BitwiseU16::msb(), 15-n), "test_shr_u16");
@@ -448,8 +484,7 @@ mod unit {
     #[test]
     fn test_shift_u32() {
         let mut n: usize = 0;
-        loop {
-            if n == 32 { break; }
+        while (n < 32) {
             let bit = BitwiseU32::bit(n);
             assert_eq!(bit, BitwiseU32::shl(1, n), "test_shl_u32");
             assert_eq!(bit, BitwiseU32::shr(BitwiseU32::msb(), (31-n)), "test_shr_u32");
@@ -460,8 +495,7 @@ mod unit {
     #[test]
     fn test_shift_u64() {
         let mut n: usize = 0;
-        loop {
-            if n == 64 { break; }
+        while (n < 64) {
             let bit = BitwiseU64::bit(n);
             assert_eq!(bit, BitwiseU64::shl(1, n), "test_shl_u64");
             assert_eq!(bit, BitwiseU64::shr(BitwiseU64::msb(), (63-n)), "test_shr_u64");
@@ -472,8 +506,7 @@ mod unit {
     #[test]
     fn test_shift_u128() {
         let mut n: usize = 0;
-        loop {
-            if n == 128 { break; }
+        while (n < 128) {
             let bit = BitwiseU128::bit(n);
             assert_eq!(bit, BitwiseU128::shl(1, n), "test_shl_u128");
             assert_eq!(bit, BitwiseU128::shr(BitwiseU128::msb(), (127-n)), "test_shr_u128");
@@ -484,8 +517,7 @@ mod unit {
     #[test]
     fn test_shift_u256() {
         let mut n: usize = 0;
-        loop {
-            if n == 256 { break; }
+        while (n < 256) {
             let bit = BitwiseU256::bit(n);
             assert_eq!(bit, BitwiseU256::shl(1, n), "test_shl_u256");
             assert_eq!(bit, BitwiseU256::shr(BitwiseU256::msb(), (255-n)), "test_shr_u256");
@@ -493,14 +525,29 @@ mod unit {
         };
     }
 
+    #[test]
+    fn test_bit_fill() {
+        assert_eq!(BitwiseU8::bit_fill(0), 0b0, "fill_u8_0");
+        assert_eq!(BitwiseU8::bit_fill(1), 0b1, "fill_u8_1");
+        assert_eq!(BitwiseU8::bit_fill(2), 0b11, "fill_u8_2");
+        assert_eq!(BitwiseU8::bit_fill(3), 0b111, "fill_u8_3");
+        assert_eq!(BitwiseU8::bit_fill(4), 0b1111, "fill_u8_4");
+        assert_eq!(BitwiseU8::bit_fill(5), 0b11111, "fill_u8_5");
+        assert_eq!(BitwiseU8::bit_fill(6), 0b111111, "fill_u8_6");
+        assert_eq!(BitwiseU8::bit_fill(7), 0b1111111, "fill_u8_7");
+        assert_eq!(BitwiseU8::bit_fill(8), 0b11111111, "fill_u8_8");
+        assert_eq!(BitwiseU8::bit_fill(99), 0b11111111, "fill_u8_99");
+        assert_eq!(BitwiseU128::bit_fill(8), BITWISE::MAX_U8.into(), "fill_u128_8");
+        assert_eq!(BitwiseU128::bit_fill(64), BITWISE::MAX_U64.into(), "fill_u128_64");
+        assert_eq!(BitwiseU256::bit_fill(128), BITWISE::MAX_U128.into(), "fill_u256_128");
+    }
 
     #[test]
     fn test_set_u8() {
         let ok: u8 = HALF_U8;
         let mut bitmap: u8 = ok;
         let mut n: usize = 0;
-        loop {
-            if n == 8 { break; }
+        while (n < 8) {
             let shouldBeSet: bool = (n % 2) == 0;
             assert_eq!(BitwiseU8::is_set(bitmap, n), shouldBeSet, "u8_shouldBeSet_1");
             if(shouldBeSet) { bitmap = BitwiseU8::unset(bitmap, n); }
@@ -510,8 +557,7 @@ mod unit {
         };
         assert_eq!(bitmap, ~ok, "~ok");
         n = 0;
-        loop {
-            if n == 8 { break; }
+        while (n < 8) {
             let shouldBeSet: bool = (n % 2) == 1;
             assert_eq!(BitwiseU8::is_set(bitmap, n), shouldBeSet, "u8_shouldBeSet_2");
             if(shouldBeSet) { bitmap = BitwiseU8::unset(bitmap, n); }
@@ -527,8 +573,7 @@ mod unit {
         let ok: u16 = HALF_U16;
         let mut bitmap: u16 = ok;
         let mut n: usize = 0;
-        loop {
-            if n == 16 { break; }
+        while (n < 16) {
             let shouldBeSet: bool = (n % 2) == 0;
             assert_eq!(BitwiseU16::is_set(bitmap, n), shouldBeSet, "u16_shouldBeSet_1");
             if(shouldBeSet) { bitmap = BitwiseU16::unset(bitmap, n); }
@@ -538,8 +583,7 @@ mod unit {
         };
         assert_eq!(bitmap, ~ok, "~ok");
         n = 0;
-        loop {
-            if n == 16 { break; }
+        while (n < 16) {
             let shouldBeSet: bool = (n % 2) == 1;
             assert_eq!(BitwiseU16::is_set(bitmap, n), shouldBeSet, "u16_shouldBeSet_2");
             if(shouldBeSet) { bitmap = BitwiseU16::unset(bitmap, n); }
@@ -555,8 +599,7 @@ mod unit {
         let ok: u32 = HALF_U32;
         let mut bitmap: u32 = ok;
         let mut n: usize = 0;
-        loop {
-            if n == 32 { break; }
+        while (n < 32) {
             let shouldBeSet: bool = (n % 2) == 0;
             assert_eq!(BitwiseU32::is_set(bitmap, n), shouldBeSet, "u32_shouldBeSet_1");
             if(shouldBeSet) { bitmap = BitwiseU32::unset(bitmap, n); }
@@ -566,8 +609,7 @@ mod unit {
         };
         assert_eq!(bitmap, ~ok, "~ok");
         n = 0;
-        loop {
-            if n == 32 { break; }
+        while (n < 32) {
             let shouldBeSet: bool = (n % 2) == 1;
             assert_eq!(BitwiseU32::is_set(bitmap, n), shouldBeSet, "u32_shouldBeSet_2");
             if(shouldBeSet) { bitmap = BitwiseU32::unset(bitmap, n); }
@@ -583,8 +625,7 @@ mod unit {
         let ok: u64 = HALF_U64;
         let mut bitmap: u64 = ok;
         let mut n: usize = 0;
-        loop {
-            if n == 64 { break; }
+        while (n < 64) {
             let shouldBeSet: bool = (n % 2) == 0;
             assert_eq!(BitwiseU64::is_set(bitmap, n), shouldBeSet, "u64_shouldBeSet_1");
             if(shouldBeSet) { bitmap = BitwiseU64::unset(bitmap, n); }
@@ -594,8 +635,7 @@ mod unit {
         };
         assert_eq!(bitmap, ~ok, "~ok");
         n = 0;
-        loop {
-            if n == 64 { break; }
+        while (n < 64) {
             let shouldBeSet: bool = (n % 2) == 1;
             assert_eq!(BitwiseU64::is_set(bitmap, n), shouldBeSet, "u64_shouldBeSet_2");
             if(shouldBeSet) { bitmap = BitwiseU64::unset(bitmap, n); }
@@ -611,8 +651,7 @@ mod unit {
         let ok: u128 = HALF_U128;
         let mut bitmap: u128 = ok;
         let mut n: usize = 0;
-        loop {
-            if n == 128 { break; }
+        while (n < 128) {
             let shouldBeSet: bool = (n % 2) == 0;
             assert_eq!(BitwiseU128::is_set(bitmap, n), shouldBeSet, "u128_shouldBeSet_1");
             if(shouldBeSet) { bitmap = BitwiseU128::unset(bitmap, n); }
@@ -622,8 +661,7 @@ mod unit {
         };
         assert_eq!(bitmap, ~ok, "~ok");
         n = 0;
-        loop {
-            if n == 128 { break; }
+        while (n < 128) {
             let shouldBeSet: bool = (n % 2) == 1;
             assert_eq!(BitwiseU128::is_set(bitmap, n), shouldBeSet, "u128_shouldBeSet_2");
             if(shouldBeSet) { bitmap = BitwiseU128::unset(bitmap, n); }
@@ -639,8 +677,7 @@ mod unit {
         let ok: u256 = HALF_U256;
         let mut bitmap: u256 = ok;
         let mut n: usize = 0;
-        loop {
-            if n == 256 { break; }
+        while (n < 256) {
             let shouldBeSet: bool = (n % 2) == 0;
             assert_eq!(BitwiseU256::is_set(bitmap, n), shouldBeSet, "u256_shouldBeSet_1");
             if(shouldBeSet) { bitmap = BitwiseU256::unset(bitmap, n); }
@@ -650,8 +687,7 @@ mod unit {
         };
         assert_eq!(bitmap, ~ok, "~ok");
         n = 0;
-        loop {
-            if n == 256 { break; }
+        while (n < 256) {
             let shouldBeSet: bool = (n % 2) == 1;
             assert_eq!(BitwiseU256::is_set(bitmap, n), shouldBeSet, "u256_shouldBeSet_2");
             if(shouldBeSet) { bitmap = BitwiseU256::unset(bitmap, n); }

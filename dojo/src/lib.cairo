@@ -46,6 +46,7 @@ mod models {
     pub mod pact;
     pub mod player;
     pub mod pool;
+    pub mod leaderboard;
     pub mod season;
     pub mod table;
 }

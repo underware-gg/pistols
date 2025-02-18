@@ -48,6 +48,9 @@ pub mod tester {
             m_DuelistChallenge, DuelistChallenge,
             m_Scoreboard, Scoreboard,
         },
+        leaderboard::{
+            m_Leaderboard, Leaderboard,
+        },
         pact::{
             m_Pact,
         },
@@ -215,10 +218,11 @@ pub mod tester {
             TestResource::Model(m_Pact::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
+            TestResource::Model(m_Leaderboard::TEST_CLASS_HASH),
             TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
+            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_Pool::TEST_CLASS_HASH),
             // events
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
@@ -655,6 +659,10 @@ pub mod tester {
     #[inline(always)]
     pub fn get_Scoreboard(world: WorldStorage, holder: felt252, table_id: felt252) -> Scoreboard {
         (world.read_model((holder, table_id),))
+    }
+    #[inline(always)]
+    pub fn get_Leaderboard(world: WorldStorage, table_id: felt252) -> Leaderboard {
+        (world.read_model(table_id))
     }
     #[inline(always)]
     pub fn get_Challenge(world: WorldStorage, duel_id: u128) -> Challenge {

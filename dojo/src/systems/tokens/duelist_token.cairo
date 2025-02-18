@@ -51,7 +51,7 @@ pub trait IDuelistToken<TState> {
     fn is_inactive(self: @TState, duelist_id: u128) -> bool;
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
-    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> RewardValues;
+    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8, table_id: felt252) -> RewardValues;
     fn poke(ref self: TState, duelist_id: u128);
     fn sacrifice(ref self: TState, duelist_id: u128);
     // fn delete_duelist(ref self: TState, duelist_id: u128);
@@ -70,7 +70,7 @@ pub trait IDuelistTokenPublic<TState> {
     fn is_inactive(self: @TState, duelist_id: u128) -> bool;
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
-    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> RewardValues;
+    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8, table_id: felt252) -> RewardValues;
     // write
     fn poke(ref self: TState, duelist_id: u128); //@description:Reactivates an inactive Duelist
     fn sacrifice(ref self: TState, duelist_id: u128); //@description:Sacrifices a Duelist
@@ -143,6 +143,7 @@ pub mod duelist_token {
             ScoreboardValue, ScoreTrait,
             Archetype,
         },
+        leaderboard::{Leaderboard, LeaderboardTrait},
         challenge::{Challenge},
     };
     use pistols::types::{
@@ -248,17 +249,21 @@ pub mod duelist_token {
         fn calc_season_reward(self: @ContractState,
             duelist_id: u128,
             lives_staked: u8,
+            table_id: felt252,
         ) -> RewardValues {
             let mut store: Store = StoreTrait::new(self.world_default());
             let rules: RulesType = store.get_current_season_rules();
             let fame_balance: u128 = store.world.fame_coin_dispatcher().balance_of_token(starknet::get_contract_address(), duelist_id).low;
             let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false);
             let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true);
+            let mut leaderboard: Leaderboard = store.get_leaderboard(table_id);
+            let position: u8 = leaderboard.insert_score(duelist_id, rewards_win.points_scored);
             (RewardValues{
                 // if you win...
                 fame_gained: rewards_win.fame_gained,
                 fools_gained: rewards_win.fools_gained,
                 points_scored: rewards_win.points_scored,
+                position,
                 // if you lose...
                 fame_lost: rewards_loss.fame_lost,
                 lords_unlocked: 0,

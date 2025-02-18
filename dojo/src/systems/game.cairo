@@ -1,5 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::types::duel_progress::{DuelProgress};
+use pistols::models::leaderboard::{LeaderboardPosition};
 
 // Exposed to clients
 #[starknet::interface]
@@ -24,6 +25,8 @@ pub trait IGame<TState> {
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
+    fn get_duelist_leaderboard_position(self: @TState, duelist_id: u128, table_id: felt252) -> LeaderboardPosition;
+    fn get_leaderboard(self: @TState, table_id: felt252) -> Span<LeaderboardPosition>;
     fn can_collect(self: @TState) -> bool;
     fn get_timestamp(self: @TState) -> u64;
     
@@ -75,6 +78,10 @@ pub mod game {
             DuelistTrait,
             Scoreboard,
             ScoreTrait,
+        },
+        leaderboard::{
+            Leaderboard, LeaderboardTrait,
+            LeaderboardPosition,
         },
         pact::{
             PactTrait,
@@ -313,10 +320,10 @@ pub mod game {
 
             // transfer rewards
             let tournament_id: u128 = 0;
-            let (rewards_a, rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_dispatcher().transfer_rewards(challenge, tournament_id);
+            let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_dispatcher().transfer_rewards(challenge, tournament_id);
 
             // finish challenge
-            self.update_scoreboards(ref store, @challenge, @round, @rewards_a, @rewards_b);
+            self.update_scoreboards(ref store, @challenge, @round, ref rewards_a, ref rewards_b);
 
             // undo pacts
             store.exit_challenge(challenge.duelist_id_a);
@@ -376,6 +383,16 @@ pub mod game {
             }
         }
 
+        fn get_duelist_leaderboard_position(self: @ContractState, duelist_id: u128, table_id: felt252) -> LeaderboardPosition {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            (store.get_leaderboard(table_id).get_duelist_position(duelist_id))
+        }
+        
+        fn get_leaderboard(self: @ContractState, table_id: felt252) -> Span<LeaderboardPosition> {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            (store.get_leaderboard(table_id).get_all_positions())
+        }
+
         fn can_collect(self: @ContractState) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let season: SeasonConfig = store.get_current_season();
@@ -414,7 +431,7 @@ pub mod game {
             (owner)
         }
 
-        fn update_scoreboards(self: @ContractState, ref store: Store, challenge: @Challenge, round: @Round, rewards_a: @RewardValues, rewards_b: @RewardValues) {
+        fn update_scoreboards(self: @ContractState, ref store: Store, challenge: @Challenge, round: @Round, ref rewards_a: RewardValues, ref rewards_b: RewardValues) {
             // per table score
             let mut score_global_a: Scoreboard = store.get_scoreboard((*challenge).duelist_id_a.into(), 0);
             let mut score_global_b: Scoreboard = store.get_scoreboard((*challenge).duelist_id_b.into(), 0);
@@ -423,8 +440,8 @@ pub mod game {
             let mut score_season_b: Scoreboard = store.get_scoreboard((*challenge).duelist_id_b.into(), (*challenge).table_id);
             
             // update totals
-            ScoreTrait::update_totals(ref score_global_a.score, ref score_global_b.score, rewards_a, rewards_b, *challenge.winner);
-            ScoreTrait::update_totals(ref score_season_a.score, ref score_season_b.score, rewards_a, rewards_b, *challenge.winner);
+            ScoreTrait::update_totals(ref score_global_a.score, ref score_global_b.score, @rewards_a, @rewards_b, *challenge.winner);
+            ScoreTrait::update_totals(ref score_season_a.score, ref score_season_b.score, @rewards_a, @rewards_b, *challenge.winner);
 
             // compute honour from final round
             score_global_a.score.update_honour(*round.state_a.honour);
@@ -437,6 +454,18 @@ pub mod game {
             store.set_scoreboard(@score_global_b);
             store.set_scoreboard(@score_season_a);
             store.set_scoreboard(@score_season_b);
+
+            // update leaderboards
+            let mut leaderboard: Leaderboard = store.get_leaderboard(*challenge.table_id);
+            rewards_a.position = leaderboard.insert_score(*challenge.duelist_id_a, rewards_a.points_scored);
+            rewards_b.position = leaderboard.insert_score(*challenge.duelist_id_b, rewards_b.points_scored);
+            if (rewards_a.position != 0 || rewards_b.position != 0) {
+                // adjust [a] if [b] moved up
+                if (rewards_b.position <= rewards_a.position) {
+                    rewards_a.position = if (rewards_a.position < leaderboard.positions) {rewards_a.position+1} else {0};
+                }
+                store.set_leaderboard(@leaderboard);
+            }
 
             // unlock achievements
             if (*challenge.winner != 0) {
