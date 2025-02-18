@@ -103,19 +103,19 @@ impl EnvCardDefault of Default<EnvCard> {
 
 #[generate_trait]
 pub impl EnvCardImpl of EnvCardTrait {
-    fn is_shots_modifier(self: EnvCard) -> bool {
+    fn is_shots_modifier(self: @EnvCard) -> bool {
         (match self {
             EnvCard::SpecialAllShotsHit | EnvCard::SpecialAllShotsMiss => true,
             _ => false,
         })
     }
-    fn is_tactics_modifier(self: EnvCard) -> bool {
+    fn is_tactics_modifier(self: @EnvCard) -> bool {
         (match self {
             EnvCard::SpecialDoubleTactics | EnvCard::SpecialNoTactics => true,
             _ => false,
         })
     }
-    fn get_points(self: EnvCard) -> EnvCardPoints {
+    fn get_points(self: @EnvCard) -> EnvCardPoints {
         match self {
             EnvCard::DamageUp =>                ENV_POINTS::DamageUp,
             EnvCard::DamageDown =>              ENV_POINTS::DamageDown,
@@ -131,9 +131,9 @@ pub impl EnvCardImpl of EnvCardTrait {
         }
     }
     #[inline(always)]
-    fn apply_points(self: EnvCard, ref specials: SpecialsDrawn, ref state_self: DuelistState, ref state_other: DuelistState) {
-        if (self != EnvCard::None) {
-            let points: EnvCardPoints = self.get_points();
+    fn apply_points(self: @EnvCard, ref specials: SpecialsDrawn, ref state_self: DuelistState, ref state_other: DuelistState) {
+        if (*self != EnvCard::None) {
+            let points: EnvCardPoints = (*self).get_points();
             if (points.is_special()) {
                 if (specials.coin_toss) {
                     // duelist blocked 1st special
@@ -141,17 +141,17 @@ pub impl EnvCardImpl of EnvCardTrait {
                 } else if (self.is_shots_modifier()) {
                     // All shots hit or miss
                     state_self.apply_chances(points.chances);
-                    specials.shots_modifier = self;
+                    specials.shots_modifier = *self;
                 } else if (self.is_tactics_modifier()) {
                     // Double or No tactics
                     let multiplier: i8 =
-                        if (self == EnvCard::SpecialDoubleTactics)
+                        if (*self == EnvCard::SpecialDoubleTactics)
                             {if (specials.tactics_modifier == EnvCard::SpecialNoTactics) {(2)} else {(1)}}
-                        else if (self == EnvCard::SpecialNoTactics)
+                        else if (*self == EnvCard::SpecialNoTactics)
                             {if (specials.tactics_modifier == EnvCard::SpecialDoubleTactics) {(-2)} else {(-1)}}
                         else {(0)}; // not happening!
                     specials.tactics.apply_points(ref state_self, ref state_other, multiplier, specials.shots_modifier);
-                    specials.tactics_modifier = self;
+                    specials.tactics_modifier = *self;
                 }            
             } else {
                 // check reversal

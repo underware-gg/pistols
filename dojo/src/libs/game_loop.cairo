@@ -68,8 +68,8 @@ pub fn game_loop(wrapped: @RngWrap, deck: @Deck, ref round: Round) -> DuelProgre
     (*deck).validate_hand(ref hand_a);
     (*deck).validate_hand(ref hand_b);
 
-    let mut specials_a: SpecialsDrawn = SpecialsDrawnTrait::initialize(hand_a.card_tactics, hand_b.card_tactics);
-    let mut specials_b: SpecialsDrawn = SpecialsDrawnTrait::initialize(hand_b.card_tactics, hand_a.card_tactics);
+    let mut specials_a: SpecialsDrawn = SpecialsDrawnTrait::initialize(@hand_a.card_tactics, @hand_b.card_tactics);
+    let mut specials_b: SpecialsDrawn = SpecialsDrawnTrait::initialize(@hand_b.card_tactics, @hand_a.card_tactics);
 
     round.state_a.initialize(hand_a);
     round.state_b.initialize(hand_b);
@@ -117,7 +117,7 @@ pub fn game_loop(wrapped: @RngWrap, deck: @Deck, ref round: Round) -> DuelProgre
         // println!("Pace [{}] A:{} B:{}, shuffle:{}", step_number, round.moves_a.card_1, round.moves_b.card_1, shuffle.seed);
 
         // draw env card
-        let (card_env, dice_env): (EnvCard, u8) = draw_env_card(env_deck, pace, ref shuffle);
+        let (card_env, dice_env): (EnvCard, u8) = draw_env_card(@env_deck, @pace, ref shuffle);
         // println!("Env card/dice {}:{}", card_env, dice_env);
 
         // apply env card points to both duelists
@@ -126,11 +126,11 @@ pub fn game_loop(wrapped: @RngWrap, deck: @Deck, ref round: Round) -> DuelProgre
 
         // Fire!
         if (hand_a.card_fire == pace) {
-            fire(hand_a.card_fire, hand_b.card_dodge, ref state_a, ref state_b, ref dice, 'shoot_a');
+            fire(@hand_a.card_fire, @hand_b.card_dodge, ref state_a, ref state_b, ref dice, 'shoot_a');
             dice_fire_a = state_a.dice_fire;
         }
         if (hand_b.card_fire == pace) {
-            fire(hand_b.card_fire, hand_a.card_dodge, ref state_b, ref state_a, ref dice, 'shoot_b');
+            fire(@hand_b.card_fire, @hand_a.card_dodge, ref state_b, ref state_a, ref dice, 'shoot_b');
             dice_fire_b = state_b.dice_fire;
         }
 
@@ -166,7 +166,7 @@ pub fn game_loop(wrapped: @RngWrap, deck: @Deck, ref round: Round) -> DuelProgre
     if (state_a.health != 0 && state_b.health != 0 &&
         (hand_a.card_blades != BladesCard::None || hand_b.card_blades != BladesCard::None)
     ) {
-        blades(hand_a.card_blades, hand_b.card_blades, ref state_a, ref state_b);
+        blades(@hand_a.card_blades, @hand_b.card_blades, ref state_a, ref state_b);
         steps.append(DuelStep {
             pace: PacesCard::None,
             card_env: EnvCard::None,
@@ -211,14 +211,14 @@ pub fn game_loop(wrapped: @RngWrap, deck: @Deck, ref round: Round) -> DuelProgre
 }
 
 
-fn draw_env_card(env_deck: Span<EnvCard>, pace: PacesCard, ref shuffle: Shuffle) -> (EnvCard, u8) {
+fn draw_env_card(env_deck: @Span<EnvCard>, pace: @PacesCard, ref shuffle: Shuffle) -> (EnvCard, u8) {
     let dice: u8 = shuffle.draw_next();
     assert(dice > 0, GameErrors::BAD_SHUFFLE_SEED);
-    let env_card: EnvCard = *env_deck[(dice - 1).into()];
+    let env_card: EnvCard = *(*env_deck)[(dice - 1).into()];
     (env_card, dice)
 }
 
-fn fire(paces_shoot: PacesCard, paces_dodge: PacesCard, ref state_self: DuelistState, ref state_other: DuelistState, ref dice: Dice, salt: felt252) {
+fn fire(paces_shoot: @PacesCard, paces_dodge: @PacesCard, ref state_self: DuelistState, ref state_other: DuelistState, ref dice: Dice, salt: felt252) {
     let (dice, hit) = dice.throw_decide(salt, 100, state_self.chances);
     state_self.dice_fire = dice;
     if (hit && paces_shoot != paces_dodge) {
@@ -226,7 +226,7 @@ fn fire(paces_shoot: PacesCard, paces_dodge: PacesCard, ref state_self: DuelistS
     }
 }
 
-fn blades(blades_a: BladesCard, blades_b: BladesCard, ref state_a: DuelistState, ref state_b: DuelistState) {
+fn blades(blades_a: @BladesCard, blades_b: @BladesCard, ref state_a: DuelistState, ref state_b: DuelistState) {
     // Rock-Paper-Scissors
     if (state_a.health != 0 && state_b.health != 0) {
         let (died_a, died_b): (bool, bool) = blades_a.clash(blades_b);

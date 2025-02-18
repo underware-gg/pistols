@@ -84,7 +84,7 @@ use pistols::utils::short_string::{ShortStringTrait};
 
 #[generate_trait]
 pub impl PremiseImpl of PremiseTrait {
-    fn description(self: Premise) -> PremiseDescription {
+    fn description(self: @Premise) -> PremiseDescription {
         match self {
             Premise::Undefined   => PREMISES::Undefined,
             Premise::Matter      => PREMISES::Matter,
@@ -99,10 +99,10 @@ pub impl PremiseImpl of PremiseTrait {
             Premise::Lesson      => PREMISES::Lesson,
         }
     }
-    fn name(self: Premise) -> ByteArray {
+    fn name(self: @Premise) -> ByteArray {
         (self.description().name.to_string())
     }
-    fn prefix(self: Premise) -> ByteArray {
+    fn prefix(self: @Premise) -> ByteArray {
         (self.description().prefix.to_string())
     }
 }

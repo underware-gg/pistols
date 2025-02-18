@@ -110,31 +110,31 @@ pub impl PlayerImpl of PlayerTrait {
         activity.emit(ref store.world, player_address, identifier);
     }
     #[inline(always)]
-    fn exists(self: Player) -> bool {
-        (self.timestamp_registered != 0)
+    fn exists(self: @Player) -> bool {
+        (*self.timestamp_registered != 0)
     }
 }
 
 
 #[generate_trait]
 pub impl ActivityImpl of ActivityTrait {
-    fn emit(self: Activity, ref world: WorldStorage, player_address: ContractAddress, identifier: felt252) {
+    fn emit(self: @Activity, ref world: WorldStorage, player_address: ContractAddress, identifier: felt252) {
         world.emit_event(@PlayerActivity{
             player_address,
             timestamp: starknet::get_block_timestamp(),
-            activity: self,
+            activity: *self,
             identifier,
             is_public: self.is_public(),
         });
     }
-    fn is_public(self: Activity) -> bool {
+    fn is_public(self: @Activity) -> bool {
         match self {
             Activity::PackPurchased |
             Activity::PackOpened => false,
             _ => true,
         }
     }
-    fn can_register_player(self: Activity) -> bool {
+    fn can_register_player(self: @Activity) -> bool {
         match self {
             // Activity::PackWelcome => true,
             // Activity::TutorialFinished => true,

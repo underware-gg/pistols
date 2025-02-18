@@ -64,11 +64,11 @@ pub enum DuelistDrawnCard {
 
 #[generate_trait]
 pub impl SpecialsDrawnImpl of SpecialsDrawnTrait {
-    fn initialize(tactics_self: TacticsCard, tactics_other: TacticsCard) -> SpecialsDrawn {
+    fn initialize(tactics_self: @TacticsCard, tactics_other: @TacticsCard) -> SpecialsDrawn {
         (SpecialsDrawn {
-            tactics: tactics_self,
-            coin_toss: (tactics_self == TacticsCard::CoinToss),
-            reversal: (tactics_self == TacticsCard::Reversal || tactics_other == TacticsCard::Reversal),
+            tactics: *tactics_self,
+            coin_toss: (*tactics_self == TacticsCard::CoinToss),
+            reversal: (*tactics_self == TacticsCard::Reversal || *tactics_other == TacticsCard::Reversal),
             shots_modifier: EnvCard::None,
             tactics_modifier: EnvCard::None,
         })

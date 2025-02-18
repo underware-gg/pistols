@@ -51,7 +51,7 @@ pub mod TROPHY_ID {
 #[generate_trait]
 pub impl TrophyImpl of TrophyTrait {
     #[inline]
-    fn identifier(self: Trophy) -> felt252 {
+    fn identifier(self: @Trophy) -> felt252 {
         match self {
             Trophy::None        => TROPHY_ID::None,
             Trophy::FirstBlood  => TROPHY_ID::FirstBlood,
@@ -60,14 +60,14 @@ pub impl TrophyImpl of TrophyTrait {
     }
 
     #[inline]
-    fn hidden(self: Trophy) -> bool {
+    fn hidden(self: @Trophy) -> bool {
         match self {
             _ => true,
         }
     }
 
     #[inline]
-    fn index(self: Trophy) -> u8 {
+    fn index(self: @Trophy) -> u8 {
         match self {
             Trophy::None        => 0,
             // Group: Player
@@ -78,7 +78,7 @@ pub impl TrophyImpl of TrophyTrait {
     }
 
     #[inline]
-    fn points(self: Trophy) -> u16 {
+    fn points(self: @Trophy) -> u16 {
         match self {
             Trophy::None        => 0,
             Trophy::FirstBlood  => 50,
@@ -87,21 +87,21 @@ pub impl TrophyImpl of TrophyTrait {
     }
 
     #[inline]
-    fn start(self: Trophy) -> u64 {
+    fn start(self: @Trophy) -> u64 {
         match self {
             _ => 0,
         }
     }
 
     #[inline]
-    fn end(self: Trophy) -> u64 {
+    fn end(self: @Trophy) -> u64 {
         match self {
             _ => 0,
         }
     }
 
     #[inline]
-    fn group(self: Trophy) -> felt252 {
+    fn group(self: @Trophy) -> felt252 {
         match self {
             Trophy::None        => 0,
             Trophy::FirstBlood  => 'Player',
@@ -111,7 +111,7 @@ pub impl TrophyImpl of TrophyTrait {
 
     // from: https://fontawesome.com/icons
     #[inline]
-    fn icon(self: Trophy) -> felt252 {
+    fn icon(self: @Trophy) -> felt252 {
         match self {
             Trophy::None        => 'circle-question',
             Trophy::FirstBlood  => 'droplet',
@@ -120,7 +120,7 @@ pub impl TrophyImpl of TrophyTrait {
     }
 
     #[inline]
-    fn title(self: Trophy) -> felt252 {
+    fn title(self: @Trophy) -> felt252 {
         match self {
             Trophy::None        => 'None',
             Trophy::FirstBlood  => 'First Blood',
@@ -130,7 +130,7 @@ pub impl TrophyImpl of TrophyTrait {
 
 
     #[inline]
-    fn description(self: Trophy) -> ByteArray {
+    fn description(self: @Trophy) -> ByteArray {
         match self {
             Trophy::None        => "This is not the trophy you're looking for",
             Trophy::FirstBlood  => "That's how it feels!",
@@ -139,7 +139,7 @@ pub impl TrophyImpl of TrophyTrait {
     }
 
     #[inline]
-    fn task_description(self: Trophy) -> ByteArray {
+    fn task_description(self: @Trophy) -> ByteArray {
         match self {
             Trophy::None        => "Nothing to do here",
             Trophy::FirstBlood  => "Win a Duel",
@@ -148,7 +148,7 @@ pub impl TrophyImpl of TrophyTrait {
     }
 
     #[inline]
-    fn task_count(self: Trophy) -> u32 {
+    fn task_count(self: @Trophy) -> u32 {
         match self {
             Trophy::None        => 0,
             Trophy::FirstBlood  => 1,
@@ -157,7 +157,7 @@ pub impl TrophyImpl of TrophyTrait {
     }
 
     #[inline]
-    fn tasks(self: Trophy) -> Span<ArcadeTask> {
+    fn tasks(self: @Trophy) -> Span<ArcadeTask> {
         let task: ArcadeTask = ArcadeTaskTrait::new(
             self.identifier(),
             self.task_count(),
@@ -167,14 +167,14 @@ pub impl TrophyImpl of TrophyTrait {
     }
 
     #[inline]
-    fn data(self: Trophy) -> ByteArray {
+    fn data(self: @Trophy) -> ByteArray {
         ("")
     }
 
     // send a progress event to the arcade store
     // https://github.com/cartridge-gg/arcade/blob/main/packages/achievement/src/components/achievable.cairo#L99-L112
     // https://github.com/cartridge-gg/arcade/blob/main/packages/achievement/src/store.cairo#L59-L63
-    fn progress(self: Trophy, world: WorldStorage, player_address: ContractAddress, count: u32) {
+    fn progress(self: @Trophy, world: WorldStorage, player_address: ContractAddress, count: u32) {
         let arcade_store = ArcadeStoreTrait::new(world);
         arcade_store.progress(
             player_address.into(),

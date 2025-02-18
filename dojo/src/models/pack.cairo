@@ -105,31 +105,31 @@ pub impl PackImpl of PackTrait {
 
 #[generate_trait]
 pub impl PackTypeImpl of PackTypeTrait {
-    fn description(self: PackType) -> PackDescription {
+    fn description(self: @PackType) -> PackDescription {
         match self {
             PackType::Unknown       => PACK_TYPES::Unknown,
             PackType::WelcomePack   => PACK_TYPES::WelcomePack,
             PackType::Duelists5x    => PACK_TYPES::Duelists5x,
         }
     }
-    fn identifier(self: PackType) -> felt252 {
-        (self.description().id)
+    fn identifier(self: @PackType) -> felt252 {
+        ((*self).description().id)
     }
-    fn name(self: PackType) -> ByteArray {
-        (self.description().name.to_string())
+    fn name(self: @PackType) -> ByteArray {
+        ((*self).description().name.to_string())
     }
-    fn image_url(self: PackType, is_open: bool) -> ByteArray {
+    fn image_url(self: @PackType, is_open: bool) -> ByteArray {
         if (is_open) {
-            (self.description().image_url_open.to_string())
+            ((*self).description().image_url_open.to_string())
         } else {
-            (self.description().image_url_closed.to_string())
+            ((*self).description().image_url_closed.to_string())
         }
     }
-    fn can_purchase(self: PackType) -> bool {
-        (self.description().can_purchase)
+    fn can_purchase(self: @PackType) -> bool {
+        ((*self).description().can_purchase)
     }
-    fn mint_fee(self: PackType) -> u256 {
-        (self.description().lords_price)
+    fn mint_fee(self: @PackType) -> u256 {
+        ((*self).description().lords_price)
     }
 }
 

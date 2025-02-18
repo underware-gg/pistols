@@ -81,7 +81,7 @@ use pistols::models::challenge::{DuelistState};
 
 #[generate_trait]
 pub impl TacticsCardImpl of TacticsCardTrait {
-    fn get_points(self: TacticsCard) -> CardPoints {
+    fn get_points(self: @TacticsCard) -> CardPoints {
         match self {
             TacticsCard::Insult =>      TACTICS_POINTS::Insult,
             TacticsCard::CoinToss =>    TACTICS_POINTS::CoinToss,
@@ -93,12 +93,12 @@ pub impl TacticsCardImpl of TacticsCardTrait {
         }
     }
     #[inline(always)]
-    fn apply_points(self: TacticsCard, ref state_self: DuelistState, ref state_other: DuelistState, multiplier: i8, shots_modifier: EnvCard) {
-        if (self != TacticsCard::None) {
-            self.get_points().apply(ref state_self, ref state_other, multiplier, shots_modifier);
+    fn apply_points(self: @TacticsCard, ref state_self: DuelistState, ref state_other: DuelistState, multiplier: i8, shots_modifier: EnvCard) {
+        if (*self != TacticsCard::None) {
+            (*self).get_points().apply(ref state_self, ref state_other, multiplier, shots_modifier);
         }
     }
-    fn build_deck(deck_type: DeckType) -> Span<u8> {
+    fn build_deck(deck_type: @DeckType) -> Span<u8> {
         (match deck_type {
             DeckType::None => array![],
             DeckType::Classic => array![

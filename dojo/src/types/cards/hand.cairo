@@ -32,32 +32,32 @@ impl FinalBlowDefault of Default<FinalBlow> {
 
 #[generate_trait]
 pub impl DuelistHandImpl of DuelistHandTrait {
-    fn draw_card(self: DuelistHand, pace: PacesCard) -> DuelistDrawnCard {
+    fn draw_card(self: @DuelistHand, pace: PacesCard) -> DuelistDrawnCard {
         (
-            if (self.card_fire == pace) {DuelistDrawnCard::Fire(pace)}
-            else if (self.card_dodge == pace) {DuelistDrawnCard::Dodge(pace)}
+            if (*self.card_fire == pace) {DuelistDrawnCard::Fire(pace)}
+            else if (*self.card_dodge == pace) {DuelistDrawnCard::Dodge(pace)}
             else {DuelistDrawnCard::None}
         )
     }
-    fn to_span(self: DuelistHand) -> Span<u8> {
+    fn to_span(self: @DuelistHand) -> Span<u8> {
         ([
-            self.card_fire.into(),
-            self.card_dodge.into(),
-            self.card_tactics.into(),
-            self.card_blades.into(),
+            (*self.card_fire).into(),
+            (*self.card_dodge).into(),
+            (*self.card_tactics).into(),
+            (*self.card_blades).into(),
         ].span())
     }
 }
 
 #[generate_trait]
 pub impl FinalBlowImpl of FinalBlowTrait {
-    fn ended_in_paces(self: FinalBlow) -> bool {
+    fn ended_in_paces(self: @FinalBlow) -> bool {
         (match self {
             FinalBlow::Paces(_) => true,
             _ => false,
         })
     }
-    fn ended_in_blades(self: FinalBlow) -> bool {
+    fn ended_in_blades(self: @FinalBlow) -> bool {
         (match self {
             FinalBlow::Blades(_) => true,
             _ => false,

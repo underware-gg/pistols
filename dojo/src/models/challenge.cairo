@@ -90,33 +90,33 @@ use pistols::utils::misc::{ZERO};
 #[generate_trait]
 pub impl ChallengeImpl of ChallengeTrait {
     #[inline(always)]
-    fn duelist_number(self: Challenge, duelist_id: u128) -> u8 {
-        (if (duelist_id == self.duelist_id_a) {(1)}
-        else if (duelist_id == self.duelist_id_b) {(2)}
+    fn duelist_number(self: @Challenge, duelist_id: u128) -> u8 {
+        (if (duelist_id == *self.duelist_id_a) {(1)}
+        else if (duelist_id == *self.duelist_id_b) {(2)}
         else {(0)})
     }
     #[inline(always)]
-    fn winner_address(self: Challenge) -> ContractAddress {
-        (if (self.winner == 1) {self.address_a}
-        else if (self.winner == 2) {self.address_b}
+    fn winner_address(self: @Challenge) -> ContractAddress {
+        (if (*self.winner == 1) {*self.address_a}
+        else if (*self.winner == 2) {*self.address_b}
         else {ZERO()})
     }
     #[inline(always)]
-    fn exists(self: Challenge) -> bool {
-        (self.state.exists())
+    fn exists(self: @Challenge) -> bool {
+        ((*self).state.exists())
     }
     #[inline(always)]
-    fn is_tutorial(self: Challenge) -> bool {
-        (self.table_id == TABLES::TUTORIAL)
+    fn is_tutorial(self: @Challenge) -> bool {
+        (*self.table_id == TABLES::TUTORIAL)
     }
     #[inline(always)]
-    fn is_practice(self: Challenge) -> bool {
-        (self.table_id == TABLES::PRACTICE)
+    fn is_practice(self: @Challenge) -> bool {
+        (*self.table_id == TABLES::PRACTICE)
     }
-    fn get_deck_type(self: Challenge) -> DeckType {
+    fn get_deck_type(self: @Challenge) -> DeckType {
         if (
             self.is_tutorial() &&
-            (self.duelist_id_a.into() == CharacterProfile::Drunkard || self.duelist_id_b.into() == CharacterProfile::Drunkard)
+            ((*self).duelist_id_a.into() == CharacterProfile::Drunkard || (*self).duelist_id_b.into() == CharacterProfile::Drunkard)
         ) {
             (DeckType::PacesOnly)
         } else {
@@ -124,7 +124,7 @@ pub impl ChallengeImpl of ChallengeTrait {
         }
     }
     #[inline(always)]
-    fn get_deck(self: Challenge) -> Deck {
+    fn get_deck(self: @Challenge) -> Deck {
         (self.get_deck_type().build_deck())
     }
 }
@@ -132,8 +132,8 @@ pub impl ChallengeImpl of ChallengeTrait {
 #[generate_trait]
 pub impl RoundImpl of RoundTrait {
     #[inline(always)]
-    fn make_seed(self: Round) -> felt252 {
-        (hash_values([self.moves_a.salt, self.moves_b.salt].span()))
+    fn make_seed(self: @Round) -> felt252 {
+        (hash_values([(*self).moves_a.salt, (*self).moves_b.salt].span()))
     }
 }
 

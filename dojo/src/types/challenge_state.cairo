@@ -11,21 +11,16 @@ pub enum ChallengeState {
     Draw,       // 7
 }
 
-pub trait ChallengeStateTrait {
-    fn exists(self: ChallengeState) -> bool;
-    fn is_canceled(self: ChallengeState) -> bool;
-    fn is_live(self: ChallengeState) -> bool;
-    fn is_finished(self: ChallengeState) -> bool;
-}
 
+#[generate_trait]
 pub impl ChallengeStateImpl of ChallengeStateTrait {
-    fn exists(self: ChallengeState) -> bool {
+    fn exists(self: @ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             _                           => true,
         }
     }
-    fn is_canceled(self: ChallengeState) -> bool {
+    fn is_canceled(self: @ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => false,
@@ -37,7 +32,7 @@ pub impl ChallengeStateImpl of ChallengeStateTrait {
             ChallengeState::Draw        => false,
         }
     }
-    fn is_live(self: ChallengeState) -> bool {
+    fn is_live(self: @ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => true,
@@ -49,7 +44,7 @@ pub impl ChallengeStateImpl of ChallengeStateTrait {
             ChallengeState::Draw        => false,
         }
     }
-    fn is_finished(self: ChallengeState) -> bool {
+    fn is_finished(self: @ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => false,

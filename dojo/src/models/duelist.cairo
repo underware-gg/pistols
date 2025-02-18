@@ -90,27 +90,27 @@ impl ArchetypeDefault of Default<Archetype> {
 #[generate_trait]
 pub impl ScoreImpl of ScoreTrait {
     #[inline(always)]
-    fn is_villain(self: Score) -> bool {
-        (self.total_duels > 0 && self.honour < HONOUR::TRICKSTER_START)
+    fn is_villain(self: @Score) -> bool {
+        (*self.total_duels > 0 && *self.honour < HONOUR::TRICKSTER_START)
     }
     #[inline(always)]
-    fn is_trickster(self: Score) -> bool {
-        (self.honour >= HONOUR::TRICKSTER_START && self.honour < HONOUR::LORD_START)
+    fn is_trickster(self: @Score) -> bool {
+        (*self.honour >= HONOUR::TRICKSTER_START && *self.honour < HONOUR::LORD_START)
     }
     #[inline(always)]
-    fn is_lord(self: Score) -> bool {
-        (self.honour >= HONOUR::LORD_START)
+    fn is_lord(self: @Score) -> bool {
+        (*self.honour >= HONOUR::LORD_START)
     }
     #[inline(always)]
-    fn get_archetype(self: Score) -> Archetype {
+    fn get_archetype(self: @Score) -> Archetype {
         if (self.is_lord()) {(Archetype::Honourable)}
         else if (self.is_trickster()) {(Archetype::Trickster)}
         else if (self.is_villain()) {(Archetype::Villainous)}
         else {(Archetype::Undefined)}
     }
     #[inline(always)]
-    fn get_honour(self: Score) -> ByteArray {
-        (format!("{}.{}", self.honour/10, self.honour%10))
+    fn get_honour(self: @Score) -> ByteArray {
+        (format!("{}.{}", *self.honour / 10, *self.honour % 10))
     }
 
     // update duel totals only

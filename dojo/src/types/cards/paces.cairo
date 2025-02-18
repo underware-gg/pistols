@@ -24,21 +24,21 @@ use pistols::types::cards::deck::{DeckType};
 #[generate_trait]
 pub impl PacesCardImpl of PacesCardTrait {
     #[inline(always)]
-    fn to_felt(self: PacesCard) -> felt252 {
-        let result: u8 = self.into();
+    fn to_felt(self: @PacesCard) -> felt252 {
+        let result: u8 = (*self).into();
         (result.into())
     }
     #[inline(always)]
-    fn is_before(self: PacesCard, other: PacesCard) -> bool {
-        let pace: u8 = self.into();
-        (pace < other.into())
+    fn is_before(self: @PacesCard, other: @PacesCard) -> bool {
+        let pace: u8 = (*self).into();
+        (pace < (*other).into())
     }
     #[inline]
-    fn is_after(self: PacesCard, other: PacesCard) -> bool {
-        let pace: u8 = self.into();
-        (pace > other.into())
+    fn is_after(self: @PacesCard, other: @PacesCard) -> bool {
+        let pace: u8 = (*self).into();
+        (pace > (*other).into())
     }
-    fn honour(self: PacesCard) -> u8 {
+    fn honour(self: @PacesCard) -> u8 {
         match self {
             PacesCard::Paces1 |
             PacesCard::Paces2 |
@@ -49,12 +49,12 @@ pub impl PacesCardImpl of PacesCardTrait {
             PacesCard::Paces7 |
             PacesCard::Paces8 |
             PacesCard::Paces9 |
-            PacesCard::Paces10 =>  self.into() * 10,
+            PacesCard::Paces10 =>  (*self).into() * 10,
             PacesCard::None => 0,
         }
     }
     #[inline(always)]
-    fn build_deck(deck_type: DeckType) -> Span<u8> {
+    fn build_deck(_deck_type: @DeckType) -> Span<u8> {
         (array![
             PacesCard::Paces1.into(),
             PacesCard::Paces2.into(),

@@ -198,7 +198,7 @@ pub mod tutorial {
             round.moves_b.initialize(0xffff, moves);
 
             // store NPC moves
-            let (npc_moves, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(round.moves_b.as_hand());
+            let (npc_moves, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(@round.moves_b.as_hand());
             round.moves_a.initialize(0xffff, npc_moves);
 
             // execute game loop...
@@ -220,7 +220,7 @@ pub mod tutorial {
             if (challenge.state.is_finished()) {
                 let level: TutorialLevel = challenge.into();
                 let mut round: Round = store.get_round(duel_id);
-                let (_, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(round.moves_b.as_hand());
+                let (_, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(@round.moves_b.as_hand());
                 let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), mocked);
                 (game_loop(wrapped, @challenge.get_deck(), ref round))
             } else {

@@ -344,31 +344,31 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
 
 #[generate_trait]
 pub impl ProfileTypeImpl of ProfileTypeTrait {
-    fn description(self: ProfileType) -> ProfileDescription {
-        (match self {
+    fn description(self: @ProfileType) -> ProfileDescription {
+        (match *self {
             ProfileType::Undefined =>           DUELIST_PROFILES::Unknown,
             ProfileType::Duelist(profile) =>    profile.into(),
             ProfileType::Character(profile) =>  profile.into(),
             ProfileType::Bot(profile) =>        profile.into(),
         })
     }
-    fn exists(self: ProfileType) -> bool {
+    fn exists(self: @ProfileType) -> bool {
         let desc: ProfileDescription = self.description();
         (desc.profile_id != 0)
     }
-    fn duelist_id(self: ProfileType) -> u128 {
-        (match self {
+    fn duelist_id(self: @ProfileType) -> u128 {
+        (match *self {
             ProfileType::Undefined =>               0,
             ProfileType::Duelist(duelist) =>        duelist.into(),
             ProfileType::Character(character) =>    character.into(),
             ProfileType::Bot(bot) =>                bot.into(),
         })
     }
-    fn name(self: ProfileType) -> ByteArray {
+    fn name(self: @ProfileType) -> ByteArray {
         let desc: ProfileDescription = self.description();
         (desc.name.to_string())
     }
-    fn get_uri(self: ProfileType,
+    fn get_uri(self: @ProfileType,
         base_uri: ByteArray,
         variant: ByteArray,    
     ) -> ByteArray {

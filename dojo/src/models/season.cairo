@@ -88,18 +88,18 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
         (table_id)
     }
     #[inline(always)]
-    fn is_active(self: SeasonConfig) -> bool {
-        (self.phase == SeasonPhase::InProgress)
+    fn is_active(self: @SeasonConfig) -> bool {
+        (*self.phase == SeasonPhase::InProgress)
     }
     #[inline(always)]
-    fn seconds_to_collect(self: SeasonConfig) -> u64 {
-        (MathU64::sub(self.timestamp_end, starknet::get_block_timestamp()))
+    fn seconds_to_collect(self: @SeasonConfig) -> u64 {
+        (MathU64::sub(*self.timestamp_end, starknet::get_block_timestamp()))
     }
     #[inline(always)]
-    fn can_collect(self: SeasonConfig) -> bool {
+    fn can_collect(self: @SeasonConfig) -> bool {
         (
-            self.phase != SeasonPhase::Ended &&
-            self.seconds_to_collect() == 0
+            *self.phase != SeasonPhase::Ended &&
+            (*self).seconds_to_collect() == 0
         )
     }
 }
