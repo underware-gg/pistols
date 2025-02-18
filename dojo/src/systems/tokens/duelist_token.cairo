@@ -61,6 +61,7 @@ pub trait IDuelistToken<TState> {
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (RewardValues, RewardValues);
 }
 
+// Exposed to clients
 #[starknet::interface]
 pub trait IDuelistTokenPublic<TState> {
     // view
@@ -76,6 +77,7 @@ pub trait IDuelistTokenPublic<TState> {
     // fn delete_duelist(ref self: TState, duelist_id: u128);
 }
 
+// Exposed to world
 #[starknet::interface]
 pub trait IDuelistTokenProtected<TState> {
     fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, seed: felt252) -> Span<u128>;
@@ -158,8 +160,8 @@ pub mod duelist_token {
     use pistols::utils::math::{MathTrait};
 
     mod Errors {
+        pub const INVALID_CALLER: felt252           = 'DUELIST: Invalid caller';
         pub const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
-        pub const DUEL_INVALID_CALLER: felt252      = 'DUELIST: Invalid caller';
         pub const DUELIST_IS_DEAD: felt252          = 'DUELIST: Duelist is dead!';
         pub const DUELIST_A_IS_DEAD: felt252        = 'DUELIST: Duelist A is dead!';
         pub const DUELIST_B_IS_DEAD: felt252        = 'DUELIST: Duelist B is dead!';
@@ -311,6 +313,7 @@ pub mod duelist_token {
             seed: felt252,
         ) -> Span<u128>{
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
 
             // mint tokens
             let duelist_ids: Span<u128> = self.token.mint_multiple(recipient, quantity);
@@ -350,7 +353,7 @@ pub mod duelist_token {
         ) -> (RewardValues, RewardValues) {
             // validate caller (game contract only)
             let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.is_game_contract(starknet::get_caller_address()), Errors::DUEL_INVALID_CALLER);
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
 
             // get fees distribution
             let rules: RulesType = store.get_table_rules(challenge.table_id);

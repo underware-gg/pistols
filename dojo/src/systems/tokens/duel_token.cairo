@@ -157,6 +157,7 @@ pub mod duel_token {
     use pistols::utils::timestamp::{TimestampTrait};
 
     pub mod Errors {
+        pub const INVALID_CALLER: felt252           = 'DUEL: Invalid caller';
         pub const NOT_IMPLEMENTED: felt252          = 'DUEL: Not implemented';
         pub const INVALID_DUEL: felt252             = 'DUEL: Invalid duel';
         pub const NOT_YOUR_DUEL: felt252            = 'DUEL: Not your duel';
@@ -430,9 +431,10 @@ pub mod duel_token {
             duel_id: u128,
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+
             let challenge: ChallengeValue = store.get_challenge_value(duel_id);
-            // let owner: ContractAddress = self.owner_of(duel_id.into());
-            let owner: ContractAddress = starknet::get_caller_address(); // pistols-game is the owner
+            let owner: ContractAddress = store.world.game_address();
             if (challenge.winner == 1) {
                 self.transfer_from(owner, challenge.address_a, duel_id.into());
             } else if (challenge.winner == 2) {

@@ -145,8 +145,12 @@ pub impl DnsImpl of DnsTrait {
         ))
     }
     #[inline(always)]
-    fn is_duel_contract(self: @WorldStorage, address: ContractAddress) -> bool {
-        (address == self.duel_token_address())
+    fn caller_is_world_contract(self: @WorldStorage) -> bool {
+        (self.is_world_contract(starknet::get_caller_address()))
+    }
+    #[inline(always)]
+    fn is_game_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
+        (contract_address == self.game_address())
     }
     #[inline(always)]
     fn is_duel_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {

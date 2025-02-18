@@ -60,6 +60,7 @@ pub mod bank {
     use pistols::utils::math::{MathTrait};
 
     pub mod Errors {
+        pub const INVALID_CALLER: felt252           = 'BANK: invalid caller';
         pub const INVALID_AMOUNT: felt252           = 'BANK: invalid amount';
         pub const INVALID_SHARES: felt252           = 'BANK: invalid shares';
         pub const INVALID_TREASURY: felt252         = 'BANK: invalid treasury';
@@ -121,8 +122,9 @@ pub mod bank {
             payer: ContractAddress,
             lords_amount: u256,
         ) {
-            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
             self.transfer_lords_to_pool(store, payer, lords_amount, PoolType::Bank);
         }
 
@@ -130,8 +132,9 @@ pub mod bank {
             payer: ContractAddress,
             lords_amount: u256,
         ) {
-            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            assert(lords_amount != 0, Errors::INVALID_AMOUNT);
             let mut purchases_pool: Pool = store.get_pool(PoolType::Bank);
             let mut fame_peg_pool: Pool = store.get_pool(PoolType::FamePeg);
             purchases_pool.withdraw_lords(lords_amount.low);
@@ -145,6 +148,7 @@ pub mod bank {
             fame_amount: u256,
         ) -> u256 {
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
             // get fame supply
             let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
             let fame_supply: u256 = fame_dispatcher.total_supply() + fame_amount;
@@ -171,6 +175,7 @@ pub mod bank {
             pool_id: PoolType,
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
             self.transfer_fame_to_pool(store, contract_address, token_id, fame_amount, pool_id);
         }
     }

@@ -152,7 +152,7 @@ pub mod fame_coin {
             duelist_id: u128,
             amount: u256,
         ) {
-            // validate minter (duelist token contract)
+            // validate caller (duelist token contract)
             let minter_address: ContractAddress = self.coin.assert_caller_is_minter();
 
             // mint FAME to token

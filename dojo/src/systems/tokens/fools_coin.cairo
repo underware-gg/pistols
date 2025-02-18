@@ -112,7 +112,7 @@ pub mod fools_coin {
             recipient: ContractAddress,
             amount: u256,
         ) {
-            // validate minter
+            // validate caller
             self.coin.assert_caller_is_minter();
 
             // mint FOOLS to recipient
