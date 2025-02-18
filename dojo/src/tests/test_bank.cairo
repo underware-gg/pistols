@@ -6,7 +6,7 @@ mod tests {
         pool::{Pool, PoolType},
         pack::{Pack, PackType, PackTypeTrait},
     };
-    use pistols::types::rules::{FeeValues};
+    use pistols::types::rules::{RewardValues};
     use pistols::utils::math::{MathU8};
 
     use pistols::tests::tester::{tester,
@@ -72,14 +72,14 @@ mod tests {
         assert_eq!(pool_flame.balance_lords, 0, "RESOLVED_pool_flame.balance_lords");
         assert_eq!(pool_flame.balance_fame, 0, "RESOLVED_pool_flame.balance_fame");
 
-        let reward_a: FeeValues = (*sys.duelists).calc_season_reward(duelist_id_a, challenge.lives_staked);
-        let reward_b: FeeValues = (*sys.duelists).calc_season_reward(duelist_id_b, challenge.lives_staked);
-        assert_ne!(reward_a.fame_lost, 0, "RESOLVED_reward_a.fame_lost != 0");
-        assert_ne!(reward_b.fame_lost, 0, "RESOLVED_reward_b.fame_lost != 0");
-        assert_ne!(reward_a.fame_gained, 0, "RESOLVED_reward_a.fame_gained != 0");
-        assert_ne!(reward_b.fame_gained, 0, "RESOLVED_reward_b.fame_gained != 0");
-        assert_ne!(reward_a.fools_gained, 0, "RESOLVED_reward_a.fools_gained != 0");
-        assert_ne!(reward_b.fools_gained, 0, "RESOLVED_reward_b.fools_gained != 0");
+        let rewards_a: RewardValues = (*sys.duelists).calc_season_reward(duelist_id_a, challenge.lives_staked);
+        let rewards_b: RewardValues = (*sys.duelists).calc_season_reward(duelist_id_b, challenge.lives_staked);
+        assert_ne!(rewards_a.fame_lost, 0, "RESOLVED_rewards_a.fame_lost != 0");
+        assert_ne!(rewards_b.fame_lost, 0, "RESOLVED_rewards_b.fame_lost != 0");
+        assert_ne!(rewards_a.fame_gained, 0, "RESOLVED_rewards_a.fame_gained != 0");
+        assert_ne!(rewards_b.fame_gained, 0, "RESOLVED_rewards_b.fame_gained != 0");
+        assert_ne!(rewards_a.fools_gained, 0, "RESOLVED_rewards_a.fools_gained != 0");
+        assert_ne!(rewards_b.fools_gained, 0, "RESOLVED_rewards_b.fools_gained != 0");
 
         let mut fame_balance_a: u128 = tester::fame_balance_of_token(sys, duelist_id_a);
         let mut fame_balance_b: u128 = tester::fame_balance_of_token(sys, duelist_id_b);
@@ -100,24 +100,24 @@ mod tests {
 
         // Duelist A
         if (winner == 1) {
-            let fame_gained = reward_a.fame_gained;
-            let fools_gained = reward_a.fools_gained;
+            let fame_gained = rewards_a.fame_gained;
+            let fools_gained = rewards_a.fools_gained;
             fame_balance_a = tester::assert_fame_token_balance(sys, duelist_id_a, fame_balance_a, 0, fame_gained, format!("RESOLVED_fame_balance_a_win [{}:{}]", duel_id, duelist_id_a));
             fools_balance_a = tester::assert_fools_balance(sys, address_a, fools_balance_a, 0, fools_gained, format!("RESOLVED_fools_balance_a_win [{}:{}]", duel_id, duelist_id_a));
         } else {
-            let fame_lost = reward_a.fame_lost;
+            let fame_lost = rewards_a.fame_lost;
             fame_balance_a = tester::assert_fame_token_balance(sys, duelist_id_a, fame_balance_a, fame_lost, 0, format!("RESOLVED_fame_balance_a_lost [{}:{}]", duel_id, duelist_id_a));
             fools_balance_a = tester::assert_fools_balance(sys, address_a, fools_balance_a, 0, 0, format!("RESOLVED_fools_balance_a_lost [{}:{}]", duel_id, duelist_id_a));
         }
 
         // Duelist B
         if (winner == 2) {
-            let fame_gained = reward_b.fame_gained;
-            let fools_gained = reward_b.fools_gained;
+            let fame_gained = rewards_b.fame_gained;
+            let fools_gained = rewards_b.fools_gained;
             fame_balance_b = tester::assert_fame_token_balance(sys, duelist_id_b, fame_balance_b, 0, fame_gained, format!("RESOLVED_fame_balance_b_win [{}:{}]", duel_id, duelist_id_b));
             fools_balance_b = tester::assert_fools_balance(sys, address_b, fools_balance_b, 0, fools_gained, format!("RESOLVED_fools_balance_b_win [{}:{}]", duel_id, duelist_id_b));
         } else {
-            let fame_lost = reward_b.fame_lost;
+            let fame_lost = rewards_b.fame_lost;
             fame_balance_b = tester::assert_fame_token_balance(sys, duelist_id_b, fame_balance_b, fame_lost, 0, format!("RESOLVED_fame_balance_b_lost [{}:{}]", duel_id, duelist_id_b));
             fools_balance_b = tester::assert_fools_balance(sys, address_b, fools_balance_b, 0, 0, format!("RESOLVED_fools_balance_b_lost [{}:{}]", duel_id, duelist_id_b));
         }
@@ -173,20 +173,20 @@ mod tests {
         let mut fools_balance_a: u128 = (*sys.fools).balance_of(address_a).low;
         let mut fools_balance_b: u128 = (*sys.fools).balance_of(address_b).low;
 
-        let reward_a: FeeValues = (*sys.duelists).calc_season_reward(duelist_id_a, challenge.lives_staked);
-        let reward_b: FeeValues = (*sys.duelists).calc_season_reward(duelist_id_b, challenge.lives_staked);
+        let rewards_a: RewardValues = (*sys.duelists).calc_season_reward(duelist_id_a, challenge.lives_staked);
+        let rewards_b: RewardValues = (*sys.duelists).calc_season_reward(duelist_id_b, challenge.lives_staked);
 // println!("challenge.lives_staked: {}", challenge.lives_staked);
 // println!("fame_balance_a: {}", fame_balance_a/CONST::ETH_TO_WEI.low);
-// println!("reward_a.fame_lost: {}", reward_a.fame_lost/CONST::ETH_TO_WEI.low);
-// println!("reward_a.fame_gained: {}", reward_a.fame_gained/CONST::ETH_TO_WEI.low);
-// println!("reward_a.fools_gained: {}", reward_a.fools_gained/CONST::ETH_TO_WEI.low);
-        assert_ne!(reward_a.fame_lost, 0, "DEATH_reward_a.fame_lost != 0");
-        assert_ne!(reward_b.fame_lost, 0, "DEATH_reward_b.fame_lost != 0");
-        assert_ne!(reward_a.fame_gained, 0, "DEATH_reward_a.fame_gained != 0");
-        assert_ne!(reward_b.fame_gained, 0, "DEATH_reward_b.fame_gained != 0");
-        assert_ne!(reward_a.fools_gained, 0, "DEATH_reward_a.fools_gained != 0");
-        assert_ne!(reward_b.fools_gained, 0, "DEATH_reward_b.fools_gained != 0");
-        assert_eq!(reward_a.fame_lost, reward_b.fame_lost, "DEATH_reward_a.fame_lost == reward_b.fame_lost"); // lose same amount
+// println!("rewards_a.fame_lost: {}", rewards_a.fame_lost/CONST::ETH_TO_WEI.low);
+// println!("rewards_a.fame_gained: {}", rewards_a.fame_gained/CONST::ETH_TO_WEI.low);
+// println!("rewards_a.fools_gained: {}", rewards_a.fools_gained/CONST::ETH_TO_WEI.low);
+        assert_ne!(rewards_a.fame_lost, 0, "DEATH_rewards_a.fame_lost != 0");
+        assert_ne!(rewards_b.fame_lost, 0, "DEATH_rewards_b.fame_lost != 0");
+        assert_ne!(rewards_a.fame_gained, 0, "DEATH_rewards_a.fame_gained != 0");
+        assert_ne!(rewards_b.fame_gained, 0, "DEATH_rewards_b.fame_gained != 0");
+        assert_ne!(rewards_a.fools_gained, 0, "DEATH_rewards_a.fools_gained != 0");
+        assert_ne!(rewards_b.fools_gained, 0, "DEATH_rewards_b.fools_gained != 0");
+        assert_eq!(rewards_a.fame_lost, rewards_b.fame_lost, "DEATH_rewards_a.fame_lost == rewards_b.fame_lost"); // lose same amount
 
         // commit+reveal
         tester::execute_commit_moves(sys.game, address_a, duel_id, moves_a.hashed);

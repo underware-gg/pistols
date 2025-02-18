@@ -134,8 +134,8 @@ mod tests {
             _assert_is_alive(round.state_b, "alive_b");
         }
 
-        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into());
-        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into());
+        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into(), table_id);
+        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into(), table_id);
         assert_eq!(score_a.score.total_duels, 1, "score_a.score.total_duels");
         assert_eq!(score_b.score.total_duels, 1, "score_b.score.total_duels");
         assert_eq!(score_a.score.total_draws, 1, "score_a.score.total_draws");
@@ -150,8 +150,8 @@ mod tests {
         assert_eq!(score_a.score.honour, round.state_a.honour, "score_a.score.honour");
         assert_eq!(score_b.score.honour, round.state_b.honour, "score_b.score.honour");
 
-        let mut scoreboard_a = tester::get_ScoreboardTable(sys.world, OWNER().into(), table_id);
-        let mut scoreboard_b = tester::get_ScoreboardTable(sys.world, OTHER().into(), table_id);
+        let mut scoreboard_a = tester::get_Scoreboard(sys.world, OWNER().into(), table_id);
+        let mut scoreboard_b = tester::get_Scoreboard(sys.world, OTHER().into(), table_id);
         assert_eq!(score_a.score.total_duels, scoreboard_a.score.total_duels, "scoreboard_a.score.total_duels");
         assert_eq!(score_b.score.total_duels, scoreboard_b.score.total_duels, "scoreboard_b.score.total_duels");
         assert_eq!(score_a.score.honour, scoreboard_a.score.honour, "scoreboard_a.score.honour");
@@ -263,8 +263,8 @@ mod tests {
         let final_blow: PacesCard = (if(winner == 1){*moves_a.moves[0]}else{*moves_b.moves[0]}.into());
         assert_eq!(round.final_blow, FinalBlow::Paces(final_blow), "round.final_blow");
 
-        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into());
-        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into());
+        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into(), table_id);
+        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into(), table_id);
         assert_eq!(score_a.score.total_duels, 1, "score_a.score.total_duels");
         assert_eq!(score_b.score.total_duels, 1, "score_b.score.total_duels");
         assert_eq!(score_a.score.total_draws, 0, "score_a.score.total_draws");
@@ -326,8 +326,8 @@ mod tests {
         assert_ne!(challenge.winner, 0, "challenge.winner ++");
         assert_gt!(challenge.timestamp_end, 0, "challenge.timestamp_end ++");
         assert_eq!(round.state, RoundState::Finished, "state ++");
-        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into());
-        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into());
+        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into(), table_id);
+        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into(), table_id);
         assert_eq!(score_a.score.total_duels, 2, "score_a.score.total_duels ++");
         assert_eq!(score_b.score.total_duels, 2, "score_b.score.total_duels ++");
         assert_eq!(score_a.score.total_draws, 0, "score_a.score.total_draws ++");

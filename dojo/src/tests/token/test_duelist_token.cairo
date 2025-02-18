@@ -35,7 +35,6 @@ use pistols::models::{
         m_Duelist, Duelist,
         m_DuelistChallenge,
         m_Scoreboard, Scoreboard, Score,
-        m_ScoreboardTable,
         ProfileType, DuelistProfile
     },
     pact::{
@@ -148,7 +147,6 @@ fn setup_uninitialized(fee_amount: u128) -> TestSystems {
             TestResource::Model(m_Pact::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
-            TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
             TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
@@ -276,8 +274,10 @@ fn test_token_uri() {
 
     let scoreboard = Scoreboard {
         holder: TOKEN_ID_1_1.low.into(),
+        table_id: 0,
         score: Score {
             honour: 99,
+            points: 777,
             total_duels: 6,
             total_wins: 3,
             total_losses: 2,

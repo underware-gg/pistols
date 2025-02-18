@@ -68,12 +68,12 @@ pub mod game {
         player::{PlayerTrait, Activity, ActivityTrait},
         challenge::{
             Challenge, ChallengeTrait,
-            Round, RoundValue,
+            Round,
             MovesTrait,
         },
         duelist::{
             DuelistTrait,
-            Scoreboard, ScoreboardTable,
+            Scoreboard,
             ScoreTrait,
         },
         pact::{
@@ -89,7 +89,7 @@ pub mod game {
         round_state::{RoundState},
         typed_data::{CommitMoveMessage, CommitMoveMessageTrait},
         cards::deck::{DeckTrait},
-        rules::{FeeValues},
+        rules::{RewardValues},
     };
     use pistols::types::trophies::{Trophy, TrophyTrait, TROPHY};
     use pistols::libs::store::{Store, StoreTrait};
@@ -305,20 +305,23 @@ pub mod game {
             let progress: DuelProgress = game_loop(wrapped, @challenge.get_deck(), ref round);
             store.set_round(@round);
 
-            // end challenge
+            // update challenge
             challenge.winner = progress.winner;
             challenge.state = if (progress.winner == 0) {ChallengeState::Draw} else {ChallengeState::Resolved};
             challenge.timestamp_end = starknet::get_block_timestamp();
-            self.finish_challenge(ref store, challenge, round);
+            store.set_challenge(@challenge);
+
+            // transfer rewards
+            let tournament_id: u128 = 0;
+            let (rewards_a, rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_dispatcher().transfer_rewards(challenge, tournament_id);
+
+            // finish challenge
+            self.update_scoreboards(ref store, @challenge, @round, @rewards_a, @rewards_b);
 
             // undo pacts
             store.exit_challenge(challenge.duelist_id_a);
             store.exit_challenge(challenge.duelist_id_b);
             challenge.unset_pact(ref store);
-
-            // transfer rewards
-            let tournament_id: u128 = 0;
-            let (_rewards_a, _rewards_b): (FeeValues, FeeValues) = store.world.duelist_token_dispatcher().transfer_rewards(challenge, tournament_id);
 
             // send duel token to winner
             if (challenge.winner != 0) {
@@ -411,36 +414,33 @@ pub mod game {
             (owner)
         }
 
-        fn finish_challenge(self: @ContractState, ref store: Store, challenge: Challenge, round: Round) {
-            store.set_challenge(@challenge);
-
-            // player score (per table)
-            let mut score_player_a: ScoreboardTable = store.get_scoreboard_table(challenge.address_a.into(), challenge.table_id);
-            let mut score_player_b: ScoreboardTable = store.get_scoreboard_table(challenge.address_b.into(), challenge.table_id);
-            // duelist score (global)
-            let mut score_duelist_a: Scoreboard = store.get_scoreboard(challenge.duelist_id_a.into());
-            let mut score_duelist_b: Scoreboard = store.get_scoreboard(challenge.duelist_id_b.into());
+        fn update_scoreboards(self: @ContractState, ref store: Store, challenge: @Challenge, round: @Round, rewards_a: @RewardValues, rewards_b: @RewardValues) {
+            // per table score
+            let mut score_global_a: Scoreboard = store.get_scoreboard((*challenge).duelist_id_a.into(), 0);
+            let mut score_global_b: Scoreboard = store.get_scoreboard((*challenge).duelist_id_b.into(), 0);
+            // global score
+            let mut score_season_a: Scoreboard = store.get_scoreboard((*challenge).duelist_id_a.into(), (*challenge).table_id);
+            let mut score_season_b: Scoreboard = store.get_scoreboard((*challenge).duelist_id_b.into(), (*challenge).table_id);
             
             // update totals
-            ScoreTrait::update_totals(ref score_player_a.score, ref score_player_b.score, challenge.winner);
-            ScoreTrait::update_totals(ref score_duelist_a.score, ref score_duelist_b.score, challenge.winner);
+            ScoreTrait::update_totals(ref score_global_a.score, ref score_global_b.score, rewards_a, rewards_b, *challenge.winner);
+            ScoreTrait::update_totals(ref score_season_a.score, ref score_season_b.score, rewards_a, rewards_b, *challenge.winner);
 
             // compute honour from final round
-            let round: RoundValue = store.get_round_value(challenge.duel_id);
-            score_player_a.score.update_honour(round.state_a.honour);
-            score_player_b.score.update_honour(round.state_b.honour);
-            score_duelist_a.score.update_honour(round.state_a.honour);
-            score_duelist_b.score.update_honour(round.state_b.honour);
+            score_global_a.score.update_honour(*round.state_a.honour);
+            score_global_b.score.update_honour(*round.state_b.honour);
+            score_season_a.score.update_honour(*round.state_a.honour);
+            score_season_b.score.update_honour(*round.state_b.honour);
             
             // save
-            store.set_scoreboard_table(@score_player_a);
-            store.set_scoreboard_table(@score_player_b);
-            store.set_scoreboard(@score_duelist_a);
-            store.set_scoreboard(@score_duelist_b);
+            store.set_scoreboard(@score_global_a);
+            store.set_scoreboard(@score_global_b);
+            store.set_scoreboard(@score_season_a);
+            store.set_scoreboard(@score_season_b);
 
             // unlock achievements
-            if (challenge.winner != 0) {
-                let winner_address: ContractAddress = challenge.winner_address();
+            if (*challenge.winner != 0) {
+                let winner_address: ContractAddress = (*challenge).winner_address();
 
                 // TODO: check win count first!
                 Trophy::FirstBlood.progress(store.world, winner_address, 1);

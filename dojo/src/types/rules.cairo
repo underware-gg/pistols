@@ -20,10 +20,11 @@ pub struct FeeDistribution {
 }
 
 #[derive(Copy, Drop, Serde, Introspect, Default)]
-pub struct FeeValues {
+pub struct RewardValues {
     pub fame_lost: u128,
     pub fame_gained: u128,
     pub fools_gained: u128,
+    pub points_scored: u16,
     // calculated at the bank
     pub fame_burned: u128,
     pub lords_unlocked: u128,
@@ -63,10 +64,10 @@ pub impl RulesTypeImpl of RulesTypeTrait {
         (@result)
     }
     // end game calculations
-    fn calc_fame_fees(self: @RulesType, balance: u128, lives_staked: u8, is_winner: bool) -> FeeValues {
-        let mut result: FeeValues = match self {
+    fn calc_rewards(self: @RulesType, balance: u128, lives_staked: u8, is_winner: bool) -> RewardValues {
+        let mut result: RewardValues = match self {
             RulesType::Season => {
-                let mut result: FeeValues = Default::default();
+                let mut result: RewardValues = Default::default();
                 let one_life: u128 = FAME::ONE_LIFE.low;
                 if (is_winner) {
                     result.survived = true;
@@ -74,9 +75,11 @@ pub impl RulesTypeImpl of RulesTypeTrait {
                     result.fame_gained = (one_life / (((balance / one_life) + 1) / k_fame));
                     let k_fools: u128 = 10;
                     result.fools_gained = (k_fools * ((one_life / 2) / result.fame_gained)) * CONST::ETH_TO_WEI.low;
-                    // apply stakes
+                    // apply staked lives
                     result.fame_gained *= lives_staked.into();
                     result.fools_gained *= lives_staked.into();
+                    // calc score
+                    result.points_scored = 555;
                 } else {
                     result.fame_lost = one_life * lives_staked.into();
                 }

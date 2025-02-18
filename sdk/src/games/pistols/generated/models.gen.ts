@@ -173,15 +173,15 @@ export interface Scoreboard {
 	score: Score;
 }
 
-// Type definition for `pistols::models::duelist::ScoreboardTable` struct
-export interface ScoreboardTable {
+// Type definition for `pistols::models::duelist::Scoreboard` struct
+export interface Scoreboard {
 	holder: BigNumberish;
 	table_id: BigNumberish;
 	score: Score;
 }
 
-// Type definition for `pistols::models::duelist::ScoreboardTableValue` struct
-export interface ScoreboardTableValue {
+// Type definition for `pistols::models::duelist::ScoreboardValue` struct
+export interface ScoreboardValue {
 	score: Score;
 }
 
@@ -607,8 +607,8 @@ export interface SchemaType extends ISchemaType {
 		DuelistValue: DuelistValue,
 		Score: Score,
 		Scoreboard: Scoreboard,
-		ScoreboardTable: ScoreboardTable,
-		ScoreboardTableValue: ScoreboardTableValue,
+		Scoreboard: Scoreboard,
+		ScoreboardValue: ScoreboardValue,
 		ScoreboardValue: ScoreboardValue,
 		Pack: Pack,
 		PackValue: PackValue,
@@ -834,12 +834,12 @@ export const schema: SchemaType = {
 			holder: 0,
 		score: { honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
-		ScoreboardTable: {
+		Scoreboard: {
 			holder: 0,
 			table_id: 0,
 		score: { honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
-		ScoreboardTableValue: {
+		ScoreboardValue: {
 		score: { honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		ScoreboardValue: {
@@ -1079,8 +1079,8 @@ export enum ModelsMapping {
 	DuelistValue = 'pistols-DuelistValue',
 	Score = 'pistols-Score',
 	Scoreboard = 'pistols-Scoreboard',
-	ScoreboardTable = 'pistols-ScoreboardTable',
-	ScoreboardTableValue = 'pistols-ScoreboardTableValue',
+	Scoreboard = 'pistols-Scoreboard',
+	ScoreboardValue = 'pistols-ScoreboardValue',
 	ScoreboardValue = 'pistols-ScoreboardValue',
 	Pack = 'pistols-Pack',
 	PackType = 'pistols-PackType',

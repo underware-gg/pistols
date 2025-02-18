@@ -1,7 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 use pistols::models::challenge::{Challenge};
-use pistols::types::rules::{FeeValues};
+use pistols::types::rules::{RewardValues};
 
 #[starknet::interface]
 pub trait IDuelistToken<TState> {
@@ -51,14 +51,14 @@ pub trait IDuelistToken<TState> {
     fn is_inactive(self: @TState, duelist_id: u128) -> bool;
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
-    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> FeeValues;
+    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn poke(ref self: TState, duelist_id: u128);
     fn sacrifice(ref self: TState, duelist_id: u128);
     // fn delete_duelist(ref self: TState, duelist_id: u128);
 
     // IDuelistTokenProtected
     fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, seed: felt252) -> Span<u128>;
-    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
+    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (RewardValues, RewardValues);
 }
 
 #[starknet::interface]
@@ -69,7 +69,7 @@ pub trait IDuelistTokenPublic<TState> {
     fn is_inactive(self: @TState, duelist_id: u128) -> bool;
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
-    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> FeeValues;
+    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8) -> RewardValues;
     // write
     fn poke(ref self: TState, duelist_id: u128); //@description:Reactivates an inactive Duelist
     fn sacrifice(ref self: TState, duelist_id: u128); //@description:Sacrifices a Duelist
@@ -79,7 +79,7 @@ pub trait IDuelistTokenPublic<TState> {
 #[starknet::interface]
 pub trait IDuelistTokenProtected<TState> {
     fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, seed: felt252) -> Span<u128>;
-    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
+    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (RewardValues, RewardValues);
 }
 
 #[dojo::contract]
@@ -148,7 +148,7 @@ pub mod duelist_token {
         rules::{
             RulesType, RulesTypeTrait,
             FeeDistribution, FeeDistributionTrait,
-            FeeValues,
+            RewardValues,
         },
         constants::{CONST, FAME},
     };
@@ -246,21 +246,22 @@ pub mod duelist_token {
         fn calc_season_reward(self: @ContractState,
             duelist_id: u128,
             lives_staked: u8,
-        ) -> FeeValues {
+        ) -> RewardValues {
             let mut store: Store = StoreTrait::new(self.world_default());
             let rules: RulesType = store.get_current_season_rules();
             let fame_balance: u128 = store.world.fame_coin_dispatcher().balance_of_token(starknet::get_contract_address(), duelist_id).low;
-            let fees_loss: FeeValues = rules.calc_fame_fees(fame_balance, lives_staked, false);
-            let fees_win: FeeValues = rules.calc_fame_fees(fame_balance, lives_staked, true);
-            (FeeValues{
+            let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false);
+            let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true);
+            (RewardValues{
                 // if you win...
-                fame_gained: fees_win.fame_gained,
-                fools_gained: fees_win.fools_gained,
+                fame_gained: rewards_win.fame_gained,
+                fools_gained: rewards_win.fools_gained,
+                points_scored: rewards_win.points_scored,
                 // if you lose...
-                fame_lost: fees_loss.fame_lost,
+                fame_lost: rewards_loss.fame_lost,
                 lords_unlocked: 0,
                 fame_burned: 0,
-                survived: (fame_balance - fees_loss.fame_lost) >= FAME::ONE_LIFE.low,
+                survived: (fame_balance - rewards_loss.fame_lost) >= FAME::ONE_LIFE.low,
             })
         }
 
@@ -346,7 +347,7 @@ pub mod duelist_token {
             ref self: ContractState,
             challenge: Challenge,
             tournament_id: u128,
-        ) -> (FeeValues, FeeValues) {
+        ) -> (RewardValues, RewardValues) {
             // validate caller (game contract only)
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.is_game_contract(starknet::get_caller_address()), Errors::DUEL_INVALID_CALLER);
@@ -367,18 +368,18 @@ pub mod duelist_token {
             let balance_b: u128 = self.fame_balance(fame_dispatcher, challenge.duelist_id_b);
 
             // calculate fees
-            let mut values_a: FeeValues = rules.calc_fame_fees(balance_a, challenge.lives_staked, challenge.winner == 1);
-            let mut values_b: FeeValues = rules.calc_fame_fees(balance_b, challenge.lives_staked, challenge.winner == 2);
+            let mut rewards_a: RewardValues = rules.calc_rewards(balance_a, challenge.lives_staked, challenge.winner == 1);
+            let mut rewards_b: RewardValues = rules.calc_rewards(balance_b, challenge.lives_staked, challenge.winner == 2);
 
             // transfer gains
             let treasury_address: ContractAddress = store.get_config_treasury_address();
-            self.process_rewards(fame_dispatcher, fools_dispatcher, challenge.duelist_id_a, values_a);
-            self.process_rewards(fame_dispatcher, fools_dispatcher, challenge.duelist_id_b, values_b);
+            self.process_rewards(fame_dispatcher, fools_dispatcher, challenge.duelist_id_a, rewards_a);
+            self.process_rewards(fame_dispatcher, fools_dispatcher, challenge.duelist_id_b, rewards_b);
             // TODO... optimize, combine LORDS releases into one
-            self.process_lost_fame(fame_dispatcher, bank_dispatcher, treasury_address, distribution, balance_a, challenge.duelist_id_a, ref values_a);
-            self.process_lost_fame(fame_dispatcher, bank_dispatcher, treasury_address, distribution, balance_b, challenge.duelist_id_b, ref values_b);
+            self.process_lost_fame(fame_dispatcher, bank_dispatcher, treasury_address, distribution, balance_a, challenge.duelist_id_a, ref rewards_a);
+            self.process_lost_fame(fame_dispatcher, bank_dispatcher, treasury_address, distribution, balance_b, challenge.duelist_id_b, ref rewards_b);
 
-            (values_a, values_b)
+            (rewards_a, rewards_b)
         }
     }
 
@@ -408,7 +409,7 @@ pub mod duelist_token {
             let fame_balance: u128 = self.fame_balance(fame_dispatcher, duelist_id);
             assert(fame_balance != 0, Errors::DUELIST_IS_DEAD);
 
-            let mut values: FeeValues = Default::default();
+            let mut values: RewardValues = Default::default();
             values.fame_lost = if (fame_dripped != 0) {
                 // poke: burn dripped fame, but no more than balance
                 (core::cmp::min(fame_balance, fame_dripped))
@@ -437,7 +438,7 @@ pub mod duelist_token {
             fame_dispatcher: IFameCoinDispatcher,
             fools_dispatcher: IFoolsCoinDispatcher,
             duelist_id: u128,
-            values: FeeValues,
+            values: RewardValues,
         ) {
             // reward 100% FAME to duelist
             if (values.fame_gained != 0) {
@@ -457,7 +458,7 @@ pub mod duelist_token {
             distribution: @FeeDistribution,
             fame_balance: u128,
             duelist_id: u128,
-            ref values: FeeValues,
+            ref values: RewardValues,
         ) {
             // Burn FAME from duelist
             if (values.fame_lost != 0) {
@@ -584,7 +585,7 @@ pub mod duelist_token {
             let mut world = self.world_default();
             let mut store: Store = StoreTrait::new(world);
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
-            let scoreboard: ScoreboardValue = store.get_scoreboard_value(token_id.low.into());
+            let scoreboard: ScoreboardValue = store.get_scoreboard_value(token_id.low.into(), 0);
             let mut result: Array<ByteArray> = array![];
             // Name
             result.append("Name");
@@ -609,6 +610,9 @@ pub mod duelist_token {
             result.append("Total Duels");
             result.append(scoreboard.score.total_duels.to_string());
             if (scoreboard.score.total_duels != 0) {
+                result.append("Score");
+                result.append(scoreboard.score.points.to_string());
+
                 result.append("Total Wins");
                 result.append(scoreboard.score.total_wins.to_string());
 

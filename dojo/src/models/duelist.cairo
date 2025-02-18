@@ -23,20 +23,10 @@ pub struct DuelistChallenge {
     pub duel_id: u128,      // current Challenge a Duelist is in
 }
 
-// player/duelist scoreboards
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct Scoreboard {
-    #[key]
-    pub holder: felt252,    // duelist_id or player_address
-    //------------
-    pub score: Score,
-}
-
 // Per table scoreboard
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct ScoreboardTable {
+pub struct Scoreboard {
     #[key]
     pub holder: felt252,    // duelist_id or player_address
     #[key]
@@ -48,12 +38,13 @@ pub struct ScoreboardTable {
 #[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
 pub struct Score {
     pub honour: u8,             // 0..100
+    pub points: u16,
     pub total_duels: u16,
     pub total_wins: u16,
     pub total_losses: u16,
     pub total_draws: u16,
     pub honour_history: u64,    // past 8 duels, each byte holds one duel honour
-}
+} // [8 + 4*16 + 64] = 128 bytes
 
 
 //----------------------------------
@@ -61,9 +52,10 @@ pub struct Score {
 //
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
 use pistols::libs::store::{Store, StoreTrait};
+use pistols::types::rules::{RewardValues};
+use pistols::types::constants::{HONOUR};
 use pistols::utils::bitwise::{BitwiseU64};
 use pistols::utils::math::{MathU64};
-use pistols::types::constants::{HONOUR};
 
 #[generate_trait]
 pub impl DuelistImpl of DuelistTrait {
@@ -122,15 +114,17 @@ pub impl ScoreImpl of ScoreTrait {
     }
 
     // update duel totals only
-    fn update_totals(ref score_a: Score, ref score_b: Score, winner: u8) {
+    fn update_totals(ref score_a: Score, ref score_b: Score, rewards_a: @RewardValues, rewards_b: @RewardValues, winner: u8) {
         score_a.total_duels += 1;
         score_b.total_duels += 1;
+        score_a.points += *rewards_a.points_scored;
+        score_b.points += *rewards_b.points_scored;
         if (winner == 1) {
             score_a.total_wins += 1;
             score_b.total_losses += 1;
         } else if (winner == 2) {
-            score_a.total_losses += 1;
             score_b.total_wins += 1;
+            score_a.total_losses += 1;
         } else {
             score_a.total_draws += 1;
             score_b.total_draws += 1;

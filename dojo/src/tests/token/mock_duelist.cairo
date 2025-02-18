@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::models::challenge::{Challenge};
-use pistols::types::rules::{FeeValues};
+use pistols::types::rules::{RewardValues};
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -21,7 +21,7 @@ pub trait IDuelistToken<TState> {
     // Duelist
     fn is_alive(self: @TState, token_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
-    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues);
+    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (RewardValues, RewardValues);
     fn poke(ref self: TState, duelist_id: u128) -> bool;
     fn sacrifice(ref self: TState, duelist_id: u128);
 }
@@ -35,7 +35,7 @@ pub mod duelist_token {
 
     use super::{MockDuelistOwners};
     use pistols::models::challenge::{Challenge};
-    use pistols::types::rules::{FeeValues};
+    use pistols::types::rules::{RewardValues};
     use pistols::utils::misc::{ZERO};
     use pistols::tests::tester::tester::{
         OWNER, OWNED_BY_OWNER,
@@ -91,7 +91,7 @@ pub mod duelist_token {
         fn life_count(self: @ContractState, duelist_id: u128) -> u8 {
             (3)
         }
-        fn transfer_rewards(ref self: ContractState, challenge: Challenge, tournament_id: u128) -> (FeeValues, FeeValues) {
+        fn transfer_rewards(ref self: ContractState, challenge: Challenge, tournament_id: u128) -> (RewardValues, RewardValues) {
             (Default::default(), Default::default())
         }
         fn poke(ref self: ContractState, duelist_id: u128) -> bool {

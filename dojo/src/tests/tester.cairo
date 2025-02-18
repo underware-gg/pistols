@@ -47,7 +47,6 @@ pub mod tester {
             m_Duelist, Duelist, DuelistValue,
             m_DuelistChallenge, DuelistChallenge,
             m_Scoreboard, Scoreboard,
-            m_ScoreboardTable, ScoreboardTable,
         },
         pact::{
             m_Pact,
@@ -216,7 +215,6 @@ pub mod tester {
             TestResource::Model(m_Pact::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
-            TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
             TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
@@ -655,11 +653,7 @@ pub mod tester {
         (duelist_challenge.duel_id)
     }
     #[inline(always)]
-    pub fn get_Scoreboard(world: WorldStorage, holder: felt252) -> Scoreboard {
-        (world.read_model(holder))
-    }
-    #[inline(always)]
-    pub fn get_ScoreboardTable(world: WorldStorage, holder: felt252, table_id: felt252) -> ScoreboardTable {
+    pub fn get_Scoreboard(world: WorldStorage, holder: felt252, table_id: felt252) -> Scoreboard {
         (world.read_model((holder, table_id),))
     }
     #[inline(always)]
