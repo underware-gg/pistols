@@ -22,15 +22,14 @@ pub struct LeaderboardPosition {
 // Traits
 //
 use pistols::utils::bitwise::{BitwiseU256};
-use pistols::utils::math::{MathU256};
 
 #[generate_trait]
 pub impl LeaderboardImpl of LeaderboardTrait {
     const MAX_POSITIONS: u8 = 15;
     const BITS: u8 = 16;
     const MASK: u256 = 0xffff;
+    const SHIFT: u256 = 0x10000;
 
-    #[inline(always)]
     fn new(table_id: felt252, positions: u8) -> Leaderboard {
         assert(positions > 0 && positions <= Self::MAX_POSITIONS, 'LEADERBOARD: invalid positions');
         (Leaderboard {
@@ -44,19 +43,21 @@ pub impl LeaderboardImpl of LeaderboardTrait {
     fn exists(self: @Leaderboard) -> bool {
         (*self.positions > 0)
     }
-    #[inline(always)]
     fn get_duelist_position(self: @Leaderboard, duelist_id: u128) -> LeaderboardPosition {
         let mut result: LeaderboardPosition = Default::default();
         let mut ids: u256 = (*self.duelist_ids).into();
         let mut p: u8 = 1;
         while (p <= *self.positions) {
             if (p > 1) {
-                ids = BitwiseU256::shr(ids, Self::BITS.into());
+                ids /= Self::SHIFT;
             }
             let id: u128 = (ids & Self::MASK).low;
             // println!("--> i[{}] id[{:x}]", i, id);
             if (duelist_id == id) {
-                let score: u16 = (BitwiseU256::shr((*self.scores).into(), ((p-1) * Self::BITS).into()) & Self::MASK).try_into().unwrap();
+                let score: u16 = (
+                    ((*self.scores).into() / Self::_shift_mask(p))
+                    & Self::MASK
+                ).try_into().unwrap();
                 result.position = p;
                 result.duelist_id = duelist_id;
                 result.score = score;
@@ -66,7 +67,6 @@ pub impl LeaderboardImpl of LeaderboardTrait {
         };
         (result)
     }
-    #[inline(always)]
     fn get_all_positions(self: @Leaderboard) -> Span<LeaderboardPosition> {
         let mut result: Array<LeaderboardPosition> = array![];
         let mut ids: u256 = (*self.duelist_ids).into();
@@ -74,8 +74,8 @@ pub impl LeaderboardImpl of LeaderboardTrait {
         let mut p: u8 = 1;
         while (p <= *self.positions) {
             if (p > 1) {
-                ids = BitwiseU256::shr(ids, Self::BITS.into());
-                scores = BitwiseU256::shr(scores, Self::BITS.into());
+                ids /= Self::SHIFT;
+                scores /= Self::SHIFT;
             }
             let id: u128 = (ids & Self::MASK).low;
             let score: u16 = (scores & Self::MASK).try_into().unwrap();
@@ -92,56 +92,131 @@ pub impl LeaderboardImpl of LeaderboardTrait {
         };
         (result.span())
     }
-    #[inline(always)]
-    fn insert_score(ref self: Leaderboard, duelist_id: u128, duelist_score: u16) -> u8 {
-        let mut position: u8 = 0;
-        if (duelist_score > 0) {
+    fn insert_score(ref self: Leaderboard, duelist_id: u128, new_score: u16) -> u8 {
+        let mut to_position: u8 = 0;
+        if (new_score > 0) {
+            let mut from_position: u8 = 0;
             let mut scores: u256 = (self.scores).into();
+            let mut ids: u256 = (self.duelist_ids).into();
             let mut p: u8 = 1;
             while (p <= self.positions) {
                 if (p > 1) {
-                    scores = BitwiseU256::shr(scores, Self::BITS.into());
+                    scores /= Self::SHIFT;
+                    ids /= Self::SHIFT;
                 }
                 let score: u16 = (scores & Self::MASK).try_into().unwrap();
-                // println!("--> i[{}] id[{:x}] score[{:x}]", i, id, score);
-                if (duelist_score > score) {
-                    self.duelist_ids = Self::_insert_value_at_position(self.duelist_ids.into(), duelist_id.try_into().unwrap(), p, self.positions);
-                    self.scores = Self::_insert_value_at_position(self.scores.into(), duelist_score, p, self.positions);
-                    position = p;
-                    break;
+                let id: u128 = (ids & Self::MASK).low;
+// println!("--> p[{}] id[{:x}] score[{:x}]", p, id, score);
+                if (to_position == 0 && new_score > score) {
+                    to_position = p;
+                }
+                if (id == duelist_id) {
+                    from_position = p; // need to be removed
+                    break; // current score is higher or already found to_position
+                }
+                if (score == 0) {
+                    break; // end of existing positions
                 }
                 p += 1;
             };
-        }
-        (position)
-    }
-    fn _insert_value_at_position(previous: u256, value: u16, position: u8, max_positions: u8) -> felt252 {
-        assert(position > 0 && position <= max_positions, 'LEADERBOARD: invalid insert');
-        let mut result: u256 = 0;
-        if (position == 1) {
-            result = value.into();
-        } else {
-            // insert value shifted to position
-            result = BitwiseU256::shl(value.into(), ((position-1) * Self::BITS).into());
-            // insert pre values
-            if (previous != 0) {
-                let pre_value: u256 = (previous & Self::_pre_mask(position));
-                if (pre_value != 0) {
-                    result = result | pre_value;
+// println!("--> id[{:x}] score[{:x}] = old[{}] new[{}]", duelist_id, new_score, from_position, to_position);
+            if (to_position > 0) {
+                if (to_position == from_position) {
+                    self.scores = Self::_replace_value_at_position(self.scores.into(), new_score.into(), to_position, self.positions);
+                } else if (from_position != 0) {
+                    self.scores = Self::_move_value_to_position(self.scores.into(), new_score.into(), from_position, to_position, self.positions);
+                    self.duelist_ids = Self::_move_value_to_position(self.duelist_ids.into(), duelist_id.into(), from_position, to_position, self.positions);
+                } else {
+                    self.scores = Self::_insert_value_at_position(self.scores.into(), new_score.into(), to_position, self.positions);
+                    self.duelist_ids = Self::_insert_value_at_position(self.duelist_ids.into(), duelist_id.into(), to_position, self.positions);
                 }
             }
         }
-        // insert post values, shift one position
-        if (previous != 0){
-            let post_value: u256 = (previous & Self::_post_mask(position));
-            if (post_value != 0) {
-                result = result | BitwiseU256::shl(post_value, Self::BITS.into());
-            }
-            // mask out anything not in the positions range
-            result = result & Self::_positions_mask(max_positions);
-        }
+        (to_position)
+    }
+    fn _replace_value_at_position(previous: u256, value: u256, to_position: u8, max_positions: u8) -> felt252 {
+        assert(to_position > 0 && to_position <= max_positions, 'LEADERBOARD: invalid replace');
+        let result: u256 =
+            // keep outside position
+            (previous & ~Self::_position_mask(to_position)) |
+            // shift value to position
+            if (to_position == 1) {value} else {(value * Self::_shift_mask(to_position))};
         (result.try_into().unwrap())
     }
+    fn _insert_value_at_position(previous: u256, value: u256, to_position: u8, max_positions: u8) -> felt252 {
+        assert(to_position > 0 && to_position <= max_positions, 'LEADERBOARD: invalid insert');
+        let mut result: u256 = (
+            // insert pre values
+            (previous & Self::_pre_mask(to_position)) |
+            // insert post values, shifted one position
+            ((previous & (Self::_post_mask(to_position))) * Self::SHIFT) |
+            // shift value to position
+            if (to_position == 1) {value} else {(value * Self::_shift_mask(to_position))}
+        // remove outside positions range
+        ) & Self::_full_mask(max_positions);
+        (result.try_into().unwrap())
+    }
+    fn _move_value_to_position(previous: u256, value: u256, from_position: u8, to_position: u8, max_positions: u8) -> felt252 {
+        assert(to_position > 0 && to_position <= max_positions, 'LEADERBOARD: invalid new pos');
+        assert(from_position > 0 && from_position <= max_positions, 'LEADERBOARD: invalid old pos');
+        assert(from_position > to_position, 'LEADERBOARD: invalid move');
+        // mask for old-new range
+        let range_bits: u256 = BitwiseU256::bit_fill(((from_position - to_position + 1) * Self::BITS).into());
+        let range_mask: u256 = range_bits * Self::_shift_mask(to_position);
+        let result: u256 = 
+            // keep outside range
+            (previous & ~range_mask) |
+            // shift range (less old pos)
+            BitwiseU256::shl(previous & range_mask & ~Self::_position_mask(from_position), Self::BITS.into()) |
+            // shift value to position
+            if (to_position == 1) {value} else {(value * Self::_shift_mask(to_position))};
+        (result.try_into().unwrap())
+    }
+    // this mask represents the area occupied by scores at [position]
+    fn _position_mask(position: u8) -> u256 {
+        (match position {
+            0  => 0,
+            1  => 0x00000000000000000000000000000000000000000000000000000000ffff,
+            2  => 0x0000000000000000000000000000000000000000000000000000ffff0000,
+            3  => 0x000000000000000000000000000000000000000000000000ffff00000000,
+            4  => 0x00000000000000000000000000000000000000000000ffff000000000000,
+            5  => 0x0000000000000000000000000000000000000000ffff0000000000000000,
+            6  => 0x000000000000000000000000000000000000ffff00000000000000000000,
+            7  => 0x00000000000000000000000000000000ffff000000000000000000000000,
+            8  => 0x0000000000000000000000000000ffff0000000000000000000000000000,
+             9 => 0x000000000000000000000000ffff00000000000000000000000000000000,
+            10 => 0x00000000000000000000ffff000000000000000000000000000000000000,
+            11 => 0x0000000000000000ffff0000000000000000000000000000000000000000,
+            12 => 0x000000000000ffff00000000000000000000000000000000000000000000,
+            13 => 0x00000000ffff000000000000000000000000000000000000000000000000,
+            14 => 0x0000ffff0000000000000000000000000000000000000000000000000000,
+            15 => 0xffff00000000000000000000000000000000000000000000000000000000,
+            _ => 0,
+        })
+    }
+    // multiply by this mask to shift down a number of [positions]
+    fn _shift_mask(positions: u8) -> u256 {
+        (match positions {
+            0  => 0,
+            1  => 0x000000000000000000000000000000000000000000000000000000000001,
+            2  => 0x000000000000000000000000000000000000000000000000000000010000,
+            3  => 0x000000000000000000000000000000000000000000000000000100000000,
+            4  => 0x000000000000000000000000000000000000000000000001000000000000,
+            5  => 0x000000000000000000000000000000000000000000010000000000000000,
+            6  => 0x000000000000000000000000000000000000000100000000000000000000,
+            7  => 0x000000000000000000000000000000000001000000000000000000000000,
+            8  => 0x000000000000000000000000000000010000000000000000000000000000,
+             9 => 0x000000000000000000000000000100000000000000000000000000000000,
+            10 => 0x000000000000000000000001000000000000000000000000000000000000,
+            11 => 0x000000000000000000010000000000000000000000000000000000000000,
+            12 => 0x000000000000000100000000000000000000000000000000000000000000,
+            13 => 0x000000000001000000000000000000000000000000000000000000000000,
+            14 => 0x000000010000000000000000000000000000000000000000000000000000,
+            15 => 0x000100000000000000000000000000000000000000000000000000000000,
+            _ => 0,
+        })
+    }
+    // when inserting a value at [position], keep higher scores in this mask
     fn _pre_mask(position: u8) -> u256 {
         (match position {
             0  => 0,
@@ -163,6 +238,7 @@ pub impl LeaderboardImpl of LeaderboardTrait {
             _ => 0,
         })
     }
+    // when inserting a value at [position], shift down lower scores in this mask
     fn _post_mask(position: u8) -> u256 {
         (match position {
             0  => 0,
@@ -184,8 +260,9 @@ pub impl LeaderboardImpl of LeaderboardTrait {
             _ => 0,
         })
     }
-    fn _positions_mask(positions: u8) -> u256 {
-        (match positions {
+    // the full area used by a leaderboard with [max_positions]
+    fn _full_mask(max_positions: u8) -> u256 {
+        (match max_positions {
             0  => 0,
             1  => 0x00000000000000000000000000000000000000000000000000000000ffff,
             2  => 0x0000000000000000000000000000000000000000000000000000ffffffff,
@@ -298,27 +375,31 @@ mod unit {
             duelist_ids: 0,
             scores: 0,
         };
-        lb.insert_score(0x1000, 0x00ff);
-        lb.insert_score(0x2000, 0x00ee);
-        lb.insert_score(0x3000, 0x00dd);
-        lb.insert_score(0x4000, 0x00cc);
-        lb.insert_score(0x5000, 0x00bb);
-        lb.insert_score(0x6000, 0x00aa);
-        lb.insert_score(0x7000, 0x0099);
-        lb.insert_score(0x8000, 0x0088);
-        lb.insert_score(0x9000, 0x0077);
-        lb.insert_score(0xa000, 0x0066);
-        lb.insert_score(0xb000, 0x0055);
-        lb.insert_score(0xc000, 0x0044);
-        lb.insert_score(0xd000, 0x0033);
-        lb.insert_score(0xe000, 0x0022);
-        lb.insert_score(0xf000, 0x0011);
+        lb.insert_score(0x1000, 0x00ff); // 1
+        lb.insert_score(0x2000, 0x00ee); // 2
+        lb.insert_score(0x3000, 0x00dd); // 3
+        lb.insert_score(0x4000, 0x00cc); // 4
+        lb.insert_score(0x5000, 0x00bb); // 5
+        lb.insert_score(0x6000, 0x00aa); // 6
+        lb.insert_score(0x7000, 0x0099); // 7
+        lb.insert_score(0x8000, 0x0088); // 8
+        lb.insert_score(0x9000, 0x0077); // 9
+        lb.insert_score(0xa000, 0x0066); // 10
+        lb.insert_score(0xb000, 0x0055); // 11
+        lb.insert_score(0xc000, 0x0044); // 12
+        lb.insert_score(0xd000, 0x0033); // 13
+        lb.insert_score(0xe000, 0x0022); // 14
+        lb.insert_score(0xf000, 0x0011); // 15
         assert_eq!(lb.duelist_ids, IDS, "duelist_ids");
         assert_eq!(lb.scores, SCORES, "scores");
-        // same score as last: not qualified
+        // same score as last -- not qualified
         assert_eq!(lb.insert_score(0x1234, 0x0011), 0, "not qualified");
-        // same score: goes later
+        // same score: goes later -- insert later
         assert_eq!(lb.insert_score(0x1234, 0x0022), 15, "last place");
+        // new score, same position -- replace
+        assert_eq!(lb.insert_score(0xc000, 0x0045), 12, "replace score");
+        // new score, lower position - do nothing
+        assert_eq!(lb.insert_score(0xc000, 0x0033), 0, "lower score");
     }
 
     #[test]
@@ -351,7 +432,7 @@ mod unit {
     }
 
     #[test]
-    fn test_insert_value() {
+    fn test_insert_new_value() {
         let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x0, 0xffff, 1, 5);
         assert_eq!(result, 0xffff, "at_1");
         let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x1111, 0xffff, 1, 1);
@@ -378,5 +459,59 @@ mod unit {
         assert_eq!(result, 0x2222ffff333344445555, "at_4/5_(5)");
         let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x11112222333344445555, 0xffff, 5, 5);
         assert_eq!(result, 0xffff2222333344445555, "at_5/5_(5)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 1, 15);
+        assert_eq!(result, 0x22223333444455556666777788889999aaaabbbbccccddddeeeeffffF88F, "0x11112223333..._at_1");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 2, 15);
+        assert_eq!(result, 0x22223333444455556666777788889999aaaabbbbccccddddeeeeF88Fffff, "0x11112223333..._at_2");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 14, 15);
+        assert_eq!(result, 0x2222F88F3333444455556666777788889999aaaabbbbccccddddeeeeffff, "0x11112223333..._at_14");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 15, 15);
+        assert_eq!(result, 0xF88F22223333444455556666777788889999aaaabbbbccccddddeeeeffff, "0x11112223333..._at_15");
+    }
+
+    #[test]
+    fn test_move_value() {
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x11112222, 0xffff, 2, 1, 2);
+        assert_eq!(result, 0x2222ffff, "0x1111222_to_1");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333, 0xffff, 2, 1, 3);
+        assert_eq!(result, 0x11113333ffff, "0x111122223333_to_2_1");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333, 0xffff, 3, 1, 3);
+        assert_eq!(result, 0x22223333ffff, "0x111122223333_to_2_1");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333, 0xffff, 3, 2, 3);
+        assert_eq!(result, 0x2222ffff3333, "0x111122223333_to_2_1");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 2, 1, 15);
+        assert_eq!(result, 0x111122223333444455556666777788889999aaaabbbbccccddddffffF88F, "0x11112223333..._at_");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 5, 1, 15);
+        assert_eq!(result, 0x111122223333444455556666777788889999aaaaccccddddeeeeffffF88F, "0x11112223333..._at_");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 15, 1, 15);
+        assert_eq!(result, 0x22223333444455556666777788889999aaaabbbbccccddddeeeeffffF88F, "0x11112223333..._at_");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 3, 2, 15);
+        assert_eq!(result, 0x111122223333444455556666777788889999aaaabbbbcccceeeeF88Fffff, "0x11112223333..._at_");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 5, 2, 15);
+        assert_eq!(result, 0x111122223333444455556666777788889999aaaaccccddddeeeeF88Fffff, "0x11112223333..._at_");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 15, 2, 15);
+        assert_eq!(result, 0x22223333444455556666777788889999aaaabbbbccccddddeeeeF88Fffff, "0x11112223333..._at_");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 15, 14, 15);
+        assert_eq!(result, 0x2222F88F3333444455556666777788889999aaaabbbbccccddddeeeeffff, "0x11112223333..._at_");
+    }
+
+    #[test]
+    fn test_replace_value() {
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x0, 0xffff, 1, 5);
+        assert_eq!(result, 0xffff, "0x0_at_1");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x0, 0xffff, 5, 5);
+        assert_eq!(result, 0xffff0000000000000000, "0x0_at_5");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x1111, 0xffff, 1, 1);
+        assert_eq!(result, 0xffff, "0x1111_at_1");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x11112222, 0xffff, 1, 2);
+        assert_eq!(result, 0x1111ffff, "0x1111222_at_2");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x11112222, 0xffff, 2, 2);
+        assert_eq!(result, 0xffff2222, "0x1111222_at_1");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 1, 15);
+        assert_eq!(result, 0x111122223333444455556666777788889999aaaabbbbccccddddeeeeF88F, "0x11112223333..._at_1");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 3, 15);
+        assert_eq!(result, 0x111122223333444455556666777788889999aaaabbbbccccF88Feeeeffff, "0x11112223333..._at_3");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 15, 15);
+        assert_eq!(result, 0xF88F22223333444455556666777788889999aaaabbbbccccddddeeeeffff, "0x11112223333..._at_5");
     }
 }
