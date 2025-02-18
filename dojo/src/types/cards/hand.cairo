@@ -89,7 +89,7 @@ pub impl FinalBlowDebug of core::fmt::Debug<FinalBlow> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
 
     use pistols::types::cards::{
         paces::{PacesCard},

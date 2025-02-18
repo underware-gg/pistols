@@ -16,7 +16,7 @@ pub fn make_seed(caller: ContractAddress, uuid: usize) -> u128 {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{make_seed};
 
     #[test]

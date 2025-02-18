@@ -48,7 +48,7 @@ pub fn make_block_hash() -> felt252 {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{
         hash_values,
         make_block_hash,

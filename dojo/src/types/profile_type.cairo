@@ -573,7 +573,7 @@ impl DuelistIdIntoBotProfile of core::traits::Into<u128, BotProfile> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
 
     use super::{
         ProfileType, ProfileTypeTrait,

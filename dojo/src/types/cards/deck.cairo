@@ -99,7 +99,7 @@ pub impl DeckTypeDebug of core::fmt::Debug<DeckType> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{Deck, DeckTrait, DeckType, DeckTypeTrait};
     use pistols::types::cards::hand::{
         DuelistHand,

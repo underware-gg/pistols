@@ -539,7 +539,7 @@ pub impl MathU256 of MathTrait<u256, u256> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{
         MathU8,MathU16,MathU32,MathU128,MathU256,
         MAX_SHORT_STRING_NUMBER,

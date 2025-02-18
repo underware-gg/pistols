@@ -163,7 +163,7 @@ impl TacticsCardDebug of core::fmt::Debug<TacticsCard> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{TacticsCard};
 
     #[test]

@@ -364,7 +364,7 @@ pub impl BitwiseU256 of BitwiseTrait<u256> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{
         BitwiseU8, BitwiseU16, BitwiseU32, BitwiseU64, BitwiseU128, BitwiseU256,
     };

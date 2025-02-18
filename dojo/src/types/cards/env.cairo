@@ -278,7 +278,7 @@ impl EnvCardDebug of core::fmt::Debug<EnvCard> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{EnvCard};
 
     #[test]

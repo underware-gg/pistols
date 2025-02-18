@@ -125,7 +125,7 @@ impl PacesCardDebug of core::fmt::Debug<PacesCard> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{PacesCard};
 
     #[test]

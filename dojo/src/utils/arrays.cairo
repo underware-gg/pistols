@@ -68,7 +68,7 @@ pub impl SpanDefault<T, +Drop<T>> of Default<Span<T>> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{ArrayUtilsTrait, SpanUtilsTrait};
 
     #[test]

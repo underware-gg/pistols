@@ -53,7 +53,7 @@ pub impl BoolToString of BoolToStringTrait {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{
         U8IntoByteArray,
         U16IntoByteArray,

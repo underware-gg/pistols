@@ -199,7 +199,7 @@ impl BladesCardDebug of core::fmt::Debug<BladesCard> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{BladesCard};
 
     #[test]
