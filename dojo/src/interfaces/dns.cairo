@@ -1,6 +1,7 @@
 use starknet::{ContractAddress};
 use core::num::traits::Zero;
 use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcher};
+use dojo::meta::interface::{IDeployedResourceDispatcher, IDeployedResourceDispatcherTrait};
 
 pub use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
@@ -51,10 +52,14 @@ pub mod SELECTORS {
 
 #[generate_trait]
 pub impl DnsImpl of DnsTrait {
-    fn contract_address(self: @WorldStorage, contract_name: @ByteArray) -> ContractAddress {
+    #[inline(always)]
+    fn find_contract_name(self: @WorldStorage, contract_address: ContractAddress) -> ByteArray {
+        (IDeployedResourceDispatcher{contract_address}.dojo_name())
+    }
+    fn find_contract_address(self: @WorldStorage, contract_name: @ByteArray) -> ContractAddress {
         // let (contract_address, _) = self.dns(contract_name).unwrap(); // will panic if not found
-        match self.dns(contract_name) {
-            Option::Some((contract_address, _)) => {
+        match self.dns_address(contract_name) {
+            Option::Some(contract_address) => {
                 (contract_address)
             },
             Option::None => {
@@ -76,74 +81,80 @@ pub impl DnsImpl of DnsTrait {
     //
     #[inline(always)]
     fn admin_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"admin"))
+        (self.find_contract_address(@"admin"))
     }
     #[inline(always)]
     fn bank_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"bank"))
+        (self.find_contract_address(@"bank"))
     }
     #[inline(always)]
     fn game_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"game"))
+        (self.find_contract_address(@"game"))
     }
     #[inline(always)]
     fn tutorial_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"tutorial"))
+        (self.find_contract_address(@"tutorial"))
     }
     #[inline(always)]
     fn rng_address(self: @WorldStorage) -> ContractAddress {
-        let result = self.contract_address(@"rng");
+        let result = self.find_contract_address(@"rng");
         if (result.is_non_zero()) {result} // deployments always have the rng contract
         else {self.rng_mock_address()}     // but for testing, we can skip it and deploy this
     }
     #[inline(always)]
     fn rng_mock_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"rng_mock"))
+        (self.find_contract_address(@"rng_mock"))
     }
     #[inline(always)]
     fn duel_token_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"duel_token"))
+        (self.find_contract_address(@"duel_token"))
     }
     #[inline(always)]
     fn duelist_token_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"duelist_token"))
+        (self.find_contract_address(@"duelist_token"))
     }
     #[inline(always)]
     fn pack_token_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"pack_token"))
+        (self.find_contract_address(@"pack_token"))
     }
     #[inline(always)]
     fn fame_coin_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"fame_coin"))
+        (self.find_contract_address(@"fame_coin"))
     }
     #[inline(always)]
     fn fools_coin_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"fools_coin"))
+        (self.find_contract_address(@"fools_coin"))
     }
     // mocks
     #[inline(always)]
     fn lords_mock_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"lords_mock"))
+        (self.find_contract_address(@"lords_mock"))
     }
     #[inline(always)]
     fn vrf_mock_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"vrf_mock"))
+        (self.find_contract_address(@"vrf_mock"))
     }
 
     //--------------------------
     // address validators
     //
     #[inline(always)]
-    fn is_game_contract(self: @WorldStorage, address: ContractAddress) -> bool {
-        (address == self.game_address())
+    fn is_world_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
+        (contract_address == self.find_contract_address(
+            @self.find_contract_name(contract_address)
+        ))
     }
     #[inline(always)]
     fn is_duel_contract(self: @WorldStorage, address: ContractAddress) -> bool {
         (address == self.duel_token_address())
     }
     #[inline(always)]
-    fn is_duelist_contract(self: @WorldStorage, address: ContractAddress) -> bool {
-        (address == self.duelist_token_address())
+    fn is_duel_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
+        (contract_address == self.duel_token_address())
+    }
+    #[inline(always)]
+    fn is_duelist_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
+        (contract_address == self.duelist_token_address())
     }
 
     //--------------------------

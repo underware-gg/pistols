@@ -14,7 +14,7 @@ pub mod tester {
         admin::{admin, IAdminDispatcher, IAdminDispatcherTrait},
         game::{game, IGameDispatcher, IGameDispatcherTrait},
         tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
-        rng::{rng},
+        rng::{rng, IRngDispatcher, IRngDispatcherTrait},
         rng_mock::{rng_mock, m_MockedValue, IRngMockDispatcher, IRngMockDispatcherTrait},
         vrf_mock::{vrf_mock},
         tokens::{
@@ -29,7 +29,7 @@ pub mod tester {
             token_bound::{m_TokenBoundAddress, TokenBoundAddress, TokenBoundAddressTrait},
         },
     };
-    use pistols::models::{
+    pub use pistols::models::{
         player::{
             m_Player, Player,
             e_PlayerActivity,
