@@ -19,8 +19,6 @@ mod tests {
         }
     };
 
-    const PLAYER_NAME: felt252 = 'Sensei';
-    const OTHER_NAME: felt252 = 'Senpai';
     const PREMISE_1: felt252 = 'For honour!!!';
 
 

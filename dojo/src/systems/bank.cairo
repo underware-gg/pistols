@@ -38,6 +38,9 @@ trait IBankProtected<TState> {
     // transfer FAME to payer, adding to Pool::Season(table_id)
     // (called by duelist_token)
     fn duelist_lost_fame_to_pool(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u256, pool_id: PoolType);
+    // release Pool::Season(table_id)
+    // (called by game)
+    fn release_season_pool(ref self: TState, table_id: felt252);
 }
 
 #[dojo::contract]
@@ -55,7 +58,9 @@ pub mod bank {
     use pistols::models::{
         season::{SeasonConfig, SeasonConfigTrait},
         pool::{Pool, PoolTrait, PoolType},
+        leaderboard::{LeaderboardTrait, LeaderboardPosition},
     };
+    use pistols::types::rules::{RulesType, RulesTypeTrait, SeasonDistribution};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::math::{MathTrait};
 
@@ -88,7 +93,7 @@ pub mod bank {
         ) {
             assert(lords_amount != 0, Errors::INVALID_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
-            self.transfer_lords_to_pool(store, payer, lords_amount, PoolType::Bank);
+            self._transfer_lords_to_pool(store, payer, lords_amount, PoolType::Bank);
         }
 
         fn sponsor_season(ref self: ContractState,
@@ -99,7 +104,7 @@ pub mod bank {
             let mut store: Store = StoreTrait::new(self.world_default());
             let season: SeasonConfig = store.get_current_season();
             assert(season.is_active(), Errors::INVALID_SEASON);
-            self.transfer_lords_to_pool(store, payer, lords_amount, PoolType::Season(season.table_id));
+            self._transfer_lords_to_pool(store, payer, lords_amount, PoolType::Season(season.table_id));
         }
 
         fn sponsor_tournament(ref self: ContractState,
@@ -112,7 +117,7 @@ pub mod bank {
             // TODO...
             // let tournament: TournamentConfig = store.get_tournament(tournament_id);
             // assert(tournament.is_active(), Errors::INVALID_TOURNAMENT);
-            self.transfer_lords_to_pool(store, payer, lords_amount, PoolType::Tournament(tournament_id));
+            self._transfer_lords_to_pool(store, payer, lords_amount, PoolType::Tournament(tournament_id));
         }
     }
 
@@ -125,7 +130,7 @@ pub mod bank {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
             assert(lords_amount != 0, Errors::INVALID_AMOUNT);
-            self.transfer_lords_to_pool(store, payer, lords_amount, PoolType::Bank);
+            self._transfer_lords_to_pool(store, payer, lords_amount, PoolType::Bank);
         }
 
         fn minted_fame(ref self: ContractState,
@@ -176,13 +181,30 @@ pub mod bank {
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
-            self.transfer_fame_to_pool(store, contract_address, token_id, fame_amount, pool_id);
+            self._transfer_fame_to_pool(store, contract_address, token_id, fame_amount, pool_id);
+        }
+
+        fn release_season_pool(ref self: ContractState,
+            table_id: felt252,
+        ) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            // gather season data
+            let positions: Span<LeaderboardPosition> = store.get_leaderboard(table_id).get_all_positions();
+            let rules: RulesType = store.get_table_rules(table_id);
+            let distribution: @SeasonDistribution = rules.get_season_distribution(positions.len());
+            // get pool
+            let mut pool: Pool = store.get_pool(PoolType::Season(table_id));
+
+
+            // pool.withdraw_lords(pool.balance_lords.low);
+            store.set_pool(@pool);
         }
     }
 
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn assert_payer_allowance(self: @ContractState,
+        fn _assert_payer_allowance(self: @ContractState,
             lords_dispatcher: Erc20Dispatcher,
             payer: ContractAddress,
             amount: u256,
@@ -193,7 +215,7 @@ pub mod bank {
             assert(balance >= amount, Errors::INSUFFICIENT_BALANCE);
         }
 
-        fn transfer_lords_to_pool(self: @ContractState,
+        fn _transfer_lords_to_pool(self: @ContractState,
             mut store: Store,
             payer: ContractAddress,
             amount: u256,
@@ -201,7 +223,7 @@ pub mod bank {
         ) {
             // payer must approve() first
             let lords_dispatcher: Erc20Dispatcher = store.lords_dispatcher();
-            self.assert_payer_allowance(lords_dispatcher, payer, amount);
+            self._assert_payer_allowance(lords_dispatcher, payer, amount);
             // transfer to bank
             lords_dispatcher.transfer_from(payer, starknet::get_contract_address(), amount);
             // add to pool
@@ -210,7 +232,7 @@ pub mod bank {
             store.set_pool(@pool);
         }
 
-        fn transfer_fame_to_pool(self: @ContractState,
+        fn _transfer_fame_to_pool(self: @ContractState,
             mut store: Store,
             contract_address: ContractAddress,
             token_id: u128,

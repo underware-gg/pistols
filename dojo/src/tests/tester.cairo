@@ -103,13 +103,19 @@ pub mod tester {
     pub fn OWNED_BY_OWNER() -> u128 { 0xeeee }
     pub fn OWNED_BY_OTHER() -> u128 { 0xdddd }
 
+    #[inline(always)]
     pub fn ID(address: ContractAddress) -> u128 {
         let as_u256: u256 = address.into();
         (as_u256.low)
     }
 
+    #[inline(always)]
+    pub fn SEASON_TABLE(season_id: u16) -> felt252 {
+        (SeasonManagerTrait::make_table_id(season_id))
+    }
+    #[inline(always)]
     pub fn SEASON_1_TABLE() -> felt252 {
-        (SeasonManagerTrait::make_table_id(1))
+        (SEASON_TABLE(1))
     }
 
     // set_contract_address : to define the address of the calling contract,
@@ -553,7 +559,7 @@ pub mod tester {
     }
     pub fn execute_collect(system: @IGameDispatcher, sender: ContractAddress) -> felt252 {
         impersonate(sender);
-        let new_table_id: felt252 = (*system).collect();
+        let new_table_id: felt252 = (*system).collect_season();
         _next_block();
         (new_table_id)
     }

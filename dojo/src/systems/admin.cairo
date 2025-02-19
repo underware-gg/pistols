@@ -82,7 +82,7 @@ pub mod admin {
         }
 
         fn grant_admin(ref self: ContractState, account_address: ContractAddress, granted: bool) {
-            self.assert_caller_is_admin();
+            self._assert_caller_is_admin();
             assert(account_address.is_non_zero(), Errors::INVALID_OWNER);
             let mut world = self.world_default();
             if (granted) {
@@ -99,20 +99,20 @@ pub mod admin {
         }
 
         fn set_treasury(ref self: ContractState, treasury_address: ContractAddress) {
-            self.assert_caller_is_admin();
+            self._assert_caller_is_admin();
             assert(treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
             let mut store: Store = StoreTrait::new(self.world_default());
             store.set_config_treasury_address(treasury_address);
         }
 
         fn set_paused(ref self: ContractState, paused: bool) {
-            self.assert_caller_is_admin();
+            self._assert_caller_is_admin();
             let mut store: Store = StoreTrait::new(self.world_default());
             store.set_config_is_paused(paused);
         }
 
         fn set_table(ref self: ContractState, table: TableConfig) {
-            self.assert_caller_is_admin();
+            self._assert_caller_is_admin();
             assert(table.table_id != 0, Errors::INVALID_TABLE);
             let mut store: Store = StoreTrait::new(self.world_default());
             store.set_table_config(@table);
@@ -122,7 +122,7 @@ pub mod admin {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         #[inline(always)]
-        fn assert_caller_is_admin(self: @ContractState) {
+        fn _assert_caller_is_admin(self: @ContractState) {
             assert(self.am_i_admin(starknet::get_caller_address()) == true, Errors::NOT_ADMIN);
         }
         // #[inline(always)]
