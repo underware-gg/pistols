@@ -23,13 +23,13 @@ pub trait BitwiseTrait<T> {
     fn msb() -> T;
     fn bit(n: usize) -> T;
     fn bit_fill(n: usize) -> T;
-    fn set(x: T, n: usize) -> T;
-    fn unset(x: T, n: usize) -> T;
-    fn shl(x: T, n: usize) -> T;
-    fn shr(x: T, n: usize) -> T;
-    fn is_set(x: T, n: usize) -> bool;
-    fn count_bits(x: T) -> usize;
-    fn sum_bytes(x: T) -> T;
+    fn set(self: T, n: usize) -> T;
+    fn unset(self: T, n: usize) -> T;
+    fn shl(self: T, n: usize) -> T;
+    fn shr(self: T, n: usize) -> T;
+    fn is_set(self: T, n: usize) -> bool;
+    fn count_bits(self: T) -> usize;
+    fn sum_bytes(self: T) -> T;
 }
 
 pub impl BitwiseU8 of BitwiseTrait<u8> {
@@ -59,36 +59,36 @@ pub impl BitwiseU8 of BitwiseTrait<u8> {
         else { (Self::shr(Self::max(), Self::bit_count() - n)) }
     }
     #[inline(always)]
-    fn set(x: u8, n: usize) -> u8 {
-        x | Self::bit(n)
+    fn set(self: u8, n: usize) -> u8 {
+        self | Self::bit(n)
     }
     #[inline(always)]
-    fn unset(x: u8, n: usize) -> u8 {
-        x & ~Self::bit(n)
+    fn unset(self: u8, n: usize) -> u8 {
+        self & ~Self::bit(n)
     }
     #[inline(always)]
-    fn shl(x: u8, n: usize) -> u8 {
-        x * Self::bit(n)
+    fn shl(self: u8, n: usize) -> u8 {
+        self * Self::bit(n)
     }
     #[inline(always)]
-    fn shr(x: u8, n: usize) -> u8 {
-        if (n < 8) { (x / Self::bit(n)) }
+    fn shr(self: u8, n: usize) -> u8 {
+        if (n < 8) { (self / Self::bit(n)) }
         else { (0) }
     }
     #[inline(always)]
-    fn is_set(x: u8, n: usize) -> bool {
-        ((Self::shr(x, n) & 1) != 0)
+    fn is_set(self: u8, n: usize) -> bool {
+        ((Self::shr(self, n) & 1) != 0)
     }
-    fn count_bits(x: u8) -> usize {
+    fn count_bits(self: u8) -> usize {
         let mut result: usize = 0;
         let mut bit: u8 = BITWISE::MSB_U8;
         while (bit != 0) {
-            if (x & bit != 0) { result += 1; };
+            if (self & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
     }
-    fn sum_bytes(x: u8) -> u8 {(x)}
+    fn sum_bytes(self: u8) -> u8 {(self)}
 }
 
 pub impl BitwiseU16 of BitwiseTrait<u16> {
@@ -112,41 +112,41 @@ pub impl BitwiseU16 of BitwiseTrait<u16> {
         else { (Self::shr(Self::max(), Self::bit_count() - n)) }
     }
     #[inline(always)]
-    fn set(x: u16, n: usize) -> u16 {
-        x | Self::bit(n)
+    fn set(self: u16, n: usize) -> u16 {
+        self | Self::bit(n)
     }
     #[inline(always)]
-    fn unset(x: u16, n: usize) -> u16 {
-        x & ~Self::bit(n)
+    fn unset(self: u16, n: usize) -> u16 {
+        self & ~Self::bit(n)
     }
     #[inline(always)]
-    fn shl(x: u16, n: usize) -> u16 {
-        x * Self::bit(n)
+    fn shl(self: u16, n: usize) -> u16 {
+        self * Self::bit(n)
     }
     #[inline(always)]
-    fn shr(x: u16, n: usize) -> u16 {
-        if (n < 16) { (x / Self::bit(n)) }
+    fn shr(self: u16, n: usize) -> u16 {
+        if (n < 16) { (self / Self::bit(n)) }
         else { (0) }
     }
     #[inline(always)]
-    fn is_set(x: u16, n: usize) -> bool {
-        ((Self::shr(x, n) & 1) != 0)
+    fn is_set(self: u16, n: usize) -> bool {
+        ((Self::shr(self, n) & 1) != 0)
     }
-    fn count_bits(x: u16) -> usize {
+    fn count_bits(self: u16) -> usize {
         let mut result: usize = 0;
         let mut bit: u16 = BITWISE::MSB_U16;
         while (bit != 0) {
-            if (x & bit != 0) { result += 1; };
+            if (self & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
     }
-    fn sum_bytes(mut x: u16) -> u16 {
+    fn sum_bytes(mut self: u16) -> u16 {
         let mut result: u16 = 0;
         loop {
-            if (x == 0) { break; }
-            result += (x & 0xff);
-            x /= 0x100;
+            if (self == 0) { break; }
+            result += (self & 0xff);
+            self /= 0x100;
         };
         (result)
     }
@@ -173,41 +173,41 @@ pub impl BitwiseU32 of BitwiseTrait<u32> {
         else { (Self::shr(Self::max(), Self::bit_count() - n)) }
     }
     #[inline(always)]
-    fn set(x: u32, n: usize) -> u32 {
-        x | Self::bit(n)
+    fn set(self: u32, n: usize) -> u32 {
+        self | Self::bit(n)
     }
     #[inline(always)]
-    fn unset(x: u32, n: usize) -> u32 {
-        x & ~Self::bit(n)
+    fn unset(self: u32, n: usize) -> u32 {
+        self & ~Self::bit(n)
     }
     #[inline(always)]
-    fn shl(x: u32, n: usize) -> u32 {
-        x * Self::bit(n)
+    fn shl(self: u32, n: usize) -> u32 {
+        self * Self::bit(n)
     }
     #[inline(always)]
-    fn shr(x: u32, n: usize) -> u32 {
-        if (n < 32) { (x / Self::bit(n)) }
+    fn shr(self: u32, n: usize) -> u32 {
+        if (n < 32) { (self / Self::bit(n)) }
         else { (0) }
     }
     #[inline(always)]
-    fn is_set(x: u32, n: usize) -> bool {
-        ((Self::shr(x, n) & 1) != 0)
+    fn is_set(self: u32, n: usize) -> bool {
+        ((Self::shr(self, n) & 1) != 0)
     }
-    fn count_bits(x: u32) -> usize {
+    fn count_bits(self: u32) -> usize {
         let mut result: usize = 0;
         let mut bit: u32 = BITWISE::MSB_U32;
         while (bit != 0) {
-            if (x & bit != 0) { result += 1; };
+            if (self & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
     }
-    fn sum_bytes(mut x: u32) -> u32 {
+    fn sum_bytes(mut self: u32) -> u32 {
         let mut result: u32 = 0;
         loop {
-            if (x == 0) { break; }
-            result += (x & 0xff);
-            x /= 0x100;
+            if (self == 0) { break; }
+            result += (self & 0xff);
+            self /= 0x100;
         };
         (result)
     }
@@ -234,41 +234,41 @@ pub impl BitwiseU64 of BitwiseTrait<u64> {
         else { (Self::shr(Self::max(), Self::bit_count() - n)) }
     }
     #[inline(always)]
-    fn set(x: u64, n: usize) -> u64 {
-        x | Self::bit(n)
+    fn set(self: u64, n: usize) -> u64 {
+        self | Self::bit(n)
     }
     #[inline(always)]
-    fn unset(x: u64, n: usize) -> u64 {
-        x &  ~Self::bit(n)
+    fn unset(self: u64, n: usize) -> u64 {
+        self &  ~Self::bit(n)
     }
     #[inline(always)]
-    fn shl(x: u64, n: usize) -> u64 {
-        x * Self::bit(n)
+    fn shl(self: u64, n: usize) -> u64 {
+        self * Self::bit(n)
     }
     #[inline(always)]
-    fn shr(x: u64, n: usize) -> u64 {
-        if (n < 64) { (x / Self::bit(n)) }
+    fn shr(self: u64, n: usize) -> u64 {
+        if (n < 64) { (self / Self::bit(n)) }
         else { (0) }
     }
     #[inline(always)]
-    fn is_set(x: u64, n: usize) -> bool {
-        ((Self::shr(x, n) & 1) != 0)
+    fn is_set(self: u64, n: usize) -> bool {
+        ((Self::shr(self, n) & 1) != 0)
     }
-    fn count_bits(x: u64) -> usize {
+    fn count_bits(self: u64) -> usize {
         let mut result: usize = 0;
         let mut bit: u64 = BITWISE::MSB_U64;
         while (bit != 0) {
-            if (x & bit != 0) { result += 1; };
+            if (self & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
     }
-    fn sum_bytes(mut x: u64) -> u64 {
+    fn sum_bytes(mut self: u64) -> u64 {
         let mut result: u64 = 0;
         loop {
-            if (x == 0) { break; }
-            result += (x & 0xff);
-            x /= 0x100;
+            if (self == 0) { break; }
+            result += (self & 0xff);
+            self /= 0x100;
         };
         (result)
     }
@@ -295,41 +295,41 @@ pub impl BitwiseU128 of BitwiseTrait<u128> {
         else { (Self::shr(Self::max(), Self::bit_count() - n)) }
     }
     #[inline(always)]
-    fn set(x: u128, n: usize) -> u128 {
-        x | Self::bit(n)
+    fn set(self: u128, n: usize) -> u128 {
+        self | Self::bit(n)
     }
     #[inline(always)]
-    fn unset(x: u128, n: usize) -> u128 {
-        x & ~Self::bit(n)
+    fn unset(self: u128, n: usize) -> u128 {
+        self & ~Self::bit(n)
     }
     #[inline(always)]
-    fn shl(x: u128, n: usize) -> u128 {
-        x * Self::bit(n)
+    fn shl(self: u128, n: usize) -> u128 {
+        self * Self::bit(n)
     }
     #[inline(always)]
-    fn shr(x: u128, n: usize) -> u128 {
-        if (n < 128) { (x / Self::bit(n)) }
+    fn shr(self: u128, n: usize) -> u128 {
+        if (n < 128) { (self / Self::bit(n)) }
         else { (0) }
     }
     #[inline(always)]
-    fn is_set(x: u128, n: usize) -> bool {
-        ((Self::shr(x, n) & 1) != 0)
+    fn is_set(self: u128, n: usize) -> bool {
+        ((Self::shr(self, n) & 1) != 0)
     }
-    fn count_bits(x: u128) -> usize {
+    fn count_bits(self: u128) -> usize {
         let mut result: usize = 0;
         let mut bit: u128 = BITWISE::MSB_U128;
         while (bit != 0) {
-            if (x & bit != 0) { result += 1; };
+            if (self & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
     }
-    fn sum_bytes(mut x: u128) -> u128 {
+    fn sum_bytes(mut self: u128) -> u128 {
         let mut result: u128 = 0;
         loop {
-            if (x == 0) { break; }
-            result += (x & 0xff);
-            x /= 0x100;
+            if (self == 0) { break; }
+            result += (self & 0xff);
+            self /= 0x100;
         };
         (result)
     }
@@ -356,41 +356,41 @@ pub impl BitwiseU256 of BitwiseTrait<u256> {
         else { (Self::shr(Self::max(), Self::bit_count() - n)) }
     }
     #[inline(always)]
-    fn set(x: u256, n: usize) -> u256 {
-        x | Self::bit(n)
+    fn set(self: u256, n: usize) -> u256 {
+        self | Self::bit(n)
     }
     #[inline(always)]
-    fn unset(x: u256, n: usize) -> u256 {
-        x & ~Self::bit(n)
+    fn unset(self: u256, n: usize) -> u256 {
+        self & ~Self::bit(n)
     }
     #[inline(always)]
-    fn shl(x: u256, n: usize) -> u256 {
-        x * Self::bit(n)
+    fn shl(self: u256, n: usize) -> u256 {
+        self * Self::bit(n)
     }
     #[inline(always)]
-    fn shr(x: u256, n: usize) -> u256 {
-        if (n < 256) { (x / Self::bit(n)) }
+    fn shr(self: u256, n: usize) -> u256 {
+        if (n < 256) { (self / Self::bit(n)) }
         else { (0) }
     }
     #[inline(always)]
-    fn is_set(x: u256, n: usize) -> bool {
-        ((Self::shr(x, n) & 1) != 0)
+    fn is_set(self: u256, n: usize) -> bool {
+        ((Self::shr(self, n) & 1) != 0)
     }
-    fn count_bits(x: u256) -> usize {
+    fn count_bits(self: u256) -> usize {
         let mut result: usize = 0;
         let mut bit: u256 = BITWISE::MSB_U256;
         while (bit != 0) {
-            if (x & bit != 0) { result += 1; };
+            if (self & bit != 0) { result += 1; };
             bit /= 2;
         };
         result
     }
-    fn sum_bytes(mut x: u256) -> u256 {
+    fn sum_bytes(mut self: u256) -> u256 {
         let mut result: u256 = 0;
         loop {
-            if (x == 0) { break; }
-            result += (x & 0xff);
-            x /= 0x100;
+            if (self == 0) { break; }
+            result += (self & 0xff);
+            self /= 0x100;
         };
         (result)
     }
