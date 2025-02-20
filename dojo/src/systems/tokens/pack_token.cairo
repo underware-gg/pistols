@@ -179,7 +179,7 @@ pub mod pack_token {
         }
 
         fn calc_mint_fee(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> u128 {
-            (pack_type.mint_fee().low)
+            (pack_type.mint_fee())
         }
 
         fn claim_welcome_pack(ref self: ContractState) -> Span<u128> {
@@ -191,7 +191,7 @@ pub mod pack_token {
 
             // mint
             let lords_amount: u128 = self.calc_mint_fee(recipient, PackType::WelcomePack);
-            let pack: Pack = self.mint_pack(PackType::WelcomePack, recipient, recipient.into(), lords_amount);
+            let pack: Pack = self._mint_pack(PackType::WelcomePack, recipient, recipient.into(), lords_amount);
             
             // events
             PlayerTrait::check_in(ref store, Activity::PackWelcome, recipient, pack.pack_id.into());
@@ -220,7 +220,7 @@ pub mod pack_token {
             let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_contract_address()));
 
             // mint
-            let pack: Pack = self.mint_pack(pack_type, recipient, seed, lords_amount);
+            let pack: Pack = self._mint_pack(pack_type, recipient, seed, lords_amount);
             
             // events
             PlayerTrait::check_in(ref store, Activity::PackPurchased, recipient, pack.pack_id.into());
@@ -246,7 +246,7 @@ pub mod pack_token {
             let token_ids: Span<u128> = pack.open(ref store, recipient);
 
             // minted fame, peg to paid LORDS
-            store.world.bank_dispatcher().minted_fame(recipient, pack.lords_amount.into());
+            store.world.bank_dispatcher().peg_minted_fame_to_purchased_lords(recipient, pack.lords_amount.into());
 
             // burn!
             self.token.burn(pack_id.into());
@@ -261,7 +261,7 @@ pub mod pack_token {
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn mint_pack(ref self: ContractState,
+        fn _mint_pack(ref self: ContractState,
             pack_type: PackType,
             recipient: ContractAddress,
             seed: felt252,

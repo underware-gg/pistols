@@ -595,7 +595,7 @@ pub mod tester {
 
     // ::bank
     pub fn execute_sponsor_duelists(system: @IBankDispatcher, sender: ContractAddress,
-        amount: u256,
+        amount: u128,
     ) {
         impersonate(sender);
         (*system).sponsor_duelists(sender, amount);
@@ -609,7 +609,7 @@ pub mod tester {
         let balance: u256 = (*lords).balance_of(sponsor);
         execute_lords_approve(lords, sponsor, *bank.contract_address, balance.low);
         // fund pool
-        let price: u256 = PackType::WelcomePack.description().lords_price;
+        let price: u128 = PackType::WelcomePack.description().lords_price;
         execute_sponsor_duelists(bank, sponsor, price * quantity.into());
     }
 

@@ -1,31 +1,32 @@
+use starknet::{ContractAddress};
 
 //
 // How Pools work...
 //
 // Everything that is deposited to pistols-bank contract must be assigned to a pool!
 // 
-// PoolType::Bank
-//  - LORDS from purchases
-//  - FAME: not used
+// PoolType::Purchases
+//  - LORDS: from purchases (Packs)
+//  - FAME: -
 //
 // PoolType::FamePeg
-//  - LORDS from PoolType::Bank, pegged to FAME in circulation
-//  - FAME: not used
+//  - LORDS: from PoolType::Purchases (Packs opened), pegged to FAME in circulation
+//  - FAME: -
 //
 // PoolType::Season / PoolType::Tournament
-//  - FAME lost in duels, will be burned to release LORDS from PoolType::FamePeg
-//  - LORDS from sponsors, distributed directly to winners
+//  - FAME: lost in duels, will be burned to release LORDS from PoolType::FamePeg
+//  - LORDS: from sponsors, distributed directly to winners
 //
 // PoolType::SacredFlame
-//  - FAME from dead and sacrificed duelists, burned to release LORDS from PoolType::FamePeg
-//  - LORDS: not used
+//  - FAME: from dead and sacrificed duelists, burned to release LORDS from PoolType::FamePeg
+//  - LORDS: -
 //
 
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum PoolType {
     Undefined,              // 0
-    Bank,                   // 1
+    Purchases,              // 1
     FamePeg,                // 2
     Season: felt252,        // 3
     Tournament: felt252,    // 4
@@ -45,6 +46,11 @@ pub struct Pool {
     pub balance_fame: u128,
 }
 
+#[derive(Copy, Drop, Serde, Introspect)]
+pub struct FameReleaseBill {
+    pub recipient: ContractAddress,
+    pub fame_amount: u128,
+}
 
 
 //---------------------------
@@ -91,7 +97,7 @@ impl PoolTypeIntoByteArray of core::traits::Into<PoolType, ByteArray> {
     fn into(self: PoolType) -> ByteArray {
         match self {
             PoolType::Undefined     =>  "Undefined",
-            PoolType::Bank          =>  "Bank",
+            PoolType::Purchases     =>  "Purchases",
             PoolType::FamePeg       =>  "FamePeg",
             PoolType::Season        =>  "Season",
             PoolType::Tournament    =>  "Tournament",

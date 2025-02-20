@@ -259,46 +259,46 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE);
 
         let bank_address: ContractAddress = sys.bank.contract_address;
-        let price_welcome: u128 = PackType::WelcomePack.description().lords_price.low;
-        let price_pack: u128 = PackType::Duelists5x.description().lords_price.low;
+        let price_welcome: u128 = PackType::WelcomePack.description().lords_price;
+        let price_pack: u128 = PackType::Duelists5x.description().lords_price;
         assert_ne!(price_welcome, 0, "price_welcome");
         assert_ne!(price_pack, 0, "price_pack");
 
         // initial balances
         let mut balance_bank: u128 = sys.lords.balance_of(bank_address).low;
-        let mut pool_bank: u128 = tester::get_Pool(sys.world, PoolType::Bank).balance_lords;
+        let mut pool_bank: u128 = tester::get_Pool(sys.world, PoolType::Purchases).balance_lords;
         let mut pool_peg: u128 = tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords;
         assert_eq!(balance_bank, 0, "balance_bank INIT");
         assert_eq!(pool_bank, 0, "pool_bank INIT");
         assert_eq!(pool_peg, 0, "pool_peg INIT");
 
-        // fund PoolType::Bank
+        // fund PoolType::Purchases
         tester::fund_duelists_pool(@sys.lords, @sys.bank, 1);
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, price_welcome, "balance_bank FUND");
-        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Bank).balance_lords, pool_bank, 0, price_welcome, "pool_bank FUND");
+        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Purchases).balance_lords, pool_bank, 0, price_welcome, "pool_bank FUND");
         pool_peg = tester::assert_balance(tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords, pool_peg, 0, 0, "pool_peg FUND");
 
         // claim duelists -- transfered to PoolType::FamePeg
         tester::execute_claim_welcome_pack(@sys.pack, OWNER());
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, 0, "balance_bank CLAIM");
-        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Bank).balance_lords, pool_bank, price_welcome, 0, "pool_bank CLAIM");
+        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Purchases).balance_lords, pool_bank, price_welcome, 0, "pool_bank CLAIM");
         pool_peg = tester::assert_balance(tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords, pool_peg, 0, price_welcome, "pool_peg CLAIM");
 
-        // purchase to PoolType::Bank
+        // purchase to PoolType::Purchases
         let pack: Pack = sys.pack.purchase(PackType::Duelists5x);
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, price_pack, "balance_bank PURCHASE");
-        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Bank).balance_lords, pool_bank, 0, price_pack, "pool_bank PURCHASE");
+        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Purchases).balance_lords, pool_bank, 0, price_pack, "pool_bank PURCHASE");
         pool_peg = tester::assert_balance(tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords, pool_peg, 0, 0, "pool_peg PURCHASE");
 
         // open pack
         sys.pack.open(pack.pack_id);
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, 0, "balance_bank PURCHASE");
-        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Bank).balance_lords, pool_bank, price_pack, 0, "pool_bank PURCHASE");
+        pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Purchases).balance_lords, pool_bank, price_pack, 0, "pool_bank PURCHASE");
         pool_peg = tester::assert_balance(tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords, pool_peg, 0, price_pack, "pool_peg PURCHASE");
 
         // final balances
         let mut balance_bank: u128 = sys.lords.balance_of(bank_address).low;
-        let mut pool_bank: u128 = tester::get_Pool(sys.world, PoolType::Bank).balance_lords;
+        let mut pool_bank: u128 = tester::get_Pool(sys.world, PoolType::Purchases).balance_lords;
         let mut pool_peg: u128 = tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords;
         assert_eq!(balance_bank, (price_welcome + price_pack), "balance_bank END");
         assert_eq!(pool_bank, 0, "pool_bank END");

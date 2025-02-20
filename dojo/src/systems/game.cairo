@@ -430,26 +430,26 @@ pub mod game {
         }
 
         fn _update_scoreboards(self: @ContractState, ref store: Store, challenge: @Challenge, round: @Round, ref rewards_a: RewardValues, ref rewards_b: RewardValues) {
-            // per table score
-            let mut score_global_a: Scoreboard = store.get_scoreboard((*challenge).duelist_id_a.into(), 0);
-            let mut score_global_b: Scoreboard = store.get_scoreboard((*challenge).duelist_id_b.into(), 0);
             // global score
+            // let mut score_global_a: Scoreboard = store.get_scoreboard((*challenge).duelist_id_a.into(), 0);
+            // let mut score_global_b: Scoreboard = store.get_scoreboard((*challenge).duelist_id_b.into(), 0);
+            // per table score
             let mut score_season_a: Scoreboard = store.get_scoreboard((*challenge).duelist_id_a.into(), (*challenge).table_id);
             let mut score_season_b: Scoreboard = store.get_scoreboard((*challenge).duelist_id_b.into(), (*challenge).table_id);
             
             // update totals
-            ScoreTrait::update_totals(ref score_global_a.score, ref score_global_b.score, @rewards_a, @rewards_b, *challenge.winner);
+            // ScoreTrait::update_totals(ref score_global_a.score, ref score_global_b.score, @rewards_a, @rewards_b, *challenge.winner);
             ScoreTrait::update_totals(ref score_season_a.score, ref score_season_b.score, @rewards_a, @rewards_b, *challenge.winner);
 
             // compute honour from final round
-            score_global_a.score.update_honour(*round.state_a.honour);
-            score_global_b.score.update_honour(*round.state_b.honour);
+            // score_global_a.score.update_honour(*round.state_a.honour);
+            // score_global_b.score.update_honour(*round.state_b.honour);
             score_season_a.score.update_honour(*round.state_a.honour);
             score_season_b.score.update_honour(*round.state_b.honour);
             
             // save
-            store.set_scoreboard(@score_global_a);
-            store.set_scoreboard(@score_global_b);
+            // store.set_scoreboard(@score_global_a);
+            // store.set_scoreboard(@score_global_b);
             store.set_scoreboard(@score_season_a);
             store.set_scoreboard(@score_season_b);
 
