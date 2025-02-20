@@ -5,7 +5,9 @@ pub mod tester {
     use dojo::world::{WorldStorage, IWorldDispatcherTrait};
     use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
     use dojo_cairo_test::{
-        spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
+        spawn_test_world, deploy_contract,
+        NamespaceDef, TestResource,
+        ContractDefTrait, ContractDef,
         WorldStorageTestTrait,
     };
 
@@ -70,6 +72,7 @@ pub mod tester {
             m_Pool, Pool, PoolType,
         },
     };
+    use pistols::tests::mock_account::DualCaseAccountMock;
     use pistols::tests::token::mock_duelist::{
         duelist_token as mock_duelist,
         m_MockDuelistOwners,
@@ -142,14 +145,16 @@ pub mod tester {
     const TIMESTEP: u64 = 0x1;
 
     pub mod FLAGS {
-        pub const GAME: u8       = 0b1;
-        pub const ADMIN: u8      = 0b10;
-        pub const LORDS: u8      = 0b100;
-        pub const DUEL: u8       = 0b1000;
-        pub const DUELIST: u8    = 0b10000;
-        pub const APPROVE: u8    = 0b100000;
-        pub const MOCK_RNG: u8   = 0b1000000;
-        pub const TUTORIAL: u8   = 0b10000000;
+        pub const GAME: u16     = 0b1;
+        pub const ADMIN: u16    = 0b10;
+        pub const LORDS: u16    = 0b100;
+        pub const DUEL: u16     = 0b1000;
+        pub const DUELIST: u16  = 0b10000;
+        pub const APPROVE: u16  = 0b100000;
+        pub const MOCK_RNG: u16 = 0b1000000;
+        pub const TUTORIAL: u16 = 0b10000000;
+        pub const FAME: u16     = 0b100000000;
+        pub const ACCOUNT: u16  = 0b1000000000;
     }
 
     #[derive(Copy, Drop)]
@@ -166,12 +171,13 @@ pub mod tester {
         pub duelists: IDuelistTokenDispatcher,
         pub pack: IPackTokenDispatcher,
         pub rng: IRngMockDispatcher,
+        pub account: ContractAddress,
     }
 
     #[generate_trait]
     pub impl TestSystemsImpl of TestSystemsTrait {
         #[inline(always)]
-        fn from_world(world: WorldStorage) -> TestSystems {
+        fn from_world(world: WorldStorage, mock_account: ContractAddress) -> TestSystems {
             (TestSystems {
                 world,
                 game: world.game_dispatcher(),
@@ -185,11 +191,12 @@ pub mod tester {
                 duelists: world.duelist_token_dispatcher(),
                 pack: world.pack_token_dispatcher(),
                 rng: IRngMockDispatcher{ contract_address: world.rng_address() },
+                account: mock_account,
             })
         }
     }
 
-    pub fn setup_world(flags: u8) -> TestSystems {
+    pub fn setup_world(flags: u16) -> TestSystems {
         let mut deploy_game: bool = (flags & FLAGS::GAME) != 0;
         let mut deploy_tutorial: bool = (flags & FLAGS::TUTORIAL) != 0;
         let mut deploy_admin: bool = (flags & FLAGS::ADMIN) != 0;
@@ -198,18 +205,23 @@ pub mod tester {
         let mut deploy_duelist: bool = (flags & FLAGS::DUELIST) != 0;
         let mut deploy_rng_mock = (flags & FLAGS::MOCK_RNG) != 0;
         let mut approve: bool = (flags & FLAGS::APPROVE) != 0;
+        let mut deploy_fame: bool = (flags & FLAGS::FAME) != 0;
+        let mut deploy_account: bool = (flags & FLAGS::ACCOUNT) != 0;
         let mut deploy_bank: bool = false;
-        let mut deploy_fame: bool = false;
+        let mut deploy_pack: bool = false;
         let mut deploy_fools: bool = false;
-
+        let mut deploy_vrf: bool = false;
+        
         deploy_game     = deploy_game || approve;
-        deploy_admin    = deploy_admin || deploy_game;
         deploy_lords    = deploy_lords || deploy_game || deploy_duelist || approve;
+        deploy_admin    = deploy_admin || deploy_game || deploy_lords;
         deploy_duel     = deploy_duel || deploy_game;
+        deploy_pack     = deploy_pack || deploy_duelist;
         deploy_fame     = deploy_fame || deploy_game || deploy_duelist;
         deploy_fools    = deploy_fools || deploy_game;
         deploy_rng_mock = deploy_rng_mock || deploy_tutorial;
         deploy_bank     = deploy_bank || deploy_fame || deploy_lords || deploy_duelist;
+        deploy_vrf      = deploy_vrf || deploy_game || deploy_pack;
         
 // '---- 0'.print();
         let mut resources: Array<TestResource> = array![
@@ -251,6 +263,9 @@ pub mod tester {
                 ContractDefTrait::new(@"pistols", @"game")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
+        }
+
+        if (deploy_vrf) {
             resources.append(TestResource::Contract(vrf_mock::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"vrf_mock")
@@ -295,7 +310,6 @@ pub mod tester {
         // '---- 3'.print();
         if (deploy_duelist) {
             resources.append(TestResource::Contract(duelist_token::TEST_CLASS_HASH));
-            resources.append(TestResource::Contract(pack_token::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duelist_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -304,19 +318,23 @@ pub mod tester {
                         0, // renderer_address
                     ].span())
             );
-            contract_defs.append(
-                ContractDefTrait::new(@"pistols", @"pack_token")
-                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-                    .with_init_calldata([
-                        'pistols.underware.gg',
-                    ].span()),
-            );
         }
         else if (deploy_game) {
             resources.append(TestResource::Contract(mock_duelist::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duelist_token")
                     .with_writer_of([selector_from_tag!("pistols-MockDuelistOwners")].span())
+            );
+        }
+
+        if (deploy_duelist) {
+            resources.append(TestResource::Contract(pack_token::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"pack_token")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+                    .with_init_calldata([
+                        'pistols.underware.gg',
+                    ].span()),
             );
         }
 
@@ -406,10 +424,17 @@ pub mod tester {
         }
 // '---- 7'.print();
 
+        let mock_account: ContractAddress = if (deploy_account) {
+            (deploy_mock_account())
+        } else {
+            ZERO()
+        };
+
+
         impersonate(OWNER());
 
 // '---- READY!'.print();
-        (TestSystemsTrait::from_world(world))
+        (TestSystemsTrait::from_world(world, mock_account))
     }
 
 
@@ -440,6 +465,35 @@ pub mod tester {
         testing::set_block_number(new_block_number);
         testing::set_block_timestamp(new_timestamp);
         (new_block_number, new_timestamp)
+    }
+
+
+
+    //--------------------------
+    // keipair generator
+    // from: https://github.com/buldazer23/starknet-foundry/blob/ed6ea7ee4c34d4f8387851a332b37fba5445f0f4/snforge_std/src/signature/stark_curve.cairo#L14
+    // use starknet_signers::SigningKey;
+    // use starknet::signers::SigningKey;
+    // #[derive(Copy, Drop)]
+    // struct StarkCurveKeyPair {
+    //     private_key: felt252,
+    //     public_key: felt252
+    // }
+    // #[generate_trait]
+    // impl StarkCurveKeyPairImpl of StarkCurveKeyPairTrait {
+    //     fn generate() -> StarkCurveKeyPair {
+    //         let key_pair = SigningKey::from_random();
+    //         StarkCurveKeyPair {
+    //             private_key: key_pair.secret_scalar().into_(),
+    //             public_key: key_pair.verifying_key().scalar().into_(),
+    //         }
+    //     }
+    // }
+    const NEW_PUBKEY: felt252 = 0x26da8d11938b76025862be14fdb8b28438827f73e75e86f7bfa38b196951fa7;
+    pub fn deploy_mock_account() -> ContractAddress {
+        // let key_pair: StarkCurveKeyPair = StarkCurveKeyPairTrait::generate();
+        // let public_key: felt252 = key_pair.public_key;
+        (deploy_contract(DualCaseAccountMock::TEST_CLASS_HASH.try_into().unwrap(), [NEW_PUBKEY].span()))
     }
 
     //
@@ -601,16 +655,16 @@ pub mod tester {
         (*system).sponsor_duelists(sender, amount);
         _next_block();
     }
-    pub fn fund_duelists_pool(lords: @ILordsMockDispatcher, bank: @IBankDispatcher, quantity: u8) {
+    pub fn fund_duelists_pool(sys: @TestSystems, quantity: u8) {
         // mint lords
         let sponsor: ContractAddress = starknet::contract_address_const::<0x12178517312>();
-        execute_lords_faucet(lords, sponsor);
+        execute_lords_faucet(sys.lords, sponsor);
         // approve lords
-        let balance: u256 = (*lords).balance_of(sponsor);
-        execute_lords_approve(lords, sponsor, *bank.contract_address, balance.low);
+        let balance: u256 = (*sys.lords).balance_of(sponsor);
+        execute_lords_approve(sys.lords, sponsor, *sys.bank.contract_address, balance.low);
         // fund pool
         let price: u128 = PackType::WelcomePack.description().lords_price;
-        execute_sponsor_duelists(bank, sponsor, price * quantity.into());
+        execute_sponsor_duelists(sys.bank, sponsor, price * quantity.into());
     }
 
     //
@@ -716,6 +770,12 @@ pub mod tester {
     }
     pub fn set_Pack(ref world: WorldStorage, model: Pack) {
         world.write_model_test(@model);
+    }
+
+    pub fn set_current_season(ref world: WorldStorage, table_id: felt252) {
+        let mut config: Config = get_Config(world);
+        config.season_table_id = table_id;
+        set_Config(ref world, config);
     }
 
     pub fn make_duelist_inactive(world: WorldStorage, token_id: u128, dripped_fame: u64) {

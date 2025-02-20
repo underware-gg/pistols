@@ -1,73 +1,33 @@
 use core::num::traits::Zero;
-use starknet::{ContractAddress, testing};
-use dojo::world::{WorldStorage};
-use dojo_cairo_test::{
-    spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
-    WorldStorageTestTrait,
-};
+use starknet::{ContractAddress};
 
 use pistols::systems::{
-    admin::{admin},
-    game::{game},
-    // bank::{bank},
-    vrf_mock::{vrf_mock},
     tokens::{
-        duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
-        // duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
-        lords_mock::{lords_mock}, //, ILordsMockDispatcher, ILordsMockDispatcherTrait},
-    },
-    components::{
-        token_bound::{m_TokenBoundAddress},
+        duel_token::{IDuelTokenDispatcherTrait},
     },
 };
 use pistols::models::{
-    player::{
-        m_Player,
-        e_PlayerActivity,
-        e_PlayerRequiredAction,
-    },
-    pack::{
-        m_Pack,
-    },
     challenge::{
-        m_Challenge, Challenge,
-        m_Round,
-    },
-    duelist::{
-        m_Duelist,
-        m_DuelistChallenge,
-        m_Scoreboard,
-    },
-    leaderboard::{
-        m_Leaderboard,
-    },
-    pact::{
-        m_Pact,
+        Challenge,
     },
     config::{
-        m_Config, Config,
-        m_TokenConfig, TokenConfig,
-        m_CoinConfig,
-        CONFIG,
-    },
-    season::{
-        m_SeasonConfig,
+        TokenConfig,
     },
     table::{
-        m_TableConfig, TableConfig,
-        TABLES, RulesType,
+        TABLES,
     },
-};
-use pistols::tests::token::mock_duelist::{
-    duelist_token as mock_duelist,
-    m_MockDuelistOwners,
 };
 
 use pistols::interfaces::dns::{DnsTrait};
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::premise::{Premise};
 
-use pistols::tests::tester::{tester, tester::{ID, OWNER, OTHER, BUMMER, RECIPIENT, TREASURY, ZERO}};
+use pistols::tests::tester::{tester,
+    tester::{
+        TestSystems, FLAGS,
+        ID, OWNER, OTHER, BUMMER, RECIPIENT, ZERO,
+    },
+};
 use pistols::tests::{utils};
 
 use openzeppelin_token::erc721::interface;
@@ -124,124 +84,28 @@ const DUEL_ID_2: u256 = 2; // owned by OTHER()
 const DUEL_ID_3: u256 = 3; // owned by BUMMER()
 const DUEL_ID_4: u256 = 4; // owned by RECIPIENT()
 
-fn setup_uninitialized(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher) {
-    testing::set_block_number(1);
-    testing::set_block_timestamp(1);
+fn setup(_fee_amount: u128) -> TestSystems {
+    let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::FAME | FLAGS::LORDS);
 
-    let ndef = NamespaceDef {
-        namespace: "pistols",
-        resources: [
-            // pistols models
-            TestResource::Model(m_Player::TEST_CLASS_HASH),
-            TestResource::Model(m_Pack::TEST_CLASS_HASH),
-            TestResource::Model(m_Challenge::TEST_CLASS_HASH),
-            TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_Config::TEST_CLASS_HASH),
-            TestResource::Model(m_Duelist::TEST_CLASS_HASH),
-            TestResource::Model(m_DuelistChallenge::TEST_CLASS_HASH),
-            TestResource::Model(m_Pact::TEST_CLASS_HASH),
-            TestResource::Model(m_Round::TEST_CLASS_HASH),
-            TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
-            TestResource::Model(m_Leaderboard::TEST_CLASS_HASH),
-            TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
-            // test models
-            TestResource::Model(m_MockDuelistOwners::TEST_CLASS_HASH),
-            // events
-            TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
-            TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
-            TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
-            TestResource::Event(e_PlayerRequiredAction::TEST_CLASS_HASH),
-            //
-            // contracts
-            TestResource::Contract(duel_token::TEST_CLASS_HASH),
-            TestResource::Contract(mock_duelist::TEST_CLASS_HASH),
-            TestResource::Contract(lords_mock::TEST_CLASS_HASH),
-            // needed to mint duels
-            TestResource::Contract(admin::TEST_CLASS_HASH),
-            TestResource::Contract(game::TEST_CLASS_HASH),
-            TestResource::Contract(vrf_mock::TEST_CLASS_HASH)
-        ].span()
-    };
-
-    let mut world: WorldStorage = spawn_test_world([ndef].span());
-
-    let mut contract_defs: Array<ContractDef> = array![
-        ContractDefTrait::new(@"pistols", @"admin")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            .with_init_calldata([
-                TREASURY().into(), // treasury_address
-                0, // lords_address
-                0, // vrf_address
-            ].span()),
-        ContractDefTrait::new(@"pistols", @"game")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
-        ContractDefTrait::new(@"pistols", @"vrf_mock"),
-        ContractDefTrait::new(@"pistols", @"duel_token")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            .with_init_calldata([
-                'pistols.underware.gg',
-                0, // minter_address
-                0, // renderer_address
-                0, // fee_amount
-            ].span()),
-        ContractDefTrait::new(@"pistols", @"duelist_token")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
-        ContractDefTrait::new(@"pistols", @"lords_mock")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            .with_init_calldata([
-                0, // minter
-                10_000_000_000_000_000_000_000, // 10,000 Lords
-            ].span()),
-    ];
-
-    world.sync_perms_and_inits(contract_defs.span());
-
-    tester::impersonate(OWNER());
-
-    tester::set_TableConfig(ref world, TableConfig {
-        table_id: TABLES::TUTORIAL,
-        description: 'The Training Grounds',
-        rules: RulesType::Academia,
-    });
-
-    tester::set_Config(ref world, Config {
-        key: CONFIG::CONFIG_KEY,
-        treasury_address: TREASURY(),
-        lords_address: world.lords_mock_address(),
-        vrf_address: world.vrf_mock_address(),
-        season_table_id: TABLES::PRACTICE,
-        is_paused: false,
-    });
-
-    (
-        world,
-        world.duel_token_dispatcher(),
-    )
-}
-
-fn setup(fee_amount: u128) -> (WorldStorage, IDuelTokenDispatcher) {
-    let (mut world, mut token) = setup_uninitialized(fee_amount);
+    tester::set_current_season(ref sys.world, TABLES::TUTORIAL);
 
     // initialize contracts
-    create_duel(token, OWNER(), OTHER());
-    create_duel(token, OTHER(), BUMMER());
+    create_duel(@sys, OWNER(), OTHER());
+    create_duel(@sys, OTHER(), BUMMER());
 
     tester::impersonate(OWNER());
 
     // drop all events
-    utils::drop_all_events(world.dispatcher.contract_address);
-    utils::drop_all_events(token.contract_address);
+    utils::drop_all_events(sys.world.dispatcher.contract_address);
+    utils::drop_all_events(sys.duels.contract_address);
 
-    (world, token)
+    (sys)
 }
 
-fn create_duel(token: IDuelTokenDispatcher, recipient: ContractAddress, challenged_address: ContractAddress) {
+fn create_duel(sys: @TestSystems, recipient: ContractAddress, challenged_address: ContractAddress) {
 // '---AA'.print();
     tester::impersonate(recipient);
-    token.create_duel(
+    (*sys.duels).create_duel(
         duelist_id: ID(recipient),
         challenged_address: challenged_address,
         premise: Premise::Honour,
@@ -253,8 +117,8 @@ fn create_duel(token: IDuelTokenDispatcher, recipient: ContractAddress, challeng
 // '---BB'.print();
 }
 
-fn _assert_minted_count(world: WorldStorage, token: IDuelTokenDispatcher, minted_count: u128, msg: ByteArray) {
-    let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
+fn _assert_minted_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
+    let token_config: TokenConfig = tester::get_TokenConfig(*sys.world, *sys.duels.contract_address);
     assert_eq!(token_config.minted_count, minted_count, "{}", msg);
 }
 
@@ -264,33 +128,33 @@ fn _assert_minted_count(world: WorldStorage, token: IDuelTokenDispatcher, minted
 
 #[test]
 fn test_initializer() {
-    let (world, mut token) = setup(0);
-    assert_eq!(token.symbol(), "DUEL", "Symbol is wrong");
-    _assert_minted_count(world, token, 2, "Should eq 2");
+    let sys: TestSystems = setup(0);
+    assert_eq!(sys.duels.symbol(), "DUEL", "Symbol is wrong");
+    _assert_minted_count(@sys, 2, "Should eq 2");
 
-    assert!(token.owner_of(DUEL_ID_1).is_non_zero(), "owner_of_1_non_zero");
-    assert!(token.owner_of(DUEL_ID_2).is_non_zero(), "owner_of_2_non_zero");
-    assert_eq!(token.owner_of(DUEL_ID_1), world.game_address(), "owner_of_1");
-    assert_eq!(token.owner_of(DUEL_ID_2), world.game_address(), "owner_of_2");
+    assert!(sys.duels.owner_of(DUEL_ID_1).is_non_zero(), "owner_of_1_non_zero");
+    assert!(sys.duels.owner_of(DUEL_ID_2).is_non_zero(), "owner_of_2_non_zero");
+    assert_eq!(sys.duels.owner_of(DUEL_ID_1), sys.world.game_address(), "owner_of_1");
+    assert_eq!(sys.duels.owner_of(DUEL_ID_2), sys.world.game_address(), "owner_of_2");
 
-    assert_ne!(token.token_uri(DUEL_ID_1), "", "Uri should not be empty");
-    assert_ne!(token.tokenURI(DUEL_ID_1), "", "Uri should not be empty Camel");
+    assert_ne!(sys.duels.token_uri(DUEL_ID_1), "", "Uri should not be empty");
+    assert_ne!(sys.duels.tokenURI(DUEL_ID_1), "", "Uri should not be empty Camel");
 
-    assert!(token.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
-    assert!(token.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
+    assert!(sys.duels.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
+    assert!(sys.duels.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
 }
 
 #[test]
 fn test_token_component() {
-    let (mut _world, mut token) = setup(0);
+    let sys: TestSystems = setup(0);
     // should not panic
-    token.owner_of(DUEL_ID_1);
-    token.is_owner_of(OWNER(), DUEL_ID_1.low);
+    sys.duels.owner_of(DUEL_ID_1);
+    sys.duels.is_owner_of(OWNER(), DUEL_ID_1.low);
 }
 
 #[test]
 fn test_token_uri() {
-    let (mut world, mut token) = setup(0);
+    let mut sys: TestSystems = setup(0);
 
     let challenge = Challenge {
         duel_id: DUEL_ID_1.low,
@@ -311,10 +175,10 @@ fn test_token_uri() {
         timestamp_end:   20000,
     };
 
-    tester::set_Challenge(ref world, challenge);
+    tester::set_Challenge(ref sys.world, challenge);
 
-    let uri_1 = token.token_uri(DUEL_ID_1);
-    let uri_2 = token.token_uri(DUEL_ID_2);
+    let uri_1 = sys.duels.token_uri(DUEL_ID_1);
+    let uri_2 = sys.duels.token_uri(DUEL_ID_2);
     println!("{}", uri_1);
     println!("{}", uri_2);
 
@@ -325,8 +189,8 @@ fn test_token_uri() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
-    let (_world, mut token) = setup(0);
-    token.token_uri(999);
+    let sys: TestSystems = setup(0);
+    sys.duels.token_uri(999);
 }
 
 
@@ -337,21 +201,21 @@ fn test_token_uri_invalid() {
 #[test]
 #[ignore] // owned by game now
 fn test_approve() {
-    let (world, mut token) = setup(0);
+    let sys: TestSystems = setup(0);
 
     utils::impersonate(OWNER());
 
-    token.approve(BUMMER(), DUEL_ID_1);
-    assert_eq!(token.get_approved(DUEL_ID_1), BUMMER(), "Spender not approved correctly");
+    sys.duels.approve(BUMMER(), DUEL_ID_1);
+    assert_eq!(sys.duels.get_approved(DUEL_ID_1), BUMMER(), "Spender not approved correctly");
 
     // drop StoreSetRecord ERC721TokenApprovalModel
-    utils::drop_event(world.dispatcher.contract_address);
+    utils::drop_event(sys.world.dispatcher.contract_address);
 
     // TODO: fix events
     // // drop StoreSetRecord ERC721TokenApprovalModel
-    // utils::drop_event(world.dispatcher.contract_address);
-    // assert_only_event_approval(token.contract_address, OWNER(), BUMMER(), DUEL_ID_1);
-    // assert_only_event_approval(world.dispatcher.contract_address, OWNER(), BUMMER(), DUEL_ID_1);
+    // utils::drop_event(sys.world.dispatcher.contract_address);
+    // assert_only_event_approval(sys.duels.contract_address, OWNER(), BUMMER(), DUEL_ID_1);
+    // assert_only_event_approval(sys.world.dispatcher.contract_address, OWNER(), BUMMER(), DUEL_ID_1);
 }
 
 //
@@ -361,35 +225,35 @@ fn test_approve() {
 #[test]
 #[ignore] // owned by game now// owned by game now
 fn test_transfer_from() {
-    let (world, mut token) = setup(0);
+    let sys: TestSystems = setup(0);
 
     tester::impersonate(OWNER());
-    token.approve(BUMMER(), DUEL_ID_1);
+    sys.duels.approve(BUMMER(), DUEL_ID_1);
 
-    utils::drop_all_events(token.contract_address);
-    utils::drop_all_events(world.dispatcher.contract_address);
-    utils::assert_no_events_left(token.contract_address);
+    utils::drop_all_events(sys.duels.contract_address);
+    utils::drop_all_events(sys.world.dispatcher.contract_address);
+    utils::assert_no_events_left(sys.duels.contract_address);
 
     tester::impersonate(BUMMER());
-    token.transfer_from(OWNER(), OTHER(), DUEL_ID_1);
+    sys.duels.transfer_from(OWNER(), OTHER(), DUEL_ID_1);
 
     // TODO: fix events
-    // assert_only_event_transfer(token.contract_address, OWNER(), OTHER(), DUEL_ID_1);
+    // assert_only_event_transfer(sys.duels.contract_address, OWNER(), OTHER(), DUEL_ID_1);
 
-    assert_eq!(token.balance_of(OTHER()), 2, "Should eq 1");
-    assert_eq!(token.balance_of(OWNER()), 0, "Should eq 1");
-    assert_eq!(token.get_approved(DUEL_ID_1), ZERO(), "Should eq 0");
-    _assert_minted_count(world, token, 2, "Should eq 2");
-    // assert(token.total_supply() == 2, 'Should eq 2');
-    // assert(token.token_of_owner_by_index(OTHER(), 1) == DUEL_ID_1, 'Should eq DUEL_ID_1');
+    assert_eq!(sys.duels.balance_of(OTHER()), 2, "Should eq 1");
+    assert_eq!(sys.duels.balance_of(OWNER()), 0, "Should eq 1");
+    assert_eq!(sys.duels.get_approved(DUEL_ID_1), ZERO(), "Should eq 0");
+    _assert_minted_count(@sys, 2, "Should eq 2");
+    // assert(sys.duels.total_supply() == 2, 'Should eq 2');
+    // assert(sys.duels.token_of_owner_by_index(OTHER(), 1) == DUEL_ID_1, 'Should eq DUEL_ID_1');
 }
 
 #[test]
 #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance() {
-    let (_world, mut token) = setup(0);
+    let sys: TestSystems = setup(0);
     utils::impersonate(BUMMER());
-    token.transfer_from(OWNER(), OTHER(), DUEL_ID_1);
+    sys.duels.transfer_from(OWNER(), OTHER(), DUEL_ID_1);
 }
 
 
@@ -399,24 +263,24 @@ fn test_mint_no_allowance() {
 
 #[test]
 fn test_mint_free() {
-    let (world, mut token) = setup(0);
-    _assert_minted_count(world, token, 2, "invalid total_supply init");
-    // assert(token.balance_of(OTHER()) == 1, 'invalid balance_of == 1');
-    // assert(token.token_of_owner_by_index(OTHER(), 0) == DUEL_ID_2, 'token_of_owner_by_index_2');
-    create_duel(token, BUMMER(), RECIPIENT());
-    _assert_minted_count(world, token, 3, "invalid total_supply");
-    // assert(token.balance_of(OTHER()) == 2, 'invalid balance_of == 2');
-    // assert(token.token_of_owner_by_index(OTHER(), 1) == DUEL_ID_3, 'token_of_owner_by_index_3');
+    let sys: TestSystems = setup(0);
+    _assert_minted_count(@sys, 2, "invalid total_supply init");
+    // assert(sys.duels.balance_of(OTHER()) == 1, 'invalid balance_of == 1');
+    // assert(sys.duels.token_of_owner_by_index(OTHER(), 0) == DUEL_ID_2, 'token_of_owner_by_index_2');
+    create_duel(@sys, BUMMER(), RECIPIENT());
+    _assert_minted_count(@sys, 3, "invalid total_supply");
+    // assert(sys.duels.balance_of(OTHER()) == 2, 'invalid balance_of == 2');
+    // assert(sys.duels.token_of_owner_by_index(OTHER(), 1) == DUEL_ID_3, 'token_of_owner_by_index_3');
 }
 
 #[test]
 #[ignore] // we dont charge for duels
 fn test_mint_lords() {
-    let (world, mut token) = setup(100);
-    _assert_minted_count(world, token, 2, "invalid total_supply init");
+    let sys: TestSystems = setup(100);
+    _assert_minted_count(@sys, 2, "invalid total_supply init");
     // TODO: set allowance
-    create_duel(token, BUMMER(), RECIPIENT());
-    _assert_minted_count(world, token, 3, "invalid total_supply");
+    create_duel(@sys, BUMMER(), RECIPIENT());
+    _assert_minted_count(@sys, 3, "invalid total_supply");
 }
 
 
@@ -427,11 +291,11 @@ fn test_mint_lords() {
 // #[test]
 // #[should_panic(expected: ('DUEL: Not implemented', 'ENTRYPOINT_FAILED'))]
 // fn test_burn() {
-//     let (world, mut token) = setup(0);
-//     _assert_minted_count(world, token, 2, 'invalid total_supply init');
-//     // assert(token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
-//     tester::impersonate(world.game_address());
-//     token.delete_duel(DUEL_ID_1.low);
-//     _assert_minted_count(world, token, 1, 'invalid total_supply');
-//     // assert(token.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
+//     let sys: TestSystems = setup(0);
+//     _assert_minted_count(@sys, 2, 'invalid total_supply init');
+//     // assert(sys.duels.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
+//     tester::impersonate(sys.world.game_address());
+//     sys.duels.delete_duel(DUEL_ID_1.low);
+//     _assert_minted_count(@sys, 1, 'invalid total_supply');
+//     // assert(sys.duels.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
 // }

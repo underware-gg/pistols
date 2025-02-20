@@ -11,9 +11,9 @@ mod tests {
     use pistols::utils::timestamp::{TimestampTrait};
     use pistols::tests::tester::{tester,
         tester::{
-            IGameDispatcherTrait, FLAGS,
+            TestSystems, FLAGS,
+            IGameDispatcherTrait,
             IDuelTokenDispatcherTrait,
-            TestSystems,
             ID, ZERO, OWNER, OTHER, BUMMER, FAKE_OWNER_OF_1, OWNED_BY_OWNER,
             SEASON_1_TABLE,
         }

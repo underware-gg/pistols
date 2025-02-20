@@ -89,7 +89,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.set_mocked_values(salts.salts, salts.values);
 
-        tester::fund_duelists_pool(@sys.lords, @sys.bank, 2);
+        tester::fund_duelists_pool(@sys, 2);
         let duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
         let duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
 
@@ -210,7 +210,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.set_mocked_values(salts.salts, salts.values);
 
-        tester::fund_duelists_pool(@sys.lords, @sys.bank, 2);
+        tester::fund_duelists_pool(@sys, 2);
         let _duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
 
@@ -462,7 +462,7 @@ mod tests {
         (*sys).rng.set_mocked_values(salts.salts, salts.values);
 
         if ((*sys).duelists.minted_count() == 0) {
-            tester::fund_duelists_pool(sys.lords, sys.bank, 2);
+            tester::fund_duelists_pool(sys, 2);
             let _duelist_id_a: u128 = *tester::execute_claim_welcome_pack(sys.pack, OWNER())[0];
             let _duelist_id_b: u128 = *tester::execute_claim_welcome_pack(sys.pack, OTHER())[0];
         }

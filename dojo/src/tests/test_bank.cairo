@@ -222,7 +222,7 @@ mod tests {
     #[test]
     fn test_bank_resolved_draw() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys.lords, @sys.bank, 2);
+        tester::fund_duelists_pool(@sys, 2);
         tester::execute_claim_welcome_pack(@sys.pack, OWNER());
         tester::execute_claim_welcome_pack(@sys.pack, OTHER());
         _test_bank_resolved(@sys, OWNER(), OTHER(), 0);
@@ -231,7 +231,7 @@ mod tests {
     #[test]
     fn test_bank_resolved_win_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys.lords, @sys.bank, 3);
+        tester::fund_duelists_pool(@sys, 3);
         tester::execute_claim_welcome_pack(@sys.pack, OWNER());
         tester::execute_claim_welcome_pack(@sys.pack, OTHER());
         tester::execute_claim_welcome_pack(@sys.pack, BUMMER());
@@ -242,7 +242,7 @@ mod tests {
     #[test]
     fn test_bank_resolved_win_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
-        tester::fund_duelists_pool(@sys.lords, @sys.bank, 3);
+        tester::fund_duelists_pool(@sys, 3);
         tester::execute_claim_welcome_pack(@sys.pack, OWNER());
         tester::execute_claim_welcome_pack(@sys.pack, OTHER());
         tester::execute_claim_welcome_pack(@sys.pack, BUMMER());
@@ -273,7 +273,7 @@ mod tests {
         assert_eq!(pool_peg, 0, "pool_peg INIT");
 
         // fund PoolType::Purchases
-        tester::fund_duelists_pool(@sys.lords, @sys.bank, 1);
+        tester::fund_duelists_pool(@sys, 1);
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, price_welcome, "balance_bank FUND");
         pool_bank = tester::assert_balance(tester::get_Pool(sys.world, PoolType::Purchases).balance_lords, pool_bank, 0, price_welcome, "pool_bank FUND");
         pool_peg = tester::assert_balance(tester::get_Pool(sys.world, PoolType::FamePeg).balance_lords, pool_peg, 0, 0, "pool_peg FUND");

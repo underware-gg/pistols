@@ -108,11 +108,14 @@ mod tests {
     pub mod tester;
     pub mod prefabs;
     pub mod utils;
+    // mocks
+    pub mod mock_account;
     // tokens
     mod token {
         pub mod test_duel_token;
         pub mod test_duelist_token;
         pub mod test_pack_token;
+        pub mod test_fame_coin;
         // mocks
         pub mod mock_duelist;
     }

@@ -1,48 +1,31 @@
-use starknet::{ContractAddress, testing};
+use starknet::{ContractAddress};
 use dojo::world::{WorldStorage};
-use dojo_cairo_test::{
-    spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
-    WorldStorageTestTrait,
-};
 
 use pistols::systems::{
-    bank::{bank},
     tokens::{
-        duelist_token::{duelist_token, IDuelistTokenDispatcher},
-        pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
-        fame_coin::{fame_coin},
-        lords_mock::{lords_mock, ILordsMockDispatcherTrait},
+        duelist_token::{IDuelistTokenDispatcher},
+        pack_token::{IPackTokenDispatcher, IPackTokenDispatcherTrait},
+        lords_mock::{ILordsMockDispatcherTrait},
     },
-    components::{
-        token_bound::{m_TokenBoundAddress},
-    },
-    vrf_mock::{vrf_mock},
 };
 use pistols::models::{
     player::{
-        m_Player, Player, PlayerTrait,
-        e_PlayerActivity,
-        e_PlayerRequiredAction,
+        Player, PlayerTrait,
     },
-    duelist::{m_Duelist},
-    pack::{m_Pack, Pack, PackType, PackTypeTrait},
+    pack::{Pack, PackType, PackTypeTrait},
     config::{
-        m_Config, Config,
-        m_TokenConfig, TokenConfig,
-        m_CoinConfig,
-        CONFIG,
+        TokenConfig,
     },
-    pool::{m_Pool},
     table::{TABLES},
 };
 
-use pistols::interfaces::dns::{DnsTrait};
+// use pistols::interfaces::dns::{DnsTrait};
 use pistols::types::constants::{CONST};
 use pistols::tests::tester::{
     tester,
     tester::{
-        TestSystems, TestSystemsTrait,
-        OWNER, OTHER, BUMMER, SPENDER, TREASURY,
+        TestSystems, FLAGS,
+        OWNER, OTHER, BUMMER, SPENDER,
     },
 };
 use pistols::tests::{utils};
@@ -103,88 +86,15 @@ const TOKEN_ID_4: u256 = 4;
 const TOKEN_ID_5: u256 = 5;
 
 
-fn setup_uninitialized(fee_amount: u128) -> TestSystems {
-    testing::set_block_number(1);
-    testing::set_block_timestamp(1);
+fn setup(_fee_amount: u128) -> TestSystems {
+    let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
 
-    let ndef = NamespaceDef {
-        namespace: "pistols",
-        resources: [
-            // pistols models
-            TestResource::Model(m_Player::TEST_CLASS_HASH),
-            TestResource::Model(m_Pack::TEST_CLASS_HASH),
-            TestResource::Model(m_Duelist::TEST_CLASS_HASH),
-            TestResource::Model(m_Config::TEST_CLASS_HASH),
-            TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
-            TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_Pool::TEST_CLASS_HASH),
-            // events
-            TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
-            TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
-            TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
-            TestResource::Event(e_PlayerRequiredAction::TEST_CLASS_HASH),
-            //
-            // contracts
-            TestResource::Contract(duelist_token::TEST_CLASS_HASH),
-            TestResource::Contract(pack_token::TEST_CLASS_HASH),
-            TestResource::Contract(fame_coin::TEST_CLASS_HASH),
-            TestResource::Contract(bank::TEST_CLASS_HASH),
-            TestResource::Contract(lords_mock::TEST_CLASS_HASH),
-            TestResource::Contract(vrf_mock::TEST_CLASS_HASH),
-        ].span()
-    };
-
-    let mut world: WorldStorage = spawn_test_world([ndef].span());
-
-    let mut contract_defs: Array<ContractDef> = array![
-        ContractDefTrait::new(@"pistols", @"duelist_token")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            .with_init_calldata([
-                'pistols.underware.gg',
-                0, // renderer_address
-            ].span()),
-        ContractDefTrait::new(@"pistols", @"pack_token")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            .with_init_calldata([
-                'pistols.underware.gg',
-            ].span()),
-        ContractDefTrait::new(@"pistols", @"fame_coin")
-            .with_writer_of([selector_from_tag!("pistols-CoinConfig"),selector_from_tag!("pistols-TokenBoundAddress")].span()), // same as config
-        ContractDefTrait::new(@"pistols", @"bank")
-            .with_writer_of([selector_from_tag!("pistols-Pool"),].span()),
-        ContractDefTrait::new(@"pistols", @"lords_mock")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            .with_init_calldata([
-                0, // minter
-                10_000_000_000_000_000_000_000, // 10,000 Lords
-            ].span()),
-        ContractDefTrait::new(@"pistols", @"vrf_mock"),
-    ];
-
-    world.sync_perms_and_inits(contract_defs.span());
-
-    tester::impersonate(OWNER());
-
-    tester::set_Config(ref world, Config {
-        key: CONFIG::CONFIG_KEY,
-        treasury_address: TREASURY(),
-        lords_address: world.lords_mock_address(),
-        vrf_address: world.vrf_mock_address(),
-        season_table_id: TABLES::PRACTICE,
-        is_paused: false,
-    });
-
-    (TestSystemsTrait::from_world(world))
-}
-
-fn setup(fee_amount: u128) -> TestSystems {
-    let mut sys: TestSystems = setup_uninitialized(fee_amount);
+    tester::set_current_season(ref sys.world, TABLES::PRACTICE);
 
     tester::execute_lords_faucet(@sys.lords, OWNER());
     tester::execute_lords_faucet(@sys.lords, OTHER());
 
-    tester::fund_duelists_pool(@sys.lords, @sys.bank, 2);
+    tester::fund_duelists_pool(@sys, 2);
 
     tester::impersonate(OWNER());
 

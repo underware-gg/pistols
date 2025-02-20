@@ -32,6 +32,7 @@ openzeppelin_introspection = { git = "https://github.com/underware-gg/cairo-cont
 [dev-dependencies]
 cairo_test = "=2.9.2"
 dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.2.0" }
+openzeppelin_account = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
 
 [features]
 default = ["lords_mock", "vrf_mock"]
