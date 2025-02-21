@@ -196,8 +196,9 @@ fn test_token_uri_invalid() {
 //
 
 #[test]
-// #[should_panic(expected: ('TOKEN: caller is not minter', 'ENTRYPOINT_FAILED'))]
-#[should_panic(expected: ('ENTRYPOINT_NOT_FOUND', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+// #[should_panic(expected: ('TOKEN: caller is not minter', 'ENTRYPOINT_FAILED'))] // for Dojo contracts
+// #[should_panic(expected: ('ENTRYPOINT_NOT_FOUND', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for accounts
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for random addresses
 fn test_mint_duelist_not_minter() {
     let mut sys: TestSystems = setup(0);
     let account: ContractAddress = tester::deploy_mock_account();

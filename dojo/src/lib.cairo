@@ -109,7 +109,7 @@ mod tests {
     pub mod prefabs;
     pub mod utils;
     // mocks
-    pub mod mock_account;
+    // pub mod mock_account;
     // tokens
     mod token {
         pub mod test_duel_token;

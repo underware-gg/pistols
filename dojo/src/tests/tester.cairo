@@ -5,7 +5,7 @@ pub mod tester {
     use dojo::world::{WorldStorage, IWorldDispatcherTrait};
     use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
     use dojo_cairo_test::{
-        spawn_test_world, deploy_contract,
+        spawn_test_world,
         NamespaceDef, TestResource,
         ContractDefTrait, ContractDef,
         WorldStorageTestTrait,
@@ -72,7 +72,7 @@ pub mod tester {
             m_Pool, Pool, PoolType,
         },
     };
-    use pistols::tests::mock_account::DualCaseAccountMock;
+    // use pistols::tests::mock_account::DualCaseAccountMock;
     use pistols::tests::token::mock_duelist::{
         duelist_token as mock_duelist,
         m_MockDuelistOwners,
@@ -470,30 +470,15 @@ pub mod tester {
 
 
     //--------------------------
-    // keipair generator
-    // from: https://github.com/buldazer23/starknet-foundry/blob/ed6ea7ee4c34d4f8387851a332b37fba5445f0f4/snforge_std/src/signature/stark_curve.cairo#L14
-    // use starknet_signers::SigningKey;
-    // use starknet::signers::SigningKey;
-    // #[derive(Copy, Drop)]
-    // struct StarkCurveKeyPair {
-    //     private_key: felt252,
-    //     public_key: felt252
-    // }
-    // #[generate_trait]
-    // impl StarkCurveKeyPairImpl of StarkCurveKeyPairTrait {
-    //     fn generate() -> StarkCurveKeyPair {
-    //         let key_pair = SigningKey::from_random();
-    //         StarkCurveKeyPair {
-    //             private_key: key_pair.secret_scalar().into_(),
-    //             public_key: key_pair.verifying_key().scalar().into_(),
-    //         }
-    //     }
-    // }
+    // mock account contract
+    //
+    // use dojo_cairo_test::{deploy_contract};
     const NEW_PUBKEY: felt252 = 0x26da8d11938b76025862be14fdb8b28438827f73e75e86f7bfa38b196951fa7;
     pub fn deploy_mock_account() -> ContractAddress {
         // let key_pair: StarkCurveKeyPair = StarkCurveKeyPairTrait::generate();
         // let public_key: felt252 = key_pair.public_key;
-        (deploy_contract(DualCaseAccountMock::TEST_CLASS_HASH.try_into().unwrap(), [NEW_PUBKEY].span()))
+        // (deploy_contract(DualCaseAccountMock::TEST_CLASS_HASH.try_into().unwrap(), [NEW_PUBKEY].span()))
+        (ZERO())
     }
 
     //
