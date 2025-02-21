@@ -389,7 +389,7 @@ pub impl MathU128 of MathTrait<u128, i128> {
 
     fn percentage(v: u128, percent: u8) -> u128 {
         assert(percent <= 100, 'percentage(u128) percent > 100');
-        if (percent == 0) { (0) }
+        if (v == 0 || percent == 0) { (0) }
         else { ((((v * 1_000_000) / 100) * percent.into()) / 1_000_000) } // possible overflow on high values
     }
 

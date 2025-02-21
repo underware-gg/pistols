@@ -136,7 +136,7 @@ pub mod duelist_token {
         IBankDispatcher, IBankDispatcherTrait,
     };
     use pistols::models::{
-        pool::{PoolType, PoolTypeTrait, FameReleaseBill},
+        pool::{PoolType, PoolTypeTrait, LordsReleaseBill},
         player::{Activity, ActivityTrait},
         duelist::{
             Duelist, DuelistValue,
@@ -450,12 +450,12 @@ pub mod duelist_token {
         ) {
             // reward 100% FAME to duelist
             if (values.fame_gained != 0) {
-                (*fame_dispatcher).reward_duelist(duelist_id, values.fame_gained.into());
+                (*fame_dispatcher).reward_duelist(duelist_id, values.fame_gained);
             }
             // reward 100% FOOLS to owner
             if (values.fools_gained != 0) {
                 let owner: ContractAddress = self.owner_of(duelist_id.into());
-                (*fools_dispatcher).reward_player(owner, values.fools_gained.into());
+                (*fools_dispatcher).reward_player(owner, values.fools_gained);
             }
         }
         
@@ -491,20 +491,22 @@ pub mod duelist_token {
                 }
                 //
                 // Calculate FAME to be released
-                let mut bills: Array<FameReleaseBill> = array![];
+                let mut bills: Array<LordsReleaseBill> = array![];
                 // unlock LORDS to tournament creator
                 if (*distribution.creator_percent != 0 && distribution.creator_address.is_non_zero()) {
                     let fame_amount: u128 = MathTrait::percentage(values.fame_lost, *distribution.creator_percent);
-                    bills.append(FameReleaseBill {
+                    bills.append(LordsReleaseBill {
                         recipient: *distribution.creator_address,
                         fame_amount,
+                        lords_amount: 0,
                     });
                     due_amount -= fame_amount;
                 }
                 // unlock remaining to underware
-                bills.append(FameReleaseBill {
+                bills.append(LordsReleaseBill {
                     recipient: underware_address,
                     fame_amount: due_amount,
+                    lords_amount: 0,
                 });
                 // unlock LORDS
                 values.lords_unlocked += (*bank_dispatcher).release_lords_from_fame_to_be_burned(bills.span());

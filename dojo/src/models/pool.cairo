@@ -47,9 +47,10 @@ pub struct Pool {
 }
 
 #[derive(Copy, Drop, Serde, Introspect)]
-pub struct FameReleaseBill {
+pub struct LordsReleaseBill {
     pub recipient: ContractAddress,
-    pub fame_amount: u128,
+    pub fame_amount: u128,      // LORDS pegged to FAME
+    pub lords_amount: u128,     // LORDS deposited (can be zero)
 }
 
 
@@ -60,6 +61,11 @@ use pistols::systems::bank::bank::{Errors as BankErrors};
 
 #[generate_trait]
 pub impl PoolImpl of PoolTrait {
+    #[inline(always)]
+    fn empty(ref self: Pool) {
+        self.balance_lords = 0;
+        self.balance_fame = 0;
+    }
     #[inline(always)]
     fn deposit_lords(ref self: Pool, amount: u128) {
         self.balance_lords += amount;

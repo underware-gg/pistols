@@ -65,6 +65,7 @@ pub mod game {
         IDuelistTokenDispatcherTrait,
         IDuelTokenDispatcherTrait,
         ITutorialDispatcherTrait,
+        IBankDispatcherTrait,
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
@@ -349,12 +350,10 @@ pub mod game {
             let mut season: SeasonConfig = store.get_current_season();
             let new_season_table_id: felt252 = season.collect(ref store);
             store.set_config_season_table_id(new_season_table_id);
+            // release...
+            store.world.bank_dispatcher().release_season_pool(season.table_id);
             // all hail the collector
             Trophy::Collector.progress(store.world, starknet::get_caller_address(), 1);
-            // TODO: transfer fees
-            // TODO: transfer prizes
-            // TODO: transfer FAME
-            // TODO: transfer DUEL
             (new_season_table_id)
         }
 

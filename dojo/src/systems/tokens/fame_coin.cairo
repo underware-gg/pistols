@@ -32,14 +32,16 @@ pub trait IFameCoin<TState> {
     
     // IFameCoinProtected
     fn minted_duelist(ref self: TState, duelist_id: u128);
-    fn reward_duelist(ref self: TState, duelist_id: u128, amount: u256);
+    fn reward_duelist(ref self: TState, duelist_id: u128, amount: u128);
+    fn burn(ref self: TState, amount: u128);
 }
 
 // Exposed to world
 #[starknet::interface]
 pub trait IFameCoinProtected<TState> {
     fn minted_duelist(ref self: TState, duelist_id: u128);
-    fn reward_duelist(ref self: TState, duelist_id: u128, amount: u256);
+    fn reward_duelist(ref self: TState, duelist_id: u128, amount: u128);
+    fn burn(ref self: TState, amount: u128);
 }
 
 #[dojo::contract]
@@ -52,7 +54,7 @@ pub mod fame_coin {
     // ERC-20 Start
     //
     use openzeppelin_token::erc20::ERC20Component;
-    // use openzeppelin_token::erc20::ERC20HooksEmptyImpl;
+    use openzeppelin_token::erc20::ERC20HooksEmptyImpl;
     use pistols::systems::components::token_bound::{TokenBoundComponent};
     use pistols::systems::components::coin_component::{
         CoinComponent,
@@ -96,7 +98,8 @@ pub mod fame_coin {
     use pistols::types::constants::{FAME};
 
     mod Errors {
-        pub const NOT_IMPLEMENTED: felt252 = 'FAME: Not implemented';
+        pub const INVALID_CALLER: felt252   = 'FAME: Invalid caller';
+        pub const NOT_IMPLEMENTED: felt252  = 'FAME: Not implemented';
     }
 
     //*******************************************
@@ -150,38 +153,22 @@ pub mod fame_coin {
 
         fn reward_duelist(ref self: ContractState,
             duelist_id: u128,
-            amount: u256,
+            amount: u128,
         ) {
             // validate caller (duelist token contract)
             let minter_address: ContractAddress = self.coin.assert_caller_is_minter();
 
             // mint FAME to token
             let token_address: ContractAddress = self.token_bound.address_of_token(minter_address, duelist_id);
-            self.coin.mint(token_address, amount);
-        }
-    }
-
-    //-----------------------------------
-    // Hooks
-    //
-    pub impl ERC20HooksImpl of ERC20Component::ERC20HooksTrait<ContractState> {
-        fn before_update(
-            ref self: ERC20Component::ComponentState<ContractState>,
-            from: ContractAddress,
-            recipient: ContractAddress,
-            amount: u256
-        ) {
-            // // only minter can transfer
-            // let mut contract_state = ERC20Component::HasComponent::get_contract_mut(ref self);
-            // contract_state.coin.assert_caller_is_minter();
+            self.coin.mint(token_address, amount.into());
         }
 
-        fn after_update(
-            ref self: ERC20Component::ComponentState<ContractState>,
-            from: ContractAddress,
-            recipient: ContractAddress,
-            amount: u256
+        fn burn(ref self: ContractState,
+            amount: u128,
         ) {
+            let mut world = self.world_default();
+            assert(world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            self.erc20.burn(starknet::get_caller_address(), amount.into());
         }
     }
 

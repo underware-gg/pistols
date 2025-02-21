@@ -23,13 +23,13 @@ pub trait IFoolsCoin<TState> {
     fn transferFrom(ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
 
     // IFoolsCoinProtected
-    fn reward_player(ref self: TState, recipient: ContractAddress, amount: u256);
+    fn reward_player(ref self: TState, recipient: ContractAddress, amount: u128);
 }
 
 // Exposed to world
 #[starknet::interface]
 trait IFoolsCoinProtected<TState> {
-    fn reward_player(ref self: TState, recipient: ContractAddress, amount: u256);
+    fn reward_player(ref self: TState, recipient: ContractAddress, amount: u128);
 }
 
 #[dojo::contract]
@@ -75,7 +75,8 @@ pub mod fools_coin {
     use pistols::utils::math::{MathU128, MathU256};
 
     mod Errors {
-        pub const NOT_IMPLEMENTED: felt252 = 'FOOLS: Not implemented';
+        pub const INVALID_CALLER: felt252   = 'FOOLS: Invalid caller';
+        pub const NOT_IMPLEMENTED: felt252  = 'FOOLS: Not implemented';
     }
 
     //*******************************************
@@ -110,13 +111,16 @@ pub mod fools_coin {
     impl FoolsPublicImpl of super::IFoolsCoinProtected<ContractState> {
         fn reward_player(ref self: ContractState,
             recipient: ContractAddress,
-            amount: u256,
+            amount: u128,
         ) {
+            let mut world = self.world_default();
+            assert(world.caller_is_world_contract(), Errors::INVALID_CALLER);
+
             // validate caller
             self.coin.assert_caller_is_minter();
 
             // mint FOOLS to recipient
-            self.coin.mint(recipient, amount);
+            self.coin.mint(recipient, amount.into());
         }
     }
 
