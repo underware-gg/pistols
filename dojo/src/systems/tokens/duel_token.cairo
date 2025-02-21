@@ -170,8 +170,10 @@ pub mod duel_token {
         pub const INVALID_CHALLENGE: felt252        = 'DUEL: Invalid challenge';
         pub const NOT_YOUR_CHALLENGE: felt252       = 'DUEL: Not your challenge';
         pub const NOT_YOUR_DUELIST: felt252         = 'DUEL: Not your duelist';
-        pub const DUELIST_IS_DEAD: felt252          = 'DUEL: Duelist is dead!';
-        pub const INSUFFICIENT_LIVES: felt252       = 'DUEL: Insufficient lives';
+        pub const DUELIST_IS_DEAD_A: felt252        = 'DUEL: Duelist A is dead!';
+        pub const DUELIST_IS_DEAD_B: felt252        = 'DUEL: Duelist B is dead!';
+        pub const INSUFFICIENT_LIVES_A: felt252     = 'DUEL: Insufficient lives A';
+        pub const INSUFFICIENT_LIVES_B: felt252     = 'DUEL: Insufficient lives B';
         pub const CHALLENGER_NOT_ADMITTED: felt252  = 'DUEL: Challenger not allowed';
         pub const CHALLENGED_NOT_ADMITTED: felt252  = 'DUEL: Challenged not allowed';
         pub const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
@@ -257,10 +259,11 @@ pub mod duel_token {
             assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
 
             // validate duelist health
+// println!("poke A... {}", duelist_id_a);
             duelist_dispatcher.poke(duelist_id_a);
             let lives: u8 = duelist_dispatcher.life_count(duelist_id_a);
-            assert(lives > 0, Errors::DUELIST_IS_DEAD);
-            assert(lives >= lives_staked, Errors::INSUFFICIENT_LIVES);
+            assert(lives > 0, Errors::DUELIST_IS_DEAD_A);
+            assert(lives >= lives_staked, Errors::INSUFFICIENT_LIVES_A);
 
             // validate table
             let table: TableConfig = store.get_table_config(table_id);
@@ -362,10 +365,11 @@ pub mod duel_token {
                 assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
 
                 // validate duelist health
+// println!("poke B... {}", duelist_id_b);
                 duelist_dispatcher.poke(duelist_id_b);
                 let lives: u8 = duelist_dispatcher.life_count(duelist_id_b);
-                assert(lives > 0, Errors::DUELIST_IS_DEAD);
-                assert(lives >= challenge.lives_staked, Errors::INSUFFICIENT_LIVES);
+                assert(lives > 0, Errors::DUELIST_IS_DEAD_B);
+                assert(lives >= challenge.lives_staked, Errors::INSUFFICIENT_LIVES_B);
 
                 // validate challenged identity
                 assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);

@@ -51,7 +51,7 @@ pub mod tester {
             m_Scoreboard, Scoreboard,
         },
         leaderboard::{
-            m_Leaderboard, Leaderboard,
+            m_Leaderboard, Leaderboard, LeaderboardTrait, LeaderboardPosition
         },
         pact::{
             m_Pact,
@@ -72,6 +72,7 @@ pub mod tester {
             m_Pool, Pool, PoolType,
         },
     };
+
     // use pistols::tests::mock_account::DualCaseAccountMock;
     use pistols::tests::token::mock_duelist::{
         duelist_token as mock_duelist,
@@ -84,7 +85,8 @@ pub mod tester {
     use pistols::utils::byte_arrays::{BoolToString};
     use pistols::utils::misc::{ContractAddressIntoU256};
     use pistols::utils::short_string::{ShortString};
-    use pistols::interfaces::dns::{DnsTrait};
+    pub use pistols::interfaces::dns::{DnsTrait};
+    pub use pistols::libs::store::{Store, StoreTrait};
 
     
     //
@@ -105,6 +107,17 @@ pub mod tester {
     // hard-coded owners
     pub fn OWNED_BY_OWNER() -> u128 { 0xeeee }
     pub fn OWNED_BY_OTHER() -> u128 { 0xdddd }
+
+    pub const FAUCET_AMOUNT: u128 = 10_000_000_000_000_000_000_000;
+
+    #[inline(always)]
+    pub fn WEI(value: u128) -> u128 {
+        (value * CONST::ETH_TO_WEI.low)
+    }
+    #[inline(always)]
+    pub fn ETH(value: u128) -> u128 {
+        (value / CONST::ETH_TO_WEI.low)
+    }
 
     #[inline(always)]
     pub fn ID(address: ContractAddress) -> u128 {
@@ -160,6 +173,7 @@ pub mod tester {
     #[derive(Copy, Drop)]
     pub struct TestSystems {
         pub world: WorldStorage,
+        pub store: Store,
         pub game: IGameDispatcher,
         pub tut: ITutorialDispatcher,
         pub admin: IAdminDispatcher,
@@ -181,6 +195,7 @@ pub mod tester {
             (TestSystems {
                 world,
                 game: world.game_dispatcher(),
+                store: StoreTrait::new(world),
                 tut: world.tutorial_dispatcher(),
                 admin: world.admin_dispatcher(),
                 bank: world.bank_dispatcher(),
@@ -346,7 +361,7 @@ pub mod tester {
                     .with_init_calldata([
                         // game.contract_address.into(), // minter
                         0, // minter
-                        10_000_000_000_000_000_000_000, // faucet_amount: 10,000 Lords
+                        FAUCET_AMOUNT.into(), // faucet_amount: 10,000 Lords
                     ].span())
             );
         }

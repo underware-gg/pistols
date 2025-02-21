@@ -324,6 +324,12 @@ pub mod game {
             }
 
             // events
+            if (!rewards_a.survived) {
+                Activity::DuelistDied.emit(ref store.world, starknet::get_caller_address(), challenge.duelist_id_a.into());
+            }
+            if (!rewards_b.survived) {
+                Activity::DuelistDied.emit(ref store.world, starknet::get_caller_address(), challenge.duelist_id_b.into());
+            }
             if (challenge.winner != 0) {
                 Activity::ChallengeResolved.emit(ref store.world, challenge.winner_address(), duel_id.into());
             } else {

@@ -83,14 +83,6 @@ mod tests {
         tester::execute_reply_duel(@sys.duels, OWNER(), ID(OWNER()), duel_id, true);
     }
 
-    // need duelists, moved to test_duel.cairo
-    // #[test]
-    // #[should_panic(expected:('DUEL: Insufficient lives', 'ENTRYPOINT_FAILED'))]
-    // fn test_challenge_insufficient_lives() {
-    //     let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-    //     tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 4);
-    // }
-
     #[test]
     fn test_challenge_ok() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);

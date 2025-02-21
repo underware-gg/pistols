@@ -403,6 +403,7 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
 
     // duelist lost fame...
     let fame_balance: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
+// println!("fame_balance: {}", tester::ETH(fame_balance));
     // Fame supply down
     let fame_supply: u128 = (*sys.fame).total_supply().low;
     // Flames up?
@@ -448,7 +449,7 @@ fn test_duelist_reactivate_OK_edge() {
 }
 
 #[test]
-fn test_duelist_reactivate_DEAD() {
+fn test_duelist_reactivate_DEAD_by_1() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
     _test_duelist_reactivate(@sys, token_id, 2001, false);

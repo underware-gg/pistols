@@ -259,9 +259,9 @@ pub mod duelist_token {
             let mut fame_dripped: u128 = self.inactive_fame_dripped(duelist_id);
             if (fame_dripped != 0) {
                 // burn fame_dripped
-                let is_alive: bool = self._reactivate_or_sacrifice(duelist_id, fame_dripped);
+                let survived: bool = self._reactivate_or_sacrifice(duelist_id, Option::Some(fame_dripped));
                 // only duel_token and owner can poke alive duelists
-                if (is_alive && !self.world_default().is_duel_contract(starknet::get_caller_address())) {
+                if (survived && !self.world_default().is_duel_contract(starknet::get_caller_address())) {
                     self.token.assert_is_owner_of(starknet::get_caller_address(), duelist_id.into());
                 }
             }
@@ -273,7 +273,7 @@ pub mod duelist_token {
             // only owner can sacrifice
             self.token.assert_is_owner_of(starknet::get_caller_address(), duelist_id.into());
             // burn it!
-            self._reactivate_or_sacrifice(duelist_id, 0);
+            self._reactivate_or_sacrifice(duelist_id, Option::None);
         }
 
         // fn delete_duelist(ref self: ContractState,
@@ -364,9 +364,8 @@ pub mod duelist_token {
             let treasury_address: ContractAddress = store.get_config_treasury_address();
             self._process_rewards(@fame_dispatcher, @fools_dispatcher, challenge.duelist_id_a, rewards_a);
             self._process_rewards(@fame_dispatcher, @fools_dispatcher, challenge.duelist_id_b, rewards_b);
-            // TODO... optimize, combine LORDS releases into one
-            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_a, challenge.duelist_id_a, ref rewards_a);
-            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_b, challenge.duelist_id_b, ref rewards_b);
+            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_a, challenge.duelist_id_a, ref rewards_a, rewards_b.fame_gained);
+            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_b, challenge.duelist_id_b, ref rewards_b, rewards_a.fame_gained);
 
             (rewards_a, rewards_b)
         }
@@ -385,44 +384,6 @@ pub mod duelist_token {
             (*fame_dispatcher).balance_of_token(starknet::get_contract_address(), duelist_id).low
         }
 
-        fn _reactivate_or_sacrifice(ref self: ContractState,
-            duelist_id: u128,
-            fame_dripped: u128
-        ) -> bool {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
-            let bank_dispatcher: IBankDispatcher = store.world.bank_dispatcher();
-            let distribution: FeeDistribution = Default::default();
-
-            // must be alive!
-            let fame_balance: u128 = self._fame_balance(@fame_dispatcher, duelist_id);
-            assert(fame_balance != 0, Errors::DUELIST_IS_DEAD);
-
-            let mut values: RewardValues = Default::default();
-            values.fame_lost = if (fame_dripped != 0) {
-                // poke: burn dripped fame, but no more than balance
-                (core::cmp::min(fame_balance, fame_dripped))
-            } else {
-                // sacrifice: burn whole balance
-                (fame_balance)
-            };
-
-            self._process_lost_fame(
-                @fame_dispatcher,
-                @bank_dispatcher,
-                store.get_config_treasury_address(),
-                @distribution,
-                fame_balance,
-                duelist_id,
-                ref values,
-            );
-
-            // update duelist timestamp
-            store.set_duelist_timestamp_active(duelist_id);
-            
-            (values.survived)
-        }
-
         fn _process_rewards(ref self: ContractState,
             fame_dispatcher: @IFameCoinDispatcher,
             fools_dispatcher: @IFoolsCoinDispatcher,
@@ -431,6 +392,7 @@ pub mod duelist_token {
         ) {
             // reward 100% FAME to duelist
             if (values.fame_gained != 0) {
+// println!("++ values.fame_gained: {}", values.fame_gained);
                 (*fame_dispatcher).reward_duelist(duelist_id, values.fame_gained);
             }
             // reward 100% FOOLS to owner
@@ -448,54 +410,112 @@ pub mod duelist_token {
             fame_balance: u128,
             duelist_id: u128,
             ref values: RewardValues,
+            winners_minted_fame: u128,
         ) {
             // Burn FAME from duelist
             if (values.fame_lost != 0) {
-                // if duelist died, burn all fame balance
-                values.survived = ((fame_balance - values.fame_lost) >= FAME::ONE_LIFE.low);
-                let mut due_amount: u128 = if (values.survived) {values.fame_lost} else {fame_balance};
+                // totals...
+                let mut total_to_burn: u128 = winners_minted_fame; // was minted to winner
+                let mut release_bills: Array<LordsReleaseBill> = array![];
                 //
-                // DEAD! 60% of ONE_LIFE goes to PoolType::SacredFlame
-                if (!values.survived) {
-                    let mut world = self.world_default();
-                    Activity::DuelistDied.emit(ref world, starknet::get_caller_address(), duelist_id.into());
-                    let amount: u128 = MathTrait::percentage(FAME::ONE_LIFE.low, FAME::SACRED_FLAME_PERCENTAGE);
+                // Process residuals (dead duelist)
+                // the residual balance is split between sacred flame + underware
+                let mut residual_due: u128 = (fame_balance - values.fame_lost);
+                values.survived = (residual_due >= FAME::ONE_LIFE.low);
+                if (values.survived) {
+                    residual_due = 0;
+                } else {
+                    // transfer to PoolType::SacredFlame, do not burn
+                    let amount: u128 = MathTrait::percentage(residual_due, FAME::SACRED_FLAME_PERCENTAGE);
                     (*bank_dispatcher).duelist_lost_fame_to_pool(starknet::get_contract_address(), duelist_id, amount, PoolType::SacredFlame);
-                    due_amount -= amount;
+                    residual_due -= amount;
                 }
                 //
-                // FAME to PoolType::Season()
+                // Process distribution
+                // (calculated over burn-mint difference)
+                let distribution_total: u128 = (values.fame_lost - winners_minted_fame);
+                let mut distribution_due: u128 = distribution_total;
+                // transfer to PoolType::Season(x), do not burn
                 if (*distribution.pool_percent != 0 && distribution.pool_id.exists()) {
-                    let amount: u128 = MathTrait::percentage(values.fame_lost, *distribution.pool_percent);
+                    let amount: u128 = MathTrait::percentage(distribution_total, *distribution.pool_percent);
                     (*bank_dispatcher).duelist_lost_fame_to_pool(starknet::get_contract_address(), duelist_id, amount, *distribution.pool_id);
-                    due_amount -= amount;
+                    distribution_due -= amount;
                 }
-                //
-                // Calculate FAME to be released
-                let mut bills: Array<LordsReleaseBill> = array![];
-                // unlock LORDS to tournament creator
+                // release LORDS do tournament creator + burn
                 if (*distribution.creator_percent != 0 && distribution.creator_address.is_non_zero()) {
-                    let fame_amount: u128 = MathTrait::percentage(values.fame_lost, *distribution.creator_percent);
-                    bills.append(LordsReleaseBill {
+                    let amount: u128 = MathTrait::percentage(distribution_total, *distribution.creator_percent);
+                    release_bills.append(LordsReleaseBill {
                         recipient: *distribution.creator_address,
-                        fame_amount,
+                        fame_amount: amount,
                         lords_amount: 0,
                     });
-                    due_amount -= fame_amount;
+                    distribution_due -= amount;
+                    total_to_burn += amount; // released, need to burn
                 }
-                // unlock remaining to underware
-                bills.append(LordsReleaseBill {
+                // remaining FAME to underware
+                let mut underware_due: u128 = residual_due + distribution_due;
+                release_bills.append(LordsReleaseBill {
                     recipient: underware_address,
-                    fame_amount: due_amount,
+                    fame_amount: underware_due,
                     lords_amount: 0,
                 });
-                // unlock LORDS
-                values.lords_unlocked += (*bank_dispatcher).release_lords_from_fame_to_be_burned(bills.span());
-                // burn FAME
-                (*fame_dispatcher).burn_from_token(starknet::get_contract_address(), duelist_id, due_amount.into());
+                total_to_burn += underware_due; // released, need to burn
+                //
+                // release LORDS and burn FAME
+                values.lords_unlocked += (*bank_dispatcher).release_lords_from_fame_to_be_burned(release_bills.span());
+                (*fame_dispatcher).burn_from_token(starknet::get_contract_address(), duelist_id, total_to_burn.into());
             } else {
                 values.survived = true;
             }
+        }
+
+        fn _reactivate_or_sacrifice(ref self: ContractState,
+            duelist_id: u128,
+            fame_dripped: Option<u128>
+        ) -> bool {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
+            let bank_dispatcher: IBankDispatcher = store.world.bank_dispatcher();
+
+            // must be alive!
+            let fame_balance: u128 = self._fame_balance(@fame_dispatcher, duelist_id);
+            assert(fame_balance != 0, Errors::DUELIST_IS_DEAD);
+
+            let mut due_amount = match fame_dripped {
+                // poke: burn dripped fame, but no more than balance
+                Option::Some(fame_dripped) => {core::cmp::min(fame_balance, fame_dripped)},
+                // sacrifice: burn the whole balance
+                Option::None => {fame_balance}
+            };
+// println!("fame_dripped: {}", fame_dripped.unwrap());
+// println!("fame_balance: {}", fame_balance);
+// println!("due_amount: {}", due_amount);
+            // 60% of one life goes to sacred flame
+            let survived: bool = (fame_balance - due_amount) >= FAME::ONE_LIFE.low;
+// println!("survived: {}", survived);
+            if (!survived) {
+                let amount: u128 = MathTrait::percentage(FAME::ONE_LIFE.low, FAME::SACRED_FLAME_PERCENTAGE);
+                bank_dispatcher.duelist_lost_fame_to_pool(starknet::get_contract_address(), duelist_id, amount, PoolType::SacredFlame);
+                // burn the full balance
+                due_amount = fame_balance - amount;
+                // emit event...
+                Activity::DuelistDied.emit(ref store.world, starknet::get_caller_address(), duelist_id.into());
+            }
+
+            // remaining fame to be burned and released
+            let bill = LordsReleaseBill {
+                recipient: store.get_config_treasury_address(),
+                fame_amount: due_amount,
+                lords_amount: 0,
+            };
+            bank_dispatcher.release_lords_from_fame_to_be_burned(array![bill].span());
+            fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, due_amount.into());
+// println!("remaining: {}", self._fame_balance(@fame_dispatcher, duelist_id));
+
+            // update duelist timestamp
+            store.set_duelist_timestamp_active(duelist_id);
+            
+            (survived)
         }
     }
 
