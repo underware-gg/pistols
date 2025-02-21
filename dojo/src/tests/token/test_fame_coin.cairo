@@ -1,11 +1,13 @@
 use core::num::traits::Zero;
 use starknet::{ContractAddress};
 
+use pistols::systems::components::token_bound::{TokenBoundAddress};
 use pistols::models::{
     // config::{CoinConfig}
 };
 use pistols::tests::tester::{tester,
     tester::{
+        StoreTrait,
         IFameCoinDispatcherTrait,
         TestSystems, FLAGS,
         OWNER, OTHER,
@@ -51,9 +53,7 @@ fn test_initializer() {
 #[test]
 fn test_token_bound_address() {
     let mut sys: TestSystems = setup(0);
-
     tester::execute_claim_welcome_pack(@sys.pack, OTHER());
-
     // validate token_bound address
     let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.duelists.contract_address, TOKEN_ID_1_1.low);
     let token_bound_address_2: ContractAddress = sys.fame.address_of_token(sys.duelists.contract_address, TOKEN_ID_2_1.low);
@@ -66,6 +66,18 @@ fn test_token_bound_address() {
     assert_eq!(token_contract_2, sys.duelists.contract_address, "token_contract_2");
     assert_eq!(token_id_1_1, TOKEN_ID_1_1.low, "token_id_1_1");
     assert_eq!(token_id_2_1, TOKEN_ID_2_1.low, "token_id_2_1");
+    // model
+    let token_bound_1: TokenBoundAddress = sys.store.get_token_bound_address(token_bound_address_1);
+    let token_bound_2: TokenBoundAddress = sys.store.get_token_bound_address(token_bound_address_2);
+    assert_eq!(token_bound_1.contract_address, sys.duelists.contract_address, "token_bound_1.contract_address");
+    assert_eq!(token_bound_2.contract_address, sys.duelists.contract_address, "token_bound_2.contract_address");
+    assert_eq!(token_bound_1.token_id, TOKEN_ID_1_1.low, "token_bound_1.token_id");
+    assert_eq!(token_bound_2.token_id, TOKEN_ID_2_1.low, "token_bound_2.token_id");
+    // balances
+    let balance_1: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, TOKEN_ID_1_1.low);
+    let balance_2: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, TOKEN_ID_2_1.low);
+    assert_ne!(balance_1, 0, "balance_1");
+    assert_ne!(balance_2, 0, "balance_2");
 }
 
 #[test]

@@ -1,6 +1,7 @@
 use starknet::{ContractAddress};
 use pistols::types::duel_progress::{DuelProgress};
 use pistols::models::leaderboard::{LeaderboardPosition};
+use pistols::types::rules::{RewardValues};
 
 // Exposed to clients
 #[starknet::interface]
@@ -19,7 +20,6 @@ pub trait IGame<TState> {
         salt: felt252,
         moves: Span<u8>,
     );
-    // end season and start next
     fn collect_season(ref self: TState) -> felt252; // @description:Close the current season and start the next one
 
     // view calls
@@ -28,6 +28,7 @@ pub trait IGame<TState> {
     fn get_duelist_leaderboard_position(self: @TState, duelist_id: u128, table_id: felt252) -> LeaderboardPosition;
     fn get_leaderboard(self: @TState, table_id: felt252) -> Span<LeaderboardPosition>;
     fn can_collect_season(self: @TState) -> bool;
+    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8, table_id: felt252) -> RewardValues;
     fn get_timestamp(self: @TState) -> u64;
     
     // test calls
@@ -70,26 +71,11 @@ pub mod game {
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
         player::{PlayerTrait, Activity, ActivityTrait},
-        challenge::{
-            Challenge, ChallengeTrait,
-            Round,
-            MovesTrait,
-        },
-        duelist::{
-            DuelistTrait,
-            Scoreboard,
-            ScoreTrait,
-        },
-        leaderboard::{
-            Leaderboard, LeaderboardTrait,
-            LeaderboardPosition,
-        },
-        pact::{
-            PactTrait,
-        },
-        season::{
-            SeasonConfig, SeasonConfigTrait,
-        },
+        challenge::{Challenge, ChallengeTrait, Round, MovesTrait},
+        duelist::{DuelistTrait, Scoreboard, ScoreTrait},
+        leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
+        pact::{PactTrait},
+        season::{SeasonConfig, SeasonConfigTrait},
     };
     use pistols::types::{
         challenge_state::{ChallengeState, ChallengeStateTrait},
@@ -97,7 +83,8 @@ pub mod game {
         round_state::{RoundState},
         typed_data::{CommitMoveMessage, CommitMoveMessageTrait},
         cards::deck::{DeckTrait},
-        rules::{RewardValues},
+        rules::{RulesType, RulesTypeTrait ,RewardValues},
+        constants::{FAME},
     };
     use pistols::types::trophies::{Trophy, TrophyTrait, TROPHY};
     use pistols::libs::store::{Store, StoreTrait};
@@ -398,6 +385,39 @@ pub mod game {
             (season.can_collect())
         }
 
+        fn calc_season_reward(self: @ContractState,
+            duelist_id: u128,
+            lives_staked: u8,
+            table_id: felt252,
+        ) -> RewardValues {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let rules: RulesType = store.get_current_season_rules();
+            let fame_balance: u128 = store.world.duelist_token_dispatcher().fame_balance(duelist_id);
+            let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false);
+            let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true);
+            let mut leaderboard: Leaderboard = store.get_leaderboard(table_id);
+            let position: u8 = leaderboard.insert_score(duelist_id, rewards_win.points_scored);
+            (RewardValues{
+                // if you win...
+                fame_gained: rewards_win.fame_gained,
+                fools_gained: rewards_win.fools_gained,
+                points_scored: rewards_win.points_scored,
+                position,
+                // if you lose...
+                fame_lost: rewards_loss.fame_lost,
+                lords_unlocked: 0,
+                fame_burned: 0,
+                survived: (fame_balance - rewards_loss.fame_lost) >= FAME::ONE_LIFE.low,
+            })
+        }
+
+
+
+
+        fn get_timestamp(self: @ContractState) -> u64 {
+            (starknet::get_block_timestamp())
+        }
+
         fn test_validate_commit_message(self: @ContractState,
             account: ContractAddress,
             signature: Array<felt252>,
@@ -409,10 +429,6 @@ pub mod game {
                 duelistId,
             };
             (msg.validate(account, signature))
-        }
-
-        fn get_timestamp(self: @ContractState) -> u64 {
-            (starknet::get_block_timestamp())
         }
     }
 

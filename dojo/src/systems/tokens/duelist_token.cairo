@@ -46,12 +46,12 @@ pub trait IDuelistToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IDuelistTokenPublic
+    fn fame_balance(self: @TState, duelist_id: u128) -> u128;
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
     fn is_inactive(self: @TState, duelist_id: u128) -> bool;
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
-    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8, table_id: felt252) -> RewardValues;
     fn poke(ref self: TState, duelist_id: u128);
     fn sacrifice(ref self: TState, duelist_id: u128);
     // fn delete_duelist(ref self: TState, duelist_id: u128);
@@ -65,12 +65,12 @@ pub trait IDuelistToken<TState> {
 #[starknet::interface]
 pub trait IDuelistTokenPublic<TState> {
     // view
+    fn fame_balance(self: @TState, duelist_id: u128) -> u128;
     fn is_alive(self: @TState, duelist_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
     fn is_inactive(self: @TState, duelist_id: u128) -> bool;
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
-    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8, table_id: felt252) -> RewardValues;
     // write
     fn poke(ref self: TState, duelist_id: u128); //@description:Reactivates an inactive Duelist
     fn sacrifice(ref self: TState, duelist_id: u128); //@description:Sacrifices a Duelist
@@ -143,7 +143,6 @@ pub mod duelist_token {
             ScoreboardValue, ScoreTrait,
             Archetype,
         },
-        leaderboard::{Leaderboard, LeaderboardTrait},
         challenge::{Challenge},
     };
     use pistols::types::{
@@ -206,6 +205,14 @@ pub mod duelist_token {
     #[abi(embed_v0)]
     impl DuelistTokenPublicImpl of super::IDuelistTokenPublic<ContractState> {
         #[inline(always)]
+        fn fame_balance(self: @ContractState,
+            duelist_id: u128,
+        ) -> u128 {
+            let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
+            (self._fame_balance(@fame_dispatcher, duelist_id))
+        }
+
+        #[inline(always)]
         fn is_alive(
             self: @ContractState,
             duelist_id: u128,
@@ -246,32 +253,6 @@ pub mod duelist_token {
             (fame_dripped * CONST::ETH_TO_WEI.low)
         }
         
-        fn calc_season_reward(self: @ContractState,
-            duelist_id: u128,
-            lives_staked: u8,
-            table_id: felt252,
-        ) -> RewardValues {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let rules: RulesType = store.get_current_season_rules();
-            let fame_balance: u128 = store.world.fame_coin_dispatcher().balance_of_token(starknet::get_contract_address(), duelist_id).low;
-            let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false);
-            let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true);
-            let mut leaderboard: Leaderboard = store.get_leaderboard(table_id);
-            let position: u8 = leaderboard.insert_score(duelist_id, rewards_win.points_scored);
-            (RewardValues{
-                // if you win...
-                fame_gained: rewards_win.fame_gained,
-                fools_gained: rewards_win.fools_gained,
-                points_scored: rewards_win.points_scored,
-                position,
-                // if you lose...
-                fame_lost: rewards_loss.fame_lost,
-                lords_unlocked: 0,
-                fame_burned: 0,
-                survived: (fame_balance - rewards_loss.fame_lost) >= FAME::ONE_LIFE.low,
-            })
-        }
-
         fn poke(ref self: ContractState,
             duelist_id: u128,
         ) {
