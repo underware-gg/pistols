@@ -185,16 +185,17 @@ pub mod bank {
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
-            // gather season data
-            let mut pool_season: Pool = store.get_pool(PoolType::Season(table_id));
+            let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
+            let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
+            // gather leaderboards and distribution
             let positions: Span<LeaderboardPosition> = store.get_leaderboard(table_id).get_all_positions();
             let rules: RulesType = store.get_table_rules(table_id);
             let distribution: @SeasonDistribution = rules.get_season_distribution(positions.len());
             // get pool balances
+            let mut pool_season: Pool = store.get_pool(PoolType::Season(table_id));
             let mut due_amount_fame: u128 = pool_season.balance_fame;
             let mut due_amount_lords: u128 = pool_season.balance_lords;
             // calculate bills
-            let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
             let mut bills: Array<LordsReleaseBill> = array![];
             let mut i: usize = 0;
             while (i < (*distribution.percents).len()) { // distribution is never greater than positions
@@ -205,9 +206,9 @@ pub mod bank {
                         // last one, leave no changes!
                         (due_amount_fame, due_amount_lords)
                     } else {(
-                        MathTrait::percentage(due_amount_fame, percent),
+                        MathTrait::percentage(pool_season.balance_fame, percent),
                         if (due_amount_lords == 0) {0}
-                        else {MathTrait::percentage(due_amount_lords, percent)}
+                        else {MathTrait::percentage(pool_season.balance_lords, percent)}
                     )};
                 bills.append(LordsReleaseBill {
                     recipient: duelist_dispatcher.owner_of(position.duelist_id.into()),
@@ -219,7 +220,6 @@ pub mod bank {
                 i += 1;
             };
             // release...
-            let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
             let fame_supply: u128 = fame_dispatcher.total_supply().low;
             self._release_pegged_lords(store, fame_supply, @bills.span());
             // burn FAME from pool
@@ -289,7 +289,7 @@ pub mod bank {
             let mut lords_bills: Array<u128> = array![];
             let mut i: usize = 0;
             while (i < (*bills).len()) {
-                let amount: u128 = MathTrait::map(*bills[i].fame_amount, 0, fame_supply, 0, pool_peg.balance_lords);
+                let amount: u128 = MathTrait::scale(*bills[i].fame_amount, fame_supply, pool_peg.balance_lords);
                 lords_bills.append(amount);
                 lords_released += amount;
                 i += 1;
@@ -302,7 +302,7 @@ pub mod bank {
                     let bill: LordsReleaseBill = *(*bills)[i];
                     let amount: u128 =
                         (*lords_bills[i])       // LORDS pegged with FAME
-                        + bill.lords_amount;    // LORDS from sponsors
+                        + bill.lords_amount;    // LORDS from sponsors (not pegged)
                     lords_dispatcher.transfer(bill.recipient, amount.into());
                     i += 1;
                 };

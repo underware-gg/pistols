@@ -26,6 +26,7 @@ pub trait MathTrait<T,TI> {
     fn addi(ref self: T, v: TI); // in-place add()
     // map a value form one range to another
     fn map(v: T, in_min: T, in_max: T, out_min: T, out_max: T) -> T;
+    fn scale(v: T, in_max: T, out_max: T) -> T;
     fn percentage(v: T, percent: u8) -> T;
     // returns GDC of two numbers
     fn gdc(a: T, b: T) -> T;
@@ -74,6 +75,10 @@ pub impl MathU8 of MathTrait<u8,i8> {
 
     fn map(v: u8, in_min: u8, in_max: u8, out_min: u8, out_max: u8) -> u8 {
         let result: u128 = MathU128::map(v.into(), in_min.into(), in_max.into(), out_min.into(), out_max.into());
+        (result.try_into().unwrap())
+    }
+    fn scale(v: u8, in_max: u8, out_max: u8) -> u8 {
+        let result: u128 = MathU128::scale(v.into(), in_max.into(), out_max.into());
         (result.try_into().unwrap())
     }
     // fn map(v: u8, in_min: u8, in_max: u8, out_min: u8, out_max: u8) -> u8 {
@@ -178,6 +183,10 @@ pub impl MathU16 of MathTrait<u16, i16> {
         let result: u128 = MathU128::map(v.into(), in_min.into(), in_max.into(), out_min.into(), out_max.into());
         (result.try_into().unwrap())
     }
+    fn scale(v: u16, in_max: u16, out_max: u16) -> u16 {
+        let result: u128 = MathU128::scale(v.into(), in_max.into(), out_max.into());
+        (result.try_into().unwrap())
+    }
 
     fn gdc(a: u16, b: u16) -> u16 {
         // recursive (not fastest)
@@ -245,6 +254,10 @@ pub impl MathU32 of MathTrait<u32, i32> {
 
     fn map(v: u32, in_min: u32, in_max: u32, out_min: u32, out_max: u32) -> u32 {
         let result: u128 = MathU128::map(v.into(), in_min.into(), in_max.into(), out_min.into(), out_max.into());
+        (result.try_into().unwrap())
+    }
+    fn scale(v: u32, in_max: u32, out_max: u32) -> u32 {
+        let result: u128 = MathU128::scale(v.into(), in_max.into(), out_max.into());
         (result.try_into().unwrap())
     }
 
@@ -328,6 +341,10 @@ pub impl MathU64 of MathTrait<u64, i64> {
         let result: u128 = MathU128::map(v.into(), in_min.into(), in_max.into(), out_min.into(), out_max.into());
         (result.try_into().unwrap())
     }
+    fn scale(v: u64, in_max: u64, out_max: u64) -> u64 {
+        let result: u128 = MathU128::scale(v.into(), in_max.into(), out_max.into());
+        (result.try_into().unwrap())
+    }
 
     fn gdc(a: u64, b: u64) -> u64 {
         if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
@@ -404,6 +421,16 @@ pub impl MathU128 of MathTrait<u128, i128> {
             (out_min + ((((v * 1_000_000 - in_min * 1_000_000) / (in_max - in_min)) * (out_max - out_min)) / 1_000_000))
         }
     }
+    fn scale(v: u128, in_max: u128, out_max: u128) -> u128 {
+        if (v == 0) {
+            (0)
+        } else if (v >= in_max) {
+            (out_max)
+        } else {
+            ((((v * 1_000_000) / in_max) * out_max) / 1_000_000)
+        }
+    }
+
 
     fn gdc(a: u128, b: u128) -> u128 {
         if (b == 0) { (a) } else { (Self::gdc(b, a % b)) }
@@ -498,6 +525,15 @@ pub impl MathU256 of MathTrait<u256, u256> {
             (out_min - Self::map(v, in_min, in_max, 0, out_min - out_max))
         } else {
             (out_min + ((((v * 1_000_000 - in_min * 1_000_000) / (in_max - in_min)) * (out_max - out_min)) / 1_000_000))
+        }
+    }
+    fn scale(v: u256, in_max: u256, out_max: u256) -> u256 {
+        if (v == 0) {
+            (0)
+        } else if (v >= in_max) {
+            (out_max)
+        } else {
+            ((((v * 1_000_000) / in_max) * out_max) / 1_000_000)
         }
     }
 
@@ -684,10 +720,22 @@ mod unit {
     #[test]
     fn test_map_u128() {
         let wei: u256 = CONST::ETH_TO_WEI;
-        assert_eq!(MathU256::map(1 * wei, 0, 100 * wei, 0, 500_000 * wei), 5_000 * wei, "u256: 1 > 5_000");
-        assert_eq!(MathU128::map(1 * wei.low, 0, 100 * wei.low, 0, 500_000 * wei.low), 5_000 * wei.low, "u128: 1 > 5_000");
-        assert_eq!(MathU256::map(5_000 * wei, 0, 500_000 * wei, 0, 100 * wei), 1 * wei, "u256: 5_000 > 1");
-        assert_eq!(MathU128::map(5_000 * wei.low, 0, 500_000 * wei.low, 0, 100 * wei.low), 1 * wei.low, "u128: 5_000 > 1");
+        let map_up_u256: u256 = MathU256::map(1 * wei, 0, 100 * wei, 0, 500_000 * wei);
+        let map_up_u128: u128 = MathU128::map(1 * wei.low, 0, 100 * wei.low, 0, 500_000 * wei.low);
+        let map_down_u256: u256 = MathU256::map(5_000 * wei, 0, 500_000 * wei, 0, 100 * wei);
+        let map_down_u128: u128 = MathU128::map(5_000 * wei.low, 0, 500_000 * wei.low, 0, 100 * wei.low);
+        assert_eq!(map_up_u256, 5_000 * wei, "u256: 1 > 5_000");
+        assert_eq!(map_up_u128, 5_000 * wei.low, "u128: 1 > 5_000");
+        assert_eq!(map_down_u256, 1 * wei, "u256: 5_000 > 1");
+        assert_eq!(map_down_u128, 1 * wei.low, "u128: 5_000 > 1");
+        let scale_up_u256: u256 = MathU256::scale(1 * wei, 100 * wei, 500_000 * wei);
+        let scale_up_u128: u128 = MathU128::scale(1 * wei.low, 100 * wei.low, 500_000 * wei.low);
+        let scale_down_u256: u256 = MathU256::scale(5_000 * wei, 500_000 * wei, 100 * wei);
+        let scale_down_u128: u128 = MathU128::scale(5_000 * wei.low, 500_000 * wei.low, 100 * wei.low);
+        assert_eq!(map_up_u256, scale_up_u256, "scale_up_u256");
+        assert_eq!(map_up_u128, scale_up_u128, "scale_up_u128");
+        assert_eq!(map_down_u256, scale_down_u256, "scale_down_u256");
+        assert_eq!(map_down_u128, scale_down_u128, "scale_down_u128");
     }
 
     #[test]
