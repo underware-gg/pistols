@@ -54,6 +54,7 @@ pub trait IDuelistToken<TState> {
     fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
     fn poke(ref self: TState, duelist_id: u128);
     fn sacrifice(ref self: TState, duelist_id: u128);
+    fn memorialize(ref self: TState, duelist_id: u128);
     // fn delete_duelist(ref self: TState, duelist_id: u128);
 
     // IDuelistTokenProtected
@@ -74,6 +75,7 @@ pub trait IDuelistTokenPublic<TState> {
     // write
     fn poke(ref self: TState, duelist_id: u128); //@description:Reactivates an inactive Duelist
     fn sacrifice(ref self: TState, duelist_id: u128); //@description:Sacrifices a Duelist
+    fn memorialize(ref self: TState, duelist_id: u128); //@description:Memorializes a Duelist
     // fn delete_duelist(ref self: TState, duelist_id: u128);
 }
 
@@ -271,10 +273,15 @@ pub mod duelist_token {
         fn sacrifice(ref self: ContractState,
             duelist_id: u128,
         ) {
-            // only owner can sacrifice
             self.token.assert_is_owner_of(starknet::get_caller_address(), duelist_id.into());
-            // burn it!
             self._reactivate_or_sacrifice(duelist_id, Option::None, CauseOfDeath::Sacrifice);
+        }
+
+        fn memorialize(ref self: ContractState,
+            duelist_id: u128,
+        ) {
+            self.token.assert_is_owner_of(starknet::get_caller_address(), duelist_id.into());
+            self._reactivate_or_sacrifice(duelist_id, Option::None, CauseOfDeath::Memorize);
         }
 
         // fn delete_duelist(ref self: ContractState,

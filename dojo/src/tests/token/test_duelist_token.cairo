@@ -515,10 +515,10 @@ fn test_duelist_reactivate_already_dead() {
 
 
 //---------------------------------
-// sacrifice()
+// sacrifice() / memorialize()
 //
 
-fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128) {
+fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128, cause_of_death: CauseOfDeath) {
     let token_id: u128 = TOKEN_ID_1_1.low;
     let lords_balance_bank: u128 = (*sys.lords).balance_of((*sys.bank).contract_address).low;
     let lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
@@ -530,16 +530,24 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128) {
 // println!("[] fame_to_burn: {}", dripped_fame);
 
     // reactivate
-    (*sys.duelists).sacrifice(token_id);
+    if (cause_of_death == CauseOfDeath::Sacrifice) {    
+        (*sys.duelists).sacrifice(token_id);
+    } else if (cause_of_death == CauseOfDeath::Memorize) {    
+        (*sys.duelists).memorialize(token_id);
+    }
     assert!(!(*sys.duelists).is_alive(token_id), "AFTER_is_alive()");
     assert!(!(*sys.duelists).is_inactive(token_id), "AFTER_is_inactive");
     assert_eq!((*sys.duelists).inactive_timestamp(token_id), 0, "AFTER_inactive_timestamp");
     assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), 0, "AFTER_inactive_fame_dripped");
 
     let memorial: DuelistMemorialValue = (*sys.store).get_duelist_memorial_value(token_id);
-    assert_eq!(memorial.cause_of_death, CauseOfDeath::Sacrifice, "AFTER_cause_of_death");
+    assert_eq!(memorial.cause_of_death, cause_of_death, "AFTER_cause_of_death");
     assert_eq!(memorial.fame_before_death, fame_balance_start, "AFTER_fame_before_death");
-    assert_eq!(memorial.killed_by, token_id, "AFTER_killed_by");
+    if (cause_of_death == CauseOfDeath::Sacrifice) {    
+        assert_eq!(memorial.killed_by, token_id, "AFTER_killed_by");
+    } else if (cause_of_death == CauseOfDeath::Memorize) {    
+        assert_eq!(memorial.killed_by, 0, "AFTER_killed_by");
+    }
 
     // timestamp_active updated
     let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
@@ -566,7 +574,7 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128) {
 fn test_duelist_sacrifice_OK() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
-    _test_duelist_sacrifice(@sys, token_id);
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Sacrifice);
 }
 
 #[test]
@@ -575,7 +583,7 @@ fn test_duelist_sacrifice_already_dead() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
     _test_duelist_reactivate(@sys, token_id, 3000, false);
-    _test_duelist_sacrifice(@sys, token_id);
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Sacrifice);
 }
 
 #[test]
@@ -584,5 +592,30 @@ fn test_duelist_sacrifice_not_owner() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
     tester::impersonate(OTHER());
-    _test_duelist_sacrifice(@sys, token_id);
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Sacrifice);
+}
+
+#[test]
+fn test_duelist_memorialize_OK() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Memorize);
+}
+
+#[test]
+#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_memorialize_already_dead() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 3000, false);
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Memorize);
+}
+
+#[test]
+#[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_memorialize_not_owner() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    tester::impersonate(OTHER());
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Memorize);
 }
