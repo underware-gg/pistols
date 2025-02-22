@@ -1,10 +1,10 @@
 use starknet::{ContractAddress};
-use dojo::world::{WorldStorage};
+// use dojo::world::{WorldStorage};
 
 use pistols::systems::{
     tokens::{
-        duelist_token::{IDuelistTokenDispatcher},
-        pack_token::{IPackTokenDispatcher, IPackTokenDispatcherTrait},
+        // duelist_token::{IDuelistTokenDispatcher},
+        pack_token::{IPackTokenDispatcherTrait},
         lords_mock::{ILordsMockDispatcherTrait},
     },
 };
@@ -24,6 +24,7 @@ use pistols::types::constants::{CONST};
 use pistols::tests::tester::{
     tester,
     tester::{
+        StoreTrait,
         TestSystems, FLAGS,
         OWNER, OTHER, BUMMER, SPENDER,
     },
@@ -89,7 +90,7 @@ const TOKEN_ID_5: u256 = 5;
 fn setup(_fee_amount: u128) -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
 
-    tester::set_current_season(ref sys.world, TABLES::PRACTICE);
+    tester::set_current_season(ref sys, TABLES::PRACTICE);
 
     tester::execute_lords_faucet(@sys.lords, OWNER());
     tester::execute_lords_faucet(@sys.lords, OTHER());
@@ -105,12 +106,12 @@ fn setup(_fee_amount: u128) -> TestSystems {
     (sys)
 }
 
-fn _assert_minted_count(world: WorldStorage, token: IPackTokenDispatcher, minted_count: u128, msg: ByteArray) {
-    let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
+fn _assert_minted_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
+    let token_config: TokenConfig = (*sys.store).get_token_config((*sys.pack).contract_address);
     assert_eq!(token_config.minted_count, minted_count, "{}", msg);
 }
-fn _assert_duelist_count(world: WorldStorage, token: IDuelistTokenDispatcher, minted_count: u128, msg: ByteArray) {
-    let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
+fn _assert_duelist_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
+    let token_config: TokenConfig = (*sys.store).get_token_config((*sys.duelists).contract_address);
     assert_eq!(token_config.minted_count, minted_count, "{}", msg);
 }
 
@@ -132,7 +133,7 @@ fn test_initializer() {
     let mut sys: TestSystems = setup(0);
     assert_eq!(sys.pack.symbol(), "PACK", "Symbol is wrong");
 
-    _assert_minted_count(sys.world, sys.pack, 0, "Should eq 0");
+    _assert_minted_count(@sys, 0, "Should eq 0");
 
     assert!(sys.pack.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
     assert!(sys.pack.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
@@ -150,7 +151,7 @@ fn test_token_uri() {
         is_open: false,
     };
 
-    tester::set_Pack(ref sys.world, pack);
+    tester::set_Pack(ref sys.world, @pack);
 
     tester::execute_claim_welcome_pack(@sys.pack, OWNER());
     _purchase(@sys, OWNER());
@@ -175,24 +176,24 @@ fn test_token_uri_invalid() {
 #[test]
 fn test_claim_purchase() {
     let mut sys: TestSystems = setup(0);
-    _assert_minted_count(sys.world, sys.pack, 0, "total_supply init");
+    _assert_minted_count(@sys, 0, "total_supply init");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "balance_of 0");
 
-    let player: Player = tester::get_Player(sys.world, OWNER());
+    let player: Player = sys.store.get_player(OWNER());
     assert!(!player.exists(), "!player.exists()");
     assert!(!player.claimed_welcome_pack, "!player.claimed_welcome_pack");
 
     let welcome_pack_duelist_count: usize = PackType::WelcomePack.description().quantity;
 
     tester::execute_claim_welcome_pack(@sys.pack, OWNER());
-    _assert_minted_count(sys.world, sys.pack, 1, "total_supply 1");
-    _assert_duelist_count(sys.world, sys.duelists, welcome_pack_duelist_count.into(), "duelist_supply [welcome_pack_duelist_count]");
+    _assert_minted_count(@sys, 1, "total_supply 1");
+    _assert_duelist_count(@sys, welcome_pack_duelist_count.into(), "duelist_supply [welcome_pack_duelist_count]");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "balance_of 0");
 
-    let player: Player = tester::get_Player(sys.world, OWNER());
+    let player: Player = sys.store.get_player(OWNER());
     assert!(player.exists(), "player.exists()");
     assert!(player.claimed_welcome_pack, "player.claimed_welcome_pack");
-    let pack_1: Pack = tester::get_Pack(sys.world, TOKEN_ID_1.low);
+    let pack_1: Pack = sys.store.get_pack(TOKEN_ID_1.low);
     assert_eq!(pack_1.pack_id, TOKEN_ID_1.low, "pack_1.pack_id");
     assert_eq!(pack_1.pack_type, PackType::WelcomePack, "pack_1.pack_type");
     assert_ne!(pack_1.seed, 0, "pack_1.seed");
@@ -205,11 +206,11 @@ fn test_claim_purchase() {
     assert_ne!(balance_bank_initial, 0, "balance_bank_initial");
 
     let price: u128 = _purchase(@sys, OWNER());
-    _assert_minted_count(sys.world, sys.pack, 2, "total_supply 2");
+    _assert_minted_count(@sys, 2, "total_supply 2");
     assert_eq!(sys.pack.balance_of(OWNER()), 1, "balance_of 1");
     assert!(sys.pack.owner_of(TOKEN_ID_2) == OWNER(), "owner_of_2");
 
-    let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
+    let pack_2: Pack = sys.store.get_pack(TOKEN_ID_2.low);
     assert_eq!(pack_2.pack_id, TOKEN_ID_2.low, "pack_2.pack_id");
     assert_eq!(pack_2.pack_type, PackType::Duelists5x, "pack_2.pack_type");
     assert_ne!(pack_2.seed, pack_1.seed, "pack_2.seed");
@@ -287,20 +288,20 @@ fn test_open() {
 
     // claiming opens and mint duelists
     tester::execute_claim_welcome_pack(@sys.pack, OWNER());
-    _assert_duelist_count(sys.world, sys.duelists, welcome_pack_duelist_count.into(), "duelist_supply");
-    let pack_1: Pack = tester::get_Pack(sys.world, TOKEN_ID_1.low);
+    _assert_duelist_count(@sys, welcome_pack_duelist_count.into(), "duelist_supply");
+    let pack_1: Pack = sys.store.get_pack(TOKEN_ID_1.low);
     assert!(pack_1.is_open, "pack_1.is_open == true");
 
     // purchase, minted count does not change
     _purchase(@sys, OWNER());
-    _assert_duelist_count(sys.world, sys.duelists, welcome_pack_duelist_count.into(), "duelist_supply_after_purchase");
-    let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
+    _assert_duelist_count(@sys, welcome_pack_duelist_count.into(), "duelist_supply_after_purchase");
+    let pack_2: Pack = sys.store.get_pack(TOKEN_ID_2.low);
     assert!(!pack_2.is_open, "pack_2.is_open == false");
 
     // open, minted count +5
     sys.pack.open(TOKEN_ID_2.low);
-    _assert_duelist_count(sys.world, sys.duelists, welcome_pack_duelist_count.into() + 5, "duelist_supply_after_open");
-    let pack_2: Pack = tester::get_Pack(sys.world, TOKEN_ID_2.low);
+    _assert_duelist_count(@sys, welcome_pack_duelist_count.into() + 5, "duelist_supply_after_open");
+    let pack_2: Pack = sys.store.get_pack(TOKEN_ID_2.low);
     assert!(pack_2.is_open, "pack_2.is_open == false");
 }
 

@@ -11,6 +11,7 @@ mod tests {
     use pistols::utils::timestamp::{TimestampTrait};
     use pistols::tests::tester::{tester,
         tester::{
+            StoreTrait,
             TestSystems, FLAGS,
             IGameDispatcherTrait,
             IDuelTokenDispatcherTrait,
@@ -91,7 +92,7 @@ mod tests {
         assert_gt!(timestamp, 0, "timestamp > 0");
         assert_eq!(timestamp, game_timestamp, "game_timestamp");
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
         assert_eq!(ch.address_a, OWNER(), "challenged");
         assert_eq!(ch.address_b, OTHER(), "challenger");
@@ -105,14 +106,14 @@ mod tests {
         let game_timestamp = sys.game.get_timestamp();
         assert_gt!(game_timestamp, ch.timestamp_start, "game_timestamp > timestamp_start");
         // deck type
-        assert_eq!(tester::get_Challenge(sys.world, duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
+        assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
     }
 
     #[test]
     fn test_challenge_stake_0() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 0);
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.lives_staked, 1, "lives_staked");
     }
 
@@ -120,7 +121,7 @@ mod tests {
     fn test_challenge_stake_2() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 2);
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.lives_staked, 2, "lives_staked");
     }
 
@@ -130,7 +131,7 @@ mod tests {
         let expire_hours: u64 = 24;
         let timestamp: u64 = tester::get_block_timestamp();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), expire_hours, 1);
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.timestamp_start, timestamp, "timestamp_start");
         assert_eq!(ch.timestamp_end, ch.timestamp_start + TimestampTrait::from_hours(expire_hours), "timestamp_end");
         _assert_empty_progress(@sys, duel_id);
@@ -174,7 +175,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, SEASON_1_TABLE(), 48, 1);
-        let _ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let _ch = sys.store.get_challenge_value(duel_id);
         let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_days(3));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, B, ID(B), duel_id, false);
         assert_ne!(new_state, ChallengeState::Awaiting, "!awaiting");
@@ -187,7 +188,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, 24, 1);
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
 
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
         let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_datetime(1, 0, 1));
@@ -195,7 +196,7 @@ mod tests {
         assert_eq!(new_state, ChallengeState::Expired, "expired");
         tester::assert_pact(@sys, duel_id, ch, false, false, "replied");
 
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, new_state, "state");
         assert_eq!(ch.winner, 0, "winner");
         assert_gt!(ch.timestamp_start, 0, "timestamp_start");
@@ -211,7 +212,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, SEASON_1_TABLE(), 48, 1);
-        let _ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let _ch = sys.store.get_challenge_value(duel_id);
 
         tester::elapse_block_timestamp(TimestampTrait::from_days(1));
         tester::execute_reply_duel(@sys.duels, A, ID(A), duel_id, true);
@@ -223,7 +224,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, SEASON_1_TABLE(), 48, 1);
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
         let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_days(1));
 
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
@@ -231,7 +232,7 @@ mod tests {
         assert_eq!(new_state, ChallengeState::Withdrawn, "canceled");
         tester::assert_pact(@sys, duel_id, ch, false, false, "withdrew");
 
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, new_state, "state");
         assert_eq!(ch.winner, 0, "winner");
         assert_lt!(ch.timestamp_start, timestamp, "timestamp_start");
@@ -247,7 +248,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, SEASON_1_TABLE(), 48, 1);
-        let _ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let _ch = sys.store.get_challenge_value(duel_id);
         let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_days(1));
         tester::execute_reply_duel(@sys.duels, BUMMER(), ID(BUMMER()), duel_id, false);
     }
@@ -259,7 +260,7 @@ mod tests {
         let B = OTHER();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, 48, 1);
 
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
         assert_eq!(ch.address_a, A, "challenger");
         assert_eq!(ch.address_b, B, "challenged");
@@ -270,7 +271,7 @@ mod tests {
         let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_days(1));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, B, ID(B), duel_id, false);
         assert_eq!(new_state, ChallengeState::Refused, "refused");
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, new_state, "state");
         assert_eq!(ch.winner, 0, "winner");
         assert_lt!(ch.timestamp_start, timestamp, "timestamp_start");
@@ -293,13 +294,13 @@ mod tests {
         let B = OTHER();
 
         // players not registered
-        let player_a: Player = tester::get_Player(sys.world, A);
-        let player_b: Player = tester::get_Player(sys.world, B);
+        let player_a: Player = sys.store.get_player(A);
+        let player_b: Player = sys.store.get_player(B);
         assert!(!player_a.exists(), "player_a.exists NOT");
         assert!(!player_b.exists(), "player_b.exists NOT");
 
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, 48, 1);
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
         assert_eq!(ch.address_a, A, "challenger");
         assert_eq!(ch.address_b, B, "challenged");
@@ -309,15 +310,15 @@ mod tests {
         // reply...
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, B, ID(B), duel_id, true);
         assert_eq!(new_state, ChallengeState::InProgress, "in_progress");
-        let ch = tester::get_ChallengeValue(sys.world, duel_id);
+        let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.duelist_id_b, ID(B), "challenged_id_ok");   // << UPDATED!!!
         tester::assert_pact(@sys, duel_id, ch, true, true, "replied");
 
         _assert_empty_progress(@sys, duel_id);
 
         // players registered automatically
-        let player_a: Player = tester::get_Player(sys.world, A);
-        let player_b: Player = tester::get_Player(sys.world, B);
+        let player_a: Player = sys.store.get_player(A);
+        let player_b: Player = sys.store.get_player(B);
         assert!(player_a.exists(), "player_a.exists YES");
         assert!(player_b.exists(), "player_b.exists YES");
     }

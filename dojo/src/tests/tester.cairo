@@ -3,7 +3,7 @@ pub mod tester {
     use starknet::{ContractAddress, testing};
 
     use dojo::world::{WorldStorage, IWorldDispatcherTrait};
-    use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
+    use dojo::model::{ModelStorageTest};
     use dojo_cairo_test::{
         spawn_test_world,
         NamespaceDef, TestResource,
@@ -672,74 +672,9 @@ pub mod tester {
     //
 
     #[inline(always)]
-    pub fn get_Config(world: WorldStorage) -> Config {
-        (world.read_model(CONFIG::CONFIG_KEY))
-    }
-    #[inline(always)]
-    pub fn get_TokenConfig(world: WorldStorage, contract_address: ContractAddress) -> TokenConfig {
-        (world.read_model(contract_address))
-    }
-    #[inline(always)]
-    pub fn get_CoinConfig(world: WorldStorage, contract_address: ContractAddress) -> CoinConfig {
-        (world.read_model(contract_address))
-    }
-    #[inline(always)]
-    pub fn get_Pool(world: WorldStorage, pool_id: PoolType) -> Pool {
-        (world.read_model(pool_id))
-    }
-    #[inline(always)]
-    pub fn get_Table(world: WorldStorage, table_id: felt252) -> TableConfig {
-        (world.read_model(table_id))
-    }
-    #[inline(always)]
-    pub fn get_Season(world: WorldStorage, table_id: felt252) -> SeasonConfig {
-        (world.read_model(table_id))
-    }
-    #[inline(always)]
-    pub fn get_current_Season(world: WorldStorage) -> SeasonConfig {
-        (world.read_model(get_Config(world).season_table_id))
-    }
-    #[inline(always)]
-    pub fn get_Player(world: WorldStorage, address: ContractAddress) -> Player {
-        (world.read_model(address))
-    }
-    #[inline(always)]
-    pub fn get_Pack(world: WorldStorage, pack_id: u128) -> Pack {
-        (world.read_model(pack_id))
-    }
-    #[inline(always)]
-    pub fn get_DuelistValue(world: WorldStorage, duelist_id: u128) -> DuelistValue {
-        (world.read_value(duelist_id))
-    }
-    #[inline(always)]
-    pub fn get_DuelistChallengeId(world: WorldStorage, duelist_id: u128) -> u128 {
-        let duelist_challenge : DuelistChallenge = world.read_model(duelist_id);
-        (duelist_challenge.duel_id)
-    }
-    #[inline(always)]
-    pub fn get_Scoreboard(world: WorldStorage, holder: felt252, table_id: felt252) -> Scoreboard {
-        (world.read_model((holder, table_id),))
-    }
-    #[inline(always)]
-    pub fn get_Leaderboard(world: WorldStorage, table_id: felt252) -> Leaderboard {
-        (world.read_model(table_id))
-    }
-    #[inline(always)]
-    pub fn get_Challenge(world: WorldStorage, duel_id: u128) -> Challenge {
-        (world.read_model(duel_id))
-    }
-    #[inline(always)]
-    pub fn get_ChallengeValue(world: WorldStorage, duel_id: u128) -> ChallengeValue {
-        (world.read_value(duel_id))
-    }
-    #[inline(always)]
-    pub fn get_RoundValue(world: WorldStorage, duel_id: u128) -> RoundValue {
-        (world.read_value(duel_id))
-    }
-    #[inline(always)]
-    pub fn get_Challenge_Round_Entity(world: WorldStorage, duel_id: u128) -> (ChallengeValue, RoundValue) {
-        let challenge = get_ChallengeValue(world, duel_id);
-        let round = get_RoundValue(world, duel_id);
+    pub fn get_Challenge_Round(sys: @TestSystems, duel_id: u128) -> (ChallengeValue, RoundValue) {
+        let challenge: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
+        let round: RoundValue = (*sys.store).get_round_value(duel_id);
         (challenge, round)
     }
 
@@ -753,33 +688,33 @@ pub mod tester {
     //
 
     // depends on use dojo::model::{Model};
-    pub fn set_Config(ref world: WorldStorage, model: Config) {
-        world.write_model_test(@model);
+    pub fn set_Config(ref world: WorldStorage, model: @Config) {
+        world.write_model_test(model);
     }
-    pub fn set_TableConfig(ref world: WorldStorage, model: TableConfig) {
-        world.write_model_test(@model);
+    pub fn set_TableConfig(ref world: WorldStorage, model: @TableConfig) {
+        world.write_model_test(model);
     }
-    pub fn set_Duelist(ref world: WorldStorage, model: Duelist) {
-        world.write_model_test(@model);
+    pub fn set_Duelist(ref world: WorldStorage, model: @Duelist) {
+        world.write_model_test(model);
     }
-    pub fn set_Scoreboard(ref world: WorldStorage, model: Scoreboard) {
-        world.write_model_test(@model);
+    pub fn set_Scoreboard(ref world: WorldStorage, model: @Scoreboard) {
+        world.write_model_test(model);
     }
-    pub fn set_Challenge(ref world: WorldStorage, model: Challenge) {
-        world.write_model_test(@model);
+    pub fn set_Challenge(ref world: WorldStorage, model: @Challenge) {
+        world.write_model_test(model);
     }
-    pub fn set_Pack(ref world: WorldStorage, model: Pack) {
-        world.write_model_test(@model);
+    pub fn set_Pack(ref world: WorldStorage, model: @Pack) {
+        world.write_model_test(model);
     }
 
-    pub fn set_current_season(ref world: WorldStorage, table_id: felt252) {
-        let mut config: Config = get_Config(world);
+    pub fn set_current_season(ref sys: TestSystems, table_id: felt252) {
+        let mut config: Config = sys.store.get_config();
         config.season_table_id = table_id;
-        set_Config(ref world, config);
+        set_Config(ref sys.world, @config);
     }
 
-    pub fn make_duelist_inactive(world: WorldStorage, token_id: u128, dripped_fame: u64) {
-        let timestamp_active: u64 = get_DuelistValue(world, token_id).timestamp_active;
+    pub fn make_duelist_inactive(sys: @TestSystems, token_id: u128, dripped_fame: u64) {
+        let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
         let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + (FAME::TIMESTAMP_TO_DRIP_ONE_FAME * dripped_fame);
         set_block_timestamp(timestamp_active + elapsed);
     }
@@ -805,25 +740,25 @@ pub mod tester {
 
     pub fn assert_balance(balance: u128, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
         if (subtract > add) {
-            assert_lt!(balance, balance_before, "{}_lt", prefix);
+            assert_lt!(balance, balance_before, "{}__lt", prefix);
         } else if (add > subtract) {
-            assert_gt!(balance, balance_before, "{}_gt", prefix);
+            assert_gt!(balance, balance_before, "{}__gt", prefix);
         } else {
-            assert_eq!(balance, balance_before, "{}_eq", prefix);
+            assert_eq!(balance, balance_before, "{}__eq", prefix);
         }
-        assert_eq!(balance, balance_before - subtract + add, "{}_sum", prefix);
+        assert_eq!(balance, balance_before - subtract + add, "{}__sum", prefix);
         (balance)
     }
     pub fn assert_balance_up(balance: u128, balance_before: u128, prefix: ByteArray) -> u128 {
-        assert_gt!(balance, balance_before, "{}_up", prefix);
+        assert_gt!(balance, balance_before, "{}__up", prefix);
         (balance)
     }
     pub fn assert_balance_down(balance: u128, balance_before: u128, prefix: ByteArray) -> u128 {
-        assert_lt!(balance, balance_before, "{}_down", prefix);
+        assert_lt!(balance, balance_before, "{}__down", prefix);
         (balance)
     }
     pub fn assert_balance_equal(balance: u128, balance_before: u128, prefix: ByteArray) -> u128 {
-        assert_eq!(balance, balance_before, "{}_equal", prefix);
+        assert_eq!(balance, balance_before, "{}__equal", prefix);
         (balance)
     }
 
@@ -884,12 +819,12 @@ pub mod tester {
             "[{}] __assert_pact() not [{}]", prefix, has_pact.to_string()
         );
         let expected_duel_id: u128 = if (has_pact) {duel_id} else {0};
-        let duelist_duel_id: u128 = get_DuelistChallengeId(*sys.world, ch.duelist_id_a);
+        let duelist_duel_id: u128 = (*sys.store).get_duelist_challenge(ch.duelist_id_a).duel_id;
         assert!(duelist_duel_id == expected_duel_id,
             "[{}] duelist_challenge_a: [{}] not [{}]", prefix, duelist_duel_id, expected_duel_id
         );
         let expected_duel_id: u128 = if (has_pact && accepted) {duel_id} else {0};
-        let duelist_duel_id: u128 = get_DuelistChallengeId(*sys.world, ch.duelist_id_b);
+        let duelist_duel_id: u128 = (*sys.store).get_duelist_challenge(ch.duelist_id_b).duel_id;
         assert!(duelist_duel_id == expected_duel_id,
             "[{}] duelist_challenge_b: [{}] not [{}]", prefix, duelist_duel_id, expected_duel_id
         );

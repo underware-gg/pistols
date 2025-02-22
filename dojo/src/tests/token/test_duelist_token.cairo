@@ -1,6 +1,6 @@
 // use core::num::traits::Zero;
 use starknet::{ContractAddress};
-use dojo::world::{WorldStorage};
+// use dojo::world::{WorldStorage};
 
 use pistols::models::{
     pack::{
@@ -28,8 +28,9 @@ use pistols::utils::misc::{WEI};
 use pistols::tests::tester::{
     tester,
     tester::{
+        StoreTrait,
         TestSystems, FLAGS,
-        IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+        IDuelistTokenDispatcherTrait,
         IFameCoinDispatcherTrait,
         ILordsMockDispatcherTrait,
         OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO,
@@ -96,7 +97,7 @@ const TOKEN_ID_3_2: u256 = 6;
 fn setup(_fee_amount: u128) -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
 
-    tester::set_current_season(ref sys.world, TABLES::PRACTICE);
+    tester::set_current_season(ref sys, TABLES::PRACTICE);
 
     tester::fund_duelists_pool(@sys, 2);
 
@@ -112,8 +113,8 @@ fn setup(_fee_amount: u128) -> TestSystems {
     (sys)
 }
 
-fn _assert_minted_count(world: WorldStorage, token: IDuelistTokenDispatcher, minted_count: usize, msg: ByteArray) {
-    let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
+fn _assert_minted_count(sys: @TestSystems, minted_count: usize, msg: ByteArray) {
+    let token_config: TokenConfig = (*sys.store).get_token_config(*sys.duelists.contract_address);
     assert_eq!(token_config.minted_count, minted_count.into(), "{}", msg);
 }
 
@@ -128,7 +129,7 @@ fn test_initializer() {
 
     let welcome_pack_duelist_count: usize = PackType::WelcomePack.description().quantity;
 
-    _assert_minted_count(sys.world, sys.duelists, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
+    _assert_minted_count(@sys, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
     assert_eq!(sys.duelists.balance_of(OWNER()), welcome_pack_duelist_count.into(), "Should eq [welcome_pack_duelist_count]");
     assert_eq!(sys.duelists.balance_of(OTHER()), 0, "Should eq 0");
 
@@ -156,7 +157,7 @@ fn test_token_uri() {
         timestamp_registered: 999999,
         timestamp_active: 999999,
     };
-    tester::set_Duelist(ref sys.world, duelist);
+    tester::set_Duelist(ref sys.world, @duelist);
 
     let scoreboard = Scoreboard {
         holder: TOKEN_ID_1_1.low.into(),
@@ -171,7 +172,7 @@ fn test_token_uri() {
             honour_history: 0,
         },
     };
-    tester::set_Scoreboard(ref sys.world, scoreboard);
+    tester::set_Scoreboard(ref sys.world, @scoreboard);
 
     let uri_1 = sys.duelists.token_uri(TOKEN_ID_1_1);
     let uri_2 = sys.duelists.token_uri(TOKEN_ID_1_2);
@@ -235,7 +236,7 @@ fn test_transfer_from() {
 
     assert_eq!(sys.duelists.balance_of(OWNER()), welcome_pack_duelist_count.into(), "Should eq [welcome_pack_duelist_count]");
     assert_eq!(sys.duelists.balance_of(OTHER()), 0, "Should eq 0");
-    _assert_minted_count(sys.world, sys.duelists, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
+    _assert_minted_count(@sys, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
 
     tester::impersonate(OWNER());
     sys.duelists.approve(SPENDER(), TOKEN_ID_1_1);
@@ -250,7 +251,7 @@ fn test_transfer_from() {
     assert_eq!(sys.duelists.balance_of(OWNER()), (welcome_pack_duelist_count - 1).into(), "Should eq [welcome_pack_duelist_count - 1]");
     assert_eq!(sys.duelists.balance_of(OTHER()), 1, "Should eq 1");
     assert_eq!(sys.duelists.get_approved(TOKEN_ID_1_1), ZERO(), "Should eq 0");
-    _assert_minted_count(sys.world, sys.duelists, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
+    _assert_minted_count(@sys, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
 }
 
 #[test]
@@ -269,10 +270,10 @@ fn test_transfer_no_allowance() {
 // #[should_panic(expected: ('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
 // fn test_burn() {
 //     let mut sys: TestSystems = setup(0);
-//     _assert_minted_count(sys.world, sys.duelists, 2, 'invalid total_supply init');
+//     _assert_minted_count(@sys, 2, 'invalid total_supply init');
 //     assert(sys.duelists.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
 //     sys.duelists.delete_duelist(TOKEN_ID_1_1.low);
-//     _assert_minted_count(sys.world, sys.duelists, 1, 'invalid total_supply');
+//     _assert_minted_count(@sys, 1, 'invalid total_supply');
 //     assert(sys.duelists.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
 // }
 
@@ -327,13 +328,13 @@ fn test_duelist_inactive() {
     assert_eq!(intial_fame, WEI(3000).low, "intial_fame");
 
     let token_id: u128 = TOKEN_ID_1_1.low;
-    let timestamp_registered: u64 = tester::get_DuelistValue(sys.world, token_id).timestamp_registered;
+    let timestamp_registered: u64 = sys.store.get_duelist_value(token_id).timestamp_registered;
     assert_eq!(tester::get_block_timestamp(), timestamp_registered + 1, "timestamp_registered");
 
     let fame_supply: u128 = sys.fame.total_supply().low;
     assert_eq!(fame_supply, (intial_fame * 2), "INIT_fame_supply");
 
-    let pool_flame: Pool = tester::get_Pool(sys.world, PoolType::SacredFlame);
+    let pool_flame: Pool = sys.store.get_pool(PoolType::SacredFlame);
     assert_eq!(pool_flame.balance_fame, 0, "pool_flame.balance_fame");
 
     let balance_initial: u128 = sys.fame.balance_of_token(sys.duelists.contract_address, token_id).low;
@@ -379,13 +380,13 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
     let lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
     let fame_balance_start: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
     let fame_supply_start: u128 = (*sys.fame).total_supply().low;
-    let timestamp_active_start: u64 = tester::get_DuelistValue(*sys.world, token_id).timestamp_active;
+    let timestamp_active_start: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
     // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
 // println!("[] balance     : {}", fame_balance_start/CONST::ETH_TO_WEI.low);
 // println!("[] fame_to_burn: {}", dripped_fame);
 
     // dripped...
-    tester::make_duelist_inactive(*sys.world, token_id, dripped_fame);
+    tester::make_duelist_inactive(sys, token_id, dripped_fame);
     let dripped_fame_wei: u128 = WEI(dripped_fame.into()).low;
     assert!((*sys.duelists).is_inactive(token_id), "is_inactive");
     assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), dripped_fame_wei, "inactive_fame_dripped");
@@ -398,7 +399,7 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
     assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), 0, "AFTER_inactive_fame_dripped");
 
     // timestamp_active updated
-    let timestamp_active: u64 = tester::get_DuelistValue(*sys.world, token_id).timestamp_active;
+    let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
     assert_gt!(timestamp_active, timestamp_active_start, "AFTER_timestamp_active");
 
     // duelist lost fame...
@@ -407,7 +408,7 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
     // Fame supply down
     let fame_supply: u128 = (*sys.fame).total_supply().low;
     // Flames up?
-    let pool_flame: Pool = tester::get_Pool(*sys.world, PoolType::SacredFlame);
+    let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
     let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
     if (should_survive) {
         assert_eq!(fame_balance, fame_balance_start - dripped_fame_wei, "AFTER_fame_balance_ALIVE");
@@ -515,7 +516,7 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128) {
     let lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
     let fame_balance_start: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
     let fame_supply_start: u128 = (*sys.fame).total_supply().low;
-    let timestamp_active_start: u64 = tester::get_DuelistValue(*sys.world, token_id).timestamp_active;
+    let timestamp_active_start: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
     // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
 // println!("[] balance     : {}", fame_balance_start/CONST::ETH_TO_WEI.low);
 // println!("[] fame_to_burn: {}", dripped_fame);
@@ -528,7 +529,7 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128) {
     assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), 0, "AFTER_inactive_fame_dripped");
 
     // timestamp_active updated
-    let timestamp_active: u64 = tester::get_DuelistValue(*sys.world, token_id).timestamp_active;
+    let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
     assert_gt!(timestamp_active, timestamp_active_start, "AFTER_timestamp_active");
 
     // duelist lost fame...
@@ -536,7 +537,7 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128) {
     // Fame supply down
     let fame_supply: u128 = (*sys.fame).total_supply().low;
     // Flames up?
-    let pool_flame: Pool = tester::get_Pool(*sys.world, PoolType::SacredFlame);
+    let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
     let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
     assert_eq!(fame_balance, 0, "AFTER_fame_balance_DEAD");
     assert_eq!(fame_supply, fame_supply_start - fame_balance_start + pool_amount, "AFTER_fame_supply_DEAD");

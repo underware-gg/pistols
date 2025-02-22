@@ -24,6 +24,7 @@ use pistols::types::premise::{Premise};
 
 use pistols::tests::tester::{tester,
     tester::{
+            StoreTrait,
         TestSystems, FLAGS,
         ID, OWNER, OTHER, BUMMER, RECIPIENT, ZERO,
     },
@@ -87,7 +88,7 @@ const DUEL_ID_4: u256 = 4; // owned by RECIPIENT()
 fn setup(_fee_amount: u128) -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::FAME | FLAGS::LORDS);
 
-    tester::set_current_season(ref sys.world, TABLES::TUTORIAL);
+    tester::set_current_season(ref sys, TABLES::TUTORIAL);
 
     // initialize contracts
     create_duel(@sys, OWNER(), OTHER());
@@ -118,7 +119,7 @@ fn create_duel(sys: @TestSystems, recipient: ContractAddress, challenged_address
 }
 
 fn _assert_minted_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
-    let token_config: TokenConfig = tester::get_TokenConfig(*sys.world, *sys.duels.contract_address);
+    let token_config: TokenConfig = (*sys.store).get_token_config(*sys.duels.contract_address);
     assert_eq!(token_config.minted_count, minted_count, "{}", msg);
 }
 
@@ -175,7 +176,7 @@ fn test_token_uri() {
         timestamp_end:   20000,
     };
 
-    tester::set_Challenge(ref sys.world, challenge);
+    tester::set_Challenge(ref sys.world, @challenge);
 
     let uri_1 = sys.duels.token_uri(DUEL_ID_1);
     let uri_2 = sys.duels.token_uri(DUEL_ID_2);

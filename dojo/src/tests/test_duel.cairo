@@ -19,6 +19,7 @@ mod tests {
 
     use pistols::tests::tester::{tester,
         tester::{
+            StoreTrait,
             TestSystems, FLAGS,
             IGameDispatcherTrait,
             IDuelTokenDispatcherTrait,
@@ -50,8 +51,8 @@ mod tests {
     //
 
     fn _assert_duel_progress(sys: @TestSystems, duel_id: u128, moves_a: Span<u8>, moves_b: Span<u8>) {
-        let challenge: ChallengeValue = tester::get_ChallengeValue(*sys.world, duel_id);
-        let round: RoundValue = tester::get_RoundValue(*sys.world, duel_id);
+        let challenge: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
+        let round: RoundValue = (*sys.store).get_round_value(duel_id);
         let progress: DuelProgress = (*sys.game).get_duel_progress(duel_id);
         let final_step: DuelStep = *progress.steps[progress.steps.len() - 1];
         assert_eq!(progress.winner, challenge.winner, "winner");
@@ -105,7 +106,7 @@ mod tests {
         assert_eq!(fools_balance_b_init, 0, "fools_balance_b_init");
 
         let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), table_id, 1);
-        assert_eq!(tester::get_Challenge(sys.world, duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
+        assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
         tester::assert_pact(@sys, duel_id, challenge, true, true, "started");
 
         // duel nft owned by contract
@@ -115,7 +116,7 @@ mod tests {
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
-        let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
         tester::assert_pact(@sys, duel_id, challenge, false, false, "ended");
 // challenge.winner.print();
 // round.state_a.health.print();
@@ -135,8 +136,8 @@ mod tests {
             _assert_is_alive(round.state_b, "alive_b");
         }
 
-        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into(), table_id);
-        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into(), table_id);
+        let score_a = sys.store.get_scoreboard(ID(OWNER()).into(), table_id);
+        let score_b = sys.store.get_scoreboard(ID(OTHER()).into(), table_id);
         assert_eq!(score_a.score.total_duels, 1, "score_a.score.total_duels");
         assert_eq!(score_b.score.total_duels, 1, "score_b.score.total_duels");
         assert_eq!(score_a.score.total_draws, 1, "score_a.score.total_draws");
@@ -151,14 +152,14 @@ mod tests {
         assert_eq!(score_a.score.honour, round.state_a.honour, "score_a.score.honour");
         assert_eq!(score_b.score.honour, round.state_b.honour, "score_b.score.honour");
 
-        let mut scoreboard_a = tester::get_Scoreboard(sys.world, OWNER().into(), table_id);
-        let mut scoreboard_b = tester::get_Scoreboard(sys.world, OTHER().into(), table_id);
+        let mut scoreboard_a = sys.store.get_scoreboard(OWNER().into(), table_id);
+        let mut scoreboard_b = sys.store.get_scoreboard(OTHER().into(), table_id);
         assert_eq!(score_a.score.total_duels, scoreboard_a.score.total_duels, "scoreboard_a.score.total_duels");
         assert_eq!(score_b.score.total_duels, scoreboard_b.score.total_duels, "scoreboard_b.score.total_duels");
         assert_eq!(score_a.score.honour, scoreboard_a.score.honour, "scoreboard_a.score.honour");
         assert_eq!(score_b.score.honour, scoreboard_b.score.honour, "scoreboard_b.score.honour");
 
-        let leaderboard: Leaderboard = tester::get_Leaderboard(sys.world, table_id);
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(table_id);
         let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
         assert_eq!(positions.len(), 2, "leaderboard_positions.len");
         assert_eq!(*positions[0].duelist_id, ID(OWNER()).into(), "draw_leaderboards[0].pos");
@@ -217,7 +218,7 @@ mod tests {
         let table_id: felt252 = SEASON_1_TABLE();
 
         let (challenge, _round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), table_id, 1);
-        assert_eq!(tester::get_Challenge(sys.world, duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
+        assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
         tester::assert_pact(@sys, duel_id, challenge, true, true, "started");
 
         // duel owned by contract
@@ -229,20 +230,20 @@ mod tests {
 
         // 1st commit
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
-        let (_challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
+        let (_challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
         assert_eq!(round.state, RoundState::Commit, "1__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "1__hash");
 
         // 2nd commit > Reveal
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
-        let (_challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
+        let (_challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
         assert_eq!(round.state, RoundState::Reveal, "2__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "21__hash");
         assert_eq!(round.moves_b.hashed, moves_b.hashed, "2__hash");
 
         // 1st reveal
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
-        let (_challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
+        let (_challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
         assert_eq!(round.state, RoundState::Reveal, "3__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "3__hash");
         assert_eq!(round.moves_a.salt, moves_a.salt, "3__salt");
@@ -251,7 +252,7 @@ mod tests {
 
         // 2nd reveal > Finished
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
-        let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
         tester::assert_pact(@sys, duel_id, challenge, false, false, "ended");
 // challenge.winner.print();
 // // challenge.state.print();
@@ -272,8 +273,8 @@ mod tests {
         let final_blow: PacesCard = (if(winner == 1){*moves_a.moves[0]}else{*moves_b.moves[0]}.into());
         assert_eq!(round.final_blow, FinalBlow::Paces(final_blow), "round.final_blow");
 
-        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into(), table_id);
-        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into(), table_id);
+        let score_a = sys.store.get_scoreboard(ID(OWNER()).into(), table_id);
+        let score_b = sys.store.get_scoreboard(ID(OTHER()).into(), table_id);
         assert_eq!(score_a.score.total_duels, 1, "score_a.score.total_duels");
         assert_eq!(score_b.score.total_duels, 1, "score_b.score.total_duels");
         assert_eq!(score_a.score.total_draws, 0, "score_a.score.total_draws");
@@ -284,7 +285,7 @@ mod tests {
         assert_eq!(score_a.score.honour, round.state_a.honour, "score_a.score.honour");
         assert_eq!(score_b.score.honour, round.state_b.honour, "score_b.score.honour");
 
-        let leaderboard: Leaderboard = tester::get_Leaderboard(sys.world, table_id);
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(table_id);
         let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
         assert_eq!(positions.len(), 2, "leaderboard_positions.len");
         assert_gt!(*positions[0].score, 0, "b_win_leaderboards[0].score");
@@ -339,7 +340,7 @@ mod tests {
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         tester::assert_pact(@sys, duel_id, challenge, false, false, "ended_2");
-        let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
+        let (challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
         assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state ++");
         assert_ne!(challenge.winner, 0, "challenge.winner ++");
         assert_gt!(challenge.timestamp_end, 0, "challenge.timestamp_end ++");
@@ -347,14 +348,14 @@ mod tests {
         assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "score_a.score.honour ++");
         assert_eq!(round.state_b.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "score_b.score.honour ++");
 
-        let score_a = tester::get_Scoreboard(sys.world, ID(OWNER()).into(), table_id);
-        let score_b = tester::get_Scoreboard(sys.world, ID(OTHER()).into(), table_id);
+        let score_a = sys.store.get_scoreboard(ID(OWNER()).into(), table_id);
+        let score_b = sys.store.get_scoreboard(ID(OTHER()).into(), table_id);
         assert_eq!(score_a.score.total_duels, 2, "score_a.score.total_duels ++");
         assert_eq!(score_b.score.total_duels, 2, "score_b.score.total_duels ++");
         assert_eq!(score_a.score.total_draws, 0, "score_a.score.total_draws ++");
         assert_eq!(score_b.score.total_draws, 0, "score_b.score.total_draws ++");
 
-        let leaderboard: Leaderboard = tester::get_Leaderboard(sys.world, table_id);
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(table_id);
         let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
         assert_eq!(positions.len(), 2, "leaderboard_positions.len() ++");
 
@@ -407,7 +408,7 @@ mod tests {
         sys.duelists.transfer_from(OWNER(), BUMMER(), ID(OWNER()).into());
         tester::execute_commit_moves_ID(@sys.game, BUMMER(), ID(OWNER()).into(), duel_id, moves_a.hashed);
         // no panic
-        let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.address_a, BUMMER(), "challenge.address_a_committed");
         assert_eq!(challenge.address_b, OTHER(), "challenge.address_b");
     }
@@ -424,7 +425,7 @@ mod tests {
         sys.duelists.transfer_from(OTHER(), BUMMER(), ID(OTHER()).into());
         tester::execute_commit_moves_ID(@sys.game, BUMMER(), ID(OTHER()).into(), duel_id, moves_b.hashed);
         // no panic
-        let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.address_a, OWNER(), "challenge.address_a");
         assert_eq!(challenge.address_b, BUMMER(), "challenge.address_b_committed");
     }
@@ -480,7 +481,7 @@ mod tests {
             tester::execute_commit_moves(sys.game, OTHER(), duel_id, moves_b.hashed);
             tester::execute_reveal_moves(sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
             tester::execute_reveal_moves(sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
-            let challenge: ChallengeValue = tester::get_ChallengeValue(*sys.world, duel_id);
+            let challenge: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
             assert_eq!(challenge.winner, winner, "challenge.winner:{}", i);
             loser_lives -= lives_staked;
             i += 1;
@@ -609,7 +610,7 @@ mod tests {
 // println!("> balance [{}]: {}", ID(OWNER()), tester::fame_balance_of_token(@sys, ID(OWNER())));
 // println!("> balance [{}]: {}", ID(OTHER()), tester::fame_balance_of_token(@sys, ID(OTHER())));
         // drip fame
-        tester::make_duelist_inactive(sys.world, ID(OWNER()), 800);
+        tester::make_duelist_inactive(@sys, ID(OWNER()), 800);
 // println!("> dripped [{}]: {}", ID(OWNER()), sys.duelists.inactive_fame_dripped(ID(OWNER())));
 // println!("> dripped [{}]: {}", ID(OTHER()), sys.duelists.inactive_fame_dripped(ID(OTHER())));
         _duel_until_death(@sys, WIN_2, 1, 2);
@@ -621,7 +622,7 @@ mod tests {
         // duel once to create duelists
         _duel_until_death(@sys, WIN_1, 1, 1);
         // drip fame
-        tester::make_duelist_inactive(sys.world, ID(OTHER()), 800);
+        tester::make_duelist_inactive(@sys, ID(OTHER()), 800);
         _duel_until_death(@sys, WIN_1, 1, 2);
     }
 
@@ -632,7 +633,7 @@ mod tests {
         // duel once to create duelists
         _duel_until_death(@sys, WIN_2, 1, 1);
         // drip fame
-        tester::make_duelist_inactive(sys.world, ID(OWNER()), 1100);
+        tester::make_duelist_inactive(@sys, ID(OWNER()), 1100);
         _duel_until_death(@sys, WIN_2, 1, 2);
     }
     #[test]
@@ -644,7 +645,7 @@ mod tests {
 // println!("> balance [{}]: {}", ID(OWNER()), tester::fame_balance_of_token(@sys, ID(OWNER())));
 // println!("> balance [{}]: {}", ID(OTHER()), tester::fame_balance_of_token(@sys, ID(OTHER())));
         // drip fame
-        tester::make_duelist_inactive(sys.world, ID(OTHER()), 1100);
+        tester::make_duelist_inactive(@sys, ID(OTHER()), 1100);
 // println!("> dripped [{}]: {}", ID(OWNER()), sys.duelists.inactive_fame_dripped(ID(OWNER())));
 // println!("> dripped [{}]: {}", ID(OTHER()), sys.duelists.inactive_fame_dripped(ID(OTHER())));
         _duel_until_death(@sys, WIN_1, 1, 2);
