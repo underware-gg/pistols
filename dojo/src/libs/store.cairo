@@ -28,6 +28,7 @@ pub use pistols::models::{
         Duelist, DuelistValue,
         DuelistChallenge, DuelistChallengeValue,
         Scoreboard, ScoreboardValue,
+        DuelistMemorial, DuelistMemorialValue,
     },
     leaderboard::{
         Leaderboard, LeaderboardValue,
@@ -116,6 +117,10 @@ pub impl StoreImpl of StoreTrait {
     }
     #[inline(always)]
     fn get_duelist_challenge_value(self: @Store, duelist_id: u128) -> DuelistChallengeValue {
+        (self.world.read_value(duelist_id))
+    }
+    #[inline(always)]
+    fn get_duelist_memorial_value(self: @Store, duelist_id: u128) -> DuelistMemorialValue {
         (self.world.read_value(duelist_id))
     }
 
@@ -233,6 +238,11 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_duelist_challenge(ref self: Store, model: @DuelistChallenge) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_duelist_memorial(ref self: Store, model: @DuelistMemorial) {
         self.world.write_model(model);
     }
 

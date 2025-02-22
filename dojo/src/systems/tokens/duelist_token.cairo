@@ -141,6 +141,7 @@ pub mod duelist_token {
         duelist::{
             Duelist, DuelistValue,
             ScoreboardValue, ScoreTrait,
+            DuelistMemorial, CauseOfDeath,
             Archetype,
         },
         challenge::{Challenge},
@@ -259,7 +260,7 @@ pub mod duelist_token {
             let mut fame_dripped: u128 = self.inactive_fame_dripped(duelist_id);
             if (fame_dripped != 0) {
                 // burn fame_dripped
-                let survived: bool = self._reactivate_or_sacrifice(duelist_id, Option::Some(fame_dripped));
+                let survived: bool = self._reactivate_or_sacrifice(duelist_id, Option::Some(fame_dripped), CauseOfDeath::Forsaken);
                 // only duel_token and owner can poke alive duelists
                 if (survived && !self.world_default().is_duel_contract(starknet::get_caller_address())) {
                     self.token.assert_is_owner_of(starknet::get_caller_address(), duelist_id.into());
@@ -273,7 +274,7 @@ pub mod duelist_token {
             // only owner can sacrifice
             self.token.assert_is_owner_of(starknet::get_caller_address(), duelist_id.into());
             // burn it!
-            self._reactivate_or_sacrifice(duelist_id, Option::None);
+            self._reactivate_or_sacrifice(duelist_id, Option::None, CauseOfDeath::Sacrifice);
         }
 
         // fn delete_duelist(ref self: ContractState,
@@ -366,6 +367,14 @@ pub mod duelist_token {
             self._process_rewards(@fame_dispatcher, @fools_dispatcher, challenge.duelist_id_b, rewards_b);
             self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_a, challenge.duelist_id_a, ref rewards_a, rewards_b.fame_gained);
             self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_b, challenge.duelist_id_b, ref rewards_b, rewards_a.fame_gained);
+
+            // DEAD
+            if (!rewards_a.survived) {
+                self._duelist_died(ref store, challenge.duelist_id_a, CauseOfDeath::Duelling, balance_a, challenge.duelist_id_b);
+            }
+            if (!rewards_b.survived) {
+                self._duelist_died(ref store, challenge.duelist_id_b, CauseOfDeath::Duelling, balance_b, challenge.duelist_id_a);
+            }
 
             (rewards_a, rewards_b)
         }
@@ -471,7 +480,8 @@ pub mod duelist_token {
 
         fn _reactivate_or_sacrifice(ref self: ContractState,
             duelist_id: u128,
-            fame_dripped: Option<u128>
+            fame_dripped: Option<u128>,
+            cause_of_death: CauseOfDeath,
         ) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
@@ -499,7 +509,12 @@ pub mod duelist_token {
                 // burn the full balance
                 due_amount = fame_balance - amount;
                 // emit event...
-                Activity::DuelistDied.emit(ref store.world, starknet::get_caller_address(), duelist_id.into());
+                self._duelist_died(ref store,
+                    duelist_id,
+                    cause_of_death,
+                    if (cause_of_death == CauseOfDeath::Sacrifice) {duelist_id} else {0},
+                    fame_balance,
+                );
             }
 
             // remaining fame to be burned and released
@@ -516,6 +531,24 @@ pub mod duelist_token {
             store.set_duelist_timestamp_active(duelist_id);
             
             (survived)
+        }
+
+        fn _duelist_died(ref self: ContractState,
+            ref store: Store,
+            duelist_id: u128,
+            cause_of_death: CauseOfDeath,
+            killed_by: u128,
+            fame_before_death: u128,
+        ) {
+            let mut memorial = DuelistMemorial {
+                duelist_id,
+                cause_of_death,
+                killed_by,
+                fame_before_death,
+            };
+            store.set_duelist_memorial(@memorial);
+            // events
+            Activity::DuelistDied.emit(ref store.world, starknet::get_caller_address(), duelist_id.into());
         }
     }
 

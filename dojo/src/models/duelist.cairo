@@ -46,6 +46,27 @@ pub struct Score {
     pub honour_history: u64,    // past 8 duels, each byte holds one duel honour
 } // [8 + 4*16 + 64] = 128 bytes
 
+// cfrated for dead duelists
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct DuelistMemorial {
+    #[key]
+    pub duelist_id: u128,
+    //------------
+    pub cause_of_death: CauseOfDeath,
+    pub killed_by: u128,
+    pub fame_before_death: u128,
+}
+
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum CauseOfDeath {
+    None,       // 0
+    Duelling,   // 1
+    Memorize,   // 2
+    Sacrifice,  // 3
+    Forsaken,   // 4
+}
+
 
 //----------------------------------
 // Traits
@@ -148,5 +169,25 @@ impl ArchetypeIntoByteArray of core::traits::Into<Archetype, ByteArray> {
             Archetype::Trickster => "Trickster",
             Archetype::Honourable => "Honourable",
         }
+    }
+}
+
+impl CauseOfDeathIntoByteArray of core::traits::Into<CauseOfDeath, ByteArray> {
+    fn into(self: CauseOfDeath) -> ByteArray {
+        match self {
+            CauseOfDeath::None =>       "None",
+            CauseOfDeath::Duelling =>   "Duelling",
+            CauseOfDeath::Memorize =>   "Memorize",
+            CauseOfDeath::Sacrifice =>  "Sacrifice",
+            CauseOfDeath::Forsaken =>   "Forsaken",
+        }
+    }
+}
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+pub impl CauseOfDeathDebug of core::fmt::Debug<CauseOfDeath> {
+    fn fmt(self: @CauseOfDeath, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
     }
 }

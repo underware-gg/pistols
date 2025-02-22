@@ -9,7 +9,8 @@ use pistols::models::{
     duelist::{
         Duelist,
         Scoreboard, Score,
-        ProfileType, DuelistProfile
+        ProfileType, DuelistProfile,
+        DuelistMemorialValue, CauseOfDeath,
     },
     config::{
         TokenConfig,
@@ -402,6 +403,9 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
     let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
     assert_gt!(timestamp_active, timestamp_active_start, "AFTER_timestamp_active");
 
+    // if dead, has a memorial
+    let memorial: DuelistMemorialValue = (*sys.store).get_duelist_memorial_value(token_id);
+    assert_eq!(memorial.killed_by, 0, "AFTER_killed_by");
     // duelist lost fame...
     let fame_balance: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
 // println!("fame_balance: {}", tester::ETH(fame_balance));
@@ -411,10 +415,14 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
     let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
     let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
     if (should_survive) {
+        assert_eq!(memorial.cause_of_death, CauseOfDeath::None, "AFTER_cause_of_death");
+        assert_eq!(memorial.fame_before_death, 0, "AFTER_fame_before_death");
         assert_eq!(fame_balance, fame_balance_start - dripped_fame_wei, "AFTER_fame_balance_ALIVE");
         assert_eq!(fame_supply, fame_supply_start - dripped_fame_wei, "AFTER_fame_supply_ALIVE");
         assert_eq!(pool_flame.balance_fame, 0, "AFTER_pool_flame.balance_fame_ALIVE");
     } else {
+        assert_eq!(memorial.cause_of_death, CauseOfDeath::Forsaken, "AFTER_cause_of_death");
+        assert_eq!(memorial.fame_before_death, fame_balance_start, "AFTER_fame_before_death");
         assert_eq!(fame_balance, 0, "AFTER_fame_balance_DEAD");
         assert_eq!(fame_supply, fame_supply_start - fame_balance_start + pool_amount, "AFTER_fame_supply_DEAD");
         assert_eq!(pool_flame.balance_fame, pool_amount, "AFTER_pool_flame.balance_fame_DEAD");
@@ -527,6 +535,11 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128) {
     assert!(!(*sys.duelists).is_inactive(token_id), "AFTER_is_inactive");
     assert_eq!((*sys.duelists).inactive_timestamp(token_id), 0, "AFTER_inactive_timestamp");
     assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), 0, "AFTER_inactive_fame_dripped");
+
+    let memorial: DuelistMemorialValue = (*sys.store).get_duelist_memorial_value(token_id);
+    assert_eq!(memorial.cause_of_death, CauseOfDeath::Sacrifice, "AFTER_cause_of_death");
+    assert_eq!(memorial.fame_before_death, fame_balance_start, "AFTER_fame_before_death");
+    assert_eq!(memorial.killed_by, token_id, "AFTER_killed_by");
 
     // timestamp_active updated
     let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;

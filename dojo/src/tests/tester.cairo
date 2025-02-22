@@ -49,6 +49,7 @@ pub mod tester {
             m_Duelist, Duelist, DuelistValue,
             m_DuelistChallenge, DuelistChallenge,
             m_Scoreboard, Scoreboard,
+            m_DuelistMemorial, DuelistMemorial, DuelistMemorialValue, CauseOfDeath,
         },
         leaderboard::{
             m_Leaderboard, Leaderboard, LeaderboardTrait, LeaderboardPosition
@@ -248,6 +249,7 @@ pub mod tester {
             TestResource::Model(m_Config::TEST_CLASS_HASH),
             TestResource::Model(m_Duelist::TEST_CLASS_HASH),
             TestResource::Model(m_DuelistChallenge::TEST_CLASS_HASH),
+            TestResource::Model(m_DuelistMemorial::TEST_CLASS_HASH),
             TestResource::Model(m_Pact::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
