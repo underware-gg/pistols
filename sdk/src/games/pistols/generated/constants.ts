@@ -30,6 +30,18 @@ export const getTutorialLevelFromValue = (value: number): TutorialLevel | undefi
 export const getTutorialLevelMap = (): Record<TutorialLevel, number> => Object.keys(TutorialLevel).reduce((acc, v, index) => { acc[v as TutorialLevel] = index; return acc; }, {} as Record<TutorialLevel, number>);
 
 // from: ../dojo/src/models/duelist.cairo
+export enum CauseOfDeath {
+  None = 'None', // 0
+  Duelling = 'Duelling', // 1
+  Memorize = 'Memorize', // 2
+  Sacrifice = 'Sacrifice', // 3
+  Forsaken = 'Forsaken', // 4
+};
+export const getCauseOfDeathValue = (name: CauseOfDeath): number | undefined => _indexOrUndefined(Object.keys(CauseOfDeath).indexOf(name));
+export const getCauseOfDeathFromValue = (value: number): CauseOfDeath | undefined => Object.keys(CauseOfDeath)[value] as CauseOfDeath;
+export const getCauseOfDeathMap = (): Record<CauseOfDeath, number> => Object.keys(CauseOfDeath).reduce((acc, v, index) => { acc[v as CauseOfDeath] = index; return acc; }, {} as Record<CauseOfDeath, number>);
+
+// from: ../dojo/src/models/duelist.cairo
 export enum Archetype {
   Undefined = 'Undefined', // 0
   Villainous = 'Villainous', // 1
@@ -53,16 +65,18 @@ export const getPackTypeMap = (): Record<PackType, number> => Object.keys(PackTy
 // from: ../dojo/src/models/player.cairo
 export enum Activity {
   Undefined = 'Undefined', // 0
-  FinishedTutorial = 'FinishedTutorial', // 1
-  WelcomePack = 'WelcomePack', // 2
-  PurchasedPack = 'PurchasedPack', // 3
-  CreatedDuelist = 'CreatedDuelist', // 4
-  CreatedChallenge = 'CreatedChallenge', // 5
-  RepliedChallenge = 'RepliedChallenge', // 6
-  CommittedMoves = 'CommittedMoves', // 7
-  RevealedMoves = 'RevealedMoves', // 8
-  DuelResolved = 'DuelResolved', // 9
-  DuelDraw = 'DuelDraw', // 10
+  TutorialFinished = 'TutorialFinished', // 1
+  PackWelcome = 'PackWelcome', // 2
+  PackPurchased = 'PackPurchased', // 3
+  PackOpened = 'PackOpened', // 4
+  DuelistSpawned = 'DuelistSpawned', // 5
+  DuelistDied = 'DuelistDied', // 6
+  ChallengeCreated = 'ChallengeCreated', // 7
+  ChallengeReplied = 'ChallengeReplied', // 8
+  MovesCommitted = 'MovesCommitted', // 9
+  MovesRevealed = 'MovesRevealed', // 10
+  ChallengeResolved = 'ChallengeResolved', // 11
+  ChallengeDraw = 'ChallengeDraw', // 12
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
@@ -71,10 +85,11 @@ export const getActivityMap = (): Record<Activity, number> => Object.keys(Activi
 // from: ../dojo/src/models/pool.cairo
 export enum PoolType {
   Undefined = 'Undefined', // 0
-  Bank = 'Bank', // 1
-  Season = 'Season', // 2
-  Tournament = 'Tournament', // 3
-  SacredFlame = 'SacredFlame', // 4
+  Purchases = 'Purchases', // 1
+  FamePeg = 'FamePeg', // 2
+  Season = 'Season', // 3
+  Tournament = 'Tournament', // 4
+  SacredFlame = 'SacredFlame', // 5
 };
 export const getPoolTypeValue = (name: PoolType): number | undefined => _indexOrUndefined(Object.keys(PoolType).indexOf(name));
 export const getPoolTypeFromValue = (value: number): PoolType | undefined => Object.keys(PoolType)[value] as PoolType;
@@ -89,18 +104,6 @@ export enum SeasonPhase {
 export const getSeasonPhaseValue = (name: SeasonPhase): number | undefined => _indexOrUndefined(Object.keys(SeasonPhase).indexOf(name));
 export const getSeasonPhaseFromValue = (value: number): SeasonPhase | undefined => Object.keys(SeasonPhase)[value] as SeasonPhase;
 export const getSeasonPhaseMap = (): Record<SeasonPhase, number> => Object.keys(SeasonPhase).reduce((acc, v, index) => { acc[v as SeasonPhase] = index; return acc; }, {} as Record<SeasonPhase, number>);
-
-// from: ../dojo/src/models/table.cairo
-export enum TableType {
-  Undefined = 'Undefined', // 0
-  Season = 'Season', // 1
-  Tutorial = 'Tutorial', // 2
-  Practice = 'Practice', // 3
-  Eternum = 'Eternum', // 4
-};
-export const getTableTypeValue = (name: TableType): number | undefined => _indexOrUndefined(Object.keys(TableType).indexOf(name));
-export const getTableTypeFromValue = (value: number): TableType | undefined => Object.keys(TableType)[value] as TableType;
-export const getTableTypeMap = (): Record<TableType, number> => Object.keys(TableType).reduce((acc, v, index) => { acc[v as TableType] = index; return acc; }, {} as Record<TableType, number>);
 
 // from: ../dojo/src/types/boolean.cairo
 export enum Boolean {
@@ -333,6 +336,16 @@ export const getRoundStateValue = (name: RoundState): number | undefined => _ind
 export const getRoundStateFromValue = (value: number): RoundState | undefined => Object.keys(RoundState)[value] as RoundState;
 export const getRoundStateMap = (): Record<RoundState, number> => Object.keys(RoundState).reduce((acc, v, index) => { acc[v as RoundState] = index; return acc; }, {} as Record<RoundState, number>);
 
+// from: ../dojo/src/types/rules.cairo
+export enum RulesType {
+  Undefined = 'Undefined', // 0
+  Academia = 'Academia', // 1
+  Season = 'Season', // 2
+};
+export const getRulesTypeValue = (name: RulesType): number | undefined => _indexOrUndefined(Object.keys(RulesType).indexOf(name));
+export const getRulesTypeFromValue = (value: number): RulesType | undefined => Object.keys(RulesType)[value] as RulesType;
+export const getRulesTypeMap = (): Record<RulesType, number> => Object.keys(RulesType).reduce((acc, v, index) => { acc[v as RulesType] = index; return acc; }, {} as Record<RulesType, number>);
+
 // from: ../dojo/src/types/trophies.cairo
 export enum Trophy {
   None = 'None', // 0
@@ -363,7 +376,8 @@ export type PackDescription = {
   image_url_closed : string,
   image_url_open : string,
   can_purchase : boolean,
-  price : bigint,
+  lords_price : bigint,
+  quantity : number,
 };
 
 // from: ../dojo/src/types/cards/cards.cairo
@@ -404,7 +418,6 @@ export type ProfileDescription = {
 
 // from: ../dojo/src/types/constants.cairo
 type type_CONST = {
-  WELCOME_PACK_DUELIST_COUNT: number, // cairo: usize
   ROUND_COUNT: number, // cairo: u8
   MAX_DUELIST_ID: bigint, // cairo: u128
   FULL_HEALTH: number, // cairo: u8
@@ -415,7 +428,6 @@ type type_CONST = {
   ETH_TO_WEI: bigint, // cairo: u256
 };
 export const CONST: type_CONST = {
-  WELCOME_PACK_DUELIST_COUNT: 2,
   ROUND_COUNT: 1,
   MAX_DUELIST_ID: BigInt('0xffff'),
   FULL_HEALTH: 3,
@@ -450,13 +462,19 @@ export const CHANCES: type_CHANCES = {
 type type_FAME = {
   MINT_GRANT_AMOUNT: bigint, // cairo: u256
   ONE_LIFE: bigint, // cairo: u256
+  MAX_INACTIVE_TIMESTAMP: bigint, // cairo: u64
+  TIMESTAMP_TO_DRIP_ONE_FAME: bigint, // cairo: u64
+  SACRED_FLAME_PERCENTAGE: number, // cairo: u8
 };
 export const FAME: type_FAME = {
   MINT_GRANT_AMOUNT: (3000n * CONST.ETH_TO_WEI),
   ONE_LIFE: (1000n * CONST.ETH_TO_WEI),
+  MAX_INACTIVE_TIMESTAMP: TIMESTAMP.FOUR_WEEKS,
+  TIMESTAMP_TO_DRIP_ONE_FAME: ((10 * TIMESTAMP.ONE_MINUTE)),
+  SACRED_FLAME_PERCENTAGE: 60,
 };
 
-// from: ../dojo/src/interfaces/systems.cairo
+// from: ../dojo/src/interfaces/dns.cairo
 type type_SELECTORS = {
   ADMIN: bigint, // cairo: felt252
   BANK: bigint, // cairo: felt252
@@ -515,7 +533,8 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_url_closed: '/tokens/Unknown.jpg',
     image_url_open: '/tokens/Unknown.jpg',
     can_purchase: false,
-    price: 0n,
+    lords_price: 0n,
+    quantity: 0,
   },
   WelcomePack: {
     id: 'WelcomePack',
@@ -523,7 +542,8 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_url_closed: '/tokens/WelcomePack.jpg',
     image_url_open: '/tokens/WelcomePack.jpg',
     can_purchase: false,
-    price: 0n,
+    lords_price: (20n * CONST.ETH_TO_WEI.low),
+    quantity: 2,
   },
   Duelists5x: {
     id: 'Duelists5x',
@@ -531,7 +551,8 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_url_closed: '/tokens/Duelists5x.jpg',
     image_url_open: '/tokens/Duelists5x.jpg',
     can_purchase: true,
-    price: (50n * CONST.ETH_TO_WEI),
+    lords_price: (50n * CONST.ETH_TO_WEI.low),
+    quantity: 5,
   },
 };
 

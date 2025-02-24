@@ -58,7 +58,7 @@ Use these to call functions with graphql
             "calldata": [
               "0x300000001",
               "0x123",
-              ${constants.Premise.Training},
+              ${constants.Premise.Lesson},
               "${bigintToHex(stringToFelt("The Quote"))}",
               "${bigintToHex(stringToFelt(constants.TABLES.PRACTICE))}",
               24
