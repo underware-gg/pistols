@@ -21,7 +21,7 @@ import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 export default function ScTutorial({ currentTutorialScene }: { currentTutorialScene: string }) {
   // Scene & Context
   const { dispatchSetScene } = usePistolsScene()
-  const { dispatchSetTutorialLevel } = usePistolsContext()
+  const { tutorialOpener, dispatchSetTutorialLevel } = usePistolsContext()
   
   // Game Events
   const { value: itemHovered } = useGameEvent('hover_item', null)
@@ -52,7 +52,6 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   const [textDuration, setTextDuration] = useState<number>(0)
   const [flashOpacity, setFlashOpacity] = useState(0)
   const [textOpacity, setTextOpacity] = useState(0)
-  const [showTutorialOverlay, setShowTutorialOverlay] = useState(false)
   const [showCardPack, setShowCardPack] = useState(false)
   const [cardPackClickable, setCardPackClickable] = useState(false)
   const textOpacityRef = useRef(0)
@@ -72,7 +71,6 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       setDisplayText(undefined) 
       setTextOpacity(0)
       textOpacityRef.current = 0
-      setShowTutorialOverlay(false)
       setShowCardPack(false)
       setCardPackClickable(false)
       currentTween.current?.stop()
@@ -184,7 +182,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
           animateTextOpacity(0)
           setShowCardPack(true)
           setTimeout(() => {
-            setShowTutorialOverlay(true)
+            tutorialOpener.open()
           }, 1000)
         } else {
           dispatchSetScene(SceneName.Tavern)
@@ -340,8 +338,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
 
       <DuelTutorialOverlay 
         tutorialType={DuelTutorialLevel.DUELIST_PACKS}
-        isOpen={showTutorialOverlay}
-        setIsOpen={setShowTutorialOverlay}
+        opener={tutorialOpener}
         onComplete={() => setCardPackClickable(true)}
       />
 
