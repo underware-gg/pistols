@@ -34,9 +34,9 @@ pub mod FAME {
     use pistols::utils::timestamp::{TIMESTAMP};
 
     // amount of FAME minted to every new Duelist
-    pub const MINT_GRANT_AMOUNT: u256 = 3000 * CONST::ETH_TO_WEI;
+    pub const MINT_GRANT_AMOUNT: u256 = (3000 * CONST::ETH_TO_WEI);
     // amount of FAME lost in a duel
-    pub const ONE_LIFE: u256 = 1000 * CONST::ETH_TO_WEI;
+    pub const ONE_LIFE: u256 = (1000 * CONST::ETH_TO_WEI);
 
     // inactivity timestamps in seconds
     pub const MAX_INACTIVE_TIMESTAMP: u64 = TIMESTAMP::FOUR_WEEKS;

@@ -416,6 +416,26 @@ export type ProfileDescription = {
 // constants
 //
 
+// from: ../dojo/src/utils/timestamp.cairo
+type type_TIMESTAMP = {
+  ONE_MINUTE: bigint, // cairo: u64
+  ONE_HOUR: bigint, // cairo: u64
+  ONE_DAY: bigint, // cairo: u64
+  ONE_WEEK: bigint, // cairo: u64
+  TWO_WEEKS: bigint, // cairo: u64
+  THREE_WEEKS: bigint, // cairo: u64
+  FOUR_WEEKS: bigint, // cairo: u64
+};
+export const TIMESTAMP: type_TIMESTAMP = {
+  ONE_MINUTE: 60n,
+  ONE_HOUR: (60n * 60n),
+  ONE_DAY: (60n * 60n * 24n),
+  ONE_WEEK: (60n * 60n * 24n * 7n),
+  TWO_WEEKS: (60n * 60n * 24n * 14n),
+  THREE_WEEKS: (60n * 60n * 24n * 21n),
+  FOUR_WEEKS: (60n * 60n * 24n * 28n),
+};
+
 // from: ../dojo/src/types/constants.cairo
 type type_CONST = {
   ROUND_COUNT: number, // cairo: u8
@@ -470,7 +490,7 @@ export const FAME: type_FAME = {
   MINT_GRANT_AMOUNT: (3000n * CONST.ETH_TO_WEI),
   ONE_LIFE: (1000n * CONST.ETH_TO_WEI),
   MAX_INACTIVE_TIMESTAMP: TIMESTAMP.FOUR_WEEKS,
-  TIMESTAMP_TO_DRIP_ONE_FAME: ((10 * TIMESTAMP.ONE_MINUTE)),
+  TIMESTAMP_TO_DRIP_ONE_FAME: (10n * TIMESTAMP.ONE_MINUTE),
   SACRED_FLAME_PERCENTAGE: 60,
 };
 
@@ -542,7 +562,7 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_url_closed: '/tokens/WelcomePack.jpg',
     image_url_open: '/tokens/WelcomePack.jpg',
     can_purchase: false,
-    lords_price: (20n * CONST.ETH_TO_WEI.low),
+    lords_price: (20n * CONST.ETH_TO_WEI),
     quantity: 2,
   },
   Duelists5x: {
@@ -551,7 +571,7 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_url_closed: '/tokens/Duelists5x.jpg',
     image_url_open: '/tokens/Duelists5x.jpg',
     can_purchase: true,
-    lords_price: (50n * CONST.ETH_TO_WEI.low),
+    lords_price: (50n * CONST.ETH_TO_WEI),
     quantity: 5,
   },
 };
@@ -1133,24 +1153,4 @@ export const BITWISE: type_BITWISE = {
   MSB_U64: BigInt('0x8000000000000000'),
   MSB_U128: BigInt('0x80000000000000000000000000000000'),
   MSB_U256: BigInt('0x8000000000000000000000000000000000000000000000000000000000000000'),
-};
-
-// from: ../dojo/src/utils/timestamp.cairo
-type type_TIMESTAMP = {
-  ONE_MINUTE: bigint, // cairo: u64
-  ONE_HOUR: bigint, // cairo: u64
-  ONE_DAY: bigint, // cairo: u64
-  ONE_WEEK: bigint, // cairo: u64
-  TWO_WEEKS: bigint, // cairo: u64
-  THREE_WEEKS: bigint, // cairo: u64
-  FOUR_WEEKS: bigint, // cairo: u64
-};
-export const TIMESTAMP: type_TIMESTAMP = {
-  ONE_MINUTE: 60n,
-  ONE_HOUR: (60n * 60n),
-  ONE_DAY: (60n * 60n * 24n),
-  ONE_WEEK: (60n * 60n * 24n * 7n),
-  TWO_WEEKS: (60n * 60n * 24n * 14n),
-  THREE_WEEKS: (60n * 60n * 24n * 21n),
-  FOUR_WEEKS: (60n * 60n * 24n * 28n),
 };
