@@ -791,6 +791,9 @@ export function switchScene(sceneName) {
         (_currentScene as InteractibleScene).setSceneData(sceneName)
       }
 
+      emitter.emit('hover_description', null)
+      emitter.emit('hover_item', null)
+
       fadeInCurrentScene();
       
       if (sceneName != SceneName.Duel) {

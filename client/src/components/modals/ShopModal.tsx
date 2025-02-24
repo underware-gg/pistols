@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Modal, Grid, Image, ButtonGroup, Button } from 'semantic-ui-react'
+import { Modal, Grid, ButtonGroup, Button } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { useCalcFeePack, useCanPurchase } from '/src/hooks/usePistolsContractCalls'
@@ -59,7 +59,7 @@ export default function ShopModal({
           <Row columns='equal' textAlign='center' verticalAlign='middle'>
             <Col textAlign='left' className='PaddedSides'>
               {/* <Image src={constants.PACK_TYPES[packType].image_url_closed} /> */}
-              <CardPack isOpen={true} clickable={false} cardPackSize={6} maxTilt={30} />
+              <CardPack isOpen={true} clickable={false} cardPackSize={6} maxTilt={30} packType={packType} />
             </Col>
             <Col textAlign='left' className='PaddedSides'>
 

@@ -1,9 +1,5 @@
 @import 'aspect';
-
-$color-positive: #77d64d;
-$color-negative: #e34a4a;
-$color-warning: #f1d242;
-$color-cold: #4d9ad6;
+@import 'color';
 
 .card {
   -moz-box-sizing: border-box;
@@ -804,15 +800,18 @@ $color-cold: #4d9ad6;
     
     &.hover {
       scale: 1.15;
-      animation: wobble 0.3s infinite;
+    }
+
+    &.claiming {
+      animation: wobble 0.2s infinite;
     }
   }
   
   @keyframes wobble {
     0% { rotate: 0deg; }
-    25% { rotate: -5deg; }
-    75% { rotate: 5deg; }
-    100% { rotate: 0deg; }
+    25% { rotate: -4deg; }
+    75% { rotate: 0deg; }
+    100% { rotate: 4deg; }
   }
 
   
@@ -840,4 +839,20 @@ $color-cold: #4d9ad6;
     opacity: 0;
     pointer-events: none;
   }
+}
+
+.card-pack-title {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: $color-darkest;
+  font-size: aspect-width(2);
+  font-weight: 900;
+  text-align: center;
+  text-shadow: 
+    0.2rem 0.2rem 1px rgba($color-brightest, 0.8),
+    -0.2rem 0.2rem 1px rgba($color-brightest, 0.8),
+    -0.2rem -0.2rem 1px rgba($color-brightest, 0.8),
+    0.2rem -0.2rem 1px rgba($color-brightest, 0.8);
 }

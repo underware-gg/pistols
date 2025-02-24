@@ -42,9 +42,19 @@ export const useGameAspect = () => {
     return (vh / 100) * aspectRatio.aspectH;
   }, [aspectRatio]);
 
+  const pixelsToAspectWidth = useCallback((px: number) => {
+    return (px / aspectRatio.aspectW) * 100;
+  }, [aspectRatio]);
+
+  const pixelsToAspectHeight = useCallback((px: number) => {
+    return (px / aspectRatio.aspectH) * 100; 
+  }, [aspectRatio]);
+
   return {
     ...aspectRatio,
     aspectWidth,
     aspectHeight,
+    pixelsToAspectWidth,
+    pixelsToAspectHeight,
   };
 };

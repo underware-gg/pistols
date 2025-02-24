@@ -9,6 +9,7 @@ import { ActionButton } from '../Buttons'
 import { SceneName } from '/src/data/assets'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { DuelTutorialLevel } from '/src/data/tutorialConstants'
+import { SettingsActions, useSettings } from '/src/hooks/SettingsContext'
 
 
 export default function DuelStateDisplay({
@@ -18,6 +19,7 @@ export default function DuelStateDisplay({
 }) {
   const { animated } = useGameplayContext()
 
+  const { dispatchSetting } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSetTutorialLevel } = usePistolsContext()
 
@@ -29,9 +31,11 @@ export default function DuelStateDisplay({
 
   const handleContinue = useCallback(() => {
     if (tutorialLevel === 1) {
+      dispatchSetting(SettingsActions.TUTORIAL_LEVEL, 1)
       dispatchSetScene(SceneName.TutorialScene3)
       dispatchSetTutorialLevel(DuelTutorialLevel.NONE)
     } else {
+      dispatchSetting(SettingsActions.TUTORIAL_LEVEL, 2)
       dispatchSetScene(SceneName.TutorialScene4)
       dispatchSetTutorialLevel(DuelTutorialLevel.NONE)
     }

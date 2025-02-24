@@ -22,22 +22,76 @@ import {
   CARD_PACK_CARD_SCALE_DURATION,
   CARD_PACK_REVEAL_DELAY,
 } from '/src/data/cardConstants';
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
+import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo';
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { useAccount } from '@starknet-react/core';
 
 interface CardPack {
-  onComplete?: () => void
-  style?: React.CSSProperties
+  onComplete?: (selectedDuelistId?: number) => void
+  packType: constants.PackType,
+  packId?: number
   isOpen?: boolean
   clickable?: boolean,
   cardPackSize: number,
-  maxTilt: number
+  maxTilt: number,
+  optionalTitle?: string
 }
 
-export const CardPack = ({ onComplete, style, isOpen = false, clickable = true, cardPackSize, maxTilt }: CardPack) => {
+export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle }: CardPack) => {
+  const { account } = useAccount()
+  const { pack_token } = useDojoSystemCalls()
+  const { duelistIds } = useDuelistsOfPlayer()
+  const [isClaiming, setIsClaiming] = useState(false)
+
   const [isOpening, setIsOpening] = useState(false)
   const [sealClicked, setSealClicked] = useState(false)
   const [cardsSpawned, setCardsSpawned] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
   const [showRevealButton, setShowRevealButton] = useState(false)
+  const [hasRevealed, setHasRevealed] = useState(false)
+  const [selectedDuelistId, setSelectedDuelistId] = useState<number | undefined>()
+  const [newDuelistIds, setNewDuelistIds] = useState<number[]>([])
+  const [revealedDuelists, setRevealedDuelists] = useState<Set<number>>(new Set())
+  const previousDuelistIdsRef = useRef<bigint[]>([])
+
+  const _claim = async () => {
+    if (packType === constants.PackType.WelcomePack) {
+      setIsClaiming(true)
+      await pack_token.claim_welcome_pack(account)
+    } else if (packType === constants.PackType.Duelists5x && packId) {
+      setIsClaiming(true)
+      await pack_token.open(account, packId)
+    }
+  }
+
+  useEffect(() => {
+    if (!isClaiming) {
+      console.log('Not claiming, setting previous duelist IDs:', [...duelistIds])
+      previousDuelistIdsRef.current = [...duelistIds]
+      return
+    }
+
+    //TODO adjust to all card pack possibilities
+    // const expectedNewIds = packType === constants.PackType.WelcomePack ? 2 : 5
+    const expectedNewIds = 5
+    console.log('Expected new IDs:', expectedNewIds)
+    const newIds = duelistIds.filter(id => !previousDuelistIdsRef.current.includes(id))
+    console.log('Found new IDs:', newIds)
+
+    if (newIds.length === expectedNewIds) {
+      console.log('Got expected number of new IDs, setting claiming to false')
+      setIsClaiming(false)
+      setNewDuelistIds(newIds.map(id => Number(id)))
+    }
+  }, [isClaiming, duelistIds, packType])
+
+  useEffect(() => {
+    if (newDuelistIds.length > 0) {
+      console.log('New duelist IDs received, handling seal click:', newDuelistIds)
+      handleSealClick()
+    }
+  }, [newDuelistIds])
 
   const cardPackRef = useRef<HTMLDivElement>(null)
   const innerBagRef = useRef<HTMLDivElement>(null)
@@ -146,11 +200,11 @@ export const CardPack = ({ onComplete, style, isOpen = false, clickable = true, 
       cardPackCardsRef.current.style.setProperty('--card-height', `${aspectWidth(CARD_PACK_CARD_SIZE_HEIGHT)}px`)
     }
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < newDuelistIds.length; i++) {
       const cardRef = cardRefs.current[i]
       if (!cardRef) continue
 
-      const pentaPos = getLinePosition(i, 5)
+      const pentaPos = getLinePosition(i, newDuelistIds.length)
       const spawnDelay = i * PACK_ANIMATION_CARD_SPAWN_DELAY_BETWEEN + PACK_ANIMATION_BAG_SLIDE_DURATION * 0.4
 
       setTimeout(() => {
@@ -177,7 +231,7 @@ export const CardPack = ({ onComplete, style, isOpen = false, clickable = true, 
   }
   
   const handleSealClick = () => {
-    if (sealClicked || !clickable) return
+    if (sealClicked) return
     setSealClicked(true)
     
     if (!sealRef.current || !cardPackRef.current) return
@@ -208,7 +262,6 @@ export const CardPack = ({ onComplete, style, isOpen = false, clickable = true, 
           })
           .onComplete(() => {
             spawnCards()
-            onComplete?.()
           })
           .start()
       })
@@ -241,7 +294,7 @@ export const CardPack = ({ onComplete, style, isOpen = false, clickable = true, 
 
   const handleRevealAll = () => {
     if (!clickable) return
-    setShowRevealButton(false)
+    setHasRevealed(true)
 
     const numCards = cardRefs.current.length;
     const orderedCards = cardRefs.current.map((cardRef, index) => {
@@ -251,16 +304,71 @@ export const CardPack = ({ onComplete, style, isOpen = false, clickable = true, 
       } else {
         adjustedIndex = numCards - Math.ceil(index / 2);
       }
-      return {cardRef, adjustedIndex};
+      return {cardRef, adjustedIndex, duelistId: newDuelistIds[index]};
     })
     .sort((a, b) => a.adjustedIndex - b.adjustedIndex)
-    .map(({cardRef}) => cardRef);
+    .filter(({duelistId}) => !revealedDuelists.has(duelistId));
 
-    orderedCards.forEach((cardRef, index) => {
+    orderedCards.forEach(({cardRef, duelistId}, index) => {
       setTimeout(() => {
         cardRef?.flipCard(true, 180, CARD_PACK_FLIP_DURATION);
+        setRevealedDuelists(prev => new Set([...prev, duelistId]));
       }, index * CARD_PACK_REVEAL_DELAY);
     });
+  }
+
+  const handleButtonClick = () => {
+    if (!hasRevealed) {
+      handleRevealAll()
+    } else if (packType === constants.PackType.WelcomePack) {
+      if (selectedDuelistId !== undefined) {
+        onComplete?.(selectedDuelistId)
+      }
+    } else {
+      onComplete?.()
+    }
+  }
+
+  const getButtonLabel = () => {
+    if (!hasRevealed) return 'Reveal All'
+    if (packType === constants.PackType.WelcomePack) return 'Go to Duel'
+    return 'Close'
+  }
+
+  const isButtonDisabled = () => {
+    if (!hasRevealed) return false
+    if (packType === constants.PackType.WelcomePack && selectedDuelistId === undefined) return true
+    return false
+  }
+
+  const handleCardClick = (id: number, cardRef: DuelistCardHandle | null) => {
+    if (!revealedDuelists.has(id)) {
+      cardRef?.flipCard(true, 180, CARD_PACK_FLIP_DURATION);
+      setRevealedDuelists(prev => {
+        const newSet = new Set([...prev, id]);
+        if (newSet.size === newDuelistIds.length) {
+          setHasRevealed(true);
+        }
+        return newSet;
+      });
+    } else if (revealedDuelists.size === newDuelistIds.length) {
+      if (packType === constants.PackType.WelcomePack) {
+        if (selectedDuelistId === id) {
+          setSelectedDuelistId(undefined);
+          cardRef?.setCardScale(1, CARD_PACK_CARD_SCALE_DURATION);
+          cardRef?.toggleHighlight(false);
+        } else {
+          const previousCardRef = cardRefs.current.find(ref => ref?.duelistId === selectedDuelistId);
+          if (previousCardRef) {
+            previousCardRef.setCardScale(1, CARD_PACK_CARD_SCALE_DURATION);
+            previousCardRef.toggleHighlight(false);
+          }
+          setSelectedDuelistId(id);
+          cardRef?.setCardScale(1.1, CARD_PACK_CARD_SCALE_DURATION);
+          cardRef?.toggleHighlight(true);
+        }
+      }
+    }
   }
 
   return (
@@ -294,43 +402,51 @@ export const CardPack = ({ onComplete, style, isOpen = false, clickable = true, 
 
         {/* Seal */}
         <div 
-          className={`seal ${isHovering && !sealClicked ? 'hover' : ''}`}
-          onClick={handleSealClick}
+          className={`seal ${isHovering || isClaiming  || sealClicked ? 'hover' : ''} ${isClaiming || sealClicked ? 'claiming' : ''}`}
+          onClick={_claim}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
           ref={sealRef}
         />
 
         <div className="card-pack-cards" ref={cardPackCardsRef}>
-          {[...Array(5)].map((_, i) => (
+          { sealClicked && newDuelistIds.map((id, i) => (
             <DuelistCard
-              duelistId={0}
+              duelistId={id}
               key={i}
               ref={el => { cardRefs.current[i] = el; }}
               width={CARD_PACK_CARD_SIZE_WIDTH}
               height={CARD_PACK_CARD_SIZE_HEIGHT}
               isLeft={false}
-              isVisible={true}
-              // cardData={FireCardsTextures.None}
+              isVisible={false}
+              isSelected={selectedDuelistId === id}
               onHover={(isHovered) => {
-                if (cardRefs.current[i]) {
+                if (cardRefs.current[i] && id !== selectedDuelistId) {
                   cardRefs.current[i].setCardScale(isHovered ? 1.1 : 1, CARD_PACK_CARD_SCALE_DURATION);
                   cardRefs.current[i].toggleHighlight(isHovered);
                 }
               }}
-              onClick={() => {
-                if (cardRefs.current[i]) {
-                  cardRefs.current[i].flipCard(true, 180, CARD_PACK_FLIP_DURATION);
-                }
-              }}
+              onClick={() => handleCardClick(id, cardRefs.current[i])}
             />
           ))}
         </div>
 
       </div>
 
+      {hasRevealed && optionalTitle && (
+        <div className="card-pack-title">
+          {optionalTitle}
+        </div>
+      )}
       <div className={`reveal-button-container NoDrag ${showRevealButton ? 'visible' : 'hidden NoMouse'}`}>
-        <ActionButton large fill label='Reveal All' onClick={() => handleRevealAll()} />
+        <ActionButton 
+          large 
+          fill 
+          label={getButtonLabel()} 
+          onClick={handleButtonClick}
+          disabled={isButtonDisabled()}
+          dimmed
+        />
       </div>
     </>
   )
@@ -341,3 +457,4 @@ export const CardPack = ({ onComplete, style, isOpen = false, clickable = true, 
 //TODO connect data
 //TODo adjust toscreen resizing
 //TODO on click of duelist card, go to next duelist card
+//TODO after reveal all, add a button to collapse the duelist, zsoom them out fade out and go back to the scene (call on complete?)

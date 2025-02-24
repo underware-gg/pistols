@@ -127,7 +127,7 @@ const SettingsProvider = ({
       }
       case SettingsActions.TUTORIAL_LEVEL: {
         newState.completedTutorialLevel = action.payload as number
-        newState.hasFinishedTutorial = (newState.completedTutorialLevel >= 2)
+        newState.hasFinishedTutorial = (newState.completedTutorialLevel > 2)
         cookieSetter(SettingsActions.TUTORIAL_LEVEL, newState)
         break
       }

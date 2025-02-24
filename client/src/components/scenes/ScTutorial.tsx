@@ -14,6 +14,9 @@ import * as TWEEN from '@tweenjs/tween.js'
 import { CardPack } from '../ui/CardPack'
 import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
 import { CARD_PACK_SIZE, MAX_TILT } from '/src/data/cardConstants'
+import { useCanClaimWelcomePack } from '/src/hooks/usePistolsContractCalls'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
 export default function ScTutorial({ currentTutorialScene }: { currentTutorialScene: string }) {
   // Scene & Context
@@ -31,6 +34,11 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   const { account } = useAccount()
   const { connect } = useConnectToSelectedNetwork(handleConnectionSuccess)
   const { tutorial } = useDojoSystemCalls()
+
+  // CardPack Data
+  const { duelistIds } = useDuelistsOfPlayer()
+  const { canClaimWelcomePack } = useCanClaimWelcomePack(duelistIds.length)
+
 
   // Tutorial State
   const { duelId: duelIdSimple } = useTutorialLevel(1)
@@ -61,9 +69,9 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       setCurrentSceneData(undefined)
       setCurrentTextIndex(0)
       setCanSkipText(false)
-      setDisplayText(undefined)
-      setFlashOpacity(0)
+      setDisplayText(undefined) 
       setTextOpacity(0)
+      textOpacityRef.current = 0
       setShowTutorialOverlay(false)
       setShowCardPack(false)
       setCardPackClickable(false)
@@ -125,6 +133,11 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
     handleTutorialCreation()
   }, [currentTutorialScene, duelIdSimple, duelIdFull])
 
+  function goToRealDuel(duelistId: number) {
+    //TODO create challenge against bot with matchmaking and navigatge there with a selected duelist 
+    dispatchSetScene(SceneName.Tavern)
+  }
+
   // Helper Functions
   function initializeScene() {
     setCurrentTextIndex(-1)
@@ -167,11 +180,15 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         dispatchSetScene(SceneName.Duel, { duelId: duelIdFull })
         break
       case SceneName.TutorialScene5:
-        animateTextOpacity(0)
-        setShowCardPack(true)
-        setTimeout(() => {
-          setShowTutorialOverlay(true)
-        }, 1000)
+        if (canClaimWelcomePack) {
+          animateTextOpacity(0)
+          setShowCardPack(true)
+          setTimeout(() => {
+            setShowTutorialOverlay(true)
+          }, 1000)
+        } else {
+          dispatchSetScene(SceneName.Tavern)
+        }
         break
     }
   }
@@ -329,7 +346,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       />
 
       {showCardPack && (
-        <CardPack isOpen={showCardPack} clickable={cardPackClickable} cardPackSize={CARD_PACK_SIZE} maxTilt={MAX_TILT} />
+        <CardPack packType={constants.PackType.WelcomePack} isOpen={showCardPack} clickable={cardPackClickable} cardPackSize={CARD_PACK_SIZE} maxTilt={MAX_TILT} onComplete={(selectedDuelistId) => goToRealDuel(selectedDuelistId)} optionalTitle="Choose your Duelist:" />
       )}
     </>
   )

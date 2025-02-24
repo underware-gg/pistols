@@ -1,0 +1,188 @@
+@import 'aspect';
+@import 'color';
+
+.book-container {
+  position: absolute;
+  perspective: aspect-width(100);
+  width: aspect-width(100);
+  height: aspect-height(100);
+  top: 0;
+  left: 0;
+  z-index: 983;
+}
+
+.book-backfill {
+  position: absolute;
+  width: aspect-width(100);
+  height: aspect-height(100);
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  opacity: var(--book-opacity);
+}
+
+.book-container-translate {
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: 50%;
+  top: 50%;
+  transform: translate(var(--book-translate-x), var(--book-translate-y));
+}
+
+.book-container-scale {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transform: scale(var(--book-scale));
+}
+
+
+
+
+.book {
+  position: absolute;
+  width: var(--book-width);
+  height: var(--book-height);
+  transform-style: preserve-3d;
+  transform-origin: center;
+  transform: translate(-50%, -50%) rotateX(var(--book-rotate-x)) rotateY(var(--book-rotate-y));
+
+  .cover-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform: translateZ(var(--cover-translate-z));
+  }
+  
+  .top-cover {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: var(--layer-color);
+    transform-origin: left center;
+    transform: translateX(var(--top-translate-x)) translateZ(var(--top-translate-z)) rotateY(var(--top-rotate-y));
+    border-radius: 0 calc(var(--book-width) * 0.05) calc(var(--book-width) * 0.05) 0;
+    box-shadow:
+      rgba(22, 31, 39, 0.1) 0px 15px 30px -10px,
+      rgba(19, 26, 32, 0.02) 0px 8px 20px -15px;
+    opacity: var(--book-opacity);
+  }
+  
+  .bottom-cover {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-origin: left center;
+    backface-visibility: visible;
+    background: var(--layer-color);
+    border-radius: 0 calc(var(--book-width) * 0.05) calc(var(--book-width) * 0.05) 0;
+    transform: translateZ(var(--bottom-translate-z));
+    box-shadow:
+      rgba(22, 31, 39, 0.1) 0px 15px 30px -10px,
+      rgba(19, 26, 32, 0.02) 0px 8px 20px -15px;
+    opacity: var(--book-opacity);
+  }
+  
+  .spine {
+    position: absolute;
+    width: var(--spine-width);
+    height: 100%;
+    transform-style: preserve-3d;
+    backface-visibility: visible;
+    transform-origin: right center;
+    transform: translateX(calc(-1 * var(--spine-width))) rotateY(var(--spine-rotate-y));
+    direction: rtl;
+    // will-change: transform;
+  }
+  
+  .spine-piece {
+    position: absolute;
+    width: var(--piece-width, aspect-width(0.7));
+    height: 100%;
+    background: var(--layer-color);
+    transform-origin: right center;
+    transform: translateX(var(--piece-translate-x)) translateZ(var(--piece-translate-z)) rotateY(var(--piece-rotate-y));
+    direction: rtl;
+    // will-change: transform;
+    opacity: var(--book-opacity);
+  }
+  
+  .book-sheets {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform-origin: left center;
+    transform: rotateY(var(--book-sheets-rotate-y));
+  }
+  
+  .paper-sheet {
+    position: absolute;
+    width: 96%;
+    height: 92%;
+    left: 0;
+    top: 4%;
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    backface-visibility: visible;
+    background: #f0e6d9;
+    border: 1px solid rgba(89, 54, 31, 0.2);
+    transform: translateX(var(--sheet-translate-x)) translateZ(var(--sheet-translate-z)) rotateY(var(--sheet-rotate-y, 0deg));
+    // will-change: transform;
+    box-shadow:
+      rgba(89, 54, 31, 0.2) 0px 8px 15px -5px,
+      rgba(71, 43, 25, 0.05) 0px 4px 10px -8px;
+    opacity: var(--book-opacity);
+  }
+  
+  .page-content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: var(--book-opacity);
+  }
+  
+  .left-page {
+    transform: rotateY(180deg) translateZ(var(--left-page-translate-z));
+    pointer-events: var(--left-page);
+  }
+  
+  .right-page {
+    transform: translateX(0) translateZ(var(--right-page-translate-z));
+    pointer-events: var(--right-page);
+  }
+  
+  .prev-button, .next-button {
+    position: absolute;
+    bottom: 20px;
+    padding: 8px 16px;
+    background: #a0522d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 10;
+  }
+  
+  .prev-button { left: 20px; }
+  .next-button { right: 20px; }
+  
+  .book-close-button {
+    position: absolute;
+    width: aspect-width(6);
+    height: aspect-width(6);
+    top: aspect-height(0);
+    right: aspect-width(-2);
+    transform: translateZ(aspect-width(5));
+    background: url('/images/ui/duel/card_details/button_exit.png') no-repeat;
+    background-size: cover;
+    transition: transform 0.2s ease;
+  }
+}

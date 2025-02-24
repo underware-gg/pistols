@@ -1,5 +1,6 @@
 
 @import 'aspect';
+@import 'color';
 
 $font-family: 'EB Garamond', serif;
 $font-family-mono: 'Courier Prime', monospace;
@@ -7,21 +8,6 @@ $font-family-mono: 'Courier Prime', monospace;
 
 // Figma colors
 // https://www.figma.com/file/eseZA1jRIoX6IYNtoHgz30/Pistols-at-Ten-Blocks
-$color-bg: #000; //#1e1e1e;
-$color-darkest: #201a18;
-$color-dark: #57493e;
-$color-medium: #ef9758;
-$color-medium-bg: #ce6f2c;
-$color-bright: #c8b6a8;
-$color-brightest: #efe1d7;
-
-$color-white: $color-brightest;
-$color-shadow: $color-bg;
-$color-text: $color-bright;
-$color-link: $color-medium;
-$color-important: $color-medium;
-$color-active: $color-medium;
-$color-inactive: rgba($color-brightest, 0.35);
 $text-shadow: 0.05rem 0.05rem 1px rgba($color-darkest, 0.5);
 $title-shadow: 0.2rem 0.2rem 1px rgba($color-bg, 0.5);
 $ui-border: 6px ridge $color-active;
@@ -31,11 +17,6 @@ $border-hr: solid 0.5px rgba($color-bright, 0.5);
 $border-button: 1px solid $color-bright;
 $border-button-active: 1px solid $color-brightest;
 $border-button-inactive: 1px solid rgba($color-bright, 0.5);
-
-$color-positive: #77d64d;
-$color-negative: #e34a4a;
-$color-warning: #f1d242;
-$color-cold: #4d9ad6;
 
 $game-width: 960px;
 $game-height: 540px;
@@ -300,19 +281,23 @@ canvas {
 
 .Spacer5 {
   width: '100%';
-  min-height: 5px;
+  min-height: aspect-width(0.5);
 }
 .Spacer10 {
   width: '100%';
-  min-height: 10px;
+  min-height: aspect-width(1);
 }
 .Spacer20 {
   width: '100%';
-  min-height: 20px;
+  min-height: aspect-width(2);
+}
+.Spacer30 {
+  width: '100%';
+  min-height: aspect-width(3);
 }
 .Spacer50 {
   width: '100%';
-  min-height: 50px;
+  min-height: aspect-width(5);
 }
 
 .Hidden {
@@ -767,7 +752,7 @@ $ui-container-gap: 1em;
 }
 
 #Door .UIPage {
-  padding: 0 aspect-width(6) aspect-width(6) aspect-width(6)!important;
+  padding: 0 aspect-width(6) aspect-width(2) aspect-width(6)!important;
   margin: 0!important;
   align-content: center;
   height: 100%;
