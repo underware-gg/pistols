@@ -19,9 +19,9 @@ build-external-contracts = [
 ]
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.2.0" }
-# achievement = { git = "https://github.com/cartridge-gg/arcade", tag = "v1.2.0" }
-achievement = { git = "https://github.com/rsodre/arcade", branch = "dojo_v1.2.0" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.2.1" }
+achievement = { git = "https://github.com/cartridge-gg/arcade", tag = "v1.2.1" }
+# achievement = { git = "https://github.com/rsodre/arcade", branch = "dojo_v1.2.1" }
 graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
 openzeppelin_token = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
 openzeppelin_introspection = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
@@ -31,7 +31,7 @@ openzeppelin_introspection = { git = "https://github.com/underware-gg/cairo-cont
 
 [dev-dependencies]
 cairo_test = "=2.9.2"
-dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.2.0" }
+dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.2.1" }
 # openzeppelin_account = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
 
 [features]
