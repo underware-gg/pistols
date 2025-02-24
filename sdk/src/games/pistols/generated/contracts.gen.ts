@@ -1931,26 +1931,26 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_bank_releaseLordsFromFameToBeBurned_calldata = (bills: Array<LordsReleaseBill>): DojoCall => {
-		return {
-			contractName: "bank",
-			entrypoint: "release_lords_from_fame_to_be_burned",
-			calldata: [bills],
-		};
-	};
+	// const build_bank_releaseLordsFromFameToBeBurned_calldata = (bills: Array<LordsReleaseBill>): DojoCall => {
+	// 	return {
+	// 		contractName: "bank",
+	// 		entrypoint: "release_lords_from_fame_to_be_burned",
+	// 		calldata: [bills],
+	// 	};
+	// };
 
-	const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, bills: Array<LordsReleaseBill>) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_bank_releaseLordsFromFameToBeBurned_calldata(bills),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
+	// const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, bills: Array<LordsReleaseBill>) => {
+	// 	try {
+	// 		return await provider.execute(
+	// 			snAccount,
+	// 			build_bank_releaseLordsFromFameToBeBurned_calldata(bills),
+	// 			"pistols",
+	// 		);
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 		throw error;
+	// 	}
+	// };
 
 	const build_bank_releaseSeasonPool_calldata = (tableId: BigNumberish): DojoCall => {
 		return {
@@ -2011,7 +2011,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+  const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>): DojoCall => {
 		return {
 			contractName: "rng",
 			entrypoint: "reseed",
@@ -2019,7 +2019,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+  const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
 		try {
 			return await provider.call("pistols", build_rng_reseed_calldata(seed, salt, mocked));
 		} catch (error) {
@@ -2028,7 +2028,7 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+	const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>): DojoCall => {
 		return {
 			contractName: "rng_mock",
 			entrypoint: "reseed",
@@ -2036,7 +2036,7 @@ export function setupWorld(provider: DojoProvider) {
 		};
 	};
 
-	const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+  const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
 		try {
 			return await provider.call("pistols", build_rng_mock_reseed_calldata(seed, salt, mocked));
 		} catch (error) {
@@ -3305,8 +3305,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildDuelistLostFameToPoolCalldata: build_bank_duelistLostFameToPool_calldata,
 			pegMintedFameToPurchasedLords: bank_pegMintedFameToPurchasedLords,
 			buildPegMintedFameToPurchasedLordsCalldata: build_bank_pegMintedFameToPurchasedLords_calldata,
-			releaseLordsFromFameToBeBurned: bank_releaseLordsFromFameToBeBurned,
-			buildReleaseLordsFromFameToBeBurnedCalldata: build_bank_releaseLordsFromFameToBeBurned_calldata,
+			// releaseLordsFromFameToBeBurned: bank_releaseLordsFromFameToBeBurned,
+			// buildReleaseLordsFromFameToBeBurnedCalldata: build_bank_releaseLordsFromFameToBeBurned_calldata,
 			releaseSeasonPool: bank_releaseSeasonPool,
 			buildReleaseSeasonPoolCalldata: build_bank_releaseSeasonPool_calldata,
 			sponsorDuelists: bank_sponsorDuelists,
