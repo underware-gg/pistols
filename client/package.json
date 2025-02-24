@@ -17,7 +17,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "generate-constants": "npx --package=@underware_gg/pistols-sdk generate-constants --src:\"../dojo/src\" --out:\"$npm_config_sdk/generated/constants.ts\"",
-    "generate-controller-preset": "npx --package=@underware_gg/pistols-sdk generate-controller-preset --out:\"$npm_config_sdk/generated/config.json\""
+    "generate-controller-preset": "npx --package=@underware_gg/pistols-sdk generate-controller-preset --out:\"$npm_config_sdk/generated/preset.json\""
   },
   "keywords": [
     "pistols at dawn",

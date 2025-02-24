@@ -113,8 +113,8 @@ if [[ "$PROFILE" == "dev" ]]; then
   echo "------------------------------------------------------------------------------"
   echo ">>> Generate controller preset..."
   # npm run generate-controller-preset --sdk=../sdk/src/games/pistols
-  # npx --package=@underware_gg/pistols-sdk generate-controller-preset --out:"../sdk/src/games/pistols/generated/config.json"
-  # ../sdk/dist/bin/generateControllerPreset.mjs --out:"../sdk/src/games/pistols/generated/config.json"
+  # npx --package=@underware_gg/pistols-sdk generate-controller-preset --out:"../sdk/src/games/pistols/generated/preset.json"
+  # ../sdk/dist/bin/generateControllerPreset.mjs --out:"../sdk/src/games/pistols/generated/preset.json"
   execute_command "npm run generate-controller-preset --sdk=$SDK_GAME_PATH"
   echo "👍?"
   #

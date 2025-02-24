@@ -14,7 +14,7 @@
   },
   "policies": {
     "contracts": {
-      "0x0083d17b50f055aa563709ca793fc2131bed0503da090f2ce7828382a2fe8042": {
+      "0x05806644787a0554ebcc12a7910aab6ce3c6ff54a088a29d99c07b25b75a9ceb": {
         "name": "Game",
         "description": "Game loop contract",
         "methods": [
@@ -25,26 +25,11 @@
             "entrypoint": "reveal_moves"
           },
           {
-            "entrypoint": "collect"
+            "entrypoint": "collect_season"
           }
         ]
       },
-      "0x00532539b4f53628e9843be4572f68f4b52c09a2e6089735386b56c28bdda502": {
-        "name": "Tutorial",
-        "description": "Tutorial game contract",
-        "methods": [
-          {
-            "entrypoint": "create_tutorial"
-          },
-          {
-            "entrypoint": "commit_moves"
-          },
-          {
-            "entrypoint": "reveal_moves"
-          }
-        ]
-      },
-      "0x0361f8b20465186029ac361ac7448210543607b47bfdc268e75ef889ad67d621": {
+      "0x068e480abb86a8a3551ffe759c917405151232d6c1f196c13e28382b1e9adde3": {
         "name": "Pack token",
         "description": "Packs ERC721 contract",
         "methods": [
@@ -59,7 +44,7 @@
           }
         ]
       },
-      "0x0738ce44319e86b73bd0b9006e2609b549e53c7330bb97dec3bfc160d95bbf13": {
+      "0x04bda40caab0c57dadf1b6e3c00361d290bd2ed08ee24aba0fe6dd0f5208cfc2": {
         "name": "Duel token",
         "description": "Duel ERC721 contract",
         "methods": [
@@ -68,9 +53,21 @@
           },
           {
             "entrypoint": "reply_duel"
+          }
+        ]
+      },
+      "0x00924dd4997108609a926f31f39ad8c69f6441e3b75f8bb1ac304668eddd3ba6": {
+        "name": "Bank",
+        "description": "Bank contract",
+        "methods": [
+          {
+            "entrypoint": "sponsor_duelists"
           },
           {
-            "entrypoint": "transfer_to_winner"
+            "entrypoint": "sponsor_season"
+          },
+          {
+            "entrypoint": "sponsor_tournament"
           }
         ]
       }
