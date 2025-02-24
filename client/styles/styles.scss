@@ -1,5 +1,6 @@
 
 @import 'aspect';
+@import 'color';
 
 $font-family: 'EB Garamond', serif;
 $font-family-mono: 'Courier Prime', monospace;
@@ -7,21 +8,6 @@ $font-family-mono: 'Courier Prime', monospace;
 
 // Figma colors
 // https://www.figma.com/file/eseZA1jRIoX6IYNtoHgz30/Pistols-at-Ten-Blocks
-$color-bg: #000; //#1e1e1e;
-$color-darkest: #201a18;
-$color-dark: #57493e;
-$color-medium: #ef9758;
-$color-medium-bg: #ce6f2c;
-$color-bright: #c8b6a8;
-$color-brightest: #efe1d7;
-
-$color-white: $color-brightest;
-$color-shadow: $color-bg;
-$color-text: $color-bright;
-$color-link: $color-medium;
-$color-important: $color-medium;
-$color-active: $color-medium;
-$color-inactive: rgba($color-brightest, 0.35);
 $text-shadow: 0.05rem 0.05rem 1px rgba($color-darkest, 0.5);
 $title-shadow: 0.2rem 0.2rem 1px rgba($color-bg, 0.5);
 $ui-border: 6px ridge $color-active;
@@ -31,11 +17,6 @@ $border-hr: solid 0.5px rgba($color-bright, 0.5);
 $border-button: 1px solid $color-bright;
 $border-button-active: 1px solid $color-brightest;
 $border-button-inactive: 1px solid rgba($color-bright, 0.5);
-
-$color-positive: #77d64d;
-$color-negative: #e34a4a;
-$color-warning: #f1d242;
-$color-cold: #4d9ad6;
 
 $game-width: 960px;
 $game-height: 540px;
@@ -300,19 +281,23 @@ canvas {
 
 .Spacer5 {
   width: '100%';
-  min-height: 5px;
+  min-height: aspect-width(0.5);
 }
 .Spacer10 {
   width: '100%';
-  min-height: 10px;
+  min-height: aspect-width(1);
 }
 .Spacer20 {
   width: '100%';
-  min-height: 20px;
+  min-height: aspect-width(2);
+}
+.Spacer30 {
+  width: '100%';
+  min-height: aspect-width(3);
 }
 .Spacer50 {
   width: '100%';
-  min-height: 50px;
+  min-height: aspect-width(5);
 }
 
 .Hidden {
@@ -767,7 +752,7 @@ $ui-container-gap: 1em;
 }
 
 #Door .UIPage {
-  padding: 0 aspect-width(6) aspect-width(6) aspect-width(6)!important;
+  padding: 0 aspect-width(6) aspect-width(2) aspect-width(6)!important;
   margin: 0!important;
   align-content: center;
   height: 100%;
@@ -859,6 +844,7 @@ $ui-container-gap: 1em;
 }
 .ProfilePicSquare {
   max-width: aspect-width(6)!important; // avoids not taking space in flex
+  max-height: aspect-width(6)!important;
   width: aspect-width(6);
   height: aspect-width(6);
   // border: $border-button-inactive;
@@ -867,13 +853,14 @@ $ui-container-gap: 1em;
 }
 .ProfilePicMedium {
   @extend .ProfilePicSquare;
-  max-width: 60px!important;
+  max-width: aspect-width(4) !important;
+  max-height: aspect-width(4) !important;
   width: aspect-width(4);
   height: aspect-width(4);
   border: none;
 }
 .ProfilePicMediumWidth {
-  width: 60px!important;
+  width: aspect-width(4)!important;
 }
 .ProfilePicCircle {
   width: aspect-width(7.5);
@@ -1360,7 +1347,7 @@ $ui-container-gap: 1em;
 .IconNoClick {
   color: $color-bright;
 	text-shadow: 0.1rem 0.1rem $color-shadow;
-  z-index: 1000;
+  z-index: 970;
 }
 .IconClick {
   @extend .IconNoClick, .Anchor;
@@ -1501,51 +1488,72 @@ $logo-url: '/logos/logo_avante.svg';
   @extend .AboveAll;
 }
 
-.TempBarkeepTalkBalloon {
+.DialogBalloon {
   width: aspect-width(25);
   height: auto;
   min-height: aspect-width(6.25);
-  border: aspect-width(0.1875) solid $color-dark;
-  background-color: $color-bright;
+  border: aspect-width(0.1875) solid var(--border-color);
+  background-color: var(--bg-color);
   color: $color-darkest;
   position: absolute;
-  top: 20%;
-  left: 25%;
+  top: 10%;
+  left: 20%;
   padding: aspect-width(0.4);
   font-size: aspect-width(1.6);
   text-shadow: $text-shadow;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -moz-border-radius: aspect-width(0.625);
-  -webkit-border-radius: aspect-width(0.625);
   border-radius: aspect-width(0.625);
+  z-index: 999;
+
+  &:before {
+    content:"";
+    position: absolute;
+    right: aspect-width(-1.875);
+    top: aspect-width(4.8125);
+    border-top: aspect-width(0.9375) solid transparent;
+    border-left: aspect-width(1.875) solid var(--border-color);
+    border-bottom: aspect-width(0) solid transparent;
+  }
+  
+  &:after {
+    content:"";
+    position: absolute;
+    right: aspect-width(-1.24);
+    top: aspect-width(5);
+    border-top: aspect-width(0.625) solid transparent;
+    border-left: aspect-width(1.25) solid var(--bg-color);
+    border-bottom: aspect-width(0) solid transparent;
+  }
+
+  .DialogBalloonText {
+    margin: aspect-width(2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 0;
+  }
 }
 
-.TempBarkeepTalkBalloon:before {
-  content:"";
-  position: absolute;
-  right: aspect-width(-1.875);
-  top: aspect-width(4.8125);
-  border-top: aspect-width(0.9375) solid transparent;
-  border-left: aspect-width(1.875) solid $color-dark;
-  border-bottom: aspect-width(0) solid transparent;
-}
-
-.TempBarkeepTalkBalloon:after {
-  content:"";
-  position: absolute;
-  right: aspect-width(-1.24);
-  top: aspect-width(5);
-  border-top: aspect-width(0.625) solid transparent;
-  border-left: aspect-width(1.25) solid $color-bright;
-  border-bottom: aspect-width(0) solid transparent;
+// For backwards compatibility
+.TempBarkeepTalkBalloon {
+  @extend .DialogBalloon;
+  --bg-color: #{$color-bright};
+  --border-color: #{$color-dark};
 }
 
 .TempBarkeepTalkBalloonText {
-  margin: aspect-width(2);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-height: 0;
+  @extend .DialogBalloonText;
+}
+
+.DemonTalkBaloon {
+  @extend .DialogBalloon;
+  top: 20%;
+  left: 5%;
+  font-size: aspect-width(2);
+  color: $color-bright;
+  z-index: 800;
+  --bg-color: #{$color-dark};
+  --border-color: #{$color-darkest};
 }
 
 .DialogOptionsContainer {
@@ -2238,4 +2246,276 @@ a.active.step:hover,
 .modal {
   position: fixed; /* Ensures the modal is fixed to the viewport */
   z-index: 9999 !important; /* High z-index to ensure it is on top */
+}
+
+.animated-character {
+  opacity: 0;
+  animation: bounceInDown 1s forwards;
+}
+
+.fadeIn{
+  opacity: 0;
+  -webkit-animation: fadeIn 0.2s;
+  animation: fadeIn 0.2s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+
+
+
+
+
+
+.tutorialDialogContainer {
+  position: absolute;
+  bottom: 0;
+  width: aspect-width(100);
+  height: aspect-height(25);
+  display: flex;
+  flex-direction: column;
+  background-color: #000a;
+}
+
+.tutorialTextBackground {
+  position: absolute;
+  top: 0;
+  width: aspect-width(80);
+  height: aspect-height(30);
+  margin: 0 aspect-width(10);
+  background: radial-gradient(ellipse 70% 150% at 50% -10%, rgba(0,0,0,0.7) 0%, transparent 70%);
+  mask-image: linear-gradient(to top, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
+  z-index: 0;
+}
+
+.tutorialContent {
+  z-index: 1;
+}
+
+.speakerName {
+  height: aspect-height(7);
+  color: $color-warning;
+  font-weight: bold;
+  font-size: aspect-width(1.7);
+  padding: aspect-width(1);
+  text-align: center;
+}
+
+.tutorialDivider {
+  width: aspect-width(50);
+  height: aspect-height(0.1);
+  margin: 0 aspect-width(25);
+  background: $color-warning;
+}
+
+.textContainer {
+  max-width: aspect-width(60);
+  // background-color: #000;
+  font-size: aspect-width(1.5);
+  font-weight: 500;
+  margin: 0 auto;
+  text-align: center;
+  padding: aspect-width(1);
+}
+
+.indicator {
+  text-align: center;
+  font-size: aspect-width(1.5);
+  color: $color-warning;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  animation: blink 1s infinite;
+}
+
+.nextButton {
+  position: absolute;
+  bottom: aspect-width(1);
+  right: aspect-width(1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: aspect-width(0.5);
+  cursor: pointer;
+  transition: all 200ms ease;
+  transform: scale(1);
+}
+
+.nextButton:hover {
+  transform: scale(1.1);
+}
+
+.nextText {
+  font-size: calc(0.8vw + 0.8vh);
+  text-transform: uppercase;
+  color: white;
+}
+
+.nextIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: aspect-width(2);
+  height: aspect-height(2);
+  background-color: #333;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+  }
+}
+
+.nextIcon .svg {
+  width: 90%;
+  height: 90%;
+  fill: white;
+}
+
+
+@keyframes blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+
+// client/src/components/ui/duel/DuelTutorialOverlay.module.scss
+
+.tutorialOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.tutorialBackground {
+  position: absolute;
+  width: aspect-width(100);
+  height: aspect-height(100);
+  background-color: rgba(39, 17, 11, 0.7);
+  filter: brightness(0) saturate(100%) invert(0) sepia(1) hue-rotate(0deg) brightness(0.6) contrast(1);
+}
+
+.tutorialContainer {
+  width: aspect-width(80);
+  height: aspect-height(80);
+  background: url('/images/ui/duel/card_details/box_left.png') no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+  background-color: rgba(0, 0, 0, 0);
+  padding: aspect-width(2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tutorialTitle {
+  min-height: aspect-height(5);
+  font-size: aspect-width(1.8);
+  font-weight: 600;
+  color: $color-warning;
+  transition: opacity 0.3s ease;
+  text-transform: uppercase;
+  margin: 0 0;
+}
+
+.tutorialImage {
+  width: aspect-width(50);
+  height: aspect-height(50);
+  transition: opacity 0.3s ease;
+}
+
+.tutorialText {
+  max-width: aspect-width(60);
+  min-height: aspect-height(12);
+  max-height: aspect-height(12);
+  font-size: aspect-width(1.1);
+  overflow-y: hidden;
+  color: white;
+  text-align: center;
+  transition: opacity 0.3s ease;
+  margin: aspect-width(0.6) 0;
+  // -webkit-line-clamp: 4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.tutorialNavigationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+}
+
+.tutorialDotsContainer {
+  display: flex;
+  gap: aspect-width(0.5);
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.tutorialDot {
+  width: aspect-width(1.2);
+  height: aspect-width(1.2);
+  transition: background-color 0.3s ease;
+  border-radius: 50%;
+}
+
+.tutorialDotActive {
+  background-color: $color-warning;
+  border: aspect-width(0.2) solid #ff8c00;
+}
+
+.tutorialDotPassed {
+  background-color: #b8860b;
+}
+
+.tutorialDotFuture {
+  background-color: #4a4a4a;
+}
+
+.tutorialButton {
+  color: $color-warning;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: aspect-width(1);
+  transition: color 0.3s ease, transform 0.3s ease;
+  outline: none;
+  &:focus {
+    outline: none;
+    border: none;
+  }
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.tutorialButtonDisabled {
+  color: #4a4a4a;
+  cursor: not-allowed;
 }

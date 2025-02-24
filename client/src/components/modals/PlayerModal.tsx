@@ -13,7 +13,7 @@ import { PlayerDescription } from '/src/components/account/PlayerDescription'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { AddressShort } from '/src/components/ui/AddressShort'
-import { DuelistItem } from '/src/components/account/AccountHeader'
+// import { DuelistItem } from '/src/components/account/AccountHeader'
 import { BookmarkIcon } from '/src/components/ui/Icons'
 import { SceneName } from '/src/data/assets'
 import { useTableId } from '/src/stores/configStore'
@@ -53,7 +53,7 @@ export default function PlayerModal() {
     return duelistIds.map((duelistId) => (
       <Row key={`duelist-${duelistId}`} columns='equal'>
         <Col className='H3 Anchor DuelistItem' onClick={() => _gotoDuelist(duelistId)} >
-          <DuelistItem duelistId={duelistId} />
+          {/* <DuelistItem duelistId={duelistId} /> */}
         </Col>
       </Row>
     ))
@@ -122,7 +122,7 @@ export function ChallengeButton({
 }: {
   challengedPlayerAddress: BigNumberish,
 }) {
-  const { dispatchChallengingPlayerAddress, dispatchSelectDuel } = usePistolsContext()
+  const { dispatchChallengingPlayerAddress, dispatchSetDuel } = usePistolsContext()
   const { address } = useAccount()
   const { duelistId } = useSettings()
   const { tableId } = useTableId()
@@ -133,6 +133,6 @@ export function ChallengeButton({
   if (!hasPact) {
     return <ActionButton large fill disabled={!canChallenge} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(challengedPlayerAddress)} />
   } else {
-    return <ActionButton large fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />
+    return <ActionButton large fill important label='Challenge In Progress!' onClick={() => dispatchSetDuel(pactDuelId)} />
   }
 }

@@ -51,7 +51,8 @@ export interface DuelistCardHandle {
     translateY: number
     rotation: number
     scale: number
-  }
+  },
+  duelistId: number
 }
 
 export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((props: DuelistCardProps, ref: React.Ref<DuelistCardHandle>) => {
@@ -121,6 +122,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       rotation: rotationRef.current.rotation,
       scale: scaleRef.current.scale
     }),
+    duelistId: props.duelistId
   }))
 
   useEffect(() => {
@@ -201,6 +203,9 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
         .onUpdate((value) => {
           const innerElement = cardRef.current?.querySelector('.card-inner') as HTMLElement
           innerElement?.style.setProperty('--card-flip-rotation', `${value.rotation}deg`);
+
+          const cardOutline = cardBackgroundRef.current?.querySelector('.card-outline') as HTMLElement
+          cardOutline?.style.setProperty('--card-flip-rotation', `${value.rotation}deg`);
         })
         .start()
     }

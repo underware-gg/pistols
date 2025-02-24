@@ -7,6 +7,7 @@ import { useEffectOnce, usePlayerId } from '@underware_gg/pistols-sdk/utils/hook
 import { DojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { Header } from '/src/components/Header'
+import { SceneName } from '/src/data/assets'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppGame from '/src/components/AppGame'
@@ -20,17 +21,18 @@ import WalletFinderModal from '/src/components/modals/WalletFinderModal'
 import ActivityPanel from '/src/components/ActivityPanel'
 import ScProfile from '/src/components/scenes/ScProfile'
 import ScTavern from '/src/components/scenes/ScTavern'
-import ScDuels from '/src/components/scenes/ScDuels'
+import ScDuelsBoard from '/src/components/scenes/ScDuelsBoard'
 import ScDuelists from '/src/components/scenes/ScDuelists'
 import ScGraveyard from '/src/components/scenes/ScGraveyard'
 import ScTutorial from '/src/components/scenes/ScTutorial'
 import StoreSync from '/src/stores/sync/StoreSync'
 import Gate from '/src/components/scenes/ScGate'
 import Door from '/src/components/scenes/ScDoor'
-import Duel from '/src/components/scenes/Duel'
 
 // test sdk
 import { helloPistols } from '@underware_gg/pistols-sdk'
+import Duel from '../components/scenes/Duel'
+
 helloPistols();
 
 export default function MainPage() {
@@ -42,7 +44,7 @@ export default function MainPage() {
   usePistolsSceneFromRoute()
   useSetPageTitle()
 
-  const overlay = useMemo(() => <div id="game-black-overlay" className='NoMouse NoDrag' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'black', opacity: 1, pointerEvents: 'none', zIndex: 5 }}></div>, [])
+  const overlay = useMemo(() => <div id="game-black-overlay" className='NoMouse NoDrag' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'black', opacity: 1, pointerEvents: 'none', zIndex: 981 }}></div>, [])
 
   useEffectOnce(() => console.log(`---------------- MAIN PAGE MOUNTED`), [])
 
@@ -53,8 +55,8 @@ export default function MainPage() {
         <GameContainer isVisible={true} />
         <MainUI />
         <Modals />
-        {overlay}
         <ActivityPanel />
+        {overlay}
         <Header />
         <CurrentChainHint />
         <MouseToolTip />
@@ -71,8 +73,8 @@ function MainUI() {
   useSyncSelectedDuelist()
 
   const { gameImpl } = useThreeJsContext()
-  const { selectedDuelId } = usePistolsContext()
-  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuels, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
+  const { currentDuel, tutorialLevel } = usePistolsContext()
+  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
   useEffect(() => {
@@ -80,16 +82,16 @@ function MainUI() {
       if (atGate) setCurrentScene(<Gate />);
       else if (atDoor) setCurrentScene(<Door />);
       else if (atTutorial) setCurrentScene(<TutorialUI />);
-      else if (atDuel && selectedDuelId) setCurrentScene(<Duel duelId={selectedDuelId} />);
+      else if (atDuel && currentDuel > 0n) setCurrentScene(<Duel duelId={currentDuel} tutorial={tutorialLevel} />);
       else if (atProfile) setCurrentScene(<ScProfile />);
-      else if (atDuels) setCurrentScene(<ScDuels />);
+      else if (atDuelsBoard) setCurrentScene(<ScDuelsBoard />);
       else if (atDuelists) setCurrentScene(<ScDuelists />);
       else if (atGraveyard) setCurrentScene(<ScGraveyard />);
       else setCurrentScene(<ScTavern />);
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [atGate, atDoor, atTutorial, atDuel, selectedDuelId, atProfile, atDuels, atDuelists, atGraveyard, atTavern]);
+  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atGraveyard, currentDuel]);
 
   if (!gameImpl) return <></>
 
@@ -99,17 +101,22 @@ function MainUI() {
 function TutorialUI({
 }) {
   const { gameImpl } = useThreeJsContext()
-  const { atTutorial, currentScene } = usePistolsScene()
+  const { atTutorial, currentScene, wasLastSceneTutorial } = usePistolsScene()
 
   const [currentTutorialScene, setCurrentTutorialScene] = useState<string>("");
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (atTutorial) {
+    let timer
+    if (!wasLastSceneTutorial && atTutorial) {
+      timer = setTimeout(() => {
         setCurrentTutorialScene(currentScene);
-      }
-    }, SCENE_CHANGE_ANIMATION_DURATION);
-
+      }, SCENE_CHANGE_ANIMATION_DURATION / 5);
+    } else if (atTutorial && wasLastSceneTutorial) {
+      timer = setTimeout(() => {
+        setCurrentTutorialScene(currentScene);
+      }, SCENE_CHANGE_ANIMATION_DURATION);
+    }
+    
     return () => clearTimeout(timer);
   }, [atTutorial, currentScene]);
 
@@ -125,6 +132,7 @@ function Modals() {
   const duelistIsOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
   const playerIsOpen = useMemo(() => (selectedPlayerAddress > 0n), [selectedPlayerAddress])
   const newChallengeIsOpen = useMemo(() => (challengingAddress > 0n), [challengingAddress])
+  
   return (
     <>
       {challengeIsOpen && <ChallengeModal />}

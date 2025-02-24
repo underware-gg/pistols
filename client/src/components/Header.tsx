@@ -36,8 +36,22 @@ export function Header() {
   const { tableOpener } = usePistolsContext()
   const { description } = useTable(tableId)
 
-  const { atDuel, atGate, atDoor, atProfile, atTavern } = usePistolsScene()
+  const { atDuel, atGate, atDoor, atProfile, atTavern, atTutorial } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
+
+  const [show, setShow] = useState(false);
+  
+  useEffect(() => {
+    const shouldShow = !atGate && !atDoor && !atTutorial;
+    if (!shouldShow) {
+      setShow(false);
+    } else {
+      const timer = setTimeout(() => {
+        setShow(true);
+      }, SCENE_CHANGE_ANIMATION_DURATION);
+      return () => clearTimeout(timer);
+    }
+  }, [atGate, atDoor, atTutorial]);
 
   const _changeTable = () => {
     tableOpener.open()
@@ -48,11 +62,11 @@ export function Header() {
   }
 
   return (
-    <div className='NoMouse NoDrag NoSelection' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
-      {!atGate && !atDoor &&
+    <div className='NoMouse NoDrag NoSelection' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 982 }}>
+      {show &&
         <>
           <div className='UIHeader NoMouse NoDrag NoSelection' style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <CurtainUI visible={!atTavern} short={true} />
+            <CurtainUI visible={!atTavern && !atTutorial} short={true} />
             <BannerButton button={<MusicToggle size='big' />} visible={atTavern} />
           </div>
           <Image className='NoMouse NoDrag NoSelection' src='/images/ui/tavern/wooden_corners.png' style={{ position: 'absolute' }} />
@@ -155,7 +169,7 @@ function CurtainUI({
   visible?: boolean
 }) {
 
-  const { atProfile, atDuelists, atDuels, atGraveyard } = usePistolsScene()
+  const { atProfile, atDuelists, atDuelsBoard, atGraveyard } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
   const {
     walletFinderOpener,
@@ -384,7 +398,7 @@ function CurtainUI({
             </div>
           </div>
         </div>}
-        {atDuels && <div style={{width: '90%'}}>
+        {atDuelsBoard && <div style={{width: '90%'}}>
           <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
             <FilterDuelistName  />
             <FilterButton label='Show All Live Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />

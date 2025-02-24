@@ -7,7 +7,7 @@ import { useCanClaimWelcomePack } from '/src/hooks/usePistolsContractCalls'
 import { useMintMockLords } from '/src/hooks/useMintMockLords'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { ClaimDuelistsButton, ConnectButton, EnterAsGuestButton } from '/src/components/scenes/ScDoor'
+import { ConnectButton, EnterAsGuestButton } from '/src/components/scenes/ScDoor'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { PublishOnlineStatusButton } from '/src/stores/sync/PlayerOnlineSync'
@@ -17,11 +17,42 @@ import { Divider } from '/src/components/ui/Divider'
 import { VStack } from '/src/components/ui/Stack'
 import ShopModal from '/src/components/modals/ShopModal'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
+import { DuelistsBook } from '../ui/DuelistsBook'
+import { useGameEvent } from '/src/hooks/useGameEvent'
+import { _currentScene } from '/src/three/game'
+import { InteractibleScene } from '/src/three/InteractibleScene'
 
 export default function ScProfile() {
   const { isConnected } = useAccount()
   const { debugMode } = useSettings()
-  const { shopOpener } = usePistolsContext()
+  const { shopOpener, bookOpener, cardPackOpener } = usePistolsContext()
+
+  const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
+  const { dispatchSetScene } = usePistolsScene()
+
+  useEffect(() => {
+    if (itemClicked) {
+      switch (itemClicked) {
+        case 'book':
+          bookOpener.open();
+          (_currentScene as InteractibleScene).setClickable(false);
+          break
+        case 'chest':
+          console.log('chest')
+          shopOpener.open({ packType: constants.PackType.Duelists5x })
+          break
+      }
+    }
+  }, [itemClicked, timestamp])
+
+  useEffect(() => {
+    if (bookOpener.isOpen || shopOpener.isOpen) {
+      (_currentScene as InteractibleScene).setClickable(false);
+    } else {
+      (_currentScene as InteractibleScene).setClickable(true);
+    }
+  }, [bookOpener.isOpen, shopOpener.isOpen])
 
   // auto mint mock lords on testnets
   useMintMockLords()
@@ -43,14 +74,25 @@ export default function ScProfile() {
           ]}
         >
         </Tab> */}
-        {isConnected ? <DuelistsList /> : <DuelistsConnect />}
+        {/* {isConnected ? <DuelistsList /> : <DuelistsConnect />} */}
+        <DuelistsBook 
+          opener={bookOpener}
+          width={30} 
+          height={40}
+          bookTranslateXClosed={-16}
+          bookTranslateYClosed={18}
+          bookRotateXClosed={60}
+          bookRotateYClosed={0}
+          bookRotateZClosed={-30}
+          bookRotateXOpen={20}
+        />
       </div>
 
       <ShopModal opener={shopOpener} />
 
       {(debugMode || true) && <>
         <PublishOnlineStatusButton />
-        <TutorialProgressDebug />
+        {/* <TutorialProgressDebug /> */}
       </>}
     </div>
   )
@@ -211,4 +253,30 @@ function DuelistsList() {
       </div>
     </div>
   )
+}
+
+export function ClaimDuelistsButton() {
+  const { account } = useAccount()
+  const { pack_token } = useDojoSystemCalls()
+  const { dispatchDuelistId } = useSettings()
+  const { dispatchSetScene } = usePistolsScene()
+  const { duelistIds } = useDuelistsOfPlayer()
+  const { canClaimWelcomePack } = useCanClaimWelcomePack(duelistIds.length)
+  const [isClaiming, setIsClaiming] = useState(false)
+
+  const _claim = async () => {
+    if (canClaimWelcomePack) {
+      setIsClaiming(true)
+      await pack_token.claim_welcome_pack(account)
+    }
+  }
+
+  useEffect(() => {
+    if (canClaimWelcomePack === false && isClaiming) {
+      dispatchDuelistId(duelistIds[0])
+      dispatchSetScene(SceneName.Profile)
+    }
+  }, [canClaimWelcomePack, duelistIds, isClaiming])
+
+  return <ActionButton large fill important disabled={false} onClick={_claim} label='Claim your Duelists' />
 }

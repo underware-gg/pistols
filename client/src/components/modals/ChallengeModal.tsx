@@ -32,7 +32,7 @@ export default function ChallengeModal() {
   const { account } = useAccount()
 
   const { atDuel, dispatchSetScene } = usePistolsScene()
-  const { selectedDuelId, dispatchSelectDuel, dispatchSelectDuelistId } = usePistolsContext()
+  const { selectedDuelId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchSetDuel } = usePistolsContext()
   const isOpen = useMemo(() => (selectedDuelId > 0 && !atDuel), [selectedDuelId, atDuel])
 
   const _close = () => { dispatchSelectDuel(0n) }
@@ -71,7 +71,7 @@ export default function ChallengeModal() {
   }
 
   const _gotoDuel = () => {
-    dispatchSetScene(SceneName.Duel)
+    dispatchSetScene(SceneName.Duel, { duelId: selectedDuelId })
   }
 
   // bookmark

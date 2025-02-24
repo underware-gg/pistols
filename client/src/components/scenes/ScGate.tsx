@@ -4,7 +4,7 @@ import { SceneName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { TavernAudios } from '/src/components/GameContainer'
 import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
-
+import Logo from '/src/components/Logo'
 export default function ScGate() {
   const { tableOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
@@ -29,12 +29,16 @@ export default function ScGate() {
 
   return (
     <>
+      <div style={{ position: 'absolute', left: '4%', bottom: '6%',zIndex: 1 }}>
+        <Logo width={12} showName square />
+      </div>
 
       <TavernAudios />
       {/* <BarkeepModal /> */}
 
       <DojoSetupErrorDetector />
       {/* <ConnectionDetector /> */}
+
     </>
   )
 }

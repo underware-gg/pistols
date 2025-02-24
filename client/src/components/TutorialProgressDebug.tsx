@@ -9,6 +9,7 @@ export function TutorialProgressDebug() {
       <TutorialProgressButton level={0} label='Tutorial: Not Started' />
       <TutorialProgressButton level={1} label='Level 1' />
       <TutorialProgressButton level={2} label='Level 2' />
+      <TutorialProgressButton level={3} label='Level 3' />
     </ButtonGroup>
   )
 }

@@ -1,52 +1,28 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Grid } from 'semantic-ui-react'
+import React, { useEffect, useState } from 'react'
 import { VStack } from '/src/components/ui/Stack'
 import { useEffectOnce } from '@underware_gg/pistols-sdk/utils/hooks'
-import { useDojoStatus, useDojoSystemCalls, useConnectToSelectedNetwork } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoStatus, useConnectToSelectedNetwork } from '@underware_gg/pistols-sdk/dojo'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
+import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { useCanClaimWelcomePack } from '/src/hooks/usePistolsContractCalls'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { Divider } from '/src/components/ui/Divider'
 import { PACKAGE_VERSION } from '/src/utils/constants'
-import { useIsMyDuelist } from '/src/hooks/useIsYou'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { SceneName } from '/src/data/assets'
 import Logo from '/src/components/Logo'
 
-const Row = Grid.Row
-const Col = Grid.Column
-
 export default function ScDoor() {
-  const { isConnected } = useAccount()
-
-  const { dispatchSelectDuel } = usePistolsContext()
-  const { dispatchDuelistId, duelistId } = useSettings()
-  const { dispatchSetScene } = usePistolsScene()
-  const { duelistIds } = useDuelistsOfPlayer()
-  const isMyDuelist = useIsMyDuelist(duelistId)
-
   const { isReady } = useDojoStatus()
-  
-  const [visibleChars, setVisibleChars] = useState<string[]>([])
-  const [isFirstDivVisible, setIsFirstDivVisible] = useState(true)
-  const [isLoading, setIsLoading] = useState(false)
-  const { isError } = useDojoStatus()
+  const { hasFinishedTutorial } = useSettings()
 
-  const duelists = useRef<bigint[]>(duelistIds)
+  const [visibleChars, setVisibleChars] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(false)
 
   // clear tavern state
   useEffectOnce(() => {
-    dispatchSelectDuel(0n)
-    setIsFirstDivVisible(true)
     setIsLoading(false)
-    
-    // setIsEntryLoading(true)
-    // disconnect()
-    // setTimeout(() => {
-    //   setIsEntryLoading(false)
-    // }, 200)
   }, [])
 
   useEffectOnce(() => {
@@ -62,58 +38,40 @@ export default function ScDoor() {
     addCharacter(0)
   }, [])
 
-  useEffect(() => {
-    let timeoutId;
-
-    console.log("CONNECTED", isConnected, isError, isMyDuelist, duelists.current.length)
-    if (isConnected && !isError) {
-      setIsLoading(true)
-      timeoutId = setTimeout(() => {
-        if (isMyDuelist) {
-          dispatchSetScene(SceneName.Tavern)
-        } else if (duelists.current.length > 0) {
-          dispatchDuelistId(duelists.current[0])
-          dispatchSetScene(SceneName.Tavern)
-        } else {
-          setIsLoading(false)
-          setIsFirstDivVisible(false)
-        }
-      }, 1000)
-    }
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
-    }
-
-  }, [isConnected, isError, isMyDuelist, duelists.current])
-
   return (
     <div id='Door'>
       <div className='UIContainer' >
-        <div className={`UIPage ${isFirstDivVisible && !isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: isFirstDivVisible && !isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute' }}>
+        <div className={`UIPage ${!isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: !isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute' }}>
           <DoorHeader />
           <VStack className='NoPadding'>
 
             {isReady && <>
-              <ConnectButton />
-              <Divider content='OR' />
-              <EnterAsGuestButton />
+              {hasFinishedTutorial ? <>
+                <div className='Spacer10' />
+                <ConnectButton setLoading={setIsLoading} />
+                <Divider content='OR' />  
+                <EnterAsGuestButton />
+                <div className='Spacer10' />
+              </> : <>
+                <Divider content='NEWCOMERS:' />
+                <div className='Spacer10' />
+                <PlayGameButton />
+                <Divider content='OR' />
+                <EnterAsGuestButton />
+                <div className='Spacer30' />
+                <Divider content='EXISTING PATRONS:' />
+                <div className='Spacer10' />
+                <ConnectButton setLoading={setIsLoading} />
+              </>}
             </>}
-
-            <ConnectStatus />
 
           </VStack>
         </div>
 
         <div className={`UIPage ${isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute' }}>
-          <h1>Loading...</h1>
+          <ConnectStatus />
         </div>
         
-        <div className={`UIPage ${!isFirstDivVisible && !isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: !isFirstDivVisible && !isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute' }}>
-          <ClaimDuelistsButton />
-        </div>
       </div>
 
       <div
@@ -140,11 +98,9 @@ export default function ScDoor() {
 function DoorHeader() {
   return (
     <VStack>
-      <Logo />
+      <Logo showName vertical/>
 
-      <h1>Pistols at Dawn</h1>
-
-      <div className='Spacer5' />
+      <div className='Spacer10' />
       <div className='H5 TitleCase'>
         An <a href='https://underware.gg'>Underware</a> Game
       </div>
@@ -155,34 +111,36 @@ function DoorHeader() {
       </div>
 
       <div className='Spacer10' />
-      <hr />
-
-      <div className='Spacer10' />
     </VStack>
   )
 }
 
 export function EnterAsGuestButton() {
-  const { dispatchDuelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
 
   const _enterAsGuest = () => {
-    dispatchDuelistId(0n)
     dispatchSetScene(SceneName.Tavern)
   }
-  return <ActionButton large fill onClick={() => _enterAsGuest()} label='Enter as Guest' />
+  return <ActionButton large fill onClick={() => _enterAsGuest()} label='Enter as Spectator' />
 }
 
-export function ConnectButton({
-  onConnect,
-}: {
-  onConnect?: Function
-}) {
-  const { isConnecting } = useAccount()
+export function PlayGameButton() {
+  const { dispatchSetScene } = usePistolsScene()
+
+  const _playGame = () => {
+    dispatchSetScene(SceneName.Tutorial)
+  }
+  return <ActionButton large fill important onClick={() => _playGame()} label='Play Game' />
+}
+
+export function ConnectButton({ setLoading }: { setLoading?: (loading: boolean) => void }) {
+  const { isConnected, isConnecting } = useAccount()
   const { isLoading, isError } = useDojoStatus()
-  const { connect } = useConnectToSelectedNetwork(() => {
-    onConnect?.()
-  })
+  const { connect } = useConnectToSelectedNetwork()
+  
+  const { duelistIds } = useDuelistsOfPlayer()
+  const { canClaimWelcomePack } = useCanClaimWelcomePack(duelistIds.length)
+  const { dispatchSetScene } = usePistolsScene()
 
   const canConnect = (!isLoading && !isError && !isConnecting && connect != null)
   // const switchChain = (isConnected && !isCorrectChain)
@@ -190,36 +148,32 @@ export function ConnectButton({
   const _connect = () => {
     if (canConnect) {
       connect()
-    }
-  }
-
-  return <ActionButton fill large important disabled={!canConnect} onClick={() => _connect()} label={'Connect / Create Account'} />
-}
-
-export function ClaimDuelistsButton() {
-  const { account } = useAccount()
-  const { pack_token } = useDojoSystemCalls()
-  const { dispatchDuelistId } = useSettings()
-  const { dispatchSetScene } = usePistolsScene()
-  const { duelistIds } = useDuelistsOfPlayer()
-  const { canClaimWelcomePack } = useCanClaimWelcomePack(duelistIds.length)
-  const [isClaiming, setIsClaiming] = useState(false)
-
-  const _claim = async () => {
-    if (canClaimWelcomePack) {
-      setIsClaiming(true)
-      await pack_token.claim_welcome_pack(account)
+      setLoading?.(true)
     }
   }
 
   useEffect(() => {
-    if (canClaimWelcomePack === false && isClaiming) {
-      dispatchDuelistId(duelistIds[0])
-      dispatchSetScene(SceneName.Profile)
-    }
-  }, [canClaimWelcomePack, duelistIds, isClaiming])
+    let timeoutId;
 
-  return <ActionButton large fill important disabled={false} onClick={_claim} label='Claim your Duelists' />
+    if (isConnected && !isError) {
+      timeoutId = setTimeout(() => {
+        if (canClaimWelcomePack) {
+          dispatchSetScene(SceneName.Tutorial)
+        } else {
+          dispatchSetScene(SceneName.Tavern)
+        }
+      }, 1000)
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
+
+  }, [isConnected, isError, canClaimWelcomePack])
+
+  return <ActionButton fill large important disabled={!canConnect} onClick={() => _connect()} label={'Enter as Patron'} />
 }
 
 export function ConnectStatus() {
@@ -227,10 +181,10 @@ export function ConnectStatus() {
   const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()
 
   if (isConnecting) {
-    return <h3 className='TitleCase Important'>Connecting...</h3>
+    return <h1 className='TitleCase Important'>Connecting...</h1>
   }
   if (isLoading) {
-    return <h3 className='TitleCase Important'>{loadingMessage}</h3>
+    return <h1 className='TitleCase Important'>{loadingMessage}</h1>
   }
   if (isError) {
     return (
@@ -241,5 +195,5 @@ export function ConnectStatus() {
       </div>
     )
   }
-  return <></>
+  return <h1>Connecting...</h1>
 }

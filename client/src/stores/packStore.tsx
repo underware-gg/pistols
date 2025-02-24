@@ -13,8 +13,8 @@ export const usePackStore = createDojoStore<PistolsSchemaType>();
 //--------------------------------
 // Get pack from the store
 //
-export const usePack = (duelId: BigNumberish) => {
-  const entityId = useEntityId([duelId])
+export const usePack = (pack_id: BigNumberish) => {
+  const entityId = useEntityId([pack_id])
   const entities = usePackStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 

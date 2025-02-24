@@ -2,6 +2,7 @@ import 'semantic-ui-css/semantic.min.css'
 import '/styles/fonts.scss'
 import '/styles/styles.scss'
 import '/styles/cards.scss'
+import '/styles/book.scss'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router'
@@ -39,6 +40,14 @@ const router = createBrowserRouter([
       { path: "profile", element: <MainPage /> },
       { path: "profile/:table_id", element: <MainPage /> },
       { path: "tavern", element: <MainPage /> },
+      { path: "tutorial/entry", element: <MainPage /> },
+      { path: "tutorial/conflict", element: <MainPage /> },
+      { path: "tutorial/honour", element: <MainPage /> },
+      { path: "tutorial/barkeep", element: <MainPage /> },
+      { path: "tutorial/lection", element: <MainPage /> },
+      { path: "tutorial/demon", element: <MainPage /> },
+      { path: "tutorial/resurection", element: <MainPage /> },
+      { path: "tutorial/duel", element: <MainPage /> },
       { path: "tavern/:table_id", element: <MainPage /> },
       { path: "balcony", element: <MainPage /> },
       { path: "balcony/:table_id", element: <MainPage /> },

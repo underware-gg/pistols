@@ -132,6 +132,7 @@ export let _renderer: THREE.WebGLRenderer
 let _animationRequest = null
 let _clock: THREE.Clock
 let _duelCamera: THREE.PerspectiveCamera
+let _duelCameraParent: THREE.Object3D
 let _staticCamera: THREE.PerspectiveCamera
 let _supportsExtension: boolean = true
 let _stats
@@ -304,13 +305,15 @@ function setRender(canvas) {
   // _renderer.debug.checkShaderErrors = false;
 }
 
-function setCameras() {
+export function setCameras() {
+  _duelCameraParent = new THREE.Object3D()
   _duelCamera = new THREE.PerspectiveCamera(
     cameraData.fieldOfView,
     ASPECT,
     cameraData.nearPlane,
     cameraData.farPlane,
   )
+  _duelCameraParent.add(_duelCamera)
   _duelCamera.position.set(0, 0.05, 0)
   _staticCamera = new THREE.PerspectiveCamera(
     cameraData.fieldOfView,
@@ -352,6 +355,28 @@ function setGUI() {
 //-------------------------------------------
 // Game Loop
 //
+
+export function shakeCamera(duration = 500, magnitude = 0.01) {
+  const initialPosition = _duelCameraParent.position.clone(); // Store the initial position of the camera
+
+  const shake = () => {
+    const offsetX = (Math.random() - 0.5) * 2 * magnitude;
+    const offsetY = (Math.random() - 0.5) * 2 * magnitude;
+    const offsetZ = (Math.random() - 0.5) * 2 * magnitude;
+
+    _duelCameraParent.position.set(
+      initialPosition.x + offsetX,
+      initialPosition.y + offsetY,
+      initialPosition.z + offsetZ
+    );
+  };
+
+  new TWEEN.Tween({ t: 0 })
+    .to({ t: 1 }, duration)
+    .onUpdate(() => { shake() })
+    .onComplete(() => { _duelCameraParent.position.copy(initialPosition) })
+    .start();
+}
 
 let lastFrameTime = performance.now()
 
@@ -415,11 +440,11 @@ function setupScenes() {
   Object.values(SceneName).forEach((sceneName) => {
     if (sceneName === SceneName.Duel) {
       _scenes[sceneName] = setupDuelScene()
-    } else if (sceneName.includes('Tutorial') && !hasInstancedTutorial) {
-      _scenes[sceneName] = setupStaticScene(SceneName.Tutorial)
-      hasInstancedTutorial = true
-    } else {
+    } else if (!sceneName.includes('Tutorial')) {
       _scenes[sceneName] = setupStaticScene(sceneName)
+    } else if (!hasInstancedTutorial){
+      hasInstancedTutorial = true
+      _scenes[sceneName] = setupStaticScene(SceneName.Tutorial)
     }
   })
 }
@@ -429,7 +454,7 @@ function setupScenes() {
 //
 function setupDuelScene() {
   const scene = new THREE.Scene()
-  scene.add(_duelCamera)
+  scene.add(_duelCameraParent)
 
   setEnvironment(scene)
 
@@ -747,6 +772,9 @@ export function switchScene(sceneName) {
   if (!_currentScene) {
     _sceneName = sceneName
     _currentScene = _scenes[sceneName.includes('Tutorial') ? SceneName.Tutorial : sceneName]
+    if (sceneName.includes('Tutorial')) {
+      (_currentScene as InteractibleScene).setSceneData(sceneName)
+    }
 
     fadeInCurrentScene();
     
@@ -759,6 +787,12 @@ export function switchScene(sceneName) {
     fadeOutCurrentScene(() => {
       _sceneName = sceneName
       _currentScene = _scenes[sceneName.includes('Tutorial') ? SceneName.Tutorial : sceneName]
+      if (sceneName.includes('Tutorial')) {
+        (_currentScene as InteractibleScene).setSceneData(sceneName)
+      }
+
+      emitter.emit('hover_description', null)
+      emitter.emit('hover_item', null)
 
       fadeInCurrentScene();
       
@@ -837,7 +871,7 @@ export function zoomCameraToPaces(paceCount, seconds) {
   if (seconds == 0) {
     // just set
     // console.log(`CAMS SET`, targetPos)
-    _duelCamera.position.set(targetPos.x, targetPos.y, targetPos.z)
+    _duelCamera.position.set(targetPos.x, targetPos.y, targetPos.z);
     _duelCamera.lookAt(0, 0.5, 2)
   } else {
     // console.log(`CAM ANIM`, targetPos)
@@ -862,7 +896,7 @@ export function animatePace(pace: number, statsA: DuelistState, statsB: DuelistS
   _duelistManager.animatePace(pace, statsA, statsB)
 }
 
-export function animateDuel(state: AnimationState, actionA: Action, actionB: Action, healthA: number, healthB: number, damageA: number, damageB: number) {
+export function animateDuel(state: AnimationState) {
   //only animated once per entry safety
   if (state == AnimationState.Round1 && !_round1Animated) {
     _round1Animated = true

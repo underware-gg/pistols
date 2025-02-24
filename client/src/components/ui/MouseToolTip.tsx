@@ -4,7 +4,7 @@ import { useGameEvent } from '/src/hooks/useGameEvent'
 
 
 export function MouseToolTip() {
-  const { value: hoverSceneValue } = useGameEvent('hover_scene', null);
+  const { value: hoverSceneValue } = useGameEvent('hover_description', null);
   const tooltipRef = useRef(null);
   const [mousePos, setMousePos] = useState<any>(null);
 
