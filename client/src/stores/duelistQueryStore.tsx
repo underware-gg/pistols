@@ -15,7 +15,8 @@ import { usePlayer } from '/src/stores/playerStore'
 //
 interface StateEntity {
   duelist_id: bigint
-  timestamp: number
+  timestamp_registered: number
+  timestamp_active: number
   name: string
   fame: number
   honour: number
@@ -43,7 +44,8 @@ const createStore = () => {
     if (!duelist) return undefined
     return {
       duelist_id: BigInt(duelist.duelist_id),
-      timestamp: Number(duelist.timestamp),
+      timestamp_registered: Number(duelist.timestamp_registered),
+      timestamp_active: Number(duelist.timestamp_active),
       name: 'DUELIST_????',
       fame: 0,
       honour: Number(scoreboard?.score.honour ?? 0),

@@ -8,7 +8,7 @@ import { useTableId } from '/src/stores/configStore'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
 import { usePact } from '/src/hooks/usePact'
-import { useCalcFeeDuel } from '/src/hooks/usePistolsContractCalls'
+import { useCalcFeeDuel, useCanJoin } from '/src/hooks/usePistolsContractCalls'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ProfileDescription } from '/src/components/account/ProfileDescription'
@@ -43,7 +43,7 @@ export default function NewChallengeModal() {
   const [args, setArgs] = useState(null)
 
   const { fee } = useCalcFeeDuel(tableId)
-  const { tableIsOpen } = useTable(tableId)
+  const { canJoin } = useCanJoin(tableId, duelistId)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -60,7 +60,7 @@ export default function NewChallengeModal() {
   const _create_duel = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await duel_token.create_duel(account, duelistId, challengingAddress, args.premise, args.quote, tableId, args.expire_hours)
+      await duel_token.create_duel(account, duelistId, challengingAddress, args.premise, args.quote, tableId, args.expire_hours, args.lives_staked)
       setIsSubmitting(false)
     }
     if (args) _submit()
@@ -130,7 +130,7 @@ export default function NewChallengeModal() {
               <ActionButton large fill label='Nevermind!' onClick={() => _close()} />
             </Col>
             <Col>
-              {tableIsOpen &&
+              {canJoin &&
                 <BalanceRequiredButton
                   fee={fee}
                   disabled={!args || isSubmitting}
@@ -138,7 +138,7 @@ export default function NewChallengeModal() {
                   onClick={() => _create_duel()}
                 />
               }
-              {!tableIsOpen && <ActionButton large fill disabled negative label='Table is Closed!' onClick={() => { }} />}
+              {!canJoin && <ActionButton large fill disabled negative label='Table is Closed!' onClick={() => { }} />}
             </Col>
           </Row>
         </Grid>
@@ -155,6 +155,7 @@ function NewChallengeForm({
   const [quote, setQuote] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
+  const [lives_staked, setLivesStaked] = useState(1)
   const { fee } = useCalcFeeDuel(tableId)
 
   const canSubmit = useMemo(() => (quote.length > 3 && (days + hours) > 0), [quote, days, hours])
@@ -164,9 +165,10 @@ function NewChallengeForm({
       premise,
       quote,
       expire_hours: ((days * 24) + hours),
+      lives_staked,
       table_id: tableId,
     } : null)
-  }, [premise, quote, days, hours])
+  }, [premise, quote, days, hours, lives_staked])
 
   const premiseOptions: any[] = useMemo(() => Object.keys(constants.Premise).slice(1).map((premise, index) => ({
     key: `${premise}`,
@@ -184,6 +186,12 @@ function NewChallengeForm({
     key: `${index}h`,
     value: `${index}`,
     text: `${index} hours`,
+  })), [])
+
+  const livesOptions: any[] = useMemo(() => [1, 2, 3, 4, 5].map(index => ({
+    key: `${index}`,
+    value: `${index}`,
+    text: `${index} lives`,
   })), [])
 
   return (
@@ -221,10 +229,16 @@ function NewChallengeForm({
           <Grid className='NoMargin'>
             <Row>
               <Col width={5}>
+                Days
                 <Dropdown className='FillWidth' defaultValue='7' placeholder='Days' selection options={daysOptions} onChange={(e, { value }) => setDays(parseInt(value as string))} />
               </Col>
               <Col width={5}>
+                Hours
                 <Dropdown className='FillWidth' defaultValue='0' placeholder='Hours' selection options={hoursOptions} onChange={(e, { value }) => setHours(parseInt(value as string))} />
+              </Col>
+              <Col width={5}>
+                Lives Staked
+                <Dropdown className='FillWidth' defaultValue='1' placeholder='Lives' selection options={livesOptions} onChange={(e, { value }) => setLivesStaked(parseInt(value as string))} />
               </Col>
             </Row>
           </Grid>

@@ -43,34 +43,34 @@ const ActivityItem = ({
   if (!activity.is_public) {
     return <></>
   }
-  if (activity.activity === constants.Activity.WelcomePack) {
-    return <ActivityItemWelcomePack activity={activity} clientSeconds={clientSeconds} />
+  if (activity.activity === constants.Activity.PackWelcome) {
+    return <ActivityItemPackWelcome activity={activity} clientSeconds={clientSeconds} />
   }
-  if (activity.activity === constants.Activity.CreatedDuelist) {
-    return <ActivityItemCreatedDuelist activity={activity} clientSeconds={clientSeconds} />
+  if (activity.activity === constants.Activity.DuelistSpawned) {
+    return <ActivityItemDuelistSpawned activity={activity} clientSeconds={clientSeconds} />
   }
-  if (activity.activity === constants.Activity.CreatedChallenge) {
-    return <ActivityItemCreatedChallenge activity={activity} clientSeconds={clientSeconds} />
+  if (activity.activity === constants.Activity.ChallengeCreated) {
+    return <ActivityItemChallengeCreated activity={activity} clientSeconds={clientSeconds} />
   }
-  if (activity.activity === constants.Activity.RepliedChallenge) {
-    return <ActivityItemRepliedChallenge activity={activity} clientSeconds={clientSeconds} />
+  if (activity.activity === constants.Activity.ChallengeReplied) {
+    return <ActivityItemChallengeReplied activity={activity} clientSeconds={clientSeconds} />
   }
-  if (activity.activity === constants.Activity.CommittedMoves) {
-    return <ActivityItemCommittedMoves activity={activity} clientSeconds={clientSeconds} />
+  if (activity.activity === constants.Activity.MovesCommitted) {
+    return <ActivityItemMovesCommitted activity={activity} clientSeconds={clientSeconds} />
   }
-  if (activity.activity === constants.Activity.RevealedMoves) {
-    return <ActivityItemRevealedMoves activity={activity} clientSeconds={clientSeconds} />
+  if (activity.activity === constants.Activity.MovesRevealed) {
+    return <ActivityItemMovesRevealed activity={activity} clientSeconds={clientSeconds} />
   }
-  if (activity.activity === constants.Activity.DuelResolved) {
-    return <ActivityItemDuelResolved activity={activity} clientSeconds={clientSeconds} />
+  if (activity.activity === constants.Activity.ChallengeResolved) {
+    return <ActivityItemChallengeResolved activity={activity} clientSeconds={clientSeconds} />
   }
-  if (activity.activity === constants.Activity.DuelDraw) {
-    return <ActivityItemDuelDraw activity={activity} clientSeconds={clientSeconds} />
+  if (activity.activity === constants.Activity.ChallengeDraw) {
+    return <ActivityItemChallengeDraw activity={activity} clientSeconds={clientSeconds} />
   }
   return <></>
 }
 
-const ActivityItemWelcomePack = ({
+const ActivityItemPackWelcome = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
@@ -84,7 +84,7 @@ const ActivityItemWelcomePack = ({
   )
 }
 
-const ActivityItemCreatedDuelist = ({
+const ActivityItemDuelistSpawned = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
@@ -100,7 +100,7 @@ const ActivityItemCreatedDuelist = ({
   )
 }
 
-const ActivityItemCreatedChallenge = ({
+const ActivityItemChallengeCreated = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
@@ -119,7 +119,7 @@ const ActivityItemCreatedChallenge = ({
   )
 }
 
-const ActivityItemRepliedChallenge = ({
+const ActivityItemChallengeReplied = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
@@ -138,7 +138,7 @@ const ActivityItemRepliedChallenge = ({
   )
 }
 
-const ActivityItemCommittedMoves = ({
+const ActivityItemMovesCommitted = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
@@ -154,7 +154,7 @@ const ActivityItemCommittedMoves = ({
   )
 }
 
-const ActivityItemRevealedMoves = ({
+const ActivityItemMovesRevealed = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
@@ -170,7 +170,7 @@ const ActivityItemRevealedMoves = ({
   )
 }
 
-const ActivityItemDuelResolved = ({
+const ActivityItemChallengeResolved = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
@@ -186,7 +186,7 @@ const ActivityItemDuelResolved = ({
   )
 }
 
-const ActivityItemDuelDraw = ({
+const ActivityItemChallengeDraw = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {

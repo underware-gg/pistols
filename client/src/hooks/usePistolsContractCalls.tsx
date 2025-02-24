@@ -70,15 +70,15 @@ export const useTutorialDuelId = (player_id: BigNumberish, tutorial_id: BigNumbe
 // duel_token
 //
 
-export const useCanJoin = (table_id: string) => {
+export const useCanJoin = (table_id: string, duelist_id: BigNumberish) => {
   const { duel_token: { canJoin } } = useDojoContractCalls()
   const { address } = useAccount()
   const options = useMemo(() => ({
     call: canJoin,
-    args: [stringToFelt(table_id), BigInt(address ?? 0)],
-    enabled: isBigint(address),
+    args: [stringToFelt(table_id), BigInt(address ?? 0), BigInt(duelist_id ?? 0)],
+    enabled: Boolean(table_id) && isPositiveBigint(address) && isPositiveBigint(duelist_id),
     defaultValue: null,
-  }), [address])
+  }), [address, table_id, duelist_id])
   const { value, isLoading } = useSdkCallPromise<boolean>(options)
   return {
     canJoin: value,
@@ -87,17 +87,17 @@ export const useCanJoin = (table_id: string) => {
 }
 
 export const useCalcFeeDuel = (table_id: string) => {
-  const { duel_token: { calcMintFee } } = useDojoContractCalls()
-  const options = useMemo(() => ({
-    call: calcMintFee,
-    args: [stringToFelt(table_id)],
-    enabled: Boolean(table_id),
-    defaultValue: null,
-  }), [table_id])
-  const { value, isLoading } = useSdkCallPromise<bigint>(options)
+  // const { duel_token: { calcMintFee } } = useDojoContractCalls()
+  // const options = useMemo(() => ({
+  //   call: calcMintFee,
+  //   args: [stringToFelt(table_id)],
+  //   enabled: Boolean(table_id),
+  //   defaultValue: null,
+  // }), [table_id])
+  // const { value, isLoading } = useSdkCallPromise<bigint>(options)
   return {
-    fee: value,
-    isLoading,
+    fee: 0n,
+    isLoading: false,
   }
 }
 
