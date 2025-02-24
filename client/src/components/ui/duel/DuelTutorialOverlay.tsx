@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { Modal } from 'semantic-ui-react'
 import { DuelTutorialLevel, DUEL_TUTORIAL_LIST, TUTORIAL_DATA } from '/src/data/tutorialConstants'
+import { Opener } from '/src/hooks/useOpener'
 
 interface DuelTutorialOverlayProps {
   tutorialType: DuelTutorialLevel
-  isOpen: boolean
-  setIsOpen: (isOpen: boolean) => void
+  opener: Opener,
   onComplete?: () => void
 }
 
-export default function DuelTutorialOverlay({ tutorialType, isOpen, setIsOpen, onComplete }: DuelTutorialOverlayProps) {
+export default function DuelTutorialOverlay({ tutorialType, opener, onComplete }: DuelTutorialOverlayProps) {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentTutorialIndex, setCurrentTutorialIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -64,9 +64,9 @@ export default function DuelTutorialOverlay({ tutorialType, isOpen, setIsOpen, o
   }
 
   const _close = () => {
-    setIsOpen(false)
-    if (isLastSlide && onComplete) {
-      onComplete()
+    if (isLastSlide) {
+      onComplete?.()
+      opener.close()
     }
   }
 
@@ -74,7 +74,7 @@ export default function DuelTutorialOverlay({ tutorialType, isOpen, setIsOpen, o
 
   return (
     <Modal
-      open={isOpen}
+      open={opener.isOpen}
       onClose={_close}
       className="modal"
       closeOnDimmerClick={false}

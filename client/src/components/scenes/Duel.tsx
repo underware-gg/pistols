@@ -46,7 +46,7 @@ export default function Duel({
 }) {
   const { gameImpl } = useThreeJsContext()
   const { dispatchAnimated } = useGameplayContext()
-  const { dispatchSetDuel } = usePistolsContext()
+  const { dispatchSetDuel, tutorialOpener } = usePistolsContext()
   const { debugMode, duelSpeedFactor } = useSettings()
   const { clientSeconds } = useClientTimestamp(false)
 
@@ -94,7 +94,15 @@ export default function Duel({
 
   useEffect(() => dispatchSetDuel(duelId), [duelId])
 
- useEffect(() => {
+  useEffect(() => {
+    if (tutorial != DuelTutorialLevel.NONE) {
+      tutorialOpener.open()
+    } else {
+      tutorialOpener.close()
+    }
+  }, [tutorial])
+
+  useEffect(() => {
     if (gameImpl && mounted && !duelSceneStarted && isSynced && nameA && nameB && characterTypeA && characterTypeB) {
       gameImpl.startDuelWithPlayers(nameA, characterTypeA, isYouA, isYouB, nameB, characterTypeB)
       setDuelSceneStarted(true)
@@ -405,7 +413,7 @@ export default function Duel({
         </div>
       </div>
 
-      {isTutorial && <DuelTutorialOverlay tutorialType={tutorial} isOpen={tutorial != DuelTutorialLevel.NONE} setIsOpen={() => {}} />}
+      {isTutorial && <DuelTutorialOverlay tutorialType={tutorial} opener={tutorialOpener} />}
 
       {/* {duelProgress &&
         <div className='CenteredPanel'>

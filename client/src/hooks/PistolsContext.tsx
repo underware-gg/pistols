@@ -39,6 +39,7 @@ export const initialState = {
   // injected
   connectOpener: null as Opener,
   shopOpener: null as Opener,
+  tutorialOpener: null as Opener,
   bookOpener: null as Opener,
   cardPackOpener: null as Opener,
   tableOpener: null as Opener,
@@ -98,6 +99,7 @@ const PistolsProvider = ({
 }: PistolsProviderProps) => {
   const connectOpener = useOpener()
   const shopOpener = useOpener()
+  const tutorialOpener = useOpener()
   const bookOpener = useOpener()
   const cardPackOpener = useOpener()
   const tableOpener = useOpener()
@@ -178,6 +180,7 @@ const PistolsProvider = ({
       ...state,
       connectOpener,
       shopOpener,
+      tutorialOpener,
       bookOpener,
       cardPackOpener,
       tableOpener,
