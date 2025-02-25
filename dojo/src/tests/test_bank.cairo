@@ -375,8 +375,8 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE);
 
         let bank_address: ContractAddress = sys.bank.contract_address;
-        let price_welcome: u128 = PackType::WelcomePack.description().lords_price;
-        let price_pack: u128 = PackType::Duelists5x.description().lords_price;
+        let price_welcome: u128 = PackType::WelcomePack.description().price_lords;
+        let price_pack: u128 = PackType::Duelists5x.description().price_lords;
         assert_ne!(price_welcome, 0, "price_welcome");
         assert_ne!(price_pack, 0, "price_pack");
 

@@ -35,7 +35,7 @@ pub struct PackDescription {
     pub image_url_closed: felt252, // @generateContants:shortstring
     pub image_url_open: felt252, // @generateContants:shortstring
     pub can_purchase: bool,
-    pub lords_price: u128,
+    pub price_lords: u128,
     pub quantity: usize,
 }
 
@@ -50,7 +50,7 @@ mod PACK_TYPES {
         image_url_closed: '/tokens/Unknown.jpg',
         image_url_open: '/tokens/Unknown.jpg',
         can_purchase: false,
-        lords_price: 0,
+        price_lords: 0,
         quantity: 0,
     };
     pub const WelcomePack: PackDescription = PackDescription {
@@ -59,7 +59,7 @@ mod PACK_TYPES {
         image_url_closed: '/tokens/WelcomePack.jpg',
         image_url_open: '/tokens/WelcomePack.jpg',
         can_purchase: false,
-        lords_price: 20 * CONST::ETH_TO_WEI.low,
+        price_lords: 20 * CONST::ETH_TO_WEI.low,
         quantity: 2,
     };  
     pub const Duelists5x: PackDescription = PackDescription {
@@ -68,7 +68,7 @@ mod PACK_TYPES {
         image_url_closed: '/tokens/Duelists5x.jpg',
         image_url_open: '/tokens/Duelists5x.jpg',
         can_purchase: true,
-        lords_price: 50 * CONST::ETH_TO_WEI.low,
+        price_lords: 50 * CONST::ETH_TO_WEI.low,
         quantity: 5,
     };
 }
@@ -129,7 +129,7 @@ pub impl PackTypeImpl of PackTypeTrait {
         ((*self).description().can_purchase)
     }
     fn mint_fee(self: @PackType) -> u128 {
-        ((*self).description().lords_price)
+        ((*self).description().price_lords)
     }
 }
 

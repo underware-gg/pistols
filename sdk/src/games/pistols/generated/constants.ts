@@ -376,7 +376,7 @@ export type PackDescription = {
   image_url_closed : string,
   image_url_open : string,
   can_purchase : boolean,
-  lords_price : bigint,
+  price_lords : bigint,
   quantity : number,
 };
 
@@ -553,7 +553,7 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_url_closed: '/tokens/Unknown.jpg',
     image_url_open: '/tokens/Unknown.jpg',
     can_purchase: false,
-    lords_price: 0n,
+    price_lords: 0n,
     quantity: 0,
   },
   WelcomePack: {
@@ -562,7 +562,7 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_url_closed: '/tokens/WelcomePack.jpg',
     image_url_open: '/tokens/WelcomePack.jpg',
     can_purchase: false,
-    lords_price: (20n * CONST.ETH_TO_WEI),
+    price_lords: (20n * CONST.ETH_TO_WEI),
     quantity: 2,
   },
   Duelists5x: {
@@ -571,7 +571,7 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_url_closed: '/tokens/Duelists5x.jpg',
     image_url_open: '/tokens/Duelists5x.jpg',
     can_purchase: true,
-    lords_price: (50n * CONST.ETH_TO_WEI),
+    price_lords: (50n * CONST.ETH_TO_WEI),
     quantity: 5,
   },
 };

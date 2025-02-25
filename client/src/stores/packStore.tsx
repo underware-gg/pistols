@@ -28,7 +28,7 @@ export const usePack = (pack_id: BigNumberish) => {
   const imageUrlOpen = useMemo(() => (description?.image_url_open ?? null), [description])
   const imageUrlClosed = useMemo(() => (description?.image_url_closed ?? null), [description])
   const canPurchase = useMemo(() => (description?.can_purchase ?? false), [description])
-  const price = useMemo(() => (description?.lords_price ?? null), [description])
+  const price = useMemo(() => (description?.price_lords ?? null), [description])
   const quantity = useMemo(() => (description?.quantity ?? null), [description])
 
   return {
