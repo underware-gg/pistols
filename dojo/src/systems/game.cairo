@@ -25,10 +25,10 @@ pub trait IGame<TState> {
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
-    fn get_duelist_leaderboard_position(self: @TState, duelist_id: u128, table_id: felt252) -> LeaderboardPosition;
+    fn get_duelist_leaderboard_position(self: @TState, table_id: felt252, duelist_id: u128) -> LeaderboardPosition;
     fn get_leaderboard(self: @TState, table_id: felt252) -> Span<LeaderboardPosition>;
     fn can_collect_season(self: @TState) -> bool;
-    fn calc_season_reward(self: @TState, duelist_id: u128, lives_staked: u8, table_id: felt252) -> RewardValues;
+    fn calc_season_reward(self: @TState, table_id: felt252, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn get_timestamp(self: @TState) -> u64;
     
     // test calls
@@ -369,7 +369,7 @@ pub mod game {
             }
         }
 
-        fn get_duelist_leaderboard_position(self: @ContractState, duelist_id: u128, table_id: felt252) -> LeaderboardPosition {
+        fn get_duelist_leaderboard_position(self: @ContractState, table_id: felt252, duelist_id: u128) -> LeaderboardPosition {
             let mut store: Store = StoreTrait::new(self.world_default());
             (store.get_leaderboard(table_id).get_duelist_position(duelist_id))
         }
@@ -386,9 +386,9 @@ pub mod game {
         }
 
         fn calc_season_reward(self: @ContractState,
+            table_id: felt252,
             duelist_id: u128,
             lives_staked: u8,
-            table_id: felt252,
         ) -> RewardValues {
             let mut store: Store = StoreTrait::new(self.world_default());
             let rules: RulesType = store.get_current_season_rules();

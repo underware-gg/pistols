@@ -8,14 +8,16 @@ import { useTableId } from '/src/stores/configStore'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
 import { usePact } from '/src/hooks/usePact'
-import { useCalcFeeDuel, useCanJoin } from '/src/hooks/usePistolsContractCalls'
+import { useCalcFeeDuel, useCalcSeasonReward, useCanJoin } from '/src/hooks/usePistolsContractCalls'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ProfileDescription } from '/src/components/account/ProfileDescription'
 import { FormInput } from '/src/components/ui/Form'
-import { FeesToPay } from '/src/components/account/LordsBalance'
+import { FameBalance, FeesToPay } from '/src/components/account/LordsBalance'
 import { Divider } from '/src/components/ui/Divider'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { Balance } from '../account/Balance'
+import { formatOrdinalNumber } from '@underware_gg/pistols-sdk/utils'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -44,6 +46,7 @@ export default function NewChallengeModal() {
 
   const { fee } = useCalcFeeDuel(tableId)
   const { canJoin } = useCanJoin(tableId, duelistId)
+  const { rewards } = useCalcSeasonReward(tableId, duelistId, args?.lives_staked)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -63,7 +66,7 @@ export default function NewChallengeModal() {
       await duel_token.create_duel(account, duelistId, challengingAddress, args.premise, args.quote, tableId, args.expire_hours, args.lives_staked)
       setIsSubmitting(false)
     }
-    if (args) _submit()
+    if (args?.canSubmit) _submit()
   }
 
   return (
@@ -118,6 +121,33 @@ export default function NewChallengeModal() {
                 <NewChallengeForm setArgs={setArgs} />
               </Col>
             </Row>
+            {/* <Row columns='equal' textAlign='left'>
+              <Col>
+                <FeesToPay big value={0} fee={fee} prefixed />
+              </Col>
+            </Row> */}
+            <Row columns='equal' textAlign='left'>
+              <Col className='H3'>
+                Winning...
+                {' '}
+                <Balance fame wei={rewards?.win?.fame_gained} />
+                {' / '}
+                <Balance fools wei={rewards?.win?.fools_gained} />
+                {' / '}
+                {rewards?.win?.points_scored} points
+                {' / '}
+                {formatOrdinalNumber(rewards?.win?.position)} place
+              </Col>
+            </Row>
+            <Row columns='equal' textAlign='left'>
+              <Col className='H3'>
+                Losing...
+                {' '}
+                <Balance fame wei={rewards?.lose?.fame_lost} />
+                {' and '}
+                {rewards?.lose?.survived ? 'survives' : 'dies!'}
+              </Col>
+            </Row>
           </Grid>
         </Modal.Description>
 
@@ -133,7 +163,7 @@ export default function NewChallengeModal() {
               {canJoin &&
                 <BalanceRequiredButton
                   fee={fee}
-                  disabled={!args || isSubmitting}
+                  disabled={!args?.canSubmit || isSubmitting}
                   label='Submit Challenge!'
                   onClick={() => _create_duel()}
                 />
@@ -156,19 +186,19 @@ function NewChallengeForm({
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
   const [lives_staked, setLivesStaked] = useState(1)
-  const { fee } = useCalcFeeDuel(tableId)
 
   const canSubmit = useMemo(() => (quote.length > 3 && (days + hours) > 0), [quote, days, hours])
 
   useEffect(() => {
-    setArgs(canSubmit ? {
+    setArgs({
       premise,
       quote,
       expire_hours: ((days * 24) + hours),
       lives_staked,
       table_id: tableId,
-    } : null)
-  }, [premise, quote, days, hours, lives_staked])
+      canSubmit,
+    })
+  }, [canSubmit, premise, quote, days, hours, lives_staked])
 
   const premiseOptions: any[] = useMemo(() => Object.keys(constants.Premise).slice(1).map((premise, index) => ({
     key: `${premise}`,
@@ -243,9 +273,6 @@ function NewChallengeForm({
             </Row>
           </Grid>
         </Form.Field>
-
-        <FeesToPay big value={0} fee={fee} prefixed />
-
       </Form>
     </div>
   )

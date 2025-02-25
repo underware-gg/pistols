@@ -45,6 +45,48 @@ export const useGetDuelDeck = (duel_id: BigNumberish) => {
   }
 }
 
+export type RewardValues = {
+  win: {
+    // if win...
+    fame_gained: bigint
+    fools_gained: bigint
+    points_scored: number
+    position: number
+
+  }, lose: {
+    // if lose...
+    fame_lost: bigint
+    survived: boolean
+  }
+}
+
+export const useCalcSeasonReward = (table_id: string, duelist_id: BigNumberish, lives_staked: BigNumberish) => {
+  const { game: { calcSeasonReward } } = useDojoContractCalls()
+  const options = useMemo(() => ({
+    call: calcSeasonReward,
+    args: [stringToFelt(table_id), BigInt(duelist_id ?? 0), BigInt(lives_staked ?? 1)],
+    enabled: Boolean(table_id) && isPositiveBigint(duelist_id) && isPositiveBigint(lives_staked),
+    defaultValue: null,
+  }), [table_id, duelist_id, lives_staked])
+  const { value, isLoading } = useSdkCallPromise<any>(options)
+  const rewards = useMemo<RewardValues>(() => (value ? {
+    win: {
+      fame_gained: value.fame_gained,
+      fools_gained: value.fools_gained,
+      points_scored: Number(value.points_scored),
+      position: Number(value.position),
+    }, lose: {
+      fame_lost: value.fame_lost,
+      survived: value.survived,
+    }
+  } : null), [value])
+  console.log(`REWARDS::::`, rewards)
+  return {
+    rewards,
+    isLoading,
+  }
+}
+
 
 //------------------------------------------
 // tutorial

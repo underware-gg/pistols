@@ -80,8 +80,8 @@ mod tests {
         assert_eq!(pool_flame.balance_lords, 0, "RESOLVED_pool_flame.balance_lords");
         assert_eq!(pool_flame.balance_fame, 0, "RESOLVED_pool_flame.balance_fame");
 
-        let rewards_a: RewardValues = (*sys.game).calc_season_reward(duelist_id_a, challenge.lives_staked, table_id);
-        let rewards_b: RewardValues = (*sys.game).calc_season_reward(duelist_id_b, challenge.lives_staked, table_id);
+        let rewards_a: RewardValues = (*sys.game).calc_season_reward(table_id, duelist_id_a, challenge.lives_staked);
+        let rewards_b: RewardValues = (*sys.game).calc_season_reward(table_id, duelist_id_b, challenge.lives_staked);
         assert_ne!(rewards_a.fame_lost, 0, "RESOLVED_rewards_a.fame_lost != 0");
         assert_ne!(rewards_b.fame_lost, 0, "RESOLVED_rewards_b.fame_lost != 0");
         assert_ne!(rewards_a.fame_gained, 0, "RESOLVED_rewards_a.fame_gained != 0");
@@ -181,8 +181,8 @@ mod tests {
         let mut fools_balance_a: u128 = (*sys.fools).balance_of(address_a).low;
         let mut fools_balance_b: u128 = (*sys.fools).balance_of(address_b).low;
 
-        let rewards_a: RewardValues = (*sys.game).calc_season_reward(duelist_id_a, challenge.lives_staked, table_id);
-        let rewards_b: RewardValues = (*sys.game).calc_season_reward(duelist_id_b, challenge.lives_staked, table_id);
+        let rewards_a: RewardValues = (*sys.game).calc_season_reward(table_id, duelist_id_a, challenge.lives_staked);
+        let rewards_b: RewardValues = (*sys.game).calc_season_reward(table_id, duelist_id_b, challenge.lives_staked);
 // println!("challenge.lives_staked: {}", challenge.lives_staked);
 // println!("fame_balance_a: {}", WEI(fame_balance_a));
 // println!("rewards_a.fame_lost: {}", WEI(rewards_a.fame_lost));
