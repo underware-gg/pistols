@@ -3,7 +3,7 @@ use starknet::{ContractAddress};
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum PackType {
     Unknown,        // 0
-    WelcomePack,    // 1
+    StarterPack,    // 1
     Duelists5x,     // 2
 }
 
@@ -53,11 +53,11 @@ mod PACK_TYPES {
         price_lords: 0,
         quantity: 0,
     };
-    pub const WelcomePack: PackDescription = PackDescription {
-        id: 'WelcomePack',
-        name: 'Welcome Pack',
-        image_url_closed: '/tokens/WelcomePack.jpg',
-        image_url_open: '/tokens/WelcomePack.jpg',
+    pub const StarterPack: PackDescription = PackDescription {
+        id: 'StarterPack',
+        name: 'Starter Pack',
+        image_url_closed: '/tokens/StarterPack.jpg',
+        image_url_open: '/tokens/StarterPack.jpg',
         can_purchase: false,
         price_lords: 20 * CONST::ETH_TO_WEI.low,
         quantity: 2,
@@ -91,7 +91,7 @@ pub impl PackImpl of PackTrait {
         assert(!self.is_open, PackErrors::ALREADY_OPENED);
         let token_ids: Span<u128> = match self.pack_type {
             PackType::Unknown => { [].span() },
-            PackType::WelcomePack |
+            PackType::StarterPack |
             PackType::Duelists5x => {
                 let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
                 (duelist_dispatcher.mint_duelists(recipient, self.pack_type.description().quantity, self.seed))
@@ -108,7 +108,7 @@ pub impl PackTypeImpl of PackTypeTrait {
     fn description(self: @PackType) -> PackDescription {
         match self {
             PackType::Unknown       => PACK_TYPES::Unknown,
-            PackType::WelcomePack   => PACK_TYPES::WelcomePack,
+            PackType::StarterPack   => PACK_TYPES::StarterPack,
             PackType::Duelists5x    => PACK_TYPES::Duelists5x,
         }
     }

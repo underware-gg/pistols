@@ -79,7 +79,7 @@ function Account() {
 function Bank() {
   const { account } = useAccount()
   const { contractAddress } = useDojoSystem('bank')
-  const { priceLords } = usePackType(constants.PackType.WelcomePack)
+  const { priceLords } = usePackType(constants.PackType.StarterPack)
   const [amount, setAmount] = useState(1)
   const fundAmount = useMemo(() => (priceLords * BigInt(amount)), [priceLords, amount])
 
@@ -97,7 +97,7 @@ function Bank() {
     <Table celled striped size='small' color='orange'>
       <Header>
         <Row>
-          <HeaderCell width={4}><h3>Welcome Packs</h3></HeaderCell>
+          <HeaderCell width={4}><h3>Starter Packs</h3></HeaderCell>
           <HeaderCell><h5></h5></HeaderCell>
           <HeaderCell><h5></h5></HeaderCell>
         </Row>

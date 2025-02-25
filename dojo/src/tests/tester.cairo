@@ -537,9 +537,9 @@ pub mod tester {
     }
 
     // ::pack_token
-    pub fn execute_claim_welcome_pack(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
+    pub fn execute_claim_starter_pack(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
         impersonate(sender);
-        let token_ids: Span<u128> = (*system).claim_welcome_pack();
+        let token_ids: Span<u128> = (*system).claim_starter_pack();
         _next_block();
         (token_ids)
     }
@@ -665,7 +665,7 @@ pub mod tester {
         let balance: u256 = (*sys.lords).balance_of(sponsor);
         execute_lords_approve(sys.lords, sponsor, *sys.bank.contract_address, balance.low);
         // fund pool
-        let price: u128 = PackType::WelcomePack.description().price_lords;
+        let price: u128 = PackType::StarterPack.description().price_lords;
         execute_sponsor_duelists(sys.bank, sponsor, price * quantity.into());
     }
 

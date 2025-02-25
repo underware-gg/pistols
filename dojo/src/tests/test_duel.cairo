@@ -91,8 +91,8 @@ mod tests {
         sys.rng.set_mocked_values(salts.salts, salts.values);
 
         tester::fund_duelists_pool(@sys, 2);
-        let duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
-        let duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
+        let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
+        let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
 
         let table_id: felt252 = SEASON_1_TABLE();
 
@@ -212,8 +212,8 @@ mod tests {
         sys.rng.set_mocked_values(salts.salts, salts.values);
 
         tester::fund_duelists_pool(@sys, 2);
-        let _duelist_id_a: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OWNER())[0];
-        let _duelist_id_b: u128 = *tester::execute_claim_welcome_pack(@sys.pack, OTHER())[0];
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
 
         let table_id: felt252 = SEASON_1_TABLE();
 
@@ -464,8 +464,8 @@ mod tests {
 
         if ((*sys).duelists.minted_count() == 0) {
             tester::fund_duelists_pool(sys, 2);
-            let _duelist_id_a: u128 = *tester::execute_claim_welcome_pack(sys.pack, OWNER())[0];
-            let _duelist_id_b: u128 = *tester::execute_claim_welcome_pack(sys.pack, OTHER())[0];
+            let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(sys.pack, OWNER())[0];
+            let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(sys.pack, OTHER())[0];
         }
         let duelist_id_a: u128 = ID(OWNER());
         let duelist_id_b: u128 = ID(OTHER());

@@ -153,7 +153,7 @@ fn test_token_uri() {
 
     tester::set_Pack(ref sys.world, @pack);
 
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     _purchase(@sys, OWNER());
 
     let uri = sys.pack.token_uri(TOKEN_ID_2);
@@ -181,21 +181,21 @@ fn test_claim_purchase() {
 
     let player: Player = sys.store.get_player(OWNER());
     assert!(!player.exists(), "!player.exists()");
-    assert!(!player.claimed_welcome_pack, "!player.claimed_welcome_pack");
+    assert!(!player.claimed_starter_pack, "!player.claimed_starter_pack");
 
-    let welcome_pack_duelist_count: usize = PackType::WelcomePack.description().quantity;
+    let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
 
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     _assert_minted_count(@sys, 1, "total_supply 1");
-    _assert_duelist_count(@sys, welcome_pack_duelist_count.into(), "duelist_supply [welcome_pack_duelist_count]");
+    _assert_duelist_count(@sys, starter_pack_duelist_count.into(), "duelist_supply [starter_pack_duelist_count]");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "balance_of 0");
 
     let player: Player = sys.store.get_player(OWNER());
     assert!(player.exists(), "player.exists()");
-    assert!(player.claimed_welcome_pack, "player.claimed_welcome_pack");
+    assert!(player.claimed_starter_pack, "player.claimed_starter_pack");
     let pack_1: Pack = sys.store.get_pack(TOKEN_ID_1.low);
     assert_eq!(pack_1.pack_id, TOKEN_ID_1.low, "pack_1.pack_id");
-    assert_eq!(pack_1.pack_type, PackType::WelcomePack, "pack_1.pack_type");
+    assert_eq!(pack_1.pack_type, PackType::StarterPack, "pack_1.pack_type");
     assert_ne!(pack_1.seed, 0, "pack_1.seed");
     assert!(pack_1.is_open, "pack_1.is_open");
 
@@ -222,23 +222,23 @@ fn test_claim_purchase() {
     assert_eq!(balance_owner, balance_owner_initial - price, "balance_owner");
     assert_eq!(balance_bank, balance_bank_initial + price, "balance_bank");
 
-    tester::execute_claim_welcome_pack(@sys.pack, OTHER());
+    tester::execute_claim_starter_pack(@sys.pack, OTHER());
 }
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_claim_not_sponsored() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
-    tester::execute_claim_welcome_pack(@sys.pack, OTHER());
-    tester::execute_claim_welcome_pack(@sys.pack, BUMMER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OTHER());
+    tester::execute_claim_starter_pack(@sys.pack, BUMMER());
 }
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance_zero() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     sys.pack.purchase(PackType::Duelists5x);
 }
 
@@ -246,15 +246,15 @@ fn test_mint_no_allowance_zero() {
 #[should_panic(expected: ('PACK: Already claimed', 'ENTRYPOINT_FAILED'))]
 fn test_claim_twice() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
 }
 
 #[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance_half() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     let price: u128 = sys.pack.calc_mint_fee(OWNER(), PackType::Duelists5x);
     tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, price / 2);
     sys.pack.purchase(PackType::Duelists5x);
@@ -271,8 +271,8 @@ fn test_no_claim() {
 #[should_panic(expected: ('PACK: Not for sale', 'ENTRYPOINT_FAILED'))]
 fn test_mint_not_for_sale() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
-    sys.pack.purchase(PackType::WelcomePack);
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    sys.pack.purchase(PackType::StarterPack);
 }
 
 
@@ -284,23 +284,23 @@ fn test_mint_not_for_sale() {
 fn test_open() {
     let mut sys: TestSystems = setup(0);
 
-    let welcome_pack_duelist_count: usize = PackType::WelcomePack.description().quantity;
+    let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
 
     // claiming opens and mint duelists
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
-    _assert_duelist_count(@sys, welcome_pack_duelist_count.into(), "duelist_supply");
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    _assert_duelist_count(@sys, starter_pack_duelist_count.into(), "duelist_supply");
     let pack_1: Pack = sys.store.get_pack(TOKEN_ID_1.low);
     assert!(pack_1.is_open, "pack_1.is_open == true");
 
     // purchase, minted count does not change
     _purchase(@sys, OWNER());
-    _assert_duelist_count(@sys, welcome_pack_duelist_count.into(), "duelist_supply_after_purchase");
+    _assert_duelist_count(@sys, starter_pack_duelist_count.into(), "duelist_supply_after_purchase");
     let pack_2: Pack = sys.store.get_pack(TOKEN_ID_2.low);
     assert!(!pack_2.is_open, "pack_2.is_open == false");
 
     // open, minted count +5
     sys.pack.open(TOKEN_ID_2.low);
-    _assert_duelist_count(@sys, welcome_pack_duelist_count.into() + 5, "duelist_supply_after_open");
+    _assert_duelist_count(@sys, starter_pack_duelist_count.into() + 5, "duelist_supply_after_open");
     let pack_2: Pack = sys.store.get_pack(TOKEN_ID_2.low);
     assert!(pack_2.is_open, "pack_2.is_open == false");
 }
@@ -318,7 +318,7 @@ fn test_open_invalid() {
 // #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_already_opened() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     tester::impersonate(OWNER());
     sys.pack.open(TOKEN_ID_1.low);
 }
@@ -327,7 +327,7 @@ fn test_already_opened() {
 #[should_panic(expected: ('PACK: Not owner', 'ENTRYPOINT_FAILED'))]
 fn test_open_not_owner() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     _purchase(@sys, OWNER());
     tester::impersonate(OTHER());
     sys.pack.open(TOKEN_ID_2.low);
@@ -343,7 +343,7 @@ fn test_open_not_owner() {
 // #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_transfer_opened() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     // try to transfer already opened
     utils::impersonate(OWNER());
     sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
@@ -354,7 +354,7 @@ fn test_transfer_opened() {
 // #[should_panic(expected: ('PACK: Already opened', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_transfer_opened_allowed() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     // approve
     tester::impersonate(OWNER());
     sys.pack.approve(SPENDER(), TOKEN_ID_1);
@@ -368,7 +368,7 @@ fn test_transfer_opened_allowed() {
 // #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))] // no burn
 fn test_transfer_opened_no_allowance() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     // try to transfer from unauthorized
     utils::impersonate(SPENDER());
     sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
@@ -377,7 +377,7 @@ fn test_transfer_opened_no_allowance() {
 #[test]
 fn test_transfer_unopened_ok() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     _purchase(@sys, OWNER());
     assert_eq!(sys.pack.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
     assert_eq!(sys.pack.balance_of(OTHER()), 0, "balance_of(OTHER) 0");
@@ -393,7 +393,7 @@ fn test_transfer_unopened_ok() {
 #[test]
 fn test_transfer_unopened_allowed_ok() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     _purchase(@sys, OWNER());
     assert_eq!(sys.pack.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
     assert_eq!(sys.pack.balance_of(OTHER()), 0, "balance_of(OTHER) 0");
@@ -413,7 +413,7 @@ fn test_transfer_unopened_allowed_ok() {
 #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
 fn test_transfer_unopened_no_allowance() {
     let mut sys: TestSystems = setup(0);
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
     _purchase(@sys, OWNER());
     // try to transfer from unauthorized
     utils::impersonate(SPENDER());

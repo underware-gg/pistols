@@ -177,9 +177,9 @@ export function createSystemCalls(
     // pack_token
     //
     pack_token: {
-      claim_welcome_pack: async (signer: AccountInterface): Promise<boolean> => {
+      claim_starter_pack: async (signer: AccountInterface): Promise<boolean> => {
         const calls: DojoCalls = [
-          contractCalls.pack_token.buildClaimWelcomePackCalldata(),
+          contractCalls.pack_token.buildClaimStarterPackCalldata(),
         ]
         return await _executeTransaction(signer, calls)
       },

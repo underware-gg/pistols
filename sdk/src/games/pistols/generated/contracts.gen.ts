@@ -427,17 +427,17 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_canClaimWelcomePack_calldata = (recipient: string): DojoCall => {
+	const build_pack_token_canClaimStarterPack_calldata = (recipient: string): DojoCall => {
 		return {
 			contractName: "pack_token",
-			entrypoint: "can_claim_welcome_pack",
+			entrypoint: "can_claim_starter_pack",
 			calldata: [recipient],
 		};
 	};
 
-	const pack_token_canClaimWelcomePack = async (recipient: string) => {
+	const pack_token_canClaimStarterPack = async (recipient: string) => {
 		try {
-			return await provider.call("pistols", build_pack_token_canClaimWelcomePack_calldata(recipient));
+			return await provider.call("pistols", build_pack_token_canClaimStarterPack_calldata(recipient));
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -567,19 +567,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_pack_token_claimWelcomePack_calldata = (): DojoCall => {
+	const build_pack_token_claimStarterPack_calldata = (): DojoCall => {
 		return {
 			contractName: "pack_token",
-			entrypoint: "claim_welcome_pack",
+			entrypoint: "claim_starter_pack",
 			calldata: [],
 		};
 	};
 
-	const pack_token_claimWelcomePack = async (snAccount: Account | AccountInterface) => {
+	const pack_token_claimStarterPack = async (snAccount: Account | AccountInterface) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_pack_token_claimWelcomePack_calldata(),
+				build_pack_token_claimStarterPack_calldata(),
 				"pistols",
 			);
 		} catch (error) {
@@ -3091,14 +3091,14 @@ export function setupWorld(provider: DojoProvider) {
 			buildBalanceOfCalldata: build_pack_token_balanceOf_calldata,
 			calcMintFee: pack_token_calcMintFee,
 			buildCalcMintFeeCalldata: build_pack_token_calcMintFee_calldata,
-			canClaimWelcomePack: pack_token_canClaimWelcomePack,
-			buildCanClaimWelcomePackCalldata: build_pack_token_canClaimWelcomePack_calldata,
+			canClaimStarterPack: pack_token_canClaimStarterPack,
+			buildCanClaimStarterPackCalldata: build_pack_token_canClaimStarterPack_calldata,
 			canMint: pack_token_canMint,
 			buildCanMintCalldata: build_pack_token_canMint_calldata,
 			canPurchase: pack_token_canPurchase,
 			buildCanPurchaseCalldata: build_pack_token_canPurchase_calldata,
-			claimWelcomePack: pack_token_claimWelcomePack,
-			buildClaimWelcomePackCalldata: build_pack_token_claimWelcomePack_calldata,
+			claimStarterPack: pack_token_claimStarterPack,
+			buildClaimStarterPackCalldata: build_pack_token_claimStarterPack_calldata,
 			exists: pack_token_exists,
 			buildExistsCalldata: build_pack_token_exists_calldata,
 			getApproved: pack_token_getApproved,

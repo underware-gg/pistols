@@ -43,8 +43,8 @@ const ActivityItem = ({
   if (!activity.is_public) {
     return <></>
   }
-  if (activity.activity === constants.Activity.PackWelcome) {
-    return <ActivityItemPackWelcome activity={activity} clientSeconds={clientSeconds} />
+  if (activity.activity === constants.Activity.PackStarter) {
+    return <ActivityItemPackStarter activity={activity} clientSeconds={clientSeconds} />
   }
   if (activity.activity === constants.Activity.DuelistSpawned) {
     return <ActivityItemDuelistSpawned activity={activity} clientSeconds={clientSeconds} />
@@ -70,7 +70,7 @@ const ActivityItem = ({
   return <></>
 }
 
-const ActivityItemPackWelcome = ({
+const ActivityItemPackStarter = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {

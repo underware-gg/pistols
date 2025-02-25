@@ -4,7 +4,7 @@ import { useEffectOnce } from '@underware_gg/pistols-sdk/utils/hooks'
 import { useDojoStatus, useConnectToSelectedNetwork } from '@underware_gg/pistols-sdk/dojo'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
-import { useCanClaimWelcomePack } from '/src/hooks/usePistolsContractCalls'
+import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { Divider } from '/src/components/ui/Divider'
 import { PACKAGE_VERSION } from '/src/utils/constants'
@@ -139,7 +139,7 @@ export function ConnectButton({ setLoading }: { setLoading?: (loading: boolean) 
   const { connect } = useConnectToSelectedNetwork()
   
   const { duelistIds } = useDuelistsOfPlayer()
-  const { canClaimWelcomePack } = useCanClaimWelcomePack(duelistIds.length)
+  const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
   const { dispatchSetScene } = usePistolsScene()
 
   const canConnect = (!isLoading && !isError && !isConnecting && connect != null)
@@ -157,7 +157,7 @@ export function ConnectButton({ setLoading }: { setLoading?: (loading: boolean) 
 
     if (isConnected && !isError) {
       timeoutId = setTimeout(() => {
-        if (canClaimWelcomePack) {
+        if (canClaimStarterPack) {
           dispatchSetScene(SceneName.Tutorial)
         } else {
           dispatchSetScene(SceneName.Tavern)
@@ -171,7 +171,7 @@ export function ConnectButton({ setLoading }: { setLoading?: (loading: boolean) 
       }
     }
 
-  }, [isConnected, isError, canClaimWelcomePack])
+  }, [isConnected, isError, canClaimStarterPack])
 
   return <ActionButton fill large important disabled={!canConnect} onClick={() => _connect()} label={'Enter as Patron'} />
 }

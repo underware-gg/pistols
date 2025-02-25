@@ -55,7 +55,7 @@ export const getArchetypeMap = (): Record<Archetype, number> => Object.keys(Arch
 // from: ../dojo/src/models/pack.cairo
 export enum PackType {
   Unknown = 'Unknown', // 0
-  WelcomePack = 'WelcomePack', // 1
+  StarterPack = 'StarterPack', // 1
   Duelists5x = 'Duelists5x', // 2
 };
 export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
@@ -66,7 +66,7 @@ export const getPackTypeMap = (): Record<PackType, number> => Object.keys(PackTy
 export enum Activity {
   Undefined = 'Undefined', // 0
   TutorialFinished = 'TutorialFinished', // 1
-  PackWelcome = 'PackWelcome', // 2
+  PackStarter = 'PackStarter', // 2
   PackPurchased = 'PackPurchased', // 3
   PackOpened = 'PackOpened', // 4
   DuelistSpawned = 'DuelistSpawned', // 5
@@ -543,7 +543,7 @@ export const CONFIG: type_CONFIG = {
 // from: ../dojo/src/models/pack.cairo
 type type_PACK_TYPES = {
   Unknown: PackDescription, // cairo: PackDescription
-  WelcomePack: PackDescription, // cairo: PackDescription
+  StarterPack: PackDescription, // cairo: PackDescription
   Duelists5x: PackDescription, // cairo: PackDescription
 };
 export const PACK_TYPES: type_PACK_TYPES = {
@@ -556,11 +556,11 @@ export const PACK_TYPES: type_PACK_TYPES = {
     price_lords: 0n,
     quantity: 0,
   },
-  WelcomePack: {
-    id: 'WelcomePack',
-    name: 'Welcome Pack',
-    image_url_closed: '/tokens/WelcomePack.jpg',
-    image_url_open: '/tokens/WelcomePack.jpg',
+  StarterPack: {
+    id: 'StarterPack',
+    name: 'Starter Pack',
+    image_url_closed: '/tokens/StarterPack.jpg',
+    image_url_open: '/tokens/StarterPack.jpg',
     can_purchase: false,
     price_lords: (20n * CONST.ETH_TO_WEI),
     quantity: 2,

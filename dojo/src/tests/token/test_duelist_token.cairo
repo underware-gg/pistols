@@ -103,7 +103,7 @@ fn setup(_fee_amount: u128) -> TestSystems {
     tester::fund_duelists_pool(@sys, 2);
 
     // initialize contracts
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
 
     tester::impersonate(OWNER());
 
@@ -128,10 +128,10 @@ fn test_initializer() {
     let mut sys: TestSystems = setup(0);
     assert_eq!(sys.duelists.symbol(), "DUELIST", "Symbol is wrong");
 
-    let welcome_pack_duelist_count: usize = PackType::WelcomePack.description().quantity;
+    let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
 
-    _assert_minted_count(@sys, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
-    assert_eq!(sys.duelists.balance_of(OWNER()), welcome_pack_duelist_count.into(), "Should eq [welcome_pack_duelist_count]");
+    _assert_minted_count(@sys, starter_pack_duelist_count, "Should eq [starter_pack_duelist_count]");
+    assert_eq!(sys.duelists.balance_of(OWNER()), starter_pack_duelist_count.into(), "Should eq [starter_pack_duelist_count]");
     assert_eq!(sys.duelists.balance_of(OTHER()), 0, "Should eq 0");
 
     assert_eq!(sys.duelists.owner_of(TOKEN_ID_1_1), OWNER(), "owner_of_1");
@@ -233,11 +233,11 @@ fn test_approve() {
 fn test_transfer_from() {
     let mut sys: TestSystems = setup(0);
 
-    let welcome_pack_duelist_count: usize = PackType::WelcomePack.description().quantity;
+    let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
 
-    assert_eq!(sys.duelists.balance_of(OWNER()), welcome_pack_duelist_count.into(), "Should eq [welcome_pack_duelist_count]");
+    assert_eq!(sys.duelists.balance_of(OWNER()), starter_pack_duelist_count.into(), "Should eq [starter_pack_duelist_count]");
     assert_eq!(sys.duelists.balance_of(OTHER()), 0, "Should eq 0");
-    _assert_minted_count(@sys, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
+    _assert_minted_count(@sys, starter_pack_duelist_count, "Should eq [starter_pack_duelist_count]");
 
     tester::impersonate(OWNER());
     sys.duelists.approve(SPENDER(), TOKEN_ID_1_1);
@@ -249,10 +249,10 @@ fn test_transfer_from() {
     tester::impersonate(SPENDER());
     sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1_1);
 
-    assert_eq!(sys.duelists.balance_of(OWNER()), (welcome_pack_duelist_count - 1).into(), "Should eq [welcome_pack_duelist_count - 1]");
+    assert_eq!(sys.duelists.balance_of(OWNER()), (starter_pack_duelist_count - 1).into(), "Should eq [starter_pack_duelist_count - 1]");
     assert_eq!(sys.duelists.balance_of(OTHER()), 1, "Should eq 1");
     assert_eq!(sys.duelists.get_approved(TOKEN_ID_1_1), ZERO(), "Should eq 0");
-    _assert_minted_count(@sys, welcome_pack_duelist_count, "Should eq [welcome_pack_duelist_count]");
+    _assert_minted_count(@sys, starter_pack_duelist_count, "Should eq [starter_pack_duelist_count]");
 }
 
 #[test]
@@ -287,7 +287,7 @@ fn test_transfer_no_allowance() {
 fn test_fame() {
     let mut sys: TestSystems = setup(0);
 
-    tester::execute_claim_welcome_pack(@sys.pack, OTHER());
+    tester::execute_claim_starter_pack(@sys.pack, OTHER());
 
     // initial token balances
     let balance_1_initial: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, TOKEN_ID_1_1.low);

@@ -45,10 +45,10 @@ pub trait IPackToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IPackTokenPublic
-    fn can_claim_welcome_pack(self: @TState, recipient: ContractAddress) -> bool;
+    fn can_claim_starter_pack(self: @TState, recipient: ContractAddress) -> bool;
     fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
-    fn claim_welcome_pack(ref self: TState) -> Span<u128>;
+    fn claim_starter_pack(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
 }
@@ -57,11 +57,11 @@ pub trait IPackToken<TState> {
 #[starknet::interface]
 pub trait IPackTokenPublic<TState> {
     // view
-    fn can_claim_welcome_pack(self: @TState, recipient: ContractAddress) -> bool;
+    fn can_claim_starter_pack(self: @TState, recipient: ContractAddress) -> bool;
     fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
     // write
-    fn claim_welcome_pack(ref self: TState) -> Span<u128>;
+    fn claim_starter_pack(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
 }
@@ -168,33 +168,33 @@ pub mod pack_token {
     #[abi(embed_v0)]
     impl PackTokenPublicImpl of super::IPackTokenPublic<ContractState> {
 
-        fn can_claim_welcome_pack(self: @ContractState, recipient: ContractAddress) -> bool {
+        fn can_claim_starter_pack(self: @ContractState, recipient: ContractAddress) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let player: Player = store.get_player(recipient);
-            (!player.claimed_welcome_pack)
+            (!player.claimed_starter_pack)
         }
 
         fn can_purchase(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> bool {
-            (!self.can_claim_welcome_pack(recipient) && pack_type.can_purchase())
+            (!self.can_claim_starter_pack(recipient) && pack_type.can_purchase())
         }
 
         fn calc_mint_fee(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> u128 {
             (pack_type.mint_fee())
         }
 
-        fn claim_welcome_pack(ref self: ContractState) -> Span<u128> {
+        fn claim_starter_pack(ref self: ContractState) -> Span<u128> {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate
             let recipient: ContractAddress = starknet::get_caller_address();
-            assert(self.can_claim_welcome_pack(recipient), Errors::ALREADY_CLAIMED);
+            assert(self.can_claim_starter_pack(recipient), Errors::ALREADY_CLAIMED);
 
             // mint
-            let lords_amount: u128 = self.calc_mint_fee(recipient, PackType::WelcomePack);
-            let pack: Pack = self._mint_pack(PackType::WelcomePack, recipient, recipient.into(), lords_amount);
+            let lords_amount: u128 = self.calc_mint_fee(recipient, PackType::StarterPack);
+            let pack: Pack = self._mint_pack(PackType::StarterPack, recipient, recipient.into(), lords_amount);
             
             // events
-            PlayerTrait::check_in(ref store, Activity::PackWelcome, recipient, pack.pack_id.into());
+            PlayerTrait::check_in(ref store, Activity::PackStarter, recipient, pack.pack_id.into());
 
             // open immediately
             (self.open(pack.pack_id))
@@ -208,7 +208,7 @@ pub mod pack_token {
 
             // validate recipient
             let recipient: ContractAddress = starknet::get_caller_address();
-            assert(!self.can_claim_welcome_pack(recipient), Errors::CLAIM_FIRST);
+            assert(!self.can_claim_starter_pack(recipient), Errors::CLAIM_FIRST);
 
             // transfer mint fee
             let lords_amount: u128 = self.calc_mint_fee(recipient, pack_type);

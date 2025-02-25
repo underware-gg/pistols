@@ -107,11 +107,11 @@ export const useCalcFeeDuel = (table_id: string) => {
 // pack_token
 //
 
-export const useCanClaimWelcomePack = (forceCounter?: number) => {
+export const useCanClaimStarterPack = (forceCounter?: number) => {
   const { address } = useAccount()
-  const { pack_token: { canClaimWelcomePack } } = useDojoContractCalls()
+  const { pack_token: { canClaimStarterPack } } = useDojoContractCalls()
   const options = useMemo(() => ({
-    call: canClaimWelcomePack,
+    call: canClaimStarterPack,
     args: [address],
     enabled: isPositiveBigint(address),
     defaultValue: null,
@@ -119,7 +119,7 @@ export const useCanClaimWelcomePack = (forceCounter?: number) => {
   }), [address, forceCounter])
   const { value, isLoading } = useSdkCallPromise<boolean>(options)
   return {
-    canClaimWelcomePack: value,
+    canClaimStarterPack: value,
     isLoading,
   }
 }

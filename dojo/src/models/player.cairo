@@ -4,7 +4,7 @@ use starknet::{ContractAddress};
 pub enum Activity {
     Undefined,          // 0
     TutorialFinished,   // 1
-    PackWelcome,        // 2
+    PackStarter,        // 2
     PackPurchased,      // 3
     PackOpened,         // 4
     DuelistSpawned,     // 5
@@ -27,7 +27,7 @@ pub struct Player {
     pub player_address: ContractAddress,   // controller wallet
     //-----------------------
     pub timestamp_registered: u64,
-    pub claimed_welcome_pack: bool,
+    pub claimed_starter_pack: bool,
 }
 
 
@@ -101,10 +101,10 @@ pub impl PlayerImpl of PlayerTrait {
         if (!player.exists()) {
             assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
             player.timestamp_registered = starknet::get_block_timestamp();
-            player.claimed_welcome_pack = (activity == Activity::PackWelcome);
+            player.claimed_starter_pack = (activity == Activity::PackStarter);
             store.set_player(@player);
-        } else if (activity == Activity::PackWelcome) {
-            player.claimed_welcome_pack = true;
+        } else if (activity == Activity::PackStarter) {
+            player.claimed_starter_pack = true;
             store.set_player(@player);
         }
         activity.emit(ref store.world, player_address, identifier);
@@ -136,7 +136,7 @@ pub impl ActivityImpl of ActivityTrait {
     }
     fn can_register_player(self: @Activity) -> bool {
         match self {
-            // Activity::PackWelcome => true,
+            // Activity::PackStarter => true,
             // Activity::TutorialFinished => true,
             // Activity::DuelistSpawned => true,
             // Activity::ChallengeCreated => true,

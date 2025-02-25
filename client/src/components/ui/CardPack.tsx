@@ -56,9 +56,9 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   const previousDuelistIdsRef = useRef<bigint[]>([])
 
   const _claim = async () => {
-    if (packType === constants.PackType.WelcomePack) {
+    if (packType === constants.PackType.StarterPack) {
       setIsClaiming(true)
-      await pack_token.claim_welcome_pack(account)
+      await pack_token.claim_starter_pack(account)
     } else if (packType === constants.PackType.Duelists5x && packId) {
       setIsClaiming(true)
       await pack_token.open(account, packId)
@@ -73,7 +73,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
     }
 
     //TODO adjust to all card pack possibilities
-    // const expectedNewIds = packType === constants.PackType.WelcomePack ? 2 : 5
+    // const expectedNewIds = packType === constants.PackType.StarterPack ? 2 : 5
     const expectedNewIds = 5
     console.log('Expected new IDs:', expectedNewIds)
     const newIds = duelistIds.filter(id => !previousDuelistIdsRef.current.includes(id))
@@ -320,7 +320,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   const handleButtonClick = () => {
     if (!hasRevealed) {
       handleRevealAll()
-    } else if (packType === constants.PackType.WelcomePack) {
+    } else if (packType === constants.PackType.StarterPack) {
       if (selectedDuelistId !== undefined) {
         onComplete?.(selectedDuelistId)
       }
@@ -331,13 +331,13 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
 
   const getButtonLabel = () => {
     if (!hasRevealed) return 'Reveal All'
-    if (packType === constants.PackType.WelcomePack) return 'Go to Duel'
+    if (packType === constants.PackType.StarterPack) return 'Go to Duel'
     return 'Close'
   }
 
   const isButtonDisabled = () => {
     if (!hasRevealed) return false
-    if (packType === constants.PackType.WelcomePack && selectedDuelistId === undefined) return true
+    if (packType === constants.PackType.StarterPack && selectedDuelistId === undefined) return true
     return false
   }
 
@@ -352,7 +352,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
         return newSet;
       });
     } else if (revealedDuelists.size === newDuelistIds.length) {
-      if (packType === constants.PackType.WelcomePack) {
+      if (packType === constants.PackType.StarterPack) {
         if (selectedDuelistId === id) {
           setSelectedDuelistId(undefined);
           cardRef?.setCardScale(1, CARD_PACK_CARD_SCALE_DURATION);

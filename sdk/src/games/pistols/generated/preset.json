@@ -34,7 +34,7 @@
         "description": "Packs ERC721 contract",
         "methods": [
           {
-            "entrypoint": "claim_welcome_pack"
+            "entrypoint": "claim_starter_pack"
           },
           {
             "entrypoint": "purchase"
