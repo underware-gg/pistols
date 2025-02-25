@@ -49,6 +49,9 @@ const ActivityItem = ({
   if (activity.activity === constants.Activity.DuelistSpawned) {
     return <ActivityItemDuelistSpawned activity={activity} clientSeconds={clientSeconds} />
   }
+  if (activity.activity === constants.Activity.DuelistDied) {
+    return <ActivityItemDuelistDied activity={activity} clientSeconds={clientSeconds} />
+  }
   if (activity.activity === constants.Activity.ChallengeCreated) {
     return <ActivityItemChallengeCreated activity={activity} clientSeconds={clientSeconds} />
   }
@@ -94,6 +97,20 @@ const ActivityItemDuelistSpawned = ({
       {' spawned '}
       <DuelistLink duelistId={activity.identifier} />
       {' '}
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <br />
+    </>
+  )
+}
+
+const ActivityItemDuelistDied = ({
+  activity,
+  clientSeconds,
+}: ActivityItemProps) => {
+  return (
+    <>
+      <DuelistLink duelistId={activity.identifier} />
+      {' is dead! '}
       <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
       <br />
     </>
