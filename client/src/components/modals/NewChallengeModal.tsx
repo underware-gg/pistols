@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal, Form, Dropdown } from 'semantic-ui-react'
+import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
@@ -10,14 +11,15 @@ import { useTable } from '/src/stores/tableStore'
 import { usePact } from '/src/hooks/usePact'
 import { useCalcFeeDuel, useCalcSeasonReward, useCanJoin } from '/src/hooks/usePistolsContractCalls'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
+import { formatOrdinalNumber } from '@underware_gg/pistols-sdk/utils'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ProfileDescription } from '/src/components/account/ProfileDescription'
 import { FormInput } from '/src/components/ui/Form'
-import { FameBalance, FeesToPay } from '/src/components/account/LordsBalance'
+import { FeesToPay } from '/src/components/account/LordsBalance'
 import { Divider } from '/src/components/ui/Divider'
+import { Balance } from '/src/components/account/Balance'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
-import { Balance } from '../account/Balance'
-import { formatOrdinalNumber } from '@underware_gg/pistols-sdk/utils'
+import { useFameBalanceDuelist } from '/src/hooks/useFame'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -42,7 +44,7 @@ export default function NewChallengeModal() {
 
   const { description: tableDescription } = useTable(tableId)
 
-  const [args, setArgs] = useState(null)
+  const [args, setArgs] = useState<any>(null)
 
   const { fee } = useCalcFeeDuel(tableId)
   const { canJoin } = useCanJoin(tableId, duelistId)
@@ -118,14 +120,16 @@ export default function NewChallengeModal() {
             </Row>
             <Row columns='equal' textAlign='left'>
               <Col>
-                <NewChallengeForm setArgs={setArgs} />
+                <NewChallengeForm duelistId={duelistIdA} setArgs={setArgs} />
               </Col>
             </Row>
-            {/* <Row columns='equal' textAlign='left'>
-              <Col>
-                <FeesToPay big value={0} fee={fee} prefixed />
-              </Col>
-            </Row> */}
+            {fee > 0n &&
+              <Row columns='equal' textAlign='left'>
+                <Col>
+                  <FeesToPay big value={0} fee={fee} prefixed />
+                </Col>
+              </Row>
+            }
             <Row columns='equal' textAlign='left'>
               <Col className='H3'>
                 Winning...
@@ -178,9 +182,15 @@ export default function NewChallengeModal() {
 }
 
 function NewChallengeForm({
+  duelistId,
   setArgs,
+}: {
+  duelistId: BigNumberish
+  setArgs: (args: any) => void
 }) {
   const { tableId } = useTableId()
+  const { lives } = useFameBalanceDuelist(duelistId)
+  
   const [premise, setPremise] = useState(constants.Premise.Honour)
   const [quote, setQuote] = useState('')
   const [days, setDays] = useState(7)
@@ -218,11 +228,11 @@ function NewChallengeForm({
     text: `${index} hours`,
   })), [])
 
-  const livesOptions: any[] = useMemo(() => [1, 2, 3, 4, 5].map(index => ({
-    key: `${index}`,
-    value: `${index}`,
-    text: `${index} lives`,
-  })), [])
+  const livesOptions: any[] = useMemo(() => [...Array(lives).keys()].map(index => ({
+    key: `${index + 1}`,
+    value: `${index + 1}`,
+    text: `${index + 1} lives`,
+  })), [lives])
 
   return (
     <div style={{ width: '350px' }}>
