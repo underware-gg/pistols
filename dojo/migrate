@@ -109,7 +109,13 @@ if [[ "$PROFILE" == "dev" ]]; then
   # ../sdk/bin/generateConstants.cjs --src:"../dojo/src" --out:"../sdk/src/games/pistols/generated/constants.ts"
   execute_command "npm run generate-constants --sdk=$SDK_GAME_PATH"
   echo "👍?"
+  #
+  # list copied files
+  echo "------------------------------------------------------------------------------"
+  ls -ld $SDK_GAME_PATH/* | grep -E 'ts|json'
+fi
 
+if [[ "$PROFILE" == "mainnet" ]]; then
   echo "------------------------------------------------------------------------------"
   echo ">>> Generate controller preset..."
   # npm run generate-controller-preset --sdk=../sdk/src/games/pistols
@@ -117,10 +123,6 @@ if [[ "$PROFILE" == "dev" ]]; then
   # ../sdk/dist/bin/generateControllerPreset.mjs --out:"../sdk/src/games/pistols/generated/preset.json"
   execute_command "npm run generate-controller-preset --sdk=$SDK_GAME_PATH"
   echo "👍?"
-  #
-  # list copied files
-  echo "------------------------------------------------------------------------------"
-  ls -ld $SDK_GAME_PATH/* | grep -E 'ts|json'
 fi
 
 #------------------
