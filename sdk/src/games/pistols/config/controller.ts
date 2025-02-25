@@ -5,7 +5,7 @@ import { makeControllerConnector } from 'src/dojo/setup/controller'
 import {
   getLordsAddress,
   getFameAddress,
-  // getFoolsAddress,
+  getFoolsAddress,
   getDuelistTokenAddress,
   getDuelTokenAddress,
   getPackTokenAddress,
@@ -18,7 +18,7 @@ export const makePistolsControllerConnector = (networkId: NetworkId): Connector 
     erc20: [
       getLordsAddress(networkId),
       getFameAddress(networkId),
-      // getFoolsAddress(networkId),
+      getFoolsAddress(networkId),
     ],
     //@ts-ignore
     erc721: [

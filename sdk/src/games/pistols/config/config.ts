@@ -125,7 +125,7 @@ export const makeStarknetDomain = (networkId: NetworkId): StarknetDomain => ({
 // erc-20
 export const getLordsAddress = (networkId: NetworkId): string => (NETWORKS[networkId].lordsAddress || (getContractByName(manifests[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
 export const getFameAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fame_coin')?.address ?? '0x0')
-// export const getFoolsAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
+export const getFoolsAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
 // erc-721
 export const getDuelistTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duelist_token')?.address ?? '0x0')
 export const getDuelTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duel_token')?.address ?? '0x0')

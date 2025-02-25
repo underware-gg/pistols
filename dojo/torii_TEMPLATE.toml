@@ -19,5 +19,6 @@ contracts = [
   "erc721:$duelist_token", # duelist_token
   "erc721:$pack_token", # pack_token
   "erc20:$fame_coin", # fame_coin
-  # "erc20:$lords", # lords
+  "erc20:$fools_coin", # fools_coin
+  "erc20:$lords", # lords
 ]
