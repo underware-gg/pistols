@@ -25,14 +25,19 @@ export function createSystemCalls(
   const _executeTransaction = async (signer: AccountInterface, calls: DojoCalls): Promise<boolean> => {
     let success = false
     try {
-      console.log(`execute...`, calls)
+      console.log(`_executeTransaction(): execute...`, calls)
+      if (!signer) {
+        throw new Error(`_executeTransaction(): not connected!`)
+      }
       calls = arrayClean(calls)
       const tx = await provider.execute(signer, calls, NAMESPACE);
       calls.forEach((c, index) => {
         //@ts-ignore
         console.log(`execute[${index}] ${c?.contractAddress ? `(${shortAddress(c.contractAddress)})` : c?.contractName}::${c.entrypoint}():`, c.calldata, tx)
       })
-
+      if (!tx) {
+        throw new Error(`_executeTransaction(): provider returned undefined tx`)
+      }
       const receipt = await signer.waitForTransaction(tx.transaction_hash, { retryInterval: 200 })
       success = getReceiptStatus(receipt);
       (success ? console.log : console.warn)(`execute success:`, success, 'receipt:', receipt, 'calls:', calls)
