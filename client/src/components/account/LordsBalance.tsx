@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useLordsBalance, useEtherBalance } from '@underware_gg/pistols-sdk/dojo'
-import { Balance } from '/src/components/account/Balance'
+import { useFoolsBalance } from '/src/hooks/useFools'
 import { useFameBalance, useFameBalanceDuelist } from '/src/hooks/useFame'
+import { Balance } from '/src/components/account/Balance'
 
 
 //
@@ -38,7 +39,23 @@ export const LordsBalance = ({
 
 
 //
-// Fame Balance of a Duelist
+// Fools balance of a player
+//
+export const FoolsBalance = ({
+  address,
+  big = false,
+}: {
+  address: BigNumberish
+  big?: boolean
+}) => {
+  const { balance } = useFoolsBalance(address)
+  return (
+    <Balance fools wei={balance} big={big} />
+  )
+}
+
+//
+// Fame Balance of a contract (players dont have FAME)
 //
 export const FameBalance = ({
   address,

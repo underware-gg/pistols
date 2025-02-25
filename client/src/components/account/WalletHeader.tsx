@@ -5,7 +5,7 @@ import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useLordsContract, useStarknetContext, useConnectedController, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { usePlayer } from '/src/stores/playerStore'
-import { FameBalance, LordsBalance } from '/src/components/account/LordsBalance'
+import { FoolsBalance, LordsBalance } from '/src/components/account/LordsBalance'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { AddressShort } from '/src/components/ui/AddressShort'
@@ -50,7 +50,7 @@ export default function WalletHeader({
               <h5>
                 LORDS: <LordsBalance address={address} />
                 <span className='Inactive'> | </span>
-                FAME: <FameBalance address={address} />
+                FOOLS: <FoolsBalance address={address} />
                 {/* <EtherBalance address={address} /> */}
               </h5>
             }
