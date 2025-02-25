@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 import { useAccount } from '@starknet-react/core'
-import { TokenBalance } from '@dojoengine/torii-client'
-import { useDojoSetup } from '@underware_gg/pistols-sdk/dojo'
+import { formatQueryValue, useDojoSetup } from '@underware_gg/pistols-sdk/dojo'
 import { useToriiTokensByOwnerQL } from '@underware_gg/pistols-sdk/dojo/graphql'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
+import { useTokenConfig } from '/src/stores/tokenConfigStore'
 import { useTokenStore } from '/src/stores/tokenStore'
-import { useTokenConfig } from '../tokenConfigStore'
+import * as torii from '@dojoengine/torii-client'
 
 
 //----------------------------------------
@@ -31,7 +31,7 @@ export function TokensOfPlayerStoreSyncQL({
       state.setTokens(duelistContractAddress, address, tokens)
     }
   }, [duelistContractAddress, address, tokens, isLoading])
-  // useEffect(() => console.log("TokensOfPlayerStoreSyncQL() =>", state.tokens), [state.tokens])
+  useEffect(() => console.log("TokensOfPlayerStoreSyncQL() =>", state.tokens), [state.tokens])
   return (<></>)
 }
 
@@ -46,22 +46,29 @@ export function TokensOfPlayerStoreSync() {
   // const state = useTokenStore((state) => state)
   // useEffect(() => {
   //   const _fetch = async () => {
-  //     // const response: Token[] = await sdk.getTokens([])
-  //     const response: TokenBalance[] = await sdk.getTokenBalances(
-  //       // [],
-  //       ['0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7'],
-  //       // [formatQueryValue(address)],
-  //       // ['0x24ec36b5c19d158e9749d4f2b48afb7b51ce0f5e4a871f53028a601a253fb6e'],
-  //       // [formatQueryValue(duelistContractAddress)],
+  //     console.log(`GRPC-1: TokensOfPlayerStoreSync_SDK() fetch...`)
+  //     const response: torii.TokenBalance[] = await sdk.getTokenBalances(
+  //       // [formatQueryValue(address)], // accounts
+  //       // ["0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7"],
   //       [],
+  //       // [formatQueryValue(duelistContractAddress)], // contracts
+  //       // ['0xd103c7c53ce13a217d8a05a92e277ca6edca7c4362621c538dc7ec74be3b02'], // duelists
+  //       [], // contracts
+  //       [], // tokens
   //     )
-  //     console.log("TokensOfPlayerStoreSync_SDK() =>>>>>>>>>", response)
+  //     // const response: torii.Token[] = await sdk.getTokens(
+  //     //   // [formatQueryValue(duelistContractAddress)], // contracts
+  //     //   // ['0xd103c7c53ce13a217d8a05a92e277ca6edca7c4362621c538dc7ec74be3b02'], // duelists
+  //     //   [], // contracts
+  //     //   [], // tokens
+  //     // )
+  //     console.log("GRPC-2: TokensOfPlayerStoreSync_SDK() response =>>>>>>>>>", response)
   //   }
-  //   console.log(`____SDK account:`, address, duelistContractAddress, sdk)
   //   if (sdk && address) {
+  //     console.log(`GRPC-0: TokensOfPlayerStoreSync_SDK() fetch...`, address, duelistContractAddress)
   //     _fetch()
   //   }
   // }, [sdk, address])
-  // useEffect(() => console.log("TokensOfPlayerStoreSync() =>", state.tokenIds), [state.tokenIds])
+  // useEffect(() => console.log("GRPC-2: TokensOfPlayerStoreSync_SDK() state =>", state.tokens), [state.tokens])
   return (<></>)
 }
