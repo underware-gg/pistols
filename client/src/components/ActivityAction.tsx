@@ -94,7 +94,7 @@ const ActionItem = ({
   isBookmarked: boolean
     requiredActionDuelIds: bigint[]
 }) => {
-  const { isInAction, currentDuelId } = useDuelist(duelistId)
+  const { isInAction, isInactive, currentDuelId } = useDuelist(duelistId)
   const requiresAction = useMemo(() => requiredActionDuelIds.includes(currentDuelId), [currentDuelId, requiredActionDuelIds])
   const { duelistContractAddress } = useDuelistTokenContract()
   const { publish } = usePlayerBookmarkSignedMessage(duelistContractAddress, duelistId, !isBookmarked)
@@ -102,6 +102,9 @@ const ActionItem = ({
   const icon = useMemo(() => {
     if (requiresAction) {
       return <Icon name='circle' className='Positive' />
+    }
+    if (isInactive) {
+      return <Icon name='circle' className='Warning' />
     }
     if (isInAction) {
       return <Icon name='circle' />
@@ -115,12 +118,12 @@ const ActionItem = ({
       {icon}
       <DuelistLink duelistId={duelistId} useName />
       {' '}
-      {isInAction ?
-        <>
-          {requiresAction ? ' required in ' : ' awaits in '}
-          <ChallengeLink duelId={currentDuelId} />
-        </>
-        : 'is idle'}
+      {isInAction ? <>
+        {requiresAction ? ' required in ' : ' awaits in '}
+        <ChallengeLink duelId={currentDuelId} />
+      </>
+        : isInactive ? 'is inactive losing FAME!'
+          : 'is idle'}
       <br />
     </>
   )

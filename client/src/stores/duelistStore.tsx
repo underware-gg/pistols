@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { BigNumberish, CairoCustomEnum } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
-import { useEntityId } from '@underware_gg/pistols-sdk/utils/hooks'
+import { useClientTimestamp, useEntityId } from '@underware_gg/pistols-sdk/utils/hooks'
 import { isPositiveBigint, parseCustomEnum, bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 import { PistolsSchemaType, getProfileDescription } from '@underware_gg/pistols-sdk/pistols'
 import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
@@ -40,9 +40,22 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const scoreboard = useEntityModel<models.Scoreboard>(entity, 'Scoreboard')
   // console.log(`useDuelist() =>`, duelist_id, duelist)
 
-  const timestamp_registered = useMemo(() => Number(duelist?.timestamp_registered ?? 0), [duelist])
-  const timestamp_active = useMemo(() => Number(duelist?.timestamp_active ?? 0), [duelist])
-  const exists = useMemo(() => Boolean(timestamp_registered), [timestamp_registered])
+  const timestampRegistered = useMemo(() => Number(duelist?.timestamp_registered ?? 0), [duelist])
+  const timestampActive = useMemo(() => Number(duelist?.timestamp_active ?? 0), [duelist])
+  const exists = useMemo(() => Boolean(timestampRegistered), [timestampRegistered])
+
+  // inactivity
+  const { clientTimestamp } = useClientTimestamp()
+  // sync with duelist_token.inactive_timestamp()
+  const inactiveTimestamp = useMemo(() => (clientTimestamp - timestampActive), [timestampActive, clientTimestamp])
+  // sync with duelist_token.is_inactive()
+  const isInactive = useMemo(() => (timestampActive > 0 && (inactiveTimestamp > constants.FAME.MAX_INACTIVE_TIMESTAMP)), [timestampActive, inactiveTimestamp])
+  // sync with duelist_token.inactive_fame_dripped()
+  const inactiveFameDripped = useMemo(() => (
+    !isInactive ? 0 : ((BigInt(inactiveTimestamp) - constants.FAME.MAX_INACTIVE_TIMESTAMP) / constants.FAME.TIMESTAMP_TO_DRIP_ONE_FAME) * constants.CONST.ETH_TO_WEI
+  ), [isInactive, inactiveTimestamp])
+
+  // current duel a duelist is in
   const currentDuelId = useMemo(() => BigInt(duelistChallenge?.duel_id ?? 0), [duelistChallenge])
   const isInAction = useMemo(() => (currentDuelId > 0n), [currentDuelId])
   const score = useScore(scoreboard?.score)
@@ -66,7 +79,6 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     isNpc ? 'NPC' : `Duelist #${isValidDuelistId ? bigintToDecimal(duelistId) : '?'}`
   ), [duelistId, isValidDuelistId, isNpc])
 
-
   return {
     isValidDuelistId,
     duelistId,
@@ -74,8 +86,8 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     nameAndId,
     duelistIdDisplay,
     exists,
-    timestamp_registered,
-    timestamp_active,
+    timestampRegistered,
+    timestampActive,
     profileType: profileType as constants.ProfileType,
     profileValue,
     profilePic,
@@ -84,6 +96,8 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     isNpc,
     currentDuelId,
     isInAction,
+    isInactive,
+    inactiveFameDripped,
     score,
   }
 }
