@@ -2,22 +2,21 @@ import React, { useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystem, useDojoSystemCalls, useLordsBalance } from '@underware_gg/pistols-sdk/dojo'
+import { usePool, useSeasonPool, UsePoolResult, useFundedStarterPackCount } from '/src/stores/bankStore'
+import { useFameBalance } from '/src/hooks/useFame'
 import { usePackType } from '/src/stores/packStore'
 import { FameBalance, LordsBalance } from '/src/components/account/LordsBalance'
+import { FormInputNumber } from '/src/components/ui/Form'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
-import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
-import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { BalanceRequiredButton } from '/src/components/ui/Buttons'
+import { Balance } from '/src/components/account/Balance'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
 import AppDojo from '/src/components/AppDojo'
 import * as ENV from '/src/utils/env'
-import { FormInputNumber } from '/src/components/ui/Form'
-import { Balance } from '/src/components/account/Balance'
-import { usePool, useSeasonPool, UsePoolResult } from '/src/stores/bankStore'
-import { useFameBalance } from '/src/hooks/useFame'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -78,13 +77,11 @@ function Account() {
 
 function Bank() {
   const { account } = useAccount()
-  const { contractAddress } = useDojoSystem('bank')
   const { priceLords } = usePackType(constants.PackType.StarterPack)
   const [amount, setAmount] = useState(1)
   const fundAmount = useMemo(() => (priceLords * BigInt(amount)), [priceLords, amount])
 
-  const { balance } = useLordsBalance(contractAddress)
-  const fundedPacksCount = useMemo(() => Number(balance / priceLords), [balance, priceLords])
+  const { fundedCount } = useFundedStarterPackCount()
 
   const { bank } = useDojoSystemCalls()
   const _fund = () => {
@@ -107,7 +104,7 @@ function Bank() {
         <Row className='ModalText'>
           <Cell>Funded Packs:</Cell>
           <Cell className='Code' textAlign='left'>
-            {fundedPacksCount}
+            {fundedCount}
           </Cell>
           <Cell className='Code' textAlign='right'>
           </Cell>

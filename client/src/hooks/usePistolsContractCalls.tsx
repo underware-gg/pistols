@@ -75,7 +75,7 @@ export const useCanJoin = (table_id: string, duelist_id: BigNumberish) => {
   const { address } = useAccount()
   const options = useMemo(() => ({
     call: canJoin,
-    args: [stringToFelt(table_id), BigInt(address ?? 0), BigInt(duelist_id ?? 0)],
+    args: [stringToFelt(table_id), BigInt(duelist_id ?? 0)],
     enabled: Boolean(table_id) && isPositiveBigint(address) && isPositiveBigint(duelist_id),
     defaultValue: null,
   }), [address, table_id, duelist_id])

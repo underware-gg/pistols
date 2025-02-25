@@ -10,6 +10,25 @@ import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
 export const usePackStore = createDojoStore<PistolsSchemaType>();
 
 
+export const usePackType = (packType: constants.PackType) => {
+  const description = useMemo(() => constants.PACK_TYPES[packType], [packType])
+  const name = useMemo(() => (description?.name ?? '?'), [description])
+  const imageUrlOpen = useMemo(() => (description?.image_url_open ?? null), [description])
+  const imageUrlClosed = useMemo(() => (description?.image_url_closed ?? null), [description])
+  const canPurchase = useMemo(() => (description?.can_purchase ?? false), [description])
+  const priceLords = useMemo(() => (description?.price_lords ?? null), [description])
+  const quantity = useMemo(() => (description?.quantity ?? null), [description])
+  return {
+    name,
+    imageUrlOpen,
+    imageUrlClosed,
+    canPurchase,
+    priceLords,
+    quantity,
+  }
+}
+
+
 //--------------------------------
 // Get pack from the store
 //
@@ -32,23 +51,6 @@ export const usePack = (pack_id: BigNumberish) => {
   }
 }
 
-export const usePackType = (packType: constants.PackType) => {
-  const description = useMemo(() => constants.PACK_TYPES[packType], [packType])
-  const name = useMemo(() => (description?.name ?? '?'), [description])
-  const imageUrlOpen = useMemo(() => (description?.image_url_open ?? null), [description])
-  const imageUrlClosed = useMemo(() => (description?.image_url_closed ?? null), [description])
-  const canPurchase = useMemo(() => (description?.can_purchase ?? false), [description])
-  const priceLords = useMemo(() => (description?.price_lords ?? null), [description])
-  const quantity = useMemo(() => (description?.quantity ?? null), [description])
-  return {
-    name,
-    imageUrlOpen,
-    imageUrlClosed,
-    canPurchase,
-    priceLords,
-    quantity,
-  }
-}
 
 
 //-----------------------------------------
