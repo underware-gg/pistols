@@ -205,6 +205,42 @@ export function createSystemCalls(
       },
     },
     //
+    // bank
+    //
+    bank: {
+      sponsor_duelists: async (signer: AccountInterface, lords_amount: BigNumberish): Promise<boolean> => {
+        const calls: DojoCalls = [
+          approve_call(lords_amount),
+          contractCalls.bank.buildSponsorDuelistsCalldata(
+            signer.address,
+            lords_amount,
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
+      },
+      sponsor_season: async (signer: AccountInterface, lords_amount: BigNumberish): Promise<boolean> => {
+        const calls: DojoCalls = [
+          approve_call(lords_amount),
+          contractCalls.bank.buildSponsorSeasonCalldata(
+            signer.address,
+            lords_amount,
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
+      },
+      sponsor_tournament: async (signer: AccountInterface, lords_amount: BigNumberish, tournament_id: BigNumberish): Promise<boolean> => {
+        const calls: DojoCalls = [
+          approve_call(lords_amount),
+          contractCalls.bank.buildSponsorTournamentCalldata(
+            signer.address,
+            lords_amount,
+            tournament_id,
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
+      },
+    },
+    //
     // admin
     //
     admin: {

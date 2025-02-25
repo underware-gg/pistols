@@ -9,7 +9,7 @@ import { FeesToPay } from '/src/components/account/LordsBalance'
 import { Opener } from '/src/hooks/useOpener'
 import { Divider } from '/src/components/ui/Divider'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
-import { useGetPack } from '/src/stores/packStore'
+import { useGetPack, usePackType } from '/src/stores/packStore'
 import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 import { CardPack } from '../ui/CardPack'
 
@@ -29,6 +29,7 @@ export default function ShopModal({
   const { pack_token } = useDojoSystemCalls()
   const { canPurchase } = useCanPurchase(packType)
   const { fee } = useCalcFeePack(packType)
+  const { name: packName, imageUrlClosed, imageUrlOpen } = usePackType(packType)
 
   const canSubmit = (account && canPurchase)
 
@@ -58,12 +59,12 @@ export default function ShopModal({
         <Grid className='OnboardingProfile'>
           <Row columns='equal' textAlign='center' verticalAlign='middle'>
             <Col textAlign='left' className='PaddedSides'>
-              {/* <Image src={constants.PACK_TYPES[packType].image_url_closed} /> */}
+              {/* <Image src={imageUrlClosed} /> */}
               <CardPack isOpen={true} clickable={false} cardPackSize={6} maxTilt={30} packType={packType} />
             </Col>
             <Col textAlign='left' className='PaddedSides'>
 
-              <h1>{constants.PACK_TYPES[packType].name}</h1>
+              <h1>{packName}</h1>
               <Divider />
 
               <FeesToPay value={0} fee={fee} prefixed />

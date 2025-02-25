@@ -20,30 +20,35 @@ export const usePack = (pack_id: BigNumberish) => {
 
   const pack = useEntityModel<models.Pack>(entity, 'Pack')
 
-  const packType = useMemo(() => parseEnumVariant<constants.PackType>(pack?.pack_type), [pack])
   const isOpen = useMemo(() => pack?.is_open ?? false, [pack])
-
-  const description = useMemo(() => (packType ? constants.PACK_TYPES[packType] : null), [packType])
-  const name = useMemo(() => (description?.name ?? '?'), [description])
-  const imageUrlOpen = useMemo(() => (description?.image_url_open ?? null), [description])
-  const imageUrlClosed = useMemo(() => (description?.image_url_closed ?? null), [description])
-  const canPurchase = useMemo(() => (description?.can_purchase ?? false), [description])
-  const price = useMemo(() => (description?.price_lords ?? null), [description])
-  const quantity = useMemo(() => (description?.quantity ?? null), [description])
+  const packType = useMemo(() => parseEnumVariant<constants.PackType>(pack?.pack_type), [pack])
+  const packDescription = usePackType(packType)
 
   return {
     packExists: (pack != null),
     packType,
     isOpen,
+    ...packDescription,
+  }
+}
+
+export const usePackType = (packType: constants.PackType) => {
+  const description = useMemo(() => constants.PACK_TYPES[packType], [packType])
+  const name = useMemo(() => (description?.name ?? '?'), [description])
+  const imageUrlOpen = useMemo(() => (description?.image_url_open ?? null), [description])
+  const imageUrlClosed = useMemo(() => (description?.image_url_closed ?? null), [description])
+  const canPurchase = useMemo(() => (description?.can_purchase ?? false), [description])
+  const priceLords = useMemo(() => (description?.price_lords ?? null), [description])
+  const quantity = useMemo(() => (description?.quantity ?? null), [description])
+  return {
     name,
     imageUrlOpen,
     imageUrlClosed,
     canPurchase,
-    price,
+    priceLords,
     quantity,
   }
 }
-
 
 
 //-----------------------------------------

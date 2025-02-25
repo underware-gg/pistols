@@ -10,8 +10,9 @@ import { SettingsProvider } from '/src/hooks/SettingsContext'
 import { PistolsProvider } from '/src/hooks/PistolsContext'
 import ErrorModal from '/src/components/modals/ErrorModal'
 import MainPage from '/src/pages/MainPage'
-import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import AdminPage from '/src/pages/internal/AdminPage'
+import PoolsPage from '/src/pages/internal/PoolsPage'
+import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
 import ErrorPage from '/src/pages/error/ErrorPage'
 import TestPageIndex from '/src/pages/tests/TestPageIndex'
@@ -65,6 +66,7 @@ const router = createBrowserRouter([
     path: '/internal',
     children: [
       { path: "admin", element: <AdminPage /> },
+      { path: "pools", element: <PoolsPage /> },
       { path: "snapshot", element: <SnapshotPage /> },
     ],
   },
