@@ -38,7 +38,7 @@ export default function ChallengeModal() {
   const _close = () => { dispatchSelectDuel(0n) }
 
   const {
-    state, tableId, premise, quote,
+    state, tableId, premise, quote, livesStaked,
     duelistIdA, duelistIdB: challengeDuelistIdB, duelistAddressA, duelistAddressB,
     isLive, isFinished, needToSyncExpired,
   } = useChallenge(selectedDuelId)
@@ -138,6 +138,7 @@ export default function ChallengeModal() {
             <Row columns='equal' textAlign='center'>
               <Col>
                 <h3 className='Quote'>{`“${quote}”`}</h3>
+                <h3 className='Quote'>~ Staking {livesStaked} {livesStaked == 1 ? 'life' : 'lives!'} ~</h3>
               </Col>
             </Row>
 
