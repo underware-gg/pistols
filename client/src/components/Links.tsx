@@ -40,9 +40,9 @@ export const ChallengeLink = ({
 }: {
   duelId: BigNumberish
 }) => {
-  const { dispatchSetDuel } = usePistolsContext()
+  const { dispatchSelectDuel } = usePistolsContext()
   return (
-    <span className='AnchorLink' onClick={() => dispatchSetDuel(duelId)}>
+    <span className='AnchorLink' onClick={() => dispatchSelectDuel(duelId)}>
       Duel #{bigintToDecimal(duelId)}
     </span>
   )
