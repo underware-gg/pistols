@@ -234,7 +234,7 @@ export interface PactValue {
 export interface Player {
 	player_address: string;
 	timestamp_registered: BigNumberish;
-	claimed_welcome_pack: boolean;
+	claimed_starter_pack: boolean;
 }
 
 // Type definition for `pistols::models::player::PlayerBookmark` struct
@@ -264,7 +264,7 @@ export interface PlayerOnlineValue {
 // Type definition for `pistols::models::player::PlayerValue` struct
 export interface PlayerValue {
 	timestamp_registered: BigNumberish;
-	claimed_welcome_pack: boolean;
+	claimed_starter_pack: boolean;
 }
 
 // Type definition for `pistols::models::pool::Pool` struct
@@ -429,7 +429,7 @@ export type CauseOfDeathEnum = CairoCustomEnum;
 // Type definition for `pistols::models::pack::PackType` enum
 export type PackType = {
 	Unknown: string;
-	WelcomePack: string;
+	StarterPack: string;
 	Duelists5x: string;
 }
 export type PackTypeEnum = CairoCustomEnum;
@@ -592,7 +592,7 @@ export type RulesTypeEnum = CairoCustomEnum;
 export type Activity = {
 	Undefined: string;
 	TutorialFinished: string;
-	PackWelcome: string;
+	PackStarter: string;
 	PackPurchased: string;
 	PackOpened: string;
 	DuelistSpawned: string;
@@ -893,7 +893,7 @@ export const schema: SchemaType = {
 			pack_id: 0,
 		pack_type: new CairoCustomEnum({ 
 					Unknown: "",
-				WelcomePack: undefined,
+				StarterPack: undefined,
 				Duelists5x: undefined, }),
 			seed: 0,
 			lords_amount: 0,
@@ -902,7 +902,7 @@ export const schema: SchemaType = {
 		PackValue: {
 		pack_type: new CairoCustomEnum({ 
 					Unknown: "",
-				WelcomePack: undefined,
+				StarterPack: undefined,
 				Duelists5x: undefined, }),
 			seed: 0,
 			lords_amount: 0,
@@ -919,7 +919,7 @@ export const schema: SchemaType = {
 		Player: {
 			player_address: "",
 			timestamp_registered: 0,
-			claimed_welcome_pack: false,
+			claimed_starter_pack: false,
 		},
 		PlayerBookmark: {
 			identity: "",
@@ -939,7 +939,7 @@ export const schema: SchemaType = {
 		},
 		PlayerValue: {
 			timestamp_registered: 0,
-			claimed_welcome_pack: false,
+			claimed_starter_pack: false,
 		},
 		Pool: {
 		pool_id: new CairoCustomEnum({ 
@@ -1056,7 +1056,7 @@ export const schema: SchemaType = {
 		activity: new CairoCustomEnum({ 
 					Undefined: "",
 				TutorialFinished: undefined,
-				PackWelcome: undefined,
+				PackStarter: undefined,
 				PackPurchased: undefined,
 				PackOpened: undefined,
 				DuelistSpawned: undefined,
@@ -1075,7 +1075,7 @@ export const schema: SchemaType = {
 		activity: new CairoCustomEnum({ 
 					Undefined: "",
 				TutorialFinished: undefined,
-				PackWelcome: undefined,
+				PackStarter: undefined,
 				PackPurchased: undefined,
 				PackOpened: undefined,
 				DuelistSpawned: undefined,

@@ -14,7 +14,7 @@
   },
   "policies": {
     "contracts": {
-      "0x05806644787a0554ebcc12a7910aab6ce3c6ff54a088a29d99c07b25b75a9ceb": {
+      "0x03dc37aa28e52e005b07b684336ae4ae33891e8bd4461c517dbd5380268bee65": {
         "name": "Game",
         "description": "Game loop contract",
         "methods": [
@@ -29,7 +29,7 @@
           }
         ]
       },
-      "0x068e480abb86a8a3551ffe759c917405151232d6c1f196c13e28382b1e9adde3": {
+      "0x07c8896d54d254bcff8524c6fef87817e8727bf5e30c64e7fffc3a4625858433": {
         "name": "Pack token",
         "description": "Packs ERC721 contract",
         "methods": [
@@ -44,7 +44,7 @@
           }
         ]
       },
-      "0x04bda40caab0c57dadf1b6e3c00361d290bd2ed08ee24aba0fe6dd0f5208cfc2": {
+      "0x0441cd108743f8087418d903c9787c2e99925a7a8a892d5aa26895ae5f89b423": {
         "name": "Duel token",
         "description": "Duel ERC721 contract",
         "methods": [
