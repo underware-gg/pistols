@@ -204,21 +204,22 @@ const makeStoredMovesKey = (message: CommitMoveMessage): string => {
 
 export const usePistolsContext = () => {
   const { state, dispatch } = useContext(PistolsContext)
-  const dispatchSetSig = (address: BigNumberish | null, sig: BigNumberish | null) => {
+
+  const dispatchSetSig = useCallback((address: BigNumberish | null, sig: BigNumberish | null) => {
     dispatch({
       type: PistolsActions.SET_SIG,
       payload: [BigInt(address ?? 0n), BigInt(sig ?? 0n)]
     })
-  }
+  }, [dispatch])
 
-  const dispatchSetDuel = (newId: BigNumberish) => {
+  const dispatchSetDuel = useCallback((newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SET_DUEL,
       payload: BigInt(newId),
     })
-  }
+  }, [dispatch])
 
-  const dispatchSelectDuelistId = (newId: BigNumberish, playerAddress?: BigNumberish) => {
+  const dispatchSelectDuelistId = useCallback((newId: BigNumberish, playerAddress?: BigNumberish) => {
     if (!isPositiveBigint(newId) && isPositiveBigint(playerAddress)) {
       dispatch({
         type: PistolsActions.SELECT_PLAYER_ADDRESS,
@@ -230,32 +231,37 @@ export const usePistolsContext = () => {
         payload: BigInt(newId),
       })
     }
-  }
-  const dispatchSelectPlayerAddress = (newId: BigNumberish) => {
+  }, [dispatch])
+
+  const dispatchSelectPlayerAddress = useCallback((newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_PLAYER_ADDRESS,
       payload: BigInt(newId),
     })
-  }
-  const dispatchChallengingPlayerAddress = (address: BigNumberish) => {
+  }, [dispatch])
+
+  const dispatchChallengingPlayerAddress = useCallback((address: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_CHALLENGING_ADDRESS,
       payload: BigInt(address),
     })
-  }
-  const dispatchSelectDuel = (newId: BigNumberish) => {
+  }, [dispatch])
+
+  const dispatchSelectDuel = useCallback((newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_DUEL,
       payload: BigInt(newId),
     })
-  }
-  const dispatchSetTutorialLevel = (newLevel: DuelTutorialLevel) => {
+  }, [dispatch])
+
+  const dispatchSetTutorialLevel = useCallback((newLevel: DuelTutorialLevel) => {
     dispatch({
       type: PistolsActions.SET_TUTORIAL_LEVEL,
       payload: newLevel,
     })
-  }
-  const dispatchSetMoves = (message: CommitMoveMessage, moves: number[], salt: bigint ) => {
+  }, [dispatch])
+
+  const dispatchSetMoves = useCallback((message: CommitMoveMessage, moves: number[], salt: bigint ) => {
     const key = makeStoredMovesKey(message)
     if (!key) {
       console.warn(`dispatchSetMoves: Invalid message [${message}] [${salt}]`)
@@ -265,19 +271,22 @@ export const usePistolsContext = () => {
       type: PistolsActions.SET_MOVES,
       payload: { [key]: { moves, salt } },
     })
-  }
-  const __dispatchSetScene = (newScene: SceneName) => {
+  }, [dispatch])
+
+  const __dispatchSetScene = useCallback((newScene: SceneName) => {
     dispatch({
       type: PistolsActions.SET_SCENE,
       payload: newScene,
     })
-  }
-  const __dispatchResetValues = () => {
+  }, [dispatch])
+
+  const __dispatchResetValues = useCallback(() => {
     dispatch({
       type: PistolsActions.RESET_VALUES,
       payload: null,
     })
-  }
+  }, [dispatch])
+
   return {
     ...state,
     hasSigned: (state.walletSig.sig > 0n),
