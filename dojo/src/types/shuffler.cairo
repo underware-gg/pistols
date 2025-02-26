@@ -98,7 +98,7 @@ pub impl ShufflerImpl of ShufflerTrait {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{Shuffler, ShufflerTrait};
 
     fn _fact(value: usize) -> usize {

@@ -26,8 +26,8 @@ use pistols::utils::hash::{hash_values};
 
 #[generate_trait]
 pub impl TutorialLevelImpl of TutorialLevelTrait {
-    fn make_duel_id(self: TutorialLevel, player_id: u128) -> u128 {
-        let tutorial_id: u128 = self.into();
+    fn make_duel_id(self: @TutorialLevel, player_id: u128) -> u128 {
+        let tutorial_id: u128 = (*self).into();
         let mut duel_id: u128 = hash_values([
             player_id.into(),
             tutorial_id.into(),
@@ -36,21 +36,21 @@ pub impl TutorialLevelImpl of TutorialLevelTrait {
         duel_id = (duel_id & ~0xff) | tutorial_id;
         (duel_id)
     }
-    fn opponent_profile(self: TutorialLevel) -> ProfileType {
+    fn opponent_profile(self: @TutorialLevel) -> ProfileType {
         match self {
             TutorialLevel::Level1 => ProfileType::Character(CharacterProfile::Drunkard),
             TutorialLevel::Level2 => ProfileType::Character(CharacterProfile::Bartender),
             _ => ProfileType::Undefined,
         }
     }
-    fn quote(self: TutorialLevel) -> felt252 {
+    fn quote(self: @TutorialLevel) -> felt252 {
         match self {
             TutorialLevel::Level1 => 'I challenge you, SCUM!!',
             TutorialLevel::Level2 => 'Prepare for a real duel!',
             _ => 0,
         }
     }
-    fn make_moves(self: TutorialLevel, player_hand: DuelistHand) -> (Span<u8>, Span<MockedValue>) {
+    fn make_moves(self: @TutorialLevel, player_hand: @DuelistHand) -> (Span<u8>, Span<MockedValue>) {
         let mut npc_hand: DuelistHand = Default::default();
         let mut mocked: Array<MockedValue> = array![];
         let mut env_cards: Array<felt252> = array![];
@@ -60,7 +60,7 @@ pub impl TutorialLevelImpl of TutorialLevelTrait {
                 // Level 1: Paces only, player wins
                 //
                 // respond based on player's fire pace
-                match player_hand.card_fire {
+                match (*player_hand.card_fire) {
                     PacesCard::Paces1 => {
                         // NPC never gets a chance to shoot
                         npc_hand.card_dodge = PacesCard::Paces9;
@@ -77,9 +77,9 @@ pub impl TutorialLevelImpl of TutorialLevelTrait {
                     _ => {
                         // NPC fires when player dodges
                         // else trips and shoot!
-                        npc_hand.card_fire = if (player_hand.card_dodge.is_before(player_hand.card_fire)) {player_hand.card_dodge} else {PacesCard::Paces2};
+                        npc_hand.card_fire = if (player_hand.card_dodge.is_before(player_hand.card_fire)) {(*player_hand.card_dodge)} else {PacesCard::Paces2};
                         npc_hand.card_dodge = if (npc_hand.card_fire == PacesCard::Paces2) {PacesCard::Paces1} else {PacesCard::Paces2};
-                        let pace: u8 = player_hand.card_fire.into();
+                        let pace: u8 = (*player_hand.card_fire).into();
                         // use the last <paces> cards from...
                         env_cards.extend_from_span(array![
                             ENV_DICES::CHANCES_DOWN,
@@ -106,12 +106,12 @@ pub impl TutorialLevelImpl of TutorialLevelTrait {
                 // NPC dodges when player fires
                 npc_hand.card_dodge = npc_hand.card_fire;
                 // NPC shoots afer dodge or just before player
-                let pace: u8 = player_hand.card_fire.into();
-                npc_hand.card_fire = if (player_hand.card_fire == PacesCard::Paces10) {PacesCard::Paces9} else {(pace + 1).into()};
+                let pace: u8 = (*player_hand.card_fire).into();
+                npc_hand.card_fire = if (*player_hand.card_fire == PacesCard::Paces10) {PacesCard::Paces9} else {(pace + 1).into()};
                 // Tactics whatever
                 npc_hand.card_tactics = TacticsCard::ThickCoat;
                 // Blades always win
-                npc_hand.card_blades = match player_hand.card_blades {
+                npc_hand.card_blades = match (*player_hand.card_blades) {
                     BladesCard::PocketPistol => BladesCard::Grapple,
                     BladesCard::Behead =>       BladesCard::PocketPistol,
                     BladesCard::Grapple =>      BladesCard::Behead,
@@ -165,8 +165,8 @@ impl TutorialLevelIntoU128 of core::traits::Into<TutorialLevel, u128> {
 }
 impl ChallengeIntoTutorialLevel of core::traits::Into<Challenge, TutorialLevel> {
     fn into(self: Challenge) -> TutorialLevel {
-        if self.quote == TutorialLevel::Level1.quote()        { TutorialLevel::Level1 }
-        else if self.quote == TutorialLevel::Level2.quote()   { TutorialLevel::Level2 }
-        else                                                  { TutorialLevel::Undefined }
+        if (self.quote == TutorialLevel::Level1.quote())        { TutorialLevel::Level1 }
+        else if (self.quote == TutorialLevel::Level2.quote())   { TutorialLevel::Level2 }
+        else                                                    { TutorialLevel::Undefined }
     }
 }

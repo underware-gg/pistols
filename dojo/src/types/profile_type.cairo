@@ -261,7 +261,7 @@ mod PROFILES {
     pub const CHARACTER_PROFILE_COUNT: u8 = 4;
     pub const BOT_PROFILE_COUNT: u8 = 3;
 
-    // profile base duelist ids
+    // profile base duelist ids (> u32)
     pub const DUELIST_ID_BASE: u128    = 0x100000000;
     pub const CHARACTER_ID_BASE: u128  = 0x200000000;
     pub const BOT_ID_BASE: u128        = 0x300000000;
@@ -286,10 +286,12 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
         let mut i: u8 = 0;
         while (i.into() < profiles.len()) {
             let profile_type: ProfileType = *profiles.at((i).into());
+            let timestamp: u64 = starknet::get_block_timestamp();
             store.set_duelist(@Duelist {
                 duelist_id: profile_type.duelist_id(),
                 profile_type,
-                timestamp: starknet::get_block_timestamp(),
+                timestamp_registered: timestamp,
+                timestamp_active: timestamp,
             });
             i += 1;
         };
@@ -342,31 +344,31 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
 
 #[generate_trait]
 pub impl ProfileTypeImpl of ProfileTypeTrait {
-    fn description(self: ProfileType) -> ProfileDescription {
-        (match self {
+    fn description(self: @ProfileType) -> ProfileDescription {
+        (match *self {
             ProfileType::Undefined =>           DUELIST_PROFILES::Unknown,
             ProfileType::Duelist(profile) =>    profile.into(),
             ProfileType::Character(profile) =>  profile.into(),
             ProfileType::Bot(profile) =>        profile.into(),
         })
     }
-    fn exists(self: ProfileType) -> bool {
+    fn exists(self: @ProfileType) -> bool {
         let desc: ProfileDescription = self.description();
         (desc.profile_id != 0)
     }
-    fn duelist_id(self: ProfileType) -> u128 {
-        (match self {
+    fn duelist_id(self: @ProfileType) -> u128 {
+        (match *self {
             ProfileType::Undefined =>               0,
             ProfileType::Duelist(duelist) =>        duelist.into(),
             ProfileType::Character(character) =>    character.into(),
             ProfileType::Bot(bot) =>                bot.into(),
         })
     }
-    fn name(self: ProfileType) -> ByteArray {
+    fn name(self: @ProfileType) -> ByteArray {
         let desc: ProfileDescription = self.description();
         (desc.name.to_string())
     }
-    fn get_uri(self: ProfileType,
+    fn get_uri(self: @ProfileType,
         base_uri: ByteArray,
         variant: ByteArray,    
     ) -> ByteArray {
@@ -432,6 +434,11 @@ impl BotProfileIntoDescription of core::traits::Into<BotProfile, ProfileDescript
     }
 }
 
+
+
+//---------------------------
+// Converters
+//
 impl ProfileTypeIntoByteArray of core::traits::Into<ProfileType, ByteArray> {
     fn into(self: ProfileType) -> ByteArray {
         match self {
@@ -442,8 +449,7 @@ impl ProfileTypeIntoByteArray of core::traits::Into<ProfileType, ByteArray> {
         }
     }
 }
-
-// for println! and format! 
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl ProfileTypeDebug of core::fmt::Debug<ProfileType> {
     fn fmt(self: @ProfileType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();
@@ -567,7 +573,7 @@ impl DuelistIdIntoBotProfile of core::traits::Into<u128, BotProfile> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
 
     use super::{
         ProfileType, ProfileTypeTrait,

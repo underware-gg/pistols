@@ -6,15 +6,13 @@ use pistols::models::table::{TableConfig};
 // https://github.com/cartridge-gg/rollyourown/blob/market_packed/src/config/ryo.cairo
 
 
+// Exposed to clients
 #[starknet::interface]
 pub trait IAdmin<TState> {
     fn am_i_admin(self: @TState, account_address: ContractAddress) -> bool;
     fn grant_admin(ref self: TState, account_address: ContractAddress, granted: bool);
-
     fn set_treasury(ref self: TState, treasury_address: ContractAddress);
     fn set_paused(ref self: TState, paused: bool);
-
-    fn open_table(ref self: TState, table_id: felt252, is_open: bool);
     fn set_table(ref self: TState, table: TableConfig);
 }
 
@@ -26,10 +24,10 @@ pub mod admin {
 
     use pistols::models::{
         config::{Config, ConfigManagerTrait},
-        table::{TableConfig, TableConfigTrait, TableManagerTrait},
+        table::{TableConfig, TableManagerTrait},
         season::{SeasonManagerTrait},
     };
-    use pistols::interfaces::systems::{SystemsTrait, SELECTORS};
+    use pistols::interfaces::dns::{DnsTrait, SELECTORS};
     use pistols::libs::store::{Store, StoreTrait};
 
     mod Errors {
@@ -78,14 +76,13 @@ pub mod admin {
                     world.dispatcher.is_writer(SELECTORS::CONFIG, account_address) &&
                     world.dispatcher.is_writer(SELECTORS::TABLE_CONFIG, account_address) &&
                     world.dispatcher.is_writer(SELECTORS::TOKEN_CONFIG, account_address) &&
-                    world.dispatcher.is_writer(SELECTORS::COIN_CONFIG, account_address) &&
-                    world.dispatcher.is_writer(SELECTORS::PAYMENT, account_address)
+                    world.dispatcher.is_writer(SELECTORS::COIN_CONFIG, account_address)
                 )
             )
         }
 
         fn grant_admin(ref self: ContractState, account_address: ContractAddress, granted: bool) {
-            self.assert_caller_is_admin();
+            self._assert_caller_is_admin();
             assert(account_address.is_non_zero(), Errors::INVALID_OWNER);
             let mut world = self.world_default();
             if (granted) {
@@ -93,44 +90,31 @@ pub mod admin {
                 world.dispatcher.grant_writer(SELECTORS::TABLE_CONFIG, account_address);
                 world.dispatcher.grant_writer(SELECTORS::TOKEN_CONFIG, account_address);
                 world.dispatcher.grant_writer(SELECTORS::COIN_CONFIG, account_address);
-                world.dispatcher.grant_writer(SELECTORS::PAYMENT, account_address);
             } else {
                 world.dispatcher.revoke_writer(SELECTORS::CONFIG, account_address);
                 world.dispatcher.revoke_writer(SELECTORS::TABLE_CONFIG, account_address);
                 world.dispatcher.revoke_writer(SELECTORS::TOKEN_CONFIG, account_address);
                 world.dispatcher.revoke_writer(SELECTORS::COIN_CONFIG, account_address);
-                world.dispatcher.revoke_writer(SELECTORS::PAYMENT, account_address);
             }
         }
 
         fn set_treasury(ref self: ContractState, treasury_address: ContractAddress) {
-            self.assert_caller_is_admin();
+            self._assert_caller_is_admin();
             assert(treasury_address.is_non_zero(), Errors::INVALID_TREASURY);
             let mut store: Store = StoreTrait::new(self.world_default());
-            ConfigManagerTrait::set_treasury(ref store, treasury_address);
+            store.set_config_treasury_address(treasury_address);
         }
 
         fn set_paused(ref self: ContractState, paused: bool) {
-            self.assert_caller_is_admin();
+            self._assert_caller_is_admin();
             let mut store: Store = StoreTrait::new(self.world_default());
-            ConfigManagerTrait::set_is_paused(ref store, paused);
+            store.set_config_is_paused(paused);
         }
 
         fn set_table(ref self: ContractState, table: TableConfig) {
-            self.assert_caller_is_admin();
+            self._assert_caller_is_admin();
             assert(table.table_id != 0, Errors::INVALID_TABLE);
             let mut store: Store = StoreTrait::new(self.world_default());
-            store.set_table_config(@table);
-        }
-
-        fn open_table(ref self: ContractState, table_id: felt252, is_open: bool) {
-            self.assert_caller_is_admin();
-            // check table
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let mut table: TableConfig = store.get_table_config(table_id);
-            assert(table.exists(), Errors::INVALID_TABLE);
-            // update
-            table.is_open = is_open;
             store.set_table_config(@table);
         }
     }
@@ -138,7 +122,7 @@ pub mod admin {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         #[inline(always)]
-        fn assert_caller_is_admin(self: @ContractState) {
+        fn _assert_caller_is_admin(self: @ContractState) {
             assert(self.am_i_admin(starknet::get_caller_address()) == true, Errors::NOT_ADMIN);
         }
         // #[inline(always)]

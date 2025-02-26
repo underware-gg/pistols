@@ -1312,8 +1312,8 @@
   },
   "contracts": [
     {
-      "address": "0x67bb8480d73dc126edce256fc6ff452a5a880514130c77b9daf23f7f216872b",
-      "class_hash": "0x4fa4f89df96ee1aac06e94b8a92fb3216dd76a180bcab486424d14aadc4899b",
+      "address": "0x4e9bfb23fb4e6157dfb404bf1d92bb5461a67eb076984a1471f2b65a1088bd6",
+      "class_hash": "0x4623f8af37e8a2c97312667ae2534c6bfb7ff3043144e4e29b6137614e23daf",
       "abi": [
         {
           "type": "impl",
@@ -1406,22 +1406,18 @@
         },
         {
           "type": "enum",
-          "name": "pistols::models::table::TableType",
+          "name": "pistols::types::rules::RulesType",
           "variants": [
             {
               "name": "Undefined",
               "type": "()"
             },
             {
+              "name": "Academia",
+              "type": "()"
+            },
+            {
               "name": "Season",
-              "type": "()"
-            },
-            {
-              "name": "Tutorial",
-              "type": "()"
-            },
-            {
-              "name": "Practice",
               "type": "()"
             }
           ]
@@ -1439,20 +1435,8 @@
               "type": "core::felt252"
             },
             {
-              "name": "table_type",
-              "type": "pistols::models::table::TableType"
-            },
-            {
-              "name": "fee_collector_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "fee_min",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "is_open",
-              "type": "core::bool"
+              "name": "rules",
+              "type": "pistols::types::rules::RulesType"
             }
           ]
         },
@@ -1510,22 +1494,6 @@
               "inputs": [
                 {
                   "name": "paused",
-                  "type": "core::bool"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "open_table",
-              "inputs": [
-                {
-                  "name": "table_id",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "is_open",
                   "type": "core::bool"
                 }
               ],
@@ -1666,14 +1634,13 @@
         "grant_admin",
         "set_treasury",
         "set_paused",
-        "open_table",
         "set_table",
         "upgrade"
       ]
     },
     {
-      "address": "0x49eb463d71d4d7e1035c8a4f709ba0f161a59caa335c5b508ec8c1d76263e74",
-      "class_hash": "0x3495ebdc3248fb51b08c4779b8214f7c6377daafadc7e8111f1dac4132abc69",
+      "address": "0x924dd4997108609a926f31f39ad8c69f6441e3b75f8bb1ac304668eddd3ba6",
+      "class_hash": "0x4e8ad2b26b72af460496e021f9e1ec06a354a2c80d8f82624f0829b2972f347",
       "abi": [
         {
           "type": "impl",
@@ -1727,72 +1694,213 @@
         },
         {
           "type": "impl",
-          "name": "BankImpl",
-          "interface_name": "pistols::systems::bank::IBank"
-        },
-        {
-          "type": "struct",
-          "name": "core::integer::u256",
-          "members": [
-            {
-              "name": "low",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "high",
-              "type": "core::integer::u128"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "pistols::models::payment::Payment",
-          "members": [
-            {
-              "name": "key",
-              "type": "core::felt252"
-            },
-            {
-              "name": "amount",
-              "type": "core::integer::u256"
-            },
-            {
-              "name": "client_percent",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "ranking_percent",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "owner_percent",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "pool_percent",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "treasury_percent",
-              "type": "core::integer::u8"
-            }
-          ]
+          "name": "BankPublicImpl",
+          "interface_name": "pistols::systems::bank::IBankPublic"
         },
         {
           "type": "interface",
-          "name": "pistols::systems::bank::IBank",
+          "name": "pistols::systems::bank::IBankPublic",
           "items": [
             {
               "type": "function",
-              "name": "charge",
+              "name": "sponsor_duelists",
               "inputs": [
                 {
                   "name": "payer",
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
-                  "name": "payment",
-                  "type": "pistols::models::payment::Payment"
+                  "name": "lords_amount",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "sponsor_season",
+              "inputs": [
+                {
+                  "name": "payer",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "lords_amount",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "sponsor_tournament",
+              "inputs": [
+                {
+                  "name": "payer",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "lords_amount",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "tournament_id",
+                  "type": "core::felt252"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "BankProtectedImpl",
+          "interface_name": "pistols::systems::bank::IBankProtected"
+        },
+        {
+          "type": "struct",
+          "name": "pistols::models::pool::LordsReleaseBill",
+          "members": [
+            {
+              "name": "recipient",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "fame_amount",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "lords_amount",
+              "type": "core::integer::u128"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<pistols::models::pool::LordsReleaseBill>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<pistols::models::pool::LordsReleaseBill>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::models::pool::PoolType",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Purchases",
+              "type": "()"
+            },
+            {
+              "name": "FamePeg",
+              "type": "()"
+            },
+            {
+              "name": "Season",
+              "type": "core::felt252"
+            },
+            {
+              "name": "Tournament",
+              "type": "core::felt252"
+            },
+            {
+              "name": "SacredFlame",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::bank::IBankProtected",
+          "items": [
+            {
+              "type": "function",
+              "name": "charge_purchase",
+              "inputs": [
+                {
+                  "name": "payer",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "lords_amount",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "peg_minted_fame_to_purchased_lords",
+              "inputs": [
+                {
+                  "name": "payer",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "lords_amount",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "release_lords_from_fame_to_be_burned",
+              "inputs": [
+                {
+                  "name": "bills",
+                  "type": "core::array::Span::<pistols::models::pool::LordsReleaseBill>"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "duelist_lost_fame_to_pool",
+              "inputs": [
+                {
+                  "name": "contract_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "token_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "fame_amount",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "pool_id",
+                  "type": "pistols::models::pool::PoolType"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "release_season_pool",
+              "inputs": [
+                {
+                  "name": "table_id",
+                  "type": "core::felt252"
                 }
               ],
               "outputs": [],
@@ -1919,13 +2027,20 @@
       "tag": "pistols-bank",
       "selector": "0x7a683ab68bc70300995da8de5781002e781f22ba246fe239ebeff02b2230375",
       "systems": [
-        "charge",
+        "sponsor_duelists",
+        "sponsor_season",
+        "sponsor_tournament",
+        "charge_purchase",
+        "peg_minted_fame_to_purchased_lords",
+        "release_lords_from_fame_to_be_burned",
+        "duelist_lost_fame_to_pool",
+        "release_season_pool",
         "upgrade"
       ]
     },
     {
-      "address": "0x738ce44319e86b73bd0b9006e2609b549e53c7330bb97dec3bfc160d95bbf13",
-      "class_hash": "0x3f33fa24e8d0372539b955864c6fcc79c9732d2a15c2a116686eea3a72f48c5",
+      "address": "0x441cd108743f8087418d903c9787c2e99925a7a8a892d5aa26895ae5f89b423",
+      "class_hash": "0x4e5b28836dc30a9c66049bd4fc46f36e36d8a7077bd0aec0bff3827f739377b",
       "abi": [
         {
           "type": "impl",
@@ -2061,11 +2176,11 @@
               "type": "()"
             },
             {
-              "name": "Training",
+              "name": "Treaty",
               "type": "()"
             },
             {
-              "name": "Tutorial",
+              "name": "Lesson",
               "type": "()"
             }
           ]
@@ -2112,22 +2227,6 @@
           "type": "interface",
           "name": "pistols::systems::tokens::duel_token::IDuelTokenPublic",
           "items": [
-            {
-              "type": "function",
-              "name": "calc_mint_fee",
-              "inputs": [
-                {
-                  "name": "table_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u128"
-                }
-              ],
-              "state_mutability": "view"
-            },
             {
               "type": "function",
               "name": "get_pact",
@@ -2223,6 +2322,10 @@
                 {
                   "name": "expire_hours",
                   "type": "core::integer::u64"
+                },
+                {
+                  "name": "lives_staked",
+                  "type": "core::integer::u8"
                 }
               ],
               "outputs": [
@@ -2255,7 +2358,18 @@
                 }
               ],
               "state_mutability": "external"
-            },
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "DuelTokenProtectedImpl",
+          "interface_name": "pistols::systems::tokens::duel_token::IDuelTokenProtected"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::tokens::duel_token::IDuelTokenProtected",
+          "items": [
             {
               "type": "function",
               "name": "transfer_to_winner",
@@ -2863,6 +2977,17 @@
                 }
               ],
               "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "minted_count",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "view"
             }
           ]
         },
@@ -3058,8 +3183,8 @@
       ]
     },
     {
-      "address": "0x14be0714dfbfda333245dcc9fe6e56f8deb8c88fdfb2d71720155af98d11354",
-      "class_hash": "0x879cc2149e9d841810821be3776f9627cea0f5ad726184ea6139c9ca37d1e2",
+      "address": "0xd103c7c53ce13a217d8a05a92e277ca6edca7c4362621c538dc7ec74be3b02",
+      "class_hash": "0x4b8af3899b15ae22528b3ed394dd3dcd28d1a33f6773ecfa36e4da7338a3766",
       "abi": [
         {
           "type": "impl",
@@ -3147,19 +3272,25 @@
           ]
         },
         {
-          "type": "struct",
-          "name": "core::array::Span::<core::integer::u128>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::integer::u128>"
-            }
-          ]
-        },
-        {
           "type": "interface",
           "name": "pistols::systems::tokens::duelist_token::IDuelistTokenPublic",
           "items": [
+            {
+              "type": "function",
+              "name": "fame_balance",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "view"
+            },
             {
               "type": "function",
               "name": "is_alive",
@@ -3178,7 +3309,55 @@
             },
             {
               "type": "function",
-              "name": "calc_fame_reward",
+              "name": "life_count",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "is_inactive",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "inactive_timestamp",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u64"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "inactive_fame_dripped",
               "inputs": [
                 {
                   "name": "duelist_id",
@@ -3194,6 +3373,247 @@
             },
             {
               "type": "function",
+              "name": "poke",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "sacrifice",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "memorialize",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "DuelistTokenProtectedImpl",
+          "interface_name": "pistols::systems::tokens::duelist_token::IDuelistTokenProtected"
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<core::integer::u128>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<core::integer::u128>"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::premise::Premise",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "Matter",
+              "type": "()"
+            },
+            {
+              "name": "Debt",
+              "type": "()"
+            },
+            {
+              "name": "Dispute",
+              "type": "()"
+            },
+            {
+              "name": "Honour",
+              "type": "()"
+            },
+            {
+              "name": "Hatred",
+              "type": "()"
+            },
+            {
+              "name": "Blood",
+              "type": "()"
+            },
+            {
+              "name": "Nothing",
+              "type": "()"
+            },
+            {
+              "name": "Tournament",
+              "type": "()"
+            },
+            {
+              "name": "Treaty",
+              "type": "()"
+            },
+            {
+              "name": "Lesson",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "pistols::types::challenge_state::ChallengeState",
+          "variants": [
+            {
+              "name": "Null",
+              "type": "()"
+            },
+            {
+              "name": "Awaiting",
+              "type": "()"
+            },
+            {
+              "name": "Withdrawn",
+              "type": "()"
+            },
+            {
+              "name": "Refused",
+              "type": "()"
+            },
+            {
+              "name": "Expired",
+              "type": "()"
+            },
+            {
+              "name": "InProgress",
+              "type": "()"
+            },
+            {
+              "name": "Resolved",
+              "type": "()"
+            },
+            {
+              "name": "Draw",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::models::challenge::Challenge",
+          "members": [
+            {
+              "name": "duel_id",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "table_id",
+              "type": "core::felt252"
+            },
+            {
+              "name": "premise",
+              "type": "pistols::types::premise::Premise"
+            },
+            {
+              "name": "quote",
+              "type": "core::felt252"
+            },
+            {
+              "name": "lives_staked",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "address_a",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "address_b",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "duelist_id_a",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "duelist_id_b",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "state",
+              "type": "pistols::types::challenge_state::ChallengeState"
+            },
+            {
+              "name": "winner",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "timestamp_start",
+              "type": "core::integer::u64"
+            },
+            {
+              "name": "timestamp_end",
+              "type": "core::integer::u64"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::types::rules::RewardValues",
+          "members": [
+            {
+              "name": "fame_lost",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "fame_gained",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "fools_gained",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "points_scored",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "position",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "fame_burned",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "lords_unlocked",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "survived",
+              "type": "core::bool"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::tokens::duelist_token::IDuelistTokenProtected",
+          "items": [
+            {
+              "type": "function",
               "name": "mint_duelists",
               "inputs": [
                 {
@@ -3201,7 +3621,7 @@
                   "type": "core::starknet::contract_address::ContractAddress"
                 },
                 {
-                  "name": "amount",
+                  "name": "quantity",
                   "type": "core::integer::u32"
                 },
                 {
@@ -3218,16 +3638,20 @@
             },
             {
               "type": "function",
-              "name": "transfer_fame_reward",
+              "name": "transfer_rewards",
               "inputs": [
                 {
-                  "name": "duel_id",
+                  "name": "challenge",
+                  "type": "pistols::models::challenge::Challenge"
+                },
+                {
+                  "name": "tournament_id",
                   "type": "core::integer::u128"
                 }
               ],
               "outputs": [
                 {
-                  "type": "(core::integer::i128, core::integer::i128)"
+                  "type": "(pistols::types::rules::RewardValues, pistols::types::rules::RewardValues)"
                 }
               ],
               "state_mutability": "external"
@@ -3827,6 +4251,17 @@
                 }
               ],
               "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "minted_count",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "view"
             }
           ]
         },
@@ -4006,8 +4441,11 @@
       "selector": "0x45c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e",
       "systems": [
         "dojo_init",
+        "poke",
+        "sacrifice",
+        "memorialize",
         "mint_duelists",
-        "transfer_fame_reward",
+        "transfer_rewards",
         "upgrade",
         "safe_transfer_from",
         "transfer_from",
@@ -4019,8 +4457,8 @@
       ]
     },
     {
-      "address": "0x49f0e0908f3994e9b72b410f26b22a44e988ba3cd50e715ca4572040b4ce2ee",
-      "class_hash": "0x1d32e402a5bc33c56f2daa3b03958d553f4958011db9164e6068cc9bd022b1b",
+      "address": "0x37873b9275789306a698d8a27049eff679c21573be52c2d1711471b317f98ba",
+      "class_hash": "0x5fc35719808e4a1653a61861907ad4640b5cb2319128606ab9a5efca2261616",
       "abi": [
         {
           "type": "impl",
@@ -4082,25 +4520,11 @@
         {
           "type": "impl",
           "name": "FamePublicImpl",
-          "interface_name": "pistols::systems::tokens::fame_coin::IFameCoinPublic"
-        },
-        {
-          "type": "struct",
-          "name": "core::integer::u256",
-          "members": [
-            {
-              "name": "low",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "high",
-              "type": "core::integer::u128"
-            }
-          ]
+          "interface_name": "pistols::systems::tokens::fame_coin::IFameCoinProtected"
         },
         {
           "type": "interface",
-          "name": "pistols::systems::tokens::fame_coin::IFameCoinPublic",
+          "name": "pistols::systems::tokens::fame_coin::IFameCoinProtected",
           "items": [
             {
               "type": "function",
@@ -4109,10 +4533,6 @@
                 {
                   "name": "duelist_id",
                   "type": "core::integer::u128"
-                },
-                {
-                  "name": "amount_paid",
-                  "type": "core::integer::u256"
                 }
               ],
               "outputs": [],
@@ -4120,18 +4540,26 @@
             },
             {
               "type": "function",
-              "name": "updated_duelist",
+              "name": "reward_duelist",
               "inputs": [
                 {
-                  "name": "from",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "to",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
                   "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "amount",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "burn",
+              "inputs": [
+                {
+                  "name": "amount",
                   "type": "core::integer::u128"
                 }
               ],
@@ -4199,6 +4627,20 @@
           "type": "impl",
           "name": "ERC20MixinImpl",
           "interface_name": "openzeppelin_token::erc20::interface::IERC20Mixin"
+        },
+        {
+          "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
         },
         {
           "type": "enum",
@@ -4493,6 +4935,34 @@
                   "type": "core::integer::u128"
                 },
                 {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "amount",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "transfer_from_token_to_token",
+              "inputs": [
+                {
+                  "name": "contract_address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "sender_token_id",
+                  "type": "core::integer::u128"
+                },
+                {
                   "name": "recipient_token_id",
                   "type": "core::integer::u128"
                 },
@@ -4677,19 +5147,541 @@
       "systems": [
         "dojo_init",
         "minted_duelist",
-        "updated_duelist",
+        "reward_duelist",
+        "burn",
         "upgrade",
         "transfer",
         "transfer_from",
         "approve",
         "transferFrom",
         "transfer_from_token",
+        "transfer_from_token_to_token",
         "burn_from_token"
       ]
     },
     {
-      "address": "0x83d17b50f055aa563709ca793fc2131bed0503da090f2ce7828382a2fe8042",
-      "class_hash": "0x41f04e91733c457e7ad7306ac06cac9617ba5301a4d869bc5d09462c49212a",
+      "address": "0x33d01627b45113b177ffe8e723e02ac1cddac4c18b2c1bfc2a36c645eb2b733",
+      "class_hash": "0x20a7dccb437faddeb6cc0c75a7d2c44fdf21cbdca2881920a3629fc1ec48434",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "fools_coin__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "fools_coin__DeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "type": "impl",
+          "name": "FoolsPublicImpl",
+          "interface_name": "pistols::systems::tokens::fools_coin::IFoolsCoinProtected"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::tokens::fools_coin::IFoolsCoinProtected",
+          "items": [
+            {
+              "type": "function",
+              "name": "reward_player",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "amount",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "ERC20MixinImpl",
+          "interface_name": "openzeppelin_token::erc20::interface::IERC20Mixin"
+        },
+        {
+          "type": "struct",
+          "name": "core::integer::u256",
+          "members": [
+            {
+              "name": "low",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "high",
+              "type": "core::integer::u128"
+            }
+          ]
+        },
+        {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "openzeppelin_token::erc20::interface::IERC20Mixin",
+          "items": [
+            {
+              "type": "function",
+              "name": "total_supply",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "balance_of",
+              "inputs": [
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "allowance",
+              "inputs": [
+                {
+                  "name": "owner",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "spender",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "transfer",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "amount",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "transfer_from",
+              "inputs": [
+                {
+                  "name": "sender",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "amount",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "approve",
+              "inputs": [
+                {
+                  "name": "spender",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "amount",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "symbol",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "decimals",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u8"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "totalSupply",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "balanceOf",
+              "inputs": [
+                {
+                  "name": "account",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u256"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "transferFrom",
+              "inputs": [
+                {
+                  "name": "sender",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "amount",
+                  "type": "core::integer::u256"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_token::erc20::erc20::ERC20Component::Transfer",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "from",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "to",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "value",
+              "type": "core::integer::u256",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_token::erc20::erc20::ERC20Component::Approval",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "owner",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "spender",
+              "type": "core::starknet::contract_address::ContractAddress",
+              "kind": "key"
+            },
+            {
+              "name": "value",
+              "type": "core::integer::u256",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "openzeppelin_token::erc20::erc20::ERC20Component::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Transfer",
+              "type": "openzeppelin_token::erc20::erc20::ERC20Component::Transfer",
+              "kind": "nested"
+            },
+            {
+              "name": "Approval",
+              "type": "openzeppelin_token::erc20::erc20::ERC20Component::Approval",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::components::coin_component::CoinComponent::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "pistols::systems::tokens::fools_coin::fools_coin::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "ERC20Event",
+              "type": "openzeppelin_token::erc20::erc20::ERC20Component::Event",
+              "kind": "flat"
+            },
+            {
+              "name": "CoinEvent",
+              "type": "pistols::systems::components::coin_component::CoinComponent::Event",
+              "kind": "flat"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [],
+      "tag": "pistols-fools_coin",
+      "selector": "0x58070034702ab2b03c2911459d7299e63048e70e3d41f77e1d806b4cb8f2dcd",
+      "systems": [
+        "dojo_init",
+        "reward_player",
+        "upgrade",
+        "transfer",
+        "transfer_from",
+        "approve",
+        "transferFrom"
+      ]
+    },
+    {
+      "address": "0x1f4ddd580dc84b8481dbb05cff0ffc731cb21713090b0571472dc60ae64e819",
+      "class_hash": "0x68f081228a77ec91ccb10f4fb5838e1848e89309961d966d16b3d6492218932",
       "abi": [
         {
           "type": "impl",
@@ -5118,6 +6110,72 @@
           ]
         },
         {
+          "type": "struct",
+          "name": "pistols::models::leaderboard::LeaderboardPosition",
+          "members": [
+            {
+              "name": "position",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "duelist_id",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "score",
+              "type": "core::integer::u16"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "core::array::Span::<pistols::models::leaderboard::LeaderboardPosition>",
+          "members": [
+            {
+              "name": "snapshot",
+              "type": "@core::array::Array::<pistols::models::leaderboard::LeaderboardPosition>"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::types::rules::RewardValues",
+          "members": [
+            {
+              "name": "fame_lost",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "fame_gained",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "fools_gained",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "points_scored",
+              "type": "core::integer::u16"
+            },
+            {
+              "name": "position",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "fame_burned",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "lords_unlocked",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "survived",
+              "type": "core::bool"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::game::IGame",
           "items": [
@@ -5167,7 +6225,7 @@
             },
             {
               "type": "function",
-              "name": "collect",
+              "name": "collect_season",
               "inputs": [],
               "outputs": [
                 {
@@ -5210,11 +6268,71 @@
             },
             {
               "type": "function",
-              "name": "can_collect",
+              "name": "get_duelist_leaderboard_position",
+              "inputs": [
+                {
+                  "name": "table_id",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "pistols::models::leaderboard::LeaderboardPosition"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "get_leaderboard",
+              "inputs": [
+                {
+                  "name": "table_id",
+                  "type": "core::felt252"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<pistols::models::leaderboard::LeaderboardPosition>"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "can_collect_season",
               "inputs": [],
               "outputs": [
                 {
                   "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "calc_season_reward",
+              "inputs": [
+                {
+                  "name": "table_id",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "lives_staked",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "pistols::types::rules::RewardValues"
                 }
               ],
               "state_mutability": "view"
@@ -5386,13 +6504,13 @@
         "dojo_init",
         "commit_moves",
         "reveal_moves",
-        "collect",
+        "collect_season",
         "upgrade"
       ]
     },
     {
-      "address": "0x15fc023cf50caf702414a3fcd4a7217182fa891aef405be2d34e1943b6c8435",
-      "class_hash": "0x4b686a8c94e9b5b047e9183b14bd0c4f7d625141f5de27e5c43054ca8531b57",
+      "address": "0x2f4423e6f44a05135e57758209347745d1a481da2b666f585075d482b9c2951",
+      "class_hash": "0xb4b35cd22e1455ea080937306f7d64edc68c0c4574454a1461ba3cad58f08c",
       "abi": [
         {
           "type": "impl",
@@ -5931,8 +7049,8 @@
       ]
     },
     {
-      "address": "0x361f8b20465186029ac361ac7448210543607b47bfdc268e75ef889ad67d621",
-      "class_hash": "0x3ac115000fca77cb30fc19f55f6f8b041220503f944de916a07af6bc6d6775b",
+      "address": "0x7c8896d54d254bcff8524c6fef87817e8727bf5e30c64e7fffc3a4625858433",
+      "class_hash": "0x4709901258b588f8ddd1ed7e455c82939334d689520d3a9457180019f2127b8",
       "abi": [
         {
           "type": "impl",
@@ -6024,7 +7142,7 @@
               "type": "()"
             },
             {
-              "name": "WelcomePack",
+              "name": "StarterPack",
               "type": "()"
             },
             {
@@ -6060,6 +7178,10 @@
               "type": "core::felt252"
             },
             {
+              "name": "lords_amount",
+              "type": "core::integer::u128"
+            },
+            {
               "name": "is_open",
               "type": "core::bool"
             }
@@ -6071,7 +7193,7 @@
           "items": [
             {
               "type": "function",
-              "name": "can_claim_welcome_pack",
+              "name": "can_claim_starter_pack",
               "inputs": [
                 {
                   "name": "recipient",
@@ -6127,7 +7249,7 @@
             },
             {
               "type": "function",
-              "name": "claim_welcome_pack",
+              "name": "claim_starter_pack",
               "inputs": [],
               "outputs": [
                 {
@@ -6763,6 +7885,17 @@
                 }
               ],
               "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "minted_count",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
+                }
+              ],
+              "state_mutability": "view"
             }
           ]
         },
@@ -6941,7 +8074,7 @@
       "selector": "0x3d74e76192285c5a19a63c54a6c2ba5b015a1a25818c2d8f9cf75d7fef2b5c1",
       "systems": [
         "dojo_init",
-        "claim_welcome_pack",
+        "claim_starter_pack",
         "purchase",
         "open",
         "upgrade",
@@ -7521,8 +8654,8 @@
       ]
     },
     {
-      "address": "0x532539b4f53628e9843be4572f68f4b52c09a2e6089735386b56c28bdda502",
-      "class_hash": "0x76cb0c41e1d02c845367668ecd4fcb8d137dedab79c41f91b10d18fa6121179",
+      "address": "0x2f684a6dad0c5fd2e9f5dcfc38353a3ba06bb175c1bd055113682ade846f9d7",
+      "class_hash": "0x1f8c57fc555fd947c1cfbc01971b01d4da4c952860911bf79281d0e12f879be",
       "abi": [
         {
           "type": "impl",
@@ -8404,15 +9537,9 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x74fe6d941c364ca88f4e46d47e838751b077ea2d025c987da343ae45e7961db",
+      "class_hash": "0x683dccabe9f16dc7275d2d747c6e68f6b8bb5f10104d25941df5ceb11e2d095",
       "tag": "pistols-Challenge",
       "selector": "0x673267b69d74c703ea86d97b041278944b49f62b52867345a95d3047b11378a"
-    },
-    {
-      "members": [],
-      "class_hash": "0x1de8f3af4dd1ae9d29d52372ef233189e0906da1c5a8e9c8ac7796838b281bf",
-      "tag": "pistols-ChallengeFameBalance",
-      "selector": "0x4d3c5336d06d93a8d0c67c59bb8d67291581c276b63c66293779d71c48d49bf"
     },
     {
       "members": [],
@@ -8428,7 +9555,7 @@
     },
     {
       "members": [],
-      "class_hash": "0xc5eb4e537cba5348734405153c8aaf120828fff34e43b87ea2d19ef39dd1a6",
+      "class_hash": "0x4e946ca34111b0fae9bbdd08356d30cbbd397f6ae63e281dbeefe957fc74acc",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -8440,13 +9567,25 @@
     },
     {
       "members": [],
+      "class_hash": "0x351dd4bdb7a45d789700217383c7581029a23741de9d91b4de65d4d970c3c63",
+      "tag": "pistols-DuelistMemorial",
+      "selector": "0x399b9689c37bf440c4f0478f361f68bd59161d01a096160d3ceaeae53b67b71"
+    },
+    {
+      "members": [],
+      "class_hash": "0x277fbf8c21c43959d4a96753735d2b7b68c05f21a2804944707f4b654c85541",
+      "tag": "pistols-Leaderboard",
+      "selector": "0x39835217fd4998f6024a6ae92f98bd185d158168f92b4363a47f73e5e1073ae"
+    },
+    {
+      "members": [],
       "class_hash": "0x6ce08da6707dea9b8ee283537597c1ae38231b79a912c90a5ba13a16f5f370d",
       "tag": "pistols-MockedValue",
       "selector": "0x8deb0b9e5cc0c6c2089ee6a4bfdd306444147a869b6179c4e22b283a5176dc"
     },
     {
       "members": [],
-      "class_hash": "0x26b487c02e0bb655dd41c9c3188ce96d0ca63a91842b9516b27ff7f620b5944",
+      "class_hash": "0x2b515e6fecbbf13912a37bc54f715f697116f778a08d23be5dd9a39c4108777",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
@@ -8458,13 +9597,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x5e5021bb7e3b29991f0a34f8f02ff2b1f4ae5370564dd97990b1728fb7b691d",
-      "tag": "pistols-Payment",
-      "selector": "0x17a03e9cb461470b9149f9efbd95ad9b217fca9fdccd3827383904c33da96c1"
-    },
-    {
-      "members": [],
-      "class_hash": "0x6de1c4db0b753e19adaec99fb0dcfcf242310d09515e02d44626a3dd705bea6",
+      "class_hash": "0x39ffed3beb2025261bfe2f5b97c9c1ef4668353f831f2da37c0b29d5e88d576",
       "tag": "pistols-Player",
       "selector": "0x4fc7ed2304172cd24d40e2b967bf3642228eec13547b09e0ffdfb85469f6f86"
     },
@@ -8482,31 +9615,31 @@
     },
     {
       "members": [],
+      "class_hash": "0x1e45ef5db91792ce0ca08272b04088a4116699025639e4ad8598b9ede62c0d8",
+      "tag": "pistols-Pool",
+      "selector": "0xb4328e5f120dfe361a8f367e6ea51e2be55dbc6b1c9f2c17a87b7d06ab8972"
+    },
+    {
+      "members": [],
       "class_hash": "0x6cd1c6b47b2a054894863dad72194da1e7fd25b45961f2c2594a6581ef0cf00",
       "tag": "pistols-Round",
       "selector": "0x617e0a3d97aa8cb3f83bbb5341ede98d3e3d825b6424bcab0676933fec52bc2"
     },
     {
       "members": [],
-      "class_hash": "0x754403c3a788bc79690c26b6f0ea0fceca48e5d8ad196d440b06fa98fa9cde7",
+      "class_hash": "0x146326babbbeba23cf7618424855c186949b290d5051ab38b91a21b08b79a2c",
       "tag": "pistols-Scoreboard",
       "selector": "0x18889906443a52ec3b3fd07ba7108bcf2b0067bdec842953530710a9dfdb728"
     },
     {
       "members": [],
-      "class_hash": "0x12ea1ef2777d5512df8a9b602051b1510c5b3e21dbcf17d1f3bbae3aa692dfe",
-      "tag": "pistols-ScoreboardTable",
-      "selector": "0x27c4d05ef5265e1457b48f7ec6151c190f11a3159bbb13322c27c285f7ecc1c"
-    },
-    {
-      "members": [],
-      "class_hash": "0x7504a926d7d1c5016ec9dabb8a18a482a33bb387f5b749e1a06f67b7430f6e1",
+      "class_hash": "0x7ab475e5909c90a90e9204bd80d581a66e9e20d40bc1604ead1e068fe286768",
       "tag": "pistols-SeasonConfig",
       "selector": "0x407b92d935dd7193931243082059cb7180309a73de27eea948ffa0649f6ebf3"
     },
     {
       "members": [],
-      "class_hash": "0x72e3ffcde47c95ba57c57e52b54bfc3c65d3b7b20a3cf6a3d5c8506f878b3c3",
+      "class_hash": "0x269ec3cbf07613f669af723c2db4e556f75ba36a79564152ee40c26c26d8c18",
       "tag": "pistols-TableConfig",
       "selector": "0x1e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138"
     },
@@ -8526,7 +9659,7 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x1bb6c8038961f1954472a5a0fb6bf729c63d4254f13d8d5c40829c2584361ce",
+      "class_hash": "0x2c1199a2d38a78e1fd8e00d93b4b4bff4908f33a4fe10fdf0f818b2dc424cbd",
       "tag": "pistols-PlayerActivity",
       "selector": "0x20ac3bc7f231ea11afb0576a200bff82197a6b397f3e5a4299f5a79ab563ff1"
     },

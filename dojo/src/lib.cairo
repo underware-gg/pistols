@@ -1,5 +1,5 @@
 mod interfaces {
-    pub mod systems;
+    pub mod dns;
     pub mod ierc20;
     pub mod ierc721;
     pub mod vrf;
@@ -19,6 +19,7 @@ mod systems {
         pub mod duelist_token;
         pub mod duel_token;
         pub mod fame_coin;
+        pub mod fools_coin;
         #[cfg(feature:'lords_mock')]
         pub mod lords_mock;
     }
@@ -43,8 +44,9 @@ mod models {
     pub mod duelist;
     pub mod pack;
     pub mod pact;
-    pub mod payment;
     pub mod player;
+    pub mod pool;
+    pub mod leaderboard;
     pub mod season;
     pub mod table;
 }
@@ -57,6 +59,7 @@ mod types {
     pub mod premise;
     pub mod profile_type;
     pub mod round_state;
+    pub mod rules;
     pub mod shuffler;
     pub mod typed_data;
     pub mod trophies;
@@ -91,8 +94,10 @@ mod utils {
 #[cfg(test)]
 mod tests {
     pub mod test_admin;
+    pub mod test_bank;
     pub mod test_cards;
     pub mod test_challenge;
+    pub mod test_dns;
     pub mod test_duel;
     pub mod test_env_cards;
     pub mod test_rng;
@@ -103,11 +108,14 @@ mod tests {
     pub mod tester;
     pub mod prefabs;
     pub mod utils;
+    // mocks
+    // pub mod mock_account;
     // tokens
     mod token {
         pub mod test_duel_token;
         pub mod test_duelist_token;
         pub mod test_pack_token;
+        pub mod test_fame_coin;
         // mocks
         pub mod mock_duelist;
     }

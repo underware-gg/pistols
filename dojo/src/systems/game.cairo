@@ -1,32 +1,34 @@
 use starknet::{ContractAddress};
 use pistols::types::duel_progress::{DuelProgress};
+use pistols::models::leaderboard::{LeaderboardPosition};
+use pistols::types::rules::{RewardValues};
 
-// define the interface
+// Exposed to clients
 #[starknet::interface]
 pub trait IGame<TState> {
-    //
     // Game actions
-    fn commit_moves(
+    fn commit_moves( //@description:Commit moves of a Duelist into a Duel
         ref self: TState,
         duelist_id: u128,
         duel_id: u128,
         hashed: u128,
     );
-    fn reveal_moves(
+    fn reveal_moves( //@description:Reveal moves of a Duelist into a Duel
         ref self: TState,
         duelist_id: u128,
         duel_id: u128,
         salt: felt252,
         moves: Span<u8>,
     );
-    // end season and start next
-    fn collect(ref self: TState) -> felt252;
+    fn collect_season(ref self: TState) -> felt252; // @description:Close the current season and start the next one
 
-    //
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
-    fn can_collect(self: @TState) -> bool;
+    fn get_duelist_leaderboard_position(self: @TState, table_id: felt252, duelist_id: u128) -> LeaderboardPosition;
+    fn get_leaderboard(self: @TState, table_id: felt252) -> Span<LeaderboardPosition>;
+    fn can_collect_season(self: @TState) -> bool;
+    fn calc_season_reward(self: @TState, table_id: felt252, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn get_timestamp(self: @TState) -> u64;
     
     // test calls
@@ -59,35 +61,21 @@ pub mod game {
     //-------------------------------------
     // pistols
     //
-    use pistols::interfaces::systems::{
-        SystemsTrait,
-        IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+    use pistols::interfaces::dns::{
+        DnsTrait,
+        IDuelistTokenDispatcherTrait,
         IDuelTokenDispatcherTrait,
         ITutorialDispatcherTrait,
+        IBankDispatcherTrait,
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
         player::{PlayerTrait, Activity, ActivityTrait},
-        challenge::{
-            Challenge, ChallengeTrait,
-            ChallengeFameBalance,
-            Round, RoundValue,
-            MovesTrait,
-        },
-        duelist::{
-            DuelistTrait,
-            Scoreboard, ScoreboardTable,
-            ScoreTrait,
-        },
-        pact::{
-            PactTrait,
-        },
-        season::{
-            SeasonConfig, SeasonConfigTrait,
-        },
-        config::{
-            ConfigManagerTrait,
-        },
+        challenge::{Challenge, ChallengeTrait, Round, MovesTrait},
+        duelist::{DuelistTrait, Scoreboard, ScoreTrait},
+        leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
+        pact::{PactTrait},
+        season::{SeasonConfig, SeasonConfigTrait},
     };
     use pistols::types::{
         challenge_state::{ChallengeState, ChallengeStateTrait},
@@ -95,6 +83,8 @@ pub mod game {
         round_state::{RoundState},
         typed_data::{CommitMoveMessage, CommitMoveMessageTrait},
         cards::deck::{DeckTrait},
+        rules::{RulesType, RulesTypeTrait ,RewardValues},
+        constants::{FAME},
     };
     use pistols::types::trophies::{Trophy, TrophyTrait, TROPHY};
     use pistols::libs::store::{Store, StoreTrait};
@@ -114,7 +104,7 @@ pub mod game {
         pub const INVALID_MOVES_COUNT: felt252       = 'PISTOLS: Invalid moves count';
         pub const MOVES_HASH_MISMATCH: felt252       = 'PISTOLS: Moves hash mismatch';
         pub const IMPOSSIBLE_ERROR: felt252          = 'PISTOLS: Impossible error';
-        pub const SEASON_ENDED: felt252              = 'PISTOLS: Season ended';
+        pub const SEASON_IS_NOT_ACTIVE: felt252      = 'PISTOLS: Season is not active';
         pub const SEASON_IS_ACTIVE: felt252          = 'PISTOLS: Season is active';
         pub const SEASON_NOT_ENDGAME: felt252        = 'PISTOLS: Not endgame';
         pub const BAD_SHUFFLE_SEED: felt252          = 'PISTOLS: Bad shuffle seed';
@@ -175,7 +165,7 @@ pub mod game {
             }
 
             // validate challenge
-            let owner: ContractAddress = self.validate_ownership(duelist_id);
+            let owner: ContractAddress = self._validate_ownership(@store.world, duelist_id);
             let duelist_number: u8 = challenge.duelist_number(duelist_id);
             if (duelist_number == 1) {
                 // validate challenge: challenger can commit while waiting for challenged
@@ -230,8 +220,11 @@ pub mod game {
                 round.state = RoundState::Reveal;
             }
 
+            // update duelist timestamp
+            store.set_duelist_timestamp_active(duelist_id);
+
             // events
-            PlayerTrait::check_in(ref store, Activity::CommittedMoves, starknet::get_caller_address(), duel_id.into());
+            PlayerTrait::check_in(ref store, Activity::MovesCommitted, starknet::get_caller_address(), duel_id.into());
 
             store.set_round(@round);
         }
@@ -259,7 +252,7 @@ pub mod game {
             assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
             // validate duelist
-            self.validate_ownership(duelist_id);
+            self._validate_ownership(@store.world, duelist_id);
             let duelist_number: u8 = challenge.duelist_number(duelist_id);
             assert(duelist_number != 0, Errors::NOT_YOUR_DUEL);
 
@@ -289,8 +282,11 @@ pub mod game {
                 assert(false, Errors::IMPOSSIBLE_ERROR);
             }
 
+            // update duelist timestamp
+            store.set_duelist_timestamp_active(duelist_id);
+
             // events
-            Activity::RevealedMoves.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
+            Activity::MovesRevealed.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
 
             //
             // missing reveal, update only and wait for final reveal
@@ -304,50 +300,47 @@ pub mod game {
             let progress: DuelProgress = game_loop(wrapped, @challenge.get_deck(), ref round);
             store.set_round(@round);
 
-            // end challenge
+            // update challenge
             challenge.winner = progress.winner;
             challenge.state = if (progress.winner == 0) {ChallengeState::Draw} else {ChallengeState::Resolved};
             challenge.timestamp_end = starknet::get_block_timestamp();
-            self.finish_challenge(ref store, challenge, round);
+            store.set_challenge(@challenge);
 
-            // transfer FAME reward
-            let (balance_a, balance_b): (i128, i128) = store.world.duelist_token_dispatcher().transfer_fame_reward(duel_id);
-            store.set_challenge_fame_bill(
-                @ChallengeFameBalance {
-                    duel_id,
-                    balance_a,
-                    balance_b,
-                }
-            );
+            // transfer rewards
+            let tournament_id: u128 = 0;
+            let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_dispatcher().transfer_rewards(challenge, tournament_id);
 
-            if (challenge.winner != 0) {
-                // send duel token to winner
-                store.world.duel_token_dispatcher().transfer_to_winner(duel_id);
-                // winning event
-                Activity::DuelResolved.emit(ref store.world, challenge.winner_address(), duel_id.into());
-            } else {
-                // draw event
-                Activity::DuelDraw.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
-            }
+            // finish challenge
+            self._update_scoreboards(ref store, @challenge, @round, ref rewards_a, ref rewards_b);
 
             // undo pacts
             store.exit_challenge(challenge.duelist_id_a);
             store.exit_challenge(challenge.duelist_id_b);
             challenge.unset_pact(ref store);
+
+            // send duel token to winner
+            if (challenge.winner != 0) {
+                store.world.duel_token_dispatcher().transfer_to_winner(duel_id);
+            }
+
+            // events
+            if (challenge.winner != 0) {
+                Activity::ChallengeResolved.emit(ref store.world, challenge.winner_address(), duel_id.into());
+            } else {
+                Activity::ChallengeDraw.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
+            }
         }
 
-        fn collect(ref self: ContractState) -> felt252 {
+        fn collect_season(ref self: ContractState) -> felt252 {
             let mut store: Store = StoreTrait::new(self.world_default());
             // collect season if permitted
             let mut season: SeasonConfig = store.get_current_season();
             let new_season_table_id: felt252 = season.collect(ref store);
-            ConfigManagerTrait::set_season(ref store, new_season_table_id);
+            store.set_config_season_table_id(new_season_table_id);
+            // release...
+            store.world.bank_dispatcher().release_season_pool(season.table_id);
             // all hail the collector
             Trophy::Collector.progress(store.world, starknet::get_caller_address(), 1);
-            // TODO: transfer fees
-            // TODO: transfer prizes
-            // TODO: transfer FAME
-            // TODO: transfer DUEL
             (new_season_table_id)
         }
 
@@ -376,10 +369,53 @@ pub mod game {
             }
         }
 
-        fn can_collect(self: @ContractState) -> bool {
+        fn get_duelist_leaderboard_position(self: @ContractState, table_id: felt252, duelist_id: u128) -> LeaderboardPosition {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            (store.get_leaderboard(table_id).get_duelist_position(duelist_id))
+        }
+        
+        fn get_leaderboard(self: @ContractState, table_id: felt252) -> Span<LeaderboardPosition> {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            (store.get_leaderboard(table_id).get_all_positions())
+        }
+
+        fn can_collect_season(self: @ContractState) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let season: SeasonConfig = store.get_current_season();
             (season.can_collect())
+        }
+
+        fn calc_season_reward(self: @ContractState,
+            table_id: felt252,
+            duelist_id: u128,
+            lives_staked: u8,
+        ) -> RewardValues {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let rules: RulesType = store.get_current_season_rules();
+            let fame_balance: u128 = store.world.duelist_token_dispatcher().fame_balance(duelist_id);
+            let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false);
+            let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true);
+            let mut leaderboard: Leaderboard = store.get_leaderboard(table_id);
+            let position: u8 = leaderboard.insert_score(duelist_id, rewards_win.points_scored);
+            (RewardValues{
+                // if you win...
+                fame_gained: rewards_win.fame_gained,
+                fools_gained: rewards_win.fools_gained,
+                points_scored: rewards_win.points_scored,
+                position,
+                // if you lose...
+                fame_lost: rewards_loss.fame_lost,
+                lords_unlocked: 0,
+                fame_burned: 0,
+                survived: (fame_balance - rewards_loss.fame_lost) >= FAME::ONE_LIFE.low,
+            })
+        }
+
+
+
+
+        fn get_timestamp(self: @ContractState) -> u64 {
+            (starknet::get_block_timestamp())
         }
 
         fn test_validate_commit_message(self: @ContractState,
@@ -394,10 +430,6 @@ pub mod game {
             };
             (msg.validate(account, signature))
         }
-
-        fn get_timestamp(self: @ContractState) -> u64 {
-            (starknet::get_block_timestamp())
-        }
     }
 
 
@@ -406,44 +438,51 @@ pub mod game {
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn validate_ownership(self: @ContractState, duelist_id: u128) -> ContractAddress {
-            let mut world = self.world_default();
-            let duelist_dispatcher: IDuelistTokenDispatcher = world.duelist_token_dispatcher();
-            let owner: ContractAddress = duelist_dispatcher.owner_of(duelist_id.into());
+        fn _validate_ownership(self: @ContractState, world: @WorldStorage, duelist_id: u128) -> ContractAddress {
+            let owner: ContractAddress = world.duelist_token_dispatcher().owner_of(duelist_id.into());
             assert(owner == starknet::get_caller_address(), Errors::NOT_YOUR_DUELIST);
             (owner)
         }
 
-        fn finish_challenge(self: @ContractState, ref store: Store, challenge: Challenge, round: Round) {
-            store.set_challenge(@challenge);
-
-            // player score (per table)
-            let mut score_player_a: ScoreboardTable = store.get_scoreboard_table(challenge.address_a.into(), challenge.table_id);
-            let mut score_player_b: ScoreboardTable = store.get_scoreboard_table(challenge.address_b.into(), challenge.table_id);
-            // duelist score (global)
-            let mut score_duelist_a: Scoreboard = store.get_scoreboard(challenge.duelist_id_a.into());
-            let mut score_duelist_b: Scoreboard = store.get_scoreboard(challenge.duelist_id_b.into());
+        fn _update_scoreboards(self: @ContractState, ref store: Store, challenge: @Challenge, round: @Round, ref rewards_a: RewardValues, ref rewards_b: RewardValues) {
+            // global score
+            // let mut score_global_a: Scoreboard = store.get_scoreboard((*challenge).duelist_id_a.into(), 0);
+            // let mut score_global_b: Scoreboard = store.get_scoreboard((*challenge).duelist_id_b.into(), 0);
+            // per table score
+            let mut score_season_a: Scoreboard = store.get_scoreboard((*challenge).duelist_id_a.into(), (*challenge).table_id);
+            let mut score_season_b: Scoreboard = store.get_scoreboard((*challenge).duelist_id_b.into(), (*challenge).table_id);
             
             // update totals
-            ScoreTrait::update_totals(ref score_player_a.score, ref score_player_b.score, challenge.winner);
-            ScoreTrait::update_totals(ref score_duelist_a.score, ref score_duelist_b.score, challenge.winner);
+            // ScoreTrait::update_totals(ref score_global_a.score, ref score_global_b.score, @rewards_a, @rewards_b, *challenge.winner);
+            ScoreTrait::update_totals(ref score_season_a.score, ref score_season_b.score, @rewards_a, @rewards_b, *challenge.winner);
 
             // compute honour from final round
-            let round: RoundValue = store.get_round_value(challenge.duel_id);
-            score_player_a.score.update_honour(round.state_a.honour);
-            score_player_b.score.update_honour(round.state_b.honour);
-            score_duelist_a.score.update_honour(round.state_a.honour);
-            score_duelist_b.score.update_honour(round.state_b.honour);
+            // score_global_a.score.update_honour(*round.state_a.honour);
+            // score_global_b.score.update_honour(*round.state_b.honour);
+            score_season_a.score.update_honour(*round.state_a.honour);
+            score_season_b.score.update_honour(*round.state_b.honour);
             
             // save
-            store.set_scoreboard_table(@score_player_a);
-            store.set_scoreboard_table(@score_player_b);
-            store.set_scoreboard(@score_duelist_a);
-            store.set_scoreboard(@score_duelist_b);
+            // store.set_scoreboard(@score_global_a);
+            // store.set_scoreboard(@score_global_b);
+            store.set_scoreboard(@score_season_a);
+            store.set_scoreboard(@score_season_b);
+
+            // update leaderboards
+            let mut leaderboard: Leaderboard = store.get_leaderboard(*challenge.table_id);
+            rewards_a.position = leaderboard.insert_score(*challenge.duelist_id_a, rewards_a.points_scored);
+            rewards_b.position = leaderboard.insert_score(*challenge.duelist_id_b, rewards_b.points_scored);
+            if (rewards_a.position != 0 || rewards_b.position != 0) {
+                // adjust [a] if [b] moved up
+                if (rewards_b.position <= rewards_a.position) {
+                    rewards_a.position = if (rewards_a.position < leaderboard.positions) {rewards_a.position+1} else {0};
+                }
+                store.set_leaderboard(@leaderboard);
+            }
 
             // unlock achievements
-            if (challenge.winner != 0) {
-                let winner_address: ContractAddress = challenge.winner_address();
+            if (*challenge.winner != 0) {
+                let winner_address: ContractAddress = (*challenge).winner_address();
 
                 // TODO: check win count first!
                 Trophy::FirstBlood.progress(store.world, winner_address, 1);

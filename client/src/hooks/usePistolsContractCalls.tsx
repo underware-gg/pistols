@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSdkCallPromise, useDojoContractCalls } from '@underware_gg/pistols-sdk/dojo'
-import { isBigint, isPositiveBigint, makeCustomEnum, stringToFelt } from '@underware_gg/pistols-sdk/utils'
+import { isPositiveBigint, makeCustomEnum, stringToFelt } from '@underware_gg/pistols-sdk/utils'
 import { convert_duel_progress } from '@underware_gg/pistols-sdk/pistols'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { useChallenge } from '/src/stores/challengeStore'
@@ -45,6 +45,47 @@ export const useGetDuelDeck = (duel_id: BigNumberish) => {
   }
 }
 
+export type RewardValues = {
+  win: {
+    // if win...
+    fame_gained: bigint
+    fools_gained: bigint
+    points_scored: number
+    position: number
+
+  }, lose: {
+    // if lose...
+    fame_lost: bigint
+    survived: boolean
+  }
+}
+
+export const useCalcSeasonReward = (table_id: string, duelist_id: BigNumberish, lives_staked: BigNumberish) => {
+  const { game: { calcSeasonReward } } = useDojoContractCalls()
+  const options = useMemo(() => ({
+    call: calcSeasonReward,
+    args: [stringToFelt(table_id), BigInt(duelist_id ?? 0), BigInt(lives_staked ?? 1)],
+    enabled: Boolean(table_id) && isPositiveBigint(duelist_id) && isPositiveBigint(lives_staked),
+    defaultValue: null,
+  }), [table_id, duelist_id, lives_staked])
+  const { value, isLoading } = useSdkCallPromise<any>(options)
+  const rewards = useMemo<RewardValues>(() => (value ? {
+    win: {
+      fame_gained: value.fame_gained,
+      fools_gained: value.fools_gained,
+      points_scored: Number(value.points_scored),
+      position: Number(value.position),
+    }, lose: {
+      fame_lost: value.fame_lost,
+      survived: value.survived,
+    }
+  } : null), [value])
+  return {
+    rewards,
+    isLoading,
+  }
+}
+
 
 //------------------------------------------
 // tutorial
@@ -70,15 +111,15 @@ export const useTutorialDuelId = (player_id: BigNumberish, tutorial_id: BigNumbe
 // duel_token
 //
 
-export const useCanJoin = (table_id: string) => {
+export const useCanJoin = (table_id: string, duelist_id: BigNumberish) => {
   const { duel_token: { canJoin } } = useDojoContractCalls()
   const { address } = useAccount()
   const options = useMemo(() => ({
     call: canJoin,
-    args: [stringToFelt(table_id), BigInt(address ?? 0)],
-    enabled: isBigint(address),
+    args: [stringToFelt(table_id), BigInt(duelist_id ?? 0)],
+    enabled: Boolean(table_id) && isPositiveBigint(address) && isPositiveBigint(duelist_id),
     defaultValue: null,
-  }), [address])
+  }), [address, table_id, duelist_id])
   const { value, isLoading } = useSdkCallPromise<boolean>(options)
   return {
     canJoin: value,
@@ -87,17 +128,17 @@ export const useCanJoin = (table_id: string) => {
 }
 
 export const useCalcFeeDuel = (table_id: string) => {
-  const { duel_token: { calcMintFee } } = useDojoContractCalls()
-  const options = useMemo(() => ({
-    call: calcMintFee,
-    args: [stringToFelt(table_id)],
-    enabled: Boolean(table_id),
-    defaultValue: null,
-  }), [table_id])
-  const { value, isLoading } = useSdkCallPromise<bigint>(options)
+  // const { duel_token: { calcMintFee } } = useDojoContractCalls()
+  // const options = useMemo(() => ({
+  //   call: calcMintFee,
+  //   args: [stringToFelt(table_id)],
+  //   enabled: Boolean(table_id),
+  //   defaultValue: null,
+  // }), [table_id])
+  // const { value, isLoading } = useSdkCallPromise<bigint>(options)
   return {
-    fee: value,
-    isLoading,
+    fee: 0n,
+    isLoading: false,
   }
 }
 
@@ -107,11 +148,11 @@ export const useCalcFeeDuel = (table_id: string) => {
 // pack_token
 //
 
-export const useCanClaimWelcomePack = (forceCounter?: number) => {
+export const useCanClaimStarterPack = (forceCounter?: number) => {
   const { address } = useAccount()
-  const { pack_token: { canClaimWelcomePack } } = useDojoContractCalls()
+  const { pack_token: { canClaimStarterPack } } = useDojoContractCalls()
   const options = useMemo(() => ({
-    call: canClaimWelcomePack,
+    call: canClaimStarterPack,
     args: [address],
     enabled: isPositiveBigint(address),
     defaultValue: null,
@@ -119,7 +160,7 @@ export const useCanClaimWelcomePack = (forceCounter?: number) => {
   }), [address, forceCounter])
   const { value, isLoading } = useSdkCallPromise<boolean>(options)
   return {
-    canClaimWelcomePack: value,
+    canClaimStarterPack: value,
     isLoading,
   }
 }

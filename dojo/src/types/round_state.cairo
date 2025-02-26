@@ -8,11 +8,11 @@ pub enum RoundState {
 }
 
 pub trait RoundStateTrait {
-    fn is_finished(self: RoundState) -> bool;
+    fn is_finished(self: @RoundState) -> bool;
 }
 
 impl RoundStateImpl of RoundStateTrait {
-    fn is_finished(self: RoundState) -> bool {
+    fn is_finished(self: @RoundState) -> bool {
         match self {
             RoundState::Null        => true,
             RoundState::Commit      => false,
@@ -22,6 +22,11 @@ impl RoundStateImpl of RoundStateTrait {
     }
 }
 
+
+
+//---------------------------
+// Converters
+//
 impl RoundStateIntoByteArray of core::traits::Into<RoundState, ByteArray> {
     fn into(self: RoundState) -> ByteArray {
         match self {
@@ -32,8 +37,7 @@ impl RoundStateIntoByteArray of core::traits::Into<RoundState, ByteArray> {
         }
     }
 }
-
-// for println! and format! 
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 // pub impl RoundStateDisplay of core::fmt::Display<RoundState> {
 //     fn fmt(self: @RoundState, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
 //         let result: ByteArray = (*self).into();

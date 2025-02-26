@@ -10,8 +10,15 @@ pub trait ITokenBoundPublic<TState> {
     fn token_of_address(self: @TState, address: ContractAddress) -> (ContractAddress, u128);
     // balance of a token
     fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
-    // transfer between tokens
+    // transfer form token to account
     fn transfer_from_token(ref self: TState,
+        contract_address: ContractAddress,
+        sender_token_id: u128,
+        recipient: ContractAddress,
+        amount: u256,
+    ) -> bool;
+    // transfer between tokens
+    fn transfer_from_token_to_token(ref self: TState,
         contract_address: ContractAddress,
         sender_token_id: u128,
         recipient_token_id: u128,
@@ -57,7 +64,7 @@ pub mod TokenBoundComponent {
     };
 
     use super::{TokenBoundAddress, TokenBoundAddressTrait};
-    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::interfaces::dns::{DnsTrait};
     use pistols::libs::store::{
         Store, StoreTrait,
     };
@@ -79,7 +86,6 @@ pub mod TokenBoundComponent {
     //-----------------------------------------
     // Public
     //
-    use super::{ITokenBoundPublic};
     #[embeddable_as(TokenBoundPublicImpl)]
     pub impl TokenBoundPublic<
         TContractState,
@@ -88,7 +94,7 @@ pub mod TokenBoundComponent {
         +ERC20Component::ERC20HooksTrait<TContractState>,
         impl ERC20: ERC20Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ITokenBoundPublic<ComponentState<TContractState>> {
+    > of super::ITokenBoundPublic<ComponentState<TContractState>> {
         fn address_of_token(self: @ComponentState<TContractState>,
             contract_address: ContractAddress,
             token_id: u128,
@@ -101,7 +107,7 @@ pub mod TokenBoundComponent {
         fn token_of_address(self: @ComponentState<TContractState>,
             address: ContractAddress,
         ) -> (ContractAddress, u128) {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let token_bound_address: TokenBoundAddress = store.get_token_bound_address(address);
             (token_bound_address.contract_address, token_bound_address.token_id)
@@ -117,6 +123,20 @@ pub mod TokenBoundComponent {
         }
 
         fn transfer_from_token(ref self: ComponentState<TContractState>,
+            contract_address: ContractAddress,
+            sender_token_id: u128,
+            recipient: ContractAddress,
+            amount: u256,
+        ) -> bool {
+            let mut erc20 = get_dep_component_mut!(ref self, ERC20);
+            (erc20.transfer_from(
+                self.address_of_token(contract_address, sender_token_id),
+                recipient,
+                amount)
+            )
+        }
+        
+        fn transfer_from_token_to_token(ref self: ComponentState<TContractState>,
             contract_address: ContractAddress,
             sender_token_id: u128,
             recipient_token_id: u128,
@@ -145,7 +165,6 @@ pub mod TokenBoundComponent {
     //-----------------------------------------
     // Internal
     //
-    use super::{ITokenBoundInternal};
     #[embeddable_as(TokenBoundInternalImpl)]
     pub impl InternalImpl<
         TContractState,
@@ -154,12 +173,12 @@ pub mod TokenBoundComponent {
         +ERC20Component::ERC20HooksTrait<TContractState>,
         impl ERC20: ERC20Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ITokenBoundInternal<ComponentState<TContractState>> {
+    > of super::ITokenBoundInternal<ComponentState<TContractState>> {
         fn register_token(self: @ComponentState<TContractState>,
             contract_address: ContractAddress,
             token_id: u128,
         ) -> ContractAddress {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             // validate address
             let recipient: ContractAddress = self.address_of_token(contract_address, token_id);

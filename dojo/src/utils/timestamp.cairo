@@ -37,7 +37,7 @@ pub impl TimestampImpl of TimestampTrait {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{TimestampTrait, TIMESTAMP};
 
     #[test]

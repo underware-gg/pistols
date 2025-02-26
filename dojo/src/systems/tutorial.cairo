@@ -1,6 +1,6 @@
 use pistols::types::duel_progress::{DuelProgress};
 
-// define the interface
+// Exposed to clients
 #[starknet::interface]
 pub trait ITutorial<TState> {
     fn create_tutorial(
@@ -37,7 +37,7 @@ pub mod tutorial {
     //-------------------------------------
     // pistols
     //
-    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::interfaces::dns::{DnsTrait};
     use pistols::systems::rng::{RngWrapTrait, MockedValue};
     use pistols::models::{
         challenge::{
@@ -116,8 +116,9 @@ pub mod tutorial {
             let challenge = Challenge {
                 duel_id,
                 table_id: TABLES::TUTORIAL,
-                premise: Premise::Tutorial,
+                premise: Premise::Lesson,
                 quote: level.quote(),
+                lives_staked: 1,
                 // duelists
                 address_a: starknet::get_caller_address(),
                 address_b: starknet::get_caller_address(),
@@ -197,7 +198,7 @@ pub mod tutorial {
             round.moves_b.initialize(0xffff, moves);
 
             // store NPC moves
-            let (npc_moves, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(round.moves_b.as_hand());
+            let (npc_moves, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(@round.moves_b.as_hand());
             round.moves_a.initialize(0xffff, npc_moves);
 
             // execute game loop...
@@ -219,7 +220,7 @@ pub mod tutorial {
             if (challenge.state.is_finished()) {
                 let level: TutorialLevel = challenge.into();
                 let mut round: Round = store.get_round(duel_id);
-                let (_, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(round.moves_b.as_hand());
+                let (_, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(@round.moves_b.as_hand());
                 let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), mocked);
                 (game_loop(wrapped, @challenge.get_deck(), ref round))
             } else {

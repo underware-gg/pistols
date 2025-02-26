@@ -65,7 +65,7 @@ use pistols::models::challenge::{DuelistState};
 
 #[generate_trait]
 pub impl BladesCardImpl of BladesCardTrait {
-    fn get_points(self: BladesCard) -> CardPoints {
+    fn get_points(self: @BladesCard) -> CardPoints {
         match self {
             BladesCard::Seppuku =>      BLADES_POINTS::Seppuku,
             BladesCard::PocketPistol => BLADES_POINTS::PocketPistol,
@@ -75,9 +75,9 @@ pub impl BladesCardImpl of BladesCardTrait {
         }
     }
     #[inline(always)]
-    fn apply_points(self: BladesCard, ref state_self: DuelistState, ref state_other: DuelistState) {
-        if (self != BladesCard::None) {
-            self.get_points().apply(ref state_self, ref state_other, 1, EnvCard::None);
+    fn apply_points(self: @BladesCard, ref state_self: DuelistState, ref state_other: DuelistState) {
+        if (*self != BladesCard::None) {
+            (*self).get_points().apply(ref state_self, ref state_other, 1, EnvCard::None);
         }
     }
     //
@@ -87,7 +87,7 @@ pub impl BladesCardImpl of BladesCardTrait {
     // Grapple beats PocketPistol
     //
     // returns (is_dead, is_dead)
-    fn clash(self: BladesCard, other: BladesCard) -> (bool, bool) {
+    fn clash(self: @BladesCard, other: @BladesCard) -> (bool, bool) {
         match self {
             BladesCard::None => {
                 match other {
@@ -141,7 +141,7 @@ pub impl BladesCardImpl of BladesCardTrait {
             },
         }
     }
-    fn build_deck(deck_type: DeckType) -> Span<u8> {
+    fn build_deck(deck_type: @DeckType) -> Span<u8> {
         (match deck_type {
             DeckType::None => array![],
             DeckType::Classic => array![
@@ -160,11 +160,9 @@ pub impl BladesCardImpl of BladesCardTrait {
 // converters
 //
 use pistols::utils::short_string::{ShortStringTrait};
-
 impl BladesCardDefault of Default<BladesCard> {
     fn default() -> BladesCard {(BladesCard::None)}
 }
-
 impl BladesCardIntoU8 of core::traits::Into<BladesCard, u8> {
     fn into(self: BladesCard) -> u8 {
         match self {
@@ -185,15 +183,7 @@ impl U8IntoBladesCard of core::traits::Into<u8, BladesCard> {
         else                { BladesCard::None }
     }
 }
-
-// for println! and format!
-// impl BladesCardDisplay of core::fmt::Display<BladesCard> {
-//     fn fmt(self: @BladesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).get_points().name.to_string();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 impl BladesCardDebug of core::fmt::Debug<BladesCard> {
     fn fmt(self: @BladesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let name: ByteArray = (*self).get_points().name.to_string();
@@ -209,7 +199,7 @@ impl BladesCardDebug of core::fmt::Debug<BladesCard> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{BladesCard};
 
     #[test]

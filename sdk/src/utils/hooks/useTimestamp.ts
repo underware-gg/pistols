@@ -48,6 +48,7 @@ export const useClientTimestamp = (autoUpdate: boolean = false, updateSeconds: n
     clientDate,
     clientMillis,
     clientSeconds,
+    clientTimestamp: Math.floor(clientSeconds),
     updateTimestamp,
   }
 }

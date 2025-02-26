@@ -10,7 +10,8 @@ pub struct Duelist {
     pub duelist_id: u128,   // erc721 token_id
     //-----------------------
     pub profile_type: ProfileType,
-    pub timestamp: u64,     // date registered (seconds since epoch)
+    pub timestamp_registered: u64,  // date registered (seconds since epoch)
+    pub timestamp_active: u64,      // last active (seconds since epoch)
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -22,20 +23,10 @@ pub struct DuelistChallenge {
     pub duel_id: u128,      // current Challenge a Duelist is in
 }
 
-// player/duelist scoreboards
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct Scoreboard {
-    #[key]
-    pub holder: felt252,    // duelist_id or player_address
-    //------------
-    pub score: Score,
-}
-
 // Per table scoreboard
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct ScoreboardTable {
+pub struct Scoreboard {
     #[key]
     pub holder: felt252,    // duelist_id or player_address
     #[key]
@@ -47,11 +38,33 @@ pub struct ScoreboardTable {
 #[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
 pub struct Score {
     pub honour: u8,             // 0..100
+    pub points: u16,
     pub total_duels: u16,
     pub total_wins: u16,
     pub total_losses: u16,
     pub total_draws: u16,
     pub honour_history: u64,    // past 8 duels, each byte holds one duel honour
+} // [8 + 4*16 + 64] = 128 bytes
+
+// cfrated for dead duelists
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct DuelistMemorial {
+    #[key]
+    pub duelist_id: u128,
+    //------------
+    pub cause_of_death: CauseOfDeath,
+    pub killed_by: u128,
+    pub fame_before_death: u128,
+}
+
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum CauseOfDeath {
+    None,       // 0
+    Duelling,   // 1
+    Memorize,   // 2
+    Sacrifice,  // 3
+    Forsaken,   // 4
 }
 
 
@@ -60,9 +73,10 @@ pub struct Score {
 //
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
 use pistols::libs::store::{Store, StoreTrait};
+use pistols::types::rules::{RewardValues};
+use pistols::types::constants::{HONOUR};
 use pistols::utils::bitwise::{BitwiseU64};
 use pistols::utils::math::{MathU64};
-use pistols::types::constants::{HONOUR};
 
 #[generate_trait]
 pub impl DuelistImpl of DuelistTrait {
@@ -97,39 +111,41 @@ impl ArchetypeDefault of Default<Archetype> {
 #[generate_trait]
 pub impl ScoreImpl of ScoreTrait {
     #[inline(always)]
-    fn is_villain(self: Score) -> bool {
-        (self.total_duels > 0 && self.honour < HONOUR::TRICKSTER_START)
+    fn is_villain(self: @Score) -> bool {
+        (*self.total_duels > 0 && *self.honour < HONOUR::TRICKSTER_START)
     }
     #[inline(always)]
-    fn is_trickster(self: Score) -> bool {
-        (self.honour >= HONOUR::TRICKSTER_START && self.honour < HONOUR::LORD_START)
+    fn is_trickster(self: @Score) -> bool {
+        (*self.honour >= HONOUR::TRICKSTER_START && *self.honour < HONOUR::LORD_START)
     }
     #[inline(always)]
-    fn is_lord(self: Score) -> bool {
-        (self.honour >= HONOUR::LORD_START)
+    fn is_lord(self: @Score) -> bool {
+        (*self.honour >= HONOUR::LORD_START)
     }
     #[inline(always)]
-    fn get_archetype(self: Score) -> Archetype {
+    fn get_archetype(self: @Score) -> Archetype {
         if (self.is_lord()) {(Archetype::Honourable)}
         else if (self.is_trickster()) {(Archetype::Trickster)}
         else if (self.is_villain()) {(Archetype::Villainous)}
         else {(Archetype::Undefined)}
     }
     #[inline(always)]
-    fn get_honour(self: Score) -> ByteArray {
-        (format!("{}.{}", self.honour/10, self.honour%10))
+    fn get_honour(self: @Score) -> ByteArray {
+        (format!("{}.{}", *self.honour / 10, *self.honour % 10))
     }
 
     // update duel totals only
-    fn update_totals(ref score_a: Score, ref score_b: Score, winner: u8) {
+    fn update_totals(ref score_a: Score, ref score_b: Score, rewards_a: @RewardValues, rewards_b: @RewardValues, winner: u8) {
         score_a.total_duels += 1;
         score_b.total_duels += 1;
+        score_a.points += *rewards_a.points_scored;
+        score_b.points += *rewards_b.points_scored;
         if (winner == 1) {
             score_a.total_wins += 1;
             score_b.total_losses += 1;
         } else if (winner == 2) {
-            score_a.total_losses += 1;
             score_b.total_wins += 1;
+            score_a.total_losses += 1;
         } else {
             score_a.total_draws += 1;
             score_b.total_draws += 1;
@@ -141,7 +157,7 @@ pub impl ScoreImpl of ScoreTrait {
         self.honour_history =
             (self.honour_history & ~BitwiseU64::shl(0xff, history_pos)) |
             BitwiseU64::shl(duel_honour.into(), history_pos);
-        self.honour = (BitwiseU64::sum_bytes(self.honour_history) / MathU64::min(self.total_duels.into(), 8)).try_into().unwrap();
+        self.honour = (BitwiseU64::sum_bytes(self.honour_history) / core::cmp::min(self.total_duels.into(), 8)).try_into().unwrap();
     }
 }
 
@@ -153,5 +169,25 @@ impl ArchetypeIntoByteArray of core::traits::Into<Archetype, ByteArray> {
             Archetype::Trickster => "Trickster",
             Archetype::Honourable => "Honourable",
         }
+    }
+}
+
+impl CauseOfDeathIntoByteArray of core::traits::Into<CauseOfDeath, ByteArray> {
+    fn into(self: CauseOfDeath) -> ByteArray {
+        match self {
+            CauseOfDeath::None =>       "None",
+            CauseOfDeath::Duelling =>   "Duelling",
+            CauseOfDeath::Memorize =>   "Memorize",
+            CauseOfDeath::Sacrifice =>  "Sacrifice",
+            CauseOfDeath::Forsaken =>   "Forsaken",
+        }
+    }
+}
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+pub impl CauseOfDeathDebug of core::fmt::Debug<CauseOfDeath> {
+    fn fmt(self: @CauseOfDeath, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
     }
 }

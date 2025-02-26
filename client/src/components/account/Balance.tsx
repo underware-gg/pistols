@@ -20,6 +20,12 @@ export function LordsBagIcon({
   return <CustomIcon logo png name='lords_bag' size={size} alt='$LORDS' />
 }
 
+export function FoolsIcon({
+  size = null,
+}: CoinIconProps) {
+  return <EmojiIcon emoji={EMOJI.FOOLS} size={size} alt='$FOOLS' />
+}
+
 export function FameIcon({
   size = null,
 }: CoinIconProps) {
@@ -29,6 +35,7 @@ export function FameIcon({
 export function Balance({
   ether = false,    // used for icon only
   lords = false,    // used for icon only
+  fools = false,     // used for icon only
   fame = false,     // used for icon only
   clean = false,    // no icon
   value = null,
@@ -44,6 +51,7 @@ export function Balance({
 }: {
   ether?: boolean
   lords?: boolean
+  fools?: boolean
   fame?: boolean
   clean?: boolean
   value?: BigNumberish
@@ -80,9 +88,10 @@ export function Balance({
     if (clean) return <></>
     if (ether) return <><EtherIcon size={'small'} />{' '}</>
     if (lords) return <><LordsBagIcon size={null} />{' '}</>
+    if (fools) return <><FoolsIcon size={'small'} />{' '}</>
     if (fame) return <><FameIcon size={'small'} />{' '}</>
     return <></>
-  }, [clean, lords, fame, ether])
+  }, [clean, lords, fools, fame, ether])
 
   return (
     <span className={classNames.join(' ')}>

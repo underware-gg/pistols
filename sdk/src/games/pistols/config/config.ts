@@ -36,11 +36,11 @@ const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
     description: 'Game loop contract',
     interfaces: ['IGame'],
   },
-  tutorial: {
-    name: 'Tutorial',
-    description: 'Tutorial game contract',
-    interfaces: ['ITutorial'],
-  },
+  // tutorial: {
+  //   name: 'Tutorial',
+  //   description: 'Tutorial game contract',
+  //   interfaces: ['ITutorial'],
+  // },
   pack_token: {
     name: 'Pack token',
     description: 'Packs ERC721 contract',
@@ -56,6 +56,11 @@ const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   //   description: 'Duelist ERC721 contract',
   //   interfaces: ['IDuelistTokenPublic'],
   // },
+  bank: {
+    name: 'Bank',
+    description: 'Bank contract',
+    interfaces: ['IBankPublic'],
+  },
 }
 const contractPolicyDescriptions_mock: ContractPolicyDescriptions = {
   lords_mock: {
@@ -120,7 +125,7 @@ export const makeStarknetDomain = (networkId: NetworkId): StarknetDomain => ({
 // erc-20
 export const getLordsAddress = (networkId: NetworkId): string => (NETWORKS[networkId].lordsAddress || (getContractByName(manifests[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
 export const getFameAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fame_coin')?.address ?? '0x0')
-// export const getFoolsAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
+export const getFoolsAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
 // erc-721
 export const getDuelistTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duelist_token')?.address ?? '0x0')
 export const getDuelTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duel_token')?.address ?? '0x0')

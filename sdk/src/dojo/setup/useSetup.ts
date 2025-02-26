@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { init } from '@dojoengine/sdk'
+import { init, SDKConfig } from '@dojoengine/sdk'
 import { DojoProvider } from '@dojoengine/core'
 import { useAsyncMemo } from 'src/utils/hooks/useAsyncMemo'
 import { useMounted } from 'src/utils/hooks/useMounted'
@@ -59,17 +59,16 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
     if (!starknetDomain) return undefined
     if (!manifest) return null
     console.log(`TORII CLIENT...`, selectedNetworkConfig.toriiUrl)
-    const sdk = await init<models.SchemaType>(
-      {
-        client: {
-          rpcUrl: selectedNetworkConfig.rpcUrl,
-          toriiUrl: selectedNetworkConfig.toriiUrl,
-          relayUrl: selectedNetworkConfig.relayUrl ?? '',
-          worldAddress: manifest.world.address ?? '',
-        },
-        domain: starknetDomain,
+    let config: SDKConfig = {
+      client: {
+        // rpcUrl: selectedNetworkConfig.rpcUrl,
+        toriiUrl: selectedNetworkConfig.toriiUrl,
+        relayUrl: selectedNetworkConfig.relayUrl ?? '',
+        worldAddress: manifest.world.address ?? '',
       },
-    );
+      domain: starknetDomain,
+    }
+    const sdk = await init<models.SchemaType>(config);
     console.log(`TORII CLIENT OK!`)
     return sdk
   }, [mounted, selectedNetworkConfig, manifest, starknetDomain, dojoProvider], undefined, null)

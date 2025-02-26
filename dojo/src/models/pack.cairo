@@ -3,7 +3,7 @@ use starknet::{ContractAddress};
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum PackType {
     Unknown,        // 0
-    WelcomePack,    // 1
+    StarterPack,    // 1
     Duelists5x,     // 2
 }
 
@@ -18,6 +18,7 @@ pub struct Pack {
     //-----------------------
     pub pack_type: PackType,
     pub seed: felt252,
+    pub lords_amount: u128,
     pub is_open: bool,
 }
 
@@ -29,12 +30,13 @@ pub struct Pack {
 
 #[derive(Copy, Drop, Serde, Default)]
 pub struct PackDescription {
-    id: felt252, // @generateContants:shortstring
-    name: felt252, // @generateContants:shortstring
-    image_url_closed: felt252, // @generateContants:shortstring
-    image_url_open: felt252, // @generateContants:shortstring
-    can_purchase: bool,
-    price: u256,
+    pub id: felt252, // @generateContants:shortstring
+    pub name: felt252, // @generateContants:shortstring
+    pub image_url_closed: felt252, // @generateContants:shortstring
+    pub image_url_open: felt252, // @generateContants:shortstring
+    pub can_purchase: bool,
+    pub price_lords: u128,
+    pub quantity: usize,
 }
 
 // to be exported to typescript by generateConstants
@@ -48,15 +50,17 @@ mod PACK_TYPES {
         image_url_closed: '/tokens/Unknown.jpg',
         image_url_open: '/tokens/Unknown.jpg',
         can_purchase: false,
-        price: 0,
+        price_lords: 0,
+        quantity: 0,
     };
-    pub const WelcomePack: PackDescription = PackDescription {
-        id: 'WelcomePack',
-        name: 'Welcome Pack',
-        image_url_closed: '/tokens/WelcomePack.jpg',
-        image_url_open: '/tokens/WelcomePack.jpg',
+    pub const StarterPack: PackDescription = PackDescription {
+        id: 'StarterPack',
+        name: 'Starter Pack',
+        image_url_closed: '/tokens/StarterPack.jpg',
+        image_url_open: '/tokens/StarterPack.jpg',
         can_purchase: false,
-        price: 0,
+        price_lords: 20 * CONST::ETH_TO_WEI.low,
+        quantity: 2,
     };  
     pub const Duelists5x: PackDescription = PackDescription {
         id: 'Duelists5x',
@@ -64,7 +68,8 @@ mod PACK_TYPES {
         image_url_closed: '/tokens/Duelists5x.jpg',
         image_url_open: '/tokens/Duelists5x.jpg',
         can_purchase: true,
-        price: 100 * CONST::ETH_TO_WEI,
+        price_lords: 50 * CONST::ETH_TO_WEI.low,
+        quantity: 5,
     };
 }
 
@@ -73,13 +78,12 @@ mod PACK_TYPES {
 // Traits
 //
 use pistols::systems::tokens::pack_token::pack_token::{Errors as PackErrors};
-use pistols::interfaces::systems::{
-    SystemsTrait,
+use pistols::interfaces::dns::{
+    DnsTrait,
     IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
 };
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::libs::store::{Store, StoreTrait};
-use pistols::types::constants::{CONST};
 
 #[generate_trait]
 pub impl PackImpl of PackTrait {
@@ -87,13 +91,10 @@ pub impl PackImpl of PackTrait {
         assert(!self.is_open, PackErrors::ALREADY_OPENED);
         let token_ids: Span<u128> = match self.pack_type {
             PackType::Unknown => { [].span() },
-            PackType::WelcomePack => {
-                let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-                (duelist_dispatcher.mint_duelists(recipient, CONST::WELCOME_PACK_DUELIST_COUNT, self.seed))
-            },
+            PackType::StarterPack |
             PackType::Duelists5x => {
                 let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-                (duelist_dispatcher.mint_duelists(recipient, 5, self.seed))
+                (duelist_dispatcher.mint_duelists(recipient, self.pack_type.description().quantity, self.seed))
             },
         };
         self.is_open = true;
@@ -104,56 +105,43 @@ pub impl PackImpl of PackTrait {
 
 #[generate_trait]
 pub impl PackTypeImpl of PackTypeTrait {
-    fn description(self: PackType) -> PackDescription {
+    fn description(self: @PackType) -> PackDescription {
         match self {
             PackType::Unknown       => PACK_TYPES::Unknown,
-            PackType::WelcomePack   => PACK_TYPES::WelcomePack,
+            PackType::StarterPack   => PACK_TYPES::StarterPack,
             PackType::Duelists5x    => PACK_TYPES::Duelists5x,
         }
     }
-    fn identifier(self: PackType) -> felt252 {
-        (self.description().id)
+    fn identifier(self: @PackType) -> felt252 {
+        ((*self).description().id)
     }
-    fn name(self: PackType) -> ByteArray {
-        (self.description().name.to_string())
+    fn name(self: @PackType) -> ByteArray {
+        ((*self).description().name.to_string())
     }
-    fn image_url(self: PackType, is_open: bool) -> ByteArray {
+    fn image_url(self: @PackType, is_open: bool) -> ByteArray {
         if (is_open) {
-            (self.description().image_url_open.to_string())
+            ((*self).description().image_url_open.to_string())
         } else {
-            (self.description().image_url_closed.to_string())
+            ((*self).description().image_url_closed.to_string())
         }
     }
-    fn can_purchase(self: PackType) -> bool {
-        (self.description().can_purchase)
+    fn can_purchase(self: @PackType) -> bool {
+        ((*self).description().can_purchase)
     }
-    fn mint_fee(self: PackType) -> u256 {
-        (self.description().price)
+    fn mint_fee(self: @PackType) -> u128 {
+        ((*self).description().price_lords)
     }
 }
 
-impl PackTypeIntoByteArray of core::traits::Into<PackType, ByteArray> {
-    fn into(self: PackType) -> ByteArray {
-        match self {
-            PackType::Unknown =>        "Unknown",
-            PackType::WelcomePack =>    "WelcomePack",
-            PackType::Duelists5x =>     "Duelists5x",
-        }
-    }
-}
 
-// for println! and format! 
-// pub impl PackTypeDisplay of core::fmt::Display<PackType> {
-//     fn fmt(self: @PackType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).into();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+
+//---------------------------
+// Converters
+//
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl PackTypeDebug of core::fmt::Debug<PackType> {
     fn fmt(self: @PackType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-        let result: ByteArray = (*self).into();
-        f.buffer.append(@result);
+        f.buffer.append(@(*self).name());
         Result::Ok(())
     }
 }

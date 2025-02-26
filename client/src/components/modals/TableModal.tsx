@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Modal, Dropdown, ButtonGroup, Button } from 'semantic-ui-react'
+import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { useTableId } from '/src/stores/configStore'
 import { useTable } from '/src/stores/tableStore'
 import { useTableTotals, useTableActiveDuelistIds } from '/src/hooks/useTable'
+import { useCanJoin } from '/src/hooks/usePistolsContractCalls'
 import { useMounted } from '@underware_gg/pistols-sdk/utils/hooks'
 import { getObjectKeyByValue } from '@underware_gg/pistols-sdk/utils'
-import { Balance } from '/src/components/account/Balance'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { RowDivider } from '/src/components/ui/Stack'
 import { Opener } from '/src/hooks/useOpener'
@@ -24,8 +25,7 @@ export default function TableModal({
   const { tableId } = useTableId()
   const { currentScene, dispatchSetScene } = usePistolsScene()
   const [selectedTableId, setSelectedTableId] = useState('')
-  const { tableIsOpen } = useTable(selectedTableId)
-
+  
   // always closed on mount
   const mounted = useMounted(() => {
     opener.close()
@@ -97,7 +97,7 @@ export default function TableModal({
               <ActionButton large fill label='Close' onClick={() => opener.close()} />
             </Col>
             <Col>
-              <ActionButton large fill important label='Join Table' disabled={!tableIsOpen || !selectedTableId} onClick={() => _joinTable()} />
+              <ActionButton large fill important label='Enter Table' disabled={!selectedTableId} onClick={() => _joinTable()} />
             </Col>
           </Row>
         </Grid>
@@ -112,12 +112,12 @@ function TableDescription({
 }) {
   const {
     description,
-    feeMin,
-    tableIsOpen,
-    tableType,
+    tableTypeDescription,
   } = useTable(tableId)
   const { liveDuelsCount, pastDuelsCount } = useTableTotals(tableId)
   const { activeDuelistIds } = useTableActiveDuelistIds(tableId)
+  const { duelistId } = useSettings()
+  const { canJoin } = useCanJoin(tableId, duelistId)
 
   return (
     <Grid className='H5'>
@@ -135,16 +135,7 @@ function TableDescription({
           Game Type:
         </Col>
         <Col width={8} className='Coin PaddedLeft Bold'>
-          {tableType}
-        </Col>
-      </Row>
-
-      <Row className='NoPadding' verticalAlign='middle'>
-        <Col width={8} textAlign='right'>
-          Fee:
-        </Col>
-        <Col width={8} className='Bold'>
-          <Balance lords wei={feeMin ?? 0} />
+          {tableTypeDescription}
         </Col>
       </Row>
 
@@ -179,7 +170,7 @@ function TableDescription({
 
       <Row columns={'equal'} className='NoPadding' textAlign='center'>
         <Col>
-          <h5>Table is {tableIsOpen ? <span className='Important'>Open</span> : <span className='Negative'>Closed</span>}</h5>
+          <h5>Table is {canJoin ? <span className='Important'>Open</span> : <span className='Negative'>Closed</span>}</h5>
         </Col>
       </Row>
 

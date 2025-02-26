@@ -23,7 +23,7 @@ enum FieldType {
   Wei,
   Number,
   Boolean,
-  TableType,
+  RulesType,
   DeckType,
 }
 
@@ -43,10 +43,7 @@ const config_schema: FormSchema = {
 const table_config_schema: FormSchema = {
   table_id: { type: FieldType.ShortString, isKey: true },
   description: { type: FieldType.ShortString },
-  table_type: { type: FieldType.TableType },
-  fee_collector_address: { type: FieldType.Address },
-  fee_min: { type: FieldType.Wei },
-  is_open: { type: FieldType.Boolean },
+  rules: { type: FieldType.RulesType },
 }
 
 export const ConfigForm = ({
@@ -214,10 +211,10 @@ export const Field = ({
               value={value}
               setValue={setValue}
             />
-            : fieldType == FieldType.TableType ? <>
+            : fieldType == FieldType.RulesType ? <>
               {value}
               <FormSelectFromMap
-                map={constants.getTableTypeMap()}
+                map={constants.getRulesTypeMap()}
                 label={name}
                 disabled={readOnly}
                 value={value}

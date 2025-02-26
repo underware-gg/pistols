@@ -30,6 +30,18 @@ export const getTutorialLevelFromValue = (value: number): TutorialLevel | undefi
 export const getTutorialLevelMap = (): Record<TutorialLevel, number> => Object.keys(TutorialLevel).reduce((acc, v, index) => { acc[v as TutorialLevel] = index; return acc; }, {} as Record<TutorialLevel, number>);
 
 // from: ../dojo/src/models/duelist.cairo
+export enum CauseOfDeath {
+  None = 'None', // 0
+  Duelling = 'Duelling', // 1
+  Memorize = 'Memorize', // 2
+  Sacrifice = 'Sacrifice', // 3
+  Forsaken = 'Forsaken', // 4
+};
+export const getCauseOfDeathValue = (name: CauseOfDeath): number | undefined => _indexOrUndefined(Object.keys(CauseOfDeath).indexOf(name));
+export const getCauseOfDeathFromValue = (value: number): CauseOfDeath | undefined => Object.keys(CauseOfDeath)[value] as CauseOfDeath;
+export const getCauseOfDeathMap = (): Record<CauseOfDeath, number> => Object.keys(CauseOfDeath).reduce((acc, v, index) => { acc[v as CauseOfDeath] = index; return acc; }, {} as Record<CauseOfDeath, number>);
+
+// from: ../dojo/src/models/duelist.cairo
 export enum Archetype {
   Undefined = 'Undefined', // 0
   Villainous = 'Villainous', // 1
@@ -43,7 +55,7 @@ export const getArchetypeMap = (): Record<Archetype, number> => Object.keys(Arch
 // from: ../dojo/src/models/pack.cairo
 export enum PackType {
   Unknown = 'Unknown', // 0
-  WelcomePack = 'WelcomePack', // 1
+  StarterPack = 'StarterPack', // 1
   Duelists5x = 'Duelists5x', // 2
 };
 export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
@@ -53,41 +65,45 @@ export const getPackTypeMap = (): Record<PackType, number> => Object.keys(PackTy
 // from: ../dojo/src/models/player.cairo
 export enum Activity {
   Undefined = 'Undefined', // 0
-  FinishedTutorial = 'FinishedTutorial', // 1
-  WelcomePack = 'WelcomePack', // 2
-  PurchasedPack = 'PurchasedPack', // 3
-  CreatedDuelist = 'CreatedDuelist', // 4
-  CreatedChallenge = 'CreatedChallenge', // 5
-  RepliedChallenge = 'RepliedChallenge', // 6
-  CommittedMoves = 'CommittedMoves', // 7
-  RevealedMoves = 'RevealedMoves', // 8
-  DuelResolved = 'DuelResolved', // 9
-  DuelDraw = 'DuelDraw', // 10
+  TutorialFinished = 'TutorialFinished', // 1
+  PackStarter = 'PackStarter', // 2
+  PackPurchased = 'PackPurchased', // 3
+  PackOpened = 'PackOpened', // 4
+  DuelistSpawned = 'DuelistSpawned', // 5
+  DuelistDied = 'DuelistDied', // 6
+  ChallengeCreated = 'ChallengeCreated', // 7
+  ChallengeReplied = 'ChallengeReplied', // 8
+  MovesCommitted = 'MovesCommitted', // 9
+  MovesRevealed = 'MovesRevealed', // 10
+  ChallengeResolved = 'ChallengeResolved', // 11
+  ChallengeDraw = 'ChallengeDraw', // 12
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
 export const getActivityMap = (): Record<Activity, number> => Object.keys(Activity).reduce((acc, v, index) => { acc[v as Activity] = index; return acc; }, {} as Record<Activity, number>);
 
+// from: ../dojo/src/models/pool.cairo
+export enum PoolType {
+  Undefined = 'Undefined', // 0
+  Purchases = 'Purchases', // 1
+  FamePeg = 'FamePeg', // 2
+  Season = 'Season', // 3
+  Tournament = 'Tournament', // 4
+  SacredFlame = 'SacredFlame', // 5
+};
+export const getPoolTypeValue = (name: PoolType): number | undefined => _indexOrUndefined(Object.keys(PoolType).indexOf(name));
+export const getPoolTypeFromValue = (value: number): PoolType | undefined => Object.keys(PoolType)[value] as PoolType;
+export const getPoolTypeMap = (): Record<PoolType, number> => Object.keys(PoolType).reduce((acc, v, index) => { acc[v as PoolType] = index; return acc; }, {} as Record<PoolType, number>);
+
 // from: ../dojo/src/models/season.cairo
 export enum SeasonPhase {
-  None = 'None', // 0
-  Single = 'Single', // 1
+  Undefined = 'Undefined', // 0
+  InProgress = 'InProgress', // 1
   Ended = 'Ended', // 2
 };
 export const getSeasonPhaseValue = (name: SeasonPhase): number | undefined => _indexOrUndefined(Object.keys(SeasonPhase).indexOf(name));
 export const getSeasonPhaseFromValue = (value: number): SeasonPhase | undefined => Object.keys(SeasonPhase)[value] as SeasonPhase;
 export const getSeasonPhaseMap = (): Record<SeasonPhase, number> => Object.keys(SeasonPhase).reduce((acc, v, index) => { acc[v as SeasonPhase] = index; return acc; }, {} as Record<SeasonPhase, number>);
-
-// from: ../dojo/src/models/table.cairo
-export enum TableType {
-  Undefined = 'Undefined', // 0
-  Season = 'Season', // 1
-  Tutorial = 'Tutorial', // 2
-  Practice = 'Practice', // 3
-};
-export const getTableTypeValue = (name: TableType): number | undefined => _indexOrUndefined(Object.keys(TableType).indexOf(name));
-export const getTableTypeFromValue = (value: number): TableType | undefined => Object.keys(TableType)[value] as TableType;
-export const getTableTypeMap = (): Record<TableType, number> => Object.keys(TableType).reduce((acc, v, index) => { acc[v as TableType] = index; return acc; }, {} as Record<TableType, number>);
 
 // from: ../dojo/src/types/boolean.cairo
 export enum Boolean {
@@ -229,8 +245,8 @@ export enum Premise {
   Blood = 'Blood', // 6
   Nothing = 'Nothing', // 7
   Tournament = 'Tournament', // 8
-  Training = 'Training', // 9
-  Tutorial = 'Tutorial', // 10
+  Treaty = 'Treaty', // 9
+  Lesson = 'Lesson', // 10
 };
 export const getPremiseValue = (name: Premise): number | undefined => _indexOrUndefined(Object.keys(Premise).indexOf(name));
 export const getPremiseFromValue = (value: number): Premise | undefined => Object.keys(Premise)[value] as Premise;
@@ -320,6 +336,16 @@ export const getRoundStateValue = (name: RoundState): number | undefined => _ind
 export const getRoundStateFromValue = (value: number): RoundState | undefined => Object.keys(RoundState)[value] as RoundState;
 export const getRoundStateMap = (): Record<RoundState, number> => Object.keys(RoundState).reduce((acc, v, index) => { acc[v as RoundState] = index; return acc; }, {} as Record<RoundState, number>);
 
+// from: ../dojo/src/types/rules.cairo
+export enum RulesType {
+  Undefined = 'Undefined', // 0
+  Academia = 'Academia', // 1
+  Season = 'Season', // 2
+};
+export const getRulesTypeValue = (name: RulesType): number | undefined => _indexOrUndefined(Object.keys(RulesType).indexOf(name));
+export const getRulesTypeFromValue = (value: number): RulesType | undefined => Object.keys(RulesType)[value] as RulesType;
+export const getRulesTypeMap = (): Record<RulesType, number> => Object.keys(RulesType).reduce((acc, v, index) => { acc[v as RulesType] = index; return acc; }, {} as Record<RulesType, number>);
+
 // from: ../dojo/src/types/trophies.cairo
 export enum Trophy {
   None = 'None', // 0
@@ -350,7 +376,8 @@ export type PackDescription = {
   image_url_closed : string,
   image_url_open : string,
   can_purchase : boolean,
-  price : bigint,
+  price_lords : bigint,
+  quantity : number,
 };
 
 // from: ../dojo/src/types/cards/cards.cairo
@@ -389,9 +416,28 @@ export type ProfileDescription = {
 // constants
 //
 
+// from: ../dojo/src/utils/timestamp.cairo
+type type_TIMESTAMP = {
+  ONE_MINUTE: bigint, // cairo: u64
+  ONE_HOUR: bigint, // cairo: u64
+  ONE_DAY: bigint, // cairo: u64
+  ONE_WEEK: bigint, // cairo: u64
+  TWO_WEEKS: bigint, // cairo: u64
+  THREE_WEEKS: bigint, // cairo: u64
+  FOUR_WEEKS: bigint, // cairo: u64
+};
+export const TIMESTAMP: type_TIMESTAMP = {
+  ONE_MINUTE: 60n,
+  ONE_HOUR: (60n * 60n),
+  ONE_DAY: (60n * 60n * 24n),
+  ONE_WEEK: (60n * 60n * 24n * 7n),
+  TWO_WEEKS: (60n * 60n * 24n * 14n),
+  THREE_WEEKS: (60n * 60n * 24n * 21n),
+  FOUR_WEEKS: (60n * 60n * 24n * 28n),
+};
+
 // from: ../dojo/src/types/constants.cairo
 type type_CONST = {
-  WELCOME_PACK_DUELIST_COUNT: number, // cairo: usize
   ROUND_COUNT: number, // cairo: u8
   MAX_DUELIST_ID: bigint, // cairo: u128
   FULL_HEALTH: number, // cairo: u8
@@ -402,7 +448,6 @@ type type_CONST = {
   ETH_TO_WEI: bigint, // cairo: u256
 };
 export const CONST: type_CONST = {
-  WELCOME_PACK_DUELIST_COUNT: 5,
   ROUND_COUNT: 1,
   MAX_DUELIST_ID: BigInt('0xffff'),
   FULL_HEALTH: 3,
@@ -435,17 +480,21 @@ export const CHANCES: type_CHANCES = {
 
 // from: ../dojo/src/types/constants.cairo
 type type_FAME = {
-  FAME_PER_LORDS: bigint, // cairo: u256
-  MIN_MINT_GRANT_AMOUNT: bigint, // cairo: u256
-  MIN_REWARD_AMOUNT: bigint, // cairo: u256
+  MINT_GRANT_AMOUNT: bigint, // cairo: u256
+  ONE_LIFE: bigint, // cairo: u256
+  MAX_INACTIVE_TIMESTAMP: bigint, // cairo: u64
+  TIMESTAMP_TO_DRIP_ONE_FAME: bigint, // cairo: u64
+  SACRED_FLAME_PERCENTAGE: number, // cairo: u8
 };
 export const FAME: type_FAME = {
-  FAME_PER_LORDS: 10n,
-  MIN_MINT_GRANT_AMOUNT: (1000n * CONST.ETH_TO_WEI),
-  MIN_REWARD_AMOUNT: (100n * CONST.ETH_TO_WEI),
+  MINT_GRANT_AMOUNT: (3000n * CONST.ETH_TO_WEI),
+  ONE_LIFE: (1000n * CONST.ETH_TO_WEI),
+  MAX_INACTIVE_TIMESTAMP: TIMESTAMP.FOUR_WEEKS,
+  TIMESTAMP_TO_DRIP_ONE_FAME: (10n * TIMESTAMP.ONE_MINUTE),
+  SACRED_FLAME_PERCENTAGE: 60,
 };
 
-// from: ../dojo/src/interfaces/systems.cairo
+// from: ../dojo/src/interfaces/dns.cairo
 type type_SELECTORS = {
   ADMIN: bigint, // cairo: felt252
   BANK: bigint, // cairo: felt252
@@ -456,13 +505,13 @@ type type_SELECTORS = {
   DUELIST_TOKEN: bigint, // cairo: felt252
   PACK_TOKEN: bigint, // cairo: felt252
   FAME_COIN: bigint, // cairo: felt252
+  FOOLS_COIN: bigint, // cairo: felt252
   LORDS_MOCK: bigint, // cairo: felt252
   VR_MOCK: bigint, // cairo: felt252
   CONFIG: bigint, // cairo: felt252
   TABLE_CONFIG: bigint, // cairo: felt252
   TOKEN_CONFIG: bigint, // cairo: felt252
   COIN_CONFIG: bigint, // cairo: felt252
-  PAYMENT: bigint, // cairo: felt252
 };
 export const SELECTORS: type_SELECTORS = {
   ADMIN: BigInt('0x036fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497'), // selector_from_tag!("pistols-admin")
@@ -474,13 +523,13 @@ export const SELECTORS: type_SELECTORS = {
   DUELIST_TOKEN: BigInt('0x045c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e'), // selector_from_tag!("pistols-duelist_token")
   PACK_TOKEN: BigInt('0x03d74e76192285c5a19a63c54a6c2ba5b015a1a25818c2d8f9cf75d7fef2b5c1'), // selector_from_tag!("pistols-pack_token")
   FAME_COIN: BigInt('0x0371b95cb7056eb2d21819662e973ed32c345c989aa9f6097e7811a5665a0b0a'), // selector_from_tag!("pistols-fame_coin")
+  FOOLS_COIN: BigInt('0x058070034702ab2b03c2911459d7299e63048e70e3d41f77e1d806b4cb8f2dcd'), // selector_from_tag!("pistols-fools_coin")
   LORDS_MOCK: BigInt('0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788'), // selector_from_tag!("pistols-lords_mock")
   VR_MOCK: BigInt('0x07d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e'), // selector_from_tag!("pistols-vrf_mock")
   CONFIG: BigInt('0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392'), // selector_from_tag!("pistols-Config")
   TABLE_CONFIG: BigInt('0x01e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138'), // selector_from_tag!("pistols-TableConfig")
   TOKEN_CONFIG: BigInt('0x056ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed'), // selector_from_tag!("pistols-TokenConfig")
   COIN_CONFIG: BigInt('0x026fad4dff063a4f2c3b3889723194b9bdbbbf833e44ff2d573af01741b966ac'), // selector_from_tag!("pistols-CoinConfig")
-  PAYMENT: BigInt('0x017a03e9cb461470b9149f9efbd95ad9b217fca9fdccd3827383904c33da96c1'), // selector_from_tag!("pistols-Payment")
 };
 
 // from: ../dojo/src/models/config.cairo
@@ -494,7 +543,7 @@ export const CONFIG: type_CONFIG = {
 // from: ../dojo/src/models/pack.cairo
 type type_PACK_TYPES = {
   Unknown: PackDescription, // cairo: PackDescription
-  WelcomePack: PackDescription, // cairo: PackDescription
+  StarterPack: PackDescription, // cairo: PackDescription
   Duelists5x: PackDescription, // cairo: PackDescription
 };
 export const PACK_TYPES: type_PACK_TYPES = {
@@ -504,15 +553,17 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_url_closed: '/tokens/Unknown.jpg',
     image_url_open: '/tokens/Unknown.jpg',
     can_purchase: false,
-    price: 0n,
+    price_lords: 0n,
+    quantity: 0,
   },
-  WelcomePack: {
-    id: 'WelcomePack',
-    name: 'Welcome Pack',
-    image_url_closed: '/tokens/WelcomePack.jpg',
-    image_url_open: '/tokens/WelcomePack.jpg',
+  StarterPack: {
+    id: 'StarterPack',
+    name: 'Starter Pack',
+    image_url_closed: '/tokens/StarterPack.jpg',
+    image_url_open: '/tokens/StarterPack.jpg',
     can_purchase: false,
-    price: 0n,
+    price_lords: (20n * CONST.ETH_TO_WEI),
+    quantity: 2,
   },
   Duelists5x: {
     id: 'Duelists5x',
@@ -520,7 +571,8 @@ export const PACK_TYPES: type_PACK_TYPES = {
     image_url_closed: '/tokens/Duelists5x.jpg',
     image_url_open: '/tokens/Duelists5x.jpg',
     can_purchase: true,
-    price: (100n * CONST.ETH_TO_WEI),
+    price_lords: (50n * CONST.ETH_TO_WEI),
+    quantity: 5,
   },
 };
 
@@ -767,8 +819,8 @@ type type_PREMISES = {
   Blood: PremiseDescription, // cairo: PremiseDescription
   Nothing: PremiseDescription, // cairo: PremiseDescription
   Tournament: PremiseDescription, // cairo: PremiseDescription
-  Tutorial: PremiseDescription, // cairo: PremiseDescription
-  Training: PremiseDescription, // cairo: PremiseDescription
+  Treaty: PremiseDescription, // cairo: PremiseDescription
+  Lesson: PremiseDescription, // cairo: PremiseDescription
 };
 export const PREMISES: type_PREMISES = {
   Undefined: {
@@ -807,13 +859,13 @@ export const PREMISES: type_PREMISES = {
     name: 'Tournament',
     prefix: 'to be the winner of',
   },
-  Tutorial: {
-    name: 'Tutorial',
-    prefix: 'to learn the ropes',
+  Treaty: {
+    name: 'Treaty',
+    prefix: 'to settle the terms of',
   },
-  Training: {
-    name: 'Training',
-    prefix: 'to train for',
+  Lesson: {
+    name: 'Lesson',
+    prefix: 'to learn about',
   },
 };
 
@@ -1101,24 +1153,4 @@ export const BITWISE: type_BITWISE = {
   MSB_U64: BigInt('0x8000000000000000'),
   MSB_U128: BigInt('0x80000000000000000000000000000000'),
   MSB_U256: BigInt('0x8000000000000000000000000000000000000000000000000000000000000000'),
-};
-
-// from: ../dojo/src/utils/timestamp.cairo
-type type_TIMESTAMP = {
-  ONE_MINUTE: bigint, // cairo: u64
-  ONE_HOUR: bigint, // cairo: u64
-  ONE_DAY: bigint, // cairo: u64
-  ONE_WEEK: bigint, // cairo: u64
-  TWO_WEEKS: bigint, // cairo: u64
-  THREE_WEEKS: bigint, // cairo: u64
-  FOUR_WEEKS: bigint, // cairo: u64
-};
-export const TIMESTAMP: type_TIMESTAMP = {
-  ONE_MINUTE: 60n,
-  ONE_HOUR: (60n * 60n),
-  ONE_DAY: (60n * 60n * 24n),
-  ONE_WEEK: (60n * 60n * 24n * 7n),
-  TWO_WEEKS: (60n * 60n * 24n * 14n),
-  THREE_WEEKS: (60n * 60n * 24n * 21n),
-  FOUR_WEEKS: (60n * 60n * 24n * 28n),
 };

@@ -1,4 +1,6 @@
 use starknet::{ContractAddress};
+use pistols::models::challenge::{Challenge};
+use pistols::types::rules::{RewardValues};
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -18,8 +20,10 @@ pub trait IDuelistToken<TState> {
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
     // Duelist
     fn is_alive(self: @TState, token_id: u128) -> bool;
-    fn calc_fame_reward(self: @TState, duelist_id: u128) -> u128;
-    fn transfer_fame_reward(ref self: TState, duel_id: u128) -> (i128, i128);
+    fn life_count(self: @TState, duelist_id: u128) -> u8;
+    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (RewardValues, RewardValues);
+    fn poke(ref self: TState, duelist_id: u128) -> bool;
+    fn sacrifice(ref self: TState, duelist_id: u128);
 }
 
 #[dojo::contract]
@@ -29,8 +33,9 @@ pub mod duelist_token {
     use dojo::world::{WorldStorage};
     use dojo::model::{ModelStorage};
 
-    use super::{IDuelistToken, MockDuelistOwners};
-    use pistols::types::constants::{FAME};
+    use super::{MockDuelistOwners};
+    use pistols::models::challenge::{Challenge};
+    use pistols::types::rules::{RewardValues};
     use pistols::utils::misc::{ZERO};
     use pistols::tests::tester::tester::{
         OWNER, OWNED_BY_OWNER,
@@ -46,7 +51,7 @@ pub mod duelist_token {
     }
 
     #[abi(embed_v0)]
-    impl ERC721MockImpl of IDuelistToken<ContractState> {
+    impl ERC721MockImpl of super::IDuelistToken<ContractState> {
         fn transfer_from(ref self: ContractState, from: ContractAddress, to: ContractAddress, token_id: u256) {
             let mut world = self.world_default();
             world.write_model(
@@ -83,12 +88,16 @@ pub mod duelist_token {
         fn is_alive(self: @ContractState, token_id: u128) -> bool {
             (true)
         }
-        fn calc_fame_reward(self: @ContractState, duelist_id: u128) -> u128 {
-            (FAME::MIN_REWARD_AMOUNT.low)
+        fn life_count(self: @ContractState, duelist_id: u128) -> u8 {
+            (3)
         }
-        fn transfer_fame_reward(ref self: ContractState, duel_id: u128) -> (i128, i128) {
-            (0, 0)
+        fn transfer_rewards(ref self: ContractState, challenge: Challenge, tournament_id: u128) -> (RewardValues, RewardValues) {
+            (Default::default(), Default::default())
         }
+        fn poke(ref self: ContractState, duelist_id: u128) -> bool {
+            (true)
+        }
+        fn sacrifice(ref self: ContractState, duelist_id: u128) {}
     }
 
 }

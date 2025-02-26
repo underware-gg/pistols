@@ -37,6 +37,7 @@ pub trait IPackToken<TState> {
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
+    fn minted_count(self: @TState) -> u128;
 
     // ITokenRenderer
     fn get_token_name(self: @TState, token_id: u256) -> ByteArray;
@@ -44,22 +45,23 @@ pub trait IPackToken<TState> {
     fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IPackTokenPublic
-    fn can_claim_welcome_pack(self: @TState, recipient: ContractAddress) -> bool;
+    fn can_claim_starter_pack(self: @TState, recipient: ContractAddress) -> bool;
     fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
-    fn claim_welcome_pack(ref self: TState) -> Span<u128>;
+    fn claim_starter_pack(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
 }
 
+// Exposed to clients
 #[starknet::interface]
 pub trait IPackTokenPublic<TState> {
     // view
-    fn can_claim_welcome_pack(self: @TState, recipient: ContractAddress) -> bool;
+    fn can_claim_starter_pack(self: @TState, recipient: ContractAddress) -> bool;
     fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
     // write
-    fn claim_welcome_pack(ref self: TState) -> Span<u128>;
+    fn claim_starter_pack(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
 }
@@ -108,15 +110,14 @@ pub mod pack_token {
     // ERC-721 End
     //-----------------------------------
 
-    use pistols::interfaces::systems::{
-        SystemsTrait,
+    use pistols::interfaces::dns::{
+        DnsTrait,
         IBankDispatcherTrait,
         IVrfProviderDispatcherTrait, Source,
     };
     use pistols::models::{
         pack::{Pack, PackTrait, PackValue, PackType, PackTypeTrait},
         player::{Player, PlayerTrait, Activity},
-        payment::{Payment},
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
@@ -146,19 +147,9 @@ pub mod pack_token {
             TOKEN_SYMBOL(),
             format!("https://{}",base_uri.to_string()),
         );
-        let payment = Payment {
-            key: starknet::get_contract_address().into(),
-            amount: 0,
-            client_percent: 0,
-            ranking_percent: 0,
-            owner_percent: 0,
-            pool_percent: 0,
-            treasury_percent: 100,
-        };
         self.token.initialize(
             ZERO(),
             ZERO(),
-            payment,
         );
     }
 
@@ -174,36 +165,36 @@ pub mod pack_token {
     //-----------------------------------
     // Public
     //
-    use super::{IPackTokenPublic};
     #[abi(embed_v0)]
-    impl PackTokenPublicImpl of IPackTokenPublic<ContractState> {
+    impl PackTokenPublicImpl of super::IPackTokenPublic<ContractState> {
 
-        fn can_claim_welcome_pack(self: @ContractState, recipient: ContractAddress) -> bool {
+        fn can_claim_starter_pack(self: @ContractState, recipient: ContractAddress) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let player: Player = store.get_player(recipient);
-            (!player.claimed_welcome_pack)
+            (!player.claimed_starter_pack)
         }
 
         fn can_purchase(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> bool {
-            (!self.can_claim_welcome_pack(recipient) && pack_type.can_purchase())
+            (!self.can_claim_starter_pack(recipient) && pack_type.can_purchase())
         }
 
         fn calc_mint_fee(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> u128 {
-            (self.get_payment(recipient, pack_type).amount.low)
+            (pack_type.mint_fee())
         }
 
-        fn claim_welcome_pack(ref self: ContractState) -> Span<u128> {
+        fn claim_starter_pack(ref self: ContractState) -> Span<u128> {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // validate
             let recipient: ContractAddress = starknet::get_caller_address();
-            assert(self.can_claim_welcome_pack(recipient), Errors::ALREADY_CLAIMED);
+            assert(self.can_claim_starter_pack(recipient), Errors::ALREADY_CLAIMED);
 
             // mint
-            let pack: Pack = self.mint_pack(PackType::WelcomePack, recipient, recipient.into());
+            let lords_amount: u128 = self.calc_mint_fee(recipient, PackType::StarterPack);
+            let pack: Pack = self._mint_pack(PackType::StarterPack, recipient, recipient.into(), lords_amount);
             
             // events
-            PlayerTrait::check_in(ref store, Activity::WelcomePack, recipient, 0);
+            PlayerTrait::check_in(ref store, Activity::PackStarter, recipient, pack.pack_id.into());
 
             // open immediately
             (self.open(pack.pack_id))
@@ -217,22 +208,22 @@ pub mod pack_token {
 
             // validate recipient
             let recipient: ContractAddress = starknet::get_caller_address();
-            assert(!self.can_claim_welcome_pack(recipient), Errors::CLAIM_FIRST);
+            assert(!self.can_claim_starter_pack(recipient), Errors::CLAIM_FIRST);
 
             // transfer mint fee
-            let payment: Payment = self.get_payment(recipient, pack_type);
-            if (payment.amount != 0) {
-                store.world.bank_dispatcher().charge(recipient, payment);
+            let lords_amount: u128 = self.calc_mint_fee(recipient, pack_type);
+            if (lords_amount != 0) {
+                store.world.bank_dispatcher().charge_purchase(recipient, lords_amount.into());
             }
 
             // create vrf seed
-            let seed: felt252 = store.world.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_contract_address()));
+            let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_contract_address()));
 
             // mint
-            let pack: Pack = self.mint_pack(pack_type, recipient, seed);
+            let pack: Pack = self._mint_pack(pack_type, recipient, seed, lords_amount);
             
             // events
-            PlayerTrait::check_in(ref store, Activity::PurchasedPack, recipient, pack.pack_type.identifier());
+            PlayerTrait::check_in(ref store, Activity::PackPurchased, recipient, pack.pack_id.into());
 
             (pack)
         }
@@ -248,8 +239,14 @@ pub mod pack_token {
             let mut pack: Pack = store.get_pack(pack_id);
             assert(!pack.is_open, Errors::ALREADY_OPENED);
 
+            // events
+            PlayerTrait::check_in(ref store, Activity::PackOpened, recipient, pack_id.into());
+
             // open...
             let token_ids: Span<u128> = pack.open(ref store, recipient);
+
+            // minted fame, peg to paid LORDS
+            store.world.bank_dispatcher().peg_minted_fame_to_purchased_lords(recipient, pack.lords_amount.into());
 
             // burn!
             self.token.burn(pack_id.into());
@@ -264,10 +261,11 @@ pub mod pack_token {
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
-        fn mint_pack(ref self: ContractState,
+        fn _mint_pack(ref self: ContractState,
             pack_type: PackType,
             recipient: ContractAddress,
             seed: felt252,
+            lords_amount: u128,
         ) -> Pack {
             let mut store: Store = StoreTrait::new(self.world_default());
 
@@ -279,18 +277,12 @@ pub mod pack_token {
                 pack_id: token_id,
                 pack_type,
                 seed,
+                lords_amount,
                 is_open: false,
             };
             store.set_pack(@pack);
 
             (pack)
-        }
-        
-        fn get_payment(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> Payment {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let mut payment: Payment = store.get_payment(starknet::get_contract_address().into());
-            payment.amount = pack_type.mint_fee();
-            (payment)
         }
     }
 
@@ -312,7 +304,7 @@ pub mod pack_token {
     //         auth: ContractAddress,
     //     ) {
     //         // avoid transfer after opened
-    //         let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+    //         let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
     //         let mut store: Store = StoreTrait::new(world);
     //         let pack: Pack = store.get_pack(token_id.low);
     //         assert(!pack.is_open, Errors::ALREADY_OPENED);

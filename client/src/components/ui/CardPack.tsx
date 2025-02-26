@@ -22,10 +22,11 @@ import {
   CARD_PACK_CARD_SCALE_DURATION,
   CARD_PACK_REVEAL_DELAY,
 } from '/src/data/cardConstants';
+import { useAccount } from '@starknet-react/core';
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
 import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo';
+import { usePackType } from '/src/stores/packStore';
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
-import { useAccount } from '@starknet-react/core';
 
 interface CardPack {
   onComplete?: (selectedDuelistId?: number) => void
@@ -43,6 +44,8 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   const { pack_token } = useDojoSystemCalls()
   const { duelistIds } = useDuelistsOfPlayer()
   const [isClaiming, setIsClaiming] = useState(false)
+  const { quantity: starterPackQuantity } = usePackType(constants.PackType.StarterPack)
+  const { quantity: duelists5xQuantity } = usePackType(constants.PackType.Duelists5x)
 
   const [isOpening, setIsOpening] = useState(false)
   const [sealClicked, setSealClicked] = useState(false)
@@ -56,9 +59,9 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   const previousDuelistIdsRef = useRef<bigint[]>([])
 
   const _claim = async () => {
-    if (packType === constants.PackType.WelcomePack) {
+    if (packType === constants.PackType.StarterPack) {
       setIsClaiming(true)
-      await pack_token.claim_welcome_pack(account)
+      await pack_token.claim_starter_pack(account)
     } else if (packType === constants.PackType.Duelists5x && packId) {
       setIsClaiming(true)
       await pack_token.open(account, packId)
@@ -72,9 +75,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
       return
     }
 
-    //TODO adjust to all card pack possibilities
-    // const expectedNewIds = packType === constants.PackType.WelcomePack ? 2 : 5
-    const expectedNewIds = 5
+    const expectedNewIds = isClaiming ? starterPackQuantity : duelists5xQuantity
     console.log('Expected new IDs:', expectedNewIds)
     const newIds = duelistIds.filter(id => !previousDuelistIdsRef.current.includes(id))
     console.log('Found new IDs:', newIds)
@@ -320,7 +321,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   const handleButtonClick = () => {
     if (!hasRevealed) {
       handleRevealAll()
-    } else if (packType === constants.PackType.WelcomePack) {
+    } else if (packType === constants.PackType.StarterPack) {
       if (selectedDuelistId !== undefined) {
         onComplete?.(selectedDuelistId)
       }
@@ -331,13 +332,13 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
 
   const getButtonLabel = () => {
     if (!hasRevealed) return 'Reveal All'
-    if (packType === constants.PackType.WelcomePack) return 'Go to Duel'
+    if (packType === constants.PackType.StarterPack) return 'Go to Duel'
     return 'Close'
   }
 
   const isButtonDisabled = () => {
     if (!hasRevealed) return false
-    if (packType === constants.PackType.WelcomePack && selectedDuelistId === undefined) return true
+    if (packType === constants.PackType.StarterPack && selectedDuelistId === undefined) return true
     return false
   }
 
@@ -352,7 +353,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
         return newSet;
       });
     } else if (revealedDuelists.size === newDuelistIds.length) {
-      if (packType === constants.PackType.WelcomePack) {
+      if (packType === constants.PackType.StarterPack) {
         if (selectedDuelistId === id) {
           setSelectedDuelistId(undefined);
           cardRef?.setCardScale(1, CARD_PACK_CARD_SCALE_DURATION);

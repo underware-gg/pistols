@@ -3,16 +3,18 @@ use starknet::{ContractAddress};
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Activity {
     Undefined,          // 0
-    FinishedTutorial,   // 1
-    WelcomePack,        // 2
-    PurchasedPack,      // 3
-    CreatedDuelist,     // 4
-    CreatedChallenge,   // 5
-    RepliedChallenge,   // 6
-    CommittedMoves,     // 7
-    RevealedMoves,      // 8
-    DuelResolved,       // 9
-    DuelDraw,           // 10
+    TutorialFinished,   // 1
+    PackStarter,        // 2
+    PackPurchased,      // 3
+    PackOpened,         // 4
+    DuelistSpawned,     // 5
+    DuelistDied,        // 6
+    ChallengeCreated,   // 7
+    ChallengeReplied,   // 8
+    MovesCommitted,     // 9
+    MovesRevealed,      // 10
+    ChallengeResolved,  // 11
+    ChallengeDraw,      // 12
 }
 
 //---------------------
@@ -25,7 +27,7 @@ pub struct Player {
     pub player_address: ContractAddress,   // controller wallet
     //-----------------------
     pub timestamp_registered: u64,
-    pub claimed_welcome_pack: bool,
+    pub claimed_starter_pack: bool,
 }
 
 
@@ -99,45 +101,46 @@ pub impl PlayerImpl of PlayerTrait {
         if (!player.exists()) {
             assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
             player.timestamp_registered = starknet::get_block_timestamp();
-            player.claimed_welcome_pack = (activity == Activity::WelcomePack);
+            player.claimed_starter_pack = (activity == Activity::PackStarter);
             store.set_player(@player);
-        } else if (activity == Activity::WelcomePack) {
-            player.claimed_welcome_pack = true;
+        } else if (activity == Activity::PackStarter) {
+            player.claimed_starter_pack = true;
             store.set_player(@player);
         }
         activity.emit(ref store.world, player_address, identifier);
     }
     #[inline(always)]
-    fn exists(self: Player) -> bool {
-        (self.timestamp_registered != 0)
+    fn exists(self: @Player) -> bool {
+        (*self.timestamp_registered != 0)
     }
 }
 
 
 #[generate_trait]
 pub impl ActivityImpl of ActivityTrait {
-    fn emit(self: Activity, ref world: WorldStorage, player_address: ContractAddress, identifier: felt252) {
+    fn emit(self: @Activity, ref world: WorldStorage, player_address: ContractAddress, identifier: felt252) {
         world.emit_event(@PlayerActivity{
             player_address,
             timestamp: starknet::get_block_timestamp(),
-            activity: self,
+            activity: *self,
             identifier,
             is_public: self.is_public(),
         });
     }
-    fn is_public(self: Activity) -> bool {
+    fn is_public(self: @Activity) -> bool {
         match self {
-            Activity::PurchasedPack => false,
+            Activity::PackPurchased |
+            Activity::PackOpened => false,
             _ => true,
         }
     }
-    fn can_register_player(self: Activity) -> bool {
+    fn can_register_player(self: @Activity) -> bool {
         match self {
-            // Activity::WelcomePack => true,
-            // Activity::FinishedTutorial => true,
-            // Activity::CreatedDuelist => true,
-            // Activity::CreatedChallenge => true,
-            // Activity::RepliedChallenge => true,
+            // Activity::PackStarter => true,
+            // Activity::TutorialFinished => true,
+            // Activity::DuelistSpawned => true,
+            // Activity::ChallengeCreated => true,
+            // Activity::ChallengeReplied => true,
             // _ => false,
             _ => true,
         }

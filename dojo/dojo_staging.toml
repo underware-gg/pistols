@@ -53,8 +53,13 @@ default = "pistols"
   "pistols-pack_token",
 ]
 # ERC-20
-"pistols-CoinConfig"        = ["pistols-fame_coin","pistols-lords_mock"]
+"pistols-CoinConfig" = [
+  "pistols-fame_coin",
+  "pistols-fools_coin",
+  "pistols-lords_mock",
+]
 "pistols-TokenBoundAddress" = ["pistols-fame_coin"]
+"pistols-Pool" = ["pistols-bank"]
 # arcade trophies
 "pistols-TrophyCreation" = ["pistols-game"]
 "pistols-TrophyProgression" = ["pistols-game"]

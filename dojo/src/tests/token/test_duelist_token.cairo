@@ -1,68 +1,42 @@
-use core::num::traits::Zero;
-use starknet::{ContractAddress, testing};
-use dojo::world::{WorldStorage};
-use dojo_cairo_test::{
-    spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
-    WorldStorageTestTrait,
-};
+// use core::num::traits::Zero;
+use starknet::{ContractAddress};
+// use dojo::world::{WorldStorage};
 
-use pistols::systems::{
-    bank::{IBankDispatcher},
-    tokens::{
-        pack_token::{pack_token, IPackTokenDispatcher},
-        duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
-        fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
-        lords_mock::{ILordsMockDispatcher},
-    },
-    components::{
-        token_bound::{m_TokenBoundAddress},
-    },
-};
 use pistols::models::{
-    player::{
-        m_Player,
-        e_PlayerActivity,
-        e_PlayerRequiredAction,
-    },
     pack::{
-        m_Pack,
-    },
-    challenge::{
-        m_Challenge,
-        m_ChallengeFameBalance,
-        m_Round,
+        PackType, PackTypeTrait,
     },
     duelist::{
-        m_Duelist, Duelist,
-        m_DuelistChallenge,
-        m_Scoreboard, Scoreboard, Score,
-        m_ScoreboardTable,
-        ProfileType, DuelistProfile
-    },
-    pact::{
-        m_Pact,
-    },
-    payment::{
-        m_Payment,
+        Duelist,
+        Scoreboard, Score,
+        ProfileType, DuelistProfile,
+        DuelistMemorialValue, CauseOfDeath,
     },
     config::{
-        m_Config, Config,
-        m_TokenConfig, TokenConfig,
-        m_CoinConfig,
-        CONFIG,
+        TokenConfig,
     },
-    season::{
-        m_SeasonConfig,
+    pool::{
+        Pool, PoolType,
     },
     table::{
-        m_TableConfig,
         TABLES,
     },
 };
 
-use pistols::interfaces::systems::{SystemsTrait};
-use pistols::types::constants::{CONST, FAME};
-use pistols::tests::tester::{tester, tester::{OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO}};
+// use pistols::interfaces::dns::{DnsTrait};
+use pistols::types::constants::{FAME};
+use pistols::utils::misc::{WEI};
+use pistols::tests::tester::{
+    tester,
+    tester::{
+        StoreTrait,
+        TestSystems, FLAGS,
+        IDuelistTokenDispatcherTrait,
+        IFameCoinDispatcherTrait,
+        ILordsMockDispatcherTrait,
+        OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO,
+    },
+};
 use pistols::tests::{utils};
 
 use openzeppelin_token::erc721::interface;
@@ -114,137 +88,34 @@ fn assert_only_event_approval(
 // Setup
 //
 
-const TOKEN_ID_1: u256 = 1;
-const TOKEN_ID_2: u256 = 2;
-const TOKEN_ID_3: u256 = 3;
-const TOKEN_ID_4: u256 = 4;
-const TOKEN_ID_5: u256 = 5;
-const TOKEN_ID_6: u256 = 6;
-const TOKEN_ID_7: u256 = 7;
-const TOKEN_ID_8: u256 = 8;
-const TOKEN_ID_9: u256 = 9;
-const TOKEN_ID_10: u256 = 10;
+const TOKEN_ID_1_1: u256 = 1;
+const TOKEN_ID_1_2: u256 = 2;
+const TOKEN_ID_2_1: u256 = 3;
+const TOKEN_ID_2_2: u256 = 4;
+const TOKEN_ID_3_1: u256 = 5;
+const TOKEN_ID_3_2: u256 = 6;
 
-#[derive(Copy, Drop)]
-pub struct TestSystems {
-    pub world: WorldStorage,
-    pub lords: ILordsMockDispatcher,
-    pub token: IDuelistTokenDispatcher,
-    pub pack: IPackTokenDispatcher,
-    pub fame: IFameCoinDispatcher,
-    pub bank: IBankDispatcher,
-}
+fn setup(_fee_amount: u128) -> TestSystems {
+    let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
 
-fn setup_uninitialized(fee_amount: u128) -> TestSystems {
-    testing::set_block_number(1);
-    testing::set_block_timestamp(1);
+    tester::set_current_season(ref sys, TABLES::PRACTICE);
 
-    let ndef = NamespaceDef {
-        namespace: "pistols",
-        resources: [
-            // pistols models
-            TestResource::Model(m_Player::TEST_CLASS_HASH),
-            TestResource::Model(m_Pack::TEST_CLASS_HASH),
-            TestResource::Model(m_Challenge::TEST_CLASS_HASH),
-            TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
-            TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_Config::TEST_CLASS_HASH),
-            TestResource::Model(m_Duelist::TEST_CLASS_HASH),
-            TestResource::Model(m_DuelistChallenge::TEST_CLASS_HASH),
-            TestResource::Model(m_Pact::TEST_CLASS_HASH),
-            TestResource::Model(m_Payment::TEST_CLASS_HASH),
-            TestResource::Model(m_Round::TEST_CLASS_HASH),
-            TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
-            TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
-            TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
-            TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
-            // events
-            TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
-            TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
-            TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
-            TestResource::Event(e_PlayerRequiredAction::TEST_CLASS_HASH),
-            //
-            // contracts
-            TestResource::Contract(duelist_token::TEST_CLASS_HASH),
-            TestResource::Contract(pack_token::TEST_CLASS_HASH),
-            TestResource::Contract(fame_coin::TEST_CLASS_HASH),
-            // TestResource::Contract(bank::TEST_CLASS_HASH),
-            // TestResource::Contract(lords_mock::TEST_CLASS_HASH),
-        ].span()
-    };
-
-    let mut world: WorldStorage = spawn_test_world([ndef].span());
-
-    let mut contract_defs: Array<ContractDef> = array![
-        ContractDefTrait::new(@"pistols", @"duelist_token")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            .with_init_calldata([
-                'pistols.underware.gg',
-                0, // renderer_address
-            ].span()),
-        ContractDefTrait::new(@"pistols", @"pack_token")
-            .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-            .with_init_calldata([
-                'pistols.underware.gg',
-            ].span()),
-        ContractDefTrait::new(@"pistols", @"fame_coin")
-            .with_writer_of([
-                // same as config
-                selector_from_tag!("pistols-CoinConfig"),
-                selector_from_tag!("pistols-TokenBoundAddress"),
-            ].span()),
-        // ContractDefTrait::new(@"pistols", @"bank")
-        //     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span()),
-        // ContractDefTrait::new(@"pistols", @"lords_mock")
-        //     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-        //     .with_init_calldata([
-        //         0, // minter
-        //         10_000_000_000_000_000_000_000, // 10,000 Lords
-        //     ].span()),
-    ];
-
-    world.sync_perms_and_inits(contract_defs.span());
-
-    tester::impersonate(OWNER());
-
-    tester::set_Config(ref world, Config {
-        key: CONFIG::CONFIG_KEY,
-        treasury_address: TREASURY(),
-        lords_address: world.lords_mock_address(),
-        vrf_address: world.vrf_mock_address(),
-        season_table_id: TABLES::PRACTICE,
-        is_paused: false,
-    });
-
-    TestSystems{
-        world,
-        lords: world.lords_mock_dispatcher(),
-        token: world.duelist_token_dispatcher(),
-        pack: world.pack_token_dispatcher(),
-        fame: world.fame_coin_dispatcher(),
-        bank: world.bank_dispatcher(),
-    }
-}
-
-fn setup(fee_amount: u128) -> TestSystems {
-    let mut sys: TestSystems = setup_uninitialized(fee_amount);
+    tester::fund_duelists_pool(@sys, 2);
 
     // initialize contracts
-    tester::execute_claim_welcome_pack(@sys.pack, OWNER());
-    
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
+
     tester::impersonate(OWNER());
 
     // drop all events
     utils::drop_all_events(sys.world.dispatcher.contract_address);
-    utils::drop_all_events(sys.token.contract_address);
+    utils::drop_all_events(sys.duelists.contract_address);
 
     (sys)
 }
 
-fn _assert_minted_count(world: WorldStorage, token: IDuelistTokenDispatcher, minted_count: usize, msg: ByteArray) {
-    let token_config: TokenConfig = tester::get_TokenConfig(world, token.contract_address);
+fn _assert_minted_count(sys: @TestSystems, minted_count: usize, msg: ByteArray) {
+    let token_config: TokenConfig = (*sys.store).get_token_config(*sys.duelists.contract_address);
     assert_eq!(token_config.minted_count, minted_count.into(), "{}", msg);
 }
 
@@ -255,24 +126,26 @@ fn _assert_minted_count(world: WorldStorage, token: IDuelistTokenDispatcher, min
 #[test]
 fn test_initializer() {
     let mut sys: TestSystems = setup(0);
-    assert_eq!(sys.token.symbol(), "DUELIST", "Symbol is wrong");
+    assert_eq!(sys.duelists.symbol(), "DUELIST", "Symbol is wrong");
 
-    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, "Should eq [5]");
-    assert_eq!(sys.token.balance_of(OWNER()), CONST::WELCOME_PACK_DUELIST_COUNT.into(), "Should eq [5]");
-    assert_eq!(sys.token.balance_of(OTHER()), 0, "Should eq 0");
+    let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
 
-    assert_eq!(sys.token.owner_of(TOKEN_ID_1), OWNER(), "owner_of_1");
+    _assert_minted_count(@sys, starter_pack_duelist_count, "Should eq [starter_pack_duelist_count]");
+    assert_eq!(sys.duelists.balance_of(OWNER()), starter_pack_duelist_count.into(), "Should eq [starter_pack_duelist_count]");
+    assert_eq!(sys.duelists.balance_of(OTHER()), 0, "Should eq 0");
 
-    assert!(sys.token.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
-    assert!(sys.token.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
+    assert_eq!(sys.duelists.owner_of(TOKEN_ID_1_1), OWNER(), "owner_of_1");
+
+    assert!(sys.duelists.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
+    assert!(sys.duelists.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
 }
 
 #[test]
 fn test_token_component() {
     let mut sys: TestSystems = setup(0);
     // should not panic
-    sys.token.owner_of(TOKEN_ID_1);//.print();
-    sys.token.is_owner_of(OWNER(), TOKEN_ID_1.low);//.print();
+    sys.duelists.owner_of(TOKEN_ID_1_1);
+    sys.duelists.is_owner_of(OWNER(), TOKEN_ID_1_1.low);
 }
 
 #[test]
@@ -280,16 +153,19 @@ fn test_token_uri() {
     let mut sys: TestSystems = setup(0);
 
     let duelist = Duelist {
-        duelist_id: TOKEN_ID_1.low,
+        duelist_id: TOKEN_ID_1_1.low,
         profile_type: ProfileType::Duelist(DuelistProfile::Duke),
-        timestamp: 999999,
+        timestamp_registered: 999999,
+        timestamp_active: 999999,
     };
-    tester::set_Duelist(ref sys.world, duelist);
+    tester::set_Duelist(ref sys.world, @duelist);
 
     let scoreboard = Scoreboard {
-        holder: TOKEN_ID_1.low.into(),
+        holder: TOKEN_ID_1_1.low.into(),
+        table_id: 0,
         score: Score {
             honour: 99,
+            points: 777,
             total_duels: 6,
             total_wins: 3,
             total_losses: 2,
@@ -297,10 +173,10 @@ fn test_token_uri() {
             honour_history: 0,
         },
     };
-    tester::set_Scoreboard(ref sys.world, scoreboard);
+    tester::set_Scoreboard(ref sys.world, @scoreboard);
 
-    let uri_1 = sys.token.token_uri(TOKEN_ID_1);
-    let uri_2 = sys.token.token_uri(TOKEN_ID_2);
+    let uri_1 = sys.duelists.token_uri(TOKEN_ID_1_1);
+    let uri_2 = sys.duelists.token_uri(TOKEN_ID_1_2);
     
     println!("{}", uri_1);
     println!("{}", uri_2);
@@ -313,7 +189,7 @@ fn test_token_uri() {
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
     let mut sys: TestSystems = setup(0);
-    sys.token.token_uri(999);
+    sys.duelists.token_uri(999);
 }
 
 
@@ -322,10 +198,14 @@ fn test_token_uri_invalid() {
 //
 
 #[test]
-#[should_panic(expected: ('TOKEN: caller is not minter', 'ENTRYPOINT_FAILED'))]
+// #[should_panic(expected: ('TOKEN: caller is not minter', 'ENTRYPOINT_FAILED'))] // for Dojo contracts
+// #[should_panic(expected: ('ENTRYPOINT_NOT_FOUND', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for accounts
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for random addresses
 fn test_mint_duelist_not_minter() {
     let mut sys: TestSystems = setup(0);
-    sys.token.mint_duelists(OWNER(), 1, 0x1234);
+    let account: ContractAddress = tester::deploy_mock_account();
+    utils::impersonate(account);
+    sys.duelists.mint_duelists(OWNER(), 1, 0x1234);
 }
 
 //
@@ -338,8 +218,8 @@ fn test_approve() {
 
     utils::impersonate(OWNER());
 
-    sys.token.approve(SPENDER(), TOKEN_ID_1);
-    assert_eq!(sys.token.get_approved(TOKEN_ID_1), SPENDER(), "Spender not approved correctly");
+    sys.duelists.approve(SPENDER(), TOKEN_ID_1_1);
+    assert_eq!(sys.duelists.get_approved(TOKEN_ID_1_1), SPENDER(), "Spender not approved correctly");
 
     // drop StoreSetRecord ERC721TokenApprovalModel
     utils::drop_event(sys.world.dispatcher.contract_address);
@@ -353,24 +233,26 @@ fn test_approve() {
 fn test_transfer_from() {
     let mut sys: TestSystems = setup(0);
 
-    assert_eq!(sys.token.balance_of(OWNER()), CONST::WELCOME_PACK_DUELIST_COUNT.into(), "Should eq [5]");
-    assert_eq!(sys.token.balance_of(OTHER()), 0, "Should eq 0");
-    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, "Should eq [5]");
+    let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
+
+    assert_eq!(sys.duelists.balance_of(OWNER()), starter_pack_duelist_count.into(), "Should eq [starter_pack_duelist_count]");
+    assert_eq!(sys.duelists.balance_of(OTHER()), 0, "Should eq 0");
+    _assert_minted_count(@sys, starter_pack_duelist_count, "Should eq [starter_pack_duelist_count]");
 
     tester::impersonate(OWNER());
-    sys.token.approve(SPENDER(), TOKEN_ID_1);
+    sys.duelists.approve(SPENDER(), TOKEN_ID_1_1);
 
-    utils::drop_all_events(sys.token.contract_address);
+    utils::drop_all_events(sys.duelists.contract_address);
     utils::drop_all_events(sys.world.dispatcher.contract_address);
-    utils::assert_no_events_left(sys.token.contract_address);
+    utils::assert_no_events_left(sys.duelists.contract_address);
 
     tester::impersonate(SPENDER());
-    sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1_1);
 
-    assert_eq!(sys.token.balance_of(OWNER()), 4, "Should eq 4");
-    assert_eq!(sys.token.balance_of(OTHER()), 1, "Should eq 1");
-    assert_eq!(sys.token.get_approved(TOKEN_ID_1), ZERO(), "Should eq 0");
-    _assert_minted_count(sys.world, sys.token, CONST::WELCOME_PACK_DUELIST_COUNT, "Should eq [5]");
+    assert_eq!(sys.duelists.balance_of(OWNER()), (starter_pack_duelist_count - 1).into(), "Should eq [starter_pack_duelist_count - 1]");
+    assert_eq!(sys.duelists.balance_of(OTHER()), 1, "Should eq 1");
+    assert_eq!(sys.duelists.get_approved(TOKEN_ID_1_1), ZERO(), "Should eq 0");
+    _assert_minted_count(@sys, starter_pack_duelist_count, "Should eq [starter_pack_duelist_count]");
 }
 
 #[test]
@@ -378,7 +260,7 @@ fn test_transfer_from() {
 fn test_transfer_no_allowance() {
     let mut sys: TestSystems = setup(0);
     utils::impersonate(SPENDER());
-    sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1_1);
 }
 
 //
@@ -389,11 +271,11 @@ fn test_transfer_no_allowance() {
 // #[should_panic(expected: ('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
 // fn test_burn() {
 //     let mut sys: TestSystems = setup(0);
-//     _assert_minted_count(sys.world, sys.token, 2, 'invalid total_supply init');
-//     assert(sys.token.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
-//     sys.token.delete_duelist(TOKEN_ID_1.low);
-//     _assert_minted_count(sys.world, sys.token, 1, 'invalid total_supply');
-//     assert(sys.token.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
+//     _assert_minted_count(@sys, 2, 'invalid total_supply init');
+//     assert(sys.duelists.balance_of(OWNER()) == 1, 'invalid balance_of (1)');
+//     sys.duelists.delete_duelist(TOKEN_ID_1_1.low);
+//     _assert_minted_count(@sys, 1, 'invalid total_supply');
+//     assert(sys.duelists.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
 // }
 
 
@@ -405,113 +287,335 @@ fn test_transfer_no_allowance() {
 fn test_fame() {
     let mut sys: TestSystems = setup(0);
 
-    tester::execute_claim_welcome_pack(@sys.pack, OTHER());
-
-    // validate token_bound address
-    let token_bound_address_1: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_1.low);
-    let token_bound_address_6: ContractAddress = sys.fame.address_of_token(sys.token.contract_address, TOKEN_ID_6.low);
-    assert!(token_bound_address_1.is_non_zero(), "token_bound_address_1");
-    assert!(token_bound_address_6.is_non_zero(), "token_bound_address_6");
-    assert_ne!(token_bound_address_1, token_bound_address_6, "token_bound_address_1 != 2");
-    let (token_contract_1, token_id_1) = sys.fame.token_of_address(token_bound_address_1);
-    let (token_contract_6, token_id_6) = sys.fame.token_of_address(token_bound_address_6);
-    assert_eq!(token_contract_1, sys.token.contract_address, "token_contract_1");
-    assert_eq!(token_contract_6, sys.token.contract_address, "token_contract_6");
-    assert_eq!(token_id_1, TOKEN_ID_1.low, "token_id_1");
-    assert_eq!(token_id_6, TOKEN_ID_6.low, "token_id_6");
+    tester::execute_claim_starter_pack(@sys.pack, OTHER());
 
     // initial token balances
-    let balance_1_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
-    let balance_6_initial: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_6.low);
-    assert_gt!(FAME::MIN_MINT_GRANT_AMOUNT, 0, "FAME::MIN_MINT_GRANT_AMOUNT > 0");
-    assert_eq!(balance_1_initial, FAME::MIN_MINT_GRANT_AMOUNT, "balance_1_initial");
-    assert_eq!(balance_6_initial, FAME::MIN_MINT_GRANT_AMOUNT, "balance_6_initial");
-
-    // owner balances must match
-    let mut balance_owner_initial: u256 = sys.fame.balance_of(OWNER());
-    let mut balance_other_initial: u256 = sys.fame.balance_of(OTHER());
-    assert_eq!(balance_owner_initial, balance_1_initial * CONST::WELCOME_PACK_DUELIST_COUNT.into(), "balance_owner_initial");
-    assert_eq!(balance_other_initial, balance_6_initial * CONST::WELCOME_PACK_DUELIST_COUNT.into(), "balance_other_initial");
+    let balance_1_initial: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, TOKEN_ID_1_1.low);
+    let balance_2_initial: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, TOKEN_ID_2_1.low);
+    assert_gt!(FAME::MINT_GRANT_AMOUNT, 0, "FAME::MINT_GRANT_AMOUNT > 0");
+    assert_eq!(balance_1_initial, FAME::MINT_GRANT_AMOUNT, "balance_1_initial");
+    assert_eq!(balance_2_initial, FAME::MINT_GRANT_AMOUNT, "balance_2_initial");
 
     // transfer duelist
     tester::impersonate(OWNER());
-    sys.token.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1_1);
     // check balances
-    let balance_1: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_1.low);
-    let balance_6: u256 = sys.fame.balance_of_token(sys.token.contract_address, TOKEN_ID_6.low);
-    let balance_owner: u256 = sys.fame.balance_of(OWNER());
-    let balance_other: u256 = sys.fame.balance_of(OTHER());
-    let balance_recipient: u256 = sys.fame.balance_of(RECIPIENT());
+    let balance_1: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, TOKEN_ID_1_1.low);
+    let balance_2: u256 = sys.fame.balance_of_token(sys.duelists.contract_address, TOKEN_ID_2_1.low);
     assert_eq!(balance_1, balance_1_initial, "balance_1 (1)");
-    assert_eq!(balance_6, balance_6_initial, "balance_6 (1)");
-    assert_eq!(balance_owner, balance_owner_initial - balance_1, "balance_owner (1)");
-    assert_eq!(balance_other, balance_other_initial + balance_1, "balance_other (1)");
-    assert_eq!(balance_recipient, 0, "balance_recipient (1)");
-    let balance_owner_last = balance_owner;
-    let balance_other_last = balance_other;
+    assert_eq!(balance_2, balance_2_initial, "balance_2 (1)");
 
     // transfer to new owner
     tester::impersonate(OTHER());
-    sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_6);
-    let balance_owner: u256 = sys.fame.balance_of(OWNER());
-    let balance_other: u256 = sys.fame.balance_of(OTHER());
-    let balance_recipient: u256 = sys.fame.balance_of(RECIPIENT());
-    assert_eq!(balance_6, balance_6_initial, "balance_6 (2)");
-    assert_eq!(balance_owner, balance_owner_last, "balance_owner (2)");
-    assert_eq!(balance_other, balance_other_last - balance_6, "balance_other (2)");
-    assert_eq!(balance_recipient, balance_6, "balance_recipient (2)");
+    sys.duelists.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_2_1);
+    assert_eq!(balance_2, balance_2_initial, "balance_2 (2)");
 
     // transfer all
     tester::impersonate(OTHER());
-    sys.token.transfer_from(OTHER(), OWNER(), TOKEN_ID_1);
-    sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_7);
-    sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_8);
-    sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_9);
-    sys.token.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_10);
-    let balance_owner: u256 = sys.fame.balance_of(OWNER());
-    let balance_other: u256 = sys.fame.balance_of(OTHER());
-    let balance_recipient: u256 = sys.fame.balance_of(RECIPIENT());
-    assert_eq!(balance_owner, balance_owner_initial, "balance_owner (3)");
-    assert_eq!(balance_other, 0, "balance_other (3)");
-    assert_eq!(balance_recipient, balance_other_initial, "balance_recipient (3)");
+    sys.duelists.transfer_from(OTHER(), OWNER(), TOKEN_ID_1_1);
+    sys.duelists.transfer_from(OTHER(), RECIPIENT(), TOKEN_ID_2_2);
+}
+
+
+//---------------------------------
+// inactivity / poke()
+//
+
+#[test]
+fn test_duelist_inactive() {
+    let mut sys: TestSystems = setup(0);
+
+    let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
+    assert_eq!(intial_fame, WEI(3000).low, "intial_fame");
+
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    let timestamp_registered: u64 = sys.store.get_duelist_value(token_id).timestamp_registered;
+    assert_eq!(tester::get_block_timestamp(), timestamp_registered + 1, "timestamp_registered");
+
+    let fame_supply: u128 = sys.fame.total_supply().low;
+    assert_eq!(fame_supply, (intial_fame * 2), "INIT_fame_supply");
+
+    let pool_flame: Pool = sys.store.get_pool(PoolType::SacredFlame);
+    assert_eq!(pool_flame.balance_fame, 0, "pool_flame.balance_fame");
+
+    let balance_initial: u128 = sys.fame.balance_of_token(sys.duelists.contract_address, token_id).low;
+    assert_eq!(balance_initial, intial_fame, "INIT_balance");
+    assert!(!sys.duelists.is_inactive(token_id), "INIT_is_inactive");
+    assert_eq!(sys.duelists.inactive_timestamp(token_id), 1, "INIT_inactive_timestamp");
+    assert_eq!(sys.duelists.inactive_fame_dripped(token_id), 0, "INIT_inactive_fame_dripped");
+
+    // on the edge...
+    let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP;
+    tester::set_block_timestamp(timestamp_registered + elapsed);
+    assert!(!sys.duelists.is_inactive(token_id), "EDGE_is_inactive");
+    assert_eq!(sys.duelists.inactive_timestamp(token_id), elapsed, "EDGE_inactive_timestamp");
+    assert_eq!(sys.duelists.inactive_fame_dripped(token_id), 0, "EDGE_inactive_fame_dripped");
+
+    // inactivated
+    let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + 1;
+    tester::set_block_timestamp(timestamp_registered + elapsed);
+    assert!(sys.duelists.is_inactive(token_id), "INACTIVATED_is_inactive");
+    assert_eq!(sys.duelists.inactive_timestamp(token_id), elapsed, "INACTIVATED_inactive_timestamp");
+    assert_eq!(sys.duelists.inactive_fame_dripped(token_id), 0, "INACTIVATED_inactive_fame_dripped");
+
+    // dripped
+    let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + FAME::TIMESTAMP_TO_DRIP_ONE_FAME;
+    tester::set_block_timestamp(timestamp_registered + elapsed);
+    assert!(sys.duelists.is_inactive(token_id), "DRIPPED_is_inactive");
+    assert_eq!(sys.duelists.inactive_timestamp(token_id), elapsed, "DRIPPED_inactive_timestamp");
+    assert_eq!(sys.duelists.inactive_fame_dripped(token_id), WEI(1).low, "DRIPPED_inactive_fame_dripped");
+
+    // dripped more!
+    let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + (FAME::TIMESTAMP_TO_DRIP_ONE_FAME * 111);
+    tester::set_block_timestamp(timestamp_registered + elapsed);
+    assert!(sys.duelists.is_inactive(token_id), "DRIPPED_MORE_is_inactive");
+    assert_eq!(sys.duelists.inactive_timestamp(token_id), elapsed, "DRIPPED_MORE_inactive_timestamp");
+    assert_eq!(sys.duelists.inactive_fame_dripped(token_id), WEI(111).low, "DRIPPED_MORE_inactive_fame_dripped");
+}
+
+// poke()
+
+fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64, should_survive: bool) {
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    let lords_balance_bank: u128 = (*sys.lords).balance_of((*sys.bank).contract_address).low;
+    let lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
+    let fame_balance_start: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
+    let fame_supply_start: u128 = (*sys.fame).total_supply().low;
+    let timestamp_active_start: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
+    // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
+// println!("[] balance     : {}", fame_balance_start/CONST::ETH_TO_WEI.low);
+// println!("[] fame_to_burn: {}", dripped_fame);
+
+    // dripped...
+    tester::make_duelist_inactive(sys, token_id, dripped_fame);
+    let dripped_fame_wei: u128 = WEI(dripped_fame.into()).low;
+    assert!((*sys.duelists).is_inactive(token_id), "is_inactive");
+    assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), dripped_fame_wei, "inactive_fame_dripped");
+
+    // reactivate
+    (*sys.duelists).poke(token_id);
+    assert_eq!((*sys.duelists).is_alive(token_id), should_survive, "AFTER_is_alive()");
+    assert!(!(*sys.duelists).is_inactive(token_id), "AFTER_is_inactive");
+    assert_eq!((*sys.duelists).inactive_timestamp(token_id), 0, "AFTER_inactive_timestamp");
+    assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), 0, "AFTER_inactive_fame_dripped");
+
+    // timestamp_active updated
+    let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
+    assert_gt!(timestamp_active, timestamp_active_start, "AFTER_timestamp_active");
+
+    // if dead, has a memorial
+    let memorial: DuelistMemorialValue = (*sys.store).get_duelist_memorial_value(token_id);
+    assert_eq!(memorial.killed_by, 0, "AFTER_killed_by");
+    // duelist lost fame...
+    let fame_balance: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
+// println!("fame_balance: {}", tester::ETH(fame_balance));
+    // Fame supply down
+    let fame_supply: u128 = (*sys.fame).total_supply().low;
+    // Flames up?
+    let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
+    let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
+    if (should_survive) {
+        assert_eq!(memorial.cause_of_death, CauseOfDeath::None, "AFTER_cause_of_death");
+        assert_eq!(memorial.fame_before_death, 0, "AFTER_fame_before_death");
+        assert_eq!(fame_balance, fame_balance_start - dripped_fame_wei, "AFTER_fame_balance_ALIVE");
+        assert_eq!(fame_supply, fame_supply_start - dripped_fame_wei, "AFTER_fame_supply_ALIVE");
+        assert_eq!(pool_flame.balance_fame, 0, "AFTER_pool_flame.balance_fame_ALIVE");
+    } else {
+        assert_eq!(memorial.cause_of_death, CauseOfDeath::Forsaken, "AFTER_cause_of_death");
+        assert_eq!(memorial.fame_before_death, fame_balance_start, "AFTER_fame_before_death");
+        assert_eq!(fame_balance, 0, "AFTER_fame_balance_DEAD");
+        assert_eq!(fame_supply, fame_supply_start - fame_balance_start + pool_amount, "AFTER_fame_supply_DEAD");
+        assert_eq!(pool_flame.balance_fame, pool_amount, "AFTER_pool_flame.balance_fame_DEAD");
+    }
+
+    // bank down
+    tester::assert_lords_balance_down(*sys.lords, (*sys.bank).contract_address, lords_balance_bank, "AFTER_bank_down");
+    // underware up
+    tester::assert_lords_balance_up(*sys.lords, TREASURY(), lords_balance_treasury, "AFTER_treasury_up");
 }
 
 #[test]
-#[should_panic(expected: ('ERC20: insufficient allowance', 'ENTRYPOINT_FAILED'))]
-fn test_fame_transfer_between_owners_not_allowed() {
+fn test_duelist_reactivate_OK_alive() {
     let mut sys: TestSystems = setup(0);
-    // transfer FAME
-    tester::impersonate(sys.token.contract_address);
-    sys.fame.transfer_from(OWNER(), OTHER(), FAME::MIN_MINT_GRANT_AMOUNT / 2);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 100, true);
 }
 
 #[test]
-#[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
-fn test_fame_transfer_from_owner_not_allowed() {
+#[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_reactivate_OK_alive_not_owner() {
     let mut sys: TestSystems = setup(0);
-    // transfer FAME
-    tester::impersonate(OWNER());
-    sys.fame.transfer(OTHER(), FAME::MIN_MINT_GRANT_AMOUNT / 2);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    tester::impersonate(OTHER());
+    _test_duelist_reactivate(@sys, token_id, 100, true);
 }
 
 #[test]
-#[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
-fn test_fame_mint_not_minter() {
+fn test_duelist_reactivate_OK_edge() {
     let mut sys: TestSystems = setup(0);
-    sys.fame.minted_duelist(TOKEN_ID_3.low, 0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 2000, true);
 }
 
 #[test]
-#[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
-fn test_fame_update_not_minter() {
+fn test_duelist_reactivate_DEAD_by_1() {
     let mut sys: TestSystems = setup(0);
-    sys.fame.updated_duelist(OWNER(), OTHER(), TOKEN_ID_1.low);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 2001, false);
 }
 
 #[test]
-#[should_panic(expected: ('TOKEN_BOUND: already registered', 'ENTRYPOINT_FAILED'))]
-fn test_fame_mint_already_registered() {
+fn test_duelist_reactivate_DEAD_empty() {
     let mut sys: TestSystems = setup(0);
-    utils::impersonate(sys.token.contract_address);
-    sys.fame.minted_duelist(TOKEN_ID_1.low, 0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 3000, false);
+}
+
+#[test]
+fn test_duelist_reactivate_DEAD_empty_not_owner() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    tester::impersonate(OTHER());
+    _test_duelist_reactivate(@sys, token_id, 3000, false);
+}
+
+#[test]
+fn test_duelist_reactivate_DEAD_over() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 4000, false);
+}
+
+#[test]
+fn test_duelist_reactivate_DEAD_over_not_owner() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    tester::impersonate(OTHER());
+    _test_duelist_reactivate(@sys, token_id, 4000, false);
+}
+
+#[test]
+fn test_duelist_reactivate_DEAD_thrice() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 1000, true);
+    _test_duelist_reactivate(@sys, token_id, 1000, true);
+    _test_duelist_reactivate(@sys, token_id, 1, false);
+}
+
+#[test]
+#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_reactivate_already_dead() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 3000, false);
+    _test_duelist_reactivate(@sys, token_id, 1, false);
+}
+
+
+
+//---------------------------------
+// sacrifice() / memorialize()
+//
+
+fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128, cause_of_death: CauseOfDeath) {
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    let lords_balance_bank: u128 = (*sys.lords).balance_of((*sys.bank).contract_address).low;
+    let lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
+    let fame_balance_start: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
+    let fame_supply_start: u128 = (*sys.fame).total_supply().low;
+    let timestamp_active_start: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
+    // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
+// println!("[] balance     : {}", fame_balance_start/CONST::ETH_TO_WEI.low);
+// println!("[] fame_to_burn: {}", dripped_fame);
+
+    // reactivate
+    if (cause_of_death == CauseOfDeath::Sacrifice) {    
+        (*sys.duelists).sacrifice(token_id);
+    } else if (cause_of_death == CauseOfDeath::Memorize) {    
+        (*sys.duelists).memorialize(token_id);
+    }
+    assert!(!(*sys.duelists).is_alive(token_id), "AFTER_is_alive()");
+    assert!(!(*sys.duelists).is_inactive(token_id), "AFTER_is_inactive");
+    assert_eq!((*sys.duelists).inactive_timestamp(token_id), 0, "AFTER_inactive_timestamp");
+    assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), 0, "AFTER_inactive_fame_dripped");
+
+    let memorial: DuelistMemorialValue = (*sys.store).get_duelist_memorial_value(token_id);
+    assert_eq!(memorial.cause_of_death, cause_of_death, "AFTER_cause_of_death");
+    assert_eq!(memorial.fame_before_death, fame_balance_start, "AFTER_fame_before_death");
+    if (cause_of_death == CauseOfDeath::Sacrifice) {    
+        assert_eq!(memorial.killed_by, token_id, "AFTER_killed_by");
+    } else if (cause_of_death == CauseOfDeath::Memorize) {    
+        assert_eq!(memorial.killed_by, 0, "AFTER_killed_by");
+    }
+
+    // timestamp_active updated
+    let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
+    assert_gt!(timestamp_active, timestamp_active_start, "AFTER_timestamp_active");
+
+    // duelist lost fame...
+    let fame_balance: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
+    // Fame supply down
+    let fame_supply: u128 = (*sys.fame).total_supply().low;
+    // Flames up?
+    let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
+    let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
+    assert_eq!(fame_balance, 0, "AFTER_fame_balance_DEAD");
+    assert_eq!(fame_supply, fame_supply_start - fame_balance_start + pool_amount, "AFTER_fame_supply_DEAD");
+    assert_eq!(pool_flame.balance_fame, pool_amount, "AFTER_pool_flame.balance_fame_DEAD");
+
+    // bank down
+    tester::assert_lords_balance_down(*sys.lords, (*sys.bank).contract_address, lords_balance_bank, "AFTER_bank_down");
+    // underware up
+    tester::assert_lords_balance_up(*sys.lords, TREASURY(), lords_balance_treasury, "AFTER_treasury_up");
+}
+
+#[test]
+fn test_duelist_sacrifice_OK() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Sacrifice);
+}
+
+#[test]
+#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_sacrifice_already_dead() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 3000, false);
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Sacrifice);
+}
+
+#[test]
+#[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_sacrifice_not_owner() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    tester::impersonate(OTHER());
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Sacrifice);
+}
+
+#[test]
+fn test_duelist_memorialize_OK() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Memorize);
+}
+
+#[test]
+#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_memorialize_already_dead() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    _test_duelist_reactivate(@sys, token_id, 3000, false);
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Memorize);
+}
+
+#[test]
+#[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
+fn test_duelist_memorialize_not_owner() {
+    let mut sys: TestSystems = setup(0);
+    let token_id: u128 = TOKEN_ID_1_1.low;
+    tester::impersonate(OTHER());
+    _test_duelist_sacrifice(@sys, token_id, CauseOfDeath::Memorize);
 }

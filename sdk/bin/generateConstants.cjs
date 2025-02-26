@@ -212,9 +212,13 @@ function format_ts_value(value, cairo_type, ts_type) {
     // replace enum separator
     // es: Rarity::Common, CONST::ETH_TO_WEI
     ts_value = ts_value.replaceAll('::', '.');
+    ts_value = ts_value.replaceAll('.low', '');
   }
   if (ts_type == 'bigint' || ts_type == 'number') {
     // parse 0x12343, '1234', 1233 * CONST::ETH_TO_WEI
+    if (ts_value.startsWith('(') && ts_value.endsWith(')')) {
+      ts_value = ts_value.slice(1, -1); // remove () around value
+    }
     const operands = ts_value.split('*');
     ts_value = (operands.length == 1) ? '' : '(';
     operands.forEach((operand, index) => {
@@ -434,9 +438,10 @@ const jsFilePath = path.resolve(arg_out);
 let cairoFiles = getFolderFilesRecursively(srcPath, '.cairo');
 
 // render constants.cairo first
+const _hasPrecedence = (a) => (a.endsWith('constants.cairo') || a.endsWith('timestamp.cairo'))
 cairoFiles.sort((a, b) => (
-  a.endsWith('constants.cairo') ? -1
-    : b.endsWith('constants.cairo') ? 1
+  _hasPrecedence(a) ? -1
+    : _hasPrecedence(b) ? 1
       : 0
 ));
 

@@ -3,7 +3,7 @@ import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { useCanClaimWelcomePack } from '/src/hooks/usePistolsContractCalls'
+import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { useMintMockLords } from '/src/hooks/useMintMockLords'
 import { useGameAspect } from '/src/hooks/useGameApect'
 import { ActionButton } from '/src/components/ui/Buttons'
@@ -130,7 +130,7 @@ function DuelistsList() {
   const { shopOpener, dispatchSelectDuelistId } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
   const { duelistIds } = useDuelistsOfPlayer()
-  const { canClaimWelcomePack } = useCanClaimWelcomePack(duelistIds.length)
+  const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
 
   const { aspectWidth } = useGameAspect()
 
@@ -236,7 +236,7 @@ function DuelistsList() {
       )}
       <Divider />
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        {canClaimWelcomePack
+        {canClaimStarterPack
           ? <ClaimDuelistsButton />
           : <ActionButton fill
             disabled={false}
@@ -261,22 +261,22 @@ export function ClaimDuelistsButton() {
   const { dispatchDuelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
   const { duelistIds } = useDuelistsOfPlayer()
-  const { canClaimWelcomePack } = useCanClaimWelcomePack(duelistIds.length)
+  const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
   const [isClaiming, setIsClaiming] = useState(false)
 
   const _claim = async () => {
-    if (canClaimWelcomePack) {
+    if (canClaimStarterPack) {
       setIsClaiming(true)
-      await pack_token.claim_welcome_pack(account)
+      await pack_token.claim_starter_pack(account)
     }
   }
 
   useEffect(() => {
-    if (canClaimWelcomePack === false && isClaiming) {
+    if (canClaimStarterPack === false && isClaiming) {
       dispatchDuelistId(duelistIds[0])
       dispatchSetScene(SceneName.Profile)
     }
-  }, [canClaimWelcomePack, duelistIds, isClaiming])
+  }, [canClaimStarterPack, duelistIds, isClaiming])
 
   return <ActionButton large fill important disabled={false} onClick={_claim} label='Claim your Duelists' />
 }

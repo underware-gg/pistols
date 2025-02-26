@@ -24,21 +24,21 @@ use pistols::types::cards::deck::{DeckType};
 #[generate_trait]
 pub impl PacesCardImpl of PacesCardTrait {
     #[inline(always)]
-    fn to_felt(self: PacesCard) -> felt252 {
-        let result: u8 = self.into();
+    fn to_felt(self: @PacesCard) -> felt252 {
+        let result: u8 = (*self).into();
         (result.into())
     }
     #[inline(always)]
-    fn is_before(self: PacesCard, other: PacesCard) -> bool {
-        let pace: u8 = self.into();
-        (pace < other.into())
+    fn is_before(self: @PacesCard, other: @PacesCard) -> bool {
+        let pace: u8 = (*self).into();
+        (pace < (*other).into())
     }
     #[inline]
-    fn is_after(self: PacesCard, other: PacesCard) -> bool {
-        let pace: u8 = self.into();
-        (pace > other.into())
+    fn is_after(self: @PacesCard, other: @PacesCard) -> bool {
+        let pace: u8 = (*self).into();
+        (pace > (*other).into())
     }
-    fn honour(self: PacesCard) -> u8 {
+    fn honour(self: @PacesCard) -> u8 {
         match self {
             PacesCard::Paces1 |
             PacesCard::Paces2 |
@@ -49,12 +49,12 @@ pub impl PacesCardImpl of PacesCardTrait {
             PacesCard::Paces7 |
             PacesCard::Paces8 |
             PacesCard::Paces9 |
-            PacesCard::Paces10 =>  self.into() * 10,
+            PacesCard::Paces10 =>  (*self).into() * 10,
             PacesCard::None => 0,
         }
     }
     #[inline(always)]
-    fn build_deck(deck_type: DeckType) -> Span<u8> {
+    fn build_deck(_deck_type: @DeckType) -> Span<u8> {
         (array![
             PacesCard::Paces1.into(),
             PacesCard::Paces2.into(),
@@ -75,11 +75,9 @@ pub impl PacesCardImpl of PacesCardTrait {
 // converters
 //
 use pistols::utils::short_string::{ShortString};
-
 impl PacesCardDefault of Default<PacesCard> {
     fn default() -> PacesCard {(PacesCard::None)}
 }
-
 impl PacesCardIntoU8 of core::traits::Into<PacesCard, u8> {
     fn into(self: PacesCard) -> u8 {
         match self {
@@ -112,23 +110,7 @@ impl U8IntoPacesCard of core::traits::Into<u8, PacesCard> {
         else                { PacesCard::None }
     }
 }
-
-// impl PacesCardPrintImpl of core::debug::PrintTrait<PacesCard> {
-//     fn print(self: PacesCard) {
-//         let p: u8 = self.into();
-//         ShortString::concat('Paces::', ('0' + p.into())).print();
-//     }
-// }
-
-// for println! and format!
-// impl PacesCardDisplay of core::fmt::Display<PacesCard> {
-//     fn fmt(self: @PacesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let p: u8 = (*self).into();
-//         let result: ByteArray = format!("Paces::{}", p);
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 impl PacesCardDebug of core::fmt::Debug<PacesCard> {
     fn fmt(self: @PacesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let p: u8 = (*self).into();
@@ -143,7 +125,7 @@ impl PacesCardDebug of core::fmt::Debug<PacesCard> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{PacesCard};
 
     #[test]

@@ -4,7 +4,7 @@ use dojo::contract::components::world_provider::{IWorldProvider};
 use openzeppelin_token::erc721::{ERC721Component};
 use graffiti::json::JsonImpl;
 
-use pistols::interfaces::systems::{SystemsTrait};
+use pistols::interfaces::dns::{DnsTrait};
 use pistols::models::{
     config::{TokenConfig},
 };
@@ -56,7 +56,7 @@ pub impl TokenConfigRenderImpl<
     +ITokenRenderer<TContractState>,
 > of TokenRendererTrait<TContractState> {
     fn render_token_uri(self: @TContractState, token_id: u256) -> ByteArray {
-        let mut world = SystemsTrait::storage(self.world_dispatcher(), @"pistols");
+        let mut world = DnsTrait::storage(self.world_dispatcher(), @"pistols");
         let mut store: Store = StoreTrait::new(world);
         let token_config: TokenConfig = store.get_token_config(starknet::get_contract_address());
         let renderer = ITokenRendererDispatcher{

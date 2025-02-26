@@ -10,6 +10,7 @@ import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { usePackStore } from '/src/stores/packStore'
+import { useBankStore } from '/src/stores/bankStore'
 
 // const query_get: PistolsQueryBuilder = {
 //   pistols: {
@@ -60,6 +61,7 @@ const query: PistolsQueryBuilder = new PistolsQueryBuilder()
     "pistols-Challenge",
     "pistols-Round",
     "pistols-Pack",
+    "pistols-Pool",
     // off-chain signed messages
     "pistols-PlayerOnline",
     "pistols-PlayerBookmark",
@@ -81,6 +83,7 @@ export function EntityStoreSync() {
   const challengeState = useChallengeStore((state) => state)
   const challengeQueryState = useChallengeQueryStore((state) => state)
   const packState = usePackStore((state) => state)
+  const bankState = useBankStore((state) => state)
 
   const mounted = useMounted()
 
@@ -94,6 +97,7 @@ export function EntityStoreSync() {
       // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModel(entities, 'TokenConfig'))
       // console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
       // console.log("EntityStoreSync() SET =======> [Player]:", filterEntitiesByModel(entities, 'Player'))
+      // console.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModel(entities, 'Pool'))
       configState.setEntities(filterEntitiesByModel(entities, 'Config'))
       tableState.setEntities(filterEntitiesByModel(entities, ['TableConfig', 'SeasonConfig']))
       tokenState.setEntities(filterEntitiesByModel(entities, 'TokenConfig'))
@@ -102,6 +106,7 @@ export function EntityStoreSync() {
       const duelistEntities = filterEntitiesByModel(entities, ['Duelist', 'DuelistChallenge', 'Scoreboard'])
       duelistState.setEntities(duelistEntities)
       duelistQueryState.setEntities(duelistEntities)
+      bankState.setEntities(filterEntitiesByModel(entities, 'Pool'))
       // challenge initial state is handled by <ChallengeStoreSync>
       // const challengeEntities = filterEntitiesByModel(entities, ['Challenge', 'Round'])
       // challengeState.setEntities(challengeEntities)
@@ -134,6 +139,9 @@ export function EntityStoreSync() {
       }
       if (getEntityModels(entity, ['Pack']).length > 0) {
         packState.updateEntity(entity)
+      }
+      if (getEntityModels(entity, ['Pool']).length > 0) {
+        bankState.updateEntity(entity)
       }
     },
   })

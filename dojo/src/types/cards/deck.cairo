@@ -29,7 +29,7 @@ use pistols::types::cards::hand::{DuelistHand};
 
 #[generate_trait]
 pub impl DeckTypeImpl of DeckTypeTrait {
-    fn build_deck(self: DeckType) -> Deck {
+    fn build_deck(self: @DeckType) -> Deck {
         (Deck {
             fire_cards: PacesCardTrait::build_deck(self),
             dodge_cards: PacesCardTrait::build_deck(self),
@@ -41,37 +41,41 @@ pub impl DeckTypeImpl of DeckTypeTrait {
 
 #[generate_trait]
 pub impl DeckImpl of DeckTrait {
-    fn validate_hand(self: Deck, ref hand: DuelistHand) {
+    fn validate_hand(self: @Deck, ref hand: DuelistHand) {
         // Paces
-        if (!self.fire_cards.contains(@hand.card_fire.into())) {
+        if (!(*self.fire_cards).contains(@hand.card_fire.into())) {
             hand.card_fire = PacesCard::None;
         }
         // Dodge
         if (hand.card_dodge == hand.card_fire) {
             // cant have dodge and fire at same pace
             hand.card_dodge = PacesCard::None;
-        } else if (!self.dodge_cards.contains(@hand.card_dodge.into())) {
+        } else if (!(*self.dodge_cards).contains(@hand.card_dodge.into())) {
             hand.card_dodge = PacesCard::None;
         }
         // Tactics
-        if (!self.tactics_cards.contains(@hand.card_tactics.into())) {
+        if (!(*self.tactics_cards).contains(@hand.card_tactics.into())) {
             hand.card_tactics = TacticsCard::None;
         }
         // Blades
-        if (!self.blades_cards.contains(@hand.card_blades.into())) {
+        if (!(*self.blades_cards).contains(@hand.card_blades.into())) {
             hand.card_blades = BladesCard::None;
         }
     }
-    fn to_span(self: Deck) -> Span<Span<u8>> {
+    fn to_span(self: @Deck) -> Span<Span<u8>> {
         ([
-            self.fire_cards,
-            self.dodge_cards,
-            self.tactics_cards,
-            self.blades_cards,
+            *self.fire_cards,
+            *self.dodge_cards,
+            *self.tactics_cards,
+            *self.blades_cards,
         ].span())
     }
 }
 
+
+//---------------------------
+// Converters
+//
 impl DeckTypeIntoByteArray of core::traits::Into<DeckType, ByteArray> {
     fn into(self: DeckType) -> ByteArray {
         match self {
@@ -81,15 +85,7 @@ impl DeckTypeIntoByteArray of core::traits::Into<DeckType, ByteArray> {
         }
     }
 }
-
-// for println! and format! 
-// pub impl DeckTypeDisplay of core::fmt::Display<DeckType> {
-//     fn fmt(self: @DeckType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).into();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl DeckTypeDebug of core::fmt::Debug<DeckType> {
     fn fmt(self: @DeckType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();
@@ -103,7 +99,7 @@ pub impl DeckTypeDebug of core::fmt::Debug<DeckType> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{Deck, DeckTrait, DeckType, DeckTypeTrait};
     use pistols::types::cards::hand::{
         DuelistHand,

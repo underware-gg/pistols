@@ -6,6 +6,15 @@ import { getEntityIdFromKeys } from '@dojoengine/utils'
 //
 
 export const isNumber = (v: string) => (/^\d+$/.test(v))
+export const formatOrdinalNumber = (v: number) => {
+  const lastDigit = v % 10
+  const lastTwoDigits = v % 100
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 13) return `${v}th`
+  if (lastDigit === 1) return `${v}st`
+  if (lastDigit === 2) return `${v}nd`
+  if (lastDigit === 3) return `${v}rd`
+  return `${v}th`
+}
 
 //
 // strings

@@ -14,7 +14,7 @@ import * as TWEEN from '@tweenjs/tween.js'
 import { CardPack } from '../ui/CardPack'
 import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
 import { CARD_PACK_SIZE, MAX_TILT } from '/src/data/cardConstants'
-import { useCanClaimWelcomePack } from '/src/hooks/usePistolsContractCalls'
+import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 
@@ -37,7 +37,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
 
   // CardPack Data
   const { duelistIds } = useDuelistsOfPlayer()
-  const { canClaimWelcomePack } = useCanClaimWelcomePack(duelistIds.length)
+  const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
 
 
   // Tutorial State
@@ -178,7 +178,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         dispatchSetScene(SceneName.TutorialDuel, { duelId: duelIdFull })
         break
       case SceneName.TutorialScene5:
-        if (canClaimWelcomePack) {
+        if (canClaimStarterPack) {
           animateTextOpacity(0)
           setShowCardPack(true)
           setTimeout(() => {
@@ -343,7 +343,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       />
 
       {showCardPack && (
-        <CardPack packType={constants.PackType.WelcomePack} isOpen={showCardPack} clickable={cardPackClickable} cardPackSize={CARD_PACK_SIZE} maxTilt={MAX_TILT} onComplete={(selectedDuelistId) => goToRealDuel(selectedDuelistId)} optionalTitle="Choose your Duelist:" />
+        <CardPack packType={constants.PackType.StarterPack} isOpen={showCardPack} clickable={cardPackClickable} cardPackSize={CARD_PACK_SIZE} maxTilt={MAX_TILT} onComplete={(selectedDuelistId) => goToRealDuel(selectedDuelistId)} optionalTitle="Choose your Duelist:" />
       )}
     </>
   )

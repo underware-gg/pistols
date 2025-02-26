@@ -42,7 +42,7 @@ pub impl ShortString of ShortStringTrait {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
+mod unit {
     use super::{ShortString};
     
     #[test]

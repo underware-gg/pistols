@@ -1,6 +1,7 @@
 use starknet::{ContractAddress};
 use core::num::traits::Zero;
 use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcher};
+use dojo::meta::interface::{IDeployedResourceDispatcher, IDeployedResourceDispatcherTrait};
 
 pub use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
@@ -14,15 +15,16 @@ pub use pistols::systems::{
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
         pack_token::{IPackTokenDispatcher, IPackTokenDispatcherTrait},
         fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait},
+        fools_coin::{IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait},
         lords_mock::{ILordsMockDispatcher, ILordsMockDispatcherTrait},
     }
 };
 pub use pistols::interfaces::{
-    ierc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait},
+    ierc20::{ierc20, Erc20Dispatcher, Erc20DispatcherTrait},
     vrf::{IVrfProviderDispatcher, IVrfProviderDispatcherTrait, Source},
 };
 pub use pistols::libs::store::{Store, StoreTrait};
-pub use pistols::models::config::{CONFIG, Config, ConfigTrait};
+pub use pistols::models::config::{CONFIG, Config};
 pub use pistols::utils::misc::{ZERO};
 
 pub mod SELECTORS {
@@ -37,6 +39,7 @@ pub mod SELECTORS {
     pub const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
     pub const PACK_TOKEN: felt252 = selector_from_tag!("pistols-pack_token");
     pub const FAME_COIN: felt252 = selector_from_tag!("pistols-fame_coin");
+    pub const FOOLS_COIN: felt252 = selector_from_tag!("pistols-fools_coin");
     // mocks
     pub const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
     pub const VR_MOCK: felt252 = selector_from_tag!("pistols-vrf_mock");
@@ -45,15 +48,18 @@ pub mod SELECTORS {
     pub const TABLE_CONFIG: felt252 = selector_from_tag!("pistols-TableConfig");
     pub const TOKEN_CONFIG: felt252 = selector_from_tag!("pistols-TokenConfig");
     pub const COIN_CONFIG: felt252 = selector_from_tag!("pistols-CoinConfig");
-    pub const PAYMENT: felt252 = selector_from_tag!("pistols-Payment");
 }
 
 #[generate_trait]
-pub impl SystemsImpl of SystemsTrait {
-    fn contract_address(self: @WorldStorage, contract_name: @ByteArray) -> ContractAddress {
+pub impl DnsImpl of DnsTrait {
+    #[inline(always)]
+    fn find_contract_name(self: @WorldStorage, contract_address: ContractAddress) -> ByteArray {
+        (IDeployedResourceDispatcher{contract_address}.dojo_name())
+    }
+    fn find_contract_address(self: @WorldStorage, contract_name: @ByteArray) -> ContractAddress {
         // let (contract_address, _) = self.dns(contract_name).unwrap(); // will panic if not found
-        match self.dns(contract_name) {
-            Option::Some((contract_address, _)) => {
+        match self.dns_address(contract_name) {
+            Option::Some(contract_address) => {
                 (contract_address)
             },
             Option::None => {
@@ -75,70 +81,84 @@ pub impl SystemsImpl of SystemsTrait {
     //
     #[inline(always)]
     fn admin_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"admin"))
+        (self.find_contract_address(@"admin"))
     }
     #[inline(always)]
     fn bank_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"bank"))
+        (self.find_contract_address(@"bank"))
     }
     #[inline(always)]
     fn game_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"game"))
+        (self.find_contract_address(@"game"))
     }
     #[inline(always)]
     fn tutorial_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"tutorial"))
+        (self.find_contract_address(@"tutorial"))
     }
     #[inline(always)]
     fn rng_address(self: @WorldStorage) -> ContractAddress {
-        let result = self.contract_address(@"rng");
+        let result = self.find_contract_address(@"rng");
         if (result.is_non_zero()) {result} // deployments always have the rng contract
         else {self.rng_mock_address()}     // but for testing, we can skip it and deploy this
     }
     #[inline(always)]
     fn rng_mock_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"rng_mock"))
+        (self.find_contract_address(@"rng_mock"))
     }
     #[inline(always)]
     fn duel_token_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"duel_token"))
+        (self.find_contract_address(@"duel_token"))
     }
     #[inline(always)]
     fn duelist_token_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"duelist_token"))
+        (self.find_contract_address(@"duelist_token"))
     }
     #[inline(always)]
     fn pack_token_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"pack_token"))
+        (self.find_contract_address(@"pack_token"))
     }
     #[inline(always)]
     fn fame_coin_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"fame_coin"))
+        (self.find_contract_address(@"fame_coin"))
+    }
+    #[inline(always)]
+    fn fools_coin_address(self: @WorldStorage) -> ContractAddress {
+        (self.find_contract_address(@"fools_coin"))
     }
     // mocks
     #[inline(always)]
     fn lords_mock_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"lords_mock"))
+        (self.find_contract_address(@"lords_mock"))
     }
     #[inline(always)]
     fn vrf_mock_address(self: @WorldStorage) -> ContractAddress {
-        (self.contract_address(@"vrf_mock"))
+        (self.find_contract_address(@"vrf_mock"))
     }
 
     //--------------------------
     // address validators
     //
     #[inline(always)]
-    fn is_game_contract(self: @WorldStorage, address: ContractAddress) -> bool {
-        (address == self.game_address())
+    fn is_world_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
+        (contract_address == self.find_contract_address(
+            @self.find_contract_name(contract_address)
+        ))
     }
     #[inline(always)]
-    fn is_duel_contract(self: @WorldStorage, address: ContractAddress) -> bool {
-        (address == self.duel_token_address())
+    fn caller_is_world_contract(self: @WorldStorage) -> bool {
+        (self.is_world_contract(starknet::get_caller_address()))
     }
     #[inline(always)]
-    fn is_duelist_contract(self: @WorldStorage, address: ContractAddress) -> bool {
-        (address == self.duelist_token_address())
+    fn is_game_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
+        (contract_address == self.game_address())
+    }
+    #[inline(always)]
+    fn is_duel_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
+        (contract_address == self.duel_token_address())
+    }
+    #[inline(always)]
+    fn is_duelist_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
+        (contract_address == self.duelist_token_address())
     }
 
     //--------------------------
@@ -185,14 +205,18 @@ pub impl SystemsImpl of SystemsTrait {
         (IFameCoinDispatcher{ contract_address: self.fame_coin_address() })
     }
     #[inline(always)]
-    fn lords_dispatcher(self: @WorldStorage) -> ERC20ABIDispatcher {
-        let mut store: Store = StoreTrait::new(*self);
-        (store.get_config().lords_dispatcher())
+    fn fools_coin_dispatcher(self: @WorldStorage) -> IFoolsCoinDispatcher {
+        (IFoolsCoinDispatcher{ contract_address: self.fools_coin_address() })
+    }
+    // need access to store...
+    #[inline(always)]
+    fn lords_dispatcher(self: @Store) -> Erc20Dispatcher {
+        (Erc20Dispatcher{ contract_address: self.get_config_lords_address() })
+        // (ierc20(self.get_config_lords_address()))
     }
     #[inline(always)]
-    fn vrf_dispatcher(self: @WorldStorage) -> IVrfProviderDispatcher {
-        let mut store: Store = StoreTrait::new(*self);
-        (store.get_config().vrf_dispatcher())
+    fn vrf_dispatcher(self: @Store) -> IVrfProviderDispatcher {
+        (IVrfProviderDispatcher{ contract_address: self.get_config_vrf_address() })
     }
 
 

@@ -12,6 +12,7 @@ pub mod prefabs {
     use pistols::utils::timestamp::{TimestampTrait};
     use pistols::tests::tester::{tester,
         tester::{
+            // StoreTrait,
             TestSystems,
             ID,
         }
@@ -66,29 +67,28 @@ pub mod prefabs {
     }
 
 
-    pub fn start_new_challenge(sys: TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> u128 {
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, duelist_a, duelist_b, MESSAGE, table_id, 48);
-        tester::elapse_timestamp(TimestampTrait::from_days(1));
-        tester::execute_reply_duel(@sys.duels, duelist_b, ID(duelist_b), duel_id, true);
+    pub fn start_new_challenge(sys: @TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252, lives_staked: u8) -> u128 {
+        let duel_id: u128 = tester::execute_create_duel(sys.duels, duelist_a, duelist_b, MESSAGE, table_id, 48, lives_staked);
+        tester::elapse_block_timestamp(TimestampTrait::from_minutes(2));
+        tester::execute_reply_duel(sys.duels, duelist_b, ID(duelist_b), duel_id, true);
         (duel_id)
     }
 
-    pub fn start_get_new_challenge(sys: TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252) -> (ChallengeValue, RoundValue, u128) {
-        let duel_id: u128 = start_new_challenge(sys, duelist_a, duelist_b, table_id);
-        let challenge: ChallengeValue = tester::get_ChallengeValue(sys.world, duel_id);
-        let round: RoundValue = tester::get_RoundValue(sys.world, duel_id);
+    pub fn start_get_new_challenge(sys: @TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, table_id: felt252, lives_staked: u8) -> (ChallengeValue, RoundValue, u128) {
+        let duel_id: u128 = start_new_challenge(sys, duelist_a, duelist_b, table_id, lives_staked);
+        let (challenge, round) = tester::get_Challenge_Round(sys, duel_id);
         assert_eq!(challenge.state, ChallengeState::InProgress, "challenge.state");
         assert_eq!(round.state, RoundState::Commit, "round.state");
         (challenge, round, duel_id)
     }
 
-    pub fn commit_reveal_get(sys: TestSystems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeValue, RoundValue) {
-        @sys.rng.set_mocked_values(salts.salts, salts.values);
-        tester::execute_commit_moves(@sys.game, duelist_a, duel_id, moves_a.hashed);
-        tester::execute_commit_moves(@sys.game, duelist_b, duel_id, moves_b.hashed);
-        tester::execute_reveal_moves(@sys.game, duelist_a, duel_id, moves_a.salt, moves_a.moves);
-        tester::execute_reveal_moves(@sys.game, duelist_b, duel_id, moves_b.salt, moves_b.moves);
-        let (challenge, round) = tester::get_Challenge_Round_Entity(sys.world, duel_id);
+    pub fn commit_reveal_get(sys: @TestSystems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeValue, RoundValue) {
+        (*sys.rng).set_mocked_values(salts.salts, salts.values);
+        tester::execute_commit_moves(sys.game, duelist_a, duel_id, moves_a.hashed);
+        tester::execute_commit_moves(sys.game, duelist_b, duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(sys.game, duelist_a, duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(sys.game, duelist_b, duel_id, moves_b.salt, moves_b.moves);
+        let (challenge, round) = tester::get_Challenge_Round(sys, duel_id);
         (challenge, round)
     }
 

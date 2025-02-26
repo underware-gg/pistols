@@ -3,9 +3,11 @@ pub mod tester {
     use starknet::{ContractAddress, testing};
 
     use dojo::world::{WorldStorage, IWorldDispatcherTrait};
-    use dojo::model::{ModelStorage, ModelValueStorage, ModelStorageTest};
+    use dojo::model::{ModelStorageTest};
     use dojo_cairo_test::{
-        spawn_test_world, NamespaceDef, TestResource, ContractDefTrait, ContractDef,
+        spawn_test_world,
+        NamespaceDef, TestResource,
+        ContractDefTrait, ContractDef,
         WorldStorageTestTrait,
     };
 
@@ -14,7 +16,7 @@ pub mod tester {
         admin::{admin, IAdminDispatcher, IAdminDispatcherTrait},
         game::{game, IGameDispatcher, IGameDispatcherTrait},
         tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
-        rng::{rng},
+        rng::{rng, IRngDispatcher, IRngDispatcherTrait},
         rng_mock::{rng_mock, m_MockedValue, IRngMockDispatcher, IRngMockDispatcherTrait},
         vrf_mock::{vrf_mock},
         tokens::{
@@ -22,24 +24,24 @@ pub mod tester {
             duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
             pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
             fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
+            fools_coin::{fools_coin, IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait},
             lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
         },
         components::{
             token_bound::{m_TokenBoundAddress, TokenBoundAddress, TokenBoundAddressTrait},
         },
     };
-    use pistols::models::{
+    pub use pistols::models::{
         player::{
             m_Player, Player,
             e_PlayerActivity,
             e_PlayerRequiredAction,
         },
         pack::{
-            m_Pack, Pack,
+            m_Pack, Pack, PackType, PackTypeTrait,
         },
         challenge::{
             m_Challenge, Challenge, ChallengeValue,
-            m_ChallengeFameBalance, ChallengeFameBalanceValue,
             m_Round, RoundValue,
             DuelistState,
         },
@@ -47,13 +49,13 @@ pub mod tester {
             m_Duelist, Duelist, DuelistValue,
             m_DuelistChallenge, DuelistChallenge,
             m_Scoreboard, Scoreboard,
-            m_ScoreboardTable, ScoreboardTable,
+            m_DuelistMemorial, DuelistMemorial, DuelistMemorialValue, CauseOfDeath,
+        },
+        leaderboard::{
+            m_Leaderboard, Leaderboard, LeaderboardTrait, LeaderboardPosition
         },
         pact::{
             m_Pact,
-        },
-        payment::{
-            m_Payment,
         },
         config::{
             m_Config, Config,
@@ -62,24 +64,30 @@ pub mod tester {
             CONFIG,
         },
         season::{
-            m_SeasonConfig, SeasonConfig,
+            m_SeasonConfig, SeasonConfig, SeasonManagerTrait,
         },
         table::{
             m_TableConfig, TableConfig,
         },
+        pool::{
+            m_Pool, Pool, PoolType,
+        },
     };
+
+    // use pistols::tests::mock_account::DualCaseAccountMock;
     use pistols::tests::token::mock_duelist::{
         duelist_token as mock_duelist,
         m_MockDuelistOwners,
     };
 
     use pistols::types::challenge_state::{ChallengeState};
-    use pistols::types::constants::{CONST};
+    use pistols::types::constants::{CONST, FAME};
     use pistols::types::premise::{Premise};
     use pistols::utils::byte_arrays::{BoolToString};
     use pistols::utils::misc::{ContractAddressIntoU256};
     use pistols::utils::short_string::{ShortString};
-    use pistols::interfaces::systems::{SystemsTrait};
+    pub use pistols::interfaces::dns::{DnsTrait};
+    pub use pistols::libs::store::{Store, StoreTrait};
 
     
     //
@@ -88,9 +96,9 @@ pub mod tester {
     //
 
     pub fn ZERO()      -> ContractAddress { starknet::contract_address_const::<0x0>() }
-    pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // welcome 1-5
-    pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x6>() } // welcome 6-10
-    pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x111>() }
+    pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // duelists 1-2
+    pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x3>() } // duelists 3-4
+    pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x5>() } // duelists 5-6
     pub fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x222>() }
     pub fn SPENDER()   -> ContractAddress { starknet::contract_address_const::<0x333>() }
     pub fn TREASURY()  -> ContractAddress { starknet::contract_address_const::<0x444>() }
@@ -101,9 +109,30 @@ pub mod tester {
     pub fn OWNED_BY_OWNER() -> u128 { 0xeeee }
     pub fn OWNED_BY_OTHER() -> u128 { 0xdddd }
 
+    pub const FAUCET_AMOUNT: u128 = 10_000_000_000_000_000_000_000;
+
+    #[inline(always)]
+    pub fn WEI(value: u128) -> u128 {
+        (value * CONST::ETH_TO_WEI.low)
+    }
+    #[inline(always)]
+    pub fn ETH(value: u128) -> u128 {
+        (value / CONST::ETH_TO_WEI.low)
+    }
+
+    #[inline(always)]
     pub fn ID(address: ContractAddress) -> u128 {
         let as_u256: u256 = address.into();
         (as_u256.low)
+    }
+
+    #[inline(always)]
+    pub fn SEASON_TABLE(season_id: u16) -> felt252 {
+        (SeasonManagerTrait::make_table_id(season_id))
+    }
+    #[inline(always)]
+    pub fn SEASON_1_TABLE() -> felt252 {
+        (SEASON_TABLE(1))
     }
 
     // set_contract_address : to define the address of the calling contract,
@@ -130,31 +159,60 @@ pub mod tester {
     const TIMESTEP: u64 = 0x1;
 
     pub mod FLAGS {
-        pub const GAME: u8       = 0b1;
-        pub const ADMIN: u8      = 0b10;
-        pub const LORDS: u8      = 0b100;
-        pub const DUEL: u8       = 0b1000;
-        pub const DUELIST: u8    = 0b10000;
-        pub const APPROVE: u8    = 0b100000;
-        pub const MOCK_RNG: u8   = 0b1000000;
-        pub const TUTORIAL: u8   = 0b10000000;
+        pub const GAME: u16     = 0b1;
+        pub const ADMIN: u16    = 0b10;
+        pub const LORDS: u16    = 0b100;
+        pub const DUEL: u16     = 0b1000;
+        pub const DUELIST: u16  = 0b10000;
+        pub const APPROVE: u16  = 0b100000;
+        pub const MOCK_RNG: u16 = 0b1000000;
+        pub const TUTORIAL: u16 = 0b10000000;
+        pub const FAME: u16     = 0b100000000;
+        pub const ACCOUNT: u16  = 0b1000000000;
     }
 
     #[derive(Copy, Drop)]
     pub struct TestSystems {
         pub world: WorldStorage,
+        pub store: Store,
         pub game: IGameDispatcher,
         pub tut: ITutorialDispatcher,
         pub admin: IAdminDispatcher,
+        pub bank: IBankDispatcher,
         pub lords: ILordsMockDispatcher,
         pub fame: IFameCoinDispatcher,
+        pub fools: IFoolsCoinDispatcher,
         pub duels: IDuelTokenDispatcher,
         pub duelists: IDuelistTokenDispatcher,
         pub pack: IPackTokenDispatcher,
         pub rng: IRngMockDispatcher,
+        pub account: ContractAddress,
     }
 
-    pub fn setup_world(flags: u8) -> TestSystems {
+    #[generate_trait]
+    pub impl TestSystemsImpl of TestSystemsTrait {
+        #[inline(always)]
+        fn from_world(world: WorldStorage, mock_account: ContractAddress) -> TestSystems {
+            (TestSystems {
+                world,
+                game: world.game_dispatcher(),
+                store: StoreTrait::new(world),
+                tut: world.tutorial_dispatcher(),
+                admin: world.admin_dispatcher(),
+                bank: world.bank_dispatcher(),
+                lords: world.lords_mock_dispatcher(),
+                fame: world.fame_coin_dispatcher(),
+                fools: world.fools_coin_dispatcher(),
+                duels: world.duel_token_dispatcher(),
+                duelists: world.duelist_token_dispatcher(),
+                pack: world.pack_token_dispatcher(),
+                rng: IRngMockDispatcher{ contract_address: world.rng_address() },
+                account: mock_account,
+            })
+        }
+    }
+
+    pub fn setup_world(flags: u16) -> TestSystems {
         let mut deploy_game: bool = (flags & FLAGS::GAME) != 0;
         let mut deploy_tutorial: bool = (flags & FLAGS::TUTORIAL) != 0;
         let mut deploy_admin: bool = (flags & FLAGS::ADMIN) != 0;
@@ -163,16 +221,23 @@ pub mod tester {
         let mut deploy_duelist: bool = (flags & FLAGS::DUELIST) != 0;
         let mut deploy_rng_mock = (flags & FLAGS::MOCK_RNG) != 0;
         let mut approve: bool = (flags & FLAGS::APPROVE) != 0;
+        let mut deploy_fame: bool = (flags & FLAGS::FAME) != 0;
+        let mut deploy_account: bool = (flags & FLAGS::ACCOUNT) != 0;
         let mut deploy_bank: bool = false;
-        let mut deploy_fame: bool = false;
-
-        deploy_game = deploy_game || approve;
-        deploy_admin = deploy_admin || deploy_game;
-        deploy_lords = deploy_lords || deploy_game || deploy_duelist || approve;
-        deploy_duel = deploy_duel || deploy_game;
-        deploy_bank = deploy_bank || deploy_lords || deploy_duelist;
-        deploy_fame = deploy_fame || deploy_game || deploy_duelist;
+        let mut deploy_pack: bool = false;
+        let mut deploy_fools: bool = false;
+        let mut deploy_vrf: bool = false;
+        
+        deploy_game     = deploy_game || approve;
+        deploy_lords    = deploy_lords || deploy_game || deploy_duelist || approve;
+        deploy_admin    = deploy_admin || deploy_game || deploy_lords;
+        deploy_duel     = deploy_duel || deploy_game;
+        deploy_pack     = deploy_pack || deploy_duelist;
+        deploy_fame     = deploy_fame || deploy_game || deploy_duelist;
+        deploy_fools    = deploy_fools || deploy_game;
         deploy_rng_mock = deploy_rng_mock || deploy_tutorial;
+        deploy_bank     = deploy_bank || deploy_fame || deploy_lords || deploy_duelist;
+        deploy_vrf      = deploy_vrf || deploy_game || deploy_pack;
         
 // '---- 0'.print();
         let mut resources: Array<TestResource> = array![
@@ -180,20 +245,20 @@ pub mod tester {
             TestResource::Model(m_Player::TEST_CLASS_HASH),
             TestResource::Model(m_Pack::TEST_CLASS_HASH),
             TestResource::Model(m_Challenge::TEST_CLASS_HASH),
-            TestResource::Model(m_ChallengeFameBalance::TEST_CLASS_HASH),
             TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
             TestResource::Model(m_Config::TEST_CLASS_HASH),
             TestResource::Model(m_Duelist::TEST_CLASS_HASH),
             TestResource::Model(m_DuelistChallenge::TEST_CLASS_HASH),
+            TestResource::Model(m_DuelistMemorial::TEST_CLASS_HASH),
             TestResource::Model(m_Pact::TEST_CLASS_HASH),
-            TestResource::Model(m_Payment::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),
             TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
-            TestResource::Model(m_ScoreboardTable::TEST_CLASS_HASH),
+            TestResource::Model(m_Leaderboard::TEST_CLASS_HASH),
             TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
+            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
+            TestResource::Model(m_Pool::TEST_CLASS_HASH),
             // events
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
@@ -215,6 +280,9 @@ pub mod tester {
                 ContractDefTrait::new(@"pistols", @"game")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
+        }
+
+        if (deploy_vrf) {
             resources.append(TestResource::Contract(vrf_mock::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"vrf_mock")
@@ -259,7 +327,6 @@ pub mod tester {
         // '---- 3'.print();
         if (deploy_duelist) {
             resources.append(TestResource::Contract(duelist_token::TEST_CLASS_HASH));
-            resources.append(TestResource::Contract(pack_token::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duelist_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -268,6 +335,17 @@ pub mod tester {
                         0, // renderer_address
                     ].span())
             );
+        }
+        else if (deploy_game) {
+            resources.append(TestResource::Contract(mock_duelist::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"duelist_token")
+                    .with_writer_of([selector_from_tag!("pistols-MockDuelistOwners")].span())
+            );
+        }
+
+        if (deploy_duelist) {
+            resources.append(TestResource::Contract(pack_token::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"pack_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
@@ -276,27 +354,16 @@ pub mod tester {
                     ].span()),
             );
         }
-        else if (deploy_game) {
-            resources.append(TestResource::Contract(mock_duelist::TEST_CLASS_HASH));
-            contract_defs.append(
-                ContractDefTrait::new(@"pistols", @"duelist_token")
-                    .with_writer_of([
-                        selector_from_tag!("pistols-MockDuelistOwners"),
-                    ].span())
-            );
-        }
 
         if (deploy_lords) {
             resources.append(TestResource::Contract(lords_mock::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"lords_mock")
-                    .with_writer_of([
-                        selector_from_tag!("pistols-CoinConfig"),
-                    ].span())
+                    .with_writer_of([selector_from_tag!("pistols-CoinConfig")].span())
                     .with_init_calldata([
                         // game.contract_address.into(), // minter
                         0, // minter
-                        10_000_000_000_000_000_000_000, // faucet_amount: 10,000 Lords
+                        FAUCET_AMOUNT.into(), // faucet_amount: 10,000 Lords
                     ].span())
             );
         }
@@ -305,7 +372,7 @@ pub mod tester {
             resources.append(TestResource::Contract(bank::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"bank")
-                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+                    .with_writer_of([selector_from_tag!("pistols-Pool")].span())
             );
         }
 
@@ -313,6 +380,13 @@ pub mod tester {
             resources.append(TestResource::Contract(fame_coin::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"fame_coin")
+                    .with_writer_of([selector_from_tag!("pistols-CoinConfig"),selector_from_tag!("pistols-TokenBoundAddress")].span()), // same as config
+            );
+        }
+        if (deploy_fools) {
+            resources.append(TestResource::Contract(fools_coin::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"fools_coin")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         }
@@ -367,21 +441,17 @@ pub mod tester {
         }
 // '---- 7'.print();
 
+        let mock_account: ContractAddress = if (deploy_account) {
+            (deploy_mock_account())
+        } else {
+            ZERO()
+        };
+
+
         impersonate(OWNER());
 
 // '---- READY!'.print();
-        (TestSystems {
-            world,
-            game: world.game_dispatcher(),
-            tut: world.tutorial_dispatcher(),
-            admin: world.admin_dispatcher(),
-            lords: world.lords_mock_dispatcher(),
-            fame: world.fame_coin_dispatcher(),
-            duels: world.duel_token_dispatcher(),
-            duelists: world.duelist_token_dispatcher(),
-            pack: world.pack_token_dispatcher(),
-            rng: IRngMockDispatcher{ contract_address: world.rng_address() },
-        })
+        (TestSystemsTrait::from_world(world, mock_account))
     }
 
 
@@ -399,19 +469,33 @@ pub mod tester {
 
     #[inline(always)]
     pub fn _next_block() -> (u64, u64) {
-        (elapse_timestamp(TIMESTEP))
+        (elapse_block_timestamp(TIMESTEP))
     }
 
-    pub fn elapse_timestamp(delta: u64) -> (u64, u64) {
+    pub fn elapse_block_timestamp(delta: u64) -> (u64, u64) {
         let new_timestamp = starknet::get_block_timestamp() + delta;
-        (set_timestamp(new_timestamp))
+        (set_block_timestamp(new_timestamp))
     }
 
-    pub fn set_timestamp(new_timestamp: u64) -> (u64, u64) {
+    pub fn set_block_timestamp(new_timestamp: u64) -> (u64, u64) {
         let new_block_number = get_block_number() + 1;
         testing::set_block_number(new_block_number);
         testing::set_block_timestamp(new_timestamp);
         (new_block_number, new_timestamp)
+    }
+
+
+
+    //--------------------------
+    // mock account contract
+    //
+    // use dojo_cairo_test::{deploy_contract};
+    const NEW_PUBKEY: felt252 = 0x26da8d11938b76025862be14fdb8b28438827f73e75e86f7bfa38b196951fa7;
+    pub fn deploy_mock_account() -> ContractAddress {
+        // let key_pair: StarkCurveKeyPair = StarkCurveKeyPairTrait::generate();
+        // let public_key: felt252 = key_pair.public_key;
+        // (deploy_contract(DualCaseAccountMock::TEST_CLASS_HASH.try_into().unwrap(), [NEW_PUBKEY].span()))
+        (ZERO())
     }
 
     //
@@ -439,11 +523,6 @@ pub mod tester {
         (*system).set_table(table);
         _next_block();
     }
-    pub fn execute_admin_open_table(system: @IAdminDispatcher, sender: ContractAddress, table_id: felt252, enabled: bool) {
-        impersonate(sender);
-        (*system).open_table(table_id, enabled);
-        _next_block();
-    }
 
     // ::ierc20
     pub fn execute_lords_faucet(system: @ILordsMockDispatcher, sender: ContractAddress) {
@@ -458,9 +537,9 @@ pub mod tester {
     }
 
     // ::pack_token
-    pub fn execute_claim_welcome_pack(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
+    pub fn execute_claim_starter_pack(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
         impersonate(sender);
-        let token_ids: Span<u128> = (*system).claim_welcome_pack();
+        let token_ids: Span<u128> = (*system).claim_starter_pack();
         _next_block();
         (token_ids)
     }
@@ -472,8 +551,9 @@ pub mod tester {
         quote: felt252,
         table_id: felt252,
         expire_hours: u64,
+        lives_staked: u8,
     ) -> u128 {
-        (execute_create_duel_ID(system, sender, ID(sender), challenged, quote, table_id, expire_hours))
+        (execute_create_duel_ID(system, sender, ID(sender), challenged, quote, table_id, expire_hours, lives_staked))
     }
     pub fn execute_create_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
         token_id: u128,
@@ -482,9 +562,10 @@ pub mod tester {
         quote: felt252,
         table_id: felt252,
         expire_hours: u64,
+        lives_staked: u8,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*system).create_duel(token_id, challenged, Premise::Nothing, quote, table_id, expire_hours);
+        let duel_id: u128 = (*system).create_duel(token_id, challenged, Premise::Nothing, quote, table_id, expire_hours, lives_staked);
         _next_block();
         (duel_id)
     }
@@ -534,12 +615,12 @@ pub mod tester {
     }
     pub fn execute_collect(system: @IGameDispatcher, sender: ContractAddress) -> felt252 {
         impersonate(sender);
-        let new_table_id: felt252 = (*system).collect();
+        let new_table_id: felt252 = (*system).collect_season();
         _next_block();
         (new_table_id)
     }
 
-    // ::game
+    // ::tutorial
     pub fn execute_create_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
         tutorial_id: u128,
     ) -> u128 {
@@ -568,79 +649,34 @@ pub mod tester {
         _next_block();
     }
 
+    // ::bank
+    pub fn execute_sponsor_duelists(system: @IBankDispatcher, sender: ContractAddress,
+        amount: u128,
+    ) {
+        impersonate(sender);
+        (*system).sponsor_duelists(sender, amount);
+        _next_block();
+    }
+    pub fn fund_duelists_pool(sys: @TestSystems, quantity: u8) {
+        // mint lords
+        let sponsor: ContractAddress = starknet::contract_address_const::<0x12178517312>();
+        execute_lords_faucet(sys.lords, sponsor);
+        // approve lords
+        let balance: u256 = (*sys.lords).balance_of(sponsor);
+        execute_lords_approve(sys.lords, sponsor, *sys.bank.contract_address, balance.low);
+        // fund pool
+        let price: u128 = PackType::StarterPack.description().price_lords;
+        execute_sponsor_duelists(sys.bank, sponsor, price * quantity.into());
+    }
+
     //
     // getters
     //
 
     #[inline(always)]
-    pub fn get_Config(world: WorldStorage) -> Config {
-        (world.read_model(CONFIG::CONFIG_KEY))
-    }
-    #[inline(always)]
-    pub fn get_TokenConfig(world: WorldStorage, contract_address: ContractAddress) -> TokenConfig {
-        (world.read_model(contract_address))
-    }
-    #[inline(always)]
-    pub fn get_CoinConfig(world: WorldStorage, contract_address: ContractAddress) -> CoinConfig {
-        (world.read_model(contract_address))
-    }
-    #[inline(always)]
-    pub fn get_Table(world: WorldStorage, table_id: felt252) -> TableConfig {
-        (world.read_model(table_id))
-    }
-    #[inline(always)]
-    pub fn get_Season(world: WorldStorage, table_id: felt252) -> SeasonConfig {
-        (world.read_model(table_id))
-    }
-    #[inline(always)]
-    pub fn get_current_Season(world: WorldStorage) -> SeasonConfig {
-        (world.read_model(get_Config(world).season_table_id))
-    }
-    #[inline(always)]
-    pub fn get_Player(world: WorldStorage, address: ContractAddress) -> Player {
-        (world.read_model(address))
-    }
-    #[inline(always)]
-    pub fn get_Pack(world: WorldStorage, pack_id: u128) -> Pack {
-        (world.read_model(pack_id))
-    }
-    #[inline(always)]
-    pub fn get_DuelistValue(world: WorldStorage, duelist_id: u128) -> DuelistValue {
-        (world.read_value(duelist_id))
-    }
-    #[inline(always)]
-    pub fn get_DuelistChallengeId(world: WorldStorage, duelist_id: u128) -> u128 {
-        let duelist_challenge : DuelistChallenge = world.read_model(duelist_id);
-        (duelist_challenge.duel_id)
-    }
-    #[inline(always)]
-    pub fn get_Scoreboard(world: WorldStorage, holder: felt252) -> Scoreboard {
-        (world.read_model(holder))
-    }
-    #[inline(always)]
-    pub fn get_ScoreboardTable(world: WorldStorage, holder: felt252, table_id: felt252) -> ScoreboardTable {
-        (world.read_model((holder, table_id),))
-    }
-    #[inline(always)]
-    pub fn get_Challenge(world: WorldStorage, duel_id: u128) -> Challenge {
-        (world.read_model(duel_id))
-    }
-    #[inline(always)]
-    pub fn get_ChallengeValue(world: WorldStorage, duel_id: u128) -> ChallengeValue {
-        (world.read_value(duel_id))
-    }
-    #[inline(always)]
-    pub fn get_ChallengeFameBalanceValue(world: WorldStorage, duel_id: u128) -> ChallengeFameBalanceValue {
-        (world.read_value(duel_id))
-    }
-    #[inline(always)]
-    pub fn get_RoundValue(world: WorldStorage, duel_id: u128) -> RoundValue {
-        (world.read_value(duel_id))
-    }
-    #[inline(always)]
-    pub fn get_Challenge_Round_Entity(world: WorldStorage, duel_id: u128) -> (ChallengeValue, RoundValue) {
-        let challenge = get_ChallengeValue(world, duel_id);
-        let round = get_RoundValue(world, duel_id);
+    pub fn get_Challenge_Round(sys: @TestSystems, duel_id: u128) -> (ChallengeValue, RoundValue) {
+        let challenge: ChallengeValue = (*sys.store).get_challenge_value(duel_id);
+        let round: RoundValue = (*sys.store).get_round_value(duel_id);
         (challenge, round)
     }
 
@@ -654,83 +690,143 @@ pub mod tester {
     //
 
     // depends on use dojo::model::{Model};
-    pub fn set_Config(ref world: WorldStorage, model: Config) {
-        world.write_model_test(@model);
+    pub fn set_Config(ref world: WorldStorage, model: @Config) {
+        world.write_model_test(model);
     }
-    pub fn set_TableConfig(ref world: WorldStorage, model: TableConfig) {
-        world.write_model_test(@model);
+    pub fn set_TableConfig(ref world: WorldStorage, model: @TableConfig) {
+        world.write_model_test(model);
     }
-    pub fn set_Duelist(ref world: WorldStorage, model: Duelist) {
-        world.write_model_test(@model);
+    pub fn set_Duelist(ref world: WorldStorage, model: @Duelist) {
+        world.write_model_test(model);
     }
-    pub fn set_Scoreboard(ref world: WorldStorage, model: Scoreboard) {
-        world.write_model_test(@model);
+    pub fn set_Scoreboard(ref world: WorldStorage, model: @Scoreboard) {
+        world.write_model_test(model);
     }
-    pub fn set_Challenge(ref world: WorldStorage, model: Challenge) {
-        world.write_model_test(@model);
+    pub fn set_Challenge(ref world: WorldStorage, model: @Challenge) {
+        world.write_model_test(model);
     }
-    pub fn set_Pack(ref world: WorldStorage, model: Pack) {
-        world.write_model_test(@model);
+    pub fn set_Pack(ref world: WorldStorage, model: @Pack) {
+        world.write_model_test(model);
+    }
+
+    pub fn set_current_season(ref sys: TestSystems, table_id: felt252) {
+        let mut config: Config = sys.store.get_config();
+        config.season_table_id = table_id;
+        set_Config(ref sys.world, @config);
+    }
+
+    pub fn make_duelist_inactive(sys: @TestSystems, token_id: u128, dripped_fame: u64) {
+        let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
+        let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + (FAME::TIMESTAMP_TO_DRIP_ONE_FAME * dripped_fame);
+        set_block_timestamp(timestamp_active + elapsed);
     }
 
     //
     // Asserts
     //
 
-    pub fn assert_balance_token(sys: @TestSystems, duelist_id: u128, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
+    pub fn assert_fame_token_balance(sys: @TestSystems, duelist_id: u128, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
         let address: ContractAddress = TokenBoundAddressTrait::address((*sys.duelists).contract_address, duelist_id);
-        (assert_balance(
+        (assert_lords_balance(
             ILordsMockDispatcher{ contract_address: (*sys.fame).contract_address },
             address, balance_before, subtract, add, prefix,
         ))
     }
 
-    pub fn assert_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
-        let balance: u128 = lords.balance_of(address).low;
+    pub fn assert_fools_balance(sys: @TestSystems, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
+        (assert_lords_balance(
+            ILordsMockDispatcher{ contract_address: (*sys.fools).contract_address },
+            address, balance_before, subtract, add, prefix,
+        ))
+    }
+
+    pub fn assert_balance(balance: u128, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
         if (subtract > add) {
-            assert_lt!(balance, balance_before, "{}_<", prefix);
+            assert_lt!(balance, balance_before, "{}__lt", prefix);
         } else if (add > subtract) {
-            assert_gt!(balance, balance_before, "{}_>", prefix);
+            assert_gt!(balance, balance_before, "{}__gt", prefix);
         } else {
-            assert_eq!(balance, balance_before, "{}_==", prefix);
+            assert_eq!(balance, balance_before, "{}__eq", prefix);
         }
-        assert_eq!(balance, balance_before - subtract + add, "{}_=>", prefix);
+        assert_eq!(balance, balance_before - subtract + add, "{}__sum", prefix);
+        (balance)
+    }
+    pub fn assert_balance_up(balance: u128, balance_before: u128, prefix: ByteArray) -> u128 {
+        assert_gt!(balance, balance_before, "{}__up", prefix);
+        (balance)
+    }
+    pub fn assert_balance_down(balance: u128, balance_before: u128, prefix: ByteArray) -> u128 {
+        assert_lt!(balance, balance_before, "{}__down", prefix);
+        (balance)
+    }
+    pub fn assert_balance_equal(balance: u128, balance_before: u128, prefix: ByteArray) -> u128 {
+        assert_eq!(balance, balance_before, "{}__equal", prefix);
         (balance)
     }
 
-    pub fn assert_winner_balance(lords: ILordsMockDispatcher,
-        winner: u8,
-        duelist_a: ContractAddress, duelist_b: ContractAddress,
-        balance_a: u128, balance_b: u128,
-        fee: u128, prize_value: u128,
-        prefix: ByteArray,
-    ) {
-        if (winner == 1) {
-            assert_balance(lords, duelist_a, balance_a, fee, prize_value, format!("A_A_{}", prefix));
-            assert_balance(lords, duelist_b, balance_b, fee + prize_value, 0, format!("A_B_{}", prefix));
-        } else if (winner == 2) {
-            assert_balance(lords, duelist_a, balance_a, fee + prize_value, 0, format!("B_A_{}", prefix));
-            assert_balance(lords, duelist_b, balance_b, fee, prize_value, format!("B_B_{}", prefix));
-        } else {
-            assert_balance(lords, duelist_a, balance_a, fee, 0, format!("D_A_{}", prefix));
-            assert_balance(lords, duelist_b, balance_b, fee, 0, format!("D_B_{}", prefix));
-        }
+    pub fn assert_lords_balance(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, subtract: u128, add: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = lords.balance_of(address).low;
+        (assert_balance(balance, balance_before, subtract, add, prefix))
+    }
+    pub fn assert_lords_balance_up(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = lords.balance_of(address).low;
+        (assert_balance_up(balance, balance_before, prefix))
+    }
+    pub fn assert_lords_balance_down(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = lords.balance_of(address).low;
+        (assert_balance_down(balance, balance_before, prefix))
+    }
+    pub fn assert_lords_balance_equal(lords: ILordsMockDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = lords.balance_of(address).low;
+        (assert_balance_equal(balance, balance_before, prefix))
     }
 
-    pub fn assert_pact(sys: TestSystems, duel_id: u128, ch: ChallengeValue, has_pact: bool, accepted: bool, prefix: ByteArray) {
-        assert!(sys.duels.has_pact(ch.table_id, ch.address_a, ch.address_b) == has_pact,
+    pub fn assert_fame_balance_up(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = fame.balance_of(address).low;
+        (assert_balance_up(balance, balance_before, prefix))
+    }
+    pub fn assert_fame_balance_down(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = fame.balance_of(address).low;
+        (assert_balance_down(balance, balance_before, prefix))
+    }
+    pub fn assert_fame_balance_equal(fame: IFameCoinDispatcher, address: ContractAddress, balance_before: u128, prefix: ByteArray) -> u128 {
+        let balance: u128 = fame.balance_of(address).low;
+        (assert_balance_equal(balance, balance_before, prefix))
+    }
+
+    // pub fn assert_winner_balance(lords: ILordsMockDispatcher,
+    //     winner: u8,
+    //     duelist_a: ContractAddress, duelist_b: ContractAddress,
+    //     balance_a: u128, balance_b: u128,
+    //     fee: u128, prize_value: u128,
+    //     prefix: ByteArray,
+    // ) {
+    //     if (winner == 1) {
+    //         assert_lords_balance(lords, duelist_a, balance_a, fee, prize_value, format!("A_A_{}", prefix));
+    //         assert_lords_balance(lords, duelist_b, balance_b, fee + prize_value, 0, format!("A_B_{}", prefix));
+    //     } else if (winner == 2) {
+    //         assert_lords_balance(lords, duelist_a, balance_a, fee + prize_value, 0, format!("B_A_{}", prefix));
+    //         assert_lords_balance(lords, duelist_b, balance_b, fee, prize_value, format!("B_B_{}", prefix));
+    //     } else {
+    //         assert_lords_balance(lords, duelist_a, balance_a, fee, 0, format!("D_A_{}", prefix));
+    //         assert_lords_balance(lords, duelist_b, balance_b, fee, 0, format!("D_B_{}", prefix));
+    //     }
+    // }
+
+    pub fn assert_pact(sys: @TestSystems, duel_id: u128, ch: ChallengeValue, has_pact: bool, accepted: bool, prefix: ByteArray) {
+        assert!((*sys.duels).has_pact(ch.table_id, ch.address_a, ch.address_b) == has_pact,
             "[{}] _assert_pact() not [{}]", prefix, has_pact.to_string()
         );
-        assert!(sys.duels.has_pact(ch.table_id, ch.address_b, ch.address_a) == has_pact,
+        assert!((*sys.duels).has_pact(ch.table_id, ch.address_b, ch.address_a) == has_pact,
             "[{}] __assert_pact() not [{}]", prefix, has_pact.to_string()
         );
         let expected_duel_id: u128 = if (has_pact) {duel_id} else {0};
-        let duelist_duel_id: u128 = get_DuelistChallengeId(sys.world, ch.duelist_id_a);
+        let duelist_duel_id: u128 = (*sys.store).get_duelist_challenge(ch.duelist_id_a).duel_id;
         assert!(duelist_duel_id == expected_duel_id,
             "[{}] duelist_challenge_a: [{}] not [{}]", prefix, duelist_duel_id, expected_duel_id
         );
         let expected_duel_id: u128 = if (has_pact && accepted) {duel_id} else {0};
-        let duelist_duel_id: u128 = get_DuelistChallengeId(sys.world, ch.duelist_id_b);
+        let duelist_duel_id: u128 = (*sys.store).get_duelist_challenge(ch.duelist_id_b).duel_id;
         assert!(duelist_duel_id == expected_duel_id,
             "[{}] duelist_challenge_b: [{}] not [{}]", prefix, duelist_duel_id, expected_duel_id
         );

@@ -1,11 +1,11 @@
 use starknet::{ContractAddress};
-use pistols::models::payment::{Payment};
 
 #[starknet::interface]
 pub trait ITokenComponentPublic<TState> {
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
+    fn minted_count(self: @TState) -> u128;
 }
 
 #[starknet::interface]
@@ -13,10 +13,9 @@ pub trait ITokenComponentInternal<TState> {
     fn initialize(ref self: TState,
         minter_address: ContractAddress,
         renderer_address: ContractAddress,
-        payment: Payment,
     );
     fn mint(ref self: TState, recipient: ContractAddress) -> u128;
-    fn mint_multiple(ref self: TState, recipient: ContractAddress, amount: usize) -> Span<u128>;
+    fn mint_multiple(ref self: TState, recipient: ContractAddress, quantity: usize) -> Span<u128>;
     fn burn(ref self: TState, token_id: u128);
     fn assert_exists(self: @TState, token_id: u128);
     fn assert_is_owner_of(self: @TState, address: ContractAddress, token_id: u128);
@@ -34,11 +33,10 @@ pub mod TokenComponent {
         ERC721Component::{InternalImpl as ERC721InternalImpl},
     };
 
-    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::interfaces::dns::{DnsTrait};
     use pistols::libs::store::{
         Store, StoreTrait,
         TokenConfig, TokenConfigValue,
-        Payment,
     };
 
     #[storage]
@@ -58,7 +56,6 @@ pub mod TokenComponent {
     //-----------------------------------------
     // Public
     //
-    use super::{ITokenComponentPublic};
     #[embeddable_as(TokenComponentPublicImpl)]
     pub impl TokenComponentPublic<
         TContractState,
@@ -68,12 +65,12 @@ pub mod TokenComponent {
         +ERC721Component::ERC721HooksTrait<TContractState>,
         impl ERC721: ERC721Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ITokenComponentPublic<ComponentState<TContractState>> {
+    > of super::ITokenComponentPublic<ComponentState<TContractState>> {
 
         fn can_mint(self: @ComponentState<TContractState>,
             recipient: ContractAddress,
         ) -> bool {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let token_config: TokenConfigValue = store.get_token_config_value(starknet::get_contract_address());
             (
@@ -94,13 +91,19 @@ pub mod TokenComponent {
             let erc721 = get_dep_component!(self, ERC721);
             (erc721._owner_of(token_id.into()) == address)
         }
+
+        fn minted_count(self: @ComponentState<TContractState>) -> u128 {
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut store: Store = StoreTrait::new(world);
+            let token_config: TokenConfigValue = store.get_token_config_value(starknet::get_contract_address());
+            (token_config.minted_count)
+        }
     }
 
 
     //-----------------------------------------
     // Internal
     //
-    use super::{ITokenComponentInternal};
     #[embeddable_as(TokenComponentInternalImpl)]
     pub impl InternalImpl<
         TContractState,
@@ -110,13 +113,12 @@ pub mod TokenComponent {
         +ERC721Component::ERC721HooksTrait<TContractState>,
         impl ERC721: ERC721Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ITokenComponentInternal<ComponentState<TContractState>> {
+    > of super::ITokenComponentInternal<ComponentState<TContractState>> {
         fn initialize(ref self: ComponentState<TContractState>,
             minter_address: ContractAddress,
             renderer_address: ContractAddress,
-            payment: Payment,
         ) {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let token_config: TokenConfig = TokenConfig {
                 token_address: starknet::get_contract_address(),
@@ -125,7 +127,6 @@ pub mod TokenComponent {
                 minted_count: 0,
             };
             store.set_token_config(@token_config);
-            store.set_payment(@payment);
         }
 
         fn mint(ref self: ComponentState<TContractState>,
@@ -136,18 +137,18 @@ pub mod TokenComponent {
 
         fn mint_multiple(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
-            amount: usize,
+            quantity: usize,
         ) -> Span<u128> {
             assert(self.can_mint(starknet::get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
 
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let mut token_config: TokenConfig = store.get_token_config(starknet::get_contract_address());
             let mut erc721 = get_dep_component_mut!(ref self, ERC721);
 
             let mut token_ids: Array<u128> = array![];
             let mut i: usize = 0;
-            while (i < amount) {
+            while (i < quantity) {
                 token_config.minted_count += 1;
                 token_ids.append(token_config.minted_count);
                 erc721.mint(recipient, token_config.minted_count.into());

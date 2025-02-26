@@ -26,7 +26,6 @@ pub struct TokenConfig {
     pub minter_address: ContractAddress,
     pub renderer_address: ContractAddress,
     pub minted_count: u128,
-    // use the Payment model for pricing
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -43,9 +42,6 @@ pub struct CoinConfig {
 //---------------------------
 // Traits
 //
-pub use pistols::interfaces::ierc20::{ierc20, ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
-pub use pistols::interfaces::vrf::{IVrfProviderDispatcher, IVrfProviderDispatcherTrait};
-use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
@@ -59,30 +55,5 @@ pub impl ConfigManagerImpl of ConfigManagerTrait {
             season_table_id: 0,
             is_paused: false,
         })
-    }
-    fn set_is_paused(ref store: Store, is_paused: bool) {
-        let mut config: Config = store.get_config();
-        config.is_paused = is_paused;
-        store.set_config(@config);
-    }
-    fn set_season(ref store: Store, season_table_id: felt252) {
-        let mut config: Config = store.get_config();
-        config.season_table_id = season_table_id;
-        store.set_config(@config);
-    }
-    fn set_treasury(ref store: Store, treasury_address: ContractAddress) {
-        let mut config: Config = store.get_config();
-        config.treasury_address = treasury_address;
-        store.set_config(@config);
-    }
-}
-
-#[generate_trait]
-pub impl ConfigImpl of ConfigTrait {
-    fn lords_dispatcher(self: @Config) -> ERC20ABIDispatcher {
-        (ierc20(*self.lords_address))
-    }
-    fn vrf_dispatcher(self: @Config) -> IVrfProviderDispatcher {
-        (IVrfProviderDispatcher{ contract_address: *self.vrf_address })
     }
 }

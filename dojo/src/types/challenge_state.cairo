@@ -11,21 +11,16 @@ pub enum ChallengeState {
     Draw,       // 7
 }
 
-pub trait ChallengeStateTrait {
-    fn exists(self: ChallengeState) -> bool;
-    fn is_canceled(self: ChallengeState) -> bool;
-    fn is_live(self: ChallengeState) -> bool;
-    fn is_finished(self: ChallengeState) -> bool;
-}
 
+#[generate_trait]
 pub impl ChallengeStateImpl of ChallengeStateTrait {
-    fn exists(self: ChallengeState) -> bool {
+    fn exists(self: @ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             _                           => true,
         }
     }
-    fn is_canceled(self: ChallengeState) -> bool {
+    fn is_canceled(self: @ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => false,
@@ -37,7 +32,7 @@ pub impl ChallengeStateImpl of ChallengeStateTrait {
             ChallengeState::Draw        => false,
         }
     }
-    fn is_live(self: ChallengeState) -> bool {
+    fn is_live(self: @ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => true,
@@ -49,7 +44,7 @@ pub impl ChallengeStateImpl of ChallengeStateTrait {
             ChallengeState::Draw        => false,
         }
     }
-    fn is_finished(self: ChallengeState) -> bool {
+    fn is_finished(self: @ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => false,
@@ -63,6 +58,11 @@ pub impl ChallengeStateImpl of ChallengeStateTrait {
     }
 }
 
+
+
+//---------------------------
+// Converters
+//
 impl ChallengeStateIntoByteArray of core::traits::Into<ChallengeState, ByteArray> {
     fn into(self: ChallengeState) -> ByteArray {
         match self {
@@ -77,8 +77,7 @@ impl ChallengeStateIntoByteArray of core::traits::Into<ChallengeState, ByteArray
         }
     }
 }
-
-// for println! and format! 
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 // pub impl ChallengeStateDisplay of core::fmt::Display<ChallengeState> {
 //     fn fmt(self: @ChallengeState, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
 //         let result: ByteArray = (*self).into();

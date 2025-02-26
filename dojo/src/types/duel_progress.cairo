@@ -64,36 +64,33 @@ pub enum DuelistDrawnCard {
 
 #[generate_trait]
 pub impl SpecialsDrawnImpl of SpecialsDrawnTrait {
-    fn initialize(tactics_self: TacticsCard, tactics_other: TacticsCard) -> SpecialsDrawn {
+    fn initialize(tactics_self: @TacticsCard, tactics_other: @TacticsCard) -> SpecialsDrawn {
         (SpecialsDrawn {
-            tactics: tactics_self,
-            coin_toss: (tactics_self == TacticsCard::CoinToss),
-            reversal: (tactics_self == TacticsCard::Reversal || tactics_other == TacticsCard::Reversal),
+            tactics: *tactics_self,
+            coin_toss: (*tactics_self == TacticsCard::CoinToss),
+            reversal: (*tactics_self == TacticsCard::Reversal || *tactics_other == TacticsCard::Reversal),
             shots_modifier: EnvCard::None,
             tactics_modifier: EnvCard::None,
         })
     }
 }
 
+
+
+//---------------------------
+// Converters
+//
 impl DuelistDrawnCardIntoByteArray of core::traits::Into<DuelistDrawnCard, ByteArray> {
     fn into(self: DuelistDrawnCard) -> ByteArray {
         match self {
-            DuelistDrawnCard::None =>       "None",
+            DuelistDrawnCard::None =>   "None",
             DuelistDrawnCard::Fire =>   "Fire",
             DuelistDrawnCard::Dodge =>  "Dodge",
-            DuelistDrawnCard::Blades =>    "Blades",
+            DuelistDrawnCard::Blades => "Blades",
         }
     }
 }
-
-// for println! and format! 
-// pub impl DuelistDrawnCardDisplay of core::fmt::Display<DuelistDrawnCard> {
-//     fn fmt(self: @DuelistDrawnCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).into();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl DuelistDrawnCardDebug of core::fmt::Debug<DuelistDrawnCard> {
     fn fmt(self: @DuelistDrawnCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();

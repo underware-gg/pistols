@@ -33,22 +33,25 @@ export const useTable = (table_id: string) => {
   // console.log(`useTable() =>`, table_id, table)
 
   const description = useMemo(() => (table ? feltToString(table.description) : '?'), [table])
-  const feeMin = useMemo(() => BigInt(table?.fee_min ?? 0), [table])
-  const tableType = useMemo(() => (parseEnumVariant<constants.TableType>(table?.table_type) ?? null), [table])
-  const tableTypeDescription = useMemo(() => (table?.table_type ? {
-    [constants.TableType.Practice]: 'Practice',
-    [constants.TableType.Tutorial]: 'Tutorial',
-    [constants.TableType.Season]: 'Season',
-  }[tableType] : null), [table])
+  const rules = useMemo(() => (parseEnumVariant<constants.RulesType>(table?.rules) ?? null), [table])
+
+  const isPractice = useMemo(() => (table_id == constants.TABLES.PRACTICE), [table_id])
+  const isTutorial = useMemo(() => (table_id == constants.TABLES.TUTORIAL), [table_id])
+  const isSeason = useMemo(() => (table_id?.startsWith('Season') ?? false), [table_id])
+  const tableTypeDescription = useMemo(() => (
+    isPractice ? 'Practice'
+      : isTutorial ? 'Tutorial'
+        : isSeason ? 'Season'
+          : 'Unknown'
+  ), [isPractice, isTutorial, isSeason])
 
   return {
     tableId: table_id,
     description,
-    feeMin,
-    tableType: tableTypeDescription ?? '?',
-    tableIsOpen: table?.is_open ?? false,
-    isPractice: (tableType == constants.TableType.Practice),
-    isTutorial: (tableType == constants.TableType.Tutorial),
-    isSeason: (tableType == constants.TableType.Season),
+    rules,
+    isPractice,
+    isTutorial,
+    isSeason,
+    tableTypeDescription,
   }
 }

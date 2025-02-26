@@ -11,8 +11,8 @@ pub enum Premise {
     Blood,      // 6
     Nothing,    // 7
     Tournament, // 8
-    Training,   // 9
-    Tutorial,   // 10
+    Treaty,     // 9
+    Lesson,     // 10
 }
 
 
@@ -66,13 +66,13 @@ mod PREMISES {
         name: 'Tournament',
         prefix: 'to be the winner of',
     };
-    pub const Tutorial: PremiseDescription = PremiseDescription {
-        name: 'Tutorial',
-        prefix: 'to learn the ropes',
+    pub const Treaty: PremiseDescription = PremiseDescription {
+        name: 'Treaty',
+        prefix: 'to settle the terms of',
     };
-    pub const Training: PremiseDescription = PremiseDescription {
-        name: 'Training',
-        prefix: 'to train for',
+    pub const Lesson: PremiseDescription = PremiseDescription {
+        name: 'Lesson',
+        prefix: 'to learn about',
     };
 }
 
@@ -84,7 +84,7 @@ use pistols::utils::short_string::{ShortStringTrait};
 
 #[generate_trait]
 pub impl PremiseImpl of PremiseTrait {
-    fn description(self: Premise) -> PremiseDescription {
+    fn description(self: @Premise) -> PremiseDescription {
         match self {
             Premise::Undefined   => PREMISES::Undefined,
             Premise::Matter      => PREMISES::Matter,
@@ -95,48 +95,28 @@ pub impl PremiseImpl of PremiseTrait {
             Premise::Blood       => PREMISES::Blood,
             Premise::Nothing     => PREMISES::Nothing,
             Premise::Tournament  => PREMISES::Tournament,
-            Premise::Tutorial    => PREMISES::Tutorial,
-            Premise::Training    => PREMISES::Training, 
+            Premise::Treaty      => PREMISES::Treaty,
+            Premise::Lesson      => PREMISES::Lesson,
         }
     }
-    fn name(self: Premise) -> ByteArray {
+    fn name(self: @Premise) -> ByteArray {
         (self.description().name.to_string())
     }
-    fn prefix(self: Premise) -> ByteArray {
+    fn prefix(self: @Premise) -> ByteArray {
         (self.description().prefix.to_string())
     }
 }
 
-impl PremiseIntoByteArray of core::traits::Into<Premise, ByteArray> {
-    fn into(self: Premise) -> ByteArray {
-        match self {
-            Premise::Undefined   =>  "Undefined",
-            Premise::Matter      =>  "Matter",
-            Premise::Debt        =>  "Debt",
-            Premise::Dispute     =>  "Dispute",
-            Premise::Honour      =>  "Honour",
-            Premise::Hatred      =>  "Hatred",
-            Premise::Blood       =>  "Blood",
-            Premise::Nothing     =>  "Nothing",
-            Premise::Tournament  =>  "Tournament",
-            Premise::Tutorial    =>  "Tutorial",
-            Premise::Training    =>  "Training",
-        }
-    }
-}
 
-// for println! and format! 
-// pub impl PremiseDisplay of core::fmt::Display<Premise> {
-//     fn fmt(self: @Premise, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).into();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+
+
+//---------------------------
+// Converters
+//
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
 pub impl PremiseDebug of core::fmt::Debug<Premise> {
     fn fmt(self: @Premise, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-        let result: ByteArray = (*self).into();
-        f.buffer.append(@result);
+        f.buffer.append(@(*self).name());
         Result::Ok(())
     }
 }

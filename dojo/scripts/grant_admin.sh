@@ -34,15 +34,13 @@ if [[ "$GRANT" == "0" ]]; then
     model:pistols-Config,$ACCOUNT \
     model:pistols-TableConfig,$ACCOUNT \
     model:pistols-TokenConfig,$ACCOUNT \
-    model:pistols-CoinConfig,$ACCOUNT \
-    model:pistols-Payment,$ACCOUNT
+    model:pistols-CoinConfig,$ACCOUNT
 else
   echo "* GRANTING admin powers to $ACCOUNT..."
   sozo -P $PROFILE auth grant --world $WORLD_ADDRESS --wait writer \
     model:pistols-Config,$ACCOUNT \
     model:pistols-TableConfig,$ACCOUNT \
     model:pistols-TokenConfig,$ACCOUNT \
-    model:pistols-CoinConfig,$ACCOUNT \
-    model:pistols-Payment,$ACCOUNT
+    model:pistols-CoinConfig,$ACCOUNT
 fi
 
