@@ -41,10 +41,6 @@ export default function DuelStateDisplay({
     }
   }, [tutorialLevel, dispatchSetTutorialLevel, dispatchSetScene])
 
-  useEffect(() => {
-    console.log(isTutorial, isFinishedTutorial, isFinished, animated)
-  }, [isTutorial, isFinishedTutorial, isFinished, animated])
-
   //TODO add screen for beginning of duel and for switching between pistols and blade rounds, replace the existing "ready" screen thats there on reload
   return (
     <>

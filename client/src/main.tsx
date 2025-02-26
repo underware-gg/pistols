@@ -10,7 +10,6 @@ import { SettingsProvider } from '/src/hooks/SettingsContext'
 import { PistolsProvider } from '/src/hooks/PistolsContext'
 import ErrorModal from '/src/components/modals/ErrorModal'
 import MainPage from '/src/pages/MainPage'
-import TutorialPage from '/src/pages/TutorialPage'
 import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import AdminPage from '/src/pages/internal/AdminPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
@@ -40,14 +39,15 @@ const router = createBrowserRouter([
       { path: "profile", element: <MainPage /> },
       { path: "profile/:table_id", element: <MainPage /> },
       { path: "tavern", element: <MainPage /> },
-      { path: "tutorial/entry", element: <MainPage /> },
-      { path: "tutorial/conflict", element: <MainPage /> },
-      { path: "tutorial/honour", element: <MainPage /> },
-      { path: "tutorial/barkeep", element: <MainPage /> },
-      { path: "tutorial/lection", element: <MainPage /> },
-      { path: "tutorial/demon", element: <MainPage /> },
-      { path: "tutorial/resurection", element: <MainPage /> },
-      { path: "tutorial/duel", element: <MainPage /> },
+      { path: "tutorial/entry", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/conflict", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/honour", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/barkeep", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/lection", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/demon", element: <MainPage tutorial={false} /> },
+      { path: "tutorial/resurrection", element: <MainPage tutorial={false} /> },
+      { path: "tutorial/duel", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/duel/:duel_id", element: <MainPage tutorial={true} /> },
       { path: "tavern/:table_id", element: <MainPage /> },
       { path: "balcony", element: <MainPage /> },
       { path: "balcony/:table_id", element: <MainPage /> },
@@ -59,21 +59,6 @@ const router = createBrowserRouter([
       { path: "dueldata/:duel_id", element: <DuelDataPage /> },
     ],
     errorElement: <ErrorPage />,
-  },
-  // tutorial pages
-  {
-    path: '/tutorial',
-    children: [
-      { path: "entry", element: <TutorialPage /> },
-      { path: "conflict", element: <TutorialPage /> },
-      { path: "honour", element: <TutorialPage /> },
-      { path: "barkeep", element: <TutorialPage /> },
-      { path: "lection", element: <TutorialPage /> },
-      { path: "demon", element: <TutorialPage /> },
-      { path: "resurection", element: <TutorialPage /> },
-      { path: "duel", element: <TutorialPage /> },
-      { path: "duel/:duel_id", element: <TutorialPage /> },
-    ],
   },
   // internal pages
   {

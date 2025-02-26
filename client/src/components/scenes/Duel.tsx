@@ -12,7 +12,7 @@ import { useSyncToActiveDuelists } from '/src/hooks/useSyncDuelist'
 import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
 import { DojoSetupErrorDetector } from '../account/ConnectionDetector'
 import { EnvironmentCardsTextures } from '/src/data/cardAssets'
-import { AnimationState } from '/src/three/game'
+import { AnimationState, SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import { Action } from '/src/utils/pistols'
 import { MenuDuel, MenuDuelControl } from '/src/components/Menus'
 import { MenuDebugAnimations } from '/src/components/MenusDebug'
@@ -50,8 +50,7 @@ export default function Duel({
   const { debugMode, duelSpeedFactor } = useSettings()
   const { clientSeconds } = useClientTimestamp(false)
 
-  const { duelistIdA, duelistIdB, timestamp_start } = useGetChallenge(duelId)
-  const { isTutorial } = useGetChallenge(duelId)
+  const { duelistIdA, duelistIdB, timestamp_start, isTutorial } = useGetChallenge(duelId)
 
   // switch to active duelist, if owned by player
   const { isSynced } = useSyncToActiveDuelists([duelistIdA, duelistIdB])
@@ -95,12 +94,12 @@ export default function Duel({
   useEffect(() => dispatchSetDuel(duelId), [duelId])
 
   useEffect(() => {
-    if (tutorial != DuelTutorialLevel.NONE) {
+    if (tutorial != DuelTutorialLevel.NONE && isTutorial) {
       tutorialOpener.open()
     } else {
       tutorialOpener.close()
     }
-  }, [tutorial])
+  }, [tutorial, isTutorial])
 
   useEffect(() => {
     if (gameImpl && mounted && !duelSceneStarted && isSynced && nameA && nameB && characterTypeA && characterTypeB) {
@@ -164,9 +163,15 @@ export default function Duel({
       cardRef.current?.setAllEnvCards(envCardsList)
 
       setTimeout(() => {
-        cardRef.current?.spawnCards('A', { fire: duelProgress.hand_a.card_fire, dodge: duelProgress.hand_a.card_dodge, blade: duelProgress.hand_a.card_blades, tactics: duelProgress.hand_a.card_tactics })
-        cardRef.current?.spawnCards('B', { fire: duelProgress.hand_b.card_fire, dodge: duelProgress.hand_b.card_dodge, blade: duelProgress.hand_b.card_blades, tactics: duelProgress.hand_b.card_tactics })
-      }, tutorial === DuelTutorialLevel.NONE ? 1500 : 0)
+        if (!hasSpawnedCardsA.current) {
+          hasSpawnedCardsA.current = true
+          cardRef.current?.spawnCards('A', { fire: duelProgress.hand_a.card_fire, dodge: duelProgress.hand_a.card_dodge, blade: duelProgress.hand_a.card_blades, tactics: duelProgress.hand_a.card_tactics })
+        }
+        if (!hasSpawnedCardsB.current) {
+          hasSpawnedCardsB.current = true
+          cardRef.current?.spawnCards('B', { fire: duelProgress.hand_b.card_fire, dodge: duelProgress.hand_b.card_dodge, blade: duelProgress.hand_b.card_blades, tactics: duelProgress.hand_b.card_tactics })
+        }
+      }, tutorial === DuelTutorialLevel.SIMPLE ? 0 : 1500)
 
       setTimeout(() => {
         const step = duelProgress.steps[currentStep.current]
@@ -189,7 +194,7 @@ export default function Duel({
             dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_b.dodge ? currentStep.current : undefined),
           }
         })
-      }, tutorial === DuelTutorialLevel.NONE ? 2500 : 500);
+      }, tutorial === DuelTutorialLevel.SIMPLE ? 0 : 2500);
 
       setTimeout(() => {
         gameImpl?.hideDialogs()
@@ -200,9 +205,9 @@ export default function Duel({
         if (isPlayingRef.current) {
           nextStepCallback.current = setTimeout(() => {
             playStep()
-          }, tutorial === DuelTutorialLevel.NONE ? (Constants.BASE_CARD_REVEAL_DURATION * 1.2) / speedRef.current : 200)
+          }, tutorial === DuelTutorialLevel.SIMPLE ? 0 : (Constants.BASE_CARD_REVEAL_DURATION * 1.2) / speedRef.current)
         }
-      }, tutorial === DuelTutorialLevel.NONE ? 4000 : 1000)
+      }, tutorial === DuelTutorialLevel.SIMPLE ? 0 : 4000)
     }
 
     return () => {
@@ -252,10 +257,12 @@ export default function Duel({
       revealCardsB.push({ type: DuelistCardType.BLADE, delay: 1000 });
     }
 
-    cardRevealTimeout.current = setTimeout(() => {
-      revealCardsA.forEach(card => cardRef.current?.revealCard("A", card.type, speedRef.current, step.state_a.health > 0));
-      revealCardsB.forEach(card => cardRef.current?.revealCard("B", card.type, speedRef.current, step.state_b.health > 0));
-    }, Math.max(...[...revealCardsA, ...revealCardsB].map(card => card.delay || 0), 0) / speedRef.current);
+    if (tutorial !== DuelTutorialLevel.SIMPLE) {
+      cardRevealTimeout.current = setTimeout(() => {
+        revealCardsA.forEach(card => cardRef.current?.revealCard("A", card.type, speedRef.current, step.state_a.health > 0));
+        revealCardsB.forEach(card => cardRef.current?.revealCard("B", card.type, speedRef.current, step.state_b.health > 0));
+      }, Math.max(...[...revealCardsA, ...revealCardsB].map(card => card.delay || 0), 0) / speedRef.current);
+    }
 
     let newStatsA: DuelistState;
     let newStatsB: DuelistState;
@@ -281,7 +288,7 @@ export default function Duel({
       return newStatsB
     })
 
-    if (currentStep.current > 1 && step.card_env == constants.EnvCard.None) {
+    if (tutorial !== DuelTutorialLevel.SIMPLE && currentStep.current > 1 && step.card_env == constants.EnvCard.None) {
       gameBladeAnimationTimeout.current = setTimeout(() => {
         gameImpl?.prepareActionAnimation()
         gameImpl?.animateDuelistBlade()
@@ -289,7 +296,7 @@ export default function Duel({
     }
 
     const timeDelay = Constants.DRAW_CARD_BASE_DURATION + 200 + (shouldDoblePause ? (Constants.BASE_CARD_REVEAL_DURATION + 200) : 200)
-    const timeDelayNextStep = timeDelay + (shouldDoblePause ? 1400 : 1000)
+    const timeDelayNextStep = (tutorial === DuelTutorialLevel.SIMPLE ? 500 : timeDelay) + (shouldDoblePause ? 1400 : 1000)
 
     gameAnimationTimeout.current = setTimeout(() => {
       cardRef.current?.updateDuelistData(newStatsA?.damage, newStatsB?.damage, newStatsA?.hitChance, newStatsB?.hitChance)
@@ -298,7 +305,7 @@ export default function Duel({
       } else {
         gameImpl?.animateActions(Action[step.card_a.blades], Action[step.card_b.blades], newStatsA?.health, newStatsB?.health)
       }
-    }, step.card_env != constants.EnvCard.None ? (timeDelay / speedRef.current) : 3000 / speedRef.current);
+    }, tutorial === DuelTutorialLevel.SIMPLE ? 500 : step.card_env != constants.EnvCard.None ? (timeDelay / speedRef.current) : 3000 / speedRef.current);
 
     if (currentStep.current < duelProgress.steps.length && isPlayingRef.current) {
       nextStepCallback.current = setTimeout(() => {
@@ -376,7 +383,10 @@ export default function Duel({
         completedStages={completedStagesA}
         canAutoReveal={canAutoRevealA}
         isYou={isYouA}
-        revealCards={(cards: DuelistHand) => cardRef.current?.spawnCards('A', cards)}
+        revealCards={(cards: DuelistHand) => {
+          cardRef.current?.spawnCards('A', cards)
+          hasSpawnedCardsA.current = true
+        }}
       />
       <DuelProgress
         isB
@@ -387,7 +397,10 @@ export default function Duel({
         completedStages={completedStagesB}
         canAutoReveal={canAutoRevealB}
         isYou={isYouB}
-        revealCards={(cards: DuelistHand) => cardRef.current?.spawnCards('B', cards)}
+        revealCards={(cards: DuelistHand) => {
+          cardRef.current?.spawnCards('B', cards)
+          hasSpawnedCardsB.current = true
+        }}
       />
 
       <Cards duelId={duelId} ref={cardRef} tutorialLevel={tutorial} />

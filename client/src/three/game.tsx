@@ -171,6 +171,8 @@ const _tweens = {
 
 export async function init(canvas, framerate = 60, statsEnabled = false) {
 
+  dispose()
+
   if (Object.keys(_scenes).length > 0) {
     return
   }
@@ -440,7 +442,7 @@ function setupScenes() {
   Object.values(SceneName).forEach((sceneName) => {
     if (sceneName === SceneName.Duel) {
       _scenes[sceneName] = setupDuelScene()
-    } else if (!sceneName.includes('Tutorial')) {
+    } else if (!sceneName.includes('Tutorial') && sceneName !== SceneName.TutorialDuel) {
       _scenes[sceneName] = setupStaticScene(sceneName)
     } else if (!hasInstancedTutorial){
       hasInstancedTutorial = true
@@ -769,6 +771,12 @@ function setupStaticScene(sceneName) {
 //
 
 export function switchScene(sceneName) {
+  if (sceneName === SceneName.TutorialDuel) {
+    sceneName = SceneName.Duel
+  }
+
+  if (_currentScene === sceneName) return;
+
   if (!_currentScene) {
     _sceneName = sceneName
     _currentScene = _scenes[sceneName.includes('Tutorial') ? SceneName.Tutorial : sceneName]
@@ -776,7 +784,9 @@ export function switchScene(sceneName) {
       (_currentScene as InteractibleScene).setSceneData(sceneName)
     }
 
-    fadeInCurrentScene();
+    setTimeout(() => {
+      fadeInCurrentScene();
+    }, SCENE_CHANGE_ANIMATION_DURATION);
     
     if (sceneName != SceneName.Duel) {
       _duelistManager.hideElements()
@@ -794,7 +804,9 @@ export function switchScene(sceneName) {
       emitter.emit('hover_description', null)
       emitter.emit('hover_item', null)
 
-      fadeInCurrentScene();
+      setTimeout(() => {
+        fadeInCurrentScene();
+      }, 0);
       
       if (sceneName != SceneName.Duel) {
         _duelistManager.hideElements()
@@ -807,6 +819,8 @@ export function switchScene(sceneName) {
 
 function fadeOutCurrentScene(callback) {
   const overlay = document.getElementById('game-black-overlay');
+
+  _tweens.staticFade?.stop();
 
   _tweens.staticFade = new TWEEN.Tween({ opacity: 0 })
     .to({ opacity: 1 }, SCENE_CHANGE_ANIMATION_DURATION)
@@ -822,16 +836,20 @@ function fadeOutCurrentScene(callback) {
 function fadeInCurrentScene() {
   const overlay = document.getElementById('game-black-overlay');
 
+  _tweens.staticFade?.stop();
+
+  console.log('Initial opacity:', overlay.style.opacity);
+
   _tweens.staticFade = new TWEEN.Tween({ opacity: 1 })
     .to({ opacity: 0 }, SCENE_CHANGE_ANIMATION_DURATION)
     .onUpdate(({ opacity }) => {
+      console.log('Updating opacity:', opacity);
       overlay.style.opacity = opacity.toString()
     })
     .start();
 }
 
 export function startDuelWithPlayers(duelistNameA, duelistModelA, isDuelistAYou, isDuelistBYou, duelistNameB, duelistModelB) {
-  switchScene(SceneName.Duel) // make sure we're in the correct scene (duel page refresh)
   resetDuelScene()
   
   _duelistManager.switchDuelists(duelistNameA, duelistModelA, isDuelistAYou, isDuelistBYou, duelistNameB, duelistModelB)
@@ -1022,7 +1040,7 @@ export function dispose() {
   });
 
   TWEEN.removeAll()
-  _duelistManager.dispose()
+  _duelistManager?.dispose()
 
   // 8. Clear References:
   _duelistManager = null
