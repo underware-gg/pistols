@@ -22,10 +22,11 @@ import {
   CARD_PACK_CARD_SCALE_DURATION,
   CARD_PACK_REVEAL_DELAY,
 } from '/src/data/cardConstants';
+import { useAccount } from '@starknet-react/core';
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
 import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo';
+import { usePackType } from '/src/stores/packStore';
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
-import { useAccount } from '@starknet-react/core';
 
 interface CardPack {
   onComplete?: (selectedDuelistId?: number) => void
@@ -43,6 +44,8 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   const { pack_token } = useDojoSystemCalls()
   const { duelistIds } = useDuelistsOfPlayer()
   const [isClaiming, setIsClaiming] = useState(false)
+  const { quantity: starterPackQuantity } = usePackType(constants.PackType.StarterPack)
+  const { quantity: duelists5xQuantity } = usePackType(constants.PackType.Duelists5x)
 
   const [isOpening, setIsOpening] = useState(false)
   const [sealClicked, setSealClicked] = useState(false)
@@ -72,9 +75,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
       return
     }
 
-    //TODO adjust to all card pack possibilities
-    // const expectedNewIds = packType === constants.PackType.StarterPack ? 2 : 5
-    const expectedNewIds = 5
+    const expectedNewIds = isClaiming ? starterPackQuantity : duelists5xQuantity
     console.log('Expected new IDs:', expectedNewIds)
     const newIds = duelistIds.filter(id => !previousDuelistIdsRef.current.includes(id))
     console.log('Found new IDs:', newIds)
