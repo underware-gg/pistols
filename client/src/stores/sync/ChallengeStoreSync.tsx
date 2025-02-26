@@ -34,9 +34,10 @@ export function ChallengeStoreSync() {
           "Eq", formatQueryValue(stringToFelt(tableId)),
         ).build()
       )
-      .withEntityModels(
-        ['pistols-Challenge']
-      )
+      .withEntityModels([
+        'pistols-Challenge',
+        "pistols-Round",
+      ])
       .includeHashedKeys()
   ), [tableId])
 
