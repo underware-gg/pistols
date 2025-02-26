@@ -331,7 +331,8 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   [SceneName.TutorialScene2]: { baseUrl: '/tutorial/conflict', title: 'Pistols - Tutorial' },
   [SceneName.TutorialScene3]: { baseUrl: '/tutorial/barkeep', title: 'Pistols - Tutorial' },
   [SceneName.TutorialScene4]: { baseUrl: '/tutorial/demon', title: 'Pistols - Tutorial' },
-  [SceneName.TutorialScene5]: { baseUrl: '/tutorial/resurection', title: 'Pistols - Tutorial' },
+  [SceneName.TutorialScene5]: { baseUrl: '/tutorial/resurrection', title: 'Pistols - Tutorial' },
+  [SceneName.TutorialDuel]: { baseUrl: '/tutorial/duel', hasDuelId: true, title: 'Pistols - Tutorial' },
   // '/' must be the last...
   [SceneName.Gate]: { baseUrl: '/' },
 }
@@ -399,7 +400,7 @@ export const usePistolsScene = () => {
     atDuelists: (currentScene == SceneName.Duelists),
     atDuelsBoard: (currentScene == SceneName.DuelsBoard),
     atGraveyard: (currentScene == SceneName.Graveyard),
-    atDuel: (currentScene == SceneName.Duel),
+    atDuel: (currentScene == SceneName.Duel || currentScene == SceneName.TutorialDuel),
     atTutorial: tutorialScenes.includes(currentScene as typeof tutorialScenes[number]),
     atTutorialScene1: (currentScene == SceneName.Tutorial),
     atTutorialScene2: (currentScene == SceneName.TutorialScene2),

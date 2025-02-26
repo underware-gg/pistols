@@ -397,20 +397,20 @@ export class DuelistsManager {
   //
 
   public dispose() {
-      this.duelistA = {
-        id: 'A',
-        model: undefined,
-        name: undefined,
-        actor: undefined
-      }
-      this.duelistB = {
-        id: 'B',
-        model: undefined,
-        name: undefined,
-        actor: undefined
-      }
+    this.duelistA = {
+      id: 'A',
+      model: undefined,
+      name: undefined,
+      actor: undefined
+    }
+    this.duelistB = {
+      id: 'B',
+      model: undefined,
+      name: undefined,
+      actor: undefined
+    }
 
-      this.scene = null
-      this.spriteSheets = null
+    this.scene = null
+    this.spriteSheets = null
   }
 }

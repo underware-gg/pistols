@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRouterParams } from '/src/hooks/PistolsContext'
 import { useSyncSelectedDuelist } from '/src/hooks/useSyncDuelist'
@@ -7,7 +7,8 @@ import { useEffectOnce, usePlayerId } from '@underware_gg/pistols-sdk/utils/hook
 import { DojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { Header } from '/src/components/Header'
-import { SceneName } from '/src/data/assets'
+import * as ENV from '/src/utils/env'
+import * as TWEEN from '@tweenjs/tween.js'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppGame from '/src/components/AppGame'
@@ -34,22 +35,58 @@ import { helloPistols } from '@underware_gg/pistols-sdk'
 import Duel from '../components/scenes/Duel'
 
 helloPistols();
-
-export default function MainPage() {
-  // let's initialize player id always
-  // (random client identifier, useful for off-chain tracking)
-  const { playerId } = usePlayerId()
-
+export default function MainPage({
+  tutorial = false,
+}) {
   // this hook will parse slugs and manage the current scene
   usePistolsSceneFromRoute()
   useSetPageTitle()
 
-  const overlay = useMemo(() => <div id="game-black-overlay" className='NoMouse NoDrag' style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'black', opacity: 1, pointerEvents: 'none', zIndex: 981 }}></div>, [])
+  const { gameImpl } = useThreeJsContext()
 
+  const [showTutorial, setShowTutorial] = useState(tutorial)
+  const overlayRef = useRef<HTMLDivElement>(null)
+
+  const overlay = useMemo(() => (
+    <div 
+      ref={overlayRef}
+      id="game-black-overlay" 
+      className='NoMouse NoDrag' 
+      style={{ 
+        position: 'absolute', 
+        top: 0, 
+        left: 0, 
+        width: '100%', 
+        height: '100%', 
+        backgroundColor: 'black', 
+        opacity: 1, 
+        pointerEvents: 'none', 
+        zIndex: 981 
+      }}
+    />
+  ), [])
+
+  useEffect(() => {
+    if (tutorial !== showTutorial) {
+      // Fade to black
+      new TWEEN.Tween({ opacity: 0 })
+        .to({ opacity: 1 }, SCENE_CHANGE_ANIMATION_DURATION)
+        .onUpdate(({opacity}) => {
+          if (overlayRef.current) {
+            overlayRef.current.style.opacity = opacity.toString()
+          }
+        })
+        .onComplete(() => {
+          setShowTutorial(tutorial)
+        })
+        .start()
+    }
+  }, [tutorial])
+  
   useEffectOnce(() => console.log(`---------------- MAIN PAGE MOUNTED`), [])
 
   return (
-    <AppGame backgroundImage={null}>
+    <AppGame backgroundImage={null} networkId={showTutorial ? ENV.ACADEMY_NETWORK_ID : undefined} autoConnect={showTutorial}>
       <Background className={null}>
         <StoreSync />
         <GameContainer isVisible={true} />
@@ -62,8 +99,10 @@ export default function MainPage() {
         <MouseToolTip />
       </Background>
     </AppGame>
-  )
+  );
 }
+
+
 
 function MainUI() {
   // sync game context with url params
@@ -81,8 +120,8 @@ function MainUI() {
     const timer = setTimeout(() => {
       if (atGate) setCurrentScene(<Gate />);
       else if (atDoor) setCurrentScene(<Door />);
-      else if (atTutorial) setCurrentScene(<TutorialUI />);
       else if (atDuel && currentDuel > 0n) setCurrentScene(<Duel duelId={currentDuel} tutorial={tutorialLevel} />);
+      else if (atTutorial) setCurrentScene(<TutorialUI />);
       else if (atProfile) setCurrentScene(<ScProfile />);
       else if (atDuelsBoard) setCurrentScene(<ScDuelsBoard />);
       else if (atDuelists) setCurrentScene(<ScDuelists />);
@@ -95,7 +134,7 @@ function MainUI() {
 
   if (!gameImpl) return <></>
 
-  return currentScene || <DojoStatus message={'Loading Pistols...'} />;
+  return currentScene || <DojoStatus message={'Loading Scene...'} />;
 }
 
 function TutorialUI({

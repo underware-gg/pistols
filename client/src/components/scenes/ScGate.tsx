@@ -5,9 +5,15 @@ import { useGameEvent } from '/src/hooks/useGameEvent'
 import { TavernAudios } from '/src/components/GameContainer'
 import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
 import Logo from '/src/components/Logo'
+import { useAccount } from '@starknet-react/core'
+import { useDisconnect } from '@starknet-react/core'
+
 export default function ScGate() {
   const { tableOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
+
+  const { isConnected } = useAccount()
+  const { disconnect } = useDisconnect()
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
   
@@ -26,6 +32,12 @@ export default function ScGate() {
       }
     }
   }, [itemClicked, timestamp])
+
+  useEffect(() => {
+    if (isConnected) {
+      disconnect()
+    }
+  }, [isConnected, disconnect])
 
   return (
     <>

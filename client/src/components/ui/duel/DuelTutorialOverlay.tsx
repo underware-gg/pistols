@@ -76,7 +76,7 @@ export default function DuelTutorialOverlay({ tutorialType, opener, onComplete }
     <Modal
       open={opener.isOpen}
       onClose={_close}
-      className="modal"
+      className={`modal NoDrag ${opener.isOpen ? 'YesMouse' : 'NoMouse'}`}
       closeOnDimmerClick={false}
       closeOnDocumentClick={false}
     >

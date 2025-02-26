@@ -14,6 +14,7 @@ enum SceneName {
   TutorialScene3 = 'TutorialScene3',
   TutorialScene4 = 'TutorialScene4',
   TutorialScene5 = 'TutorialScene5',
+  TutorialDuel = 'TutorialDuel',
 }
 
 
@@ -226,7 +227,8 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { name: 'demon_left', color: '00ff00', description: 'Drink, forget this happened', mask: TextureName.bg_demon_left_hand_mask, renderOrder: 1 },
     ]
   },
-  [SceneName.TutorialScene5]: { backgrounds: [{ texture: TextureName.bg_tutorial_5, shiftMultiplier: 0, renderOrder: 0 }] }
+  [SceneName.TutorialScene5]: { backgrounds: [{ texture: TextureName.bg_tutorial_5, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.TutorialDuel]: { backgrounds: [{ texture: TextureName.bg_duel, shiftMultiplier: 0, renderOrder: 0 }] },
 }
 
 enum CharacterType {

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { _currentScene } from '/src/three/game'
+import { _currentScene, SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
 import { SceneName, TextureName } from '/src/data/assets'
 import { ANIMATION_TIME_PER_LETTER, DELAY_BETWEEN_TEXTS, DELAY_BETWEEN_SPEECH, TUTORIAL_SCENE_DATA, TutorialScene, TutorialText, DuelTutorialLevel } from '/src/data/tutorialConstants'
@@ -142,7 +142,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
     setDisplayText(undefined)
     setCurrentSceneData(TUTORIAL_SCENE_DATA[currentTutorialScene])
 
-    setTimeout(() => setCurrentTextIndex(0), 500)
+    setTimeout(() => setCurrentTextIndex(0), SCENE_CHANGE_ANIMATION_DURATION * 1.5)
   }
 
   function handleTextDisplay() {
@@ -171,11 +171,11 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         break
       case SceneName.TutorialScene2:
         dispatchSetTutorialLevel(DuelTutorialLevel.SIMPLE)
-        dispatchSetScene(SceneName.Duel, { duelId: duelIdSimple })
+        dispatchSetScene(SceneName.TutorialDuel, { duelId: duelIdSimple })
         break
       case SceneName.TutorialScene3:
         dispatchSetTutorialLevel(DuelTutorialLevel.FULL)
-        dispatchSetScene(SceneName.Duel, { duelId: duelIdFull })
+        dispatchSetScene(SceneName.TutorialDuel, { duelId: duelIdFull })
         break
       case SceneName.TutorialScene5:
         if (canClaimWelcomePack) {
