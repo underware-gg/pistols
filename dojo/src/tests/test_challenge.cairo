@@ -30,6 +30,13 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected:('DUEL: Invalid table', 'ENTRYPOINT_FAILED'))]
+    fn test_invalid_table() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, 'abcd', 0, 1);
+    }
+
+    #[test]
     #[should_panic(expected:('DUEL: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_not_your_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);

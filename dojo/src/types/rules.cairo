@@ -179,7 +179,11 @@ pub impl RulesTypeDebug of core::fmt::Debug<RulesType> {
 //
 #[cfg(test)]
 mod unit {
-    use super::{RulesType, RulesTypeTrait, SeasonDistribution};
+    use super::{
+        RulesType, RulesTypeTrait,
+        SeasonDistribution, RewardValues,
+    };
+    use pistols::utils::misc::{WEI};
 
     #[test]
     fn test_season_distribution() {
@@ -201,5 +205,42 @@ mod unit {
             assert_eq!(sum, 100, "win[{}] sum", recipient_count);
             recipient_count -= 1;
         };
+    }
+
+    #[test]
+    fn test_calc_rewards() {
+        let winner_1_1: RewardValues = RulesType::Season.calc_rewards(WEI(3_000).low, 1, true);
+        let winner_2_1: RewardValues = RulesType::Season.calc_rewards(WEI(5_000).low, 1, true);
+        let winner_1_2: RewardValues = RulesType::Season.calc_rewards(WEI(3_000).low, 2, true);
+        let winner_2_2: RewardValues = RulesType::Season.calc_rewards(WEI(5_000).low, 2, true);
+        let loser_1_1: RewardValues = RulesType::Season.calc_rewards(WEI(3_000).low, 1, false);
+        // greater balances win less FAME
+        assert_gt!(winner_1_1.fame_gained, winner_2_1.fame_gained, "balance_fame_gained");
+        assert_gt!(winner_1_2.fame_gained, winner_2_2.fame_gained, "balance_fame_gained");
+        // greater balances win more FOOLS
+        assert_lt!(winner_1_1.fools_gained, winner_2_1.fools_gained, "balance_fools_gained");
+        assert_lt!(winner_1_2.fools_gained, winner_2_2.fools_gained, "balance_fools_gained");
+        // always same points
+        assert_eq!(winner_1_1.points_scored, winner_2_1.points_scored, "balance_points_scored");
+        assert_eq!(winner_1_2.points_scored, winner_2_2.points_scored, "balance_points_scored");
+        assert_eq!(winner_1_2.points_scored, winner_1_1.points_scored, "lives_points_scored_1");
+        assert_eq!(winner_2_2.points_scored, winner_2_1.points_scored, "lives_points_scored_2");
+        // lost fame always zero
+        assert_eq!(winner_1_1.fame_lost, 0, "lives_fame_lost_1");
+        assert_eq!(winner_2_1.fame_lost, 0, "lives_fame_lost_2");
+        assert_eq!(winner_1_2.fame_lost, 0, "lives_fame_lost_1");
+        assert_eq!(winner_2_2.fame_lost, 0, "lives_fame_lost_2");
+        // more lives gets everything higher
+        assert_gt!(winner_1_2.fame_gained, winner_1_1.fame_gained, "lives_fame_gained_1");
+        assert_gt!(winner_1_2.fools_gained, winner_1_1.fools_gained, "lives_fools_gained_1");
+        assert_gt!(winner_2_2.fame_gained, winner_2_1.fame_gained, "lives_fame_gained_2");
+        assert_gt!(winner_2_2.fools_gained, winner_2_1.fools_gained, "lives_fools_gained_2");
+        // losers
+        assert_eq!(loser_1_1.fame_gained, 0, "loser_1_1.fame_gained");
+        assert_eq!(loser_1_1.fools_gained, 0, "loser_1_1.fools_gained");
+        assert_gt!(loser_1_1.fame_lost, 0, "loser_1_1.fame_lost");
+        // les points
+        assert_gt!(loser_1_1.points_scored, 0, "loser_1_1.points_scored");
+        assert_lt!(loser_1_1.points_scored, winner_1_1.points_scored, "loser_1_1.points_scored");
     }
 }

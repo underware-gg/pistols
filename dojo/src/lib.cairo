@@ -116,6 +116,7 @@ mod tests {
         pub mod test_duelist_token;
         pub mod test_pack_token;
         pub mod test_fame_coin;
+        pub mod test_fools_coin;
         // mocks
         pub mod mock_duelist;
     }

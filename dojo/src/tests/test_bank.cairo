@@ -21,8 +21,8 @@ mod tests {
             IPackTokenDispatcherTrait,
             IDuelistTokenDispatcherTrait,
             IFameCoinDispatcherTrait,
-            // IBankDispatcherTrait,
-            ID, OWNER, OTHER, BUMMER, RECIPIENT, TREASURY,
+            IBankDispatcherTrait,
+            ID, OWNER, OWNER2, OTHER, OTHER2, BUMMER, RECIPIENT, TREASURY,
             SEASON_1_TABLE,
             FAUCET_AMOUNT, ETH, WEI,
         }
@@ -151,7 +151,7 @@ mod tests {
         assert_eq!(pool_flame.balance_fame, 0, "RESOLVED_pool_flame.balance_fame");
     }
 
-    fn _test_bank_draw(sys: @TestSystems, address_a: ContractAddress, address_b: ContractAddress, lives: u8) {
+    fn _test_bank_draw(sys: @TestSystems, address_a: ContractAddress, address_b: ContractAddress, lives: u8, flames_up: bool) {
         let (salts, moves_a, moves_b): (SaltsValues, PlayerMoves, PlayerMoves) = prefabs::get_moves_dual_crit();
         (*sys.rng).set_mocked_values(salts.salts, salts.values);
 
@@ -222,11 +222,13 @@ mod tests {
         tester::assert_balance_down((*sys.store).get_pool(PoolType::FamePeg).balance_lords, pool_peg.balance_lords, format!("DEATH_pool_peg.balance_lords [{}]", duel_id));
         // PoolType::Season() up
         tester::assert_balance_up((*sys.store).get_pool(PoolType::Season(table_id)).balance_fame, pool_season.balance_fame, format!("DEATH_pool_season.balance_fame [{}]", duel_id));
-        // PoolType::SacredFlame up
-        tester::assert_balance_up((*sys.store).get_pool(PoolType::SacredFlame).balance_fame, pool_flame.balance_fame, format!("DEATH_pool_flame.balance_fame [{}]", duel_id));
+        if (flames_up) {
+            // PoolType::SacredFlame up
+            tester::assert_balance_up((*sys.store).get_pool(PoolType::SacredFlame).balance_fame, pool_flame.balance_fame, format!("DEATH_pool_flame.balance_fame [{}]", duel_id));
+        }
     }
 
-    fn _test_season_collect(sys: @TestSystems, order: Span<u128>, dead_duelist: u128) {
+    fn _test_season_collect(sys: @TestSystems, order: Span<u128>, flames_up: bool) {
         // get rid of FAUCET_AMOUNT to start with balance zero
         tester::impersonate(OWNER());
         (*sys.lords).transfer(RECIPIENT(), FAUCET_AMOUNT.into());
@@ -306,20 +308,18 @@ mod tests {
         assert_eq!(pool_season.balance_fame, 0, "COLLECTED_pool_season.balance_fame AFTER = 0");
 
         // PoolType::SacredFlame increased if DEAD
-        let has_deads: bool = (order.len() > 2);
+        // let has_deads: bool = (order.len() > 2);
         let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
         assert_eq!(pool_flame.balance_lords, 0, "COLLECTED_pool_flame.balance_lords = 0");
-        if (has_deads) {
+        if (flames_up) { // everyone dies with ZERO fame
             assert_ne!(pool_flame.balance_fame, 0, "COLLECTED_pool_flame.balance_fame_DEADS > 0");
         } else {
             assert_eq!(pool_flame.balance_fame, 0, "COLLECTED_pool_flame.balance_fame_ALIVES = 0");
         }
-
     }
 
-
     #[test]
-    fn test_bank_resolved_draw() {
+    fn test_bank_resolved_draw_alive() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         tester::fund_duelists_pool(@sys, 2);
         tester::execute_claim_starter_pack(@sys.pack, OWNER());
@@ -327,9 +327,50 @@ mod tests {
         _test_bank_resolved(@sys, OWNER(), OTHER(), 0);
         let order: Span<u128> = [
             ID(OWNER()), // fame 3000 - 1000 = 2000 / score 10
-            ID(OTHER()), // fame 2000 - 1000 = 2000 / score 10
+            ID(OTHER()), // fame 3000 - 1000 = 2000 / score 10
         ].span();
-        _test_season_collect(@sys, order, 0);
+        _test_season_collect(@sys, order, false);
+    }
+
+    #[test]
+    fn test_bank_resolved_draw_dead() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+// tester::print_pools(@sys, 1, "INIT");
+        tester::fund_duelists_pool(@sys, 2);
+// tester::print_pools(@sys, 1, "FUNDED");
+        tester::execute_claim_starter_pack(@sys.pack, OWNER());
+        tester::execute_claim_starter_pack(@sys.pack, OTHER());
+// tester::print_pools(@sys, 1, "CLAIMED");
+        _test_bank_draw(@sys, OWNER(), OTHER(), 3, false);
+// tester::print_pools(@sys, 1, "DRAW_1");
+        // transfer remaining duelists
+        tester::execute_transfer_duelist(@sys.duelists, OWNER(), OWNER2(), ID(OWNER2()));
+        tester::execute_transfer_duelist(@sys.duelists, OTHER(), OTHER2(), ID(OTHER2()));
+        _test_bank_draw(@sys, OWNER2(), OTHER2(), 3, false);
+// tester::print_pools(@sys, 1, "DRAW_2");
+        let order: Span<u128> = [
+            ID(OWNER()), // fame 3000 - 3000 = 0 / score 10
+            ID(OTHER()), // fame 3000 - 3000 = 0 / score 10
+            ID(OWNER2()), // fame 3000 - 3000 = 0 / score 10
+            ID(OTHER2()), // fame 3000 - 3000 = 0 / score 10
+        ].span();
+        _test_season_collect(@sys, order, false);
+tester::print_pools(@sys, 1, "COLLECTED");
+        // players have LORDS
+        assert_gt!(sys.lords.balance_of(TREASURY()), 0, "TREASURY LORDS");
+        assert_gt!(sys.lords.balance_of(OWNER()), 0, "OWNER LORDS");
+        assert_gt!(sys.lords.balance_of(OTHER()), 0, "OTHER LORDS");
+        assert_gt!(sys.lords.balance_of(OWNER2()), 0, "OWNER2 LORDS");
+        assert_gt!(sys.lords.balance_of(OTHER2()), 0, "OTHER2 LORDS");
+        // Bank is zeroed
+        assert_eq!(sys.lords.balance_of(sys.bank.contract_address), 0, "BANK LORDS");
+        assert_eq!(sys.fame.balance_of(sys.bank.contract_address), 0, "BANK FAME");
+        let pool_peg: Pool = sys.store.get_pool(PoolType::FamePeg);
+        assert_eq!(pool_peg.balance_lords, 0, "PEGGED LORDS");
+        assert_eq!(pool_peg.balance_fame, 0, "PEGGED FAME");
+        let pool_season: Pool = sys.store.get_pool(PoolType::Season(SEASON_1_TABLE()));
+        assert_eq!(pool_season.balance_lords, 0, "SEASON_1_TABLE LORDS");
+        assert_eq!(pool_season.balance_fame, 0, "SEASON_1_TABLE FAME");
     }
 
     #[test]
@@ -340,13 +381,13 @@ mod tests {
         tester::execute_claim_starter_pack(@sys.pack, OTHER());
         tester::execute_claim_starter_pack(@sys.pack, BUMMER());
         _test_bank_resolved(@sys, OWNER(), OTHER(), 1);
-        _test_bank_draw(@sys, OWNER(), BUMMER(), 3);
+        _test_bank_draw(@sys, OWNER(), BUMMER(), 3, true);
         let order: Span<u128> = [
             ID(OWNER()), // fame 3000 + 250 - 3000 = 250 (DEAD) / score 100 + 10 = 110
             ID(OTHER()), // fame 3000 - 1000 = 2000 / score 10
             ID(BUMMER()), // fame 3000 - 3000 - 0 (DEAD) / score 10
         ].span();
-        _test_season_collect(@sys, order, ID(OWNER()));
+        _test_season_collect(@sys, order, true);
     }
 
     #[test]
@@ -357,13 +398,13 @@ mod tests {
         tester::execute_claim_starter_pack(@sys.pack, OTHER());
         tester::execute_claim_starter_pack(@sys.pack, BUMMER());
         _test_bank_resolved(@sys, OWNER(), OTHER(), 2);
-        _test_bank_draw(@sys, OTHER(), BUMMER(), 3);
+        _test_bank_draw(@sys, OTHER(), BUMMER(), 3, true);
         let order: Span<u128> = [
             ID(OTHER()), // fame 3000 + 250 - 3000 = 250 (DEAD) / score 100 + 10 = 110
             ID(OWNER()), // fame 3000 - 1000 = 2000 / score 10
             ID(BUMMER()), // fame 3000 - 3000 - 0 (DEAD) / score 10
             ].span();
-        _test_season_collect(@sys, order, ID(OTHER()));
+        _test_season_collect(@sys, order, true);
     }
 
 
@@ -420,5 +461,138 @@ mod tests {
         assert_eq!(pool_bank, 0, "pool_bank END");
         assert_eq!(pool_peg, (price_starter + price_pack), "pool_peg END");
     }
+
+
+    //-----------------------------------------
+    // sponsoring
+    //
+    #[test]
+    fn test_sponsor_duelists() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
+
+        // initial balances
+        let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
+        let pool_type: PoolType = PoolType::Purchases;
+        let pool: Pool = sys.store.get_pool(pool_type);
+        assert_eq!(balance_bank, 0, "balance_bank INIT");
+        assert_eq!(pool.balance_lords, 0, "pool INIT lords");
+        assert_eq!(pool.balance_fame, 0, "pool INIT fame");
+
+        // sponsor...
+        let amount: u128 = 1_000;
+        tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, amount);
+        sys.bank.sponsor_duelists(OWNER(), amount);
+
+        // balances
+        let pool_sponsored: Pool = sys.store.get_pool(pool_type);
+        tester::assert_balance(sys.lords.balance_of(sys.bank.contract_address).low, balance_bank, 0, amount, "balance_bank AFTER");
+        tester::assert_balance(pool_sponsored.balance_lords, pool.balance_lords, 0, amount, "pool.balance_lords AFTER");
+        tester::assert_balance_equal(pool_sponsored.balance_fame, pool.balance_fame, "pool.balance_fame AFTER");
+    }
+    #[test]
+    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    fn test_sponsor_duelists_zero_allowance() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
+        let amount: u128 = 1_000;
+        sys.bank.sponsor_duelists(OWNER(), amount);
+    }
+    #[test]
+    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    fn test_sponsor_duelists_insufficient_allowance() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
+        let amount: u128 = 1_000;
+        tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, amount);
+        sys.bank.sponsor_duelists(OWNER(), amount + 1);
+    }
+
+    #[test]
+    fn test_sponsor_season() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
+
+        // initial balances
+        let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
+        let pool_type: PoolType = PoolType::Season(SEASON_1_TABLE());
+        let pool: Pool = sys.store.get_pool(pool_type);
+        assert_eq!(balance_bank, 0, "balance_bank INIT");
+        assert_eq!(pool.balance_lords, 0, "pool INIT lords");
+        assert_eq!(pool.balance_fame, 0, "pool INIT fame");
+
+        // sponsor...
+        let amount: u128 = 1_000;
+        tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, amount);
+        sys.bank.sponsor_season(OWNER(), amount);
+
+        // balances
+        let pool_sponsored: Pool = sys.store.get_pool(pool_type);
+        tester::assert_balance(sys.lords.balance_of(sys.bank.contract_address).low, balance_bank, 0, amount, "balance_bank AFTER");
+        tester::assert_balance(pool_sponsored.balance_lords, pool.balance_lords, 0, amount, "pool.balance_lords AFTER");
+        tester::assert_balance_equal(pool_sponsored.balance_fame, pool.balance_fame, "pool.balance_fame AFTER");
+    }
+    #[test]
+    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    fn test_sponsor_season_zero_allowance() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
+        let amount: u128 = 1_000;
+        sys.bank.sponsor_season(OWNER(), amount);
+    }
+    #[test]
+    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    fn test_sponsor_season_insufficient_allowance() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
+        let amount: u128 = 1_000;
+        tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, amount);
+        sys.bank.sponsor_season(OWNER(), amount + 1);
+    }
+
+    #[test]
+    #[ignore]
+    fn test_sponsor_tournament() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
+
+        // initial balances
+        let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
+        let pool_type: PoolType = PoolType::Tournament(SEASON_1_TABLE());
+        let pool: Pool = sys.store.get_pool(pool_type);
+        assert_eq!(balance_bank, 0, "balance_bank INIT");
+        assert_eq!(pool.balance_lords, 0, "pool INIT lords");
+        assert_eq!(pool.balance_fame, 0, "pool INIT fame");
+
+        // sponsor...
+        let amount: u128 = 1_000;
+        let tournament_id: felt252 = 'tournament_id';
+        tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, amount);
+        sys.bank.sponsor_tournament(OWNER(), amount, tournament_id);
+
+        // balances
+        let pool_sponsored: Pool = sys.store.get_pool(pool_type);
+        tester::assert_balance(sys.lords.balance_of(sys.bank.contract_address).low, balance_bank, 0, amount, "balance_bank AFTER");
+        tester::assert_balance(pool_sponsored.balance_lords, pool.balance_lords, 0, amount, "pool.balance_lords AFTER");
+        tester::assert_balance_equal(pool_sponsored.balance_fame, pool.balance_fame, "pool.balance_fame AFTER");
+    }
+    #[test]
+    #[ignore]
+    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    fn test_sponsor_tournament_zero_allowance() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
+        let amount: u128 = 1_000;
+        let tournament_id: felt252 = 'tournament_id';
+        sys.bank.sponsor_tournament(OWNER(), amount, tournament_id);
+    }
+    #[test]
+    #[ignore]
+    #[should_panic(expected:('BANK: insufficient allowance', 'ENTRYPOINT_FAILED'))]
+    fn test_sponsor_tournament_insufficient_allowance() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
+        let amount: u128 = 1_000;
+        let tournament_id: felt252 = 'tournament_id';
+        tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, amount);
+        sys.bank.sponsor_tournament(OWNER(), amount + 1, tournament_id);
+    }
+
+
+
+    // fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128);
+    // fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128);
+    // fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: felt252);
 
 }

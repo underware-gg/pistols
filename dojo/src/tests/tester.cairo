@@ -98,7 +98,9 @@ pub mod tester {
 
     pub fn ZERO()      -> ContractAddress { starknet::contract_address_const::<0x0>() }
     pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // duelists 1-2
+    pub fn OWNER2()    -> ContractAddress { starknet::contract_address_const::<0x2>() } // duelists 1-2
     pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x3>() } // duelists 3-4
+    pub fn OTHER2()    -> ContractAddress { starknet::contract_address_const::<0x4>() } // duelists 3-4
     pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x5>() } // duelists 5-6
     pub fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x222>() }
     pub fn SPENDER()   -> ContractAddress { starknet::contract_address_const::<0x333>() }
@@ -546,6 +548,16 @@ pub mod tester {
         (token_ids)
     }
 
+    // ::duelist_token
+    pub fn execute_transfer_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress,
+        to: ContractAddress,
+        token_id: u128,
+    ) {
+        impersonate(sender);
+        (*system).transfer_from(sender, to, token_id.into());
+        _next_block();
+    }
+
     // ::duel_token
     pub fn execute_create_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
@@ -834,4 +846,20 @@ pub mod tester {
         );
     }
 
+    pub fn print_pools(sys: @TestSystems, season_id: u16, prefix: ByteArray) {
+        let mut fame_balance_bank: u128 = (*sys.fame).balance_of(*sys.bank.contract_address).low;
+        let mut lords_balance_bank: u128 = (*sys.lords).balance_of(*sys.bank.contract_address).low;
+        let mut lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
+        let pool_purchases: Pool = (*sys.store).get_pool(PoolType::Purchases);
+        let pool_peg: Pool = (*sys.store).get_pool(PoolType::FamePeg);
+        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_TABLE(season_id)));
+        let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
+        println!(">>>>>>>>>>>>>>>>>> {}",  prefix);
+        println!("BANK_______________LORDS:{} FAME:{}", ETH(lords_balance_bank), ETH(fame_balance_bank));
+        println!("TREASURY___________LORDS:{}", ETH(lords_balance_treasury));
+        println!("Pool::Purchases____LORDS:{} FAME:{}", ETH(pool_purchases.balance_lords), ETH(pool_purchases.balance_fame));
+        println!("Pool::FamePeg______LORDS:{} FAME:{}", ETH(pool_peg.balance_lords), ETH(pool_peg.balance_fame));
+        println!("Pool::Season_______LORDS:{} FAME:{}", ETH(pool_season.balance_lords), ETH(pool_season.balance_fame));
+        println!("Pool::SacredFlame__LORDS:{} FAME:{}", ETH(pool_flame.balance_lords), ETH(pool_flame.balance_fame));
+    }
 }
