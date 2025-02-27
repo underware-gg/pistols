@@ -9,6 +9,8 @@ import { SceneName } from '/src/data/assets'
 import { useTableId } from '../stores/configStore'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '../three/game'
 
+import { emitter } from '../three/game'
+
 //
 // React + Typescript + Context
 // https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/context
@@ -462,6 +464,11 @@ export const useSyncRouterParams = () => {
   // URL params (/path?param=value)
   // https://api.reactrouter.com/v7/functions/react_router.useSearchParams.html
   const [searchParams, setSearchParams] = useSearchParams()
+
+  // Log if there are any search params
+  useEffect(() => {
+    emitter.emit('searchParams', searchParams.toString().length > 0)
+  }, [searchParams])
 
   //--------------------------------------------
   // URL Params > Game Context

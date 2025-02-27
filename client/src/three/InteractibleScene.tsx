@@ -52,6 +52,14 @@ export class InteractibleScene extends THREE.Scene {
     this.camera = camera
 
     this.setSceneData(sceneName)
+
+    emitter.on('searchParams', (data) => {
+      if (data) {
+        this.setClickable(false)
+      } else {
+        this.setClickable(true)
+      }
+    })
   }
 
   public setSceneData(sceneName: string) {

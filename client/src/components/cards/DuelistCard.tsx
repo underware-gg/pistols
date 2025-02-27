@@ -533,7 +533,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                   props.duelistId ?
                     <>
                       <div className="duelist-name" data-contentlength={_nameLength(name)}>{name}</div>
-                      <div className="duelist-name Smaller" data-contentlength={12}>Duelist #{bigintToDecimal(props.duelistId)} </div>
+                      {/* <div className="duelist-name Smaller" data-contentlength={12}>Duelist #{bigintToDecimal(props.duelistId)} </div> */}
                       <div className="duelist-name Smaller" data-contentlength={_nameLength(playerName)}>{playerName}</div>
                     </>
                     : <div className="duelist-name" data-contentlength={_nameLength(playerName)}>{playerName}</div>

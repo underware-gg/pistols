@@ -1,0 +1,107 @@
+@import 'aspect';
+@import 'color';
+
+.WantedPoster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/images/ui/duel_paper.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: aspect-width(40);
+  height: aspect-height(90);
+  max-width: aspect-width(40);
+  max-height: aspect-height(90);
+  margin: auto; 
+}
+
+.WantedText {
+  font-size: aspect-width(3.4);
+  letter-spacing: aspect-width(2);
+  text-transform: uppercase;
+  text-align: center;
+  color: $color-darkest;
+  font-weight: 900;
+  margin-top: aspect-width(1.8);
+  margin-left: aspect-width(2);
+}
+
+.ProfileSection {
+  margin-top: aspect-width(0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ProfilePicWanted {
+  max-width: aspect-width(22)!important; // avoids not taking space in flex
+  max-height: aspect-width(22)!important;
+  width: aspect-width(22);
+  height: aspect-width(22);
+  border: aspect-width(0.2) solid $color-darkest;
+  border-radius: 0;
+}
+
+.PlayerName {
+  font-size: aspect-width(2.4);
+  font-weight: bold;
+  color: $color-darkest;
+  margin-top: aspect-width(0.8);
+}
+
+.PlayerAddress {
+  margin-top: aspect-width(0.4);
+  color: $color-dark;
+}
+
+.DuelistsSection {
+  width: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-top: aspect-width(1);
+  margin-left: 5%;
+}
+
+.NavButton {
+  background: none;
+  border: none;
+  font-size: aspect-width(2);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  transition: transform 0.2s ease-in-out;
+}
+
+.NavButton:hover {
+  transform: scale(1.2);
+}
+
+.NavButton:focus {
+  outline: none;
+}
+
+.NavButton:focus-visible {
+  outline: none;
+}
+
+.WantedDivider {
+  width: 80%;
+  height: aspect-height(0.1);
+  margin: 0 10%;
+  margin-top: aspect-width(1);
+  color: $color-darkest;
+  font-size: aspect-width(1);
+}
+
+.ButtonSection {
+  width: 90%;
+}

@@ -140,8 +140,10 @@ export default function CommitPacesModal({
         alignContent: 'space'
       }}
       onClose={() => {
-        emitter.emit('hover_description', null)
         setIsOpen(false)
+        setTimeout(() => {
+          emitter.emit('hover_description', null)
+        }, 100)
       }}
       open={isOpen}
     >

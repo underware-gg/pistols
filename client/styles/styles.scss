@@ -1931,6 +1931,9 @@ td {
 .ui.modal {
   @extend ._round_border_inactive;
 }
+.ui.basic.modal {
+  border: 0 !important;
+}
 .ui.modal>.header {
   @extend .Title;
   font-family: $font-family;
@@ -2029,6 +2032,37 @@ a.active.step:hover,
   border-top: 1px solid rgba($color-brightest, .15);
   border-bottom: 1px solid rgba($color-brightest, .25);
 }
+
+.TextDivider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.TextDivider::before,
+.TextDivider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid rgba(black, 0.6) !important;
+  border-bottom: 1px solid rgba(black, 0.6) !important;
+  vertical-align: middle;
+}
+
+.TextDivider::before {
+  margin-right: aspect-width(1);
+}
+
+.TextDivider::after {
+  margin-left: aspect-width(1);
+}
+
+.TextDivider:empty::before,
+.TextDivider:empty::after {
+  margin: 0;
+}
+
 // <Popup>
 .ui.popup,
 .ui.label {
