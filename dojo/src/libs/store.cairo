@@ -23,6 +23,7 @@ pub use pistols::models::{
     challenge::{
         Challenge, ChallengeValue,
         Round, RoundValue,
+        ChallengeRewards,
     },
     duelist::{
         Duelist, DuelistValue,
@@ -43,6 +44,9 @@ pub use pistols::models::{
     season::{
         SeasonConfig, SeasonConfigValue,
     },
+};
+use pistols::types::{
+    rules::{RewardValues},
 };
 pub use pistols::systems::components::{
     token_bound::{
@@ -362,6 +366,15 @@ pub impl StoreImpl of StoreTrait {
         self.world.emit_event(@PlayerRequiredAction{
             duelist_id,
             duel_id,
+        });
+    }
+
+    #[inline(always)]
+    fn emit_challenge_rewards(ref self: Store, duel_id: u128, duelist_id: u128, rewards: RewardValues) {
+        self.world.emit_event(@ChallengeRewards{
+            duel_id,
+            duelist_id,
+            rewards,
         });
     }
 }

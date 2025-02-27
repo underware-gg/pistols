@@ -44,6 +44,7 @@ pub mod tester {
             m_Challenge, Challenge, ChallengeValue,
             m_Round, RoundValue,
             DuelistState,
+            e_ChallengeRewards,
         },
         duelist::{
             m_Duelist, Duelist, DuelistValue,
@@ -264,6 +265,7 @@ pub mod tester {
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
             TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
             TestResource::Event(e_PlayerRequiredAction::TEST_CLASS_HASH),
+            TestResource::Event(e_ChallengeRewards::TEST_CLASS_HASH),
         ];
         if (deploy_rng_mock) {
             resources.append(TestResource::Model(m_MockedValue::TEST_CLASS_HASH));

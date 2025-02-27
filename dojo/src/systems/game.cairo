@@ -329,6 +329,8 @@ pub mod game {
             } else {
                 Activity::ChallengeDraw.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
             }
+            store.emit_challenge_rewards(duel_id, challenge.duelist_id_a, rewards_a);
+            store.emit_challenge_rewards(duel_id, challenge.duelist_id_b, rewards_b);
         }
 
         fn collect_season(ref self: ContractState) -> felt252 {
