@@ -17,7 +17,7 @@ pub trait IDuelistToken<TState> {
     fn owner_of(self: @TState, token_id: u256) -> ContractAddress;
     // Token
     fn exists(self: @TState, token_id: u128) -> bool;
-    fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
+    fn is_owner_of(self: @TState, address: ContractAddress, token_id: u256) -> bool;
     // Duelist
     fn is_alive(self: @TState, token_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
@@ -82,7 +82,7 @@ pub mod duelist_token {
         fn exists(self: @ContractState, token_id: u128) -> bool {
             (self.owner_of(token_id.into()).is_non_zero())
         }
-        fn is_owner_of(self: @ContractState, address: ContractAddress, token_id: u128) -> bool {
+        fn is_owner_of(self: @ContractState, address: ContractAddress, token_id: u256) -> bool {
             (self.owner_of(token_id.into()) == address)
         }
         fn is_alive(self: @ContractState, token_id: u128) -> bool {

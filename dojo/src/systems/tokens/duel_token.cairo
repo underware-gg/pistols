@@ -42,11 +42,11 @@ pub trait IDuelToken<TState> {
     fn total_supply(self: @TState) -> u256;
     fn last_token_id(self: @TState) -> u256;
     fn is_minting_paused(self: @TState) -> bool;
+    fn is_owner_of(self: @TState, address: ContractAddress, token_id: u256) -> bool;
+    fn exists(self: @TState, token_id: u256) -> bool;
     // (CamelOnly)
     fn maxSupply(self: @TState) -> u256;
     fn totalSupply(self: @TState) -> u256;
-    fn lastTokenId(self: @TState) -> u256;
-    fn isMintingPaused(self: @TState) -> bool;
     //-----------------------------------
     // IERC7572ContractMetadata
     fn contract_uri(self: @TState) -> ByteArray;
@@ -68,8 +68,6 @@ pub trait IDuelToken<TState> {
 
     // ITokenComponentPublic
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
-    fn exists(self: @TState, token_id: u128) -> bool;
-    fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
     fn minted_count(self: @TState) -> u128;
 
     // IDuelTokenPublic
@@ -292,7 +290,7 @@ pub mod duel_token {
             let address_a: ContractAddress = starknet::get_caller_address();
             let duelist_id_a: u128 = duelist_id;
             let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-            assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a) == true, Errors::NOT_YOUR_DUELIST);
+            assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a.into()) == true, Errors::NOT_YOUR_DUELIST);
 
             // validate duelist health
 // println!("poke A... {}", duelist_id_a);
@@ -398,7 +396,7 @@ pub mod duel_token {
             } else {
                 // validate duelist ownership
                 let duelist_dispatcher = store.world.duelist_token_dispatcher();
-                assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b) == true, Errors::NOT_YOUR_DUELIST);
+                assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b.into()) == true, Errors::NOT_YOUR_DUELIST);
 
                 // validate duelist health
 // println!("poke B... {}", duelist_id_b);
@@ -455,7 +453,7 @@ pub mod duel_token {
         // fn delete_duel(ref self: ContractState,
         //     duel_id: u128,
         // ) {
-        //     self.token.assert_is_owner_of(starknet::get_caller_address(), duel_id.into());
+        //     self.erc721_combo._require_owner_of(starknet::get_caller_address(), duel_id.into());
         //     assert(false, Errors::NOT_IMPLEMENTED);
         //     self.token.burn(duel_id.into());
         // }

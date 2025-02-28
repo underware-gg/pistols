@@ -242,7 +242,7 @@ pub mod tester {
         deploy_bank     = deploy_bank || deploy_fame || deploy_lords || deploy_duelist;
         deploy_vrf      = deploy_vrf || deploy_game || deploy_pack;
         
-// '---- 0'.print();
+// println!("---- 0");
         let mut resources: Array<TestResource> = array![
             // pistols models
             TestResource::Model(m_Player::TEST_CLASS_HASH),
@@ -327,7 +327,7 @@ pub mod tester {
             );
         }
 
-        // '---- 3'.print();
+        // println!("---- 3");
         if (deploy_duelist) {
             resources.append(TestResource::Contract(duelist_token::TEST_CLASS_HASH));
             contract_defs.append(
@@ -416,24 +416,24 @@ pub mod tester {
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
 
-// '---- 1'.print();
+// println!("---- 1");
         let mut world: WorldStorage = spawn_test_world([namespace_def].span());
-// '---- 2'.print();
+// println!("---- 2");
 
         world.sync_perms_and_inits(contract_defs.span());
-// '---- 3'.print();
+// println!("---- 3");
 
         // initializers
-// '---- 4'.print();
+// println!("---- 4");
         if (deploy_admin) {
             world.dispatcher.grant_owner(selector_from_tag!("pistols-admin"), OWNER());
         }
-// '---- 5'.print();
+// println!("---- 5");
         if (deploy_lords) {
             let lords = world.lords_mock_dispatcher();
             execute_lords_faucet(@lords, OWNER());
             execute_lords_faucet(@lords, OTHER());
-// '---- 6'.print();
+// println!("---- 6");
             if (approve) {
                 let spender = world.bank_address();
                 execute_lords_approve(@lords, OWNER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
@@ -441,7 +441,7 @@ pub mod tester {
                 execute_lords_approve(@lords, BUMMER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
             }
         }
-// '---- 7'.print();
+// println!("---- 7");
 
         let mock_account: ContractAddress = if (deploy_account) {
             (deploy_mock_account())
@@ -452,7 +452,7 @@ pub mod tester {
 
         impersonate(OWNER());
 
-// '---- READY!'.print();
+// println!("READY!");
         (TestSystemsTrait::from_world(world, mock_account))
     }
 

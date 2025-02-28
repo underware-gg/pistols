@@ -87,24 +87,20 @@ const DUEL_ID_4: u256 = 4; // owned by RECIPIENT()
 
 fn setup(_fee_amount: u128) -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::FAME | FLAGS::LORDS);
-
     tester::set_current_season(ref sys, TABLES::TUTORIAL);
 
     // initialize contracts
     create_duel(@sys, OWNER(), OTHER());
     create_duel(@sys, OTHER(), BUMMER());
-
     tester::impersonate(OWNER());
-
     // drop all events
     utils::drop_all_events(sys.world.dispatcher.contract_address);
     utils::drop_all_events(sys.duels.contract_address);
-
     (sys)
 }
 
 fn create_duel(sys: @TestSystems, recipient: ContractAddress, challenged_address: ContractAddress) {
-// '---AA'.print();
+// println!("---AA");
     tester::impersonate(recipient);
     (*sys.duels).create_duel(
         duelist_id: ID(recipient),
@@ -115,7 +111,7 @@ fn create_duel(sys: @TestSystems, recipient: ContractAddress, challenged_address
         expire_hours: 1,
         lives_staked: 1,
     );
-// '---BB'.print();
+// println!("---BB");
 }
 
 fn _assert_minted_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
@@ -150,7 +146,7 @@ fn test_token_component() {
     let sys: TestSystems = setup(0);
     // should not panic
     sys.duels.owner_of(DUEL_ID_1);
-    sys.duels.is_owner_of(OWNER(), DUEL_ID_1.low);
+    sys.duels.is_owner_of(OWNER(), DUEL_ID_1);
 }
 
 #[test]

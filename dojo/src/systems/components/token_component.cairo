@@ -3,8 +3,6 @@ use starknet::{ContractAddress};
 #[starknet::interface]
 pub trait ITokenComponentPublic<TState> {
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
-    fn exists(self: @TState, token_id: u128) -> bool;
-    fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
     fn minted_count(self: @TState) -> u128;
 }
 
@@ -16,8 +14,6 @@ pub trait ITokenComponentInternal<TState> {
     fn mint(ref self: TState, recipient: ContractAddress) -> u128;
     fn mint_multiple(ref self: TState, recipient: ContractAddress, quantity: usize) -> Span<u128>;
     fn burn(ref self: TState, token_id: u128);
-    fn assert_exists(self: @TState, token_id: u128);
-    fn assert_is_owner_of(self: @TState, address: ContractAddress, token_id: u128);
 }
 
 #[starknet::component]
@@ -30,6 +26,10 @@ pub mod TokenComponent {
     use openzeppelin_token::erc721::{
         ERC721Component,
         ERC721Component::{InternalImpl as ERC721InternalImpl},
+    };
+    use nft_combo::erc721::erc721_combo::{
+        ERC721ComboComponent,
+        ERC721ComboComponent::{InternalImpl as ERC721ComboInternalImpl, ERC721MinterImpl},
     };
 
     use pistols::interfaces::dns::{DnsTrait};
@@ -47,8 +47,6 @@ pub mod TokenComponent {
 
     mod Errors {
         pub const CALLER_IS_NOT_MINTER: felt252 = 'TOKEN: caller is not minter';
-        pub const CALLER_IS_NOT_OWNER: felt252  = 'TOKEN: caller is not owner';
-        pub const INVALID_TOKEN_ID: felt252     = 'TOKEN: invalid token ID';
     }
 
 
@@ -62,7 +60,9 @@ pub mod TokenComponent {
         +IWorldProvider<TContractState>,
         +SRC5Component::HasComponent<TContractState>,
         +ERC721Component::ERC721HooksTrait<TContractState>,
+        +ERC721ComboComponent::ERC721ComboHooksTrait<TContractState>,
         impl ERC721: ERC721Component::HasComponent<TContractState>,
+        impl ERC721_COMBO: ERC721ComboComponent::HasComponent<TContractState>,
         +Drop<TContractState>,
     > of super::ITokenComponentPublic<ComponentState<TContractState>> {
 
@@ -78,24 +78,9 @@ pub mod TokenComponent {
             )
         }
 
-        fn exists(self: @ComponentState<TContractState>, token_id: u128) -> bool {
-            let erc721 = get_dep_component!(self, ERC721);
-            (erc721._owner_of(token_id.into()).is_non_zero())
-        }
-
-        fn is_owner_of(self: @ComponentState<TContractState>,
-            address: ContractAddress,
-            token_id: u128,
-        ) -> bool {
-            let erc721 = get_dep_component!(self, ERC721);
-            (erc721._owner_of(token_id.into()) == address)
-        }
-
         fn minted_count(self: @ComponentState<TContractState>) -> u128 {
-            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
-            let mut store: Store = StoreTrait::new(world);
-            let token_config: TokenConfigValue = store.get_token_config_value(starknet::get_contract_address());
-            (token_config.minted_count)
+            let erc721_combo = get_dep_component!(self, ERC721_COMBO);
+            (erc721_combo.last_token_id().low)
         }
     }
 
@@ -110,7 +95,9 @@ pub mod TokenComponent {
         +IWorldProvider<TContractState>,
         +SRC5Component::HasComponent<TContractState>,
         +ERC721Component::ERC721HooksTrait<TContractState>,
+        +ERC721ComboComponent::ERC721ComboHooksTrait<TContractState>,
         impl ERC721: ERC721Component::HasComponent<TContractState>,
+        impl ERC721_COMBO: ERC721ComboComponent::HasComponent<TContractState>,
         +Drop<TContractState>,
     > of super::ITokenComponentInternal<ComponentState<TContractState>> {
         fn initialize(ref self: ComponentState<TContractState>,
@@ -141,14 +128,13 @@ pub mod TokenComponent {
             let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let mut token_config: TokenConfig = store.get_token_config(starknet::get_contract_address());
-            let mut erc721 = get_dep_component_mut!(ref self, ERC721);
+            let mut erc721_combo = get_dep_component_mut!(ref self, ERC721_COMBO);
 
             let mut token_ids: Array<u128> = array![];
             let mut i: usize = 0;
             while (i < quantity) {
-                token_config.minted_count += 1;
+                token_config.minted_count = erc721_combo._mint_next(recipient).low;
                 token_ids.append(token_config.minted_count);
-                erc721.mint(recipient, token_config.minted_count.into());
                 i += 1;
             };
 
@@ -160,20 +146,11 @@ pub mod TokenComponent {
         fn burn(ref self: ComponentState<TContractState>,
             token_id: u128,
         ) {
-            assert(self.can_mint(starknet::get_caller_address()), Errors::CALLER_IS_NOT_MINTER);
+            let erc721_combo = get_dep_component!(@self, ERC721_COMBO);
+            erc721_combo._require_owner_of(starknet::get_caller_address(), token_id.into());
             let mut erc721 = get_dep_component_mut!(ref self, ERC721);
             erc721.burn(token_id.into());
         }
 
-        fn assert_exists(self: @ComponentState<TContractState>, token_id: u128) {
-            assert(self.exists(token_id.into()), Errors::INVALID_TOKEN_ID);
-        }
-
-        fn assert_is_owner_of(self: @ComponentState<TContractState>,
-            address: ContractAddress,
-            token_id: u128,
-        ) {
-            assert(self.is_owner_of(address, token_id.into()), Errors::CALLER_IS_NOT_OWNER);
-        }
     }
 }

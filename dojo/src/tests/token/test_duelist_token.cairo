@@ -148,7 +148,7 @@ fn test_token_component() {
     let mut sys: TestSystems = setup(0);
     // should not panic
     sys.duelists.owner_of(TOKEN_ID_1_1);
-    sys.duelists.is_owner_of(OWNER(), TOKEN_ID_1_1.low);
+    sys.duelists.is_owner_of(OWNER(), TOKEN_ID_1_1);
 }
 
 #[test]
@@ -440,7 +440,7 @@ fn test_duelist_reactivate_OK_alive() {
 }
 
 #[test]
-#[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_reactivate_OK_alive_not_owner() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -585,7 +585,7 @@ fn test_duelist_sacrifice_already_dead() {
 }
 
 #[test]
-#[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_sacrifice_not_owner() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -610,7 +610,7 @@ fn test_duelist_memorialize_already_dead() {
 }
 
 #[test]
-#[should_panic(expected:('TOKEN: caller is not owner', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_memorialize_not_owner() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;

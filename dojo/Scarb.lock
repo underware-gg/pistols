@@ -38,7 +38,7 @@ source = "git+https://github.com/rsodre/graffiti?rev=json2#8049f2d188e33ebfba2c3
 [[package]]
 name = "nft_combo"
 version = "0.2.0"
-source = "git+https://github.com/underware-gg/cairo-nft-combo?tag=v0.2.0#35f00591abded9b14d793fea63eac5a43fe152e2"
+source = "git+https://github.com/underware-gg/cairo-nft-combo?tag=v0.2.0#e2a1c80fed62493b24665f580efab20400c21dc2"
 dependencies = [
  "graffiti",
  "openzeppelin_introspection",

@@ -41,11 +41,11 @@ pub trait IPackToken<TState> {
     fn total_supply(self: @TState) -> u256;
     fn last_token_id(self: @TState) -> u256;
     fn is_minting_paused(self: @TState) -> bool;
+    fn is_owner_of(self: @TState, address: ContractAddress, token_id: u256) -> bool;
+    fn exists(self: @TState, token_id: u256) -> bool;
     // (CamelOnly)
     fn maxSupply(self: @TState) -> u256;
     fn totalSupply(self: @TState) -> u256;
-    fn lastTokenId(self: @TState) -> u256;
-    fn isMintingPaused(self: @TState) -> bool;
     //-----------------------------------
     // IERC7572ContractMetadata
     fn contract_uri(self: @TState) -> ByteArray;
@@ -67,8 +67,6 @@ pub trait IPackToken<TState> {
 
     // ITokenComponentPublic
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
-    fn exists(self: @TState, token_id: u128) -> bool;
-    fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
     fn minted_count(self: @TState) -> u128;
 
     // IPackTokenPublic
@@ -287,7 +285,7 @@ pub mod pack_token {
             store.world.bank_dispatcher().peg_minted_fame_to_purchased_lords(recipient, pack.lords_amount.into());
 
             // burn!
-            self.token.burn(pack_id.into());
+            self.erc721.burn(pack_id.into());
 
             (token_ids)
         }
