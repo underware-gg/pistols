@@ -306,17 +306,17 @@ pub mod game {
             challenge.timestamp_end = starknet::get_block_timestamp();
             store.set_challenge(@challenge);
 
-            // transfer rewards
-            let tournament_id: u128 = 0;
-            let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_dispatcher().transfer_rewards(challenge, tournament_id);
-
-            // finish challenge
-            self._update_scoreboards(ref store, @challenge, @round, ref rewards_a, ref rewards_b);
-
             // undo pacts
             store.exit_challenge(challenge.duelist_id_a);
             store.exit_challenge(challenge.duelist_id_b);
             challenge.unset_pact(ref store);
+
+            // transfer rewards
+            let tournament_id: u128 = 0;
+            let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_dispatcher().transfer_rewards(challenge, tournament_id);
+
+            // update leaderboards
+            self._update_scoreboards(ref store, @challenge, @round, ref rewards_a, ref rewards_b);
 
             // send duel token to winner
             if (challenge.winner != 0) {

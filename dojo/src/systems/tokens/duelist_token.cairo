@@ -421,6 +421,10 @@ pub mod duelist_token {
                 self._duelist_died(ref store, challenge.duelist_id_b, CauseOfDeath::Duelling, balance_b, challenge.duelist_id_a);
             }
 
+            // notify indexers to update metadata
+            self.erc721_combo._emit_metadata_update(challenge.duelist_id_a.into());
+            self.erc721_combo._emit_metadata_update(challenge.duelist_id_b.into());
+
             (rewards_a, rewards_b)
         }
     }
@@ -575,6 +579,9 @@ pub mod duelist_token {
             // update duelist timestamp
             store.set_duelist_timestamp_active(duelist_id);
             
+            // notify indexers to update metadata
+            self.erc721_combo._emit_metadata_update(duelist_id.into());
+
             (survived)
         }
 
