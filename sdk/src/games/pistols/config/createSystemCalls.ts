@@ -1,5 +1,5 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
-import { AccountInterface, BigNumberish, Call, CallData } from 'starknet'
+import { AccountInterface, BigNumberish, Call, CallData, UniversalDetails } from 'starknet'
 import { arrayClean, shortAddress, isPositiveBigint, bigintToHex } from 'src/utils/misc/types'
 import { NAMESPACE, getLordsAddress, getBankAddress } from 'src/games/pistols/config/config'
 import { stringToFelt, bigintToU256 } from 'src/utils/misc/starknet'
@@ -12,6 +12,10 @@ import * as constants from 'src/games/pistols/generated/constants'
 
 export type SystemCalls = ReturnType<typeof createSystemCalls>;
 export type DojoCalls = Array<DojoCall | Call>
+
+const _details: UniversalDetails = {
+  version: 3,
+}
 
 export function createSystemCalls(
   provider: DojoProvider,
@@ -30,7 +34,7 @@ export function createSystemCalls(
         throw new Error(`_executeTransaction(): not connected!`)
       }
       calls = arrayClean(calls)
-      const tx = await provider.execute(signer, calls, NAMESPACE);
+      const tx = await provider.execute(signer, calls, NAMESPACE, _details);
       calls.forEach((c, index) => {
         //@ts-ignore
         console.log(`execute[${index}] ${c?.contractAddress ? `(${shortAddress(c.contractAddress)})` : c?.contractName}::${c.entrypoint}():`, c.calldata, tx)
