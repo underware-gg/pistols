@@ -862,4 +862,21 @@ pub mod tester {
         println!("Pool::Season_______LORDS:{} FAME:{}", ETH(pool_season.balance_lords), ETH(pool_season.balance_fame));
         println!("Pool::SacredFlame__LORDS:{} FAME:{}", ETH(pool_flame.balance_lords), ETH(pool_flame.balance_fame));
     }
+
+    pub fn starts_with(input: ByteArray, prefix: ByteArray) -> bool {
+        (if (input.len() < prefix.len()) {
+            (false)
+        } else {
+            let mut result = true;
+            let mut i = 0;
+            while (i < prefix.len()) {
+                if (input[i] != prefix[i]) {
+                    result = false;
+                    break;
+                }
+                i += 1;
+            };
+            (result)
+        })
+    }
 }

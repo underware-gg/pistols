@@ -22,17 +22,18 @@ build-external-contracts = [
 dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.2.1" }
 achievement = { git = "https://github.com/cartridge-gg/arcade", tag = "v1.2.1" }
 # achievement = { git = "https://github.com/rsodre/arcade", branch = "dojo_v1.2.1" }
-graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
-openzeppelin_token = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
-openzeppelin_introspection = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
-# openzeppelin_account = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
+graffiti = { git = "https://github.com/rsodre/graffiti", rev = "json2" }
+nft_combo = { git = "https://github.com/underware-gg/cairo-nft-combo", tag = "v0.2.0"}
+openzeppelin_token = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
+openzeppelin_introspection = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
+# openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
 # openzeppelin_token = { path = "../../cairo-contracts" }
 # cartridge_vrf = { git = "https://github.com/cartridge-gg/vrf" }
 
 [dev-dependencies]
 cairo_test = "=2.9.2"
 dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.2.1" }
-# openzeppelin_account = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
+# openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
 
 [features]
 default = ["lords_mock", "vrf_mock"]

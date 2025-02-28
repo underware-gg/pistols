@@ -154,6 +154,16 @@ fn test_token_component() {
 }
 
 #[test]
+fn test_contract_uri() {
+    let mut sys: TestSystems = setup(0);
+    let uri: ByteArray = sys.duels.contract_uri();
+    let uri_camel: ByteArray = sys.duels.contractURI();
+    println!("___duels.contract_uri():{}", uri);
+    assert!(tester::starts_with(uri.clone(), "data:"), "contract_uri() should be a json string");
+    assert_eq!(uri.clone(), uri_camel.clone(), "uri_camel");
+}
+
+#[test]
 fn test_token_uri() {
     let mut sys: TestSystems = setup(0);
 
@@ -180,8 +190,8 @@ fn test_token_uri() {
 
     let uri_1 = sys.duels.token_uri(DUEL_ID_1);
     let uri_2 = sys.duels.token_uri(DUEL_ID_2);
-    println!("{}", uri_1);
-    println!("{}", uri_2);
+    println!("___duels.token_uri(1):{}", uri_1);
+    println!("___duels.token_uri(2):{}", uri_2);
 
     assert_gt!(uri_1.len(), 100, "Uri 1 should not be empty");
     assert_gt!(uri_2.len(), 100, "Uri 2 should not be empty");

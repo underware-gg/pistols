@@ -7,9 +7,12 @@ pub trait IPackToken<TState> {
     // IWorldProvider
     fn world_dispatcher(self: @TState) -> IWorldDispatcher;
 
-    // ISRC5
+    //-----------------------------------
+    // IERC721ComboABI start
+    //
+    // (ISRC5)
     fn supports_interface(self: @TState, interface_id: felt252) -> bool;
-    // IERC721
+    // (IERC721)
     fn balance_of(self: @TState, account: ContractAddress) -> u256;
     fn owner_of(self: @TState, token_id: u256) -> ContractAddress;
     fn safe_transfer_from(ref self: TState, from: ContractAddress, to: ContractAddress, token_id: u256, data: Span<felt252>);
@@ -18,7 +21,7 @@ pub trait IPackToken<TState> {
     fn set_approval_for_all(ref self: TState, operator: ContractAddress, approved: bool);
     fn get_approved(self: @TState, token_id: u256) -> ContractAddress;
     fn is_approved_for_all(self: @TState, owner: ContractAddress, operator: ContractAddress) -> bool;
-    // IERC721CamelOnly
+    // (CamelOnly)
     fn balanceOf(self: @TState, account: ContractAddress) -> u256;
     fn ownerOf(self: @TState, tokenId: u256) -> ContractAddress;
     fn safeTransferFrom(ref self: TState, from: ContractAddress, to: ContractAddress, tokenId: u256, data: Span<felt252>);
@@ -26,23 +29,47 @@ pub trait IPackToken<TState> {
     fn setApprovalForAll(ref self: TState, operator: ContractAddress, approved: bool);
     fn getApproved(self: @TState, tokenId: u256) -> ContractAddress;
     fn isApprovedForAll(self: @TState, owner: ContractAddress, operator: ContractAddress) -> bool;
-    // IERC721Metadata
+    // (IERC721Metadata)
     fn name(self: @TState) -> ByteArray;
     fn symbol(self: @TState) -> ByteArray;
     fn token_uri(self: @TState, token_id: u256) -> ByteArray;
-    // IERC721MetadataCamelOnly
+    // (CamelOnly)
     fn tokenURI(self: @TState, tokenId: u256) -> ByteArray;
+    //-----------------------------------
+    // IERC721Minter
+    fn max_supply(self: @TState) -> u256;
+    fn total_supply(self: @TState) -> u256;
+    fn last_token_id(self: @TState) -> u256;
+    fn is_minting_paused(self: @TState) -> bool;
+    // (CamelOnly)
+    fn maxSupply(self: @TState) -> u256;
+    fn totalSupply(self: @TState) -> u256;
+    fn lastTokenId(self: @TState) -> u256;
+    fn isMintingPaused(self: @TState) -> bool;
+    //-----------------------------------
+    // IERC7572ContractMetadata
+    fn contract_uri(self: @TState) -> ByteArray;
+    // (CamelOnly)
+    fn contractURI(self: @TState) -> ByteArray;
+    //-----------------------------------
+    // IERC4906MetadataUpdate
+    //-----------------------------------
+    // IERC2981RoyaltyInfo
+    fn royalty_info(self: @TState, token_id: u256, sale_price: u256) -> (ContractAddress, u256);
+    fn default_royalty(self: @TState) -> (ContractAddress, u128, u128);
+    fn token_royalty(self: @TState, token_id: u256) -> (ContractAddress, u128, u128);
+    // (CamelOnly)
+    fn royaltyInfo(self: @TState, token_id: u256, sale_price: u256) -> (ContractAddress, u256);
+    fn defaultRoyalty(self: @TState) -> (ContractAddress, u128, u128);
+    fn tokenRoyalty(self: @TState, token_id: u256) -> (ContractAddress, u128, u128);
+    // IERC721ComboABI end
+    //-----------------------------------
 
     // ITokenComponentPublic
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
     fn minted_count(self: @TState) -> u128;
-
-    // ITokenRenderer
-    fn get_token_name(self: @TState, token_id: u256) -> ByteArray;
-    fn get_token_description(self: @TState, token_id: u256) -> ByteArray;
-    fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IPackTokenPublic
     fn can_claim_starter_pack(self: @TState, recipient: ContractAddress) -> bool;
@@ -75,15 +102,20 @@ pub mod pack_token {
     // ERC-721 Start
     //
     use openzeppelin_introspection::src5::SRC5Component;
-    use openzeppelin_token::erc721::{ERC721Component};
+    use openzeppelin_token::erc721::ERC721Component;
+    use nft_combo::erc721::erc721_combo::ERC721ComboComponent;
+    use nft_combo::erc721::erc721_combo::ERC721ComboComponent::{ERC721HooksImpl};
+    use nft_combo::utils::renderer::{ContractMetadata, TokenMetadata, Attribute};
+    use nft_combo::utils::encoder::{Encoder};
     use pistols::systems::components::token_component::{TokenComponent};
-    use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
+    component!(path: ERC721ComboComponent, storage: erc721_combo, event: ERC721ComboEvent);
     component!(path: TokenComponent, storage: token, event: TokenEvent);
-    #[abi(embed_v0)]
-    impl ERC721MixinImpl = ERC721Component::ERC721MixinImpl<ContractState>;
     impl ERC721InternalImpl = ERC721Component::InternalImpl<ContractState>;
+    impl ERC721ComboInternalImpl = ERC721ComboComponent::InternalImpl<ContractState>;
+    #[abi(embed_v0)]
+    impl ERC721ComboMixinImpl = ERC721ComboComponent::ERC721ComboMixinImpl<ContractState>;
     #[abi(embed_v0)]
     impl TokenComponentPublicImpl = TokenComponent::TokenComponentPublicImpl<ContractState>;
     impl TokenComponentInternalImpl = TokenComponent::TokenComponentInternalImpl<ContractState>;
@@ -94,6 +126,8 @@ pub mod pack_token {
         #[substorage(v0)]
         erc721: ERC721Component::Storage,
         #[substorage(v0)]
+        erc721_combo: ERC721ComboComponent::Storage,
+        #[substorage(v0)]
         token: TokenComponent::Storage,
     }
     #[event]
@@ -103,6 +137,8 @@ pub mod pack_token {
         SRC5Event: SRC5Component::Event,
         #[flat]
         ERC721Event: ERC721Component::Event,
+        #[flat]
+        ERC721ComboEvent: ERC721ComboComponent::Event,
         #[flat]
         TokenEvent: TokenComponent::Event,
     }
@@ -122,7 +158,7 @@ pub mod pack_token {
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::byte_arrays::{BoolToStringTrait};
-    use pistols::utils::misc::{ZERO, CONSUME_U256};
+    use pistols::utils::misc::{ZERO};
 
     pub mod Errors {
         pub const NOT_IMPLEMENTED: felt252      = 'PACK: Not implemented';
@@ -142,10 +178,13 @@ pub mod pack_token {
         ref self: ContractState,
         base_uri: felt252,
     ) {
-        self.erc721.initializer(
+        let base_uri: ByteArray = format!("https://{}",base_uri.to_string());
+        self.erc721_combo.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            format!("https://{}",base_uri.to_string()),
+            base_uri,
+            Option::None, // contract_uri (use hooks)
+            Option::None, // max_supply (infinite)
         );
         self.token.initialize(
             ZERO(),
@@ -288,81 +327,67 @@ pub mod pack_token {
 
 
     //-----------------------------------
-    // ERC721HooksTrait
+    // ERC721ComboHooksTrait
     //
-    // use pistols::systems::components::erc721_hooks::{TokenRendererTrait};
-    // pub impl ERC721HooksImpl of ERC721Component::ERC721HooksTrait<ContractState> {
-    //     fn before_update(ref self: ERC721Component::ComponentState<ContractState>,
-    //         to: ContractAddress,
-    //         token_id: u256,
-    //         auth: ContractAddress,
-    //     ) {}
+    pub impl ERC721ComboHooksImpl of ERC721ComboComponent::ERC721ComboHooksTrait<ContractState> {
+        fn render_contract_uri(self: @ERC721ComboComponent::ComponentState<ContractState>) -> Option<ContractMetadata> {
+            let self = self.get_contract(); // get the component's contract state
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            // return the metadata to be rendered by the component
+            let metadata = ContractMetadata {
+                name: self.name(),
+                symbol: self.symbol(),
+                description: "Pistols at Dawn Packs",
+                image: "",
+                banner_image: "",
+                featured_image: "",
+                external_link: "https://pistols.underware.gg",
+                collaborators: array![
+                    // starknet::contract_address_const::<0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7>(),
+                ].span(),
+            };
+            (Option::Some(metadata))
+        }
 
-    //     fn after_update(ref self: ERC721Component::ComponentState<ContractState>,
-    //         to: ContractAddress,
-    //         token_id: u256,
-    //         auth: ContractAddress,
-    //     ) {
-    //         // avoid transfer after opened
-    //         let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
-    //         let mut store: Store = StoreTrait::new(world);
-    //         let pack: Pack = store.get_pack(token_id.low);
-    //         assert(!pack.is_open, Errors::ALREADY_OPENED);
-    //     }
-
-    //     // same as ERC721HooksImpl::token_uri()
-    //     fn token_uri(self: @ERC721Component::ComponentState<ContractState>, token_id: u256) -> ByteArray {
-    //         (self.get_contract().render_token_uri(token_id))
-    //     }
-    // }
-
-
-    //-----------------------------------
-    // ITokenRenderer
-    //
-    use pistols::systems::components::erc721_hooks::{ITokenRenderer};
-    #[abi(embed_v0)]
-    impl TokenRendererImpl of ITokenRenderer<ContractState> {
-        fn get_token_name(self: @ContractState, token_id: u256) -> ByteArray {
+        fn render_token_uri(self: @ERC721ComboComponent::ComponentState<ContractState>, token_id: u256) -> Option<TokenMetadata> {
+            let self = self.get_contract(); // get the component's contract state
             let mut store: Store = StoreTrait::new(self.world_default());
+            // gether data
             let pack: PackValue = store.get_pack_value(token_id.low);
-            (format!("{} #{}",
-                pack.pack_type.name(),
+            let base_uri: ByteArray = self.erc721._base_uri();
+            // Attributes
+            let mut attributes: Array<Attribute> = array![
+                Attribute {
+                    key: "Type",
+                    value: pack.pack_type.name(),
+                },
+                Attribute {
+                    key: "Is Open",
+                    value: pack.is_open.to_string(),
+                },
+            ];
+            // return the metadata to be rendered by the component
+            let metadata = TokenMetadata {
                 token_id,
-            ))
+                name: format!("{} #{}", pack.pack_type.name(), token_id),
+                description: format!("Pistols at Dawn Pack #{}. https://pistols.underware.gg", token_id),
+                image: format!("{}{}", base_uri, pack.pack_type.image_url(pack.is_open)),
+                attributes: attributes.span(),
+                additional_metadata: array![].span(),
+            };
+            (Option::Some(metadata))
         }
 
-        fn get_token_description(self: @ContractState, token_id: u256) -> ByteArray {
-            (format!("Pistols at Dawn Pack #{}. https://pistols.underware.gg", token_id))
-        }
-
-        fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let pack: PackValue = store.get_pack_value(token_id.low);
-            (format!("{}{}",
-                self.erc721._base_uri(),
-                pack.pack_type.image_url(pack.is_open),
-            ))
-        }
-
-        // returns: [key1, value1, key2, value2,...]
-        fn get_metadata_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            CONSUME_U256(token_id);
-            ([].span())
-        }
-
-        // returns: [key1, value1, key2, value2,...]
-        fn get_attribute_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let pack: PackValue = store.get_pack_value(token_id.low);
-            let mut result: Array<ByteArray> = array![];
-            // metadata
-            result.append("Type");
-            result.append(pack.pack_type.name());
-            result.append("Is Open");
-            result.append(pack.is_open.to_string());
-            // done!
-            (result.span())
-        }
+        // optional hooks from ERC721Component::ERC721HooksTrait
+        // fn before_update(ref self: ERC721ComboComponent::ComponentState<ContractState>, to: ContractAddress, token_id: u256, auth: ContractAddress) {}
+        // fn after_update(ref self: ERC721ComboComponent::ComponentState<ContractState>, to: ContractAddress, token_id: u256, auth: ContractAddress) {
+        // ) {
+        //     // avoid transfer after opened
+        //     let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+        //     let mut store: Store = StoreTrait::new(world);
+        //     let pack: Pack = store.get_pack(token_id.low);
+        //     assert(!pack.is_open, Errors::ALREADY_OPENED);
+        // }
     }
+
 }

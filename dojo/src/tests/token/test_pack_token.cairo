@@ -140,6 +140,16 @@ fn test_initializer() {
 }
 
 #[test]
+fn test_contract_uri() {
+    let mut sys: TestSystems = setup(0);
+    let uri: ByteArray = sys.pack.contract_uri();
+    let uri_camel: ByteArray = sys.pack.contractURI();
+    println!("___pack.contract_uri():{}", uri);
+    assert!(tester::starts_with(uri.clone(), "data:"), "contract_uri() should be a json string");
+    assert_eq!(uri.clone(), uri_camel.clone(), "uri_camel");
+}
+
+#[test]
 fn test_token_uri() {
     let mut sys: TestSystems = setup(0);
 
@@ -158,7 +168,7 @@ fn test_token_uri() {
 
     let uri = sys.pack.token_uri(TOKEN_ID_2);
     assert_gt!(uri.len(), 100, "Uri 1 should not be empty");
-    println!("{}", uri);
+    println!("___packs.token_uri(1):{}", uri);
 }
 
 #[test]

@@ -8,9 +8,12 @@ pub trait IDuelistToken<TState> {
     // IWorldProvider
     fn world_dispatcher(self: @TState) -> IWorldDispatcher;
 
-    // ISRC5
+    //-----------------------------------
+    // IERC721ComboABI start
+    //
+    // (ISRC5)
     fn supports_interface(self: @TState, interface_id: felt252) -> bool;
-    // IERC721
+    // (IERC721)
     fn balance_of(self: @TState, account: ContractAddress) -> u256;
     fn owner_of(self: @TState, token_id: u256) -> ContractAddress;
     fn safe_transfer_from(ref self: TState, from: ContractAddress, to: ContractAddress, token_id: u256, data: Span<felt252>);
@@ -19,7 +22,7 @@ pub trait IDuelistToken<TState> {
     fn set_approval_for_all(ref self: TState, operator: ContractAddress, approved: bool);
     fn get_approved(self: @TState, token_id: u256) -> ContractAddress;
     fn is_approved_for_all(self: @TState, owner: ContractAddress, operator: ContractAddress) -> bool;
-    // IERC721CamelOnly
+    // (CamelOnly)
     fn balanceOf(self: @TState, account: ContractAddress) -> u256;
     fn ownerOf(self: @TState, tokenId: u256) -> ContractAddress;
     fn safeTransferFrom(ref self: TState, from: ContractAddress, to: ContractAddress, tokenId: u256, data: Span<felt252>);
@@ -27,23 +30,47 @@ pub trait IDuelistToken<TState> {
     fn setApprovalForAll(ref self: TState, operator: ContractAddress, approved: bool);
     fn getApproved(self: @TState, tokenId: u256) -> ContractAddress;
     fn isApprovedForAll(self: @TState, owner: ContractAddress, operator: ContractAddress) -> bool;
-    // IERC721Metadata
+    // (IERC721Metadata)
     fn name(self: @TState) -> ByteArray;
     fn symbol(self: @TState) -> ByteArray;
     fn token_uri(self: @TState, token_id: u256) -> ByteArray;
-    // IERC721MetadataCamelOnly
+    // (CamelOnly)
     fn tokenURI(self: @TState, tokenId: u256) -> ByteArray;
+    //-----------------------------------
+    // IERC721Minter
+    fn max_supply(self: @TState) -> u256;
+    fn total_supply(self: @TState) -> u256;
+    fn last_token_id(self: @TState) -> u256;
+    fn is_minting_paused(self: @TState) -> bool;
+    // (CamelOnly)
+    fn maxSupply(self: @TState) -> u256;
+    fn totalSupply(self: @TState) -> u256;
+    fn lastTokenId(self: @TState) -> u256;
+    fn isMintingPaused(self: @TState) -> bool;
+    //-----------------------------------
+    // IERC7572ContractMetadata
+    fn contract_uri(self: @TState) -> ByteArray;
+    // (CamelOnly)
+    fn contractURI(self: @TState) -> ByteArray;
+    //-----------------------------------
+    // IERC4906MetadataUpdate
+    //-----------------------------------
+    // IERC2981RoyaltyInfo
+    fn royalty_info(self: @TState, token_id: u256, sale_price: u256) -> (ContractAddress, u256);
+    fn default_royalty(self: @TState) -> (ContractAddress, u128, u128);
+    fn token_royalty(self: @TState, token_id: u256) -> (ContractAddress, u128, u128);
+    // (CamelOnly)
+    fn royaltyInfo(self: @TState, token_id: u256, sale_price: u256) -> (ContractAddress, u256);
+    fn defaultRoyalty(self: @TState) -> (ContractAddress, u128, u128);
+    fn tokenRoyalty(self: @TState, token_id: u256) -> (ContractAddress, u128, u128);
+    // IERC721ComboABI end
+    //-----------------------------------
 
     // ITokenComponentPublic
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u128) -> bool;
     fn minted_count(self: @TState) -> u128;
-
-    // ITokenRenderer
-    fn get_token_name(self: @TState, token_id: u256) -> ByteArray;
-    fn get_token_description(self: @TState, token_id: u256) -> ByteArray;
-    fn get_token_image(self: @TState, token_id: u256) -> ByteArray;
 
     // IDuelistTokenPublic
     fn fame_balance(self: @TState, duelist_id: u128) -> u128;
@@ -96,15 +123,20 @@ pub mod duelist_token {
     // ERC-721 Start
     //
     use openzeppelin_introspection::src5::SRC5Component;
-    use openzeppelin_token::erc721::{ERC721Component};
+    use openzeppelin_token::erc721::ERC721Component;
+    use nft_combo::erc721::erc721_combo::ERC721ComboComponent;
+    use nft_combo::erc721::erc721_combo::ERC721ComboComponent::{ERC721HooksImpl};
+    use nft_combo::utils::renderer::{ContractMetadata, TokenMetadata, Attribute};
+    use nft_combo::utils::encoder::{Encoder};
     use pistols::systems::components::token_component::{TokenComponent};
-    use pistols::systems::components::erc721_hooks::{ERC721HooksImpl};
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
+    component!(path: ERC721ComboComponent, storage: erc721_combo, event: ERC721ComboEvent);
     component!(path: TokenComponent, storage: token, event: TokenEvent);
-    #[abi(embed_v0)]
-    impl ERC721MixinImpl = ERC721Component::ERC721MixinImpl<ContractState>;
     impl ERC721InternalImpl = ERC721Component::InternalImpl<ContractState>;
+    impl ERC721ComboInternalImpl = ERC721ComboComponent::InternalImpl<ContractState>;
+    #[abi(embed_v0)]
+    impl ERC721ComboMixinImpl = ERC721ComboComponent::ERC721ComboMixinImpl<ContractState>;
     #[abi(embed_v0)]
     impl TokenComponentPublicImpl = TokenComponent::TokenComponentPublicImpl<ContractState>;
     impl TokenComponentInternalImpl = TokenComponent::TokenComponentInternalImpl<ContractState>;
@@ -115,6 +147,8 @@ pub mod duelist_token {
         #[substorage(v0)]
         erc721: ERC721Component::Storage,
         #[substorage(v0)]
+        erc721_combo: ERC721ComboComponent::Storage,
+        #[substorage(v0)]
         token: TokenComponent::Storage,
     }
     #[event]
@@ -124,6 +158,8 @@ pub mod duelist_token {
         SRC5Event: SRC5Component::Event,
         #[flat]
         ERC721Event: ERC721Component::Event,
+        #[flat]
+        ERC721ComboEvent: ERC721ComboComponent::Event,
         #[flat]
         TokenEvent: TokenComponent::Event,
     }
@@ -158,7 +194,6 @@ pub mod duelist_token {
         constants::{CONST, FAME},
     };
     use pistols::libs::store::{Store, StoreTrait};
-    use pistols::utils::metadata::{MetadataTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::math::{MathTrait};
 
@@ -182,10 +217,13 @@ pub mod duelist_token {
         renderer_address: ContractAddress,
     ) {
         let mut world = self.world_default();
-        self.erc721.initializer(
+        let base_uri: ByteArray = format!("https://{}",base_uri.to_string());
+        self.erc721_combo.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            format!("https://{}",base_uri.to_string()),
+            base_uri,
+            Option::None, // contract_uri (use hooks)
+            Option::None, // max_supply
         );
         self.token.initialize(
             world.pack_token_address(),
@@ -561,127 +599,120 @@ pub mod duelist_token {
 
 
     //-----------------------------------
-    // ERC721HooksTrait
+    // ERC721ComboHooksTrait
     //
-    // use pistols::systems::components::erc721_hooks::{TokenRendererTrait};
-    // pub impl ERC721HooksImpl of ERC721Component::ERC721HooksTrait<ContractState> {
-    //     fn before_update(ref self: ERC721Component::ComponentState<ContractState>,
-    //         to: ContractAddress,
-    //         token_id: u256,
-    //         auth: ContractAddress,
-    //     ) {
-    //     }
-
-    //     fn after_update(ref self: ERC721Component::ComponentState<ContractState>,
-    //         to: ContractAddress,
-    //         token_id: u256,
-    //         auth: ContractAddress,
-    //     ) {}
-
-    //     // same as ERC721HooksImpl::token_uri()
-    //     fn token_uri(self: @ERC721Component::ComponentState<ContractState>, token_id: u256) -> ByteArray {
-    //         (self.get_contract().render_token_uri(token_id))
-    //     }
-    // }
-
-
-
-    //-----------------------------------
-    // ITokenRenderer
-    //
-    use pistols::systems::components::erc721_hooks::{ITokenRenderer};
-    #[abi(embed_v0)]
-    impl TokenRendererImpl of ITokenRenderer<ContractState> {
-        fn get_token_name(self: @ContractState, token_id: u256) -> ByteArray {
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
-            let duelist: DuelistValue = store.get_duelist_value(token_id.low);
-            (format!("{} #{}",
-                duelist.profile_type.name(),
-                token_id
-            ))
+    pub impl ERC721ComboHooksImpl of ERC721ComboComponent::ERC721ComboHooksTrait<ContractState> {
+        fn render_contract_uri(self: @ERC721ComboComponent::ComponentState<ContractState>) -> Option<ContractMetadata> {
+            let self = self.get_contract(); // get the component's contract state
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            // return the metadata to be rendered by the component
+            let metadata = ContractMetadata {
+                name: self.name(),
+                symbol: self.symbol(),
+                description: "Pistols at Dawn Duelists",
+                image: "",
+                banner_image: "",
+                featured_image: "",
+                external_link: "https://pistols.underware.gg",
+                collaborators: array![
+                    // starknet::contract_address_const::<0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7>(),
+                ].span(),
+            };
+            (Option::Some(metadata))
         }
 
-        fn get_token_description(self: @ContractState, token_id: u256) -> ByteArray {
-            (format!("Pistols at Dawn Duelist #{}. https://pistols.underware.gg", token_id))
-        }
-
-        fn get_token_image(self: @ContractState, token_id: u256) -> ByteArray {
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
-            let duelist: DuelistValue = store.get_duelist_value(token_id.low);
-            let base_uri: ByteArray = self.erc721._base_uri();
-            let image_square: ByteArray = duelist.profile_type.get_uri(base_uri.clone(), "square");
-            let result: ByteArray = 
-                "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1024 1434'>" +
-                "<image href='" + 
-                image_square +
-                "' x='0' y='0' width='1024px' height='1024px' />" +
-                "<image href='" +
-                base_uri +
-                "/textures/cards/card_front_brown.png' x='0' y='0' width='1024px' height='1434px' />" +
-                "</svg>";
-            (MetadataTrait::encode_svg(result, true))
-        }
-
-        // returns: [key1, value1, key2, value2,...]
-        fn get_metadata_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
-            let duelist: DuelistValue = store.get_duelist_value(token_id.low);
-            let base_uri: ByteArray = self.erc721._base_uri();
-            let mut result: Array<ByteArray> = array![];
-            result.append("square");
-            result.append(duelist.profile_type.get_uri(base_uri.clone(), "square"));
-            result.append("portrait");
-            result.append(duelist.profile_type.get_uri(base_uri.clone(), "portrait"));
-            (result.span())
-        }
-
-        // returns: [key1, value1, key2, value2,...]
-        fn get_attribute_pairs(self: @ContractState, token_id: u256) -> Span<ByteArray> {
-            let mut world = self.world_default();
-            let mut store: Store = StoreTrait::new(world);
+        fn render_token_uri(self: @ERC721ComboComponent::ComponentState<ContractState>, token_id: u256) -> Option<TokenMetadata> {
+            let self = self.get_contract(); // get the component's contract state
+            let mut store: Store = StoreTrait::new(self.world_default());
+            // gether data
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
             let scoreboard: ScoreboardValue = store.get_scoreboard_value(token_id.low.into(), 0);
-            let mut result: Array<ByteArray> = array![];
-            // Name
-            result.append("Name");
-            result.append(duelist.profile_type.name());
-            // Honour
-            result.append("Honour");
-            result.append(scoreboard.score.get_honour());
-            // Archetype
             let archetype: Archetype = scoreboard.score.get_archetype();
-            result.append("Archetype");
-            result.append(archetype.into());
-            // Fame
-            let fame_dispatcher: IFameCoinDispatcher = world.fame_coin_dispatcher();
-            let fame_balance: u128 = self._fame_balance(@fame_dispatcher, token_id.low) / CONST::ETH_TO_WEI.low;
-            result.append("Fame");
-            result.append(fame_balance.to_string());
-            result.append("Lives");
-            result.append((fame_balance / FAME::ONE_LIFE.low).to_string());
-            result.append("Alive");
-            result.append(if (fame_balance != 0) {"Alive"} else {"Dead"});
-            // Totals
-            result.append("Total Duels");
-            result.append(scoreboard.score.total_duels.to_string());
+            let base_uri: ByteArray = self.erc721._base_uri();
+            let image_square: ByteArray = duelist.profile_type.get_uri(base_uri.clone(), "square");
+            let image_portrait: ByteArray = duelist.profile_type.get_uri(base_uri.clone(), "portrait");
+            let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low) / CONST::ETH_TO_WEI.low;
+            // Image
+            let svg: ByteArray = 
+                "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1024 1434'>" +
+                "<image href='" + 
+                image_square.clone() +
+                "' x='0' y='0' width='1024px' height='1024px' />" +
+                "<image href='" +
+                base_uri.clone() +
+                "/textures/cards/card_front_brown.png' x='0' y='0' width='1024px' height='1434px' />" +
+                "</svg>";
+            let image: ByteArray = Encoder::encode_svg(svg, true);
+            // Attributes
+            let mut attributes: Array<Attribute> = array![
+                Attribute {
+                    key: "Name",
+                    value: duelist.profile_type.name(),
+                },
+                Attribute {
+                    key: "Honour",
+                    value: scoreboard.score.get_honour(),
+                },
+                Attribute {
+                    key: "Archetype",
+                    value: archetype.into(),
+                },
+                Attribute {
+                    key: "Fame",
+                    value: fame_balance.to_string(),
+                },
+                Attribute {
+                    key: "Lives",
+                    value: (fame_balance / FAME::ONE_LIFE.low).to_string(),
+                },
+                Attribute {
+                    key: "Alive",
+                    value: if (fame_balance != 0) {"Alive"} else {"Dead"},
+                },
+                Attribute {
+                    key: "Total Duels",
+                    value: scoreboard.score.total_duels.to_string(),
+                },
+            ];
             if (scoreboard.score.total_duels != 0) {
-                result.append("Score");
-                result.append(scoreboard.score.points.to_string());
-
-                result.append("Total Wins");
-                result.append(scoreboard.score.total_wins.to_string());
-
-                result.append("Total Losses");
-                result.append(scoreboard.score.total_losses.to_string());
-                
-                result.append("Total Draws");
-                result.append(scoreboard.score.total_draws.to_string());
+                attributes.append(Attribute {
+                    key: "Total Wins",
+                    value: scoreboard.score.total_wins.to_string(),
+                });
+                attributes.append(Attribute {
+                    key: "Total Losses",
+                    value: scoreboard.score.total_losses.to_string(),
+                });
+                attributes.append(Attribute {
+                    key: "Total Draws",
+                    value: scoreboard.score.total_draws.to_string(),
+                });
+                attributes.append(Attribute {
+                    key: "Score",
+                    value: scoreboard.score.points.to_string(),
+                });
             }
-            // done!
-            (result.span())
+            // metadata
+            let mut additional_metadata: Array<Attribute> = array![
+                Attribute {
+                    key: "image_square",
+                    value: image_square.clone(),
+                },
+                Attribute {
+                    key: "image_portrait",
+                    value: image_portrait.clone(),
+                },
+            ];
+            // return the metadata to be rendered by the component
+            let metadata = TokenMetadata {
+                token_id,
+                name: format!("{} #{}", duelist.profile_type.name(), token_id),
+                description: format!("Pistols at Dawn Duelist #{}. https://pistols.underware.gg", token_id),
+                image,
+                attributes: attributes.span(),
+                additional_metadata: additional_metadata.span(),
+            };
+            (Option::Some(metadata))
         }
     }
 }

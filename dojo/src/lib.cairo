@@ -27,7 +27,6 @@ mod systems {
         pub mod coin_component;
         pub mod token_component;
         pub mod token_bound;
-        pub mod erc721_hooks;
     }
 }
 
@@ -78,10 +77,8 @@ mod utils {
     pub mod arrays;
     pub mod byte_arrays;
     pub mod bitwise;
-    pub mod encoding;
     pub mod hash;
     pub mod math;
-    pub mod metadata;
     pub mod misc;
     pub mod short_string;
     pub mod timestamp;
