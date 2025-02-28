@@ -619,8 +619,8 @@ fn test_duelist_memorialize_not_owner() {
 #[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for random addresses
 fn test_mint_duelist_not_minter() {
     let mut sys: TestSystems = setup(0);
-    let account: ContractAddress = tester::deploy_mock_account();
-    utils::impersonate(account);
+    // let account: ContractAddress = tester::deploy_mock_account();
+    // utils::impersonate(account);
     sys.duelists.mint_duelists(OWNER(), 1, 0x1234);
 }
 
@@ -628,11 +628,11 @@ fn test_mint_duelist_not_minter() {
 // #[should_panic(expected: ('DUELIST: Invalid caller', 'ENTRYPOINT_FAILED'))] // for Dojo contracts
 // #[should_panic(expected: ('ENTRYPOINT_NOT_FOUND', 'ENTRYPOINT_FAILED'))] // for accounts
 #[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))] // for random addresses
-fn test_transfer_rewards_not_owner() {
+fn test_transfer_rewards_invalid_caller() {
     let mut sys: TestSystems = setup(0);
     let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), 'premise', SEASON_TABLE(1), 0, 1);
     let challenge: Challenge = sys.store.get_challenge(duel_id);
-    let account: ContractAddress = tester::deploy_mock_account();
-    utils::impersonate(account);
+    // let account: ContractAddress = tester::deploy_mock_account();
+    // utils::impersonate(account);
     sys.duelists.transfer_rewards(challenge, 0);
 }

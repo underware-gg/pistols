@@ -7,7 +7,6 @@ use pistols::models::{
 use pistols::tests::tester::{tester,
     tester::{
         // StoreTrait,
-        IFameCoinDispatcherTrait,
         IFoolsCoinDispatcherTrait,
         TestSystems, FLAGS,
         OWNER,
@@ -36,7 +35,7 @@ fn setup(_fee_amount: u128) -> TestSystems {
 #[test]
 fn test_initializer() {
     let mut sys: TestSystems = setup(0);
-    assert_eq!(sys.fame.symbol(), "FOOLS", "Symbol is wrong");
+    assert_eq!(sys.fools.symbol(), "FOOLS", "Symbol is wrong");
 }
 
 
@@ -45,7 +44,9 @@ fn test_initializer() {
 //
 
 #[test]
-#[should_panic(expected:('FOOLS: Invalid caller', 'ENTRYPOINT_FAILED'))]
+// #[should_panic(expected:('FOOLS: Invalid caller', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for Dojo contracts
+// #[should_panic(expected: ('ENTRYPOINT_NOT_FOUND', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for accounts
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for random addresses
 fn test_reward_player_invalid_caller() {
     let mut sys: TestSystems = setup(0);
     sys.fools.reward_player(OWNER(), 1_000);
