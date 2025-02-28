@@ -76,12 +76,10 @@ default = "pistols"
 "pistols-duel_token" = [
   "sstr:localhost:5173", # base_uri
   "0x0", # minter_address
-  "0x0", # renderer_address
   "0", # fee_amount
 ]
 "pistols-duelist_token" = [
   "sstr:localhost:5173", # base_uri
-  "0x0", # renderer_address
 ]
 "pistols-pack_token" = [
   "sstr:localhost:5173", # base_uri

@@ -188,7 +188,6 @@ pub mod pack_token {
         );
         self.token.initialize(
             ZERO(),
-            ZERO(),
         );
     }
 

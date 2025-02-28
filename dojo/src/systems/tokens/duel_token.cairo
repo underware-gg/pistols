@@ -225,7 +225,6 @@ pub mod duel_token {
         ref self: ContractState,
         base_uri: felt252,
         minter_address: ContractAddress,
-        renderer_address: ContractAddress,
         fee_amount: u128,
     ) {
         let base_uri: ByteArray = format!("https://{}",base_uri.to_string());
@@ -238,7 +237,6 @@ pub mod duel_token {
         );
         self.token.initialize(
             minter_address,
-            renderer_address,
         );
     }
 

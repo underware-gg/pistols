@@ -322,7 +322,6 @@ pub mod tester {
                     .with_init_calldata([
                         'pistols.underware.gg',
                         0, // minter_address
-                        0, // renderer_address
                         0, // fee_amount
                     ].span())
             );
@@ -336,7 +335,6 @@ pub mod tester {
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
                     .with_init_calldata([
                         'pistols.underware.gg',
-                        0, // renderer_address
                     ].span())
             );
         }

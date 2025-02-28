@@ -214,7 +214,6 @@ pub mod duelist_token {
     fn dojo_init(
         ref self: ContractState,
         base_uri: felt252,
-        renderer_address: ContractAddress,
     ) {
         let mut world = self.world_default();
         let base_uri: ByteArray = format!("https://{}",base_uri.to_string());
@@ -227,7 +226,6 @@ pub mod duelist_token {
         );
         self.token.initialize(
             world.pack_token_address(),
-            renderer_address,
         );
     }
 

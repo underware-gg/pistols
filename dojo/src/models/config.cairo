@@ -24,7 +24,6 @@ pub struct TokenConfig {
     pub token_address: ContractAddress,
     //------
     pub minter_address: ContractAddress,
-    pub renderer_address: ContractAddress,
     pub minted_count: u128,
 }
 
