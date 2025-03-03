@@ -7,7 +7,7 @@ import { usePlayer } from '/src/stores/playerStore'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
-import { bigintEquals, isPositiveBigint, keysToEntity, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
+import { bigintEquals, isPositiveBigint, keysToEntityId, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
 import { BigNumberish } from 'starknet'
 
 
@@ -52,8 +52,8 @@ const createStore = () => {
       address_b: BigInt(challenge.address_b),
       duelist_id_a: BigInt(challenge.duelist_id_a),
       duelist_id_b: BigInt(challenge.duelist_id_b),
-      duelist_entity_id_a: keysToEntity([challenge.duelist_id_a]),
-      duelist_entity_id_b: keysToEntity([challenge.duelist_id_b]),
+      duelist_entity_id_a: keysToEntityId([challenge.duelist_id_a]),
+      duelist_entity_id_b: keysToEntityId([challenge.duelist_id_b]),
     }
   }
   return create<State>()(immer((set) => ({

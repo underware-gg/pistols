@@ -40,8 +40,7 @@ export const isPositiveBigint = (v: BigNumberish | null): boolean => {
 }
 export const isNumeric = (v: string | null): boolean => (v != null && /^\d+$/.test(v))
 
-export const bigintToEntity = (v: BigNumberish): string => (getEntityIdFromKeys([BigInt(v)]) as string)
-export const keysToEntity = (keys: BigNumberish[]): string => (getEntityIdFromKeys(keys.map(v => BigInt(v ?? 0))) as string)
+export const keysToEntityId = (keys: BigNumberish[]): string => (getEntityIdFromKeys(keys.map(v => BigInt(v ?? 0))) as string)
 
 export const shortAddress = (address: string | null, small: boolean = false) => {
   const addresLength = small ? 7 : 12

@@ -1,5 +1,5 @@
 import { CairoCustomEnum, BigNumberish, Abi, CallData, Calldata } from 'starknet'
-import { bigintToHex, keysToEntity } from 'src/utils/misc/types'
+import { bigintToHex, keysToEntityId } from 'src/utils/misc/types'
 
 export type CustomEnumValue = number | BigNumberish | BigNumberish[] | string
 
@@ -83,5 +83,5 @@ export const makeAbiCustomEnum = <T extends CustomEnumValue>(
 export const makeCustomEnumEntityId = (data: CairoCustomEnum | undefined): string | undefined => {
   if (!data) return undefined
   let calldata: Calldata = CallData.compile([data])
-  return keysToEntity(calldata)
+  return keysToEntityId(calldata)
 }
