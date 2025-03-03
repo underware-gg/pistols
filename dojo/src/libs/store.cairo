@@ -1,6 +1,6 @@
 use starknet::{ContractAddress};
 use dojo::world::{WorldStorage};
-use dojo::model::{Model, ModelStorage, ModelValueStorage};
+use dojo::model::{Model, ModelPtr, ModelStorage, ModelValueStorage};
 use dojo::event::{EventStorage};
 
 pub use pistols::models::{
@@ -26,7 +26,7 @@ pub use pistols::models::{
         ChallengeRewards,
     },
     duelist::{
-        Duelist, DuelistValue,
+        Duelist, DuelistValue, DuelistTimestamps,
         DuelistChallenge, DuelistChallengeValue,
         Scoreboard, ScoreboardValue,
         DuelistMemorial, DuelistMemorialValue,
@@ -353,7 +353,10 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_duelist_timestamp_active(ref self: Store, duelist_id: u128) {
-        self.world.write_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("timestamp_active"), starknet::get_block_timestamp());
+        let model_ptr: ModelPtr<Duelist> = Model::<Duelist>::ptr_from_keys(duelist_id);
+        let mut timestamps: DuelistTimestamps = self.world.read_member(model_ptr, selector!("timestamps"));
+        timestamps.active = starknet::get_block_timestamp();
+        self.world.write_member(model_ptr, selector!("timestamps"), timestamps);
     }
 
 

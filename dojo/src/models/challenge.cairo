@@ -3,6 +3,7 @@ use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState};
 use pistols::types::rules::{RewardValues};
 use pistols::types::premise::{Premise};
+use pistols::types::timestamp::{Period};
 
 //-------------------------
 // Challenge lifecycle
@@ -26,8 +27,7 @@ pub struct Challenge {
     pub state: ChallengeState,
     pub winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
-    pub timestamp_start: u64,       // seconds since epoch, started
-    pub timestamp_end: u64,         // seconds since epoch, ended
+    pub timestamps: Period,
 }
 
 //

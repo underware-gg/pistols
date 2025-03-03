@@ -191,7 +191,7 @@ fn test_claim_purchase() {
 
     let player: Player = sys.store.get_player(OWNER());
     assert!(!player.exists(), "!player.exists()");
-    assert!(!player.claimed_starter_pack, "!player.claimed_starter_pack");
+    assert!(!player.timestamps.claimed_starter_pack, "!player.timestamps.claimed_starter_pack");
 
     let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
 
@@ -202,7 +202,7 @@ fn test_claim_purchase() {
 
     let player: Player = sys.store.get_player(OWNER());
     assert!(player.exists(), "player.exists()");
-    assert!(player.claimed_starter_pack, "player.claimed_starter_pack");
+    assert!(player.timestamps.claimed_starter_pack, "player.timestamps.claimed_starter_pack");
     let pack_1: Pack = sys.store.get_pack(TOKEN_ID_1.low);
     assert_eq!(pack_1.pack_id, TOKEN_ID_1.low, "pack_1.pack_id");
     assert_eq!(pack_1.pack_type, PackType::StarterPack, "pack_1.pack_type");

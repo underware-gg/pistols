@@ -41,7 +41,7 @@ const createStore = () => {
     const event = e.models.pistols.Player
     return event ? {
       player_address: bigintToHex(event.player_address),
-      timestamp_registered: bigintToNumber(event.timestamp_registered),
+      timestamp_registered: bigintToNumber(event.timestamps.registered),
       username: shortAddress(event.player_address),
       name: shortAddress(event.player_address),
       isNew: true,
@@ -57,7 +57,7 @@ const createStore = () => {
       // console.log("setEntities()[Player] =>", entities)
       set((state: State) => {
         state.players = entities.sort((a, b) => (
-          Number(b.models.pistols.Player?.timestamp_registered ?? 0) - Number(a.models.pistols.Player?.timestamp_registered ?? 0)
+          Number(b.models.pistols.Player?.timestamps.registered ?? 0) - Number(a.models.pistols.Player?.timestamps.registered ?? 0)
         )).reduce((acc, e) => {
           const player = _parseEvent(e)
           if (player) {
@@ -149,7 +149,7 @@ export const usePlayer = (address: BigNumberish) => {
   const isNew = useMemo(() => (player?.isNew ?? false), [player])
   const username = useMemo(() => (player?.username ?? 'unknown'), [player])
   const name = useMemo(() => (player?.name ?? 'Unknown'), [player])
-  const timestampRegistered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
+  const timestampRegistered = useMemo(() => (player?.timestamps.registered ?? 0), [player])
   const bookmarkedPlayers = useMemo(() => (player?.bookmarked_players ?? []), [player])
   const bookmarkedTokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
 

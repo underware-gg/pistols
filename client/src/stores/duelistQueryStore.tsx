@@ -44,8 +44,8 @@ const createStore = () => {
     if (!duelist) return undefined
     return {
       duelist_id: BigInt(duelist.duelist_id),
-      timestamp_registered: Number(duelist.timestamp_registered),
-      timestamp_active: Number(duelist.timestamp_active),
+      timestamp_registered: Number(duelist.timestamps.registered),
+      timestamp_active: Number(duelist.timestamps.active),
       name: 'DUELIST_????',
       fame: 0,
       honour: Number(scoreboard?.score.honour ?? 0),

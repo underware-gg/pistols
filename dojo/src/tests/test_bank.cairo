@@ -266,7 +266,7 @@ mod tests {
 
         // collect season
         let season: SeasonConfig = (*sys.store).get_current_season();
-        tester::set_block_timestamp(season.timestamp_end);
+        tester::set_block_timestamp(season.period.end);
         tester::execute_collect(sys.game, OWNER());
 
         // duelists got some LORDS

@@ -146,7 +146,7 @@ function DuelItem({
 }) {
   const { duelistId } = useSettings()
   const {
-    challenge: { duelistIdA, duelistIdB, tableId, state, isLive, isCanceled, isExpired, isDraw, winner, timestamp_start },
+    challenge: { duelistIdA, duelistIdB, tableId, state, isLive, isCanceled, isExpired, isDraw, winner },
     turnA, turnB,
   } = useDuel(duelId)
   const { name: nameA, profilePic: profilePicA } = useDuelist(duelistIdA)

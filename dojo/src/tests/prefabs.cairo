@@ -9,7 +9,7 @@ pub mod prefabs {
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::round_state::{RoundState};
     use pistols::libs::game_loop::{make_moves_hash};
-    use pistols::utils::timestamp::{TimestampTrait};
+    use pistols::types::timestamp::{TimestampTrait};
     use pistols::tests::tester::{tester,
         tester::{
             // StoreTrait,

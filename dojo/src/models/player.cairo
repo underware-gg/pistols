@@ -26,7 +26,12 @@ pub struct Player {
     #[key]
     pub player_address: ContractAddress,   // controller wallet
     //-----------------------
-    pub timestamp_registered: u64,
+    pub timestamps: PlayerTimestamps,
+}
+
+#[derive(Copy, Drop, Serde, PartialEq, IntrospectPacked)]
+pub struct PlayerTimestamps {
+    pub registered: u64,
     pub claimed_starter_pack: bool,
 }
 
@@ -100,18 +105,18 @@ pub impl PlayerImpl of PlayerTrait {
         let mut player: Player = store.get_player(player_address);
         if (!player.exists()) {
             assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
-            player.timestamp_registered = starknet::get_block_timestamp();
-            player.claimed_starter_pack = (activity == Activity::PackStarter);
+            player.timestamps.registered = starknet::get_block_timestamp();
+            player.timestamps.claimed_starter_pack = (activity == Activity::PackStarter);
             store.set_player(@player);
         } else if (activity == Activity::PackStarter) {
-            player.claimed_starter_pack = true;
+            player.timestamps.claimed_starter_pack = true;
             store.set_player(@player);
         }
         activity.emit(ref store.world, player_address, identifier);
     }
     #[inline(always)]
     fn exists(self: @Player) -> bool {
-        (*self.timestamp_registered != 0)
+        (*self.timestamps.registered != 0)
     }
 }
 

@@ -71,8 +71,8 @@ export const useChallenge = (duelId: BigNumberish) => {
   const premise = useMemo(() => (parseEnumVariant<constants.Premise>(challenge?.premise) ?? constants.Premise.Undefined), [challenge])
   const quote = useMemo(() => feltToString(challenge?.quote ?? 0n), [challenge])
   const livesStaked = useMemo(() => Number(challenge?.lives_staked ?? 0), [challenge])
-  const timestamp_start = useMemo(() => Number(challenge?.timestamp_start ?? 0), [challenge])
-  const timestamp_end = useMemo(() => Number(challenge?.timestamp_end ?? 0), [challenge])
+  const timestamp_start = useMemo(() => Number(challenge?.timestamps.start ?? 0), [challenge])
+  const timestamp_end = useMemo(() => Number(challenge?.timestamps.end ?? 0), [challenge])
 
   const { clientSeconds } = useClientTimestamp(false)
   let _state = useMemo(() => parseEnumVariant<constants.ChallengeState>(challenge?.state), [challenge])

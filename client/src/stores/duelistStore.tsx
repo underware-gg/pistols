@@ -40,8 +40,8 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const scoreboard = useEntityModel<models.Scoreboard>(entity, 'Scoreboard')
   // console.log(`useDuelist() =>`, duelist_id, duelist)
 
-  const timestampRegistered = useMemo(() => Number(duelist?.timestamp_registered ?? 0), [duelist])
-  const timestampActive = useMemo(() => Number(duelist?.timestamp_active ?? 0), [duelist])
+  const timestampRegistered = useMemo(() => Number(duelist?.timestamps.registered ?? 0), [duelist])
+  const timestampActive = useMemo(() => Number(duelist?.timestamps.active ?? 0), [duelist])
   const exists = useMemo(() => Boolean(timestampRegistered), [timestampRegistered])
 
   // inactivity

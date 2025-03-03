@@ -260,7 +260,7 @@ mod tests {
 // round.state_b.health.print();
         assert_eq!(challenge.state, ChallengeState::Resolved, "4_challenge.state");
         assert_ne!(challenge.winner, 0, "4_challenge.winner");
-        assert_gt!(challenge.timestamp_end, 0, "4_challenge.timestamp_end");
+        assert_gt!(challenge.timestamps.end, 0, "4_challenge.timestamps.end");
         assert_eq!(round.state, RoundState::Finished, "4__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "43__hash");
         assert_eq!(round.moves_a.salt, moves_a.salt, "43__salt");
@@ -343,7 +343,7 @@ mod tests {
         let (challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
         assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state ++");
         assert_ne!(challenge.winner, 0, "challenge.winner ++");
-        assert_gt!(challenge.timestamp_end, 0, "challenge.timestamp_end ++");
+        assert_gt!(challenge.timestamps.end, 0, "challenge.timestamps.end ++");
         assert_eq!(round.state, RoundState::Finished, "state ++");
         assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "score_a.score.honour ++");
         assert_eq!(round.state_b.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "score_b.score.honour ++");

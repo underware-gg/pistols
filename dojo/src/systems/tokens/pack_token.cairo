@@ -207,7 +207,7 @@ pub mod pack_token {
         fn can_claim_starter_pack(self: @ContractState, recipient: ContractAddress) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let player: Player = store.get_player(recipient);
-            (!player.claimed_starter_pack)
+            (!player.timestamps.claimed_starter_pack)
         }
 
         fn can_purchase(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> bool {

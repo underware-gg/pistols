@@ -303,7 +303,7 @@ pub mod game {
             // update challenge
             challenge.winner = progress.winner;
             challenge.state = if (progress.winner == 0) {ChallengeState::Draw} else {ChallengeState::Resolved};
-            challenge.timestamp_end = starknet::get_block_timestamp();
+            challenge.timestamps.end = starknet::get_block_timestamp();
             store.set_challenge(@challenge);
 
             // undo pacts

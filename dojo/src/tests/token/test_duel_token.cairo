@@ -1,6 +1,7 @@
 use core::num::traits::Zero;
 use starknet::{ContractAddress};
 
+use pistols::interfaces::dns::{DnsTrait};
 use pistols::systems::{
     tokens::{
         duel_token::{IDuelTokenDispatcherTrait},
@@ -17,10 +18,11 @@ use pistols::models::{
         TABLES,
     },
 };
-
-use pistols::interfaces::dns::{DnsTrait};
-use pistols::types::challenge_state::{ChallengeState};
-use pistols::types::premise::{Premise};
+use pistols::types::{
+    challenge_state::{ChallengeState},
+    premise::{Premise},
+    timestamp::{Period},
+};
 
 use pistols::tests::tester::{tester,
     tester::{
@@ -178,8 +180,10 @@ fn test_token_uri() {
         state: ChallengeState::Resolved,
         winner: 1,
         // times
-        timestamp_start: 10000,
-        timestamp_end:   20000,
+        timestamps: Period {
+            start: 10000,
+            end: 20000,
+        },
     };
 
     tester::set_Challenge(ref sys.world, @challenge);

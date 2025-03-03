@@ -60,6 +60,7 @@ mod types {
     pub mod round_state;
     pub mod rules;
     pub mod shuffler;
+    pub mod timestamp;
     pub mod typed_data;
     pub mod trophies;
     pub mod cards {
@@ -81,7 +82,6 @@ mod utils {
     pub mod math;
     pub mod misc;
     pub mod short_string;
-    pub mod timestamp;
     pub mod openzeppelin {
         pub mod snip12;
     }

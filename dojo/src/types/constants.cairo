@@ -31,7 +31,7 @@ pub mod CHANCES {
 
 pub mod FAME {
     use super::CONST;
-    use pistols::utils::timestamp::{TIMESTAMP};
+    use pistols::types::timestamp::{TIMESTAMP};
 
     // amount of FAME minted to every new Duelist
     pub const MINT_GRANT_AMOUNT: u256 = (3000 * CONST::ETH_TO_WEI);

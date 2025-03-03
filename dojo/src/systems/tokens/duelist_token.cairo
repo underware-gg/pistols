@@ -175,7 +175,7 @@ pub mod duelist_token {
         pool::{PoolType, PoolTypeTrait, LordsReleaseBill},
         player::{Activity, ActivityTrait},
         duelist::{
-            Duelist, DuelistValue,
+            Duelist, DuelistValue, DuelistTimestamps,
             ScoreboardValue, ScoreTrait,
             DuelistMemorial, CauseOfDeath,
             Archetype,
@@ -276,7 +276,7 @@ pub mod duelist_token {
             duelist_id: u128,
         ) -> u64 {
             let mut store: Store = StoreTrait::new(self.world_default());
-            let timestamp_active: u64 = store.get_duelist_value(duelist_id).timestamp_active;
+            let timestamp_active: u64 = store.get_duelist_value(duelist_id).timestamps.active;
             let timestamp: u64 = starknet::get_block_timestamp();
             (timestamp - timestamp_active)
         }
@@ -355,8 +355,10 @@ pub mod duelist_token {
                 let duelist = Duelist {
                     duelist_id: *duelist_ids[i],
                     profile_type: ProfileManagerTrait::randomize_duelist(rnd.low.into()),
-                    timestamp_registered: timestamp,
-                    timestamp_active: timestamp,
+                    timestamps: DuelistTimestamps {
+                        registered: timestamp,
+                        active: timestamp,
+                    },
                 };
                 store.set_duelist(@duelist);
 

@@ -274,7 +274,7 @@ mod PROFILES {
 //----------------------------------
 // Traits
 //
-use pistols::models::duelist::{Duelist};
+use pistols::models::duelist::{Duelist, DuelistTimestamps};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::utils::misc::{FeltToLossy};
@@ -290,8 +290,10 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
             store.set_duelist(@Duelist {
                 duelist_id: profile_type.duelist_id(),
                 profile_type,
-                timestamp_registered: timestamp,
-                timestamp_active: timestamp,
+                timestamps: DuelistTimestamps {
+                    registered: timestamp,
+                    active: timestamp,
+                },
             });
             i += 1;
         };

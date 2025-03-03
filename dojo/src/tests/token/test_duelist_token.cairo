@@ -7,7 +7,7 @@ use pistols::models::{
         PackType, PackTypeTrait,
     },
     duelist::{
-        Duelist,
+        Duelist, DuelistTimestamps,
         Scoreboard, Score,
         ProfileType, DuelistProfile,
         DuelistMemorialValue, CauseOfDeath,
@@ -168,8 +168,10 @@ fn test_token_uri() {
     let duelist = Duelist {
         duelist_id: TOKEN_ID_1_1.low,
         profile_type: ProfileType::Duelist(DuelistProfile::Duke),
-        timestamp_registered: 999999,
-        timestamp_active: 999999,
+        timestamps: DuelistTimestamps {
+            registered: 999999,
+            active: 999999,
+        },
     };
     tester::set_Duelist(ref sys.world, @duelist);
 
@@ -327,8 +329,8 @@ fn test_duelist_inactive() {
     assert_eq!(intial_fame, WEI(3000).low, "intial_fame");
 
     let token_id: u128 = TOKEN_ID_1_1.low;
-    let timestamp_registered: u64 = sys.store.get_duelist_value(token_id).timestamp_registered;
-    assert_eq!(tester::get_block_timestamp(), timestamp_registered + 1, "timestamp_registered");
+    let timestamp_registered: u64 = sys.store.get_duelist_value(token_id).timestamps.registered;
+    assert_eq!(tester::get_block_timestamp(), timestamp_registered + 1, "timestamps.registered");
 
     let fame_supply: u128 = sys.fame.total_supply().low;
     assert_eq!(fame_supply, (intial_fame * 2), "INIT_fame_supply");
@@ -379,7 +381,7 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
     let lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
     let fame_balance_start: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
     let fame_supply_start: u128 = (*sys.fame).total_supply().low;
-    let timestamp_active_start: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
+    let timestamp_active_start: u64 = (*sys.store).get_duelist_value(token_id).timestamps.active;
     // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
 // println!("[] balance     : {}", fame_balance_start/CONST::ETH_TO_WEI.low);
 // println!("[] fame_to_burn: {}", dripped_fame);
@@ -398,7 +400,7 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
     assert_eq!((*sys.duelists).inactive_fame_dripped(token_id), 0, "AFTER_inactive_fame_dripped");
 
     // timestamp_active updated
-    let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
+    let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamps.active;
     assert_gt!(timestamp_active, timestamp_active_start, "AFTER_timestamp_active");
 
     // if dead, has a memorial
@@ -522,7 +524,7 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128, cause_of_death: Ca
     let lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
     let fame_balance_start: u128 = (*sys.fame).balance_of_token((*sys.duelists).contract_address, token_id).low;
     let fame_supply_start: u128 = (*sys.fame).total_supply().low;
-    let timestamp_active_start: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
+    let timestamp_active_start: u64 = (*sys.store).get_duelist_value(token_id).timestamps.active;
     // let intial_fame: u128 = FAME::MINT_GRANT_AMOUNT.low;
 // println!("[] balance     : {}", fame_balance_start/CONST::ETH_TO_WEI.low);
 // println!("[] fame_to_burn: {}", dripped_fame);
@@ -548,7 +550,7 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128, cause_of_death: Ca
     }
 
     // timestamp_active updated
-    let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamp_active;
+    let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamps.active;
     assert_gt!(timestamp_active, timestamp_active_start, "AFTER_timestamp_active");
 
     // duelist lost fame...

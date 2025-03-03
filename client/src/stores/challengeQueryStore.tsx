@@ -40,8 +40,8 @@ const createStore = () => {
   const _parseEntity = (e: PistolsEntity) => {
     const challenge = e.models.pistols.Challenge
     if (!challenge) return undefined
-    const start = Number(challenge.timestamp_start)
-    const end = Number(challenge.timestamp_end)
+    const start = Number(challenge.timestamps.start)
+    const end = Number(challenge.timestamps.end)
     const state = parseEnumVariant<constants.ChallengeState>(challenge.state)
     return {
       duel_id: BigInt(challenge.duel_id),

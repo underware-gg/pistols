@@ -8,7 +8,7 @@ mod tests {
     use pistols::types::cards::hand::{DeckType};
     use pistols::types::challenge_state::{ChallengeState};
     use pistols::types::duel_progress::{DuelProgress};
-    use pistols::utils::timestamp::{TimestampTrait};
+    use pistols::types::timestamp::{TimestampTrait, TIMESTAMP};
     use pistols::tests::tester::{tester,
         tester::{
             StoreTrait,
@@ -107,11 +107,11 @@ mod tests {
         assert_eq!(ch.duelist_id_b, 0, "challenged_id"); // challenged an address, id is empty
         assert_eq!(ch.quote, PREMISE_1, "quote");
         assert_eq!(ch.lives_staked, 1, "lives_staked");
-        assert_eq!(ch.timestamp_start, timestamp, "timestamp_start");
-        assert_eq!(ch.timestamp_end, 0, "timestamp_end");
+        assert_eq!(ch.timestamps.start, timestamp, "timestamps.start");
+        assert_eq!(ch.timestamps.end, timestamp + TIMESTAMP::ONE_DAY, "timestamps.end");
         _assert_empty_progress(@sys, duel_id);
         let game_timestamp = sys.game.get_timestamp();
-        assert_gt!(game_timestamp, ch.timestamp_start, "game_timestamp > timestamp_start");
+        assert_gt!(game_timestamp, ch.timestamps.start, "game_timestamp > timestamps.start");
         // deck type
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
     }
@@ -139,8 +139,8 @@ mod tests {
         let timestamp: u64 = tester::get_block_timestamp();
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), expire_hours, 1);
         let ch = sys.store.get_challenge_value(duel_id);
-        assert_eq!(ch.timestamp_start, timestamp, "timestamp_start");
-        assert_eq!(ch.timestamp_end, ch.timestamp_start + TimestampTrait::from_hours(expire_hours), "timestamp_end");
+        assert_eq!(ch.timestamps.start, timestamp, "timestamps.start");
+        assert_eq!(ch.timestamps.end, ch.timestamps.start + TimestampTrait::from_hours(expire_hours), "timestamps.end");
         _assert_empty_progress(@sys, duel_id);
     }
 
@@ -206,8 +206,8 @@ mod tests {
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, new_state, "state");
         assert_eq!(ch.winner, 0, "winner");
-        assert_gt!(ch.timestamp_start, 0, "timestamp_start");
-        assert_eq!(ch.timestamp_end, timestamp, "timestamp_end");
+        assert_gt!(ch.timestamps.start, 0, "timestamps.start");
+        assert_eq!(ch.timestamps.end, timestamp, "timestamps.end");
 
         _assert_empty_progress(@sys, duel_id);
     }
@@ -242,8 +242,8 @@ mod tests {
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, new_state, "state");
         assert_eq!(ch.winner, 0, "winner");
-        assert_lt!(ch.timestamp_start, timestamp, "timestamp_start");
-        assert_eq!(ch.timestamp_end, timestamp, "timestamp_end");
+        assert_lt!(ch.timestamps.start, timestamp, "timestamps.start");
+        assert_eq!(ch.timestamps.end, timestamp, "timestamps.end");
 
         _assert_empty_progress(@sys, duel_id);
     }
@@ -281,8 +281,8 @@ mod tests {
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, new_state, "state");
         assert_eq!(ch.winner, 0, "winner");
-        assert_lt!(ch.timestamp_start, timestamp, "timestamp_start");
-        assert_eq!(ch.timestamp_end, timestamp, "timestamp_end");
+        assert_lt!(ch.timestamps.start, timestamp, "timestamps.start");
+        assert_eq!(ch.timestamps.end, timestamp, "timestamps.end");
         tester::assert_pact(@sys, duel_id, ch, false, false, "replied");
 
         _assert_empty_progress(@sys, duel_id);

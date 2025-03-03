@@ -25,9 +25,9 @@ mod tests {
         let timestamp: u64 = tester::get_block_timestamp();
         assert_ne!(season.table_id, 0, "table_id");
         assert_eq!(season.season_id, 1, "season_id");
-        assert_ne!(season.timestamp_start, 0, "timestamp_start != 0");
-        assert_lt!(season.timestamp_start, timestamp, "timestamp_start");
-        assert_gt!(season.timestamp_end, season.timestamp_start, "timestamp_end");
+        assert_ne!(season.period.start, 0, "period.start != 0");
+        assert_lt!(season.period.start, timestamp, "period.start");
+        assert_gt!(season.period.end, season.period.start, "period.end");
         assert_eq!(season.phase, SeasonPhase::InProgress, "phase");
         //  table was created
         let table: TableConfig = sys.store.get_table_config( season.table_id);
@@ -47,7 +47,7 @@ mod tests {
         //  time travel
         assert!(!season.can_collect(), "!season.can_collect");
         assert!(!sys.game.can_collect_season(), "!sys.game.can_collect_season");
-        tester::set_block_timestamp(season.timestamp_end);
+        tester::set_block_timestamp(season.period.end);
         assert!(season.can_collect(), "season.can_collect");
         assert!(sys.game.can_collect_season(), "sys.game.can_collect_season");
         // collect
@@ -77,7 +77,7 @@ mod tests {
     fn test_collect_season_baseline() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let season: SeasonConfig = sys.store.get_current_season();
-        tester::set_block_timestamp(season.timestamp_end);
+        tester::set_block_timestamp(season.period.end);
         tester::execute_collect(@sys.game, OWNER());
         // no panic!
     }
@@ -95,7 +95,7 @@ mod tests {
     fn test_collect_season_ended() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let season: SeasonConfig = sys.store.get_current_season();
-        tester::set_block_timestamp(season.timestamp_end);
+        tester::set_block_timestamp(season.period.end);
         tester::execute_collect(@sys.game, OWNER());
         // panic! >>>> will collect new season
         tester::execute_collect(@sys.game, OWNER());
@@ -106,7 +106,7 @@ mod tests {
     fn test_collect_season_create_challenge() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let season: SeasonConfig = sys.store.get_current_season();
-        tester::set_block_timestamp(season.timestamp_end);
+        tester::set_block_timestamp(season.period.end);
         tester::execute_collect(@sys.game, OWNER());
         // create a challenge in season 1
         tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_TABLE(1), 0, 1);

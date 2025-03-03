@@ -184,10 +184,10 @@ pub mod duel_token {
         challenge_state::{ChallengeState, ChallengeStateTrait},
         round_state::{RoundState},
         premise::{Premise, PremiseTrait},
+        timestamp::{Period, TimestampTrait, TIMESTAMP},
     };
-    use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
-    use pistols::utils::timestamp::{TimestampTrait};
+    use pistols::libs::store::{Store, StoreTrait};
 
     pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'DUEL: Invalid caller';
@@ -309,7 +309,7 @@ pub mod duel_token {
             assert(address_b != address_a, Errors::INVALID_CHALLENGED_SELF);
 
             // TODO...
-            // if (tournament) {
+            // if (tournament_id != 0) {
             //     assert(tournament.can_join(address_a, 0), Errors::CHALLENGED_NOT_ADMITTED);
             //     assert(tournament.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
             // }
@@ -319,8 +319,14 @@ pub mod duel_token {
             store.emit_required_action(duelist_id_a, duel_id);
 
             // calc expiration
-            let timestamp_start: u64 = starknet::get_block_timestamp();
-            let timestamp_end: u64 = if (expire_hours == 0) { 0 } else { timestamp_start + TimestampTrait::from_hours(expire_hours) };
+            let timestamp: u64 = starknet::get_block_timestamp();
+            let timestamps = Period {
+                start: timestamp,
+                end: (timestamp + 
+                    if (expire_hours == 0) {TIMESTAMP::ONE_DAY}
+                    else {TimestampTrait::from_hours(expire_hours)}
+                ),
+            };
 
             // create challenge
             let challenge = Challenge {
@@ -338,8 +344,7 @@ pub mod duel_token {
                 state: ChallengeState::Awaiting,
                 winner: 0,
                 // times
-                timestamp_start,   // chalenge issued
-                timestamp_end,     // expire
+                timestamps,
             };
             store.set_challenge(@challenge);
 
@@ -384,15 +389,15 @@ pub mod duel_token {
             let table: TableConfig = store.get_table_config(challenge.table_id);
             table.assert_can_join(@store);
 
-            if (challenge.timestamp_end != 0 && timestamp > challenge.timestamp_end) {
+            if (challenge.timestamps.end != 0 && timestamp > challenge.timestamps.end) {
                 // Expired, close it!
                 challenge.state = ChallengeState::Expired;
-                challenge.timestamp_end = timestamp;
+                challenge.timestamps.end = timestamp;
             } else if (address_b == challenge.address_a) {
                 // same duelist, can only withdraw...
                 assert(accepted == false, Errors::INVALID_REPLY_SELF);
                 challenge.state = ChallengeState::Withdrawn;
-                challenge.timestamp_end = timestamp;
+                challenge.timestamps.end = timestamp;
             } else {
                 // validate duelist ownership
                 let duelist_dispatcher = store.world.duelist_token_dispatcher();
@@ -421,8 +426,8 @@ pub mod duel_token {
 
                     // update timestamps
                     challenge.state = ChallengeState::InProgress;
-                    challenge.timestamp_start = timestamp;
-                    challenge.timestamp_end = 0;
+                    challenge.timestamps.start = timestamp;
+                    challenge.timestamps.end = 0;
 
                     // generate player deck seed
                     let mut round: Round = store.get_round(duel_id);
@@ -430,7 +435,7 @@ pub mod duel_token {
                 } else {
                     // Challenged is Refusing
                     challenge.state = ChallengeState::Refused;
-                    challenge.timestamp_end = timestamp;
+                    challenge.timestamps.end = timestamp;
                 }
             }
 

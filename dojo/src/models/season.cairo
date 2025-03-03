@@ -1,3 +1,4 @@
+use pistols::types::timestamp::{Period};
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -6,9 +7,8 @@ pub struct SeasonConfig {
     pub table_id: felt252,      // short string
     //------
     pub season_id: u16,         // sequential
-    pub timestamp_start: u64,   // start of season
-    pub timestamp_end: u64,     // end of season (past or future)
     pub phase: SeasonPhase,     // current phase
+    pub period: Period,         // start and end of season
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -28,7 +28,7 @@ use pistols::models::table::{TableConfig};
 use pistols::types::rules::{RulesType, RulesTypeTrait, SeasonDistribution};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::short_string::{ShortStringTrait};
-use pistols::utils::timestamp::{TIMESTAMP};
+use pistols::types::timestamp::{TIMESTAMP};
 use pistols::utils::math::{MathU64};
 
 #[generate_trait]
@@ -47,15 +47,17 @@ pub impl SeasonManagerImpl of SeasonManagerTrait {
         let rules: RulesType = RulesType::Season;
         let distribution: @SeasonDistribution = rules.get_season_distribution(100);
         // calc timestamps
-        let timestamp_start: u64 = starknet::get_block_timestamp();
-        let timestamp_end: u64 = (timestamp_start + Self::get_season_duration());
+        let timestamp: u64 = starknet::get_block_timestamp();
+        let period = Period {
+            start: timestamp,
+            end: (timestamp + Self::get_season_duration()),
+        };
         // create models
         store.set_season_config(@SeasonConfig {
             table_id,
             season_id,
-            timestamp_start,
-            timestamp_end,
             phase: SeasonPhase::InProgress,
+            period,
         });
         store.set_table_config(@TableConfig {
             table_id,
@@ -98,7 +100,7 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
     //
     #[inline(always)]
     fn seconds_to_collect(self: @SeasonConfig) -> u64 {
-        (MathU64::sub(*self.timestamp_end, starknet::get_block_timestamp()))
+        (MathU64::sub(*self.period.end, starknet::get_block_timestamp()))
     }
     #[inline(always)]
     fn can_collect(self: @SeasonConfig) -> bool {
@@ -113,7 +115,7 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
         assert(self.seconds_to_collect() == 0, ErrorsGame::SEASON_IS_ACTIVE);
         // collect!
         self.phase = SeasonPhase::Ended;
-        self.timestamp_end = starknet::get_block_timestamp();
+        self.period.end = starknet::get_block_timestamp();
         store.set_season_config(@self);
         // create next season
         let table_id: felt252 = SeasonManagerTrait::create_next_season(ref store, self.season_id);
