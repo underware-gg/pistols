@@ -24,6 +24,14 @@ pub struct Period {
 // Traits
 //
 #[generate_trait]
+pub impl PeriodImpl of PeriodTrait {
+    #[inline(always)]
+    fn has_expired(self: @Period) -> bool {
+        (*self.end != 0 && starknet::get_block_timestamp() > *self.end)
+    }
+}
+
+#[generate_trait]
 pub impl TimestampImpl of TimestampTrait {
     #[inline(always)]
     fn from_minutes(minutes: u64) -> u64 {

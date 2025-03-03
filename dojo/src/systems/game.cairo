@@ -20,6 +20,7 @@ pub trait IGame<TState> {
         salt: felt252,
         moves: Span<u8>,
     );
+    fn collect_duel(ref self: TState, duel_id: u128); // @description:Close expired duels
     fn collect_season(ref self: TState) -> felt252; // @description:Close the current season and start the next one
 
     // view calls
@@ -27,6 +28,7 @@ pub trait IGame<TState> {
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
     fn get_duelist_leaderboard_position(self: @TState, table_id: felt252, duelist_id: u128) -> LeaderboardPosition;
     fn get_leaderboard(self: @TState, table_id: felt252) -> Span<LeaderboardPosition>;
+    fn can_collect_duel(self: @TState, duel_id: u128) -> bool;
     fn can_collect_season(self: @TState) -> bool;
     fn calc_season_reward(self: @TState, table_id: felt252, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn get_timestamp(self: @TState) -> u64;
@@ -85,6 +87,7 @@ pub mod game {
         cards::deck::{DeckTrait},
         rules::{RulesType, RulesTypeTrait ,RewardValues},
         constants::{FAME},
+        timestamp::{PeriodTrait},
     };
     use pistols::types::trophies::{Trophy, TrophyTrait, TROPHY};
     use pistols::libs::store::{Store, StoreTrait};
@@ -93,6 +96,7 @@ pub mod game {
     pub mod Errors {
         pub const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
         pub const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not active';
+        pub const CHALLENGE_IN_PROGRESS: felt252     = 'PISTOLS: Challenge is active';
         pub const NOT_ACCEPTED: felt252              = 'PISTOLS: Accept challenge first';
         pub const NOT_YOUR_DUEL: felt252             = 'PISTOLS: Not your duel';
         pub const NOT_YOUR_DUELIST: felt252          = 'PISTOLS: Not your duelist';
@@ -333,6 +337,24 @@ pub mod game {
             store.emit_challenge_rewards(duel_id, challenge.duelist_id_b, rewards_b);
         }
 
+        fn collect_duel(ref self: ContractState, duel_id: u128) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut challenge: Challenge = store.get_challenge(duel_id);
+            assert(self.can_collect_duel(duel_id), Errors::CHALLENGE_IN_PROGRESS);
+            challenge.state = ChallengeState::Expired;
+            challenge.timestamps.end = starknet::get_block_timestamp();
+            store.set_challenge(@challenge);
+            // unset pact (if set)
+            challenge.unset_pact(ref store);
+            // exit challenge
+            store.exit_challenge(challenge.duelist_id_a);
+            store.emit_required_action(challenge.duelist_id_a, 0);
+            if (challenge.duelist_id_b != 0) {
+                store.exit_challenge(challenge.duelist_id_b);
+                store.emit_required_action(challenge.duelist_id_b, 0);
+            }
+        }
+
         fn collect_season(ref self: ContractState) -> felt252 {
             let mut store: Store = StoreTrait::new(self.world_default());
             // collect season if permitted
@@ -379,6 +401,16 @@ pub mod game {
         fn get_leaderboard(self: @ContractState, table_id: felt252) -> Span<LeaderboardPosition> {
             let mut store: Store = StoreTrait::new(self.world_default());
             (store.get_leaderboard(table_id).get_all_positions())
+        }
+
+        fn can_collect_duel(self: @ContractState, duel_id: u128) -> bool {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let challenge: Challenge = store.get_challenge(duel_id);
+            if (challenge.state == ChallengeState::Awaiting && challenge.timestamps.has_expired()) {
+                (true)
+            } else {
+                (false)
+            }
         }
 
         fn can_collect_season(self: @ContractState) -> bool {

@@ -625,7 +625,12 @@ pub mod tester {
         (*system).reveal_moves(token_id, duel_id, salt, moves);
         _next_block();
     }
-    pub fn execute_collect(system: @IGameDispatcher, sender: ContractAddress) -> felt252 {
+    pub fn execute_collect_duel(system: @IGameDispatcher, sender: ContractAddress, duel_id: u128) {
+        impersonate(sender);
+        (*system).collect_duel(duel_id);
+        _next_block();
+    }
+    pub fn execute_collect_season(system: @IGameDispatcher, sender: ContractAddress) -> felt252 {
         impersonate(sender);
         let new_table_id: felt252 = (*system).collect_season();
         _next_block();

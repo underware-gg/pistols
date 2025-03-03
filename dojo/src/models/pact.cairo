@@ -15,8 +15,8 @@ pub struct Pact {
 //----------------------------------
 // Traits
 //
+use core::num::traits::Zero;
 use starknet::{ContractAddress};
-
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
 use pistols::models::challenge::{Challenge};
 use pistols::utils::misc::{ContractAddressIntoU256};
@@ -41,6 +41,8 @@ pub impl PactImpl of PactTrait {
     // Challenge trait
     //
     fn set_pact(self: @Challenge, ref store: Store) {
+        assert((*self.address_a).is_non_zero(), DuelErrors::INVALID_DUELIST_A_NULL);
+        assert((*self.address_b).is_non_zero(), DuelErrors::INVALID_DUELIST_B_NULL);
         let pair: u128 = Self::make_pair(*self.address_a, *self.address_b);
         let mut current_pact: Pact = store.get_pact(*self.table_id, pair);
         // new pact: must not exist!
@@ -49,8 +51,10 @@ pub impl PactImpl of PactTrait {
         store.set_pact(@current_pact);
     }
     fn unset_pact(self: @Challenge, ref store: Store) {
-        let pair: u128 = Self::make_pair(*self.address_a, *self.address_b);
-        let current_pact: Pact = store.get_pact(*self.table_id, pair);
-        store.delete_pact(@current_pact);
+        if ((*self.address_a).is_non_zero() && (*self.address_b).is_non_zero()) {
+            let pair: u128 = Self::make_pair(*self.address_a, *self.address_b);
+            let current_pact: Pact = store.get_pact(*self.table_id, pair);
+            store.delete_pact(@current_pact);
+        }
     }
 }

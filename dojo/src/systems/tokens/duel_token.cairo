@@ -184,7 +184,7 @@ pub mod duel_token {
         challenge_state::{ChallengeState, ChallengeStateTrait},
         round_state::{RoundState},
         premise::{Premise, PremiseTrait},
-        timestamp::{Period, TimestampTrait, TIMESTAMP},
+        timestamp::{Period, PeriodTrait, TimestampTrait, TIMESTAMP},
     };
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::libs::store::{Store, StoreTrait};
@@ -197,6 +197,8 @@ pub mod duel_token {
         pub const INVALID_TABLE: felt252            = 'DUEL: Invalid table';
         pub const INVALID_SEASON: felt252           = 'DUEL: Invalid season';
         pub const INVALID_CHALLENGED: felt252       = 'DUEL: Challenged unknown';
+        pub const INVALID_DUELIST_A_NULL: felt252   = 'DUEL: Duelist A null';
+        pub const INVALID_DUELIST_B_NULL: felt252   = 'DUEL: Duelist B null';
         pub const INVALID_CHALLENGED_NULL: felt252  = 'DUEL: Challenged null';
         pub const INVALID_CHALLENGED_SELF: felt252  = 'DUEL: Challenged self';
         pub const INVALID_REPLY_SELF: felt252       = 'DUEL: Reply self';
@@ -389,7 +391,7 @@ pub mod duel_token {
             let table: TableConfig = store.get_table_config(challenge.table_id);
             table.assert_can_join(@store);
 
-            if (challenge.timestamps.end != 0 && timestamp > challenge.timestamps.end) {
+            if (challenge.timestamps.has_expired()) {
                 // Expired, close it!
                 challenge.state = ChallengeState::Expired;
                 challenge.timestamps.end = timestamp;

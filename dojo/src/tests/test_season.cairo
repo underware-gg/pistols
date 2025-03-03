@@ -51,7 +51,7 @@ mod tests {
         assert!(season.can_collect(), "season.can_collect");
         assert!(sys.game.can_collect_season(), "sys.game.can_collect_season");
         // collect
-        let new_table_id: felt252 = tester::execute_collect(@sys.game, OWNER());
+        let new_table_id: felt252 = tester::execute_collect_season(@sys.game, OWNER());
         assert_ne!(new_table_id, 0, "new_table_id != 0");
         assert_ne!(new_table_id, season.table_id, "new_table_id");
         // past season is ended
@@ -78,7 +78,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let season: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season.period.end);
-        tester::execute_collect(@sys.game, OWNER());
+        tester::execute_collect_season(@sys.game, OWNER());
         // no panic!
     }
 
@@ -87,7 +87,7 @@ mod tests {
     fn test_collect_still_active() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let _season: SeasonConfig = sys.store.get_current_season();
-        tester::execute_collect(@sys.game, OWNER());
+        tester::execute_collect_season(@sys.game, OWNER());
     }
 
     #[test]
@@ -96,9 +96,9 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let season: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season.period.end);
-        tester::execute_collect(@sys.game, OWNER());
+        tester::execute_collect_season(@sys.game, OWNER());
         // panic! >>>> will collect new season
-        tester::execute_collect(@sys.game, OWNER());
+        tester::execute_collect_season(@sys.game, OWNER());
     }
 
     #[test]
@@ -107,7 +107,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let season: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season.period.end);
-        tester::execute_collect(@sys.game, OWNER());
+        tester::execute_collect_season(@sys.game, OWNER());
         // create a challenge in season 1
         tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_TABLE(1), 0, 1);
     }
