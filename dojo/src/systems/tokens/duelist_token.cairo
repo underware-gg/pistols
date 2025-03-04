@@ -575,7 +575,7 @@ pub mod duelist_token {
 // println!("remaining: {}", self._fame_balance(@fame_dispatcher, duelist_id));
 
             // update duelist timestamp
-            store.set_duelist_timestamp_active(duelist_id);
+            store.set_duelist_timestamp_active(duelist_id, starknet::get_block_timestamp());
             
             // notify indexers to update metadata
             self.erc721_combo._emit_metadata_update(duelist_id.into());

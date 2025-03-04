@@ -130,6 +130,7 @@ export const useRound = (duelId: BigNumberish) => {
     value: finalBlow
   } = useMemo(() => parseCustomEnum<constants.FinalBlow>(round?.final_blow), [round])
   const endedInBlades = useMemo(() => (finalBlowType === constants.FinalBlow.Blades), [finalBlowType])
+  const playerTimedOut = useMemo(() => (finalBlowType === constants.FinalBlow.Forsaken), [finalBlowType])
 
   const hand_a = useMemo(() => round ? movesToHand(
     //@ts-ignore
@@ -169,6 +170,7 @@ export const useRound = (duelId: BigNumberish) => {
     state,
     finalBlow,
     endedInBlades,
+    playerTimedOut,
     hand_a,
     hand_b,
     moves_a,

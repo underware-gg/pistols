@@ -352,10 +352,10 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_duelist_timestamp_active(ref self: Store, duelist_id: u128) {
+    fn set_duelist_timestamp_active(ref self: Store, duelist_id: u128, current_timestamp: u64) {
         let model_ptr: ModelPtr<Duelist> = Model::<Duelist>::ptr_from_keys(duelist_id);
         let mut timestamps: DuelistTimestamps = self.world.read_member(model_ptr, selector!("timestamps"));
-        timestamps.active = starknet::get_block_timestamp();
+        timestamps.active = current_timestamp;
         self.world.write_member(model_ptr, selector!("timestamps"), timestamps);
     }
 

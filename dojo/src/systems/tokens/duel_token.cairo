@@ -174,7 +174,7 @@ pub mod duel_token {
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
     };
     use pistols::models::{
-        player::{PlayerTrait, Activity},
+        player::{PlayerTrait, Activity, ActivityTrait},
         challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, RoundTrait},
         duelist::{DuelistTrait, DuelistValue, ProfileTypeTrait},
         pact::{PactTrait},
@@ -393,12 +393,10 @@ pub mod duel_token {
             if (challenge.timestamps.has_expired()) {
                 // Expired, close it!
                 challenge.state = ChallengeState::Expired;
-                challenge.timestamps.end = timestamp;
             } else if (address_b == challenge.address_a) {
                 // same duelist, can only withdraw...
                 assert(accepted == false, Errors::INVALID_REPLY_SELF);
                 challenge.state = ChallengeState::Withdrawn;
-                challenge.timestamps.end = timestamp;
             } else {
                 // validate duelist ownership
                 let duelist_dispatcher = store.world.duelist_token_dispatcher();
@@ -436,21 +434,21 @@ pub mod duel_token {
                 } else {
                     // Challenged is Refusing
                     challenge.state = ChallengeState::Refused;
-                    challenge.timestamps.end = timestamp;
                 }
             }
 
-            // update challenge
-            store.set_challenge(@challenge);
-
             // duel canceled!
             if (challenge.state.is_canceled()) {
+                challenge.timestamps.end = timestamp;
                 challenge.unset_pact(ref store);
                 store.exit_challenge(challenge.duelist_id_a);
+                Activity::ChallengeExpired.emit(ref store.world, starknet::get_caller_address(), challenge.duel_id.into());
+            } else {
+                PlayerTrait::check_in(ref store, Activity::ChallengeReplied, address_b, duel_id.into());
             }
-
-            // events
-            PlayerTrait::check_in(ref store, Activity::ChallengeReplied, address_b, duel_id.into());
+            
+            // update challenge
+            store.set_challenge(@challenge);
 
             (challenge.state)
         }

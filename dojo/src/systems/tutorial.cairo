@@ -198,11 +198,11 @@ pub mod tutorial {
 
             // store player moves
             assert(moves.len() >= 2 && moves.len() <= 4, Errors::INVALID_MOVES_COUNT);
-            round.moves_b.initialize(0xffff, moves);
+            round.moves_b.set_salt_and_moves(0xffff, moves);
 
             // store NPC moves
             let (npc_moves, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(@round.moves_b.as_hand());
-            round.moves_a.initialize(0xffff, npc_moves);
+            round.moves_a.set_salt_and_moves(0xffff, npc_moves);
 
             // execute game loop...
             let deck: Deck = challenge.get_deck();

@@ -480,6 +480,7 @@ pub mod tester {
     }
 
     pub fn set_block_timestamp(new_timestamp: u64) -> (u64, u64) {
+        assert_ge!(new_timestamp, starknet::get_block_timestamp(), "<<< Back in time...");
         let new_block_number = get_block_number() + 1;
         testing::set_block_number(new_block_number);
         testing::set_block_timestamp(new_timestamp);

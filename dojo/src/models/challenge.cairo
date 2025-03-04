@@ -100,6 +100,7 @@ use pistols::types::cards::{
 use pistols::types::{
     profile_type::{CharacterProfile},
     rules::{RulesType, RulesTypeTrait},
+    timestamp::{TimestampTrait},
     constants::{CONST},
 };
 use pistols::models::table::{TABLES};
@@ -168,7 +169,7 @@ pub impl RoundImpl of RoundTrait {
 
 #[generate_trait]
 pub impl MovesImpl of MovesTrait {
-    fn initialize(ref self: Moves, salt: felt252, moves: Span<u8>) {
+    fn set_salt_and_moves(ref self: Moves, salt: felt252, moves: Span<u8>) {
         self.salt = salt;
         self.card_1 = moves.value_or_zero(0);
         self.card_2 = moves.value_or_zero(1);
@@ -191,6 +192,10 @@ pub impl MovesImpl of MovesTrait {
     #[inline(always)]
     fn set_reveal_timeout(ref self: Moves, rules: RulesType, current_timestamp: u64) {
         self.timeout = if (self.salt == 0) {(current_timestamp + rules.get_reply_timeout())} else {(0)};
+    }
+    #[inline(always)]
+    fn has_timed_out(ref self: Moves) -> bool {
+        (self.timeout.has_timed_out())
     }
 }
 
