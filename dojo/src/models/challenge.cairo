@@ -51,14 +51,15 @@ pub struct Round {
 #[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
 pub struct Moves {
     // commit/reveal
-    pub salt: felt252,      // the player's secret salt
-    pub hashed: u128,       // hashed moves (salt + moves)
+    pub salt: felt252,      // set on reveal: the player's secret salt
+    pub hashed: u128,       // set on commit: hashed moves (salt + moves)
+    pub timeout: u64,       // current timeout to reply
     // player input
     pub card_1: u8,         // PacesCard,
     pub card_2: u8,         // PacesCard,
     pub card_3: u8,         // TacticsCard,
     pub card_4: u8,         // BladesCard,
-} // [f] + [128 + 32(4*8)]:160
+} // [f] + [128 + 64 + 32(4*8)]:224
 
 #[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
 pub struct DuelistState {
@@ -96,9 +97,12 @@ use pistols::types::cards::{
     paces::{PacesCardTrait},
     hand::{FinalBlow},
 };
+use pistols::types::{
+    profile_type::{CharacterProfile},
+    rules::{RulesType, RulesTypeTrait},
+    constants::{CONST},
+};
 use pistols::models::table::{TABLES};
-use pistols::types::profile_type::{CharacterProfile};
-use pistols::types::constants::{CONST};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
 use pistols::utils::math::{MathTrait};
@@ -152,6 +156,14 @@ pub impl RoundImpl of RoundTrait {
     fn make_seed(self: @Round) -> felt252 {
         (hash_values([(*self).moves_a.salt, (*self).moves_b.salt].span()))
     }
+    fn set_commit_timeout(ref self: Round, rules: RulesType, current_timestamp: u64) {
+        self.moves_a.set_commit_timeout(rules, current_timestamp);
+        self.moves_b.set_commit_timeout(rules, current_timestamp);
+    }
+    fn set_reveal_timeout(ref self: Round, rules: RulesType, current_timestamp: u64) {
+        self.moves_a.set_reveal_timeout(rules, current_timestamp);
+        self.moves_b.set_reveal_timeout(rules, current_timestamp);
+    }
 }
 
 #[generate_trait]
@@ -163,6 +175,7 @@ pub impl MovesImpl of MovesTrait {
         self.card_3 = moves.value_or_zero(2);
         self.card_4 = moves.value_or_zero(3);
     }
+    #[inline(always)]
     fn as_hand(self: @Moves) -> DuelistHand {
         (DuelistHand {
             card_fire: (*self.card_1).into(),
@@ -170,6 +183,14 @@ pub impl MovesImpl of MovesTrait {
             card_tactics: (*self.card_3).into(),
             card_blades: (*self.card_4).into(),
         })
+    }
+    #[inline(always)]
+    fn set_commit_timeout(ref self: Moves, rules: RulesType, current_timestamp: u64) {
+        self.timeout = if (self.hashed == 0) {(current_timestamp + rules.get_reply_timeout())} else {(0)};
+    }
+    #[inline(always)]
+    fn set_reveal_timeout(ref self: Moves, rules: RulesType, current_timestamp: u64) {
+        self.timeout = if (self.salt == 0) {(current_timestamp + rules.get_reply_timeout())} else {(0)};
     }
 }
 
@@ -182,9 +203,11 @@ pub impl DuelistStateImpl of DuelistStateTrait {
         self.health = CONST::FULL_HEALTH;
         self.honour = hand.card_fire.honour();
     }
+    #[inline(always)]
     fn apply_damage(ref self: DuelistState, amount: i8) {
         self.damage.addi(amount);
     }
+    #[inline(always)]
     fn apply_chances(ref self: DuelistState, amount: i8) {
         self.chances.addi(amount);
         self.chances.clampi(0, 100);

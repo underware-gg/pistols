@@ -73,7 +73,7 @@ pub mod game {
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
         player::{PlayerTrait, Activity, ActivityTrait},
-        challenge::{Challenge, ChallengeTrait, Round, MovesTrait},
+        challenge::{Challenge, ChallengeTrait, Round, RoundTrait, MovesTrait},
         duelist::{DuelistTrait, Scoreboard, ScoreTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
@@ -189,6 +189,7 @@ pub mod game {
                 // validate and store hash
                 assert(round.moves_a.hashed == 0, Errors::ALREADY_COMMITTED);
                 round.moves_a.hashed = hashed;
+                round.moves_a.timeout = 0;
                 // was duelist transferred?
                 if (challenge.address_a != owner) {
                     challenge.address_a = owner;
@@ -205,6 +206,7 @@ pub mod game {
                 // validate and store hash
                 assert(round.moves_b.hashed == 0, Errors::ALREADY_COMMITTED);
                 round.moves_b.hashed = hashed;
+                round.moves_b.timeout = 0;
                 // was duelist transferred?
                 if (challenge.address_b != owner) {
                     challenge.address_b = owner;
@@ -222,6 +224,7 @@ pub mod game {
             // move to reveal phase?
             if (round.moves_a.hashed != 0 && round.moves_b.hashed != 0) {
                 round.state = RoundState::Reveal;
+                round.set_reveal_timeout(store.get_current_season_rules(), starknet::get_block_timestamp());
             }
 
             // update duelist timestamp
@@ -276,11 +279,13 @@ pub mod game {
                 assert(round.moves_a.salt == 0, Errors::ALREADY_REVEALED);
                 assert(round.moves_a.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_a.initialize(salt, moves);
+                round.moves_a.timeout = 0;
                 store.emit_required_action(challenge.duelist_id_a, 0);
             } else if (duelist_number == 2) {
                 assert(round.moves_b.salt == 0, Errors::ALREADY_REVEALED);
                 assert(round.moves_b.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_b.initialize(salt, moves);
+                round.moves_b.timeout = 0;
                 store.emit_required_action(challenge.duelist_id_b, 0);
             } else {
                 assert(false, Errors::IMPOSSIBLE_ERROR);
@@ -348,10 +353,8 @@ pub mod game {
             challenge.unset_pact(ref store);
             // exit challenge
             store.exit_challenge(challenge.duelist_id_a);
-            store.emit_required_action(challenge.duelist_id_a, 0);
             if (challenge.duelist_id_b != 0) {
                 store.exit_challenge(challenge.duelist_id_b);
-                store.emit_required_action(challenge.duelist_id_b, 0);
             }
         }
 

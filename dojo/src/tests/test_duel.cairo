@@ -217,7 +217,7 @@ mod tests {
 
         let table_id: felt252 = SEASON_1_TABLE();
 
-        let (challenge, _round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), table_id, 1);
+        let (challenge, round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), table_id, 1);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
         tester::assert_pact(@sys, duel_id, challenge, true, true, "started");
 
@@ -229,10 +229,13 @@ mod tests {
         // assert(round_1.moves_a.seed != round_1.moves_b.seed, 'round_1.moves_a.seed != moves_b');
 
         // 1st commit
+        assert_gt!(round_1.moves_a.timeout, 0, "1__timeout_commit_a");
+        assert_gt!(round_1.moves_b.timeout, 0, "1__timeout_commit_b");
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         let (_challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
         assert_eq!(round.state, RoundState::Commit, "1__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "1__hash");
+        assert_eq!(round.moves_a.timeout, 0, "1__timeout_commit_reset_a");
 
         // 2nd commit > Reveal
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
@@ -240,6 +243,9 @@ mod tests {
         assert_eq!(round.state, RoundState::Reveal, "2__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "21__hash");
         assert_eq!(round.moves_b.hashed, moves_b.hashed, "2__hash");
+        // new timeouts...
+        assert_gt!(round_1.moves_a.timeout, 0, "2__timeout_reveal_a");
+        assert_gt!(round_1.moves_b.timeout, 0, "2__timeout_reveal_b");
 
         // 1st reveal
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
@@ -249,6 +255,7 @@ mod tests {
         assert_eq!(round.moves_a.salt, moves_a.salt, "3__salt");
         assert_eq!(round.moves_a.card_1, *moves_a.moves[0], "3__card_fire");
         assert_eq!(round.moves_a.card_2, *moves_a.moves[1], "3__card_dodge");
+        assert_eq!(round.moves_a.timeout, 0, "3__timeout_reveal_reset_a");
 
         // 2nd reveal > Finished
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
@@ -270,6 +277,8 @@ mod tests {
         assert_eq!(round.moves_b.salt, moves_b.salt, "4__salt");
         assert_eq!(round.moves_b.card_1.into(), *moves_b.moves[0], "4__card_fire");
         assert_eq!(round.moves_b.card_2.into(), *moves_b.moves[1], "4__card_dodge");
+        assert_eq!(round.moves_a.timeout, 0, "4__timeout_ended_a");
+        assert_eq!(round.moves_b.timeout, 0, "4__timeout_ended_b");
         let final_blow: PacesCard = (if(winner == 1){*moves_a.moves[0]}else{*moves_b.moves[0]}.into());
         assert_eq!(round.final_blow, FinalBlow::Paces(final_blow), "round.final_blow");
 
@@ -327,17 +336,26 @@ mod tests {
         // (to compute totals and scores)
         //
 
-        let (_challenge, _round_2, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), table_id, 1);
+        let (_challenge, round_2, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), table_id, 1);
         tester::assert_pact(@sys, duel_id, challenge, true, true, "started_2");
         // assert(round_2.moves_a.seed != 0, "round_2.moves_a.seed");
         // assert(round_2.moves_b.seed != 0, "round_2.moves_b.seed");
         // assert(round_2.moves_a.seed != round_2.moves_b.seed, "round_2.moves_a.seed != moves_b");
         // assert(round_2.moves_a.seed != round_1.moves_a.seed, "round_2.moves_a.seed != round_1");
         // assert(round_2.moves_b.seed != round_1.moves_b.seed, "round_2.moves_b.seed != round_1");
+        assert_gt!(round_2.moves_a.timeout, 0, "++ timeout_commit_a");
+        assert_gt!(round_2.moves_b.timeout, 0, "++ timeout_commit_b");
         // invert player order just for fun, expect same results!
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        let round: RoundValue = sys.store.get_round_value(duel_id);
+        assert_eq!(round.moves_b.timeout, 0, "++ timeout_commit_b_reset");
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        let round: RoundValue = sys.store.get_round_value(duel_id);
+        assert_gt!(round.moves_a.timeout, 0, "++ timeout_reveal_a");
+        assert_gt!(round.moves_b.timeout, 0, "++ timeout_reveal_b");
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        let round: RoundValue = sys.store.get_round_value(duel_id);
+        assert_eq!(round.moves_b.timeout, 0, "++ timeout_reveal_b_reset");
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
         tester::assert_pact(@sys, duel_id, challenge, false, false, "ended_2");
         let (challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
@@ -347,6 +365,8 @@ mod tests {
         assert_eq!(round.state, RoundState::Finished, "state ++");
         assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "score_a.score.honour ++");
         assert_eq!(round.state_b.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "score_b.score.honour ++");
+        assert_eq!(round.moves_a.timeout, 0, "++ timeout_ended_a");
+        assert_eq!(round.moves_b.timeout, 0, "++ timeout_ended_b");
 
         let score_a = sys.store.get_scoreboard(ID(OWNER()).into(), table_id);
         let score_b = sys.store.get_scoreboard(ID(OTHER()).into(), table_id);

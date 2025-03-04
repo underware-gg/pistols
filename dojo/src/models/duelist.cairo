@@ -92,12 +92,14 @@ pub impl DuelistImpl of DuelistTrait {
             duelist_id,
             duel_id,
         });
+        self.emit_required_action(duelist_id, duel_id);
     }
     fn exit_challenge(ref self: Store, duelist_id: u128) {
         self.set_duelist_challenge(@DuelistChallenge{
             duelist_id,
             duel_id: 0,
         });
+        self.emit_required_action(duelist_id, 0);
     }
 }
 

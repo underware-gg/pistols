@@ -34,6 +34,10 @@ pub impl PeriodImpl of PeriodTrait {
 #[generate_trait]
 pub impl TimestampImpl of TimestampTrait {
     #[inline(always)]
+    fn has_timed_out(self: u64) -> bool {
+        (self != 0 && starknet::get_block_timestamp() > self)
+    }
+    #[inline(always)]
     fn from_minutes(minutes: u64) -> u64 {
         (minutes * TIMESTAMP::ONE_MINUTE)
     }
@@ -70,4 +74,47 @@ mod unit {
         assert_eq!(TimestampTrait::from_days(28), TIMESTAMP::FOUR_WEEKS, "FOUR_WEEKS");
         assert_eq!(TimestampTrait::from_datetime(1, 1, 1), TIMESTAMP::ONE_DAY + TIMESTAMP::ONE_HOUR + TIMESTAMP::ONE_MINUTE, "from_datetime");
     }
+
+    // // test if "free" starknet::get_block_timestamp() is really free...
+    // // spoiler.. it is not!
+    // #[test]
+    // fn test_timestamp_once() { // 12,200
+    //     // let timestamp: u64 = starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    // }
+    // #[test]
+    // fn test_timestamp_twice() { // 24,000
+    //     // let timestamp: u64 = starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    // }
+    // #[test]
+    // fn test_timestamp_multi() { // 118,400
+    //     starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    //     starknet::get_block_timestamp();
+    // }
+    // #[test]
+    // fn test_timestamp_call_pass() { // 13,280
+    //     let timestamp: u64 = starknet::get_block_timestamp();
+    //     _call_pass(timestamp);
+    // }
+    // fn _call_pass(timestamp: u64) -> bool {
+    //     (timestamp > 0)
+    // }
+    // #[test]
+    // fn test_timestamp_call_no_pass() { // 25,080
+    //     let _timestamp: u64 = starknet::get_block_timestamp();
+    //     _call_no_pass();
+    // }
+    // fn _call_no_pass() -> bool {
+    //     (starknet::get_block_timestamp() > 0)
+    // }
 }

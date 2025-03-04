@@ -175,7 +175,7 @@ pub mod duel_token {
     };
     use pistols::models::{
         player::{PlayerTrait, Activity},
-        challenge::{Challenge, ChallengeTrait, ChallengeValue, Round},
+        challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, RoundTrait},
         duelist::{DuelistTrait, DuelistValue, ProfileTypeTrait},
         pact::{PactTrait},
         table::{TableConfig, TableConfigTrait},
@@ -318,7 +318,6 @@ pub mod duel_token {
 
             // assert duelist is not in a challenge
             store.enter_challenge(duelist_id_a, duel_id);
-            store.emit_required_action(duelist_id_a, duel_id);
 
             // calc expiration
             let timestamp: u64 = starknet::get_block_timestamp();
@@ -424,15 +423,15 @@ pub mod duel_token {
                     // Challenged is accepting...
                     // assert duelist is not in a challenge
                     store.enter_challenge(challenge.duelist_id_b, duel_id);
-                    store.emit_required_action(challenge.duelist_id_b, duel_id);
 
                     // update timestamps
                     challenge.state = ChallengeState::InProgress;
                     challenge.timestamps.start = timestamp;
                     challenge.timestamps.end = 0;
 
-                    // generate player deck seed
+                    // set reply timeouts
                     let mut round: Round = store.get_round(duel_id);
+                    round.set_commit_timeout(table.rules, timestamp);
                     store.set_round(@round);
                 } else {
                     // Challenged is Refusing
@@ -448,7 +447,6 @@ pub mod duel_token {
             if (challenge.state.is_canceled()) {
                 challenge.unset_pact(ref store);
                 store.exit_challenge(challenge.duelist_id_a);
-                store.emit_required_action(challenge.duelist_id_a, 0);
             }
 
             // events

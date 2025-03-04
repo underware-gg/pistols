@@ -42,6 +42,7 @@ pub struct SeasonDistribution {
 // Traits
 //
 use core::num::traits::Zero;
+use pistols::types::timestamp::{TIMESTAMP};
 use pistols::types::constants::{CONST, FAME};
 use pistols::utils::misc::{ZERO};
 
@@ -50,6 +51,11 @@ pub impl RulesTypeImpl of RulesTypeTrait {
     #[inline(always)]
     fn exists(self: @RulesType) -> bool {
         (*self != RulesType::Undefined)
+    }
+    fn get_reply_timeout(self: @RulesType) -> u64 {
+        (match self {
+            _ => TIMESTAMP::ONE_DAY,
+        })
     }
     //
     // Duel rewards
