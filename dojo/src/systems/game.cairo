@@ -495,6 +495,14 @@ pub mod game {
             let timed_out_a: bool = round.moves_a.timeout.has_timed_out();
             let timed_out_b: bool = round.moves_b.timeout.has_timed_out();
             if (timed_out_a || timed_out_b) {
+                // timeout events
+                if (timed_out_a) {
+                    Activity::PlayerTimedOut.emit(ref store.world, challenge.address_a, challenge.duel_id.into());
+                }
+                if (timed_out_b) {
+                    Activity::PlayerTimedOut.emit(ref store.world, challenge.address_b, challenge.duel_id.into());
+                }
+                // finish challenge + round
                 let winner: u8 =
                     if (!timed_out_a) {1}
                     else if (!timed_out_b) {2}
@@ -553,8 +561,6 @@ pub mod game {
                 }
                 store.emit_challenge_rewards(challenge.duel_id, challenge.duelist_id_a, rewards_a);
                 store.emit_challenge_rewards(challenge.duel_id, challenge.duelist_id_b, rewards_b);
-            } else {
-                Activity::ChallengeExpired.emit(ref store.world, starknet::get_caller_address(), challenge.duel_id.into());
             }
         }
 

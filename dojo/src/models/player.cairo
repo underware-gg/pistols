@@ -14,8 +14,9 @@ pub enum Activity {
     ChallengeReplied,   // 9
     MovesCommitted,     // 10
     MovesRevealed,      // 11
-    ChallengeResolved,  // 12
-    ChallengeDraw,      // 13
+    PlayerTimedOut,     // 12
+    ChallengeResolved,  // 13
+    ChallengeDraw,      // 14
 }
 
 //---------------------

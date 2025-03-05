@@ -70,6 +70,12 @@ const ActivityItem = ({
   if (activity.activity === constants.Activity.ChallengeDraw) {
     return <ActivityItemChallengeDraw activity={activity} clientSeconds={clientSeconds} />
   }
+  if (activity.activity === constants.Activity.ChallengeExpired) {
+    return <ActivityItemChallengeExpired activity={activity} clientSeconds={clientSeconds} />
+  }
+  if (activity.activity === constants.Activity.PlayerTimedOut) {
+    return <ActivityItemPlayerTimedOut activity={activity} clientSeconds={clientSeconds} />
+  }
   return <></>
 }
 
@@ -211,6 +217,36 @@ const ActivityItemChallengeDraw = ({
     <>
       <ChallengeLink duelId={activity.identifier} />
       {' ended in a draw! '}
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <br />
+    </>
+  )
+}
+
+const ActivityItemChallengeExpired = ({
+  activity,
+  clientSeconds,
+}: ActivityItemProps) => {
+  return (
+    <>
+      <ChallengeLink duelId={activity.identifier} />
+      {' expired '}
+      <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
+      <br />
+    </>
+  )
+}
+
+const ActivityItemPlayerTimedOut = ({
+  activity,
+  clientSeconds,
+}: ActivityItemProps) => {
+  return (
+    <>
+      <PlayerLink address={activity.player_address} />
+      {' abandoned '}
+      <ChallengeLink duelId={activity.identifier} />
+      {' '}
       <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
       <br />
     </>
