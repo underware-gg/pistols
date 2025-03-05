@@ -5,9 +5,9 @@ pub struct Leaderboard {
     #[key]
     pub table_id: felt252,
     //-----------------------
-    pub positions: u8,          // number of positions on the leaderboard (max 15)
-    pub duelist_ids: felt252,   // (positions * 16 bits) = 240 bits
-    pub scores: felt252,        // (positions * 16 bits) = 240 bits
+    pub positions: u8,          // number of positions on the leaderboard (max 10)
+    pub duelist_ids: felt252,   // (positions * 24 bits) = 240 bits max
+    pub scores: felt252,        // (positions * 24 bits) = 240 bits max
 }
 
 #[derive(Copy, Drop, Serde, Default, Introspect)]
@@ -25,10 +25,10 @@ use pistols::utils::bitwise::{BitwiseU256};
 
 #[generate_trait]
 pub impl LeaderboardImpl of LeaderboardTrait {
-    const MAX_POSITIONS: u8 = 15;
-    const BITS: u8 = 16;
-    const MASK: u256 = 0xffff;
-    const SHIFT: u256 = 0x10000;
+    const MAX_POSITIONS: u8 = 10;
+    const BITS: u8 = 24;
+    const MASK: u256 = 0xffffff;
+    const SHIFT: u256 = 0x1000000;
 
     fn new(table_id: felt252, positions: u8) -> Leaderboard {
         assert(positions > 0 && positions <= Self::MAX_POSITIONS, 'LEADERBOARD: invalid positions');
@@ -176,21 +176,16 @@ pub impl LeaderboardImpl of LeaderboardTrait {
     fn _position_mask(position: u8) -> u256 {
         (match position {
             0  => 0,
-            1  => 0x00000000000000000000000000000000000000000000000000000000ffff,
-            2  => 0x0000000000000000000000000000000000000000000000000000ffff0000,
-            3  => 0x000000000000000000000000000000000000000000000000ffff00000000,
-            4  => 0x00000000000000000000000000000000000000000000ffff000000000000,
-            5  => 0x0000000000000000000000000000000000000000ffff0000000000000000,
-            6  => 0x000000000000000000000000000000000000ffff00000000000000000000,
-            7  => 0x00000000000000000000000000000000ffff000000000000000000000000,
-            8  => 0x0000000000000000000000000000ffff0000000000000000000000000000,
-             9 => 0x000000000000000000000000ffff00000000000000000000000000000000,
-            10 => 0x00000000000000000000ffff000000000000000000000000000000000000,
-            11 => 0x0000000000000000ffff0000000000000000000000000000000000000000,
-            12 => 0x000000000000ffff00000000000000000000000000000000000000000000,
-            13 => 0x00000000ffff000000000000000000000000000000000000000000000000,
-            14 => 0x0000ffff0000000000000000000000000000000000000000000000000000,
-            15 => 0xffff00000000000000000000000000000000000000000000000000000000,
+            1  => 0x000000000000000000000000000000000000000000000000000000ffffff,
+            2  => 0x000000000000000000000000000000000000000000000000ffffff000000,
+            3  => 0x000000000000000000000000000000000000000000ffffff000000000000,
+            4  => 0x000000000000000000000000000000000000ffffff000000000000000000,
+            5  => 0x000000000000000000000000000000ffffff000000000000000000000000,
+            6  => 0x000000000000000000000000ffffff000000000000000000000000000000,
+            7  => 0x000000000000000000ffffff000000000000000000000000000000000000,
+            8  => 0x000000000000ffffff000000000000000000000000000000000000000000,
+            9  => 0x000000ffffff000000000000000000000000000000000000000000000000,
+            10 => 0xffffff000000000000000000000000000000000000000000000000000000,
             _ => 0,
         })
     }
@@ -199,20 +194,15 @@ pub impl LeaderboardImpl of LeaderboardTrait {
         (match positions {
             0  => 0,
             1  => 0x000000000000000000000000000000000000000000000000000000000001,
-            2  => 0x000000000000000000000000000000000000000000000000000000010000,
-            3  => 0x000000000000000000000000000000000000000000000000000100000000,
-            4  => 0x000000000000000000000000000000000000000000000001000000000000,
-            5  => 0x000000000000000000000000000000000000000000010000000000000000,
-            6  => 0x000000000000000000000000000000000000000100000000000000000000,
-            7  => 0x000000000000000000000000000000000001000000000000000000000000,
-            8  => 0x000000000000000000000000000000010000000000000000000000000000,
-             9 => 0x000000000000000000000000000100000000000000000000000000000000,
-            10 => 0x000000000000000000000001000000000000000000000000000000000000,
-            11 => 0x000000000000000000010000000000000000000000000000000000000000,
-            12 => 0x000000000000000100000000000000000000000000000000000000000000,
-            13 => 0x000000000001000000000000000000000000000000000000000000000000,
-            14 => 0x000000010000000000000000000000000000000000000000000000000000,
-            15 => 0x000100000000000000000000000000000000000000000000000000000000,
+            2  => 0x000000000000000000000000000000000000000000000000000001000000,
+            3  => 0x000000000000000000000000000000000000000000000001000000000000,
+            4  => 0x000000000000000000000000000000000000000001000000000000000000,
+            5  => 0x000000000000000000000000000000000001000000000000000000000000,
+            6  => 0x000000000000000000000000000001000000000000000000000000000000,
+            7  => 0x000000000000000000000001000000000000000000000000000000000000,
+            8  => 0x000000000000000001000000000000000000000000000000000000000000,
+            9  => 0x000000000001000000000000000000000000000000000000000000000000,
+            10 => 0x000001000000000000000000000000000000000000000000000000000000,
             _ => 0,
         })
     }
@@ -221,20 +211,15 @@ pub impl LeaderboardImpl of LeaderboardTrait {
         (match position {
             0  => 0,
             1  => 0x000000000000000000000000000000000000000000000000000000000000,
-            2  => 0x00000000000000000000000000000000000000000000000000000000ffff,
-            3  => 0x0000000000000000000000000000000000000000000000000000ffffffff,
-            4  => 0x000000000000000000000000000000000000000000000000ffffffffffff,
-            5  => 0x00000000000000000000000000000000000000000000ffffffffffffffff,
-            6  => 0x0000000000000000000000000000000000000000ffffffffffffffffffff,
-            7  => 0x000000000000000000000000000000000000ffffffffffffffffffffffff,
-            8  => 0x00000000000000000000000000000000ffffffffffffffffffffffffffff,
-            9  => 0x0000000000000000000000000000ffffffffffffffffffffffffffffffff,
-            10 => 0x000000000000000000000000ffffffffffffffffffffffffffffffffffff,
-            11 => 0x00000000000000000000ffffffffffffffffffffffffffffffffffffffff,
-            12 => 0x0000000000000000ffffffffffffffffffffffffffffffffffffffffffff,
-            13 => 0x000000000000ffffffffffffffffffffffffffffffffffffffffffffffff,
-            14 => 0x00000000ffffffffffffffffffffffffffffffffffffffffffffffffffff,
-            15 => 0x0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
+            2  => 0x000000000000000000000000000000000000000000000000000000ffffff,
+            3  => 0x000000000000000000000000000000000000000000000000ffffffffffff,
+            4  => 0x000000000000000000000000000000000000000000ffffffffffffffffff,
+            5  => 0x000000000000000000000000000000000000ffffffffffffffffffffffff,
+            6  => 0x000000000000000000000000000000ffffffffffffffffffffffffffffff,
+            7  => 0x000000000000000000000000ffffffffffffffffffffffffffffffffffff,
+            8  => 0x000000000000000000ffffffffffffffffffffffffffffffffffffffffff,
+            9  => 0x000000000000ffffffffffffffffffffffffffffffffffffffffffffffff,
+            10 => 0x000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff,
             _ => 0,
         })
     }
@@ -242,21 +227,16 @@ pub impl LeaderboardImpl of LeaderboardTrait {
     fn _post_mask(position: u8) -> u256 {
         (match position {
             0  => 0,
-            1  => 0x0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
-            2  => 0x0000ffffffffffffffffffffffffffffffffffffffffffffffffffff0000,
-            3  => 0x0000ffffffffffffffffffffffffffffffffffffffffffffffff00000000,
-            4  => 0x0000ffffffffffffffffffffffffffffffffffffffffffff000000000000,
-            5  => 0x0000ffffffffffffffffffffffffffffffffffffffff0000000000000000,
-            6  => 0x0000ffffffffffffffffffffffffffffffffffff00000000000000000000,
-            7  => 0x0000ffffffffffffffffffffffffffffffff000000000000000000000000,
-            8  => 0x0000ffffffffffffffffffffffffffff0000000000000000000000000000,
-            9  => 0x0000ffffffffffffffffffffffff00000000000000000000000000000000,
-            10 => 0x0000ffffffffffffffffffff000000000000000000000000000000000000,
-            11 => 0x0000ffffffffffffffff0000000000000000000000000000000000000000,
-            12 => 0x0000ffffffffffff00000000000000000000000000000000000000000000,
-            13 => 0x0000ffffffff000000000000000000000000000000000000000000000000,
-            14 => 0x0000ffff0000000000000000000000000000000000000000000000000000,
-            15 => 0x000000000000000000000000000000000000000000000000000000000000,
+            1  => 0x000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff,
+            2  => 0x000000ffffffffffffffffffffffffffffffffffffffffffffffff000000,
+            3  => 0x000000ffffffffffffffffffffffffffffffffffffffffff000000000000,
+            4  => 0x000000ffffffffffffffffffffffffffffffffffff000000000000000000,
+            5  => 0x000000ffffffffffffffffffffffffffffff000000000000000000000000,
+            6  => 0x000000ffffffffffffffffffffffff000000000000000000000000000000,
+            7  => 0x000000ffffffffffffffffff000000000000000000000000000000000000,
+            8  => 0x000000ffffffffffff000000000000000000000000000000000000000000,
+            9  => 0x000000ffffff000000000000000000000000000000000000000000000000,
+            10 => 0x000000000000000000000000000000000000000000000000000000000000,
             _ => 0,
         })
     }
@@ -264,21 +244,16 @@ pub impl LeaderboardImpl of LeaderboardTrait {
     fn _full_mask(max_positions: u8) -> u256 {
         (match max_positions {
             0  => 0,
-            1  => 0x00000000000000000000000000000000000000000000000000000000ffff,
-            2  => 0x0000000000000000000000000000000000000000000000000000ffffffff,
-            3  => 0x000000000000000000000000000000000000000000000000ffffffffffff,
-            4  => 0x00000000000000000000000000000000000000000000ffffffffffffffff,
-            5  => 0x0000000000000000000000000000000000000000ffffffffffffffffffff,
-            6  => 0x000000000000000000000000000000000000ffffffffffffffffffffffff,
-            7  => 0x00000000000000000000000000000000ffffffffffffffffffffffffffff,
-            8  => 0x0000000000000000000000000000ffffffffffffffffffffffffffffffff,
-             9 => 0x000000000000000000000000ffffffffffffffffffffffffffffffffffff,
-            10 => 0x00000000000000000000ffffffffffffffffffffffffffffffffffffffff,
-            11 => 0x0000000000000000ffffffffffffffffffffffffffffffffffffffffffff,
-            12 => 0x000000000000ffffffffffffffffffffffffffffffffffffffffffffffff,
-            13 => 0x00000000ffffffffffffffffffffffffffffffffffffffffffffffffffff,
-            14 => 0x0000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
-            15 => 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
+            1  => 0x000000000000000000000000000000000000000000000000000000ffffff,
+            2  => 0x000000000000000000000000000000000000000000000000ffffffffffff,
+            3  => 0x000000000000000000000000000000000000000000ffffffffffffffffff,
+            4  => 0x000000000000000000000000000000000000ffffffffffffffffffffffff,
+            5  => 0x000000000000000000000000000000ffffffffffffffffffffffffffffff,
+            6  => 0x000000000000000000000000ffffffffffffffffffffffffffffffffffff,
+            7  => 0x000000000000000000ffffffffffffffffffffffffffffffffffffffffff,
+            8  => 0x000000000000ffffffffffffffffffffffffffffffffffffffffffffffff,
+            9  => 0x000000ffffffffffffffffffffffffffffffffffffffffffffffffffffff,
+            10 => 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff,
             _ => 0,
         })
     }
@@ -294,12 +269,12 @@ pub impl LeaderboardImpl of LeaderboardTrait {
 mod unit {
     use super::{Leaderboard, LeaderboardTrait, LeaderboardPosition};
 
-    const IDS: felt252    = 0xf000e000d000c000b000a000900080007000600050004000300020001000;
-    const SCORES: felt252 = 0x00110022003300440055006600770088009900aa00bb00cc00dd00ee00ff;
-    const ID_1: u128 = 0x1000;
-    const ID_STEP: u128 = 0x1000;
-    const SCORE_1: u16 = 0x00ff;
-    const SCORE_STEP: u16 = 0x0011;
+    const IDS: felt252    = 0xa00000900000800000700000600000500000400000300000200000100000;
+    const SCORES: felt252 = 0x0000660000770000880000990000aa0000bb0000cc0000dd0000ee0000ff;
+    const ID_1: u128 = 0x100000;
+    const ID_STEP: u128 = 0x100000;
+    const SCORE_1: u16 = 0x0000ff;
+    const SCORE_STEP: u16 = 0x000011;
     
     const LB: Leaderboard = Leaderboard {
         table_id: 'dummy',
@@ -375,31 +350,26 @@ mod unit {
             duelist_ids: 0,
             scores: 0,
         };
-        lb.insert_score(0x1000, 0x00ff); // 1
-        lb.insert_score(0x2000, 0x00ee); // 2
-        lb.insert_score(0x3000, 0x00dd); // 3
-        lb.insert_score(0x4000, 0x00cc); // 4
-        lb.insert_score(0x5000, 0x00bb); // 5
-        lb.insert_score(0x6000, 0x00aa); // 6
-        lb.insert_score(0x7000, 0x0099); // 7
-        lb.insert_score(0x8000, 0x0088); // 8
-        lb.insert_score(0x9000, 0x0077); // 9
-        lb.insert_score(0xa000, 0x0066); // 10
-        lb.insert_score(0xb000, 0x0055); // 11
-        lb.insert_score(0xc000, 0x0044); // 12
-        lb.insert_score(0xd000, 0x0033); // 13
-        lb.insert_score(0xe000, 0x0022); // 14
-        lb.insert_score(0xf000, 0x0011); // 15
+        lb.insert_score(0x100000, 0x00ff); // 1
+        lb.insert_score(0x200000, 0x00ee); // 2
+        lb.insert_score(0x300000, 0x00dd); // 3
+        lb.insert_score(0x400000, 0x00cc); // 4
+        lb.insert_score(0x500000, 0x00bb); // 5
+        lb.insert_score(0x600000, 0x00aa); // 6
+        lb.insert_score(0x700000, 0x0099); // 7
+        lb.insert_score(0x800000, 0x0088); // 8
+        lb.insert_score(0x900000, 0x0077); // 9
+        lb.insert_score(0xa00000, 0x0066); // 10
         assert_eq!(lb.duelist_ids, IDS, "duelist_ids");
         assert_eq!(lb.scores, SCORES, "scores");
         // same score as last -- not qualified
-        assert_eq!(lb.insert_score(0x1234, 0x0011), 0, "not qualified");
+        assert_eq!(lb.insert_score(0x123456, 0x0066), 0, "not qualified");
         // same score: goes later -- insert later
-        assert_eq!(lb.insert_score(0x1234, 0x0022), 15, "last place");
+        assert_eq!(lb.insert_score(0x123456, 0x0077), 10, "last place");
         // new score, same position -- replace
-        assert_eq!(lb.insert_score(0xc000, 0x0045), 12, "replace score");
+        assert_eq!(lb.insert_score(0x800000, 0x0089), 8, "replace score");
         // new score, lower position - do nothing
-        assert_eq!(lb.insert_score(0xc000, 0x0033), 0, "lower score");
+        assert_eq!(lb.insert_score(0x900000, 0x0033), 0, "lower score");
     }
 
     #[test]
@@ -410,108 +380,103 @@ mod unit {
             duelist_ids: 0,
             scores: 0,
         };
-        assert_eq!(lb.insert_score(0x4000, 0x00cc), 1, "0x4000");
-        assert_eq!(lb.insert_score(0x5000, 0x00bb), 2, "0x5000");
-        assert_eq!(lb.insert_score(0xa000, 0x0066), 3, "0xa000");
-        assert_eq!(lb.insert_score(0xb000, 0x0055), 4, "0xb000");
-        assert_eq!(lb.insert_score(0x1234, 0x0000), 0, "zero value not inserted");
-        assert_eq!(lb.insert_score(0x2000, 0x00ee), 1, "0x2000");
-        assert_eq!(lb.insert_score(0x1000, 0x00ff), 1, "0x1000");
-        assert_eq!(lb.insert_score(0x9000, 0x0077), 5, "0x9000");
-        assert_eq!(lb.insert_score(0x3000, 0x00dd), 3, "0x3000");
-        assert_eq!(lb.insert_score(0x6000, 0x00aa), 6, "0x6000");
-        assert_eq!(lb.insert_score(0x7000, 0x0099), 7, "0x7000");
-        assert_eq!(lb.insert_score(0xc000, 0x0044), 11, "0xc000");
-        assert_eq!(lb.insert_score(0xe000, 0x0022), 12, "0xe000");
-        assert_eq!(lb.insert_score(0xf000, 0x0011), 13, "0xf000");
-        assert_eq!(lb.insert_score(0x8000, 0x0088), 8, "0x8000");
-        assert_eq!(lb.insert_score(0xd000, 0x0033), 13, "0xd000");
-        assert_eq!(lb.insert_score(0x1234, 0x0001), 0, "not qualified");
+        assert_eq!(lb.insert_score(0x400000, 0x00cc), 1, "0x4000");
+        assert_eq!(lb.insert_score(0x500000, 0x00bb), 2, "0x5000");
+        assert_eq!(lb.insert_score(0xa00000, 0x0066), 3, "0xa000");
+        assert_eq!(lb.insert_score(0x123456, 0x0000), 0, "zero value not inserted");
+        assert_eq!(lb.insert_score(0x200000, 0x00ee), 1, "0x2000");
+        assert_eq!(lb.insert_score(0x100000, 0x00ff), 1, "0x1000");
+        assert_eq!(lb.insert_score(0x900000, 0x0077), 5, "0x9000");
+        assert_eq!(lb.insert_score(0x300000, 0x00dd), 3, "0x3000");
+        assert_eq!(lb.insert_score(0x600000, 0x00aa), 6, "0x6000");
+        assert_eq!(lb.insert_score(0x700000, 0x0099), 7, "0x7000");
+        assert_eq!(lb.insert_score(0x800000, 0x0088), 8, "0x8000");
+        assert_eq!(lb.insert_score(0x123456, 0x0001), 0, "not qualified");
         assert_eq!(lb.duelist_ids, IDS, "duelist_ids");
         assert_eq!(lb.scores, SCORES, "scores");
     }
 
     #[test]
+    fn test_replace_value() {
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x0, 0xffffff, 1, 5);
+        assert_eq!(result, 0xffffff, "0x0_at_1");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x0, 0xffffff, 5, 5);
+        assert_eq!(result, 0xffffff000000000000000000000000, "0x0_at_5");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111111, 0xffffff, 1, 1);
+        assert_eq!(result, 0xffffff, "0x111111_at_1");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111111222222, 0xffffff, 1, 2);
+        assert_eq!(result, 0x111111ffffff, "0x111111222222_at_1");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111111222222, 0xffffff, 2, 2);
+        assert_eq!(result, 0xffffff222222, "0x111111222222_at_2");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 1, 10);
+        assert_eq!(result, 0x111111222222333333444444555555666666777777888888999999ffffff, "0x11111122222333333..._at_1");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 3, 10);
+        assert_eq!(result, 0x111111222222333333444444555555666666777777ffffff999999aaaaaa, "0x11111122222333333..._at_3");
+        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 10, 10);
+        assert_eq!(result, 0xffffff222222333333444444555555666666777777888888999999aaaaaa, "0x11111122222333333..._at_10");
+    }
+
+    #[test]
     fn test_insert_new_value() {
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x0, 0xffff, 1, 5);
-        assert_eq!(result, 0xffff, "at_1");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x1111, 0xffff, 1, 1);
-        assert_eq!(result, 0xffff, "at_1/2_(1)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x1111, 0xffff, 1, 5);
-        assert_eq!(result, 0x1111ffff, "at_1/2_(5)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x1111, 0xffff, 2, 5);
-        assert_eq!(result, 0xffff1111, "at_2/2_(5)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x11112222, 0xffff, 1, 2);
-        assert_eq!(result, 0x2222ffff, "at_1/3_(2)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x11112222, 0xffff, 1, 5);
-        assert_eq!(result, 0x11112222ffff, "at_1/3_(5)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x11112222, 0xffff, 2, 5);
-        assert_eq!(result, 0x1111ffff2222, "at_2/3_(5)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x11112222, 0xffff, 3, 5);
-        assert_eq!(result, 0xffff11112222, "at_3/3_(5)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x11112222333344445555, 0xffff, 1, 5);
-        assert_eq!(result, 0x2222333344445555ffff, "at_1/5_(5)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x11112222333344445555, 0xffff, 2, 5);
-        assert_eq!(result, 0x222233334444ffff5555, "at_2/5_(5)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x11112222333344445555, 0xffff, 3, 5);
-        assert_eq!(result, 0x22223333ffff44445555, "at_3/5_(5)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x11112222333344445555, 0xffff, 4, 5);
-        assert_eq!(result, 0x2222ffff333344445555, "at_4/5_(5)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x11112222333344445555, 0xffff, 5, 5);
-        assert_eq!(result, 0xffff2222333344445555, "at_5/5_(5)");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 1, 15);
-        assert_eq!(result, 0x22223333444455556666777788889999aaaabbbbccccddddeeeeffffF88F, "0x11112223333..._at_1");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 2, 15);
-        assert_eq!(result, 0x22223333444455556666777788889999aaaabbbbccccddddeeeeF88Fffff, "0x11112223333..._at_2");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 14, 15);
-        assert_eq!(result, 0x2222F88F3333444455556666777788889999aaaabbbbccccddddeeeeffff, "0x11112223333..._at_14");
-        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 15, 15);
-        assert_eq!(result, 0xF88F22223333444455556666777788889999aaaabbbbccccddddeeeeffff, "0x11112223333..._at_15");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x0, 0xffffff, 1, 5);
+        assert_eq!(result, 0xffffff, "at_1");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111, 0xffffff, 1, 1);
+        assert_eq!(result, 0xffffff, "at_1/2_(1)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111, 0xffffff, 1, 5);
+        assert_eq!(result, 0x111111ffffff, "at_1/2_(5)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111, 0xffffff, 2, 5);
+        assert_eq!(result, 0xffffff111111, "at_2/2_(5)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222, 0xffffff, 1, 2);
+        assert_eq!(result, 0x222222ffffff, "at_1/3_(2)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222, 0xffffff, 1, 5);
+        assert_eq!(result, 0x111111222222ffffff, "at_1/3_(5)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222, 0xffffff, 2, 5);
+        assert_eq!(result, 0x111111ffffff222222, "at_2/3_(5)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222, 0xffffff, 3, 5);
+        assert_eq!(result, 0xffffff111111222222, "at_3/3_(5)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222333333444444555555, 0xffffff, 1, 5);
+        assert_eq!(result, 0x222222333333444444555555ffffff, "at_1/5_(5)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222333333444444555555, 0xffffff, 2, 5);
+        assert_eq!(result, 0x222222333333444444ffffff555555, "at_2/5_(5)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222333333444444555555, 0xffffff, 3, 5);
+        assert_eq!(result, 0x222222333333ffffff444444555555, "at_3/5_(5)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222333333444444555555, 0xffffff, 4, 5);
+        assert_eq!(result, 0x222222ffffff333333444444555555, "at_4/5_(5)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222333333444444555555, 0xffffff, 5, 5);
+        assert_eq!(result, 0xffffff222222333333444444555555, "at_5/5_(5)");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 1, 10);
+        assert_eq!(result, 0x222222333333444444555555666666777777888888999999aaaaaaffffff, "0x11112223333..._at_1");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 2, 10);
+        assert_eq!(result, 0x222222333333444444555555666666777777888888999999ffffffaaaaaa, "0x11112223333..._at_2");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 9, 10);
+        assert_eq!(result, 0x222222ffffff333333444444555555666666777777888888999999aaaaaa, "0x11112223333..._at_9");
+        let result: felt252 = LeaderboardTrait::_insert_value_at_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 10, 10);
+        assert_eq!(result, 0xffffff222222333333444444555555666666777777888888999999aaaaaa, "0x11112223333..._at_10");
     }
 
     #[test]
     fn test_move_value() {
-        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x11112222, 0xffff, 2, 1, 2);
-        assert_eq!(result, 0x2222ffff, "0x1111222_to_1");
-        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333, 0xffff, 2, 1, 3);
-        assert_eq!(result, 0x11113333ffff, "0x111122223333_to_2_1");
-        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333, 0xffff, 3, 1, 3);
-        assert_eq!(result, 0x22223333ffff, "0x111122223333_to_2_1");
-        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333, 0xffff, 3, 2, 3);
-        assert_eq!(result, 0x2222ffff3333, "0x111122223333_to_2_1");
-        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 2, 1, 15);
-        assert_eq!(result, 0x111122223333444455556666777788889999aaaabbbbccccddddffffF88F, "0x11112223333..._at_");
-        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 5, 1, 15);
-        assert_eq!(result, 0x111122223333444455556666777788889999aaaaccccddddeeeeffffF88F, "0x11112223333..._at_");
-        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 15, 1, 15);
-        assert_eq!(result, 0x22223333444455556666777788889999aaaabbbbccccddddeeeeffffF88F, "0x11112223333..._at_");
-        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 3, 2, 15);
-        assert_eq!(result, 0x111122223333444455556666777788889999aaaabbbbcccceeeeF88Fffff, "0x11112223333..._at_");
-        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 5, 2, 15);
-        assert_eq!(result, 0x111122223333444455556666777788889999aaaaccccddddeeeeF88Fffff, "0x11112223333..._at_");
-        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 15, 2, 15);
-        assert_eq!(result, 0x22223333444455556666777788889999aaaabbbbccccddddeeeeF88Fffff, "0x11112223333..._at_");
-        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 15, 14, 15);
-        assert_eq!(result, 0x2222F88F3333444455556666777788889999aaaabbbbccccddddeeeeffff, "0x11112223333..._at_");
-    }
-
-    #[test]
-    fn test_replace_value() {
-        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x0, 0xffff, 1, 5);
-        assert_eq!(result, 0xffff, "0x0_at_1");
-        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x0, 0xffff, 5, 5);
-        assert_eq!(result, 0xffff0000000000000000, "0x0_at_5");
-        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x1111, 0xffff, 1, 1);
-        assert_eq!(result, 0xffff, "0x1111_at_1");
-        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x11112222, 0xffff, 1, 2);
-        assert_eq!(result, 0x1111ffff, "0x1111222_at_2");
-        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x11112222, 0xffff, 2, 2);
-        assert_eq!(result, 0xffff2222, "0x1111222_at_1");
-        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 1, 15);
-        assert_eq!(result, 0x111122223333444455556666777788889999aaaabbbbccccddddeeeeF88F, "0x11112223333..._at_1");
-        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 3, 15);
-        assert_eq!(result, 0x111122223333444455556666777788889999aaaabbbbccccF88Feeeeffff, "0x11112223333..._at_3");
-        let result: felt252 = LeaderboardTrait::_replace_value_at_position(0x111122223333444455556666777788889999aaaabbbbccccddddeeeeffff, 0xF88F, 15, 15);
-        assert_eq!(result, 0xF88F22223333444455556666777788889999aaaabbbbccccddddeeeeffff, "0x11112223333..._at_5");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222, 0xffffff, 2, 1, 2);
+        assert_eq!(result, 0x222222ffffff, "0x111111222222_to_1");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222333333, 0xffffff, 2, 1, 3);
+        assert_eq!(result, 0x111111333333ffffff, "0x111111222222333333_to_2_1");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222333333, 0xffffff, 3, 1, 3);
+        assert_eq!(result, 0x222222333333ffffff, "0x111111222222333333_to_3_1");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222333333, 0xffffff, 3, 2, 3);
+        assert_eq!(result, 0x222222ffffff333333, "0x111111222222333333_to_3_2");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 2, 1, 10);
+        assert_eq!(result, 0x111111222222333333444444555555666666777777888888aaaaaaffffff, "0x11111122222333333..._at_2_1");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 5, 1, 10);
+        assert_eq!(result, 0x111111222222333333444444555555777777888888999999aaaaaaffffff, "0x11111122222333333..._at_5_1");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 10, 1, 10);
+        assert_eq!(result, 0x222222333333444444555555666666777777888888999999aaaaaaffffff, "0x11111122222333333..._at_10_1");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 3, 2, 10);
+        assert_eq!(result, 0x111111222222333333444444555555666666777777999999ffffffaaaaaa, "0x11111122222333333..._at_3_2");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 5, 2, 10);
+        assert_eq!(result, 0x111111222222333333444444555555777777888888999999ffffffaaaaaa, "0x11111122222333333..._at_5_2");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 10, 2, 10);
+        assert_eq!(result, 0x222222333333444444555555666666777777888888999999ffffffaaaaaa, "0x11111122222333333..._at_10_2");
+        let result: felt252 = LeaderboardTrait::_move_value_to_position(0x111111222222333333444444555555666666777777888888999999aaaaaa, 0xffffff, 10, 9, 10);
+        assert_eq!(result, 0x222222ffffff333333444444555555666666777777888888999999aaaaaa, "0x11111122222333333..._at_10_9");
     }
 }
