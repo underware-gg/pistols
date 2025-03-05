@@ -1,6 +1,6 @@
 import { StarknetDomain } from 'starknet'
 import { getContractByName } from '@dojoengine/core'
-import type { SessionPolicies } from '@cartridge/controller'
+import type { SessionPolicies } from '@cartridge/presets'
 import type { DojoAppConfig, DojoManifest, ContractPolicyDescriptions, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
 import { NetworkId, NETWORKS } from 'src/games/pistols/config/networks'
 import { makeControllerPolicies } from 'src/dojo/setup/controller'

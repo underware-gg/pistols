@@ -36,6 +36,7 @@ catalog:
   #
   "@cartridge/connector": 0.7.4
   "@cartridge/controller": 0.7.4
+  "@cartridge/presets": 0.5.4
   "@apollo/client": ^3.11.8
   starknetid.js: ^4.0.0
   typescript: ^5.5.4

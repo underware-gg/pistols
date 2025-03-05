@@ -89,6 +89,7 @@
     "@apollo/client": "catalog:",
     "@cartridge/connector": "catalog:",
     "@cartridge/controller": "catalog:",
+    "@cartridge/presets": "catalog:",
     "@dojoengine/core": "catalog:",
     "@dojoengine/sdk": "catalog:",
     "@dojoengine/utils": "catalog:",

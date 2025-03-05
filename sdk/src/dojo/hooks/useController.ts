@@ -23,7 +23,7 @@ export const CONTROLLER_CLASS_HASH = '0x05f0f2ae9301e0468ca3f9218dadd43a448a71ac
 //   const connectorRef = useRef<any>(undefined)
 //   const controller = useCallback(() => {
 //     if (!connectorRef.current) {
-//       connectorRef.current = makeControllerConnector(manifest, rpcUrl, namespace, descriptions)
+//       connectorRef.current = makeControllerConnector(...)
 //     }
 //     return connectorRef.current
 //   }, [manifest, rpcUrl, namespace, descriptions])

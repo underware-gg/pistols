@@ -37,7 +37,7 @@ export const makePistolsControllerConnector = (networkId: NetworkId): Connector 
   //
   // export controller connector
   return makeControllerConnector(
-    'pistols', // theme
+    'pistols', // preset name
     NAMESPACE,
     NETWORKS[networkId].chainId,
     NETWORKS[networkId].rpcUrl,

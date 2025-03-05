@@ -1,16 +1,8 @@
 import { InterfaceAbi, StarknetDomain, StarknetType, TypedData } from 'starknet'
 import { Connector } from '@starknet-react/core'
 import { ControllerConnector } from '@cartridge/connector'
-import {
-  ControllerOptions,
-  SessionPolicies,
-  ContractPolicies,
-  ContractPolicy,
-  SignMessagePolicy,
-  Policy,
-  Tokens,
-  Method,
-} from '@cartridge/controller'
+import type { ControllerOptions, Tokens } from '@cartridge/controller'
+import type { SessionPolicies, ContractPolicies, SignMessagePolicy, Method } from '@cartridge/presets'
 import { SchemaType, UnionOfModelData } from '@dojoengine/sdk'
 import { ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
@@ -30,7 +22,7 @@ import { getContractByName } from '@dojoengine/core'
 // (create as global const)
 //
 export const makeControllerConnector = (
-  theme: string,
+  preset_name: string,
   namespace: string,
   chainId: string,
   rpcUrl: string,
@@ -46,9 +38,7 @@ export const makeControllerConnector = (
     defaultChainId: bigintToHex(stringToFelt(chainId)),
     chains: [{ rpcUrl }],
     // IFrameOptions
-    theme,
-    colorMode: 'dark',
-    preset: !policies ? theme : undefined,
+    preset: preset_name,
     // KeychainOptions
     namespace,
     policies,
@@ -127,7 +117,7 @@ const _makeControllerContractPolicies = (
     })
     if (methods.length > 0) {
       contracts[formatQueryValue(c.address)] = {
-        name: desc.name,
+        // name: desc.name,
         description: desc.description,
         methods,
       }
