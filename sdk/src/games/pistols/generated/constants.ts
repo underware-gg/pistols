@@ -72,11 +72,13 @@ export enum Activity {
   DuelistSpawned = 'DuelistSpawned', // 5
   DuelistDied = 'DuelistDied', // 6
   ChallengeCreated = 'ChallengeCreated', // 7
-  ChallengeReplied = 'ChallengeReplied', // 8
-  MovesCommitted = 'MovesCommitted', // 9
-  MovesRevealed = 'MovesRevealed', // 10
-  ChallengeResolved = 'ChallengeResolved', // 11
-  ChallengeDraw = 'ChallengeDraw', // 12
+  ChallengeExpired = 'ChallengeExpired', // 8
+  ChallengeReplied = 'ChallengeReplied', // 9
+  MovesCommitted = 'MovesCommitted', // 10
+  MovesRevealed = 'MovesRevealed', // 11
+  PlayerTimedOut = 'PlayerTimedOut', // 12
+  ChallengeResolved = 'ChallengeResolved', // 13
+  ChallengeDraw = 'ChallengeDraw', // 14
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
@@ -171,6 +173,7 @@ export enum FinalBlow {
   Undefined = 'Undefined', // 0
   Paces = 'Paces', // 1
   Blades = 'Blades', // 2
+  Forsaken = 'Forsaken', // 3
 };
 export const getFinalBlowValue = (name: FinalBlow): number | undefined => _indexOrUndefined(Object.keys(FinalBlow).indexOf(name));
 export const getFinalBlowFromValue = (value: number): FinalBlow | undefined => Object.keys(FinalBlow)[value] as FinalBlow;
@@ -416,7 +419,7 @@ export type ProfileDescription = {
 // constants
 //
 
-// from: ../dojo/src/utils/timestamp.cairo
+// from: ../dojo/src/types/timestamp.cairo
 type type_TIMESTAMP = {
   ONE_MINUTE: bigint, // cairo: u64
   ONE_HOUR: bigint, // cairo: u64
@@ -449,7 +452,7 @@ type type_CONST = {
 };
 export const CONST: type_CONST = {
   ROUND_COUNT: 1,
-  MAX_DUELIST_ID: BigInt('0xffff'),
+  MAX_DUELIST_ID: BigInt('0xffffff'),
   FULL_HEALTH: 3,
   DOUBLE_DAMAGE: 2,
   SINGLE_DAMAGE: 1,
@@ -592,16 +595,6 @@ type type_TABLES = {
 export const TABLES: type_TABLES = {
   TUTORIAL: 'Tutorial',
   PRACTICE: 'Practice',
-};
-
-// from: ../dojo/src/systems/components/erc721_hooks.cairo
-type type_MetadataErrors = {
-  INVALID_ATTRIBUTES: string, // cairo: felt252
-  INVALID_METADATA: string, // cairo: felt252
-};
-export const MetadataErrors: type_MetadataErrors = {
-  INVALID_ATTRIBUTES: 'METADATA: invalid attributes',
-  INVALID_METADATA: 'METADATA: invalid metadata',
 };
 
 // from: ../dojo/src/types/cards/blades.cairo
