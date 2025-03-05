@@ -20,6 +20,7 @@ pub trait IGame<TState> {
         salt: felt252,
         moves: Span<u8>,
     );
+    fn clear_required_action(ref self: TState, duelist_id: u128); // @description:Clear the required action call for a duelist
     fn collect_duel(ref self: TState, duel_id: u128); // @description:Close expired duels
     fn collect_season(ref self: TState) -> felt252; // @description:Close the current season and start the next one
 
@@ -295,13 +296,11 @@ pub mod game {
                 assert(round.moves_a.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_a.set_salt_and_moves(salt, moves);
                 store.emit_required_action(challenge.duelist_id_a, 0);
-            } else if (duelist_number == 2) {
+            } else {
                 assert(round.moves_b.salt == 0, Errors::ALREADY_REVEALED);
                 assert(round.moves_b.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_b.set_salt_and_moves(salt, moves);
                 store.emit_required_action(challenge.duelist_id_b, 0);
-            } else {
-                assert(false, Errors::IMPOSSIBLE_ERROR);
             }
 
             // reset timeouts
@@ -322,6 +321,12 @@ pub mod game {
                 return;
             }
 
+            // call other duelist to see the results
+            store.emit_required_action(
+                if (duelist_number == 1) {challenge.duelist_id_b} else {challenge.duelist_id_a},
+                duel_id
+            );
+
             // execute game loop...
             let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
             let progress: DuelProgress = game_loop(wrapped, @challenge.get_deck(), ref round);
@@ -330,6 +335,12 @@ pub mod game {
             // update challenge
             self._finish_challenge(ref store, ref challenge, ref round, Option::Some(progress.winner));
             // store.set_challenge(@challenge); // _finish_challenge does it
+        }
+
+        fn clear_required_action(ref self: ContractState, duelist_id: u128) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            self._validate_ownership(@store.world, duelist_id);
+            store.emit_required_action(duelist_id, 0);
         }
 
         fn collect_duel(ref self: ContractState, duel_id: u128) {
@@ -490,6 +501,8 @@ pub mod game {
                     else {0};
                 round.final_blow = FinalBlow::Forsaken;
                 self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner));
+                store.emit_required_action(challenge.duelist_id_a, 0);
+                store.emit_required_action(challenge.duelist_id_b, 0);
                 (true)
             } else {
                 (false)
