@@ -50,8 +50,8 @@ export const ActivityPanel = () => {
     )
   }, [panelType, setPanelType])
 
-  const { atGate, atDoor, atDuel } = usePistolsScene()
-  if (atGate || atDoor || atDuel) {
+  const { atGate, atDoor, atDuel, atTutorial } = usePistolsScene()
+  if (atGate || atDoor || atDuel || atTutorial) {
     return <></>
   }
 
