@@ -51,11 +51,10 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Challenged null', 'ENTRYPOINT_FAILED'))]
-    // #[should_panic(expected:('Challenge a player', 'ENTRYPOINT_FAILED'))]
-    fn test_invalid_challenged_zero() {
+    #[should_panic(expected:('DUEL: Invalid duelist', 'ENTRYPOINT_FAILED'))]
+    fn test_challenge_invalid_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), ZERO(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        tester::execute_create_duel_ID(@sys.duels, OWNER(), 0, OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
     }
 
     #[test]
@@ -408,5 +407,66 @@ mod tests {
         // panic!
         tester::execute_reply_duel(@sys.duels, BUMMER(), ID(BUMMER()), duel_id, true);
     }
+
+
+    //-----------------------------------------
+    // open challenges (matchmaking)
+    //
+
+    #[test]
+    fn test_open_challenge_OK() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        let A = OWNER();
+        let B = OTHER();
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, ZERO(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let ch = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::Awaiting, "state");
+        assert_eq!(ch.address_a, A, "challenger");
+        assert_eq!(ch.duelist_id_a, ID(A), "challenger_id");
+        assert_eq!(ch.address_b, ZERO(), "challenged_ZERO");
+        assert_eq!(ch.duelist_id_b, 0, "challenged_id_ZERO");
+        tester::execute_reply_duel(@sys.duels, B, ID(B), duel_id, true);
+        let ch = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::InProgress, "state");
+        assert_eq!(ch.address_b, B, "challenged");
+        assert_eq!(ch.duelist_id_b, ID(B), "challenged_id");
+        tester::assert_pact(@sys, duel_id, ch, true, true, "replied");
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Not your challenge', 'ENTRYPOINT_FAILED'))]
+    fn test_open_challenge_cant_refuse() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), ZERO(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, false);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Invalid duelist', 'ENTRYPOINT_FAILED'))]
+    fn test_open_challenge_invalid_duelist() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), ZERO(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        tester::execute_reply_duel(@sys.duels, OTHER(), 0, duel_id, true);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Duelist in a challenge', 'ENTRYPOINT_FAILED'))]
+    fn test_open_challenge_pact_exists() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let duel_id: u128  = tester::execute_create_duel(@sys.duels, OWNER(), ZERO(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, true);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Duelist in a challenge', 'ENTRYPOINT_FAILED'))]
+    fn test_open_challenge_duelist_busy() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, true);
+        let duel_id: u128  = tester::execute_create_duel(@sys.duels, BUMMER(), ZERO(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, true);
+    }
+
 
 }

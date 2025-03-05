@@ -196,10 +196,9 @@ pub mod duel_token {
         pub const NOT_YOUR_DUEL: felt252            = 'DUEL: Not your duel';
         pub const INVALID_TABLE: felt252            = 'DUEL: Invalid table';
         pub const INVALID_SEASON: felt252           = 'DUEL: Invalid season';
-        pub const INVALID_CHALLENGED: felt252       = 'DUEL: Challenged unknown';
+        pub const INVALID_DUELIST: felt252          = 'DUEL: Invalid duelist';
         pub const INVALID_DUELIST_A_NULL: felt252   = 'DUEL: Duelist A null';
         pub const INVALID_DUELIST_B_NULL: felt252   = 'DUEL: Duelist B null';
-        pub const INVALID_CHALLENGED_NULL: felt252  = 'DUEL: Challenged null';
         pub const INVALID_CHALLENGED_SELF: felt252  = 'DUEL: Challenged self';
         pub const INVALID_REPLY_SELF: felt252       = 'DUEL: Reply self';
         pub const INVALID_CHALLENGE: felt252        = 'DUEL: Invalid challenge';
@@ -285,6 +284,10 @@ pub mod duel_token {
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
+            // validate table
+            let table: TableConfig = store.get_table_config(table_id);
+            table.assert_can_join(@store);
+
             // mint to game, so it can transfer to winner
             let duel_id: u128 = self.token.mint(store.world.game_address());
 
@@ -292,6 +295,7 @@ pub mod duel_token {
             let address_a: ContractAddress = starknet::get_caller_address();
             let duelist_id_a: u128 = duelist_id;
             let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
+            assert(duelist_id_a.is_non_zero(), Errors::INVALID_DUELIST);
             assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a.into()) == true, Errors::NOT_YOUR_DUELIST);
 
             // validate duelist health
@@ -301,13 +305,9 @@ pub mod duel_token {
             assert(lives > 0, Errors::DUELIST_IS_DEAD_A);
             assert(lives >= lives_staked, Errors::INSUFFICIENT_LIVES_A);
 
-            // validate table
-            let table: TableConfig = store.get_table_config(table_id);
-            table.assert_can_join(@store);
-
             // validate challenged
             let address_b: ContractAddress = challenged_address;
-            assert(address_b.is_non_zero(), Errors::INVALID_CHALLENGED_NULL);
+            // assert(address_b.is_non_zero(), Errors::INVALID_CHALLENGED); // allow open challenge
             assert(address_b != address_a, Errors::INVALID_CHALLENGED_SELF);
 
             // TODO...
@@ -362,7 +362,9 @@ pub mod duel_token {
             store.set_round(@round);
 
             // set the pact + assert it does not exist
-            challenge.set_pact(ref store);
+            if (address_b.is_non_zero()) {
+                challenge.set_pact(ref store);
+            }
 
             // events
             PlayerTrait::check_in(ref store, Activity::ChallengeCreated, address_a, duel_id.into());
@@ -398,27 +400,35 @@ pub mod duel_token {
                 assert(accepted == false, Errors::INVALID_REPLY_SELF);
                 challenge.state = ChallengeState::Withdrawn;
             } else {
-                // validate duelist ownership
-                let duelist_dispatcher = store.world.duelist_token_dispatcher();
-                assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b.into()) == true, Errors::NOT_YOUR_DUELIST);
+                // open challenge: anyone can ACCEPT
+                if (challenge.address_b.is_zero() && accepted) {
+                    challenge.address_b = address_b;
+                    // set the pact + assert it does not exist
+                    challenge.set_pact(ref store);
+                } else {
+                    // else, only challenged can reply
+                    assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);
+                }
 
-                // validate duelist health
-// println!("poke B... {}", duelist_id_b);
-                duelist_dispatcher.poke(duelist_id_b);
-                let lives: u8 = duelist_dispatcher.life_count(duelist_id_b);
-                assert(lives > 0, Errors::DUELIST_IS_DEAD_B);
-                assert(lives >= challenge.lives_staked, Errors::INSUFFICIENT_LIVES_B);
-
-                // validate challenged identity
-                assert(challenge.address_b == address_b, Errors::NOT_YOUR_CHALLENGE);
-                // validate chosen duelist
-                assert(challenge.duelist_id_a != duelist_id_b, Errors::INVALID_CHALLENGED_SELF);
-                // fill missing duelist
-                challenge.duelist_id_b = duelist_id_b;
-
-                // all good!
+                // Challenged is accepting...
                 if (accepted) {
-                    // Challenged is accepting...
+                    // validate duelist
+                    assert(duelist_id_b.is_non_zero(), Errors::INVALID_DUELIST);
+                    assert(duelist_id_b != challenge.duelist_id_a, Errors::INVALID_CHALLENGED_SELF);
+                    // validate ownership
+                    let duelist_dispatcher = store.world.duelist_token_dispatcher();
+                    assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b.into()) == true, Errors::NOT_YOUR_DUELIST);
+
+                    // validate duelist health
+    // println!("poke B... {}", duelist_id_b);
+                    duelist_dispatcher.poke(duelist_id_b);
+                    let lives: u8 = duelist_dispatcher.life_count(duelist_id_b);
+                    assert(lives > 0, Errors::DUELIST_IS_DEAD_B);
+                    assert(lives >= challenge.lives_staked, Errors::INSUFFICIENT_LIVES_B);
+
+                    // duelist is ok
+                    challenge.duelist_id_b = duelist_id_b;
+
                     // assert duelist is not in a challenge
                     store.enter_challenge(challenge.duelist_id_b, duel_id);
 
