@@ -50,7 +50,7 @@ export default function Duel({
   const { debugMode, duelSpeedFactor } = useSettings()
   const { clientSeconds } = useClientTimestamp(false)
 
-  const { duelistIdA, duelistIdB, timestamp_start, isTutorial } = useGetChallenge(duelId)
+  const { duelistIdA, duelistIdB, timestampStart, isTutorial } = useGetChallenge(duelId)
 
   // switch to active duelist, if owned by player
   const { isSynced } = useSyncToActiveDuelists([duelistIdA, duelistIdB])
@@ -111,10 +111,10 @@ export default function Duel({
 
   // setup grass animation 
   useEffect(() => {
-    if (clientSeconds && timestamp_start) {
-      gameImpl?.setDuelTimePercentage(clientSeconds - timestamp_start)
+    if (clientSeconds && timestampStart) {
+      gameImpl?.setDuelTimePercentage(clientSeconds - timestampStart)
     }
-  }, [gameImpl, clientSeconds, timestamp_start])
+  }, [gameImpl, clientSeconds, timestampStart])
 
   useEffect(() => {
     speedRef.current = duelSpeedFactor

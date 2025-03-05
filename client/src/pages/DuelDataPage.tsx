@@ -146,13 +146,13 @@ function DuelStats({
         <Row>
           <Cell>Timestamp Start</Cell>
           <Cell>
-            {formatTimestampLocal(challenge.timestamp_end)}
+            {formatTimestampLocal(challenge.timestampEnd)}
           </Cell>
         </Row>
         <Row>
           <Cell>Timestamp End</Cell>
           <Cell>
-            {formatTimestampLocal(challenge.timestamp_end)}
+            {formatTimestampLocal(challenge.timestampEnd)}
           </Cell>
         </Row>
         <Row>

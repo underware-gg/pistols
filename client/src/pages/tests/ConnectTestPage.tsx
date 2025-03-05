@@ -77,7 +77,7 @@ export function Connect() {
 
       <Table celled striped color={isConnected ? 'green' : 'red'} size='small'>
         <Body className='H4'>
-          <Row>
+          <Row className='H5'>
             <Cell>Network : Chain</Cell>
             <Cell className='Code Important'>
               {/* {chain && <>{bigintToHex(chain.id)} : {feltToString(chain.id)}</>} */}
@@ -86,7 +86,7 @@ export function Connect() {
               {selectedNetworkConfig.chainId}
             </Cell>
           </Row>
-          <Row>
+          <Row className='H5'>
             <Cell>Connected</Cell>
             <Cell className='Code'>
               {isConnected
@@ -95,7 +95,7 @@ export function Connect() {
               }
             </Cell>
           </Row>
-          <Row>
+          <Row className='H5'>
             <Cell>Connector</Cell>
             <Cell className='TitleCase'>
               {connector && <>

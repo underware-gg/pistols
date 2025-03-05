@@ -149,7 +149,7 @@ export const usePlayer = (address: BigNumberish) => {
   const isNew = useMemo(() => (player?.isNew ?? false), [player])
   const username = useMemo(() => (player?.username ?? 'unknown'), [player])
   const name = useMemo(() => (player?.name ?? 'Unknown'), [player])
-  const timestampRegistered = useMemo(() => (player?.timestamps.registered ?? 0), [player])
+  const timestampRegistered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
   const bookmarkedPlayers = useMemo(() => (player?.bookmarked_players ?? []), [player])
   const bookmarkedTokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
 

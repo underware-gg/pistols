@@ -86,6 +86,20 @@ export const useCalcSeasonReward = (table_id: string, duelist_id: BigNumberish, 
   }
 }
 
+export const useGameTimestamp = () => {
+  const { game: { getTimestamp } } = useDojoContractCalls()
+  const options = useMemo(() => ({
+    call: getTimestamp,
+    args: [],
+    defaultValue: null,
+  }), [])
+  const { value, isLoading } = useSdkCallPromise<bigint>(options)
+  return {
+    timestamp: value,
+    isLoading,
+  }
+}
+
 
 //------------------------------------------
 // tutorial

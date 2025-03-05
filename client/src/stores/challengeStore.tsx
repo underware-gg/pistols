@@ -71,13 +71,13 @@ export const useChallenge = (duelId: BigNumberish) => {
   const premise = useMemo(() => (parseEnumVariant<constants.Premise>(challenge?.premise) ?? constants.Premise.Undefined), [challenge])
   const quote = useMemo(() => feltToString(challenge?.quote ?? 0n), [challenge])
   const livesStaked = useMemo(() => Number(challenge?.lives_staked ?? 0), [challenge])
-  const timestamp_start = useMemo(() => Number(challenge?.timestamps.start ?? 0), [challenge])
-  const timestamp_end = useMemo(() => Number(challenge?.timestamps.end ?? 0), [challenge])
+  const timestampStart = useMemo(() => Number(challenge?.timestamps.start ?? 0), [challenge])
+  const timestampEnd = useMemo(() => Number(challenge?.timestamps.end ?? 0), [challenge])
 
   const { clientSeconds } = useClientTimestamp(false)
   let _state = useMemo(() => parseEnumVariant<constants.ChallengeState>(challenge?.state), [challenge])
   let state = useMemo(() => {
-    if (_state == constants.ChallengeState.Awaiting && (timestamp_end < clientSeconds)) {
+    if (_state == constants.ChallengeState.Awaiting && (timestampEnd < clientSeconds)) {
       return constants.ChallengeState.Expired
     }
     return _state
@@ -111,8 +111,8 @@ export const useChallenge = (duelId: BigNumberish) => {
     isExpired: (state == constants.ChallengeState.Expired),
     needToSyncExpired: (state == constants.ChallengeState.Expired && state != _state),
     // times
-    timestamp_start,
-    timestamp_end,
+    timestampStart,
+    timestampEnd,
   }
 }
 
@@ -130,7 +130,7 @@ export const useRound = (duelId: BigNumberish) => {
     value: finalBlow
   } = useMemo(() => parseCustomEnum<constants.FinalBlow>(round?.final_blow), [round])
   const endedInBlades = useMemo(() => (finalBlowType === constants.FinalBlow.Blades), [finalBlowType])
-  const playerTimedOut = useMemo(() => (finalBlowType === constants.FinalBlow.Forsaken), [finalBlowType])
+  const endedInTimeout = useMemo(() => (finalBlowType === constants.FinalBlow.Forsaken), [finalBlowType])
 
   const hand_a = useMemo(() => round ? movesToHand(
     //@ts-ignore
@@ -170,13 +170,33 @@ export const useRound = (duelId: BigNumberish) => {
     state,
     finalBlow,
     endedInBlades,
-    playerTimedOut,
+    endedInTimeout,
     hand_a,
     hand_b,
     moves_a,
     moves_b,
     state_a,
     state_b,
+  }
+}
+
+export const useRoundTimeout = (duelId: BigNumberish, autoUpdate = false) => {
+  const { clientSeconds } = useClientTimestamp(autoUpdate)
+
+  const entityId = useEntityId([duelId])
+  const entities = useChallengeStore((state) => state.entities);
+  const entity = useMemo(() => entities[entityId], [entities[entityId]])
+  const round = useEntityModel<models.Round>(entity, 'Round')
+  const timeoutTimestamp = useMemo(() => (
+    Math.max(Number(round?.moves_a.timeout ?? 0), Number(round?.moves_b.timeout ?? 0))
+  ), [round])
+  const hasTimedOut = useMemo(() => (
+    timeoutTimestamp > 0 && clientSeconds > timeoutTimestamp
+  ), [clientSeconds, timeoutTimestamp])
+
+  return {
+    timeoutTimestamp,
+    hasTimedOut,
   }
 }
 
