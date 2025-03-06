@@ -38,8 +38,10 @@ catalog:
   "@cartridge/controller": 0.7.4
   "@cartridge/presets": 0.5.4
   "@apollo/client": ^3.11.8
+  "@types/node": "^22.10.2"
   starknetid.js: ^4.0.0
   typescript: ^5.5.4
+  tsup: ^8.3.5
 
   # daydreams
   "@daydreamsai/core": ^0.0.4

@@ -104,9 +104,9 @@
   },
   "devDependencies": {
     "@types/event-emitter": "^0.3.5",
-    "@types/node": "^22.10.2",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
-    "tsup": "^8.3.5",
+    "tsup": "catalog:",
     "typescript": "catalog:",
     "vitest": "^3.0.5"
   },

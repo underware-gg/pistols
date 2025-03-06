@@ -60,7 +60,7 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@types/three": "^0.157.2",
