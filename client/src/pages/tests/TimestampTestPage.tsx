@@ -53,8 +53,8 @@ function TimestampSync() {
 
 
 function TimestampFormatTable() {
-  const { clientSeconds } = useClientTimestamp(true)
-  const start = useMemo(() => (clientSeconds), [clientSeconds])
+  const { clientTimestamp } = useClientTimestamp(true)
+  const start = useMemo(() => (clientTimestamp), [clientTimestamp])
   return (
     <>
       <h3>Formatting</h3>

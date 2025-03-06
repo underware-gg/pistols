@@ -112,6 +112,20 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls)
       },
+      collect_duel: async (signer: AccountInterface, duel_id: BigNumberish): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.game.buildCollectDuelCalldata(
+            duel_id,
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
+      },
+      collect_season: async (signer: AccountInterface): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.game.buildCollectSeasonCalldata(),
+        ]
+        return await _executeTransaction(signer, calls)
+      },
     },
     //
     // tutorial.cairo

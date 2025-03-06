@@ -149,6 +149,7 @@ export const useRound = (duelId: BigNumberish) => {
       card_4: Number(moves.card_4),
       salt: BigInt(moves.salt),
       hashed: BigInt(moves.hashed),
+      timeout: Number(moves.timeout),
     } : null
   }
   const _state = (state: models.DuelistState) => {

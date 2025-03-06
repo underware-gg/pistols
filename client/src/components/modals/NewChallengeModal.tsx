@@ -149,7 +149,7 @@ export default function NewChallengeModal() {
                 {' '}
                 <Balance fame wei={rewards?.lose?.fame_lost} />
                 {' and '}
-                {rewards?.lose?.survived ? 'survives' : 'dies!'}
+                {rewards?.lose?.survived ? 'survive' : 'dead!'}
               </Col>
             </Row>
           </Grid>

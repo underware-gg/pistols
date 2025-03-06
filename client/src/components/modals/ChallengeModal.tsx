@@ -22,12 +22,14 @@ import { Divider } from '/src/components/ui/Divider'
 import { makeDuelDataUrl } from '/src/utils/pistols'
 import { SceneName } from '/src/data/assets'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
+import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
 export default function ChallengeModal() {
-  const { duel_token } = useDojoSystemCalls()
+  const { duel_token, game } = useDojoSystemCalls()
   const { duelistId } = useSettings()
   const { account } = useAccount()
 
@@ -42,6 +44,7 @@ export default function ChallengeModal() {
     duelistIdA, duelistIdB: challengeDuelistIdB, duelistAddressA, duelistAddressB,
     isLive, isFinished, needToSyncExpired,
   } = useChallenge(selectedDuelId)
+  const { canCollectDuel } = useCanCollectDuel(selectedDuelId)
   const { description: tableDescription, isSeason, isTutorial } = useTable(tableId)
   const displayDuelId = (!isTutorial)
   const displayFameBalance = (!isTutorial)
@@ -59,7 +62,6 @@ export default function ChallengeModal() {
   const { profilePic: profilePicB, profileType: profileTypeB, isInAction } = useDuelist(duelistIdB)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
-
   const _reply = (accepted: boolean) => {
     const _submit = async () => {
       setIsSubmitting(true)
@@ -184,6 +186,11 @@ export default function ChallengeModal() {
             <Col>
               <ActionButton large fill label='Close' onClick={() => _close()} />
             </Col>
+            {(state == constants.ChallengeState.InProgress && canCollectDuel) &&
+              <Col>
+                <ActionButton large fill important label='Timed Out, Close Duel' onClick={() => game.collect_duel(account, selectedDuelId)} />
+              </Col>
+            }
             {(state == constants.ChallengeState.Awaiting && isChallenger) &&
               <>
                 <Col>

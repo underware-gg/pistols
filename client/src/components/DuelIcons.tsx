@@ -95,14 +95,16 @@ export function useDuelIcons({
       if (state1 && moves1) {
         const pacesFire = moves1.card_1
         const pacesDodge = moves1.card_2
-        const cardFire = constants.getPacesCardFromValue(pacesFire)
-        const cardDodge = constants.getPacesCardFromValue(pacesDodge)
-        if (pacesDodge <= pacesFire) {
-          icons.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
-          icons.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
-        } else {
-          icons.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
-          icons.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
+        if (pacesFire && pacesDodge) {
+          const cardFire = constants.getPacesCardFromValue(pacesFire)
+          const cardDodge = constants.getPacesCardFromValue(pacesDodge)
+          if (pacesDodge <= pacesFire) {
+            icons.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
+            icons.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
+          } else {
+            icons.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
+            icons.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
+          }
         }
       }
 
@@ -114,8 +116,13 @@ export function useDuelIcons({
         const cardBlades = constants.getBladesCardFromValue(moves1.card_4)
         icons.push(<BladesIcon key='blades' blade={cardBlades} size={iconSize} />)
       }
+      
+      if (round1?.endedInTimeout && moves1?.timeout) {
+        icons.push(<EmojiIcon key='timedOut' emoji={EMOJI.TIMED_OUT} size={iconSize} />)
+      } else if (dead) {
+        icons.push(<EmojiIcon key='dead' emoji={dead} size={iconSize} />)
+      }
 
-      if (dead) icons.push(<EmojiIcon key='dead' emoji={dead} size={iconSize} />)
       if (win1) icons.push(<EmojiIcon key='win1' emoji={win1} size={iconSize} />)
     }
 

@@ -86,6 +86,37 @@ export const useCalcSeasonReward = (table_id: string, duelist_id: BigNumberish, 
   }
 }
 
+
+export const useCanCollectDuel = (duel_id: bigint) => {
+  const { game: { canCollectDuel } } = useDojoContractCalls()
+  const options = useMemo(() => ({
+    call: canCollectDuel,
+    args: [duel_id],
+    enabled: isPositiveBigint(duel_id),
+    defaultValue: null,
+  }), [duel_id])
+  const { value, isLoading } = useSdkCallPromise<boolean>(options)
+  return {
+    canCollectDuel: value,
+    isLoading,
+  }
+}
+
+export const useCanCollectSeason = () => {
+  const { game: { canCollectSeason } } = useDojoContractCalls()
+  const options = useMemo(() => ({
+    call: canCollectSeason,
+    args: [],
+    enabled: true,
+    defaultValue: null,
+  }), [])
+  const { value, isLoading } = useSdkCallPromise<boolean>(options)
+  return {
+    canCollectDuel: value,
+    isLoading,
+  }
+}
+
 export const useGameTimestamp = () => {
   const { game: { getTimestamp } } = useDojoContractCalls()
   const options = useMemo(() => ({
