@@ -195,9 +195,9 @@ function NewChallengeForm({
   const [quote, setQuote] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
-  const [lives_staked, setLivesStaked] = useState(1)
+  const [lives_staked, setLivesStaked] = useState(Math.min(1, lives))
 
-  const canSubmit = useMemo(() => (quote.length > 3 && (days + hours) > 0), [quote, days, hours])
+  const canSubmit = useMemo(() => (quote.length > 3 && (days + hours) > 0 && lives_staked > 0), [quote, days, hours, lives_staked])
 
   useEffect(() => {
     setArgs({

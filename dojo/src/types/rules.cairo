@@ -79,15 +79,17 @@ pub impl RulesTypeImpl of RulesTypeTrait {
         (@result)
     }
     // end game calculations
-    fn calc_rewards(self: @RulesType, balance: u128, lives_staked: u8, is_winner: bool) -> RewardValues {
+    fn calc_rewards(self: @RulesType, fame_balance: u128, lives_staked: u8, is_winner: bool) -> RewardValues {
         (match self {
             RulesType::Season => {
                 let mut result: RewardValues = Default::default();
                 let one_life: u128 = FAME::ONE_LIFE.low;
-                if (is_winner) {
+                if (fame_balance == 0) {
+                    result.survived = false;
+                } else if (is_winner) {
                     result.survived = true;
                     let k_fame: u128 = 1;
-                    result.fame_gained = (one_life / (((balance / one_life) + 1) / k_fame));
+                    result.fame_gained = (one_life / (((fame_balance / one_life) + 1) / k_fame));
                     let k_fools: u128 = 10;
                     result.fools_gained = (k_fools * ((one_life / 2) / result.fame_gained)) * CONST::ETH_TO_WEI.low;
                     // apply staked lives

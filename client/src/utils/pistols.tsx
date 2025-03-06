@@ -51,7 +51,7 @@ export const ChallengeStateNames: Record<constants.ChallengeState, string> = {
 
 export const ChallengeStateDescriptions: Record<constants.ChallengeState, string> = {
   [constants.ChallengeState.Null]: "Challenge does not exist",
-  [constants.ChallengeState.Awaiting]: "Awaiting for Challenged's response",
+  [constants.ChallengeState.Awaiting]: "Waiting for Challenged's response",
   [constants.ChallengeState.Withdrawn]: "Cowardly withdrawn by Challenger",
   [constants.ChallengeState.Refused]: "Cowardly refused by Challenged",
   [constants.ChallengeState.Expired]: "Challenge expired",

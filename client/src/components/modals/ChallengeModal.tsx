@@ -23,7 +23,6 @@ import { makeDuelDataUrl } from '/src/utils/pistols'
 import { SceneName } from '/src/data/assets'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
-import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -70,6 +69,10 @@ export default function ChallengeModal() {
       setIsSubmitting(false)
     }
     _submit()
+  }
+
+  const _collectDuel = () => {
+    game.collect_duel(account, selectedDuelId)
   }
 
   const _gotoDuel = () => {
@@ -188,7 +191,7 @@ export default function ChallengeModal() {
             </Col>
             {(state == constants.ChallengeState.InProgress && canCollectDuel) &&
               <Col>
-                <ActionButton large fill important label='Timed Out, Close Duel' onClick={() => game.collect_duel(account, selectedDuelId)} />
+                <ActionButton large fill important label='Timed Out, Collect Duel' onClick={() => _collectDuel()} />
               </Col>
             }
             {(state == constants.ChallengeState.Awaiting && isChallenger) &&
@@ -229,7 +232,7 @@ export default function ChallengeModal() {
             }
             {(needToSyncExpired && (isChallenger || isChallenged)) &&
               <Col>
-                <ActionButton large fill important label='Withdraw Expired Fees' disabled={isSubmitting} onClick={() => _reply(false)} />
+                <ActionButton large fill important label='Expired, Collect Duel' disabled={isSubmitting} onClick={() => _collectDuel()} />
               </Col>
             }
           </Row>

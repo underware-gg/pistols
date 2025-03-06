@@ -4,18 +4,18 @@ import { BigNumberish } from 'starknet'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { useDuelist } from '/src/stores/duelistStore'
 import { usePlayer } from '/src/stores/playerStore'
-import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
-import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
+import { usePendingChallengesIds } from '/src/stores/challengeStore'
+import { useFameBalanceDuelist } from '/src/hooks/useFame'
 import { useRequiredActions } from '/src/stores/eventsStore'
-import { BookmarkIcon, Icon } from '/src/components/ui/Icons'
+import { Icon, BookmarkIcon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink } from '/src/components/Links'
-import { usePendingChallengesIds } from '../stores/challengeStore'
+import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
 
 export const ActionIcon = (active: boolean) => {
   const { address } = useAccount()
-  const { duelIds } = useRequiredActions()
+  const { requiredDuelIds } = useRequiredActions()
   const { pendingDuelIds } = usePendingChallengesIds(address)
-  const requiresAction = useMemo(() => (duelIds.length > 0), [duelIds])
+  const requiresAction = useMemo(() => (requiredDuelIds.length > 0), [requiredDuelIds])
   const name = useMemo(() => (active ? 'circle' : 'circle outline'), [active])
   const className = useMemo(() => (
     requiresAction ? 'Positive'
@@ -35,21 +35,9 @@ export default function ActivityAction() {
   const { bookmarkedDuelists } = usePlayer(address)
 
   const { duelistIds } = useDuelistsOfPlayer()
-  const sortedDuelistIds = useMemo(() => (
-    duelistIds.sort((a, b) => {
-      return Number(b - a)
-    })
-  ), [duelistIds])
+  const sortedDuelistIds = useMemo(() => duelistIds.sort((a, b) => Number(b - a)), [duelistIds])
 
-  const { duelIds } = useRequiredActions()
-  const actionItems = useMemo(() => (sortedDuelistIds.map((duelistId) =>
-    <ActionItem
-      key={duelistId}
-      duelistId={duelistId}
-      isBookmarked={bookmarkedDuelists.includes(duelistId)}
-      requiredActionDuelIds={duelIds}
-    />)
-  ), [duelistIds])
+  const { duelPerDuelist } = useRequiredActions()
 
   const { pendingDuelIds } = usePendingChallengesIds(address)
   const pendingItems = useMemo(() => (pendingDuelIds.map((duelId) =>
@@ -57,7 +45,16 @@ export default function ActivityAction() {
       key={duelId}
       duelId={duelId}
     />)
-  ), [duelistIds])
+  ), [pendingDuelIds])
+
+  const actionItems = useMemo(() => (sortedDuelistIds.map((duelistId) =>
+    <ActionItem
+      key={duelistId}
+      duelistId={duelistId}
+      isBookmarked={bookmarkedDuelists.includes(duelistId)}
+      duelId={duelPerDuelist[bigintToHex(duelistId)]}
+    />)
+  ), [sortedDuelistIds])
 
   return (
     <div className='FillParent'>
@@ -88,42 +85,62 @@ const PendingItem = ({
 const ActionItem = ({
   duelistId,
   isBookmarked,
-  requiredActionDuelIds,
+  duelId,
 }: {
   duelistId: BigNumberish
-  isBookmarked: boolean
-    requiredActionDuelIds: bigint[]
+  isBookmarked?: boolean
+  duelId: bigint
 }) => {
-  const { isInAction, isInactive, currentDuelId } = useDuelist(duelistId)
-  const requiresAction = useMemo(() => requiredActionDuelIds.includes(currentDuelId), [currentDuelId, requiredActionDuelIds])
-  const { duelistContractAddress } = useDuelistTokenContract()
-  const { publish } = usePlayerBookmarkSignedMessage(duelistContractAddress, duelistId, !isBookmarked)
+  const { isInAction, isInactive } = useDuelist(duelistId)
+  const { lives } = useFameBalanceDuelist(duelistId)
 
-  const icon = useMemo(() => {
-    if (requiresAction) {
-      return <Icon name='circle' className='Positive' />
-    }
-    if (isInactive) {
-      return <Icon name='circle' className='Warning' />
-    }
-    if (isInAction) {
-      return <Icon name='circle' />
-    }
-    return <Icon name='circle outline' />
-  }, [isInAction])
+  // const { duelistContractAddress } = useDuelistTokenContract()
+  // const { publish } = usePlayerBookmarkSignedMessage(duelistContractAddress, duelistId, !isBookmarked)
 
+  // in a duel, required to play
+  if (duelId > 0n) {
+    return (
+      <>
+        <Icon name='circle' className='Positive' />
+        <DuelistLink duelistId={duelistId} useName />
+        {' required in '}
+        <ChallengeLink duelId={duelId} />
+        <br />
+      </>
+    )
+  }
+
+  // in a duel, waiting for other player
+  if (isInAction) {
+    return (
+      <>
+        <Icon name='circle' />
+        <DuelistLink duelistId={duelistId} useName />
+        {' waiting in '}
+        <ChallengeLink duelId={duelId} />
+        <br />
+      </>
+    )
+  }
+
+  // dripping fame!
+  if (isInactive) {
+    return (
+      <>
+        <Icon name='circle' className='Negative' />
+        <DuelistLink duelistId={duelistId} useName />
+        {'is inactive losing FAME!'}
+        <br />
+      </>
+    )
+  }
+
+  // idle
   return (
     <>
-      {/* <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} /> */}
-      {icon}
+      <Icon name='circle outline' />
       <DuelistLink duelistId={duelistId} useName />
-      {' '}
-      {isInAction ? <>
-        {requiresAction ? ' required in ' : ' awaits in '}
-        <ChallengeLink duelId={currentDuelId} />
-      </>
-        : isInactive ? 'is inactive losing FAME!'
-          : 'is idle'}
+      {lives >= 1 ? 'is ready to duel!' : 'is dead!'}
       <br />
     </>
   )

@@ -318,6 +318,7 @@ pub mod duel_token {
 
             // assert duelist is not in a challenge
             store.enter_challenge(duelist_id_a, duel_id);
+            store.emit_required_action(duelist_id_a, duel_id);
 
             // calc expiration
             let timestamp: u64 = starknet::get_block_timestamp();
@@ -430,7 +431,8 @@ pub mod duel_token {
                     challenge.duelist_id_b = duelist_id_b;
 
                     // assert duelist is not in a challenge
-                    store.enter_challenge(challenge.duelist_id_b, duel_id);
+                    store.enter_challenge(duelist_id_b, duel_id);
+                    store.emit_required_action(duelist_id_b, duel_id);
 
                     // update timestamps
                     challenge.state = ChallengeState::InProgress;
@@ -452,6 +454,8 @@ pub mod duel_token {
                 challenge.timestamps.end = timestamp;
                 challenge.unset_pact(ref store);
                 store.exit_challenge(challenge.duelist_id_a);
+                store.emit_required_action(challenge.duelist_id_a, 0);
+                store.emit_required_action(challenge.duelist_id_b, 0);
                 Activity::ChallengeExpired.emit(ref store.world, starknet::get_caller_address(), challenge.duel_id.into());
             } else {
                 PlayerTrait::check_in(ref store, Activity::ChallengeReplied, address_b, duel_id.into());

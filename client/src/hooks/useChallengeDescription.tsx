@@ -2,11 +2,17 @@ import { useMemo } from 'react'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useChallenge } from '/src/stores/challengeStore'
 import { ChallengeStateDescriptions } from '/src/utils/pistols'
+import { useOwnerOfDuelist } from './useTokenDuelists'
+import { usePlayer } from '../stores/playerStore'
 
 export const useChallengeDescription = (duelId: bigint) => {
   const { state, duelistIdA, duelistIdB, winnerDuelistId } = useChallenge(duelId)
-  const { name: nameA } = useDuelist(duelistIdA)
-  const { name: nameB } = useDuelist(duelistIdB)
+  // const { name: nameA } = useDuelist(duelistIdA)
+  // const { name: nameB } = useDuelist(duelistIdB)
+  const { owner: ownerA } = useOwnerOfDuelist(duelistIdA)
+  const { owner: ownerB } = useOwnerOfDuelist(duelistIdB)
+  const { name: nameA } = usePlayer(ownerA)
+  const { name: nameB } = usePlayer(ownerB)
 
   const challengeDescription = useMemo(() => {
     if (!state) return null

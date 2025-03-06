@@ -330,11 +330,11 @@ pub mod game {
             // execute game loop...
             let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
             let progress: DuelProgress = game_loop(wrapped, @challenge.get_deck(), ref round);
-            // store.set_round(@round); // _finish_challenge does it
 
             // update challenge
             self._finish_challenge(ref store, ref challenge, ref round, Option::Some(progress.winner));
-            // store.set_challenge(@challenge); // _finish_challenge does it
+            // store.set_challenge(@challenge); // _finish_challenge() does it
+            // store.set_round(@round); // _finish_challenge() does it
         }
 
         fn clear_required_action(ref self: ContractState, duelist_id: u128) {
@@ -495,13 +495,6 @@ pub mod game {
             let timed_out_a: bool = round.moves_a.timeout.has_timed_out();
             let timed_out_b: bool = round.moves_b.timeout.has_timed_out();
             if (timed_out_a || timed_out_b) {
-                // timeout events
-                if (timed_out_a) {
-                    Activity::PlayerTimedOut.emit(ref store.world, challenge.address_a, challenge.duel_id.into());
-                }
-                if (timed_out_b) {
-                    Activity::PlayerTimedOut.emit(ref store.world, challenge.address_b, challenge.duel_id.into());
-                }
                 // finish challenge + round
                 let winner: u8 =
                     if (!timed_out_a) {1}
@@ -509,8 +502,16 @@ pub mod game {
                     else {0};
                 round.final_blow = FinalBlow::Forsaken;
                 self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner));
-                store.emit_required_action(challenge.duelist_id_a, 0);
-                store.emit_required_action(challenge.duelist_id_b, 0);
+                
+                // timeout events
+                if (timed_out_a) {
+                    Activity::PlayerTimedOut.emit(ref store.world, challenge.address_a, challenge.duel_id.into());
+                    store.emit_required_action(challenge.duelist_id_a, 0);
+                }
+                if (timed_out_b) {
+                    Activity::PlayerTimedOut.emit(ref store.world, challenge.address_b, challenge.duel_id.into());
+                    store.emit_required_action(challenge.duelist_id_b, 0);
+                }
                 (true)
             } else {
                 (false)

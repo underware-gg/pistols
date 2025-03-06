@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
+import { bigintToHex } from '@underware_gg/pistols-sdk/utils';
 
 export const useEventsStore = createDojoStore<PistolsSchemaType>();
 
@@ -10,13 +11,21 @@ export const useEventsStore = createDojoStore<PistolsSchemaType>();
 //
 export function useRequiredActions() {
   const entities = useEventsStore((state) => state.entities)
-  const duelIds = useMemo(() => (
+  const duelPerDuelist = useMemo(() => (
     Object.values(entities)
-      .map(e => BigInt(e.models.pistols.PlayerRequiredAction?.duel_id ?? 0))
-      .filter(id => id > 0n)
+      .reduce((acc, e) => {
+        const duelId = BigInt(e.models.pistols.PlayerRequiredAction?.duel_id ?? 0);
+        if (duelId > 0n) {
+          let duelistId = bigintToHex(e.models.pistols.PlayerRequiredAction.duelist_id);
+          acc[duelistId] = duelId;
+        }
+        return acc;
+      }, {} as Record<string, bigint>)
   ), [entities])
-  // console.log(`useRequiredActions() =================>`, duelIds)
+  const requiredDuelIds = useMemo(() => Object.values(duelPerDuelist), [duelPerDuelist])
+  // console.log(`useRequiredActions() =================>`, entities, duelPerDuelist, requiredDuelIds)
   return {
-    duelIds,
+    duelPerDuelist,
+    requiredDuelIds,
   }
 }
