@@ -126,6 +126,14 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls)
       },
+      clear_required_action: async (signer: AccountInterface, duel_id: BigNumberish): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.game.buildClearRequiredActionCalldata(
+            duel_id,
+          ),
+        ]
+        return await _executeTransaction(signer, calls)
+      },
     },
     //
     // tutorial.cairo

@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
 import { bigintToHex } from '@underware_gg/pistols-sdk/utils';
+import { BigNumberish } from 'starknet';
 
 export const useEventsStore = createDojoStore<PistolsSchemaType>();
 
@@ -28,4 +29,9 @@ export function useRequiredActions() {
     duelPerDuelist,
     requiredDuelIds,
   }
+}
+
+export function useDuelRequiredsAction(duel_id: BigNumberish) {
+  const { requiredDuelIds } = useRequiredActions()
+  return requiredDuelIds.includes(BigInt(duel_id))
 }

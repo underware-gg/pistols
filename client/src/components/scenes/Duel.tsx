@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useAccount } from '@starknet-react/core'
 import { useMounted, useClientTimestamp } from '@underware_gg/pistols-sdk/utils/hooks'
+import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useGameplayContext } from '/src/hooks/GameplayContext'
@@ -8,6 +10,7 @@ import { useGetChallenge } from '/src/stores/challengeStore'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useIsYou } from '/src/hooks/useIsYou'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
+import { useDuelRequiredsAction } from '/src/stores/eventsStore'
 import { useSyncToActiveDuelists } from '/src/hooks/useSyncDuelist'
 import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
 import { DojoSetupErrorDetector } from '../account/ConnectionDetector'
@@ -27,7 +30,6 @@ import DuelProfile from '../ui/duel/DuelProfile'
 import DuelHeader from '../ui/duel/DuelHeader'
 import DuelStateDisplay from '../ui/duel/DuelStateDispaly'
 import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
-
 
 export type DuelistState = {
   damage: number, 
@@ -50,8 +52,8 @@ export default function Duel({
   const { debugMode, duelSpeedFactor } = useSettings()
   const { clientSeconds } = useClientTimestamp(false)
 
-  const { duelistIdA, duelistIdB, timestampStart, isTutorial } = useGetChallenge(duelId)
-
+  const { duelistIdA, duelistIdB, timestampStart, isTutorial, isFinished } = useGetChallenge(duelId)
+  
   // switch to active duelist, if owned by player
   const { isSynced } = useSyncToActiveDuelists([duelistIdA, duelistIdB])
 
@@ -62,6 +64,18 @@ export default function Duel({
   const { name: nameB, characterType: characterTypeB } = useDuelist(duelistIdB)
   const { isYou: isYouA } = useIsYou(duelistIdA)
   const { isYou: isYouB } = useIsYou(duelistIdB)
+
+  // clear required action flag
+  const { account } = useAccount()
+  const { game } = useDojoSystemCalls()
+  const isRequired = useDuelRequiredsAction(duelId)
+  useEffect(() => {
+    if ((isYouA || isYouB) && mounted && account && isRequired && isFinished) {
+      console.log('clearing required action flag...')
+      if (isYouA) game.clear_required_action(account, duelistIdA)
+      if (isYouB) game.clear_required_action(account, duelistIdB)
+    }
+  }, [isYouA, isYouB, mounted, account, isRequired, isFinished])
 
   // Animated duel is useDuel added with intermediate animation stages
   const {
