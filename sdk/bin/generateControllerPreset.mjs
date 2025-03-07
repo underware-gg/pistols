@@ -27,6 +27,7 @@ function buildFileContents() {
       "pistols.underware.gg",
       "pistols.stage.underware.gg",
       "play.pistols.gg",
+      "stage.pistols.gg",
     ],
     theme: {
       colors: {

@@ -226,11 +226,10 @@ pub mod duel_token {
         minter_address: ContractAddress,
         fee_amount: u128,
     ) {
-        let base_uri: ByteArray = format!("https://{}",base_uri.to_string());
         self.erc721_combo.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            base_uri,
+            base_uri.to_string(),
             Option::None, // contract_uri (use hooks)
             Option::None, // max_supply (infinite)
         );
@@ -514,7 +513,7 @@ pub mod duel_token {
                 image: Option::None,
                 banner_image: Option::None,
                 featured_image: Option::None,
-                external_link: Option::Some("https://pistols.underware.gg"),
+                external_link: Option::Some("https://pistols.gg"),
                 collaborators: Option::None,
             };
             (Option::Some(metadata))
@@ -583,7 +582,7 @@ pub mod duel_token {
             let metadata = TokenMetadata {
                 token_id,
                 name: format!("Duel #{}", token_id),
-                description: format!("Pistols at Dawn Duel #{}. https://pistols.underware.gg", token_id),
+                description: format!("Pistols at Dawn Duel #{}. https://pistols.gg", token_id),
                 image,
                 image_data: Option::None,
                 external_url: Option::Some("https://example.underware.gg"),

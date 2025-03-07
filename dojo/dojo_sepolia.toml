@@ -7,9 +7,9 @@
 [world]
 name = "Pistols at Dawn"
 description = "An on-chain pistol duelling game of honour and betrayal."
-icon_uri = "https://pistols.underware.gg/images/logo.png"
-cover_uri = "https://pistols.underware.gg/images/splash.png"
-website = "https://pistols.underware.gg"
+icon_uri = "https://assets.underware.gg/pistols/logo.png"
+cover_uri = "https://assets.underware.gg/pistols/splash.png"
+website = "https://pistols.gg"
 seed = "pistols-0.12.0_2"
 
 [world.socials]
@@ -76,15 +76,15 @@ default = "pistols"
   "0x00be3edf412dd5982aa102524c0b8a0bcee584c5a627ed1db6a7c36922047257", # vrf_address (sepolia)
 ]
 "pistols-duel_token" = [
-  "sstr:pistols.underware.gg", # base_uri
+  "sstr:https://assets.underware.gg", # base_uri
   "0x0", # minter_address
   "0", # fee_amount
 ]
 "pistols-duelist_token" = [
-  "sstr:pistols.underware.gg", # base_uri
+  "sstr:https://assets.underware.gg", # base_uri
 ]
 "pistols-pack_token" = [
-  "sstr:pistols.underware.gg", # base_uri
+  "sstr:https://assets.underware.gg", # base_uri
 ]
 
 

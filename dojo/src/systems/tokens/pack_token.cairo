@@ -176,11 +176,10 @@ pub mod pack_token {
         ref self: ContractState,
         base_uri: felt252,
     ) {
-        let base_uri: ByteArray = format!("https://{}",base_uri.to_string());
         self.erc721_combo.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            base_uri,
+            base_uri.to_string(),
             Option::None, // contract_uri (use hooks)
             Option::None, // max_supply (infinite)
         );
@@ -338,7 +337,7 @@ pub mod pack_token {
                 image: Option::None,
                 banner_image: Option::None,
                 featured_image: Option::None,
-                external_link: Option::Some("https://pistols.underware.gg"),
+                external_link: Option::Some("https://pistols.gg"),
                 collaborators: Option::None,
             };
             (Option::Some(metadata))
@@ -365,7 +364,7 @@ pub mod pack_token {
             let metadata = TokenMetadata {
                 token_id,
                 name: format!("{} #{}", pack.pack_type.name(), token_id),
-                description: format!("Pistols at Dawn Pack #{}. https://pistols.underware.gg", token_id),
+                description: format!("Pistols at Dawn Pack #{}. https://pistols.gg", token_id),
                 image: format!("{}{}", base_uri, pack.pack_type.image_url(pack.is_open)),
                 image_data: Option::None,
                 external_url: Option::Some("https://example.underware.gg"),

@@ -214,11 +214,10 @@ pub mod duelist_token {
         base_uri: felt252,
     ) {
         let mut world = self.world_default();
-        let base_uri: ByteArray = format!("https://{}",base_uri.to_string());
         self.erc721_combo.initializer(
             TOKEN_NAME(),
             TOKEN_SYMBOL(),
-            base_uri,
+            base_uri.to_string(),
             Option::None, // contract_uri (use hooks)
             Option::Some(CONST::MAX_DUELIST_ID.into()), // max_supply
         );
@@ -618,7 +617,7 @@ pub mod duelist_token {
                 image: Option::None,
                 banner_image: Option::None,
                 featured_image: Option::None,
-                external_link: Option::Some("https://pistols.underware.gg"),
+                external_link: Option::Some("https://pistols.gg"),
                 collaborators: Option::None,
             };
             (Option::Some(metadata))
@@ -710,7 +709,7 @@ pub mod duelist_token {
             let metadata = TokenMetadata {
                 token_id,
                 name: format!("{} #{}", duelist.profile_type.name(), token_id),
-                description: format!("Pistols at Dawn Duelist #{}. https://pistols.underware.gg", token_id),
+                description: format!("Pistols at Dawn Duelist #{}. https://pistols.gg", token_id),
                 image,
                 image_data: Option::None,
                 external_url: Option::Some("https://example.underware.gg"),
