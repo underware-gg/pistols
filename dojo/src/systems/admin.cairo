@@ -125,9 +125,9 @@ pub mod admin {
         fn _assert_caller_is_admin(self: @ContractState) {
             assert(self.am_i_admin(starknet::get_caller_address()) == true, Errors::NOT_ADMIN);
         }
-        // #[inline(always)]
-        // fn assert_caller_is_owner(self: @ContractState) {
-        //     assert(world.is_owner(SELECTORS::ADMIN, starknet::get_caller_address()) == true, Errors::NOT_ADMIN);
-        // }
+        fn _assert_caller_is_owner(self: @ContractState) {
+            let mut world = self.world_default();
+            assert(world.dispatcher.is_owner(SELECTORS::ADMIN, starknet::get_caller_address()) == true, Errors::NOT_ADMIN);
+        }
     }
 }

@@ -38,10 +38,16 @@ pub trait IGame<TState> {
     fn test_validate_commit_message(self: @TState, account: ContractAddress, signature: Array<felt252>, duelId: felt252, duelistId: felt252) -> bool;
 }
 
+// Exposed to world
+#[starknet::interface]
+pub trait IGameProtected<TState> {
+    fn create_trophies(ref self: TState);
+}
+
 #[dojo::contract]
 pub mod game {
     use starknet::{ContractAddress};
-    use dojo::world::{WorldStorage};
+    use dojo::world::{WorldStorage, IWorldDispatcherTrait};
 
     //-------------------------------------
     // components
@@ -70,6 +76,7 @@ pub mod game {
         IDuelTokenDispatcherTrait,
         ITutorialDispatcherTrait,
         IBankDispatcherTrait,
+        SELECTORS,
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
@@ -96,6 +103,7 @@ pub mod game {
     use pistols::libs::game_loop::{game_loop, make_moves_hash};
 
     pub mod Errors {
+        pub const CALLER_NOT_OWNER: felt252          = 'PISTOLS: Caller not owner';
         pub const CHALLENGE_EXISTS: felt252          = 'PISTOLS: Challenge exists';
         pub const CHALLENGE_NOT_IN_PROGRESS: felt252 = 'PISTOLS: Challenge not active';
         pub const CHALLENGE_IN_PROGRESS: felt252     = 'PISTOLS: Challenge is active';
@@ -117,28 +125,7 @@ pub mod game {
     }
 
     fn dojo_init(ref self: ContractState) {
-        let mut world = self.world_default();
-
-        let mut trophy_id: u8 = 1;
-        while trophy_id <= TROPHY::COUNT {
-            let trophy: Trophy = trophy_id.into();
-            self.achievable.create(
-                world,
-                id: trophy.identifier(),
-                hidden: trophy.hidden(),
-                index: trophy.index(),
-                points: trophy.points(),
-                start: trophy.start(),
-                end: trophy.end(),
-                group: trophy.group(),
-                icon: trophy.icon(),
-                title: trophy.title(),
-                description: trophy.description(),
-                tasks: trophy.tasks(),
-                data: trophy.data(),
-            );
-            trophy_id += 1;
-        }
+        self._create_trophies();
     }
 
     #[generate_trait]
@@ -150,7 +137,7 @@ pub mod game {
     }
 
     #[abi(embed_v0)]
-    impl ActionsImpl of super::IGame<ContractState> {
+    impl GameImpl of super::IGame<ContractState> {
 
         //------------------------
         // Game actions
@@ -480,11 +467,52 @@ pub mod game {
     }
 
 
+    //-----------------------------------
+    // Protected
+    //
+    #[abi(embed_v0)]
+    impl GameProtectedImpl of super::IGameProtected<ContractState> {
+        fn create_trophies(ref self: ContractState) {
+            self._assert_caller_is_owner();
+            self._create_trophies();
+        }
+    }
+
+
     //------------------------------------
     // Internal calls
     //
     #[generate_trait]
     impl InternalImpl of InternalTrait {
+        fn _assert_caller_is_owner(self: @ContractState) {
+            let mut world = self.world_default();
+            assert(world.dispatcher.is_owner(SELECTORS::GAME, starknet::get_caller_address()) == true, Errors::CALLER_NOT_OWNER);
+        }
+
+        fn _create_trophies(ref self: ContractState) {
+            let mut world = self.world_default();
+            let mut trophy_id: u8 = 1;
+            while trophy_id <= TROPHY::COUNT {
+                let trophy: Trophy = trophy_id.into();
+                self.achievable.create(
+                    world,
+                    id: trophy.identifier(),
+                    hidden: trophy.hidden(),
+                    index: trophy.index(),
+                    points: trophy.points(),
+                    start: trophy.start(),
+                    end: trophy.end(),
+                    group: trophy.group(),
+                    icon: trophy.icon(),
+                    title: trophy.title(),
+                    description: trophy.description(),
+                    tasks: trophy.tasks(),
+                    data: trophy.data(),
+                );
+                trophy_id += 1;
+            }
+        }
+
         fn _validate_ownership(self: @ContractState, world: @WorldStorage, duelist_id: u128) -> ContractAddress {
             let owner: ContractAddress = world.duelist_token_dispatcher().owner_of(duelist_id.into());
             assert(owner == starknet::get_caller_address(), Errors::NOT_YOUR_DUELIST);

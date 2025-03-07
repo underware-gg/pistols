@@ -62,7 +62,7 @@ pub impl TrophyImpl of TrophyTrait {
     #[inline]
     fn hidden(self: @Trophy) -> bool {
         match self {
-            _ => true,
+            _ => false,
         }
     }
 
