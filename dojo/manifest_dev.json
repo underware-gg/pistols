@@ -2040,7 +2040,7 @@
     },
     {
       "address": "0x485e9a2f40604ef7d12e3549b144b1d73fee60e3cbabff4e1869c91ad63f773",
-      "class_hash": "0x4e9fb45be9d46946fd2ef09353169f095f6601bd8881542e10b0d9ddadb64b7",
+      "class_hash": "0x45c86f4aeb2268d28bd4f37386096be95b6acd38855c761256645180f75c70b",
       "abi": [
         {
           "type": "impl",
@@ -3299,7 +3299,7 @@
         }
       ],
       "init_calldata": [
-        "sstr:localhost:5173",
+        "sstr:http://localhost:3000",
         "0x0",
         "0"
       ],
@@ -3322,7 +3322,7 @@
     },
     {
       "address": "0x61b29cf168a14cc5b6431c2ad27d63579d4c59e14753306e3870835aa408e2f",
-      "class_hash": "0x70913a86366cc88d54c5cd4cb77848d41e6ddaad2a5347a99a6e5a1d8c8947f",
+      "class_hash": "0x1625d17838b83ccf6a24619cce83d4d40260f28280003042e2e32d421dc6b0d",
       "abi": [
         {
           "type": "impl",
@@ -4721,7 +4721,7 @@
         }
       ],
       "init_calldata": [
-        "sstr:localhost:5173"
+        "sstr:http://localhost:3000"
       ],
       "tag": "pistols-duelist_token",
       "selector": "0x45c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e",
@@ -5967,7 +5967,7 @@
     },
     {
       "address": "0x42ebca2752fc8755cceaad3734f44e235dc105176fcac90b7eb2ea09f522822",
-      "class_hash": "0x5d58852bb0630e80b3ab9b6d6e53abe802fa7af6fb178f97f3a93b9b6ffb79c",
+      "class_hash": "0x155c19c70226f4346f107929368791ce6a319991d4c8cd5ab8d9e12bf523d08",
       "abi": [
         {
           "type": "impl",
@@ -7378,7 +7378,7 @@
     },
     {
       "address": "0x65f42a20c2fd9a96fe6382fdbef589e3f98276d391afbfac8e21e8c4028a88",
-      "class_hash": "0x1381bfa86de11a644390dc5d7c32fa07fa0171e70c8c0ed1f13305d31045c27",
+      "class_hash": "0x4ef0691b8e3325c62458530f42ef9de88890cd02e19c110c34399983279e929",
       "abi": [
         {
           "type": "impl",
@@ -8539,7 +8539,7 @@
         }
       ],
       "init_calldata": [
-        "sstr:localhost:5173"
+        "sstr:http://localhost:3000"
       ],
       "tag": "pistols-pack_token",
       "selector": "0x3d74e76192285c5a19a63c54a6c2ba5b015a1a25818c2d8f9cf75d7fef2b5c1",
