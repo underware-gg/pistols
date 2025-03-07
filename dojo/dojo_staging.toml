@@ -10,7 +10,7 @@ description = "An on-chain pistol duelling game of honour and betrayal."
 icon_uri = "https://assets.underware.gg/pistols/logo.png"
 cover_uri = "https://assets.underware.gg/pistols/splash.png"
 website = "https://pistols.gg"
-seed = "pistols"
+seed = "staging-v0.13.0"
 
 [world.socials]
 x = "https://x.com/underware_gg"
@@ -19,11 +19,13 @@ github = "https://github.com/underware-gg/pistols"
 # telegram = "https://t.me/dojoengine"
 
 [env]
-chain_id = "WP_PISTOLS_STAGING"
-rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
-account_address = "0xcf5a59fce535e4fa443f59e025d81d24e8bd2bf375f6665c5aab22af1a1e27"
-private_key = "0x49714ee0edbcb3fd3d1f1214e5978ada40d62ece7b84f6067ed2c7b28c972bf"
-world_address = "0x1adaf57de23b6d6d43eeb42b6ab6730a022021382fef49eff1f532c21556a5a"
+chain_id = "SN_SEPOLIA"
+rpc_url = "https://api.cartridge.gg/x/starknet/sepolia" # or env: STARKNET_RPC_URL
+# account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
+# private_key = ""      # env: DOJO_PRIVATE_KEY
+world_address = "0x2ea88c9a6314a10e7d8b6e557d01d68cf72d962707086aa242bc4805071f34d"
+lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
+world_block = 576409
 
 #--------------------------
 # namespaces
