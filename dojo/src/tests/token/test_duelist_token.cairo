@@ -167,7 +167,7 @@ fn test_token_uri() {
 
     let duelist = Duelist {
         duelist_id: TOKEN_ID_1_1.low,
-        profile_type: ProfileType::Duelist(DuelistProfile::Duke),
+        profile_type: ProfileType::Duelist(DuelistProfile::LadyVengeance),
         timestamps: DuelistTimestamps {
             registered: 999999,
             active: 999999,

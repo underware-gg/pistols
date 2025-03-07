@@ -175,10 +175,12 @@ pub mod duelist_token {
         pool::{PoolType, PoolTypeTrait, LordsReleaseBill},
         player::{Activity, ActivityTrait},
         duelist::{
-            Duelist, DuelistValue, DuelistTimestamps,
+            Duelist, DuelistValue,
+            DuelistTimestamps,
+            DuelistChallengeValue,
             ScoreboardValue, ScoreTrait,
             DuelistMemorial, CauseOfDeath,
-            Archetype,
+            // Archetype,
         },
         challenge::{Challenge},
     };
@@ -194,6 +196,7 @@ pub mod duelist_token {
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::math::{MathTrait};
+    use pistols::utils::misc::{ETH};
 
     mod Errors {
         pub const INVALID_CALLER: felt252           = 'DUELIST: Invalid caller';
@@ -627,24 +630,36 @@ pub mod duelist_token {
             let self = self.get_contract(); // get the component's contract state
             let mut store: Store = StoreTrait::new(self.world_default());
             // gether data
+            let owner: ContractAddress = self.owner_of(token_id);
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
+            let challenge: DuelistChallengeValue = store.get_duelist_challenge_value(token_id.low);
             let scoreboard: ScoreboardValue = store.get_scoreboard_value(token_id.low.into(), 0);
-            let archetype: Archetype = scoreboard.score.get_archetype();
+            let profile_type: ByteArray = duelist.profile_type.into();
+            let archetype: ByteArray = scoreboard.score.get_archetype().into();
             let base_uri: ByteArray = self.erc721._base_uri();
             let image_square: ByteArray = duelist.profile_type.get_uri(base_uri.clone(), "square");
             let image_portrait: ByteArray = duelist.profile_type.get_uri(base_uri.clone(), "portrait");
-            let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low) / CONST::ETH_TO_WEI.low;
+            let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
+            let lives: u128 = (fame_balance / FAME::ONE_LIFE.low);
             // Image
-            let svg: ByteArray = 
-                "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1024 1434'>" +
-                "<image href='" + 
-                image_square.clone() +
-                "' x='0' y='0' width='1024px' height='1024px' />" +
-                "<image href='" +
-                base_uri.clone() +
-                "/textures/cards/card_front_brown.png' x='0' y='0' width='1024px' height='1434px' />" +
-                "</svg>";
-            let image: ByteArray = Encoder::encode_svg(svg, true);
+            let image: ByteArray = 
+                base_uri.clone()
+                + format!("/api/pistols/duelist_token/{}/image", token_id)
+                + format!("?owner={:x}", owner)
+                // + format!("&username={}", "Unknown")
+                + format!("&honour={}", scoreboard.score.get_honour())
+                + format!("&archetype={}", archetype.clone())
+                + format!("&profile_type={}", profile_type.clone())
+                + format!("&profile_id={}", duelist.profile_type.profile_id())
+                + format!("&total_duels={}", scoreboard.score.total_duels)
+                + format!("&total_wins={}", scoreboard.score.total_wins)
+                + format!("&total_losses={}", scoreboard.score.total_losses)
+                + format!("&total_draws={}", scoreboard.score.total_draws)
+                + format!("&fame={}", ETH(fame_balance.into()))
+                + format!("&lives={}", lives.to_string())
+                // + format!("&is_memorized={}", "false")
+                + format!("&duel_id={:x}", challenge.duel_id)
+                ;
             // Attributes
             let mut attributes: Array<Attribute> = array![
                 Attribute {
@@ -657,15 +672,15 @@ pub mod duelist_token {
                 },
                 Attribute {
                     key: "Archetype",
-                    value: archetype.into(),
+                    value: archetype.clone(),
                 },
                 Attribute {
                     key: "Fame",
-                    value: fame_balance.to_string(),
+                    value: ETH(fame_balance.into()).low.to_string(),
                 },
                 Attribute {
                     key: "Lives",
-                    value: (fame_balance / FAME::ONE_LIFE.low).to_string(),
+                    value: lives.to_string(),
                 },
                 Attribute {
                     key: "Alive",

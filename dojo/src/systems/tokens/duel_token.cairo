@@ -524,27 +524,28 @@ pub mod duel_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             // gether data
             let challenge: ChallengeValue = store.get_challenge_value(token_id.low);
+            let state: ByteArray = challenge.state.into();
             let duelist_a: DuelistValue = store.get_duelist_value(challenge.duelist_id_a);
             let duelist_b: DuelistValue = store.get_duelist_value(challenge.duelist_id_b);
+            let profile_type_a: ByteArray = duelist_a.profile_type.into();
+            let profile_type_b: ByteArray = duelist_b.profile_type.into();
             let duelist_name_a: ByteArray = format!("Duelist #{}", challenge.duelist_id_a);
             let duelist_name_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);
             let base_uri: ByteArray = self.erc721._base_uri();
-            let image_a: ByteArray = duelist_a.profile_type.get_uri(base_uri.clone(), "portrait");
-            let image_b: ByteArray = duelist_b.profile_type.get_uri(base_uri.clone(), "portrait");
             // Image
-            let svg: ByteArray = 
-                "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1942 1024'>" +
-                "<image href='" +
-                image_a +
-                "' x='0' y='50' width='560px' height='924px' />" +
-                "<image href='" +
-                image_b +
-                "' x='1380' y='50' width='560px' height='924px' />" +
-                "<image href='" +
-                base_uri +
-                "/textures/cards/card_wide_brown.png' x='0' y='0' width='1942px' height='1024px' />" +
-                "</svg>";
-            let image: ByteArray = Encoder::encode_svg(svg, true);
+            let image: ByteArray = 
+                base_uri.clone()
+                + format!("/api/pistols/duel_token/{}/image", token_id)
+                + format!("?table_id={}", challenge.table_id.to_string())
+                + format!("&premise={}", challenge.premise.name())
+                + format!("&quote={}", challenge.quote.to_string())
+                + format!("&state={}", state.clone())
+                + format!("&winner={}", challenge.winner)
+                + format!("&profile_type_a={}", profile_type_a.clone())
+                + format!("&profile_type_b={}", profile_type_b.clone())
+                + format!("&profile_id_a={}", duelist_a.profile_type.profile_id())
+                + format!("&profile_id_b={}", duelist_b.profile_type.profile_id())
+                ;
             // Attributes
             let mut attributes: Array<Attribute> = array![
                 Attribute {
@@ -569,7 +570,7 @@ pub mod duel_token {
                 },
                 Attribute {
                     key: "State",
-                    value: challenge.state.into(),
+                    value: state.clone(),
                 },
             ];
             if (challenge.winner != 0) {

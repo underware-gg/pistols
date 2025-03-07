@@ -11,6 +11,11 @@ use pistols::models::{
     challenge::{
         Challenge,
     },
+    duelist::{
+        Duelist,
+        ProfileType, DuelistProfile, BotProfile,
+        DuelistTimestamps,
+    },
     config::{
         TokenConfig,
     },
@@ -165,6 +170,22 @@ fn test_contract_uri() {
 fn test_token_uri() {
     let mut sys: TestSystems = setup(0);
 
+    let duelist_a = Duelist {
+        duelist_id: ID(OWNER()),
+        profile_type: ProfileType::Duelist(DuelistProfile::LadyVengeance),
+        timestamps: DuelistTimestamps {
+            registered: 999999,
+            active: 999999,
+        },
+    };
+    let duelist_b = Duelist {
+        duelist_id: ID(OTHER()),
+        profile_type: ProfileType::Bot(BotProfile::Leon),
+        timestamps: DuelistTimestamps {
+            registered: 999999,
+            active: 999999,
+        },
+    };
     let challenge = Challenge {
         duel_id: DUEL_ID_1.low,
         table_id: TABLES::PRACTICE,
@@ -174,8 +195,8 @@ fn test_token_uri() {
         // duelists
         address_a: OWNER(),
         address_b: OTHER()  ,
-        duelist_id_a: 1,
-        duelist_id_b: 2,
+        duelist_id_a: ID(OWNER()),
+        duelist_id_b: ID(OTHER()),
         // progress
         state: ChallengeState::Resolved,
         winner: 1,
@@ -186,6 +207,8 @@ fn test_token_uri() {
         },
     };
 
+    tester::set_Duelist(ref sys.world, @duelist_a);
+    tester::set_Duelist(ref sys.world, @duelist_b);
     tester::set_Challenge(ref sys.world, @challenge);
 
     let uri_1 = sys.duels.token_uri(DUEL_ID_1);

@@ -10,6 +10,7 @@ import { duelist_token, duel_token } from '@underware_gg/pistols-sdk/pistols/tok
 import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 import { Connect } from './ConnectTestPage'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
+import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 
@@ -155,18 +156,39 @@ function TestImages() {
   const style = { width: '100px', height: '100px', backgroundColor: 'black' }
 
   const duelist_svg = duelist_token.renderSvg({
+    // base_uri: 'https://localhost:5173',
     duelist_id: 16,
-    base_uri: 'https://localhost:5173',
-    profile_type: 'duelists',
-    profile_id: '16',
+    owner: '0x0',
+    username: 'Patron',
+    honour: 99,
+    archetype: constants.Archetype.Honourable,
+    profile_type: constants.ProfileType.Duelist,
+    profile_id: 16,
+    total_duels: 10,
+    total_wins: 5,
+    total_losses: 2,
+    total_draws: 3,
+    fame: 4250,
+    lives: 4,
+    is_memorized: false,
+    duel_id: 0,
+  }, {
+    includeMimeType: true,
   })
   const duel_svg = duel_token.renderSvg({
+    // base_uri: 'https://localhost:5173',
     duel_id: 16,
-    base_uri: 'https://localhost:5173',
-    profile_type_a: 'duelists',
-    profile_id_a: '1',
-    profile_type_b: 'duelists',
-    profile_id_b: '11',
+    table_id: 'Table1',
+    premise: constants.Premise.Honour,
+    quote: 'Die scum!!!',
+    state: constants.ChallengeState.Resolved,
+    winner: 1,
+    profile_type_a: constants.ProfileType.Duelist,
+    profile_id_a: 11,
+    profile_type_b: constants.ProfileType.Bot,
+    profile_id_b: 2,
+  }, {
+    includeMimeType: true,
   })
   // const duelist_svg_no_mime = duelist_svg.replace('data:image/svg+xml,', '')
   // const duel_svg_no_mime = duel_svg.replace('data:image/svg+xml,', '')

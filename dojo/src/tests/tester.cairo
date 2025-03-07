@@ -320,7 +320,7 @@ pub mod tester {
                 ContractDefTrait::new(@"pistols", @"duel_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
                     .with_init_calldata([
-                        'https://assets.underware.gg',
+                        'http://localhost:3000',
                         0, // minter_address
                         0, // fee_amount
                     ].span())
@@ -334,7 +334,7 @@ pub mod tester {
                 ContractDefTrait::new(@"pistols", @"duelist_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
                     .with_init_calldata([
-                        'https://assets.underware.gg',
+                        'http://localhost:3000',
                     ].span())
             );
         }
@@ -352,7 +352,7 @@ pub mod tester {
                 ContractDefTrait::new(@"pistols", @"pack_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
                     .with_init_calldata([
-                        'https://assets.underware.gg',
+                        'http://localhost:3000',
                     ].span()),
             );
         }

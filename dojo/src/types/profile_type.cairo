@@ -354,9 +354,12 @@ pub impl ProfileTypeImpl of ProfileTypeTrait {
             ProfileType::Bot(profile) =>        profile.into(),
         })
     }
-    fn exists(self: @ProfileType) -> bool {
+    fn profile_id(self: @ProfileType) -> u8 {
         let desc: ProfileDescription = self.description();
-        (desc.profile_id != 0)
+        (desc.profile_id)
+    }
+    fn exists(self: @ProfileType) -> bool {
+        (self.profile_id() != 0)
     }
     fn duelist_id(self: @ProfileType) -> u128 {
         (match *self {
@@ -417,11 +420,11 @@ impl DuelistProfileIntoDescription of core::traits::Into<DuelistProfile, Profile
 impl CharacterProfileIntoDescription of core::traits::Into<CharacterProfile, ProfileDescription> {
     fn into(self: CharacterProfile) -> ProfileDescription {
         match self {
-            CharacterProfile::Unknown =>       CHARACTER_PROFILES::Unknown,
-            CharacterProfile::Bartender =>     CHARACTER_PROFILES::Bartender,
+            CharacterProfile::Unknown =>        CHARACTER_PROFILES::Unknown,
+            CharacterProfile::Bartender =>      CHARACTER_PROFILES::Bartender,
             CharacterProfile::Drunkard =>       CHARACTER_PROFILES::Drunkard,
-            CharacterProfile::Devil =>         CHARACTER_PROFILES::Devil,
-            CharacterProfile::Player => CHARACTER_PROFILES::Player,
+            CharacterProfile::Devil =>          CHARACTER_PROFILES::Devil,
+            CharacterProfile::Player =>         CHARACTER_PROFILES::Player,
         }
     }
 }
