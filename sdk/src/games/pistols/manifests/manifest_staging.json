@@ -5967,7 +5967,7 @@
     },
     {
       "address": "0x22e296bcc7c6eaf84f1b1d8f46171e203b5983e39bfb7d7fdc4f29a1f794b1",
-      "class_hash": "0x155c19c70226f4346f107929368791ce6a319991d4c8cd5ab8d9e12bf523d08",
+      "class_hash": "0x32f187ee8a60ed0538fcef1b81fd285ae0fa2e7db024b0c112baa6574e5ca53",
       "abi": [
         {
           "type": "impl",
@@ -6028,7 +6028,7 @@
         },
         {
           "type": "impl",
-          "name": "ActionsImpl",
+          "name": "GameImpl",
           "interface_name": "pistols::systems::game::IGame"
         },
         {
@@ -6706,6 +6706,24 @@
         },
         {
           "type": "impl",
+          "name": "GameProtectedImpl",
+          "interface_name": "pistols::systems::game::IGameProtected"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::game::IGameProtected",
+          "items": [
+            {
+              "type": "function",
+              "name": "create_trophies",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
           "name": "WorldProviderImpl",
           "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
         },
@@ -6833,6 +6851,7 @@
         "clear_required_action",
         "collect_duel",
         "collect_season",
+        "create_trophies",
         "upgrade"
       ]
     },
