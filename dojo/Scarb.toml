@@ -45,7 +45,7 @@ vrf_mock = []
 # Dojo profiles declaration
 #
 [profile.dev]
-[profile.katana]
+[profile.academy]
 [profile.staging]
 [profile.sepolia]
 [profile.mainnet]

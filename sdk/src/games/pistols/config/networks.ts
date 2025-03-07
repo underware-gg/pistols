@@ -29,10 +29,10 @@ export enum NetworkId {
 //
 // supported chain ids
 //
-export enum XainId {
+export enum ChainId {
   SN_MAIN = 'SN_MAIN',
   SN_SEPOLIA = 'SN_SEPOLIA',
-  PISTOLS_KATANA = 'WP_PISTOLS_KATANA',
+  PISTOLS_ACADEMY = 'WP_PISTOLS_ACADEMY',
   PISTOLS_STAGING = 'WP_PISTOLS_STAGING',
   KATANA_LOCAL = 'KATANA_LOCAL',
 }
@@ -62,15 +62,13 @@ const WORLD_EXPLORER: ChainExplorers = {
 //
 export type DojoNetworkConfig = {
   networkId: NetworkId
-  chainId: XainId
+  chainId: ChainId
   chain: Chain
   name: string
   rpcUrl: string
   toriiUrl: string
   graphqlUrl: string
   relayUrl: string
-  masterAddress: string,
-  masterPrivateKey: string
   accountClassHash: string
   etherAddress: string
   lordsFaucet: boolean | string
@@ -91,7 +89,7 @@ export type DojoNetworkConfig = {
 const localKatanaConfig: DojoNetworkConfig = {
   networkId: undefined, // derive from this
   chain: undefined, // derive from this
-  chainId: XainId.KATANA_LOCAL,
+  chainId: ChainId.KATANA_LOCAL,
   name: 'Katana Local',
   rpcUrl: LOCAL_KATANA,
   // toriiUrl: LOCAL_TORII,
@@ -100,10 +98,6 @@ const localKatanaConfig: DojoNetworkConfig = {
   graphqlUrl: 'http://0.0.0.0:8080/graphql',
   relayUrl: '/ip4/127.0.0.1/tcp/9090',
   // relayUrl: '/ip4/127.0.0.1/tcp/9090/tcp/80',
-  // masterAddress: KATANA_PREFUNDED_ADDRESS,
-  // masterPrivateKey: KATANA_PREFUNDED_PRIVATE_KEY,
-  masterAddress: '0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec',
-  masterPrivateKey: '0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912',
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
@@ -181,14 +175,12 @@ const localKatanaConfig: DojoNetworkConfig = {
 const academySlotConfig: DojoNetworkConfig = {
   networkId: undefined, // derive from this
   chain: undefined, // derive from this
-  chainId: XainId.PISTOLS_KATANA,
+  chainId: ChainId.PISTOLS_ACADEMY,
   name: 'Katana Academy',
-  rpcUrl: 'https://api.cartridge.gg/x/pistols-katana/katana',
-  toriiUrl: 'https://api.cartridge.gg/x/pistols-katana/torii',
-  graphqlUrl: 'https://api.cartridge.gg/x/pistols-katana/torii/graphql',
-  relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-katana%2Ftorii%2Fwss',
-  masterAddress: undefined,
-  masterPrivateKey: undefined,
+  rpcUrl: 'https://api.cartridge.gg/x/pistols-academy/katana',
+  toriiUrl: 'https://api.cartridge.gg/x/pistols-academy/torii',
+  graphqlUrl: 'https://api.cartridge.gg/x/pistols-academy/torii/graphql',
+  relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-academy%2Ftorii%2Fwss',
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: KATANA_ETH_CONTRACT_ADDRESS,
   lordsFaucet: true,
@@ -208,14 +200,13 @@ const academySlotConfig: DojoNetworkConfig = {
       active: true,
     },
     {
-      name: 'Local Katana 9',
+      name: 'Katana 9',
       address: '0x6677fe62ee39c7b07401f754138502bab7fac99d2d3c5d37df7d1c6fab10819',
       privateKey: '0x3e3979c1ed728490308054fe357a9f49cf67f80f9721f44cc57235129e090f4',
       active: true,
     },
   ],
   connectorIds: [
-    // supportedConnetorIds.CONTROLLER,
     supportedConnetorIds.PREDEPLOYED,
   ],
   // starknet Chain
@@ -228,19 +219,15 @@ const academySlotConfig: DojoNetworkConfig = {
 // Starknet
 //
 
-const snSepoliaConfig: DojoNetworkConfig = {
+const pistolsStagingConfig: DojoNetworkConfig = {
   networkId: undefined, // derive from this
   chain: { ...sepolia },
-  chainId: XainId.SN_SEPOLIA,
-  name: 'Sepolia Testnet',
-  // rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/v0_6',
-  // rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
+  chainId: ChainId.SN_SEPOLIA,
+  name: 'Sepolia Staging',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
-  toriiUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii',
-  graphqlUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii/graphql',
-  relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-sepolia%2Ftorii%2Fwss',
-  masterAddress: undefined,
-  masterPrivateKey: undefined,
+  toriiUrl: 'https://api.cartridge.gg/x/pistols-staging/torii',
+  graphqlUrl: 'https://api.cartridge.gg/x/pistols-staging/torii/graphql',
+  relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-staging%2Ftorii%2Fwss',
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: sepolia.nativeCurrency.address,
   lordsFaucet: true,
@@ -253,19 +240,15 @@ const snSepoliaConfig: DojoNetworkConfig = {
   ],
 } as const
 
-const pistolsStagingConfig: DojoNetworkConfig = {
+const snSepoliaConfig: DojoNetworkConfig = {
   networkId: undefined, // derive from this
   chain: { ...sepolia },
-  chainId: XainId.SN_SEPOLIA,
-  name: 'Sepolia Staging',
-  // rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia/v0_6',
-  // rpcUrl: 'https://api.cartridge.gg/rpc/starknet-sepolia',
+  chainId: ChainId.SN_SEPOLIA,
+  name: 'Sepolia Testnet',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
-  toriiUrl: 'https://api.cartridge.gg/x/pistols-staging/torii',
-  graphqlUrl: 'https://api.cartridge.gg/x/pistols-staging/torii/graphql',
-  relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-staging%2Ftorii%2Fwss',
-  masterAddress: undefined,
-  masterPrivateKey: undefined,
+  toriiUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii',
+  graphqlUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii/graphql',
+  relayUrl: '/dns4/api.cartridge.gg/tcp/443/x-parity-wss/%2Fx%2Fpistols-sepolia%2Ftorii%2Fwss',
   accountClassHash: KATANA_CLASS_HASH,
   etherAddress: sepolia.nativeCurrency.address,
   lordsFaucet: true,
@@ -281,15 +264,13 @@ const pistolsStagingConfig: DojoNetworkConfig = {
 const snMainnetConfig: DojoNetworkConfig = {
   networkId: undefined, // derive from this
   chain: { ...mainnet },
-  chainId: XainId.SN_MAIN,
+  chainId: ChainId.SN_MAIN,
   name: 'Mainnet',
   // rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/mainnet',
   toriiUrl: undefined,
   graphqlUrl: undefined,
   relayUrl: undefined,
-  masterAddress: undefined,
-  masterPrivateKey: undefined,
   accountClassHash: undefined,
   etherAddress: mainnet.nativeCurrency.address,
   lordsFaucet: false,
