@@ -23,7 +23,7 @@ dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.2.2" }
 # achievement = { git = "https://github.com/cartridge-gg/arcade", tag = "v1.2.2" }
 achievement = { git = "https://github.com/rsodre/arcade", branch = "dojo_v1.2.2" }
 graffiti = { git = "https://github.com/rsodre/graffiti", rev = "json2" }
-nft_combo = { git = "https://github.com/underware-gg/cairo-nft-combo", tag = "v0.2.0"}
+nft_combo = { git = "https://github.com/underware-gg/cairo-nft-combo", tag = "v0.2.1"}
 openzeppelin_token = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
 openzeppelin_introspection = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
 # openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }

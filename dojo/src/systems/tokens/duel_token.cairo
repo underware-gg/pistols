@@ -511,13 +511,11 @@ pub mod duel_token {
                 name: self.name(),
                 symbol: self.symbol(),
                 description: "Pistols at Dawn Duels",
-                image: "",
-                banner_image: "",
-                featured_image: "",
-                external_link: "https://pistols.underware.gg",
-                collaborators: array![
-                    // starknet::contract_address_const::<0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7>(),
-                ].span(),
+                image: Option::None,
+                banner_image: Option::None,
+                featured_image: Option::None,
+                external_link: Option::Some("https://pistols.underware.gg"),
+                collaborators: Option::None,
             };
             (Option::Some(metadata))
         }
@@ -587,8 +585,13 @@ pub mod duel_token {
                 name: format!("Duel #{}", token_id),
                 description: format!("Pistols at Dawn Duel #{}. https://pistols.underware.gg", token_id),
                 image,
-                attributes: attributes.span(),
-                additional_metadata: array![].span(),
+                image_data: Option::None,
+                external_url: Option::Some("https://example.underware.gg"),
+                background_color: Option::Some("0x000000"),
+                animation_url: Option::None,
+                youtube_url: Option::None,
+                attributes: Option::Some(attributes.span()),
+                additional_metadata: Option::None,
             };
             (Option::Some(metadata))
         }
