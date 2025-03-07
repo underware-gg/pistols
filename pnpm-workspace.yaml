@@ -1,7 +1,6 @@
 packages:
   - "sdk"
   - "client"
-  - "server"
   - "dreams"
 
 catalog:
