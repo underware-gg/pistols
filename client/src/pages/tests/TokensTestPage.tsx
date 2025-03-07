@@ -6,6 +6,7 @@ import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } f
 import { useTokensByOwner } from '/src/stores/tokenStore'
 import { TokensOfPlayerStoreSyncQL } from '/src/stores/sync/TokenStoreSync'
 import { useERC721TokenUri } from '@underware_gg/pistols-sdk/utils/hooks'
+import { duelist_token, duel_token } from '@underware_gg/pistols-sdk/pistols/tokens'
 import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 import { Connect } from './ConnectTestPage'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
@@ -153,32 +154,20 @@ function TokenRow({
 function TestImages() {
   const style = { width: '100px', height: '100px', backgroundColor: 'black' }
 
-  const svg_original = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1024 1434'><image href='https://localhost:5173/profiles/duelists/square/16.jpg' x='0' y='0' width='1024px' height='1024px' /><image href='https://localhost:5173/textures/cards/card_front_brown.png' x='0' y='0' width='1024px' height='1434px' /></svg>`
-  const svg_edited = `data:image/svg+xml,
-<svg
-  xmlns='http://www.w3.org/2000/svg'
-  xmlns:xlink='http://www.w3.org/1999/xlink'
-  preserveAspectRatio='xMinYMin meet'
-  viewBox='0 0 1024 1434'
-  width='1024'
-  height='1434'
->
-  <image href='https://localhost:5173/profiles/duelists/square/16.jpg' x='0' y='0' width='1024px' height='1024px' />
-  <image href='https://localhost:5173/textures/cards/card_front_brown.png' x='0' y='0' width='1024px' height='1434px'/>
-  <foreignObject width='1000' height='1434'>
-    <body xmlns='http://www.w3.org/1999/xhtml'>
-      <p>Here is a paragraph that requires word wrap</p>
-      <p>Here is a paragraph that requires word wrap</p>
-      <p>Here is a paragraph that requires word wrap</p>
-      <p>Here is a paragraph that requires word wrap</p>
-      <p>Here is a paragraph that requires word wrap</p>
-      <p>Here is a paragraph that requires word wrap</p>
-      <p>Here is a paragraph that requires word wrap</p>
-      <img src='https://localhost:5173/textures/cards/card_front_brown.png' x='500' y='500'/>
-    </body>
-  </foreignObject>
-</svg>
-`
+  const duelist_svg = duelist_token.renderSvg({
+    duelist_id: 16,
+    base_uri: 'https://localhost:5173',
+    profile_type: 'duelists',
+    profile_id: '16',
+  })
+  const duel_svg = duel_token.renderSvg({
+    duel_id: 16,
+    base_uri: 'https://localhost:5173',
+    profile_type_a: 'duelists',
+    profile_id_a: '1',
+    profile_type_b: 'duelists',
+    profile_id_b: '11',
+  })
 
   return (
     <Table attached>
@@ -202,16 +191,16 @@ function TestImages() {
       <Body>
         <Row>
           <Cell>
-            <img src={svg_original} style={style} />
+            <img src={duelist_svg} style={style} />
           </Cell>
           <Cell>
-            <embed src={svg_original} style={style} />
+            <embed src={duelist_svg} style={style} />
           </Cell>
           <Cell>
-            <img src={svg_edited} style={style} />
+            <img src={duel_svg} style={style} />
           </Cell>
           <Cell>
-            <embed src={svg_edited} style={style} />
+            <embed src={duel_svg} style={style} />
           </Cell>
         </Row>
       </Body>
