@@ -168,6 +168,8 @@ function TestImages() {
     profile_type_b: 'duelists',
     profile_id_b: '11',
   })
+  // const duelist_svg_no_mime = duelist_svg.replace('data:image/svg+xml,', '')
+  // const duel_svg_no_mime = duel_svg.replace('data:image/svg+xml,', '')
 
   return (
     <Table attached>
