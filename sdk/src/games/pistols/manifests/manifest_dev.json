@@ -1312,8 +1312,8 @@
   },
   "contracts": [
     {
-      "address": "0x2d8782a4cdf70b04c332fed819ffc7857cb3e8f7fb8be8ca21ba754aabdee5",
-      "class_hash": "0x5f1e013bffec488d03b69e15bfbf19e5b9140e66f4c6fbfa51356fe067b2f6e",
+      "address": "0x50122103108ad97d3b666f0b6de15ab9a200232f89f47fe5caa0b384947fcf0",
+      "class_hash": "0x72e14670edd6a32ca54aeab11d98c44d40383def55451f73686023b7c1977df",
       "abi": [
         {
           "type": "impl",
@@ -1413,7 +1413,7 @@
               "type": "()"
             },
             {
-              "name": "Academia",
+              "name": "Academy",
               "type": "()"
             },
             {
@@ -2039,8 +2039,8 @@
       ]
     },
     {
-      "address": "0x485e9a2f40604ef7d12e3549b144b1d73fee60e3cbabff4e1869c91ad63f773",
-      "class_hash": "0x45c86f4aeb2268d28bd4f37386096be95b6acd38855c761256645180f75c70b",
+      "address": "0x899524b10391115869ab095fe4385e17dd3dfd27b3a01bcc579ed939552e4c",
+      "class_hash": "0x3667a48ebe5ce5e26d7781a16d783d717e8b48e4bcb48f869870c81bce48c9e",
       "abi": [
         {
           "type": "impl",
@@ -3321,8 +3321,8 @@
       ]
     },
     {
-      "address": "0x61b29cf168a14cc5b6431c2ad27d63579d4c59e14753306e3870835aa408e2f",
-      "class_hash": "0x1625d17838b83ccf6a24619cce83d4d40260f28280003042e2e32d421dc6b0d",
+      "address": "0x134acf409bcb512feb02c7789b6a2a00dc2eadcfac25bb9e25f7b149d24aebb",
+      "class_hash": "0x2f7bc175f6612b54664b872dc5d61652df0e3dcb806856aeef6922beafb8da5",
       "abi": [
         {
           "type": "impl",
@@ -5966,7 +5966,7 @@
       ]
     },
     {
-      "address": "0x42ebca2752fc8755cceaad3734f44e235dc105176fcac90b7eb2ea09f522822",
+      "address": "0x60420229aa9f2da8e72d42226b061b41eb63987ed6ba4d5d7a35bad053c37d7",
       "class_hash": "0x155c19c70226f4346f107929368791ce6a319991d4c8cd5ab8d9e12bf523d08",
       "abi": [
         {
@@ -7377,7 +7377,7 @@
       ]
     },
     {
-      "address": "0x65f42a20c2fd9a96fe6382fdbef589e3f98276d391afbfac8e21e8c4028a88",
+      "address": "0x7b04bc75c3d4ba5b37d2dfc91501424dd23f517a820aee89adeeef4ececb391",
       "class_hash": "0x4ef0691b8e3325c62458530f42ef9de88890cd02e19c110c34399983279e929",
       "abi": [
         {
@@ -10110,7 +10110,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x269ec3cbf07613f669af723c2db4e556f75ba36a79564152ee40c26c26d8c18",
+      "class_hash": "0x12bd3f3e6c4db60e4a9e836dc538e242bd18767e2fc5e989bf4055f84701138",
       "tag": "pistols-TableConfig",
       "selector": "0x1e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138"
     },
