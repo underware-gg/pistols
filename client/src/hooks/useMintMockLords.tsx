@@ -9,15 +9,15 @@ import { useLordsBalance, useLordsFaucet } from '@underware_gg/pistols-sdk/dojo'
 
 export const useMintMockLords = () => {
   const { account, address } = useAccount()
-  const { balance } = useLordsBalance(address)
+  const { balance, isLoading } = useLordsBalance(address)
   const { mintLords, hasFaucet } = useLordsFaucet()
 
   useEffect(() => {
     // minted new! go to Game...
-    if (account && balance === 0n && hasFaucet && mintLords) {
+    if (account && isLoading === false && balance === 0n && hasFaucet && mintLords) {
       mintLords(account)
     }
-  }, [account, balance, hasFaucet, mintLords])
+  }, [account, isLoading, balance, hasFaucet, mintLords])
 
   return <></>
 }

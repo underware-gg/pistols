@@ -444,7 +444,7 @@ const TUTORIAL_DATA: Record<TutorialParts, TutorialData> = {
     tutorialName: 'Card Packs',
     slides: [{
       imagePath: '/images/tutorial/full_duel.png',
-      tutorialDescriptions: 'Each pack contains 5 random duelists for you to collect.\nPurchase packs with $LORDS to expand your collection.\nThere\'s a chance to obtain rare duelists from packs!'
+      tutorialDescriptions: 'Each pack contains 2 random duelists for you to collect.\nPurchase packs with $LORDS to expand your collection.\nThere\'s a chance to obtain rare duelists from packs!'
     }]
   },
   [TutorialParts.DUELIST]: {

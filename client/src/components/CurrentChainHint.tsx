@@ -8,7 +8,7 @@ export default function CurrentChainHint() {
   const { tableId } = useTableId()
   return (
     <>
-      <div className='Code Disabled AbsoluteBottomRight PaddedHalf AlignRight'>
+      <div className='Code Disabled AbsoluteBottom Padded AlignLeft'>
         v{PACKAGE_VERSION}
         <br />
         ({tableId})

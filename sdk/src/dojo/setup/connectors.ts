@@ -37,7 +37,7 @@ export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: Do
       return acc
     }, [])
     return result
-  }, [chainConfig])
+  }, [dojoAppConfig, chainConfig])
 
   return connectorIds
 }

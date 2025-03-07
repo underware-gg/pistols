@@ -27,9 +27,10 @@ export default function AppDojo({
   autoConnect,
   children
 }: AppDojoProps) {
-  const dojoAppConfig = useMemo(() => (
-    makeDojoAppConfig(networkId || ENV.DEFAULT_NETWORK_ID, networkId == ENV.DEFAULT_NETWORK_ID ? controllerConnector : undefined)
-  ), [networkId])
+  const dojoAppConfig = useMemo(() => {
+    const _networkId = networkId || ENV.DEFAULT_NETWORK_ID;
+    return makeDojoAppConfig(_networkId, _networkId == ENV.DEFAULT_NETWORK_ID ? controllerConnector : undefined)
+  }, [networkId])
   return (
     <App backgroundImage={backgroundImage}>
       <Dojo dojoAppConfig={dojoAppConfig}>

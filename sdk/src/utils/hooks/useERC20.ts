@@ -10,7 +10,7 @@ export const useERC20Balance = (
   fee: BigNumberish = 0n,
   watch: boolean = false,
 ) => {
-  const { data: balance } = useBalance({
+  const { data: balance, isLoading } = useBalance({
     token: bigintToHex(contractAddress),
     address: bigintToHex(ownerAddress),
     watch,
@@ -30,6 +30,7 @@ export const useERC20Balance = (
     decimals: balance?.decimals ?? 0,     // 18
     symbol: balance?.symbol ?? '?',       // eth
     noFundsForFee,
+    isLoading,
   }
 }
 
