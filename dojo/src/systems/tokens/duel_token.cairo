@@ -186,8 +186,10 @@ pub mod duel_token {
         premise::{Premise, PremiseTrait},
         timestamp::{Period, PeriodTrait, TimestampTrait, TIMESTAMP},
     };
-    use pistols::utils::short_string::{ShortStringTrait};
     use pistols::libs::store::{Store, StoreTrait};
+    use pistols::utils::short_string::{ShortStringTrait};
+    use pistols::utils::math::{MathTrait};
+    use graffiti::url::{UrlImpl};
 
     pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'DUEL: Invalid caller';
@@ -524,28 +526,23 @@ pub mod duel_token {
             let mut store: Store = StoreTrait::new(self.world_default());
             // gether data
             let challenge: ChallengeValue = store.get_challenge_value(token_id.low);
-            let state: ByteArray = challenge.state.into();
             let duelist_a: DuelistValue = store.get_duelist_value(challenge.duelist_id_a);
             let duelist_b: DuelistValue = store.get_duelist_value(challenge.duelist_id_b);
-            let profile_type_a: ByteArray = duelist_a.profile_type.into();
-            let profile_type_b: ByteArray = duelist_b.profile_type.into();
             let duelist_name_a: ByteArray = format!("Duelist #{}", challenge.duelist_id_a);
             let duelist_name_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);
             let base_uri: ByteArray = self.erc721._base_uri();
             // Image
-            let image: ByteArray = 
-                base_uri.clone()
-                + format!("/api/pistols/duel_token/{}/image", token_id)
-                + format!("?table_id={}", challenge.table_id.to_string())
-                + format!("&premise={}", challenge.premise.name())
-                + format!("&quote={}", challenge.quote.to_string())
-                + format!("&state={}", state.clone())
-                + format!("&winner={}", challenge.winner)
-                + format!("&profile_type_a={}", profile_type_a.clone())
-                + format!("&profile_type_b={}", profile_type_b.clone())
-                + format!("&profile_id_a={}", duelist_a.profile_type.profile_id())
-                + format!("&profile_id_b={}", duelist_b.profile_type.profile_id())
-                ;
+            let image: ByteArray = UrlImpl::new(format!("{}/api/pistols/duel_token/{}/image", base_uri.clone(), token_id))
+                .add("table_id", challenge.table_id.to_string(), true)
+                .add("premise", challenge.premise.name(), true)
+                .add("quote", challenge.quote.to_string(), true)
+                .add("state", challenge.state.into(), false)
+                .add("winner", challenge.winner.to_string(), false)
+                .add("profile_type_a", duelist_a.profile_type.into(), false)
+                .add("profile_type_a", duelist_b.profile_type.into(), false)
+                .add("profile_id_a", duelist_a.profile_type.profile_id().to_string(), false)
+                .add("profile_id_b", duelist_b.profile_type.profile_id().to_string(), false)
+                .build();
             // Attributes
             let mut attributes: Array<Attribute> = array![
                 Attribute {
@@ -570,7 +567,7 @@ pub mod duel_token {
                 },
                 Attribute {
                     key: "State",
-                    value: state.clone(),
+                    value: challenge.state.into(),
                 },
             ];
             if (challenge.winner != 0) {

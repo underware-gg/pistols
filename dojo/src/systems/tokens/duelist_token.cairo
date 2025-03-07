@@ -180,7 +180,7 @@ pub mod duelist_token {
             DuelistChallengeValue,
             ScoreboardValue, ScoreTrait,
             DuelistMemorial, CauseOfDeath,
-            // Archetype,
+            Archetype,
         },
         challenge::{Challenge},
     };
@@ -197,6 +197,7 @@ pub mod duelist_token {
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::math::{MathTrait};
     use pistols::utils::misc::{ETH};
+    use graffiti::url::{UrlImpl};
 
     mod Errors {
         pub const INVALID_CALLER: felt252           = 'DUELIST: Invalid caller';
@@ -634,32 +635,29 @@ pub mod duelist_token {
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
             let challenge: DuelistChallengeValue = store.get_duelist_challenge_value(token_id.low);
             let scoreboard: ScoreboardValue = store.get_scoreboard_value(token_id.low.into(), 0);
-            let profile_type: ByteArray = duelist.profile_type.into();
-            let archetype: ByteArray = scoreboard.score.get_archetype().into();
+            let archetype: Archetype = scoreboard.score.get_archetype();
             let base_uri: ByteArray = self.erc721._base_uri();
             let image_square: ByteArray = duelist.profile_type.get_uri(base_uri.clone(), "square");
             let image_portrait: ByteArray = duelist.profile_type.get_uri(base_uri.clone(), "portrait");
             let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
             let lives: u128 = (fame_balance / FAME::ONE_LIFE.low);
             // Image
-            let image: ByteArray = 
-                base_uri.clone()
-                + format!("/api/pistols/duelist_token/{}/image", token_id)
-                + format!("?owner={:x}", owner)
-                // + format!("&username={}", "Unknown")
-                + format!("&honour={}", scoreboard.score.get_honour())
-                + format!("&archetype={}", archetype.clone())
-                + format!("&profile_type={}", profile_type.clone())
-                + format!("&profile_id={}", duelist.profile_type.profile_id())
-                + format!("&total_duels={}", scoreboard.score.total_duels)
-                + format!("&total_wins={}", scoreboard.score.total_wins)
-                + format!("&total_losses={}", scoreboard.score.total_losses)
-                + format!("&total_draws={}", scoreboard.score.total_draws)
-                + format!("&fame={}", ETH(fame_balance.into()))
-                + format!("&lives={}", lives.to_string())
-                // + format!("&is_memorized={}", "false")
-                + format!("&duel_id={:x}", challenge.duel_id)
-                ;
+            let image: ByteArray = UrlImpl::new(format!("{}/api/pistols/duelist_token/{}/image", base_uri.clone(), token_id))
+                .add("owner", format!("0x{:x}", owner), false)
+                // .add("username", username, false)
+                .add("honour", scoreboard.score.get_honour(), false)
+                .add("archetype", archetype.into(), false)
+                .add("profile_type", duelist.profile_type.into(), false)
+                .add("profile_id", duelist.profile_type.profile_id().to_string(), false)
+                .add("total_duels", scoreboard.score.total_duels.to_string(), false)
+                .add("total_wins", scoreboard.score.total_wins.to_string(), false)
+                .add("total_losses", scoreboard.score.total_losses.to_string(), false)
+                .add("total_draws", scoreboard.score.total_draws.to_string(), false)
+                .add("fame", ETH(fame_balance.into()).low.to_string(), false)
+                .add("lives", lives.to_string(), false)
+                .add("duel_id", format!("0x{:x}", challenge.duel_id), false)
+                // .add("is_memorized", (false).to_string(), false)
+                .build();
             // Attributes
             let mut attributes: Array<Attribute> = array![
                 Attribute {
@@ -672,7 +670,7 @@ pub mod duelist_token {
                 },
                 Attribute {
                     key: "Archetype",
-                    value: archetype.clone(),
+                    value: archetype.into(),
                 },
                 Attribute {
                     key: "Fame",

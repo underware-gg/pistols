@@ -33,12 +33,12 @@ source = "git+https://github.com/dojoengine/dojo?tag=v1.2.2#aafa6669b750cec99aed
 [[package]]
 name = "graffiti"
 version = "0.1.0"
-source = "git+https://github.com/rsodre/graffiti?rev=json2#ff25c565fb35f0b40d7bddf66e4e9684e0571dcb"
+source = "git+https://github.com/rsodre/graffiti?rev=url#e8b0854798ebbcebde504ea299ed556900564ff2"
 
 [[package]]
 name = "nft_combo"
-version = "0.2.1"
-source = "git+https://github.com/underware-gg/cairo-nft-combo?tag=v0.2.1#9014aa5904f48591df347b7b0d24c10d4fdd00b2"
+version = "0.2.2"
+source = "git+https://github.com/underware-gg/cairo-nft-combo?tag=v0.2.2#20cb45b5b7c1d342342ff755cec1713bfd22598a"
 dependencies = [
  "graffiti",
  "openzeppelin_introspection",
