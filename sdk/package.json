@@ -15,7 +15,8 @@
     "dev": "tsup --watch --onSuccess=\"pnpm run postbuild\"",
     "devs": "tsup --watch --onSuccess=\"pnpm run postbuild\"",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "publish": "npm publish --access public"
   },
   "bin": {
     "generate-constants": "dist/bin/generateConstants.cjs",
