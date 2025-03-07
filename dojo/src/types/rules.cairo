@@ -6,7 +6,7 @@ use pistols::utils::arrays::{SpanDefault};
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum RulesType {
     Undefined,  // 0
-    Academia,   // 1
+    Academy,    // 1
     Season,     // 2
 }
 
@@ -166,7 +166,7 @@ impl RulesTypeIntoByteArray of core::traits::Into<RulesType, ByteArray> {
     fn into(self: RulesType) -> ByteArray {
         match self {
             RulesType::Undefined    => "RulesType::Undefined",
-            RulesType::Academia     => "RulesType::Academia",
+            RulesType::Academy      => "RulesType::Academy",
             RulesType::Season       => "RulesType::Season",
         }
     }

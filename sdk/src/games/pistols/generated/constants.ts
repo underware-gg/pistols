@@ -342,7 +342,7 @@ export const getRoundStateMap = (): Record<RoundState, number> => Object.keys(Ro
 // from: ../dojo/src/types/rules.cairo
 export enum RulesType {
   Undefined = 'Undefined', // 0
-  Academia = 'Academia', // 1
+  Academy = 'Academy', // 1
   Season = 'Season', // 2
 };
 export const getRulesTypeValue = (name: RulesType): number | undefined => _indexOrUndefined(Object.keys(RulesType).indexOf(name));

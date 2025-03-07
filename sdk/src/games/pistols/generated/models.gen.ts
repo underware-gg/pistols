@@ -617,7 +617,7 @@ export type RoundStateEnum = CairoCustomEnum;
 // Type definition for `pistols::types::rules::RulesType` enum
 export type RulesType = {
 	Undefined: string;
-	Academia: string;
+	Academy: string;
 	Season: string;
 }
 export type RulesTypeEnum = CairoCustomEnum;
@@ -1020,14 +1020,14 @@ export const schema: SchemaType = {
 			description: 0,
 		rules: new CairoCustomEnum({ 
 					Undefined: "",
-				Academia: undefined,
+				Academy: undefined,
 				Season: undefined, }),
 		},
 		TableConfigValue: {
 			description: 0,
 		rules: new CairoCustomEnum({ 
 					Undefined: "",
-				Academia: undefined,
+				Academy: undefined,
 				Season: undefined, }),
 		},
 		TokenBoundAddress: {

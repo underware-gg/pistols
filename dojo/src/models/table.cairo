@@ -32,12 +32,12 @@ pub impl TableManagerImpl of TableManagerTrait {
         store.set_table_config(@TableConfig {
             table_id: TABLES::TUTORIAL,
             description: 'The Training Grounds',
-            rules: RulesType::Academia,
+            rules: RulesType::Academy,
         });
         store.set_table_config(@TableConfig {
             table_id: TABLES::PRACTICE,
             description: 'Bot Shooting Range',
-            rules: RulesType::Academia,
+            rules: RulesType::Academy,
         });
         // store.set_table_config(@TableConfig {
         //     table_id: 'EternumS1', // example
