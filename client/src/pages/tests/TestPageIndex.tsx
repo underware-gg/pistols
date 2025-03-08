@@ -4,13 +4,13 @@ import { Button, Container, Divider, Menu, MenuItem } from 'semantic-ui-react'
 import App from '/src/components/App'
 
 const testPages = [
-  'connect',
-  'tokens',
-  'tutorial',
-  'profiles',
-  'timestamp',
-  'icons',
-  // 'sign',
+  { name: 'connect', connected: true },
+  { name: 'tokens', connected: true },
+  { name: 'tutorial', connected: true },
+  { name: 'timestamp', connected: true },
+  { name: 'profiles', connected: false },
+  { name: 'icons', connected: false },
+  // { name: 'sign', connected: true },
 ]
 
 export default function TestPageIndex() {
@@ -24,13 +24,13 @@ export default function TestPageIndex() {
     <App>
       <Container text>
         <Menu inverted vertical>
-          {testPages.map(name => (
+          {testPages.map(page => (
             <MenuItem
-              key={name}
-              name={name}
+              key={page.name}
+              name={page.name}
               icon='arrow right'
-              active={activeItem === name}
-              onClick={() => _click(name)}
+              active={activeItem === page.name}
+              onClick={() => _click(page.name)}
             />
           ))}
         </Menu>
@@ -61,12 +61,13 @@ export function TestPageMenu() {
           icon='arrow left'
           onClick={() => navigate('/tests')}
         />
-        {testPages.map(name => (
+        {testPages.map(page => (
           <MenuItem
-            key={name}
-            name={name}
-            active={location.pathname.endsWith(name)}
-            onClick={() => _click(name)}
+            key={page.name}
+            name={page.name}
+            icon={page.connected ? 'chain' : null}
+            active={location.pathname.endsWith(page.name)}
+            onClick={() => _click(page.name)}
           />
         ))}
       </Menu>

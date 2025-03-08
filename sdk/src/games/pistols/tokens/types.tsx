@@ -1,4 +1,3 @@
-
 export type SvgRenderOptions = {
   includeMimeType?: boolean,
   encodeBase64?: boolean,
@@ -6,7 +5,11 @@ export type SvgRenderOptions = {
 
 export const _packSvg = (svg: string, options: SvgRenderOptions): string => {
   if (options.includeMimeType) {
-    return `data:image/svg+xml,${svg}`
+    // return `data:image/svg+xml;utf8,${encodeURI(svg)}`
+    return `data:image/svg+xml;utf8,${svg
+      .replaceAll('#', '%23')
+      .replaceAll('"', '&quot;')
+      }`
   }
   return svg
 }
