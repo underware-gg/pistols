@@ -9,6 +9,7 @@ import { InteractibleScene } from '/src/three/InteractibleScene'
 import { sceneBackgrounds } from '/src/data/assets'
 import BarkeepModal from '/src/components/modals/BarkeepModal'
 import TableModal from '/src/components/modals/TableModal'
+import ActivityPanel from '../ActivityPanel'
 
 export default function ScTavern() {
   const { tableOpener } = usePistolsContext()
@@ -54,6 +55,7 @@ export default function ScTavern() {
   return (
     <div>
 
+      <ActivityPanel />
       {/* <TableModal opener={tableOpener} /> */}
       <TavernAudios />
       <BarkeepModal open={open} setOpen={setOpen} />

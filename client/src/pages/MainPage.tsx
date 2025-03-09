@@ -3,7 +3,7 @@ import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRouterParams } from '/src/hooks/PistolsContext'
 import { useSyncSelectedDuelist } from '/src/hooks/useSyncDuelist'
 import { useSetPageTitle } from '/src/hooks/useSetPageTitle'
-import { useEffectOnce, usePlayerId } from '@underware_gg/pistols-sdk/utils/hooks'
+import { useEffectOnce } from '@underware_gg/pistols-sdk/utils/hooks'
 import { DojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { Header } from '/src/components/Header'
@@ -19,7 +19,6 @@ import DuelistModal from '/src/components/modals/DuelistModal'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import NewChallengeModal from '/src/components/modals/NewChallengeModal'
 import WalletFinderModal from '/src/components/modals/WalletFinderModal'
-import ActivityPanel from '/src/components/ActivityPanel'
 import ScProfile from '/src/components/scenes/ScProfile'
 import ScTavern from '/src/components/scenes/ScTavern'
 import ScDuelsBoard from '/src/components/scenes/ScDuelsBoard'
@@ -93,7 +92,6 @@ export default function MainPage({
         <GameContainer isVisible={true} />
         <MainUI />
         <Modals />
-        <ActivityPanel />
         {overlay}
         <Header />
         <CurrentChainHint />

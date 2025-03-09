@@ -1181,11 +1181,11 @@ $ui-container-gap: 1em;
 .ActivityPanel {
   @extend .NoMouse;
   background-color: rgba($color-darkest, 0.65);
-  height: 50%;
+  height: 40%;
   width: 20%;
   position: absolute;
-  top: 16%;
-  right: 10px;
+  bottom: 5%;
+  right: 5%;
   border-radius: 10px;
   border: $border-button-inactive;
   padding: 5px 10px;
