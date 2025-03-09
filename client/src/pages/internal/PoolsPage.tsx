@@ -176,7 +176,7 @@ function Pools() {
             <LordsBalance address={contractAddress} size='big' />
           </Cell>
           <Cell className='Code' textAlign='left'>
-            <FameBalance address={contractAddress} big />
+            <FameBalance address={contractAddress} size='big' />
           </Cell>
         </Row>
         <PoolRow pool={poolPurchases} />

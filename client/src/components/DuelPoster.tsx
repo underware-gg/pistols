@@ -27,6 +27,8 @@ import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { SceneName } from '/src/data/assets'
+import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
+
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -64,7 +66,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext()
 
-  const { duel_token } = useDojoSystemCalls()
+  const { duel_token, game } = useDojoSystemCalls()
   const { duelistId } = useSettings()
   const { account } = useAccount()
 
@@ -84,6 +86,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
     livesStaked,
     needToSyncExpired,
   } = useChallenge(props.duelId)
+  const { canCollectDuel } = useCanCollectDuel(props.duelId)
   const { challengeDescription } = useChallengeDescription(props.duelId)
   const { description: tableDescription, isSeason, isTutorial } = useTable(tableId)
   
@@ -112,6 +115,9 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const [ cardColor, setCardColor ] = useState(CardColor.WHITE)
 
   
+  const _collectDuel = () => {
+    game.collect_duel(account, props.duelId)
+  }
 
   const _reply = (accepted: boolean) => {
     const _submit = async () => {
@@ -325,6 +331,11 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                 <Col>
                   <ActionButton large fillParent label='Close' className='FillParent' onClick={props._close} />
                 </Col>
+                {(state == constants.ChallengeState.InProgress && canCollectDuel) &&
+                  <Col>
+                    <ActionButton large fill important label='Timed Out, Collect Duel' onClick={() => _collectDuel()} />
+                  </Col>
+                }
                 {(state == constants.ChallengeState.Awaiting && isChallenger) &&
                   <>
                     <Col>
@@ -363,7 +374,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                 }
                 {(needToSyncExpired && (isChallenger || isChallenged)) &&
                   <Col>
-                    <ActionButton large fillParent important label='Withdraw Expired Fees' disabled={isSubmitting} onClick={() => _reply(false)} />
+                    <ActionButton large fillParent important label='Expired, Collect Duel' disabled={isSubmitting} onClick={() => _reply(false)} />
                   </Col>
                 }
               </Row>
