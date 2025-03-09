@@ -11,6 +11,7 @@ import Stats from 'three/addons/libs/stats.module.js'
 import { Rain } from './Rain.tsx'
 import { Grass } from './Grass.tsx'
 import * as shaders from './shaders.tsx'
+import { InteractibleScene } from './InteractibleScene.tsx'
 
 // event emitter
 // var ee = require('event-emitter');
@@ -25,7 +26,6 @@ import { SpriteSheet } from './SpriteSheetMaker.tsx'
 import { DuelistsManager } from './DuelistsManager.tsx'
 import { Action } from '/src/utils/pistols.tsx'
 import { DuelistState } from '/src/components/scenes/Duel.tsx'
-import { InteractibleScene } from './InteractibleScene.tsx'
 
 
 //---------------------------
@@ -140,7 +140,7 @@ let _controls
 export let _gui: GUI
 
 let _grassTransforms
-let _growthPercentage
+let _growthPercentage = 0.0
 let _grass
 
 let _ground
@@ -154,6 +154,10 @@ let _duelistManager: DuelistsManager
 let _scenes: Partial<Record<SceneName, THREE.Scene>> = {}
 export let _currentScene: THREE.Scene = null
 export let _sceneName: SceneName
+
+export let _currentDuelId: number
+export let _currentDuelistAId: number
+export let _currentDuelistBId: number
 
 export let _sfxEnabled = true
 export let _statsEnabled = false
@@ -189,8 +193,6 @@ export async function init(canvas, framerate = 60, statsEnabled = false) {
   // THREE.ColorManagement.enabled = false
   await loadAssets()
   console.log(`THREE.init() assets loaded...`)
-
-  _growthPercentage = localStorage.getItem('GROWTH')
   
   if (_statsEnabled) {
     _stats = new Stats()
@@ -438,15 +440,11 @@ export function animate() {
 
 function setupScenes() {
   _scenes = {}
-  let hasInstancedTutorial = false
   Object.values(SceneName).forEach((sceneName) => {
     if (sceneName === SceneName.Duel) {
       _scenes[sceneName] = setupDuelScene()
-    } else if (!sceneName.includes('Tutorial') && sceneName !== SceneName.TutorialDuel) {
+    } else if (sceneName !== SceneName.TutorialDuel) {
       _scenes[sceneName] = setupStaticScene(sceneName)
-    } else if (!hasInstancedTutorial){
-      hasInstancedTutorial = true
-      _scenes[sceneName] = setupStaticScene(SceneName.Tutorial)
     }
   })
 }
@@ -717,7 +715,7 @@ function createWaterPlane(name, geometry, params) {
 
 function createGrass() {
   if (!_scenes[SceneName.Duel]) return;
-  if (!_grassTransforms || _growthPercentage == undefined) return;
+  if (!_grassTransforms) return;
   if (_grass) return;
 
   _grass = new Grass(
@@ -779,10 +777,7 @@ export function switchScene(sceneName) {
 
   if (!_currentScene) {
     _sceneName = sceneName
-    _currentScene = _scenes[sceneName.includes('Tutorial') ? SceneName.Tutorial : sceneName]
-    if (sceneName.includes('Tutorial')) {
-      (_currentScene as InteractibleScene).setSceneData(sceneName)
-    }
+    _currentScene = _scenes[sceneName]
 
     setTimeout(() => {
       fadeInCurrentScene();
@@ -796,10 +791,7 @@ export function switchScene(sceneName) {
   } else {
     fadeOutCurrentScene(() => {
       _sceneName = sceneName
-      _currentScene = _scenes[sceneName.includes('Tutorial') ? SceneName.Tutorial : sceneName]
-      if (sceneName.includes('Tutorial')) {
-        (_currentScene as InteractibleScene).setSceneData(sceneName)
-      }
+      _currentScene = _scenes[sceneName]
 
       emitter.emit('hover_description', null)
       emitter.emit('hover_item', null)
@@ -838,12 +830,9 @@ function fadeInCurrentScene() {
 
   _tweens.staticFade?.stop();
 
-  console.log('Initial opacity:', overlay.style.opacity);
-
   _tweens.staticFade = new TWEEN.Tween({ opacity: 1 })
     .to({ opacity: 0 }, SCENE_CHANGE_ANIMATION_DURATION)
     .onUpdate(({ opacity }) => {
-      console.log('Updating opacity:', opacity);
       overlay.style.opacity = opacity.toString()
     })
     .start();
@@ -856,10 +845,10 @@ export function startDuelWithPlayers(duelistNameA, duelistModelA, isDuelistAYou,
 }
 
 export function setDuelTimePercentage(timePassed: number) {
-  const timePassedPercentage = timePassed / 259_200_000.0 // grow for three days
-  localStorage.setItem('GROWTH', timePassedPercentage.toString())
-  _growthPercentage = parseFloat(localStorage.getItem('GROWTH'))
-  createGrass()
+  _growthPercentage = timePassed
+  if (_grass) {
+    _grass.setGrassGrowth(_growthPercentage)
+  }
 }
 
 export function updatePlayerProgress(isA, duelistState, onClick) {
@@ -872,6 +861,12 @@ export function setDuelistElement(isA, duelistElement) {
 
 export function setDuelistSpeedFactor(speedFactor) {
   _duelistManager.setDuelistSpeedFactor(speedFactor)
+}
+
+export function setDuelData(duelId: number, duelistAId: number, duelistBId: number) {
+  _currentDuelId = duelId
+  _currentDuelistAId = duelistAId
+  _currentDuelistBId = duelistBId
 }
 
 //----------------
@@ -1045,7 +1040,7 @@ export function dispose() {
   // 8. Clear References:
   _duelistManager = null
   _grassTransforms = null
-  _growthPercentage = null
+  _growthPercentage = 0.0
   _ground = null
   _skyVideo = null
   _skyVideoTexture = null

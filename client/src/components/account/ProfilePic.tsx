@@ -1,10 +1,7 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { Image, SemanticFLOATS } from 'semantic-ui-react'
-import { BigNumberish } from 'starknet'
-import { useSettings } from '/src/hooks/SettingsContext'
-import { useIsMyDuelist, useIsYou } from '/src/hooks/useIsYou'
-import { IconClick } from '/src/components/ui/Icons'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 
 export const ProfileTypeFolder: Record<constants.ProfileType, string> = {
   [constants.ProfileType.Undefined]: 'duelists',
@@ -13,25 +10,11 @@ export const ProfileTypeFolder: Record<constants.ProfileType, string> = {
   [constants.ProfileType.Bot]: 'bots',
 }
 
-export const makeProfilePicUrl = (profilePic: number | null, square: boolean, profileType = constants.ProfileType.Duelist) => {
+export const makeProfilePicUrl = (profilePic: number | null, profileType = constants.ProfileType.Duelist) => {
   if (profilePic === null) return null
-  const variant = (square ? 'square' : 'portrait')
   const folder = ProfileTypeFolder[profileType]
-  return `/profiles/${folder}/${variant}/${('00' + profilePic).slice(-2)}.jpg`
+  return `/profiles/${folder}/${('00' + profilePic).slice(-2)}.jpg`
 }
-const _className = ({ small, medium, square, circle, duel, anon }) => (
-  small ? 'ProfilePicSmall'
-    : medium ? 'ProfilePicMedium'
-      : anon ? 'ProfilePicAnon'
-        : square ? 'ProfilePicSquare'
-          : circle ? 'ProfilePicCircle'
-            : duel ? 'ProfilePicDuel'
-              : 'ProfilePic'
-)
-
-//---------------
-// Portraits
-//
 
 export function ProfilePic({
   profilePic = null,
@@ -39,104 +22,99 @@ export function ProfilePic({
   profileType = constants.ProfileType.Duelist,
   small = false,
   medium = false,
-  square = false,
-  circle = false,
+  large = false,
   duel = false,
-  anon = false,
+  width,
+  height,
+  circle = false,
+  removeCorners = false,
+  removeBorder = false,
+  removeShadow = false,
+  borderRadius,
+  borderWidth,
+  borderColor,
   dimmed = false,
   className = '',
   floated,
   // as button
   onClick,
   disabled = false,
-  // switch button
-  duelistId,
-  displayBountyValue = null,
 }: {
   profilePic?: number
   profilePicUrl?: string
   profileType?: constants.ProfileType
   small?: boolean
   medium?: boolean
-  square?: boolean
-  circle?: boolean
+  large?: boolean
   duel?: boolean
-  anon?: boolean
+  width?: number
+  height?: number
+  circle?: boolean
+  removeCorners?: boolean
+  removeBorder?: boolean
+  removeShadow?: boolean
+  borderRadius?: number
+  borderWidth?: number
+  borderColor?: string
   dimmed?: boolean
   className?: string
   floated?: SemanticFLOATS
   // as button
   onClick?: Function
   disabled?: boolean
-  // switch duelist
-  duelistId?: BigNumberish
-  // display bounty
-  displayBountyValue?: number | null
 }) {
+  const { aspectWidth } = useGameAspect()
+
+  const imageRef = useRef<HTMLImageElement>(null)
+
   const _clickable = (onClick != null && !disabled)
-
-  const classNames = useMemo(() => {
-    let result = [_className({ small, medium, square, circle, duel, anon }), className]
-    if (_clickable) result.push('Anchor')
-    if (disabled || dimmed) result.push('ProfilePicDisabled')
-    return result
-  }, [className, small, medium, square, circle, duel, anon, disabled, dimmed])
-  const url = useMemo(() => (profilePicUrl ?? makeProfilePicUrl(profilePic, square || anon, profileType)), [profilePicUrl, profilePic, square, profileType])
-
-  // as Button
   const _click = () => {
     if (_clickable) onClick(profilePic)
   }
-  // switch duelist
-  const { dispatchDuelistId } = useSettings()
-  const { isYou } = useIsYou(duelistId)
-  const isMyDuelist = useIsMyDuelist(duelistId)
-  const _canSwitch = (Boolean(duelistId) && isMyDuelist && !isYou)
-  const _switch = () => {
-    dispatchDuelistId(duelistId)
-  }
-  const _iconStyle = floated == 'right' ? {
-    top: '25px',
-    left: 'unset',
-    right: '25px',
-  } : (floated == 'left' || _canSwitch) ? {
-    top: '25px',
-    left: '25px',
-  } : {}
+
+  const url = useMemo(() => (profilePicUrl ?? makeProfilePicUrl(profilePic, profileType)), [profilePicUrl, profilePic, profileType])
+
+  const classNames = useMemo(() => {
+    let result = ['ProfilePic NoDrag', className]
+    if (_clickable) result.push('Anchor YesMouse')
+    if (disabled || dimmed) result.push('ProfilePicDisabled')
+    
+    if (!removeBorder) {
+      if (borderWidth || borderColor) {
+        result.push('CustomBorder')
+      } else {
+        result.push('Border')
+      }
+    }
+    if (!removeShadow) result.push('Shadow')
+    return result
+  }, [className, disabled, dimmed, onClick, borderWidth, borderColor, removeShadow])
+
+  useEffect(() => {
+    if (!imageRef.current) return;
+
+    let baseWidth = width ?? (small ? 2 : medium ? 4 : large ? 6 : duel ? 8.5 : 8);
+    let baseHeight = height ?? baseWidth;
+
+    imageRef.current.style.setProperty('--profile-pic-width', `${aspectWidth(baseWidth)}px`);
+    imageRef.current.style.setProperty('--profile-pic-height', `${aspectWidth(baseHeight)}px`);
+    imageRef.current.style.setProperty('--profile-pic-clip-path', circle ? 'circle()' : 'none');
+    imageRef.current.style.setProperty('--profile-pic-object-fit', circle ? 'cover' : 'cover');
+    // imageRef.current.style.setProperty('--profile-pic-object-position', circle && !square ? '50% 20%' : '50% 50%');
+    
+    imageRef.current.style.setProperty('--profile-pic-border', 
+      (borderWidth && borderColor) ? `${aspectWidth(borderWidth)}px solid ${borderColor}` :
+      borderWidth ? `${aspectWidth(borderWidth)}px solid #c8b6a8` :
+      borderColor ?? `1px solid ${borderColor}`
+    );
+    imageRef.current.style.setProperty('--profile-pic-border-radius', removeCorners ? '0px' : borderRadius ? `${aspectWidth(borderRadius)}px` : `${aspectWidth(0.2)}px`);
+    imageRef.current.style.setProperty('--profile-pic-shadow', removeShadow ? 'none' : 'unset');
+
+  }, [small, medium, large, duel, width, height, aspectWidth, circle, removeCorners, borderRadius, removeBorder, borderWidth, borderColor, removeShadow]);
 
   return (
     <>
-      <Image src={url} className={classNames.join(' ')} floated={floated} onClick={() => _click()} />
-      {_canSwitch && <IconClick important name='sync alternate' size='big' onClick={() => _switch()} className='Absolute' style={_iconStyle} />}
+      <Image ref={imageRef} src={url} className={classNames.join(' ')} floated={floated} onClick={() => _click()} />
     </>
   )
-}
-
-//-----------------
-// Squares
-//
-
-export function ProfilePicSquare({
-  profilePic,
-  small = false,
-  medium = false,
-  className,
-}: {
-  profilePic: number
-  small?: boolean
-  medium?: boolean
-  className?: string
-}) {
-  return <ProfilePic profilePic={profilePic} small={small} medium={medium} square className={className} />
-}
-
-export function ProfilePicSquareButton({
-  profilePic,
-  small = false,
-  medium = false,
-  disabled = false,
-  dimmed = false,
-  onClick,
-}) {
-  return <ProfilePic profilePic={profilePic} onClick={onClick} disabled={disabled} dimmed={dimmed} small={small} medium={medium} square />
 }

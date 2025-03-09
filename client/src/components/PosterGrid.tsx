@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { _currentScene } from '/src/three/game'
 
 export interface PosterGridHandle {

@@ -6,13 +6,12 @@ import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useDuel } from '/src/hooks/useDuel'
 import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
-import { ProfilePicSquare } from '/src/components/account/ProfilePic'
+import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ProfileName } from '/src/components/account/ProfileDescription'
 import { ChallengeTime } from '/src/components/ChallengeTime'
 import { DuelIconsAsRow } from '/src/components/DuelIcons'
 import { FilterButton } from '/src/components/ui/Buttons'
-// import { FilterDuelistName } from '/src/pistols/components/DuelistTable'
-import { Balance } from '/src/components/account/Balance'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { arrayRemoveValue, bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '/src/utils/pistols'
@@ -34,7 +33,11 @@ export function ChallengeTableSelectedDuelist({
   const { filterChallengeSortColumn, filterDuelistName, filterChallengeSortDirection } = useQueryParams()
   const { challengeIds, states } = useQueryChallengeIds(statesFilter, filterDuelistName, false, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
-  return <ChallengeTableByIds challengeIds={challengeIds} compact={compact} existingStates={states} states={statesFilter} setStates={setStatesFilter} />
+  return (
+    <div style={{width: '100%', height: '100%',}}>
+      <ChallengeTableByIds challengeIds={challengeIds} compact={compact} existingStates={states} states={statesFilter} setStates={setStatesFilter} />
+    </div>
+  )
 }
 
 
@@ -53,11 +56,12 @@ function ChallengeTableByIds({
   states: constants.ChallengeState[]
   setStates: (states: constants.ChallengeState[]) => void
 }) {
+  const { aspectWidth } = useGameAspect()
   const { filterDuelistName } = useQueryParams()
 
   const rows = useMemo(() => {
     let result = []
-    challengeIds.forEach((duelId, index) => {
+    challengeIds.forEach((duelId) => {
       result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} nameFilter={filterDuelistName} />)
     })
     return result
@@ -80,44 +84,40 @@ function ChallengeTableByIds({
       if (!enabled) canAdd = true
       if (enabled) canClear = true
       filters.push(
-        <FilterButton key={state}
-          // grouped={result.length > 0}
-          grouped
-          label={ChallengeStateNames[state]}
-          state={enabled}
-          onClick={() => _switch()}
-        />)
+        <FilterButton key={state} grouped label={ChallengeStateNames[state]} state={enabled} onClick={() => _switch()} />
+      )
     })
     return { filters, canAdd, canClear }
   }, [existingStates, states])
 
   return (
-    <>
+    <div>
       {filters.length > 0 &&
-        <div>
-          <ButtonGroup>
-            <FilterButton icon='add' state={false} disabled={!canAdd} onClick={() => setStates(AllChallengeStates)} />
+        <div style={{ maxWidth: '100%', overflowX: 'auto', padding: aspectWidth(0.6) }}>
+          <ButtonGroup style={{ 
+            display: 'flex',
+            flexWrap: 'wrap', 
+            gap: `${aspectWidth(0.6)}px 0`,
+            width: '100%'
+          }}>
+            <FilterButton grouped icon='add' state={false} disabled={!canAdd} onClick={() => setStates(AllChallengeStates)} />
             {filters}
             <FilterButton grouped icon='close' state={false} disabled={!canClear} onClick={() => setStates([])} />
           </ButtonGroup>
-          {/* <FilterDuelistName /> */}
         </div>
       }
 
       <Table sortable selectable className='Faded' color={color as SemanticCOLORS}>
         <Table.Header className='TableHeader'>
           <Table.Row textAlign='left' verticalAlign='middle'>
-            <HeaderCell width={1}></HeaderCell>
-            <HeaderCell>Challenger</HeaderCell>
-            <HeaderCell width={1}></HeaderCell>
-            <HeaderCell>Challenged</HeaderCell>
-            <HeaderCell width={3} textAlign='center'>Winner</HeaderCell>
-            <HeaderCell width={3} textAlign='center'>Time</HeaderCell>
+            <HeaderCell width={3} textAlign='center'>Challenger</HeaderCell>
+            <HeaderCell width={3} textAlign='center'></HeaderCell>
+            <HeaderCell width={3} textAlign='center'>Challenged</HeaderCell>
           </Table.Row>
         </Table.Header>
 
         {rows.length > 0 ?
-          <Table.Body className='TableBody'>
+          <Table.Body>
             {rows}
           </Table.Body>
           :
@@ -130,7 +130,7 @@ function ChallengeTableByIds({
           </Table.Footer>
         }
       </Table>
-    </>
+    </div>
   )
 }
 
@@ -144,6 +144,7 @@ function DuelItem({
   nameFilter?: string
   compact?: boolean
 }) {
+  const { aspectWidth } = useGameAspect()
   const { duelistId } = useSettings()
   const {
     challenge: { duelistIdA, duelistIdB, tableId, state, isLive, isCanceled, isExpired, isDraw, winner },
@@ -175,54 +176,52 @@ function DuelItem({
   }
 
   return (
-    // <Table.Row warning={isDraw || isCanceled} negative={false} positive={isInProgress || isFinished} textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
-    <Table.Row textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()}>
-      <Cell className={classNameA}>
-        <ProfilePicSquare profilePic={profilePicA} small />
-      </Cell>
-
-      <Cell className={classNameA}>
-        <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw} canceled={isCanceled || isExpired}>
-          <ProfileName duelistId={duelistIdA} />
-        </PositiveResult>
-        <br />
-        <DuelIconsAsRow duelId={duelId} duelistId={duelistIdA} size={compact ? null : 'large'} />
-      </Cell>
-
-      <Cell className={classNameB}>
-        <ProfilePicSquare profilePic={profilePicB} small />
-      </Cell>
-
-      <Cell className={classNameB}>
-        <PositiveResult positive={winnerIsB} negative={winnerIsA && false} warning={isDraw} canceled={isCanceled || isExpired}>
-          <ProfileName duelistId={duelistIdB} />
-        </PositiveResult>
-        <br />
-        <DuelIconsAsRow duelId={duelId} duelistId={duelistIdB} size={compact ? null : 'large'} />
-      </Cell>
-
-      <Cell textAlign='center' className='Result'>
-        {state == constants.ChallengeState.Resolved ?
-          <>
-            <PositiveResult positive={true}>
-              <ProfileName duelistId={winnerIsA ? duelistIdA : duelistIdB} badges={false} />
+    <Table.Row textAlign='left' verticalAlign='middle' onClick={() => _gotoChallenge()} style={{ maxWidth: '100%' }}>
+      <Cell style={{ width: '40%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: aspectWidth(0.8) }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <ProfilePic profilePic={profilePicA} small />
+            <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw} canceled={isCanceled || isExpired}>
+              <ProfileName duelistId={duelistIdA} />
             </PositiveResult>
-            {fameBalance && <><br /><Balance fame small wei={fameBalance} /></>}
-          </>
-          :
-          <>
-            <span className={ChallengeStateClasses[state]}>
-              {ChallengeStateNames[state]}
-            </span>
-            {fameBalance && <><br /><Balance fame small wei={fameBalance} crossed={!isLive} /></>}
-          </>
-        }
+          </div>
+          <div style={{ alignItems: 'center' }}>
+            <DuelIconsAsRow duelId={duelId} duelistId={duelistIdA} size={null} />
+          </div>
+        </div>
       </Cell>
 
-      <Cell textAlign='center' style={{ minWidth: '90px' }} className='Number'>
-        <PositiveResult warning={isDraw} canceled={isCanceled || isExpired}>
-          <ChallengeTime duelId={duelId} />
-        </PositiveResult>
+      <Cell textAlign='center' style={{ width: '20%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <span style={{ fontSize: aspectWidth(1.4), fontWeight: 'bold' }}>VS</span>
+          {state == constants.ChallengeState.Resolved ?
+            <>
+              <PositiveResult positive={true}>
+                <ProfileName duelistId={winnerIsA ? duelistIdA : duelistIdB} badges={false} />
+              </PositiveResult>
+            </>
+            :
+            <>
+              <span className={ChallengeStateClasses[state]}>
+                {ChallengeStateNames[state]}
+              </span>
+            </>
+          }
+        </div>
+      </Cell>
+
+      <Cell style={{ width: '40%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: aspectWidth(0.8), flexDirection: 'row-reverse' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <ProfilePic profilePic={profilePicB} small />
+            <PositiveResult positive={winnerIsB} negative={winnerIsA && false} warning={isDraw} canceled={isCanceled || isExpired}>
+              <ProfileName duelistId={duelistIdB} />
+            </PositiveResult>
+          </div>
+          <div style={{ alignItems: 'center' }}>
+            <DuelIconsAsRow duelId={duelId} duelistId={duelistIdB} size={null} />
+          </div>
+        </div>
       </Cell>
     </Table.Row>
   )

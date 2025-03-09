@@ -3,7 +3,7 @@ import { Divider, Grid, Modal } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDojoSetup, useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { CommitMoveMessage, signAndGenerateMovesHash } from '/src/utils/salt'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { Card, CardHandle } from '/src/components/cards/Cards'
@@ -253,7 +253,7 @@ function CardSelector({
     cardRefs.forEach((card, index) => {
       card.current.setCardData(Object.values(cards)[index + 1])
 
-      card.current.setCardRotation(Math.random() * 6 - 3)
+      card.current.setRotation(Math.random() * 6 - 3)
     })
   }, [])
 
@@ -273,7 +273,7 @@ function CardSelector({
     if (currentCard == 0) return
     const selectedCard = cardRefs[currentCard - 1].current
 
-    selectedCard.setCardScale(1.0, 200)
+    selectedCard.setScale(1.0, 200)
     selectedCard.toggleHighlight(false)
     selectedCard.toggleIdle(false)
   }
@@ -281,9 +281,9 @@ function CardSelector({
   const cardClick = (cardIndex) => {
     const selectedCard = cardRefs[cardIndex].current
 
-    selectedCard.setCardScale(1.05, 100)
+    selectedCard.setScale(1.05, 100)
     setTimeout(() => {
-      selectedCard.setCardScale(1.1, 100)
+      selectedCard.setScale(1.1, 100)
     }, 100)
   }
 
@@ -305,11 +305,11 @@ function CardSelector({
             height={12 * 0.66}
             onHover={(isHovered) => {
               if (isHovered) {
-                cardRefs[index].current.setCardScale(1.1, 200)
+                cardRefs[index].current.setScale(1.1, 200)
                 emitter.emit('hover_description', Object.values(cards)[index + 1].descriptionDark ?? Object.values(cards)[index + 1].description)
               } else {
                 if (currentCard - 1 != index) {
-                  cardRefs[index].current.setCardScale(1.0, 200)
+                  cardRefs[index].current.setScale(1.0, 200)
                 }
                 emitter.emit('hover_description', null)
               }

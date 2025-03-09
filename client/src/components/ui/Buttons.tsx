@@ -7,9 +7,12 @@ import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useLordsBalance } from '@underware_gg/pistols-sdk/dojo'
 import { LordsBagIcon } from '/src/components/account/Balance'
 import { CustomIcon, IconSizeProp } from '/src/components/ui/Icons'
-import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { SceneName } from '/src/data/assets'
 import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
+import { usePact } from '/src/hooks/usePact'
+import { useIsMyAccount } from '/src/hooks/useIsYou'
+import { useTableId } from '/src/stores/configStore'
 
 //-----------------
 // Generic Action button
@@ -22,6 +25,7 @@ type ActionButtonProps = {
   disabled?: boolean
   large?: boolean
   fill?: boolean
+  fillParent?: boolean
   dimmed?: boolean
   important?: boolean
   negative?: boolean
@@ -38,6 +42,7 @@ export const ActionButton = ({
   disabled = false,
   large = false,
   fill = false,
+  fillParent = false,
   dimmed = false,
   important = false,
   negative = false,
@@ -49,7 +54,7 @@ export const ActionButton = ({
   const classNames = useMemo(() => {
     let classNames = []
     if (important && !disabled) classNames.push('Important')
-    // if (fill) classNames.push('FillParent')
+    if (fillParent) classNames.push('FillParent')
     if (large) classNames.push('LargeButton')
     classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
     if (negative) classNames.push('Negative')
@@ -284,4 +289,24 @@ export function BackButton() {
   return (
     <CustomIcon icon name='left-arrow' onClick={() => handleClick()} size='big' disabled={false} />
   );
+}
+
+export function ChallengeButton({
+  challengedPlayerAddress,
+}: {
+  challengedPlayerAddress: BigNumberish,
+}) {
+  const { dispatchChallengingPlayerAddress, dispatchSetDuel } = usePistolsContext()
+  const { address } = useAccount()
+  const { duelistId } = useSettings()
+  const { tableId } = useTableId()
+  const { isMyAccount } = useIsMyAccount(challengedPlayerAddress)
+  const { hasPact, pactDuelId } = usePact(tableId, address, challengedPlayerAddress)
+  const canChallenge = (duelistId > 0n && !hasPact && !isMyAccount)
+
+  if (!hasPact) {
+    return <ActionButton large fill disabled={!canChallenge} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(challengedPlayerAddress)} />
+  } else {
+    return <ActionButton large fill important disabled label='Duel In Progress!' onClick={() => dispatchSetDuel(pactDuelId)} />
+  }
 }

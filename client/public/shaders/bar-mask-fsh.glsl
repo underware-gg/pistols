@@ -90,7 +90,7 @@ void main() {
   }
 
   vec2 ps = 1.0 / uResolution;
-  vec4 blurTex = blur(uTextures, shiftedUvs, ps, uSamples);
+  vec4 blurTex = blur(uTexturesSize, uTextures, shiftedUvs, ps, uSamples);
   vec4 texColor;
   vec4 maskValue = vec4(0.0);
   vec2 maskUv = vec2(0.0);
@@ -142,13 +142,13 @@ void main() {
 
   if (usedTexture == 0) {
     texColor = texture2D(uTextures[0], shiftedUvs[0]);
-  } else if (usedTexture == 1) {
+  } else if (usedTexture == 1 && uTexturesSize > 1) {
     texColor = texture2D(uTextures[1], shiftedUvs[1]);
-  } else if (usedTexture == 2) {
+  } else if (usedTexture == 2 && uTexturesSize > 2) {
     texColor = texture2D(uTextures[2], shiftedUvs[2]);
-  } else if (usedTexture == 3) {
+  } else if (usedTexture == 3 && uTexturesSize > 3) {
     texColor = texture2D(uTextures[3], shiftedUvs[3]);
-  } else if (usedTexture == 4) {
+  } else if (usedTexture == 4 && uTexturesSize > 4) {
     texColor = texture2D(uTextures[4], shiftedUvs[4]);
   }
 

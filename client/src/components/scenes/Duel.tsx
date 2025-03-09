@@ -52,8 +52,8 @@ export default function Duel({
   const { debugMode, duelSpeedFactor } = useSettings()
   const { clientSeconds } = useClientTimestamp(false)
 
-  const { duelistIdA, duelistIdB, timestampStart, isTutorial, isFinished } = useGetChallenge(duelId)
-  
+  const { duelistIdA, duelistIdB, timestampStart, isTutorial, timestampEnd, isAwaiting, isInProgress, isFinished  } = useGetChallenge(duelId)
+
   // switch to active duelist, if owned by player
   const { isSynced } = useSyncToActiveDuelists([duelistIdA, duelistIdB])
 
@@ -117,6 +117,7 @@ export default function Duel({
 
   useEffect(() => {
     if (gameImpl && mounted && !duelSceneStarted && isSynced && nameA && nameB && characterTypeA && characterTypeB) {
+      gameImpl.setDuelData(Number(duelId), Number(duelistIdA), Number(duelistIdB))
       gameImpl.startDuelWithPlayers(nameA, characterTypeA, isYouA, isYouB, nameB, characterTypeB)
       setDuelSceneStarted(true)
       dispatchAnimated(AnimationState.None)
@@ -124,11 +125,29 @@ export default function Duel({
   }, [gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, isSynced, isYouA, isYouB])
 
   // setup grass animation 
+  //TODO change due new timeouts...
   useEffect(() => {
-    if (clientSeconds && timestampStart) {
-      gameImpl?.setDuelTimePercentage(clientSeconds - timestampStart)
+    if (timestampStart && clientSeconds) {
+      const SEVEN_DAYS = 7 * 24 * 60 * 60; // 7 days in seconds
+      let percentage = 0;
+      
+      if (isAwaiting && timestampStart && timestampEnd) {
+        // Challenge created but not accepted - use actual start/end time
+        const timePassed = clientSeconds - timestampStart;
+        const totalDuration = timestampEnd - timestampStart;
+        percentage = Math.min(Math.max(timePassed / totalDuration, 0), 1);
+      } else if (isFinished && timestampStart && timestampEnd) {
+        // Duel completed - use actual duration capped at 7 days
+        const duelLength = timestampEnd - timestampStart;
+        percentage = Math.min(Math.max(duelLength / SEVEN_DAYS, 0), 1);
+      } else {
+        const timePassed = clientSeconds - timestampStart;
+        percentage = Math.min(Math.max(timePassed / SEVEN_DAYS, 0), 1);
+      }
+
+      gameImpl?.setDuelTimePercentage(percentage);
     }
-  }, [gameImpl, clientSeconds, timestampStart])
+  }, [gameImpl, clientSeconds, timestampStart, timestampEnd])
 
   useEffect(() => {
     speedRef.current = duelSpeedFactor

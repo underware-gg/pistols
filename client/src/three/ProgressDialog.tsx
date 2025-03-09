@@ -2,9 +2,7 @@ import * as THREE from 'three'
 import TWEEN, { update } from '@tweenjs/tween.js'
 import { HTMLMesh } from 'three/examples/jsm/interactive/HTMLMesh.js' 
 import { DuelStage } from '/src/hooks/useDuel'
-import { sizes } from './game'
-
-const FADE_ANIMATION_DURATION = 500
+import { _currentDuelId, _currentDuelistAId, _currentDuelistBId, sizes } from './game'
 
 enum DuelState {
   CHOOSING_STEPS,       //I'm choosing steps
@@ -636,24 +634,30 @@ export class ProgressDialogManager {
 
     const dialogAProps = dialogOptions[stateA]
     if (this.lastDuelStateA != stateA || !this.dialogA.message) {
+      const messageIndex = ((_currentDuelId * 31) + (_currentDuelistAId * 17)) % dialogAProps.messages.length
 
       const messageA = this.isDialogAYou
-        ? dialogAProps.messages[Math.floor(Math.random() * dialogAProps.messages.length)] 
+        ? dialogAProps.messages[messageIndex]
         : dialogAProps.isThinkingBubble
-        ? dialogAProps.opponentText 
-        : dialogAProps.messages[Math.floor(Math.random() * dialogAProps.messages.length)]
+        ? dialogAProps.opponentText
+        : dialogAProps.messages[messageIndex]
+
+      console.log('messageA', messageA)
 
       this.dialogA.updateElementData(dialogAProps.isThinkingBubble, messageA)
     }
 
     const dialogBProps = dialogOptions[stateB]
     if (this.lastDuelStateB != stateB || !this.dialogB.message) {
+      const messageIndex = ((_currentDuelId * 31) + (_currentDuelistBId * 17)) % dialogBProps.messages.length
 
       const messageB = !this.isDialogAYou
-        ? dialogBProps.messages[Math.floor(Math.random() * dialogBProps.messages.length)] 
+        ? dialogBProps.messages[messageIndex]
         : dialogBProps.isThinkingBubble
-        ? dialogBProps.opponentText 
-        : dialogBProps.messages[Math.floor(Math.random() * dialogBProps.messages.length)]
+        ? dialogBProps.opponentText
+        : dialogBProps.messages[messageIndex]
+
+      console.log('messageB', messageB)
 
       this.dialogB.updateElementData(dialogBProps.isThinkingBubble, messageB)
     }

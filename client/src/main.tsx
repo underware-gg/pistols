@@ -3,7 +3,8 @@ import '/styles/fonts.scss'
 import '/styles/styles.scss'
 import '/styles/cards.scss'
 import '/styles/book.scss'
-import '/styles/playerposter.scss'
+import '/styles/poster.scss'
+import '/styles/interactiblecomponent.scss'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router'
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
       { path: "profile", element: <MainPage /> },
       { path: "profile/:table_id", element: <MainPage /> },
       { path: "tavern", element: <MainPage /> },
+      { path: "leaderboards", element: <MainPage /> },
       { path: "tutorial/entry", element: <MainPage tutorial={true} /> },
       { path: "tutorial/conflict", element: <MainPage tutorial={true} /> },
       { path: "tutorial/honour", element: <MainPage tutorial={true} /> },

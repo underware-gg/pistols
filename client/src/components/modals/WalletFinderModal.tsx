@@ -7,7 +7,7 @@ import { STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { ChallengeButton } from './PlayerModal'
+import { ChallengeButton } from '/src/components/ui/Buttons'
 import { FormInput } from '/src/components/ui/Form'
 import { AddressShort } from '/src/components/ui/AddressShort'
 import { Divider } from '/src/components/ui/Divider'
@@ -60,7 +60,7 @@ export default function WalletFinderModal({
         </Grid>
       </Modal.Header>
       <Modal.Content image className='Relative'>
-        <ProfilePic profilePic={0} duelistId={0} anon profilePicUrl={starkProfilePic} />
+        <ProfilePic profilePic={0} profilePicUrl={starkProfilePic} />
         <Modal.Description className='FormAnonDescription'>
           <Grid className='FillWidth' >
             <Row columns={'equal'}>

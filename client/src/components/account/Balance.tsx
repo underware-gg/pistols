@@ -3,6 +3,7 @@ import { BigNumberish } from 'starknet'
 import { CustomIcon, EmojiIcon, IconSizeProp } from '/src/components/ui/Icons'
 import { weiToEthString } from '@underware_gg/pistols-sdk/utils'
 import { EMOJI } from '/src/data/messages'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 
 type CoinIconProps = {
   size?: IconSizeProp
@@ -33,16 +34,16 @@ export function FameIcon({
 }
 
 export function Balance({
-  ether = false,    // used for icon only
-  lords = false,    // used for icon only
-  fools = false,     // used for icon only
-  fame = false,     // used for icon only
-  clean = false,    // no icon
+  ether = false,
+  lords = false,
+  fools = false,
+  fame = false,
+  clean = false,
   value = null,
   decimals,
   wei = null,
-  big = false,
-  small = false,
+  size = null,
+  bold = false,
   crossed = false,
   pre = null,
   post = null,
@@ -57,14 +58,16 @@ export function Balance({
   value?: BigNumberish
   wei?: BigNumberish
   decimals?: number
-  big?: boolean
-  small?: boolean
+  size?: IconSizeProp
+  bold?: boolean
   crossed?: boolean
   pre?: string
   post?: string
   placeholdder?: string | number
   children?: ReactNode
 }) {
+  const { aspectWidth } = useGameAspect()
+
   const _value = useMemo<string>(() => {
     const _decimals = decimals ?? (ether ? 6 : 0)
     const result = (
@@ -77,12 +80,20 @@ export function Balance({
 
   const classNames = useMemo(() => {
     let result = []
-    if (small) result.push('CoinSmall')
-    else if (big) result.push('CoinBig')
-    else result.push('Coin')
+    if (bold) result.push('Bold')
     if (crossed) result.push('Crossed')
     return result
-  }, [small, big, crossed])
+  }, [crossed, bold])
+
+  const fontSize = useMemo(() => {
+    switch(size) {
+      case 'tiny': return aspectWidth(0.6)
+      case 'small': return aspectWidth(0.8) 
+      case 'big': return aspectWidth(1.4)
+      case 'huge': return aspectWidth(1.8)
+      default: return aspectWidth(1)
+    }
+  }, [size, aspectWidth])
 
   const _icon = useMemo(() => {
     if (clean) return <></>
@@ -94,14 +105,11 @@ export function Balance({
   }, [clean, lords, fools, fame, ether])
 
   return (
-    <span className={classNames.join(' ')}>
+    <span className={classNames.join(' ')} style={{ fontSize }}>
       {pre}
-      {/* {!clean && <>💰</>} */}
-      {/* {!clean && <EmojiIcon emoji='💰' />} */}
       {_icon}
       {_value || children || placeholdder}
       {post}
     </span>
   )
 }
-

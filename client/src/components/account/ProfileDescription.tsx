@@ -93,7 +93,7 @@ export function ProfileDescription({
         {displayHonor && <h3 className='Important NoMargin TitleCase'>
           Honour: <span className='Coin'>{honourAndTotal}</span>
         </h3>}
-        {displayFameBalance && <h5><FameBalanceDuelist duelistId={duelistId} big /></h5>}
+        {displayFameBalance && <h5><FameBalanceDuelist duelistId={duelistId} size='big' /></h5>}
       </div>
 
       {displayStats && total_duels > 0 &&

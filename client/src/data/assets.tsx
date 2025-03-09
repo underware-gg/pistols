@@ -5,6 +5,7 @@ enum SceneName {
   Tavern = 'Tavern',
   Duelists = 'Duelists',
   DuelsBoard = 'Your Duels',
+  Leaderboards = 'Leaderboards',
   Graveyard = 'Graveyard',
   Tournament = 'Tournament',
   IRLTournament = 'IRL Tournament',
@@ -50,18 +51,33 @@ enum TextureName {
   bg_tavern_door_test_mask = 'bg_tavern_door_test_mask',
   bg_tavern_test = 'bg_tavern_test',
   bg_tavern_test_mask = 'bg_tavern_test_mask',
-  bg_tutorial_1 = 'bg_tutorial_1',
-  bg_tutorial_2 = 'bg_tutorial_2',
-  bg_tutorial_3 = 'bg_tutorial_3',
-  bg_tutorial_4 = 'bg_tutorial_4',
-  bg_tutorial_5 = 'bg_tutorial_5',
-  bg_demon = 'bg_demon',
-  bg_demon_person = 'bg_demon_person',
+
+  bg_conflict_background = 'bg_conflict_background',
+  bg_conflict_bar = 'bg_conflict_bar',
+  bg_conflict_barkeep = 'bg_conflict_barkeep',
+  bg_conflict_drunkard = 'bg_conflict_drunkard',
+  bg_conflict_player = 'bg_conflict_player',
+  
   bg_demon_background = 'bg_demon_background',
   bg_demon_left_hand = 'bg_demon_left_hand',
   bg_demon_right_hand = 'bg_demon_right_hand',
+  bg_demon_victim = 'bg_demon_victim',
+  bg_demon = 'bg_demon',
   bg_demon_left_hand_mask = 'bg_demon_left_hand_mask',
   bg_demon_right_hand_mask = 'bg_demon_right_hand_mask',
+  
+  bg_entry_background = 'bg_entry_background',
+  bg_entry_bar = 'bg_entry_bar',
+  bg_entry_barkeep = 'bg_entry_barkeep',
+  bg_entry_crowd = 'bg_entry_crowd',
+  bg_entry_player = 'bg_entry_player',
+  
+  bg_resurrection_background = 'bg_resurrection_background',
+  bg_resurrection_barkeep = 'bg_resurrection_barkeep',
+  bg_resurrection_player = 'bg_resurrection_player',
+  bg_resurrection_table = 'bg_resurrection_table',
+
+  
   bg_profile_book = 'bg_profile_book',
   bg_profile_chest = 'bg_profile_chest',
   bg_profile_table = 'bg_profile_table',
@@ -102,18 +118,32 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_tavern_door_test_mask]: { path: '/images/bg_tavern_door_test_mask.png' },
   [TextureName.bg_tavern_test]: { path: '/images/bg_tavern_test.png' },
   [TextureName.bg_tavern_test_mask]: { path: '/images/bg_tavern_test_mask.png' },
-  [TextureName.bg_tutorial_1]: { path: '/images/bg_tutorial_1.png' },
-  [TextureName.bg_tutorial_2]: { path: '/images/bg_tutorial_2.png' },
-  [TextureName.bg_tutorial_3]: { path: '/images/bg_tutorial_3.png' },
-  [TextureName.bg_tutorial_4]: { path: '/images/bg_tutorial_4.png' },
-  [TextureName.bg_tutorial_5]: { path: '/images/bg_tutorial_5.png' },
-  [TextureName.bg_demon]: { path: '/images/bg_demon.png' },
-  [TextureName.bg_demon_person]: { path: '/images/bg_demon_person.png' },
-  [TextureName.bg_demon_background]: { path: '/images/bg_demon_background.png' },
-  [TextureName.bg_demon_left_hand]: { path: '/images/bg_demon_left_hand.png' },
-  [TextureName.bg_demon_right_hand]: { path: '/images/bg_demon_right_hand.png' },
+
+  [TextureName.bg_conflict_background]: { path: '/images/tutorial/background/conflict/bg_conflict_background.png' },
+  [TextureName.bg_conflict_bar]: { path: '/images/tutorial/background/conflict/bg_conflict_bar.png' },
+  [TextureName.bg_conflict_barkeep]: { path: '/images/tutorial/background/conflict/bg_conflict_barkeep.png' },
+  [TextureName.bg_conflict_drunkard]: { path: '/images/tutorial/background/conflict/bg_conflict_drunkard.png' },
+  [TextureName.bg_conflict_player]: { path: '/images/tutorial/background/conflict/bg_conflict_player.png' },
+  
+  [TextureName.bg_demon_background]: { path: '/images/tutorial/background/demon/bg_demon_background.png' },
+  [TextureName.bg_demon_left_hand]: { path: '/images/tutorial/background/demon/bg_demon_left_hand.png' },
+  [TextureName.bg_demon_right_hand]: { path: '/images/tutorial/background/demon/bg_demon_right_hand.png' },
+  [TextureName.bg_demon_victim]: { path: '/images/tutorial/background/demon/bg_demon_victim.png' },
+  [TextureName.bg_demon]: { path: '/images/tutorial/background/demon/bg_demon.png' },
   [TextureName.bg_demon_left_hand_mask]: { path: '/images/bg_demon_left_hand_mask.png' },
   [TextureName.bg_demon_right_hand_mask]: { path: '/images/bg_demon_right_hand_mask.png' },
+  
+  [TextureName.bg_entry_background]: { path: '/images/tutorial/background/entry/bg_entry_background.png' },
+  [TextureName.bg_entry_bar]: { path: '/images/tutorial/background/entry/bg_entry_bar.png' },
+  [TextureName.bg_entry_barkeep]: { path: '/images/tutorial/background/entry/bg_entry_barkeep.png' },
+  [TextureName.bg_entry_crowd]: { path: '/images/tutorial/background/entry/bg_entry_crowd.png' },
+  [TextureName.bg_entry_player]: { path: '/images/tutorial/background/entry/bg_entry_player.png' },
+  
+  [TextureName.bg_resurrection_background]: { path: '/images/tutorial/background/resurrection/bg_resurrection_background.png' },
+  [TextureName.bg_resurrection_barkeep]: { path: '/images/tutorial/background/resurrection/bg_resurrection_barkeep.png' },
+  [TextureName.bg_resurrection_player]: { path: '/images/tutorial/background/resurrection/bg_resurrection_player.png' },
+  [TextureName.bg_resurrection_table]: { path: '/images/tutorial/background/resurrection/bg_resurrection_table.png' },
+
   [TextureName.bg_profile_book]: { path: '/images/bg_profile_book.png' },
   [TextureName.bg_profile_chest]: { path: '/images/bg_profile_chest.png' },
   [TextureName.bg_profile_table]: { path: '/images/bg_profile_table.png' },
@@ -145,7 +175,7 @@ interface SceneObject {
 }
 
 const sceneBackgrounds: Record<SceneName, SceneData> = {
-  [SceneName.Gate]: { 
+  [SceneName.Gate]: {
     backgrounds: [{ texture: TextureName.bg_gate, shiftMultiplier: 0, renderOrder: 0 }],
     items: [
       { name: 'door', color: 'ff0000', description: 'Knock on door', mask: TextureName.bg_gate_mask, renderOrder: 0 },
@@ -154,7 +184,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     ]
   },
   [SceneName.Door]: { backgrounds: [{ texture: TextureName.bg_door, shiftMultiplier: 0, renderOrder: 0 }] },
-  [SceneName.Profile]: { 
+  [SceneName.Profile]: {
     backgrounds: [
       { texture: TextureName.bg_profile_book, shiftMultiplier: 0.016, renderOrder: 0 },
       { texture: TextureName.bg_profile_chest, shiftMultiplier: 0.013, renderOrder: 1 },
@@ -167,7 +197,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { name: 'chest', color: '0000ff', description: 'Card Packs', mask: TextureName.bg_profile_chest_mask, renderOrder: 1 },
     ]
   },
-  [SceneName.Tavern]: { 
+  [SceneName.Tavern]: {
     backgrounds: [
       { texture: TextureName.bg_tavern_bar_test, shiftMultiplier: -0.02, renderOrder: 0 },
       { texture: TextureName.bg_tavern_bartender_test, shiftMultiplier: -0.01, renderOrder: 1 },
@@ -186,49 +216,75 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       // { name: 'shovel', color: 'ff00ff', description: 'Past Duels', mask: TextureName.bg_tavern_mask, renderOrder: 0 }
     ]
   },
-  [SceneName.Duelists]: { 
+  [SceneName.Duelists]: {
     backgrounds: [{ texture: TextureName.bg_duelists, shiftMultiplier: 0, renderOrder: 0 }],
     items: [
       { name: 'left arrow', color: '00ff00', description: 'Previous Page', mask: TextureName.bg_duelists_mask, renderOrder: 0 },
       { name: 'right arrow', color: 'ff0000', description: 'Next Page', mask: TextureName.bg_duelists_mask, renderOrder: 0 },
     ]
-   },
-  [SceneName.DuelsBoard]: { 
+  },
+  [SceneName.DuelsBoard]: {
     backgrounds: [{ texture: TextureName.bg_duels, shiftMultiplier: 0, renderOrder: 0 }],
     items: [
       { name: 'left arrow', color: '00ff00', description: 'Previous Page', mask: TextureName.bg_duels_mask, renderOrder: 0 },
       { name: 'right arrow', color: 'ff0000', description: 'Next Page', mask: TextureName.bg_duels_mask, renderOrder: 0 },
     ]
-   },
-  [SceneName.Graveyard]: { 
+  },
+  [SceneName.Leaderboards]: {
+    backgrounds: [{ texture: TextureName.bg_duelists, shiftMultiplier: 0, renderOrder: 0 }]
+  },
+  [SceneName.Graveyard]: {
     backgrounds: [{ texture: TextureName.bg_graveyard, shiftMultiplier: 0, renderOrder: 0 }],
     items: [
       { name: 'left arrow', color: '00ff00', description: 'Previous Page', mask: TextureName.bg_graveyard_mask, renderOrder: 0 },
       { name: 'right arrow', color: 'ff0000', description: 'Next Page', mask: TextureName.bg_graveyard_mask, renderOrder: 0 },
     ]
-   },
+  },
   [SceneName.Tournament]: { backgrounds: [{ texture: TextureName.bg_duels_live, shiftMultiplier: 0, renderOrder: 0 }] },
   [SceneName.IRLTournament]: { backgrounds: [{ texture: TextureName.bg_duels_live, shiftMultiplier: 0, renderOrder: 0 }] },
-  [SceneName.Duel]: { backgrounds: [{ texture: TextureName.bg_duel, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.Duel]: undefined,
   //Tutorial Scenes
-  [SceneName.Tutorial]: { backgrounds: [{ texture: TextureName.bg_tutorial_1, shiftMultiplier: 0, renderOrder: 0 }] },
-  [SceneName.TutorialScene2]: { backgrounds: [{ texture: TextureName.bg_tutorial_2, shiftMultiplier: 0, renderOrder: 0 }] },
-  [SceneName.TutorialScene3]: { backgrounds: [{ texture: TextureName.bg_tutorial_3, shiftMultiplier: 0, renderOrder: 0 }] },
-  [SceneName.TutorialScene4]: { 
+  [SceneName.Tutorial]: {
+    backgrounds: [
+      { texture: TextureName.bg_entry_player, shiftMultiplier: 0.02, renderOrder: 0 },
+      { texture: TextureName.bg_entry_crowd, shiftMultiplier: 0.01, renderOrder: 1 },
+      { texture: TextureName.bg_entry_bar, shiftMultiplier: -0.005, renderOrder: 2 },
+      { texture: TextureName.bg_entry_barkeep, shiftMultiplier: -0.01, renderOrder: 3 },
+      { texture: TextureName.bg_entry_background, shiftMultiplier: -0.015, renderOrder: 4 },
+    ],
+  },
+  [SceneName.TutorialScene2]: {
+    backgrounds: [
+      { texture: TextureName.bg_conflict_barkeep, shiftMultiplier: 0.02, renderOrder: 0 },
+      { texture: TextureName.bg_conflict_bar, shiftMultiplier: 0.01, renderOrder: 1 },
+      { texture: TextureName.bg_conflict_player, shiftMultiplier: 0.00, renderOrder: 2 },
+      { texture: TextureName.bg_conflict_drunkard, shiftMultiplier: -0.01, renderOrder: 3 },
+      { texture: TextureName.bg_conflict_background, shiftMultiplier: -0.02, renderOrder: 4 },
+    ],
+  },
+  [SceneName.TutorialScene3]: { backgrounds: [{ texture: TextureName.bg_entry_background, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.TutorialScene4]: {
     backgrounds: [
       { texture: TextureName.bg_demon_right_hand, shiftMultiplier: -0.01, renderOrder: 0, animatedIdle: 0.01 },
       { texture: TextureName.bg_demon_left_hand, shiftMultiplier: -0.01, renderOrder: 1, animatedIdle: 0.01 },
       { texture: TextureName.bg_demon, shiftMultiplier: 0.01, renderOrder: 2 },
-      { texture: TextureName.bg_demon_person, shiftMultiplier: 0.02, renderOrder: 3, hidden: true },
-      { texture: TextureName.bg_demon_background, shiftMultiplier: 0, renderOrder: 4 },
+      { texture: TextureName.bg_demon_victim, shiftMultiplier: 0.02, renderOrder: 3, hidden: true },
+      { texture: TextureName.bg_demon_background, shiftMultiplier: 0.03, renderOrder: 4, hidden: true },
     ],
     items: [
       { name: 'demon_right', color: '0000ff', description: 'Take the gun, become my patron', mask: TextureName.bg_demon_right_hand_mask, renderOrder: 0 },
       { name: 'demon_left', color: '00ff00', description: 'Drink, forget this happened', mask: TextureName.bg_demon_left_hand_mask, renderOrder: 1 },
     ]
   },
-  [SceneName.TutorialScene5]: { backgrounds: [{ texture: TextureName.bg_tutorial_5, shiftMultiplier: 0, renderOrder: 0 }] },
-  [SceneName.TutorialDuel]: { backgrounds: [{ texture: TextureName.bg_duel, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.TutorialScene5]: {
+    backgrounds: [
+      { texture: TextureName.bg_resurrection_player, shiftMultiplier: 0.015, renderOrder: 0 },
+      { texture: TextureName.bg_resurrection_barkeep, shiftMultiplier: 0.005, renderOrder: 1 },
+      { texture: TextureName.bg_resurrection_table, shiftMultiplier: -0.005, renderOrder: 2 },
+      { texture: TextureName.bg_resurrection_background, shiftMultiplier: -0.02, renderOrder: 3 },
+    ]
+  },
+  [SceneName.TutorialDuel]: undefined
 }
 
 enum CharacterType {

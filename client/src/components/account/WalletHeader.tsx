@@ -9,7 +9,7 @@ import { FoolsBalance, LordsBalance } from '/src/components/account/LordsBalance
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { AddressShort } from '/src/components/ui/AddressShort'
-import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
+import { makeProfilePicUrl, ProfilePic } from '/src/components/account/ProfilePic'
 import { SceneName } from '/src/data/assets'
 
 const Row = Grid.Row
@@ -31,7 +31,7 @@ export default function WalletHeader({
   const data = { name: null, profilePicture: null }
 
   const name = useMemo(() => (data?.name ?? `Connected to ${selectedNetworkConfig.name}`), [data])
-  const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0, true)), [data, connector])
+  const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0)), [data, connector])
 
   const { openProfile } = useConnectedController()
   const { username } = usePlayer(address)
@@ -40,7 +40,8 @@ export default function WalletHeader({
     <Grid>
       <Row className='TitleCase Padded'>
         <Col width={4} verticalAlign='middle'>
-          <Image src={imageUrl} className='ProfilePicMedium' />
+          {/* <Image src={imageUrl} className='ProfilePicMedium' /> */}
+          <ProfilePic profilePicUrl={imageUrl} medium  removeBorder className='ProfilePicMargin' /> 
         </Col>
         {isConnected &&
           <Col width={12} textAlign='left'>

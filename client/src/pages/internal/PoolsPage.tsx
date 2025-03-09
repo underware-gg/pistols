@@ -62,7 +62,7 @@ function Account() {
           <Row className='ModalText'>
             <Cell>$LORDS balance:</Cell>
             <Cell className='Code' textAlign='left'>
-              <LordsBalance address={address} big />
+              <LordsBalance address={address} size='big' />
             </Cell>
             <Cell className='Code' textAlign='right'>
               <LordsFaucet />
@@ -121,7 +121,7 @@ function Bank() {
               fluid={false}
             />
             &nbsp;
-            <Balance lords wei={fundAmount} pre='Cost:' big />
+            <Balance lords wei={fundAmount} pre='Cost:' size='big' />
           </Cell>
           <Cell className='Code Smaller' textAlign='right'>
             <BalanceRequiredButton
@@ -173,7 +173,7 @@ function Pools() {
         <Row className='ModalText'>
           <Cell>Bank</Cell>
           <Cell className='Code' textAlign='left'>
-            <LordsBalance address={contractAddress} big />
+            <LordsBalance address={contractAddress} size='big' />
           </Cell>
           <Cell className='Code' textAlign='left'>
             <FameBalance address={contractAddress} big />
@@ -186,10 +186,10 @@ function Pools() {
         <Row className='ModalText'>
           <Cell>Pools Total</Cell>
           <Cell className='Code' textAlign='left'>
-            <Balance lords wei={poolTotalLords} big />
+            <Balance lords wei={poolTotalLords} size='big' />
           </Cell>
           <Cell className='Code' textAlign='left'>
-            <Balance fame wei={poolTotalFame} big />
+            <Balance fame wei={poolTotalFame} size='big' />
           </Cell>
         </Row>
         <Row className='ModalText'>
@@ -197,12 +197,12 @@ function Pools() {
           <Cell className='Code' textAlign='left'>
             {diffLords >= 0n ? <>✅</> : <>❌</>}
             &nbsp;
-            <Balance lords wei={diffLords} big />
+            <Balance lords wei={diffLords} size='big' />
           </Cell>
           <Cell className='Code' textAlign='left'>
             {diffFame >= 0n ? <>✅</> : <>❌</>}
             &nbsp;
-            <Balance fame wei={diffFame} big />
+            <Balance fame wei={diffFame} size='big' />
           </Cell>
         </Row>
       </Body>
@@ -228,10 +228,10 @@ function PoolRow({
         🏷️ Pool::{poolId}{seasonId ? `(${seasonId})` : ''}
         </Cell>
       <Cell className='Code' textAlign='left'>
-        {displayLords && <Balance lords wei={balanceLords} big />}
+        {displayLords && <Balance lords wei={balanceLords} size='big' />}
       </Cell>
       <Cell className='Code Smaller' textAlign='left'>
-        {displayFame && <Balance fame wei={balanceFame} big />}
+        {displayFame && <Balance fame wei={balanceFame} size='big' />}
       </Cell>
     </Row>
   )

@@ -229,9 +229,10 @@ export const useGetChallenge = (duel_id: BigNumberish) => {
             [formatQueryValue(duel_id)]
           ).build()
         )
-        .withEntityModels(
-          ["pistols-Challenge"]
-        )
+        .withEntityModels([
+          "pistols-Challenge",
+          "pistols-Round",
+        ])
         .includeHashedKeys()
       : null
   ), [duel_id])

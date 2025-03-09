@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import * as TWEEN from '@tweenjs/tween.js';
-import { useGameAspect } from '/src/hooks/useGameApect';
+import { useGameAspect } from '/src/hooks/useGameAspect';
 import { DuelistCard } from '../cards/DuelistCard';
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
 import { Opener } from '/src/hooks/useOpener';
+import { CardColor } from '/src/data/cardAssets';
+import { usePistolsContext } from '/src/hooks/PistolsContext';
 
-const ANIMATION_DURATION = 800;
+const ANIMATION_DURATION = 500;
 
 interface DuelistsBookProps {
   width: number;
@@ -45,6 +47,8 @@ export const DuelistsBook: React.FC<DuelistsBookProps> = ({
   const { aspectWidth } = useGameAspect();
   
   const [coverGap, setCoverGap] = useState(width / 5);
+  const [isBookVisible, setIsBookVisible] = useState(false);
+  const [isBookOpen, setIsBookOpen] = useState(false);
   
   const bookRef = useRef<HTMLDivElement>(null);
   const bookBackfillRef = useRef<HTMLDivElement>(null);
@@ -110,6 +114,22 @@ export const DuelistsBook: React.FC<DuelistsBookProps> = ({
         bookTweenRef.current.stop();
       }
 
+      if (!opener.isOpen && isBookOpen) {
+        // First close the book
+        setIsBookOpen(false);
+        setTimeout(() => {
+          // Then hide the book
+          setIsBookVisible(false);
+        }, ANIMATION_DURATION);
+      } else if (opener.isOpen && !isBookVisible) {
+        // First show the book
+        setIsBookVisible(true);
+        // Then open it
+        setTimeout(() => {
+          setIsBookOpen(true);
+        }, ANIMATION_DURATION);
+      }
+
       bookTweenRef.current = new TWEEN.Tween(startValues)
         .to(targetValues, ANIMATION_DURATION)
         .easing(TWEEN.Easing.Cubic.InOut)
@@ -135,12 +155,12 @@ export const DuelistsBook: React.FC<DuelistsBookProps> = ({
       <div ref={bookTranslationContainerRef} className="book-container-translate">
         <div ref={bookScaleContainerRef} className="book-container-scale">
           <div ref={bookRef} className="book NoDrag NoMouse">
-            <BookCoverLayer layer={0} layerColor="#a0522d" isOpen={opener.isOpen} coverGap={coverGap} layerGap={layerGap} />
-            <BookCoverLayer layer={1} layerColor="#000000" isOpen={opener.isOpen} coverGap={coverGap} layerGap={layerGap} />
-            <BookCoverLayer layer={2} layerColor="#000000" isOpen={opener.isOpen} coverGap={coverGap} layerGap={layerGap} />
-            <BookCoverLayer layer={3} layerColor="#a0522d" isOpen={opener.isOpen} coverGap={coverGap} layerGap={layerGap} />
-            <BookSheets isOpen={opener.isOpen} width={width} height={height} />
-            {opener.isOpen && <div 
+            <BookCoverLayer layer={0} layerColor="#a0522d" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
+            <BookCoverLayer layer={1} layerColor="#000000" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
+            <BookCoverLayer layer={2} layerColor="#000000" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
+            <BookCoverLayer layer={3} layerColor="#a0522d" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
+            <BookSheets isOpen={isBookOpen} width={width} height={height} />
+            {isBookOpen && <div 
               className={opener.isOpen ? 'YesMouse NoDrag book-close-button' : 'NoMouse NoDrag book-close-button'} 
               onClick={opener.close}
             />}
@@ -269,6 +289,8 @@ function BookCoverLayer({
 function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number; height?: number }) {
   const { aspectWidth } = useGameAspect();
   const { duelistIds } = useDuelistsOfPlayer();
+  const { selectedDuelistId, dispatchSelectDuelistId } = usePistolsContext()
+
   const sheetsRef = useRef<HTMLDivElement>(null);
   const sheetRefs = useRef<(HTMLDivElement | null)[]>([]);
   const lastUpdateValuesRef = useRef<{
@@ -336,13 +358,13 @@ function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number
 
               <div id={`corner-tl-fill-${duelistId}`} style={{
                 position: 'absolute',
-                top: aspectWidth(-DUELIST_CARD_WIDTH * 0.1),
-                left: aspectWidth(-DUELIST_CARD_WIDTH * 0.1),
-                width: aspectWidth(DUELIST_CARD_WIDTH * 0.5) + 'px',
-                height: aspectWidth(DUELIST_CARD_WIDTH * 0.5) + 'px',
+                top: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
+                left: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
+                width: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
+                height: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
                 background: '#e0d1bd',
                 clipPath: 'polygon(0 0, 100% 0, 0 100%)',
-                boxShadow: 'inset 12px 12px 10px #f0e6d9, inset 5px 5px 20px #f0e6d9',
+                boxShadow: 'inset 18px 18px 10px #f0e6d9, inset 8px 8px 20px #f0e6d9',
                 zIndex: 2,
                 pointerEvents: 'none'
               }} />
@@ -362,27 +384,33 @@ function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number
 
               <div id={`corner-br-fill-${duelistId}`} style={{
                 position: 'absolute',
-                bottom: aspectWidth(-DUELIST_CARD_WIDTH * 0.1),
-                right: aspectWidth(-DUELIST_CARD_WIDTH * 0.1),
-                width: aspectWidth(DUELIST_CARD_WIDTH * 0.5) + 'px',
-                height: aspectWidth(DUELIST_CARD_WIDTH * 0.5) + 'px',
+                bottom: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
+                right: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
+                width: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px', 
+                height: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
                 background: '#e0d1bd',
                 clipPath: 'polygon(100% 100%, 100% 0, 0 100%)',
-                boxShadow: 'inset -12px -12px 10px #f0e6d9, inset -5px -5px 20px #f0e6d9',
+                boxShadow: 'inset -18px -18px 10px #f0e6d9, inset -8px -8px 20px #f0e6d9',
                 zIndex: 2,
                 pointerEvents: 'none'
               }} />
 
               <DuelistCard 
                 duelistId={Number(duelistId)}
+                isSmall={true}
                 isLeft={true}
                 isVisible={true}
+                instantVisible={true}
                 isFlipped={true}
                 instantFlip={true}
                 isHanging={false}
                 isHighlightable={true}
                 width={DUELIST_CARD_WIDTH}
                 height={DUELIST_CARD_HEIGHT}
+                defaultHighlightColor={CardColor.BROWN}
+                onClick={() => {
+                  dispatchSelectDuelistId(duelistId)
+                }}
               />
             </div>
           ))}
@@ -494,21 +522,17 @@ function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number
         const rotationDelay = (progress > 0.5 ? 200 - Math.pow((progress - 0.5) * 2, 2) * 200 : 0) * (isOpen ? 1 : 0);
         const sheetRotate = progress > 0.5 ? rotateY : -rotateY;
 
-        if (orderIndex > sheetCount / 2) {
+        if (orderIndex > sheetCount / 2 - 1) {
           sheet.style.setProperty('--left-page', 'all');
           sheet.style.setProperty('--right-page', 'none');
-          sheet.style.setProperty('--left-page-translate-z', `-1px`);
-          sheet.style.setProperty('--right-page-translate-z', `1px`);
         } else {
-          sheet.style.setProperty('--left-page', 'none'); 
+          sheet.style.setProperty('--left-page', 'none');
           sheet.style.setProperty('--right-page', 'all');
-          sheet.style.setProperty('--left-page-translate-z', `1px`);
-          sheet.style.setProperty('--right-page-translate-z', `1px`);
         }
 
         if (orderIndex === sheetCount / 2 - 2) {
           sheet.style.setProperty('--left-page-translate-z', `1px`);
-          sheet.style.setProperty('--right-page-translate-z', `0px`);
+          sheet.style.setProperty('--right-page-translate-z', `-1px`);
         } else if (orderIndex === sheetCount / 2) {
           sheet.style.setProperty('--left-page-translate-z', `1px`);
           sheet.style.setProperty('--right-page-translate-z', `1px`);
@@ -516,7 +540,7 @@ function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number
           sheet.style.setProperty('--left-page-translate-z', `1px`);
           sheet.style.setProperty('--right-page-translate-z', `1px`);
         } else if (orderIndex === sheetCount / 2 + 1) {
-          sheet.style.setProperty('--left-page-translate-z', `0px`);
+          sheet.style.setProperty('--left-page-translate-z', `-1px`);
           sheet.style.setProperty('--right-page-translate-z', `1px`);
         }
 
@@ -560,7 +584,7 @@ function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number
       pageShift = isLeft ? -2 : -3;
     }
 
-    if (isAnimatingOpen && pageShift !== 0 && pageShift !== 1) return null;
+    if (isOpen && isAnimatingOpen && pageShift !== 0 && pageShift !== 1) return null;
     if (pageShift === 4 || pageShift === -3) return null;
     
     const pageIndex = currentPage + pageShift;
@@ -600,3 +624,6 @@ function BookSheets({ isOpen, width, height }: { isOpen: boolean; width?: number
     </div>
   );
 }
+
+//TODO missing filters - by fame, name, date got?
+//TODO button show hide dead duelists

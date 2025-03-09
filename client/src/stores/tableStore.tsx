@@ -18,7 +18,7 @@ export const useAllTableIds = () => {
 
 export const useAllSeasonIds = () => {
   const entities = useTableConfigStore((state) => state.entities)
-  const seasonIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.SeasonConfig.season_id)), [entities])
+  const seasonIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models?.pistols?.TableConfig?.table_id)), [entities])
   return {
     seasonIds,
   }

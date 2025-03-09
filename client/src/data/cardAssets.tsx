@@ -5,7 +5,8 @@ enum CardColor {
   RED = '#e34a4a',
   YELLOW = '#f1d242',
   BLUE = '#4d9ad6',
-  BROWN  = '#27110b'
+  BROWN  = '#27110b',
+  ORANGE = '#ffa500'
 }
 
 interface CardData {
@@ -454,5 +455,5 @@ const BladesCardsTextures: Record<constants.BladesCard, CardData> = {
   }
 }
 
-export type { CardColor, CardData };
-export { EnvironmentCardsTextures, FireCardsTextures, DodgeCardsTextures, TacticsCardsTextures, BladesCardsTextures }
+export type { CardData };
+export { CardColor, EnvironmentCardsTextures, FireCardsTextures, DodgeCardsTextures, TacticsCardsTextures, BladesCardsTextures }

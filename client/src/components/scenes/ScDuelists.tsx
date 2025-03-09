@@ -5,7 +5,7 @@ import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useQueryDuelistIds } from '/src/stores/duelistQueryStore'
 import { useOpener } from '/src/hooks/useOpener'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
@@ -144,7 +144,7 @@ export default function ScDuelists() {
         setTimeout(() => {
           cardRefs.current[cardDuelistId].toggleVisibility(true)
           cardRefs.current[cardDuelistId].setPosition(0, 0, ANIMATION_DURATION, TWEEN.Easing.Quartic.Out)
-          cardRefs.current[cardDuelistId].setCardRotation(duelist.rotation, ANIMATION_DURATION, TWEEN.Easing.Quartic.Out)
+          cardRefs.current[cardDuelistId].setRotation(duelist.rotation, ANIMATION_DURATION, TWEEN.Easing.Quartic.Out)
         }, STATIC_DELAY + DELAY)
       }
     })
@@ -191,7 +191,7 @@ export default function ScDuelists() {
         if (cardRefs.current[cardDuelistId]) {
           setTimeout(() => {
             cardRefs.current[cardDuelistId].setPosition(duelist.exitPositionX, duelist.exitPositionY, ANIMATION_DURATION, TWEEN.Easing.Sinusoidal.Out)
-            cardRefs.current[cardDuelistId].setCardRotation(0, ANIMATION_DURATION, TWEEN.Easing.Sinusoidal.Out)
+            cardRefs.current[cardDuelistId].setRotation(0, ANIMATION_DURATION, TWEEN.Easing.Sinusoidal.Out)
           }, STATIC_DELAY + (index === 3 || index === 6 ? DELAY : 
             index === 2 ? DELAY * 2 :
             index === 5 ? DELAY * 2 :
@@ -234,7 +234,7 @@ export default function ScDuelists() {
       if (cardRefs.current[cardDuelistId]) {
         cardRefs.current[cardDuelistId].toggleVisibility(false)
         cardRefs.current[cardDuelistId].setPosition(duelist.startPositionX, duelist.startPositionY, 0)
-        cardRefs.current[cardDuelistId].setCardRotation(0, 0)
+        cardRefs.current[cardDuelistId].setRotation(0, 0)
       }
     })
 
@@ -301,6 +301,7 @@ export default function ScDuelists() {
                 }}
                 key={duelist.duelist_id}
                 duelistId={Number(duelist.duelist_id)}
+                isSmall={true}
                 isLeft={true}
                 isHighlightable={true}
                 isHanging={false}

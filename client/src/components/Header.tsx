@@ -5,7 +5,7 @@ import { useQueryParams, DuelistColumn, SortDirection, ChallengeColumn } from '/
 import { useTableId } from '/src/stores/configStore'
 import { useTable } from '/src/stores/tableStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { AllChallengeStates, ChallengeStateNames, LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 import { BackButton, MusicToggle, FilterButton } from '/src/components/ui/Buttons'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
@@ -555,3 +555,5 @@ export function FilterDuelistName() {
     </div>
   )
 }
+
+//TODO remove content on the curtain ui only when the curtain is raised (when switching screen, best example is ScProfile)

@@ -2,9 +2,9 @@ import React, { ReactNode, useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { usePlayer } from '/src/stores/playerStore'
-import { ProfilePicSquare, ProfilePicSquareButton } from '/src/components/account/ProfilePic'
+import { ProfilePic } from '/src/components/account/ProfilePic'
 import { SceneName } from '/src/data/assets'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 
 export default function AccountHeader() {
@@ -38,8 +38,9 @@ export default function AccountHeader() {
             </h5>
           </>}
       </div>
-      <div className='YesMouse' style={{ padding: aspectWidth(0.6) }}>
-        <ProfilePicSquareButton profilePic={0} onClick={() => _click()} medium />
+      <div style={{ padding: aspectWidth(0.6) }}>
+        {/* TODO replace with selkectedDuelist for profile pic */}
+        <ProfilePic profilePic={0} medium  removeBorder onClick={() => _click()} /> 
       </div>
     </div>
   );
@@ -111,7 +112,7 @@ export default function AccountHeader() {
 
 //   return (
 //     <div className={'FlexInline'}>
-//       <ProfilePicSquare small profilePic={profilePic ?? 0} />
+//       <ProfilePic profilePic={profilePic ?? 0} small  />
 //       <div className='PaddedSides'>
 //         <ProfileName duelistId={duelistId} />
 //         <br/>

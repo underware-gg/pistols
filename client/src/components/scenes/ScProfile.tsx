@@ -5,7 +5,7 @@ import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { useMintMockLords } from '/src/hooks/useMintMockLords'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { ConnectButton, EnterAsGuestButton } from '/src/components/scenes/ScDoor'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
@@ -195,6 +195,7 @@ function DuelistsList() {
                     if (ref) cardRefs.current[Number(cardDuelistId)] = ref
                   }}
                   duelistId={Number(cardDuelistId)}
+                  isSmall={true}
                   isLeft={true}
                   isVisible={true}
                   isFlipped={true}

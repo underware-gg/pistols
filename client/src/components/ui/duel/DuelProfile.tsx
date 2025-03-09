@@ -3,7 +3,7 @@ import { SemanticFLOATS, Image } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
@@ -27,7 +27,7 @@ export default function DuelProfile({
       {floated == 'left' &&
         <>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)} >
-            <ProfilePic circle profilePic={profilePic} profileType={profileType} className='NoMouse NoDrag' />
+            <ProfilePic circle  profilePic={profilePic} profileType={profileType} className='NoMouse NoDrag' />
           </div>
           <Image className='NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), left: aspectWidth(8.3) }}>
@@ -43,7 +43,7 @@ export default function DuelProfile({
             <div className='NoMargin ProfileAddress'><FameBalanceDuelist duelistId={duelistId}/></div>
           </div>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
-            <ProfilePic circle profilePic={profilePic} profileType={profileType} className='NoMouse NoDrag' />
+            <ProfilePic circle  profilePic={profilePic} profileType={profileType} className='NoMouse NoDrag' />
           </div>
           <Image className='FlipHorizontal NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
         </>

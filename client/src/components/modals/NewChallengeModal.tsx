@@ -94,7 +94,7 @@ export default function NewChallengeModal() {
         </Grid>
       </Modal.Header>
       <Modal.Content image>
-        <ProfilePic profilePic={profilePicA} profileType={profileTypeA} onClick={() => dispatchSelectDuelistId(duelistIdA)} displayBountyValue={0} />
+        <ProfilePic profilePic={profilePicA} profileType={profileTypeA} onClick={() => dispatchSelectDuelistId(duelistIdA)} />
 
         <Modal.Description className='Padded' style={{ width: '550px' }}>
           <Grid style={{ width: '350px' }}>
@@ -126,7 +126,7 @@ export default function NewChallengeModal() {
             {fee > 0n &&
               <Row columns='equal' textAlign='left'>
                 <Col>
-                  <FeesToPay big value={0} fee={fee} prefixed />
+                  <FeesToPay size='big' value={0} fee={fee} prefixed />
                 </Col>
               </Row>
             }
@@ -155,7 +155,7 @@ export default function NewChallengeModal() {
           </Grid>
         </Modal.Description>
 
-        <ProfilePic profilePic={0} profileType={profileTypeA} onClick={() => dispatchSelectDuelistId(0, challengingAddress)} displayBountyValue={0} />
+        <ProfilePic profilePic={0} profileType={profileTypeA} onClick={() => dispatchSelectDuelistId(0, challengingAddress)} />
       </Modal.Content>
       <Modal.Actions className='NoPadding'>
         <Grid className='FillParent Padded' textAlign='center'>

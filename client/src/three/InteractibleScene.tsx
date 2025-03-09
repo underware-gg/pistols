@@ -188,8 +188,10 @@ export class InteractibleScene extends THREE.Scene {
     this.maskOverlay.name = 'bg'
     this.add(this.maskOverlay)
 
-    if (this.sceneData.items && this.sceneData.items.length > 0) {
+    if (this.sceneData.backgrounds && this.sceneData.backgrounds.length > 0) {
       document.addEventListener('mousemove', this.onMouseMove.bind(this), false);
+    } 
+    if (this.sceneData.items && this.sceneData.items.length > 0) {
       document.addEventListener('click', this.onMouseClick.bind(this), false);
     }
 
@@ -199,13 +201,43 @@ export class InteractibleScene extends THREE.Scene {
   public dispose() {
     document.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
     document.removeEventListener('click', this.onMouseClick.bind(this), false);
+    window.removeEventListener('resize', this.onResize, false);
 
-    window.removeEventListener('resize', this.onResize, false)
+    // Dispose of WebGLRenderTargets
+    this.fbo_mask?.dispose();
+    this.fbo_background?.dispose();
+    
+    // Dispose of scene objects
+    this.fbo_mask_scene?.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+            child.geometry.dispose();
+            if (child.material instanceof THREE.Material) {
+                child.material.dispose();
+            }
+        }
+    });
+
+    this.fbo_background_scenes.forEach(scene => {
+        scene.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+                child.geometry.dispose();
+                if (child.material instanceof THREE.Material) {
+                    child.material.dispose();
+                }
+            }
+        });
+    });
+
+    this.fbo_mask_scene = null;
+    this.fbo_background_scenes = [];
+
+    // Dispose of shaders
+    this.maskShader?.dispose();
+    this.maskShader = null;
   }
 
   public render(elapsedTime: number, enabled: boolean = true) {
-    if (!this.sceneData.items) return
-
+    if (!this.isClickable) return
     this.calculateTextureShifts()
 
     if (this.renderer && enabled) {
@@ -229,14 +261,16 @@ export class InteractibleScene extends THREE.Scene {
       }
 
       // Render mask scene
-      this.renderer.setRenderTarget(this.fbo_mask);
-      this.renderer.clear();
-      this.renderer.render(this.fbo_mask_scene, this.camera);
+      if (this.sceneData.items) {
+        this.renderer.setRenderTarget(this.fbo_mask);
+        this.renderer.clear();
+        this.renderer.render(this.fbo_mask_scene, this.camera);
 
-      const maskRead = new Float32Array(4);
-      this.renderer.readRenderTargetPixels(this.fbo_mask, this.mousePos.x, this.mousePos.y, 1, 1, maskRead);
+        const maskRead = new Float32Array(4);
+        this.renderer.readRenderTargetPixels(this.fbo_mask, this.mousePos.x, this.mousePos.y, 1, 1, maskRead);
 
-      this.checkRenderOrders(maskRead);
+        this.checkRenderOrders(maskRead);
+      }
     } else {
       this.timeOffset = 0
       this.pickColor(0, 0, 0)
@@ -308,12 +342,9 @@ export class InteractibleScene extends THREE.Scene {
 
   // get mouse position over the canvas for bar interaction
   onMouseMove(event: MouseEvent) {
-    if (!this.sceneData.items) return
-
     event.preventDefault();
 
     const domElement = this.renderer?.domElement
-    const elements = document.elementsFromPoint(event.clientX, event.clientY)
 
     var rect = domElement.getBoundingClientRect();
     let x = (event.clientX - rect.left) / rect.width

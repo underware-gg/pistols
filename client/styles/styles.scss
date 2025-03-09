@@ -188,7 +188,7 @@ canvas {
 }
 
 .Bold {
-  color: $color-brightest;
+  // color: $color-brightest;
   font-weight: 600;
 }
 
@@ -206,6 +206,8 @@ canvas {
 .Canceled  { color: $color-inactive!important; }
 .Inactive  { color: $color-inactive!important; }
 .Disabled  { color: $color-inactive!important; }
+.Dark      { color: $color-dark!important; }
+.Darkest   { color: $color-darkest!important; }
 
 .ImportantHover:hover { color: $color-important!important; }
 
@@ -596,40 +598,12 @@ TextArea::selection {
   color: $color-negative
 }
 
-.DuelistModal {
-  width: 900px;
-  // height: 450px;
-}
-.DuelistModalDescription {
-  width: aspect-width(36);
-}
-.BladesModalDescription {
-  @extend .CenteredContainer;
-  height: 130px;
-}
-
 .StarknetConnectModal {
   max-width: 400px;
 }
 
 .OnboardingProfile {
   max-height: 300px;
-}
-
-// .TableHeader {
-//   height: 30px!important;
-//   max-height: 30px!important;
-// }
-// .TableBody {
-//   margin-top: 100px;
-// }
-
-.DirectionButton {
-  /* margin: 0.25em; */
-  font-size: 24px;
-  text-align: center;
-  border: 0;
-  padding: 0;
 }
 
 .SmallButton {
@@ -644,6 +618,10 @@ TextArea::selection {
   padding: aspect-width(1) aspect-width(2);
   font-size: 1.5em!important;
   min-height: aspect-width(1.2)!important;
+}
+
+.LargeButton.FillParent {
+  @extend .FillParent;
 }
 
 .FilterButton {
@@ -824,82 +802,45 @@ $ui-container-gap: 1em;
 }
 
 .ProfilePic {
-  width: calc(439px / 2);
-  height: calc(768px / 2);
-  border-radius: 8px;
-  border: $border-button;
-  box-shadow: $title-shadow;
+  width: var(--profile-pic-width) !important;
+  height: var(--profile-pic-height) !important;
+  max-width: var(--profile-pic-width) !important;
+  max-height: var(--profile-pic-height) !important;
+
+  clip-path: var(--profile-pic-clip-path);
+  object-fit: var(--profile-pic-object-fit);
+  object-position: var(--profile-pic-object-position);
+
+  border-radius: var(--profile-pic-border-radius);
+
+  &.Border {
+    border: $border-button;
+  }
+
+  &.Shadow {
+    box-shadow: $title-shadow;
+  }
+
+  &.CustomBorder {
+    border: var(--profile-pic-border);
+  }
 }
-.ProfilePicAnon {
-  @extend .ProfilePic;
-  height: calc(439px / 2);
+
+.ProfilePicDisabled {
+  @extend .Sepia;
 }
+
 .ProfilePicDuel {
-  width: aspect-width(8.5);
-  height: aspect-width(8.5);
-  object-fit: cover;
-  clip-path: circle();
-  object-position: 50% 20%; //TODO this moves the image center for the rounded image change to a proper solution
-  margin: aspect-width(0.95);
+  margin: aspect-width(1);
 }
-.ProfilePicSquare {
-  max-width: aspect-width(6)!important; // avoids not taking space in flex
-  max-height: aspect-width(6)!important;
-  width: aspect-width(6);
-  height: aspect-width(6);
-  // border: $border-button-inactive;
-  border-radius: 4px;
+.ProfilePicMargin {
   margin: auto;
 }
-.ProfilePicMedium {
-  @extend .ProfilePicSquare;
-  max-width: aspect-width(4) !important;
-  max-height: aspect-width(4) !important;
-  width: aspect-width(4);
-  height: aspect-width(4);
-  border: none;
-}
-.ProfilePicMediumWidth {
-  width: aspect-width(4)!important;
-}
+
 .ProfilePicCircle {
   width: aspect-width(7.5);
   height: aspect-width(7.5);
-  object-fit: cover;
-  object-position: 50% 20%; //TODO this moves the image center for the rounded image change to a proper solution
-  clip-path: circle();
   margin: aspect-width(0.23);
-}
-.ProfilePicSmall {
-  @extend .ProfilePicSquare;
-  max-width: 40px!important; // avoids not taking space in flex
-  width: 40px;
-  height: 40px;
-  border: none;
-}
-.ProfilePicHeight {
-  // height: 40px;
-  // min-height: 40px!important;
-  // background-color: red;
-}
-
-.ProfilePicSelectButton {
-  color: $color-bright;
-  text-shadow: $text-shadow;
-  font-size: 1.5em;
-  width: 50%;
-  height: 100%;
-  cursor: pointer;
-  user-select: none;
-  padding-top: calc(50%);
-  margin: auto;
-}
-.ProfilePicSelectButton:hover {
-  color: $color-brightest;
-}
-.ProfilePicDisabled {
-  // @extend .Grayscale;
-  @extend .Sepia;
 }
 
 .ProfileStats {
@@ -1415,55 +1356,6 @@ $logo-url: '/logos/logo_avante.svg';
   transition: transform .25s ease;
 }
 
-
-.CoinBig {
-  @extend .TitleCase, .H3, .Bold;//, .Number;
-}
-.Coin {
-  @extend .TitleCase, .H4;//, .Number;
-}
-.CoinSmall {
-  @extend .TitleCase, .H5, .Bold;//, .Number;
-}
-
-.ChancesBar {
-  width: 450px;
-  margin: auto!important;
-}
-
-.LethalBar {
-  background-color: $color-warning;
-  width: 0;
-  height: 21px;
-  position: absolute;
-  top: 0;
-  left:0;
-  // from .ui.progress .bar
-  border-radius: 0.28571429rem;
-  transition: width .1s ease, background-color .1s ease;
-  margin-left: 0.2em; // .ui.progress .bar > .progress
-}
-
-.SlotNumber {
-  font-size: 1.1em;
-  padding: 0.5em;
-  color: $color-brightest;
-}
-
-.TornaContents {
-  height: 310px;
-}
-.TornaImage {
-  @extend .Anchor;
-  height: 300px;
-  width: auto;
-  border: 5px solid #0000;
-}
-.TornaImageSelected {
-  @extend .TornaImage;
-  border: 5px solid $color-medium!important;
-}
-
 .CenteredPanel {
   background-color: rgba($color-darkest, 0.7);
   position: absolute;
@@ -1471,16 +1363,6 @@ $logo-url: '/logos/logo_avante.svg';
   left: 25%;
   width: 50%;
   height: 50%;
-}
-.TempRevealPanel {
-  @extend .YesMouse;
-  background-color: rgba($color-darkest, 0.7);
-  width: 300px;
-  height: 120px;
-  position: absolute;
-  bottom: -120px;
-  left: 0;
-  z-index: 1000;
 }
 
 .TempBarkeepOverlay {
@@ -1735,7 +1617,7 @@ input::placeholder {
 ._button {
   @extend ._button_shape, ._round_border, .TitleCase;
   font-family: $font-family;
-  background-color: rgba($color-dark, 0.6);
+  background-color: rgba($color-dark, 0.8);
   color: $color-text;
 }
 ._button_hover {
@@ -2002,15 +1884,25 @@ a.active.step:hover,
 // <Segment>
 .ui.segment {
   @extend ._round_border;
-  background-color: $color-dark;
+  background-color: $color-darkest;
   border: 0.5px solid rgba($color-bright, 0.8)!important;
 }
 //
 // <ProgressBar>
-.ui.progress .bar {
-  background-color: $color-important;
-  min-width: 3em;
+.ui.progress {
+  --progress-value-width: 1.2;
+
+  &.hide-value {
+    --progress-value-width: 0;
+  }
+
+  .bar {  
+    background-color: $color-important;
+    min-width: aspect-width(var(--progress-value-width));
+    height: inherit;
+  }
 }
+
 // .ui.disaled.progress .bar {
 //   background-color: $color-inactive;
 // }
@@ -2018,12 +1910,12 @@ a.active.step:hover,
   @extend .TitleCase;
   font-family: $font-family;
   font-weight: 600;
-  font-size: 1.5em;
+  font-size: aspect-width(1.35);
   color: $color-brightest;
   text-shadow: $text-shadow;
-  margin-top: -0.65em;
-  margin-right: -0.2em;
-  z-index: 100;
+  margin-top: aspect-width(-0.9);
+  margin-right: aspect-width(-0.4);
+  // z-index: 100;
 }
 // <Divider>
 .ui.divider:not(.vertical):not(.horizontal) {
@@ -2039,28 +1931,67 @@ a.active.step:hover,
   text-align: center;
   white-space: nowrap;
   line-height: 1;
+
+  // Default border style
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    border-top: 1px solid rgba(black, 0.6) !important;
+    border-bottom: 1px solid rgba(black, 0.6) !important;
+    vertical-align: middle;
+  }
+
+  &::before {
+    margin-right: aspect-width(1);
+  }
+
+  &::after {
+    margin-left: aspect-width(1);
+  }
+
+  &:empty::before,
+  &:empty::after {
+    margin: 0;
+  }
+
+  // Border color variants
+  &.bright {
+    &::before, &::after {
+      border-color: rgba($color-brightest, 0.6) !important; 
+    }
+  }
+
+  &.dark {
+    &::before, &::after {
+      border-color: rgba($color-darkest, 0.6) !important;
+    }
+  }
+
+  &.important {
+    &::before, &::after {
+      border-color: rgba($color-important, 0.6) !important;
+    }
+  }
+
+  &.warning {
+    &::before, &::after {
+      border-color: rgba($color-warning, 0.6) !important;
+    }
+  }
 }
 
-.TextDivider::before,
-.TextDivider::after {
-  content: "";
-  flex: 1;
-  border-top: 1px solid rgba(black, 0.6) !important;
-  border-bottom: 1px solid rgba(black, 0.6) !important;
-  vertical-align: middle;
-}
+.LeaderboardsDivider {
+  width: 90%;
+  margin: 0 5%;
+  height: aspect-height(0.1);
+  margin-top: aspect-width(2);
+  color: $color-brightest;
+  font-size: aspect-width(1.4);
 
-.TextDivider::before {
-  margin-right: aspect-width(1);
-}
-
-.TextDivider::after {
-  margin-left: aspect-width(1);
-}
-
-.TextDivider:empty::before,
-.TextDivider:empty::after {
-  margin: 0;
+  &.EqualMargin {
+    margin-bottom: aspect-width(3);
+  }
 }
 
 // <Popup>
@@ -2318,7 +2249,7 @@ a.active.step:hover,
   height: aspect-height(25);
   display: flex;
   flex-direction: column;
-  background-color: #000a;
+  // background-color: #fff;
 }
 
 .tutorialTextBackground {
@@ -2327,7 +2258,7 @@ a.active.step:hover,
   width: aspect-width(80);
   height: aspect-height(30);
   margin: 0 aspect-width(10);
-  background: radial-gradient(ellipse 70% 150% at 50% -10%, rgba(0,0,0,0.7) 0%, transparent 70%);
+  background: radial-gradient(ellipse 70% 250% at 50% -10%, rgba(0,0,0,0.9) 0%, transparent 72%);
   mask-image: linear-gradient(to top, black 80%, transparent 100%);
   -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
   z-index: 0;

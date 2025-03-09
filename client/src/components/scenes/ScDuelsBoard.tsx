@@ -5,7 +5,7 @@ import { useQueryParams } from '/src/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { PosterGrid, PosterGridHandle } from '/src/components/PosterGrid'
 import { DuelPoster, DuelPosterHandle } from '/src/components/DuelPoster'
 import { _currentScene } from '/src/three/game'
@@ -73,7 +73,7 @@ export default function ScDuelsBoard() {
 
   const handlePosterHover = (isHovering: boolean, duelId: bigint) => {
     if (!isAnimating) {
-      posterRefs.current[Number(duelId)].setPosterScale(isHovering ? 1.1 : 1)
+      posterRefs.current[Number(duelId)].setScale(isHovering ? 1.1 : 1)
     }
   }
 
@@ -85,20 +85,23 @@ export default function ScDuelsBoard() {
     })
     
     const getStartPosition = (index: number) => {
-      // const yOffset = index === 0 || index === 4 ? 
-      //   Math.random() * aspectWidth(-3) + aspectWidth(3) :
-      //   Math.random() * aspectWidth(10) - aspectWidth(5)
-
       const yOffset = Math.random() * aspectWidth(-2) - aspectWidth(3);
       
       return {
-        x: Math.random() * aspectWidth(3) - aspectWidth(1.5),
+        x: index === 0 ? Math.random() * aspectWidth(1.5) :
+           index === 4 ? Math.random() * aspectWidth(1.5) - aspectWidth(1.5) :
+           Math.random() * aspectWidth(3) - aspectWidth(1.5),
         y: yOffset,
       }
     }
 
     const createPoster = (duel: bigint) => {
       const index = challengeIds.indexOf(duel) % duelsPerPage
+
+      const rotation = Math.random() * 10 - 5 + (index - 2) * 5
+      const position = getStartPosition(index)
+
+      console.log('index', duel, 'rotation', rotation, 'position', position)
       return (
         <div 
           key={duel} 
@@ -118,10 +121,12 @@ export default function ScDuelsBoard() {
               if (ref) posterRefs.current[Number(duel)] = ref
             }}
             duelId={duel}
-            isVisible={false}
+            isSmall={true}
+            isVisible={true}
+            isFlipped={true}
             isHighlightable={true}
-            startPosition={getStartPosition(index)}
-            startRotation={Math.random() * 20 - 10 + ((index) - 2) * 5}
+            startPosition={position}
+            startRotation={rotation}
             onHover={(hover) => handlePosterHover(hover, duel)}
             onClick={() => handlePosterClick(duel)}
           />
@@ -140,6 +145,7 @@ export default function ScDuelsBoard() {
     return posters
   }, [challengeIds, aspectWidth, aspectHeight])
 
+  const initialLoad = useRef(true)
   useEffect(() => {
     gridRefs.current.forEach(({ref}, index) => {
       if (ref.current) {
@@ -150,10 +156,7 @@ export default function ScDuelsBoard() {
         ref.current.setPostersData(getDuelsForPage((renderOrder == 0 ? -1 : (renderOrder == 2 ? 1 : 0))))
       }
     })
-  }, [allDuelPosters])
-
-  const initialLoad = useRef(true)
-  useEffect(() => {
+    
     if (posterRefs.current) {
       setTimeout(() => {
         Object.entries(posterRefs.current).forEach(([key, ref]) => {

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Image, SemanticFLOATS } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useDuelist } from '/src/stores/duelistStore'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import { ProfilePic } from '/src/components/account/ProfilePic'
@@ -110,7 +110,7 @@ export default function DuelistProfile({
       </div>
       {floated == 'left' &&
         <>
-          <ProfilePic className='NoMouse NoDrag' duel profilePicUrl={archetypeImage} />
+          <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel  circle profilePicUrl={archetypeImage} />
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
           </div>
@@ -131,7 +131,7 @@ export default function DuelistProfile({
       }
       {floated == 'right' &&
         <>
-          <ProfilePic className='FlipHorizontal NoMouse NoDrag' duel profilePicUrl={archetypeImage} />
+          <ProfilePic className='FlipHorizontal NoMouse NoDrag ProfilePicDuel' duel  circle profilePicUrl={archetypeImage} />
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
           </div>

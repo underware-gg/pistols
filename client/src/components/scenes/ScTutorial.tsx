@@ -201,7 +201,8 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
     } else if (itemHovered === 'demon_left') {
       handleDemonLeftHover()
     } else {
-      (_currentScene as InteractibleScene).hideItem?.(TextureName.bg_demon_person)
+      ;(_currentScene as InteractibleScene).hideItem?.(TextureName.bg_demon_victim)
+      ;(_currentScene as InteractibleScene).hideItem?.(TextureName.bg_demon_background)
     }
   }
 
@@ -210,7 +211,8 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       setTimeout(() => handleAnimationComplete(), 500)
     }
     setDisplayText(currentSceneData?.texts[2])
-    ;(_currentScene as InteractibleScene).showItem?.(TextureName.bg_demon_person)
+    ;(_currentScene as InteractibleScene).showItem?.(TextureName.bg_demon_victim)
+    ;(_currentScene as InteractibleScene).showItem?.(TextureName.bg_demon_background)
   }
 
   function handleDemonLeftHover() {
@@ -218,7 +220,8 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       setTimeout(() => handleAnimationComplete(), 500)
     }
     setDisplayText(currentSceneData?.texts[1])
-    ;(_currentScene as InteractibleScene).hideItem?.(TextureName.bg_demon_person)
+    ;(_currentScene as InteractibleScene).hideItem?.(TextureName.bg_demon_victim)
+    ;(_currentScene as InteractibleScene).hideItem?.(TextureName.bg_demon_background)
   }
 
   function handleItemClick() {

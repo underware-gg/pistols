@@ -163,6 +163,8 @@ export function ConnectButton({ setLoading }: { setLoading?: (loading: boolean) 
           dispatchSetScene(SceneName.Tavern)
         }
       }, 1000)
+    } else if (isError) {
+      setLoading?.(false)
     }
 
     return () => {

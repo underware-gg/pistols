@@ -29,10 +29,11 @@ import ScTutorial from '/src/components/scenes/ScTutorial'
 import StoreSync from '/src/stores/sync/StoreSync'
 import Gate from '/src/components/scenes/ScGate'
 import Door from '/src/components/scenes/ScDoor'
+import Duel from '/src/components/scenes/Duel'
+import ScLeaderboards from '/src/components/scenes/ScLeaderboards'
 
 // test sdk
 import { helloPistols } from '@underware_gg/pistols-sdk'
-import Duel from '../components/scenes/Duel'
 
 helloPistols();
 export default function MainPage({
@@ -113,7 +114,7 @@ function MainUI() {
 
   const { gameImpl } = useThreeJsContext()
   const { currentDuel, tutorialLevel } = usePistolsContext()
-  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial } = usePistolsScene()
+  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards } = usePistolsScene()
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
   useEffect(() => {
@@ -126,6 +127,7 @@ function MainUI() {
       else if (atDuelsBoard) setCurrentScene(<ScDuelsBoard />);
       else if (atDuelists) setCurrentScene(<ScDuelists />);
       else if (atGraveyard) setCurrentScene(<ScGraveyard />);
+      else if (atLeaderboards) setCurrentScene(<ScLeaderboards />);
       else setCurrentScene(<ScTavern />);
     }, SCENE_CHANGE_ANIMATION_DURATION);
 

@@ -10,6 +10,7 @@ import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import StarknetConnectModal from '/src/components/starknet/StarknetConnectModal'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
+import { ProfilePic } from '/src/components/account/ProfilePic'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -99,7 +100,7 @@ export function Connect() {
             <Cell>Connector</Cell>
             <Cell className='TitleCase'>
               {connector && <>
-                <Image className='ProfilePicSmall' spaced src={getConnectorIcon(connector)} /> {connector.name}
+                <ProfilePic medium  profilePicUrl={getConnectorIcon(connector)} /> {connector.name}
               </>}
               {!connector && JSON.stringify(connectors.map(c => c.id))}
             </Cell>

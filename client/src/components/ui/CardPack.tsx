@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import TWEEN from '@tweenjs/tween.js'
 import { DuelistCard, DuelistCardHandle } from '../cards/DuelistCard';
 import { FireCardsTextures } from '/src/data/cardAssets';
-import { useGameAspect } from '/src/hooks/useGameApect';
+import { useGameAspect } from '/src/hooks/useGameAspect';
 import { CARD_PACK_CARD_SIZE_WIDTH, CARD_PACK_CARD_SIZE_HEIGHT } from '/src/data/cardConstants';
 import { ActionButton } from './Buttons';
 import { 
@@ -27,6 +27,9 @@ import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
 import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo';
 import { usePackType } from '/src/stores/packStore';
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { useFundedStarterPackCount } from '/src/stores/bankStore';
+import { Button } from 'semantic-ui-react';
+import { Modal } from 'semantic-ui-react';
 
 interface CardPack {
   onComplete?: (selectedDuelistId?: number) => void
@@ -44,9 +47,10 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   const { pack_token } = useDojoSystemCalls()
   const { duelistIds } = useDuelistsOfPlayer()
   const [isClaiming, setIsClaiming] = useState(false)
-  const { quantity: starterPackQuantity } = usePackType(constants.PackType.StarterPack)
-  const { quantity: duelists5xQuantity } = usePackType(constants.PackType.Duelists5x)
+  const { quantity } = usePackType(packType)
+  const { fundedCount } = useFundedStarterPackCount()
 
+  const [isNoFundsModalOpen, setIsNoFundsModalOpen] = useState(false)
   const [isOpening, setIsOpening] = useState(false)
   const [sealClicked, setSealClicked] = useState(false)
   const [cardsSpawned, setCardsSpawned] = useState(false)
@@ -60,8 +64,12 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
 
   const _claim = async () => {
     if (packType === constants.PackType.StarterPack) {
-      setIsClaiming(true)
-      await pack_token.claim_starter_pack(account)
+      if (fundedCount > 0) {
+        setIsClaiming(true)
+        await pack_token.claim_starter_pack(account)
+      } else {
+        setIsNoFundsModalOpen(true)
+      }
     } else if (packType === constants.PackType.Duelists5x && packId) {
       setIsClaiming(true)
       await pack_token.open(account, packId)
@@ -75,7 +83,8 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
       return
     }
 
-    const expectedNewIds = isClaiming ? starterPackQuantity : duelists5xQuantity
+    const expectedNewIds = quantity
+    console.log('---------quantity:', quantity)
     console.log('Expected new IDs:', expectedNewIds)
     const newIds = duelistIds.filter(id => !previousDuelistIdsRef.current.includes(id))
     console.log('Found new IDs:', newIds)
@@ -171,9 +180,9 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
       if (!cardRef) continue
 
       cardRef.setPosition(0, aspectWidth(5), 0)
-      cardRef.setCardScale(0.8, 0)
+      cardRef.setScale(0.8, 0)
       cardRef.toggleVisibility(false)
-      cardRef.setCardZIndex(50)
+      cardRef.setZIndex(50)
     }
   }, [cardRefs.current])
 
@@ -216,7 +225,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
           TWEEN.Easing.Sinusoidal.Out,
           TWEEN.Interpolation.Bezier
         )
-        cardRef.setCardScale(
+        cardRef.setScale(
           1, 
           PACK_ANIMATION_CARD_SPAWN_SCALE_DURATION, 
           TWEEN.Easing.Sinusoidal.Out
@@ -312,7 +321,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
 
     orderedCards.forEach(({cardRef, duelistId}, index) => {
       setTimeout(() => {
-        cardRef?.flipCard(true, 180, CARD_PACK_FLIP_DURATION);
+        cardRef?.flip(true, true, CARD_PACK_FLIP_DURATION);
         setRevealedDuelists(prev => new Set([...prev, duelistId]));
       }, index * CARD_PACK_REVEAL_DELAY);
     });
@@ -344,7 +353,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
 
   const handleCardClick = (id: number, cardRef: DuelistCardHandle | null) => {
     if (!revealedDuelists.has(id)) {
-      cardRef?.flipCard(true, 180, CARD_PACK_FLIP_DURATION);
+      cardRef?.flip(true, true, CARD_PACK_FLIP_DURATION);
       setRevealedDuelists(prev => {
         const newSet = new Set([...prev, id]);
         if (newSet.size === newDuelistIds.length) {
@@ -356,16 +365,16 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
       if (packType === constants.PackType.StarterPack) {
         if (selectedDuelistId === id) {
           setSelectedDuelistId(undefined);
-          cardRef?.setCardScale(1, CARD_PACK_CARD_SCALE_DURATION);
+          cardRef?.setScale(1, CARD_PACK_CARD_SCALE_DURATION);
           cardRef?.toggleHighlight(false);
         } else {
           const previousCardRef = cardRefs.current.find(ref => ref?.duelistId === selectedDuelistId);
           if (previousCardRef) {
-            previousCardRef.setCardScale(1, CARD_PACK_CARD_SCALE_DURATION);
+            previousCardRef.setScale(1, CARD_PACK_CARD_SCALE_DURATION);
             previousCardRef.toggleHighlight(false);
           }
           setSelectedDuelistId(id);
-          cardRef?.setCardScale(1.1, CARD_PACK_CARD_SCALE_DURATION);
+          cardRef?.setScale(1.1, CARD_PACK_CARD_SCALE_DURATION);
           cardRef?.toggleHighlight(true);
         }
       }
@@ -416,6 +425,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
               duelistId={id}
               key={i}
               ref={el => { cardRefs.current[i] = el; }}
+              isSmall={true}
               width={CARD_PACK_CARD_SIZE_WIDTH}
               height={CARD_PACK_CARD_SIZE_HEIGHT}
               isLeft={false}
@@ -423,8 +433,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
               isSelected={selectedDuelistId === id}
               onHover={(isHovered) => {
                 if (cardRefs.current[i] && id !== selectedDuelistId) {
-                  cardRefs.current[i].setCardScale(isHovered ? 1.1 : 1, CARD_PACK_CARD_SCALE_DURATION);
-                  cardRefs.current[i].toggleHighlight(isHovered);
+                  cardRefs.current[i].setScale(isHovered ? 1.1 : 1, CARD_PACK_CARD_SCALE_DURATION);
                 }
               }}
               onClick={() => handleCardClick(id, cardRefs.current[i])}
@@ -449,6 +458,30 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
           dimmed
         />
       </div>
+
+    <Modal
+      size="tiny"
+      open={isNoFundsModalOpen}
+      className="ModalText"
+    >
+      <Modal.Header>
+        <h3 className="Important">We're Sorry</h3>
+      </Modal.Header>
+      <Modal.Content>
+        <p>Currently there are no starter packs available. Please contact us for assistance.</p>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button
+          primary
+          onClick={() => {
+            window.open('https://x.com/underware_gg', '_blank') //TODO change for support page on website
+            setIsNoFundsModalOpen(false)
+          }}
+        >
+          Contact Us
+        </Button>
+      </Modal.Actions>
+    </Modal>
     </>
   )
 }

@@ -86,9 +86,9 @@ function Profiles({
             {profile.name}
           </Cell>
           <Cell>
-            <img src={makeProfilePicUrl(profile.profile_id, false, profileType)} style={style} />
+            <img src={makeProfilePicUrl(profile.profile_id, profileType)} style={style} />
             {` `}
-            <img src={makeProfilePicUrl(profile.profile_id, true, profileType)} style={style} />
+            <img src={makeProfilePicUrl(profile.profile_id, profileType)} style={style} />
           </Cell>
           <Cell>
             <img src={duelist_svg} style={style} />

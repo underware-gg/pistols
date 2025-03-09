@@ -1,0 +1,146 @@
+@import 'aspect';
+@import 'color';
+
+.component-container {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  position: absolute;
+  overflow: visible;
+  width: var(--component-width);
+  height: var(--component-height);
+  translate: var(--translate-x) var(--translate-y);
+  scale: var(--scale);
+  rotate: var(--rotation);
+  z-index: var(--z-index, 0);
+  opacity: var(--visibility);
+  background-color: transparent;
+  // transition: width 0.3s ease, height 0.3s ease;
+  perspective: 1000px;
+  transform-origin: var(--component-origin, center bottom);
+  border-radius: var(--component-border-radius, 0px);
+  cursor: var(--component-cursor, pointer);
+  // opacity: 1;
+}
+
+.component-inner,
+.component-back,
+.component-front,
+.component-outline {
+  border-radius: var(--component-border-radius, 0px); // Inherit the border radius from the parent
+}
+
+.hanging-nail-container {
+  position: absolute;
+  transform: translateX(var(--random-offset, 0px));
+}
+
+.hanging-container {
+  position: absolute;
+  width: var(--component-width);
+  height: var(--component-height);
+  transform-origin: calc(var(--component-width) / 2 + var(--random-offset, 0px)) calc(var(--component-height) * 0.03);
+  transform: rotate(var(--hang-rotation, 0deg));
+}
+
+.nail-container {
+  position: absolute;
+  transform-origin: bottom center;
+  z-index: 1;
+}
+
+.nail-point {
+  background: radial-gradient(circle at 30% 30%, #666, #444 40%, #333);
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: inset -1px -1px 2px rgba(0,0,0,0.4), 
+              inset 1px 1px 2px rgba(255,255,255,0.3);
+}
+
+#component-filter-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  z-index: 500;
+  border-radius: var(--component-border-radius, 0px);
+
+  &.visible {
+    opacity: 1;
+  }
+
+  &.disabled {
+    background-color: rgba(39, 17, 11, 0.7);
+    filter: brightness(0) saturate(100%) invert(0) sepia(1) hue-rotate(0deg) brightness(0.6) contrast(1);
+  }
+
+  &.selected {
+    background-color: rgb(255, 255, 200, 0.1);
+    filter: brightness(1) saturate(100%) invert(0) sepia(0) hue-rotate(0deg) brightness(0.6) contrast(1);
+  }
+
+  &.defeated {
+    background-color: rgba(200, 0, 0, 0.5);
+    filter: brightness(1.2) saturate(250%) invert(0) sepia(0.8) hue-rotate(345deg) brightness(0.6) contrast(1.6);
+  }
+}
+
+.component-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: translate 0.6s;
+  translate: var(--idle-translate-x, 0px) var(--idle-translate-y, 0px);
+  transform-style: preserve-3d;
+  transform: rotateY(var(--flip-rotation, 0deg));
+  box-shadow: var(--component-border-shadow, none);
+}
+
+.component-outline {
+  position: absolute;
+  width: 110%;
+  height: 110%;
+  transition: translate 0.6s, rotateY 0.8s;
+  transform-style: preserve-3d;
+  background-color: var(--background-color, white);
+  box-shadow: var(--component-border-shadow, none);
+  filter: blur(4px);
+  top: -5%;
+  left: -5%;
+  translate: var(--idle-translate-x, 0px) var(--idle-translate-y, 0px);
+  transform: rotateY(var(--flip-rotation, 0deg));
+}
+
+.component-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.component-front-face {
+  @extend .component-face;
+  transform: rotateY(180deg);
+}
+
+.component-back-face {
+  @extend .component-face;
+}
+
+.component-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.component-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}

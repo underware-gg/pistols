@@ -1,0 +1,324 @@
+@import 'aspect';
+@import 'color';
+
+.PosterModal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.Poster {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-direction: column;
+}
+
+
+// ProfilePoster.tsx
+.WantedText {
+  font-size: aspect-width(3.4);
+  letter-spacing: aspect-width(2);
+  text-transform: uppercase;
+  text-align: center;
+  color: $color-darkest;
+  font-weight: 900;
+  margin-top: aspect-width(1.8);
+  margin-left: aspect-width(2);
+
+  &.Small {
+    font-size: aspect-width(1.4);
+    letter-spacing: aspect-width(0.8);
+    margin-top: aspect-width(0.8);
+    margin-left: aspect-width(0.6);
+  }
+}
+
+.ProfileSection {
+  margin-top: aspect-width(0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;  
+
+  &.Small {
+    flex-grow: 1;
+  }
+}
+
+.PlayerName {
+  font-size: aspect-width(2.4);
+  font-weight: bold;
+  color: $color-darkest;
+  margin-top: aspect-width(0.8);
+
+  &.Small {
+    flex-grow: 1;
+    font-size: aspect-width(1.6);
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    text-align: center;
+    max-width: aspect-width(10);
+    word-break: break-word;
+    overflow: hidden;
+    line-height: aspect-width(1.5);
+    max-height: aspect-width(4.5);
+  }
+}
+
+.PlayerAddress {
+  margin-top: aspect-width(0.4);
+  color: $color-dark;
+}
+
+.DuelistsSection {
+  width: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-top: aspect-width(1);
+  margin-left: 5%;
+}
+
+.NavButton {
+  background: none;
+  border: none;
+  font-size: aspect-width(2);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  transition: transform 0.2s ease-in-out;
+}
+
+.NavButton:hover {
+  transform: scale(1.2);
+}
+
+.NavButton:focus {
+  outline: none;
+}
+
+.NavButton:focus-visible {
+  outline: none;
+}
+
+.WantedDivider {
+  width: 80%;
+  height: aspect-height(0.1);
+  margin: 0 10%;
+  margin-top: aspect-width(1);
+  color: $color-darkest;
+  font-size: aspect-width(1);
+
+  &.EqualMargin {
+    margin-bottom: aspect-width(1);
+  }
+}
+
+.ButtonSection {
+  width: 90%;
+  margin-top: aspect-width(0.5) !important;
+}
+
+.BookmarkSection {
+  position: absolute;
+  transform-origin: center aspect-width(2);
+  background-image: url('/images/ui/seal.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: top;
+  justify-content: center;
+  padding-top: aspect-width(2);
+  z-index: 10;
+
+  &.PlayerPoster {
+    width: aspect-width(6);
+    height: aspect-width(9);
+    top: 52%;
+    right: 16%;
+    transform: rotateZ(-16deg);
+  }
+
+  &.DuelPoster {
+    width: aspect-width(6);
+    height: aspect-width(9);
+    top: -1%;
+    left: 0%;
+    transform: scaleX(-1) rotateZ(-20deg);
+  }
+}
+
+.BookmarkIcon {
+  color: $color-bright;
+}
+
+
+
+//DuelPoster.tsx
+.PlayerNameA {
+  width: 88%;
+  position: relative;
+  text-align: start;
+  font-size: aspect-width(1);
+
+  &.Large {
+    width: 84%;
+    height: 6%;
+    font-size: aspect-width(2.6);
+    margin-top: -1.5%;
+  }
+}
+
+.PlayerNameB {
+  width: 88%;
+  position: relative;
+  margin-top: aspect-width(0.6);
+  text-align: end;
+  font-size: aspect-width(1);
+
+  &.Large {
+    width: 84%;
+    height: 6%;
+    font-size: aspect-width(2.6);
+  }
+}
+
+.ProfilePicContainer {
+  width: 88%;
+  position: relative;
+  height: 37%;
+
+  &.Large {
+    width: 84%;
+    height: 27%;
+  }
+}
+
+.VS {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: aspect-width(3);
+  font-weight: bold;
+  color: $color-darkest;
+}
+
+.TableDescriptionFooter {
+  font-size: aspect-width(1);
+  font-weight: bold;
+  margin-top: aspect-width(0.6);
+  color: $color-dark;
+}
+
+.TableDescriptionTitle {
+  font-size: aspect-width(2.4);
+  font-weight: bold;
+  margin-top: aspect-width(1);
+}
+
+.DuelInfoContainer {
+  width: 95%;
+  height: 36%;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: aspect-width(0.8);
+}
+
+.DuelistCard {
+  position: relative;
+  z-index: 2;
+  transform: translateX(-50%);
+}
+
+.DuelIconsContainer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  min-height: aspect-width(4.4);
+  font-size: aspect-width(0.5);
+  color: $color-darkest;
+  transform: scale(1.4);
+}
+
+.InfoGrid {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  height: '100%';
+}
+
+.ProfilePicChallengeContainer {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: $color-darkest;
+  
+  &.Small {
+    width: aspect-width(6.3);
+    height: aspect-width(6.3);
+  }
+
+  &.Large {
+    width: aspect-width(15.8);
+    height: aspect-width(13.8);
+  }
+  
+  &.Left {
+    left: 0;
+    clip-path: polygon(0 0, 75% 0, 100% 100%, 0 100%);
+  }
+
+  &.Right {
+    right: 0;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 25% 100%);
+  }
+
+  .ProfilePicChallenge {
+    &.Left {
+      clip-path: polygon(0 0, 75% 0, 100% 100%, 0 100%);
+    }
+  
+    &.Right {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 25% 100%);
+    }
+  }
+
+  #DefeatedOverlay {
+    position: absolute;
+    top: 0;
+    width: 80%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    z-index: 500;
+
+    &.Left {
+      left: 0;
+    }
+
+    &.Right {
+      right: 0;      
+    }
+
+    &.visible {
+      opacity: 1;
+    }
+  }
+}

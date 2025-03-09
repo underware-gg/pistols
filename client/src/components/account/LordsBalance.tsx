@@ -4,6 +4,8 @@ import { useLordsBalance, useEtherBalance } from '@underware_gg/pistols-sdk/dojo
 import { useFoolsBalance } from '/src/hooks/useFools'
 import { useFameBalance, useFameBalanceDuelist } from '/src/hooks/useFame'
 import { Balance } from '/src/components/account/Balance'
+import ProgressBar from '../ui/ProgressBar'
+import { IconSizeProp } from '../ui/Icons'
 
 
 //
@@ -29,11 +31,11 @@ export const LordsBalance = ({
   pre = null,
   post = null,
   clean = false,
-  big = false,
+  size = null,
 }) => {
   const { balance } = useLordsBalance(address)
   return (
-    <Balance lords big={big} wei={balance} pre={pre} post={post} clean={clean} />
+    <Balance lords size={size} wei={balance} pre={pre} post={post} clean={clean} />
   )
 }
 
@@ -43,14 +45,14 @@ export const LordsBalance = ({
 //
 export const FoolsBalance = ({
   address,
-  big = false,
+  size = null,
 }: {
   address: BigNumberish
-  big?: boolean
+  size?: IconSizeProp
 }) => {
   const { balance } = useFoolsBalance(address)
   return (
-    <Balance fools wei={balance} big={big} />
+    <Balance fools size={size} wei={balance} />
   )
 }
 
@@ -59,14 +61,14 @@ export const FoolsBalance = ({
 //
 export const FameBalance = ({
   address,
-  big = false,
+  size = null,
 }: {
   address: BigNumberish
-    big?: boolean
+  size?: IconSizeProp
 }) => {
   const { balance } = useFameBalance(address)
   return (
-    <Balance fame wei={balance} big={big} />
+    <Balance fame size={size} wei={balance} />
   )
 }
 
@@ -75,16 +77,43 @@ export const FameBalance = ({
 //
 export const FameBalanceDuelist = ({
   duelistId,
-  big = false,
+  size = null,
 }: {
   duelistId: BigNumberish
-  big?: boolean
+  size?: IconSizeProp
 }) => {
   const { balance } = useFameBalanceDuelist(duelistId)
   return (
-    <Balance fame wei={balance} big={big} />
+    <Balance fame size={size} wei={balance / 1000n} />
   )
 }
+
+//
+// Fame Progress Bar of a Duelist
+//
+export const FameProgressBar = ({
+  duelistId,
+  label = null,
+  width,
+  height,
+  hideValue = false,
+}: {
+  duelistId: BigNumberish
+  label?: string
+  width?: number
+  height?: number
+  hideValue?: boolean
+}) => {
+  const { balance } = useFameBalanceDuelist(duelistId)
+  const progressPercent = useMemo(() => {
+    return Number(balance) % 1000
+  }, [balance])
+
+  return (
+    <ProgressBar className='FameProgressBar' value={progressPercent} total={1000} label={label} width={width} height={height} hideValue={hideValue} />
+  )
+}
+
 
 //
 // Fees to be paid
@@ -92,18 +121,18 @@ export const FameBalanceDuelist = ({
 export function FeesToPay({
   fee,
   prefixed = false,
-  big = false,
+  size = null,
 }: {
   value: BigNumberish
   fee: BigNumberish
   prefixed?: boolean
-  big?: boolean
+  size?: IconSizeProp
 }) {
   const hasFees = useMemo(() => (BigInt(fee ?? 0) > 0), [fee])
   const pre = useMemo(() => (prefixed ? 'Fee: ' : null), [prefixed, hasFees])
   return (
     <span>
-      <Balance lords big={big} wei={fee} pre={pre} placeholdder={0} />
+      <Balance lords size={size} wei={fee} pre={pre} placeholdder={0} />
     </span>
   )
 }

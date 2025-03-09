@@ -1,5 +1,5 @@
 import { Image } from 'semantic-ui-react'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 
 export default function Logo({
   width = 11,
