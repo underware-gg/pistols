@@ -3,7 +3,7 @@ import { Container, Table } from 'semantic-ui-react'
 import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
-import { duelist_token } from '@underware_gg/pistols-sdk/pistols/tokens'
+import { duelist_token, duel_token, SvgRenderOptions } from '@underware_gg/pistols-sdk/pistols/tokens'
 import { map } from '@underware_gg/pistols-sdk/utils'
 import App from '/src/components/App'
 
@@ -55,6 +55,23 @@ const _randomArchetype = () => {
   return { archetype, honour }
 }
 
+const _randomPremise = () => {
+  return constants.Premise[Math.floor(Math.random() * Object.keys(constants.Premise).length)] as constants.Premise
+}
+const _randomQuote = () => {
+  const options = [
+    "Choose your steps, quick!",
+    "Decide on your steps now!",
+    "What's your plan? Choose fast!",
+    "Make your move, no delay!",
+    "Pick your steps, time's short!",
+  ];
+  return options[Math.floor(Math.random() * options.length)]
+}
+const _randomChallengeState = () => {
+  return constants.ChallengeState[Math.floor(Math.random() * Object.keys(constants.ChallengeState).length)] as constants.ChallengeState
+}
+
 function Profiles({
   profiles,
   profileType,
@@ -64,11 +81,11 @@ function Profiles({
 }) {
   const style = { width: 'auto', height: '300px', backgroundColor: 'black' }
 
-  const rows = useMemo(() => {
+  const props = useMemo(() => {
     return Object.entries(profiles).map(([key, profile]) => {
       const { archetype, honour } = _randomArchetype()
       const { fame, lives } = _randomFame(archetype)
-      const duelist_svg = duelist_token.renderSvg({
+      const prop: duelist_token.DuelistSvgProps = {
         // base_uri: 'https://localhost:5173',
         duelist_id: 16,
         owner: '0x0',
@@ -85,17 +102,41 @@ function Profiles({
         lives,
         is_memorized: false,
         duel_id: 0,
-      }, {
-        includeMimeType: true,
-      })
+      };
+      return { profile, prop }
+    })
+  }, [profiles])
 
+  const rows = useMemo(() => {
+    return props.map((e, index) => {
+      const { profile, prop } = e;
+      const options: SvgRenderOptions = {
+        includeMimeType: true,
+      };
+      const duelist_svg = duelist_token.renderSvg(prop, options);
+      const state = _randomChallengeState()
+      let nextProfileIndex = (index < props.length - 1) ? index + 1 : 0;
+      const duel_prop: duel_token.DuelSvgProps = {
+        // base_uri: 'https://localhost:5173',
+        duel_id: Math.floor(Math.random() * 1000),
+        table_id: 'Season1',
+        premise: _randomPremise(),
+        quote: _randomQuote(),
+        state,
+        winner: (state == constants.ChallengeState.Resolved || state == constants.ChallengeState.Draw) ? (1 + Math.floor(Math.random() * 2)) : 0,
+        profile_type_a: prop.profile_type,
+        profile_id_a: prop.profile_id,
+        profile_type_b: props[nextProfileIndex].prop.profile_type,
+        profile_id_b: props[nextProfileIndex].prop.profile_id,
+      };
+      const duel_svg = duel_token.renderSvg(duel_prop, options)
       return (
-        <Row key={key} className='ModalText'>
+        <Row key={`${profileType}-${profile.profile_id}`} className='ModalText'>
           <Cell className='Code'>
             {profile.profile_id}
           </Cell>
           <Cell className='Inactive'>
-            {key}
+            {profileType}
           </Cell>
           <Cell>
             {profile.name}
@@ -106,10 +147,13 @@ function Profiles({
           <Cell>
             <img src={duelist_svg} style={style} />
           </Cell>
+          <Cell>
+            <img src={duel_svg} style={style} />
+          </Cell>
         </Row>
       )
     })
-  }, [profiles])
+  }, [props])
 
   return (
     <Table attached>
@@ -125,10 +169,13 @@ function Profiles({
             <h3 className='Important'>Name</h3>
           </HeaderCell>
           <HeaderCell>
-            <h3 className='Important'>Profile Pics</h3>
+            <h3 className='Important'>Profile Pic</h3>
           </HeaderCell>
           <HeaderCell>
-            <h3 className='Important'>Token</h3>
+            <h3 className='Important'>Duelist Token</h3>
+          </HeaderCell>
+          <HeaderCell>
+            <h3 className='Important'>Random Duel Token</h3>
           </HeaderCell>
         </Row>
       </Header>
