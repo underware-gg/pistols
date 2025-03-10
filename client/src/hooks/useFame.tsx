@@ -25,5 +25,6 @@ export const useFameBalance = (address: BigNumberish, fee: BigNumberish = 0n) =>
   return {
     ...result,
     lives,
+    isAlive: (lives > 0),
   }
 }
