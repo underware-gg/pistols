@@ -637,8 +637,7 @@ pub mod duelist_token {
             let scoreboard: ScoreboardValue = store.get_scoreboard_value(token_id.low.into(), 0);
             let archetype: Archetype = scoreboard.score.get_archetype();
             let base_uri: ByteArray = self.erc721._base_uri();
-            let image_square: ByteArray = duelist.profile_type.get_uri(base_uri.clone(), "square");
-            let image_portrait: ByteArray = duelist.profile_type.get_uri(base_uri.clone(), "portrait");
+            let duelist_image: ByteArray = duelist.profile_type.get_uri(base_uri.clone());
             let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
             let lives: u128 = (fame_balance / FAME::ONE_LIFE.low);
             // Image
@@ -710,12 +709,8 @@ pub mod duelist_token {
             // metadata
             let mut additional_metadata: Array<Attribute> = array![
                 Attribute {
-                    key: "image_square",
-                    value: image_square.clone(),
-                },
-                Attribute {
-                    key: "image_portrait",
-                    value: image_portrait.clone(),
+                    key: "duelist_image",
+                    value: duelist_image.clone(),
                 },
             ];
             // return the metadata to be rendered by the component

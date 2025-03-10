@@ -40,12 +40,13 @@ const ArchetypeCardUrl: Record<constants.Archetype, string> = {
   [constants.Archetype.Honourable]: `/textures/cards/card_circular_honourable.png`,
   [constants.Archetype.Trickster]: `/textures/cards/card_circular_trickster.png`,
   [constants.Archetype.Villainous]: `/textures/cards/card_circular_villainous.png`,
-  [constants.Archetype.Undefined]: `/textures/cards/card_circular_villainous.png`,
+  [constants.Archetype.Undefined]: `/textures/cards/card_circular_neutral.png`,
 }
+const STAR = '&#11088;' // ⭐️
 
-export const renderDuelistImageUrl = (variant: string, profile_type: constants.ProfileType, profile_id: number): string => {
+export const renderDuelistImageUrl = (profile_type: constants.ProfileType, profile_id: number): string => {
   const folder = ProfileTypeFolder[profile_type];
-  return `/profiles/${folder}/${variant}/${('00' + profile_id.toString()).slice(-2)}.jpg`;
+  return `/profiles/${folder}/${('00' + profile_id.toString()).slice(-2)}.jpg`;
 }
 
 const _getProfile = (profile_type: constants.ProfileType, profile_id: number) => {
@@ -62,7 +63,7 @@ const _getProfile = (profile_type: constants.ProfileType, profile_id: number) =>
 
 export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}): string => {
   const profile = _getProfile(props.profile_type, props.profile_id)
-  const profile_url = renderDuelistImageUrl('square', props.profile_type, props.profile_id);
+  const profile_url = renderDuelistImageUrl(props.profile_type, props.profile_id);
   const card_url = ArchetypeCardUrl[props.archetype];
   const svg = `
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' 
@@ -100,12 +101,12 @@ fill:none;
 <image href='${getAsset(cardsAssets, card_url)}' x='0' y='0' width='${WIDTH}px' height='${HEIGHT}px' />
 <path id='circle' d='M${92},350a200,200 0 1,1 ${WIDTH - 92 - 92},0' />
 <text class='NAME'>
-<textPath startOffset='50%' xlink:href='#circle'>
-${profile.name}
-</textPath>
+  <textPath startOffset='50%' xlink:href='#circle'>
+  ${profile.name}
+  </textPath>
 </text>
 <text class='FAME' x='${WIDTH / 2}' y='${HEIGHT * 0.7}'>
-&#11088;${props.fame}
+  ${STAR}${props.fame}
 </text>
 </svg>
 `.replaceAll('\n', '');

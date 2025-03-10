@@ -375,7 +375,6 @@ pub impl ProfileTypeImpl of ProfileTypeTrait {
     }
     fn get_uri(self: @ProfileType,
         base_uri: ByteArray,
-        variant: ByteArray,    
     ) -> ByteArray {
         let desc: ProfileDescription = self.description();
         let number = if (desc.profile_id < 10) {format!("0{}", desc.profile_id)} else {format!("{}", desc.profile_id)};
@@ -385,7 +384,7 @@ pub impl ProfileTypeImpl of ProfileTypeTrait {
             ProfileType::Character(_) =>    "characters",
             ProfileType::Bot(_) =>          "bots",
         };
-        (format!("{}/profiles/{}/{}/{}.jpg", base_uri, folder, variant, number))
+        (format!("{}/profiles/{}/{}.jpg", base_uri, folder, number))
     }
 }
 

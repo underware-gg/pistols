@@ -4,6 +4,7 @@ import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import { duelist_token } from '@underware_gg/pistols-sdk/pistols/tokens'
+import { map } from '@underware_gg/pistols-sdk/utils'
 import App from '/src/components/App'
 
 // const Row = Grid.Row
@@ -36,8 +37,22 @@ export default function ProfilesTestPage() {
 }
 
 
-const _randomHonour = () => {
-  return Math.floor(Math.random() * 100) / 10
+const _randomFame = (archetype: constants.Archetype) => {
+  const fame = archetype == constants.Archetype.Undefined ? 3000 : Math.floor(100 + Math.random() * 500) * 10
+  return {
+    fame,
+    lives: Math.floor(fame / 1000),
+  }
+}
+
+const _randomArchetype = () => {
+  const archetype = constants.getArchetypeFromValue(Math.floor(Math.random() * Object.keys(constants.Archetype).length))
+  const honour =
+    archetype == constants.Archetype.Honourable ? Math.floor(map(Math.random(), 0, 1, constants.HONOUR.LORD_START, 100) + 1)
+      : archetype == constants.Archetype.Trickster ? Math.floor(map(Math.random(), 0, 1, constants.HONOUR.TRICKSTER_START, constants.HONOUR.LORD_START))
+        : archetype == constants.Archetype.Villainous ? Math.floor(map(Math.random(), 0, 1, 0, constants.HONOUR.TRICKSTER_START))
+          : 0
+  return { archetype, honour }
 }
 
 function Profiles({
@@ -51,8 +66,8 @@ function Profiles({
 
   const rows = useMemo(() => {
     return Object.entries(profiles).map(([key, profile]) => {
-      const honour = _randomHonour()
-      const archetype = honour <= 3.5 ? constants.Archetype.Villainous : honour < 7.5 ? constants.Archetype.Trickster : constants.Archetype.Honourable
+      const { archetype, honour } = _randomArchetype()
+      const { fame, lives } = _randomFame(archetype)
       const duelist_svg = duelist_token.renderSvg({
         // base_uri: 'https://localhost:5173',
         duelist_id: 16,
@@ -66,8 +81,8 @@ function Profiles({
         total_wins: 5,
         total_losses: 2,
         total_draws: 3,
-        fame: 4250,
-        lives: 4,
+        fame,
+        lives,
         is_memorized: false,
         duel_id: 0,
       }, {
@@ -86,8 +101,6 @@ function Profiles({
             {profile.name}
           </Cell>
           <Cell>
-            <img src={makeProfilePicUrl(profile.profile_id, profileType)} style={style} />
-            {` `}
             <img src={makeProfilePicUrl(profile.profile_id, profileType)} style={style} />
           </Cell>
           <Cell>
