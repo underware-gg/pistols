@@ -16,6 +16,7 @@ export interface ActivityState {
   activity: constants.Activity
   identifier: bigint
   is_public: boolean
+  index: number
 }
 interface State {
   playerActivity: ActivityState[],
@@ -24,14 +25,15 @@ interface State {
 }
 
 const createStore = () => {
-  const _parseEvent = (e: PistolsEntity): ActivityState => {
-    let event = e.models.pistols.PlayerActivity
+  const _parseEvent = (e: PistolsEntity, index?: number): ActivityState => {
+    const event = e.models.pistols.PlayerActivity
     return event ? {
       player_address: bigintToHex(event.player_address),
       timestamp: bigintToNumber(event.timestamp),
       activity: parseEnumVariant<constants.Activity>(event.activity),
       identifier: BigInt(event.identifier),
       is_public: event.is_public,
+      index: index ?? 0,
     } : undefined
   }
   return create<State>()(immer((set) => ({
@@ -39,7 +41,9 @@ const createStore = () => {
     setEvents: (events: PistolsEntity[]) => {
       // console.log("setHistoricalEvents() =>", events)
       set((state: State) => {
-        state.playerActivity = arrayClean(events.map(e => _parseEvent(e))).sort((a, b) => (a.timestamp - b.timestamp))
+        state.playerActivity = arrayClean(events.map((e, i) => _parseEvent(e, i)))
+          // .sort((a, b) => (a.timestamp - b.timestamp))
+          .sort((a, b) => ((a.timestamp != b.timestamp) ? (a.timestamp - b.timestamp) : (b.index - a.index)))
       })
     },
     updateEvent: (e: PistolsEntity) => {
