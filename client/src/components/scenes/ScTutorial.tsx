@@ -17,9 +17,11 @@ import { CARD_PACK_SIZE, MAX_TILT } from '/src/data/cardConstants'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { SettingsActions, useSettings } from '/src/hooks/SettingsContext'
 
 export default function ScTutorial({ currentTutorialScene }: { currentTutorialScene: string }) {
   // Scene & Context
+  const { dispatchSetting } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
   const { tutorialOpener, dispatchSetTutorialLevel } = usePistolsContext()
   
@@ -133,6 +135,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
 
   function goToRealDuel(duelistId: number) {
     //TODO create challenge against bot with matchmaking and navigatge there with a selected duelist 
+    dispatchSetting(SettingsActions.TUTORIAL_LEVEL, 3)
     dispatchSetScene(SceneName.Tavern)
   }
 

@@ -261,7 +261,6 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     instantFlip={true}
                     isHanging={true}
                     isHighlightable={true}
-                    isDisabled={isDead(Number(duelistIdA))}
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
                     onClick={() => dispatchSelectDuelistId(duelistId)}

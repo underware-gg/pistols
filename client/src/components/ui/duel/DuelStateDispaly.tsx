@@ -52,7 +52,7 @@ export default function DuelStateDisplay({
       {(isTutorial && isFinishedTutorial && animated == AnimationState.Finished) &&  //TODO replace with the sheet of paper that represents the duel and modify to better show outcome, add maybe a winner glow animation around profile picture
         <Segment style={{ position: 'absolute', top: '50%' }}>
           <h3 className='Important' style={{ fontSize: aspectWidth(1.3) }}>{challengeDescription}</h3>
-          <ActionButton large fill label='Close' onClick={() => handleContinue()} />
+          <ActionButton large fill label='Continue' onClick={() => handleContinue()} />
         </Segment>
       }
     </>
