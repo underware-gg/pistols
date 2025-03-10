@@ -154,7 +154,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   }, [sealClicked]);
 
   const getLinePosition = (index: number, numCards: number) => {
-    const totalWidth = aspectWidth(80);
+    const totalWidth = aspectWidth(16 * numCards);
     const sectionWidth = totalWidth / numCards;
     
     let adjustedIndex;

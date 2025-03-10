@@ -39,7 +39,6 @@ export default function ScProfile() {
           (_currentScene as InteractibleScene).setClickable(false);
           break
         case 'chest':
-          console.log('chest')
           shopOpener.open({ packType: constants.PackType.Duelists5x })
           break
       }

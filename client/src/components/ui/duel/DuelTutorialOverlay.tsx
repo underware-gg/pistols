@@ -72,6 +72,23 @@ export default function DuelTutorialOverlay({ tutorialType, opener, onComplete }
 
   const isLastSlide = currentTutorialIndex === tutorialParts.length - 1 && currentSlide === totalSlides - 1
 
+  useEffect(() => {
+    if (!opener.isOpen) return
+
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.code === 'Space') {
+        if (isLastSlide) {
+          _close()
+        } else {
+          handleNext()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [opener.isOpen, isLastSlide, _close, handleNext])
+
   return (
     <Modal
       open={opener.isOpen}

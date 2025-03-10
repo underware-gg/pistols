@@ -101,7 +101,6 @@ export default function ScDuelsBoard() {
       const rotation = Math.random() * 10 - 5 + (index - 2) * 5
       const position = getStartPosition(index)
 
-      console.log('index', duel, 'rotation', rotation, 'position', position)
       return (
         <div 
           key={duel} 

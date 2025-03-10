@@ -173,10 +173,6 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
     return name ? Math.floor(name.length / 10) : 31
   }
 
-  useEffect(() => {
-    console.log('showBack', props.showBack)
-  }, [props.showBack])
-
   return (
     <InteractibleComponent
       width={aspectWidth(props.width)}
@@ -274,7 +270,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                     </Grid>
                   </GridColumn>
                 </Grid>
-                <div className={`duels-button-container double ${props.isAnimating ? '' : 'visible'}`}>
+                <div className={`duels-button-container ${isYou ? 'single' : 'double'} ${props.isAnimating ? '' : 'visible'}`}>
                   <ActionButton 
                     className='NoMargin YesMouse' 
                     large 
@@ -306,7 +302,6 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
               important={false}
               label='Hide Duels'
               onClick={() => {
-                console.log('hide duels')
                 props.animateFlip(false)
               }} 
             />

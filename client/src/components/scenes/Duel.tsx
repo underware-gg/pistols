@@ -15,7 +15,7 @@ import { useSyncToActiveDuelists } from '/src/hooks/useSyncDuelist'
 import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
 import { DojoSetupErrorDetector } from '../account/ConnectionDetector'
 import { EnvironmentCardsTextures } from '/src/data/cardAssets'
-import { AnimationState, SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
+import { AnimationState } from '/src/three/game'
 import { Action } from '/src/utils/pistols'
 import { MenuDuel, MenuDuelControl } from '/src/components/Menus'
 import { MenuDebugAnimations } from '/src/components/MenusDebug'
@@ -162,13 +162,11 @@ export default function Duel({
       if(completedStagesA[DuelStage.Round1Reveal] && completedStagesB[DuelStage.Round1Reveal]) return
       if (!isYouA) {
         if (completedStagesA[DuelStage.Round1Commit] && !hasSpawnedCardsA.current) {
-          hasSpawnedCardsA.current = true
           cardRef.current?.spawnCards('A', { fire: constants.PacesCard.None, dodge: constants.PacesCard.None, blade: constants.BladesCard.None, tactics: constants.TacticsCard.None })
         }
       }
       if (!isYouB) {
         if (completedStagesB[DuelStage.Round1Commit] && !hasSpawnedCardsB.current) {
-          hasSpawnedCardsB.current = true
           cardRef.current?.spawnCards('B', { fire: constants.PacesCard.None, dodge: constants.PacesCard.None, blade: constants.BladesCard.None, tactics: constants.TacticsCard.None })
         }
       }

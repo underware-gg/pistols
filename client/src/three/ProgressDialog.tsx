@@ -642,8 +642,6 @@ export class ProgressDialogManager {
         ? dialogAProps.opponentText
         : dialogAProps.messages[messageIndex]
 
-      console.log('messageA', messageA)
-
       this.dialogA.updateElementData(dialogAProps.isThinkingBubble, messageA)
     }
 
@@ -656,8 +654,6 @@ export class ProgressDialogManager {
         : dialogBProps.isThinkingBubble
         ? dialogBProps.opponentText
         : dialogBProps.messages[messageIndex]
-
-      console.log('messageB', messageB)
 
       this.dialogB.updateElementData(dialogBProps.isThinkingBubble, messageB)
     }
