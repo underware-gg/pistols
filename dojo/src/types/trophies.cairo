@@ -113,9 +113,9 @@ pub impl TrophyImpl of TrophyTrait {
     #[inline]
     fn icon(self: @Trophy) -> felt252 {
         match self {
-            Trophy::None        => 'circle-question',
-            Trophy::FirstBlood  => 'droplet',
-            Trophy::Collector   => 'briefcase-arrow-right',
+            Trophy::None        => 'fa-circle-question',
+            Trophy::FirstBlood  => 'fa-droplet',
+            Trophy::Collector   => 'fa-briefcase-arrow-right',
         }
     }
 
