@@ -28,6 +28,7 @@ import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { SceneName } from '/src/data/assets'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
+import { useGetChallengeRewards } from '../hooks/useChallengeRewards'
 
 
 const Row = Grid.Row
@@ -89,6 +90,11 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { canCollectDuel } = useCanCollectDuel(props.duelId)
   const { challengeDescription } = useChallengeDescription(props.duelId)
   const { description: tableDescription, isSeason, isTutorial } = useTable(tableId)
+
+  const rewardsA = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdA)
+  const rewardsB = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdB)
+  // console.log('rewardsA:', rewardsA)
+  // console.log('rewardsB:', rewardsB)
   
   const { name: playerNameA } = usePlayer(duelistAddressA)
   const { name: playerNameB } = usePlayer(duelistAddressB)

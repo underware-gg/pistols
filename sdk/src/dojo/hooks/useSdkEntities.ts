@@ -33,11 +33,15 @@ type UseSdkEntitiesSubProps = UseSdkEntitiesProps & {
   setEntities: (entities: PistolsEntity[]) => void // stores set callback (erases previous state)
   updateEntity: (entities: PistolsEntity) => void // store update callback
 }
+
+export type UseSdkEventsProps = UseSdkEntitiesProps & {
+  historical: boolean
+}
 type UseSdkEventsGetProps = UseSdkEntitiesGetProps & {
-  historical?: boolean
+  historical: boolean
 }
 type UseSdkEventsSubProps = UseSdkEntitiesSubProps & {
-  historical?: boolean
+  historical: boolean
 }
 
 type SdkEntitiesCallbackResponse = {
@@ -142,8 +146,8 @@ export const useSdkEntitiesSub = ({
 export const useSdkEventsGet = ({
   query,
   setEntities,
+  historical,
   enabled = true,
-  historical = true,
 }: UseSdkEventsGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
@@ -176,8 +180,8 @@ export const useSdkEventsSub = ({
   query,
   setEntities,
   updateEntity,
+  historical,
   enabled = true,
-  historical = true,
 }: UseSdkEventsSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()

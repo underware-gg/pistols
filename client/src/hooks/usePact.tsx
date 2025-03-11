@@ -1,7 +1,7 @@
 import { useMemo, useEffect } from 'react'
 import { BigNumberish } from 'starknet'
 import { isPositiveBigint, bigintToU256, stringToFelt, bigintToHex } from '@underware_gg/pistols-sdk/utils'
-import { getEntityMapModels, formatQueryValue, useSdkStateSub } from '@underware_gg/pistols-sdk/dojo'
+import { getEntityMapModels, formatQueryValue, useSdkStateEntitiesSub } from '@underware_gg/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
 import { models } from '@underware_gg/pistols-sdk/pistols/gen'
 
@@ -50,7 +50,7 @@ export const usePact = (table_id: string, address_a: BigNumberish, address_b: Bi
       : null
   ), [table_id, pair])
 
-  const { entities } = useSdkStateSub({
+  const { entities } = useSdkStateEntitiesSub({
     query,
   })
   const pacts = useMemo(() => getEntityMapModels<models.Pact>(entities, 'Pact'), [entities])
