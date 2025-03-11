@@ -86,19 +86,10 @@ export default function ScDuelists() {
   }
 
   const getCurrentPagePosters = (ids: string[]) => {
-    const realPosters = ids.slice(
+    return ids.slice(
       pageNumber * postersPerPage, 
       (pageNumber + 1) * postersPerPage
     )
-    
-    // Fill remaining slots with random fake addresses
-    const fakePosters = Array(postersPerPage - realPosters.length).fill(null).map(() => {
-      const bytes = new Uint8Array(20)
-      crypto.getRandomValues(bytes)
-      return '0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
-    })
-
-    return [...realPosters, ...fakePosters].slice(0, 5)
   }
 
   const hasPageContentChanged = (oldIds: string[], newIds: string[]) => {
