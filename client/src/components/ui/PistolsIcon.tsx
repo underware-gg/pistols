@@ -4,7 +4,7 @@ import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon
 import { ActionEmojis, ActionNames } from '/src/utils/pistols'
 import { EmojiIcon, _downSize } from '/src/components/ui/Icons'
 import { EMOJI } from '/src/data/messages'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export function PacesIcon({
   paces,

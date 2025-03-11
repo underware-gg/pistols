@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useAccount } from '@starknet-react/core'
-import { useLordsBalance, useLordsFaucet } from '@underware_gg/pistols-sdk/dojo'
+import { useLordsBalance, useLordsFaucet } from '@underware/pistols-sdk/dojo'
 
 //
 // mint mock lords if balance is zero

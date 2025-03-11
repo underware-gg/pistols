@@ -1,9 +1,9 @@
 import { useMemo, useEffect } from 'react'
 import { BigNumberish } from 'starknet'
-import { isPositiveBigint, bigintToU256, stringToFelt, bigintToHex } from '@underware_gg/pistols-sdk/utils'
-import { getEntityMapModels, formatQueryValue, useSdkStateEntitiesSub } from '@underware_gg/pistols-sdk/dojo'
-import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
-import { models } from '@underware_gg/pistols-sdk/pistols/gen'
+import { isPositiveBigint, bigintToU256, stringToFelt, bigintToHex } from '@underware/pistols-sdk/utils'
+import { getEntityMapModels, formatQueryValue, useSdkStateEntitiesSub } from '@underware/pistols-sdk/dojo'
+import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
+import { models } from '@underware/pistols-sdk/pistols/gen'
 
 
 // IMPORTANT!!!

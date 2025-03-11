@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
-import { duelist_token, duel_token, SvgRenderOptions } from '@underware_gg/pistols-sdk/pistols/tokens'
-import { map } from '@underware_gg/pistols-sdk/utils'
+import { duelist_token, duel_token, SvgRenderOptions } from '@underware/pistols-sdk/pistols/tokens'
+import { map } from '@underware/pistols-sdk/utils'
 import App from '/src/components/App'
 
 // const Row = Grid.Row

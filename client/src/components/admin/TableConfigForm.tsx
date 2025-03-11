@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useAdminAmIOwner } from '/src/hooks/usePistolsContractCalls'
 import { FormInput, FormCheckbox, FormSelectFromMap } from '/src/components/ui/Form'
 import { TableSwitcher } from '/src/components/modals/TableModal'
 import { Balance } from '/src/components/account/Balance'
-import { bigintToHex, isBigint, isNumeric, feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex, isBigint, isNumeric, feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@underware/pistols-sdk/utils'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 const Row = Table.Row
 const Cell = Table.Cell

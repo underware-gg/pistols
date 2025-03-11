@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { lookupAddresses } from '@cartridge/controller'
 import { usePlayerStore } from '/src/stores/playerStore'
-import { useStarknetContext, useConnectedController, supportedConnetorIds } from '@underware_gg/pistols-sdk/dojo'
+import { useStarknetContext, useConnectedController, supportedConnetorIds } from '@underware/pistols-sdk/dojo'
 
 
 //------------------------------------------------------

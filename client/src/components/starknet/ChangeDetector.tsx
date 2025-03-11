@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
-import { useStarknetContext } from '@underware_gg/pistols-sdk/dojo'
-import { bigintEquals, bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { bigintEquals, bigintToHex } from '@underware/pistols-sdk/utils'
 
 export function AccountChangeDetector({
   onChange,

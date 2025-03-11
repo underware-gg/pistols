@@ -1,5 +1,5 @@
 {
-  "name": "@underware_gg/pistols-at-dawn",
+  "name": "@underware/pistols-at-dawn",
   "version": "0.13.1",
   "description": "Pistols at Dawn JS client",
   "homepage": "https://github.com/underware-gg/pistols",
@@ -16,8 +16,8 @@
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest run",
     "test:watch": "vitest",
-    "generate-constants": "npx --package=@underware_gg/pistols-sdk generate-constants --src:\"../dojo/src\" --out:\"$npm_config_sdk/generated/constants.ts\"",
-    "generate-controller-preset": "npx --package=@underware_gg/pistols-sdk generate-controller-preset --out:\"$npm_config_sdk/generated/preset.json\""
+    "generate-constants": "npx --package=@underware/pistols-sdk generate-constants --src:\"../dojo/src\" --out:\"$npm_config_sdk/generated/constants.ts\"",
+    "generate-controller-preset": "npx --package=@underware/pistols-sdk generate-controller-preset --out:\"$npm_config_sdk/generated/preset.json\""
   },
   "keywords": [
     "pistols at dawn",
@@ -38,7 +38,7 @@
     "@starknet-react/chains": "catalog:",
     "@starknet-react/core": "catalog:",
     "@tweenjs/tween.js": "^21.0.0",
-    "@underware_gg/pistols-sdk": "workspace:*",
+    "@underware/pistols-sdk": "workspace:*",
     "event-emitter": "^0.3.5",
     "get-starknet-core": "catalog:",
     "immer": "catalog:",

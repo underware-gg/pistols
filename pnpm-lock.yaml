@@ -116,7 +116,7 @@ importers:
       '@tweenjs/tween.js':
         specifier: ^21.0.0
         version: 21.1.1
-      '@underware_gg/pistols-sdk':
+      '@underware/pistols-sdk':
         specifier: workspace:*
         version: link:../sdk
       event-emitter:
@@ -231,7 +231,7 @@ importers:
       '@dojoengine/core':
         specifier: 'catalog:'
         version: 1.2.4(bufferutil@4.0.9)(typescript@5.7.2)(utf-8-validate@5.0.10)
-      '@underware_gg/pistols-sdk':
+      '@underware/pistols-sdk':
         specifier: workspace:*
         version: link:../sdk
       chalk:

@@ -1,9 +1,9 @@
 import { BigNumberish } from 'starknet'
 import { EMOJI } from '/src/data/messages'
 import { SceneName } from '/src/data/assets'
-import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
-import { makeCharacterDuelistId } from '@underware_gg/pistols-sdk/pistols'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { makeCharacterDuelistId } from '@underware/pistols-sdk/pistols'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 
 //------------------------------------------

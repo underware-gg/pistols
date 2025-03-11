@@ -1,5 +1,5 @@
 {
-  "name": "@underware_gg/pistols-dreams",
+  "name": "@underware/pistols-dreams",
   "version": "0.13.1",
   "description": "Pistols at Dawn Daydreams Agents",
   "homepage": "https://github.com/underware-gg/pistols",
@@ -25,7 +25,7 @@
   "dependencies": {
     "@dojoengine/core": "catalog:",
     "@daydreamsai/core": "catalog:",
-    "@underware_gg/pistols-sdk": "workspace:*",
+    "@underware/pistols-sdk": "workspace:*",
     "chalk": "^5.4.1",
     "dotenv": "^16.4.7",
     "zod": "^3.24.1"

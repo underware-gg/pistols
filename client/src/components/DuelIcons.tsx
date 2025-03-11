@@ -4,10 +4,10 @@ import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon
 import { DuelStage, useDuel } from '/src/hooks/useDuel'
 import { CompletedIcon, EmojiIcon, LoadingIcon } from '/src/components/ui/Icons'
 import { BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
-import { bigintEquals } from '@underware_gg/pistols-sdk/utils'
+import { bigintEquals } from '@underware/pistols-sdk/utils'
 import { EMOJI } from '/src/data/messages'
 import { BigNumberish } from 'starknet'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 const Row = Grid.Row
 const Col = Grid.Column

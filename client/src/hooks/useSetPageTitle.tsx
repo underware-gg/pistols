@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
+import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { getPlayerName } from '/src/stores/playerStore'
 import { SceneName } from '/src/data/assets'
 

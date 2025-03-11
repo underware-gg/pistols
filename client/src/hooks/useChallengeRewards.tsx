@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware_gg/pistols-sdk/pistols'
-import { useSdkStateEventsGet, formatQueryValue, getEntityMapModels } from '@underware_gg/pistols-sdk/dojo'
-import { isPositiveBigint, weiToEth } from '@underware_gg/pistols-sdk/utils'
-import { models } from '@underware_gg/pistols-sdk/pistols/gen'
+import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols'
+import { useSdkStateEventsGet, formatQueryValue, getEntityMapModels } from '@underware/pistols-sdk/dojo'
+import { isPositiveBigint, weiToEth } from '@underware/pistols-sdk/utils'
+import { models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useGetChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNumberish) => {
   const query = useMemo<PistolsQueryBuilder>(() => (

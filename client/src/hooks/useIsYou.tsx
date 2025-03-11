@@ -3,9 +3,9 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
-import { bigintEquals, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
+import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { PLAYER_CHARACTER_ID } from '/src/utils/pistols'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export const useIsMyAccount = (otherAddress: BigNumberish) => {
   const { address } = useAccount()

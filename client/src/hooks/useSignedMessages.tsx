@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import { Account, BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useSdkPublishTypedData, useStarknetContext } from '@underware_gg/pistols-sdk/dojo'
+import { useSdkPublishTypedData, useStarknetContext } from '@underware/pistols-sdk/dojo'
 import {
   make_typed_data_PlayerBookmark,
   make_typed_data_PlayerOnline,
-} from '@underware_gg/pistols-sdk/pistols'
+} from '@underware/pistols-sdk/pistols'
 
 
 export function usePlayerOnlineSignedMessage(timestamp: number) {

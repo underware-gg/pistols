@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { useTableId } from '/src/stores/configStore'
-import { formatQueryValue, useSdkEntitiesGet } from '@underware_gg/pistols-sdk/dojo'
-import { useMounted } from '@underware_gg/pistols-sdk/utils/hooks'
-import { stringToFelt } from '@underware_gg/pistols-sdk/utils'
-import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
+import { formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { useMounted } from '@underware/pistols-sdk/utils/hooks'
+import { stringToFelt } from '@underware/pistols-sdk/utils'
+import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
 

@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useDojoSystem } from '@underware_gg/pistols-sdk/dojo'
-import { poseidon } from '@underware_gg/pistols-sdk/utils'
+import { useDojoSystem } from '@underware/pistols-sdk/dojo'
+import { poseidon } from '@underware/pistols-sdk/utils'
 
 export const usePackTokenContract = () => {
   const { contractAddress: packContractAddress } = useDojoSystem('pack_token')

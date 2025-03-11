@@ -5,9 +5,9 @@ import { useAccount } from '@starknet-react/core'
 import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
-import { PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
-import { bigintEquals, isPositiveBigint, keysToEntityId, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
+import { PistolsEntity } from '@underware/pistols-sdk/pistols'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { bigintEquals, isPositiveBigint, keysToEntityId, parseEnumVariant } from '@underware/pistols-sdk/utils'
 import { BigNumberish } from 'starknet'
 
 

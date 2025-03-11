@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import { BigNumberish, CairoCustomEnum } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
-import { useClientTimestamp, useEntityId } from '@underware_gg/pistols-sdk/utils/hooks'
-import { isPositiveBigint, parseCustomEnum, bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
-import { PistolsSchemaType, getProfileDescription } from '@underware_gg/pistols-sdk/pistols'
-import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
+import { useEntityModel } from '@underware/pistols-sdk/dojo'
+import { useClientTimestamp, useEntityId } from '@underware/pistols-sdk/utils/hooks'
+import { isPositiveBigint, parseCustomEnum, bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { PistolsSchemaType, getProfileDescription } from '@underware/pistols-sdk/pistols'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();

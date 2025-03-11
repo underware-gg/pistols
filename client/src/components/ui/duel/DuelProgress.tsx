@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Image } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useRevealAction, useSignAndRestoreMovesFromHash } from '/src/hooks/useRevealAction'
 import { useIsMyDuelist } from '/src/hooks/useIsYou'

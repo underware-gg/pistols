@@ -5,7 +5,7 @@ import { InteractibleScene } from '/src/three/InteractibleScene'
 import { SceneName, TextureName } from '/src/data/assets'
 import { ANIMATION_TIME_PER_LETTER, DELAY_BETWEEN_TEXTS, DELAY_BETWEEN_SPEECH, TUTORIAL_SCENE_DATA, TutorialScene, TutorialText, DuelTutorialLevel } from '/src/data/tutorialConstants'
 import { AUDIO_ASSETS } from '/src/data/audioAssets'
-import { useConnectToSelectedNetwork, useDojoStatus, useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
+import { useConnectToSelectedNetwork, useDojoStatus, useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useTutorialLevel, useTutorialPlayerId } from '/src/hooks/useTutorial'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useGameEvent } from '/src/hooks/useGameEvent'
@@ -16,7 +16,7 @@ import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
 import { CARD_PACK_SIZE, MAX_TILT } from '/src/data/cardConstants'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export default function ScTutorial({ currentTutorialScene }: { currentTutorialScene: string }) {
   // Scene & Context

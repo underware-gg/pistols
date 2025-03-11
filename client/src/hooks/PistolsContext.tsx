@@ -2,7 +2,7 @@ import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEf
 import { useNavigate, useSearchParams, useLocation, useParams } from 'react-router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
-import { bigintToHex, bigintToDecimal, isPositiveBigint, poseidon, bigintEquals } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex, bigintToDecimal, isPositiveBigint, poseidon, bigintEquals } from '@underware/pistols-sdk/utils'
 import { CommitMoveMessage } from '/src/utils/salt'
 import { DuelTutorialLevel, tutorialScenes } from '/src/data/tutorialConstants'
 import { SceneName } from '/src/data/assets'

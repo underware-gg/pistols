@@ -6,13 +6,13 @@ import { useTableId } from '/src/stores/configStore'
 import { useTable } from '/src/stores/tableStore'
 import { useTableTotals, useTableActiveDuelistIds } from '/src/hooks/useTable'
 import { useCanJoin } from '/src/hooks/usePistolsContractCalls'
-import { useMounted } from '@underware_gg/pistols-sdk/utils/hooks'
-import { getObjectKeyByValue } from '@underware_gg/pistols-sdk/utils'
+import { useMounted } from '@underware/pistols-sdk/utils/hooks'
+import { getObjectKeyByValue } from '@underware/pistols-sdk/utils'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { RowDivider } from '/src/components/ui/Stack'
 import { Opener } from '/src/hooks/useOpener'
 import { Divider } from '/src/components/ui/Divider'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 const Row = Grid.Row
 const Col = Grid.Column

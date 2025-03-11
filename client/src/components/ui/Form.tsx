@@ -3,7 +3,7 @@
 
 import React, { useMemo } from 'react'
 import { Checkbox, Dropdown, Input } from 'semantic-ui-react'
-import { getObjectKeyByValue, isNumber } from '@underware_gg/pistols-sdk/utils'
+import { getObjectKeyByValue, isNumber } from '@underware/pistols-sdk/utils'
 
 export function FormInput({
   label,

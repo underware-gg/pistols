@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react'
 import { Image, SemanticFLOATS } from 'semantic-ui-react'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 
 export const ProfileTypeFolder: Record<constants.ProfileType, string> = {

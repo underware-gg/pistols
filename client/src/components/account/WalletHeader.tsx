@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { Grid, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
-import { useLordsContract, useStarknetContext, useConnectedController, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
+import { useLordsContract, useStarknetContext, useConnectedController, getConnectorIcon } from '@underware/pistols-sdk/dojo'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { FoolsBalance, LordsBalance } from '/src/components/account/LordsBalance'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'

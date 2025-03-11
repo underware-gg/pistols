@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useLordsBalance, useEtherBalance } from '@underware_gg/pistols-sdk/dojo'
+import { useLordsBalance, useEtherBalance } from '@underware/pistols-sdk/dojo'
 import { useFoolsBalance } from '/src/hooks/useFools'
 import { useFameBalance, useFameBalanceDuelist } from '/src/hooks/useFame'
 import { Balance } from '/src/components/account/Balance'

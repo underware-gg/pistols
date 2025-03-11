@@ -1,6 +1,6 @@
 import { AccountInterface, BigNumberish, StarknetDomain } from 'starknet'
-import { poseidon, bigintToHex, signMessages, Messages } from '@underware_gg/pistols-sdk/utils'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { poseidon, bigintToHex, signMessages, Messages } from '@underware/pistols-sdk/utils'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export interface CommitMoveMessage extends Messages {
   duelId: bigint,

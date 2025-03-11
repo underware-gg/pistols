@@ -1,6 +1,6 @@
 import { BigNumberish } from 'starknet'
-import { useDojoSystem } from '@underware_gg/pistols-sdk/dojo'
-import { useERC20Balance } from '@underware_gg/pistols-sdk/utils/hooks'
+import { useDojoSystem } from '@underware/pistols-sdk/dojo'
+import { useERC20Balance } from '@underware/pistols-sdk/utils/hooks'
 
 export const useFoolsContract = () => {
   const { contractAddress: foolsContractAddress, abi } = useDojoSystem('fools_coin')
