@@ -42,15 +42,16 @@ export const isNumeric = (v: string | null): boolean => (v != null && /^\d+$/.te
 
 export const keysToEntityId = (keys: BigNumberish[]): string => (getEntityIdFromKeys(keys.map(v => BigInt(v ?? 0))) as string)
 
-export const shortAddress = (address: string | null, small: boolean = false) => {
+export const shortAddress = (address: bigint | string | null, small: boolean = false) => {
+  const _address = (typeof address === 'bigint') ? bigintToHex(address) : address
   const addresLength = small ? 7 : 12
   const sliceStart = small ? 2 : 6
   const sliceEnd = small ? 3 : 4
   return (
-    !address ? '?'
-      : !address.startsWith('0x') ? `(${address})`  // not hex
-        : address.length < addresLength ? address             // size is good
-          : `${address.slice(0, sliceStart)}..${address.slice(-sliceEnd)}`
+    !_address ? '?'
+      : !_address.startsWith('0x') ? `(${_address})`  // not hex
+        : _address.length < addresLength ? _address             // size is good
+          : `${_address.slice(0, sliceStart)}..${_address.slice(-sliceEnd)}`
   )
 }
 
