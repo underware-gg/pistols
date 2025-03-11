@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Container, Grid, Icon } from 'semantic-ui-react'
 import { CustomIcon, EmojiIcon } from '/src/components/ui/Icons'
 import { ArchetypeIcon, BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
-import { LordsBagIcon } from '/src/components/account/Balance'
+import { FameIcon, FoolsIcon, LordsBagIcon } from '/src/components/account/Balance'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import App from '/src/components/App'
@@ -81,14 +81,14 @@ export default function IconsTestPage() {
 
           <Row columns={'equal'}>
             <Col>
-              <CustomIcon name='lords_bag' logo png size='mini' />
-              <CustomIcon name='lords_bag' logo png size='tiny' />
-              <CustomIcon name='lords_bag' logo png size='small' />
-              <CustomIcon name='lords_bag' logo png />
-              <CustomIcon name='lords_bag' logo png size='large' />
-              <CustomIcon name='lords_bag' logo png size='big' />
-              <CustomIcon name='lords_bag' logo png size='huge' />
-              <CustomIcon name='lords_bag' logo png size='massive' />
+              <CustomIcon name='lords_bag' logo svg size='mini' />
+              <CustomIcon name='lords_bag' logo svg size='tiny' />
+              <CustomIcon name='lords_bag' logo svg size='small' />
+              <CustomIcon name='lords_bag' logo svg />
+              <CustomIcon name='lords_bag' logo svg size='large' />
+              <CustomIcon name='lords_bag' logo svg size='big' />
+              <CustomIcon name='lords_bag' logo svg size='huge' />
+              <CustomIcon name='lords_bag' logo svg size='massive' />
             </Col>
           </Row>
 
@@ -103,6 +103,34 @@ export default function IconsTestPage() {
               <LordsBagIcon size='big' />
               <LordsBagIcon size='huge' />
               <LordsBagIcon size='massive' />
+            </Col>
+          </Row>
+
+          <Row columns={'equal'}>
+            <Col>
+              <FoolsIcon size='mini' />
+              <FoolsIcon size='tiny' />
+              <FoolsIcon size='small' />
+              <FoolsIcon size='small' />
+              <FoolsIcon />
+              <FoolsIcon size='large' />
+              <FoolsIcon size='big' />
+              <FoolsIcon size='huge' />
+              <FoolsIcon size='massive' />
+            </Col>
+          </Row>
+
+          <Row columns={'equal'}>
+            <Col>
+              <FameIcon size='mini' />
+              <FameIcon size='tiny' />
+              <FameIcon size='small' />
+              <FameIcon size='small' />
+              <FameIcon />
+              <FameIcon size='large' />
+              <FameIcon size='big' />
+              <FameIcon size='huge' />
+              <FameIcon size='massive' />
             </Col>
           </Row>
 

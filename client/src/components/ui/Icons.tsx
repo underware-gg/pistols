@@ -264,7 +264,8 @@ interface CustomIconProps {
   name: SemanticICONS | string,   // name of icon, logo, or Icon
   icon?: boolean,			  // if the svg is on /icons/
   logo?: boolean,			  // if the svg is on /logos/
-  png?: boolean,        // png extension
+  png?: boolean,        // use pure png file
+  svg?: boolean,        // use pure svg file
   alt?: string,
   // <Icon> fallback
   // optionals
@@ -281,6 +282,7 @@ export function CustomIcon({
   icon = false,
   logo = false,
   png = false,
+  svg = false,
   alt = undefined,    // TODO: add tooltip
   name = 'avante',
   className = null,
@@ -301,14 +303,14 @@ export function CustomIcon({
     }
 
     // png
-    if (png) {
+    if (png || svg) {
       let _style = {
         backgroundImage: `url(${_url})`,
       }
       return (
         <i className={`${className} icon ${size} NoMargin Relative`}>
           {' '}
-          <div className='CustomIconPng' style={_style} />
+          <div className={png ? 'CustomIconPng' : 'CustomIconSvg'} style={_style} />
         </i>
       )
     }

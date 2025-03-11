@@ -18,18 +18,20 @@ export function EtherIcon({
 export function LordsBagIcon({
   size = null,
 }: CoinIconProps) {
-  return <CustomIcon logo png name='lords_bag' size={size} alt='$LORDS' />
+  return <CustomIcon logo svg name='lords_bag' size={size} alt='$LORDS' />
 }
 
 export function FoolsIcon({
   size = null,
 }: CoinIconProps) {
-  return <EmojiIcon emoji={EMOJI.FOOLS} size={size} alt='$FOOLS' />
+  return <CustomIcon logo svg name='fools1' size={size} alt='$FOOLS' />
+  // return <EmojiIcon emoji={EMOJI.FOOLS} size={size} alt='$FOOLS' />
 }
 
 export function FameIcon({
   size = null,
 }: CoinIconProps) {
+  // return <CustomIcon logo svg name='fame1' size={size} alt='$FAME' />
   return <EmojiIcon emoji={EMOJI.FAME} size={size} alt='$FAME' />
 }
 
@@ -99,7 +101,7 @@ export function Balance({
     if (clean) return <></>
     if (ether) return <><EtherIcon size={'small'} />{' '}</>
     if (lords) return <><LordsBagIcon size={null} />{' '}</>
-    if (fools) return <><FoolsIcon size={'small'} />{' '}</>
+    if (fools) return <><FoolsIcon size={null} />{' '}</>
     if (fame) return <><FameIcon size={'small'} />{' '}</>
     return <></>
   }, [clean, lords, fools, fame, ether])
