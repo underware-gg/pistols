@@ -1,7 +1,7 @@
 import { ReactNode, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { CustomIcon, EmojiIcon, IconSizeProp } from '/src/components/ui/Icons'
-import { weiToEthString } from '@underware/pistols-sdk/utils'
+import { weiToEthString } from '@underware/pistols-sdk/utils/starknet'
 import { EMOJI } from '/src/data/messages'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 

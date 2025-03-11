@@ -11,7 +11,7 @@ import {
   RpcProvider,
 } from 'starknet'
 import { bigintToHex, cleanObject, isBigint } from 'src/utils/misc/types'
-import { poseidon } from 'src/utils/misc/starknet'
+import { poseidon } from 'src/utils/starknet/starknet'
 
 export type Messages = { [key: string]: string | BigInt }
 export type Revision = 0 | 1

@@ -3,7 +3,8 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { arrayClean, bigintToHex, bigintToNumber, parseEnumVariant } from '@underware/pistols-sdk/utils'
+import { arrayClean, bigintToHex, bigintToNumber } from '@underware/pistols-sdk/utils'
+import { parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
 
 
 //-----------------------------------------

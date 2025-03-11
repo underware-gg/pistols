@@ -3,7 +3,7 @@ import { Account, AccountInterface } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { useLordsContract } from 'src/dojo/hooks/useLords'
-import { bigintToU256, ethToWei, execute } from 'src/utils/misc/starknet'
+import { bigintToU256, ethToWei, execute } from 'src/utils/starknet/starknet'
 import { bigintToHex } from 'src/utils/misc/types'
 
 export interface FaucetExecuteResult {

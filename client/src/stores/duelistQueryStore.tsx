@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 import { useAccount } from '@starknet-react/core'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { DuelistColumn, SortDirection } from '/src/stores/queryParamsStore'
-import { feltToString, bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { calcWinRatio } from '/src/hooks/useScore'
 import { usePlayer } from '/src/stores/playerStore'
 

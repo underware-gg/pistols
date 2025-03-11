@@ -75,6 +75,10 @@
       "import": "./dist/utils_hooks.js",
       "types": "./dist/utils_hooks.d.ts"
     },
+    "./utils/starknet": {
+      "import": "./dist/utils_starknet.js",
+      "types": "./dist/utils_starknet.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "keywords": [

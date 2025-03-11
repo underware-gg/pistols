@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { getEntityMapModels, formatQueryValue, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils'
+import { parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
 import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 
 

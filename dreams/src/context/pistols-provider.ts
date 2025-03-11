@@ -2,7 +2,8 @@
 
 import { getContractByName } from '@dojoengine/core';
 import { makeDojoAppConfig, NetworkId } from '@underware/pistols-sdk/pistols';
-import { bigintToHex, stringToFelt } from '@underware/pistols-sdk/utils';
+import { bigintToHex } from '@underware/pistols-sdk/utils';
+import { stringToFelt } from '@underware/pistols-sdk/utils/starknet';
 import { constants } from '@underware/pistols-sdk/pistols/gen';
 import { env } from '../env';
 

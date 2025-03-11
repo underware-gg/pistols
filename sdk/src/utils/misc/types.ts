@@ -1,5 +1,4 @@
 import { BigNumberish } from 'starknet'
-import { getEntityIdFromKeys } from '@dojoengine/utils'
 
 //
 // numbers
@@ -39,8 +38,6 @@ export const isPositiveBigint = (v: BigNumberish | null): boolean => {
   try { return (v != null && BigInt(v) > 0n) } catch { return false }
 }
 export const isNumeric = (v: string | null): boolean => (v != null && /^\d+$/.test(v))
-
-export const keysToEntityId = (keys: BigNumberish[]): string => (getEntityIdFromKeys(keys.map(v => BigInt(v ?? 0))) as string)
 
 export const shortAddress = (address: bigint | string | null, small: boolean = false) => {
   const _address = (typeof address === 'bigint') ? bigintToHex(address) : address

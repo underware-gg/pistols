@@ -1,5 +1,6 @@
 import { CairoCustomEnum, BigNumberish, Abi, CallData, Calldata } from 'starknet'
-import { bigintToHex, keysToEntityId } from 'src/utils/misc/types'
+import { keysToEntityId } from 'src/utils/hooks/useEntityId'
+import { bigintToHex } from 'src/utils/misc/types'
 
 export type CustomEnumValue = number | BigNumberish | BigNumberish[] | string
 

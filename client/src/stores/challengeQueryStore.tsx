@@ -1,15 +1,16 @@
 import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
+import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { bigintEquals, isPositiveBigint, keysToEntityId, parseEnumVariant } from '@underware/pistols-sdk/utils'
-import { BigNumberish } from 'starknet'
-
+import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
+import { keysToEntityId } from '@underware/pistols-sdk/utils/hooks'
 
 //-----------------------------------------
 // Stores only the entity ids and sorting data from a challenges query

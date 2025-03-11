@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useAddressFromStarkName } from 'src/utils/hooks/useStarkName'
-import { sanitizedAddress, STARKNET_ADDRESS_LENGTHS, ETHEREUM_ADDRESS_LENGTH } from 'src/utils/misc/starknet'
+import { sanitizedAddress, STARKNET_ADDRESS_LENGTHS, ETHEREUM_ADDRESS_LENGTH } from 'src/utils/starknet/starknet'
 import { arrayLast } from 'src/utils/misc/types'
 
 export const useValidateWalletAddress = (address: BigNumberish) => {

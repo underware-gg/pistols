@@ -7,7 +7,7 @@ import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, parseEnumVariant, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
 
 interface PlayerState {
   player_address: string

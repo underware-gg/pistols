@@ -4,7 +4,7 @@ import { createDojoStore } from '@dojoengine/sdk/react'
 import { useDojoSystem, useEntityModel } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { makeAbiCustomEnum, makeCustomEnumEntityId } from '@underware/pistols-sdk/utils'
+import { makeAbiCustomEnum, makeCustomEnumEntityId } from '@underware/pistols-sdk/utils/starknet'
 import { usePackType } from '/src/stores/packStore'
 
 export const useBankStore = createDojoStore<PistolsSchemaType>();

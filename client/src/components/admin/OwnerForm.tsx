@@ -4,7 +4,7 @@ import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useAdminAmIOwner, useAdminIsOwner } from '/src/hooks/usePistolsContractCalls'
 import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
-import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/utils'
+import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/utils/starknet'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { FormInput } from '/src/components/ui/Form'
 
