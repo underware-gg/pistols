@@ -593,8 +593,9 @@ pub mod duelist_token {
             killed_by: u128,
             fame_before_death: u128,
         ) {
-            let mut memorial = DuelistMemorial {
+            let memorial = DuelistMemorial {
                 duelist_id,
+                player_address: self.owner_of(duelist_id.into()),
                 cause_of_death,
                 killed_by,
                 fame_before_death,
