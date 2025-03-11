@@ -399,17 +399,13 @@
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
   // height: 20%;
-  
-  &.single {
-    bottom: -5vw;
-  }
-
-  &.double {
-    bottom: -8vw;
-  }
 
   &.visible {
     opacity: 1;
+  }
+
+  &.padded {
+    bottom: -5vw;
   }
 }
 

@@ -65,92 +65,6 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   }, [score.total_duels, score.total_losses, score.total_draws])
 
   const baseRef = useRef<InteractibleComponentHandle>(null);
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    if (!canvasRef.current) return;
-    
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d", { alpha: true });
-    
-    const dpr = Math.max(window.devicePixelRatio || 1, 2);
-    const logicalWidth = aspectWidth(props.width);
-    const logicalHeight = aspectWidth(props.height * 0.2);
-    
-    canvas.width = logicalWidth * dpr;
-    canvas.height = logicalHeight * dpr;
-    
-    canvas.style.width = `${logicalWidth}px`;
-    canvas.style.height = `${logicalHeight}px`;
-    
-    ctx.scale(dpr, dpr);
-    
-    const text = name.toUpperCase();
-    const color = "#201a18";
-    const fontFamily = "EB Garamond";
-    const radius = aspectWidth(props.width * 0.4);
-    const rotation = -Math.PI / 2;
-    const arcExtent = 1.35;
-    const desiredLetterSpacing = aspectWidth(props.width * 0.008);
-    
-    let fontSize = aspectWidth(props.width * 0.08);
-    let letterSpacing = desiredLetterSpacing;
-    
-    const arcLength = radius * arcExtent;
-    
-    ctx.font = `1000 ${fontSize}px ${fontFamily}`;
-    const mWidth = ctx.measureText('M').width;
-    const iWidth = ctx.measureText('I').width;
-    const spaceWidth = (mWidth + iWidth) / 2;
-    
-    const totalTextWidth = (spaceWidth * text.length) + 
-                          (desiredLetterSpacing * (text.length - 1));
-    
-    if (totalTextWidth > arcLength) {
-      const scale = arcLength / totalTextWidth;
-      fontSize *= scale;
-      letterSpacing *= scale;
-      ctx.font = `1000 ${fontSize}px ${fontFamily}`;
-    }
-    
-    const finalMWidth = ctx.measureText('M').width;
-    const finalIWidth = ctx.measureText('I').width;
-    const finalSpaceWidth = (finalMWidth + finalIWidth) / 2;
-    const finalTotalWidth = (finalSpaceWidth * text.length) + 
-                           (letterSpacing * (text.length - 1));
-    
-    const startAngle = rotation - (arcExtent / 2);
-    const textStartAngle = startAngle + ((arcExtent - (finalTotalWidth / radius)) / 2) + 0.04;
-    
-    ctx.fillStyle = color;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    
-    ctx.lineWidth = aspectWidth(0.02);
-    ctx.strokeStyle = color;
-    
-    ctx.save();
-    ctx.translate(logicalWidth / 2 - Math.cos(rotation) * radius, logicalHeight / 2 - Math.sin(rotation) * radius - logicalHeight * 0.25);
-    
-    let currentAngle = textStartAngle;
-    for (let i = 0; i < text.length; i++) {
-      const x = Math.cos(currentAngle) * radius;
-      const y = Math.sin(currentAngle) * radius;
-      
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(currentAngle + Math.PI / 2);
-      ctx.strokeText(text[i], 0, 0);
-      ctx.fillText(text[i], 0, 0);
-      ctx.restore();
-      
-      currentAngle += (finalSpaceWidth + letterSpacing) / radius;
-    }
-    
-    ctx.restore();
-  }, [aspectWidth, props.width, props.height, name]);
-
-  
 
   useImperativeHandle(ref, () => ({
     flip: (flipped, isLeft, duration, easing, interpolation) =>
@@ -180,6 +94,10 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const _nameLength = (name: string) => {
     return name ? Math.floor(name.length / 10) : 31
   }
+
+  //Just works this way, ask @mataleone why hahaha - stolen from duelist.tsx
+  const SVG_WIDTH = 771;
+  const SVG_HEIGHT = 1080;
 
   return (
     <InteractibleComponent
@@ -217,7 +135,45 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       }
       childrenInFront={
         <>
-          <canvas ref={canvasRef} />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+            preserveAspectRatio="xMinYMin meet"
+          >
+            <style>
+              {`
+                text{
+                  fill:#200;
+                  text-shadow:0.05rem 0.05rem 2px #2008;
+                  font-size:28px;
+                  font-family:Garamond;
+                  dominant-baseline:middle;
+                  text-anchor:middle;
+                  -webkit-user-select:none;
+                  -moz-user-select:none;
+                  -ms-user-select:none;
+                  user-select:none;
+                }
+                .DuelistNameSVG{
+                  font-weight:bold;
+                  font-variant-caps:small-caps;
+                }
+              `}
+            </style>
+            <path id="circle" d={`M${92},350a200,200 0 1,1 ${SVG_WIDTH - 184},0`} fill="none" stroke="none" />
+            <text 
+              className="DuelistNameSVG" 
+              style={{
+                fontSize: `${Math.min(60, 460 / (name.length * 0.5))}px`
+              }}
+            >
+              <textPath startOffset="50%" xlinkHref="#circle">
+                {name}
+              </textPath>
+            </text>
+          </svg>
+
           {/* <DuelistTokenArt duelistId={props.duelistId} className='Absolute' /> */}
           <div className='InDuelEmoji'>
             {isInAction &&
@@ -285,7 +241,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                     </Grid>
                   </GridColumn>
                 </Grid>
-                <div className={`duels-button-container ${isYou ? 'single' : 'double'} ${props.isAnimating ? '' : 'visible'}`}>
+                <div className={`duels-button-container padded ${props.isAnimating ? '' : 'visible'}`}>
                   <ActionButton 
                     className='NoMargin YesMouse' 
                     large 
@@ -296,11 +252,6 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                       props.animateFlip(true)
                     }} 
                   />
-                  {!isYou && !isDead &&
-                  <div className='YesMouse NoDrag'>
-                    <ChallengeButton challengedPlayerAddress={owner} />
-                  </div>
-                  }
                 </div>
               </>
             )}

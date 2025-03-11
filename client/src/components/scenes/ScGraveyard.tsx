@@ -14,8 +14,8 @@ import { _currentScene } from '/src/three/game'
 
 export default function ScGraveyard() {
   const { address } = useAccount()
-  const { filterStatesPastDuels, filterDuelistName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds } = useQueryChallengeIds(filterStatesPastDuels, filterDuelistName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : address, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { filterStatesPastDuels, filterPlayerName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds } = useQueryChallengeIds(filterStatesPastDuels, filterPlayerName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : address, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()

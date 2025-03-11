@@ -271,7 +271,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     isHighlightable={true}
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
-                    onClick={() => dispatchSelectDuelistId(duelistId)}
+                    onClick={() => dispatchSelectDuelistId(duelistIdA)}
                   />
                 ) : null}
               </div>
@@ -327,7 +327,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     isHighlightable={true}
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
-                    onClick={() => dispatchSelectDuelistId(duelistId)}
+                    onClick={() => dispatchSelectDuelistId(duelistIdB)}
                   />
                 ) : null}
               </div>

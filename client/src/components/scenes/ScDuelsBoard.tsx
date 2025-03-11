@@ -12,8 +12,8 @@ import { _currentScene } from '/src/three/game'
 
 export default function ScDuelsBoard() {
   const { address } = useAccount()
-  const { filterStatesLiveDuels, filterDuelistName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterDuelistName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : address, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { filterStatesLiveDuels, filterPlayerName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds } = useQueryChallengeIds(filterStatesLiveDuels, filterPlayerName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : address, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()

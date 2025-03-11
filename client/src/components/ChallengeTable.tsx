@@ -15,6 +15,7 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { arrayRemoveValue, bigintEquals } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '/src/utils/pistols'
+import { useDuelRequiresAction } from '../stores/eventsStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -30,8 +31,8 @@ export function ChallengeTableSelectedDuelist({
   const [statesFilter, setStatesFilter] = useState(AllChallengeStates)
 
   const { selectedDuelistId } = usePistolsContext()
-  const { filterChallengeSortColumn, filterDuelistName, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds, states } = useQueryChallengeIds(statesFilter, filterDuelistName, false, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds, states } = useQueryChallengeIds(statesFilter, null, false, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
 
   return (
     <div style={{width: '100%', height: '100%',}}>
@@ -57,15 +58,14 @@ function ChallengeTableByIds({
   setStates: (states: constants.ChallengeState[]) => void
 }) {
   const { aspectWidth } = useGameAspect()
-  const { filterDuelistName } = useQueryParams()
 
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} nameFilter={filterDuelistName} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} />)
     })
     return result
-  }, [challengeIds, compact, filterDuelistName])
+  }, [challengeIds, compact])
 
   const { filters, canAdd, canClear } = useMemo(() => {
     let canAdd = false
@@ -160,6 +160,7 @@ function DuelItem({
   const classNameB = useMemo(() => ((turnB && bigintEquals(duelistId, duelistIdB)) ? 'BgImportant' : null), [duelistId, duelistIdB, turnB])
 
   const { dispatchSelectDuel } = usePistolsContext()
+  const isRequiredAction = useDuelRequiresAction(duelId)
 
   const _gotoChallenge = () => {
     dispatchSelectDuel(duelId)
@@ -203,7 +204,7 @@ function DuelItem({
             :
             <>
               <span className={ChallengeStateClasses[state]}>
-                {ChallengeStateNames[state]}
+                {isRequiredAction ? constants.ChallengeState.Awaiting : ChallengeStateNames[state]}
               </span>
             </>
           }

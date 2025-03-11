@@ -114,10 +114,20 @@ export const useQueryChallengeIds = (
         : Object.values(entities)
 
     // get all current states by duelist
-    const states = result.reduce((acc, e) => {
-      if (!acc.includes(e.state)) acc.push(e.state)
-      return acc
-    }, [] as constants.ChallengeState[])
+    const states = [] as constants.ChallengeState[]
+    
+    // add awaiting state if there are required duels
+    if (result.some(e => requiredDuelIds.includes(e.duel_id))) {
+      states.push(constants.ChallengeState.Awaiting)
+    }
+
+    // add remaining states from filtered results
+    result
+          .filter(e => !requiredDuelIds.includes(e.duel_id))
+          .reduce((acc, e) => {
+            if (!acc.includes(e.state)) acc.push(e.state)
+            return acc
+          }, states)
 
     // filter by bookmarked duels
     if (filterBookmarked) {

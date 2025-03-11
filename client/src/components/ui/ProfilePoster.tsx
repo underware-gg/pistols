@@ -21,14 +21,17 @@ import { ChallengeButton } from '/src/components/ui/Buttons'
 const Row = Grid.Row
 const Col = Grid.Column
 
+export const POSTER_WIDTH_BIG = 40
+export const POSTER_HEIGHT_BIG = 90
+export const POSTER_WIDTH_SMALL = 13
+export const POSTER_HEIGHT_SMALL = 32
+
 interface ProfilePosterProps {
   playerAddress?: bigint
   isSmall?: boolean
-  isFlipped?: boolean
   isVisible?: boolean
   isHighlightable?: boolean
   instantVisible?: boolean
-
   startPosition?: { x: number, y: number }
   startRotation?: number
   startScale?: number
@@ -42,7 +45,6 @@ export interface ProfilePosterHandle extends InteractibleComponentHandle {}
 
 export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props: ProfilePosterProps = {
   isSmall: true,
-  isFlipped: true,
   isVisible: false,
   isHighlightable: false,
   instantVisible: false,
@@ -108,10 +110,10 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
 
   return (
     <InteractibleComponent
-      width={aspectWidth(props.isSmall ? 13 : 40)}
-      height={aspectHeight(props.isSmall ? 32 : 90)}
+      width={aspectWidth(props.isSmall ? POSTER_WIDTH_SMALL : POSTER_WIDTH_BIG)}
+      height={aspectHeight(props.isSmall ? POSTER_HEIGHT_SMALL : POSTER_HEIGHT_BIG)}
       isLeft={false}
-      isFlipped={props.isFlipped}
+      isFlipped={true}
       isVisible={props.isVisible}
       isHighlightable={props.isHighlightable}
       instantFlip={true}
@@ -134,7 +136,7 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
             
             <div className='ProfileSection Small'>
               <ProfilePic profilePic={0} width={9} removeCorners borderColor='#201a18' borderWidth={0.3} />
-              <div className='PlayerName Small'>Local Katana 1</div>
+              <div className='PlayerName Small'>{name}</div>
             </div>
           </div>
         ) : (
@@ -209,7 +211,7 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
                 </Col>
                 <Col>
                   {isMyAccount ? <ActionButton large fillParent important label='Manage Profile' onClick={() => dispatchSetScene(SceneName.Profile)} />
-                    : <ChallengeButton challengedPlayerAddress={props.playerAddress} />
+                    : <ChallengeButton challengedPlayerAddress={props.playerAddress} fillParent={true} />
                   }
                 </Col>
               </Row>

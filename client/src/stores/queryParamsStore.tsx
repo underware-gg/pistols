@@ -12,6 +12,11 @@ export enum DuelistColumn {
   WinRatio = 'WinRatio',
 }
 
+export enum PlayerColumn {
+  Name = 'Name',
+  Timestamp = 'Date Joined',
+}
+
 export enum ChallengeColumn {
   Time = 'Time',
   Status = 'Status'
@@ -31,6 +36,12 @@ type State = {
   filterDuelistBookmarked: boolean
   filterDuelistSortColumn: DuelistColumn
   filterDuelistSortDirection: SortDirection
+  // player filters
+  filterPlayerName: string
+  filterPlayerOnline: boolean
+  filterPlayerBookmarked: boolean
+  filterPlayerSortColumn: PlayerColumn
+  filterPlayerSortDirection: SortDirection
   //challenge filters
   filterChallengeSortColumn: ChallengeColumn
   filterChallengeSortDirection: SortDirection
@@ -46,6 +57,13 @@ type State = {
   setFilterDuelistSortColumn: (value: DuelistColumn) => void
   setFilterDuelistSortDirection: (value: SortDirection) => void
   setFilterDuelistSortSwitch: () => void
+  // player setters
+  setFilterPlayerName: (value: string) => void
+  setFilterPlayerOnline: (value: boolean) => void
+  setFilterPlayerBookmarked: (value: boolean) => void
+  setFilterPlayerSortColumn: (value: PlayerColumn) => void
+  setFilterPlayerSortDirection: (value: SortDirection) => void
+  setFilterPlayerSortSwitch: () => void
   // challenge setters
   setFilterChallengeSortColumn: (value: ChallengeColumn) => void
   setFilterChallengeSortDirection: (value: SortDirection) => void
@@ -64,6 +82,12 @@ export const useQueryParams = create<State>((set) => ({
   filterDuelistBookmarked: false,
   filterDuelistSortColumn: DuelistColumn.Honour,
   filterDuelistSortDirection: SortDirection.Descending,
+  // player filters
+  filterPlayerName: '',
+  filterPlayerOnline: false,
+  filterPlayerBookmarked: false,
+  filterPlayerSortColumn: PlayerColumn.Name,
+  filterPlayerSortDirection: SortDirection.Descending,
   // challenge filters
   filterChallengeSortColumn: ChallengeColumn.Time,
   filterChallengeSortDirection: SortDirection.Descending,
@@ -79,6 +103,13 @@ export const useQueryParams = create<State>((set) => ({
   setFilterDuelistSortColumn: (value: DuelistColumn) => set({ filterDuelistSortColumn: value }),
   setFilterDuelistSortDirection: (value: SortDirection) => set({ filterDuelistSortDirection: value }),
   setFilterDuelistSortSwitch: () => set((state: State) => ({ filterDuelistSortDirection: _switchDirection(state.filterDuelistSortDirection) })),
+  // player setters
+  setFilterPlayerName: (value: string) => set({ filterPlayerName: value.toLowerCase() }),
+  setFilterPlayerOnline: (value: boolean) => set({ filterPlayerOnline: value }),
+  setFilterPlayerBookmarked: (value: boolean) => set({ filterPlayerBookmarked: value }),
+  setFilterPlayerSortColumn: (value: PlayerColumn) => set({ filterPlayerSortColumn: value }),
+  setFilterPlayerSortDirection: (value: SortDirection) => set({ filterPlayerSortDirection: value }),
+  setFilterPlayerSortSwitch: () => set((state: State) => ({ filterPlayerSortDirection: _switchDirection(state.filterPlayerSortDirection) })),
   // challenge setters
   setFilterChallengeSortColumn: (value: ChallengeColumn) => set({ filterChallengeSortColumn: value }),
   setFilterChallengeSortDirection: (value: SortDirection) => set({ filterChallengeSortDirection: value }),
