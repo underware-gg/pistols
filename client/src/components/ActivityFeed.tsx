@@ -81,7 +81,7 @@ const ActivityItem = ({
     )
   }
   if (activity.activity === constants.Activity.ChallengeExpired) {
-    return <ActivityItemChallengeExpired activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemChallengeCanceled activity={activity} clientSeconds={clientSeconds} />
   }
   if (activity.activity === constants.Activity.PlayerTimedOut) {
     return <ActivityItemPlayerTimedOut activity={activity} clientSeconds={clientSeconds} />
@@ -247,14 +247,20 @@ const ActivityItemChallengeDraw = ({
   )
 }
 
-const ActivityItemChallengeExpired = ({
+const ActivityItemChallengeCanceled = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
+  const { state } = useChallenge(activity.identifier)
   return (
     <>
       <ChallengeLink duelId={activity.identifier} />
-      {' expired '}
+      {
+        state == constants.ChallengeState.Expired ? ' expired '
+          : state == constants.ChallengeState.Withdrawn ? ' withdrawn '
+            : state == constants.ChallengeState.Refused ? ' refused '
+              : ' canceled '
+      }
       <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
       <br />
     </>
