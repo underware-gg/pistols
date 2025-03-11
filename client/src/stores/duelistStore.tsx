@@ -6,7 +6,6 @@ import { useClientTimestamp, useEntityId } from '@underware_gg/pistols-sdk/utils
 import { isPositiveBigint, parseCustomEnum, bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
 import { PistolsSchemaType, getProfileDescription } from '@underware_gg/pistols-sdk/pistols'
 import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
-import { useScore } from '/src/hooks/useScore'
 import { CharacterType } from '/src/data/assets'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
@@ -37,7 +36,6 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   const duelist = useEntityModel<models.Duelist>(entity, 'Duelist')
   const duelistChallenge = useEntityModel<models.DuelistChallenge>(entity, 'DuelistChallenge')
-  const scoreboard = useEntityModel<models.Scoreboard>(entity, 'Scoreboard')
   // console.log(`useDuelist() =>`, duelist_id, duelist)
 
   const timestampRegistered = useMemo(() => Number(duelist?.timestamps.registered ?? 0), [duelist])
@@ -58,7 +56,6 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   // current duel a duelist is in
   const currentDuelId = useMemo(() => BigInt(duelistChallenge?.duel_id ?? 0), [duelistChallenge])
   const isInAction = useMemo(() => (currentDuelId > 0n), [currentDuelId])
-  const score = useScore(scoreboard?.score)
 
   // profile
   const {
@@ -98,6 +95,5 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     isInAction,
     isInactive,
     inactiveFameDripped,
-    score,
   }
 }

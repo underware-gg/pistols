@@ -26,8 +26,8 @@ export type DuelistSvgProps = {
   duel_id: BigNumberish
 }
 
-// size:    1024w x 1434h
-// resized:  771w x 1080h
+// card size: 1024w x 1434h
+// resized:   771w x 1080h
 const WIDTH = 771;
 const HEIGHT = 1080;
 const HALF_WIDTH = Math.floor(WIDTH / 2);
@@ -52,6 +52,7 @@ const STAT2_Y = (STAT1_Y + STAT_H);
 const STAT3_Y = (STAT2_Y + STAT_H);
 const STAT4_Y = (STAT3_Y + STAT_H);
 const STAT5_Y = (STAT4_Y + STAT_H);
+
 const STAR = '&#11088;' // ⭐️
 
 // const card_square_url = `/textures/cards/card_front_brown.png`

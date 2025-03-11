@@ -1,14 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Image, SemanticFLOATS } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
-import { useDuelist } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
+import { useGetSeasonScoreboard } from '/src/hooks/useScore'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
+import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import * as Constants from '/src/data/cardConstants'
 import * as TWEEN from '@tweenjs/tween.js'
-import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 
 export default function DuelistProfile({
   duelistId,
@@ -25,7 +25,7 @@ export default function DuelistProfile({
   speedFactor: number
   tutorialLevel: DuelTutorialLevel
 }) {
-  const { score } = useDuelist(duelistId)
+  const score = useGetSeasonScoreboard(duelistId)
   const { aspectWidth } = useGameAspect()
 
   const [archetypeImage, setArchetypeImage] = useState<string>()

@@ -1,6 +1,12 @@
 import { useMemo } from 'react'
-import { ArchetypeNames } from '/src/utils/pistols'
+import { BigNumberish } from 'starknet'
+import { useTableId } from '/src/stores/configStore'
+import { getEntityMapModels, useSdkStateEntitiesGet } from '@underware_gg/pistols-sdk/dojo'
+import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware_gg/pistols-sdk/pistols'
+import { isPositiveBigint, stringToFelt } from '@underware_gg/pistols-sdk/utils'
+import { formatQueryValue } from '@underware_gg/pistols-sdk/dojo'
 import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
+import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJI } from '/src/data/messages'
 
 export const calcWinRatio = (total_duels: number, total_wins: number) => (total_duels > 0 ? (total_wins / total_duels) : null)
@@ -39,5 +45,37 @@ export function useScore(score: models.Score | undefined) {
     honourDisplay,
     honourAndTotal,
     winRatio,
+  }
+}
+
+
+export const useGetSeasonScoreboard = (duelist_id: BigNumberish) => {
+  const { tableId } = useTableId()
+  return useGetScoreboard(tableId, duelist_id)
+}
+
+export const useGetScoreboard = (table_id: string, duelist_id: BigNumberish) => {
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    new PistolsQueryBuilder()
+      .withClause(
+        new PistolsClauseBuilder().keys(
+          ["pistols-Scoreboard"],
+          [formatQueryValue(duelist_id), formatQueryValue(stringToFelt(table_id))]
+        ).build()
+      )
+      .withEntityModels(["pistols-Scoreboard"])
+      .includeHashedKeys()
+  ), [table_id, duelist_id])
+
+  const { entities, isLoading } = useSdkStateEntitiesGet({
+    query,
+    enabled: (isPositiveBigint(duelist_id) && Boolean(table_id)),
+  })
+  const scoreboard = useMemo(() => getEntityMapModels<models.Scoreboard>(entities, 'Scoreboard')?.[0], [entities])
+  const score = useScore(scoreboard?.score)
+
+  return {
+    ...score,
+    isLoading,
   }
 }
