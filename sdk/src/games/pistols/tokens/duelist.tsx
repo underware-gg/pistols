@@ -37,17 +37,19 @@ const SLOT_Y = (HEIGHT * 0.505);
 const SLOT_X1 = (WIDTH * 0.11);
 const SLOT_X2 = (WIDTH - SLOT_X1);
 
-const FAME_Y = (HEIGHT * 0.65);
-const BOX_Y = (HEIGHT * 0.7);
+const FAME_Y = (HEIGHT * 0.64);
+const BOX_Y = (HEIGHT * 0.68);
 const BOX_W = (WIDTH * 0.6);
 const BOX_H = 50;
 const BOX_W_MIN = (BOX_H * 2);
 const BOX_GAP = (WIDTH - BOX_W) / 2;
 
+const USERNAME_Y = (HEIGHT * 0.76);
+
 const STAT_W = (WIDTH * 0.35);
-const STAT_H = 40;
+const STAT_H = 36;
 const STAT_GAP = (WIDTH * 0.12);
-const STAT1_Y = (HEIGHT * 0.76);
+const STAT1_Y = (HEIGHT * 0.785);
 const STAT2_Y = (STAT1_Y + STAT_H);
 const STAT3_Y = (STAT2_Y + STAT_H);
 const STAT4_Y = (STAT3_Y + STAT_H);
@@ -135,6 +137,11 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
     // font-size:45px;
     fill:#fff8;
   }
+  .USERNAME{
+    font-size:40px;
+    text-shadow:0.02rem 0.02rem 1px #2008;
+    font-style:italic;
+  }
   .KEY{
     text-anchor:start;
     text-shadow:0.02rem 0.02rem 1px #2008;
@@ -192,13 +199,20 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
 ${_renderStat(STAT_GAP, STAT1_Y, 'ID', `#${props.duelist_id}`)}
 ${_renderStat(STAT_GAP, STAT2_Y, 'Fame', `${props.fame}`)}
 ${_renderStat(STAT_GAP, STAT3_Y, 'State', state)}
-${_renderStat(STAT_GAP, STAT4_Y, 'Dueling', (BigInt(props.duel_id) > 0n ? `Duel #${props.duel_id.toString()}` : 'No'))}
+${BigInt(props.duel_id) > 0n
+  ? _renderStat(STAT_GAP, STAT4_Y, 'Duel', `#${props.duel_id.toString()}`)
+  : _renderStat(STAT_GAP, STAT4_Y, 'Dueling', `No`)
+}
 ${_renderStat(STAT_GAP, STAT5_Y, 'Owner', shortAddress(BigInt(props.owner)))}
-${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT1_Y, 'Duels', `${props.total_duels}`)}
-${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT2_Y, 'Wins', props.total_wins == 0 ? '0' : `${props.total_wins} (${Math.floor((props.total_wins / props.total_duels) * 100)}%)`)}
-${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT3_Y, 'Losses', total_losses == 0 ? '0' : `${(total_losses)} (${Math.floor(((total_losses) / props.total_duels) * 100)}%)`)}
+${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT1_Y, 'Duels', `${props.total_duels || '-'}`)}
+${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT2_Y, 'Wins', props.total_wins == 0 ? '-' : `${props.total_wins} (${Math.floor((props.total_wins / props.total_duels) * 100)}%)`)}
+${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT3_Y, 'Losses', total_losses == 0 ? '-' : `${(total_losses)} (${Math.floor(((total_losses) / props.total_duels) * 100)}%)`)}
 ${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT4_Y, 'Honour', `${(props.honour / 10).toFixed(1)}`)}
 ${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT5_Y, props.archetype != constants.Archetype.Undefined ? `${props.archetype}` : '', '')}
+
+<text class='USERNAME' x='${HALF_WIDTH}' y='${USERNAME_Y}'>
+  ~ ${props.username || 'Unknown'} ~
+</text>
 </svg>
 `;
   // svg = svg.map('\n', '');
