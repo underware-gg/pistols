@@ -98,10 +98,10 @@ pub trait IDuelistTokenPublic<TState> {
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
     // write
-    fn poke(ref self: TState, duelist_id: u128); //@description:Reactivates an inactive Duelist
-    fn sacrifice(ref self: TState, duelist_id: u128); //@description:Sacrifices a Duelist
-    fn memorialize(ref self: TState, duelist_id: u128); //@description:Memorializes a Duelist
-    // fn delete_duelist(ref self: TState, duelist_id: u128);
+    fn poke(ref self: TState, duelist_id: u128); //@description: Reactivates an inactive Duelist
+    fn sacrifice(ref self: TState, duelist_id: u128); //@description: Sacrifices a Duelist
+    fn memorialize(ref self: TState, duelist_id: u128); //@description: Memorializes a Duelist
+    // fn delete_duelist(ref self: TState, duelist_id: u128); //@description: Delete a Duelist
 }
 
 // Exposed to world

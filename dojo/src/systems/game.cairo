@@ -7,22 +7,22 @@ use pistols::types::rules::{RewardValues};
 #[starknet::interface]
 pub trait IGame<TState> {
     // Game actions
-    fn commit_moves( //@description:Commit moves of a Duelist into a Duel
+    fn commit_moves( //@description: Commit moves of a Duelist in a Duel
         ref self: TState,
         duelist_id: u128,
         duel_id: u128,
         hashed: u128,
     );
-    fn reveal_moves( //@description:Reveal moves of a Duelist into a Duel
+    fn reveal_moves( //@description: Reveal moves of a Duelist in a Duel
         ref self: TState,
         duelist_id: u128,
         duel_id: u128,
         salt: felt252,
         moves: Span<u8>,
     );
-    fn clear_required_action(ref self: TState, duelist_id: u128); // @description:Clear the required action call for a duelist
-    fn collect_duel(ref self: TState, duel_id: u128); // @description:Close expired duels
-    fn collect_season(ref self: TState) -> felt252; // @description:Close the current season and start the next one
+    fn clear_required_action(ref self: TState, duelist_id: u128); // @description: Clear the required action call for a duelist
+    fn collect_duel(ref self: TState, duel_id: u128); // @description: Close expired duels
+    fn collect_season(ref self: TState) -> felt252; // @description: Close the current season and start the next one
 
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;

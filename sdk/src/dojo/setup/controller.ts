@@ -11,6 +11,7 @@ import { stringToFelt } from 'src/utils/misc/starknet'
 import { bigintToHex } from 'src/utils/misc/types'
 import { assert } from 'src/utils/misc/math'
 import { getContractByName } from '@dojoengine/core'
+import { INTERFACE_DESCRIPTIONS } from 'src/games/pistols/generated/constants'
 
 
 
@@ -105,9 +106,9 @@ const _makeControllerContractPolicies = (
           if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(entrypoint)) {
             // console.log(`CI:`, item.name, item)
             const method = {
-              // name: `${i.name}()`,
-              // description: `${c.tag}::${i.name}()`,
               entrypoint,
+              // name: `${i.name}()`,
+              description: INTERFACE_DESCRIPTIONS[interfaceName]?.[entrypoint] ?? undefined,
             }
             methods.push(method)
           }

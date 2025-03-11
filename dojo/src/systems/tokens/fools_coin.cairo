@@ -28,7 +28,7 @@ pub trait IFoolsCoin<TState> {
 
 // Exposed to world
 #[starknet::interface]
-trait IFoolsCoinProtected<TState> {
+pub trait IFoolsCoinProtected<TState> {
     fn reward_player(ref self: TState, recipient: ContractAddress, amount: u128);
 }
 

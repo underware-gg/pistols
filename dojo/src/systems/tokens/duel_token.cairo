@@ -90,7 +90,7 @@ pub trait IDuelTokenPublic<TState> {
     fn has_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool;
     fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
     // write
-    fn create_duel(
+    fn create_duel( //@description: Create a Duel, mint its token
         ref self: TState,
         duelist_id: u128,
         challenged_address: ContractAddress,
@@ -100,7 +100,7 @@ pub trait IDuelTokenPublic<TState> {
         expire_hours: u64,
         lives_staked: u8,
     ) -> u128;
-    fn reply_duel(
+    fn reply_duel( //@description: Reply to a Duel (accept or reject)
         ref self: TState,
         duelist_id: u128,
         duel_id: u128,
