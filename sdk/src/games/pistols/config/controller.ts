@@ -17,7 +17,7 @@ export const makePistolsControllerConnector = (networkId: NetworkId): Connector 
   const tokens: Tokens = {
     erc20: [
       getLordsAddress(networkId),
-      getFameAddress(networkId),
+      // getFameAddress(networkId),
       getFoolsAddress(networkId),
     ],
     //@ts-ignore
