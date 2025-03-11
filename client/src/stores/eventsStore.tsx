@@ -31,7 +31,13 @@ export function useRequiredActions() {
   }
 }
 
-export function useDuelRequiredsAction(duel_id: BigNumberish) {
+export function useDuelRequiresAction(duel_id: BigNumberish) {
   const { requiredDuelIds } = useRequiredActions()
   return requiredDuelIds.includes(BigInt(duel_id))
 }
+
+export function useDuelistRequiresAction(duelist_id: BigNumberish) {
+  const { duelPerDuelist } = useRequiredActions()
+  return !!duelPerDuelist[bigintToHex(duelist_id)]
+}
+

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Icon, Grid } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '/src/hooks/useDuel'
@@ -8,6 +8,7 @@ import { bigintEquals } from '@underware_gg/pistols-sdk/utils'
 import { EMOJI } from '/src/data/messages'
 import { BigNumberish } from 'starknet'
 import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { useDuelistRequiresAction, useDuelRequiresAction } from '/src/stores/eventsStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -25,6 +26,8 @@ export function useDuelIcons({
     challenge: { duelistIdA, duelistIdB, winner, isAwaiting, isInProgress, isFinished },
     round1, duelStage, completedStagesA, completedStagesB, turnA, turnB,
   } = useDuel(duelId)
+  const isRequiredAction = useDuelRequiresAction(duelId)
+  const isDuelistRequiresAction = useDuelistRequiresAction(duelistId)
 
   const isA = useMemo(() => bigintEquals(duelistId, duelistIdA), [duelistId, duelistIdA])
   const isB = useMemo(() => bigintEquals(duelistId, duelistIdB), [duelistId, duelistIdB])
@@ -48,6 +51,17 @@ export function useDuelIcons({
 
   const { icons } = useMemo(() => {
     let icons = []
+    //
+    // Required Action...
+    if (isRequiredAction) {
+      if (isDuelistRequiresAction) {
+        icons.push(<LoadingIcon key='isTurn' size={iconSize} className='Brightest' />)
+      } else {
+        icons.push(<EmojiIcon emoji={EMOJI.IDLE} size={iconSize} />)
+      }
+
+      return { icons }
+    }
     //
     // Awaiting (B is always pending)
     if (isAwaiting) {
@@ -172,7 +186,7 @@ export function DuelIconsAsGrid({
   const { icons: iconsB } = useDuelIcons({ duelId, duelistId: duelistIdB, size })
 
   return (
-    <Grid textAlign='center' verticalAlign='middle' className='TitleCase'>
+    <Grid textAlign='center' verticalAlign='middle' className='TitleCase' style={{ width: '100%' }}>
       {iconsA.length > 0 &&
         <Row>
           <Col width={6} textAlign='right'>

@@ -59,7 +59,7 @@ export default function ScDoor() {
                 <Divider content='OR' />
                 <EnterAsGuestButton />
                 <div className='Spacer30' />
-                <Divider content='EXISTING PATRONS:' />
+                <Divider content='EXISTING PLAYERS:' />
                 <div className='Spacer10' />
                 <ConnectButton setLoading={setIsLoading} />
               </>}
