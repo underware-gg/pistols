@@ -1,10 +1,8 @@
 import React, { useMemo } from 'react'
 import { Grid, Image } from 'semantic-ui-react'
-import { _useConnector } from '@underware_gg/pistols-sdk/fix'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useLordsContract, useStarknetContext, useConnectedController, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { usePlayer } from '/src/stores/playerStore'
 import { FoolsBalance, LordsBalance } from '/src/components/account/LordsBalance'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { ActionButton } from '/src/components/ui/Buttons'
@@ -18,12 +16,11 @@ const Col = Grid.Column
 export default function WalletHeader({
 }) {
   const { disconnect } = useDisconnect()
-  const { account, address, isConnected } = useAccount()
+  const { account, address, isConnected, connector } = useAccount()
   const { selectedNetworkConfig } = useStarknetContext()
   const { lordsContractAddress } = useLordsContract()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
-  const { connector } = _useConnector()
 
   // BUG: https://github.com/apibara/starknet-react/issues/419
   // const { data, error, isLoading } = useStarkProfile({ address, enabled: false })
@@ -33,8 +30,7 @@ export default function WalletHeader({
   const name = useMemo(() => (data?.name ?? `Connected to ${selectedNetworkConfig.name}`), [data])
   const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0)), [data, connector])
 
-  const { openProfile } = useConnectedController()
-  const { username } = usePlayer(address)
+  const { username, openProfile } = useConnectedController()
 
   return (
     <Grid>
