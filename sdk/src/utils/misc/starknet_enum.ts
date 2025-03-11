@@ -14,10 +14,10 @@ export const parseCustomEnum = <T extends CustomEnumValue>(data: CairoCustomEnum
 } => (
   !data ? { variant: undefined, value: undefined }
     : typeof data === 'string' ? { variant: data, value: undefined }
-      : {
+      : data instanceof CairoCustomEnum ? {
         variant: data.activeVariant(),
         value: data.unwrap() as T,
-      }
+      } : { variant: undefined, value: undefined }
 )
 export const parseEnumVariant = <T extends string>(data: CairoCustomEnum | string | null): T | undefined => (
   parseCustomEnum(data).variant as T
