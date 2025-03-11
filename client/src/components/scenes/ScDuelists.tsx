@@ -9,12 +9,14 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
 import { TavernAudios } from '/src/components/GameContainer'
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '../ui/ProfilePoster'
+import { SceneName } from '/src/data/assets'
 
 export default function ScDuelists() {
   const { filterPlayerName, filterPlayerOnline, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection } = useQueryParams()
   const { playerIds } = useQueryPlayerIds(filterPlayerName, filterPlayerOnline, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection)
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
+  const { dispatchSetScene} = usePistolsScene()
   const anonOpener = useOpener()
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
@@ -31,6 +33,12 @@ export default function ScDuelists() {
           if (pageNumber < pageCount - 1) {
             handlePageChange(pageNumber + 1)
           }
+          break
+        case 'pistol':
+          dispatchSetScene(SceneName.DuelsBoard)
+          break
+        case 'matchmaking':
+          //TODO
           break
       }
     }

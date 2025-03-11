@@ -40,14 +40,12 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   
   const { name, profilePic, profileType, isInAction } = useDuelist(props.duelistId)
-  const { balance } = useFameBalanceDuelist(props.duelistId)
+  const {isAlive} = useFameBalanceDuelist(props.duelistId)
   const score = useGetSeasonScoreboard(props.duelistId)
 
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
   const { isYou } = useIsYou(props.duelistId)
-
-  const isDead = useMemo(() => (balance < constants.FAME.ONE_LIFE), [balance])
   
   const archetypeImage = useMemo(() => {
     let imageName = 'card_circular_' + (ArchetypeNames[score.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[score.archetype].toLowerCase())
@@ -129,8 +127,8 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       ref={baseRef}
       childrenBehindFront={
         <>
-          <ProfilePic profileType={profileType} profilePic={profilePic} width={props.width * 0.7} disabled={isDead} removeBorder removeCorners removeShadow className='duelist-card-image-drawing'/>
-          <img id='DuelistDeadOverlay' className={ `Left ${isDead ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+          <ProfilePic profileType={profileType} profilePic={profilePic} width={props.width * 0.7} disabled={!isAlive} removeBorder removeCorners removeShadow className='duelist-card-image-drawing'/>
+          <img id='DuelistDeadOverlay' className={ `Left ${!isAlive ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
         </>
       }
       childrenInFront={
@@ -179,7 +177,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
             {isInAction &&
               <EmojiIcon emoji={EMOJI.IN_ACTION} size={props.isSmall ? 'small' : 'big'} />
             }
-            {isDead &&
+            {!isAlive &&
               <EmojiIcon emoji={EMOJI.DEAD} size={props.isSmall ? 'small' : 'big'} />
             }
           </div>

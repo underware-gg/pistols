@@ -5,7 +5,7 @@ import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCar
 import { InteractibleComponent, InteractibleComponentHandle } from '/src/components/InteractibleComponent'
 import { CardColor } from '/src/data/cardAssets'
 import { ProfilePic } from '/src/components/account/ProfilePic'
-import { useIsBookmarked, usePlayer } from '/src/stores/playerStore'
+import { useIsBookmarked, usePlayer, getPlayerOnlineStatus } from '/src/stores/playerStore'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { Grid } from 'semantic-ui-react'
 import { BookmarkIcon } from '/src/components/ui/Icons'
@@ -55,6 +55,8 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectDuelistId } = usePistolsContext()
+
+  const isOnline = getPlayerOnlineStatus(props.playerAddress)
 
   const { name } = usePlayer(props.playerAddress)
   const { isMyAccount } = useIsMyAccount(props.playerAddress)
@@ -138,6 +140,10 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
               <ProfilePic profilePic={0} width={9} removeCorners borderColor='#201a18' borderWidth={0.3} />
               <div className='PlayerName Small'>{name}</div>
             </div>
+
+            <div className='OnlineStatusSection Small'>
+              <div className={`OnlineStatus Small ${isOnline ? 'Online' : 'Offline'}`} />
+            </div>
           </div>
         ) : (
           <div className='Poster'>
@@ -151,6 +157,10 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
 
             <div className='BookmarkSection PlayerPoster'>
               <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted onClick={publish} />
+            </div>
+
+            <div className='OnlineStatusSection'>
+              <div className={`OnlineStatus ${isOnline ? 'Online' : 'Offline'}`} />
             </div>
 
             <div className='TextDivider WantedDivider'>Duelists:</div>

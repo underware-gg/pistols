@@ -211,6 +211,11 @@ export const getPlayerName = (address: BigNumberish): string  | undefined => {
   return players[bigintToHex(address)]?.name
 }
 
+export const getPlayerOnlineStatus = (address: BigNumberish): boolean => {
+  const players_online = usePlayerStore((state) => state.players_online);
+  return players_online[bigintToHex(address)] !== undefined
+}
+
 
 export const useQueryPlayerIds = (
   filterName: string,
