@@ -211,7 +211,7 @@ ${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT4_Y, 'Honour', `${(props.honour / 1
 ${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT5_Y, props.archetype != constants.Archetype.Undefined ? `${props.archetype}` : '', '')}
 
 <text class='USERNAME' x='${HALF_WIDTH}' y='${USERNAME_Y}'>
-  ~ ${props.username || 'Unknown'} ~
+  ~ ${props.username || 'Unknown Player'} ~
 </text>
 </svg>
 `;
