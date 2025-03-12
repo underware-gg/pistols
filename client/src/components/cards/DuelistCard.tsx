@@ -3,8 +3,12 @@ import { BigNumberish } from 'starknet'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
+import { useGetSeasonScoreboard } from '/src/hooks/useScore'
+import { useFameBalanceDuelist } from '/src/hooks/useFame'
 import { usePlayer } from '/src/stores/playerStore'
-import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
+import { useIsYou } from '/src/hooks/useIsYou'
+import { useIsYou } from '/src/hooks/useIsYou'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { FameBalanceDuelist, FameProgressBar } from '/src/components/account/LordsBalance'
 import { ProfilePic } from '/src/components/account/ProfilePic'
@@ -16,9 +20,7 @@ import { Grid, GridRow, GridColumn } from 'semantic-ui-react'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { ActionButton, ChallengeButton } from '/src/components/ui/Buttons'
 import { ChallengeTableSelectedDuelist } from '/src/components/ChallengeTable'
-import { useIsYou } from '/src/hooks/useIsYou'
-import { useFameBalanceDuelist } from '/src/hooks/useFame'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 interface DuelistCardProps extends InteractibleComponentProps {
   duelistId: number
@@ -38,8 +40,10 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   
-  const { name, profilePic, profileType, score, isInAction,  } = useDuelist(props.duelistId)
+  const { name, profilePic, profileType, isInAction } = useDuelist(props.duelistId)
   const { balance } = useFameBalanceDuelist(props.duelistId)
+  const score = useGetSeasonScoreboard(props.duelistId)
+
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
   const { isYou } = useIsYou(props.duelistId)

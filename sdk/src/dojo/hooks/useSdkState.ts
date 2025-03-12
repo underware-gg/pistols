@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useSdkEntitiesGet, useSdkEntitiesSub, UseSdkEntitiesProps } from 'src/dojo/hooks/useSdkEntities'
+import { useSdkEntitiesGet, useSdkEntitiesSub, UseSdkEntitiesProps, useSdkEventsGet, UseSdkEventsProps } from 'src/dojo/hooks/useSdkEntities'
 import {
   PistolsModelType,
   PistolsSchemaModels,
@@ -28,7 +28,7 @@ export const getEntityMapModels = <M extends PistolsModelType>(entities: EntityM
 // as: EntityMap
 //
 
-export const useSdkStateGet = ({
+export const useSdkStateEntitiesGet = ({
   query,
   enabled = true,
 }: UseSdkEntitiesProps): useSdkStateResult => {
@@ -53,7 +53,7 @@ export const useSdkStateGet = ({
   }
 }
 
-export const useSdkStateSub = ({
+export const useSdkStateEntitiesSub = ({
   query,
   enabled = true,
 }: UseSdkEntitiesProps): useSdkStateResult => {
@@ -78,6 +78,43 @@ export const useSdkStateSub = ({
         } as EntityMap,
       });
     }
+  })
+
+  return {
+    entities,
+    isLoading,
+  }
+}
+
+
+//---------------------------------------
+// Get events from torii
+// (ephemeral)
+//
+// stores results at the hook local state
+// as: EntityMap
+//
+
+export const useSdkStateEventsGet = ({
+  query,
+  historical,
+  enabled = true,
+}: UseSdkEventsProps): useSdkStateResult => {
+  const [entities, setEntities] = useState<EntityMap | null>()
+
+  const { isLoading } = useSdkEventsGet({
+    query,
+    enabled,
+    historical,
+    setEntities: (entities: PistolsEntity[]) => {
+      console.log('useSdkStateEventsGet', entities)
+      setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
+        ...acc,
+        [e.entityId]: {
+          ...e.models.pistols
+        } as EntityMap,
+      }), {} as EntityMap));
+    },
   })
 
   return {

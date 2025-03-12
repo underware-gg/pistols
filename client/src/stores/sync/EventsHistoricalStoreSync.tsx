@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
-import { useDojoSetup, useSdkEventsSub } from '@underware_gg/pistols-sdk/dojo'
-import { useMounted } from '@underware_gg/pistols-sdk/utils/hooks'
+import { useDojoSetup, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
+import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useHistoricalEventsStore } from '/src/stores/historicalEventsStore'
-import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
+import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
 
 // const query: PistolsQueryBuilder = {

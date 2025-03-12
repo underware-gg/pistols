@@ -24,9 +24,9 @@ import {
 } from '/src/data/cardConstants';
 import { useAccount } from '@starknet-react/core';
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
-import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo';
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo';
 import { usePackType } from '/src/stores/packStore';
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useFundedStarterPackCount } from '/src/stores/bankStore';
 import { Button } from 'semantic-ui-react';
 import { Modal } from 'semantic-ui-react';

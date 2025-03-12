@@ -3,10 +3,10 @@ import { create } from 'zustand'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { Token, TokenBalance } from '@dojoengine/torii-client'
-import { useDojoSetup } from '@underware_gg/pistols-sdk/dojo'
-import { useToriiTokensByOwnerQL, ERC721_Token } from '@underware_gg/pistols-sdk/dojo/graphql'
+import { useDojoSetup } from '@underware/pistols-sdk/dojo'
+import { useToriiTokensByOwnerQL, ERC721_Token } from '@underware/pistols-sdk/dojo/graphql'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
-import { bigintToHex, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useTokenConfig } from './tokenConfigStore'
 
 

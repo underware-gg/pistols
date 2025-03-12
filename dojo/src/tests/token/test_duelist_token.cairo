@@ -1,4 +1,4 @@
-// use core::num::traits::Zero;
+use core::num::traits::Zero;
 use starknet::{ContractAddress};
 // use dojo::world::{WorldStorage};
 
@@ -421,6 +421,8 @@ fn _test_duelist_reactivate(sys: @TestSystems, token_id: u128, dripped_fame: u64
         assert_eq!(fame_supply, fame_supply_start - dripped_fame_wei, "AFTER_fame_supply_ALIVE");
         assert_eq!(pool_flame.balance_fame, 0, "AFTER_pool_flame.balance_fame_ALIVE");
     } else {
+        assert!(memorial.player_address.is_non_zero(), "AFTER_player_address_zero");
+        assert_eq!(memorial.player_address, (*sys.duelists).owner_of(token_id.into()), "AFTER_player_address");
         assert_eq!(memorial.cause_of_death, CauseOfDeath::Forsaken, "AFTER_cause_of_death");
         assert_eq!(memorial.fame_before_death, fame_balance_start, "AFTER_fame_before_death");
         assert_eq!(fame_balance, 0, "AFTER_fame_balance_DEAD");

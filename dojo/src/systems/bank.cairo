@@ -18,15 +18,15 @@ pub trait IBank<TState> {
 
 // Exposed to clients
 #[starknet::interface]
-trait IBankPublic<TState> {
-    fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128);
-    fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128);
-    fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: felt252);
+pub trait IBankPublic<TState> {
+    fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128); //@description: Sponsor duelist starter packs with $LORDS
+    fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128); //@description: Sponsor the current season with $LORDS
+    fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: felt252); //@description: Sponsor a tournament with $LORDS
 }
 
 // Exposed to world
 #[starknet::interface]
-trait IBankProtected<TState> {
+pub trait IBankProtected<TState> {
     // transfer LORDS from payer, adding to PoolType::Purchases
     // (called by pack_token)
     fn charge_purchase(ref self: TState, payer: ContractAddress, lords_amount: u128);

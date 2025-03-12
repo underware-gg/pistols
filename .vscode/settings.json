@@ -26,7 +26,7 @@
     "**/manifest.json": true,
     "**/manifest_*.json": true,
     "**/assets": true,
-    "client/public/**": true,
+    // "client/public/**": true,
     "dojo/manifests/**": true,
     "dojo/bindings/**": true,
     "gamejam": true,

@@ -2,7 +2,7 @@ import React from 'react'
 import { BigNumberish } from 'starknet'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { usePlayer } from '/src/stores/playerStore'
-import { formatTimestampDeltaElapsed, bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
+import { formatTimestampDeltaElapsed, bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { useDuelist } from '../stores/duelistStore'
 
 export const PlayerLink = ({

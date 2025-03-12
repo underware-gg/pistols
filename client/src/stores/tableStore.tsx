@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
-import { useEntityId } from '@underware_gg/pistols-sdk/utils/hooks'
-import { feltToString, stringToFelt, parseEnumVariant } from '@underware_gg/pistols-sdk/utils'
-import { PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
-import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
+import { useEntityModel } from '@underware/pistols-sdk/dojo'
+import { useEntityId } from '@underware/pistols-sdk/utils/hooks'
+import { feltToString, stringToFelt, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
+import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useTableConfigStore = createDojoStore<PistolsSchemaType>();
 

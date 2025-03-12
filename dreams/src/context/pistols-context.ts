@@ -1,4 +1,4 @@
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen';
+import { constants } from '@underware/pistols-sdk/pistols/gen';
 
 export const PISTOLS_CONTEXT = `
 

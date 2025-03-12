@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useAccount } from '@starknet-react/core'
-import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useTutorialLevel, useTutorialPlayerId, useTutorialProgress } from '/src/hooks/useTutorial'
 import { useGetChallenge } from '/src/stores/challengeStore'
 import { ActionButton } from '/src/components/ui/Buttons'

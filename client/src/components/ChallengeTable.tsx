@@ -12,8 +12,8 @@ import { ChallengeTime } from '/src/components/ChallengeTime'
 import { DuelIconsAsRow } from '/src/components/DuelIcons'
 import { FilterButton } from '/src/components/ui/Buttons'
 import { useGameAspect } from '/src/hooks/useGameAspect'
-import { arrayRemoveValue, bigintEquals } from '@underware_gg/pistols-sdk/utils'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { arrayRemoveValue, bigintEquals } from '@underware/pistols-sdk/utils'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '/src/utils/pistols'
 
 const Row = Grid.Row

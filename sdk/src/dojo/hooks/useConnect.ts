@@ -3,7 +3,7 @@ import { Connector, useAccount, useConnect, useNetwork } from '@starknet-react/c
 import { SwitchStarknetChainParameters, AddStarknetChainParameters } from 'get-starknet-core'
 import { useAddStarknetChain, useSwitchStarknetChain } from 'src/utils/hooks/useWalletRequest'
 import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
-import { feltToString } from 'src/utils/misc/starknet'
+import { feltToString } from 'src/utils/starknet/starknet'
 
 
 export const useConnectToSelectedNetwork = (onConnect?: () => void) => {

@@ -51,11 +51,11 @@ const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
     description: 'Duel ERC721 contract',
     interfaces: ['IDuelTokenPublic'],
   },
-  // duelist_token: {
-  //   name: 'Duelist token',
-  //   description: 'Duelist ERC721 contract',
-  //   interfaces: ['IDuelistTokenPublic'],
-  // },
+  duelist_token: {
+    name: 'Duelist token',
+    description: 'Duelist ERC721 contract',
+    interfaces: ['IDuelistTokenPublic'],
+  },
   bank: {
     name: 'Bank',
     description: 'Bank contract',

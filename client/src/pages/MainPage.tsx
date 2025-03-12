@@ -3,8 +3,8 @@ import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRouterParams } from '/src/hooks/PistolsContext'
 import { useSyncSelectedDuelist } from '/src/hooks/useSyncDuelist'
 import { useSetPageTitle } from '/src/hooks/useSetPageTitle'
-import { useEffectOnce } from '@underware_gg/pistols-sdk/utils/hooks'
-import { DojoStatus } from '@underware_gg/pistols-sdk/dojo'
+import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
+import { DojoStatus } from '@underware/pistols-sdk/dojo'
 import { MouseToolTip } from '/src/components/ui/MouseToolTip'
 import { Header } from '/src/components/Header'
 import * as ENV from '/src/utils/env'
@@ -32,7 +32,7 @@ import Duel from '/src/components/scenes/Duel'
 import ScLeaderboards from '/src/components/scenes/ScLeaderboards'
 
 // test sdk
-import { helloPistols } from '@underware_gg/pistols-sdk'
+import { helloPistols } from '@underware/pistols-sdk'
 
 helloPistols();
 export default function MainPage({

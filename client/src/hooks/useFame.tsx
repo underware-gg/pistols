@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useDojoSystem } from '@underware_gg/pistols-sdk/dojo'
-import { useERC20Balance } from '@underware_gg/pistols-sdk/utils/hooks'
+import { useDojoSystem } from '@underware/pistols-sdk/dojo'
+import { useERC20Balance } from '@underware/pistols-sdk/utils/hooks'
 import { useDuelistTokenBoundAddress } from '/src/hooks/useTokenContract'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export const useFameContract = () => {
   const { contractAddress: fameContractAddress, abi } = useDojoSystem('fame_coin')

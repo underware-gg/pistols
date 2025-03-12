@@ -3,19 +3,19 @@ use pistols::types::duel_progress::{DuelProgress};
 // Exposed to clients
 #[starknet::interface]
 pub trait ITutorial<TState> {
-    fn create_tutorial(
+    fn create_tutorial( //@description: Initializes a turorial level
         ref self: TState,
         player_id: u128,
         tutorial_id: u128,
     ) -> u128;
     // same as game.cairo
-    fn commit_moves(
+    fn commit_moves( //@description: Commit moves of a Duelist in a tutorial level
         ref self: TState,
         duelist_id: u128,
         duel_id: u128,
         hashed: u128,
     );
-    fn reveal_moves(
+    fn reveal_moves( //@description: Reveal moves of a Duelist in a tutorial level
         ref self: TState,
         duelist_id: u128,
         duel_id: u128,

@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 import { BigNumberish, CairoCustomEnum } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
-import { useClientTimestamp, useEntityId } from '@underware_gg/pistols-sdk/utils/hooks'
-import { isPositiveBigint, parseCustomEnum, bigintToDecimal } from '@underware_gg/pistols-sdk/utils'
-import { PistolsSchemaType, getProfileDescription } from '@underware_gg/pistols-sdk/pistols'
-import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
-import { useScore } from '/src/hooks/useScore'
+import { useEntityModel } from '@underware/pistols-sdk/dojo'
+import { useClientTimestamp, useEntityId } from '@underware/pistols-sdk/utils/hooks'
+import { isPositiveBigint, bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { parseCustomEnum } from '@underware/pistols-sdk/utils/starknet'
+import { PistolsSchemaType, getProfileDescription } from '@underware/pistols-sdk/pistols'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
@@ -37,7 +37,6 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   const duelist = useEntityModel<models.Duelist>(entity, 'Duelist')
   const duelistChallenge = useEntityModel<models.DuelistChallenge>(entity, 'DuelistChallenge')
-  const scoreboard = useEntityModel<models.Scoreboard>(entity, 'Scoreboard')
   // console.log(`useDuelist() =>`, duelist_id, duelist)
 
   const timestampRegistered = useMemo(() => Number(duelist?.timestamps.registered ?? 0), [duelist])
@@ -58,7 +57,6 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   // current duel a duelist is in
   const currentDuelId = useMemo(() => BigInt(duelistChallenge?.duel_id ?? 0), [duelistChallenge])
   const isInAction = useMemo(() => (currentDuelId > 0n), [currentDuelId])
-  const score = useScore(scoreboard?.score)
 
   // profile
   const {
@@ -98,6 +96,5 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     isInAction,
     isInactive,
     inactiveFameDripped,
-    score,
   }
 }

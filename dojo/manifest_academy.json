@@ -3322,7 +3322,7 @@
     },
     {
       "address": "0x134acf409bcb512feb02c7789b6a2a00dc2eadcfac25bb9e25f7b149d24aebb",
-      "class_hash": "0x2f7bc175f6612b54664b872dc5d61652df0e3dcb806856aeef6922beafb8da5",
+      "class_hash": "0x2c93bec33aa2846ed8f6f85d6089e9c3ae9ed685eba253b8d4c1f93e86a9c19",
       "abi": [
         {
           "type": "impl",
@@ -5967,7 +5967,7 @@
     },
     {
       "address": "0x60420229aa9f2da8e72d42226b061b41eb63987ed6ba4d5d7a35bad053c37d7",
-      "class_hash": "0x155c19c70226f4346f107929368791ce6a319991d4c8cd5ab8d9e12bf523d08",
+      "class_hash": "0x375aefb922b91f45d9ce19184f05430424fc98a46f147202d0fed7ea5615a55",
       "abi": [
         {
           "type": "impl",
@@ -6028,7 +6028,7 @@
         },
         {
           "type": "impl",
-          "name": "ActionsImpl",
+          "name": "GameImpl",
           "interface_name": "pistols::systems::game::IGame"
         },
         {
@@ -6706,6 +6706,24 @@
         },
         {
           "type": "impl",
+          "name": "GameProtectedImpl",
+          "interface_name": "pistols::systems::game::IGameProtected"
+        },
+        {
+          "type": "interface",
+          "name": "pistols::systems::game::IGameProtected",
+          "items": [
+            {
+              "type": "function",
+              "name": "create_trophies",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "impl",
           "name": "WorldProviderImpl",
           "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
         },
@@ -6833,6 +6851,7 @@
         "clear_required_action",
         "collect_duel",
         "collect_season",
+        "create_trophies",
         "upgrade"
       ]
     },
@@ -10038,7 +10057,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x351dd4bdb7a45d789700217383c7581029a23741de9d91b4de65d4d970c3c63",
+      "class_hash": "0x45bf489d84f87f5b7b25cc9d463dc25106c1ac0b4f9a966a58106888db9b419",
       "tag": "pistols-DuelistMemorial",
       "selector": "0x399b9689c37bf440c4f0478f361f68bd59161d01a096160d3ceaeae53b67b71"
     },

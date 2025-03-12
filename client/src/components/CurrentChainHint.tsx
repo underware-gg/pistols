@@ -1,5 +1,5 @@
 import React from 'react'
-import { useStarknetContext } from '@underware_gg/pistols-sdk/dojo'
+import { useStarknetContext } from '@underware/pistols-sdk/dojo'
 import { PACKAGE_VERSION } from '/src/utils/constants'
 import { useTableId } from '/src/stores/configStore'
 

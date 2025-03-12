@@ -1,6 +1,6 @@
 {
-  "name": "@underware_gg/pistols-sdk",
-  "version": "0.13.1",
+  "name": "@underware/pistols-sdk",
+  "version": "0.13.3",
   "description": "Pistols at Dawn SDK",
   "homepage": "https://github.com/underware-gg/pistols",
   "author": "Underware",
@@ -74,6 +74,10 @@
     "./utils/hooks": {
       "import": "./dist/utils_hooks.js",
       "types": "./dist/utils_hooks.d.ts"
+    },
+    "./utils/starknet": {
+      "import": "./dist/utils_starknet.js",
+      "types": "./dist/utils_starknet.d.ts"
     },
     "./package.json": "./package.json"
   },

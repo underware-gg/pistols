@@ -4,8 +4,9 @@ import { useAllChallengesIds, useChallenge } from '/src/stores/challengeStore'
 import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
-import { bigintEquals, bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { bigintEquals, bigintToHex } from '@underware/pistols-sdk/utils'
 import { CopyIcon } from '/src/components/ui/Icons'
+import { useGetSeasonScoreboard } from '../hooks/useScore'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -98,8 +99,8 @@ export function SnapDuelist({
   update,
 }) {
   const duelist = useDuelist(duelistId)
+  const score = useGetSeasonScoreboard(duelistId)
   useEffect(() => {
-    const score = duelist.score
     update({
       ...duelist,
       score: {

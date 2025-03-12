@@ -21,7 +21,7 @@ import {
 import { z } from "zod";
 import chalk from "chalk";
 import * as readline from "readline";
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen';
+import { constants } from '@underware/pistols-sdk/pistols/gen';
 import { env } from "./env";
 import { PISTOLS_CONTEXT } from "./context/pistols-context";
 import { PROVIDER_GUIDE } from "./context/pistols-provider";

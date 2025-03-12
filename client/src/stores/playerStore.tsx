@@ -5,9 +5,9 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
-import { PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
-import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, parseEnumVariant, shortAddress, sortObjectByValue } from '@underware_gg/pistols-sdk/utils'
+import { PistolsEntity } from '@underware/pistols-sdk/pistols'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
 
 interface PlayerState {
   player_address: string

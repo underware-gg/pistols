@@ -7,11 +7,11 @@ import { SchemaType, UnionOfModelData } from '@dojoengine/sdk'
 import { ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
 import { formatQueryValue } from 'src/dojo/hooks/useSdkEntities'
-import { _useConnector } from 'src/fix/starknet_react_core'
-import { stringToFelt } from 'src/utils/misc/starknet'
+import { stringToFelt } from 'src/utils/starknet/starknet'
 import { bigintToHex } from 'src/utils/misc/types'
 import { assert } from 'src/utils/misc/math'
 import { getContractByName } from '@dojoengine/core'
+import { INTERFACE_DESCRIPTIONS } from 'src/games/pistols/generated/constants'
 
 
 
@@ -106,9 +106,9 @@ const _makeControllerContractPolicies = (
           if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(entrypoint)) {
             // console.log(`CI:`, item.name, item)
             const method = {
-              // name: `${i.name}()`,
-              // description: `${c.tag}::${i.name}()`,
               entrypoint,
+              // name: `${i.name}()`,
+              description: INTERFACE_DESCRIPTIONS[interfaceName]?.[entrypoint] ?? undefined,
             }
             methods.push(method)
           }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Modal } from 'semantic-ui-react'
-import { useDojoEmitterEvent } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoEmitterEvent } from '@underware/pistols-sdk/dojo'
 import { ActionButton } from '/src/components/ui/Buttons'
 
 export default function ErrorModal() {

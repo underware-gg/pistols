@@ -98,10 +98,10 @@ pub trait IDuelistTokenPublic<TState> {
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
     // write
-    fn poke(ref self: TState, duelist_id: u128); //@description:Reactivates an inactive Duelist
-    fn sacrifice(ref self: TState, duelist_id: u128); //@description:Sacrifices a Duelist
-    fn memorialize(ref self: TState, duelist_id: u128); //@description:Memorializes a Duelist
-    // fn delete_duelist(ref self: TState, duelist_id: u128);
+    fn poke(ref self: TState, duelist_id: u128); //@description: Reactivates an inactive Duelist
+    fn sacrifice(ref self: TState, duelist_id: u128); //@description: Sacrifices a Duelist
+    fn memorialize(ref self: TState, duelist_id: u128); //@description: Memorializes a Duelist
+    // fn delete_duelist(ref self: TState, duelist_id: u128); //@description: Delete a Duelist
 }
 
 // Exposed to world
@@ -179,7 +179,7 @@ pub mod duelist_token {
             DuelistTimestamps,
             DuelistChallengeValue,
             ScoreboardValue, ScoreTrait,
-            DuelistMemorial, CauseOfDeath,
+            DuelistMemorial, CauseOfDeath, //DuelistMemorialValue,
             Archetype,
         },
         challenge::{Challenge},
@@ -593,11 +593,13 @@ pub mod duelist_token {
             killed_by: u128,
             fame_before_death: u128,
         ) {
-            let mut memorial = DuelistMemorial {
+            let memorial = DuelistMemorial {
                 duelist_id,
+                player_address: self.owner_of(duelist_id.into()),
                 cause_of_death,
                 killed_by,
                 fame_before_death,
+                season_table_id: store.get_config_season_table_id(),
             };
             store.set_duelist_memorial(@memorial);
             // events
@@ -631,10 +633,14 @@ pub mod duelist_token {
             let self = self.get_contract(); // get the component's contract state
             let mut store: Store = StoreTrait::new(self.world_default());
             // gether data
-            let owner: ContractAddress = self.owner_of(token_id);
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
+            // let memorial: DuelistMemorialValue = store.get_duelist_memorial_value(token_id.low);
+            // let is_memorized: bool = (memorial.cause_of_death == CauseOfDeath::Memorize);
+            // TODO: use memorized player, FAME, season, cause_of_death
+            let owner: ContractAddress = self.owner_of(token_id);
             let challenge: DuelistChallengeValue = store.get_duelist_challenge_value(token_id.low);
-            let scoreboard: ScoreboardValue = store.get_scoreboard_value(token_id.low.into(), 0);
+            let table_id: felt252 = store.get_config_season_table_id();
+            let scoreboard: ScoreboardValue = store.get_scoreboard_value(token_id.low.into(), table_id);
             let archetype: Archetype = scoreboard.score.get_archetype();
             let base_uri: ByteArray = self.erc721._base_uri();
             let duelist_image: ByteArray = duelist.profile_type.get_uri(base_uri.clone());
@@ -648,6 +654,7 @@ pub mod duelist_token {
                 .add("archetype", archetype.into(), false)
                 .add("profile_type", duelist.profile_type.into(), false)
                 .add("profile_id", duelist.profile_type.profile_id().to_string(), false)
+                .add("table_id", table_id.to_string(), false)
                 .add("total_duels", scoreboard.score.total_duels.to_string(), false)
                 .add("total_wins", scoreboard.score.total_wins.to_string(), false)
                 .add("total_losses", scoreboard.score.total_losses.to_string(), false)
@@ -655,7 +662,7 @@ pub mod duelist_token {
                 .add("fame", ETH(fame_balance.into()).low.to_string(), false)
                 .add("lives", lives.to_string(), false)
                 .add("duel_id", format!("0x{:x}", challenge.duel_id), false)
-                // .add("is_memorized", (false).to_string(), false)
+                // .add("is_memorized", is_memorized.to_string(), false)
                 .build();
             // Attributes
             let mut attributes: Array<Attribute> = array![
@@ -689,6 +696,10 @@ pub mod duelist_token {
                 },
             ];
             if (scoreboard.score.total_duels != 0) {
+                attributes.append(Attribute {
+                    key: "Season",
+                    value: table_id.to_string(),
+                });
                 attributes.append(Attribute {
                     key: "Total Wins",
                     value: scoreboard.score.total_wins.to_string(),

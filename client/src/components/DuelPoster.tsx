@@ -12,7 +12,7 @@ import { ProfilePic } from '/src/components/account/ProfilePic'
 import { useIsBookmarked, usePlayer } from '/src/stores/playerStore'
 import { useIsMyAccount, useIsYou } from '/src/hooks/useIsYou'
 import { Grid } from 'semantic-ui-react'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useTable } from '/src/stores/tableStore'
 import { makeDuelDataUrl } from '/src/utils/pistols'
 import { BookmarkIcon, IconClick } from '/src/components/ui/Icons'
@@ -23,7 +23,7 @@ import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { SceneName } from '/src/data/assets'
@@ -91,6 +91,11 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { canCollectDuel } = useCanCollectDuel(props.duelId)
   const { challengeDescription } = useChallengeDescription(props.duelId)
   const { description: tableDescription, isSeason, isTutorial } = useTable(tableId)
+
+  const rewardsA = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdA)
+  const rewardsB = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdB)
+  // console.log('rewardsA:', rewardsA)
+  // console.log('rewardsB:', rewardsB)
   
   const { name: playerNameA } = usePlayer(duelistAddressA)
   const { name: playerNameB } = usePlayer(duelistAddressB)

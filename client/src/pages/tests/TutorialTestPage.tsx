@@ -4,7 +4,7 @@ import { useTutorialLevel, useTutorialPlayerId, useTutorialProgress } from '/src
 import { useChallenge } from '/src/stores/challengeStore'
 import { CreateTutorialChallengeButton, OpenTutorialChallengeButton } from '/src/components/TutorialButtons'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
-import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import ChallengeModal from '/src/components/modals/ChallengeModal'

@@ -1,6 +1,6 @@
-import { useSdkEntitiesSub, getEntityModel, filterEntitiesByModel, getEntityModels } from '@underware_gg/pistols-sdk/dojo'
-import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
-import { useMounted } from '@underware_gg/pistols-sdk/utils/hooks'
+import { useSdkEntitiesSub, getEntityModel, filterEntitiesByModel, getEntityModels } from '@underware/pistols-sdk/dojo'
+import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
+import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
 import { useTableConfigStore } from '/src/stores/tableStore'
 import { useTokenConfigStore } from '/src/stores/tokenConfigStore'
@@ -57,7 +57,6 @@ const query: PistolsQueryBuilder = new PistolsQueryBuilder()
     "pistols-Player",
     "pistols-Duelist",
     "pistols-DuelistChallenge",
-    "pistols-Scoreboard",
     "pistols-Challenge",
     "pistols-Round",
     "pistols-Pack",
@@ -103,7 +102,7 @@ export function EntityStoreSync() {
       tokenState.setEntities(filterEntitiesByModel(entities, 'TokenConfig'))
       playerState.setEntities(filterEntitiesByModel(entities, 'Player'))
       playerState.updateMessages(filterEntitiesByModel(entities, ['PlayerOnline', 'PlayerBookmark']))
-      const duelistEntities = filterEntitiesByModel(entities, ['Duelist', 'DuelistChallenge', 'Scoreboard'])
+      const duelistEntities = filterEntitiesByModel(entities, ['Duelist', 'DuelistChallenge'])
       duelistState.setEntities(duelistEntities)
       duelistQueryState.setEntities(duelistEntities)
       bankState.setEntities(filterEntitiesByModel(entities, 'Pool'))
@@ -129,7 +128,7 @@ export function EntityStoreSync() {
       if (getEntityModels(entity, ['PlayerOnline', 'PlayerBookmark']).length > 0) {
         playerState.updateMessages([entity])
       }
-      if (getEntityModel(entity, 'Duelist') || getEntityModel(entity, 'Scoreboard') || getEntityModel(entity, 'DuelistChallenge')) {
+      if (getEntityModel(entity, 'Duelist') || getEntityModel(entity, 'DuelistChallenge')) {
         duelistState.updateEntity(entity)
         duelistQueryState.updateEntity(entity)
       }

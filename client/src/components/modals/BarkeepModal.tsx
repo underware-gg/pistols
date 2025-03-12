@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
-import { useConnectedController } from '@underware_gg/pistols-sdk/dojo'
+import { useConnectedController } from '@underware/pistols-sdk/dojo'
 import { useElizaMessage } from '/src/utils/eliza'
 import AnimatedText from '/src/components/ui/AnimatedText'
 

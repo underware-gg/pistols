@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo } from 'react'
 import { useAllPlayersActivityFeed, ActivityState } from '/src/stores/historicalEventsStore'
-import { useClientTimestamp } from '@underware_gg/pistols-sdk/utils/hooks'
+import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { useChallenge } from '/src/stores/challengeStore'
 import { useRequiredActions } from '/src/stores/eventsStore'
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '/src/components/Links'
 import { ChallengeStateReplyVerbs } from '/src/utils/pistols'
 
@@ -81,7 +81,7 @@ const ActivityItem = ({
     )
   }
   if (activity.activity === constants.Activity.ChallengeExpired) {
-    return <ActivityItemChallengeExpired activity={activity} clientSeconds={clientSeconds} />
+    return <ActivityItemChallengeCanceled activity={activity} clientSeconds={clientSeconds} />
   }
   if (activity.activity === constants.Activity.PlayerTimedOut) {
     return <ActivityItemPlayerTimedOut activity={activity} clientSeconds={clientSeconds} />
@@ -247,14 +247,20 @@ const ActivityItemChallengeDraw = ({
   )
 }
 
-const ActivityItemChallengeExpired = ({
+const ActivityItemChallengeCanceled = ({
   activity,
   clientSeconds,
 }: ActivityItemProps) => {
+  const { state } = useChallenge(activity.identifier)
   return (
     <>
       <ChallengeLink duelId={activity.identifier} />
-      {' expired '}
+      {
+        state == constants.ChallengeState.Expired ? ' expired '
+          : state == constants.ChallengeState.Withdrawn ? ' withdrawn '
+            : state == constants.ChallengeState.Refused ? ' refused '
+              : ' canceled '
+      }
       <TimestampDeltaElapsed timestamp={activity.timestamp} clientSeconds={clientSeconds} />
       <br />
     </>

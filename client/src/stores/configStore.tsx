@@ -1,10 +1,11 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityModel, getEntityModel } from '@underware_gg/pistols-sdk/dojo'
+import { useEntityModel, getEntityModel } from '@underware/pistols-sdk/dojo'
 import { useRouteSlugs } from '/src/hooks/useRoute'
-import { feltToString, keysToEntityId } from '@underware_gg/pistols-sdk/utils'
-import { PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
-import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
+import { feltToString } from '@underware/pistols-sdk/utils/starknet'
+import { keysToEntityId } from '@underware/pistols-sdk/utils/hooks'
+import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useConfigStore = createDojoStore<PistolsSchemaType>();
 

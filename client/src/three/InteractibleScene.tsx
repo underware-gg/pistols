@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { clamp } from '@underware_gg/pistols-sdk/utils'
+import { clamp } from '@underware/pistols-sdk/utils'
 import {
   WIDTH, HEIGHT,
   _textures,

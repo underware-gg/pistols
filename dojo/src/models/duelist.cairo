@@ -1,3 +1,4 @@
+use starknet::{ContractAddress};
 pub use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, DuelistProfile, BotProfile};
 
 //---------------------
@@ -61,6 +62,8 @@ pub struct DuelistMemorial {
     pub cause_of_death: CauseOfDeath,
     pub killed_by: u128,
     pub fame_before_death: u128,
+    pub player_address: ContractAddress,
+    pub season_table_id: felt252,
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]

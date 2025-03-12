@@ -1,9 +1,10 @@
-// import { constants } from '@underware_gg/pistols-sdk/pistols/gen'
+// import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 import { getContractByName } from '@dojoengine/core';
-import { makeDojoAppConfig, NetworkId } from '@underware_gg/pistols-sdk/pistols';
-import { bigintToHex, stringToFelt } from '@underware_gg/pistols-sdk/utils';
-import { constants } from '@underware_gg/pistols-sdk/pistols/gen';
+import { makeDojoAppConfig, NetworkId } from '@underware/pistols-sdk/pistols';
+import { bigintToHex } from '@underware/pistols-sdk/utils';
+import { stringToFelt } from '@underware/pistols-sdk/utils/starknet';
+import { constants } from '@underware/pistols-sdk/pistols/gen';
 import { env } from '../env';
 
 const dojoAppConfig = makeDojoAppConfig(env.DEFAULT_NETWORK_ID as NetworkId, undefined);

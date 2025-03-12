@@ -29,7 +29,7 @@ export const EMOJI = {
   IN_ACTION: '🔫',
   //
   // badges
-  FOOLS: '🤡',
+  FOOLS: '🎩',
   FAME: '⭐️',
   HONOUR: '👑',
   NEUTRAL: '🫥',

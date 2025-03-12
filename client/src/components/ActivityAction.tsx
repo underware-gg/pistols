@@ -9,7 +9,7 @@ import { useFameBalanceDuelist } from '/src/hooks/useFame'
 import { useRequiredActions } from '/src/stores/eventsStore'
 import { Icon, BookmarkIcon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink } from '/src/components/Links'
-import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex } from '@underware/pistols-sdk/utils'
 
 export const ActionIcon = (active: boolean) => {
   const { address } = useAccount()

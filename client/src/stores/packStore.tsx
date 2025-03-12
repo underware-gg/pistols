@@ -1,11 +1,12 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityId } from '@underware_gg/pistols-sdk/utils/hooks'
-import { parseEnumVariant, isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
-import { formatQueryValue, useEntityModel, useSdkEntitiesGet } from '@underware_gg/pistols-sdk/dojo'
-import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware_gg/pistols-sdk/pistols'
-import { constants, models } from '@underware_gg/pistols-sdk/pistols/gen'
+import { useEntityId } from '@underware/pistols-sdk/utils/hooks'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
+import { formatQueryValue, useEntityModel, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const usePackStore = createDojoStore<PistolsSchemaType>();
 

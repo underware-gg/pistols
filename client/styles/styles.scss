@@ -1334,7 +1334,7 @@ $logo-url: '/logos/logo_avante.svg';
     background-color: $color-brightest!important;
   }
 }
-.CustomIconPng {
+.CustomIconSvg {
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -1343,6 +1343,10 @@ $logo-url: '/logos/logo_avante.svg';
   position: absolute;
   top: 0.2em;
   left: 0;
+}
+.CustomIconPng {
+  @extend .CustomIconSvg;
+  top: 0.2em;
 }
 
 .TransferIcon {
