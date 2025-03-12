@@ -29,6 +29,7 @@ import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { SceneName } from '/src/data/assets'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelRequiresAction } from '/src/stores/eventsStore'
+import { useGetChallengeRewards } from '/src/hooks/useChallengeRewards'
 
 
 const Row = Grid.Row
