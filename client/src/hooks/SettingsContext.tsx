@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useReducer, useContext, useState, useCallback } from 'react'
+import React, { ReactNode, createContext, useReducer, useContext, useState, useCallback, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
 import { BigNumberish } from 'starknet'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
@@ -16,7 +16,6 @@ export const initialState = {
   duelistId: 0n,
   duelSpeedFactor: 1.0,
   completedTutorialLevel: 0,
-  hasFinishedTutorial: false,
   // internal
   initialized: false,
 }
@@ -127,7 +126,6 @@ const SettingsProvider = ({
       }
       case SettingsActions.TUTORIAL_LEVEL: {
         newState.completedTutorialLevel = action.payload as number
-        newState.hasFinishedTutorial = (newState.completedTutorialLevel > 2)
         cookieSetter(SettingsActions.TUTORIAL_LEVEL, newState)
         break
       }
@@ -192,9 +190,14 @@ export const useSettings = () => {
     })
   }
 
+  const settings = useMemo(() => ({
+    ...state,
+    hasFinishedTutorial: (state.completedTutorialLevel > 2),
+  }), [state])
+
   return {
-    ...state,   // expose individual settings values
-    settings: { ...state },  // expose settings as object {}
+    ...settings,    // expose individual settings values directly
+    settings,       // expose settings as object {}
     SettingsActions,
     dispatchSetting,
     dispatchDuelistId,
