@@ -14,6 +14,7 @@ pub trait IAdmin<TState> {
     fn set_treasury(ref self: TState, treasury_address: ContractAddress);
     fn set_paused(ref self: TState, paused: bool);
     fn set_table(ref self: TState, table: TableConfig);
+    fn urgent_update(ref self: TState);
 }
 
 #[dojo::contract]
@@ -116,6 +117,14 @@ pub mod admin {
             assert(table.table_id != 0, Errors::INVALID_TABLE);
             let mut store: Store = StoreTrait::new(self.world_default());
             store.set_table_config(@table);
+        }
+
+        fn urgent_update(ref self: ContractState) {
+            self._assert_caller_is_admin();
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let mut config: Config = ConfigManagerTrait::initialize();
+            config.vrf_address = starknet::contract_address_const::<0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f>();
+            store.set_config(@config);
         }
     }
 
