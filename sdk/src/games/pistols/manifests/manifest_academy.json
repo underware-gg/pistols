@@ -3322,7 +3322,7 @@
     },
     {
       "address": "0x134acf409bcb512feb02c7789b6a2a00dc2eadcfac25bb9e25f7b149d24aebb",
-      "class_hash": "0x536e6017276d50d65bd10a44e5877e7db0981a569491b51623f6b2ad9f21cb9",
+      "class_hash": "0x2c93bec33aa2846ed8f6f85d6089e9c3ae9ed685eba253b8d4c1f93e86a9c19",
       "abi": [
         {
           "type": "impl",
@@ -10057,7 +10057,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x34cb3734e01d6076226df35ab546d6702cf83e75af8cc14541820b00dac9946",
+      "class_hash": "0x45bf489d84f87f5b7b25cc9d463dc25106c1ac0b4f9a966a58106888db9b419",
       "tag": "pistols-DuelistMemorial",
       "selector": "0x399b9689c37bf440c4f0478f361f68bd59161d01a096160d3ceaeae53b67b71"
     },
