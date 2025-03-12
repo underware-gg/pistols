@@ -1313,7 +1313,7 @@
   "contracts": [
     {
       "address": "0x50122103108ad97d3b666f0b6de15ab9a200232f89f47fe5caa0b384947fcf0",
-      "class_hash": "0x72e14670edd6a32ca54aeab11d98c44d40383def55451f73686023b7c1977df",
+      "class_hash": "0x2960b5403115fd5230d6eb56de65ad91153bec90e7176d0bd4d68a11d0f49da",
       "abi": [
         {
           "type": "impl",
@@ -1511,6 +1511,13 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "urgent_update",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -1635,6 +1642,7 @@
         "set_treasury",
         "set_paused",
         "set_table",
+        "urgent_update",
         "upgrade"
       ]
     },

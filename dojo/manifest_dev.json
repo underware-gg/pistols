@@ -1312,8 +1312,8 @@
   },
   "contracts": [
     {
-      "address": "0x50122103108ad97d3b666f0b6de15ab9a200232f89f47fe5caa0b384947fcf0",
-      "class_hash": "0x72e14670edd6a32ca54aeab11d98c44d40383def55451f73686023b7c1977df",
+      "address": "0x1dd17653919d29c954c15c418e4745f79a9d155d8adfa5820dd9851cc16c904",
+      "class_hash": "0x2960b5403115fd5230d6eb56de65ad91153bec90e7176d0bd4d68a11d0f49da",
       "abi": [
         {
           "type": "impl",
@@ -1511,6 +1511,13 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "urgent_update",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -1635,6 +1642,7 @@
         "set_treasury",
         "set_paused",
         "set_table",
+        "urgent_update",
         "upgrade"
       ]
     },
@@ -3321,7 +3329,7 @@
       ]
     },
     {
-      "address": "0x42d04c447913b88a4800217fa205368c239b28273080f85506f007746f02b08",
+      "address": "0x611b5c48d17de65d8015d48d491e0d120361a85099e28f3630600b3a91a98b0",
       "class_hash": "0x2c93bec33aa2846ed8f6f85d6089e9c3ae9ed685eba253b8d4c1f93e86a9c19",
       "abi": [
         {

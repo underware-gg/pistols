@@ -1313,7 +1313,7 @@
   "contracts": [
     {
       "address": "0x24b728ed9d1b15231b54ee24c539d0a1691c406bd7bc0ba5b219077f09272b0",
-      "class_hash": "0x72e14670edd6a32ca54aeab11d98c44d40383def55451f73686023b7c1977df",
+      "class_hash": "0x2960b5403115fd5230d6eb56de65ad91153bec90e7176d0bd4d68a11d0f49da",
       "abi": [
         {
           "type": "impl",
@@ -1511,6 +1511,13 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "urgent_update",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -1625,7 +1632,7 @@
       "init_calldata": [
         "0x0",
         "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210",
-        "0x00be3edf412dd5982aa102524c0b8a0bcee584c5a627ed1db6a7c36922047257"
+        "0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f"
       ],
       "tag": "pistols-admin",
       "selector": "0x36fd20372b5d47c092e2fede52897075978efb732aeaeb155d19eb8147f6497",
@@ -1635,6 +1642,7 @@
         "set_treasury",
         "set_paused",
         "set_table",
+        "urgent_update",
         "upgrade"
       ]
     },
