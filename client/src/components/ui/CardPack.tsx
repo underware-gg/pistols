@@ -164,7 +164,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
       adjustedIndex = numCards - Math.ceil(index / 2);
     }
     
-    const x = aspectWidth(-40) +
+    const x = aspectWidth((-16 * numCards) / 2) +
              (sectionWidth * adjustedIndex) +
              (sectionWidth / 2)
     

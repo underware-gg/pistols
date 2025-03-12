@@ -28,7 +28,7 @@ import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { SceneName } from '/src/data/assets'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
-import { useGetChallengeRewards } from '../hooks/useChallengeRewards'
+import { useDuelRequiresAction } from '/src/stores/eventsStore'
 
 
 const Row = Grid.Row
@@ -70,6 +70,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { duel_token, game } = useDojoSystemCalls()
   const { duelistId } = useSettings()
   const { account } = useAccount()
+  const isRequiredAction = useDuelRequiresAction(props.duelId)
 
   const {
     state,
@@ -163,20 +164,20 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   }));
   
   const isDead = (duelistId: number) => {
-    return duelistId !== Number(winnerDuelistId) && isFinished
+    return duelistId !== Number(winnerDuelistId) && isFinished && !isRequiredAction
   }
 
   useEffect(() => {
     if (!props.isSmall) return
 
-    if ((isYouA && turnA) || (isYouB && turnB)) {
+    if ((isYouA && turnA) || (isYouB && turnB) || isRequiredAction) {
       setCardColor(CardColor.ORANGE)
       baseRef.current?.toggleBlink(true)
     } else {
       setCardColor(CardColor.WHITE)
       baseRef.current?.toggleBlink(false)
     }
-  }, [isYouA, isYouB, turnA, turnB, props.isSmall])
+  }, [isYouA, isYouB, turnA, turnB, props.isSmall, isRequiredAction])
 
   return (
     <InteractibleComponent
@@ -267,7 +268,6 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     instantFlip={true}
                     isHanging={true}
                     isHighlightable={true}
-                    isDisabled={isDead(Number(duelistIdA))}
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
                     onClick={() => dispatchSelectDuelistId(duelistId)}
@@ -368,12 +368,12 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     </Col>
                   )
                 }
-                {(state == constants.ChallengeState.InProgress) &&
+                {(state == constants.ChallengeState.InProgress || isRequiredAction) &&
                   <Col>
                     <ActionButton large fillParent important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
                   </Col>
                 }
-                {isFinished &&
+                {isFinished && !isRequiredAction &&
                   <Col>
                     <ActionButton large fillParent important label='Replay Duel!' onClick={() => _gotoDuel()} />
                   </Col>

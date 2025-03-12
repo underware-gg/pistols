@@ -248,7 +248,8 @@
 .DuelIconsContainer {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  width: 80%;
+  margin-left: 10%;
   min-height: aspect-width(4.4);
   font-size: aspect-width(0.5);
   color: $color-darkest;

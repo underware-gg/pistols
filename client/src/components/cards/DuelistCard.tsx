@@ -4,8 +4,10 @@ import { useDuelist } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { useGetSeasonScoreboard } from '/src/hooks/useScore'
-import { useIsYou } from '/src/hooks/useIsYou'
+import { useFameBalanceDuelist } from '/src/hooks/useFame'
 import { usePlayer } from '/src/stores/playerStore'
+import { useIsYou } from '/src/hooks/useIsYou'
+import { useIsYou } from '/src/hooks/useIsYou'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { FameBalanceDuelist, FameProgressBar } from '/src/components/account/LordsBalance'
@@ -18,6 +20,7 @@ import { Grid, GridRow, GridColumn } from 'semantic-ui-react'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { ActionButton, ChallengeButton } from '/src/components/ui/Buttons'
 import { ChallengeTableSelectedDuelist } from '/src/components/ChallengeTable'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 interface DuelistCardProps extends InteractibleComponentProps {
   duelistId: number
@@ -38,11 +41,14 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   
   const { name, profilePic, profileType, isInAction } = useDuelist(props.duelistId)
+  const { balance } = useFameBalanceDuelist(props.duelistId)
   const score = useGetSeasonScoreboard(props.duelistId)
 
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
   const { isYou } = useIsYou(props.duelistId)
+
+  const isDead = useMemo(() => (balance < constants.FAME.ONE_LIFE), [balance])
   
   const archetypeImage = useMemo(() => {
     let imageName = 'card_circular_' + (ArchetypeNames[score.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[score.archetype].toLowerCase())
@@ -205,7 +211,10 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       startScale={props.startScale}
       ref={baseRef}
       childrenBehindFront={
-        <ProfilePic profileType={profileType} profilePic={profilePic} width={props.width * 0.7} removeBorder removeCorners removeShadow className='duelist-card-image-drawing'/>
+        <>
+          <ProfilePic profileType={profileType} profilePic={profilePic} width={props.width * 0.7} disabled={isDead} removeBorder removeCorners removeShadow className='duelist-card-image-drawing'/>
+          <img id='DuelistDeadOverlay' className={ `Left ${isDead ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+        </>
       }
       childrenInFront={
         <>
@@ -213,6 +222,9 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
           <div className='InDuelEmoji'>
             {isInAction &&
               <EmojiIcon emoji={EMOJI.IN_ACTION} size={props.isSmall ? 'small' : 'big'} />
+            }
+            {isDead &&
+              <EmojiIcon emoji={EMOJI.DEAD} size={props.isSmall ? 'small' : 'big'} />
             }
           </div>
           <div className='HounourCircle'>
@@ -284,7 +296,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                       props.animateFlip(true)
                     }} 
                   />
-                  {!isYou &&
+                  {!isYou && !isDead &&
                   <div className='YesMouse NoDrag'>
                     <ChallengeButton challengedPlayerAddress={owner} />
                   </div>

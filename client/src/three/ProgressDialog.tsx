@@ -16,11 +16,7 @@ enum DuelState {
 }
 
 enum DuelOutcome {
-  BOTH_ALIVE,
-  ALIVE_INJURED,
   ALIVE_DEAD,
-  INJURED_ALIVE,
-  BOTH_INJURED,
   INJURED_DEAD,
   DEAD_DEAD
 }
@@ -333,80 +329,6 @@ const dialogOptions: DialogOptions = {
 
 // Define the EndingMessages object with the different outcomes and corresponding messages
 const duelEndingMessages: EndingMessages = {
-  [DuelOutcome.BOTH_ALIVE]: [
-    // Impressed
-    "Aye, yer quick, scum.",
-    "Yer better than ya look.",
-    "Good fight, filthy dog.",
-    "Respect, ye mangy mutt.",
-    "Ye've got some skill, cunt.",
-    "Not bad, yer scum.",
-    "Fair play, ye bastard.",
-    "Yer tough, filthy swine.",
-    "Well done, ye lowlife.",
-    "Nice move, ye dog.",
-
-    // Respect
-    "Ye fight with honor, dog.",
-    "Got some respect for ya.",
-    "Ye earned my respect, cunt.",
-    "I'll see ya 'round, scum.",
-    "Not bad, filthy wrench.",
-    "Ye got my respect, dog.",
-    "Respect, ye filthy swine.",
-    "Ye've got guts, bastard.",
-    "A true fight, ye cunt.",
-    "I respect that, ye dog.",
-
-    // Get you next time
-    "Next time, ye'll die, scum.",
-    "I'll get ya next time, cunt.",
-    "Yer luck'll run out, swine.",
-    "Next time, ye filthy dog.",
-    "I'll end ya next time, scum.",
-    "Ye'll not be so lucky, cunt.",
-    "I'll be waitin', bastard.",
-    "Next time, ye filthy wrench.",
-    "Yer time'll come, dog.",
-    "I'll finish ya next time, swine."
-  ],
-  [DuelOutcome.ALIVE_INJURED]: [
-    // Cocky
-    "Ha! Still standin', cunt.",
-    "I'm still here, scum.",
-    "Yer aim's shit, bastard.",
-    "I'm better than ya, wrench.",
-    "Still breathin', ye dog.",
-    "Ye can't kill me, cunt.",
-    "That all ye got, swine?",
-    "Pathetic, ye lowlife.",
-    "I'm unbreakable, scum.",
-    "Ye missed, ye cunt.",
-
-    // Angry I couldn't finish you
-    "Should've ended ya, scum.",
-    "Damn, yer tough, dog.",
-    "Should be dead, bastard.",
-    "Next time, ye die, cunt.",
-    "Cursed luck, ye dog.",
-    "Almost had ya, wrench.",
-    "Next shot's fatal, swine.",
-    "Ye slippery cunt.",
-    "Won't miss next time, scum.",
-    "Damn ye, filthy dog.",
-
-    // Ego that I'm better
-    "I'm better, ye scum.",
-    "Ye'll never beat me, cunt.",
-    "I'm the best, bastard.",
-    "Ye can't best me, swine.",
-    "Still standin', dog.",
-    "I'm superior, wrench.",
-    "Ye ain't nothin', cunt.",
-    "I'm unbeatable, swine.",
-    "Ye'll always lose, scum.",
-    "I'm the champ, ye dog."
-  ],
   [DuelOutcome.ALIVE_DEAD]: [
     // Proud
     "Got what ye deserved, cunt.",
@@ -431,92 +353,6 @@ const duelEndingMessages: EndingMessages = {
     "Yer fate's sealed, cunt.",
     "Justice done, ye dog.",
     "Earned yer death, swine."
-  ],
-  [DuelOutcome.INJURED_ALIVE]: [
-    // Angry
-    "Damn ye, dog!",
-    "I'll gut ya, cunt!",
-    "Ye mangy scum!",
-    "Fuck ye, bastard!",
-    "Curse ye, swine!",
-    "I'll end ye, wrench!",
-    "Yer luck'll end, cunt!",
-    "Damn yer hide, scum!",
-    "I'll see ye dead, dog!",
-    "Ye filthy bastard!",
-
-    // Lucky
-    "Lucky shot, cunt.",
-    "Yer luck saved ya, scum.",
-    "Damn yer luck, dog.",
-    "Lucky bastard, ye wrench.",
-    "Yer luck's cursed, swine.",
-    "Ye lucked out, ye cunt.",
-    "Luck's on yer side, scum.",
-    "Next time, no luck, dog.",
-    "Damn lucky shot, wrench.",
-    "Yer luck'll run dry, cunt.",
-
-    // Fuck that was close
-    "Close one, scum.",
-    "Damn near got me, cunt.",
-    "Too close, ye dog.",
-    "Fuck, that was near, wrench.",
-    "Almost dead, ye swine.",
-    "Close call, ye cunt.",
-    "Damn near ended me, scum.",
-    "Too damn close, dog.",
-    "Near miss, ye filthy wrench.",
-    "Barely made it, cunt."
-  ],
-  [DuelOutcome.BOTH_INJURED]: [
-    // Angry
-    "Fuck ye, scum!",
-    "Damn ya, cunt!",
-    "Curse ya, dog!",
-    "I'll get ya, bastard!",
-    "Damn yer hide, wrench!",
-    "I'll end ya, swine!",
-    "Curse yer name, cunt!",
-    "Damn ye, filthy dog!",
-    "Fuckin' bastard!",
-    "Damn ye, wrench!",
-
-    // Lucky
-    "Both cursed lucky.",
-    "Luck's on us, cunt.",
-    "Both too lucky, scum.",
-    "Damn luck, dog.",
-    "Luck's cruel, bastard.",
-    "Both lucky, wrench.",
-    "Cursed luck, swine.",
-    "Luck saved us, cunt.",
-    "Both damn lucky, scum.",
-    "Lucky bastards, dog.",
-
-    // I had you
-    "I had ye, cunt!",
-    "Ye were mine, scum!",
-    "Damn near had ya, dog!",
-    "Ye were dead, bastard!",
-    "I had ya, wrench!",
-    "So close, ye swine!",
-    "Ye were mine, cunt!",
-    "Had ya, filthy dog!",
-    "Damn near got ya, wrench!",
-    "Ye were done, swine!",
-
-    // You cunt how could you
-    "Ye cunt, how dare ya!",
-    "Fuckin' cunt, scum!",
-    "How could ye, dog!",
-    "Ye filthy cunt, bastard!",
-    "Damn ya, cunt wrench!",
-    "How dare ya, ye swine!",
-    "Cursed cunt, scum!",
-    "How could ye, filthy dog!",
-    "Damn cunt, ye wrench!",
-    "Ye filthy cunt, swine!"
   ],
   [DuelOutcome.INJURED_DEAD]: [
     // Angry but won
@@ -689,21 +525,7 @@ export class ProgressDialogManager {
     let outcomeA: DuelOutcome
     let outcomeB: DuelOutcome
 
-    if (healthA > 0 && healthB > 0) {
-      if (healthA == 3 && healthB == 3) {
-        outcomeA = DuelOutcome.BOTH_ALIVE
-        outcomeB = DuelOutcome.BOTH_ALIVE
-      } else if (healthA == 3 && healthB < 3) {
-        outcomeA = DuelOutcome.ALIVE_INJURED
-        outcomeB = DuelOutcome.INJURED_ALIVE
-      } else if (healthA < 3 && healthB == 3) {
-        outcomeA = DuelOutcome.INJURED_ALIVE
-        outcomeB = DuelOutcome.ALIVE_INJURED
-      } else {
-        outcomeA = DuelOutcome.BOTH_INJURED
-        outcomeB = DuelOutcome.BOTH_INJURED
-      }
-    } else if (healthA > 0 && healthB == 0) {
+    if (healthA > 0 && healthB == 0) {
       if (healthA == 3) {
         outcomeA = DuelOutcome.ALIVE_DEAD
       } else {

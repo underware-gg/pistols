@@ -413,6 +413,28 @@
   }
 }
 
+#DuelistDeadOverlay {
+  position: absolute;
+  top: 10%;
+  width: 80%;
+  height: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+
+  &.Left {
+    left: 0;
+  }
+
+  &.Right {
+    right: 0;      
+  }
+
+  &.visible {
+    opacity: 1;
+  }
+}
+
 .duelist-card-overlay {
   position: absolute;
   top: 3%;
@@ -808,9 +830,5 @@
   font-size: aspect-width(2);
   font-weight: 900;
   text-align: center;
-  text-shadow: 
-    0.2rem 0.2rem 1px rgba($color-brightest, 0.8),
-    -0.2rem 0.2rem 1px rgba($color-brightest, 0.8),
-    -0.2rem -0.2rem 1px rgba($color-brightest, 0.8),
-    0.2rem -0.2rem 1px rgba($color-brightest, 0.8);
+  text-shadow: 0 0 0.5rem rgba(white, 1), 0 0 1rem rgba(white, 0.8), 0 0 2rem rgba(white, 0.6);
 }

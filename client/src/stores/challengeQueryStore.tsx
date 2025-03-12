@@ -99,6 +99,8 @@ export const useQueryChallengeIds = (
 ) => {
   const { address } = useAccount()
   const { bookmarkedDuels } = usePlayer(address)
+  const { requiredDuelIds } = useRequiredActions()
+
   const entities = useChallengeQueryStore((state) => state.entities);
   const duelistEntities = useDuelistQueryStore((state) => state.entities);
   const targetId = useMemo(() => (isPositiveBigint(playerAddressOrDuelistId) ? BigInt(playerAddressOrDuelistId) : 0n), [playerAddressOrDuelistId, duelistEntities])
@@ -121,8 +123,13 @@ export const useQueryChallengeIds = (
       result = result.filter((e) => (bookmarkedDuels.find(p => bigintEquals(p, e.duel_id)) !== undefined))
     }
 
-    // filter by states
-    result = result.filter((e) => filterStates.includes(e.state))
+    // filter by states, with special handling for required action duels
+    result = result.filter((e) => {
+      if (requiredDuelIds.includes(e.duel_id)) {
+        return filterStates.includes(constants.ChallengeState.Awaiting)
+      }
+      return filterStates.includes(e.state)
+    })
 
     // filter by name
     if (filterName) {
@@ -142,7 +149,7 @@ export const useQueryChallengeIds = (
     // return ids only
     const challengeIds = result.map((e) => e.duel_id)
     return [challengeIds, states]
-  }, [entities, filterStates, filterName, filterBookmarked, targetId, sortColumn, sortDirection, bookmarkedDuels])
+  }, [entities, filterStates, filterName, filterBookmarked, targetId, sortColumn, sortDirection, bookmarkedDuels, requiredDuelIds])
 
   return {
     challengeIds,
