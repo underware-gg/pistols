@@ -1,10 +1,12 @@
 import React from 'react'
+import { useAccount } from '@starknet-react/core'
 import { useStarknetContext } from '@underware/pistols-sdk/dojo'
-import { PACKAGE_VERSION } from '/src/utils/constants'
 import { useTableId } from '/src/stores/configStore'
+import { PACKAGE_VERSION } from '/src/utils/constants'
 
 export default function CurrentChainHint() {
   const { selectedNetworkId } = useStarknetContext()
+  const { connector } = useAccount()
   const { tableId } = useTableId()
   return (
     <>
@@ -14,6 +16,8 @@ export default function CurrentChainHint() {
         ({tableId})
         <br />
         {selectedNetworkId}
+        {'/'}
+        {connector?.id ?? 'off'}
       </div>
     </>
   )

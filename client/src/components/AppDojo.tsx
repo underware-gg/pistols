@@ -1,5 +1,5 @@
-import React, { ReactNode, useMemo } from 'react'
-import { useConnect } from '@starknet-react/core'
+import React, { ReactNode, useEffect, useMemo } from 'react'
+import { useAccount, useConnect, useDisconnect } from '@starknet-react/core'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { Dojo } from '@underware/pistols-sdk/dojo'
 import { NetworkId } from '@underware/pistols-sdk/pistols'
@@ -34,7 +34,7 @@ export default function AppDojo({
   return (
     <App backgroundImage={backgroundImage}>
       <Dojo dojoAppConfig={dojoAppConfig}>
-        {autoConnect && <AutoConnect />}
+        {autoConnect ? <AutoConnect /> : <AutoDisconnect />}
         {children}
       </Dojo>
     </App>
@@ -44,7 +44,22 @@ export default function AppDojo({
 function AutoConnect() {
   const { connect, connectors } = useConnect()
   useEffectOnce(() => {
+    // console.log('AutoConnect>>>>>', connectors[0]?.id)
     connect({ connector: connectors[0] })
   }, [])
+  return <></>
+}
+
+function AutoDisconnect() {
+  const { isConnected, connector } = useAccount()
+  const { connectors } = useConnect()
+  const { disconnect } = useDisconnect()
+  useEffect(() => {
+    // disconnect if not connected to a supported connector
+    if (isConnected && connector && !connectors.some(c => c.id === connector?.id)) {
+      // console.log('AutoDisconnect>>>>>', isConnected, connector?.id, connectors)
+      disconnect()
+    }
+  }, [isConnected, connector, connectors])
   return <></>
 }

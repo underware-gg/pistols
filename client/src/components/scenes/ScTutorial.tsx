@@ -133,7 +133,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
     handleTutorialCreation()
   }, [currentTutorialScene, duelIdSimple, duelIdFull])
 
-  function goToRealDuel(duelistId: number) {
+  function goToRealDuel(duelistId?: number) {
     //TODO create challenge against bot with matchmaking and navigatge there with a selected duelist 
     dispatchSetting(SettingsActions.TUTORIAL_LEVEL, 3)
     dispatchSetScene(SceneName.Tavern)
@@ -188,7 +188,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
             tutorialOpener.open()
           }, 1000)
         } else {
-          dispatchSetScene(SceneName.Tavern)
+          goToRealDuel()
         }
         break
     }

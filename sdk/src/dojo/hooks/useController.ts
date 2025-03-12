@@ -36,9 +36,8 @@ export const CONTROLLER_CLASS_HASH = '0x05f0f2ae9301e0468ca3f9218dadd43a448a71ac
 // Interact with connected controller
 //
 export const useConnectedController = () => {
-  // const { address, connector } = useAccount()
-  const { address, account, connector} = useAccount()
-  
+  const { isConnected, connector } = useAccount()
+
   // connector
   const connectorId = useMemo(() => (connector?.id), [connector])
   const controllerConnector = useMemo(() => (
@@ -49,19 +48,19 @@ export const useConnectedController = () => {
   const [username, setUsername] = useState<string>(undefined)
   useEffect(() => {
     setUsername(undefined)
-    if (address) {
-      controllerConnector?.username().then((n) => setUsername(n.toLowerCase())) ?? 'unknown'
+    if (isConnected && controllerConnector) {
+      controllerConnector.username().then((n) => setUsername((n || 'unknown').toLowerCase()))
     }
-  }, [controllerConnector, address, account])
+  }, [controllerConnector, isConnected])
   const name = useMemo(() => (username ? capitalize(username) : undefined), [username])
 
   // callbacks
-  const openSettings = useCallback((account && controllerConnector) ? async () => {
+  const openSettings = useCallback((isConnected && controllerConnector) ? async () => {
     await controllerConnector.controller.openSettings()
-  } : null, [controllerConnector, account])
-  const openProfile = useCallback((account && controllerConnector) ? async (tab?: ProfileContextTypeVariant) => {
+  } : null, [controllerConnector, isConnected])
+  const openProfile = useCallback((isConnected && controllerConnector) ? async (tab?: ProfileContextTypeVariant) => {
     await controllerConnector.controller.openProfile(tab)
-  } : null, [controllerConnector, account])
+  } : null, [controllerConnector, isConnected])
 
   return {
     connectorId,
