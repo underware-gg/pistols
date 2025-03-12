@@ -233,7 +233,7 @@ const pistolsStagingConfig: DojoNetworkConfig = {
   lordsFaucet: true,
   // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
   lordsAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
-  vrfAddress: '0x00be3edf412dd5982aa102524c0b8a0bcee584c5a627ed1db6a7c36922047257',
+  vrfAddress: '0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
@@ -254,7 +254,7 @@ const snSepoliaConfig: DojoNetworkConfig = {
   lordsFaucet: true,
   // lordsFaucet: 'https://sepolia.voyager.online/contract/0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210#writeContract',
   lordsAddress: '0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210',
-  vrfAddress: '0x00be3edf412dd5982aa102524c0b8a0bcee584c5a627ed1db6a7c36922047257',
+  vrfAddress: '0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
@@ -275,7 +275,7 @@ const snMainnetConfig: DojoNetworkConfig = {
   etherAddress: mainnet.nativeCurrency.address,
   lordsFaucet: false,
   lordsAddress: '0x124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49',
-  vrfAddress: '0x00be3edf412dd5982aa102524c0b8a0bcee584c5a627ed1db6a7c36922047257',
+  vrfAddress: '0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f',
   predeployedAccounts: [],
   connectorIds: [
     supportedConnetorIds.CONTROLLER,
