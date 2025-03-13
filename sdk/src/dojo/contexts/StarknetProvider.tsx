@@ -24,9 +24,11 @@ export const StarknetProvider = ({
   const currentValue = useContext(StarknetContext)
   if (currentValue) throw new Error('StarknetProvider can only be used once')
 
-  // Initial state
   const chains: Chain[] = useMemo(() => (
-    Object.values(NETWORKS).map(networkConfig => networkConfig.chain)
+    Object.values(NETWORKS)
+      .map(networkConfig => networkConfig.chain)
+      // remove duplicates
+      .filter((value, index, array) => (array.findIndex(v => v.id === value.id) === index))
   ), [])
 
   // Current chain
