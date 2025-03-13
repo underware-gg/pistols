@@ -3,7 +3,8 @@ import { Container, Table } from 'semantic-ui-react'
 import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
-import { duelist_token, duel_token, SvgRenderOptions } from '@underware/pistols-sdk/pistols/tokens'
+import { duelist_token, duel_token } from '@underware/pistols-sdk/pistols/tokens'
+import { DuelistTokenImage, DuelTokenImage } from '@underware/pistols-sdk/pistols/components'
 import { map } from '@underware/pistols-sdk/utils'
 import App from '/src/components/App'
 
@@ -112,10 +113,6 @@ function Profiles({
   const rows = useMemo(() => {
     return props.map((e, index) => {
       const { profile, prop } = e;
-      const options: SvgRenderOptions = {
-        includeMimeType: true,
-      };
-      const duelist_svg = duelist_token.renderSvg(prop, options);
       const state = _randomChallengeState()
       let nextProfileIndex = (index < props.length - 1) ? index + 1 : 0;
       const duel_prop: duel_token.DuelSvgProps = {
@@ -131,7 +128,6 @@ function Profiles({
         profile_type_b: props[nextProfileIndex].prop.profile_type,
         profile_id_b: props[nextProfileIndex].prop.profile_id,
       };
-      const duel_svg = duel_token.renderSvg(duel_prop, options)
       return (
         <Row key={`${profileType}-${profile.profile_id}`} className='ModalText'>
           <Cell className='Code'>
@@ -147,10 +143,10 @@ function Profiles({
             <img src={makeProfilePicUrl(profile.profile_id, profileType)} style={style} />
           </Cell>
           <Cell>
-            <img src={duelist_svg} style={style} />
+            <DuelistTokenImage props={prop} style={style} />
           </Cell>
           <Cell>
-            <img src={duel_svg} style={style} />
+            <DuelTokenImage props={duel_prop} style={style} />
           </Cell>
         </Row>
       )

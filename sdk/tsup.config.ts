@@ -10,6 +10,7 @@ export default defineConfig({
     "src/exports/hooks.ts",
     "src/exports/pistols.ts",
     "src/exports/pistols_gen.ts",
+    "src/exports/pistols_components.ts",
     "src/exports/pistols_controller.ts",
     "src/exports/pistols_tokens.ts",
     "src/exports/utils.ts",

@@ -218,6 +218,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       childrenInFront={
         <>
           <canvas ref={canvasRef} />
+          {/* <DuelistTokenArt duelistId={props.duelistId} className='Absolute' /> */}
           <div className='InDuelEmoji'>
             {isInAction &&
               <EmojiIcon emoji={EMOJI.IN_ACTION} size={props.isSmall ? 'small' : 'big'} />

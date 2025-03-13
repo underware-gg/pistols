@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useContract, useBalance } from '@starknet-react/core'
 import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
+import { weiToEth } from 'src/utils/starknet/starknet'
 import { erc20_abi } from 'src/abis/abis'
 
 export const useERC20Balance = (
@@ -17,6 +18,7 @@ export const useERC20Balance = (
     refetchInterval: watch ? 1_000 : undefined,
     enabled: (isPositiveBigint(contractAddress) && isPositiveBigint(ownerAddress)),
   })
+  const balance_eth = useMemo(() => weiToEth(balance?.value ?? 0n), [balance])
   // console.log(`BALANCE`, (bigintToHex(contractAddress)), (bigintToHex(ownerAddress)), balance)
 
   const noFundsForFee = useMemo(() => {
@@ -26,6 +28,7 @@ export const useERC20Balance = (
 
   return {
     balance: balance?.value ?? 0n,        // wei
+    balance_eth,                          // eth
     formatted: balance?.formatted ?? 0,   // eth
     decimals: balance?.decimals ?? 0,     // 18
     symbol: balance?.symbol ?? '?',       // eth

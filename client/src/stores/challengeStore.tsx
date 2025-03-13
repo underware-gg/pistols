@@ -66,7 +66,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const duelistAddressB = useMemo(() => BigInt(challenge?.address_b ?? 0), [challenge])
   const duelistIdA = useMemo(() => BigInt(challenge?.duelist_id_a ?? 0), [challenge])
   const duelistIdB = useMemo(() => BigInt(challenge?.duelist_id_b ?? 0), [challenge])
-  const winner = useMemo(() => (challenge?.winner ?? 0), [challenge])
+  const winner = useMemo(() => Number(challenge?.winner ?? 0), [challenge])
   const winnerAddress = useMemo(() => (winner == 1 ? duelistAddressA : winner == 2 ? duelistAddressB : 0n), [winner, duelistAddressA, duelistAddressB])
   const winnerDuelistId = useMemo(() => (winner == 1 ? duelistIdA : winner == 2 ? duelistIdB : 0n), [winner, duelistIdA, duelistIdB])
   const premise = useMemo(() => (parseEnumVariant<constants.Premise>(challenge?.premise) ?? constants.Premise.Undefined), [challenge])
