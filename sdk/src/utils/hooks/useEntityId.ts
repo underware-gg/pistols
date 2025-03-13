@@ -7,6 +7,13 @@ export const keysToEntityId = (keys: BigNumberish[]): string => (getEntityIdFrom
 // same as @dojoengine/sdk/src/react/hooks/useEntityId()
 // but the response is always a hex string
 export const useEntityId = (keys: BigNumberish[]) => {
-  const entityId = useMemo(() => (keys.length > 0 ? keysToEntityId(keys) : '0x0'), keys)
+  const entityId = useMemo(() => (keys.length > 0 ? keysToEntityId(keys) : '0x0'), [keys])
   return entityId
+}
+
+export const useEntityIds = (keys_array: BigNumberish[][]) => {
+  const entityIds = useMemo(() => (
+    keys_array.map(keys => (keys.length > 0 ? keysToEntityId(keys) : '0x0'))
+  ), [keys_array])
+  return entityIds
 }

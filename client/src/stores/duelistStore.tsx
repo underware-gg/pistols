@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
-import { BigNumberish, CairoCustomEnum } from 'starknet'
+import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityModel } from '@underware/pistols-sdk/dojo'
-import { useClientTimestamp, useEntityId } from '@underware/pistols-sdk/utils/hooks'
-import { isPositiveBigint, bigintToDecimal } from '@underware/pistols-sdk/utils'
-import { parseCustomEnum } from '@underware/pistols-sdk/utils/starknet'
+import { getEntityModel, useEntityModel } from '@underware/pistols-sdk/dojo'
+import { useClientTimestamp, useEntityId, useEntityIds } from '@underware/pistols-sdk/utils/hooks'
+import { isPositiveBigint, bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
+import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
 import { PistolsSchemaType, getProfileDescription } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
@@ -37,7 +37,9 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   const duelist = useEntityModel<models.Duelist>(entity, 'Duelist')
   const duelistChallenge = useEntityModel<models.DuelistChallenge>(entity, 'DuelistChallenge')
+  const duelistMemorial = useEntityModel<models.DuelistMemorial>(entity, 'DuelistMemorial')
   // console.log(`useDuelist() =>`, duelist_id, duelist)
+  // console.log(`DuelistMemorial =>`, duelist_id, duelistMemorial)
 
   const timestampRegistered = useMemo(() => Number(duelist?.timestamps.registered ?? 0), [duelist])
   const timestampActive = useMemo(() => Number(duelist?.timestamps.active ?? 0), [duelist])
@@ -57,6 +59,10 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   // current duel a duelist is in
   const currentDuelId = useMemo(() => BigInt(duelistChallenge?.duel_id ?? 0), [duelistChallenge])
   const isInAction = useMemo(() => (currentDuelId > 0n), [currentDuelId])
+
+  // memorial (dead duelists)
+  const isDead = useMemo(() => Boolean(duelistMemorial), [duelistMemorial])
+  const causeOfDeath = useMemo(() => parseEnumVariant<constants.CauseOfDeath>(duelistMemorial?.cause_of_death), [duelistMemorial])
 
   // profile
   const {
@@ -96,5 +102,50 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     isInAction,
     isInactive,
     inactiveFameDripped,
+    // dead duelists
+    isDead,
+    isAlive: !isDead,
+    causeOfDeath,
   }
 }
+
+export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
+  const entities = useDuelistStore((state) => state.entities)
+
+  const entityIds = useEntityIds(duelistIds.map(id => [id]))
+
+  // filter alive duelists from duelistIds
+  const alive_entities = useMemo(() => (
+    Object.keys(entities).filter(e => (
+      entityIds.includes(e) && !Boolean(getEntityModel(entities[e], 'DuelistMemorial'))
+    ))
+  ), [entities, entityIds])
+
+  const { notDuelingIds, duellingIds, duelPerDuelists } = useMemo(() => {
+    const notDuelingIds: BigNumberish[] = []
+    const duellingIds: BigNumberish[] = []
+    const duelPerDuelists: Record<string, BigNumberish> = {}
+    alive_entities.forEach(entityId => {
+      const challenge = getEntityModel(entities[entityId], 'DuelistChallenge')
+      const duelist_id = bigintToHex(challenge?.duelist_id ?? getEntityModel(entities[entityId], 'Duelist').duelist_id)
+      if (isPositiveBigint(challenge?.duel_id)) {
+        duellingIds.push(duelist_id)
+        duelPerDuelists[duelist_id] = bigintToHex(challenge.duel_id)
+      } else {
+        notDuelingIds.push(duelist_id)
+      }
+    })
+    return {
+      notDuelingIds,
+      duellingIds,
+      duelPerDuelists,
+    }
+  }, [alive_entities])
+
+  return {
+    notDuelingIds,    // duelist_ids who are not duelling
+    duellingIds,      // duelist_ids who are duelling
+    duelPerDuelists,  // duel_ids per (duelling) duelist_id
+  }
+}
+
