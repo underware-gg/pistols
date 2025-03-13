@@ -121,10 +121,14 @@ pub mod admin {
 
         fn urgent_update(ref self: ContractState) {
             self._assert_caller_is_admin();
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let mut config: Config = ConfigManagerTrait::initialize();
-            config.vrf_address = starknet::contract_address_const::<0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f>();
-            store.set_config(@config);
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            // let mut config: Config = store.get_config();
+            // config.treasury_address = starknet::contract_address_const::<0x020dD2C29473df564F9735B7c16063Eb3B7A4A3bd70a7986526636Fe33E8227d>();
+            // config.lords_address = starknet::contract_address_const::<0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210>();
+            // config.vrf_address = starknet::contract_address_const::<0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f>();
+            // config.season_table_id = 'Season1';
+            // config.is_paused = false;
+            // store.set_config(@config);
         }
     }
 
