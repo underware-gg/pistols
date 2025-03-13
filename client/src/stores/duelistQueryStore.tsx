@@ -2,11 +2,13 @@ import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { useAccount } from '@starknet-react/core'
+import { usePlayer } from '/src/stores/playerStore'
+import { parseCustomEnum } from '@underware/pistols-sdk/utils/starknet'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { DuelistColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { calcWinRatio } from '/src/hooks/useScore'
-import { usePlayer } from '/src/stores/playerStore'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 
 //-----------------------------------------
@@ -26,6 +28,7 @@ interface StateEntity {
   total_losses: number
   total_draws: number
   is_active: boolean
+  is_alive: boolean
 }
 interface StateEntities {
   [entityId: string]: StateEntity,
@@ -39,9 +42,11 @@ interface State {
 const createStore = () => {
   const _parseEntity = (e: PistolsEntity) => {
     let duelist = e.models.pistols.Duelist
+    const { variant } = parseCustomEnum<constants.ProfileType>(duelist?.profile_type)
+    if (!duelist || variant != constants.ProfileType.Duelist) return undefined
     let currentChallenge = e.models.pistols.DuelistChallenge
     let scoreboard = e.models.pistols.Scoreboard
-    if (!duelist) return undefined
+    let memorial = e.models.pistols.DuelistMemorial
     return {
       duelist_id: BigInt(duelist.duelist_id),
       timestamp_registered: Number(duelist.timestamps.registered),
@@ -55,6 +60,7 @@ const createStore = () => {
       total_losses: Number(scoreboard?.score.total_losses ?? 0),
       total_draws: Number(scoreboard?.score.total_draws ?? 0),
       is_active: (Number(scoreboard?.score.total_duels ?? 0) > 0 || isPositiveBigint(currentChallenge?.duel_id ?? 0n)),
+      is_alive: !Boolean(memorial),
     }
   }
   return create<State>()(immer((set) => ({
