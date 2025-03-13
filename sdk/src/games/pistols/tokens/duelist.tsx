@@ -24,6 +24,8 @@ export type DuelistSvgProps = {
   lives: number
   is_memorized: boolean
   duel_id: BigNumberish
+  // optional
+  is_loading?: boolean
 }
 
 // card size: 1024w x 1434h
@@ -33,9 +35,14 @@ const HEIGHT = 1080;
 const HALF_WIDTH = Math.floor(WIDTH / 2);
 const HALF_HEIGHT = Math.floor(HEIGHT / 2);
 
+const PROFILE_X = 125;
+const PROFILE_Y = 100;
+const PROFILE_W = 521;
+const PROFILE_H = 521;
+
 const SLOT_Y = (HEIGHT * 0.505);
 const SLOT_X1 = (WIDTH * 0.11);
-const SLOT_X2 = (WIDTH - SLOT_X1);
+const SLOT_X2 = (WIDTH - SLOT_X1 - 0.02);
 
 const FAME_Y = (HEIGHT * 0.64);
 const BOX_Y = (HEIGHT * 0.68);
@@ -56,8 +63,10 @@ const STAT4_Y = (STAT3_Y + STAT_H);
 const STAT5_Y = (STAT4_Y + STAT_H);
 
 const STAR = '&#11088;' // ⭐️
+const PISTOL = '&#x1F52B;' // 🔫
 
 // const card_square_url = `/textures/cards/card_front_brown.png`
+const card_disabled_url = `/textures/cards/card_disabled.png`
 const ArchetypeCardUrl: Record<constants.Archetype, string> = {
   [constants.Archetype.Honourable]: `/textures/cards/card_circular_honourable.png`,
   [constants.Archetype.Trickster]: `/textures/cards/card_circular_trickster.png`,
@@ -105,8 +114,10 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
   const profile = _getProfile(props.profile_type, props.profile_id)
   const profile_url = renderDuelistImageUrl(props.profile_type, props.profile_id);
   const card_url = ArchetypeCardUrl[props.archetype];
-  const life = (props.fame % 1000);
-  const state = props.is_memorized ? 'Memorized' : (props.lives > 0) ? 'Alive' : 'Dead';
+  const life_bar_value = (props.fame % 1000);
+  const is_alive = (props.lives > 0);
+  const is_duelling = (BigInt(props.duel_id) > 0n);
+  const state = props.is_memorized ? 'Memorized' : (is_alive ? 'Alive' : 'Dead');
   const total_losses = (props.total_losses + props.total_draws);
   const svg = `
 <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' preserveAspectRatio='xMinYMin meet' viewBox='0 0 ${WIDTH} ${HEIGHT}'>
@@ -163,7 +174,7 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
     fill:none;
   }
 </style>
-<image href='${getAsset(profileAssets, profile_url)}' x='125' y='100' width='521px' height='521px' />
+<image href='${getAsset(profileAssets, profile_url)}' x='${PROFILE_X}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />
 <image href='${getAsset(cardsAssets, card_url)}' x='0' y='0' width='${WIDTH}px' height='${HEIGHT}px' />
 
 // name
@@ -174,6 +185,15 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
   </textPath>
 </text>
 
+// avoid flickering while loading
+${(props.is_loading !== true) &&
+`
+
+// Dead duelist cross
+${(!is_alive && props.is_memorized === false) &&
+  `<image href='${getAsset(cardsAssets, card_disabled_url)}' x='${PROFILE_X}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`
+}
+
 // Honour slots
 //<circle cx='${SLOT_X1}' cy='${SLOT_Y}' r='${WIDTH * 0.05}' fill='white' />
 //<circle cx='${SLOT_X2}' cy='${SLOT_Y}' r='${WIDTH * 0.05}' fill='white' />
@@ -181,25 +201,37 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
   ${props.honour > 0 ? (props.honour / 10).toFixed(1) : ''}
 </text>
 <text class='TITLE' x='${SLOT_X2}' y='${SLOT_Y}'>
-  ${props.archetype == constants.Archetype.Honourable ? '👑' : props.archetype == constants.Archetype.Trickster ? '🃏' : props.archetype == constants.Archetype.Villainous ? '👺' : ''}
+  ${is_duelling ? PISTOL
+    : props.archetype == constants.Archetype.Honourable ? '👑'
+      : props.archetype == constants.Archetype.Trickster ? '🃏'
+        : props.archetype == constants.Archetype.Villainous ? '👺'
+          : ''
+  }
 </text>
 
 // FAME
 <text class='TITLE' x='${WIDTH / 2}' y='${FAME_Y}'>
-  ${STAR} ${Math.floor(props.fame / 1000)}
+  ${STAR} ${props.lives}
 </text>
 <rect class='shadow' x='${BOX_GAP}' y='${BOX_Y}' width='${BOX_W}' height='${BOX_H}' rx='10' fill='#2004' />
-<rect x='${BOX_GAP}' y='${BOX_Y}' width='${BOX_W_MIN + (life == 0 ? (BOX_W - BOX_W_MIN) : map(props.fame % 1000, 0, 1000, 0, BOX_W - BOX_W_MIN))}' height='${BOX_H}' rx='10' fill='#d9924c' stroke='#2008'/>
+${is_alive &&
+`
+<rect x='${BOX_GAP}' y='${BOX_Y}' width='${BOX_W_MIN + (life_bar_value == 0 ? (BOX_W - BOX_W_MIN) : map(life_bar_value, 0, 1000, 0, BOX_W - BOX_W_MIN))}' height='${BOX_H}' rx='10' fill='#d9924c' stroke='#2008'/>
 <rect class='shadow' x='${BOX_GAP}' y='${BOX_Y}' width='${BOX_W}' height='${BOX_H}' rx='10' fill='none' stroke='#2008' stroke-width='2' />
 <text class='LIFE' x='${BOX_GAP + BOX_W_MIN / 2}' y='${BOX_Y + BOX_H / 2 + 5}'>
-  ${life != 0 ? `${Math.floor(life / 10)}%` : ''}
+  ${life_bar_value != 0 ? `${Math.floor(life_bar_value / 10)}%` : ''}
+</text>
+`
+}
+<text class='LIFE' x='${BOX_GAP + BOX_W_MIN / 2}' y='${BOX_Y + BOX_H / 2 + 5}'>
+  ${life_bar_value != 0 ? `${Math.floor(life_bar_value / 10)}%` : ''}
 </text>
 
 // STATS
 ${_renderStat(STAT_GAP, STAT1_Y, 'ID', `#${props.duelist_id}`)}
 ${_renderStat(STAT_GAP, STAT2_Y, 'Fame', `${props.fame}`)}
 ${_renderStat(STAT_GAP, STAT3_Y, 'State', state)}
-${BigInt(props.duel_id) > 0n
+${is_duelling
   ? _renderStat(STAT_GAP, STAT4_Y, 'Duel', `#${props.duel_id.toString()}`)
   : _renderStat(STAT_GAP, STAT4_Y, 'Dueling', `No`)
 }
@@ -213,6 +245,11 @@ ${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT5_Y, props.archetype != constants.A
 <text class='USERNAME' x='${HALF_WIDTH}' y='${USERNAME_Y}'>
   ~ ${props.username || 'Unknown Player'} ~
 </text>
+
+
+` // props.is_loading
+}
+
 </svg>
 `;
   // svg = svg.map('\n', '');

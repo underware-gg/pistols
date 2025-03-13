@@ -40,9 +40,11 @@ export default function ProfilesTestPage() {
 
 const _randomFame = (archetype: constants.Archetype) => {
   const rookie = (archetype == constants.Archetype.Undefined);
-  const fame = rookie ? 3000 : Math.floor(100 + Math.random() * 500) * 10;
+  const dead = (Math.random() > 0.8);
+  const fame = dead ? 0 : rookie ? 3000 : Math.floor(100 + Math.random() * 500) * 10;
   return {
     rookie,
+    dead,
     fame,
     lives: Math.floor(fame / 1000),
   }
@@ -87,7 +89,8 @@ function Profiles({
   const props = useMemo(() => {
     return Object.entries(profiles).map(([key, profile]) => {
       const { archetype, honour } = _randomArchetype()
-      const { fame, lives, rookie } = _randomFame(archetype)
+      const { fame, lives, rookie, dead } = _randomFame(archetype)
+      const is_dueling = (Math.random() > 0.25);
       const prop: duelist_token.DuelistSvgProps = {
         // base_uri: 'https://localhost:5173',
         duelist_id: 16,
@@ -104,7 +107,7 @@ function Profiles({
         fame,
         lives,
         is_memorized: false,
-        duel_id: (honour > 0) ? Math.floor(Math.random() * 1000) : 0,
+        duel_id: (honour > 0 && !dead && is_dueling) ? Math.floor(Math.random() * 1000) : 0,
       };
       return { profile, prop }
     })

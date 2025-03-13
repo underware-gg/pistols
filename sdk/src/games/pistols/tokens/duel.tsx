@@ -18,6 +18,8 @@ export type DuelSvgProps = {
   profile_id_a: number
   profile_type_b: constants.ProfileType
   profile_id_b: number
+  // optional
+  is_loading?: boolean
 }
 
 export const renderSvg = (props: DuelSvgProps, options: SvgRenderOptions = {}): string => {
