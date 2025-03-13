@@ -7,9 +7,10 @@ import { usePlayer } from '/src/stores/playerStore'
 import { usePendingChallengesIds } from '/src/stores/challengeStore'
 import { useFameBalanceDuelist } from '/src/hooks/useFame'
 import { useRequiredActions } from '/src/stores/eventsStore'
-import { Icon, BookmarkIcon } from '/src/components/ui/Icons'
+import { Icon, BookmarkIcon, EmojiIcon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink } from '/src/components/Links'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
+import { EMOJI } from '/src/data/messages'
 
 export const ActionIcon = (active: boolean) => {
   const { address } = useAccount()
@@ -91,8 +92,8 @@ const ActionItem = ({
   isBookmarked?: boolean
   duelId: bigint
 }) => {
-  const { isInAction, isInactive } = useDuelist(duelistId)
-  const { lives } = useFameBalanceDuelist(duelistId)
+  const { isInAction, currentDuelId, isInactive } = useDuelist(duelistId)
+  const { lives, isLoading } = useFameBalanceDuelist(duelistId)
 
   // const { duelistContractAddress } = useDuelistTokenContract()
   // const { publish } = usePlayerBookmarkSignedMessage(duelistContractAddress, duelistId, !isBookmarked)
@@ -117,7 +118,7 @@ const ActionItem = ({
         <Icon name='circle' />
         <DuelistLink duelistId={duelistId} useName />
         {' waiting in '}
-        <ChallengeLink duelId={duelId} />
+        <ChallengeLink duelId={currentDuelId} />
         <br />
       </>
     )
@@ -135,12 +136,36 @@ const ActionItem = ({
     )
   }
 
+  if (isLoading) {
+    return (
+      <>
+        <Icon name='circle outline' />
+        <DuelistLink duelistId={duelistId} useName />
+        {'...'}
+        <br />
+      </>
+    )
+  }
+
+
+  // dripping fame!
+  if (lives == 0) {
+    return (
+      <>
+        <EmojiIcon emoji={EMOJI.DEAD} />{' '}
+        <DuelistLink duelistId={duelistId} useName />
+        {' is dead!'}
+        <br />
+      </>
+    )
+  }
+
   // idle
   return (
     <>
       <Icon name='circle outline' />
       <DuelistLink duelistId={duelistId} useName />
-      {lives >= 1 ? 'is ready to duel!' : 'is dead!'}
+      {' is ready to duel!'}
       <br />
     </>
   )
