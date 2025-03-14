@@ -30,10 +30,15 @@ type StoredMoves = {
 
 export const initialState = {
   walletSig: { address: 0n, sig: 0n },
+  // opening modals
   selectedDuelId: 0n,
   selectedDuelistId: 0n,
   selectedPlayerAddress: 0n,
+  
+  // new challenge modal
   challengingAddress: 0n,
+  challengingDuelistId: 0n,
+
   currentDuel: 0n,
   currentScene: undefined as SceneName,
   tutorialLevel: undefined as DuelTutorialLevel,
@@ -57,6 +62,7 @@ const PistolsActions = {
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
   SELECT_PLAYER_ADDRESS: 'SELECT_PLAYER_ADDRESS',
   SELECT_CHALLENGING_ADDRESS: 'SELECT_CHALLENGING_ADDRESS',
+  SELECT_CHALLENGING_DUELIST_ID: 'SELECT_CHALLENGING_DUELIST_ID',
   SET_MOVES: 'SET_MOVES',
   SET_TUTORIAL_LEVEL: 'SET_TUTORIAL_LEVEL',
   RESET_VALUES: 'RESET_VALUES',
@@ -76,6 +82,7 @@ type ActionType =
   | { type: 'SELECT_DUELIST_ID', payload: bigint }
   | { type: 'SELECT_PLAYER_ADDRESS', payload: bigint }
   | { type: 'SELECT_CHALLENGING_ADDRESS', payload: bigint }
+  | { type: 'SELECT_CHALLENGING_DUELIST_ID', payload: bigint }
   | { type: 'SET_MOVES', payload: StoredMoves }
   | { type: 'RESET_VALUES', payload: null }
   | { type: 'SET_TUTORIAL_LEVEL', payload: DuelTutorialLevel }
@@ -139,6 +146,7 @@ const PistolsProvider = ({
         newState.selectedDuelistId = 0n
         newState.selectedPlayerAddress = 0n
         newState.challengingAddress = 0n
+        newState.challengingDuelistId = 0n
         break
       }
       case PistolsActions.SELECT_DUELIST_ID: {
@@ -146,6 +154,7 @@ const PistolsProvider = ({
         newState.selectedDuelistId = action.payload as bigint
         newState.selectedPlayerAddress = 0n
         newState.challengingAddress = 0n
+        newState.challengingDuelistId = 0n
         break
       }
       case PistolsActions.SELECT_PLAYER_ADDRESS: {
@@ -153,6 +162,7 @@ const PistolsProvider = ({
         newState.selectedDuelistId = 0n
         newState.selectedPlayerAddress = action.payload as bigint
         newState.challengingAddress = 0n
+        newState.challengingDuelistId = 0n
         break
       }
       case PistolsActions.SELECT_CHALLENGING_ADDRESS: {
@@ -160,6 +170,13 @@ const PistolsProvider = ({
         newState.selectedDuelistId = 0n
         newState.selectedPlayerAddress = 0n
         newState.challengingAddress = action.payload as bigint
+        break
+      }
+      case PistolsActions.SELECT_CHALLENGING_DUELIST_ID: {
+        newState.selectedDuelId = 0n
+        newState.selectedDuelistId = 0n
+        newState.selectedPlayerAddress = 0n
+        newState.challengingDuelistId = action.payload as bigint
         break
       }
       case PistolsActions.SET_MOVES: {
@@ -250,6 +267,13 @@ export const usePistolsContext = () => {
     })
   }, [dispatch])
 
+  const dispatchChallengingDuelistId = useCallback((duelistId: BigNumberish) => {
+    dispatch({
+      type: PistolsActions.SELECT_CHALLENGING_DUELIST_ID,
+      payload: BigInt(duelistId),
+    })
+  }, [dispatch])
+
   const dispatchSelectDuel = useCallback((newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_DUEL,
@@ -301,6 +325,7 @@ export const usePistolsContext = () => {
     dispatchSelectDuelistId,
     dispatchSelectPlayerAddress,
     dispatchChallengingPlayerAddress,
+    dispatchChallengingDuelistId,
     dispatchSetMoves,
     makeStoredMovesKey,
     __dispatchSetScene, // used internally only

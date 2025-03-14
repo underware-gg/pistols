@@ -67,6 +67,8 @@ export class InteractibleScene extends THREE.Scene {
 
     this.sceneData = sceneBackgrounds[sceneName]
 
+    console.log(this.sceneData)
+
     const bgDistance = -1
     const vFOV = THREE.MathUtils.degToRad(cameraData.fieldOfView * 0.5)
     const height = 2 * Math.tan(vFOV) * Math.abs(bgDistance)

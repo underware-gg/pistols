@@ -290,7 +290,6 @@ export default function ScLeaderboards() {
                 _close={() => {}}
                 isSmall={true}
                 isVisible={true}
-                isFlipped={true}
                 instantVisible={true}
                 isHighlightable={false}
               />
@@ -304,7 +303,6 @@ export default function ScLeaderboards() {
                 _close={() => {}}
                 isSmall={true}
                 isVisible={true}
-                isFlipped={true}
                 instantVisible={true}
                 isHighlightable={false}
               />
@@ -318,7 +316,6 @@ export default function ScLeaderboards() {
                 _close={() => {}}
                 isSmall={true}
                 isVisible={true}
-                isFlipped={true}
                 instantVisible={true}
                 isHighlightable={false}
               />

@@ -16,7 +16,7 @@ export default function Logo({
   }
 
   return (
-    <div style={{ 
+    <div className='NoMouse NoDrag' style={{ 
       display: 'flex', 
       flexDirection: vertical ? 'column' : 'row',
       alignItems: 'center',

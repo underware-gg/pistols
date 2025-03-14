@@ -145,7 +145,7 @@ function DuelItem({
   compact?: boolean
 }) {
   const { aspectWidth } = useGameAspect()
-  const { duelistId } = useSettings()
+
   const {
     challenge: { duelistIdA, duelistIdB, tableId, state, isLive, isCanceled, isExpired, isDraw, winner },
     turnA, turnB,
@@ -155,9 +155,6 @@ function DuelItem({
 
   const winnerIsA = useMemo(() => (winner == 1), [winner])
   const winnerIsB = useMemo(() => (winner == 2), [winner])
-
-  const classNameA = useMemo(() => ((turnA && bigintEquals(duelistId, duelistIdA)) ? 'BgImportant' : null), [duelistId, duelistIdA, turnA])
-  const classNameB = useMemo(() => ((turnB && bigintEquals(duelistId, duelistIdB)) ? 'BgImportant' : null), [duelistId, duelistIdB, turnB])
 
   const { dispatchSelectDuel } = usePistolsContext()
   const isRequiredAction = useDuelRequiresAction(duelId)

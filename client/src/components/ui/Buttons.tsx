@@ -108,18 +108,20 @@ export const BalanceRequiredButton = ({
   onClick,
   disabled = false,
   fill = true,
+  fillParent = false,
 }: {
   label: string
   fee: BigNumberish
   onClick: Function
   disabled?: boolean
   fill?: boolean
+  fillParent?: boolean
 }) => {
   const { address } = useAccount()
   const { noFundsForFee } = useLordsBalance(address, fee)
   const canSubmit = (!noFundsForFee)
   return (
-    <ActionButton large fill={fill}
+    <ActionButton large fill={fill} fillParent={fillParent}
       disabled={disabled}
       important={canSubmit}
       negative={!canSubmit}

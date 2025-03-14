@@ -23,12 +23,6 @@ export default function ScGate() {
         case 'door':
           dispatchSetScene(SceneName.Door)
           break
-        case 'duel':
-          //TODO navigate to tutorial
-          break
-        case 'sign':
-          //TODO navigate to pistols website
-          break
       }
     }
   }, [itemClicked, timestamp])

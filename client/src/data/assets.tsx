@@ -146,8 +146,8 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_demon_right_hand]: { path: '/images/tutorial/background/demon/bg_demon_right_hand.png' },
   [TextureName.bg_demon_victim]: { path: '/images/tutorial/background/demon/bg_demon_victim.png' },
   [TextureName.bg_demon]: { path: '/images/tutorial/background/demon/bg_demon.png' },
-  [TextureName.bg_demon_left_hand_mask]: { path: '/images/bg_demon_left_hand_mask.png' },
-  [TextureName.bg_demon_right_hand_mask]: { path: '/images/bg_demon_right_hand_mask.png' },
+  [TextureName.bg_demon_left_hand_mask]: { path: '/images/tutorial/background/demon/bg_demon_left_hand_mask.png' },
+  [TextureName.bg_demon_right_hand_mask]: { path: '/images/tutorial/background/demon/bg_demon_right_hand_mask.png' },
   
   [TextureName.bg_entry_background]: { path: '/images/tutorial/background/entry/bg_entry_background.png' },
   [TextureName.bg_entry_bar]: { path: '/images/tutorial/background/entry/bg_entry_bar.png' },
@@ -195,8 +195,6 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     backgrounds: [{ texture: TextureName.bg_gate, shiftMultiplier: 0, renderOrder: 0 }],
     items: [
       { name: 'door', color: 'ff0000', description: 'Knock on door', mask: TextureName.bg_gate_mask, renderOrder: 0 },
-      { name: 'duel', color: 'ffff00', description: 'Show duel tutorial', mask: TextureName.bg_gate_mask, renderOrder: 0 },
-      { name: 'sign', color: '00ff00', description: 'See more', mask: TextureName.bg_gate_mask, renderOrder: 0 },
     ]
   },
   [SceneName.Door]: { backgrounds: [{ texture: TextureName.bg_door, shiftMultiplier: 0, renderOrder: 0 }] },
@@ -224,7 +222,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     items: [
       { name: 'bottle', color: '0000ff', description: 'All Duelists', mask: TextureName.bg_tavern_bar_test_mask, renderOrder: 0 },
       { name: 'bartender', color: 'ff0000', description: 'Bartender', mask: TextureName.bg_tavern_bartender_test_mask, renderOrder: 1 },
-      { name: 'pistol', color: '00ff00', description: 'Your Duels', mask: TextureName.bg_tavern_test_mask, renderOrder: 2 },
+      { name: 'pistol', color: '00ff00', description: 'Leaderboards', mask: TextureName.bg_tavern_test_mask, renderOrder: 2 },
       { name: 'shovel', color: 'ff00ff', description: 'Past Duels', mask: TextureName.bg_tavern_door_test_mask, renderOrder: 3 }
       // { name: 'bottle', color: '0000ff', description: 'All Duelists', mask: TextureName.bg_tavern_mask, renderOrder: 0 },
       // { name: 'bartender', color: 'ff0000', description: 'Bartender', mask: TextureName.bg_tavern_mask, renderOrder: 0 },
