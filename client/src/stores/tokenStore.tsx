@@ -4,9 +4,10 @@ import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSdkTokenBalancesGet } from '@underware/pistols-sdk/dojo'
+import { useTokenConfig } from './tokenConfigStore'
+import { useDelay } from '@underware/pistols-sdk/utils/hooks'
 import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import * as torii from '@dojoengine/torii-client'
-import { useTokenConfig } from './tokenConfigStore'
 
 
 interface TokenState {
@@ -113,6 +114,8 @@ export function useTokensByOwner(contractAddress: BigNumberish, owner: BigNumber
   const tokens = useMemo(() => state.getTokens(contractAddress, owner), [state.contracts, contractAddress, owner])
 
   const { mintedCount } = useTokenConfig(contractAddress)
+  const forceCounter = useDelay(mintedCount, 1000)
+
   const contracts = useMemo(() => (isPositiveBigint(contractAddress) ? [bigintToHex(contractAddress)] : []), [contractAddress])
   const accounts = useMemo(() => (isPositiveBigint(owner) ? [bigintToHex(owner)] : []), [owner])
   const { isLoading } = useSdkTokenBalancesGet({
@@ -122,7 +125,7 @@ export function useTokensByOwner(contractAddress: BigNumberish, owner: BigNumber
     enabled: (contracts.length > 0 && accounts.length > 0 && mintedCount > 0
       // && tokens === null
     ),
-    forceCounter: mintedCount,
+    forceCounter,
   })
 
   return {
