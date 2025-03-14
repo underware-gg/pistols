@@ -135,7 +135,7 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
     user-select:none;
   }
   .TITLE{
-    font-size:60px;
+    font-size:50px;
     font-weight:bold;
     font-variant-caps:small-caps;
   }
@@ -181,7 +181,7 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
 <path id='circle' d='M${92},350a200,200 0 1,1 ${WIDTH - 92 - 92},0' />
 <text class='TITLE'>
   <textPath startOffset='50%' xlink:href='#circle'>
-  ${profile.name}
+  ${profile.name} #${props.duelist_id}
   </textPath>
 </text>
 
