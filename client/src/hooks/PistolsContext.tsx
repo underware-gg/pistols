@@ -49,7 +49,7 @@ export const initialState = {
   shopOpener: null as Opener,
   tutorialOpener: null as Opener,
   bookOpener: null as Opener,
-  cardPackOpener: null as Opener,
+  duelistSelectOpener: null as Opener,
   tableOpener: null as Opener,
   walletFinderOpener: null as Opener,
 }
@@ -111,7 +111,7 @@ const PistolsProvider = ({
   const shopOpener = useOpener()
   const tutorialOpener = useOpener()
   const bookOpener = useOpener()
-  const cardPackOpener = useOpener()
+  const duelistSelectOpener = useOpener()
   const tableOpener = useOpener()
   const walletFinderOpener = useOpener()
 
@@ -202,7 +202,7 @@ const PistolsProvider = ({
       shopOpener,
       tutorialOpener,
       bookOpener,
-      cardPackOpener,
+      duelistSelectOpener,
       tableOpener,
       walletFinderOpener,
     } }}>

@@ -16,28 +16,19 @@ export const useIsMyAccount = (otherAddress: BigNumberish) => {
   }
 }
 
-export const useIsYou = (otherDueistId: BigNumberish) => {
-  const { duelistId } = useSettings()
-  const isYou = useMemo(() => (
-    bigintEquals(otherDueistId ?? 0, PLAYER_CHARACTER_ID) ||
-    (isPositiveBigint(otherDueistId) && bigintEquals(otherDueistId, duelistId))
-  ), [duelistId, otherDueistId])
-  return {
-    isYou,
-    myDuelistId: duelistId,
-  }
-}
-
-export const useIsMyDuelist = (otherDueistId: BigNumberish) => {
+export const useIsMyDuelist = (otherDuelistId: BigNumberish) => {
   // the tutorial player character is always my duelist
-  const isPlayerCharacter = bigintEquals(otherDueistId ?? 0, PLAYER_CHARACTER_ID)
-  const isCharacter = BigInt(otherDueistId ?? 0) >= constants.PROFILES.CHARACTER_ID_BASE
+  const isPlayerCharacter = bigintEquals(otherDuelistId ?? 0, PLAYER_CHARACTER_ID)
+  const isCharacter = BigInt(otherDuelistId ?? 0) >= constants.PROFILES.CHARACTER_ID_BASE
   // fetch owner onlt if not a character
   const { address } = useAccount()
-  const { owner } = useOwnerOfDuelist(!isCharacter ? otherDueistId : 0n)
+  const { owner } = useOwnerOfDuelist(!isCharacter ? otherDuelistId : 0n)
   const isMyDuelist = useMemo(() => (
     isPlayerCharacter ||
     (isPositiveBigint(owner) ? bigintEquals(address, owner) : false)
   ), [address, owner])
-  return isMyDuelist
+  return {
+    isMyDuelist,
+    myDuelistId: otherDuelistId,
+  }
 }

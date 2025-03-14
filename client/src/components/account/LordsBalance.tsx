@@ -6,6 +6,7 @@ import { useFameBalance, useFameBalanceDuelist } from '/src/hooks/useFame'
 import { Balance } from '/src/components/account/Balance'
 import ProgressBar from '../ui/ProgressBar'
 import { IconSizeProp } from '../ui/Icons'
+import { weiToEth } from '@underware/pistols-sdk/utils/starknet'
 
 
 //
@@ -106,7 +107,7 @@ export const FameProgressBar = ({
 }) => {
   const { balance } = useFameBalanceDuelist(duelistId)
   const progressPercent = useMemo(() => {
-    return Number(balance) % 1000
+    return Number(weiToEth(balance)) % 1000
   }, [balance])
 
   return (

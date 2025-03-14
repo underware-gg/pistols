@@ -8,7 +8,7 @@ import { useGameplayContext } from '/src/hooks/GameplayContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useGetChallenge } from '/src/stores/challengeStore'
 import { useDuelist } from '/src/stores/duelistStore'
-import { useIsYou } from '/src/hooks/useIsYou'
+import { useIsMyDuelist } from '/src/hooks/useIsYou'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { useDuelRequiresAction } from '/src/stores/eventsStore'
 import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
@@ -58,8 +58,8 @@ export default function Duel({
   const [duelSceneStarted, setDuelSceneStarted] = useState(false)
   const { name: nameA, characterType: characterTypeA } = useDuelist(duelistIdA)
   const { name: nameB, characterType: characterTypeB } = useDuelist(duelistIdB)
-  const { isYou: isYouA } = useIsYou(duelistIdA)
-  const { isYou: isYouB } = useIsYou(duelistIdB)
+  const { isMyDuelist: isYouA } = useIsMyDuelist(duelistIdA)
+  const { isMyDuelist: isYouB } = useIsMyDuelist(duelistIdB)
 
   // clear required action flag
   const { account } = useAccount()

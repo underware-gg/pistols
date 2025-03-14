@@ -26,7 +26,7 @@ import { InteractibleScene } from '/src/three/InteractibleScene'
 export default function ScProfile() {
   const { isConnected } = useAccount()
   const { debugMode } = useSettings()
-  const { shopOpener, bookOpener, cardPackOpener } = usePistolsContext()
+  const { shopOpener, bookOpener } = usePistolsContext()
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
   const { dispatchSetScene } = usePistolsScene()

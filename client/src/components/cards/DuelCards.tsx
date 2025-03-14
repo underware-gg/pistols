@@ -2,7 +2,7 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo
 import { BigNumberish } from 'starknet'
 import { useChallenge } from '/src/stores/challengeStore'
 import { useDuelist } from '/src/stores/duelistStore'
-import { useIsYou } from '/src/hooks/useIsYou'
+import { useIsMyDuelist } from '/src/hooks/useIsYou'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
@@ -49,7 +49,7 @@ interface EnvironmentDeckHandle {
 }
 
 const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: DuelistCardsProps, ref: React.Ref<DuelistCardsHandle>) => {
-  const { isYou } = useIsYou(props.duelistId)
+  const { isMyDuelist } = useIsMyDuelist(props.duelistId)
 
   const { aspectW, aspectH } = useGameAspect()
 
@@ -216,7 +216,7 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
           card.setPosition(targetX, targetY, Constants.SPAWN_CARDS_POSITION_DURATION)
           card.setRotation(angle, Constants.SPAWN_CARDS_ROTATION_DURATION)
           card.toggleVisibility(true)
-          if (isYou) {
+          if (isMyDuelist) {
             card.flip(
               true, 
               isLeft,

@@ -6,7 +6,6 @@ import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { useGetSeasonScoreboard } from '/src/hooks/useScore'
 import { useFameBalanceDuelist } from '/src/hooks/useFame'
 import { usePlayer } from '/src/stores/playerStore'
-import { useIsYou } from '/src/hooks/useIsYou'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { FameBalanceDuelist, FameProgressBar } from '/src/components/account/LordsBalance'
@@ -45,7 +44,6 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
 
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
-  const { isYou } = useIsYou(props.duelistId)
   
   const archetypeImage = useMemo(() => {
     let imageName = 'card_circular_' + (ArchetypeNames[score.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[score.archetype].toLowerCase())
