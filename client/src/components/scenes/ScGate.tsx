@@ -3,7 +3,7 @@ import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { SceneName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { TavernAudios } from '/src/components/GameContainer'
-import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
+import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
 import Logo from '/src/components/Logo'
 import { useAccount } from '@starknet-react/core'
 import { useDisconnect } from '@starknet-react/core'
@@ -43,7 +43,6 @@ export default function ScGate() {
       {/* <BarkeepModal /> */}
 
       <DojoSetupErrorDetector />
-      {/* <ConnectionDetector /> */}
 
     </>
   )

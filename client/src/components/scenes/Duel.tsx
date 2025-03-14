@@ -11,9 +11,8 @@ import { useDuelist } from '/src/stores/duelistStore'
 import { useIsYou } from '/src/hooks/useIsYou'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { useDuelRequiresAction } from '/src/stores/eventsStore'
-import { useSyncToActiveDuelists } from '/src/hooks/useSyncDuelist'
 import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
-import { DojoSetupErrorDetector } from '../account/ConnectionDetector'
+import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
 import { EnvironmentCardsTextures } from '/src/data/cardAssets'
 import { AnimationState } from '/src/three/game'
 import { Action } from '/src/utils/pistols'
@@ -53,9 +52,6 @@ export default function Duel({
   const { clientSeconds } = useClientTimestamp(false)
 
   const { duelistIdA, duelistIdB, timestampStart, isTutorial, timestampEnd, isAwaiting, isInProgress, isFinished  } = useGetChallenge(duelId)
-
-  // switch to active duelist, if owned by player
-  const { isSynced } = useSyncToActiveDuelists([duelistIdA, duelistIdB])
 
   // guarantee to run only once when this component mounts
   const mounted = useMounted()

@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRouterParams } from '/src/hooks/PistolsContext'
-import { useSyncSelectedDuelist } from '/src/hooks/useSyncDuelist'
 import { useSetPageTitle } from '/src/hooks/useSetPageTitle'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { DojoStatus } from '@underware/pistols-sdk/dojo'
