@@ -1,8 +1,11 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
-import { bigintToHex } from '@underware/pistols-sdk/utils'
+import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import * as torii from '@dojoengine/torii-client'
+import { useMemo } from 'react'
+import { weiToEth } from '@underware/pistols-sdk/utils/starknet'
+import { useSdkTokenBalancesGet } from '@underware/pistols-sdk/dojo'
 
 
 interface BalancesByAccount {
@@ -75,11 +78,37 @@ export const useCoinStore = createStore();
 //----------------------------------------
 // consumer hooks
 //
-export function useBalancesByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
+
+export const useCoinBalance = (
+  contractAddress: BigNumberish,
+  accountAddress: BigNumberish,
+  // watch: boolean = false,
+) => {
   const state = useCoinStore((state) => state)
-  // const balance = useMemo(() => state.getBalance(contractAddress, owner), [contractAddress, owner, state.balances])
-  const balance = 0n;
+  const balance = useMemo(() => state.getBalance(contractAddress, accountAddress), [state.contracts, contractAddress, accountAddress])
+  const balance_eth = useMemo(() => (balance != null ? weiToEth(balance) : balance), [balance])
+  // console.log(`BALANCE`, (bigintToHex(contractAddress)), (bigintToHex(ownerAddress)), balance)
+
+  const supply = 1;
+  const contracts = useMemo(() => (isPositiveBigint(contractAddress) ? [bigintToHex(contractAddress)] : []), [contractAddress])
+  const accounts = useMemo(() => (isPositiveBigint(accountAddress) ? [bigintToHex(accountAddress)] : []), [accountAddress])
+  const { isLoading } = useSdkTokenBalancesGet({
+    contracts,
+    accounts,
+    setBalances: state.setBalances,
+    enabled: (contracts.length > 0 && accounts.length > 0 && supply > 0
+      // && balance === null
+    ),
+    forceCounter: supply,
+  })
+
   return {
-    balance,
+    balance: balance ?? 0n,        // wei
+    balance_eth,                          // eth
+    // formatted: balance?.formatted ?? 0,   // eth
+    // decimals: balance?.decimals ?? 0,     // 18
+    // symbol: balance?.symbol ?? '?',       // eth
+    // noFundsForFee,
+    isLoading,
   }
 }
