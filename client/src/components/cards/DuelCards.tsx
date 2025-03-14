@@ -49,7 +49,7 @@ interface EnvironmentDeckHandle {
 }
 
 const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: DuelistCardsProps, ref: React.Ref<DuelistCardsHandle>) => {
-  const { isMyDuelist } = useIsMyDuelist(props.duelistId)
+  const isMyDuelist = useIsMyDuelist(props.duelistId)
 
   const { aspectW, aspectH } = useGameAspect()
 

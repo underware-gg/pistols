@@ -28,15 +28,17 @@ export default function NewChallengeModal() {
   const { duel_token } = useDojoSystemCalls()
   const { account, address } = useAccount()
   const { tableId } = useTableId()
-  const { duelistId } = useSettings()
 
-  const { challengingAddress, dispatchChallengingPlayerAddress, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
-  const isOpen = useMemo(() => (challengingAddress > 0n), [challengingAddress])
-  const duelistIdA = duelistId
+  const { challengingAddress, challengingDuelistId, dispatchChallengingPlayerAddress, dispatchChallengingDuelistId, dispatchSelectPlayerAddress, dispatchSelectDuelistId, dispatchSelectDuel } = usePistolsContext()
+  const isOpen = useMemo(() => (challengingAddress > 0n && challengingDuelistId > 0n), [challengingDuelistId, challengingDuelistId])
+  const duelistIdA = challengingDuelistId
   const addressA = address
   const addressB = challengingAddress
 
-  const _close = () => { dispatchChallengingPlayerAddress(0n) }
+  const _close = () => { 
+    dispatchChallengingPlayerAddress(0n) 
+    dispatchChallengingDuelistId(0n)
+  }
 
   const { profilePic: profilePicA, profileType: profileTypeA } = useDuelist(duelistIdA)
 
@@ -47,8 +49,8 @@ export default function NewChallengeModal() {
   const [args, setArgs] = useState<any>(null)
 
   const { fee } = useCalcFeeDuel(tableId)
-  const { canJoin } = useCanJoin(tableId, duelistId)
-  const { rewards } = useCalcSeasonReward(tableId, duelistId, args?.lives_staked)
+  const { canJoin } = useCanJoin(tableId, challengingDuelistId)
+  const { rewards } = useCalcSeasonReward(tableId, challengingDuelistId, args?.lives_staked)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -65,7 +67,7 @@ export default function NewChallengeModal() {
   const _create_duel = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await duel_token.create_duel(account, duelistId, challengingAddress, args.premise, args.quote, tableId, args.expire_hours, args.lives_staked)
+      await duel_token.create_duel(account, challengingDuelistId, challengingAddress, args.premise, args.quote, tableId, args.expire_hours, args.lives_staked)
       setIsSubmitting(false)
     }
     if (args?.canSubmit) _submit()

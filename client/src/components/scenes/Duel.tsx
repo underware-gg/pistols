@@ -58,8 +58,8 @@ export default function Duel({
   const [duelSceneStarted, setDuelSceneStarted] = useState(false)
   const { name: nameA, characterType: characterTypeA } = useDuelist(duelistIdA)
   const { name: nameB, characterType: characterTypeB } = useDuelist(duelistIdB)
-  const { isMyDuelist: isYouA } = useIsMyDuelist(duelistIdA)
-  const { isMyDuelist: isYouB } = useIsMyDuelist(duelistIdB)
+  const isYouA = useIsMyDuelist(duelistIdA)
+  const isYouB = useIsMyDuelist(duelistIdB)
 
   // clear required action flag
   const { account } = useAccount()
@@ -492,3 +492,4 @@ export default function Duel({
 //TODO on page refresh in duel, automatically pause duel and instead of the ready button call start button so sounds are enabled + duel starts properly
 //TODO on refresh add a black overlay or round overlay with brown background that is shown and animated untill the assets are loaded and duel can be started!
 //TODO on duel end add rechallenge option!
+//TODO handle duel replay when someone withdrew/abandoned the duel or timedout currently it play the duel out without cards for one side 

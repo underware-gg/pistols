@@ -13,7 +13,6 @@ export const initialState = {
   framerate: 60,
   musicEnabled: true,
   sfxEnabled: true,
-  duelistId: 0n,
   duelSpeedFactor: 1.0,
   completedTutorialLevel: 0,
   // internal
@@ -26,7 +25,6 @@ const SettingsActions = {
   FRAMERATE: 'settings.FRAMERATE',
   MUSIC_ENABLED: 'settings.MUSIC_ENABLED',
   SFX_ENABLED: 'settings.SFX_ENABLED',
-  DUELIST_ID: 'settings.DUELIST_ID',
   DUEL_SPEED_FACTOR: 'settings.DUEL_SPEED_FACTOR',
   TUTORIAL_LEVEL: 'settings.TUTORIAL_LEVEL',
 }
@@ -42,7 +40,6 @@ type ActionType =
   | { type: 'FRAMERATE', payload: number }
   | { type: 'MUSIC_ENABLED', payload: boolean }
   | { type: 'SFX_ENABLED', payload: boolean }
-  | { type: 'DUELIST_ID', payload: bigint }
   | { type: 'DUEL_SPEED_FACTOR', payload: number }
   | { type: 'TUTORIAL_LEVEL', payload: number }
   // internal
@@ -80,7 +77,6 @@ const SettingsProvider = ({
       [SettingsActions.FRAMERATE]: () => setCookie(cookieName, state.framerate, _options),
       [SettingsActions.MUSIC_ENABLED]: () => setCookie(cookieName, state.musicEnabled, _options),
       [SettingsActions.SFX_ENABLED]: () => setCookie(cookieName, state.sfxEnabled, _options),
-      [SettingsActions.DUELIST_ID]: () => setCookie(cookieName, Number(state.duelistId), _options),
       [SettingsActions.DUEL_SPEED_FACTOR]: () => setCookie(cookieName, Number(state.duelSpeedFactor), _options),
       [SettingsActions.TUTORIAL_LEVEL]: () => setCookie(cookieName, state.completedTutorialLevel, _options),
     }
@@ -127,11 +123,6 @@ const SettingsProvider = ({
       case SettingsActions.TUTORIAL_LEVEL: {
         newState.completedTutorialLevel = action.payload as number
         cookieSetter(SettingsActions.TUTORIAL_LEVEL, newState)
-        break
-      }
-      case SettingsActions.DUELIST_ID: {
-        newState.duelistId = BigInt(action.payload)
-        cookieSetter(SettingsActions.DUELIST_ID, newState)
         break
       }
       default:
@@ -183,13 +174,6 @@ export const useSettings = () => {
     })
   }
 
-  const dispatchDuelistId = (newId: BigNumberish) => {
-    dispatch({
-      type: SettingsActions.DUELIST_ID,
-      payload: BigInt(newId),
-    })
-  }
-
   const settings = useMemo(() => ({
     ...state,
     hasFinishedTutorial: (state.completedTutorialLevel > 2),
@@ -200,7 +184,6 @@ export const useSettings = () => {
     settings,       // expose settings as object {}
     SettingsActions,
     dispatchSetting,
-    dispatchDuelistId,
   }
 }
 

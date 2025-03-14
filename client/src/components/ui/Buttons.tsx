@@ -302,14 +302,14 @@ export function ChallengeButton({
 }) {
   const { dispatchChallengingPlayerAddress, dispatchSetDuel } = usePistolsContext()
   const { address } = useAccount()
-  const { duelistId } = useSettings()
+
   const { tableId } = useTableId()
   const { isMyAccount } = useIsMyAccount(challengedPlayerAddress)
   const { hasPact, pactDuelId } = usePact(tableId, address, challengedPlayerAddress)
-  const canChallenge = (duelistId > 0n && !hasPact && !isMyAccount)
+  const canChallenge = (!hasPact && !isMyAccount)
 
   if (!hasPact) {
-    return <ActionButton large fill fillParent={fillParent} disabled={!canChallenge} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(challengedPlayerAddress)} />
+    return <ActionButton large fill fillParent={fillParent} important disabled={!canChallenge} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(challengedPlayerAddress)} />
   } else {
     return <ActionButton large fill fillParent={fillParent} important disabled label='Duel In Progress!' onClick={() => dispatchSetDuel(pactDuelId)} />
   }

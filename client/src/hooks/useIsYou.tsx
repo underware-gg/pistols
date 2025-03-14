@@ -27,8 +27,5 @@ export const useIsMyDuelist = (otherDuelistId: BigNumberish) => {
     isPlayerCharacter ||
     (isPositiveBigint(owner) ? bigintEquals(address, owner) : false)
   ), [address, owner])
-  return {
-    isMyDuelist,
-    myDuelistId: otherDuelistId,
-  }
+  return isMyDuelist
 }

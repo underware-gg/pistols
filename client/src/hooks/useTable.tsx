@@ -41,7 +41,7 @@ const useGetChallengesByTableQuery = (tableId: string) => {
   ), [tableId])
   const { entities } = useSdkStateEntitiesGet({ query })
   const challenges = useMemo(() => getEntityMapModels<models.Challenge>(entities, 'Challenge'), [entities])
-  useEffect(() => console.log(`useGetChallengesByTableQuery()`, challenges), [challenges])
+  // useEffect(() => console.log(`useGetChallengesByTableQuery()`, challenges), [challenges])
   return { challenges }
 }
 

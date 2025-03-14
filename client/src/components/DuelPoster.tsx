@@ -30,6 +30,8 @@ import { SceneName } from '/src/data/assets'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelRequiresAction } from '/src/stores/eventsStore'
 import { useGetChallengeRewards } from '/src/hooks/useChallengeRewards'
+import SelectDuelistModal from './modals/SelectDuelistModal'
+import { BigNumberish } from 'starknet'
 
 
 const Row = Grid.Row
@@ -66,12 +68,12 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
 }, ref: React.Ref<DuelPosterHandle>) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
-  const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext()
+  const { challengingDuelistId, dispatchSelectPlayerAddress, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
 
   const { duel_token, game } = useDojoSystemCalls()
-  const { duelistId } = useSettings()
   const { account } = useAccount()
   const isRequiredAction = useDuelRequiresAction(props.duelId)
+  const { duelistSelectOpener } = usePistolsContext()
 
   const {
     state,
@@ -125,13 +127,26 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   }
 
   const _reply = (accepted: boolean) => {
-    const _submit = async () => {
-      setIsSubmitting(true)
-      await duel_token.reply_duel(account, duelistId, props.duelId, accepted)
-      if (accepted) _gotoDuel()
-      setIsSubmitting(false)
+    if (accepted) {
+      duelistSelectOpener.open()
+    } else {
+      _submit(null, accepted)
     }
-    _submit()
+  }
+
+  useEffect(() => {
+    if (challengingDuelistId > 0n) {
+      _submit(challengingDuelistId, true)
+    }
+  }, [challengingDuelistId])
+
+  const _submit = async (duelistId?: BigNumberish, accepted?: boolean) => {
+    console.log('DuelPoster _submit duelistId:', duelistId, 'accepted:', accepted)
+    setIsSubmitting(true)
+    await duel_token.reply_duel(account, duelistId, props.duelId, accepted)
+    dispatchChallengingDuelistId(0n)
+    if (accepted) _gotoDuel()
+    setIsSubmitting(false)
   }
 
   const _gotoDuel = () => {
@@ -380,6 +395,8 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                 }
               </Row>
             </Grid>
+
+            <SelectDuelistModal opener={duelistSelectOpener} />
             
           </div>
         )

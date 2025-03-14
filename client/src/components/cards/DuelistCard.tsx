@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useImperativeHandle, useMemo, useRef } from 'react'
 import { BigNumberish } from 'starknet'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
@@ -16,9 +16,8 @@ import { InteractibleComponent, InteractibleComponentHandle, InteractibleCompone
 import { ProfileBadge } from '/src/components/account/ProfileDescription'
 import { Grid, GridRow, GridColumn } from 'semantic-ui-react'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { ActionButton, ChallengeButton } from '/src/components/ui/Buttons'
+import { ActionButton } from '/src/components/ui/Buttons'
 import { ChallengeTableSelectedDuelist } from '/src/components/ChallengeTable'
-import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 interface DuelistCardProps extends InteractibleComponentProps {
   duelistId: number
@@ -254,7 +253,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
           </div>
         </>
       }
-      childrenInBack={(props.showBack || props.isAnimating) &&
+      childrenInBack={(props.showBack || props.isAnimating) && !props.isSmall &&
         <>
           <div className={`duels-button-container ${props.isAnimating ? '' : 'visible'}`}>
             <ActionButton 

@@ -17,6 +17,7 @@ import { SceneName } from '/src/data/assets'
 import { useDuelistsOfOwner } from '/src/hooks/useTokenDuelists'
 import { AddressShort } from './AddressShort'
 import { ChallengeButton } from '/src/components/ui/Buttons'
+import SelectDuelistModal from '../modals/SelectDuelistModal'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -54,7 +55,7 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
 }, ref: React.Ref<ProfilePosterHandle>) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
-  const { dispatchSelectDuelistId } = usePistolsContext()
+  const { duelistSelectOpener, dispatchSelectDuelistId } = usePistolsContext()
 
   const isOnline = getPlayerOnlineStatus(props.playerAddress)
 
@@ -226,6 +227,8 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
                 </Col>
               </Row>
             </Grid>
+
+            <SelectDuelistModal opener={duelistSelectOpener} />
           </div>
         )
       }

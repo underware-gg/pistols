@@ -53,14 +53,16 @@ export function useDuelIcons({
     let icons = []
     //
     // Required Action...
-    if (isRequiredAction) {
-      if (isDuelistRequiresAction) {
-        icons.push(<LoadingIcon key='isTurn' size={iconSize} className='Brightest' />)
-      } else {
-        icons.push(<EmojiIcon emoji={EMOJI.IDLE} size={iconSize} />)
-      }
+    if (isFinished) { 
+      if (isRequiredAction) {
+        if (isDuelistRequiresAction) {
+          icons.push(<LoadingIcon key='isTurn' size={iconSize} className='Brightest' />)
+        } else {
+          icons.push(<EmojiIcon emoji={EMOJI.IDLE} size={iconSize} />)
+        }
 
-      return { icons }
+        return { icons }
+      }
     }
     //
     // Awaiting (B is always pending)

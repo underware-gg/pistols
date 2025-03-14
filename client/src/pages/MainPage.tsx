@@ -17,6 +17,7 @@ import PlayerModal from '/src/components/modals/PlayerModal'
 import DuelistModal from '/src/components/modals/DuelistModal'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import NewChallengeModal from '/src/components/modals/NewChallengeModal'
+import SelectDuelistModal from '../components/modals/SelectDuelistModal'
 import WalletFinderModal from '/src/components/modals/WalletFinderModal'
 import ScProfile from '/src/components/scenes/ScProfile'
 import ScTavern from '/src/components/scenes/ScTavern'
@@ -162,11 +163,12 @@ function TutorialUI({
 
 
 function Modals() {
-  const { selectedDuelId, selectedDuelistId, selectedPlayerAddress, challengingAddress, walletFinderOpener } = usePistolsContext()
+  const { selectedDuelId, selectedDuelistId, selectedPlayerAddress, challengingAddress, challengingDuelistId, walletFinderOpener } = usePistolsContext()
   const challengeIsOpen = useMemo(() => (selectedDuelId > 0), [selectedDuelId])
   const duelistIsOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
   const playerIsOpen = useMemo(() => (selectedPlayerAddress > 0n), [selectedPlayerAddress])
-  const newChallengeIsOpen = useMemo(() => (challengingAddress > 0n), [challengingAddress])
+  const newChallengeIsOpen = useMemo(() => (challengingAddress > 0n && challengingDuelistId > 0n), [challengingDuelistId, challengingAddress])
+  const selectDuelistIsOpen = useMemo(() => (challengingAddress > 0n && challengingDuelistId == 0n), [challengingDuelistId, challengingAddress])
   
   return (
     <>
@@ -174,6 +176,7 @@ function Modals() {
       {duelistIsOpen && <DuelistModal />}
       {playerIsOpen && <PlayerModal />}
       {newChallengeIsOpen && <NewChallengeModal />}
+      {selectDuelistIsOpen && <SelectDuelistModal />}
       <WalletFinderModal opener={walletFinderOpener} />
     </>
   )
