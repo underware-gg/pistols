@@ -4,13 +4,13 @@ const fs = require("fs");
 const path = require("path");
 const { Buffer } = require("node:buffer");
 
-function getFolderFilesRecursively(folder, extensions = []) {
+function getFolderFilesRecursively(folder, extensions = [], includeSubfolders = false) {
   let files = [];
   fs.readdirSync(folder).forEach(File => {
     const absPath = path.join(folder, File);
     if (fs.statSync(absPath).isDirectory()) {
-      if (!absPath.endsWith(`/tests`)) {
-        files = files.concat(getFolderFilesRecursively(absPath, extensions));
+      if (includeSubfolders) {
+        files = files.concat(getFolderFilesRecursively(absPath, extensions, includeSubfolders));
       }
     } else if (
       extensions.length === 0 ||
@@ -19,7 +19,7 @@ function getFolderFilesRecursively(folder, extensions = []) {
       files.push(absPath);
     }
   });
-  return files;
+  return files.sort((a, b) => a.localeCompare(b));
 }
 
 function cleanLine(line) {
@@ -41,11 +41,18 @@ const sources = [
   {
     source_path: '../../client/public/profiles',
     out_file: '../src/games/pistols/tokens/assets/profiles.tsx',
+    include_subfolders: true,
   },
   {
     source_path: '../../client/public/textures/cards',
     out_file: '../src/games/pistols/tokens/assets/cards.tsx',
-  }
+    include_subfolders: false,
+  },
+  {
+    source_path: '../../client/public/images/ui',
+    out_file: '../src/games/pistols/tokens/assets/ui.tsx',
+    include_subfolders: false,
+  },
 ];
 
 sources.forEach(source => {
@@ -56,7 +63,7 @@ sources.forEach(source => {
 
   let assets = {};
 
-  let files = getFolderFilesRecursively(srcPath, ['.png', '.jpg']);
+  let files = getFolderFilesRecursively(srcPath, ['.png', '.jpg'], source.include_subfolders);
   files.forEach(async filePath => {
     const fileContents = fs.readFileSync(filePath);
     // console.log(fileContents);
