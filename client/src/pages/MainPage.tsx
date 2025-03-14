@@ -106,9 +106,6 @@ function MainUI() {
   // sync game context with url params
   useSyncRouterParams()
 
-  // switch duelist after wallet change
-  useSyncSelectedDuelist()
-
   const { gameImpl } = useThreeJsContext()
   const { currentDuel, tutorialLevel } = usePistolsContext()
   const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards } = usePistolsScene()
