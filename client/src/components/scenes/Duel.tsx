@@ -112,13 +112,13 @@ export default function Duel({
   }, [tutorial, isTutorial])
 
   useEffect(() => {
-    if (gameImpl && mounted && !duelSceneStarted && isSynced && nameA && nameB && characterTypeA && characterTypeB) {
+    if (gameImpl && mounted && !duelSceneStarted && nameA && nameB && characterTypeA && characterTypeB) {
       gameImpl.setDuelData(Number(duelId), Number(duelistIdA), Number(duelistIdB))
       gameImpl.startDuelWithPlayers(nameA, characterTypeA, isYouA, isYouB, nameB, characterTypeB)
       setDuelSceneStarted(true)
       dispatchAnimated(AnimationState.None)
     }
-  }, [gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, isSynced, isYouA, isYouB])
+  }, [gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, isYouA, isYouB])
 
   // setup grass animation 
   //TODO change due new timeouts...
