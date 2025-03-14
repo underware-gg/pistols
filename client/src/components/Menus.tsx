@@ -14,10 +14,10 @@ export function MenuDuel({
 }) {
   const { dispatchSetting, settings, SettingsActions } = useSettings()
   const { dispatchSetDuel } = usePistolsContext()
-  const { dispatchSetScene } = usePistolsScene()
+  const { dispatchSceneBack } = usePistolsScene()
 
   const _backToTavern = () => {
-    dispatchSetScene(SceneName.Tavern)
+    dispatchSceneBack()
     dispatchSetDuel(0n)
   }
 

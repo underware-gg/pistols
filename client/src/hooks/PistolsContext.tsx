@@ -42,7 +42,7 @@ export const initialState = {
   currentDuel: 0n,
   currentScene: undefined as SceneName,
   tutorialLevel: undefined as DuelTutorialLevel,
-  lastScene: undefined as SceneName,
+  sceneStack: [] as SceneName[],
   moves: {} as StoredMoves,
   // injected
   connectOpener: null as Opener,
@@ -57,6 +57,7 @@ export const initialState = {
 const PistolsActions = {
   SET_SIG: 'SET_SIG',
   SET_SCENE: 'SET_SCENE',
+  POP_SCENE: 'POP_SCENE',
   SET_DUEL: 'SET_DUEL',
   SELECT_DUEL: 'SELECT_DUEL',
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
@@ -77,6 +78,7 @@ type PistolsContextStateType = typeof initialState
 type ActionType =
   | { type: 'SET_SIG', payload: bigint[] }
   | { type: 'SET_SCENE', payload: SceneName }
+  | { type: 'POP_SCENE', payload: null }
   | { type: 'SET_DUEL', payload: bigint }
   | { type: 'SELECT_DUEL', payload: bigint }
   | { type: 'SELECT_DUELIST_ID', payload: bigint }
@@ -133,8 +135,30 @@ const PistolsProvider = ({
         break
       }
       case PistolsActions.SET_SCENE: {
-        newState.lastScene = state.currentScene
-        newState.currentScene = action.payload as SceneName
+        const newScene = action.payload as SceneName
+        
+        // For Tavern and Gate, reset stack to just that scene
+        if (newScene === SceneName.Tavern || newScene === SceneName.Gate) {
+          newState.sceneStack = [newScene]
+        } else {
+          // Check if scene already exists in stack
+          const existingIndex = state.sceneStack.indexOf(newScene)
+          if (existingIndex !== -1) {
+            // If exists, remove everything after it
+            newState.sceneStack = state.sceneStack.slice(0, existingIndex + 1)
+          } else {
+            // Otherwise add new scene to stack
+            newState.sceneStack = [...state.sceneStack, newScene]
+          }
+        }
+        newState.currentScene = newScene
+        break
+      }
+      case PistolsActions.POP_SCENE: {
+        if (state.sceneStack.length > 1) {
+          newState.sceneStack = state.sceneStack.slice(0, -1)
+          newState.currentScene = newState.sceneStack[newState.sceneStack.length - 1]
+        }
         break
       }
       case PistolsActions.SET_DUEL: {
@@ -307,6 +331,13 @@ export const usePistolsContext = () => {
     })
   }, [dispatch])
 
+  const __dispatchSceneBack = useCallback(() => {
+    dispatch({
+      type: PistolsActions.POP_SCENE,
+      payload: null,
+    })
+  }, [dispatch])
+
   const __dispatchResetValues = useCallback(() => {
     dispatch({
       type: PistolsActions.RESET_VALUES,
@@ -317,6 +348,7 @@ export const usePistolsContext = () => {
   return {
     ...state,
     hasSigned: (state.walletSig.sig > 0n),
+    lastScene: state.sceneStack[state.sceneStack.length - 2],
     // PistolsActions,
     dispatch,
     dispatchSetSig,
@@ -329,6 +361,7 @@ export const usePistolsContext = () => {
     dispatchSetMoves,
     makeStoredMovesKey,
     __dispatchSetScene, // used internally only
+    __dispatchSceneBack, // used internally only
     __dispatchResetValues,  // used internally only
     dispatchSetTutorialLevel,
   }
@@ -393,7 +426,7 @@ type SceneSlug = {
   duelId?: BigNumberish,
 }
 export const usePistolsScene = () => {
-  const { currentScene, lastScene, selectedDuelId, currentDuel, dispatchSetDuel, __dispatchSetScene, __dispatchResetValues } = usePistolsContext()
+  const { currentScene, sceneStack, selectedDuelId, currentDuel, dispatchSetDuel, __dispatchSetScene, __dispatchSceneBack, __dispatchResetValues } = usePistolsContext()
   const { tableId, isSeason, isTutorial } = useTableId()
 
   const location = useLocation()
@@ -423,12 +456,36 @@ export const usePistolsScene = () => {
     __dispatchSetScene(newScene)
   }, [location.pathname, navigate, selectedDuelId, tableId, isSeason])
 
+  const dispatchSceneBack = useCallback(() => {
+    if (sceneStack.length > 1) {
+      const prevScene = sceneStack[sceneStack.length - 2]
+      let route = sceneRoutes[prevScene]
+      let url = route.baseUrl
+      let slug = ''
+      if (route.hasTableId) {
+        slug = tableId && !isSeason ? tableId : ''
+      } else if (route.hasDuelId) {
+        slug = `${bigintToDecimal(currentDuel)}`
+      }
+      url += slug ? `/${slug}` : ''
+      if (url != location.pathname) {
+        console.log(`navigate back >>>>> [${location.pathname}] > [${url}]`)
+        navigate(url)
+      }
+      __dispatchSceneBack()
+    } else {
+      // If no previous scene, go to tavern
+      __dispatchSetScene(SceneName.Tavern)
+    }
+  }, [sceneStack, location.pathname, navigate, tableId, isSeason, currentDuel])
+
   const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at Dawn'), [currentScene])
 
   return {
     currentScene,
-    lastScene,
-    wasLastSceneTutorial: tutorialScenes.includes(lastScene as typeof tutorialScenes[number]),
+    sceneStack,
+    lastScene: sceneStack[sceneStack.length - 2],
+    wasLastSceneTutorial: tutorialScenes.includes(sceneStack[sceneStack.length - 2] as typeof tutorialScenes[number]),
     sceneTitle,
     // helpers
     atGate: (currentScene == SceneName.Gate),
@@ -448,6 +505,7 @@ export const usePistolsScene = () => {
     atTutorialScene5: (currentScene == SceneName.TutorialScene5),
     // PistolsActions,
     dispatchSetScene,
+    dispatchSceneBack,
   }
 }
 

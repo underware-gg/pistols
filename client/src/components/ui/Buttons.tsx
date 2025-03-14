@@ -278,13 +278,13 @@ export function SettingsMenuItem({
 }
 
 export function BackButton() {
-  const { dispatchSetScene, atDoor } = usePistolsScene();
+  const { dispatchSetScene, atDoor, dispatchSceneBack } = usePistolsScene();
 
   const handleClick = () => {
     if (atDoor) {
       dispatchSetScene(SceneName.Gate);
     } else {
-      dispatchSetScene(SceneName.Tavern);
+      dispatchSceneBack();
     }
   }
 
