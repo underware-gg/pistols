@@ -1,17 +1,39 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useDojoSetup, useLordsContract, useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
+import { useLordsContract, useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
 import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
 import { useFameContract } from '/src/hooks/useFame'
 import { useFoolsContract } from '/src/hooks/useFools'
 import { useTokenIdsOfPlayer, useTokenStore } from '/src/stores/tokenStore'
 import { useCoinStore } from '/src/stores/coinStore'
+import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import * as torii from '@dojoengine/torii-client'
-import { useMounted } from '@underware/pistols-sdk/utils/hooks'
+
+
+
+export function TokenStoreSyncQL() {
+  // const { duelistContractAddress } = useDuelistTokenContract()
+  // const { address } = useAccount()
+  // const state = useTokenStore((state) => state)
+  // const { tokens, isLoading, refetch } = useToriiTokensByOwnerQL(duelistContractAddress, address, watch)
+
+  // const { mintedCount } = useTokenConfig(duelistContractAddress)
+  // useEffect(() => {
+  //   setTimeout(() => { refetch() }, 500);
+  // }, [mintedCount, refetch])
+
+  // useEffect(() => {
+  //   if (duelistContractAddress && address && !isLoading) {
+  //     state.setTokens(duelistContractAddress, address, tokens)
+  //   }
+  // }, [duelistContractAddress, address, tokens, isLoading])
+  // useEffect(() => console.log("TokensOfPlayerStoreSyncQL() =>", state.tokens), [state.tokens])
+  return (<></>)
+}
+
 
 
 export function TokenStoreSync() {
-  const { sdk } = useDojoSetup()
   const token_state = useTokenStore((state) => state)
   const coin_state = useCoinStore((state) => state)
 
@@ -46,9 +68,9 @@ export function TokenStoreSync() {
   }, [initialized, token_contracts, coin_contracts])
 
   // initialize player's duelists
-  useTokenIdsOfPlayer(duelistContractAddress, !initialized)
-  useTokenIdsOfPlayer(duelContractAddress, !initialized)
-  useTokenIdsOfPlayer(packContractAddress, !initialized)
+  // useTokenIdsOfPlayer(duelistContractAddress, !initialized)
+  // useTokenIdsOfPlayer(duelContractAddress, !initialized)
+  // useTokenIdsOfPlayer(packContractAddress, !initialized)
 
   // subscribe for any updates
   const mounted = useMounted()
@@ -56,23 +78,21 @@ export function TokenStoreSync() {
     ...token_contracts,
     ...coin_contracts,
   ], [token_contracts, coin_contracts])
-  const accounts = useMemo(() => [], [])
   useSdkTokenBalancesSub({
     contracts,
-    accounts,
     updateBalance: (balance: torii.TokenBalance) => {
       console.log("TOKENS SUB >>>", balance)
       const _contract = bigintToHex(balance.contract_address)
       if (token_contracts.includes(_contract)) {
         token_state.updateBalance(balance)
-      } else {
+      } else if (coin_contracts.includes(_contract)) {
         coin_state.updateBalance(balance)
       }
     },
     enabled: mounted,
   })
 
-  useEffect(() => console.log("TokenStoreSync() token_state =>", token_state.contracts), [token_state.contracts])
-  useEffect(() => console.log("TokenStoreSync() coin_state =>", coin_state.contracts), [coin_state.contracts])
+  // useEffect(() => console.log("TokenStoreSync() token_state =>", token_state.contracts), [token_state.contracts])
+  // useEffect(() => console.log("TokenStoreSync() coin_state =>", coin_state.contracts), [coin_state.contracts])
   return (<></>)
 }

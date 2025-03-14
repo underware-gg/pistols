@@ -190,7 +190,7 @@ export const useSdkEventsSub = ({
     let _unsubscribe: (() => void) = undefined;
     const _subscribe = async () => {
       setIsLoading(true)
-      console.log("EVENTS SUB _______ query:", query);
+      // console.log("EVENTS SUB _______ query:", query);
       await sdk.subscribeEventQuery({
         query,
         historical,

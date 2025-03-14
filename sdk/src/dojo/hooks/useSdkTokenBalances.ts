@@ -49,7 +49,7 @@ export const useSdkTokenBalancesGet = ({
 
   useEffect(() => {
     const _get = async () => {
-      console.warn("useSdkTokenBalancesGet() GET........", enabled, forceCounter, contracts, accounts)
+      // console.warn("useSdkTokenBalancesGet() GET........", enabled, forceCounter, contracts, accounts)
       setIsLoading(true)
       await sdk.getTokenBalances(
         contracts,

@@ -1,10 +1,7 @@
-import { useMemo, useEffect } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
-import { useToriiBalancesByContractQL } from '@underware/pistols-sdk/dojo/graphql'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
-import { useFameContract } from '/src/hooks/useFame'
 import * as torii from '@dojoengine/torii-client'
 
 

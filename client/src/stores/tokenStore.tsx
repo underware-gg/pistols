@@ -6,6 +6,7 @@ import { useAccount } from '@starknet-react/core'
 import { useSdkTokenBalancesGet } from '@underware/pistols-sdk/dojo'
 import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import * as torii from '@dojoengine/torii-client'
+import { useTokenConfig } from './tokenConfigStore'
 
 
 interface TokenState {
@@ -50,11 +51,13 @@ const createStore = () => {
       console.log("tokenStore() SET:", balances)
       set((state: State) => {
         // insert if not exists
+        let processed_accounts = []
         balances.forEach((balance) => {
           const _contract = bigintToHex(balance.contract_address)
           const _owner = bigintToHex(balance.account_address)
-          if (!state.contracts[_contract][_owner]) {
+          if (!state.contracts[_contract][_owner] || !processed_accounts.includes(_owner)) {
             state.contracts[_contract][_owner] = []
+            processed_accounts.push(_owner)
           }
           state.contracts[_contract][_owner].push(_parseBalance(balance))
         })
@@ -88,13 +91,13 @@ export const useTokenStore = createStore();
 //
 
 // get current players tokens from the store
-export function useTokenIdsOfPlayer(contractAddress: BigNumberish, disabled: boolean = true) {
+export function useTokenIdsOfPlayer(contractAddress: BigNumberish) {
   const { address } = useAccount()
-  return useTokenIdsByOwner(contractAddress, address, disabled)
+  return useTokenIdsByOwner(contractAddress, address)
 }
 
-export function useTokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish, disabled: boolean = false) {
-  const { tokens, isLoading } = useTokensByOwner(contractAddress, owner, disabled)
+export function useTokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
+  const { tokens, isLoading } = useTokensByOwner(contractAddress, owner)
   const tokenIds = useMemo(() => (
     tokens.map((token) => token.tokenId).sort((a, b) => Number(b - a))
   ), [tokens])
@@ -105,18 +108,21 @@ export function useTokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumb
 }
 
 // get initial tokens of owner
-export function useTokensByOwner(contractAddress: BigNumberish, owner: BigNumberish, disabled: boolean = false) {
+export function useTokensByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
   const state = useTokenStore((state) => state)
   const tokens = useMemo(() => state.getTokens(contractAddress, owner), [state.contracts, contractAddress, owner])
 
-  // get tokens only if owner not already in store
+  const { mintedCount } = useTokenConfig(contractAddress)
   const contracts = useMemo(() => (isPositiveBigint(contractAddress) ? [bigintToHex(contractAddress)] : []), [contractAddress])
   const accounts = useMemo(() => (isPositiveBigint(owner) ? [bigintToHex(owner)] : []), [owner])
   const { isLoading } = useSdkTokenBalancesGet({
     contracts,
     accounts,
     setBalances: state.setBalances,
-    enabled: (tokens === null && contracts.length > 0 && accounts.length > 0 && !disabled),
+    enabled: (contracts.length > 0 && accounts.length > 0 && mintedCount > 0
+      // && tokens === null
+    ),
+    forceCounter: mintedCount,
   })
 
   return {
