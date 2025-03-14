@@ -28,7 +28,6 @@
     "client"
   ],
   "dependencies": {
-    "@apollo/client": "catalog:",
     "@cartridge/connector": "catalog:",
     "@cartridge/controller": "catalog:",
     "@dojoengine/core": "catalog:",

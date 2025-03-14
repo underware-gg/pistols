@@ -4,7 +4,7 @@ import { Container, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
 import { useTokensByOwner } from '/src/stores/tokenStore'
-import { TokensOfPlayerStoreSyncQL } from '/src/stores/sync/TokenStoreSync'
+import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { useERC721TokenUri } from '@underware/pistols-sdk/utils/hooks'
 import { duelist_token, duel_token } from '@underware/pistols-sdk/pistols/tokens'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
@@ -50,7 +50,7 @@ function Tokens() {
       <br />
       <TokenContract contractAddress={duelContractAddress} tokenName='Duels' />
       <br />
-      <TokensOfPlayerStoreSyncQL />
+      <TokenStoreSync />
     </>
   );
 }
@@ -74,7 +74,8 @@ function TokenContract({
         <TokenRow key={token.tokenId}
           contractAddress={contractAddress}
           tokenId={token.tokenId}
-          cached_metadata={token.metadata}
+          // cached_metadata={token.metadata}
+          cached_metadata={''}
           attributes={attributes}
         />
       )

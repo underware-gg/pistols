@@ -4,23 +4,23 @@ import { useDojoSystem } from '@underware/pistols-sdk/dojo'
 import { poseidon } from '@underware/pistols-sdk/utils/starknet'
 
 export const usePackTokenContract = () => {
-  const { contractAddress: packContractAddress } = useDojoSystem('pack_token')
+  const { contractAddress } = useDojoSystem('pack_token')
   return {
-    packContractAddress,
+    packContractAddress: contractAddress,
   }
 }
 
 export const useDuelistTokenContract = () => {
-  const { contractAddress: duelistContractAddress } = useDojoSystem('duelist_token')
+  const { contractAddress } = useDojoSystem('duelist_token')
   return {
-    duelistContractAddress,
+    duelistContractAddress: contractAddress,
   }
 }
 
 export const useDuelTokenContract = () => {
-  const { contractAddress: duelContractAddress } = useDojoSystem('duel_token')
+  const { contractAddress } = useDojoSystem('duel_token')
   return {
-    duelContractAddress,
+    duelContractAddress: contractAddress,
   }
 }
 

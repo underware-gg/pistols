@@ -5,9 +5,7 @@ import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { PlayerOnlineSync } from '/src/stores/sync/PlayerOnlineSync'
-// QL to be replaced...
-import { FameCoinStoreSyncQL } from '/src/stores/fameCoinStore'
-import { TokensOfPlayerStoreSync, TokensOfPlayerStoreSyncQL } from '/src/stores/sync/TokenStoreSync'
+import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 
 //
 // Manages all store subscriptions
@@ -21,10 +19,7 @@ export default function StoreSync() {
       <EventsModelStoreSync />
       <ChallengeStoreSync />
       <EntityStoreSync />
-      {/* QL to be replaced... */}
-      <FameCoinStoreSyncQL />
-      <TokensOfPlayerStoreSyncQL />
-      <TokensOfPlayerStoreSync />
+      <TokenStoreSync />
 
       {/* Controller */}
       <PlayerNameSync />
