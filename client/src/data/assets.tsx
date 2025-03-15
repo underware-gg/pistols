@@ -85,9 +85,8 @@ enum TextureName {
   bg_resurrection_player = 'bg_resurrection_player',
   bg_resurrection_table = 'bg_resurrection_table',
 
-  bg_profile_book = 'bg_profile_book',
-  bg_profile_chest = 'bg_profile_chest',
   bg_profile_table = 'bg_profile_table',
+  bg_profile_items = 'bg_profile_items',
   bg_profile_player = 'bg_profile_player',
   bg_profile_book_mask = 'bg_profile_book_mask',
   bg_profile_chest_mask = 'bg_profile_chest_mask',
@@ -159,13 +158,12 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_resurrection_player]: { path: '/images/tutorial/background/resurrection/bg_resurrection_player.png' },
   [TextureName.bg_resurrection_table]: { path: '/images/tutorial/background/resurrection/bg_resurrection_table.png' },
 
-  [TextureName.bg_profile_book]: { path: '/images/bg_profile_book.png' },
-  [TextureName.bg_profile_chest]: { path: '/images/bg_profile_chest.png' },
-  [TextureName.bg_profile_table]: { path: '/images/bg_profile_table.png' },
-  [TextureName.bg_profile_player]: { path: '/images/bg_profile_player.png' },
+  [TextureName.bg_profile_table]: { path: '/images/scenes/profile/bg_profile_table.png' },
+  [TextureName.bg_profile_player]: { path: '/images/scenes/profile/bg_profile_player.png' },
+  [TextureName.bg_profile_items]: { path: '/images/scenes/profile/bg_profile_items.png' },
   [TextureName.bg_profile_book_mask]: { path: '/images/bg_profile_book_mask.png' },
   [TextureName.bg_profile_chest_mask]: { path: '/images/bg_profile_chest_mask.png' },
-  [TextureName.bg_profile_background]: { path: '/images/bg_profile_background.png' },
+  [TextureName.bg_profile_background]: { path: '/images/scenes/profile/bg_profile_background.png' },
 }
 
 interface SceneData {
@@ -199,14 +197,13 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
   [SceneName.Door]: { backgrounds: [{ texture: TextureName.bg_door, shiftMultiplier: 0, renderOrder: 0 }] },
   [SceneName.Profile]: {
     backgrounds: [
-      { texture: TextureName.bg_profile_book, shiftMultiplier: 0.016, renderOrder: 0 },
-      { texture: TextureName.bg_profile_chest, shiftMultiplier: 0.013, renderOrder: 1 },
-      { texture: TextureName.bg_profile_table, shiftMultiplier: 0.01, renderOrder: 2 },
-      { texture: TextureName.bg_profile_player, shiftMultiplier: -0.02, renderOrder: 3 },
-      { texture: TextureName.bg_profile_background, shiftMultiplier: -0.03, renderOrder: 4 },
+      { texture: TextureName.bg_profile_table, shiftMultiplier: 0.015, renderOrder: 0 },
+      { texture: TextureName.bg_profile_items, shiftMultiplier: 0.005, renderOrder: 1 },
+      { texture: TextureName.bg_profile_player, shiftMultiplier: -0.005, renderOrder: 2 },
+      { texture: TextureName.bg_profile_background, shiftMultiplier: -0.03, renderOrder: 3 },
     ],
     items: [
-      { name: 'book', color: 'ff0000', description: 'Your Duelists', mask: TextureName.bg_profile_book_mask, renderOrder: 0 },
+      { name: 'book', color: 'ff0000', description: 'Your Duelists', mask: TextureName.bg_profile_book_mask, renderOrder: 1 },
       { name: 'chest', color: '0000ff', description: 'Card Packs', mask: TextureName.bg_profile_chest_mask, renderOrder: 1 },
     ]
   },
