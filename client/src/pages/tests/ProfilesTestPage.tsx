@@ -74,7 +74,7 @@ const _randomQuote = () => {
   return options[Math.floor(Math.random() * options.length)]
 }
 const _randomChallengeState = () => {
-  return constants.ChallengeState[Math.floor(Math.random() * Object.keys(constants.ChallengeState).length)] as constants.ChallengeState
+  return constants.getChallengeStateFromValue(Math.floor(Math.random() * Object.keys(constants.ChallengeState).length))
 }
 
 function Profiles({
@@ -117,6 +117,8 @@ function Profiles({
     return props.map((e, index) => {
       const { profile, prop } = e;
       const state = _randomChallengeState()
+      const is_finished = (state == constants.ChallengeState.Resolved || state == constants.ChallengeState.Draw);
+      const winner = is_finished ? (Math.floor(Math.random() * 3)) : 0;
       let nextProfileIndex = (index < props.length - 1) ? index + 1 : 0;
       const duel_prop: duel_token.DuelSvgProps = {
         // base_uri: 'https://localhost:5173',
@@ -125,11 +127,15 @@ function Profiles({
         premise: _randomPremise(),
         quote: _randomQuote(),
         state,
-        winner: (state == constants.ChallengeState.Resolved || state == constants.ChallengeState.Draw) ? (1 + Math.floor(Math.random() * 2)) : 0,
+        winner,
         profile_type_a: prop.profile_type,
-        profile_id_a: prop.profile_id,
         profile_type_b: props[nextProfileIndex].prop.profile_type,
+        profile_id_a: prop.profile_id,
         profile_id_b: props[nextProfileIndex].prop.profile_id,
+        username_a: prop.username,
+        username_b: props[nextProfileIndex].prop.username,
+        owner_a: prop.owner,
+        owner_b: props[nextProfileIndex].prop.owner,
       };
       return (
         <Row key={`${profileType}-${profile.profile_id}`} className='ModalText'>

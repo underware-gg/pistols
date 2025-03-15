@@ -1,8 +1,16 @@
+import {
+  ArchetypeCardUrl,
+  COLOR_SHADOW, COLOR_LIGHT, COLOR_DARK,
+  renderDuelistImageUrl, card_cross,
+  STAR, PISTOL,
+  SvgRenderOptions,
+  _getProfile, _packSvg,
+  COLOR_TITLE,
+} from './types'
 import { BigNumberish } from 'starknet'
 import { assets as profileAssets } from './assets/profiles'
 import { assets as cardsAssets } from './assets/cards'
-import { renderDuelistImageUrl } from './duelist'
-import { SvgRenderOptions, _packSvg } from './types'
+import { assets as uiAssets } from './assets/ui'
 import { getAsset } from './assets'
 import * as constants from '../generated/constants'
 
@@ -15,21 +23,158 @@ export type DuelSvgProps = {
   state: constants.ChallengeState
   winner: number
   profile_type_a: constants.ProfileType
-  profile_id_a: number
   profile_type_b: constants.ProfileType
+  profile_id_a: number
   profile_id_b: number
+  username_a: string
+  username_b: string
+  owner_a: BigNumberish
+  owner_b: BigNumberish
   // optional
   is_loading?: boolean
 }
 
+// paper size: 799w x 1072h
+// resized:   805w x 1080h
+const WIDTH = 805;
+const HEIGHT = 1080;
+const HALF_WIDTH = Math.floor(WIDTH / 2);
+const HALF_HEIGHT = Math.floor(HEIGHT / 2);
+
+const PROFILE_W = Math.floor(WIDTH * 0.45);
+const PROFILE_H = PROFILE_W;
+const PROFILE_Y = 130;
+const PROFILE_GAP = Math.floor(HALF_WIDTH - PROFILE_W);
+const PROFILE_X1 = PROFILE_GAP;
+const PROFILE_X2 = Math.floor(HALF_WIDTH);
+const MASK_SKEW = Math.floor(PROFILE_W * 0.2);
+
+const TITLE_Y = 50;
+const USERNAME_Y = 100;
+const NAME_Y = USERNAME_Y + PROFILE_H + 70;
+const NAME_X1 = PROFILE_GAP;
+const NAME_X2 = (WIDTH - PROFILE_GAP);
+
+const WEBSITE_Y = (HEIGHT * 0.97);
+
+
 export const renderSvg = (props: DuelSvgProps, options: SvgRenderOptions = {}): string => {
+  const profile_a = _getProfile(props.profile_type_a, props.profile_id_a)
+  const profile_b = _getProfile(props.profile_type_b, props.profile_id_b)
+  const is_finished = (props.state === constants.ChallengeState.Resolved || props.state === constants.ChallengeState.Draw);
   let image_duelist_a = renderDuelistImageUrl(props.profile_type_a, props.profile_id_a)
   let image_duelist_b = renderDuelistImageUrl(props.profile_type_b, props.profile_id_b)
-  let image_border = `/textures/cards/card_wide_brown.png`
-  let svg = `<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 1942 1024'>` +
-    `<image href='${getAsset(profileAssets, image_duelist_a)}' x='0' y='50' width='560px' height='924px' />` +
-    `<image href='${getAsset(profileAssets, image_duelist_b)}' x='1380' y='50' width='560px' height='924px' />` +
-    `<image href='${getAsset(cardsAssets, image_border)}' x='0' y='0' width='1942px' height='1024px' />` +
-    `</svg>`;
+  let image_paper = `/images/ui/duel_paper.png`
+  let svg = `
+<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 ${WIDTH} ${HEIGHT}'>
+<style>
+  text{
+    fill:${COLOR_DARK};
+    text-shadow:0.02rem 0.02rem 2px ${COLOR_SHADOW};
+    font-size:28px;
+    font-family:Garamond;
+    dominant-baseline:middle;
+    text-anchor:middle;
+    stroke-width:1px;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+  }
+  .VS{
+    font-size:50px;
+  }
+  .TITLE{
+    fill:${COLOR_TITLE};
+    // stroke:${COLOR_SHADOW};
+    font-size:50px;
+    font-weight:bold;
+    font-variant-caps:small-caps;
+    text-anchor:start;
+  }
+  .USERNAME{
+    font-size:40px;
+    font-style:italic;
+    text-anchor:start;
+  }
+  .NAME{
+    font-size:36px;
+    font-weight:bold;
+    font-variant-caps:small-caps;
+    text-anchor:start;
+  }
+  .RIGHT{
+    text-anchor:end;
+  }
+  .PROFILE {
+    stroke:${COLOR_DARK};
+    stroke-width:10px;
+    fill:none;
+  }
+  .WEBSITE{
+    font-size:20px;
+    // font-family:monospace;
+    // font-style:italic;
+    // text-decoration:underline;
+  }
+</style>
+
+// paper background
+<image href='${getAsset(uiAssets, image_paper)}' x='0' y='0' width='${WIDTH}px' height='${HEIGHT}px'/>
+
+// profiles
+<mask id='mask1'>
+  <path d='M${PROFILE_X1},${PROFILE_Y}h${PROFILE_W - MASK_SKEW}l${MASK_SKEW},${PROFILE_H}h-${PROFILE_W}z' fill='white'/>
+</mask>
+<mask id='mask2'>
+  <path d='M${PROFILE_X2},${PROFILE_Y}h${PROFILE_W}v${PROFILE_H}h-${PROFILE_W - MASK_SKEW}z' fill='white'/>
+</mask>
+<image href='${getAsset(profileAssets, image_duelist_a)}' x='${PROFILE_X1}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' mask='url(#mask1)'/>
+<image href='${getAsset(profileAssets, image_duelist_b)}' x='${PROFILE_X2}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' mask='url(#mask2)'/>
+<path class='PROFILE' d='M${PROFILE_X1},${PROFILE_Y}h${PROFILE_W - MASK_SKEW}l${MASK_SKEW},${PROFILE_H}h-${PROFILE_W}z'/>
+<path class='PROFILE' d='M${PROFILE_X2},${PROFILE_Y}h${PROFILE_W}v${PROFILE_H}h-${PROFILE_W - MASK_SKEW}z'/>
+<text class='VS' x='${HALF_WIDTH}' y='${PROFILE_Y+PROFILE_H/2}'>
+  vs
+</text>
+// cross
+${(is_finished && props.winner != 1) &&
+`<image href='${getAsset(cardsAssets, card_cross)}' x='${PROFILE_X1}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`
+}
+${(is_finished && props.winner != 2) &&
+`<image href='${getAsset(cardsAssets, card_cross)}' x='${PROFILE_X2}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`
+}
+
+// usernames
+<text class='TITLE' x='${NAME_X1}' y='${TITLE_Y}'>
+  Duel #${props.duel_id}
+</text>
+<text class='TITLE RIGHT' x='${NAME_X2}' y='${TITLE_Y}'>
+  ${props.table_id}
+</text>
+
+// usernames
+<text class='USERNAME' x='${NAME_X1}' y='${USERNAME_Y}'>
+  ${props.username_a}
+</text>
+<text class='USERNAME RIGHT' x='${NAME_X2}' y='${USERNAME_Y}'>
+  ${props.username_b}
+</text>
+
+// profile names
+<text class='NAME' x='${NAME_X1}' y='${NAME_Y}'>
+  ${profile_a.name} #${props.profile_id_a}
+</text>
+<text class='NAME RIGHT' x='${NAME_X2}' y='${NAME_Y}'>
+  ${profile_b.name} #${props.profile_id_b}
+</text>
+
+
+// pistols
+<text class='WEBSITE' x='${HALF_WIDTH}' y='${WEBSITE_Y}'>
+  pistols.gg
+</text>
+
+</svg>
+`;
   return _packSvg(svg, options)
 }
