@@ -106,8 +106,9 @@ export const useQueryChallengeIds = (
   const duelistEntities = useDuelistQueryStore((state) => state.entities);
   const targetId = useMemo(() => (isPositiveBigint(playerAddressOrDuelistId) ? BigInt(playerAddressOrDuelistId) : 0n), [playerAddressOrDuelistId, duelistEntities])
 
-  const [challengeIds, states] = useMemo(() => {
+  const [challengeIds, states, challengePlayerMap] = useMemo(() => {
     // get all challenges, by duelist (or all)
+    console.log(entities)
     let result =
       (targetId > 0n) ?
         Object.values(entities).filter((e) => e.duelist_id_a === targetId || e.duelist_id_b === targetId || e.address_a === targetId || e.address_b === targetId)
@@ -159,11 +160,22 @@ export const useQueryChallengeIds = (
 
     // return ids only
     const challengeIds = result.map((e) => e.duel_id)
-    return [challengeIds, states]
+    
+    // create map of challenge ids to player addresses
+    const challengePlayerMap = result.reduce((map, e) => {
+      map.set(e.duel_id, {
+        addressA: e.address_a,
+        addressB: e.address_b
+      })
+      return map
+    }, new Map())
+
+    return [challengeIds, states, challengePlayerMap]
   }, [entities, filterStates, filterName, filterBookmarked, targetId, sortColumn, sortDirection, bookmarkedDuels, requiredDuelIds])
 
   return {
     challengeIds,
     states,
+    challengePlayerMap
   }
 }

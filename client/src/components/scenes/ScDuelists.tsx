@@ -1,23 +1,35 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useQueryParams } from '/src/stores/queryParamsStore'
+import { SortDirection, PlayerColumn, useQueryParams, ChallengeColumn } from '/src/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useQueryPlayerIds } from '/src/stores/playerStore'
-import { useOpener } from '/src/hooks/useOpener'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
 import { TavernAudios } from '/src/components/GameContainer'
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '../ui/ProfilePoster'
 import { SceneName } from '/src/data/assets'
+import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
+import { useAccount } from '@starknet-react/core'
+import { LiveChallengeStates } from '/src/utils/pistols'
 
 export default function ScDuelists() {
+  const { address } = useAccount()
   const { filterPlayerName, filterPlayerOnline, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection } = useQueryParams()
   const { playerIds } = useQueryPlayerIds(filterPlayerName, filterPlayerOnline, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection)
+  const { playerIds: matchmakingPlayerIds } = useQueryPlayerIds("", true, false, PlayerColumn.Timestamp, SortDirection.Descending)
+  const { challengePlayerMap } = useQueryChallengeIds(LiveChallengeStates, "", false, address, ChallengeColumn.Time, SortDirection.Descending)
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   const { dispatchSetScene} = usePistolsScene()
-  const anonOpener = useOpener()
+
+  const availableMatchmakingPlayers = useMemo(() => {
+    return matchmakingPlayerIds.filter(id => !Array.from(challengePlayerMap.values()).some(player => player.addressA === id || player.addressB === id))
+  }, [matchmakingPlayerIds, challengePlayerMap])
+
+  useEffect(() => {
+    console.log(matchmakingPlayerIds, challengePlayerMap, availableMatchmakingPlayers)
+  }, [matchmakingPlayerIds, challengePlayerMap, availableMatchmakingPlayers])
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
   
@@ -38,7 +50,13 @@ export default function ScDuelists() {
           dispatchSetScene(SceneName.DuelsBoard)
           break
         case 'matchmaking':
-          //TODO
+          if (availableMatchmakingPlayers.length > 0) {
+            const randomIndex = Math.floor(Math.random() * availableMatchmakingPlayers.length)
+            const randomPlayer = availableMatchmakingPlayers[randomIndex]
+            dispatchSelectPlayerAddress(randomPlayer)
+          } else {
+            console.log("No players available for matchmaking")             
+          }
           break
       }
     }
@@ -281,7 +299,7 @@ export default function ScDuelists() {
     if (playerAddress) {
       dispatchSelectPlayerAddress(playerAddress)
     } else {
-      anonOpener.open();
+      console.log("No player address selected")
     }
   }
 
