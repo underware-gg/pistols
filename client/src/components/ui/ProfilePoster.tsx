@@ -33,6 +33,10 @@ interface ProfilePosterProps {
   isVisible?: boolean
   isHighlightable?: boolean
   instantVisible?: boolean
+  
+  width?: number
+  height?: number
+  
   startPosition?: { x: number, y: number }
   startRotation?: number
   startScale?: number
@@ -49,6 +53,8 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
   isVisible: false,
   isHighlightable: false,
   instantVisible: false,
+  width: null,
+  height: null,
   startPosition: { x: 0, y: 0 },
   startRotation: 0,
   startScale: 1
@@ -113,8 +119,8 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
 
   return (
     <InteractibleComponent
-      width={aspectWidth(props.isSmall ? POSTER_WIDTH_SMALL : POSTER_WIDTH_BIG)}
-      height={aspectHeight(props.isSmall ? POSTER_HEIGHT_SMALL : POSTER_HEIGHT_BIG)}
+      width={aspectWidth(props.width || (props.isSmall ? POSTER_WIDTH_SMALL : POSTER_WIDTH_BIG))}
+      height={aspectHeight(props.height || (props.isSmall ? POSTER_HEIGHT_SMALL : POSTER_HEIGHT_BIG))}
       isLeft={false}
       isFlipped={true}
       isVisible={props.isVisible}

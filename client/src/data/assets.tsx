@@ -85,7 +85,6 @@ enum TextureName {
   bg_resurrection_player = 'bg_resurrection_player',
   bg_resurrection_table = 'bg_resurrection_table',
 
-  
   bg_profile_book = 'bg_profile_book',
   bg_profile_chest = 'bg_profile_chest',
   bg_profile_table = 'bg_profile_table',

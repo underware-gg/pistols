@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
-import { Container, Grid, Header, Table, Button, Segment, Pagination, Icon } from 'semantic-ui-react';
-import { ProfilePoster } from '/src/components/ui/ProfilePoster';
+import React, { useState, useRef, useEffect } from 'react';
+import { Container, Grid, Header, Table, Button, Segment, Pagination, Icon, Divider } from 'semantic-ui-react';
+import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '/src/components/ui/ProfilePoster';
 import { useGameAspect } from '/src/hooks/useGameAspect';
-
-interface LeaderboardEntry {
-  id: string;
-  name: string;
-  score: number;
-  wins: number;
-  losses: number;
-  avatar: string;
-}
+import { usePlayer } from '/src/stores/playerStore';
+import { useDuelist } from '/src/stores/duelistStore';
+import { ProfilePic } from '../account/ProfilePic';
+import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { BigNumberish } from 'starknet';
+import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext';
+import { DuelistCard } from '../cards/DuelistCard';
+import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
 
 interface Season {
   id: string;
@@ -26,6 +25,7 @@ export default function ScLeaderboards() {
   const [selectedSeason, setSelectedSeason] = useState<string | null>('current');
   const [activePage, setActivePage] = useState(1);
   const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
+  const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext()
 
   function SeasonRow({ season, isSelected, onClick }: { season: Season, isSelected: boolean, onClick: () => void }) {
     const [isHovered, setIsHovered] = useState(false);
@@ -80,8 +80,18 @@ export default function ScLeaderboards() {
     );
   }
 
-  function PlayerRow({ player, rank }: { player: LeaderboardEntry, rank: number }) {
+  function PlayerRow({ playerId, duelistId, rank, isMe = false }: { playerId: BigNumberish, duelistId: BigNumberish, rank: number, isMe?: boolean }) {
     const [isHovered, setIsHovered] = useState(false);
+    const { name: playerName } = usePlayer(playerId);
+    const { name: duelistName, profilePic: duelistProfilePic } = useDuelist(duelistId);
+
+    // TODO: Implement real season stats
+    const seasonStats = {
+      score: 2450,
+      wins: 32, 
+      losses: 4,
+      reward: 1000
+    };
 
     return (
       <div
@@ -89,35 +99,54 @@ export default function ScLeaderboards() {
         onMouseLeave={() => setIsHovered(false)}
         style={{
           padding: aspectWidth(0.2),
-          backgroundColor: isHovered ? 'rgba(255,255,255,0.05)' : 'transparent',
+          backgroundColor: isMe 
+            ? (isHovered ? 'rgba(0,255,0,0.1)' : 'rgba(0,255,0,0.05)')
+            : (isHovered ? 'rgba(255,255,255,0.05)' : 'transparent'),
           marginBottom: aspectWidth(0.4),
           borderRadius: aspectWidth(0.3),
           transition: 'all 0.2s ease-in-out',
           transform: isHovered ? 'scale(1.01)' : 'scale(1)',
+          marginRight: aspectWidth(0.4),
+          marginLeft: aspectWidth(0.4),
+          border: isMe ? '1px solid rgba(0,255,0,0.2)' : '1px solid transparent',
+          borderBottom: !isMe ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,255,0,0.2)',
         }}
+        
       >
-        <Grid columns={5}>
-          <Grid.Column width={2} style={{ display: 'flex', alignItems: 'center' }}>
+        <Grid columns={9}>
+          <Grid.Column width={1} style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{ fontSize: aspectWidth(1.2), color: 'white' }}>#{rank}</div>
           </Grid.Column>
           
-          <Grid.Column width={5}>
-            <div style={{ fontSize: aspectWidth(1.2), color: 'lightskyblue' }}>{player.name}</div>
+          <Grid.Column width={4} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => dispatchSelectPlayerAddress(playerId)}>
+            <ProfilePic profilePic={0} width={2.5} removeBorder circle />
+            <div style={{ marginLeft: aspectWidth(1), fontSize: aspectWidth(1.2), color: isMe ? '#00ff00' : 'lightskyblue', overflow: 'hidden', textOverflow: 'ellipsis' }}>{playerName}</div>
           </Grid.Column>
 
-          <Grid.Column width={3}>
+          <Grid.Column width={3} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => dispatchSelectDuelistId(duelistId)}>
+            <div style={{ width: aspectWidth(0.05), height: '100%', backgroundColor: 'white', opacity: 0.3, marginRight: aspectWidth(0.6) }} />
+            <ProfilePic profilePic={duelistProfilePic} profileType={constants.ProfileType.Duelist} width={2.5} />
+            <div style={{ marginLeft: aspectWidth(1), fontSize: aspectWidth(0.8), color: '#888', overflow: 'hidden', textOverflow: 'ellipsis' }}>{duelistName}</div>
+          </Grid.Column>
+
+          <Grid.Column width={2}>
             <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Score:</div>
-            <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'gold' }}>{player.score}</div>
+            <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'gold' }}>{seasonStats.score}</div>
           </Grid.Column>
 
-          <Grid.Column width={3}>
+          <Grid.Column width={2}>
             <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Wins:</div>
-            <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'green' }}>{player.wins}</div>
+            <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'green' }}>{seasonStats.wins}</div>
           </Grid.Column>
 
-          <Grid.Column width={3}>
+          <Grid.Column width={2}>
             <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Losses:</div>
-            <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'red' }}>{player.losses}</div>
+            <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'red' }}>{seasonStats.losses}</div>
+          </Grid.Column>
+
+          <Grid.Column width={2}>
+            <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Reward:</div>
+            <div style={{ fontSize: aspectWidth(1.3), fontWeight: 'bold', color: 'white' }}>{seasonStats.reward}</div>
           </Grid.Column>
         </Grid>
       </div>
@@ -142,111 +171,181 @@ export default function ScLeaderboards() {
     { id: 'season1', name: 'Season 1', participants: 85, highScore: 1530, timeLeft: '0', winner: 'EarthShaker' },
   ];
 
-  const topPlayers: LeaderboardEntry[] = [
-    { id: 'player1', name: 'DragonMaster', score: 2450, wins: 32, losses: 4, avatar: '/avatars/1.png' },
-    { id: 'player2', name: 'ShadowHunter', score: 2380, wins: 29, losses: 8, avatar: '/avatars/2.png' },
-    { id: 'player3', name: 'MysticWizard', score: 2315, wins: 27, losses: 10, avatar: '/avatars/3.png' },
-  ];
-
-  const leaderboardEntries: LeaderboardEntry[] = [
-    { id: 'player4', name: 'ElectricKnight', score: 2280, wins: 25, losses: 12, avatar: '/avatars/4.png' },
-    { id: 'player5', name: 'FlameBringer', score: 2245, wins: 24, losses: 13, avatar: '/avatars/5.png' },
-    { id: 'player6', name: 'AquaPhoenix', score: 2210, wins: 23, losses: 15, avatar: '/avatars/6.png' },
-    { id: 'player7', name: 'EarthShaker', score: 2175, wins: 22, losses: 16, avatar: '/avatars/7.png' },
-    { id: 'player8', name: 'WindWalker', score: 2140, wins: 21, losses: 18, avatar: '/avatars/8.png' },
-    { id: 'player9', name: 'NightOwl', score: 2105, wins: 20, losses: 19, avatar: '/avatars/9.png' },
-    { id: 'player10', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player11', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player12', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player13', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player14', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player15', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player16', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player17', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player18', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player19', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player20', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player21', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player22', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player23', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player24', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player25', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player4', name: 'ElectricKnight', score: 2280, wins: 25, losses: 12, avatar: '/avatars/4.png' },
-    { id: 'player5', name: 'FlameBringer', score: 2245, wins: 24, losses: 13, avatar: '/avatars/5.png' },
-    { id: 'player6', name: 'AquaPhoenix', score: 2210, wins: 23, losses: 15, avatar: '/avatars/6.png' },
-    { id: 'player7', name: 'EarthShaker', score: 2175, wins: 22, losses: 16, avatar: '/avatars/7.png' },
-    { id: 'player8', name: 'WindWalker', score: 2140, wins: 21, losses: 18, avatar: '/avatars/8.png' },
-    { id: 'player9', name: 'NightOwl', score: 2105, wins: 20, losses: 19, avatar: '/avatars/9.png' },
-    { id: 'player10', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player11', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player12', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player13', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player14', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player15', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player16', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player17', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player18', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player19', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player20', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player21', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player22', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player23', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player24', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player25', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player4', name: 'ElectricKnight', score: 2280, wins: 25, losses: 12, avatar: '/avatars/4.png' },
-    { id: 'player5', name: 'FlameBringer', score: 2245, wins: 24, losses: 13, avatar: '/avatars/5.png' },
-    { id: 'player6', name: 'AquaPhoenix', score: 2210, wins: 23, losses: 15, avatar: '/avatars/6.png' },
-    { id: 'player7', name: 'EarthShaker', score: 2175, wins: 22, losses: 16, avatar: '/avatars/7.png' },
-    { id: 'player8', name: 'WindWalker', score: 2140, wins: 21, losses: 18, avatar: '/avatars/8.png' },
-    { id: 'player9', name: 'NightOwl', score: 2105, wins: 20, losses: 19, avatar: '/avatars/9.png' },
-    { id: 'player10', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player11', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player12', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player13', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player14', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player15', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player16', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player17', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player18', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player19', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player20', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player21', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player22', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player23', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player24', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player25', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player4', name: 'ElectricKnight', score: 2280, wins: 25, losses: 12, avatar: '/avatars/4.png' },
-    { id: 'player5', name: 'FlameBringer', score: 2245, wins: 24, losses: 13, avatar: '/avatars/5.png' },
-    { id: 'player6', name: 'AquaPhoenix', score: 2210, wins: 23, losses: 15, avatar: '/avatars/6.png' },
-    { id: 'player7', name: 'EarthShaker', score: 2175, wins: 22, losses: 16, avatar: '/avatars/7.png' },
-    { id: 'player8', name: 'WindWalker', score: 2140, wins: 21, losses: 18, avatar: '/avatars/8.png' },
-    { id: 'player9', name: 'NightOwl', score: 2105, wins: 20, losses: 19, avatar: '/avatars/9.png' },
-    { id: 'player10', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player11', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player12', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player13', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player14', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player15', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player16', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player17', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player18', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player19', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player20', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player21', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player22', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player23', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player24', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    { id: 'player25', name: 'DuskRider', score: 2070, wins: 19, losses: 21, avatar: '/avatars/10.png' },
-    
-  ];
-
   const handleSeasonSelect = (seasonId: string) => {
     setSelectedSeason(seasonId);
   };
 
-  const itemsPerPage = 10;
-  const startIndex = (activePage - 1) * itemsPerPage;
+  const leaderboardEntries = [
+    3, 2, 4, 1, 5, 2, 3, 1, 4, 5,
+    2, 4, 1, 3, 5, 1, 2, 4, 3, 5,
+    4, 1, 3, 5, 2, 3, 4, 1, 5, 2,
+    1, 5, 2, 4, 3, 5, 1, 2, 4, 3,
+    2, 4, 5, 1, 3, 4, 2, 5, 3, 1
+  ];
+
+  const itemsPerPage = activePage === 1 ? 3 : 7;
+  const startIndex = activePage === 1 ? 0 : 3 + ((activePage - 2) * 7);
   const paginatedEntries = leaderboardEntries.slice(startIndex, startIndex + itemsPerPage);
+
+  const LeaderboardPodium = ({
+    rank,
+    color,
+    height,
+    playerAddress,
+    duelistId,
+    score,
+    wins,
+    losses,
+    reward,
+    cardScale = 0.6
+  }: {
+    rank: '1ˢᵀ' | '2ᴺᴰ' | '3ᴿᴰ',
+    color: string,
+    height: number,
+    playerAddress: bigint,
+    duelistId: number,
+    score: number,
+    wins: number,
+    losses: number,
+    reward: number,
+    cardScale?: number
+  }) => {
+    const isMe = playerAddress === 0x1234567890123456789012345678901234567890n;
+    const posterRef = useRef<ProfilePosterHandle>(null);
+    //TODO get score and stuff from season stats here not through params
+
+    useEffect(() => {
+      if (posterRef.current) {
+        setTimeout(() => {
+          posterRef.current.toggleHighlight(true, false, 'green');
+        }, 50);
+      }
+    }, [isMe]);
+
+    return (
+      <div style={{ position: 'relative', width: aspectWidth(17) }}>
+        <Header as="h1" style={{ 
+          color: color,
+          position: 'absolute',
+          top: aspectHeight(-6),
+          width: '100%',
+          textAlign: 'center',
+          fontSize: aspectWidth(rank === '1ˢᵀ' ? 2.2 : 2),
+          textShadow: `0 0 10px ${color}80`,
+          zIndex: 1
+        }}>{rank}</Header>
+        
+        <div style={{ 
+          height: aspectHeight(height),
+          backgroundColor: 'rgba(255,255,255,0.15)',
+          border: `2px solid ${color}`,
+          borderRadius: aspectWidth(1),
+          boxShadow: `0 0 20px ${color}4D`,
+          padding: aspectWidth(1),
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}>
+          <div style={{ position: 'relative', width: aspectWidth(POSTER_WIDTH_SMALL * 0.9), backgroundColor: 'blue' }}>
+            <ProfilePoster 
+              ref={posterRef}
+              playerAddress={playerAddress}
+              _close={() => {}}
+              isSmall={true}
+              width={POSTER_WIDTH_SMALL * 0.9}
+              height={POSTER_HEIGHT_SMALL * 0.9}
+              isVisible={true}
+              instantVisible={true}
+              isHighlightable={false}
+              onClick={() => dispatchSelectPlayerAddress(playerAddress)}
+            />
+          </div>
+          
+          <div style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: aspectWidth(1),
+            marginTop: aspectHeight(POSTER_HEIGHT_SMALL * 0.9 + 2),
+          }}>
+            <div style={{ 
+              width: aspectWidth(DUELIST_CARD_WIDTH * cardScale),
+              height: aspectHeight(DUELIST_CARD_HEIGHT),
+              filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.3))',
+            }}>
+              <DuelistCard 
+                width={DUELIST_CARD_WIDTH * cardScale}
+                height={DUELIST_CARD_HEIGHT * cardScale}
+                isSmall isLeft
+                isVisible instantFlip instantVisible 
+                isFlipped isHighlightable 
+                duelistId={duelistId}
+                onClick={() => dispatchSelectDuelistId(duelistId)}
+              />
+            </div>
+            
+            <div style={{
+              height: '90%',
+              width: '2px',
+              background: `linear-gradient(transparent, ${color}, transparent)`,
+              margin: `0 ${aspectWidth(1)}`
+            }} />
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: aspectHeight(0.6), flex: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ color: '#ffffff', fontSize: aspectWidth(1.2), fontWeight: 'bold' }}>SCORE</div>
+                <div style={{ color: 'gold', fontSize: aspectWidth(1.8), fontWeight: 'bold', textShadow: '0 0 10px rgba(255,215,0,0.5)' }}>{score}</div>
+              </div>
+              
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: aspectWidth(1) }}>
+                <div style={{ color: '#ffffff', fontSize: aspectWidth(1), fontWeight: 'bold' }}>WINS:</div>
+                <div style={{ color: '#00ff00', fontSize: aspectWidth(1), fontWeight: 'bold', textShadow: '0 0 10px rgba(0,255,0,0.5)' }}>{wins}</div>
+              </div>
+              
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: aspectWidth(1) }}>
+                <div style={{ color: '#ffffff', fontSize: aspectWidth(1), fontWeight: 'bold' }}>LOSSES:</div>
+                <div style={{ color: '#ff4444', fontSize: aspectWidth(1), fontWeight: 'bold', textShadow: '0 0 10px rgba(255,0,0,0.5)' }}>{losses}</div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ 
+            marginTop: 'auto',
+            textAlign: 'center',
+            padding: aspectWidth(0.5),
+            width: '100%',
+            position: 'absolute',
+            bottom: 0,
+            left: 0
+          }}>
+            <div style={{
+              width: '100%',
+              height: '2px',
+              background: `linear-gradient(to right, transparent, ${color}, transparent)`,
+              marginBottom: aspectHeight(0.5)
+            }} />
+            <div style={{ 
+              color: '#ffffff', 
+              fontSize: aspectWidth(1.4), 
+              fontWeight: 'bold', 
+              textShadow: '0 0 10px rgba(255,255,255,0.5)',
+              marginBottom: aspectHeight(0.2)
+            }}>
+              REWARD
+              <div style={{ 
+                fontSize: aspectWidth(1.8), 
+                color: 'gold', 
+                textShadow: '0 0 15px rgba(255,215,0,0.7)',
+                marginTop: aspectHeight(0.2)
+              }}>
+                {reward}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div style={{ position: 'absolute', bottom: 0, left: 0, width: aspectWidth(100), height: aspectHeight(84), display: 'flex' }}>
@@ -277,68 +376,70 @@ export default function ScLeaderboards() {
       </div>
 
       {/* Right Side - Leaderboard */}
-      <div style={{ flex: '1.3', padding: aspectWidth(1) }}>
+      <div style={{ flex: '1.5', padding: aspectWidth(1) }}>
         <Segment style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <Header as="h2" style={{ color: 'white', marginBottom: aspectHeight(2) }}>Standings:</Header>
+          <Header as="h2" style={{ color: 'white', marginBottom: aspectHeight(4) }}>Standings:</Header>
           
-          {/* Top 3 players podium - 40% height */}
-          <div style={{ height: '40%', position: 'relative', marginBottom: aspectHeight(2), display: 'flex', justifyContent: 'space-evenly', flexDirection: 'row' }}>
-            {/* 2nd place */}
-            <div style={{ height: '85%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <ProfilePoster 
+          {activePage === 1 && (
+            <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: aspectWidth(1), marginBottom: aspectHeight(7) }}>
+              <LeaderboardPodium
+                rank="2ᴺᴰ"
+                color="silver"
+                height={60}
                 playerAddress={0x1234567890123456789012345678901234567890n}
-                _close={() => {}}
-                isSmall={true}
-                isVisible={true}
-                instantVisible={true}
-                isHighlightable={false}
+                duelistId={leaderboardEntries[1]}
+                score={2320}
+                wins={28}
+                losses={5}
+                reward={800}
               />
-              <Header as="h3" style={{ color: 'silver', margin: aspectHeight(1) }}>2ᴺᴰ</Header>
-            </div>
 
-            {/* 1st place */}
-            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <ProfilePoster 
+              <LeaderboardPodium
+                rank="1ˢᵀ"
+                color="gold"
+                height={63}
                 playerAddress={0x1234567890123456789012345678901234567890n}
-                _close={() => {}}
-                isSmall={true}
-                isVisible={true}
-                instantVisible={true}
-                isHighlightable={false}
+                duelistId={leaderboardEntries[0]}
+                score={2450}
+                wins={32}
+                losses={4}
+                reward={1000}
+                cardScale={0.6}
               />
-              <Header as="h3" style={{ color: 'gold', margin: aspectHeight(1) }}>1ˢᵀ</Header>
-            </div>
 
-            {/* 3rd place */}
-            <div style={{ height: '70%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <ProfilePoster 
+              <LeaderboardPodium
+                rank="3ᴿᴰ"
+                color="#cd7f32"
+                height={57}
                 playerAddress={0x1234567890123456789012345678901234567890n}
-                _close={() => {}}
-                isSmall={true}
-                isVisible={true}
-                instantVisible={true}
-                isHighlightable={false}
+                duelistId={leaderboardEntries[2]}
+                score={2180}
+                wins={25}
+                losses={7}
+                reward={600}
               />
-              <Header as="h3" style={{ color: '#cd7f32', margin: aspectHeight(1) }}>3ᴿᴰ</Header>
             </div>
-          </div>
+          )}
 
-          {/* Scrollable leaderboard - 60% height */}
-          <div style={{ flex: 1, overflow: 'auto' }}>
-            {paginatedEntries.map((entry, index) => (
-              <PlayerRow 
-                key={entry.id} 
-                player={entry} 
-                rank={startIndex + index + 4}
-              />
-            ))}
-          </div>
+          {activePage > 1 && (
+            <div style={{ flex: 1 }}>
+              {paginatedEntries.map((entry, index) => (
+                <PlayerRow 
+                  key={index} 
+                  playerId={entry}
+                  duelistId={entry}
+                  rank={startIndex + index + 1}
+                  isMe={index === 2} // Example condition - replace with actual logic
+                />
+              ))}
+            </div>
+          )}
 
           {/* Pagination */}
-          <div style={{ padding: aspectHeight(2), textAlign: 'center' }}>
+          <div style={{ position: 'absolute', bottom: aspectHeight(2), left: 0, right: 0, textAlign: 'center' }}>
             <Pagination
               activePage={activePage}
-              totalPages={Math.ceil(leaderboardEntries.length / itemsPerPage)}
+              totalPages={Math.ceil((leaderboardEntries.length - 3) / 7) + 1}
               firstItem={{ content: '<', key: 'first' }}
               lastItem={{ content: '>', key: 'last' }}
               onPageChange={(_, data) => setActivePage(Number(data.activePage))}
