@@ -168,7 +168,8 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
 
 interface SceneData {
   backgrounds: SceneBackgroundObject[],
-  items?: SceneObject[]
+  items?: SceneObject[],
+  scaleAddon?: number
 }
 
 interface SceneBackgroundObject {
@@ -199,13 +200,14 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     backgrounds: [
       { texture: TextureName.bg_profile_table, shiftMultiplier: 0.015, renderOrder: 0 },
       { texture: TextureName.bg_profile_items, shiftMultiplier: 0.005, renderOrder: 1 },
-      { texture: TextureName.bg_profile_player, shiftMultiplier: -0.005, renderOrder: 2 },
+      { texture: TextureName.bg_profile_player, shiftMultiplier: -0.002, renderOrder: 2 },
       { texture: TextureName.bg_profile_background, shiftMultiplier: -0.03, renderOrder: 3 },
     ],
     items: [
       { name: 'book', color: 'ff0000', description: 'Your Duelists', mask: TextureName.bg_profile_book_mask, renderOrder: 1 },
       { name: 'chest', color: '0000ff', description: 'Card Packs', mask: TextureName.bg_profile_chest_mask, renderOrder: 1 },
-    ]
+    ],
+    scaleAddon: 0.065
   },
   [SceneName.Tavern]: {
     backgrounds: [
@@ -224,7 +226,8 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       // { name: 'bartender', color: 'ff0000', description: 'Bartender', mask: TextureName.bg_tavern_mask, renderOrder: 0 },
       // { name: 'pistol', color: '00ff00', description: 'Your Duels', mask: TextureName.bg_tavern_mask, renderOrder: 0 },
       // { name: 'shovel', color: 'ff00ff', description: 'Past Duels', mask: TextureName.bg_tavern_mask, renderOrder: 0 }
-    ]
+    ],
+    scaleAddon: 0.045
   },
   [SceneName.Duelists]: {
     backgrounds: [
@@ -268,6 +271,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { texture: TextureName.bg_entry_barkeep, shiftMultiplier: -0.01, renderOrder: 3 },
       { texture: TextureName.bg_entry_background, shiftMultiplier: -0.015, renderOrder: 4 },
     ],
+    scaleAddon: 0.045
   },
   [SceneName.TutorialScene2]: {
     backgrounds: [
@@ -277,6 +281,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { texture: TextureName.bg_conflict_drunkard, shiftMultiplier: -0.01, renderOrder: 3 },
       { texture: TextureName.bg_conflict_background, shiftMultiplier: -0.02, renderOrder: 4 },
     ],
+    scaleAddon: 0.045
   },
   [SceneName.TutorialScene3]: { backgrounds: [{ texture: TextureName.bg_entry_background, shiftMultiplier: 0, renderOrder: 0 }] },
   [SceneName.TutorialScene4]: {
@@ -290,7 +295,8 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     items: [
       { name: 'demon_right', color: '0000ff', description: 'Take the gun, become my patron', mask: TextureName.bg_demon_right_hand_mask, renderOrder: 0 },
       { name: 'demon_left', color: '00ff00', description: 'Drink, forget this happened', mask: TextureName.bg_demon_left_hand_mask, renderOrder: 1 },
-    ]
+    ],
+    scaleAddon: 0.01
   },
   [SceneName.TutorialScene5]: {
     backgrounds: [
@@ -298,7 +304,8 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { texture: TextureName.bg_resurrection_barkeep, shiftMultiplier: 0.005, renderOrder: 1 },
       { texture: TextureName.bg_resurrection_table, shiftMultiplier: -0.005, renderOrder: 2 },
       { texture: TextureName.bg_resurrection_background, shiftMultiplier: -0.02, renderOrder: 3 },
-    ]
+    ],
+    scaleAddon: 0.045
   },
   [SceneName.TutorialDuel]: undefined
 }
