@@ -30,7 +30,6 @@ import { SceneName } from '/src/data/assets'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelRequiresAction } from '/src/stores/eventsStore'
 import { useGetChallengeRewards } from '/src/hooks/useChallengeRewards'
-import SelectDuelistModal from './modals/SelectDuelistModal'
 import { BigNumberish } from 'starknet'
 
 
@@ -396,8 +395,6 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
               </Row>
             </Grid>
 
-            <SelectDuelistModal opener={duelistSelectOpener} />
-            
           </div>
         )
       }

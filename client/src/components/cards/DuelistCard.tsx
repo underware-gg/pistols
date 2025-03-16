@@ -253,25 +253,52 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
           </div>
         </>
       }
-      childrenInBack={(props.showBack || props.isAnimating) && !props.isSmall &&
-        <>
-          <div className={`duels-button-container ${props.isAnimating ? '' : 'visible'}`}>
-            <ActionButton 
-              className='NoMargin YesMouse' 
-              large 
-              fillParent 
-              important={false}
-              label='Hide Duels'
-              onClick={() => {
-                props.animateFlip(false)
-              }} 
-            />
+      childrenInBack={(props.showBack || props.isAnimating) && (
+        !props.isSmall ? (
+          <>
+            <div className={`duels-button-container ${props.isAnimating ? '' : 'visible'}`}>
+              <ActionButton 
+                className='NoMargin YesMouse' 
+                large 
+                fillParent 
+                important={false}
+                label='Hide Duels'
+                onClick={() => {
+                  props.animateFlip(false)
+                }} 
+              />
+            </div>
+            <div className="duelist-card-overlay YesMouse">
+              <ChallengeTableSelectedDuelist compact />
+            </div>
+          </>
+        ) : (
+          <div style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(59, 42, 35, 0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: aspectWidth(6),
+            color: '#ffd700',
+            borderRadius: aspectWidth(0.5),
+            border: '2px dashed rgba(255, 215, 0, 0.6)',
+            boxShadow: '0 0 20px rgba(255, 215, 0, 0.3), inset 0 0 30px rgba(0,0,0,0.5)',
+            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              position: 'absolute',
+              width: '200%',
+              height: '200%',
+              background: 'radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 70%)',
+            }}/>
+            ?
           </div>
-          <div className="duelist-card-overlay YesMouse">
-            <ChallengeTableSelectedDuelist compact />
-          </div>
-        </>
-      }
+        )
+      )}
     />
   )
 })

@@ -17,7 +17,7 @@ import { SceneName } from '/src/data/assets'
 import { useDuelistsOfOwner } from '/src/hooks/useTokenDuelists'
 import { AddressShort } from './AddressShort'
 import { ChallengeButton } from '/src/components/ui/Buttons'
-import SelectDuelistModal from '../modals/SelectDuelistModal'
+import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -28,7 +28,7 @@ export const POSTER_WIDTH_SMALL = 13
 export const POSTER_HEIGHT_SMALL = 32
 
 interface ProfilePosterProps {
-  playerAddress?: bigint
+  playerAddress?: BigNumberish
   isSmall?: boolean
   isVisible?: boolean
   isHighlightable?: boolean
@@ -61,7 +61,7 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
 }, ref: React.Ref<ProfilePosterHandle>) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
-  const { duelistSelectOpener, dispatchSelectDuelistId } = usePistolsContext()
+  const { dispatchSelectDuelistId } = usePistolsContext()
 
   const isOnline = getPlayerOnlineStatus(props.playerAddress)
 
@@ -233,8 +233,6 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
                 </Col>
               </Row>
             </Grid>
-
-            <SelectDuelistModal opener={duelistSelectOpener} />
           </div>
         )
       }

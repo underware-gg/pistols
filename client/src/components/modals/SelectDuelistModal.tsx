@@ -22,18 +22,16 @@ const SPREAD_ANGLE_INCREASE = 15 // Additional angle when spreading
 const SPREAD_SPACING_INCREASE = 15 // Additional spacing when spreading
 
 export default function SelectDuelistModal({
-  opener = null,
+  opener,
 }: {
-  opener?: Opener
+  opener: Opener
 }) {
   const { aspectWidth } = useGameAspect()
-  const { challengingAddress, dispatchChallengingPlayerAddress, challengingDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
+  const { dispatchChallengingPlayerAddress, challengingDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
   
   const { duelistIds } = useDuelistsOfPlayer()
 
   const { notDuelingIds: availableDuelists } = useDuellingDuelists(duelistIds);
-
-  const isOpen = useMemo(() => ((challengingAddress > 0n && challengingDuelistId == 0n) || (opener?.isOpen ?? false)), [challengingDuelistId, challengingAddress, opener?.isOpen])
 
   const bottomCardRef = useRef<HTMLImageElement>(null)
   const topCardRef = useRef<HTMLImageElement>(null)
@@ -51,6 +49,13 @@ export default function SelectDuelistModal({
       (currentPage + 1) * CARDS_PER_PAGE
     )
   }), [availableDuelists, currentPage])
+
+  useEffect(() => {
+    if (opener?.isOpen) {
+      setCurrentPage(0)
+      setSelectedDuelistId(0n)
+    }
+  }, [opener?.isOpen])
 
   const getCardPositioning = useCallback((index: number, totalCards: number, hoveredIndex: number = -1) => {
     if (totalCards === 1) {
@@ -114,13 +119,13 @@ export default function SelectDuelistModal({
   }, [])
 
   useEffect(() => {
-    if (isOpen) {
+    if (opener.isOpen) {
       setIsAnimating(true)
       animate(1000, 0, 0.5, 1, TWEEN.Easing.Circular.Out, () => {
         setIsAnimating(false)
       })
     }
-  }, [isOpen, animate])
+  }, [opener.isOpen, animate])
 
   useEffect(() => {
     if (isPositiveBigint(selectedDuelistId)) {
@@ -131,15 +136,10 @@ export default function SelectDuelistModal({
   const _close = useCallback(() => {
     setIsAnimating(true)
     animate(0, 1000, 1, 0.5, TWEEN.Easing.Cubic.In, () => {
-      if (opener?.isOpen) {
-        opener.close()
-      } else {
-        if (isPositiveBigint(selectedDuelistId)) {
-          dispatchChallengingDuelistId(selectedDuelistId)
-        } else {
-          dispatchChallengingPlayerAddress(0n)
-        }
+      if (isPositiveBigint(selectedDuelistId)) {
+        dispatchChallengingDuelistId(selectedDuelistId)
       }
+      opener?.close()
       setIsAnimating(false)
     })
   }, [selectedDuelistId, animate, dispatchChallengingPlayerAddress, dispatchChallengingDuelistId, opener])
@@ -169,7 +169,7 @@ export default function SelectDuelistModal({
       basic
       size='fullscreen'
       onClose={() => _close()}
-      open={isOpen}
+      open={opener.isOpen}
       className=''
     >
       <div className='DuelistModalContainer NoMouse NoDrag'>

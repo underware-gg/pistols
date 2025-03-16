@@ -1541,6 +1541,19 @@ input::placeholder {
   background-color: $color-dark!important;
   // color: rgba($color-text, 0.75)!important;
   color: $color-text!important;
+  border: 1px solid $color-brightest !important;
+  min-height: aspect-width(2.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  
+  &.selection > .dropdown.icon {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    top: 0 !important;
+    margin: 0 !important;
+    padding-right: aspect-width(0) !important;
+  }
 }
 .ui.selection.dropdown {
   color: $color-brightest!important;
@@ -1841,6 +1854,11 @@ td {
 .ui.modal>.actions {
   background-color: $color-darkest;
 }
+
+.scrolling.dimmable>.dimmer {
+  justify-content: center !important;
+}
+
 .ui.header {
   @extend .TitleCase;
   font-family: $font-family;
@@ -1995,6 +2013,25 @@ a.active.step:hover,
 
   &.EqualMargin {
     margin-bottom: aspect-width(3);
+  }
+}
+
+.NewChallengeDivider {
+  color: $color-brightest;
+  font-size: aspect-width(1.4);
+
+  &.Small {
+    font-size: aspect-width(1);
+  }
+
+  &.VerticalSpacing {
+    margin-top: aspect-width(0.6);
+    margin-bottom: aspect-width(0.6);
+  }
+
+  &.Centered {
+    width: 100%;
+    text-align: center;
   }
 }
 

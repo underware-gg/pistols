@@ -8,7 +8,7 @@ import { ProfilePic } from '../account/ProfilePic';
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { BigNumberish } from 'starknet';
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext';
-import { DuelistCard } from '../cards/DuelistCard';
+import { DuelistCard } from '/src/components/cards/DuelistCard';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
 
 interface Season {
