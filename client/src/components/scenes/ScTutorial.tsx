@@ -18,6 +18,7 @@ import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { SettingsActions, useSettings } from '/src/hooks/SettingsContext'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 
 export default function ScTutorial({ currentTutorialScene }: { currentTutorialScene: string }) {
   // Scene & Context
@@ -129,9 +130,20 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
     handleItemClick()
   }, [itemClicked, timestamp])
 
+  const mounted = useMounted()
+  const [createdTutorialSimple, setCreatedTutorialSimple] = useState(false)
+  const [createdTutorialFull, setCreatedTutorialFull] = useState(false)
   useEffect(() => {
-    handleTutorialCreation()
-  }, [currentTutorialScene, duelIdSimple, duelIdFull])
+    if (mounted) {
+      if (currentTutorialScene === SceneName.TutorialScene2 && duelIdSimple && !createdTutorialSimple) {
+        tutorial.create_tutorial(account, playerId, 1)
+        setCreatedTutorialSimple(true)
+      } else if (currentTutorialScene === SceneName.TutorialScene3 && duelIdFull && !createdTutorialFull) {
+        tutorial.create_tutorial(account, playerId, 2)
+        setCreatedTutorialFull(true)
+      }
+    }
+  }, [currentTutorialScene, duelIdSimple, duelIdFull, createdTutorialSimple, createdTutorialFull])
 
   function goToRealDuel(duelistId?: number) {
     //TODO create challenge against bot with matchmaking and navigatge there with a selected duelist 
@@ -240,14 +252,6 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         disconnect()
         dispatchSetScene(SceneName.Gate)
         break
-    }
-  }
-
-  function handleTutorialCreation() {
-    if (currentTutorialScene === SceneName.TutorialScene2) {
-      tutorial.create_tutorial(account, playerId, 1)
-    } else if (currentTutorialScene === SceneName.TutorialScene3) {
-      tutorial.create_tutorial(account, playerId, 2)
     }
   }
 
