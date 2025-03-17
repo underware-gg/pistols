@@ -7,7 +7,9 @@ import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { SortDirection } from './queryParamsStore'
+import { PlayerColumn } from './queryParamsStore'
 
 interface PlayerState {
   player_address: string
@@ -207,4 +209,72 @@ export const usePlayersOnline = () => {
 export const getPlayerName = (address: BigNumberish): string  | undefined => {
   const players = usePlayerStore.getState().players
   return players[bigintToHex(address)]?.name
+}
+
+export const getPlayerOnlineStatus = (address: BigNumberish): boolean => {
+  const players_online = usePlayerStore((state) => state.players_online);
+  return players_online[bigintToHex(address)] !== undefined
+}
+
+
+export const useQueryPlayerIds = (
+  filterName: string,
+  filterOnline: boolean,
+  filterBookmarked: boolean,
+  sortColumn: PlayerColumn,
+  sortDirection: SortDirection,
+) => {
+  const { address } = useAccount()
+  const { bookmarkedDuelists } = usePlayer(address)
+  const entities = usePlayerStore((state) => state.players);
+  
+  const players_online = usePlayerStore((state) => state.players_online);
+
+  const playerIds = useMemo(() => {
+    let result = Object.values(entities);
+
+    result = result.filter((e) => (e.player_address !== bigintToHex(address)))
+
+    // filter by name
+    if (filterName) {
+      result = result.filter((e) => e.name.includes(filterName))
+    }
+
+    // filter by bookmarked duelists
+    if (filterBookmarked) {
+      result = result.filter((e) => (bookmarkedDuelists.find(p => bigintEquals(p, e.player_address)) !== undefined))
+    }
+
+    // filter by active
+    if (filterOnline) {
+      result = result.filter((e) => (players_online[e.player_address] !== undefined))
+    }
+
+    // sort...
+    result = result.sort((player_a, player_b) => {
+      // Sort by names, or both rookies
+      const _sortByName = (a: string, b: string) => {
+        return isAscending ? a.localeCompare(player_b.name) : b.localeCompare(player_a.name)
+      }
+      const isAscending = (sortDirection == SortDirection.Ascending)
+      if (sortColumn == PlayerColumn.Name) {
+        return _sortByName(player_a.name, player_b.name)
+      }
+
+      // Sort by values
+      const _sortTotals = (a: number, b: number) => {
+        return (!isAscending ? (b - a) : (a - b))
+        // return (!isAscending ? (b - a) : (a && !b) ? -1 : (!a && b) ? 1 : (a - b))
+      }
+      if (sortColumn == PlayerColumn.Timestamp) return _sortTotals(player_a.timestamp_registered, player_b.timestamp_registered)
+      return 0
+    })
+
+    // return ids only
+    return result.map((e) => e.player_address)
+  }, [entities, filterName, filterOnline, sortColumn, sortDirection, filterBookmarked, bookmarkedDuelists, address, players_online])
+
+  return {
+    playerIds,
+  }
 }

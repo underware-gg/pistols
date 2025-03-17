@@ -77,7 +77,7 @@ export function Balance({
         : value != null ? weiToEthString(value, _decimals)
           : ''
     )
-    return (result == '0' || result == '0.0') ? EMOJI.ZERO : result
+    return fools ? result : ((result == '0' || result == '0.0') ? EMOJI.ZERO : result)
   }, [decimals, value, wei])
 
   const classNames = useMemo(() => {

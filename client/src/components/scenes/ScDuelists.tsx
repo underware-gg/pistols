@@ -1,22 +1,35 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
-import { useQueryParams } from '/src/stores/queryParamsStore'
+import { SortDirection, PlayerColumn, useQueryParams, ChallengeColumn } from '/src/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
-import { useQueryDuelistIds } from '/src/stores/duelistQueryStore'
-import { useOpener } from '/src/hooks/useOpener'
+import { useQueryPlayerIds } from '/src/stores/playerStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
-import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
-import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
-import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
+import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
 import { TavernAudios } from '/src/components/GameContainer'
+import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '../ui/ProfilePoster'
+import { SceneName } from '/src/data/assets'
+import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
+import { useAccount } from '@starknet-react/core'
+import { LiveChallengeStates } from '/src/utils/pistols'
 
 export default function ScDuelists() {
-  const { filterDuelistName, filterDuelistActive, filterDuelistBookmarked, filterDuelistSortColumn, filterDuelistSortDirection } = useQueryParams()
-  const { duelistIds } = useQueryDuelistIds(filterDuelistName, filterDuelistActive, filterDuelistBookmarked, filterDuelistSortColumn, filterDuelistSortDirection)
+  const { address } = useAccount()
+  const { filterPlayerName, filterPlayerOnline, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection } = useQueryParams()
+  const { playerIds } = useQueryPlayerIds(filterPlayerName, filterPlayerOnline, filterPlayerBookmarked, filterPlayerSortColumn, filterPlayerSortDirection)
+  const { playerIds: matchmakingPlayerIds } = useQueryPlayerIds("", true, false, PlayerColumn.Timestamp, SortDirection.Descending)
+  const { challengePlayerMap } = useQueryChallengeIds(LiveChallengeStates, "", false, address, ChallengeColumn.Time, SortDirection.Descending)
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { dispatchSelectDuelistId } = usePistolsContext()
-  const anonOpener = useOpener()
+  const { dispatchSelectPlayerAddress } = usePistolsContext()
+  const { dispatchSetScene} = usePistolsScene()
+
+  const availableMatchmakingPlayers = useMemo(() => {
+    return matchmakingPlayerIds.filter(id => !Array.from(challengePlayerMap.values()).some(player => player.addressA === id || player.addressB === id))
+  }, [matchmakingPlayerIds, challengePlayerMap])
+
+  useEffect(() => {
+    console.log(matchmakingPlayerIds, challengePlayerMap, availableMatchmakingPlayers)
+  }, [matchmakingPlayerIds, challengePlayerMap, availableMatchmakingPlayers])
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
   
@@ -33,64 +46,83 @@ export default function ScDuelists() {
             handlePageChange(pageNumber + 1)
           }
           break
+        case 'pistol':
+          dispatchSetScene(SceneName.DuelsBoard)
+          break
+        case 'matchmaking':
+          if (availableMatchmakingPlayers.length > 0) {
+            const randomIndex = Math.floor(Math.random() * availableMatchmakingPlayers.length)
+            const randomPlayer = availableMatchmakingPlayers[randomIndex]
+            dispatchSelectPlayerAddress(randomPlayer)
+          } else {
+            console.log("No players available for matchmaking")             
+          }
+          break
       }
     }
   }, [itemClicked, timestamp])
 
   const [pageNumber, setPageNumber] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
-  const [duelistsChanged, setDuelistsChanged] = useState(false)
-  const duelistsPerPage = 7
-  const pageCount = useMemo(() => Math.ceil(duelistIds.length / duelistsPerPage), [duelistIds])
-  const cardRefs = useRef<{[key: number]: DuelistCardHandle}>({})
+  const [postersChanged, setPostersChanged] = useState(false)
+  const postersPerPage = 4
+  const pageCount = useMemo(() => Math.ceil(playerIds.length / postersPerPage), [playerIds])
+  const posterRefs = useRef<{[key: number]: ProfilePosterHandle}>({})
   const timeoutRef = useRef<NodeJS.Timeout>()
+  const playerIdsRef = useRef<string[]>([])
   const initialLoadRef = useRef(true)
 
-  const cardOffsets = useMemo(() => {
-    return {
-      horizontal: ((aspectWidth(60) / 4) - aspectWidth(DUELIST_CARD_WIDTH)) / 2,
-      vertical: ((aspectHeight(70) / 2) - aspectWidth(DUELIST_CARD_HEIGHT)) / 2
-    }
-  }, [aspectWidth, aspectHeight])
-
-  const setDuelistData = (duelist: any, index: number) => {
-    const horizontalOffset = duelist.horizontalOffset != 0 ? duelist.horizontalOffset : Math.random() * 2 - 1
-    const verticalOffset = duelist.verticalOffset != 0 ? duelist.verticalOffset : Math.random() * 2 - 1
+  const setPosterData = (poster: any, index: number) => {
+    const horizontalOffset = (((aspectWidth(60) / 4) - aspectWidth(POSTER_WIDTH_SMALL)) / 2) * (poster.horizontalOffset != 0 ? poster.horizontalOffset : Math.random() * 2 - 1)
+    const verticalOffset = (((aspectHeight(70) / 2) - aspectHeight(POSTER_HEIGHT_SMALL)) / 2) * (poster.verticalOffset != 0 ? poster.verticalOffset : Math.random() * 2 - 1)
   
-    const centerX = aspectWidth(100) / 2 - aspectWidth(DUELIST_CARD_WIDTH) / 2
-    const centerY = aspectHeight(100) / 2 - aspectWidth(DUELIST_CARD_HEIGHT) / 2
+    const centerX = aspectWidth(100) / 2 - aspectWidth(POSTER_WIDTH_SMALL) / 2
+    const centerY = aspectHeight(100) / 2 - aspectHeight(POSTER_HEIGHT_SMALL) / 2
 
-    const gridX = aspectWidth(20) + ((index <= 3) ? (index % 4) * (aspectWidth(60) / 4) : ((index % 4) * (aspectWidth(60) / 4)) + (aspectWidth(60) / 8)) + (aspectWidth(60) / 8)
-    const gridY = aspectHeight(20) + (Math.floor(index / 4) * (aspectHeight(70) / 2))
+    const gridX = aspectWidth(20) + (index % 2) * (aspectWidth(60) / 4)
+    const gridY = aspectHeight(20) + (Math.floor(index / 2) * (aspectHeight(70) / 2))
     
-    const currentX = gridX + cardOffsets.horizontal * horizontalOffset
-    const currentY = gridY + cardOffsets.vertical * verticalOffset
+    const currentX = gridX + horizontalOffset
+    const currentY = gridY + verticalOffset
     
     const moveX = centerX - currentX 
-    const moveY = centerY - currentY + aspectHeight(50) + aspectWidth(DUELIST_CARD_HEIGHT / 2)
+    const moveY = centerY - currentY + aspectHeight(50) + aspectHeight(POSTER_HEIGHT_SMALL / 2)
 
-    const exitPositionX = centerX - currentX - aspectWidth(60) - aspectWidth(DUELIST_CARD_WIDTH / 2)
+    const exitPositionX = centerX - currentX - aspectWidth(60) - aspectWidth(POSTER_WIDTH_SMALL / 2)
     const exitPositionY = centerY - currentY
 
     const angle = Math.atan2(moveY, moveX) * (180 / Math.PI)
-    const rotation = duelist.rotation != 0 ? duelist.rotation : angle - 90
+    const rotation = poster.rotation != 0 ? poster.rotation : angle - 90
 
-    duelist.horizontalOffset = horizontalOffset
-    duelist.verticalOffset = verticalOffset
-    duelist.rotation = rotation
-    duelist.startPositionX = moveX
-    duelist.startPositionY = moveY
-    duelist.exitPositionX = exitPositionX
-    duelist.exitPositionY = exitPositionY
+    poster.horizontalOffset = horizontalOffset
+    poster.verticalOffset = verticalOffset
+    poster.rotation = rotation
+    poster.startPositionX = moveX
+    poster.startPositionY = moveY
+    poster.exitPositionX = exitPositionX
+    poster.exitPositionY = exitPositionY
   }
 
-  const paginatedDuelists = useMemo(() => (
-    duelistIds.slice(
-      pageNumber * duelistsPerPage,
-      (pageNumber + 1) * duelistsPerPage
-    ).map((duelist_id, index) => {
-      const newDuelist = {
-        duelist_id,
+  const getCurrentPagePosters = (ids: string[]) => {
+    return ids.slice(
+      pageNumber * postersPerPage, 
+      (pageNumber + 1) * postersPerPage
+    )
+  }
+
+  const hasPageContentChanged = (oldIds: string[], newIds: string[]) => {
+    const oldPageContent = getCurrentPagePosters(oldIds)
+    const newPageContent = getCurrentPagePosters(newIds)
+
+    if (oldPageContent.length !== newPageContent.length) return true
+
+    return oldPageContent.some((id, index) => id !== newPageContent[index])
+  }
+
+  const paginatedPosters = useMemo(() => (
+    getCurrentPagePosters(playerIds).map((playerAddress, index) => {
+      const newPoster = {
+        playerAddress,
         horizontalOffset: 0,
         verticalOffset: 0,
         rotation: 0,
@@ -99,14 +131,14 @@ export default function ScDuelists() {
         exitPositionX: 0,
         exitPositionY: 0
       }
-      setDuelistData(newDuelist, index)
-      return newDuelist
+      setPosterData(newPoster, index)
+      return newPoster
     })
-  ), [duelistsChanged])
+  ), [postersChanged])
 
   useEffect(() => {
-    paginatedDuelists.forEach((duelist, index) => {
-      setDuelistData(duelist, index)
+    paginatedPosters.forEach((poster, index) => {
+      setPosterData(poster, index)
     })
   }, [aspectWidth, aspectHeight])
 
@@ -138,13 +170,13 @@ export default function ScDuelists() {
       )
       .start()
 
-    paginatedDuelists.forEach((duelist, index) => {
-      const cardDuelistId = Number(duelist.duelist_id)
-      if (cardRefs.current[cardDuelistId]) {
+    paginatedPosters.forEach((poster, index) => {
+      const posterPlayerAddress = poster.playerAddress
+      if (posterRefs.current[posterPlayerAddress]) {
         setTimeout(() => {
-          cardRefs.current[cardDuelistId].toggleVisibility(true)
-          cardRefs.current[cardDuelistId].setPosition(0, 0, ANIMATION_DURATION, TWEEN.Easing.Quartic.Out)
-          cardRefs.current[cardDuelistId].setRotation(duelist.rotation, ANIMATION_DURATION, TWEEN.Easing.Quartic.Out)
+          posterRefs.current[posterPlayerAddress].toggleVisibility(true)
+          posterRefs.current[posterPlayerAddress].setPosition(0, 0, ANIMATION_DURATION, TWEEN.Easing.Quartic.Out)
+          posterRefs.current[posterPlayerAddress].setRotation(poster.rotation, ANIMATION_DURATION, TWEEN.Easing.Quartic.Out)
         }, STATIC_DELAY + DELAY)
       }
     })
@@ -186,12 +218,12 @@ export default function ScDuelists() {
         .start()
 
       
-      paginatedDuelists.forEach((duelist, index) => {
-        const cardDuelistId = Number(duelist.duelist_id)
-        if (cardRefs.current[cardDuelistId]) {
+      paginatedPosters.forEach((poster, index) => {
+        const posterPlayerAddress = poster.playerAddress
+        if (posterRefs.current[posterPlayerAddress]) {
           setTimeout(() => {
-            cardRefs.current[cardDuelistId].setPosition(duelist.exitPositionX, duelist.exitPositionY, ANIMATION_DURATION, TWEEN.Easing.Sinusoidal.Out)
-            cardRefs.current[cardDuelistId].setRotation(0, ANIMATION_DURATION, TWEEN.Easing.Sinusoidal.Out)
+            posterRefs.current[posterPlayerAddress].setPosition(poster.exitPositionX, poster.exitPositionY, ANIMATION_DURATION, TWEEN.Easing.Sinusoidal.Out)
+            posterRefs.current[posterPlayerAddress].setRotation(0, ANIMATION_DURATION, TWEEN.Easing.Sinusoidal.Out)
           }, STATIC_DELAY + (index === 3 || index === 6 ? DELAY : 
             index === 2 ? DELAY * 2 :
             index === 5 ? DELAY * 2 :
@@ -201,50 +233,59 @@ export default function ScDuelists() {
       })
 
       setTimeout(() => {
-        setDuelistsChanged(!duelistsChanged)
+        setPostersChanged(!postersChanged)
       }, EXIT_COMPLETE_DELAY)
     }
   }
 
   useEffect(() => {
-    if (initialLoadRef.current) {
-      return
-    }
-
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
     }
 
     timeoutRef.current = setTimeout(() => {
-      setIsAnimating(true)
-      setPageNumber(0)
-      playExitCardsAnimation()
-    }, 400)
+      const contentChanged = hasPageContentChanged(playerIdsRef.current, playerIds)
+      
+      if (contentChanged) {
+        if (!initialLoadRef.current) {
+          setIsAnimating(true)
+          playExitCardsAnimation()
+        } else {
+          setPostersChanged(prev => !prev)
+        }
+      }
+
+      playerIdsRef.current = playerIds
+    }, 100)
 
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [duelistIds])
+  }, [playerIds])
 
   useEffect(() => {
-    paginatedDuelists.forEach((duelist, index) => {
-      const cardDuelistId = Number(duelist.duelist_id)
-      if (cardRefs.current[cardDuelistId]) {
-        cardRefs.current[cardDuelistId].toggleVisibility(false)
-        cardRefs.current[cardDuelistId].setPosition(duelist.startPositionX, duelist.startPositionY, 0)
-        cardRefs.current[cardDuelistId].setRotation(0, 0)
-      }
-    })
+    const timeoutId = setTimeout(() => {
+      paginatedPosters.forEach((poster, index) => {
+        const posterPlayerAddress = poster.playerAddress
+        if (posterRefs.current[posterPlayerAddress]) {
+          posterRefs.current[posterPlayerAddress].toggleVisibility(false)
+          posterRefs.current[posterPlayerAddress].setPosition(poster.startPositionX, poster.startPositionY, 0)
+          posterRefs.current[posterPlayerAddress].setRotation(0, 0)
+        }
+      })
 
-    if (isAnimating || initialLoadRef.current) {
-      setTimeout(() => {
-        initialLoadRef.current = false
-      }, 450)
-      playEnterCardsAnimation()
-    }
-  }, [paginatedDuelists])
+      if (isAnimating || initialLoadRef.current) {
+        setTimeout(() => {
+          initialLoadRef.current = false
+        }, 450)
+        playEnterCardsAnimation()
+      }
+    }, 100)
+
+    return () => clearTimeout(timeoutId)
+  }, [paginatedPosters])
 
   const handlePageChange = (newPage: number) => {
     if (isAnimating) return
@@ -254,11 +295,11 @@ export default function ScDuelists() {
     playExitCardsAnimation()
   }
 
-  const _selectCallback = (duelistId: bigint) => {
-    if (duelistId) {
-      dispatchSelectDuelistId(duelistId)
+  const _selectCallback = (playerAddress: bigint) => {
+    if (playerAddress) {
+      dispatchSelectPlayerAddress(playerAddress)
     } else {
-      anonOpener.open();
+      console.log("No player address selected")
     }
   }
 
@@ -271,48 +312,49 @@ export default function ScDuelists() {
   const throwRef = useRef<HTMLImageElement>(null);
 
   return (
-    <div>
+    <div style={{
+      // position: 'absolute',
+      // top: 0,
+      // left: 0,
+      // width: '100%',
+      // height: '100%',
+      // perspective: '1000px',
+      // perspectiveOrigin: 'bottom center',
+      // transform: 'rotateX(-50deg)',
+    }}>
       <div style={{
         display: 'grid',
         gridTemplateRows: 'repeat(2, 1fr)',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        width: aspectWidth(60),
-        height: aspectHeight(70),
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        width: aspectWidth(40),
+        height: aspectHeight(75),
         position: 'absolute',
-        bottom: aspectHeight(10),
-        left: '50%',
-        transform: 'translateX(-50%)'
+        bottom: aspectHeight(5),
+        left: aspectWidth(8)
       }}>
-        {paginatedDuelists.map((duelist, index) => (
-          <div key={`duelist-${duelist.duelist_id}`} style={{
-            transform: index > 3 && 'translateX(50%)',
+        {paginatedPosters.map((poster, index) => (
+          <div key={`poster-${poster.playerAddress}`} style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
             <div style={{
-              width: aspectWidth(DUELIST_CARD_WIDTH),
-              height: aspectWidth(DUELIST_CARD_HEIGHT),
-              transform: `translate(${cardOffsets.horizontal * duelist.horizontalOffset}px, ${cardOffsets.vertical * duelist.verticalOffset}px)`,
+              width: aspectWidth(POSTER_WIDTH_SMALL),
+              height: aspectHeight(POSTER_HEIGHT_SMALL),
+              transform: `translate(${poster.horizontalOffset}px, ${poster.verticalOffset}px)`,
             }}>
-              <DuelistCard
-                ref={(ref: DuelistCardHandle | null) => {
-                  if (ref) cardRefs.current[Number(duelist.duelist_id)] = ref
+              <ProfilePoster
+                ref={(ref: ProfilePosterHandle | null) => {
+                  if (ref) posterRefs.current[poster.playerAddress] = ref
                 }}
-                key={duelist.duelist_id}
-                duelistId={Number(duelist.duelist_id)}
+                key={poster.playerAddress}
+                playerAddress={BigInt(poster.playerAddress)}
                 isSmall={true}
-                isLeft={true}
                 isHighlightable={true}
-                isHanging={false}
-                isFlipped={true}
-                isVisible={true}
-                instantFlip={true}
-                width={DUELIST_CARD_WIDTH}
-                height={DUELIST_CARD_HEIGHT}
+                isVisible={false}
                 onClick={() => {
                   if (!isAnimating) {
-                    _selectCallback(duelist.duelist_id)
+                    _selectCallback(BigInt(poster.playerAddress))
                   }
                 }}
               />

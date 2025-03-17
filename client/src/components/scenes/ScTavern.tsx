@@ -3,7 +3,7 @@ import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { SceneName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { TavernAudios } from '/src/components/GameContainer'
-import { DojoSetupErrorDetector } from '/src/components/account/ConnectionDetector'
+import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
 import { _currentScene } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
 import { sceneBackgrounds } from '/src/data/assets'
@@ -23,8 +23,7 @@ export default function ScTavern() {
     if (itemClicked) {
       switch (itemClicked) {
         case 'pistol':
-          dispatchSetScene(SceneName.DuelsBoard)
-          // dispatchSetScene(SceneName.Leaderboards)
+          dispatchSetScene(SceneName.Leaderboards)
           break
         case 'bottle':
           dispatchSetScene(SceneName.Duelists)
@@ -61,7 +60,6 @@ export default function ScTavern() {
       <BarkeepModal open={open} setOpen={setOpen} />
 
       <DojoSetupErrorDetector />
-      {/* <ConnectionDetector /> */}
     </div>
   )
 }

@@ -108,18 +108,20 @@ export const BalanceRequiredButton = ({
   onClick,
   disabled = false,
   fill = true,
+  fillParent = false,
 }: {
   label: string
   fee: BigNumberish
   onClick: Function
   disabled?: boolean
   fill?: boolean
+  fillParent?: boolean
 }) => {
   const { address } = useAccount()
   const { noFundsForFee } = useLordsBalance(address, fee)
   const canSubmit = (!noFundsForFee)
   return (
-    <ActionButton large fill={fill}
+    <ActionButton large fill={fill} fillParent={fillParent}
       disabled={disabled}
       important={canSubmit}
       negative={!canSubmit}
@@ -276,13 +278,13 @@ export function SettingsMenuItem({
 }
 
 export function BackButton() {
-  const { dispatchSetScene, atDoor } = usePistolsScene();
+  const { dispatchSetScene, atDoor, dispatchSceneBack } = usePistolsScene();
 
   const handleClick = () => {
     if (atDoor) {
       dispatchSetScene(SceneName.Gate);
     } else {
-      dispatchSetScene(SceneName.Tavern);
+      dispatchSceneBack();
     }
   }
 
@@ -293,20 +295,25 @@ export function BackButton() {
 
 export function ChallengeButton({
   challengedPlayerAddress,
+  fillParent = false,
 }: {
   challengedPlayerAddress: BigNumberish,
+  fillParent?: boolean
 }) {
-  const { dispatchChallengingPlayerAddress, dispatchSetDuel } = usePistolsContext()
+  const { dispatchChallengingPlayerAddress, dispatchSetDuel, duelistSelectOpener } = usePistolsContext()
   const { address } = useAccount()
-  const { duelistId } = useSettings()
+
   const { tableId } = useTableId()
   const { isMyAccount } = useIsMyAccount(challengedPlayerAddress)
   const { hasPact, pactDuelId } = usePact(tableId, address, challengedPlayerAddress)
-  const canChallenge = (duelistId > 0n && !hasPact && !isMyAccount)
+  const canChallenge = (!hasPact && !isMyAccount)
 
   if (!hasPact) {
-    return <ActionButton large fill disabled={!canChallenge} label='Challenge for a Duel!' onClick={() => dispatchChallengingPlayerAddress(challengedPlayerAddress)} />
+    return <ActionButton large fill fillParent={fillParent} important disabled={!canChallenge} label='Challenge for a Duel!' onClick={() => {
+      dispatchChallengingPlayerAddress(challengedPlayerAddress)
+      duelistSelectOpener.open()
+    }} />
   } else {
-    return <ActionButton large fill important disabled label='Duel In Progress!' onClick={() => dispatchSetDuel(pactDuelId)} />
+    return <ActionButton large fill fillParent={fillParent} important disabled label='Duel In Progress!' onClick={() => dispatchSetDuel(pactDuelId)} />
   }
 }

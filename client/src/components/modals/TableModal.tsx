@@ -116,8 +116,7 @@ function TableDescription({
   } = useTable(tableId)
   const { liveDuelsCount, pastDuelsCount } = useTableTotals(tableId)
   const { activeDuelistIds } = useTableActiveDuelistIds(tableId)
-  const { duelistId } = useSettings()
-  const { canJoin } = useCanJoin(tableId, duelistId)
+  const { canJoin } = useCanJoin(tableId, activeDuelistIds[0]) //TODO change if ever used again
 
   return (
     <Grid className='H5'>

@@ -35,6 +35,8 @@ export interface InteractibleComponentProps {
   startPosition?: { x: number, y: number }
   startRotation?: number
   startScale?: number
+  startZIndex?: number
+
   onHover?: (isHovered: boolean) => void
   onClick?: (e: React.MouseEvent) => void
 }
@@ -361,6 +363,12 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
   }, [props.startScale])
 
   useEffect(() => {
+    if (props.startZIndex) {
+      setComponentZIndex(props.startZIndex)
+    }
+  }, [props.startZIndex])
+
+  useEffect(() => {
     if (!hangingRef.current) return
     if (props.isHanging) {
       hangingRef.current.style.setProperty('--hang-rotation', `${hangRotationRef.current.rotation}deg`)
@@ -523,8 +531,8 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
   const toggleHighlight = (isHighlighted: boolean, shouldBeWhite?: boolean, color?: string)  => {
     if (!backgroundRef.current) return
     if (visibilityRef.current.opacity == 0) return
-    if (isHighlighted && (shouldBeWhite || color)) {
-      backgroundRef.current.style.setProperty('--background-color', color ? color : (shouldBeWhite ? 'white' : props.defaultHighlightColor))
+    if (isHighlighted) {
+      backgroundRef.current.style.setProperty('--background-color', color ? color : (shouldBeWhite ? 'white' : props.defaultHighlightColor || 'white'))
     }
     setHighlight({ dataField1: [isHighlighted ? 1 : 0], duration: Constants.CARD_BASE_HIGHLIGHT_DURATION, easing: TWEEN.Easing.Quadratic.InOut, interpolation: TWEEN.Interpolation.Linear })
   }

@@ -26,7 +26,6 @@ export default function PlayerModal() {
           _close={_close} 
           isSmall={false}
           isVisible={true}
-          isFlipped={true}
           instantVisible={true}
           isHighlightable={false}
         />

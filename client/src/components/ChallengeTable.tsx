@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useQueryParams } from '/src/stores/queryParamsStore'
@@ -15,6 +15,9 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { arrayRemoveValue, bigintEquals } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '/src/utils/pistols'
+import { useDuelRequiresAction } from '../stores/eventsStore'
+import { useFameBalanceDuelist } from '../hooks/useFame'
+import { usePlayer } from '../stores/playerStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -30,8 +33,12 @@ export function ChallengeTableSelectedDuelist({
   const [statesFilter, setStatesFilter] = useState(AllChallengeStates)
 
   const { selectedDuelistId } = usePistolsContext()
-  const { filterChallengeSortColumn, filterDuelistName, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds, states } = useQueryChallengeIds(statesFilter, filterDuelistName, false, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds, states } = useQueryChallengeIds(statesFilter, null, false, selectedDuelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+
+  useEffect(() => {
+    console.log('ChallengeTableSelectedDuelist', selectedDuelistId)
+  }, [selectedDuelistId])
 
   return (
     <div style={{width: '100%', height: '100%',}}>
@@ -57,15 +64,14 @@ function ChallengeTableByIds({
   setStates: (states: constants.ChallengeState[]) => void
 }) {
   const { aspectWidth } = useGameAspect()
-  const { filterDuelistName } = useQueryParams()
 
   const rows = useMemo(() => {
     let result = []
     challengeIds.forEach((duelId) => {
-      result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} nameFilter={filterDuelistName} />)
+      result.push(<DuelItem key={duelId} duelId={duelId} compact={compact} />)
     })
     return result
-  }, [challengeIds, compact, filterDuelistName])
+  }, [challengeIds, compact])
 
   const { filters, canAdd, canClear } = useMemo(() => {
     let canAdd = false
@@ -145,21 +151,21 @@ function DuelItem({
   compact?: boolean
 }) {
   const { aspectWidth } = useGameAspect()
-  const { duelistId } = useSettings()
+
   const {
-    challenge: { duelistIdA, duelistIdB, tableId, state, isLive, isCanceled, isExpired, isDraw, winner },
+    challenge: { duelistIdA, duelistIdB, tableId, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB },
     turnA, turnB,
   } = useDuel(duelId)
-  const { name: nameA, profilePic: profilePicA } = useDuelist(duelistIdA)
-  const { name: nameB, profilePic: profilePicB } = useDuelist(duelistIdB)
+  const { name: playerNameA } = usePlayer(duelistAddressA)
+  const { name: playerNameB } = usePlayer(duelistAddressB)
+  const { isAlive: isAliveA } = useFameBalanceDuelist(duelistIdA)
+  const { isAlive: isAliveB } = useFameBalanceDuelist(duelistIdB)
 
   const winnerIsA = useMemo(() => (winner == 1), [winner])
   const winnerIsB = useMemo(() => (winner == 2), [winner])
 
-  const classNameA = useMemo(() => ((turnA && bigintEquals(duelistId, duelistIdA)) ? 'BgImportant' : null), [duelistId, duelistIdA, turnA])
-  const classNameB = useMemo(() => ((turnB && bigintEquals(duelistId, duelistIdB)) ? 'BgImportant' : null), [duelistId, duelistIdB, turnB])
-
   const { dispatchSelectDuel } = usePistolsContext()
+  const isRequiredAction = useDuelRequiresAction(duelId)
 
   const _gotoChallenge = () => {
     dispatchSelectDuel(duelId)
@@ -168,8 +174,8 @@ function DuelItem({
   const fameBalance = null;
 
   if (nameFilter) {
-    const isA = nameA ? nameA.toLowerCase().includes(nameFilter) : false
-    const isB = nameB ? nameB.toLowerCase().includes(nameFilter) : false
+    const isA = playerNameA ? playerNameA.toLowerCase().includes(nameFilter) : false
+    const isB = playerNameB ? playerNameB.toLowerCase().includes(nameFilter) : false
     if (!isA && !isB) {
       return <></>
     }
@@ -180,9 +186,9 @@ function DuelItem({
       <Cell style={{ width: '40%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: aspectWidth(0.8) }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <ProfilePic profilePic={profilePicA} small />
-            <PositiveResult positive={winnerIsA} negative={winnerIsB && false} warning={isDraw} canceled={isCanceled || isExpired}>
-              <ProfileName duelistId={duelistIdA} />
+            <ProfilePic profilePic={0} small />
+            <PositiveResult positive={winnerIsA} negative={winnerIsB} warning={isDraw} canceled={isCanceled || isExpired}>
+              <span className='BreakWord'>{playerNameA}</span>
             </PositiveResult>
           </div>
           <div style={{ alignItems: 'center' }}>
@@ -197,13 +203,13 @@ function DuelItem({
           {state == constants.ChallengeState.Resolved ?
             <>
               <PositiveResult positive={true}>
-                <ProfileName duelistId={winnerIsA ? duelistIdA : duelistIdB} badges={false} />
+                <span className='BreakWord'>{winnerIsA ? playerNameA : playerNameB}</span>
               </PositiveResult>
             </>
             :
             <>
               <span className={ChallengeStateClasses[state]}>
-                {ChallengeStateNames[state]}
+                {isRequiredAction ? constants.ChallengeState.Awaiting : ChallengeStateNames[state]}
               </span>
             </>
           }
@@ -213,9 +219,9 @@ function DuelItem({
       <Cell style={{ width: '40%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: aspectWidth(0.8), flexDirection: 'row-reverse' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <ProfilePic profilePic={profilePicB} small />
-            <PositiveResult positive={winnerIsB} negative={winnerIsA && false} warning={isDraw} canceled={isCanceled || isExpired}>
-              <ProfileName duelistId={duelistIdB} />
+            <ProfilePic profilePic={0} small />
+            <PositiveResult positive={winnerIsB} negative={winnerIsA} warning={isDraw} canceled={isCanceled || isExpired}>
+              <span className='BreakWord'>{playerNameB}</span>
             </PositiveResult>
           </div>
           <div style={{ alignItems: 'center' }}>

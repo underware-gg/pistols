@@ -6,6 +6,7 @@ import { ProfilePic } from '/src/components/account/ProfilePic'
 import { SceneName } from '/src/data/assets'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { FoolsBalance } from './LordsBalance'
 
 export default function AccountHeader() {
   const { isConnected } = useAccount()
@@ -27,7 +28,8 @@ export default function AccountHeader() {
           : <>
             <h3>{username}</h3>
             <h5>
-              Total Alive Duelists: {duelistIds.length}
+              <FoolsBalance address={address} />
+              {/* Total Alive Duelists: {duelistIds.length} */}
               {/* TODO: Replace this with other info preferably multiple of them, ideas:
               - Total Duelists icon + number
               - FOOLS amount earned

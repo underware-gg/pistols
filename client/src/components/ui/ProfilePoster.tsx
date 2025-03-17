@@ -5,7 +5,7 @@ import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCar
 import { InteractibleComponent, InteractibleComponentHandle } from '/src/components/InteractibleComponent'
 import { CardColor } from '/src/data/cardAssets'
 import { ProfilePic } from '/src/components/account/ProfilePic'
-import { useIsBookmarked, usePlayer } from '/src/stores/playerStore'
+import { useIsBookmarked, usePlayer, getPlayerOnlineStatus } from '/src/stores/playerStore'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { Grid } from 'semantic-ui-react'
 import { BookmarkIcon } from '/src/components/ui/Icons'
@@ -17,18 +17,26 @@ import { SceneName } from '/src/data/assets'
 import { useDuelistsOfOwner } from '/src/hooks/useTokenDuelists'
 import { AddressShort } from './AddressShort'
 import { ChallengeButton } from '/src/components/ui/Buttons'
+import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
 
+export const POSTER_WIDTH_BIG = 40
+export const POSTER_HEIGHT_BIG = 90
+export const POSTER_WIDTH_SMALL = 13
+export const POSTER_HEIGHT_SMALL = 32
+
 interface ProfilePosterProps {
-  playerAddress?: bigint
+  playerAddress?: BigNumberish
   isSmall?: boolean
-  isFlipped?: boolean
   isVisible?: boolean
   isHighlightable?: boolean
   instantVisible?: boolean
-
+  
+  width?: number
+  height?: number
+  
   startPosition?: { x: number, y: number }
   startRotation?: number
   startScale?: number
@@ -42,10 +50,11 @@ export interface ProfilePosterHandle extends InteractibleComponentHandle {}
 
 export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>((props: ProfilePosterProps = {
   isSmall: true,
-  isFlipped: true,
   isVisible: false,
   isHighlightable: false,
   instantVisible: false,
+  width: null,
+  height: null,
   startPosition: { x: 0, y: 0 },
   startRotation: 0,
   startScale: 1
@@ -53,6 +62,8 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectDuelistId } = usePistolsContext()
+
+  const isOnline = getPlayerOnlineStatus(props.playerAddress)
 
   const { name } = usePlayer(props.playerAddress)
   const { isMyAccount } = useIsMyAccount(props.playerAddress)
@@ -108,10 +119,10 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
 
   return (
     <InteractibleComponent
-      width={aspectWidth(props.isSmall ? 13 : 40)}
-      height={aspectHeight(props.isSmall ? 32 : 90)}
+      width={aspectWidth(props.width || (props.isSmall ? POSTER_WIDTH_SMALL : POSTER_WIDTH_BIG))}
+      height={aspectHeight(props.height || (props.isSmall ? POSTER_HEIGHT_SMALL : POSTER_HEIGHT_BIG))}
       isLeft={false}
-      isFlipped={props.isFlipped}
+      isFlipped={true}
       isVisible={props.isVisible}
       isHighlightable={props.isHighlightable}
       instantFlip={true}
@@ -134,7 +145,11 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
             
             <div className='ProfileSection Small'>
               <ProfilePic profilePic={0} width={9} removeCorners borderColor='#201a18' borderWidth={0.3} />
-              <div className='PlayerName Small'>Local Katana 1</div>
+              <div className='PlayerName Small'>{name}</div>
+            </div>
+
+            <div className='OnlineStatusSection Small'>
+              <div className={`OnlineStatus Small ${isOnline ? 'Online' : 'Offline'}`} />
             </div>
           </div>
         ) : (
@@ -149,6 +164,10 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
 
             <div className='BookmarkSection PlayerPoster'>
               <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted onClick={publish} />
+            </div>
+
+            <div className='OnlineStatusSection'>
+              <div className={`OnlineStatus ${isOnline ? 'Online' : 'Offline'}`} />
             </div>
 
             <div className='TextDivider WantedDivider'>Duelists:</div>
@@ -209,7 +228,7 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
                 </Col>
                 <Col>
                   {isMyAccount ? <ActionButton large fillParent important label='Manage Profile' onClick={() => dispatchSetScene(SceneName.Profile)} />
-                    : <ChallengeButton challengedPlayerAddress={props.playerAddress} />
+                    : <ChallengeButton challengedPlayerAddress={props.playerAddress} fillParent={true} />
                   }
                 </Col>
               </Row>

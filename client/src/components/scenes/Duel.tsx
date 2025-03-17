@@ -8,12 +8,11 @@ import { useGameplayContext } from '/src/hooks/GameplayContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useGetChallenge } from '/src/stores/challengeStore'
 import { useDuelist } from '/src/stores/duelistStore'
-import { useIsYou } from '/src/hooks/useIsYou'
+import { useIsMyDuelist } from '/src/hooks/useIsYou'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { useDuelRequiresAction } from '/src/stores/eventsStore'
-import { useSyncToActiveDuelists } from '/src/hooks/useSyncDuelist'
 import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
-import { DojoSetupErrorDetector } from '../account/ConnectionDetector'
+import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
 import { EnvironmentCardsTextures } from '/src/data/cardAssets'
 import { AnimationState } from '/src/three/game'
 import { Action } from '/src/utils/pistols'
@@ -54,16 +53,13 @@ export default function Duel({
 
   const { duelistIdA, duelistIdB, timestampStart, isTutorial, timestampEnd, isAwaiting, isInProgress, isFinished  } = useGetChallenge(duelId)
 
-  // switch to active duelist, if owned by player
-  const { isSynced } = useSyncToActiveDuelists([duelistIdA, duelistIdB])
-
   // guarantee to run only once when this component mounts
   const mounted = useMounted()
   const [duelSceneStarted, setDuelSceneStarted] = useState(false)
   const { name: nameA, characterType: characterTypeA } = useDuelist(duelistIdA)
   const { name: nameB, characterType: characterTypeB } = useDuelist(duelistIdB)
-  const { isYou: isYouA } = useIsYou(duelistIdA)
-  const { isYou: isYouB } = useIsYou(duelistIdB)
+  const isYouA = useIsMyDuelist(duelistIdA)
+  const isYouB = useIsMyDuelist(duelistIdB)
 
   // clear required action flag
   const { account } = useAccount()
@@ -116,13 +112,13 @@ export default function Duel({
   }, [tutorial, isTutorial])
 
   useEffect(() => {
-    if (gameImpl && mounted && !duelSceneStarted && isSynced && nameA && nameB && characterTypeA && characterTypeB) {
+    if (gameImpl && mounted && !duelSceneStarted && nameA && nameB && characterTypeA && characterTypeB) {
       gameImpl.setDuelData(Number(duelId), Number(duelistIdA), Number(duelistIdB))
       gameImpl.startDuelWithPlayers(nameA, characterTypeA, isYouA, isYouB, nameB, characterTypeB)
       setDuelSceneStarted(true)
       dispatchAnimated(AnimationState.None)
     }
-  }, [gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, isSynced, isYouA, isYouB])
+  }, [gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, isYouA, isYouB])
 
   // setup grass animation 
   //TODO change due new timeouts...
@@ -496,3 +492,4 @@ export default function Duel({
 //TODO on page refresh in duel, automatically pause duel and instead of the ready button call start button so sounds are enabled + duel starts properly
 //TODO on refresh add a black overlay or round overlay with brown background that is shown and animated untill the assets are loaded and duel can be started!
 //TODO on duel end add rechallenge option!
+//TODO handle duel replay when someone withdrew/abandoned the duel or timedout currently it play the duel out without cards for one side 

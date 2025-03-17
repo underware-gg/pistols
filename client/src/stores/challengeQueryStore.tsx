@@ -106,7 +106,7 @@ export const useQueryChallengeIds = (
   const duelistEntities = useDuelistQueryStore((state) => state.entities);
   const targetId = useMemo(() => (isPositiveBigint(playerAddressOrDuelistId) ? BigInt(playerAddressOrDuelistId) : 0n), [playerAddressOrDuelistId, duelistEntities])
 
-  const [challengeIds, states] = useMemo(() => {
+  const [challengeIds, states, challengePlayerMap] = useMemo(() => {
     // get all challenges, by duelist (or all)
     let result =
       (targetId > 0n) ?
@@ -114,10 +114,20 @@ export const useQueryChallengeIds = (
         : Object.values(entities)
 
     // get all current states by duelist
-    const states = result.reduce((acc, e) => {
-      if (!acc.includes(e.state)) acc.push(e.state)
-      return acc
-    }, [] as constants.ChallengeState[])
+    const states = [] as constants.ChallengeState[]
+    
+    // add awaiting state if there are required duels
+    if (result.some(e => requiredDuelIds.includes(e.duel_id))) {
+      states.push(constants.ChallengeState.Awaiting)
+    }
+
+    // add remaining states from filtered results
+    result
+          .filter(e => !requiredDuelIds.includes(e.duel_id))
+          .reduce((acc, e) => {
+            if (!acc.includes(e.state)) acc.push(e.state)
+            return acc
+          }, states)
 
     // filter by bookmarked duels
     if (filterBookmarked) {
@@ -149,11 +159,22 @@ export const useQueryChallengeIds = (
 
     // return ids only
     const challengeIds = result.map((e) => e.duel_id)
-    return [challengeIds, states]
+    
+    // create map of challenge ids to player addresses
+    const challengePlayerMap = result.reduce((map, e) => {
+      map.set(e.duel_id, {
+        addressA: e.address_a,
+        addressB: e.address_b
+      })
+      return map
+    }, new Map())
+
+    return [challengeIds, states, challengePlayerMap]
   }, [entities, filterStates, filterName, filterBookmarked, targetId, sortColumn, sortDirection, bookmarkedDuels, requiredDuelIds])
 
   return {
     challengeIds,
     states,
+    challengePlayerMap
   }
 }

@@ -30,21 +30,26 @@ type StoredMoves = {
 
 export const initialState = {
   walletSig: { address: 0n, sig: 0n },
+  // opening modals
   selectedDuelId: 0n,
   selectedDuelistId: 0n,
   selectedPlayerAddress: 0n,
+  
+  // new challenge modal
   challengingAddress: 0n,
+  challengingDuelistId: 0n,
+
   currentDuel: 0n,
   currentScene: undefined as SceneName,
   tutorialLevel: undefined as DuelTutorialLevel,
-  lastScene: undefined as SceneName,
+  sceneStack: [] as SceneName[],
   moves: {} as StoredMoves,
   // injected
   connectOpener: null as Opener,
   shopOpener: null as Opener,
   tutorialOpener: null as Opener,
   bookOpener: null as Opener,
-  cardPackOpener: null as Opener,
+  duelistSelectOpener: null as Opener,
   tableOpener: null as Opener,
   walletFinderOpener: null as Opener,
 }
@@ -52,11 +57,13 @@ export const initialState = {
 const PistolsActions = {
   SET_SIG: 'SET_SIG',
   SET_SCENE: 'SET_SCENE',
+  POP_SCENE: 'POP_SCENE',
   SET_DUEL: 'SET_DUEL',
   SELECT_DUEL: 'SELECT_DUEL',
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
   SELECT_PLAYER_ADDRESS: 'SELECT_PLAYER_ADDRESS',
   SELECT_CHALLENGING_ADDRESS: 'SELECT_CHALLENGING_ADDRESS',
+  SELECT_CHALLENGING_DUELIST_ID: 'SELECT_CHALLENGING_DUELIST_ID',
   SET_MOVES: 'SET_MOVES',
   SET_TUTORIAL_LEVEL: 'SET_TUTORIAL_LEVEL',
   RESET_VALUES: 'RESET_VALUES',
@@ -71,11 +78,13 @@ type PistolsContextStateType = typeof initialState
 type ActionType =
   | { type: 'SET_SIG', payload: bigint[] }
   | { type: 'SET_SCENE', payload: SceneName }
+  | { type: 'POP_SCENE', payload: null }
   | { type: 'SET_DUEL', payload: bigint }
   | { type: 'SELECT_DUEL', payload: bigint }
   | { type: 'SELECT_DUELIST_ID', payload: bigint }
   | { type: 'SELECT_PLAYER_ADDRESS', payload: bigint }
   | { type: 'SELECT_CHALLENGING_ADDRESS', payload: bigint }
+  | { type: 'SELECT_CHALLENGING_DUELIST_ID', payload: bigint }
   | { type: 'SET_MOVES', payload: StoredMoves }
   | { type: 'RESET_VALUES', payload: null }
   | { type: 'SET_TUTORIAL_LEVEL', payload: DuelTutorialLevel }
@@ -104,7 +113,7 @@ const PistolsProvider = ({
   const shopOpener = useOpener()
   const tutorialOpener = useOpener()
   const bookOpener = useOpener()
-  const cardPackOpener = useOpener()
+  const duelistSelectOpener = useOpener()
   const tableOpener = useOpener()
   const walletFinderOpener = useOpener()
 
@@ -126,8 +135,30 @@ const PistolsProvider = ({
         break
       }
       case PistolsActions.SET_SCENE: {
-        newState.lastScene = state.currentScene
-        newState.currentScene = action.payload as SceneName
+        const newScene = action.payload as SceneName
+        
+        // For Tavern and Gate, reset stack to just that scene
+        if (newScene === SceneName.Tavern || newScene === SceneName.Gate) {
+          newState.sceneStack = [newScene]
+        } else {
+          // Check if scene already exists in stack
+          const existingIndex = state.sceneStack.indexOf(newScene)
+          if (existingIndex !== -1) {
+            // If exists, remove everything after it
+            newState.sceneStack = state.sceneStack.slice(0, existingIndex + 1)
+          } else {
+            // Otherwise add new scene to stack
+            newState.sceneStack = [...state.sceneStack, newScene]
+          }
+        }
+        newState.currentScene = newScene
+        break
+      }
+      case PistolsActions.POP_SCENE: {
+        if (state.sceneStack.length > 1) {
+          newState.sceneStack = state.sceneStack.slice(0, -1)
+          newState.currentScene = newState.sceneStack[newState.sceneStack.length - 1]
+        }
         break
       }
       case PistolsActions.SET_DUEL: {
@@ -139,6 +170,7 @@ const PistolsProvider = ({
         newState.selectedDuelistId = 0n
         newState.selectedPlayerAddress = 0n
         newState.challengingAddress = 0n
+        newState.challengingDuelistId = 0n
         break
       }
       case PistolsActions.SELECT_DUELIST_ID: {
@@ -146,6 +178,7 @@ const PistolsProvider = ({
         newState.selectedDuelistId = action.payload as bigint
         newState.selectedPlayerAddress = 0n
         newState.challengingAddress = 0n
+        newState.challengingDuelistId = 0n
         break
       }
       case PistolsActions.SELECT_PLAYER_ADDRESS: {
@@ -153,6 +186,7 @@ const PistolsProvider = ({
         newState.selectedDuelistId = 0n
         newState.selectedPlayerAddress = action.payload as bigint
         newState.challengingAddress = 0n
+        newState.challengingDuelistId = 0n
         break
       }
       case PistolsActions.SELECT_CHALLENGING_ADDRESS: {
@@ -160,6 +194,13 @@ const PistolsProvider = ({
         newState.selectedDuelistId = 0n
         newState.selectedPlayerAddress = 0n
         newState.challengingAddress = action.payload as bigint
+        break
+      }
+      case PistolsActions.SELECT_CHALLENGING_DUELIST_ID: {
+        newState.selectedDuelId = 0n
+        newState.selectedDuelistId = 0n
+        newState.selectedPlayerAddress = 0n
+        newState.challengingDuelistId = action.payload as bigint
         break
       }
       case PistolsActions.SET_MOVES: {
@@ -185,7 +226,7 @@ const PistolsProvider = ({
       shopOpener,
       tutorialOpener,
       bookOpener,
-      cardPackOpener,
+      duelistSelectOpener,
       tableOpener,
       walletFinderOpener,
     } }}>
@@ -250,6 +291,13 @@ export const usePistolsContext = () => {
     })
   }, [dispatch])
 
+  const dispatchChallengingDuelistId = useCallback((duelistId: BigNumberish) => {
+    dispatch({
+      type: PistolsActions.SELECT_CHALLENGING_DUELIST_ID,
+      payload: BigInt(duelistId),
+    })
+  }, [dispatch])
+
   const dispatchSelectDuel = useCallback((newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_DUEL,
@@ -283,6 +331,13 @@ export const usePistolsContext = () => {
     })
   }, [dispatch])
 
+  const __dispatchSceneBack = useCallback(() => {
+    dispatch({
+      type: PistolsActions.POP_SCENE,
+      payload: null,
+    })
+  }, [dispatch])
+
   const __dispatchResetValues = useCallback(() => {
     dispatch({
       type: PistolsActions.RESET_VALUES,
@@ -293,6 +348,7 @@ export const usePistolsContext = () => {
   return {
     ...state,
     hasSigned: (state.walletSig.sig > 0n),
+    lastScene: state.sceneStack[state.sceneStack.length - 2],
     // PistolsActions,
     dispatch,
     dispatchSetSig,
@@ -301,9 +357,11 @@ export const usePistolsContext = () => {
     dispatchSelectDuelistId,
     dispatchSelectPlayerAddress,
     dispatchChallengingPlayerAddress,
+    dispatchChallengingDuelistId,
     dispatchSetMoves,
     makeStoredMovesKey,
     __dispatchSetScene, // used internally only
+    __dispatchSceneBack, // used internally only
     __dispatchResetValues,  // used internally only
     dispatchSetTutorialLevel,
   }
@@ -368,7 +426,7 @@ type SceneSlug = {
   duelId?: BigNumberish,
 }
 export const usePistolsScene = () => {
-  const { currentScene, lastScene, selectedDuelId, currentDuel, dispatchSetDuel, __dispatchSetScene, __dispatchResetValues } = usePistolsContext()
+  const { currentScene, sceneStack, selectedDuelId, currentDuel, dispatchSetDuel, __dispatchSetScene, __dispatchSceneBack, __dispatchResetValues } = usePistolsContext()
   const { tableId, isSeason, isTutorial } = useTableId()
 
   const location = useLocation()
@@ -398,12 +456,36 @@ export const usePistolsScene = () => {
     __dispatchSetScene(newScene)
   }, [location.pathname, navigate, selectedDuelId, tableId, isSeason])
 
+  const dispatchSceneBack = useCallback(() => {
+    if (sceneStack.length > 1) {
+      const prevScene = sceneStack[sceneStack.length - 2]
+      let route = sceneRoutes[prevScene]
+      let url = route.baseUrl
+      let slug = ''
+      if (route.hasTableId) {
+        slug = tableId && !isSeason ? tableId : ''
+      } else if (route.hasDuelId) {
+        slug = `${bigintToDecimal(currentDuel)}`
+      }
+      url += slug ? `/${slug}` : ''
+      if (url != location.pathname) {
+        console.log(`navigate back >>>>> [${location.pathname}] > [${url}]`)
+        navigate(url)
+      }
+      __dispatchSceneBack()
+    } else {
+      // If no previous scene, go to tavern
+      __dispatchSetScene(SceneName.Tavern)
+    }
+  }, [sceneStack, location.pathname, navigate, tableId, isSeason, currentDuel])
+
   const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at Dawn'), [currentScene])
 
   return {
     currentScene,
-    lastScene,
-    wasLastSceneTutorial: tutorialScenes.includes(lastScene as typeof tutorialScenes[number]),
+    sceneStack,
+    lastScene: sceneStack[sceneStack.length - 2],
+    wasLastSceneTutorial: tutorialScenes.includes(sceneStack[sceneStack.length - 2] as typeof tutorialScenes[number]),
     sceneTitle,
     // helpers
     atGate: (currentScene == SceneName.Gate),
@@ -423,6 +505,7 @@ export const usePistolsScene = () => {
     atTutorialScene5: (currentScene == SceneName.TutorialScene5),
     // PistolsActions,
     dispatchSetScene,
+    dispatchSceneBack,
   }
 }
 
@@ -498,9 +581,7 @@ export const useSyncRouterParams = () => {
       // const params = new URLSearchParams(prev)
       const params = new URLSearchParams()
       if (selectedDuelId) {
-        if (currentScene != SceneName.Duel) {
-          params.set('duel', bigintToDecimal(selectedDuelId))
-        }
+        params.set('duel', bigintToDecimal(selectedDuelId))
       } else if (selectedDuelistId) {
         params.set('duelist', bigintToDecimal(selectedDuelistId))
       } else if (selectedPlayerAddress) {

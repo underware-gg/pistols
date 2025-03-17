@@ -101,6 +101,8 @@ export default function DuelistModal() {
 
   useEffect(() => {
     if (isOpen) {
+      setIsHandOpen(false)
+      setShowBack(false)
       setIsAnimating(true)
       animate(1000, 0, 0.5, 1, TWEEN.Easing.Circular.Out, () => {
         setIsAnimating(false)

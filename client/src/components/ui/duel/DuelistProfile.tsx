@@ -9,6 +9,7 @@ import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import * as Constants from '/src/data/cardConstants'
 import * as TWEEN from '@tweenjs/tween.js'
+import { useDuelist } from '/src/stores/duelistStore'
 
 export default function DuelistProfile({
   duelistId,
@@ -31,6 +32,8 @@ export default function DuelistProfile({
   const [archetypeImage, setArchetypeImage] = useState<string>()
   const [lastDamage, setLastDamage] = useState(0)
   const [lastHitChance, setLastHitChance] = useState(0)
+
+  const { profilePic, profileType, name, nameAndId } = useDuelist(duelistId)
 
   useEffect(() => {
     // let imageName = 'duelist_' + ProfileModels[profilePic].toLowerCase() + '_' + ArchetypeNames[score.archetype].toLowerCase()
@@ -110,7 +113,7 @@ export default function DuelistProfile({
       </div>
       {floated == 'left' &&
         <>
-          <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel  circle profilePicUrl={archetypeImage} />
+          <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePic={profilePic} profileType={profileType} />
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
           </div>
@@ -131,7 +134,7 @@ export default function DuelistProfile({
       }
       {floated == 'right' &&
         <>
-          <ProfilePic className='FlipHorizontal NoMouse NoDrag ProfilePicDuel' duel  circle profilePicUrl={archetypeImage} />
+          <ProfilePic className='FlipHorizontal NoMouse NoDrag ProfilePicDuel' duel circle profilePic={profilePic} profileType={profileType} />
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
           </div>

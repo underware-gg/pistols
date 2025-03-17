@@ -10,7 +10,7 @@ import { InteractibleComponent, InteractibleComponentHandle } from '/src/compone
 import { CardColor } from '/src/data/cardAssets'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { useIsBookmarked, usePlayer } from '/src/stores/playerStore'
-import { useIsMyAccount, useIsYou } from '/src/hooks/useIsYou'
+import { useIsMyAccount, useIsMyDuelist } from '/src/hooks/useIsYou'
 import { Grid } from 'semantic-ui-react'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useTable } from '/src/stores/tableStore'
@@ -22,7 +22,6 @@ import { useDuelist } from '/src/stores/duelistStore'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useAccount } from '@starknet-react/core'
-import { useSettings } from '/src/hooks/SettingsContext'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
@@ -30,10 +29,17 @@ import { SceneName } from '/src/data/assets'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelRequiresAction } from '/src/stores/eventsStore'
 import { useGetChallengeRewards } from '/src/hooks/useChallengeRewards'
+import { BigNumberish } from 'starknet'
 
 
 const Row = Grid.Row
 const Col = Grid.Column
+
+const POSTER_WIDTH_BIG = 40
+const POSTER_HEIGHT_BIG = 90
+const POSTER_WIDTH_SMALL = 13
+const POSTER_HEIGHT_SMALL = 30
+
 
 interface DuelPosterProps {
   duelId?: bigint
@@ -66,12 +72,12 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
 }, ref: React.Ref<DuelPosterHandle>) => {
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
-  const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext()
+  const { challengingDuelistId, dispatchSelectPlayerAddress, dispatchSelectDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
 
   const { duel_token, game } = useDojoSystemCalls()
-  const { duelistId } = useSettings()
   const { account } = useAccount()
   const isRequiredAction = useDuelRequiresAction(props.duelId)
+  const { duelistSelectOpener } = usePistolsContext()
 
   const {
     state,
@@ -93,8 +99,8 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { challengeDescription } = useChallengeDescription(props.duelId)
   const { description: tableDescription, isSeason, isTutorial } = useTable(tableId)
 
-  const rewardsA = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdA)
-  const rewardsB = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdB)
+  // const rewardsA = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdA)
+  // const rewardsB = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdB)
   // console.log('rewardsA:', rewardsA)
   // console.log('rewardsB:', rewardsB)
   
@@ -102,14 +108,11 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { name: playerNameB } = usePlayer(duelistAddressB)
 
   const { turnA, turnB } = useDuel(props.duelId)
-  const { isYou: isYouA } = useIsYou(duelistIdA)
-  const { isYou: isYouB } = useIsYou(duelistIdB)
+  const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
+  const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
 
-  const displayDuelId = (!isTutorial)
-  const linkToDuelist = (!isTutorial)
-
-  const { isYou: isChallenger } = useIsYou(duelistIdA)
-  const { isMyAccount: isChallenged } = useIsMyAccount(duelistAddressB)
+  const isChallenger = useMemo(() => isYouA, [isYouA])
+  const isChallenged = useMemo(() => isYouB, [isYouB])
 
   const { isInAction } = useDuelist(duelistIdB)
 
@@ -128,13 +131,26 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   }
 
   const _reply = (accepted: boolean) => {
-    const _submit = async () => {
-      setIsSubmitting(true)
-      await duel_token.reply_duel(account, duelistId, props.duelId, accepted)
-      if (accepted) _gotoDuel()
-      setIsSubmitting(false)
+    if (accepted) {
+      duelistSelectOpener.open()
+    } else {
+      _submit(null, accepted)
     }
-    _submit()
+  }
+
+  useEffect(() => {
+    if (challengingDuelistId > 0n) {
+      _submit(challengingDuelistId, true)
+    }
+  }, [challengingDuelistId])
+
+  const _submit = async (duelistId?: BigNumberish, accepted?: boolean) => {
+    console.log('DuelPoster _submit duelistId:', duelistId, 'accepted:', accepted)
+    setIsSubmitting(true)
+    await duel_token.reply_duel(account, duelistId, props.duelId, accepted)
+    dispatchChallengingDuelistId(0n)
+    if (accepted) _gotoDuel()
+    setIsSubmitting(false)
   }
 
   const _gotoDuel = () => {
@@ -182,8 +198,8 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
 
   return (
     <InteractibleComponent
-      width={aspectWidth(props.isSmall ? 13 : 40)}
-      height={aspectHeight(props.isSmall ? 30 : 90)}
+      width={aspectWidth(props.isSmall ? POSTER_WIDTH_SMALL : POSTER_WIDTH_BIG)}
+      height={aspectHeight(props.isSmall ? POSTER_HEIGHT_SMALL : POSTER_HEIGHT_BIG)}
       isLeft={false}
       isFlipped={props.isFlipped}
       isVisible={props.isVisible}
@@ -242,15 +258,15 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
             </div>
             <div className='ProfilePicContainer Large'>
               <div className='ProfilePicChallengeContainer Left Large'>
-                <ProfilePic profilePic={0} width={15} height={13} disabled={isDead(Number(duelistIdA))}  removeBorder removeCorners className='ProfilePicChallenge Left' onClick={() => dispatchSelectPlayerAddress(duelistAddressA)} />
-                <img id='DefeatedOverlay' className={ `Left ${isDead(Number(duelistIdA)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+                <ProfilePic profilePic={0} width={15} height={13} dimmed={isDead(Number(duelistIdA))}  removeBorder removeCorners className='ProfilePicChallenge Left' onClick={() => dispatchSelectPlayerAddress(duelistAddressA)} />
+                <img id='DefeatedOverlay' className={ `NoMouse NoDrag Left ${isDead(Number(duelistIdA)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
               </div>
               <div className='VS'>
                 VS
               </div>
               <div className='ProfilePicChallengeContainer Right Large'>
-                <ProfilePic profilePic={0} width={15} height={13} disabled={isDead(Number(duelistIdB))}  removeBorder removeCorners className='ProfilePicChallenge Right' onClick={() => dispatchSelectPlayerAddress(duelistAddressB)} />
-                <img id='DefeatedOverlay' className={ `Right ${isDead(Number(duelistIdB)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+                <ProfilePic profilePic={0} width={15} height={13} dimmed={isDead(Number(duelistIdB))}  removeBorder removeCorners className='ProfilePicChallenge Right' onClick={() => dispatchSelectPlayerAddress(duelistAddressB)} />
+                <img id='DefeatedOverlay' className={ `NoMouse NoDrag Right ${isDead(Number(duelistIdB)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
               </div>
             </div>
             <div className='PlayerNameA Large'>
@@ -271,7 +287,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     isHighlightable={true}
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
-                    onClick={() => dispatchSelectDuelistId(duelistId)}
+                    onClick={() => dispatchSelectDuelistId(duelistIdA)}
                   />
                 ) : null}
               </div>
@@ -327,7 +343,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     isHighlightable={true}
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
-                    onClick={() => dispatchSelectDuelistId(duelistId)}
+                    onClick={() => dispatchSelectDuelistId(duelistIdB)}
                   />
                 ) : null}
               </div>
@@ -348,9 +364,6 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     <Col>
                       <ActionButton large fillParent negative label='Cowardly Withdraw' disabled={isSubmitting} onClick={() => _reply(false)} confirm confirmMessage='This action will cancel this Challenge' />
                     </Col>
-                    <Col>
-                      <ActionButton large fillParent important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
-                    </Col>
                   </>
                 }
                 {(state == constants.ChallengeState.Awaiting && isChallenged) &&
@@ -361,7 +374,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                 {(state == constants.ChallengeState.Awaiting && isChallenged) &&
                   (!isInAction ?
                     <Col>
-                      <BalanceRequiredButton label='Accept Challenge!' disabled={isSubmitting} onClick={() => _reply(true)} fee={0} />
+                      <BalanceRequiredButton label='Accept Challenge!' fillParent fill={false} disabled={isSubmitting} onClick={() => _reply(true)} fee={0} />
                     </Col>
                     :
                     <Col>
@@ -369,7 +382,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     </Col>
                   )
                 }
-                {(state == constants.ChallengeState.InProgress || isRequiredAction) &&
+                {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || isRequiredAction) &&
                   <Col>
                     <ActionButton large fillParent important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
                   </Col>
@@ -386,7 +399,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                 }
               </Row>
             </Grid>
-            
+
           </div>
         )
       }

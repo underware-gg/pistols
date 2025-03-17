@@ -1541,6 +1541,19 @@ input::placeholder {
   background-color: $color-dark!important;
   // color: rgba($color-text, 0.75)!important;
   color: $color-text!important;
+  border: 1px solid $color-brightest !important;
+  min-height: aspect-width(2.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  
+  &.selection > .dropdown.icon {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    top: 0 !important;
+    margin: 0 !important;
+    padding-right: aspect-width(0) !important;
+  }
 }
 .ui.selection.dropdown {
   color: $color-brightest!important;
@@ -1841,6 +1854,11 @@ td {
 .ui.modal>.actions {
   background-color: $color-darkest;
 }
+
+.scrolling.dimmable>.dimmer {
+  justify-content: center !important;
+}
+
 .ui.header {
   @extend .TitleCase;
   font-family: $font-family;
@@ -1935,6 +1953,8 @@ a.active.step:hover,
   text-align: center;
   white-space: nowrap;
   line-height: 1;
+  width: 100%;
+  height: aspect-height(0.1);
 
   // Default border style
   &::before,
@@ -1985,6 +2005,53 @@ a.active.step:hover,
   }
 }
 
+.DuelDivider {
+  width: 110%;
+  margin: aspect-width(1) 0;
+  opacity: 0;
+}
+
+.DividerAnimation {
+  animation: fadeIn 1s ease-in forwards;
+
+  &::before {
+    animation: expandLineFromLeft 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-origin: left;
+  }
+
+  &::after {
+    animation: expandLineFromRight 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-origin: right;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes expandLineFromLeft {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes expandLineFromRight {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
 .LeaderboardsDivider {
   width: 90%;
   margin: 0 5%;
@@ -1995,6 +2062,25 @@ a.active.step:hover,
 
   &.EqualMargin {
     margin-bottom: aspect-width(3);
+  }
+}
+
+.NewChallengeDivider {
+  color: $color-brightest;
+  font-size: aspect-width(1.4);
+
+  &.Small {
+    font-size: aspect-width(1);
+  }
+
+  &.VerticalSpacing {
+    margin-top: aspect-width(0.6);
+    margin-bottom: aspect-width(0.6);
+  }
+
+  &.Centered {
+    width: 100%;
+    text-align: center;
   }
 }
 
@@ -2217,15 +2303,28 @@ a.active.step:hover,
   z-index: 9999 !important; /* High z-index to ensure it is on top */
 }
 
-.animated-character {
-  opacity: 0;
-  animation: bounceInDown 1s forwards;
-}
-
-.fadeIn{
+.fadeIn {
   opacity: 0;
   -webkit-animation: fadeIn 0.2s;
   animation: fadeIn 0.2s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.slideInFromTop {
+  opacity: 0;
+  -webkit-animation: slideInFromTop 0.5s ease forwards;
+  animation: slideInFromTop 0.5s ease forwards;
+  display: inline-block;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.slideInFromBottom {
+  opacity: 0;
+  -webkit-animation: slideInFromBottom 0.5s ease forwards; 
+  animation: slideInFromBottom 0.5s ease forwards;
+  display: inline-block;
   -webkit-animation-fill-mode: forwards;
   animation-fill-mode: forwards;
 }
@@ -2234,9 +2333,30 @@ a.active.step:hover,
   0% {
     opacity: 0;
   }
-
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes slideInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

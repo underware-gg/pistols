@@ -38,10 +38,9 @@ export default function ProgressBar({
         <Col textAlign='left' className='Relative' style={{ height: '100%' }}>
           <Progress
             disabled={_disabled}
-            value={_disabled || hideValue ? null : value}
-            progress={!_disabled && value !== null ? 'value' : true}
-            percent={!_disabled ? percent : undefined}
-            total={!_disabled ? total : undefined}
+            value={value}
+            progress={!_disabled && value !== null && !hideValue ? 'value' : false}
+            total={total}
             className={_className + (hideValue ? ' hide-value' : '')}
             color={_disabled ? 'grey' : (neutral ? 'grey' : cold ? 'teal' : null)}
             warning={!_disabled && warning}

@@ -185,6 +185,9 @@ export class InteractibleScene extends THREE.Scene {
 
     this.maskOverlay = new THREE.Mesh(fullScreenGeom, this.maskShader)
     this.maskOverlay.position.set(0, 0, bgDistance)
+    if (this.sceneData.scaleAddon) {
+      this.maskOverlay.scale.set(1 + this.sceneData.scaleAddon, 1 + this.sceneData.scaleAddon, 1)
+    }
     this.maskOverlay.name = 'bg'
     this.add(this.maskOverlay)
 
@@ -411,7 +414,14 @@ export class InteractibleScene extends THREE.Scene {
         this.currentRandomValues[index] = 0
       }
 
-      this.maskShader.setUniformValue(`uTextureShift${index}`, this.mouseScreenPos.clone().multiplyScalar(background.shiftMultiplier))
+      const aspectRatio = 1920/1080;
+      const screenSize = Math.min(window.innerWidth, window.innerHeight);
+      const width = screenSize * aspectRatio;
+      const height = screenSize;
+      const scaledMousePos = this.mouseScreenPos.clone();
+      scaledMousePos.x *= width/window.innerWidth;
+      scaledMousePos.y *= height/window.innerHeight;
+      this.maskShader.setUniformValue(`uTextureShift${index}`, scaledMousePos.multiplyScalar(background.shiftMultiplier));
       this.maskShader.setUniformValue(`uRandomShift${index}`, this.currentRandomValues[index])
     })
   }

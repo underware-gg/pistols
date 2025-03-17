@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { usePistolsContext, usePistolsScene, usePistolsSceneFromRoute, useSyncRouterParams } from '/src/hooks/PistolsContext'
-import { useSyncSelectedDuelist } from '/src/hooks/useSyncDuelist'
 import { useSetPageTitle } from '/src/hooks/useSetPageTitle'
 import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { DojoStatus } from '@underware/pistols-sdk/dojo'
@@ -18,6 +17,7 @@ import PlayerModal from '/src/components/modals/PlayerModal'
 import DuelistModal from '/src/components/modals/DuelistModal'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import NewChallengeModal from '/src/components/modals/NewChallengeModal'
+import SelectDuelistModal from '/src/components/modals/SelectDuelistModal'
 import WalletFinderModal from '/src/components/modals/WalletFinderModal'
 import ScProfile from '/src/components/scenes/ScProfile'
 import ScTavern from '/src/components/scenes/ScTavern'
@@ -107,9 +107,6 @@ function MainUI() {
   // sync game context with url params
   useSyncRouterParams()
 
-  // switch duelist after wallet change
-  useSyncSelectedDuelist()
-
   const { gameImpl } = useThreeJsContext()
   const { currentDuel, tutorialLevel } = usePistolsContext()
   const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards } = usePistolsScene()
@@ -166,18 +163,16 @@ function TutorialUI({
 
 
 function Modals() {
-  const { selectedDuelId, selectedDuelistId, selectedPlayerAddress, challengingAddress, walletFinderOpener } = usePistolsContext()
-  const challengeIsOpen = useMemo(() => (selectedDuelId > 0), [selectedDuelId])
-  const duelistIsOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
-  const playerIsOpen = useMemo(() => (selectedPlayerAddress > 0n), [selectedPlayerAddress])
-  const newChallengeIsOpen = useMemo(() => (challengingAddress > 0n), [challengingAddress])
+  const { walletFinderOpener, duelistSelectOpener } = usePistolsContext()
+
   
   return (
     <>
-      {challengeIsOpen && <ChallengeModal />}
-      {duelistIsOpen && <DuelistModal />}
-      {playerIsOpen && <PlayerModal />}
-      {newChallengeIsOpen && <NewChallengeModal />}
+      <ChallengeModal />
+      <DuelistModal />
+      <PlayerModal />
+      <NewChallengeModal />
+      <SelectDuelistModal opener={duelistSelectOpener} />
       <WalletFinderModal opener={walletFinderOpener} />
     </>
   )

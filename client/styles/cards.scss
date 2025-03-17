@@ -399,17 +399,13 @@
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
   // height: 20%;
-  
-  &.single {
-    bottom: -5vw;
-  }
-
-  &.double {
-    bottom: -8vw;
-  }
 
   &.visible {
     opacity: 1;
+  }
+
+  &.padded {
+    bottom: -5vw;
   }
 }
 
@@ -487,6 +483,11 @@
   position: absolute;
   margin-left: aspect-width(3);
   margin-top: aspect-width(-16.5);
+}
+
+.HandCard.Multiple {
+  margin-left: aspect-width(0);
+  margin-top: aspect-width(0);
 }
 
 .DuelistModalContainer {
