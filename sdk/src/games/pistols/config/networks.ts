@@ -191,7 +191,7 @@ const academySlotConfig: DojoNetworkConfig = {
       name: 'Katana 1',
       address: '0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7',
       privateKey: '0x1c9053c053edf324aec366a34c6901b1095b07af69495bffec7d7fe21effb1b',
-      active: true,
+      // active: true,
     },
     {
       name: 'Katana 2',
