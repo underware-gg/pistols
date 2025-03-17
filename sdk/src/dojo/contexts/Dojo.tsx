@@ -6,7 +6,7 @@ import { NetworkId } from 'src/games/pistols/config/networks'
 import { Manifest } from '@dojoengine/core'
 import { StarknetProvider, useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { DojoProvider } from 'src/dojo/contexts/DojoContext'
-import { DojoStatus } from 'src/exports/dojo'
+import { DojoStatus } from 'src/dojo/contexts/DojoStatus'
 import { useSetup } from 'src/dojo/setup/useSetup'
 
 // TODO: Manifest is outdated???

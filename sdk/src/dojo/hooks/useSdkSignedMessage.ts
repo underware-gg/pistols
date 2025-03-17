@@ -3,7 +3,7 @@ import { Account, TypedData, stark } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { serialize } from 'src/utils/misc/types'
-import { useConnectedController } from 'src/exports/dojo'
+import { useConnectedController } from 'src/dojo/hooks/useController'
 
 // export const useSdkPublishSignedMessage = <M extends PistolsModelType>(
 //   account: Account,

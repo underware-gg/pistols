@@ -1,7 +1,8 @@
 import { AccountInterface, BigNumberish, StarknetDomain } from 'starknet'
-import { poseidon, signMessages, Messages } from '@underware/pistols-sdk/utils/starknet'
-import { bigintToHex } from '@underware/pistols-sdk/utils'
-import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { signMessages, Messages } from 'src/utils/starknet/starknet_sign'
+import { poseidon } from 'src/utils/starknet/starknet'
+import { bigintToHex } from 'src/utils/misc/types'
+import * as constants from '../generated/constants'
 
 export interface CommitMoveMessage extends Messages {
   duelId: bigint,
@@ -65,10 +66,6 @@ export const signAndGenerateMovesHash = async (
   messageToSign: CommitMoveMessage,
   moves: number[]
 ): Promise<{ hash: bigint, salt: bigint }> => {
-  //------------------------------
-  // TODO: REMOVE THIS!!!
-  // return poseidon([duelId, duelistId])
-  //------------------------------
   const salt = await signAndGenerateSalt(account, starknetDomain, messageToSign)
   const hash = make_moves_hash(salt, moves)
   console.log(`signAndGenerateMovesHash():`, messageToSign, moves, bigintToHex(salt), bigintToHex(hash))

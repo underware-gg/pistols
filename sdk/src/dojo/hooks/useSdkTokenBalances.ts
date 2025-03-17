@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
+import { isPositiveBigint } from 'src/utils/misc/types'
 import * as torii from '@dojoengine/torii-client'
-import { isPositiveBigint } from 'src/exports/utils'
 
 
 //---------------------------------------

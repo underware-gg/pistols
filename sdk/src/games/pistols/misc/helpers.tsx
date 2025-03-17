@@ -1,5 +1,5 @@
 import { BigNumberish } from 'starknet'
-import { bigintToHex } from 'src/exports/utils'
+import { bigintToHex } from 'src/utils/misc/types'
 import {
   DuelistHand,
   getPacesCardFromValue,
@@ -14,7 +14,7 @@ import {
   CHARACTER_PROFILES,
   BOT_PROFILES,
   PROFILES,
-} from './generated/constants'
+} from '../generated/constants'
 
 //------------------------------------------
 // misc helpers

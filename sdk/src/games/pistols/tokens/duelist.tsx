@@ -10,9 +10,9 @@ import {
 import { BigNumberish } from 'starknet'
 import { assets as profileAssets } from './assets/profiles'
 import { assets as cardsAssets } from './assets/cards'
-import { getAsset } from './assets'
-import { shortAddress } from 'src/exports/utils'
+import { shortAddress } from 'src/utils/misc/types'
 import { map } from 'src/utils/misc/math'
+import { getAsset } from './assets'
 import * as constants from '../generated/constants'
 
 
