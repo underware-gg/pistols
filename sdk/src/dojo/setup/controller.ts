@@ -91,32 +91,45 @@ const _makeControllerContractPolicies = (
 ): ContractPolicies => {
   const contracts: ContractPolicies = {};
   Object.keys(policyDescriptions).forEach((name) => {
+    let contract_address
+    let methods: Method[] = []
+    // --- parse interfaces from abis
     const desc = policyDescriptions[name]
     const c = getContractByName(manifest, namespace, name)
-    let methods: Method[] = []
-    // --- abis
-    c.abi.forEach((abi: InterfaceAbi) => {
-      // --- interfaces
-      const interfaceName = abi.name.split('::').slice(-1)[0]
-      // console.log(`CI:`, contractName, interfaceName)
-      if (abi.type == 'interface' && desc.interfaces.includes(interfaceName)) {
-        // --- functions
-        abi.items.forEach((i) => {
-          const entrypoint = i.name
-          if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(entrypoint)) {
-            // console.log(`CI:`, item.name, item)
-            const method = {
-              entrypoint,
-              // name: `${i.name}()`,
-              description: INTERFACE_DESCRIPTIONS[interfaceName]?.[entrypoint] ?? undefined,
+    // console.log(`CI:`, name, desc, c)
+    if (c && desc.interfaces) {
+      contract_address = c.address
+      c.abi.forEach((abi: InterfaceAbi) => {
+        // --- interfaces
+        const interfaceName = abi.name.split('::').slice(-1)[0]
+        // console.log(`CI:`, contractName, interfaceName)
+        if (abi.type == 'interface' && desc.interfaces.includes(interfaceName)) {
+          // --- functions
+          abi.items.forEach((i) => {
+            const entrypoint = i.name
+            if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(entrypoint)) {
+              // console.log(`CI:`, item.name, item)
+              const method = {
+                entrypoint,
+                // name: `${i.name}()`,
+                description: INTERFACE_DESCRIPTIONS[interfaceName]?.[entrypoint] ?? undefined,
+              }
+              methods.push(method)
             }
-            methods.push(method)
-          }
-        })
-      }
-    })
-    if (methods.length > 0) {
-      contracts[formatQueryValue(c.address)] = {
+          })
+        }
+      })
+    }
+    // --- external contracts
+    else if (desc.methods) {
+      contract_address = desc.contract_address
+      desc.methods?.forEach((m) => {
+        methods.push({ ...m })
+      })
+    }
+    // create policy
+    if (contract_address && methods.length > 0) {
+      contracts[formatQueryValue(contract_address)] = {
         // name: desc.name,
         description: desc.description,
         methods,

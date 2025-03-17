@@ -1,7 +1,7 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
 import { AccountInterface, BigNumberish, Call, CallData, UniversalDetails } from 'starknet'
 import { arrayClean, shortAddress, isPositiveBigint, bigintToHex } from 'src/utils/misc/types'
-import { NAMESPACE, getLordsAddress, getBankAddress } from 'src/games/pistols/config/config'
+import { NAMESPACE, getLordsAddress, getBankAddress, getVrfAddress } from 'src/games/pistols/config/config'
 import { stringToFelt, bigintToU256 } from 'src/utils/starknet/starknet'
 import { makeCustomEnum } from 'src/utils/starknet/starknet_enum'
 import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
@@ -75,9 +75,8 @@ export function createSystemCalls(
   // https://docs.cartridge.gg/vrf/overview#executing-vrf-transactions
   const vrf_request_call = (signer: AccountInterface, contractName: string): Call => {
     const contract_address = getContractByName(manifest, NAMESPACE, contractName).address
-    const vrf_address = selectedNetworkConfig.vrfAddress || getContractByName(manifest, NAMESPACE, 'vrf_mock').address
     return {
-      contractAddress: vrf_address,
+      contractAddress: getVrfAddress(selectedNetworkConfig.networkId),
       entrypoint: 'request_random',
       calldata: CallData.compile({
         caller: contract_address,

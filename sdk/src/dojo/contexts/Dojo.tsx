@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect, useMemo } from 'react'
 import { StarknetDomain, TypedData } from 'starknet'
 import { Connector } from '@starknet-react/core'
+import { Method } from '@cartridge/controller'
 import { NetworkId } from 'src/games/pistols/config/networks'
 import { Manifest } from '@dojoengine/core'
 import { StarknetProvider, useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
@@ -14,9 +15,13 @@ export type DojoManifest = Manifest & any
 
 export type ContractPolicyDescriptions = {
   [contract_name: string]: {
-    name?: string
-    description?: string
-    interfaces: string[]
+    name: string            // display name of the contract
+    description: string     // description of the contract
+    // for dojo contracts (contract_name)
+    interfaces?: string[]   // parse interfaces from abi
+    // for external contracts
+    contract_address?: string
+    methods?: Method[]      // parse methods from abi
   }
 }
 

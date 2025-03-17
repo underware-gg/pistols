@@ -30,6 +30,25 @@ const manifests: Record<NetworkId, DojoManifest> = {
 
 export const NAMESPACE = 'pistols'
 
+//----------------------------------------
+// contract addresses
+//
+// erc-20
+export const getLordsAddress = (networkId: NetworkId): string => (NETWORKS[networkId].lordsAddress || (getContractByName(manifests[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
+export const getFameAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fame_coin')?.address ?? '0x0')
+export const getFoolsAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
+// erc-721
+export const getDuelistTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duelist_token')?.address ?? '0x0')
+export const getDuelTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duel_token')?.address ?? '0x0')
+export const getPackTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'pack_token')?.address ?? '0x0')
+// contracts
+export const getBankAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'bank')?.address ?? '0x0')
+export const getVrfAddress = (networkId: NetworkId): string => (NETWORKS[networkId].vrfAddress || (getContractByName(manifests[networkId], NAMESPACE, 'vrf_mock')?.address ?? '0x0'))
+
+
+//----------------------------------------
+// policies
+//
 const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   game: {
     name: 'Game',
@@ -79,6 +98,19 @@ const contractPolicyDescriptions_admin: ContractPolicyDescriptions = {
     interfaces: ['IAdmin'],
   },
 }
+const contractPolicyDescriptions_vrf = (networkId: NetworkId): ContractPolicyDescriptions => ({
+  vrf: {
+    name: 'VRF',
+    description: 'Cartridge VRF Provider',
+    contract_address: getVrfAddress(networkId),
+    methods: [
+      {
+        entrypoint: 'request_random',
+        description: 'Request a random number',
+      },
+    ]
+  },
+})
 
 export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: boolean): SessionPolicies => {
   const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
@@ -108,6 +140,7 @@ export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: 
       ...contractPolicyDescriptions_pistols,
       ...(mock ? contractPolicyDescriptions_mock : {}),
       ...(admin ? contractPolicyDescriptions_admin : {}),
+      ...contractPolicyDescriptions_vrf(networkId),
     },
     signedMessagePolicyDescriptions,
   );
@@ -120,18 +153,6 @@ export const makeStarknetDomain = (networkId: NetworkId): StarknetDomain => ({
   chainId: NETWORKS[networkId].chainId,
   revision: '1',
 })
-
-// contract addresses
-// erc-20
-export const getLordsAddress = (networkId: NetworkId): string => (NETWORKS[networkId].lordsAddress || (getContractByName(manifests[networkId], NAMESPACE, 'lords_mock')?.address ?? '0x0'))
-export const getFameAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fame_coin')?.address ?? '0x0')
-export const getFoolsAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'fools_coin')?.address ?? '0x0')
-// erc-721
-export const getDuelistTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duelist_token')?.address ?? '0x0')
-export const getDuelTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duel_token')?.address ?? '0x0')
-export const getPackTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'pack_token')?.address ?? '0x0')
-// contracts
-export const getBankAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'bank')?.address ?? '0x0')
 
 
 
