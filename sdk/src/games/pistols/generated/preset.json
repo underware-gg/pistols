@@ -15,60 +15,101 @@
   },
   "policies": {
     "contracts": {
-      "0x03dc37aa28e52e005b07b684336ae4ae33891e8bd4461c517dbd5380268bee65": {
-        "name": "Game",
+      "0x0619c7bd5d5d635e010ef3bf9a59ecc49fa055f19bb2202e530554cfda655b59": {
         "description": "Game loop contract",
         "methods": [
           {
-            "entrypoint": "commit_moves"
+            "entrypoint": "commit_moves",
+            "description": "Commit moves of a Duelist in a Duel"
           },
           {
-            "entrypoint": "reveal_moves"
+            "entrypoint": "reveal_moves",
+            "description": "Reveal moves of a Duelist in a Duel"
           },
           {
-            "entrypoint": "collect_season"
+            "entrypoint": "clear_required_action",
+            "description": "Clear the required action call for a duelist"
+          },
+          {
+            "entrypoint": "collect_duel",
+            "description": "Close expired duels"
+          },
+          {
+            "entrypoint": "collect_season",
+            "description": "Close the current season and start the next one"
           }
         ]
       },
-      "0x07c8896d54d254bcff8524c6fef87817e8727bf5e30c64e7fffc3a4625858433": {
-        "name": "Pack token",
+      "0x07b04bc75c3d4ba5b37d2dfc91501424dd23f517a820aee89adeeef4ececb391": {
         "description": "Packs ERC721 contract",
         "methods": [
           {
-            "entrypoint": "claim_starter_pack"
+            "entrypoint": "claim_starter_pack",
+            "description": "Claim the starter pack, mint Duelists"
           },
           {
-            "entrypoint": "purchase"
+            "entrypoint": "purchase",
+            "description": "Purchase a closed pack"
           },
           {
-            "entrypoint": "open"
+            "entrypoint": "open",
+            "description": "Open a pack, mint its contents"
           }
         ]
       },
-      "0x0441cd108743f8087418d903c9787c2e99925a7a8a892d5aa26895ae5f89b423": {
-        "name": "Duel token",
+      "0x00899524b10391115869ab095fe4385e17dd3dfd27b3a01bcc579ed939552e4c": {
         "description": "Duel ERC721 contract",
         "methods": [
           {
-            "entrypoint": "create_duel"
+            "entrypoint": "create_duel",
+            "description": "Create a Duel, mint its token"
           },
           {
-            "entrypoint": "reply_duel"
+            "entrypoint": "reply_duel",
+            "description": "Reply to a Duel (accept or reject)"
           }
         ]
       },
-      "0x00924dd4997108609a926f31f39ad8c69f6441e3b75f8bb1ac304668eddd3ba6": {
-        "name": "Bank",
+      "0x0611b5c48d17de65d8015d48d491e0d120361a85099e28f3630600b3a91a98b0": {
+        "description": "Duelist ERC721 contract",
+        "methods": [
+          {
+            "entrypoint": "poke",
+            "description": "Reactivates an inactive Duelist"
+          },
+          {
+            "entrypoint": "sacrifice",
+            "description": "Sacrifices a Duelist"
+          },
+          {
+            "entrypoint": "memorialize",
+            "description": "Memorializes a Duelist"
+          }
+        ]
+      },
+      "0x05c3c66f68bf24a4f61263d18622f97769ef62497f07a0ce9b07c7f02d6aa435": {
         "description": "Bank contract",
         "methods": [
           {
-            "entrypoint": "sponsor_duelists"
+            "entrypoint": "sponsor_duelists",
+            "description": "Sponsor duelist starter packs with $LORDS"
           },
           {
-            "entrypoint": "sponsor_season"
+            "entrypoint": "sponsor_season",
+            "description": "Sponsor the current season with $LORDS"
           },
           {
-            "entrypoint": "sponsor_tournament"
+            "entrypoint": "sponsor_tournament",
+            "description": "Sponsor a tournament with $LORDS"
+          }
+        ]
+      },
+      "0x05355768013cba6f96d985d189c0a69362d1a79a962e0d595ba7ea114ead720c": {
+        "description": "Cartridge VRF Provider",
+        "methods": [
+          {
+            "entrypoint": "request_random",
+            "description": "Request a random number"
           }
         ]
       }
