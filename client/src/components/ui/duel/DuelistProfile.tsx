@@ -10,6 +10,7 @@ import { ProfilePic } from '/src/components/account/ProfilePic'
 import * as Constants from '/src/data/cardConstants'
 import * as TWEEN from '@tweenjs/tween.js'
 import { useDuelist } from '/src/stores/duelistStore'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
 
 export default function DuelistProfile({
   duelistId,
@@ -28,6 +29,8 @@ export default function DuelistProfile({
 }) {
   const score = useGetSeasonScoreboard(duelistId)
   const { aspectWidth } = useGameAspect()
+
+  const { dispatchSelectDuelistId } = usePistolsContext()
 
   const [archetypeImage, setArchetypeImage] = useState<string>()
   const [lastDamage, setLastDamage] = useState(0)
@@ -113,7 +116,9 @@ export default function DuelistProfile({
       </div>
       {floated == 'left' &&
         <>
-          <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePic={profilePic} profileType={profileType} />
+          <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
+            <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePic={profilePic} profileType={profileType} />
+          </div>
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
           </div>
@@ -134,7 +139,9 @@ export default function DuelistProfile({
       }
       {floated == 'right' &&
         <>
-          <ProfilePic className='FlipHorizontal NoMouse NoDrag ProfilePicDuel' duel circle profilePic={profilePic} profileType={profileType} />
+          <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
+            <ProfilePic className='FlipHorizontal NoMouse NoDrag ProfilePicDuel' duel circle profilePic={profilePic} profileType={profileType} />
+          </div>
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
           </div>

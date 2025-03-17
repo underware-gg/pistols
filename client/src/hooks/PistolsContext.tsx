@@ -506,10 +506,14 @@ export const usePistolsScene = () => {
       }
       __dispatchSceneBack()
     } else {
-      // If no previous scene, go to tavern
-      __dispatchSetScene(SceneName.Tavern)
+      // If no previous scene, determine the appropriate base scene
+      const baseScene = (currentScene === SceneName.Door || tutorialScenes.includes(currentScene as typeof tutorialScenes[number])) 
+        ? SceneName.Gate 
+        : SceneName.Tavern;
+      
+      dispatchSetScene(baseScene);
     }
-  }, [sceneStack, location.pathname, navigate, tableId, isSeason, currentDuel])
+  }, [sceneStack, location.pathname, navigate, tableId, isSeason, currentDuel, currentScene])
 
   const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at Dawn'), [currentScene])
 

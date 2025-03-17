@@ -300,7 +300,7 @@ export function ChallengeButton({
   challengedPlayerAddress: BigNumberish,
   fillParent?: boolean
 }) {
-  const { dispatchChallengingPlayerAddress, dispatchSetDuel, duelistSelectOpener } = usePistolsContext()
+  const { dispatchChallengingPlayerAddress, dispatchSelectDuel, duelistSelectOpener } = usePistolsContext()
   const { address } = useAccount()
 
   const { tableId } = useTableId()
@@ -314,6 +314,6 @@ export function ChallengeButton({
       duelistSelectOpener.open()
     }} />
   } else {
-    return <ActionButton large fill fillParent={fillParent} important disabled label='Duel In Progress!' onClick={() => dispatchSetDuel(pactDuelId)} />
+    return <ActionButton large fill fillParent={fillParent} important label='Duel In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />
   }
 }

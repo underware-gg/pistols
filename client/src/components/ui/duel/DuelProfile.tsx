@@ -20,7 +20,7 @@ export default function DuelProfile({
   const { owner } = useOwnerOfDuelist(duelistId)
   const { name } = usePlayer(owner)
   const { aspectWidth } = useGameAspect()
-  const { dispatchSelectDuelistId } = usePistolsContext()
+  const { dispatchSelectPlayerAddress } = usePistolsContext()
 
   const { name: duelistName } = useDuelist(duelistId)
 
@@ -31,8 +31,8 @@ export default function DuelProfile({
     <>
       {floated == 'left' &&
         <>
-          <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)} >
-            <ProfilePic circle profilePic={0} profileType={constants.ProfileType.Duelist} className='NoMouse NoDrag' />
+          <div className='YesMouse NoDrag' onClick={() => dispatchSelectPlayerAddress(owner)} >
+            <ProfilePic circle profilePic={0} profileType={constants.ProfileType.Character} className='NoMouse NoDrag' />
           </div>
           <Image className='NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), left: aspectWidth(8.3) }}>
@@ -47,8 +47,8 @@ export default function DuelProfile({
             <div className='NoMargin ProfileName' data-contentlength={contentLength}>{name}</div>
             <div className='NoMargin ProfileName' data-contentlength={duelistContentLength}>{duelistName}</div>
           </div>
-          <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
-            <ProfilePic circle profilePic={0} profileType={constants.ProfileType.Duelist} className='NoMouse NoDrag' />
+          <div className='YesMouse NoDrag' onClick={() => dispatchSelectPlayerAddress(owner)}>
+            <ProfilePic circle profilePic={0} profileType={constants.ProfileType.Character} className='NoMouse NoDrag' />
           </div>
           <Image className='FlipHorizontal NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
         </>

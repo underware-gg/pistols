@@ -18,6 +18,7 @@ import { Grid, GridRow, GridColumn } from 'semantic-ui-react'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { ChallengeTableSelectedDuelist } from '/src/components/ChallengeTable'
+import { DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 
 interface DuelistCardProps extends InteractibleComponentProps {
   duelistId: number
@@ -124,7 +125,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       ref={baseRef}
       childrenBehindFront={
         <>
-          <ProfilePic profileType={profileType} profilePic={profilePic} width={props.width * 0.7} disabled={!isAlive} removeBorder removeCorners removeShadow className='duelist-card-image-drawing'/>
+          <ProfilePic profileType={profileType} profilePic={profilePic} width={(props.width ?? DUELIST_CARD_WIDTH) * 0.7} disabled={!isAlive} removeBorder removeCorners removeShadow className='duelist-card-image-drawing'/>
           <img id='DuelistDeadOverlay' className={ `Left ${!isAlive ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
         </>
       }
