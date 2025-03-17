@@ -66,7 +66,8 @@ const createStore = () => {
       if (!get().initialized) return undefined
       const _contractAddress = bigintToHex(contractAddress)
       const balances = get().contracts[_contractAddress]
-      if (!balances) throw new Error(`coinStore() contract not initialized: ${_contractAddress}`)
+      // if (!balances) throw new Error(`coinStore() contract not initialized: ${_contractAddress}`)
+      if (!balances) return undefined
       return balances[bigintToHex(accountAddress)] ?? null
     },
   })))

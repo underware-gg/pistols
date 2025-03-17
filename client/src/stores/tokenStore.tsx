@@ -78,7 +78,8 @@ const createStore = () => {
       if (!get().initialized) return undefined
       const _contractAddress = bigintToHex(contractAddress)
       const owners = get().contracts[_contractAddress]
-      if (!owners) throw new Error(`tokenStore() contract not initialized: ${_contractAddress}`)
+      // if (!owners) throw new Error(`tokenStore() contract not initialized: ${_contractAddress}`)
+      if (!owners) return undefined
       return owners[bigintToHex(accountAddress)] ?? null
     },
   })))
