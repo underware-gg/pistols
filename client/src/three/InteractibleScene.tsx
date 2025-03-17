@@ -53,7 +53,7 @@ export class InteractibleScene extends THREE.Scene {
 
     this.setSceneData(sceneName)
 
-    emitter.on('searchParams', (data) => {
+    emitter.on('hasModalOpen', (data) => {
       if (data) {
         this.setClickable(false)
       } else {
