@@ -23,7 +23,7 @@ export default function ShopModal({
 }) {
   const packType = opener.props.packType ?? constants.PackType.Unknown
 
-  const { account } = useAccount()
+  const { account, isConnected } = useAccount()
   const [selectedPackId, setSelectedPackId] = useState(0n)
 
   const { pack_token } = useDojoSystemCalls()
@@ -57,8 +57,8 @@ export default function ShopModal({
 
       <Modal.Content className='ModalText ShopModal'>
         <Grid className='OnboardingProfile'>
-          <Row columns='equal' textAlign='center' verticalAlign='middle'>
-            <Col textAlign='left' className='PaddedSides'>
+          <Row columns='equal' textAlign='center' verticalAlign='top'>
+            <Col textAlign='left' className='PaddedSides FillHeight'>
               {/* <Image src={imageUrlClosed} /> */}
               <CardPack isOpen={true} clickable={false} cardPackSize={6} maxTilt={30} packType={packType} />
             </Col>
@@ -67,7 +67,7 @@ export default function ShopModal({
               <h1>{packName}</h1>
               <Divider />
 
-              <FeesToPay value={0} fee={fee} prefixed />
+              <FeesToPay value={0} fee={fee} prefixed size='big' />
             </Col>
             <Col>
               <h1>Your Packs</h1>
@@ -86,17 +86,24 @@ export default function ShopModal({
             <Col>
               <ActionButton large fill label='Close' onClick={() => opener.close()} />
             </Col>
-            <Col>
-              <BalanceRequiredButton
-                fee={fee}
-                disabled={!canSubmit}
-                label='Purchase Pack'
-                onClick={() => _purchase()}
-              />
-            </Col>
-            <Col>
-              <ActionButton large fill disabled={!selectedPackId} label={`Open Pack #${bigintToDecimal(selectedPackId)}`} onClick={() => _openPack()} />
-            </Col>
+            {isConnected && <>
+              <Col>
+                <BalanceRequiredButton
+                  fee={fee}
+                  disabled={!canSubmit}
+                  label='Purchase Pack'
+                  onClick={() => _purchase()}
+                />
+              </Col>
+              <Col>
+                <ActionButton large fill disabled={!selectedPackId} label={`Open Pack #${bigintToDecimal(selectedPackId)}`} onClick={() => _openPack()} />
+              </Col>
+            </>}
+            {!isConnected && <>
+              <Col>
+                <ActionButton large fill disabled={true} label={`Unavailable to Guests`} onClick={() => {}} />
+              </Col>
+            </>}
           </Row>
         </Grid>
       </Modal.Actions>
