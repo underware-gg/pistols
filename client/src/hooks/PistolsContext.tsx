@@ -581,9 +581,7 @@ export const useSyncRouterParams = () => {
       // const params = new URLSearchParams(prev)
       const params = new URLSearchParams()
       if (selectedDuelId) {
-        if (currentScene != SceneName.Duel) {
-          params.set('duel', bigintToDecimal(selectedDuelId))
-        }
+        params.set('duel', bigintToDecimal(selectedDuelId))
       } else if (selectedDuelistId) {
         params.set('duelist', bigintToDecimal(selectedDuelistId))
       } else if (selectedPlayerAddress) {

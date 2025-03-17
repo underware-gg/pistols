@@ -27,7 +27,6 @@ enum TextureName {
   bg_gate = 'bg_gate',
   bg_door = 'bg_door',
   bg_gate_mask = 'bg_gate_mask',
-  bg_profile = 'bg_profile',
   bg_tavern = 'bg_tavern',
   bg_tavern_mask = 'bg_tavern_mask',
   bg_duelists = 'bg_duelists',
@@ -90,6 +89,7 @@ enum TextureName {
   bg_profile_player = 'bg_profile_player',
   bg_profile_book_mask = 'bg_profile_book_mask',
   bg_profile_chest_mask = 'bg_profile_chest_mask',
+  bg_profile_door_mask = 'bg_profile_door_mask',
   bg_profile_background = 'bg_profile_background',
 }
 type TextureAttributes = {
@@ -100,7 +100,6 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_gate]: { path: '/images/bg_gate.jpg' },
   [TextureName.bg_door]: { path: '/images/bg_door.jpg' },
   [TextureName.bg_gate_mask]: { path: '/images/bg_gate_mask.png' },
-  [TextureName.bg_profile]: { path: '/images/bg_profile.jpg' },
   [TextureName.bg_tavern]: { path: '/images/bg_tavern.jpg' },
   [TextureName.bg_tavern_mask]: { path: '/images/bg_tavern_mask.png' },
   [TextureName.bg_duelists]: { path: '/images/bg_duelists.jpg' },
@@ -161,9 +160,10 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_profile_table]: { path: '/images/scenes/profile/bg_profile_table.png' },
   [TextureName.bg_profile_player]: { path: '/images/scenes/profile/bg_profile_player.png' },
   [TextureName.bg_profile_items]: { path: '/images/scenes/profile/bg_profile_items.png' },
-  [TextureName.bg_profile_book_mask]: { path: '/images/bg_profile_book_mask.png' },
-  [TextureName.bg_profile_chest_mask]: { path: '/images/bg_profile_chest_mask.png' },
+  [TextureName.bg_profile_book_mask]: { path: '/images/scenes/profile/bg_profile_book_mask.png' },
+  [TextureName.bg_profile_chest_mask]: { path: '/images/scenes/profile/bg_profile_chest_mask.png' },
   [TextureName.bg_profile_background]: { path: '/images/scenes/profile/bg_profile_background.png' },
+  [TextureName.bg_profile_door_mask]: { path: '/images/scenes/profile/bg_profile_door_mask.png' },
 }
 
 interface SceneData {
@@ -204,8 +204,9 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { texture: TextureName.bg_profile_background, shiftMultiplier: -0.03, renderOrder: 3 },
     ],
     items: [
-      { name: 'book', color: 'ff0000', description: 'Your Duelists', mask: TextureName.bg_profile_book_mask, renderOrder: 1 },
+      { name: 'book', color: 'ffff00', description: 'Your Duelists', mask: TextureName.bg_profile_book_mask, renderOrder: 1 },
       { name: 'chest', color: '0000ff', description: 'Card Packs', mask: TextureName.bg_profile_chest_mask, renderOrder: 1 },
+      { name: 'door', color: 'ff0000', description: 'Exit tavern', mask: TextureName.bg_profile_door_mask, renderOrder: 3 },
     ],
     scaleAddon: 0.065
   },

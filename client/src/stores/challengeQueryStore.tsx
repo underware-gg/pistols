@@ -108,7 +108,6 @@ export const useQueryChallengeIds = (
 
   const [challengeIds, states, challengePlayerMap] = useMemo(() => {
     // get all challenges, by duelist (or all)
-    console.log(entities)
     let result =
       (targetId > 0n) ?
         Object.values(entities).filter((e) => e.duelist_id_a === targetId || e.duelist_id_b === targetId || e.address_a === targetId || e.address_b === targetId)

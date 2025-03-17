@@ -41,6 +41,17 @@ export const useGetChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNum
   // const fame_burned_eth = useMemo(() => Number(weiToEth(fame_burned_wei)), [fame_burned_wei])
   // const lords_unlocked_eth = useMemo(() => Number(weiToEth(lords_unlocked_wei)), [lords_unlocked_wei])
 
+  const getPositionText = (position: number | undefined) => {
+    if (!position) return '';
+    
+    const suffixes = ['th', 'st', 'nd', 'rd'];
+    const specialCase = position % 100;
+    const suffix = (specialCase >= 11 && specialCase <= 13) ? 'th' : 
+                  suffixes[position % 10] || 'th';
+    
+    return `${position}${suffix} Place`;
+  }
+
   return {
     hasProcessedRewards: Boolean(rewards),
     // on win...
@@ -48,6 +59,7 @@ export const useGetChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNum
     fools_gained_wei, fools_gained_eth,
     points_scored: rewards?.points_scored ?? 0,
     position: rewards?.position ?? 0,
+    position_string: getPositionText(Number(rewards?.position)),
     // on loss...
     fame_lost_wei, fame_lost_eth,
     survived: rewards?.survived ?? undefined,

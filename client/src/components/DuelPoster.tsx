@@ -22,7 +22,6 @@ import { useDuelist } from '/src/stores/duelistStore'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useAccount } from '@starknet-react/core'
-import { useSettings } from '/src/hooks/SettingsContext'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
@@ -35,6 +34,12 @@ import { BigNumberish } from 'starknet'
 
 const Row = Grid.Row
 const Col = Grid.Column
+
+const POSTER_WIDTH_BIG = 40
+const POSTER_HEIGHT_BIG = 90
+const POSTER_WIDTH_SMALL = 13
+const POSTER_HEIGHT_SMALL = 30
+
 
 interface DuelPosterProps {
   duelId?: bigint
@@ -94,8 +99,8 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { challengeDescription } = useChallengeDescription(props.duelId)
   const { description: tableDescription, isSeason, isTutorial } = useTable(tableId)
 
-  const rewardsA = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdA)
-  const rewardsB = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdB)
+  // const rewardsA = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdA)
+  // const rewardsB = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdB)
   // console.log('rewardsA:', rewardsA)
   // console.log('rewardsB:', rewardsB)
   
@@ -193,8 +198,8 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
 
   return (
     <InteractibleComponent
-      width={aspectWidth(props.isSmall ? 13 : 40)}
-      height={aspectHeight(props.isSmall ? 30 : 90)}
+      width={aspectWidth(props.isSmall ? POSTER_WIDTH_SMALL : POSTER_WIDTH_BIG)}
+      height={aspectHeight(props.isSmall ? POSTER_HEIGHT_SMALL : POSTER_HEIGHT_BIG)}
       isLeft={false}
       isFlipped={props.isFlipped}
       isVisible={props.isVisible}

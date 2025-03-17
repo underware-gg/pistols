@@ -41,6 +41,9 @@ export default function ScProfile() {
         case 'chest':
           shopOpener.open({ packType: constants.PackType.Duelists5x })
           break
+        case 'door':
+          dispatchSetScene(SceneName.Gate)
+          break
       }
     }
   }, [itemClicked, timestamp])

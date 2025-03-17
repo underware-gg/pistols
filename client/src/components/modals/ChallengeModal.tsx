@@ -1,15 +1,13 @@
 import React, { useMemo } from 'react'
 import { Modal } from 'semantic-ui-react'
 
-import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { DuelPoster } from '../DuelPoster'
 
 
 export default function ChallengeModal() {
-  
-  const { atDuel } = usePistolsScene()
   const { selectedDuelId, dispatchSelectDuel } = usePistolsContext()
-  const isOpen = useMemo(() => (selectedDuelId > 0 && !atDuel), [selectedDuelId, atDuel])
+  const isOpen = useMemo(() => (selectedDuelId > 0), [selectedDuelId])
 
   const _close = () => { dispatchSelectDuel(0n) }
 

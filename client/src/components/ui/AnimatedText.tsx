@@ -4,15 +4,29 @@ interface AnimatedTextProps {
   text: string;
   delayPerCharacter: number;
   onAnimationComplete?: () => void;
+  slideDirection?: 'top' | 'bottom';
+  style?: React.CSSProperties;
+  reverse?: boolean;
+  animationDuration?: number;
 }
 
-const AnimatedText: React.FC<AnimatedTextProps> = ({ text, delayPerCharacter, onAnimationComplete }) => {
+const AnimatedText: React.FC<AnimatedTextProps> = ({ 
+  text, 
+  delayPerCharacter, 
+  onAnimationComplete, 
+  slideDirection, 
+  style, 
+  reverse = false,
+  animationDuration = 0.5
+}) => {
   const [spans, setSpans] = useState<JSX.Element[]>([]);
 
   const lastText = useRef(text)
 
   useEffect(() => {
     if (!text || lastText.current === text) return;
+
+    console.log('entered')
 
     lastText.current = text
 
@@ -26,14 +40,28 @@ const AnimatedText: React.FC<AnimatedTextProps> = ({ text, delayPerCharacter, on
       if (char === ' ') {
         newSpans.push(char);
       } else {
+        let animationClass = "fadeIn";
+        if (slideDirection === 'top') {
+          animationClass = "slideInFromTop";
+        } else if (slideDirection === 'bottom') {
+          animationClass = "slideInFromBottom";
+        }
+
+        const delay = reverse ? 
+          ((totalCharacters - 1 - i) * delayPerCharacter) : 
+          (i * delayPerCharacter);
+
         newSpans.push(
           <span
             key={i}
-            className="animated-character fadeIn"
+            className={animationClass}
             style={{
-              animationDelay: `${i * delayPerCharacter}ms`,
-              WebkitAnimationDelay: `${i * delayPerCharacter}ms`,
-              opacity: 0
+              animationDelay: `${delay}ms`,
+              WebkitAnimationDelay: `${delay}ms`,
+              animationDuration: `${animationDuration}s`,
+              WebkitAnimationDuration: `${animationDuration}s`,
+              opacity: 0,
+              ...style
             }}
           >
             {char}
@@ -52,7 +80,7 @@ const AnimatedText: React.FC<AnimatedTextProps> = ({ text, delayPerCharacter, on
     }, totalCharacters * delayPerCharacter);
 
     return () => clearTimeout(animationTimeout); // Cleanup timeout on unmount or when text changes
-  }, [text]);
+  }, [text, slideDirection, style, reverse, animationDuration]);
 
   return <div>{spans}</div>;
 };

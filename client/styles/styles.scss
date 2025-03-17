@@ -1953,6 +1953,8 @@ a.active.step:hover,
   text-align: center;
   white-space: nowrap;
   line-height: 1;
+  width: 100%;
+  height: aspect-height(0.1);
 
   // Default border style
   &::before,
@@ -1999,6 +2001,53 @@ a.active.step:hover,
   &.warning {
     &::before, &::after {
       border-color: rgba($color-warning, 0.6) !important;
+    }
+  }
+}
+
+.DuelDivider {
+  width: 110%;
+  margin: aspect-width(1) 0;
+  opacity: 0;
+}
+
+.DividerAnimation {
+  animation: fadeIn 1s ease-in forwards;
+
+  &::before {
+    animation: expandLineFromLeft 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-origin: left;
+  }
+
+  &::after {
+    animation: expandLineFromRight 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-origin: right;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes expandLineFromLeft {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes expandLineFromRight {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
     }
   }
 }
@@ -2254,15 +2303,28 @@ a.active.step:hover,
   z-index: 9999 !important; /* High z-index to ensure it is on top */
 }
 
-.animated-character {
-  opacity: 0;
-  animation: bounceInDown 1s forwards;
-}
-
-.fadeIn{
+.fadeIn {
   opacity: 0;
   -webkit-animation: fadeIn 0.2s;
   animation: fadeIn 0.2s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.slideInFromTop {
+  opacity: 0;
+  -webkit-animation: slideInFromTop 0.5s ease forwards;
+  animation: slideInFromTop 0.5s ease forwards;
+  display: inline-block;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.slideInFromBottom {
+  opacity: 0;
+  -webkit-animation: slideInFromBottom 0.5s ease forwards; 
+  animation: slideInFromBottom 0.5s ease forwards;
+  display: inline-block;
   -webkit-animation-fill-mode: forwards;
   animation-fill-mode: forwards;
 }
@@ -2271,9 +2333,30 @@ a.active.step:hover,
   0% {
     opacity: 0;
   }
-
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes slideInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

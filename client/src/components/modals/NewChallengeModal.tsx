@@ -246,7 +246,6 @@ export default function NewChallengeModal() {
                     transform: 'translateX(-50%)'
                   }} />
                 </div>
-
               </Col>
 
               <Col width={4}>
@@ -373,7 +372,7 @@ function NewChallengeForm({
       </Form.Field>
 
       <Form.Field>
-        <div className='NewChallengeDivider Small VerticalSpacing Centered'>{constants.PREMISES[premise].prefix.toUpperCase()}</div>
+        <div className={`NewChallengeDivider Small VerticalSpacing Centered ${quote.length > 3 ? '' : 'Warning'}`}>{constants.PREMISES[premise].prefix.toUpperCase()}</div>
         <FormInput
           placeholder={'DESCRIBE YOUR REASONING'}
           value={quote}
@@ -385,7 +384,7 @@ function NewChallengeForm({
         />
       </Form.Field>
 
-      <div className='NewChallengeDivider Small VerticalSpacing Centered'>DURATION</div>
+      <div className={`NewChallengeDivider Small VerticalSpacing Centered ${(days + hours) > 0 ? '' : 'Warning'}`}>DURATION</div>
       <Grid>
         <Row>
           <Col width={8}>
@@ -397,7 +396,7 @@ function NewChallengeForm({
         </Row>
       </Grid>
 
-      <div className='NewChallengeDivider Small VerticalSpacing Centered'>STAKES</div>
+      <div className={`NewChallengeDivider Small VerticalSpacing Centered ${lives_staked > 0 ? '' : 'Warning'}`}>STAKES</div>
        <Dropdown className='FillWidth' defaultValue='1' placeholder='Lives' selection options={livesOptions} onChange={(e, { value }) => setLivesStaked(parseInt(value as string))} />
     </Form>
   )
