@@ -3,11 +3,13 @@ import { Grid, Image } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useLordsContract, useStarknetContext, useConnectedController, getConnectorIcon } from '@underware/pistols-sdk/dojo'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
+import { useSettings } from '/src/hooks/SettingsContext'
+import { makeProfilePicUrl, ProfilePic } from '/src/components/account/ProfilePic'
 import { FoolsBalance, LordsBalance } from '/src/components/account/LordsBalance'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { AddressShort } from '/src/components/ui/AddressShort'
-import { makeProfilePicUrl, ProfilePic } from '/src/components/account/ProfilePic'
+import { ConnectButton, PlayGameButton } from '/src/components/scenes/ScDoor'
 import { SceneName } from '/src/data/assets'
 
 const Row = Grid.Row
@@ -21,45 +23,45 @@ export default function WalletHeader({
   const { lordsContractAddress } = useLordsContract()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
+  const { hasFinishedTutorial } = useSettings()
 
   // BUG: https://github.com/apibara/starknet-react/issues/419
   // const { data, error, isLoading } = useStarkProfile({ address, enabled: false })
   // console.log(data)
   const data = { name: null, profilePicture: null }
 
-  const name = useMemo(() => (data?.name ?? `Connected to ${selectedNetworkConfig.name}`), [data])
+  const connectionName = useMemo(() => (data?.name ?? `Connected to ${selectedNetworkConfig.name}`), [data])
   const imageUrl = useMemo(() => (data?.profilePicture ?? getConnectorIcon(connector) ?? makeProfilePicUrl(0)), [data, connector])
 
   const { username, openProfile } = useConnectedController()
 
   return (
-    <Grid>
+    <Grid className='WalletHeader'>
       <Row className='TitleCase Padded'>
         <Col width={4} verticalAlign='middle'>
           {/* <Image src={imageUrl} className='ProfilePicMedium' /> */}
-          <ProfilePic profilePicUrl={imageUrl} medium  removeBorder className='ProfilePicMargin' /> 
+          <ProfilePic profilePicUrl={imageUrl} medium removeBorder className='ProfilePicMargin' />
         </Col>
-        {isConnected &&
-          <Col width={12} textAlign='left'>
-            <h4>{name}</h4>
+        <Col width={12} textAlign='left'>
+          {isConnected && <>
+            <h4>{connectionName}</h4>
             {username && <span className='H4 Bold'>{username} <span className='Inactive'>|</span> </span>} <AddressShort address={address ?? 0n} />
-            {isConnected &&
-              <h5>
-                LORDS: <LordsBalance address={address} />
-                <span className='Inactive'> | </span>
-                FOOLS: <FoolsBalance address={address} />
-                {/* <EtherBalance address={address} /> */}
-              </h5>
-            }
-            <div className='AbsoluteRight AbsoluteBottom PaddedDouble'>
-            </div>
-          </Col>
-        }
-        {!isConnected &&
-          <Col width={12} textAlign='left'>
+            <h5>
+              LORDS: <LordsBalance address={address} />
+              <span className='Inactive'> | </span>
+              FOOLS: <FoolsBalance address={address} />
+              {/* <EtherBalance address={address} /> */}
+            </h5>
+          </>}
+          {!isConnected && <>
             <h4>Guest</h4>
-          </Col>
-        }
+            <h5>
+              Connect a Controller account
+              <br />
+              to start playing
+            </h5>
+          </>}
+        </Col>
       </Row>
 
       {isConnected &&
@@ -85,6 +87,16 @@ export default function WalletHeader({
         </Row>
       }
 
+      {!isConnected &&
+        <Row columns={'equal'}>
+          <Col verticalAlign='middle'>
+            {hasFinishedTutorial ?
+              <ConnectButton large={false} />
+              : <PlayGameButton large={false} />
+            }
+          </Col>
+        </Row>
+      }
     </Grid>
   )
 }

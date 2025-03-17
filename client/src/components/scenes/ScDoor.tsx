@@ -124,16 +124,26 @@ export function EnterAsGuestButton() {
   return <ActionButton large fill onClick={() => _enterAsGuest()} label='Enter as Spectator' />
 }
 
-export function PlayGameButton() {
+export function PlayGameButton({
+  large = true,
+}: {
+  large?: boolean
+}) {
   const { dispatchSetScene } = usePistolsScene()
 
   const _playGame = () => {
     dispatchSetScene(SceneName.Tutorial)
   }
-  return <ActionButton large fill important onClick={() => _playGame()} label='Play Game' />
+  return <ActionButton large={large} fill important onClick={() => _playGame()} label='Play Game' />
 }
 
-export function ConnectButton({ setLoading }: { setLoading?: (loading: boolean) => void }) {
+export function ConnectButton({
+  setLoading,
+  large = true,
+}: {
+  setLoading?: (loading: boolean) => void,
+  large?: boolean
+}) {
   const { isConnected, isConnecting } = useAccount()
   const { isLoading, isError } = useDojoStatus()
   const { connect } = useConnectToSelectedNetwork()
@@ -175,7 +185,7 @@ export function ConnectButton({ setLoading }: { setLoading?: (loading: boolean) 
 
   }, [isConnected, isError, canClaimStarterPack])
 
-  return <ActionButton fill large important disabled={!canConnect} onClick={() => _connect()} label={'Enter as Patron'} />
+  return <ActionButton fill large={large} important disabled={!canConnect} onClick={() => _connect()} label={'Enter as Patron'} />
 }
 
 export function ConnectStatus() {

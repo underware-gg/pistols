@@ -849,6 +849,10 @@ $ui-container-gap: 1em;
   line-height: 1.1em;
 }
 
+.WalletHeader {
+  min-width: 350px;
+}
+
 .FormLabel {
   @extend .TitleCase;
   color: $color-text;
