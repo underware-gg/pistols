@@ -619,8 +619,8 @@ pub mod game {
 
             // update leaderboards
             let mut leaderboard: Leaderboard = store.get_leaderboard(*challenge.table_id);
-            rewards_a.position = leaderboard.insert_score(*challenge.duelist_id_a, rewards_a.points_scored);
-            rewards_b.position = leaderboard.insert_score(*challenge.duelist_id_b, rewards_b.points_scored);
+            rewards_a.position = leaderboard.insert_score(*challenge.duelist_id_a, score_season_a.score.points);
+            rewards_b.position = leaderboard.insert_score(*challenge.duelist_id_b, score_season_b.score.points);
             if (rewards_a.position != 0 || rewards_b.position != 0) {
                 // adjust [a] if [b] moved up
                 if (rewards_b.position <= rewards_a.position) {
