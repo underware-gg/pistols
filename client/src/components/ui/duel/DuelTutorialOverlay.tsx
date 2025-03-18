@@ -220,17 +220,17 @@ export default function DuelTutorialOverlay({ tutorialType, opener, onComplete }
           <CustomIcon icon name='left-arrow' onClick={() => setSelectedTutorialType(undefined)} size='big' disabled={false} className='YesMouse tutorialTopLeftArrow'/>
         )}        
         <h2 className="tutorialTitle">
-          {currentTutorial.tutorialName}
+          {currentTutorial?.tutorialName}
         </h2>
 
         <img
-          src={currentTutorial.slides[currentSlide].imagePath}
+          src={currentTutorial?.slides[currentSlide]?.imagePath}
           alt="Tutorial"
           className="tutorialImage"
         />
 
         <p className="tutorialText">
-          {currentTutorial.slides[currentSlide].tutorialDescriptions}          
+          {currentTutorial?.slides[currentSlide]?.tutorialDescriptions}          
         </p>
 
         <div className="tutorialNavigationContainer">

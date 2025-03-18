@@ -46,11 +46,11 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   const { account } = useAccount()
   const { pack_token } = useDojoSystemCalls()
   const { duelistIds } = useDuelistsOfPlayer()
-  const [isClaiming, setIsClaiming] = useState(false)
   const { quantity } = usePackType(packType)
   const { fundedCount } = useFundedStarterPackCount()
-
+  
   const [isNoFundsModalOpen, setIsNoFundsModalOpen] = useState(false)
+  const [isClaiming, setIsClaiming] = useState(false)
   const [isOpening, setIsOpening] = useState(false)
   const [sealClicked, setSealClicked] = useState(false)
   const [cardsSpawned, setCardsSpawned] = useState(false)

@@ -143,7 +143,7 @@ export default function CommitPacesModal({
         setIsOpen(false)
         setTimeout(() => {
           emitter.emit('hover_description', null)
-        }, 100)
+        }, 300)
       }}
       open={isOpen}
     >

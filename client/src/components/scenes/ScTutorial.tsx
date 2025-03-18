@@ -84,7 +84,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   // Text Animation & Progression
   useEffect(() => {
     if (currentTextIndex < 0) return
-    if (currentTextIndex >= currentSceneData?.texts.length) {
+    if (currentTextIndex == currentSceneData?.texts.length) {
       handleSceneProgression()
       return
     }
@@ -196,6 +196,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         if (canClaimStarterPack) {
           animateTextOpacity(0)
           setShowCardPack(true)
+          console.log('showCardPack', showCardPack)
           setTimeout(() => {
             tutorialOpener.open()
           }, 1000)
