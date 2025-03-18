@@ -33,9 +33,9 @@ export default function ScTavern() {
           break
         case 'bartender':
           setOpen(true);
-          (_currentScene as InteractibleScene).toggleBlur(true);
-          (_currentScene as InteractibleScene).setClickable(false);
-          (_currentScene as InteractibleScene).excludeItem(sceneBackgrounds.Tavern.items.find(item => item.name === 'bartender'));
+          (_currentScene as InteractibleScene)?.toggleBlur(true);
+          (_currentScene as InteractibleScene)?.setClickable(false);
+          (_currentScene as InteractibleScene)?.excludeItem(sceneBackgrounds.Tavern.items.find(item => item.name === 'bartender'));
           break;
       }
     }
@@ -43,10 +43,10 @@ export default function ScTavern() {
 
   useEffect(() => {
     if (!open && _currentScene && _currentScene instanceof InteractibleScene) {
-      (_currentScene as InteractibleScene).toggleBlur?.(false);
-      (_currentScene as InteractibleScene).setClickable?.(true);
+      (_currentScene as InteractibleScene)?.toggleBlur?.(false);
+      (_currentScene as InteractibleScene)?.setClickable?.(true);
       setTimeout(() => {
-        (_currentScene as InteractibleScene).excludeItem?.(null);
+        (_currentScene as InteractibleScene)?.excludeItem?.(null);
       }, 400)
     }
   }, [open])
