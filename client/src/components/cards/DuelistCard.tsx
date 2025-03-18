@@ -38,7 +38,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   
-  const { name, profilePic, profileType, isInAction } = useDuelist(props.duelistId)
+  const { nameAndId: name, profilePic, profileType, isInAction } = useDuelist(props.duelistId)
   const {isAlive} = useFameBalanceDuelist(props.duelistId)
   const score = useGetSeasonScoreboard(props.duelistId)
 

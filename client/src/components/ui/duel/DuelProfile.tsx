@@ -24,7 +24,7 @@ export default function DuelProfile({
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
 
-  const { profilePic, profileType, name: duelistName } = useDuelist(duelistId)
+  const { profilePic, profileType, nameAndId: duelistName } = useDuelist(duelistId)
 
   const contentLength = useMemo(() => Math.floor(name.length/10), [name])
   const duelistContentLength = useMemo(() => Math.floor(duelistName.length/10), [duelistName])
