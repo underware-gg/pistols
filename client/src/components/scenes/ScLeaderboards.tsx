@@ -684,6 +684,7 @@ const CommingSoon = () => {
         ))}
       </div>
       
+      {/* @ts-ignore */}
       <style jsx>{`
         @keyframes gradientAnimation {
           0% { background-position: 0% 50% }
