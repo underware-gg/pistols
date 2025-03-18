@@ -134,7 +134,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
     if (accepted) {
       duelistSelectOpener.open()
     } else {
-      _submit(null, accepted)
+      _submit(0n, accepted)
     }
   }
 
