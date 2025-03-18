@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback } from 'react'
+import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState } from 'react'
 import { useNavigate, useSearchParams, useLocation, useParams } from 'react-router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
@@ -117,6 +117,8 @@ const PistolsProvider = ({
   const tableOpener = useOpener()
   const walletFinderOpener = useOpener()
 
+  const [hasSearchParams, setHasSearchParams] = useState(false)
+
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
     switch (action.type) {
@@ -218,6 +220,36 @@ const PistolsProvider = ({
     }
     return newState
   }, initialState)
+
+  emitter.on('searchParams', (data) => {
+    setHasSearchParams(data)
+  })
+
+  useEffect(() => {
+    const hasModalOpen = connectOpener.isOpen || 
+                        shopOpener.isOpen || 
+                        tutorialOpener.isOpen || 
+                        bookOpener.isOpen || 
+                        duelistSelectOpener.isOpen || 
+                        tableOpener.isOpen || 
+                        walletFinderOpener.isOpen ||
+                        hasSearchParams ||
+                        (state.challengingAddress && state.challengingDuelistId)
+
+    emitter.emit('hasModalOpen', hasModalOpen)
+  }, [
+    connectOpener.isOpen,
+    shopOpener.isOpen, 
+    tutorialOpener.isOpen,
+    bookOpener.isOpen,
+    duelistSelectOpener.isOpen,
+    tableOpener.isOpen,
+    walletFinderOpener.isOpen,
+    hasSearchParams,
+    state.challengingAddress,
+    state.challengingDuelistId
+  ])
+
 
   return (
     <PistolsContext.Provider value={{ dispatch, state: {
@@ -474,10 +506,14 @@ export const usePistolsScene = () => {
       }
       __dispatchSceneBack()
     } else {
-      // If no previous scene, go to tavern
-      __dispatchSetScene(SceneName.Tavern)
+      // If no previous scene, determine the appropriate base scene
+      const baseScene = (currentScene === SceneName.Door || tutorialScenes.includes(currentScene as typeof tutorialScenes[number])) 
+        ? SceneName.Gate 
+        : SceneName.Tavern;
+      
+      dispatchSetScene(baseScene);
     }
-  }, [sceneStack, location.pathname, navigate, tableId, isSeason, currentDuel])
+  }, [sceneStack, location.pathname, navigate, tableId, isSeason, currentDuel, currentScene])
 
   const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at Dawn'), [currentScene])
 

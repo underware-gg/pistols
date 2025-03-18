@@ -10,6 +10,8 @@ import { ProfilePic } from '/src/components/account/ProfilePic'
 import * as Constants from '/src/data/cardConstants'
 import * as TWEEN from '@tweenjs/tween.js'
 import { useDuelist } from '/src/stores/duelistStore'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export default function DuelistProfile({
   duelistId,
@@ -29,16 +31,18 @@ export default function DuelistProfile({
   const score = useGetSeasonScoreboard(duelistId)
   const { aspectWidth } = useGameAspect()
 
-  const [archetypeImage, setArchetypeImage] = useState<string>()
+  const { dispatchSelectDuelistId } = usePistolsContext()
+
+  const [archetypeImage1, setArchetypeImage1] = useState<string>()
+  const [archetypeImage2, setArchetypeImage2] = useState<string>()
   const [lastDamage, setLastDamage] = useState(0)
   const [lastHitChance, setLastHitChance] = useState(0)
 
   const { profilePic, profileType, name, nameAndId } = useDuelist(duelistId)
 
   useEffect(() => {
-    // let imageName = 'duelist_' + ProfileModels[profilePic].toLowerCase() + '_' + ArchetypeNames[score.archetype].toLowerCase()
-    let imageName = 'duelist_female_' + (ArchetypeNames[score.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[score.archetype].toLowerCase())
-    setArchetypeImage('/images/' + imageName + '.png')
+    setArchetypeImage1('/images/' + 'duelist_female_' + ArchetypeNames[constants.Archetype.Villainous].toLowerCase() + '.png')
+    setArchetypeImage2('/images/' + 'duelist_female_' + ArchetypeNames[constants.Archetype.Trickster].toLowerCase() + '.png')
   }, [score])
 
   useEffect(() => {
@@ -113,7 +117,9 @@ export default function DuelistProfile({
       </div>
       {floated == 'left' &&
         <>
-          <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePic={profilePic} profileType={profileType} />
+          <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
+            <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePicUrl={tutorialLevel === DuelTutorialLevel.FULL ? archetypeImage1 : undefined} profilePic={tutorialLevel === DuelTutorialLevel.FULL ? undefined : profilePic} profileType={tutorialLevel === DuelTutorialLevel.FULL ? constants.ProfileType.Duelist : profileType} />
+          </div>
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
           </div>
@@ -134,7 +140,9 @@ export default function DuelistProfile({
       }
       {floated == 'right' &&
         <>
-          <ProfilePic className='FlipHorizontal NoMouse NoDrag ProfilePicDuel' duel circle profilePic={profilePic} profileType={profileType} />
+          <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
+            <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePicUrl={tutorialLevel === DuelTutorialLevel.FULL ? archetypeImage2 : undefined} profilePic={tutorialLevel === DuelTutorialLevel.FULL ? undefined : profilePic} profileType={tutorialLevel === DuelTutorialLevel.FULL ? constants.ProfileType.Duelist : profileType} />
+          </div>
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
           </div>

@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef, useState, useMemo } from 'react'
+import React, { forwardRef, useImperativeHandle, useRef, useState, useMemo, useEffect } from 'react'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DUELIST_CARD_WIDTH, DUELIST_CARD_HEIGHT } from '/src/data/cardConstants'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
@@ -76,6 +76,7 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
   const cardRefs = useRef<{ [key: number]: DuelistCardHandle }>({})
 
   const [pageNumber, setPageNumber] = useState(0)
+  const [deferredLoading, setDeferredLoading] = useState(isLoading)
 
   const duelistsPerPage = 3
   const pageCount = useMemo(() => Math.ceil(duelistIds.length / duelistsPerPage), [duelistIds])
@@ -93,6 +94,15 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
   const handleNext = () => {
     setPageNumber(prev => Math.min(Math.max(0, pageCount - 1), prev + 1))
   }
+
+  useEffect(() => {
+    // Add a small delay before updating the loading state
+    const timer = setTimeout(() => {
+      setDeferredLoading(isLoading && duelistIds.length == 0) //TODO this shouldnt be needed, loading doesnt work because token is undefined this is quick fix for now
+    }, 300)
+    
+    return () => clearTimeout(timer)
+  }, [isLoading, duelistIds])
 
   useImperativeHandle(ref, () => ({
     flip: (flipped, isLeft, duration, easing, interpolation) =>
@@ -116,6 +126,37 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
     toggleBlink: (isBlinking, duration) => baseRef.current?.toggleBlink(isBlinking, duration),
     getStyle: () => baseRef.current?.getStyle() || { translateX: 0, translateY: 0, rotation: 0, scale: 1 },
   }));
+
+  const renderDuelistCards = useMemo(() => {
+    return [...Array(3)].map((_, i) => {
+      const duelistId = paginatedDuelistIds[i]
+      return (
+        <div 
+          key={duelistId ? duelistId.toString() : `empty-${i}`}
+          style={{ width: `${aspectWidth(DUELIST_CARD_WIDTH * 0.7)}px`, height: `${aspectWidth(DUELIST_CARD_HEIGHT * 0.7)}px` }}
+          onClick={duelistId ? () => dispatchSelectDuelistId(duelistId) : undefined}
+        >
+          {duelistId && (
+            <DuelistCard
+              ref={(ref: DuelistCardHandle | null) => {
+                if (ref) cardRefs.current[Number(duelistId)] = ref
+              }}
+              duelistId={Number(duelistId)}
+              isSmall={true}
+              isLeft={true}
+              isVisible={true}
+              isFlipped={true}
+              instantFlip={true}
+              isHighlightable={true}
+              width={DUELIST_CARD_WIDTH * 0.7}
+              height={DUELIST_CARD_HEIGHT * 0.7}
+              onClick={() => dispatchSelectDuelistId(duelistId)}
+            />
+          )}
+        </div>
+      )
+    })
+  }, [paginatedDuelistIds, aspectWidth, dispatchSelectDuelistId]);
 
   return (
     <InteractibleComponent
@@ -178,40 +219,11 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
                 onClick={handlePrev}
                 disabled={pageNumber === 0}
               >←</button>
-              {isLoading ? (
+              {deferredLoading ? (
                 <div className='DuelistCard'>Loading...</div>
               ) : duelistIds.length === 0 ? (
                 <div className='DuelistCard'>No Duelists</div>
-              ) : (
-                [...Array(3)].map((_, i) => {
-                  const duelistId = paginatedDuelistIds[i]
-                  return (
-                    <div 
-                      key={duelistId ? duelistId.toString() : `empty-${i}`}
-                      style={{ width: `${aspectWidth(DUELIST_CARD_WIDTH * 0.7)}px`, height: `${aspectWidth(DUELIST_CARD_HEIGHT * 0.7)}px` }}
-                      onClick={duelistId ? () => dispatchSelectDuelistId(duelistId) : undefined}
-                    >
-                      {duelistId && (
-                        <DuelistCard
-                          ref={(ref: DuelistCardHandle | null) => {
-                            if (ref) cardRefs.current[Number(duelistId)] = ref
-                          }}
-                          duelistId={Number(duelistId)}
-                          isSmall={true}
-                          isLeft={true}
-                          isVisible={true}
-                          isFlipped={true}
-                          instantFlip={true}
-                          isHighlightable={true}
-                          width={DUELIST_CARD_WIDTH * 0.7}
-                          height={DUELIST_CARD_HEIGHT * 0.7}
-                          onClick={() => dispatchSelectDuelistId(duelistId)}
-                        />
-                      )}
-                    </div>
-                  )
-                })
-              )}
+              ) : renderDuelistCards}
               <button 
                 className='NavButton'
                 onClick={handleNext}
@@ -239,4 +251,3 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
     />
   )
 })
-

@@ -155,6 +155,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
 
   const _gotoDuel = () => {
     dispatchSetScene(SceneName.Duel, { duelId: props.duelId })
+    props._close?.()
   }
 
   useImperativeHandle(ref, () => ({

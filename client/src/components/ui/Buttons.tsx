@@ -296,11 +296,13 @@ export function BackButton() {
 export function ChallengeButton({
   challengedPlayerAddress,
   fillParent = false,
+  customLabel = null,
 }: {
   challengedPlayerAddress: BigNumberish,
   fillParent?: boolean
+  customLabel?: string
 }) {
-  const { dispatchChallengingPlayerAddress, dispatchSetDuel, duelistSelectOpener } = usePistolsContext()
+  const { dispatchChallengingPlayerAddress, dispatchSelectDuel, duelistSelectOpener } = usePistolsContext()
   const { address } = useAccount()
 
   const { tableId } = useTableId()
@@ -309,11 +311,11 @@ export function ChallengeButton({
   const canChallenge = (!hasPact && !isMyAccount)
 
   if (!hasPact) {
-    return <ActionButton large fill fillParent={fillParent} important disabled={!canChallenge} label='Challenge for a Duel!' onClick={() => {
+    return <ActionButton large fill fillParent={fillParent} important disabled={!canChallenge} label={customLabel ?? 'Challenge for a Duel!'} onClick={() => {
       dispatchChallengingPlayerAddress(challengedPlayerAddress)
       duelistSelectOpener.open()
     }} />
   } else {
-    return <ActionButton large fill fillParent={fillParent} important disabled label='Duel In Progress!' onClick={() => dispatchSetDuel(pactDuelId)} />
+    return <ActionButton large fill fillParent={fillParent} important label='Duel In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />
   }
 }

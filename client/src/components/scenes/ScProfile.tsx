@@ -36,7 +36,7 @@ export default function ScProfile() {
       switch (itemClicked) {
         case 'book':
           bookOpener.open();
-          (_currentScene as InteractibleScene).setClickable(false);
+          (_currentScene as InteractibleScene)?.setClickable(false);
           break
         case 'chest':
           shopOpener.open({ packType: constants.PackType.Duelists5x })
@@ -50,9 +50,9 @@ export default function ScProfile() {
 
   useEffect(() => {
     if (bookOpener.isOpen || shopOpener.isOpen) {
-      (_currentScene as InteractibleScene).setClickable(false);
+      (_currentScene as InteractibleScene)?.setClickable(false);
     } else {
-      (_currentScene as InteractibleScene).setClickable(true);
+      (_currentScene as InteractibleScene)?.setClickable(true);
     }
   }, [bookOpener.isOpen, shopOpener.isOpen])
 

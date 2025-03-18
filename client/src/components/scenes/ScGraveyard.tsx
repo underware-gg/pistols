@@ -201,7 +201,7 @@ export default function ScGraveyard() {
       })
       .start();
 
-    (_currentScene as InteractibleScene).shiftImage(direction === 'left')
+    (_currentScene as InteractibleScene)?.shiftImage(direction === 'left')
   }
 
   const handlePageChange = (newPage: number) => {

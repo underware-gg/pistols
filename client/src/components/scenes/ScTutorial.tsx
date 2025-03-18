@@ -216,8 +216,8 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
     } else if (itemHovered === 'demon_left') {
       handleDemonLeftHover()
     } else {
-      ;(_currentScene as InteractibleScene).hideItem?.(TextureName.bg_demon_victim)
-      ;(_currentScene as InteractibleScene).hideItem?.(TextureName.bg_demon_background)
+      ;(_currentScene as InteractibleScene)?.hideItem?.(TextureName.bg_demon_victim)
+      ;(_currentScene as InteractibleScene)?.hideItem?.(TextureName.bg_demon_background)
     }
   }
 
@@ -226,8 +226,8 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       setTimeout(() => handleAnimationComplete(), 500)
     }
     setDisplayText(currentSceneData?.texts[2])
-    ;(_currentScene as InteractibleScene).showItem?.(TextureName.bg_demon_victim)
-    ;(_currentScene as InteractibleScene).showItem?.(TextureName.bg_demon_background)
+    ;(_currentScene as InteractibleScene)?.showItem?.(TextureName.bg_demon_victim)
+    ;(_currentScene as InteractibleScene)?.showItem?.(TextureName.bg_demon_background)
   }
 
   function handleDemonLeftHover() {
@@ -235,14 +235,14 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       setTimeout(() => handleAnimationComplete(), 500)
     }
     setDisplayText(currentSceneData?.texts[1])
-    ;(_currentScene as InteractibleScene).hideItem?.(TextureName.bg_demon_victim)
-    ;(_currentScene as InteractibleScene).hideItem?.(TextureName.bg_demon_background)
+    ;(_currentScene as InteractibleScene)?.hideItem?.(TextureName.bg_demon_victim)
+    ;(_currentScene as InteractibleScene)?.hideItem?.(TextureName.bg_demon_background)
   }
 
   function handleItemClick() {
     switch (itemClicked) {
       case 'demon_right':
-        (_currentScene as InteractibleScene).setClickable?.(false)
+        (_currentScene as InteractibleScene)?.setClickable?.(false)
         setFlashOpacity(1)
         if (!isLoading && !isError && !isConnecting && connect) {
           connect()
@@ -261,7 +261,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       dispatchSetScene(SceneName.TutorialScene5)
     }, 500)
     setTimeout(() => {
-      (_currentScene as InteractibleScene).setClickable?.(true)
+      (_currentScene as InteractibleScene)?.setClickable?.(true)
     }, 1000)
   }
 

@@ -34,220 +34,245 @@ uniform float uRandomShift4;
 
 int MAX_ELEMENTS = 5;
 
-int findFirstUsed(sampler2D elements[5], vec2 uvs[5]) {
-  if (texture2D(elements[0], uvs[0]).a > 0.0) return 0;
-  if (texture2D(elements[1], uvs[1]).a > 0.0) return 1;
-  if (texture2D(elements[2], uvs[2]).a > 0.0) return 2;
-  if (texture2D(elements[3], uvs[3]).a > 0.0) return 3;
-  if (texture2D(elements[4], uvs[4]).a > 0.0) return 4;
-  
-  return -1;
-}
-
-vec2 findShift(int index) {
+vec2 getShiftForIndex(int index) {
   if (index == 0) return uTextureShift0 + uRandomShift0;
   if (index == 1) return uTextureShift1 + uRandomShift1;
   if (index == 2) return uTextureShift2 + uRandomShift2;
   if (index == 3) return uTextureShift3 + uRandomShift3;
   if (index == 4) return uTextureShift4 + uRandomShift4;
-  
-  return vec2(0.0);
-}
-
-vec2 findMaskUv(int maskRenderOrder, vec2 shiftedUvs[5]) {
-  if (maskRenderOrder == uTexturesRenderOrder[0]) {
-    return shiftedUvs[0];
-  } else if (maskRenderOrder == uTexturesRenderOrder[1]) {
-    return shiftedUvs[1];
-  } else if (maskRenderOrder == uTexturesRenderOrder[2]) {
-    return shiftedUvs[2];
-  } else if (maskRenderOrder == uTexturesRenderOrder[3]) {
-    return shiftedUvs[3];
-  } else if (maskRenderOrder == uTexturesRenderOrder[4]) {
-    return shiftedUvs[4];
-  }
   return vec2(0.0);
 }
 
 void main() {
   vec2 shiftedUv = vUv + vec2(uShiftAmount, 0.0);
   shiftedUv.x = mod(shiftedUv.x, 1.0);
-  
-  float alpha = 0.0;
 
-  // Calculate all texture parallax shifts and shifted UVs
   vec2 shiftedUvs[5];
   for(int i = 0; i < 5; i++) {
-    shiftedUvs[i] = shiftedUv + findShift(i);
+    shiftedUvs[i] = shiftedUv + getShiftForIndex(i);
   }
-
-  int usedTexture = findFirstUsed(uTextures, shiftedUvs);
-  int usedMask = findFirstUsed(uMasks, shiftedUvs);
-
-  if (usedTexture == -1) {
-    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
-    return;
-  }
-
+  
   vec2 ps = 1.0 / uResolution;
-  vec4 blurTex = blur(uTexturesSize, uTextures, shiftedUvs, ps, uSamples);
-  vec4 texColor;
-  vec4 maskValue = vec4(0.0);
-  vec2 maskUv = vec2(0.0);
-
-  int maskOrder;
-
-  // Get mask order from used mask index
-  if (usedMask == 0) {
-    maskOrder = uMasksRenderOrder[0];
-  } else if (usedMask == 1) {
-    maskOrder = uMasksRenderOrder[1];
-  } else if (usedMask == 2) {
-    maskOrder = uMasksRenderOrder[2]; 
-  } else if (usedMask == 3) {
-    maskOrder = uMasksRenderOrder[3];
-  } else if (usedMask == 4) {
-    maskOrder = uMasksRenderOrder[4];
-  } else {
-    maskOrder = 5;
+  
+  // Final result
+  vec4 result = vec4(0.0);
+  
+  // Masks for highlighting
+  vec4 allMasks = vec4(0.0);
+  
+  // Process textures from back to front
+  vec2 tex0Uv = shiftedUvs[0];
+  vec4 tex0 = uTexturesSize > 0 ? texture2D(uTextures[0], tex0Uv) : vec4(0.0);
+  tex0.a *= uHiddenOpacities[0];
+  result = tex0;
+  
+  // Check for masks matching texture 0
+  vec4 mask0 = vec4(0.0);
+  if (uMasksSize > 0 && uMasksRenderOrder[0] == uTexturesRenderOrder[0]) {
+    mask0 = texture2D(uMasks[0], tex0Uv);
+    allMasks = mix(allMasks, mask0, mask0.a);
+  }
+  if (uMasksSize > 1 && uMasksRenderOrder[1] == uTexturesRenderOrder[0]) {
+    vec4 m = texture2D(uMasks[1], tex0Uv);
+    allMasks = mix(allMasks, m, m.a);
+  }
+  if (uMasksSize > 2 && uMasksRenderOrder[2] == uTexturesRenderOrder[0]) {
+    vec4 m = texture2D(uMasks[2], tex0Uv);
+    allMasks = mix(allMasks, m, m.a);
+  }
+  if (uMasksSize > 3 && uMasksRenderOrder[3] == uTexturesRenderOrder[0]) {
+    vec4 m = texture2D(uMasks[3], tex0Uv);
+    allMasks = mix(allMasks, m, m.a);
+  }
+  if (uMasksSize > 4 && uMasksRenderOrder[4] == uTexturesRenderOrder[0]) {
+    vec4 m = texture2D(uMasks[4], tex0Uv);
+    allMasks = mix(allMasks, m, m.a);
+  }
+  
+  // Texture 1
+  vec2 tex1Uv = shiftedUvs[1];
+  if (uTexturesSize > 1) {
+    vec4 tex1 = texture2D(uTextures[1], tex1Uv);
+    tex1.a *= uHiddenOpacities[1];
+    
+    // Clear mask where texture 1 covers it
+    if (tex1.a > 0.0) {
+      allMasks *= (1.0 - tex1.a);
+    }
+    
+    result = mix(result, tex1, tex1.a);
+    
+    // Check for masks matching texture 1
+    if (uMasksSize > 0 && uMasksRenderOrder[0] == uTexturesRenderOrder[1]) {
+      vec4 m = texture2D(uMasks[0], tex1Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 1 && uMasksRenderOrder[1] == uTexturesRenderOrder[1]) {
+      vec4 m = texture2D(uMasks[1], tex1Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 2 && uMasksRenderOrder[2] == uTexturesRenderOrder[1]) {
+      vec4 m = texture2D(uMasks[2], tex1Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 3 && uMasksRenderOrder[3] == uTexturesRenderOrder[1]) {
+      vec4 m = texture2D(uMasks[3], tex1Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 4 && uMasksRenderOrder[4] == uTexturesRenderOrder[1]) {
+      vec4 m = texture2D(uMasks[4], tex1Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+  }
+  
+  // Texture 2
+  vec2 tex2Uv = shiftedUvs[2];
+  if (uTexturesSize > 2) {
+    vec4 tex2 = texture2D(uTextures[2], tex2Uv);
+    tex2.a *= uHiddenOpacities[2];
+    
+    // Clear mask where texture 2 covers it
+    if (tex2.a > 0.0) {
+      allMasks *= (1.0 - tex2.a);
+    }
+    
+    result = mix(result, tex2, tex2.a);
+    
+    // Check for masks matching texture 2
+    if (uMasksSize > 0 && uMasksRenderOrder[0] == uTexturesRenderOrder[2]) {
+      vec4 m = texture2D(uMasks[0], tex2Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 1 && uMasksRenderOrder[1] == uTexturesRenderOrder[2]) {
+      vec4 m = texture2D(uMasks[1], tex2Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 2 && uMasksRenderOrder[2] == uTexturesRenderOrder[2]) {
+      vec4 m = texture2D(uMasks[2], tex2Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 3 && uMasksRenderOrder[3] == uTexturesRenderOrder[2]) {
+      vec4 m = texture2D(uMasks[3], tex2Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 4 && uMasksRenderOrder[4] == uTexturesRenderOrder[2]) {
+      vec4 m = texture2D(uMasks[4], tex2Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+  }
+  
+  // Texture 3
+  vec2 tex3Uv = shiftedUvs[3];
+  if (uTexturesSize > 3) {
+    vec4 tex3 = texture2D(uTextures[3], tex3Uv);
+    tex3.a *= uHiddenOpacities[3];
+    
+    // Clear mask where texture 3 covers it
+    if (tex3.a > 0.0) {
+      allMasks *= (1.0 - tex3.a);
+    }
+    
+    result = mix(result, tex3, tex3.a);
+    
+    // Check for masks matching texture 3
+    if (uMasksSize > 0 && uMasksRenderOrder[0] == uTexturesRenderOrder[3]) {
+      vec4 m = texture2D(uMasks[0], tex3Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 1 && uMasksRenderOrder[1] == uTexturesRenderOrder[3]) {
+      vec4 m = texture2D(uMasks[1], tex3Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 2 && uMasksRenderOrder[2] == uTexturesRenderOrder[3]) {
+      vec4 m = texture2D(uMasks[2], tex3Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 3 && uMasksRenderOrder[3] == uTexturesRenderOrder[3]) {
+      vec4 m = texture2D(uMasks[3], tex3Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 4 && uMasksRenderOrder[4] == uTexturesRenderOrder[3]) {
+      vec4 m = texture2D(uMasks[4], tex3Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+  }
+  
+  // Texture 4
+  vec2 tex4Uv = shiftedUvs[4];
+  if (uTexturesSize > 4) {
+    vec4 tex4 = texture2D(uTextures[4], tex4Uv);
+    tex4.a *= uHiddenOpacities[4];
+    
+    // Clear mask where texture 4 covers it
+    if (tex4.a > 0.0) {
+      allMasks *= (1.0 - tex4.a);
+    }
+    
+    result = mix(result, tex4, tex4.a);
+    
+    // Check for masks matching texture 4
+    if (uMasksSize > 0 && uMasksRenderOrder[0] == uTexturesRenderOrder[4]) {
+      vec4 m = texture2D(uMasks[0], tex4Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 1 && uMasksRenderOrder[1] == uTexturesRenderOrder[4]) {
+      vec4 m = texture2D(uMasks[1], tex4Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 2 && uMasksRenderOrder[2] == uTexturesRenderOrder[4]) {
+      vec4 m = texture2D(uMasks[2], tex4Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 3 && uMasksRenderOrder[3] == uTexturesRenderOrder[4]) {
+      vec4 m = texture2D(uMasks[3], tex4Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 4 && uMasksRenderOrder[4] == uTexturesRenderOrder[4]) {
+      vec4 m = texture2D(uMasks[4], tex4Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
   }
 
-  // Find texture UVs for each mask based on render order
-  vec2 maskUvs[5];
-  maskUvs[0] = findMaskUv(uMasksRenderOrder[0], shiftedUvs);
-  maskUvs[1] = findMaskUv(uMasksRenderOrder[1], shiftedUvs);
-  maskUvs[2] = findMaskUv(uMasksRenderOrder[2], shiftedUvs);
-  maskUvs[3] = findMaskUv(uMasksRenderOrder[3], shiftedUvs);
-  maskUvs[4] = findMaskUv(uMasksRenderOrder[4], shiftedUvs);
-
-  // Sample masks using the matched UVs
-  if (uMasksSize > 0) maskValue = texture2D(uMasks[0], maskUvs[0]);
-  if (uMasksSize > 1) maskValue = mix(maskValue, texture2D(uMasks[1], maskUvs[1]), 1.0 - maskValue.a);
-  if (uMasksSize > 2) maskValue = mix(maskValue, texture2D(uMasks[2], maskUvs[2]), 1.0 - maskValue.a);
-  if (uMasksSize > 3) maskValue = mix(maskValue, texture2D(uMasks[3], maskUvs[3]), 1.0 - maskValue.a);
-  if (uMasksSize > 4) maskValue = mix(maskValue, texture2D(uMasks[4], maskUvs[4]), 1.0 - maskValue.a);
-
-  // Find texture with matching render order and use its UV
-  if (uTexturesRenderOrder[0] == maskOrder) {
-    maskUv = shiftedUvs[0];
-  } else if (uTexturesRenderOrder[1] == maskOrder) {
-    maskUv = shiftedUvs[1];
-  } else if (uTexturesRenderOrder[2] == maskOrder) {
-    maskUv = shiftedUvs[2];
-  } else if (uTexturesRenderOrder[3] == maskOrder) {
-    maskUv = shiftedUvs[3];
-  } else if (uTexturesRenderOrder[4] == maskOrder) {
-    maskUv = shiftedUvs[4];
-  }
-
-  if (usedTexture == 0) {
-    texColor = texture2D(uTextures[0], shiftedUvs[0]);
-  } else if (usedTexture == 1 && uTexturesSize > 1) {
-    texColor = texture2D(uTextures[1], shiftedUvs[1]);
-  } else if (usedTexture == 2 && uTexturesSize > 2) {
-    texColor = texture2D(uTextures[2], shiftedUvs[2]);
-  } else if (usedTexture == 3 && uTexturesSize > 3) {
-    texColor = texture2D(uTextures[3], shiftedUvs[3]);
-  } else if (usedTexture == 4 && uTexturesSize > 4) {
-    texColor = texture2D(uTextures[4], shiftedUvs[4]);
-  }
-
-  vec4 combinedTex = vec4(0.0);
-  if (uHiddenOpacities[0] == 1.0) combinedTex = texture2D(uTextures[0], shiftedUvs[0]);
-  if (uHiddenOpacities[1] == 1.0) combinedTex = mix(combinedTex, texture2D(uTextures[1], shiftedUvs[1]), 1.0 - combinedTex.a);
-  if (uHiddenOpacities[2] == 1.0) combinedTex = mix(combinedTex, texture2D(uTextures[2], shiftedUvs[2]), 1.0 - combinedTex.a);
-  if (uHiddenOpacities[3] == 1.0) combinedTex = mix(combinedTex, texture2D(uTextures[3], shiftedUvs[3]), 1.0 - combinedTex.a);
-  if (uHiddenOpacities[4] == 1.0) combinedTex = mix(combinedTex, texture2D(uTextures[4], shiftedUvs[4]), 1.0 - combinedTex.a);
-
-  // gl_FragColor = texture2D(uTextures[0], shiftedUvs[0]);
+  // gl_FragColor = result;
   // return;
-  // Hide item
-  bool hide = false;
-  if (usedTexture == 0) {
-    if (uHiddenOpacities[0] < 1.0) {
-      hide = true;
-    }
-    texColor = mix(texColor, combinedTex, 1.0 - uHiddenOpacities[0]);
-    blurTex = mix(blurTex, combinedTex, 1.0 - uHiddenOpacities[0]);
-  } else if (usedTexture == 1) {
-    if (uHiddenOpacities[1] < 1.0) {
-      hide = true;
-    }
-    texColor = mix(texColor, combinedTex, 1.0 - uHiddenOpacities[1]);
-    blurTex = mix(blurTex, combinedTex, 1.0 - uHiddenOpacities[1]);
-  } else if (usedTexture == 2) {
-    if (uHiddenOpacities[2] < 1.0) {
-      hide = true;
-    }
-    texColor = mix(texColor, combinedTex, 1.0 - uHiddenOpacities[2]);
-    blurTex = mix(blurTex, combinedTex, 1.0 - uHiddenOpacities[2]);
-  } else if (usedTexture == 3) {
-    if (uHiddenOpacities[3] < 1.0) {
-      hide = true;
-    }
-    texColor = mix(texColor, combinedTex, 1.0 - uHiddenOpacities[3]);
-    blurTex = mix(blurTex, combinedTex, 1.0 - uHiddenOpacities[3]);
-  } else if (usedTexture == 4) {
-    if (uHiddenOpacities[4] < 1.0) {
-      hide = true;
-    }
-    texColor = mix(texColor, combinedTex, 1.0 - uHiddenOpacities[4]);
-    blurTex = mix(blurTex, combinedTex, 1.0 - uHiddenOpacities[4]);
-  }
-
-  vec4 combinedTexNoMask = vec4(0.0);
-  if (uTexturesSize > 0 && uTexturesRenderOrder[0] < maskOrder) {
-    combinedTexNoMask = texture2D(uTextures[0], shiftedUvs[0]);
-  }
-  if (uTexturesSize > 1 && uTexturesRenderOrder[1] < maskOrder) {
-    combinedTexNoMask = mix(combinedTexNoMask, texture2D(uTextures[1], shiftedUvs[1]), 1.0 - combinedTexNoMask.a);
-  }
-  if (uTexturesSize > 2 && uTexturesRenderOrder[2] < maskOrder) {
-    combinedTexNoMask = mix(combinedTexNoMask, texture2D(uTextures[2], shiftedUvs[2]), 1.0 - combinedTexNoMask.a);
-  }
-  if (uTexturesSize > 3 && uTexturesRenderOrder[3] < maskOrder) {
-    combinedTexNoMask = mix(combinedTexNoMask, texture2D(uTextures[3], shiftedUvs[3]), 1.0 - combinedTexNoMask.a);
-  }
-  if (uTexturesSize > 4 && uTexturesRenderOrder[4] < maskOrder) {
-    combinedTexNoMask = mix(combinedTexNoMask, texture2D(uTextures[4], shiftedUvs[4]), 1.0 - combinedTexNoMask.a);
-  }
-
-  // bool selected = maskValue.a > 0.0;
-  bool selected = (maskValue.a > 0.0 && maskValue.rgb == uPickedColor);
-  bool excluded = (maskValue.a > 0.0 && maskValue.rgb == uExcludedColor);
-
+  
+  // Apply blur effect based on uSamples
+  vec4 blurredResult = blur(uTexturesSize, uTextures, shiftedUvs, ps, uSamples);
+  
+  // Apply darkening based on blur amount
+  float darkFactor = mix(0.4, 1.0, 1.0 - ((float(uSamples) - 1.0) / 34.0));
+  blurredResult.rgb *= darkFactor;
+  
+  // Check if selected or excluded based on mask color
+  bool selected = (allMasks.a > 0.0 && allMasks.rgb == uPickedColor);
+  bool excluded = (allMasks.a > 0.0 && allMasks.rgb == uExcludedColor);
+  
+  // Apply glow effect
   float glowAlpha = 0.0;
-  if (combinedTexNoMask.a == 0.0) {
-    glowAlpha = (sin(clamp(mod((uTime * 2.0 + maskUv.y * 2.0), 8.0), 0.0, 1.0) * PI * 2.0));
-    glowAlpha *= (uHighlightOpacity * 0.5) * maskValue.a;
+  if (allMasks.a > 0.0) {
+    glowAlpha = (sin(clamp(mod((uTime * 2.0 + vUv.y * 2.0), 8.0), 0.0, 1.0) * PI * 2.0));
+    glowAlpha *= (uHighlightOpacity * 0.5) * allMasks.a;
+  }
+  
+  float highlightAmount = 0.0;
+  if (selected && uClickable) {
+    highlightAmount = uHighlightOpacity;
   }
 
-  if (selected && uClickable && combinedTexNoMask.a == 0.0) {
-    alpha = uHighlightOpacity;
+  result.rgb = linearToSRGB(result.rgb);
+  blurredResult.rgb = linearToSRGB(blurredResult.rgb);
+  
+  // Apply highlight
+  if (uClickable) {
+    float finalHighlight = max(highlightAmount, glowAlpha);
+    result.rgb = mix(result.rgb, uHighlightColor, finalHighlight * allMasks.a);
+    blurredResult.rgb = mix(blurredResult.rgb, uHighlightColor, finalHighlight * allMasks.a);
   }
-  // Darken the blurred texture by multiplying RGB values
-  float darkFactor = 1.0;
-  if ((uExcludedColor != vec3(0.0) && !excluded) || combinedTexNoMask.a != 0.0) {
-    float t = 1.0 - ((float(uSamples) - 1.0) / 34.0); // Map uSamples from [1,35] to [1,0]
-    darkFactor = mix(0.4, 1.0, t);
-  }
-  blurTex.rgb *= darkFactor;
-
-  blurTex.rgb = linearToSRGB(blurTex.rgb);
-  texColor.rgb = linearToSRGB(texColor.rgb);
-
-  if (uClickable && !hide) {
-    blurTex = mix(blurTex, vec4(uHighlightColor, 1.0), max(alpha, glowAlpha));
-    texColor = vec4(mix(texColor.rgb, uHighlightColor, max(alpha, glowAlpha)), texColor.a);
-  }
-
-  if (excluded && combinedTexNoMask.a == 0.0) {
-    gl_FragColor = texColor;
+  
+  // Final output
+  if (excluded && result.a > 0.0) {
+    gl_FragColor = result;
   } else {
-    gl_FragColor = blurTex;
+    gl_FragColor = blurredResult;
   }
-
-  //Test mask
-  // gl_FragColor = mix(blurTex, maskValue, 0.5);
-  // gl_FragColor = maskValue;
 }

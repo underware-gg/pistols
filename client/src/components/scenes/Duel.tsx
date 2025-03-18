@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
-import { useMounted, useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
+import { useMounted, useClientTimestamp, useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
@@ -51,11 +51,13 @@ export default function Duel({
   const { debugMode, duelSpeedFactor } = useSettings()
   const { clientSeconds } = useClientTimestamp(false)
 
-  const { duelistIdA, duelistIdB, timestampStart, isTutorial, timestampEnd, isAwaiting, isInProgress, isFinished  } = useGetChallenge(duelId)
+  const { duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, timestampStart, isTutorial, timestampEnd, isAwaiting, isInProgress, isFinished  } = useGetChallenge(duelId)
 
   // guarantee to run only once when this component mounts
   const mounted = useMounted()
   const [duelSceneStarted, setDuelSceneStarted] = useState(false)
+  const [dataSet, setDataSet] = useState(false)
+
   const { name: nameA, characterType: characterTypeA } = useDuelist(duelistIdA)
   const { name: nameB, characterType: characterTypeB } = useDuelist(duelistIdB)
   const isYouA = useIsMyDuelist(duelistIdA)
@@ -65,6 +67,7 @@ export default function Duel({
   const { account } = useAccount()
   const { game } = useDojoSystemCalls()
   const isRequired = useDuelRequiresAction(duelId)
+
   useEffect(() => {
     if ((isYouA || isYouB) && mounted && account && isRequired && isFinished) {
       console.log('clearing required action flag...')
@@ -112,13 +115,25 @@ export default function Duel({
   }, [tutorial, isTutorial])
 
   useEffect(() => {
-    if (gameImpl && mounted && !duelSceneStarted && nameA && nameB && characterTypeA && characterTypeB) {
+    if (gameImpl && mounted && !duelSceneStarted && duelistAddressA && duelistAddressB) {
       gameImpl.setDuelData(Number(duelId), Number(duelistIdA), Number(duelistIdB))
-      gameImpl.startDuelWithPlayers(nameA, characterTypeA, isYouA, isYouB, nameB, characterTypeB)
+      gameImpl.resetDuelScene()
       setDuelSceneStarted(true)
       dispatchAnimated(AnimationState.None)
     }
-  }, [gameImpl, mounted, duelSceneStarted, characterTypeA, characterTypeB, nameA, nameB, isYouA, isYouB])
+  }, [gameImpl, mounted, duelSceneStarted, duelistAddressA, duelistAddressB])
+
+  useEffect(() => {
+    if (gameImpl && mounted && nameA && nameB && characterTypeA && characterTypeB && !dataSet) {
+      gameImpl.startDuelWithPlayers(nameA, characterTypeA, isYouA, isYouB, nameB, characterTypeB)
+      
+      const timer = setTimeout(() => {
+        setDataSet(true)
+      }, 5000)
+      
+      return () => clearTimeout(timer)
+    }
+  }, [gameImpl, mounted, characterTypeA, characterTypeB, nameA, nameB, isYouA, isYouB, dataSet])
 
   // setup grass animation 
   //TODO change due new timeouts...
@@ -438,7 +453,7 @@ export default function Duel({
 
       <div>
         <div className='DuelProfileA NoMouse NoDrag'>
-          <DuelProfile floated='left' duelistId={duelistIdA} />
+          <DuelProfile floated='left' duelistId={duelistIdA} tutorialLevel={tutorial} />
         </div>
         <div className='DuelistProfileA NoMouse NoDrag'>
           <DuelistProfile floated='left' duelistId={duelistIdA} damage={statsA.damage} hitChance={statsA.hitChance} speedFactor={duelSpeedFactor} tutorialLevel={tutorial} />
@@ -446,7 +461,7 @@ export default function Duel({
       </div>
       <div>
         <div className='DuelProfileB NoMouse NoDrag' >
-          <DuelProfile floated='right' duelistId={duelistIdB} />
+          <DuelProfile floated='right' duelistId={duelistIdB} tutorialLevel={tutorial} />
         </div>
         <div className='DuelistProfileB NoMouse NoDrag' >
           <DuelistProfile floated='right' duelistId={duelistIdB} damage={statsB.damage} hitChance={statsB.hitChance} speedFactor={duelSpeedFactor} tutorialLevel={tutorial} />
