@@ -10,7 +10,7 @@ description = "An on-chain pistol duelling game of honour and betrayal."
 icon_uri = "https://assets.underware.gg/pistols/logo.png"
 cover_uri = "https://assets.underware.gg/pistols/splash.png"
 website = "https://pistols.gg"
-seed = "pistols-0.12.0_2"
+seed = "sepolia-v0.13.5"
 
 [world.socials]
 x = "https://x.com/underware_gg"
@@ -23,9 +23,9 @@ chain_id = "SN_SEPOLIA"
 rpc_url = "https://api.cartridge.gg/x/starknet/sepolia" # or env: STARKNET_RPC_URL
 # account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
 # private_key = ""      # env: DOJO_PRIVATE_KEY
-world_address = "0x4255cc0cdc92f77f2ae9c3ff07060bfb851a0a93e9bea5c2161cf4934c5ffc8"
+world_address = "0xd3e899c8511c1bc6a2a0b502f15ce488ca8b3d2ccf65393ab66a78ac3af100"
 lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
-world_block = 309115
+world_block = 603575
 
 #--------------------------
 # namespaces
