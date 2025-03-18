@@ -49,7 +49,7 @@ const createStore = () => {
       }))
     },
     setBalances: (balances: torii.TokenBalance[]) => {
-      console.log("tokenStore() SET:", balances)
+      // console.log("tokenStore() SET:", balances)
       set((state: State) => {
         // insert if not exists
         let processed_accounts = []
@@ -124,6 +124,7 @@ export function useTokensByOwner(contractAddress: BigNumberish, owner: BigNumber
     accounts,
     setBalances: state.setBalances,
     enabled: (contracts.length > 0 && accounts.length > 0 && mintedCount > 0
+      // TODO: uncomment when subscriptions work!
       // && tokens === null
     ),
     forceCounter,

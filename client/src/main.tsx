@@ -19,6 +19,7 @@ import DuelDataPage from '/src/pages/DuelDataPage'
 import ErrorPage from '/src/pages/error/ErrorPage'
 import TestPageIndex from '/src/pages/tests/TestPageIndex'
 import ConnectTestPage from '/src/pages/tests/ConnectTestPage'
+import SeasonsTestPage from '/src/pages/tests/SeasonsTestPage'
 import IconsTestPage from '/src/pages/tests/IconsTestPage'
 import SignTestPage from '/src/pages/tests/SignTestPage'
 import TimestampTestPage from '/src/pages/tests/TimestampTestPage'
@@ -78,11 +79,12 @@ const router = createBrowserRouter([
     path: '/tests',
     children: [
       { path: "", element: <TestPageIndex /> },
-      { path: "tokens", element: <TokensTestPage /> },
-      { path: "profiles", element: <ProfilesTestPage /> },
-      { path: "tutorial", element: <TutorialTestPage /> },
       { path: "connect", element: <ConnectTestPage /> },
+      { path: "seasons", element: <SeasonsTestPage /> },
+      { path: "tokens", element: <TokensTestPage /> },
+      { path: "tutorial", element: <TutorialTestPage /> },
       { path: "timestamp", element: <TimestampTestPage /> },
+      { path: "profiles", element: <ProfilesTestPage /> },
       { path: "icons", element: <IconsTestPage /> },
       { path: "sign", element: <SignTestPage /> },
     ],

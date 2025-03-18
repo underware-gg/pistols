@@ -42,7 +42,7 @@ const createStore = () => {
       }))
     },
     setBalances: (balances: torii.TokenBalance[]) => {
-      console.log("coinStore() SET:", balances)
+      // console.log("coinStore() SET:", balances)
       set((state: State) => {
         // insert if not exists
         balances.forEach((balance) => {
