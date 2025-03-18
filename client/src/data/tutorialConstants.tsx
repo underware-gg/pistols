@@ -434,32 +434,36 @@ const TUTORIAL_DATA: Record<TutorialParts, TutorialData> = {
   [TutorialParts.PACK]: {
     tutorialName: 'Card Packs',
     slides: [{
-      imagePath: '/images/tutorial/overlay/duel_simple_intro_frame_01.png',
-      tutorialDescriptions: 'Each pack contains 5 random duelists for you to collect.\nPurchase packs with $LORDS to expand your collection.\nThere\'s a chance to obtain rare duelists from packs!'
+      imagePath: '/images/tutorial/overlay/duelist_tutorial_card_pack_frame_01.png',
+      tutorialDescriptions: 'Card packs come in different varieties - every new player gets a free starter pack containing 2 duelists!\nYou can purchase additional packs for $LORDS, with each bought pack containing 5 random duelists to expand your roster.'
+    },
+    {
+      imagePath: '/images/tutorial/overlay/duelist_tutorial_card_pack_frame_02.gif',
+      tutorialDescriptions: 'Once you own a card pack, click on the wax seal to open it and reveal your new duelists!\nThe seal will break with satisfying crack to show your freshly acquired champions - check their archetypes and stats immediately!'
     }]
   },
   [TutorialParts.DUELIST]: {
     tutorialName: 'Duelists',
     slides: [{
-      imagePath: '/images/tutorial/overlay/duel_simple_duel_info_frame_01.png',
+      imagePath: '/images/tutorial/overlay/duelist_tutorial_duelist_frame_01.png',
       tutorialDescriptions: 'Duelists are champions you can summon to fight in your name.\nEach duelist is a NFT that you can collect and trade with other players.\nYou\'ll need at least one duelist to participate in duels, tournaments and seasonal events.\nKeep in mind that each duelist can only fight in one duel at a time, so having multiple duelists allows you to participate in multiple duels simultaneously.'
     }]
   },
   [TutorialParts.DUELIST_ARCHETYPE]: {
     tutorialName: 'Duelist Types',
     slides: [{
-      imagePath: '/images/tutorial/overlay/duel_simple_player_info_frame_01.png',
+      imagePath: '/images/tutorial/overlay/duelist_tutorial_duelist_archetype_frame_01.png',
       tutorialDescriptions: 'Duelists fall into three archetypes, indicated by their color: red for villainous, yellow for trickster, and blue for honorable.\nA duelist\'s archetype is determined by their preferred shooting distance in their last 8 duels.\nVillainous duelists prefer close range (steps 1-3), tricksters lean towards mid-range (steps 3-7), and honorable duelists engage at long range (steps 7-10).'
     }]
   },
   [TutorialParts.DUELIST_FAME]: {
     tutorialName: 'Fame System',
     slides: [{
-      imagePath: '/images/tutorial/overlay/full_duel.png',
+      imagePath: '/images/tutorial/overlay/duelist_tutorial_duelist_fame_frame_01.png',
       tutorialDescriptions: 'Each duelist has their own Fame score - representing both their reputation and life force.\nEvery duel puts a portion of your duelist\'s Fame at risk. Victories increase their Fame, while defeats drain it.'
     },
     {
-      imagePath: '/images/tutorial/overlay/full_duel.png',
+      imagePath: '/images/tutorial/overlay/duelist_tutorial_duelist_fame_frame_02.png',
       tutorialDescriptions: 'Be strategic with your duelist - too many losses will bring them closer to death. Once their Fame falls to low, they\'re gone!\nChoose your battles wisely - but remember, greater risks can lead to greater Fame rewards!'
     }]
   },

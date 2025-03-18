@@ -210,7 +210,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
   },
   [SceneName.Tavern]: {
     backgrounds: [
-      { texture: TextureName.bg_tavern_background, shiftMultiplier: -0.005, renderOrder: 0 },
+      { texture: TextureName.bg_tavern_background, shiftMultiplier: -0.015, renderOrder: 0 },
       { texture: TextureName.bg_tavern_bartender, shiftMultiplier: 0.005, renderOrder: 1 },
       { texture: TextureName.bg_tavern_bar, shiftMultiplier: 0.01, renderOrder: 2 },
     ],
