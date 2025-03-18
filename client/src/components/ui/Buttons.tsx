@@ -307,7 +307,7 @@ export function ChallengeButton({
 
   const { tableId } = useTableId()
   const { isMyAccount } = useIsMyAccount(challengedPlayerAddress)
-  const { hasPact, pactDuelId } = usePact(tableId, address, challengedPlayerAddress)
+  const { hasPact, pactDuelId } = usePact(tableId, address, challengedPlayerAddress, true)
   const canChallenge = (!hasPact && !isMyAccount)
 
   if (!hasPact) {

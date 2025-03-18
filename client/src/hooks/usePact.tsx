@@ -21,7 +21,7 @@ export const usePactPair = (address_a: BigNumberish, address_b: BigNumberish): b
   return pair
 }
 
-export const usePact = (table_id: string, address_a: BigNumberish, address_b: BigNumberish) => {
+export const usePact = (table_id: string, address_a: BigNumberish, address_b: BigNumberish, enabled: boolean) => {
   const pair = usePactPair(address_a, address_b)
   // const query_get = useMemo<PistolsQueryBuilder>(() => ({
   //   pistols: {
@@ -53,6 +53,7 @@ export const usePact = (table_id: string, address_a: BigNumberish, address_b: Bi
 
   const { entities } = useSdkStateEntitiesSub({
     query,
+    enabled,
   })
   const pacts = useMemo(() => getEntityMapModels<models.Pact>(entities, 'Pact'), [entities])
   // useEffect(() => console.log(`usePact()`, bigintToHex(stringToFelt(table_id)), bigintToHex(pair), pacts), [table_id, pair, pacts])
