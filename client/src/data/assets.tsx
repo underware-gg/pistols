@@ -299,7 +299,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     backgrounds: [
       { texture: TextureName.bg_barkeep_background, shiftMultiplier: -0.02, renderOrder: 0 },
       { texture: TextureName.bg_barkeep_crowd_back, shiftMultiplier: -0.01, renderOrder: 1 },
-      { texture: TextureName.bg_barkeep_player, shiftMultiplier: 0.00, renderOrder: 2 },
+      { texture: TextureName.bg_barkeep_player, shiftMultiplier: 0.003, renderOrder: 2 },
       { texture: TextureName.bg_barkeep_crowd_front, shiftMultiplier: 0.01, renderOrder: 3 },
       { texture: TextureName.bg_barkeep_table, shiftMultiplier: 0.02, renderOrder: 4 },
     ],

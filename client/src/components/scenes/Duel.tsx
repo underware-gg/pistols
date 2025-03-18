@@ -453,7 +453,7 @@ export default function Duel({
 
       <div>
         <div className='DuelProfileA NoMouse NoDrag'>
-          <DuelProfile floated='left' playerAddress={duelistAddressA} duelistId={duelistIdA} tutorialLevel={tutorial} />
+          <DuelProfile floated='left' playerAddress={duelistAddressA} duelistId={duelistIdA} isTutorial={isTutorial} />
         </div>
         <div className='DuelistProfileA NoMouse NoDrag'>
           <DuelistProfile floated='left' duelistId={duelistIdA} damage={statsA.damage} hitChance={statsA.hitChance} speedFactor={duelSpeedFactor} tutorialLevel={tutorial} />
@@ -461,7 +461,7 @@ export default function Duel({
       </div>
       <div>
         <div className='DuelProfileB NoMouse NoDrag' >
-          <DuelProfile floated='right' playerAddress={duelistAddressB} duelistId={duelistIdB} tutorialLevel={tutorial} />
+          <DuelProfile floated='right' playerAddress={duelistAddressB} duelistId={duelistIdB} isTutorial={isTutorial} />
         </div>
         <div className='DuelistProfileB NoMouse NoDrag' >
           <DuelistProfile floated='right' duelistId={duelistIdB} damage={statsB.damage} hitChance={statsB.hitChance} speedFactor={duelSpeedFactor} tutorialLevel={tutorial} />

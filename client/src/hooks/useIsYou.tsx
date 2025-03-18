@@ -20,12 +20,12 @@ export const useIsMyDuelist = (otherDuelistId: BigNumberish) => {
   // the tutorial player character is always my duelist
   const isPlayerCharacter = bigintEquals(otherDuelistId ?? 0, PLAYER_CHARACTER_ID)
   const isCharacter = BigInt(otherDuelistId ?? 0) >= constants.PROFILES.CHARACTER_ID_BASE
-  // fetch owner onlt if not a character
+  // fetch owner only if not a character
   const { address } = useAccount()
   const { owner } = useOwnerOfDuelist(!isCharacter ? otherDuelistId : 0n)
   const isMyDuelist = useMemo(() => (
     isPlayerCharacter ||
     (isPositiveBigint(owner) ? bigintEquals(address, owner) : false)
-  ), [address, owner])
+  ), [address, owner, isPlayerCharacter, otherDuelistId])
   return isMyDuelist
 }
