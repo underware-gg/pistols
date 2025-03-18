@@ -199,9 +199,6 @@ const PistolsProvider = ({
         break
       }
       case PistolsActions.SELECT_CHALLENGING_DUELIST_ID: {
-        newState.selectedDuelId = 0n
-        newState.selectedDuelistId = 0n
-        newState.selectedPlayerAddress = 0n
         newState.challengingDuelistId = action.payload as bigint
         break
       }
