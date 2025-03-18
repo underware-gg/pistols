@@ -79,8 +79,6 @@ export const useSeason = (table_id: string) => {
   const timestamp_start = useMemo(() => (period ? Number(period.start) : null), [period])
   const timestamp_end = useMemo(() => (period ? Number(period.end) : null), [period])
 
-  console.log(`useSeason() =>`, table_id, seasonId, phase, period)
-
   return {
     tableId: table_id,
     seasonId,
@@ -90,6 +88,10 @@ export const useSeason = (table_id: string) => {
   }
 }
 
+export type DuelistScore = {
+  duelistId: bigint
+  score: number
+}
 
 export const useLeaderboard = (table_id: string) => {
   const entityId = useEntityId([stringToFelt(table_id)])
@@ -99,23 +101,28 @@ export const useLeaderboard = (table_id: string) => {
   const leaderboard = useEntityModel<models.Leaderboard>(entity, 'Leaderboard')
   // console.log(`useLeaderboard() =>`, table_id, leaderboard)
 
-  const positions = useMemo(() => Number(leaderboard?.positions ?? 0), [leaderboard])
+  const maxPositions = useMemo(() => Number(leaderboard?.positions ?? 0), [leaderboard])
   const _duelistIds = useMemo(() => BigInt(leaderboard?.duelist_ids ?? 0), [leaderboard])
   const _scores = useMemo(() => BigInt(leaderboard?.scores ?? 0), [leaderboard])
 
-  const scorePerDuelistId = useMemo(() => {
-    const result: { [duelistId: string]: number } = {}
-    for (let i = 0n; i < positions; i++) {
+  const scores = useMemo(() => {
+    const result: DuelistScore[] = []
+    for (let i = 0n; i < maxPositions; i++) {
       const duelistId = (_duelistIds >> (i * 24n)) & 0xffffffn
       const score = (_scores >> (i * 24n)) & 0xffffffn
-      result[bigintToDecimal(duelistId)] = Number(score)
+      if (duelistId > 0n) {
+        result.push({
+          duelistId,
+          score: Number(score),
+        })
+      }
     }
     return result
   }, [leaderboard, _duelistIds, _scores])
 
   return {
     tableId: table_id,
-    positions,
-    scorePerDuelistId,
+    maxPositions,
+    scores,
   }
 }

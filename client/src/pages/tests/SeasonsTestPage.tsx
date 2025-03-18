@@ -119,12 +119,12 @@ function Leaderboards({
 }: {
   tableId: string,
 }) {
-  const { positions, scorePerDuelistId } = useLeaderboard(tableId)
-  console.log(`Leaderboards() =>`, tableId, positions, scorePerDuelistId)
+  const { maxPositions, scores } = useLeaderboard(tableId)
+  // console.log(`Leaderboards() =>`, tableId, maxPositions, scorePerDuelistId)
 
   return (
     <Grid style={{ width: '150px' }}>
-      {Object.entries(scorePerDuelistId).map(([duelistId, score]) => (
+      {scores.map(({ duelistId, score }) => (
         <Grid.Row columns={'equal'}>
           <Grid.Column>
             <span className='Important'>

@@ -114,7 +114,7 @@ function DuelStats({
             Duelist A
           </Cell>
           <Cell>
-            <b>{nameA}</b>
+            <b>#{bigintToDecimal(challenge.duelistIdA)}: {nameA}</b>
           </Cell>
         </Row>
         <Row>
@@ -122,7 +122,7 @@ function DuelStats({
             Duelist B
           </Cell>
           <Cell>
-            <b>{nameB}</b>
+            <b>#{bigintToDecimal(challenge.duelistIdB)}: {nameB}</b>
           </Cell>
         </Row>
         <Row>
@@ -140,7 +140,11 @@ function DuelStats({
         <Row>
           <Cell>Winner</Cell>
           <Cell>
-            {bigintToDecimal(challenge.winner)}: {challenge.winner == 1 ? nameA : challenge.winner == 2 ? nameB : '-'}
+            ({bigintToDecimal(challenge.winner)})
+            {' '}
+            {challenge.winner == 1 && <b>#{bigintToDecimal(challenge.duelistIdA)}: {nameA}</b>}
+            {challenge.winner == 2 && <b>#{bigintToDecimal(challenge.duelistIdB)}: {nameB}</b>}
+            {challenge.winner == 0 && <b>-</b>}
           </Cell>
         </Row>
         <Row>
