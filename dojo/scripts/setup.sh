@@ -4,21 +4,21 @@
 #
 if [ $# -lt 1 ]; then
   echo "❌ Error: Missing profile!"
-  echo "usage: $0 <PROFILE> [--offline] [--inspect]"
+  echo "usage: $0 <PROFILE> [--offline] [--inspect] [--bindings]"
   exit 1
 fi
 
 # initialize argument variables
 export PROFILE=
-export BINDINGS="--typescript"
-export OFFLINE=
-export INSPECT=
+export ARG_BINDINGS=
+export ARG_OFFLINE=
+export ARG_INSPECT=
 
 # parse arguments
 for arg in "$@"
 do
   echo ":$arg"
-  if [[ -z "$PROFILE" ]]; then
+  if [[ -z "$PROFILE" ]]; then # if not set
     # $1: Profile
     export PROFILE=$1
     export DOJO_PROFILE_FILE="dojo_$PROFILE.toml"
@@ -27,10 +27,11 @@ do
       exit 1
     fi
   elif [[ $arg == "--offline" ]]; then
-    export OFFLINE="--offline"
+    export ARG_OFFLINE="--offline"
   elif [[ $arg == "--inspect" ]]; then
-    export INSPECT="true"
-    export BINDINGS=""
+    export ARG_INSPECT="true"
+  elif [[ $arg == "--bindings" ]]; then
+    export ARG_BINDINGS="--typescript"
   else
     echo "❌ Error: Invalid argument: $arg"
     exit 1
@@ -60,7 +61,7 @@ fi
 get_profile_env () {
   local ENV_NAME=$1
   local RESULT=$(toml get $DOJO_PROFILE_FILE --raw env.$ENV_NAME)
-  if [[ -z "$RESULT" ]]; then
+  if [[ -z "$RESULT" ]]; then # if not set
     >&2 echo "get_profile_env($ENV_NAME) not found! 👎"
   fi
   echo $RESULT
@@ -69,11 +70,18 @@ get_profile_env () {
 get_contract_address () {
   local TAG=$1
   local RESULT=$(cat $MANIFEST_FILE_PATH | jq -r ".contracts[] | select(.tag == \"$TAG\" ).address")
-  if [[ -z "$RESULT" ]]; then
+  if [[ -z "$RESULT" ]]; then # if not set
     >&2 echo "get_contract_address($TAG) not found! 👎"
   fi
   echo $RESULT
 }
+
+execute_command () {
+  local COMMAND=$1
+  echo "🚦 execute: $COMMAND"
+  $COMMAND
+}
+
 
 #-----------------
 # env setup
@@ -102,11 +110,13 @@ export GAME_ADDRESS=$(get_contract_address "pistols-game")
 export CHAIN_ID=$(starkli chain-id --no-decode --rpc $RPC_URL | xxd -r -p)
 export PROFILE_CHAIN_ID=$(get_profile_env "chain_id")
 
-if [[ "$PROFILE_CHAIN_ID" != "$CHAIN_ID" ]]; then
-  echo "PROFILE CHAIN ID: [$PROFILE_CHAIN_ID]"
-  echo "RPC CHAIN ID: [$CHAIN_ID]"
-  echo "❌ Chain mismatch! 👎"
-  exit 1
+if [[ -z "$ARG_OFFLINE" ]]; then # if not set
+  if [[ "$PROFILE_CHAIN_ID" != "$CHAIN_ID" ]]; then
+    echo "PROFILE CHAIN ID: [$PROFILE_CHAIN_ID]"
+    echo "RPC CHAIN ID: [$CHAIN_ID]"
+    echo "❌ Chain mismatch! 👎"
+    exit 1
+  fi
 fi
 
 

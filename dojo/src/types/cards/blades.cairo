@@ -10,23 +10,15 @@ pub enum BladesCard {
 }
 
 
-
 //--------------------
 // constants
 //
 
-mod BLADES_CARDS {
-    // IMPORTANT: must be in sync with BladesCard
-    const None: u8 = 0;
-    const Seppuku: u8 = 1;
-    const PocketPistol: u8 = 2;
-    const Behead: u8 = 3;
-    const Grapple: u8 = 4;
-}
-
+// to be exported to typescript by generateConstants
+// IMPORTANT: names must be in sync with enum BladesCard
 mod BLADES_POINTS {
     use pistols::types::cards::cards::{CardPoints};
-    const Seppuku: CardPoints = CardPoints {
+    pub const Seppuku: CardPoints = CardPoints {
         name: 'Seppuku',
         self_chances: 20,
         self_damage: 1,
@@ -34,7 +26,7 @@ mod BLADES_POINTS {
         other_damage: 0,
         special: 'Suicide if survives',
     };
-    const PocketPistol: CardPoints = CardPoints {
+    pub const PocketPistol: CardPoints = CardPoints {
         name: 'Pocket Pistol',
         self_chances: 0,
         self_damage: 0,
@@ -42,7 +34,7 @@ mod BLADES_POINTS {
         other_damage: 0,
         special: 'Beats Behead',
     };
-    const Behead: CardPoints = CardPoints {
+    pub const Behead: CardPoints = CardPoints {
         name: 'Behead',
         self_chances: 0,
         self_damage: 1,
@@ -50,7 +42,7 @@ mod BLADES_POINTS {
         other_damage: 0,
         special: 'Beats Grapple',
     };
-    const Grapple: CardPoints = CardPoints {
+    pub const Grapple: CardPoints = CardPoints {
         name: 'Grapple',
         self_chances: 0,
         self_damage: 0,
@@ -64,14 +56,16 @@ mod BLADES_POINTS {
 //--------------------
 // traits
 //
-use pistols::types::cards::cards::{CardPoints, CardPointsTrait};
-use pistols::types::cards::hand::{DeckType};
-use pistols::types::cards::env::{EnvCard, EnvCardTrait};
+use pistols::types::cards::{
+    deck::{DeckType},
+    cards::{CardPoints, CardPointsTrait},
+    env::{EnvCard},
+};
 use pistols::models::challenge::{DuelistState};
 
 #[generate_trait]
-impl BladesCardImpl of BladesCardTrait {
-    fn get_points(self: BladesCard) -> CardPoints {
+pub impl BladesCardImpl of BladesCardTrait {
+    fn get_points(self: @BladesCard) -> CardPoints {
         match self {
             BladesCard::Seppuku =>      BLADES_POINTS::Seppuku,
             BladesCard::PocketPistol => BLADES_POINTS::PocketPistol,
@@ -81,9 +75,9 @@ impl BladesCardImpl of BladesCardTrait {
         }
     }
     #[inline(always)]
-    fn apply_points(self: BladesCard, ref state_self: DuelistState, ref state_other: DuelistState) {
-        if (self != BladesCard::None) {
-            self.get_points().apply(ref state_self, ref state_other, 1, EnvCard::None);
+    fn apply_points(self: @BladesCard, ref state_self: DuelistState, ref state_other: DuelistState) {
+        if (*self != BladesCard::None) {
+            (*self).get_points().apply(ref state_self, ref state_other, 1, EnvCard::None);
         }
     }
     //
@@ -93,7 +87,7 @@ impl BladesCardImpl of BladesCardTrait {
     // Grapple beats PocketPistol
     //
     // returns (is_dead, is_dead)
-    fn clash(self: BladesCard, other: BladesCard) -> (bool, bool) {
+    fn clash(self: @BladesCard, other: @BladesCard) -> (bool, bool) {
         match self {
             BladesCard::None => {
                 match other {
@@ -147,22 +141,17 @@ impl BladesCardImpl of BladesCardTrait {
             },
         }
     }
-    fn get_deck(_deck_type: DeckType) -> Span<u8> {
-        (array![
-            BladesCard::Seppuku.into(),
-            BladesCard::PocketPistol.into(),
-            BladesCard::Behead.into(),
-            BladesCard::Grapple.into(),
-        ].span())
-    }
-    fn variant_name(self: BladesCard) -> felt252 {
-        match self {
-            BladesCard::Seppuku =>      'Seppuku',
-            BladesCard::PocketPistol => 'PocketPistol',
-            BladesCard::Behead =>       'Behead',
-            BladesCard::Grapple =>      'Grapple',
-            BladesCard::None =>         0,
-        }
+    fn build_deck(deck_type: @DeckType) -> Span<u8> {
+        (match deck_type {
+            DeckType::None => array![],
+            DeckType::Classic => array![
+                BladesCard::Seppuku.into(),
+                BladesCard::PocketPistol.into(),
+                BladesCard::Behead.into(),
+                BladesCard::Grapple.into(),
+            ],
+            DeckType::PacesOnly => array![],
+        }.span())
     }
 }
 
@@ -170,55 +159,61 @@ impl BladesCardImpl of BladesCardTrait {
 //--------------------
 // converters
 //
-use debug::PrintTrait;
-use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortStringTrait};
-
 impl BladesCardDefault of Default<BladesCard> {
     fn default() -> BladesCard {(BladesCard::None)}
 }
-
-impl BladesCardIntoU8 of Into<BladesCard, u8> {
+impl BladesCardIntoU8 of core::traits::Into<BladesCard, u8> {
     fn into(self: BladesCard) -> u8 {
         match self {
-            BladesCard::Seppuku =>  BLADES_CARDS::Seppuku,
-            BladesCard::PocketPistol =>  BLADES_CARDS::PocketPistol,
-            BladesCard::Behead =>   BLADES_CARDS::Behead,
-            BladesCard::Grapple =>  BLADES_CARDS::Grapple,
-            _ =>                    BLADES_CARDS::None,
+            BladesCard::None =>         0,
+            BladesCard::Seppuku =>      1,
+            BladesCard::PocketPistol => 2,
+            BladesCard::Behead =>       3,
+            BladesCard::Grapple =>      4,
         }
     }
 }
-impl U8IntoBladesCard of Into<u8, BladesCard> {
+impl U8IntoBladesCard of core::traits::Into<u8, BladesCard> {
     fn into(self: u8) -> BladesCard {
-        if self == BLADES_CARDS::Seppuku        { BladesCard::Seppuku }
-        else if self == BLADES_CARDS::PocketPistol  { BladesCard::PocketPistol }
-        else if self == BLADES_CARDS::Behead    { BladesCard::Behead }
-        else if self == BLADES_CARDS::Grapple   { BladesCard::Grapple }
-        else                                    { BladesCard::None }
+        if self == 1        { BladesCard::Seppuku }
+        else if self == 2   { BladesCard::PocketPistol }
+        else if self == 3   { BladesCard::Behead }
+        else if self == 4   { BladesCard::Grapple }
+        else                { BladesCard::None }
     }
 }
-
-impl BladesCardIntoFelt252 of Into<BladesCard, felt252> {
-    fn into(self: BladesCard) -> felt252 {
-        let v: u8 = self.into();
-        (v.into())
-    }
-}
-
-impl BladesCardPrintImpl of PrintTrait<BladesCard> {
-    fn print(self: BladesCard) {
-        self.get_points().name.print();
-    }
-}
-
-// for println! and format!
-impl BladesCardDisplay of Display<BladesCard> {
-    fn fmt(self: @BladesCard, ref f: Formatter) -> Result<(), Error> {
-        let name: ByteArray = (*self).get_points().name.as_string();
-        let value: felt252 = (*self).into();
-        let str: ByteArray = format!("({}:{})", value, name);
-        f.buffer.append(@str);
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+impl BladesCardDebug of core::fmt::Debug<BladesCard> {
+    fn fmt(self: @BladesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let name: ByteArray = (*self).get_points().name.to_string();
+        let value: u8 = (*self).into();
+        let result: ByteArray = format!("({}:{})", value, name);
+        f.buffer.append(@result);
         Result::Ok(())
+    }
+}
+
+
+//----------------------------------------
+// Unit  tests
+//
+#[cfg(test)]
+mod unit {
+    use super::{BladesCard};
+
+    #[test]
+    fn test_into_u8() {
+        let mut i: u8 = 0;
+        loop {
+            let card: BladesCard = i.into();
+            if (i > 0 && card == BladesCard::None) {
+                break;
+            }
+            let as_u8: u8 = card.into();
+            assert!(i == as_u8, "{} != {}", i, as_u8);
+            // println!("BladesCard {} == {}", i, as_u8);
+            i += 1;
+        };
     }
 }

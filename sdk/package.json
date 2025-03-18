@@ -1,22 +1,26 @@
 {
-  "name": "@underware_gg/pistols-sdk",
-  "version": "0.12.5",
-  "description": "Pistols at 10 Blocks SDK",
+  "name": "@underware/pistols-sdk",
+  "version": "0.13.5",
+  "description": "Pistols at Dawn SDK",
   "homepage": "https://github.com/underware-gg/pistols",
   "author": "Underware",
   "license": "CC0",
   "private": false,
   "type": "module",
   "scripts": {
+    "prebuild": "./bin/generateTokenAssets.cjs",
     "build": "tsup",
+    "sync": "tsup --watch",
     "postbuild": "cp -R bin dist/",
     "dev": "tsup --watch --onSuccess=\"pnpm run postbuild\"",
     "devs": "tsup --watch --onSuccess=\"pnpm run postbuild\"",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "publish": "npm publish --access public"
   },
   "bin": {
-    "create-constants": "dist/bin/generateConstants.cjs"
+    "generate-constants": "dist/bin/generateConstants.cjs",
+    "generate-controller-preset": "dist/bin/generateControllerPreset.mjs"
   },
   "main": "dist/index.js",
   "files": [
@@ -35,25 +39,54 @@
       "import": "./dist/dojo.js",
       "types": "./dist/dojo.d.ts"
     },
+    "./dojo/graphql": {
+      "import": "./dist/dojo_graphql.js",
+      "types": "./dist/dojo_graphql.d.ts"
+    },
     "./fix": {
       "import": "./dist/fix.js",
       "types": "./dist/fix.d.ts"
-    },
-    "./pistols": {
-      "import": "./dist/games_pistols.js",
-      "types": "./dist/games_pistols.d.ts"
     },
     "./hooks": {
       "import": "./dist/hooks.js",
       "types": "./dist/hooks.d.ts"
     },
+    "./pistols": {
+      "import": "./dist/pistols.js",
+      "types": "./dist/pistols.d.ts"
+    },
+    "./pistols/gen": {
+      "import": "./dist/pistols_gen.js",
+      "types": "./dist/pistols_gen.d.ts"
+    },
+    "./pistols/components": {
+      "import": "./dist/pistols_components.js",
+      "types": "./dist/pistols_components.d.ts"
+    },
+    "./pistols/controller": {
+      "import": "./dist/pistols_controller.js",
+      "types": "./dist/pistols_controller.d.ts"
+    },
+    "./pistols/tokens": {
+      "import": "./dist/pistols_tokens.js",
+      "types": "./dist/pistols_tokens.d.ts"
+    },
     "./utils": {
       "import": "./dist/utils.js",
       "types": "./dist/utils.d.ts"
     },
+    "./utils/hooks": {
+      "import": "./dist/utils_hooks.js",
+      "types": "./dist/utils_hooks.d.ts"
+    },
+    "./utils/starknet": {
+      "import": "./dist/utils_starknet.js",
+      "types": "./dist/utils_starknet.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "keywords": [
+    "pistols at dawn",
     "pistols at 10 blocks",
     "underware",
     "dojo",
@@ -62,6 +95,7 @@
     "sdk"
   ],
   "dependencies": {
+    "buffer": "^6.0.3",
     "event-emitter": "^0.3.5",
     "swr": "^2.2.4"
   },
@@ -69,8 +103,10 @@
     "@apollo/client": "catalog:",
     "@cartridge/connector": "catalog:",
     "@cartridge/controller": "catalog:",
+    "@cartridge/presets": "catalog:",
     "@dojoengine/core": "catalog:",
     "@dojoengine/sdk": "catalog:",
+    "@dojoengine/torii-client": "catalog:",
     "@dojoengine/utils": "catalog:",
     "@starknet-react/chains": "catalog:",
     "@starknet-react/core": "catalog:",
@@ -83,10 +119,13 @@
   },
   "devDependencies": {
     "@types/event-emitter": "^0.3.5",
-    "@types/node": "^22.10.2",
-    "@types/react": "^18.2.30",
-    "tsup": "^8.3.5",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "tsup": "catalog:",
     "typescript": "catalog:",
-    "vitest": "^2.1.8"
+    "vitest": "^3.0.5"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

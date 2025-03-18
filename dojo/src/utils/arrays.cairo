@@ -7,7 +7,7 @@ use core::num::traits::Zero;
 //
 
 #[generate_trait]
-impl SpanUtilsImpl<T, +Clone<T>, +Drop<T>> of SpanUtilsTrait<T> {
+pub impl SpanUtilsImpl<T, +Clone<T>, +Drop<T>> of SpanUtilsTrait<T> {
     fn value_or_zero<+Copy<T>, +Zero<T>>(self: Span<T>, index: usize) -> T {
         (if (index < self.len()) { *self[index] } else { Zero::zero() })
     }
@@ -32,7 +32,7 @@ impl SpanUtilsImpl<T, +Clone<T>, +Drop<T>> of SpanUtilsTrait<T> {
 }
 
 #[generate_trait]
-impl ArrayUtilsImpl<T, +Clone<T>, +Drop<T>> of ArrayUtilsTrait<T> {
+pub impl ArrayUtilsImpl<T, +Clone<T>, +Drop<T>> of ArrayUtilsTrait<T> {
     fn value_or_zero<+Copy<T>, +Zero<T>>(self: @Array<T>, index: usize) -> T {
         (if (index < self.len()) { *self[index] } else { Zero::zero() })
     }
@@ -55,7 +55,7 @@ impl ArrayUtilsImpl<T, +Clone<T>, +Drop<T>> of ArrayUtilsTrait<T> {
 // Defaults
 //
 
-impl SpanDefault<T, +Drop<T>> of Default<Span<T>> {
+pub impl SpanDefault<T, +Drop<T>> of Default<Span<T>> {
     fn default() -> Span<T> {
         let arr = core::array::ArrayTrait::<T>::new();
         (arr.span())
@@ -68,8 +68,7 @@ impl SpanDefault<T, +Drop<T>> of Default<Span<T>> {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
-    use debug::PrintTrait;
+mod unit {
     use super::{ArrayUtilsTrait, SpanUtilsTrait};
 
     #[test]
@@ -83,10 +82,10 @@ mod tests {
         loop {
             if(i == arr0.len()) { break; }
             if (i % 2 == 0) {
-                assert(arr0.contains(@i) == true, 'array_contains_0_!true');
-                assert(arr1.contains(@i) == false, 'array_contains_1_!false');
-                assert(span0.contains(@i) == true, 'span_contains_0_!true');
-                assert(span1.contains(@i) == false, 'span_contains_1_!false');
+                assert!(arr0.contains(@i), "array_contains_0_!true");
+                assert!(!arr1.contains(@i), "array_contains_1_!false");
+                assert!(span0.contains(@i), "span_contains_0_!true");
+                assert!(!span1.contains(@i), "span_contains_1_!false");
             }
             i += 1;
         };
@@ -97,15 +96,15 @@ mod tests {
         let arr: Array<usize> = array![11, 22, 33];
         let span: Span<usize> = arr.span();
         // test default values
-        assert(arr.value_or_zero(0) == 11, 'array_value_or_zero(0) != 11');
-        assert(arr.value_or_zero(1) == 22, 'array_value_or_zero(1) != 22');
-        assert(arr.value_or_zero(2) == 33, 'array_value_or_zero(2) != 33');
-        assert(arr.value_or_zero(3) == 0, 'array_value_or_zero(3) != 0');
-        assert(arr.value_or_zero(999) == 0, 'array_value_or_zero(999) != 0');
-        assert(span.value_or_zero(0) == 11, 'span_value_or_zero(0) != 11');
-        assert(span.value_or_zero(1) == 22, 'span_value_or_zero(1) != 22');
-        assert(span.value_or_zero(2) == 33, 'span_value_or_zero(2) != 33');
-        assert(span.value_or_zero(3) == 0, 'span_value_or_zero(3) != 0');
-        assert(span.value_or_zero(999) == 0, 'span_value_or_zero(999) != 0');
+        assert_eq!(arr.value_or_zero(0), 11, "array_value_or_zero(0) != 11");
+        assert_eq!(arr.value_or_zero(1), 22, "array_value_or_zero(1) != 22");
+        assert_eq!(arr.value_or_zero(2), 33, "array_value_or_zero(2) != 33");
+        assert_eq!(arr.value_or_zero(3), 0, "array_value_or_zero(3) != 0");
+        assert_eq!(arr.value_or_zero(999), 0, "array_value_or_zero(999) != 0");
+        assert_eq!(span.value_or_zero(0), 11, "span_value_or_zero(0) != 11");
+        assert_eq!(span.value_or_zero(1), 22, "span_value_or_zero(1) != 22");
+        assert_eq!(span.value_or_zero(2), 33, "span_value_or_zero(2) != 33");
+        assert_eq!(span.value_or_zero(3), 0, "span_value_or_zero(3) != 0");
+        assert_eq!(span.value_or_zero(999), 0, "span_value_or_zero(999) != 0");
     }
 }

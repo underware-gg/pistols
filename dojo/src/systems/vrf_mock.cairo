@@ -1,27 +1,26 @@
-use starknet::{ContractAddress};
-use dojo::world::IWorldDispatcher;
-
-// TODO: import Cartridge interfaces
-// TODO: add Source to consume_random()
-
-#[starknet::interface]
-pub trait IVRFMock<TState> {
-    fn consume_random(self: @TState) -> felt252;
-}
+pub use pistols::interfaces::vrf::{IVrfProvider, Source};
 
 #[dojo::contract]
 pub mod vrf_mock {
-    // use debug::PrintTrait;
-    use core::byte_array::ByteArrayTrait;
-    use starknet::{ContractAddress, get_caller_address};
-    use dojo::world::{WorldStorage, WorldStorageTrait, IWorldDispatcherTrait};
+    use starknet::{ContractAddress};
+    use dojo::world::{WorldStorage, IWorldDispatcherTrait};
+    use pistols::interfaces::vrf::{IVrfProvider, Source};
     use pistols::libs::seeder::{make_seed};
 
-    #[abi(embed_v0)]
-    impl VRFMockImpl of super::IVRFMock<ContractState> {
-        fn consume_random(self: @ContractState) ->felt252 {
-            let mut world = self.world(@"pistols");
-            (make_seed(get_caller_address(), world.dispatcher.uuid()).into())
+    #[generate_trait]
+    impl WorldDefaultImpl of WorldDefaultTrait {
+        #[inline(always)]
+        fn world_default(self: @ContractState) -> WorldStorage {
+            (self.world(@"pistols"))
         }
+    }
+
+    #[abi(embed_v0)]
+    impl VRFMockImpl of IVrfProvider<ContractState> {
+        fn consume_random(ref self: ContractState, source: Source) -> felt252 {
+            let mut world = self.world_default();
+            (make_seed(starknet::get_caller_address(), world.dispatcher.uuid()).into())
+        }
+        fn request_random(self: @ContractState, caller: ContractAddress, source: Source) {}
     }
 }

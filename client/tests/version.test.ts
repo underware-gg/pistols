@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { PACKAGE_VERSION } from "../src/utils/constants";
-import { getVersion } from "@underware_gg/pistols-sdk";
+import { getVersion } from "@underware/pistols-sdk";
 
 test("PACKAGE_VERSION", () => {
   expect(PACKAGE_VERSION).not.toBeNull();

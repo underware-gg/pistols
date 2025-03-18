@@ -9,13 +9,12 @@
     "**/_bak": true,
     "**/*.tsbuildinfo": true,
     "**/next-env.d.ts": true,
-    "lords_mock": true,
   },
   "search.exclude": {
     "**/*-lock.json": true,
     "**/*-lock.yaml": true,
     "**/*.lock": true,
-    // "**/*.graphql": true,
+    "**/*.graphql": true,
     "**/artifacts/**/*.json": true,
     "**/contracts/**/*.json": true,
     "**/yarn*.json": true,
@@ -27,7 +26,7 @@
     "**/manifest.json": true,
     "**/manifest_*.json": true,
     "**/assets": true,
-    "client/public/**": true,
+    // "client/public/**": true,
     "dojo/manifests/**": true,
     "dojo/bindings/**": true,
     "gamejam": true,
@@ -43,7 +42,10 @@
   "[cairo]": {
     "editor.tabSize": 4,
   },
-  // "cairo1.languageServerPath": "${userHome}/.dojo/bin/dojo-language-server",
+  "[python]": {
+    "editor.tabSize": 4,
+  },
+  "cairo1.languageServerPath": "${userHome}/.dojo/bin/dojo-language-server",
   "cairo1.enableLanguageServer": true,
   "cairo1.enableScarb": true
 }

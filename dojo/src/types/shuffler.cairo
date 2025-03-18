@@ -1,5 +1,5 @@
 use pistols::utils::bitwise::{BitwiseU256};
-use pistols::utils::misc::{felt_to_usize};
+use pistols::utils::misc::{FeltToLossy};
 
 //
 // shuffle max 42 ids, from 1 to size
@@ -15,36 +15,27 @@ use pistols::utils::misc::{felt_to_usize};
 
 #[derive(Copy, Drop, Serde)]
 pub struct Shuffler {
-    ids: u256,      // 1..MAX
-    size : usize,
-    pos : usize,
-    mocked: bool,   // for testing
+    pub ids: u256,      // 1..MAX
+    pub size : usize,
+    pub pos : usize,
+    pub mocked: bool,   // for testing
 }
 
 #[generate_trait]
-impl ShufflerImpl of ShufflerTrait {
+pub impl ShufflerImpl of ShufflerTrait {
     const MAX: u8 = 42;
     const BITS: usize = 6;
     const MASK: u256 = 0b111111;
 
 	// size is the total number of Ids to be suffled
 	// allows get_next() to be called <size> times
-    fn new(size: u8) -> Shuffler {
+    fn new(size: u8, mocked: bool) -> Shuffler {
         assert(size <= Self::MAX, 'SHUFFLE: too many elements');
         (Shuffler {
             ids: 0,
             size: size.into(),
             pos: 0,
-            mocked: false,
-        })
-    }
-
-    fn new_mocked(size: usize) -> Shuffler {
-        (Shuffler {
-            ids: 0,
-            size,
-            pos: 0,
-            mocked: true,
+            mocked,
         })
     }
 
@@ -56,14 +47,14 @@ impl ShufflerImpl of ShufflerTrait {
 		if (self.pos == self.size) { return 0; }
         // get next pos
 		self.pos += 1;
-        // testing
-        if (self.mocked) { return (felt_to_usize(seed) & Self::MASK.try_into().unwrap()).try_into().unwrap(); }
+        // seed contains mocked values
+        if (self.mocked) { return (seed.into() & Self::MASK).try_into().unwrap(); }
         // only 1 id was shuffled
 		if (self.size == 1) { return 1; }
         // it is the last id
 		if (self.pos == self.size) { return self.get_id(self.pos).try_into().unwrap(); }
         // get random pos
-        let rnd: usize = self.pos + (felt_to_usize(seed) % (self.size - self.pos)).try_into().unwrap();
+        let rnd: usize = self.pos + (seed.to_usize_lossy() % (self.size - self.pos)).try_into().unwrap();
 		// swap for current position
 		let swap_pos: usize = rnd + 1;
         let swap_id: u256 = self.get_id(swap_pos);
@@ -87,6 +78,19 @@ impl ShufflerImpl of ShufflerTrait {
         value = BitwiseU256::shl(value, index * Self::BITS);
         self.ids = (self.ids & mask) | value;
     }
+
+    // convert an array of values into a mocked seed
+    fn mock_to_seed(values: Span<felt252>) -> felt252 {
+        let mut result: u256 = 0;
+        let mut index: usize = 0;
+        while (index < values.len()) {
+            let v: u256 = (*values[index]).into();
+            result = result | BitwiseU256::shl(v, Self::BITS * index);
+            index += 1;
+        };
+        result += 1; // rng_mock::reseed() will subtract 1
+        (result.try_into().unwrap())
+    }
 }
 
 
@@ -94,8 +98,7 @@ impl ShufflerImpl of ShufflerTrait {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
-    use debug::PrintTrait;
+mod unit {
     use super::{Shuffler, ShufflerTrait};
 
     fn _fact(value: usize) -> usize {
@@ -110,30 +113,30 @@ mod tests {
 
     #[test]
     fn test_factorial() {
-        assert(_fact(0) == 0, 'fact_0');
-        assert(_fact(1) == 1, 'fact_1');
-        assert(_fact(2) == 3, 'fact_2');
-        assert(_fact(3) == 6, 'fact_3');
-        assert(_fact(4) == 10, 'fact_4');
-        assert(_fact(5) == 15, 'fact_5');
+        assert_eq!(_fact(0), 0, "fact_0");
+        assert_eq!(_fact(1), 1, "fact_1");
+        assert_eq!(_fact(2), 3, "fact_2");
+        assert_eq!(_fact(3), 6, "fact_3");
+        assert_eq!(_fact(4), 10, "fact_4");
+        assert_eq!(_fact(5), 15, "fact_5");
     }
     
     fn _test_shuffler(size: u8) {
-        let mut shuffler: Shuffler = ShufflerTrait::new(size.into());
+        let mut shuffler: Shuffler = ShufflerTrait::new(size.into(), false);
         let mut seed: u256 = size.into();
         let mut sum: usize = 0;
         let mut n: u8 = 1;
         while (n <= size) {
-            seed = pedersen::pedersen(seed.low.into(), seed.high.into()).into();
+            seed = core::pedersen::pedersen(seed.low.into(), seed.high.into()).into();
             let id: u8 = shuffler.get_next((seed & 0xff).try_into().unwrap());
-            assert(id >= 1, 'id >= 1');
-            assert(id <= size, 'id <= size');
+            assert_ge!(id, 1, "id >= 1");
+            assert_le!(id, size, "id <= size");
             sum += id.into();
             n += 1;
         };
         let not_id: u8 = shuffler.get_next(99);
-        assert(not_id == 0, 'not_id');
-        assert(sum == _fact(size.into()), 'factorial');
+        assert_eq!(not_id, 0, "not_id");
+        assert_eq!(sum, _fact(size.into()), "factorial");
     }
 
     #[test]

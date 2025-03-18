@@ -1,13 +1,14 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Icon, Grid } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { DuelStage, useDuel } from '/src/hooks/useDuel'
 import { CompletedIcon, EmojiIcon, LoadingIcon } from '/src/components/ui/Icons'
 import { BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
-import { bigintEquals } from '@underware_gg/pistols-sdk/utils'
+import { bigintEquals } from '@underware/pistols-sdk/utils'
 import { EMOJI } from '/src/data/messages'
 import { BigNumberish } from 'starknet'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { useDuelistRequiresAction, useDuelRequiresAction } from '/src/stores/eventsStore'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -25,6 +26,8 @@ export function useDuelIcons({
     challenge: { duelistIdA, duelistIdB, winner, isAwaiting, isInProgress, isFinished },
     round1, duelStage, completedStagesA, completedStagesB, turnA, turnB,
   } = useDuel(duelId)
+  const isRequiredAction = useDuelRequiresAction(duelId)
+  const isDuelistRequiresAction = useDuelistRequiresAction(duelistId)
 
   const isA = useMemo(() => bigintEquals(duelistId, duelistIdA), [duelistId, duelistIdA])
   const isB = useMemo(() => bigintEquals(duelistId, duelistIdB), [duelistId, duelistIdB])
@@ -48,6 +51,19 @@ export function useDuelIcons({
 
   const { icons } = useMemo(() => {
     let icons = []
+    //
+    // Required Action...
+    if (isFinished) { 
+      if (isRequiredAction) {
+        if (isDuelistRequiresAction) {
+          icons.push(<LoadingIcon key='isTurn' size={iconSize} className='Brightest' />)
+        } else {
+          icons.push(<EmojiIcon emoji={EMOJI.IDLE} size={iconSize} />)
+        }
+
+        return { icons }
+      }
+    }
     //
     // Awaiting (B is always pending)
     if (isAwaiting) {
@@ -95,14 +111,16 @@ export function useDuelIcons({
       if (state1 && moves1) {
         const pacesFire = moves1.card_1
         const pacesDodge = moves1.card_2
-        const cardFire = constants.getPacesCardFromValue(pacesFire)
-        const cardDodge = constants.getPacesCardFromValue(pacesDodge)
-        if (pacesDodge <= pacesFire) {
-          icons.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
-          icons.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
-        } else {
-          icons.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
-          icons.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
+        if (pacesFire && pacesDodge) {
+          const cardFire = constants.getPacesCardFromValue(pacesFire)
+          const cardDodge = constants.getPacesCardFromValue(pacesDodge)
+          if (pacesDodge <= pacesFire) {
+            icons.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
+            icons.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
+          } else {
+            icons.push(<PacesIcon key='fire' paces={cardFire} size={iconSize} />)
+            icons.push(<PacesIcon key='dodge' paces={cardDodge} size={iconSize} dodge />)
+          }
         }
       }
 
@@ -114,8 +132,13 @@ export function useDuelIcons({
         const cardBlades = constants.getBladesCardFromValue(moves1.card_4)
         icons.push(<BladesIcon key='blades' blade={cardBlades} size={iconSize} />)
       }
+      
+      if (round1?.endedInTimeout && moves1?.timeout) {
+        icons.push(<EmojiIcon key='timedOut' emoji={EMOJI.TIMED_OUT} size={iconSize} />)
+      } else if (dead) {
+        icons.push(<EmojiIcon key='dead' emoji={dead} size={iconSize} />)
+      }
 
-      if (dead) icons.push(<EmojiIcon key='dead' emoji={dead} size={iconSize} />)
       if (win1) icons.push(<EmojiIcon key='win1' emoji={win1} size={iconSize} />)
     }
 
@@ -165,7 +188,7 @@ export function DuelIconsAsGrid({
   const { icons: iconsB } = useDuelIcons({ duelId, duelistId: duelistIdB, size })
 
   return (
-    <Grid textAlign='center' verticalAlign='middle' className='TitleCase'>
+    <Grid textAlign='center' verticalAlign='middle' className='TitleCase' style={{ width: '100%' }}>
       {iconsA.length > 0 &&
         <Row>
           <Col width={6} textAlign='right'>

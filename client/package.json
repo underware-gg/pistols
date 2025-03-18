@@ -1,7 +1,7 @@
 {
-  "name": "pistols-client",
-  "version": "0.12.5",
-  "description": "Pistols at 10 Blocks JS client",
+  "name": "@underware/pistols-at-dawn",
+  "version": "0.13.5",
+  "description": "Pistols at Dawn JS client",
   "homepage": "https://github.com/underware-gg/pistols",
   "author": "Underware",
   "license": "CC0",
@@ -11,13 +11,16 @@
     "dev": "vite",
     "devs": "vite -c vite_https.config",
     "build": "npx tsc -p tsconfig.json && vite build",
+    "sync": "npx tsc -watch",
     "check-types": "npx tsc --noEmit",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest run",
     "test:watch": "vitest",
-    "create-constants": "npx @underware_gg/pistols-sdk generate-constants --src:\"../dojo/src\" --out:\"$npm_config_sdk/generated/constants.ts\""
+    "generate-constants": "npx --package=@underware/pistols-sdk generate-constants --src:\"../dojo/src\" --out:\"$npm_config_sdk/generated/constants.ts\"",
+    "generate-controller-preset": "npx --package=@underware/pistols-sdk generate-controller-preset --out:\"$npm_config_sdk/generated/preset.json\""
   },
   "keywords": [
+    "pistols at dawn",
     "pistols at 10 blocks",
     "underware",
     "dojo",
@@ -25,7 +28,6 @@
     "client"
   ],
   "dependencies": {
-    "@apollo/client": "catalog:",
     "@cartridge/connector": "catalog:",
     "@cartridge/controller": "catalog:",
     "@dojoengine/core": "catalog:",
@@ -35,7 +37,7 @@
     "@starknet-react/chains": "catalog:",
     "@starknet-react/core": "catalog:",
     "@tweenjs/tween.js": "^21.0.0",
-    "@underware_gg/pistols-sdk": "workspace:*",
+    "@underware/pistols-sdk": "workspace:*",
     "event-emitter": "^0.3.5",
     "get-starknet-core": "catalog:",
     "immer": "catalog:",
@@ -57,9 +59,9 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "@types/react": "^18.2.30",
-    "@types/react-dom": "^18.2.14",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@types/three": "^0.157.2",
     "@typescript-eslint/eslint-plugin": "^8.18.2",
     "@typescript-eslint/parser": "^8.18.2",
@@ -71,7 +73,7 @@
     "typescript": "catalog:",
     "vite": "^6.0.5",
     "vite-plugin-mkcert": "^1.17.6",
-    "vitest": "3.0.0-beta.2"
+    "vitest": "^3.0.5"
   },
   "engines": {
     "node": ">=22"

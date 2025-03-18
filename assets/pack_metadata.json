@@ -1,0 +1,20 @@
+{
+  "id": "2",
+  "name": "Duelists 5-pack #2",
+  "description": "Pistols at Dawn Pack #2. https://pistols.underware.gg",
+  "image": "https://pistols.underware.gg/tokens/Duelists5x.jpg",
+  "metadata": {
+    "Type": "Duelists 5-pack",
+    "Is Open": "False"
+  },
+  "attributes": [
+    {
+      "trait": "Type",
+      "value": "Duelists 5-pack"
+    },
+    {
+      "trait": "Is Open",
+      "value": "False"
+    }
+  ]
+}

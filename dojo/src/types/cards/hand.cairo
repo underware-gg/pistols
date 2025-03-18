@@ -1,60 +1,87 @@
-use pistols::types::cards::{
-    paces::{PacesCard, PacesCardTrait, PACES_CARDS},
-    tactics::{TacticsCard, TacticsCardTrait, TACTICS_CARDS},
-    blades::{BladesCard, BladesCardTrait, BLADES_CARDS},
-    env::{EnvCard, EnvCardTrait, ENV_CARDS},
+pub use pistols::types::cards::{
+    deck::{Deck, DeckTrait, DeckType, DeckTypeTrait},
+    paces::{PacesCard, PacesCardTrait},
+    tactics::{TacticsCard, TacticsCardTrait},
+    blades::{BladesCard, BladesCardTrait},
+    env::{EnvCard, EnvCardTrait},
 };
-use pistols::types::duel_progress::{DuelistDrawnCard};
-
-#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-pub enum DeckType {
-    None,
-    //
-    Classic,
-}
+pub use pistols::types::duel_progress::{DuelistDrawnCard};
 
 #[derive(Copy, Drop, Serde, Default)]
-pub struct DuelistHand {
-    card_fire: PacesCard,
-    card_dodge: PacesCard,
-    card_tactics: TacticsCard,
-    card_blades: BladesCard,
+pub struct DuelistHand { // @generateContants:force
+    pub card_fire: PacesCard,
+    pub card_dodge: PacesCard,
+    pub card_tactics: TacticsCard,
+    pub card_blades: BladesCard,
+}
+
+#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
+pub enum FinalBlow {
+    Undefined,
+    Paces: PacesCard,   // ended in Pistols round
+    Blades: BladesCard, // ended in Blades round
+    Forsaken,           // some player(s) timed-out
+}
+impl FinalBlowDefault of Default<FinalBlow> {
+    fn default() -> FinalBlow {(FinalBlow::Undefined)}
 }
 
 
 //--------------------
 // traits
 //
-use pistols::utils::arrays::{SpanUtilsTrait};
 
 #[generate_trait]
-impl DuelistHandImpl of DuelistHandTrait {
-    fn draw_card(self:DuelistHand, pace: PacesCard) -> DuelistDrawnCard {
+pub impl DuelistHandImpl of DuelistHandTrait {
+    fn draw_card(self: @DuelistHand, pace: PacesCard) -> DuelistDrawnCard {
         (
-            if (self.card_fire == pace) {DuelistDrawnCard::Fire(pace)}
-            else if (self.card_dodge == pace) {DuelistDrawnCard::Dodge(pace)}
+            if (*self.card_fire == pace) {DuelistDrawnCard::Fire(pace)}
+            else if (*self.card_dodge == pace) {DuelistDrawnCard::Dodge(pace)}
             else {DuelistDrawnCard::None}
         )
     }
-    fn validate(ref self: DuelistHand, _deck_type: DeckType) {
-        if (self.card_dodge == self.card_fire) {
-            self.card_dodge = PacesCard::None;
-        }
-        // TODO: enable this when we support multiple decks
-        // if (!TacticsCardTrait::get_deck(deck_type).contains(self.card_tactics.into())) {
-        //     self.card_tactics = TacticsCard::None;
-        // }
-        // if (!BladesCardTrait::get_deck(deck_type).contains(self.card_blades.into())) {
-        //     self.card_blades = BladesCard::None;
-        // }
-    }
-    fn get_table_player_decks(deck_type: DeckType) -> Span<Span<u8>> {
-        (array![
-            PacesCardTrait::get_deck(deck_type),
-            PacesCardTrait::get_deck(deck_type),
-            TacticsCardTrait::get_deck(deck_type),
-            BladesCardTrait::get_deck(deck_type),
+    fn to_span(self: @DuelistHand) -> Span<u8> {
+        ([
+            (*self.card_fire).into(),
+            (*self.card_dodge).into(),
+            (*self.card_tactics).into(),
+            (*self.card_blades).into(),
         ].span())
+    }
+}
+
+#[generate_trait]
+pub impl FinalBlowImpl of FinalBlowTrait {
+    fn ended_in_paces(self: @FinalBlow) -> bool {
+        (match self {
+            FinalBlow::Paces(_) => true,
+            _ => false,
+        })
+    }
+    fn ended_in_blades(self: @FinalBlow) -> bool {
+        (match self {
+            FinalBlow::Blades(_) => true,
+            _ => false,
+        })
+    }
+}
+
+impl FinalBlowIntoByteArray of core::traits::Into<FinalBlow, ByteArray> {
+    fn into(self: FinalBlow) -> ByteArray {
+        match self {
+            FinalBlow::Undefined => "Undefined",
+            FinalBlow::Paces(_) =>  "Paces",
+            FinalBlow::Blades(_) => "Blades",
+            FinalBlow::Forsaken =>  "Forsaken",
+        }
+    }
+}
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+pub impl FinalBlowDebug of core::fmt::Debug<FinalBlow> {
+    fn fmt(self: @FinalBlow, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
     }
 }
 
@@ -64,15 +91,13 @@ impl DuelistHandImpl of DuelistHandTrait {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
-    use debug::PrintTrait;
-    use core::traits::Into;
+mod unit {
 
     use pistols::types::cards::{
-        paces::{PacesCard, PacesCardTrait},
+        paces::{PacesCard},
         hand::{DuelistHand, DuelistHandTrait},
-        tactics::{TacticsCard, TacticsCardTrait},
-        blades::{BladesCard, BladesCardTrait},
+        tactics::{TacticsCard},
+        blades::{BladesCard},
     };
     use pistols::types::duel_progress::{DuelistDrawnCard};
 
@@ -90,9 +115,9 @@ mod tests {
             card_tactics: TacticsCard::None,
             card_blades: BladesCard::None,
         };
-        assert(hand_1_2.draw_card(PacesCard::Paces1) == DuelistDrawnCard::Fire(PacesCard::Paces1), '1_2 > shoot');
-        assert(hand_1_2.draw_card(PacesCard::Paces2) == DuelistDrawnCard::Dodge(PacesCard::Paces2), '1_2 > dodge');
-        assert(hand_1_2.draw_card(PacesCard::Paces3) == DuelistDrawnCard::None, '1_2 > none');
-        assert(hand_2_2.draw_card(PacesCard::Paces2) == DuelistDrawnCard::Fire(PacesCard::Paces2), '2_2 > shoot');
+        assert_eq!(hand_1_2.draw_card(PacesCard::Paces1), DuelistDrawnCard::Fire(PacesCard::Paces1), "1_2 > shoot");
+        assert_eq!(hand_1_2.draw_card(PacesCard::Paces2), DuelistDrawnCard::Dodge(PacesCard::Paces2), "1_2 > dodge");
+        assert_eq!(hand_1_2.draw_card(PacesCard::Paces3), DuelistDrawnCard::None, "1_2 > none");
+        assert_eq!(hand_2_2.draw_card(PacesCard::Paces2), DuelistDrawnCard::Fire(PacesCard::Paces2), "2_2 > shoot");
     }
 }

@@ -3,8 +3,8 @@ import { Account, AccountInterface } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { useLordsContract } from 'src/dojo/hooks/useLords'
-import { bigintToU256, ethToWei, execute } from 'src/utils/starknet'
-import { bigintToHex } from 'src/utils/types'
+import { bigintToU256, ethToWei, execute } from 'src/utils/starknet/starknet'
+import { bigintToHex } from 'src/utils/misc/types'
 
 export interface FaucetExecuteResult {
   transaction_hash: string
@@ -20,10 +20,10 @@ export interface FaucetInterface {
 
 export const useLordsFaucet = (): FaucetInterface => {
   const { account } = useAccount()
-  const { selectedChainConfig } = useStarknetContext()
-  const { lordsContractAddress, isMock, abi } = useLordsContract()
-  const faucetUrl = useMemo(() => (typeof selectedChainConfig.lordsFaucet === 'string' ? selectedChainConfig.lordsFaucet : null), [selectedChainConfig])
-  const hasFaucet = useMemo(() => (selectedChainConfig.lordsFaucet === true), [selectedChainConfig])
+  const { selectedNetworkConfig } = useStarknetContext()
+  const { lordsContractAddress, abi } = useLordsContract()
+  const faucetUrl = useMemo(() => (typeof selectedNetworkConfig.lordsFaucet === 'string' ? selectedNetworkConfig.lordsFaucet : null), [selectedNetworkConfig])
+  const hasFaucet = useMemo(() => (selectedNetworkConfig.lordsFaucet === true), [selectedNetworkConfig])
 
   const [isMinting, setIsMinting] = useState(false)
   const [error, setError] = useState<string | undefined>(undefined)

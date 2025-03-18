@@ -4,12 +4,15 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
-import { useLordsBalance } from '@underware_gg/pistols-sdk/dojo'
+import { useLordsBalance } from '@underware/pistols-sdk/dojo'
 import { LordsBagIcon } from '/src/components/account/Balance'
 import { CustomIcon, IconSizeProp } from '/src/components/ui/Icons'
-import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { SceneName } from '/src/data/assets'
-import { isPositiveBigint } from '@underware_gg/pistols-sdk/utils'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { usePact } from '/src/hooks/usePact'
+import { useIsMyAccount } from '/src/hooks/useIsYou'
+import { useTableId } from '/src/stores/configStore'
 
 //-----------------
 // Generic Action button
@@ -22,6 +25,7 @@ type ActionButtonProps = {
   disabled?: boolean
   large?: boolean
   fill?: boolean
+  fillParent?: boolean
   dimmed?: boolean
   important?: boolean
   negative?: boolean
@@ -38,6 +42,7 @@ export const ActionButton = ({
   disabled = false,
   large = false,
   fill = false,
+  fillParent = false,
   dimmed = false,
   important = false,
   negative = false,
@@ -49,7 +54,7 @@ export const ActionButton = ({
   const classNames = useMemo(() => {
     let classNames = []
     if (important && !disabled) classNames.push('Important')
-    // if (fill) classNames.push('FillParent')
+    if (fillParent) classNames.push('FillParent')
     if (large) classNames.push('LargeButton')
     classNames.push((disabled || dimmed) ? 'Locked' : 'Unlocked')
     if (negative) classNames.push('Negative')
@@ -102,17 +107,21 @@ export const BalanceRequiredButton = ({
   fee,
   onClick,
   disabled = false,
+  fill = true,
+  fillParent = false,
 }: {
   label: string
   fee: BigNumberish
   onClick: Function
   disabled?: boolean
+  fill?: boolean
+  fillParent?: boolean
 }) => {
   const { address } = useAccount()
   const { noFundsForFee } = useLordsBalance(address, fee)
   const canSubmit = (!noFundsForFee)
   return (
-    <ActionButton large fill
+    <ActionButton large fill={fill} fillParent={fillParent}
       disabled={disabled}
       important={canSubmit}
       negative={!canSubmit}
@@ -269,17 +278,44 @@ export function SettingsMenuItem({
 }
 
 export function BackButton() {
-  const { dispatchSetScene, atDoor } = usePistolsScene();
+  const { dispatchSetScene, atDoor, dispatchSceneBack } = usePistolsScene();
 
   const handleClick = () => {
     if (atDoor) {
       dispatchSetScene(SceneName.Gate);
     } else {
-      dispatchSetScene(SceneName.Tavern);
+      dispatchSceneBack();
     }
   }
 
   return (
     <CustomIcon icon name='left-arrow' onClick={() => handleClick()} size='big' disabled={false} />
   );
+}
+
+export function ChallengeButton({
+  challengedPlayerAddress,
+  fillParent = false,
+  customLabel = null,
+}: {
+  challengedPlayerAddress: BigNumberish,
+  fillParent?: boolean
+  customLabel?: string
+}) {
+  const { dispatchChallengingPlayerAddress, dispatchSelectDuel, duelistSelectOpener } = usePistolsContext()
+  const { address } = useAccount()
+
+  const { tableId } = useTableId()
+  const { isMyAccount } = useIsMyAccount(challengedPlayerAddress)
+  const { hasPact, pactDuelId } = usePact(tableId, address, challengedPlayerAddress)
+  const canChallenge = (!hasPact && !isMyAccount)
+
+  if (!hasPact) {
+    return <ActionButton large fill fillParent={fillParent} important disabled={!canChallenge} label={customLabel ?? 'Challenge for a Duel!'} onClick={() => {
+      dispatchChallengingPlayerAddress(challengedPlayerAddress)
+      duelistSelectOpener.open()
+    }} />
+  } else {
+    return <ActionButton large fill fillParent={fillParent} important label='Duel In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />
+  }
 }

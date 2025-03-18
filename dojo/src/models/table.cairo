@@ -1,23 +1,10 @@
-// use debug::PrintTrait;
-use starknet::ContractAddress;
-use pistols::systems::game::game::{Errors as GameErrors};
-use pistols::types::cards::hand::{DeckType};
-use pistols::types::constants::{CONST};
-use pistols::utils::arrays::{ArrayUtilsTrait};
-use pistols::utils::math::{MathTrait};
-use pistols::utils::misc::{ZERO};
+pub use pistols::types::rules::{RulesType, RulesTypeTrait};
 
-mod TABLES {
-    const LORDS: felt252 = 'Lords';
-    const COMMONERS: felt252 = 'Commoners';
-}
-
-#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-pub enum TableType {
-    Undefined,      // 0
-    Classic,        // 1
-    Tournament,     // 2
-    IRLTournament,  // 3
+// permanent tables
+pub mod TABLES {
+    pub const TUTORIAL: felt252 = 'Tutorial';   // player tutorials
+    pub const PRACTICE: felt252 = 'Practice';   // bot practice
+    // pub const ETERNUM_S1: felt252 = 'EternumS1';
 }
 
 // Temporarily renamed to TableConfig while this bug exists:
@@ -26,196 +13,66 @@ pub enum TableType {
 #[dojo::model]
 pub struct TableConfig {
     #[key]
-    pub table_id: felt252,
+    pub table_id: felt252,      // short string
     //------
-    pub description: felt252,
-    pub table_type: TableType,
-    pub deck_type: DeckType,
-    pub fee_collector_address: ContractAddress, // if 0x0: use default treasury
-    pub fee_min: u128,
-    pub is_open: bool,
-}
-
-#[derive(Drop, Serde)]
-#[dojo::model]
-pub struct TableAdmittance {
-    #[key]
-    pub table_id: felt252,
-    //------
-    pub accounts: Array<ContractAddress>,
-    pub duelists: Array<u128>,
-}
-
-fn default_tables() -> Array<TableConfig> {
-    (array![
-        (TableConfig {
-            table_id: TABLES::LORDS,
-            description: 'The Lords Table',
-            table_type: TableType::Classic,
-            deck_type: DeckType::Classic,
-            fee_collector_address: ZERO(),
-            fee_min: 0, //60 * CONST::ETH_TO_WEI.low,
-            is_open: true,
-        }),
-        (TableConfig {
-            table_id: TABLES::COMMONERS,
-            description: 'The Commoners Table',
-            table_type: TableType::Classic,
-            deck_type: DeckType::Classic,
-            fee_collector_address: ZERO(),
-            fee_min: 0,
-            is_open: true,
-        }),
-    ])
+    pub description: felt252,   // short string
+    pub rules: RulesType,
 }
 
 
 //---------------------------
-// TableInitializer
+// Table Manager
 //
 use pistols::libs::store::{Store, StoreTrait};
 
-#[derive(Copy, Drop)]
-pub struct TableInitializer {
-    store: Store
-}
-
 #[generate_trait]
-impl TableInitializerTraitImpl of TableInitializerTrait {
-    fn new(store: Store) -> TableInitializer {
-        TableInitializer { store }
-    }
-    fn initialize(ref self: TableInitializer) {
-        self.set_array(@default_tables());
-    }
-    fn set_array(ref self: TableInitializer, tables: @Array<TableConfig>) {
-        let mut n: usize = 0;
-        loop {
-            if (n == tables.len()) { break; }
-            self.store.set_table_config(tables.at(n));
-            n += 1;
-        };
-    }
-}
-
-//---------------------------
-// TableConfig Traits
-//
-#[generate_trait]
-impl TableConfigImpl of TableConfigTrait {
-    fn exists(self: @TableConfig) -> bool {
-        (*self.table_type != TableType::Undefined)
-    }
-    fn calc_mint_fee(self: @TableConfig) -> u128 {
-        (0)
-    }
-}
-
-//---------------------------
-// TableAdmittance Traits
-//
-#[generate_trait]
-impl TableAdmittanceImpl of TableAdmittanceTrait {
-    fn can_join(self: @TableAdmittance, account_address: ContractAddress, duelist_id: u128) -> bool {
-        if (self.accounts.len() == 0 && self.duelists.len() == 0) {
-            (true)
-        } else {
-            (self.accounts.contains(@account_address) || self.duelists.contains(@duelist_id))
-        }
+pub impl TableManagerImpl of TableManagerTrait {
+    fn initialize(ref store: Store) {
+        // create permanent tables
+        store.set_table_config(@TableConfig {
+            table_id: TABLES::TUTORIAL,
+            description: 'The Training Grounds',
+            rules: RulesType::Academy,
+        });
+        store.set_table_config(@TableConfig {
+            table_id: TABLES::PRACTICE,
+            description: 'Bot Shooting Range',
+            rules: RulesType::Academy,
+        });
+        // store.set_table_config(@TableConfig {
+        //     table_id: 'EternumS1', // example
+        //     description: 'Eternum Season 1',
+        //     rules: RulesType::Eternum,
+        // });
     }
 }
 
 
 //---------------------------
-// enum traits
+// Traits
 //
+use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
+use pistols::models::season::{SeasonConfig, SeasonConfigTrait};
 
-impl TableTypeIntoFelt252 of Into<TableType, felt252> {
-    fn into(self: TableType) -> felt252 {
-        match self {
-            TableType::Undefined => 0,
-            TableType::Classic => 1,
-            TableType::Tournament => 2,
-            TableType::IRLTournament => 3,
-        }
+#[generate_trait]
+pub impl TableConfigImpl of TableConfigTrait {
+    fn can_join(self: @TableConfig, store: @Store) -> bool {
+        (
+            (*self).rules.exists() &&
+            (*self).validate_season(store)
+        )
     }
-}
-impl TableTypeIntoByteArray of Into<TableType, ByteArray> {
-    fn into(self: TableType) -> ByteArray {
-        match self {
-            TableType::Undefined => "Undefined",
-            TableType::Classic => "Classic",
-            TableType::Tournament => "Tournament",
-            TableType::IRLTournament => "IRLTournament",
-        }
+    fn assert_can_join(self: @TableConfig, store: @Store) {
+        assert(self.rules.exists(), DuelErrors::INVALID_TABLE);
+        assert(self.validate_season(store), DuelErrors::INVALID_SEASON);
     }
-}
-
-
-
-
-
-//----------------------------------------
-// Unit  tests
-//
-#[cfg(test)]
-mod tests {
-    use debug::PrintTrait;
-    use starknet::ContractAddress;
-    use super::{TableAdmittance, TableAdmittanceTrait};
-    use pistols::utils::misc::{ZERO};
-
-    #[test]
-    fn test_admittance() {
-        let table_id: felt252 = 'RoundTable';
-        let address_1: ContractAddress = starknet::contract_address_const::<0x111>();
-        let address_2: ContractAddress = starknet::contract_address_const::<0x222>();
-        let address_3: ContractAddress = starknet::contract_address_const::<0x333>();
-        let duelist_id_1: u128 = 0x1;
-        let duelist_id_2: u128 = 0x2;
-        let duelist_id_3: u128 = 0x3;
-        let admittance = @TableAdmittance{
-            table_id,
-            accounts: array![],
-            duelists: array![],
-        };
-        assert(admittance.can_join(address_1, duelist_id_1) == true, 'empty_1');
-        assert(admittance.can_join(address_1, duelist_id_2) == true, 'empty_2');
-        assert(admittance.can_join(address_2, duelist_id_1) == true, 'empty_3');
-        let admittance = @TableAdmittance{
-            table_id,
-            accounts: array![address_3],
-            duelists: array![],
-        };
-        assert(admittance.can_join(address_1, duelist_id_2) == false, 'accounts_1_2');
-        assert(admittance.can_join(address_2, duelist_id_1) == false, 'accounts_2_1');
-        assert(admittance.can_join(address_1, duelist_id_3) == false, 'accounts_1_3');
-        assert(admittance.can_join(address_3, duelist_id_1) == true, 'accounts_3_1');
-        let admittance = @TableAdmittance{
-            table_id,
-            accounts: array![],
-            duelists: array![duelist_id_3],
-        };
-        assert(admittance.can_join(address_1, duelist_id_2) == false, 'duelists_1_2');
-        assert(admittance.can_join(address_2, duelist_id_1) == false, 'duelists_2_1');
-        assert(admittance.can_join(address_1, duelist_id_3) == true, 'duelists_1_3');
-        assert(admittance.can_join(address_3, duelist_id_1) == false, 'duelists_3_1');
-        let admittance = @TableAdmittance{
-            table_id,
-            accounts: array![address_1, address_2],
-            duelists: array![],
-        };
-        assert(admittance.can_join(address_1, duelist_id_2) == true, 'dual_1_2');
-        assert(admittance.can_join(address_2, duelist_id_1) == true, 'dual_2_1');
-        assert(admittance.can_join(address_3, duelist_id_3) == false, 'dual_3_3');
-        let admittance = @TableAdmittance{
-            table_id,
-            accounts: array![],
-            duelists: array![duelist_id_1, duelist_id_2],
-        };
-        assert(admittance.can_join(address_1, duelist_id_2) == true, 'dual_1_2');
-        assert(admittance.can_join(address_2, duelist_id_1) == true, 'dual_2_1');
-        assert(admittance.can_join(address_3, duelist_id_3) == false, 'dual_3_3');
+    fn validate_season(self: @TableConfig, store: @Store) -> bool {
+        (match self.rules {
+            RulesType::Season => {
+                let season: SeasonConfig = store.get_season_config(*self.table_id);
+                (season.is_active())
+            },
+            _ => true
+        })
     }
-
 }

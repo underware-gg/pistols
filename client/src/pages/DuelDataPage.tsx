@@ -1,20 +1,19 @@
 import React from 'react'
-import { useParams } from 'react-router'
 import { Container, Divider, Table } from 'semantic-ui-react'
-import { useChallenge } from '/src/stores/challengeStore'
+import { useGetChallenge } from '/src/stores/challengeStore'
 import { useDuel } from '/src/hooks/useDuel'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useTable } from '/src/stores/tableStore'
-import { useFinishedDuelProgress } from '/src/hooks/useContractCalls'
+import { useRouteSlugs } from '/src/hooks/useRoute'
+import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { ChallengeStateNames, RoundStateNames } from '/src/utils/pistols'
-import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
-import { bigintToDecimal, bigintToHex, formatTimestampLocal } from '@underware_gg/pistols-sdk/utils'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { bigintToDecimal, bigintToHex, formatTimestampLocal } from '@underware/pistols-sdk/utils'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
 import { DuelIconsAsRow } from '/src/components/DuelIcons'
 import { EMOJI } from '/src/data/messages'
-import App from '/src/components/App'
+import AppDojo from '/src/components/AppDojo'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -24,24 +23,19 @@ const HeaderCell = Table.HeaderCell
 
 export default function DuelDataPage() {
   return (
-    <App backgroundImage={null}>
+    <AppDojo backgroundImage={null}>
       <ChallengeStoreSync />
       <StatsLoader />
-    </App>
+    </AppDojo>
   );
 }
 
 function StatsLoader() {
-  const { isInitialized } = useDojoStatus()
-
-  const { duel_id } = useParams()
+  const { duel_id } = useRouteSlugs()
 
   return (
     <Container>
-      {(isInitialized && duel_id)
-        ? <Stats duelId={BigInt(duel_id as string)} />
-        : <DojoStatus />
-      }
+      {Boolean(duel_id) && <Stats duelId={BigInt(duel_id as string)} />}
     </Container>
   )
 }
@@ -54,7 +48,7 @@ function Stats({
 }) {
   const { challenge: { tableId }, round1 } = useDuel(duelId)
 
-  const challenge = useChallenge(duelId)
+  const challenge = useGetChallenge(duelId)
 
   return (
     <>
@@ -82,8 +76,8 @@ function DuelStats({
 }) {
   const { challenge } = useDuel(duelId)
   const { description } = useTable(challenge.tableId)
-  const { nameDisplay: nameA } = useDuelist(challenge.duelistIdA)
-  const { nameDisplay: nameB } = useDuelist(challenge.duelistIdB)
+  const { nameAndId: nameA } = useDuelist(challenge.duelistIdA)
+  const { nameAndId: nameB } = useDuelist(challenge.duelistIdB)
 
   return (
     <Table celled striped color='red'>
@@ -152,13 +146,13 @@ function DuelStats({
         <Row>
           <Cell>Timestamp Start</Cell>
           <Cell>
-            {formatTimestampLocal(challenge.timestamp_end)}
+            {formatTimestampLocal(challenge.timestampEnd)}
           </Cell>
         </Row>
         <Row>
           <Cell>Timestamp End</Cell>
           <Cell>
-            {formatTimestampLocal(challenge.timestamp_end)}
+            {formatTimestampLocal(challenge.timestampEnd)}
           </Cell>
         </Row>
         <Row>
@@ -197,8 +191,8 @@ function RoundStats({
   round: any
 }) {
   const { challenge } = useDuel(duelId)
-  const { nameDisplay: nameA } = useDuelist(challenge.duelistIdA)
-  const { nameDisplay: nameB } = useDuelist(challenge.duelistIdB)
+  const { nameAndId: nameA } = useDuelist(challenge.duelistIdA)
+  const { nameAndId: nameB } = useDuelist(challenge.duelistIdB)
   // console.log('round', round)
   return (
     <>
@@ -206,7 +200,7 @@ function RoundStats({
         <Header>
           <Row>
             <HeaderCell width={4}><h5>Round</h5></HeaderCell>
-            <HeaderCell><h2>1 and only</h2></HeaderCell>
+            <HeaderCell><h2>Single Round</h2></HeaderCell>
           </Row>
         </Header>
 
@@ -220,7 +214,7 @@ function RoundStats({
           <Row>
             <Cell>Final Blow</Cell>
             <Cell>
-              {round.final_blow}: {round.endedInBlades ? <BladesIcon blade={round.final_blow} /> : round.final_blow ? <PacesIcon paces={round.final_blow} /> : '-'}
+              {round.finalBlow}: {round.endedInBlades ? <BladesIcon blade={round.finalBlow} /> : round.finalBlow ? <PacesIcon paces={round.finalBlow} /> : '-'}
             </Cell>
           </Row>
         </Body>
@@ -384,7 +378,7 @@ function DuelProgress({
 }: {
   duelId: bigint
 }) {
-  const duelProgress = useFinishedDuelProgress(duelId)
+  const { duelProgress } = useDuelProgress(duelId)
   if (!duelProgress) return <></>
   return (
     <>

@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
-import { DojoStatus, useDojoStatus } from '@underware_gg/pistols-sdk/dojo'
 import { useAllChallengesIds, useChallenge } from '/src/stores/challengeStore'
 import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
-import { bigintEquals, bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { bigintEquals, bigintToHex } from '@underware/pistols-sdk/utils'
 import { CopyIcon } from '/src/components/ui/Icons'
+import { useGetSeasonScoreboard } from '../hooks/useScore'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -15,12 +15,7 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export function Snapshots() {
-  const { isInitialized } = useDojoStatus()
   const [data, setData] = useState('')
-
-  if (!isInitialized) {
-    return <DojoStatus message={'Loading Pistols...'} />
-  }
 
   const _update = (newData: any[]) => {
     setData(JSON.stringify(newData, null, '  '))
@@ -104,8 +99,8 @@ export function SnapDuelist({
   update,
 }) {
   const duelist = useDuelist(duelistId)
+  const score = useGetSeasonScoreboard(duelistId)
   useEffect(() => {
-    const score = duelist.score
     update({
       ...duelist,
       score: {

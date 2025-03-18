@@ -1,4 +1,109 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
+pub use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, DuelistProfile, BotProfile};
+
+//---------------------
+// Duelist
+//
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct Duelist {
+    #[key]
+    pub duelist_id: u128,   // erc721 token_id
+    //-----------------------
+    pub profile_type: ProfileType,
+    pub timestamps: DuelistTimestamps,
+}
+
+#[derive(Copy, Drop, Serde, PartialEq, IntrospectPacked)]
+pub struct DuelistTimestamps {
+    pub registered: u64,    // seconds since epoch, started
+    pub active: u64,        // seconds since epoch, ended
+}
+
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct DuelistChallenge {
+    #[key]
+    pub duelist_id: u128,
+    //-----------------------
+    pub duel_id: u128,      // current Challenge a Duelist is in
+}
+
+// Per table scoreboard
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct Scoreboard {
+    #[key]
+    pub holder: felt252,    // duelist_id or player_address
+    #[key]
+    pub table_id: felt252,
+    //------------
+    pub score: Score,
+}
+
+#[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
+pub struct Score {
+    pub honour: u8,             // 0..100
+    pub points: u16,
+    pub total_duels: u16,
+    pub total_wins: u16,
+    pub total_losses: u16,
+    pub total_draws: u16,
+    pub honour_history: u64,    // past 8 duels, each byte holds one duel honour
+} // [8 + 4*16 + 64] = 128 bytes
+
+// cfrated for dead duelists
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct DuelistMemorial {
+    #[key]
+    pub duelist_id: u128,
+    //------------
+    pub cause_of_death: CauseOfDeath,
+    pub killed_by: u128,
+    pub fame_before_death: u128,
+    pub player_address: ContractAddress,
+    pub season_table_id: felt252,
+}
+
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum CauseOfDeath {
+    None,       // 0
+    Duelling,   // 1
+    Memorize,   // 2
+    Sacrifice,  // 3
+    Forsaken,   // 4
+}
+
+
+//----------------------------------
+// Traits
+//
+use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
+use pistols::libs::store::{Store, StoreTrait};
+use pistols::types::rules::{RewardValues};
+use pistols::types::constants::{HONOUR};
+use pistols::utils::bitwise::{BitwiseU64};
+use pistols::utils::math::{MathU64};
+
+#[generate_trait]
+pub impl DuelistImpl of DuelistTrait {
+    fn enter_challenge(ref self: Store, duelist_id: u128, duel_id: u128) {
+        let current_challenge: DuelistChallenge = self.get_duelist_challenge(duelist_id);
+        assert(current_challenge.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);
+        self.set_duelist_challenge(@DuelistChallenge{
+            duelist_id,
+            duel_id,
+        });
+    }
+    fn exit_challenge(ref self: Store, duelist_id: u128) {
+        self.set_duelist_challenge(@DuelistChallenge{
+            duelist_id,
+            duel_id: 0,
+        });
+    }
+}
+
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Archetype {
@@ -7,135 +112,48 @@ pub enum Archetype {
     Trickster,  // 2
     Honourable, // 3
 }
-
 impl ArchetypeDefault of Default<Archetype> {
     fn default() -> Archetype {(Archetype::Undefined)}
 }
 
-#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-pub enum ProfilePicType {
-    Undefined,  // 0
-    Duelist,    // 1
-    External,   // 2
-    // StarkId,    // stark.id (ipfs?)
-    // ERC721,     // Owned erc-721 (hard to validate and keep up to date)
-    // Discord,    // Linked account (had to be cloned, or just copy the url)
-}
-
-
-//---------------------
-// Duelist
-//
-// #[derive(Copy, Drop, Serde)] // ByteArray is not copiable!
-#[derive(Clone, Drop, Serde, Default)]   // pass to functions using duelist.clone()
-#[dojo::model]
-pub struct Duelist {
-    #[key]
-    pub duelist_id: u128,   // erc721 token_id
-    //-----------------------
-    pub name: felt252,
-    pub profile_pic_type: ProfilePicType,
-    pub profile_pic_uri: ByteArray,     // can be anything
-    pub timestamp: u64,                 // date registered (seconds since epoch)
-    pub score: Score,
-}
-
-// Current challenge between two Duelists
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct Pact {
-    #[key]
-    pub table_id: felt252,
-    #[key]
-    pub pair: u128,     // xor'd duelists as u256(address).low
-    //------------
-    pub duel_id: u128,  // current Challenge, or 0x0
-}
-
-//
-// Duelist scores per Table
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct Scoreboard {
-    #[key]
-    pub table_id: felt252,
-    #[key]
-    pub duelist_id: u128,
-    //------------
-    pub score: Score,
-} // [160] [128] [128]
-
-#[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
-pub struct Score {
-    pub honour: u8,             // 0..100
-    pub total_duels: u16,
-    pub total_wins: u16,
-    pub total_losses: u16,
-    pub total_draws: u16,
-    pub honour_history: u64,    // past 8 duels, each byte holds one duel honour
-} // [160]
-
-
-
-//----------------------------------
-// Traits
-//
-use pistols::types::constants::{CONST, HONOUR};
-use pistols::utils::bitwise::{BitwiseU64};
-use pistols::utils::math::{MathU64};
-
 #[generate_trait]
-impl DuelistTraitImpl of DuelistTrait {
-    fn is_owner(self: Duelist, address: ContractAddress) -> bool {
-        // for testing
-        let address_felt: felt252 = address.into();
-        if (address_felt == self.duelist_id.into()) { return (true); }
-        (false)
+pub impl ScoreImpl of ScoreTrait {
+    #[inline(always)]
+    fn is_villain(self: @Score) -> bool {
+        (*self.total_duels > 0 && *self.honour < HONOUR::TRICKSTER_START)
     }
-    // try to convert a challenged account address to duelist id
-    // retuns 0 if the address is not an id
-    fn try_address_to_id(address: ContractAddress) -> u128 {
-        let as_felt: felt252 = address.into();
-        let as_u256: u256 = as_felt.into();
-        if (as_u256 <= CONST::MAX_DUELIST_ID.into()) {(as_u256.low)} else {(0)}
+    #[inline(always)]
+    fn is_trickster(self: @Score) -> bool {
+        (*self.honour >= HONOUR::TRICKSTER_START && *self.honour < HONOUR::LORD_START)
     }
-    // "cast" an address to an id for pacts
-    // the low part is good enough
-    fn address_as_id(address: ContractAddress) -> u128 {
-        let as_felt: felt252 = address.into();
-        let as_u256: u256 = as_felt.into();
-        (as_u256.low)
+    #[inline(always)]
+    fn is_lord(self: @Score) -> bool {
+        (*self.honour >= HONOUR::LORD_START)
     }
-}
-
-#[generate_trait]
-impl ScoreTraitImpl of ScoreTrait {
     #[inline(always)]
-    fn is_villain(self: Score) -> bool { (self.total_duels > 0 && self.honour < HONOUR::TRICKSTER_START) }
-    #[inline(always)]
-    fn is_trickster(self: Score) -> bool { (self.honour >= HONOUR::TRICKSTER_START && self.honour < HONOUR::LORD_START) }
-    #[inline(always)]
-    fn is_lord(self: Score) -> bool { (self.honour >= HONOUR::LORD_START) }
-    #[inline(always)]
-    fn get_archetype(self: Score) -> Archetype {
+    fn get_archetype(self: @Score) -> Archetype {
         if (self.is_lord()) {(Archetype::Honourable)}
         else if (self.is_trickster()) {(Archetype::Trickster)}
         else if (self.is_villain()) {(Archetype::Villainous)}
         else {(Archetype::Undefined)}
     }
     #[inline(always)]
-    fn format_honour(value: u8) -> ByteArray { (format!("{}.{}", value/10, value%10)) }
+    fn get_honour(self: @Score) -> ByteArray {
+        (format!("{}.{}", *self.honour / 10, *self.honour % 10))
+    }
 
     // update duel totals only
-    fn update_totals(ref score_a: Score, ref score_b: Score, winner: u8) {
+    fn update_totals(ref score_a: Score, ref score_b: Score, rewards_a: @RewardValues, rewards_b: @RewardValues, winner: u8) {
         score_a.total_duels += 1;
         score_b.total_duels += 1;
+        score_a.points += *rewards_a.points_scored;
+        score_b.points += *rewards_b.points_scored;
         if (winner == 1) {
             score_a.total_wins += 1;
             score_b.total_losses += 1;
         } else if (winner == 2) {
-            score_a.total_losses += 1;
             score_b.total_wins += 1;
+            score_a.total_losses += 1;
         } else {
             score_a.total_draws += 1;
             score_b.total_draws += 1;
@@ -147,46 +165,11 @@ impl ScoreTraitImpl of ScoreTrait {
         self.honour_history =
             (self.honour_history & ~BitwiseU64::shl(0xff, history_pos)) |
             BitwiseU64::shl(duel_honour.into(), history_pos);
-        self.honour = (BitwiseU64::sum_bytes(self.honour_history) / MathU64::min(self.total_duels.into(), 8)).try_into().unwrap();
+        self.honour = (BitwiseU64::sum_bytes(self.honour_history) / core::cmp::min(self.total_duels.into(), 8)).try_into().unwrap();
     }
 }
 
-impl ProfilePicTypeDefault of Default<ProfilePicType> {
-    fn default() -> ProfilePicType {(ProfilePicType::Undefined)}
-}
-
-#[generate_trait]
-impl ProfilePicTypeImpl of ProfilePicTypeTrait {
-    fn get_uri(self: ProfilePicType,
-        base_uri: ByteArray,
-        profile_pic_uri: ByteArray,
-        variant: ByteArray,    
-    ) -> ByteArray {
-        match self {
-            ProfilePicType::Duelist => {
-                let number =
-                    if (profile_pic_uri.len() == 0) {"00"}
-                    else if (profile_pic_uri.len() == 1) {format!("0{}", profile_pic_uri)}
-                    else {profile_pic_uri};
-                (format!("{}/profiles/{}/{}.jpg", base_uri, variant, number))
-            },
-            ProfilePicType::External |
-            ProfilePicType::Undefined => Self::get_uri(ProfilePicType::Duelist, base_uri, "", variant)
-        }
-    }
-}
-
-impl ArchetypeIntoFelt252 of Into<Archetype, felt252> {
-    fn into(self: Archetype) -> felt252 {
-        match self {
-            Archetype::Undefined => 0,
-            Archetype::Villainous => 1,
-            Archetype::Trickster => 2,
-            Archetype::Honourable => 3,
-        }
-    }
-}
-impl ArchetypeIntoByteArray of Into<Archetype, ByteArray> {
+impl ArchetypeIntoByteArray of core::traits::Into<Archetype, ByteArray> {
     fn into(self: Archetype) -> ByteArray {
         match self {
             Archetype::Undefined => "Undefined",
@@ -197,4 +180,22 @@ impl ArchetypeIntoByteArray of Into<Archetype, ByteArray> {
     }
 }
 
-
+impl CauseOfDeathIntoByteArray of core::traits::Into<CauseOfDeath, ByteArray> {
+    fn into(self: CauseOfDeath) -> ByteArray {
+        match self {
+            CauseOfDeath::None =>       "None",
+            CauseOfDeath::Duelling =>   "Duelling",
+            CauseOfDeath::Memorize =>   "Memorize",
+            CauseOfDeath::Sacrifice =>  "Sacrifice",
+            CauseOfDeath::Forsaken =>   "Forsaken",
+        }
+    }
+}
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+pub impl CauseOfDeathDebug of core::fmt::Debug<CauseOfDeath> {
+    fn fmt(self: @CauseOfDeath, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}

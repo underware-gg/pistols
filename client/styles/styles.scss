@@ -1,5 +1,6 @@
 
 @import 'aspect';
+@import 'color';
 
 $font-family: 'EB Garamond', serif;
 $font-family-mono: 'Courier Prime', monospace;
@@ -7,21 +8,6 @@ $font-family-mono: 'Courier Prime', monospace;
 
 // Figma colors
 // https://www.figma.com/file/eseZA1jRIoX6IYNtoHgz30/Pistols-at-Ten-Blocks
-$color-bg: #000; //#1e1e1e;
-$color-darkest: #201a18;
-$color-dark: #57493e;
-$color-medium: #ef9758;
-$color-medium-bg: #ce6f2c;
-$color-bright: #c8b6a8;
-$color-brightest: #efe1d7;
-
-$color-white: $color-brightest;
-$color-shadow: $color-bg;
-$color-text: $color-bright;
-$color-link: $color-medium;
-$color-important: $color-medium;
-$color-active: $color-medium;
-$color-inactive: rgba($color-brightest, 0.35);
 $text-shadow: 0.05rem 0.05rem 1px rgba($color-darkest, 0.5);
 $title-shadow: 0.2rem 0.2rem 1px rgba($color-bg, 0.5);
 $ui-border: 6px ridge $color-active;
@@ -31,11 +17,6 @@ $border-hr: solid 0.5px rgba($color-bright, 0.5);
 $border-button: 1px solid $color-bright;
 $border-button-active: 1px solid $color-brightest;
 $border-button-inactive: 1px solid rgba($color-bright, 0.5);
-
-$color-positive: #77d64d;
-$color-negative: #e34a4a;
-$color-warning: #f1d242;
-$color-cold: #4d9ad6;
 
 $game-width: 960px;
 $game-height: 540px;
@@ -207,7 +188,7 @@ canvas {
 }
 
 .Bold {
-  color: $color-brightest;
+  // color: $color-brightest;
   font-weight: 600;
 }
 
@@ -225,6 +206,8 @@ canvas {
 .Canceled  { color: $color-inactive!important; }
 .Inactive  { color: $color-inactive!important; }
 .Disabled  { color: $color-inactive!important; }
+.Dark      { color: $color-dark!important; }
+.Darkest   { color: $color-darkest!important; }
 
 .ImportantHover:hover { color: $color-important!important; }
 
@@ -239,6 +222,8 @@ canvas {
 .BgCanceled  { background-color: $color-inactive!important; }
 .BgInactive  { background-color: $color-inactive!important; }
 
+.Invisible { opacity: 0.0!important; }
+.Transparent { opacity: 0!important; }
 .Translucent { opacity: 0.7!important; }
 
 
@@ -298,19 +283,23 @@ canvas {
 
 .Spacer5 {
   width: '100%';
-  min-height: 5px;
+  min-height: aspect-width(0.5);
 }
 .Spacer10 {
   width: '100%';
-  min-height: 10px;
+  min-height: aspect-width(1);
 }
 .Spacer20 {
   width: '100%';
-  min-height: 20px;
+  min-height: aspect-width(2);
+}
+.Spacer30 {
+  width: '100%';
+  min-height: aspect-width(3);
 }
 .Spacer50 {
   width: '100%';
-  min-height: 50px;
+  min-height: aspect-width(5);
 }
 
 .Hidden {
@@ -609,40 +598,12 @@ TextArea::selection {
   color: $color-negative
 }
 
-.DuelistModal {
-  width: 900px;
-  // height: 450px;
-}
-.DuelistModalDescription {
-  width: aspect-width(36);
-}
-.BladesModalDescription {
-  @extend .CenteredContainer;
-  height: 130px;
-}
-
 .StarknetConnectModal {
   max-width: 400px;
 }
 
 .OnboardingProfile {
   max-height: 300px;
-}
-
-// .TableHeader {
-//   height: 30px!important;
-//   max-height: 30px!important;
-// }
-// .TableBody {
-//   margin-top: 100px;
-// }
-
-.DirectionButton {
-  /* margin: 0.25em; */
-  font-size: 24px;
-  text-align: center;
-  border: 0;
-  padding: 0;
 }
 
 .SmallButton {
@@ -657,6 +618,10 @@ TextArea::selection {
   padding: aspect-width(1) aspect-width(2);
   font-size: 1.5em!important;
   min-height: aspect-width(1.2)!important;
+}
+
+.LargeButton.FillParent {
+  @extend .FillParent;
 }
 
 .FilterButton {
@@ -765,7 +730,7 @@ $ui-container-gap: 1em;
 }
 
 #Door .UIPage {
-  padding: 0 aspect-width(6) aspect-width(6) aspect-width(6)!important;
+  padding: 0 aspect-width(6) aspect-width(2) aspect-width(6)!important;
   margin: 0!important;
   align-content: center;
   height: 100%;
@@ -837,86 +802,55 @@ $ui-container-gap: 1em;
 }
 
 .ProfilePic {
-  width: calc(439px / 2);
-  height: calc(768px / 2);
-  border-radius: 8px;
-  border: $border-button;
-  box-shadow: $title-shadow;
+  width: var(--profile-pic-width) !important;
+  height: var(--profile-pic-height) !important;
+  max-width: var(--profile-pic-width) !important;
+  max-height: var(--profile-pic-height) !important;
+
+  clip-path: var(--profile-pic-clip-path);
+  object-fit: var(--profile-pic-object-fit);
+  object-position: var(--profile-pic-object-position);
+
+  border-radius: var(--profile-pic-border-radius);
+
+  &.Border {
+    border: $border-button;
+  }
+
+  &.Shadow {
+    box-shadow: $title-shadow;
+  }
+
+  &.CustomBorder {
+    border: var(--profile-pic-border);
+  }
 }
-.ProfilePicAnon {
-  @extend .ProfilePic;
-  height: calc(439px / 2);
+
+.ProfilePicDisabled {
+  @extend .Sepia;
 }
+
 .ProfilePicDuel {
-  width: aspect-width(8.5);
-  height: aspect-width(8.5);
-  object-fit: cover;
-  clip-path: circle();
-  object-position: 50% 20%; //TODO this moves the image center for the rounded image change to a proper solution
-  margin: aspect-width(0.95);
+  margin: aspect-width(1);
 }
-.ProfilePicSquare {
-  max-width: aspect-width(6)!important; // avoids not taking space in flex
-  width: aspect-width(6);
-  height: aspect-width(6);
-  // border: $border-button-inactive;
-  border-radius: 4px;
+.ProfilePicMargin {
   margin: auto;
 }
-.ProfilePicMedium {
-  @extend .ProfilePicSquare;
-  max-width: 60px!important;
-  width: aspect-width(4);
-  height: aspect-width(4);
-  border: none;
-}
-.ProfilePicMediumWidth {
-  width: 60px!important;
-}
+
 .ProfilePicCircle {
   width: aspect-width(7.5);
   height: aspect-width(7.5);
-  object-fit: cover;
-  object-position: 50% 20%; //TODO this moves the image center for the rounded image change to a proper solution
-  clip-path: circle();
   margin: aspect-width(0.23);
-}
-.ProfilePicSmall {
-  @extend .ProfilePicSquare;
-  max-width: 40px!important; // avoids not taking space in flex
-  width: 40px;
-  height: 40px;
-  border: none;
-}
-.ProfilePicHeight {
-  // height: 40px;
-  // min-height: 40px!important;
-  // background-color: red;
-}
-
-.ProfilePicSelectButton {
-  color: $color-bright;
-  text-shadow: $text-shadow;
-  font-size: 1.5em;
-  width: 50%;
-  height: 100%;
-  cursor: pointer;
-  user-select: none;
-  padding-top: calc(50%);
-  margin: auto;
-}
-.ProfilePicSelectButton:hover {
-  color: $color-brightest;
-}
-.ProfilePicDisabled {
-  // @extend .Grayscale;
-  @extend .Sepia;
 }
 
 .ProfileStats {
   top: 0.3em;
   font-size: 1.3em;
   line-height: 1.1em;
+}
+
+.WalletHeader {
+  min-width: 350px;
 }
 
 .FormLabel {
@@ -1250,12 +1184,12 @@ $ui-container-gap: 1em;
 
 .ActivityPanel {
   @extend .NoMouse;
-  background-color: rgba($color-darkest, 0.5);
-  height: 50%;
+  background-color: rgba($color-darkest, 0.65);
+  height: 40%;
   width: 20%;
   position: absolute;
-  top: 16%;
-  right: 10px;
+  bottom: 5%;
+  right: 5%;
   border-radius: 10px;
   border: $border-button-inactive;
   padding: 5px 10px;
@@ -1272,6 +1206,7 @@ $ui-container-gap: 1em;
   right: 5px;
 }
 .ActivityFeed {
+  @extend .Scroller;
   // background-color: rgba(#f00, 0.2);
   height: calc(90% - 5px);
   width: calc(100% - 20px);
@@ -1357,7 +1292,7 @@ $ui-container-gap: 1em;
 .IconNoClick {
   color: $color-bright;
 	text-shadow: 0.1rem 0.1rem $color-shadow;
-  z-index: 1000;
+  z-index: 970;
 }
 .IconClick {
   @extend .IconNoClick, .Anchor;
@@ -1403,7 +1338,7 @@ $logo-url: '/logos/logo_avante.svg';
     background-color: $color-brightest!important;
   }
 }
-.CustomIconPng {
+.CustomIconSvg {
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -1412,6 +1347,10 @@ $logo-url: '/logos/logo_avante.svg';
   position: absolute;
   top: 0.2em;
   left: 0;
+}
+.CustomIconPng {
+  @extend .CustomIconSvg;
+  top: 0.2em;
 }
 
 .TransferIcon {
@@ -1425,55 +1364,6 @@ $logo-url: '/logos/logo_avante.svg';
   transition: transform .25s ease;
 }
 
-
-.CoinBig {
-  @extend .TitleCase, .H3, .Bold;//, .Number;
-}
-.Coin {
-  @extend .TitleCase, .H4;//, .Number;
-}
-.CoinSmall {
-  @extend .TitleCase, .H5, .Bold;//, .Number;
-}
-
-.ChancesBar {
-  width: 450px;
-  margin: auto!important;
-}
-
-.LethalBar {
-  background-color: $color-warning;
-  width: 0;
-  height: 21px;
-  position: absolute;
-  top: 0;
-  left:0;
-  // from .ui.progress .bar
-  border-radius: 0.28571429rem;
-  transition: width .1s ease, background-color .1s ease;
-  margin-left: 0.2em; // .ui.progress .bar > .progress
-}
-
-.SlotNumber {
-  font-size: 1.1em;
-  padding: 0.5em;
-  color: $color-brightest;
-}
-
-.TornaContents {
-  height: 310px;
-}
-.TornaImage {
-  @extend .Anchor;
-  height: 300px;
-  width: auto;
-  border: 5px solid #0000;
-}
-.TornaImageSelected {
-  @extend .TornaImage;
-  border: 5px solid $color-medium!important;
-}
-
 .CenteredPanel {
   background-color: rgba($color-darkest, 0.7);
   position: absolute;
@@ -1482,67 +1372,78 @@ $logo-url: '/logos/logo_avante.svg';
   width: 50%;
   height: 50%;
 }
-.TempRevealPanel {
-  @extend .YesMouse;
-  background-color: rgba($color-darkest, 0.7);
-  width: 300px;
-  height: 120px;
-  position: absolute;
-  bottom: -120px;
-  left: 0;
-  z-index: 1000;
-}
 
 .TempBarkeepOverlay {
   @extend .FillParent;
   @extend .AboveAll;
 }
 
-.TempBarkeepTalkBalloon {
+.DialogBalloon {
   width: aspect-width(25);
   height: auto;
   min-height: aspect-width(6.25);
-  border: aspect-width(0.1875) solid $color-dark;
-  background-color: $color-bright;
+  border: aspect-width(0.1875) solid var(--border-color);
+  background-color: var(--bg-color);
   color: $color-darkest;
   position: absolute;
-  top: 20%;
-  left: 25%;
+  top: 10%;
+  left: 20%;
   padding: aspect-width(0.4);
   font-size: aspect-width(1.6);
   text-shadow: $text-shadow;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -moz-border-radius: aspect-width(0.625);
-  -webkit-border-radius: aspect-width(0.625);
   border-radius: aspect-width(0.625);
+  z-index: 999;
+
+  &:before {
+    content:"";
+    position: absolute;
+    right: aspect-width(-1.875);
+    top: aspect-width(4.8125);
+    border-top: aspect-width(0.9375) solid transparent;
+    border-left: aspect-width(1.875) solid var(--border-color);
+    border-bottom: aspect-width(0) solid transparent;
+  }
+  
+  &:after {
+    content:"";
+    position: absolute;
+    right: aspect-width(-1.24);
+    top: aspect-width(5);
+    border-top: aspect-width(0.625) solid transparent;
+    border-left: aspect-width(1.25) solid var(--bg-color);
+    border-bottom: aspect-width(0) solid transparent;
+  }
+
+  .DialogBalloonText {
+    margin: aspect-width(2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 0;
+  }
 }
 
-.TempBarkeepTalkBalloon:before {
-  content:"";
-  position: absolute;
-  right: aspect-width(-1.875);
-  top: aspect-width(4.8125);
-  border-top: aspect-width(0.9375) solid transparent;
-  border-left: aspect-width(1.875) solid $color-dark;
-  border-bottom: aspect-width(0) solid transparent;
-}
-
-.TempBarkeepTalkBalloon:after {
-  content:"";
-  position: absolute;
-  right: aspect-width(-1.24);
-  top: aspect-width(5);
-  border-top: aspect-width(0.625) solid transparent;
-  border-left: aspect-width(1.25) solid $color-bright;
-  border-bottom: aspect-width(0) solid transparent;
+// For backwards compatibility
+.TempBarkeepTalkBalloon {
+  @extend .DialogBalloon;
+  --bg-color: #{$color-bright};
+  --border-color: #{$color-dark};
 }
 
 .TempBarkeepTalkBalloonText {
-  margin: aspect-width(2);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-height: 0;
+  @extend .DialogBalloonText;
+}
+
+.DemonTalkBaloon {
+  @extend .DialogBalloon;
+  top: 20%;
+  left: 5%;
+  font-size: aspect-width(2);
+  color: $color-bright;
+  z-index: 800;
+  --bg-color: #{$color-dark};
+  --border-color: #{$color-darkest};
 }
 
 .DialogOptionsContainer {
@@ -1644,6 +1545,19 @@ input::placeholder {
   background-color: $color-dark!important;
   // color: rgba($color-text, 0.75)!important;
   color: $color-text!important;
+  border: 1px solid $color-brightest !important;
+  min-height: aspect-width(2.4) !important;
+  display: flex !important;
+  align-items: center !important;
+  
+  &.selection > .dropdown.icon {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    top: 0 !important;
+    margin: 0 !important;
+    padding-right: aspect-width(0) !important;
+  }
 }
 .ui.selection.dropdown {
   color: $color-brightest!important;
@@ -1724,7 +1638,7 @@ input::placeholder {
 ._button {
   @extend ._button_shape, ._round_border, .TitleCase;
   font-family: $font-family;
-  background-color: rgba($color-dark, 0.6);
+  background-color: rgba($color-dark, 0.8);
   color: $color-text;
 }
 ._button_hover {
@@ -1920,6 +1834,9 @@ td {
 .ui.modal {
   @extend ._round_border_inactive;
 }
+.ui.basic.modal {
+  border: 0 !important;
+}
 .ui.modal>.header {
   @extend .Title;
   font-family: $font-family;
@@ -1941,6 +1858,11 @@ td {
 .ui.modal>.actions {
   background-color: $color-darkest;
 }
+
+.scrolling.dimmable>.dimmer {
+  justify-content: center !important;
+}
+
 .ui.header {
   @extend .TitleCase;
   font-family: $font-family;
@@ -1988,15 +1910,25 @@ a.active.step:hover,
 // <Segment>
 .ui.segment {
   @extend ._round_border;
-  background-color: $color-dark;
+  background-color: $color-darkest;
   border: 0.5px solid rgba($color-bright, 0.8)!important;
 }
 //
 // <ProgressBar>
-.ui.progress .bar {
-  background-color: $color-important;
-  min-width: 3em;
+.ui.progress {
+  --progress-value-width: 1.2;
+
+  &.hide-value {
+    --progress-value-width: 0;
+  }
+
+  .bar {  
+    background-color: $color-important;
+    min-width: aspect-width(var(--progress-value-width));
+    height: inherit;
+  }
 }
+
 // .ui.disaled.progress .bar {
 //   background-color: $color-inactive;
 // }
@@ -2004,12 +1936,12 @@ a.active.step:hover,
   @extend .TitleCase;
   font-family: $font-family;
   font-weight: 600;
-  font-size: 1.5em;
+  font-size: aspect-width(1.35);
   color: $color-brightest;
   text-shadow: $text-shadow;
-  margin-top: -0.65em;
-  margin-right: -0.2em;
-  z-index: 100;
+  margin-top: aspect-width(-0.9);
+  margin-right: aspect-width(-0.4);
+  // z-index: 100;
 }
 // <Divider>
 .ui.divider:not(.vertical):not(.horizontal) {
@@ -2018,6 +1950,144 @@ a.active.step:hover,
   border-top: 1px solid rgba($color-brightest, .15);
   border-bottom: 1px solid rgba($color-brightest, .25);
 }
+
+.TextDivider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1;
+  width: 100%;
+  height: aspect-height(0.1);
+
+  // Default border style
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    border-top: 1px solid rgba(black, 0.6) !important;
+    border-bottom: 1px solid rgba(black, 0.6) !important;
+    vertical-align: middle;
+  }
+
+  &::before {
+    margin-right: aspect-width(1);
+  }
+
+  &::after {
+    margin-left: aspect-width(1);
+  }
+
+  &:empty::before,
+  &:empty::after {
+    margin: 0;
+  }
+
+  // Border color variants
+  &.bright {
+    &::before, &::after {
+      border-color: rgba($color-brightest, 0.6) !important; 
+    }
+  }
+
+  &.dark {
+    &::before, &::after {
+      border-color: rgba($color-darkest, 0.6) !important;
+    }
+  }
+
+  &.important {
+    &::before, &::after {
+      border-color: rgba($color-important, 0.6) !important;
+    }
+  }
+
+  &.warning {
+    &::before, &::after {
+      border-color: rgba($color-warning, 0.6) !important;
+    }
+  }
+}
+
+.DuelDivider {
+  width: 110%;
+  margin: aspect-width(1) 0;
+  opacity: 0;
+}
+
+.DividerAnimation {
+  animation: fadeIn 1s ease-in forwards;
+
+  &::before {
+    animation: expandLineFromLeft 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-origin: left;
+  }
+
+  &::after {
+    animation: expandLineFromRight 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    transform-origin: right;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes expandLineFromLeft {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes expandLineFromRight {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+.LeaderboardsDivider {
+  width: 90%;
+  margin: 0 5%;
+  height: aspect-height(0.1);
+  margin-top: aspect-width(2);
+  color: $color-brightest;
+  font-size: aspect-width(1.4);
+
+  &.EqualMargin {
+    margin-bottom: aspect-width(3);
+  }
+}
+
+.NewChallengeDivider {
+  color: $color-brightest;
+  font-size: aspect-width(1.4);
+
+  &.Small {
+    font-size: aspect-width(1);
+  }
+
+  &.VerticalSpacing {
+    margin-top: aspect-width(0.6);
+    margin-bottom: aspect-width(0.6);
+  }
+
+  &.Centered {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 // <Popup>
 .ui.popup,
 .ui.label {
@@ -2235,4 +2305,310 @@ a.active.step:hover,
 .modal {
   position: fixed; /* Ensures the modal is fixed to the viewport */
   z-index: 9999 !important; /* High z-index to ensure it is on top */
+}
+
+.fadeIn {
+  opacity: 0;
+  -webkit-animation: fadeIn 0.2s;
+  animation: fadeIn 0.2s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.slideInFromTop {
+  opacity: 0;
+  -webkit-animation: slideInFromTop 0.5s ease forwards;
+  animation: slideInFromTop 0.5s ease forwards;
+  display: inline-block;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.slideInFromBottom {
+  opacity: 0;
+  -webkit-animation: slideInFromBottom 0.5s ease forwards; 
+  animation: slideInFromBottom 0.5s ease forwards;
+  display: inline-block;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+
+
+
+
+
+.tutorialDialogContainer {
+  position: absolute;
+  bottom: 0;
+  width: aspect-width(100);
+  height: aspect-height(25);
+  display: flex;
+  flex-direction: column;
+  // background-color: #fff;
+}
+
+.tutorialTextBackground {
+  position: absolute;
+  top: 0;
+  width: aspect-width(80);
+  height: aspect-height(30);
+  margin: 0 aspect-width(10);
+  background: radial-gradient(ellipse 70% 250% at 50% -10%, rgba(0,0,0,0.9) 0%, transparent 72%);
+  mask-image: linear-gradient(to top, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
+  z-index: 0;
+}
+
+.tutorialContent {
+  z-index: 1;
+}
+
+.speakerName {
+  height: aspect-height(7);
+  color: $color-warning;
+  font-weight: bold;
+  font-size: aspect-width(1.7);
+  padding: aspect-width(1);
+  text-align: center;
+}
+
+.tutorialDivider {
+  width: aspect-width(50);
+  height: aspect-height(0.1);
+  margin: 0 aspect-width(25);
+  background: $color-warning;
+}
+
+.textContainer {
+  max-width: aspect-width(60);
+  // background-color: #000;
+  font-size: aspect-width(1.5);
+  font-weight: 500;
+  margin: 0 auto;
+  text-align: center;
+  padding: aspect-width(1);
+}
+
+.indicator {
+  text-align: center;
+  font-size: aspect-width(1.5);
+  color: $color-warning;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  animation: blink 1s infinite;
+}
+
+.nextButton {
+  position: absolute;
+  bottom: aspect-width(1);
+  right: aspect-width(1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: aspect-width(0.5);
+  cursor: pointer;
+  transition: all 200ms ease;
+  transform: scale(1);
+}
+
+.nextButton:hover {
+  transform: scale(1.1);
+}
+
+.nextText {
+  font-size: calc(0.8vw + 0.8vh);
+  text-transform: uppercase;
+  color: white;
+}
+
+.nextIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: aspect-width(2);
+  height: aspect-height(2);
+  background-color: #333;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+  }
+}
+
+.nextIcon .svg {
+  width: 90%;
+  height: 90%;
+  fill: white;
+}
+
+
+@keyframes blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+
+// client/src/components/ui/duel/DuelTutorialOverlay.module.scss
+
+.tutorialOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.tutorialBackground {
+  position: absolute;
+  width: aspect-width(100);
+  height: aspect-height(100);
+  background-color: rgba(39, 17, 11, 0.7);
+  filter: brightness(0) saturate(100%) invert(0) sepia(1) hue-rotate(0deg) brightness(0.6) contrast(1);
+}
+
+.tutorialContainer {
+  width: aspect-width(80);
+  height: aspect-height(80);
+  background: url('/images/ui/duel/card_details/box_left.png') no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+  background-color: rgba(0, 0, 0, 0);
+  padding: aspect-width(2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tutorialTitle {
+  min-height: aspect-height(5);
+  font-size: aspect-width(1.8);
+  font-weight: 600;
+  color: $color-warning;
+  transition: opacity 0.3s ease;
+  text-transform: uppercase;
+  margin: 0 0;
+}
+
+.tutorialImage {
+  width: aspect-width(50);
+  height: aspect-height(50);
+  transition: opacity 0.3s ease;
+}
+
+.tutorialText {
+  max-width: aspect-width(60);
+  min-height: aspect-height(12);
+  max-height: aspect-height(12);
+  font-size: aspect-width(1.1);
+  overflow-y: hidden;
+  color: white;
+  text-align: center;
+  transition: opacity 0.3s ease;
+  margin: aspect-width(0.6) 0;
+  // -webkit-line-clamp: 4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+.tutorialNavigationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+}
+
+.tutorialDotsContainer {
+  display: flex;
+  gap: aspect-width(0.5);
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.tutorialDot {
+  width: aspect-width(1.2);
+  height: aspect-width(1.2);
+  transition: background-color 0.3s ease;
+  border-radius: 50%;
+}
+
+.tutorialDotActive {
+  background-color: $color-warning;
+  border: aspect-width(0.2) solid #ff8c00;
+}
+
+.tutorialDotPassed {
+  background-color: #b8860b;
+}
+
+.tutorialDotFuture {
+  background-color: #4a4a4a;
+}
+
+.tutorialButton {
+  color: $color-warning;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: aspect-width(1);
+  transition: color 0.3s ease, transform 0.3s ease;
+  outline: none;
+  &:focus {
+    outline: none;
+    border: none;
+  }
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.tutorialButtonDisabled {
+  color: #4a4a4a;
+  cursor: not-allowed;
 }

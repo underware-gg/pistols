@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useEffectOnce } from 'src/hooks/useEffectOnce'
+import { useEffectOnce } from 'src/utils/hooks/useEffectOnce'
 
 import ee from 'event-emitter'
 export var emitter = ee()

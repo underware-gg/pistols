@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
+import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 
@@ -49,8 +49,6 @@ export const ThreeJsCanvas = ({
 
   return (
     <div>
-      <div id='hidden-container' style={{ position: 'absolute', visibility: 'hidden'}}></div>
-
       <canvas
         id='gameCanvas'
         className='GameCanvas'

@@ -47,7 +47,7 @@ export async function elizaMessage({
     return data.map((message: any) => message.text as string)
   } catch (error) {
     console.error("elizaMessage() ERROR:", error);
-    return ['Agent is confused.']
+    return ['Pardon me, it\'s hard to hear you with all that noise.']
   }
 }
 

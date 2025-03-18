@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
-import { useAdminAmIOwner, useAdminIsOwner } from '/src/hooks/useContractCalls'
-import { FormInput } from '/src/components/ui/Form'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
+import { useAdminAmIOwner, useAdminIsOwner } from '/src/hooks/usePistolsContractCalls'
+import { useValidateWalletAddress } from '@underware/pistols-sdk/utils/hooks'
+import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/utils/starknet'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { STARKNET_ADDRESS_LENGTHS } from '@underware_gg/pistols-sdk/utils'
-import { useValidateWalletAddress } from '@underware_gg/pistols-sdk/hooks'
+import { FormInput } from '/src/components/ui/Form'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -22,14 +22,14 @@ export const OwnerForm = ({
   const { isOwner } = useAdminIsOwner(validatedAddress)
 
   const { account } = useAccount()
-  const { grant_admin } = useDojoSystemCalls()
+  const { admin } = useDojoSystemCalls()
   const { IAmOwner } = useAdminAmIOwner()
 
   const canGrant = (IAmOwner && isStarknetAddress && !isOwner)
   const canRevoke = (IAmOwner && isStarknetAddress && isOwner)
 
   const _grant = (granted: boolean) => {
-    grant_admin(account, validatedAddress, granted)
+    admin.grant_admin(account, validatedAddress, granted)
   }
 
   return (

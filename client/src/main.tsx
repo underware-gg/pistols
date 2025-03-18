@@ -2,23 +2,29 @@ import 'semantic-ui-css/semantic.min.css'
 import '/styles/fonts.scss'
 import '/styles/styles.scss'
 import '/styles/cards.scss'
+import '/styles/book.scss'
+import '/styles/poster.scss'
+import '/styles/interactiblecomponent.scss'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router'
-import { makeDojoAppConfig } from '@underware_gg/pistols-sdk/pistols'
 import { SettingsProvider } from '/src/hooks/SettingsContext'
 import { PistolsProvider } from '/src/hooks/PistolsContext'
-import { Dojo } from '@underware_gg/pistols-sdk/dojo'
 import ErrorModal from '/src/components/modals/ErrorModal'
 import MainPage from '/src/pages/MainPage'
-import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import AdminPage from '/src/pages/internal/AdminPage'
-import ConnectPage from '/src/pages/tests/ConnectPage'
-import IconsPage from '/src/pages/tests/IconsPage'
-import SignPage from '/src/pages/tests/SignPage'
-import TimestampPage from '/src/pages/tests/TimestampPage'
+import PoolsPage from '/src/pages/internal/PoolsPage'
+import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
 import ErrorPage from '/src/pages/error/ErrorPage'
+import TestPageIndex from '/src/pages/tests/TestPageIndex'
+import ConnectTestPage from '/src/pages/tests/ConnectTestPage'
+import IconsTestPage from '/src/pages/tests/IconsTestPage'
+import SignTestPage from '/src/pages/tests/SignTestPage'
+import TimestampTestPage from '/src/pages/tests/TimestampTestPage'
+import TokensTestPage from '/src/pages/tests/TokensTestPage'
+import ProfilesTestPage from '/src/pages/tests/ProfilesTestPage'
+import TutorialTestPage from '/src/pages/tests/TutorialTestPage'
 
 //
 // REF:
@@ -32,8 +38,20 @@ const router = createBrowserRouter([
       { path: "", element: <MainPage /> },
       { path: "gate", element: <MainPage /> },
       { path: "door", element: <MainPage /> },
+      { path: "door/:table_id", element: <MainPage /> },
       { path: "profile", element: <MainPage /> },
+      { path: "profile/:table_id", element: <MainPage /> },
       { path: "tavern", element: <MainPage /> },
+      { path: "leaderboards", element: <MainPage /> },
+      { path: "tutorial/entry", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/conflict", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/honour", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/barkeep", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/lection", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/demon", element: <MainPage tutorial={false} /> },
+      { path: "tutorial/resurrection", element: <MainPage tutorial={false} /> },
+      { path: "tutorial/duel", element: <MainPage tutorial={true} /> },
+      { path: "tutorial/duel/:duel_id", element: <MainPage tutorial={true} /> },
       { path: "tavern/:table_id", element: <MainPage /> },
       { path: "balcony", element: <MainPage /> },
       { path: "balcony/:table_id", element: <MainPage /> },
@@ -42,18 +60,16 @@ const router = createBrowserRouter([
       { path: "graveyard", element: <MainPage /> },
       { path: "graveyard/:table_id", element: <MainPage /> },
       { path: "duel/:duel_id", element: <MainPage /> },
+      { path: "dueldata/:duel_id", element: <DuelDataPage /> },
     ],
     errorElement: <ErrorPage />,
-  },
-  {
-    path: '/dueldata/:duel_id',
-    element: <DuelDataPage />,
   },
   // internal pages
   {
     path: '/internal',
     children: [
       { path: "admin", element: <AdminPage /> },
+      { path: "pools", element: <PoolsPage /> },
       { path: "snapshot", element: <SnapshotPage /> },
     ],
   },
@@ -61,10 +77,14 @@ const router = createBrowserRouter([
   {
     path: '/tests',
     children: [
-      { path: "connect", element: <ConnectPage /> },
-      { path: "icons", element: <IconsPage /> },
-      { path: "sign", element: <SignPage /> },
-      { path: "timestamp", element: <TimestampPage /> },
+      { path: "", element: <TestPageIndex /> },
+      { path: "tokens", element: <TokensTestPage /> },
+      { path: "profiles", element: <ProfilesTestPage /> },
+      { path: "tutorial", element: <TutorialTestPage /> },
+      { path: "connect", element: <ConnectTestPage /> },
+      { path: "timestamp", element: <TimestampTestPage /> },
+      { path: "icons", element: <IconsTestPage /> },
+      { path: "sign", element: <SignTestPage /> },
     ],
   },
 ]);
@@ -74,16 +94,12 @@ async function init() {
   if (!rootElement) throw new Error('React root not found');
   const root = ReactDOM.createRoot(rootElement as HTMLElement);
 
-  const dojoAppConfig = makeDojoAppConfig();
-
   root.render(
     <React.StrictMode>
       <SettingsProvider>
         <PistolsProvider>
-          <Dojo dojoAppConfig={dojoAppConfig}>
-            <RouterProvider router={router} />
-            <ErrorModal />
-          </Dojo>
+          <RouterProvider router={router} />
+          <ErrorModal />
         </PistolsProvider>
       </SettingsProvider>
     </React.StrictMode>

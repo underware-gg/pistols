@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Modal, Button, Image } from 'semantic-ui-react'
 import { useConnect, Connector, useAccount } from '@starknet-react/core'
-import { useChainSwitchCallbacks, useSelectedChain, getConnectorIcon } from '@underware_gg/pistols-sdk/dojo'
-import { useMounted } from '@underware_gg/pistols-sdk/hooks'
+import { useChainSwitchCallbacks, useStarknetContext, getConnectorIcon, useIsConnectedToSelectedNetwork } from '@underware/pistols-sdk/dojo'
+import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { Opener } from '/src/hooks/useOpener'
 import { VStack } from '/src/components/ui/Stack'
 import { Divider } from '/src/components/ui/Divider'
@@ -14,7 +14,7 @@ export default function StarknetConnectModal({
   opener: Opener
   walletHelp?: boolean
 }) {
-  const { isConnected, isCorrectChain } = useSelectedChain()
+  const { isConnected, isCorrectNetwork } = useIsConnectedToSelectedNetwork()
 
   // always closed on mount
   const mounted = useMounted(() => {
@@ -22,10 +22,10 @@ export default function StarknetConnectModal({
   })
 
   useEffect(() => {
-    if (isCorrectChain) {
+    if (isConnected) {
       opener.close()
     }
-  }, [isConnected, isCorrectChain])
+  }, [isConnected])
 
   return (
     <Modal
@@ -36,7 +36,7 @@ export default function StarknetConnectModal({
     >
       <Modal.Content>
         {!isConnected ? <ConnectButtons walletHelp={walletHelp} />
-          : !isCorrectChain ? <SwitchChainButtons />
+          : !isCorrectNetwork ? <SwitchChainButtons />
             : <></>
         }
       </Modal.Content>
@@ -49,12 +49,12 @@ function ConnectButtons({
 }: {
   walletHelp: boolean
 }) {
-  const { selectedChainName, selectedChainConfig } = useSelectedChain()
+  const { selectedNetworkConfig } = useStarknetContext()
   const { connect, connectors } = useConnect()
   const { isConnecting } = useAccount()
 
   let connectorsButtons = useMemo(() => connectors.reduce((acc, connector: Connector) => {
-    if (selectedChainConfig.connectorIds.includes(connector.id)) {
+    if (selectedNetworkConfig.connectorIds.includes(connector.id)) {
       acc.push(
         <Button key={connector.id} fluid size='huge'
           disabled={!connector.available() || isConnecting}
@@ -84,8 +84,8 @@ function ConnectButtons({
   return (
     <VStack>
       <div className='ModalText'>
-        {/* Connect to <b>{selectedChainName} ({selectedChainId})</b> */}
-        Connect to <b>{selectedChainName}</b>
+        {/* Connect to <b>{selectedNetworkConfig.name} ({selectedNetworkId})</b> */}
+        Connect to <b>{selectedNetworkConfig.name}</b>
       </div>
       <Divider content={'with'} />
       <VStack>
@@ -96,10 +96,7 @@ function ConnectButtons({
 }
 
 function SwitchChainButtons() {
-  const {
-    connectedChainId, connectedChainName,
-    selectedChainId, selectedChainName,
-  } = useSelectedChain()
+  const { selectedNetworkId, selectedNetworkConfig } = useStarknetContext()
   const { switch_starknet_chain, add_starknet_chain } = useChainSwitchCallbacks()
   const [chainExists, setChainExists] = useState(true)
   const [isBusy, setIsBusy] = useState(false)
@@ -144,10 +141,10 @@ function SwitchChainButtons() {
     <VStack>
       <div className='ModalText'>
         <p>
-          Connected to <b>{connectedChainName} ({connectedChainId})</b>
+          Connected to <b>{selectedNetworkConfig.name} ({selectedNetworkId})</b>
         </p>
         <p>
-          Need <b>{selectedChainName} ({selectedChainId})</b>
+          Need <b>{selectedNetworkConfig.name} ({selectedNetworkId})</b>
         </p>
       </div>
       <Divider />

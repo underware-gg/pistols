@@ -1,17 +1,19 @@
 {
   "name": "pistols-monorepo",
-  "version": "0.12.5",
-  "description": "Pistols at 10 Blocks monorepo",
+  "version": "0.13.5",
+  "description": "Pistols at Dawn monorepo",
   "homepage": "https://github.com/underware-gg/pistols",
   "author": "Underware",
   "license": "CC0",
   "private": true,
   "scripts": {
+    "sync": "turbo watch watch",
     "dev": "turbo watch dev",
-    "devs": "turbo watch devs"
+    "devs": "turbo watch devs",
+    "test": "cd sdk && pnpm test"
   },
   "devDependencies": {
-    "turbo": "^2.3.3"
+    "turbo": "^2.3.4"
   },
   "packageManager": "pnpm@9.0.0"
 }

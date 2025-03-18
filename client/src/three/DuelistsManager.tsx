@@ -4,7 +4,7 @@ import { DuelistState } from '/src/components/scenes/Duel'
 import { AudioName } from '/src/data/audioAssets'
 import { Action } from '/src/utils/pistols'
 import { Actor } from './SpriteSheetMaker'
-import { _sfxEnabled, AnimationState, emitter, playAudio } from './game'
+import { _sfxEnabled, AnimationState, emitter, playAudio, shakeCamera } from './game'
 import { ProgressDialogManager } from './ProgressDialog'
 
 const ACTOR_WIDTH = 2.5
@@ -29,7 +29,6 @@ interface Duelist {
 export class DuelistsManager {
   
   private scene: THREE.Scene
-  private camera: THREE.PerspectiveCamera
   private spriteSheets: any
 
   private mousePointer = new THREE.Vector2()
@@ -55,18 +54,14 @@ export class DuelistsManager {
   constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, spriteSheets: any) {
      
     this.scene = scene
-    this.camera = camera
     this.spriteSheets = spriteSheets
 
     this.loadDuelists()
-    this.setupCameraCardUI()
 
     const positionA = new THREE.Vector3(this.duelistA.actor.mesh.position.x, ACTOR_HEIGHT * (this.duelistA.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistA.actor.mesh.position.z)
     const positionB = new THREE.Vector3(this.duelistB.actor.mesh.position.x, ACTOR_HEIGHT * (this.duelistB.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistB.actor.mesh.position.z)
 
     this.duelProgressDialogManger = new ProgressDialogManager(scene, camera, positionA, positionB)
-
-    this.setupEvents()
   }
 
   private loadDuelists() {
@@ -80,38 +75,6 @@ export class DuelistsManager {
     this.duelistB.actor = new Actor(this.duelistB.model == CharacterType.MALE ? this.spriteSheets.MALE : this.spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, PACES_X_0, true)
     this.scene.add(this.duelistB.actor.mesh)
   }
-
-  private setupCameraCardUI() {
-    this.createDarkBackground()
-    //TODO add camera hand groups here already for easier managment??
-  }
-
-  createDarkBackground() {
-    const vFOV = THREE.MathUtils.degToRad(this.camera.fov * 0.5)
-    const height = 2 * Math.tan(vFOV) * Math.abs(-2)
-    const width = height * this.camera.aspect
-
-    const geometry = new THREE.PlaneGeometry(width, height)
-
-    const material = new THREE.MeshBasicMaterial({
-        color: 0x000000,
-        transparent: true,
-        opacity: 0.0,
-        side: THREE.DoubleSide,
-        depthTest: false
-    });
-
-    this.darkBackground = new THREE.Mesh(geometry, material);
-    this.darkBackground.position.z = -2
-    this.darkBackground.renderOrder = 500
-    this.darkBackground.name = "Background"
-
-    this.camera.add(this.darkBackground)
-  }
-
-  private setupEvents() {
-  }
-
 
   //-------------------------------------------
   // Game Loop
@@ -283,6 +246,8 @@ export class DuelistsManager {
           }
         }
       }
+    } else {
+      _updateB()
     }
 
     if (hasDuelistBShotThisRound) {
@@ -301,10 +266,13 @@ export class DuelistsManager {
           }
         }
       }
+    } else {
+      _updateA()
     }
   }
 
   private finishAnimation(healthA, healthB) {
+    console.log('finishAnimation', healthA, healthB)
     emitter.emit('animated', AnimationState.Finished)
     this.duelProgressDialogManger.hideDialogs()
     this.duelProgressDialogManger.showDialogEnd(healthA, healthB)
@@ -313,42 +281,47 @@ export class DuelistsManager {
   public animateActions(actionA: Action, actionB: Action, healthA: number, healthB: number) {
     if(this.showDialogsTimeout) clearTimeout(this.showDialogsTimeout)
     
-      const animA = this.getActionAnimName(actionA)
-      const animB = this.getActionAnimName(actionB)
+    const animA = this.getActionAnimName(actionA)
+    const animB = this.getActionAnimName(actionB)
 
-    // animate sprites
-    if (animB != AnimName.SEPPUKU || animA == AnimName.SEPPUKU) {
-      this.playActorAnimation(this.duelistA, animA, () => {
-        let survived = 0
-        if (animA != AnimName.SEPPUKU) {
-          if (healthB == 0) {
-            this.playActorAnimation(this.duelistB, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
-          } else if (healthB < 3) {
-            this.playActorAnimation(this.duelistB, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
-          } else {
-            survived++
-          }
-
-          if (healthA == 0) {
-            this.playActorAnimation(this.duelistA, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
-          } else if (healthA < 3) {
-            this.playActorAnimation(this.duelistA, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
-          } else {
-            survived++
-          }
-        } else {
-          this.finishAnimation(healthA, healthB)
-        }
-        if (survived == 2) emitter.emit('animated', AnimationState.Finished)
-      })
+    let survivedCount = 0
+    const checkBothSurvived = () => {
+      survivedCount++
+      if (survivedCount === 2) {
+        emitter.emit('animated', AnimationState.Finished)
+      }
     }
 
-    if (animA != AnimName.SEPPUKU || animB == AnimName.SEPPUKU) {
-      this.playActorAnimation(this.duelistB, this.getActionAnimName(actionB), () => {
-        if (animB == AnimName.SEPPUKU) {
-          this.finishAnimation(healthA, healthB)
-        }
-      })
+    // Handle seppuku cases first
+    if (animA === AnimName.SEPPUKU) {
+      this.playActorAnimation(this.duelistA, AnimName.SEPPUKU, () => this.finishAnimation(healthA, healthB))
+    }
+
+    if (animB === AnimName.SEPPUKU) {
+      this.playActorAnimation(this.duelistB, AnimName.SEPPUKU, () => this.finishAnimation(healthA, healthB))
+    }
+
+    if (animA == AnimName.SEPPUKU || animB == AnimName.SEPPUKU) {
+      return
+    }
+
+    // Handle normal combat animations
+    if (healthA === 0) {
+      this.playActorAnimation(this.duelistA, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
+    } else if (healthA < 3) {
+      this.playActorAnimation(this.duelistA, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
+      checkBothSurvived()
+    } else {
+      checkBothSurvived()
+    }
+
+    if (healthB === 0) {
+      this.playActorAnimation(this.duelistB, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
+    } else if (healthB < 3) {
+      this.playActorAnimation(this.duelistB, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
+      checkBothSurvived()
+    } else {
+      checkBothSurvived()
     }
   }
 
@@ -375,22 +348,27 @@ export class DuelistsManager {
     } else if (key == AnimName.DODGE_BACK) {
       movement.x = 0.352 * 2
     } else if (key == AnimName.SHOOT) {
-      onStart = () => { playAudio(AudioName.SHOOT, _sfxEnabled) }
+      onStart = () => { 
+        playAudio(AudioName.SHOOT, _sfxEnabled)
+        setTimeout(() => {
+          shakeCamera(150, 0.01)
+        }, 900)
+      }
     } else if ([AnimName.SHOT_DEAD_FRONT, AnimName.SHOT_DEAD_BACK, AnimName.STRUCK_DEAD].includes(key)) {
       if (key == AnimName.SHOT_DEAD_BACK) {
         if (duelist.model == CharacterType.MALE) {
-          movement.x = 0.088
-          movement.frames = 2
+          movement.x = 0.352 + 0.088
+          movement.frames = 8 + 2
         } else {
-          movement.x = 0.176
-          movement.frames = 4
+          movement.x = 0.352 + 0.176
+          movement.frames = 8 + 4
         }
       }
       onStart = () => { playAudio(AudioName.BODY_FALL, _sfxEnabled) }
     } else if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK, AnimName.STRUCK_INJURED].includes(key)) {
       if (key == AnimName.SHOT_INJURED_BACK) {
-        movement.x = 0.176
-        movement.frames = 4
+        movement.x = 0.352
+        movement.frames = 8
       }
       if (duelist.model == CharacterType.MALE) {
         onStart = () => { playAudio(AudioName.GRUNT_MALE, _sfxEnabled) }
@@ -419,21 +397,20 @@ export class DuelistsManager {
   //
 
   public dispose() {
-      this.duelistA = {
-        id: 'A',
-        model: undefined,
-        name: undefined,
-        actor: undefined
-      }
-      this.duelistB = {
-        id: 'B',
-        model: undefined,
-        name: undefined,
-        actor: undefined
-      }
+    this.duelistA = {
+      id: 'A',
+      model: undefined,
+      name: undefined,
+      actor: undefined
+    }
+    this.duelistB = {
+      id: 'B',
+      model: undefined,
+      name: undefined,
+      actor: undefined
+    }
 
-      this.scene = null
-      this.camera = null
-      this.spriteSheets = null
+    this.scene = null
+    this.spriteSheets = null
   }
 }

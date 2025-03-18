@@ -1,525 +1,305 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useImperativeHandle, useMemo, useRef } from 'react'
+import { BigNumberish } from 'starknet'
 import { useDuelist } from '/src/stores/duelistStore'
-import { useGameAspect } from '/src/hooks/useGameApect'
-import { AnimationData } from '/src/components/cards/Cards'
+import { useGameAspect } from '/src/hooks/useGameAspect'
+import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
+import { useGetSeasonScoreboard } from '/src/hooks/useScore'
+import { useFameBalanceDuelist } from '/src/hooks/useFame'
+import { usePlayer } from '/src/stores/playerStore'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { ArchetypeNames } from '/src/utils/pistols'
-import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
-import * as TWEEN from '@tweenjs/tween.js'
-import * as Constants from '/src/data/cardConstants'
+import { FameBalanceDuelist, FameProgressBar } from '/src/components/account/LordsBalance'
+import { ProfilePic } from '/src/components/account/ProfilePic'
+import { EmojiIcon } from '/src/components/ui/Icons'
+import { EMOJI } from '/src/data/messages'
+import { InteractibleComponent, InteractibleComponentHandle, InteractibleComponentProps } from '/src/components/InteractibleComponent'
+import { ProfileBadge } from '/src/components/account/ProfileDescription'
+import { Grid, GridRow, GridColumn } from 'semantic-ui-react'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { ActionButton } from '/src/components/ui/Buttons'
+import { ChallengeTableSelectedDuelist } from '/src/components/ChallengeTable'
+import { DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 
-interface DuelistCardProps {
+interface DuelistCardProps extends InteractibleComponentProps {
   duelistId: number
-  width?: number
-  height?: number
-  classes?: string
-  isLeft: boolean
-  isFlipped?: boolean
-  isVisible?: boolean
-  isSelected?: boolean
-  isDisabled?: boolean
-  isDraggable?: boolean
-  isHighlightable?: boolean
-  isBig?: boolean
-  isHanging?: boolean,
-  isHangingLeft?: boolean
-  shouldSwing?: boolean
-  instantFlip?: boolean
-  onHover?: (isHovered: boolean) => void
-  onClick?: (e: React.MouseEvent) => void
+  address?: BigNumberish
+  isSmall?: boolean
+  isAnimating?: boolean
+
+  showBack?: boolean
+  animateFlip?: (showBack: boolean) => void
 }
 
-export interface DuelistCardHandle {
-  flipCard: (flipped: boolean, degree: number, duration?: number, easing?: any, interpolation?: any) => void
-  setPosition: (x: number[] | number, y: number[] | number, duration?: number, easing?: any, interpolation?: any) => void
-  setCardScale: (scale: number[] | number, duration?: number, easing?: any, interpolation?: any) => void
-  setCardRotation: (rotation: number[] | number, duration?: number, easing?: any, interpolation?: any) => void
-  playHangingCard: () => void
-  setCardZIndex: (index: number, backgroundIndex?: number) => void
-  toggleVisibility: (isVisible: boolean) => void
-  toggleHighlight: (isHighlighted: boolean, color?: string) => void
-  toggleIdle: (isPlaying) => void
-  getStyle: () => {
-    translateX: number
-    translateY: number
-    rotation: number
-    scale: number
-  }
+export interface DuelistCardHandle extends InteractibleComponentHandle {
+  duelistId: number
 }
 
 export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((props: DuelistCardProps, ref: React.Ref<DuelistCardHandle>) => {
-  const { name, nameDisplay, profilePic, score } = useDuelist(props.duelistId)
-
-  const [spring, setSpring] = useState<AnimationData>({ dataField1: [], dataField2: [], duration: 0, easing: TWEEN.Easing.Quadratic.InOut, interpolation: TWEEN.Interpolation.Linear })
-  const [rotation, setRotation] = useState<AnimationData>({ dataField1: [], dataField2: [], duration: 0, easing: TWEEN.Easing.Quadratic.InOut, interpolation: TWEEN.Interpolation.Linear })
-  const [flipRotation, setFlipRotation] = useState<AnimationData>({ dataField1: [], dataField2: [], duration: 0, easing: TWEEN.Easing.Quadratic.InOut, interpolation: TWEEN.Interpolation.Linear })
-  const [scale, setScale] = useState<AnimationData>({dataField1: [], duration: 0})
-  const [isDragging, setIsDragging] = useState(false)
+  const { aspectWidth } = useGameAspect()
+  const { dispatchSelectPlayerAddress } = usePistolsContext()
   
-  const cardRef = useRef<HTMLDivElement>(null)
-  const hangingRef = useRef<HTMLDivElement>(null)
-  const cardBackgroundRef = useRef<HTMLDivElement>(null)
-  const springRef = useRef({ x: 0, y: 0 })
-  const rotationRef = useRef({ rotation: 0 })
-  const hangRotationRef = useRef({ rotation: Math.random() < 0.5 ? 
-        Math.random() * 20 - 30 : // Random between -30 and -10
-        Math.random() * 20 + 10   // Random between 10 and 30 
-  })
-  const nailRotationRef = useRef({ rotation: Math.random() * 30 - 15 })
-  const lastHangingRotationInteractionTimeRef = useRef(0)
-  const flipRotationRef = useRef({ rotation: 0 })
-  const scaleRef = useRef({ scale: 1 })
+  const { name, profilePic, profileType, isInAction } = useDuelist(props.duelistId)
+  const {isAlive} = useFameBalanceDuelist(props.duelistId)
+  const score = useGetSeasonScoreboard(props.duelistId)
 
-  const tweenMovementRef = useRef<TWEEN.Tween<{ x: number; y: number }>>()
-  const tweenRotationRef = useRef<TWEEN.Tween<{ rotation: number }>>()
-  const tweenHangRotationRef = useRef<TWEEN.Tween<{ rotation: number }>>()
-  const tweenFlipRotationRef = useRef<TWEEN.Tween<{ rotation: number }>>()
-  const tweenScaleRef = useRef<TWEEN.Tween<{ scale: number }>>()
-  const idleTweenRef = useRef<TWEEN.Tween<{ x: number; y: number }> | null>(null)
-  const initialLoad = useRef<boolean>(true)
-
-  const { boxW, boxH, aspectWidth } = useGameAspect()
-
-  const [randomOffset] = useState(() => {
-    if (props.isHangingLeft == true) {
-      return aspectWidth(props.width) * (Math.random() * -0.4)
-    } else if (props.isHangingLeft == false) {
-      return aspectWidth(props.width) * (Math.random() * 0.4)
-    } else {
-      return aspectWidth(props.width) * (Math.random() * 0.4 - 0.20)
-    }
-  })
+  const { owner } = useOwnerOfDuelist(props.duelistId)
+  const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
   
   const archetypeImage = useMemo(() => {
     let imageName = 'card_circular_' + (ArchetypeNames[score.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[score.archetype].toLowerCase())
     return '/textures/cards/' + imageName + '.png'
   }, [score])
 
+  const winPercentage = useMemo(() => {
+    if (!score.total_duels || score.total_duels === 0) return '0%'
+    return `${((score.total_wins / score.total_duels) * 100).toFixed(1)}%`
+  }, [score.total_duels, score.total_wins])
+
+  const lossPercentage = useMemo(() => {
+    if (!score.total_duels || score.total_duels === 0) return '0%'
+    return `${(((score.total_losses + score.total_draws) / score.total_duels) * 100).toFixed(1)}%`
+  }, [score.total_duels, score.total_losses, score.total_draws])
+
+  const baseRef = useRef<InteractibleComponentHandle>(null);
 
   useImperativeHandle(ref, () => ({
-    flipCard,
-    setPosition,
-    setCardScale,
-    setCardRotation,
-    setCardZIndex,
-    toggleVisibility,
-    toggleHighlight,
-    playHangingCard,
-    toggleIdle,
-    getStyle: () => ({
-      translateX: springRef.current.x,
-      translateY: springRef.current.y,
-      rotation: rotationRef.current.rotation,
-      scale: scaleRef.current.scale
-    }),
-  }))
-
-  useEffect(() => {
-    if (props.isHanging && hangingRef.current) {
-      hangingRef.current.style.setProperty('--hang-rotation', `${hangRotationRef.current.rotation}deg`)
-    } else if (!props.isHanging) {
-      hangRotationRef.current.rotation = 0
-      hangingRef.current.style.setProperty('--hang-rotation', '0deg')
-    }
-  }, [hangingRef, props.isHanging])
-
-  useEffect(() => {
-    if (cardRef.current) {
-      cardRef.current?.style.setProperty('--card-width', `${aspectWidth(props.width)}px`)
-      cardRef.current?.style.setProperty('--card-height', `${aspectWidth(props.height)}px`)
-      
-      cardBackgroundRef.current.style.setProperty('--card-width', `${aspectWidth(props.width)}px`)
-      cardBackgroundRef.current.style.setProperty('--card-height', `${aspectWidth(props.height)}px`)
-
-      hangingRef.current.style.setProperty('--card-width', `${aspectWidth(props.width)}px`)
-      hangingRef.current.style.setProperty('--card-height', `${aspectWidth(props.height)}px`)
-      hangingRef.current.style.setProperty('--random-offset', `${randomOffset}px`)
-    }
-  }, [props.width, props.height, aspectWidth, randomOffset])
-
-  useEffect(() => {
-    if (cardRef.current) {
-      if (tweenMovementRef.current) {
-        tweenMovementRef.current.stop()
-      }
-
-      tweenMovementRef.current = new TWEEN.Tween(springRef.current)
-        .to({ x: spring.dataField1, y: spring.dataField2 }, spring.duration)
-        .easing(spring.easing)
-        .interpolation(spring.interpolation)
-        .onUpdate((value) => {
-          cardRef.current?.style.setProperty('--card-translate-x', `${value.x}px`)
-          cardRef.current?.style.setProperty('--card-translate-y', `${value.y}px`)
-          if (cardBackgroundRef.current) {
-            cardBackgroundRef.current.style.setProperty('--card-translate-x', `${value.x}px`)
-            cardBackgroundRef.current.style.setProperty('--card-translate-y', `${value.y}px`)
-          }
-        })
-        .start()
-    }
-  }, [spring])
-
-  useEffect(() => {
-    if (cardRef.current) {
-      if (tweenRotationRef.current) {
-        tweenRotationRef.current.stop()
-      }
-
-      tweenRotationRef.current = new TWEEN.Tween(rotationRef.current)
-        .to({ rotation: rotation.dataField1 }, rotation.duration)
-        .easing(rotation.easing)
-        .interpolation(rotation.interpolation)
-        .onUpdate((value) => {
-          cardRef.current?.style.setProperty('--card-rotation', `${value.rotation}deg`)
-          if (cardBackgroundRef.current) {
-            cardBackgroundRef.current.style.setProperty('--card-rotation', `${value.rotation}deg`)
-          }
-        })
-        .start()
-    }
-  }, [rotation])
-
-  useEffect(() => {
-    if (cardRef.current) {
-      if (tweenFlipRotationRef.current) {
-        tweenFlipRotationRef.current.stop()
-      }
-
-      tweenFlipRotationRef.current = new TWEEN.Tween(flipRotationRef.current)
-        .to({ rotation: flipRotation.dataField1 }, flipRotation.duration)
-        .easing(flipRotation.easing)
-        .interpolation(flipRotation.interpolation)
-        .onUpdate((value) => {
-          const innerElement = cardRef.current?.querySelector('.card-inner') as HTMLElement
-          innerElement?.style.setProperty('--card-flip-rotation', `${value.rotation}deg`);
-        })
-        .start()
-    }
-  }, [flipRotation])
-
-  useEffect(() => {
-    flipCard(props.isFlipped, props.isLeft ? Constants.CARD_FLIP_ROTATION : -Constants.CARD_FLIP_ROTATION, props.instantFlip ? 0 : Constants.CARD_BASE_FLIP_DURATION)
-  }, [props.isFlipped])
-
-  useEffect(() => {
-    if (cardRef.current) {
-      if (tweenScaleRef.current) {
-        tweenScaleRef.current.stop()
-      }
-
-      tweenScaleRef.current = new TWEEN.Tween(scaleRef.current)
-        .to({ scale: scale.dataField1 }, scale.duration)
-        .easing(scale.easing)
-        .interpolation(scale.interpolation)
-        .onUpdate((value) => {
-          cardRef.current?.style.setProperty('--card-scale', `${value.scale}`)
-          if (cardBackgroundRef.current) {
-            cardBackgroundRef.current.style.setProperty('--card-scale', `${value.scale}`)
-          }
-        })
-        .start()
-    }
-  }, [scale])
-
-  useEffect(() => {
-    toggleVisibility(props.isVisible)
-  }, [props.isVisible])
-
-  useEffect(() => {
-    playHangingCard()
-  }, [props.isHanging])
-
-  const flipCard = (flipped = false, degree = 0, duration = Constants.CARD_BASE_FLIP_DURATION, easing = TWEEN.Easing.Quadratic.InOut, interpolation = TWEEN.Interpolation.Linear) => {
-    setFlipRotation({ dataField1: [flipped ? degree : 0], duration: duration, easing: easing, interpolation: interpolation })
-  }
-
-  const toggleHighlight = (isHighlighted: boolean, color?: string)  => {
-    if (cardRef.current?.style.opacity != '1') return
-    if (isHighlighted) {
-      cardBackgroundRef.current.style.opacity = '1'
-      cardBackgroundRef.current.style.setProperty('--background-color', 'white')
-    } else {
-      cardBackgroundRef.current.style.opacity = '0'
-    }
-  }
-
-  const toggleVisibility = (isVisible)  => {
-    if (!cardRef.current) return
-
-    if (isVisible) {
-      cardRef.current.style.opacity = '1'
-    } else {
-      cardRef.current.style.opacity = '0'
-    }
-  }
-
-  const playHangingCard = () => {
-    if (!props.isHanging) return
-    const animateHanging = (startAngle: number) => {
-      if (!hangingRef.current) return
-      
-      if (tweenHangRotationRef.current) {
-        tweenHangRotationRef.current.stop()
-      }
-
-       const percentage = Math.abs(randomOffset) / (aspectWidth(props.width) * 0.15)
-      const targetRestAngle = randomOffset < 0 ? percentage * 3 : percentage * -3
-
-      let targetAngle;
-      if (Math.abs(startAngle - targetRestAngle) < 2) {
-        targetAngle = startAngle + (startAngle < targetRestAngle ? Math.random() : - Math.random())
-      } else {
-        targetAngle = (startAngle / 3) * -2
-      }
-
-      if (props.shouldSwing == false && initialLoad.current) {
-        hangRotationRef.current.rotation = targetRestAngle
-        initialLoad.current = false
-        hangingRef.current?.style.setProperty('--hang-rotation', `${targetRestAngle}deg`) 
-        animateHanging(targetRestAngle)
-      } else {
-        tweenHangRotationRef.current = new TWEEN.Tween(hangRotationRef.current)
-          .to({ rotation: targetAngle }, 1000)
-          .easing(TWEEN.Easing.Quadratic.InOut)
-          .onUpdate((value) => {
-            hangingRef.current?.style.setProperty('--hang-rotation', `${value.rotation}deg`)
-          })
-          .onComplete(() => {
-            animateHanging(targetAngle)
-          })
-          .start()
-      }
-    }
-
-    animateHanging(hangRotationRef.current.rotation)
-  }
-
-  const toggleIdle = (isPlayingIdle: boolean) => {
-    const innerElement = cardRef.current?.querySelector('.card-inner') as HTMLElement
-    const backgroundElement = cardBackgroundRef?.current
-
-    if (idleTweenRef.current) {
-      idleTweenRef.current.stop()
-      idleTweenRef.current = null
-    }
-
-    if (isPlayingIdle) {
-      const animateIdle = () => {
-        const range = aspectWidth(Constants.IDLE_RANGE)
-        const startRange = -range / 2
-        const duration = (1 + Math.random()) * Constants.IDLE_DURATION
-
-        const newTarget = {
-          x: Array.from({ length: Constants.IDLE_LENGTH }, () => startRange + Math.random() * range),
-          y: Array.from({ length: Constants.IDLE_LENGTH }, () => startRange + Math.random() * range)
-        }
-
-        idleTweenRef.current = new TWEEN.Tween({ x: 0, y: 0 })
-          .to(newTarget, duration)
-          .interpolation(TWEEN.Interpolation.CatmullRom)
-          .easing(TWEEN.Easing.Sinusoidal.InOut)
-          .onUpdate((value) => {
-            if (innerElement) {
-              innerElement?.style.setProperty('--idle-translate-x', `${value.x}px`)
-              innerElement?.style.setProperty('--idle-translate-y', `${value.y}px`)
-            }
-            if (backgroundElement) {
-              backgroundElement.style.setProperty('--idle-translate-x', `${value.x}px`)
-              backgroundElement.style.setProperty('--idle-translate-y', `${value.y}px`)
-            }
-          })
-          .onComplete(animateIdle)
-          .start()
-      }
-
-      animateIdle()
-    } else {
-      if (innerElement) {
-        innerElement?.style.setProperty('--idle-translate-x', '0px')
-        innerElement?.style.setProperty('--idle-translate-y', '0px')
-      }
-      if (backgroundElement) {
-        backgroundElement.style.setProperty('--idle-translate-x', '0px')
-        backgroundElement.style.setProperty('--idle-translate-y', '0px')
-      }
-    }
-  }
-
-  const setPosition = (x: number[] | number, y: number[] | number, duration = Constants.CARD_BASE_POSITION_DURATION, easing = TWEEN.Easing.Quadratic.InOut, interpolation = TWEEN.Interpolation.Linear) => {
-    setSpring({ dataField1: Array.isArray(x) ? x : [x], dataField2: Array.isArray(y) ? y : [y], duration: duration, easing: easing, interpolation: interpolation })
-  }
-
-  const setCardRotation = (rotation: number[] | number, duration = Constants.CARD_BASE_ROTATION_DURATION, easing = TWEEN.Easing.Quadratic.InOut, interpolation = TWEEN.Interpolation.Linear) => {
-    setRotation({ dataField1: Array.isArray(rotation) ? rotation : [rotation], duration: duration, easing: easing, interpolation: interpolation })
-  }
-
-  const setCardScale = (scale: number[] | number, duration = Constants.CARD_BASE_SCALE_DURATION, easing = TWEEN.Easing.Quadratic.InOut, interpolation = TWEEN.Interpolation.Linear) => {
-    setScale({ dataField1: Array.isArray(scale) ? scale : [scale], duration: duration, easing: easing, interpolation: interpolation })
-  }
-
-  const setCardZIndex = (index: number, backgroundIndex?: number) => {
-    cardRef.current?.style.setProperty('--card-z-index', index.toString())
-    if (cardBackgroundRef.current) {
-      cardBackgroundRef.current.style.setProperty('--card-z-index', backgroundIndex ? backgroundIndex.toString() : index.toString())
-    }
-  }
-
-  const handleMouseEnter = (e: React.MouseEvent) => {
-    if (isDragging) return
+    flip: (flipped, isLeft, duration, easing, interpolation) =>
+      baseRef.current?.flip(flipped, isLeft, duration, easing, interpolation),
+    setPosition: (x, y, duration, easing, interpolation) =>
+      baseRef.current?.setPosition(x, y, duration, easing, interpolation),
+    setScale: (scale, duration, easing, interpolation) =>
+      baseRef.current?.setScale(scale, duration, easing, interpolation),
+    setRotation: (rotation, duration, easing, interpolation) =>
+      baseRef.current?.setRotation(rotation, duration, easing, interpolation),
+    setZIndex: (index, backgroundIndex) =>
+      baseRef.current?.setZIndex(index, backgroundIndex),
+    toggleVisibility: (isVisible) =>
+      baseRef.current?.toggleVisibility(isVisible),
+    toggleHighlight: (isHighlighted, shouldBeWhite, color) =>
+      baseRef.current?.toggleHighlight(isHighlighted, shouldBeWhite, color),
+    toggleDefeated: (isDefeated) =>
+      baseRef.current?.toggleDefeated(isDefeated),
+    playHanging: () => baseRef.current?.playHanging(),
+    toggleIdle: (isPlaying) => baseRef.current?.toggleIdle(isPlaying),
+    toggleBlink: (isBlinking, duration) => baseRef.current?.toggleBlink(isBlinking, duration),
+    getStyle: () => baseRef.current?.getStyle() || { translateX: 0, translateY: 0, rotation: 0, scale: 1 },
     
-    if (props.isHanging && Date.now() - lastHangingRotationInteractionTimeRef.current > 2000) {
-      const cardRect = cardRef.current?.getBoundingClientRect()
-      if (!cardRect) return
+    duelistId: props.duelistId
+  }));
 
-      const cardCenterX = cardRect.left + cardRect.width / 2
-      const isFromLeft = e.clientX < cardCenterX
-
-      if (tweenHangRotationRef.current) {
-        tweenHangRotationRef.current.stop()
-      }
-
-      tweenHangRotationRef.current = new TWEEN.Tween(hangRotationRef.current)
-        .to({ rotation: isFromLeft ? Math.max(hangRotationRef.current.rotation - (Math.random() * 8 + 8), -40) : Math.min(hangRotationRef.current.rotation + (Math.random() * 8 + 8), 40) }, 600)
-        .easing(TWEEN.Easing.Quadratic.InOut)
-        .onUpdate((value) => {
-          hangingRef.current?.style.setProperty('--hang-rotation', `${value.rotation}deg`)
-        })
-        .onComplete(() => {
-          playHangingCard()
-        })
-        .start()
-
-      lastHangingRotationInteractionTimeRef.current = Date.now()
-    }
-
-    if (props.isHighlightable) toggleHighlight(true)
-    props.onHover && props.onHover(true)
+  const _nameLength = (name: string) => {
+    return name ? Math.floor(name.length / 10) : 31
   }
 
-  const handleMouseLeave = () => {
-    if (isDragging) return
-    if (props.isHighlightable && !props.isSelected) toggleHighlight(false)
-    props.onHover && props.onHover(false)
-  }
-
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    const startX = e.clientX - springRef.current.x
-    const startY = e.clientY - springRef.current.y
-    
-    const startClientX = e.clientX
-    const startClientY = e.clientY
-    const startTime = Date.now()
-    let mouseMove = false
-    
-    const oldPositionX = springRef.current.x
-    const oldPositionY = springRef.current.y
-    const startRotation = rotation
-    const startScale = scale
-
-    const width = aspectWidth(props.width)
-    const height = aspectWidth(props.height)
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const newX = e.clientX - startX
-      const newY = e.clientY - startY
-
-      const deltaX = Math.abs(startClientX - e.clientX)
-      const deltaY = Math.abs(startClientY - e.clientY)
-
-      if ((deltaX > 10 || deltaY > 10) && !mouseMove && props.isDraggable) {
-        mouseMove = true
-        setIsDragging(true)
-        setCardRotation(0)
-        setCardScale(1.8)
-      }
-
-      if (mouseMove) {
-        const limitedX = Math.max((-window.innerWidth / 2) + boxW + (width / 2), Math.min(newX, (window.innerWidth / 2) - boxW - (width / 2)))
-        const limitedY = Math.max((-window.innerHeight / 2) + boxH + (height / 2), Math.min(newY, (window.innerHeight / 2) - boxH - (height / 2)))
-
-        setSpring({ dataField1: [limitedX], dataField2: [limitedY], duration: 0, easing: TWEEN.Easing.Quadratic.InOut })
-      }
-    }
-
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-
-      const endTime = Date.now()
-      setIsDragging(false)
-
-      if (endTime - startTime < 150 && !mouseMove) {
-        props.onClick && props.onClick(e)
-      } else if (mouseMove) {
-        setPosition(oldPositionX, oldPositionY, Constants.CARD_POSITION_RESET_DURATION)
-        setRotation(startRotation)
-        setScale(startScale)
-
-        handleMouseLeave()
-      }
-    }
-
-    document.addEventListener('mousemove', handleMouseMove)
-    document.addEventListener('mouseup', handleMouseUp)
-  }, [props.isDraggable, spring, boxW, boxH, props.width, props.height, scale, rotation, props.onClick])
-
-  const testName = '1234567890123456789012345678901'
+  //Just works this way, ask @mataleone why hahaha - stolen from duelist.tsx
+  const SVG_WIDTH = 771;
+  const SVG_HEIGHT = 1080;
 
   return (
-    <div className='duelist-card-container'>
-      {props.isHanging && <div className="duelist-nail" style={{ 
-        width: aspectWidth(0.6),
-        height: aspectWidth(1.2),
-        left: aspectWidth(props.width) / 2 - aspectWidth(0.3) + randomOffset,
-        top: aspectWidth(props.height) * 0.03 - aspectWidth(1.2),
-        transform: `rotate(${nailRotationRef.current.rotation}deg)` 
-      }}>
-        <div className="duelist-nail-point" style={{
-          width: aspectWidth(0.2),
-          height: aspectWidth(1),
-          left: aspectWidth(0.2),
-          top: aspectWidth(0.2),
-          }}/>
-        <div className="duelist-nail-point" style={{
-          width: aspectWidth(0.6),
-          height: aspectWidth(0.4),
-          left: 0,
-          top: 0,
-          zIndex: 10,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-        }}/>
-      </div>}
-      <div 
-        ref={hangingRef} 
-        className='card-hanging-container'
-      >
-        <div className='card' ref={cardBackgroundRef}>
-          <div className='card-outline'/>
-        </div>
-        <div 
-          ref={cardRef}
-          className='card'
-          onMouseDown={handleMouseDown}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className="card-inner">
-            <div className="card-front NoMouse NoDrag">
-              <div id='card-filter-overlay' className={props.isSelected ? 'visible selected' : 'selected'} />
-              <img id='card-filter-overlay' className={props.isDisabled ? 'visible' : ''} src='/textures/cards/card_disabled.png' />
-              {/* <div id='card-filter-overlay' className={props.isDisabled ? 'visible disabled' : 'disabled'} /> */}
-              <img className='duelist-card-image-drawing NoMouse NoDrag' src={`/profiles/square/${('00' + profilePic).slice(-2)}.jpg`} alt="Profile Picture" />
-              <img className='card-image-front NoMouse NoDrag' src={archetypeImage} alt="Card Front" />
-              <div className="duelist-card-details">
-                <div className="duelist-name" data-contentlength={name ? Math.floor(name.length / 10) : 31}>{name}</div>
+    <InteractibleComponent
+      width={aspectWidth(props.width)}
+      height={aspectWidth(props.height)}
+      isLeft={props.isLeft}
+      isFlipped={props.isFlipped}
+      isVisible={props.isVisible}
+      isSelected={props.isSelected}
+      isDisabled={props.isDisabled}
+      isDraggable={props.isDraggable}
+      isHighlightable={props.isHighlightable}
+      isHanging={props.isHanging}
+      isHangingLeft={props.isHangingLeft}
+      shouldSwing={props.shouldSwing}
+      instantFlip={props.instantFlip}
+      instantVisible={props.instantVisible}
+      hasBorder={true}
+      mouseDisabled={!props.isSmall}
+      hasCenteredOrigin={props.hasCenteredOrigin}
+      onHover={props.onHover}
+      onClick={props.onClick}
+      frontImagePath={archetypeImage}
+      backgroundImagePath={"/textures/cards/card_back.png"}
+      defaultHighlightColor={props.defaultHighlightColor}
+      startPosition={props.startPosition}
+      startRotation={props.startRotation}
+      startScale={props.startScale}
+      ref={baseRef}
+      childrenBehindFront={
+        <>
+          <ProfilePic profileType={profileType} profilePic={profilePic} width={(props.width ?? DUELIST_CARD_WIDTH) * 0.7} disabled={!isAlive} removeBorder removeCorners removeShadow className='duelist-card-image-drawing'/>
+          <img id='DuelistDeadOverlay' className={ `Left ${!isAlive ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+        </>
+      }
+      childrenInFront={
+        <>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+            preserveAspectRatio="xMinYMin meet"
+          >
+            <style>
+              {`
+                text{
+                  fill:#200;
+                  text-shadow:0.05rem 0.05rem 2px #2008;
+                  font-size:28px;
+                  font-family:Garamond;
+                  dominant-baseline:middle;
+                  text-anchor:middle;
+                  -webkit-user-select:none;
+                  -moz-user-select:none;
+                  -ms-user-select:none;
+                  user-select:none;
+                }
+                .DuelistNameSVG{
+                  font-weight:bold;
+                  font-variant-caps:small-caps;
+                }
+              `}
+            </style>
+            <path id="circle" d={`M${92},350a200,200 0 1,1 ${SVG_WIDTH - 184},0`} fill="none" stroke="none" />
+            <text 
+              className="DuelistNameSVG" 
+              style={{
+                fontSize: `${Math.min(60, 460 / (name.length * 0.5))}px`
+              }}
+            >
+              <textPath startOffset="50%" xlinkHref="#circle">
+                {name}
+              </textPath>
+            </text>
+          </svg>
+
+          {/* <DuelistTokenArt duelistId={props.duelistId} className='Absolute' /> */}
+          <div className='InDuelEmoji'>
+            {isInAction &&
+              <EmojiIcon emoji={EMOJI.IN_ACTION} size={props.isSmall ? 'small' : 'big'} />
+            }
+            {!isAlive &&
+              <EmojiIcon emoji={EMOJI.DEAD} size={props.isSmall ? 'small' : 'big'} />
+            }
+          </div>
+          <div className='HounourCircle'>
+            <ProfileBadge duelistId={props.duelistId} />
+          </div>
+          <div className="duelist-card-details">
+            {props.isSmall ? (
+              <>
                 <div className="duelist-fame">
                   <FameBalanceDuelist duelistId={props.duelistId} />
                 </div>
-              </div>
-            </div>
-            <div className="card-back NoMouse NoDrag"></div>
+                <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} height={props.height * 0.1} hideValue />
+                <div className="duelist-name small" data-contentlength={_nameLength(playerName)}>{playerName}</div>
+              </>
+            ) : (
+              <>
+                <div className="duelist-fame">
+                  <FameBalanceDuelist duelistId={props.duelistId} size='huge' />
+                </div>
+                <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} />
+                
+                <div className="TextDivider CardDivider">Stats</div>
+                
+                <Grid className='NoMargin' columns={2} divided style={{ width: '96%' }}>
+                  <GridColumn>
+                    <Grid className='NoMargin'>
+                      <GridRow>
+                        <GridColumn className='Bold' textAlign='left' width={5}>Owner:</GridColumn>
+                        <GridColumn className="Anchor Black" textAlign='right' width={11} onClick={() => {
+                          dispatchSelectPlayerAddress(owner)
+                        }}>{playerName}</GridColumn>
+                      </GridRow>
+                      <GridRow>
+                        <GridColumn className='Bold' textAlign='left' width={6}>Honour:</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{score.honour}/10</GridColumn>
+                      </GridRow>
+                      <GridRow>
+                        <GridColumn className='Bold' textAlign='left' width={6}>Archetype:</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{ArchetypeNames[score.archetype]}</GridColumn>
+                      </GridRow>
+                    </Grid>
+                  </GridColumn>
+                  
+                  <GridColumn>
+                    <Grid className='NoMargin'>
+                      <GridRow>
+                        <GridColumn className='Bold' textAlign='left' width={6}>Duels:</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{score.total_duels}</GridColumn>
+                      </GridRow>
+                      <GridRow>
+                        <GridColumn className='Bold' textAlign='left' width={6}>Wins:</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{score.total_wins} ({winPercentage})</GridColumn>
+                      </GridRow>
+                      <GridRow>
+                        <GridColumn className='Bold' textAlign='left' width={6}>Losses:</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{score.total_losses + score.total_draws} ({lossPercentage})</GridColumn>
+                      </GridRow>
+                    </Grid>
+                  </GridColumn>
+                </Grid>
+                <div className={`duels-button-container padded ${props.isAnimating ? '' : 'visible'}`}>
+                  <ActionButton 
+                    className='NoMargin YesMouse' 
+                    large 
+                    fillParent 
+                    important
+                    label='Show Duels'
+                    onClick={() => {
+                      props.animateFlip(true)
+                    }} 
+                  />
+                </div>
+              </>
+            )}
           </div>
-        </div>
-      </div>
-    </div>
+        </>
+      }
+      childrenInBack={(props.showBack || props.isAnimating) && (
+        !props.isSmall ? (
+          <>
+            <div className={`duels-button-container ${props.isAnimating ? '' : 'visible'}`}>
+              <ActionButton 
+                className='NoMargin YesMouse' 
+                large 
+                fillParent 
+                important={false}
+                label='Hide Duels'
+                onClick={() => {
+                  props.animateFlip(false)
+                }} 
+              />
+            </div>
+            <div className="duelist-card-overlay YesMouse">
+              <ChallengeTableSelectedDuelist compact />
+            </div>
+          </>
+        ) : (
+          <div style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(59, 42, 35, 0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: aspectWidth(6),
+            color: '#ffd700',
+            borderRadius: aspectWidth(0.5),
+            border: '2px dashed rgba(255, 215, 0, 0.6)',
+            boxShadow: '0 0 20px rgba(255, 215, 0, 0.3), inset 0 0 30px rgba(0,0,0,0.5)',
+            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              position: 'absolute',
+              width: '200%',
+              height: '200%',
+              background: 'radial-gradient(circle, rgba(255,215,0,0.05) 0%, transparent 70%)',
+            }}/>
+            ?
+          </div>
+        )
+      )}
+    />
   )
 })

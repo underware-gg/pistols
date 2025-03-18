@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
-import { useConnectedController } from '@underware_gg/pistols-sdk/dojo'
+import { useConnectedController } from '@underware/pistols-sdk/dojo'
 import { useElizaMessage } from '/src/utils/eliza'
 import AnimatedText from '/src/components/ui/AnimatedText'
 
@@ -29,7 +29,7 @@ export default function BarkeepModal({ open, setOpen }) {
   return (
     <div className='TempBarkeepOverlay NoMouse NoDrag'>
       <div className='TempBarkeepTalkBalloon Relative'>
-        <AnimatedText text={displayText} duration={30} />
+        <AnimatedText text={displayText} delayPerCharacter={30} />
       </div>
 
       <div className='DialogOptionsContainer'>

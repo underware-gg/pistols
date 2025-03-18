@@ -55,7 +55,7 @@ scalar felt252
 
 scalar i128
 
-union ModelUnion = pistols_ChallengeFameBalance | pistols_Payment | pistols_TokenBoundAddress | pistols_TableAdmittance | pistols_Round | pistols_Pact | pistols_TokenConfig | pistols_Scoreboard | pistols_TableConfig | pistols_Config | pistols_Challenge | pistols_CoinConfig | pistols_Duelist | pistols_PPlayerTutorialProgress | pistols_PPlayerBookmark | pistols_PPlayerOnline | pistols_PlayerActivity | pistols_ConsumableBalance | pistols_PlayerBookmark | pistols_PlayerTutorialProgress | pistols_Player | pistols_PlayerOnline
+union ModelUnion = pistols_TrophyCreation | pistols_PlayerRequiredAction | pistols_PlayerActivity | pistols_ScoreboardTable | pistols_Player | pistols_Pact | pistols_ChallengeFameBalance | pistols_TrophyProgression | pistols_Config | pistols_TableConfig | pistols_SeasonConfig | pistols_CoinConfig | pistols_Scoreboard | pistols_Pack | pistols_TokenConfig | pistols_TokenBoundAddress | pistols_PlayerBookmark | pistols_MockedValue | pistols_Challenge | pistols_PlayerOnline | pistols_Payment | pistols_DuelistChallenge | pistols_Duelist | pistols_Round
 
 enum OrderDirection {
   ASC
@@ -362,6 +362,7 @@ type pistols_Config {
   treasury_address: ContractAddress
   lords_address: ContractAddress
   vrf_address: ContractAddress
+  season_table_id: felt252
   is_paused: bool
   entity: World__Entity
   eventMessage: World__EventMessage
@@ -388,6 +389,7 @@ enum pistols_ConfigOrderField {
   TREASURY_ADDRESS
   LORDS_ADDRESS
   VRF_ADDRESS
+  SEASON_TABLE_ID
   IS_PAUSED
 }
 
@@ -436,74 +438,86 @@ input pistols_ConfigWhereInput {
   vrf_addressIN: [ContractAddress]
   vrf_addressNOTLIKE: ContractAddress
   vrf_addressLIKE: ContractAddress
+  season_table_id: felt252
+  season_table_idGT: felt252
+  season_table_idGTE: felt252
+  season_table_idLT: felt252
+  season_table_idLTE: felt252
+  season_table_idNEQ: felt252
+  season_table_idEQ: felt252
+  season_table_idNOTIN: [felt252]
+  season_table_idIN: [felt252]
+  season_table_idNOTLIKE: felt252
+  season_table_idLIKE: felt252
   is_paused: bool
-}
-
-type pistols_ConsumableBalance {
-  consumable_type: Enum
-  player_address: ContractAddress
-  balance: u32
-  entity: World__Entity
-  eventMessage: World__EventMessage
-}
-
-type pistols_ConsumableBalanceConnection {
-  edges: [pistols_ConsumableBalanceEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type pistols_ConsumableBalanceEdge {
-  node: pistols_ConsumableBalance
-  cursor: Cursor
-}
-
-input pistols_ConsumableBalanceOrder {
-  direction: OrderDirection!
-  field: pistols_ConsumableBalanceOrderField!
-}
-
-enum pistols_ConsumableBalanceOrderField {
-  CONSUMABLE_TYPE
-  PLAYER_ADDRESS
-  BALANCE
-}
-
-input pistols_ConsumableBalanceWhereInput {
-  consumable_type: Enum
-  player_address: ContractAddress
-  player_addressGT: ContractAddress
-  player_addressGTE: ContractAddress
-  player_addressLT: ContractAddress
-  player_addressLTE: ContractAddress
-  player_addressNEQ: ContractAddress
-  player_addressEQ: ContractAddress
-  player_addressNOTIN: [ContractAddress]
-  player_addressIN: [ContractAddress]
-  player_addressNOTLIKE: ContractAddress
-  player_addressLIKE: ContractAddress
-  balance: u32
-  balanceGT: u32
-  balanceGTE: u32
-  balanceLT: u32
-  balanceLTE: u32
-  balanceNEQ: u32
-  balanceEQ: u32
-  balanceNOTIN: [u32]
-  balanceIN: [u32]
-  balanceNOTLIKE: u32
-  balanceLIKE: u32
 }
 
 type pistols_Duelist {
   duelist_id: u128
-  name: felt252
-  profile_pic_type: Enum
-  profile_pic_uri: ByteArray
+  profile_type: pistols_ProfileType
   timestamp: u64
-  score: pistols_Score
   entity: World__Entity
   eventMessage: World__EventMessage
+}
+
+input pistols_Duelist_profile_typeWhereInput {
+  Duelist: Enum
+  Character: Enum
+  Bot: Enum
+  option: Enum
+}
+
+type pistols_DuelistChallenge {
+  duelist_id: u128
+  duel_id: u128
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_DuelistChallengeConnection {
+  edges: [pistols_DuelistChallengeEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_DuelistChallengeEdge {
+  node: pistols_DuelistChallenge
+  cursor: Cursor
+}
+
+input pistols_DuelistChallengeOrder {
+  direction: OrderDirection!
+  field: pistols_DuelistChallengeOrderField!
+}
+
+enum pistols_DuelistChallengeOrderField {
+  DUELIST_ID
+  DUEL_ID
+}
+
+input pistols_DuelistChallengeWhereInput {
+  duelist_id: u128
+  duelist_idGT: u128
+  duelist_idGTE: u128
+  duelist_idLT: u128
+  duelist_idLTE: u128
+  duelist_idNEQ: u128
+  duelist_idEQ: u128
+  duelist_idNOTIN: [u128]
+  duelist_idIN: [u128]
+  duelist_idNOTLIKE: u128
+  duelist_idLIKE: u128
+  duel_id: u128
+  duel_idGT: u128
+  duel_idGTE: u128
+  duel_idLT: u128
+  duel_idLTE: u128
+  duel_idNEQ: u128
+  duel_idEQ: u128
+  duel_idNOTIN: [u128]
+  duel_idIN: [u128]
+  duel_idNOTLIKE: u128
+  duel_idLIKE: u128
 }
 
 type pistols_DuelistConnection {
@@ -524,11 +538,8 @@ input pistols_DuelistOrder {
 
 enum pistols_DuelistOrderField {
   DUELIST_ID
-  NAME
-  PROFILE_PIC_TYPE
-  PROFILE_PIC_URI
+  PROFILE_TYPE
   TIMESTAMP
-  SCORE
 }
 
 type pistols_DuelistState {
@@ -551,29 +562,7 @@ input pistols_DuelistWhereInput {
   duelist_idIN: [u128]
   duelist_idNOTLIKE: u128
   duelist_idLIKE: u128
-  name: felt252
-  nameGT: felt252
-  nameGTE: felt252
-  nameLT: felt252
-  nameLTE: felt252
-  nameNEQ: felt252
-  nameEQ: felt252
-  nameNOTIN: [felt252]
-  nameIN: [felt252]
-  nameNOTLIKE: felt252
-  nameLIKE: felt252
-  profile_pic_type: Enum
-  profile_pic_uri: ByteArray
-  profile_pic_uriGT: ByteArray
-  profile_pic_uriGTE: ByteArray
-  profile_pic_uriLT: ByteArray
-  profile_pic_uriLTE: ByteArray
-  profile_pic_uriNEQ: ByteArray
-  profile_pic_uriEQ: ByteArray
-  profile_pic_uriNOTIN: [ByteArray]
-  profile_pic_uriIN: [ByteArray]
-  profile_pic_uriNOTLIKE: ByteArray
-  profile_pic_uriLIKE: ByteArray
+  profile_type: pistols_Duelist_profile_typeWhereInput
   timestamp: u64
   timestampGT: u64
   timestampGTE: u64
@@ -587,14 +576,134 @@ input pistols_DuelistWhereInput {
   timestampLIKE: u64
 }
 
+type pistols_FinalBlow {
+  Paces: Enum
+  Blades: Enum
+  option: Enum
+}
+
+type pistols_MockedValue {
+  salt: felt252
+  value: felt252
+  exists: bool
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_MockedValueConnection {
+  edges: [pistols_MockedValueEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_MockedValueEdge {
+  node: pistols_MockedValue
+  cursor: Cursor
+}
+
+input pistols_MockedValueOrder {
+  direction: OrderDirection!
+  field: pistols_MockedValueOrderField!
+}
+
+enum pistols_MockedValueOrderField {
+  SALT
+  VALUE
+  EXISTS
+}
+
+input pistols_MockedValueWhereInput {
+  salt: felt252
+  saltGT: felt252
+  saltGTE: felt252
+  saltLT: felt252
+  saltLTE: felt252
+  saltNEQ: felt252
+  saltEQ: felt252
+  saltNOTIN: [felt252]
+  saltIN: [felt252]
+  saltNOTLIKE: felt252
+  saltLIKE: felt252
+  value: felt252
+  valueGT: felt252
+  valueGTE: felt252
+  valueLT: felt252
+  valueLTE: felt252
+  valueNEQ: felt252
+  valueEQ: felt252
+  valueNOTIN: [felt252]
+  valueIN: [felt252]
+  valueNOTLIKE: felt252
+  valueLIKE: felt252
+  exists: bool
+}
+
 type pistols_Moves {
-  seed: felt252
   salt: felt252
   hashed: u128
   card_1: u8
   card_2: u8
   card_3: u8
   card_4: u8
+}
+
+type pistols_Pack {
+  pack_id: u128
+  pack_type: Enum
+  seed: felt252
+  is_open: bool
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_PackConnection {
+  edges: [pistols_PackEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_PackEdge {
+  node: pistols_Pack
+  cursor: Cursor
+}
+
+input pistols_PackOrder {
+  direction: OrderDirection!
+  field: pistols_PackOrderField!
+}
+
+enum pistols_PackOrderField {
+  PACK_ID
+  PACK_TYPE
+  SEED
+  IS_OPEN
+}
+
+input pistols_PackWhereInput {
+  pack_id: u128
+  pack_idGT: u128
+  pack_idGTE: u128
+  pack_idLT: u128
+  pack_idLTE: u128
+  pack_idNEQ: u128
+  pack_idEQ: u128
+  pack_idNOTIN: [u128]
+  pack_idIN: [u128]
+  pack_idNOTLIKE: u128
+  pack_idLIKE: u128
+  pack_type: Enum
+  seed: felt252
+  seedGT: felt252
+  seedGTE: felt252
+  seedLT: felt252
+  seedLTE: felt252
+  seedNEQ: felt252
+  seedEQ: felt252
+  seedNOTIN: [felt252]
+  seedIN: [felt252]
+  seedNOTLIKE: felt252
+  seedLIKE: felt252
+  is_open: bool
 }
 
 type pistols_Pact {
@@ -782,17 +891,19 @@ input pistols_PaymentWhereInput {
 }
 
 type pistols_Player {
-  address: ContractAddress
+  player_address: ContractAddress
   timestamp_registered: u64
+  claimed_welcome_pack: bool
   entity: World__Entity
   eventMessage: World__EventMessage
 }
 
 type pistols_PlayerActivity {
-  address: ContractAddress
+  player_address: ContractAddress
   timestamp: u64
   activity: Enum
   identifier: felt252
+  is_public: bool
   entity: World__Entity
   eventMessage: World__EventMessage
 }
@@ -814,24 +925,25 @@ input pistols_PlayerActivityOrder {
 }
 
 enum pistols_PlayerActivityOrderField {
-  ADDRESS
+  PLAYER_ADDRESS
   TIMESTAMP
   ACTIVITY
   IDENTIFIER
+  IS_PUBLIC
 }
 
 input pistols_PlayerActivityWhereInput {
-  address: ContractAddress
-  addressGT: ContractAddress
-  addressGTE: ContractAddress
-  addressLT: ContractAddress
-  addressLTE: ContractAddress
-  addressNEQ: ContractAddress
-  addressEQ: ContractAddress
-  addressNOTIN: [ContractAddress]
-  addressIN: [ContractAddress]
-  addressNOTLIKE: ContractAddress
-  addressLIKE: ContractAddress
+  player_address: ContractAddress
+  player_addressGT: ContractAddress
+  player_addressGTE: ContractAddress
+  player_addressLT: ContractAddress
+  player_addressLTE: ContractAddress
+  player_addressNEQ: ContractAddress
+  player_addressEQ: ContractAddress
+  player_addressNOTIN: [ContractAddress]
+  player_addressIN: [ContractAddress]
+  player_addressNOTLIKE: ContractAddress
+  player_addressLIKE: ContractAddress
   timestamp: u64
   timestampGT: u64
   timestampGTE: u64
@@ -855,10 +967,11 @@ input pistols_PlayerActivityWhereInput {
   identifierIN: [felt252]
   identifierNOTLIKE: felt252
   identifierLIKE: felt252
+  is_public: bool
 }
 
 type pistols_PlayerBookmark {
-  address: ContractAddress
+  identity: ContractAddress
   target_address: ContractAddress
   target_id: u128
   enabled: bool
@@ -883,24 +996,24 @@ input pistols_PlayerBookmarkOrder {
 }
 
 enum pistols_PlayerBookmarkOrderField {
-  ADDRESS
+  IDENTITY
   TARGET_ADDRESS
   TARGET_ID
   ENABLED
 }
 
 input pistols_PlayerBookmarkWhereInput {
-  address: ContractAddress
-  addressGT: ContractAddress
-  addressGTE: ContractAddress
-  addressLT: ContractAddress
-  addressLTE: ContractAddress
-  addressNEQ: ContractAddress
-  addressEQ: ContractAddress
-  addressNOTIN: [ContractAddress]
-  addressIN: [ContractAddress]
-  addressNOTLIKE: ContractAddress
-  addressLIKE: ContractAddress
+  identity: ContractAddress
+  identityGT: ContractAddress
+  identityGTE: ContractAddress
+  identityLT: ContractAddress
+  identityLTE: ContractAddress
+  identityNEQ: ContractAddress
+  identityEQ: ContractAddress
+  identityNOTIN: [ContractAddress]
+  identityIN: [ContractAddress]
+  identityNOTLIKE: ContractAddress
+  identityLIKE: ContractAddress
   target_address: ContractAddress
   target_addressGT: ContractAddress
   target_addressGTE: ContractAddress
@@ -938,7 +1051,7 @@ type pistols_PlayerEdge {
 }
 
 type pistols_PlayerOnline {
-  address: ContractAddress
+  identity: ContractAddress
   timestamp: u64
   entity: World__Entity
   eventMessage: World__EventMessage
@@ -961,22 +1074,22 @@ input pistols_PlayerOnlineOrder {
 }
 
 enum pistols_PlayerOnlineOrderField {
-  ADDRESS
+  IDENTITY
   TIMESTAMP
 }
 
 input pistols_PlayerOnlineWhereInput {
-  address: ContractAddress
-  addressGT: ContractAddress
-  addressGTE: ContractAddress
-  addressLT: ContractAddress
-  addressLTE: ContractAddress
-  addressNEQ: ContractAddress
-  addressEQ: ContractAddress
-  addressNOTIN: [ContractAddress]
-  addressIN: [ContractAddress]
-  addressNOTLIKE: ContractAddress
-  addressLIKE: ContractAddress
+  identity: ContractAddress
+  identityGT: ContractAddress
+  identityGTE: ContractAddress
+  identityLT: ContractAddress
+  identityLTE: ContractAddress
+  identityNEQ: ContractAddress
+  identityEQ: ContractAddress
+  identityNOTIN: [ContractAddress]
+  identityIN: [ContractAddress]
+  identityNOTLIKE: ContractAddress
+  identityLIKE: ContractAddress
   timestamp: u64
   timestampGT: u64
   timestampGTE: u64
@@ -996,65 +1109,76 @@ input pistols_PlayerOrder {
 }
 
 enum pistols_PlayerOrderField {
-  ADDRESS
+  PLAYER_ADDRESS
   TIMESTAMP_REGISTERED
+  CLAIMED_WELCOME_PACK
 }
 
-type pistols_PlayerTutorialProgress {
-  address: ContractAddress
-  progress: Enum
+type pistols_PlayerRequiredAction {
+  duelist_id: u128
+  duel_id: u128
   entity: World__Entity
   eventMessage: World__EventMessage
 }
 
-type pistols_PlayerTutorialProgressConnection {
-  edges: [pistols_PlayerTutorialProgressEdge]
+type pistols_PlayerRequiredActionConnection {
+  edges: [pistols_PlayerRequiredActionEdge]
   totalCount: Int!
   pageInfo: World__PageInfo!
 }
 
-type pistols_PlayerTutorialProgressEdge {
-  node: pistols_PlayerTutorialProgress
+type pistols_PlayerRequiredActionEdge {
+  node: pistols_PlayerRequiredAction
   cursor: Cursor
 }
 
-input pistols_PlayerTutorialProgressOrder {
+input pistols_PlayerRequiredActionOrder {
   direction: OrderDirection!
-  field: pistols_PlayerTutorialProgressOrderField!
+  field: pistols_PlayerRequiredActionOrderField!
 }
 
-enum pistols_PlayerTutorialProgressOrderField {
-  ADDRESS
-  PROGRESS
+enum pistols_PlayerRequiredActionOrderField {
+  DUELIST_ID
+  DUEL_ID
 }
 
-input pistols_PlayerTutorialProgressWhereInput {
-  address: ContractAddress
-  addressGT: ContractAddress
-  addressGTE: ContractAddress
-  addressLT: ContractAddress
-  addressLTE: ContractAddress
-  addressNEQ: ContractAddress
-  addressEQ: ContractAddress
-  addressNOTIN: [ContractAddress]
-  addressIN: [ContractAddress]
-  addressNOTLIKE: ContractAddress
-  addressLIKE: ContractAddress
-  progress: Enum
+input pistols_PlayerRequiredActionWhereInput {
+  duelist_id: u128
+  duelist_idGT: u128
+  duelist_idGTE: u128
+  duelist_idLT: u128
+  duelist_idLTE: u128
+  duelist_idNEQ: u128
+  duelist_idEQ: u128
+  duelist_idNOTIN: [u128]
+  duelist_idIN: [u128]
+  duelist_idNOTLIKE: u128
+  duelist_idLIKE: u128
+  duel_id: u128
+  duel_idGT: u128
+  duel_idGTE: u128
+  duel_idLT: u128
+  duel_idLTE: u128
+  duel_idNEQ: u128
+  duel_idEQ: u128
+  duel_idNOTIN: [u128]
+  duel_idIN: [u128]
+  duel_idNOTLIKE: u128
+  duel_idLIKE: u128
 }
 
 input pistols_PlayerWhereInput {
-  address: ContractAddress
-  addressGT: ContractAddress
-  addressGTE: ContractAddress
-  addressLT: ContractAddress
-  addressLTE: ContractAddress
-  addressNEQ: ContractAddress
-  addressEQ: ContractAddress
-  addressNOTIN: [ContractAddress]
-  addressIN: [ContractAddress]
-  addressNOTLIKE: ContractAddress
-  addressLIKE: ContractAddress
+  player_address: ContractAddress
+  player_addressGT: ContractAddress
+  player_addressGTE: ContractAddress
+  player_addressLT: ContractAddress
+  player_addressLTE: ContractAddress
+  player_addressNEQ: ContractAddress
+  player_addressEQ: ContractAddress
+  player_addressNOTIN: [ContractAddress]
+  player_addressIN: [ContractAddress]
+  player_addressNOTLIKE: ContractAddress
+  player_addressLIKE: ContractAddress
   timestamp_registered: u64
   timestamp_registeredGT: u64
   timestamp_registeredGTE: u64
@@ -1066,171 +1190,14 @@ input pistols_PlayerWhereInput {
   timestamp_registeredIN: [u64]
   timestamp_registeredNOTLIKE: u64
   timestamp_registeredLIKE: u64
+  claimed_welcome_pack: bool
 }
 
-type pistols_PPlayerBookmark {
-  identity: ContractAddress
-  target_address: ContractAddress
-  target_id: u128
-  enabled: bool
-  entity: World__Entity
-  eventMessage: World__EventMessage
-}
-
-type pistols_PPlayerBookmarkConnection {
-  edges: [pistols_PPlayerBookmarkEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type pistols_PPlayerBookmarkEdge {
-  node: pistols_PPlayerBookmark
-  cursor: Cursor
-}
-
-input pistols_PPlayerBookmarkOrder {
-  direction: OrderDirection!
-  field: pistols_PPlayerBookmarkOrderField!
-}
-
-enum pistols_PPlayerBookmarkOrderField {
-  IDENTITY
-  TARGET_ADDRESS
-  TARGET_ID
-  ENABLED
-}
-
-input pistols_PPlayerBookmarkWhereInput {
-  identity: ContractAddress
-  identityGT: ContractAddress
-  identityGTE: ContractAddress
-  identityLT: ContractAddress
-  identityLTE: ContractAddress
-  identityNEQ: ContractAddress
-  identityEQ: ContractAddress
-  identityNOTIN: [ContractAddress]
-  identityIN: [ContractAddress]
-  identityNOTLIKE: ContractAddress
-  identityLIKE: ContractAddress
-  target_address: ContractAddress
-  target_addressGT: ContractAddress
-  target_addressGTE: ContractAddress
-  target_addressLT: ContractAddress
-  target_addressLTE: ContractAddress
-  target_addressNEQ: ContractAddress
-  target_addressEQ: ContractAddress
-  target_addressNOTIN: [ContractAddress]
-  target_addressIN: [ContractAddress]
-  target_addressNOTLIKE: ContractAddress
-  target_addressLIKE: ContractAddress
-  target_id: u128
-  target_idGT: u128
-  target_idGTE: u128
-  target_idLT: u128
-  target_idLTE: u128
-  target_idNEQ: u128
-  target_idEQ: u128
-  target_idNOTIN: [u128]
-  target_idIN: [u128]
-  target_idNOTLIKE: u128
-  target_idLIKE: u128
-  enabled: bool
-}
-
-type pistols_PPlayerOnline {
-  identity: ContractAddress
-  timestamp: u64
-  entity: World__Entity
-  eventMessage: World__EventMessage
-}
-
-type pistols_PPlayerOnlineConnection {
-  edges: [pistols_PPlayerOnlineEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type pistols_PPlayerOnlineEdge {
-  node: pistols_PPlayerOnline
-  cursor: Cursor
-}
-
-input pistols_PPlayerOnlineOrder {
-  direction: OrderDirection!
-  field: pistols_PPlayerOnlineOrderField!
-}
-
-enum pistols_PPlayerOnlineOrderField {
-  IDENTITY
-  TIMESTAMP
-}
-
-input pistols_PPlayerOnlineWhereInput {
-  identity: ContractAddress
-  identityGT: ContractAddress
-  identityGTE: ContractAddress
-  identityLT: ContractAddress
-  identityLTE: ContractAddress
-  identityNEQ: ContractAddress
-  identityEQ: ContractAddress
-  identityNOTIN: [ContractAddress]
-  identityIN: [ContractAddress]
-  identityNOTLIKE: ContractAddress
-  identityLIKE: ContractAddress
-  timestamp: u64
-  timestampGT: u64
-  timestampGTE: u64
-  timestampLT: u64
-  timestampLTE: u64
-  timestampNEQ: u64
-  timestampEQ: u64
-  timestampNOTIN: [u64]
-  timestampIN: [u64]
-  timestampNOTLIKE: u64
-  timestampLIKE: u64
-}
-
-type pistols_PPlayerTutorialProgress {
-  identity: ContractAddress
-  progress: Enum
-  entity: World__Entity
-  eventMessage: World__EventMessage
-}
-
-type pistols_PPlayerTutorialProgressConnection {
-  edges: [pistols_PPlayerTutorialProgressEdge]
-  totalCount: Int!
-  pageInfo: World__PageInfo!
-}
-
-type pistols_PPlayerTutorialProgressEdge {
-  node: pistols_PPlayerTutorialProgress
-  cursor: Cursor
-}
-
-input pistols_PPlayerTutorialProgressOrder {
-  direction: OrderDirection!
-  field: pistols_PPlayerTutorialProgressOrderField!
-}
-
-enum pistols_PPlayerTutorialProgressOrderField {
-  IDENTITY
-  PROGRESS
-}
-
-input pistols_PPlayerTutorialProgressWhereInput {
-  identity: ContractAddress
-  identityGT: ContractAddress
-  identityGTE: ContractAddress
-  identityLT: ContractAddress
-  identityLTE: ContractAddress
-  identityNEQ: ContractAddress
-  identityEQ: ContractAddress
-  identityNOTIN: [ContractAddress]
-  identityIN: [ContractAddress]
-  identityNOTLIKE: ContractAddress
-  identityLIKE: ContractAddress
-  progress: Enum
+type pistols_ProfileType {
+  Duelist: Enum
+  Character: Enum
+  Bot: Enum
+  option: Enum
 }
 
 type pistols_Round {
@@ -1240,9 +1207,269 @@ type pistols_Round {
   state_a: pistols_DuelistState
   state_b: pistols_DuelistState
   state: Enum
-  final_blow: felt252
+  final_blow: pistols_FinalBlow
   entity: World__Entity
   eventMessage: World__EventMessage
+}
+
+input pistols_Round_final_blowWhereInput {
+  Paces: Enum
+  Blades: Enum
+  option: Enum
+}
+
+input pistols_Round_moves_aWhereInput {
+  salt: felt252
+  saltGT: felt252
+  saltGTE: felt252
+  saltLT: felt252
+  saltLTE: felt252
+  saltNEQ: felt252
+  saltEQ: felt252
+  saltNOTIN: [felt252]
+  saltIN: [felt252]
+  saltNOTLIKE: felt252
+  saltLIKE: felt252
+  hashed: u128
+  hashedGT: u128
+  hashedGTE: u128
+  hashedLT: u128
+  hashedLTE: u128
+  hashedNEQ: u128
+  hashedEQ: u128
+  hashedNOTIN: [u128]
+  hashedIN: [u128]
+  hashedNOTLIKE: u128
+  hashedLIKE: u128
+  card_1: u8
+  card_1GT: u8
+  card_1GTE: u8
+  card_1LT: u8
+  card_1LTE: u8
+  card_1NEQ: u8
+  card_1EQ: u8
+  card_1NOTIN: [u8]
+  card_1IN: [u8]
+  card_1NOTLIKE: u8
+  card_1LIKE: u8
+  card_2: u8
+  card_2GT: u8
+  card_2GTE: u8
+  card_2LT: u8
+  card_2LTE: u8
+  card_2NEQ: u8
+  card_2EQ: u8
+  card_2NOTIN: [u8]
+  card_2IN: [u8]
+  card_2NOTLIKE: u8
+  card_2LIKE: u8
+  card_3: u8
+  card_3GT: u8
+  card_3GTE: u8
+  card_3LT: u8
+  card_3LTE: u8
+  card_3NEQ: u8
+  card_3EQ: u8
+  card_3NOTIN: [u8]
+  card_3IN: [u8]
+  card_3NOTLIKE: u8
+  card_3LIKE: u8
+  card_4: u8
+  card_4GT: u8
+  card_4GTE: u8
+  card_4LT: u8
+  card_4LTE: u8
+  card_4NEQ: u8
+  card_4EQ: u8
+  card_4NOTIN: [u8]
+  card_4IN: [u8]
+  card_4NOTLIKE: u8
+  card_4LIKE: u8
+}
+
+input pistols_Round_moves_bWhereInput {
+  salt: felt252
+  saltGT: felt252
+  saltGTE: felt252
+  saltLT: felt252
+  saltLTE: felt252
+  saltNEQ: felt252
+  saltEQ: felt252
+  saltNOTIN: [felt252]
+  saltIN: [felt252]
+  saltNOTLIKE: felt252
+  saltLIKE: felt252
+  hashed: u128
+  hashedGT: u128
+  hashedGTE: u128
+  hashedLT: u128
+  hashedLTE: u128
+  hashedNEQ: u128
+  hashedEQ: u128
+  hashedNOTIN: [u128]
+  hashedIN: [u128]
+  hashedNOTLIKE: u128
+  hashedLIKE: u128
+  card_1: u8
+  card_1GT: u8
+  card_1GTE: u8
+  card_1LT: u8
+  card_1LTE: u8
+  card_1NEQ: u8
+  card_1EQ: u8
+  card_1NOTIN: [u8]
+  card_1IN: [u8]
+  card_1NOTLIKE: u8
+  card_1LIKE: u8
+  card_2: u8
+  card_2GT: u8
+  card_2GTE: u8
+  card_2LT: u8
+  card_2LTE: u8
+  card_2NEQ: u8
+  card_2EQ: u8
+  card_2NOTIN: [u8]
+  card_2IN: [u8]
+  card_2NOTLIKE: u8
+  card_2LIKE: u8
+  card_3: u8
+  card_3GT: u8
+  card_3GTE: u8
+  card_3LT: u8
+  card_3LTE: u8
+  card_3NEQ: u8
+  card_3EQ: u8
+  card_3NOTIN: [u8]
+  card_3IN: [u8]
+  card_3NOTLIKE: u8
+  card_3LIKE: u8
+  card_4: u8
+  card_4GT: u8
+  card_4GTE: u8
+  card_4LT: u8
+  card_4LTE: u8
+  card_4NEQ: u8
+  card_4EQ: u8
+  card_4NOTIN: [u8]
+  card_4IN: [u8]
+  card_4NOTLIKE: u8
+  card_4LIKE: u8
+}
+
+input pistols_Round_state_aWhereInput {
+  chances: u8
+  chancesGT: u8
+  chancesGTE: u8
+  chancesLT: u8
+  chancesLTE: u8
+  chancesNEQ: u8
+  chancesEQ: u8
+  chancesNOTIN: [u8]
+  chancesIN: [u8]
+  chancesNOTLIKE: u8
+  chancesLIKE: u8
+  damage: u8
+  damageGT: u8
+  damageGTE: u8
+  damageLT: u8
+  damageLTE: u8
+  damageNEQ: u8
+  damageEQ: u8
+  damageNOTIN: [u8]
+  damageIN: [u8]
+  damageNOTLIKE: u8
+  damageLIKE: u8
+  health: u8
+  healthGT: u8
+  healthGTE: u8
+  healthLT: u8
+  healthLTE: u8
+  healthNEQ: u8
+  healthEQ: u8
+  healthNOTIN: [u8]
+  healthIN: [u8]
+  healthNOTLIKE: u8
+  healthLIKE: u8
+  dice_fire: u8
+  dice_fireGT: u8
+  dice_fireGTE: u8
+  dice_fireLT: u8
+  dice_fireLTE: u8
+  dice_fireNEQ: u8
+  dice_fireEQ: u8
+  dice_fireNOTIN: [u8]
+  dice_fireIN: [u8]
+  dice_fireNOTLIKE: u8
+  dice_fireLIKE: u8
+  honour: u8
+  honourGT: u8
+  honourGTE: u8
+  honourLT: u8
+  honourLTE: u8
+  honourNEQ: u8
+  honourEQ: u8
+  honourNOTIN: [u8]
+  honourIN: [u8]
+  honourNOTLIKE: u8
+  honourLIKE: u8
+}
+
+input pistols_Round_state_bWhereInput {
+  chances: u8
+  chancesGT: u8
+  chancesGTE: u8
+  chancesLT: u8
+  chancesLTE: u8
+  chancesNEQ: u8
+  chancesEQ: u8
+  chancesNOTIN: [u8]
+  chancesIN: [u8]
+  chancesNOTLIKE: u8
+  chancesLIKE: u8
+  damage: u8
+  damageGT: u8
+  damageGTE: u8
+  damageLT: u8
+  damageLTE: u8
+  damageNEQ: u8
+  damageEQ: u8
+  damageNOTIN: [u8]
+  damageIN: [u8]
+  damageNOTLIKE: u8
+  damageLIKE: u8
+  health: u8
+  healthGT: u8
+  healthGTE: u8
+  healthLT: u8
+  healthLTE: u8
+  healthNEQ: u8
+  healthEQ: u8
+  healthNOTIN: [u8]
+  healthIN: [u8]
+  healthNOTLIKE: u8
+  healthLIKE: u8
+  dice_fire: u8
+  dice_fireGT: u8
+  dice_fireGTE: u8
+  dice_fireLT: u8
+  dice_fireLTE: u8
+  dice_fireNEQ: u8
+  dice_fireEQ: u8
+  dice_fireNOTIN: [u8]
+  dice_fireIN: [u8]
+  dice_fireNOTLIKE: u8
+  dice_fireLIKE: u8
+  honour: u8
+  honourGT: u8
+  honourGTE: u8
+  honourLT: u8
+  honourLTE: u8
+  honourNEQ: u8
+  honourEQ: u8
+  honourNOTIN: [u8]
+  honourIN: [u8]
+  honourNOTLIKE: u8
+  honourLIKE: u8
 }
 
 type pistols_RoundConnection {
@@ -1283,18 +1510,12 @@ input pistols_RoundWhereInput {
   duel_idIN: [u128]
   duel_idNOTLIKE: u128
   duel_idLIKE: u128
+  moves_a: pistols_Round_moves_aWhereInput
+  moves_b: pistols_Round_moves_bWhereInput
+  state_a: pistols_Round_state_aWhereInput
+  state_b: pistols_Round_state_bWhereInput
   state: Enum
-  final_blow: felt252
-  final_blowGT: felt252
-  final_blowGTE: felt252
-  final_blowLT: felt252
-  final_blowLTE: felt252
-  final_blowNEQ: felt252
-  final_blowEQ: felt252
-  final_blowNOTIN: [felt252]
-  final_blowIN: [felt252]
-  final_blowNOTLIKE: felt252
-  final_blowLIKE: felt252
+  final_blow: pistols_Round_final_blowWhereInput
 }
 
 type pistols_Score {
@@ -1307,11 +1528,79 @@ type pistols_Score {
 }
 
 type pistols_Scoreboard {
-  table_id: felt252
-  duelist_id: u128
+  holder: felt252
   score: pistols_Score
   entity: World__Entity
   eventMessage: World__EventMessage
+}
+
+input pistols_Scoreboard_scoreWhereInput {
+  honour: u8
+  honourGT: u8
+  honourGTE: u8
+  honourLT: u8
+  honourLTE: u8
+  honourNEQ: u8
+  honourEQ: u8
+  honourNOTIN: [u8]
+  honourIN: [u8]
+  honourNOTLIKE: u8
+  honourLIKE: u8
+  total_duels: u16
+  total_duelsGT: u16
+  total_duelsGTE: u16
+  total_duelsLT: u16
+  total_duelsLTE: u16
+  total_duelsNEQ: u16
+  total_duelsEQ: u16
+  total_duelsNOTIN: [u16]
+  total_duelsIN: [u16]
+  total_duelsNOTLIKE: u16
+  total_duelsLIKE: u16
+  total_wins: u16
+  total_winsGT: u16
+  total_winsGTE: u16
+  total_winsLT: u16
+  total_winsLTE: u16
+  total_winsNEQ: u16
+  total_winsEQ: u16
+  total_winsNOTIN: [u16]
+  total_winsIN: [u16]
+  total_winsNOTLIKE: u16
+  total_winsLIKE: u16
+  total_losses: u16
+  total_lossesGT: u16
+  total_lossesGTE: u16
+  total_lossesLT: u16
+  total_lossesLTE: u16
+  total_lossesNEQ: u16
+  total_lossesEQ: u16
+  total_lossesNOTIN: [u16]
+  total_lossesIN: [u16]
+  total_lossesNOTLIKE: u16
+  total_lossesLIKE: u16
+  total_draws: u16
+  total_drawsGT: u16
+  total_drawsGTE: u16
+  total_drawsLT: u16
+  total_drawsLTE: u16
+  total_drawsNEQ: u16
+  total_drawsEQ: u16
+  total_drawsNOTIN: [u16]
+  total_drawsIN: [u16]
+  total_drawsNOTLIKE: u16
+  total_drawsLIKE: u16
+  honour_history: u64
+  honour_historyGT: u64
+  honour_historyGTE: u64
+  honour_historyLT: u64
+  honour_historyLTE: u64
+  honour_historyNEQ: u64
+  honour_historyEQ: u64
+  honour_historyNOTIN: [u64]
+  honour_historyIN: [u64]
+  honour_historyNOTLIKE: u64
+  honour_historyLIKE: u64
 }
 
 type pistols_ScoreboardConnection {
@@ -1331,67 +1620,121 @@ input pistols_ScoreboardOrder {
 }
 
 enum pistols_ScoreboardOrderField {
-  TABLE_ID
-  DUELIST_ID
+  HOLDER
   SCORE
 }
 
-input pistols_ScoreboardWhereInput {
+type pistols_ScoreboardTable {
+  holder: felt252
   table_id: felt252
-  table_idGT: felt252
-  table_idGTE: felt252
-  table_idLT: felt252
-  table_idLTE: felt252
-  table_idNEQ: felt252
-  table_idEQ: felt252
-  table_idNOTIN: [felt252]
-  table_idIN: [felt252]
-  table_idNOTLIKE: felt252
-  table_idLIKE: felt252
-  duelist_id: u128
-  duelist_idGT: u128
-  duelist_idGTE: u128
-  duelist_idLT: u128
-  duelist_idLTE: u128
-  duelist_idNEQ: u128
-  duelist_idEQ: u128
-  duelist_idNOTIN: [u128]
-  duelist_idIN: [u128]
-  duelist_idNOTLIKE: u128
-  duelist_idLIKE: u128
-}
-
-type pistols_TableAdmittance {
-  table_id: felt252
-  accounts: [ContractAddress]
-  duelists: [u128]
+  score: pistols_Score
   entity: World__Entity
   eventMessage: World__EventMessage
 }
 
-type pistols_TableAdmittanceConnection {
-  edges: [pistols_TableAdmittanceEdge]
+input pistols_ScoreboardTable_scoreWhereInput {
+  honour: u8
+  honourGT: u8
+  honourGTE: u8
+  honourLT: u8
+  honourLTE: u8
+  honourNEQ: u8
+  honourEQ: u8
+  honourNOTIN: [u8]
+  honourIN: [u8]
+  honourNOTLIKE: u8
+  honourLIKE: u8
+  total_duels: u16
+  total_duelsGT: u16
+  total_duelsGTE: u16
+  total_duelsLT: u16
+  total_duelsLTE: u16
+  total_duelsNEQ: u16
+  total_duelsEQ: u16
+  total_duelsNOTIN: [u16]
+  total_duelsIN: [u16]
+  total_duelsNOTLIKE: u16
+  total_duelsLIKE: u16
+  total_wins: u16
+  total_winsGT: u16
+  total_winsGTE: u16
+  total_winsLT: u16
+  total_winsLTE: u16
+  total_winsNEQ: u16
+  total_winsEQ: u16
+  total_winsNOTIN: [u16]
+  total_winsIN: [u16]
+  total_winsNOTLIKE: u16
+  total_winsLIKE: u16
+  total_losses: u16
+  total_lossesGT: u16
+  total_lossesGTE: u16
+  total_lossesLT: u16
+  total_lossesLTE: u16
+  total_lossesNEQ: u16
+  total_lossesEQ: u16
+  total_lossesNOTIN: [u16]
+  total_lossesIN: [u16]
+  total_lossesNOTLIKE: u16
+  total_lossesLIKE: u16
+  total_draws: u16
+  total_drawsGT: u16
+  total_drawsGTE: u16
+  total_drawsLT: u16
+  total_drawsLTE: u16
+  total_drawsNEQ: u16
+  total_drawsEQ: u16
+  total_drawsNOTIN: [u16]
+  total_drawsIN: [u16]
+  total_drawsNOTLIKE: u16
+  total_drawsLIKE: u16
+  honour_history: u64
+  honour_historyGT: u64
+  honour_historyGTE: u64
+  honour_historyLT: u64
+  honour_historyLTE: u64
+  honour_historyNEQ: u64
+  honour_historyEQ: u64
+  honour_historyNOTIN: [u64]
+  honour_historyIN: [u64]
+  honour_historyNOTLIKE: u64
+  honour_historyLIKE: u64
+}
+
+type pistols_ScoreboardTableConnection {
+  edges: [pistols_ScoreboardTableEdge]
   totalCount: Int!
   pageInfo: World__PageInfo!
 }
 
-type pistols_TableAdmittanceEdge {
-  node: pistols_TableAdmittance
+type pistols_ScoreboardTableEdge {
+  node: pistols_ScoreboardTable
   cursor: Cursor
 }
 
-input pistols_TableAdmittanceOrder {
+input pistols_ScoreboardTableOrder {
   direction: OrderDirection!
-  field: pistols_TableAdmittanceOrderField!
+  field: pistols_ScoreboardTableOrderField!
 }
 
-enum pistols_TableAdmittanceOrderField {
+enum pistols_ScoreboardTableOrderField {
+  HOLDER
   TABLE_ID
-  ACCOUNTS
-  DUELISTS
+  SCORE
 }
 
-input pistols_TableAdmittanceWhereInput {
+input pistols_ScoreboardTableWhereInput {
+  holder: felt252
+  holderGT: felt252
+  holderGTE: felt252
+  holderLT: felt252
+  holderLTE: felt252
+  holderNEQ: felt252
+  holderEQ: felt252
+  holderNOTIN: [felt252]
+  holderIN: [felt252]
+  holderNOTLIKE: felt252
+  holderLIKE: felt252
   table_id: felt252
   table_idGT: felt252
   table_idGTE: felt252
@@ -1403,13 +1746,110 @@ input pistols_TableAdmittanceWhereInput {
   table_idIN: [felt252]
   table_idNOTLIKE: felt252
   table_idLIKE: felt252
+  score: pistols_ScoreboardTable_scoreWhereInput
+}
+
+input pistols_ScoreboardWhereInput {
+  holder: felt252
+  holderGT: felt252
+  holderGTE: felt252
+  holderLT: felt252
+  holderLTE: felt252
+  holderNEQ: felt252
+  holderEQ: felt252
+  holderNOTIN: [felt252]
+  holderIN: [felt252]
+  holderNOTLIKE: felt252
+  holderLIKE: felt252
+  score: pistols_Scoreboard_scoreWhereInput
+}
+
+type pistols_SeasonConfig {
+  table_id: felt252
+  season_id: u16
+  timestamp_start: u64
+  timestamp_end: u64
+  phase: Enum
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_SeasonConfigConnection {
+  edges: [pistols_SeasonConfigEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_SeasonConfigEdge {
+  node: pistols_SeasonConfig
+  cursor: Cursor
+}
+
+input pistols_SeasonConfigOrder {
+  direction: OrderDirection!
+  field: pistols_SeasonConfigOrderField!
+}
+
+enum pistols_SeasonConfigOrderField {
+  TABLE_ID
+  SEASON_ID
+  TIMESTAMP_START
+  TIMESTAMP_END
+  PHASE
+}
+
+input pistols_SeasonConfigWhereInput {
+  table_id: felt252
+  table_idGT: felt252
+  table_idGTE: felt252
+  table_idLT: felt252
+  table_idLTE: felt252
+  table_idNEQ: felt252
+  table_idEQ: felt252
+  table_idNOTIN: [felt252]
+  table_idIN: [felt252]
+  table_idNOTLIKE: felt252
+  table_idLIKE: felt252
+  season_id: u16
+  season_idGT: u16
+  season_idGTE: u16
+  season_idLT: u16
+  season_idLTE: u16
+  season_idNEQ: u16
+  season_idEQ: u16
+  season_idNOTIN: [u16]
+  season_idIN: [u16]
+  season_idNOTLIKE: u16
+  season_idLIKE: u16
+  timestamp_start: u64
+  timestamp_startGT: u64
+  timestamp_startGTE: u64
+  timestamp_startLT: u64
+  timestamp_startLTE: u64
+  timestamp_startNEQ: u64
+  timestamp_startEQ: u64
+  timestamp_startNOTIN: [u64]
+  timestamp_startIN: [u64]
+  timestamp_startNOTLIKE: u64
+  timestamp_startLIKE: u64
+  timestamp_end: u64
+  timestamp_endGT: u64
+  timestamp_endGTE: u64
+  timestamp_endLT: u64
+  timestamp_endLTE: u64
+  timestamp_endNEQ: u64
+  timestamp_endEQ: u64
+  timestamp_endNOTIN: [u64]
+  timestamp_endIN: [u64]
+  timestamp_endNOTLIKE: u64
+  timestamp_endLIKE: u64
+  phase: Enum
 }
 
 type pistols_TableConfig {
   table_id: felt252
   description: felt252
   table_type: Enum
-  deck_type: Enum
   fee_collector_address: ContractAddress
   fee_min: u128
   is_open: bool
@@ -1437,7 +1877,6 @@ enum pistols_TableConfigOrderField {
   TABLE_ID
   DESCRIPTION
   TABLE_TYPE
-  DECK_TYPE
   FEE_COLLECTOR_ADDRESS
   FEE_MIN
   IS_OPEN
@@ -1467,7 +1906,6 @@ input pistols_TableConfigWhereInput {
   descriptionNOTLIKE: felt252
   descriptionLIKE: felt252
   table_type: Enum
-  deck_type: Enum
   fee_collector_address: ContractAddress
   fee_collector_addressGT: ContractAddress
   fee_collector_addressGTE: ContractAddress
@@ -1491,6 +1929,12 @@ input pistols_TableConfigWhereInput {
   fee_minNOTLIKE: u128
   fee_minLIKE: u128
   is_open: bool
+}
+
+type pistols_Task {
+  id: felt252
+  total: u32
+  description: ByteArray
 }
 
 type pistols_TokenBoundAddress {
@@ -1636,6 +2080,247 @@ input pistols_TokenConfigWhereInput {
   minted_countIN: [u128]
   minted_countNOTLIKE: u128
   minted_countLIKE: u128
+}
+
+type pistols_TrophyCreation {
+  id: felt252
+  hidden: bool
+  index: u8
+  points: u16
+  start: u64
+  end: u64
+  group: felt252
+  icon: felt252
+  title: felt252
+  description: ByteArray
+  tasks: [pistols_Task]
+  data: ByteArray
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_TrophyCreationConnection {
+  edges: [pistols_TrophyCreationEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_TrophyCreationEdge {
+  node: pistols_TrophyCreation
+  cursor: Cursor
+}
+
+input pistols_TrophyCreationOrder {
+  direction: OrderDirection!
+  field: pistols_TrophyCreationOrderField!
+}
+
+enum pistols_TrophyCreationOrderField {
+  ID
+  HIDDEN
+  INDEX
+  POINTS
+  START
+  END
+  GROUP
+  ICON
+  TITLE
+  DESCRIPTION
+  TASKS
+  DATA
+}
+
+input pistols_TrophyCreationWhereInput {
+  id: felt252
+  idGT: felt252
+  idGTE: felt252
+  idLT: felt252
+  idLTE: felt252
+  idNEQ: felt252
+  idEQ: felt252
+  idNOTIN: [felt252]
+  idIN: [felt252]
+  idNOTLIKE: felt252
+  idLIKE: felt252
+  hidden: bool
+  index: u8
+  indexGT: u8
+  indexGTE: u8
+  indexLT: u8
+  indexLTE: u8
+  indexNEQ: u8
+  indexEQ: u8
+  indexNOTIN: [u8]
+  indexIN: [u8]
+  indexNOTLIKE: u8
+  indexLIKE: u8
+  points: u16
+  pointsGT: u16
+  pointsGTE: u16
+  pointsLT: u16
+  pointsLTE: u16
+  pointsNEQ: u16
+  pointsEQ: u16
+  pointsNOTIN: [u16]
+  pointsIN: [u16]
+  pointsNOTLIKE: u16
+  pointsLIKE: u16
+  start: u64
+  startGT: u64
+  startGTE: u64
+  startLT: u64
+  startLTE: u64
+  startNEQ: u64
+  startEQ: u64
+  startNOTIN: [u64]
+  startIN: [u64]
+  startNOTLIKE: u64
+  startLIKE: u64
+  end: u64
+  endGT: u64
+  endGTE: u64
+  endLT: u64
+  endLTE: u64
+  endNEQ: u64
+  endEQ: u64
+  endNOTIN: [u64]
+  endIN: [u64]
+  endNOTLIKE: u64
+  endLIKE: u64
+  group: felt252
+  groupGT: felt252
+  groupGTE: felt252
+  groupLT: felt252
+  groupLTE: felt252
+  groupNEQ: felt252
+  groupEQ: felt252
+  groupNOTIN: [felt252]
+  groupIN: [felt252]
+  groupNOTLIKE: felt252
+  groupLIKE: felt252
+  icon: felt252
+  iconGT: felt252
+  iconGTE: felt252
+  iconLT: felt252
+  iconLTE: felt252
+  iconNEQ: felt252
+  iconEQ: felt252
+  iconNOTIN: [felt252]
+  iconIN: [felt252]
+  iconNOTLIKE: felt252
+  iconLIKE: felt252
+  title: felt252
+  titleGT: felt252
+  titleGTE: felt252
+  titleLT: felt252
+  titleLTE: felt252
+  titleNEQ: felt252
+  titleEQ: felt252
+  titleNOTIN: [felt252]
+  titleIN: [felt252]
+  titleNOTLIKE: felt252
+  titleLIKE: felt252
+  description: ByteArray
+  descriptionGT: ByteArray
+  descriptionGTE: ByteArray
+  descriptionLT: ByteArray
+  descriptionLTE: ByteArray
+  descriptionNEQ: ByteArray
+  descriptionEQ: ByteArray
+  descriptionNOTIN: [ByteArray]
+  descriptionIN: [ByteArray]
+  descriptionNOTLIKE: ByteArray
+  descriptionLIKE: ByteArray
+  data: ByteArray
+  dataGT: ByteArray
+  dataGTE: ByteArray
+  dataLT: ByteArray
+  dataLTE: ByteArray
+  dataNEQ: ByteArray
+  dataEQ: ByteArray
+  dataNOTIN: [ByteArray]
+  dataIN: [ByteArray]
+  dataNOTLIKE: ByteArray
+  dataLIKE: ByteArray
+}
+
+type pistols_TrophyProgression {
+  player_id: felt252
+  task_id: felt252
+  count: u32
+  time: u64
+  entity: World__Entity
+  eventMessage: World__EventMessage
+}
+
+type pistols_TrophyProgressionConnection {
+  edges: [pistols_TrophyProgressionEdge]
+  totalCount: Int!
+  pageInfo: World__PageInfo!
+}
+
+type pistols_TrophyProgressionEdge {
+  node: pistols_TrophyProgression
+  cursor: Cursor
+}
+
+input pistols_TrophyProgressionOrder {
+  direction: OrderDirection!
+  field: pistols_TrophyProgressionOrderField!
+}
+
+enum pistols_TrophyProgressionOrderField {
+  PLAYER_ID
+  TASK_ID
+  COUNT
+  TIME
+}
+
+input pistols_TrophyProgressionWhereInput {
+  player_id: felt252
+  player_idGT: felt252
+  player_idGTE: felt252
+  player_idLT: felt252
+  player_idLTE: felt252
+  player_idNEQ: felt252
+  player_idEQ: felt252
+  player_idNOTIN: [felt252]
+  player_idIN: [felt252]
+  player_idNOTLIKE: felt252
+  player_idLIKE: felt252
+  task_id: felt252
+  task_idGT: felt252
+  task_idGTE: felt252
+  task_idLT: felt252
+  task_idLTE: felt252
+  task_idNEQ: felt252
+  task_idEQ: felt252
+  task_idNOTIN: [felt252]
+  task_idIN: [felt252]
+  task_idNOTLIKE: felt252
+  task_idLIKE: felt252
+  count: u32
+  countGT: u32
+  countGTE: u32
+  countLT: u32
+  countLTE: u32
+  countNEQ: u32
+  countEQ: u32
+  countNOTIN: [u32]
+  countIN: [u32]
+  countNOTLIKE: u32
+  countLIKE: u32
+  time: u64
+  timeGT: u64
+  timeGTE: u64
+  timeLT: u64
+  timeLTE: u64
+  timeNEQ: u64
+  timeEQ: u64
+  timeNOTIN: [u64]
+  timeIN: [u64]
+  timeNOTLIKE: u64
+  timeLIKE: u64
 }
 
 type Token__Balance {
@@ -1830,28 +2515,30 @@ type World__Query {
   transactions(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int): World__TransactionConnection
   tokenBalances(accountAddress: String!, first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int): Token__BalanceConnection
   tokenTransfers(accountAddress: String!, first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int): Token__TransferConnection
-  pistolsChallengeFameBalanceModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ChallengeFameBalanceWhereInput, order: pistols_ChallengeFameBalanceOrder): pistols_ChallengeFameBalanceConnection
-  pistolsPaymentModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PaymentWhereInput, order: pistols_PaymentOrder): pistols_PaymentConnection
-  pistolsTokenBoundAddressModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TokenBoundAddressWhereInput, order: pistols_TokenBoundAddressOrder): pistols_TokenBoundAddressConnection
-  pistolsTableAdmittanceModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TableAdmittanceWhereInput, order: pistols_TableAdmittanceOrder): pistols_TableAdmittanceConnection
-  pistolsRoundModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_RoundWhereInput, order: pistols_RoundOrder): pistols_RoundConnection
-  pistolsPactModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PactWhereInput, order: pistols_PactOrder): pistols_PactConnection
-  pistolsTokenConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TokenConfigWhereInput, order: pistols_TokenConfigOrder): pistols_TokenConfigConnection
-  pistolsScoreboardModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ScoreboardWhereInput, order: pistols_ScoreboardOrder): pistols_ScoreboardConnection
-  pistolsTableConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TableConfigWhereInput, order: pistols_TableConfigOrder): pistols_TableConfigConnection
-  pistolsConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ConfigWhereInput, order: pistols_ConfigOrder): pistols_ConfigConnection
-  pistolsChallengeModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ChallengeWhereInput, order: pistols_ChallengeOrder): pistols_ChallengeConnection
-  pistolsCoinConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_CoinConfigWhereInput, order: pistols_CoinConfigOrder): pistols_CoinConfigConnection
-  pistolsDuelistModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_DuelistWhereInput, order: pistols_DuelistOrder): pistols_DuelistConnection
-  pistolsPPlayerTutorialProgressModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PPlayerTutorialProgressWhereInput, order: pistols_PPlayerTutorialProgressOrder): pistols_PPlayerTutorialProgressConnection
-  pistolsPPlayerBookmarkModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PPlayerBookmarkWhereInput, order: pistols_PPlayerBookmarkOrder): pistols_PPlayerBookmarkConnection
-  pistolsPPlayerOnlineModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PPlayerOnlineWhereInput, order: pistols_PPlayerOnlineOrder): pistols_PPlayerOnlineConnection
+  pistolsTrophyCreationModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TrophyCreationWhereInput, order: pistols_TrophyCreationOrder): pistols_TrophyCreationConnection
+  pistolsPlayerRequiredActionModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerRequiredActionWhereInput, order: pistols_PlayerRequiredActionOrder): pistols_PlayerRequiredActionConnection
   pistolsPlayerActivityModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerActivityWhereInput, order: pistols_PlayerActivityOrder): pistols_PlayerActivityConnection
-  pistolsConsumableBalanceModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ConsumableBalanceWhereInput, order: pistols_ConsumableBalanceOrder): pistols_ConsumableBalanceConnection
-  pistolsPlayerBookmarkModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerBookmarkWhereInput, order: pistols_PlayerBookmarkOrder): pistols_PlayerBookmarkConnection
-  pistolsPlayerTutorialProgressModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerTutorialProgressWhereInput, order: pistols_PlayerTutorialProgressOrder): pistols_PlayerTutorialProgressConnection
+  pistolsScoreboardTableModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ScoreboardTableWhereInput, order: pistols_ScoreboardTableOrder): pistols_ScoreboardTableConnection
   pistolsPlayerModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerWhereInput, order: pistols_PlayerOrder): pistols_PlayerConnection
+  pistolsPactModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PactWhereInput, order: pistols_PactOrder): pistols_PactConnection
+  pistolsChallengeFameBalanceModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ChallengeFameBalanceWhereInput, order: pistols_ChallengeFameBalanceOrder): pistols_ChallengeFameBalanceConnection
+  pistolsTrophyProgressionModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TrophyProgressionWhereInput, order: pistols_TrophyProgressionOrder): pistols_TrophyProgressionConnection
+  pistolsConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ConfigWhereInput, order: pistols_ConfigOrder): pistols_ConfigConnection
+  pistolsTableConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TableConfigWhereInput, order: pistols_TableConfigOrder): pistols_TableConfigConnection
+  pistolsSeasonConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_SeasonConfigWhereInput, order: pistols_SeasonConfigOrder): pistols_SeasonConfigConnection
+  pistolsCoinConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_CoinConfigWhereInput, order: pistols_CoinConfigOrder): pistols_CoinConfigConnection
+  pistolsScoreboardModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ScoreboardWhereInput, order: pistols_ScoreboardOrder): pistols_ScoreboardConnection
+  pistolsPackModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PackWhereInput, order: pistols_PackOrder): pistols_PackConnection
+  pistolsTokenConfigModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TokenConfigWhereInput, order: pistols_TokenConfigOrder): pistols_TokenConfigConnection
+  pistolsTokenBoundAddressModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_TokenBoundAddressWhereInput, order: pistols_TokenBoundAddressOrder): pistols_TokenBoundAddressConnection
+  pistolsPlayerBookmarkModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerBookmarkWhereInput, order: pistols_PlayerBookmarkOrder): pistols_PlayerBookmarkConnection
+  pistolsMockedValueModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_MockedValueWhereInput, order: pistols_MockedValueOrder): pistols_MockedValueConnection
+  pistolsChallengeModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_ChallengeWhereInput, order: pistols_ChallengeOrder): pistols_ChallengeConnection
   pistolsPlayerOnlineModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PlayerOnlineWhereInput, order: pistols_PlayerOnlineOrder): pistols_PlayerOnlineConnection
+  pistolsPaymentModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_PaymentWhereInput, order: pistols_PaymentOrder): pistols_PaymentConnection
+  pistolsDuelistChallengeModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_DuelistChallengeWhereInput, order: pistols_DuelistChallengeOrder): pistols_DuelistChallengeConnection
+  pistolsDuelistModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_DuelistWhereInput, order: pistols_DuelistOrder): pistols_DuelistConnection
+  pistolsRoundModels(first: Int, last: Int, before: Cursor, after: Cursor, offset: Int, limit: Int, where: pistols_RoundWhereInput, order: pistols_RoundOrder): pistols_RoundConnection
 }
 
 type World__Social {

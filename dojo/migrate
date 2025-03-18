@@ -24,12 +24,12 @@ echo "--------------------------------------------------------------------------
 sozo --version
 echo "------------------------------------------------------------------------------"
 echo ">>> Cleaning..."
-sozo -P $PROFILE $OFFLINE clean
+execute_command "sozo -P $PROFILE $ARG_OFFLINE clean"
 echo ">>> Building..."
 if [[ "$PROFILE" == "dev" ]]; then
-  sozo -P $PROFILE $OFFLINE build $BINDINGS
+  execute_command "sozo -P $PROFILE $ARG_OFFLINE build $ARG_BINDINGS"
 else
-  sozo -P $PROFILE $OFFLINE build
+  execute_command "sozo -P $PROFILE $ARG_OFFLINE build"
 fi
 echo "👍"
 
@@ -38,20 +38,20 @@ echo "👍"
 #
 echo "------------------------------------------------------------------------------"
 echo ">>> Inspect migrations..."
-sozo -P $PROFILE $OFFLINE inspect --world $WORLD_ADDRESS
+execute_command "sozo -P $PROFILE $ARG_OFFLINE inspect --world $WORLD_ADDRESS"
 
-if [[ -n "$INSPECT" ]]; then
+if [[ -n "$ARG_INSPECT" ]]; then # if is set
   echo "--- INSPECTED! 👍"
   exit 0
 fi
 
 echo ">>> Do migrations..."
-# sozo -P $PROFILE $OFFLINE migrate -vvv --world $WORLD_ADDRESS
-sozo -P $PROFILE $OFFLINE migrate --world $WORLD_ADDRESS
+# execute_command "sozo -P $PROFILE $ARG_OFFLINE migrate -vvv --world $WORLD_ADDRESS"
+execute_command "sozo -P $PROFILE $ARG_OFFLINE migrate --world $WORLD_ADDRESS"
 echo "👍"
 
-echo ">>> Inspect again..."
-sozo -P $PROFILE $OFFLINE inspect --world $WORLD_ADDRESS
+# echo ">>> Inspect again..."
+# execute_command "sozo -P $PROFILE $ARG_OFFLINE inspect --world $WORLD_ADDRESS"
 
 #-----------------
 # auth write
@@ -71,7 +71,9 @@ echo "👍"
 # create torii config
 export DUEL_TOKEN_ADDRESS=$(get_contract_address "pistols-duel_token")
 export DUELIST_TOKEN_ADDRESS=$(get_contract_address "pistols-duelist_token")
+export PACK_TOKEN_ADDRESS=$(get_contract_address "pistols-pack_token")
 export FAME_TOKEN_ADDRESS=$(get_contract_address "pistols-fame_coin")
+export FOOLS_TOKEN_ADDRESS=$(get_contract_address "pistols-fools_coin")
 export LORDS_TOKEN_ADDRESS=${LORDS_ADDRESS:-$(get_contract_address "pistols-lords_mock")}
 echo "------------------------------------------------------------------------------"
 echo ">>> Create torii config [$TORII_CONFIG_PATH]..."
@@ -81,7 +83,9 @@ sed -i '' -e "s|\$world_address|$WORLD_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$rpc_url|$RPC_URL|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$duel_token|$DUEL_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$duelist_token|$DUELIST_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
+sed -i '' -e "s|\$pack_token|$PACK_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$fame_coin|$FAME_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
+sed -i '' -e "s|\$fools_coin|$FOOLS_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$lords|$LORDS_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 cat $TORII_CONFIG_PATH
 echo "👍"
@@ -92,16 +96,18 @@ echo "👍"
 if [[ "$PROFILE" == "dev" ]]; then
   #
   # copy typescript bindings
-  cp -R $BINDINGS_PATH/typescript/* $SDK_GAME_PATH/generated/
+  if [[ -n "$ARG_BINDINGS" ]]; then # if is set
+    cp -R $BINDINGS_PATH/typescript/* $SDK_GAME_PATH/generated/
+  fi
   #
-  # constant generator
-  # npm run create-constants --sdk=../sdk/src/games/pistols
-  echo "------------------------------------------------------------------------------"
-  echo ">>> Generate sources..."
+  # run generators...
   cd ../client
-  export CMD="npm run create-constants --sdk=$SDK_GAME_PATH"
-  echo "command: $CMD"
-  $CMD
+  echo "------------------------------------------------------------------------------"
+  echo ">>> Generate constants..."
+  # npm run generate-constants --sdk=../sdk/src/games/pistols
+  # npx --package=@underware/pistols-sdk generate-constants --src:"../dojo/src" --out:"../sdk/src/games/pistols/generated/constants.ts"
+  # ../sdk/bin/generateConstants.cjs --src:"../dojo/src" --out:"../sdk/src/games/pistols/generated/constants.ts"
+  execute_command "npm run generate-constants --sdk=$SDK_GAME_PATH"
   echo "👍?"
   #
   # list copied files
@@ -109,6 +115,15 @@ if [[ "$PROFILE" == "dev" ]]; then
   ls -ld $SDK_GAME_PATH/* | grep -E 'ts|json'
 fi
 
+if [[ "$PROFILE" == "mainnet" ]]; then
+  echo "------------------------------------------------------------------------------"
+  echo ">>> Generate controller preset..."
+  # npm run generate-controller-preset --sdk=../sdk/src/games/pistols
+  # npx --package=@underware/pistols-sdk generate-controller-preset --out:"../sdk/src/games/pistols/generated/preset.json"
+  # ../sdk/dist/bin/generateControllerPreset.mjs --out:"../sdk/src/games/pistols/generated/preset.json"
+  execute_command "npm run generate-controller-preset --sdk=$SDK_GAME_PATH"
+  echo "👍?"
+fi
 
 #------------------
 echo "--- DONE! 👍"

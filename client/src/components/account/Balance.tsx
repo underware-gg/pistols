@@ -1,8 +1,9 @@
 import { ReactNode, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { CustomIcon, EmojiIcon, IconSizeProp } from '/src/components/ui/Icons'
-import { weiToEthString } from '@underware_gg/pistols-sdk/utils'
+import { weiToEthString } from '@underware/pistols-sdk/utils/starknet'
 import { EMOJI } from '/src/data/messages'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 
 type CoinIconProps = {
   size?: IconSizeProp
@@ -17,25 +18,34 @@ export function EtherIcon({
 export function LordsBagIcon({
   size = null,
 }: CoinIconProps) {
-  return <CustomIcon logo png name='lords_bag' size={size} alt='$LORDS' />
+  return <CustomIcon logo svg name='lords_bag' size={size} alt='$LORDS' />
+}
+
+export function FoolsIcon({
+  size = null,
+}: CoinIconProps) {
+  return <CustomIcon logo svg name='fools1' size={size} alt='$FOOLS' />
+  // return <EmojiIcon emoji={EMOJI.FOOLS} size={size} alt='$FOOLS' />
 }
 
 export function FameIcon({
   size = null,
 }: CoinIconProps) {
+  // return <CustomIcon logo svg name='fame1' size={size} alt='$FAME' />
   return <EmojiIcon emoji={EMOJI.FAME} size={size} alt='$FAME' />
 }
 
 export function Balance({
-  ether = false,    // used for icon only
-  lords = false,    // used for icon only
-  fame = false,     // used for icon only
-  clean = false,    // no icon
+  ether = false,
+  lords = false,
+  fools = false,
+  fame = false,
+  clean = false,
   value = null,
   decimals,
   wei = null,
-  big = false,
-  small = false,
+  size = null,
+  bold = false,
   crossed = false,
   pre = null,
   post = null,
@@ -44,19 +54,22 @@ export function Balance({
 }: {
   ether?: boolean
   lords?: boolean
+  fools?: boolean
   fame?: boolean
   clean?: boolean
   value?: BigNumberish
   wei?: BigNumberish
   decimals?: number
-  big?: boolean
-  small?: boolean
+  size?: IconSizeProp
+  bold?: boolean
   crossed?: boolean
   pre?: string
   post?: string
   placeholdder?: string | number
   children?: ReactNode
 }) {
+  const { aspectWidth } = useGameAspect()
+
   const _value = useMemo<string>(() => {
     const _decimals = decimals ?? (ether ? 6 : 0)
     const result = (
@@ -64,35 +77,41 @@ export function Balance({
         : value != null ? weiToEthString(value, _decimals)
           : ''
     )
-    return (result == '0' || result == '0.0') ? EMOJI.ZERO : result
+    return fools ? result : ((result == '0' || result == '0.0') ? EMOJI.ZERO : result)
   }, [decimals, value, wei])
 
   const classNames = useMemo(() => {
     let result = []
-    if (small) result.push('CoinSmall')
-    else if (big) result.push('CoinBig')
-    else result.push('Coin')
+    if (bold) result.push('Bold')
     if (crossed) result.push('Crossed')
     return result
-  }, [small, big, crossed])
+  }, [crossed, bold])
+
+  const fontSize = useMemo(() => {
+    switch(size) {
+      case 'tiny': return aspectWidth(0.6)
+      case 'small': return aspectWidth(0.8) 
+      case 'big': return aspectWidth(1.4)
+      case 'huge': return aspectWidth(1.8)
+      default: return aspectWidth(1)
+    }
+  }, [size, aspectWidth])
 
   const _icon = useMemo(() => {
     if (clean) return <></>
     if (ether) return <><EtherIcon size={'small'} />{' '}</>
     if (lords) return <><LordsBagIcon size={null} />{' '}</>
+    if (fools) return <><FoolsIcon size={null} />{' '}</>
     if (fame) return <><FameIcon size={'small'} />{' '}</>
     return <></>
-  }, [clean, lords, fame, ether])
+  }, [clean, lords, fools, fame, ether])
 
   return (
-    <span className={classNames.join(' ')}>
+    <span className={classNames.join(' ')} style={{ fontSize }}>
       {pre}
-      {/* {!clean && <>💰</>} */}
-      {/* {!clean && <EmojiIcon emoji='💰' />} */}
       {_icon}
       {_value || children || placeholdder}
       {post}
     </span>
   )
 }
-

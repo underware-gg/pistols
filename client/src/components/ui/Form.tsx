@@ -3,7 +3,7 @@
 
 import React, { useMemo } from 'react'
 import { Checkbox, Dropdown, Input } from 'semantic-ui-react'
-import { getObjectKeyByValue } from '@underware_gg/pistols-sdk/utils'
+import { getObjectKeyByValue, isNumber } from '@underware/pistols-sdk/utils'
 
 export function FormInput({
   label,
@@ -14,8 +14,10 @@ export function FormInput({
   code = false,
   fluid = true,
   disabled = false,
+  className = null,
+  style = null,
 }: {
-  label: string
+  label?: string
   placeholder?: string
   value: string,
   setValue: (v: string) => void
@@ -23,18 +25,22 @@ export function FormInput({
   code?: boolean
   fluid?: boolean
   disabled?: boolean
+  className?: string
+  style?: React.CSSProperties
 }) {
   const classNames = useMemo(() => {
-    let classNames = ['FormInput']
+    let classNames = className ? [className] : []
+    classNames.push('FormInput')
     if (code) classNames.push('Number')
     return classNames
   }, [code])
 
   return (
     <>
-      <span className='FormLabel TitleCase'>{label}</span>
+      {label && <span className='FormLabel TitleCase'>{label}</span>}
       <Input
         className={classNames.join(' ')}
+        style={style}
         fluid={fluid}
         maxLength={maxLength}
         placeholder={placeholder}
@@ -43,6 +49,55 @@ export function FormInput({
         onChange={(e) => setValue(e.target.value)}
       />
     </>
+  )
+}
+
+export function FormInputNumber({
+  label,
+  placeholder,
+  value,
+  setValue,
+  minValue,
+  maxValue,
+  code = true,
+  fluid = true,
+  disabled = false,
+  className = null,
+}: {
+  label?: string
+  placeholder?: string
+  value: number,
+  setValue: (v: number) => void
+  minValue: number
+  maxValue: number
+  code?: boolean
+  fluid?: boolean
+  disabled?: boolean
+  className?: string
+}) {
+  const maxLength = useMemo(() => (maxValue.toString().length), [maxValue])
+  const style = useMemo(() => ({ width: `${maxLength}em` }), [maxLength])
+  const _setValue = (v: string) => {
+    if (isNumber(v)) {
+      const n = parseInt(v)
+      if (n >= minValue && n <= maxValue) {
+        setValue(n)
+      }
+    }
+  }
+  return (
+    <FormInput
+      label={label}
+      placeholder={placeholder}
+      value={value.toString()}
+      setValue={_setValue}
+      maxLength={maxLength}
+      code={code}
+      fluid={fluid}
+      disabled={disabled}
+      className={className}
+      style={style}
+    />
   )
 }
 

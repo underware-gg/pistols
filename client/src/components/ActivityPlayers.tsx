@@ -3,12 +3,12 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { usePlayer, usePlayersOnline } from '/src/stores/playerStore'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
-import { useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
-import { formatTimestampDeltaElapsed } from '@underware_gg/pistols-sdk/utils'
+import { formatTimestampDeltaElapsed } from '@underware/pistols-sdk/utils'
+import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { PlayerLink } from '/src/components/Links'
 import { BookmarkIcon, OnlineStatusIcon } from '/src/components/ui/Icons'
 
-export const ActivityPlayers = () => {
+export default function ActivityPlayers() {
   const { address } = useAccount()
   const { bookmarkedPlayers } = usePlayer(address)
   const { playersOnline } = usePlayersOnline()
@@ -35,22 +35,18 @@ export const ActivityPlayers = () => {
   );
 }
 
-export default ActivityPlayers;
-
-
-interface ActivityItemProps {
-  address: BigNumberish
-  timestamp: number
-  clientSeconds: number
-  isBookmarked: boolean
-}
 
 const ActivityItem = ({
   address,
   timestamp,
   clientSeconds,
   isBookmarked,
-}: ActivityItemProps) => {
+}: {
+  address: BigNumberish
+  timestamp: number
+  clientSeconds: number
+  isBookmarked: boolean
+}) => {
   const { isAvailable } = usePlayer(address)
   const { publish } = usePlayerBookmarkSignedMessage(address, 0, !isBookmarked)
   const { result: time, isOnline, isAway } = useMemo(() => formatTimestampDeltaElapsed(timestamp, clientSeconds), [timestamp, clientSeconds])

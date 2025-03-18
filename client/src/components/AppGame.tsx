@@ -1,19 +1,21 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { ThreeJsProvider } from '/src/hooks/ThreeJsContext'
 import { GameplayProvider } from '/src/hooks/GameplayContext'
-import App, { AppProps } from '/src/components/App'
+import AppDojo, { AppDojoProps } from '/src/components/AppDojo'
 
 export default function AppGame({
-  backgroundImage = null,
+  backgroundImage,
+  networkId,
+  autoConnect,
   children,
-}: AppProps) {
+}: AppDojoProps) {
   return (
-    <App backgroundImage={backgroundImage}>
+    <AppDojo networkId={networkId} backgroundImage={backgroundImage} autoConnect={autoConnect}>
       <ThreeJsProvider>
         <GameplayProvider>
           {children}
         </GameplayProvider>
       </ThreeJsProvider>
-    </App>
+    </AppDojo>
   )
 }

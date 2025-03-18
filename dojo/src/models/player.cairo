@@ -1,22 +1,22 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum Activity {
-    Undefined,        // 0
-    CreatedDuelist,   // 1
-    CreatedChallenge, // 2
-    RepliedChallenge, // 3
-    CommittedMoves,   // 4
-    RevealedMoves,    // 5
-    Online,           // 6
-}
-
-#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-pub enum TutorialProgress {
-    None,               // 0
-    FinishedFirst,      // 1
-    FinishedSecond,     // 2
-    FinishedFirstDuel,  // 3
+    Undefined,          // 0
+    TutorialFinished,   // 1
+    PackStarter,        // 2
+    PackPurchased,      // 3
+    PackOpened,         // 4
+    DuelistSpawned,     // 5
+    DuelistDied,        // 6
+    ChallengeCreated,   // 7
+    ChallengeExpired,   // 8
+    ChallengeReplied,   // 9
+    MovesCommitted,     // 10
+    MovesRevealed,      // 11
+    PlayerTimedOut,     // 12
+    ChallengeResolved,  // 13
+    ChallengeDraw,      // 14
 }
 
 //---------------------
@@ -26,9 +26,15 @@ pub enum TutorialProgress {
 #[dojo::model]
 pub struct Player {
     #[key]
-    pub address: ContractAddress,   // controller wallet
+    pub player_address: ContractAddress,   // controller wallet
     //-----------------------
-    pub timestamp_registered: u64,
+    pub timestamps: PlayerTimestamps,
+}
+
+#[derive(Copy, Drop, Serde, PartialEq, IntrospectPacked)]
+pub struct PlayerTimestamps {
+    pub registered: u64,
+    pub claimed_starter_pack: bool,
 }
 
 
@@ -39,11 +45,20 @@ pub struct Player {
 #[dojo::event(historical:true)]
 pub struct PlayerActivity {
     #[key]
-    pub address: ContractAddress,
+    pub player_address: ContractAddress,
     //-----------------------
-    pub timestamp: u64,     // seconds since epoch
+    pub timestamp: u64,         // seconds since epoch
     pub activity: Activity,
-    pub identifier: felt252,
+    pub identifier: felt252,    // (optional) duel_id, duelist_id, ...
+    pub is_public: bool,        // can be displayed in activity log
+}
+#[derive(Copy, Drop, Serde)]
+#[dojo::event(historical:false)]
+pub struct PlayerRequiredAction {
+    #[key]
+    pub duelist_id: u128,
+    //-----------------------
+    pub duel_id: u128,
 }
 
 //--------------------------
@@ -55,7 +70,7 @@ pub struct PlayerActivity {
 //
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct PPlayerOnline {
+pub struct PlayerOnline {
     #[key]
     pub identity: ContractAddress,
     //-----------------------
@@ -63,7 +78,7 @@ pub struct PPlayerOnline {
 }
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct PPlayerBookmark {
+pub struct PlayerBookmark {
     #[key]
     pub identity: ContractAddress,
     #[key]
@@ -73,70 +88,68 @@ pub struct PPlayerBookmark {
     //-----------------------
     pub enabled: bool,
 }
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct PPlayerTutorialProgress {
-    #[key]
-    pub identity: ContractAddress,
-    //-----------------------
-    pub progress: TutorialProgress,
-}
 
 
 //----------------------------------
 // Traits
 //
-use starknet::{get_block_timestamp};
 use dojo::world::{WorldStorage};
 use dojo::event::EventStorage;
 use pistols::libs::store::{Store, StoreTrait};
-use pistols::models::consumable::{ConsumableType, ConsumableTypeTrait};
-use pistols::utils::arrays::{ArrayUtilsTrait};
-use pistols::types::constants::{CONST};
 
 mod PlayerErrors {
-    const PLAYER_NOT_REGISTERED: felt252    = 'PLAYER: Not registered';
-    const INSUFFICIENT_CONSUMABLES: felt252 = 'PLAYER: Insufficient consumable';
+    pub const PLAYER_NOT_REGISTERED: felt252    = 'PLAYER: Not registered';
 }
 
 #[generate_trait]
-impl PlayerImpl of PlayerTrait {
-    fn check_in(ref store: Store, address: ContractAddress, activity: Activity, identifier: felt252) {
-        let mut player: Player = store.get_player(address);
+pub impl PlayerImpl of PlayerTrait {
+    fn check_in(ref store: Store, activity: Activity, player_address: ContractAddress, identifier: felt252) {
+        let mut player: Player = store.get_player(player_address);
         if (!player.exists()) {
             assert(activity.can_register_player(), PlayerErrors::PLAYER_NOT_REGISTERED);
-            player.timestamp_registered = get_block_timestamp();
+            player.timestamps.registered = starknet::get_block_timestamp();
+            player.timestamps.claimed_starter_pack = (activity == Activity::PackStarter);
             store.set_player(@player);
-            // grant duelists
-            ConsumableType::DuelistToken.grant(ref store, address, CONST::DUELIST_PACK_AMOUNT_REGISTER);
+        } else if (activity == Activity::PackStarter) {
+            player.timestamps.claimed_starter_pack = true;
+            store.set_player(@player);
         }
-        activity.emit(ref store.world, address, identifier);
+        activity.emit(ref store.world, player_address, identifier);
     }
     #[inline(always)]
-    fn exists(self: Player) -> bool {
-        (self.timestamp_registered != 0)
+    fn exists(self: @Player) -> bool {
+        (*self.timestamps.registered != 0)
     }
 }
 
 
 #[generate_trait]
-impl ActivityImpl of ActivityTrait {
-    fn emit(self: Activity, ref world: WorldStorage, address: ContractAddress, identifier: felt252) {
+pub impl ActivityImpl of ActivityTrait {
+    fn emit(self: @Activity, ref world: WorldStorage, player_address: ContractAddress, identifier: felt252) {
         world.emit_event(@PlayerActivity{
-            address,
-            timestamp: get_block_timestamp(),
-            activity: self,
+            player_address,
+            timestamp: starknet::get_block_timestamp(),
+            activity: *self,
             identifier,
+            is_public: self.is_public(),
         });
     }
-    fn can_register_player(self: Activity) -> bool {
-        // match self {
-        //     Activity::CreatedDuelist |
-        //     Activity::CreatedChallenge |
-        //     Activity::RepliedChallenge => true,
-        //     _ => false,
-        // }
-        // TODO: remove this when we do a fresh deployment
-        (true)
+    fn is_public(self: @Activity) -> bool {
+        match self {
+            Activity::PackPurchased |
+            Activity::PackOpened => false,
+            _ => true,
+        }
+    }
+    fn can_register_player(self: @Activity) -> bool {
+        match self {
+            // Activity::PackStarter => true,
+            // Activity::TutorialFinished => true,
+            // Activity::DuelistSpawned => true,
+            // Activity::ChallengeCreated => true,
+            // Activity::ChallengeReplied => true,
+            // _ => false,
+            _ => true,
+        }
     }
 }

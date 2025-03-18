@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
-import { useSelectedChain } from '@underware_gg/pistols-sdk/dojo'
-import { bigintEquals, bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { bigintEquals, bigintToHex } from '@underware/pistols-sdk/utils'
 
 export function AccountChangeDetector({
   onChange,
@@ -25,14 +25,14 @@ export function ChainChangeDetector({
 }: {
   onChange?: Function
 }) {
-  const { selectedChainId } = useSelectedChain()
+  const { selectedNetworkId } = useStarknetContext()
   const [currentChainId, setCurrentChainId] = useState<string>(null)
   useEffect(() => {
-    if (!currentChainId && selectedChainId) {
-      setCurrentChainId(selectedChainId)
-    } else if (currentChainId && currentChainId != selectedChainId) {
+    if (!currentChainId && selectedNetworkId) {
+      setCurrentChainId(selectedNetworkId)
+    } else if (currentChainId && currentChainId != selectedNetworkId) {
       onChange?.()
     }
-  }, [currentChainId, selectedChainId])
+  }, [currentChainId, selectedNetworkId])
   return <></>
 }

@@ -1,8 +1,8 @@
-import React, { ReactNode, createContext, useReducer, useContext, useState, useCallback } from 'react'
+import React, { ReactNode, createContext, useReducer, useContext, useState, useCallback, useMemo } from 'react'
 import { useCookies } from 'react-cookie'
-import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
 import { BigNumberish } from 'starknet'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 //--------------------------------
 // Constants
@@ -13,9 +13,8 @@ export const initialState = {
   framerate: 60,
   musicEnabled: true,
   sfxEnabled: true,
-  tableId: '',
-  duelistId: 0n,
   duelSpeedFactor: 1.0,
+  completedTutorialLevel: 0,
   // internal
   initialized: false,
 }
@@ -26,9 +25,8 @@ const SettingsActions = {
   FRAMERATE: 'settings.FRAMERATE',
   MUSIC_ENABLED: 'settings.MUSIC_ENABLED',
   SFX_ENABLED: 'settings.SFX_ENABLED',
-  TABLE_ID: 'settings.TABLE_ID',
-  DUELIST_ID: 'settings.DUELIST_ID',
-  DUEL_SPEED_FACTOR: 'settings.DUEL_SPEED_FACTOR'
+  DUEL_SPEED_FACTOR: 'settings.DUEL_SPEED_FACTOR',
+  TUTORIAL_LEVEL: 'settings.TUTORIAL_LEVEL',
 }
 
 //--------------------------------
@@ -42,9 +40,8 @@ type ActionType =
   | { type: 'FRAMERATE', payload: number }
   | { type: 'MUSIC_ENABLED', payload: boolean }
   | { type: 'SFX_ENABLED', payload: boolean }
-  | { type: 'TABLE_ID', payload: string }
-  | { type: 'DUELIST_ID', payload: bigint }
   | { type: 'DUEL_SPEED_FACTOR', payload: number }
+  | { type: 'TUTORIAL_LEVEL', payload: number }
   // internal
   | { type: 'INITIALIZED', payload: boolean }
 
@@ -80,9 +77,8 @@ const SettingsProvider = ({
       [SettingsActions.FRAMERATE]: () => setCookie(cookieName, state.framerate, _options),
       [SettingsActions.MUSIC_ENABLED]: () => setCookie(cookieName, state.musicEnabled, _options),
       [SettingsActions.SFX_ENABLED]: () => setCookie(cookieName, state.sfxEnabled, _options),
-      [SettingsActions.TABLE_ID]: () => setCookie(cookieName, state.tableId, _options),
-      [SettingsActions.DUELIST_ID]: () => setCookie(cookieName, Number(state.duelistId), _options),
       [SettingsActions.DUEL_SPEED_FACTOR]: () => setCookie(cookieName, Number(state.duelSpeedFactor), _options),
+      [SettingsActions.TUTORIAL_LEVEL]: () => setCookie(cookieName, state.completedTutorialLevel, _options),
     }
     _setters[cookieName]?.()
   }, [setCookie])
@@ -124,14 +120,9 @@ const SettingsProvider = ({
         cookieSetter(SettingsActions.DUEL_SPEED_FACTOR, newState)
         break
       }
-      case SettingsActions.TABLE_ID: {
-        newState.tableId = action.payload as string
-        cookieSetter(SettingsActions.TABLE_ID, newState)
-        break
-      }
-      case SettingsActions.DUELIST_ID: {
-        newState.duelistId = BigInt(action.payload)
-        cookieSetter(SettingsActions.DUELIST_ID, newState)
+      case SettingsActions.TUTORIAL_LEVEL: {
+        newState.completedTutorialLevel = action.payload as number
+        cookieSetter(SettingsActions.TUTORIAL_LEVEL, newState)
         break
       }
       default:
@@ -183,29 +174,16 @@ export const useSettings = () => {
     })
   }
 
-  const dispatchTableId = (newId: string) => {
-    dispatch({
-      type: SettingsActions.TABLE_ID,
-      payload: newId,
-    })
-  }
-
-  const dispatchDuelistId = (newId: BigNumberish) => {
-    dispatch({
-      type: SettingsActions.DUELIST_ID,
-      payload: BigInt(newId),
-    })
-  }
+  const settings = useMemo(() => ({
+    ...state,
+    hasFinishedTutorial: (state.completedTutorialLevel > 2),
+  }), [state])
 
   return {
-    ...state,   // expose individual settings values
-    tableId: (state.tableId || constants.TABLES.LORDS),
-    isAnon: (state.duelistId == 0n),
-    settings: { ...state },  // expose settings as object {}
+    ...settings,    // expose individual settings values directly
+    settings,       // expose settings as object {}
     SettingsActions,
     dispatchSetting,
-    dispatchTableId,
-    dispatchDuelistId,
   }
 }
 

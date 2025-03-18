@@ -1,27 +1,21 @@
-
 //------------------------------------------------------
 // libs::utils tests
 //
 #[cfg(test)]
 mod tests {
-    use debug::PrintTrait;
-    use core::traits::{Into, TryInto};
     use starknet::{ContractAddress};
 
-    use pistols::libs::{pact};
-    use pistols::models::challenge::{Round};
-    use pistols::models::duelist::{Duelist, Score, ScoreTrait};
-    use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
-    use pistols::types::round_state::{RoundState, RoundStateTrait};
+    use pistols::models::duelist::{Score, ScoreTrait};
+    use pistols::models::pact::{PactTrait};
     use pistols::utils::short_string::{ShortString};
 
     #[test]
     fn test_pact_pair() {
-        let a: u128 = 0xb5e186ef2e4ab2762367cd07c8f892a1;
-        let b: u128 = 0x6b86e40118f29ebe393a75469b4d926c;
-        let p_a = pact::make_pact_pair(a, b);
-        let p_b = pact::make_pact_pair(b, a);
-        assert(p_a == p_b, 'test_pact_pair');
+        let a: ContractAddress = starknet::contract_address_const::<0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec>();
+        let b: ContractAddress = starknet::contract_address_const::<0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7>();
+        let p_a = PactTrait::make_pair(a, b);
+        let p_b = PactTrait::make_pair(b, a);
+        assert_eq!(p_a, p_b, "test_pact_pair");
     }
 
     #[test]
@@ -29,7 +23,7 @@ mod tests {
         let mut score: Score = Default::default();
         score.total_duels = 1;
         score.update_honour(100);
-        assert(score.is_lord(), 'is_lord()');
+        assert!(score.is_lord(), "is_lord()");
     }
 
     #[test]
@@ -42,10 +36,10 @@ mod tests {
             score.total_duels += 1;
             score.update_honour(n);
             sum += n;
-            assert(score.honour == (sum / n), ShortString::concat('sum_8___', n.into()));
+            assert_eq!(score.honour, (sum / n), "sum_8__{}", n);
             n += 1;
         };
-        assert(score.honour_history == 0x0807060504030201, '0x0807060504030201');
+        assert_eq!(score.honour_history, 0x0807060504030201, "0x0807060504030201");
         // loop history
         loop {
             if (n > 16) { break; }
@@ -53,14 +47,14 @@ mod tests {
             score.update_honour(n);
             sum -= n - 8;
             sum += n;
-            assert(score.honour == (sum / 8), ShortString::concat('sum_16___', n.into()));
+            assert_eq!(score.honour, (sum / 8), "sum_16__{}", n);
             n += 1;
         };
-        assert(score.honour_history == 0x100f0e0d0c0b0a09, '0x100f0e0d0c0b0a09');
+        assert_eq!(score.honour_history, 0x100f0e0d0c0b0a09, "0x100f0e0d0c0b0a09");
         // new loop
         score.total_duels += 1;
         score.update_honour(n);
-        assert(score.honour_history == 0x100f0e0d0c0b0a11, '0x100f0e0d0c0b0a11');
+        assert_eq!(score.honour_history, 0x100f0e0d0c0b0a11, "0x100f0e0d0c0b0a11");
     }
 
 }

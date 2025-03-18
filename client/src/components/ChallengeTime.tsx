@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
-import { useChallenge } from '/src/stores/challengeStore'
-import { useClientTimestamp } from '@underware_gg/pistols-sdk/hooks'
-import { formatTimestampLocal, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@underware_gg/pistols-sdk/utils'
+import { useChallenge, useRoundTimeout } from '/src/stores/challengeStore'
+import { formatTimestampLocal, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@underware/pistols-sdk/utils'
+import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { EMOJI } from '/src/data/messages'
 
 export function ChallengeTime({
@@ -10,27 +10,38 @@ export function ChallengeTime({
 }) {
   const {
     isAwaiting, isLive, isFinished, isCanceled,
-    timestamp_start, timestamp_end,
+    timestampStart, timestampEnd,
   } = useChallenge(duelId)
+  const { timeoutTimestamp } = useRoundTimeout(duelId)
 
   const { clientSeconds } = useClientTimestamp(isAwaiting || isLive)
 
-  const emoji = useMemo(() => {
-    if (isAwaiting) return EMOJI.AWAITING
-    if (isLive) return EMOJI.IN_PROGRESS
-    return null
-  }, [isAwaiting, isLive])
+  const elapsed = useMemo(() => {
+    return (timestampStart && isLive) ? formatTimestampDeltaElapsed(timestampStart, clientSeconds).result : null
+  }, [isLive, clientSeconds, timestampStart])
+
+  const countdown = useMemo(() => {
+    const timestamp = Math.max(timestampEnd, timeoutTimestamp)
+    return (timestamp && (isAwaiting || isLive)) ? formatTimestampDeltaCountdown(clientSeconds, timestamp).result : null
+  }, [isAwaiting, isLive, clientSeconds, timestampEnd, timeoutTimestamp])
 
   const date = useMemo(() => {
-    if (isAwaiting) return formatTimestampDeltaCountdown(clientSeconds, timestamp_end).result
-    if (isLive) return formatTimestampDeltaElapsed(timestamp_start, clientSeconds).result
-    if (isCanceled || isFinished) return (prefixed ? 'Finished at ' : '') + formatTimestampLocal(timestamp_end)
-    return formatTimestampLocal(timestamp_start)
-  }, [isAwaiting, isCanceled, isLive, isFinished, timestamp_start, timestamp_end, clientSeconds])
+    return (timestampEnd && (isCanceled || isFinished)) ?
+      (prefixed ? 'Finished at ' : '') + formatTimestampLocal(timestampEnd)
+      : formatTimestampLocal(timestampStart)
+  }, [isCanceled, isFinished, clientSeconds, timestampStart, timestampEnd])
 
   return (
     <>
-      {emoji} <span className='Number Smaller'>{date}</span>
+      {elapsed && <>
+        {` ${EMOJI.IN_PROGRESS} `} <span className='Number Smaller'>{elapsed}</span>
+      </>}
+      {countdown && <>
+        {` ${EMOJI.AWAITING} `} <span className='Number Smaller'>{countdown}</span>
+      </>}
+      {(!elapsed && !countdown) && <>
+        <span className='Number Smaller'>{date}</span>
+      </>}
     </>
   )
 }

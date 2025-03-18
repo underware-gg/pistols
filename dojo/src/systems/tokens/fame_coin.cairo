@@ -26,38 +26,39 @@ pub trait IFameCoin<TState> {
     fn address_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> ContractAddress;
     fn token_of_address(self: @TState, address: ContractAddress) -> (ContractAddress, u128);
     fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
-    fn transfer_from_token(ref self: TState, contract_address: ContractAddress, sender_token_id: u128, recipient_token_id: u128, amount: u256) -> bool;
+    fn transfer_from_token(ref self: TState, contract_address: ContractAddress, sender_token_id: u128, recipient: ContractAddress, amount: u256) -> bool;
+    fn transfer_from_token_to_token(ref self: TState, contract_address: ContractAddress, sender_token_id: u128, recipient_token_id: u128, amount: u256) -> bool;
     fn burn_from_token(ref self: TState, contract_address: ContractAddress, token_id: u128, amount: u256);
     
-    // IFameCoinPublic
-    fn minted_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);
-    fn updated_duelist(ref self: TState, from: ContractAddress, to: ContractAddress, duelist_id: u128);
+    // IFameCoinProtected
+    fn minted_duelist(ref self: TState, duelist_id: u128);
+    fn reward_duelist(ref self: TState, duelist_id: u128, amount: u128);
+    fn burn(ref self: TState, amount: u128);
 }
 
+// Exposed to world
 #[starknet::interface]
-pub trait IFameCoinPublic<TState> {
-    fn minted_duelist(ref self: TState, duelist_id: u128, amount_paid: u256);
-    fn updated_duelist(ref self: TState, from: ContractAddress, to: ContractAddress, duelist_id: u128);
+pub trait IFameCoinProtected<TState> {
+    fn minted_duelist(ref self: TState, duelist_id: u128);
+    fn reward_duelist(ref self: TState, duelist_id: u128, amount: u128);
+    fn burn(ref self: TState, amount: u128);
 }
 
 #[dojo::contract]
 pub mod fame_coin {
-    // use debug::PrintTrait;
-    use core::num::traits::Bounded;
-    use core::byte_array::ByteArrayTrait;
-    use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
-    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    use core::num::traits::{Bounded};
+    use starknet::{ContractAddress};
+    use dojo::world::{WorldStorage};
 
     //-----------------------------------
     // ERC-20 Start
     //
     use openzeppelin_token::erc20::ERC20Component;
-    // use openzeppelin_token::erc20::ERC20HooksEmptyImpl;
+    use openzeppelin_token::erc20::ERC20HooksEmptyImpl;
     use pistols::systems::components::token_bound::{TokenBoundComponent};
     use pistols::systems::components::coin_component::{
         CoinComponent,
-        CoinComponent::{Errors as CoinErrors},
+        // CoinComponent::{Errors as CoinErrors},
     };
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
     component!(path: CoinComponent, storage: coin, event: CoinEvent);
@@ -92,14 +93,13 @@ pub mod fame_coin {
     // ERC-20 End
     //-----------------------------------
 
-    use pistols::interfaces::systems::{SystemsTrait};
-    use pistols::interfaces::ierc721::{ierc721, ERC721ABIDispatcher, ERC721ABIDispatcherTrait};
+    use pistols::interfaces::dns::{DnsTrait};
     use pistols::utils::math::{MathU128, MathU256};
-    use pistols::utils::misc::{ZERO};
-    use pistols::types::constants::{CONST, FAME};
+    use pistols::types::constants::{FAME};
 
     mod Errors {
-        const NOT_IMPLEMENTED: felt252          = 'FAME: Not implemented';
+        pub const INVALID_CALLER: felt252   = 'FAME: Invalid caller';
+        pub const NOT_IMPLEMENTED: felt252  = 'FAME: Not implemented';
     }
 
     //*******************************************
@@ -108,103 +108,67 @@ pub mod fame_coin {
     //*******************************************
 
     fn dojo_init(ref self: ContractState) {
+        let mut world = self.world_default();
         self.erc20.initializer(
             COIN_NAME(),
             COIN_SYMBOL(),
         );
-        let mut world = self.world(@"pistols");
         self.coin.initialize(
             world.duelist_token_address(),
             faucet_amount: 0,
         );
     }
-
-    //-----------------------------------
-    // Public
-    //
-    use super::{IFameCoinPublic};
-    #[abi(embed_v0)]
-    impl FamePublicImpl of IFameCoinPublic<ContractState> {
-        fn minted_duelist(ref self: ContractState,
-            duelist_id: u128,
-            amount_paid: u256,
-        ) {
-            // validate minter
-            let duelist_contract_address: ContractAddress = self.coin.assert_caller_is_minter();
-
-            // register token_bound token
-            let token_address: ContractAddress = self.token_bound.register_token(duelist_contract_address, duelist_id);
-
-            // pre-approve minter as spender
-            self.erc20._approve(token_address, duelist_contract_address, Bounded::MAX);
-
-            // mint FAME to token
-            let amount: u256 = MathU256::max(FAME::MIN_MINT_GRANT_AMOUNT, amount_paid * FAME::FAME_PER_LORDS);
-            self.coin.mint(token_address, amount);
-        }
-
-        fn updated_duelist(ref self: ContractState,
-            from: ContractAddress,
-            to: ContractAddress,
-            duelist_id: u128,
-        ) {
-            // validate caller
-            let duelist_contract_address: ContractAddress = self.coin.assert_caller_is_minter();
-
-            // mint is handled in minted_duelist()
-            if (from.is_zero()) {
-                return;
-            }
-
-            // duelist changed owner, transfer its FAME
-            if (from != to) {
-                let balance: u256 = self.balance_of_token(duelist_contract_address, duelist_id);
-                if (balance > 0) {
-                    self.erc20.update(from, to, balance);
-                }
-            }
+    
+    #[generate_trait]
+    impl WorldDefaultImpl of WorldDefaultTrait {
+        #[inline(always)]
+        fn world_default(self: @ContractState) -> WorldStorage {
+            (self.world(@"pistols"))
         }
     }
 
     //-----------------------------------
-    // Hooks
+    // Public
     //
-    pub impl ERC20HooksImpl of ERC20Component::ERC20HooksTrait<ContractState> {
-        fn before_update(
-            ref self: ERC20Component::ComponentState<ContractState>,
-            from: ContractAddress,
-            recipient: ContractAddress,
-            amount: u256
+    #[abi(embed_v0)]
+    impl FamePublicImpl of super::IFameCoinProtected<ContractState> {
+        fn minted_duelist(ref self: ContractState,
+            duelist_id: u128,
         ) {
-            // validate caller
-            let mut contract_state = ERC20Component::HasComponent::get_contract_mut(ref self);
-            contract_state.coin.assert_caller_is_minter();
+            let mut world = self.world_default();
+
+            // validate minter (duelist token contract)
+            let minter_address: ContractAddress = self.coin.assert_caller_is_minter();
+
+            // register token_bound token
+            let token_address: ContractAddress = self.token_bound.register_token(minter_address, duelist_id);
+
+            // pre-approve minter (duelist) and bank as spenders
+            self.erc20._approve(token_address, minter_address, Bounded::MAX);
+            self.erc20._approve(token_address, world.bank_address(), Bounded::MAX);
+
+            // mint FAME to token
+            self.coin.mint(token_address, FAME::MINT_GRANT_AMOUNT);
         }
 
-        fn after_update(
-            ref self: ERC20Component::ComponentState<ContractState>,
-            from: ContractAddress,
-            recipient: ContractAddress,
-            amount: u256
+        fn reward_duelist(ref self: ContractState,
+            duelist_id: u128,
+            amount: u128,
         ) {
-            let mut contract_state = ERC20Component::HasComponent::get_contract_mut(ref self);
-            
-            let (from_contract_address, from_token_id): (ContractAddress, u128) = contract_state.token_bound.token_of_address(from);
-            let (to_contract_address, to_token_id): (ContractAddress, u128) = contract_state.token_bound.token_of_address(recipient);
-            
-            let from_owner: ContractAddress = 
-                if (from_contract_address.is_non_zero()) {
-                    ierc721(from_contract_address).owner_of(from_token_id.into())
-                } else {ZERO()};
-            let to_owner: ContractAddress = 
-                if (to_contract_address.is_non_zero()) {
-                    ierc721(to_contract_address).owner_of(to_token_id.into())
-                } else {ZERO()};
+            // validate caller (duelist token contract)
+            let minter_address: ContractAddress = self.coin.assert_caller_is_minter();
 
-            // transfer between tokens, repeat for owners
-            if ((from_owner.is_non_zero() || to_owner.is_non_zero()) && from_owner != to_owner) {
-                contract_state.erc20.update(from_owner, to_owner, amount);
-            }
+            // mint FAME to token
+            let token_address: ContractAddress = self.token_bound.address_of_token(minter_address, duelist_id);
+            self.coin.mint(token_address, amount.into());
+        }
+
+        fn burn(ref self: ContractState,
+            amount: u128,
+        ) {
+            let mut world = self.world_default();
+            assert(world.caller_is_world_contract(), Errors::INVALID_CALLER);
+            self.erc20.burn(starknet::get_caller_address(), amount.into());
         }
     }
 

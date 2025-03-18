@@ -1,125 +1,172 @@
-import React, { useMemo } from 'react'
-import { Grid, Modal } from 'semantic-ui-react'
-import { useSettings } from '/src/hooks/SettingsContext'
-import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { useIsMyDuelist, useIsYou } from '/src/hooks/useIsYou'
-import { useOwnerOfDuelist } from '/src/hooks/useDuelistToken'
-import { useDuelist } from '/src/stores/duelistStore'
-import { usePact } from '/src/hooks/usePact'
-import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
-import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
-import { useIsBookmarked, usePlayer } from '/src/stores/playerStore'
-import { ProfilePic } from '/src/components/account/ProfilePic'
-import { ProfileDescription } from '/src/components/account/ProfileDescription'
-import { ChallengeTableSelectedDuelist } from '/src/components/ChallengeTable'
-import { ActionButton } from '/src/components/ui/Buttons'
-import { BookmarkIcon, IconClick } from '/src/components/ui/Icons'
-import { SceneName } from '/src/data/assets'
+import React, { useMemo, useRef, useState, useEffect } from 'react'
+import { Modal } from 'semantic-ui-react'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
+import { CARD_ASPECT_RATIO, CARD_FLIP_ROTATION } from '/src/data/cardConstants'
+import TWEEN from '@tweenjs/tween.js'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 
-const Row = Grid.Row
-const Col = Grid.Column
+const HAND_CARD_WIDTH = 195
+const HAND_CARD_HEIGHT = HAND_CARD_WIDTH * (1080/1920)
 
 export default function DuelistModal() {
-  const { tableId, duelistId, isAnon, dispatchDuelistId } = useSettings()
-  const { atProfile, dispatchSetScene } = usePistolsScene()
-
-  const { selectedDuelistId, dispatchSelectDuel, dispatchSelectDuelistId, dispatchChallengingDuelistId, dispatchSelectPlayerAddress } = usePistolsContext()
-  const { owner } = useOwnerOfDuelist(selectedDuelistId)
-  const { name: ownerName } = usePlayer(owner)
+  const { aspectWidth } = useGameAspect()
+  const { selectedDuelistId, dispatchSelectDuelistId } = usePistolsContext()
+  
   const isOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
-  const { isYou } = useIsYou(selectedDuelistId)
-  const isMyDuelist = useIsMyDuelist(selectedDuelistId)
 
-  const _close = () => { dispatchSelectDuelistId(0n) }
+  const bottomCardRef = useRef<HTMLImageElement>(null)
+  const topCardRef = useRef<HTMLImageElement>(null)
+  const modalContentRef = useRef<HTMLDivElement>(null)
+  const duelistCardRef = useRef<DuelistCardHandle>(null)
 
-  const { profilePic, duelistIdDisplay } = useDuelist(selectedDuelistId)
-  const { hasPact, pactDuelId } = usePact(tableId, duelistId, selectedDuelistId)
+  const [showBack, setShowBack] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const [isHandOpen, setIsHandOpen] = useState(false)
 
-  const _switch = () => {
-    if (isYou) {
-      dispatchSetScene(SceneName.Gate)
-    } else if (isMyDuelist) {
-      dispatchDuelistId(selectedDuelistId)
+  const animate = (start: number, end: number, startScale: number, endScale: number, easing: (k: number) => number, onComplete?: () => void) => {
+    const position = { y: start, scale: startScale }
+    new TWEEN.Tween(position)
+      .to({ y: end, scale: endScale }, 500)
+      .easing(easing)
+      .onUpdate(() => {
+        if (modalContentRef.current) {
+          modalContentRef.current.style.transform = `translate(-50%, -50%) translateY(${position.y}px) scale(${position.scale})`
+        }
+      })
+      .onComplete(() => onComplete?.())
+      .start()
+
+    const animate = () => {
+      TWEEN.update()
+      if (modalContentRef.current) {
+        requestAnimationFrame(animate)
+      }
     }
+    animate()
   }
 
-  const _gotoOwner = () => {
-    dispatchSelectPlayerAddress(owner)
+  const animateFlip = (shouldShowBack: boolean) => {
+    // First animation: scale down to 0.8
+    setIsAnimating(true)
+    new TWEEN.Tween({ scale: 1 })
+      .to({ scale: 0.8 }, 400)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .onUpdate(({ scale }) => {
+        if (modalContentRef.current) {
+          modalContentRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`
+        }
+      })
+      .onComplete(() => {
+        setIsHandOpen(true)
+        // Second animation: quick scale up to 1.2
+        new TWEEN.Tween({ scale: 0.8 })
+          .to({ scale: 1.2 }, 100)
+          .easing(TWEEN.Easing.Quadratic.Out)
+          .onUpdate(({ scale }) => {
+            if (modalContentRef.current) {
+              modalContentRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`
+            }
+          })
+          .start()
+          
+
+        console.log('shouldShowBack', shouldShowBack)
+        setTimeout(() => {
+          duelistCardRef.current?.setScale([2, 1], 600, TWEEN.Easing.Quadratic.InOut, TWEEN.Interpolation.Bezier)
+          duelistCardRef.current?.flip(!shouldShowBack, !shouldShowBack, 600, CARD_FLIP_ROTATION, TWEEN.Easing.Quadratic.InOut)
+
+          setTimeout(() => {
+            // Fourth animation: scale back to 1
+            new TWEEN.Tween({ scale: 1.2 })
+              .to({ scale: 1 }, 400)
+              .easing(TWEEN.Easing.Quadratic.InOut)
+              .onUpdate(({ scale }) => {
+                if (modalContentRef.current) {
+                  modalContentRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`
+                }
+              })
+              .start()
+
+            setTimeout(() => {
+              setShowBack(shouldShowBack)
+              setIsHandOpen(false)
+              setIsAnimating(false)
+            }, 300)
+          }, 300)
+        }, 50)
+      })
+      .start()
   }
 
-  const _duel = () => {
-    dispatchSetScene(SceneName.Duels)
-    _close()
-  }
+  useEffect(() => {
+    if (isOpen) {
+      setIsHandOpen(false)
+      setShowBack(false)
+      setIsAnimating(true)
+      animate(1000, 0, 0.5, 1, TWEEN.Easing.Circular.Out, () => {
+        setIsAnimating(false)
+      })
+    }
+  }, [isOpen])
 
-  // bookmark
-  const { duelistContractAddress } = useDuelistTokenContract()
-  const { isBookmarked } = useIsBookmarked(duelistContractAddress, selectedDuelistId)
-  const { publish } = usePlayerBookmarkSignedMessage(duelistContractAddress, selectedDuelistId, !isBookmarked)
+  const _close = () => {
+    setIsAnimating(true)
+    animate(0, 1000, 1, 0.5, TWEEN.Easing.Cubic.In, () => {
+      dispatchSelectDuelistId(0n)
+      setIsAnimating(false)
+    })
+  }
 
   return (
     <Modal
-      // size='large'
-      // dimmer='inverted'
+      basic
+      size='fullscreen'
       onClose={() => _close()}
       open={isOpen}
-      className='modal'
+      className=''
     >
-      <Modal.Header>
-        <Grid>
-          <Row>
-            <Col width={1} textAlign='center'>
-              <BookmarkIcon isBookmarked={isBookmarked} onClick={publish} />
-            </Col>
-            <Col width={5} textAlign='left'>
-              {duelistIdDisplay}
-              {' '}
-              {(isYou || isMyDuelist) &&
-                <span className='Smaller Important'>
-                  {isYou ? <>(Current)</>
-                    : <>(Yours <IconClick important name='sync alternate' size='small' onClick={() => _switch()} />)</>
-                  }
-                </span>
-              }
-            </Col>
-            <Col width={10} textAlign='right'>
-              <div className='Anchor Important' onClick={() => _gotoOwner()}>{ownerName}</div>
-            </Col>
-          </Row>
-        </Grid>
-      </Modal.Header>
-      <Modal.Content image className='DuelistModal Relative'>
-        <ProfilePic profilePic={profilePic} duelistId={selectedDuelistId} />
-        <Modal.Description className='FillParent'>
-          <div className='DuelistModalDescription'>
-            <ProfileDescription duelistId={selectedDuelistId} displayFameBalance displayStats />
-            <div className='Spacer10' />
-            <div className='TableInModal'>
-              <ChallengeTableSelectedDuelist compact />
-            </div>
-          </div>
-        </Modal.Description>
-      </Modal.Content>
-      <Modal.Actions className='NoPadding'>
-        <Grid className='FillParent Padded' textAlign='center'>
-          <Row columns='equal'>
-            <Col>
-              <ActionButton large fill label='Close' onClick={() => _close()} />
-            </Col>
-            {!isYou &&
-              <Col>
-                {hasPact && <ActionButton large fill important label='Challenge In Progress!' onClick={() => dispatchSelectDuel(pactDuelId)} />}
-                {!hasPact && <ActionButton large fill disabled={isAnon} label='Challenge for a Duel!' onClick={() => dispatchChallengingDuelistId(selectedDuelistId)} />}
-              </Col>
-            }
-            {atProfile &&
-              <Col>
-                <ActionButton large fill important label='Duel!' onClick={() => _duel()} />
-              </Col>
-            }
-          </Row>
-        </Grid>
-      </Modal.Actions>
+      <div className='DuelistModalContainer NoMouse NoDrag'>
+        <div className="DuelistModal NoMouse NoDrag" ref={modalContentRef}>
+          <img 
+            ref={bottomCardRef}
+            className='HandCard NoMouse NoDrag' 
+            src={isHandOpen || showBack ? '/images/ui/hand_card_single_bottom_open.png' : '/images/ui/hand_card_single_bottom_closed.png'}
+            style={{
+              width: aspectWidth(HAND_CARD_WIDTH),
+              height: aspectWidth(HAND_CARD_HEIGHT)
+            }}
+          />
+          <DuelistCard
+            ref={duelistCardRef}
+            duelistId={Number(selectedDuelistId)}
+            isSmall={false}
+            isLeft={true}
+            isVisible={true}
+            instantVisible={true}
+            isFlipped={true}
+            instantFlip={true}
+            isHanging={false}
+            isHighlightable={false}
+            isAnimating={isAnimating}
+            width={36 * CARD_ASPECT_RATIO}
+            height={36}
+            showBack={showBack}
+            animateFlip={animateFlip}
+          />
+          {!isHandOpen && !showBack &&
+            <img 
+              ref={topCardRef}
+              className='HandCard NoMouse NoDrag' 
+              src='/images/ui/hand_card_single_top.png'
+              style={{
+                width: aspectWidth(HAND_CARD_WIDTH),
+                height: aspectWidth(HAND_CARD_HEIGHT)
+              }}
+            />
+          }
+        </div>
+      </div>
     </Modal>
   )
 }

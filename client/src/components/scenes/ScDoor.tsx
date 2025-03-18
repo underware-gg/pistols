@@ -1,66 +1,28 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { FormInput, Grid } from 'semantic-ui-react'
+import React, { useEffect, useState } from 'react'
 import { VStack } from '/src/components/ui/Stack'
-import { useEffectOnce } from '@underware_gg/pistols-sdk/hooks'
-import { useDojoStatus, useDojoSystemCalls, useSelectedChain, useConnectToSelectedChain } from '@underware_gg/pistols-sdk/dojo'
+import { useEffectOnce } from '@underware/pistols-sdk/utils/hooks'
+import { useDojoStatus, useConnectToSelectedNetwork } from '@underware/pistols-sdk/dojo'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { Divider } from '/src/components/ui/Divider'
-import { PACKAGE_VERSION, PROFILE_PIC_COUNT } from '/src/utils/constants'
-import { useIsMyDuelist } from '/src/hooks/useIsYou'
+import { PACKAGE_VERSION } from '/src/utils/constants'
 import { useAccount } from '@starknet-react/core'
-import { useDuelistsOfPlayer, useNextRandomProfilePic } from '/src/hooks/useDuelistToken'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { IconClick } from '/src/components/ui/Icons'
-import { ProfilePic } from '/src/components/account/ProfilePic'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { SceneName } from '/src/data/assets'
 import Logo from '/src/components/Logo'
 
-const Row = Grid.Row
-const Col = Grid.Column
-
 export default function ScDoor() {
-  const { account, address, isConnected } = useAccount()
-
-  const { create_duelist } = useDojoSystemCalls()
-  const { dispatchSelectDuel } = usePistolsContext()
-  const { dispatchDuelistId, duelistId } = useSettings()
-  const { dispatchSetScene } = usePistolsScene()
-  const { duelistIds } = useDuelistsOfPlayer()
-  const isMyDuelist = useIsMyDuelist(duelistId)
-
   const { isReady } = useDojoStatus()
-  
+  const { hasFinishedTutorial } = useSettings()
+
   const [visibleChars, setVisibleChars] = useState<string[]>([])
-  const [isFirstDivVisible, setIsFirstDivVisible] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
-  const [isDuelistBeingCreated, setIsDuelistBeingCreated] = useState(false)
-  
-  const [selectedProfilePic, setSelectedProfilePic] = useState(0)
-  const [inputName, setInputName] = useState('')
-
-  const { aspectWidth } = useGameAspect()
-
-  const { randomPic } = useNextRandomProfilePic()
-  const _profilePic = useMemo(() => (selectedProfilePic || randomPic), [selectedProfilePic, randomPic])
-
-  const duelists = useRef<bigint[]>(duelistIds)
-
-  const inputIsValid = inputName.length >= 3
 
   // clear tavern state
   useEffectOnce(() => {
-    dispatchSelectDuel(0n)
-    setIsFirstDivVisible(true)
     setIsLoading(false)
-    
-    // setIsEntryLoading(true)
-    // disconnect()
-    // setTimeout(() => {
-    //   setIsEntryLoading(false)
-    // }, 200)
   }, [])
 
   useEffectOnce(() => {
@@ -76,106 +38,40 @@ export default function ScDoor() {
     addCharacter(0)
   }, [])
 
-  let timeoutId;
-  useEffect(() => {
-    if (timeoutId) {
-      clearTimeout(timeoutId)
-    }
-
-    console.log("CONNECTED", isConnected, isMyDuelist, duelistIds.length)
-    if (isConnected) {
-      setIsLoading(true)
-      timeoutId = setTimeout(() => {
-        if (isMyDuelist) {
-          dispatchSetScene(SceneName.Tavern)
-        } else if (duelists.current.length > 0) {
-          dispatchDuelistId(duelists.current[0])
-          dispatchSetScene(SceneName.Tavern)
-        } else {
-          setIsLoading(false)
-          setIsFirstDivVisible(false)
-        }
-      }, 1000)
-    }
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
-    }
-
-  }, [isConnected])
-
-  const _submit = async () => {
-    if (inputIsValid) {
-      setIsDuelistBeingCreated(true)
-      await create_duelist(account, address, inputName, constants.ProfilePicType.Duelist, _profilePic.toString())
-      // dispatchSetScene(SceneName.Tavern)
-    }
-  }
-
-  useEffect(() => {
-    duelists.current = duelistIds
-    console.log('isDuelistBeingCreated', isDuelistBeingCreated, duelistIds)
-    if (isDuelistBeingCreated && duelistIds.length > 0) {
-      dispatchDuelistId(duelistIds[duelistIds.length - 1])
-      dispatchSetScene(SceneName.Tavern)
-      setIsDuelistBeingCreated(false)
-    }
-  }, [duelistIds])
-
   return (
     <div id='Door'>
       <div className='UIContainer' >
-        <div className={`UIPage ${isFirstDivVisible && !isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: isFirstDivVisible && !isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute' }}>
+        <div className={`UIPage ${!isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: !isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute' }}>
           <DoorHeader />
           <VStack className='NoPadding'>
 
             {isReady && <>
-              <ConnectButton />
-              <Divider content='OR' />
-              <EnterAsGuestButton />
+              {hasFinishedTutorial ? <>
+                <div className='Spacer10' />
+                <ConnectButton setLoading={setIsLoading} />
+                <Divider content='OR' />  
+                <EnterAsGuestButton />
+                <div className='Spacer10' />
+              </> : <>
+                <Divider content='NEWCOMERS:' />
+                <div className='Spacer10' />
+                <PlayGameButton />
+                <Divider content='OR' />
+                <EnterAsGuestButton />
+                <div className='Spacer30' />
+                <Divider content='EXISTING PLAYERS:' />
+                <div className='Spacer10' />
+                <ConnectButton setLoading={setIsLoading} />
+              </>}
             </>}
-
-            <ConnectStatus />
 
           </VStack>
         </div>
 
         <div className={`UIPage ${isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute' }}>
-          <h1>Loading...</h1>
+          <ConnectStatus />
         </div>
         
-        <div className={`UIPage ${!isFirstDivVisible && !isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: !isFirstDivVisible && !isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute' }}>
-          <div style={{ marginTop: aspectWidth(8), marginBottom: aspectWidth(4), textAlign: 'center' }}>
-            <h1 style={{marginBottom: aspectWidth(3), textAlign: 'center' }}>Create Your Duelist</h1>
-            <FormInput
-              placeholder={'Duelist Name'} 
-              value={inputName}
-              onChange={(e) => setInputName(e.target.value)}
-              maxLength={31}
-              disabled={!account || !address}
-              style={{width: '100%', backgroundColor: 'transparent'}}
-            />
-            
-            <div style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-evenly',
-              marginTop: '20px'
-            }}>
-              <IconClick name='angle double left' size={'huge'} important
-                onClick={() => setSelectedProfilePic(selectedProfilePic === 0 ? PROFILE_PIC_COUNT - 1 : selectedProfilePic - 1)}
-              />
-              <ProfilePic profilePic={_profilePic} className='AutoHeight NoBorder DuelistImageSelect' />
-              <IconClick name='angle double right' size={'huge'} important
-                onClick={() => setSelectedProfilePic((selectedProfilePic + 1 % PROFILE_PIC_COUNT))}
-              />
-            </div>
-          </div>
-          <ActionButton large fill important disabled={!inputIsValid} onClick={_submit} label='Create Duelist' />
-        </div>
       </div>
 
       <div
@@ -194,23 +90,7 @@ export default function ScDoor() {
           ))}
         </div>
       </div>
-        
-
-      <CurrentChainHint />
     </div>
-  )
-}
-
-export function CurrentChainHint() {
-  const { selectedChainId } = useSelectedChain()
-  return (
-    <>
-      <div className='Code Disabled AbsoluteBottomRight Padded AlignRight'>
-        v{PACKAGE_VERSION}
-        <br />
-        {selectedChainId}
-      </div>
-    </>
   )
 }
 
@@ -218,11 +98,9 @@ export function CurrentChainHint() {
 function DoorHeader() {
   return (
     <VStack>
-      <Logo />
+      <Logo showName vertical/>
 
-      <h1>Pistols at Dawn</h1>
-
-      <div className='Spacer5' />
+      <div className='Spacer10' />
       <div className='H5 TitleCase'>
         An <a href='https://underware.gg'>Underware</a> Game
       </div>
@@ -233,34 +111,46 @@ function DoorHeader() {
       </div>
 
       <div className='Spacer10' />
-      <hr />
-
-      <div className='Spacer10' />
     </VStack>
   )
 }
 
 export function EnterAsGuestButton() {
-  const { dispatchDuelistId } = useSettings()
   const { dispatchSetScene } = usePistolsScene()
 
   const _enterAsGuest = () => {
-    dispatchDuelistId(0n)
     dispatchSetScene(SceneName.Tavern)
   }
-  return <ActionButton large fill onClick={() => _enterAsGuest()} label='Enter as Guest' />
+  return <ActionButton large fill onClick={() => _enterAsGuest()} label='Enter as Spectator' />
+}
+
+export function PlayGameButton({
+  large = true,
+}: {
+  large?: boolean
+}) {
+  const { dispatchSetScene } = usePistolsScene()
+
+  const _playGame = () => {
+    dispatchSetScene(SceneName.Tutorial)
+  }
+  return <ActionButton large={large} fill important onClick={() => _playGame()} label='Play Game' />
 }
 
 export function ConnectButton({
-  onConnect,
+  setLoading,
+  large = true,
 }: {
-  onConnect?: Function
+  setLoading?: (loading: boolean) => void,
+  large?: boolean
 }) {
-  const { isConnecting } = useSelectedChain()
+  const { isConnected, isConnecting } = useAccount()
   const { isLoading, isError } = useDojoStatus()
-  const { connect } = useConnectToSelectedChain(() => {
-    onConnect?.()
-  })
+  const { connect } = useConnectToSelectedNetwork()
+  
+  const { duelistIds } = useDuelistsOfPlayer()
+  const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
+  const { dispatchSetScene } = usePistolsScene()
 
   const canConnect = (!isLoading && !isError && !isConnecting && connect != null)
   // const switchChain = (isConnected && !isCorrectChain)
@@ -268,21 +158,45 @@ export function ConnectButton({
   const _connect = () => {
     if (canConnect) {
       connect()
+      setLoading?.(true)
     }
   }
 
-  return <ActionButton fill large important disabled={!canConnect} onClick={() => _connect()} label={'Connect / Create Account'} />
+  useEffect(() => {
+    let timeoutId;
+
+    if (isConnected && !isError) {
+      timeoutId = setTimeout(() => {
+        if (canClaimStarterPack) {
+          dispatchSetScene(SceneName.Tutorial)
+        } else {
+          dispatchSetScene(SceneName.Tavern)
+        }
+      }, 1000)
+    } else if (isError) {
+      setLoading?.(false)
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
+
+  }, [isConnected, isError, canClaimStarterPack])
+
+  return <ActionButton fill large={large} important disabled={!canConnect} onClick={() => _connect()} label={'Enter as Patron'} />
 }
 
 export function ConnectStatus() {
-  const { isConnecting } = useSelectedChain()
+  const { isConnecting } = useAccount()
   const { isLoading, loadingMessage, isError, errorMessage } = useDojoStatus()
 
   if (isConnecting) {
-    return <h3 className='TitleCase Important'>Connecting...</h3>
+    return <h1 className='TitleCase Important'>Connecting...</h1>
   }
   if (isLoading) {
-    return <h3 className='TitleCase Important'>{loadingMessage}</h3>
+    return <h1 className='TitleCase Important'>{loadingMessage}</h1>
   }
   if (isError) {
     return (
@@ -293,5 +207,5 @@ export function ConnectStatus() {
       </div>
     )
   }
-  return <></>
+  return <h1>Connecting...</h1>
 }

@@ -1,22 +1,26 @@
 {
   "id": "1",
-  "name": "Ser Walker #1",
-  "description": "Pistols at 10 Blocks Duelist #1. https://pistols.underware.gg",
-  "image": "https://pistols.underware.gg/profiles/square/01.jpg",
+  "name": "Duke #1",
+  "description": "Pistols at Dawn Duelist #1. https://pistols.underware.gg",
+  "image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHByZXNlcnZlQXNwZWN0UmF0aW89J3hNaW5ZTWluIG1lZXQnIHZpZXdCb3g9JzAgMCAxMDI0IDE0MzQnPjxpbWFnZSBocmVmPSdodHRwczovL3Bpc3RvbHMudW5kZXJ3YXJlLmdnL3Byb2ZpbGVzL2R1ZWxpc3RzL3NxdWFyZS8wMS5qcGcnIHg9JzAnIHk9JzAnIHdpZHRoPScxMDI0cHgnIGhlaWdodD0nMTAyNHB4JyAvPjxpbWFnZSBocmVmPSdodHRwczovL3Bpc3RvbHMudW5kZXJ3YXJlLmdnL3RleHR1cmVzL2NhcmRzL2NhcmRfZnJvbnRfYnJvd24ucG5nJyB4PScwJyB5PScwJyB3aWR0aD0nMTAyNHB4JyBoZWlnaHQ9JzE0MzRweCcgLz48L3N2Zz4=",
   "metadata": {
+    "Name": "Duke",
     "Honour": "9.9",
     "Archetype": "Honourable",
+    "Fame": "1000",
+    "Alive": "Alive",
     "Total Duels": "6",
     "Total Wins": "3",
     "Total Losses": "2",
     "Total Draws": "1",
-    "Lords Won": "1000",
-    "Lords Lost": "-200",
-    "Lords Balance": "800",
-    "square": "https://pistols.underware.gg/profiles/square/01.jpg",
-    "portrait": "https://pistols.underware.gg/profiles/portrait/01.jpg"
+    "square": "https://pistols.underware.gg/profiles/duelists/square/01.jpg",
+    "portrait": "https://pistols.underware.gg/profiles/duelists/portrait/01.jpg"
   },
   "attributes": [
+    {
+      "trait": "Name",
+      "value": "Duke"
+    },
     {
       "trait": "Honour",
       "value": "9.9"
@@ -24,6 +28,14 @@
     {
       "trait": "Archetype",
       "value": "Honourable"
+    },
+    {
+      "trait": "Fame",
+      "value": "1000"
+    },
+    {
+      "trait": "Alive",
+      "value": "Alive"
     },
     {
       "trait": "Total Duels",
@@ -40,18 +52,6 @@
     {
       "trait": "Total Draws",
       "value": "1"
-    },
-    {
-      "trait": "Lords Won",
-      "value": "1000"
-    },
-    {
-      "trait": "Lords Lost",
-      "value": "-200"
-    },
-    {
-      "trait": "Lords Balance",
-      "value": "800"
     }
   ]
 }

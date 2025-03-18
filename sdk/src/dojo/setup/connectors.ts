@@ -4,10 +4,10 @@ import {
   // injected,
   // argent, braavos,
 } from '@starknet-react/core'
-import { usePredeployedConnector } from 'src/hooks/usePredeployedConnector'
+import { usePredeployedConnector } from 'src/utils/hooks/usePredeployedConnector'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
-import { DojoChainConfig } from 'src/dojo/setup/chains'
-import { PREDEPLOYED_ID } from 'src/utils/predeployed'
+import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
+import { PREDEPLOYED_ID } from 'src/utils/starknet/predeployed'
 
 export const supportedConnetorIds = {
   CONTROLLER: 'controller', // same as ControllerConnector.id
@@ -22,7 +22,7 @@ export const getConnectorIcon = (connector: Connector): string  => {
   return connector.icon.dark
 }
 
-export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: DojoChainConfig) => {
+export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: DojoNetworkConfig) => {
 
   // Predeployed connector
   const { predeployed } = usePredeployedConnector(chainConfig.rpcUrl, chainConfig.chainId, chainConfig.predeployedAccounts)
@@ -32,12 +32,12 @@ export const useChainConnectors = (dojoAppConfig: DojoAppConfig, chainConfig: Do
       // if (id == supportedConnetorIds.ARGENT) acc.push(argent())
       // if (id == supportedConnetorIds.BRAAVOS) acc.push(braavos())
       // if (id == supportedConnetorIds.CONTROLLER) acc.push(controller())
-      if (id == supportedConnetorIds.CONTROLLER) acc.push(dojoAppConfig.controllerConnector)
+      if (id == supportedConnetorIds.CONTROLLER && dojoAppConfig.controllerConnector) acc.push(dojoAppConfig.controllerConnector)
       if (id == supportedConnetorIds.PREDEPLOYED && typeof window !== 'undefined') acc.push(predeployed())
       return acc
     }, [])
     return result
-  }, [chainConfig])
+  }, [dojoAppConfig, chainConfig])
 
   return connectorIds
 }

@@ -5,12 +5,19 @@ export default defineConfig({
     "src/exports/index.ts",
     "src/exports/abis.ts",
     "src/exports/dojo.ts",
+    "src/exports/dojo_graphql.ts",
     "src/exports/fix.ts",
-    "src/exports/games_pistols.ts",
     "src/exports/hooks.ts",
-    "src/exports/utils.ts"
+    "src/exports/pistols.ts",
+    "src/exports/pistols_gen.ts",
+    "src/exports/pistols_components.ts",
+    "src/exports/pistols_controller.ts",
+    "src/exports/pistols_tokens.ts",
+    "src/exports/utils.ts",
+    "src/exports/utils_hooks.ts",
+    "src/exports/utils_starknet.ts"
   ],
+  format: ["esm"],
   clean: true,
-  format: ["cjs", "esm"],
   dts: true,
 });

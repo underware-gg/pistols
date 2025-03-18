@@ -1,22 +1,17 @@
 import { InterfaceAbi, StarknetDomain, StarknetType, TypedData } from 'starknet'
 import { Connector } from '@starknet-react/core'
 import { ControllerConnector } from '@cartridge/connector'
-import {
-  ControllerOptions,
-  SessionPolicies,
-  ContractPolicies,
-  ContractPolicy,
-  SignMessagePolicy,
-  Policy,
-  Tokens,
-  Method,
-} from '@cartridge/controller'
+import type { ControllerOptions, Tokens } from '@cartridge/controller'
+import type { SessionPolicies, ContractPolicies, SignMessagePolicy, Method } from '@cartridge/presets'
 import { SchemaType, UnionOfModelData } from '@dojoengine/sdk'
 import { ContractPolicyDescriptions, DojoManifest, SignedMessagePolicyDescriptions } from 'src/dojo/contexts/Dojo'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
-import { _useConnector } from 'src/fix/starknet_react_core'
-import { assert } from 'src/utils/math'
-import { serialize } from 'src/utils/types'
+import { formatQueryValue } from 'src/dojo/hooks/useSdkEntities'
+import { stringToFelt } from 'src/utils/starknet/starknet'
+import { bigintToHex } from 'src/utils/misc/types'
+import { assert } from 'src/utils/misc/math'
+import { getContractByName } from '@dojoengine/core'
+import { INTERFACE_DESCRIPTIONS } from 'src/games/pistols/generated/constants'
 
 
 
@@ -27,29 +22,23 @@ import { serialize } from 'src/utils/types'
 // (create as global const)
 //
 export const makeControllerConnector = (
+  preset_name: string,
   namespace: string,
-  manifest: DojoManifest,
+  chainId: string,
   rpcUrl: string,
   toriiUrl: string,
-  contractPolicyDescriptions: ContractPolicyDescriptions,
-  signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions,
+  policies: SessionPolicies | undefined, // if undefined, use preset 
   tokens: Tokens,
 ): Connector => {
-  // const policies = _makeControllerPolicyArray(manifest, namespace, descriptions)
-  const policies: SessionPolicies = {
-    contracts: _makeControllerContractPolicies(manifest, namespace, contractPolicyDescriptions),
-    messages: _makeControllerSignMessagePolicies(signedMessagePolicyDescriptions),
-  }
-
   // extract slot service name from rpcUrl
   const slot = /api\.cartridge\.gg\/x\/([^/]+)\/torii/.exec(toriiUrl)?.[1];
 
   const options: ControllerOptions = {
     // ProviderOptions
-    rpc: rpcUrl,
+    defaultChainId: bigintToHex(stringToFelt(chainId)),
+    chains: [{ rpcUrl }],
     // IFrameOptions
-    theme: 'pistols',
-    colorMode: 'dark',
+    preset: preset_name,
     // KeychainOptions
     namespace,
     policies,
@@ -57,8 +46,15 @@ export const makeControllerConnector = (
     tokens,
   }
   if (typeof window !== 'undefined') console.log(`-------- ControllerOptions:`, options)//, serialize(options))
-  const connector = new ControllerConnector(options) as never as Connector
-  assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
+  
+  // create connector
+  let connector: Connector | undefined
+  try {
+    connector = new ControllerConnector(options) as never as Connector
+    assert(connector.id == supportedConnetorIds.CONTROLLER, `ControllerConnector id does not match [${connector.id}/${supportedConnetorIds.CONTROLLER}]`)
+  } catch(e) {
+    console.warn(`makeControllerConnector() ERROR:`, e)
+  }
   return connector
 }
 
@@ -75,18 +71,34 @@ const exclusions = [
 // https://github.com/cartridge-gg/controller/blob/main/packages/keychain/src/components/connect/CreateSession.stories.tsx
 // https://github.com/cartridge-gg/presets/blob/419dbda4283e4957db8a14ce202a04fabffea673/configs/eternum/config.json#L379
 //
+export const makeControllerPolicies = (
+  namespace: string,
+  manifest: DojoManifest,
+  policyDescriptions: ContractPolicyDescriptions,
+  messageDescriptions: SignedMessagePolicyDescriptions,
+): SessionPolicies => {
+  const policies: SessionPolicies = {
+    contracts: _makeControllerContractPolicies(manifest, namespace, policyDescriptions),
+    messages: _makeControllerSignMessagePolicies(messageDescriptions),
+  }
+  return policies
+}
+
 const _makeControllerContractPolicies = (
   manifest: DojoManifest,
   namespace: string,
-  descriptions: ContractPolicyDescriptions,
+  policyDescriptions: ContractPolicyDescriptions,
 ): ContractPolicies => {
   const contracts: ContractPolicies = {};
-  manifest?.contracts.forEach((c: any) => {
-    const contractName = c.tag.split(`${namespace}-`).at(-1)
-    const desc = descriptions[contractName]
-    if (desc) {
-      let methods: Method[] = []
-      // --- abis
+  Object.keys(policyDescriptions).forEach((name) => {
+    let contract_address
+    let methods: Method[] = []
+    // --- parse interfaces from abis
+    const desc = policyDescriptions[name]
+    const c = getContractByName(manifest, namespace, name)
+    // console.log(`CI:`, name, desc, c)
+    if (c && desc.interfaces) {
+      contract_address = c.address
       c.abi.forEach((abi: InterfaceAbi) => {
         // --- interfaces
         const interfaceName = abi.name.split('::').slice(-1)[0]
@@ -98,21 +110,29 @@ const _makeControllerContractPolicies = (
             if (i.type == 'function' && i.state_mutability == 'external' && !exclusions.includes(entrypoint)) {
               // console.log(`CI:`, item.name, item)
               const method = {
-                // name: `${i.name}()`,
-                // description: `${c.tag}::${i.name}()`,
                 entrypoint,
+                // name: `${i.name}()`,
+                description: INTERFACE_DESCRIPTIONS[interfaceName]?.[entrypoint] ?? undefined,
               }
               methods.push(method)
             }
           })
         }
       })
-      if (methods.length > 0) {
-        contracts[c.address] = {
-          name: desc.name,
-          description: desc.description,
-          methods,
-        }
+    }
+    // --- external contracts
+    else if (desc.methods) {
+      contract_address = desc.contract_address
+      desc.methods?.forEach((m) => {
+        methods.push({ ...m })
+      })
+    }
+    // create policy
+    if (contract_address && methods.length > 0) {
+      contracts[formatQueryValue(contract_address)] = {
+        // name: desc.name,
+        description: desc.description,
+        methods,
       }
     }
   })
@@ -159,10 +179,10 @@ export const generateTypedData = <T extends SchemaType, M extends UnionOfModelDa
 
 
 const _makeControllerSignMessagePolicies = (
-  descriptions: SignedMessagePolicyDescriptions,
+  messageDescriptions: SignedMessagePolicyDescriptions,
 ): SignMessagePolicy[] => {
   const messages: SignMessagePolicy[] = [];
-  descriptions.forEach(desc => {
+  messageDescriptions.forEach(desc => {
     const msg: SignMessagePolicy = {
       types: {
         ...desc.typedData.types

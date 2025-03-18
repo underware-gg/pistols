@@ -19,7 +19,7 @@ export function PlayerDescription({
       <div>
         <h1>{name}</h1>
         {displayAddress && <AddressShort address={address} />}
-        {displayFameBalance && <FameBalance address={address} big />}
+        {displayFameBalance && <FameBalance address={address} size='big' />}
       </div>
     </div>
   )

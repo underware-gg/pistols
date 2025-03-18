@@ -1,54 +1,61 @@
 import { useMemo, useEffect } from 'react'
-import { addAddressPadding, BigNumberish } from 'starknet'
-import { isPositiveBigint, bigintToU256, poseidon, stringToFelt } from '@underware_gg/pistols-sdk/utils'
-import { useSdkState, getEntityMapModels } from '@underware_gg/pistols-sdk/dojo'
-import { PistolsGetQuery, PistolsSubQuery, models } from '@underware_gg/pistols-sdk/pistols'
+import { BigNumberish } from 'starknet'
+import { isPositiveBigint, bigintToHex } from '@underware/pistols-sdk/utils'
+import { bigintToU256, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
+import { getEntityMapModels, formatQueryValue, useSdkStateEntitiesSub } from '@underware/pistols-sdk/dojo'
+import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
+import { models } from '@underware/pistols-sdk/pistols/gen'
 
 
-export const usePactPair = (duelist_id_or_address_a: BigNumberish, duelist_id_or_address_b: BigNumberish): BigNumberish => {
+// IMPORTANT!!!
+// must be in sync with:
+// pistols::models::pact::PactTrait::make_pair()
+export const usePactPair = (address_a: BigNumberish, address_b: BigNumberish): bigint => {
   const pair = useMemo(() => {
-    if (!isPositiveBigint(duelist_id_or_address_a) || !isPositiveBigint(duelist_id_or_address_b)) return 0n
-    // same as pistols::libs::pact::make_pact_pair()
-    const a_u256 = bigintToU256(duelist_id_or_address_a)
-    const b_u256 = bigintToU256(duelist_id_or_address_b)
-    const aa = poseidon([a_u256.low, a_u256.low])
-    const bb = poseidon([b_u256.low, b_u256.low])
-    const pair = bigintToU256(aa ^ bb).low
+    const aa = BigInt(bigintToU256(address_a ?? 0).low)
+    const bb = BigInt(bigintToU256(address_b ?? 0).low)
+    const pair = (aa && bb) ? (aa ^ bb) : 0n
+    // console.log(`usePactPair()`, bigintToHex(aa), '^', bigintToHex(bb), ':', bigintToHex(pair))
     return pair
-  }, [duelist_id_or_address_a, duelist_id_or_address_b])
+  }, [address_a, address_b])
   return pair
 }
 
-export const usePact = (table_id: string, duelist_id_or_address_a: BigNumberish, duelist_id_or_address_b: BigNumberish) => {
-  const pair = usePactPair(duelist_id_or_address_a, duelist_id_or_address_b)
-  const query_get = useMemo<PistolsGetQuery>(() => ({
-    pistols: {
-      Pact: {
-        $: {
-          where: {
-            table_id: { $eq: addAddressPadding(stringToFelt(table_id)) },
-            pair: { $eq: addAddressPadding(pair) },
-          },
-        },
-      },
-    },
-  }), [table_id, pair])
-  const query_sub = useMemo<PistolsSubQuery>(() => ({
-    pistols: {
-      Pact: {
-        $: {
-          where: {
-            table_id: { $is: addAddressPadding(stringToFelt(table_id)) },
-            pair: { $is: addAddressPadding(pair) },
-          },
-        },
-      },
-    },
-  }), [table_id, pair])
-  
-  const { entities } = useSdkState({ query_get, query_sub })
+export const usePact = (table_id: string, address_a: BigNumberish, address_b: BigNumberish) => {
+  const pair = usePactPair(address_a, address_b)
+  // const query_get = useMemo<PistolsQueryBuilder>(() => ({
+  //   pistols: {
+  //     Pact: {
+  //       $: {
+  //         where: {
+  //           table_id: { $eq: formatQueryValue(stringToFelt(table_id)) },
+  //           pair: { $eq: formatQueryValue(pair) },
+  //         },
+  //       },
+  //     },
+  //   },
+  // }), [table_id, pair])
+  const query = useMemo<PistolsQueryBuilder>(() => (
+    (Boolean(table_id) && isPositiveBigint(pair))
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().keys(
+            ["pistols-Pact"],
+            [formatQueryValue(stringToFelt(table_id)), formatQueryValue(pair)]
+          ).build()
+        )
+        .withEntityModels(
+          ["pistols-Pact"]
+        )
+        .includeHashedKeys()
+      : null
+  ), [table_id, pair])
+
+  const { entities } = useSdkStateEntitiesSub({
+    query,
+  })
   const pacts = useMemo(() => getEntityMapModels<models.Pact>(entities, 'Pact'), [entities])
-  // useEffect(() => console.log(`usePact()`, pacts), [pacts])
+  // useEffect(() => console.log(`usePact()`, bigintToHex(stringToFelt(table_id)), bigintToHex(pair), pacts), [table_id, pair, pacts])
 
   const pactDuelId = useMemo(() => BigInt(pacts?.[0]?.duel_id ?? 0n), [pacts])
   const hasPact = useMemo(() => (pactDuelId > 0n), [pactDuelId])

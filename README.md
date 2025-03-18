@@ -1,6 +1,8 @@
-# Pistols at 10 Blocks
+# Pistols at Dawn
 
-A fully on-chain game, made with love, by Loot Underworld, with Dojo, for Realms, on Starknet.
+> Formerly known as **Pistols at 10 Blocks**
+
+A fully on-chain game, made with love, by [Underware](https://underware.gg/), with [Dojo](https://www.dojoengine.org/), for [Realms](https://realms.world/), on [Starknet](https://www.starknet.io/).
 
 Winner of the [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059)
 
@@ -34,7 +36,7 @@ Winner of the [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/174762644
 ## Overview
 Thou art an offence to all that is decent, dog. I challenge you... to a duel!
 
-Pistols at 10 Blocks is an onchain game, in which you face off against another Lord in a pistol duel to defend your honour.
+Pistols at Dawn is an onchain game, in which you face off against another Lord in a pistol duel to defend your honour.
 
 > **A righteous smoulder in your eye and your smoothbore, flintlock pistol held lightly at your side, cocked and ready, you stand
 > in the misty morning field. Holding back the gorge rising in your throat, you shake that mongrel's hand and turn, taking your
@@ -49,56 +51,34 @@ Pistols at 10 Blocks is an onchain game, in which you face off against another L
 
 ## Team
 
-* Recipromancer — Lead, Renaissance Chaos Mode
-* Mataleone — Engineering
-* Voltrevo — Engineering, Hidden information mechanism
-* FortunaRegem - Engineering, Frontend, UI & Animations
-* Amaro — Art, Design, UI & Animations
-* Mononoke — Logo & Art
-* Jubiliee - Technical 3D systems
+* Recipromancer — Lead, Renaissance Chaos Mode - [@recipromancer](https://x.com/recipromancer)
+* Mataleone — Engineering - [@matalecode](https://x.com/matalecode)
+* FortunaRegem - Engineering, Frontend, UI & Animations - [@FortunaRegem](https://x.com/FortunaRegem)
+* Amaro — Art, Design, UI & Animations - [@AmaroKoberle](https://x.com/AmaroKoberle)
+* Jubilee - R&D, Technical 3D systems
 
-## Assets
+### Contributors
+
+* Voltrevo — Engineering, Hidden information mechanism
+* Mononoke — Logo & Art
+
+
+## Contents
+
+* `/client`: Main game web client (typescript, Vite)
+* `/dojo`: Dojo contracts (cairo)
+* `/sdk`: Pistols at Dawm SDK (typescript)
+* `/dreams`: [Daydreams](https://www.dreams.fun/) AI agents (typescript)
+* `/gamejam`: Original [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059) contents 
+* `/assets`: Assorted test assets
+
+### Assets
 
 * biodecay-song6.mp3 - Original music by Recipromancer
 * sfx/pistol-shot.mp3 — https://freesound.org/people/nioczkus/sounds/395789/
 * sfx/grunt-man.mp3 — https://freesound.org/people/MrFossy/sounds/547198/
 * sfx/grunt-female.mp3 — https://freesound.org/people/SkyRaeVoicing/sounds/368843/
 * sfx/body-fall.mp3 — https://freesound.org/people/leonelmail/sounds/504626/
-
-
-## Gameplay Logic 
-
-### Pistols Round
-
-In the Pistols round, each player has a chance to **injure** (1 dmg) or **wound** (2 dmg) and a chance to **execute**, each expressed as percentages, calculated based on the number of steps taken.
-
-2) Hit chance is calculated, affected by hit penalties. The highest chance at 1 pace, the lowest chance at 10 paces, interpolated in between.
-
-https://github.com/funDAOmental/pistols/blob/0d064ac90f502f348b6f14624f962661140b67aa/dojo/src/types/constants.cairo#L15-L17
-
-1) Execute chances is calculated, not affected by hit penalties. The highest chance at 10 paces, the lowest chance at 1 pace, interpolated in between.
-
-https://github.com/funDAOmental/pistols/blob/0d064ac90f502f348b6f14624f962661140b67aa/dojo/src/types/constants.cairo#L19-L21
-
-### Blades Round
-
-In the Blades round, each player has two strikes, each with a chance to **injure** or **wound**, each expressed as percentages.
-
-1) `Heavy` blades use both strikes, doing nothing on the first strike and 2 dmg on the second strike. They have a chance to **execute**, which occurs before other strikes.
-
-If no execution occurs...
-
-2) `Light` blades do 1 dmg, `Block` prevents 1 damage, and each use one strike. They have a chance to **crit**, doubling their effect.
-
-3) All other strikes happen at the same time, and `Block` only prevents damage against strikes that happen at the same time as it.
-
-
-
-### Bonus and Damage penalty
-
-Honourable duelists, with Honour > 9.0, get a bonus to crit or execution on every Hit
-
-Injured duelists suffer a penalty to Hit
 
 
 ## Development notes
@@ -142,12 +122,12 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 
 > [Dojo Book](https://book.dojoengine.org/getting-started)
 
-Currenty using Dojo version `v1.0.8`
+Currenty using Dojo version `v1.2.2`
 
 ```sh
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
-dojoup -v v1.0.8
+dojoup -v v1.2.2
 
 # test dojo
 cd dojo
@@ -166,7 +146,7 @@ pnpm install
 
 ```sh
 cd dojo
-katana --disable-fee --chain-id KATANA_LOCAL --invoke-max-steps 10000000 --allowed-origins "*" --accounts 10
+katana --disable-fee --chain-id KATANA_LOCAL --invoke-max-steps 10000000 --allowed-origins "*"
 
 # or preferably...
 cd dojo
@@ -179,11 +159,11 @@ Uncomment the `world_address` parameter in `dojo/Scarb.toml` then:
 
 ```sh
 cd dojo
-torii --allowed-origins "*" --index-pending --world 0x360fd2af2f118387ae282b66bfdbb6d4bb7e45a7213e101e5b8aa3471939677
+torii --allowed-origins "*" --index-pending --world 0xbee2bb53422762f6c51fb478a8a5da41a64ad678860d02800e0dbdac23dc36
 
 # or preferably...
 cd dojo
-./run_torii
+./run_torii dev
 ```
 
 #### Terminal 3: Sozo commands / migration
@@ -197,15 +177,14 @@ sozo clean
 sozo build
 
 # migrate to local Katana
-./migrate
+./migrate dev
 
-# migrate other profiles
-./migrate <PROFILE_NAME>
-# example:
+# migrate other profiles...
+# ./migrate <PROFILE_NAME>
 ./migrate slot
 ```
 
-For Starknet chains, create env files for `SN_SEPOLIA` (`.env.sepolia`) and/or `SN_MAINNET` (`.env.mainnet`)
+For Starknet chains, create env files for `SN_SEPOLIA` (`.env.sepolia`) and/or `SN_MAIN` (`.env.mainnet`)
 
 ```sh
 export STARKNET_RPC_URL=https://sepolia.your-favorite-rpc-provider.com/xxx/
@@ -236,37 +215,29 @@ cd client
 pnpm i
 ```
 
-Configure default chain id in a `.env` file:
+Configure default [NetworkId](/sdk/src/dojo/setup/networks.ts) in your `.env` file:
 
 ```sh
 VITE_DEBUG=0
-VITE_CHAIN_ID=KATANA_LOCAL
-#VITE_CHAIN_ID=SN_SEPOLIA
-#VITE_CHAIN_ID=WP_PISTOLS_SLOT
+VITE_NETWORK_ID=KATANA_LOCAL
+#VITE_NETWORK_ID=STAGING
+#VITE_NETWORK_ID=SEPOLIA
+#VITE_NETWORK_ID=MAINNET
 ```
 
 Start the client
 
 ```sh
 # http server
-# http://localhost:3000
+# http://localhost:5173
 cd pistols
 turbo dev
 
 # https server (required for Catridge Controller)
-# https://localhost:3000
+# https://localhost:5173
 cd pistols
 turbo devs
 ```
 
-Open [http://localhost:3000](http://localhost:3000) or [https://localhost:3000](https://localhost:3000)
+Open [http://localhost:5173](http://localhost:5173) or [https://localhost:5173](https://localhost:5173)
 
-
-### sozo test profiling
-
-* `sozo test -f resolved`
-
-| Project State                    | Memory Usage |
-|----------------------------------|--------------|
-| v0.11.0 (origami)                | 9.64 GB      |
-| v0.12.0 (OpenZeppelin)           | 8.62 GB      |

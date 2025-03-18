@@ -1,54 +1,44 @@
-use pistols::utils::math::{MathTrait};
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum PacesCard {
-    None,
+    None,       // 0
     //
-    Paces1,
-    Paces2,
-    Paces3,
-    Paces4,
-    Paces5,
-    Paces6,
-    Paces7,
-    Paces8,
-    Paces9,
-    Paces10,
-}
-
-
-//--------------------
-// constants
-//
-
-mod PACES_CARDS {
-    // IMPORTANT: must be in sync with PacesCard
-    const None: u8 = 0;
-    const Paces1: u8 = 1;
-    const Paces2: u8 = 2;
-    const Paces3: u8 = 3;
-    const Paces4: u8 = 4;
-    const Paces5: u8 = 5;
-    const Paces6: u8 = 6;
-    const Paces7: u8 = 7;
-    const Paces8: u8 = 8;
-    const Paces9: u8 = 9;
-    const Paces10: u8 = 10;
+    Paces1,     // 1
+    Paces2,     // 2
+    Paces3,     // 3
+    Paces4,     // 4
+    Paces5,     // 5
+    Paces6,     // 6
+    Paces7,     // 7
+    Paces8,     // 8
+    Paces9,     // 9
+    Paces10,    // 10
 }
 
 
 //--------------------
 // traits
 //
-use pistols::types::cards::hand::{DeckType};
+use pistols::types::cards::deck::{DeckType};
 
 #[generate_trait]
-impl PacesCardImpl of PacesCardTrait {
-    fn as_felt(self: PacesCard) -> felt252 {
-        let result: u8 = self.into();
+pub impl PacesCardImpl of PacesCardTrait {
+    #[inline(always)]
+    fn to_felt(self: @PacesCard) -> felt252 {
+        let result: u8 = (*self).into();
         (result.into())
     }
-    fn honour(self: PacesCard) -> u8 {
+    #[inline(always)]
+    fn is_before(self: @PacesCard, other: @PacesCard) -> bool {
+        let pace: u8 = (*self).into();
+        (pace < (*other).into())
+    }
+    #[inline]
+    fn is_after(self: @PacesCard, other: @PacesCard) -> bool {
+        let pace: u8 = (*self).into();
+        (pace > (*other).into())
+    }
+    fn honour(self: @PacesCard) -> u8 {
         match self {
             PacesCard::Paces1 |
             PacesCard::Paces2 |
@@ -59,11 +49,12 @@ impl PacesCardImpl of PacesCardTrait {
             PacesCard::Paces7 |
             PacesCard::Paces8 |
             PacesCard::Paces9 |
-            PacesCard::Paces10 =>  self.into() * 10,
+            PacesCard::Paces10 =>  (*self).into() * 10,
             PacesCard::None => 0,
         }
     }
-    fn get_deck(_deck_type: DeckType) -> Span<u8> {
+    #[inline(always)]
+    fn build_deck(_deck_type: @DeckType) -> Span<u8> {
         (array![
             PacesCard::Paces1.into(),
             PacesCard::Paces2.into(),
@@ -77,88 +68,78 @@ impl PacesCardImpl of PacesCardTrait {
             PacesCard::Paces10.into(),
         ].span())
     }
-    fn variant_name(self: PacesCard) -> felt252 {
-        match self {
-            PacesCard::Paces1 =>    'Paces1',
-            PacesCard::Paces2 =>    'Paces2',
-            PacesCard::Paces3 =>    'Paces3',
-            PacesCard::Paces4 =>    'Paces4',
-            PacesCard::Paces5 =>    'Paces5',
-            PacesCard::Paces6 =>    'Paces6',
-            PacesCard::Paces7 =>    'Paces7',
-            PacesCard::Paces8 =>    'Paces8',
-            PacesCard::Paces9 =>    'Paces9',
-            PacesCard::Paces10 =>   'Paces10',
-            PacesCard::None => 0,
-        }
-    }
 }
 
 
 //--------------------
 // converters
 //
-use debug::PrintTrait;
-use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortString};
-
 impl PacesCardDefault of Default<PacesCard> {
     fn default() -> PacesCard {(PacesCard::None)}
 }
-
-impl PacesCardIntoU8 of Into<PacesCard, u8> {
+impl PacesCardIntoU8 of core::traits::Into<PacesCard, u8> {
     fn into(self: PacesCard) -> u8 {
         match self {
-            PacesCard::Paces1 =>    PACES_CARDS::Paces1,
-            PacesCard::Paces2 =>    PACES_CARDS::Paces2,
-            PacesCard::Paces3 =>    PACES_CARDS::Paces3,
-            PacesCard::Paces4 =>    PACES_CARDS::Paces4,
-            PacesCard::Paces5 =>    PACES_CARDS::Paces5,
-            PacesCard::Paces6 =>    PACES_CARDS::Paces6,
-            PacesCard::Paces7 =>    PACES_CARDS::Paces7,
-            PacesCard::Paces8 =>    PACES_CARDS::Paces8,
-            PacesCard::Paces9 =>    PACES_CARDS::Paces9,
-            PacesCard::Paces10 =>   PACES_CARDS::Paces10,
-            PacesCard::None =>      PACES_CARDS::None,
+            PacesCard::None =>      0,
+            PacesCard::Paces1 =>    1,
+            PacesCard::Paces2 =>    2,
+            PacesCard::Paces3 =>    3,
+            PacesCard::Paces4 =>    4,
+            PacesCard::Paces5 =>    5,
+            PacesCard::Paces6 =>    6,
+            PacesCard::Paces7 =>    7,
+            PacesCard::Paces8 =>    8,
+            PacesCard::Paces9 =>    9,
+            PacesCard::Paces10 =>   10,
         }
     }
 }
-impl U8IntoPacesCard of Into<u8, PacesCard> {
+impl U8IntoPacesCard of core::traits::Into<u8, PacesCard> {
     fn into(self: u8) -> PacesCard {
-        if self == PACES_CARDS::Paces1         { PacesCard::Paces1 }
-        else if self == PACES_CARDS::Paces2    { PacesCard::Paces2 }
-        else if self == PACES_CARDS::Paces3    { PacesCard::Paces3 }
-        else if self == PACES_CARDS::Paces4    { PacesCard::Paces4 }
-        else if self == PACES_CARDS::Paces5    { PacesCard::Paces5 }
-        else if self == PACES_CARDS::Paces6    { PacesCard::Paces6 }
-        else if self == PACES_CARDS::Paces7    { PacesCard::Paces7 }
-        else if self == PACES_CARDS::Paces8    { PacesCard::Paces8 }
-        else if self == PACES_CARDS::Paces9    { PacesCard::Paces9 }
-        else if self == PACES_CARDS::Paces10   { PacesCard::Paces10 }
-        else                                    { PacesCard::None }
+        if self == 1        { PacesCard::Paces1 }
+        else if self == 2   { PacesCard::Paces2 }
+        else if self == 3   { PacesCard::Paces3 }
+        else if self == 4   { PacesCard::Paces4 }
+        else if self == 5   { PacesCard::Paces5 }
+        else if self == 6   { PacesCard::Paces6 }
+        else if self == 7   { PacesCard::Paces7 }
+        else if self == 8   { PacesCard::Paces8 }
+        else if self == 9   { PacesCard::Paces9 }
+        else if self == 10  { PacesCard::Paces10 }
+        else                { PacesCard::None }
     }
 }
-
-impl PacesCardIntoFelt252 of Into<PacesCard, felt252> {
-    fn into(self: PacesCard) -> felt252 {
-        let v: u8 = self.into();
-        (v.into())
-    }
-}
-
-impl PacesCardPrintImpl of PrintTrait<PacesCard> {
-    fn print(self: PacesCard) {
-        let p: felt252 = self.into();
-        ShortString::concat('Paces::', ('0' + p)).print();
-    }
-}
-
-// for println! and format!
-impl PacesCardDisplay of Display<PacesCard> {
-    fn fmt(self: @PacesCard, ref f: Formatter) -> Result<(), Error> {
-        let p: felt252 = (*self).into();
-        let str: ByteArray = format!("Paces::{}", p);
-        f.buffer.append(@str);
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+impl PacesCardDebug of core::fmt::Debug<PacesCard> {
+    fn fmt(self: @PacesCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let p: u8 = (*self).into();
+        let result: ByteArray = format!("Paces::{}", p);
+        f.buffer.append(@result);
         Result::Ok(())
+    }
+}
+
+
+//----------------------------------------
+// Unit  tests
+//
+#[cfg(test)]
+mod unit {
+    use super::{PacesCard};
+
+    #[test]
+    fn test_into_u8() {
+        let mut i: u8 = 0;
+        loop {
+            let card: PacesCard = i.into();
+            if (i > 0 && card == PacesCard::None) {
+                break;
+            }
+            let as_u8: u8 = card.into();
+            assert!(i == as_u8, "{} != {}", i, as_u8);
+            // println!("PacesCard {} == {}", i, as_u8);
+            i += 1;
+        };
     }
 }

@@ -1,9 +1,10 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { createDojoStore } from '@dojoengine/sdk'
-import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
-import { PistolsSchemaType, models } from '@underware_gg/pistols-sdk/pistols'
-import { useEntityId } from '@underware_gg/pistols-sdk/hooks'
+import { createDojoStore } from '@dojoengine/sdk/react'
+import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
+import { useEntityId, keysToEntityId } from '@underware/pistols-sdk/utils/hooks'
+import { useEntityModel, getEntityModel } from '@underware/pistols-sdk/dojo'
+import { models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useTokenConfigStore = createDojoStore<PistolsSchemaType>();
 
@@ -15,10 +16,22 @@ export const useTokenConfig = (contractAddress: BigNumberish) => {
   const tokenConfig = useEntityModel<models.TokenConfig>(entity, 'TokenConfig')
   // useEffect(() => console.log(`useTokenConfig() =>`, tokenConfig), [tokenConfig])
 
-  const mintedCount = useMemo(() => (tokenConfig?.minted_count ?? null), [tokenConfig])
+  const mintedCount = useMemo(() => (tokenConfig ? Number(tokenConfig.minted_count) : null), [tokenConfig])
 
   return {
     mintedCount,
     isLoading: (tokenConfig == null),
   }
+}
+
+
+//----------------------------------------
+// vanilla getter
+// (non-React)
+//
+export const getMintedCount = (contractAddress: BigNumberish): number => {
+  const entities = useTokenConfigStore.getState().entities
+  const entityId = keysToEntityId([contractAddress])
+  const tokenConfig = getEntityModel<models.TokenConfig>(entities[entityId], 'TokenConfig')
+  return (tokenConfig ? Number(tokenConfig.minted_count) : 0)
 }

@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
+import { useAccount } from '@starknet-react/core'
 import { useQueryParams } from '/src/stores/queryParamsStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { useSettings } from '/src/hooks/SettingsContext'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DuelPoster, DuelPosterHandle } from '/src/components/DuelPoster'
 import { PosterGrid, PosterGridHandle } from '/src/components/PosterGrid'
 import { InteractibleScene } from '/src/three/InteractibleScene'
@@ -13,9 +13,9 @@ import { _currentScene } from '/src/three/game'
 
 
 export default function ScGraveyard() {
-  const { duelistId } = useSettings()
-  const { filterStatesPastDuels, filterDuelistName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
-  const { challengeIds } = useQueryChallengeIds(filterStatesPastDuels, filterDuelistName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : duelistId, filterChallengeSortColumn, filterChallengeSortDirection)
+  const { address } = useAccount()
+  const { filterStatesPastDuels, filterPlayerName, filterShowAllDuels, filterShowBookmarkedDuels, filterChallengeSortColumn, filterChallengeSortDirection } = useQueryParams()
+  const { challengeIds } = useQueryChallengeIds(filterStatesPastDuels, filterPlayerName, filterShowBookmarkedDuels, filterShowAllDuels ? 0n : address, filterChallengeSortColumn, filterChallengeSortDirection)
 
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
@@ -75,7 +75,7 @@ export default function ScGraveyard() {
 
   const handlePosterHover = (isHovering: boolean, duelId: bigint) => {
     if (!isAnimating) {
-      posterRefs.current[Number(duelId)].setPosterScale(isHovering ? 1.1 : 1)
+      posterRefs.current[Number(duelId)].setScale(isHovering ? 1.1 : 1)
     }
   }
 
@@ -105,7 +105,9 @@ export default function ScGraveyard() {
             if (ref) posterRefs.current[Number(duel)] = ref
           }}
           duelId={duel}
+          isSmall={true}
           isVisible={false}
+          isFlipped={true}
           isHighlightable={true}
           onHover={(hover) => handlePosterHover(hover, duel)}
           onClick={() => handlePosterClick(duel)}
@@ -199,7 +201,7 @@ export default function ScGraveyard() {
       })
       .start();
 
-    (_currentScene as InteractibleScene).shiftImage(direction === 'left')
+    (_currentScene as InteractibleScene)?.shiftImage(direction === 'left')
   }
 
   const handlePageChange = (newPage: number) => {

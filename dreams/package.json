@@ -1,0 +1,41 @@
+{
+  "name": "@underware/pistols-dreams",
+  "version": "0.13.5",
+  "description": "Pistols at Dawn Daydreams Agents",
+  "homepage": "https://github.com/underware-gg/pistols",
+  "author": "Underware",
+  "license": "CC0",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "build": "tsup",
+    "sync": "tsup --watch",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "chromadb": "chroma run --path ./.chroma",
+    "scarecrow": "./dist/bots/scarecrow.js",
+    "tinman": "./dist/bots/tinman.js",
+    "leon": "./dist/bots/leon.js",
+    "hello": "./dist/bots/hello.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "keywords": [],
+  "dependencies": {
+    "@dojoengine/core": "catalog:",
+    "@daydreamsai/core": "catalog:",
+    "@underware/pistols-sdk": "workspace:*",
+    "chalk": "^5.4.1",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

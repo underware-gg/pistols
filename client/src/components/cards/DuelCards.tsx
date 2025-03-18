@@ -2,13 +2,17 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo
 import { BigNumberish } from 'starknet'
 import { useChallenge } from '/src/stores/challengeStore'
 import { useDuelist } from '/src/stores/duelistStore'
-import { useIsYou } from '/src/hooks/useIsYou'
-import { useGameAspect } from '/src/hooks/useGameApect'
+import { useIsMyDuelist } from '/src/hooks/useIsYou'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 import { ProfilePic } from '/src/components/account/ProfilePic'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { BladesCardsTextures, CardData, DodgeCardsTextures, FireCardsTextures, TacticsCardsTextures } from '/src/data/cardAssets'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { BladesCardsTextures, CardData, DodgeCardsTextures, EnvironmentCardsTextures, FireCardsTextures, TacticsCardsTextures } from '/src/data/cardAssets'
 import { DuelistCardType, CardHandle, Card } from '/src/components/cards/Cards'
 import * as TWEEN from '@tweenjs/tween.js'
+import * as Constants from '/src/data/cardConstants'
+import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { shakeCamera } from '/src/three/game'
+import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 
 interface DuelistCardsProps {
   isLeft: boolean
@@ -19,7 +23,7 @@ interface DuelistCardsProps {
 interface DuelistCardsHandle {
   resetCards: () => void
   spawnCards: (cards: DuelistHand) => void
-  revealCard: (cardType: DuelistCardType, speedFactor: number) => void
+  revealCard: (cardType: DuelistCardType, speedFactor: number, alive?: boolean) => void
   expandHand: () => void
   collapseHand: () => void
   showHandDetails: () => void
@@ -43,11 +47,9 @@ interface EnvironmentDeckHandle {
   returnActiveCard: () => boolean
   setCardsData: (cardsData: CardData[]) => void
 }
-import * as Constants from '/src/data/cardConstants'
-import { usePistolsContext } from '/src/hooks/PistolsContext'
 
 const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: DuelistCardsProps, ref: React.Ref<DuelistCardsHandle>) => {
-  const { isYou } = useIsYou(props.duelistId)
+  const isMyDuelist = useIsMyDuelist(props.duelistId)
 
   const { aspectW, aspectH } = useGameAspect()
 
@@ -163,9 +165,9 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
       card.ref.current.toggleVisibility(false)
       setTimeout(() => {
         card.ref.current.setPosition(centerX, centerY, 0)
-        card.ref.current.setCardRotation(0, 0)
-        card.ref.current.setCardZIndex(card.renderOrder + 10, 1)
-        card.ref.current.flipCard(false, 0, 0)
+        card.ref.current.setRotation(0, 0)
+        card.ref.current.setZIndex(card.renderOrder + 10, 1)
+        card.ref.current.flip(false, isLeft, 0)
       }, 200);
     })
   }
@@ -203,8 +205,8 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
 
       if (!cardRef.isSpawned) {
         card.setPosition(centerX, centerY, 0)
-        card.setCardRotation(0, 0)
-        card.setCardZIndex(renderOrder + 10, 1)
+        card.setRotation(0, 0)
+        card.setZIndex(renderOrder + 10, 1)
 
         const angle = (isLeft ? 1 : -1) * ((renderOrder - 0.2) * (Constants.CARDS_FAN_SPREAD / 3)) * (180 / Math.PI)
 
@@ -212,12 +214,12 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
 
         setTimeout(() => {
           card.setPosition(targetX, targetY, Constants.SPAWN_CARDS_POSITION_DURATION)
-          card.setCardRotation(angle, Constants.SPAWN_CARDS_ROTATION_DURATION)
+          card.setRotation(angle, Constants.SPAWN_CARDS_ROTATION_DURATION)
           card.toggleVisibility(true)
-          if (isYou) {
-            card.flipCard(
+          if (isMyDuelist) {
+            card.flip(
               true, 
-              isLeft ? Constants.CARD_FLIP_ROTATION : -Constants.CARD_FLIP_ROTATION,
+              isLeft,
               Constants.SPAWN_CARDS_FLIP_DURATION
             )
             if (cardRef) {
@@ -234,9 +236,9 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
     }, Constants.BASE_SPAWN_CARD_DURATION)
   }
 
-  const revealCard = (cardType: DuelistCardType, speedFactor: number) => {
+  const revealCard = (cardType: DuelistCardType, speedFactor: number, alive?: boolean) => {
     const cardIndex = cardRefs.current.findIndex(card => card.type === cardType)
-    let cardCurrent;
+    let cardCurrent: CardHandle;
     if (cardIndex !== -1) {
       const removedCard = cardRefs.current[cardIndex]
       removedCard.isFlipped = true;
@@ -256,12 +258,22 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
     isAnimatingCardsRef.current = true
 
     const target = { 
-      x: (isLeft ? 1 : -1) * (-aspectW * Constants.TARGET_END_POSITION_X_OFFSET), 
-      y: aspectH * Constants.TARGET_END_POSITION_Y_OFFSET
+      x: (isLeft ? 1 : -1) * (-aspectW * (cardType == DuelistCardType.BLADE ? Constants.TARGET_END_POSITION_BLADE_X_OFFSET : Constants.TARGET_END_POSITION_X_OFFSET)), 
+      y: aspectH * (cardType == DuelistCardType.BLADE ? Constants.TARGET_END_POSITION_BLADE_Y_OFFSET : Constants.TARGET_END_POSITION_Y_OFFSET)
     }
-    cardCurrent.setPosition(target.x, target.y, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor, TWEEN.Easing.Back.Out)
-    cardCurrent.setCardRotation(0, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor, TWEEN.Easing.Back.Out)
-    cardCurrent.setCardScale(1.2, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor, TWEEN.Easing.Back.Out)
+    if (cardType == DuelistCardType.BLADE) {
+      const midPoint = { 
+        x: (isLeft ? 1 : -1) * (-aspectW * Constants.MIDDLE_POSITION_BLADE_X_OFFSET), 
+        y: aspectH * Constants.MIDDLE_POSITION_BLADE_Y_OFFSET
+      }
+      cardCurrent.setPosition([midPoint.x, target.x], [midPoint.y, target.y], Constants.BLADE_CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor, TWEEN.Easing.Circular.Out, TWEEN.Interpolation.CatmullRom)
+      cardCurrent.setRotation([0, 0], Constants.BLADE_CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor, TWEEN.Easing.Back.Out)
+      cardCurrent.setScale(2.2, Constants.BLADE_CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor, TWEEN.Easing.Back.Out)
+    } else {
+      cardCurrent.setPosition(target.x, target.y, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor, TWEEN.Easing.Back.Out)
+      cardCurrent.setRotation(0, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor, TWEEN.Easing.Back.Out)
+      cardCurrent.setScale(1.6, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor, TWEEN.Easing.Back.Out)
+    }
 
     const targetX = (isLeft ? -aspectW : aspectW) * Constants.SPAWN_CARDS_POSITION_X_OFFSET
     const targetY = aspectH * Constants.SPAWN_CARDS_POSITION_Y_OFFSET
@@ -275,32 +287,114 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
       originalCardStylesRef.current[type] = { translateX: targetX, translateY: targetY, rotation: angle }
 
       if (type == cardType) {
-        setTimeout(() => {
-          card.flipCard(
-            true, 
-            isLeft ? Constants.CARD_FLIP_ROTATION : -Constants.CARD_FLIP_ROTATION, 
-            Constants.CARD_REVEAL_FLIP_DURATION / speedFactor, 
-            TWEEN.Easing.Back.Out
-          )
-          card.setCardZIndex(renderOrder + 5, 1)
-        }, Constants.CARD_REVEAL_FLIP_DELAY / speedFactor)
-        setTimeout(() => {
-          card.setPosition(targetX, targetY, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor)
-          card.setCardRotation(angle, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor)
-          cardCurrent.setCardScale(1, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor)
-        }, Constants.CARD_REVEAL_TRANSORMS_DELAY / speedFactor)
+        if (cardType == DuelistCardType.BLADE) {
+          setTimeout(() => {
+            card.flip(
+              true, 
+              isLeft,
+              Constants.BLADE_CARD_REVEAL_FLIP_DURATION / speedFactor, 
+              Constants.CARD_FLIP_ROTATION,
+              TWEEN.Easing.Back.Out
+            )
+            card.setZIndex(renderOrder + 5, 1)
+          }, Constants.BLADE_CARD_REVEAL_FLIP_DELAY / speedFactor)
+          setTimeout(() => {
+            card.setPosition(
+              [
+                target.x + (target.x * -0.10), // Move towards other card
+                target.x, // Back to original
+              ],
+              [
+                target.y,
+                target.y,
+              ],
+              Constants.BLADE_CARD_REVEAL_BATTLE_ATTACK_SHAKE / speedFactor,
+              TWEEN.Easing.Back.Out,
+              TWEEN.Interpolation.CatmullRom
+            )
+            const originalRotation = card.getStyle().rotation
+            card.setRotation(
+              [
+                originalRotation + (isLeft ? (10 + Math.random() * 10) : -(10 + Math.random() * 10)),
+                originalRotation,
+              ],
+              Constants.BLADE_CARD_REVEAL_BATTLE_ATTACK_SHAKE / speedFactor,
+              TWEEN.Easing.Back.Out
+            )
+          }, Constants.BLADE_CARD_REVEAL_BATTLE_DELAY / speedFactor)
+          if (!alive) {
+            setTimeout(() => {
+              card.setPosition(
+                [
+                  target.x + (target.x * 0.06),
+                  target.x + (target.x * -0.04),
+                  target.x + (target.x * 0.02),
+                  target.x
+                ],
+                [
+                  target.y + (target.y * 0.02),
+                  target.y - (target.y * 0.02),
+                  target.y + (target.y * 0.01),
+                  target.y
+                ],
+                Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME / speedFactor,
+                TWEEN.Easing.Bounce.Out,
+                TWEEN.Interpolation.CatmullRom
+              )
+            }, Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME_DELAY / speedFactor)
+            setTimeout(() => {
+              shakeCamera(150, 0.01)
+            }, Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME_DELAY / speedFactor + (Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME / speedFactor) * 0.2)
+            setTimeout(() => {
+              card.toggleHighlight(true, false, "red")
+              card.toggleDefeated(true)
+            }, Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME_DELAY / speedFactor)
+            setTimeout(() => {
+              card.toggleHighlight(false)
+              card.toggleDefeated(false)
+            }, Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME_DELAY / speedFactor + Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME / speedFactor)
+          } else {
+            setTimeout(() => {
+              card.toggleHighlight(true, false, "green")
+            }, Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME_DELAY / speedFactor)
+            setTimeout(() => {
+              card.toggleHighlight(false)
+            }, Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME_DELAY / speedFactor + Constants.BLADE_CARD_REVEAL_BATTLE_OUTCOME / speedFactor)
+          }
+          setTimeout(() => {
+            card.setPosition(targetX, targetY, Constants.BLADE_CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor)
+            card.setRotation(angle, Constants.BLADE_CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor)
+            cardCurrent.setScale(1, Constants.BLADE_CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor)
+          }, Constants.BLADE_CARD_REVEAL_TRANSORMS_DELAY / speedFactor)
+        } else {
+          setTimeout(() => {
+            card.flip(
+              true, 
+              isLeft,
+              Constants.CARD_REVEAL_FLIP_DURATION / speedFactor, 
+              Constants.CARD_FLIP_ROTATION,
+              TWEEN.Easing.Back.Out
+            )
+            card.setZIndex(renderOrder + 5, 1)
+          }, Constants.CARD_REVEAL_FLIP_DELAY / speedFactor)
+          setTimeout(() => {
+            card.setPosition(targetX, targetY, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor)
+            card.setRotation(angle, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor)
+            cardCurrent.setScale(1, Constants.CARD_REVEAL_TRANSOFRMS_DURATION / speedFactor)
+          }, Constants.CARD_REVEAL_TRANSORMS_DELAY / speedFactor)
+        }
       } else {
         setTimeout(() => {
           card.setPosition(targetX, targetY, Constants.CARD_REVEAL_POSITION_DURATION / speedFactor)
-          card.setCardRotation(angle, Constants.CARD_REVEAL_ROTATION_DURATION / speedFactor)
-          card.setCardZIndex(renderOrder + 5, 1)
+          card.setRotation(angle, Constants.CARD_REVEAL_ROTATION_DURATION / speedFactor)
+          card.setZIndex(renderOrder + 5, 1)
         }, renderOrder * Constants.CARD_REVEAL_SLIDE_TRANSFORMS_DELAY / speedFactor)
       }
     })
 
     setTimeout(() => {
       isAnimatingCardsRef.current = false
-    }, Constants.BASE_CARD_REVEAL_DURATION / speedFactor)
+    }, (cardType == DuelistCardType.BLADE ? Constants.BASE_BLADE_CARD_REVEAL_DURATION : Constants.BASE_CARD_REVEAL_DURATION) / speedFactor)
   }
 
   const expandHand = () => {
@@ -315,7 +409,7 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
       card.toggleHighlight(true)
       card.toggleIdle(true)
 
-      card.setCardScale(Constants.EXPAND_HAND_CARD_SCALE, Constants.EXPAND_HAND_CARD_SCALE_DURATION)
+      card.setScale(Constants.EXPAND_HAND_CARD_SCALE, Constants.EXPAND_HAND_CARD_SCALE_DURATION)
     })
 
     setTimeout(()=> {
@@ -345,7 +439,7 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
       card.toggleHighlight(false)
       card.toggleIdle(false)
 
-      card.setCardScale(1)
+      card.setScale(1)
     })
 
     setTimeout(()=> {
@@ -367,10 +461,10 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
       
       setTimeout(() => {
         card.setPosition(gridPositions[type].x, gridPositions[type].y, Constants.HAND_DETAILS_POSITION_DURATION)
-        card.setCardRotation(0, Constants.HAND_DETAILS_ROTATION_DURATION)
-        card.setCardScale(Constants.HAND_DETAILS_SCALE, Constants.HAND_DETAILS_SCALE_DURATION)
+        card.setRotation(0, Constants.HAND_DETAILS_ROTATION_DURATION)
+        card.setScale(Constants.HAND_DETAILS_SCALE, Constants.HAND_DETAILS_SCALE_DURATION)
         setTimeout(() => {
-          card.setCardZIndex(901 + renderOrder)
+          card.setZIndex(901 + renderOrder)
         }, Constants.HAND_DETAILS_Z_INDEX_MAX_DELAY - (renderOrder * Constants.HAND_DETAILS_DELAY))
       }, renderOrder * Constants.HAND_DETAILS_DELAY)
     })
@@ -394,11 +488,11 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
       setTimeout(() => {
         const { translateX, translateY, rotation } = originalCardStylesRef.current[type]
         card.setPosition(translateX, translateY, Constants.HAND_DETAILS_POSITION_DURATION)
-        card.setCardRotation(rotation, Constants.HAND_DETAILS_ROTATION_DURATION)
-        card.setCardScale(1, Constants.HAND_DETAILS_SCALE_DURATION)
+        card.setRotation(rotation, Constants.HAND_DETAILS_ROTATION_DURATION)
+        card.setScale(1, Constants.HAND_DETAILS_SCALE_DURATION)
         card.toggleIdle(false)
         setTimeout(() => {
-          card.setCardZIndex(renderOrder + 5, 1)
+          card.setZIndex(renderOrder + 5, 1)
         }, Constants.HAND_DETAILS_Z_INDEX_DELAY)
       }, renderOrder * Constants.HAND_DETAILS_DELAY)
     })
@@ -450,10 +544,10 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
         currentActiveCardRef.current = cardType
 
         card.toggleHighlight(false)
-        card.flipCard(true, isLeft ? Constants.CARD_DETAIL_FLIP_ROTATION : -Constants.CARD_DETAIL_FLIP_ROTATION, Constants.CARD_DETAILS_FLIP_DURATION, TWEEN.Easing.Quartic.InOut)
+        card.flip(true, isLeft, Constants.CARD_DETAILS_FLIP_DURATION, Constants.CARD_DETAIL_FLIP_ROTATION, TWEEN.Easing.Quartic.InOut)
         card.setPosition(0, 0, Constants.CARD_DETAILS_POSITION_DURATION, TWEEN.Easing.Quartic.InOut)
-        card.setCardScale(Constants.CARD_DETAIL_SCALE, Constants.CARD_DETAILS_SCALE_DURATION, TWEEN.Easing.Quartic.InOut)
-        card.setCardZIndex(950)
+        card.setScale(Constants.CARD_DETAIL_SCALE, Constants.CARD_DETAILS_SCALE_DURATION, TWEEN.Easing.Quartic.InOut)
+        card.setZIndex(950)
       } else {
         currentActiveCardRef.current = null
       }
@@ -472,11 +566,11 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
       const oldCardIndex = cardRefs.current.findIndex(card => card.type == currentActiveCardRef.current)
       const oldCard = cardRefs.current[oldCardIndex].ref.current
 
-      oldCard.flipCard(true, isLeft ? Constants.CARD_FLIP_ROTATION : -Constants.CARD_FLIP_ROTATION, 0)
+      oldCard.flip(true, isLeft, 0)
       oldCard.setPosition(gridPositions[currentActiveCardRef.current].x, gridPositions[currentActiveCardRef.current].y, Constants.RETURN_CARD_POSITION_DURATION, TWEEN.Easing.Quadratic.Out, TWEEN.Interpolation.Linear)
-      oldCard.setCardScale(Constants.EXPAND_HAND_CARD_SCALE, Constants.RETURN_CARD_SCALE_DURATION, TWEEN.Easing.Quadratic.InOut, TWEEN.Interpolation.Linear)
+      oldCard.setScale(Constants.EXPAND_HAND_CARD_SCALE, Constants.RETURN_CARD_SCALE_DURATION, TWEEN.Easing.Quadratic.InOut, TWEEN.Interpolation.Linear)
       setTimeout(() => {
-        oldCard.setCardZIndex(901 + oldCardIndex)
+        oldCard.setZIndex(901 + oldCardIndex)
       }, Constants.RETURN_CARD_Z_INDEX_DELAY);
 
       if (reset) {
@@ -515,6 +609,7 @@ const DuelistCards = forwardRef<DuelistCardsHandle, DuelistCardsProps>((props: D
 const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>((props: EnvironmentDeckProps, ref: React.Ref<EnvironmentDeckHandle>) => {
   const [cards,  setCards] = useState<{ ref: React.RefObject<CardHandle>, id: number, isDrawn: boolean }[]>([]);
   const [drawnCardsCount, setDrawnCardsCount] = useState(0);
+  const [showDeckInfo, setShowDeckInfo] = useState(false);
 
   const [ expanded, setExpanded ] = useState(false)
   
@@ -565,9 +660,9 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
           setTimeout(() => {
             cardComponent.setPosition(targetX, targetY, 400);
           }, 200 * Math.random())
-          cardComponent.setCardRotation(0);
-          cardComponent.setCardScale(1);
-          cardComponent.setCardZIndex(100 + i, i);
+          cardComponent.setRotation(0);
+          cardComponent.setScale(1);
+          cardComponent.setZIndex(100 + i, i);
           setTimeout(() => {
             cardComponent.toggleVisibility(true);
           }, 1000)
@@ -642,14 +737,14 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
           const targetY = -card.id * Constants.CARD_DECK_CARD_Y_OFFSET + (aspectH * Constants.CARD_GRID_POSITION_Y_OFFSET)
           setTimeout(() => {
             cardComponent.setPosition(targetX, targetY, 800);
-            cardComponent.setCardRotation(0);
-            cardComponent.setCardScale(1);
+            cardComponent.setRotation(0);
+            cardComponent.setScale(1);
           }, i * 100)
           setTimeout(() => {
-            cardComponent.flipCard(false, 0)
+            cardComponent.flip(false)
           }, i * 100 + 100);
           setTimeout(() => {
-            cardComponent.setCardZIndex(100 + card.id, card.id);
+            cardComponent.setZIndex(100 + card.id, card.id);
           }, i * 100 + 400);
 
           card.isDrawn = false
@@ -745,10 +840,10 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
             );
 
             setTimeout(() => {
-              cardComponent.setCardScale(Constants.DRAW_CARD_TOP_CARD_SCALE, Constants.DRAW_CARD_SCALE_DURATION / speedFactor)
+              cardComponent.setScale(Constants.DRAW_CARD_TOP_CARD_SCALE, Constants.DRAW_CARD_SCALE_DURATION / speedFactor)
             }, Constants.DRAW_CARD_SCALE_DELAY / speedFactor)
             setTimeout(() => {
-              cardComponent.setCardScale(1, Constants.DRAW_CARD_RESET_SCALE_DURATION / speedFactor)
+              cardComponent.setScale(1, Constants.DRAW_CARD_RESET_SCALE_DURATION / speedFactor)
             }, Constants.DRAW_CARD_RESET_SCALE_DELAY / speedFactor)
             setTimeout(() => {
               cardComponent.toggleHighlight(true)
@@ -757,9 +852,9 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
               cardComponent.toggleHighlight(false)
             }, Constants.DRAW_CARD_RESET_HIGHLIGHT_DELAY / speedFactor)
             setTimeout(() => {
-              cardComponent.flipCard(true, -Constants.CARD_FLIP_ROTATION, Constants.DRAW_CARD_FLIP_DURATION / speedFactor, TWEEN.Easing.Quartic.InOut);
+              cardComponent.flip(true, false, Constants.DRAW_CARD_FLIP_DURATION / speedFactor, Constants.CARD_FLIP_ROTATION, TWEEN.Easing.Quartic.InOut);
             }, Constants.DRAW_CARD_FLIP_DELAY / speedFactor)
-            cardComponent.setCardZIndex(100 + firstCard.id + (drawnCardsCount * 2), firstCard.id + (drawnCardsCount * 2))
+            cardComponent.setZIndex(100 + firstCard.id + (drawnCardsCount * 2), firstCard.id + (drawnCardsCount * 2))
 
             firstCard.isDrawn = true
             setDrawnCardsCount(prevValue => prevValue + 1)
@@ -794,9 +889,9 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
 
       setTimeout(() => {
         card.setPosition(gridPositions[index].x, gridPositions[index].y, Constants.EXPAND_DECK_POSITION_DURATION)
-        card.setCardRotation(0, Constants.EXPAND_DECK_ROTATION_DURATION)
-        card.setCardScale(Constants.EXPANDED_DECK_CARD_SCALE, Constants.EXPAND_DECK_SCALE_DURATION)
-        card.setCardZIndex(980 - cardData[1].id, 950 - cardData[1].id)
+        card.setRotation(0, Constants.EXPAND_DECK_ROTATION_DURATION)
+        card.setScale(Constants.EXPANDED_DECK_CARD_SCALE, Constants.EXPAND_DECK_SCALE_DURATION)
+        card.setZIndex(980 - cardData[1].id, 950 - cardData[1].id)
       }, index * Constants.EXPAND_DECK_TRANSOFORM_DELAY)
     })
 
@@ -824,12 +919,12 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
 
       setTimeout(() => {
         card.setPosition(gridPositionsCollapse[index].x, gridPositionsCollapse[index].y, Constants.EXPAND_DECK_POSITION_DURATION)
-        card.setCardRotation(0, Constants.EXPAND_DECK_ROTATION_DURATION)
-        card.setCardScale(1, Constants.EXPAND_DECK_SCALE_DURATION)
+        card.setRotation(0, Constants.EXPAND_DECK_ROTATION_DURATION)
+        card.setScale(1, Constants.EXPAND_DECK_SCALE_DURATION)
       }, index * Constants.EXPAND_DECK_TRANSOFORM_DELAY)
 
       setTimeout(() => {
-        card.setCardZIndex(100 + cardData[1].id + index * 2, cardData[1].id + index * 2)
+        card.setZIndex(100 + cardData[1].id + index * 2, cardData[1].id + index * 2)
       }, Constants.EXPAND_DECK_Z_INDEX_DELAY);
     })
 
@@ -847,6 +942,18 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
       card.ref.current.toggleHighlight(isHovered, true)
       card.ref.current.toggleIdle(isHovered)
     })
+  }
+
+  const handleDeckHover = (isHovered: boolean) => {
+    if (!isHovered || expanded || isAnimatingCardsRef.current) {
+      setShowDeckInfo(false)
+      return
+    }
+
+    const undrawnCards = cards.filter(card => !card.isDrawn)
+    if (undrawnCards.length > 0) {
+      setShowDeckInfo(true)
+    }
   }
 
   const handleCardClick = (cardId: number, e: React.MouseEvent) => {
@@ -870,10 +977,10 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
         currentActiveCardRef.current = cardId
 
         card.toggleHighlight(false)
-        card.flipCard(true, -Constants.CARD_DETAIL_FLIP_ROTATION, Constants.CARD_DETAILS_FLIP_DURATION, TWEEN.Easing.Quartic.InOut)
+        card.flip(true, false, Constants.CARD_DETAILS_FLIP_DURATION, Constants.CARD_FLIP_ROTATION, TWEEN.Easing.Quartic.InOut)
         card.setPosition(0, 0, Constants.CARD_DETAILS_POSITION_DURATION, TWEEN.Easing.Quartic.InOut)
-        card.setCardScale(Constants.CARD_DETAIL_SCALE, Constants.CARD_DETAILS_SCALE_DURATION, TWEEN.Easing.Quartic.InOut)
-        card.setCardZIndex(950)
+        card.setScale(Constants.CARD_DETAIL_SCALE, Constants.CARD_DETAILS_SCALE_DURATION, TWEEN.Easing.Quartic.InOut)
+        card.setZIndex(950)
       } else {
         currentActiveCardRef.current = null
       }
@@ -893,11 +1000,11 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
       const gridIndex = cards.filter((card) => card.isDrawn ).findIndex(card => card.id == currentActiveCardRef.current)
       const oldCard = cards[oldCardIndex].ref.current
 
-      oldCard.flipCard(true, -Constants.CARD_FLIP_ROTATION, 0)
+      oldCard.flip(true, false, 0)
       oldCard.setPosition(gridPositions[gridIndex].x, gridPositions[gridIndex].y, Constants.RETURN_CARD_POSITION_DURATION, TWEEN.Easing.Quadratic.Out, TWEEN.Interpolation.Linear)
-      oldCard.setCardScale(Constants.EXPANDED_DECK_CARD_SCALE, Constants.RETURN_CARD_SCALE_DURATION, TWEEN.Easing.Quadratic.InOut, TWEEN.Interpolation.Linear)
+      oldCard.setScale(Constants.EXPANDED_DECK_CARD_SCALE, Constants.RETURN_CARD_SCALE_DURATION, TWEEN.Easing.Quadratic.InOut, TWEEN.Interpolation.Linear)
       setTimeout(() => {
-        oldCard.setCardZIndex(901 + oldCardIndex)
+        oldCard.setZIndex(901 + oldCardIndex)
       }, Constants.RETURN_CARD_Z_INDEX_DELAY);
 
       if (reset) {
@@ -932,7 +1039,13 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
           width={Constants.CARD_WIDTH}
           height={Constants.CARD_HEIGHT}
           isVisible={false}
-          onHover={(isHovered) => handleCardHover(isHovered, card.id)}
+          onHover={(isHovered) => {
+            if (card.isDrawn) {
+              handleCardHover(isHovered, card.id)
+            } else {
+              handleDeckHover(isHovered)
+            }
+          }}
           onClick={(e) => handleCardClick(card.id, e)}
         />
       ))}
@@ -940,14 +1053,38 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
       {emptyCards.map((card, index) => (
         <div id='dashed-outline' className={expanded && drawnCardsCount < (index + 1) ? 'visible' : ''} ref={card} key={`empty-card-${index}`} />
       ))}
+
+      <div 
+        className={`DeckInfoBubble ${showDeckInfo ? 'visible' : ''}`}
+      >
+        {Object.entries(EnvironmentCardsTextures).reduce((acc, [_, cardData]) => acc + cardData.cardAmount, 0)} cards total
+        <br/>
+        Types: 
+        <div className="deck-info-grid">
+          {Object.entries(EnvironmentCardsTextures)
+            .filter((_, index) => index > 0)
+            .map(([cardName, cardData], index) => (
+              <div key={`row-${index}`} className="deck-info-row">
+                <div className="deck-info-cell deck-card-title">
+                  {cardData.title}
+                </div>
+                <div className={`deck-info-cell deck-card-rarity ${cardData.rarity.toLowerCase()}`}>
+                  {cardData.rarity}
+                </div>
+                <div className="deck-info-cell deck-card-count">
+                  x{cardData.cardAmount}
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
     </>
   );
 });
 
-const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
+const PlayerStats = ({ duelistId, isLeft, damage, hitChance, visible }) => {
 
-  const { name, profilePic } = useDuelist(duelistId)
-  const { isYou } = useIsYou(duelistId)
+  const { name, profilePic, profileType } = useDuelist(duelistId)
   const { dispatchSelectDuelistId } = usePistolsContext()
 
   const contentLength = useMemo(() => Math.floor(name.length/10), [name])
@@ -973,8 +1110,8 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
         
       </div>
       <div className={ isLeft ? 'data-window left' : 'data-window right' }>
-        <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)} >
-          <ProfilePic className='NoMouse NoDrag profile-picture' duel profilePic={profilePic} />
+        <div className={`Relative ${visible ? 'YesMouse NoDrag' : 'NoMouse NoDrag'}`} onClick={() => dispatchSelectDuelistId(duelistId)} >
+          <ProfilePic className='NoMouse NoDrag' width={10}  circle profilePic={profilePic} profileType={profileType} />
           <img className='NoMouse NoDrag profile-outline' src='/images/ui/duel/card_details/profile_border.png' />
         </div>
         <div className='value-name' data-contentlength={contentLength}>{name}</div>
@@ -994,7 +1131,7 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance }) => {
   )
 }
 
-const Cards = forwardRef<CardsHandle, { duelId: BigNumberish }>(({ duelId }, ref) => {
+const Cards = forwardRef<CardsHandle, { duelId: BigNumberish, tutorialLevel: DuelTutorialLevel }>(({ duelId, tutorialLevel }, ref) => {
   const { duelistIdA, duelistIdB } = useChallenge(duelId)
 
   const [isOverlayVisible, setIsOverlayVisible] = useState(false)
@@ -1017,28 +1154,28 @@ const Cards = forwardRef<CardsHandle, { duelId: BigNumberish }>(({ duelId }, ref
   }));
 
   const resetCards = () => {
-    environmentDeck.current.shuffle()
-    duelistAHand.current.resetCards()
-    duelistBHand.current.resetCards()
+    environmentDeck.current?.shuffle()
+    duelistAHand.current?.resetCards()
+    duelistBHand.current?.resetCards()
   }
 
   const spawnCards = (duelist: string, cards: DuelistHand) => {
     if (duelist == 'A') {
-      duelistAHand.current.spawnCards(cards)
+      duelistAHand.current?.spawnCards(cards)
     } else {
-      duelistBHand.current.spawnCards(cards)
+      duelistBHand.current?.spawnCards(cards)
     }
   }
 
   const drawNextCard = (speedFactor: number) => {
-    environmentDeck.current.drawCard(speedFactor)
+    environmentDeck.current?.drawCard(speedFactor)
   }
 
-  const revealCard = (duelist: string, type: DuelistCardType, speedFactor: number) => {
+  const revealCard = (duelist: string, type: DuelistCardType, speedFactor: number, alive?: boolean) => {
     if (duelist == 'A') {
-      duelistAHand.current.revealCard(type, speedFactor)
+      duelistAHand.current?.revealCard(type, speedFactor, alive)
     } else {
-      duelistBHand.current.revealCard(type, speedFactor)
+      duelistBHand.current?.revealCard(type, speedFactor, alive)
     }
   }
 
@@ -1067,70 +1204,73 @@ const Cards = forwardRef<CardsHandle, { duelId: BigNumberish }>(({ duelId }, ref
   }, []);
 
   const setAllEnvCards = (cardsData: CardData[]) => {
-    environmentDeck.current.setCardsData(cardsData)
+    environmentDeck.current?.setCardsData(cardsData)
   }
 
   const handleClick = (isLeft?: boolean, shouldClose?: boolean) => {
     if (shouldClose) {
       if (isLeft == true) {
-        duelistBHand.current.returnActiveCard()
-        environmentDeck.current.returnActiveCard()
+        duelistBHand.current?.returnActiveCard()
+        environmentDeck.current?.returnActiveCard()
       } else if (isLeft == false) {
-        duelistAHand.current.returnActiveCard()
-        environmentDeck.current.returnActiveCard()
+        duelistAHand.current?.returnActiveCard()
+        environmentDeck.current?.returnActiveCard()
       } else {
-        duelistBHand.current.returnActiveCard()
-        duelistAHand.current.returnActiveCard()
+        duelistBHand.current?.returnActiveCard()
+        duelistAHand.current?.returnActiveCard()
       }
     } else {
-      if (!duelistAHand.current.isReadyToShow() || !duelistBHand.current.isReadyToShow() || !environmentDeck.current.isReadyToShow()) return
-      duelistBHand.current.showHandDetails()
-      duelistAHand.current.showHandDetails()
-      environmentDeck.current.expand()
+      if (!duelistAHand.current?.isReadyToShow() || !duelistBHand.current?.isReadyToShow() || !environmentDeck.current?.isReadyToShow()) return
+      duelistBHand.current?.showHandDetails()
+      duelistAHand.current?.showHandDetails()
+      environmentDeck.current?.expand()
       
       setTimeout(() => {
         setIsOverlayVisible(true)
       }, 600)
 
       setTimeout(() => {
-        overlayRef.current.addEventListener('click', handleGlobalClick)
+        overlayRef.current?.addEventListener('click', handleGlobalClick)
       }, 100)
     }
   }
 
   const handleGlobalClick = useCallback((event: MouseEvent) => {
-    duelistAHand.current.returnActiveCard()
-    duelistBHand.current.returnActiveCard()
-    environmentDeck.current.returnActiveCard()
+    duelistAHand.current?.returnActiveCard()
+    duelistBHand.current?.returnActiveCard()
+    environmentDeck.current?.returnActiveCard()
 
   }, [duelistAHand, duelistBHand, overlayRef, environmentDeck])
 
   const collapse = () => {
-    if (!duelistAHand.current.isReadyToCollapse() || !duelistBHand.current.isReadyToCollapse() || !environmentDeck.current.isReadyToCollapse()) return
-    duelistAHand.current.hideHandDetails()
-    duelistBHand.current.hideHandDetails()
+    if (!duelistAHand.current?.isReadyToCollapse() || !duelistBHand.current?.isReadyToCollapse() || !environmentDeck.current?.isReadyToCollapse()) return
+    duelistAHand.current?.hideHandDetails()
+    duelistBHand.current?.hideHandDetails()
 
-    environmentDeck.current.collapse()
+    environmentDeck.current?.collapse()
 
     setIsOverlayVisible(false)
 
-    overlayRef.current.removeEventListener('click', handleGlobalClick)
+    overlayRef.current?.removeEventListener('click', handleGlobalClick)
   }
+
+  if (tutorialLevel === DuelTutorialLevel.SIMPLE) return null
 
   return (
     <>
       <div id="overlay" className={isOverlayVisible ? 'visible' : ''} ref={overlayRef}>
         <div className='background'/>
-        <PlayerStats duelistId={duelistIdA} isLeft={true} damage={statsA.damage} hitChance={statsA.hitChance} />
-        <PlayerStats duelistId={duelistIdB} isLeft={false} damage={statsB.damage} hitChance={statsB.hitChance} />
+        <PlayerStats duelistId={duelistIdA} isLeft={true} damage={statsA.damage} hitChance={statsA.hitChance} visible={isOverlayVisible} />
+        <PlayerStats duelistId={duelistIdB} isLeft={false} damage={statsB.damage} hitChance={statsB.hitChance} visible={isOverlayVisible} />
         <div className='env-divider' />
         <div 
-          className='YesMouse NoDrag close-button' 
+          className={isOverlayVisible ? 'YesMouse NoDrag close-button' : 'NoMouse NoDrag close-button'} 
           onClick={collapse}
           onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.25)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         />
       </div>
+
 
       <EnvironmentDeck onClick={handleClick} ref={environmentDeck}/>
       <DuelistCards duelistId={duelistIdA} isLeft={true} onClick={handleClick} ref={duelistAHand}/>
@@ -1143,7 +1283,7 @@ export interface CardsHandle {
   resetCards: () => void
   spawnCards: (duelist: string, cards: DuelistHand) => void
   drawNextCard: (speedFactor: number) => void
-  revealCard: (duelist: string, type: DuelistCardType, speedFactor: number) => void
+  revealCard: (duelist: string, type: DuelistCardType, speedFactor: number, alive?: boolean) => void
   updateDuelistData(damageA: number, damageB: number, hitChanceA: number, hitChanceB: number)
   setAllEnvCards: (cardsData: CardData[]) => void
 }
@@ -1168,3 +1308,4 @@ export default Cards;
 //TODO when duelist cards are invisible disable hover
 //TODO handle details better, should stop tween update probably? and halt the duel show details and then resume? needs better handling or access only when duel finishes or paused and animations finished
 //TODO better animation tracking!!!
+//TODO add empty cards to details screen if a player hasnt chosen their cards yet

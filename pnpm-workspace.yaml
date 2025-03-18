@@ -1,22 +1,48 @@
 packages:
-  - 'client'
-  - 'sdk'
+  - "sdk"
+  - "client"
+  - "dreams"
 
 catalog:
-  '@apollo/client': ^3.11.8
-  '@cartridge/connector': 0.5.7
-  '@cartridge/controller': 0.5.7
-  '@dojoengine/core': 1.0.4-alpha.3.1.2
-  '@dojoengine/sdk': 1.0.4-alpha.3.1.2
-  '@dojoengine/torii-client': 1.0.4-alpha.3.1.2
-  '@dojoengine/utils': 1.0.4-alpha.3.1.2
-  '@starknet-react/chains': 3.0.2
-  '@starknet-react/core': 3.0.3
+  #--------------------------------
+  # dojo.js
+  #
+  "@dojoengine/core": 1.2.4
+  "@dojoengine/sdk": 1.2.4
+  "@dojoengine/torii-client": 1.2.4
+  "@dojoengine/utils": 1.2.4
+  # "@dojoengine/core": ../../dojo.js/packages/core
+  # "@dojoengine/sdk": ../../dojo.js/packages/sdk
+  # "@dojoengine/torii-client": ../../dojo.js/packages/torii-client
+  # "@dojoengine/utils": ../../dojo.js/packages/utils
+
+  #--------------------------------
+  # same as dojo.js
+  # https://github.com/dojoengine/dojo.js/blob/main/pnpm-workspace.yaml
+  #
+  "@starknet-react/core": ^3.6.2
+  "@starknet-react/chains": ^3.1.0
   get-starknet-core: ^4.0.0
+  starknet: 6.23.1
   immer: ^10.1.1
-  react: ^18.2.0
-  react-dom: ^18.2.0
-  starknet: 6.11.0
+  zustand: ^4.5.5
+  "@types/react": ^18.3.1
+  "@types/react-dom": ^18.3.1
+  react: ^18.3.1
+  react-dom: ^18.3.1
+  
+  #--------------------------------
+  # misc
+  #
+  "@cartridge/connector": 0.7.4
+  "@cartridge/controller": 0.7.4
+  "@cartridge/presets": 0.5.4
+  "@apollo/client": ^3.11.8
+  "@types/node": "^22.10.2"
   starknetid.js: ^4.0.0
   typescript: ^5.5.4
-  zustand: ^4.5.5
+  tsup: ^8.3.5
+
+  # daydreams
+  "@daydreamsai/core": ^0.0.4
+  # "@daydreamsai/core": ../../daydreams/packages/core

@@ -1,20 +1,18 @@
 import { useEffect, useMemo } from 'react'
-import { init } from '@dojoengine/sdk'
+import { init, SDKConfig } from '@dojoengine/sdk'
 import { DojoProvider } from '@dojoengine/core'
-import { useAsyncMemo } from 'src/hooks/useAsyncMemo'
-import { useMounted } from 'src/hooks/useMounted'
-import { feltToString } from 'src/utils/starknet'
+import { useAsyncMemo } from 'src/utils/hooks/useAsyncMemo'
+import { useMounted } from 'src/utils/hooks/useMounted'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
-import { DojoChainConfig } from 'src/dojo/setup/chains'
+import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
 import { useDeployedSystem } from 'src/dojo/hooks/useDojoSystem'
 import { createSystemCalls } from 'src/games/pistols/config/createSystemCalls'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
-export type Schema = typeof models.schema
 
-export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: DojoChainConfig) {
+export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: DojoNetworkConfig) {
 
   // avoid double effects
   const mounted = useMounted()
@@ -26,11 +24,11 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   // - object or true: when success
   //
 
-  const chainId = useMemo(() => (selectedChainConfig.chainId), [selectedChainConfig])
+  const chainId = useMemo(() => (selectedNetworkConfig.chainId), [selectedNetworkConfig])
 
   const manifest = useMemo(() => {
-    return dojoAppConfig.manifests[chainId] ?? null
-  }, [dojoAppConfig, chainId])
+    return dojoAppConfig.manifest ?? null
+  }, [dojoAppConfig])
 
   const starknetDomain = useMemo(() => {
     return dojoAppConfig.starknetDomain ?? null
@@ -44,21 +42,11 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
   } = useAsyncMemo<DojoProvider>(async () => {
     if (!mounted) return undefined
     if (!manifest) return null
-    const dojoProvider = new DojoProvider(manifest, selectedChainConfig.rpcUrl)
-    console.log(`DojoProvider:`, feltToString(await dojoProvider.provider.getChainId()), dojoProvider)
+    console.log(`DojoProvider...`, selectedNetworkConfig.rpcUrl)
+    const dojoProvider = new DojoProvider(manifest, selectedNetworkConfig.rpcUrl)
+    console.log(`DojoProvider:`, dojoProvider)
     return dojoProvider
-  }, [mounted, selectedChainConfig, manifest], undefined, null)
-
-  //
-  // Contract calls
-  const {
-    value: contractCalls,
-    isError: contractCallsIsError,
-  } = useAsyncMemo(async () => {
-    if (!mounted) return undefined
-    if (!dojoProvider) return null
-    return await setupWorld(dojoProvider)
-  }, [mounted, dojoProvider], undefined, null)
+  }, [mounted, selectedNetworkConfig, manifest], undefined, null)
 
   //
   // Torii setup
@@ -67,43 +55,56 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     isError: sdkIsError,
   } = useAsyncMemo(async () => {
     if (!mounted) return undefined
+    if (!dojoProvider) return undefined
     if (!starknetDomain) return undefined
     if (!manifest) return null
-    const sdk = await init<Schema>(
-      {
-        client: {
-          rpcUrl: selectedChainConfig.rpcUrl,
-          toriiUrl: selectedChainConfig.toriiUrl,
-          relayUrl: selectedChainConfig.relayUrl ?? '',
-          worldAddress: manifest.world.address ?? '',
-        },
-        domain: starknetDomain,
+    console.log(`TORII CLIENT...`, selectedNetworkConfig.toriiUrl)
+    let config: SDKConfig = {
+      client: {
+        // rpcUrl: selectedNetworkConfig.rpcUrl,
+        toriiUrl: selectedNetworkConfig.toriiUrl,
+        relayUrl: selectedNetworkConfig.relayUrl ?? '',
+        worldAddress: manifest.world.address ?? '',
       },
-      models.schema
-    );
-    // console.log(`TORII CLIENT OK!`)
+      domain: starknetDomain,
+    }
+    const sdk = await init<models.SchemaType>(config);
+    console.log(`TORII CLIENT OK!`)
     return sdk
-  }, [mounted, selectedChainConfig, manifest, starknetDomain], undefined, null)
+  }, [mounted, selectedNetworkConfig, manifest, starknetDomain, dojoProvider], undefined, null)
 
   //
   // Check world deployment
-  const { isDeployed } = useDeployedSystem(dojoAppConfig.namespace, Object.keys(dojoAppConfig.contractPolicyDescriptions)[0], manifest)
+  const { isDeployed } = useDeployedSystem(dojoAppConfig.namespace, dojoAppConfig.mainContractName, manifest)
+
+  //
+  // Contract calls
+  const {
+    value: contractCalls,
+    isError: contractCallsIsError,
+  } = useAsyncMemo<ReturnType<typeof setupWorld>>(async () => {
+    if (!mounted) return undefined
+    if (!dojoProvider) return (dojoProvider as any) // undefined or null
+    return await setupWorld(dojoProvider)
+  }, [mounted, dojoProvider], undefined, null)
 
   //
   // Establish system calls using the network and components.
   const systemCalls = useMemo<ReturnType<typeof createSystemCalls>>(() => {
     if (!manifest) return null
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
-    return createSystemCalls(manifest, dojoProvider) ?? null
-  }, [manifest, dojoProvider])
+    if (!contractCalls) return (contractCalls as any) // undefined or null
+    return createSystemCalls(dojoProvider, manifest, contractCalls, selectedNetworkConfig) ?? null
+  }, [manifest, dojoProvider, contractCalls, selectedNetworkConfig, chainId])
 
   //
   // Status
 
-  const isLoading = !(
-    (sdk !== undefined) &&
-    (dojoProvider !== undefined) &&
-    (systemCalls !== undefined)
+  const isLoading = (
+    (sdk === undefined) ||
+    (dojoProvider === undefined) ||
+    (contractCalls === undefined) ||
+    (systemCalls === undefined)
   )
   const loadingMessage = (isLoading ? 'Loading Pistols...' : null)
 
@@ -129,7 +130,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedChainConfig: Dojo
     systemCalls,
     // pass thru
     dojoAppConfig,
-    selectedChainConfig,
+    selectedNetworkConfig,
     namespace: dojoAppConfig.namespace,
     manifest,
     starknetDomain,

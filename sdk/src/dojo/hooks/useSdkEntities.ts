@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { arrayClean, isPositiveBigint } from 'src/utils/types'
+import { useEffect, useMemo, useState } from 'react'
+import { BigNumberish, addAddressPadding } from 'starknet'
+import { bigintToHex, arrayClean } from 'src/utils/misc/types'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import {
-  PistolsGetQuery,
-  PistolsSubQuery,
+  PistolsQueryBuilder,
   PistolsEntity,
   PistolsModelType,
   PistolsSchemaModelNames,
@@ -18,117 +18,230 @@ import {
 // updates calls: updateEntity() (optional)
 //
 
-export type UseSdkEntitiesResult = {
-  isLoading: boolean
-  isSubscribed: boolean
-  refetch: () => void
+type UseSdkGetResult = {
+  isLoading: boolean | undefined
 }
 
 export type UseSdkEntitiesProps = {
-  query_get: PistolsGetQuery
-  query_sub?: PistolsSubQuery
-  setEntities: (entities: PistolsEntity[]) => void // stores initial state
-  updateEntity?: (entities: PistolsEntity) => void // store updates (if absent, do not subscribe)
+  query: PistolsQueryBuilder
   enabled?: boolean
-  // events options
-  historical?: boolean // if defined, will fetch for event messages
-  // get options
-  limit?: number
-  offset?: number
-  // subscribe options
-  logging?: boolean
+}
+type UseSdkEntitiesGetProps = UseSdkEntitiesProps & {
+  setEntities: (entities: PistolsEntity[]) => void // stores set callback (erases previous state)
+}
+type UseSdkEntitiesSubProps = UseSdkEntitiesProps & {
+  setEntities: (entities: PistolsEntity[]) => void // stores set callback (erases previous state)
+  updateEntity: (entities: PistolsEntity) => void // store update callback
 }
 
-export const useSdkEntities = ({
-  query_get,
-  query_sub,
+export type UseSdkEventsProps = UseSdkEntitiesProps & {
+  historical: boolean
+}
+type UseSdkEventsGetProps = UseSdkEntitiesGetProps & {
+  historical: boolean
+}
+type UseSdkEventsSubProps = UseSdkEntitiesSubProps & {
+  historical: boolean
+}
+
+type SdkEntitiesCallbackResponse = {
+  data?: PistolsEntity[]
+  error?: Error
+};
+type SdkEventsCallbackResponse = {
+  data?: PistolsEntity[] | PistolsEntity[][]
+  error?: Error
+};
+
+
+//---------------------------------------
+// entities get/subscribe
+//
+export const useSdkEntitiesGet = ({
+  query,
   setEntities,
-  updateEntity,
   enabled = true,
-  historical = undefined,
-  limit = 100,
-  offset = 0,
-  logging = false,
-}: UseSdkEntitiesProps): UseSdkEntitiesResult => {
+}: UseSdkEntitiesGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
-  const [isSubscribed, setIsSubscribed] = useState<boolean>()
-  const isEvent = useMemo(() => (historical !== undefined), [historical])
 
-  //----------------------
-  // get initial entities
-  //
   useEffect(() => {
     const _get = async () => {
       setIsLoading(true)
-      await (isEvent ? sdk.getEventMessages : sdk.getEntities)({
-        query: query_get,
-        callback: (response: any) => {
-          if (response.error) {
-            console.error("useSdkEntities().sdk.get() error:", response.error)
-          } else if (response.data) {
-            // console.log("useSdkEntities() GOT:", response.data);
-            setEntities(response.data);
-          }
-          setIsLoading(false)
-        },
-        limit,
-        offset,
-        options: { logging },
-        //@ts-ignore
-        historical,
+      await sdk.getEntities({
+        query,
+      }).then((data: PistolsEntity[]) => {
+        console.log("useSdkEntitiesGet() GOT:", data)
+        setEntities(_filterEntities(data))
+      }).catch((error: Error) => {
+        console.error("useSdkEntitiesGet().sdk.get() error:", error, query)
+      }).finally(() => {
+        setIsLoading(false)
       })
     }
-    if (sdk && query_get && enabled) {
-      _get()
-    }
-  }, [sdk, query_get, enabled])
-
-  //----------------------
-  // subscribe for updates
-  //
-  useEffect(() => {
-    let _unsubscribe: (() => void) | undefined;
-
-    const _subscribe = async () => {
-      setIsSubscribed(undefined)
-      const subscription = await (isEvent ? sdk.subscribeEventQuery : sdk.subscribeEntityQuery)({
-        query: query_sub,
-        callback: (response: any) => {
-          if (response.error) {
-            console.error("useSdkEntities().sdk.subscribe() error:", response.error)
-          } else if (isPositiveBigint(response.data?.[0]?.entityId ?? 0)) {
-            // console.log("useSdkEntities() SUB:", response.data[0]);
-            updateEntity(response.data[0]);
-          }
-        },
-        options: { logging },
-        //@ts-ignore
-        historical,
-      })
-      setIsSubscribed(true)
-      _unsubscribe = () => subscription.cancel()
-    };
-
-    if (sdk && query_sub && enabled && updateEntity && isLoading === false) {
-      _subscribe()
-    }
-
-    return () => {
-      setIsSubscribed(false)
-      _unsubscribe?.()
-    }
-  }, [sdk, query_sub, enabled, isLoading])
-
-  const refetch = useCallback(() => {
-    console.warn(`useSdkEntities().refetch() not implemented`)
-  }, [])
+    // get...
+    if (sdk && query && enabled) _get()
+  }, [sdk, query, enabled])
 
   return {
     isLoading,
-    isSubscribed,
-    refetch,
   }
+}
+
+export const useSdkEntitiesSub = ({
+  query,
+  setEntities,
+  updateEntity,
+  enabled = true,
+}: UseSdkEntitiesSubProps): UseSdkGetResult => {
+  const { sdk } = useDojoSetup()
+  const [isLoading, setIsLoading] = useState<boolean>()
+
+  useEffect(() => {
+    let _unsubscribe: (() => void) = undefined;
+    const _subscribe = async () => {
+      setIsLoading(true)
+      console.log("ENTITIES SUB _______ query:", query);
+      sdk.subscribeEntityQuery({
+        query,
+        callback: (response: SdkEntitiesCallbackResponse) => {
+          if (response.error) {
+            console.error("useSdkEntitiesSub() callback error:", response.error, query)
+          } else {
+            console.log("useSdkEntitiesSub() SUB:", response.data);
+            _filterEntities(response.data).forEach(entity => updateEntity(entity) )
+          }
+        },
+      }).then(response => {
+        const [initialEntities, sub] = response;
+        // console.log("ENTITIES SUB ====== initialEntities:", initialEntities);
+        if (!_unsubscribe) {
+          _unsubscribe = () => sub.cancel()
+          setEntities(_filterEntities(initialEntities))
+        }
+      }).catch(error => {
+        console.error("useSdkEntitiesSub() promise error:", error, query)
+      }).finally(() => {
+        setIsLoading(false)
+      })
+    };
+    // subscribe
+    if (sdk && enabled && query) _subscribe()
+    // unsubscribe
+    return () => {
+      _unsubscribe?.()
+      _unsubscribe = () => {}
+    }
+  }, [sdk, enabled, query])
+
+  return {
+    isLoading,
+  }
+}
+
+
+//---------------------------------------
+// events get/subscribe
+//
+export const useSdkEventsGet = ({
+  query,
+  setEntities,
+  historical,
+  enabled = true,
+}: UseSdkEventsGetProps): UseSdkGetResult => {
+  const { sdk } = useDojoSetup()
+  const [isLoading, setIsLoading] = useState<boolean>()
+
+  useEffect(() => {
+    const _get = async () => {
+      setIsLoading(true)
+      sdk.getEventMessages({
+        query,
+        historical,
+      }).then((data: PistolsEntity[] | PistolsEntity[][]) => {
+        // console.log("useSdkEventsGet() GOT:", historical, response.data)
+        setEntities(_parseEvents(data, historical))
+      }).catch((error: Error) => {
+        console.error("useSdkEventsGet() error:", error, query)
+      }).finally(() => {
+        setIsLoading(false)
+      })
+    }
+    // get...
+    if (sdk && query && enabled) _get()
+  }, [sdk, query, enabled])
+
+  return {
+    isLoading,
+  }
+}
+
+export const useSdkEventsSub = ({
+  query,
+  setEntities,
+  updateEntity,
+  historical,
+  enabled = true,
+}: UseSdkEventsSubProps): UseSdkGetResult => {
+  const { sdk } = useDojoSetup()
+  const [isLoading, setIsLoading] = useState<boolean>()
+
+  useEffect(() => {
+    let _unsubscribe: (() => void) = undefined;
+    const _subscribe = async () => {
+      setIsLoading(true)
+      // console.log("EVENTS SUB _______ query:", query);
+      await sdk.subscribeEventQuery({
+        query,
+        historical,
+        callback: (response: SdkEventsCallbackResponse) => {
+          if (response.error) {
+            console.error("useSdkEventsSub() callback error:", response.error, query)
+          } else {
+            // console.log("useSdkEventsSub() SUB:", historical, response.data);
+            _parseEvents(response.data, historical).forEach(entity => updateEntity(entity))
+          }
+        },
+      }).then(response => {
+        const [initialEntities, sub] = response;
+        // console.log("EVENTS SUB ====== initialEntities:", initialEntities);
+        if (!_unsubscribe) {
+          _unsubscribe = () => sub.cancel()
+          setEntities(_parseEvents(initialEntities, historical))
+          setIsLoading(false)
+        }
+      }).catch(error => {
+        console.error("useSdkEventsSub() promise error:", error, query)
+      }).finally(() => {
+        setIsLoading(false)
+      })
+    };
+    // subscribe...
+    if (sdk && enabled && query) _subscribe()
+    // unsubscribe...
+    return () => {
+      _unsubscribe?.()
+      _unsubscribe = () => { }
+    }
+  }, [sdk, enabled, query])
+
+  return {
+    isLoading,
+  }
+}
+
+const _filterEntities = (data: PistolsEntity[]): PistolsEntity[] => {
+  return (data ?? []).filter(e => e && e.entityId != '0x0')
+}
+
+const _parseEvents = (data: PistolsEntity[] | PistolsEntity[][], historical: boolean): PistolsEntity[] => {
+  return _filterEntities(
+    !data ? []
+      : !historical ? (data as PistolsEntity[])
+        : (data as PistolsEntity[][]).reduce((acc: PistolsEntity[], e: PistolsEntity[]) => (
+          acc.concat(e)
+        ), [] as PistolsEntity[])
+  )
 }
 
 
@@ -137,10 +250,16 @@ export const useSdkEntities = ({
 //
 
 //
+// Format Bignumberish value for operators
+export const formatQueryValue = (value: BigNumberish): string => {
+  return addAddressPadding(bigintToHex(value))
+}
+
+//
 // Extract models from a stored entity
 //
 export const getEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: PistolsSchemaModelNames): M => (
-  entity?.models.pistols[modelName] as M
+  entity?.models.pistols?.[modelName] as M
 )
 export const getEntityModels = <M extends PistolsModelType>(entity: PistolsEntity, modelNames: PistolsSchemaModelNames[]): M[] => (
   arrayClean(modelNames.map(modelName => getEntityModel<M>(entity, modelName)))

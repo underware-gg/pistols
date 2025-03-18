@@ -1,19 +1,26 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useDojoSystem } from '@underware_gg/pistols-sdk/dojo'
-import { poseidon } from '@underware_gg/pistols-sdk/utils'
+import { useDojoSystem } from '@underware/pistols-sdk/dojo'
+import { poseidon } from '@underware/pistols-sdk/utils/starknet'
+
+export const usePackTokenContract = () => {
+  const { contractAddress } = useDojoSystem('pack_token')
+  return {
+    packContractAddress: contractAddress,
+  }
+}
 
 export const useDuelistTokenContract = () => {
-  const { contractAddress: duelistContractAddress } = useDojoSystem('duelist_token')
+  const { contractAddress } = useDojoSystem('duelist_token')
   return {
-    duelistContractAddress,
+    duelistContractAddress: contractAddress,
   }
 }
 
 export const useDuelTokenContract = () => {
-  const { contractAddress: duelContractAddress } = useDojoSystem('duel_token')
+  const { contractAddress } = useDojoSystem('duel_token')
   return {
-    duelContractAddress,
+    duelContractAddress: contractAddress,
   }
 }
 

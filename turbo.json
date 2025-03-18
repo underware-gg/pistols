@@ -22,6 +22,10 @@
       "persistent": true,
       "cache": false
     },
+    "sync": {
+      "persistent": true,
+      "cache": false
+    },
     "lint": {
       "dependsOn": [
         "^lint"

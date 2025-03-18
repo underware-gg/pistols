@@ -27,6 +27,7 @@ pub trait ILordsMock<TState> {
     fn mint(ref self: TState, recipient: ContractAddress, amount: u256);
 }
 
+// Exposed to clients
 #[starknet::interface]
 pub trait ILordsMockPublic<TState> {
     fn faucet(ref self: TState);
@@ -35,12 +36,7 @@ pub trait ILordsMockPublic<TState> {
 
 #[dojo::contract]
 pub mod lords_mock {
-    // use debug::PrintTrait;
-    use core::byte_array::ByteArrayTrait;
-    use starknet::{ContractAddress, get_contract_address, get_caller_address, get_block_timestamp};
-    use pistols::types::constants::{CONST};
-    use dojo::world::{WorldStorage};
-    use dojo::model::{ModelStorage, ModelValueStorage};
+    use starknet::{ContractAddress};
 
     //-----------------------------------
     // ERC-20 Start
@@ -96,11 +92,10 @@ pub mod lords_mock {
     //-----------------------------------
     // Public
     //
-    use super::{ILordsMockPublic};
     #[abi(embed_v0)]
-    impl LordsMockPublicImpl of ILordsMockPublic<ContractState> {
+    impl LordsMockPublicImpl of super::ILordsMockPublic<ContractState> {
         fn faucet(ref self: ContractState) {
-            self.coin.faucet(get_caller_address());
+            self.coin.faucet(starknet::get_caller_address());
         }
         fn mint(ref self: ContractState,
             recipient: ContractAddress,

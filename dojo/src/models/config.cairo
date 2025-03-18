@@ -1,7 +1,7 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 
-mod CONFIG {
-    const CONFIG_KEY: u8 = 1;
+pub mod CONFIG {
+    pub const CONFIG_KEY: u8 = 1;
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -13,6 +13,7 @@ pub struct Config {
     pub treasury_address: ContractAddress,
     pub lords_address: ContractAddress,
     pub vrf_address: ContractAddress,
+    pub season_table_id: felt252,
     pub is_paused: bool,
 }
 
@@ -23,9 +24,7 @@ pub struct TokenConfig {
     pub token_address: ContractAddress,
     //------
     pub minter_address: ContractAddress,
-    pub renderer_address: ContractAddress,
     pub minted_count: u128,
-    // use the Payment model for pricing
 }
 
 #[derive(Copy, Drop, Serde)]
@@ -42,25 +41,18 @@ pub struct CoinConfig {
 //---------------------------
 // Traits
 //
-pub use pistols::interfaces::ierc20::{ierc20, ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
-pub use pistols::interfaces::systems::{IVRFMockDispatcher, IVRFMockDispatcherTrait};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
-impl ConfigImpl of ConfigTrait {
-    fn new() -> Config {
+pub impl ConfigManagerImpl of ConfigManagerTrait {
+    fn initialize() -> Config {
         (Config {
             key: CONFIG::CONFIG_KEY,
             treasury_address: ZERO(),
             lords_address: ZERO(),
             vrf_address: ZERO(),
+            season_table_id: 0,
             is_paused: false,
         })
-    }
-    fn lords_dispatcher(self: @Config) -> ERC20ABIDispatcher {
-        (ierc20(*self.lords_address))
-    }
-    fn vrf_dispatcher(self: @Config) -> IVRFMockDispatcher {
-        (IVRFMockDispatcher{ contract_address: *self.vrf_address })
     }
 }

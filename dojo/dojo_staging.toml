@@ -5,12 +5,12 @@
 #
 
 [world]
-name = "Pistols at 10 Blocks"
+name = "Pistols at Dawn"
 description = "An on-chain pistol duelling game of honour and betrayal."
-icon_uri = "https://pistols.underware.gg/images/logo.png"
-cover_uri = "https://pistols.underware.gg/images/splash.png"
-website = "https://pistols.underware.gg"
-seed = "pistols"
+icon_uri = "https://assets.underware.gg/pistols/logo.png"
+cover_uri = "https://assets.underware.gg/pistols/splash.png"
+website = "https://pistols.gg"
+seed = "staging-v0.13.0"
 
 [world.socials]
 x = "https://x.com/underware_gg"
@@ -19,11 +19,13 @@ github = "https://github.com/underware-gg/pistols"
 # telegram = "https://t.me/dojoengine"
 
 [env]
-chain_id = "WP_PISTOLS_STAGING"
-rpc_url = "https://api.cartridge.gg/x/pistols-staging/katana"
-account_address = "0xcf5a59fce535e4fa443f59e025d81d24e8bd2bf375f6665c5aab22af1a1e27"
-private_key = "0x49714ee0edbcb3fd3d1f1214e5978ada40d62ece7b84f6067ed2c7b28c972bf"
-world_address = "0x1adaf57de23b6d6d43eeb42b6ab6730a022021382fef49eff1f532c21556a5a"
+chain_id = "SN_SEPOLIA"
+rpc_url = "https://api.cartridge.gg/x/starknet/sepolia" # or env: STARKNET_RPC_URL
+# account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
+# private_key = ""      # env: DOJO_PRIVATE_KEY
+world_address = "0x2ea88c9a6314a10e7d8b6e557d01d68cf72d962707086aa242bc4805071f34d"
+lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
+world_block = 576409
 
 #--------------------------
 # namespaces
@@ -46,13 +48,23 @@ default = "pistols"
 [writers]
 "pistols" = [
   "pistols-game",
+  "pistols-tutorial",
   "pistols-admin",
   "pistols-duel_token",
   "pistols-duelist_token",
+  "pistols-pack_token",
 ]
 # ERC-20
-"pistols-CoinConfig"        = ["pistols-fame_coin","pistols-lords_mock"]
+"pistols-CoinConfig" = [
+  "pistols-fame_coin",
+  "pistols-fools_coin",
+  "pistols-lords_mock",
+]
 "pistols-TokenBoundAddress" = ["pistols-fame_coin"]
+"pistols-Pool" = ["pistols-bank"]
+# arcade trophies
+"pistols-TrophyCreation" = ["pistols-game"]
+"pistols-TrophyProgression" = ["pistols-game"]
 
 #--------------------------
 # init_calldata
@@ -60,25 +72,19 @@ default = "pistols"
 [init_call_args]
 "pistols-admin" = [
   "0x0", # treasury_address (or initializer)
-  "0x0", # lords_address (use lords_mock)
-  "0x0", # vrf_address (use vrf_mock)
+  "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210", # lords_address (sepolia)
+  "0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f", # vrf_address (sepolia)
 ]
 "pistols-duel_token" = [
-  "sstr:pistols.underware.gg", # base_uri
+  "sstr:https://assets.underware.gg", # base_uri
   "0x0", # minter_address
-  "0x0", # renderer_address
   "0", # fee_amount
 ]
 "pistols-duelist_token" = [
-  "sstr:pistols.underware.gg", # base_uri
-  "0x0", # minter_address
-  "0x0", # renderer_address
-  # "100000000000000000000", # fee_amount: 100 LORDS
-  "0x0", # fee_amount
+  "sstr:https://assets.underware.gg", # base_uri
 ]
-"pistols-lords_mock" = [
-  "0x0", # minter_address
-  "10000000000000000000000", # faucet_amount: 10,000 LORDS
+"pistols-pack_token" = [
+  "sstr:https://assets.underware.gg", # base_uri
 ]
 
 
@@ -87,4 +93,7 @@ default = "pistols"
 #
 [migration]
 order_inits = []
-skip_contracts = []
+skip_contracts = [
+  "pistols-lords_mock",
+  "pistols-vrf_mock",
+]

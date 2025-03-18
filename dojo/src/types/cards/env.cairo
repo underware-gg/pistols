@@ -21,78 +21,65 @@ pub enum EnvCard {
 // constants
 //
 
-mod ENV_CARDS {
-    // IMPORTANT: must be in sync with EnvCard
-    const None: u8 = 0;
-    const DamageUp: u8 = 1;
-    const DamageDown: u8 = 2;
-    const ChancesUp: u8 = 3;
-    const ChancesDown: u8 = 4;
-    const DoubleDamageUp: u8 = 5;
-    const DoubleChancesUp: u8 = 7;
-    const SpecialAllShotsHit: u8 = 9;
-    const SpecialAllShotsMiss: u8 = 10;
-    const SpecialDoubleTactics: u8 = 11;
-    const SpecialNoTactics: u8 = 12;
-}
-
+// to be exported to typescript by generateConstants
+// IMPORTANT: names must be in sync with enum EnvCard
 mod ENV_POINTS {
     use pistols::types::cards::cards::{EnvCardPoints, Rarity};
-    const DamageUp: EnvCardPoints = EnvCardPoints {
+    pub const DamageUp: EnvCardPoints = EnvCardPoints {
         name: 'Damage Up',
         rarity: Rarity::Common,
         chances: 0,
         damage: 1,
     };
-    const DamageDown: EnvCardPoints = EnvCardPoints {
+    pub const DamageDown: EnvCardPoints = EnvCardPoints {
         name: 'Damage Down',
         rarity: Rarity::Common,
         chances: 0,
         damage: -1,
     };
-    const ChancesUp: EnvCardPoints = EnvCardPoints {
+    pub const ChancesUp: EnvCardPoints = EnvCardPoints {
         name: 'Chances Up',
         rarity: Rarity::Common,
         chances: 10,
         damage: 0,
     };
-    const ChancesDown: EnvCardPoints = EnvCardPoints {
+    pub const ChancesDown: EnvCardPoints = EnvCardPoints {
         name: 'Chances Down',
         rarity: Rarity::Common,
         chances: -10, 
         damage: 0,
     };
-    const DoubleDamageUp: EnvCardPoints = EnvCardPoints {
+    pub const DoubleDamageUp: EnvCardPoints = EnvCardPoints {
         name: 'Double Damage Up',
         rarity: Rarity::Uncommon,
         chances: 0,
         damage: 2,
     };
-    const DoubleChancesUp: EnvCardPoints = EnvCardPoints {
+    pub const DoubleChancesUp: EnvCardPoints = EnvCardPoints {
         name: 'Double Chances Up',
         rarity: Rarity::Uncommon,
         chances: 20,
         damage: 0,
     };
-    const SpecialAllShotsHit: EnvCardPoints = EnvCardPoints {
+    pub const SpecialAllShotsHit: EnvCardPoints = EnvCardPoints {
         name: 'All Shots Hit',
         rarity: Rarity::Special,
         chances: 100,
         damage: 0,
     };
-    const SpecialAllShotsMiss: EnvCardPoints = EnvCardPoints {
+    pub const SpecialAllShotsMiss: EnvCardPoints = EnvCardPoints {
         name: 'All Shots Miss',
         rarity: Rarity::Special,
         chances: -100,
         damage: 0,
     };
-    const SpecialDoubleTactics: EnvCardPoints = EnvCardPoints {
+    pub const SpecialDoubleTactics: EnvCardPoints = EnvCardPoints {
         name: 'Double Tactics',
         rarity: Rarity::Special,
         chances: 0,
         damage: 0,
     };
-    const SpecialNoTactics: EnvCardPoints = EnvCardPoints {
+    pub const SpecialNoTactics: EnvCardPoints = EnvCardPoints {
         name: 'No Tactics',
         rarity: Rarity::Special,
         chances: 0,
@@ -104,32 +91,31 @@ mod ENV_POINTS {
 // traits
 //
 use pistols::types::cards::{
-    cards::{EnvCardPoints, EnvCardPointsTrait, Rarity},
-    tactics::{TacticsCard, TacticsCardTrait},
+    cards::{EnvCardPoints, EnvCardPointsTrait},
+    tactics::{TacticsCardTrait},
 };
 use pistols::types::duel_progress::{SpecialsDrawn};
 use pistols::models::challenge::{DuelistState, DuelistStateTrait};
-use pistols::utils::math::{MathTrait};
 
 impl EnvCardDefault of Default<EnvCard> {
     fn default() -> EnvCard {(EnvCard::None)}
 }
 
 #[generate_trait]
-impl EnvCardImpl of EnvCardTrait {
-    fn is_shots_modifier(self: EnvCard) -> bool {
+pub impl EnvCardImpl of EnvCardTrait {
+    fn is_shots_modifier(self: @EnvCard) -> bool {
         (match self {
             EnvCard::SpecialAllShotsHit | EnvCard::SpecialAllShotsMiss => true,
             _ => false,
         })
     }
-    fn is_tactics_modifier(self: EnvCard) -> bool {
+    fn is_tactics_modifier(self: @EnvCard) -> bool {
         (match self {
             EnvCard::SpecialDoubleTactics | EnvCard::SpecialNoTactics => true,
             _ => false,
         })
     }
-    fn get_points(self: EnvCard) -> EnvCardPoints {
+    fn get_points(self: @EnvCard) -> EnvCardPoints {
         match self {
             EnvCard::DamageUp =>                ENV_POINTS::DamageUp,
             EnvCard::DamageDown =>              ENV_POINTS::DamageDown,
@@ -145,9 +131,9 @@ impl EnvCardImpl of EnvCardTrait {
         }
     }
     #[inline(always)]
-    fn apply_points(self: EnvCard, ref specials: SpecialsDrawn, ref state_self: DuelistState, ref state_other: DuelistState) {
-        if (self != EnvCard::None) {
-            let points: EnvCardPoints = self.get_points();
+    fn apply_points(self: @EnvCard, ref specials: SpecialsDrawn, ref state_self: DuelistState, ref state_other: DuelistState) {
+        if (*self != EnvCard::None) {
+            let points: EnvCardPoints = (*self).get_points();
             if (points.is_special()) {
                 if (specials.coin_toss) {
                     // duelist blocked 1st special
@@ -155,17 +141,17 @@ impl EnvCardImpl of EnvCardTrait {
                 } else if (self.is_shots_modifier()) {
                     // All shots hit or miss
                     state_self.apply_chances(points.chances);
-                    specials.shots_modifier = self;
+                    specials.shots_modifier = *self;
                 } else if (self.is_tactics_modifier()) {
                     // Double or No tactics
                     let multiplier: i8 =
-                        if (self == EnvCard::SpecialDoubleTactics)
+                        if (*self == EnvCard::SpecialDoubleTactics)
                             {if (specials.tactics_modifier == EnvCard::SpecialNoTactics) {(2)} else {(1)}}
-                        else if (self == EnvCard::SpecialNoTactics)
+                        else if (*self == EnvCard::SpecialNoTactics)
                             {if (specials.tactics_modifier == EnvCard::SpecialDoubleTactics) {(-2)} else {(-1)}}
                         else {(0)}; // not happening!
                     specials.tactics.apply_points(ref state_self, ref state_other, multiplier, specials.shots_modifier);
-                    specials.tactics_modifier = self;
+                    specials.tactics_modifier = *self;
                 }            
             } else {
                 // check reversal
@@ -178,7 +164,7 @@ impl EnvCardImpl of EnvCardTrait {
             }
         }
     }
-    fn get_full_deck() -> Array<EnvCard> {
+    fn get_full_deck() -> Span<EnvCard> {
         (array![
             // 7
             EnvCard::DamageUp, // dice: 1
@@ -221,72 +207,92 @@ impl EnvCardImpl of EnvCardTrait {
             EnvCard::SpecialAllShotsMiss,  // dice: 32
             EnvCard::SpecialDoubleTactics, // dice: 33
             EnvCard::SpecialNoTactics,     // dice: 34
-        ])
+        ].span())
     }
 }
 
+pub mod ENV_DICES {
+    // dice positions for tutorial and testing
+    // sync from EnvCard::get_full_deck()
+    pub const DAMAGE_UP: felt252 = 1;
+    pub const DAMAGE_DOWN: felt252 = 8;
+    pub const CHANCES_UP: felt252 = 13;
+    pub const CHANCES_DOWN: felt252 = 20;
+    pub const DOUBLE_DAMAGE_UP: felt252 = 25;
+    pub const DOUBLE_CHANCES_UP: felt252 = 28;
+    pub const ALL_SHOTS_HIT: felt252 = 31;
+    pub const ALL_SHOTS_MISS: felt252 = 32;
+    pub const DOUBLE_TACTICS: felt252 = 33;
+    pub const NO_TACTICS: felt252 = 34;
+}
 
 //--------------------
 // converters
 //
-use debug::PrintTrait;
-use core::fmt::{Display, Formatter, Error};
 use pistols::utils::short_string::{ShortStringTrait};
-
-impl EnvCardIntoU8 of Into<EnvCard, u8> {
+impl EnvCardIntoU8 of core::traits::Into<EnvCard, u8> {
     fn into(self: EnvCard) -> u8 {
         match self {
-            EnvCard::DamageUp =>                ENV_CARDS::DamageUp,
-            EnvCard::DamageDown =>              ENV_CARDS::DamageDown,
-            EnvCard::ChancesUp =>               ENV_CARDS::ChancesUp,
-            EnvCard::ChancesDown =>             ENV_CARDS::ChancesDown,
-            EnvCard::DoubleDamageUp =>          ENV_CARDS::DoubleDamageUp,
-            EnvCard::DoubleChancesUp =>         ENV_CARDS::DoubleChancesUp,
-            EnvCard::SpecialAllShotsHit =>      ENV_CARDS::SpecialAllShotsHit,
-            EnvCard::SpecialAllShotsMiss =>     ENV_CARDS::SpecialAllShotsMiss,
-            EnvCard::SpecialDoubleTactics =>    ENV_CARDS::SpecialDoubleTactics,
-            EnvCard::SpecialNoTactics =>        ENV_CARDS::SpecialNoTactics,
-            EnvCard::None =>                    ENV_CARDS::None,
+            EnvCard::None =>                    0,
+            EnvCard::DamageUp =>                1,
+            EnvCard::DamageDown =>              2,
+            EnvCard::ChancesUp =>               3,
+            EnvCard::ChancesDown =>             4,
+            EnvCard::DoubleDamageUp =>          5,
+            EnvCard::DoubleChancesUp =>         6,
+            EnvCard::SpecialAllShotsHit =>      7,
+            EnvCard::SpecialAllShotsMiss =>     8,
+            EnvCard::SpecialDoubleTactics =>    9,
+            EnvCard::SpecialNoTactics =>        10,
         }
     }
 }
-
-impl U8IntoEnvCard of Into<u8, EnvCard> {
+impl U8IntoEnvCard of core::traits::Into<u8, EnvCard> {
     fn into(self: u8) -> EnvCard {
-        if self == ENV_CARDS::DamageUp                     { EnvCard::DamageUp }
-        else if self == ENV_CARDS::DamageDown              { EnvCard::DamageDown }
-        else if self == ENV_CARDS::ChancesUp               { EnvCard::ChancesUp }
-        else if self == ENV_CARDS::ChancesDown             { EnvCard::ChancesDown }
-        else if self == ENV_CARDS::DoubleDamageUp         { EnvCard::DoubleDamageUp }
-        else if self == ENV_CARDS::DoubleChancesUp        { EnvCard::DoubleChancesUp }
-        else if self == ENV_CARDS::SpecialAllShotsHit    { EnvCard::SpecialAllShotsHit }
-        else if self == ENV_CARDS::SpecialAllShotsMiss   { EnvCard::SpecialAllShotsMiss }
-        else if self == ENV_CARDS::SpecialDoubleTactics   { EnvCard::SpecialDoubleTactics }
-        else if self == ENV_CARDS::SpecialNoTactics       { EnvCard::SpecialNoTactics }
-        else                                                { EnvCard::None }
+        if self == 1        { EnvCard::DamageUp }
+        else if self == 2   { EnvCard::DamageDown }
+        else if self == 3   { EnvCard::ChancesUp }
+        else if self == 4   { EnvCard::ChancesDown }
+        else if self == 5   { EnvCard::DoubleDamageUp }
+        else if self == 6   { EnvCard::DoubleChancesUp }
+        else if self == 7   { EnvCard::SpecialAllShotsHit }
+        else if self == 8   { EnvCard::SpecialAllShotsMiss }
+        else if self == 9   { EnvCard::SpecialDoubleTactics }
+        else if self == 10  { EnvCard::SpecialNoTactics }
+        else                { EnvCard::None }
     }
 }
-
-impl EnvCardIntoFelt252 of Into<EnvCard, felt252> {
-    fn into(self: EnvCard) -> felt252 {
-        let v: u8 = self.into();
-        (v.into())
-    }
-}
-
-impl EnvCardPrintImpl of PrintTrait<EnvCard> {
-    fn print(self: EnvCard) {
-        self.get_points().name.print();
-    }
-}
-
-// for println! and format!
-impl EnvCardDisplay of Display<EnvCard> {
-    fn fmt(self: @EnvCard, ref f: Formatter) -> Result<(), Error> {
-        let name: ByteArray = (*self).get_points().name.as_string();
-        let value: felt252 = (*self).into();
-        let str: ByteArray = format!("({}:{})", value, name);
-        f.buffer.append(@str);
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+impl EnvCardDebug of core::fmt::Debug<EnvCard> {
+    fn fmt(self: @EnvCard, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let name: ByteArray = (*self).get_points().name.to_string();
+        let value: u8 = (*self).into();
+        let result: ByteArray = format!("({}:{})", value, name);
+        f.buffer.append(@result);
         Result::Ok(())
+    }
+}
+
+
+//----------------------------------------
+// Unit  tests
+//
+#[cfg(test)]
+mod unit {
+    use super::{EnvCard};
+
+    #[test]
+    fn test_into_u8() {
+        let mut i: u8 = 0;
+        loop {
+            let card: EnvCard = i.into();
+            if (i > 0 && card == EnvCard::None) {
+                break;
+            }
+            let as_u8: u8 = card.into();
+            assert!(i == as_u8, "{} != {}", i, as_u8);
+            // println!("EnvCard {} == {}", i, as_u8);
+            i += 1;
+        };
     }
 }

@@ -1,10 +1,10 @@
 {
   "id": "1",
   "name": "Duel #1",
-  "description": "Pistols at 10 Blocks Duel #1. https://pistols.underware.gg",
-  "image": "https://pistols.underware.gg/profiles/square/00.jpg",
+  "description": "Pistols at Dawn Duel #1. https://pistols.underware.gg",
+  "image": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHByZXNlcnZlQXNwZWN0UmF0aW89J3hNaW5ZTWluIG1lZXQnIHZpZXdCb3g9JzAgMCAxOTQyIDEwMjQnPjxpbWFnZSBocmVmPSdodHRwczovL3Bpc3RvbHMudW5kZXJ3YXJlLmdnL3Byb2ZpbGVzL2R1ZWxpc3RzL3BvcnRyYWl0LzAwLmpwZycgeD0nMCcgeT0nNTAnIHdpZHRoPSc1NjBweCcgaGVpZ2h0PSc5MjRweCcgLz48aW1hZ2UgaHJlZj0naHR0cHM6Ly9waXN0b2xzLnVuZGVyd2FyZS5nZy9wcm9maWxlcy9kdWVsaXN0cy9wb3J0cmFpdC8wMC5qcGcnIHg9JzEzODAnIHk9JzUwJyB3aWR0aD0nNTYwcHgnIGhlaWdodD0nOTI0cHgnIC8+PGltYWdlIGhyZWY9J2h0dHBzOi8vcGlzdG9scy51bmRlcndhcmUuZ2cvdGV4dHVyZXMvY2FyZHMvY2FyZF93aWRlX2Jyb3duLnBuZycgeD0nMCcgeT0nMCcgd2lkdGg9JzE5NDJweCcgaGVpZ2h0PScxMDI0cHgnIC8+PC9zdmc+",
   "metadata": {
-    "Table": "Lords",
+    "Table": "Practice",
     "Challenger": "Duelist #1",
     "Challenged": "Duelist #2",
     "Premise": "Honour",
@@ -15,7 +15,7 @@
   "attributes": [
     {
       "trait": "Table",
-      "value": "Lords"
+      "value": "Practice"
     },
     {
       "trait": "Challenger",

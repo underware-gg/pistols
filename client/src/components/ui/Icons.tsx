@@ -125,6 +125,8 @@ interface IconClickProps extends IconProps {
   important?: boolean
   className?: string
   style?: any
+  fitted?: boolean
+  size?: IconSizeProp
 }
 export function IconClick(props: IconClickProps) {
   const classNames = props.onClick ? ['IconClick'] : ['IconNoClick']
@@ -132,7 +134,7 @@ export function IconClick(props: IconClickProps) {
   if (props.className) classNames.push(props.className)
   const iconProps = useMemo(() => ({ ...props, important: undefined }), [props])
   return (
-    <Icon {...iconProps as IconProps} className={classNames.join(' ')} style={props.style} onClick={() => props.onClick?.()} />
+    <Icon {...iconProps as IconProps} className={classNames.join(' ')} style={props.style} onClick={() => props.onClick?.()} fitted={props.fitted} size={props.size} />
   )
 }
 
@@ -160,12 +162,16 @@ export function CopyIcon(props: CopyIconProps) {
 interface BookmarkIconProps extends IconProps {
   isBookmarked: boolean
   onClick?: Function
+  fitted?: boolean
+  size?: IconSizeProp
 }
 export function BookmarkIcon(props: BookmarkIconProps) {
   return (
     <IconClick
       name={props.isBookmarked ? 'bookmark' : 'bookmark outline'}
       onClick={props.onClick}
+      fitted={props.fitted}
+      size={props.size}
     />
   )
 }
@@ -258,7 +264,8 @@ interface CustomIconProps {
   name: SemanticICONS | string,   // name of icon, logo, or Icon
   icon?: boolean,			  // if the svg is on /icons/
   logo?: boolean,			  // if the svg is on /logos/
-  png?: boolean,        // png extension
+  png?: boolean,        // use pure png file
+  svg?: boolean,        // use pure svg file
   alt?: string,
   // <Icon> fallback
   // optionals
@@ -275,6 +282,7 @@ export function CustomIcon({
   icon = false,
   logo = false,
   png = false,
+  svg = false,
   alt = undefined,    // TODO: add tooltip
   name = 'avante',
   className = null,
@@ -295,14 +303,14 @@ export function CustomIcon({
     }
 
     // png
-    if (png) {
+    if (png || svg) {
       let _style = {
         backgroundImage: `url(${_url})`,
       }
       return (
         <i className={`${className} icon ${size} NoMargin Relative`}>
           {' '}
-          <div className='CustomIconPng' style={_style} />
+          <div className={png ? 'CustomIconPng' : 'CustomIconSvg'} style={_style} />
         </i>
       )
     }

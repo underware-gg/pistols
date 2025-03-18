@@ -1,19 +1,19 @@
 import { useMemo } from 'react'
 import { Account, BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useSdkPublishTypedData } from '@underware_gg/pistols-sdk/dojo'
+import { useSdkPublishTypedData, useStarknetContext } from '@underware/pistols-sdk/dojo'
 import {
-  constants,
-  make_typed_data_PPlayerBookmark,
-  make_typed_data_PPlayerOnline,
-  make_typed_data_PPlayerTutorialProgress,
-} from '@underware_gg/pistols-sdk/pistols'
+  make_typed_data_PlayerBookmark,
+  make_typed_data_PlayerOnline,
+} from '@underware/pistols-sdk/pistols'
 
 
 export function usePlayerOnlineSignedMessage(timestamp: number) {
+  const { selectedNetworkId } = useStarknetContext()
   const { account } = useAccount()
   const typedData = useMemo(() => (
-    make_typed_data_PPlayerOnline({
+    make_typed_data_PlayerOnline({
+      networkId: selectedNetworkId,
       identity: account?.address ?? 0,
       timestamp: Math.floor(timestamp),
     })
@@ -25,25 +25,12 @@ export function usePlayerOnlineSignedMessage(timestamp: number) {
   }
 }
 
-export function useTutorialProgressSignedMessage(progress: constants.TutorialProgress) {
-  const { account } = useAccount()
-  const typedData = useMemo(() => (
-    make_typed_data_PPlayerTutorialProgress({
-      identity: account?.address ?? 0,
-      progress,
-    })
-  ), [account, progress])
-  const { publish, isPublishing } = useSdkPublishTypedData(account as Account, typedData)
-  return {
-    publish,
-    isPublishing,
-  }
-}
-
 export function usePlayerBookmarkSignedMessage(target_address: BigNumberish, target_id: BigNumberish, enabled: boolean) {
+  const { selectedNetworkId } = useStarknetContext()
   const { account } = useAccount()
   const typedData = useMemo(() => (
-    make_typed_data_PPlayerBookmark({
+    make_typed_data_PlayerBookmark({
+      networkId: selectedNetworkId,
       identity: account?.address ?? 0,
       target_address,
       target_id,

@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react'
 import useSWR from 'swr'
-import { useSelectedChain } from 'src/dojo/hooks/useChain'
+import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 
 const textFetcher = (url: string) => fetch(url).then((res) => res.text())
 
 export const useToriiStatus = () => {
-  const { selectedChainConfig } = useSelectedChain()
-  const { data, error, isLoading } = useSWR(selectedChainConfig.toriiUrl, textFetcher)
+  const { selectedNetworkConfig } = useStarknetContext()
+  const { data, error, isLoading } = useSWR(selectedNetworkConfig.toriiUrl, textFetcher)
   // data: string = {"service":"torii","success":true}
   // console.log(`torii:`, data, data, error, isLoading)
 
@@ -28,8 +28,8 @@ export const useToriiStatus = () => {
 }
 
 export const useKatanaStatus = () => {
-  const { selectedChainConfig } = useSelectedChain()
-  const { data, error, isLoading } = useSWR(selectedChainConfig.rpcUrl, textFetcher)
+  const { selectedNetworkConfig } = useStarknetContext()
+  const { data, error, isLoading } = useSWR(selectedNetworkConfig.rpcUrl, textFetcher)
   // data: string = {"health":true}
   // console.log(`torii:`, data, data, error, isLoading)
 

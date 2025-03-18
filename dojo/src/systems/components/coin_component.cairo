@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 
 #[starknet::interface]
 pub trait ICoinComponentInternal<TState> {
@@ -6,7 +6,7 @@ pub trait ICoinComponentInternal<TState> {
         minter_address: ContractAddress,
         faucet_amount: u128,
     );
-    fn can_mint(self: @TState, caller_address: ContractAddress) -> bool;
+    fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn assert_caller_is_minter(self: @TState) -> ContractAddress;
     fn mint(ref self: TState, recipient: ContractAddress, amount: u256);
     fn faucet(ref self: TState, recipient: ContractAddress);
@@ -14,41 +14,38 @@ pub trait ICoinComponentInternal<TState> {
 
 #[starknet::component]
 pub mod CoinComponent {
-    // use debug::PrintTrait;
-    use zeroable::Zeroable;
-    use starknet::{ContractAddress, get_contract_address, get_caller_address};
-    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+    use core::num::traits::Zero;
+    use starknet::{ContractAddress};
     use dojo::contract::components::world_provider::{IWorldProvider};
     
-    use openzeppelin_introspection::src5::SRC5Component;
+    // use openzeppelin_introspection::src5::SRC5Component;
     use openzeppelin_token::erc20::{
         ERC20Component,
         ERC20Component::{InternalImpl as ERC20InternalImpl},
     };
 
-    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::interfaces::dns::{DnsTrait};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::models::config::{
         CoinConfig, CoinConfigValue,
     };
 
     #[storage]
-    struct Storage {}
+    pub struct Storage {}
 
     #[event]
     #[derive(Drop, PartialEq, starknet::Event)]
     pub enum Event {}
 
-    mod Errors {
-        const CALLER_IS_NOT_MINTER: felt252 = 'COIN: caller is not minter';
-        const FAUCET_UNAVAILABLE: felt252   = 'COIN: faucet unavailable';
+    pub mod Errors {
+        pub const CALLER_IS_NOT_MINTER: felt252 = 'COIN: caller is not minter';
+        pub const FAUCET_UNAVAILABLE: felt252   = 'COIN: faucet unavailable';
     }
 
 
     //-----------------------------------------
     // Internal
     //
-    use super::{ICoinComponentInternal};
     #[embeddable_as(CoinComponentInternalImpl)]
     pub impl CoinComponentInternal<
         TContractState,
@@ -57,15 +54,15 @@ pub mod CoinComponent {
         +ERC20Component::ERC20HooksTrait<TContractState>,
         impl ERC20: ERC20Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ICoinComponentInternal<ComponentState<TContractState>> {
+    > of super::ICoinComponentInternal<ComponentState<TContractState>> {
         fn initialize(ref self: ComponentState<TContractState>,
             minter_address: ContractAddress,
             faucet_amount: u128,
         ) {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let coin_config: CoinConfig = CoinConfig{
-                coin_address: get_contract_address(),
+                coin_address: starknet::get_contract_address(),
                 minter_address,
                 faucet_amount,
             };
@@ -73,19 +70,19 @@ pub mod CoinComponent {
         }
 
         fn can_mint(self: @ComponentState<TContractState>,
-            caller_address: ContractAddress,
+            recipient: ContractAddress,
         ) -> bool {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
-            let coin_config: CoinConfigValue = store.get_coin_config_value(get_contract_address());
+            let coin_config: CoinConfigValue = store.get_coin_config_value(starknet::get_contract_address());
             (
                 coin_config.minter_address.is_zero() ||      // anyone can mint
-                caller_address == coin_config.minter_address // caller is minter contract
+                recipient == coin_config.minter_address // caller is minter contract
             )
         }
 
         fn assert_caller_is_minter(self: @ComponentState<TContractState>) -> ContractAddress {
-            let caller: ContractAddress = get_caller_address();
+            let caller: ContractAddress = starknet::get_caller_address();
             assert(self.can_mint(caller), Errors::CALLER_IS_NOT_MINTER);
             (caller)
         }
@@ -102,9 +99,9 @@ pub mod CoinComponent {
         fn faucet(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
         ) {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
-            let coin_config: CoinConfigValue = store.get_coin_config_value(get_contract_address());
+            let coin_config: CoinConfigValue = store.get_coin_config_value(starknet::get_contract_address());
             assert(coin_config.faucet_amount > 0, Errors::FAUCET_UNAVAILABLE);
 
             // let erc20 = get_dep_component!(self, ERC20);

@@ -1,810 +1,1242 @@
 import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
-import type { BigNumberish } from 'starknet';
+import { CairoCustomEnum, BigNumberish } from 'starknet';
 
-type RemoveFieldOrder<T> = T extends object
-  ? Omit<
-      {
-        [K in keyof T]: T[K] extends object ? RemoveFieldOrder<T[K]> : T[K];
-      },
-      'fieldOrder'
-    >
-  : T;
 // Type definition for `pistols::models::challenge::Challenge` struct
 export interface Challenge {
-	fieldOrder: string[];
 	duel_id: BigNumberish;
 	table_id: BigNumberish;
-	premise: Premise;
+	premise: PremiseEnum;
 	quote: BigNumberish;
+	lives_staked: BigNumberish;
 	address_a: string;
 	address_b: string;
 	duelist_id_a: BigNumberish;
 	duelist_id_b: BigNumberish;
-	state: ChallengeState;
+	state: ChallengeStateEnum;
 	winner: BigNumberish;
-	timestamp_start: BigNumberish;
-	timestamp_end: BigNumberish;
+	timestamps: Period;
 }
-export type InputChallenge = RemoveFieldOrder<Challenge>;
 
 // Type definition for `pistols::models::challenge::ChallengeValue` struct
 export interface ChallengeValue {
-	fieldOrder: string[];
 	table_id: BigNumberish;
-	premise: Premise;
+	premise: PremiseEnum;
 	quote: BigNumberish;
+	lives_staked: BigNumberish;
 	address_a: string;
 	address_b: string;
 	duelist_id_a: BigNumberish;
 	duelist_id_b: BigNumberish;
-	state: ChallengeState;
+	state: ChallengeStateEnum;
 	winner: BigNumberish;
-	timestamp_start: BigNumberish;
-	timestamp_end: BigNumberish;
+	timestamps: Period;
 }
-export type InputChallengeValue = RemoveFieldOrder<ChallengeValue>;
-
-// Type definition for `pistols::models::challenge::ChallengeFameBalance` struct
-export interface ChallengeFameBalance {
-	fieldOrder: string[];
-	duel_id: BigNumberish;
-	balance_a: BigNumberish;
-	balance_b: BigNumberish;
-}
-export type InputChallengeFameBalance = RemoveFieldOrder<ChallengeFameBalance>;
-
-// Type definition for `pistols::models::challenge::ChallengeFameBalanceValue` struct
-export interface ChallengeFameBalanceValue {
-	fieldOrder: string[];
-	balance_a: BigNumberish;
-	balance_b: BigNumberish;
-}
-export type InputChallengeFameBalanceValue = RemoveFieldOrder<ChallengeFameBalanceValue>;
-
-// Type definition for `pistols::models::config::CoinConfig` struct
-export interface CoinConfig {
-	fieldOrder: string[];
-	coin_address: string;
-	minter_address: string;
-	faucet_amount: BigNumberish;
-}
-export type InputCoinConfig = RemoveFieldOrder<CoinConfig>;
-
-// Type definition for `pistols::models::config::CoinConfigValue` struct
-export interface CoinConfigValue {
-	fieldOrder: string[];
-	minter_address: string;
-	faucet_amount: BigNumberish;
-}
-export type InputCoinConfigValue = RemoveFieldOrder<CoinConfigValue>;
-
-// Type definition for `pistols::models::config::ConfigValue` struct
-export interface ConfigValue {
-	fieldOrder: string[];
-	treasury_address: string;
-	lords_address: string;
-	vrf_address: string;
-	is_paused: boolean;
-}
-export type InputConfigValue = RemoveFieldOrder<ConfigValue>;
-
-// Type definition for `pistols::models::config::Config` struct
-export interface Config {
-	fieldOrder: string[];
-	key: BigNumberish;
-	treasury_address: string;
-	lords_address: string;
-	vrf_address: string;
-	is_paused: boolean;
-}
-export type InputConfig = RemoveFieldOrder<Config>;
-
-// Type definition for `pistols::models::consumable::ConsumableBalanceValue` struct
-export interface ConsumableBalanceValue {
-	fieldOrder: string[];
-	balance: BigNumberish;
-}
-export type InputConsumableBalanceValue = RemoveFieldOrder<ConsumableBalanceValue>;
-
-// Type definition for `pistols::models::consumable::ConsumableBalance` struct
-export interface ConsumableBalance {
-	fieldOrder: string[];
-	consumable_type: ConsumableType;
-	player_address: string;
-	balance: BigNumberish;
-}
-export type InputConsumableBalance = RemoveFieldOrder<ConsumableBalance>;
-
-// Type definition for `pistols::models::duelist::Duelist` struct
-export interface Duelist {
-	fieldOrder: string[];
-	duelist_id: BigNumberish;
-	name: BigNumberish;
-	profile_pic_type: ProfilePicType;
-	profile_pic_uri: string;
-	timestamp: BigNumberish;
-	score: Score;
-}
-export type InputDuelist = RemoveFieldOrder<Duelist>;
-
-// Type definition for `pistols::models::duelist::DuelistValue` struct
-export interface DuelistValue {
-	fieldOrder: string[];
-	name: BigNumberish;
-	profile_pic_type: ProfilePicType;
-	profile_pic_uri: string;
-	timestamp: BigNumberish;
-	score: Score;
-}
-export type InputDuelistValue = RemoveFieldOrder<DuelistValue>;
-
-// Type definition for `pistols::models::duelist::Score` struct
-export interface Score {
-	fieldOrder: string[];
-	honour: BigNumberish;
-	total_duels: BigNumberish;
-	total_wins: BigNumberish;
-	total_losses: BigNumberish;
-	total_draws: BigNumberish;
-	honour_history: BigNumberish;
-}
-export type InputScore = RemoveFieldOrder<Score>;
-
-// Type definition for `pistols::models::player::PPlayerBookmarkValue` struct
-export interface PPlayerBookmarkValue {
-	fieldOrder: string[];
-	enabled: boolean;
-}
-export type InputPPlayerBookmarkValue = RemoveFieldOrder<PPlayerBookmarkValue>;
-
-// Type definition for `pistols::models::player::PPlayerBookmark` struct
-export interface PPlayerBookmark {
-	fieldOrder: string[];
-	identity: string;
-	target_address: string;
-	target_id: BigNumberish;
-	enabled: boolean;
-}
-export type InputPPlayerBookmark = RemoveFieldOrder<PPlayerBookmark>;
-
-// Type definition for `pistols::models::player::PPlayerOnlineValue` struct
-export interface PPlayerOnlineValue {
-	fieldOrder: string[];
-	timestamp: BigNumberish;
-}
-export type InputPPlayerOnlineValue = RemoveFieldOrder<PPlayerOnlineValue>;
-
-// Type definition for `pistols::models::player::PPlayerOnline` struct
-export interface PPlayerOnline {
-	fieldOrder: string[];
-	identity: string;
-	timestamp: BigNumberish;
-}
-export type InputPPlayerOnline = RemoveFieldOrder<PPlayerOnline>;
-
-// Type definition for `pistols::models::player::PPlayerTutorialProgress` struct
-export interface PPlayerTutorialProgress {
-	fieldOrder: string[];
-	identity: string;
-	progress: TutorialProgress;
-}
-export type InputPPlayerTutorialProgress = RemoveFieldOrder<PPlayerTutorialProgress>;
-
-// Type definition for `pistols::models::player::PPlayerTutorialProgressValue` struct
-export interface PPlayerTutorialProgressValue {
-	fieldOrder: string[];
-	progress: TutorialProgress;
-}
-export type InputPPlayerTutorialProgressValue = RemoveFieldOrder<PPlayerTutorialProgressValue>;
-
-// Type definition for `pistols::models::duelist::Pact` struct
-export interface Pact {
-	fieldOrder: string[];
-	table_id: BigNumberish;
-	pair: BigNumberish;
-	duel_id: BigNumberish;
-}
-export type InputPact = RemoveFieldOrder<Pact>;
-
-// Type definition for `pistols::models::duelist::PactValue` struct
-export interface PactValue {
-	fieldOrder: string[];
-	duel_id: BigNumberish;
-}
-export type InputPactValue = RemoveFieldOrder<PactValue>;
-
-// Type definition for `pistols::models::payment::Payment` struct
-export interface Payment {
-	fieldOrder: string[];
-	key: BigNumberish;
-	amount: BigNumberish;
-	client_percent: BigNumberish;
-	ranking_percent: BigNumberish;
-	owner_percent: BigNumberish;
-	pool_percent: BigNumberish;
-	treasury_percent: BigNumberish;
-}
-export type InputPayment = RemoveFieldOrder<Payment>;
-
-// Type definition for `pistols::models::payment::PaymentValue` struct
-export interface PaymentValue {
-	fieldOrder: string[];
-	amount: BigNumberish;
-	client_percent: BigNumberish;
-	ranking_percent: BigNumberish;
-	owner_percent: BigNumberish;
-	pool_percent: BigNumberish;
-	treasury_percent: BigNumberish;
-}
-export type InputPaymentValue = RemoveFieldOrder<PaymentValue>;
-
-// Type definition for `pistols::models::player::Player` struct
-export interface Player {
-	fieldOrder: string[];
-	address: string;
-	timestamp_registered: BigNumberish;
-}
-export type InputPlayer = RemoveFieldOrder<Player>;
-
-// Type definition for `pistols::models::player::PlayerValue` struct
-export interface PlayerValue {
-	fieldOrder: string[];
-	timestamp_registered: BigNumberish;
-}
-export type InputPlayerValue = RemoveFieldOrder<PlayerValue>;
 
 // Type definition for `pistols::models::challenge::DuelistState` struct
 export interface DuelistState {
-	fieldOrder: string[];
 	chances: BigNumberish;
 	damage: BigNumberish;
 	health: BigNumberish;
 	dice_fire: BigNumberish;
 	honour: BigNumberish;
 }
-export type InputDuelistState = RemoveFieldOrder<DuelistState>;
-
-// Type definition for `pistols::models::challenge::Round` struct
-export interface Round {
-	fieldOrder: string[];
-	duel_id: BigNumberish;
-	moves_a: Moves;
-	moves_b: Moves;
-	state_a: DuelistState;
-	state_b: DuelistState;
-	state: RoundState;
-	final_blow: BigNumberish;
-}
-export type InputRound = RemoveFieldOrder<Round>;
 
 // Type definition for `pistols::models::challenge::Moves` struct
 export interface Moves {
-	fieldOrder: string[];
-	seed: BigNumberish;
 	salt: BigNumberish;
 	hashed: BigNumberish;
+	timeout: BigNumberish;
 	card_1: BigNumberish;
 	card_2: BigNumberish;
 	card_3: BigNumberish;
 	card_4: BigNumberish;
 }
-export type InputMoves = RemoveFieldOrder<Moves>;
 
-// Type definition for `pistols::models::challenge::RoundValue` struct
-export interface RoundValue {
-	fieldOrder: string[];
+// Type definition for `pistols::models::challenge::Round` struct
+export interface Round {
+	duel_id: BigNumberish;
 	moves_a: Moves;
 	moves_b: Moves;
 	state_a: DuelistState;
 	state_b: DuelistState;
-	state: RoundState;
-	final_blow: BigNumberish;
+	state: RoundStateEnum;
+	final_blow: FinalBlowEnum;
 }
-export type InputRoundValue = RemoveFieldOrder<RoundValue>;
+
+// Type definition for `pistols::models::challenge::RoundValue` struct
+export interface RoundValue {
+	moves_a: Moves;
+	moves_b: Moves;
+	state_a: DuelistState;
+	state_b: DuelistState;
+	state: RoundStateEnum;
+	final_blow: FinalBlowEnum;
+}
+
+// Type definition for `pistols::models::config::CoinConfig` struct
+export interface CoinConfig {
+	coin_address: string;
+	minter_address: string;
+	faucet_amount: BigNumberish;
+}
+
+// Type definition for `pistols::models::config::CoinConfigValue` struct
+export interface CoinConfigValue {
+	minter_address: string;
+	faucet_amount: BigNumberish;
+}
+
+// Type definition for `pistols::models::config::Config` struct
+export interface Config {
+	key: BigNumberish;
+	treasury_address: string;
+	lords_address: string;
+	vrf_address: string;
+	season_table_id: BigNumberish;
+	is_paused: boolean;
+}
+
+// Type definition for `pistols::models::config::ConfigValue` struct
+export interface ConfigValue {
+	treasury_address: string;
+	lords_address: string;
+	vrf_address: string;
+	season_table_id: BigNumberish;
+	is_paused: boolean;
+}
+
+// Type definition for `pistols::models::config::TokenConfig` struct
+export interface TokenConfig {
+	token_address: string;
+	minter_address: string;
+	minted_count: BigNumberish;
+}
+
+// Type definition for `pistols::models::config::TokenConfigValue` struct
+export interface TokenConfigValue {
+	minter_address: string;
+	minted_count: BigNumberish;
+}
+
+// Type definition for `pistols::models::duelist::Duelist` struct
+export interface Duelist {
+	duelist_id: BigNumberish;
+	profile_type: ProfileTypeEnum;
+	timestamps: DuelistTimestamps;
+}
+
+// Type definition for `pistols::models::duelist::DuelistChallenge` struct
+export interface DuelistChallenge {
+	duelist_id: BigNumberish;
+	duel_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::duelist::DuelistChallengeValue` struct
+export interface DuelistChallengeValue {
+	duel_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::duelist::DuelistMemorial` struct
+export interface DuelistMemorial {
+	duelist_id: BigNumberish;
+	cause_of_death: CauseOfDeathEnum;
+	killed_by: BigNumberish;
+	fame_before_death: BigNumberish;
+}
+
+// Type definition for `pistols::models::duelist::DuelistMemorialValue` struct
+export interface DuelistMemorialValue {
+	cause_of_death: CauseOfDeathEnum;
+	killed_by: BigNumberish;
+	fame_before_death: BigNumberish;
+}
+
+// Type definition for `pistols::models::duelist::DuelistTimestamps` struct
+export interface DuelistTimestamps {
+	registered: BigNumberish;
+	active: BigNumberish;
+}
+
+// Type definition for `pistols::models::duelist::DuelistValue` struct
+export interface DuelistValue {
+	profile_type: ProfileTypeEnum;
+	timestamps: DuelistTimestamps;
+}
+
+// Type definition for `pistols::models::duelist::Score` struct
+export interface Score {
+	honour: BigNumberish;
+	points: BigNumberish;
+	total_duels: BigNumberish;
+	total_wins: BigNumberish;
+	total_losses: BigNumberish;
+	total_draws: BigNumberish;
+	honour_history: BigNumberish;
+}
 
 // Type definition for `pistols::models::duelist::Scoreboard` struct
 export interface Scoreboard {
-	fieldOrder: string[];
+	holder: BigNumberish;
 	table_id: BigNumberish;
-	duelist_id: BigNumberish;
 	score: Score;
 }
-export type InputScoreboard = RemoveFieldOrder<Scoreboard>;
 
 // Type definition for `pistols::models::duelist::ScoreboardValue` struct
 export interface ScoreboardValue {
-	fieldOrder: string[];
 	score: Score;
 }
-export type InputScoreboardValue = RemoveFieldOrder<ScoreboardValue>;
 
-// Type definition for `pistols::models::table::TableAdmittanceValue` struct
-export interface TableAdmittanceValue {
-	fieldOrder: string[];
-	accounts: Array<string>;
-	duelists: Array<BigNumberish>;
-}
-export type InputTableAdmittanceValue = RemoveFieldOrder<TableAdmittanceValue>;
-
-// Type definition for `pistols::models::table::TableAdmittance` struct
-export interface TableAdmittance {
-	fieldOrder: string[];
+// Type definition for `pistols::models::leaderboard::Leaderboard` struct
+export interface Leaderboard {
 	table_id: BigNumberish;
-	accounts: Array<string>;
-	duelists: Array<BigNumberish>;
+	positions: BigNumberish;
+	duelist_ids: BigNumberish;
+	scores: BigNumberish;
 }
-export type InputTableAdmittance = RemoveFieldOrder<TableAdmittance>;
 
-// Type definition for `pistols::models::table::TableConfigValue` struct
-export interface TableConfigValue {
-	fieldOrder: string[];
-	description: BigNumberish;
-	table_type: TableType;
-	deck_type: DeckType;
-	fee_collector_address: string;
-	fee_min: BigNumberish;
+// Type definition for `pistols::models::leaderboard::LeaderboardValue` struct
+export interface LeaderboardValue {
+	positions: BigNumberish;
+	duelist_ids: BigNumberish;
+	scores: BigNumberish;
+}
+
+// Type definition for `pistols::models::pack::Pack` struct
+export interface Pack {
+	pack_id: BigNumberish;
+	pack_type: PackTypeEnum;
+	seed: BigNumberish;
+	lords_amount: BigNumberish;
 	is_open: boolean;
 }
-export type InputTableConfigValue = RemoveFieldOrder<TableConfigValue>;
+
+// Type definition for `pistols::models::pack::PackValue` struct
+export interface PackValue {
+	pack_type: PackTypeEnum;
+	seed: BigNumberish;
+	lords_amount: BigNumberish;
+	is_open: boolean;
+}
+
+// Type definition for `pistols::models::pact::Pact` struct
+export interface Pact {
+	table_id: BigNumberish;
+	pair: BigNumberish;
+	duel_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::pact::PactValue` struct
+export interface PactValue {
+	duel_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::player::Player` struct
+export interface Player {
+	player_address: string;
+	timestamps: PlayerTimestamps;
+}
+
+// Type definition for `pistols::models::player::PlayerBookmark` struct
+export interface PlayerBookmark {
+	identity: string;
+	target_address: string;
+	target_id: BigNumberish;
+	enabled: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerBookmarkValue` struct
+export interface PlayerBookmarkValue {
+	enabled: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerOnline` struct
+export interface PlayerOnline {
+	identity: string;
+	timestamp: BigNumberish;
+}
+
+// Type definition for `pistols::models::player::PlayerOnlineValue` struct
+export interface PlayerOnlineValue {
+	timestamp: BigNumberish;
+}
+
+// Type definition for `pistols::models::player::PlayerTimestamps` struct
+export interface PlayerTimestamps {
+	registered: BigNumberish;
+	claimed_starter_pack: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerValue` struct
+export interface PlayerValue {
+	timestamps: PlayerTimestamps;
+}
+
+// Type definition for `pistols::models::pool::Pool` struct
+export interface Pool {
+	pool_id: PoolTypeEnum;
+	balance_lords: BigNumberish;
+	balance_fame: BigNumberish;
+}
+
+// Type definition for `pistols::models::pool::PoolValue` struct
+export interface PoolValue {
+	balance_lords: BigNumberish;
+	balance_fame: BigNumberish;
+}
+
+// Type definition for `pistols::models::season::SeasonConfig` struct
+export interface SeasonConfig {
+	table_id: BigNumberish;
+	season_id: BigNumberish;
+	phase: SeasonPhaseEnum;
+	period: Period;
+}
+
+// Type definition for `pistols::models::season::SeasonConfigValue` struct
+export interface SeasonConfigValue {
+	season_id: BigNumberish;
+	phase: SeasonPhaseEnum;
+	period: Period;
+}
 
 // Type definition for `pistols::models::table::TableConfig` struct
 export interface TableConfig {
-	fieldOrder: string[];
 	table_id: BigNumberish;
 	description: BigNumberish;
-	table_type: TableType;
-	deck_type: DeckType;
-	fee_collector_address: string;
-	fee_min: BigNumberish;
-	is_open: boolean;
+	rules: RulesTypeEnum;
 }
-export type InputTableConfig = RemoveFieldOrder<TableConfig>;
 
-// Type definition for `pistols::systems::components::token_bound::TokenBoundAddressValue` struct
-export interface TokenBoundAddressValue {
-	fieldOrder: string[];
-	contract_address: string;
-	token_id: BigNumberish;
+// Type definition for `pistols::models::table::TableConfigValue` struct
+export interface TableConfigValue {
+	description: BigNumberish;
+	rules: RulesTypeEnum;
 }
-export type InputTokenBoundAddressValue = RemoveFieldOrder<TokenBoundAddressValue>;
 
 // Type definition for `pistols::systems::components::token_bound::TokenBoundAddress` struct
 export interface TokenBoundAddress {
-	fieldOrder: string[];
 	recipient: string;
 	contract_address: string;
 	token_id: BigNumberish;
 }
-export type InputTokenBoundAddress = RemoveFieldOrder<TokenBoundAddress>;
 
-// Type definition for `pistols::models::config::TokenConfigValue` struct
-export interface TokenConfigValue {
-	fieldOrder: string[];
-	minter_address: string;
-	renderer_address: string;
-	minted_count: BigNumberish;
+// Type definition for `pistols::systems::components::token_bound::TokenBoundAddressValue` struct
+export interface TokenBoundAddressValue {
+	contract_address: string;
+	token_id: BigNumberish;
 }
-export type InputTokenConfigValue = RemoveFieldOrder<TokenConfigValue>;
 
-// Type definition for `pistols::models::config::TokenConfig` struct
-export interface TokenConfig {
-	fieldOrder: string[];
-	token_address: string;
-	minter_address: string;
-	renderer_address: string;
-	minted_count: BigNumberish;
+// Type definition for `pistols::systems::rng_mock::MockedValue` struct
+export interface MockedValue {
+	salt: BigNumberish;
+	value: BigNumberish;
+	exists: boolean;
 }
-export type InputTokenConfig = RemoveFieldOrder<TokenConfig>;
+
+// Type definition for `pistols::systems::rng_mock::MockedValueValue` struct
+export interface MockedValueValue {
+	value: BigNumberish;
+	exists: boolean;
+}
+
+// Type definition for `pistols::types::timestamp::Period` struct
+export interface Period {
+	start: BigNumberish;
+	end: BigNumberish;
+}
+
+// Type definition for `achievement::events::index::TrophyCreation` struct
+export interface TrophyCreation {
+	id: BigNumberish;
+	hidden: boolean;
+	index: BigNumberish;
+	points: BigNumberish;
+	start: BigNumberish;
+	end: BigNumberish;
+	group: BigNumberish;
+	icon: BigNumberish;
+	title: BigNumberish;
+	description: string;
+	tasks: Array<Task>;
+	data: string;
+}
+
+// Type definition for `achievement::events::index::TrophyCreationValue` struct
+export interface TrophyCreationValue {
+	hidden: boolean;
+	index: BigNumberish;
+	points: BigNumberish;
+	start: BigNumberish;
+	end: BigNumberish;
+	group: BigNumberish;
+	icon: BigNumberish;
+	title: BigNumberish;
+	description: string;
+	tasks: Array<Task>;
+	data: string;
+}
+
+// Type definition for `achievement::events::index::TrophyProgression` struct
+export interface TrophyProgression {
+	player_id: BigNumberish;
+	task_id: BigNumberish;
+	count: BigNumberish;
+	time: BigNumberish;
+}
+
+// Type definition for `achievement::events::index::TrophyProgressionValue` struct
+export interface TrophyProgressionValue {
+	count: BigNumberish;
+	time: BigNumberish;
+}
+
+// Type definition for `achievement::types::index::Task` struct
+export interface Task {
+	id: BigNumberish;
+	total: BigNumberish;
+	description: string;
+}
+
+// Type definition for `pistols::models::challenge::ChallengeRewards` struct
+export interface ChallengeRewards {
+	duel_id: BigNumberish;
+	duelist_id: BigNumberish;
+	rewards: RewardValues;
+}
+
+// Type definition for `pistols::models::challenge::ChallengeRewardsValue` struct
+export interface ChallengeRewardsValue {
+	rewards: RewardValues;
+}
+
+// Type definition for `pistols::models::player::PlayerActivity` struct
+export interface PlayerActivity {
+	player_address: string;
+	timestamp: BigNumberish;
+	activity: ActivityEnum;
+	identifier: BigNumberish;
+	is_public: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerActivityValue` struct
+export interface PlayerActivityValue {
+	timestamp: BigNumberish;
+	activity: ActivityEnum;
+	identifier: BigNumberish;
+	is_public: boolean;
+}
+
+// Type definition for `pistols::models::player::PlayerRequiredAction` struct
+export interface PlayerRequiredAction {
+	duelist_id: BigNumberish;
+	duel_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::player::PlayerRequiredActionValue` struct
+export interface PlayerRequiredActionValue {
+	duel_id: BigNumberish;
+}
+
+// Type definition for `pistols::types::rules::RewardValues` struct
+export interface RewardValues {
+	fame_lost: BigNumberish;
+	fame_gained: BigNumberish;
+	fools_gained: BigNumberish;
+	points_scored: BigNumberish;
+	position: BigNumberish;
+	fame_burned: BigNumberish;
+	lords_unlocked: BigNumberish;
+	survived: boolean;
+}
+
+// Type definition for `pistols::models::duelist::CauseOfDeath` enum
+export type CauseOfDeath = {
+	None: string;
+	Duelling: string;
+	Memorize: string;
+	Sacrifice: string;
+	Forsaken: string;
+}
+export type CauseOfDeathEnum = CairoCustomEnum;
+
+// Type definition for `pistols::models::pack::PackType` enum
+export type PackType = {
+	Unknown: string;
+	StarterPack: string;
+	Duelists5x: string;
+}
+export type PackTypeEnum = CairoCustomEnum;
+
+// Type definition for `pistols::models::pool::PoolType` enum
+export type PoolType = {
+	Undefined: string;
+	Purchases: string;
+	FamePeg: string;
+	Season: BigNumberish;
+	Tournament: BigNumberish;
+	SacredFlame: string;
+}
+export type PoolTypeEnum = CairoCustomEnum;
+
+// Type definition for `pistols::models::season::SeasonPhase` enum
+export type SeasonPhase = {
+	Undefined: string;
+	InProgress: string;
+	Ended: string;
+}
+export type SeasonPhaseEnum = CairoCustomEnum;
+
+// Type definition for `pistols::types::cards::blades::BladesCard` enum
+export type BladesCard = {
+	None: string;
+	Seppuku: string;
+	PocketPistol: string;
+	Behead: string;
+	Grapple: string;
+}
+export type BladesCardEnum = CairoCustomEnum;
+
+// Type definition for `pistols::types::cards::hand::FinalBlow` enum
+export type FinalBlow = {
+	Undefined: string;
+	Paces: PacesCardEnum;
+	Blades: BladesCardEnum;
+	Forsaken: string;
+}
+export type FinalBlowEnum = CairoCustomEnum;
+
+// Type definition for `pistols::types::cards::paces::PacesCard` enum
+export type PacesCard = {
+	None: string;
+	Paces1: string;
+	Paces2: string;
+	Paces3: string;
+	Paces4: string;
+	Paces5: string;
+	Paces6: string;
+	Paces7: string;
+	Paces8: string;
+	Paces9: string;
+	Paces10: string;
+}
+export type PacesCardEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::challenge_state::ChallengeState` enum
-export enum ChallengeState {
-	Null,
-	Awaiting,
-	Withdrawn,
-	Refused,
-	Expired,
-	InProgress,
-	Resolved,
-	Draw,
+export type ChallengeState = {
+	Null: string;
+	Awaiting: string;
+	Withdrawn: string;
+	Refused: string;
+	Expired: string;
+	InProgress: string;
+	Resolved: string;
+	Draw: string;
 }
+export type ChallengeStateEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::premise::Premise` enum
-export enum Premise {
-	Null,
-	Matter,
-	Debt,
-	Dispute,
-	Honour,
-	Hatred,
-	Blood,
-	Nothing,
-	Tournament,
+export type Premise = {
+	Undefined: string;
+	Matter: string;
+	Debt: string;
+	Dispute: string;
+	Honour: string;
+	Hatred: string;
+	Blood: string;
+	Nothing: string;
+	Tournament: string;
+	Treaty: string;
+	Lesson: string;
 }
+export type PremiseEnum = CairoCustomEnum;
 
-// Type definition for `pistols::models::consumable::ConsumableType` enum
-export enum ConsumableType {
-	Undefined,
-	DuelistToken,
+// Type definition for `pistols::types::profile_type::BotProfile` enum
+export type BotProfile = {
+	Unknown: string;
+	TinMan: string;
+	Scarecrow: string;
+	Leon: string;
 }
+export type BotProfileEnum = CairoCustomEnum;
 
-// Type definition for `pistols::models::duelist::ProfilePicType` enum
-export enum ProfilePicType {
-	Undefined,
-	Duelist,
-	External,
+// Type definition for `pistols::types::profile_type::CharacterProfile` enum
+export type CharacterProfile = {
+	Unknown: string;
+	Bartender: string;
+	Drunkard: string;
+	Devil: string;
+	Player: string;
 }
+export type CharacterProfileEnum = CairoCustomEnum;
 
-// Type definition for `pistols::models::player::TutorialProgress` enum
-export enum TutorialProgress {
-	None,
-	FinishedFirst,
-	FinishedSecond,
-	FinishedFirstDuel,
+// Type definition for `pistols::types::profile_type::DuelistProfile` enum
+export type DuelistProfile = {
+	Unknown: string;
+	Duke: string;
+	Duella: string;
+	Jameson: string;
+	Pilgrim: string;
+	Jack: string;
+	Pops: string;
+	SerWalker: string;
+	Bloberto: string;
+	Squiddo: string;
+	SlenderDuck: string;
+	LadyVengeance: string;
+	Breadman: string;
+	Brutus: string;
+	Pistolopher: string;
+	Secreto: string;
+	ShadowMare: string;
+	Karaku: string;
+	Misty: string;
+	Kenzu: string;
+	NynJah: string;
+	Thrak: string;
 }
+export type DuelistProfileEnum = CairoCustomEnum;
+
+// Type definition for `pistols::types::profile_type::ProfileType` enum
+export type ProfileType = {
+	Undefined: string;
+	Duelist: DuelistProfileEnum;
+	Character: CharacterProfileEnum;
+	Bot: BotProfileEnum;
+}
+export type ProfileTypeEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::round_state::RoundState` enum
-export enum RoundState {
-	Null,
-	Commit,
-	Reveal,
-	Finished,
+export type RoundState = {
+	Null: string;
+	Commit: string;
+	Reveal: string;
+	Finished: string;
 }
+export type RoundStateEnum = CairoCustomEnum;
 
-// Type definition for `pistols::types::cards::hand::DeckType` enum
-export enum DeckType {
-	None,
-	Classic,
+// Type definition for `pistols::types::rules::RulesType` enum
+export type RulesType = {
+	Undefined: string;
+	Academia: string;
+	Season: string;
 }
+export type RulesTypeEnum = CairoCustomEnum;
 
-// Type definition for `pistols::models::table::TableType` enum
-export enum TableType {
-	Undefined,
-	Classic,
-	Tournament,
-	IRLTournament,
+// Type definition for `pistols::models::player::Activity` enum
+export type Activity = {
+	Undefined: string;
+	TutorialFinished: string;
+	PackStarter: string;
+	PackPurchased: string;
+	PackOpened: string;
+	DuelistSpawned: string;
+	DuelistDied: string;
+	ChallengeCreated: string;
+	ChallengeExpired: string;
+	ChallengeReplied: string;
+	MovesCommitted: string;
+	MovesRevealed: string;
+	ChallengeResolved: string;
+	ChallengeDraw: string;
 }
+export type ActivityEnum = CairoCustomEnum;
 
 export interface SchemaType extends ISchemaType {
 	pistols: {
 		Challenge: Challenge,
 		ChallengeValue: ChallengeValue,
-		ChallengeFameBalance: ChallengeFameBalance,
-		ChallengeFameBalanceValue: ChallengeFameBalanceValue,
+		DuelistState: DuelistState,
+		Moves: Moves,
+		Round: Round,
+		RoundValue: RoundValue,
 		CoinConfig: CoinConfig,
 		CoinConfigValue: CoinConfigValue,
-		ConfigValue: ConfigValue,
 		Config: Config,
-		ConsumableBalanceValue: ConsumableBalanceValue,
-		ConsumableBalance: ConsumableBalance,
+		ConfigValue: ConfigValue,
+		TokenConfig: TokenConfig,
+		TokenConfigValue: TokenConfigValue,
 		Duelist: Duelist,
+		DuelistChallenge: DuelistChallenge,
+		DuelistChallengeValue: DuelistChallengeValue,
+		DuelistMemorial: DuelistMemorial,
+		DuelistMemorialValue: DuelistMemorialValue,
+		DuelistTimestamps: DuelistTimestamps,
 		DuelistValue: DuelistValue,
 		Score: Score,
-		PPlayerBookmarkValue: PPlayerBookmarkValue,
-		PPlayerBookmark: PPlayerBookmark,
-		PPlayerOnlineValue: PPlayerOnlineValue,
-		PPlayerOnline: PPlayerOnline,
-		PPlayerTutorialProgress: PPlayerTutorialProgress,
-		PPlayerTutorialProgressValue: PPlayerTutorialProgressValue,
-		Pact: Pact,
-		PactValue: PactValue,
-		Payment: Payment,
-		PaymentValue: PaymentValue,
-		Player: Player,
-		PlayerValue: PlayerValue,
-		DuelistState: DuelistState,
-		Round: Round,
-		Moves: Moves,
-		RoundValue: RoundValue,
 		Scoreboard: Scoreboard,
 		ScoreboardValue: ScoreboardValue,
-		TableAdmittanceValue: TableAdmittanceValue,
-		TableAdmittance: TableAdmittance,
-		TableConfigValue: TableConfigValue,
+		Leaderboard: Leaderboard,
+		LeaderboardValue: LeaderboardValue,
+		Pack: Pack,
+		PackValue: PackValue,
+		Pact: Pact,
+		PactValue: PactValue,
+		Player: Player,
+		PlayerBookmark: PlayerBookmark,
+		PlayerBookmarkValue: PlayerBookmarkValue,
+		PlayerOnline: PlayerOnline,
+		PlayerOnlineValue: PlayerOnlineValue,
+		PlayerTimestamps: PlayerTimestamps,
+		PlayerValue: PlayerValue,
+		Pool: Pool,
+		PoolValue: PoolValue,
+		SeasonConfig: SeasonConfig,
+		SeasonConfigValue: SeasonConfigValue,
 		TableConfig: TableConfig,
-		TokenBoundAddressValue: TokenBoundAddressValue,
+		TableConfigValue: TableConfigValue,
 		TokenBoundAddress: TokenBoundAddress,
-		TokenConfigValue: TokenConfigValue,
-		TokenConfig: TokenConfig,
+		TokenBoundAddressValue: TokenBoundAddressValue,
+		MockedValue: MockedValue,
+		MockedValueValue: MockedValueValue,
+		Period: Period,
+	},
+	achievement: {
+		TrophyCreation: TrophyCreation,
+		TrophyCreationValue: TrophyCreationValue,
+		TrophyProgression: TrophyProgression,
+		TrophyProgressionValue: TrophyProgressionValue,
+		Task: Task,
+		ChallengeRewards: ChallengeRewards,
+		ChallengeRewardsValue: ChallengeRewardsValue,
+		PlayerActivity: PlayerActivity,
+		PlayerActivityValue: PlayerActivityValue,
+		PlayerRequiredAction: PlayerRequiredAction,
+		PlayerRequiredActionValue: PlayerRequiredActionValue,
+		RewardValues: RewardValues,
 	},
 }
 export const schema: SchemaType = {
 	pistols: {
 		Challenge: {
-			fieldOrder: ['duel_id', 'table_id', 'premise', 'quote', 'address_a', 'address_b', 'duelist_id_a', 'duelist_id_b', 'state', 'winner', 'timestamp_start', 'timestamp_end'],
 			duel_id: 0,
 			table_id: 0,
-			premise: Premise.Null,
+		premise: new CairoCustomEnum({ 
+					Undefined: "",
+				Matter: undefined,
+				Debt: undefined,
+				Dispute: undefined,
+				Honour: undefined,
+				Hatred: undefined,
+				Blood: undefined,
+				Nothing: undefined,
+				Tournament: undefined,
+				Treaty: undefined,
+				Lesson: undefined, }),
 			quote: 0,
+			lives_staked: 0,
 			address_a: "",
 			address_b: "",
 			duelist_id_a: 0,
 			duelist_id_b: 0,
-			state: ChallengeState.Null,
+		state: new CairoCustomEnum({ 
+					Null: "",
+				Awaiting: undefined,
+				Withdrawn: undefined,
+				Refused: undefined,
+				Expired: undefined,
+				InProgress: undefined,
+				Resolved: undefined,
+				Draw: undefined, }),
 			winner: 0,
-			timestamp_start: 0,
-			timestamp_end: 0,
+		timestamps: { start: 0, end: 0, },
 		},
 		ChallengeValue: {
-			fieldOrder: ['table_id', 'premise', 'quote', 'address_a', 'address_b', 'duelist_id_a', 'duelist_id_b', 'state', 'winner', 'timestamp_start', 'timestamp_end'],
 			table_id: 0,
-			premise: Premise.Null,
+		premise: new CairoCustomEnum({ 
+					Undefined: "",
+				Matter: undefined,
+				Debt: undefined,
+				Dispute: undefined,
+				Honour: undefined,
+				Hatred: undefined,
+				Blood: undefined,
+				Nothing: undefined,
+				Tournament: undefined,
+				Treaty: undefined,
+				Lesson: undefined, }),
 			quote: 0,
+			lives_staked: 0,
 			address_a: "",
 			address_b: "",
 			duelist_id_a: 0,
 			duelist_id_b: 0,
-			state: ChallengeState.Null,
+		state: new CairoCustomEnum({ 
+					Null: "",
+				Awaiting: undefined,
+				Withdrawn: undefined,
+				Refused: undefined,
+				Expired: undefined,
+				InProgress: undefined,
+				Resolved: undefined,
+				Draw: undefined, }),
 			winner: 0,
-			timestamp_start: 0,
-			timestamp_end: 0,
-		},
-		ChallengeFameBalance: {
-			fieldOrder: ['duel_id', 'balance_a', 'balance_b'],
-			duel_id: 0,
-			balance_a: 0,
-			balance_b: 0,
-		},
-		ChallengeFameBalanceValue: {
-			fieldOrder: ['balance_a', 'balance_b'],
-			balance_a: 0,
-			balance_b: 0,
-		},
-		CoinConfig: {
-			fieldOrder: ['coin_address', 'minter_address', 'faucet_amount'],
-			coin_address: "",
-			minter_address: "",
-			faucet_amount: 0,
-		},
-		CoinConfigValue: {
-			fieldOrder: ['minter_address', 'faucet_amount'],
-			minter_address: "",
-			faucet_amount: 0,
-		},
-		ConfigValue: {
-			fieldOrder: ['treasury_address', 'lords_address', 'vrf_address', 'is_paused'],
-			treasury_address: "",
-			lords_address: "",
-			vrf_address: "",
-			is_paused: false,
-		},
-		Config: {
-			fieldOrder: ['key', 'treasury_address', 'lords_address', 'vrf_address', 'is_paused'],
-			key: 0,
-			treasury_address: "",
-			lords_address: "",
-			vrf_address: "",
-			is_paused: false,
-		},
-		ConsumableBalanceValue: {
-			fieldOrder: ['balance'],
-			balance: 0,
-		},
-		ConsumableBalance: {
-			fieldOrder: ['consumable_type', 'player_address', 'balance'],
-			consumable_type: ConsumableType.Undefined,
-			player_address: "",
-			balance: 0,
-		},
-		Duelist: {
-			fieldOrder: ['duelist_id', 'name', 'profile_pic_type', 'profile_pic_uri', 'timestamp', 'score'],
-			duelist_id: 0,
-			name: 0,
-			profile_pic_type: ProfilePicType.Undefined,
-			profile_pic_uri: "",
-			timestamp: 0,
-			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
-		},
-		DuelistValue: {
-			fieldOrder: ['name', 'profile_pic_type', 'profile_pic_uri', 'timestamp', 'score'],
-			name: 0,
-			profile_pic_type: ProfilePicType.Undefined,
-			profile_pic_uri: "",
-			timestamp: 0,
-			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
-		},
-		Score: {
-			fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'],
-			honour: 0,
-			total_duels: 0,
-			total_wins: 0,
-			total_losses: 0,
-			total_draws: 0,
-			honour_history: 0,
-		},
-		PPlayerBookmarkValue: {
-			fieldOrder: ['enabled'],
-			enabled: false,
-		},
-		PPlayerBookmark: {
-			fieldOrder: ['identity', 'target_address', 'target_id', 'enabled'],
-			identity: "",
-			target_address: "",
-			target_id: 0,
-			enabled: false,
-		},
-		PPlayerOnlineValue: {
-			fieldOrder: ['timestamp'],
-			timestamp: 0,
-		},
-		PPlayerOnline: {
-			fieldOrder: ['identity', 'timestamp'],
-			identity: "",
-			timestamp: 0,
-		},
-		PPlayerTutorialProgress: {
-			fieldOrder: ['identity', 'progress'],
-			identity: "",
-			progress: TutorialProgress.None,
-		},
-		PPlayerTutorialProgressValue: {
-			fieldOrder: ['progress'],
-			progress: TutorialProgress.None,
-		},
-		Pact: {
-			fieldOrder: ['table_id', 'pair', 'duel_id'],
-			table_id: 0,
-			pair: 0,
-			duel_id: 0,
-		},
-		PactValue: {
-			fieldOrder: ['duel_id'],
-			duel_id: 0,
-		},
-		Payment: {
-			fieldOrder: ['key', 'amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
-			key: 0,
-			amount: 0,
-			client_percent: 0,
-			ranking_percent: 0,
-			owner_percent: 0,
-			pool_percent: 0,
-			treasury_percent: 0,
-		},
-		PaymentValue: {
-			fieldOrder: ['amount', 'client_percent', 'ranking_percent', 'owner_percent', 'pool_percent', 'treasury_percent'],
-			amount: 0,
-			client_percent: 0,
-			ranking_percent: 0,
-			owner_percent: 0,
-			pool_percent: 0,
-			treasury_percent: 0,
-		},
-		Player: {
-			fieldOrder: ['address', 'timestamp_registered'],
-			address: "",
-			timestamp_registered: 0,
-		},
-		PlayerValue: {
-			fieldOrder: ['timestamp_registered'],
-			timestamp_registered: 0,
+		timestamps: { start: 0, end: 0, },
 		},
 		DuelistState: {
-			fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'],
 			chances: 0,
 			damage: 0,
 			health: 0,
 			dice_fire: 0,
 			honour: 0,
 		},
-		Round: {
-			fieldOrder: ['duel_id', 'moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
-			duel_id: 0,
-			moves_a: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-			moves_b: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-			state_a: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
-			state_b: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
-			state: RoundState.Null,
-			final_blow: 0,
-		},
 		Moves: {
-			fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'],
-			seed: 0,
 			salt: 0,
 			hashed: 0,
+			timeout: 0,
 			card_1: 0,
 			card_2: 0,
 			card_3: 0,
 			card_4: 0,
 		},
+		Round: {
+			duel_id: 0,
+		moves_a: { salt: 0, hashed: 0, timeout: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+		moves_b: { salt: 0, hashed: 0, timeout: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+		state_a: { chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
+		state_b: { chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
+		state: new CairoCustomEnum({ 
+					Null: "",
+				Commit: undefined,
+				Reveal: undefined,
+				Finished: undefined, }),
+		final_blow: new CairoCustomEnum({ 
+					Undefined: "",
+				Paces: undefined,
+				Blades: undefined,
+				Forsaken: undefined, }),
+		},
 		RoundValue: {
-			fieldOrder: ['moves_a', 'moves_b', 'state_a', 'state_b', 'state', 'final_blow'],
-			moves_a: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-			moves_b: { fieldOrder: ['seed', 'salt', 'hashed', 'card_1', 'card_2', 'card_3', 'card_4'], seed: 0, salt: 0, hashed: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
-			state_a: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
-			state_b: { fieldOrder: ['chances', 'damage', 'health', 'dice_fire', 'honour'], chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
-			state: RoundState.Null,
-			final_blow: 0,
+		moves_a: { salt: 0, hashed: 0, timeout: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+		moves_b: { salt: 0, hashed: 0, timeout: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
+		state_a: { chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
+		state_b: { chances: 0, damage: 0, health: 0, dice_fire: 0, honour: 0, },
+		state: new CairoCustomEnum({ 
+					Null: "",
+				Commit: undefined,
+				Reveal: undefined,
+				Finished: undefined, }),
+		final_blow: new CairoCustomEnum({ 
+					Undefined: "",
+				Paces: undefined,
+				Blades: undefined,
+				Forsaken: undefined, }),
+		},
+		CoinConfig: {
+			coin_address: "",
+			minter_address: "",
+			faucet_amount: 0,
+		},
+		CoinConfigValue: {
+			minter_address: "",
+			faucet_amount: 0,
+		},
+		Config: {
+			key: 0,
+			treasury_address: "",
+			lords_address: "",
+			vrf_address: "",
+			season_table_id: 0,
+			is_paused: false,
+		},
+		ConfigValue: {
+			treasury_address: "",
+			lords_address: "",
+			vrf_address: "",
+			season_table_id: 0,
+			is_paused: false,
+		},
+		TokenConfig: {
+			token_address: "",
+			minter_address: "",
+			minted_count: 0,
+		},
+		TokenConfigValue: {
+			minter_address: "",
+			minted_count: 0,
+		},
+		Duelist: {
+			duelist_id: 0,
+		profile_type: new CairoCustomEnum({ 
+					Undefined: "",
+				Duelist: undefined,
+				Character: undefined,
+				Bot: undefined, }),
+		timestamps: { registered: 0, active: 0, },
+		},
+		DuelistChallenge: {
+			duelist_id: 0,
+			duel_id: 0,
+		},
+		DuelistChallengeValue: {
+			duel_id: 0,
+		},
+		DuelistMemorial: {
+			duelist_id: 0,
+		cause_of_death: new CairoCustomEnum({ 
+					None: "",
+				Duelling: undefined,
+				Memorize: undefined,
+				Sacrifice: undefined,
+				Forsaken: undefined, }),
+			killed_by: 0,
+			fame_before_death: 0,
+		},
+		DuelistMemorialValue: {
+		cause_of_death: new CairoCustomEnum({ 
+					None: "",
+				Duelling: undefined,
+				Memorize: undefined,
+				Sacrifice: undefined,
+				Forsaken: undefined, }),
+			killed_by: 0,
+			fame_before_death: 0,
+		},
+		DuelistTimestamps: {
+			registered: 0,
+			active: 0,
+		},
+		DuelistValue: {
+		profile_type: new CairoCustomEnum({ 
+					Undefined: "",
+				Duelist: undefined,
+				Character: undefined,
+				Bot: undefined, }),
+		timestamps: { registered: 0, active: 0, },
+		},
+		Score: {
+			honour: 0,
+			points: 0,
+			total_duels: 0,
+			total_wins: 0,
+			total_losses: 0,
+			total_draws: 0,
+			honour_history: 0,
 		},
 		Scoreboard: {
-			fieldOrder: ['table_id', 'duelist_id', 'score'],
+			holder: 0,
 			table_id: 0,
-			duelist_id: 0,
-			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
+		score: { honour: 0, points: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
 		ScoreboardValue: {
-			fieldOrder: ['score'],
-			score: { fieldOrder: ['honour', 'total_duels', 'total_wins', 'total_losses', 'total_draws', 'honour_history'], honour: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
+		score: { honour: 0, points: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
 		},
-		TableAdmittanceValue: {
-			fieldOrder: ['accounts', 'duelists'],
-			accounts: [""],
-			duelists: [0],
-		},
-		TableAdmittance: {
-			fieldOrder: ['table_id', 'accounts', 'duelists'],
+		Leaderboard: {
 			table_id: 0,
-			accounts: [""],
-			duelists: [0],
+			positions: 0,
+			duelist_ids: 0,
+			scores: 0,
 		},
-		TableConfigValue: {
-			fieldOrder: ['description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
-			description: 0,
-			table_type: TableType.Undefined,
-			deck_type: DeckType.None,
-			fee_collector_address: "",
-			fee_min: 0,
+		LeaderboardValue: {
+			positions: 0,
+			duelist_ids: 0,
+			scores: 0,
+		},
+		Pack: {
+			pack_id: 0,
+		pack_type: new CairoCustomEnum({ 
+					Unknown: "",
+				StarterPack: undefined,
+				Duelists5x: undefined, }),
+			seed: 0,
+			lords_amount: 0,
 			is_open: false,
+		},
+		PackValue: {
+		pack_type: new CairoCustomEnum({ 
+					Unknown: "",
+				StarterPack: undefined,
+				Duelists5x: undefined, }),
+			seed: 0,
+			lords_amount: 0,
+			is_open: false,
+		},
+		Pact: {
+			table_id: 0,
+			pair: 0,
+			duel_id: 0,
+		},
+		PactValue: {
+			duel_id: 0,
+		},
+		Player: {
+			player_address: "",
+		timestamps: { registered: 0, claimed_starter_pack: false, },
+		},
+		PlayerBookmark: {
+			identity: "",
+			target_address: "",
+			target_id: 0,
+			enabled: false,
+		},
+		PlayerBookmarkValue: {
+			enabled: false,
+		},
+		PlayerOnline: {
+			identity: "",
+			timestamp: 0,
+		},
+		PlayerOnlineValue: {
+			timestamp: 0,
+		},
+		PlayerTimestamps: {
+			registered: 0,
+			claimed_starter_pack: false,
+		},
+		PlayerValue: {
+		timestamps: { registered: 0, claimed_starter_pack: false, },
+		},
+		Pool: {
+		pool_id: new CairoCustomEnum({ 
+					Undefined: "",
+				Purchases: undefined,
+				FamePeg: undefined,
+				Season: undefined,
+				Tournament: undefined,
+				SacredFlame: undefined, }),
+			balance_lords: 0,
+			balance_fame: 0,
+		},
+		PoolValue: {
+			balance_lords: 0,
+			balance_fame: 0,
+		},
+		SeasonConfig: {
+			table_id: 0,
+			season_id: 0,
+		phase: new CairoCustomEnum({ 
+					Undefined: "",
+				InProgress: undefined,
+				Ended: undefined, }),
+		period: { start: 0, end: 0, },
+		},
+		SeasonConfigValue: {
+			season_id: 0,
+		phase: new CairoCustomEnum({ 
+					Undefined: "",
+				InProgress: undefined,
+				Ended: undefined, }),
+		period: { start: 0, end: 0, },
 		},
 		TableConfig: {
-			fieldOrder: ['table_id', 'description', 'table_type', 'deck_type', 'fee_collector_address', 'fee_min', 'is_open'],
 			table_id: 0,
 			description: 0,
-			table_type: TableType.Undefined,
-			deck_type: DeckType.None,
-			fee_collector_address: "",
-			fee_min: 0,
-			is_open: false,
+		rules: new CairoCustomEnum({ 
+					Undefined: "",
+				Academia: undefined,
+				Season: undefined, }),
 		},
-		TokenBoundAddressValue: {
-			fieldOrder: ['contract_address', 'token_id'],
-			contract_address: "",
-			token_id: 0,
+		TableConfigValue: {
+			description: 0,
+		rules: new CairoCustomEnum({ 
+					Undefined: "",
+				Academia: undefined,
+				Season: undefined, }),
 		},
 		TokenBoundAddress: {
-			fieldOrder: ['recipient', 'contract_address', 'token_id'],
 			recipient: "",
 			contract_address: "",
 			token_id: 0,
 		},
-		TokenConfigValue: {
-			fieldOrder: ['minter_address', 'renderer_address', 'minted_count'],
-			minter_address: "",
-			renderer_address: "",
-			minted_count: 0,
+		TokenBoundAddressValue: {
+			contract_address: "",
+			token_id: 0,
 		},
-		TokenConfig: {
-			fieldOrder: ['token_address', 'minter_address', 'renderer_address', 'minted_count'],
-			token_address: "",
-			minter_address: "",
-			renderer_address: "",
-			minted_count: 0,
+		MockedValue: {
+			salt: 0,
+			value: 0,
+			exists: false,
+		},
+		MockedValueValue: {
+			value: 0,
+			exists: false,
+		},
+		Period: {
+			start: 0,
+			end: 0,
+		},
+		TrophyCreation: {
+			id: 0,
+			hidden: false,
+			index: 0,
+			points: 0,
+			start: 0,
+			end: 0,
+			group: 0,
+			icon: 0,
+			title: 0,
+		description: "",
+			tasks: [{ id: 0, total: 0, description: "", }],
+		data: "",
+		},
+		TrophyCreationValue: {
+			hidden: false,
+			index: 0,
+			points: 0,
+			start: 0,
+			end: 0,
+			group: 0,
+			icon: 0,
+			title: 0,
+		description: "",
+			tasks: [{ id: 0, total: 0, description: "", }],
+		data: "",
+		},
+		TrophyProgression: {
+			player_id: 0,
+			task_id: 0,
+			count: 0,
+			time: 0,
+		},
+		TrophyProgressionValue: {
+			count: 0,
+			time: 0,
+		},
+		Task: {
+			id: 0,
+			total: 0,
+		description: "",
+		},
+		ChallengeRewards: {
+			duel_id: 0,
+			duelist_id: 0,
+		rewards: { fame_lost: 0, fame_gained: 0, fools_gained: 0, points_scored: 0, position: 0, fame_burned: 0, lords_unlocked: 0, survived: false, },
+		},
+		ChallengeRewardsValue: {
+		rewards: { fame_lost: 0, fame_gained: 0, fools_gained: 0, points_scored: 0, position: 0, fame_burned: 0, lords_unlocked: 0, survived: false, },
+		},
+		PlayerActivity: {
+			player_address: "",
+			timestamp: 0,
+		activity: new CairoCustomEnum({ 
+					Undefined: "",
+				TutorialFinished: undefined,
+				PackStarter: undefined,
+				PackPurchased: undefined,
+				PackOpened: undefined,
+				DuelistSpawned: undefined,
+				DuelistDied: undefined,
+				ChallengeCreated: undefined,
+				ChallengeExpired: undefined,
+				ChallengeReplied: undefined,
+				MovesCommitted: undefined,
+				MovesRevealed: undefined,
+				ChallengeResolved: undefined,
+				ChallengeDraw: undefined, }),
+			identifier: 0,
+			is_public: false,
+		},
+		PlayerActivityValue: {
+			timestamp: 0,
+		activity: new CairoCustomEnum({ 
+					Undefined: "",
+				TutorialFinished: undefined,
+				PackStarter: undefined,
+				PackPurchased: undefined,
+				PackOpened: undefined,
+				DuelistSpawned: undefined,
+				DuelistDied: undefined,
+				ChallengeCreated: undefined,
+				ChallengeExpired: undefined,
+				ChallengeReplied: undefined,
+				MovesCommitted: undefined,
+				MovesRevealed: undefined,
+				ChallengeResolved: undefined,
+				ChallengeDraw: undefined, }),
+			identifier: 0,
+			is_public: false,
+		},
+		PlayerRequiredAction: {
+			duelist_id: 0,
+			duel_id: 0,
+		},
+		PlayerRequiredActionValue: {
+			duel_id: 0,
+		},
+		RewardValues: {
+			fame_lost: 0,
+			fame_gained: 0,
+			fools_gained: 0,
+			points_scored: 0,
+			position: 0,
+			fame_burned: 0,
+			lords_unlocked: 0,
+			survived: false,
 		},
 	},
 };
-// Type definition for ERC__Balance struct
-export type ERC__Type = 'ERC20' | 'ERC721';
-export interface ERC__Balance {
-    fieldOrder: string[];
-    balance: string;
-    type: string;
-    tokenMetadata: ERC__Token;
-}
-export interface ERC__Token {
-    fieldOrder: string[];
-    name: string;
-    symbol: string;
-    tokenId: string;
-    decimals: string;
-    contractAddress: string;
-}
-export interface ERC__Transfer {
-    fieldOrder: string[];
-    from: string;
-    to: string;
-    amount: string;
-    type: string;
-    executedAt: string;
-    tokenMetadata: ERC__Token;
-    transactionHash: string;
+export enum ModelsMapping {
+	Challenge = 'pistols-Challenge',
+	ChallengeValue = 'pistols-ChallengeValue',
+	DuelistState = 'pistols-DuelistState',
+	Moves = 'pistols-Moves',
+	Round = 'pistols-Round',
+	RoundValue = 'pistols-RoundValue',
+	CoinConfig = 'pistols-CoinConfig',
+	CoinConfigValue = 'pistols-CoinConfigValue',
+	Config = 'pistols-Config',
+	ConfigValue = 'pistols-ConfigValue',
+	TokenConfig = 'pistols-TokenConfig',
+	TokenConfigValue = 'pistols-TokenConfigValue',
+	CauseOfDeath = 'pistols-CauseOfDeath',
+	Duelist = 'pistols-Duelist',
+	DuelistChallenge = 'pistols-DuelistChallenge',
+	DuelistChallengeValue = 'pistols-DuelistChallengeValue',
+	DuelistMemorial = 'pistols-DuelistMemorial',
+	DuelistMemorialValue = 'pistols-DuelistMemorialValue',
+	DuelistTimestamps = 'pistols-DuelistTimestamps',
+	DuelistValue = 'pistols-DuelistValue',
+	Score = 'pistols-Score',
+	Scoreboard = 'pistols-Scoreboard',
+	ScoreboardValue = 'pistols-ScoreboardValue',
+	Leaderboard = 'pistols-Leaderboard',
+	LeaderboardValue = 'pistols-LeaderboardValue',
+	Pack = 'pistols-Pack',
+	PackType = 'pistols-PackType',
+	PackValue = 'pistols-PackValue',
+	Pact = 'pistols-Pact',
+	PactValue = 'pistols-PactValue',
+	Player = 'pistols-Player',
+	PlayerBookmark = 'pistols-PlayerBookmark',
+	PlayerBookmarkValue = 'pistols-PlayerBookmarkValue',
+	PlayerOnline = 'pistols-PlayerOnline',
+	PlayerOnlineValue = 'pistols-PlayerOnlineValue',
+	PlayerTimestamps = 'pistols-PlayerTimestamps',
+	PlayerValue = 'pistols-PlayerValue',
+	Pool = 'pistols-Pool',
+	PoolType = 'pistols-PoolType',
+	PoolValue = 'pistols-PoolValue',
+	SeasonConfig = 'pistols-SeasonConfig',
+	SeasonConfigValue = 'pistols-SeasonConfigValue',
+	SeasonPhase = 'pistols-SeasonPhase',
+	TableConfig = 'pistols-TableConfig',
+	TableConfigValue = 'pistols-TableConfigValue',
+	TokenBoundAddress = 'pistols-TokenBoundAddress',
+	TokenBoundAddressValue = 'pistols-TokenBoundAddressValue',
+	MockedValue = 'pistols-MockedValue',
+	MockedValueValue = 'pistols-MockedValueValue',
+	BladesCard = 'pistols-BladesCard',
+	FinalBlow = 'pistols-FinalBlow',
+	PacesCard = 'pistols-PacesCard',
+	ChallengeState = 'pistols-ChallengeState',
+	Premise = 'pistols-Premise',
+	BotProfile = 'pistols-BotProfile',
+	CharacterProfile = 'pistols-CharacterProfile',
+	DuelistProfile = 'pistols-DuelistProfile',
+	ProfileType = 'pistols-ProfileType',
+	RoundState = 'pistols-RoundState',
+	RulesType = 'pistols-RulesType',
+	Period = 'pistols-Period',
+	TrophyCreation = 'achievement-TrophyCreation',
+	TrophyCreationValue = 'achievement-TrophyCreationValue',
+	TrophyProgression = 'achievement-TrophyProgression',
+	TrophyProgressionValue = 'achievement-TrophyProgressionValue',
+	Task = 'achievement-Task',
+	ChallengeRewards = 'pistols-ChallengeRewards',
+	ChallengeRewardsValue = 'pistols-ChallengeRewardsValue',
+	Activity = 'pistols-Activity',
+	PlayerActivity = 'pistols-PlayerActivity',
+	PlayerActivityValue = 'pistols-PlayerActivityValue',
+	PlayerRequiredAction = 'pistols-PlayerRequiredAction',
+	PlayerRequiredActionValue = 'pistols-PlayerRequiredActionValue',
+	RewardValues = 'pistols-RewardValues',
 }

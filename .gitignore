@@ -136,10 +136,12 @@ dist
 *.zip
 
 # Cairo
-Scarb.lock
 */target
 *.pem
 
 # Turbo
 .turbo
 .vercel
+
+# Pistols
+.chroma

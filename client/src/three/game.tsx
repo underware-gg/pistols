@@ -11,6 +11,7 @@ import Stats from 'three/addons/libs/stats.module.js'
 import { Rain } from './Rain.tsx'
 import { Grass } from './Grass.tsx'
 import * as shaders from './shaders.tsx'
+import { InteractibleScene } from './InteractibleScene.tsx'
 
 // event emitter
 // var ee = require('event-emitter');
@@ -20,12 +21,11 @@ export var emitter = ee()
 import { TEXTURES, SPRITESHEETS, TextureName } from '/src/data/assets.tsx'
 import { AudioName, AUDIO_ASSETS } from '/src/data/audioAssets.tsx'
 import { SceneName } from '/src/data/assets.tsx'
-import { map } from '@underware_gg/pistols-sdk/utils'
+import { map } from '@underware/pistols-sdk/utils'
 import { SpriteSheet } from './SpriteSheetMaker.tsx'
 import { DuelistsManager } from './DuelistsManager.tsx'
 import { Action } from '/src/utils/pistols.tsx'
 import { DuelistState } from '/src/components/scenes/Duel.tsx'
-import { InteractibleScene } from './InteractibleScene.tsx'
 
 
 //---------------------------
@@ -132,6 +132,7 @@ export let _renderer: THREE.WebGLRenderer
 let _animationRequest = null
 let _clock: THREE.Clock
 let _duelCamera: THREE.PerspectiveCamera
+let _duelCameraParent: THREE.Object3D
 let _staticCamera: THREE.PerspectiveCamera
 let _supportsExtension: boolean = true
 let _stats
@@ -139,7 +140,7 @@ let _controls
 export let _gui: GUI
 
 let _grassTransforms
-let _growthPercentage
+let _growthPercentage = 0.0
 let _grass
 
 let _ground
@@ -153,6 +154,10 @@ let _duelistManager: DuelistsManager
 let _scenes: Partial<Record<SceneName, THREE.Scene>> = {}
 export let _currentScene: THREE.Scene = null
 export let _sceneName: SceneName
+
+export let _currentDuelId: number
+export let _currentDuelistAId: number
+export let _currentDuelistBId: number
 
 export let _sfxEnabled = true
 export let _statsEnabled = false
@@ -170,6 +175,8 @@ const _tweens = {
 
 export async function init(canvas, framerate = 60, statsEnabled = false) {
 
+  dispose()
+
   if (Object.keys(_scenes).length > 0) {
     return
   }
@@ -186,8 +193,6 @@ export async function init(canvas, framerate = 60, statsEnabled = false) {
   // THREE.ColorManagement.enabled = false
   await loadAssets()
   console.log(`THREE.init() assets loaded...`)
-
-  _growthPercentage = localStorage.getItem('GROWTH')
   
   if (_statsEnabled) {
     _stats = new Stats()
@@ -304,13 +309,15 @@ function setRender(canvas) {
   // _renderer.debug.checkShaderErrors = false;
 }
 
-function setCameras() {
+export function setCameras() {
+  _duelCameraParent = new THREE.Object3D()
   _duelCamera = new THREE.PerspectiveCamera(
     cameraData.fieldOfView,
     ASPECT,
     cameraData.nearPlane,
     cameraData.farPlane,
   )
+  _duelCameraParent.add(_duelCamera)
   _duelCamera.position.set(0, 0.05, 0)
   _staticCamera = new THREE.PerspectiveCamera(
     cameraData.fieldOfView,
@@ -352,6 +359,28 @@ function setGUI() {
 //-------------------------------------------
 // Game Loop
 //
+
+export function shakeCamera(duration = 500, magnitude = 0.01) {
+  const initialPosition = _duelCameraParent.position.clone(); // Store the initial position of the camera
+
+  const shake = () => {
+    const offsetX = (Math.random() - 0.5) * 2 * magnitude;
+    const offsetY = (Math.random() - 0.5) * 2 * magnitude;
+    const offsetZ = (Math.random() - 0.5) * 2 * magnitude;
+
+    _duelCameraParent.position.set(
+      initialPosition.x + offsetX,
+      initialPosition.y + offsetY,
+      initialPosition.z + offsetZ
+    );
+  };
+
+  new TWEEN.Tween({ t: 0 })
+    .to({ t: 1 }, duration)
+    .onUpdate(() => { shake() })
+    .onComplete(() => { _duelCameraParent.position.copy(initialPosition) })
+    .start();
+}
 
 let lastFrameTime = performance.now()
 
@@ -411,14 +440,10 @@ export function animate() {
 
 function setupScenes() {
   _scenes = {}
-  let hasInstancedTutorial = false
   Object.values(SceneName).forEach((sceneName) => {
     if (sceneName === SceneName.Duel) {
       _scenes[sceneName] = setupDuelScene()
-    } else if (sceneName.includes('Tutorial') && !hasInstancedTutorial) {
-      _scenes[sceneName] = setupStaticScene(SceneName.Tutorial)
-      hasInstancedTutorial = true
-    } else {
+    } else if (sceneName !== SceneName.TutorialDuel) {
       _scenes[sceneName] = setupStaticScene(sceneName)
     }
   })
@@ -429,7 +454,7 @@ function setupScenes() {
 //
 function setupDuelScene() {
   const scene = new THREE.Scene()
-  scene.add(_duelCamera)
+  scene.add(_duelCameraParent)
 
   setEnvironment(scene)
 
@@ -690,7 +715,7 @@ function createWaterPlane(name, geometry, params) {
 
 function createGrass() {
   if (!_scenes[SceneName.Duel]) return;
-  if (!_grassTransforms || _growthPercentage == undefined) return;
+  if (!_grassTransforms) return;
   if (_grass) return;
 
   _grass = new Grass(
@@ -744,11 +769,19 @@ function setupStaticScene(sceneName) {
 //
 
 export function switchScene(sceneName) {
+  if (sceneName === SceneName.TutorialDuel) {
+    sceneName = SceneName.Duel
+  }
+
+  if (_currentScene === sceneName) return;
+
   if (!_currentScene) {
     _sceneName = sceneName
-    _currentScene = _scenes[sceneName.includes('Tutorial') ? SceneName.Tutorial : sceneName]
+    _currentScene = _scenes[sceneName]
 
-    fadeInCurrentScene();
+    setTimeout(() => {
+      fadeInCurrentScene();
+    }, SCENE_CHANGE_ANIMATION_DURATION);
     
     if (sceneName != SceneName.Duel) {
       _duelistManager.hideElements()
@@ -758,9 +791,14 @@ export function switchScene(sceneName) {
   } else {
     fadeOutCurrentScene(() => {
       _sceneName = sceneName
-      _currentScene = _scenes[sceneName.includes('Tutorial') ? SceneName.Tutorial : sceneName]
+      _currentScene = _scenes[sceneName]
 
-      fadeInCurrentScene();
+      emitter.emit('hover_description', null)
+      emitter.emit('hover_item', null)
+
+      setTimeout(() => {
+        fadeInCurrentScene();
+      }, 0);
       
       if (sceneName != SceneName.Duel) {
         _duelistManager.hideElements()
@@ -773,6 +811,8 @@ export function switchScene(sceneName) {
 
 function fadeOutCurrentScene(callback) {
   const overlay = document.getElementById('game-black-overlay');
+
+  _tweens.staticFade?.stop();
 
   _tweens.staticFade = new TWEEN.Tween({ opacity: 0 })
     .to({ opacity: 1 }, SCENE_CHANGE_ANIMATION_DURATION)
@@ -788,6 +828,8 @@ function fadeOutCurrentScene(callback) {
 function fadeInCurrentScene() {
   const overlay = document.getElementById('game-black-overlay');
 
+  _tweens.staticFade?.stop();
+
   _tweens.staticFade = new TWEEN.Tween({ opacity: 1 })
     .to({ opacity: 0 }, SCENE_CHANGE_ANIMATION_DURATION)
     .onUpdate(({ opacity }) => {
@@ -796,18 +838,15 @@ function fadeInCurrentScene() {
     .start();
 }
 
-export function startDuelWithPlayers(duelistNameA, duelistModelA, isDuelistAYou, isDuelistBYou, duelistNameB, duelistModelB) {
-  switchScene(SceneName.Duel) // make sure we're in the correct scene (duel page refresh)
-  resetDuelScene()
-  
+export function startDuelWithPlayers(duelistNameA, duelistModelA, isDuelistAYou, isDuelistBYou, duelistNameB, duelistModelB) {  
   _duelistManager.switchDuelists(duelistNameA, duelistModelA, isDuelistAYou, isDuelistBYou, duelistNameB, duelistModelB)
 }
 
 export function setDuelTimePercentage(timePassed: number) {
-  const timePassedPercentage = timePassed / 259_200_000.0 // grow for three days
-  localStorage.setItem('GROWTH', timePassedPercentage.toString())
-  _growthPercentage = parseFloat(localStorage.getItem('GROWTH'))
-  createGrass()
+  _growthPercentage = timePassed
+  if (_grass) {
+    _grass.setGrassGrowth(_growthPercentage)
+  }
 }
 
 export function updatePlayerProgress(isA, duelistState, onClick) {
@@ -820,6 +859,12 @@ export function setDuelistElement(isA, duelistElement) {
 
 export function setDuelistSpeedFactor(speedFactor) {
   _duelistManager.setDuelistSpeedFactor(speedFactor)
+}
+
+export function setDuelData(duelId: number, duelistAId: number, duelistBId: number) {
+  _currentDuelId = duelId
+  _currentDuelistAId = duelistAId
+  _currentDuelistBId = duelistBId
 }
 
 //----------------
@@ -837,7 +882,7 @@ export function zoomCameraToPaces(paceCount, seconds) {
   if (seconds == 0) {
     // just set
     // console.log(`CAMS SET`, targetPos)
-    _duelCamera.position.set(targetPos.x, targetPos.y, targetPos.z)
+    _duelCamera.position.set(targetPos.x, targetPos.y, targetPos.z);
     _duelCamera.lookAt(0, 0.5, 2)
   } else {
     // console.log(`CAM ANIM`, targetPos)
@@ -862,7 +907,7 @@ export function animatePace(pace: number, statsA: DuelistState, statsB: DuelistS
   _duelistManager.animatePace(pace, statsA, statsB)
 }
 
-export function animateDuel(state: AnimationState, actionA: Action, actionB: Action, healthA: number, healthB: number, damageA: number, damageB: number) {
+export function animateDuel(state: AnimationState) {
   //only animated once per entry safety
   if (state == AnimationState.Round1 && !_round1Animated) {
     _round1Animated = true
@@ -988,12 +1033,12 @@ export function dispose() {
   });
 
   TWEEN.removeAll()
-  _duelistManager.dispose()
+  _duelistManager?.dispose()
 
   // 8. Clear References:
   _duelistManager = null
   _grassTransforms = null
-  _growthPercentage = null
+  _growthPercentage = 0.0
   _ground = null
   _skyVideo = null
   _skyVideoTexture = null

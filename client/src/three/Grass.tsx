@@ -6,7 +6,7 @@ const GRASS_PATCH_SIZE_LENGTH = 0.1;
 const GRASS_PATCH_SIZE_DEPTH = 0.01;
 const GRASS_WIDTH = 0.012;
 const GRASS_HEIGHT = 0.1;
-const MAX_GRASS_GROWTH = 0.3;
+const MAX_GRASS_GROWTH = 0.2;
 const NUM_GRASS = (32) * 3;
 const GRASS_SEGMENTS_HIGH = 6;
 const GRASS_VERTICES_HIGH = (GRASS_SEGMENTS_HIGH + 1) * 2;
@@ -283,6 +283,11 @@ export class Grass extends THREE.Object3D {
 
     this.depthMaterial.setUniformValue('windStrength', strength)
     this.depthMaterial.setUniformValue('windSpeed', speed)
+  }
+
+  public setGrassGrowth(growth: number) {
+    this.materialHigh.setUniformValue('grassSize', new THREE.Vector2(GRASS_WIDTH, GRASS_HEIGHT + (MAX_GRASS_GROWTH * growth)));
+    this.depthMaterial.setUniformValue('grassSize', new THREE.Vector2(GRASS_WIDTH, GRASS_HEIGHT + (MAX_GRASS_GROWTH * growth)));
   }
 
   public getWind() {

@@ -1,4 +1,4 @@
-use starknet::ContractAddress;
+use starknet::{ContractAddress};
 use pistols::utils::hash::{hash_values};
 use pistols::utils::misc::{ZERO};
 
@@ -10,8 +10,15 @@ pub trait ITokenBoundPublic<TState> {
     fn token_of_address(self: @TState, address: ContractAddress) -> (ContractAddress, u128);
     // balance of a token
     fn balance_of_token(self: @TState, contract_address: ContractAddress, token_id: u128) -> u256;
-    // transfer between tokens
+    // transfer form token to account
     fn transfer_from_token(ref self: TState,
+        contract_address: ContractAddress,
+        sender_token_id: u128,
+        recipient: ContractAddress,
+        amount: u256,
+    ) -> bool;
+    // transfer between tokens
+    fn transfer_from_token_to_token(ref self: TState,
         contract_address: ContractAddress,
         sender_token_id: u128,
         recipient_token_id: u128,
@@ -37,7 +44,7 @@ pub struct TokenBoundAddress {
 }
 
 #[generate_trait]
-impl TokenBoundAddressImpl of TokenBoundAddressTrait {
+pub impl TokenBoundAddressImpl of TokenBoundAddressTrait {
     #[inline(always)]
     fn address(contract_address: ContractAddress, token_id: u128) -> ContractAddress {
         if (token_id != 0) {hash_values([contract_address.into(), token_id.into()].span()).try_into().unwrap()}
@@ -47,9 +54,8 @@ impl TokenBoundAddressImpl of TokenBoundAddressTrait {
 
 #[starknet::component]
 pub mod TokenBoundComponent {
-    use zeroable::Zeroable;
-    use starknet::{ContractAddress, get_contract_address, get_caller_address};
-    use dojo::world::{WorldStorage, IWorldDispatcher, IWorldDispatcherTrait};
+    use core::num::traits::Zero;
+    use starknet::{ContractAddress};
     use dojo::contract::components::world_provider::{IWorldProvider};
     
     use openzeppelin_token::erc20::{
@@ -58,29 +64,28 @@ pub mod TokenBoundComponent {
     };
 
     use super::{TokenBoundAddress, TokenBoundAddressTrait};
-    use pistols::interfaces::systems::{SystemsTrait};
+    use pistols::interfaces::dns::{DnsTrait};
     use pistols::libs::store::{
         Store, StoreTrait,
     };
 
     #[storage]
-    struct Storage {}
+    pub struct Storage {}
 
     #[event]
     #[derive(Drop, PartialEq, starknet::Event)]
     pub enum Event {}
 
     mod Errors {
-        const ALREADY_REGISTERED: felt252       = 'TOKEN_BOUND: already registered';
-        const INVALID_CONTRACT_ADDRESS: felt252 = 'TOKEN_BOUND: invalid contract';
-        // const INVALID_TOKEN_ID: felt252         = 'TOKEN_BOUND: invalid token id';
+        pub const ALREADY_REGISTERED: felt252       = 'TOKEN_BOUND: already registered';
+        pub const INVALID_CONTRACT_ADDRESS: felt252 = 'TOKEN_BOUND: invalid contract';
+        // pub const INVALID_TOKEN_ID: felt252         = 'TOKEN_BOUND: invalid token id';
     }
 
 
     //-----------------------------------------
     // Public
     //
-    use super::{ITokenBoundPublic};
     #[embeddable_as(TokenBoundPublicImpl)]
     pub impl TokenBoundPublic<
         TContractState,
@@ -89,7 +94,7 @@ pub mod TokenBoundComponent {
         +ERC20Component::ERC20HooksTrait<TContractState>,
         impl ERC20: ERC20Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ITokenBoundPublic<ComponentState<TContractState>> {
+    > of super::ITokenBoundPublic<ComponentState<TContractState>> {
         fn address_of_token(self: @ComponentState<TContractState>,
             contract_address: ContractAddress,
             token_id: u128,
@@ -102,7 +107,7 @@ pub mod TokenBoundComponent {
         fn token_of_address(self: @ComponentState<TContractState>,
             address: ContractAddress,
         ) -> (ContractAddress, u128) {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             let token_bound_address: TokenBoundAddress = store.get_token_bound_address(address);
             (token_bound_address.contract_address, token_bound_address.token_id)
@@ -118,6 +123,20 @@ pub mod TokenBoundComponent {
         }
 
         fn transfer_from_token(ref self: ComponentState<TContractState>,
+            contract_address: ContractAddress,
+            sender_token_id: u128,
+            recipient: ContractAddress,
+            amount: u256,
+        ) -> bool {
+            let mut erc20 = get_dep_component_mut!(ref self, ERC20);
+            (erc20.transfer_from(
+                self.address_of_token(contract_address, sender_token_id),
+                recipient,
+                amount)
+            )
+        }
+        
+        fn transfer_from_token_to_token(ref self: ComponentState<TContractState>,
             contract_address: ContractAddress,
             sender_token_id: u128,
             recipient_token_id: u128,
@@ -146,7 +165,6 @@ pub mod TokenBoundComponent {
     //-----------------------------------------
     // Internal
     //
-    use super::{ITokenBoundInternal};
     #[embeddable_as(TokenBoundInternalImpl)]
     pub impl InternalImpl<
         TContractState,
@@ -155,12 +173,12 @@ pub mod TokenBoundComponent {
         +ERC20Component::ERC20HooksTrait<TContractState>,
         impl ERC20: ERC20Component::HasComponent<TContractState>,
         +Drop<TContractState>,
-    > of ITokenBoundInternal<ComponentState<TContractState>> {
+    > of super::ITokenBoundInternal<ComponentState<TContractState>> {
         fn register_token(self: @ComponentState<TContractState>,
             contract_address: ContractAddress,
             token_id: u128,
         ) -> ContractAddress {
-            let mut world = SystemsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
             // validate address
             let recipient: ContractAddress = self.address_of_token(contract_address, token_id);

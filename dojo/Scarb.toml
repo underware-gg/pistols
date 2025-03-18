@@ -1,7 +1,8 @@
 [package]
 name = "pistols"
-version = "0.12.5"
-cairo-version = "2.8.4"
+version = "0.13.5"
+cairo-version = "2.9.2"
+edition = "2024_07"
 
 [cairo]
 sierra-replace-ids = true
@@ -11,18 +12,28 @@ migrate = "./migrate"
 
 [[target.starknet-contract]]
 sierra = true
-build-external-contracts = ["dojo::world::world_contract::world"]
+build-external-contracts = [
+  "dojo::world::world_contract::world",
+  "achievement::events::index::e_TrophyCreation", 
+  "achievement::events::index::e_TrophyProgression", 
+]
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.0.8" }
-graffiti = { git = "https://github.com/ponderingdemocritus/graffiti", rev = "bc569531791dbc71c6cd8d9bc154c34eedad31fe" }
-openzeppelin_token = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.2.2" }
+# achievement = { git = "https://github.com/cartridge-gg/arcade", tag = "v1.2.2" }
+achievement = { git = "https://github.com/rsodre/arcade", branch = "dojo_v1.2.2" }
+graffiti = { git = "https://github.com/rsodre/graffiti", rev = "url" }
+nft_combo = { git = "https://github.com/underware-gg/cairo-nft-combo", tag = "v0.2.2"}
+openzeppelin_token = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
+openzeppelin_introspection = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
+# openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
 # openzeppelin_token = { path = "../../cairo-contracts" }
+# cartridge_vrf = { git = "https://github.com/cartridge-gg/vrf" }
 
 [dev-dependencies]
-dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.0.8" }
-openzeppelin_test_common = { git = "https://github.com/underware-gg/cairo-contracts", branch = "pistols" }
-# openzeppelin_test_common = { path = "../../cairo-contracts" }
+cairo_test = "=2.9.2"
+dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.2.2" }
+# openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
 
 [features]
 default = ["lords_mock", "vrf_mock"]
@@ -34,6 +45,7 @@ vrf_mock = []
 # Dojo profiles declaration
 #
 [profile.dev]
-[profile.slot]
+[profile.academy]
 [profile.staging]
 [profile.sepolia]
+[profile.mainnet]

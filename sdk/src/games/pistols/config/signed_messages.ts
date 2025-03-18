@@ -1,9 +1,9 @@
 import { BigNumberish, StarknetType, typedData } from 'starknet'
-import { bigintToDecimal, bigintToHex, bigintToNumber } from 'src/utils/types'
-import { generateTypedData } from 'src/dojo/setup/controller'
-import { STARKNET_DOMAIN } from 'src/games/pistols/config/config'
+import { bigintToDecimal, bigintToHex } from 'src/utils/misc/types'
 import { PistolsSchemaType } from 'src/games/pistols/config/types'
-import * as constants from 'src/games/pistols/generated/constants'
+import { generateTypedData } from 'src/dojo/setup/controller'
+import { makeStarknetDomain } from 'src/games/pistols/config/config'
+import { NetworkId } from 'src/games/pistols/config/networks'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 //
@@ -18,16 +18,18 @@ import * as models from 'src/games/pistols/generated/models.gen'
 
 export type OmitFieldOrder<T> = Omit<T, 'fieldOrder'>;
 
-export function make_typed_data_PPlayerOnline({
+export function make_typed_data_PlayerOnline({
+  networkId,
   identity,
   timestamp,
 }: {
+  networkId: NetworkId,
   identity: BigNumberish,
   timestamp: number,
 }) {
-  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PPlayerOnline>>(
-    STARKNET_DOMAIN,
-    'pistols-PPlayerOnline',
+  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PlayerOnline>>(
+    makeStarknetDomain(networkId),
+    'pistols-PlayerOnline',
     {
       identity: bigintToHex(identity),
       timestamp,
@@ -39,20 +41,22 @@ export function make_typed_data_PPlayerOnline({
   )
 }
 
-export function make_typed_data_PPlayerBookmark({
+export function make_typed_data_PlayerBookmark({
+  networkId,
   identity,
   target_address,
   target_id,
   enabled,
 }: {
+  networkId: NetworkId,
   identity: BigNumberish,
   target_address: BigNumberish,
   target_id: BigNumberish,
   enabled: boolean,
 }) {
-  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PPlayerBookmark>>(
-    STARKNET_DOMAIN,
-    'pistols-PPlayerBookmark',
+  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PlayerBookmark>>(
+    makeStarknetDomain(networkId),
+    'pistols-PlayerBookmark',
     {
       identity: bigintToHex(identity),
       target_address: bigintToHex(target_address),
@@ -68,39 +72,15 @@ export function make_typed_data_PPlayerBookmark({
   )
 }
 
-export function make_typed_data_PPlayerTutorialProgress({
-  identity,
-  progress,
-}: {
-  identity: BigNumberish,
-  progress: constants.TutorialProgress,
-}) {
-  return generateTypedData<PistolsSchemaType, OmitFieldOrder<models.PPlayerTutorialProgress>>(
-    STARKNET_DOMAIN,
-    'pistols-PPlayerTutorialProgress',
-    {
-      identity: bigintToHex(identity),
-      //@ts-ignore
-      progress: { [progress]: [] }, // enum!
-    },
-    {
-      identity: 'ContractAddress',
-      progress: 'TutorialProgress',
-    },
-    {
-      TutorialProgress: makeEnumType(constants.TutorialProgressNameToValue)
-    }
-  )
-}
-
 
 //
 // example: from...
-// export const TutorialProgressNameToValue: Record<TutorialProgress, number> = {
-//   [TutorialProgress.None]: 0,
-//   [TutorialProgress.FinishedFirst]: 1,
-//   [TutorialProgress.FinishedSecond]: 2,
-//   [TutorialProgress.FinishedFirstDuel]: 3,
+//
+// export enum TutorialProgress {
+//   None = 'None', // 0
+//   FinishedFirst = 'FinishedFirst', // 1
+//   FinishedSecond = 'FinishedSecond', // 2
+//   FinishedFirstDuel = 'FinishedFirstDuel', // 3
 // };
 //
 // to...
@@ -110,8 +90,9 @@ export function make_typed_data_PPlayerTutorialProgress({
 //   { name: 'FinishedSecond', type: '()' },
 //   { name: 'FinishedFirstDuel', type: '()' },
 // ]
-function makeEnumType(enumValues: Record<string, number>): StarknetType[] {
-  return Object.keys(enumValues).map(name => ({
+//
+function makeEnumType(enumNames: string[]): StarknetType[] {
+  return enumNames.map(name => ({
     name,
     type: '()',
   }))

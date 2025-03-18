@@ -21,12 +21,15 @@ export const EMOJI = {
   LIFE: '❤️',
   ALIVE: '❤️',
   INJURED: '🩸',
+  TIMED_OUT: '👻',
   DEAD: '☠️',
   BOUNTY: '💰',
   WINNER: '🏅',
   DICE: '🎲',
+  IN_ACTION: '🔫',
   //
   // badges
+  FOOLS: '🎩',
   FAME: '⭐️',
   HONOUR: '👑',
   NEUTRAL: '🫥',

@@ -1,63 +1,43 @@
-import { BigNumberish } from 'starknet'
-import { create } from 'zustand'
-import { immer } from 'zustand/middleware/immer'
-import { constants, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
-import { arrayClean, bigintToHex, bigintToNumber } from '@underware_gg/pistols-sdk/utils'
+import { useMemo } from 'react'
+import { createDojoStore } from '@dojoengine/sdk/react'
+import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
+import { bigintToHex } from '@underware/pistols-sdk/utils';
+import { BigNumberish } from 'starknet';
 
-
-//-----------------------------------------
-// Stores only the entity ids and sorting data from a duelists query
-// to get duelist data, use duelistStore
-//
-export interface ActivityState {
-  address: BigNumberish
-  timestamp: number
-  activity: constants.Activity
-  identifier: bigint
-}
-interface State {
-  playerActivity: ActivityState[],
-  setEvents: (events: PistolsEntity[]) => void;
-  updateEvent: (event: PistolsEntity) => void;
-}
-
-const createStore = () => {
-  const _parseEvent = (e: PistolsEntity): ActivityState => {
-    let event = e.models.pistols.PlayerActivity
-    return event ? {
-      address: bigintToHex(event.address),
-      timestamp: bigintToNumber(event.timestamp),
-      activity: event.activity as unknown as constants.Activity,
-      identifier: BigInt(event.identifier),
-    } : undefined
-  }
-  return create<State>()(immer((set) => ({
-    playerActivity: [],
-    setEvents: (events: PistolsEntity[]) => {
-      console.log("setEvents() =>", events)
-      set((state: State) => {
-        state.playerActivity = arrayClean(events.map(e => _parseEvent(e))).sort((a, b) => (a.timestamp - b.timestamp))
-      })
-    },
-    updateEvent: (e: PistolsEntity) => {
-      console.log("updateEvent() =>", e)
-      set((state: State) => {
-        const activity = _parseEvent(e)
-        if (activity) state.playerActivity.push(activity)
-      });
-    },
-  })))
-}
-
-export const useHistoricalEventsStore = createStore();
+export const useEventsStore = createDojoStore<PistolsSchemaType>();
 
 
 //--------------------------------
 // 'consumer' hooks
 //
-export function useAllPlayersActivityFeed() {
-  const allPlayersActivity = useHistoricalEventsStore((state) => state.playerActivity)
+export function useRequiredActions() {
+  const entities = useEventsStore((state) => state.entities)
+  const duelPerDuelist = useMemo(() => (
+    Object.values(entities)
+      .reduce((acc, e) => {
+        const duelId = BigInt(e.models.pistols.PlayerRequiredAction?.duel_id ?? 0);
+        if (duelId > 0n) {
+          let duelistId = bigintToHex(e.models.pistols.PlayerRequiredAction.duelist_id);
+          acc[duelistId] = duelId;
+        }
+        return acc;
+      }, {} as Record<string, bigint>)
+  ), [entities])
+  const requiredDuelIds = useMemo(() => Object.values(duelPerDuelist), [duelPerDuelist])
+  // console.log(`useRequiredActions() =================>`, entities, duelPerDuelist, requiredDuelIds)
   return {
-    allPlayersActivity,
+    duelPerDuelist,
+    requiredDuelIds,
   }
 }
+
+export function useDuelRequiresAction(duel_id: BigNumberish) {
+  const { requiredDuelIds } = useRequiredActions()
+  return requiredDuelIds.includes(BigInt(duel_id))
+}
+
+export function useDuelistRequiresAction(duelist_id: BigNumberish) {
+  const { duelPerDuelist } = useRequiredActions()
+  return !!duelPerDuelist[bigintToHex(duelist_id)]
+}
+

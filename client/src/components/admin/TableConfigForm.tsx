@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useDojoSystemCalls } from '@underware_gg/pistols-sdk/dojo'
-import { useAdminAmIOwner } from '/src/hooks/useContractCalls'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
+import { useAdminAmIOwner } from '/src/hooks/usePistolsContractCalls'
 import { FormInput, FormCheckbox, FormSelectFromMap } from '/src/components/ui/Form'
 import { TableSwitcher } from '/src/components/modals/TableModal'
 import { Balance } from '/src/components/account/Balance'
-import { bigintToEntity, bigintToHex, isBigint, isNumeric, feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex, isBigint, isNumeric } from '@underware/pistols-sdk/utils'
+import { feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -23,7 +24,7 @@ enum FieldType {
   Wei,
   Number,
   Boolean,
-  TableType,
+  RulesType,
   DeckType,
 }
 
@@ -43,20 +44,16 @@ const config_schema: FormSchema = {
 const table_config_schema: FormSchema = {
   table_id: { type: FieldType.ShortString, isKey: true },
   description: { type: FieldType.ShortString },
-  table_type: { type: FieldType.TableType },
-  deck_type: { type: FieldType.DeckType },
-  fee_collector_address: { type: FieldType.Address },
-  fee_min: { type: FieldType.Wei },
-  is_open: { type: FieldType.Boolean },
+  rules: { type: FieldType.RulesType },
 }
 
 export const ConfigForm = ({
 }: {
   }) => {
   const { account } = useAccount()
-  const { admin_set_config } = useDojoSystemCalls()
+  const { admin } = useDojoSystemCalls()
   const storeComponent = (values: any) => {
-    admin_set_config(account, values)
+    admin.set_config(account, values)
   }
 
   return (
@@ -77,9 +74,9 @@ export const TableConfigForm = ({
   const [tableId, setTableId] = useState<string>()
 
   const { account } = useAccount()
-  const { admin_set_table } = useDojoSystemCalls()
+  const { admin } = useDojoSystemCalls()
   const storeComponent = (values: any) => {
-    admin_set_table(account, values)
+    admin.set_table(account, values)
   }
 
   return (
@@ -215,10 +212,10 @@ export const Field = ({
               value={value}
               setValue={setValue}
             />
-            : fieldType == FieldType.TableType ? <>
+            : fieldType == FieldType.RulesType ? <>
               {value}
               <FormSelectFromMap
-                map={constants.TableTypeNameToValue}
+                map={constants.getRulesTypeMap()}
                 label={name}
                 disabled={readOnly}
                 value={value}
@@ -227,7 +224,7 @@ export const Field = ({
             </> : fieldType == FieldType.DeckType ? <>
               {value}
               <FormSelectFromMap
-                map={constants.DeckTypeNameToValue}
+                map={constants.getDeckTypeMap()}
                 label={name}
                 disabled={readOnly}
                 value={value}

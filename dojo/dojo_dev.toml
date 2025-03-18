@@ -5,11 +5,11 @@
 #
 
 [world]
-name = "Pistols at 10 Blocks"
+name = "Pistols at Dawn"
 description = "An on-chain pistol duelling game of honour and betrayal."
-icon_uri = "https://pistols.underware.gg/images/logo.png"
-cover_uri = "https://pistols.underware.gg/images/splash.png"
-website = "https://pistols.underware.gg"
+icon_uri = "https://assets.underware.gg/pistols/logo.png"
+cover_uri = "https://assets.underware.gg/pistols/splash.png"
+website = "https://pistols.gg"
 seed = "pistols"
 
 [world.socials]
@@ -23,7 +23,7 @@ chain_id = "KATANA_LOCAL"
 rpc_url = "http://localhost:5050"
 account_address = "0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec"
 private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
-world_address = "0x3d5489a911389c23b96408ffd94854bd22a3032e2cb81c15e74b228bf39e1a7"
+world_address = "0xbee2bb53422762f6c51fb478a8a5da41a64ad678860d02800e0dbdac23dc36"
 
 #--------------------------
 # namespaces
@@ -46,13 +46,23 @@ default = "pistols"
 [writers]
 "pistols" = [
   "pistols-game",
+  "pistols-tutorial",
   "pistols-admin",
   "pistols-duel_token",
   "pistols-duelist_token",
+  "pistols-pack_token",
 ]
 # ERC-20
-"pistols-CoinConfig"        = ["pistols-fame_coin","pistols-lords_mock"]
+"pistols-CoinConfig" = [
+  "pistols-fame_coin",
+  "pistols-fools_coin",
+  "pistols-lords_mock",
+]
 "pistols-TokenBoundAddress" = ["pistols-fame_coin"]
+"pistols-Pool" = ["pistols-bank"]
+# arcade trophies
+"pistols-TrophyCreation" = ["pistols-game"]
+"pistols-TrophyProgression" = ["pistols-game"]
 
 #--------------------------
 # init_calldata
@@ -64,18 +74,17 @@ default = "pistols"
   "0x0", # vrf_address (use vrf_mock)
 ]
 "pistols-duel_token" = [
-  "sstr:pistols.stage.underware.gg", # base_uri
+  "sstr:http://localhost:3000", # base_uri
   "0x0", # minter_address
-  "0x0", # renderer_address
   "0", # fee_amount
 ]
 "pistols-duelist_token" = [
-  "sstr:pistols.stage.underware.gg", # base_uri
-  "0x0", # minter_address
-  "0x0", # renderer_address
-  # "100000000000000000000", # fee_amount: 100 LORDS
-  "0x0", # fee_amount
+  "sstr:http://localhost:3000", # base_uri
 ]
+"pistols-pack_token" = [
+  "sstr:http://localhost:3000", # base_uri
+]
+
 "pistols-lords_mock" = [
   "0x0", # minter_address
   "10000000000000000000000", # faucet_amount: 10,000 LORDS

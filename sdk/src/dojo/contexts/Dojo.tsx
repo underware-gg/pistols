@@ -1,11 +1,13 @@
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useEffect, useMemo } from 'react'
 import { StarknetDomain, TypedData } from 'starknet'
 import { Connector } from '@starknet-react/core'
+import { Method } from '@cartridge/controller'
+import { NetworkId } from 'src/games/pistols/config/networks'
 import { Manifest } from '@dojoengine/core'
 import { StarknetProvider, useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
 import { DojoProvider } from 'src/dojo/contexts/DojoContext'
+import { DojoStatus } from 'src/dojo/contexts/DojoStatus'
 import { useSetup } from 'src/dojo/setup/useSetup'
-import { ChainId } from 'src/dojo/setup/chains'
 
 // TODO: Manifest is outdated???
 // export type DojoManifest = Manifest
@@ -13,9 +15,13 @@ export type DojoManifest = Manifest & any
 
 export type ContractPolicyDescriptions = {
   [contract_name: string]: {
-    name?: string
-    description?: string
-    interfaces: string[]
+    name: string            // display name of the contract
+    description: string     // description of the contract
+    // for dojo contracts (contract_name)
+    interfaces?: string[]   // parse interfaces from abi
+    // for external contracts
+    contract_address?: string
+    methods?: Method[]      // parse methods from abi
   }
 }
 
@@ -26,12 +32,11 @@ export type SignedMessagePolicyDescriptions = {
 }[]
 
 export interface DojoAppConfig {
+  selectedNetworkId: NetworkId
   namespace: string
-  supportedChainIds: ChainId[]
-  defaultChainId: ChainId
+  manifest: DojoManifest,
+  mainContractName: string
   starknetDomain: StarknetDomain
-  manifests: { [chain_id: string]: DojoManifest | undefined }
-  contractPolicyDescriptions: ContractPolicyDescriptions
   controllerConnector: Connector
 }
 
@@ -59,11 +64,14 @@ function SetupDojoProvider({
   children: ReactNode
 }) {
   // Connected wallet or Dojo Predeployed (master)
-  const { selectedChainConfig } = useStarknetContext()
-  const setupResult = useSetup(dojoAppConfig, selectedChainConfig)
+  const { selectedNetworkConfig } = useStarknetContext()
+  const setupResult = useSetup(dojoAppConfig, selectedNetworkConfig)
+  const isInitialized = useMemo(() => Boolean(setupResult), [setupResult])
+  useEffect(() => console.log(!isInitialized ? '---> DOJO setup...' : '---> DOJO initialized!'), [isInitialized])
   return (
     <DojoProvider value={setupResult}>
-      {children}
+      {!isInitialized && <DojoStatus message={'Loading Pistols...'} />}
+      {isInitialized && children}
     </DojoProvider>
   )
 }

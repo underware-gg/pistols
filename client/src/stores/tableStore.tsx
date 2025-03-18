@@ -1,9 +1,10 @@
 import { useMemo } from 'react'
-import { createDojoStore } from '@dojoengine/sdk'
-import { useEntityModel } from '@underware_gg/pistols-sdk/dojo'
-import { feltToString, stringToFelt } from '@underware_gg/pistols-sdk/utils'
-import { constants, models, PistolsSchemaType } from '@underware_gg/pistols-sdk/pistols'
-import { useEntityId } from '@underware_gg/pistols-sdk/hooks'
+import { createDojoStore } from '@dojoengine/sdk/react'
+import { useEntityModel } from '@underware/pistols-sdk/dojo'
+import { useEntityId } from '@underware/pistols-sdk/utils/hooks'
+import { feltToString, stringToFelt, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
+import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useTableConfigStore = createDojoStore<PistolsSchemaType>();
 
@@ -12,6 +13,14 @@ export const useAllTableIds = () => {
   const tableIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.TableConfig.table_id)), [entities])
   return {
     tableIds,
+  }
+}
+
+export const useAllSeasonIds = () => {
+  const entities = useTableConfigStore((state) => state.entities)
+  const seasonIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models?.pistols?.TableConfig?.table_id)), [entities])
+  return {
+    seasonIds,
   }
 }
 
@@ -24,21 +33,25 @@ export const useTable = (table_id: string) => {
   // console.log(`useTable() =>`, table_id, table)
 
   const description = useMemo(() => (table ? feltToString(table.description) : '?'), [table])
-  const feeMin = useMemo(() => BigInt(table?.fee_min ?? 0), [table])
-  const tableType = useMemo(() => ((table?.table_type as unknown as constants.TableType) ?? null), [table])
-  const tableTypeDescription = useMemo(() => (table?.table_type ? {
-    [constants.TableType.Classic]: 'Classic',
-    [constants.TableType.Tournament]: 'Tournament',
-    [constants.TableType.IRLTournament]: 'IRL Tournamment',
-  }[table.table_type] : null), [table])
+  const rules = useMemo(() => (parseEnumVariant<constants.RulesType>(table?.rules) ?? null), [table])
+
+  const isPractice = useMemo(() => (table_id == constants.TABLES.PRACTICE), [table_id])
+  const isTutorial = useMemo(() => (table_id == constants.TABLES.TUTORIAL), [table_id])
+  const isSeason = useMemo(() => (table_id?.startsWith('Season') ?? false), [table_id])
+  const tableTypeDescription = useMemo(() => (
+    isPractice ? 'Practice'
+      : isTutorial ? 'Tutorial'
+        : isSeason ? 'Season'
+          : 'Unknown'
+  ), [isPractice, isTutorial, isSeason])
 
   return {
     tableId: table_id,
     description,
-    feeMin,
-    tableType: tableTypeDescription ?? '?',
-    tableIsOpen: table?.is_open ?? false,
-    isTournament: (tableType == constants.TableType.Tournament),
-    isIRLTournament: (tableType == constants.TableType.IRLTournament),
+    rules,
+    isPractice,
+    isTutorial,
+    isSeason,
+    tableTypeDescription,
   }
 }

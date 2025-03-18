@@ -1,104 +1,120 @@
 mod interfaces {
-    mod systems;
-    mod ierc20;
-    mod ierc721;
+    pub mod dns;
+    pub mod ierc20;
+    pub mod ierc721;
+    pub mod vrf;
 }
 
 mod systems {
-    mod admin;
-    mod bank;
-    mod game;
-    mod rng;
+    pub mod admin;
+    pub mod bank;
+    pub mod game;
+    pub mod rng;
+    pub mod rng_mock;
+    pub mod tutorial;
     #[cfg(feature:'vrf_mock')]
-    mod vrf_mock;
-    mod tokens {
-        mod duel_token;
-        mod duelist_token;
-        mod fame_coin;
+    pub mod vrf_mock;
+    pub mod tokens {
+        pub mod pack_token;
+        pub mod duelist_token;
+        pub mod duel_token;
+        pub mod fame_coin;
+        pub mod fools_coin;
         #[cfg(feature:'lords_mock')]
-        mod lords_mock;
+        pub mod lords_mock;
     }
-    mod components {
-        mod coin_component;
-        mod token_component;
-        mod token_bound;
-        mod erc721_hooks;
+    pub mod components {
+        pub mod coin_component;
+        pub mod token_component;
+        pub mod token_bound;
     }
 }
 
 mod libs {
-    mod game_loop;
-    mod pact;
-    mod seeder;
-    mod store;
+    pub mod game_loop;
+    pub mod seeder;
+    pub mod store;
+    pub mod tut;
 }
 
 mod models {
-    mod challenge;
-    mod config;
-    mod consumable;
-    mod duelist;
-    mod payment;
-    mod player;
-    mod table;
+    pub mod challenge;
+    pub mod config;
+    pub mod duelist;
+    pub mod pack;
+    pub mod pact;
+    pub mod player;
+    pub mod pool;
+    pub mod leaderboard;
+    pub mod season;
+    pub mod table;
 }
 
 mod types {
-    mod challenge_state;
-    mod constants;
-    mod duel_progress;
-    mod misc;
-    mod premise;
-    mod round_state;
-    mod shuffler;
-    mod typed_data;
-    mod cards {
-        mod cards;
-        mod hand;
-        mod paces;
-        mod tactics;
-        mod blades;
-        mod env;
+    pub mod boolean;
+    pub mod challenge_state;
+    pub mod constants;
+    pub mod duel_progress;
+    pub mod premise;
+    pub mod profile_type;
+    pub mod round_state;
+    pub mod rules;
+    pub mod shuffler;
+    pub mod timestamp;
+    pub mod typed_data;
+    pub mod trophies;
+    pub mod cards {
+        pub mod cards;
+        pub mod deck;
+        pub mod hand;
+        pub mod paces;
+        pub mod tactics;
+        pub mod blades;
+        pub mod env;
     }
 }
 
 mod utils {
-    mod arrays;
-    mod byte_arrays;
-    mod bitwise;
-    mod encoding;
-    mod hash;
-    mod math;
-    mod metadata;
-    mod misc;
-    mod short_string;
-    mod timestamp;
-    mod openzeppelin {
-        mod snip12;
+    pub mod arrays;
+    pub mod byte_arrays;
+    pub mod bitwise;
+    pub mod hash;
+    pub mod math;
+    pub mod misc;
+    pub mod short_string;
+    pub mod openzeppelin {
+        pub mod snip12;
     }
 }
 
 
 #[cfg(test)]
 mod tests {
-    mod test_admin;
-    mod test_cards;
-    mod test_env_cards;
-    mod test_challenge;
-    mod test_duel;
-    mod test_duelist;
-    mod test_utils;
-    mod test_rng;
+    pub mod test_admin;
+    pub mod test_bank;
+    pub mod test_cards;
+    pub mod test_challenge;
+    pub mod test_dns;
+    pub mod test_duel;
+    pub mod test_env_cards;
+    pub mod test_rng;
+    pub mod test_season;
+    pub mod test_tutorial;
+    pub mod test_utils;
     // utils
-    mod tester;
-    mod prefabs;
-    mod mock_rng;
-    mod utils;
+    pub mod tester;
+    pub mod prefabs;
+    pub mod utils;
+    // mocks
+    // pub mod mock_account;
     // tokens
     mod token {
-        mod test_duel_token;
-        mod test_duelist_token;
+        pub mod test_duel_token;
+        pub mod test_duelist_token;
+        pub mod test_pack_token;
+        pub mod test_fame_coin;
+        pub mod test_fools_coin;
         // mocks
-        mod mock_duelist;
+        pub mod mock_duelist;
     }
 }

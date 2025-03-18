@@ -5,17 +5,19 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
-import { constants, PistolsEntity } from '@underware_gg/pistols-sdk/pistols'
-import { arrayRemoveValue, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@underware_gg/pistols-sdk/utils'
+import { PistolsEntity } from '@underware/pistols-sdk/pistols'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { SortDirection } from './queryParamsStore'
+import { PlayerColumn } from './queryParamsStore'
 
 interface PlayerState {
-  address: string
+  player_address: string
   timestamp_registered: number
   username: string
   name: string
   isNew: boolean
   // off-chain messages
-  tutorial_progress: constants.TutorialProgress
   bookmarked_players: string[]
   bookmarked_tokens: {
     [address: string]: bigint[]
@@ -40,13 +42,12 @@ const createStore = () => {
   const _parseEvent = (e: PistolsEntity): PlayerState => {
     const event = e.models.pistols.Player
     return event ? {
-      address: bigintToHex(event.address),
-      timestamp_registered: bigintToNumber(event.timestamp_registered),
-      username: shortAddress(event.address),
-      name: shortAddress(event.address),
+      player_address: bigintToHex(event.player_address),
+      timestamp_registered: bigintToNumber(event.timestamps.registered),
+      username: shortAddress(event.player_address),
+      name: shortAddress(event.player_address),
       isNew: true,
       // off-chain messages
-      tutorial_progress: constants.TutorialProgress.None,
       bookmarked_players: [],
       bookmarked_tokens: {},
     } : undefined
@@ -58,11 +59,11 @@ const createStore = () => {
       // console.log("setEntities()[Player] =>", entities)
       set((state: State) => {
         state.players = entities.sort((a, b) => (
-          Number(b.models.pistols.Player?.timestamp_registered ?? 0) - Number(a.models.pistols.Player?.timestamp_registered ?? 0)
+          Number(b.models.pistols.Player?.timestamps.registered ?? 0) - Number(a.models.pistols.Player?.timestamps.registered ?? 0)
         )).reduce((acc, e) => {
           const player = _parseEvent(e)
           if (player) {
-            acc[player.address] = player
+            acc[player.player_address] = player
           }
           return acc
         }, {} as PlayersByAddress)
@@ -73,28 +74,21 @@ const createStore = () => {
       set((state: State) => {
         // only insert!
         const player = _parseEvent(e)
-        if (!state.players[player.address]) {
-          state.players[player.address] = player
+        if (!state.players[player.player_address]) {
+          state.players[player.player_address] = player
         }
       });
     },
     updateMessages: (entities: PistolsEntity[]) => {
-      console.log("updateMessages()[Player] =>", entities)
+      // console.log("updateMessages()[Player] =>", entities)
       set((state: State) => {
         entities.forEach((e) => {
-          const online = e.models.pistols.PPlayerOnline
+          const online = e.models.pistols.PlayerOnline
           if (online) {
             const address = bigintToHex(online.identity)
             state.players_online[address] = bigintToNumber(online.timestamp)
           }
-          const progress = e.models.pistols.PPlayerTutorialProgress
-          if (progress) {
-            const address = bigintToHex(progress.identity)
-            if (state.players[address]) {
-              state.players[address].tutorial_progress = progress.progress as unknown as constants.TutorialProgress
-            }
-          }
-          const bookmark = e.models.pistols.PPlayerBookmark
+          const bookmark = e.models.pistols.PlayerBookmark
           if (bookmark) {
             const address = bigintToHex(bookmark.identity)
             if (state.players[address]) {
@@ -160,9 +154,10 @@ export const usePlayer = (address: BigNumberish) => {
   const timestampRegistered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
   const bookmarkedPlayers = useMemo(() => (player?.bookmarked_players ?? []), [player])
   const bookmarkedTokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
-  const tutorialProgress = useMemo(() => (player?.tutorial_progress ?? constants.TutorialProgress.None), [player])
-  const hasCompletedTutorial = useMemo(() => (tutorialProgress === constants.TutorialProgress.FinishedFirstDuel), [tutorialProgress])
-  const isAvailable = useMemo(() => (hasCompletedTutorial), [hasCompletedTutorial])
+
+  // TODO... check if completed tutorial from Activity events
+  const hasFinishedTutorial = false
+  const isAvailable = false
 
   const { duelContractAddress } = useDuelTokenContract()
   const { duelistContractAddress } = useDuelistTokenContract()
@@ -181,8 +176,7 @@ export const usePlayer = (address: BigNumberish) => {
     bookmarkedTokens,
     bookmarkedDuels,
     bookmarkedDuelists,
-    tutorialProgress,
-    hasCompletedTutorial,
+    hasFinishedTutorial,
     isAvailable,
   }
 }
@@ -205,5 +199,82 @@ export const usePlayersOnline = () => {
   const playersOnline = useMemo(() => sortObjectByValue(players_online, (a, b) => (b - a)), [players_online])
   return {
     playersOnline,
+  }
+}
+
+//----------------------------------------
+// vanilla getter
+// (non-React)
+//
+export const getPlayerName = (address: BigNumberish): string  | undefined => {
+  const players = usePlayerStore.getState().players
+  return players[bigintToHex(address)]?.name
+}
+
+export const getPlayerOnlineStatus = (address: BigNumberish): boolean => {
+  const players_online = usePlayerStore((state) => state.players_online);
+  return players_online[bigintToHex(address)] !== undefined
+}
+
+
+export const useQueryPlayerIds = (
+  filterName: string,
+  filterOnline: boolean,
+  filterBookmarked: boolean,
+  sortColumn: PlayerColumn,
+  sortDirection: SortDirection,
+) => {
+  const { address } = useAccount()
+  const { bookmarkedDuelists } = usePlayer(address)
+  const entities = usePlayerStore((state) => state.players);
+  
+  const players_online = usePlayerStore((state) => state.players_online);
+
+  const playerIds = useMemo(() => {
+    let result = Object.values(entities);
+
+    result = result.filter((e) => (e.player_address !== bigintToHex(address)))
+
+    // filter by name
+    if (filterName) {
+      result = result.filter((e) => e.name.includes(filterName))
+    }
+
+    // filter by bookmarked duelists
+    if (filterBookmarked) {
+      result = result.filter((e) => (bookmarkedDuelists.find(p => bigintEquals(p, e.player_address)) !== undefined))
+    }
+
+    // filter by active
+    if (filterOnline) {
+      result = result.filter((e) => (players_online[e.player_address] !== undefined))
+    }
+
+    // sort...
+    result = result.sort((player_a, player_b) => {
+      // Sort by names, or both rookies
+      const _sortByName = (a: string, b: string) => {
+        return isAscending ? a.localeCompare(player_b.name) : b.localeCompare(player_a.name)
+      }
+      const isAscending = (sortDirection == SortDirection.Ascending)
+      if (sortColumn == PlayerColumn.Name) {
+        return _sortByName(player_a.name, player_b.name)
+      }
+
+      // Sort by values
+      const _sortTotals = (a: number, b: number) => {
+        return (!isAscending ? (b - a) : (a - b))
+        // return (!isAscending ? (b - a) : (a && !b) ? -1 : (!a && b) ? 1 : (a - b))
+      }
+      if (sortColumn == PlayerColumn.Timestamp) return _sortTotals(player_a.timestamp_registered, player_b.timestamp_registered)
+      return 0
+    })
+
+    // return ids only
+    return result.map((e) => e.player_address)
+  }, [entities, filterName, filterOnline, sortColumn, sortDirection, filterBookmarked, bookmarkedDuelists, address, players_online])
+
+  return {
+    playerIds,
   }
 }

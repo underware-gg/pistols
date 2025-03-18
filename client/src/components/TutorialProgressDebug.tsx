@@ -1,37 +1,35 @@
 import React from 'react'
 import { ButtonGroup, Button } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
-import { useTutorialProgressSignedMessage } from '/src/hooks/useSignedMessages'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { usePlayer } from '/src/stores/playerStore'
+import { SettingsActions, useSettings } from '/src/hooks/SettingsContext'
 
 
 export function TutorialProgressDebug() {
   return (
     <ButtonGroup className='AbsoluteBottom' style={{left: '200px'}}>
-      <TutorialProgressButton progress={constants.TutorialProgress.None} label='Tutorial: None' />
-      <TutorialProgressButton progress={constants.TutorialProgress.FinishedFirst} label='First Level' />
-      <TutorialProgressButton progress={constants.TutorialProgress.FinishedSecond} label='Second Level' />
-      <TutorialProgressButton progress={constants.TutorialProgress.FinishedFirstDuel} label='First Duel' />
+      <TutorialProgressButton level={0} label='Tutorial: Not Started' />
+      <TutorialProgressButton level={1} label='Level 1' />
+      <TutorialProgressButton level={2} label='Level 2' />
+      <TutorialProgressButton level={3} label='Level 3' />
     </ButtonGroup>
   )
 }
 
 function TutorialProgressButton({
-  progress,
+  level,
   label,
 }: {
-  progress: constants.TutorialProgress
+  level: number
   label: string
 }) {
-  const { address } = useAccount()
-  const { tutorialProgress } = usePlayer(address)
-  const { publish, isPublishing } = useTutorialProgressSignedMessage(progress)
+  const { completedTutorialLevel, dispatchSetting } = useSettings()
+  const _setLevel = () => {
+    dispatchSetting(SettingsActions.TUTORIAL_LEVEL, level)
+  }
   return (
     <Button toggle
-      active={progress == tutorialProgress}
-      disabled={isPublishing}
-      onClick={publish}
+      active={level == completedTutorialLevel}
+      disabled={false}
+      onClick={_setLevel}
     >
       {label}
     </Button>

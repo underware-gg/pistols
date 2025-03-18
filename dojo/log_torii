@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+if [ $# -ge 1 ]; then
+  export SERVICE_NAME=$1
+else
+  echo "Usage: $0 <service_name>"
+  exit 1
+fi
+
+slot deployments logs $SERVICE_NAME torii -l 10
+slot deployments logs $SERVICE_NAME torii -f

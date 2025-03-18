@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react'
 import { Grid, Progress } from 'semantic-ui-react'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -13,48 +14,39 @@ export default function ProgressBar({
   cold = false,
   neutral = false,
   percent = null,
-  includedExtraPercent = null,
-  includedInnerPercent = null,
   value = null,
   total = null,
+  width = null,
+  height = null,
+  hideValue = false,
 }) {
+  const { aspectWidth } = useGameAspect()
+
   const _disabled = (disabled || (value === null && !percent))
   const _className = `NoMargin ${className}`
+
   return (
-    <Grid verticalAlign='middle' className={`ChancesBar ${className}`}>
-      <Row style={{ height: '25px' }}>
-        <Col width={4} textAlign='right' className='TitleCase'>
-          {label}
-        </Col>
-        <Col width={12} textAlign='left' className='Relative'>
-          {_disabled &&
-            <Progress
-              disabled={true}
-              value={null}
-              className={_className}
-              color='grey'
-            />
-          }
-          {!_disabled &&
-            <>
-              <Progress
-                progress={value !== null ? 'value' : true}
-                percent={percent}
-                value={value}
-                total={total}
-                className={_className}
-                warning={warning || Boolean(includedExtraPercent)}
-                error={negative}
-                color={neutral ? 'grey' : cold ? 'teal' : null}
-              />
-              {Boolean(includedExtraPercent) &&
-                <div className='LethalBar BgImportant' style={{ width: `${percent - includedExtraPercent}%` }} />
-              }
-              {Boolean(includedInnerPercent) &&
-                <div className='LethalBar' style={{ width: `${includedInnerPercent}%` }} />
-              }
-            </>
-          }
+    <Grid verticalAlign='middle' style={{ width: aspectWidth(width ?? 10), height: aspectWidth(height ?? 2), margin: 0 }}>
+      {label &&
+        <Row style={{ width: '100%' }}>
+          <Col textAlign='left' className='TitleCase NoMargin' style={{ height: '100%' }}>
+            {label}
+          </Col>
+        </Row>
+      }
+      <Row style={{ width: '100%', height: '100%' }}>
+        <Col textAlign='left' className='Relative' style={{ height: '100%' }}>
+          <Progress
+            disabled={_disabled}
+            value={value}
+            progress={!_disabled && value !== null && !hideValue ? 'value' : false}
+            total={total}
+            className={_className + (hideValue ? ' hide-value' : '')}
+            color={_disabled ? 'grey' : (neutral ? 'grey' : cold ? 'teal' : null)}
+            warning={!_disabled && warning}
+            error={!_disabled && negative}
+            style={{ width: '100%', height: '100%', margin: 0, border: '1px solid rgba(0, 0, 0, 0.2)', boxShadow: '1px 1px 2px 0px rgba(0, 0, 0, 0.8)' }}
+          />
         </Col>
       </Row>
     </Grid>

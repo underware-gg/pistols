@@ -1,13 +1,16 @@
-import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState, useRef } from 'react'
-import { useNavigate, useLocation, useParams } from 'react-router'
+import React, { ReactNode, createContext, useReducer, useContext, useMemo, useEffect, useCallback, useState } from 'react'
+import { useNavigate, useSearchParams, useLocation, useParams } from 'react-router'
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
-import { bigintToHex, bigintToNumber, poseidon } from '@underware_gg/pistols-sdk/utils'
-import { useSettings } from '/src/hooks/SettingsContext'
-import { constants } from '@underware_gg/pistols-sdk/pistols'
-import { CommitMoveMessage } from '/src/utils/salt'
-import { tutorialScenes } from '/src/data/tutorialConstants'
+import { bigintToHex, bigintToDecimal, isPositiveBigint, bigintEquals } from '@underware/pistols-sdk/utils'
+import { poseidon } from '@underware/pistols-sdk/utils/starknet'
+import { CommitMoveMessage } from '@underware/pistols-sdk/pistols'
+import { DuelTutorialLevel, tutorialScenes } from '/src/data/tutorialConstants'
 import { SceneName } from '/src/data/assets'
+import { useTableId } from '../stores/configStore'
+import { SCENE_CHANGE_ANIMATION_DURATION } from '../three/game'
+
+import { emitter } from '../three/game'
 
 //
 // React + Typescript + Context
@@ -27,16 +30,26 @@ type StoredMoves = {
 
 export const initialState = {
   walletSig: { address: 0n, sig: 0n },
+  // opening modals
   selectedDuelId: 0n,
   selectedDuelistId: 0n,
   selectedPlayerAddress: 0n,
-  challengingId: 0n,
+  
+  // new challenge modal
+  challengingAddress: 0n,
+  challengingDuelistId: 0n,
+
+  currentDuel: 0n,
   currentScene: undefined as SceneName,
-  lastScene: undefined as SceneName,
+  tutorialLevel: undefined as DuelTutorialLevel,
+  sceneStack: [] as SceneName[],
   moves: {} as StoredMoves,
   // injected
   connectOpener: null as Opener,
-  duelistEditOpener: null as Opener,
+  shopOpener: null as Opener,
+  tutorialOpener: null as Opener,
+  bookOpener: null as Opener,
+  duelistSelectOpener: null as Opener,
   tableOpener: null as Opener,
   walletFinderOpener: null as Opener,
 }
@@ -44,11 +57,16 @@ export const initialState = {
 const PistolsActions = {
   SET_SIG: 'SET_SIG',
   SET_SCENE: 'SET_SCENE',
+  POP_SCENE: 'POP_SCENE',
+  SET_DUEL: 'SET_DUEL',
   SELECT_DUEL: 'SELECT_DUEL',
   SELECT_DUELIST_ID: 'SELECT_DUELIST_ID',
   SELECT_PLAYER_ADDRESS: 'SELECT_PLAYER_ADDRESS',
-  SELECT_CHALLENGING_ID: 'SELECT_CHALLENGING_ID',
+  SELECT_CHALLENGING_ADDRESS: 'SELECT_CHALLENGING_ADDRESS',
+  SELECT_CHALLENGING_DUELIST_ID: 'SELECT_CHALLENGING_DUELIST_ID',
   SET_MOVES: 'SET_MOVES',
+  SET_TUTORIAL_LEVEL: 'SET_TUTORIAL_LEVEL',
+  RESET_VALUES: 'RESET_VALUES',
 }
 
 
@@ -60,13 +78,16 @@ type PistolsContextStateType = typeof initialState
 type ActionType =
   | { type: 'SET_SIG', payload: bigint[] }
   | { type: 'SET_SCENE', payload: SceneName }
+  | { type: 'POP_SCENE', payload: null }
+  | { type: 'SET_DUEL', payload: bigint }
   | { type: 'SELECT_DUEL', payload: bigint }
   | { type: 'SELECT_DUELIST_ID', payload: bigint }
   | { type: 'SELECT_PLAYER_ADDRESS', payload: bigint }
-  | { type: 'SELECT_CHALLENGING_ID', payload: bigint }
+  | { type: 'SELECT_CHALLENGING_ADDRESS', payload: bigint }
+  | { type: 'SELECT_CHALLENGING_DUELIST_ID', payload: bigint }
   | { type: 'SET_MOVES', payload: StoredMoves }
-
-
+  | { type: 'RESET_VALUES', payload: null }
+  | { type: 'SET_TUTORIAL_LEVEL', payload: DuelTutorialLevel }
 
 //--------------------------------
 // Context
@@ -89,13 +110,25 @@ const PistolsProvider = ({
   children,
 }: PistolsProviderProps) => {
   const connectOpener = useOpener()
-  const duelistEditOpener = useOpener()
+  const shopOpener = useOpener()
+  const tutorialOpener = useOpener()
+  const bookOpener = useOpener()
+  const duelistSelectOpener = useOpener()
   const tableOpener = useOpener()
   const walletFinderOpener = useOpener()
+
+  const [hasSearchParams, setHasSearchParams] = useState(false)
 
   const [state, dispatch] = useReducer((state: PistolsContextStateType, action: ActionType) => {
     let newState = { ...state }
     switch (action.type) {
+      case PistolsActions.RESET_VALUES: {
+        newState.selectedDuelId = 0n
+        newState.selectedDuelistId = 0n
+        newState.selectedPlayerAddress = 0n
+        newState.challengingAddress = 0n
+        break
+      }
       case PistolsActions.SET_SIG: {
         newState.walletSig = {
           address: action.payload[0] as bigint,
@@ -104,41 +137,81 @@ const PistolsProvider = ({
         break
       }
       case PistolsActions.SET_SCENE: {
-        newState.lastScene = state.currentScene
-        newState.currentScene = action.payload as SceneName
+        const newScene = action.payload as SceneName
+        
+        // For Tavern and Gate, reset stack to just that scene
+        if (newScene === SceneName.Tavern || newScene === SceneName.Gate) {
+          newState.sceneStack = [newScene]
+        } else {
+          // Check if scene already exists in stack
+          const existingIndex = state.sceneStack.indexOf(newScene)
+          if (existingIndex !== -1) {
+            // If exists, remove everything after it
+            newState.sceneStack = state.sceneStack.slice(0, existingIndex + 1)
+          } else {
+            // Otherwise add new scene to stack
+            newState.sceneStack = [...state.sceneStack, newScene]
+          }
+        }
+        newState.currentScene = newScene
+        break
+      }
+      case PistolsActions.POP_SCENE: {
+        if (state.sceneStack.length > 1) {
+          newState.sceneStack = state.sceneStack.slice(0, -1)
+          newState.currentScene = newState.sceneStack[newState.sceneStack.length - 1]
+        }
+        break
+      }
+      case PistolsActions.SET_DUEL: {
+        newState.currentDuel = action.payload as bigint
         break
       }
       case PistolsActions.SELECT_DUEL: {
         newState.selectedDuelId = action.payload as bigint
         newState.selectedDuelistId = 0n
         newState.selectedPlayerAddress = 0n
-        newState.challengingId = 0n
+        newState.challengingAddress = 0n
+        newState.challengingDuelistId = 0n
         break
       }
       case PistolsActions.SELECT_DUELIST_ID: {
         newState.selectedDuelId = 0n
         newState.selectedDuelistId = action.payload as bigint
         newState.selectedPlayerAddress = 0n
-        newState.challengingId = 0n
+        newState.challengingAddress = 0n
+        newState.challengingDuelistId = 0n
         break
       }
       case PistolsActions.SELECT_PLAYER_ADDRESS: {
         newState.selectedDuelId = 0n
         newState.selectedDuelistId = 0n
         newState.selectedPlayerAddress = action.payload as bigint
-        newState.challengingId = 0n
+        newState.challengingAddress = 0n
+        newState.challengingDuelistId = 0n
         break
       }
-      case PistolsActions.SELECT_CHALLENGING_ID: {
+      case PistolsActions.SELECT_CHALLENGING_ADDRESS: {
         newState.selectedDuelId = 0n
         newState.selectedDuelistId = 0n
         newState.selectedPlayerAddress = 0n
-        newState.challengingId = action.payload as bigint
+        newState.challengingAddress = action.payload as bigint
+        break
+      }
+      case PistolsActions.SELECT_CHALLENGING_DUELIST_ID: {
+        newState.selectedDuelId = 0n
+        newState.selectedDuelistId = 0n
+        newState.selectedPlayerAddress = 0n
+        newState.challengingDuelistId = action.payload as bigint
         break
       }
       case PistolsActions.SET_MOVES: {
         const newMove = action.payload as StoredMoves
         newState.moves = { ...state.moves, ...newMove }
+        break
+      }
+      case PistolsActions.SET_TUTORIAL_LEVEL: {
+        newState.tutorialLevel = action.payload as DuelTutorialLevel
         break
       }
       default:
@@ -148,11 +221,44 @@ const PistolsProvider = ({
     return newState
   }, initialState)
 
+  emitter.on('searchParams', (data) => {
+    setHasSearchParams(data)
+  })
+
+  useEffect(() => {
+    const hasModalOpen = connectOpener.isOpen || 
+                        shopOpener.isOpen || 
+                        tutorialOpener.isOpen || 
+                        bookOpener.isOpen || 
+                        duelistSelectOpener.isOpen || 
+                        tableOpener.isOpen || 
+                        walletFinderOpener.isOpen ||
+                        hasSearchParams ||
+                        (state.challengingAddress && state.challengingDuelistId)
+
+    emitter.emit('hasModalOpen', hasModalOpen)
+  }, [
+    connectOpener.isOpen,
+    shopOpener.isOpen, 
+    tutorialOpener.isOpen,
+    bookOpener.isOpen,
+    duelistSelectOpener.isOpen,
+    tableOpener.isOpen,
+    walletFinderOpener.isOpen,
+    hasSearchParams,
+    state.challengingAddress,
+    state.challengingDuelistId
+  ])
+
+
   return (
     <PistolsContext.Provider value={{ dispatch, state: {
       ...state,
       connectOpener,
-      duelistEditOpener,
+      shopOpener,
+      tutorialOpener,
+      bookOpener,
+      duelistSelectOpener,
       tableOpener,
       walletFinderOpener,
     } }}>
@@ -174,37 +280,71 @@ const makeStoredMovesKey = (message: CommitMoveMessage): string => {
 
 export const usePistolsContext = () => {
   const { state, dispatch } = useContext(PistolsContext)
-  const dispatchSetSig = (address: BigNumberish | null, sig: BigNumberish | null) => {
+
+  const dispatchSetSig = useCallback((address: BigNumberish | null, sig: BigNumberish | null) => {
     dispatch({
       type: PistolsActions.SET_SIG,
       payload: [BigInt(address ?? 0n), BigInt(sig ?? 0n)]
     })
-  }
-  const dispatchSelectDuelistId = (newId: BigNumberish) => {
+  }, [dispatch])
+
+  const dispatchSetDuel = useCallback((newId: BigNumberish) => {
     dispatch({
-      type: PistolsActions.SELECT_DUELIST_ID,
+      type: PistolsActions.SET_DUEL,
       payload: BigInt(newId),
     })
-  }
-  const dispatchSelectPlayerAddress = (newId: BigNumberish) => {
+  }, [dispatch])
+
+  const dispatchSelectDuelistId = useCallback((newId: BigNumberish, playerAddress?: BigNumberish) => {
+    if (!isPositiveBigint(newId) && isPositiveBigint(playerAddress)) {
+      dispatch({
+        type: PistolsActions.SELECT_PLAYER_ADDRESS,
+        payload: BigInt(playerAddress),
+      })
+    } else {
+      dispatch({
+        type: PistolsActions.SELECT_DUELIST_ID,
+        payload: BigInt(newId),
+      })
+    }
+  }, [dispatch])
+
+  const dispatchSelectPlayerAddress = useCallback((newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_PLAYER_ADDRESS,
       payload: BigInt(newId),
     })
-  }
-  const dispatchChallengingDuelistId = (newId: BigNumberish) => {
+  }, [dispatch])
+
+  const dispatchChallengingPlayerAddress = useCallback((address: BigNumberish) => {
     dispatch({
-      type: PistolsActions.SELECT_CHALLENGING_ID,
-      payload: BigInt(newId),
+      type: PistolsActions.SELECT_CHALLENGING_ADDRESS,
+      payload: BigInt(address),
     })
-  }
-  const dispatchSelectDuel = (newId: BigNumberish) => {
+  }, [dispatch])
+
+  const dispatchChallengingDuelistId = useCallback((duelistId: BigNumberish) => {
+    dispatch({
+      type: PistolsActions.SELECT_CHALLENGING_DUELIST_ID,
+      payload: BigInt(duelistId),
+    })
+  }, [dispatch])
+
+  const dispatchSelectDuel = useCallback((newId: BigNumberish) => {
     dispatch({
       type: PistolsActions.SELECT_DUEL,
       payload: BigInt(newId),
     })
-  }
-  const dispatchSetMoves = (message: CommitMoveMessage, moves: number[], salt: bigint ) => {
+  }, [dispatch])
+
+  const dispatchSetTutorialLevel = useCallback((newLevel: DuelTutorialLevel) => {
+    dispatch({
+      type: PistolsActions.SET_TUTORIAL_LEVEL,
+      payload: newLevel,
+    })
+  }, [dispatch])
+
+  const dispatchSetMoves = useCallback((message: CommitMoveMessage, moves: number[], salt: bigint ) => {
     const key = makeStoredMovesKey(message)
     if (!key) {
       console.warn(`dispatchSetMoves: Invalid message [${message}] [${salt}]`)
@@ -214,26 +354,48 @@ export const usePistolsContext = () => {
       type: PistolsActions.SET_MOVES,
       payload: { [key]: { moves, salt } },
     })
-  }
-  const __dispatchSetScene = (newScene: SceneName) => {
+  }, [dispatch])
+
+  const __dispatchSetScene = useCallback((newScene: SceneName) => {
     dispatch({
       type: PistolsActions.SET_SCENE,
       payload: newScene,
     })
-  }
+  }, [dispatch])
+
+  const __dispatchSceneBack = useCallback(() => {
+    dispatch({
+      type: PistolsActions.POP_SCENE,
+      payload: null,
+    })
+  }, [dispatch])
+
+  const __dispatchResetValues = useCallback(() => {
+    dispatch({
+      type: PistolsActions.RESET_VALUES,
+      payload: null,
+    })
+  }, [dispatch])
+
   return {
     ...state,
     hasSigned: (state.walletSig.sig > 0n),
+    lastScene: state.sceneStack[state.sceneStack.length - 2],
     // PistolsActions,
     dispatch,
     dispatchSetSig,
+    dispatchSetDuel,
     dispatchSelectDuel,
     dispatchSelectDuelistId,
     dispatchSelectPlayerAddress,
+    dispatchChallengingPlayerAddress,
     dispatchChallengingDuelistId,
     dispatchSetMoves,
     makeStoredMovesKey,
     __dispatchSetScene, // used internally only
+    __dispatchSceneBack, // used internally only
+    __dispatchResetValues,  // used internally only
+    dispatchSetTutorialLevel,
   }
 }
 
@@ -242,7 +404,7 @@ export const usePistolsContext = () => {
 
 
 //-------------------------------------
-// Scenes
+// Scene management
 //
 
 type SceneRoute = {
@@ -253,61 +415,113 @@ type SceneRoute = {
   // makeRoute: (state: PistolsContextStateType) => string
 }
 
+// !!! all routes need to be configured in main.tsx
 export const sceneRoutes: Record<SceneName, SceneRoute> = {
-  // !!! all routes need to be redirected in next.config.js
-  [SceneName.Door]: { baseUrl: '/door' },
-  // standalone scenes
-  [SceneName.Profile]: { baseUrl: '/profile', title: 'Pistols - Profile' },
+  // scenes with tableId (optional)
+  [SceneName.Door]: { baseUrl: '/door', hasTableId: true },
+  [SceneName.Tavern]: { baseUrl: '/tavern', hasTableId: true },
+  [SceneName.Profile]: { baseUrl: '/profile', hasTableId: true, title: 'Pistols - Profile' },
+  [SceneName.Duelists]: { baseUrl: '/balcony', hasTableId: true, title: 'Pistols - Duelists' },
+  [SceneName.DuelsBoard]: { baseUrl: '/duels', hasTableId: true, title: 'Pistols - Your Duels' },
+  [SceneName.Leaderboards]: { baseUrl: '/leaderboards', hasTableId: true, title: 'Pistols - Leaderboards' },
+  [SceneName.Graveyard]: { baseUrl: '/graveyard', hasTableId: true, title: 'Pistols - Past Duels' },
+  [SceneName.Tournament]: { baseUrl: '/__tournament__', hasTableId: true, title: 'Pistols - Tournament' },
+  [SceneName.IRLTournament]: { baseUrl: '/__irltournament__', hasTableId: true, title: 'Pistols - IRL Tournament' },
   // scenes with duelId
-  [SceneName.Duel]: { baseUrl: '/duel/', hasDuelId: true, title: 'Pistols - Duel!' },
-  // scenes with tableId
-  [SceneName.Tavern]: { baseUrl: '/tavern/', hasTableId: true },
-  [SceneName.Duelists]: { baseUrl: '/balcony/', hasTableId: true, title: 'Pistols - Duelists' },
-  [SceneName.Duels]: { baseUrl: '/duels/', hasTableId: true, title: 'Pistols - Your Duels' },
-  [SceneName.Graveyard]: { baseUrl: '/graveyard/', hasTableId: true, title: 'Pistols - Past Duels' },
-  [SceneName.Tournament]: { baseUrl: '/__tournament__/', hasTableId: true, title: 'Pistols - Tournament' },
-  [SceneName.IRLTournament]: { baseUrl: '/__irltournament__/', hasTableId: true, title: 'Pistols - IRL Tournament' },
+  [SceneName.Duel]: { baseUrl: '/duel', hasDuelId: true, title: 'Pistols - Duel!' },
   // tutorial scenes
   [SceneName.Tutorial]: { baseUrl: '/tutorial/entry', title: 'Pistols - Tutorial' },
   [SceneName.TutorialScene2]: { baseUrl: '/tutorial/conflict', title: 'Pistols - Tutorial' },
   [SceneName.TutorialScene3]: { baseUrl: '/tutorial/barkeep', title: 'Pistols - Tutorial' },
   [SceneName.TutorialScene4]: { baseUrl: '/tutorial/demon', title: 'Pistols - Tutorial' },
-  [SceneName.TutorialScene5]: { baseUrl: '/tutorial/resurection', title: 'Pistols - Tutorial' },
+  [SceneName.TutorialScene5]: { baseUrl: '/tutorial/resurrection', title: 'Pistols - Tutorial' },
+  [SceneName.TutorialDuel]: { baseUrl: '/tutorial/duel', hasDuelId: true, title: 'Pistols - Tutorial' },
   // '/' must be the last...
   [SceneName.Gate]: { baseUrl: '/' },
 }
 
+
+//
+// Scene <> URL sync
+//
+// A: Game loads from URL > read URL PATH and PARAMS to game context
+//    > usePistolsSceneFromRoute()
+//    > useSyncRouterParams()
+// B: Game SCENE changes > update URL PATH
+//    > usePistolsScene()
+// C: Game CONTEXT changes (selected duel, etc.) > update URL params
+//    > useSyncRouterParams()
+// D: Browser BACK button > same as A
+//
+type SceneSlug = {
+  tableId?: string,
+  duelId?: BigNumberish,
+}
 export const usePistolsScene = () => {
-  const { currentScene, lastScene, selectedDuelId, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
-  const { tableId, dispatchTableId } = useSettings()
+  const { currentScene, sceneStack, selectedDuelId, currentDuel, dispatchSetDuel, __dispatchSetScene, __dispatchSceneBack, __dispatchResetValues } = usePistolsContext()
+  const { tableId, isSeason, isTutorial } = useTableId()
 
   const location = useLocation()
   const navigate = useNavigate()
 
   // setting a scene will only the url
-  const dispatchSetScene = useCallback((newScene: SceneName, slugs?: string[]) => {
+  const dispatchSetScene = useCallback((newScene: SceneName, setSlug: SceneSlug = {}) => {
     let route = sceneRoutes[newScene]
     let url = route.baseUrl
     let slug = ''
     if (sceneRoutes[newScene].hasTableId) {
-      slug = `${slugs?.[0] || tableId || constants.TABLES.LORDS}`
-      dispatchTableId(slug)
+      slug = setSlug.tableId ?? (tableId && !isSeason ? tableId : '')
     } else if (sceneRoutes[newScene].hasDuelId) {
-      slug = `${bigintToNumber(slugs?.[0] || selectedDuelId)}`
-      dispatchSelectDuel(slug)
+      slug = `${bigintToDecimal(setSlug.duelId || currentDuel)}`
+      if (!bigintEquals(slug, currentDuel)) {
+        dispatchSetDuel(slug)
+      }
     }
-    url += slug
+    url += slug ? `/${slug}` : ''
     if (url != location.pathname) {
+      console.log(`navigate >>>>> [${location.pathname}] > [${url}]`)
       navigate(url)
     }
+    setTimeout(() => {
+      __dispatchResetValues()
+    }, SCENE_CHANGE_ANIMATION_DURATION)
     __dispatchSetScene(newScene)
-  }, [location.pathname, navigate])
+  }, [location.pathname, navigate, selectedDuelId, tableId, isSeason])
 
-  const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at 10 Blocks'), [currentScene])
+  const dispatchSceneBack = useCallback(() => {
+    if (sceneStack.length > 1) {
+      const prevScene = sceneStack[sceneStack.length - 2]
+      let route = sceneRoutes[prevScene]
+      let url = route.baseUrl
+      let slug = ''
+      if (route.hasTableId) {
+        slug = tableId && !isSeason ? tableId : ''
+      } else if (route.hasDuelId) {
+        slug = `${bigintToDecimal(currentDuel)}`
+      }
+      url += slug ? `/${slug}` : ''
+      if (url != location.pathname) {
+        console.log(`navigate back >>>>> [${location.pathname}] > [${url}]`)
+        navigate(url)
+      }
+      __dispatchSceneBack()
+    } else {
+      // If no previous scene, determine the appropriate base scene
+      const baseScene = (currentScene === SceneName.Door || tutorialScenes.includes(currentScene as typeof tutorialScenes[number])) 
+        ? SceneName.Gate 
+        : SceneName.Tavern;
+      
+      dispatchSetScene(baseScene);
+    }
+  }, [sceneStack, location.pathname, navigate, tableId, isSeason, currentDuel, currentScene])
+
+  const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at Dawn'), [currentScene])
 
   return {
     currentScene,
-    lastScene,
+    sceneStack,
+    lastScene: sceneStack[sceneStack.length - 2],
+    wasLastSceneTutorial: tutorialScenes.includes(sceneStack[sceneStack.length - 2] as typeof tutorialScenes[number]),
     sceneTitle,
     // helpers
     atGate: (currentScene == SceneName.Gate),
@@ -315,10 +529,10 @@ export const usePistolsScene = () => {
     atTavern: (currentScene == SceneName.Tavern),
     atProfile: (currentScene == SceneName.Profile),
     atDuelists: (currentScene == SceneName.Duelists),
-    atDuels: (currentScene == SceneName.Duels),
+    atDuelsBoard: (currentScene == SceneName.DuelsBoard),
+    atLeaderboards: (currentScene == SceneName.Leaderboards),
     atGraveyard: (currentScene == SceneName.Graveyard),
-    atDuel: (currentScene == SceneName.Duel),
-    fromGate: (lastScene == SceneName.Gate),
+    atDuel: (currentScene == SceneName.Duel || currentScene == SceneName.TutorialDuel),
     atTutorial: tutorialScenes.includes(currentScene as typeof tutorialScenes[number]),
     atTutorialScene1: (currentScene == SceneName.Tutorial),
     atTutorialScene2: (currentScene == SceneName.TutorialScene2),
@@ -327,17 +541,20 @@ export const usePistolsScene = () => {
     atTutorialScene5: (currentScene == SceneName.TutorialScene5),
     // PistolsActions,
     dispatchSetScene,
+    dispatchSceneBack,
   }
 }
 
 // use only once!!!!
 export const usePistolsSceneFromRoute = () => {
-  const { currentScene, dispatchSelectDuel, __dispatchSetScene } = usePistolsContext()
-  const { dispatchTableId } = useSettings()
+  const { dispatchSetDuel, __dispatchSetScene, currentScene } = usePistolsContext()
 
-  const location = useLocation()
+  // URL slugs (/path/slug)
+  // https://api.reactrouter.com/v7/functions/react_router.useParams.html
   const params = useParams()
-  const navigate = useNavigate()
+  
+  const location = useLocation()
+  // useEffect(() => console.log(`location >>>>>`, location.key, location), [location])
 
   //------------------------------
   // Detect scene from route
@@ -349,20 +566,67 @@ export const usePistolsSceneFromRoute = () => {
       const newScene = Object.keys(sceneRoutes).find(key => {
         return location.pathname.startsWith(sceneRoutes[key].baseUrl)
       }) as SceneName
-      // console.log(`ROUTE [${currentRoute}] >> SCENE [${newScene}]`, router)
-      if (newScene) {
+      if (newScene && newScene != currentScene) {
         const route = sceneRoutes[newScene]
-        __dispatchSetScene(newScene)
-        if (route.hasTableId) {
-          dispatchTableId(params['table_id'] || constants.TABLES.LORDS)
-        } else if (route.hasDuelId) {
-          dispatchSelectDuel(params['duel_id'] || '0x0')
+        if (route.baseUrl != currentScene) {
+          __dispatchSetScene(newScene)
+          if (route.hasDuelId) {
+            dispatchSetDuel(params['duel_id'] || '0x0')
+          }
         }
-      } else {
-        navigate('/')
       }
     }
   }, [location.pathname, params])
+
+  return {}
+}
+
+// use only once!!!!
+export const useSyncRouterParams = () => {
+  // URL params (/path?param=value)
+  // https://api.reactrouter.com/v7/functions/react_router.useSearchParams.html
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // Log if there are any search params
+  useEffect(() => {
+    emitter.emit('searchParams', searchParams.toString().length > 0)
+  }, [searchParams])
+
+  //--------------------------------------------
+  // URL Params > Game Context
+  // cases: A, D
+  const { dispatchSelectDuel, dispatchSelectDuelistId, dispatchSelectPlayerAddress } = usePistolsContext()
+  useEffect(() => {
+    if (searchParams.get('duel')) {
+      dispatchSelectDuel(searchParams.get('duel'))
+    } else if (searchParams.get('duelist')) {
+      dispatchSelectDuelistId(searchParams.get('duelist'))
+    } else if (searchParams.get('player')) {
+      dispatchSelectPlayerAddress(searchParams.get('player'))
+    }
+  }, [searchParams])
+
+  //--------------------------------------------
+  // Game Context > URL params
+  // (for shareable urls, back button support)
+  // cases: C
+  //
+  const { currentScene, selectedDuelId, selectedDuelistId, selectedPlayerAddress } = usePistolsContext()
+  useEffect(() => {
+    setSearchParams((prev) => {
+      // const params = new URLSearchParams(prev)
+      const params = new URLSearchParams()
+      if (selectedDuelId) {
+        params.set('duel', bigintToDecimal(selectedDuelId))
+      } else if (selectedDuelistId) {
+        params.set('duelist', bigintToDecimal(selectedDuelistId))
+      } else if (selectedPlayerAddress) {
+        params.set('player', bigintToHex(selectedPlayerAddress))
+      }
+      // console.log(`params >>>>>`, params)
+      return params
+    })
+  }, [selectedDuelId, selectedDuelistId, selectedPlayerAddress])
 
   return {}
 }

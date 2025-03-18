@@ -1,14 +1,13 @@
-use core::byte_array::ByteArrayTrait;
 use pistols::utils::bitwise::{BitwiseU256};
 
-trait ShortStringTrait {
+pub trait ShortStringTrait {
     fn strlen(self: felt252) -> usize;
-    fn as_string(self: felt252) -> ByteArray;
+    fn to_string(self: felt252) -> ByteArray;
     fn concat(self: felt252, value: felt252) -> felt252;
     fn join(self: felt252, value: felt252) -> felt252;
 }
 
-impl ShortString of ShortStringTrait {
+pub impl ShortString of ShortStringTrait {
     fn strlen(self: felt252) -> usize {
         let mut result: usize = 0;
         let mut v: u256 = self.into();
@@ -19,7 +18,7 @@ impl ShortString of ShortStringTrait {
         (result)
     }
 
-    fn as_string(self: felt252) -> ByteArray {
+    fn to_string(self: felt252) -> ByteArray {
         // alternative: core::to_byte_array::FormatAsByteArray
         let mut result: ByteArray = "";
         result.append_word(self, self.strlen());
@@ -43,45 +42,44 @@ impl ShortString of ShortStringTrait {
 // Unit  tests
 //
 #[cfg(test)]
-mod tests {
-    use debug::PrintTrait;
+mod unit {
     use super::{ShortString};
     
     #[test]
     fn test_concat() {
-        assert(ShortString::concat('ABC', '123') == 'ABC123', 'ABC123');
-        assert(ShortString::concat('Hey ', 'World') == 'Hey World', 'Hey 1');
-        assert(ShortString::concat('Hey', ' World') == 'Hey World', 'Hey 2');
-        assert(ShortString::concat(' Hey', 'World ') == ' HeyWorld ', 'Hey 3');
-        assert(ShortString::concat(' Hey ', ' World ') == ' Hey  World ', 'Hey 4');
-        assert(ShortString::concat('123456789012345678901234567890', '1') == '1234567890123456789012345678901', '1234567890123456789012345678901');
-        assert(ShortString::concat('1', '123456789012345678901234567890') == '1123456789012345678901234567890', '1123456789012345678901234567890');
-        assert(ShortString::join('Hey', 'World') == 'Hey_World', 'Hey_World');
+        assert_eq!(ShortString::concat('ABC', '123'), 'ABC123', "ABC123");
+        assert_eq!(ShortString::concat('Hey ', 'World'), 'Hey World', "Hey 1");
+        assert_eq!(ShortString::concat('Hey', ' World'), 'Hey World', "Hey 2");
+        assert_eq!(ShortString::concat(' Hey', 'World '), ' HeyWorld ', "Hey 3");
+        assert_eq!(ShortString::concat(' Hey ', ' World '), ' Hey  World ', "Hey 4");
+        assert_eq!(ShortString::concat('123456789012345678901234567890', '1'), '1234567890123456789012345678901', "1234567890123456789012345678901");
+        assert_eq!(ShortString::concat('1', '123456789012345678901234567890'), '1123456789012345678901234567890', "1123456789012345678901234567890");
+        assert_eq!(ShortString::join('Hey', 'World'), 'Hey_World', "Hey_World");
     }
     
     #[test]
-    #[should_panic(expected: 'short_string::concat() Overflow')]
+    #[should_panic(expected:('short_string::concat() Overflow',))]
     fn test_concat_overflow() {
-        ShortString::concat('123456789012345678901234567890', '12');
+        ShortString::concat('1234567890123456789012345678901', '2');
     }
     
     #[test]
     fn test_strlen() {
-        assert(0.strlen() == 0, '0');
-        assert(''.strlen() == 0, 'empty');
-        assert('1'.strlen() == 1, 'not 1');
-        assert('Hey'.strlen() == 3, 'not 5');
-        assert('Hey World'.strlen() == 9, 'not 9');
-        assert('1234567890123456789012345678901'.strlen() == 31, 'not 31');
+        assert_eq!(0.strlen(), 0, "0");
+        assert_eq!(''.strlen(), 0, "empty");
+        assert_eq!('1'.strlen(), 1, "not 1");
+        assert_eq!('Hey'.strlen(), 3, "not 5");
+        assert_eq!('Hey World'.strlen(), 9, "not 9");
+        assert_eq!('1234567890123456789012345678901'.strlen(), 31, "not 31");
     }
     
     #[test]
     fn test_string() {
-        assert(0.as_string() == "", 'not 0');
-        assert(''.as_string() == "", 'not empty');
-        assert('1'.as_string() == "1", 'not 1');
-        assert('Hey'.as_string() == "Hey", 'not Hey');
-        assert('Hey World'.as_string() == "Hey World", 'not Hey World');
-        assert('1234567890123456789012345678901'.as_string() == "1234567890123456789012345678901", 'not 31');
+        assert_eq!(0.to_string(), "", "not 0");
+        assert_eq!(''.to_string(), "", "not empty");
+        assert_eq!('1'.to_string(), "1", "not 1");
+        assert_eq!('Hey'.to_string(), "Hey", "not Hey");
+        assert_eq!('Hey World'.to_string(), "Hey World", "not Hey World");
+        assert_eq!('1234567890123456789012345678901'.to_string(), "1234567890123456789012345678901", "not 31");
     }
 }

@@ -1,35 +1,34 @@
-# Pistols at 10 Blocks SDK
+# Pistols at Dawn SDK
 
 ### Packages
 
-* `@underware_gg/pistols-sdk/pistols`: Pistols related code
-* `@underware_gg/pistols-sdk/dojo`: Dojo utils and hooks
-* `@underware_gg/pistols-sdk/utils`: Misc and Starknet utils
-* `@underware_gg/pistols-sdk/hooks`: Misc and Starknet hooks
-* `@underware_gg/pistols-sdk/abis`: Misc Starknet ABIs
-* `@underware_gg/pistols-sdk/fix`: Temporary fixes for dependencies
+* `@underware/pistols-sdk/pistols`: Pistols config and utils
+* `@underware/pistols-sdk/pistols/gen`: Pistols generated code
+* `@underware/pistols-sdk/pistols/controller`: Controller connector instance
+* `@underware/pistols-sdk/dojo`: Dojo utils and hooks
+* `@underware/pistols-sdk/dojo/graphql`: Dojo GraphQL utils and hooks
+* `@underware/pistols-sdk/utils`: Misc and Starknet utils
+* `@underware/pistols-sdk/utils/hooks`: Misc and Starknet utility hooks
+* `@underware/pistols-sdk/abis`: Misc Starknet ABIs
+* `@underware/pistols-sdk/fix`: Temporary fixes for dependencies
 
 
 ## Dependencies
 
-|                          | `/utils` | `/hooks` | `/abis` | `/dojo` | `/pistols` |
-|--------------------------|:--------:|:--------:|:-------:|:-------:|:--------:|
-| `starknet`               | ✅       | ✅       | ✅      | ✅      |  ✅      |
-| `starknetid.js`          |          | ✅       |         |         |          |
-| `get-starknet-core`      |          | ✅       |         | ✅      |          |
-| `react`                  |          | ✅       |         | ✅      |          |
-| `@starknet-react/core`   | ✅       | ✅       |         | ✅      |          |
-| `@starknet-react/chains` |          |          |         | ✅      |          |
-| `@apollo/client`         |          | ✅       |         | ✅      |          |
-| `@cartridge/controller`  |          |          |         | ✅      | ✅       |
-| `@cartridge/connector`   |          |          |         | ✅      |          |
-| `@dojoengine/core`       |          |          |         | ✅      | ✅       |
-| `@dojoengine/sdk`        |          |          |         | ✅      | ✅       |
-| `@dojoengine/utils`      | ✅       |          |         |         |          |
-
-* Environment variables
-
-`VITE_CHAIN_ID`: should contain a valid chain from [chains.ts](src/dojo/setup/chains.ts)
+|                          | `/utils` | `/abis`  | `/dojo` | `/dojo/graphql` | `/pistols` |
+|--------------------------|:--------:|:--------:|:-------:|:---------------:|:----------:|
+| `starknet`               | ✅       | ✅        | ✅      | ✅             |  ✅        |
+| `starknetid.js`          | ✅       |           |         |                |            |
+| `get-starknet-core`      | ✅       |           | ✅      |                |            |
+| `react`                  | ✅       |           | ✅      | ✅             |            |
+| `@starknet-react/core`   | ✅       |           | ✅      | ✅             |            |
+| `@starknet-react/chains` |          |           | ✅      |                |            |
+| `@cartridge/controller`  |          |           | ✅      |                | ✅         |
+| `@cartridge/connector`   |          |           | ✅      |                |            |
+| `@dojoengine/core`       |          |           | ✅      |                | ✅         |
+| `@dojoengine/sdk`        |          |           | ✅      |                | ✅         |
+| `@dojoengine/utils`      | ✅       |           |         |                |            |
+| `@apollo/client`         |          |           |         | ✅             |            |
 
 
 ## Installation
@@ -37,16 +36,16 @@
 * Install dependency
 
 ```bash
-pnpm install @underware_gg/pistols-sdk
+pnpm install @underware/pistols-sdk
 ```
 
 * Import and use what you need...
 
 ```js
-import { helloPistols } from '@underware_gg/pistols-sdk'
+import { helloPistols } from '@underware/pistols-sdk'
 helloPistols();
 
-import { bigintToHex } from '@underware_gg/pistols-sdk/utils'
+import { bigintToHex } from '@underware/pistols-sdk/utils'
 const address = bigintToHex(1234567890n)
 ```
 
@@ -59,7 +58,7 @@ const address = bigintToHex(1234567890n)
 
 A very simple basic tool that generates a Typescript source containint all constants and enums from your cairo source code.
 
-Usage: `npx @underware_gg/pistols-sdk generate-constants --src:<CAIRO_SRC_PATH> --out:<OUTPUT_PATH>`
+Usage: `npx @underware/pistols-sdk generate-constants --src:<CAIRO_SRC_PATH> --out:<OUTPUT_PATH>`
 
 * All `.cairo` files inside `<CAIRO_SRC_PATH>` will be parsed
 * Only `const` declared inside a `mod` will be extracted
