@@ -5,7 +5,7 @@ import { useGetChallenge } from '/src/stores/challengeStore'
 import { AnimationState } from '/src/three/game'
 import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
 import { useGameAspect } from '/src/hooks/useGameAspect'
-import { ActionButton } from '../Buttons'
+import { ActionButton, ChallengeButton } from '../Buttons'
 import { SceneName } from '/src/data/assets'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { DuelTutorialLevel } from '/src/data/tutorialConstants'
@@ -14,6 +14,7 @@ import { useGetChallengeRewards } from '/src/hooks/useChallengeRewards'
 import { usePlayer } from '/src/stores/playerStore'
 import { Balance } from '../../account/Balance'
 import AnimatedText from '../AnimatedText'
+import { useIsMyAccount } from '/src/hooks/useIsYou'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -24,7 +25,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
   const { animated } = useGameplayContext()
 
   const { dispatchSetting } = useSettings()
-  const { dispatchSetScene } = usePistolsScene()
+  const { dispatchSetScene, dispatchSceneBack } = usePistolsScene()
   const { dispatchSetTutorialLevel } = usePistolsContext()
 
   const { challengeDescription } = useChallengeDescription(duelId)
@@ -33,6 +34,8 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
   const { name: playerNameA } = usePlayer(duelistAddressA)
   const { name: playerNameB } = usePlayer(duelistAddressB)
 
+  const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
+  const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
   const rewardsA = useGetChallengeRewards(isFinished ? duelId : 0n, duelistIdA)
   const rewardsB = useGetChallengeRewards(isFinished ? duelId : 0n, duelistIdB)
 
@@ -88,7 +91,6 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
       {(!isTutorial && isFinished && animated == AnimationState.Finished) &&
         <div className='NoMouse NoDrag' style={{ 
           position: 'absolute', 
-          top: 0, 
           left: 0, 
           width: '100%', 
           height: '100%',
@@ -105,7 +107,8 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
             justifyContent: 'center',
             alignItems: 'center',
             padding: '1rem',
-            width: aspectWidth(40),
+            width: aspectWidth(42),
+            marginTop: '-10%',
           }}>
             <h2 className='Important' style={{ 
               fontSize: aspectWidth(2.5),
@@ -175,11 +178,13 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                     </RewardRow>
 
                     <RewardRow delay={0.6} animation='slideInFromTop'>
-                      <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: aspectHeight(0.5)}}>
+                      <div style={{display: 'flex', justifyContent: winnerIsA ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
                         {winnerIsA ? (
                           <>
                             <div style={{textAlign: 'left'}}>+</div>
-                            <Balance fools wei={rewardsA?.fools_gained_wei || 0n} size='large' />
+                            <div style={{textAlign: 'right'}}>
+                              <Balance fools wei={rewardsA?.fools_gained_wei || 0n} size='large' />
+                            </div>
                           </>
                         ) : (
                           <div>-</div>
@@ -188,11 +193,11 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                     </RewardRow>
 
                     <RewardRow delay={0.9} animation='slideInFromTop'>
-                      <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: aspectHeight(0.5)}}>
+                      <div style={{display: 'flex', justifyContent: winnerIsA ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
                         {winnerIsA ? (
                           <>
                             <div style={{textAlign: 'left'}}>+</div>
-                            <div style={{fontSize: aspectWidth(1)}}>
+                            <div style={{textAlign: 'right', fontSize: aspectWidth(1)}}>
                               {Number(rewardsA?.points_scored || 0)} Points
                             </div>
                           </>
@@ -246,11 +251,13 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                     </RewardRow>
 
                     <RewardRow delay={0.6} animation='slideInFromTop'>
-                      <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: aspectHeight(0.5)}}>
+                      <div style={{display: 'flex', justifyContent: winnerIsB ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
                         {winnerIsB ? (
                           <>
                             <div style={{textAlign: 'left'}}>+</div>
-                            <Balance fools wei={rewardsB?.fools_gained_wei || 0n} size='large' />
+                            <div style={{textAlign: 'right'}}>
+                              <Balance fools wei={rewardsB?.fools_gained_wei || 0n} size='large' />
+                            </div>
                           </>
                         ) : (
                           <div>-</div>
@@ -259,11 +266,11 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                     </RewardRow>
 
                     <RewardRow delay={0.9} animation='slideInFromTop'>
-                      <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: aspectHeight(0.5)}}>
+                      <div style={{display: 'flex', justifyContent: winnerIsB ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
                         {winnerIsB ? (
                           <>
                             <div style={{textAlign: 'left'}}>+</div>
-                            <div style={{fontSize: aspectWidth(1)}}>
+                            <div style={{textAlign: 'right', fontSize: aspectWidth(1)}}>
                               {Number(rewardsB?.points_scored || 0)} Points
                             </div>
                           </>
@@ -289,7 +296,25 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                   </div>
                 </Col>
               </Row>
-            </Grid>            
+            </Grid>
+            <div style={{ width: '100%', height: aspectHeight(7), marginTop: aspectHeight(2) }}>
+              {showRewards && (
+                <div className='fadeIn' style={{ animationDelay: '2s', width: '100%', height: '100%' }}>
+                  <Grid className='YesMouse' textAlign='center' style={{ width: '100%' }}>
+                    <Row columns='equal'>
+                      <Col width={7}>
+                        <ActionButton large fillParent label='Leave Duel' className='FillParent' onClick={() => dispatchSceneBack()} />
+                      </Col>
+                      <Col width={2}>
+                      </Col>
+                      <Col width={7}>
+                        <ChallengeButton challengedPlayerAddress={isYouA ? duelistAddressB : duelistAddressA} customLabel={isYouA || isYouB ? 'Rematch!' : null} fillParent />
+                      </Col>
+                    </Row>
+                  </Grid>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       }
