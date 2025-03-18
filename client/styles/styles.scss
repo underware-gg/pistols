@@ -689,7 +689,6 @@ TextArea::selection {
 //
 // Pistols
 //
-$profile-pic-width: 80px;
 $ui-header-height: aspect-height(16);
 $ui-container-gap: 1em;
 
@@ -802,10 +801,10 @@ $ui-container-gap: 1em;
 }
 
 .ProfilePic {
-  width: var(--profile-pic-width) !important;
-  height: var(--profile-pic-height) !important;
-  max-width: var(--profile-pic-width) !important;
-  max-height: var(--profile-pic-height) !important;
+  width: var(--profile-pic-width, aspect-width(8)) !important;
+  height: var(--profile-pic-height, aspect-width(8)) !important;
+  max-width: var(--profile-pic-width, aspect-width(8)) !important;
+  max-height: var(--profile-pic-height, aspect-width(8)) !important;
 
   clip-path: var(--profile-pic-clip-path);
   object-fit: var(--profile-pic-object-fit);

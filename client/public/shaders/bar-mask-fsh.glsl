@@ -272,7 +272,9 @@ void main() {
   // Final output
   if (excluded && result.a > 0.0) {
     gl_FragColor = result;
-  } else {
+  } else if (uSamples > 3) {
     gl_FragColor = blurredResult;
+  } else {
+    gl_FragColor = result;
   }
 }

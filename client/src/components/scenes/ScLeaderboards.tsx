@@ -153,24 +153,6 @@ export default function ScLeaderboards() {
     );
   }
 
-  const currentSeason: Season = {
-    id: 'current',
-    name: 'Season 8',
-    participants: 256,
-    highScore: 2450,
-    timeLeft: '3d 12h',
-  };
-
-  const pastSeasons: Season[] = [
-    { id: 'season7', name: 'Season 7', participants: 248, highScore: 2320, timeLeft: '0', winner: 'DragonMaster' },
-    { id: 'season6', name: 'Season 6', participants: 210, highScore: 2180, timeLeft: '0', winner: 'ShadowHunter' },
-    { id: 'season5', name: 'Season 5', participants: 185, highScore: 2050, timeLeft: '0', winner: 'MysticWizard' },
-    { id: 'season4', name: 'Season 4', participants: 160, highScore: 1920, timeLeft: '0', winner: 'ElectricKnight' },
-    { id: 'season3', name: 'Season 3', participants: 135, highScore: 1790, timeLeft: '0', winner: 'FlameBringer' },
-    { id: 'season2', name: 'Season 2', participants: 110, highScore: 1660, timeLeft: '0', winner: 'AquaPhoenix' },
-    { id: 'season1', name: 'Season 1', participants: 85, highScore: 1530, timeLeft: '0', winner: 'EarthShaker' },
-  ];
-
   const handleSeasonSelect = (seasonId: string) => {
     setSelectedSeason(seasonId);
   };
@@ -346,6 +328,12 @@ export default function ScLeaderboards() {
       </div>
     );
   };
+  
+  return (
+    <div style={{ position: 'absolute', bottom: 0, left: 0, width: aspectWidth(100), height: aspectHeight(100), display: 'flex' }}>
+      <CommingSoon />
+    </div>
+  )
 
   return (
     <div style={{ position: 'absolute', bottom: 0, left: 0, width: aspectWidth(100), height: aspectHeight(84), display: 'flex' }}>
@@ -354,23 +342,23 @@ export default function ScLeaderboards() {
         <Segment style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
           <Header as="h3" style={{ color: 'white', textAlign: 'center', marginBottom: '20px' }}>CURRENT SEASON</Header>
           
-          <SeasonRow 
+          {/* <SeasonRow 
             season={currentSeason}
             isSelected={selectedSeason === currentSeason.id}
             onClick={() => setSelectedSeason(currentSeason.id)}
-          />
+          /> */}
           
           <div className='TextDivider bright LeaderboardsDivider EqualMargin'>Past Seasons</div>
           
           <div style={{ overflow: 'auto', flex: 1 }}>
-            {pastSeasons.map(season => (
+            {/* {pastSeasons.map(season => (
               <SeasonRow
                 key={season.id}
                 season={season}
                 isSelected={selectedSeason === season.id}
                 onClick={() => setSelectedSeason(season.id)}
               />
-            ))}
+            ))} */}
           </div>
         </Segment>
       </div>
@@ -435,7 +423,6 @@ export default function ScLeaderboards() {
             </div>
           )}
 
-          {/* Pagination */}
           <div style={{ position: 'absolute', bottom: aspectHeight(2), left: 0, right: 0, textAlign: 'center' }}>
             <Pagination
               activePage={activePage}
@@ -451,6 +438,331 @@ export default function ScLeaderboards() {
           </div>
         </Segment>
       </div>
+    </div>
+  );
+};
+
+const CommingSoon = () => {
+  const {aspectWidth, aspectHeight} = useGameAspect();
+  
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100%',
+      width: '100%',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      {/* Enhanced animated background with noise effect */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'linear-gradient(135deg, rgba(30,8,0,1) 0%, rgba(60,20,5,1) 35%, rgba(80,30,10,1) 50%, rgba(60,20,5,1) 65%, rgba(30,8,0,1) 100%)',
+        backgroundSize: '400% 400%',
+        animation: 'gradientAnimation 12s ease infinite',
+        zIndex: 1
+      }} className="noiseOverlay" />
+      
+      {/* Additional background elements */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'radial-gradient(circle at center, transparent 30%, rgba(120,60,10,0.4) 70%)',
+        zIndex: 2,
+        animation: 'pulseBackground 8s ease-in-out infinite'
+      }} />
+      
+      {/* Enhanced glowing lines */}
+      <div style={{
+        position: 'absolute',
+        width: '200%',
+        height: '2px',
+        background: 'linear-gradient(90deg, transparent, rgba(255,215,0,0.8), transparent)',
+        top: '40%',
+        left: '-50%',
+        transform: 'rotate(-5deg)',
+        boxShadow: '0 0 15px rgba(255,215,0,0.8), 0 0 30px rgba(255,215,0,0.5)',
+        zIndex: 2,
+        animation: 'lineShift 10s ease-in-out infinite'
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        width: '200%',
+        height: '2px',
+        background: 'linear-gradient(90deg, transparent, rgba(255,215,0,0.8), transparent)',
+        top: '60%',
+        left: '-50%',
+        transform: 'rotate(5deg)',
+        boxShadow: '0 0 15px rgba(255,215,0,0.8), 0 0 30px rgba(255,215,0,0.5)',
+        zIndex: 2,
+        animation: 'lineShift 10s ease-in-out infinite reverse'
+      }} />
+      
+      {/* Additional diagonal lines */}
+      <div style={{
+        position: 'absolute',
+        width: '150%',
+        height: '1px',
+        background: 'linear-gradient(90deg, transparent, rgba(255,165,0,0.6), transparent)',
+        top: '30%',
+        left: '-25%',
+        transform: 'rotate(-15deg)',
+        boxShadow: '0 0 8px rgba(255,165,0,0.6), 0 0 16px rgba(255,165,0,0.3)',
+        zIndex: 2,
+        animation: 'lineShift 15s ease-in-out infinite 2s'
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        width: '150%',
+        height: '1px',
+        background: 'linear-gradient(90deg, transparent, rgba(255,165,0,0.6), transparent)',
+        top: '70%',
+        left: '-25%',
+        transform: 'rotate(15deg)',
+        boxShadow: '0 0 8px rgba(255,165,0,0.6), 0 0 16px rgba(255,165,0,0.3)',
+        zIndex: 2,
+        animation: 'lineShift 15s ease-in-out infinite 2s reverse'
+      }} />
+      
+      {/* Main text */}
+      <div style={{
+        fontSize: aspectWidth(8),
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center',
+        textTransform: 'uppercase',
+        textShadow: `
+          0 0 10px rgba(255,255,255,0.8),
+          0 0 20px rgba(255,215,0,0.8),
+          0 0 30px rgba(255,215,0,0.6),
+          0 0 40px rgba(255,215,0,0.4),
+          0 0 50px rgba(255,215,0,0.2)
+        `,
+        letterSpacing: aspectWidth(0.5),
+        position: 'relative',
+        zIndex: 30,
+        transform: 'perspective(500px) rotateX(10deg)',
+        animation: 'textPulse 2s ease-in-out infinite alternate',
+        marginBottom: aspectHeight(0)  // Added space between text elements
+      }}>
+        COMING
+      </div>
+      
+      <div style={{
+        fontSize: aspectWidth(8),
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center',
+        textTransform: 'uppercase',
+        textShadow: `
+          0 0 10px rgba(255,255,255,0.8),
+          0 0 20px rgba(255,215,0,0.8),
+          0 0 30px rgba(255,215,0,0.6),
+          0 0 40px rgba(255,215,0,0.4),
+          0 0 50px rgba(255,215,0,0.2)
+        `,
+        letterSpacing: aspectWidth(0.5),
+        marginTop: aspectHeight(0),  // Increased space between text elements
+        position: 'relative',
+        zIndex: 30,
+        transform: 'perspective(500px) rotateX(10deg)',
+        animation: 'textPulse 2s ease-in-out infinite alternate-reverse',
+        marginBottom: aspectHeight(2)  // Added space below second text
+      }}>
+        SOON
+      </div>
+      
+      {/* Enhanced decorative elements with pulsating animation */}
+      <div style={{
+        position: 'absolute',
+        width: aspectWidth(30),
+        height: aspectWidth(30),
+        border: '2px solid rgba(255,215,0,0.3)',
+        borderRadius: '50%',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        boxShadow: 'inset 0 0 30px rgba(255,215,0,0.3), 0 0 20px rgba(255,215,0,0.2)',
+        zIndex: 2,
+        animation: 'rotate 20s linear infinite, circlePulsate 4s ease-in-out infinite'
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        width: aspectWidth(20),
+        height: aspectWidth(20),
+        border: '1px solid rgba(255,165,0,0.2)',
+        borderRadius: '50%',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        boxShadow: 'inset 0 0 20px rgba(255,165,0,0.2), 0 0 15px rgba(255,165,0,0.1)',
+        zIndex: 2,
+        animation: 'rotate 15s linear infinite reverse, circlePulsate 6s ease-in-out infinite 1s'
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        width: aspectWidth(40),
+        height: aspectWidth(40),
+        border: '1px solid rgba(255,215,0,0.1)',
+        borderRadius: '50%',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        boxShadow: 'inset 0 0 40px rgba(255,215,0,0.1), 0 0 25px rgba(255,215,0,0.05)',
+        zIndex: 2,
+        animation: 'rotate 25s linear infinite, circlePulsate 8s ease-in-out infinite 2s'
+      }} />
+      
+      {/* Crossed pistols in the center - larger size */}
+      <div style={{
+        position: 'absolute',
+        width: aspectWidth(30),
+        height: aspectWidth(30),
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        zIndex: 3,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <img 
+          src="/images/ui/pistol.png" 
+          style={{
+            width: aspectWidth(30),
+            height: 'auto',
+            position: 'absolute',
+            filter: 'drop-shadow(0 0 5px rgba(255,215,0,0.4)) brightness(0.7) contrast(0.8) blur(1px)',
+          }}
+        />
+        <img 
+          src="/images/ui/pistol.png" 
+          style={{
+            width: aspectWidth(30),
+            height: 'auto',
+            position: 'absolute',
+            transform: 'scaleX(-1)',
+            filter: 'drop-shadow(0 0 5px rgba(255,215,0,0.4)) brightness(0.7) contrast(0.8) blur(1px)',
+          }}
+        />
+      </div>
+      
+      {/* Animated floating particles with fade in/out */}
+      <div className="particles-container">
+        {Array.from({ length: 30 }).map((_, i) => (
+          <div 
+            key={i} 
+            className="particle"
+            style={{
+              position: 'absolute',
+              width: `${Math.random() * 4 + 2}px`,
+              height: `${Math.random() * 4 + 2}px`,
+              backgroundColor: `rgba(255, 215, 0, ${Math.random() * 0.5 + 0.2})`,
+              borderRadius: '50%',
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              boxShadow: '0 0 4px rgba(255, 215, 0, 0.8)',
+              opacity: 0,
+              animation: `particleAnimation ${Math.random() * 8 + 7}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 5}s`,
+              zIndex: 4
+            }}
+          />
+        ))}
+      </div>
+      
+      {/* @ts-ignore */}
+      <style jsx>{`
+        @keyframes gradientAnimation {
+          0% { background-position: 0% 50% }
+          50% { background-position: 100% 50% }
+          100% { background-position: 0% 50% }
+        }
+        
+        @keyframes textPulse {
+          0% { opacity: 0.8; transform: perspective(500px) rotateX(10deg) scale(1); }
+          100% { opacity: 1; transform: perspective(500px) rotateX(10deg) scale(1.05); }
+        }
+        
+        @keyframes rotate {
+          0% { transform: translate(-50%, -50%) rotate(0deg); }
+          100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        @keyframes circlePulsate {
+          0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); opacity: 0.7; }
+          50% { transform: translate(-50%, -50%) rotate(180deg) scale(1.1); opacity: 1; }
+          100% { transform: translate(-50%, -50%) rotate(360deg) scale(1); opacity: 0.7; }
+        }
+        
+        @keyframes lineShift {
+          0% { transform: translateX(-10%) rotate(-5deg); opacity: 0.5; }
+          50% { transform: translateX(10%) rotate(-5deg); opacity: 1; }
+          100% { transform: translateX(-10%) rotate(-5deg); opacity: 0.5; }
+        }
+        
+        @keyframes pulseBackground {
+          0% { opacity: 0.3; }
+          50% { opacity: 0.7; }
+          100% { opacity: 0.3; }
+        }
+        
+        @keyframes particleAnimation {
+          0% {
+            transform: translate(0, 0);
+            opacity: 0;
+          }
+          20% {
+            opacity: 1;
+          }
+          80% {
+            opacity: 1;
+          }
+          100% {
+            transform: translate(${Math.random() > 0.5 ? '+' : '-'}${Math.random() * 150 + 50}px, ${Math.random() > 0.5 ? '+' : '-'}${Math.random() * 150 + 50}px);
+            opacity: 0;
+          }
+        }
+        
+        .noiseOverlay::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+          opacity: 0.15;
+          mix-blend-mode: overlay;
+        }
+        
+        .particles-container {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          pointer-events: none;
+        }
+        
+        .particle {
+          will-change: transform, opacity;
+        }
+      `}</style>
     </div>
   );
 };

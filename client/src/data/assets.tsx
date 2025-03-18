@@ -60,11 +60,23 @@ enum TextureName {
   bg_duelists_tutorial = 'bg_duelists_tutorial',
   bg_duelists_tutorial_mask = 'bg_duelists_tutorial_mask',
 
+  bg_entry_background = 'bg_entry_background',
+  bg_entry_bar = 'bg_entry_bar',
+  bg_entry_barkeep = 'bg_entry_barkeep',
+  bg_entry_crowd = 'bg_entry_crowd',
+  bg_entry_player = 'bg_entry_player',
+
   bg_conflict_background = 'bg_conflict_background',
   bg_conflict_bar = 'bg_conflict_bar',
   bg_conflict_barkeep = 'bg_conflict_barkeep',
   bg_conflict_drunkard = 'bg_conflict_drunkard',
   bg_conflict_player = 'bg_conflict_player',
+
+  bg_barkeep_background = 'bg_barkeep_background',
+  bg_barkeep_crowd_back = 'bg_barkeep_crowd_back',
+  bg_barkeep_crowd_front = 'bg_barkeep_crowd_front',
+  bg_barkeep_player = 'bg_barkeep_player',
+  bg_barkeep_table = 'bg_barkeep_table',
   
   bg_demon_background = 'bg_demon_background',
   bg_demon_left_hand = 'bg_demon_left_hand',
@@ -73,12 +85,6 @@ enum TextureName {
   bg_demon = 'bg_demon',
   bg_demon_left_hand_mask = 'bg_demon_left_hand_mask',
   bg_demon_right_hand_mask = 'bg_demon_right_hand_mask',
-  
-  bg_entry_background = 'bg_entry_background',
-  bg_entry_bar = 'bg_entry_bar',
-  bg_entry_barkeep = 'bg_entry_barkeep',
-  bg_entry_crowd = 'bg_entry_crowd',
-  bg_entry_player = 'bg_entry_player',
   
   bg_resurrection_background = 'bg_resurrection_background',
   bg_resurrection_barkeep = 'bg_resurrection_barkeep',
@@ -135,11 +141,23 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_duelists_tutorial_mask]: { path: '/images/scenes/duelists/bg_duelists_tutorial_mask.png' },
 
 
+  [TextureName.bg_entry_background]: { path: '/images/tutorial/background/entry/bg_entry_background.png' },
+  [TextureName.bg_entry_bar]: { path: '/images/tutorial/background/entry/bg_entry_bar.png' },
+  [TextureName.bg_entry_barkeep]: { path: '/images/tutorial/background/entry/bg_entry_barkeep.png' },
+  [TextureName.bg_entry_crowd]: { path: '/images/tutorial/background/entry/bg_entry_crowd.png' },
+  [TextureName.bg_entry_player]: { path: '/images/tutorial/background/entry/bg_entry_player.png' },
+
   [TextureName.bg_conflict_background]: { path: '/images/tutorial/background/conflict/bg_conflict_background.png' },
   [TextureName.bg_conflict_bar]: { path: '/images/tutorial/background/conflict/bg_conflict_bar.png' },
   [TextureName.bg_conflict_barkeep]: { path: '/images/tutorial/background/conflict/bg_conflict_barkeep.png' },
   [TextureName.bg_conflict_drunkard]: { path: '/images/tutorial/background/conflict/bg_conflict_drunkard.png' },
   [TextureName.bg_conflict_player]: { path: '/images/tutorial/background/conflict/bg_conflict_player.png' },
+
+  [TextureName.bg_barkeep_background]: { path: '/images/tutorial/background/barkeep/bg_barkeep_background.png' },
+  [TextureName.bg_barkeep_crowd_back]: { path: '/images/tutorial/background/barkeep/bg_barkeep_crowd_back.png' },
+  [TextureName.bg_barkeep_crowd_front]: { path: '/images/tutorial/background/barkeep/bg_barkeep_crowd_front.png' },
+  [TextureName.bg_barkeep_player]: { path: '/images/tutorial/background/barkeep/bg_barkeep_player.png' },
+  [TextureName.bg_barkeep_table]: { path: '/images/tutorial/background/barkeep/bg_barkeep_table.png' },
   
   [TextureName.bg_demon_background]: { path: '/images/tutorial/background/demon/bg_demon_background.png' },
   [TextureName.bg_demon_left_hand]: { path: '/images/tutorial/background/demon/bg_demon_left_hand.png' },
@@ -148,12 +166,6 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_demon]: { path: '/images/tutorial/background/demon/bg_demon.png' },
   [TextureName.bg_demon_left_hand_mask]: { path: '/images/tutorial/background/demon/bg_demon_left_hand_mask.png' },
   [TextureName.bg_demon_right_hand_mask]: { path: '/images/tutorial/background/demon/bg_demon_right_hand_mask.png' },
-  
-  [TextureName.bg_entry_background]: { path: '/images/tutorial/background/entry/bg_entry_background.png' },
-  [TextureName.bg_entry_bar]: { path: '/images/tutorial/background/entry/bg_entry_bar.png' },
-  [TextureName.bg_entry_barkeep]: { path: '/images/tutorial/background/entry/bg_entry_barkeep.png' },
-  [TextureName.bg_entry_crowd]: { path: '/images/tutorial/background/entry/bg_entry_crowd.png' },
-  [TextureName.bg_entry_player]: { path: '/images/tutorial/background/entry/bg_entry_player.png' },
   
   [TextureName.bg_resurrection_background]: { path: '/images/tutorial/background/resurrection/bg_resurrection_background.png' },
   [TextureName.bg_resurrection_barkeep]: { path: '/images/tutorial/background/resurrection/bg_resurrection_barkeep.png' },
@@ -283,7 +295,16 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     ],
     scaleAddon: 0.045
   },
-  [SceneName.TutorialScene3]: { backgrounds: [{ texture: TextureName.bg_entry_background, shiftMultiplier: 0, renderOrder: 0 }] },
+  [SceneName.TutorialScene3]: { 
+    backgrounds: [
+      { texture: TextureName.bg_barkeep_background, shiftMultiplier: -0.02, renderOrder: 0 },
+      { texture: TextureName.bg_barkeep_crowd_back, shiftMultiplier: -0.01, renderOrder: 1 },
+      { texture: TextureName.bg_barkeep_player, shiftMultiplier: 0.00, renderOrder: 2 },
+      { texture: TextureName.bg_barkeep_crowd_front, shiftMultiplier: 0.01, renderOrder: 3 },
+      { texture: TextureName.bg_barkeep_table, shiftMultiplier: 0.02, renderOrder: 4 },
+    ],
+    scaleAddon: 0.045
+  },
   [SceneName.TutorialScene4]: {
     backgrounds: [
       { texture: TextureName.bg_demon_background, shiftMultiplier: 0.03, renderOrder: 0, hidden: true },

@@ -67,7 +67,7 @@ export default function ScProfile() {
           opener={bookOpener}
           width={30} 
           height={40}
-          bookTranslateXClosed={-16}
+          bookTranslateXClosed={16}
           bookTranslateYClosed={18}
           bookRotateXClosed={60}
           bookRotateYClosed={0}

@@ -1084,7 +1084,7 @@ const EnvironmentDeck = forwardRef<EnvironmentDeckHandle, EnvironmentDeckProps>(
 
 const PlayerStats = ({ duelistId, isLeft, damage, hitChance, visible }) => {
 
-  const { name, profilePic, profileType } = useDuelist(duelistId)
+  const { nameAndId: name, profilePic, profileType } = useDuelist(duelistId)
   const { dispatchSelectDuelistId } = usePistolsContext()
 
   const contentLength = useMemo(() => Math.floor(name.length/10), [name])
