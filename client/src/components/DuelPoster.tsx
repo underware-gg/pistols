@@ -88,6 +88,8 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
     duelistIdB,
     isLive,
     isFinished,
+    isCanceled,
+    isExpired,
     premise,
     quote,
     winnerDuelistId,
@@ -99,10 +101,9 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { challengeDescription } = useChallengeDescription(props.duelId)
   const { description: tableDescription, isSeason, isTutorial } = useTable(tableId)
 
-  // const rewardsA = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdA)
-  // const rewardsB = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdB)
-  // console.log('rewardsA:', rewardsA)
-  // console.log('rewardsB:', rewardsB)
+  useEffect(() => {
+    console.log('needToSyncExpired', needToSyncExpired)
+  }, [needToSyncExpired])
   
   const { name: playerNameA } = usePlayer(duelistAddressA)
   const { name: playerNameB } = usePlayer(duelistAddressB)
@@ -145,7 +146,6 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   }, [challengingDuelistId])
 
   const _submit = async (duelistId?: BigNumberish, accepted?: boolean) => {
-    console.log('DuelPoster _submit duelistId:', duelistId, 'accepted:', accepted)
     setIsSubmitting(true)
     await duel_token.reply_duel(account, duelistId, props.duelId, accepted)
     dispatchChallengingDuelistId(0n)

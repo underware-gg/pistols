@@ -169,9 +169,9 @@ const TUTORIAL_SCENE_DATA: Record<TutorialScenes, TutorialScene> = {
 
 enum DuelTutorialLevel { //Used to group info specific for the dueling tutorials stages
   NONE = 'NONE',
-  SIMPLE = 'SIMPLE',
-  FULL = 'FULL',
-  DUELIST_PACKS = 'DUELIST_PACKS',
+  SIMPLE = 'BASIC TUTORIAL',
+  FULL = 'ADVANCED TUTORIAL',
+  DUELIST_PACKS = 'DUELISTS & PACKS',
 }
 
 enum TutorialGroups { //Used to display groups for all tutorials later in the game for players to revisit
@@ -261,7 +261,6 @@ const DUEL_TUTORIAL_LIST: Record<DuelTutorialLevel, TutorialParts[]> = {
     TutorialParts.DUELIST,
     TutorialParts.DUELIST_ARCHETYPE,
     TutorialParts.DUELIST_FAME,
-    TutorialParts.DUELIST_INFO, //TODO is this needed?
   ],
 }
 

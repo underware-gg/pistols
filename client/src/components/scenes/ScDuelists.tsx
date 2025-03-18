@@ -12,6 +12,8 @@ import { SceneName } from '/src/data/assets'
 import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
 import { useAccount } from '@starknet-react/core'
 import { LiveChallengeStates } from '/src/utils/pistols'
+import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
+import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 
 export default function ScDuelists() {
   const { address } = useAccount()
@@ -20,7 +22,7 @@ export default function ScDuelists() {
   const { playerIds: matchmakingPlayerIds } = useQueryPlayerIds("", true, false, PlayerColumn.Timestamp, SortDirection.Descending)
   const { challengePlayerMap } = useQueryChallengeIds(LiveChallengeStates, "", false, address, ChallengeColumn.Time, SortDirection.Descending)
   const { aspectWidth, aspectHeight } = useGameAspect()
-  const { dispatchSelectPlayerAddress } = usePistolsContext()
+  const { dispatchSelectPlayerAddress, tutorialOpener } = usePistolsContext()
   const { dispatchSetScene} = usePistolsScene()
 
   const availableMatchmakingPlayers = useMemo(() => {
@@ -57,6 +59,9 @@ export default function ScDuelists() {
           } else {
             console.log("No players available for matchmaking")             
           }
+          break
+        case 'tutorial':
+          tutorialOpener.open()
           break
       }
     }
@@ -393,6 +398,8 @@ export default function ScDuelists() {
           pointerEvents: 'none'
         }}
       />
+
+      <DuelTutorialOverlay opener={tutorialOpener} />
 
       <TavernAudios />
 

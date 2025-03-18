@@ -1833,6 +1833,10 @@ td {
 // <Modal>
 .ui.modal {
   @extend ._round_border_inactive;
+
+  &.modalNoBorder {
+    border: 0 !important;
+  }
 }
 .ui.basic.modal {
   border: 0 !important;
@@ -1857,6 +1861,11 @@ td {
 .ui.modal>.content,
 .ui.modal>.actions {
   background-color: $color-darkest;
+}
+
+.modal {
+  position: fixed; /* Ensures the modal is fixed to the viewport */
+  z-index: 9999 !important; /* High z-index to ensure it is on top */
 }
 
 .scrolling.dimmable>.dimmer {
@@ -2302,11 +2311,6 @@ a.active.step:hover,
   margin: 0 aspect-width(2);
 }
 
-.modal {
-  position: fixed; /* Ensures the modal is fixed to the viewport */
-  z-index: 9999 !important; /* High z-index to ensure it is on top */
-}
-
 .fadeIn {
   opacity: 0;
   -webkit-animation: fadeIn 0.2s;
@@ -2512,7 +2516,7 @@ a.active.step:hover,
 .tutorialContainer {
   width: aspect-width(80);
   height: aspect-height(80);
-  background: url('/images/ui/duel/card_details/box_left.png') no-repeat;
+  background: url('/images/ui/duel/card_details/box_right.png') no-repeat;
   background-size: 100% 100%;
   background-position: center;
   background-color: rgba(0, 0, 0, 0);
@@ -2524,6 +2528,18 @@ a.active.step:hover,
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.tutorialCloseButton {
+  position: absolute;
+  width: aspect-width(6.4);
+  height: aspect-width(6.4);
+  top: aspect-width(-1);
+  right: aspect-width(0);
+  background: url('/images/ui/duel/card_details/button_exit.png') no-repeat;
+  background-size: cover;
+  transition: transform 0.2s ease;
+  z-index: 11;
 }
 
 .tutorialTitle {
@@ -2611,4 +2627,20 @@ a.active.step:hover,
 .tutorialButtonDisabled {
   color: #4a4a4a;
   cursor: not-allowed;
+}
+
+.tutorialTopLeftArrow {
+  position: absolute;
+  top: aspect-width(2.4);
+  left: aspect-width(2.8);
+  z-index: 10;
+}
+
+.tutorialGoToDuelButton {
+  position: absolute;
+  bottom: aspect-height(4);
+  left: 50%;
+  transform: translateX(-50%);
+  width: aspect-width(30);
+  text-align: center;
 }
