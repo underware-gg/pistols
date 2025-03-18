@@ -51,7 +51,7 @@ export default function NewChallengeModal() {
     duelistSelectOpener.close()
   }
 
-  const { hasPact, pactDuelId } = usePact(tableId, addressA, addressB)
+  const { hasPact, pactDuelId } = usePact(tableId, addressA, addressB, isOpen)
   const { description: tableDescription } = useTable(tableId)
   const [args, setArgs] = useState<any>(null)
   const { fee } = useCalcFeeDuel(tableId)

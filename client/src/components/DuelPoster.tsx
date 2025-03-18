@@ -28,8 +28,8 @@ import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { SceneName } from '/src/data/assets'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelRequiresAction } from '/src/stores/eventsStore'
-import { useGetChallengeRewards } from '/src/hooks/useChallengeRewards'
 import { BigNumberish } from 'starknet'
+import { useFameBalanceDuelist } from '/src/hooks/useFame'
 
 
 const Row = Grid.Row
@@ -88,6 +88,8 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
     duelistIdB,
     isLive,
     isFinished,
+    isCanceled,
+    isExpired,
     premise,
     quote,
     winnerDuelistId,
@@ -99,10 +101,9 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { challengeDescription } = useChallengeDescription(props.duelId)
   const { description: tableDescription, isSeason, isTutorial } = useTable(tableId)
 
-  // const rewardsA = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdA)
-  // const rewardsB = useGetChallengeRewards(isFinished ? props.duelId : 0n, duelistIdB)
-  // console.log('rewardsA:', rewardsA)
-  // console.log('rewardsB:', rewardsB)
+  useEffect(() => {
+    console.log('needToSyncExpired', needToSyncExpired)
+  }, [needToSyncExpired])
   
   const { name: playerNameA } = usePlayer(duelistAddressA)
   const { name: playerNameB } = usePlayer(duelistAddressB)
@@ -111,10 +112,12 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
   const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
 
+  const { lives, isLoading } = useFameBalanceDuelist(challengingDuelistId)
+
   const isChallenger = useMemo(() => isYouA, [isYouA])
   const isChallenged = useMemo(() => isYouB, [isYouB])
 
-  const { isInAction } = useDuelist(duelistIdB)
+  const { isInAction } = useDuelist(challengingDuelistId)
 
   const { duelContractAddress } = useDuelTokenContract()
   const { isBookmarked } = useIsBookmarked(duelContractAddress, props.duelId)
@@ -134,18 +137,11 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
     if (accepted) {
       duelistSelectOpener.open()
     } else {
-      _submit(null, accepted)
+      _submit(0n, accepted)
     }
   }
 
-  useEffect(() => {
-    if (challengingDuelistId > 0n) {
-      _submit(challengingDuelistId, true)
-    }
-  }, [challengingDuelistId])
-
   const _submit = async (duelistId?: BigNumberish, accepted?: boolean) => {
-    console.log('DuelPoster _submit duelistId:', duelistId, 'accepted:', accepted)
     setIsSubmitting(true)
     await duel_token.reply_duel(account, duelistId, props.duelId, accepted)
     dispatchChallengingDuelistId(0n)
@@ -332,9 +328,9 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
 
               </Grid>
               <div className='DuelistCard' style={{ width: aspectWidth(DUELIST_CARD_WIDTH / 2), height: aspectWidth(DUELIST_CARD_HEIGHT) }}>
-                {duelistIdB ? (
+                {duelistIdB || challengingDuelistId ? (
                   <DuelistCard
-                    duelistId={Number(duelistIdB)}
+                    duelistId={Number(duelistIdB || challengingDuelistId)}
                     isSmall={true}
                     isLeft={false}
                     isVisible={true}
@@ -344,7 +340,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     isHighlightable={true}
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
-                    onClick={() => dispatchSelectDuelistId(duelistIdB)}
+                    onClick={() => duelistSelectOpener.open()}
                   />
                 ) : null}
               </div>
@@ -373,15 +369,21 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                   </Col>
                 }
                 {(state == constants.ChallengeState.Awaiting && isChallenged) &&
-                  (!isInAction ?
-                    <Col>
-                      <BalanceRequiredButton label='Accept Challenge!' fillParent fill={false} disabled={isSubmitting} onClick={() => _reply(true)} fee={0} />
-                    </Col>
-                    :
-                    <Col>
-                      <ActionButton large fillParent label='Select another duelist!' disabled={true} onClick={() => {}} />
-                    </Col>
-                  )
+                  (!challengingDuelistId ? (
+                      <Col>
+                        <ActionButton large fillParent important label='Select Duelist' disabled={isSubmitting} onClick={() => duelistSelectOpener.open()} />
+                      </Col>
+                    ) : (
+                      isInAction || lives < livesStaked ? (
+                        <Col>
+                          <ActionButton large fillParent label='Select another duelist!' onClick={() => duelistSelectOpener.open()} />
+                        </Col>
+                      ) : (
+                        <Col>
+                          <BalanceRequiredButton label='Accept Challenge!' fillParent fill={false} disabled={isSubmitting} onClick={() => _submit(challengingDuelistId, true)} fee={0} />
+                        </Col>
+                      )
+                    ))
                 }
                 {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || isRequiredAction) &&
                   <Col>

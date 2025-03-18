@@ -113,7 +113,7 @@ export const useCanCollectSeason = () => {
   }), [])
   const { value, isLoading } = useSdkCallPromise<boolean>(options)
   return {
-    canCollectDuel: value,
+    canCollectSeason: value,
     isLoading,
   }
 }

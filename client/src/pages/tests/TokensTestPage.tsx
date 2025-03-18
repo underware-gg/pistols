@@ -3,7 +3,8 @@ import { BigNumberish } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
-import { useTokensByOwner } from '/src/stores/tokenStore'
+import { useTokenIdsOfPlayer, useTokensByOwner } from '/src/stores/tokenStore'
+import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { useERC721TokenUri } from '@underware/pistols-sdk/utils/hooks'
 import { duelist_token, duel_token } from '@underware/pistols-sdk/pistols/tokens'
@@ -30,6 +31,9 @@ export default function TokensTestPage() {
         <CurrentChainHint />
         <Connect />
 
+        <EntityStoreSync />
+        <TokenStoreSync />
+
         <TestImages />
         <Tokens />
       </Container>
@@ -49,8 +53,6 @@ function Tokens() {
       <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists' />
       <br />
       <TokenContract contractAddress={duelContractAddress} tokenName='Duels' />
-      <br />
-      <TokenStoreSync />
     </>
   );
 }
@@ -64,23 +66,23 @@ function TokenContract({
   tokenName: string,
   attributes?: string[],
 }) {
-  const { address } = useAccount()
-  const { tokens } = useTokensByOwner(contractAddress, address) // direct get
-  // const { tokenIds } = useTokenIdsOfPlayer(contractAddress) // from the store
+  // const { address } = useAccount()
+  // const { tokens } = useTokensByOwner(contractAddress, address) // direct get
+  const { tokenIds } = useTokenIdsOfPlayer(contractAddress) // from the store
 
   const rows = useMemo(() => {
-    return tokens.sort((a, b) => Number(a.tokenId - b.tokenId)).map((token) => {
+    return tokenIds.sort((a, b) => Number(a - b)).map((tokenId) => {
       return (
-        <TokenRow key={token.tokenId}
+        <TokenRow key={tokenId}
           contractAddress={contractAddress}
-          tokenId={token.tokenId}
+          tokenId={tokenId}
           // cached_metadata={token.metadata}
-          cached_metadata={''}
+          cached_metadata={'{}'}
           attributes={attributes}
         />
       )
     })
-  }, [tokens])
+  }, [tokenIds])
 
   return (
     <Table attached>
@@ -128,7 +130,7 @@ function TokenRow({
       <Cell verticalAlign='top'>
         <h3>{name}</h3>
         {attributes.map((a) => (
-          <li key={a}>{a}: <b>{attr[a]}</b></li>
+          <li key={a}>{a}: <b>{attr?.[a] ?? '?'}</b></li>
         ))}
       </Cell>
       <Cell>
@@ -203,16 +205,16 @@ function TestImages() {
       <Header fullWidth>
         <Row>
           <HeaderCell>
-            <h3 className='Important'>TEST<br />{`<img>`}<br />(original)</h3>
+            <h3 className='Important'>TEST DUELIST<br />{`<img>`}</h3>
           </HeaderCell>
           <HeaderCell>
-            <h3 className='Important'>TEST<br />{`<embed>`}<br />(original)</h3>
+            <h3 className='Important'>TEST DUELIST<br />{`<embed>`}</h3>
           </HeaderCell>
           <HeaderCell>
-            <h3 className='Important'>TEST<br />{`<img>`}<br />(edited)</h3>
+            <h3 className='Important'>TEST DUEL<br />{`<img>`}</h3>
           </HeaderCell>
           <HeaderCell>
-            <h3 className='Important'>TEST<br />{`<embed>`}<br />(edited)</h3>
+            <h3 className='Important'>TEST DUEL<br />{`<embed>`}</h3>
           </HeaderCell>
         </Row>
       </Header>

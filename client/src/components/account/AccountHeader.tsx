@@ -42,7 +42,7 @@ export default function AccountHeader() {
       </div>
       <div style={{ padding: aspectWidth(0.6) }}>
         {/* TODO replace with selkectedDuelist for profile pic */}
-        <ProfilePic profilePic={0} medium  removeBorder onClick={() => _click()} /> 
+        <ProfilePic profilePic={0} medium removeBorder onClick={() => _click()} /> 
       </div>
     </div>
   );

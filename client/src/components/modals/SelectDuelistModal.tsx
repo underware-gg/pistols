@@ -139,6 +139,7 @@ export default function SelectDuelistModal({
       if (isPositiveBigint(selectedDuelistId)) {
         dispatchChallengingDuelistId(selectedDuelistId)
       }
+      setSelectedDuelistId(0n)
       opener?.close()
       setIsAnimating(false)
     })

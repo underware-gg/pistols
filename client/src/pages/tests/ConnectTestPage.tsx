@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { EthSigner, Signature } from 'starknet'
-import { Container, Table, Button, Image } from 'semantic-ui-react'
+import { Container, Table, Button, Image, Grid } from 'semantic-ui-react'
 import { useAccount, useConnect, useDisconnect, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDojoSetup, useStarknetContext, getConnectorIcon } from '@underware/pistols-sdk/dojo'
@@ -89,7 +89,7 @@ export function Connect() {
             </Cell>
           </Row>
           <Row className='H5'>
-            <Cell>Connected</Cell>
+            <Cell>Connected to</Cell>
             <Cell className='Code'>
               {isConnected
                 ? <span className='Important'>{feltToString(chain.id)}</span>
@@ -100,9 +100,12 @@ export function Connect() {
           <Row className='H5'>
             <Cell>Connector</Cell>
             <Cell className='TitleCase'>
-              {connector && <>
-                <ProfilePic medium  profilePicUrl={getConnectorIcon(connector)} /> {connector.name}
-              </>}
+              {connector && <Grid>
+                <Grid.Row>
+                  <ProfilePic small profilePicUrl={getConnectorIcon(connector)} className='NoBorder'/>
+                  {` ${connector.name}`}
+                </Grid.Row>
+              </Grid>}
               {!connector && JSON.stringify(connectors.map(c => c.id))}
             </Cell>
           </Row>

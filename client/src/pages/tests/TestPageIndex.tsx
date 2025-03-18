@@ -5,6 +5,7 @@ import App from '/src/components/App'
 
 const testPages = [
   { name: 'connect', connected: true },
+  { name: 'seasons', connected: true },
   { name: 'tokens', connected: true },
   { name: 'tutorial', connected: true },
   { name: 'timestamp', connected: true },
