@@ -38,16 +38,16 @@ export default function DuelProfile({
           </div>
           <Image className='NoMouse NoDrag' src='/images/ui/duel/player_profile.png' style={{ position: 'absolute' }} />
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), left: aspectWidth(8.3) }}>
-            <div className='NoMargin ProfileName' data-contentlength={contentLength}>{name}</div>
-            <div className='NoMargin ProfileName' data-contentlength={duelistContentLength}>{duelistName}</div>
+            {!isTutorial && <div className='NoMargin ProfileName' data-contentlength={contentLength}>{name}</div>}
+            <div className={`ProfileName ${isTutorial ? '' : 'NoMargin '}`} data-contentlength={duelistContentLength} style={{ marginTop: isTutorial ? aspectWidth(0.4) : '0px' }}>{duelistName}</div>
           </div>
         </>
       }
       {floated == 'right' &&
         <>
           <div className='NoMouse NoDrag' style={{ zIndex: 10, position: 'absolute', top: aspectWidth(0.2), right: aspectWidth(8.3), display: 'flex', flexDirection: 'column', alignItems: 'end' }}>
-            <div className='NoMargin ProfileName' data-contentlength={contentLength}>{name}</div>
-            <div className='NoMargin ProfileName' data-contentlength={duelistContentLength}>{duelistName}</div>
+            {!isTutorial && <div className='NoMargin ProfileName' data-contentlength={contentLength}>{name}</div>}
+            <div className={`ProfileName ${isTutorial ? '' : 'NoMargin '}`} data-contentlength={duelistContentLength} style={{ marginTop: isTutorial ? aspectWidth(0.4) : '0px' }}>{duelistName}</div>
           </div>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectPlayerAddress(playerAddress)}>
             <ProfilePic circle profilePic={isTutorial ? profilePic : 0} profileType={isTutorial ? profileType : constants.ProfileType.Character} className='NoMouse NoDrag' />
