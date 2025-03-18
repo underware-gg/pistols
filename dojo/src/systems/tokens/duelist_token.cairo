@@ -632,7 +632,7 @@ pub mod duelist_token {
         fn render_token_uri(self: @ERC721ComboComponent::ComponentState<ContractState>, token_id: u256) -> Option<TokenMetadata> {
             let self = self.get_contract(); // get the component's contract state
             let mut store: Store = StoreTrait::new(self.world_default());
-            // gether data
+            // gather data
             let duelist: DuelistValue = store.get_duelist_value(token_id.low);
             // let memorial: DuelistMemorialValue = store.get_duelist_memorial_value(token_id.low);
             // let is_memorized: bool = (memorial.cause_of_death == CauseOfDeath::Memorize);
