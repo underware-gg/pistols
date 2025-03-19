@@ -1,16 +1,18 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { Container, Table } from 'semantic-ui-react'
-import { useAccount } from '@starknet-react/core'
+import { Container, Icon, Table } from 'semantic-ui-react'
 import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
 import { useTokenIdsOfPlayer, useTokensByOwner } from '/src/stores/tokenStore'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
+import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { useERC721TokenUri } from '@underware/pistols-sdk/utils/hooks'
 import { duelist_token, duel_token } from '@underware/pistols-sdk/pistols/tokens'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { Connect } from './ConnectTestPage'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
+import { DuelistTokenArt } from '/src/components/cards/DuelistTokenArt'
+import { DuelTokenArt } from '/src/components/cards/DuelTokenArt'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
@@ -33,6 +35,7 @@ export default function TokensTestPage() {
 
         <EntityStoreSync />
         <TokenStoreSync />
+        <ChallengeStoreSync />
 
         <TestImages />
         <Tokens />
@@ -41,18 +44,29 @@ export default function TokensTestPage() {
   );
 }
 
+const _style = {
+  minWidth: '70px',
+  width: 'auto',
+  height: '100px',
+}
+
 function Tokens() {
   const { packContractAddress } = usePackTokenContract()
   const { duelistContractAddress } = useDuelistTokenContract()
   const { duelContractAddress } = useDuelTokenContract()
+  // useSdkTokenBalancesTest();
   return (
     <>
       <br />
       <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
       <br />
-      <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists' />
+      <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists'
+        renderer={(tokenId: bigint) => <DuelistTokenArt duelistId={tokenId} style={_style} />}
+      />
       <br />
-      <TokenContract contractAddress={duelContractAddress} tokenName='Duels' />
+      <TokenContract contractAddress={duelContractAddress} tokenName='Duels'
+        renderer={(tokenId: bigint) => <DuelTokenArt duelId={tokenId} style={_style} />}
+      />
     </>
   );
 }
@@ -61,10 +75,12 @@ function TokenContract({
   contractAddress,
   tokenName,
   attributes = [],
+  renderer = null,
 }: {
   contractAddress: BigNumberish,
   tokenName: string,
   attributes?: string[],
+  renderer?: (tokenId: bigint) => React.ReactNode,
 }) {
   // const { address } = useAccount()
   // const { tokens } = useTokensByOwner(contractAddress, address) // direct get
@@ -79,6 +95,7 @@ function TokenContract({
           // cached_metadata={token.metadata}
           cached_metadata={'{}'}
           attributes={attributes}
+          rendered_token={renderer?.(tokenId)}
         />
       )
     })
@@ -95,6 +112,7 @@ function TokenContract({
           <HeaderCell><h3 className='Important'>Cached {`<embed>`}</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>RPC {`<img>`}</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>RPC {`<embed>`}</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Render {`<img>`}</h3></HeaderCell>
         </Row>
       </Header>
 
@@ -112,16 +130,17 @@ function TokenRow({
   tokenId,
   cached_metadata,
   attributes = [],
+  rendered_token = null,
 }: {
   contractAddress: BigNumberish,
   tokenId: bigint,
   cached_metadata: string,
   attributes?: string[],
+  rendered_token?: React.ReactNode,
 }) {
   const { id, name, description, image: cached_image, metadata: attr } = useMemo(() => JSON.parse(cached_metadata), [cached_metadata])
   // const img = image.replace('https', 'http')
-  const { image: rpc_image } = useERC721TokenUri(contractAddress, tokenId)
-  const style = { width: '100px', height: '100px' }
+  const { image: rpc_image, metadata: rpc_metadata } = useERC721TokenUri(contractAddress, tokenId)
   return (
     <Row key={tokenId}>
       <Cell verticalAlign='top'>
@@ -133,31 +152,31 @@ function TokenRow({
           <li key={a}>{a}: <b>{attr?.[a] ?? '?'}</b></li>
         ))}
       </Cell>
-      <Cell>
-        <img src={cached_image} alt={name} style={style} />
+      <Cell verticalAlign='bottom'>
+        <img src={cached_image} alt={name} style={_style} />
+        &nbsp;<a href={cached_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
       </Cell>
-      <Cell>
-        <embed src={cached_image} style={style} />
+      <Cell verticalAlign='bottom'>
+        <embed src={cached_image} style={_style} />
+        &nbsp;<a href={cached_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
       </Cell>
-      <Cell>
-        <img src={rpc_image} alt={name} style={style} />
+      <Cell verticalAlign='bottom'>
+        <img src={rpc_image} alt={name} style={_style} />
+        &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
       </Cell>
-      <Cell>
-        <embed src={rpc_image} style={style} />
+      <Cell verticalAlign='bottom'>
+        <embed src={rpc_image} style={_style} />
+        &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
+      </Cell>
+      <Cell verticalAlign='bottom'>
+        {rendered_token}
       </Cell>
     </Row>
   )
-
 }
 
 
-
-
-
-
 function TestImages() {
-  const style = { width: '100px', height: '100px', backgroundColor: 'black' }
-
   const duelist_svg = duelist_token.renderSvg({
     // base_uri: 'https://localhost:5173',
     duelist_id: 16,
@@ -222,19 +241,71 @@ function TestImages() {
       <Body>
         <Row>
           <Cell>
-            <img src={duelist_svg} style={style} />
+            <img src={duelist_svg} style={_style} />
           </Cell>
           <Cell>
-            <embed src={duelist_svg} style={style} />
+            <embed src={duelist_svg} style={_style} />
           </Cell>
           <Cell>
-            <img src={duel_svg} style={style} />
+            <img src={duel_svg} style={_style} />
           </Cell>
           <Cell>
-            <embed src={duel_svg} style={style} />
+            <embed src={duel_svg} style={_style} />
           </Cell>
         </Row>
       </Body>
     </Table>
   )
 }
+
+
+
+
+// import { useAccount } from '@starknet-react/core'
+// import { useDojoSetup } from '@underware/pistols-sdk/dojo'
+// import * as torii from '@dojoengine/torii-client'
+// const useSdkTokenBalancesTest = () => {
+//   const { sdk } = useDojoSetup();
+//   useEffect(() => {
+//     const _get = async () => {
+//       await sdk.getTokenBalances(
+//         ["0x335f20596a8cc613cfe2c463443513beee082ce84ceee8dbf18f993f1959e8b"], // packs
+//         ["0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f"], // Mataleone
+//         []
+//       ).then((balances: torii.TokenBalance[]) => {
+//         console.log("sdk.getTokenBalances() PACKS+Mataleone:", balances)
+//       }).catch((error: Error) => {
+//         console.error("useSdkTokenBalancesGet().sdk.get() ERROR PACKS+Mataleone:", error)
+//       });
+//       await sdk.getTokenBalances(
+//         ["0x43f800e9f5f6e290a798379029fcb28ba7c34e9669f7b5fc77fce8a4ebdc893"], // duelists
+//         ["0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f"], // Mataleone
+//         []
+//       ).then((balances: torii.TokenBalance[]) => {
+//         console.log("sdk.getTokenBalances() DUELISTS+Mataleone:", balances)
+//       }).catch((error: Error) => {
+//         console.error("useSdkTokenBalancesGet().sdk.get() ERROR DUELISTS+Mataleone:", error)
+//       });
+//       await sdk.getTokenBalances(
+//         ["0x335f20596a8cc613cfe2c463443513beee082ce84ceee8dbf18f993f1959e8b"], // packs
+//         ["0x0458f10bf89dfd916eaeabbf6866870bd5bb8b05c6df7de0ad36bb8ad66dce69"], // Rogers
+//         []
+//       ).then((balances: torii.TokenBalance[]) => {
+//         console.log("sdk.getTokenBalances() PACKS+Rogers:", balances)
+//       }).catch((error: Error) => {
+//         console.error("useSdkTokenBalancesGet().sdk.get() ERROR PACKS+Rogers:", error)
+//       });
+//       await sdk.getTokenBalances(
+//         ["0x43f800e9f5f6e290a798379029fcb28ba7c34e9669f7b5fc77fce8a4ebdc893"], // duelists
+//         ["0x0458f10bf89dfd916eaeabbf6866870bd5bb8b05c6df7de0ad36bb8ad66dce69"], // Rogers
+//         []
+//       ).then((balances: torii.TokenBalance[]) => {
+//         console.log("sdk.getTokenBalances() DUELISTS+Rogers:", balances)
+//       }).catch((error: Error) => {
+//         console.error("useSdkTokenBalancesGet().sdk.get() ERROR DUELISTS+Rogers:", error)
+//       });
+//     }
+//     _get();
+//   }, []);
+//   return {};
+// }

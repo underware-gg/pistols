@@ -1,23 +1,16 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useAccount } from '@starknet-react/core'
+import React, { useEffect } from 'react'
+import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { useMintMockLords } from '/src/hooks/useMintMockLords'
 import { useGameAspect } from '/src/hooks/useGameAspect'
-import { ActionButton } from '/src/components/ui/Buttons'
 import { ConnectButton, EnterAsGuestButton } from '/src/components/scenes/ScDoor'
-import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
-import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { PublishOnlineStatusButton } from '/src/stores/sync/PlayerOnlineSync'
-import { TutorialProgressDebug } from '/src/components/TutorialProgressDebug'
 import { SceneName } from '/src/data/assets'
 import { Divider } from '/src/components/ui/Divider'
 import { VStack } from '/src/components/ui/Stack'
 import ShopModal from '/src/components/modals/ShopModal'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { DuelistsBook } from '../ui/DuelistsBook'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { _currentScene } from '/src/three/game'
@@ -27,6 +20,7 @@ export default function ScProfile() {
   const { isConnected } = useAccount()
   const { debugMode } = useSettings()
   const { shopOpener, bookOpener } = usePistolsContext()
+  const { disconnect } = useDisconnect()
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
   const { dispatchSetScene } = usePistolsScene()
@@ -42,6 +36,7 @@ export default function ScProfile() {
           shopOpener.open({ packType: constants.PackType.Duelists5x })
           break
         case 'door':
+          disconnect()
           dispatchSetScene(SceneName.Gate)
           break
       }

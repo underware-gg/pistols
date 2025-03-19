@@ -6,7 +6,7 @@ import { useAccount } from '@starknet-react/core'
 import { useSdkTokenBalancesGet } from '@underware/pistols-sdk/dojo'
 import { useTokenConfig } from './tokenConfigStore'
 import { useDelay } from '@underware/pistols-sdk/utils/hooks'
-import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import * as torii from '@dojoengine/torii-client'
 
 
@@ -54,24 +54,33 @@ const createStore = () => {
         // insert if not exists
         let processed_accounts = []
         balances.forEach((balance) => {
+          const _owned = Number(balance.balance) > 0
           const _contract = bigintToHex(balance.contract_address)
           const _owner = bigintToHex(balance.account_address)
           if (!state.contracts[_contract][_owner] || !processed_accounts.includes(_owner)) {
             state.contracts[_contract][_owner] = []
             processed_accounts.push(_owner)
           }
-          state.contracts[_contract][_owner].push(_parseBalance(balance))
+          if (_owned) {
+            state.contracts[_contract][_owner].push(_parseBalance(balance))
+          }
         })
       });
     },
     updateBalance: (balance: torii.TokenBalance) => {
       set((state: State) => {
-        // insert ONLY if exists
-        const _contract = bigintToHex(balance.contract_address)
-        const _owner = bigintToHex(balance.account_address)
-        if (state.contracts[_contract][_owner]) {
-          state.contracts[_contract][_owner].push(_parseBalance(balance))
-        }
+        throw new Error('tokenStore.updateBalance() not implemented')
+        // // insert ONLY if exists ?????
+        // const _owned = Number(balance.balance) > 0
+        // const _contract = bigintToHex(balance.contract_address)
+        // const _owner = bigintToHex(balance.account_address)
+        // if (state.contracts[_contract][_owner]) {
+        //   if (_owned) {
+        //     state.contracts[_contract][_owner].push(_parseBalance(balance))
+        //   } else {
+        //     // TODO: REMOVE
+        //   }
+        // }
       });
     },
     getTokens: (contractAddress: BigNumberish, accountAddress: BigNumberish): TokenState[] | undefined | null => {

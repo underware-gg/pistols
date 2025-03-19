@@ -62,6 +62,8 @@ export const renderSvg = (props: DuelSvgProps, options: SvgRenderOptions = {}): 
   const profile_a = _getProfile(props.profile_type_a, props.profile_id_a)
   const profile_b = _getProfile(props.profile_type_b, props.profile_id_b)
   const is_finished = (props.state === constants.ChallengeState.Resolved || props.state === constants.ChallengeState.Draw);
+  const is_dead_a = (is_finished && props.winner != 1);
+  const is_dead_b = (is_finished && props.winner != 2);
   let image_duelist_a = renderDuelistImageUrl(props.profile_type_a, props.profile_id_a)
   let image_duelist_b = renderDuelistImageUrl(props.profile_type_b, props.profile_id_b)
   let image_paper = `/images/ui/duel_paper.png`
@@ -117,6 +119,10 @@ export const renderSvg = (props: DuelSvgProps, options: SvgRenderOptions = {}): 
     // font-style:italic;
     // text-decoration:underline;
   }
+  .dead{
+    -webkit-filter:sepia(1);
+    filter:sepia(1);
+  }
 </style>
 
 // paper background
@@ -129,20 +135,16 @@ export const renderSvg = (props: DuelSvgProps, options: SvgRenderOptions = {}): 
 <mask id='mask2'>
   <path d='M${PROFILE_X2},${PROFILE_Y}h${PROFILE_W}v${PROFILE_H}h-${PROFILE_W - MASK_SKEW}z' fill='white'/>
 </mask>
-<image href='${getAsset(profileAssets, image_duelist_a)}' x='${PROFILE_X1}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' mask='url(#mask1)'/>
-<image href='${getAsset(profileAssets, image_duelist_b)}' x='${PROFILE_X2}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' mask='url(#mask2)'/>
+<image ${is_dead_a ? `class='dead'` : ''} href='${getAsset(profileAssets, image_duelist_a)}' x='${PROFILE_X1}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' mask='url(#mask1)'/>
+<image ${is_dead_b ? `class='dead'` : ''} href='${getAsset(profileAssets, image_duelist_b)}' x='${PROFILE_X2}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' mask='url(#mask2)'/>
 <path class='PROFILE' d='M${PROFILE_X1},${PROFILE_Y}h${PROFILE_W - MASK_SKEW}l${MASK_SKEW},${PROFILE_H}h-${PROFILE_W}z'/>
 <path class='PROFILE' d='M${PROFILE_X2},${PROFILE_Y}h${PROFILE_W}v${PROFILE_H}h-${PROFILE_W - MASK_SKEW}z'/>
 <text class='VS' x='${HALF_WIDTH}' y='${PROFILE_Y+PROFILE_H/2}'>
   vs
 </text>
 // cross
-${(is_finished && props.winner != 1) &&
-`<image href='${getAsset(cardsAssets, card_cross)}' x='${PROFILE_X1}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`
-}
-${(is_finished && props.winner != 2) &&
-`<image href='${getAsset(cardsAssets, card_cross)}' x='${PROFILE_X2}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`
-}
+${is_dead_a && `<image href='${getAsset(cardsAssets, card_cross)}' x='${PROFILE_X1}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`}
+${is_dead_b && `<image href='${getAsset(cardsAssets, card_cross)}' x='${PROFILE_X2}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`}
 
 // usernames
 <text class='TITLE' x='${NAME_X1}' y='${TITLE_Y}'>

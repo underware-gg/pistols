@@ -246,6 +246,7 @@ export default function Duel({
 
         if (isPlayingRef.current) {
           nextStepCallback.current = setTimeout(() => {
+            gameImpl?.removeHighlightEffects()
             playStep()
           }, tutorial === DuelTutorialLevel.SIMPLE ? 0 : (Constants.BASE_CARD_REVEAL_DURATION * 1.2) / speedRef.current)
         }
@@ -330,6 +331,9 @@ export default function Duel({
       return newStatsB
     })
 
+    let hasHealthChangedA = step.state_a.health < 3;
+    let hasHealthChangedB = step.state_b.health < 3;
+
     if (tutorial !== DuelTutorialLevel.SIMPLE && currentStep.current > 1 && step.card_env == constants.EnvCard.None) {
       gameBladeAnimationTimeout.current = setTimeout(() => {
         gameImpl?.prepareActionAnimation()
@@ -338,7 +342,8 @@ export default function Duel({
     }
 
     const timeDelay = Constants.DRAW_CARD_BASE_DURATION + 200 + (shouldDoblePause ? (Constants.BASE_CARD_REVEAL_DURATION + 200) : 200)
-    const timeDelayNextStep = (tutorial === DuelTutorialLevel.SIMPLE ? 500 : timeDelay) + (shouldDoblePause ? 1400 : 1000)
+    const timeDelayNextStep = (tutorial === DuelTutorialLevel.SIMPLE ? 500 : timeDelay) + 
+      (shouldDoblePause ? ((hasHealthChangedA || hasHealthChangedB) ? 2800 : 1400) : 1000)
 
     gameAnimationTimeout.current = setTimeout(() => {
       cardRef.current?.updateDuelistData(newStatsA?.damage, newStatsB?.damage, newStatsA?.hitChance, newStatsB?.hitChance)

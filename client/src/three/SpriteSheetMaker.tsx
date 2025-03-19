@@ -40,7 +40,7 @@ export class SpriteSheet {
 
   makeMaterial() {
     return new THREE.MeshBasicMaterial({
-      transparent: true,
+      // transparent: true,
       side: THREE.DoubleSide,
       alphaTest: 0.5
     })

@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import * as shaders from './shaders.tsx'
 import { _gui, _statsEnabled } from './game.tsx';
 
-const GRASS_PATCH_SIZE_LENGTH = 0.1;
-const GRASS_PATCH_SIZE_DEPTH = 0.01;
+const GRASS_PATCH_SIZE_LENGTH = 0.5;
+const GRASS_PATCH_SIZE_DEPTH = 0.51;
 const GRASS_WIDTH = 0.012;
 const GRASS_HEIGHT = 0.1;
 const MAX_GRASS_GROWTH = 0.2;
-const NUM_GRASS = (32) * 3;
+const NUM_GRASS = (32) * 5;
 const GRASS_SEGMENTS_HIGH = 6;
 const GRASS_VERTICES_HIGH = (GRASS_SEGMENTS_HIGH + 1) * 2;
 

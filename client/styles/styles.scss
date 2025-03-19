@@ -1182,7 +1182,7 @@ $ui-container-gap: 1em;
 }
 
 .ActivityPanel {
-  @extend .NoMouse;
+  // @extend .NoMouse;
   background-color: rgba($color-darkest, 0.65);
   height: 40%;
   width: 20%;
@@ -1443,6 +1443,15 @@ $logo-url: '/logos/logo_avante.svg';
   z-index: 800;
   --bg-color: #{$color-dark};
   --border-color: #{$color-darkest};
+}
+
+.GateTalkBaloon {
+  @extend .DemonTalkBaloon;
+  left: 10%;
+  color: $color-darkest;
+  z-index: 800;
+  --bg-color: #{$color-bright};
+  --border-color: #{$color-dark};
 }
 
 .DialogOptionsContainer {

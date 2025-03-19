@@ -415,7 +415,7 @@ const SPRITESHEETS: Spritesheets = {
     },
     [AnimName.SHOT_INJURED_FRONT]: {
       path: '/textures/animations/Female Duelist/Shot_Injured_Front',
-      frameCount: 13,
+      frameCount: 16,
       frameRate: 8,
     },
     [AnimName.SHOT_DEAD_BACK]: {
