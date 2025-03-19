@@ -5,6 +5,7 @@ import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } f
 import { useTokenIdsOfPlayer, useTokensByOwner } from '/src/stores/tokenStore'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
+import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { useERC721TokenUri } from '@underware/pistols-sdk/utils/hooks'
 import { duelist_token, duel_token } from '@underware/pistols-sdk/pistols/tokens'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
@@ -34,6 +35,7 @@ export default function TokensTestPage() {
 
         <EntityStoreSync />
         <TokenStoreSync />
+        <ChallengeStoreSync />
 
         <TestImages />
         <Tokens />

@@ -148,6 +148,10 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
   rect{
     dominant-baseline:middle;
   }
+  .dead{
+    -webkit-filter:sepia(1);
+    filter:sepia(1);
+  }
   .shadow {
     -webkit-filter:drop-shadow(0.2rem 0.2rem 3px ${COLOR_DARK});
     filter:drop-shadow(0.2rem 0.2rem 3px ${COLOR_DARK});
@@ -157,7 +161,7 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
     fill:none;
   }
 </style>
-<image href='${getAsset(profileAssets, profile_url)}' x='${PROFILE_X}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />
+<image ${!is_alive ? `class='dead'` : ''} href='${getAsset(profileAssets, profile_url)}' x='${PROFILE_X}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />
 <image href='${getAsset(cardsAssets, card_url)}' x='0' y='0' width='${WIDTH}px' height='${HEIGHT}px' />
 
 // name
