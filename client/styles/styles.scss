@@ -1445,6 +1445,15 @@ $logo-url: '/logos/logo_avante.svg';
   --border-color: #{$color-darkest};
 }
 
+.GateTalkBaloon {
+  @extend .DemonTalkBaloon;
+  left: 10%;
+  color: $color-darkest;
+  z-index: 800;
+  --bg-color: #{$color-bright};
+  --border-color: #{$color-dark};
+}
+
 .DialogOptionsContainer {
   position: fixed;
   bottom: var(--box-h);

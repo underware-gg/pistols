@@ -367,8 +367,8 @@ export class DuelistsManager {
       onStart = () => { playAudio(AudioName.BODY_FALL, _sfxEnabled) }
     } else if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK, AnimName.STRUCK_INJURED].includes(key)) {
       if (key == AnimName.SHOT_INJURED_BACK) {
-        movement.x = 0.352
-        movement.frames = 8
+        movement.x = 0.352 * 2
+        movement.frames = 8 * 2
       }
       if (duelist.model == CharacterType.MALE) {
         onStart = () => { playAudio(AudioName.GRUNT_MALE, _sfxEnabled) }
