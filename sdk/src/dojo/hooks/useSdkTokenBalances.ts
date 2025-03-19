@@ -56,7 +56,7 @@ export const useSdkTokenBalancesGet = ({
         accounts ?? [],
         tokenIds?.map(a => toToriiTokenId(a)) ?? []
       ).then((balances: torii.TokenBalance[]) => {
-          console.log("useSdkTokenBalancesGet() GOT:", balances)
+          // console.log("useSdkTokenBalancesGet() GOT:", balances)
           setBalances(balances)
         }).catch((error: Error) => {
           console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contracts, accounts)

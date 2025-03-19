@@ -6,8 +6,7 @@ import { useAccount } from '@starknet-react/core'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
-import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, capitalize, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
 import { SortDirection } from './queryParamsStore'
 import { PlayerColumn } from './queryParamsStore'
 
@@ -120,13 +119,13 @@ const createStore = () => {
       });
     },
     updateUsernames: (usernames: Map<string, string>) => {
-      // console.log("updateUsername()[Player] =>", usernames)
+      console.log("updateUsername()[Player] =>", usernames)
       set((state: State) => {
         usernames.forEach((value: string, key: string) => {
           const _key = bigintToHex(key)
           if (state.players[_key]) {
             state.players[_key].username = value
-            state.players[_key].name = capitalize(value)
+            state.players[_key].name = value
             state.players[_key].isNew = false
           }
         })

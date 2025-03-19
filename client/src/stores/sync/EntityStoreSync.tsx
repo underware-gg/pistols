@@ -49,6 +49,8 @@ import { useBankStore } from '/src/stores/bankStore'
 //     PlayerBookmark: [],
 //   },
 // }
+
+const _limit = 1000
 const query: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels([
     "pistols-Config",
@@ -68,6 +70,7 @@ const query: PistolsQueryBuilder = new PistolsQueryBuilder()
     "pistols-PlayerOnline",
     "pistols-PlayerBookmark",
   ])
+  .withLimit(_limit)
   .includeHashedKeys()
 
 
@@ -93,6 +96,9 @@ export function EntityStoreSync() {
     query,
     enabled: mounted,
     setEntities: (entities: PistolsEntity[]) => {
+      if (entities.length == _limit) {
+        console.warn("EntityStoreSync() LIMIT REACHED!!!!:", entities.length)
+      }
       // console.log("EntityStoreSync() SET =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModel(entities, 'Config'))
       // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModel(entities, 'TokenConfig'))
