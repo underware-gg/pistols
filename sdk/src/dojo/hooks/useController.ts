@@ -7,7 +7,7 @@ import { useContractClassHash } from 'src/utils/hooks/useContractClassHash'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
-import { bigintEquals, capitalize } from 'src/utils/misc/types'
+import { bigintEquals } from 'src/utils/misc/types'
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
@@ -52,7 +52,6 @@ export const useConnectedController = () => {
       controllerConnector.username().then((n) => setUsername((n || 'unknown').toLowerCase()))
     }
   }, [controllerConnector, isConnected])
-  const name = useMemo(() => (username ? capitalize(username) : undefined), [username])
 
   // callbacks
   const openSettings = useCallback((isConnected && controllerConnector) ? async () => {
@@ -67,7 +66,7 @@ export const useConnectedController = () => {
     controllerConnector,
     isControllerConnected: (controllerConnector != null),
     username,
-    name,
+    name: username,
     openSettings,
     openProfile,
     openInventory: () => openProfile('inventory'),
