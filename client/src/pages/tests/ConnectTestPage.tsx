@@ -3,7 +3,7 @@ import { EthSigner, Signature } from 'starknet'
 import { Container, Table, Button, Image, Grid } from 'semantic-ui-react'
 import { useAccount, useConnect, useDisconnect, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { useDojoSetup, useStarknetContext, getConnectorIcon } from '@underware/pistols-sdk/dojo'
+import { useDojoSetup, useStarknetContext, getConnectorIcon, useConnectedController } from '@underware/pistols-sdk/dojo'
 import { useTypedMessage, useAsyncMemo } from '@underware/pistols-sdk/utils/hooks'
 import { Messages, Revision, splitSignature, feltToString } from '@underware/pistols-sdk/utils/starknet'
 import { bigintToHex, shortAddress } from '@underware/pistols-sdk/utils'
@@ -67,12 +67,13 @@ export function DojoAccount() {
 
 
 export function Connect() {
+  const { connectOpener } = usePistolsContext()
   const { address, isConnecting, isConnected, connector } = useAccount()
   const { selectedNetworkConfig } = useStarknetContext()
-  const { connectors } = useConnect();
-  const { chain } = useNetwork()
   const { disconnect } = useDisconnect()
-  const { connectOpener } = usePistolsContext()
+  const { connectors } = useConnect()
+  const { chain } = useNetwork()
+  const { openProfile } = useConnectedController()
   return (
     <>
       <StarknetConnectModal opener={connectOpener} />
@@ -103,7 +104,8 @@ export function Connect() {
               {connector && <Grid>
                 <Grid.Row>
                   <ProfilePic small profilePicUrl={getConnectorIcon(connector)} className='NoBorder'/>
-                  {` ${connector.name}`}
+                  <div>&nbsp;&nbsp;{connector.name}&nbsp;&nbsp;</div>
+                  {Boolean(openProfile) && <Button size='tiny' onClick={() => openProfile()}>Profile</Button>}
                 </Grid.Row>
               </Grid>}
               {!connector && JSON.stringify(connectors.map(c => c.id))}

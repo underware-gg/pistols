@@ -53,14 +53,15 @@ const createStore = () => {
       });
     },
     updateBalance: (balance: torii.TokenBalance) => {
-      set((state: State) => {
-        // insert ONLY if exists
-        const _contract = bigintToHex(balance.contract_address)
-        const _owner = bigintToHex(balance.account_address)
-        if (state.contracts[_contract][_owner] != undefined) {
-          state.contracts[_contract][_owner] = _parseBalance(balance)
-        }
-      });
+      throw new Error('coinStore.updateBalance() not implemented')
+      // set((state: State) => {
+      //   // insert ONLY if exists
+      //   const _contract = bigintToHex(balance.contract_address)
+      //   const _owner = bigintToHex(balance.account_address)
+      //   if (state.contracts[_contract][_owner] != undefined) {
+      //     state.contracts[_contract][_owner] = _parseBalance(balance)
+      //   }
+      // });
     },
     getBalance: (contractAddress: BigNumberish, accountAddress: BigNumberish): bigint | undefined | null => {
       if (!get().initialized) return undefined
