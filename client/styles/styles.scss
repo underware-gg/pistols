@@ -1182,7 +1182,7 @@ $ui-container-gap: 1em;
 }
 
 .ActivityPanel {
-  @extend .NoMouse;
+  // @extend .NoMouse;
   background-color: rgba($color-darkest, 0.65);
   height: 40%;
   width: 20%;
