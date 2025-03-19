@@ -246,6 +246,7 @@ export default function Duel({
 
         if (isPlayingRef.current) {
           nextStepCallback.current = setTimeout(() => {
+            gameImpl?.removeHighlightEffects()
             playStep()
           }, tutorial === DuelTutorialLevel.SIMPLE ? 0 : (Constants.BASE_CARD_REVEAL_DURATION * 1.2) / speedRef.current)
         }
