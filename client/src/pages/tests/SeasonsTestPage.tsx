@@ -1,22 +1,26 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { Container, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
-import { useConfig } from '/src/stores/configStore'
+import React, { useMemo, useState } from 'react'
+import { Container, SemanticCOLORS, Table } from 'semantic-ui-react'
+import { BigNumberish } from 'starknet'
 import { useAllSeasonTableIds, useLeaderboard, useSeason, useTable } from '/src/stores/tableStore'
-import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
-import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
-import { Connect } from './ConnectTestPage'
-import CurrentChainHint from '/src/components/CurrentChainHint'
-import AppDojo from '/src/components/AppDojo'
-import { bigintToDecimal, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal } from '@underware/pistols-sdk/utils'
+import { bigintToHex, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal } from '@underware/pistols-sdk/utils'
+import { formatQueryValue, useControllerUsername, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { parseCustomEnum, parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
 import { useClientTimestamp, useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
-import { ActionButton } from '/src/components/ui/Buttons'
-import { formatQueryValue, getEntityModel, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { useAccount } from '@starknet-react/core'
+import { useConfig } from '/src/stores/configStore'
+import { usePlayer } from '/src/stores/playerStore'
+import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
 import { PistolsQueryBuilder } from '@underware/pistols-sdk/pistols'
-import { parseCustomEnum, parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
+import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
+import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
+import { ActionButton } from '/src/components/ui/Buttons'
+import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
+import { Connect } from './ConnectTestPage'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import CurrentChainHint from '/src/components/CurrentChainHint'
+import AppDojo from '/src/components/AppDojo'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -35,6 +39,7 @@ export default function SeasonsTestPage() {
         <Connect />
 
         <EntityStoreSync />
+        <PlayerNameSync />
 
         <Seasons />
       </Container>
@@ -47,8 +52,8 @@ function Seasons() {
   const { seasonTableIds } = useAllSeasonTableIds()
   return (
     <>
-      <Season tableId={seasonTableId} name='Current' color='green' />
       <br />
+      <Season tableId={seasonTableId} name='Current' color='green' />
       {seasonTableIds.map((tableId, i) => (
         <Season key={tableId} tableId={tableId} name={`Season [${i}]`} color='orange' />
       ))}
@@ -85,7 +90,6 @@ function Season({
             <HeaderCell><h3 className='Important'>Start</h3></HeaderCell>
             <HeaderCell><h3 className='Important'>End</h3></HeaderCell>
             <HeaderCell><h3 className='Important'>Collect</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>Leaderboards</h3></HeaderCell>
           </Row>
         </Header>
 
@@ -118,18 +122,17 @@ function Season({
                 onClick={() => collectSeason(account)}
               />
             </Cell>
-            <Cell textAlign='left'>
-              <Leaderboards tableId={tableId} />
-            </Cell>
           </Row>
         </Body>
       </Table>
       {displayReports && <>
+        <Leaderboards tableId={tableId} />
         <PacksReport tableId={tableId} />
         <DuelistsReport tableId={tableId} />
         <DuelsReport tableId={tableId} />
       </>
       }
+      <br />
     </>
   )
 }
@@ -140,22 +143,50 @@ function Leaderboards({
   tableId: string,
 }) {
   const { maxPositions, scores } = useLeaderboard(tableId)
+
   // console.log(`Leaderboards() =>`, tableId, maxPositions, scorePerDuelistId)
   return (
-    <Grid style={{ width: '150px' }} className='NoMargin'>
-      {scores.map(({ duelistId, score }) => (
-        <Grid.Row key={duelistId} columns={'equal'}>
-          <Grid.Column>
-            <span className='Important'>
-              {`Duelist #${duelistId}`}
-            </span>
-          </Grid.Column>
-          <Grid.Column>
-            {score}
-          </Grid.Column>
-        </Grid.Row>
-      ))}
-    </Grid>
+    <Table celled attached>
+      <Header fullWidth>
+        <Row>
+          <HeaderCell><h3 className='Important'>Leaderboards</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Points</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Wallet</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Username</h3></HeaderCell>
+        </Row>
+      </Header>
+      <Body>
+        {scores.map(({ duelistId, score }, index) => (
+          <LeaderboardRow key={duelistId} duelistId={duelistId} score={score} index={index} />
+        ))}
+      </Body>
+    </Table>
+  )
+}
+function LeaderboardRow({
+  duelistId,
+  score,
+  index,
+}: {
+  duelistId: BigNumberish,
+  score: number,
+  index: number,
+}) {
+  const { owner, isLoading: isLoadingOwner } = useOwnerOfDuelist(duelistId)
+  // const { username, isLoading: isLoadingUsername } = useControllerUsername(isLoadingOwner ? undefined : owner)
+  const { username } = usePlayer(owner)
+  return (
+    <Row key={duelistId}>
+      <Cell>
+        <span className='Important'>
+          {`Duelist #${duelistId}`}
+        </span>
+      </Cell>
+      <Cell className='Code'>{score}</Cell>
+      <Cell className='Code'>{isLoadingOwner ? '...' : bigintToHex(owner)}</Cell>
+      {/* <Cell className='Code'>{isLoadingUsername ? '...' : username}</Cell> */}
+      <Cell className='Code'>{username || '...'}</Cell>
+    </Row>
   )
 }
 
