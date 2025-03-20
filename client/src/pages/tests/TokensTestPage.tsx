@@ -211,8 +211,8 @@ function TestImages() {
     profile_id_b: 2,
     username_a: 'Mataleone',
     username_b: 'Recipromancer',
-    owner_a: '0xc1bba2af9427c5a277474c079a1283c880ee8a6f0f8fbf73ce969c08d88befe',
-    owner_b: '0xc079a1283c88c1bba2af9427c5a2774740ee8a6f0f8fbf73ce969c08d88befe',
+    address_a: '0xc1bba2af9427c5a277474c079a1283c880ee8a6f0f8fbf73ce969c08d88befe',
+    address_b: '0xc079a1283c88c1bba2af9427c5a2774740ee8a6f0f8fbf73ce969c08d88befe',
   }, {
     includeMimeType: true,
   })

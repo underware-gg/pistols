@@ -527,7 +527,6 @@ pub mod duel_token {
         fn render_token_uri(self: @ERC721ComboComponent::ComponentState<ContractState>, token_id: u256) -> Option<TokenMetadata> {
             let self = self.get_contract(); // get the component's contract state
             let mut store: Store = StoreTrait::new(self.world_default());
-            let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
             // gather data
             let base_uri: ByteArray = self.erc721._base_uri();
             let challenge: ChallengeValue = store.get_challenge_value(token_id.low);
@@ -535,8 +534,6 @@ pub mod duel_token {
             let duelist_b: DuelistValue = store.get_duelist_value(challenge.duelist_id_b);
             let duelist_name_a: ByteArray = format!("Duelist #{}", challenge.duelist_id_a);
             let duelist_name_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);
-            let owner_a: ContractAddress = duelist_dispatcher.owner_of(challenge.duelist_id_a.into());
-            let owner_b: ContractAddress = duelist_dispatcher.owner_of(challenge.duelist_id_b.into());
             // Image
             let image: ByteArray = UrlImpl::new(format!("{}/api/pistols/duel_token/{}/image", base_uri.clone(), token_id))
                 .add("table_id", challenge.table_id.to_string(), true)
@@ -548,8 +545,8 @@ pub mod duel_token {
                 .add("profile_type_a", duelist_b.profile_type.into(), false)
                 .add("profile_id_a", duelist_a.profile_type.profile_id().to_string(), false)
                 .add("profile_id_b", duelist_b.profile_type.profile_id().to_string(), false)
-                .add("owner_a", format!("0x{:x}", owner_a), false)
-                .add("owner_b", format!("0x{:x}", owner_b), false)
+                .add("address_a", format!("0x{:x}", challenge.address_a), false)
+                .add("address_b", format!("0x{:x}", challenge.address_b), false)
                 .build();
             // Attributes
             let mut attributes: Array<Attribute> = array![
