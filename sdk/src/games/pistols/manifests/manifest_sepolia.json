@@ -2048,7 +2048,7 @@
     },
     {
       "address": "0x6a4af1a5da66446071dd7227b6634c03473ab4aa0784e488a6000bef8ab6d78",
-      "class_hash": "0x6838c4506d169e445cb8d61bf0340df5e03107f89002d25521b897cb4d0ab35",
+      "class_hash": "0x540a149f1671894bda18d9db4043dbe84ae69a04f813f734c8acf839ff5dffe",
       "abi": [
         {
           "type": "impl",
@@ -3065,14 +3065,38 @@
             },
             {
               "type": "function",
-              "name": "minted_count",
+              "name": "update_contract_metadata",
               "inputs": [],
-              "outputs": [
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "update_token_metadata",
+              "inputs": [
                 {
+                  "name": "token_id",
                   "type": "core::integer::u128"
                 }
               ],
-              "state_mutability": "view"
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "update_tokens_metadata",
+              "inputs": [
+                {
+                  "name": "from_token_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "to_token_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -3325,12 +3349,15 @@
         "set_approval_for_all",
         "safeTransferFrom",
         "transferFrom",
-        "setApprovalForAll"
+        "setApprovalForAll",
+        "update_contract_metadata",
+        "update_token_metadata",
+        "update_tokens_metadata"
       ]
     },
     {
       "address": "0x559b1e18b102f7f984a2fe9811df5231e9965cb6bc2c3be659082449186544a",
-      "class_hash": "0x2c93bec33aa2846ed8f6f85d6089e9c3ae9ed685eba253b8d4c1f93e86a9c19",
+      "class_hash": "0x7cd6fe552d6e60f0b33bd33d4873bb39797af884fb505008354f6e9165e0d2b",
       "abi": [
         {
           "type": "impl",
@@ -4487,14 +4514,38 @@
             },
             {
               "type": "function",
-              "name": "minted_count",
+              "name": "update_contract_metadata",
               "inputs": [],
-              "outputs": [
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "update_token_metadata",
+              "inputs": [
                 {
+                  "name": "token_id",
                   "type": "core::integer::u128"
                 }
               ],
-              "state_mutability": "view"
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "update_tokens_metadata",
+              "inputs": [
+                {
+                  "name": "from_token_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "to_token_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -4747,7 +4798,10 @@
         "set_approval_for_all",
         "safeTransferFrom",
         "transferFrom",
-        "setApprovalForAll"
+        "setApprovalForAll",
+        "update_contract_metadata",
+        "update_token_metadata",
+        "update_tokens_metadata"
       ]
     },
     {
@@ -6865,7 +6919,7 @@
     },
     {
       "address": "0x5dd18266b62db64defdafcb98042fd327fd7eed3c76616dfb0c3be3098b844c",
-      "class_hash": "0x7ed9bc9a37b70f577defbe5ae3901d266b50b027e2938c6ea432614468ca441",
+      "class_hash": "0x597a8edb13418d795c81f0b1e459c28ec5bff32e4bf583102b1a6e755e71f62",
       "abi": [
         {
           "type": "impl",
@@ -7784,14 +7838,38 @@
             },
             {
               "type": "function",
-              "name": "minted_count",
+              "name": "update_contract_metadata",
               "inputs": [],
-              "outputs": [
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "update_token_metadata",
+              "inputs": [
                 {
+                  "name": "token_id",
                   "type": "core::integer::u128"
                 }
               ],
-              "state_mutability": "view"
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "update_tokens_metadata",
+              "inputs": [
+                {
+                  "name": "from_token_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "to_token_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -8042,7 +8120,10 @@
         "set_approval_for_all",
         "safeTransferFrom",
         "transferFrom",
-        "setApprovalForAll"
+        "setApprovalForAll",
+        "update_contract_metadata",
+        "update_token_metadata",
+        "update_tokens_metadata"
       ]
     },
     {
