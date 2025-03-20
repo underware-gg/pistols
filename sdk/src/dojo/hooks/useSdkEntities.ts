@@ -22,25 +22,23 @@ type UseSdkGetResult = {
   isLoading: boolean | undefined
 }
 
-export type UseSdkEntitiesProps = {
+type UseSdkEntitiesProps = {
   query: PistolsQueryBuilder
   enabled?: boolean
 }
-type UseSdkEntitiesGetProps = UseSdkEntitiesProps & {
+export type UseSdkEntitiesGetProps = UseSdkEntitiesProps & {
+  retryInterval?: number
   setEntities: (entities: PistolsEntity[]) => void // stores set callback (erases previous state)
 }
-type UseSdkEntitiesSubProps = UseSdkEntitiesProps & {
+export type UseSdkEntitiesSubProps = UseSdkEntitiesProps & {
   setEntities: (entities: PistolsEntity[]) => void // stores set callback (erases previous state)
   updateEntity: (entities: PistolsEntity) => void // store update callback
 }
 
-export type UseSdkEventsProps = UseSdkEntitiesProps & {
+export type UseSdkEventsGetProps = UseSdkEntitiesGetProps & {
   historical: boolean
 }
-type UseSdkEventsGetProps = UseSdkEntitiesGetProps & {
-  historical: boolean
-}
-type UseSdkEventsSubProps = UseSdkEntitiesSubProps & {
+export type UseSdkEventsSubProps = UseSdkEntitiesSubProps & {
   historical: boolean
 }
 
@@ -61,26 +59,40 @@ export const useSdkEntitiesGet = ({
   query,
   setEntities,
   enabled = true,
+  retryInterval = 0,
 }: UseSdkEntitiesGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
 
   useEffect(() => {
+    let _mounted = true
     const _get = async () => {
       setIsLoading(true)
       await sdk.getEntities({
         query,
       }).then((data: PistolsEntity[]) => {
+        if (!_mounted) return
         console.log("useSdkEntitiesGet() GOT:", data)
-        setEntities(_filterEntities(data))
+        const entities = _filterEntities(data)
+        if (entities.length > 0) {
+          // console.log("useSdkEntitiesGet() GOT>>>>>>>>>>>>", entities)
+          setEntities(entities)
+          setIsLoading(false)
+        } else if (retryInterval > 0) {
+          console.log("useSdkEntitiesGet() retry...", retryInterval)
+          setTimeout(() => _get(), retryInterval)
+        }
       }).catch((error: Error) => {
+        if (!_mounted) return
         console.error("useSdkEntitiesGet().sdk.get() error:", error, query)
-      }).finally(() => {
         setIsLoading(false)
       })
     }
     // get...
     if (sdk && query && enabled) _get()
+    return () => {
+      _mounted = false
+    }
   }, [sdk, query, enabled])
 
   return {
@@ -98,6 +110,7 @@ export const useSdkEntitiesSub = ({
   const [isLoading, setIsLoading] = useState<boolean>()
 
   useEffect(() => {
+    let _mounted = true
     let _unsubscribe: (() => void) = undefined;
     const _subscribe = async () => {
       setIsLoading(true)
@@ -113,15 +126,17 @@ export const useSdkEntitiesSub = ({
           }
         },
       }).then(response => {
+        if (!_mounted) return
         const [initialEntities, sub] = response;
         // console.log("ENTITIES SUB ====== initialEntities:", initialEntities);
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
           setEntities(_filterEntities(initialEntities))
         }
+        setIsLoading(false)
       }).catch(error => {
+        if (!_mounted) return
         console.error("useSdkEntitiesSub() promise error:", error, query)
-      }).finally(() => {
         setIsLoading(false)
       })
     };
@@ -130,7 +145,8 @@ export const useSdkEntitiesSub = ({
     // unsubscribe
     return () => {
       _unsubscribe?.()
-      _unsubscribe = () => {}
+      _unsubscribe = undefined
+      _mounted = false
     }
   }, [sdk, enabled, query])
 
@@ -148,27 +164,41 @@ export const useSdkEventsGet = ({
   setEntities,
   historical,
   enabled = true,
+  retryInterval = 0,
 }: UseSdkEventsGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
 
   useEffect(() => {
+    let _mounted = true
     const _get = async () => {
       setIsLoading(true)
       sdk.getEventMessages({
         query,
         historical,
       }).then((data: PistolsEntity[] | PistolsEntity[][]) => {
+        if (!_mounted) return
         // console.log("useSdkEventsGet() GOT:", historical, response.data)
-        setEntities(_parseEvents(data, historical))
+        const entities = _parseEvents(data, historical)
+        if (entities.length > 0) {
+          // console.log("useSdkEventsGet() GOT>>>>>>>>>>>>", historical, entities)
+          setEntities(entities)
+          setIsLoading(false)
+        } else if (retryInterval > 0) {
+          console.log("useSdkEventsGet() retry...", historical, retryInterval)
+          setTimeout(() => _get(), retryInterval)
+        }
       }).catch((error: Error) => {
+        if (!_mounted) return
         console.error("useSdkEventsGet() error:", error, query)
-      }).finally(() => {
         setIsLoading(false)
       })
     }
     // get...
     if (sdk && query && enabled) _get()
+    return () => {
+      _mounted = false
+    }
   }, [sdk, query, enabled])
 
   return {
@@ -187,6 +217,7 @@ export const useSdkEventsSub = ({
   const [isLoading, setIsLoading] = useState<boolean>()
 
   useEffect(() => {
+    let _mounted = true
     let _unsubscribe: (() => void) = undefined;
     const _subscribe = async () => {
       setIsLoading(true)
@@ -203,6 +234,7 @@ export const useSdkEventsSub = ({
           }
         },
       }).then(response => {
+        if (!_mounted) return
         const [initialEntities, sub] = response;
         // console.log("EVENTS SUB ====== initialEntities:", initialEntities);
         if (!_unsubscribe) {
@@ -211,8 +243,8 @@ export const useSdkEventsSub = ({
           setIsLoading(false)
         }
       }).catch(error => {
+        if (!_mounted) return
         console.error("useSdkEventsSub() promise error:", error, query)
-      }).finally(() => {
         setIsLoading(false)
       })
     };
@@ -221,7 +253,8 @@ export const useSdkEventsSub = ({
     // unsubscribe...
     return () => {
       _unsubscribe?.()
-      _unsubscribe = () => { }
+      _unsubscribe = undefined
+      _mounted = false
     }
   }, [sdk, enabled, query])
 
@@ -250,7 +283,7 @@ const _parseEvents = (data: PistolsEntity[] | PistolsEntity[][], historical: boo
 //
 
 //
-// Format Bignumberish value for operators
+// Format Bignumberish value for torii query operators
 export const formatQueryValue = (value: BigNumberish): string => {
   return addAddressPadding(bigintToHex(value))
 }

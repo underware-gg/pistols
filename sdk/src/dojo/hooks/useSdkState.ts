@@ -1,5 +1,12 @@
 import { useState } from 'react'
-import { useSdkEntitiesGet, useSdkEntitiesSub, UseSdkEntitiesProps, useSdkEventsGet, UseSdkEventsProps } from 'src/dojo/hooks/useSdkEntities'
+import {
+  useSdkEntitiesGet,
+  UseSdkEntitiesGetProps,
+  useSdkEntitiesSub,
+  UseSdkEntitiesSubProps,
+  useSdkEventsGet,
+  UseSdkEventsGetProps,
+} from 'src/dojo/hooks/useSdkEntities'
 import {
   PistolsModelType,
   PistolsSchemaModels,
@@ -31,7 +38,7 @@ export const getEntityMapModels = <M extends PistolsModelType>(entities: EntityM
 export const useSdkStateEntitiesGet = ({
   query,
   enabled = true,
-}: UseSdkEntitiesProps): useSdkStateResult => {
+}: Omit<UseSdkEntitiesGetProps, 'setEntities'>): useSdkStateResult => {
   const [entities, setEntities] = useState<EntityMap | null>()
 
   const { isLoading } = useSdkEntitiesGet({
@@ -56,7 +63,7 @@ export const useSdkStateEntitiesGet = ({
 export const useSdkStateEntitiesSub = ({
   query,
   enabled = true,
-}: UseSdkEntitiesProps): useSdkStateResult => {
+}: Omit<UseSdkEntitiesSubProps, 'setEntities' | 'updateEntity'>): useSdkStateResult => {
   const [entities, setEntities] = useState<EntityMap | null>()
 
   const { isLoading } = useSdkEntitiesSub({
@@ -99,13 +106,15 @@ export const useSdkStateEventsGet = ({
   query,
   historical,
   enabled = true,
-}: UseSdkEventsProps): useSdkStateResult => {
+  retryInterval = 0,
+}: Omit<UseSdkEventsGetProps, 'setEntities'>): useSdkStateResult => {
   const [entities, setEntities] = useState<EntityMap | null>()
 
   const { isLoading } = useSdkEventsGet({
     query,
     enabled,
     historical,
+    retryInterval,
     setEntities: (entities: PistolsEntity[]) => {
       console.log('useSdkStateEventsGet', entities)
       setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
