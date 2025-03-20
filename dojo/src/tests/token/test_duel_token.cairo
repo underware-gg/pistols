@@ -36,51 +36,9 @@ use pistols::tests::tester::{tester,
         ID, OWNER, OTHER, BUMMER, RECIPIENT, ZERO,
     },
 };
-use pistols::tests::{utils};
 
+use nft_combo::erc721::erc721_combo::{ERC721ComboComponent as combo};
 use openzeppelin_token::erc721::interface;
-use openzeppelin_token::erc721::{
-    // ERC721Component,
-    ERC721Component::{
-        Transfer, Approval,
-    }
-};
-
-//
-// events helpers
-//
-
-fn assert_event_transfer(
-    emitter: ContractAddress, from: ContractAddress, to: ContractAddress, token_id: u256
-) {
-    let event = utils::pop_log::<Transfer>(emitter).unwrap();
-    assert_eq!(event.from, from, "Invalid `from`");
-    assert_eq!(event.to, to, "Invalid `to`");
-    assert_eq!(event.token_id, token_id, "Invalid `token_id`");
-}
-
-fn assert_only_event_transfer(
-    emitter: ContractAddress, from: ContractAddress, to: ContractAddress, token_id: u256
-) {
-    assert_event_transfer(emitter, from, to, token_id);
-    utils::assert_no_events_left(emitter);
-}
-
-fn assert_event_approval(
-    emitter: ContractAddress, owner: ContractAddress, spender: ContractAddress, token_id: u256
-) {
-    let event = utils::pop_log::<Approval>(emitter).unwrap();
-    assert_eq!(event.owner, owner, "Invalid `owner`");
-    assert_eq!(event.approved, spender, "Invalid `spender`");
-    assert_eq!(event.token_id, token_id, "Invalid `token_id`");
-}
-
-fn assert_only_event_approval(
-    emitter: ContractAddress, owner: ContractAddress, spender: ContractAddress, token_id: u256
-) {
-    assert_event_approval(emitter, owner, spender, token_id);
-    utils::assert_no_events_left(emitter);
-}
 
 
 //
@@ -99,10 +57,13 @@ fn setup(_fee_amount: u128) -> TestSystems {
     // initialize contracts
     create_duel(@sys, OWNER(), OTHER());
     create_duel(@sys, OTHER(), BUMMER());
-    tester::impersonate(OWNER());
+    
     // drop all events
-    utils::drop_all_events(sys.world.dispatcher.contract_address);
-    utils::drop_all_events(sys.duels.contract_address);
+    tester::drop_all_events(sys.world.dispatcher.contract_address);
+    tester::drop_all_events(sys.duels.contract_address);
+
+    tester::impersonate(OWNER());
+
     (sys)
 }
 
@@ -237,19 +198,13 @@ fn test_token_uri_invalid() {
 fn test_approve() {
     let sys: TestSystems = setup(0);
 
-    utils::impersonate(OWNER());
+    tester::impersonate(OWNER());
 
     sys.duels.approve(BUMMER(), DUEL_ID_1);
     assert_eq!(sys.duels.get_approved(DUEL_ID_1), BUMMER(), "Spender not approved correctly");
 
-    // drop StoreSetRecord ERC721TokenApprovalModel
-    utils::drop_event(sys.world.dispatcher.contract_address);
-
-    // TODO: fix events
-    // // drop StoreSetRecord ERC721TokenApprovalModel
-    // utils::drop_event(sys.world.dispatcher.contract_address);
-    // assert_only_event_approval(sys.duels.contract_address, OWNER(), BUMMER(), DUEL_ID_1);
-    // assert_only_event_approval(sys.world.dispatcher.contract_address, OWNER(), BUMMER(), DUEL_ID_1);
+    // test events
+    tester::assert_only_event_approval(sys.duels.contract_address, OWNER(), BUMMER(), DUEL_ID_1);
 }
 
 //
@@ -257,22 +212,22 @@ fn test_approve() {
 //
 
 #[test]
-#[ignore] // owned by game now// owned by game now
+#[ignore] // owned by game now
 fn test_transfer_from() {
     let sys: TestSystems = setup(0);
 
     tester::impersonate(OWNER());
     sys.duels.approve(BUMMER(), DUEL_ID_1);
 
-    utils::drop_all_events(sys.duels.contract_address);
-    utils::drop_all_events(sys.world.dispatcher.contract_address);
-    utils::assert_no_events_left(sys.duels.contract_address);
+    tester::drop_all_events(sys.duels.contract_address);
+    tester::drop_all_events(sys.world.dispatcher.contract_address);
+    tester::assert_no_events_left(sys.duels.contract_address);
 
     tester::impersonate(BUMMER());
     sys.duels.transfer_from(OWNER(), OTHER(), DUEL_ID_1);
 
-    // TODO: fix events
-    // assert_only_event_transfer(sys.duels.contract_address, OWNER(), OTHER(), DUEL_ID_1);
+    // test events
+    tester::assert_only_event_transfer(sys.duels.contract_address, OWNER(), OTHER(), DUEL_ID_1);
 
     assert_eq!(sys.duels.balance_of(OTHER()), 2, "Should eq 1");
     assert_eq!(sys.duels.balance_of(OWNER()), 0, "Should eq 1");
@@ -286,7 +241,7 @@ fn test_transfer_from() {
 #[should_panic(expected: ('ERC721: unauthorized caller', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance() {
     let sys: TestSystems = setup(0);
-    utils::impersonate(BUMMER());
+    tester::impersonate(BUMMER());
     sys.duels.transfer_from(OWNER(), OTHER(), DUEL_ID_1);
 }
 
@@ -333,3 +288,32 @@ fn test_mint_lords() {
 //     _assert_minted_count(@sys, 1, 'invalid total_supply');
 //     // assert(sys.duels.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
 // }
+
+
+//---------------------------------
+// metadata_update
+//
+#[test]
+fn test_update_contract_metadata() {
+    let mut sys: TestSystems = setup(0);
+    tester::drop_all_events(sys.duels.contract_address);
+    sys.duels.update_contract_metadata();
+    let _event = tester::pop_log::<combo::ContractURIUpdated>(sys.duels.contract_address, selector!("ContractURIUpdated")).unwrap();
+}
+#[test]
+fn test_update_token_metadata() {
+    let mut sys: TestSystems = setup(0);
+    tester::drop_all_events(sys.duels.contract_address);
+    sys.duels.update_token_metadata(DUEL_ID_1.low);
+    let event = tester::pop_log::<combo::MetadataUpdate>(sys.duels.contract_address, selector!("MetadataUpdate")).unwrap();
+    assert_eq!(event.token_id, DUEL_ID_1.into(), "event.token_id");
+}
+#[test]
+fn test_update_tokens_metadata() {
+    let mut sys: TestSystems = setup(0);
+    tester::drop_all_events(sys.duels.contract_address);
+    sys.duels.update_tokens_metadata(DUEL_ID_1.low, DUEL_ID_2.low);
+    let event = tester::pop_log::<combo::BatchMetadataUpdate>(sys.duels.contract_address, selector!("BatchMetadataUpdate")).unwrap();
+    assert_eq!(event.from_token_id, DUEL_ID_1.into(), "event.from_token_id");
+    assert_eq!(event.to_token_id, DUEL_ID_2.into(), "event.to_token_id");
+}

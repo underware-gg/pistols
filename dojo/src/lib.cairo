@@ -104,7 +104,6 @@ mod tests {
     // utils
     pub mod tester;
     pub mod prefabs;
-    pub mod utils;
     // mocks
     // pub mod mock_account;
     // tokens

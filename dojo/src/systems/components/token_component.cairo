@@ -3,7 +3,9 @@ use starknet::{ContractAddress};
 #[starknet::interface]
 pub trait ITokenComponentPublic<TState> {
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
-    fn minted_count(self: @TState) -> u128;
+    fn update_contract_metadata(ref self: TState);
+    fn update_token_metadata(ref self: TState, token_id: u128);
+    fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
 }
 
 #[starknet::interface]
@@ -65,7 +67,6 @@ pub mod TokenComponent {
         impl ERC721_COMBO: ERC721ComboComponent::HasComponent<TContractState>,
         +Drop<TContractState>,
     > of super::ITokenComponentPublic<ComponentState<TContractState>> {
-
         fn can_mint(self: @ComponentState<TContractState>,
             recipient: ContractAddress,
         ) -> bool {
@@ -78,9 +79,17 @@ pub mod TokenComponent {
             )
         }
 
-        fn minted_count(self: @ComponentState<TContractState>) -> u128 {
-            let erc721_combo = get_dep_component!(self, ERC721_COMBO);
-            (erc721_combo.last_token_id().low)
+        fn update_contract_metadata(ref self: ComponentState<TContractState>) {
+            let mut erc721_combo = get_dep_component_mut!(ref self, ERC721_COMBO);
+            erc721_combo._emit_contract_uri_updated();
+        }
+        fn update_token_metadata(ref self: ComponentState<TContractState>, token_id: u128) {
+            let mut erc721_combo = get_dep_component_mut!(ref self, ERC721_COMBO);
+            erc721_combo._emit_metadata_update(token_id.into());
+        }
+        fn update_tokens_metadata(ref self: ComponentState<TContractState>, from_token_id: u128, to_token_id: u128) {
+            let mut erc721_combo = get_dep_component_mut!(ref self, ERC721_COMBO);
+            erc721_combo._emit_batch_metadata_update(from_token_id.into(), to_token_id.into());
         }
     }
 

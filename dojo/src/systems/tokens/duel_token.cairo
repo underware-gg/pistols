@@ -68,7 +68,9 @@ pub trait IDuelToken<TState> {
 
     // ITokenComponentPublic
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
-    fn minted_count(self: @TState) -> u128;
+    fn update_contract_metadata(ref self: TState);
+    fn update_token_metadata(ref self: TState, token_id: u128);
+    fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
 
     // IDuelTokenPublic
     fn get_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128;
