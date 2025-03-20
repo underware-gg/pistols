@@ -46,3 +46,19 @@ pub mod FAME {
     // residual FAME (<1000) that goes to PoolType::SacredFlame
     pub const SACRED_FLAME_PERCENTAGE: u8 = 60;
 }
+
+pub mod METADATA {
+    pub fn EXTERNAL_LINK() -> ByteArray {
+        ("https://pistols.gg")
+    }
+    pub fn CONTRACT_IMAGE(base_uri: ByteArray) -> ByteArray {
+        format!("{}/pistols/logo.png", base_uri)
+    }
+    pub fn CONTRACT_BANNER_IMAGE(base_uri: ByteArray) -> ByteArray {
+        format!("{}/pistols/splash.png", base_uri)
+    }
+    pub fn CONTRACT_FEATURED_IMAGE(base_uri: ByteArray) -> ByteArray {
+        format!("{}/pistols/splash_og.png", base_uri)
+    }
+
+}
