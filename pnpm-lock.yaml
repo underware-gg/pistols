@@ -10,11 +10,11 @@ catalogs:
       specifier: ^3.11.8
       version: 3.13.4
     '@cartridge/connector':
-      specifier: 0.7.4
-      version: 0.7.4
+      specifier: 0.7.7
+      version: 0.7.7
     '@cartridge/controller':
-      specifier: 0.7.4
-      version: 0.7.4
+      specifier: 0.7.7
+      version: 0.7.7
     '@cartridge/presets':
       specifier: 0.5.4
       version: 0.5.4
@@ -88,10 +88,10 @@ importers:
     dependencies:
       '@cartridge/connector':
         specifier: 'catalog:'
-        version: 0.7.4(@starknet-react/core@3.7.2(bufferutil@4.0.9)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@6.23.1)(typescript@5.8.2)(utf-8-validate@5.0.10))(open@10.1.0)(starknet@6.23.1)
+        version: 0.7.7(@starknet-react/core@3.7.2(bufferutil@4.0.9)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@6.23.1)(typescript@5.8.2)(utf-8-validate@5.0.10))(open@10.1.0)(starknet@6.23.1)
       '@cartridge/controller':
         specifier: 'catalog:'
-        version: 0.7.4(open@10.1.0)(starknet@6.23.1)
+        version: 0.7.7(open@10.1.0)(starknet@6.23.1)
       '@dojoengine/core':
         specifier: 'catalog:'
         version: 1.2.4(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10)
@@ -258,10 +258,10 @@ importers:
         version: 3.13.4(@types/react@18.3.18)(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@cartridge/connector':
         specifier: 'catalog:'
-        version: 0.7.4(@starknet-react/core@3.7.2(bufferutil@4.0.9)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@6.23.1)(typescript@5.8.2)(utf-8-validate@5.0.10))(open@10.1.0)(starknet@6.23.1)
+        version: 0.7.7(@starknet-react/core@3.7.2(bufferutil@4.0.9)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@6.23.1)(typescript@5.8.2)(utf-8-validate@5.0.10))(open@10.1.0)(starknet@6.23.1)
       '@cartridge/controller':
         specifier: 'catalog:'
-        version: 0.7.4(open@10.1.0)(starknet@6.23.1)
+        version: 0.7.7(open@10.1.0)(starknet@6.23.1)
       '@cartridge/presets':
         specifier: 'catalog:'
         version: 0.5.4
@@ -711,16 +711,16 @@ packages:
     resolution: {integrity: sha512-emqcG3vHrpxUKTrxcblR36dcrcoRDvKmnL/dCL6ZsHaShW80qxCAcNhzQZrpeM765VzEos+xOi4s+r4IXzTwdQ==}
     engines: {node: '>=6.9.0'}
 
-  '@cartridge/account-wasm@0.7.4':
-    resolution: {integrity: sha512-2zuxamHerYI6UnzmfshMhfYlLvjdAxWxZSPBcMfch/M+p8FP1DGJs+Ybkhk52tp8RD3vevVJxMjGD2DtVwGIlg==}
+  '@cartridge/account-wasm@0.7.7':
+    resolution: {integrity: sha512-2JO0QeaPD0Nnl8mDDmc4hzarOYW71gnFhOe+m+nzYciP5YqKTq9elP7SYVXTpAVrcivIK/dZ7wHJmtRKs20q8g==}
 
-  '@cartridge/connector@0.7.4':
-    resolution: {integrity: sha512-v3TnI+nMt20/gXruAKn8uKgdylR2in7mvPmZB594ygy7q9WmeJOoxZAEqfjW5y/bvUAMZHG+qjVvOCehRrK5tQ==}
+  '@cartridge/connector@0.7.7':
+    resolution: {integrity: sha512-nXKcfdxp56QJJe9PvnkGZcevc+jlhXaL6MPylc+tSpKOThEuzR2itnDNFvaRG2maaS3l1QqIOhmCgfmjasoDcA==}
     peerDependencies:
       '@starknet-react/core': ^3.7
 
-  '@cartridge/controller@0.7.4':
-    resolution: {integrity: sha512-GxfiwcFyqAyj/dxcmPCMXbi/FFK8pIR9zcGqiFHRy5AtFu50qOTZqwyyIZea8QbSjGwDmHg9X5kyw4dmqS01kg==}
+  '@cartridge/controller@0.7.7':
+    resolution: {integrity: sha512-7otQ2zKzfzLKKTM4knku3Xjs/if7vttFl6X77juuM0sPo8Uy6phsHiQcYoBzVtvnO4J4jniCPjl/zbKsW4pnCA==}
     peerDependencies:
       open: ^10.1.0
       starknet: ^6.21.0
@@ -5057,19 +5057,19 @@ snapshots:
       '@babel/helper-string-parser': 7.25.9
       '@babel/helper-validator-identifier': 7.25.9
 
-  '@cartridge/account-wasm@0.7.4': {}
+  '@cartridge/account-wasm@0.7.7': {}
 
-  '@cartridge/connector@0.7.4(@starknet-react/core@3.7.2(bufferutil@4.0.9)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@6.23.1)(typescript@5.8.2)(utf-8-validate@5.0.10))(open@10.1.0)(starknet@6.23.1)':
+  '@cartridge/connector@0.7.7(@starknet-react/core@3.7.2(bufferutil@4.0.9)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@6.23.1)(typescript@5.8.2)(utf-8-validate@5.0.10))(open@10.1.0)(starknet@6.23.1)':
     dependencies:
-      '@cartridge/controller': 0.7.4(open@10.1.0)(starknet@6.23.1)
+      '@cartridge/controller': 0.7.7(open@10.1.0)(starknet@6.23.1)
       '@starknet-react/core': 3.7.2(bufferutil@4.0.9)(get-starknet-core@4.0.0)(react@18.3.1)(starknet@6.23.1)(typescript@5.8.2)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - open
       - starknet
 
-  '@cartridge/controller@0.7.4(open@10.1.0)(starknet@6.23.1)':
+  '@cartridge/controller@0.7.7(open@10.1.0)(starknet@6.23.1)':
     dependencies:
-      '@cartridge/account-wasm': 0.7.4
+      '@cartridge/account-wasm': 0.7.7
       '@cartridge/penpal': 6.2.4
       '@starknet-io/types-js': 0.7.10
       '@telegram-apps/sdk': 2.11.3

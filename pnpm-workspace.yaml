@@ -34,8 +34,8 @@ catalog:
   #--------------------------------
   # misc
   #
-  "@cartridge/connector": 0.7.4
-  "@cartridge/controller": 0.7.4
+  "@cartridge/connector": 0.7.7
+  "@cartridge/controller": 0.7.7
   "@cartridge/presets": 0.5.4
   "@apollo/client": ^3.11.8
   "@types/node": "^22.10.2"
