@@ -28,8 +28,8 @@ export type DuelSvgProps = {
   profile_id_b: number
   username_a: string
   username_b: string
-  owner_a: BigNumberish
-  owner_b: BigNumberish
+  address_a: BigNumberish
+  address_b: BigNumberish
   // optional
   is_loading?: boolean
 }

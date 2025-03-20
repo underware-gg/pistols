@@ -85,7 +85,7 @@ source = "git+https://github.com/OpenZeppelin/cairo-contracts?tag=v0.20.0#7756fd
 
 [[package]]
 name = "pistols"
-version = "0.13.6"
+version = "0.13.7"
 dependencies = [
  "achievement",
  "dojo",

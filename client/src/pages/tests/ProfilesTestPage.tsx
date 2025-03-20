@@ -134,8 +134,8 @@ function Profiles({
         profile_id_b: props[nextProfileIndex].prop.profile_id,
         username_a: prop.username,
         username_b: props[nextProfileIndex].prop.username,
-        owner_a: prop.owner,
-        owner_b: props[nextProfileIndex].prop.owner,
+        address_a: prop.owner,
+        address_b: props[nextProfileIndex].prop.owner,
       };
       return (
         <Row key={`${profileType}-${profile.profile_id}`} className='ModalText'>

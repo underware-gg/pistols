@@ -67,7 +67,9 @@ pub trait IPackToken<TState> {
 
     // ITokenComponentPublic
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
-    fn minted_count(self: @TState) -> u128;
+    fn update_contract_metadata(ref self: TState);
+    fn update_token_metadata(ref self: TState, token_id: u128);
+    fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
 
     // IPackTokenPublic
     fn can_claim_starter_pack(self: @TState, recipient: ContractAddress) -> bool;
@@ -156,6 +158,7 @@ pub mod pack_token {
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::byte_arrays::{BoolToStringTrait};
+    use pistols::types::constants::{METADATA};
     use pistols::utils::misc::{ZERO};
 
     pub mod Errors {
@@ -328,16 +331,18 @@ pub mod pack_token {
     pub impl ERC721ComboHooksImpl of ERC721ComboComponent::ERC721ComboHooksTrait<ContractState> {
         fn render_contract_uri(self: @ERC721ComboComponent::ComponentState<ContractState>) -> Option<ContractMetadata> {
             let self = self.get_contract(); // get the component's contract state
+            let base_uri: ByteArray = self.erc721._base_uri();
             // let mut store: Store = StoreTrait::new(self.world_default());
             // return the metadata to be rendered by the component
+            // https://docs.opensea.io/docs/contract-level-metadata
             let metadata = ContractMetadata {
                 name: self.name(),
                 symbol: self.symbol(),
                 description: "Pistols at Dawn Packs",
-                image: Option::None,
-                banner_image: Option::None,
-                featured_image: Option::None,
-                external_link: Option::Some("https://pistols.gg"),
+                image: Option::Some(METADATA::CONTRACT_IMAGE(base_uri.clone())),
+                banner_image: Option::Some(METADATA::CONTRACT_BANNER_IMAGE(base_uri.clone())),
+                featured_image: Option::Some(METADATA::CONTRACT_FEATURED_IMAGE(base_uri.clone())),
+                external_link: Option::Some(METADATA::EXTERNAL_LINK()),
                 collaborators: Option::None,
             };
             (Option::Some(metadata))
@@ -347,8 +352,8 @@ pub mod pack_token {
             let self = self.get_contract(); // get the component's contract state
             let mut store: Store = StoreTrait::new(self.world_default());
             // gather data
-            let pack: PackValue = store.get_pack_value(token_id.low);
             let base_uri: ByteArray = self.erc721._base_uri();
+            let pack: PackValue = store.get_pack_value(token_id.low);
             // Attributes
             let mut attributes: Array<Attribute> = array![
                 Attribute {
@@ -361,14 +366,15 @@ pub mod pack_token {
                 },
             ];
             // return the metadata to be rendered by the component
+            // https://docs.opensea.io/docs/metadata-standards#metadata-structure
             let metadata = TokenMetadata {
                 token_id,
                 name: format!("{} #{}", pack.pack_type.name(), token_id),
                 description: format!("Pistols at Dawn Pack #{}. https://pistols.gg", token_id),
                 image: format!("{}/pistols{}", base_uri, pack.pack_type.image_url(pack.is_open)),
                 image_data: Option::None,
-                external_url: Option::Some("https://example.underware.gg"),
-                background_color: Option::Some("0x000000"),
+                external_url: Option::Some(METADATA::EXTERNAL_LINK()), // TODO: format external token link
+                background_color: Option::Some("000000"),
                 animation_url: Option::None,
                 youtube_url: Option::None,
                 attributes: Option::Some(attributes.span()),

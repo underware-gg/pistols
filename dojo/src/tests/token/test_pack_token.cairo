@@ -29,52 +29,9 @@ use pistols::tests::tester::{
         OWNER, OTHER, BUMMER, SPENDER,
     },
 };
-use pistols::tests::{utils};
 
+use nft_combo::erc721::erc721_combo::{ERC721ComboComponent as combo};
 use openzeppelin_token::erc721::interface;
-use openzeppelin_token::erc721::{
-    // ERC721Component,
-    ERC721Component::{
-        Transfer, Approval,
-    }
-};
-
-//
-// events helpers
-//
-
-fn assert_event_transfer(
-    emitter: ContractAddress, from: ContractAddress, to: ContractAddress, token_id: u256
-) {
-    let event = utils::pop_log::<Transfer>(emitter).unwrap();
-    assert_eq!(event.from, from, "Invalid `from`");
-    assert_eq!(event.to, to, "Invalid `to`");
-    assert_eq!(event.token_id, token_id, "Invalid `token_id`");
-}
-
-fn assert_only_event_transfer(
-    emitter: ContractAddress, from: ContractAddress, to: ContractAddress, token_id: u256
-) {
-    assert_event_transfer(emitter, from, to, token_id);
-    utils::assert_no_events_left(emitter);
-}
-
-fn assert_event_approval(
-    emitter: ContractAddress, owner: ContractAddress, spender: ContractAddress, token_id: u256
-) {
-    let event = utils::pop_log::<Approval>(emitter).unwrap();
-    assert_eq!(event.owner, owner, "Invalid `owner`");
-    assert_eq!(event.approved, spender, "Invalid `spender`");
-    assert_eq!(event.token_id, token_id, "Invalid `token_id`");
-}
-
-fn assert_only_event_approval(
-    emitter: ContractAddress, owner: ContractAddress, spender: ContractAddress, token_id: u256
-) {
-    assert_event_approval(emitter, owner, spender, token_id);
-    utils::assert_no_events_left(emitter);
-}
-
 
 //
 // Setup
@@ -97,11 +54,11 @@ fn setup(_fee_amount: u128) -> TestSystems {
 
     tester::fund_duelists_pool(@sys, 2);
 
-    tester::impersonate(OWNER());
-
     // drop all events
-    utils::drop_all_events(sys.world.dispatcher.contract_address);
-    utils::drop_all_events(sys.pack.contract_address);
+    tester::drop_all_events(sys.world.dispatcher.contract_address);
+    tester::drop_all_events(sys.pack.contract_address);
+
+    tester::impersonate(OWNER());
 
     (sys)
 }
@@ -355,7 +312,7 @@ fn test_transfer_opened() {
     let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
     // try to transfer already opened
-    utils::impersonate(OWNER());
+    tester::impersonate(OWNER());
     sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
 }
 
@@ -369,7 +326,7 @@ fn test_transfer_opened_allowed() {
     tester::impersonate(OWNER());
     sys.pack.approve(SPENDER(), TOKEN_ID_1);
     // try to transfer from unauthorized
-    utils::impersonate(SPENDER());
+    tester::impersonate(SPENDER());
     sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
 }
 
@@ -380,7 +337,7 @@ fn test_transfer_opened_no_allowance() {
     let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
     // try to transfer from unauthorized
-    utils::impersonate(SPENDER());
+    tester::impersonate(SPENDER());
     sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
 }
 
@@ -426,6 +383,35 @@ fn test_transfer_unopened_no_allowance() {
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
     _purchase(@sys, OWNER());
     // try to transfer from unauthorized
-    utils::impersonate(SPENDER());
+    tester::impersonate(SPENDER());
     sys.pack.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
+}
+
+
+//---------------------------------
+// metadata_update
+//
+#[test]
+fn test_update_contract_metadata() {
+    let mut sys: TestSystems = setup(0);
+    tester::drop_all_events(sys.pack.contract_address);
+    sys.pack.update_contract_metadata();
+    let _event = tester::pop_log::<combo::ContractURIUpdated>(sys.pack.contract_address, selector!("ContractURIUpdated")).unwrap();
+}
+#[test]
+fn test_update_token_metadata() {
+    let mut sys: TestSystems = setup(0);
+    tester::drop_all_events(sys.pack.contract_address);
+    sys.pack.update_token_metadata(TOKEN_ID_1.low);
+    let event = tester::pop_log::<combo::MetadataUpdate>(sys.pack.contract_address, selector!("MetadataUpdate")).unwrap();
+    assert_eq!(event.token_id, TOKEN_ID_1.into(), "event.token_id");
+}
+#[test]
+fn test_update_tokens_metadata() {
+    let mut sys: TestSystems = setup(0);
+    tester::drop_all_events(sys.pack.contract_address);
+    sys.pack.update_tokens_metadata(TOKEN_ID_1.low, TOKEN_ID_2.low);
+    let event = tester::pop_log::<combo::BatchMetadataUpdate>(sys.pack.contract_address, selector!("BatchMetadataUpdate")).unwrap();
+    assert_eq!(event.from_token_id, TOKEN_ID_1.into(), "event.from_token_id");
+    assert_eq!(event.to_token_id, TOKEN_ID_2.into(), "event.to_token_id");
 }

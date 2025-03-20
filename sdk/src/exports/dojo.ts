@@ -5,6 +5,7 @@ export * from '../dojo/contexts/StarknetProvider'
 
 export * from '../dojo/hooks/useConnect'
 export * from '../dojo/hooks/useController'
+export * from '../dojo/hooks/useControllerUsername'
 export * from '../dojo/hooks/useDojoEmitterEvent'
 export * from '../dojo/hooks/useDojoERC20'
 export * from '../dojo/hooks/useDojoSystem'

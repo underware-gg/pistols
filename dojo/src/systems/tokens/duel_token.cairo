@@ -68,7 +68,9 @@ pub trait IDuelToken<TState> {
 
     // ITokenComponentPublic
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
-    fn minted_count(self: @TState) -> u128;
+    fn update_contract_metadata(ref self: TState);
+    fn update_token_metadata(ref self: TState, token_id: u128);
+    fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
 
     // IDuelTokenPublic
     fn get_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128;
@@ -185,6 +187,7 @@ pub mod duel_token {
         round_state::{RoundState},
         premise::{Premise, PremiseTrait},
         timestamp::{Period, PeriodTrait, TimestampTrait, TIMESTAMP},
+        constants::{METADATA},
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
@@ -506,16 +509,18 @@ pub mod duel_token {
     pub impl ERC721ComboHooksImpl of ERC721ComboComponent::ERC721ComboHooksTrait<ContractState> {
         fn render_contract_uri(self: @ERC721ComboComponent::ComponentState<ContractState>) -> Option<ContractMetadata> {
             let self = self.get_contract(); // get the component's contract state
+            let base_uri: ByteArray = self.erc721._base_uri();
             // let mut store: Store = StoreTrait::new(self.world_default());
             // return the metadata to be rendered by the component
+            // https://docs.opensea.io/docs/contract-level-metadata
             let metadata = ContractMetadata {
                 name: self.name(),
                 symbol: self.symbol(),
                 description: "Pistols at Dawn Duels",
-                image: Option::None,
-                banner_image: Option::None,
-                featured_image: Option::None,
-                external_link: Option::Some("https://pistols.gg"),
+                image: Option::Some(METADATA::CONTRACT_IMAGE(base_uri.clone())),
+                banner_image: Option::Some(METADATA::CONTRACT_BANNER_IMAGE(base_uri.clone())),
+                featured_image: Option::Some(METADATA::CONTRACT_FEATURED_IMAGE(base_uri.clone())),
+                external_link: Option::Some(METADATA::EXTERNAL_LINK()),
                 collaborators: Option::None,
             };
             (Option::Some(metadata))
@@ -524,16 +529,13 @@ pub mod duel_token {
         fn render_token_uri(self: @ERC721ComboComponent::ComponentState<ContractState>, token_id: u256) -> Option<TokenMetadata> {
             let self = self.get_contract(); // get the component's contract state
             let mut store: Store = StoreTrait::new(self.world_default());
-            let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
             // gather data
+            let base_uri: ByteArray = self.erc721._base_uri();
             let challenge: ChallengeValue = store.get_challenge_value(token_id.low);
             let duelist_a: DuelistValue = store.get_duelist_value(challenge.duelist_id_a);
             let duelist_b: DuelistValue = store.get_duelist_value(challenge.duelist_id_b);
             let duelist_name_a: ByteArray = format!("Duelist #{}", challenge.duelist_id_a);
             let duelist_name_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);
-            let owner_a: ContractAddress = duelist_dispatcher.owner_of(challenge.duelist_id_a.into());
-            let owner_b: ContractAddress = duelist_dispatcher.owner_of(challenge.duelist_id_b.into());
-            let base_uri: ByteArray = self.erc721._base_uri();
             // Image
             let image: ByteArray = UrlImpl::new(format!("{}/api/pistols/duel_token/{}/image", base_uri.clone(), token_id))
                 .add("table_id", challenge.table_id.to_string(), true)
@@ -545,8 +547,8 @@ pub mod duel_token {
                 .add("profile_type_a", duelist_b.profile_type.into(), false)
                 .add("profile_id_a", duelist_a.profile_type.profile_id().to_string(), false)
                 .add("profile_id_b", duelist_b.profile_type.profile_id().to_string(), false)
-                .add("owner_a", format!("0x{:x}", owner_a), false)
-                .add("owner_b", format!("0x{:x}", owner_b), false)
+                .add("address_a", format!("0x{:x}", challenge.address_a), false)
+                .add("address_b", format!("0x{:x}", challenge.address_b), false)
                 .build();
             // Attributes
             let mut attributes: Array<Attribute> = array![
@@ -582,14 +584,15 @@ pub mod duel_token {
                 });
             }
             // return the metadata to be rendered by the component
+            // https://docs.opensea.io/docs/metadata-standards#metadata-structure
             let metadata = TokenMetadata {
                 token_id,
                 name: format!("Duel #{}", token_id),
                 description: format!("Pistols at Dawn Duel #{}. https://pistols.gg", token_id),
                 image,
                 image_data: Option::None,
-                external_url: Option::Some("https://example.underware.gg"),
-                background_color: Option::Some("0x000000"),
+                external_url: Option::Some(METADATA::EXTERNAL_LINK()), // TODO: format external token link
+                background_color: Option::Some("000000"),
                 animation_url: Option::None,
                 youtube_url: Option::None,
                 attributes: Option::Some(attributes.span()),

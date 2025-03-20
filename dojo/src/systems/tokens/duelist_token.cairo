@@ -68,7 +68,9 @@ pub trait IDuelistToken<TState> {
 
     // ITokenComponentPublic
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
-    fn minted_count(self: @TState) -> u128;
+    fn update_contract_metadata(ref self: TState);
+    fn update_token_metadata(ref self: TState, token_id: u128);
+    fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
 
     // IDuelistTokenPublic
     fn fame_balance(self: @TState, duelist_id: u128) -> u128;
@@ -191,7 +193,7 @@ pub mod duelist_token {
             FeeDistribution, FeeDistributionTrait,
             RewardValues,
         },
-        constants::{CONST, FAME},
+        constants::{CONST, FAME, METADATA},
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
@@ -614,16 +616,18 @@ pub mod duelist_token {
     pub impl ERC721ComboHooksImpl of ERC721ComboComponent::ERC721ComboHooksTrait<ContractState> {
         fn render_contract_uri(self: @ERC721ComboComponent::ComponentState<ContractState>) -> Option<ContractMetadata> {
             let self = self.get_contract(); // get the component's contract state
+            let base_uri: ByteArray = self.erc721._base_uri();
             // let mut store: Store = StoreTrait::new(self.world_default());
             // return the metadata to be rendered by the component
+            // https://docs.opensea.io/docs/contract-level-metadata
             let metadata = ContractMetadata {
                 name: self.name(),
                 symbol: self.symbol(),
                 description: "Pistols at Dawn Duelists",
-                image: Option::None,
-                banner_image: Option::None,
-                featured_image: Option::None,
-                external_link: Option::Some("https://pistols.gg"),
+                image: Option::Some(METADATA::CONTRACT_IMAGE(base_uri.clone())),
+                banner_image: Option::Some(METADATA::CONTRACT_BANNER_IMAGE(base_uri.clone())),
+                featured_image: Option::Some(METADATA::CONTRACT_FEATURED_IMAGE(base_uri.clone())),
+                external_link: Option::Some(METADATA::EXTERNAL_LINK()),
                 collaborators: Option::None,
             };
             (Option::Some(metadata))
@@ -637,12 +641,12 @@ pub mod duelist_token {
             // let memorial: DuelistMemorialValue = store.get_duelist_memorial_value(token_id.low);
             // let is_memorized: bool = (memorial.cause_of_death == CauseOfDeath::Memorize);
             // TODO: use memorized player, FAME, season, cause_of_death
+            let base_uri: ByteArray = self.erc721._base_uri();
             let owner: ContractAddress = self.owner_of(token_id);
             let challenge: DuelistChallengeValue = store.get_duelist_challenge_value(token_id.low);
             let table_id: felt252 = store.get_config_season_table_id();
             let scoreboard: ScoreboardValue = store.get_scoreboard_value(token_id.low.into(), table_id);
             let archetype: Archetype = scoreboard.score.get_archetype();
-            let base_uri: ByteArray = self.erc721._base_uri();
             let duelist_image: ByteArray = duelist.profile_type.get_uri(base_uri.clone());
             let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
             let lives: u128 = (fame_balance / FAME::ONE_LIFE.low);
@@ -725,14 +729,15 @@ pub mod duelist_token {
                 },
             ];
             // return the metadata to be rendered by the component
+            // https://docs.opensea.io/docs/metadata-standards#metadata-structure
             let metadata = TokenMetadata {
                 token_id,
                 name: format!("{} #{}", duelist.profile_type.name(), token_id),
                 description: format!("Pistols at Dawn Duelist #{}. https://pistols.gg", token_id),
                 image,
                 image_data: Option::None,
-                external_url: Option::Some("https://example.underware.gg"),
-                background_color: Option::Some("0x000000"),
+                external_url: Option::Some(METADATA::EXTERNAL_LINK()), // TODO: format external token link
+                background_color: Option::Some("000000"),
                 animation_url: Option::None,
                 youtube_url: Option::None,
                 attributes: Option::Some(attributes.span()),

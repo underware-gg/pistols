@@ -493,7 +493,7 @@ mod tests {
         let (salts, moves_a, moves_b) = if (winner == 1) {prefabs::get_moves_crit_a()} else {prefabs::get_moves_crit_b()};
         (*sys).rng.set_mocked_values(salts.salts, salts.values);
 
-        if ((*sys).duelists.minted_count() == 0) {
+        if ((*sys).duelists.total_supply() == 0) {
             tester::fund_duelists_pool(sys, 2);
             let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(sys.pack, OWNER())[0];
             let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(sys.pack, OTHER())[0];

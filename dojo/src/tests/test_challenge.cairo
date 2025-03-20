@@ -113,6 +113,8 @@ mod tests {
         assert_gt!(game_timestamp, ch.timestamps.start, "game_timestamp > timestamps.start");
         // deck type
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
+        // token_uri
+        assert_ne!(sys.duels.token_uri(duel_id.into()), "", "duels.token_uri()");
     }
 
     #[test]
@@ -380,6 +382,9 @@ mod tests {
         let player_b: Player = sys.store.get_player(B);
         assert!(player_a.exists(), "player_a.exists YES");
         assert!(player_b.exists(), "player_b.exists YES");
+
+        // token_uri
+        assert_ne!(sys.duels.token_uri(duel_id.into()), "", "duels.token_uri()");
     }
 
     #[test]
@@ -431,6 +436,8 @@ mod tests {
         assert_eq!(ch.address_b, B, "challenged");
         assert_eq!(ch.duelist_id_b, ID(B), "challenged_id");
         tester::assert_pact(@sys, duel_id, ch, true, true, "replied");
+        // token_uri
+        assert_ne!(sys.duels.token_uri(duel_id.into()), "", "duels.token_uri()");
     }
 
     #[test]

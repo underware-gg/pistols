@@ -35,8 +35,8 @@ export function DuelTokenArt({
     profile_id_b: profilePicB,
     username_a: usernameA,
     username_b: usernameB,
-    owner_a: bigintToHex(duelistAddressA),
-    owner_b: bigintToHex(duelistAddressB),
+    address_a: bigintToHex(duelistAddressA),
+    address_b: bigintToHex(duelistAddressB),
   }), [duelId, tableId, premise, quote, state, winner, profileTypeA, profilePicA, profileTypeB, profilePicB, usernameA, usernameB, duelistAddressA, duelistAddressB])
 
   return <DuelTokenImage props={props} className={className} style={style} />

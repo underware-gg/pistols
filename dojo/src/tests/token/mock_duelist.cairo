@@ -65,6 +65,9 @@ pub mod duelist_token {
         fn owner_of(self: @ContractState, token_id: u256) -> ContractAddress {
             let mut world = self.world_default();
 
+            // OZ always panics on token zero
+            assert(token_id.is_non_zero(), 'DUELIS_MOCK: invalid ID');
+
             // transfered tokens
             let owner: MockDuelistOwners = world.read_model(token_id.low);
             if (owner.address != ZERO()) {
