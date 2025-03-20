@@ -26,6 +26,7 @@ export const useGetChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNum
   const { entities } = useSdkStateEventsGet({
     query,
     historical: false,
+    retryInterval: 1000,
   })
   const rewards = useMemo(() => getEntityMapModels<models.ChallengeRewards>(entities, 'ChallengeRewards')?.[0]?.rewards, [entities])
 

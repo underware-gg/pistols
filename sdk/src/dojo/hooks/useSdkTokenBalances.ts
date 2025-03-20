@@ -112,6 +112,13 @@ export const useSdkTokenBalancesSub = ({
   }
 }
 
+
+//---------------------------------------
+// utils
+//
+
+//
+// Format token ids for torii token queries
 function toToriiTokenId(value: BigNumberish) {
   return BigInt(value).toString(16).padStart(64, "0");
 }
