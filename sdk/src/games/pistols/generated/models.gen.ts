@@ -720,8 +720,8 @@ export interface SchemaType extends ISchemaType {
 		MockedValue: MockedValue,
 		MockedValueValue: MockedValueValue,
 		Period: Period,
-	},
-	achievement: {
+	// },
+	// achievement: {
 		TrophyCreation: TrophyCreation,
 		TrophyCreationValue: TrophyCreationValue,
 		TrophyProgression: TrophyProgression,
