@@ -21,16 +21,17 @@ export type UseSdkTokenBalancesGetProps = {
   contracts: string[]
   accounts?: string[]
   tokenIds?: string[]
-  setBalances: (balances: torii.TokenBalance[]) => void
   enabled?: boolean
+  setBalances: (balances: torii.TokenBalance[]) => void
   forceCounter?: number
+  retryInterval?: number
 }
 export type UseSdkTokenBalancesSubProps = {
   contracts: string[]
   accounts?: string[]
   tokenIds?: string[]
-  updateBalance: (balance: torii.TokenBalance) => void
   enabled?: boolean
+  updateBalance: (balance: torii.TokenBalance) => void
 }
 
 //---------------------------------------
@@ -43,30 +44,43 @@ export const useSdkTokenBalancesGet = ({
   setBalances,
   enabled = true,
   forceCounter = 0,
+  retryInterval = 0,
 }: UseSdkTokenBalancesGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
 
   useEffect(() => {
+    let _mounted = true
     const _get = async () => {
-      // console.warn("useSdkTokenBalancesGet() GET........", enabled, forceCounter, contracts, accounts)
+      // console.log("useSdkTokenBalancesGet() GET........", enabled, forceCounter, retryInterval, contracts, accounts)
       setIsLoading(true)
       await sdk.getTokenBalances(
         contracts,
         accounts ?? [],
         tokenIds?.map(a => toToriiTokenId(a)) ?? []
       ).then((balances: torii.TokenBalance[]) => {
-          // console.log("useSdkTokenBalancesGet() GOT:", balances)
+        if (!_mounted) return
+        // console.log("useSdkTokenBalancesGet() GOT:", balances)
+        if (balances.length > 0) {
           setBalances(balances)
-        }).catch((error: Error) => {
-          console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contracts, accounts)
-        }).finally(() => {
           setIsLoading(false)
-        })
+        } else if (retryInterval > 0) {
+          console.log("useSdkTokenBalancesGet() retry...", retryInterval)
+          setTimeout(() => _get(), retryInterval)
+        }
+      }).catch((error: Error) => {
+        if (!_mounted) return
+        console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contracts, accounts)
+        setIsLoading(false)
+      })
+      // console.log("useSdkTokenBalancesGet() done!")
     }
     // get...
     if (sdk && enabled) _get()
-  }, [sdk, enabled, contracts, accounts, tokenIds, forceCounter])
+    return () => {
+      _mounted = false
+    }
+  }, [sdk, enabled, contracts, accounts, tokenIds, forceCounter, retryInterval])
 
   return {
     isLoading,

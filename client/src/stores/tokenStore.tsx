@@ -6,8 +6,9 @@ import { useAccount } from '@starknet-react/core'
 import { useSdkTokenBalancesGet } from '@underware/pistols-sdk/dojo'
 import { useTokenConfig } from './tokenConfigStore'
 import { useDelay } from '@underware/pistols-sdk/utils/hooks'
-import { arrayRemoveValue, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import * as torii from '@dojoengine/torii-client'
+import { useDuelistTokenContract } from '../hooks/useTokenContract'
 
 
 interface TokenState {
@@ -123,6 +124,7 @@ export function useTokensByOwner(contractAddress: BigNumberish, owner: BigNumber
   const state = useTokenStore((state) => state)
   const tokens = useMemo(() => state.getTokens(contractAddress, owner), [state.contracts, contractAddress, owner])
 
+  // TODO: REMOVE THIS WHEN TOKEN SUBSCRIPTIONS WORK
   const { mintedCount } = useTokenConfig(contractAddress)
   const forceCounter = useDelay(mintedCount, 1000)
 
@@ -142,5 +144,36 @@ export function useTokensByOwner(contractAddress: BigNumberish, owner: BigNumber
   return {
     tokens: tokens ?? [],
     isLoading: (tokens === null || contracts.length == 0 || accounts.length == 0 || isLoading),
+  }
+}
+
+
+// TODO: REMOVE THIS ABERRATION
+export const _useDuelistIdsOfPlayerRetry = () => {
+  const { address } = useAccount()
+  const { duelistContractAddress } = useDuelistTokenContract()
+
+  const state = useTokenStore((state) => state)
+  const tokens = useMemo(() => state.getTokens(duelistContractAddress, address), [state.contracts, duelistContractAddress, address])
+
+  const contracts = useMemo(() => ([bigintToHex(duelistContractAddress)]), [duelistContractAddress])
+  const accounts = useMemo(() => ([bigintToHex(address)]), [address])
+  const enabled = useMemo(() => (isPositiveBigint(duelistContractAddress) && isPositiveBigint(address)), [duelistContractAddress, address])
+  // console.log(">>>>>> useDuelistIdsOfPlayerRetry() contracts:", enabled, contracts, accounts)
+  const { isLoading } = useSdkTokenBalancesGet({
+    contracts,
+    accounts,
+    setBalances: state.setBalances,
+    enabled,
+    retryInterval: 1000,
+  })
+
+  const tokenIds = useMemo(() => (
+    tokens?.map((token) => token.tokenId).sort((a, b) => Number(b - a)) ?? []
+  ), [tokens])
+
+  return {
+    duelistIds: tokenIds,
+    isLoading,
   }
 }
