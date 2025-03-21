@@ -80,7 +80,7 @@ const ActivityItem = ({
       : <ActivityItemChallengeDraw activity={activity} clientSeconds={clientSeconds} />
     )
   }
-  if (activity.activity === constants.Activity.ChallengeExpired) {
+  if (activity.activity === constants.Activity.ChallengeCanceled) {
     return <ActivityItemChallengeCanceled activity={activity} clientSeconds={clientSeconds} />
   }
   if (activity.activity === constants.Activity.PlayerTimedOut) {

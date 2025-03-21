@@ -3,7 +3,6 @@ import { BigNumberish } from 'starknet'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
-import { useGetSeasonScoreboard } from '/src/hooks/useScore'
 import { useFameBalanceDuelist } from '/src/hooks/useFame'
 import { usePlayer } from '/src/stores/playerStore'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
@@ -38,27 +37,26 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   
-  const { nameAndId: name, profilePic, profileType, isInAction } = useDuelist(props.duelistId)
+  const { nameAndId: name, profilePic, profileType, isInAction, status } = useDuelist(props.duelistId)
   const {isAlive} = useFameBalanceDuelist(props.duelistId)
-  const score = useGetSeasonScoreboard(!props.isSmall ? props.duelistId : 0)
 
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
   
   const archetypeImage = useMemo(() => {
-    let imageName = 'card_circular_' + (ArchetypeNames[score.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[score.archetype].toLowerCase())
+    let imageName = 'card_circular_' + (ArchetypeNames[status.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[status.archetype].toLowerCase())
     return '/textures/cards/' + imageName + '.png'
-  }, [score])
+  }, [status])
 
   const winPercentage = useMemo(() => {
-    if (!score.total_duels || score.total_duels === 0) return '0%'
-    return `${((score.total_wins / score.total_duels) * 100).toFixed(1)}%`
-  }, [score.total_duels, score.total_wins])
+    if (!status.total_duels || status.total_duels === 0) return '0%'
+    return `${((status.total_wins / status.total_duels) * 100).toFixed(1)}%`
+  }, [status.total_duels, status.total_wins])
 
   const lossPercentage = useMemo(() => {
-    if (!score.total_duels || score.total_duels === 0) return '0%'
-    return `${(((score.total_losses + score.total_draws) / score.total_duels) * 100).toFixed(1)}%`
-  }, [score.total_duels, score.total_losses, score.total_draws])
+    if (!status.total_duels || status.total_duels === 0) return '0%'
+    return `${(((status.total_losses + status.total_draws) / status.total_duels) * 100).toFixed(1)}%`
+  }, [status.total_duels, status.total_losses, status.total_draws])
 
   const baseRef = useRef<InteractibleComponentHandle>(null);
 
@@ -211,11 +209,11 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                       </GridRow>
                       <GridRow>
                         <GridColumn className='Bold' textAlign='left' width={6}>Honour:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{score.honour}/10</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{status.honour}/10</GridColumn>
                       </GridRow>
                       <GridRow>
                         <GridColumn className='Bold' textAlign='left' width={6}>Archetype:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{ArchetypeNames[score.archetype]}</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{ArchetypeNames[status.archetype]}</GridColumn>
                       </GridRow>
                     </Grid>
                   </GridColumn>
@@ -224,15 +222,15 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                     <Grid className='NoMargin'>
                       <GridRow>
                         <GridColumn className='Bold' textAlign='left' width={6}>Duels:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{score.total_duels}</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{status.total_duels}</GridColumn>
                       </GridRow>
                       <GridRow>
                         <GridColumn className='Bold' textAlign='left' width={6}>Wins:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{score.total_wins} ({winPercentage})</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{status.total_wins} ({winPercentage})</GridColumn>
                       </GridRow>
                       <GridRow>
                         <GridColumn className='Bold' textAlign='left' width={6}>Losses:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{score.total_losses + score.total_draws} ({lossPercentage})</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{status.total_losses + status.total_draws} ({lossPercentage})</GridColumn>
                       </GridRow>
                     </Grid>
                   </GridColumn>

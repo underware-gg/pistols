@@ -7,7 +7,7 @@ import { parseCustomEnum } from '@underware/pistols-sdk/utils/starknet'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { DuelistColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { calcWinRatio } from '/src/hooks/useScore'
+import { calcWinRatio } from '/src/stores/duelistStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 
@@ -45,7 +45,6 @@ const createStore = () => {
     const { variant } = parseCustomEnum<constants.ProfileType>(duelist?.profile_type)
     if (!duelist || variant != constants.ProfileType.Duelist) return undefined
     let currentChallenge = e.models.pistols.DuelistChallenge
-    let scoreboard = e.models.pistols.Scoreboard
     let memorial = e.models.pistols.DuelistMemorial
     return {
       duelist_id: BigInt(duelist.duelist_id),
@@ -53,13 +52,13 @@ const createStore = () => {
       timestamp_active: Number(duelist.timestamps.active),
       name: 'DUELIST_????',
       fame: 0,
-      honour: Number(scoreboard?.score.honour ?? 0),
-      win_ratio: calcWinRatio(Number(scoreboard?.score.total_duels ?? 0), Number(scoreboard?.score.total_wins ?? 0)),
-      total_duels: Number(scoreboard?.score.total_duels ?? 0),
-      total_wins: Number(scoreboard?.score.total_wins ?? 0),
-      total_losses: Number(scoreboard?.score.total_losses ?? 0),
-      total_draws: Number(scoreboard?.score.total_draws ?? 0),
-      is_active: (Number(scoreboard?.score.total_duels ?? 0) > 0 || isPositiveBigint(currentChallenge?.duel_id ?? 0n)),
+      honour: Number(duelist.status.honour ?? 0),
+      win_ratio: calcWinRatio(Number(duelist.status.total_duels ?? 0), Number(duelist.status.total_wins ?? 0)),
+      total_duels: Number(duelist.status.total_duels ?? 0),
+      total_wins: Number(duelist.status.total_wins ?? 0),
+      total_losses: Number(duelist.status.total_losses ?? 0),
+      total_draws: Number(duelist.status.total_draws ?? 0),
+      is_active: (Number(duelist.status.total_duels ?? 0) > 0 || isPositiveBigint(currentChallenge?.duel_id ?? 0n)),
       is_alive: !Boolean(memorial),
     }
   }
