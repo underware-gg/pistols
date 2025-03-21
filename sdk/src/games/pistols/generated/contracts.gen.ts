@@ -3187,22 +3187,22 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>): DojoCall => {
-		return {
-			contractName: "rng_mock",
-			entrypoint: "reseed",
-			calldata: [seed, salt, mocked],
-		};
-	};
+	// const build_rng_mock_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+	// 	return {
+	// 		contractName: "rng_mock",
+	// 		entrypoint: "reseed",
+	// 		calldata: [seed, salt, mocked],
+	// 	};
+	// };
 
-  const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
-		try {
-			return await provider.call("pistols", build_rng_mock_reseed_calldata(seed, salt, mocked));
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
+	// const rng_mock_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+	// 	try {
+	// 		return await provider.call("pistols", build_rng_mock_reseed_calldata(seed, salt, mocked));
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 		throw error;
+	// 	}
+	// };
 
 	const build_rng_mock_setMockedValues_calldata = (salts: Array<BigNumberish>, values: Array<BigNumberish>): DojoCall => {
 		return {
@@ -3225,22 +3225,22 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-  const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>): DojoCall => {
-		return {
-			contractName: "rng",
-			entrypoint: "reseed",
-			calldata: [seed, salt, mocked],
-		};
-	};
+	// const build_rng_reseed_calldata = (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>): DojoCall => {
+	// 	return {
+	// 		contractName: "rng",
+	// 		entrypoint: "reseed",
+	// 		calldata: [seed, salt, mocked],
+	// 	};
+	// };
 
-  const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<models.MockedValue>) => {
-		try {
-			return await provider.call("pistols", build_rng_reseed_calldata(seed, salt, mocked));
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
+	// const rng_reseed = async (seed: BigNumberish, salt: BigNumberish, mocked: Array<MockedValue>) => {
+	// 	try {
+	// 		return await provider.call("pistols", build_rng_reseed_calldata(seed, salt, mocked));
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 		throw error;
+	// 	}
+	// };
 
 	const build_tutorial_calcDuelId_calldata = (playerId: BigNumberish, tutorialId: BigNumberish): DojoCall => {
 		return {
@@ -3739,14 +3739,14 @@ export function setupWorld(provider: DojoProvider) {
 		rng: {
 			isMocked: rng_isMocked,
 			buildIsMockedCalldata: build_rng_isMocked_calldata,
-			reseed: rng_reseed,
-			buildReseedCalldata: build_rng_reseed_calldata,
+			// reseed: rng_reseed,
+			// buildReseedCalldata: build_rng_reseed_calldata,
 		},
 		rng_mock: {
 			isMocked: rng_mock_isMocked,
 			buildIsMockedCalldata: build_rng_mock_isMocked_calldata,
-			reseed: rng_mock_reseed,
-			buildReseedCalldata: build_rng_mock_reseed_calldata,
+			// reseed: rng_mock_reseed,
+			// buildReseedCalldata: build_rng_mock_reseed_calldata,
 			setMockedValues: rng_mock_setMockedValues,
 			buildSetMockedValuesCalldata: build_rng_mock_setMockedValues_calldata,
 		},

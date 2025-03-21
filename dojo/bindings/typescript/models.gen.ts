@@ -124,6 +124,7 @@ export interface Duelist {
 	duelist_id: BigNumberish;
 	profile_type: ProfileTypeEnum;
 	timestamps: DuelistTimestamps;
+	status: DuelistStatus;
 }
 
 // Type definition for `pistols::models::duelist::DuelistChallenge` struct
@@ -156,6 +157,16 @@ export interface DuelistMemorialValue {
 	season_table_id: BigNumberish;
 }
 
+// Type definition for `pistols::models::duelist::DuelistStatus` struct
+export interface DuelistStatus {
+	total_duels: BigNumberish;
+	total_wins: BigNumberish;
+	total_losses: BigNumberish;
+	total_draws: BigNumberish;
+	honour: BigNumberish;
+	honour_log: BigNumberish;
+}
+
 // Type definition for `pistols::models::duelist::DuelistTimestamps` struct
 export interface DuelistTimestamps {
 	registered: BigNumberish;
@@ -166,29 +177,7 @@ export interface DuelistTimestamps {
 export interface DuelistValue {
 	profile_type: ProfileTypeEnum;
 	timestamps: DuelistTimestamps;
-}
-
-// Type definition for `pistols::models::duelist::Score` struct
-export interface Score {
-	honour: BigNumberish;
-	points: BigNumberish;
-	total_duels: BigNumberish;
-	total_wins: BigNumberish;
-	total_losses: BigNumberish;
-	total_draws: BigNumberish;
-	honour_history: BigNumberish;
-}
-
-// Type definition for `pistols::models::duelist::Scoreboard` struct
-export interface Scoreboard {
-	holder: BigNumberish;
-	table_id: BigNumberish;
-	score: Score;
-}
-
-// Type definition for `pistols::models::duelist::ScoreboardValue` struct
-export interface ScoreboardValue {
-	score: Score;
+	status: DuelistStatus;
 }
 
 // Type definition for `pistols::models::leaderboard::Leaderboard` struct
@@ -315,6 +304,18 @@ export interface TableConfig {
 export interface TableConfigValue {
 	description: BigNumberish;
 	rules: RulesTypeEnum;
+}
+
+// Type definition for `pistols::models::table::TableScoreboard` struct
+export interface TableScoreboard {
+	table_id: BigNumberish;
+	holder: BigNumberish;
+	points: BigNumberish;
+}
+
+// Type definition for `pistols::models::table::TableScoreboardValue` struct
+export interface TableScoreboardValue {
+	points: BigNumberish;
 }
 
 // Type definition for `pistols::systems::components::token_bound::TokenBoundAddress` struct
@@ -661,7 +662,7 @@ export const activity = [
 	'DuelistSpawned',
 	'DuelistDied',
 	'ChallengeCreated',
-	'ChallengeExpired',
+	'ChallengeCanceled',
 	'ChallengeReplied',
 	'MovesCommitted',
 	'MovesRevealed',
@@ -691,11 +692,9 @@ export interface SchemaType extends ISchemaType {
 		DuelistChallengeValue: DuelistChallengeValue,
 		DuelistMemorial: DuelistMemorial,
 		DuelistMemorialValue: DuelistMemorialValue,
+		DuelistStatus: DuelistStatus,
 		DuelistTimestamps: DuelistTimestamps,
 		DuelistValue: DuelistValue,
-		Score: Score,
-		Scoreboard: Scoreboard,
-		ScoreboardValue: ScoreboardValue,
 		Leaderboard: Leaderboard,
 		LeaderboardValue: LeaderboardValue,
 		Pack: Pack,
@@ -715,6 +714,8 @@ export interface SchemaType extends ISchemaType {
 		SeasonConfigValue: SeasonConfigValue,
 		TableConfig: TableConfig,
 		TableConfigValue: TableConfigValue,
+		TableScoreboard: TableScoreboard,
+		TableScoreboardValue: TableScoreboardValue,
 		TokenBoundAddress: TokenBoundAddress,
 		TokenBoundAddressValue: TokenBoundAddressValue,
 		MockedValue: MockedValue,
@@ -893,6 +894,7 @@ export const schema: SchemaType = {
 				Character: undefined,
 				Bot: undefined, }),
 		timestamps: { registered: 0, active: 0, },
+		status: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 		},
 		DuelistChallenge: {
 			duelist_id: 0,
@@ -926,6 +928,14 @@ export const schema: SchemaType = {
 			player_address: "",
 			season_table_id: 0,
 		},
+		DuelistStatus: {
+			total_duels: 0,
+			total_wins: 0,
+			total_losses: 0,
+			total_draws: 0,
+			honour: 0,
+			honour_log: 0,
+		},
 		DuelistTimestamps: {
 			registered: 0,
 			active: 0,
@@ -937,23 +947,7 @@ export const schema: SchemaType = {
 				Character: undefined,
 				Bot: undefined, }),
 		timestamps: { registered: 0, active: 0, },
-		},
-		Score: {
-			honour: 0,
-			points: 0,
-			total_duels: 0,
-			total_wins: 0,
-			total_losses: 0,
-			total_draws: 0,
-			honour_history: 0,
-		},
-		Scoreboard: {
-			holder: 0,
-			table_id: 0,
-		score: { honour: 0, points: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
-		},
-		ScoreboardValue: {
-		score: { honour: 0, points: 0, total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour_history: 0, },
+		status: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 		},
 		Leaderboard: {
 			table_id: 0,
@@ -1067,6 +1061,14 @@ export const schema: SchemaType = {
 				Academy: undefined,
 				Season: undefined, }),
 		},
+		TableScoreboard: {
+			table_id: 0,
+			holder: 0,
+			points: 0,
+		},
+		TableScoreboardValue: {
+			points: 0,
+		},
 		TokenBoundAddress: {
 			recipient: "",
 			contract_address: "",
@@ -1151,7 +1153,7 @@ export const schema: SchemaType = {
 				DuelistSpawned: undefined,
 				DuelistDied: undefined,
 				ChallengeCreated: undefined,
-				ChallengeExpired: undefined,
+				ChallengeCanceled: undefined,
 				ChallengeReplied: undefined,
 				MovesCommitted: undefined,
 				MovesRevealed: undefined,
@@ -1172,7 +1174,7 @@ export const schema: SchemaType = {
 				DuelistSpawned: undefined,
 				DuelistDied: undefined,
 				ChallengeCreated: undefined,
-				ChallengeExpired: undefined,
+				ChallengeCanceled: undefined,
 				ChallengeReplied: undefined,
 				MovesCommitted: undefined,
 				MovesRevealed: undefined,
@@ -1220,11 +1222,9 @@ export enum ModelsMapping {
 	DuelistChallengeValue = 'pistols-DuelistChallengeValue',
 	DuelistMemorial = 'pistols-DuelistMemorial',
 	DuelistMemorialValue = 'pistols-DuelistMemorialValue',
+	DuelistStatus = 'pistols-DuelistStatus',
 	DuelistTimestamps = 'pistols-DuelistTimestamps',
 	DuelistValue = 'pistols-DuelistValue',
-	Score = 'pistols-Score',
-	Scoreboard = 'pistols-Scoreboard',
-	ScoreboardValue = 'pistols-ScoreboardValue',
 	Leaderboard = 'pistols-Leaderboard',
 	LeaderboardValue = 'pistols-LeaderboardValue',
 	Pack = 'pistols-Pack',
@@ -1247,6 +1247,8 @@ export enum ModelsMapping {
 	SeasonPhase = 'pistols-SeasonPhase',
 	TableConfig = 'pistols-TableConfig',
 	TableConfigValue = 'pistols-TableConfigValue',
+	TableScoreboard = 'pistols-TableScoreboard',
+	TableScoreboardValue = 'pistols-TableScoreboardValue',
 	TokenBoundAddress = 'pistols-TokenBoundAddress',
 	TokenBoundAddressValue = 'pistols-TokenBoundAddressValue',
 	MockedValue = 'pistols-MockedValue',

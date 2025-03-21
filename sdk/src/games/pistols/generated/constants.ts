@@ -115,7 +115,7 @@ export enum Activity {
   DuelistSpawned = 'DuelistSpawned', // 5
   DuelistDied = 'DuelistDied', // 6
   ChallengeCreated = 'ChallengeCreated', // 7
-  ChallengeExpired = 'ChallengeExpired', // 8
+  ChallengeCanceled = 'ChallengeCanceled', // 8
   ChallengeReplied = 'ChallengeReplied', // 9
   MovesCommitted = 'MovesCommitted', // 10
   MovesRevealed = 'MovesRevealed', // 11
