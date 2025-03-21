@@ -26,6 +26,14 @@ export default function SelectDuelistModal({
 }: {
   opener: Opener
 }) {
+  return <>{opener.isOpen && <_SelectDuelistModal opener={opener} />}</>
+}
+
+function _SelectDuelistModal({
+  opener,
+}: {
+  opener: Opener
+}) {
   const { aspectWidth } = useGameAspect()
   const { dispatchChallengingPlayerAddress, challengingDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
   

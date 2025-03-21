@@ -10,11 +10,19 @@ const HAND_CARD_WIDTH = 195
 const HAND_CARD_HEIGHT = HAND_CARD_WIDTH * (1080/1920)
 
 export default function DuelistModal() {
+  const { selectedDuelistId } = usePistolsContext()
+  const isOpen = useMemo(() => (selectedDuelistId > 0n), [selectedDuelistId])
+  return <>{isOpen && <_DuelistModal isOpen={isOpen} />}</>
+}
+
+function _DuelistModal({
+  isOpen,
+}: {
+  isOpen: boolean
+}) {
   const { aspectWidth } = useGameAspect()
   const { selectedDuelistId, dispatchSelectDuelistId } = usePistolsContext()
   
-  const isOpen = useMemo(() => (selectedDuelistId > 0), [selectedDuelistId])
-
   const bottomCardRef = useRef<HTMLImageElement>(null)
   const topCardRef = useRef<HTMLImageElement>(null)
   const modalContentRef = useRef<HTMLDivElement>(null)

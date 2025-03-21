@@ -164,8 +164,6 @@ function TutorialUI({
 
 function Modals() {
   const { walletFinderOpener, duelistSelectOpener } = usePistolsContext()
-
-  
   return (
     <>
       <ChallengeModal />

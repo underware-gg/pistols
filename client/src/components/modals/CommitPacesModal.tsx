@@ -15,17 +15,23 @@ import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 const Row = Grid.Row
 const Col = Grid.Column
 
-export default function CommitPacesModal({
-  duelId,
-  duelistId,
-  isOpen,
-  setIsOpen,
-}: {
+interface CommitPacesModalProps {
   duelId: bigint
   duelistId: bigint
   isOpen: boolean
   setIsOpen: Function
-}) {
+}
+
+export default function CommitPacesModal(props: CommitPacesModalProps) {
+  return <>{props.isOpen && <_CommitPacesModal {...props} />}</>
+}
+
+function _CommitPacesModal({
+  duelId,
+  duelistId,
+  isOpen,
+  setIsOpen,
+}: CommitPacesModalProps) {
   const { account } = useAccount()
   const { game } = useDojoSystemCalls()
   const { dispatchSetMoves, tutorialLevel } = usePistolsContext()
