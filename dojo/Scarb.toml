@@ -19,9 +19,9 @@ build-external-contracts = [
 ]
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.2.2" }
-# achievement = { git = "https://github.com/cartridge-gg/arcade", tag = "v1.2.2" }
-achievement = { git = "https://github.com/rsodre/arcade", branch = "dojo_v1.2.2" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.3.1" }
+# achievement = { git = "https://github.com/cartridge-gg/arcade", tag = "v1.3.1" }
+achievement = { git = "https://github.com/rsodre/arcade", branch = "dojo_v1.3.1" }
 graffiti = { git = "https://github.com/rsodre/graffiti", rev = "url" }
 nft_combo = { git = "https://github.com/underware-gg/cairo-nft-combo", tag = "v0.2.2"}
 openzeppelin_token = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
@@ -32,7 +32,7 @@ openzeppelin_introspection = { git = "https://github.com/OpenZeppelin/cairo-cont
 
 [dev-dependencies]
 cairo_test = "=2.9.2"
-dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.2.2" }
+dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.3.1" }
 # openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v0.20.0" }
 
 [features]
