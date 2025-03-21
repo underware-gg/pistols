@@ -7,6 +7,7 @@ import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@under
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
 
+const _limit = 1000
 
 //------------------------------------------------------
 // Sync everything that depends on current season
@@ -38,6 +39,7 @@ export function ChallengeStoreSync() {
         'pistols-Challenge',
         "pistols-Round",
       ])
+      .withLimit(_limit)
       .includeHashedKeys()
   ), [tableId])
 
