@@ -143,6 +143,8 @@ export interface DuelistMemorial {
 	cause_of_death: CauseOfDeathEnum;
 	killed_by: BigNumberish;
 	fame_before_death: BigNumberish;
+	player_address: string;
+	season_table_id: BigNumberish;
 }
 
 // Type definition for `pistols::models::duelist::DuelistMemorialValue` struct
@@ -150,6 +152,8 @@ export interface DuelistMemorialValue {
 	cause_of_death: CauseOfDeathEnum;
 	killed_by: BigNumberish;
 	fame_before_death: BigNumberish;
+	player_address: string;
+	season_table_id: BigNumberish;
 }
 
 // Type definition for `pistols::models::duelist::DuelistTimestamps` struct
@@ -450,195 +454,222 @@ export interface RewardValues {
 }
 
 // Type definition for `pistols::models::duelist::CauseOfDeath` enum
-export type CauseOfDeath = {
-	None: string;
-	Duelling: string;
-	Memorize: string;
-	Sacrifice: string;
-	Forsaken: string;
-}
+export const causeOfDeath = [
+	'None',
+	'Duelling',
+	'Memorize',
+	'Sacrifice',
+	'Forsaken',
+] as const;
+export type CauseOfDeath = { [key in typeof causeOfDeath[number]]: string };
 export type CauseOfDeathEnum = CairoCustomEnum;
 
 // Type definition for `pistols::models::pack::PackType` enum
-export type PackType = {
-	Unknown: string;
-	StarterPack: string;
-	Duelists5x: string;
-}
+export const packType = [
+	'Unknown',
+	'StarterPack',
+	'Duelists5x',
+] as const;
+export type PackType = { [key in typeof packType[number]]: string };
 export type PackTypeEnum = CairoCustomEnum;
 
 // Type definition for `pistols::models::pool::PoolType` enum
-export type PoolType = {
-	Undefined: string;
-	Purchases: string;
-	FamePeg: string;
-	Season: BigNumberish;
-	Tournament: BigNumberish;
-	SacredFlame: string;
-}
+export const poolType = [
+	'Undefined',
+	'Purchases',
+	'FamePeg',
+	'Season',
+	'Tournament',
+	'SacredFlame',
+] as const;
+export type PoolType = { [key in typeof poolType[number]]: string };
 export type PoolTypeEnum = CairoCustomEnum;
 
 // Type definition for `pistols::models::season::SeasonPhase` enum
-export type SeasonPhase = {
-	Undefined: string;
-	InProgress: string;
-	Ended: string;
-}
+export const seasonPhase = [
+	'Undefined',
+	'InProgress',
+	'Ended',
+] as const;
+export type SeasonPhase = { [key in typeof seasonPhase[number]]: string };
 export type SeasonPhaseEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::cards::blades::BladesCard` enum
-export type BladesCard = {
-	None: string;
-	Seppuku: string;
-	PocketPistol: string;
-	Behead: string;
-	Grapple: string;
-}
+export const bladesCard = [
+	'None',
+	'Seppuku',
+	'PocketPistol',
+	'Behead',
+	'Grapple',
+] as const;
+export type BladesCard = { [key in typeof bladesCard[number]]: string };
 export type BladesCardEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::cards::hand::FinalBlow` enum
-export type FinalBlow = {
-	Undefined: string;
-	Paces: PacesCardEnum;
-	Blades: BladesCardEnum;
-	Forsaken: string;
-}
+export const finalBlow = [
+	'Undefined',
+	'Paces',
+	'Blades',
+	'Forsaken',
+] as const;
+export type FinalBlow = { 
+	Undefined: string,
+	Paces: PacesCardEnum,
+	Blades: BladesCardEnum,
+	Forsaken: string,
+};
 export type FinalBlowEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::cards::paces::PacesCard` enum
-export type PacesCard = {
-	None: string;
-	Paces1: string;
-	Paces2: string;
-	Paces3: string;
-	Paces4: string;
-	Paces5: string;
-	Paces6: string;
-	Paces7: string;
-	Paces8: string;
-	Paces9: string;
-	Paces10: string;
-}
+export const pacesCard = [
+	'None',
+	'Paces1',
+	'Paces2',
+	'Paces3',
+	'Paces4',
+	'Paces5',
+	'Paces6',
+	'Paces7',
+	'Paces8',
+	'Paces9',
+	'Paces10',
+] as const;
+export type PacesCard = { [key in typeof pacesCard[number]]: string };
 export type PacesCardEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::challenge_state::ChallengeState` enum
-export type ChallengeState = {
-	Null: string;
-	Awaiting: string;
-	Withdrawn: string;
-	Refused: string;
-	Expired: string;
-	InProgress: string;
-	Resolved: string;
-	Draw: string;
-}
+export const challengeState = [
+	'Null',
+	'Awaiting',
+	'Withdrawn',
+	'Refused',
+	'Expired',
+	'InProgress',
+	'Resolved',
+	'Draw',
+] as const;
+export type ChallengeState = { [key in typeof challengeState[number]]: string };
 export type ChallengeStateEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::premise::Premise` enum
-export type Premise = {
-	Undefined: string;
-	Matter: string;
-	Debt: string;
-	Dispute: string;
-	Honour: string;
-	Hatred: string;
-	Blood: string;
-	Nothing: string;
-	Tournament: string;
-	Treaty: string;
-	Lesson: string;
-}
+export const premise = [
+	'Undefined',
+	'Matter',
+	'Debt',
+	'Dispute',
+	'Honour',
+	'Hatred',
+	'Blood',
+	'Nothing',
+	'Tournament',
+	'Treaty',
+	'Lesson',
+] as const;
+export type Premise = { [key in typeof premise[number]]: string };
 export type PremiseEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::profile_type::BotProfile` enum
-export type BotProfile = {
-	Unknown: string;
-	TinMan: string;
-	Scarecrow: string;
-	Leon: string;
-}
+export const botProfile = [
+	'Unknown',
+	'TinMan',
+	'Scarecrow',
+	'Leon',
+] as const;
+export type BotProfile = { [key in typeof botProfile[number]]: string };
 export type BotProfileEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::profile_type::CharacterProfile` enum
-export type CharacterProfile = {
-	Unknown: string;
-	Bartender: string;
-	Drunkard: string;
-	Devil: string;
-	Player: string;
-}
+export const characterProfile = [
+	'Unknown',
+	'Bartender',
+	'Drunkard',
+	'Devil',
+	'Player',
+] as const;
+export type CharacterProfile = { [key in typeof characterProfile[number]]: string };
 export type CharacterProfileEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::profile_type::DuelistProfile` enum
-export type DuelistProfile = {
-	Unknown: string;
-	Duke: string;
-	Duella: string;
-	Jameson: string;
-	Pilgrim: string;
-	Jack: string;
-	Pops: string;
-	SerWalker: string;
-	Bloberto: string;
-	Squiddo: string;
-	SlenderDuck: string;
-	LadyVengeance: string;
-	Breadman: string;
-	Brutus: string;
-	Pistolopher: string;
-	Secreto: string;
-	ShadowMare: string;
-	Karaku: string;
-	Misty: string;
-	Kenzu: string;
-	NynJah: string;
-	Thrak: string;
-}
+export const duelistProfile = [
+	'Unknown',
+	'Duke',
+	'Duella',
+	'Jameson',
+	'Pilgrim',
+	'Jack',
+	'Pops',
+	'SerWalker',
+	'Bloberto',
+	'Squiddo',
+	'SlenderDuck',
+	'LadyVengeance',
+	'Breadman',
+	'Brutus',
+	'Pistolopher',
+	'Secreto',
+	'ShadowMare',
+	'Karaku',
+	'Misty',
+	'Kenzu',
+	'NynJah',
+	'Thrak',
+] as const;
+export type DuelistProfile = { [key in typeof duelistProfile[number]]: string };
 export type DuelistProfileEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::profile_type::ProfileType` enum
-export type ProfileType = {
-	Undefined: string;
-	Duelist: DuelistProfileEnum;
-	Character: CharacterProfileEnum;
-	Bot: BotProfileEnum;
-}
+export const profileType = [
+	'Undefined',
+	'Duelist',
+	'Character',
+	'Bot',
+] as const;
+export type ProfileType = { 
+	Undefined: string,
+	Duelist: DuelistProfileEnum,
+	Character: CharacterProfileEnum,
+	Bot: BotProfileEnum,
+};
 export type ProfileTypeEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::round_state::RoundState` enum
-export type RoundState = {
-	Null: string;
-	Commit: string;
-	Reveal: string;
-	Finished: string;
-}
+export const roundState = [
+	'Null',
+	'Commit',
+	'Reveal',
+	'Finished',
+] as const;
+export type RoundState = { [key in typeof roundState[number]]: string };
 export type RoundStateEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::rules::RulesType` enum
-export type RulesType = {
-	Undefined: string;
-	Academy: string;
-	Season: string;
-}
+export const rulesType = [
+	'Undefined',
+	'Academy',
+	'Season',
+] as const;
+export type RulesType = { [key in typeof rulesType[number]]: string };
 export type RulesTypeEnum = CairoCustomEnum;
 
 // Type definition for `pistols::models::player::Activity` enum
-export type Activity = {
-	Undefined: string;
-	TutorialFinished: string;
-	PackStarter: string;
-	PackPurchased: string;
-	PackOpened: string;
-	DuelistSpawned: string;
-	DuelistDied: string;
-	ChallengeCreated: string;
-	ChallengeExpired: string;
-	ChallengeReplied: string;
-	MovesCommitted: string;
-	MovesRevealed: string;
-	ChallengeResolved: string;
-	ChallengeDraw: string;
-}
+export const activity = [
+	'Undefined',
+	'TutorialFinished',
+	'PackStarter',
+	'PackPurchased',
+	'PackOpened',
+	'DuelistSpawned',
+	'DuelistDied',
+	'ChallengeCreated',
+	'ChallengeExpired',
+	'ChallengeReplied',
+	'MovesCommitted',
+	'MovesRevealed',
+	'PlayerTimedOut',
+	'ChallengeResolved',
+	'ChallengeDraw',
+] as const;
+export type Activity = { [key in typeof activity[number]]: string };
 export type ActivityEnum = CairoCustomEnum;
 
 export interface SchemaType extends ISchemaType {
@@ -689,6 +720,8 @@ export interface SchemaType extends ISchemaType {
 		MockedValue: MockedValue,
 		MockedValueValue: MockedValueValue,
 		Period: Period,
+	},
+	achievement: {
 		TrophyCreation: TrophyCreation,
 		TrophyCreationValue: TrophyCreationValue,
 		TrophyProgression: TrophyProgression,
@@ -878,6 +911,8 @@ export const schema: SchemaType = {
 				Forsaken: undefined, }),
 			killed_by: 0,
 			fame_before_death: 0,
+			player_address: "",
+			season_table_id: 0,
 		},
 		DuelistMemorialValue: {
 		cause_of_death: new CairoCustomEnum({ 
@@ -888,6 +923,8 @@ export const schema: SchemaType = {
 				Forsaken: undefined, }),
 			killed_by: 0,
 			fame_before_death: 0,
+			player_address: "",
+			season_table_id: 0,
 		},
 		DuelistTimestamps: {
 			registered: 0,
@@ -1118,6 +1155,7 @@ export const schema: SchemaType = {
 				ChallengeReplied: undefined,
 				MovesCommitted: undefined,
 				MovesRevealed: undefined,
+				PlayerTimedOut: undefined,
 				ChallengeResolved: undefined,
 				ChallengeDraw: undefined, }),
 			identifier: 0,
@@ -1138,6 +1176,7 @@ export const schema: SchemaType = {
 				ChallengeReplied: undefined,
 				MovesCommitted: undefined,
 				MovesRevealed: undefined,
+				PlayerTimedOut: undefined,
 				ChallengeResolved: undefined,
 				ChallengeDraw: undefined, }),
 			identifier: 0,
