@@ -38,7 +38,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const duelist = useEntityModel<models.Duelist>(entity, 'Duelist')
   const duelistChallenge = useEntityModel<models.DuelistChallenge>(entity, 'DuelistChallenge')
   const duelistMemorial = useEntityModel<models.DuelistMemorial>(entity, 'DuelistMemorial')
-  // console.log(`useDuelist() =>`, duelist_id, duelist)
+  console.log(`useDuelist() =>`, duelist_id, bigintToHex(entityId), duelist)
   // console.log(`DuelistMemorial =>`, duelist_id, duelistMemorial)
 
   const timestampRegistered = useMemo(() => Number(duelist?.timestamps.registered ?? 0), [duelist])

@@ -105,7 +105,7 @@ export function EntityStoreSync() {
       // console.log("EntityStoreSync() SET =======> [TableConfig]:", filterEntitiesByModel(entities, 'TableConfig'))
       // console.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModel(entities, 'SeasonConfig'))
       // console.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModel(entities, 'SeaLeaderboardsonConfig'))
-      // console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
+      console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
       // console.log("EntityStoreSync() SET =======> [Player]:", filterEntitiesByModel(entities, 'Player'))
       // console.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModel(entities, 'Pool'))
       configState.setEntities(filterEntitiesByModel(entities, 'Config'))

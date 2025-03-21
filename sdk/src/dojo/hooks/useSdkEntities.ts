@@ -190,7 +190,7 @@ export const useSdkEventsGet = ({
         }
       }).catch((error: Error) => {
         if (!_mounted) return
-        console.error("useSdkEventsGet() error:", error, query)
+        console.error("useSdkEventsGet() error:", historical, error, query)
         setIsLoading(false)
       })
     }
@@ -227,7 +227,7 @@ export const useSdkEventsSub = ({
         historical,
         callback: (response: SdkEventsCallbackResponse) => {
           if (response.error) {
-            console.error("useSdkEventsSub() callback error:", response.error, query)
+            console.error("useSdkEventsSub() callback error:", historical, response.error, query)
           } else {
             // console.log("useSdkEventsSub() SUB:", historical, response.data);
             _parseEvents(response.data, historical).forEach(entity => updateEntity(entity))
@@ -235,8 +235,8 @@ export const useSdkEventsSub = ({
         },
       }).then(response => {
         if (!_mounted) return
+        console.log("EVENTS SUB ====== initialEntities:", historical, response);
         const [initialEntities, sub] = response;
-        // console.log("EVENTS SUB ====== initialEntities:", initialEntities);
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
           setEntities(_parseEvents(initialEntities, historical))
@@ -244,7 +244,7 @@ export const useSdkEventsSub = ({
         }
       }).catch(error => {
         if (!_mounted) return
-        console.error("useSdkEventsSub() promise error:", error, query)
+        console.error("useSdkEventsSub() promise error:", historical, error, query)
         setIsLoading(false)
       })
     };
