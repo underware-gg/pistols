@@ -121,7 +121,9 @@
   height: 100%;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
+
 .component-front-face {
   @extend .component-face;
   transform: rotateY(180deg);
