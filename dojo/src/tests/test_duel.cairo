@@ -4,8 +4,9 @@ mod tests {
 
     use pistols::models::{
         challenge::{ChallengeTrait, ChallengeValue, RoundValue},
+        duelist::{DuelistStatus},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
-        duelist::{Scoreboard},
+        table::{TableScoreboard},
     };
     use pistols::types::{
         cards::hand::{PacesCard, FinalBlow, DeckType},
@@ -137,36 +138,33 @@ mod tests {
             _assert_is_alive(round.state_b, "alive_b");
         }
 
-        let score_a = sys.store.get_scoreboard(ID(OWNER()).into(), table_id);
-        let score_b = sys.store.get_scoreboard(ID(OTHER()).into(), table_id);
-        assert_eq!(score_a.score.total_duels, 1, "score_a.score.total_duels");
-        assert_eq!(score_b.score.total_duels, 1, "score_b.score.total_duels");
-        assert_eq!(score_a.score.total_draws, 1, "score_a.score.total_draws");
-        assert_eq!(score_b.score.total_draws, 1, "score_b.score.total_draws");
-        assert_eq!(score_a.score.total_wins, 0, "score_a.score.total_wins");
-        assert_eq!(score_b.score.total_wins, 0, "score_b.score.total_wins");
-        assert_eq!(score_a.score.total_losses, 0, "score_a.score.total_losses");
-        assert_eq!(score_b.score.total_losses, 0, "score_b.score.total_losses");
+        let status_a: DuelistStatus = sys.store.get_duelist(ID(OWNER()).into()).status;
+        let status_b: DuelistStatus = sys.store.get_duelist(ID(OTHER()).into()).status;
+        let score_a: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OWNER()).into());
+        let score_b: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OTHER()).into());
+        assert_eq!(status_a.total_duels, 1, "status_a.total_duels");
+        assert_eq!(status_b.total_duels, 1, "status_b.total_duels");
+        assert_eq!(status_a.total_draws, 1, "status_a.total_draws");
+        assert_eq!(status_b.total_draws, 1, "status_b.total_draws");
+        assert_eq!(status_a.total_wins, 0, "status_a.total_wins");
+        assert_eq!(status_b.total_wins, 0, "status_b.total_wins");
+        assert_eq!(status_a.total_losses, 0, "status_a.total_losses");
+        assert_eq!(status_b.total_losses, 0, "status_b.total_losses");
 
-        assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "score_a.score.honour");
-        assert_eq!(round.state_a.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "score_b.score.honour");
-        assert_eq!(score_a.score.honour, round.state_a.honour, "score_a.score.honour");
-        assert_eq!(score_b.score.honour, round.state_b.honour, "score_b.score.honour");
-
-        let mut scoreboard_a = sys.store.get_scoreboard(OWNER().into(), table_id);
-        let mut scoreboard_b = sys.store.get_scoreboard(OTHER().into(), table_id);
-        assert_eq!(score_a.score.total_duels, scoreboard_a.score.total_duels, "scoreboard_a.score.total_duels");
-        assert_eq!(score_b.score.total_duels, scoreboard_b.score.total_duels, "scoreboard_b.score.total_duels");
-        assert_eq!(score_a.score.honour, scoreboard_a.score.honour, "scoreboard_a.score.honour");
-        assert_eq!(score_b.score.honour, scoreboard_b.score.honour, "scoreboard_b.score.honour");
+        assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "status_a.honour");
+        assert_eq!(round.state_a.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "status_b.honour");
+        assert_eq!(status_a.honour, round.state_a.honour, "status_a.honour");
+        assert_eq!(status_b.honour, round.state_b.honour, "status_b.honour");
 
         let leaderboard: Leaderboard = sys.store.get_leaderboard(table_id);
         let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
         assert_eq!(positions.len(), 2, "leaderboard_positions.len");
         assert_eq!(*positions[0].duelist_id, ID(OWNER()).into(), "draw_leaderboards[0].pos");
         assert_eq!(*positions[1].duelist_id, ID(OTHER()).into(), "draw_leaderboards[1].pos");
-        assert_gt!(*positions[0].score, 0, "draw_leaderboards[0].score");
-        assert_gt!(*positions[1].score, 0, "draw_leaderboards[1].score");
+        assert_gt!(*positions[0].points, 0, "draw_leaderboards[0].points");
+        assert_gt!(*positions[1].points, 0, "draw_leaderboards[1].points");
+        assert_eq!(*positions[0].points, score_a.points, "score_a.points");
+        assert_eq!(*positions[1].points, score_b.points, "score_b.points");
 
         // duel nft still owned by contract
         assert_eq!(sys.duels.owner_of(duel_id.into()), sys.game.contract_address, "duels.owner_of_END");
@@ -283,52 +281,55 @@ mod tests {
         let final_blow: PacesCard = (if(winner == 1){*moves_a.moves[0]}else{*moves_b.moves[0]}.into());
         assert_eq!(round.final_blow, FinalBlow::Paces(final_blow), "round.final_blow");
 
-        let score_a_1: Scoreboard = sys.store.get_scoreboard(ID(OWNER()).into(), table_id);
-        let score_b_1: Scoreboard = sys.store.get_scoreboard(ID(OTHER()).into(), table_id);
-        assert_eq!(score_a_1.score.total_duels, 1, "score_a_1.score.total_duels");
-        assert_eq!(score_b_1.score.total_duels, 1, "score_b_1.score.total_duels");
-        assert_eq!(score_a_1.score.total_draws, 0, "score_a_1.score.total_draws");
-        assert_eq!(score_b_1.score.total_draws, 0, "score_b_1.score.total_draws");
+        let status_a_1: DuelistStatus = sys.store.get_duelist(ID(OWNER()).into()).status;
+        let status_b_1: DuelistStatus = sys.store.get_duelist(ID(OTHER()).into()).status;
+        assert_eq!(status_a_1.total_duels, 1, "status_a_1.total_duels");
+        assert_eq!(status_b_1.total_duels, 1, "status_b_1.total_duels");
+        assert_eq!(status_a_1.total_draws, 0, "status_a_1.total_draws");
+        assert_eq!(status_b_1.total_draws, 0, "status_b_1.total_draws");
 
-        assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "score_a.score.honour");
-        assert_eq!(round.state_b.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "score_b.score.honour");
-        assert_eq!(score_a_1.score.honour, round.state_a.honour, "score_a_1.score.honour");
-        assert_eq!(score_b_1.score.honour, round.state_b.honour, "score_b_1.score.honour");
+        assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "round.state_a.honour");
+        assert_eq!(round.state_b.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "round.state_b.honour");
+        assert_eq!(status_a_1.honour, round.state_a.honour, "status_a_1.honour");
+        assert_eq!(status_b_1.honour, round.state_b.honour, "status_b_1.honour");
 
         let leaderboard_1: Leaderboard = sys.store.get_leaderboard(table_id);
         let positions_1: Span<LeaderboardPosition> = leaderboard_1.get_all_positions();
         assert_eq!(positions_1.len(), 2, "leaderboard_positions.len");
-        assert_gt!(*positions_1[0].score, 0, "leaderboard_1[0].score");
-        assert_gt!(*positions_1[1].score, 0, "leaderboard_1[1].score");
+        assert_gt!(*positions_1[0].points, 0, "leaderboard_1[0].points");
+        assert_gt!(*positions_1[1].points, 0, "leaderboard_1[1].points");
+
+        let score_a_1: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OWNER()).into());
+        let score_b_1: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OTHER()).into());
 
         assert_eq!(challenge.winner, winner, "winner");
         if (winner == 1) {
-            assert_eq!(score_a_1.score.total_wins, 1, "a_win_duelist_a.total_wins");
-            assert_eq!(score_b_1.score.total_wins, 0, "a_win_duelist_b.total_wins");
-            assert_eq!(score_a_1.score.total_losses, 0, "a_win_duelist_a.total_losses");
-            assert_eq!(score_b_1.score.total_losses, 1, "a_win_duelist_b.total_losses");
+            assert_eq!(status_a_1.total_wins, 1, "a_win_duelist_a.total_wins");
+            assert_eq!(status_b_1.total_wins, 0, "a_win_duelist_b.total_wins");
+            assert_eq!(status_a_1.total_losses, 0, "a_win_duelist_a.total_losses");
+            assert_eq!(status_b_1.total_losses, 1, "a_win_duelist_b.total_losses");
             assert_eq!(round.state_a.damage, CONST::FULL_HEALTH, "a_win_damage_a");
             assert_eq!(round.state_a.health, CONST::FULL_HEALTH, "a_win_health_a");
             assert_eq!(round.state_b.health, 0, "a_win_health_b");
             assert_eq!(*positions_1[0].duelist_id, ID(OWNER()).into(), "a_win_leaderboards[0].pos");
             assert_eq!(*positions_1[1].duelist_id, ID(OTHER()).into(), "a_win_leaderboards[1].pos");
-            assert_eq!(*positions_1[0].score, score_a_1.score.points, "score_a_1.score.points");
-            assert_eq!(*positions_1[1].score, score_b_1.score.points, "score_b_1.score.points");
+            assert_eq!(*positions_1[0].points, score_a_1.points, "score_a_1.points");
+            assert_eq!(*positions_1[1].points, score_b_1.points, "score_b_1.points");
             _assert_is_alive(round.state_a, "alive_a");
             _assert_is_dead(round.state_b, "dead_b");
             assert_eq!(sys.duels.owner_of(duel_id.into()), challenge.address_a, "duels.owner_of_END_1");
         } else if (winner == 2) {
-            assert_eq!(score_a_1.score.total_wins, 0, "b_win_duelist_a.total_wins");
-            assert_eq!(score_b_1.score.total_wins, 1, "b_win_duelist_b.total_wins");
-            assert_eq!(score_a_1.score.total_losses, 1, "b_win_duelist_a.total_losses");
-            assert_eq!(score_b_1.score.total_losses, 0, "b_win_duelist_b.total_losses");
+            assert_eq!(status_a_1.total_wins, 0, "b_win_duelist_a.total_wins");
+            assert_eq!(status_b_1.total_wins, 1, "b_win_duelist_b.total_wins");
+            assert_eq!(status_a_1.total_losses, 1, "b_win_duelist_a.total_losses");
+            assert_eq!(status_b_1.total_losses, 0, "b_win_duelist_b.total_losses");
             assert_eq!(round.state_b.damage, CONST::FULL_HEALTH, "b_win_damage_b");
             assert_eq!(round.state_b.health, CONST::FULL_HEALTH, "b_win_health_b");
             assert_eq!(round.state_a.health, 0, "b_win_health_a");
             assert_eq!(*positions_1[0].duelist_id, ID(OTHER()).into(), "b_win_leaderboards[0].pos");
             assert_eq!(*positions_1[1].duelist_id, ID(OWNER()).into(), "b_win_leaderboards[1].pos");
-            assert_eq!(*positions_1[0].score, score_b_1.score.points, "score_b_1.score.points");
-            assert_eq!(*positions_1[1].score, score_a_1.score.points, "score_a_1.score.points");
+            assert_eq!(*positions_1[0].points, score_b_1.points, "score_b_1.points");
+            assert_eq!(*positions_1[1].points, score_a_1.points, "score_a_1.points");
             _assert_is_alive(round.state_b, "alive_b");
             _assert_is_dead(round.state_a, "dead_a");
             assert_eq!(sys.duels.owner_of(duel_id.into()), challenge.address_b, "duels.owner_of_END_1");
@@ -368,42 +369,45 @@ mod tests {
         assert_ne!(challenge.winner, 0, "challenge.winner ++");
         assert_gt!(challenge.timestamps.end, 0, "challenge.timestamps.end ++");
         assert_eq!(round.state, RoundState::Finished, "state ++");
-        assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "score_a.score.honour ++");
-        assert_eq!(round.state_b.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "score_b.score.honour ++");
+        assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "round.state_a.honour ++");
+        assert_eq!(round.state_b.honour, (*moves_b.moves[0] * 10).try_into().unwrap(), "round.state_b.honour ++");
         assert_eq!(round.moves_a.timeout, 0, "++ timeout_ended_a");
         assert_eq!(round.moves_b.timeout, 0, "++ timeout_ended_b");
 
-        let score_a_2: Scoreboard = sys.store.get_scoreboard(ID(OWNER()).into(), table_id);
-        let score_b_2: Scoreboard = sys.store.get_scoreboard(ID(OTHER()).into(), table_id);
-        assert_eq!(score_a_2.score.total_duels, 2, "score_a_2.score.total_duels ++");
-        assert_eq!(score_b_2.score.total_duels, 2, "score_b_2.score.total_duels ++");
-        assert_eq!(score_a_2.score.total_draws, 0, "score_a_2.score.total_draws ++");
-        assert_eq!(score_b_2.score.total_draws, 0, "score_b_2.score.total_draws ++");
+        let status_a_2: DuelistStatus = sys.store.get_duelist(ID(OWNER()).into()).status;
+        let status_b_2: DuelistStatus = sys.store.get_duelist(ID(OTHER()).into()).status;
+        assert_eq!(status_a_2.total_duels, 2, "status_a_2.total_duels ++");
+        assert_eq!(status_b_2.total_duels, 2, "status_b_2.total_duels ++");
+        assert_eq!(status_a_2.total_draws, 0, "status_a_2.total_draws ++");
+        assert_eq!(status_b_2.total_draws, 0, "status_b_2.total_draws ++");
 
         let leaderboard_2: Leaderboard = sys.store.get_leaderboard(table_id);
         let positions_2: Span<LeaderboardPosition> = leaderboard_2.get_all_positions();
         assert_eq!(positions_2.len(), 2, "leaderboard_positions.len() ++");
-        assert_gt!(*positions_2[0].score, *positions_1[0].score, "score_2 > score_1");
-        assert_gt!(*positions_2[1].score, *positions_1[1].score, "score_2 > score_1");
+        assert_gt!(*positions_2[0].points, *positions_1[0].points, "score_2 > score_1");
+        assert_gt!(*positions_2[1].points, *positions_1[1].points, "score_2 > score_1");
+
+        let score_a_2: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OWNER()).into());
+        let score_b_2: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OTHER()).into());
 
         if (winner == 1) {
-            assert_eq!(score_a_2.score.total_wins, 2, "a_win_duelist_a.total_wins ++");
-            assert_eq!(score_b_2.score.total_wins, 0, "a_win_duelist_b.total_wins ++");
-            assert_eq!(score_a_2.score.total_losses, 0, "a_win_duelist_a.total_losses ++");
-            assert_eq!(score_b_2.score.total_losses, 2, "a_win_duelist_b.total_losses ++");
+            assert_eq!(status_a_2.total_wins, 2, "a_win_duelist_a.total_wins ++");
+            assert_eq!(status_b_2.total_wins, 0, "a_win_duelist_b.total_wins ++");
+            assert_eq!(status_a_2.total_losses, 0, "a_win_duelist_a.total_losses ++");
+            assert_eq!(status_b_2.total_losses, 2, "a_win_duelist_b.total_losses ++");
             assert_eq!(*positions_2[0].duelist_id, ID(OWNER()).into(), "a_win_leaderboards[0].pos ++");
             assert_eq!(*positions_2[1].duelist_id, ID(OTHER()).into(), "a_win_leaderboards[1].pos ++");
-            assert_eq!(*positions_2[0].score, score_a_2.score.points, "score_a_2.score.points ++");
-            assert_eq!(*positions_2[1].score, score_b_2.score.points, "score_b_2.score.points ++");
+            assert_eq!(*positions_2[0].points, score_a_2.points, "score_a_2.points ++");
+            assert_eq!(*positions_2[1].points, score_b_2.points, "score_b_2.points ++");
         } else if (winner == 2) {
-            assert_eq!(score_a_2.score.total_wins, 0, "b_win_duelist_a.total_wins ++");
-            assert_eq!(score_b_2.score.total_wins, 2, "b_win_duelist_b.total_wins ++");
-            assert_eq!(score_a_2.score.total_losses, 2, "b_win_duelist_a.total_losses ++");
-            assert_eq!(score_b_2.score.total_losses, 0, "b_win_duelist_b.total_losses ++");
+            assert_eq!(status_a_2.total_wins, 0, "b_win_duelist_a.total_wins ++");
+            assert_eq!(status_b_2.total_wins, 2, "b_win_duelist_b.total_wins ++");
+            assert_eq!(status_a_2.total_losses, 2, "b_win_duelist_a.total_losses ++");
+            assert_eq!(status_b_2.total_losses, 0, "b_win_duelist_b.total_losses ++");
             assert_eq!(*positions_2[0].duelist_id, ID(OTHER()).into(), "b_win_leaderboards[0].pos ++");
             assert_eq!(*positions_2[1].duelist_id, ID(OWNER()).into(), "b_win_leaderboards[1].pos ++");
-            assert_eq!(*positions_2[0].score, score_b_2.score.points, "score_b_2.score.points ++");
-            assert_eq!(*positions_2[1].score, score_a_2.score.points, "score_a_2.score.points ++");
+            assert_eq!(*positions_2[0].points, score_b_2.points, "score_b_2.points ++");
+            assert_eq!(*positions_2[1].points, score_a_2.points, "score_a_2.points ++");
         } else {
             assert!(false, "bad winner")
         }

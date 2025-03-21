@@ -460,7 +460,7 @@ pub mod duel_token {
                 store.exit_challenge(challenge.duelist_id_a);
                 store.emit_required_action(challenge.duelist_id_a, 0);
                 store.emit_required_action(challenge.duelist_id_b, 0);
-                Activity::ChallengeExpired.emit(ref store.world, starknet::get_caller_address(), challenge.duel_id.into());
+                Activity::ChallengeCanceled.emit(ref store.world, starknet::get_caller_address(), challenge.duel_id.into());
             } else {
                 PlayerTrait::check_in(ref store, Activity::ChallengeReplied, address_b, duel_id.into());
             }

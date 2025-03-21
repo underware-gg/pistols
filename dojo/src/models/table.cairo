@@ -19,6 +19,19 @@ pub struct TableConfig {
     pub rules: RulesType,
 }
 
+// Per table scoreboard
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct TableScoreboard {
+    #[key]
+    pub table_id: felt252,
+    #[key]
+    pub holder: felt252,    // duelist_id or player_address
+    //------------
+    pub points: u16,
+}
+
+
 
 //---------------------------
 // Table Manager
@@ -53,6 +66,7 @@ pub impl TableManagerImpl of TableManagerTrait {
 //
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
 use pistols::models::season::{SeasonConfig, SeasonConfigTrait};
+use pistols::types::rules::{RewardValues};
 
 #[generate_trait]
 pub impl TableConfigImpl of TableConfigTrait {
@@ -74,5 +88,13 @@ pub impl TableConfigImpl of TableConfigTrait {
             },
             _ => true
         })
+    }
+}
+
+#[generate_trait]
+pub impl TableScoreboardImpl of TableScoreboardTrait {
+    #[inline(always)]
+    fn apply_rewards(ref self: TableScoreboard, rewards: @RewardValues) {
+        self.points += *rewards.points_scored;
     }
 }

@@ -82,9 +82,10 @@ pub mod game {
     use pistols::models::{
         player::{PlayerTrait, Activity, ActivityTrait},
         challenge::{Challenge, ChallengeTrait, Round, RoundTrait, MovesTrait},
-        duelist::{DuelistTrait, Scoreboard, ScoreTrait},
+        duelist::{Duelist, DuelistTrait, DuelistStatusTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
+        table::{TableScoreboard, TableScoreboardTrait},
         season::{SeasonConfig, SeasonConfigTrait},
     };
     use pistols::types::{
@@ -375,7 +376,7 @@ pub mod game {
             let challenge: Challenge = store.get_challenge(duel_id);
             if (challenge.is_tutorial()) {
                 (store.world.tutorial_dispatcher().get_duel_progress(duel_id))
-            } else if (challenge.state.is_finished()) {
+            } else if (challenge.state.is_concluded()) {
                 let mut round: Round = store.get_round(duel_id);
                 let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
                 (game_loop(wrapped, @challenge.get_deck(), ref round))
@@ -569,7 +570,7 @@ pub mod game {
                 store.exit_challenge(challenge.duelist_id_b);
             }
             // distributions
-            if (challenge.state.is_finished()) {
+            if (challenge.state.is_concluded()) {
                 // transfer rewards
                 let tournament_id: u128 = 0;
                 let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_dispatcher().transfer_rewards(challenge, tournament_id);
@@ -594,33 +595,29 @@ pub mod game {
         }
 
         fn _update_scoreboards(self: @ContractState, ref store: Store, challenge: @Challenge, round: @Round, ref rewards_a: RewardValues, ref rewards_b: RewardValues) {
-            // global score
-            // let mut score_global_a: Scoreboard = store.get_scoreboard((*challenge).duelist_id_a.into(), 0);
-            // let mut score_global_b: Scoreboard = store.get_scoreboard((*challenge).duelist_id_b.into(), 0);
-            // per table score
-            let mut score_season_a: Scoreboard = store.get_scoreboard((*challenge).duelist_id_a.into(), (*challenge).table_id);
-            let mut score_season_b: Scoreboard = store.get_scoreboard((*challenge).duelist_id_b.into(), (*challenge).table_id);
-            
-            // update totals
-            // ScoreTrait::update_totals(ref score_global_a.score, ref score_global_b.score, @rewards_a, @rewards_b, *challenge.winner);
-            ScoreTrait::update_totals(ref score_season_a.score, ref score_season_b.score, @rewards_a, @rewards_b, *challenge.winner);
-
-            // compute honour from final round
-            // score_global_a.score.update_honour(*round.state_a.honour);
-            // score_global_b.score.update_honour(*round.state_b.honour);
-            score_season_a.score.update_honour(*round.state_a.honour);
-            score_season_b.score.update_honour(*round.state_b.honour);
-            
+            // update duelists status
+            let mut duelist_a: Duelist = store.get_duelist(*challenge.duelist_id_a);
+            let mut duelist_b: Duelist = store.get_duelist(*challenge.duelist_id_b);
+            DuelistStatusTrait::apply_challenge_results(ref duelist_a.status, ref duelist_b.status, @rewards_a, @rewards_b, *challenge.winner);
+            duelist_a.status.update_honour(*round.state_a.honour);
+            duelist_b.status.update_honour(*round.state_b.honour);
             // save
-            // store.set_scoreboard(@score_global_a);
-            // store.set_scoreboard(@score_global_b);
-            store.set_scoreboard(@score_season_a);
-            store.set_scoreboard(@score_season_b);
+            store.set_duelist(@duelist_a);
+            store.set_duelist(@duelist_b);
+
+            // per table score
+            let mut scoreboard_a: TableScoreboard = store.get_scoreboard(*challenge.table_id, (*challenge).duelist_id_a.into());
+            let mut scoreboard_b: TableScoreboard = store.get_scoreboard(*challenge.table_id, (*challenge).duelist_id_b.into());
+            scoreboard_a.apply_rewards(@rewards_a);
+            scoreboard_b.apply_rewards(@rewards_b);
+            // save
+            store.set_scoreboard(@scoreboard_a);
+            store.set_scoreboard(@scoreboard_b);
 
             // update leaderboards
             let mut leaderboard: Leaderboard = store.get_leaderboard(*challenge.table_id);
-            rewards_a.position = leaderboard.insert_score(*challenge.duelist_id_a, score_season_a.score.points);
-            rewards_b.position = leaderboard.insert_score(*challenge.duelist_id_b, score_season_b.score.points);
+            rewards_a.position = leaderboard.insert_score(*challenge.duelist_id_a, scoreboard_a.points);
+            rewards_b.position = leaderboard.insert_score(*challenge.duelist_id_b, scoreboard_b.points);
             if (rewards_a.position != 0 || rewards_b.position != 0) {
                 // adjust [a] if [b] moved up
                 if (rewards_b.position <= rewards_a.position) {

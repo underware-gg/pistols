@@ -59,7 +59,7 @@ pub struct Moves {
     pub card_2: u8,         // PacesCard,
     pub card_3: u8,         // TacticsCard,
     pub card_4: u8,         // BladesCard,
-} // [f] + [128 + 64 + 32(4*8)]:224
+} // [f] + [128 + 64 + 32(4*8)]: 224 bits
 
 #[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
 pub struct DuelistState {
@@ -69,7 +69,7 @@ pub struct DuelistState {
     pub health: u8,     // 0..CONST::FULL_HEALTH
     pub dice_fire: u8,  // 0..100
     pub honour: u8,     // honour granted
-} // [5*8]:40
+} // [5*8]: 40 bits
 
 
 //---------------------

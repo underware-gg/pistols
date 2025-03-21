@@ -294,6 +294,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
                     registered: timestamp,
                     active: timestamp,
                 },
+                status: Default::default(),
             });
             i += 1;
         };

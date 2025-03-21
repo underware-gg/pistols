@@ -8,7 +8,6 @@ use pistols::models::{
     },
     duelist::{
         Duelist, DuelistTimestamps,
-        Scoreboard, Score,
         ProfileType, DuelistProfile,
         DuelistMemorialValue, CauseOfDeath,
     },
@@ -17,6 +16,9 @@ use pistols::models::{
     },
     config::{
         TokenConfig,
+    },
+    table::{
+        TableScoreboard,
     },
     pool::{
         Pool, PoolType,
@@ -130,23 +132,16 @@ fn test_token_uri() {
             registered: 999999,
             active: 999999,
         },
+        status: Default::default(),
     };
     tester::set_Duelist(ref sys.world, @duelist);
 
-    let scoreboard = Scoreboard {
+    let scoreboard = TableScoreboard {
         holder: TOKEN_ID_1_1.low.into(),
         table_id: 0,
-        score: Score {
-            honour: 99,
-            points: 777,
-            total_duels: 6,
-            total_wins: 3,
-            total_losses: 2,
-            total_draws: 1,
-            honour_history: 0,
-        },
+        points: 777,
     };
-    tester::set_Scoreboard(ref sys.world, @scoreboard);
+    tester::set_TableScoreboard(ref sys.world, @scoreboard);
 
     let uri_1 = sys.duelists.token_uri(TOKEN_ID_1_1);
     let uri_2 = sys.duelists.token_uri(TOKEN_ID_1_2);

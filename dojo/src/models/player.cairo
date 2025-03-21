@@ -10,7 +10,7 @@ pub enum Activity {
     DuelistSpawned,     // 5
     DuelistDied,        // 6
     ChallengeCreated,   // 7
-    ChallengeExpired,   // 8
+    ChallengeCanceled,   // 8
     ChallengeReplied,   // 9
     MovesCommitted,     // 10
     MovesRevealed,      // 11

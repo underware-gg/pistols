@@ -14,7 +14,7 @@ pub struct Leaderboard {
 pub struct LeaderboardPosition {
     pub position: u8,
     pub duelist_id: u128,
-    pub score: u16,
+    pub points: u16,
 }
 
 
@@ -60,7 +60,7 @@ pub impl LeaderboardImpl of LeaderboardTrait {
                 ).try_into().unwrap();
                 result.position = p;
                 result.duelist_id = duelist_id;
-                result.score = score;
+                result.points = score;
                 break;
             }
             p += 1;
@@ -86,7 +86,7 @@ pub impl LeaderboardImpl of LeaderboardTrait {
             result.append(LeaderboardPosition {
                 position: p,
                 duelist_id: id,
-                score,
+                points: score,
             });
             p += 1;
         };
@@ -291,7 +291,7 @@ mod unit {
         while (p <= LB.positions) {
             let pos: LeaderboardPosition = LB.get_duelist_position(current_id);
             assert_eq!(pos.position, p, "position[{}]: {}", p, pos.position);
-            assert_eq!(pos.score, expected_score, "score[{}]: {}", p, pos.score);
+            assert_eq!(pos.points, expected_score, "points[{}]: {}", p, pos.points);
             assert_eq!(pos.duelist_id, current_id, "duelist_id[{}]: {}", p, pos.duelist_id);
             current_id += ID_STEP;
             expected_score -= SCORE_STEP;
@@ -310,7 +310,7 @@ mod unit {
         while (p <= LB.positions) {
             let pos: LeaderboardPosition = *all_positions.at(p.into()-1);
             assert_eq!(pos.position, p, "position[{}]: {}", p, pos.position);
-            assert_eq!(pos.score, expected_score, "score[{}]: {}", p, pos.score);
+            assert_eq!(pos.points, expected_score, "points[{}]: {}", p, pos.points);
             assert_eq!(pos.duelist_id, current_id, "duelist_id[{}]: {}", p, pos.duelist_id);
             current_id += ID_STEP;
             expected_score -= SCORE_STEP;

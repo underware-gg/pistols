@@ -49,7 +49,6 @@ pub mod tester {
         duelist::{
             m_Duelist, Duelist, DuelistValue,
             m_DuelistChallenge, DuelistChallenge,
-            m_Scoreboard, Scoreboard,
             m_DuelistMemorial, DuelistMemorial, DuelistMemorialValue, CauseOfDeath,
         },
         leaderboard::{
@@ -69,6 +68,7 @@ pub mod tester {
         },
         table::{
             m_TableConfig, TableConfig,
+            m_TableScoreboard, TableScoreboard,
         },
         pool::{
             m_Pool, Pool, PoolType,
@@ -260,7 +260,7 @@ pub mod tester {
             TestResource::Model(m_DuelistMemorial::TEST_CLASS_HASH),
             TestResource::Model(m_Pact::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),
-            TestResource::Model(m_Scoreboard::TEST_CLASS_HASH),
+            TestResource::Model(m_TableScoreboard::TEST_CLASS_HASH),
             TestResource::Model(m_Leaderboard::TEST_CLASS_HASH),
             TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
@@ -773,7 +773,7 @@ pub mod tester {
     pub fn set_Duelist(ref world: WorldStorage, model: @Duelist) {
         world.write_model_test(model);
     }
-    pub fn set_Scoreboard(ref world: WorldStorage, model: @Scoreboard) {
+    pub fn set_TableScoreboard(ref world: WorldStorage, model: @TableScoreboard) {
         world.write_model_test(model);
     }
     pub fn set_Challenge(ref world: WorldStorage, model: @Challenge) {

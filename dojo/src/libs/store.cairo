@@ -28,7 +28,6 @@ pub use pistols::models::{
     duelist::{
         Duelist, DuelistValue, DuelistTimestamps,
         DuelistChallenge, DuelistChallengeValue,
-        Scoreboard, ScoreboardValue,
         DuelistMemorial, DuelistMemorialValue,
     },
     leaderboard::{
@@ -39,6 +38,7 @@ pub use pistols::models::{
     },
     table::{
         TableConfig, TableConfigValue,
+        TableScoreboard, TableScoreboardValue,
         RulesType,
     },
     season::{
@@ -106,10 +106,10 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_value(duel_id))
     }
 
-    // #[inline(always)]
-    // fn get_duelist(self: @Store, duelist_id: u128) -> Duelist {
-    //     (self.world.read_model(duelist_id))
-    // }
+    #[inline(always)]
+    fn get_duelist(self: @Store, duelist_id: u128) -> Duelist {
+        (self.world.read_model(duelist_id))
+    }
     #[inline(always)]
     fn get_duelist_value(self: @Store, duelist_id: u128) -> DuelistValue {
         (self.world.read_value(duelist_id))
@@ -134,13 +134,13 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_scoreboard_value(self: @Store, holder: felt252, table_id: felt252) -> ScoreboardValue {
-        (self.world.read_value((holder, table_id),))
+    fn get_scoreboard_value(self: @Store, table_id: felt252, holder: felt252) -> TableScoreboardValue {
+        (self.world.read_value((table_id, holder),))
     }
 
     #[inline(always)]
-    fn get_scoreboard(self: @Store, holder: felt252, table_id: felt252) -> Scoreboard {
-        (self.world.read_model((holder, table_id),))
+    fn get_scoreboard(self: @Store, table_id: felt252, holder: felt252) -> TableScoreboard {
+        (self.world.read_model((table_id, holder),))
     }
 
     #[inline(always)]
@@ -260,7 +260,7 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_scoreboard(ref self: Store, model: @Scoreboard) {
+    fn set_scoreboard(ref self: Store, model: @TableScoreboard) {
         self.world.write_model(model);
     }
 

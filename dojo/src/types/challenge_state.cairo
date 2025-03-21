@@ -44,7 +44,7 @@ pub impl ChallengeStateImpl of ChallengeStateTrait {
             ChallengeState::Draw        => false,
         }
     }
-    fn is_finished(self: @ChallengeState) -> bool {
+    fn is_concluded(self: @ChallengeState) -> bool {
         match self {
             ChallengeState::Null        => false,
             ChallengeState::Awaiting    => false,
