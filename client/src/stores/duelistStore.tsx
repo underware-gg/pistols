@@ -38,7 +38,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const duelist = useEntityModel<models.Duelist>(entity, 'Duelist')
   const duelistChallenge = useEntityModel<models.DuelistChallenge>(entity, 'DuelistChallenge')
   const duelistMemorial = useEntityModel<models.DuelistMemorial>(entity, 'DuelistMemorial')
-  console.log(`useDuelist() =>`, duelist_id, bigintToHex(entityId), duelist)
+  // console.log(`useDuelist() =>`, duelist_id, duelist)
   // console.log(`DuelistMemorial =>`, duelist_id, duelistMemorial)
 
   const timestampRegistered = useMemo(() => Number(duelist?.timestamps.registered ?? 0), [duelist])
@@ -73,7 +73,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const profilePic = useMemo(() => (profileDescription.profile_id), [profileDescription])
   const name = useMemo(() => (profileDescription.name), [profileDescription])
   const gender = useMemo(() => (profileDescription.gender), [profileDescription])
-  const isNpc = useMemo(() => (profileType != constants.ProfileType.Duelist), [profileType])
+  const isNpc = useMemo(() => (profileType == constants.ProfileType.Character || profileType == constants.ProfileType.Bot), [profileType])
   const characterType = useMemo(() => (profileDescription.gender == constants.Gender.Female ? CharacterType.FEMALE : CharacterType.MALE), [profileDescription])
 
   const nameAndId = useMemo(() => (

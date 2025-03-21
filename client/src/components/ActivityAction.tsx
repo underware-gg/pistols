@@ -35,11 +35,7 @@ export default function ActivityAction() {
   const { address } = useAccount()
   const { bookmarkedDuelists } = usePlayer(address)
 
-  const { duelistIds } = useDuelistsOfPlayer()
-  const sortedDuelistIds = useMemo(() => duelistIds.sort((a, b) => Number(b - a)), [duelistIds])
-
-  const { duelPerDuelist } = useRequiredActions()
-
+  // pending duels (reply)
   const { pendingDuelIds } = usePendingChallengesIds(address)
   const pendingItems = useMemo(() => (pendingDuelIds.map((duelId) =>
     <PendingItem
@@ -48,6 +44,20 @@ export default function ActivityAction() {
     />)
   ), [pendingDuelIds])
 
+  // all duelists
+  const { duelPerDuelist } = useRequiredActions()
+  const { duelistIds } = useDuelistsOfPlayer()
+  const sortedDuelistIds = useMemo(() => (
+    duelistIds.sort((a, b) => {
+      // const duelA = duelPerDuelist[bigintToHex(a)] ?? 0n
+      // const duelB = duelPerDuelist[bigintToHex(b)] ?? 0n
+      // if (duelA == 0n && duelB == 0n) {
+      //   return Number(b - a)
+      // }
+      // return Number(duelB - duelA)
+      return Number(b - a)
+    })
+  ), [duelistIds, duelPerDuelist])
   const actionItems = useMemo(() => (sortedDuelistIds.map((duelistId) =>
     <ActionItem
       key={duelistId}
