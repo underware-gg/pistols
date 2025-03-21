@@ -25,7 +25,6 @@ rpc_url = "https://api.cartridge.gg/x/starknet/sepolia" # or env: STARKNET_RPC_U
 # private_key = ""      # env: DOJO_PRIVATE_KEY
 world_address = "0x2ea88c9a6314a10e7d8b6e557d01d68cf72d962707086aa242bc4805071f34d"
 lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
-world_block = 576409
 
 #--------------------------
 # namespaces

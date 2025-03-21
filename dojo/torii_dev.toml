@@ -6,14 +6,16 @@ rpc = "http://localhost:5050"
 
 [events]
 raw = true
+
+[sql]
 historical = [
   "pistols-PlayerActivity",
   "pistols-TrophyProgression",
 ]
 
 [indexing]
-index_pending = true
-index_transactions = false
+pending = true
+transactions = false
 contracts = [
   "erc721:0xc370447c2990b4e04a8689dac6c714addd8994466f4c082697da28e372cea1", # duel_token
   "erc721:0x14bbf7b77589b6d8e47d0d8f8b6da28fdd1a6626f3b0b9862d6f10c0689b643", # duelist_token

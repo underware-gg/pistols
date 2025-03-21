@@ -6,14 +6,16 @@ rpc = "https://api.cartridge.gg/x/starknet/sepolia"
 
 [events]
 raw = true
+
+[sql]
 historical = [
   "pistols-PlayerActivity",
   "pistols-TrophyProgression",
 ]
 
 [indexing]
-index_pending = true
-index_transactions = false
+pending = true
+transactions = false
 contracts = [
   "erc721:0x2f6572117075285c6e3124a3e13b6923329ef7ce6ec31c8ba3b6023d7ebc6ba", # duel_token
   "erc721:0x43f800e9f5f6e290a798379029fcb28ba7c34e9669f7b5fc77fce8a4ebdc893", # duelist_token
