@@ -40,7 +40,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   
   const { nameAndId: name, profilePic, profileType, isInAction } = useDuelist(props.duelistId)
   const {isAlive} = useFameBalanceDuelist(props.duelistId)
-  const score = useGetSeasonScoreboard(props.duelistId)
+  const score = useGetSeasonScoreboard(!props.isSmall ? props.duelistId : 0)
 
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)

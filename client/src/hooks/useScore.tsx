@@ -68,14 +68,18 @@ export const useGetScoreboard = (table_id: string, duelist_id: BigNumberish) => 
       .includeHashedKeys()
   ), [table_id, duelist_id])
 
+
+  const enabled = useMemo(() => (isPositiveBigint(duelist_id) && Boolean(table_id)), [duelist_id, table_id])
   const { entities, isLoading } = useSdkStateEntitiesGet({
     query,
-    enabled: (isPositiveBigint(duelist_id) && Boolean(table_id)),
+    enabled,
   })
   const scoreboard = useMemo(() => getEntityMapModels<models.Scoreboard>(entities, 'Scoreboard')?.[0], [entities])
   const score = useScore(scoreboard?.score)
 
-  return {
+  if (enabled) console.warn("useGetScoreboard()...", table_id, duelist_id)
+
+    return {
     ...score,
     isLoading,
   }

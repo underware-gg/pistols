@@ -155,15 +155,17 @@ export const DuelistsBook: React.FC<DuelistsBookProps> = ({
       <div ref={bookTranslationContainerRef} className="book-container-translate">
         <div ref={bookScaleContainerRef} className="book-container-scale">
           <div ref={bookRef} className="book NoDrag NoMouse">
-            <BookCoverLayer layer={0} layerColor="#a0522d" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
-            <BookCoverLayer layer={1} layerColor="#000000" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
-            <BookCoverLayer layer={2} layerColor="#000000" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
-            <BookCoverLayer layer={3} layerColor="#a0522d" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
-            <BookSheets isOpen={isBookOpen} width={width} height={height} />
-            {isBookOpen && <div 
-              className={opener.isOpen ? 'YesMouse NoDrag book-close-button' : 'NoMouse NoDrag book-close-button'} 
-              onClick={opener.close}
-            />}
+            {isBookOpen && <>
+              <BookCoverLayer layer={0} layerColor="#a0522d" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
+              <BookCoverLayer layer={1} layerColor="#000000" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
+              <BookCoverLayer layer={2} layerColor="#000000" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
+              <BookCoverLayer layer={3} layerColor="#a0522d" isOpen={isBookOpen} coverGap={coverGap} layerGap={layerGap} />
+              <BookSheets isOpen={isBookOpen} width={width} height={height} />
+              <div
+                className={opener.isOpen ? 'YesMouse NoDrag book-close-button' : 'NoMouse NoDrag book-close-button'}
+                onClick={opener.close}
+              />
+            </>}
           </div>
         </div>
       </div>

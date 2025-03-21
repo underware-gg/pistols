@@ -32,7 +32,7 @@ function _ShopModal({
   const packType = opener.props.packType ?? constants.PackType.Unknown
 
   const { account, isConnected } = useAccount()
-  const [selectedPackId, setSelectedPackId] = useState(0n)
+  const [selectedPackId, setSelectedPackId] = useState(0)
 
   const { pack_token } = useDojoSystemCalls()
   const { canPurchase } = useCanPurchase(packType)
@@ -127,8 +127,8 @@ export function PacksList({
   selectedPackId,
   setSelectedPackId,
 }: {
-  selectedPackId: bigint
-  setSelectedPackId: (packId: bigint) => void
+  selectedPackId: number
+  setSelectedPackId: (packId: number) => void
 }) {
   const { packIds } = usePacksOfPlayer()
   return (
@@ -149,9 +149,9 @@ function PacksListItem({
   active,
   setSelectedPackId,
 }: {
-  packId: bigint
+  packId: number
   active: boolean
-  setSelectedPackId: (packId: bigint) => void
+  setSelectedPackId: (packId: number) => void
 }) {
   const { packExists, packType, name, isOpen } = useGetPack(packId)
   return (

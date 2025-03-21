@@ -13,7 +13,7 @@ export const usePackStore = createDojoStore<PistolsSchemaType>();
 
 export const usePackType = (packType: constants.PackType) => {
   const description = useMemo(() => constants.PACK_TYPES[packType], [packType])
-  const name = useMemo(() => (description?.name ?? '?'), [description])
+  const name = useMemo(() => (description?.name ?? 'Pack'), [description])
   const imageUrlOpen = useMemo(() => (description?.image_url_open ?? null), [description])
   const imageUrlClosed = useMemo(() => (description?.image_url_closed ?? null), [description])
   const canPurchase = useMemo(() => (description?.can_purchase ?? false), [description])
@@ -59,7 +59,7 @@ export const usePack = (pack_id: BigNumberish) => {
 // (for non default tables, like tutorials)
 //
 
-export const useGetPack = (pack_id: BigNumberish) => {
+export const useGetPack = (pack_id: number) => {
   const result = usePack(pack_id)
 
   // const query_get = useMemo<PistolsQueryBuilder>(() => ({

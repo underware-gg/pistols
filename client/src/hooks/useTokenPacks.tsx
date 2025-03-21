@@ -17,7 +17,7 @@ export const usePacksOfPlayer = () => {
   const { packContractAddress } = usePackTokenContract()
   const { tokenIds, isLoading } = useTokenIdsByOwner(packContractAddress, address)
   return {
-    packIds: tokenIds,
+    packIds: tokenIds.map(id => Number(id)),
     isLoading,
   }
 }
