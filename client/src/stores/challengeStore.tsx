@@ -242,6 +242,7 @@ export const useGetChallenge = (duel_id: BigNumberish) => {
 
   useSdkEntitiesGet({
     query,
+    retryInterval: 500,
     enabled: !result.challengeExists,
     setEntities: (entities: PistolsEntity[]) => {
       entities.forEach(e => {
