@@ -21,7 +21,7 @@ const query: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels([
     "pistols-PlayerActivity",
   ])
-  .withLimit(30)
+  .withLimit(100)
   // .includeHashedKeys() // historical events are sequential
 
 // Sync entities: Add only once to a top level component
