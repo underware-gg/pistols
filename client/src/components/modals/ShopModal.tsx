@@ -21,6 +21,14 @@ export default function ShopModal({
 }: {
   opener: Opener
 }) {
+  return <>{opener.isOpen && <_ShopModal opener={opener} />}</>
+}
+
+function _ShopModal({
+  opener,
+}: {
+  opener: Opener
+}) {
   const packType = opener.props.packType ?? constants.PackType.Unknown
 
   const { account, isConnected } = useAccount()

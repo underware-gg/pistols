@@ -4,9 +4,17 @@ import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { ProfilePoster } from '../ui/ProfilePoster'
 
 export default function PlayerModal() {
-  const { selectedPlayerAddress, dispatchSelectPlayerAddress } = usePistolsContext()
+  const { selectedPlayerAddress } = usePistolsContext()
+  const isOpen = useMemo(() => (selectedPlayerAddress > 0n), [selectedPlayerAddress])
+  return <>{isOpen && <_PlayerModal isOpen={isOpen} />}</>
+}
 
-  const isOpen = useMemo(() => (selectedPlayerAddress > 0), [selectedPlayerAddress])
+function _PlayerModal({
+  isOpen,
+}: {
+  isOpen: boolean
+}) {
+  const { selectedPlayerAddress, dispatchSelectPlayerAddress } = usePistolsContext()
 
   const _close = () => {
     dispatchSelectPlayerAddress(0n)

@@ -21,6 +21,14 @@ export default function WalletFinderModal({
 }: {
   opener: Opener
 }) {
+  return <>{opener.isOpen && <_WalletFinderModal opener={opener} />}</>
+}
+
+function _WalletFinderModal({
+  opener,
+}: {
+  opener: Opener
+}) {
   // always closed on mount
   const mounted = useMounted(() => {
     opener.close()

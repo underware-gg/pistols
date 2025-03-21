@@ -22,6 +22,14 @@ export default function TableModal({
 }: {
   opener: Opener
 }) {
+  return <>{opener.isOpen && <_TableModal opener={opener} />}</>
+}
+
+function _TableModal({
+  opener,
+}: {
+  opener: Opener
+}) {
   const { tableId } = useTableId()
   const { currentScene, dispatchSetScene } = usePistolsScene()
   const [selectedTableId, setSelectedTableId] = useState('')

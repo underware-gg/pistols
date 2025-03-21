@@ -25,6 +25,16 @@ const Row = Grid.Row
 const Col = Grid.Column
 
 export default function NewChallengeModal() {
+  const { challengingAddress, challengingDuelistId } = usePistolsContext()
+  const isOpen = useMemo(() => (challengingAddress > 0n && challengingDuelistId > 0n), [challengingDuelistId, challengingDuelistId])
+  return (<>{isOpen && <_NewChallengeModal isOpen={isOpen} />}</>)
+}
+
+function _NewChallengeModal({
+  isOpen,
+}: {
+  isOpen: boolean
+}) {
   const { duel_token } = useDojoSystemCalls()
   const { account, address } = useAccount()
   const { tableId } = useTableId()
@@ -41,7 +51,6 @@ export default function NewChallengeModal() {
     dispatchSelectDuel 
   } = usePistolsContext()
 
-  const isOpen = useMemo(() => (challengingAddress > 0n && challengingDuelistId > 0n), [challengingDuelistId, challengingDuelistId])
   const addressA = address
   const addressB = challengingAddress
 
