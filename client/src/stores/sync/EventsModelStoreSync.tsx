@@ -26,30 +26,33 @@ export function EventsModelStoreSync() {
   //   },
   // }), [duelistIds])
   const query = useMemo<PistolsQueryBuilder>(() => (
-    new PistolsQueryBuilder()
-      .withClause(
-        new PistolsClauseBuilder().where(
+    duelistIds.length > 0
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().where(
+            "pistols-PlayerRequiredAction",
+            "duelist_id",
+            "In", duelistIds.map(id => formatQueryValue(id))
+          ).build()
+        )
+        .withLimit(50)
+        .withEntityModels([
           "pistols-PlayerRequiredAction",
-          "duelist_id",
-          "In", duelistIds.map(id => formatQueryValue(id))
-        ).build()
-      )
-      .withLimit(50)
-      .withEntityModels([
-        "pistols-PlayerRequiredAction",
-      ])
-      .includeHashedKeys()
-  ), [duelistIds])
+        ])
+        .includeHashedKeys()
+      : undefined
+  ), [duelistIds.join(",")])
 
   useSdkEventsSub({
     query,
-    enabled: (mounted && duelistIds.length > 0),
+    historical: false,
+    enabled: (mounted && Boolean(query)),
     setEntities: (entities: PistolsEntity[]) => {
-      // console.log(`GET PlayerRequiredAction() ======>`, entities)
+      console.log(`GET PlayerRequiredAction() ======>`, entities)
       eventsState.setEntities(entities)
     },
     updateEntity: (entity: PistolsEntity) => {
-      // console.log(`SUB PlayerRequiredAction() ======>`, entity)
+      console.log(`SUB PlayerRequiredAction() ======>`, entity)
       const requiresAction = getEntityModel(entity, 'PlayerRequiredAction')
       // console.log(`SUB PlayerRequiredAction() ======> model:`, requiresAction, duelistIds.includes(BigInt(requiresAction.duelist_id)))
       if (requiresAction) {
@@ -58,7 +61,6 @@ export function EventsModelStoreSync() {
         }
       }
     },
-    historical: false, // historical events
   })
 
   // // TESTING raw events from client

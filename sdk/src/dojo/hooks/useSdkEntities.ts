@@ -234,7 +234,7 @@ export const useSdkEventsSub = ({
     let _unsubscribe: (() => void) = undefined;
     const _subscribe = async () => {
       setIsLoading(true)
-      // console.log("EVENTS SUB _______ query:", query);
+      // console.log("useSdkEventsSub() _______ query:", query);
       await sdk.subscribeEventQuery({
         query,
         historical,
@@ -248,7 +248,7 @@ export const useSdkEventsSub = ({
         },
       }).then(response => {
         if (!_mounted) return
-        console.log("EVENTS SUB ====== initialEntities:", historical, response);
+        console.log("useSdkEventsSub() ====== initialEntities:", historical, response);
         const [initialEntities, sub] = response;
         if (initialEntities.length == limit) {
           console.warn("useSdkEventsSub() LIMIT REACHED!!!! Possible loss of data", limit, query)

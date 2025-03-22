@@ -32,10 +32,10 @@ export function EventsHistoricalStoreSync() {
 
   useSdkEventsSub({
     query,
+    historical: true,
     enabled: mounted,
     setEntities: historicalEventsState.setEvents,
     updateEntity: historicalEventsState.updateEvent,
-    historical: true, // historical events
   })
 
   // // TESTING raw events from client
