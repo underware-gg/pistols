@@ -10,22 +10,36 @@ export const useEventsStore = createDojoStore<PistolsSchemaType>();
 //--------------------------------
 // 'consumer' hooks
 //
+type RequiredActionDuel = {
+  duelId: bigint;
+  requiredAction: boolean;
+  timestamp: number;
+}
 export function useRequiredActions() {
   const entities = useEventsStore((state) => state.entities)
   const duelPerDuelist = useMemo(() => (
     Object.values(entities)
       .reduce((acc, e) => {
-        const duelId = BigInt(e.models.pistols.PlayerRequiredAction?.duel_id ?? 0);
-        if (duelId > 0n) {
-          let duelistId = bigintToHex(e.models.pistols.PlayerRequiredAction.duelist_id);
-          acc[duelistId] = duelId;
+        const requiredAction = e.models.pistols.PlayerRequiredAction
+        if (requiredAction) {
+          const duelId = BigInt(requiredAction.duel_id ?? 0);
+          if (duelId > 0n) {
+            let duelistId = bigintToHex(requiredAction.duelist_id);
+            acc[duelistId] = {
+              duelId,
+              requiredAction: requiredAction.required_action,
+              timestamp: Number(requiredAction.timestamp),
+            }
+          }
         }
         return acc;
-      }, {} as Record<string, bigint>)
+      }, {} as Record<string, RequiredActionDuel>)
   ), [entities])
-  const requiredDuelIds = useMemo(() => Object.values(duelPerDuelist), [duelPerDuelist])
+  const requiredDuelIds = useMemo(() => Object.values(duelPerDuelist).map((duel) => duel.duelId), [duelPerDuelist])
+  const requiresAction = useMemo(() => (requiredDuelIds.length > 0), [requiredDuelIds])
   // console.log(`useRequiredActions() =================>`, entities, duelPerDuelist, requiredDuelIds)
   return {
+    requiresAction,
     duelPerDuelist,
     requiredDuelIds,
   }

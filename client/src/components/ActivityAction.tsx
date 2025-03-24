@@ -4,7 +4,6 @@ import { BigNumberish } from 'starknet'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { useDuelist } from '/src/stores/duelistStore'
 import { usePlayer } from '/src/stores/playerStore'
-import { usePendingChallengesIds } from '/src/stores/challengeStore'
 import { useFameBalanceDuelist } from '/src/hooks/useFame'
 import { useRequiredActions } from '/src/stores/eventsStore'
 import { Icon, BookmarkIcon, EmojiIcon } from '/src/components/ui/Icons'
@@ -12,17 +11,18 @@ import { ChallengeLink, DuelistLink } from '/src/components/Links'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { EMOJI } from '/src/data/messages'
 
-export const ActionIcon = (active: boolean) => {
-  const { address } = useAccount()
-  const { requiredDuelIds } = useRequiredActions()
-  const { pendingDuelIds } = usePendingChallengesIds(address)
-  const requiresAction = useMemo(() => (requiredDuelIds.length > 0), [requiredDuelIds])
-  const name = useMemo(() => (active ? 'circle' : 'circle outline'), [active])
+export const ActionIcon = (isActive: boolean) => {
+  const { duelistIds } = useDuelistsOfPlayer()
+  const { requiresAction, duelPerDuelist } = useRequiredActions()
+  const replyOnly = useMemo(() => (
+    requiresAction && !Object.keys(duelPerDuelist).some((duelistId) => (duelistIds.includes(BigInt(duelistId))))
+  ), [duelistIds, duelPerDuelist])
+  const name = useMemo(() => (isActive ? 'circle' : 'circle outline'), [isActive])
   const className = useMemo(() => (
-    requiresAction ? 'Positive'
-      : pendingDuelIds.length > 0 ? 'Warning'
+    replyOnly ? 'Warning'
+      : requiresAction ? 'Positive'
         : ''
-  ), [requiresAction, pendingDuelIds])
+  ), [requiresAction, replyOnly])
   return (
     <Icon size='small'
       name={name}
@@ -35,61 +35,45 @@ export default function ActivityAction() {
   const { address } = useAccount()
   const { bookmarkedDuelists } = usePlayer(address)
 
-  // pending duels (reply)
-  const { pendingDuelIds } = usePendingChallengesIds(address)
-  const pendingItems = useMemo(() => (pendingDuelIds.map((duelId) =>
-    <PendingItem
-      key={duelId}
-      duelId={duelId}
-    />)
-  ), [pendingDuelIds])
-
-  // all duelists
   const { duelPerDuelist } = useRequiredActions()
   const { duelistIds } = useDuelistsOfPlayer()
   const sortedDuelistIds = useMemo(() => (
-    duelistIds.sort((a, b) => {
-      // const duelA = duelPerDuelist[bigintToHex(a)] ?? 0n
-      // const duelB = duelPerDuelist[bigintToHex(b)] ?? 0n
-      // if (duelA == 0n && duelB == 0n) {
-      //   return Number(b - a)
-      // }
-      // return Number(duelB - duelA)
-      return Number(b - a)
+    Array.from(new Set([
+      // join with duelists in actions (other player when replying)
+      ...duelistIds,
+      ...Object.keys(duelPerDuelist).map((duelistId) => BigInt(duelistId))
+    ])).sort((a, b) => {
+      const duelA = duelPerDuelist[bigintToHex(a)] ?? null
+      const duelB = duelPerDuelist[bigintToHex(b)] ?? null
+      if (!duelA && !duelB) return Number(b - a)
+      if (!duelA) return 1
+      if (!duelB) return -1
+      return Number(duelB.duelId - duelA.duelId)
+      // return (duelB.timestamp - duelA.timestamp)
     })
   ), [duelistIds, duelPerDuelist])
-  const actionItems = useMemo(() => (sortedDuelistIds.map((duelistId) =>
-    <ActionItem
-      key={duelistId}
-      duelistId={duelistId}
-      isBookmarked={bookmarkedDuelists.includes(duelistId)}
-      duelId={duelPerDuelist[bigintToHex(duelistId)]}
-    />)
-  ), [sortedDuelistIds])
+
+  const actions = useMemo(() => (sortedDuelistIds.map((duelistId) => {
+    const duel = duelPerDuelist[bigintToHex(duelistId)]
+    const duelId = duel?.duelId ?? 0n
+    const isReply = (duelId > 0n && !duelistIds.includes(duelistId))
+    return (
+      <ActionItem
+        key={duelistId}
+        duelistId={duelistId}
+        duelId={duelId}
+        isBookmarked={bookmarkedDuelists.includes(duelistId)}
+        requiredAction={duel?.requiredAction ?? false}
+        isReply={isReply}
+      />
+    )
+  })), [sortedDuelistIds, duelistIds, duelPerDuelist, bookmarkedDuelists])
 
   return (
     <div className='FillParent'>
-      {pendingItems}
-      {actionItems}
+      {actions}
     </div>
   );
-}
-
-
-const PendingItem = ({
-  duelId,
-}: {
-  duelId: BigNumberish
-}) => {
-  return (
-    <>
-      {/* <Icon name='circle' className='Invisible' /> */}
-      <Icon name='circle' className='Warning' />
-      {'Reply to  '}
-      <ChallengeLink duelId={duelId} />
-      <br />
-    </>
-  )
 }
 
 
@@ -97,20 +81,36 @@ const ActionItem = ({
   duelistId,
   isBookmarked,
   duelId,
+  requiredAction,
+  isReply,
 }: {
   duelistId: BigNumberish
   isBookmarked?: boolean
   duelId: bigint
+  requiredAction: boolean
+  isReply: boolean
 }) => {
-  const { isInAction, currentDuelId, isInactive } = useDuelist(duelistId)
+  const { isInactive } = useDuelist(duelistId)
   const { lives, isLoading } = useFameBalanceDuelist(duelistId)
 
   // const { duelistContractAddress } = useDuelistTokenContract()
   // const { publish } = usePlayerBookmarkSignedMessage(duelistContractAddress, duelistId, !isBookmarked)
 
+  if (isReply) {
+    return (
+      <>
+        {/* <Icon name='circle' className='Invisible' /> */}
+        <Icon name='circle' className='Warning' />
+        {'Reply to  '}
+        <ChallengeLink duelId={duelId} />
+        <br />
+      </>
+    )
+  }
+
   // in a duel, required to play
   if (duelId > 0n) {
-    return (
+    return requiredAction ?
       <>
         <Icon name='circle' className='Positive' />
         <DuelistLink duelistId={duelistId} useName />
@@ -118,20 +118,14 @@ const ActionItem = ({
         <ChallengeLink duelId={duelId} />
         <br />
       </>
-    )
-  }
-
-  // in a duel, waiting for other player
-  if (isInAction) {
-    return (
+      :
       <>
         <Icon name='circle' />
         <DuelistLink duelistId={duelistId} useName />
         {' waiting in '}
-        <ChallengeLink duelId={currentDuelId} />
+        <ChallengeLink duelId={duelId} />
         <br />
       </>
-    )
   }
 
   // dripping fame!

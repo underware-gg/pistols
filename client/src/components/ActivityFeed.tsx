@@ -17,7 +17,6 @@ export default function ActivityFeed() {
   }, [allPlayersActivity])
 
   const items = useMemo(() => ([...allPlayersActivity].reverse().map((a) =>
-    
     <ActivityItem
       key={`${a.activity}-${a.identifier.toString()}-${a.timestamp}-${a.player_address}`}
       clientSeconds={clientSeconds}
@@ -26,14 +25,12 @@ export default function ActivityFeed() {
     />)
   ), [allPlayersActivity, clientSeconds, requiredDuelIds])
 
-
   return (
     <div className='FillParent'>
       {items}
     </div>
   );
 }
-
 
 interface ActivityItemProps {
   activity: ActivityState
@@ -71,12 +68,14 @@ const ActivityItem = ({
     return <ActivityItemMovesRevealed activity={activity} clientSeconds={clientSeconds} />
   }
   if (activity.activity === constants.Activity.ChallengeResolved) {
-    return (isRequired ? <ActivityItemChallengeEnded activity={activity} clientSeconds={clientSeconds} />
+    return (isRequired
+      ? <ActivityItemChallengeEnded activity={activity} clientSeconds={clientSeconds} />
       : <ActivityItemChallengeResolved activity={activity} clientSeconds={clientSeconds} />
     )
   }
   if (activity.activity === constants.Activity.ChallengeDraw) {
-    return (isRequired ? <ActivityItemChallengeEnded activity={activity} clientSeconds={clientSeconds} />
+    return (isRequired
+      ? <ActivityItemChallengeEnded activity={activity} clientSeconds={clientSeconds} />
       : <ActivityItemChallengeDraw activity={activity} clientSeconds={clientSeconds} />
     )
   }

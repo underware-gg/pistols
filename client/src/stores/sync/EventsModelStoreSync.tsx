@@ -1,10 +1,11 @@
 import { useEffect, useMemo } from 'react'
-import { formatQueryValue, getEntityModel, useDojoSetup, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
+import { useAccount } from '@starknet-react/core'
+import { formatQueryValue, getEntityModel, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useEventsStore } from '/src/stores/eventsStore'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
-import * as torii from '@dojoengine/torii-client'
+import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
+// import * as torii from '@dojoengine/torii-client'
 
 
 // Sync entities: Add only once to a top level component
@@ -12,53 +13,38 @@ export function EventsModelStoreSync() {
   const eventsState = useEventsStore((state) => state)
   const mounted = useMounted()
 
-  const { duelistIds } = useDuelistsOfPlayer()
+  const { address } = useAccount()
 
-  // const query = useMemo<PistolsQueryBuilder>(() => ({
-  //   pistols: {
-  //     PlayerRequiredAction: {
-  //       $: {
-  //         where: {
-  //           duelist_id: { $in: duelistIds.map(id => formatQueryValue(id)) }
-  //         },
-  //       },
-  //     },
-  //   },
-  // }), [duelistIds])
   const query = useMemo<PistolsQueryBuilder>(() => (
-    duelistIds.length > 0
+    isPositiveBigint(address)
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().where(
-            "pistols-PlayerRequiredAction",
-            "duelist_id",
-            "In", duelistIds.map(id => formatQueryValue(id))
+          new PistolsClauseBuilder().keys(
+            ['pistols-PlayerRequiredAction'],
+            [formatQueryValue(address), undefined],
           ).build()
         )
-        .withLimit(50)
         .withEntityModels([
-          "pistols-PlayerRequiredAction",
+          'pistols-PlayerRequiredAction',
         ])
         .includeHashedKeys()
       : undefined
-  ), [duelistIds.join(",")])
+  ), [address])
 
   useSdkEventsSub({
     query,
     historical: false,
     enabled: (mounted && Boolean(query)),
     setEntities: (entities: PistolsEntity[]) => {
-      console.log(`GET PlayerRequiredAction() ======>`, entities)
+      // console.log(`GET PlayerRequiredAction() ======>`, entities)
       eventsState.setEntities(entities)
     },
     updateEntity: (entity: PistolsEntity) => {
-      console.log(`SUB PlayerRequiredAction() ======>`, entity)
-      const requiresAction = getEntityModel(entity, 'PlayerRequiredAction')
-      // console.log(`SUB PlayerRequiredAction() ======> model:`, requiresAction, duelistIds.includes(BigInt(requiresAction.duelist_id)))
-      if (requiresAction) {
-        if (duelistIds.includes(BigInt(requiresAction.duelist_id))) {
-          eventsState.updateEntity(entity)
-        }
+      // console.log(`SUB PlayerRequiredAction() ======>`, entity)
+      const model = getEntityModel(entity, 'PlayerRequiredAction')
+      if (bigintEquals(model?.player_address, address)) {
+        // console.log(`SUB PlayerRequiredAction() ======> model:`, getEntityModel(entity, 'PlayerRequiredAction'))
+        eventsState.updateEntity(entity)
       }
     },
   })
@@ -94,7 +80,7 @@ export function EventsModelStoreSync() {
   //   if (sdk) _fetch()
   // }, [sdk])
 
-  // useEffect(() => console.log("EventsModelStoreSync() =>", eventsState.entities), [eventsState.entities])
+  useEffect(() => console.log("EventsModelStoreSync() =>", eventsState.entities), [eventsState.entities])
 
   return (<></>)
 }

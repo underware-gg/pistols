@@ -191,10 +191,10 @@ pub mod game {
                 }
                 if (round.moves_b.hashed == 0) {
                     // other duelist did not commit: clear self action flag
-                    store.emit_required_action(challenge.duelist_id_a, 0);
+                    store.emit_challenge_action(@challenge, 1, false);
                 } else {
                     // other duelist committed: call for action (keep self flag for reveal)
-                    store.emit_required_action(challenge.duelist_id_b, duel_id);
+                    store.emit_challenge_action(@challenge, 2, true);
                 }
             } else if (duelist_number == 2) {
                 // validate and store hash
@@ -207,10 +207,10 @@ pub mod game {
                 }
                 if (round.moves_a.hashed == 0) {
                     // other duelist did not commit: clear self action flag
-                    store.emit_required_action(challenge.duelist_id_b, 0);
+                    store.emit_challenge_action(@challenge, 2, false);
                 } else {
                     // other duelist committed: call for action (keep self flag for reveal)
-                    store.emit_required_action(challenge.duelist_id_a, duel_id);
+                    store.emit_challenge_action(@challenge, 1, true);
                 }
             }
 
@@ -283,12 +283,10 @@ pub mod game {
                 assert(round.moves_a.salt == 0, Errors::ALREADY_REVEALED);
                 assert(round.moves_a.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_a.set_salt_and_moves(salt, moves);
-                store.emit_required_action(challenge.duelist_id_a, 0);
             } else {
                 assert(round.moves_b.salt == 0, Errors::ALREADY_REVEALED);
                 assert(round.moves_b.hashed == hashed, Errors::MOVES_HASH_MISMATCH);
                 round.moves_b.set_salt_and_moves(salt, moves);
-                store.emit_required_action(challenge.duelist_id_b, 0);
             }
 
             // reset timeouts
@@ -306,13 +304,17 @@ pub mod game {
             // missing reveal, update only and wait for final reveal
             if (round.moves_a.salt == 0 || round.moves_b.salt == 0) {
                 store.set_round(@round);
+                // clear self flag
+                store.emit_challenge_action(@challenge, duelist_number, false);
                 return;
             }
 
+            // clear self duel
+            store.emit_clear_challenge_action(@challenge, duelist_number);
             // call other duelist to see the results
-            store.emit_required_action(
-                if (duelist_number == 1) {challenge.duelist_id_b} else {challenge.duelist_id_a},
-                duel_id
+            store.emit_challenge_action(@challenge,
+                if (duelist_number == 1) {2} else {1},
+                true,
             );
 
             // execute game loop...
@@ -328,7 +330,7 @@ pub mod game {
         fn clear_required_action(ref self: ContractState, duelist_id: u128) {
             let mut store: Store = StoreTrait::new(self.world_default());
             self._validate_ownership(@store.world, duelist_id);
-            store.emit_required_action(duelist_id, 0);
+            store.emit_required_action(starknet::get_caller_address(), duelist_id, 0, false);
         }
 
         fn collect_duel(ref self: ContractState, duel_id: u128) {
@@ -535,12 +537,13 @@ pub mod game {
                 // timeout events
                 if (timed_out_a) {
                     Activity::PlayerTimedOut.emit(ref store.world, challenge.address_a, challenge.duel_id.into());
-                    store.emit_required_action(challenge.duelist_id_a, 0);
                 }
                 if (timed_out_b) {
                     Activity::PlayerTimedOut.emit(ref store.world, challenge.address_b, challenge.duel_id.into());
-                    store.emit_required_action(challenge.duelist_id_b, 0);
                 }
+                // clear both duelists actions
+                store.emit_clear_challenge_action(@challenge, 1);
+                store.emit_clear_challenge_action(@challenge, 2);
                 (true)
             } else {
                 (false)

@@ -27,20 +27,6 @@ export const useAllChallengesIds = () => {
   }
 }
 
-export const usePendingChallengesIds = (address: BigNumberish) => {
-  const entities = useChallengeStore((state) => state.entities)
-  const pendingDuelIds = useMemo(() => (
-    Object.values(entities)
-      .filter(e => parseEnumVariant<constants.ChallengeState>(e.models.pistols?.Challenge?.state) == constants.ChallengeState.Awaiting)
-      .filter(e => bigintEquals(e.models.pistols?.Challenge?.address_b ?? 0n, address))
-      .map(e => BigInt(e.models.pistols?.Challenge?.duel_id ?? 0))
-  ), [address, entities])
-  // useEffect(() => console.log(`useAllChallengesIds() =>`, duelIds.length), [duelIds])
-  return {
-    pendingDuelIds,
-  }
-}
-
 export const useChallenge = (duelId: BigNumberish) => {
   const entityId = useEntityId([duelId])
   const entities = useChallengeStore((state) => state.entities);

@@ -1,3 +1,4 @@
+use core::num::traits::Zero;
 use starknet::{ContractAddress};
 use dojo::world::{WorldStorage};
 use dojo::model::{Model, ModelPtr, ModelStorage, ModelValueStorage};
@@ -45,13 +46,13 @@ pub use pistols::models::{
         SeasonConfig, SeasonConfigValue,
     },
 };
-use pistols::types::{
-    rules::{RewardValues},
-};
 pub use pistols::systems::components::{
     token_bound::{
         TokenBoundAddress, TokenBoundAddressValue,
     },
+};
+use pistols::types::{
+    rules::{RewardValues},
 };
 
 #[derive(Copy, Drop)]
@@ -365,10 +366,38 @@ pub impl StoreImpl of StoreTrait {
     //
 
     #[inline(always)]
-    fn emit_required_action(ref self: Store, duelist_id: u128, duel_id: u128) {
+    fn emit_challenge_reply_action(ref self: Store, challenge: @Challenge, reply_required: bool) {
+        if ((*challenge.address_b).is_non_zero()) {
+            // duelist is challenger (just to be unique)
+            self.emit_required_action(*challenge.address_b, *challenge.duelist_id_a,
+                if (reply_required) {*challenge.duel_id} else {0},
+                reply_required);
+        }
+    }
+    #[inline(always)]
+    fn emit_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8, required_action: bool) {
+        if (duelist_number == 1) {
+            self.emit_required_action(*challenge.address_a, *challenge.duelist_id_a, *challenge.duel_id, required_action);
+        } else if (duelist_number == 2) {
+            self.emit_required_action(*challenge.address_b, *challenge.duelist_id_b, *challenge.duel_id, required_action);
+        }
+    }
+    #[inline(always)]
+    fn emit_clear_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8) {
+        if (duelist_number == 1) {
+            self.emit_required_action(*challenge.address_a, *challenge.duelist_id_a, 0, false);
+        } else if (duelist_number == 2) {
+            self.emit_required_action(*challenge.address_b, *challenge.duelist_id_b, 0, false);
+        }
+    }
+    #[inline(always)]
+    fn emit_required_action(ref self: Store, player_address: ContractAddress, duelist_id: u128, duel_id: u128, required_action: bool) {
         self.world.emit_event(@PlayerRequiredAction{
+            player_address,
             duelist_id,
             duel_id,
+            required_action,
+            timestamp: if (duel_id.is_non_zero()) {starknet::get_block_timestamp()} else {0},
         });
     }
 

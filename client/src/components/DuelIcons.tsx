@@ -60,7 +60,6 @@ export function useDuelIcons({
         } else {
           icons.push(<EmojiIcon emoji={EMOJI.IDLE} size={iconSize} />)
         }
-
         return { icons }
       }
     }

@@ -29,6 +29,7 @@ pub struct Player {
     pub player_address: ContractAddress,   // controller wallet
     //-----------------------
     pub timestamps: PlayerTimestamps,
+    // pub referral_code: felt252,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, IntrospectPacked)]
@@ -56,9 +57,13 @@ pub struct PlayerActivity {
 #[dojo::event(historical:false)]
 pub struct PlayerRequiredAction {
     #[key]
+    pub player_address: ContractAddress,
+    #[key]
     pub duelist_id: u128,
     //-----------------------
     pub duel_id: u128,
+    pub required_action: bool,
+    pub timestamp: u64,
 }
 
 //--------------------------
