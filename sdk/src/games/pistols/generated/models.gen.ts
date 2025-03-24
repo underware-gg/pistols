@@ -433,13 +433,18 @@ export interface PlayerActivityValue {
 
 // Type definition for `pistols::models::player::PlayerRequiredAction` struct
 export interface PlayerRequiredAction {
+	player_address: string;
 	duelist_id: BigNumberish;
 	duel_id: BigNumberish;
+	required_action: boolean;
+	timestamp: BigNumberish;
 }
 
 // Type definition for `pistols::models::player::PlayerRequiredActionValue` struct
 export interface PlayerRequiredActionValue {
 	duel_id: BigNumberish;
+	required_action: boolean;
+	timestamp: BigNumberish;
 }
 
 // Type definition for `pistols::types::rules::RewardValues` struct
@@ -1185,11 +1190,16 @@ export const schema: SchemaType = {
 			is_public: false,
 		},
 		PlayerRequiredAction: {
+			player_address: "",
 			duelist_id: 0,
 			duel_id: 0,
+			required_action: false,
+			timestamp: 0,
 		},
 		PlayerRequiredActionValue: {
 			duel_id: 0,
+			required_action: false,
+			timestamp: 0,
 		},
 		RewardValues: {
 			fame_lost: 0,
