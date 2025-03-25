@@ -24,7 +24,7 @@ export function LordsBagIcon({
 export function FoolsIcon({
   size = null,
 }: CoinIconProps) {
-  return <CustomIcon logo svg name='fools1' size={size} alt='$FOOLS' />
+  return <CustomIcon logo svg name='fools' size={size} alt='$FOOLS' />
   // return <EmojiIcon emoji={EMOJI.FOOLS} size={size} alt='$FOOLS' />
 }
 
