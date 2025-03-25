@@ -104,7 +104,7 @@ function _ShopModal({
                 />
               </Col>
               <Col>
-                <ActionButton large fill disabled={!selectedPackId} label={`Open Pack #${bigintToDecimal(selectedPackId)}`} onClick={() => _openPack()} />
+                <ActionButton large fill disabled={!selectedPackId} label={selectedPackId ? `Open Pack #${bigintToDecimal(selectedPackId)}` : `Select Pack to Open`} onClick={() => _openPack()} />
               </Col>
             </>}
             {!isConnected && <>
