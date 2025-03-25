@@ -67,11 +67,6 @@ export function TokenStoreSync() {
     }
   }, [initialized, token_contracts, coin_contracts])
 
-  // initialize player's duelists
-  // useTokenIdsOfPlayer(duelistContractAddress, !initialized)
-  // useTokenIdsOfPlayer(duelContractAddress, !initialized)
-  // useTokenIdsOfPlayer(packContractAddress, !initialized)
-
   // subscribe for any updates
   const mounted = useMounted()
   const contracts = useMemo(() => [
@@ -89,7 +84,7 @@ export function TokenStoreSync() {
         coin_state.updateBalance(balance)
       }
     },
-    enabled: mounted,
+    enabled: (mounted && initialized),
   })
 
   // useEffect(() => console.log("TokenStoreSync() token_state =>", token_state.contracts), [token_state.contracts])

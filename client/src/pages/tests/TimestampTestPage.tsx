@@ -4,7 +4,7 @@ import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { useGameTimestamp } from '/src/hooks/usePistolsContractCalls'
 import { formatTimestampLocal, formatTimestampDeltaTime, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@underware/pistols-sdk/utils'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
-import { Connect } from './ConnectTestPage'
+import { Connect } from '/src/pages/tests/ConnectTestPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 

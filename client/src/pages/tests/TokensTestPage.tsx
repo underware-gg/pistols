@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { Container, Icon, Table } from 'semantic-ui-react'
+import { Button, Container, Icon, Table } from 'semantic-ui-react'
 import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
 import { useTokenIdsOfPlayer, useTokensByOwner } from '/src/stores/tokenStore'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
@@ -9,13 +9,16 @@ import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { useERC721TokenUri } from '@underware/pistols-sdk/utils/hooks'
 import { duelist_token, duel_token } from '@underware/pistols-sdk/pistols/tokens'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
-import { Connect } from './ConnectTestPage'
+import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import { DuelistTokenArt } from '/src/components/cards/DuelistTokenArt'
 import { DuelTokenArt } from '/src/components/cards/DuelTokenArt'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
+import { useAccount } from '@starknet-react/core'
+import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -51,12 +54,16 @@ const _style = {
 }
 
 function Tokens() {
+  const { account } = useAccount()
+  const { canClaimStarterPack } = useCanClaimStarterPack()
+  const { pack_token } = useDojoSystemCalls()
   const { packContractAddress } = usePackTokenContract()
   const { duelistContractAddress } = useDuelistTokenContract()
   const { duelContractAddress } = useDuelTokenContract()
   // useSdkTokenBalancesTest();
   return (
     <>
+      <Button disabled={!canClaimStarterPack} onClick={() => pack_token.claim_starter_pack(account)}>Claim Starter Pack</Button>
       <br />
       <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
       <br />
@@ -258,54 +265,3 @@ function TestImages() {
   )
 }
 
-
-
-
-// import { useAccount } from '@starknet-react/core'
-// import { useDojoSetup } from '@underware/pistols-sdk/dojo'
-// import * as torii from '@dojoengine/torii-client'
-// const useSdkTokenBalancesTest = () => {
-//   const { sdk } = useDojoSetup();
-//   useEffect(() => {
-//     const _get = async () => {
-//       await sdk.getTokenBalances(
-//         ["0x335f20596a8cc613cfe2c463443513beee082ce84ceee8dbf18f993f1959e8b"], // packs
-//         ["0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f"], // Mataleone
-//         []
-//       ).then((balances: torii.TokenBalance[]) => {
-//         console.log("sdk.getTokenBalances() PACKS+Mataleone:", balances)
-//       }).catch((error: Error) => {
-//         console.error("useSdkTokenBalancesGet().sdk.get() ERROR PACKS+Mataleone:", error)
-//       });
-//       await sdk.getTokenBalances(
-//         ["0x43f800e9f5f6e290a798379029fcb28ba7c34e9669f7b5fc77fce8a4ebdc893"], // duelists
-//         ["0x550212d3f13a373dfe9e3ef6aa41fba4124bde63fd7955393f879de19f3f47f"], // Mataleone
-//         []
-//       ).then((balances: torii.TokenBalance[]) => {
-//         console.log("sdk.getTokenBalances() DUELISTS+Mataleone:", balances)
-//       }).catch((error: Error) => {
-//         console.error("useSdkTokenBalancesGet().sdk.get() ERROR DUELISTS+Mataleone:", error)
-//       });
-//       await sdk.getTokenBalances(
-//         ["0x335f20596a8cc613cfe2c463443513beee082ce84ceee8dbf18f993f1959e8b"], // packs
-//         ["0x0458f10bf89dfd916eaeabbf6866870bd5bb8b05c6df7de0ad36bb8ad66dce69"], // Rogers
-//         []
-//       ).then((balances: torii.TokenBalance[]) => {
-//         console.log("sdk.getTokenBalances() PACKS+Rogers:", balances)
-//       }).catch((error: Error) => {
-//         console.error("useSdkTokenBalancesGet().sdk.get() ERROR PACKS+Rogers:", error)
-//       });
-//       await sdk.getTokenBalances(
-//         ["0x43f800e9f5f6e290a798379029fcb28ba7c34e9669f7b5fc77fce8a4ebdc893"], // duelists
-//         ["0x0458f10bf89dfd916eaeabbf6866870bd5bb8b05c6df7de0ad36bb8ad66dce69"], // Rogers
-//         []
-//       ).then((balances: torii.TokenBalance[]) => {
-//         console.log("sdk.getTokenBalances() DUELISTS+Rogers:", balances)
-//       }).catch((error: Error) => {
-//         console.error("useSdkTokenBalancesGet().sdk.get() ERROR DUELISTS+Rogers:", error)
-//       });
-//     }
-//     _get();
-//   }, []);
-//   return {};
-// }

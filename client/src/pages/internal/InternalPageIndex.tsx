@@ -3,28 +3,24 @@ import { useLocation, useNavigate } from 'react-router'
 import { Button, Container, Divider, Menu, MenuItem } from 'semantic-ui-react'
 import App from '/src/components/App'
 
-const testPages = [
-  { name: 'connect', connected: true },
-  { name: 'tokens', connected: true },
-  { name: 'tutorial', connected: true },
-  { name: 'timestamp', connected: true },
-  { name: 'profiles', connected: false },
-  { name: 'icons', connected: false },
-  // { name: 'sign', connected: true },
+const internalPages = [
+  { name: 'pools', connected: true },
+  { name: 'seasons', connected: true },
+  { name: 'snapshot', connected: true },
 ]
 
-export default function TestPageIndex() {
+export default function InternalPageIndex() {
   const [activeItem, setActiveItem] = useState('home')
   const navigate = useNavigate()
   const _click = (name: string) => {
     setActiveItem(name)
-    navigate(`/tests/${name}`)
+    navigate(`/internal/${name}`)
   }
   return (
     <App>
       <Container text>
         <Menu inverted vertical>
-          {testPages.map(page => (
+          {internalPages.map(page => (
             <MenuItem
               key={page.name}
               name={page.name}
@@ -39,11 +35,11 @@ export default function TestPageIndex() {
   );
 }
 
-export function TestPageMenu() {
+export function InternalPageMenu() {
   const navigate = useNavigate()
   const location = useLocation()
   const _click = (name: string) => {
-    navigate(`/tests/${name}`)
+    navigate(`/internal/${name}`)
   }
   return (
     <>
@@ -51,9 +47,9 @@ export function TestPageMenu() {
       <Menu inverted>
         <MenuItem
           icon='arrow left'
-          onClick={() => navigate('/tests')}
+          onClick={() => navigate('/internal')}
         />
-        {testPages.map(page => (
+        {internalPages.map(page => (
           <MenuItem
             key={page.name}
             name={page.name}

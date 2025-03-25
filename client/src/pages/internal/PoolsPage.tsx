@@ -12,6 +12,7 @@ import { BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { Balance } from '/src/components/account/Balance'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { InternalPageMenu } from './InternalPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
@@ -28,6 +29,7 @@ export default function PoolsPage() {
   return (
     <AppDojo networkId={ENV.DEFAULT_NETWORK_ID} autoConnect>
       <Container>
+        <InternalPageMenu />
         <CurrentChainHint />
 
         <Connect />

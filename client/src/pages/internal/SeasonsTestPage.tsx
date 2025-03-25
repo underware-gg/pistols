@@ -16,8 +16,8 @@ import { PistolsQueryBuilder } from '@underware/pistols-sdk/pistols'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
-import { Connect } from './ConnectTestPage'
+import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
+import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
@@ -34,7 +34,7 @@ export default function SeasonsTestPage() {
   return (
     <AppDojo>
       <Container>
-        <TestPageMenu />
+        <InternalPageMenu />
         <CurrentChainHint />
         <Connect />
 
