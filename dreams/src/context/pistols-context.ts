@@ -263,8 +263,8 @@ query getPlayer {
 
 * Find if a Duelist ot bot needs to act on a game, by their duelist_id:
 \`\`\`graphql
-query getRequiredAction{
-  pistolsPlayerRequiredActionModels(where:{duelist_id: $duelist_id}) {
+query getCallToAction{
+  pistolsCallToActionEventModels(where:{duelist_id: $duelist_id}) {
     edges {
       node {
         duelist_id

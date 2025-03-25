@@ -189,19 +189,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_bank_releaseLordsFromFameToBeBurned_calldata = (bills: Array<LordsReleaseBill>): DojoCall => {
+	const build_bank_releaseLordsFromFameToBeBurned_calldata = (seasonTableId: BigNumberish, bills: Array<LordsReleaseBill>): DojoCall => {
 		return {
 			contractName: "bank",
 			entrypoint: "release_lords_from_fame_to_be_burned",
-			calldata: [bills],
+			calldata: [seasonTableId, bills],
 		};
 	};
 
-	const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, bills: Array<LordsReleaseBill>) => {
+	const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, seasonTableId: BigNumberish, bills: Array<LordsReleaseBill>) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_bank_releaseLordsFromFameToBeBurned_calldata(bills),
+				build_bank_releaseLordsFromFameToBeBurned_calldata(seasonTableId, bills),
 				"pistols",
 			);
 		} catch (error) {
@@ -210,19 +210,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_bank_releaseSeasonPool_calldata = (tableId: BigNumberish): DojoCall => {
+	const build_bank_releaseSeasonPool_calldata = (seasonTableId: BigNumberish): DojoCall => {
 		return {
 			contractName: "bank",
 			entrypoint: "release_season_pool",
-			calldata: [tableId],
+			calldata: [seasonTableId],
 		};
 	};
 
-	const bank_releaseSeasonPool = async (snAccount: Account | AccountInterface, tableId: BigNumberish) => {
+	const bank_releaseSeasonPool = async (snAccount: Account | AccountInterface, seasonTableId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_bank_releaseSeasonPool_calldata(tableId),
+				build_bank_releaseSeasonPool_calldata(seasonTableId),
 				"pistols",
 			);
 		} catch (error) {
@@ -2134,19 +2134,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_game_clearRequiredAction_calldata = (duelistId: BigNumberish): DojoCall => {
+	const build_game_clearCallToAction_calldata = (duelistId: BigNumberish): DojoCall => {
 		return {
 			contractName: "game",
-			entrypoint: "clear_required_action",
+			entrypoint: "clear_call_to_action",
 			calldata: [duelistId],
 		};
 	};
 
-	const game_clearRequiredAction = async (snAccount: Account | AccountInterface, duelistId: BigNumberish) => {
+	const game_clearCallToAction = async (snAccount: Account | AccountInterface, duelistId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_game_clearRequiredAction_calldata(duelistId),
+				build_game_clearCallToAction_calldata(duelistId),
 				"pistols",
 			);
 		} catch (error) {
@@ -3621,8 +3621,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildCanCollectDuelCalldata: build_game_canCollectDuel_calldata,
 			canCollectSeason: game_canCollectSeason,
 			buildCanCollectSeasonCalldata: build_game_canCollectSeason_calldata,
-			clearRequiredAction: game_clearRequiredAction,
-			buildClearRequiredActionCalldata: build_game_clearRequiredAction_calldata,
+			clearCallToAction: game_clearCallToAction,
+			buildClearCallToActionCalldata: build_game_clearCallToAction_calldata,
 			collectDuel: game_collectDuel,
 			buildCollectDuelCalldata: build_game_collectDuel_calldata,
 			collectSeason: game_collectSeason,

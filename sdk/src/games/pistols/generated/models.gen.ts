@@ -402,20 +402,47 @@ export interface Task {
 	description: string;
 }
 
-// Type definition for `pistols::models::challenge::ChallengeRewards` struct
-export interface ChallengeRewards {
+// Type definition for `pistols::models::events::CallToActionEvent` struct
+export interface CallToActionEvent {
+	player_address: string;
+	duelist_id: BigNumberish;
+	duel_id: BigNumberish;
+	call_to_action: boolean;
+	timestamp: BigNumberish;
+}
+
+// Type definition for `pistols::models::events::CallToActionEventValue` struct
+export interface CallToActionEventValue {
+	duel_id: BigNumberish;
+	call_to_action: boolean;
+	timestamp: BigNumberish;
+}
+
+// Type definition for `pistols::models::events::ChallengeRewardsEvent` struct
+export interface ChallengeRewardsEvent {
 	duel_id: BigNumberish;
 	duelist_id: BigNumberish;
 	rewards: RewardValues;
 }
 
-// Type definition for `pistols::models::challenge::ChallengeRewardsValue` struct
-export interface ChallengeRewardsValue {
+// Type definition for `pistols::models::events::ChallengeRewardsEventValue` struct
+export interface ChallengeRewardsEventValue {
 	rewards: RewardValues;
 }
 
-// Type definition for `pistols::models::player::PlayerActivity` struct
-export interface PlayerActivity {
+// Type definition for `pistols::models::events::LordsReleaseEvent` struct
+export interface LordsReleaseEvent {
+	season_table_id: BigNumberish;
+	bill: LordsReleaseBill;
+}
+
+// Type definition for `pistols::models::events::LordsReleaseEventValue` struct
+export interface LordsReleaseEventValue {
+	bill: LordsReleaseBill;
+}
+
+// Type definition for `pistols::models::events::PlayerActivityEvent` struct
+export interface PlayerActivityEvent {
 	player_address: string;
 	timestamp: BigNumberish;
 	activity: ActivityEnum;
@@ -423,28 +450,22 @@ export interface PlayerActivity {
 	is_public: boolean;
 }
 
-// Type definition for `pistols::models::player::PlayerActivityValue` struct
-export interface PlayerActivityValue {
+// Type definition for `pistols::models::events::PlayerActivityEventValue` struct
+export interface PlayerActivityEventValue {
 	timestamp: BigNumberish;
 	activity: ActivityEnum;
 	identifier: BigNumberish;
 	is_public: boolean;
 }
 
-// Type definition for `pistols::models::player::PlayerRequiredAction` struct
-export interface PlayerRequiredAction {
-	player_address: string;
+// Type definition for `pistols::models::pool::LordsReleaseBill` struct
+export interface LordsReleaseBill {
+	reason: ReleaseReasonEnum;
 	duelist_id: BigNumberish;
-	duel_id: BigNumberish;
-	required_action: boolean;
-	timestamp: BigNumberish;
-}
-
-// Type definition for `pistols::models::player::PlayerRequiredActionValue` struct
-export interface PlayerRequiredActionValue {
-	duel_id: BigNumberish;
-	required_action: boolean;
-	timestamp: BigNumberish;
+	recipient: string;
+	pegged_fame: BigNumberish;
+	pegged_lords: BigNumberish;
+	sponsored_lords: BigNumberish;
 }
 
 // Type definition for `pistols::types::rules::RewardValues` struct
@@ -657,7 +678,7 @@ export const rulesType = [
 export type RulesType = { [key in typeof rulesType[number]]: string };
 export type RulesTypeEnum = CairoCustomEnum;
 
-// Type definition for `pistols::models::player::Activity` enum
+// Type definition for `pistols::models::events::Activity` enum
 export const activity = [
 	'Undefined',
 	'TutorialFinished',
@@ -677,6 +698,17 @@ export const activity = [
 ] as const;
 export type Activity = { [key in typeof activity[number]]: string };
 export type ActivityEnum = CairoCustomEnum;
+
+// Type definition for `pistols::models::pool::ReleaseReason` enum
+export const releaseReason = [
+	'Undefined',
+	'FameLostToCreator',
+	'FameLostToDeveloper',
+	'SacrificedToDeveloper',
+	'LeaderboardPrize',
+] as const;
+export type ReleaseReason = { [key in typeof releaseReason[number]]: string };
+export type ReleaseReasonEnum = CairoCustomEnum;
 
 export interface SchemaType extends ISchemaType {
 	pistols: {
@@ -733,12 +765,15 @@ export interface SchemaType extends ISchemaType {
 		TrophyProgression: TrophyProgression,
 		TrophyProgressionValue: TrophyProgressionValue,
 		Task: Task,
-		ChallengeRewards: ChallengeRewards,
-		ChallengeRewardsValue: ChallengeRewardsValue,
-		PlayerActivity: PlayerActivity,
-		PlayerActivityValue: PlayerActivityValue,
-		PlayerRequiredAction: PlayerRequiredAction,
-		PlayerRequiredActionValue: PlayerRequiredActionValue,
+		CallToActionEvent: CallToActionEvent,
+		CallToActionEventValue: CallToActionEventValue,
+		ChallengeRewardsEvent: ChallengeRewardsEvent,
+		ChallengeRewardsEventValue: ChallengeRewardsEventValue,
+		LordsReleaseEvent: LordsReleaseEvent,
+		LordsReleaseEventValue: LordsReleaseEventValue,
+		PlayerActivityEvent: PlayerActivityEvent,
+		PlayerActivityEventValue: PlayerActivityEventValue,
+		LordsReleaseBill: LordsReleaseBill,
 		RewardValues: RewardValues,
 	},
 }
@@ -1138,15 +1173,44 @@ export const schema: SchemaType = {
 			total: 0,
 		description: "",
 		},
-		ChallengeRewards: {
+		CallToActionEvent: {
+			player_address: "",
+			duelist_id: 0,
+			duel_id: 0,
+			call_to_action: false,
+			timestamp: 0,
+		},
+		CallToActionEventValue: {
+			duel_id: 0,
+			call_to_action: false,
+			timestamp: 0,
+		},
+		ChallengeRewardsEvent: {
 			duel_id: 0,
 			duelist_id: 0,
 		rewards: { fame_lost: 0, fame_gained: 0, fools_gained: 0, points_scored: 0, position: 0, fame_burned: 0, lords_unlocked: 0, survived: false, },
 		},
-		ChallengeRewardsValue: {
+		ChallengeRewardsEventValue: {
 		rewards: { fame_lost: 0, fame_gained: 0, fools_gained: 0, points_scored: 0, position: 0, fame_burned: 0, lords_unlocked: 0, survived: false, },
 		},
-		PlayerActivity: {
+		LordsReleaseEvent: {
+			season_table_id: 0,
+		bill: { reason: new CairoCustomEnum({ 
+					Undefined: "",
+				FameLostToCreator: undefined,
+				FameLostToDeveloper: undefined,
+				SacrificedToDeveloper: undefined,
+				LeaderboardPrize: undefined, }), duelist_id: 0, recipient: "", pegged_fame: 0, pegged_lords: 0, sponsored_lords: 0, },
+		},
+		LordsReleaseEventValue: {
+		bill: { reason: new CairoCustomEnum({ 
+					Undefined: "",
+				FameLostToCreator: undefined,
+				FameLostToDeveloper: undefined,
+				SacrificedToDeveloper: undefined,
+				LeaderboardPrize: undefined, }), duelist_id: 0, recipient: "", pegged_fame: 0, pegged_lords: 0, sponsored_lords: 0, },
+		},
+		PlayerActivityEvent: {
 			player_address: "",
 			timestamp: 0,
 		activity: new CairoCustomEnum({ 
@@ -1168,7 +1232,7 @@ export const schema: SchemaType = {
 			identifier: 0,
 			is_public: false,
 		},
-		PlayerActivityValue: {
+		PlayerActivityEventValue: {
 			timestamp: 0,
 		activity: new CairoCustomEnum({ 
 					Undefined: "",
@@ -1189,17 +1253,18 @@ export const schema: SchemaType = {
 			identifier: 0,
 			is_public: false,
 		},
-		PlayerRequiredAction: {
-			player_address: "",
+		LordsReleaseBill: {
+		reason: new CairoCustomEnum({ 
+					Undefined: "",
+				FameLostToCreator: undefined,
+				FameLostToDeveloper: undefined,
+				SacrificedToDeveloper: undefined,
+				LeaderboardPrize: undefined, }),
 			duelist_id: 0,
-			duel_id: 0,
-			required_action: false,
-			timestamp: 0,
-		},
-		PlayerRequiredActionValue: {
-			duel_id: 0,
-			required_action: false,
-			timestamp: 0,
+			recipient: "",
+			pegged_fame: 0,
+			pegged_lords: 0,
+			sponsored_lords: 0,
 		},
 		RewardValues: {
 			fame_lost: 0,
@@ -1280,12 +1345,16 @@ export enum ModelsMapping {
 	TrophyProgression = 'achievement-TrophyProgression',
 	TrophyProgressionValue = 'achievement-TrophyProgressionValue',
 	Task = 'achievement-Task',
-	ChallengeRewards = 'pistols-ChallengeRewards',
-	ChallengeRewardsValue = 'pistols-ChallengeRewardsValue',
 	Activity = 'pistols-Activity',
-	PlayerActivity = 'pistols-PlayerActivity',
-	PlayerActivityValue = 'pistols-PlayerActivityValue',
-	PlayerRequiredAction = 'pistols-PlayerRequiredAction',
-	PlayerRequiredActionValue = 'pistols-PlayerRequiredActionValue',
+	CallToActionEvent = 'pistols-CallToActionEvent',
+	CallToActionEventValue = 'pistols-CallToActionEventValue',
+	ChallengeRewardsEvent = 'pistols-ChallengeRewardsEvent',
+	ChallengeRewardsEventValue = 'pistols-ChallengeRewardsEventValue',
+	LordsReleaseEvent = 'pistols-LordsReleaseEvent',
+	LordsReleaseEventValue = 'pistols-LordsReleaseEventValue',
+	PlayerActivityEvent = 'pistols-PlayerActivityEvent',
+	PlayerActivityEventValue = 'pistols-PlayerActivityEventValue',
+	LordsReleaseBill = 'pistols-LordsReleaseBill',
+	ReleaseReason = 'pistols-ReleaseReason',
 	RewardValues = 'pistols-RewardValues',
 }
