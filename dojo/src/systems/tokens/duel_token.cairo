@@ -176,11 +176,12 @@ pub mod duel_token {
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
     };
     use pistols::models::{
-        player::{PlayerTrait, Activity, ActivityTrait},
+        player::{PlayerTrait},
         challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, RoundTrait},
         duelist::{DuelistTrait, DuelistValue, ProfileTypeTrait},
         pact::{PactTrait},
         table::{TableConfig, TableConfigTrait},
+        events::{Activity, ActivityTrait},
     };
     use pistols::types::{
         challenge_state::{ChallengeState, ChallengeStateTrait},

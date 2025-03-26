@@ -153,7 +153,8 @@ pub mod pack_token {
     };
     use pistols::models::{
         pack::{Pack, PackTrait, PackValue, PackType, PackTypeTrait},
-        player::{Player, PlayerTrait, Activity},
+        player::{Player, PlayerTrait},
+        events::{Activity},
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};

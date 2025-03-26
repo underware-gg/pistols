@@ -6,8 +6,11 @@ rpc = "https://api.cartridge.gg/x/starknet/sepolia"
 
 [events]
 raw = true
+
+[sql]
 historical = [
-  "pistols-PlayerActivity",
+  "pistols-PlayerActivityEvent",
+  "pistols-LordsReleaseEvent",
   "pistols-TrophyProgression",
 ]
 

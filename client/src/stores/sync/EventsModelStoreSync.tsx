@@ -20,12 +20,12 @@ export function EventsModelStoreSync() {
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().keys(
-            ['pistols-PlayerRequiredAction'],
+            ['pistols-CallToActionEvent'],
             [formatQueryValue(address), undefined],
           ).build()
         )
         .withEntityModels([
-          'pistols-PlayerRequiredAction',
+          'pistols-CallToActionEvent',
         ])
         .includeHashedKeys()
       : undefined
@@ -36,14 +36,14 @@ export function EventsModelStoreSync() {
     historical: false,
     enabled: (mounted && Boolean(query)),
     setEntities: (entities: PistolsEntity[]) => {
-      // console.log(`GET PlayerRequiredAction() ======>`, entities)
+      // console.log(`GET CallToActionEvent() ======>`, entities)
       eventsState.setEntities(entities)
     },
     updateEntity: (entity: PistolsEntity) => {
-      // console.log(`SUB PlayerRequiredAction() ======>`, entity)
-      const model = getEntityModel(entity, 'PlayerRequiredAction')
+      // console.log(`SUB CallToActionEvent() ======>`, entity)
+      const model = getEntityModel(entity, 'CallToActionEvent')
       if (bigintEquals(model?.player_address, address)) {
-        // console.log(`SUB PlayerRequiredAction() ======> model:`, getEntityModel(entity, 'PlayerRequiredAction'))
+        // console.log(`SUB CallToActionEvent() ======> model:`, getEntityModel(entity, 'CallToActionEvent'))
         eventsState.updateEntity(entity)
       }
     },
@@ -55,7 +55,7 @@ export function EventsModelStoreSync() {
   //   Keys: {
   //     // keys: ['0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7'],
   //     keys: [undefined],
-  //     models: ["pistols-PlayerRequiredAction"],
+  //     models: ["pistols-CallToActionEvent"],
   //     pattern_matching: "FixedLen",
   //   },
   // }
@@ -70,7 +70,7 @@ export function EventsModelStoreSync() {
   //         offset: 0,
   //         dont_include_hashed_keys: true,
   //         order_by: [],
-  //         entity_models: ["pistols-PlayerRequiredAction"],
+  //         entity_models: ["pistols-CallToActionEvent"],
   //         entity_updated_after: 0,
   //       },
   //       false, // historical

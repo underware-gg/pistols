@@ -10,34 +10,34 @@ export const useEventsStore = createDojoStore<PistolsSchemaType>();
 //--------------------------------
 // 'consumer' hooks
 //
-type RequiredActionDuel = {
+type CallToActionDuel = {
   duelId: bigint;
-  requiredAction: boolean;
+  callToAction: boolean;
   timestamp: number;
 }
-export function useRequiredActions() {
+export function useCallToActions() {
   const entities = useEventsStore((state) => state.entities)
   const duelPerDuelist = useMemo(() => (
     Object.values(entities)
       .reduce((acc, e) => {
-        const requiredAction = e.models.pistols.PlayerRequiredAction
-        if (requiredAction) {
-          const duelId = BigInt(requiredAction.duel_id ?? 0);
+        const callToAction = e.models.pistols.CallToActionEvent
+        if (callToAction) {
+          const duelId = BigInt(callToAction.duel_id ?? 0);
           if (duelId > 0n) {
-            let duelistId = bigintToHex(requiredAction.duelist_id);
+            let duelistId = bigintToHex(callToAction.duelist_id);
             acc[duelistId] = {
               duelId,
-              requiredAction: requiredAction.required_action,
-              timestamp: Number(requiredAction.timestamp),
+              callToAction: callToAction.call_to_action,
+              timestamp: Number(callToAction.timestamp),
             }
           }
         }
         return acc;
-      }, {} as Record<string, RequiredActionDuel>)
+      }, {} as Record<string, CallToActionDuel>)
   ), [entities])
   const requiredDuelIds = useMemo(() => Object.values(duelPerDuelist).map((duel) => duel.duelId), [duelPerDuelist])
   const requiresAction = useMemo(() => (requiredDuelIds.length > 0), [requiredDuelIds])
-  // console.log(`useRequiredActions() =================>`, entities, duelPerDuelist, requiredDuelIds)
+  // console.log(`useCallToActions() =================>`, entities, duelPerDuelist, requiredDuelIds)
   return {
     requiresAction,
     duelPerDuelist,
@@ -45,13 +45,13 @@ export function useRequiredActions() {
   }
 }
 
-export function useDuelRequiresAction(duel_id: BigNumberish) {
-  const { requiredDuelIds } = useRequiredActions()
+export function useDuelCallToAction(duel_id: BigNumberish) {
+  const { requiredDuelIds } = useCallToActions()
   return requiredDuelIds.includes(BigInt(duel_id))
 }
 
-export function useDuelistRequiresAction(duelist_id: BigNumberish) {
-  const { duelPerDuelist } = useRequiredActions()
+export function useDuelistCallToAction(duelist_id: BigNumberish) {
+  const { duelPerDuelist } = useCallToActions()
   return !!duelPerDuelist[bigintToHex(duelist_id)]
 }
 

@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
-import { useRequiredActions } from '/src/stores/eventsStore'
+import { useCallToActions } from '/src/stores/eventsStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
@@ -100,7 +100,7 @@ export const useQueryChallengeIds = (
 ) => {
   const { address } = useAccount()
   const { bookmarkedDuels } = usePlayer(address)
-  const { requiredDuelIds } = useRequiredActions()
+  const { requiredDuelIds } = useCallToActions()
 
   const entities = useChallengeQueryStore((state) => state.entities);
   const duelistEntities = useDuelistQueryStore((state) => state.entities);

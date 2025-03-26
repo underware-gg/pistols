@@ -13,10 +13,10 @@ pub use pistols::models::{
     },
     pool::{
         Pool, PoolType,
+        LordsReleaseBill,
     },
     player::{
         Player, PlayerValue,
-        PlayerRequiredAction,
     },
     pack::{
         Pack, PackValue,
@@ -24,7 +24,6 @@ pub use pistols::models::{
     challenge::{
         Challenge, ChallengeValue,
         Round, RoundValue,
-        ChallengeRewards,
     },
     duelist::{
         Duelist, DuelistValue, DuelistTimestamps,
@@ -44,6 +43,11 @@ pub use pistols::models::{
     },
     season::{
         SeasonConfig, SeasonConfigValue,
+    },
+    events::{
+        CallToActionEvent,
+        ChallengeRewardsEvent,
+        LordsReleaseEvent,
     },
 };
 pub use pistols::systems::components::{
@@ -369,44 +373,52 @@ pub impl StoreImpl of StoreTrait {
     fn emit_challenge_reply_action(ref self: Store, challenge: @Challenge, reply_required: bool) {
         if ((*challenge.address_b).is_non_zero()) {
             // duelist is challenger (just to be unique)
-            self.emit_required_action(*challenge.address_b, *challenge.duelist_id_a,
+            self.emit_call_to_action(*challenge.address_b, *challenge.duelist_id_a,
                 if (reply_required) {*challenge.duel_id} else {0},
                 reply_required);
         }
     }
     #[inline(always)]
-    fn emit_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8, required_action: bool) {
+    fn emit_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8, call_to_action: bool) {
         if (duelist_number == 1) {
-            self.emit_required_action(*challenge.address_a, *challenge.duelist_id_a, *challenge.duel_id, required_action);
+            self.emit_call_to_action(*challenge.address_a, *challenge.duelist_id_a, *challenge.duel_id, call_to_action);
         } else if (duelist_number == 2) {
-            self.emit_required_action(*challenge.address_b, *challenge.duelist_id_b, *challenge.duel_id, required_action);
+            self.emit_call_to_action(*challenge.address_b, *challenge.duelist_id_b, *challenge.duel_id, call_to_action);
         }
     }
     #[inline(always)]
     fn emit_clear_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8) {
         if (duelist_number == 1) {
-            self.emit_required_action(*challenge.address_a, *challenge.duelist_id_a, 0, false);
+            self.emit_call_to_action(*challenge.address_a, *challenge.duelist_id_a, 0, false);
         } else if (duelist_number == 2) {
-            self.emit_required_action(*challenge.address_b, *challenge.duelist_id_b, 0, false);
+            self.emit_call_to_action(*challenge.address_b, *challenge.duelist_id_b, 0, false);
         }
     }
     #[inline(always)]
-    fn emit_required_action(ref self: Store, player_address: ContractAddress, duelist_id: u128, duel_id: u128, required_action: bool) {
-        self.world.emit_event(@PlayerRequiredAction{
+    fn emit_call_to_action(ref self: Store, player_address: ContractAddress, duelist_id: u128, duel_id: u128, call_to_action: bool) {
+        self.world.emit_event(@CallToActionEvent{
             player_address,
             duelist_id,
             duel_id,
-            required_action,
+            call_to_action,
             timestamp: if (duel_id.is_non_zero()) {starknet::get_block_timestamp()} else {0},
         });
     }
 
     #[inline(always)]
     fn emit_challenge_rewards(ref self: Store, duel_id: u128, duelist_id: u128, rewards: RewardValues) {
-        self.world.emit_event(@ChallengeRewards{
+        self.world.emit_event(@ChallengeRewardsEvent{
             duel_id,
             duelist_id,
             rewards,
+        });
+    }
+
+    #[inline(always)]
+    fn emit_lords_release(ref self: Store, season_table_id: felt252, bill: @LordsReleaseBill) {
+        self.world.emit_event(@LordsReleaseEvent{
+            season_table_id,
+            bill: *bill,
         });
     }
 }

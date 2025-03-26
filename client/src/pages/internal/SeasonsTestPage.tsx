@@ -72,8 +72,8 @@ function Season({
 }) {
   const { account } = useAccount()
   const { description } = useTable(tableId)
-  const { seasonId, phase, timestamp_start, timestamp_end } = useSeason(tableId)
-  const { clientTimestamp } = useClientTimestamp()
+  const { seasonId, phase, timestamp_start, timestamp_end, isActive } = useSeason(tableId)
+  const { clientTimestamp } = useClientTimestamp(isActive)
   const { canCollectSeason } = useCanCollectSeason()
   const { game: { collectSeason } } = useDojoContractCalls()
   const [displayReports, setDisplayReports] = useState(false)

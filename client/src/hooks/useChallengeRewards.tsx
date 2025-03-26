@@ -12,12 +12,12 @@ export const useGetChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNum
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().keys(
-            ["pistols-ChallengeRewards"],
+            ["pistols-ChallengeRewardsEvent"],
             [formatQueryValue(duel_id), formatQueryValue(duelist_id)]
           ).build()
         )
         .withEntityModels(
-          ["pistols-ChallengeRewards"]
+          ["pistols-ChallengeRewardsEvent"]
         )
         .includeHashedKeys()
       : null
@@ -28,7 +28,7 @@ export const useGetChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNum
     historical: false,
     retryInterval: 1000,
   })
-  const rewards = useMemo(() => getEntityMapModels<models.ChallengeRewards>(entities, 'ChallengeRewards')?.[0]?.rewards, [entities])
+  const rewards = useMemo(() => getEntityMapModels<models.ChallengeRewardsEvent>(entities, 'ChallengeRewardsEvent')?.[0]?.rewards, [entities])
 
   const fame_lost_wei = useMemo(() => BigInt(rewards?.fame_lost ?? 0), [rewards])
   const fame_gained_wei = useMemo(() => BigInt(rewards?.fame_gained ?? 0), [rewards])

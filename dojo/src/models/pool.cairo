@@ -46,11 +46,23 @@ pub struct Pool {
     pub balance_fame: u128,
 }
 
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum ReleaseReason {
+    Undefined,              // 0
+    FameLostToCreator,      // 1
+    FameLostToDeveloper,    // 2
+    SacrificedToDeveloper,  // 3
+    LeaderboardPrize: u8,   // 4
+}
+
 #[derive(Copy, Drop, Serde, Introspect)]
 pub struct LordsReleaseBill {
+    pub reason: ReleaseReason,
+    pub duelist_id: u128,
     pub recipient: ContractAddress,
-    pub fame_amount: u128,      // LORDS pegged to FAME
-    pub lords_amount: u128,     // LORDS deposited (can be zero)
+    pub pegged_fame: u128,      // LORDS pegged to FAME
+    pub pegged_lords: u128,     // LORDS pegged to FAME
+    pub sponsored_lords: u128,  // LORDS from sponsors (can be zero)
 }
 
 

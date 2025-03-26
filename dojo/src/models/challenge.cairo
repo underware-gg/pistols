@@ -1,7 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState};
-use pistols::types::rules::{RewardValues};
 use pistols::types::premise::{Premise};
 use pistols::types::timestamp::{Period};
 
@@ -70,21 +69,6 @@ pub struct DuelistState {
     pub dice_fire: u8,  // 0..100
     pub honour: u8,     // honour granted
 } // [5*8]: 40 bits
-
-
-//---------------------
-// ON-CHAIN events
-//
-#[derive(Copy, Drop, Serde)]
-#[dojo::event(historical:false)]
-pub struct ChallengeRewards {
-    #[key]
-    pub duel_id: u128,
-    #[key]
-    pub duelist_id: u128,
-    //-----------------------
-    pub rewards: RewardValues,
-}
 
 
 

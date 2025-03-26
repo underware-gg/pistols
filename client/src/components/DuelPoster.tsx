@@ -27,7 +27,7 @@ import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { SceneName } from '/src/data/assets'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
-import { useDuelRequiresAction } from '/src/stores/eventsStore'
+import { useDuelCallToAction } from '/src/stores/eventsStore'
 import { BigNumberish } from 'starknet'
 import { useFameBalanceDuelist } from '/src/hooks/useFame'
 
@@ -76,7 +76,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
 
   const { duel_token, game } = useDojoSystemCalls()
   const { account } = useAccount()
-  const isRequiredAction = useDuelRequiresAction(props.duelId)
+  const isCallToAction = useDuelCallToAction(props.duelId)
   const { duelistSelectOpener } = usePistolsContext()
 
   const {
@@ -178,20 +178,20 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   }));
   
   const isDead = (duelistId: number) => {
-    return duelistId !== Number(winnerDuelistId) && isFinished && !isRequiredAction
+    return duelistId !== Number(winnerDuelistId) && isFinished && !isCallToAction
   }
 
   useEffect(() => {
     if (!props.isSmall) return
 
-    if ((isYouA && turnA) || (isYouB && turnB) || isRequiredAction) {
+    if ((isYouA && turnA) || (isYouB && turnB) || isCallToAction) {
       setCardColor(CardColor.ORANGE)
       baseRef.current?.toggleBlink(true)
     } else {
       setCardColor(CardColor.WHITE)
       baseRef.current?.toggleBlink(false)
     }
-  }, [isYouA, isYouB, turnA, turnB, props.isSmall, isRequiredAction])
+  }, [isYouA, isYouB, turnA, turnB, props.isSmall, isCallToAction])
 
   return (
     <InteractibleComponent
@@ -385,12 +385,12 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                       )
                     ))
                 }
-                {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || isRequiredAction) &&
+                {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || isCallToAction) &&
                   <Col>
                     <ActionButton large fillParent important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
                   </Col>
                 }
-                {isFinished && !isRequiredAction &&
+                {isFinished && !isCallToAction &&
                   <Col>
                     <ActionButton large fillParent important label='Replay Duel!' onClick={() => _gotoDuel()} />
                   </Col>

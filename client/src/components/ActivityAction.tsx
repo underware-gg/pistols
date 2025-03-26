@@ -5,7 +5,7 @@ import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { useDuelist } from '/src/stores/duelistStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { useFameBalanceDuelist } from '/src/hooks/useFame'
-import { useRequiredActions } from '/src/stores/eventsStore'
+import { useCallToActions } from '/src/stores/eventsStore'
 import { Icon, BookmarkIcon, EmojiIcon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink } from '/src/components/Links'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
@@ -13,7 +13,7 @@ import { EMOJI } from '/src/data/messages'
 
 export const ActionIcon = (isActive: boolean) => {
   const { duelistIds } = useDuelistsOfPlayer()
-  const { requiresAction, duelPerDuelist } = useRequiredActions()
+  const { requiresAction, duelPerDuelist } = useCallToActions()
   const replyOnly = useMemo(() => (
     requiresAction && !Object.keys(duelPerDuelist).some((duelistId) => (duelistIds.includes(BigInt(duelistId))))
   ), [duelistIds, duelPerDuelist])
@@ -35,7 +35,7 @@ export default function ActivityAction() {
   const { address } = useAccount()
   const { bookmarkedDuelists } = usePlayer(address)
 
-  const { duelPerDuelist } = useRequiredActions()
+  const { duelPerDuelist } = useCallToActions()
   const { duelistIds } = useDuelistsOfPlayer()
   const sortedDuelistIds = useMemo(() => (
     Array.from(new Set([
@@ -63,7 +63,7 @@ export default function ActivityAction() {
         duelistId={duelistId}
         duelId={duelId}
         isBookmarked={bookmarkedDuelists.includes(duelistId)}
-        requiredAction={duel?.requiredAction ?? false}
+        callToAction={duel?.callToAction ?? false}
         isReply={isReply}
       />
     )
@@ -81,13 +81,13 @@ const ActionItem = ({
   duelistId,
   isBookmarked,
   duelId,
-  requiredAction,
+  callToAction,
   isReply,
 }: {
   duelistId: BigNumberish
   isBookmarked?: boolean
   duelId: bigint
-  requiredAction: boolean
+  callToAction: boolean
   isReply: boolean
 }) => {
   const { isInactive } = useDuelist(duelistId)
@@ -110,7 +110,7 @@ const ActionItem = ({
 
   // in a duel, required to play
   if (duelId > 0n) {
-    return requiredAction ?
+    return callToAction ?
       <>
         <Icon name='circle' className='Positive' />
         <DuelistLink duelistId={duelistId} useName />

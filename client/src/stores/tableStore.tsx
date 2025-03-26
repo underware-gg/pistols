@@ -75,6 +75,9 @@ export const useSeason = (table_id: string) => {
 
   const seasonId = useMemo(() => (season ? feltToString(season.season_id) : '?'), [season])
   const phase = useMemo(() => (parseEnumVariant<constants.SeasonPhase>(season?.phase) ?? null), [season])
+  const isActive = useMemo(() => (phase == constants.SeasonPhase.InProgress), [season])
+  const isFinished = useMemo(() => (phase == constants.SeasonPhase.Ended), [season])
+
   const period = useMemo(() => (season?.period ?? null), [season])
   const timestamp_start = useMemo(() => (period ? Number(period.start) : null), [period])
   const timestamp_end = useMemo(() => (period ? Number(period.end) : null), [period])
@@ -85,6 +88,8 @@ export const useSeason = (table_id: string) => {
     phase,
     timestamp_start,
     timestamp_end,
+    isActive,
+    isFinished,
   }
 }
 

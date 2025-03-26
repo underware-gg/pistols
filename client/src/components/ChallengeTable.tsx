@@ -15,7 +15,7 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { arrayRemoveValue, bigintEquals } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '/src/utils/pistols'
-import { useDuelRequiresAction } from '../stores/eventsStore'
+import { useDuelCallToAction } from '../stores/eventsStore'
 import { useFameBalanceDuelist } from '../hooks/useFame'
 import { usePlayer } from '../stores/playerStore'
 
@@ -165,7 +165,7 @@ function DuelItem({
   const winnerIsB = useMemo(() => (winner == 2), [winner])
 
   const { dispatchSelectDuel } = usePistolsContext()
-  const isRequiredAction = useDuelRequiresAction(duelId)
+  const isCallToAction = useDuelCallToAction(duelId)
 
   const _gotoChallenge = () => {
     dispatchSelectDuel(duelId)
@@ -209,7 +209,7 @@ function DuelItem({
             :
             <>
               <span className={ChallengeStateClasses[state]}>
-                {isRequiredAction ? constants.ChallengeState.Awaiting : ChallengeStateNames[state]}
+                {isCallToAction ? constants.ChallengeState.Awaiting : ChallengeStateNames[state]}
               </span>
             </>
           }

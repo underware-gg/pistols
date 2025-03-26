@@ -34,8 +34,6 @@ pub mod tester {
     pub use pistols::models::{
         player::{
             m_Player, Player,
-            e_PlayerActivity,
-            e_PlayerRequiredAction,
         },
         pack::{
             m_Pack, Pack, PackType, PackTypeTrait,
@@ -44,7 +42,6 @@ pub mod tester {
             m_Challenge, Challenge, ChallengeValue,
             m_Round, RoundValue,
             DuelistState,
-            e_ChallengeRewards,
         },
         duelist::{
             m_Duelist, Duelist, DuelistValue,
@@ -72,6 +69,12 @@ pub mod tester {
         },
         pool::{
             m_Pool, Pool, PoolType,
+        },
+        events::{
+            e_PlayerActivityEvent,
+            e_CallToActionEvent,
+            e_ChallengeRewardsEvent,
+            e_LordsReleaseEvent,
         },
     };
 
@@ -270,9 +273,10 @@ pub mod tester {
             // events
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
-            TestResource::Event(e_PlayerActivity::TEST_CLASS_HASH),
-            TestResource::Event(e_PlayerRequiredAction::TEST_CLASS_HASH),
-            TestResource::Event(e_ChallengeRewards::TEST_CLASS_HASH),
+            TestResource::Event(e_PlayerActivityEvent::TEST_CLASS_HASH),
+            TestResource::Event(e_CallToActionEvent::TEST_CLASS_HASH),
+            TestResource::Event(e_ChallengeRewardsEvent::TEST_CLASS_HASH),
+            TestResource::Event(e_LordsReleaseEvent::TEST_CLASS_HASH),
         ];
         if (deploy_rng_mock) {
             resources.append(TestResource::Model(m_MockedValue::TEST_CLASS_HASH));
@@ -379,7 +383,7 @@ pub mod tester {
             resources.append(TestResource::Contract(bank::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"bank")
-                    .with_writer_of([selector_from_tag!("pistols-Pool")].span())
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         }
 

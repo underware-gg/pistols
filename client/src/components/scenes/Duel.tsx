@@ -10,7 +10,7 @@ import { useGetChallenge } from '/src/stores/challengeStore'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useIsMyDuelist } from '/src/hooks/useIsYou'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
-import { useDuelRequiresAction } from '/src/stores/eventsStore'
+import { useDuelCallToAction } from '/src/stores/eventsStore'
 import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
 import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
 import { EnvironmentCardsTextures } from '/src/data/cardAssets'
@@ -66,13 +66,13 @@ export default function Duel({
   // clear required action flag
   const { account } = useAccount()
   const { game } = useDojoSystemCalls()
-  const isRequired = useDuelRequiresAction(duelId)
+  const isRequired = useDuelCallToAction(duelId)
 
   useEffect(() => {
     if ((isYouA || isYouB) && mounted && account && isRequired && isFinished) {
       console.log('clearing required action flag...')
-      if (isYouA) game.clear_required_action(account, duelistIdA)
-      if (isYouB) game.clear_required_action(account, duelistIdB)
+      if (isYouA) game.clear_call_to_action(account, duelistIdA)
+      if (isYouB) game.clear_call_to_action(account, duelistIdB)
     }
   }, [isYouA, isYouB, mounted, account, isRequired, isFinished])
 

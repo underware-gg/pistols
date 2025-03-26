@@ -9,7 +9,8 @@ raw = true
 
 [sql]
 historical = [
-  "pistols-PlayerActivity",
+  "pistols-PlayerActivityEvent",
+  "pistols-LordsReleaseEvent",
   "pistols-TrophyProgression",
 ]
 

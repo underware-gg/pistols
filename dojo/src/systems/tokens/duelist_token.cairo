@@ -174,8 +174,7 @@ pub mod duelist_token {
         IBankDispatcher, IBankDispatcherTrait,
     };
     use pistols::models::{
-        pool::{PoolType, PoolTypeTrait, LordsReleaseBill},
-        player::{Activity, ActivityTrait},
+        pool::{PoolType, PoolTypeTrait, LordsReleaseBill, ReleaseReason},
         duelist::{
             Duelist, DuelistValue,
             DuelistTimestamps,
@@ -185,6 +184,7 @@ pub mod duelist_token {
             Archetype,
         },
         challenge::{Challenge},
+        events::{Activity, ActivityTrait},
     };
     use pistols::types::{
         profile_type::{ProfileTypeTrait, ProfileManagerTrait},
@@ -503,13 +503,16 @@ pub mod duelist_token {
                     (*bank_dispatcher).duelist_lost_fame_to_pool(starknet::get_contract_address(), duelist_id, amount, *distribution.pool_id);
                     distribution_due -= amount;
                 }
-                // release LORDS do tournament creator + burn
+                // release LORDS to tournament creator + burn
                 if (*distribution.creator_percent != 0 && distribution.creator_address.is_non_zero()) {
                     let amount: u128 = MathTrait::percentage(distribution_total, *distribution.creator_percent);
                     release_bills.append(LordsReleaseBill {
+                        reason: ReleaseReason::FameLostToCreator,
+                        duelist_id,
                         recipient: *distribution.creator_address,
-                        fame_amount: amount,
-                        lords_amount: 0,
+                        pegged_fame: amount,
+                        pegged_lords: 0,
+                        sponsored_lords: 0,
                     });
                     distribution_due -= amount;
                     total_to_burn += amount; // released, need to burn
@@ -517,14 +520,21 @@ pub mod duelist_token {
                 // remaining FAME to underware
                 let mut underware_due: u128 = residual_due + distribution_due;
                 release_bills.append(LordsReleaseBill {
+                    reason: ReleaseReason::FameLostToDeveloper,
+                    duelist_id,
                     recipient: underware_address,
-                    fame_amount: underware_due,
-                    lords_amount: 0,
+                    pegged_fame: underware_due,
+                    pegged_lords: 0,
+                    sponsored_lords: 0,
                 });
                 total_to_burn += underware_due; // released, need to burn
                 //
                 // release LORDS and burn FAME
-                values.lords_unlocked += (*bank_dispatcher).release_lords_from_fame_to_be_burned(release_bills.span());
+                let season_table_id: felt252 = match (*distribution.pool_id) {
+                    PoolType::Season(table_id) => {table_id},
+                    _ => {0},
+                };
+                values.lords_unlocked += (*bank_dispatcher).release_lords_from_fame_to_be_burned(season_table_id, release_bills.span());
                 (*fame_dispatcher).burn_from_token(starknet::get_contract_address(), duelist_id, total_to_burn.into());
             } else {
                 values.survived = true;
@@ -572,11 +582,14 @@ pub mod duelist_token {
 
             // remaining fame to be burned and released
             let bill = LordsReleaseBill {
+                reason: ReleaseReason::SacrificedToDeveloper,
+                duelist_id,
                 recipient: store.get_config_treasury_address(),
-                fame_amount: due_amount,
-                lords_amount: 0,
+                pegged_fame: due_amount,
+                pegged_lords: 0,
+                sponsored_lords: 0,
             };
-            bank_dispatcher.release_lords_from_fame_to_be_burned(array![bill].span());
+            bank_dispatcher.release_lords_from_fame_to_be_burned(0, array![bill].span());
             fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, due_amount.into());
 // println!("remaining: {}", self._fame_balance(@fame_dispatcher, duelist_id));
 

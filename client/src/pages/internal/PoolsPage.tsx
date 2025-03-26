@@ -5,6 +5,7 @@ import { useDojoSystem, useDojoSystemCalls, useLordsBalance } from '@underware/p
 import { usePool, useSeasonPool, UsePoolResult, useFundedStarterPackCount } from '/src/stores/bankStore'
 import { useFameBalance } from '/src/hooks/useFame'
 import { usePackType } from '/src/stores/packStore'
+import { useConfig } from '/src/stores/configStore'
 import { FameBalance, LordsBalance } from '/src/components/account/LordsBalance'
 import { FormInputNumber } from '/src/components/ui/Form'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
@@ -150,7 +151,9 @@ function Pools() {
   const poolPurchases = usePool(constants.PoolType.Purchases)
   const poolFamePeg = usePool(constants.PoolType.FamePeg)
   const poolSacredFlame = usePool(constants.PoolType.SacredFlame)
-  const poolSeason = useSeasonPool(1)
+
+  const { seasonTableId } = useConfig()
+  const poolSeason = useSeasonPool(seasonTableId)
 
   const poolTotalLords = useMemo(() => (
     poolPurchases.balanceLords + poolFamePeg.balanceLords + poolSacredFlame.balanceLords + poolSeason.balanceLords
@@ -222,12 +225,12 @@ function PoolRow({
   displayLords?: boolean
   displayFame?: boolean
 }) {
-  const { poolId, seasonId, tournamentId, balanceLords, balanceFame } = pool
+  const { poolType, seasonId, tournamentId, balanceLords, balanceFame } = pool
 
   return (
     <Row className='ModalText'>
       <Cell>
-        🏷️ Pool::{poolId}{seasonId ? `(${seasonId})` : ''}
+        🏷️ Pool::{poolType}{seasonId ? `(${seasonId})` : ''}
         </Cell>
       <Cell className='Code' textAlign='left'>
         {displayLords && <Balance lords wei={balanceLords} size='big' />}

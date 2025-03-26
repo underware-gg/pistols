@@ -27,7 +27,7 @@ interface State {
 
 const createStore = () => {
   const _parseEvent = (e: PistolsEntity, index?: number): ActivityState => {
-    const event = e.models.pistols.PlayerActivity
+    const event = e.models.pistols.PlayerActivityEvent
     return event ? {
       player_address: bigintToHex(event.player_address),
       timestamp: bigintToNumber(event.timestamp),

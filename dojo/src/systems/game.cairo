@@ -20,7 +20,7 @@ pub trait IGame<TState> {
         salt: felt252,
         moves: Span<u8>,
     );
-    fn clear_required_action(ref self: TState, duelist_id: u128); // @description: Clear the required action call for a duelist
+    fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear the required action call for a duelist
     fn collect_duel(ref self: TState, duel_id: u128); // @description: Close expired duels
     fn collect_season(ref self: TState) -> felt252; // @description: Close the current season and start the next one
 
@@ -80,13 +80,14 @@ pub mod game {
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
-        player::{PlayerTrait, Activity, ActivityTrait},
+        player::{PlayerTrait},
         challenge::{Challenge, ChallengeTrait, Round, RoundTrait, MovesTrait},
         duelist::{Duelist, DuelistTrait, DuelistStatusTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
         table::{TableScoreboard, TableScoreboardTrait},
         season::{SeasonConfig, SeasonConfigTrait},
+        events::{Activity, ActivityTrait},
     };
     use pistols::types::{
         challenge_state::{ChallengeState, ChallengeStateTrait},
@@ -327,10 +328,10 @@ pub mod game {
             // store.set_round(@round); // _finish_challenge() does it
         }
 
-        fn clear_required_action(ref self: ContractState, duelist_id: u128) {
+        fn clear_call_to_action(ref self: ContractState, duelist_id: u128) {
             let mut store: Store = StoreTrait::new(self.world_default());
             self._validate_ownership(@store.world, duelist_id);
-            store.emit_required_action(starknet::get_caller_address(), duelist_id, 0, false);
+            store.emit_call_to_action(starknet::get_caller_address(), duelist_id, 0, false);
         }
 
         fn collect_duel(ref self: ContractState, duel_id: u128) {

@@ -5,21 +5,16 @@ import { useHistoricalEventsStore } from '/src/stores/historicalEventsStore'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
 import * as torii from '@dojoengine/torii-client'
 
-// const query: PistolsQueryBuilder = {
-//   pistols: {
-//     PlayerActivity: [],
-//   },
-//   limit: 20,
-// }
 const query: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withClause(
     new PistolsClauseBuilder().keys(
-      ["pistols-PlayerActivity"],
+      ["pistols-PlayerActivityEvent", "pistols-LordsReleaseEvent"],
       [],
     ).build()
   )
   .withEntityModels([
-    "pistols-PlayerActivity",
+    "pistols-PlayerActivityEvent",
+    "pistols-LordsReleaseEvent",
   ])
   .withLimit(100)
   // .includeHashedKeys() // historical events are sequential
@@ -44,7 +39,7 @@ export function EventsHistoricalStoreSync() {
   //   Keys: {
   //     // keys: ['0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7'],
   //     keys: [undefined, undefined],
-  //     models: ["pistols-PlayerActivity"],
+  //     models: ["pistols-PlayerActivityEvent"],
   //     pattern_matching: "FixedLen",
   //   },
   // }
@@ -59,7 +54,7 @@ export function EventsHistoricalStoreSync() {
   //         offset: 0,
   //         dont_include_hashed_keys: true,
   //         order_by: [],
-  //         entity_models: ["pistols-PlayerActivity"],
+  //         entity_models: ["pistols-PlayerActivityEvent"],
   //         entity_updated_after: 0,
   //       },
   //       true, // historical

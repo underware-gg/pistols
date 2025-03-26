@@ -41,6 +41,7 @@ mod models {
     pub mod challenge;
     pub mod config;
     pub mod duelist;
+    pub mod events;
     pub mod pack;
     pub mod pact;
     pub mod player;
