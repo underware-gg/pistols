@@ -33,8 +33,9 @@ export const LordsBalance = ({
   post = null,
   clean = false,
   size = null,
+  watch = false,
 }) => {
-  const { balance } = useLordsBalance(address)
+  const { balance } = useLordsBalance(address, 0n, watch)
   return (
     <Balance lords size={size} wei={balance} pre={pre} post={post} clean={clean} />
   )

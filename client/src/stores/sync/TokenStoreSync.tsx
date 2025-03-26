@@ -76,7 +76,7 @@ export function TokenStoreSync() {
   useSdkTokenBalancesSub({
     contracts,
     updateBalance: (balance: torii.TokenBalance) => {
-      console.log("TOKENS SUB >>>", balance)
+      // console.log("TOKENS SUB >>>", balance)
       const _contract = bigintToHex(balance.contract_address)
       if (token_contracts.includes(_contract)) {
         token_state.updateBalance(balance)

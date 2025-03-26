@@ -19,6 +19,9 @@ import AppDojo from '/src/components/AppDojo'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useAccount } from '@starknet-react/core'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
+import { LordsFaucet } from '/src/components/account/LordsFaucet'
+import { LordsBalance } from '/src/components/account/LordsBalance'
+import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -41,6 +44,7 @@ export default function TokensTestPage() {
         <ChallengeStoreSync />
 
         <TestImages />
+        <Purchases />
         <Tokens />
       </Container>
     </AppDojo>
@@ -53,17 +57,36 @@ const _style = {
   height: '100px',
 }
 
-function Tokens() {
-  const { account } = useAccount()
+function Purchases() {
+  const { account, address } = useAccount()
   const { canClaimStarterPack } = useCanClaimStarterPack()
   const { pack_token } = useDojoSystemCalls()
+  const { packIds } = usePacksOfPlayer()
+  return (
+    <>
+      <LordsFaucet />
+      &nbsp;&nbsp;<span className='Code'>(mint LORDS, causes unreachable error)</span>
+      <LordsBalance address={address} size='big' watch />
+      <br />
+      <Button disabled={!canClaimStarterPack} onClick={() => pack_token.claim_starter_pack(account)}>Claim Starter Pack</Button>
+      &nbsp;&nbsp;<span className='Code'>(mint PACK + burn PACK + mint 2 DUELISTS)</span>
+      <br />
+      <Button disabled={canClaimStarterPack} onClick={() => pack_token.purchase(account, constants.PackType.Duelists5x)}>Purchase Pack</Button>
+      &nbsp;&nbsp;<span className='Code'>(transfer $LORDS + mint PACK)</span>
+      <br />
+      <Button disabled={packIds.length === 0} onClick={() => pack_token.open(account, packIds[0])}>Open Pack {packIds[0] ?? ''}</Button>
+      &nbsp;&nbsp;<span className='Code'>[{packIds.join(',')}] (burn PACK + mint 5 DUELISTS)</span>
+    </>
+  );
+}
+
+function Tokens() {
   const { packContractAddress } = usePackTokenContract()
   const { duelistContractAddress } = useDuelistTokenContract()
   const { duelContractAddress } = useDuelTokenContract()
   // useSdkTokenBalancesTest();
   return (
     <>
-      <Button disabled={!canClaimStarterPack} onClick={() => pack_token.claim_starter_pack(account)}>Claim Starter Pack</Button>
       <br />
       <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
       <br />
@@ -160,20 +183,20 @@ function TokenRow({
         ))}
       </Cell>
       <Cell verticalAlign='bottom'>
-        <img src={cached_image} alt={name} style={_style} />
-        &nbsp;<a href={cached_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
+        {/* <img src={cached_image} alt={name} style={_style} /> */}
+        {/* &nbsp;<a href={cached_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a> */}
       </Cell>
       <Cell verticalAlign='bottom'>
-        <embed src={cached_image} style={_style} />
-        &nbsp;<a href={cached_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
+        {/* <embed src={cached_image} style={_style} /> */}
+        {/* &nbsp;<a href={cached_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a> */}
       </Cell>
       <Cell verticalAlign='bottom'>
-        <img src={rpc_image} alt={name} style={_style} />
-        &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
+        {/* <img src={rpc_image} alt={name} style={_style} /> */}
+        {/* &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a> */}
       </Cell>
       <Cell verticalAlign='bottom'>
-        <embed src={rpc_image} style={_style} />
-        &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
+        {/* <embed src={rpc_image} style={_style} /> */}
+        {/* &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a> */}
       </Cell>
       <Cell verticalAlign='bottom'>
         {rendered_token}
