@@ -19,8 +19,8 @@ type UseSdkGetResult = {
 
 export type UseSdkTokenBalancesGetProps = {
   contract: string
-  account: string
-  tokenIds?: string[]
+  account?: string
+  tokenIds?: BigNumberish[]
   enabled?: boolean
   setBalances: (balances: torii.TokenBalance[]) => void
 }
@@ -46,7 +46,7 @@ export const useSdkTokenBalancesGet = ({
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
-      // console.log("useSdkTokenBalancesGet() GET........", enabled, contract, account)
+      // console.log("useSdkTokenBalancesGet() GET........", enabled, contract, account, tokenIds)
       setIsLoading(true)
       await sdk.getTokenBalances(
         [contract],
@@ -76,7 +76,7 @@ export const useSdkTokenBalancesGet = ({
       // console.log("useSdkTokenBalancesGet() done!")
     }
     // get...
-    if (sdk && enabled && isPositiveBigint(contract) && isPositiveBigint(account)) _get()
+    if (sdk && enabled && isPositiveBigint(contract) && (isPositiveBigint(account) || tokenIds)) _get()
     return () => {
       _mounted = false
     }
@@ -132,5 +132,6 @@ export const useSdkTokenBalancesSub = ({
 //
 // Format token ids for torii token queries
 function toToriiTokenId(value: BigNumberish) {
-  return BigInt(value).toString(16).padStart(64, "0");
+  // return BigInt(value).toString(16).padStart(64, "0");
+  return BigInt(value).toString().padStart(64, "0");
 }
