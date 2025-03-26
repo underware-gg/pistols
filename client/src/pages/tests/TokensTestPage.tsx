@@ -2,13 +2,13 @@ import React, { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { Button, Container, Icon, Table } from 'semantic-ui-react'
 import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
-import { useTokenIdsOfPlayer, useTokensByOwner } from '/src/stores/tokenStore'
+import { useTokenIdsOfPlayer, useTokenIdsByAccount } from '/src/stores/tokenStore'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { useERC721TokenUri } from '@underware/pistols-sdk/utils/hooks'
 import { duelist_token, duel_token } from '@underware/pistols-sdk/pistols/tokens'
-import { bigintToDecimal } from '@underware/pistols-sdk/utils'
+import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import { DuelistTokenArt } from '/src/components/cards/DuelistTokenArt'
@@ -22,6 +22,7 @@ import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { LordsBalance } from '/src/components/account/LordsBalance'
 import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -59,9 +60,10 @@ const _style = {
 
 function Purchases() {
   const { account, address } = useAccount()
-  const { canClaimStarterPack } = useCanClaimStarterPack()
   const { pack_token } = useDojoSystemCalls()
   const { packIds } = usePacksOfPlayer()
+  const { duelistIds } = useDuelistsOfPlayer()
+  const { canClaimStarterPack } = useCanClaimStarterPack(Math.min(duelistIds.length, 1))
   return (
     <>
       <LordsFaucet />
@@ -113,7 +115,7 @@ function TokenContract({
   renderer?: (tokenId: bigint) => React.ReactNode,
 }) {
   // const { address } = useAccount()
-  // const { tokens } = useTokensByOwner(contractAddress, address) // direct get
+  // const { tokens } = useTokenIdsByAccount(contractAddress, address) // direct get
   const { tokenIds } = useTokenIdsOfPlayer(contractAddress) // from the store
 
   const rows = useMemo(() => {
@@ -135,7 +137,7 @@ function TokenContract({
     <Table attached>
       <Header fullWidth>
         <Row>
-          <HeaderCell width={4}><h3 className='Important'>{tokenName}</h3></HeaderCell>
+          <HeaderCell width={4}><h3 className='Important'>{tokenName}: {tokenIds.length}</h3></HeaderCell>
           {/* <HeaderCell width={4}><h3 className='Important'>{bigintToHex(contractAddress)}</h3></HeaderCell> */}
           <HeaderCell><h3 className='Important'>Name</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Cached {`<img>`}</h3></HeaderCell>
@@ -147,6 +149,11 @@ function TokenContract({
       </Header>
 
       <Body>
+        <Row>
+          <Cell colSpan={10}>
+            <span className='Code'>{bigintToHex(contractAddress)}</span>
+          </Cell>
+        </Row>
         {rows}
       </Body>
     </Table>
@@ -182,23 +189,23 @@ function TokenRow({
           <li key={a}>{a}: <b>{attr?.[a] ?? '?'}</b></li>
         ))}
       </Cell>
-      <Cell verticalAlign='bottom'>
+      <Cell verticalAlign='top'>
         {/* <img src={cached_image} alt={name} style={_style} /> */}
         {/* &nbsp;<a href={cached_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a> */}
       </Cell>
-      <Cell verticalAlign='bottom'>
+      <Cell verticalAlign='top'>
         {/* <embed src={cached_image} style={_style} /> */}
         {/* &nbsp;<a href={cached_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a> */}
       </Cell>
-      <Cell verticalAlign='bottom'>
+      <Cell verticalAlign='top'>
         {/* <img src={rpc_image} alt={name} style={_style} /> */}
-        {/* &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a> */}
+        &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
       </Cell>
-      <Cell verticalAlign='bottom'>
+      <Cell verticalAlign='top'>
         {/* <embed src={rpc_image} style={_style} /> */}
-        {/* &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a> */}
+        &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
       </Cell>
-      <Cell verticalAlign='bottom'>
+      <Cell verticalAlign='top'>
         {rendered_token}
       </Cell>
     </Row>

@@ -16,8 +16,6 @@ interface Contracts {
 }
 interface State {
   contracts: Contracts,
-  initialized: boolean,
-  initialize: (contractAddress: string[]) => void
   setBalances: (balances: torii.TokenBalance[]) => void;
   updateBalance: (balance: torii.TokenBalance) => void;
   getBalance: (contractAddress: BigNumberish, accountAddress: BigNumberish) => bigint | undefined | null;
@@ -29,31 +27,22 @@ const createStore = () => {
   }
   return create<State>()(immer((set, get) => ({
     contracts: {},
-    initialized: false,
-    initialize: (contractAddress: string[]) => {
-      set((state: State) => ({
-        contracts: {
-          ...contractAddress.reduce((acc, contract) => {
-            acc[contract] = {}
-            return acc
-          }, {} as Contracts),
-        },
-        initialized: true,
-      }))
-    },
     setBalances: (balances: torii.TokenBalance[]) => {
-      // console.log("coinStore() SET:", balances)
+      console.log("coinStore() SET:", balances)
       set((state: State) => {
         // insert if not exists
         balances.forEach((balance) => {
           const _contract = bigintToHex(balance.contract_address)
           const _owner = bigintToHex(balance.account_address)
+          if (!state.contracts[_contract]) {
+            state.contracts[_contract] = {}
+          }
           state.contracts[_contract][_owner] = _parseBalance(balance)
         })
       });
     },
     updateBalance: (balance: torii.TokenBalance) => {
-      throw new Error('coinStore.updateBalance() not implemented')
+      console.log('coinStore() UPDATE:', balance)
       // set((state: State) => {
       //   // insert ONLY if exists
       //   const _contract = bigintToHex(balance.contract_address)
@@ -64,10 +53,8 @@ const createStore = () => {
       // });
     },
     getBalance: (contractAddress: BigNumberish, accountAddress: BigNumberish): bigint | undefined | null => {
-      if (!get().initialized) return undefined
       const _contractAddress = bigintToHex(contractAddress)
       const balances = get().contracts[_contractAddress]
-      // if (!balances) throw new Error(`coinStore() contract not initialized: ${_contractAddress}`)
       if (!balances) return undefined
       return balances[bigintToHex(accountAddress)] ?? null
     },
@@ -91,17 +78,11 @@ export const useCoinBalance = (
   const balance_eth = useMemo(() => (balance != null ? weiToEth(balance) : balance), [balance])
   // console.log(`BALANCE`, (bigintToHex(contractAddress)), (bigintToHex(ownerAddress)), balance)
 
-  const supply = 1;
-  const contracts = useMemo(() => (isPositiveBigint(contractAddress) ? [bigintToHex(contractAddress)] : []), [contractAddress])
-  const accounts = useMemo(() => (isPositiveBigint(accountAddress) ? [bigintToHex(accountAddress)] : []), [accountAddress])
   const { isLoading } = useSdkTokenBalancesGet({
-    contracts,
-    accounts,
+    contract: bigintToHex(contractAddress || 0n),
+    account: bigintToHex(accountAddress || 0n),
     setBalances: state.setBalances,
-    enabled: (contracts.length > 0 && accounts.length > 0 && supply > 0
-      // && balance === null
-    ),
-    forceCounter: supply,
+    enabled: (balance == null),
   })
 
   return {

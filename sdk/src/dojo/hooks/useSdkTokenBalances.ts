@@ -18,18 +18,14 @@ type UseSdkGetResult = {
 }
 
 export type UseSdkTokenBalancesGetProps = {
-  contracts: string[]
-  accounts?: string[]
+  contract: string
+  account: string
   tokenIds?: string[]
   enabled?: boolean
   setBalances: (balances: torii.TokenBalance[]) => void
-  forceCounter?: number
-  retryInterval?: number
 }
 export type UseSdkTokenBalancesSubProps = {
   contracts: string[]
-  accounts?: string[]
-  tokenIds?: string[]
   enabled?: boolean
   updateBalance: (balance: torii.TokenBalance) => void
 }
@@ -38,13 +34,11 @@ export type UseSdkTokenBalancesSubProps = {
 // TokenBalances get/subscribe
 //
 export const useSdkTokenBalancesGet = ({
-  contracts,
-  accounts,
+  contract,
+  account,
   tokenIds,
   setBalances,
   enabled = true,
-  forceCounter = 0,
-  retryInterval = 0,
 }: UseSdkTokenBalancesGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
@@ -52,35 +46,41 @@ export const useSdkTokenBalancesGet = ({
   useEffect(() => {
     let _mounted = true
     const _get = async () => {
-      // console.log("useSdkTokenBalancesGet() GET........", enabled, forceCounter, retryInterval, contracts, accounts)
+      // console.log("useSdkTokenBalancesGet() GET........", enabled, contract, account)
       setIsLoading(true)
       await sdk.getTokenBalances(
-        contracts,
-        accounts ?? [],
+        [contract],
+        account ? [account] : [],
         tokenIds?.map(a => toToriiTokenId(a)) ?? []
       ).then((balances: torii.TokenBalance[]) => {
         if (!_mounted) return
         // console.log("useSdkTokenBalancesGet() GOT:", balances)
         if (balances.length > 0) {
           setBalances(balances)
-          setIsLoading(false)
-        } else if (retryInterval > 0) {
-          console.log("useSdkTokenBalancesGet() retry...", retryInterval)
-          setTimeout(() => _get(), retryInterval)
+        } else if (!tokenIds) {
+          // initialize zero balance
+          const _balances = [{
+            contract_address: contract,
+            account_address: account,
+            token_id: '0x0',
+            balance: '0x0',
+          }]
+          setBalances(_balances)
         }
       }).catch((error: Error) => {
         if (!_mounted) return
-        console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contracts, accounts)
+        console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contract, account)
+      }).finally(() => {
         setIsLoading(false)
       })
       // console.log("useSdkTokenBalancesGet() done!")
     }
     // get...
-    if (sdk && enabled) _get()
+    if (sdk && enabled && isPositiveBigint(contract) && isPositiveBigint(account)) _get()
     return () => {
       _mounted = false
     }
-  }, [sdk, enabled, contracts, accounts, tokenIds, forceCounter, retryInterval])
+  }, [sdk, enabled, contract, account, tokenIds])
 
   return {
     isLoading,
@@ -89,8 +89,6 @@ export const useSdkTokenBalancesGet = ({
 
 export const useSdkTokenBalancesSub = ({
   contracts,
-  accounts,
-  tokenIds,
   updateBalance,
   enabled = true,
 }: UseSdkTokenBalancesSubProps): UseSdkGetResult => {
@@ -99,11 +97,11 @@ export const useSdkTokenBalancesSub = ({
   useEffect(() => {
     let _subscription: torii.Subscription = undefined;
     const _subscribe = () => {
-      console.log(`useSdkTokenBalancesSub() SUBSCRIBE......`, contracts, accounts)
+      console.log(`useSdkTokenBalancesSub() SUBSCRIBE......`, contracts)
       _subscription = sdk.onTokenBalanceUpdated(
         contracts,
-        accounts ?? [],
-        tokenIds?.map(a => toToriiTokenId(a)) ?? [],
+        [],
+        [],
         (balance: torii.TokenBalance) => {
           console.log("useSdkTokenBalancesSub() SUB:", balance);
           if (isPositiveBigint(balance.contract_address)) {
@@ -113,13 +111,13 @@ export const useSdkTokenBalancesSub = ({
       )
     };
     // subscribe
-    if (sdk && enabled) _subscribe()
+    if (sdk && enabled && contracts.length > 0) _subscribe()
     // unsubscribe
     return () => {
       _subscription?.cancel()
       _subscription = undefined
     }
-  }, [sdk, enabled, contracts, accounts, tokenIds])
+  }, [sdk, enabled, contracts])
 
   return {
     isLoading: false,

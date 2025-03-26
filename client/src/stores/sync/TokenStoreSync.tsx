@@ -57,16 +57,6 @@ export function TokenStoreSync() {
     bigintToHex(foolsContractAddress),
   ], [lordsContractAddress, fameContractAddress, foolsContractAddress])
 
-  // initialize stores
-  const [initialized, setInitialized] = useState(false)
-  useEffect(() => {
-    if (!initialized && token_contracts.length > 0 && coin_contracts.length > 0) {
-      token_state.initialize(token_contracts);
-      coin_state.initialize(coin_contracts);
-      setInitialized(true)
-    }
-  }, [initialized, token_contracts, coin_contracts])
-
   // subscribe for any updates
   const mounted = useMounted()
   const contracts = useMemo(() => [
@@ -84,7 +74,7 @@ export function TokenStoreSync() {
         coin_state.updateBalance(balance)
       }
     },
-    enabled: (mounted && initialized),
+    enabled: (mounted),
   })
 
   // useEffect(() => console.log("TokenStoreSync() token_state =>", token_state.contracts), [token_state.contracts])
