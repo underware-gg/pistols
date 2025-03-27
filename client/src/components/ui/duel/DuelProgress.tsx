@@ -12,6 +12,7 @@ import CommitPacesModal from '/src/components/modals/CommitPacesModal'
 export default function DuelProgress({
   isA = false,
   isB = false,
+  swapSides = false,
   name,
   duelId,
   duelStage,
@@ -23,7 +24,13 @@ export default function DuelProgress({
 }) {
   const { gameImpl } = useThreeJsContext()
   const { round1 } = useDuel(duelId)
-  const round1Moves = useMemo(() => (isA ? round1?.moves_a : round1?.moves_b), [isA, round1])
+  const round1Moves = useMemo(() => {
+    if (swapSides) {
+      return isA ? round1?.moves_b : round1?.moves_a;
+    } else {
+      return isA ? round1?.moves_a : round1?.moves_b;
+    }
+  }, [isA, round1, swapSides])
 
   const duelProgressRef = useRef(null)
 

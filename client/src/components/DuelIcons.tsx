@@ -7,8 +7,9 @@ import { BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
 import { bigintEquals } from '@underware/pistols-sdk/utils'
 import { EMOJI } from '/src/data/messages'
 import { BigNumberish } from 'starknet'
-import { useDuelistCallToAction, useDuelCallToAction } from '/src/stores/eventsStore'
+import { useDuelCallToAction } from '/src/stores/eventsStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { useIsMyDuelist } from '../hooks/useIsYou'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -27,7 +28,7 @@ export function useDuelIcons({
     round1, duelStage, completedStagesA, completedStagesB, turnA, turnB,
   } = useDuel(duelId)
   const isCallToAction = useDuelCallToAction(duelId)
-  const isDuelistCalledToAction = useDuelistCallToAction(duelistId)
+  const isMyDuelist = useIsMyDuelist(duelistId)
 
   const isA = useMemo(() => bigintEquals(duelistId, duelistIdA), [duelistId, duelistIdA])
   const isB = useMemo(() => bigintEquals(duelistId, duelistIdB), [duelistId, duelistIdB])
@@ -55,7 +56,7 @@ export function useDuelIcons({
     // Required Action...
     if (isFinished) { 
       if (isCallToAction) {
-        if (isDuelistCalledToAction) {
+        if (isMyDuelist) {
           icons.push(<LoadingIcon key='finished' size={iconSize} className='Brightest' />)
         } else {
           icons.push(<EmojiIcon key='finished' emoji={EMOJI.IDLE} size={iconSize} />)

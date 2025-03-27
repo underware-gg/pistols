@@ -18,6 +18,7 @@ import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '
 import { useDuelCallToAction } from '../stores/eventsStore'
 import { useFameBalanceDuelist } from '../hooks/useFame'
 import { usePlayer } from '../stores/playerStore'
+import { useIsMyAccount } from '../hooks/useIsYou'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -160,9 +161,36 @@ function DuelItem({
   const { name: playerNameB } = usePlayer(duelistAddressB)
   const { isAlive: isAliveA } = useFameBalanceDuelist(duelistIdA)
   const { isAlive: isAliveB } = useFameBalanceDuelist(duelistIdB)
+  const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
+  const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
 
-  const winnerIsA = useMemo(() => (winner == 1), [winner])
-  const winnerIsB = useMemo(() => (winner == 2), [winner])
+  const [leftDuelistId, leftDuelistAddress, leftPlayerName] = useMemo(() => {
+    if (isYouB) {
+      return [duelistIdB, duelistAddressB, playerNameB]
+    }
+    return [duelistIdA, duelistAddressA, playerNameA]
+  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB])
+  
+  const [rightDuelistId, rightDuelistAddress, rightPlayerName] = useMemo(() => {
+    if (isYouB) {
+      return [duelistIdA, duelistAddressA, playerNameA]
+    }
+    return [duelistIdB, duelistAddressB, playerNameB]
+  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB])
+
+  const winnerIsLeft = useMemo(() => {
+    if (isYouB) {
+      return winner == 2
+    }
+    return winner == 1
+  }, [winner, isYouB])
+  
+  const winnerIsRight = useMemo(() => {
+    if (isYouB) {
+      return winner == 1
+    }
+    return winner == 2
+  }, [winner, isYouB])
 
   const { dispatchSelectDuel } = usePistolsContext()
   const isCallToAction = useDuelCallToAction(duelId)
@@ -187,12 +215,12 @@ function DuelItem({
         <div style={{ display: 'flex', alignItems: 'center', gap: aspectWidth(0.8) }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <ProfilePic profilePic={0} small />
-            <PositiveResult positive={winnerIsA} negative={winnerIsB} warning={isDraw} canceled={isCanceled || isExpired}>
-              <span className='BreakWord'>{playerNameA}</span>
+            <PositiveResult positive={winnerIsLeft} negative={winnerIsRight} warning={isDraw} canceled={isCanceled || isExpired}>
+              <span className='BreakWord'>{leftPlayerName}</span>
             </PositiveResult>
           </div>
           <div style={{ alignItems: 'center' }}>
-            <DuelIconsAsRow duelId={duelId} duelistId={duelistIdA} size={null} />
+            <DuelIconsAsRow duelId={duelId} duelistId={leftDuelistId} size={null} />
           </div>
         </div>
       </Cell>
@@ -203,7 +231,7 @@ function DuelItem({
           {state == constants.ChallengeState.Resolved ?
             <>
               <PositiveResult positive={true}>
-                <span className='BreakWord'>{winnerIsA ? playerNameA : playerNameB}</span>
+                <span className='BreakWord'>{winnerIsLeft ? leftPlayerName : rightPlayerName}</span>
               </PositiveResult>
             </>
             :
@@ -220,12 +248,12 @@ function DuelItem({
         <div style={{ display: 'flex', alignItems: 'center', gap: aspectWidth(0.8), flexDirection: 'row-reverse' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <ProfilePic profilePic={0} small />
-            <PositiveResult positive={winnerIsB} negative={winnerIsA} warning={isDraw} canceled={isCanceled || isExpired}>
-              <span className='BreakWord'>{playerNameB}</span>
+            <PositiveResult positive={winnerIsRight} negative={winnerIsLeft} warning={isDraw} canceled={isCanceled || isExpired}>
+              <span className='BreakWord'>{rightPlayerName}</span>
             </PositiveResult>
           </div>
           <div style={{ alignItems: 'center' }}>
-            <DuelIconsAsRow duelId={duelId} duelistId={duelistIdB} size={null} />
+            <DuelIconsAsRow duelId={duelId} duelistId={rightDuelistId} size={null} />
           </div>
         </div>
       </Cell>

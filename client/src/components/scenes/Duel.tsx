@@ -63,6 +63,21 @@ export default function Duel({
   const isYouA = useIsMyDuelist(duelistIdA)
   const isYouB = useIsMyDuelist(duelistIdB)
 
+  // Determine if we need to swap sides to put the player on the left
+  const swapSides = isYouB
+
+  // Get the correct duelist IDs, names, etc. based on whether we need to swap
+  const leftDuelistId = swapSides ? duelistIdB : duelistIdA
+  const rightDuelistId = swapSides ? duelistIdA : duelistIdB
+  const leftDuelistAddress = swapSides ? duelistAddressB : duelistAddressA
+  const rightDuelistAddress = swapSides ? duelistAddressA : duelistAddressB
+  const leftName = swapSides ? nameB : nameA
+  const rightName = swapSides ? nameA : nameB
+  const leftCharacterType = swapSides ? characterTypeB : characterTypeA
+  const rightCharacterType = swapSides ? characterTypeA : characterTypeB
+  const isLeftYou = swapSides ? isYouB : isYouA
+  const isRightYou = swapSides ? isYouA : isYouB
+
   // clear required action flag
   const { account } = useAccount()
   const { game } = useDojoSystemCalls()
@@ -82,6 +97,12 @@ export default function Duel({
     completedStagesA, completedStagesB,
     canAutoRevealA, canAutoRevealB,
   } = useAnimatedDuel(duelId, duelSceneStarted)
+
+  // Use the correct completed stages and auto reveal flags based on whether we need to swap
+  const leftCompletedStages = swapSides ? completedStagesB : completedStagesA
+  const rightCompletedStages = swapSides ? completedStagesA : completedStagesB
+  const leftCanAutoReveal = swapSides ? canAutoRevealB : canAutoRevealA
+  const rightCanAutoReveal = swapSides ? canAutoRevealA : canAutoRevealB
 
   const [ statsA, setStatsA ] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined })
   const [ statsB, setStatsB ] = useState<DuelistState>({ damage: 0, hitChance: 0, health: 3, shotPaces: undefined, dodgePaces: undefined })
@@ -116,16 +137,16 @@ export default function Duel({
 
   useEffect(() => {
     if (gameImpl && mounted && !duelSceneStarted && duelistAddressA && duelistAddressB) {
-      gameImpl.setDuelData(Number(duelId), Number(duelistIdA), Number(duelistIdB))
+      gameImpl.setDuelData(Number(duelId), Number(leftDuelistId), Number(rightDuelistId))
       gameImpl.resetDuelScene()
       setDuelSceneStarted(true)
       dispatchAnimated(AnimationState.None)
     }
-  }, [gameImpl, mounted, duelSceneStarted, duelistAddressA, duelistAddressB])
+  }, [gameImpl, mounted, duelSceneStarted, duelistAddressA, duelistAddressB, leftDuelistId, rightDuelistId])
 
   useEffect(() => {
     if (gameImpl && mounted && nameA && nameB && characterTypeA && characterTypeB && !dataSet) {
-      gameImpl.startDuelWithPlayers(nameA, characterTypeA, isYouA, isYouB, nameB, characterTypeB)
+      gameImpl.startDuelWithPlayers(leftName, leftCharacterType, isLeftYou, isRightYou, rightName, rightCharacterType)
       
       const timer = setTimeout(() => {
         setDataSet(true)
@@ -133,7 +154,7 @@ export default function Duel({
       
       return () => clearTimeout(timer)
     }
-  }, [gameImpl, mounted, characterTypeA, characterTypeB, nameA, nameB, isYouA, isYouB, dataSet])
+  }, [gameImpl, mounted, characterTypeA, characterTypeB, nameA, nameB, leftName, rightName, leftCharacterType, rightCharacterType, isLeftYou, isRightYou, dataSet])
 
   // setup grass animation 
   //TODO change due new timeouts...
@@ -170,19 +191,20 @@ export default function Duel({
     if (!cardRef.current) return
 
     setTimeout(() => {
-      if(completedStagesA[DuelStage.Round1Reveal] && completedStagesB[DuelStage.Round1Reveal]) return
-      if (!isYouA) {
-        if (completedStagesA[DuelStage.Round1Commit] && !hasSpawnedCardsA.current) {
+      if(leftCompletedStages[DuelStage.Round1Reveal] && rightCompletedStages[DuelStage.Round1Reveal]) return
+      
+      if (!isLeftYou) {
+        if (leftCompletedStages[DuelStage.Round1Commit] && !hasSpawnedCardsA.current) {
           cardRef.current?.spawnCards('A', { fire: constants.PacesCard.None, dodge: constants.PacesCard.None, blade: constants.BladesCard.None, tactics: constants.TacticsCard.None })
         }
       }
-      if (!isYouB) {
-        if (completedStagesB[DuelStage.Round1Commit] && !hasSpawnedCardsB.current) {
+      if (!isRightYou) {
+        if (rightCompletedStages[DuelStage.Round1Commit] && !hasSpawnedCardsB.current) {
           cardRef.current?.spawnCards('B', { fire: constants.PacesCard.None, dodge: constants.PacesCard.None, blade: constants.BladesCard.None, tactics: constants.TacticsCard.None })
         }
       }
     }, 1000);
-  }, [completedStagesA, completedStagesB, isYouA, isYouB])
+  }, [leftCompletedStages, rightCompletedStages, isLeftYou, isRightYou, swapSides])
 
   useEffect(() => {
     return () => {
@@ -191,6 +213,7 @@ export default function Duel({
   }, [])
   
   useEffect(() => {
+    console.log('duelProgress', duelProgress)
     if (duelProgress) {
 
       resetEverything()
@@ -205,35 +228,45 @@ export default function Duel({
       cardRef.current?.setAllEnvCards(envCardsList)
 
       setTimeout(() => {
+        // Get the correct hands based on swapSides
+        const leftHand = swapSides ? duelProgress.hand_b : duelProgress.hand_a
+        const rightHand = swapSides ? duelProgress.hand_a : duelProgress.hand_b
+
         if (!hasSpawnedCardsA.current) {
           hasSpawnedCardsA.current = true
-          cardRef.current?.spawnCards('A', { fire: duelProgress.hand_a.card_fire, dodge: duelProgress.hand_a.card_dodge, blade: duelProgress.hand_a.card_blades, tactics: duelProgress.hand_a.card_tactics })
+          cardRef.current?.spawnCards('A', { fire: leftHand.card_fire, dodge: leftHand.card_dodge, blade: leftHand.card_blades, tactics: leftHand.card_tactics })
         }
         if (!hasSpawnedCardsB.current) {
           hasSpawnedCardsB.current = true
-          cardRef.current?.spawnCards('B', { fire: duelProgress.hand_b.card_fire, dodge: duelProgress.hand_b.card_dodge, blade: duelProgress.hand_b.card_blades, tactics: duelProgress.hand_b.card_tactics })
+          cardRef.current?.spawnCards('B', { fire: rightHand.card_fire, dodge: rightHand.card_dodge, blade: rightHand.card_blades, tactics: rightHand.card_tactics })
         }
       }, tutorial === DuelTutorialLevel.SIMPLE ? 0 : 1500)
 
       setTimeout(() => {
         const step = duelProgress.steps[currentStep.current]
+        
+        // Get the correct states and cards based on swapSides
+        const leftState = swapSides ? step.state_b : step.state_a
+        const rightState = swapSides ? step.state_a : step.state_b
+        const leftCard = swapSides ? step.card_b : step.card_a
+        const rightCard = swapSides ? step.card_a : step.card_b
 
         setStatsA((prevValue) => {
           return { 
-            damage: Number(step.state_a.damage),
-            hitChance: Number(step.state_a.chances),
-            health: Number(step.state_a.health),
-            shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_a.fire ? currentStep.current : undefined),
-            dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_a.dodge ? currentStep.current : undefined),
+            damage: Number(leftState.damage),
+            hitChance: Number(leftState.chances),
+            health: Number(leftState.health),
+            shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (leftCard.fire ? currentStep.current : undefined),
+            dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (leftCard.dodge ? currentStep.current : undefined),
           }
         })
         setStatsB((prevValue) => {
           return { 
-            damage: Number(step.state_b.damage),
-            hitChance: Number(step.state_b.chances),
-            health: Number(step.state_b.health),
-            shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_b.fire ? currentStep.current : undefined),
-            dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_b.dodge ? currentStep.current : undefined),
+            damage: Number(rightState.damage),
+            hitChance: Number(rightState.chances),
+            health: Number(rightState.health),
+            shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (rightCard.fire ? currentStep.current : undefined),
+            dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (rightCard.dodge ? currentStep.current : undefined),
           }
         })
       }, tutorial === DuelTutorialLevel.SIMPLE ? 0 : 2500);
@@ -241,8 +274,8 @@ export default function Duel({
       setTimeout(() => {
         gameImpl?.hideDialogs()
 
-        cardRef.current?.revealCard("A", DuelistCardType.TACTICS, speedRef.current)
-        cardRef.current?.revealCard("B", DuelistCardType.TACTICS, speedRef.current)
+        cardRef.current?.revealCard('A', DuelistCardType.TACTICS, speedRef.current)
+        cardRef.current?.revealCard('B', DuelistCardType.TACTICS, speedRef.current)
 
         if (isPlayingRef.current) {
           nextStepCallback.current = setTimeout(() => {
@@ -256,7 +289,7 @@ export default function Duel({
     return () => {
         hasUnmounted.current = true
     };
-  }, [duelProgress, triggerReset, tutorial])
+  }, [duelProgress, triggerReset, tutorial, swapSides])
 
   const playStep = () => {
     currentStep.current += 1
@@ -274,36 +307,42 @@ export default function Duel({
     let revealCardsA = [];
     let revealCardsB = [];
     
-    // Reveal all cards in hand A
-    if (step.card_a.fire) {
+    // Get the correct cards and states based on swapSides
+    const leftCard = swapSides ? step.card_b : step.card_a
+    const rightCard = swapSides ? step.card_a : step.card_b
+    const leftState = swapSides ? step.state_b : step.state_a
+    const rightState = swapSides ? step.state_a : step.state_b
+    
+    // Reveal all cards in left hand
+    if (leftCard.fire) {
       shouldDoblePause = true;
       revealCardsA.push({ type: DuelistCardType.FIRE, delay: Constants.DRAW_CARD_BASE_DURATION + 200 });
     }
-    if (step.card_a.dodge) {
+    if (leftCard.dodge) {
       shouldDoblePause = true;
       revealCardsA.push({ type: DuelistCardType.DODGE, delay: Constants.DRAW_CARD_BASE_DURATION + 200 });
     }
-    if (step.card_a.blades) {
+    if (leftCard.blades) {
       revealCardsA.push({ type: DuelistCardType.BLADE, delay: 1000 });
     }
 
-    // Reveal all cards in hand B
-    if (step.card_b.fire) {
+    // Reveal all cards in right hand
+    if (rightCard.fire) {
       shouldDoblePause = true;
       revealCardsB.push({ type: DuelistCardType.FIRE, delay: Constants.DRAW_CARD_BASE_DURATION + 200 });
     }
-    if (step.card_b.dodge) {
+    if (rightCard.dodge) {
       shouldDoblePause = true;
       revealCardsB.push({ type: DuelistCardType.DODGE, delay: Constants.DRAW_CARD_BASE_DURATION + 200 });
     }
-    if (step.card_b.blades) {
+    if (rightCard.blades) {
       revealCardsB.push({ type: DuelistCardType.BLADE, delay: 1000 });
     }
 
     if (tutorial !== DuelTutorialLevel.SIMPLE) {
       cardRevealTimeout.current = setTimeout(() => {
-        revealCardsA.forEach(card => cardRef.current?.revealCard("A", card.type, speedRef.current, step.state_a.health > 0));
-        revealCardsB.forEach(card => cardRef.current?.revealCard("B", card.type, speedRef.current, step.state_b.health > 0));
+        revealCardsA.forEach(card => cardRef.current?.revealCard('A', card.type, speedRef.current, leftState.health > 0));
+        revealCardsB.forEach(card => cardRef.current?.revealCard('B', card.type, speedRef.current, rightState.health > 0));
       }, Math.max(...[...revealCardsA, ...revealCardsB].map(card => card.delay || 0), 0) / speedRef.current);
     }
 
@@ -312,27 +351,27 @@ export default function Duel({
 
     setStatsA((prevValue) => {
       newStatsA = { 
-        damage: Number(step.state_a.damage),
-        hitChance: Number(step.state_a.chances),
-        health: Number(step.state_a.health),
-        shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_a.fire ? currentStep.current : undefined),
-        dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_a.dodge ? currentStep.current : undefined),
+        damage: Number(leftState.damage),
+        hitChance: Number(leftState.chances),
+        health: Number(leftState.health),
+        shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (leftCard.fire ? currentStep.current : undefined),
+        dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (leftCard.dodge ? currentStep.current : undefined),
       }
       return newStatsA
     })
     setStatsB((prevValue) => {
       newStatsB = { 
-        damage: Number(step.state_b.damage),
-        hitChance: Number(step.state_b.chances),
-        health: Number(step.state_b.health),
-        shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (step.card_b.fire ? currentStep.current : undefined),
-        dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (step.card_b.dodge ? currentStep.current : undefined),
+        damage: Number(rightState.damage),
+        hitChance: Number(rightState.chances),
+        health: Number(rightState.health),
+        shotPaces: prevValue.shotPaces ? prevValue.shotPaces : (rightCard.fire ? currentStep.current : undefined),
+        dodgePaces: prevValue.dodgePaces ? prevValue.dodgePaces : (rightCard.dodge ? currentStep.current : undefined),
       }
       return newStatsB
     })
 
-    let hasHealthChangedA = step.state_a.health < 3;
-    let hasHealthChangedB = step.state_b.health < 3;
+    let hasHealthChangedA = leftState.health < 3;
+    let hasHealthChangedB = rightState.health < 3;
 
     if (tutorial !== DuelTutorialLevel.SIMPLE && currentStep.current > 1 && step.card_env == constants.EnvCard.None) {
       gameBladeAnimationTimeout.current = setTimeout(() => {
@@ -350,7 +389,10 @@ export default function Duel({
       if (step.card_env != constants.EnvCard.None) {
         gameImpl?.animatePace(currentStep.current, newStatsA, newStatsB)
       } else {
-        gameImpl?.animateActions(Action[step.card_a.blades], Action[step.card_b.blades], newStatsA?.health, newStatsB?.health)
+        // Get the correct blade actions based on swapSides
+        const leftBlade = swapSides ? Action[step.card_b.blades] : Action[step.card_a.blades]
+        const rightBlade = swapSides ? Action[step.card_a.blades] : Action[step.card_b.blades]
+        gameImpl?.animateActions(leftBlade, rightBlade, newStatsA?.health, newStatsB?.health)
       }
     }, tutorial === DuelTutorialLevel.SIMPLE ? 500 : step.card_env != constants.EnvCard.None ? (timeDelay / speedRef.current) : 3000 / speedRef.current);
 
@@ -423,13 +465,14 @@ export default function Duel({
     <>
       <DuelProgress 
         isA
-        name={nameA}
+        swapSides={swapSides}
+        name={leftName}
         duelId={duelId}
         duelStage={duelStage}
-        duelistId={duelistIdA}
-        completedStages={completedStagesA}
-        canAutoReveal={canAutoRevealA}
-        isYou={isYouA}
+        duelistId={leftDuelistId}
+        completedStages={leftCompletedStages}
+        canAutoReveal={leftCanAutoReveal}
+        isYou={isLeftYou}
         revealCards={(cards: DuelistHand) => {
           cardRef.current?.spawnCards('A', cards)
           hasSpawnedCardsA.current = true
@@ -437,20 +480,21 @@ export default function Duel({
       />
       <DuelProgress
         isB
-        name={nameB}
+        swapSides={swapSides}
+        name={rightName}
         duelId={duelId}
         duelStage={duelStage}
-        duelistId={duelistIdB}
-        completedStages={completedStagesB}
-        canAutoReveal={canAutoRevealB}
-        isYou={isYouB}
+        duelistId={rightDuelistId}
+        completedStages={rightCompletedStages}
+        canAutoReveal={rightCanAutoReveal}
+        isYou={isRightYou}
         revealCards={(cards: DuelistHand) => {
           cardRef.current?.spawnCards('B', cards)
           hasSpawnedCardsB.current = true
         }}
       />
 
-      <Cards duelId={duelId} ref={cardRef} tutorialLevel={tutorial} />
+      <Cards duelistIdA={leftDuelistId} duelistIdB={rightDuelistId} ref={cardRef} tutorialLevel={tutorial} />
       
       <DuelHeader duelId={duelId} tutorialLevel={tutorial} />
 
@@ -458,18 +502,18 @@ export default function Duel({
 
       <div>
         <div className='DuelProfileA NoMouse NoDrag'>
-          <DuelProfile floated='left' playerAddress={duelistAddressA} duelistId={duelistIdA} isTutorial={isTutorial} />
+          <DuelProfile floated='left' playerAddress={leftDuelistAddress} duelistId={leftDuelistId} isTutorial={isTutorial} />
         </div>
         <div className='DuelistProfileA NoMouse NoDrag'>
-          <DuelistProfile floated='left' duelistId={duelistIdA} damage={statsA.damage} hitChance={statsA.hitChance} speedFactor={duelSpeedFactor} tutorialLevel={tutorial} />
+          <DuelistProfile floated='left' duelistId={leftDuelistId} damage={statsA.damage} hitChance={statsA.hitChance} speedFactor={duelSpeedFactor} tutorialLevel={tutorial} />
         </div>
       </div>
       <div>
         <div className='DuelProfileB NoMouse NoDrag' >
-          <DuelProfile floated='right' playerAddress={duelistAddressB} duelistId={duelistIdB} isTutorial={isTutorial} />
+          <DuelProfile floated='right' playerAddress={rightDuelistAddress} duelistId={rightDuelistId} isTutorial={isTutorial} />
         </div>
         <div className='DuelistProfileB NoMouse NoDrag' >
-          <DuelistProfile floated='right' duelistId={duelistIdB} damage={statsB.damage} hitChance={statsB.hitChance} speedFactor={duelSpeedFactor} tutorialLevel={tutorial} />
+          <DuelistProfile floated='right' duelistId={rightDuelistId} damage={statsB.damage} hitChance={statsB.hitChance} speedFactor={duelSpeedFactor} tutorialLevel={tutorial} />
         </div>
       </div>
 
