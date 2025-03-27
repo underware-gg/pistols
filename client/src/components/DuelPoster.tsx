@@ -284,7 +284,13 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     isHighlightable={true}
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
-                    onClick={() => dispatchSelectDuelistId(duelistIdA)}
+                    onClick={() => {
+                      if (duelistIdA && state != constants.ChallengeState.Awaiting) {
+                        dispatchSelectDuelistId(duelistIdA)
+                      } else {
+                        duelistSelectOpener.open()
+                      }
+                    }}
                   />
                 ) : null}
               </div>
@@ -340,7 +346,13 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     isHighlightable={true}
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
-                    onClick={() => duelistSelectOpener.open()}
+                    onClick={() => {
+                      if (duelistIdB && state != constants.ChallengeState.Awaiting) {
+                        dispatchSelectDuelistId(duelistIdB)
+                      } else {
+                        duelistSelectOpener.open()
+                      }
+                    }}
                   />
                 ) : null}
               </div>
