@@ -9,7 +9,6 @@ import { BigNumberish } from 'starknet'
 import { Button } from 'semantic-ui-react'
 import { useDuelist, useDuellingDuelists } from '/src/stores/duelistStore'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { useFameBalanceDuelist } from '/src/hooks/useFame'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { Opener } from '/src/hooks/useOpener'
 

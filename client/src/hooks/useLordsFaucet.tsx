@@ -1,10 +1,11 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Account, AccountInterface } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
-import { useLordsContract } from 'src/dojo/hooks/useLords'
-import { bigintToU256, ethToWei, execute } from 'src/utils/starknet/starknet'
-import { bigintToHex } from 'src/utils/misc/types'
+import { useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { bigintToU256, ethToWei, execute } from '@underware/pistols-sdk/utils/starknet'
+import { bigintToHex } from '@underware/pistols-sdk/utils'
+import { useLordsContract } from '/src/hooks/useTokenContract'
+import { useLordsBalance } from '../stores/coinStore'
 
 export interface FaucetExecuteResult {
   transaction_hash: string
@@ -87,3 +88,22 @@ export const useLordsFaucet = (): FaucetInterface => {
   }
 }
 
+//
+// mint mock lords if balance is zero
+// (testnets only)
+//
+
+export const useMintMockLords = () => {
+  const { account, address } = useAccount()
+  const { balance, isLoading } = useLordsBalance(address)
+  const { mintLords, hasFaucet } = useLordsFaucet()
+
+  useEffect(() => {
+    // minted new! go to Game...
+    if (account && isLoading === false && balance === 0n && hasFaucet && mintLords) {
+      mintLords(account)
+    }
+  }, [account, isLoading, balance, hasFaucet, mintLords])
+
+  return (<></>)
+}

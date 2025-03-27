@@ -3,11 +3,11 @@ import { BigNumberish } from 'starknet'
 import { useDuelist } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
-import { useFameBalanceDuelist } from '/src/hooks/useFame'
+import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { ArchetypeNames } from '/src/utils/pistols'
-import { FameBalanceDuelist, FameProgressBar } from '/src/components/account/LordsBalance'
+import { FameLivesDuelist, FameProgressBar } from '/src/components/account/LordsBalance'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { EmojiIcon } from '/src/components/ui/Icons'
 import { EMOJI } from '/src/data/messages'
@@ -38,7 +38,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   
   const { nameAndId: name, profilePic, profileType, isInAction, status } = useDuelist(props.duelistId)
-  const {isAlive} = useFameBalanceDuelist(props.duelistId)
+  const {isAlive} = useDuelistFameBalance(props.duelistId)
 
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
@@ -184,7 +184,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
             {props.isSmall ? (
               <>
                 <div className="duelist-fame">
-                  <FameBalanceDuelist duelistId={props.duelistId} />
+                  <FameLivesDuelist duelistId={props.duelistId} />
                 </div>
                 <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} height={props.height * 0.1} hideValue />
                 <div className="duelist-name small" data-contentlength={_nameLength(playerName)}>{playerName}</div>
@@ -192,7 +192,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
             ) : (
               <>
                 <div className="duelist-fame">
-                  <FameBalanceDuelist duelistId={props.duelistId} size='huge' />
+                  <FameLivesDuelist duelistId={props.duelistId} size='huge' />
                 </div>
                 <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} />
                 

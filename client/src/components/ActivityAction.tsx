@@ -4,7 +4,7 @@ import { BigNumberish } from 'starknet'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { useDuelist } from '/src/stores/duelistStore'
 import { usePlayer } from '/src/stores/playerStore'
-import { useFameBalanceDuelist } from '/src/hooks/useFame'
+import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useCallToActions } from '/src/stores/eventsStore'
 import { Icon, BookmarkIcon, EmojiIcon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink } from '/src/components/Links'
@@ -91,7 +91,7 @@ const ActionItem = ({
   isReply: boolean
 }) => {
   const { isInactive } = useDuelist(duelistId)
-  const { lives, isLoading } = useFameBalanceDuelist(duelistId)
+  const { lives, isLoading } = useDuelistFameBalance(duelistId)
 
   // const { duelistContractAddress } = useDuelistTokenContract()
   // const { publish } = usePlayerBookmarkSignedMessage(duelistContractAddress, duelistId, !isBookmarked)

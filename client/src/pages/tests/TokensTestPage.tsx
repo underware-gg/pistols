@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { Button, Container, Icon, Table } from 'semantic-ui-react'
 import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
-import { useTokenIdsOfPlayer, useTokenIdsByAccount } from '/src/stores/tokenStore'
+import { useTokenIdsOfPlayer } from '/src/stores/tokenStore'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
@@ -20,7 +20,7 @@ import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useAccount } from '@starknet-react/core'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
-import { LordsBalance } from '/src/components/account/LordsBalance'
+import { FameBalanceDuelist, FameLivesDuelist, LordsBalance } from '/src/components/account/LordsBalance'
 import { usePacksOfPlayer } from '/src/hooks/useTokenPacks'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 
@@ -67,8 +67,8 @@ function Purchases() {
   return (
     <>
       <LordsFaucet />
-      &nbsp;&nbsp;<span className='Code'>(mint LORDS, causes unreachable error)</span>
-      <LordsBalance address={address} size='big' watch />
+      &nbsp;&nbsp;<LordsBalance address={address} size='big' />
+      &nbsp;&nbsp;<span className='Code'>(mint test LORDS, if available)</span>
       <br />
       <Button disabled={!canClaimStarterPack} onClick={() => pack_token.claim_starter_pack(account)}>Claim Starter Pack</Button>
       &nbsp;&nbsp;<span className='Code'>(mint PACK + burn PACK + mint 2 DUELISTS)</span>
@@ -92,12 +92,12 @@ function Tokens() {
       <br />
       <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
       <br />
-      <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists'
-        renderer={(tokenId: bigint) => <DuelistTokenArt duelistId={tokenId} style={_style} />}
+      <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists' hasFame
+        renderer={(tokenId: bigint) => <DuelistTokenArt duelistId={tokenId} />}
       />
       <br />
       <TokenContract contractAddress={duelContractAddress} tokenName='Duels'
-        renderer={(tokenId: bigint) => <DuelTokenArt duelId={tokenId} style={_style} />}
+        renderer={(tokenId: bigint) => <DuelTokenArt duelId={tokenId} />}
       />
     </>
   );
@@ -108,11 +108,13 @@ function TokenContract({
   tokenName,
   attributes = [],
   renderer = null,
+  hasFame = false,
 }: {
   contractAddress: BigNumberish,
   tokenName: string,
   attributes?: string[],
   renderer?: (tokenId: bigint) => React.ReactNode,
+  hasFame?: boolean,
 }) {
   // const { address } = useAccount()
   // const { tokens } = useTokenIdsByAccount(contractAddress, address) // direct get
@@ -128,6 +130,7 @@ function TokenContract({
           cached_metadata={'{}'}
           attributes={attributes}
           rendered_token={renderer?.(tokenId)}
+          hasFame={hasFame}
         />
       )
     })
@@ -168,12 +171,14 @@ function TokenRow({
   cached_metadata,
   attributes = [],
   rendered_token = null,
+  hasFame = false,
 }: {
   contractAddress: BigNumberish,
   tokenId: bigint,
   cached_metadata: string,
   attributes?: string[],
   rendered_token?: React.ReactNode,
+  hasFame?: boolean,
 }) {
   const { id, name, description, image: cached_image, metadata: attr } = useMemo(() => JSON.parse(cached_metadata), [cached_metadata])
   // const img = image.replace('https', 'http')
@@ -181,7 +186,12 @@ function TokenRow({
   return (
     <Row key={tokenId}>
       <Cell verticalAlign='top'>
-        <h3>{bigintToDecimal(tokenId)}</h3>
+        <h1>#{bigintToDecimal(tokenId)}</h1>
+        {hasFame && <>
+          <FameBalanceDuelist duelistId={tokenId} size='huge' />
+          <br />
+          <FameLivesDuelist duelistId={tokenId} size='huge' />
+        </>}
       </Cell>
       <Cell verticalAlign='top'>
         <h3>{name}</h3>

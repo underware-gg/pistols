@@ -1,23 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { ButtonGroup, Grid, SemanticCOLORS, Table } from 'semantic-ui-react'
-import { useSettings } from '/src/hooks/SettingsContext'
 import { useQueryParams } from '/src/stores/queryParamsStore'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { useDuelist } from '/src/stores/duelistStore'
 import { useDuel } from '/src/hooks/useDuel'
 import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
+import { useDuelistFameBalance } from '/src/stores/coinStore'
+import { useDuelCallToAction } from '/src/stores/eventsStore'
+import { usePlayer } from '/src/stores/playerStore'
+import { useGameAspect } from '/src/hooks/useGameAspect'
+import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '/src/utils/pistols'
 import { ProfilePic } from '/src/components/account/ProfilePic'
-import { ProfileName } from '/src/components/account/ProfileDescription'
-import { ChallengeTime } from '/src/components/ChallengeTime'
 import { DuelIconsAsRow } from '/src/components/DuelIcons'
 import { FilterButton } from '/src/components/ui/Buttons'
-import { useGameAspect } from '/src/hooks/useGameAspect'
-import { arrayRemoveValue, bigintEquals } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '/src/utils/pistols'
-import { useDuelCallToAction } from '../stores/eventsStore'
-import { useFameBalanceDuelist } from '../hooks/useFame'
-import { usePlayer } from '../stores/playerStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -158,8 +154,8 @@ function DuelItem({
   } = useDuel(duelId)
   const { name: playerNameA } = usePlayer(duelistAddressA)
   const { name: playerNameB } = usePlayer(duelistAddressB)
-  const { isAlive: isAliveA } = useFameBalanceDuelist(duelistIdA)
-  const { isAlive: isAliveB } = useFameBalanceDuelist(duelistIdB)
+  const { isAlive: isAliveA } = useDuelistFameBalance(duelistIdA)
+  const { isAlive: isAliveB } = useDuelistFameBalance(duelistIdB)
 
   const winnerIsA = useMemo(() => (winner == 1), [winner])
   const winnerIsB = useMemo(() => (winner == 2), [winner])

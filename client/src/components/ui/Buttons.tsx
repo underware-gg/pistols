@@ -4,7 +4,7 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
-import { useLordsBalance } from '@underware/pistols-sdk/dojo'
+import { useLordsBalance } from '/src/stores/coinStore'
 import { LordsBagIcon } from '/src/components/account/Balance'
 import { CustomIcon, IconSizeProp } from '/src/components/ui/Icons'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
@@ -118,14 +118,14 @@ export const BalanceRequiredButton = ({
   fillParent?: boolean
 }) => {
   const { address } = useAccount()
-  const { noFundsForFee } = useLordsBalance(address, fee)
-  const canSubmit = (!noFundsForFee)
+  const { canAffordFee } = useLordsBalance(address, fee)
+  const canSubmit = (canAffordFee !== false)
   return (
     <ActionButton large fill={fill} fillParent={fillParent}
       disabled={disabled}
       important={canSubmit}
       negative={!canSubmit}
-      label={noFundsForFee ? 'No Funds!' : isPositiveBigint(fee) ? <>{label} <LordsBagIcon /></> : label}
+      label={!canSubmit ? 'No Funds!' : isPositiveBigint(fee) ? <>{label} <LordsBagIcon /></> : label}
       onClick={() => (canSubmit ? onClick() : {})}
     />
   )

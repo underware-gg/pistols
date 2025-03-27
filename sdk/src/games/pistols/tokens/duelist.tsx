@@ -185,7 +185,7 @@ ${(!is_alive && props.is_memorized === false) &&
 //<circle cx='${SLOT_X1}' cy='${SLOT_Y}' r='${WIDTH * 0.05}' fill='white' />
 //<circle cx='${SLOT_X2}' cy='${SLOT_Y}' r='${WIDTH * 0.05}' fill='white' />
 <text class='HONOUR' x='${SLOT_X1}' y='${SLOT_Y}'>
-  ${props.honour > 0 ? (props.honour / 10).toFixed(1) : ''}
+  ${props.honour > 0 ? props.honour.toFixed(1) : ''}
 </text>
 <text class='TITLE' x='${SLOT_X2}' y='${SLOT_Y}'>
   ${is_duelling ? PISTOL

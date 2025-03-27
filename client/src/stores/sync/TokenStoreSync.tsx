@@ -1,36 +1,18 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useLordsContract, useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
-import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
-import { useFameContract } from '/src/hooks/useFame'
-import { useFoolsContract } from '/src/hooks/useFools'
-import { useTokenIdsOfPlayer, useTokenStore } from '/src/stores/tokenStore'
-import { useCoinStore } from '/src/stores/coinStore'
+import { useMemo } from 'react'
+import { useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
+import { useTokenStore } from '/src/stores/tokenStore'
+import { useCoinStore } from '/src/stores/coinStore'
+import {
+  useDuelistTokenContract,
+  useDuelTokenContract,
+  usePackTokenContract,
+  useFameContract,
+  useFoolsContract,
+  useLordsContract,
+} from '/src/hooks/useTokenContract'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import * as torii from '@dojoengine/torii-client'
-
-
-
-export function TokenStoreSyncQL() {
-  // const { duelistContractAddress } = useDuelistTokenContract()
-  // const { address } = useAccount()
-  // const state = useTokenStore((state) => state)
-  // const { tokens, isLoading, refetch } = useToriiTokensByOwnerQL(duelistContractAddress, address, watch)
-
-  // const { mintedCount } = useTokenConfig(duelistContractAddress)
-  // useEffect(() => {
-  //   setTimeout(() => { refetch() }, 500);
-  // }, [mintedCount, refetch])
-
-  // useEffect(() => {
-  //   if (duelistContractAddress && address && !isLoading) {
-  //     state.setTokens(duelistContractAddress, address, tokens)
-  //   }
-  // }, [duelistContractAddress, address, tokens, isLoading])
-  // useEffect(() => console.log("TokensOfPlayerStoreSyncQL() =>", state.tokens), [state.tokens])
-  return (<></>)
-}
-
 
 
 export function TokenStoreSync() {
