@@ -4,11 +4,13 @@ import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useERC20Balance } from '@underware/pistols-sdk/utils/hooks'
 import { useSdkTokenBalancesGet, useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { useFameContract, useFoolsContract, useLordsContract } from '/src/hooks/useTokenContract'
+import { useDuelistTokenBoundAddress } from '/src/hooks/useTokenBound'
+import { makeTokenBoundAddress } from '@underware/pistols-sdk/pistols'
+import { SetupResult } from '@underware/pistols-sdk/dojo'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/utils/starknet'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useFameContract, useFoolsContract, useLordsContract } from '/src/hooks/useTokenContract'
-import { useDuelistTokenBoundAddress } from '/src/hooks/useTokenBound'
 import * as torii from '@dojoengine/torii-client'
 
 
@@ -100,6 +102,23 @@ export const useCoinBalance = (
     canAffordFee,
     isLoading: (balance == null || isLoading),
   }
+}
+
+export const fetchNewTokenBoundCoins = async (sdk: SetupResult['sdk'], coinAddress: BigNumberish, tokenAddress: BigNumberish, tokenIds: bigint[]) => {
+  // console.log("fetchNewTokenBoundCoins()...", tokenAddress, tokenIds)
+  if (tokenIds.length == 0) return
+  const setBalances = useCoinStore.getState().setBalances
+  const tokenBoundAddresses = tokenIds.map((tokenId) => bigintToHex(makeTokenBoundAddress(tokenAddress, tokenId)))
+  await sdk.getTokenBalances(
+    [coinAddress as string],
+    tokenBoundAddresses,
+    [], // no token ids
+  ).then((balances: torii.TokenBalance[]) => {
+    // console.log("fetchNewTokenBoundCoins() GOT:", balances)
+    setBalances(balances)
+  }).catch((error: Error) => {
+    console.error("fetchNewTokenBoundCoins().sdk.get() error:", error, tokenIds)
+  })
 }
 
 

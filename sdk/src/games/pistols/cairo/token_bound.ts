@@ -6,6 +6,6 @@ import { poseidon } from 'src/utils/starknet/starknet'
 // in sync with pistols::systems::components::token_bound::address_of_token
 //
 
-export const makeTokenBoundAddress = (contractAddress: BigNumberish, tokenId: BigNumberish) => {
+export const makeTokenBoundAddress = (contractAddress: BigNumberish, tokenId: BigNumberish): bigint => {
   return poseidon([contractAddress, tokenId])
 }

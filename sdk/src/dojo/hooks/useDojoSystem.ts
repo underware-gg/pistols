@@ -13,7 +13,10 @@ export const useDojoSystem = (systemName: string) => {
 }
 
 const useSystem = (namespace: string, systemName: string, manifest: DojoManifest) => {
-  const { contractAddress, abi } = useMemo(() => {
+  const {
+    contractAddress,
+    abi,
+  } = useMemo(() => {
     const contract = manifest ? getContractByName(manifest, namespace, systemName) : null
     return {
       contractAddress: (contract ? bigintToHex(contract.address) : null) as BigNumberish,
