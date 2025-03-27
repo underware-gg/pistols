@@ -141,8 +141,8 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
       }
     })
     return {
-      notDuelingIds,
-      duellingIds,
+      notDuelingIds: notDuelingIds.sort((a, b) => Number(BigInt(a) - BigInt(b))),
+      duellingIds: duellingIds.sort((a, b) => Number(BigInt(a) - BigInt(b))),
       duelPerDuelists,
     }
   }, [alive_entities])
