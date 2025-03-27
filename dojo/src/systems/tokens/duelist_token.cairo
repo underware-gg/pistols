@@ -662,6 +662,8 @@ pub mod duelist_token {
             let duelist_image: ByteArray = duelist.profile_type.get_uri(base_uri.clone());
             let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
             let lives: u128 = (fame_balance / FAME::ONE_LIFE.low);
+            let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
+            let tokenbound_address = fame_dispatcher.address_of_token(starknet::get_contract_address(), token_id.low);
             // Image
             let image: ByteArray = UrlImpl::new(format!("{}/api/pistols/duelist_token/{}/image", base_uri.clone(), token_id))
                 .add("owner", format!("0x{:x}", owner), false)
@@ -677,6 +679,7 @@ pub mod duelist_token {
                 .add("fame", ETH(fame_balance.into()).low.to_string(), false)
                 .add("lives", lives.to_string(), false)
                 .add("duel_id", format!("0x{:x}", challenge.duel_id), false)
+                .add("tokenbound_address", format!("0x{:x}", tokenbound_address), false)
                 // .add("is_memorized", is_memorized.to_string(), false)
                 .build();
             // Attributes
@@ -729,6 +732,10 @@ pub mod duelist_token {
                 Attribute {
                     key: "duelist_image",
                     value: duelist_image.clone(),
+                },
+                Attribute {
+                    key: "tokenbound_address",
+                    value: format!("0x{:x}", tokenbound_address),
                 },
             ];
             // return the metadata to be rendered by the component
