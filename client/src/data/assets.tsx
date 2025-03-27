@@ -314,7 +314,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { texture: TextureName.bg_demon_right_hand, shiftMultiplier: -0.01, renderOrder: 4, animatedIdle: 0.01 },
     ],
     items: [
-      { name: 'demon_left', color: '00ff00', description: 'Drink, forget this happened', mask: TextureName.bg_demon_left_hand_mask, renderOrder: 3 },
+      { name: 'demon_left', color: 'ff0000', description: 'Drink, forget this happened', mask: TextureName.bg_demon_left_hand_mask, renderOrder: 3 },
       { name: 'demon_right', color: '0000ff', description: 'Take the gun, become my patron', mask: TextureName.bg_demon_right_hand_mask, renderOrder: 4 },
     ],
     scaleAddon: 0.01
@@ -322,9 +322,9 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
   [SceneName.TutorialScene5]: {
     backgrounds: [
       { texture: TextureName.bg_resurrection_background, shiftMultiplier: -0.02, renderOrder: 0 },
-      { texture: TextureName.bg_resurrection_table, shiftMultiplier: -0.005, renderOrder: 1 },
-      { texture: TextureName.bg_resurrection_barkeep, shiftMultiplier: 0.005, renderOrder: 2 },
-      { texture: TextureName.bg_resurrection_player, shiftMultiplier: 0.015, renderOrder: 3 },
+      { texture: TextureName.bg_resurrection_table, shiftMultiplier: -0.01, renderOrder: 1 },
+      { texture: TextureName.bg_resurrection_barkeep, shiftMultiplier: -0.005, renderOrder: 2 },
+      { texture: TextureName.bg_resurrection_player, shiftMultiplier: 0.005, renderOrder: 3 },
     ],
     scaleAddon: 0.045
   },
