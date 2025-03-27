@@ -2443,10 +2443,16 @@ a.active.step:hover,
   animation: blink 1s infinite;
 }
 
-.nextButton {
+.tutorialButtonsContainer {
   position: absolute;
   bottom: aspect-width(1);
   right: aspect-width(1);
+  display: flex;
+  align-items: center;
+  gap: aspect-width(1);
+}
+
+.nextButton {
   display: flex;
   align-items: center;
   justify-content: center;
