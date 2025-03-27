@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { poseidon } from '@underware/pistols-sdk/utils/starknet'
+import { makeTokenBoundAddress } from '@underware/pistols-sdk/pistols'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 
 export const useTokenBoundAddress = (contractAddress: BigNumberish, tokenId: BigNumberish) => {
-  const address = useMemo(() => poseidon([contractAddress, tokenId]), [contractAddress, tokenId])
+  const address = useMemo(() => makeTokenBoundAddress(contractAddress, tokenId), [contractAddress, tokenId])
   return {
     contractAddress,
     address,
