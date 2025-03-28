@@ -55,7 +55,7 @@ export default function TokensTestPage() {
 const _style = {
   minWidth: '70px',
   width: 'auto',
-  height: '100px',
+  height: '200px',
 }
 
 function Purchases() {
@@ -93,11 +93,11 @@ function Tokens() {
       <TokenContract contractAddress={packContractAddress} tokenName='Packs' attributes={['Is Open']} />
       <br />
       <TokenContract contractAddress={duelistContractAddress} tokenName='Duelists' hasFame
-        renderer={(tokenId: bigint) => <DuelistTokenArt duelistId={tokenId} />}
+        renderer={(tokenId: bigint) => <DuelistTokenArt duelistId={tokenId} style={_style} />}
       />
       <br />
       <TokenContract contractAddress={duelContractAddress} tokenName='Duels'
-        renderer={(tokenId: bigint) => <DuelTokenArt duelId={tokenId} />}
+        renderer={(tokenId: bigint) => <DuelTokenArt duelId={tokenId} style={_style} />}
       />
     </>
   );
@@ -140,9 +140,9 @@ function TokenContract({
     <Table attached>
       <Header fullWidth>
         <Row>
-          <HeaderCell width={4}><h3 className='Important'>{tokenName}: {tokenIds.length}</h3></HeaderCell>
+          <HeaderCell width={2}><h3 className='Important'>{tokenName}: {tokenIds.length}</h3></HeaderCell>
           {/* <HeaderCell width={4}><h3 className='Important'>{bigintToHex(contractAddress)}</h3></HeaderCell> */}
-          <HeaderCell><h3 className='Important'>Name</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Props</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Cached {`<img>`}</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Cached {`<embed>`}</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>RPC {`<img>`}</h3></HeaderCell>
@@ -208,11 +208,11 @@ function TokenRow({
         {/* &nbsp;<a href={cached_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a> */}
       </Cell>
       <Cell verticalAlign='top'>
-        {/* <img src={rpc_image} alt={name} style={_style} /> */}
+        <img src={rpc_image} alt={name} style={_style} />
         &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
       </Cell>
       <Cell verticalAlign='top'>
-        {/* <embed src={rpc_image} style={_style} /> */}
+        <embed src={rpc_image} style={_style} />
         &nbsp;<a href={rpc_image} target='_blank'><Icon className='Anchor' name='external' size='small' /></a>
       </Cell>
       <Cell verticalAlign='top'>

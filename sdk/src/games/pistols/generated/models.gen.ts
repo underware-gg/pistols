@@ -434,11 +434,15 @@ export interface ChallengeRewardsEventValue {
 export interface LordsReleaseEvent {
 	season_table_id: BigNumberish;
 	bill: LordsReleaseBill;
+	duel_id: BigNumberish;
+	timestamp: BigNumberish;
 }
 
 // Type definition for `pistols::models::events::LordsReleaseEventValue` struct
 export interface LordsReleaseEventValue {
 	bill: LordsReleaseBill;
+	duel_id: BigNumberish;
+	timestamp: BigNumberish;
 }
 
 // Type definition for `pistols::models::events::PlayerActivityEvent` struct
@@ -1201,6 +1205,8 @@ export const schema: SchemaType = {
 				FameLostToDeveloper: undefined,
 				SacrificedToDeveloper: undefined,
 				LeaderboardPrize: undefined, }), duelist_id: 0, recipient: "", pegged_fame: 0, pegged_lords: 0, sponsored_lords: 0, },
+			duel_id: 0,
+			timestamp: 0,
 		},
 		LordsReleaseEventValue: {
 		bill: { reason: new CairoCustomEnum({ 
@@ -1209,6 +1215,8 @@ export const schema: SchemaType = {
 				FameLostToDeveloper: undefined,
 				SacrificedToDeveloper: undefined,
 				LeaderboardPrize: undefined, }), duelist_id: 0, recipient: "", pegged_fame: 0, pegged_lords: 0, sponsored_lords: 0, },
+			duel_id: 0,
+			timestamp: 0,
 		},
 		PlayerActivityEvent: {
 			player_address: "",

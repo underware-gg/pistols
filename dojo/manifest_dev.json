@@ -1647,8 +1647,8 @@
       ]
     },
     {
-      "address": "0x7d0d81a2c392cc019f67b7fb06a83672bf137da31d3bb19e6e833fa8be01307",
-      "class_hash": "0x4c4ac0c22980a124ccd37d159ef0f0fe8224addbb469b2b83495ad0576d4eb1",
+      "address": "0x56ad39d08d739d26def4bf24945e9a06bde05b29ed4ca2cb9b4b22686fd59d3",
+      "class_hash": "0x6f9c243506fd36c8b6e20c95fe4ee9fac9ff6c102132f877f67ae99f261a9be",
       "abi": [
         {
           "type": "impl",
@@ -1907,6 +1907,10 @@
                 {
                   "name": "season_table_id",
                   "type": "core::felt252"
+                },
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
                 },
                 {
                   "name": "bills",
@@ -3373,7 +3377,7 @@
         }
       ],
       "init_calldata": [
-        "sstr:http://localhost:3000",
+        "sstr:https://assets.underware.gg",
         "0x0",
         "0"
       ],
@@ -3398,8 +3402,8 @@
       ]
     },
     {
-      "address": "0x6992cdc7eb74e9b7f2df6023bd5f64353fb54cbe1359d505ce1d58d32e52401",
-      "class_hash": "0x42132caef6b08d496296504ee4dab3de3b08f02670662d3cb221f07bbe218d1",
+      "address": "0x5bb11dbafcba6b9543a7e9d84131116e943faaedbd8ef3186534fee8dbed307",
+      "class_hash": "0x2769aee3614244d151d4d9082d398d8556addbde0a8a0bbaeef1521b466fb61",
       "abi": [
         {
           "type": "impl",
@@ -4822,7 +4826,7 @@
         }
       ],
       "init_calldata": [
-        "sstr:http://localhost:3000"
+        "sstr:https://assets.underware.gg"
       ],
       "tag": "pistols-duelist_token",
       "selector": "0x45c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e",
@@ -8686,7 +8690,7 @@
         }
       ],
       "init_calldata": [
-        "sstr:http://localhost:3000"
+        "sstr:https://assets.underware.gg"
       ],
       "tag": "pistols-pack_token",
       "selector": "0x3d74e76192285c5a19a63c54a6c2ba5b015a1a25818c2d8f9cf75d7fef2b5c1",
@@ -10292,7 +10296,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x39ab2152b67044b72e74dc191ba31809e4193df4a10d51fc8382f40fd084df3",
+      "class_hash": "0x5a11bed1343952febb21160b7b938f3b7d7f3d94755849793a646981010d0a2",
       "tag": "pistols-LordsReleaseEvent",
       "selector": "0x7121aa913fad664b07951ce2c9a3ee807c721c6fa15b015d5b6fc22f8daa7a1"
     },

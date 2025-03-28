@@ -189,19 +189,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_bank_releaseLordsFromFameToBeBurned_calldata = (seasonTableId: BigNumberish, bills: Array<LordsReleaseBill>): DojoCall => {
+	const build_bank_releaseLordsFromFameToBeBurned_calldata = (seasonTableId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>): DojoCall => {
 		return {
 			contractName: "bank",
 			entrypoint: "release_lords_from_fame_to_be_burned",
-			calldata: [seasonTableId, bills],
+			calldata: [seasonTableId, duelId, bills],
 		};
 	};
 
-	const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, seasonTableId: BigNumberish, bills: Array<LordsReleaseBill>) => {
+	const bank_releaseLordsFromFameToBeBurned = async (snAccount: Account | AccountInterface, seasonTableId: BigNumberish, duelId: BigNumberish, bills: Array<LordsReleaseBill>) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_bank_releaseLordsFromFameToBeBurned_calldata(seasonTableId, bills),
+				build_bank_releaseLordsFromFameToBeBurned_calldata(seasonTableId, duelId, bills),
 				"pistols",
 			);
 		} catch (error) {
