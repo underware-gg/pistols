@@ -59,6 +59,7 @@ export const useSdkTokenBalancesGet = ({
           setBalances(balances)
         } else if (!tokenIds) {
           // initialize zero balance
+          // console.log("useSdkTokenBalancesGet() initialize balance:", contract, account)
           const _balances = [{
             contract_address: contract,
             account_address: account,

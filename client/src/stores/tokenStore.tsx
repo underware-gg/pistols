@@ -59,7 +59,7 @@ const createStore = () => {
         const _contract = bigintToHex(balance.contract_address)
         const _account = bigintToHex(balance.account_address)
         // update only if account is being tracked
-        if (state.contracts[_contract][_account]) {
+        if (state.contracts[_contract]?.[_account] != undefined) {
           const _tokenId = _parseTokenId(balance)
           const _owned = isPositiveBigint(balance.balance)
           const _added = state.contracts[_contract][_account].includes(_tokenId)
