@@ -1,9 +1,9 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { getEntityMapModels, formatQueryValue, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { formatQueryValue, getEntityModel, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
-import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 
 
@@ -39,7 +39,7 @@ const useGetChallengesByTableQuery = (tableId: string) => {
       : null
   ), [tableId])
   const { entities } = useSdkStateEntitiesGet({ query })
-  const challenges = useMemo(() => getEntityMapModels<models.Challenge>(entities, 'Challenge'), [entities])
+  const challenges = useMemo(() => entities.map(e => getEntityModel<models.Challenge>(e, 'Challenge')), [entities])
   // useEffect(() => console.log(`useGetChallengesByTableQuery()`, challenges), [challenges])
   return { challenges }
 }

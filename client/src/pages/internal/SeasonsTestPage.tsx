@@ -3,7 +3,7 @@ import { Container, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAllSeasonTableIds, useLeaderboard, useSeason, useTable } from '/src/stores/tableStore'
 import { bigintToDecimal, bigintToHex, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal } from '@underware/pistols-sdk/utils'
-import { formatQueryValue, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { formatQueryValue, getEntityModel, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { parseCustomEnum, parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
 import { useClientTimestamp, useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
@@ -23,7 +23,7 @@ import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
 import { AddressShort } from '/src/components/ui/AddressShort'
 import { Balance } from '/src/components/account/Balance'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
-import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 
@@ -205,8 +205,8 @@ function DuelsReport({ tableId }: { tableId: string }) {
     let finalBlowSet: { [key: string]: number } = {}
     if (entities) {
       Object.values(entities).forEach((entity) => {
-        let challenge = entity.Challenge
-        let round = entity.Round
+        let challenge = getEntityModel<models.Challenge>(entity, 'Challenge')
+        let round = getEntityModel<models.Round>(entity, 'Round')
         if (challenge) {
           const state = parseEnumVariant<constants.ChallengeState>(challenge.state)
           duelsCount++;
@@ -305,7 +305,7 @@ function PacksReport({ tableId }: { tableId: string }) {
     let duelistPackClosedCount = 0
     if (entities) {
       Object.values(entities).forEach((entity) => {
-        let pack = entity.Pack
+        let pack = getEntityModel<models.Pack>(entity, 'Pack')
         if (pack) {
           const pack_type = parseEnumVariant<constants.PackType>(pack.pack_type)
           packsCount++;
@@ -377,8 +377,8 @@ function DuelistsReport({ tableId }: { tableId: string }) {
     let duelistsAliveCount = 0
     if (entities) {
       Object.values(entities).forEach((entity) => {
-        let duelist = entity.Duelist
-        let memorial = entity.DuelistMemorial
+        let duelist = getEntityModel<models.Duelist>(entity, 'Duelist')
+        let memorial = getEntityModel<models.DuelistMemorial>(entity, 'DuelistMemorial')
         if (duelist) {
           duelistsCount++;
           if (memorial) duelistsDeadCount++;

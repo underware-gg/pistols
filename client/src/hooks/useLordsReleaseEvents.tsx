@@ -50,7 +50,7 @@ export const useLordsReleaseEvents = (season_table_id: string) => {
     }).sort((a, b) => (a.timestamp - b.timestamp))
   ), [events])
 
-  console.log(`useLordsReleaseEvents() => entities(${entities.length})`, events, bills)
+  console.log(`useLordsReleaseEvents() => entities(${entities.length})`, entities, events, bills)
 
   return {
     bills,

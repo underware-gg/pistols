@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { createDojoStore } from '@dojoengine/sdk/react'
+import { useEffect, useMemo } from 'react'
 import {
   useSdkEntitiesGet,
   UseSdkEntitiesGetProps,
@@ -8,27 +9,15 @@ import {
   UseSdkEventsGetProps,
 } from 'src/dojo/hooks/useSdkEntities'
 import {
-  PistolsModelType,
-  PistolsSchemaModels,
   PistolsEntity,
-  PistolsSchemaModelNames,
+  PistolsSchemaType,
 } from 'src/games/pistols/config/types'
+import { useStore } from 'zustand'
 
-export type EntityMap = {
-  [entityId: string]: Partial<PistolsSchemaModels>,
-}
-
-export type useSdkStateResultOLD = {
-  entities: EntityMap | null
-  isLoading: boolean | undefined
-}
 export type useSdkStateResult = {
   entities: PistolsEntity[] | null
   isLoading: boolean | undefined
 }
-
-export const getEntityMapModels = <M extends PistolsModelType>(entities: EntityMap, modelName: PistolsSchemaModelNames): M[] =>
-  (Object.values(entities ?? {}).map(e => (e[modelName] as unknown as M)) ?? [])
 
 
 //---------------------------------------
@@ -42,24 +31,21 @@ export const getEntityMapModels = <M extends PistolsModelType>(entities: EntityM
 export const useSdkStateEntitiesGet = ({
   query,
   enabled = true,
-}: Omit<UseSdkEntitiesGetProps, 'setEntities'>): useSdkStateResultOLD => {
-  const [entities, setEntities] = useState<EntityMap | null>()
+}: Omit<UseSdkEntitiesGetProps, 'setEntities'>): useSdkStateResult => {
+  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [])
+  const state = useStore(store, (state) => state)
 
   const { isLoading } = useSdkEntitiesGet({
     query,
     enabled,
     setEntities: (entities: PistolsEntity[]) => {
-      setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
-        ...acc,
-        [e.entityId]: {
-          ...e.models.pistols
-        } as EntityMap,
-      }), {} as EntityMap));
+      console.log('useSdkStateEntitiesGet() GOT:', entities, query)
+      state.setEntities([...entities]);
     },
   })
 
   return {
-    entities,
+    entities: Object.values(state.entities),
     isLoading,
   }
 }
@@ -67,32 +53,25 @@ export const useSdkStateEntitiesGet = ({
 export const useSdkStateEntitiesSub = ({
   query,
   enabled = true,
-}: Omit<UseSdkEntitiesSubProps, 'setEntities' | 'updateEntity'>): useSdkStateResultOLD => {
-  const [entities, setEntities] = useState<EntityMap | null>()
+}: Omit<UseSdkEntitiesSubProps, 'setEntities' | 'updateEntity'>): useSdkStateResult => {
+  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [])
+  const state = useStore(store, (state) => state)
 
   const { isLoading } = useSdkEntitiesSub({
     query,
     enabled,
     setEntities: (entities: PistolsEntity[]) => {
-      setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
-        ...acc,
-        [e.entityId]: {
-          ...e.models.pistols
-        } as EntityMap,
-      }), {} as EntityMap));
+      console.log('useSdkStateEntitiesSub() GOT:', entities, query)
+      state.setEntities([...entities]);
     },
-    updateEntity: (e: PistolsEntity) => {
-      setEntities({
-        ...entities,
-        [e.entityId]: {
-          ...e.models.pistols
-        } as EntityMap,
-      });
-    }
+    updateEntity: (entity: PistolsEntity) => {
+      console.log('useSdkStateEntitiesSub() SUB:', entity, query)
+      state.updateEntity(entity);
+    },
   })
 
   return {
-    entities,
+    entities: Object.values(state.entities),
     isLoading,
   }
 }
@@ -112,7 +91,8 @@ export const useSdkStateEventsGet = ({
   enabled = true,
   retryInterval = 0,
 }: Omit<UseSdkEventsGetProps, 'setEntities'>): useSdkStateResult => {
-  const [entities, setEntities] = useState<PistolsEntity[]>([])
+  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [])
+  const state = useStore(store, (state) => state)
 
   const { isLoading } = useSdkEventsGet({
     query,
@@ -121,12 +101,16 @@ export const useSdkStateEventsGet = ({
     retryInterval,
     setEntities: (entities: PistolsEntity[]) => {
       console.log('useSdkStateEventsGet() GOT:', entities, query)
-      setEntities([...entities]);
+      state.setEntities([...entities]);
     },
   })
 
+  useEffect(() => {
+    console.log('useSdkStateEventsGet() STORE:', state)
+  }, [state])
+
   return {
-    entities,
+    entities: Object.values(state.entities),
     isLoading,
   }
 }
