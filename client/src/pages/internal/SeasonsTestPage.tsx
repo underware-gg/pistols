@@ -25,6 +25,7 @@ import { useLordsReleaseEvents } from '/src/hooks/useLordsReleaseEvents'
 import { LordsBalance } from '/src/components/account/LordsBalance'
 import { Balance } from '/src/components/account/Balance'
 import { AddressShort } from '/src/components/ui/AddressShort'
+import { useSeasonPool } from '/src/stores/bankStore'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -55,21 +56,24 @@ function Seasons() {
   const { seasonTableId } = useConfig()
   const { seasonTableIds } = useAllSeasonTableIds()
   const [reportTableId, setReportTableId] = useState<string>()
+  const header = (
+    <Header fullWidth>
+      <Row>
+        <HeaderCell><h3 className='Important'>Season</h3></HeaderCell>
+        <HeaderCell><h3 className='Important'>Number</h3></HeaderCell>
+        <HeaderCell><h3 className='Important'>Name</h3></HeaderCell>
+        <HeaderCell><h3 className='Important'>Phase</h3></HeaderCell>
+        <HeaderCell><h3 className='Important'>Pool</h3></HeaderCell>
+        <HeaderCell><h3 className='Important'>Start</h3></HeaderCell>
+        <HeaderCell><h3 className='Important'>End</h3></HeaderCell>
+        <HeaderCell><h3 className='Important'></h3></HeaderCell>
+      </Row>
+    </Header>
+  )
   return (
     <>
       <Table celled color='orange'>
-        <Header fullWidth>
-          <Row>
-            <HeaderCell><h3 className='Important'>Season</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>Number</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>Name</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>Phase</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>Start</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>End</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'></h3></HeaderCell>
-          </Row>
-        </Header>
-
+        {header}
         <Body>
           {seasonTableIds.map((tableId, i) => (
             <SeasonRow key={tableId} tableId={tableId} isCurrent={tableId === seasonTableId} setReport={setReportTableId} />
@@ -80,16 +84,7 @@ function Seasons() {
         <>
           <br />
           <Table celled color='green'>
-            <Header fullWidth>
-              <Row>
-                <HeaderCell><h3 className='Important'>Season</h3></HeaderCell>
-                <HeaderCell><h3 className='Important'>Number</h3></HeaderCell>
-                <HeaderCell><h3 className='Important'>Name</h3></HeaderCell>
-                <HeaderCell><h3 className='Important'>Phase</h3></HeaderCell>
-                <HeaderCell><h3 className='Important'>Start</h3></HeaderCell>
-                <HeaderCell><h3 className='Important'>End</h3></HeaderCell>
-              </Row>
-            </Header>
+            {header}
             <Body>
               <SeasonRow key={reportTableId} tableId={reportTableId} isCurrent={reportTableId === seasonTableId} setReport={setReportTableId} actions={false} />
             </Body>
@@ -123,21 +118,25 @@ function SeasonRow({
   const { clientTimestamp } = useClientTimestamp(isActive)
   const { canCollectSeason } = useCanCollectSeason()
   const { game: { collectSeason } } = useDojoContractCalls()
+  const poolSeason = useSeasonPool(tableId)
 
   return (
     <Row>
       <Cell>
-        <span className='Important H3'>{tableId}{isCurrent ? <b><br />(Current)</b> : ''}</span>
+        <span className='Important H3'>
+          {isCurrent ? <b>{tableId} (Current)</b> : tableId}
+        </span>
       </Cell>
       <Cell>{seasonId}</Cell>
       <Cell>{description}</Cell>
       <Cell>{phase}</Cell>
+      <Cell><Balance lords wei={poolSeason.balanceLords} /></Cell>
       <Cell>{formatTimestampLocal(timestamp_start)}</Cell>
       <Cell>
         {formatTimestampLocal(timestamp_end)}
         <br />
         {formatTimestampDeltaTime(clientTimestamp, timestamp_end).result}
-        <br />
+        {` / `}
         {formatTimestampDeltaCountdown(clientTimestamp, timestamp_end).result}
       </Cell>
       {actions &&
@@ -489,6 +488,7 @@ function LordsReleaseEvents({
           <HeaderCell><h3 className='Important'>Pegged Lords</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Sponsored Lords</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Recipient</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Timestamp</h3></HeaderCell>
         </Row>
       </Header>
       <Body>
@@ -504,6 +504,7 @@ function LordsReleaseEvents({
             </Cell>
             <Cell><Balance lords wei={bill.sponsoredLords} decimals={6} /></Cell>
             <Cell><AddressShort address={bill.recipient} /></Cell>
+            <Cell>{formatTimestampLocal(bill.timestamp)}</Cell>
           </Row>
         ))}
       </Body>
