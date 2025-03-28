@@ -448,9 +448,14 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         onComplete={() => setCardPackClickable(true)}
       />
 
-      {showCardPack && (
-        <CardPack packType={constants.PackType.StarterPack} isOpen={showCardPack} clickable={cardPackClickable} cardPackSize={CARD_PACK_SIZE} maxTilt={MAX_TILT} onComplete={(selectedDuelistId) => goToRealDuel(selectedDuelistId)} optionalTitle="Choose your Duelist:" />
-      )}
+      <CardPack 
+        packType={constants.PackType.StarterPack} 
+        isOpen={showCardPack} 
+        clickable={cardPackClickable} 
+        cardPackSize={CARD_PACK_SIZE} 
+        maxTilt={MAX_TILT} 
+        onComplete={(selectedDuelistId) => goToRealDuel(selectedDuelistId)} 
+        optionalTitle="Choose your Duelist:" />
     </>
   )
 }

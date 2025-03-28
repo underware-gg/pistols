@@ -544,7 +544,7 @@
   transform-style: preserve-3d;
   transition: transform 0.1s ease-out;
   transform: translate(-50%, -50%) rotateX(var(--card-pack-rotate-x)) rotateY(var(--card-pack-rotate-y));
-
+  opacity: var(--card-pack-opacity);
 
   .inner-bag {
     position: absolute;
