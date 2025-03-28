@@ -18,11 +18,11 @@ export const useGetTableScoreboard = (table_id: string, duelist_id: BigNumberish
     new PistolsQueryBuilder()
       .withClause(
         new PistolsClauseBuilder().keys(
-          ["pistols-Scoreboard"],
-          [formatQueryValue(duelist_id), formatQueryValue(stringToFelt(table_id))]
+          ["pistols-TableScoreboard"],
+          [formatQueryValue(stringToFelt(table_id)), formatQueryValue(duelist_id)]
         ).build()
       )
-      .withEntityModels(["pistols-Scoreboard"])
+      .withEntityModels(["pistols-TableScoreboard"])
       .includeHashedKeys()
   ), [table_id, duelist_id])
 
@@ -33,8 +33,7 @@ export const useGetTableScoreboard = (table_id: string, duelist_id: BigNumberish
   })
   const scoreboard = useMemo(() => entities.map(e => getEntityModel<models.TableScoreboard>(e, 'TableScoreboard'))?.[0], [entities])
   const points = useMemo(() => Number(scoreboard?.points ?? 0), [scoreboard])
-
-  if (enabled) console.warn("------------- useGetTableScoreboard()...", table_id, duelist_id)
+  // console.log("------------- useGetTableScoreboard()...", enabled, isLoading, table_id, duelist_id, points)
 
   return {
     isLoading,

@@ -3,21 +3,23 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
 import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
+import { useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { useAllChallengesIds, useChallenge } from '/src/stores/challengeStore'
 import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
+import { useFameContract } from '/src/hooks/useTokenContract'
+import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
+import { useTableTotals } from '/src/hooks/useTable'
+import { useGetTableScoreboard } from '/src/hooks/useScore'
+import { useDuelistFameBalance, fetchNewTokenBoundCoins } from '/src/stores/coinStore'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
+import { SeasonSelectDropdown } from '/src/components/SeasonSelectDropdown'
 import { CopyIcon, IconClick } from '/src/components/ui/Icons'
 import AppDojo from '/src/components/AppDojo'
-import { useDojoSetup } from '@underware/pistols-sdk/dojo'
-import { fetchNewTokenBoundCoins, useDuelistFameBalance } from '/src/stores/coinStore'
-import { useFameContract } from '/src/hooks/useTokenContract'
-import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
-import { SeasonSelectDropdown } from '/src/components/SeasonSelectDropdown'
-import { useConfig } from '/src/stores/configStore'
-import { useTableTotals } from '/src/hooks/useTable'
+import { DuelistScore, useLeaderboard } from '/src/stores/tableStore'
+
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -83,7 +85,8 @@ export function Snapshots() {
   const { duelIds: tableDuelIds, duelistIds: tableDuelistIds } = useTableTotals(tableId)
   const { duelIds: allDuelIds } = useAllChallengesIds()
   const { duelistIds: allDuelistIds } = useAllDuelistsIds()
-  // console.log("______________Snapshots:", tableId)
+  const { scores: leaderboardScores } = useLeaderboard(tableId)
+  // console.log("______________Snapshots:", tableId, leaderboardScores)
 
   useEffect(() => {
     state.initialize('', tableId)
@@ -116,7 +119,7 @@ export function Snapshots() {
         </Row>
         <Row columns={'equal'}>
           <Col>
-            <SnapshotDuelists tableId={tableId} duelistIds={tableId ? tableDuelistIds : allDuelistIds} />
+            <SnapshotDuelists tableId={tableId} duelistIds={tableId ? tableDuelistIds : allDuelistIds} leaderboardScores={leaderboardScores} />
           </Col>
           <Col>
             <SnapshotChallenges tableId={tableId} duelIds={tableId ? tableDuelIds : allDuelIds} />
@@ -175,13 +178,15 @@ const useSnapping = (name: string, domain: string, limit: number) => {
 function SnapshotDuelists({
   tableId,
   duelistIds,
+  leaderboardScores,
 }: {
   tableId: string
   duelistIds: bigint[]
+  leaderboardScores: DuelistScore[]
 }) {
   const { snapping, count, limit, start } = useSnapping('duelists', tableId, duelistIds.length)
   const loaders = useMemo(() => (
-    snapping ? duelistIds.map(duelistId => <SnapDuelist key={duelistId} duelistId={duelistId} />) : null
+    snapping ? duelistIds.map(duelistId => <SnapDuelist key={duelistId} tableId={tableId} duelistId={duelistId} leaderboardScores={leaderboardScores} />) : null
   ), [snapping, duelistIds])
   return (
     <>
@@ -195,13 +200,21 @@ function SnapshotDuelists({
 
 export function SnapDuelist({
   duelistId,
+  tableId,
+  leaderboardScores,
+}: {
+  tableId: string
+  duelistId: bigint
+  leaderboardScores: DuelistScore[]
 }) {
   const insert = useStore((state) => state.insert)
   const duelist = useDuelist(duelistId)
   const { balance_eth, lives } = useDuelistFameBalance(duelistId)
+  const { points, isLoading } = useGetTableScoreboard(tableId, duelistId)
   const mounted = useMounted()
   useEffect(() => {
-    if (mounted && duelist) {
+    if (mounted && duelist && (!tableId || !isLoading)) {
+      const leaderboardIndex = leaderboardScores.findIndex(s => s.duelistId == duelistId)
       insert('duelist', bigintToDecimal(duelistId.toString()), {
         ...duelist,
         fame_balance: bigintToDecimal(balance_eth),
@@ -215,10 +228,16 @@ export function SnapDuelist({
           honourDisplay: undefined,
           honourAndTotal: undefined,
           archetypeName: undefined,
-        }
+        },
+        ...(tableId ? {
+          [tableId]: {
+            score: points,
+            position: (leaderboardIndex >= 0 ? leaderboardIndex + 1 : 0),
+          }
+        } : {}),
       })
     }
-  }, [mounted, duelist])
+  }, [mounted, duelist, isLoading, tableId, points, isLoading])
   return <></>
 }
 
