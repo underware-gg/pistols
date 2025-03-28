@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { Container, SemanticCOLORS, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAllSeasonTableIds, useLeaderboard, useSeason, useTable } from '/src/stores/tableStore'
-import { bigintToHex, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal } from '@underware/pistols-sdk/utils'
+import { bigintToDecimal, bigintToHex, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal } from '@underware/pistols-sdk/utils'
 import { formatQueryValue, useControllerUsername, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { parseCustomEnum, parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
 import { useClientTimestamp, useMounted } from '@underware/pistols-sdk/utils/hooks'
@@ -21,6 +21,10 @@ import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
+import { useLordsReleaseEvents } from '/src/hooks/useLordsReleaseEvents'
+import { LordsBalance } from '/src/components/account/LordsBalance'
+import { Balance } from '/src/components/account/Balance'
+import { AddressShort } from '/src/components/ui/AddressShort'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -50,25 +54,68 @@ export default function SeasonsTestPage() {
 function Seasons() {
   const { seasonTableId } = useConfig()
   const { seasonTableIds } = useAllSeasonTableIds()
+  const [reportTableId, setReportTableId] = useState<string>()
   return (
     <>
+      <Table celled color='orange'>
+        <Header fullWidth>
+          <Row>
+            <HeaderCell><h3 className='Important'>Season</h3></HeaderCell>
+            <HeaderCell><h3 className='Important'>Number</h3></HeaderCell>
+            <HeaderCell><h3 className='Important'>Name</h3></HeaderCell>
+            <HeaderCell><h3 className='Important'>Phase</h3></HeaderCell>
+            <HeaderCell><h3 className='Important'>Start</h3></HeaderCell>
+            <HeaderCell><h3 className='Important'>End</h3></HeaderCell>
+            <HeaderCell><h3 className='Important'></h3></HeaderCell>
+          </Row>
+        </Header>
+
+        <Body>
+          {seasonTableIds.map((tableId, i) => (
+            <SeasonRow key={tableId} tableId={tableId} isCurrent={tableId === seasonTableId} setReport={setReportTableId} />
+          ))}
+        </Body>
+      </Table>
+      {reportTableId &&
+        <>
+          <br />
+          <Table celled color='green'>
+            <Header fullWidth>
+              <Row>
+                <HeaderCell><h3 className='Important'>Season</h3></HeaderCell>
+                <HeaderCell><h3 className='Important'>Number</h3></HeaderCell>
+                <HeaderCell><h3 className='Important'>Name</h3></HeaderCell>
+                <HeaderCell><h3 className='Important'>Phase</h3></HeaderCell>
+                <HeaderCell><h3 className='Important'>Start</h3></HeaderCell>
+                <HeaderCell><h3 className='Important'>End</h3></HeaderCell>
+              </Row>
+            </Header>
+            <Body>
+              <SeasonRow key={reportTableId} tableId={reportTableId} isCurrent={reportTableId === seasonTableId} setReport={setReportTableId} actions={false} />
+            </Body>
+          </Table>
+          <PacksReport tableId={reportTableId} />
+          <DuelistsReport tableId={reportTableId} />
+          <DuelsReport tableId={reportTableId} />
+          <Leaderboards tableId={reportTableId} />
+          <LordsReleaseEvents tableId={reportTableId} />
+        </>
+      }
       <br />
-      <Season tableId={seasonTableId} name='Current' color='green' />
-      {seasonTableIds.map((tableId, i) => (
-        <Season key={tableId} tableId={tableId} name={`Season [${i}]`} color='orange' />
-      ))}
     </>
   );
 }
 
-function Season({
+function SeasonRow({
   tableId,
-  name,
-  color,
+  isCurrent,
+  actions = true,
+  setReport,
 }: {
   tableId: string,
-  name: string,
-  color?: SemanticCOLORS,
+  isCurrent: boolean,
+  actions?: boolean,
+  setReport: (tableId: string) => void,
 }) {
   const { account } = useAccount()
   const { description } = useTable(tableId)
@@ -76,120 +123,42 @@ function Season({
   const { clientTimestamp } = useClientTimestamp(isActive)
   const { canCollectSeason } = useCanCollectSeason()
   const { game: { collectSeason } } = useDojoContractCalls()
-  const [displayReports, setDisplayReports] = useState(false)
 
   return (
-    <>
-      <Table celled attached color={color}>
-        <Header fullWidth>
-          <Row>
-            <HeaderCell><h3 className='Important'>{name}</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>Number</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>Name</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>Phase</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>Start</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>End</h3></HeaderCell>
-            <HeaderCell><h3 className='Important'>Collect</h3></HeaderCell>
-          </Row>
-        </Header>
-
-        <Body>
-          <Row>
-            <Cell>
-              <span className='Important H3'>{tableId}</span>
-              <br />
-              <br />
-              <ActionButton
-                label={'Reports'}
-                onClick={() => setDisplayReports(!displayReports)}
-              />
-            </Cell>
-            <Cell>{seasonId}</Cell>
-            <Cell>{description}</Cell>
-            <Cell>{phase}</Cell>
-            <Cell>{formatTimestampLocal(timestamp_start)}</Cell>
-            <Cell>
-              {formatTimestampLocal(timestamp_end)}
-              <br />
-              {formatTimestampDeltaTime(clientTimestamp, timestamp_end).result}
-              <br />
-              {formatTimestampDeltaCountdown(clientTimestamp, timestamp_end).result}
-            </Cell>
-            <Cell>
-              <ActionButton
-                disabled={!canCollectSeason}
-                label={'Collect'}
-                onClick={() => collectSeason(account)}
-              />
-            </Cell>
-          </Row>
-        </Body>
-      </Table>
-      {displayReports && <>
-        <Leaderboards tableId={tableId} />
-        <PacksReport tableId={tableId} />
-        <DuelistsReport tableId={tableId} />
-        <DuelsReport tableId={tableId} />
-      </>
-      }
-      <br />
-    </>
-  )
-}
-
-function Leaderboards({
-  tableId,
-}: {
-  tableId: string,
-}) {
-  const { maxPositions, scores } = useLeaderboard(tableId)
-
-  // console.log(`Leaderboards() =>`, tableId, maxPositions, scorePerDuelistId)
-  return (
-    <Table celled attached>
-      <Header fullWidth>
-        <Row>
-          <HeaderCell><h3 className='Important'>Leaderboards</h3></HeaderCell>
-          <HeaderCell><h3 className='Important'>Points</h3></HeaderCell>
-          <HeaderCell><h3 className='Important'>Wallet</h3></HeaderCell>
-          <HeaderCell><h3 className='Important'>Username</h3></HeaderCell>
-        </Row>
-      </Header>
-      <Body>
-        {scores.map(({ duelistId, score }, index) => (
-          <LeaderboardRow key={duelistId} duelistId={duelistId} score={score} index={index} />
-        ))}
-      </Body>
-    </Table>
-  )
-}
-function LeaderboardRow({
-  duelistId,
-  score,
-  index,
-}: {
-  duelistId: BigNumberish,
-  score: number,
-  index: number,
-}) {
-  const { owner, isLoading: isLoadingOwner } = useOwnerOfDuelist(duelistId)
-  // const { username, isLoading: isLoadingUsername } = useControllerUsername(isLoadingOwner ? undefined : owner)
-  const { username } = usePlayer(owner)
-  return (
-    <Row key={duelistId}>
+    <Row>
       <Cell>
-        <span className='Important'>
-          {`Duelist #${duelistId}`}
-        </span>
+        <span className='Important H3'>{tableId}{isCurrent ? <b><br />(Current)</b> : ''}</span>
       </Cell>
-      <Cell className='Code'>{score}</Cell>
-      <Cell className='Code'>{isLoadingOwner ? '...' : bigintToHex(owner)}</Cell>
-      {/* <Cell className='Code'>{isLoadingUsername ? '...' : username}</Cell> */}
-      <Cell className='Code'>{username || '...'}</Cell>
+      <Cell>{seasonId}</Cell>
+      <Cell>{description}</Cell>
+      <Cell>{phase}</Cell>
+      <Cell>{formatTimestampLocal(timestamp_start)}</Cell>
+      <Cell>
+        {formatTimestampLocal(timestamp_end)}
+        <br />
+        {formatTimestampDeltaTime(clientTimestamp, timestamp_end).result}
+        <br />
+        {formatTimestampDeltaCountdown(clientTimestamp, timestamp_end).result}
+      </Cell>
+      {actions &&
+        <Cell>
+          <ActionButton
+            label={'Reports'}
+            onClick={() => setReport(tableId)}
+          />
+          &nbsp;
+          {isCurrent &&
+            <ActionButton
+              disabled={!canCollectSeason}
+              label={'Collect'}
+              onClick={() => collectSeason(account)}
+            />
+          }
+        </Cell>
+      }
     </Row>
   )
 }
-
 
 function DuelsReport({ tableId }: { tableId: string }) {
   const mounted = useMounted()
@@ -380,8 +349,6 @@ function PacksReport({ tableId }: { tableId: string }) {
   )
 }
 
-
-
 function DuelistsReport({ tableId }: { tableId: string }) {
   const mounted = useMounted()
   const query = useMemo<PistolsQueryBuilder>(() => (
@@ -438,6 +405,107 @@ function DuelistsReport({ tableId }: { tableId: string }) {
           <Cell>{isLoading ? '...' : duelistsDeadCount}</Cell>
           <Cell>{isLoading ? '...' : duelistsAliveCount}</Cell>
         </Row>
+      </Body>
+    </Table>
+  )
+}
+
+
+
+//--------------------------------
+// Leaderboards
+//
+function Leaderboards({
+  tableId,
+}: {
+  tableId: string,
+}) {
+  const { maxPositions, scores } = useLeaderboard(tableId)
+
+  // console.log(`Leaderboards() =>`, tableId, maxPositions, scorePerDuelistId)
+  return (
+    <Table celled>
+      <Header fullWidth>
+        <Row>
+          <HeaderCell><h3 className='Important'>Leaderboards</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Points</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Wallet</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Username</h3></HeaderCell>
+        </Row>
+      </Header>
+      <Body>
+        {scores.map(({ duelistId, score }, index) => (
+          <LeaderboardRow key={duelistId} duelistId={duelistId} score={score} index={index} />
+        ))}
+      </Body>
+    </Table>
+  )
+}
+function LeaderboardRow({
+  duelistId,
+  score,
+  index,
+}: {
+  duelistId: BigNumberish,
+  score: number,
+  index: number,
+}) {
+  const { owner, isLoading: isLoadingOwner } = useOwnerOfDuelist(duelistId)
+  // const { username, isLoading: isLoadingUsername } = useControllerUsername(isLoadingOwner ? undefined : owner)
+  const { username } = usePlayer(owner)
+  return (
+    <Row key={duelistId}>
+      <Cell>
+        <span className='Important'>
+          {`Duelist #${duelistId}`}
+        </span>
+      </Cell>
+      <Cell className='Code'>{score}</Cell>
+      <Cell className='Code'>{isLoadingOwner ? '...' : bigintToHex(owner)}</Cell>
+      {/* <Cell className='Code'>{isLoadingUsername ? '...' : username}</Cell> */}
+      <Cell className='Code'>{username || '...'}</Cell>
+    </Row>
+  )
+}
+
+
+
+//--------------------------------
+// Lords Releases
+//
+function LordsReleaseEvents({
+  tableId,
+}: {
+  tableId: string,
+}) {
+  const { bills } = useLordsReleaseEvents(tableId)
+  return (
+    <Table celled>
+      <Header fullWidth>
+        <Row>
+          <HeaderCell><h3 className='Important'>Duel</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Duelist</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Reason</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Pegged Lords</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Sponsored Lords</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Recipient</h3></HeaderCell>
+        </Row>
+      </Header>
+      <Body>
+        {bills.map((bill, index) => (
+          <Row key={`${index}`}>
+            <Cell>Duel #{bigintToDecimal(bill.duelId)}</Cell>
+            <Cell>Duelist #{bigintToDecimal(bill.duelistId)}</Cell>
+            <Cell>{bill.reason}{bill.position ? ` (${bill.position})` : ''}</Cell>
+            <Cell>
+              <Balance fame wei={bill.peggedFame} />
+              {` = `}
+              <Balance lords wei={bill.peggedLords} decimals={6} />
+            </Cell>
+            <Cell><Balance lords wei={bill.sponsoredLords} decimals={6} /></Cell>
+            <Cell><AddressShort address={bill.recipient} /></Cell>
+          </Row>
+        ))}
       </Body>
     </Table>
   )

@@ -27,7 +27,7 @@ import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
-import { useDuelCallToAction } from '/src/stores/eventsStore'
+import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { SceneName } from '/src/data/assets'
 

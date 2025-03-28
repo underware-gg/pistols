@@ -5,7 +5,7 @@ import { useStarknetContext } from '@underware/pistols-sdk/dojo'
 import { bigintToU256, ethToWei, execute } from '@underware/pistols-sdk/utils/starknet'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { useLordsContract } from '/src/hooks/useTokenContract'
-import { useLordsBalance } from '../stores/coinStore'
+import { useLordsBalance } from '/src/stores/coinStore'
 
 export interface FaucetExecuteResult {
   transaction_hash: string

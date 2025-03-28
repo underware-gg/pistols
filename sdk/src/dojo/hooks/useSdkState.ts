@@ -18,8 +18,12 @@ export type EntityMap = {
   [entityId: string]: Partial<PistolsSchemaModels>,
 }
 
-export type useSdkStateResult = {
+export type useSdkStateResultOLD = {
   entities: EntityMap | null
+  isLoading: boolean | undefined
+}
+export type useSdkStateResult = {
+  entities: PistolsEntity[] | null
   isLoading: boolean | undefined
 }
 
@@ -38,7 +42,7 @@ export const getEntityMapModels = <M extends PistolsModelType>(entities: EntityM
 export const useSdkStateEntitiesGet = ({
   query,
   enabled = true,
-}: Omit<UseSdkEntitiesGetProps, 'setEntities'>): useSdkStateResult => {
+}: Omit<UseSdkEntitiesGetProps, 'setEntities'>): useSdkStateResultOLD => {
   const [entities, setEntities] = useState<EntityMap | null>()
 
   const { isLoading } = useSdkEntitiesGet({
@@ -48,6 +52,7 @@ export const useSdkStateEntitiesGet = ({
       setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
         ...acc,
         [e.entityId]: {
+          ...(acc[e.entityId] ?? {}),
           ...e.models.pistols
         } as EntityMap,
       }), {} as EntityMap));
@@ -63,7 +68,7 @@ export const useSdkStateEntitiesGet = ({
 export const useSdkStateEntitiesSub = ({
   query,
   enabled = true,
-}: Omit<UseSdkEntitiesSubProps, 'setEntities' | 'updateEntity'>): useSdkStateResult => {
+}: Omit<UseSdkEntitiesSubProps, 'setEntities' | 'updateEntity'>): useSdkStateResultOLD => {
   const [entities, setEntities] = useState<EntityMap | null>()
 
   const { isLoading } = useSdkEntitiesSub({
@@ -73,6 +78,7 @@ export const useSdkStateEntitiesSub = ({
       setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
         ...acc,
         [e.entityId]: {
+          ...(acc[e.entityId] ?? {}),
           ...e.models.pistols
         } as EntityMap,
       }), {} as EntityMap));
@@ -81,6 +87,7 @@ export const useSdkStateEntitiesSub = ({
       setEntities({
         ...entities,
         [e.entityId]: {
+          ...(entities[e.entityId] ?? {}),
           ...e.models.pistols
         } as EntityMap,
       });
@@ -108,7 +115,7 @@ export const useSdkStateEventsGet = ({
   enabled = true,
   retryInterval = 0,
 }: Omit<UseSdkEventsGetProps, 'setEntities'>): useSdkStateResult => {
-  const [entities, setEntities] = useState<EntityMap | null>()
+  const [entities, setEntities] = useState<PistolsEntity[]>([])
 
   const { isLoading } = useSdkEventsGet({
     query,
@@ -116,13 +123,8 @@ export const useSdkStateEventsGet = ({
     historical,
     retryInterval,
     setEntities: (entities: PistolsEntity[]) => {
-      console.log('useSdkStateEventsGet', entities)
-      setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
-        ...acc,
-        [e.entityId]: {
-          ...e.models.pistols
-        } as EntityMap,
-      }), {} as EntityMap));
+      console.log('useSdkStateEventsGet() GOT:', entities, query)
+      setEntities([...entities]);
     },
   })
 
