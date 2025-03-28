@@ -52,7 +52,6 @@ export const useSdkStateEntitiesGet = ({
       setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
         ...acc,
         [e.entityId]: {
-          ...(acc[e.entityId] ?? {}),
           ...e.models.pistols
         } as EntityMap,
       }), {} as EntityMap));
@@ -78,7 +77,6 @@ export const useSdkStateEntitiesSub = ({
       setEntities(entities.reduce((acc: EntityMap, e: PistolsEntity) => ({
         ...acc,
         [e.entityId]: {
-          ...(acc[e.entityId] ?? {}),
           ...e.models.pistols
         } as EntityMap,
       }), {} as EntityMap));
@@ -87,7 +85,6 @@ export const useSdkStateEntitiesSub = ({
       setEntities({
         ...entities,
         [e.entityId]: {
-          ...(entities[e.entityId] ?? {}),
           ...e.models.pistols
         } as EntityMap,
       });

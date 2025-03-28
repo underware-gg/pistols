@@ -424,7 +424,7 @@ function Leaderboards({
 
   // console.log(`Leaderboards() =>`, tableId, maxPositions, scorePerDuelistId)
   return (
-    <Table celled>
+    <Table celled color='green'>
       <Header fullWidth>
         <Row>
           <HeaderCell><h3 className='Important'>Leaderboards</h3></HeaderCell>
@@ -480,7 +480,7 @@ function LordsReleaseEvents({
 }) {
   const { bills } = useLordsReleaseEvents(tableId)
   return (
-    <Table celled>
+    <Table celled color='green'>
       <Header fullWidth>
         <Row>
           <HeaderCell><h3 className='Important'>Duel</h3></HeaderCell>

@@ -414,8 +414,8 @@ pub mod duelist_token {
             let treasury_address: ContractAddress = store.get_config_treasury_address();
             self._process_rewards(@fame_dispatcher, @fools_dispatcher, challenge.duelist_id_a, rewards_a);
             self._process_rewards(@fame_dispatcher, @fools_dispatcher, challenge.duelist_id_b, rewards_b);
-            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_a, challenge.duelist_id_a, ref rewards_a, rewards_b.fame_gained);
-            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_b, challenge.duelist_id_b, ref rewards_b, rewards_a.fame_gained);
+            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_a, challenge.duel_id, challenge.duelist_id_a, ref rewards_a, rewards_b.fame_gained);
+            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_b, challenge.duel_id, challenge.duelist_id_b, ref rewards_b, rewards_a.fame_gained);
 
             // DEAD
             if (!rewards_a.survived) {
@@ -470,6 +470,7 @@ pub mod duelist_token {
             underware_address: ContractAddress,
             distribution: @FeeDistribution,
             fame_balance: u128,
+            duel_id: u128,
             duelist_id: u128,
             ref values: RewardValues,
             winners_minted_fame: u128,
@@ -534,7 +535,7 @@ pub mod duelist_token {
                     PoolType::Season(table_id) => {table_id},
                     _ => {0},
                 };
-                values.lords_unlocked += (*bank_dispatcher).release_lords_from_fame_to_be_burned(season_table_id, release_bills.span());
+                values.lords_unlocked += (*bank_dispatcher).release_lords_from_fame_to_be_burned(season_table_id, duel_id, release_bills.span());
                 (*fame_dispatcher).burn_from_token(starknet::get_contract_address(), duelist_id, total_to_burn.into());
             } else {
                 values.survived = true;
@@ -589,7 +590,7 @@ pub mod duelist_token {
                 pegged_lords: 0,
                 sponsored_lords: 0,
             };
-            bank_dispatcher.release_lords_from_fame_to_be_burned(0, array![bill].span());
+            bank_dispatcher.release_lords_from_fame_to_be_burned(0, 0, array![bill].span());
             fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, due_amount.into());
 // println!("remaining: {}", self._fame_balance(@fame_dispatcher, duelist_id));
 

@@ -37,8 +37,8 @@ export const useLordsReleaseEvents = (season_table_id: string) => {
       const bill = {
         seasonId: feltToString(e.season_table_id),
         duelistId: BigInt(e.bill.duelist_id),
-        duelId: 0n,//BigInt(e.duel_id),
-        timestamp: 0,//Number(e.timestamp),
+        duelId: BigInt(e.duel_id ?? 0),
+        timestamp: Number(e.timestamp),
         recipient: BigInt(e.bill.recipient),
         reason: variant,
         position: value,
