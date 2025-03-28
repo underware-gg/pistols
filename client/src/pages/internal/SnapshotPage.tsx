@@ -15,6 +15,9 @@ import { useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { fetchNewTokenBoundCoins, useDuelistFameBalance } from '/src/stores/coinStore'
 import { useFameContract } from '/src/hooks/useTokenContract'
 import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
+import { SeasonSelectDropdown } from '/src/components/SeasonSelectDropdown'
+import { useConfig } from '/src/stores/configStore'
+import { useTableTotals } from '/src/hooks/useTable'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -76,6 +79,16 @@ export default function SnapshotPage() {
 export function Snapshots() {
   const state = useStore((state) => state)
 
+  const [tableId, setTableId] = useState<string>(null)
+  const { duelIds: tableDuelIds, duelistIds: tableDuelistIds } = useTableTotals(tableId)
+  const { duelIds: allDuelIds } = useAllChallengesIds()
+  const { duelistIds: allDuelistIds } = useAllDuelistsIds()
+  // console.log("______________Snapshots:", tableId)
+
+  useEffect(() => {
+    state.initialize('', tableId)
+  }, [tableId])
+
   const _download = useCallback(() => {
     const blob = new Blob([state.formatted], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -85,6 +98,11 @@ export function Snapshots() {
     a.click();
   }, [state.formatted, state.filename])
 
+  const { sdk } = useDojoSetup()
+  const { fameContractAddress } = useFameContract()
+  const { duelistContractAddress } = useDuelistTokenContract()
+  fetchNewTokenBoundCoins(sdk, fameContractAddress, duelistContractAddress, allDuelistIds)
+
   return (
     <Container text>
       <ChallengeStoreSync />
@@ -93,10 +111,15 @@ export function Snapshots() {
       <Grid>
         <Row columns={'equal'}>
           <Col>
-            <SnapshotDuelists />
+            <SeasonSelectDropdown tableId={tableId} setTableId={setTableId} />
+          </Col>
+        </Row>
+        <Row columns={'equal'}>
+          <Col>
+            <SnapshotDuelists tableId={tableId} duelistIds={tableId ? tableDuelistIds : allDuelistIds} />
           </Col>
           <Col>
-            <SnapshotChallenges />
+            <SnapshotChallenges tableId={tableId} duelIds={tableId ? tableDuelIds : allDuelIds} />
           </Col>
         </Row>
       </Grid>
@@ -149,13 +172,14 @@ const useSnapping = (name: string, domain: string, limit: number) => {
 }
 
 //----------------------------------
-function SnapshotDuelists() {
-  const { sdk } = useDojoSetup()
-  const { duelistIds } = useAllDuelistsIds()
-  const { fameContractAddress } = useFameContract()
-  const { duelistContractAddress } = useDuelistTokenContract()
-  fetchNewTokenBoundCoins(sdk, fameContractAddress, duelistContractAddress, duelistIds)
-  const { snapping, count, limit, start } = useSnapping('duelists', null, duelistIds.length)
+function SnapshotDuelists({
+  tableId,
+  duelistIds,
+}: {
+  tableId: string
+  duelistIds: bigint[]
+}) {
+  const { snapping, count, limit, start } = useSnapping('duelists', tableId, duelistIds.length)
   const loaders = useMemo(() => (
     snapping ? duelistIds.map(duelistId => <SnapDuelist key={duelistId} duelistId={duelistId} />) : null
   ), [snapping, duelistIds])
@@ -204,9 +228,14 @@ export function SnapDuelist({
 //----------------------------------
 // Challenge model
 //
-function SnapshotChallenges() {
-  const { duelIds } = useAllChallengesIds()
-  const { snapping, count, limit, start } = useSnapping('challenges', null, duelIds.length)
+function SnapshotChallenges({
+  tableId,
+  duelIds,
+}: {
+  tableId: string
+  duelIds: bigint[]
+}) {
+  const { snapping, count, limit, start } = useSnapping('challenges', tableId, duelIds.length)
   const loaders = useMemo(() => (
     snapping ? duelIds.map(duelId => <SnapChallenge key={duelId} duelId={duelId} />) : null
   ), [snapping, duelIds])

@@ -25,6 +25,7 @@ interface State {
   setBalances: (balances: torii.TokenBalance[]) => void;
   updateBalance: (balance: torii.TokenBalance) => void;
   getBalance: (contractAddress: BigNumberish, accountAddress: BigNumberish) => bigint | undefined | null;
+  getAccounts: (contractAddress: BigNumberish) => string[];
 }
 
 const createStore = () => {
@@ -63,6 +64,12 @@ const createStore = () => {
       const balances = get().contracts[_contractAddress]
       if (!balances) return undefined
       return balances[bigintToHex(accountAddress)] ?? null
+    },
+    getAccounts: (contractAddress: BigNumberish): string[] => {
+      const _contractAddress = bigintToHex(contractAddress)
+      const balances = get().contracts[_contractAddress]
+      if (!balances) return []
+      return Object.keys(balances)
     },
   })))
 }
@@ -105,20 +112,25 @@ export const useCoinBalance = (
 }
 
 export const fetchNewTokenBoundCoins = async (sdk: SetupResult['sdk'], coinAddress: BigNumberish, tokenAddress: BigNumberish, tokenIds: bigint[]) => {
-  // console.log("fetchNewTokenBoundCoins()...", tokenAddress, tokenIds)
   if (tokenIds.length == 0) return
   const setBalances = useCoinStore.getState().setBalances
-  const tokenBoundAddresses = tokenIds.map((tokenId) => bigintToHex(makeTokenBoundAddress(tokenAddress, tokenId)))
-  await sdk.getTokenBalances(
-    [coinAddress as string],
-    tokenBoundAddresses,
-    [], // no token ids
-  ).then((balances: torii.TokenBalance[]) => {
-    // console.log("fetchNewTokenBoundCoins() GOT:", balances)
-    setBalances(balances)
-  }).catch((error: Error) => {
-    console.error("fetchNewTokenBoundCoins().sdk.get() error:", error, tokenIds)
-  })
+  const accounts = useCoinStore.getState().getAccounts(coinAddress)
+  const tokenBoundAddresses = tokenIds
+    .map((tokenId) => bigintToHex(makeTokenBoundAddress(tokenAddress, tokenId)))
+    .filter((address) => !accounts.includes(address))
+  // console.log("fetchNewTokenBoundCoins()...", tokenAddress, tokenIds, tokenBoundAddresses, accounts)
+  if (tokenBoundAddresses.length > 0) {
+    await sdk.getTokenBalances(
+      [coinAddress as string],
+      tokenBoundAddresses,
+      [], // no token ids
+    ).then((balances: torii.TokenBalance[]) => {
+      // console.log("fetchNewTokenBoundCoins() GOT:", balances)
+      setBalances(balances)
+    }).catch((error: Error) => {
+      console.error("fetchNewTokenBoundCoins().sdk.get() error:", error, tokenIds)
+    })
+  }
 }
 
 

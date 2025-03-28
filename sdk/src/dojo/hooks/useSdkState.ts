@@ -32,7 +32,7 @@ export const useSdkStateEntitiesGet = ({
   query,
   enabled = true,
 }: Omit<UseSdkEntitiesGetProps, 'setEntities'>): useSdkStateResult => {
-  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [])
+  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [query])
   const state = useStore(store, (state) => state)
 
   const { isLoading } = useSdkEntitiesGet({
@@ -44,8 +44,10 @@ export const useSdkStateEntitiesGet = ({
     },
   })
 
+  const entities = useMemo(() => Object.values(state.entities), [state.entities])
+
   return {
-    entities: Object.values(state.entities),
+    entities,
     isLoading,
   }
 }
@@ -54,7 +56,7 @@ export const useSdkStateEntitiesSub = ({
   query,
   enabled = true,
 }: Omit<UseSdkEntitiesSubProps, 'setEntities' | 'updateEntity'>): useSdkStateResult => {
-  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [])
+  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [query])
   const state = useStore(store, (state) => state)
 
   const { isLoading } = useSdkEntitiesSub({
@@ -70,8 +72,10 @@ export const useSdkStateEntitiesSub = ({
     },
   })
 
+  const entities = useMemo(() => Object.values(state.entities), [state.entities])
+
   return {
-    entities: Object.values(state.entities),
+    entities,
     isLoading,
   }
 }
@@ -91,7 +95,7 @@ export const useSdkStateEventsGet = ({
   enabled = true,
   retryInterval = 0,
 }: Omit<UseSdkEventsGetProps, 'setEntities'>): useSdkStateResult => {
-  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [])
+  const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [query])
   const state = useStore(store, (state) => state)
 
   const { isLoading } = useSdkEventsGet({
@@ -105,12 +109,10 @@ export const useSdkStateEventsGet = ({
     },
   })
 
-  useEffect(() => {
-    console.log('useSdkStateEventsGet() STORE:', state)
-  }, [state])
+  const entities = useMemo(() => Object.values(state.entities), [state.entities])
 
   return {
-    entities: Object.values(state.entities),
+    entities,
     isLoading,
   }
 }

@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { formatQueryValue, getEntityModel, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
@@ -47,6 +47,7 @@ const useGetChallengesByTableQuery = (tableId: string) => {
 export const useTableTotals = (tableId: string) => {
   const { challenges } = useGetChallengesByTableQuery(tableId)
   const result = useMemo(() => {
+    const duelIds = challenges.map((ch: models.Challenge) => BigInt(ch.duel_id))
     const liveDuelsCount = challenges.reduce((acc: number, ch: models.Challenge) => {
       const state = parseEnumVariant<constants.ChallengeState>(ch.state) ?? constants.ChallengeState.Null
       if (LiveChallengeStates.includes(state)) acc++
@@ -57,28 +58,29 @@ export const useTableTotals = (tableId: string) => {
       if (PastChallengeStates.includes(state)) acc++
       return acc
     }, 0)
-    const duelistsCount = challenges.reduce((acc: Set<bigint>, ch: models.Challenge) => {
+    const duelistIds = Array.from(challenges.reduce((acc: Set<bigint>, ch: models.Challenge) => {
       acc.add(BigInt(ch.duelist_id_a))
       acc.add(BigInt(ch.duelist_id_b))
       return acc
-    }, new Set<bigint>())
-    const accountsCount = challenges.reduce((acc: Set<bigint>, ch: models.Challenge) => {
+    }, new Set<bigint>())).filter(id => id !== 0n)
+    const accountIds = Array.from(challenges.reduce((acc: Set<bigint>, ch: models.Challenge) => {
       acc.add(BigInt(ch.address_a))
       acc.add(BigInt(ch.address_b))
       return acc
-    }, new Set<bigint>())
+    }, new Set<bigint>())).filter(id => id !== 0n)
 
     return {
+      duelIds,
       liveDuelsCount,
       pastDuelsCount,
-      duelistsCount: duelistsCount.size,
-      accountsCount: accountsCount.size
+      duelistsCount: duelistIds.length,
+      accountsCount: accountIds.length,
+      duelistIds,
+      accountIds,
     }
   }, [challenges])
 
-  return {
-    ...result
-  }
+  return result
 }
 
 export const useTableActiveDuelistIds = (tableId: string) => {
