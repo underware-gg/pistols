@@ -1,12 +1,15 @@
 import React, { useMemo, useState } from 'react'
-import { Container, SemanticCOLORS, Table } from 'semantic-ui-react'
+import { Container, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAllSeasonTableIds, useLeaderboard, useSeason, useTable } from '/src/stores/tableStore'
 import { bigintToDecimal, bigintToHex, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal } from '@underware/pistols-sdk/utils'
-import { formatQueryValue, useControllerUsername, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { formatQueryValue, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { parseCustomEnum, parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
 import { useClientTimestamp, useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
+import { useLordsReleaseEvents } from '/src/hooks/useLordsReleaseEvents'
+import { useSeasonPool } from '/src/stores/bankStore'
+import { useTableTotals } from '/src/hooks/useTable'
 import { useAccount } from '@starknet-react/core'
 import { useConfig } from '/src/stores/configStore'
 import { usePlayer } from '/src/stores/playerStore'
@@ -17,15 +20,12 @@ import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
+import { AddressShort } from '/src/components/ui/AddressShort'
+import { Balance } from '/src/components/account/Balance'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
-import { useLordsReleaseEvents } from '/src/hooks/useLordsReleaseEvents'
-import { LordsBalance } from '/src/components/account/LordsBalance'
-import { Balance } from '/src/components/account/Balance'
-import { AddressShort } from '/src/components/ui/AddressShort'
-import { useSeasonPool } from '/src/stores/bankStore'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -60,10 +60,11 @@ function Seasons() {
     <Header fullWidth>
       <Row>
         <HeaderCell><h3 className='Important'>Season</h3></HeaderCell>
-        <HeaderCell><h3 className='Important'>Number</h3></HeaderCell>
+        <HeaderCell><h3 className='Important'>#</h3></HeaderCell>
         <HeaderCell><h3 className='Important'>Name</h3></HeaderCell>
         <HeaderCell><h3 className='Important'>Phase</h3></HeaderCell>
         <HeaderCell><h3 className='Important'>Pool</h3></HeaderCell>
+        <HeaderCell><h3 className='Important'>Players</h3></HeaderCell>
         <HeaderCell><h3 className='Important'>Start</h3></HeaderCell>
         <HeaderCell><h3 className='Important'>End</h3></HeaderCell>
         <HeaderCell><h3 className='Important'></h3></HeaderCell>
@@ -76,7 +77,7 @@ function Seasons() {
         {header}
         <Body>
           {seasonTableIds.map((tableId, i) => (
-            <SeasonRow key={tableId} tableId={tableId} isCurrent={tableId === seasonTableId} setReport={setReportTableId} />
+            <SeasonRow key={tableId} tableId={tableId} isCurrent={tableId === seasonTableId} reportTableId={reportTableId} setReport={setReportTableId} />
           ))}
         </Body>
       </Table>
@@ -106,11 +107,13 @@ function SeasonRow({
   isCurrent,
   actions = true,
   setReport,
+  reportTableId,
 }: {
   tableId: string,
   isCurrent: boolean,
   actions?: boolean,
   setReport: (tableId: string) => void,
+  reportTableId?: string,
 }) {
   const { account } = useAccount()
   const { description } = useTable(tableId)
@@ -119,7 +122,7 @@ function SeasonRow({
   const { canCollectSeason } = useCanCollectSeason()
   const { game: { collectSeason } } = useDojoContractCalls()
   const poolSeason = useSeasonPool(tableId)
-
+  const { accountsCount } = useTableTotals(tableId)
   return (
     <Row>
       <Cell>
@@ -131,6 +134,7 @@ function SeasonRow({
       <Cell>{description}</Cell>
       <Cell>{phase}</Cell>
       <Cell><Balance lords wei={poolSeason.balanceLords} /></Cell>
+      <Cell>{accountsCount}</Cell>
       <Cell>{formatTimestampLocal(timestamp_start)}</Cell>
       <Cell>
         {formatTimestampLocal(timestamp_end)}
@@ -143,7 +147,8 @@ function SeasonRow({
         <Cell>
           <ActionButton
             label={'Reports'}
-            onClick={() => setReport(tableId)}
+            important={reportTableId == tableId}
+            onClick={() => setReport(reportTableId != tableId ? tableId : null)}
           />
           &nbsp;
           {isCurrent &&

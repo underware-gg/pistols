@@ -28,9 +28,8 @@ const useGetChallengesByTableQuery = (tableId: string) => {
     tableId
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().keys(
-            ["pistols-Challenge"],
-            [formatQueryValue(stringToFelt(tableId))]
+          new PistolsClauseBuilder().where(
+            "pistols-Challenge", "table_id", "Eq", formatQueryValue(stringToFelt(tableId)),
           ).build()
         )
         .withEntityModels(
@@ -58,10 +57,22 @@ export const useTableTotals = (tableId: string) => {
       if (PastChallengeStates.includes(state)) acc++
       return acc
     }, 0)
+    const duelistsCount = challenges.reduce((acc: Set<bigint>, ch: models.Challenge) => {
+      acc.add(BigInt(ch.duelist_id_a))
+      acc.add(BigInt(ch.duelist_id_b))
+      return acc
+    }, new Set<bigint>())
+    const accountsCount = challenges.reduce((acc: Set<bigint>, ch: models.Challenge) => {
+      acc.add(BigInt(ch.address_a))
+      acc.add(BigInt(ch.address_b))
+      return acc
+    }, new Set<bigint>())
 
     return {
       liveDuelsCount,
-      pastDuelsCount
+      pastDuelsCount,
+      duelistsCount: duelistsCount.size,
+      accountsCount: accountsCount.size
     }
   }, [challenges])
 
