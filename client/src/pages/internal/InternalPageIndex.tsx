@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
-import { Button, Container, Divider, Menu, MenuItem } from 'semantic-ui-react'
+import { Container, Menu, MenuItem } from 'semantic-ui-react'
+import { TestPageMainMenu } from '/src/pages/tests/TestPageIndex'
 import App from '/src/components/App'
 
 const internalPages = [
@@ -19,6 +20,7 @@ export default function InternalPageIndex() {
   return (
     <App>
       <Container text>
+        <h3>Internal pages</h3>
         <Menu inverted vertical>
           {internalPages.map(page => (
             <MenuItem
@@ -30,6 +32,8 @@ export default function InternalPageIndex() {
             />
           ))}
         </Menu>
+        <br />
+        <TestPageMainMenu />
       </Container>
     </App>
   );
@@ -43,7 +47,6 @@ export function InternalPageMenu() {
   }
   return (
     <>
-      <br />
       <Menu inverted>
         <MenuItem
           icon='arrow left'
