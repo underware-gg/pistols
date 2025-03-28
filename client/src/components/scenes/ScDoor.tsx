@@ -53,10 +53,10 @@ export default function ScDoor() {
                 <EnterAsGuestButton />
                 <div className='Spacer10' />
               </> : <>
-                <Divider content='NEWCOMERS:' />
+                <Divider content='NEW PLAYERS:' />
                 <div className='Spacer10' />
                 <PlayGameButton />
-                <Divider content='OR' />
+                <Divider content='OR' as='h5' className='DividerSmall'/>
                 <EnterAsGuestButton />
                 <div className='Spacer30' />
                 <Divider content='EXISTING PLAYERS:' />
@@ -121,7 +121,7 @@ export function EnterAsGuestButton() {
   const _enterAsGuest = () => {
     dispatchSetScene(SceneName.Tavern)
   }
-  return <ActionButton large fill onClick={() => _enterAsGuest()} label='Enter as Spectator' />
+  return <ActionButton large fill onClick={() => _enterAsGuest()} label='Enter as Guest' />
 }
 
 export function PlayGameButton({
@@ -134,7 +134,7 @@ export function PlayGameButton({
   const _playGame = () => {
     dispatchSetScene(SceneName.Tutorial)
   }
-  return <ActionButton large={large} fill important onClick={() => _playGame()} label='Play Game' />
+  return <ActionButton large={large} fill important onClick={() => _playGame()} label='Start Tutorial' />
 }
 
 export function ConnectButton({

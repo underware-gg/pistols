@@ -1968,6 +1968,11 @@ a.active.step:hover,
   border-bottom: 1px solid rgba($color-brightest, .25);
 }
 
+.DividerSmall {
+  margin-left: aspect-width(5) !important;
+  margin-right: aspect-width(5) !important;
+}
+
 .TextDivider {
   display: flex;
   align-items: center;
