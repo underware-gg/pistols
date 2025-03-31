@@ -49,7 +49,7 @@ export default function ScGate() {
           scene.toggleBlur(false)
         }, 3000)
       }
-    }, 1000)
+    }, 7000)
 
     return () => {
       if (timerRef.current) {
