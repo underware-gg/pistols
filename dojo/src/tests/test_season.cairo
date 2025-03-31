@@ -18,6 +18,7 @@ mod tests {
             OWNER, OTHER, SEASON_TABLE, ID,
         }
     };
+    use pistols::tests::prefabs::{prefabs};
 
     const PREMISE_1: felt252 = 'For honour!!!';
 
@@ -100,7 +101,30 @@ mod tests {
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel(1)");
         tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, true);
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
-        assert_eq!(challenge.state, ChallengeState::Expired, "challenge.state_expired");
+        assert_eq!(challenge.state, ChallengeState::Expired, "ChallengeState::Expired");
+    }
+
+    #[test]
+    fn test_season_collect_pending_challenge() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
+        let season_1: SeasonConfig = sys.store.get_current_season();
+        tester::set_block_timestamp(season_1.period.end - TIMESTAMP::ONE_HOUR);
+        // create a challenge in season 1
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_TABLE(1), 0, 1);
+        tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, true);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(challenge.table_id, season_1.table_id, "challenge.season_id_1");
+        assert_eq!(challenge.state, ChallengeState::InProgress, "ChallengeState::InProgress");
+        // collect season 1
+        tester::set_block_timestamp(season_1.period.end);
+        tester::execute_collect_season(@sys.game, OWNER());
+        // continue challenge
+        let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+        let (challenge, _) = prefabs::commit_reveal_get(@sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
+        assert_eq!(challenge.state, ChallengeState::Draw, "ChallengeState::Draw");
+        // settled on season 2
+        let season_2: SeasonConfig = sys.store.get_current_season();
+        assert_eq!(challenge.table_id, season_2.table_id, "challenge.season_id_2");
     }
 
     #[test]

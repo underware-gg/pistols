@@ -301,13 +301,22 @@ pub mod game {
             // events
             Activity::MovesRevealed.emit(ref store.world, starknet::get_caller_address(), duel_id.into());
 
-            //
             // missing reveal, update only and wait for final reveal
             if (round.moves_a.salt == 0 || round.moves_b.salt == 0) {
                 store.set_round(@round);
                 // clear self flag
                 store.emit_challenge_action(@challenge, duelist_number, false);
                 return;
+            }
+
+            //
+            // RESOLVED!!!
+            //
+
+            // if season ended, settle on next
+            let current_season_table_id: felt252 = store.get_config_season_table_id();
+            if (challenge.table_id != current_season_table_id) {
+                challenge.table_id = current_season_table_id;
             }
 
             // clear self duel
