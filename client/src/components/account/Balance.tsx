@@ -1,7 +1,7 @@
 import { ReactNode, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { CustomIcon, EmojiIcon, IconSizeProp } from '/src/components/ui/Icons'
-import { weiToEthString } from '@underware/pistols-sdk/utils/starknet'
+import { ethToWei, weiToEthString } from '@underware/pistols-sdk/utils/starknet'
 import { EMOJI } from '/src/data/messages'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 
@@ -41,9 +41,9 @@ export function Balance({
   fools = false,
   fame = false,
   clean = false,
-  value = null,
-  decimals,
   wei = null,
+  eth = null,
+  decimals,
   size = null,
   bold = false,
   crossed = false,
@@ -57,7 +57,7 @@ export function Balance({
   fools?: boolean
   fame?: boolean
   clean?: boolean
-  value?: BigNumberish
+  eth?: BigNumberish
   wei?: BigNumberish
   decimals?: number
   size?: IconSizeProp
@@ -74,11 +74,11 @@ export function Balance({
     const _decimals = decimals ?? (ether ? 6 : 0)
     const result = (
       wei != null ? weiToEthString(wei, _decimals)
-        : value != null ? weiToEthString(value, _decimals)
+        : eth != null ? weiToEthString(ethToWei(eth), _decimals)
           : ''
     )
     return fools ? result : ((result == '0' || result == '0.0') ? EMOJI.ZERO : result)
-  }, [decimals, value, wei])
+  }, [decimals, eth, wei])
 
   const classNames = useMemo(() => {
     let result = []

@@ -1,96 +1,92 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
+import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useSdkTokenBalancesGet } from '@underware/pistols-sdk/dojo'
-import { useTokenConfig } from './tokenConfigStore'
-import { useDelay } from '@underware/pistols-sdk/utils/hooks'
-import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import * as torii from '@dojoengine/torii-client'
-import { useDuelistTokenContract } from '../hooks/useTokenContract'
 
-
-interface TokenState {
-  tokenId: bigint
-}
-interface TokenIdsByOwner {
-  [accountAddress: string]: TokenState[]
+interface TokenIdsByAccount {
+  [accountAddress: string]: bigint[]
 }
 interface Contracts {
-  [contractAddress: string]: TokenIdsByOwner
+  [contractAddress: string]: TokenIdsByAccount
 }
 interface State {
   contracts: Contracts,
-  initialized: boolean,
-  initialize: (contractAddress: string[]) => void
   setBalances: (balances: torii.TokenBalance[]) => void;
   updateBalance: (balance: torii.TokenBalance) => void;
-  getTokens: (contractAddress: BigNumberish, accountAddress: BigNumberish) => TokenState[] | undefined | null;
+  getTokenIds: (contractAddress: BigNumberish, accountAddress: BigNumberish) => bigint[] | undefined | null;
+  getOwnerOfTokenId: (contractAddress: BigNumberish, tokenId: BigNumberish) => bigint | undefined | null;
 }
 
 const createStore = () => {
-  const _parseBalance = (balance: torii.TokenBalance): TokenState => {
-    return balance ? {
-      tokenId: BigInt(balance.token_id),
-    } : undefined
+  const _parseTokenId = (balance: torii.TokenBalance): bigint => {
+    return balance ? BigInt(balance.token_id) : undefined
   }
   return create<State>()(immer((set, get) => ({
     contracts: {},
-    initialized: false,
-    initialize: (contractAddress: string[]) => {
-      set((state: State) => ({
-        contracts: {
-          ...contractAddress.reduce((acc, contract) => {
-            acc[contract] = {}
-            return acc
-          }, {} as Contracts),
-        },
-        initialized: true,
-      }))
-    },
     setBalances: (balances: torii.TokenBalance[]) => {
-      // console.log("tokenStore() SET:", balances)
+      console.log("tokenStore() SET:", balances)
       set((state: State) => {
-        // insert if not exists
         let processed_accounts = []
         balances.forEach((balance) => {
-          const _owned = Number(balance.balance) > 0
           const _contract = bigintToHex(balance.contract_address)
-          const _owner = bigintToHex(balance.account_address)
-          if (!state.contracts[_contract][_owner] || !processed_accounts.includes(_owner)) {
-            state.contracts[_contract][_owner] = []
-            processed_accounts.push(_owner)
+          const _account = bigintToHex(balance.account_address)
+          if (!state.contracts[_contract]) {
+            // initialize contract
+            state.contracts[_contract] = {}
           }
+          if (!state.contracts[_contract][_account] || !processed_accounts.includes(_account)) {
+            // initialize account
+            state.contracts[_contract][_account] = []
+            processed_accounts.push(_account)
+          }
+          // insert only if owned
+          const _owned = isPositiveBigint(balance.balance)
           if (_owned) {
-            state.contracts[_contract][_owner].push(_parseBalance(balance))
+            const _tokenId = _parseTokenId(balance)
+            state.contracts[_contract][_account].push(_tokenId)
           }
         })
       });
     },
     updateBalance: (balance: torii.TokenBalance) => {
       set((state: State) => {
-        throw new Error('tokenStore.updateBalance() not implemented')
-        // // insert ONLY if exists ?????
-        // const _owned = Number(balance.balance) > 0
-        // const _contract = bigintToHex(balance.contract_address)
-        // const _owner = bigintToHex(balance.account_address)
-        // if (state.contracts[_contract][_owner]) {
-        //   if (_owned) {
-        //     state.contracts[_contract][_owner].push(_parseBalance(balance))
-        //   } else {
-        //     // TODO: REMOVE
-        //   }
-        // }
+        console.log("tokenStore() UPDATE:", balance)
+        const _contract = bigintToHex(balance.contract_address)
+        const _account = bigintToHex(balance.account_address)
+        // update only if account is being tracked
+        if (state.contracts[_contract]?.[_account] != undefined) {
+          const _tokenId = _parseTokenId(balance)
+          const _owned = isPositiveBigint(balance.balance)
+          const _added = state.contracts[_contract][_account].includes(_tokenId)
+          if (_owned && !_added) {
+            state.contracts[_contract][_account].push(_tokenId)
+          } else if (!_owned && _added) {
+            state.contracts[_contract][_account] = arrayRemoveValue(state.contracts[_contract][_account], _tokenId)
+          }
+        }
       });
     },
-    getTokens: (contractAddress: BigNumberish, accountAddress: BigNumberish): TokenState[] | undefined | null => {
-      if (!get().initialized) return undefined
+    getTokenIds: (contractAddress: BigNumberish, accountAddress: BigNumberish): bigint[] | undefined | null => {
       const _contractAddress = bigintToHex(contractAddress)
-      const owners = get().contracts[_contractAddress]
-      // if (!owners) throw new Error(`tokenStore() contract not initialized: ${_contractAddress}`)
-      if (!owners) return undefined
-      return owners[bigintToHex(accountAddress)] ?? null
+      const accounts = get().contracts[_contractAddress]
+      if (!accounts) return undefined
+      return accounts[bigintToHex(accountAddress)] ?? null
+    },
+    getOwnerOfTokenId: (contractAddress: BigNumberish, tokenId: BigNumberish): bigint | undefined | null => {
+      const _contractAddress = bigintToHex(contractAddress)
+      const accounts = get().contracts[_contractAddress]
+      if (!accounts) return undefined
+      const _tokenId = BigInt(tokenId)
+      const owner = Object.keys(accounts).find((accountAddress) => {
+        return accounts[accountAddress].includes(_tokenId)
+      })
+      // console.log("------------------ getOwnerOfTokenId()", tokenId, accounts[owner], owner)
+      return owner ? BigInt(owner) : null
     },
   })))
 }
@@ -105,75 +101,57 @@ export const useTokenStore = createStore();
 // get current players tokens from the store
 export function useTokenIdsOfPlayer(contractAddress: BigNumberish) {
   const { address } = useAccount()
-  return useTokenIdsByOwner(contractAddress, address)
+  return useTokenIdsByAccount(contractAddress, address)
 }
 
-export function useTokenIdsByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
-  const { tokens, isLoading } = useTokensByOwner(contractAddress, owner)
-  const tokenIds = useMemo(() => (
-    tokens.map((token) => token.tokenId).sort((a, b) => Number(b - a))
-  ), [tokens])
+// get initial tokens of an account
+export function useTokenIdsByAccount(contractAddress: BigNumberish, accountAddress: BigNumberish) {
+  const state = useTokenStore((state) => state)
+  const tokenIds = useMemo(() => state.getTokenIds(contractAddress, accountAddress), [state.contracts, contractAddress, accountAddress])
+
+  const mounted = useMounted()
+  const { isLoading } = useSdkTokenBalancesGet({
+    contract: bigintToHex(contractAddress || 0n),
+    account: bigintToHex(accountAddress || 0n),
+    setBalances: state.setBalances,
+    enabled: (tokenIds == null && mounted),
+  })
+
+  const tokenIdsAscending = useMemo(() => ([...(tokenIds ?? [])].sort((a, b) => Number(a - b))), [tokenIds])
+  const tokenIdsDescending = useMemo(() => ([...(tokenIds ?? [])].sort((a, b) => Number(b - a))), [tokenIds])
+
   return {
+    tokenIds: tokenIdsAscending,
+    tokenIdsDescending,
+    isLoading: (tokenIds === null || isLoading),
+  }
+}
+
+export function useOwnerOfTokenId(contractAddress: BigNumberish, tokenId: BigNumberish) {
+  const state = useTokenStore((state) => state)
+  const owner = useMemo(() => state.getOwnerOfTokenId(contractAddress, tokenId), [state.contracts, contractAddress, tokenId])
+
+  // find balance of tokenId
+  const [balances, setBalances] = useState<torii.TokenBalance[]>([])
+  const tokenIds = useMemo(() => (isPositiveBigint(tokenId) ? [tokenId] : []), [tokenId])
+  const mounted = useMounted()
+  const { isLoading: isLoadingOwner } = useSdkTokenBalancesGet({
+    contract: bigintToHex(contractAddress || 0n),
     tokenIds,
-    isLoading,
-  }
-}
-
-// get initial tokens of owner
-export function useTokensByOwner(contractAddress: BigNumberish, owner: BigNumberish) {
-  const state = useTokenStore((state) => state)
-  const tokens = useMemo(() => state.getTokens(contractAddress, owner), [state.contracts, contractAddress, owner])
-
-  // TODO: REMOVE THIS WHEN TOKEN SUBSCRIPTIONS WORK
-  const { mintedCount } = useTokenConfig(contractAddress)
-  const forceCounter = useDelay(mintedCount, 1000)
-
-  const contracts = useMemo(() => (isPositiveBigint(contractAddress) ? [bigintToHex(contractAddress)] : []), [contractAddress])
-  const accounts = useMemo(() => (isPositiveBigint(owner) ? [bigintToHex(owner)] : []), [owner])
-  const { isLoading } = useSdkTokenBalancesGet({
-    contracts,
-    accounts,
-    setBalances: state.setBalances,
-    enabled: (contracts.length > 0 && accounts.length > 0 && mintedCount > 0
-      // TODO: uncomment when subscriptions work!
-      // && tokens === null
-    ),
-    forceCounter,
+    setBalances,
+    enabled: (owner == null && tokenIds.length > 0 && mounted),
   })
 
-  return {
-    tokens: tokens ?? [],
-    isLoading: (tokens === null || contracts.length == 0 || accounts.length == 0 || isLoading),
-  }
-}
-
-
-// TODO: REMOVE THIS ABERRATION
-export const _useDuelistIdsOfPlayerRetry = () => {
-  const { address } = useAccount()
-  const { duelistContractAddress } = useDuelistTokenContract()
-
-  const state = useTokenStore((state) => state)
-  const tokens = useMemo(() => state.getTokens(duelistContractAddress, address), [state.contracts, duelistContractAddress, address])
-
-  const contracts = useMemo(() => ([bigintToHex(duelistContractAddress)]), [duelistContractAddress])
-  const accounts = useMemo(() => ([bigintToHex(address)]), [address])
-  const enabled = useMemo(() => (isPositiveBigint(duelistContractAddress) && isPositiveBigint(address)), [duelistContractAddress, address])
-  // console.log(">>>>>> useDuelistIdsOfPlayerRetry() contracts:", enabled, contracts, accounts)
-  const { isLoading } = useSdkTokenBalancesGet({
-    contracts,
-    accounts,
-    setBalances: state.setBalances,
-    enabled,
-    retryInterval: 1000,
-  })
-
-  const tokenIds = useMemo(() => (
-    tokens?.map((token) => token.tokenId).sort((a, b) => Number(b - a)) ?? []
-  ), [tokens])
+  // load owners account into the store
+  const foundOwner = useMemo(() => (
+    balances.reduce((acc, balance) => {
+      return acc ?? bigintToHex(balance.account_address)
+    }, null as string | null)
+  ), [balances])
+  const { isLoading: isLoadingAccount } = useTokenIdsByAccount(contractAddress, foundOwner)
 
   return {
-    duelistIds: tokenIds,
-    isLoading,
+    owner,
+    isLoading: (owner === null || isLoadingOwner || isLoadingAccount),
   }
 }

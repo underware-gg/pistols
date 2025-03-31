@@ -1,19 +1,73 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useCallback } from 'react'
+import { create } from 'zustand'
+import { immer } from 'zustand/middleware/immer'
 import { Grid, Button, Container, Divider, TextArea } from 'semantic-ui-react'
+import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
+import { useDojoSetup } from '@underware/pistols-sdk/dojo'
 import { useAllChallengesIds, useChallenge } from '/src/stores/challengeStore'
 import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
+import { useFameContract } from '/src/hooks/useTokenContract'
+import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
+import { useTableTotals } from '/src/hooks/useTable'
+import { useGetTableScoreboard } from '/src/hooks/useScore'
+import { useDuelistFameBalance, fetchNewTokenBoundCoins } from '/src/stores/coinStore'
+import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
-import { bigintEquals, bigintToHex } from '@underware/pistols-sdk/utils'
-import { CopyIcon } from '/src/components/ui/Icons'
 import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
+import { SeasonSelectDropdown } from '/src/components/SeasonSelectDropdown'
+import { CopyIcon, IconClick } from '/src/components/ui/Icons'
 import AppDojo from '/src/components/AppDojo'
+import { DuelistScore, useLeaderboard } from '/src/stores/tableStore'
 
-//@ts-ignore
-BigInt.prototype.toJSON = function () { return bigintToHex(this) }
 
 const Row = Grid.Row
 const Col = Grid.Column
+
+// serialize bigint types
+//@ts-ignore
+BigInt.prototype.toJSON = function () { return bigintToHex(this) }
+
+interface State {
+  name: string,
+  data: any,
+  length: number,
+  formatted: string,
+  filename: string,
+  initialize: (name: string, domain: string) => void;
+  insert: (name: string, key: string, data: any | null) => void;
+}
+
+const createStore = () => {
+  return create<State>()(immer((set, get) => ({
+    name: '',
+    data: {},
+    length: 0,
+    formatted: '',
+    filename: '',
+    initialize: (name: string, domain: string) => {
+      set((state: State) => {
+        state.name = name;
+        state.data = {};
+        state.length = 0;
+        state.formatted = JSON.stringify(state.data, null, '  ');
+        state.filename = `snapshot-${name}${domain ? `_${domain}` : ''}-${new Date().toISOString()}.json`;
+      });
+    },
+    insert: (name: string, key: string, data: any) => {
+      // console.log("snapshotStore() SET:", name, key, data)
+      set((state: State) => {
+        if (key != null && data != null) {
+          state.data[key] = data;
+        }
+        state.length = Object.keys(state.data).length;
+        state.formatted = JSON.stringify(state.data, null, '  ');
+      });
+    },
+  })))
+}
+
+export const useStore = createStore();
 
 export default function SnapshotPage() {
   return (
@@ -25,11 +79,32 @@ export default function SnapshotPage() {
 }
 
 export function Snapshots() {
-  const [data, setData] = useState('')
+  const state = useStore((state) => state)
 
-  const _update = (newData: any[]) => {
-    setData(JSON.stringify(newData, null, '  '))
-  }
+  const [tableId, setTableId] = useState<string>(null)
+  const { duelIds: tableDuelIds, duelistIds: tableDuelistIds } = useTableTotals(tableId)
+  const { duelIds: allDuelIds } = useAllChallengesIds()
+  const { duelistIds: allDuelistIds } = useAllDuelistsIds()
+  const { scores: leaderboardScores } = useLeaderboard(tableId)
+  // console.log("______________Snapshots:", tableId, leaderboardScores)
+
+  useEffect(() => {
+    state.initialize('', tableId)
+  }, [tableId])
+
+  const _download = useCallback(() => {
+    const blob = new Blob([state.formatted], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = state.filename;
+    a.click();
+  }, [state.formatted, state.filename])
+
+  const { sdk } = useDojoSetup()
+  const { fameContractAddress } = useFameContract()
+  const { duelistContractAddress } = useDuelistTokenContract()
+  fetchNewTokenBoundCoins(sdk, fameContractAddress, duelistContractAddress, allDuelistIds)
 
   return (
     <Container text>
@@ -39,65 +114,84 @@ export function Snapshots() {
       <Grid>
         <Row columns={'equal'}>
           <Col>
-            <SnapshotDuelists update={_update} />
+            <SeasonSelectDropdown tableId={tableId} setTableId={setTableId} />
+          </Col>
+        </Row>
+        <Row columns={'equal'}>
+          <Col>
+            <SnapshotDuelists tableId={tableId} duelistIds={tableId ? tableDuelistIds : allDuelistIds} leaderboardScores={leaderboardScores} />
           </Col>
           <Col>
-            <SnapshotChallenges update={_update} />
+            <SnapshotChallenges tableId={tableId} duelIds={tableId ? tableDuelIds : allDuelIds} />
           </Col>
         </Row>
       </Grid>
 
       <Divider />
 
-      <TextArea readOnly value={data} />
-      <CopyIcon content={data} />
+      <TextArea readOnly value={state.formatted} />
+      <span>
+        <b>{state.length}:</b>
+        &nbsp;
+        <CopyIcon content={state.formatted} disabled={state.length == 0} />
+        &nbsp;
+        <IconClick name='download' onClick={_download} disabled={state.length == 0} />
+        &nbsp;
+        {state.filename}
+      </span>
     </Container>
   );
 }
 
-
-
-//----------------------------------
-// Duelist Model
-//
-function SnapshotDuelists({
-  update,
-}) {
-  const { duelistIds } = useAllDuelistsIds()
-  const [duelists, setDuelists] = useState([])
-
+const useSnapping = (name: string, domain: string, limit: number) => {
+  const state = useStore((state) => state)
   const [snapping, setSnapping] = useState(false)
-  const canSnap = (duelistIds.length > 0 && (!snapping || duelists.length == duelistIds.length))
+
+  const start = useCallback(() => {
+    if (!snapping) {
+      setSnapping(true)
+      state.initialize(name, domain)
+      console.log("______________START:", name)
+    }
+  }, [snapping, name])
+
+  const count = useMemo(() => {
+    return (state.name == name ? state.length : 0)
+  }, [state.name, name, state.length])
 
   useEffect(() => {
-    if (snapping) {
-      update(duelists)
+    if (snapping && count == limit) {
+      console.log("______________DONE:", name)
+      setSnapping(false)
     }
-  }, [snapping, duelists])
+  }, [snapping, count, limit])
 
-  const _update = (duelist) => {
-    setDuelists(o => (o.findIndex(v => bigintEquals(duelist.address, v.address)) == -1 ? [...o, duelist] : [...o]))
+  return {
+    snapping,
+    count,
+    limit,
+    start,
   }
+}
 
-  const loaders = useMemo(() => {
-    let result = []
-    if (snapping && duelists.length < duelistIds.length) {
-      const duelistId = duelistIds[duelists.length]
-      // console.log(`...loaders`, duelists.length, address.toString(16))
-      result.push(<SnapDuelist key={bigintToHex(duelistId)} duelistId={duelistId} update={_update} />)
-    }
-    return result
-  }, [snapping, duelistIds, duelists])
-
-  const _start = () => {
-    setSnapping(true)
-    setDuelists([])
-  }
-
+//----------------------------------
+function SnapshotDuelists({
+  tableId,
+  duelistIds,
+  leaderboardScores,
+}: {
+  tableId: string
+  duelistIds: bigint[]
+  leaderboardScores: DuelistScore[]
+}) {
+  const { snapping, count, limit, start } = useSnapping('duelists', tableId, duelistIds.length)
+  const loaders = useMemo(() => (
+    snapping ? duelistIds.map(duelistId => <SnapDuelist key={duelistId} tableId={tableId} duelistId={duelistId} leaderboardScores={leaderboardScores} />) : null
+  ), [snapping, duelistIds])
   return (
     <>
-      <Button className='FillParent' disabled={!canSnap} onClick={() => _start()}>
-        Duelists Snapshot ({duelistIds.length > 0 ? `${duelists.length}/${duelistIds.length}` : '...'})
+      <Button className='FillParent' disabled={snapping} onClick={() => start()}>
+        Duelists Snapshot ({limit > 0 ? `${count}/${limit}` : '...'})
       </Button>
       {loaders}
     </>
@@ -106,20 +200,44 @@ function SnapshotDuelists({
 
 export function SnapDuelist({
   duelistId,
-  update,
+  tableId,
+  leaderboardScores,
+}: {
+  tableId: string
+  duelistId: bigint
+  leaderboardScores: DuelistScore[]
 }) {
+  const insert = useStore((state) => state.insert)
   const duelist = useDuelist(duelistId)
-  const { status } = useDuelist(duelistId)
+  const { balance_eth, lives } = useDuelistFameBalance(duelistId)
+  const { points, isLoading } = useGetTableScoreboard(tableId, duelistId)
+  const mounted = useMounted()
   useEffect(() => {
-    update({
-      ...duelist,
-      status: {
-        ...status,
-        honourDisplay: undefined,
-        honourAndTotal: undefined,
-      }
-    })
-  }, [duelist])
+    if (mounted && duelist && (!tableId || !isLoading)) {
+      const leaderboardIndex = leaderboardScores.findIndex(s => s.duelistId == duelistId)
+      insert('duelist', bigintToDecimal(duelistId.toString()), {
+        ...duelist,
+        fame_balance: bigintToDecimal(balance_eth),
+        fame_lives: lives,
+        isValidDuelistId: undefined,
+        exists: undefined,
+        gender: undefined,
+        characterType: undefined,
+        status: {
+          ...duelist.status,
+          honourDisplay: undefined,
+          honourAndTotal: undefined,
+          archetypeName: undefined,
+        },
+        ...(tableId ? {
+          [tableId]: {
+            score: points,
+            position: (leaderboardIndex >= 0 ? leaderboardIndex + 1 : 0),
+          }
+        } : {}),
+      })
+    }
+  }, [mounted, duelist, isLoading, tableId, points, isLoading])
   return <></>
 }
 
@@ -130,42 +248,20 @@ export function SnapDuelist({
 // Challenge model
 //
 function SnapshotChallenges({
-  update,
+  tableId,
+  duelIds,
+}: {
+  tableId: string
+  duelIds: bigint[]
 }) {
-  const { duelIds } = useAllChallengesIds()
-  const [challenges, setChallenges] = useState([])
-
-  const [snapping, setSnapping] = useState(false)
-  const canSnap = (duelIds.length > 0 && (!snapping || challenges.length == duelIds.length))
-
-  useEffect(() => {
-    if (snapping) {
-      update(challenges)
-    }
-  }, [snapping, challenges])
-
-  const _update = (challenge) => {
-    setChallenges(o => (o.findIndex(v => bigintEquals(challenge.duelId, v.duelId)) == -1 ? [...o, challenge] : [...o]))
-  }
-
-  const loaders = useMemo(() => {
-    let result = []
-    if (snapping && challenges.length < duelIds.length) {
-      const duelId = BigInt(duelIds[challenges.length])
-      result.push(<SnapChallenge key={duelId} duelId={duelId} update={_update} />)
-    }
-    return result
-  }, [snapping, duelIds, challenges])
-
-  const _start = () => {
-    setSnapping(true)
-    setChallenges([])
-  }
-
+  const { snapping, count, limit, start } = useSnapping('challenges', tableId, duelIds.length)
+  const loaders = useMemo(() => (
+    snapping ? duelIds.map(duelId => <SnapChallenge key={duelId} duelId={duelId} />) : null
+  ), [snapping, duelIds])
   return (
     <>
-      <Button className='FillParent' disabled={!canSnap} onClick={() => _start()}>
-        Challenges Snapshot ({duelIds.length > 0 ? `${challenges.length}/${duelIds.length}` : '...'})
+      <Button className='FillParent' disabled={snapping} onClick={() => start()}>
+        Challenges Snapshot ({limit > 0 ? `${count}/${limit}` : '...'})
       </Button>
       {loaders}
     </>
@@ -174,13 +270,22 @@ function SnapshotChallenges({
 
 export function SnapChallenge({
   duelId,
-  update,
 }) {
+  const insert = useStore((state) => state.insert)
   const challenge = useChallenge(duelId)
+  const mounted = useMounted()
   useEffect(() => {
-    update({
-      ...challenge,
-    })
-  }, [challenge])
+    if (mounted && challenge) {
+      insert('challenge', bigintToDecimal(duelId.toString()), {
+        ...challenge,
+        challengeExists: undefined,
+        tutorialLevel: challenge.tutorialLevel ?? undefined,
+        needToSyncExpired: undefined,
+      })
+    }
+  }, [mounted, challenge])
+  useEffect(() => {
+  }, [mounted, challenge])
   return <></>
+  // return <>{challenge?.duelId.toString()}</>
 }

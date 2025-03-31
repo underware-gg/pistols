@@ -1,9 +1,9 @@
 import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { getEntityMapModels, formatQueryValue, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { formatQueryValue, getEntityModel, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
-import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 
 
@@ -28,9 +28,8 @@ const useGetChallengesByTableQuery = (tableId: string) => {
     tableId
       ? new PistolsQueryBuilder()
         .withClause(
-          new PistolsClauseBuilder().keys(
-            ["pistols-Challenge"],
-            [formatQueryValue(stringToFelt(tableId))]
+          new PistolsClauseBuilder().where(
+            "pistols-Challenge", "table_id", "Eq", formatQueryValue(stringToFelt(tableId)),
           ).build()
         )
         .withEntityModels(
@@ -40,7 +39,7 @@ const useGetChallengesByTableQuery = (tableId: string) => {
       : null
   ), [tableId])
   const { entities } = useSdkStateEntitiesGet({ query })
-  const challenges = useMemo(() => getEntityMapModels<models.Challenge>(entities, 'Challenge'), [entities])
+  const challenges = useMemo(() => entities.map(e => getEntityModel<models.Challenge>(e, 'Challenge')), [entities])
   // useEffect(() => console.log(`useGetChallengesByTableQuery()`, challenges), [challenges])
   return { challenges }
 }
@@ -48,6 +47,7 @@ const useGetChallengesByTableQuery = (tableId: string) => {
 export const useTableTotals = (tableId: string) => {
   const { challenges } = useGetChallengesByTableQuery(tableId)
   const result = useMemo(() => {
+    const duelIds = challenges.map((ch: models.Challenge) => BigInt(ch.duel_id))
     const liveDuelsCount = challenges.reduce((acc: number, ch: models.Challenge) => {
       const state = parseEnumVariant<constants.ChallengeState>(ch.state) ?? constants.ChallengeState.Null
       if (LiveChallengeStates.includes(state)) acc++
@@ -58,16 +58,29 @@ export const useTableTotals = (tableId: string) => {
       if (PastChallengeStates.includes(state)) acc++
       return acc
     }, 0)
+    const duelistIds = Array.from(challenges.reduce((acc: Set<bigint>, ch: models.Challenge) => {
+      acc.add(BigInt(ch.duelist_id_a))
+      acc.add(BigInt(ch.duelist_id_b))
+      return acc
+    }, new Set<bigint>())).filter(id => id !== 0n)
+    const accountIds = Array.from(challenges.reduce((acc: Set<bigint>, ch: models.Challenge) => {
+      acc.add(BigInt(ch.address_a))
+      acc.add(BigInt(ch.address_b))
+      return acc
+    }, new Set<bigint>())).filter(id => id !== 0n)
 
     return {
+      duelIds,
       liveDuelsCount,
-      pastDuelsCount
+      pastDuelsCount,
+      duelistsCount: duelistIds.length,
+      accountsCount: accountIds.length,
+      duelistIds,
+      accountIds,
     }
   }, [challenges])
 
-  return {
-    ...result
-  }
+  return result
 }
 
 export const useTableActiveDuelistIds = (tableId: string) => {

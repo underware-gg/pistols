@@ -1,36 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useLordsContract, useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
-import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
-import { useFameContract } from '/src/hooks/useFame'
-import { useFoolsContract } from '/src/hooks/useFools'
-import { useTokenIdsOfPlayer, useTokenStore } from '/src/stores/tokenStore'
-import { useCoinStore } from '/src/stores/coinStore'
+import { useDojoSetup, useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
+import { useTokenStore } from '/src/stores/tokenStore'
+import { fetchNewTokenBoundCoins, useCoinStore } from '/src/stores/coinStore'
+import {
+  useDuelistTokenContract,
+  useDuelTokenContract,
+  usePackTokenContract,
+  useFameContract,
+  useFoolsContract,
+  useLordsContract,
+} from '/src/hooks/useTokenContract'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import * as torii from '@dojoengine/torii-client'
-
-
-
-export function TokenStoreSyncQL() {
-  // const { duelistContractAddress } = useDuelistTokenContract()
-  // const { address } = useAccount()
-  // const state = useTokenStore((state) => state)
-  // const { tokens, isLoading, refetch } = useToriiTokensByOwnerQL(duelistContractAddress, address, watch)
-
-  // const { mintedCount } = useTokenConfig(duelistContractAddress)
-  // useEffect(() => {
-  //   setTimeout(() => { refetch() }, 500);
-  // }, [mintedCount, refetch])
-
-  // useEffect(() => {
-  //   if (duelistContractAddress && address && !isLoading) {
-  //     state.setTokens(duelistContractAddress, address, tokens)
-  //   }
-  // }, [duelistContractAddress, address, tokens, isLoading])
-  // useEffect(() => console.log("TokensOfPlayerStoreSyncQL() =>", state.tokens), [state.tokens])
-  return (<></>)
-}
-
 
 
 export function TokenStoreSync() {
@@ -42,9 +24,9 @@ export function TokenStoreSync() {
   const { duelContractAddress } = useDuelTokenContract()
   const { packContractAddress } = usePackTokenContract()
   const token_contracts = useMemo(() => [
-    bigintToHex(duelistContractAddress),
-    bigintToHex(duelContractAddress),
-    bigintToHex(packContractAddress),
+    (duelistContractAddress as string),
+    (duelContractAddress as string),
+    (packContractAddress as string),
   ], [duelistContractAddress, duelContractAddress, packContractAddress])
 
   // get coin contracts
@@ -52,20 +34,10 @@ export function TokenStoreSync() {
   const { fameContractAddress } = useFameContract()
   const { foolsContractAddress } = useFoolsContract()
   const coin_contracts = useMemo(() => [
-    bigintToHex(lordsContractAddress),
-    bigintToHex(fameContractAddress),
-    bigintToHex(foolsContractAddress),
+    (lordsContractAddress as string),
+    (fameContractAddress as string),
+    (foolsContractAddress as string),
   ], [lordsContractAddress, fameContractAddress, foolsContractAddress])
-
-  // initialize stores
-  const [initialized, setInitialized] = useState(false)
-  useEffect(() => {
-    if (!initialized && token_contracts.length > 0 && coin_contracts.length > 0) {
-      token_state.initialize(token_contracts);
-      coin_state.initialize(coin_contracts);
-      setInitialized(true)
-    }
-  }, [initialized, token_contracts, coin_contracts])
 
   // subscribe for any updates
   const mounted = useMounted()
@@ -84,8 +56,27 @@ export function TokenStoreSync() {
         coin_state.updateBalance(balance)
       }
     },
-    enabled: (mounted && initialized),
+    enabled: (mounted),
   })
+
+  // for every new account DUELISTS, fetch its tokenbound FAME balances
+  const { sdk } = useDojoSetup()
+  const [trackedAccounts, setTrackedAccounts] = useState<string[]>([])
+  useEffect(() => {
+    const _balances = token_state.contracts?.[duelistContractAddress as string]
+    if (_balances) {
+      const allAccounts = Object.keys(_balances)
+      const newAccounts = allAccounts.filter((address) => !trackedAccounts.includes(address))
+      if (newAccounts.length > 0) {
+        // console.log("TokenStoreSync() TRACK newAccounts =>", newAccounts)
+        newAccounts.forEach((address) => {
+          fetchNewTokenBoundCoins(sdk, fameContractAddress, duelistContractAddress, _balances[address])
+        })
+        setTrackedAccounts(allAccounts)
+      }
+    }
+  }, [token_state.contracts])
+
 
   // useEffect(() => console.log("TokenStoreSync() token_state =>", token_state.contracts), [token_state.contracts])
   // useEffect(() => console.log("TokenStoreSync() coin_state =>", coin_state.contracts), [coin_state.contracts])

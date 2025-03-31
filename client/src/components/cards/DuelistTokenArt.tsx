@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { duelist_token } from '@underware/pistols-sdk/pistols/tokens'
 import { DuelistTokenImage } from '@underware/pistols-sdk/pistols/components'
 import { useDuelist } from '/src/stores/duelistStore'
-import { useFameBalanceDuelist } from '/src/hooks/useFame'
+import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { usePlayer } from '/src/stores/playerStore'
@@ -18,7 +18,7 @@ export function DuelistTokenArt({
   style?: React.CSSProperties,
 }) {
   const { profileType, profilePic, currentDuelId, status } = useDuelist(duelistId)
-  const { balance_eth, lives, isLoading } = useFameBalanceDuelist(duelistId)
+  const { balance_eth, lives, isLoading } = useDuelistFameBalance(duelistId)
   const { owner } = useOwnerOfDuelist(duelistId)
   const { name } = usePlayer(owner)
 
@@ -38,8 +38,8 @@ export function DuelistTokenArt({
     lives,
     is_memorized: false,
     duel_id: currentDuelId,
-    is_loading: isLoading,
+    is_loading: (isLoading !== false),
   }), [name, profileType, profilePic, currentDuelId, history, balance_eth, lives, isLoading])
-  
+
   return <DuelistTokenImage props={props} className={className} style={style} />
 }

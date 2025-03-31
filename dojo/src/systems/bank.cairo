@@ -11,7 +11,7 @@ pub trait IBank<TState> {
     // IBankProtected
     fn charge_purchase(ref self: TState, payer: ContractAddress, lords_amount: u128);
     fn peg_minted_fame_to_purchased_lords(ref self: TState, payer: ContractAddress, lords_amount: u128);
-    fn release_lords_from_fame_to_be_burned(ref self: TState, season_table_id: felt252, bills: Span<LordsReleaseBill>) -> u128;
+    fn release_lords_from_fame_to_be_burned(ref self: TState, season_table_id: felt252, duel_id: u128, bills: Span<LordsReleaseBill>) -> u128;
     fn duelist_lost_fame_to_pool(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u128, pool_id: PoolType);
     fn release_season_pool(ref self: TState, season_table_id: felt252);
 }
@@ -35,7 +35,7 @@ pub trait IBankProtected<TState> {
     fn peg_minted_fame_to_purchased_lords(ref self: TState, payer: ContractAddress, lords_amount: u128);
     // transfer LORDS to recipient, removing from PoolType::Purchases
     // (called by duelist_token)
-    fn release_lords_from_fame_to_be_burned(ref self: TState, season_table_id: felt252, bills: Span<LordsReleaseBill>) -> u128;
+    fn release_lords_from_fame_to_be_burned(ref self: TState, season_table_id: felt252, duel_id: u128, bills: Span<LordsReleaseBill>) -> u128;
     // transfer FAME to payer, adding to PoolType::Season(table_id)
     // (called by duelist_token)
     fn duelist_lost_fame_to_pool(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u128, pool_id: PoolType);
@@ -163,6 +163,7 @@ pub mod bank {
 
         fn release_lords_from_fame_to_be_burned(ref self: ContractState,
             season_table_id: felt252,
+            duel_id: u128,
             bills: Span<LordsReleaseBill>,
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
@@ -170,7 +171,7 @@ pub mod bank {
             // release
             let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
             let fame_supply: u128 = fame_dispatcher.total_supply().low;
-            let released_lords: u128 = self._release_pegged_lords(store, season_table_id, fame_supply, @bills);
+            let released_lords: u128 = self._release_pegged_lords(store, season_table_id, duel_id, fame_supply, @bills);
             (released_lords)
         }
 
@@ -225,7 +226,7 @@ pub mod bank {
             };
             // release...
             let fame_supply: u128 = fame_dispatcher.total_supply().low;
-            self._release_pegged_lords(store, season_table_id, fame_supply, @bills.span());
+            self._release_pegged_lords(store, season_table_id, 0, fame_supply, @bills.span());
             // burn FAME from pool
             fame_dispatcher.burn(pool_season.balance_fame);
             // empty from pool
@@ -283,6 +284,7 @@ pub mod bank {
         fn _release_pegged_lords(ref self: ContractState,
             mut store: Store,
             season_table_id: felt252,
+            duel_id: u128,
             fame_supply: u128,
             bills: @Span<LordsReleaseBill>,
         ) -> u128 {
@@ -307,7 +309,7 @@ pub mod bank {
                     let mut bill: LordsReleaseBill = *(*bills)[i];
                     bill.pegged_lords = (*pegged_lordses[i]);
                     lords_dispatcher.transfer(bill.recipient, (bill.pegged_lords + bill.sponsored_lords).into());
-                    store.emit_lords_release(season_table_id, @bill);
+                    store.emit_lords_release(season_table_id, duel_id, @bill);
                     i += 1;
                 };
                 // remove from pool

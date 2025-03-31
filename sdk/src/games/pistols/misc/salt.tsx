@@ -1,41 +1,12 @@
 import { AccountInterface, BigNumberish, StarknetDomain } from 'starknet'
 import { signMessages, Messages } from 'src/utils/starknet/starknet_sign'
-import { poseidon } from 'src/utils/starknet/starknet'
 import { bigintToHex } from 'src/utils/misc/types'
-import * as constants from '../generated/constants'
+import { make_moves_hash, _make_move_mask, _make_move_hash } from '../cairo/make_moves_hash'
 
 export interface CommitMoveMessage extends Messages {
   duelId: bigint,
   duelistId: bigint,
 }
-
-// in sync with pistols::libs::utils::make_moves_hash
-export const make_moves_hash = (salt: BigNumberish, moves: number[]) => {
-  if (!salt) return null
-  let result: bigint = 0n
-  for (let index = 0; index < moves.length; index++) {
-    if (index == 4) {
-      console.warn(`make_moves_hash(): too many moves (${moves.length})!`, moves)
-      break
-    }
-    const move: number = moves[index]
-    if (move != 0) {
-      const move_hash = make_move_hash(salt, index, move)
-      result |= move_hash
-    }
-  }
-  return result
-}
-const make_move_mask = (index: number): bigint => {
-  return (BigInt(constants.BITWISE.MAX_U32) << (BigInt(index) * 32n))
-}
-const make_move_hash = (salt: BigNumberish, index: number, move: number): bigint => {
-  const mask: bigint = make_move_mask(index)
-  const hash: bigint = move ? poseidon([salt, move]) : 0n
-  return (hash & mask)
-}
-
-
 
 /** @returns a salt from account signature, or 0 if fails */
 const signAndGenerateSalt = async (
@@ -88,7 +59,7 @@ export const signAndRestoreMovesFromHash = async (
     // there are 2 to 4 decks...
     for (let di = 0; di < decks.length; ++di) {
       const deck = decks[di]
-      const mask = make_move_mask(di)
+      const mask = _make_move_mask(di)
       // is deck is empty, no move
       if (deck.length == 0) {
         console.log(`___RESTORE D${di}: SKIP`)
@@ -98,7 +69,7 @@ export const signAndRestoreMovesFromHash = async (
       // each deck can contain up to 10 cards/moves...
       for (let mi = 0; mi < deck.length; ++mi) {
         const move = deck[mi]
-        const move_hash = make_move_hash(salt, di, move)
+        const move_hash = _make_move_hash(salt, di, move)
         const stored_hash = (hash & mask)
         if (stored_hash == 0n) {
           moves.push(0) // did not move here

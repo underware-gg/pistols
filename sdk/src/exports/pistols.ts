@@ -6,3 +6,7 @@ export * from '../games/pistols/config/signed_messages'
 export * from '../games/pistols/config/types'
 export * from '../games/pistols/misc/helpers'
 export * from '../games/pistols/misc/salt'
+// in sync with cairo sources
+export * from '../games/pistols/cairo/pact'
+export * from '../games/pistols/cairo/make_moves_hash'
+export * from '../games/pistols/cairo/token_bound'

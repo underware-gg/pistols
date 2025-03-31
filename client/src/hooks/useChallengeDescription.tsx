@@ -3,7 +3,7 @@ import { useDuelist } from '/src/stores/duelistStore'
 import { useGetChallenge } from '/src/stores/challengeStore'
 import { ChallengeStateDescriptions } from '/src/utils/pistols'
 import { useOwnerOfDuelist } from './useTokenDuelists'
-import { usePlayer } from '../stores/playerStore'
+import { usePlayer } from '/src/stores/playerStore'
 
 export const useChallengeDescription = (duelId: bigint) => {
   const { state, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, winnerDuelistId, isTutorial } = useGetChallenge(duelId)

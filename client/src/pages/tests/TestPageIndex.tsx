@@ -14,6 +14,16 @@ const testPages = [
 ]
 
 export default function TestPageIndex() {
+  return (
+    <App>
+      <Container text>
+        <TestPageMainMenu />
+      </Container>
+    </App>
+  );
+}
+
+export function TestPageMainMenu() {
   const [activeItem, setActiveItem] = useState('home')
   const navigate = useNavigate()
   const _click = (name: string) => {
@@ -21,21 +31,20 @@ export default function TestPageIndex() {
     navigate(`/tests/${name}`)
   }
   return (
-    <App>
-      <Container text>
-        <Menu inverted vertical>
-          {testPages.map(page => (
-            <MenuItem
-              key={page.name}
-              name={page.name}
-              icon='arrow right'
-              active={activeItem === page.name}
-              onClick={() => _click(page.name)}
-            />
-          ))}
-        </Menu>
-      </Container>
-    </App>
+    <>
+      <h3>Test pagess</h3>
+      <Menu inverted vertical>
+        {testPages.map(page => (
+          <MenuItem
+            key={page.name}
+            name={page.name}
+            icon='arrow right'
+            active={activeItem === page.name}
+            onClick={() => _click(page.name)}
+          />
+        ))}
+      </Menu>
+    </>
   );
 }
 
@@ -47,7 +56,6 @@ export function TestPageMenu() {
   }
   return (
     <>
-      <br />
       <Menu inverted>
         <MenuItem
           icon='arrow left'

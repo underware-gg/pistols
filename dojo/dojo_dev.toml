@@ -74,15 +74,18 @@ default = "pistols"
   "0x0", # vrf_address (use vrf_mock)
 ]
 "pistols-duel_token" = [
-  "sstr:http://localhost:3000", # base_uri
+  # "sstr:http://localhost:3000", # base_uri
+  "sstr:https://assets.underware.gg", # base_uri
   "0x0", # minter_address
   "0", # fee_amount
 ]
 "pistols-duelist_token" = [
-  "sstr:http://localhost:3000", # base_uri
+  # "sstr:http://localhost:3000", # base_uri
+  "sstr:https://assets.underware.gg", # base_uri
 ]
 "pistols-pack_token" = [
-  "sstr:http://localhost:3000", # base_uri
+  # "sstr:http://localhost:3000", # base_uri
+  "sstr:https://assets.underware.gg", # base_uri
 ]
 
 "pistols-lords_mock" = [

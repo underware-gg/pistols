@@ -85,6 +85,8 @@ export const useSdkEntitiesGet = ({
         } else if (retryInterval > 0) {
           console.log("useSdkEntitiesGet() retry...", retryInterval)
           setTimeout(() => _get(), retryInterval)
+        } else {
+          setIsLoading(false)
         }
       }).catch((error: Error) => {
         if (!_mounted) return

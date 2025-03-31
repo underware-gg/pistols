@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
-import { useDojoSystem, useDojoSystemCalls, useLordsBalance } from '@underware/pistols-sdk/dojo'
+import { useDojoSystem, useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePool, useSeasonPool, UsePoolResult, useFundedStarterPackCount } from '/src/stores/bankStore'
-import { useFameBalance } from '/src/hooks/useFame'
+import { useFameBalance, useLordsBalance } from '/src/stores/coinStore'
 import { usePackType } from '/src/stores/packStore'
 import { useConfig } from '/src/stores/configStore'
 import { FameBalance, LordsBalance } from '/src/components/account/LordsBalance'
@@ -19,6 +19,7 @@ import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
 import AppDojo from '/src/components/AppDojo'
 import * as ENV from '/src/utils/env'
+import { ethToWei } from '@underware/pistols-sdk/utils/starknet'
 
 const Row = Table.Row
 const Cell = Table.Cell
@@ -81,14 +82,18 @@ function Account() {
 function Bank() {
   const { account } = useAccount()
   const { priceLords } = usePackType(constants.PackType.StarterPack)
-  const [amount, setAmount] = useState(1)
-  const fundAmount = useMemo(() => (priceLords * BigInt(amount)), [priceLords, amount])
+  const [packCount, setPackCount] = useState(1)
+  const [sponsorLords, setSponsorLords] = useState(1000)
+  const fundAmount = useMemo(() => (priceLords * BigInt(packCount)), [priceLords, packCount])
 
   const { fundedCount } = useFundedStarterPackCount()
 
   const { bank } = useDojoSystemCalls()
-  const _fund = () => {
+  const _fund_packs = () => {
     bank.sponsor_duelists(account, fundAmount)
+  }
+  const _sponsor_season = () => {
+    bank.sponsor_season(account, ethToWei(sponsorLords))
   }
 
   const poolPurchases = usePool(constants.PoolType.Purchases)
@@ -113,14 +118,13 @@ function Bank() {
           </Cell>
         </Row>
         <Row>
-          <Cell className='ModalText'>Fund Packs:</Cell>
+          <Cell className='ModalText'>Sponsor Packs:</Cell>
           <Cell className='ModalText' textAlign='left'>
             <FormInputNumber
-              // label='Amount:'
-              value={amount}
-              setValue={setAmount}
+              value={packCount}
+              setValue={setPackCount}
               minValue={1}
-              maxValue={100}
+              maxValue={1000}
               fluid={false}
             />
             &nbsp;
@@ -128,11 +132,35 @@ function Bank() {
           </Cell>
           <Cell className='Code Smaller' textAlign='right'>
             <BalanceRequiredButton
-              label={`Fund ${amount} Packs`}
-              disabled={amount === 0}
+              label={`Fund ${packCount} More Packs`}
+              disabled={packCount === 0}
               fee={fundAmount}
               fill={false}
-              onClick={_fund}
+              onClick={_fund_packs}
+            />
+          </Cell>
+        </Row>
+        <Row>
+          <Cell className='ModalText'>Sponsor Season:</Cell>
+          <Cell className='ModalText' textAlign='left'>
+            <FormInputNumber
+              // label='Amount:'
+              value={sponsorLords}
+              setValue={setSponsorLords}
+              minValue={1}
+              maxValue={100000}
+              fluid={false}
+            />
+            &nbsp;
+            <Balance lords eth={sponsorLords} size='big' />
+          </Cell>
+          <Cell className='Code Smaller' textAlign='right'>
+            <BalanceRequiredButton
+              label={`Sponsor Season`}
+              disabled={sponsorLords === 0}
+              fee={sponsorLords}
+              fill={false}
+              onClick={_sponsor_season}
             />
           </Cell>
         </Row>

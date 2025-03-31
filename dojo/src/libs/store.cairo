@@ -415,10 +415,12 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn emit_lords_release(ref self: Store, season_table_id: felt252, bill: @LordsReleaseBill) {
-        self.world.emit_event(@LordsReleaseEvent{
+    fn emit_lords_release(ref self: Store, season_table_id: felt252, duel_id: u128, bill: @LordsReleaseBill) {
+        self.world.emit_event(@LordsReleaseEvent {
             season_table_id,
+            duel_id,
             bill: *bill,
+            timestamp: starknet::get_block_timestamp(),
         });
     }
 }

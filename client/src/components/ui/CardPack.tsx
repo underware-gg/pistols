@@ -24,7 +24,6 @@ import {
 } from '/src/data/cardConstants';
 import { useAccount } from '@starknet-react/core';
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
-import { _useDuelistIdsOfPlayerRetry } from '/src/stores/tokenStore';
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo';
 import { usePackType } from '/src/stores/packStore';
 import { constants } from '@underware/pistols-sdk/pistols/gen'
@@ -47,8 +46,7 @@ interface CardPack {
 export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle, customButtonLabel }: CardPack) => {
   const { account } = useAccount()
   const { pack_token } = useDojoSystemCalls()
-  // const { duelistIds } = useDuelistsOfPlayer()
-  const { duelistIds } = _useDuelistIdsOfPlayerRetry() // tODO: REMOVE THIS WHEN TOKEN SUBSCRITIONS WORK
+  const { duelistIds } = useDuelistsOfPlayer()
   const { quantity } = usePackType(packType)
   const { fundedCount } = useFundedStarterPackCount()
   

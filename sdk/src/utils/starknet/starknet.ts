@@ -37,13 +37,13 @@ export const bigintToU256 = (v: BigNumberish): Uint256 => (uint256.bnToUint256(v
 //
 // ETH conversions
 export const ETH_TO_WEI = 1_000_000_000_000_000_000n
-export const ethToWei = (v: BigNumberish): bigint => (BigInt(v) * ETH_TO_WEI)
-export const weiToEth = (v: BigNumberish): bigint => (BigInt(v) / ETH_TO_WEI)
-export const weiToEthDecimals = (v: BigNumberish): bigint => (BigInt(v) % ETH_TO_WEI)
-export const weiToEthString = (v: BigNumberish, decimals: number = 0, trailingZeros: boolean = false): string => {
-  let result = Number(weiToEth(v)).toLocaleString('en-US', { maximumFractionDigits: 8 })
+export const ethToWei = (eth: BigNumberish): bigint => (BigInt(eth) * ETH_TO_WEI)
+export const weiToEth = (wei: BigNumberish): bigint => (BigInt(wei) / ETH_TO_WEI)
+export const weiToEthDecimals = (wei: BigNumberish): bigint => (BigInt(wei) % ETH_TO_WEI)
+export const weiToEthString = (wei: BigNumberish, decimals: number = 0, trailingZeros: boolean = false): string => {
+  let result = Number(weiToEth(wei)).toLocaleString('en-US', { maximumFractionDigits: 8 })
   if (decimals > 0) {
-    let ethDecimals = weiToEthDecimals(v)
+    let ethDecimals = weiToEthDecimals(wei)
     let decimalsStr = (ETH_TO_WEI + ethDecimals).toString().slice(1, decimals + 1)
     while (!trailingZeros && decimalsStr.length > 1 && decimalsStr.at(-1) == '0') {
       decimalsStr = decimalsStr.slice(0, -1)

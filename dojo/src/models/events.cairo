@@ -68,6 +68,8 @@ pub struct LordsReleaseEvent {
     pub season_table_id: felt252,
     //-----------------------
     pub bill: LordsReleaseBill,
+    pub duel_id: u128,
+    pub timestamp: u64,
 }
 
 
