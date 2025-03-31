@@ -1,8 +1,8 @@
 {
   "world": {
     "class_hash": "0x7c9469d45a9cdbab775035afb48e1fa73fb35ab059fcb9dfb0a301aa973e783",
-    "address": "0x2ea88c9a6314a10e7d8b6e557d01d68cf72d962707086aa242bc4805071f34d",
-    "seed": "staging-v0.13.0",
+    "address": "0x585a28495ca41bece7640b0ccf2eff199ebe70cc381fa73cb34cc5721614fbd",
+    "seed": "staging-v0.14.0",
     "name": "Pistols at Dawn",
     "entrypoints": [
       "uuid",
@@ -1312,7 +1312,7 @@
   },
   "contracts": [
     {
-      "address": "0x24b728ed9d1b15231b54ee24c539d0a1691c406bd7bc0ba5b219077f09272b0",
+      "address": "0x74a12ba831dfbbef0d614798dd2b87304241b68bee6a96fac8446e4e2ad8c89",
       "class_hash": "0x3bf7dd9d2d786556b20a18fa19a22030c71007bc4487da01d07b585621def49",
       "abi": [
         {
@@ -1647,8 +1647,8 @@
       ]
     },
     {
-      "address": "0x2d9f6c074a5d8c6df9694472b3c289eaf815f21255e0f6896eff32d2ec96f33",
-      "class_hash": "0x2720f03deed8dee64bc13e93e728bc305d1529cdcc046d367cb28adb77b4c85",
+      "address": "0x4c6e5584d995094b273879ec8479b4baa5cae3d1b88e6e5c4473a11fd18c830",
+      "class_hash": "0x6f9c243506fd36c8b6e20c95fe4ee9fac9ff6c102132f877f67ae99f261a9be",
       "abi": [
         {
           "type": "impl",
@@ -1769,19 +1769,57 @@
           "interface_name": "pistols::systems::bank::IBankProtected"
         },
         {
+          "type": "enum",
+          "name": "pistols::models::pool::ReleaseReason",
+          "variants": [
+            {
+              "name": "Undefined",
+              "type": "()"
+            },
+            {
+              "name": "FameLostToCreator",
+              "type": "()"
+            },
+            {
+              "name": "FameLostToDeveloper",
+              "type": "()"
+            },
+            {
+              "name": "SacrificedToDeveloper",
+              "type": "()"
+            },
+            {
+              "name": "LeaderboardPrize",
+              "type": "core::integer::u8"
+            }
+          ]
+        },
+        {
           "type": "struct",
           "name": "pistols::models::pool::LordsReleaseBill",
           "members": [
+            {
+              "name": "reason",
+              "type": "pistols::models::pool::ReleaseReason"
+            },
+            {
+              "name": "duelist_id",
+              "type": "core::integer::u128"
+            },
             {
               "name": "recipient",
               "type": "core::starknet::contract_address::ContractAddress"
             },
             {
-              "name": "fame_amount",
+              "name": "pegged_fame",
               "type": "core::integer::u128"
             },
             {
-              "name": "lords_amount",
+              "name": "pegged_lords",
+              "type": "core::integer::u128"
+            },
+            {
+              "name": "sponsored_lords",
               "type": "core::integer::u128"
             }
           ]
@@ -1867,6 +1905,14 @@
               "name": "release_lords_from_fame_to_be_burned",
               "inputs": [
                 {
+                  "name": "season_table_id",
+                  "type": "core::felt252"
+                },
+                {
+                  "name": "duel_id",
+                  "type": "core::integer::u128"
+                },
+                {
                   "name": "bills",
                   "type": "core::array::Span::<pistols::models::pool::LordsReleaseBill>"
                 }
@@ -1907,7 +1953,7 @@
               "name": "release_season_pool",
               "inputs": [
                 {
-                  "name": "table_id",
+                  "name": "season_table_id",
                   "type": "core::felt252"
                 }
               ],
@@ -2047,8 +2093,8 @@
       ]
     },
     {
-      "address": "0x2f6572117075285c6e3124a3e13b6923329ef7ce6ec31c8ba3b6023d7ebc6ba",
-      "class_hash": "0x540a149f1671894bda18d9db4043dbe84ae69a04f813f734c8acf839ff5dffe",
+      "address": "0x7825e3e3103b47768e1acf6112ed28a8170aca67b49a8541786f1054931fe11",
+      "class_hash": "0x402df4075a09d504aa15f009bfedeed1327aeb3115407b77f255b1f6cda21ba",
       "abi": [
         {
           "type": "impl",
@@ -3356,8 +3402,8 @@
       ]
     },
     {
-      "address": "0x43f800e9f5f6e290a798379029fcb28ba7c34e9669f7b5fc77fce8a4ebdc893",
-      "class_hash": "0x7cd6fe552d6e60f0b33bd33d4873bb39797af884fb505008354f6e9165e0d2b",
+      "address": "0x161c882f793617e5fbf7c3ff681edca2590dffd0cc741b9b58262e61d6718d0",
+      "class_hash": "0x2769aee3614244d151d4d9082d398d8556addbde0a8a0bbaeef1521b466fb61",
       "abi": [
         {
           "type": "impl",
@@ -4805,7 +4851,7 @@
       ]
     },
     {
-      "address": "0x7fb9183f47540f7700cad6c17ca9db615fc9fe26edae9409f7b56294a6d1b17",
+      "address": "0xf14cf4b00ac73f69cb878821c3cb4cf41675c9c8838fe6d6261712f95a529a",
       "class_hash": "0x5fc35719808e4a1653a61861907ad4640b5cb2319128606ab9a5efca2261616",
       "abi": [
         {
@@ -5508,7 +5554,7 @@
       ]
     },
     {
-      "address": "0x34b5a7d8c147efbd5e4178b2cab770fd9c4b121faad88df9cbc916b5db99961",
+      "address": "0x71370ec1d4a52bf5b80080e8d549b53a22328421bca06181acfe210e5dbfde3",
       "class_hash": "0x20a7dccb437faddeb6cc0c75a7d2c44fdf21cbdca2881920a3629fc1ec48434",
       "abi": [
         {
@@ -6028,8 +6074,8 @@
       ]
     },
     {
-      "address": "0x22e296bcc7c6eaf84f1b1d8f46171e203b5983e39bfb7d7fdc4f29a1f794b1",
-      "class_hash": "0x48592782aa8f9810bd11da80b6f76fa015201391589246997316a48e8f8b55c",
+      "address": "0x5c4f1f1d2a7317ff65fb917d3557b5ae2210bb248401ea5707c0cf3d0fe04e2",
+      "class_hash": "0x5c98299f26e106cacc5e30c157e1ecc8cd5dd77df50b88c49c7aaabaf457949",
       "abi": [
         {
           "type": "impl",
@@ -6470,7 +6516,7 @@
               "type": "core::integer::u128"
             },
             {
-              "name": "score",
+              "name": "points",
               "type": "core::integer::u16"
             }
           ]
@@ -6573,7 +6619,7 @@
             },
             {
               "type": "function",
-              "name": "clear_required_action",
+              "name": "clear_call_to_action",
               "inputs": [
                 {
                   "name": "duelist_id",
@@ -6910,7 +6956,7 @@
         "dojo_init",
         "commit_moves",
         "reveal_moves",
-        "clear_required_action",
+        "clear_call_to_action",
         "collect_duel",
         "collect_season",
         "create_trophies",
@@ -6918,8 +6964,8 @@
       ]
     },
     {
-      "address": "0x335f20596a8cc613cfe2c463443513beee082ce84ceee8dbf18f993f1959e8b",
-      "class_hash": "0x597a8edb13418d795c81f0b1e459c28ec5bff32e4bf583102b1a6e755e71f62",
+      "address": "0x13598114c4d7f22a7a82b494071ab30917fcdf0606cb2b4205e9926f42c7faa",
+      "class_hash": "0x5b696654474aae11881739706f926e78cfdb6a26bb84e6fdf6b26090bf6ee91",
       "abi": [
         {
           "type": "impl",
@@ -8127,7 +8173,7 @@
       ]
     },
     {
-      "address": "0x52fa78c5549dc74f68e5b1ab0f09dc63aa0e0eb797914c3e15975c448e82786",
+      "address": "0x5bb70eccd45d6fa259d7c0c9a2416894317b30aaa0022edaff623cfd59af19",
       "class_hash": "0xa58d186898c09006f40f550b222ceb74e84b7af1ae0e75f176466dd64a8aa8",
       "abi": [
         {
@@ -8391,7 +8437,7 @@
       ]
     },
     {
-      "address": "0x7d5c2b5240833a0a2097e516b974a905526ef1fc985b48626ab2cb7fab37294",
+      "address": "0x5a740274f95ea07596f58fc20135400091be54a771ea791a01f01028bd7d06a",
       "class_hash": "0x5fca4b692c9e4cea7deb5a27d947deded036ce53ad6c0f169c0bf51a0f47610",
       "abi": [
         {
@@ -8693,8 +8739,8 @@
       ]
     },
     {
-      "address": "0x3cf42f21113565e0fbfee75516f5b4532388d43d7dd87c1ef3173d4f124efc5",
-      "class_hash": "0xa867ac9392b0c4a5b7527fbf62967c2e0bfb96c4e083499d9d015251becb83",
+      "address": "0x399caffb82b0cafa718c7fd514b5c3fa1e781259b9b3027c618eee0ebab5991",
+      "class_hash": "0x7e8b086426a16e2a5f2dc34eb172b8fbb95c7592b5f855b958d839711241881",
       "abi": [
         {
           "type": "impl",
@@ -9360,7 +9406,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x2eedc90c2723dc0c4fa2fe6e855648fe58a584bb0627b8c8a03e47e7d1f16e0",
+      "class_hash": "0x74322b9244cd68d475baa5418cd3a7a4b0d6ca0af3cd0fd7ad581f697f34c1a",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -9432,12 +9478,6 @@
     },
     {
       "members": [],
-      "class_hash": "0x146326babbbeba23cf7618424855c186949b290d5051ab38b91a21b08b79a2c",
-      "tag": "pistols-Scoreboard",
-      "selector": "0x18889906443a52ec3b3fd07ba7108bcf2b0067bdec842953530710a9dfdb728"
-    },
-    {
-      "members": [],
       "class_hash": "0x571bf8c9a646e545acb2f9fb703cc0903a2f47f6f1dc326db5689decf31e5f0",
       "tag": "pistols-SeasonConfig",
       "selector": "0x407b92d935dd7193931243082059cb7180309a73de27eea948ffa0649f6ebf3"
@@ -9447,6 +9487,12 @@
       "class_hash": "0x12bd3f3e6c4db60e4a9e836dc538e242bd18767e2fc5e989bf4055f84701138",
       "tag": "pistols-TableConfig",
       "selector": "0x1e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138"
+    },
+    {
+      "members": [],
+      "class_hash": "0x74600bf7343aa2f7f6985e87a6eb58c49a4daeeda3232e3c318ee1b0552767",
+      "tag": "pistols-TableScoreboard",
+      "selector": "0x7cedfed46fd59e7ccbf8d54e1466e6be9cea499c99e917bdc8873b53a00e1f3"
     },
     {
       "members": [],
@@ -9464,21 +9510,27 @@
   "events": [
     {
       "members": [],
-      "class_hash": "0x23596555cefdea39a4df55ef1aa2006b81ceeece45c13f1e0e6d9ef64e9e2e2",
-      "tag": "pistols-ChallengeRewards",
-      "selector": "0x17640e289349c0db767c2e79f2af91e2a08939419dc1a85cdf529b9cce910fd"
+      "class_hash": "0x199d31b0a903fa72b436b818b626fd5af1d0a5a47242ca6a13482820233c04f",
+      "tag": "pistols-CallToActionEvent",
+      "selector": "0x2626522e055d4243cc4565f162bea1b170c6a5fd29721e7bc59607f9b737849"
     },
     {
       "members": [],
-      "class_hash": "0x6dc23f8ecfb98efcb36850c16225cade3c4833e464b92891a04bdea74063863",
-      "tag": "pistols-PlayerActivity",
-      "selector": "0x20ac3bc7f231ea11afb0576a200bff82197a6b397f3e5a4299f5a79ab563ff1"
+      "class_hash": "0x18c481a46f5e554283430e8ae4cc4529a57a0f1d37b33f73d4e4a4f0421ea5d",
+      "tag": "pistols-ChallengeRewardsEvent",
+      "selector": "0x5d14202bbb6fb802276824aacd8f0256d17d49407a1909c2de53c66acebcfa8"
     },
     {
       "members": [],
-      "class_hash": "0x33f7988973de99b251705282fe1b151d3a6834e9760fa79279a4da62abd88e0",
-      "tag": "pistols-PlayerRequiredAction",
-      "selector": "0x7a8a6e4891353356c5c6a727ca9998890e212fb06e892e08f0344973a6c7b4b"
+      "class_hash": "0x5a11bed1343952febb21160b7b938f3b7d7f3d94755849793a646981010d0a2",
+      "tag": "pistols-LordsReleaseEvent",
+      "selector": "0x7121aa913fad664b07951ce2c9a3ee807c721c6fa15b015d5b6fc22f8daa7a1"
+    },
+    {
+      "members": [],
+      "class_hash": "0x352aeeacdbcbccc7fca58437c767ec7069c090e6185d3c5d41481930dc6e829",
+      "tag": "pistols-PlayerActivityEvent",
+      "selector": "0x46a192c105a4598953e7aeaf3809703964eb9e6d65403156d0458dcd2ee379b"
     },
     {
       "members": [],
