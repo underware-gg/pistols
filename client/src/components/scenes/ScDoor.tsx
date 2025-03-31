@@ -12,6 +12,7 @@ import { useAccount } from '@starknet-react/core'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { SceneName } from '/src/data/assets'
 import Logo from '/src/components/Logo'
+import { Modal } from 'semantic-ui-react'
 
 export default function ScDoor() {
   const { isReady } = useDojoStatus()
@@ -53,10 +54,10 @@ export default function ScDoor() {
                 <EnterAsGuestButton />
                 <div className='Spacer10' />
               </> : <>
-                <Divider content='NEWCOMERS:' />
+                <Divider content='NEW PLAYERS:' />
                 <div className='Spacer10' />
                 <PlayGameButton />
-                <Divider content='OR' />
+                <Divider content='OR' as='h5' className='DividerSmall'/>
                 <EnterAsGuestButton />
                 <div className='Spacer30' />
                 <Divider content='EXISTING PLAYERS:' />
@@ -121,7 +122,7 @@ export function EnterAsGuestButton() {
   const _enterAsGuest = () => {
     dispatchSetScene(SceneName.Tavern)
   }
-  return <ActionButton large fill onClick={() => _enterAsGuest()} label='Enter as Spectator' />
+  return <ActionButton large fill onClick={() => _enterAsGuest()} label='Enter as Guest' />
 }
 
 export function PlayGameButton({
@@ -134,7 +135,7 @@ export function PlayGameButton({
   const _playGame = () => {
     dispatchSetScene(SceneName.Tutorial)
   }
-  return <ActionButton large={large} fill important onClick={() => _playGame()} label='Play Game' />
+  return <ActionButton large={large} fill important onClick={() => _playGame()} label='Start Tutorial' />
 }
 
 export function ConnectButton({
@@ -151,6 +152,7 @@ export function ConnectButton({
   const { duelistIds } = useDuelistsOfPlayer()
   const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
   const { dispatchSetScene } = usePistolsScene()
+  const [showTutorialPrompt, setShowTutorialPrompt] = useState(false)
 
   const canConnect = (!isLoading && !isError && !isConnecting && connect != null)
   // const switchChain = (isConnected && !isCorrectChain)
@@ -162,13 +164,22 @@ export function ConnectButton({
     }
   }
 
+  const handleTutorialChoice = (playTutorial: boolean) => {
+    setShowTutorialPrompt(false)
+    if (playTutorial) {
+      dispatchSetScene(SceneName.Tutorial)
+    } else {
+      dispatchSetScene(SceneName.Tavern)
+    }
+  }
+
   useEffect(() => {
     let timeoutId;
 
     if (isConnected && !isError) {
       timeoutId = setTimeout(() => {
         if (canClaimStarterPack) {
-          dispatchSetScene(SceneName.Tutorial)
+          setShowTutorialPrompt(true)
         } else {
           dispatchSetScene(SceneName.Tavern)
         }
@@ -185,7 +196,46 @@ export function ConnectButton({
 
   }, [isConnected, isError, canClaimStarterPack])
 
-  return <ActionButton fill large={large} important disabled={!canConnect} onClick={() => _connect()} label={'Enter as Patron'} />
+  return (
+    <>
+      <ActionButton fill large={large} important disabled={!canConnect} onClick={() => _connect()} label={'Enter as Patron'} />
+      
+      <Modal
+        size="small"
+        open={showTutorialPrompt}
+      >
+        <Modal.Header>
+          <h2 className="Important" style={{ textAlign: 'center', margin: '0.5rem 0' }}>Welcome, Duelist!</h2>
+        </Modal.Header>
+        <Modal.Content style={{ padding: '1rem 2rem' }}>
+          <div style={{ 
+            textAlign: 'center', 
+            margin: '1.5rem 0',
+            lineHeight: '1.6',
+            fontSize: '1.4rem'
+          }}>
+            This appears to be your first visit to Pistols at Dawn.
+            <br />
+            Would you like to learn the ropes?
+          </div>
+        </Modal.Content>
+        <Modal.Actions style={{ display: 'flex' }}>
+          <ActionButton 
+            fill
+            dimmed
+            onClick={() => handleTutorialChoice(false)}
+            label="No, take me to the tavern"
+          />
+          <ActionButton
+            fill
+            important
+            onClick={() => handleTutorialChoice(true)}
+            label="Yes, show me the tutorial"
+          />
+        </Modal.Actions>
+      </Modal>
+    </>
+  )
 }
 
 export function ConnectStatus() {

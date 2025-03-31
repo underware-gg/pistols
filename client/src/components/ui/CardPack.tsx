@@ -39,10 +39,11 @@ interface CardPack {
   clickable?: boolean,
   cardPackSize: number,
   maxTilt: number,
-  optionalTitle?: string
+  optionalTitle?: string,
+  customButtonLabel?: string
 }
 
-export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle }: CardPack) => {
+export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle, customButtonLabel }: CardPack) => {
   const { account } = useAccount()
   const { pack_token } = useDojoSystemCalls()
   const { duelistIds } = useDuelistsOfPlayer()
@@ -77,20 +78,21 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   }
 
   useEffect(() => {
+    if (cardPackRef.current) {
+      cardPackRef.current.style.setProperty('--card-pack-opacity', '0')
+    }
+  }, [])
+
+  useEffect(() => {
     if (!isClaiming) {
-      console.log('Not claiming, setting previous duelist IDs:', [...duelistIds])
       previousDuelistIdsRef.current = [...duelistIds]
       return
     }
 
     const expectedNewIds = quantity
-    console.log('---------quantity:', quantity)
-    console.log('Expected new IDs:', expectedNewIds)
     const newIds = duelistIds.filter(id => !previousDuelistIdsRef.current.includes(id))
-    console.log('Found new IDs:', newIds)
 
     if (newIds.length === expectedNewIds) {
-      console.log('Got expected number of new IDs, setting claiming to false')
       setIsClaiming(false)
       setNewDuelistIds(newIds.map(id => Number(id)))
     }
@@ -98,7 +100,6 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
 
   useEffect(() => {
     if (newDuelistIds.length > 0) {
-      console.log('New duelist IDs received, handling seal click:', newDuelistIds)
       handleSealClick()
     }
   }, [newDuelistIds])
@@ -128,7 +129,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   }, [isOpen])
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!cardPackRef.current || sealClicked) {
+    if (!cardPackRef.current || sealClicked || !clickable) {
       cardPackRef.current?.style.setProperty('--card-pack-rotate-x', '0deg')
       cardPackRef.current?.style.setProperty('--card-pack-rotate-y', '0deg')
       return;
@@ -151,7 +152,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [sealClicked]);
+  }, [sealClicked, clickable]);
 
   const getLinePosition = (index: number, numCards: number) => {
     const totalWidth = aspectWidth(16 * numCards);
@@ -340,6 +341,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   }
 
   const getButtonLabel = () => {
+    if (customButtonLabel) return customButtonLabel
     if (!hasRevealed) return 'Reveal All'
     if (packType === constants.PackType.StarterPack) return 'Go to Duel'
     return 'Close'

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
@@ -13,8 +13,13 @@ import ShopModal from '/src/components/modals/ShopModal'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { DuelistsBook } from '../ui/DuelistsBook'
 import { useGameEvent } from '/src/hooks/useGameEvent'
-import { _currentScene } from '/src/three/game'
+import { _currentScene, emitter } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
+import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { MAX_TILT } from '/src/data/cardConstants'
+import { CardPack } from '../ui/CardPack'
+import { CARD_PACK_SIZE } from '/src/data/cardConstants'
 
 export default function ScProfile() {
   const { isConnected } = useAccount()
@@ -23,7 +28,13 @@ export default function ScProfile() {
   const { disconnect } = useDisconnect()
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
+  const { value: itemHovered } = useGameEvent('hover_item', null)
   const { dispatchSetScene } = usePistolsScene()
+
+  const { duelistIds } = useDuelistsOfPlayer()
+  const { canClaimStarterPack } = useCanClaimStarterPack(duelistIds.length)
+
+  const [showCardPack, setShowCardPack] = useState(false)
 
   useEffect(() => {
     if (itemClicked) {
@@ -33,7 +44,11 @@ export default function ScProfile() {
           (_currentScene as InteractibleScene)?.setClickable(false);
           break
         case 'chest':
-          shopOpener.open({ packType: constants.PackType.Duelists5x })
+          if (canClaimStarterPack) {
+            setShowCardPack(true)
+          } else {
+            shopOpener.open({ packType: constants.PackType.Duelists5x })
+          }
           break
         case 'door':
           disconnect()
@@ -42,6 +57,20 @@ export default function ScProfile() {
       }
     }
   }, [itemClicked, timestamp])
+
+  useEffect(() => {
+    if (showCardPack) {
+      (_currentScene as InteractibleScene)?.setClickable(false);
+    } else {
+      (_currentScene as InteractibleScene)?.setClickable(true);
+    }
+  }, [showCardPack])
+
+  useEffect(() => {
+    if (itemHovered == 'chest' && canClaimStarterPack) {
+      emitter.emit('hover_description', 'Claim your free starter pack!')
+    }
+  }, [itemHovered])
 
   useEffect(() => {
     if (bookOpener.isOpen || shopOpener.isOpen) {
@@ -71,6 +100,17 @@ export default function ScProfile() {
         />
       </div>
 
+      
+      <CardPack 
+        packType={constants.PackType.StarterPack} 
+        isOpen={showCardPack} 
+        clickable={showCardPack} 
+        cardPackSize={CARD_PACK_SIZE} 
+        maxTilt={MAX_TILT}
+        onComplete={() => setShowCardPack(false)}
+        customButtonLabel="Close"
+      />
+
       <ShopModal opener={shopOpener} />
 
       {(debugMode || true) && <>
@@ -78,31 +118,5 @@ export default function ScProfile() {
         {/* <TutorialProgressDebug /> */}
       </>}
     </div>
-  )
-}
-
-
-//------------------------------------
-// Duelists
-//
-
-
-function DuelistsConnect() {
-  const { aspectWidth } = useGameAspect()
-
-  return (
-    <VStack className='Faded FillWidth' style={{ marginTop: aspectWidth(10) }}>
-      <span className='Title'>
-        Create or Log In with your
-        <br />
-        Controller Account
-      </span>
-
-      <Divider />
-      <ConnectButton />
-
-      <Divider content='OR' />
-      <EnterAsGuestButton />
-    </VStack>
   )
 }

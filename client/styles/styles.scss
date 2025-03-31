@@ -1968,6 +1968,11 @@ a.active.step:hover,
   border-bottom: 1px solid rgba($color-brightest, .25);
 }
 
+.DividerSmall {
+  margin-left: aspect-width(5) !important;
+  margin-right: aspect-width(5) !important;
+}
+
 .TextDivider {
   display: flex;
   align-items: center;
@@ -2296,11 +2301,31 @@ a.active.step:hover,
 }
 
 .button_duel[type="tavern"] {
-  width: aspect-width(9.8);
+  position: absolute !important;
+  bottom: aspect-width(-0.2);
+  right: aspect-width(0.4);
+  width: aspect-width(9);
+}
+
+.button_duel[type="help"] {
+  position: absolute !important;
+  bottom: aspect-width(-0.2);
+  right: aspect-width(-3.5);
+  width: aspect-width(4);
 }
 
 .button_duel[type="icon"] {
-  width: aspect-width(2.9);
+  position: absolute !important;
+  bottom: aspect-width(-0.3);
+  width: aspect-width(2.5);
+
+  &:nth-of-type(1) {
+    right: aspect-width(-6.4);
+  }
+
+  &:nth-of-type(2) {
+    right: aspect-width(-9);
+  }
 }
 
 .button_duel[type="icon-vertical"] {
@@ -2443,10 +2468,16 @@ a.active.step:hover,
   animation: blink 1s infinite;
 }
 
-.nextButton {
+.tutorialButtonsContainer {
   position: absolute;
   bottom: aspect-width(1);
   right: aspect-width(1);
+  display: flex;
+  align-items: center;
+  gap: aspect-width(1);
+}
+
+.nextButton {
   display: flex;
   align-items: center;
   justify-content: center;

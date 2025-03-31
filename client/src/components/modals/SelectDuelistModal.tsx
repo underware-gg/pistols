@@ -1,16 +1,19 @@
 import React, { useMemo, useRef, useState, useEffect, useCallback } from 'react'
 import { Modal } from 'semantic-ui-react'
-import { usePistolsContext } from '/src/hooks/PistolsContext'
+import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { DuelistCard, DuelistCardHandle } from '/src/components/cards/DuelistCard'
-import { CARD_ASPECT_RATIO, CARD_FLIP_ROTATION } from '/src/data/cardConstants'
+import { CARD_ASPECT_RATIO } from '/src/data/cardConstants'
 import TWEEN from '@tweenjs/tween.js'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { BigNumberish } from 'starknet'
 import { Button } from 'semantic-ui-react'
-import { useDuelist, useDuellingDuelists } from '/src/stores/duelistStore'
+import { useDuellingDuelists } from '/src/stores/duelistStore'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { Opener } from '/src/hooks/useOpener'
+import { NoDuelistsSlip, NoDuelistsSlipHandle } from '../NoDuelistsSlip'
+import { emitter } from '/src/three/game'
+import { SceneName } from '/src/data/assets'
 
 const HAND_CARD_WIDTH = 110
 const HAND_CARD_HEIGHT = HAND_CARD_WIDTH * (1080/1920)
@@ -34,7 +37,8 @@ function _SelectDuelistModal({
   opener: Opener
 }) {
   const { aspectWidth } = useGameAspect()
-  const { dispatchChallengingPlayerAddress, challengingDuelistId, dispatchChallengingDuelistId } = usePistolsContext()
+  const { dispatchChallengingPlayerAddress, dispatchChallengingDuelistId } = usePistolsContext()
+  const { dispatchSetScene } = usePistolsScene()
   
   const { duelistIds } = useDuelistsOfPlayer()
 
@@ -44,10 +48,13 @@ function _SelectDuelistModal({
   const topCardRef = useRef<HTMLImageElement>(null)
   const modalContentRef = useRef<HTMLDivElement>(null)
   const duelistCardRefs = useRef<(DuelistCardHandle | null)[]>([])
+  const noDuelistsCardRef = useRef<NoDuelistsSlipHandle | null>(null)
 
   const [selectedDuelistId, setSelectedDuelistId] = useState<BigNumberish>(0n)
   const [currentPage, setCurrentPage] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
+
+  const isAnimatingRef = useRef(false)
 
   const { totalPages, currentDuelists } = useMemo(() => ({
     totalPages: Math.ceil(availableDuelists.length / CARDS_PER_PAGE),
@@ -128,8 +135,10 @@ function _SelectDuelistModal({
   useEffect(() => {
     if (opener.isOpen) {
       setIsAnimating(true)
+      isAnimatingRef.current = true
       animate(1000, 0, 0.5, 1, TWEEN.Easing.Circular.Out, () => {
         setIsAnimating(false)
+        isAnimatingRef.current = false
       })
     }
   }, [opener.isOpen, animate])
@@ -142,6 +151,7 @@ function _SelectDuelistModal({
 
   const _close = useCallback(() => {
     setIsAnimating(true)
+    isAnimatingRef.current = true
     animate(0, 1000, 1, 0.5, TWEEN.Easing.Cubic.In, () => {
       if (isPositiveBigint(selectedDuelistId)) {
         dispatchChallengingDuelistId(selectedDuelistId)
@@ -149,6 +159,7 @@ function _SelectDuelistModal({
       setSelectedDuelistId(0n)
       opener?.close()
       setIsAnimating(false)
+      isAnimatingRef.current = false
     })
   }, [selectedDuelistId, animate, dispatchChallengingPlayerAddress, dispatchChallengingDuelistId, opener])
 
@@ -172,6 +183,154 @@ function _SelectDuelistModal({
     })
   }, [currentDuelists, getCardPositioning])
 
+  const handleNoDuelistsClick = useCallback(() => {    
+    dispatchSetScene(SceneName.Profile)
+    opener?.close()
+    emitter.emit('hover_description', '')
+  }, [dispatchSetScene, opener])
+
+  const hoverTimeout = useRef<NodeJS.Timeout>()
+
+  const handleCardHover = useCallback((isHovered: boolean, index: number) => {
+    if (isAnimatingRef.current) {
+      clearTimeout(hoverTimeout.current)
+      if (isHovered) {
+        hoverTimeout.current = setTimeout(() => {
+          handleCardHover(isHovered, index)
+        }, 100)
+      }
+      return
+    }
+    
+    const card = duelistCardRefs.current[index]
+    if (card) {
+      const { angle, xOffset, yOffset } = getCardPositioning(index, currentDuelists.length)
+      
+      // Calculate hover offsets based on card angle
+      const angleRad = angle * Math.PI / 180
+      const hoverDistance = 30
+      const hoverXOffset = Math.sin(angleRad) * hoverDistance
+      const hoverYOffset = -Math.abs(Math.cos(angleRad)) * hoverDistance - 20
+      
+      card.setScale(isHovered ? 1 : 1, 400, TWEEN.Easing.Quadratic.Out)
+      card.toggleHighlight(isHovered)
+      card.setZIndex(isHovered ? 10 : 0)
+      card.setPosition(
+        xOffset + (isHovered ? hoverXOffset : 0),
+        yOffset + (isHovered ? hoverYOffset : 0),
+        400,
+        TWEEN.Easing.Quadratic.Out
+      )
+      
+      // Update positions of other cards
+      updateAllCardPositions(isHovered ? index : -1)
+    }
+  }, [getCardPositioning, updateAllCardPositions, currentDuelists, isAnimating])
+
+  const handleNoDuelistsHover = useCallback((isHovered: boolean) => {
+    if (isAnimatingRef.current || !noDuelistsCardRef.current) {
+      clearTimeout(hoverTimeout.current)
+      if (isHovered) {
+        hoverTimeout.current = setTimeout(() => {
+          handleNoDuelistsHover(isHovered)
+        }, 100)
+      }
+      return
+    }
+    const { angle, xOffset, yOffset } = getCardPositioning(0, 1)
+    
+    // Calculate hover offsets based on card angle
+    const angleRad = angle * Math.PI / 180
+    const hoverDistance = 30
+    const hoverXOffset = Math.sin(angleRad) * hoverDistance
+    const hoverYOffset = -Math.abs(Math.cos(angleRad)) * hoverDistance - 20
+    
+    noDuelistsCardRef.current.setScale(isHovered ? 1 : 1, 400, TWEEN.Easing.Quadratic.Out)
+    noDuelistsCardRef.current.toggleHighlight(isHovered)
+    noDuelistsCardRef.current.setZIndex(isHovered ? 10 : 0)
+    noDuelistsCardRef.current.setPosition(
+      xOffset + (isHovered ? hoverXOffset : 0),
+      yOffset + (isHovered ? hoverYOffset : 0),
+      400,
+      TWEEN.Easing.Quadratic.Out
+    )
+    
+    if (isHovered) {
+      emitter.emit('hover_description', 'Go to profile screen')
+    } else {
+      emitter.emit('hover_description', '')
+    }
+  }, [getCardPositioning, isAnimating])
+
+  // Memoize the duelist cards to prevent unnecessary re-renders
+  const duelistCardsMemo = useMemo(() => {
+    if (availableDuelists.length === 0) return null
+    
+    return currentDuelists.map((duelist, index) => {
+      const { angle, xOffset, yOffset } = getCardPositioning(index, currentDuelists.length)
+      
+      return (
+        <DuelistCard
+          key={duelist}
+          ref={el => duelistCardRefs.current[index] = el}
+          duelistId={Number(duelist)}
+          isSmall={true}
+          isLeft={true}
+          isVisible={true}
+          instantVisible={true}
+          isFlipped={true}
+          instantFlip={true}
+          isHanging={false}
+          isHighlightable={false}
+          isAnimating={isAnimating}
+          width={20 * CARD_ASPECT_RATIO}
+          height={20}
+          startRotation={angle}
+          startPosition={{ x: xOffset, y: yOffset }}
+          onClick={() => {
+            setSelectedDuelistId(duelist)
+          }}
+          onHover={(isHovered) => handleCardHover(isHovered, index)}
+        />
+      )
+    })
+  }, [
+    currentDuelists, 
+    getCardPositioning, 
+    isAnimating, 
+    handleCardHover, 
+    availableDuelists.length
+  ])
+
+  // Memoize the no duelists slip to prevent unnecessary re-renders
+  const noDuelistsSlipMemo = useMemo(() => {
+    if (availableDuelists.length > 0) return null
+    
+    const { angle, xOffset, yOffset } = getCardPositioning(0, 1)
+    
+    return (
+      <NoDuelistsSlip
+        key={0}
+        ref={noDuelistsCardRef}
+        isLeft={true}
+        isVisible={true}
+        isHighlightable={false}
+        instantVisible={true}
+        width={25 * CARD_ASPECT_RATIO}
+        height={25}
+        startRotation={angle}
+        startPosition={{ x: xOffset, y: yOffset }}
+        onClick={handleNoDuelistsClick}
+        onHover={handleNoDuelistsHover}
+      />
+    )
+  }, [
+    availableDuelists.length, 
+    getCardPositioning, 
+    handleNoDuelistsClick, 
+    handleNoDuelistsHover
+  ])
+
   return (
     <Modal
       basic
@@ -191,53 +350,9 @@ function _SelectDuelistModal({
               height: aspectWidth(HAND_CARD_HEIGHT)
             }}
           />
-          {currentDuelists.map((duelist, index) => {
-            const { angle, xOffset, yOffset } = getCardPositioning(index, currentDuelists.length)
-            
-            // Calculate hover offsets based on card angle
-            const angleRad = angle * Math.PI / 180
-            const hoverDistance = 30
-            const hoverXOffset = Math.sin(angleRad) * hoverDistance
-            const hoverYOffset = -Math.abs(Math.cos(angleRad)) * hoverDistance - 20
-            
-            return (
-              <DuelistCard
-                key={duelist}
-                ref={el => duelistCardRefs.current[index] = el}
-                duelistId={Number(duelist)}
-                isSmall={true}
-                isLeft={true}
-                isVisible={true}
-                instantVisible={true}
-                isFlipped={true}
-                instantFlip={true}
-                isHanging={false}
-                isHighlightable={true}
-                isAnimating={isAnimating}
-                width={20 * CARD_ASPECT_RATIO}
-                height={20}
-                startRotation={angle}
-                startPosition={{ x: xOffset, y: yOffset }}
-                onClick={() => setSelectedDuelistId(duelist)}
-                onHover={(isHovered) => {
-                  const card = duelistCardRefs.current[index]
-                  if (card) {
-                    card.setScale(isHovered ? 1 : 1, 400, TWEEN.Easing.Quadratic.Out)
-                    card.toggleHighlight(isHovered)
-                    card.setZIndex(isHovered ? 10 : 0)
-                    card.setPosition(
-                      xOffset + (isHovered ? hoverXOffset : 0),
-                      yOffset + (isHovered ? hoverYOffset : 0),
-                      400,
-                      TWEEN.Easing.Quadratic.Out
-                    )
-                    // Update positions of other cards
-                    updateAllCardPositions(isHovered ? index : -1)
-                  }
-                }}
-              />
-            )
-          })}
+          
+          {duelistCardsMemo}
+          {noDuelistsSlipMemo}
 
           <img 
             ref={topCardRef}
@@ -256,6 +371,7 @@ function _SelectDuelistModal({
               icon='chevron left'
               style={{position: 'absolute', left: aspectWidth(25), top: '50%'}}
               onClick={handlePrevPage}
+              disabled={isAnimating}
             />
           )}
           
@@ -265,6 +381,7 @@ function _SelectDuelistModal({
               icon='chevron right'
               style={{position: 'absolute', right: aspectWidth(25), top: '50%'}}
               onClick={handleNextPage}
+              disabled={isAnimating}
             />
           )}
         </div>

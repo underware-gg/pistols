@@ -13,7 +13,6 @@ import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
 import { useAccount } from '@starknet-react/core'
 import { LiveChallengeStates } from '/src/utils/pistols'
 import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
-import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 
 export default function ScDuelists() {
   const { address } = useAccount()
