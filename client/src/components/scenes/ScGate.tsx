@@ -1,29 +1,37 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { SceneName } from '/src/data/assets'
+import { sceneBackgrounds, SceneName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { TavernAudios } from '/src/components/GameContainer'
 import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
 import Logo from '/src/components/Logo'
 import AnimatedText from '../ui/AnimatedText'
 import TWEEN from '@tweenjs/tween.js'
+import { _currentScene, emitter } from '/src/three/game'
+import { InteractibleScene } from '/src/three/InteractibleScene'
+import { useGameAspect } from '/src/hooks/useGameAspect'
 
 export default function ScGate() {
+  const { aspectWidth, aspectHeight } = useGameAspect()
+
   const { tableOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
   
   const [textOpacity, setTextOpacity] = useState(0)
   const [text, setText] = useState('')
-
+  const [balloonPosition, setBalloonPosition] = useState({ x: 0, y: 0 })
+  const [logoPosition, setLogoPosition] = useState({ x: 0, y: 0 })
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
+  const { value: textureShiftBubble, timestamp: textureShiftBubbleTimestamp } = useGameEvent('texture_shift_1', null)
+  const { value: textureShiftLogo, timestamp: textureShiftLogoTimestamp } = useGameEvent('texture_shift_3', null)
   
   useEffect(() => {
-    // Start a 10 second timer when entering the screen
+    // Set up the text display with delay
     timerRef.current = setTimeout(() => {
-      // Animate opacity for text
-      setText('I should try Knocking on the door...')
+      setText('OY! Ye just standin\' there wastin\' me precious time or will ye enter?!')
+      
       new TWEEN.Tween({ opacity: 0 })
         .to({ opacity: 1 }, 1000)
         .easing(TWEEN.Easing.Cubic.Out)
@@ -31,15 +39,48 @@ export default function ScGate() {
           setTextOpacity(opacity)
         })
         .start()
-    }, 10000)
+        
+      const scene = (_currentScene as InteractibleScene);
+      if (scene) {
+        scene.excludeItem(sceneBackgrounds.Gate.items[0])
+        scene.toggleBlur(true)
+        
+        setTimeout(() => {
+          scene.toggleBlur(false)
+        }, 3000)
+      }
+    }, 1000)
 
-    // Clean up timer when leaving the screen
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current)
       }
     }
-  }, [])
+  }, [tableOpener])
+
+  useEffect(() => {
+    const handleTextureShift = (shift: { x: number, y: number }) => {
+      const scaledX = -shift.x * aspectWidth(100)
+      const scaledY = shift.y * aspectHeight(100)
+      setBalloonPosition({ x: scaledX, y: scaledY })
+    }
+
+    if (textureShiftBubble && text.includes('OY!')) {
+      handleTextureShift(textureShiftBubble)
+    }
+  }, [textureShiftBubble, textureShiftBubbleTimestamp, text])
+
+  useEffect(() => {
+    const handleTextureShift = (shift: { x: number, y: number }) => {
+      const scaledX = -shift.x * aspectWidth(100)
+      const scaledY = shift.y * aspectHeight(100)
+      setLogoPosition({ x: scaledX, y: scaledY })
+    }
+
+    if (textureShiftLogo) {
+      handleTextureShift(textureShiftLogo)
+    }
+  }, [textureShiftLogo, textureShiftLogoTimestamp])
 
   useEffect(() => {
     if (itemClicked) {
@@ -53,14 +94,22 @@ export default function ScGate() {
 
   return (
     <>
-      <div style={{ position: 'absolute', left: '4%', bottom: '6%',zIndex: 1 }}>
-        <Logo width={12} showName square />
+      <div style={{ position: 'absolute', right: '4%', bottom: '6%', zIndex: 1, transform: `translate(${logoPosition.x}px, ${logoPosition.y}px)` }}>
+        <Logo width={12} showName vertical />
       </div>
 
       <TavernAudios />
       {/* <BarkeepModal /> */}
-      <div className='GateTalkBaloon NoMouse NoDrag' style={{ opacity: textOpacity }}>
-        <AnimatedText text={text} delayPerCharacter={50} />
+      <div
+        className='FillParent'
+        style={{ 
+          opacity: textOpacity,
+          transform: `translate(${balloonPosition.x}px, ${balloonPosition.y}px)`
+        }}
+      >
+        <div className='GateTalkBaloon NoMouse NoDrag' data-tail="left" >
+          <AnimatedText text={text} delayPerCharacter={50} />
+        </div>
       </div>
 
       <DojoSetupErrorDetector />

@@ -431,8 +431,14 @@ export class InteractibleScene extends THREE.Scene {
       const scaledMousePos = this.mouseScreenPos.clone();
       scaledMousePos.x *= width/window.innerWidth;
       scaledMousePos.y *= height/window.innerHeight;
-      this.maskShader.setUniformValue(`uTextureShift${index}`, scaledMousePos.multiplyScalar(background.shiftMultiplier));
-      this.maskShader.setUniformValue(`uRandomShift${index}`, this.currentRandomValues[index])
+      const textureShift = scaledMousePos.multiplyScalar(background.shiftMultiplier);
+      
+      // Set uniform value for shader
+      this.maskShader.setUniformValue(`uTextureShift${index}`, textureShift);
+      this.maskShader.setUniformValue(`uRandomShift${index}`, this.currentRandomValues[index]);
+      
+      // Emit texture shift events
+      emitter.emit(`texture_shift_${index}`, textureShift);
     })
   }
 
@@ -507,6 +513,10 @@ export class InteractibleScene extends THREE.Scene {
 
   public excludeItem(item?: SceneObject) {
     this.maskShader.setUniformValue('uExcludedColor', item ? new THREE.Color('#' + item.color) : new THREE.Color(0, 0, 0))
+  }
+
+  public includeItem(item?: SceneObject) {
+    this.maskShader.setUniformValue('uExcludedColor', item ? new THREE.Color(0, 0, 0) : new THREE.Color(0, 0, 0))
   }
 
   public hideItem(item: TextureName) {

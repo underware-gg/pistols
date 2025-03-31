@@ -1394,25 +1394,50 @@ $logo-url: '/logos/logo_avante.svg';
   -webkit-box-orient: vertical;
   border-radius: aspect-width(0.625);
   z-index: 999;
+  --tail-position: left; /* default value, can be overridden */
 
   &:before {
-    content:"";
+    content: "";
     position: absolute;
-    right: aspect-width(-1.875);
     top: aspect-width(4.8125);
     border-top: aspect-width(0.9375) solid transparent;
-    border-left: aspect-width(1.875) solid var(--border-color);
     border-bottom: aspect-width(0) solid transparent;
   }
   
   &:after {
-    content:"";
+    content: "";
     position: absolute;
-    right: aspect-width(-1.24);
     top: aspect-width(5);
     border-top: aspect-width(0.625) solid transparent;
-    border-left: aspect-width(1.25) solid var(--bg-color);
     border-bottom: aspect-width(0) solid transparent;
+  }
+
+  &:has([data-tail="left"]), &[data-tail="left"] {
+    &:before {
+      left: aspect-width(-1.875);
+      border-right: aspect-width(1.875) solid var(--border-color);
+      border-left: none;
+    }
+    
+    &:after {
+      left: aspect-width(-1.24);
+      border-right: aspect-width(1.25) solid var(--bg-color);
+      border-left: none;
+    }
+  }
+
+  &:has([data-tail="right"]), &[data-tail="right"], &:not([data-tail="left"]) {
+    &:before {
+      right: aspect-width(-1.875);
+      border-left: aspect-width(1.875) solid var(--border-color);
+      border-right: none;
+    }
+    
+    &:after {
+      right: aspect-width(-1.24);
+      border-left: aspect-width(1.25) solid var(--bg-color);
+      border-right: none;
+    }
   }
 
   .DialogBalloonText {
@@ -1446,8 +1471,9 @@ $logo-url: '/logos/logo_avante.svg';
 }
 
 .GateTalkBaloon {
-  @extend .DemonTalkBaloon;
-  left: 10%;
+  @extend .DialogBalloon;
+  top: 52%;
+  left: 56%;
   color: $color-darkest;
   z-index: 800;
   --bg-color: #{$color-bright};
