@@ -181,6 +181,7 @@ pub mod duel_token {
         duelist::{DuelistTrait, DuelistValue, ProfileTypeTrait},
         pact::{PactTrait},
         table::{TableConfig, TableConfigTrait},
+        season::{SeasonConfigValue},
         events::{Activity, ActivityTrait},
     };
     use pistols::types::{
@@ -325,13 +326,14 @@ pub mod duel_token {
             store.enter_challenge(duelist_id_a, duel_id);
 
             // calc expiration
+            let season: SeasonConfigValue = store.get_current_season_value();
             let timestamp: u64 = starknet::get_block_timestamp();
+            let timestamp_end: u64 = timestamp + 
+                if (expire_hours == 0) {TIMESTAMP::ONE_DAY}
+                else {TimestampTrait::from_hours(expire_hours)};
             let timestamps = Period {
                 start: timestamp,
-                end: (timestamp + 
-                    if (expire_hours == 0) {TIMESTAMP::ONE_DAY}
-                    else {TimestampTrait::from_hours(expire_hours)}
-                ),
+                end: core::cmp::min(timestamp_end, season.period.end),
             };
 
             // create challenge
@@ -397,10 +399,11 @@ pub mod duel_token {
             let address_b: ContractAddress = starknet::get_caller_address();
             let duelist_id_b: u128 = duelist_id;
             let timestamp: u64 = starknet::get_block_timestamp();
-            
+
             // validate table
             let table: TableConfig = store.get_table_config(challenge.table_id);
-            table.assert_can_join(@store);
+            // validated on create_duel
+            // table.assert_can_join(@store);
 
             if (challenge.timestamps.has_expired()) {
                 // Expired, close it!

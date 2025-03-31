@@ -3,7 +3,12 @@ mod tests {
     use pistols::models::{
         season::{SeasonConfig, SeasonConfigTrait, SeasonPhase},
         table::{TableConfig, RulesType},
+        challenge::{ChallengeValue},
         config::{Config},
+    };
+    use pistols::types::{
+        challenge_state::{ChallengeState},
+        timestamp::{TIMESTAMP},
     };
     use pistols::tests::tester::{tester,
         tester::{
@@ -38,39 +43,64 @@ mod tests {
     #[test]
     fn test_season_collect() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
-        let season: SeasonConfig = sys.store.get_current_season();
-        assert_eq!(season.season_id, 1, "season_id");
-        assert_eq!(season.phase, SeasonPhase::InProgress, "phase");
+        let season_1: SeasonConfig = sys.store.get_current_season();
+        assert_eq!(season_1.season_id, 1, "season_id");
+        assert_eq!(season_1.phase, SeasonPhase::InProgress, "phase");
         // create a challenge in season 1
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_TABLE(1), 0, 1);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         tester::execute_reply_duel(@sys.duels, OWNER(), ID(OWNER()), duel_id, false);
+        assert_eq!(challenge.table_id, season_1.table_id, "challenge.season_id_1");
         //  time travel
-        assert!(!season.can_collect(), "!season.can_collect");
+        assert!(!season_1.can_collect(), "!season_1.can_collect");
         assert!(!sys.game.can_collect_season(), "!sys.game.can_collect_season");
-        tester::set_block_timestamp(season.period.end);
-        assert!(season.can_collect(), "season.can_collect");
+        tester::set_block_timestamp(season_1.period.end);
+        assert!(season_1.can_collect(), "season_1.can_collect");
         assert!(sys.game.can_collect_season(), "sys.game.can_collect_season");
         // collect
         let new_table_id: felt252 = tester::execute_collect_season(@sys.game, OWNER());
         assert_ne!(new_table_id, 0, "new_table_id != 0");
-        assert_ne!(new_table_id, season.table_id, "new_table_id");
+        assert_ne!(new_table_id, season_1.table_id, "new_table_id");
         // past season is ended
-        let season: SeasonConfig = sys.store.get_season_config(season.table_id);
-        assert_eq!(season.phase, SeasonPhase::Ended, "season.phase_ENDED");
+        let season_1_ended: SeasonConfig = sys.store.get_season_config(season_1.table_id);
+        assert_eq!(season_1_ended.phase, SeasonPhase::Ended, "season_1_ended.phase_ENDED");
         // get new season
-        let new_season: SeasonConfig = sys.store.get_current_season();
-        assert_eq!(new_season.table_id, new_table_id, "new_season.table_id");
-        assert_eq!(new_season.phase, SeasonPhase::InProgress, "new_season.phase");
-        assert_eq!(new_season.season_id, 2, "new_season.season_id");
-        assert!(!new_season.can_collect(), "!new_season.can_collect");
+        let season_2: SeasonConfig = sys.store.get_current_season();
+        assert_eq!(season_2.table_id, new_table_id, "season_2.table_id");
+        assert_eq!(season_2.phase, SeasonPhase::InProgress, "season_2.phase");
+        assert_eq!(season_2.season_id, 2, "season_2.season_id");
+        assert!(!season_2.can_collect(), "!season_2.can_collect");
         assert!(!sys.game.can_collect_season(), "!sys.game.can_collect_season_NEW");
         // get new table
         let new_table: TableConfig = sys.store.get_table_config( new_table_id);
         assert_eq!(new_table.rules, RulesType::Season, "table_type");
-        assert_eq!(new_table.table_id, new_season.table_id, "table_id");
+        assert_eq!(new_table.table_id, season_2.table_id, "table_id");
         // create a challenge in season 2
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_TABLE(2), 0, 1);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(challenge.table_id, season_2.table_id, "challenge.season_id_2");
         tester::execute_reply_duel(@sys.duels, OWNER(), ID(OWNER()), duel_id, false);
+    }
+
+    #[test]
+    fn test_season_challenge_expire_before_season_end() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
+        let season_1: SeasonConfig = sys.store.get_current_season();
+        tester::set_block_timestamp(season_1.period.end - TIMESTAMP::ONE_HOUR);
+        // create a challenge in season 1
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_TABLE(1), 24, 1);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(challenge.table_id, season_1.table_id, "challenge.season_id_1");
+        assert_eq!(challenge.timestamps.end, season_1.period.end, "challenge.timestamps.end");
+        assert!(!sys.game.can_collect_duel(duel_id), "can_collect_duel(1)");
+        // collect season 1
+        tester::set_block_timestamp(season_1.period.end);
+        tester::execute_collect_season(@sys.game, OWNER());
+        // can't reply...
+        assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel(1)");
+        tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, true);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(challenge.state, ChallengeState::Expired, "challenge.state_expired");
     }
 
     #[test]
