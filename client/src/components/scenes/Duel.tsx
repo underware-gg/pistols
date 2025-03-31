@@ -517,7 +517,7 @@ export default function Duel({
         </div>
       </div>
 
-      {isTutorial && <DuelTutorialOverlay tutorialType={tutorial} opener={tutorialOpener} />}
+      <DuelTutorialOverlay tutorialType={tutorial ? tutorial : undefined} opener={tutorialOpener} />
 
       {/* {duelProgress &&
         <div className='CenteredPanel'>

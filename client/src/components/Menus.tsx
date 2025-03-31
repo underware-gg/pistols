@@ -13,7 +13,7 @@ export function MenuDuel({
   duelId: bigint
 }) {
   const { dispatchSetting, settings, SettingsActions } = useSettings()
-  const { dispatchSetDuel } = usePistolsContext()
+  const { dispatchSetDuel, tutorialOpener } = usePistolsContext()
   const { dispatchSceneBack } = usePistolsScene()
 
   const _backToTavern = () => {
@@ -25,7 +25,8 @@ export function MenuDuel({
     dispatchSetting(SettingsActions.SFX_ENABLED, !settings.sfxEnabled)
   }
 
-  const _skipAnimation = () => {
+  const _openTutorial = () => {
+    tutorialOpener.open()
   }
 
   return (
@@ -33,16 +34,14 @@ export function MenuDuel({
       <div className='MenuBottomBackground NoDrag NoMouse'>
         <img className='MenuBackgroundImage' src='/images/ui/duel/bottom_nav.png'/>
       </div>
-      <Menu secondary compact className='YesMouse' size='huge' style={{ minHeight: '0' }}>
+      <Menu secondary compact className='YesMouse' size='huge' style={{ minHeight: '0', position: 'relative' }}>
         <Menu.Item className='button_duel' type='tavern' onClick={() => _backToTavern()}>
           Back to Tavern
         </Menu.Item>
 
-        {/* <Menu.Item disabled={!canSkip} onClick={() => _skipAnimation()}>
-          Skip animation
-        </Menu.Item> */}
-
-        {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
+        <Menu.Item className='button_duel' type='help' onClick={() => _openTutorial()}>
+          Help
+        </Menu.Item>
 
         <Menu.Item className='button_duel' type='icon'>
           <IconClick name='database' onClick={() => window?.open(makeDuelDataUrl(duelId), '_blank')} className='icon-control' />
@@ -51,6 +50,14 @@ export function MenuDuel({
         <Menu.Item className='button_duel' type='icon'>
           <IconClick name={settings.sfxEnabled ? 'volume up' : 'volume off'} onClick={() => _switchSfx()} className='icon-control'  />
         </Menu.Item>
+
+
+
+        {/* <Menu.Item disabled={!canSkip} onClick={() => _skipAnimation()}>
+          Skip animation
+        </Menu.Item> */}
+
+        {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
 
       </Menu>
     </div>

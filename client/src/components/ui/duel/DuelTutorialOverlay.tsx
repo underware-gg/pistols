@@ -22,8 +22,10 @@ function _DuelTutorialOverlay({ tutorialType, opener, onComplete }: DuelTutorial
   const { aspectWidth, aspectHeight } = useGameAspect()
   const { dispatchSetScene } = usePistolsScene()
   
-  const [hasTyped, setHasTyped] = useState(false)
-  const [selectedTutorialType, setSelectedTutorialType] = useState<DuelTutorialLevel | undefined>(tutorialType)
+  const [hasType, setHasType] = useState(false)
+  const [selectedTutorialType, setSelectedTutorialType] = useState<DuelTutorialLevel | undefined>(
+    tutorialType === DuelTutorialLevel.NONE ? undefined : tutorialType
+  )
   const [currentSlide, setCurrentSlide] = useState(0)
   const [currentTutorialIndex, setCurrentTutorialIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -35,11 +37,12 @@ function _DuelTutorialOverlay({ tutorialType, opener, onComplete }: DuelTutorial
   const totalDots = tutorialParts.reduce((total, tutorialId) => total + (TUTORIAL_DATA[tutorialId]?.slides?.length || 0), 0)
 
   useEffect(() => {
-    setSelectedTutorialType(tutorialType)
+    const effectiveTutorialType = tutorialType === DuelTutorialLevel.NONE ? undefined : tutorialType
+    setSelectedTutorialType(effectiveTutorialType)
     setCurrentSlide(0)
     setCurrentTutorialIndex(0)
     setCurrentDot(0)
-    setHasTyped(tutorialType ? true : false)
+    setHasType(effectiveTutorialType !== undefined)
   }, [tutorialType])
 
   useEffect(() => {
@@ -220,7 +223,7 @@ function _DuelTutorialOverlay({ tutorialType, opener, onComplete }: DuelTutorial
   const renderTutorialContent = () => {
     return (
       <>
-        {!hasTyped && (
+        {!hasType && (
           <CustomIcon icon name='left-arrow' onClick={() => setSelectedTutorialType(undefined)} size='big' disabled={false} className='YesMouse tutorialTopLeftArrow'/>
         )}        
         <h2 className="tutorialTitle">
