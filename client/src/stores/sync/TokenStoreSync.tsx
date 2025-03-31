@@ -24,9 +24,9 @@ export function TokenStoreSync() {
   const { duelContractAddress } = useDuelTokenContract()
   const { packContractAddress } = usePackTokenContract()
   const token_contracts = useMemo(() => [
-    (duelistContractAddress as string),
-    (duelContractAddress as string),
-    (packContractAddress as string),
+    bigintToHex(duelistContractAddress),
+    bigintToHex(duelContractAddress),
+    bigintToHex(packContractAddress),
   ], [duelistContractAddress, duelContractAddress, packContractAddress])
 
   // get coin contracts
@@ -34,9 +34,9 @@ export function TokenStoreSync() {
   const { fameContractAddress } = useFameContract()
   const { foolsContractAddress } = useFoolsContract()
   const coin_contracts = useMemo(() => [
-    (lordsContractAddress as string),
-    (fameContractAddress as string),
-    (foolsContractAddress as string),
+    bigintToHex(lordsContractAddress),
+    bigintToHex(fameContractAddress),
+    bigintToHex(foolsContractAddress),
   ], [lordsContractAddress, fameContractAddress, foolsContractAddress])
 
   // subscribe for any updates
@@ -48,8 +48,8 @@ export function TokenStoreSync() {
   useSdkTokenBalancesSub({
     contracts,
     updateBalance: (balance: torii.TokenBalance) => {
-      // console.log("TOKENS SUB >>>", balance)
       const _contract = bigintToHex(balance.contract_address)
+      // console.log("TOKENS SUB >>>", balance, token_contracts.includes(_contract), coin_contracts.includes(_contract))
       if (token_contracts.includes(_contract)) {
         token_state.updateBalance(balance)
       } else if (coin_contracts.includes(_contract)) {

@@ -104,7 +104,7 @@ export const useSdkTokenBalancesSub = ({
         [],
         [],
         (balance: torii.TokenBalance) => {
-          console.log("useSdkTokenBalancesSub() SUB:", balance);
+          console.log("useSdkTokenBalancesSub() SUB:", isPositiveBigint(balance.contract_address), balance);
           if (isPositiveBigint(balance.contract_address)) {
             updateBalance(balance);
           }
