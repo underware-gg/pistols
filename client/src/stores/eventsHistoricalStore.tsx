@@ -40,7 +40,7 @@ const createStore = () => {
   return create<State>()(immer((set) => ({
     playerActivity: [],
     setEvents: (events: PistolsEntity[]) => {
-      console.log("setHistoricalEvents() =>", events)
+      console.log("historicalEventsStore() => SET:", events)
       set((state: State) => {
         state.playerActivity = arrayClean(events.map((e, i) => _parseEvent(e, i)))
           // .sort((a, b) => (a.timestamp - b.timestamp))
@@ -48,7 +48,7 @@ const createStore = () => {
       })
     },
     updateEvent: (e: PistolsEntity) => {
-      // console.log("updateHistoricalEvent() =>", e)
+      console.log("historicalEventsStore() => UPDATE:", e)
       set((state: State) => {
         const activity = _parseEvent(e)
         if (activity) state.playerActivity.push(activity)

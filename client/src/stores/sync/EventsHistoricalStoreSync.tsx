@@ -1,4 +1,5 @@
-import { useSdkEventsSub } from '@underware/pistols-sdk/dojo'
+import { useEffect } from 'react'
+import { useDojoSetup, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useHistoricalEventsStore } from '/src/stores/eventsHistoricalStore'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
@@ -7,7 +8,7 @@ const query: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withClause(
     new PistolsClauseBuilder().keys(
       ["pistols-PlayerActivityEvent"],
-      [],
+      [undefined],
     ).build()
   )
   .withEntityModels([
@@ -30,7 +31,20 @@ export function EventsHistoricalStoreSync() {
     updateEntity: historicalEventsState.updateEvent,
   })
 
-  // useEffect(() => console.log("EventsHistoricalStoreSync() =>", historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
+  // const { sdk } = useDojoSetup()
+  // useEffect(() => {
+  //   console.log("getEventMessages()...")
+  //   sdk.getEventMessages({
+  //     query,
+  //     historical: true,
+  //   }).then((data) => {
+  //     console.log("getEventMessages() GOT:", data)
+  //   }).catch((error: Error) => {
+  //     console.error("getEventMessages() error:", error, query)
+  //   })
+  // }, [mounted])
+
+  useEffect(() => console.log("EventsHistoricalStoreSync() =>", historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
 
   return (<></>)
 }
