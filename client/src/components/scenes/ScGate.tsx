@@ -31,7 +31,7 @@ export default function ScGate() {
           setTextOpacity(opacity)
         })
         .start()
-    }, 10000)
+    }, 7000)
 
     // Clean up timer when leaving the screen
     return () => {
@@ -53,13 +53,13 @@ export default function ScGate() {
 
   return (
     <>
-      <div style={{ position: 'absolute', left: '4%', bottom: '6%',zIndex: 1 }}>
-        <Logo width={12} showName square />
+      <div style={{ position: 'absolute', right: '4%', bottom: '6%',zIndex: 1 }}>
+        <Logo width={12} showName vertical />
       </div>
 
       <TavernAudios />
       {/* <BarkeepModal /> */}
-      <div className='GateTalkBaloon NoMouse NoDrag' style={{ opacity: textOpacity }}>
+      <div className='GateTalkBaloon NoMouse NoDrag' data-tail="left" style={{ opacity: textOpacity }}>
         <AnimatedText text={text} delayPerCharacter={50} />
       </div>
 
