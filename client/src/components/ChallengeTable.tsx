@@ -8,14 +8,13 @@ import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
+import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { AllChallengeStates, ChallengeStateClasses, ChallengeStateNames } from '/src/utils/pistols'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { DuelIconsAsRow } from '/src/components/DuelIcons'
 import { FilterButton } from '/src/components/ui/Buttons'
 import { arrayRemoveValue } from '@underware/pistols-sdk/utils'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useFameBalanceDuelist } from '../hooks/useFame'
-import { useIsMyAccount } from '../hooks/useIsYou'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -156,8 +155,8 @@ function DuelItem({
   } = useDuel(duelId)
   const { name: playerNameA } = usePlayer(duelistAddressA)
   const { name: playerNameB } = usePlayer(duelistAddressB)
-  const { isAlive: isAliveA } = useFameBalanceDuelist(duelistIdA)
-  const { isAlive: isAliveB } = useFameBalanceDuelist(duelistIdB)
+  const { isAlive: isAliveA } = useDuelistFameBalance(duelistIdA)
+  const { isAlive: isAliveB } = useDuelistFameBalance(duelistIdB)
   const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
   const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
 

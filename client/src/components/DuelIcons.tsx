@@ -7,9 +7,9 @@ import { BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
 import { bigintEquals } from '@underware/pistols-sdk/utils'
 import { EMOJI } from '/src/data/messages'
 import { BigNumberish } from 'starknet'
-import { useDuelCallToAction } from '/src/stores/eventsStore'
+import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useIsMyDuelist } from '../hooks/useIsYou'
+import { useIsMyDuelist } from '/src/hooks/useIsYou'
 
 const Row = Grid.Row
 const Col = Grid.Column

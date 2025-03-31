@@ -112,7 +112,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
   const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
 
-  const { lives, isLoading } = useFameBalanceDuelist(challengingDuelistId)
+  const { lives, isLoading } = useDuelistFameBalance(challengingDuelistId)
   
   const [leftDuelistId, leftDuelistAddress, leftPlayerName] = useMemo(() => {
     if (isYouB) {
