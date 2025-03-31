@@ -57,6 +57,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   const [textOpacity, setTextOpacity] = useState(0)
   const [showCardPack, setShowCardPack] = useState(false)
   const [cardPackClickable, setCardPackClickable] = useState(false)
+  const [hasSkippedScene, setHasSkippedScene] = useState(false)
   const [skipProgress, setSkipProgress] = useState(0)
   const [isHoldingSkip, setIsHoldingSkip] = useState(false)
   const [skipSource, setSkipSource] = useState<'mouse' | 'keyboard' | null>(null)
@@ -85,6 +86,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       currentTween.current = null
       skipTween.current?.stop()
       skipTween.current = null
+      setHasSkippedScene(false)
       setSkipSource(null)
       setIsTransitioning(false)
     }
@@ -104,6 +106,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   // Text Animation Timers
   useEffect(() => {
     if (textDuration <= 0) return
+    if (hasSkippedScene) return
 
     const skipTimeout = setTimeout(() => setCanSkipText(true), textDuration * 0.8)
     const nextTextTimeout = setTimeout(() => {
@@ -115,7 +118,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       clearTimeout(skipTimeout)
       clearTimeout(nextTextTimeout)
     }
-  }, [totalDuration, textDuration])
+  }, [totalDuration, textDuration, hasSkippedScene])
 
   // Keyboard Controls
   useEffect(() => {
@@ -222,7 +225,6 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         if (canClaimStarterPack) {
           animateTextOpacity(0)
           setShowCardPack(true)
-          console.log('showCardPack', showCardPack)
           setTimeout(() => {
             tutorialOpener.open()
           }, 1000)
@@ -319,10 +321,10 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         setSkipProgress(progress)
       })
       .onComplete(() => {
-        console.log('handleSceneProgression')
         setIsHoldingSkip(false)
         setSkipProgress(0)
         setSkipSource(null)
+        setHasSkippedScene(true)
         handleSceneProgression()
       })
       .start()

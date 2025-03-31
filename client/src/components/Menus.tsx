@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, Label, Menu, SemanticICONS } from 'semantic-ui-react'
 import { usePistolsScene, usePistolsContext } from '/src/hooks/PistolsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
@@ -76,7 +76,7 @@ export function MenuDuelControl({
     dispatchSetting(SettingsActions.DUEL_SPEED_FACTOR, newSpeed > 2.0 ? 0.5 : newSpeed)
   }
 
-  const ControlMenuItem = ({ 
+  const ControlMenuItem = React.memo(({ 
     icon, 
     onClick, 
     tooltip, 
@@ -87,36 +87,31 @@ export function MenuDuelControl({
     tooltip?: string;
     children?: React.ReactNode;
   }) => {
-    const [tooltipVisible, setTooltipVisible] = useState(false);
     const [tooltipOpacity, setTooltipOpacity] = useState(0);
     const tooltipTimeoutRef = useRef(null);
     const leaveTimeoutRef = useRef(null);
     const tweenRef = useRef(null);
     
-    const handleMouseEnter = () => {
+    const handleMouseEnter = useCallback(() => {
       if (leaveTimeoutRef.current) {
         clearTimeout(leaveTimeoutRef.current);
         leaveTimeoutRef.current = null;
       }
       
-      if (!tooltipVisible) {
-        setTooltipVisible(true);
-        
-        if (tweenRef.current) {
-          tweenRef.current.stop();
-        }
-        
-        const tween = new TWEEN.Tween({ opacity: 0 })
-          .to({ opacity: 1 }, 300)
-          .onUpdate(obj => setTooltipOpacity(obj.opacity))
-          .delay(400)
-          .start();
-        
-        tweenRef.current = tween;
+      if (tweenRef.current) {
+        tweenRef.current.stop();
       }
-    };
+      
+      const tween = new TWEEN.Tween({ opacity: 0 })
+        .to({ opacity: 1 }, 300)
+        .onUpdate(obj => setTooltipOpacity(obj.opacity))
+        .delay(400)
+        .start();
+      
+      tweenRef.current = tween;
+    }, []);
     
-    const handleMouseLeave = () => {
+    const handleMouseLeave = useCallback(() => {
       if (tweenRef.current) {
         tweenRef.current.stop();
         tweenRef.current = null;
@@ -127,20 +122,17 @@ export function MenuDuelControl({
       }
       
       leaveTimeoutRef.current = setTimeout(() => {
-        if (tooltipVisible) {
-          const tween = new TWEEN.Tween({ opacity: tooltipOpacity })
-            .to({ opacity: 0 }, 200)
-            .onUpdate(obj => setTooltipOpacity(obj.opacity))
-            .onComplete(() => {
-              setTooltipVisible(false);
-              tweenRef.current = null;
-            })
-            .start();
-          
-          tweenRef.current = tween;
-        }
+        const tween = new TWEEN.Tween({ opacity: tooltipOpacity })
+          .to({ opacity: 0 }, 200)
+          .onUpdate(obj => setTooltipOpacity(obj.opacity))
+          .onComplete(() => {
+            tweenRef.current = null;
+          })
+          .start();
+        
+        tweenRef.current = tween;
       }, 200);
-    };
+    }, [tooltipOpacity]);
     
     useEffect(() => {
       return () => {
@@ -161,14 +153,14 @@ export function MenuDuelControl({
         <div className='Relative'>
           <Label 
             pointing='right' 
+            className='NoMouse NoDrag'
             style={{ 
               position: 'absolute', 
               top: '-120%', 
               right: '180%', 
-              display: tooltipVisible ? 'block' : 'none',
               opacity: tooltipOpacity,
               whiteSpace: 'nowrap',
-              zIndex: 999
+              zIndex: 1000
             }}
           >
             {tooltip}
@@ -184,7 +176,38 @@ export function MenuDuelControl({
         {children}
       </Menu.Item>
     );
-  };
+  });
+
+  // Memoize the menu items to prevent unnecessary re-renders
+  const menuItems = useMemo(() => (
+    <>
+      <ControlMenuItem 
+        icon='angle double right' 
+        onClick={() => _switchSpeedFactor()} 
+        tooltip="Change playback speed"
+      >
+        <div>{settings.duelSpeedFactor}</div>
+      </ControlMenuItem>
+
+      <ControlMenuItem 
+        icon={isPlaying ? 'pause' : 'play'} 
+        onClick={() => clickPlay()} 
+        tooltip={`${isPlaying ? 'Pause' : 'Play'} animation`}
+      />
+
+      <ControlMenuItem 
+        icon='plus' 
+        onClick={() => clickStep()} 
+        tooltip="Step forward"
+      />
+
+      <ControlMenuItem 
+        icon='redo' 
+        onClick={() => clickReset()} 
+        tooltip="Reset animation"
+      />
+    </>
+  ), [isPlaying, settings.duelSpeedFactor, _switchSpeedFactor, clickPlay, clickStep, clickReset]);
 
   return (
     <div className='MenuRightDuel NoMouse'>
@@ -192,33 +215,7 @@ export function MenuDuelControl({
         <img className='MenuBackgroundImageFliped' src='/images/ui/duel/side_nav.png'/>
       </div>
       <Menu secondary compact vertical className='YesMouse' size='huge' style={{ minHeight: '0' }}>
-        
-        <ControlMenuItem 
-          icon='angle double right' 
-          onClick={() => _switchSpeedFactor()} 
-          tooltip="Change playback speed"
-        >
-          <div>{settings.duelSpeedFactor}</div>
-        </ControlMenuItem>
-
-        <ControlMenuItem 
-          icon={isPlaying ? 'pause' : 'play'} 
-          onClick={() => clickPlay()} 
-          tooltip={`${isPlaying ? 'Pause' : 'Play'} animation`}
-        />
-
-        <ControlMenuItem 
-          icon='plus' 
-          onClick={() => clickStep()} 
-          tooltip="Step forward"
-        />
-
-        <ControlMenuItem 
-          icon='redo' 
-          onClick={() => clickReset()} 
-          tooltip="Reset animation"
-        />
-
+        {menuItems}
       </Menu>
     </div>
   )

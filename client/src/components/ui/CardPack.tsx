@@ -40,10 +40,11 @@ interface CardPack {
   cardPackSize: number,
   maxTilt: number,
   optionalTitle?: string,
-  customButtonLabel?: string
+  customButtonLabel?: string,
+  atTutorialEnding?: boolean
 }
 
-export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle, customButtonLabel }: CardPack) => {
+export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle, customButtonLabel, atTutorialEnding = false }: CardPack) => {
   const { account } = useAccount()
   const { pack_token } = useDojoSystemCalls()
   const { duelistIds } = useDuelistsOfPlayer()
@@ -127,6 +128,16 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
       cardPackRef.current?.style.setProperty('--card-pack-opacity', '0')
     }
   }, [isOpen])
+
+  const _close = () => {
+    new TWEEN.Tween({ opacity: 1 })
+      .to({ opacity: 0 }, CARD_PACK_OPACITY_DURATION)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .onUpdate(({ opacity }) => {
+        cardPackRef.current?.style.setProperty('--card-pack-opacity', opacity.toString())
+      })
+      .start()
+  }
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!cardPackRef.current || sealClicked || !clickable) {
@@ -331,25 +342,23 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   const handleButtonClick = () => {
     if (!hasRevealed) {
       handleRevealAll()
-    } else if (packType === constants.PackType.StarterPack) {
-      if (selectedDuelistId !== undefined) {
-        onComplete?.(selectedDuelistId)
-      }
     } else {
       onComplete?.()
+      setShowRevealButton(false)
+      _close()
     }
   }
 
   const getButtonLabel = () => {
-    if (customButtonLabel) return customButtonLabel
     if (!hasRevealed) return 'Reveal All'
-    if (packType === constants.PackType.StarterPack) return 'Go to Duel'
+    if (customButtonLabel) return customButtonLabel
+    if (packType === constants.PackType.StarterPack && atTutorialEnding) return 'Go to Tavern!'
     return 'Close'
   }
 
   const isButtonDisabled = () => {
     if (!hasRevealed) return false
-    if (packType === constants.PackType.StarterPack && selectedDuelistId === undefined) return true
+    if (packType === constants.PackType.StarterPack && atTutorialEnding && selectedDuelistId === undefined) return true
     return false
   }
 
