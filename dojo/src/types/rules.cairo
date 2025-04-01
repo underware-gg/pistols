@@ -114,12 +114,16 @@ pub impl RulesTypeImpl of RulesTypeTrait {
         if (recipient_count > 0) {
             match self {
                 RulesType::Season => {
-                    percents.append(40); // (1) :0
-                    percents.append(25); // (2) :1
-                    percents.append(15); // (3) :2
-                    percents.append(10); // (4) :3
-                    percents.append(5);  // (5) :4
-                    percents.append(5);  // (6) :5
+                    percents.append(25); // 1
+                    percents.append(20); // 2
+                    percents.append(15); // 3
+                    percents.append(10); // 4
+                    percents.append(8);  // 5
+                    percents.append(6);  // 6
+                    percents.append(6);  // 7
+                    percents.append(4);  // 8
+                    percents.append(4);  // 9
+                    percents.append(2);  // 10
                 },
                 _ => {}
             };
@@ -172,6 +176,13 @@ impl RulesTypeIntoByteArray of core::traits::Into<RulesType, ByteArray> {
     }
 }
 // for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+pub impl RulesTypeDisplay of core::fmt::Display<RulesType> {
+    fn fmt(self: @RulesType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
 pub impl RulesTypeDebug of core::fmt::Debug<RulesType> {
     fn fmt(self: @RulesType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();
@@ -191,28 +202,35 @@ mod unit {
         RulesType, RulesTypeTrait,
         SeasonDistribution, RewardValues,
     };
+    use pistols::models::leaderboard::{LeaderboardTrait};
     use pistols::utils::misc::{WEI};
 
-    #[test]
-    fn test_season_distribution() {
+    fn _test_season_distribution(rules: RulesType) {
         let mut recipient_count: usize = 12;
         loop {
-            let distribution: @SeasonDistribution = RulesType::Season.get_season_distribution(recipient_count);
-            assert_le!((*distribution.percents).len(), recipient_count, "win[{}] distribution.percents.len()", recipient_count);
+            let distribution: @SeasonDistribution = rules.get_season_distribution(recipient_count);
+            let distribution_count: usize = (*distribution.percents).len();
+            assert_le!(distribution_count, LeaderboardTrait::MAX_POSITIONS.into(), "{}: win[{}] distribution.percents.len()", rules, recipient_count);
+            assert_le!(distribution_count, recipient_count, "{}: win[{}] distribution.percents.len()", rules, recipient_count);
 // println!("[{}] > [{}]", recipient_count, (*distribution.percents).len());
-            if (recipient_count == 0) {
+            if (recipient_count == 0 || distribution_count == 0) {
                 break;
             }
             // sum must be 100
             let mut sum: u8 = 0;
             let mut i: usize  = 0;
-            while (i < (*distribution.percents).len()) {
+            while (i < distribution_count) {
                 sum += *distribution.percents[i];
                 i += 1;
             };
-            assert_eq!(sum, 100, "win[{}] sum", recipient_count);
+            assert_eq!(sum, 100, "{}: win[{}] sum", rules, recipient_count);
             recipient_count -= 1;
         };
+    }
+
+    #[test]
+    fn test_season_distribution() {
+        _test_season_distribution(RulesType::Season);
     }
 
     #[test]
