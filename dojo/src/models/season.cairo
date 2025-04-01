@@ -1,12 +1,13 @@
+pub use pistols::types::rules::{Rules, RulesTrait};
 use pistols::types::timestamp::{Period};
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct SeasonConfig {
     #[key]
-    pub table_id: felt252,      // short string
+    pub season_id: u128,
     //------
-    pub season_id: u16,         // sequential
+    pub rules: Rules,           // rules for this season
     pub phase: SeasonPhase,     // current phase
     pub period: Period,         // start and end of season
 }
@@ -18,16 +19,26 @@ pub enum SeasonPhase {
     Ended,      // 2
 }
 
+// Per season scoreboard
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct SeasonScoreboard {
+    #[key]
+    pub season_id: u128,
+    #[key]
+    pub holder: felt252,    // duelist_id or player_address
+    //------------
+    pub points: u16,
+}
+
 
 //---------------------------
 // Season Manager
 //
 use pistols::systems::game::game::{Errors as ErrorsGame};
 use pistols::models::leaderboard::{LeaderboardTrait};
-use pistols::models::table::{TableConfig};
-use pistols::types::rules::{RulesType, RulesTypeTrait, SeasonDistribution};
+use pistols::types::rules::{RewardDistribution, RewardValues};
 use pistols::libs::store::{Store, StoreTrait};
-use pistols::utils::short_string::{ShortStringTrait};
 use pistols::types::timestamp::{TIMESTAMP};
 use pistols::utils::math::{MathU64};
 
@@ -36,55 +47,56 @@ pub impl SeasonManagerImpl of SeasonManagerTrait {
     // const LEADERBOARD_POSITIONS: u8 = 10;
 
     #[inline(always)]
-    fn initialize(ref store: Store) -> felt252 {
+    fn initialize(ref store: Store) -> u128 {
         (Self::create_next_season(ref store, 0))
     }
-    fn create_next_season(ref store: Store, current_season_id: u16) -> felt252 {
+    fn create_next_season(ref store: Store, current_season_id: u128) -> u128 {
         // create ids
-        let season_id: u16 = current_season_id + 1;
-        let table_id: felt252 = Self::make_table_id(season_id);
+        let season_id: u128 = current_season_id + 1;
         // set rules
-        let rules: RulesType = RulesType::Season;
-        let distribution: @SeasonDistribution = rules.get_season_distribution(100);
+        let rules: Rules = Self::get_next_season_rules();
+        let distribution: @RewardDistribution = rules.get_season_distribution(100);
         // calc timestamps
         let timestamp: u64 = starknet::get_block_timestamp();
         let period = Period {
             start: timestamp,
-            end: (timestamp + Self::get_season_duration()),
+            end: (timestamp + Self::get_next_season_duration()),
         };
         // create models
         store.set_season_config(@SeasonConfig {
-            table_id,
             season_id,
+            rules,
             phase: SeasonPhase::InProgress,
             period,
         });
-        store.set_table_config(@TableConfig {
-            table_id,
-            description: 'Season '.concat(season_id.to_short_string()),
-            rules,
-        });
         store.set_leaderboard(
             @LeaderboardTrait::new(
-                table_id,
+                season_id,
                 (*distribution.percents).len().try_into().unwrap(),
             )
         );
-        (table_id)
+        (season_id)
     }
-    //-----------------
-    // info
+    //---------------------
+    // Next season setup
     //
     #[inline(always)]
-    fn make_table_id(season_id: u16) -> felt252 {
-        ('Season'.concat(season_id.to_short_string()))
+    fn get_next_season_rules() -> Rules {
+        (Rules::Season)
     }
     #[inline(always)]
-    fn get_season_duration() -> u64 {
+    fn get_next_season_duration() -> u64 {
         (TIMESTAMP::ONE_WEEK)
     }
 }
 
+#[generate_trait]
+pub impl SeasonScoreboardImpl of SeasonScoreboardTrait {
+    #[inline(always)]
+    fn apply_rewards(ref self: SeasonScoreboard, rewards: @RewardValues) {
+        self.points += *rewards.points_scored;
+    }
+}
 
 //---------------------------
 // Traits
@@ -109,7 +121,7 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
             (*self).seconds_to_collect() == 0
         )
     }
-    fn collect(ref self: SeasonConfig, ref store: Store) -> felt252 {
+    fn collect(ref self: SeasonConfig, ref store: Store) -> u128 {
         // must sync with Self::collect()
         assert(self.phase == SeasonPhase::InProgress, ErrorsGame::SEASON_IS_NOT_ACTIVE);
         assert(self.seconds_to_collect() == 0, ErrorsGame::SEASON_IS_ACTIVE);
@@ -118,8 +130,8 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
         self.period.end = starknet::get_block_timestamp();
         store.set_season_config(@self);
         // create next season
-        let table_id: felt252 = SeasonManagerTrait::create_next_season(ref store, self.season_id);
-        (table_id)
+        let season_id: u128 = SeasonManagerTrait::create_next_season(ref store, self.season_id);
+        (season_id)
     }
 }
 

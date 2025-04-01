@@ -1,8 +1,7 @@
 #[cfg(test)]
 mod tests {
     use pistols::systems::rng::{RngWrapTrait};
-    use pistols::models::challenge::{Round, MovesTrait, DuelistState, DuelistStateTrait};
-    use pistols::models::table::{TABLES};
+    use pistols::models::challenge::{DuelType, Round, MovesTrait, DuelistState, DuelistStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep, DuelistDrawnCard};
     use pistols::types::round_state::{RoundState};
     use pistols::types::constants::{CONST};
@@ -30,7 +29,6 @@ mod tests {
     use pistols::tests::prefabs::{prefabs,
         prefabs::{
             SALT_A, SALT_B,
-            // TABLE_ID, MESSAGE,
             ENV_CARD_NEUTRAL,
             // SaltsValues, SaltsValuesTrait,
             // PlayerMoves, PlayerMovesTrait,
@@ -44,7 +42,7 @@ mod tests {
     fn test_game_loop() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        let duel_id = prefabs::start_new_challenge(@sys, OWNER(), OTHER(), TABLES::PRACTICE, 1);
+        let duel_id = prefabs::start_new_challenge(@sys, OWNER(), OTHER(), DuelType::Practice, 1);
         let (challenge, round) = prefabs::commit_reveal_get(@sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
         assert_gt!(round.state_a.damage, CONST::INITIAL_DAMAGE, "final_damage_a");
         assert_gt!(round.state_b.damage, CONST::INITIAL_DAMAGE, "final_damage_b");

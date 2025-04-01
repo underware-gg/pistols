@@ -22,16 +22,16 @@ pub trait IGame<TState> {
     );
     fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear the required action call for a duelist
     fn collect_duel(ref self: TState, duel_id: u128); // @description: Close expired duels
-    fn collect_season(ref self: TState) -> felt252; // @description: Close the current season and start the next one
+    fn collect_season(ref self: TState) -> u128; // @description: Close the current season and start the next one
 
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
-    fn get_duelist_leaderboard_position(self: @TState, table_id: felt252, duelist_id: u128) -> LeaderboardPosition;
-    fn get_leaderboard(self: @TState, table_id: felt252) -> Span<LeaderboardPosition>;
+    fn get_duelist_leaderboard_position(self: @TState, season_id: u128, duelist_id: u128) -> LeaderboardPosition;
+    fn get_leaderboard(self: @TState, season_id: u128) -> Span<LeaderboardPosition>;
     fn can_collect_duel(self: @TState, duel_id: u128) -> bool;
     fn can_collect_season(self: @TState) -> bool;
-    fn calc_season_reward(self: @TState, table_id: felt252, duelist_id: u128, lives_staked: u8) -> RewardValues;
+    fn calc_season_reward(self: @TState, season_id: u128, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn get_timestamp(self: @TState) -> u64;
     
     // test calls
@@ -85,8 +85,7 @@ pub mod game {
         duelist::{Duelist, DuelistTrait, DuelistStatusTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
-        table::{TableScoreboard, TableScoreboardTrait},
-        season::{SeasonConfig, SeasonConfigTrait},
+        season::{SeasonConfig, SeasonConfigTrait, SeasonScoreboard, SeasonScoreboardTrait},
         events::{Activity, ActivityTrait},
     };
     use pistols::types::{
@@ -94,7 +93,7 @@ pub mod game {
         duel_progress::{DuelProgress},
         round_state::{RoundState},
         typed_data::{CommitMoveMessage, CommitMoveMessageTrait},
-        rules::{RulesType, RulesTypeTrait ,RewardValues},
+        rules::{Rules, RulesTrait ,RewardValues},
         timestamp::{PeriodTrait, TimestampTrait},
         cards::deck::{DeckTrait},
         cards::hand::{FinalBlow},
@@ -217,7 +216,7 @@ pub mod game {
 
             // move to reveal phase?
             let timestamp: u64 = starknet::get_block_timestamp();
-            let rules: RulesType = store.get_current_season_rules();
+            let rules: Rules = store.get_current_season_rules();
             if (round.moves_a.hashed != 0 && round.moves_b.hashed != 0) {
                 round.state = RoundState::Reveal;
                 round.set_reveal_timeout(rules, timestamp);
@@ -292,7 +291,7 @@ pub mod game {
 
             // reset timeouts
             let timestamp: u64 = starknet::get_block_timestamp();
-            let rules: RulesType = store.get_current_season_rules();
+            let rules: Rules = store.get_current_season_rules();
             round.set_reveal_timeout(rules, timestamp);
             
             // update duelist timestamps
@@ -312,12 +311,6 @@ pub mod game {
             //
             // RESOLVED!!!
             //
-
-            // if season ended, settle on next
-            let current_season_table_id: felt252 = store.get_config_season_table_id();
-            if (challenge.table_id != current_season_table_id) {
-                challenge.table_id = current_season_table_id;
-            }
 
             // clear self duel
             store.emit_clear_challenge_action(@challenge, duelist_number);
@@ -359,17 +352,17 @@ pub mod game {
             }
         }
 
-        fn collect_season(ref self: ContractState) -> felt252 {
+        fn collect_season(ref self: ContractState) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
             // collect season if permitted
             let mut season: SeasonConfig = store.get_current_season();
-            let new_season_table_id: felt252 = season.collect(ref store);
-            store.set_config_season_table_id(new_season_table_id);
+            let new_season_id: u128 = season.collect(ref store);
+            store.set_config_season_id(new_season_id);
             // release...
-            store.world.bank_dispatcher().release_season_pool(season.table_id);
+            store.world.bank_dispatcher().release_season_pool(season.season_id);
             // all hail the collector
             Trophy::Collector.progress(store.world, starknet::get_caller_address(), 1);
-            (new_season_table_id)
+            (new_season_id)
         }
 
 
@@ -397,14 +390,14 @@ pub mod game {
             }
         }
 
-        fn get_duelist_leaderboard_position(self: @ContractState, table_id: felt252, duelist_id: u128) -> LeaderboardPosition {
+        fn get_duelist_leaderboard_position(self: @ContractState, season_id: u128, duelist_id: u128) -> LeaderboardPosition {
             let mut store: Store = StoreTrait::new(self.world_default());
-            (store.get_leaderboard(table_id).get_duelist_position(duelist_id))
+            (store.get_leaderboard(season_id).get_duelist_position(duelist_id))
         }
         
-        fn get_leaderboard(self: @ContractState, table_id: felt252) -> Span<LeaderboardPosition> {
+        fn get_leaderboard(self: @ContractState, season_id: u128) -> Span<LeaderboardPosition> {
             let mut store: Store = StoreTrait::new(self.world_default());
-            (store.get_leaderboard(table_id).get_all_positions())
+            (store.get_leaderboard(season_id).get_all_positions())
         }
 
         fn can_collect_duel(self: @ContractState, duel_id: u128) -> bool {
@@ -433,16 +426,16 @@ pub mod game {
         }
 
         fn calc_season_reward(self: @ContractState,
-            table_id: felt252,
+            season_id: u128,
             duelist_id: u128,
             lives_staked: u8,
         ) -> RewardValues {
             let mut store: Store = StoreTrait::new(self.world_default());
-            let rules: RulesType = store.get_current_season_rules();
+            let rules: Rules = store.get_current_season_rules();
             let fame_balance: u128 = store.world.duelist_token_dispatcher().fame_balance(duelist_id);
             let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false);
             let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true);
-            let mut leaderboard: Leaderboard = store.get_leaderboard(table_id);
+            let mut leaderboard: Leaderboard = store.get_leaderboard(season_id);
             let position: u8 = leaderboard.insert_score(duelist_id, rewards_win.points_scored);
             (RewardValues{
                 // if you win...
@@ -618,9 +611,10 @@ pub mod game {
             store.set_duelist(@duelist_a);
             store.set_duelist(@duelist_b);
 
-            // per table score
-            let mut scoreboard_a: TableScoreboard = store.get_scoreboard(*challenge.table_id, (*challenge).duelist_id_a.into());
-            let mut scoreboard_b: TableScoreboard = store.get_scoreboard(*challenge.table_id, (*challenge).duelist_id_b.into());
+            // per season score
+            let season_id: u128 = store.get_current_season_id();
+            let mut scoreboard_a: SeasonScoreboard = store.get_scoreboard(season_id, (*challenge).duelist_id_a.into());
+            let mut scoreboard_b: SeasonScoreboard = store.get_scoreboard(season_id, (*challenge).duelist_id_b.into());
             scoreboard_a.apply_rewards(@rewards_a);
             scoreboard_b.apply_rewards(@rewards_b);
             // save
@@ -628,7 +622,7 @@ pub mod game {
             store.set_scoreboard(@scoreboard_b);
 
             // update leaderboards
-            let mut leaderboard: Leaderboard = store.get_leaderboard(*challenge.table_id);
+            let mut leaderboard: Leaderboard = store.get_leaderboard(season_id);
             rewards_a.position = leaderboard.insert_score(*challenge.duelist_id_a, scoreboard_a.points);
             rewards_b.position = leaderboard.insert_score(*challenge.duelist_id_b, scoreboard_b.points);
             if (rewards_a.position != 0 || rewards_b.position != 0) {

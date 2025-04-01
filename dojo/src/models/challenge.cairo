@@ -13,7 +13,7 @@ pub struct Challenge {
     #[key]
     pub duel_id: u128,
     //-------------------------
-    pub table_id: felt252,
+    pub duel_type: DuelType,        // duel type
     pub premise: Premise,           // premise of the dispute
     pub quote: felt252,             // message to challenged
     pub lives_staked: u8,           // lives staked by challenger
@@ -27,6 +27,15 @@ pub struct Challenge {
     pub winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
     pub timestamps: Period,
+}
+
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum DuelType {
+    Undefined,      // 0
+    Seasonal,       // 1
+    Tournament,     // 2
+    Tutorial,       // 3
+    Practice,       // 4
 }
 
 //
@@ -83,11 +92,10 @@ use pistols::types::cards::{
 };
 use pistols::types::{
     profile_type::{CharacterProfile},
-    rules::{RulesType, RulesTypeTrait},
+    rules::{Rules, RulesTrait},
     timestamp::{TimestampTrait},
     constants::{CONST},
 };
-use pistols::models::table::{TABLES};
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
 use pistols::utils::math::{MathTrait};
@@ -113,11 +121,7 @@ pub impl ChallengeImpl of ChallengeTrait {
     }
     #[inline(always)]
     fn is_tutorial(self: @Challenge) -> bool {
-        (*self.table_id == TABLES::TUTORIAL)
-    }
-    #[inline(always)]
-    fn is_practice(self: @Challenge) -> bool {
-        (*self.table_id == TABLES::PRACTICE)
+        (*self.duel_type == DuelType::Tutorial)
     }
     fn get_deck_type(self: @Challenge) -> DeckType {
         if (
@@ -141,11 +145,11 @@ pub impl RoundImpl of RoundTrait {
     fn make_seed(self: @Round) -> felt252 {
         (hash_values([(*self).moves_a.salt, (*self).moves_b.salt].span()))
     }
-    fn set_commit_timeout(ref self: Round, rules: RulesType, current_timestamp: u64) {
+    fn set_commit_timeout(ref self: Round, rules: Rules, current_timestamp: u64) {
         self.moves_a.set_commit_timeout(rules, current_timestamp);
         self.moves_b.set_commit_timeout(rules, current_timestamp);
     }
-    fn set_reveal_timeout(ref self: Round, rules: RulesType, current_timestamp: u64) {
+    fn set_reveal_timeout(ref self: Round, rules: Rules, current_timestamp: u64) {
         self.moves_a.set_reveal_timeout(rules, current_timestamp);
         self.moves_b.set_reveal_timeout(rules, current_timestamp);
     }
@@ -170,11 +174,11 @@ pub impl MovesImpl of MovesTrait {
         })
     }
     #[inline(always)]
-    fn set_commit_timeout(ref self: Moves, rules: RulesType, current_timestamp: u64) {
+    fn set_commit_timeout(ref self: Moves, rules: Rules, current_timestamp: u64) {
         self.timeout = if (self.hashed == 0) {(current_timestamp + rules.get_reply_timeout())} else {(0)};
     }
     #[inline(always)]
-    fn set_reveal_timeout(ref self: Moves, rules: RulesType, current_timestamp: u64) {
+    fn set_reveal_timeout(ref self: Moves, rules: Rules, current_timestamp: u64) {
         self.timeout = if (self.salt == 0) {(current_timestamp + rules.get_reply_timeout())} else {(0)};
     }
     #[inline(always)]
@@ -200,5 +204,36 @@ pub impl DuelistStateImpl of DuelistStateTrait {
     fn apply_chances(ref self: DuelistState, amount: i8) {
         self.chances.addi(amount);
         self.chances.clampi(0, 100);
+    }
+}
+
+
+//---------------------------
+// Converters
+//
+impl DuelTypeIntoByteArray of core::traits::Into<DuelType, ByteArray> {
+    fn into(self: DuelType) -> ByteArray {
+        match self {
+            DuelType::Undefined    => "DuelType::Undefined",
+            DuelType::Seasonal     => "DuelType::Seasonal",
+            DuelType::Tournament   => "DuelType::Tournament",
+            DuelType::Tutorial     => "DuelType::Tutorial",
+            DuelType::Practice     => "DuelType::Practice",
+        }
+    }
+}
+// for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
+pub impl DuelTypeDisplay of core::fmt::Display<DuelType> {
+    fn fmt(self: @DuelType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
+pub impl DuelTypeDebug of core::fmt::Debug<DuelType> {
+    fn fmt(self: @DuelType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
     }
 }

@@ -1,14 +1,15 @@
 #[cfg(test)]
 mod tests {
     use pistols::models::{
-        challenge::{ChallengeTrait},
+        challenge::{ChallengeTrait, DuelType},
         player::{Player, PlayerTrait},
-        table::{TABLES},
     };
-    use pistols::types::cards::hand::{DeckType};
-    use pistols::types::challenge_state::{ChallengeState};
-    use pistols::types::duel_progress::{DuelProgress};
-    use pistols::types::timestamp::{TimestampTrait, TIMESTAMP};
+    use pistols::types::{
+        cards::hand::{DeckType},
+        challenge_state::{ChallengeState},
+        duel_progress::{DuelProgress},
+        timestamp::{TimestampTrait, TIMESTAMP},
+    };
     use pistols::tests::tester::{tester,
         tester::{
             StoreTrait,
@@ -16,7 +17,6 @@ mod tests {
             IGameDispatcherTrait,
             IDuelTokenDispatcherTrait,
             ID, ZERO, OWNER, OTHER, BUMMER, FAKE_OWNER_OF_1, OWNED_BY_OWNER,
-            SEASON_1_TABLE,
         }
     };
 
@@ -30,63 +30,65 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Invalid table', 'ENTRYPOINT_FAILED'))]
-    fn test_invalid_table() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, 'abcd', 0, 1);
-    }
-
-    #[test]
     #[should_panic(expected:('DUEL: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_not_your_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, FAKE_OWNER_OF_1(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, FAKE_OWNER_OF_1(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
     }
 
     #[test]
     #[should_panic(expected:('DUEL: Challenged self', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_self() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OWNER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OWNER(), PREMISE_1, DuelType::Seasonal, 0, 1);
     }
 
     #[test]
     #[should_panic(expected:('DUEL: Invalid duelist', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_invalid_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        tester::execute_create_duel_ID(@sys.duels, OWNER(), 0, OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        tester::execute_create_duel_ID(@sys.duels, OWNER(), 0, OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
     }
 
     #[test]
     #[should_panic(expected:('DUEL: Pact exists', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_pact_exists() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        tester::execute_create_duel_ID(@sys.duels, OWNER(), ID(OWNER()), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
-        tester::execute_create_duel_ID(@sys.duels, OWNER(), OWNED_BY_OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        tester::execute_create_duel_ID(@sys.duels, OWNER(), ID(OWNER()), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
+        tester::execute_create_duel_ID(@sys.duels, OWNER(), OWNED_BY_OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
     }
 
     #[test]
     #[should_panic(expected:('DUEL: Pact exists', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_pact_exists_from_challenged() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
-        tester::execute_create_duel(@sys.duels, OTHER(), OWNER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
+        tester::execute_create_duel(@sys.duels, OTHER(), OWNER(), PREMISE_1, DuelType::Seasonal, 0, 1);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Duelist in a challenge', 'ENTRYPOINT_FAILED'))]
+    fn test_challenge_pact_over_duel_type() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
+        tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Practice, 0, 1);
+        // do not work because they are already in a duel
     }
 
     #[test]
     #[should_panic(expected:('DUEL: Duelist in a challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_duelist_busy() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
-        tester::execute_create_duel(@sys.duels, OWNER(), BUMMER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
+        tester::execute_create_duel(@sys.duels, OWNER(), BUMMER(), PREMISE_1, DuelType::Seasonal, 0, 1);
     }
 
     #[test]
     #[should_panic(expected:('DUEL: Duelist in a challenge', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_duelist_busy_reply() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, BUMMER(), OWNER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, BUMMER(), OWNER(), PREMISE_1, DuelType::Seasonal, 0, 1);
         tester::execute_reply_duel(@sys.duels, OWNER(), ID(OWNER()), duel_id, true);
     }
 
@@ -97,7 +99,7 @@ mod tests {
         let game_timestamp = sys.game.get_timestamp();
         assert_gt!(timestamp, 0, "timestamp > 0");
         assert_eq!(timestamp, game_timestamp, "game_timestamp");
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
         assert_eq!(ch.address_a, OWNER(), "challenged");
@@ -120,7 +122,7 @@ mod tests {
     #[test]
     fn test_challenge_stake_0() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 0);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 0);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.lives_staked, 1, "lives_staked");
     }
@@ -128,7 +130,7 @@ mod tests {
     #[test]
     fn test_challenge_stake_2() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 2);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 2);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.lives_staked, 2, "lives_staked");
     }
@@ -138,7 +140,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let expire_hours: u64 = 24;
         let timestamp: u64 = tester::get_block_timestamp();
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, expire_hours, 1);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.timestamps.start, timestamp, "timestamps.start");
         assert_eq!(ch.timestamps.end, ch.timestamps.start + TimestampTrait::from_hours(expire_hours), "timestamps.end");
@@ -148,16 +150,20 @@ mod tests {
     #[test]
     fn test_challenge_pact() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let table_id: felt252 = SEASON_1_TABLE();
-        assert_eq!(sys.duels.get_pact(table_id, OWNER(), OTHER()), 0, "get_pact_0_1");
-        assert_eq!(sys.duels.get_pact(table_id, OTHER(), OWNER()), 0, "get_pact_0_2");
-        assert!(!sys.duels.has_pact(table_id, OWNER(), OTHER()), "has_pact_0_1");
-        assert!(!sys.duels.has_pact(table_id, OTHER(), OWNER()), "has_pact_0_2");
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, table_id, 0, 1);
-        assert_eq!(sys.duels.get_pact(table_id, OWNER(), OTHER()), duel_id, "get_pact_1_1");
-        assert_eq!(sys.duels.get_pact(table_id, OTHER(), OWNER()), duel_id, "get_pact_1_2");
-        assert!(sys.duels.has_pact(table_id, OWNER(), OTHER()), "has_pact_1_1");
-        assert!(sys.duels.has_pact(table_id, OTHER(), OWNER()), "has_pact_1_2");
+        let duel_type: DuelType = DuelType::Seasonal;
+        assert_eq!(sys.duels.get_pact(duel_type, OWNER(), OTHER()), 0, "get_pact_0_1");
+        assert_eq!(sys.duels.get_pact(duel_type, OTHER(), OWNER()), 0, "get_pact_0_2");
+        assert!(!sys.duels.has_pact(duel_type, OWNER(), OTHER()), "has_pact_0_1");
+        assert!(!sys.duels.has_pact(duel_type, OTHER(), OWNER()), "has_pact_0_2");
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, duel_type, 0, 1);
+        assert_eq!(sys.duels.get_pact(duel_type, OWNER(), OTHER()), duel_id, "get_pact_1_1");
+        assert_eq!(sys.duels.get_pact(duel_type, OTHER(), OWNER()), duel_id, "get_pact_1_2");
+        assert!(sys.duels.has_pact(duel_type, OWNER(), OTHER()), "has_pact_1_1");
+        assert!(sys.duels.has_pact(duel_type, OTHER(), OWNER()), "has_pact_1_2");
+        // not affecting other types...
+        let another_type: DuelType = DuelType::Practice;
+        assert!(!sys.duels.has_pact(another_type, OWNER(), OTHER()), "has_pact_0_1");
+        assert!(!sys.duels.has_pact(another_type, OTHER(), OWNER()), "has_pact_0_2");
     }
 
 
@@ -172,7 +178,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, SEASON_1_TABLE(), expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Seasonal, expire_hours, 1);
         tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours - 1));
         tester::execute_reply_duel(@sys.duels, A, ID(A), duel_id + 1, true);
     }
@@ -184,7 +190,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, SEASON_1_TABLE(), expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Seasonal, expire_hours, 1);
         // let _ch = sys.store.get_challenge_value(duel_id);
         let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours + 1));
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, B, ID(B), duel_id, false);
@@ -198,7 +204,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let expire_hours: u64 = 24;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Practice, expire_hours, 1);
         let ch = sys.store.get_challenge_value(duel_id);
 
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
@@ -224,7 +230,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let expire_hours: u64 = 24;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Practice, expire_hours, 1);
         let ch = sys.store.get_challenge_value(duel_id);
 
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
@@ -251,7 +257,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let expire_hours: u64 = 24;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Practice, expire_hours, 1);
         let ch = sys.store.get_challenge_value(duel_id);
 
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
@@ -268,7 +274,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Practice, expire_hours, 1);
         // let _ch: ChallengeValue = sys.store.get_challenge_value(duel_id);
 
         tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours - 1));
@@ -281,7 +287,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, SEASON_1_TABLE(), expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Seasonal, expire_hours, 1);
         let ch = sys.store.get_challenge_value(duel_id);
         let (_block_number, timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours - 1));
 
@@ -306,7 +312,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, SEASON_1_TABLE(), expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Seasonal, expire_hours, 1);
         // let _ch = sys.store.get_challenge_value(duel_id);
         let (_block_number, _timestamp) = tester::elapse_block_timestamp(TimestampTrait::from_hours(expire_hours - 1));
         tester::execute_reply_duel(@sys.duels, BUMMER(), ID(BUMMER()), duel_id, false);
@@ -318,7 +324,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Practice, expire_hours, 1);
 
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
@@ -360,7 +366,7 @@ mod tests {
         assert!(!player_b.exists(), "player_b.exists NOT");
 
         let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, TABLES::PRACTICE, expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Practice, expire_hours, 1);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
         assert_eq!(ch.address_a, A, "challenger");
@@ -394,7 +400,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, SEASON_1_TABLE(), expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Seasonal, expire_hours, 1);
         // reply with different TOKEN ID
         // panic!
         tester::execute_reply_duel(@sys.duels, B, 0xaaa, duel_id, true);
@@ -407,7 +413,7 @@ mod tests {
         let A = OWNER();
         let B = OTHER();
         let expire_hours: u64 = 48;
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, SEASON_1_TABLE(), expire_hours, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, B, PREMISE_1, DuelType::Seasonal, expire_hours, 1);
         // reply with different TOKEN ID
         // panic!
         tester::execute_reply_duel(@sys.duels, BUMMER(), ID(BUMMER()), duel_id, true);
@@ -423,7 +429,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let A = OWNER();
         let B = OTHER();
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, ZERO(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, A, ZERO(), PREMISE_1, DuelType::Seasonal, 0, 1);
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Awaiting, "state");
         assert_eq!(ch.address_a, A, "challenger");
@@ -444,7 +450,7 @@ mod tests {
     #[should_panic(expected:('DUEL: Not your challenge', 'ENTRYPOINT_FAILED'))]
     fn test_open_challenge_cant_refuse() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), ZERO(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), ZERO(), PREMISE_1, DuelType::Seasonal, 0, 1);
         tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, false);
     }
 
@@ -452,7 +458,7 @@ mod tests {
     #[should_panic(expected:('DUEL: Invalid duelist', 'ENTRYPOINT_FAILED'))]
     fn test_open_challenge_invalid_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), ZERO(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), ZERO(), PREMISE_1, DuelType::Seasonal, 0, 1);
         tester::execute_reply_duel(@sys.duels, OTHER(), 0, duel_id, true);
     }
 
@@ -460,8 +466,8 @@ mod tests {
     #[should_panic(expected:('DUEL: Duelist in a challenge', 'ENTRYPOINT_FAILED'))]
     fn test_open_challenge_pact_exists() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
-        let duel_id: u128  = tester::execute_create_duel(@sys.duels, OWNER(), ZERO(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
+        let duel_id: u128  = tester::execute_create_duel(@sys.duels, OWNER(), ZERO(), PREMISE_1, DuelType::Seasonal, 0, 1);
         tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, true);
     }
 
@@ -469,9 +475,9 @@ mod tests {
     #[should_panic(expected:('DUEL: Duelist in a challenge', 'ENTRYPOINT_FAILED'))]
     fn test_open_challenge_duelist_busy() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
         tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, true);
-        let duel_id: u128  = tester::execute_create_duel(@sys.duels, BUMMER(), ZERO(), PREMISE_1, SEASON_1_TABLE(), 0, 1);
+        let duel_id: u128  = tester::execute_create_duel(@sys.duels, BUMMER(), ZERO(), PREMISE_1, DuelType::Seasonal, 0, 1);
         tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, true);
     }
 

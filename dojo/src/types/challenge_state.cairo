@@ -78,13 +78,13 @@ impl ChallengeStateIntoByteArray of core::traits::Into<ChallengeState, ByteArray
     }
 }
 // for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
-// pub impl ChallengeStateDisplay of core::fmt::Display<ChallengeState> {
-//     fn fmt(self: @ChallengeState, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-//         let result: ByteArray = (*self).into();
-//         f.buffer.append(@result);
-//         Result::Ok(())
-//     }
-// }
+pub impl ChallengeStateDisplay of core::fmt::Display<ChallengeState> {
+    fn fmt(self: @ChallengeState, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
 pub impl ChallengeStateDebug of core::fmt::Debug<ChallengeState> {
     fn fmt(self: @ChallengeState, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();

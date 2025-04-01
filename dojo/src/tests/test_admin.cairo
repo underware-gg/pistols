@@ -5,8 +5,9 @@ mod tests {
     use dojo::world::{IWorldDispatcherTrait};
 
     use pistols::systems::admin::{IAdminDispatcherTrait};
-    use pistols::models::config::{Config};
-    use pistols::models::table::{TableConfig, TABLES, RulesTypeTrait};
+    use pistols::models::{
+        config::{Config},
+    };
     use pistols::tests::tester::{tester,
         tester::{
             StoreTrait,
@@ -15,7 +16,6 @@ mod tests {
         }
     };
 
-    const INVALID_TABLE: felt252 = 'TheBookIsOnTheTable';
     const CONFIG_HASH: felt252 = selector_from_tag!("pistols-Config");
 
     fn DUMMY_LORDS() -> ContractAddress { starknet::contract_address_const::<0x131313131313>() }
@@ -123,47 +123,4 @@ mod tests {
         tester::execute_admin_set_treasury(@sys.admin, OTHER(), BUMMER());
     }
 
-    //
-    // Tables
-    //
-
-    #[test]
-    fn test_initialize_table_defaults() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN | FLAGS::LORDS);
-        let table: TableConfig = sys.store.get_table_config( TABLES::TUTORIAL);
-        assert!(table.rules.exists(), "TUTORIAL_exists");
-        let table: TableConfig = sys.store.get_table_config( TABLES::PRACTICE);
-        assert!(table.rules.exists(), "PRACTICE_exists");
-    }
-
-    #[test]
-    fn test_set_table() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        let mut table: TableConfig = sys.store.get_table_config( TABLES::PRACTICE);
-        table.description = 'LORDS+';
-        tester::execute_admin_set_table(@sys.admin, OWNER(), table);
-        let mut table: TableConfig = sys.store.get_table_config( TABLES::PRACTICE);
-        assert_eq!(table.description, 'LORDS+', "description_1");
-        table.description = 'LORDS+++';
-        tester::execute_admin_set_table(@sys.admin, OWNER(), table);
-        let mut table: TableConfig = sys.store.get_table_config( TABLES::PRACTICE);
-        assert_eq!(table.description, 'LORDS+++', "description_2");
-    }
-
-    #[test]
-    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
-    fn test_set_table_not_owner() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        let table: TableConfig = sys.store.get_table_config( TABLES::PRACTICE);
-        tester::execute_admin_set_table(@sys.admin, OTHER(), table);
-    }
-
-    #[test]
-    #[should_panic(expected:('ADMIN: Invalid table', 'ENTRYPOINT_FAILED'))]
-    fn test_set_table_zero() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
-        let mut table: TableConfig = sys.store.get_table_config( TABLES::PRACTICE);
-        table.table_id = 0;
-        tester::execute_admin_set_table(@sys.admin, OWNER(), table);
-    }
 }

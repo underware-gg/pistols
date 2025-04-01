@@ -4,19 +4,23 @@ use pistols::utils::misc::{ContractAddressDefault};
 use pistols::utils::arrays::{SpanDefault};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-pub enum RulesType {
-    Undefined,  // 0
-    Academy,    // 1
-    Season,     // 2
+pub enum Rules {
+    Undefined,      // 0
+    Season,         // 1
 }
 
 #[derive(Copy, Drop, Serde, Introspect, Default)]
-pub struct FeeDistribution {
+pub struct PoolDistribution {
     pub underware_percent: u8,
     pub creator_percent: u8,
     pub creator_address: ContractAddress,
     pub pool_percent: u8,
     pub pool_id: PoolType,
+}
+
+#[derive(Copy, Drop, Serde, Introspect, Default)]
+pub struct RewardDistribution {
+    pub percents: Span<u8>,
 }
 
 #[derive(Copy, Drop, Serde, Introspect, Default)]
@@ -32,11 +36,6 @@ pub struct RewardValues {
     pub survived: bool,
 }
 
-#[derive(Copy, Drop, Serde, Introspect, Default)]
-pub struct SeasonDistribution {
-    pub percents: Span<u8>,
-}
-
 
 //---------------------------
 // Traits
@@ -47,12 +46,12 @@ use pistols::types::constants::{CONST, FAME};
 use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
-pub impl RulesTypeImpl of RulesTypeTrait {
+pub impl RulesImpl of RulesTrait {
     #[inline(always)]
-    fn exists(self: @RulesType) -> bool {
-        (*self != RulesType::Undefined)
+    fn exists(self: @Rules) -> bool {
+        (*self != Rules::Undefined)
     }
-    fn get_reply_timeout(self: @RulesType) -> u64 {
+    fn get_reply_timeout(self: @Rules) -> u64 {
         (match self {
             _ => TIMESTAMP::ONE_DAY,
         })
@@ -60,14 +59,14 @@ pub impl RulesTypeImpl of RulesTypeTrait {
     //
     // Duel rewards
     //
-    fn get_rewards_distribution(self: @RulesType, table_id: felt252, tournament_id: u128) -> @FeeDistribution {
-        let mut result: FeeDistribution = match self {
-            RulesType::Season => FeeDistribution {
+    fn get_rewards_distribution(self: @Rules, season_id: u128, tournament_id: u128) -> @PoolDistribution {
+        let mut result: PoolDistribution = match self {
+            Rules::Season => PoolDistribution {
                 underware_percent: 30,
                 creator_percent: 30,
                 creator_address: ZERO(), // TODO: find from tournament_id
                 pool_percent: 40,
-                pool_id: PoolType::Season(table_id),
+                pool_id: PoolType::Season(season_id),
             },
             _ => Default::default()
         };
@@ -79,9 +78,9 @@ pub impl RulesTypeImpl of RulesTypeTrait {
         (@result)
     }
     // end game calculations
-    fn calc_rewards(self: @RulesType, fame_balance: u128, lives_staked: u8, is_winner: bool) -> RewardValues {
+    fn calc_rewards(self: @Rules, fame_balance: u128, lives_staked: u8, is_winner: bool) -> RewardValues {
         (match self {
-            RulesType::Season => {
+            Rules::Season => {
                 let mut result: RewardValues = Default::default();
                 let one_life: u128 = FAME::ONE_LIFE.low;
                 if (fame_balance == 0) {
@@ -109,11 +108,11 @@ pub impl RulesTypeImpl of RulesTypeTrait {
     //
     // Season rewards
     //
-    fn get_season_distribution(self: @RulesType, recipient_count: usize) -> @SeasonDistribution {
+    fn get_season_distribution(self: @Rules, recipient_count: usize) -> @RewardDistribution {
         let mut percents: Array<u8> = array![];
         if (recipient_count > 0) {
             match self {
-                RulesType::Season => {
+                Rules::Season => {
                     percents.append(25); // 1
                     percents.append(20); // 2
                     percents.append(15); // 3
@@ -146,7 +145,7 @@ pub impl RulesTypeImpl of RulesTypeTrait {
                 percents = new_percents;
             }
         }
-        (@SeasonDistribution{
+        (@RewardDistribution{
             percents: percents.span(),
         })
     }
@@ -154,9 +153,9 @@ pub impl RulesTypeImpl of RulesTypeTrait {
 
 
 #[generate_trait]
-pub impl FeeDistributionImpl of FeeDistributionTrait {
+pub impl PoolDistributionImpl of PoolDistributionTrait {
     #[inline(always)]
-    fn is_payable(self: @FeeDistribution) -> bool {
+    fn is_payable(self: @PoolDistribution) -> bool {
         (*self.underware_percent != 0 || *self.creator_percent != 0 || *self.pool_percent != 0)
     }
 }
@@ -166,25 +165,24 @@ pub impl FeeDistributionImpl of FeeDistributionTrait {
 //---------------------------
 // Converters
 //
-impl RulesTypeIntoByteArray of core::traits::Into<RulesType, ByteArray> {
-    fn into(self: RulesType) -> ByteArray {
+impl RulesIntoByteArray of core::traits::Into<Rules, ByteArray> {
+    fn into(self: Rules) -> ByteArray {
         match self {
-            RulesType::Undefined    => "RulesType::Undefined",
-            RulesType::Academy      => "RulesType::Academy",
-            RulesType::Season       => "RulesType::Season",
+            Rules::Undefined    => "Rules::Undefined",
+            Rules::Season       => "Rules::Season",
         }
     }
 }
 // for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
-pub impl RulesTypeDisplay of core::fmt::Display<RulesType> {
-    fn fmt(self: @RulesType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+pub impl RulesDisplay of core::fmt::Display<Rules> {
+    fn fmt(self: @Rules, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();
         f.buffer.append(@result);
         Result::Ok(())
     }
 }
-pub impl RulesTypeDebug of core::fmt::Debug<RulesType> {
-    fn fmt(self: @RulesType, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+pub impl RulesDebug of core::fmt::Debug<Rules> {
+    fn fmt(self: @Rules, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = (*self).into();
         f.buffer.append(@result);
         Result::Ok(())
@@ -199,16 +197,16 @@ pub impl RulesTypeDebug of core::fmt::Debug<RulesType> {
 #[cfg(test)]
 mod unit {
     use super::{
-        RulesType, RulesTypeTrait,
-        SeasonDistribution, RewardValues,
+        Rules, RulesTrait,
+        RewardDistribution, RewardValues,
     };
     use pistols::models::leaderboard::{LeaderboardTrait};
     use pistols::utils::misc::{WEI};
 
-    fn _test_season_distribution(rules: RulesType) {
+    fn _test_season_distribution(rules: Rules) {
         let mut recipient_count: usize = 12;
         loop {
-            let distribution: @SeasonDistribution = rules.get_season_distribution(recipient_count);
+            let distribution: @RewardDistribution = rules.get_season_distribution(recipient_count);
             let distribution_count: usize = (*distribution.percents).len();
             assert_le!(distribution_count, LeaderboardTrait::MAX_POSITIONS.into(), "{}: win[{}] distribution.percents.len()", rules, recipient_count);
             assert_le!(distribution_count, recipient_count, "{}: win[{}] distribution.percents.len()", rules, recipient_count);
@@ -230,16 +228,16 @@ mod unit {
 
     #[test]
     fn test_season_distribution() {
-        _test_season_distribution(RulesType::Season);
+        _test_season_distribution(Rules::Season);
     }
 
     #[test]
     fn test_calc_rewards() {
-        let winner_1_1: RewardValues = RulesType::Season.calc_rewards(WEI(3_000).low, 1, true);
-        let winner_2_1: RewardValues = RulesType::Season.calc_rewards(WEI(5_000).low, 1, true);
-        let winner_1_2: RewardValues = RulesType::Season.calc_rewards(WEI(3_000).low, 2, true);
-        let winner_2_2: RewardValues = RulesType::Season.calc_rewards(WEI(5_000).low, 2, true);
-        let loser_1_1: RewardValues = RulesType::Season.calc_rewards(WEI(3_000).low, 1, false);
+        let winner_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true);
+        let winner_2_1: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 1, true);
+        let winner_1_2: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 2, true);
+        let winner_2_2: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 2, true);
+        let loser_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false);
         // greater balances win less FAME
         assert_gt!(winner_1_1.fame_gained, winner_2_1.fame_gained, "balance_fame_gained");
         assert_gt!(winner_1_2.fame_gained, winner_2_2.fame_gained, "balance_fame_gained");

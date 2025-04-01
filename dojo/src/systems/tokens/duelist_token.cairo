@@ -189,8 +189,8 @@ pub mod duelist_token {
     use pistols::types::{
         profile_type::{ProfileTypeTrait, ProfileManagerTrait},
         rules::{
-            RulesType, RulesTypeTrait,
-            FeeDistribution, FeeDistributionTrait,
+            Rules, RulesTrait,
+            PoolDistribution, PoolDistributionTrait,
             RewardValues,
         },
         constants::{CONST, FAME, METADATA},
@@ -392,8 +392,9 @@ pub mod duelist_token {
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
 
             // get fees distribution
-            let rules: RulesType = store.get_table_rules(challenge.table_id);
-            let distribution: @FeeDistribution = rules.get_rewards_distribution(challenge.table_id, tournament_id);
+            let season_id: u128 = store.get_current_season_id();
+            let rules: Rules = store.get_season_rules(season_id);
+            let distribution: @PoolDistribution = rules.get_rewards_distribution(season_id, tournament_id);
             if (!distribution.is_payable()) {
                 return (Default::default(), Default::default());
             }
@@ -468,7 +469,7 @@ pub mod duelist_token {
             fame_dispatcher: @IFameCoinDispatcher,
             bank_dispatcher: @IBankDispatcher,
             underware_address: ContractAddress,
-            distribution: @FeeDistribution,
+            distribution: @PoolDistribution,
             fame_balance: u128,
             duel_id: u128,
             duelist_id: u128,
@@ -531,11 +532,11 @@ pub mod duelist_token {
                 total_to_burn += underware_due; // released, need to burn
                 //
                 // release LORDS and burn FAME
-                let season_table_id: felt252 = match (*distribution.pool_id) {
-                    PoolType::Season(table_id) => {table_id},
+                let season_id: u128 = match (*distribution.pool_id) {
+                    PoolType::Season(season_id) => {season_id},
                     _ => {0},
                 };
-                values.lords_unlocked += (*bank_dispatcher).release_lords_from_fame_to_be_burned(season_table_id, duel_id, release_bills.span());
+                values.lords_unlocked += (*bank_dispatcher).release_lords_from_fame_to_be_burned(season_id, duel_id, release_bills.span());
                 (*fame_dispatcher).burn_from_token(starknet::get_contract_address(), duelist_id, total_to_burn.into());
             } else {
                 values.survived = true;
@@ -616,7 +617,7 @@ pub mod duelist_token {
                 cause_of_death,
                 killed_by,
                 fame_before_death,
-                season_table_id: store.get_config_season_table_id(),
+                season_id: store.get_current_season_id(),
             };
             store.set_duelist_memorial(@memorial);
             // events

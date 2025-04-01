@@ -3,6 +3,7 @@ mod tests {
     use starknet::{ContractAddress};
 
     use pistols::models::{
+        challenge::{DuelType},
         pool::{Pool, PoolType},
         pack::{Pack, PackType, PackTypeTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
@@ -23,8 +24,8 @@ mod tests {
             IFameCoinDispatcherTrait,
             IBankDispatcherTrait,
             ID, OWNER, OWNER2, OTHER, OTHER2, BUMMER, RECIPIENT, TREASURY,
-            SEASON_1_TABLE,
-            FAUCET_AMOUNT, ETH, WEI,
+            FAUCET_AMOUNT, SEASON_ID_1,
+            ETH, WEI,
         }
     };
     use pistols::tests::prefabs::{prefabs,
@@ -55,8 +56,7 @@ mod tests {
         let duelist_id_a: u128 = ID(address_a);
         let duelist_id_b: u128 = ID(address_b);
 
-        let table_id: felt252 = SEASON_1_TABLE();
-        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, address_a, address_b, table_id, 1);
+        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, address_a, address_b, DuelType::Seasonal, 1);
 
         let mut fame_balance_bank: u128 = (*sys.fame).balance_of(*sys.bank.contract_address).low;
         let mut lords_balance_bank: u128 = (*sys.lords).balance_of(*sys.bank.contract_address).low;
@@ -72,7 +72,7 @@ mod tests {
         assert_eq!(pool_peg.balance_lords, lords_balance_bank, "RESOLVED_pool_peg.balance_lords");
         assert_eq!(pool_peg.balance_fame, 0, "RESOLVED_pool_peg.balance_fame");
         // PoolType::Season() == zero
-        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(table_id));
+        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_ID_1));
         assert_eq!(pool_season.balance_lords, 0, "RESOLVED_pool_season.balance_lords");
         assert_eq!(pool_season.balance_fame, 0, "RESOLVED_pool_season.balance_fame");
         // PoolType::SacredFlame == zero
@@ -80,8 +80,8 @@ mod tests {
         assert_eq!(pool_flame.balance_lords, 0, "RESOLVED_pool_flame.balance_lords");
         assert_eq!(pool_flame.balance_fame, 0, "RESOLVED_pool_flame.balance_fame");
 
-        let rewards_a: RewardValues = (*sys.game).calc_season_reward(table_id, duelist_id_a, challenge.lives_staked);
-        let rewards_b: RewardValues = (*sys.game).calc_season_reward(table_id, duelist_id_b, challenge.lives_staked);
+        let rewards_a: RewardValues = (*sys.game).calc_season_reward(SEASON_ID_1, duelist_id_a, challenge.lives_staked);
+        let rewards_b: RewardValues = (*sys.game).calc_season_reward(SEASON_ID_1, duelist_id_b, challenge.lives_staked);
         assert_ne!(rewards_a.fame_lost, 0, "RESOLVED_rewards_a.fame_lost != 0");
         assert_ne!(rewards_b.fame_lost, 0, "RESOLVED_rewards_b.fame_lost != 0");
         assert_ne!(rewards_a.fame_gained, 0, "RESOLVED_rewards_a.fame_gained != 0");
@@ -141,7 +141,7 @@ mod tests {
         assert_eq!(pool_peg.balance_fame, 0, "RESOLVED_pool_peg.balance_fame END");
 
         // FAME >> PoolType::Season()
-        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(table_id));
+        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_ID_1));
         assert_eq!(pool_season.balance_lords, 0, "RESOLVED_pool_season.balance_lords END");
         assert_eq!(pool_season.balance_fame, fame_balance_bank, "RESOLVED_pool_season.balance_fame END");
 
@@ -163,15 +163,14 @@ mod tests {
         let duelist_id_a: u128 = ID(address_a);
         let duelist_id_b: u128 = ID(address_b);
 
-        let table_id: felt252 = SEASON_1_TABLE();
-        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, address_a, address_b, table_id, lives);
+        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, address_a, address_b, DuelType::Seasonal, lives);
 
         let mut fame_balance_bank: u128 = (*sys.fame).balance_of(*sys.bank.contract_address).low;
         let mut lords_balance_bank: u128 = (*sys.lords).balance_of(*sys.bank.contract_address).low;
         let mut lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
 
         let pool_peg: Pool = (*sys.store).get_pool(PoolType::FamePeg);
-        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(table_id));
+        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_ID_1));
         let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
         assert_eq!(pool_flame.balance_lords, 0, "DEATH_pool_flame.balance_lords");
         assert_eq!(pool_flame.balance_fame, 0, "DEATH_pool_flame.balance_fame");
@@ -181,8 +180,8 @@ mod tests {
         let mut fools_balance_a: u128 = (*sys.fools).balance_of(address_a).low;
         let mut fools_balance_b: u128 = (*sys.fools).balance_of(address_b).low;
 
-        let rewards_a: RewardValues = (*sys.game).calc_season_reward(table_id, duelist_id_a, challenge.lives_staked);
-        let rewards_b: RewardValues = (*sys.game).calc_season_reward(table_id, duelist_id_b, challenge.lives_staked);
+        let rewards_a: RewardValues = (*sys.game).calc_season_reward(SEASON_ID_1, duelist_id_a, challenge.lives_staked);
+        let rewards_b: RewardValues = (*sys.game).calc_season_reward(SEASON_ID_1, duelist_id_b, challenge.lives_staked);
 // println!("challenge.lives_staked: {}", challenge.lives_staked);
 // println!("fame_balance_a: {}", WEI(fame_balance_a));
 // println!("rewards_a.fame_lost: {}", WEI(rewards_a.fame_lost));
@@ -221,7 +220,7 @@ mod tests {
         // PoolType::FamePeg down
         tester::assert_balance_down((*sys.store).get_pool(PoolType::FamePeg).balance_lords, pool_peg.balance_lords, format!("DEATH_pool_peg.balance_lords [{}]", duel_id));
         // PoolType::Season() up
-        tester::assert_balance_up((*sys.store).get_pool(PoolType::Season(table_id)).balance_fame, pool_season.balance_fame, format!("DEATH_pool_season.balance_fame [{}]", duel_id));
+        tester::assert_balance_up((*sys.store).get_pool(PoolType::Season(SEASON_ID_1)).balance_fame, pool_season.balance_fame, format!("DEATH_pool_season.balance_fame [{}]", duel_id));
         if (flames_up) {
             // PoolType::SacredFlame up
             tester::assert_balance_up((*sys.store).get_pool(PoolType::SacredFlame).balance_fame, pool_flame.balance_fame, format!("DEATH_pool_flame.balance_fame [{}]", duel_id));
@@ -236,7 +235,7 @@ mod tests {
         (*sys.lords).transfer(RECIPIENT(), FAUCET_AMOUNT.into());
 
         // validate leaderboards
-        let leaderboard: Leaderboard = sys.store.get_leaderboard(SEASON_1_TABLE());
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(SEASON_ID_1);
         let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
         assert_eq!(positions.len(), order.len(), "leaderboard_size");
         let mut i: usize = 0;
@@ -260,7 +259,7 @@ mod tests {
 // println!("pool_peg.balance_lords {} / {}", ETH(pool_peg.balance_lords), pool_peg.balance_lords);
 
         // FAME >> PoolType::Season()
-        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_1_TABLE()));
+        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_ID_1));
         assert_eq!(pool_season.balance_lords, 0, "COLLECTED_pool_season.balance_lords BEFORE = 0");
         assert_ne!(pool_season.balance_fame, 0, "COLLECTED_pool_season.balance_fame BEFORE > 0");
 
@@ -303,7 +302,7 @@ mod tests {
 // println!("+ pool_peg.balance_lords {} / {}", ETH(pool_peg_lords), pool_peg_lords);
 
         // PoolType::Season() ZEROEDs
-        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_1_TABLE()));
+        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_ID_1));
         assert_eq!(pool_season.balance_lords, 0, "COLLECTED_pool_season.balance_lords AFTER = 0");
         assert_eq!(pool_season.balance_fame, 0, "COLLECTED_pool_season.balance_fame AFTER = 0");
 
@@ -368,9 +367,9 @@ tester::print_pools(@sys, 1, "COLLECTED");
         let pool_peg: Pool = sys.store.get_pool(PoolType::FamePeg);
         assert_eq!(pool_peg.balance_lords, 0, "PEGGED LORDS");
         assert_eq!(pool_peg.balance_fame, 0, "PEGGED FAME");
-        let pool_season: Pool = sys.store.get_pool(PoolType::Season(SEASON_1_TABLE()));
-        assert_eq!(pool_season.balance_lords, 0, "SEASON_1_TABLE LORDS");
-        assert_eq!(pool_season.balance_fame, 0, "SEASON_1_TABLE FAME");
+        let pool_season: Pool = sys.store.get_pool(PoolType::Season(SEASON_ID_1));
+        assert_eq!(pool_season.balance_lords, 0, "SEASON_ID_1 LORDS");
+        assert_eq!(pool_season.balance_fame, 0, "SEASON_ID_1 FAME");
     }
 
     #[test]
@@ -511,7 +510,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
 
         // initial balances
         let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
-        let pool_type: PoolType = PoolType::Season(SEASON_1_TABLE());
+        let pool_type: PoolType = PoolType::Season(SEASON_ID_1);
         let pool: Pool = sys.store.get_pool(pool_type);
         assert_eq!(balance_bank, 0, "balance_bank INIT");
         assert_eq!(pool.balance_lords, 0, "pool INIT lords");
@@ -551,7 +550,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
 
         // initial balances
         let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
-        let pool_type: PoolType = PoolType::Tournament(SEASON_1_TABLE());
+        let pool_type: PoolType = PoolType::Tournament(SEASON_ID_1);
         let pool: Pool = sys.store.get_pool(pool_type);
         assert_eq!(balance_bank, 0, "balance_bank INIT");
         assert_eq!(pool.balance_lords, 0, "pool INIT lords");
@@ -559,7 +558,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
 
         // sponsor...
         let amount: u128 = 1_000;
-        let tournament_id: felt252 = 'tournament_id';
+        let tournament_id: u128 = 'tournament_id';
         tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, amount);
         sys.bank.sponsor_tournament(OWNER(), amount, tournament_id);
 
@@ -575,7 +574,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
     fn test_sponsor_tournament_zero_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
         let amount: u128 = 1_000;
-        let tournament_id: felt252 = 'tournament_id';
+        let tournament_id: u128 = 'tournament_id';
         sys.bank.sponsor_tournament(OWNER(), amount, tournament_id);
     }
     #[test]
@@ -584,7 +583,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
     fn test_sponsor_tournament_insufficient_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
         let amount: u128 = 1_000;
-        let tournament_id: felt252 = 'tournament_id';
+        let tournament_id: u128 = 'tournament_id';
         tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, amount);
         sys.bank.sponsor_tournament(OWNER(), amount + 1, tournament_id);
     }
@@ -593,6 +592,6 @@ tester::print_pools(@sys, 1, "COLLECTED");
 
     // fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128);
     // fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128);
-    // fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: felt252);
+    // fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u128);
 
 }

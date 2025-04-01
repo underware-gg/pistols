@@ -43,6 +43,7 @@ pub mod tester {
             m_Challenge, Challenge, ChallengeValue,
             m_Round, RoundValue,
             DuelistState,
+            DuelType,
         },
         duelist::{
             m_Duelist, Duelist, DuelistValue,
@@ -63,10 +64,7 @@ pub mod tester {
         },
         season::{
             m_SeasonConfig, SeasonConfig, SeasonManagerTrait,
-        },
-        table::{
-            m_TableConfig, TableConfig,
-            m_TableScoreboard, TableScoreboard,
+            m_SeasonScoreboard, SeasonScoreboard,
         },
         pool::{
             m_Pool, Pool, PoolType,
@@ -121,6 +119,9 @@ pub mod tester {
     pub fn OWNED_BY_OWNER() -> u128 { 0xeeee }
     pub fn OWNED_BY_OTHER() -> u128 { 0xdddd }
 
+    pub const SEASON_ID_1: u128 = 1;
+    pub const SEASON_ID_2: u128 = 2;
+
     pub const FAUCET_AMOUNT: u128 = 10_000_000_000_000_000_000_000;
 
     #[inline(always)]
@@ -136,15 +137,6 @@ pub mod tester {
     pub fn ID(address: ContractAddress) -> u128 {
         let as_u256: u256 = address.into();
         (as_u256.low)
-    }
-
-    #[inline(always)]
-    pub fn SEASON_TABLE(season_id: u16) -> felt252 {
-        (SeasonManagerTrait::make_table_id(season_id))
-    }
-    #[inline(always)]
-    pub fn SEASON_1_TABLE() -> felt252 {
-        (SEASON_TABLE(1))
     }
 
     // set_contract_address : to define the address of the calling contract,
@@ -268,10 +260,9 @@ pub mod tester {
             TestResource::Model(m_DuelistMemorial::TEST_CLASS_HASH),
             TestResource::Model(m_Pact::TEST_CLASS_HASH),
             TestResource::Model(m_Round::TEST_CLASS_HASH),
-            TestResource::Model(m_TableScoreboard::TEST_CLASS_HASH),
+            TestResource::Model(m_SeasonScoreboard::TEST_CLASS_HASH),
             TestResource::Model(m_Leaderboard::TEST_CLASS_HASH),
             TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_TableConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
             TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
             TestResource::Model(m_Pool::TEST_CLASS_HASH),
@@ -597,11 +588,6 @@ pub mod tester {
         (*system).set_paused(paused);
         _next_block();
     }
-    pub fn execute_admin_set_table(system: @IAdminDispatcher, sender: ContractAddress, table: TableConfig) {
-        impersonate(sender);
-        (*system).set_table(table);
-        _next_block();
-    }
 
     // ::ierc20
     pub fn execute_lords_faucet(system: @ILordsMockDispatcher, sender: ContractAddress) {
@@ -638,23 +624,23 @@ pub mod tester {
         challenged: ContractAddress,
         // premise: Premise,
         quote: felt252,
-        table_id: felt252,
+        duel_type: DuelType,
         expire_hours: u64,
         lives_staked: u8,
     ) -> u128 {
-        (execute_create_duel_ID(system, sender, ID(sender), challenged, quote, table_id, expire_hours, lives_staked))
+        (execute_create_duel_ID(system, sender, ID(sender), challenged, quote, duel_type, expire_hours, lives_staked))
     }
     pub fn execute_create_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
         token_id: u128,
         challenged: ContractAddress,
         // premise: Premise,
         quote: felt252,
-        table_id: felt252,
+        duel_type: DuelType,
         expire_hours: u64,
         lives_staked: u8,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*system).create_duel(token_id, challenged, Premise::Nothing, quote, table_id, expire_hours, lives_staked);
+        let duel_id: u128 = (*system).create_duel(duel_type, token_id, challenged, Premise::Nothing, quote, expire_hours, lives_staked);
         _next_block();
         (duel_id)
     }
@@ -664,7 +650,7 @@ pub mod tester {
         accepted: bool,
     ) -> ChallengeState {
         impersonate(sender);
-        let new_state: ChallengeState = (*system).reply_duel(token_id, duel_id, accepted);
+        let new_state: ChallengeState = (*system).reply_duel(duel_id, token_id, accepted);
         _next_block();
         (new_state)
     }
@@ -707,11 +693,11 @@ pub mod tester {
         (*system).collect_duel(duel_id);
         _next_block();
     }
-    pub fn execute_collect_season(system: @IGameDispatcher, sender: ContractAddress) -> felt252 {
+    pub fn execute_collect_season(system: @IGameDispatcher, sender: ContractAddress) -> u128 {
         impersonate(sender);
-        let new_table_id: felt252 = (*system).collect_season();
+        let new_season_id: u128 = (*system).collect_season();
         _next_block();
-        (new_table_id)
+        (new_season_id)
     }
 
     // ::tutorial
@@ -787,13 +773,10 @@ pub mod tester {
     pub fn set_Config(ref world: WorldStorage, model: @Config) {
         world.write_model_test(model);
     }
-    pub fn set_TableConfig(ref world: WorldStorage, model: @TableConfig) {
-        world.write_model_test(model);
-    }
     pub fn set_Duelist(ref world: WorldStorage, model: @Duelist) {
         world.write_model_test(model);
     }
-    pub fn set_TableScoreboard(ref world: WorldStorage, model: @TableScoreboard) {
+    pub fn set_SeasonScoreboard(ref world: WorldStorage, model: @SeasonScoreboard) {
         world.write_model_test(model);
     }
     pub fn set_Challenge(ref world: WorldStorage, model: @Challenge) {
@@ -803,9 +786,9 @@ pub mod tester {
         world.write_model_test(model);
     }
 
-    pub fn set_current_season(ref sys: TestSystems, table_id: felt252) {
+    pub fn set_current_season(ref sys: TestSystems, season_id: u128) {
         let mut config: Config = sys.store.get_config();
-        config.season_table_id = table_id;
+        config.current_season_id = season_id;
         set_Config(ref sys.world, @config);
     }
 
@@ -908,10 +891,10 @@ pub mod tester {
     // }
 
     pub fn assert_pact(sys: @TestSystems, duel_id: u128, ch: ChallengeValue, has_pact: bool, accepted: bool, prefix: ByteArray) {
-        assert!((*sys.duels).has_pact(ch.table_id, ch.address_a, ch.address_b) == has_pact,
+        assert!((*sys.duels).has_pact(ch.duel_type, ch.address_a, ch.address_b) == has_pact,
             "[{}] _assert_pact() not [{}]", prefix, has_pact.to_string()
         );
-        assert!((*sys.duels).has_pact(ch.table_id, ch.address_b, ch.address_a) == has_pact,
+        assert!((*sys.duels).has_pact(ch.duel_type, ch.address_b, ch.address_a) == has_pact,
             "[{}] __assert_pact() not [{}]", prefix, has_pact.to_string()
         );
         let expected_duel_id: u128 = if (has_pact) {duel_id} else {0};
@@ -926,13 +909,13 @@ pub mod tester {
         );
     }
 
-    pub fn print_pools(sys: @TestSystems, season_id: u16, prefix: ByteArray) {
+    pub fn print_pools(sys: @TestSystems, season_id: u128, prefix: ByteArray) {
         let mut fame_balance_bank: u128 = (*sys.fame).balance_of(*sys.bank.contract_address).low;
         let mut lords_balance_bank: u128 = (*sys.lords).balance_of(*sys.bank.contract_address).low;
         let mut lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;
         let pool_purchases: Pool = (*sys.store).get_pool(PoolType::Purchases);
         let pool_peg: Pool = (*sys.store).get_pool(PoolType::FamePeg);
-        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_TABLE(season_id)));
+        let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(season_id));
         let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
         println!(">>>>>>>>>>>>>>>>>> {}",  prefix);
         println!("BANK_______________LORDS:{} FAME:{}", ETH(lords_balance_bank), ETH(fame_balance_bank));

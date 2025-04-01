@@ -9,11 +9,10 @@ use pistols::models::{
         ProfileType, DuelistProfile,
         DuelistMemorialValue, CauseOfDeath,
     },
-    challenge::{Challenge},
+    challenge::{Challenge, DuelType},
     config::{TokenConfig},
-    table::{TableScoreboard},
+    season::{SeasonScoreboard},
     pool::{Pool, PoolType},
-    table::{TABLES},
 };
 
 // use pistols::interfaces::dns::{DnsTrait};
@@ -27,7 +26,7 @@ use pistols::tests::tester::{
         IDuelistTokenDispatcherTrait,
         IFameCoinDispatcherTrait,
         ILordsMockDispatcherTrait,
-        OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO, SEASON_TABLE,
+        OWNER, OTHER, RECIPIENT, SPENDER, TREASURY, ZERO, SEASON_ID_1,
     },
 };
 
@@ -49,7 +48,7 @@ const TOKEN_ID_3_2: u256 = 6;
 fn setup(_fee_amount: u128) -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
 
-    tester::set_current_season(ref sys, TABLES::PRACTICE);
+    tester::set_current_season(ref sys, SEASON_ID_1);
 
     tester::fund_duelists_pool(@sys, 2);
 
@@ -124,12 +123,12 @@ fn test_token_uri() {
     };
     tester::set_Duelist(ref sys.world, @duelist);
 
-    let scoreboard = TableScoreboard {
+    let scoreboard = SeasonScoreboard {
         holder: TOKEN_ID_1_1.low.into(),
-        table_id: 0,
+        season_id: SEASON_ID_1,
         points: 777,
     };
-    tester::set_TableScoreboard(ref sys.world, @scoreboard);
+    tester::set_SeasonScoreboard(ref sys.world, @scoreboard);
 
     let uri_1 = sys.duelists.token_uri(TOKEN_ID_1_1);
     let uri_2 = sys.duelists.token_uri(TOKEN_ID_1_2);
@@ -592,7 +591,7 @@ fn test_mint_duelist_not_minter() {
 #[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))] // for random addresses
 fn test_transfer_rewards_invalid_caller() {
     let mut sys: TestSystems = setup(0);
-    let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), 'premise', SEASON_TABLE(1), 0, 1);
+    let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), 'premise', DuelType::Seasonal, 0, 1);
     let challenge: Challenge = sys.store.get_challenge(duel_id);
     // let account: ContractAddress = tester::deploy_mock_account();
     // tester::impersonate(account);

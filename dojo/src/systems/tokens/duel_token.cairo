@@ -1,5 +1,6 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
+use pistols::models::challenge::{DuelType};
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::premise::{Premise};
 
@@ -73,11 +74,10 @@ pub trait IDuelToken<TState> {
     fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
 
     // IDuelTokenPublic
-    fn get_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128;
-    fn has_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool;
-    fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
-    fn create_duel(ref self: TState, duelist_id: u128, challenged_address: ContractAddress, premise: Premise, quote: felt252, table_id: felt252, expire_hours: u64, lives_staked: u8) -> u128;
-    fn reply_duel(ref self: TState, duelist_id: u128, duel_id: u128, accepted: bool) -> ChallengeState;
+    fn get_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> u128;
+    fn has_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> bool;
+    fn create_duel(ref self: TState, duel_type: DuelType, duelist_id: u128, challenged_address: ContractAddress, premise: Premise, quote: felt252, expire_hours: u64, lives_staked: u8) -> u128;
+    fn reply_duel(ref self: TState, duel_id: u128, duelist_id: u128, accepted: bool) -> ChallengeState;
     // fn delete_duel(ref self: TState, duel_id: u128);
 
     // IDuelTokenProtected
@@ -88,24 +88,23 @@ pub trait IDuelToken<TState> {
 #[starknet::interface]
 pub trait IDuelTokenPublic<TState> {
     // view
-    fn get_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128;
-    fn has_pact(self: @TState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool;
-    fn can_join(self: @TState, table_id: felt252, duelist_id: u128) -> bool;
+    fn get_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> u128;
+    fn has_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> bool;
     // write
     fn create_duel( //@description: Create a Duel, mint its token
         ref self: TState,
+        duel_type: DuelType,
         duelist_id: u128,
         challenged_address: ContractAddress,
         premise: Premise,
         quote: felt252,
-        table_id: felt252,
         expire_hours: u64,
         lives_staked: u8,
     ) -> u128;
     fn reply_duel( //@description: Reply to a Duel (accept or reject)
         ref self: TState,
-        duelist_id: u128,
         duel_id: u128,
+        duelist_id: u128,
         accepted: bool,
     ) -> ChallengeState;
     // fn delete_duel(ref self: TState, duel_id: u128);
@@ -177,11 +176,9 @@ pub mod duel_token {
     };
     use pistols::models::{
         player::{PlayerTrait},
-        challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, RoundTrait},
+        challenge::{Challenge, ChallengeTrait, ChallengeValue, DuelType, Round, RoundTrait},
         duelist::{DuelistTrait, DuelistValue, ProfileTypeTrait},
         pact::{PactTrait},
-        table::{TableConfig, TableConfigTrait},
-        season::{SeasonConfigValue},
         events::{Activity, ActivityTrait},
     };
     use pistols::types::{
@@ -198,11 +195,6 @@ pub mod duel_token {
 
     pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'DUEL: Invalid caller';
-        pub const NOT_IMPLEMENTED: felt252          = 'DUEL: Not implemented';
-        pub const INVALID_DUEL: felt252             = 'DUEL: Invalid duel';
-        pub const NOT_YOUR_DUEL: felt252            = 'DUEL: Not your duel';
-        pub const INVALID_TABLE: felt252            = 'DUEL: Invalid table';
-        pub const INVALID_SEASON: felt252           = 'DUEL: Invalid season';
         pub const INVALID_DUELIST: felt252          = 'DUEL: Invalid duelist';
         pub const INVALID_DUELIST_A_NULL: felt252   = 'DUEL: Duelist A null';
         pub const INVALID_DUELIST_B_NULL: felt252   = 'DUEL: Duelist B null';
@@ -215,8 +207,8 @@ pub mod duel_token {
         pub const DUELIST_IS_DEAD_B: felt252        = 'DUEL: Duelist B is dead!';
         pub const INSUFFICIENT_LIVES_A: felt252     = 'DUEL: Insufficient lives A';
         pub const INSUFFICIENT_LIVES_B: felt252     = 'DUEL: Insufficient lives B';
-        pub const CHALLENGER_NOT_ADMITTED: felt252  = 'DUEL: Challenger not allowed';
-        pub const CHALLENGED_NOT_ADMITTED: felt252  = 'DUEL: Challenged not allowed';
+        // pub const CHALLENGER_NOT_ADMITTED: felt252  = 'DUEL: Challenger not allowed';
+        // pub const CHALLENGED_NOT_ADMITTED: felt252  = 'DUEL: Challenged not allowed';
         pub const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
         pub const PACT_EXISTS: felt252              = 'DUEL: Pact exists';
         pub const DUELIST_IN_CHALLENGE: felt252     = 'DUEL: Duelist in a challenge';
@@ -262,36 +254,28 @@ pub mod duel_token {
         //-----------------------------------
         // View calls
         //
-        fn get_pact(self: @ContractState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> u128 {
+        fn get_pact(self: @ContractState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
-            (PactTrait::get_pact(@store, table_id, address_a, address_b))
+            (store.get_pact(duel_type, address_a, address_b).duel_id)
         }
-        fn has_pact(self: @ContractState, table_id: felt252, address_a: ContractAddress, address_b: ContractAddress) -> bool {
-            (self.get_pact(table_id, address_a, address_b) != 0)
-        }
-        fn can_join(self: @ContractState, table_id: felt252, duelist_id: u128) -> bool {
+        fn has_pact(self: @ContractState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
-            let table: TableConfig = store.get_table_config(table_id);
-            (table.can_join(@store))
+            (store.get_pact(duel_type, address_a, address_b).duel_id != 0)
         }
 
         //-----------------------------------
         // Write calls
         //
         fn create_duel(ref self: ContractState,
+            duel_type: DuelType,
             duelist_id: u128,
             challenged_address: ContractAddress,
             premise: Premise,
             quote: felt252,
-            table_id: felt252,
             expire_hours: u64,
             lives_staked: u8,
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
-
-            // validate table
-            let table: TableConfig = store.get_table_config(table_id);
-            table.assert_can_join(@store);
 
             // mint to game, so it can transfer to winner
             let duel_id: u128 = self.token.mint(store.world.game_address());
@@ -325,20 +309,18 @@ pub mod duel_token {
             store.enter_challenge(duelist_id_a, duel_id);
 
             // calc expiration
-            let season: SeasonConfigValue = store.get_current_season_value();
             let timestamp: u64 = starknet::get_block_timestamp();
-            let timestamp_end: u64 = timestamp + 
-                if (expire_hours == 0) {TIMESTAMP::ONE_DAY}
-                else {TimestampTrait::from_hours(expire_hours)};
             let timestamps = Period {
                 start: timestamp,
-                end: core::cmp::min(timestamp_end, season.period.end),
+                end: timestamp + 
+                    if (expire_hours == 0) {TIMESTAMP::ONE_DAY}
+                    else {TimestampTrait::from_hours(expire_hours)},
             };
 
             // create challenge
             let challenge = Challenge {
                 duel_id,
-                table_id,
+                duel_type,
                 premise,
                 quote,
                 lives_staked: core::cmp::max(lives_staked, 1),
@@ -384,8 +366,8 @@ pub mod duel_token {
         }
         
         fn reply_duel(ref self: ContractState,
-            duelist_id: u128,
             duel_id: u128,
+            duelist_id: u128,
             accepted: bool,
         ) -> ChallengeState {
             let mut store: Store = StoreTrait::new(self.world_default());
@@ -398,11 +380,6 @@ pub mod duel_token {
             let address_b: ContractAddress = starknet::get_caller_address();
             let duelist_id_b: u128 = duelist_id;
             let timestamp: u64 = starknet::get_block_timestamp();
-
-            // validate table
-            let table: TableConfig = store.get_table_config(challenge.table_id);
-            // validated on create_duel
-            // table.assert_can_join(@store);
 
             if (challenge.timestamps.has_expired()) {
                 // Expired, close it!
@@ -454,7 +431,7 @@ pub mod duel_token {
 
                     // set reply timeouts
                     let mut round: Round = store.get_round(duel_id);
-                    round.set_commit_timeout(table.rules, timestamp);
+                    round.set_commit_timeout(store.get_current_season_rules(), timestamp);
                     store.set_round(@round);
                 } else {
                     // Challenged is Refusing
@@ -550,7 +527,7 @@ pub mod duel_token {
             let duelist_name_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);
             // Image
             let image: ByteArray = UrlImpl::new(format!("{}/api/pistols/duel_token/{}/image", base_uri.clone(), token_id))
-                .add("table_id", challenge.table_id.to_string(), true)
+                .add("duel_type", challenge.duel_type.into(), true)
                 .add("premise", challenge.premise.name(), true)
                 .add("quote", challenge.quote.to_string(), true)
                 .add("state", challenge.state.into(), false)
@@ -565,8 +542,8 @@ pub mod duel_token {
             // Attributes
             let mut attributes: Array<Attribute> = array![
                 Attribute {
-                    key: "Table",
-                    value: challenge.table_id.to_string(),
+                    key: "Duel Type",
+                    value: challenge.duel_type.into(),
                 },
                 Attribute {
                     key: "Challenger",

@@ -12,7 +12,6 @@ use pistols::models::{
     player::{Player, PlayerTrait},
     pack::{Pack, PackType, PackTypeTrait},
     config::{TokenConfig},
-    table::{TABLES},
 };
 
 // use pistols::interfaces::dns::{DnsTrait};
@@ -22,7 +21,7 @@ use pistols::tests::tester::{
     tester::{
         StoreTrait,
         TestSystems, FLAGS,
-        OWNER, OTHER, BUMMER, SPENDER,
+        OWNER, OTHER, BUMMER, SPENDER, SEASON_ID_1,
     },
 };
 
@@ -43,7 +42,7 @@ const TOKEN_ID_5: u256 = 5;
 fn setup(_fee_amount: u128) -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(FLAGS::DUELIST | FLAGS::FAME | FLAGS::LORDS);
 
-    tester::set_current_season(ref sys, TABLES::PRACTICE);
+    tester::set_current_season(ref sys, SEASON_ID_1);
 
     tester::execute_lords_faucet(@sys.lords, OWNER());
     tester::execute_lords_faucet(@sys.lords, OTHER());

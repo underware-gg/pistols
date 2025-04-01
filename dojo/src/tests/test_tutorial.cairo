@@ -1,20 +1,23 @@
 #[cfg(test)]
 mod tests {
-    use pistols::models::challenge::{Challenge, ChallengeTrait, ChallengeValue, RoundValue};
-    use pistols::models::duelist::{DuelistValue};
-    use pistols::models::table::{TABLES};
-    use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, ProfileManagerTrait, CharacterProfile};
-    use pistols::types::cards::hand::{
-        PacesCard,
-        TacticsCard,
-        BladesCard,
-        DeckType,
-        FinalBlow, FinalBlowTrait,
+    use pistols::models::{
+        challenge::{Challenge, ChallengeTrait, ChallengeValue, RoundValue, DuelType},
+        duelist::{DuelistValue},
     };
-    use pistols::types::challenge_state::{ChallengeState};
-    use pistols::types::duel_progress::{DuelProgress};
-    use pistols::types::round_state::{RoundState};
-    use pistols::types::premise::{Premise};
+    use pistols::types::{
+        profile_type::{ProfileType, ProfileTypeTrait, ProfileManagerTrait, CharacterProfile},
+        challenge_state::{ChallengeState},
+        duel_progress::{DuelProgress},
+        round_state::{RoundState},
+        premise::{Premise},
+        cards::hand::{
+            PacesCard,
+            TacticsCard,
+            BladesCard,
+            DeckType,
+            FinalBlow, FinalBlowTrait,
+        },
+    };
     use pistols::libs::tut::{TutorialLevel, TutorialLevelTrait};
     use pistols::libs::game_loop::{make_moves_hash};
     use pistols::utils::math::{MathU8};
@@ -73,7 +76,7 @@ mod tests {
         let round: RoundValue = sys.store.get_round_value(duel_id);
         assert_eq!(challenge.state, ChallengeState::InProgress, "challenge.state");
         assert!(challenge.is_tutorial(), "challenge.is_tutorial()");
-        assert_eq!(challenge.table_id, TABLES::TUTORIAL, "challenge.table_id");
+        assert_eq!(challenge.duel_type, DuelType::Tutorial, "challenge.duel_type");
         assert_eq!(challenge.premise, Premise::Lesson, "challenge.premise");
         assert_eq!(challenge.address_a, OWNER(), "challenge.address_a");
         assert_eq!(challenge.address_b, OWNER(), "challenge.address_b");

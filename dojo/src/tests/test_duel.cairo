@@ -3,10 +3,10 @@ mod tests {
     use starknet::{ContractAddress};
 
     use pistols::models::{
-        challenge::{ChallengeTrait, ChallengeValue, RoundValue},
+        challenge::{ChallengeTrait, ChallengeValue, RoundValue, DuelType},
         duelist::{DuelistStatus},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
-        table::{TableScoreboard},
+        season::{SeasonScoreboard},
     };
     use pistols::types::{
         cards::hand::{PacesCard, FinalBlow, DeckType},
@@ -30,12 +30,11 @@ mod tests {
             // IFameCoinDispatcherTrait,
             ID, OWNER, OTHER, BUMMER, FAKE_OWNER_OF_1,
             _assert_is_alive, _assert_is_dead,
-            SEASON_1_TABLE,
+            SEASON_ID_1,
         }
     };
     use pistols::tests::prefabs::{prefabs,
         prefabs::{
-            // SALT_A, SALT_B, TABLE_ID, PRIZE_VALUE,
             MESSAGE,
             SaltsValues,
             PlayerMoves,
@@ -96,7 +95,7 @@ mod tests {
         let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
         let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
 
-        let table_id: felt252 = SEASON_1_TABLE();
+        let season_id: u128 = SEASON_ID_1;
 
         let fame_balance_a_init: u128 = tester::fame_balance_of_token(@sys, duelist_id_a);
         let fame_balance_b_init: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);
@@ -107,7 +106,7 @@ mod tests {
         assert_eq!(fools_balance_a_init, 0, "fools_balance_a_init");
         assert_eq!(fools_balance_b_init, 0, "fools_balance_b_init");
 
-        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), table_id, 1);
+        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
         tester::assert_pact(@sys, duel_id, challenge, true, true, "started");
 
@@ -140,8 +139,8 @@ mod tests {
 
         let status_a: DuelistStatus = sys.store.get_duelist(ID(OWNER()).into()).status;
         let status_b: DuelistStatus = sys.store.get_duelist(ID(OTHER()).into()).status;
-        let score_a: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OWNER()).into());
-        let score_b: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OTHER()).into());
+        let score_a: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OWNER()).into());
+        let score_b: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OTHER()).into());
         assert_eq!(status_a.total_duels, 1, "status_a.total_duels");
         assert_eq!(status_b.total_duels, 1, "status_b.total_duels");
         assert_eq!(status_a.total_draws, 1, "status_a.total_draws");
@@ -156,7 +155,7 @@ mod tests {
         assert_eq!(status_a.honour, round.state_a.honour, "status_a.honour");
         assert_eq!(status_b.honour, round.state_b.honour, "status_b.honour");
 
-        let leaderboard: Leaderboard = sys.store.get_leaderboard(table_id);
+        let leaderboard: Leaderboard = sys.store.get_leaderboard(season_id);
         let positions: Span<LeaderboardPosition> = leaderboard.get_all_positions();
         assert_eq!(positions.len(), 2, "leaderboard_positions.len");
         assert_eq!(*positions[0].duelist_id, ID(OWNER()).into(), "draw_leaderboards[0].pos");
@@ -214,9 +213,9 @@ mod tests {
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
 
-        let table_id: felt252 = SEASON_1_TABLE();
+        let season_id: u128 = SEASON_ID_1;
 
-        let (challenge, round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), table_id, 1);
+        let (challenge, round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
         tester::assert_pact(@sys, duel_id, challenge, true, true, "started");
 
@@ -293,14 +292,14 @@ mod tests {
         assert_eq!(status_a_1.honour, round.state_a.honour, "status_a_1.honour");
         assert_eq!(status_b_1.honour, round.state_b.honour, "status_b_1.honour");
 
-        let leaderboard_1: Leaderboard = sys.store.get_leaderboard(table_id);
+        let leaderboard_1: Leaderboard = sys.store.get_leaderboard(season_id);
         let positions_1: Span<LeaderboardPosition> = leaderboard_1.get_all_positions();
         assert_eq!(positions_1.len(), 2, "leaderboard_positions.len");
         assert_gt!(*positions_1[0].points, 0, "leaderboard_1[0].points");
         assert_gt!(*positions_1[1].points, 0, "leaderboard_1[1].points");
 
-        let score_a_1: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OWNER()).into());
-        let score_b_1: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OTHER()).into());
+        let score_a_1: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OWNER()).into());
+        let score_b_1: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OTHER()).into());
 
         assert_eq!(challenge.winner, winner, "winner");
         if (winner == 1) {
@@ -342,7 +341,7 @@ mod tests {
         // (to compute totals and scores)
         //
 
-        let (_challenge, round_2, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), table_id, 1);
+        let (_challenge, round_2, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::assert_pact(@sys, duel_id, challenge, true, true, "started_2");
         // assert(round_2.moves_a.seed != 0, "round_2.moves_a.seed");
         // assert(round_2.moves_b.seed != 0, "round_2.moves_b.seed");
@@ -381,14 +380,14 @@ mod tests {
         assert_eq!(status_a_2.total_draws, 0, "status_a_2.total_draws ++");
         assert_eq!(status_b_2.total_draws, 0, "status_b_2.total_draws ++");
 
-        let leaderboard_2: Leaderboard = sys.store.get_leaderboard(table_id);
+        let leaderboard_2: Leaderboard = sys.store.get_leaderboard(season_id);
         let positions_2: Span<LeaderboardPosition> = leaderboard_2.get_all_positions();
         assert_eq!(positions_2.len(), 2, "leaderboard_positions.len() ++");
         assert_gt!(*positions_2[0].points, *positions_1[0].points, "score_2 > score_1");
         assert_gt!(*positions_2[1].points, *positions_1[1].points, "score_2 > score_1");
 
-        let score_a_2: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OWNER()).into());
-        let score_b_2: TableScoreboard = sys.store.get_scoreboard(table_id, ID(OTHER()).into());
+        let score_a_2: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OWNER()).into());
+        let score_b_2: SeasonScoreboard = sys.store.get_scoreboard(season_id, ID(OTHER()).into());
 
         if (winner == 1) {
             assert_eq!(status_a_2.total_wins, 2, "a_win_duelist_a.total_wins ++");
@@ -435,7 +434,7 @@ mod tests {
     #[test]
     fn test_commit_transferred_duelist_new_owner_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert_eq!(challenge.address_a, OWNER(), "challenge.address_a");
         assert_eq!(challenge.address_b, OTHER(), "challenge.address_b");
         // try to commmit with another account
@@ -451,7 +450,7 @@ mod tests {
     #[test]
     fn test_commit_transferred_duelist_new_owner_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert_eq!(challenge.address_a, OWNER(), "challenge.address_a");
         assert_eq!(challenge.address_b, OTHER(), "challenge.address_b");
         // try to commmit with another account
@@ -469,7 +468,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_commit_transferred_duelist_old_owner_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         // try to commmit with another account
         let (_salts, moves_a, _moves_b) = prefabs::get_moves_dual_crit();
         sys.duelists.transfer_from(OWNER(), BUMMER(), ID(OWNER()).into());
@@ -480,7 +479,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_commit_transferred_duelist_old_owner_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         // try to commmit with another account
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
@@ -511,7 +510,7 @@ mod tests {
         let mut i: u8 = 0;
         while (i < challenge_count) {
             assert_eq!((*sys).duelists.life_count(loser_id), loser_lives, "____life_count(loser_id) [{}]", i);
-            let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), SEASON_1_TABLE(), lives_staked);
+            let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(sys, OWNER(), OTHER(), DuelType::Seasonal, lives_staked);
             tester::execute_commit_moves(sys.game, OWNER(), duel_id, moves_a.hashed);
             tester::execute_commit_moves(sys.game, OTHER(), duel_id, moves_b.hashed);
             tester::execute_reveal_moves(sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
@@ -694,7 +693,7 @@ mod tests {
     #[test]
     fn test_commit_before_reply_a_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE, SEASON_1_TABLE(), 48, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE, DuelType::Seasonal, 48, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 0x1212112);
         // no panic!
     }
@@ -703,7 +702,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Accept challenge first', 'ENTRYPOINT_FAILED'))]
     fn test_commit_before_reply_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE, SEASON_1_TABLE(), 48, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE, DuelType::Seasonal, 48, 1);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, 0x1212112);
     }
 
@@ -711,7 +710,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your duel', 'ENTRYPOINT_FAILED'))]
     fn test_commit_wrong_player_to_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         // try to commmit with another account
         let someone_else: ContractAddress = starknet::contract_address_const::<0x999>();
         let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
@@ -722,7 +721,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Not your duelist', 'ENTRYPOINT_FAILED'))]
     fn test_commit_wrong_player_to_address() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         // try to commmit with another account
         let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
         tester::execute_commit_moves(@sys.game, FAKE_OWNER_OF_1(), duel_id, hashed);
@@ -732,7 +731,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
     fn test_commit_already_commit_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, hashed);
@@ -741,7 +740,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Already committed', 'ENTRYPOINT_FAILED'))]
     fn test_commit_already_commit_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let hashed: u128 = make_moves_hash(0x12121, [1, 1].span());
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, hashed);
@@ -751,7 +750,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_already_revealed_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
@@ -762,7 +761,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Already revealed', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_already_revealed_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
@@ -774,7 +773,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Round not in commit', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_not_in_commit() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
@@ -785,7 +784,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Round not in reveal', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_not_in_revea_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, _moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
@@ -795,7 +794,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Round not in reveal', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_not_in_revea_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, _moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
@@ -805,7 +804,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Invalid salt', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_challenge_invalid_salt() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
@@ -816,7 +815,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Challenge not active', 'ENTRYPOINT_FAILED'))]
     fn test_commit_challenge_finished_commit() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
@@ -829,7 +828,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Challenge not active', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_challenge_finished_reveal() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
@@ -842,7 +841,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Moves hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_hash_salt_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
@@ -853,7 +852,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Moves hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_hash_salt_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
@@ -864,7 +863,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Moves hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_hash_moves_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
@@ -874,7 +873,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Moves hash mismatch', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_hash_move_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
@@ -885,7 +884,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Invalid moves count', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_moves_count_0() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_custom([1].span(), [1].span());
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
@@ -896,7 +895,7 @@ mod tests {
     #[should_panic(expected:('PISTOLS: Invalid moves count', 'ENTRYPOINT_FAILED'))]
     fn test_reveal_invalid_moves_count_1() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         let (_salts, moves_a, moves_b) = prefabs::get_moves_custom([1,1].span(), [1,1].span());
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_b.hashed);
@@ -927,7 +926,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.set_mocked_values(salts.salts, salts.values);
-        let (_challenge, round_0, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, round_0, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert_gt!(round_0.moves_a.timeout, 0, "round_0.moves_a.timeout");
         assert_eq!(round_0.moves_a.timeout, round_0.moves_b.timeout, "round_0.moves_b.timeout");
         // commit A
@@ -972,7 +971,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.set_mocked_values(salts.salts, salts.values);
-        let (_challenge, round_0, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, round_0, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert_gt!(round_0.moves_a.timeout, 0, "round_0.moves_a.timeout");
         assert_eq!(round_0.moves_a.timeout, round_0.moves_b.timeout, "round_0.moves_b.timeout");
         // commit B
@@ -1015,7 +1014,7 @@ mod tests {
     #[test]
     fn test_timeout_commit_draw() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
@@ -1026,7 +1025,7 @@ mod tests {
     #[test]
     fn test_timeout_commit_draw_collect() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
@@ -1037,7 +1036,7 @@ mod tests {
     #[test]
     fn test_timeout_commit_draw_collect_bummer() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
         tester::set_block_timestamp(round.moves_a.timeout + 1);
         assert!(sys.game.can_collect_duel(duel_id), "can_collect_duel");
@@ -1048,7 +1047,7 @@ mod tests {
     #[test]
     fn test_timeout_commit_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 0x1212112);
         // time travel...
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
@@ -1062,7 +1061,7 @@ mod tests {
     #[test]
     fn test_timeout_commit_a_collect() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 0x1212112);
         // time travel...
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
@@ -1076,7 +1075,7 @@ mod tests {
     #[test]
     fn test_timeout_commit_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, 0x1212112);
         // time travel...
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
@@ -1090,7 +1089,7 @@ mod tests {
     #[test]
     fn test_timeout_commit_b_collect() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, 0x1212112);
         // time travel...
         assert!(!sys.game.can_collect_duel(duel_id), "!can_collect_duel");
@@ -1106,7 +1105,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.set_mocked_values(salts.salts, salts.values);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         // time travel...
@@ -1126,7 +1125,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.set_mocked_values(salts.salts, salts.values);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         // time travel...
@@ -1145,7 +1144,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.set_mocked_values(salts.salts, salts.values);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
@@ -1165,7 +1164,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.set_mocked_values(salts.salts, salts.values);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
@@ -1185,7 +1184,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.set_mocked_values(salts.salts, salts.values);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
@@ -1205,7 +1204,7 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
         let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         sys.rng.set_mocked_values(salts.salts, salts.values);
-        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), SEASON_1_TABLE(), 1);
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);

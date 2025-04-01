@@ -263,11 +263,11 @@ pub mod tournament_token {
             let mut attributes: Array<Attribute> = array![
                 // Attribute {
                 //     key: "Tournament ID",
-                //     value: challenge.table_id.to_string(),
+                //     value: challenge.duel_type.to_string(),
                 // },
                 // Attribute {
                 //     key: "Table",
-                //     value: challenge.table_id.to_string(),
+                //     value: challenge.duel_type.to_string(),
                 // },
             ];
             // if (tournament.winner_address.is_non_zero()) {

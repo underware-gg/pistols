@@ -8,14 +8,13 @@ use pistols::systems::{
     },
 };
 use pistols::models::{
-    challenge::{Challenge},
+    challenge::{Challenge, DuelType},
     duelist::{
         Duelist,
         ProfileType, DuelistProfile, BotProfile,
         DuelistTimestamps,
     },
     config::{TokenConfig},
-    table::{TABLES},
 };
 use pistols::types::{
     challenge_state::{ChallengeState},
@@ -27,7 +26,7 @@ use pistols::tests::tester::{tester,
     tester::{
         StoreTrait,
         TestSystems, FLAGS,
-        ID, OWNER, OTHER, BUMMER, RECIPIENT, ZERO,
+        ID, OWNER, OTHER, BUMMER, RECIPIENT, ZERO, SEASON_ID_1,
     },
 };
 
@@ -46,7 +45,7 @@ const DUEL_ID_4: u256 = 4; // owned by RECIPIENT()
 
 fn setup(_fee_amount: u128) -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::FAME | FLAGS::LORDS);
-    tester::set_current_season(ref sys, TABLES::TUTORIAL);
+    tester::set_current_season(ref sys, SEASON_ID_1);
 
     // initialize contracts
     create_duel(@sys, OWNER(), OTHER());
@@ -65,11 +64,11 @@ fn create_duel(sys: @TestSystems, recipient: ContractAddress, challenged_address
 // println!("---AA");
     tester::impersonate(recipient);
     (*sys.duels).create_duel(
+        duel_type: DuelType::Practice,
         duelist_id: ID(recipient),
         challenged_address: challenged_address,
         premise: Premise::Honour,
         quote: 'For honour!!!',
-        table_id: TABLES::PRACTICE,
         expire_hours: 1,
         lives_staked: 1,
     );
@@ -145,7 +144,7 @@ fn test_token_uri() {
     };
     let challenge = Challenge {
         duel_id: DUEL_ID_1.low,
-        table_id: TABLES::PRACTICE,
+        duel_type: DuelType::Practice,
         premise: Premise::Honour,
         quote: 'For honour!!!',
         lives_staked: 1,

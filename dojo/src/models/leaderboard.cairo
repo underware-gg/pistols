@@ -3,7 +3,7 @@
 #[dojo::model]
 pub struct Leaderboard {
     #[key]
-    pub table_id: felt252,
+    pub season_id: u128,
     //-----------------------
     pub positions: u8,          // number of positions on the leaderboard (max 10)
     pub duelist_ids: felt252,   // (positions * 24 bits) = 240 bits max
@@ -30,10 +30,10 @@ pub impl LeaderboardImpl of LeaderboardTrait {
     const MASK: u256 = 0xffffff;
     const SHIFT: u256 = 0x1000000;
 
-    fn new(table_id: felt252, positions: u8) -> Leaderboard {
+    fn new(season_id: u128, positions: u8) -> Leaderboard {
         assert(positions > 0 && positions <= Self::MAX_POSITIONS, 'LEADERBOARD: invalid positions');
         (Leaderboard {
-            table_id,
+            season_id,
             positions,
             duelist_ids: 0,
             scores: 0,
@@ -277,7 +277,7 @@ mod unit {
     const SCORE_STEP: u16 = 0x000011;
     
     const LB: Leaderboard = Leaderboard {
-        table_id: 'dummy',
+        season_id: 1,
         positions: LeaderboardTrait::MAX_POSITIONS,
         duelist_ids: IDS,
         scores: SCORES,
@@ -321,7 +321,7 @@ mod unit {
     #[test]
     fn test_get_all_positions_empty() {
         let lb: Leaderboard = Leaderboard {
-            table_id: 'dummy',
+            season_id: 1,
             positions: 10,
             duelist_ids: 0,
             scores: 0,
@@ -333,7 +333,7 @@ mod unit {
     #[test]
     fn test_get_all_positions_max() {
         let lb: Leaderboard = Leaderboard {
-            table_id: 'dummy',
+            season_id: 1,
             positions: 10,
             duelist_ids: IDS,
             scores: SCORES,
@@ -345,7 +345,7 @@ mod unit {
     #[test]
     fn test_insert_score_ordered() {
         let mut lb: Leaderboard = Leaderboard {
-            table_id: 'dummy',
+            season_id: 1,
             positions: LeaderboardTrait::MAX_POSITIONS,
             duelist_ids: 0,
             scores: 0,
@@ -375,7 +375,7 @@ mod unit {
     #[test]
     fn test_insert_score_unordered() {
         let mut lb: Leaderboard = Leaderboard {
-            table_id: 'dummy',
+            season_id: 1,
             positions: LeaderboardTrait::MAX_POSITIONS,
             duelist_ids: 0,
             scores: 0,

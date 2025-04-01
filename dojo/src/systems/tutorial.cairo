@@ -40,12 +40,7 @@ pub mod tutorial {
     use pistols::interfaces::dns::{DnsTrait};
     use pistols::systems::rng::{RngWrapTrait, MockedValue};
     use pistols::models::{
-        challenge::{
-            Challenge, ChallengeTrait,
-            Round,
-            MovesTrait,
-        },
-        table::{TABLES},
+        challenge::{Challenge, ChallengeTrait, DuelType, Round, MovesTrait},
     };
     use pistols::types::{
         premise::{Premise},
@@ -116,7 +111,7 @@ pub mod tutorial {
             // create Challenge
             let challenge = Challenge {
                 duel_id,
-                table_id: TABLES::TUTORIAL,
+                duel_type: DuelType::Tutorial,
                 premise: Premise::Lesson,
                 quote: level.quote(),
                 lives_staked: 1,

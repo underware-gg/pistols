@@ -13,7 +13,7 @@ pub struct Config {
     pub treasury_address: ContractAddress,
     pub lords_address: ContractAddress,
     pub vrf_address: ContractAddress,
-    pub season_table_id: felt252,
+    pub current_season_id: u128,
     pub is_paused: bool,
 }
 
@@ -51,7 +51,7 @@ pub impl ConfigManagerImpl of ConfigManagerTrait {
             treasury_address: ZERO(),
             lords_address: ZERO(),
             vrf_address: ZERO(),
-            season_table_id: 0,
+            current_season_id: 0,
             is_paused: false,
         })
     }

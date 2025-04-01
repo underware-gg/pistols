@@ -24,6 +24,7 @@ pub use pistols::models::{
     challenge::{
         Challenge, ChallengeValue,
         Round, RoundValue,
+        DuelType,
     },
     duelist::{
         Duelist, DuelistValue, DuelistTimestamps,
@@ -34,15 +35,12 @@ pub use pistols::models::{
         Leaderboard, LeaderboardValue,
     },
     pact::{
-        Pact, PactValue,
-    },
-    table::{
-        TableConfig, TableConfigValue,
-        TableScoreboard, TableScoreboardValue,
-        RulesType,
+        Pact, PactValue, PactTrait,
     },
     season::{
         SeasonConfig, SeasonConfigValue,
+        SeasonScoreboard, SeasonScoreboardValue,
+        Rules,
     },
     events::{
         CallToActionEvent,
@@ -134,53 +132,45 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_pact(self: @Store, table_id: felt252, pair: u128) -> Pact {
-        (self.world.read_model((table_id, pair),))
+    fn get_pact(self: @Store, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> Pact {
+        let pair: u128 = PactTrait::make_pair(address_a, address_b);
+        (self.world.read_model((duel_type, pair),))
     }
 
     #[inline(always)]
-    fn get_scoreboard_value(self: @Store, table_id: felt252, holder: felt252) -> TableScoreboardValue {
-        (self.world.read_value((table_id, holder),))
+    fn get_scoreboard_value(self: @Store, season_id: u128, holder: felt252) -> SeasonScoreboardValue {
+        (self.world.read_value((season_id, holder),))
     }
 
     #[inline(always)]
-    fn get_scoreboard(self: @Store, table_id: felt252, holder: felt252) -> TableScoreboard {
-        (self.world.read_model((table_id, holder),))
+    fn get_scoreboard(self: @Store, season_id: u128, holder: felt252) -> SeasonScoreboard {
+        (self.world.read_model((season_id, holder),))
     }
 
     #[inline(always)]
-    fn get_leaderboard_value(self: @Store, table_id: felt252) -> LeaderboardValue {
-        (self.world.read_value(table_id))
+    fn get_leaderboard_value(self: @Store, season_id: u128) -> LeaderboardValue {
+        (self.world.read_value(season_id))
     }
     #[inline(always)]
-    fn get_leaderboard(self: @Store, table_id: felt252) -> Leaderboard {
-        (self.world.read_model(table_id))
-    }
-
-    #[inline(always)]
-    fn get_table_config(self: @Store, table_id: felt252) -> TableConfig {
-        (self.world.read_model(table_id))
-    }
-    #[inline(always)]
-    fn get_table_config_value(self: @Store, table_id: felt252) -> TableConfigValue {
-        (self.world.read_value(table_id))
+    fn get_leaderboard(self: @Store, season_id: u128) -> Leaderboard {
+        (self.world.read_model(season_id))
     }
 
     #[inline(always)]
-    fn get_season_config(self: @Store, table_id: felt252) -> SeasonConfig {
-        (self.world.read_model(table_id))
+    fn get_season_config(self: @Store, season_id: u128) -> SeasonConfig {
+        (self.world.read_model(season_id))
     }
     #[inline(always)]
-    fn get_season_config_value(self: @Store, table_id: felt252) -> SeasonConfigValue {
-        (self.world.read_value(table_id))
+    fn get_season_config_value(self: @Store, season_id: u128) -> SeasonConfigValue {
+        (self.world.read_value(season_id))
     }
     #[inline(always)]
     fn get_current_season(self: @Store) -> SeasonConfig {
-        (self.world.read_model(self.get_config_season_table_id()))
+        (self.world.read_model(self.get_current_season_id()))
     }
     #[inline(always)]
     fn get_current_season_value(self: @Store) -> SeasonConfigValue {
-        (self.world.read_value(self.get_config_season_table_id()))
+        (self.world.read_value(self.get_current_season_id()))
     }
 
     #[inline(always)]
@@ -265,17 +255,12 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_scoreboard(ref self: Store, model: @TableScoreboard) {
+    fn set_scoreboard(ref self: Store, model: @SeasonScoreboard) {
         self.world.write_model(model);
     }
 
     #[inline(always)]
     fn set_leaderboard(ref self: Store, model: @Leaderboard) {
-        self.world.write_model(model);
-    }
-
-    #[inline(always)]
-    fn set_table_config(ref self: Store, model: @TableConfig) {
         self.world.write_model(model);
     }
 
@@ -316,8 +301,8 @@ pub impl StoreImpl of StoreTrait {
     //
 
     #[inline(always)]
-    fn get_config_season_table_id(self: @Store) -> felt252 {
-        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("season_table_id")))
+    fn get_current_season_id(self: @Store) -> u128 {
+        (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("current_season_id")))
     }
     #[inline(always)]
     fn get_config_lords_address(self: @Store) -> ContractAddress {
@@ -333,12 +318,12 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_current_season_rules(self: @Store) -> RulesType {
-        (self.get_table_rules(self.get_config_season_table_id()))
+    fn get_current_season_rules(self: @Store) -> Rules {
+        (self.get_season_rules(self.get_current_season_id()))
     }
     #[inline(always)]
-    fn get_table_rules(self: @Store, table_id: felt252) -> RulesType {
-        (self.world.read_member(Model::<TableConfig>::ptr_from_keys(table_id), selector!("rules")))
+    fn get_season_rules(self: @Store, season_id: u128) -> Rules {
+        (self.world.read_member(Model::<SeasonConfig>::ptr_from_keys(season_id), selector!("rules")))
     }
 
     // setters
@@ -348,8 +333,8 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("is_paused"), is_paused);
     }
     #[inline(always)]
-    fn set_config_season_table_id(ref self: Store, season_table_id: felt252) {
-        self.world.write_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("season_table_id"), season_table_id);
+    fn set_config_season_id(ref self: Store, season_id: u128) {
+        self.world.write_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("current_season_id"), season_id);
     }
     #[inline(always)]
     fn set_config_treasury_address(ref self: Store, treasury_address: ContractAddress) {
@@ -415,9 +400,9 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn emit_lords_release(ref self: Store, season_table_id: felt252, duel_id: u128, bill: @LordsReleaseBill) {
+    fn emit_lords_release(ref self: Store, season_id: u128, duel_id: u128, bill: @LordsReleaseBill) {
         self.world.emit_event(@LordsReleaseEvent {
-            season_table_id,
+            season_id,
             duel_id,
             bill: *bill,
             timestamp: starknet::get_block_timestamp(),
