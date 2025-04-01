@@ -52,6 +52,7 @@ default = "pistols"
   "pistols-duel_token",
   "pistols-duelist_token",
   "pistols-pack_token",
+  "pistols-tournament_token",
   "pistols-bank",
 ]
 # ERC-20
@@ -83,6 +84,10 @@ default = "pistols"
 ]
 "pistols-pack_token" = [
   "sstr:https://assets.underware.gg", # base_uri
+]
+"pistols-tournament_token" = [
+  "sstr:https://assets.underware.gg", # base_uri
+  "0x025b1e8fc5e887aeccde45d1c07bf45e3e4897740d70a7e9adc58a68324df1f5", # minter_address (budokan)
 ]
 
 

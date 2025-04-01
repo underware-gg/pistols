@@ -21,6 +21,7 @@ contracts = [
   "erc721:$duel_token", # duel_token
   "erc721:$duelist_token", # duelist_token
   "erc721:$pack_token", # pack_token
+  "erc721:$tournament_token", # tournament_token
   "erc20:$fame_coin", # fame_coin
   "erc20:$fools_coin", # fools_coin
   "erc20:$lords", # lords

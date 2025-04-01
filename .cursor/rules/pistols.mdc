@@ -11,7 +11,9 @@ alwaysApply: true
 
 @Docs https://book.dojoengine.org/
 @Docs https://book.cairo-lang.org/
-@Docs https://docs.swmansion.com/scarb/corelib/modules.html
+@Docs https://docs.swmansion.com/scarb/corelib/
+@Docs https://docs.swmansion.com/scarb/docs.html
+
 
 
 

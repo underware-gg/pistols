@@ -41,6 +41,7 @@ export const getFoolsAddress = (networkId: NetworkId): string => (getContractByN
 export const getDuelistTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duelist_token')?.address ?? '0x0')
 export const getDuelTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'duel_token')?.address ?? '0x0')
 export const getPackTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'pack_token')?.address ?? '0x0')
+export const getTournamentTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'tournament_token')?.address ?? '0x0')
 // contracts
 export const getBankAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'bank')?.address ?? '0x0')
 export const getVrfAddress = (networkId: NetworkId): string => (NETWORKS[networkId].vrfAddress || (getContractByName(manifests[networkId], NAMESPACE, 'vrf_mock')?.address ?? '0x0'))
@@ -60,6 +61,11 @@ const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
   //   description: 'Tutorial game contract',
   //   interfaces: ['ITutorial'],
   // },
+  bank: {
+    name: 'Bank',
+    description: 'Bank contract',
+    interfaces: ['IBankPublic'],
+  },
   pack_token: {
     name: 'Pack token',
     description: 'Packs ERC721 contract',
@@ -75,10 +81,10 @@ const contractPolicyDescriptions_pistols: ContractPolicyDescriptions = {
     description: 'Duelist ERC721 contract',
     interfaces: ['IDuelistTokenPublic'],
   },
-  bank: {
-    name: 'Bank',
-    description: 'Bank contract',
-    interfaces: ['IBankPublic'],
+  tournament_token: {
+    name: 'Tournament token',
+    description: 'Tournament ERC721 contract',
+    interfaces: ['ITournamentTokenPublic'],
   },
 }
 const contractPolicyDescriptions_mock: ContractPolicyDescriptions = {

@@ -3,29 +3,17 @@ use core::num::traits::Zero;
 // use dojo::world::{WorldStorage};
 
 use pistols::models::{
-    pack::{
-        PackType, PackTypeTrait,
-    },
+    pack::{PackType, PackTypeTrait},
     duelist::{
         Duelist, DuelistTimestamps,
         ProfileType, DuelistProfile,
         DuelistMemorialValue, CauseOfDeath,
     },
-    challenge::{
-        Challenge,
-    },
-    config::{
-        TokenConfig,
-    },
-    table::{
-        TableScoreboard,
-    },
-    pool::{
-        Pool, PoolType,
-    },
-    table::{
-        TABLES,
-    },
+    challenge::{Challenge},
+    config::{TokenConfig},
+    table::{TableScoreboard},
+    pool::{Pool, PoolType},
+    table::{TABLES},
 };
 
 // use pistols::interfaces::dns::{DnsTrait};

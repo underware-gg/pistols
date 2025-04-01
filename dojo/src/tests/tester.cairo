@@ -23,6 +23,7 @@ pub mod tester {
             duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
             duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
             pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
+            tournament_token::{tournament_token, ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait},
             fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
             fools_coin::{fools_coin, IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait},
             lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
@@ -170,16 +171,17 @@ pub mod tester {
     const TIMESTEP: u64 = 0x1;
 
     pub mod FLAGS {
-        pub const GAME: u16     = 0b1;
-        pub const ADMIN: u16    = 0b10;
-        pub const LORDS: u16    = 0b100;
-        pub const DUEL: u16     = 0b1000;
-        pub const DUELIST: u16  = 0b10000;
-        pub const APPROVE: u16  = 0b100000;
-        pub const MOCK_RNG: u16 = 0b1000000;
-        pub const TUTORIAL: u16 = 0b10000000;
-        pub const FAME: u16     = 0b100000000;
-        pub const ACCOUNT: u16  = 0b1000000000;
+        pub const GAME: u16       = 0b1;
+        pub const ADMIN: u16      = 0b10;
+        pub const LORDS: u16      = 0b100;
+        pub const DUEL: u16       = 0b1000;
+        pub const DUELIST: u16    = 0b10000;
+        pub const APPROVE: u16    = 0b100000;
+        pub const MOCK_RNG: u16   = 0b1000000;
+        pub const TUTORIAL: u16   = 0b10000000;
+        pub const FAME: u16       = 0b100000000;
+        pub const ACCOUNT: u16    = 0b1000000000;
+        pub const TOURNAMENT: u16 = 0b10000000000;
     }
 
     #[derive(Copy, Drop)]
@@ -196,6 +198,7 @@ pub mod tester {
         pub duels: IDuelTokenDispatcher,
         pub duelists: IDuelistTokenDispatcher,
         pub pack: IPackTokenDispatcher,
+        pub tournament: ITournamentTokenDispatcher,
         pub rng: IRngMockDispatcher,
         pub account: ContractAddress,
     }
@@ -217,6 +220,7 @@ pub mod tester {
                 duels: world.duel_token_dispatcher(),
                 duelists: world.duelist_token_dispatcher(),
                 pack: world.pack_token_dispatcher(),
+                tournament: world.tournament_token_dispatcher(),
                 rng: IRngMockDispatcher{ contract_address: world.rng_address() },
                 account: mock_account,
             })
@@ -234,6 +238,7 @@ pub mod tester {
         let mut approve: bool = (flags & FLAGS::APPROVE) != 0;
         let mut deploy_fame: bool = (flags & FLAGS::FAME) != 0;
         let mut deploy_account: bool = (flags & FLAGS::ACCOUNT) != 0;
+        let mut deploy_tournament: bool = (flags & FLAGS::TOURNAMENT) != 0;
         let mut deploy_bank: bool = false;
         let mut deploy_pack: bool = false;
         let mut deploy_fools: bool = false;
@@ -361,6 +366,18 @@ pub mod tester {
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
                     .with_init_calldata([
                         'http://localhost:3000',
+                    ].span()),
+            );
+        }
+
+        if (deploy_tournament) {
+            resources.append(TestResource::Contract(tournament_token::TEST_CLASS_HASH));
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"tournament_token")
+                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+                    .with_init_calldata([
+                        'http://localhost:3000',
+                        0, // minter_address
                     ].span()),
             );
         }

@@ -15,11 +15,15 @@ mod systems {
     #[cfg(feature:'vrf_mock')]
     pub mod vrf_mock;
     pub mod tokens {
+        // erc721
         pub mod pack_token;
         pub mod duelist_token;
         pub mod duel_token;
+        pub mod tournament_token;
+        // erc20
         pub mod fame_coin;
         pub mod fools_coin;
+        // mocks
         #[cfg(feature:'lords_mock')]
         pub mod lords_mock;
     }
@@ -112,6 +116,7 @@ mod tests {
         pub mod test_duel_token;
         pub mod test_duelist_token;
         pub mod test_pack_token;
+        pub mod test_tournament_token;
         pub mod test_fame_coin;
         pub mod test_fools_coin;
         // mocks

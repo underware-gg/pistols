@@ -8,20 +8,14 @@ use pistols::systems::{
     },
 };
 use pistols::models::{
-    challenge::{
-        Challenge,
-    },
+    challenge::{Challenge},
     duelist::{
         Duelist,
         ProfileType, DuelistProfile, BotProfile,
         DuelistTimestamps,
     },
-    config::{
-        TokenConfig,
-    },
-    table::{
-        TABLES,
-    },
+    config::{TokenConfig},
+    table::{TABLES},
 };
 use pistols::types::{
     challenge_state::{ChallengeState},
@@ -31,7 +25,7 @@ use pistols::types::{
 
 use pistols::tests::tester::{tester,
     tester::{
-            StoreTrait,
+        StoreTrait,
         TestSystems, FLAGS,
         ID, OWNER, OTHER, BUMMER, RECIPIENT, ZERO,
     },

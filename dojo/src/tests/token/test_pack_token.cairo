@@ -9,13 +9,9 @@ use pistols::systems::{
     },
 };
 use pistols::models::{
-    player::{
-        Player, PlayerTrait,
-    },
+    player::{Player, PlayerTrait},
     pack::{Pack, PackType, PackTypeTrait},
-    config::{
-        TokenConfig,
-    },
+    config::{TokenConfig},
     table::{TABLES},
 };
 

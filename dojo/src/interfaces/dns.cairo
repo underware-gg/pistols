@@ -14,6 +14,7 @@ pub use pistols::systems::{
         duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
         pack_token::{IPackTokenDispatcher, IPackTokenDispatcherTrait},
+        tournament_token::{ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait},
         fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait},
         fools_coin::{IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait},
         lords_mock::{ILordsMockDispatcher, ILordsMockDispatcherTrait},
@@ -38,6 +39,7 @@ pub mod SELECTORS {
     pub const DUEL_TOKEN: felt252 = selector_from_tag!("pistols-duel_token");
     pub const DUELIST_TOKEN: felt252 = selector_from_tag!("pistols-duelist_token");
     pub const PACK_TOKEN: felt252 = selector_from_tag!("pistols-pack_token");
+    pub const TOURNAMENT_TOKEN: felt252 = selector_from_tag!("pistols-tournament_token");
     pub const FAME_COIN: felt252 = selector_from_tag!("pistols-fame_coin");
     pub const FOOLS_COIN: felt252 = selector_from_tag!("pistols-fools_coin");
     // mocks
@@ -116,6 +118,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn pack_token_address(self: @WorldStorage) -> ContractAddress {
         (self.find_contract_address(@"pack_token"))
+    }
+    #[inline(always)]
+    fn tournament_token_address(self: @WorldStorage) -> ContractAddress {
+        (self.find_contract_address(@"tournament_token"))
     }
     #[inline(always)]
     fn fame_coin_address(self: @WorldStorage) -> ContractAddress {
@@ -199,6 +205,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn pack_token_dispatcher(self: @WorldStorage) -> IPackTokenDispatcher {
         (IPackTokenDispatcher{ contract_address: self.pack_token_address() })
+    }
+    #[inline(always)]
+    fn tournament_token_dispatcher(self: @WorldStorage) -> ITournamentTokenDispatcher {
+        (ITournamentTokenDispatcher{ contract_address: self.tournament_token_address() })
     }
     #[inline(always)]
     fn fame_coin_dispatcher(self: @WorldStorage) -> IFameCoinDispatcher {
