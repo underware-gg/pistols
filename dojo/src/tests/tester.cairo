@@ -331,7 +331,6 @@ pub mod tester {
                     .with_init_calldata([
                         'http://localhost:3000',
                         0, // minter_address
-                        0, // fee_amount
                     ].span())
             );
         }

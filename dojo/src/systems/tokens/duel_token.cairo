@@ -231,7 +231,6 @@ pub mod duel_token {
         ref self: ContractState,
         base_uri: felt252,
         minter_address: ContractAddress,
-        fee_amount: u128,
     ) {
         self.erc721_combo.initializer(
             TOKEN_NAME(),

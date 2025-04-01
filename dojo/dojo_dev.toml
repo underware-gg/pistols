@@ -77,7 +77,6 @@ default = "pistols"
   # "sstr:http://localhost:3000", # base_uri
   "sstr:https://assets.underware.gg", # base_uri
   "0x0", # minter_address
-  "0", # fee_amount
 ]
 "pistols-duelist_token" = [
   # "sstr:http://localhost:3000", # base_uri
