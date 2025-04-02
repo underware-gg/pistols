@@ -563,6 +563,7 @@ pub mod game {
                 },
                 Option::None => {}
             }
+            challenge.season_id = store.get_current_season_id();
             challenge.timestamps.end = starknet::get_block_timestamp();
             store.set_challenge(@challenge);
             //end round
@@ -612,9 +613,8 @@ pub mod game {
             store.set_duelist(@duelist_b);
 
             // per season score
-            let season_id: u128 = store.get_current_season_id();
-            let mut scoreboard_a: SeasonScoreboard = store.get_scoreboard(season_id, (*challenge).duelist_id_a.into());
-            let mut scoreboard_b: SeasonScoreboard = store.get_scoreboard(season_id, (*challenge).duelist_id_b.into());
+            let mut scoreboard_a: SeasonScoreboard = store.get_scoreboard(*challenge.season_id, (*challenge).duelist_id_a.into());
+            let mut scoreboard_b: SeasonScoreboard = store.get_scoreboard(*challenge.season_id, (*challenge).duelist_id_b.into());
             scoreboard_a.apply_rewards(@rewards_a);
             scoreboard_b.apply_rewards(@rewards_b);
             // save
@@ -622,7 +622,7 @@ pub mod game {
             store.set_scoreboard(@scoreboard_b);
 
             // update leaderboards
-            let mut leaderboard: Leaderboard = store.get_leaderboard(season_id);
+            let mut leaderboard: Leaderboard = store.get_leaderboard(*challenge.season_id);
             rewards_a.position = leaderboard.insert_score(*challenge.duelist_id_a, scoreboard_a.points);
             rewards_b.position = leaderboard.insert_score(*challenge.duelist_id_b, scoreboard_b.points);
             if (rewards_a.position != 0 || rewards_b.position != 0) {

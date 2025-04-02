@@ -108,6 +108,7 @@ mod tests {
         assert_eq!(ch.duelist_id_b, 0, "challenged_id"); // challenged an address, id is empty
         assert_eq!(ch.quote, PREMISE_1, "quote");
         assert_eq!(ch.lives_staked, 1, "lives_staked");
+        assert_eq!(ch.season_id, 0, "season_id_ZERO");
         assert_eq!(ch.timestamps.start, timestamp, "timestamps.start");
         assert_eq!(ch.timestamps.end, timestamp + TIMESTAMP::ONE_DAY, "timestamps.end");
         _assert_empty_progress(@sys, duel_id);
@@ -218,6 +219,7 @@ mod tests {
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, new_state, "state");
         assert_eq!(ch.winner, 0, "winner");
+        assert_eq!(ch.season_id, sys.store.get_current_season_id(), "season_id");
         assert_gt!(ch.timestamps.start, 0, "timestamps.start");
         assert_eq!(ch.timestamps.end, timestamp, "timestamps.end");
 
@@ -244,6 +246,7 @@ mod tests {
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, ChallengeState::Expired, "i");
         assert_eq!(ch.winner, 0, "winner");
+        assert_eq!(ch.season_id, sys.store.get_current_season_id(), "season_id");
         assert_gt!(ch.timestamps.start, 0, "timestamps.start");
         assert_eq!(ch.timestamps.end, timestamp, "timestamps.end");
 
@@ -299,6 +302,7 @@ mod tests {
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, new_state, "state");
         assert_eq!(ch.winner, 0, "winner");
+        assert_eq!(ch.season_id, sys.store.get_current_season_id(), "season_id");
         assert_lt!(ch.timestamps.start, timestamp, "timestamps.start");
         assert_eq!(ch.timestamps.end, timestamp, "timestamps.end");
 
@@ -340,6 +344,7 @@ mod tests {
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.state, new_state, "state");
         assert_eq!(ch.winner, 0, "winner");
+        assert_eq!(ch.season_id, sys.store.get_current_season_id(), "season_id");
         assert_lt!(ch.timestamps.start, timestamp, "timestamps.start");
         assert_eq!(ch.timestamps.end, timestamp, "timestamps.end");
         tester::assert_pact(@sys, duel_id, ch, false, false, "replied");
@@ -373,10 +378,12 @@ mod tests {
         assert_eq!(ch.address_b, B, "challenged");
         assert_eq!(ch.duelist_id_a, ID(A), "challenger_id");
         assert_eq!(ch.duelist_id_b, 0, "challenged_id"); // challenged an address, id is empty
+        assert_eq!(ch.season_id, 0, "season_id_ZERO");
         tester::assert_pact(@sys, duel_id, ch, true, false, "created");
         // reply...
         let new_state: ChallengeState = tester::execute_reply_duel(@sys.duels, B, ID(B), duel_id, true);
         assert_eq!(new_state, ChallengeState::InProgress, "in_progress");
+        assert_eq!(ch.season_id, 0, "season_id_STILL_ZERO");
         let ch = sys.store.get_challenge_value(duel_id);
         assert_eq!(ch.duelist_id_b, ID(B), "challenged_id_ok");   // << UPDATED!!!
         tester::assert_pact(@sys, duel_id, ch, true, true, "replied");
@@ -441,6 +448,7 @@ mod tests {
         assert_eq!(ch.state, ChallengeState::InProgress, "state");
         assert_eq!(ch.address_b, B, "challenged");
         assert_eq!(ch.duelist_id_b, ID(B), "challenged_id");
+        assert_eq!(ch.season_id, 0, "season_id_ZERO");
         tester::assert_pact(@sys, duel_id, ch, true, true, "replied");
         // token_uri
         assert_ne!(sys.duels.token_uri(duel_id.into()), "", "duels.token_uri()");

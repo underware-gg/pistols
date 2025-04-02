@@ -324,6 +324,7 @@ pub mod duel_token {
                 premise,
                 quote,
                 lives_staked: core::cmp::max(lives_staked, 1),
+                tournament_id: 0,
                 // duelists
                 address_a,
                 address_b,
@@ -331,8 +332,9 @@ pub mod duel_token {
                 duelist_id_b: 0,
                 // progress
                 state: ChallengeState::Awaiting,
+                season_id: 0,
                 winner: 0,
-                // times
+                // timestamps
                 timestamps,
             };
             store.set_challenge(@challenge);
@@ -444,6 +446,7 @@ pub mod duel_token {
 
             // duel canceled!
             if (challenge.state.is_canceled()) {
+                challenge.season_id = store.get_current_season_id();
                 challenge.timestamps.end = timestamp;
                 challenge.unset_pact(ref store);
                 store.exit_challenge(challenge.duelist_id_a);

@@ -148,6 +148,7 @@ fn test_token_uri() {
         premise: Premise::Honour,
         quote: 'For honour!!!',
         lives_staked: 1,
+        tournament_id: 0,
         // duelists
         address_a: OWNER(),
         address_b: OTHER()  ,
@@ -155,6 +156,7 @@ fn test_token_uri() {
         duelist_id_b: ID(OTHER()),
         // progress
         state: ChallengeState::Resolved,
+        season_id: 0,
         winner: 1,
         // times
         timestamps: Period {

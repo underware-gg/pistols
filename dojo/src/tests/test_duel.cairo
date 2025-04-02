@@ -124,6 +124,7 @@ mod tests {
 // round.state_b.health.print();
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
         assert_eq!(challenge.winner, 0, "challenge.winner");
+        assert_eq!(challenge.season_id, sys.store.get_current_season_id(), "challenge_season_id");
         assert_eq!(round.state, RoundState::Finished, "round.state");
         assert_eq!(round.state_a.health, final_health, "round.moves_a.health");
         assert_eq!(round.state_b.health, final_health, "round.moves_b.health");
@@ -265,6 +266,7 @@ mod tests {
 // round.state_b.health.print();
         assert_eq!(challenge.state, ChallengeState::Resolved, "4_challenge.state");
         assert_ne!(challenge.winner, 0, "4_challenge.winner");
+        assert_eq!(challenge.season_id, sys.store.get_current_season_id(), "challenge_season_id");
         assert_gt!(challenge.timestamps.end, 0, "4_challenge.timestamps.end");
         assert_eq!(round.state, RoundState::Finished, "4__state");
         assert_eq!(round.moves_a.hashed, moves_a.hashed, "43__hash");
@@ -366,6 +368,7 @@ mod tests {
         let (challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
         assert_eq!(challenge.state, ChallengeState::Resolved, "challenge.state ++");
         assert_ne!(challenge.winner, 0, "challenge.winner ++");
+        assert_eq!(challenge.season_id, sys.store.get_current_season_id(), "challenge_season_id ++");
         assert_gt!(challenge.timestamps.end, 0, "challenge.timestamps.end ++");
         assert_eq!(round.state, RoundState::Finished, "state ++");
         assert_eq!(round.state_a.honour, (*moves_a.moves[0] * 10).try_into().unwrap(), "round.state_a.honour ++");
@@ -916,6 +919,7 @@ mod tests {
         } else {
             assert_eq!(challenge.state, ChallengeState::Resolved, "_assert_timed_out: ChallengeState::Resolved");
         }
+        assert_eq!(challenge.season_id, sys.store.get_current_season_id(), "_assert_timed_out: challenge_season_id");
         assert_eq!(round.state, RoundState::Finished, "_assert_timed_out: round.state");
         assert_eq!(round.final_blow, FinalBlow::Forsaken, "_assert_timed_out: round.final_blow");
         tester::assert_pact(sys, duel_id, challenge, false, false, "_assert_timed_out");
@@ -964,6 +968,7 @@ mod tests {
         // finished
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
+        assert_eq!(challenge.season_id, sys.store.get_current_season_id(), "challenge_season_id");
     }
 
     #[test]
@@ -1009,6 +1014,7 @@ mod tests {
         // finished
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
+        assert_eq!(challenge.season_id, sys.store.get_current_season_id(), "challenge_season_id");
     }
 
     #[test]
