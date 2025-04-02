@@ -489,5 +489,11 @@ mod tests {
         tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, true);
     }
 
+    #[test]
+    #[should_panic(expected:('DUEL: Invalid duel type', 'ENTRYPOINT_FAILED'))]
+    fn test_tutorial_on_production() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Tutorial, 0, 1);
+    }
 
 }

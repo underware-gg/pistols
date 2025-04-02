@@ -199,6 +199,7 @@ pub mod duel_token {
         pub const INVALID_DUELIST_A_NULL: felt252   = 'DUEL: Duelist A null';
         pub const INVALID_DUELIST_B_NULL: felt252   = 'DUEL: Duelist B null';
         pub const INVALID_CHALLENGED_SELF: felt252  = 'DUEL: Challenged self';
+        pub const INVALID_DUEL_TYPE: felt252        = 'DUEL: Invalid duel type';
         pub const INVALID_REPLY_SELF: felt252       = 'DUEL: Reply self';
         pub const INVALID_CHALLENGE: felt252        = 'DUEL: Invalid challenge';
         pub const NOT_YOUR_CHALLENGE: felt252       = 'DUEL: Not your challenge';
@@ -299,11 +300,23 @@ pub mod duel_token {
             // assert(address_b.is_non_zero(), Errors::INVALID_CHALLENGED); // allow open challenge
             assert(address_b != address_a, Errors::INVALID_CHALLENGED_SELF);
 
-            // TODO...
-            // if (tournament_id != 0) {
-            //     assert(tournament.can_join(address_a, 0), Errors::CHALLENGED_NOT_ADMITTED);
-            //     assert(tournament.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
-            // }
+            // validate duel type
+            match duel_type {
+                DuelType::Seasonal | 
+                DuelType::Practice => {}, // ok!
+                DuelType::Undefined | 
+                DuelType::Tutorial => {
+                    // create tutorials with the tutorial contact only
+                    assert(false, Errors::INVALID_DUEL_TYPE);
+                },
+                DuelType::Tournament => {
+// TODO...
+// if (tournament_id != 0) {
+//     assert(tournament.can_join(address_a, 0), Errors::CHALLENGED_NOT_ADMITTED);
+//     assert(tournament.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
+// }
+                },
+            };
 
             // assert duelist is not in a challenge
             store.enter_challenge(duelist_id_a, duel_id);
