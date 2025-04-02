@@ -5,30 +5,34 @@ import { CairoCustomEnum, BigNumberish } from 'starknet';
 // Type definition for `pistols::models::challenge::Challenge` struct
 export interface Challenge {
 	duel_id: BigNumberish;
-	table_id: BigNumberish;
+	duel_type: DuelTypeEnum;
 	premise: PremiseEnum;
 	quote: BigNumberish;
 	lives_staked: BigNumberish;
+	tournament_id: BigNumberish;
 	address_a: string;
 	address_b: string;
 	duelist_id_a: BigNumberish;
 	duelist_id_b: BigNumberish;
 	state: ChallengeStateEnum;
+	season_id: BigNumberish;
 	winner: BigNumberish;
 	timestamps: Period;
 }
 
 // Type definition for `pistols::models::challenge::ChallengeValue` struct
 export interface ChallengeValue {
-	table_id: BigNumberish;
+	duel_type: DuelTypeEnum;
 	premise: PremiseEnum;
 	quote: BigNumberish;
 	lives_staked: BigNumberish;
+	tournament_id: BigNumberish;
 	address_a: string;
 	address_b: string;
 	duelist_id_a: BigNumberish;
 	duelist_id_b: BigNumberish;
 	state: ChallengeStateEnum;
+	season_id: BigNumberish;
 	winner: BigNumberish;
 	timestamps: Period;
 }
@@ -93,7 +97,7 @@ export interface Config {
 	treasury_address: string;
 	lords_address: string;
 	vrf_address: string;
-	season_table_id: BigNumberish;
+	current_season_id: BigNumberish;
 	is_paused: boolean;
 }
 
@@ -102,7 +106,7 @@ export interface ConfigValue {
 	treasury_address: string;
 	lords_address: string;
 	vrf_address: string;
-	season_table_id: BigNumberish;
+	current_season_id: BigNumberish;
 	is_paused: boolean;
 }
 
@@ -145,7 +149,7 @@ export interface DuelistMemorial {
 	killed_by: BigNumberish;
 	fame_before_death: BigNumberish;
 	player_address: string;
-	season_table_id: BigNumberish;
+	season_id: BigNumberish;
 }
 
 // Type definition for `pistols::models::duelist::DuelistMemorialValue` struct
@@ -154,7 +158,7 @@ export interface DuelistMemorialValue {
 	killed_by: BigNumberish;
 	fame_before_death: BigNumberish;
 	player_address: string;
-	season_table_id: BigNumberish;
+	season_id: BigNumberish;
 }
 
 // Type definition for `pistols::models::duelist::DuelistStatus` struct
@@ -182,7 +186,7 @@ export interface DuelistValue {
 
 // Type definition for `pistols::models::leaderboard::Leaderboard` struct
 export interface Leaderboard {
-	table_id: BigNumberish;
+	season_id: BigNumberish;
 	positions: BigNumberish;
 	duelist_ids: BigNumberish;
 	scores: BigNumberish;
@@ -214,7 +218,7 @@ export interface PackValue {
 
 // Type definition for `pistols::models::pact::Pact` struct
 export interface Pact {
-	table_id: BigNumberish;
+	duel_type: DuelTypeEnum;
 	pair: BigNumberish;
 	duel_id: BigNumberish;
 }
@@ -280,41 +284,28 @@ export interface PoolValue {
 
 // Type definition for `pistols::models::season::SeasonConfig` struct
 export interface SeasonConfig {
-	table_id: BigNumberish;
 	season_id: BigNumberish;
+	rules: RulesEnum;
 	phase: SeasonPhaseEnum;
 	period: Period;
 }
 
 // Type definition for `pistols::models::season::SeasonConfigValue` struct
 export interface SeasonConfigValue {
-	season_id: BigNumberish;
+	rules: RulesEnum;
 	phase: SeasonPhaseEnum;
 	period: Period;
 }
 
-// Type definition for `pistols::models::table::TableConfig` struct
-export interface TableConfig {
-	table_id: BigNumberish;
-	description: BigNumberish;
-	rules: RulesTypeEnum;
-}
-
-// Type definition for `pistols::models::table::TableConfigValue` struct
-export interface TableConfigValue {
-	description: BigNumberish;
-	rules: RulesTypeEnum;
-}
-
-// Type definition for `pistols::models::table::TableScoreboard` struct
-export interface TableScoreboard {
-	table_id: BigNumberish;
+// Type definition for `pistols::models::season::SeasonScoreboard` struct
+export interface SeasonScoreboard {
+	season_id: BigNumberish;
 	holder: BigNumberish;
 	points: BigNumberish;
 }
 
-// Type definition for `pistols::models::table::TableScoreboardValue` struct
-export interface TableScoreboardValue {
+// Type definition for `pistols::models::season::SeasonScoreboardValue` struct
+export interface SeasonScoreboardValue {
 	points: BigNumberish;
 }
 
@@ -432,7 +423,7 @@ export interface ChallengeRewardsEventValue {
 
 // Type definition for `pistols::models::events::LordsReleaseEvent` struct
 export interface LordsReleaseEvent {
-	season_table_id: BigNumberish;
+	season_id: BigNumberish;
 	bill: LordsReleaseBill;
 	duel_id: BigNumberish;
 	timestamp: BigNumberish;
@@ -483,6 +474,17 @@ export interface RewardValues {
 	lords_unlocked: BigNumberish;
 	survived: boolean;
 }
+
+// Type definition for `pistols::models::challenge::DuelType` enum
+export const duelType = [
+	'Undefined',
+	'Seasonal',
+	'Tournament',
+	'Tutorial',
+	'Practice',
+] as const;
+export type DuelType = { [key in typeof duelType[number]]: string };
+export type DuelTypeEnum = CairoCustomEnum;
 
 // Type definition for `pistols::models::duelist::CauseOfDeath` enum
 export const causeOfDeath = [
@@ -673,14 +675,13 @@ export const roundState = [
 export type RoundState = { [key in typeof roundState[number]]: string };
 export type RoundStateEnum = CairoCustomEnum;
 
-// Type definition for `pistols::types::rules::RulesType` enum
-export const rulesType = [
+// Type definition for `pistols::types::rules::Rules` enum
+export const rules = [
 	'Undefined',
-	'Academy',
 	'Season',
 ] as const;
-export type RulesType = { [key in typeof rulesType[number]]: string };
-export type RulesTypeEnum = CairoCustomEnum;
+export type Rules = { [key in typeof rules[number]]: string };
+export type RulesEnum = CairoCustomEnum;
 
 // Type definition for `pistols::models::events::Activity` enum
 export const activity = [
@@ -753,10 +754,8 @@ export interface SchemaType extends ISchemaType {
 		PoolValue: PoolValue,
 		SeasonConfig: SeasonConfig,
 		SeasonConfigValue: SeasonConfigValue,
-		TableConfig: TableConfig,
-		TableConfigValue: TableConfigValue,
-		TableScoreboard: TableScoreboard,
-		TableScoreboardValue: TableScoreboardValue,
+		SeasonScoreboard: SeasonScoreboard,
+		SeasonScoreboardValue: SeasonScoreboardValue,
 		TokenBoundAddress: TokenBoundAddress,
 		TokenBoundAddressValue: TokenBoundAddressValue,
 		MockedValue: MockedValue,
@@ -785,7 +784,12 @@ export const schema: SchemaType = {
 	pistols: {
 		Challenge: {
 			duel_id: 0,
-			table_id: 0,
+		duel_type: new CairoCustomEnum({ 
+					Undefined: "",
+				Seasonal: undefined,
+				Tournament: undefined,
+				Tutorial: undefined,
+				Practice: undefined, }),
 		premise: new CairoCustomEnum({ 
 					Undefined: "",
 				Matter: undefined,
@@ -800,6 +804,7 @@ export const schema: SchemaType = {
 				Lesson: undefined, }),
 			quote: 0,
 			lives_staked: 0,
+			tournament_id: 0,
 			address_a: "",
 			address_b: "",
 			duelist_id_a: 0,
@@ -813,11 +818,17 @@ export const schema: SchemaType = {
 				InProgress: undefined,
 				Resolved: undefined,
 				Draw: undefined, }),
+			season_id: 0,
 			winner: 0,
 		timestamps: { start: 0, end: 0, },
 		},
 		ChallengeValue: {
-			table_id: 0,
+		duel_type: new CairoCustomEnum({ 
+					Undefined: "",
+				Seasonal: undefined,
+				Tournament: undefined,
+				Tutorial: undefined,
+				Practice: undefined, }),
 		premise: new CairoCustomEnum({ 
 					Undefined: "",
 				Matter: undefined,
@@ -832,6 +843,7 @@ export const schema: SchemaType = {
 				Lesson: undefined, }),
 			quote: 0,
 			lives_staked: 0,
+			tournament_id: 0,
 			address_a: "",
 			address_b: "",
 			duelist_id_a: 0,
@@ -845,6 +857,7 @@ export const schema: SchemaType = {
 				InProgress: undefined,
 				Resolved: undefined,
 				Draw: undefined, }),
+			season_id: 0,
 			winner: 0,
 		timestamps: { start: 0, end: 0, },
 		},
@@ -911,14 +924,14 @@ export const schema: SchemaType = {
 			treasury_address: "",
 			lords_address: "",
 			vrf_address: "",
-			season_table_id: 0,
+			current_season_id: 0,
 			is_paused: false,
 		},
 		ConfigValue: {
 			treasury_address: "",
 			lords_address: "",
 			vrf_address: "",
-			season_table_id: 0,
+			current_season_id: 0,
 			is_paused: false,
 		},
 		TokenConfig: {
@@ -958,7 +971,7 @@ export const schema: SchemaType = {
 			killed_by: 0,
 			fame_before_death: 0,
 			player_address: "",
-			season_table_id: 0,
+			season_id: 0,
 		},
 		DuelistMemorialValue: {
 		cause_of_death: new CairoCustomEnum({ 
@@ -970,7 +983,7 @@ export const schema: SchemaType = {
 			killed_by: 0,
 			fame_before_death: 0,
 			player_address: "",
-			season_table_id: 0,
+			season_id: 0,
 		},
 		DuelistStatus: {
 			total_duels: 0,
@@ -994,7 +1007,7 @@ export const schema: SchemaType = {
 		status: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 		},
 		Leaderboard: {
-			table_id: 0,
+			season_id: 0,
 			positions: 0,
 			duelist_ids: 0,
 			scores: 0,
@@ -1024,7 +1037,12 @@ export const schema: SchemaType = {
 			is_open: false,
 		},
 		Pact: {
-			table_id: 0,
+		duel_type: new CairoCustomEnum({ 
+					Undefined: "",
+				Seasonal: undefined,
+				Tournament: undefined,
+				Tutorial: undefined,
+				Practice: undefined, }),
 			pair: 0,
 			duel_id: 0,
 		},
@@ -1074,8 +1092,10 @@ export const schema: SchemaType = {
 			balance_fame: 0,
 		},
 		SeasonConfig: {
-			table_id: 0,
 			season_id: 0,
+		rules: new CairoCustomEnum({ 
+					Undefined: "",
+				Season: undefined, }),
 		phase: new CairoCustomEnum({ 
 					Undefined: "",
 				InProgress: undefined,
@@ -1083,34 +1103,21 @@ export const schema: SchemaType = {
 		period: { start: 0, end: 0, },
 		},
 		SeasonConfigValue: {
-			season_id: 0,
+		rules: new CairoCustomEnum({ 
+					Undefined: "",
+				Season: undefined, }),
 		phase: new CairoCustomEnum({ 
 					Undefined: "",
 				InProgress: undefined,
 				Ended: undefined, }),
 		period: { start: 0, end: 0, },
 		},
-		TableConfig: {
-			table_id: 0,
-			description: 0,
-		rules: new CairoCustomEnum({ 
-					Undefined: "",
-				Academy: undefined,
-				Season: undefined, }),
-		},
-		TableConfigValue: {
-			description: 0,
-		rules: new CairoCustomEnum({ 
-					Undefined: "",
-				Academy: undefined,
-				Season: undefined, }),
-		},
-		TableScoreboard: {
-			table_id: 0,
+		SeasonScoreboard: {
+			season_id: 0,
 			holder: 0,
 			points: 0,
 		},
-		TableScoreboardValue: {
+		SeasonScoreboardValue: {
 			points: 0,
 		},
 		TokenBoundAddress: {
@@ -1198,7 +1205,7 @@ export const schema: SchemaType = {
 		rewards: { fame_lost: 0, fame_gained: 0, fools_gained: 0, points_scored: 0, position: 0, fame_burned: 0, lords_unlocked: 0, survived: false, },
 		},
 		LordsReleaseEvent: {
-			season_table_id: 0,
+			season_id: 0,
 		bill: { reason: new CairoCustomEnum({ 
 					Undefined: "",
 				FameLostToCreator: undefined,
@@ -1289,6 +1296,7 @@ export const schema: SchemaType = {
 export enum ModelsMapping {
 	Challenge = 'pistols-Challenge',
 	ChallengeValue = 'pistols-ChallengeValue',
+	DuelType = 'pistols-DuelType',
 	DuelistState = 'pistols-DuelistState',
 	Moves = 'pistols-Moves',
 	Round = 'pistols-Round',
@@ -1328,10 +1336,8 @@ export enum ModelsMapping {
 	SeasonConfig = 'pistols-SeasonConfig',
 	SeasonConfigValue = 'pistols-SeasonConfigValue',
 	SeasonPhase = 'pistols-SeasonPhase',
-	TableConfig = 'pistols-TableConfig',
-	TableConfigValue = 'pistols-TableConfigValue',
-	TableScoreboard = 'pistols-TableScoreboard',
-	TableScoreboardValue = 'pistols-TableScoreboardValue',
+	SeasonScoreboard = 'pistols-SeasonScoreboard',
+	SeasonScoreboardValue = 'pistols-SeasonScoreboardValue',
 	TokenBoundAddress = 'pistols-TokenBoundAddress',
 	TokenBoundAddressValue = 'pistols-TokenBoundAddressValue',
 	MockedValue = 'pistols-MockedValue',
@@ -1346,7 +1352,7 @@ export enum ModelsMapping {
 	DuelistProfile = 'pistols-DuelistProfile',
 	ProfileType = 'pistols-ProfileType',
 	RoundState = 'pistols-RoundState',
-	RulesType = 'pistols-RulesType',
+	Rules = 'pistols-Rules',
 	Period = 'pistols-Period',
 	TrophyCreation = 'achievement-TrophyCreation',
 	TrophyCreationValue = 'achievement-TrophyCreationValue',

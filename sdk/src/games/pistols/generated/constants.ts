@@ -72,6 +72,18 @@ export const getTutorialLevelValue = (name: TutorialLevel): number | undefined =
 export const getTutorialLevelFromValue = (value: number): TutorialLevel | undefined => Object.keys(TutorialLevel)[value] as TutorialLevel;
 export const getTutorialLevelMap = (): Record<TutorialLevel, number> => Object.keys(TutorialLevel).reduce((acc, v, index) => { acc[v as TutorialLevel] = index; return acc; }, {} as Record<TutorialLevel, number>);
 
+// from: ../dojo/src/models/challenge.cairo
+export enum DuelType {
+  Undefined = 'Undefined', // 0
+  Seasonal = 'Seasonal', // 1
+  Tournament = 'Tournament', // 2
+  Tutorial = 'Tutorial', // 3
+  Practice = 'Practice', // 4
+};
+export const getDuelTypeValue = (name: DuelType): number | undefined => _indexOrUndefined(Object.keys(DuelType).indexOf(name));
+export const getDuelTypeFromValue = (value: number): DuelType | undefined => Object.keys(DuelType)[value] as DuelType;
+export const getDuelTypeMap = (): Record<DuelType, number> => Object.keys(DuelType).reduce((acc, v, index) => { acc[v as DuelType] = index; return acc; }, {} as Record<DuelType, number>);
+
 // from: ../dojo/src/models/duelist.cairo
 export enum CauseOfDeath {
   None = 'None', // 0
@@ -395,14 +407,13 @@ export const getRoundStateFromValue = (value: number): RoundState | undefined =>
 export const getRoundStateMap = (): Record<RoundState, number> => Object.keys(RoundState).reduce((acc, v, index) => { acc[v as RoundState] = index; return acc; }, {} as Record<RoundState, number>);
 
 // from: ../dojo/src/types/rules.cairo
-export enum RulesType {
+export enum Rules {
   Undefined = 'Undefined', // 0
-  Academy = 'Academy', // 1
-  Season = 'Season', // 2
+  Season = 'Season', // 1
 };
-export const getRulesTypeValue = (name: RulesType): number | undefined => _indexOrUndefined(Object.keys(RulesType).indexOf(name));
-export const getRulesTypeFromValue = (value: number): RulesType | undefined => Object.keys(RulesType)[value] as RulesType;
-export const getRulesTypeMap = (): Record<RulesType, number> => Object.keys(RulesType).reduce((acc, v, index) => { acc[v as RulesType] = index; return acc; }, {} as Record<RulesType, number>);
+export const getRulesValue = (name: Rules): number | undefined => _indexOrUndefined(Object.keys(Rules).indexOf(name));
+export const getRulesFromValue = (value: number): Rules | undefined => Object.keys(Rules)[value] as Rules;
+export const getRulesMap = (): Record<Rules, number> => Object.keys(Rules).reduce((acc, v, index) => { acc[v as Rules] = index; return acc; }, {} as Record<Rules, number>);
 
 // from: ../dojo/src/types/trophies.cairo
 export enum Trophy {
@@ -562,12 +573,13 @@ type type_SELECTORS = {
   DUEL_TOKEN: bigint, // cairo: felt252
   DUELIST_TOKEN: bigint, // cairo: felt252
   PACK_TOKEN: bigint, // cairo: felt252
+  TOURNAMENT_TOKEN: bigint, // cairo: felt252
   FAME_COIN: bigint, // cairo: felt252
   FOOLS_COIN: bigint, // cairo: felt252
   LORDS_MOCK: bigint, // cairo: felt252
   VR_MOCK: bigint, // cairo: felt252
   CONFIG: bigint, // cairo: felt252
-  TABLE_CONFIG: bigint, // cairo: felt252
+  SEASON_CONFIG: bigint, // cairo: felt252
   TOKEN_CONFIG: bigint, // cairo: felt252
   COIN_CONFIG: bigint, // cairo: felt252
 };
@@ -580,12 +592,13 @@ export const SELECTORS: type_SELECTORS = {
   DUEL_TOKEN: BigInt('0x0670a5c673ac776e00e61c279cf7dc0efbe282787f4d719498e55643c5116063'), // selector_from_tag!("pistols-duel_token")
   DUELIST_TOKEN: BigInt('0x045c96d20393520c5dffeb2f2929fb599034d4fc6e9d423e6a641222fb60a25e'), // selector_from_tag!("pistols-duelist_token")
   PACK_TOKEN: BigInt('0x03d74e76192285c5a19a63c54a6c2ba5b015a1a25818c2d8f9cf75d7fef2b5c1'), // selector_from_tag!("pistols-pack_token")
+  TOURNAMENT_TOKEN: BigInt('0x04ca33d8b161f957a982bee3486b9a85c5bc5de8baf22be1f987b3471e5c0b9c'), // selector_from_tag!("pistols-tournament_token")
   FAME_COIN: BigInt('0x0371b95cb7056eb2d21819662e973ed32c345c989aa9f6097e7811a5665a0b0a'), // selector_from_tag!("pistols-fame_coin")
   FOOLS_COIN: BigInt('0x058070034702ab2b03c2911459d7299e63048e70e3d41f77e1d806b4cb8f2dcd'), // selector_from_tag!("pistols-fools_coin")
   LORDS_MOCK: BigInt('0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788'), // selector_from_tag!("pistols-lords_mock")
   VR_MOCK: BigInt('0x07d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e'), // selector_from_tag!("pistols-vrf_mock")
   CONFIG: BigInt('0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392'), // selector_from_tag!("pistols-Config")
-  TABLE_CONFIG: BigInt('0x01e8368fc88328662c92a11c0e739bf8b74bcd77a20071d2641a31e1a063c138'), // selector_from_tag!("pistols-TableConfig")
+  SEASON_CONFIG: BigInt('0x0407b92d935dd7193931243082059cb7180309a73de27eea948ffa0649f6ebf3'), // selector_from_tag!("pistols-SeasonConfig")
   TOKEN_CONFIG: BigInt('0x056ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed'), // selector_from_tag!("pistols-TokenConfig")
   COIN_CONFIG: BigInt('0x026fad4dff063a4f2c3b3889723194b9bdbbbf833e44ff2d573af01741b966ac'), // selector_from_tag!("pistols-CoinConfig")
 };
@@ -640,16 +653,6 @@ type type_PlayerErrors = {
 };
 export const PlayerErrors: type_PlayerErrors = {
   PLAYER_NOT_REGISTERED: 'PLAYER: Not registered',
-};
-
-// from: ../dojo/src/models/table.cairo
-type type_TABLES = {
-  TUTORIAL: string, // cairo: felt252
-  PRACTICE: string, // cairo: felt252
-};
-export const TABLES: type_TABLES = {
-  TUTORIAL: 'Tutorial',
-  PRACTICE: 'Practice',
 };
 
 // from: ../dojo/src/types/cards/blades.cairo
