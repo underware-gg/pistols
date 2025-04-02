@@ -372,7 +372,7 @@ pub mod pack_token {
                 token_id,
                 name: format!("{} #{}", pack.pack_type.name(), token_id),
                 description: format!("Pistols at Dawn Pack #{}. https://pistols.gg", token_id),
-                image: format!("{}/pistols{}", base_uri, pack.pack_type.image_url(pack.is_open)),
+                image: Option::Some(format!("{}/pistols{}", base_uri, pack.pack_type.image_url(pack.is_open))),
                 image_data: Option::None,
                 external_url: Option::Some(METADATA::EXTERNAL_LINK()), // TODO: format external token link
                 background_color: Option::Some("000000"),

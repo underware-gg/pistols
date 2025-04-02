@@ -38,7 +38,7 @@ source = "git+https://github.com/rsodre/graffiti?rev=url#e8b0854798ebbcebde504ea
 [[package]]
 name = "nft_combo"
 version = "0.2.2"
-source = "git+https://github.com/underware-gg/cairo-nft-combo?tag=v0.2.2#20cb45b5b7c1d342342ff755cec1713bfd22598a"
+source = "git+https://github.com/underware-gg/cairo-nft-combo?tag=v1.0.0#91133761e85e5d964a4ca8b82211769b8673e73a"
 dependencies = [
  "graffiti",
  "openzeppelin_introspection",
@@ -47,16 +47,17 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_access"
-version = "0.20.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
+version = "1.0.0"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts?tag=v1.0.0#755ce1adbf8d89ed23fbb8daa328fcbeab7c6424"
 dependencies = [
  "openzeppelin_introspection",
+ "openzeppelin_utils",
 ]
 
 [[package]]
 name = "openzeppelin_account"
-version = "0.20.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
+version = "1.0.0"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts?tag=v1.0.0#755ce1adbf8d89ed23fbb8daa328fcbeab7c6424"
 dependencies = [
  "openzeppelin_introspection",
  "openzeppelin_utils",
@@ -64,13 +65,13 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_introspection"
-version = "0.20.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
+version = "1.0.0"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts?tag=v1.0.0#755ce1adbf8d89ed23fbb8daa328fcbeab7c6424"
 
 [[package]]
 name = "openzeppelin_token"
-version = "0.20.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
+version = "1.0.0"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts?tag=v1.0.0#755ce1adbf8d89ed23fbb8daa328fcbeab7c6424"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_account",
@@ -80,8 +81,8 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_utils"
-version = "0.20.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts?tag=v0.20.0#7756fd1de2b4ebd239fa6e372d75535cea02e5e5"
+version = "1.0.0"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts?tag=v1.0.0#755ce1adbf8d89ed23fbb8daa328fcbeab7c6424"
 
 [[package]]
 name = "pistols"

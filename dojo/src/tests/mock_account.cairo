@@ -1,5 +1,5 @@
 // from:
-// https://github.com/OpenZeppelin/cairo-contracts/blob/release-v0.20.0/packages/test_common/src/mocks/account.cairo
+// https://github.com/OpenZeppelin/cairo-contracts/blob/release-v1.0.0/packages/test_common/src/mocks/account.cairo
 
 #[starknet::contract(account)]
 pub mod DualCaseAccountMock {

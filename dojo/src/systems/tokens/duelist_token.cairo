@@ -746,7 +746,7 @@ pub mod duelist_token {
                 token_id,
                 name: format!("{} #{}", duelist.profile_type.name(), token_id),
                 description: format!("Pistols at Dawn Duelist #{}. https://pistols.gg", token_id),
-                image,
+                image: Option::Some(image),
                 image_data: Option::None,
                 external_url: Option::Some(METADATA::EXTERNAL_LINK()), // TODO: format external token link
                 background_color: Option::Some("000000"),
