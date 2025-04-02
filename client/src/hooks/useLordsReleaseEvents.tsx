@@ -3,15 +3,16 @@ import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware/pistols-sd
 import { useSdkStateEventsGet, formatQueryValue, getEntityModel } from '@underware/pistols-sdk/dojo'
 import { feltToString, parseCustomEnum, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
 import { models, constants } from '@underware/pistols-sdk/pistols/gen'
+import { BigNumberish } from 'starknet'
 
-export const useLordsReleaseEvents = (season_table_id: string) => {
+export const useLordsReleaseEvents = (season_id: BigNumberish) => {
   const query = useMemo<PistolsQueryBuilder>(() => (
-    (Boolean(season_table_id))
+    (Boolean(season_id))
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().keys(
             ["pistols-LordsReleaseEvent"],
-            [formatQueryValue(stringToFelt(season_table_id))]
+            [formatQueryValue(season_id)]
           ).build()
         )
         .withEntityModels(
@@ -20,7 +21,7 @@ export const useLordsReleaseEvents = (season_table_id: string) => {
         .withLimit(1000)
         .includeHashedKeys()
       : null
-  ), [season_table_id])
+  ), [season_id])
 
   const { entities } = useSdkStateEventsGet({
     query,
@@ -35,7 +36,7 @@ export const useLordsReleaseEvents = (season_table_id: string) => {
     events.map(e => {
       const { variant, value } = parseCustomEnum<constants.ReleaseReason>(e.bill.reason)
       const bill = {
-        seasonId: feltToString(e.season_table_id),
+        seasonId: feltToString(e.season_id),
         duelistId: BigInt(e.bill.duelist_id),
         duelId: BigInt(e.duel_id ?? 0),
         timestamp: Number(e.timestamp),

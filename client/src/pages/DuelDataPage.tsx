@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Container, Divider, Table } from 'semantic-ui-react'
 import { useGetChallenge } from '/src/stores/challengeStore'
 import { useDuel } from '/src/hooks/useDuel'
 import { useDuelist } from '/src/stores/duelistStore'
-import { useTable } from '/src/stores/tableStore'
+import { useCurrentSeason } from '../stores/seasonStore'
 import { useRouteSlugs } from '/src/hooks/useRoute'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
@@ -46,7 +46,7 @@ function Stats({
 }: {
   duelId: bigint
 }) {
-  const { challenge: { tableId }, round1 } = useDuel(duelId)
+  const { round1 } = useDuel(duelId)
 
   const challenge = useGetChallenge(duelId)
 
@@ -75,7 +75,9 @@ function DuelStats({
   duelId: bigint
 }) {
   const { challenge } = useDuel(duelId)
-  const { description } = useTable(challenge.tableId)
+  const { seasonName: currentSeasonName } = useCurrentSeason()
+  const seasonDescription = useMemo(() => (challenge.seasonName ?? currentSeasonName), [challenge.seasonName, currentSeasonName])
+
   const { nameAndId: nameA } = useDuelist(challenge.duelistIdA)
   const { nameAndId: nameB } = useDuelist(challenge.duelistIdB)
 
@@ -126,9 +128,9 @@ function DuelStats({
           </Cell>
         </Row>
         <Row>
-          <Cell>Table</Cell>
+          <Cell>Season</Cell>
           <Cell>
-            {challenge.tableId} ({description})
+            {seasonDescription}
           </Cell>
         </Row>
         <Row>

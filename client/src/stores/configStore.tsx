@@ -23,15 +23,15 @@ export const useConfig = () => {
   // useEffect(() => console.log(`useConfig() =>`, config), [config])
 
   const isPaused = useMemo(() => (config?.is_paused ?? false), [config])
-  const seasonTableId = useMemo(() => (config ? feltToString(config.season_table_id) : null), [config])
+  const currentSeasonId = useMemo(() => (config ? Number(config.current_season_id) : undefined), [config])
 
-  const treasuryAddress = useMemo(() => (config ? BigInt(config.treasury_address) : null), [config])
-  const lordsAddress = useMemo(() => (config ? BigInt(config.lords_address) : null), [config])
-  const vrfAddress = useMemo(() => (config ? BigInt(config.vrf_address) : null), [config])
+  const treasuryAddress = useMemo(() => (config ? BigInt(config.treasury_address) : undefined), [config])
+  const lordsAddress = useMemo(() => (config ? BigInt(config.lords_address) : undefined), [config])
+  const vrfAddress = useMemo(() => (config ? BigInt(config.vrf_address) : undefined), [config])
 
   return {
     isPaused,
-    seasonTableId,
+    currentSeasonId,
     // accounts
     treasuryAddress,
     lordsAddress,
@@ -39,18 +39,6 @@ export const useConfig = () => {
   }
 }
 
-export const useTableId = () => {
-  const { seasonTableId } = useConfig()
-  const { table_id } = useRouteSlugs()
-  const tableId = useMemo(() => (table_id || seasonTableId), [table_id, seasonTableId])
-  const isSeason = useMemo(() => (seasonTableId && tableId === seasonTableId), [tableId, seasonTableId])
-  const isTutorial = useMemo(() => (tableId === constants.TABLES.TUTORIAL), [tableId])
-  return {
-    tableId,
-    isSeason,
-    isTutorial,
-  }
-}
 
 //----------------------------------------
 // vanilla getter

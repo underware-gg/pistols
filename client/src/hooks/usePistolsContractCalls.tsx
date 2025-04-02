@@ -61,14 +61,14 @@ export type RewardValues = {
   }
 }
 
-export const useCalcSeasonReward = (table_id: string, duelist_id: BigNumberish, lives_staked: BigNumberish) => {
+export const useCalcSeasonReward = (season_id: number, duelist_id: BigNumberish, lives_staked: BigNumberish) => {
   const { game: { calcSeasonReward } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: calcSeasonReward,
-    args: [stringToFelt(table_id), BigInt(duelist_id ?? 0), BigInt(lives_staked ?? 1)],
-    enabled: Boolean(table_id) && isPositiveBigint(duelist_id) && isPositiveBigint(lives_staked),
+    args: [BigInt(season_id), BigInt(duelist_id ?? 0), BigInt(lives_staked ?? 1)],
+    enabled: isPositiveBigint(season_id) && isPositiveBigint(duelist_id) && isPositiveBigint(lives_staked),
     defaultValue: null,
-  }), [table_id, duelist_id, lives_staked])
+  }), [season_id, duelist_id, lives_staked])
   const { value, isLoading } = useSdkCallPromise<any>(options)
   const rewards = useMemo<RewardValues>(() => (value ? {
     win: {
@@ -157,37 +157,21 @@ export const useTutorialDuelId = (player_id: BigNumberish, tutorial_id: BigNumbe
 // duel_token
 //
 
-export const useCanJoin = (table_id: string, duelist_id: BigNumberish) => {
-  const { duel_token: { canJoin } } = useDojoContractCalls()
-  const { address } = useAccount()
-  const options = useMemo(() => ({
-    call: canJoin,
-    args: [stringToFelt(table_id), BigInt(duelist_id ?? 0)],
-    enabled: Boolean(table_id) && isPositiveBigint(address) && isPositiveBigint(duelist_id),
-    defaultValue: null,
-  }), [address, table_id, duelist_id])
-  const { value, isLoading } = useSdkCallPromise<boolean>(options)
-  return {
-    canJoin: value,
-    isLoading
-  }
-}
-
-export const useCalcFeeDuel = (table_id: string) => {
-  // const { duel_token: { calcMintFee } } = useDojoContractCalls()
+export const useCanJoin = (season_id: number, duelist_id: BigNumberish) => {
+  // const { duel_token: { canJoin } } = useDojoContractCalls()
+  // const { address } = useAccount()
   // const options = useMemo(() => ({
-  //   call: calcMintFee,
-  //   args: [stringToFelt(table_id)],
-  //   enabled: Boolean(table_id),
+  //   call: canJoin,
+  //   args: [BigInt(season_id ?? 0), BigInt(duelist_id ?? 0)],
+  //   enabled: isPositiveBigint(season_id) && isPositiveBigint(address) && isPositiveBigint(duelist_id),
   //   defaultValue: null,
-  // }), [table_id])
-  // const { value, isLoading } = useSdkCallPromise<bigint>(options)
+  // }), [address, season_id, duelist_id])
+  // const { value, isLoading } = useSdkCallPromise<boolean>(options)
   return {
-    fee: 0n,
+    canJoin: true,
     isLoading: false,
   }
 }
-
 
 
 //------------------------------------------

@@ -123,11 +123,12 @@ function Profiles({
       const duel_prop: duel_token.DuelSvgProps = {
         // base_uri: 'https://localhost:5173',
         duel_id: Math.floor(Math.random() * 1000),
-        table_id: 'Season1',
+        duel_type: constants.DuelType.Seasonal,
         premise: _randomPremise(),
         quote: _randomQuote(),
         state,
         winner,
+        season_id: 1,
         profile_type_a: prop.profile_type,
         profile_type_b: props[nextProfileIndex].prop.profile_type,
         profile_id_a: prop.profile_id,

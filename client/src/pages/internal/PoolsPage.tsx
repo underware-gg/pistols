@@ -180,8 +180,8 @@ function Pools() {
   const poolFamePeg = usePool(constants.PoolType.FamePeg)
   const poolSacredFlame = usePool(constants.PoolType.SacredFlame)
 
-  const { seasonTableId } = useConfig()
-  const poolSeason = useSeasonPool(seasonTableId)
+  const { currentSeasonId } = useConfig()
+  const poolSeason = useSeasonPool(currentSeasonId)
 
   const poolTotalLords = useMemo(() => (
     poolPurchases.balanceLords + poolFamePeg.balanceLords + poolSacredFlame.balanceLords + poolSeason.balanceLords

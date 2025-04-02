@@ -3,14 +3,7 @@ import { useDojoSetup, useSdkTokenBalancesSub } from '@underware/pistols-sdk/doj
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenStore } from '/src/stores/tokenStore'
 import { fetchNewTokenBoundCoins, useCoinStore } from '/src/stores/coinStore'
-import {
-  useDuelistTokenContract,
-  useDuelTokenContract,
-  usePackTokenContract,
-  useFameContract,
-  useFoolsContract,
-  useLordsContract,
-} from '/src/hooks/useTokenContract'
+import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import * as torii from '@dojoengine/torii-client'
 
@@ -19,31 +12,36 @@ export function TokenStoreSync() {
   const token_state = useTokenStore((state) => state)
   const coin_state = useCoinStore((state) => state)
 
-  // get token contracts
-  const { duelistContractAddress } = useDuelistTokenContract()
-  const { duelContractAddress } = useDuelTokenContract()
-  const { packContractAddress } = usePackTokenContract()
-  const token_contracts = useMemo(() => [
-    bigintToHex(duelistContractAddress),
-    bigintToHex(duelContractAddress),
-    bigintToHex(packContractAddress),
-  ], [duelistContractAddress, duelContractAddress, packContractAddress])
+  const {
+    lordsContractAddress,
+    fameContractAddress,
+    foolsContractAddress,
+    duelistContractAddress,
+    duelContractAddress,
+    packContractAddress,
+    tournamentContractAddress,
+  } = useTokenContracts()
 
   // get coin contracts
-  const { lordsContractAddress } = useLordsContract()
-  const { fameContractAddress } = useFameContract()
-  const { foolsContractAddress } = useFoolsContract()
   const coin_contracts = useMemo(() => [
     bigintToHex(lordsContractAddress),
     bigintToHex(fameContractAddress),
     bigintToHex(foolsContractAddress),
   ], [lordsContractAddress, fameContractAddress, foolsContractAddress])
 
+  // get token contracts
+  const token_contracts = useMemo(() => [
+    bigintToHex(duelistContractAddress),
+    bigintToHex(duelContractAddress),
+    bigintToHex(packContractAddress),
+    bigintToHex(tournamentContractAddress),
+  ], [duelistContractAddress, duelContractAddress, packContractAddress, tournamentContractAddress])
+
   // subscribe for any updates
   const mounted = useMounted()
   const contracts = useMemo(() => [
-    ...token_contracts,
     ...coin_contracts,
+    ...token_contracts,
   ], [token_contracts, coin_contracts])
   useSdkTokenBalancesSub({
     contracts,

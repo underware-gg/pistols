@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { Button, Container, Icon, Table } from 'semantic-ui-react'
-import { useDuelistTokenContract, useDuelTokenContract, usePackTokenContract } from '/src/hooks/useTokenContract'
+import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useTokenIdsOfPlayer } from '/src/stores/tokenStore'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
@@ -83,9 +83,11 @@ function Purchases() {
 }
 
 function Tokens() {
-  const { packContractAddress } = usePackTokenContract()
-  const { duelistContractAddress } = useDuelistTokenContract()
-  const { duelContractAddress } = useDuelTokenContract()
+  const {
+    packContractAddress,
+    duelistContractAddress,
+    duelContractAddress,
+  } = useTokenContracts()
   // useSdkTokenBalancesTest();
   return (
     <>
@@ -247,11 +249,12 @@ function TestImages() {
   const duel_svg = duel_token.renderSvg({
     // base_uri: 'https://localhost:5173',
     duel_id: 16,
-    table_id: 'Table1',
+    duel_type: constants.DuelType.Seasonal,
     premise: constants.Premise.Honour,
     quote: 'Die scum!!!',
     state: constants.ChallengeState.Resolved,
     winner: 1,
+    season_id: 1,
     profile_type_a: constants.ProfileType.Duelist,
     profile_type_b: constants.ProfileType.Bot,
     profile_id_a: 11,

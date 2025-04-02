@@ -10,7 +10,6 @@ export const useRoute = () => {
   return {
     pathname: location.pathname,
     slugs: {
-      table_id: params['table_id'],
       duel_id: params['duel_id'],
     },
   }

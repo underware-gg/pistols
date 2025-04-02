@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, Container, Divider, Tab } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { ConfigForm, TableConfigForm } from '/src/components/admin/TableConfigForm'
+import { ConfigForm } from '/src/components/admin/TableConfigForm'
 import { OwnerForm } from '/src/components/admin/OwnerForm'
 import { AddressShort } from '/src/components/ui/AddressShort'
 import StarknetConnectModal from '/src/components/starknet/StarknetConnectModal'
@@ -32,10 +32,6 @@ export const AdminPanel = ({
           {
             menuItem: 'Config',
             render: () => <ConfigForm />,
-          },
-          {
-            menuItem: 'TableConfig',
-            render: () => <TableConfigForm />,
           },
         ]}>
         </Tab>

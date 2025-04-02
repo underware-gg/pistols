@@ -1,8 +1,8 @@
 import { useSdkEntitiesSub, getEntityModel, filterEntitiesByModel, getEntityModels } from '@underware/pistols-sdk/dojo'
-import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
+import { PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
-import { useTableConfigStore } from '/src/stores/tableStore'
+import { useSeasonConfigStore } from '/src/stores/seasonStore'
 import { useTokenConfigStore } from '/src/stores/tokenConfigStore'
 import { usePlayerStore } from '/src/stores/playerStore'
 import { useDuelistStore } from '/src/stores/duelistStore'
@@ -12,50 +12,11 @@ import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { usePackStore } from '/src/stores/packStore'
 import { useBankStore } from '/src/stores/bankStore'
 
-// const query_get: PistolsQueryBuilder = {
-//   pistols: {
-//     // models
-//     Config: { $: { where: { key: { $eq: constants.CONFIG.CONFIG_KEY } } } },
-//     TableConfig: { $: { where: { table_id: { $neq: 0 } } } },
-//     TokenConfig: { $: { where: { token_address: { $neq: '' } } } },
-//     Player: { $: { where: { player_address: { $neq: '' } } } },
-//     Duelist: { $: { where: { duelist_id: { $neq: 0 } } } },
-//     DuelistChallenge: { $: { where: { duelist_id: { $neq: 0 } } } },
-//     Scoreboard: { $: { where: { holder: { $neq: 0 } } } },
-//   },
-// }
-// const query_get_messages: PistolsQueryBuilder = {
-//   pistols: {
-//     // off-chain signed messages
-//     PlayerOnline: { $: { where: { identity: { $neq: '' } } } },
-//     PlayerBookmark: { $: { where: { identity: { $neq: '' } } } },
-//   },
-// }
-// const query_sub: PistolsQueryBuilder = {
-//   pistols: {
-//     // models
-//     Config: [],
-//     TableConfig: [],
-//     TokenConfig: [],
-//     Player: [],
-//     Duelist: [],
-//     DuelistChallenge: [],
-//     Scoreboard: [],
-//     Challenge: [],
-//     Round: [],
-//     Pack: [],
-//     // off-chain signed messages
-//     PlayerOnline: [],
-//     PlayerBookmark: [],
-//   },
-// }
-
 const _limit = 1000
 const query: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels([
     "pistols-Config",
     "pistols-TokenConfig",
-    "pistols-TableConfig",
     "pistols-SeasonConfig",
     "pistols-Leaderboard",
     "pistols-Player",
@@ -63,7 +24,7 @@ const query: PistolsQueryBuilder = new PistolsQueryBuilder()
     "pistols-DuelistChallenge",
     "pistols-DuelistMemorial",
     "pistols-Challenge",
-    "pistols-Round",
+    'pistols-Round',
     "pistols-Pack",
     "pistols-Pool",
     // off-chain signed messages
@@ -80,7 +41,7 @@ const query: PistolsQueryBuilder = new PistolsQueryBuilder()
 //
 export function EntityStoreSync() {
   const configState = useConfigStore((state) => state)
-  const tableState = useTableConfigStore((state) => state)
+  const seasonState = useSeasonConfigStore((state) => state)
   const tokenState = useTokenConfigStore((state) => state)
   const playerState = usePlayerStore((state) => state)
   const duelistState = useDuelistStore((state) => state)
@@ -99,7 +60,6 @@ export function EntityStoreSync() {
       // console.log("EntityStoreSync() SET =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModel(entities, 'Config'))
       // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModel(entities, 'TokenConfig'))
-      // console.log("EntityStoreSync() SET =======> [TableConfig]:", filterEntitiesByModel(entities, 'TableConfig'))
       // console.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModel(entities, 'SeasonConfig'))
       // console.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModel(entities, 'Leaderboard'))
       // console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
@@ -107,7 +67,7 @@ export function EntityStoreSync() {
       // console.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModel(entities, 'Pool'))
       configState.setEntities(filterEntitiesByModel(entities, 'Config'))
       tokenState.setEntities(filterEntitiesByModel(entities, 'TokenConfig'))
-      tableState.setEntities(filterEntitiesByModel(entities, ['TableConfig', 'SeasonConfig', 'Leaderboard']))
+      seasonState.setEntities(filterEntitiesByModel(entities, ['SeasonConfig', 'Leaderboard']))
       playerState.setEntities(filterEntitiesByModel(entities, 'Player'))
       playerState.updateMessages(filterEntitiesByModel(entities, ['PlayerOnline', 'PlayerBookmark']))
       const duelistEntities = filterEntitiesByModel(entities, ['Duelist', 'DuelistChallenge', 'DuelistMemorial'])
@@ -127,8 +87,8 @@ export function EntityStoreSync() {
       if (getEntityModel(entity, 'TokenConfig')) {
         tokenState.updateEntity(entity)
       }
-      if (getEntityModel(entity, 'TableConfig') || getEntityModel(entity, 'SeasonConfig') || getEntityModel(entity, 'Leaderboard')) {
-        tableState.updateEntity(entity)
+      if (getEntityModel(entity, 'SeasonConfig') || getEntityModel(entity, 'Leaderboard')) {
+        seasonState.updateEntity(entity)
       }
       if (getEntityModel(entity, 'Player')) {
         playerState.updateEntity(entity)
@@ -154,7 +114,7 @@ export function EntityStoreSync() {
   })
 
   // useEffect(() => console.log("EntityStoreSync() [configStore.entities] =>", configState.entities), [configState.entities])
-  // useEffect(() => console.log("EntityStoreSync() [tableStore.entities] =>", tableState.entities), [tableState.entities])
+  // useEffect(() => console.log("EntityStoreSync() [seasonState.entities] =>", seasonState.entities), [seasonState.entities])
   // useEffect(() => console.log("EntityStoreSync() [tokenStore.entities] =>", tokenState.entities), [tokenState.entities])
   // useEffect(() => console.log("EntityStoreSync() [duelistStore.entities] =>", duelistState.entities), [duelistState.entities])
   // useEffect(() => console.log("EntityStoreSync() [playerState.players] =>", playerState.players), [playerState.players])

@@ -12,7 +12,7 @@ import { SceneName } from '/src/data/assets'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { usePact } from '/src/hooks/usePact'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
-import { useTableId } from '/src/stores/configStore'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 //-----------------
 // Generic Action button
@@ -305,9 +305,8 @@ export function ChallengeButton({
   const { dispatchChallengingPlayerAddress, dispatchSelectDuel, duelistSelectOpener } = usePistolsContext()
   const { address } = useAccount()
 
-  const { tableId } = useTableId()
   const { isMyAccount } = useIsMyAccount(challengedPlayerAddress)
-  const { hasPact, pactDuelId } = usePact(tableId, address, challengedPlayerAddress, true)
+  const { hasPact, pactDuelId } = usePact(constants.DuelType.Seasonal, address, challengedPlayerAddress, true)
   const canChallenge = (!hasPact && !isMyAccount)
 
   if (!hasPact) {

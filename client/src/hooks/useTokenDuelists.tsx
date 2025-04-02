@@ -1,11 +1,11 @@
 import { BigNumberish } from 'starknet'
 import { useTokenIdsByAccount, useTokenIdsOfPlayer, useOwnerOfTokenId } from '/src/stores/tokenStore'
-import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
+import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useTokenConfig } from '/src/stores/tokenConfigStore'
 
 
 export const useDuelistTokenCount = () => {
-  const { duelistContractAddress } = useDuelistTokenContract()
+  const { duelistContractAddress } = useTokenContracts()
   const { mintedCount, isLoading } = useTokenConfig(duelistContractAddress)
   return {
     tokenCount: mintedCount ?? 0,
@@ -14,7 +14,7 @@ export const useDuelistTokenCount = () => {
 }
 
 export const useOwnerOfDuelist = (token_id: BigNumberish) => {
-  const { duelistContractAddress } = useDuelistTokenContract()
+  const { duelistContractAddress } = useTokenContracts()
   const { owner, isLoading } = useOwnerOfTokenId(duelistContractAddress, token_id)
   return {
     owner,
@@ -23,7 +23,7 @@ export const useOwnerOfDuelist = (token_id: BigNumberish) => {
 }
 
 export const useDuelistsOfPlayer = () => {
-  const { duelistContractAddress } = useDuelistTokenContract()
+  const { duelistContractAddress } = useTokenContracts()
   const { tokenIds, isLoading } = useTokenIdsOfPlayer(duelistContractAddress)
   return {
     duelistIds: tokenIds,
@@ -32,7 +32,7 @@ export const useDuelistsOfPlayer = () => {
 }
 
 export const useDuelistsOfOwner = (owner: BigNumberish) => {
-  const { duelistContractAddress } = useDuelistTokenContract()
+  const { duelistContractAddress } = useTokenContracts()
   const { tokenIds, isLoading } = useTokenIdsByAccount(duelistContractAddress, owner)
   return {
     duelistIds: tokenIds,

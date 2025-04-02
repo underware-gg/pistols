@@ -4,7 +4,7 @@ import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useStarknetContext, useConnectedController, getConnectorIcon } from '@underware/pistols-sdk/dojo'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
-import { useLordsContract } from '/src/hooks/useTokenContract'
+import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { makeProfilePicUrl, ProfilePic } from '/src/components/account/ProfilePic'
 import { FoolsBalance, LordsBalance } from '/src/components/account/LordsBalance'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
@@ -21,7 +21,7 @@ export default function WalletHeader({
   const { disconnect } = useDisconnect()
   const { account, address, isConnected, connector } = useAccount()
   const { selectedNetworkConfig } = useStarknetContext()
-  const { lordsContractAddress } = useLordsContract()
+  const { lordsContractAddress } = useTokenContracts()
   const { dispatchSetScene } = usePistolsScene()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   const { hasFinishedTutorial } = useSettings()

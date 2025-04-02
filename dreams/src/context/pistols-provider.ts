@@ -45,11 +45,11 @@ Use these to call functions with graphql
         Creates a new Challenge to another player.
       </DESCRIPTION>
       <PARAMETERS>
+        - duel_type: The type of the challenge. Use ${constants.DuelType.Practice} for practice duels.
         - duelist_id: Your duelist ID (the Challenger)
         - challenged_address: The challenged player's wallet address
         - premise: The premise of the challenge see <PREMISE_VALUES>. Always use the "Training" code
         - quote: The quote of the challenge, a string of 31 characters max, encoded as a fetlt252 short string
-        - table_id: The table ID of the challenge. Bots always duel in the "${bigintToHex(stringToFelt(constants.TABLES.PRACTICE))}" table
         - expire_hours: The number of hours before the challenge expires, from 1 to 24
       </PARAMETERS>
       <EXAMPLE>
@@ -57,11 +57,11 @@ Use these to call functions with graphql
             "contractAddress": "${duel_contract?.address ?? '0x0'}",
             "entrypoint": "create_duel",
             "calldata": [
+              "${bigintToHex(constants.DuelType.Practice)}",
               "0x300000001",
               "0x123",
               ${constants.Premise.Lesson},
               "${bigintToHex(stringToFelt("The Quote"))}",
-              "${bigintToHex(stringToFelt(constants.TABLES.PRACTICE))}",
               24
             ]
           }

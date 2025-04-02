@@ -548,6 +548,7 @@ pub mod duel_token {
                 .add("quote", challenge.quote.to_string(), true)
                 .add("state", challenge.state.into(), false)
                 .add("winner", challenge.winner.to_string(), false)
+                .add("season_id", challenge.season_id.to_string(), false)
                 .add("profile_type_a", duelist_a.profile_type.into(), false)
                 .add("profile_type_a", duelist_b.profile_type.into(), false)
                 .add("profile_id_a", duelist_a.profile_type.profile_id().to_string(), false)
@@ -557,6 +558,10 @@ pub mod duel_token {
                 .build();
             // Attributes
             let mut attributes: Array<Attribute> = array![
+                Attribute {
+                    key: "Season",
+                    value: if(challenge.season_id != 0) {challenge.season_id.to_string()} else {"Undefined"},
+                },
                 Attribute {
                     key: "Duel Type",
                     value: challenge.duel_type.into(),

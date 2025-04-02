@@ -14,7 +14,7 @@ import { useIsBookmarked, usePlayer } from '/src/stores/playerStore'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { Grid } from 'semantic-ui-react'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useTable } from '/src/stores/tableStore'
+import { useCurrentSeason } from '/src/stores/seasonStore'
 import { makeDuelDataUrl } from '/src/utils/pistols'
 import { BookmarkIcon, IconClick } from '/src/components/ui/Icons'
 import { ChallengeTime } from '/src/components/ChallengeTime'
@@ -25,7 +25,7 @@ import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
-import { useDuelTokenContract } from '/src/hooks/useTokenContract'
+import { useTokenContracts } from '../hooks/useTokenContracts'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
@@ -81,7 +81,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
 
   const {
     state,
-    tableId,
+    seasonName,
     duelistAddressA,
     duelistAddressB,
     duelistIdA,
@@ -99,7 +99,8 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   } = useChallenge(props.duelId)
   const { canCollectDuel } = useCanCollectDuel(props.duelId)
   const { challengeDescription } = useChallengeDescription(props.duelId)
-  const { description: tableDescription, isSeason, isTutorial } = useTable(tableId)
+  const { seasonName: currentSeasonName } = useCurrentSeason()
+  const seasonDescription = useMemo(() => (seasonName ?? currentSeasonName), [seasonName, currentSeasonName])
 
   useEffect(() => {
     console.log('needToSyncExpired', needToSyncExpired)
@@ -133,7 +134,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
 
   const { isInAction } = useDuelist(challengingDuelistId)
 
-  const { duelContractAddress } = useDuelTokenContract()
+  const { duelContractAddress } = useTokenContracts()
   const { isBookmarked } = useIsBookmarked(duelContractAddress, props.duelId)
   const { publish } = usePlayerBookmarkSignedMessage(duelContractAddress, props.duelId, !isBookmarked)
 
@@ -157,7 +158,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
 
   const _submit = async (duelistId?: BigNumberish, accepted?: boolean) => {
     setIsSubmitting(true)
-    await duel_token.reply_duel(account, duelistId, props.duelId, accepted)
+    await duel_token.reply_duel(account, props.duelId, duelistId, accepted)
     dispatchChallengingDuelistId(0n)
     if (accepted) _gotoDuel()
     setIsSubmitting(false)
@@ -251,13 +252,13 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
               </div>
             </div>
             <div className='TableDescriptionFooter'>
-              {tableDescription}
+              {seasonDescription}
             </div>
           </div>
         ) : (
           <div className='Poster'>
             <div className='TableDescriptionTitle Important'>
-              {tableDescription.toUpperCase()}
+              {seasonDescription.toUpperCase()}
               <IconClick name='database' className='AbsoluteRight' style={{ marginTop: aspectWidth(1.4), marginRight: aspectWidth(1.4) }} size={'small'} onClick={() => window?.open(makeDuelDataUrl(props.duelId), '_blank')} />
             </div>
             <div className='BookmarkSection DuelPoster'>

@@ -17,11 +17,12 @@ import * as constants from '../generated/constants'
 export type DuelSvgProps = {
   // base_uri: string
   duel_id: BigNumberish
-  table_id: string
+  duel_type: constants.DuelType
   premise: constants.Premise
   quote: string
   state: constants.ChallengeState
   winner: number
+  season_id: BigNumberish
   profile_type_a: constants.ProfileType
   profile_type_b: constants.ProfileType
   profile_id_a: number
@@ -151,7 +152,7 @@ ${is_dead_b && `<image href='${getAsset(cardsAssets, card_cross)}' x='${PROFILE_
   Duel #${props.duel_id}
 </text>
 <text class='TITLE RIGHT' x='${NAME_X2}' y='${TITLE_Y}'>
-  ${props.table_id}
+  Season ${props.season_id || '...'}
 </text>
 
 // usernames

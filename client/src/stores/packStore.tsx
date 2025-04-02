@@ -56,23 +56,12 @@ export const usePack = (pack_id: BigNumberish) => {
 
 //-----------------------------------------
 // Fetch new Pack and add to the store
-// (for non default tables, like tutorials)
+// (for non default challenges, like tutorials)
 //
 
 export const useGetPack = (pack_id: number) => {
   const result = usePack(pack_id)
 
-  // const query_get = useMemo<PistolsQueryBuilder>(() => ({
-  //   pistols: {
-  //     Pack: {
-  //       $: {
-  //         where: {
-  //           pack_id: { $eq: formatQueryValue(pack_id) },
-  //         },
-  //       },
-  //     },
-  //   },
-  // }), [pack_id])
   const query = useMemo<PistolsQueryBuilder>(() => (
     isPositiveBigint(pack_id)
       ? new PistolsQueryBuilder()

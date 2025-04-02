@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
-import { useTableId } from '/src/stores/configStore'
 import { formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { stringToFelt } from '@underware/pistols-sdk/utils/starknet'
 import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
+import { useConfig } from '/src/stores/configStore'
 
 const _limit = 1000
 
@@ -14,34 +14,32 @@ const _limit = 1000
 // !!! Add only once to a top level component !!!
 //
 export function ChallengeStoreSync() {
-  const { tableId } = useTableId()
-  // const query_get = useMemo<PistolsQueryBuilder>(() => ({
-  //   pistols: {
-  //     Challenge: {
-  //       $: {
-  //         where: {
-  //           table_id: { $eq: formatQueryValue(stringToFelt(tableId)) },
-  //         },
-  //       },
-  //     },
-  //   },
-  // }), [tableId])
+  const { currentSeasonId } = useConfig()
   const query = useMemo<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
       .withClause(
-        new PistolsClauseBuilder().where(
-          "pistols-Challenge",
-          "table_id",
-          "Eq", formatQueryValue(stringToFelt(tableId)),
-        ).build()
+        new PistolsClauseBuilder().compose().or([
+          // Current season
+          new PistolsClauseBuilder().where(
+            "pistols-Challenge",
+            "season_id",
+            "Eq", formatQueryValue(currentSeasonId),
+          ),
+          // Unfinished challenges
+          new PistolsClauseBuilder().where(
+            "pistols-Challenge",
+            "season_id",
+            "Eq", formatQueryValue(0),
+          ),
+        ]).build()
       )
       .withEntityModels([
         'pistols-Challenge',
-        "pistols-Round",
+        'pistols-Round',
       ])
       .withLimit(_limit)
       .includeHashedKeys()
-  ), [tableId])
+  ), [currentSeasonId])
 
   const challengeState = useChallengeStore((state) => state)
   const queryState = useChallengeQueryStore((state) => state)

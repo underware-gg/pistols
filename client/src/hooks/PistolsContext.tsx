@@ -7,7 +7,6 @@ import { poseidon } from '@underware/pistols-sdk/utils/starknet'
 import { CommitMoveMessage } from '@underware/pistols-sdk/pistols'
 import { DuelTutorialLevel, tutorialScenes } from '/src/data/tutorialConstants'
 import { SceneName } from '/src/data/assets'
-import { useTableId } from '/src/stores/configStore'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '../three/game'
 
 import { emitter } from '../three/game'
@@ -50,7 +49,6 @@ export const initialState = {
   tutorialOpener: null as Opener,
   bookOpener: null as Opener,
   duelistSelectOpener: null as Opener,
-  tableOpener: null as Opener,
   walletFinderOpener: null as Opener,
 }
 
@@ -114,7 +112,6 @@ const PistolsProvider = ({
   const tutorialOpener = useOpener()
   const bookOpener = useOpener()
   const duelistSelectOpener = useOpener()
-  const tableOpener = useOpener()
   const walletFinderOpener = useOpener()
 
   const [hasSearchParams, setHasSearchParams] = useState(false)
@@ -228,7 +225,6 @@ const PistolsProvider = ({
                         tutorialOpener.isOpen || 
                         bookOpener.isOpen || 
                         duelistSelectOpener.isOpen || 
-                        tableOpener.isOpen || 
                         walletFinderOpener.isOpen ||
                         hasSearchParams ||
                         (state.challengingAddress && state.challengingDuelistId)
@@ -240,7 +236,6 @@ const PistolsProvider = ({
     tutorialOpener.isOpen,
     bookOpener.isOpen,
     duelistSelectOpener.isOpen,
-    tableOpener.isOpen,
     walletFinderOpener.isOpen,
     hasSearchParams,
     state.challengingAddress,
@@ -256,7 +251,6 @@ const PistolsProvider = ({
       tutorialOpener,
       bookOpener,
       duelistSelectOpener,
-      tableOpener,
       walletFinderOpener,
     } }}>
       {children}
@@ -407,23 +401,22 @@ export const usePistolsContext = () => {
 type SceneRoute = {
   baseUrl: string
   title?: string
-  hasTableId?: boolean
   hasDuelId?: boolean
   // makeRoute: (state: PistolsContextStateType) => string
 }
 
 // !!! all routes need to be configured in main.tsx
 export const sceneRoutes: Record<SceneName, SceneRoute> = {
-  // scenes with tableId (optional)
-  [SceneName.Door]: { baseUrl: '/door', hasTableId: true },
-  [SceneName.Tavern]: { baseUrl: '/tavern', hasTableId: true },
-  [SceneName.Profile]: { baseUrl: '/profile', hasTableId: true, title: 'Pistols - Profile' },
-  [SceneName.Duelists]: { baseUrl: '/balcony', hasTableId: true, title: 'Pistols - Duelists' },
-  [SceneName.DuelsBoard]: { baseUrl: '/duels', hasTableId: true, title: 'Pistols - Your Duels' },
-  [SceneName.Leaderboards]: { baseUrl: '/leaderboards', hasTableId: true, title: 'Pistols - Leaderboards' },
-  [SceneName.Graveyard]: { baseUrl: '/graveyard', hasTableId: true, title: 'Pistols - Past Duels' },
-  [SceneName.Tournament]: { baseUrl: '/__tournament__', hasTableId: true, title: 'Pistols - Tournament' },
-  [SceneName.IRLTournament]: { baseUrl: '/__irltournament__', hasTableId: true, title: 'Pistols - IRL Tournament' },
+  // main game scenes (no slugs)
+  [SceneName.Door]: { baseUrl: '/door' },
+  [SceneName.Tavern]: { baseUrl: '/tavern' },
+  [SceneName.Profile]: { baseUrl: '/profile', title: 'Pistols - Profile' },
+  [SceneName.Duelists]: { baseUrl: '/balcony', title: 'Pistols - Duelists' },
+  [SceneName.DuelsBoard]: { baseUrl: '/duels', title: 'Pistols - Your Duels' },
+  [SceneName.Leaderboards]: { baseUrl: '/leaderboards', title: 'Pistols - Leaderboards' },
+  [SceneName.Graveyard]: { baseUrl: '/graveyard', title: 'Pistols - Past Duels' },
+  [SceneName.Tournament]: { baseUrl: '/__tournament__', title: 'Pistols - Tournament' },
+  [SceneName.IRLTournament]: { baseUrl: '/__irltournament__', title: 'Pistols - IRL Tournament' },
   // scenes with duelId
   [SceneName.Duel]: { baseUrl: '/duel', hasDuelId: true, title: 'Pistols - Duel!' },
   // tutorial scenes
@@ -451,12 +444,10 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
 // D: Browser BACK button > same as A
 //
 type SceneSlug = {
-  tableId?: string,
   duelId?: BigNumberish,
 }
 export const usePistolsScene = () => {
   const { currentScene, sceneStack, selectedDuelId, currentDuel, dispatchSetDuel, __dispatchSetScene, __dispatchSceneBack, __dispatchResetValues } = usePistolsContext()
-  const { tableId, isSeason, isTutorial } = useTableId()
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -466,9 +457,7 @@ export const usePistolsScene = () => {
     let route = sceneRoutes[newScene]
     let url = route.baseUrl
     let slug = ''
-    if (sceneRoutes[newScene].hasTableId) {
-      slug = setSlug.tableId ?? (tableId && !isSeason ? tableId : '')
-    } else if (sceneRoutes[newScene].hasDuelId) {
+    if (sceneRoutes[newScene].hasDuelId) {
       slug = `${bigintToDecimal(setSlug.duelId || currentDuel)}`
       if (!bigintEquals(slug, currentDuel)) {
         dispatchSetDuel(slug)
@@ -483,7 +472,7 @@ export const usePistolsScene = () => {
       __dispatchResetValues()
     }, SCENE_CHANGE_ANIMATION_DURATION)
     __dispatchSetScene(newScene)
-  }, [location.pathname, navigate, selectedDuelId, tableId, isSeason])
+  }, [location.pathname, navigate, selectedDuelId])
 
   const dispatchSceneBack = useCallback(() => {
     if (sceneStack.length > 1) {
@@ -491,9 +480,7 @@ export const usePistolsScene = () => {
       let route = sceneRoutes[prevScene]
       let url = route.baseUrl
       let slug = ''
-      if (route.hasTableId) {
-        slug = tableId && !isSeason ? tableId : ''
-      } else if (route.hasDuelId) {
+      if (route.hasDuelId) {
         slug = `${bigintToDecimal(currentDuel)}`
       }
       url += slug ? `/${slug}` : ''
@@ -510,7 +497,7 @@ export const usePistolsScene = () => {
       
       dispatchSetScene(baseScene);
     }
-  }, [sceneStack, location.pathname, navigate, tableId, isSeason, currentDuel, currentScene])
+  }, [sceneStack, location.pathname, navigate, currentDuel, currentScene])
 
   const sceneTitle = useMemo(() => (sceneRoutes[currentScene]?.title ?? 'Pistols at Dawn'), [currentScene])
 

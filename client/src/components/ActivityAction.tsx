@@ -6,7 +6,7 @@ import { useDuelist } from '/src/stores/duelistStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useCallToActions } from '/src/stores/eventsModelStore'
-import { Icon, BookmarkIcon, EmojiIcon } from '/src/components/ui/Icons'
+import { Icon, EmojiIcon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink } from '/src/components/Links'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { EMOJI } from '/src/data/messages'
@@ -93,7 +93,7 @@ const ActionItem = ({
   const { isInactive } = useDuelist(duelistId)
   const { lives, isLoading } = useDuelistFameBalance(duelistId)
 
-  // const { duelistContractAddress } = useDuelistTokenContract()
+  // const { duelistContractAddress } = useTokenContracts()
   // const { publish } = usePlayerBookmarkSignedMessage(duelistContractAddress, duelistId, !isBookmarked)
 
   if (isReply) {

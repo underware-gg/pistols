@@ -17,7 +17,6 @@ mod tests {
         }
     };
 
-    const INVALID_TABLE: felt252 = 'TheBookIsOnTheTable';
     const CONFIG_HASH: felt252 = selector_from_tag!("pistols-Config");
 
     fn DUMMY_LORDS() -> ContractAddress { starknet::contract_address_const::<0x131313131313>() }

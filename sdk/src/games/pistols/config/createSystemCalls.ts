@@ -173,25 +173,25 @@ export function createSystemCalls(
     // duel_token
     //
     duel_token: {
-      create_duel: async (signer: AccountInterface, duelist_id: BigNumberish, challenged_address: BigNumberish, premise: constants.Premise, quote: string, table_id: string, expire_hours: number, lives_staked: number): Promise<boolean> => {
+      create_duel: async (signer: AccountInterface, duel_type: constants.DuelType, duelist_id: BigNumberish, challenged_address: BigNumberish, premise: constants.Premise, quote: string, expire_hours: number, lives_staked: number): Promise<boolean> => {
         let calls: DojoCalls = [
           contractCalls.duel_token.buildCreateDuelCalldata(
+            makeCustomEnum(duel_type),
             duelist_id,
             bigintToHex(challenged_address),
             makeCustomEnum(premise),
             stringToFelt(quote),
-            stringToFelt(table_id),
             expire_hours,
             lives_staked,
           ),
         ]
         return await _executeTransaction(signer, calls)
       },
-      reply_duel: async (signer: AccountInterface, duelist_id: BigNumberish, duel_id: BigNumberish, accepted: boolean): Promise<boolean> => {
+      reply_duel: async (signer: AccountInterface, duel_id: BigNumberish, duelist_id: BigNumberish, accepted: boolean): Promise<boolean> => {
         const calls: DojoCalls = [
           contractCalls.duel_token.buildReplyDuelCalldata(
-            duelist_id,
             duel_id,
+            duelist_id,
             accepted,
           ),
         ]

@@ -14,7 +14,6 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 export default function ScGate() {
   const { aspectWidth, aspectHeight } = useGameAspect()
 
-  const { tableOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
   
   const [textOpacity, setTextOpacity] = useState(0)
@@ -56,7 +55,7 @@ export default function ScGate() {
         clearTimeout(timerRef.current)
       }
     }
-  }, [tableOpener])
+  }, [])
 
   useEffect(() => {
     const handleTextureShift = (shift: { x: number, y: number }) => {

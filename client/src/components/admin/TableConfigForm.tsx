@@ -1,14 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React from 'react'
 import { Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
-import { useAdminAmIOwner } from '/src/hooks/usePistolsContractCalls'
 import { FormInput, FormCheckbox, FormSelectFromMap } from '/src/components/ui/Form'
-import { TableSwitcher } from '/src/components/modals/TableModal'
 import { Balance } from '/src/components/account/Balance'
-import { bigintToHex, isBigint, isNumeric } from '@underware/pistols-sdk/utils'
-import { feltToString, STARKNET_ADDRESS_LENGTHS, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
-import { ActionButton } from '/src/components/ui/Buttons'
+import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/utils/starknet'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 const Row = Table.Row
@@ -24,7 +20,7 @@ enum FieldType {
   Wei,
   Number,
   Boolean,
-  RulesType,
+  Rules,
   DeckType,
 }
 
@@ -44,7 +40,7 @@ const config_schema: FormSchema = {
 const table_config_schema: FormSchema = {
   table_id: { type: FieldType.ShortString, isKey: true },
   description: { type: FieldType.ShortString },
-  rules: { type: FieldType.RulesType },
+  rules: { type: FieldType.Rules },
 }
 
 export const ConfigForm = ({
@@ -67,31 +63,6 @@ export const ConfigForm = ({
     </div>
   )
 }
-
-export const TableConfigForm = ({
-}: {
-  }) => {
-  const [tableId, setTableId] = useState<string>()
-
-  const { account } = useAccount()
-  const { admin } = useDojoSystemCalls()
-  const storeComponent = (values: any) => {
-    admin.set_table(account, values)
-  }
-
-  return (
-    <div>
-      <TableSwitcher selectedTableId={tableId} setSelectedTableId={setTableId} />
-      {/* <ComponentForm
-        schema={table_config_schema}
-        component={TableConfig}
-        entityKey={entityKey}
-        storeComponent={storeComponent}
-      /> */}
-    </div>
-  )
-}
-
 
 
 
@@ -212,10 +183,10 @@ export const Field = ({
               value={value}
               setValue={setValue}
             />
-            : fieldType == FieldType.RulesType ? <>
+            : fieldType == FieldType.Rules ? <>
               {value}
               <FormSelectFromMap
-                map={constants.getRulesTypeMap()}
+                map={constants.getRulesMap()}
                 label={name}
                 disabled={readOnly}
                 value={value}

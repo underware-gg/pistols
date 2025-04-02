@@ -2,8 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Image, Input, ButtonGroup, Divider } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useQueryParams, SortDirection, ChallengeColumn, PlayerColumn } from '/src/stores/queryParamsStore'
-import { useTableId } from '/src/stores/configStore'
-import { useTable } from '/src/stores/tableStore'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { ChallengeStateNames, LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
@@ -104,10 +102,6 @@ function useExit() {
 
 export function Header() {
 
-  const { tableId, isSeason, isTutorial } = useTableId()
-  const { tableOpener } = usePistolsContext()
-  const { description } = useTable(tableId)
-
   const { atDuel, atGate, atDoor, atProfile, atTavern, atTutorial } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
 
@@ -125,9 +119,6 @@ export function Header() {
     }
   }, [atGate, atDoor, atTutorial]);
 
-  const _changeTable = () => {
-    tableOpener.open()
-  }
 
   if (atDuel) {
     return <></>

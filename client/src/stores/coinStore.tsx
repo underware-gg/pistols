@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useERC20Balance } from '@underware/pistols-sdk/utils/hooks'
 import { useSdkTokenBalancesGet, useStarknetContext } from '@underware/pistols-sdk/dojo'
-import { useFameContract, useFoolsContract, useLordsContract } from '/src/hooks/useTokenContract'
+import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenBoundAddress } from '/src/hooks/useTokenBound'
 import { makeTokenBoundAddress } from '@underware/pistols-sdk/pistols'
 import { SetupResult } from '@underware/pistols-sdk/dojo'
@@ -139,17 +139,17 @@ export const fetchNewTokenBoundCoins = async (sdk: SetupResult['sdk'], coinAddre
 //
 
 export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
-  const { lordsContractAddress } = useLordsContract()
+  const { lordsContractAddress } = useTokenContracts()
   return useCoinBalance(lordsContractAddress, address, fee)
 }
 
 export const useFoolsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
-  const { foolsContractAddress } = useFoolsContract()
+  const { foolsContractAddress } = useTokenContracts()
   return useCoinBalance(foolsContractAddress, address, fee)
 }
 
 export const useFameBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
-  const { fameContractAddress } = useFameContract()
+  const { fameContractAddress } = useTokenContracts()
   const result = useCoinBalance(fameContractAddress, address, fee)
   // console.log('useFameBalance COIN FAME:', address, result)
   const lives = useMemo(() => Math.floor(Number(result.balance / constants.FAME.ONE_LIFE)), [result.balance])

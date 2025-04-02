@@ -47,12 +47,12 @@ export const usePool = (pool_type: string) => {
   return _usePool(pool_type)
 }
 
-export const useSeasonPool = (season_table_id: string) => {
-  return _usePool(constants.PoolType.Season, BigInt(stringToFelt(season_table_id)))
+export const useSeasonPool = (season_id: BigNumberish) => {
+  return _usePool(constants.PoolType.Season, BigInt(season_id ?? 0))
 }
 
 export const useTournamentPool = (tournament_id: BigNumberish) => {
-  return _usePool(constants.PoolType.Tournament, BigInt(tournament_id))
+  return _usePool(constants.PoolType.Tournament, BigInt(tournament_id ?? 0))
 }
 
 

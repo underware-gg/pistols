@@ -150,7 +150,7 @@ function DuelItem({
   const { aspectWidth } = useGameAspect()
 
   const {
-    challenge: { duelistIdA, duelistIdB, tableId, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB },
+    challenge: { duelistIdA, duelistIdB, state, isLive, isCanceled, isExpired, isDraw, winner, duelistAddressA, duelistAddressB },
     turnA, turnB,
   } = useDuel(duelId)
   const { name: playerNameA } = usePlayer(duelistAddressA)

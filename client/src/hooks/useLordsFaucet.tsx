@@ -4,7 +4,7 @@ import { useAccount } from '@starknet-react/core'
 import { useStarknetContext } from '@underware/pistols-sdk/dojo'
 import { bigintToU256, ethToWei, execute } from '@underware/pistols-sdk/utils/starknet'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
-import { useLordsContract } from '/src/hooks/useTokenContract'
+import { useLordsContract } from './useTokenContracts'
 import { useLordsBalance } from '/src/stores/coinStore'
 
 export interface FaucetExecuteResult {

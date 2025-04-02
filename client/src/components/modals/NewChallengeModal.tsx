@@ -4,11 +4,9 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
-import { useTableId } from '/src/stores/configStore'
-import { useTable } from '/src/stores/tableStore'
 import { usePact } from '/src/hooks/usePact'
-import { useCalcFeeDuel, useCalcSeasonReward, useCanJoin } from '/src/hooks/usePistolsContractCalls'
-import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
+import { useCalcSeasonReward, useCanJoin } from '/src/hooks/usePistolsContractCalls'
+import { ActionButton } from '/src/components/ui/Buttons'
 import { formatOrdinalNumber } from '@underware/pistols-sdk/utils'
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster } from '/src/components/ui/ProfilePoster'
 import { DuelistCard } from '/src/components/cards/DuelistCard';
@@ -20,6 +18,8 @@ import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { DUELIST_CARD_HEIGHT } from '/src/data/cardConstants'
 import { DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { useGameAspect } from '/src/hooks/useGameAspect'
+import { useCurrentSeason } from '/src/stores/seasonStore'
+import { useConfig } from '/src/stores/configStore'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -37,7 +37,6 @@ function _NewChallengeModal({
 }) {
   const { duel_token } = useDojoSystemCalls()
   const { account, address } = useAccount()
-  const { tableId } = useTableId()
   const { aspectWidth, aspectHeight } = useGameAspect()
 
   const { 
@@ -60,12 +59,12 @@ function _NewChallengeModal({
     duelistSelectOpener.close()
   }
 
-  const { hasPact, pactDuelId } = usePact(tableId, addressA, addressB, isOpen)
-  const { description: tableDescription } = useTable(tableId)
+  const { hasPact, pactDuelId } = usePact(constants.DuelType.Seasonal, addressA, addressB, isOpen)
+  const { seasonName } = useCurrentSeason()
   const [args, setArgs] = useState<any>(null)
-  const { fee } = useCalcFeeDuel(tableId)
-  const { canJoin } = useCanJoin(tableId, challengingDuelistId)
-  const { rewards } = useCalcSeasonReward(tableId, challengingDuelistId, args?.lives_staked)
+  const { currentSeasonId } = useConfig()
+  const { canJoin } = useCanJoin(currentSeasonId, challengingDuelistId)
+  const { rewards } = useCalcSeasonReward(currentSeasonId, challengingDuelistId, args?.lives_staked)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
@@ -81,7 +80,7 @@ function _NewChallengeModal({
   const _create_duel = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await duel_token.create_duel(account, challengingDuelistId, challengingAddress, args.premise, args.quote, tableId, args.expire_hours, args.lives_staked)
+      await duel_token.create_duel(account, constants.DuelType.Seasonal, challengingDuelistId, challengingAddress, args.premise, args.quote, args.expire_hours, args.lives_staked)
       setIsSubmitting(false)
     }
     if (args?.canSubmit) _submit()
@@ -97,7 +96,7 @@ function _NewChallengeModal({
                 New Challenge
               </Col>
               <Col width={8} textAlign='center' className='NoBreak Important'>
-                {tableDescription}
+                {seasonName}
               </Col>
             </Row>
           </Grid>
@@ -140,12 +139,6 @@ function _NewChallengeModal({
                 <div className='Spacer5' />
 
                 <NewChallengeForm duelistId={challengingDuelistId} setArgs={setArgs} />
-
-                {fee > 0n && (
-                  <div style={{margin: '1em 0'}}>
-                    <FeesToPay size='big' value={0} fee={fee} prefixed />
-                  </div>
-                )}
 
                 <div className='Spacer20' />
                 <div className='TextDivider bright NewChallengeDivider'>
@@ -294,14 +287,13 @@ function _NewChallengeModal({
               </Col>
               <Col>
                 {canJoin &&
-                  <BalanceRequiredButton
-                    fee={fee}
+                  <ActionButton
                     disabled={!args?.canSubmit || isSubmitting}
                     label='Submit Challenge!'
                     onClick={() => _create_duel()}
                   />
                 }
-                {!canJoin && <ActionButton large fill disabled negative label='Table is Closed!' onClick={() => { }} />}
+                {!canJoin && <ActionButton large fill disabled negative label='Not Admitted!' onClick={() => { }} />}
               </Col>
             </Row>
           </Grid>
@@ -318,7 +310,6 @@ function NewChallengeForm({
   duelistId: BigNumberish
   setArgs: (args: any) => void
 }) {
-  const { tableId } = useTableId()
   const { lives } = useDuelistFameBalance(duelistId)
 
   const { aspectWidth } = useGameAspect()
@@ -337,7 +328,6 @@ function NewChallengeForm({
       quote,
       expire_hours: ((days * 24) + hours),
       lives_staked,
-      table_id: tableId,
       canSubmit,
     })
   }, [canSubmit, premise, quote, days, hours, lives_staked])

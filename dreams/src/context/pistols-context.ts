@@ -158,7 +158,7 @@ query getConfig {
   pistolsConfigModels {
     edges {
       node {
-        season_table_id
+        current_season_id
         lords_address
       }
     }
@@ -173,7 +173,7 @@ query getChallenge{
     edges {
       node {
         duel_id
-        table_id
+        duel_type
         premise
         quote
         state
@@ -223,7 +223,7 @@ query getAllChallenges {
     edges {
       node {
         duel_id
-        table_id
+        duel_type
         premise
         quote
         state

@@ -8,28 +8,17 @@ import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 
 
 //--------------------------------
-// Challenges by Table
+// Challenges by Season
 // (ephemeral)
 //
 
-const useGetChallengesByTableQuery = (tableId: string) => {
-  // const query_get = useMemo<PistolsQueryBuilder>(() => ({
-  //   pistols: {
-  //     Challenge: {
-  //       $: {
-  //         where: {
-  //           table_id: { $eq: formatQueryValue(stringToFelt(tableId)) },
-  //         },
-  //       },
-  //     },
-  //   },
-  // }), [tableId])
+const useGetChallengesBySeasonQuery = (seasonId: BigNumberish) => {
   const query = useMemo<PistolsQueryBuilder>(() => (
-    tableId
+    seasonId
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().where(
-            "pistols-Challenge", "table_id", "Eq", formatQueryValue(stringToFelt(tableId)),
+            "pistols-Challenge", "season_id", "Eq", formatQueryValue(seasonId),
           ).build()
         )
         .withEntityModels(
@@ -37,15 +26,15 @@ const useGetChallengesByTableQuery = (tableId: string) => {
         )
         .includeHashedKeys()
       : null
-  ), [tableId])
+  ), [seasonId])
   const { entities } = useSdkStateEntitiesGet({ query })
   const challenges = useMemo(() => entities.map(e => getEntityModel<models.Challenge>(e, 'Challenge')), [entities])
-  // useEffect(() => console.log(`useGetChallengesByTableQuery()`, challenges), [challenges])
+  // useEffect(() => console.log(`useGetChallengesBySeasonQuery()`, challenges), [challenges])
   return { challenges }
 }
 
-export const useTableTotals = (tableId: string) => {
-  const { challenges } = useGetChallengesByTableQuery(tableId)
+export const useSeasonTotals = (seasonId: BigNumberish) => {
+  const { challenges } = useGetChallengesBySeasonQuery(seasonId)
   const result = useMemo(() => {
     const duelIds = challenges.map((ch: models.Challenge) => BigInt(ch.duel_id))
     const liveDuelsCount = challenges.reduce((acc: number, ch: models.Challenge) => {
@@ -83,8 +72,8 @@ export const useTableTotals = (tableId: string) => {
   return result
 }
 
-export const useTableActiveDuelistIds = (tableId: string) => {
-  const { challenges } = useGetChallengesByTableQuery(tableId)
+export const useSeasonActiveDuelistIds = (seasonId: BigNumberish) => {
+  const { challenges } = useGetChallengesBySeasonQuery(seasonId)
   const activeDuelistIds = useMemo(() => (
     Array.from(challenges.reduce((acc: Set<BigNumberish>, ch: models.Challenge) => {
       acc.add(ch.duelist_id_a)

@@ -44,8 +44,10 @@ export const useChallenge = (duelId: BigNumberish) => {
   // )
   // useEffect(() => console.log(`useChallenge(${Number(duelId)}) => [${Object.keys(entities).length}]`, challenge), [challenge])
 
-  const tableId = useMemo(() => feltToString(challenge?.table_id ?? 0n), [challenge])
-  const isTutorial = useMemo(() => (tableId === constants.TABLES.TUTORIAL), [tableId])
+  const seasonId = useMemo(() => Number(challenge?.season_id ?? 0n), [challenge])
+  const seasonName = useMemo(() => (seasonId ? `Season ${seasonId}` : undefined), [seasonId])
+  const duelType = useMemo(() => (parseEnumVariant<constants.DuelType>(challenge?.duel_type) ?? constants.DuelType.Undefined), [challenge])
+  const isTutorial = useMemo(() => (duelType === constants.DuelType.Tutorial), [duelType])
   const tutorialLevel = useMemo(() => (isTutorial ? Number(BigInt(duelId) & 0xffn) : null), [isTutorial, duelId])
 
   const duelistAddressA = useMemo(() => BigInt(challenge?.address_a ?? 0), [challenge])
@@ -73,7 +75,9 @@ export const useChallenge = (duelId: BigNumberish) => {
   return {
     challengeExists: (challenge != null),
     duelId,
-    tableId,
+    duelType,
+    seasonId,
+    seasonName,
     isTutorial,
     tutorialLevel,
     state,
@@ -190,23 +194,12 @@ export const useRoundTimeout = (duelId: BigNumberish, autoUpdate = false) => {
 
 //--------------------------------
 // Fetch new challenge and add to the store
-// (for non default tables, like tutorials)
+// (for non default challenges, like tutorials)
 //
 
 export const useGetChallenge = (duel_id: BigNumberish) => {
   const result = useChallenge(duel_id)
 
-  // const query_get = useMemo<PistolsQueryBuilder>(() => ({
-  //   pistols: {
-  //     Challenge: {
-  //       $: {
-  //         where: {
-  //           duel_id: { $eq: formatQueryValue(duel_id) },
-  //         },
-  //       },
-  //     },
-  //   },
-  // }), [duel_id])
   const query = useMemo<PistolsQueryBuilder>(() => (
     isPositiveBigint(duel_id)
       ? new PistolsQueryBuilder()
@@ -218,7 +211,7 @@ export const useGetChallenge = (duel_id: BigNumberish) => {
         )
         .withEntityModels([
           "pistols-Challenge",
-          "pistols-Round",
+          'pistols-Round',
         ])
         .includeHashedKeys()
       : null

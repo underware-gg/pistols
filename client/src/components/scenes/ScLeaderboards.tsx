@@ -194,7 +194,7 @@ export default function ScLeaderboards() {
     );
   }
 
-  const handleSeasonSelect = (seasonId: string) => {
+  const handleSeasonSelect = (seasonId: number) => {
     setSelectedSeason(seasonId);
     setActivePage(1); // Reset to first page when changing seasons
   };

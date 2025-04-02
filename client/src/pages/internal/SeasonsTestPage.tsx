@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
-import { useAllSeasonTableIds, useLeaderboard, useSeason, useTable } from '/src/stores/tableStore'
+import { useAllSeasonIds, useLeaderboard, useSeason } from '../../stores/seasonStore'
 import { bigintToDecimal, bigintToHex, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal } from '@underware/pistols-sdk/utils'
 import { formatQueryValue, getEntityModel, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { parseCustomEnum, parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
@@ -9,7 +9,7 @@ import { useClientTimestamp, useMounted } from '@underware/pistols-sdk/utils/hoo
 import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
 import { useLordsReleaseEvents } from '/src/hooks/useLordsReleaseEvents'
 import { useSeasonPool } from '/src/stores/bankStore'
-import { useTableTotals } from '/src/hooks/useTable'
+import { useSeasonTotals } from '../../hooks/useSeason'
 import { useAccount } from '@starknet-react/core'
 import { useConfig } from '/src/stores/configStore'
 import { usePlayer } from '/src/stores/playerStore'
@@ -53,9 +53,9 @@ export default function SeasonsTestPage() {
 }
 
 function Seasons() {
-  const { seasonTableId } = useConfig()
-  const { seasonTableIds } = useAllSeasonTableIds()
-  const [reportTableId, setReportTableId] = useState<string>()
+  const { currentSeasonId } = useConfig()
+  const { seasonIds } = useAllSeasonIds()
+  const [reportSeasonId, setReportSeasonId] = useState<number>()
   const header = (
     <Header fullWidth>
       <Row>
@@ -76,25 +76,25 @@ function Seasons() {
       <Table celled color='orange'>
         {header}
         <Body>
-          {seasonTableIds.map((tableId, i) => (
-            <SeasonRow key={tableId} tableId={tableId} isCurrent={tableId === seasonTableId} reportTableId={reportTableId} setReport={setReportTableId} />
+          {seasonIds.map((seasonId, i) => (
+            <SeasonRow key={seasonId} seasonId={seasonId} isCurrent={seasonId === currentSeasonId} reportSeasonId={reportSeasonId} setReport={setReportSeasonId} />
           ))}
         </Body>
       </Table>
-      {reportTableId &&
+      {reportSeasonId &&
         <>
           <br />
           <Table celled color='green'>
             {header}
             <Body>
-              <SeasonRow key={reportTableId} tableId={reportTableId} isCurrent={reportTableId === seasonTableId} setReport={setReportTableId} actions={false} />
+            <SeasonRow key={reportSeasonId} seasonId={reportSeasonId} isCurrent={reportSeasonId === currentSeasonId} setReport={setReportSeasonId} actions={false} />
             </Body>
           </Table>
-          <PacksReport tableId={reportTableId} />
-          <DuelistsReport tableId={reportTableId} />
-          <DuelsReport tableId={reportTableId} />
-          <Leaderboards tableId={reportTableId} />
-          <LordsReleaseEvents tableId={reportTableId} />
+          <PacksReport seasonId={reportSeasonId} />
+          <DuelistsReport seasonId={reportSeasonId} />
+          <DuelsReport seasonId={reportSeasonId} />
+          <Leaderboards seasonId={reportSeasonId} />
+          <LordsReleaseEvents seasonId={reportSeasonId} />
         </>
       }
       <br />
@@ -103,35 +103,35 @@ function Seasons() {
 }
 
 function SeasonRow({
-  tableId,
+  seasonId,
   isCurrent,
   actions = true,
   setReport,
-  reportTableId,
+  reportSeasonId,
 }: {
-  tableId: string,
+  seasonId: number,
   isCurrent: boolean,
   actions?: boolean,
-  setReport: (tableId: string) => void,
-  reportTableId?: string,
+  setReport: (seasonId: number) => void,
+  reportSeasonId?: number,
 }) {
   const { account } = useAccount()
-  const { description } = useTable(tableId)
-  const { seasonId, phase, timestamp_start, timestamp_end, isActive } = useSeason(tableId)
+  const { seasonName } = useSeason(seasonId)
+  const { phase, timestamp_start, timestamp_end, isActive } = useSeason(seasonId)
   const { clientTimestamp } = useClientTimestamp(isActive)
   const { canCollectSeason } = useCanCollectSeason()
   const { game: { collectSeason } } = useDojoContractCalls()
-  const poolSeason = useSeasonPool(tableId)
-  const { accountsCount } = useTableTotals(tableId)
+  const poolSeason = useSeasonPool(seasonId)
+  const { accountsCount } = useSeasonTotals(seasonId)
   return (
     <Row>
       <Cell>
         <span className='Important H3'>
-          {isCurrent ? <b>{tableId} (Current)</b> : tableId}
+          {isCurrent ? <b>{seasonId} (Current)</b> : seasonId}
         </span>
       </Cell>
       <Cell>{seasonId}</Cell>
-      <Cell>{description}</Cell>
+      <Cell>{seasonName}</Cell>
       <Cell>{phase}</Cell>
       <Cell><Balance lords wei={poolSeason.balanceLords} /></Cell>
       <Cell>{accountsCount}</Cell>
@@ -147,8 +147,8 @@ function SeasonRow({
         <Cell>
           <ActionButton
             label={'Reports'}
-            important={reportTableId == tableId}
-            onClick={() => setReport(reportTableId != tableId ? tableId : null)}
+            important={reportSeasonId == seasonId}
+            onClick={() => setReport(reportSeasonId != seasonId ? seasonId : null)}
           />
           &nbsp;
           {isCurrent &&
@@ -164,19 +164,19 @@ function SeasonRow({
   )
 }
 
-function DuelsReport({ tableId }: { tableId: string }) {
+function DuelsReport({ seasonId }: { seasonId: number }) {
   const mounted = useMounted()
   const query = useMemo<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
       .withClause(
         new PistolsClauseBuilder().where(
-          "pistols-Challenge", "table_id", "Eq", formatQueryValue(stringToFelt(tableId)),
+          "pistols-Challenge", "season_id", "Eq", formatQueryValue(seasonId),
         ).build()
       )
       .withEntityModels(['pistols-Challenge', 'pistols-Round'])
       .withLimit(10000)
       .includeHashedKeys()
-  ), [tableId])
+  ), [seasonId])
   const { entities, isLoading } = useSdkStateEntitiesGet({
     query,
     enabled: mounted,
@@ -278,14 +278,14 @@ function DuelsReport({ tableId }: { tableId: string }) {
 }
 
 
-function PacksReport({ tableId }: { tableId: string }) {
+function PacksReport({ seasonId }: { seasonId: number }) {
   const mounted = useMounted()
   const query = useMemo<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
       .withEntityModels(['pistols-Pack'])
       .withLimit(10000)
       .includeHashedKeys()
-  ), [tableId])
+  ), [seasonId])
   const { entities, isLoading } = useSdkStateEntitiesGet({
     query,
     enabled: mounted,
@@ -353,14 +353,14 @@ function PacksReport({ tableId }: { tableId: string }) {
   )
 }
 
-function DuelistsReport({ tableId }: { tableId: string }) {
+function DuelistsReport({ seasonId }: { seasonId: number }) {
   const mounted = useMounted()
   const query = useMemo<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
       .withEntityModels(['pistols-Duelist', 'pistols-DuelistMemorial'])
       .withLimit(10000)
       .includeHashedKeys()
-  ), [tableId])
+  ), [seasonId])
   const { entities, isLoading } = useSdkStateEntitiesGet({
     query,
     enabled: mounted,
@@ -420,13 +420,13 @@ function DuelistsReport({ tableId }: { tableId: string }) {
 // Leaderboards
 //
 function Leaderboards({
-  tableId,
+  seasonId,
 }: {
-  tableId: string,
+  seasonId: number,
 }) {
-  const { maxPositions, scores } = useLeaderboard(tableId)
+  const { maxPositions, scores } = useLeaderboard(seasonId)
 
-  // console.log(`Leaderboards() =>`, tableId, maxPositions, scorePerDuelistId)
+  // console.log(`Leaderboards() =>`, seasonId, maxPositions, scorePerDuelistId)
   return (
     <Table celled color='green'>
       <Header fullWidth>
@@ -478,11 +478,11 @@ function LeaderboardRow({
 // Lords Releases
 //
 function LordsReleaseEvents({
-  tableId,
+  seasonId,
 }: {
-  tableId: string,
+  seasonId: number,
 }) {
-  const { bills } = useLordsReleaseEvents(tableId)
+  const { bills } = useLordsReleaseEvents(seasonId)
   return (
     <Table celled color='green'>
       <Header fullWidth>

@@ -3,10 +3,9 @@ import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
-import { useDuelTokenContract } from '/src/hooks/useTokenContract'
-import { useDuelistTokenContract } from '/src/hooks/useTokenContract'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { SortDirection } from './queryParamsStore'
 import { PlayerColumn } from './queryParamsStore'
 
@@ -158,8 +157,10 @@ export const usePlayer = (address: BigNumberish) => {
   const hasFinishedTutorial = false
   const isAvailable = false
 
-  const { duelContractAddress } = useDuelTokenContract()
-  const { duelistContractAddress } = useDuelistTokenContract()
+  const {
+    duelContractAddress,
+    duelistContractAddress,
+  } = useTokenContracts()
   const bookmarkedDuels = useMemo(() => (player?.bookmarked_tokens?.[duelContractAddress as string] ?? []), [player])
   const bookmarkedDuelists = useMemo(() => (player?.bookmarked_tokens?.[duelistContractAddress as string] ?? []), [player])
 
