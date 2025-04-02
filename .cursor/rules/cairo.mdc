@@ -1,0 +1,29 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Rules for Cairo, Dojo and Starknet related projects
+
+Ese the following docs for cairo projects:
+
+@Docs https://book.dojoengine.org/
+@Docs https://book.cairo-lang.org/
+@Docs https://docs.swmansion.com/scarb/corelib/
+@Docs https://docs.swmansion.com/scarb/docs.html
+
+Use the `sensei-mcp` if available.
+
+For typescript projects for Starknet and Dojo games (clients and bots for example), use these docs...
+
+@Docs https://starknetjs.com/docs/guides/intro/
+@Docs https://starknetjs.com/docs/API/
+
+Here some good resources containing Cairo and Dojo project examples:
+
+@Web https://github.com/keep-starknet-strange/alexandria
+@Web https://github.com/Provable-Games/tournaments
+@Web https://github.com/Provable-Games/dark-shuffle
+@Web https://github.com/Provable-Games/loot-survivor
+

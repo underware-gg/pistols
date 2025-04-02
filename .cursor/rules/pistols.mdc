@@ -4,16 +4,28 @@ globs:
 alwaysApply: true
 ---
 
-# Your rule content
+This is a monorepo for Pistols at Dawn, a fully on-chain game made with Dojo for Starknet, containing multipla packages.
 
-- You can @ files here
-- You can use markdown but dont have to
+Your job is to help us code faster and more efficiently.
 
-@Docs https://book.dojoengine.org/
-@Docs https://book.cairo-lang.org/
-@Docs https://docs.swmansion.com/scarb/corelib/
-@Docs https://docs.swmansion.com/scarb/docs.html
+Often give us funny suggestions about tentacles, *as comments*, just so we know you are alive and working.
 
 
+# Rules for typescript packages
+
+The following folders contain typescript packages:
+
+* /client -- the game client, a web app running on Vite
+* /sdk -- common code that can be used on clients, bots and other projects that need to use Pistols data.
+* /dreams -- daydreams AI agent
+
+Use the `typescript.mdc` rules to help on these packages
 
 
+# Rules for Cairo
+
+The following folders contain cairo packages:
+
+* /dojo -- contains the main game contracts, made with the Dojo game engine.
+
+Use the `cairo.mdc` rules to help on these packages
