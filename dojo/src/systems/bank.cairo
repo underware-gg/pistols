@@ -6,14 +6,14 @@ pub trait IBank<TState> {
     // IBankPublic
     fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128);
     fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128);
-    fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u128);
+    fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u64);
 
     // IBankProtected
     fn charge_purchase(ref self: TState, payer: ContractAddress, lords_amount: u128);
     fn peg_minted_fame_to_purchased_lords(ref self: TState, payer: ContractAddress, lords_amount: u128);
-    fn release_lords_from_fame_to_be_burned(ref self: TState, season_id: u128, duel_id: u128, bills: Span<LordsReleaseBill>) -> u128;
+    fn release_lords_from_fame_to_be_burned(ref self: TState, season_id: u32, duel_id: u128, bills: Span<LordsReleaseBill>) -> u128;
     fn duelist_lost_fame_to_pool(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u128, pool_id: PoolType);
-    fn release_season_pool(ref self: TState, season_id: u128);
+    fn release_season_pool(ref self: TState, season_id: u32);
 }
 
 // Exposed to clients
@@ -21,7 +21,7 @@ pub trait IBank<TState> {
 pub trait IBankPublic<TState> {
     fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128); //@description: Sponsor duelist starter packs with $LORDS
     fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128); //@description: Sponsor the current season with $LORDS
-    fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u128); //@description: Sponsor a tournament with $LORDS
+    fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u64); //@description: Sponsor a tournament with $LORDS
 }
 
 // Exposed to world
@@ -35,13 +35,13 @@ pub trait IBankProtected<TState> {
     fn peg_minted_fame_to_purchased_lords(ref self: TState, payer: ContractAddress, lords_amount: u128);
     // transfer LORDS to recipient, removing from PoolType::Purchases
     // (called by duelist_token)
-    fn release_lords_from_fame_to_be_burned(ref self: TState, season_id: u128, duel_id: u128, bills: Span<LordsReleaseBill>) -> u128;
+    fn release_lords_from_fame_to_be_burned(ref self: TState, season_id: u32, duel_id: u128, bills: Span<LordsReleaseBill>) -> u128;
     // transfer FAME to payer, adding to PoolType::Season(season_id)
     // (called by duelist_token)
     fn duelist_lost_fame_to_pool(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u128, pool_id: PoolType);
     // release PoolType::Season(season_id)
     // (called by game)
-    fn release_season_pool(ref self: TState, season_id: u128);
+    fn release_season_pool(ref self: TState, season_id: u32);
 }
 
 #[dojo::contract]
@@ -112,7 +112,7 @@ pub mod bank {
         fn sponsor_tournament(ref self: ContractState,
             payer: ContractAddress,
             lords_amount: u128,
-            tournament_id: u128,
+            tournament_id: u64,
         ) {
             assert(lords_amount != 0, Errors::INVALID_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
@@ -162,7 +162,7 @@ pub mod bank {
         }
 
         fn release_lords_from_fame_to_be_burned(ref self: ContractState,
-            season_id: u128,
+            season_id: u32,
             duel_id: u128,
             bills: Span<LordsReleaseBill>,
         ) -> u128 {
@@ -183,7 +183,7 @@ pub mod bank {
         // - remove LORDS from PoolType::Season (sponsors, if any)
         // - remove LORDS from PoolType::FamePeg (sponsors, if any)
         fn release_season_pool(ref self: ContractState,
-            season_id: u128,
+            season_id: u32,
         ) {
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
@@ -283,7 +283,7 @@ pub mod bank {
 
         fn _release_pegged_lords(ref self: ContractState,
             mut store: Store,
-            season_id: u128,
+            season_id: u32,
             duel_id: u128,
             fame_supply: u128,
             bills: @Span<LordsReleaseBill>,

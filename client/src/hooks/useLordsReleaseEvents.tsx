@@ -5,7 +5,7 @@ import { feltToString, parseCustomEnum, stringToFelt } from '@underware/pistols-
 import { models, constants } from '@underware/pistols-sdk/pistols/gen'
 import { BigNumberish } from 'starknet'
 
-export const useLordsReleaseEvents = (season_id: BigNumberish) => {
+export const useLordsReleaseEvents = (season_id: number) => {
   const query = useMemo<PistolsQueryBuilder>(() => (
     (Boolean(season_id))
       ? new PistolsQueryBuilder()

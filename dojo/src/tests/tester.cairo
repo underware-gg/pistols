@@ -119,8 +119,8 @@ pub mod tester {
     pub fn OWNED_BY_OWNER() -> u128 { 0xeeee }
     pub fn OWNED_BY_OTHER() -> u128 { 0xdddd }
 
-    pub const SEASON_ID_1: u128 = 1;
-    pub const SEASON_ID_2: u128 = 2;
+    pub const SEASON_ID_1: u32 = 1;
+    pub const SEASON_ID_2: u32 = 2;
 
     pub const FAUCET_AMOUNT: u128 = 10_000_000_000_000_000_000_000;
 
@@ -693,9 +693,9 @@ pub mod tester {
         (*system).collect_duel(duel_id);
         _next_block();
     }
-    pub fn execute_collect_season(system: @IGameDispatcher, sender: ContractAddress) -> u128 {
+    pub fn execute_collect_season(system: @IGameDispatcher, sender: ContractAddress) -> u32 {
         impersonate(sender);
-        let new_season_id: u128 = (*system).collect_season();
+        let new_season_id: u32 = (*system).collect_season();
         _next_block();
         (new_season_id)
     }
@@ -786,7 +786,7 @@ pub mod tester {
         world.write_model_test(model);
     }
 
-    pub fn set_current_season(ref sys: TestSystems, season_id: u128) {
+    pub fn set_current_season(ref sys: TestSystems, season_id: u32) {
         let mut config: Config = sys.store.get_config();
         config.current_season_id = season_id;
         set_Config(ref sys.world, @config);
@@ -909,7 +909,7 @@ pub mod tester {
         );
     }
 
-    pub fn print_pools(sys: @TestSystems, season_id: u128, prefix: ByteArray) {
+    pub fn print_pools(sys: @TestSystems, season_id: u32, prefix: ByteArray) {
         let mut fame_balance_bank: u128 = (*sys.fame).balance_of(*sys.bank.contract_address).low;
         let mut lords_balance_bank: u128 = (*sys.lords).balance_of(*sys.bank.contract_address).low;
         let mut lords_balance_treasury: u128 = (*sys.lords).balance_of(TREASURY()).low;

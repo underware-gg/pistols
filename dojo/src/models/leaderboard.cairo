@@ -3,7 +3,7 @@
 #[dojo::model]
 pub struct Leaderboard {
     #[key]
-    pub season_id: u128,
+    pub season_id: u32,
     //-----------------------
     pub positions: u8,          // number of positions on the leaderboard (max 10)
     pub duelist_ids: felt252,   // (positions * 24 bits) = 240 bits max
@@ -30,7 +30,7 @@ pub impl LeaderboardImpl of LeaderboardTrait {
     const MASK: u256 = 0xffffff;
     const SHIFT: u256 = 0x1000000;
 
-    fn new(season_id: u128, positions: u8) -> Leaderboard {
+    fn new(season_id: u32, positions: u8) -> Leaderboard {
         assert(positions > 0 && positions <= Self::MAX_POSITIONS, 'LEADERBOARD: invalid positions');
         (Leaderboard {
             season_id,

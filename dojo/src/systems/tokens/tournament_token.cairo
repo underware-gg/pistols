@@ -71,7 +71,7 @@ pub trait ITournamentToken<TState> {
     fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
 
     // IDuelTokenPublic
-    fn is_active(self: @TState, tournament_id: u128) -> bool;
+    fn is_active(self: @TState, tournament_id: u64) -> bool;
 
     // IDuelTokenProtected
 }
@@ -80,7 +80,7 @@ pub trait ITournamentToken<TState> {
 #[starknet::interface]
 pub trait ITournamentTokenPublic<TState> {
     // view
-    fn is_active(self: @TState, tournament_id: u128) -> bool;
+    fn is_active(self: @TState, tournament_id: u64) -> bool;
 }
 
 // Exposed to world
@@ -200,7 +200,7 @@ pub mod tournament_token {
         //-----------------------------------
         // View calls
         //
-        fn is_active(self: @ContractState, tournament_id: u128) -> bool {
+        fn is_active(self: @ContractState, tournament_id: u64) -> bool {
             // let mut store: Store = StoreTrait::new(self.world_default());
             (false)
         }

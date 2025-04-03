@@ -12,7 +12,7 @@ export const useGetCurrentSeasonScoreboard = (duelist_id: BigNumberish) => {
   return useGetSeasonScoreboard(currentSeasonId, duelist_id)
 }
 
-export const useGetSeasonScoreboard = (season_id: BigNumberish, duelist_id: BigNumberish) => {
+export const useGetSeasonScoreboard = (season_id: number, duelist_id: BigNumberish) => {
   const query = useMemo<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
       .withClause(

@@ -22,16 +22,16 @@ pub trait IGame<TState> {
     );
     fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear the required action call for a duelist
     fn collect_duel(ref self: TState, duel_id: u128); // @description: Close expired duels
-    fn collect_season(ref self: TState) -> u128; // @description: Close the current season and start the next one
+    fn collect_season(ref self: TState) -> u32; // @description: Close the current season and start the next one
 
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;
     fn get_duel_progress(self: @TState, duel_id: u128) -> DuelProgress;
-    fn get_duelist_leaderboard_position(self: @TState, season_id: u128, duelist_id: u128) -> LeaderboardPosition;
-    fn get_leaderboard(self: @TState, season_id: u128) -> Span<LeaderboardPosition>;
+    fn get_duelist_leaderboard_position(self: @TState, season_id: u32, duelist_id: u128) -> LeaderboardPosition;
+    fn get_leaderboard(self: @TState, season_id: u32) -> Span<LeaderboardPosition>;
     fn can_collect_duel(self: @TState, duel_id: u128) -> bool;
     fn can_collect_season(self: @TState) -> bool;
-    fn calc_season_reward(self: @TState, season_id: u128, duelist_id: u128, lives_staked: u8) -> RewardValues;
+    fn calc_season_reward(self: @TState, season_id: u32, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn get_timestamp(self: @TState) -> u64;
     
     // test calls
@@ -352,11 +352,11 @@ pub mod game {
             }
         }
 
-        fn collect_season(ref self: ContractState) -> u128 {
+        fn collect_season(ref self: ContractState) -> u32 {
             let mut store: Store = StoreTrait::new(self.world_default());
             // collect season if permitted
             let mut season: SeasonConfig = store.get_current_season();
-            let new_season_id: u128 = season.collect(ref store);
+            let new_season_id: u32 = season.collect(ref store);
             store.set_config_season_id(new_season_id);
             // release...
             store.world.bank_dispatcher().release_season_pool(season.season_id);
@@ -390,12 +390,12 @@ pub mod game {
             }
         }
 
-        fn get_duelist_leaderboard_position(self: @ContractState, season_id: u128, duelist_id: u128) -> LeaderboardPosition {
+        fn get_duelist_leaderboard_position(self: @ContractState, season_id: u32, duelist_id: u128) -> LeaderboardPosition {
             let mut store: Store = StoreTrait::new(self.world_default());
             (store.get_leaderboard(season_id).get_duelist_position(duelist_id))
         }
         
-        fn get_leaderboard(self: @ContractState, season_id: u128) -> Span<LeaderboardPosition> {
+        fn get_leaderboard(self: @ContractState, season_id: u32) -> Span<LeaderboardPosition> {
             let mut store: Store = StoreTrait::new(self.world_default());
             (store.get_leaderboard(season_id).get_all_positions())
         }
@@ -426,7 +426,7 @@ pub mod game {
         }
 
         fn calc_season_reward(self: @ContractState,
-            season_id: u128,
+            season_id: u32,
             duelist_id: u128,
             lives_staked: u8,
         ) -> RewardValues {
@@ -579,7 +579,7 @@ pub mod game {
             // distributions
             if (challenge.state.is_concluded()) {
                 // transfer rewards
-                let tournament_id: u128 = 0;
+                let tournament_id: u64 = 0;
                 let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_dispatcher().transfer_rewards(challenge, tournament_id);
 
                 // update leaderboards

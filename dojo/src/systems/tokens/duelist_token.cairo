@@ -86,7 +86,7 @@ pub trait IDuelistToken<TState> {
 
     // IDuelistTokenProtected
     fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, seed: felt252) -> Span<u128>;
-    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (RewardValues, RewardValues);
+    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64) -> (RewardValues, RewardValues);
 }
 
 // Exposed to clients
@@ -110,7 +110,7 @@ pub trait IDuelistTokenPublic<TState> {
 #[starknet::interface]
 pub trait IDuelistTokenProtected<TState> {
     fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, seed: felt252) -> Span<u128>;
-    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (RewardValues, RewardValues);
+    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64) -> (RewardValues, RewardValues);
 }
 
 #[dojo::contract]
@@ -385,14 +385,14 @@ pub mod duelist_token {
         fn transfer_rewards(
             ref self: ContractState,
             challenge: Challenge,
-            tournament_id: u128,
+            tournament_id: u64,
         ) -> (RewardValues, RewardValues) {
             // validate caller (game contract only)
             let mut store: Store = StoreTrait::new(self.world_default());
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
 
             // get fees distribution
-            let season_id: u128 = store.get_current_season_id();
+            let season_id: u32 = store.get_current_season_id();
             let rules: Rules = store.get_season_rules(season_id);
             let distribution: @PoolDistribution = rules.get_rewards_distribution(season_id, tournament_id);
             if (!distribution.is_payable()) {
@@ -532,7 +532,7 @@ pub mod duelist_token {
                 total_to_burn += underware_due; // released, need to burn
                 //
                 // release LORDS and burn FAME
-                let season_id: u128 = match (*distribution.pool_id) {
+                let season_id: u32 = match (*distribution.pool_id) {
                     PoolType::Season(season_id) => {season_id},
                     _ => {0},
                 };

@@ -95,7 +95,7 @@ mod tests {
         let duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
         let duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
 
-        let season_id: u128 = SEASON_ID_1;
+        let season_id: u32 = SEASON_ID_1;
 
         let fame_balance_a_init: u128 = tester::fame_balance_of_token(@sys, duelist_id_a);
         let fame_balance_b_init: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);
@@ -214,7 +214,7 @@ mod tests {
         let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
         let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
 
-        let season_id: u128 = SEASON_ID_1;
+        let season_id: u32 = SEASON_ID_1;
 
         let (challenge, round_1, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");

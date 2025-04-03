@@ -5,7 +5,7 @@ use pistols::types::timestamp::{Period};
 #[dojo::model]
 pub struct SeasonConfig {
     #[key]
-    pub season_id: u128,
+    pub season_id: u32,
     //------
     pub rules: Rules,           // rules for this season
     pub phase: SeasonPhase,     // current phase
@@ -24,7 +24,7 @@ pub enum SeasonPhase {
 #[dojo::model]
 pub struct SeasonScoreboard {
     #[key]
-    pub season_id: u128,
+    pub season_id: u32,
     #[key]
     pub holder: felt252,    // duelist_id or player_address
     //------------
@@ -47,12 +47,12 @@ pub impl SeasonManagerImpl of SeasonManagerTrait {
     // const LEADERBOARD_POSITIONS: u8 = 10;
 
     #[inline(always)]
-    fn initialize(ref store: Store) -> u128 {
+    fn initialize(ref store: Store) -> u32 {
         (Self::create_next_season(ref store, 0))
     }
-    fn create_next_season(ref store: Store, current_season_id: u128) -> u128 {
+    fn create_next_season(ref store: Store, current_season_id: u32) -> u32 {
         // create ids
-        let season_id: u128 = current_season_id + 1;
+        let season_id: u32 = current_season_id + 1;
         // set rules
         let rules: Rules = Self::get_next_season_rules();
         let distribution: @RewardDistribution = rules.get_season_distribution(100);
@@ -121,7 +121,7 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
             (*self).seconds_to_collect() == 0
         )
     }
-    fn collect(ref self: SeasonConfig, ref store: Store) -> u128 {
+    fn collect(ref self: SeasonConfig, ref store: Store) -> u32 {
         // must sync with Self::collect()
         assert(self.phase == SeasonPhase::InProgress, ErrorsGame::SEASON_IS_NOT_ACTIVE);
         assert(self.seconds_to_collect() == 0, ErrorsGame::SEASON_IS_ACTIVE);
@@ -130,7 +130,7 @@ pub impl SeasonConfigImpl of SeasonConfigTrait {
         self.period.end = starknet::get_block_timestamp();
         store.set_season_config(@self);
         // create next season
-        let season_id: u128 = SeasonManagerTrait::create_next_season(ref store, self.season_id);
+        let season_id: u32 = SeasonManagerTrait::create_next_season(ref store, self.season_id);
         (season_id)
     }
 }

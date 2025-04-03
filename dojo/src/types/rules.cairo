@@ -59,7 +59,7 @@ pub impl RulesImpl of RulesTrait {
     //
     // Duel rewards
     //
-    fn get_rewards_distribution(self: @Rules, season_id: u128, tournament_id: u128) -> @PoolDistribution {
+    fn get_rewards_distribution(self: @Rules, season_id: u32, tournament_id: u64) -> @PoolDistribution {
         let mut result: PoolDistribution = match self {
             Rules::Season => PoolDistribution {
                 underware_percent: 30,

@@ -18,7 +18,7 @@ pub struct Challenge {
     pub premise: Premise,           // premise of the dispute
     pub quote: felt252,             // message to challenged
     pub lives_staked: u8,           // lives staked by challenger
-    pub tournament_id: u128,        // if playing for a a tournament
+    pub tournament_id: u64,         // if playing for a a tournament
     // duelists
     pub address_a: ContractAddress, // Challenger wallet
     pub address_b: ContractAddress, // Challenged wallet
@@ -26,7 +26,7 @@ pub struct Challenge {
     pub duelist_id_b: u128,         // Challenged duelist 
     // progress and results
     pub state: ChallengeState,      // curerent state
-    pub season_id: u128,            // season in which was settled (duel has finished)
+    pub season_id: u32,            // season in which was settled (duel has finished)
     pub winner: u8,                 // 0:draw, 1:duelist_a, 2:duelist_b
     // timestamps in unix epoch
     pub timestamps: Period,

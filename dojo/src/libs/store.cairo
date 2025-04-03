@@ -138,30 +138,30 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_scoreboard_value(self: @Store, season_id: u128, holder: felt252) -> SeasonScoreboardValue {
+    fn get_scoreboard_value(self: @Store, season_id: u32, holder: felt252) -> SeasonScoreboardValue {
         (self.world.read_value((season_id, holder),))
     }
 
     #[inline(always)]
-    fn get_scoreboard(self: @Store, season_id: u128, holder: felt252) -> SeasonScoreboard {
+    fn get_scoreboard(self: @Store, season_id: u32, holder: felt252) -> SeasonScoreboard {
         (self.world.read_model((season_id, holder),))
     }
 
     #[inline(always)]
-    fn get_leaderboard_value(self: @Store, season_id: u128) -> LeaderboardValue {
+    fn get_leaderboard_value(self: @Store, season_id: u32) -> LeaderboardValue {
         (self.world.read_value(season_id))
     }
     #[inline(always)]
-    fn get_leaderboard(self: @Store, season_id: u128) -> Leaderboard {
+    fn get_leaderboard(self: @Store, season_id: u32) -> Leaderboard {
         (self.world.read_model(season_id))
     }
 
     #[inline(always)]
-    fn get_season_config(self: @Store, season_id: u128) -> SeasonConfig {
+    fn get_season_config(self: @Store, season_id: u32) -> SeasonConfig {
         (self.world.read_model(season_id))
     }
     #[inline(always)]
-    fn get_season_config_value(self: @Store, season_id: u128) -> SeasonConfigValue {
+    fn get_season_config_value(self: @Store, season_id: u32) -> SeasonConfigValue {
         (self.world.read_value(season_id))
     }
     #[inline(always)]
@@ -301,7 +301,7 @@ pub impl StoreImpl of StoreTrait {
     //
 
     #[inline(always)]
-    fn get_current_season_id(self: @Store) -> u128 {
+    fn get_current_season_id(self: @Store) -> u32 {
         (self.world.read_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("current_season_id")))
     }
     #[inline(always)]
@@ -322,7 +322,7 @@ pub impl StoreImpl of StoreTrait {
         (self.get_season_rules(self.get_current_season_id()))
     }
     #[inline(always)]
-    fn get_season_rules(self: @Store, season_id: u128) -> Rules {
+    fn get_season_rules(self: @Store, season_id: u32) -> Rules {
         (self.world.read_member(Model::<SeasonConfig>::ptr_from_keys(season_id), selector!("rules")))
     }
 
@@ -333,7 +333,7 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("is_paused"), is_paused);
     }
     #[inline(always)]
-    fn set_config_season_id(ref self: Store, season_id: u128) {
+    fn set_config_season_id(ref self: Store, season_id: u32) {
         self.world.write_member(Model::<Config>::ptr_from_keys(CONFIG::CONFIG_KEY), selector!("current_season_id"), season_id);
     }
     #[inline(always)]
@@ -400,7 +400,7 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn emit_lords_release(ref self: Store, season_id: u128, duel_id: u128, bill: @LordsReleaseBill) {
+    fn emit_lords_release(ref self: Store, season_id: u32, duel_id: u128, bill: @LordsReleaseBill) {
         self.world.emit_event(@LordsReleaseEvent {
             season_id,
             duel_id,

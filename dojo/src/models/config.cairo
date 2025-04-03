@@ -13,7 +13,7 @@ pub struct Config {
     pub treasury_address: ContractAddress,
     pub lords_address: ContractAddress,
     pub vrf_address: ContractAddress,
-    pub current_season_id: u128,
+    pub current_season_id: u32,
     pub is_paused: bool,
 }
 

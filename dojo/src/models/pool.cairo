@@ -28,8 +28,8 @@ pub enum PoolType {
     Undefined,              // 0
     Purchases,              // 1
     FamePeg,                // 2
-    Season: u128,           // 3
-    Tournament: u128,       // 4
+    Season: u32,            // 3
+    Tournament: u64,        // 4
     SacredFlame,            // 5
 }
 impl PoolTypeDefault of Default<PoolType> {

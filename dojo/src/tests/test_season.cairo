@@ -54,7 +54,7 @@ mod tests {
         assert!(season_1.can_collect(), "season_1.can_collect");
         assert!(sys.game.can_collect_season(), "sys.game.can_collect_season");
         // collect
-        let new_season_id: u128 = tester::execute_collect_season(@sys.game, OWNER());
+        let new_season_id: u32 = tester::execute_collect_season(@sys.game, OWNER());
         assert_ne!(new_season_id, 0, "new_season_id != 0");
         assert_ne!(new_season_id, season_1.season_id, "new_season_id");
         // past season is ended

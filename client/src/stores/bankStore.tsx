@@ -47,7 +47,7 @@ export const usePool = (pool_type: string) => {
   return _usePool(pool_type)
 }
 
-export const useSeasonPool = (season_id: BigNumberish) => {
+export const useSeasonPool = (season_id: number) => {
   return _usePool(constants.PoolType.Season, BigInt(season_id ?? 0))
 }
 

@@ -43,6 +43,8 @@ mod tests {
         FAUCET_AMOUNT;
     }
 
+    const TOURNAMENT_ID: u64 = 100;
+
     //-----------------------------------------
     // Challenge results
     //
@@ -550,7 +552,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
 
         // initial balances
         let balance_bank: u128 = sys.lords.balance_of(sys.bank.contract_address).low;
-        let pool_type: PoolType = PoolType::Tournament(SEASON_ID_1);
+        let pool_type: PoolType = PoolType::Tournament(TOURNAMENT_ID);
         let pool: Pool = sys.store.get_pool(pool_type);
         assert_eq!(balance_bank, 0, "balance_bank INIT");
         assert_eq!(pool.balance_lords, 0, "pool INIT lords");
@@ -558,9 +560,8 @@ tester::print_pools(@sys, 1, "COLLECTED");
 
         // sponsor...
         let amount: u128 = 1_000;
-        let tournament_id: u128 = 'tournament_id';
         tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, amount);
-        sys.bank.sponsor_tournament(OWNER(), amount, tournament_id);
+        sys.bank.sponsor_tournament(OWNER(), amount, TOURNAMENT_ID);
 
         // balances
         let pool_sponsored: Pool = sys.store.get_pool(pool_type);
@@ -574,8 +575,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
     fn test_sponsor_tournament_zero_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
         let amount: u128 = 1_000;
-        let tournament_id: u128 = 'tournament_id';
-        sys.bank.sponsor_tournament(OWNER(), amount, tournament_id);
+        sys.bank.sponsor_tournament(OWNER(), amount, TOURNAMENT_ID);
     }
     #[test]
     #[ignore]
@@ -583,15 +583,14 @@ tester::print_pools(@sys, 1, "COLLECTED");
     fn test_sponsor_tournament_insufficient_allowance() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::LORDS);
         let amount: u128 = 1_000;
-        let tournament_id: u128 = 'tournament_id';
         tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, amount);
-        sys.bank.sponsor_tournament(OWNER(), amount + 1, tournament_id);
+        sys.bank.sponsor_tournament(OWNER(), amount + 1, TOURNAMENT_ID);
     }
 
 
 
     // fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128);
     // fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128);
-    // fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u128);
+    // fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u64);
 
 }

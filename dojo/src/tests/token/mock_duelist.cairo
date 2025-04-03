@@ -21,7 +21,7 @@ pub trait IDuelistToken<TState> {
     // Duelist
     fn is_alive(self: @TState, token_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
-    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u128) -> (RewardValues, RewardValues);
+    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64) -> (RewardValues, RewardValues);
     fn poke(ref self: TState, duelist_id: u128) -> bool;
     fn sacrifice(ref self: TState, duelist_id: u128);
 }
@@ -94,7 +94,7 @@ pub mod duelist_token {
         fn life_count(self: @ContractState, duelist_id: u128) -> u8 {
             (3)
         }
-        fn transfer_rewards(ref self: ContractState, challenge: Challenge, tournament_id: u128) -> (RewardValues, RewardValues) {
+        fn transfer_rewards(ref self: ContractState, challenge: Challenge, tournament_id: u64) -> (RewardValues, RewardValues) {
             (Default::default(), Default::default())
         }
         fn poke(ref self: ContractState, duelist_id: u128) -> bool {

@@ -1,12 +1,10 @@
 import { useMemo } from 'react'
-import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityModel } from '@underware/pistols-sdk/dojo'
 import { useEntityId } from '@underware/pistols-sdk/utils/hooks'
 import { parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { useConfig } from '/src/stores/configStore'
 
 export const useSeasonConfigStore = createDojoStore<PistolsSchemaType>();
@@ -28,7 +26,7 @@ export const useCurrentSeason = () => {
   return useSeason(currentSeasonId)
 }
 
-export const useSeason = (season_id: BigNumberish) => {
+export const useSeason = (season_id: number) => {
   const entityId = useEntityId([season_id])
   const entities = useSeasonConfigStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
@@ -37,7 +35,7 @@ export const useSeason = (season_id: BigNumberish) => {
   // console.log(`useSeason() =>`, season_id, season)
 
   const seasonExists = useMemo(() => Boolean(season), [season])
-  const seasonName = useMemo(() => (season ? `Season ${bigintToDecimal(season.season_id)}` : '?'), [season])
+  const seasonName = useMemo(() => (`Season ${season?.season_id ?? '?'}`), [season])
   const phase = useMemo(() => (parseEnumVariant<constants.SeasonPhase>(season?.phase) ?? null), [season])
   const isActive = useMemo(() => (phase == constants.SeasonPhase.InProgress), [season])
   const isFinished = useMemo(() => (phase == constants.SeasonPhase.Ended), [season])
@@ -63,7 +61,7 @@ export type DuelistScore = {
   score: number
 }
 
-export const useLeaderboard = (season_id: BigNumberish) => {
+export const useLeaderboard = (season_id: number) => {
   const entityId = useEntityId([season_id])
   const entities = useSeasonConfigStore((state) => state.entities);
   const entity = useMemo(() => entities[entityId], [entities[entityId]])

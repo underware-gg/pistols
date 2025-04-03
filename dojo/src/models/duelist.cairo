@@ -52,7 +52,7 @@ pub struct DuelistMemorial {
     pub killed_by: u128,
     pub fame_before_death: u128,
     pub player_address: ContractAddress,
-    pub season_id: u128,
+    pub season_id: u32,
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]

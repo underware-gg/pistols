@@ -15,7 +15,7 @@ export interface Challenge {
 	duelist_id_a: BigNumberish;
 	duelist_id_b: BigNumberish;
 	state: ChallengeStateEnum;
-	season_id: BigNumberish;
+	season_id: number;
 	winner: BigNumberish;
 	timestamps: Period;
 }
@@ -32,7 +32,7 @@ export interface ChallengeValue {
 	duelist_id_a: BigNumberish;
 	duelist_id_b: BigNumberish;
 	state: ChallengeStateEnum;
-	season_id: BigNumberish;
+	season_id: number;
 	winner: BigNumberish;
 	timestamps: Period;
 }
@@ -97,7 +97,7 @@ export interface Config {
 	treasury_address: string;
 	lords_address: string;
 	vrf_address: string;
-	current_season_id: BigNumberish;
+	current_season_id: number;
 	is_paused: boolean;
 }
 
@@ -106,7 +106,7 @@ export interface ConfigValue {
 	treasury_address: string;
 	lords_address: string;
 	vrf_address: string;
-	current_season_id: BigNumberish;
+	current_season_id: number;
 	is_paused: boolean;
 }
 
@@ -149,7 +149,7 @@ export interface DuelistMemorial {
 	killed_by: BigNumberish;
 	fame_before_death: BigNumberish;
 	player_address: string;
-	season_id: BigNumberish;
+	season_id: number;
 }
 
 // Type definition for `pistols::models::duelist::DuelistMemorialValue` struct
@@ -158,7 +158,7 @@ export interface DuelistMemorialValue {
 	killed_by: BigNumberish;
 	fame_before_death: BigNumberish;
 	player_address: string;
-	season_id: BigNumberish;
+	season_id: number;
 }
 
 // Type definition for `pistols::models::duelist::DuelistStatus` struct
@@ -186,7 +186,7 @@ export interface DuelistValue {
 
 // Type definition for `pistols::models::leaderboard::Leaderboard` struct
 export interface Leaderboard {
-	season_id: BigNumberish;
+	season_id: number;
 	positions: BigNumberish;
 	duelist_ids: BigNumberish;
 	scores: BigNumberish;
@@ -284,7 +284,7 @@ export interface PoolValue {
 
 // Type definition for `pistols::models::season::SeasonConfig` struct
 export interface SeasonConfig {
-	season_id: BigNumberish;
+	season_id: number;
 	rules: RulesEnum;
 	phase: SeasonPhaseEnum;
 	period: Period;
@@ -299,7 +299,7 @@ export interface SeasonConfigValue {
 
 // Type definition for `pistols::models::season::SeasonScoreboard` struct
 export interface SeasonScoreboard {
-	season_id: BigNumberish;
+	season_id: number;
 	holder: BigNumberish;
 	points: BigNumberish;
 }
@@ -423,7 +423,7 @@ export interface ChallengeRewardsEventValue {
 
 // Type definition for `pistols::models::events::LordsReleaseEvent` struct
 export interface LordsReleaseEvent {
-	season_id: BigNumberish;
+	season_id: number;
 	bill: LordsReleaseBill;
 	duel_id: BigNumberish;
 	timestamp: BigNumberish;

@@ -65,7 +65,7 @@ pub struct ChallengeRewardsEvent {
 #[dojo::event(historical:true)]
 pub struct LordsReleaseEvent {
     #[key]
-    pub season_id: u128,
+    pub season_id: u32,
     //-----------------------
     pub bill: LordsReleaseBill,
     pub duel_id: u128,

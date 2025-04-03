@@ -22,7 +22,7 @@ export type DuelSvgProps = {
   quote: string
   state: constants.ChallengeState
   winner: number
-  season_id: BigNumberish
+  season_id: number
   profile_type_a: constants.ProfileType
   profile_type_b: constants.ProfileType
   profile_id_a: number

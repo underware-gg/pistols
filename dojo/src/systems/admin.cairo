@@ -43,7 +43,7 @@ pub mod admin {
     ) {
         let mut store: Store = StoreTrait::new(self.world_default());
         // initialize season
-        let season_id: u128 = SeasonManagerTrait::initialize(ref store);
+        let season_id: u32 = SeasonManagerTrait::initialize(ref store);
         // initialize Config
         let mut config: Config = ConfigManagerTrait::initialize();
         config.treasury_address = if (treasury_address.is_non_zero()) { treasury_address } else { starknet::get_caller_address() };
