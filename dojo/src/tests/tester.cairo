@@ -17,7 +17,7 @@ pub mod tester {
         game::{game, IGameDispatcher, IGameDispatcherTrait},
         tutorial::{tutorial, ITutorialDispatcher, ITutorialDispatcherTrait},
         rng::{rng, IRngDispatcher, IRngDispatcherTrait},
-        rng_mock::{rng_mock, m_MockedValue, IRngMockDispatcher, IRngMockDispatcherTrait},
+        rng_mock::{rng_mock, IRngMockDispatcher, IRngMockDispatcherTrait},
         vrf_mock::{vrf_mock},
         tokens::{
             duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
@@ -29,58 +29,36 @@ pub mod tester {
             lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
         },
         components::{
-            token_bound::{m_TokenBoundAddress, TokenBoundAddress, TokenBoundAddressTrait},
+            token_bound::{TokenBoundAddress, TokenBoundAddressTrait},
         },
     };
     pub use pistols::models::{
-        player::{
-            m_Player, Player,
-        },
-        pack::{
-            m_Pack, Pack, PackType, PackTypeTrait,
-        },
+        player::{Player},
+        pack::{Pack, PackType, PackTypeTrait},
         challenge::{
-            m_Challenge, Challenge, ChallengeValue,
-            m_Round, RoundValue,
+            Challenge, ChallengeValue,
+            RoundValue,
             DuelistState,
             DuelType,
         },
         duelist::{
-            m_Duelist, Duelist, DuelistValue,
-            m_DuelistChallenge, DuelistChallenge,
-            m_DuelistMemorial, DuelistMemorial, DuelistMemorialValue, CauseOfDeath,
+            Duelist, DuelistValue,
+            DuelistChallenge,
+            DuelistMemorial, DuelistMemorialValue,
+            CauseOfDeath,
         },
-        leaderboard::{
-            m_Leaderboard, Leaderboard, LeaderboardTrait, LeaderboardPosition
-        },
-        pact::{
-            m_Pact,
-        },
-        config::{
-            m_Config, Config,
-            m_TokenConfig, TokenConfig,
-            m_CoinConfig, CoinConfig,
-            CONFIG,
-        },
+        leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
+        config::{Config, TokenConfig, CoinConfig, CONFIG},
         season::{
-            m_SeasonConfig, SeasonConfig, SeasonManagerTrait,
-            m_SeasonScoreboard, SeasonScoreboard,
+            SeasonConfig, SeasonManagerTrait,
+            SeasonScoreboard,
         },
-        pool::{
-            m_Pool, Pool, PoolType,
-        },
-        events::{
-            e_PlayerActivityEvent,
-            e_CallToActionEvent,
-            e_ChallengeRewardsEvent,
-            e_LordsReleaseEvent,
-        },
+        pool::{Pool, PoolType},
     };
 
     // use pistols::tests::mock_account::DualCaseAccountMock;
     use pistols::tests::token::mock_duelist::{
         duelist_token as mock_duelist,
-        m_MockDuelistOwners,
     };
 
     use pistols::types::challenge_state::{ChallengeState};
@@ -250,35 +228,46 @@ pub mod tester {
 // println!("---- 0");
         let mut resources: Array<TestResource> = array![
             // pistols models
-            TestResource::Model(m_Player::TEST_CLASS_HASH),
-            TestResource::Model(m_Pack::TEST_CLASS_HASH),
-            TestResource::Model(m_Challenge::TEST_CLASS_HASH),
-            TestResource::Model(m_CoinConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_Config::TEST_CLASS_HASH),
-            TestResource::Model(m_Duelist::TEST_CLASS_HASH),
-            TestResource::Model(m_DuelistChallenge::TEST_CLASS_HASH),
-            TestResource::Model(m_DuelistMemorial::TEST_CLASS_HASH),
-            TestResource::Model(m_Pact::TEST_CLASS_HASH),
-            TestResource::Model(m_Round::TEST_CLASS_HASH),
-            TestResource::Model(m_SeasonScoreboard::TEST_CLASS_HASH),
-            TestResource::Model(m_Leaderboard::TEST_CLASS_HASH),
-            TestResource::Model(m_SeasonConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_TokenConfig::TEST_CLASS_HASH),
-            TestResource::Model(m_TokenBoundAddress::TEST_CLASS_HASH),
-            TestResource::Model(m_Pool::TEST_CLASS_HASH),
-            // events
+            TestResource::Model(pistols::models::config::m_Config::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::config::m_TokenConfig::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::config::m_CoinConfig::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::player::m_Player::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::pack::m_Pack::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::challenge::m_Challenge::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::challenge::m_Round::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::duelist::m_Duelist::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::duelist::m_DuelistChallenge::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::duelist::m_DuelistMemorial::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::pact::m_Pact::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::season::m_SeasonScoreboard::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::season::m_SeasonConfig::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::leaderboard::m_Leaderboard::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::pool::m_Pool::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::tournament::m_TournamentEntry::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::tournament::m_TournamentSettings::TEST_CLASS_HASH),
+            TestResource::Model(pistols::systems::components::token_bound::m_TokenBoundAddress::TEST_CLASS_HASH),
+            // pistols events
+            TestResource::Event(pistols::models::events::e_PlayerActivityEvent::TEST_CLASS_HASH),
+            TestResource::Event(pistols::models::events::e_CallToActionEvent::TEST_CLASS_HASH),
+            TestResource::Event(pistols::models::events::e_ChallengeRewardsEvent::TEST_CLASS_HASH),
+            TestResource::Event(pistols::models::events::e_LordsReleaseEvent::TEST_CLASS_HASH),
+            // cartridge arcade
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
-            TestResource::Event(e_PlayerActivityEvent::TEST_CLASS_HASH),
-            TestResource::Event(e_CallToActionEvent::TEST_CLASS_HASH),
-            TestResource::Event(e_ChallengeRewardsEvent::TEST_CLASS_HASH),
-            TestResource::Event(e_LordsReleaseEvent::TEST_CLASS_HASH),
+            // budokan
+            TestResource::Model(tournaments::components::models::game::m_GameMetadata::TEST_CLASS_HASH),
+            TestResource::Model(tournaments::components::models::game::m_TokenMetadata::TEST_CLASS_HASH),
+            TestResource::Model(tournaments::components::models::game::m_GameCounter::TEST_CLASS_HASH),
+            TestResource::Model(tournaments::components::models::game::m_Score::TEST_CLASS_HASH),
+            TestResource::Model(tournaments::components::models::game::m_Settings::TEST_CLASS_HASH),
+            TestResource::Model(tournaments::components::models::game::m_SettingsDetails::TEST_CLASS_HASH),
+            TestResource::Model(tournaments::components::models::game::m_SettingsCounter::TEST_CLASS_HASH),
         ];
         if (deploy_rng_mock) {
-            resources.append(TestResource::Model(m_MockedValue::TEST_CLASS_HASH));
+            resources.append(TestResource::Model(pistols::systems::rng_mock::m_MockedValue::TEST_CLASS_HASH));
         }
         if (!deploy_duelist && deploy_game) {
-            resources.append(TestResource::Model(m_MockDuelistOwners::TEST_CLASS_HASH));
+            resources.append(TestResource::Model(pistols::tests::token::mock_duelist::m_MockDuelistOwners::TEST_CLASS_HASH));
         }
 
         let mut contract_defs: Array<ContractDef> = array![];

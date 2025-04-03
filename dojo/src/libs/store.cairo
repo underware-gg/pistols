@@ -42,6 +42,10 @@ pub use pistols::models::{
         SeasonScoreboard, SeasonScoreboardValue,
         Rules,
     },
+    tournament::{
+        TournamentEntry, TournamentEntryValue,
+        TournamentSettings, TournamentSettingsValue,
+    },
     events::{
         CallToActionEvent,
         ChallengeRewardsEvent,
@@ -206,6 +210,24 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_model(recipient))
     }
 
+    #[inline(always)]
+    fn get_tournament_entry(self: @Store, game_id: u64) -> TournamentEntry {
+        (self.world.read_model(game_id))
+    }
+    #[inline(always)]
+    fn get_tournament_entry_value(self: @Store, game_id: u64) -> TournamentEntryValue {
+        (self.world.read_value(game_id))
+    }
+
+    #[inline(always)]
+    fn get_tournament_settings(self: @Store, settings_id: u32) -> TournamentSettings {
+        (self.world.read_model(settings_id))
+    }
+    #[inline(always)]
+    fn get_tournament_settings_value(self: @Store, settings_id: u32) -> TournamentSettingsValue {
+        (self.world.read_value(settings_id))
+    }
+
     //----------------------------------
     // Model Setters
     //
@@ -291,6 +313,16 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_token_bound_address(ref self: Store, model: @TokenBoundAddress) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_tournament_entry(ref self: Store, model: @TournamentEntry) {
+        self.world.write_model(model);
+    }
+    
+    #[inline(always)]
+    fn set_tournament_settings(ref self: Store, model: @TournamentSettings) {
         self.world.write_model(model);
     }
 

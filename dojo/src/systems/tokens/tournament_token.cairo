@@ -86,6 +86,7 @@ pub trait ITournamentTokenPublic<TState> {
 // Exposed to world
 #[starknet::interface]
 pub trait ITournamentTokenProtected<TState> {
+    fn create_settings(ref self: TState);
 }
 
 #[dojo::contract]
@@ -103,11 +104,14 @@ pub mod tournament_token {
     use nft_combo::erc721::erc721_combo::ERC721ComboComponent::{ERC721HooksImpl};
     use nft_combo::utils::renderer::{ContractMetadata, TokenMetadata, Attribute};
     use nft_combo::utils::encoder::{Encoder};
+    use tournaments::components::game::{game_component};
+    use tournaments::components::interfaces::{IGameDetails, ISettings};//, IGameToken};
     use pistols::systems::components::token_component::{TokenComponent};
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
     component!(path: ERC721ComboComponent, storage: erc721_combo, event: ERC721ComboEvent);
     component!(path: TokenComponent, storage: token, event: TokenEvent);
+    component!(path: game_component, storage: game, event: GameEvent);
     impl ERC721InternalImpl = ERC721Component::InternalImpl<ContractState>;
     impl ERC721ComboInternalImpl = ERC721ComboComponent::InternalImpl<ContractState>;
     #[abi(embed_v0)]
@@ -115,6 +119,9 @@ pub mod tournament_token {
     #[abi(embed_v0)]
     impl TokenComponentPublicImpl = TokenComponent::TokenComponentPublicImpl<ContractState>;
     impl TokenComponentInternalImpl = TokenComponent::TokenComponentInternalImpl<ContractState>;
+    #[abi(embed_v0)]
+    impl GameImpl = game_component::GameImpl<ContractState>;
+    impl GameInternalImpl = game_component::InternalImpl<ContractState>;
     #[storage]
     struct Storage {
         #[substorage(v0)]
@@ -125,6 +132,8 @@ pub mod tournament_token {
         erc721_combo: ERC721ComboComponent::Storage,
         #[substorage(v0)]
         token: TokenComponent::Storage,
+        #[substorage(v0)]
+        game: game_component::Storage,
     }
     #[event]
     #[derive(Drop, starknet::Event)]
@@ -137,6 +146,8 @@ pub mod tournament_token {
         ERC721ComboEvent: ERC721ComboComponent::Event,
         #[flat]
         TokenEvent: TokenComponent::Event,
+        #[flat]
+        GameEvent: game_component::Event,
     }
     //
     // ERC-721 End
@@ -145,10 +156,13 @@ pub mod tournament_token {
     // use pistols::interfaces::dns::{
     //     DnsTrait,
     // };
-    // use pistols::models::{
-    //     challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, RoundTrait},
-    //     events::{Activity, ActivityTrait},
-    // };
+    use pistols::models::{
+        tournament::{
+            TournamentEntryValue,
+            TournamentSettings, TournamentSettingsValue, TournamentSettingsValueTrait,
+            TournamentType, TOURNAMENT_SETTINGS,
+        },
+    };
     use pistols::types::{
         constants::{METADATA},
     };
@@ -161,8 +175,15 @@ pub mod tournament_token {
     }
 
     //*******************************
+    // erc721
     fn TOKEN_NAME()   -> ByteArray {("Pistols at Dawn Tournaments")}
-    fn TOKEN_SYMBOL() -> ByteArray {("TOURNA")}
+    fn TOKEN_SYMBOL() -> ByteArray {("TOURNAMENT")}
+    //*******************************
+    // Budokan
+    fn DEFAULT_NS() -> ByteArray {"pistols"}
+    fn SCORE_MODEL() -> ByteArray {"TournamentEntry"}
+    fn SCORE_ATTRIBUTE() -> ByteArray {"points"}
+    fn SETTINGS_MODEL() -> ByteArray {"TournamentSettings"}
     //*******************************
 
     fn dojo_init(
@@ -180,6 +201,21 @@ pub mod tournament_token {
         self.token.initialize(
             minter_address,
         );
+        // initialize budokan
+        self.game.initializer(
+            starknet::get_contract_address(),
+            'Pistols at Dawn',
+            "10 paces, one shot. Whether you are duelling for honour or vengeance, be sure to put the bastard in the dirt.",
+            'Underware.gg',
+            'Underware.gg',
+            'PvP Battle Royale',
+            "https://assets.underware.gg/pistols/logo.png",
+            DEFAULT_NS(),
+            SCORE_MODEL(),
+            SCORE_ATTRIBUTE(),
+            SETTINGS_MODEL(),
+        );
+        self.create_settings();
     }
 
     #[generate_trait]
@@ -187,6 +223,24 @@ pub mod tournament_token {
         #[inline(always)]
         fn world_default(self: @ContractState) -> WorldStorage {
             (self.world(@"pistols"))
+        }
+    }
+
+    // Budokan settings
+    #[abi(embed_v0)]
+    impl SettingsImpl of ISettings<ContractState> {
+        fn setting_exists(self: @ContractState, settings_id: u32) -> bool {
+            let store: Store = StoreTrait::new(self.world_default());
+            let settings: TournamentSettingsValue = store.get_tournament_settings_value(settings_id);
+            (settings.exists())
+        }
+    }
+    #[abi(embed_v0)]
+    impl GameDetailsImpl of IGameDetails<ContractState> {
+        fn score(self: @ContractState, game_id: u64) -> u32 {
+            let store: Store = StoreTrait::new(self.world_default());
+            let entry: TournamentEntryValue = store.get_tournament_entry_value(game_id);
+            entry.points.into()
         }
     }
 
@@ -217,6 +271,15 @@ pub mod tournament_token {
     //
     #[abi(embed_v0)]
     impl TournamentTokenProtectedImpl of super::ITournamentTokenProtected<ContractState> {
+        fn create_settings(ref self: ContractState) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            store.set_tournament_settings(@TournamentSettings {
+                settings_id: TOURNAMENT_SETTINGS::LAST_MAN_STANDING,
+                tournament_type: TournamentType::LastManStanding,
+                // required_fame: (3000 * CONST::ETH_TO_WEI).low,
+                required_fame: 3000,
+            });
+        }
     }
 
 

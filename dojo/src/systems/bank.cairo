@@ -117,7 +117,7 @@ pub mod bank {
             assert(lords_amount != 0, Errors::INVALID_AMOUNT);
             let mut store: Store = StoreTrait::new(self.world_default());
             // TODO...
-            // let tournament: TournamentConfig = store.get_tournament(tournament_id);
+            // let tournament: TournamentSettings = store.get_tournament(tournament_id);
             // assert(tournament.is_active(), Errors::INVALID_TOURNAMENT);
             self._transfer_lords_to_pool(store, payer, lords_amount.into(), PoolType::Tournament(tournament_id));
         }

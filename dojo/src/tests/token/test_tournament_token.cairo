@@ -9,6 +9,7 @@ use pistols::systems::{
 use pistols::models::{
     // tournament::{Tournament, TournamentTrait},
     config::{TokenConfig},
+    tournament::{TournamentSettingsValue, TournamentType, TOURNAMENT_SETTINGS},
 };
 
 // use pistols::interfaces::dns::{DnsTrait};
@@ -66,12 +67,15 @@ fn _assert_minted_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
 #[test]
 fn test_initializer() {
     let mut sys: TestSystems = setup(0);
-    assert_eq!(sys.tournament.symbol(), "TOURNA", "Symbol is wrong");
-
-    _assert_minted_count(@sys, 0, "Should eq 0");
-
+    assert_eq!(sys.tournament.symbol(), "TOURNAMENT", "Symbol is wrong");
     assert!(sys.tournament.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
     assert!(sys.tournament.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
+    _assert_minted_count(@sys, 0, "Should eq 0");
+
+    // settings created
+    let settings: TournamentSettingsValue = sys.store.get_tournament_settings_value(TOURNAMENT_SETTINGS::LAST_MAN_STANDING);
+    assert_eq!(settings.tournament_type, TournamentType::LastManStanding, "Should eq LastManStanding");
+    assert_eq!(settings.required_fame, 3000, "Should eq 3000");
 }
 
 #[test]

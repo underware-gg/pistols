@@ -52,6 +52,7 @@ mod models {
     pub mod pool;
     pub mod leaderboard;
     pub mod season;
+    pub mod tournament;
 }
 
 mod types {
