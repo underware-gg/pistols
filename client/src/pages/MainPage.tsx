@@ -88,7 +88,6 @@ export default function MainPage({
   return (
     <AppGame backgroundImage={null} networkId={showTutorial ? ENV.ACADEMY_NETWORK_ID : undefined} autoConnect={showTutorial}>
       <Background className={null}>
-        <StoreSync />
         <GameContainer isVisible={true} />
         <MainUI />
         <Modals />
@@ -131,7 +130,12 @@ function MainUI() {
 
   if (!gameImpl) return <></>
 
-  return currentScene || <DojoStatus message={'Loading Scene...'} />;
+  return (
+    <>
+      {(Boolean(currentScene) && !atGate) && <StoreSync />}
+      {currentScene || <DojoStatus message={'Loading Scene...'} />}
+    </>
+  )
 }
 
 function TutorialUI({
