@@ -10,9 +10,8 @@ pub trait ITokenComponentPublic<TState> {
 
 #[starknet::interface]
 pub trait ITokenComponentInternal<TState> {
-    fn initialize(ref self: TState,
-        minter_address: ContractAddress,
-    );
+    fn initialize(ref self: TState, minter_address: ContractAddress);
+    fn set_minter_address(ref self: TState, minter_address: ContractAddress);
     fn mint(ref self: TState, recipient: ContractAddress) -> u128;
     fn mint_multiple(ref self: TState, recipient: ContractAddress, quantity: usize) -> Span<u128>;
     fn burn(ref self: TState, token_id: u128);
@@ -97,8 +96,7 @@ pub mod TokenComponent {
     //-----------------------------------------
     // Internal
     //
-    #[embeddable_as(TokenComponentInternalImpl)]
-    pub impl InternalImpl<
+    pub impl TokenComponentInternalImpl<
         TContractState,
         +HasComponent<TContractState>,
         +IWorldProvider<TContractState>,
@@ -119,6 +117,16 @@ pub mod TokenComponent {
                 minter_address,
                 minted_count: 0,
             };
+            store.set_token_config(@token_config);
+        }
+
+        fn set_minter_address(ref self: ComponentState<TContractState>,
+            minter_address: ContractAddress,
+        ) {
+            let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
+            let mut store: Store = StoreTrait::new(world);
+            let mut token_config: TokenConfig = store.get_token_config(starknet::get_contract_address());
+            token_config.minter_address = minter_address;
             store.set_token_config(@token_config);
         }
 
