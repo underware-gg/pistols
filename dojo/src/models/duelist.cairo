@@ -34,11 +34,12 @@ pub struct DuelistStatus {
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct DuelistChallenge {
+pub struct DuelistAssignment {
     #[key]
     pub duelist_id: u128,
     //-----------------------
     pub duel_id: u128,      // current Challenge a Duelist is in
+    pub entry_id: u64,      // current Tournament a Duelist is in
 }
 
 // cfrated for dead duelists
@@ -68,7 +69,9 @@ pub enum CauseOfDeath {
 //----------------------------------
 // Traits
 //
+use core::num::traits::Zero;
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
+use pistols::systems::tokens::tournament_token::tournament_token::{Errors as TournamentErrors};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::types::rules::{RewardValues};
 use pistols::types::constants::{HONOUR};
@@ -78,18 +81,27 @@ use pistols::utils::math::{MathU64};
 #[generate_trait]
 pub impl DuelistImpl of DuelistTrait {
     fn enter_challenge(ref self: Store, duelist_id: u128, duel_id: u128) {
-        let current_challenge: DuelistChallenge = self.get_duelist_challenge(duelist_id);
-        assert(current_challenge.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);
-        self.set_duelist_challenge(@DuelistChallenge{
-            duelist_id,
-            duel_id,
-        });
+        let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
+        assert(assignment.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);
+        assignment.duel_id = duel_id;
+        self.set_duelist_challenge(@assignment);
     }
     fn exit_challenge(ref self: Store, duelist_id: u128) {
-        self.set_duelist_challenge(@DuelistChallenge{
-            duelist_id,
-            duel_id: 0,
-        });
+        let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
+        assignment.duel_id = 0;
+        self.set_duelist_challenge(@assignment);
+    }
+    fn enter_tournament(ref self: Store, duelist_id: u128, entry_id: u64) {
+        let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
+        assert(assignment.duel_id.is_zero(), TournamentErrors::DUELIST_IN_CHALLENGE);
+        assert(assignment.entry_id.is_zero(), TournamentErrors::DUELIST_IN_TOURNAMENT);
+        assignment.entry_id = entry_id;
+        self.set_duelist_challenge(@assignment);
+    }
+    fn exit_tournament(ref self: Store, duelist_id: u128) {
+        let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
+        assignment.entry_id = 0;
+        self.set_duelist_challenge(@assignment);
     }
 }
 

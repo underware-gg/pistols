@@ -90,7 +90,7 @@ function Profiles({
     return Object.entries(profiles).map(([key, profile]) => {
       const { archetype, honour } = _randomArchetype()
       const { fame, lives, rookie, dead } = _randomFame(archetype)
-      const is_dueling = (Math.random() > 0.25);
+      const is_dueling = (honour > 0 && !dead && Math.random() > 0.25);
       const prop: duelist_token.DuelistSvgProps = {
         // base_uri: 'https://localhost:5173',
         duelist_id: 16,
@@ -107,7 +107,8 @@ function Profiles({
         fame,
         lives,
         is_memorized: false,
-        duel_id: (honour > 0 && !dead && is_dueling) ? Math.floor(Math.random() * 1000) : 0,
+        duel_id: (is_dueling) ? Math.floor(Math.random() * 1000) : 0,
+        entry_id: (is_dueling) ? (Math.random() > 0.5 ? 100 : 0) : 0,
       };
       return { profile, prop }
     })

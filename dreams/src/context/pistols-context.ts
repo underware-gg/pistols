@@ -205,7 +205,7 @@ query getDuelist {
 * Identify if a duelist is free to play. If the query returns an empty, or the result has a duel_id of 0x0, the duelist is free to play:
 \`\`\`graphql
 query getIsDuelistFree {
-  pistolsDuelistChallengeModels(where:{duelist_id: $duelist_id}) {
+  pistolsDuelistAssignmentModels(where:{duelist_id: $duelist_id}) {
     edges {
       node {
         duelist_id

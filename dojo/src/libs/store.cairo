@@ -28,7 +28,7 @@ pub use pistols::models::{
     },
     duelist::{
         Duelist, DuelistValue, DuelistTimestamps,
-        DuelistChallenge, DuelistChallengeValue,
+        DuelistAssignment, DuelistAssignmentValue,
         DuelistMemorial, DuelistMemorialValue,
     },
     leaderboard::{
@@ -125,11 +125,11 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_duelist_challenge(self: @Store, duelist_id: u128) -> DuelistChallenge {
+    fn get_duelist_challenge(self: @Store, duelist_id: u128) -> DuelistAssignment {
         (self.world.read_model(duelist_id))
     }
     #[inline(always)]
-    fn get_duelist_challenge_value(self: @Store, duelist_id: u128) -> DuelistChallengeValue {
+    fn get_duelist_challenge_value(self: @Store, duelist_id: u128) -> DuelistAssignmentValue {
         (self.world.read_value(duelist_id))
     }
     #[inline(always)]
@@ -213,12 +213,12 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_tournament_entry(self: @Store, game_id: u64) -> TournamentEntry {
-        (self.world.read_model(game_id))
+    fn get_tournament_entry(self: @Store, entry_id: u64) -> TournamentEntry {
+        (self.world.read_model(entry_id))
     }
     #[inline(always)]
-    fn get_tournament_entry_value(self: @Store, game_id: u64) -> TournamentEntryValue {
-        (self.world.read_value(game_id))
+    fn get_tournament_entry_value(self: @Store, entry_id: u64) -> TournamentEntryValue {
+        (self.world.read_value(entry_id))
     }
 
     #[inline(always)]
@@ -269,7 +269,7 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_duelist_challenge(ref self: Store, model: @DuelistChallenge) {
+    fn set_duelist_challenge(ref self: Store, model: @DuelistAssignment) {
         self.world.write_model(model);
     }
 

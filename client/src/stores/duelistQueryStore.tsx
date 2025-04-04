@@ -44,7 +44,7 @@ const createStore = () => {
     let duelist = e.models.pistols.Duelist
     const { variant } = parseCustomEnum<constants.ProfileType>(duelist?.profile_type)
     if (!duelist || variant != constants.ProfileType.Duelist) return undefined
-    let currentChallenge = e.models.pistols.DuelistChallenge
+    let currentChallenge = e.models.pistols.DuelistAssignment
     let memorial = e.models.pistols.DuelistMemorial
     return {
       duelist_id: BigInt(duelist.duelist_id),

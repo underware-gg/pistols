@@ -38,7 +38,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const duelist = useEntityModel<models.Duelist>(entity, 'Duelist')
-  const duelistChallenge = useEntityModel<models.DuelistChallenge>(entity, 'DuelistChallenge')
+  const duelistChallenge = useEntityModel<models.DuelistAssignment>(entity, 'DuelistAssignment')
   const duelistMemorial = useEntityModel<models.DuelistMemorial>(entity, 'DuelistMemorial')
   // console.log(`useDuelist() =>`, duelist_id, duelist)
   // console.log(`DuelistMemorial =>`, duelist_id, duelistMemorial)
@@ -60,6 +60,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   // current duel a duelist is in
   const currentDuelId = useMemo(() => BigInt(duelistChallenge?.duel_id ?? 0), [duelistChallenge])
+  const currentEntryId = useMemo(() => BigInt(duelistChallenge?.entry_id ?? 0), [duelistChallenge])
   const isInAction = useMemo(() => (currentDuelId > 0n), [currentDuelId])
 
   // memorial (dead duelists)
@@ -103,6 +104,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     gender,
     isNpc,
     currentDuelId,
+    currentEntryId,
     isInAction,
     isInactive,
     inactiveFameDripped,
@@ -131,7 +133,7 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
     const duellingIds: BigNumberish[] = []
     const duelPerDuelists: Record<string, BigNumberish> = {}
     alive_entities.forEach(entityId => {
-      const challenge = getEntityModel(entities[entityId], 'DuelistChallenge')
+      const challenge = getEntityModel(entities[entityId], 'DuelistAssignment')
       const duelist_id = bigintToHex(challenge?.duelist_id ?? getEntityModel(entities[entityId], 'Duelist').duelist_id)
       if (isPositiveBigint(challenge?.duel_id)) {
         duellingIds.push(duelist_id)

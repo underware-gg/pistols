@@ -157,7 +157,7 @@ pub mod duelist_token {
         duelist::{
             Duelist, DuelistValue,
             DuelistTimestamps,
-            DuelistChallengeValue,
+            DuelistAssignmentValue,
             DuelistMemorial, CauseOfDeath, //DuelistMemorialValue,
             DuelistStatusTrait,
             Archetype,
@@ -628,7 +628,7 @@ pub mod duelist_token {
             // TODO: use memorized player, FAME, season, cause_of_death
             let base_uri: ByteArray = self.erc721._base_uri();
             let owner: ContractAddress = self.owner_of(token_id);
-            let challenge: DuelistChallengeValue = store.get_duelist_challenge_value(token_id.low);
+            let assignment: DuelistAssignmentValue = store.get_duelist_challenge_value(token_id.low);
             let archetype: Archetype = duelist.status.get_archetype();
             let duelist_image: ByteArray = duelist.profile_type.get_uri(base_uri.clone());
             let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
@@ -649,7 +649,8 @@ pub mod duelist_token {
                 .add("total_draws", duelist.status.total_draws.to_string(), false)
                 .add("fame", ETH(fame_balance.into()).low.to_string(), false)
                 .add("lives", lives.to_string(), false)
-                .add("duel_id", format!("0x{:x}", challenge.duel_id), false)
+                .add("duel_id", format!("0x{:x}", assignment.duel_id), false)
+                .add("entry_id", format!("0x{:x}", assignment.entry_id), false)
                 .add("tokenbound_address", format!("0x{:x}", tokenbound_address), false)
                 // .add("is_memorized", is_memorized.to_string(), false)
                 .build();

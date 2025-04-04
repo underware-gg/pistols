@@ -44,7 +44,7 @@ pub mod tester {
         },
         duelist::{
             Duelist, DuelistValue,
-            DuelistChallenge,
+            DuelistAssignment,
             DuelistMemorial, DuelistMemorialValue,
             CauseOfDeath,
         },
@@ -241,7 +241,7 @@ pub mod tester {
             TestResource::Model(pistols::models::challenge::m_Challenge::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::challenge::m_Round::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::duelist::m_Duelist::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::duelist::m_DuelistChallenge::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::duelist::m_DuelistAssignment::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::duelist::m_DuelistMemorial::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pact::m_Pact::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::season::m_SeasonScoreboard::TEST_CLASS_HASH),

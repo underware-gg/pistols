@@ -55,14 +55,19 @@ pub trait ITournamentToken<TState> {
     // fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
 
     // ITournamentTokenPublic
-    fn is_active(self: @TState, tournament_id: u64) -> bool;
+    fn can_start(self: @TState, entry_id: u64) -> bool;
+    fn can_play(self: @TState, entry_id: u64) -> bool;
+    fn start_with_duelist(ref self: TState, entry_id: u64, duelist_id: u128);
 }
 
 // Exposed to clients
 #[starknet::interface]
 pub trait ITournamentTokenPublic<TState> {
     // view
-    fn is_active(self: @TState, tournament_id: u64) -> bool;
+    fn can_start(self: @TState, entry_id: u64) -> bool;
+    fn can_play(self: @TState, entry_id: u64) -> bool;
+    // write
+    fn start_with_duelist(ref self: TState, entry_id: u64, duelist_id: u128);
 }
 
 // Exposed to world and admins
@@ -73,8 +78,8 @@ pub trait ITournamentTokenProtected<TState> {
 
 #[dojo::contract]
 pub mod tournament_token {
-    // use core::num::traits::Zero;
-    // use starknet::{ContractAddress};
+    use core::num::traits::Zero;
+    use starknet::{ContractAddress};
     use dojo::world::{WorldStorage, IWorldDispatcherTrait};
 
     //-----------------------------------
@@ -130,8 +135,9 @@ pub mod tournament_token {
     //     DnsTrait,
     // };
     use pistols::models::{
+        duelist::{DuelistTrait},
         tournament::{
-            TournamentEntryValue,
+            TournamentEntry, TournamentEntryValue,
             TournamentSettings, TournamentSettingsValue, TournamentSettingsValueTrait,
             TournamentType, TOURNAMENT_SETTINGS,
         },
@@ -139,13 +145,30 @@ pub mod tournament_token {
     use pistols::types::{
         constants::{METADATA},
     };
-    use pistols::interfaces::dns::{SELECTORS};
+    use pistols::interfaces::dns::{
+        DnsTrait, SELECTORS,
+        IDuelistTokenDispatcherTrait,
+    };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use graffiti::url::{UrlImpl};
 
+    use tournaments::components::models::{
+        game::{TokenMetadataValue},
+    };
+    use tournaments::components::libs::{
+        lifecycle::{LifecycleTrait},
+    };
+
     pub mod Errors {
-        pub const CALLER_NOT_OWNER: felt252         = 'TORNAMENT: Caller not owner';
+        pub const CALLER_NOT_OWNER: felt252         = 'TOURNAMENT: Caller not owner';
+        pub const BUDOKAN_NOT_STARTABLE: felt252    = 'TOURNAMENT: Not startable';
+        pub const BUDOKAN_NOT_PLAYABLE: felt252     = 'TOURNAMENT: Not playable';
+        pub const ALREADY_STARTED: felt252          = 'TOURNAMENT: Already started';
+        pub const NOT_YOUR_ENTRY: felt252           = 'TOURNAMENT: Not your entry';
+        pub const NOT_YOUR_DUELIST: felt252         = 'TOURNAMENT: Not your duelist';
+        pub const DUELIST_IN_CHALLENGE: felt252     = 'TOURNAMENT: In a challenge';
+        pub const DUELIST_IN_TOURNAMENT: felt252    = 'TOURNAMENT: In a tournament';
     }
 
     //*******************************
@@ -156,7 +179,7 @@ pub mod tournament_token {
     // Budokan
     fn DEFAULT_NS() -> ByteArray {"pistols"}
     fn SCORE_MODEL() -> ByteArray {"TournamentEntry"}
-    fn SCORE_ATTRIBUTE() -> ByteArray {"points"}
+    fn SCORE_ATTRIBUTE() -> ByteArray {"score"}
     fn SETTINGS_MODEL() -> ByteArray {"TournamentSettings"}
     //*******************************
 
@@ -196,7 +219,10 @@ pub mod tournament_token {
         }
     }
 
-    // Budokan settings
+
+    //-----------------------------------
+    // Budokan hooks
+    //
     #[abi(embed_v0)]
     impl SettingsImpl of ISettings<ContractState> {
         fn setting_exists(self: @ContractState, settings_id: u32) -> bool {
@@ -210,7 +236,7 @@ pub mod tournament_token {
         fn score(self: @ContractState, game_id: u64) -> u32 {
             let store: Store = StoreTrait::new(self.world_default());
             let entry: TournamentEntryValue = store.get_tournament_entry_value(game_id);
-            entry.points.into()
+            (entry.score)
         }
     }
 
@@ -224,14 +250,47 @@ pub mod tournament_token {
         //-----------------------------------
         // View calls
         //
-        fn is_active(self: @ContractState, tournament_id: u64) -> bool {
-            // let mut store: Store = StoreTrait::new(self.world_default());
-            (false)
+        fn can_start(self: @ContractState, entry_id: u64) -> bool {
+            let store: Store = StoreTrait::new(self.world_default());
+            let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
+            let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
+            (
+                token_metadata.lifecycle.can_start(starknet::get_block_timestamp()) &&
+                entry.duelist_id.is_zero()
+            )
+        }
+        fn can_play(self: @ContractState, entry_id: u64) -> bool {
+            let store: Store = StoreTrait::new(self.world_default());
+            let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
+            let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
+            (
+                token_metadata.lifecycle.is_playable(starknet::get_block_timestamp()) &&
+                entry.duelist_id.is_non_zero()
+            )
         }
 
         //-----------------------------------
         // Write calls
         //
+        fn start_with_duelist(ref self: ContractState, entry_id: u64, duelist_id: u128) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            // budokan must be startable
+            let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
+            assert(token_metadata.lifecycle.can_start(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_STARTABLE);
+            // entry not started (duelist must be empty)
+            let mut entry: TournamentEntry = store.get_tournament_entry(entry_id);
+            assert(entry.duelist_id.is_zero(), Errors::ALREADY_STARTED);
+            // validate ownership
+            let caller: ContractAddress = starknet::get_caller_address();
+            assert(self.is_owner_of(caller, entry_id.into()) == true, Errors::NOT_YOUR_ENTRY);
+            assert(store.world.duelist_token_dispatcher().is_owner_of(caller, duelist_id.into()) == true, Errors::NOT_YOUR_DUELIST);
+            // Duelist must not be assigned
+            DuelistTrait::enter_tournament(ref store, duelist_id, entry_id);
+            // lock duelist in this tournament
+            entry.duelist_id = duelist_id;
+            store.set_tournament_entry(@entry);
+        }
+
 
     }
 

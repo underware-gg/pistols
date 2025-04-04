@@ -3,10 +3,12 @@
 #[dojo::model]
 pub struct TournamentEntry {
     #[key]
-    pub game_id: u64,
+    pub entry_id: u64,
     //------
-    pub fame: u128,
-    pub points: u16,
+    pub duelist_id: u128,
+    pub score: u32,         // budokan score
+    pub points: u16,        // duelist points
+    pub fame: u128,         // duelist FAME
 }
 
 #[derive(Copy, Drop, Serde)]

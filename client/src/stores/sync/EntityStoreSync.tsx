@@ -21,7 +21,7 @@ const query: PistolsQueryBuilder = new PistolsQueryBuilder()
     "pistols-Leaderboard",
     "pistols-Player",
     "pistols-Duelist",
-    "pistols-DuelistChallenge",
+    "pistols-DuelistAssignment",
     "pistols-DuelistMemorial",
     "pistols-Challenge",
     'pistols-Round',
@@ -70,7 +70,7 @@ export function EntityStoreSync() {
       seasonState.setEntities(filterEntitiesByModel(entities, ['SeasonConfig', 'Leaderboard']))
       playerState.setEntities(filterEntitiesByModel(entities, 'Player'))
       playerState.updateMessages(filterEntitiesByModel(entities, ['PlayerOnline', 'PlayerBookmark']))
-      const duelistEntities = filterEntitiesByModel(entities, ['Duelist', 'DuelistChallenge', 'DuelistMemorial'])
+      const duelistEntities = filterEntitiesByModel(entities, ['Duelist', 'DuelistAssignment', 'DuelistMemorial'])
       duelistState.setEntities(duelistEntities)
       duelistQueryState.setEntities(duelistEntities)
       bankState.setEntities(filterEntitiesByModel(entities, 'Pool'))
@@ -96,7 +96,7 @@ export function EntityStoreSync() {
       if (getEntityModels(entity, ['PlayerOnline', 'PlayerBookmark']).length > 0) {
         playerState.updateMessages([entity])
       }
-      if (getEntityModel(entity, 'Duelist') || getEntityModel(entity, 'DuelistChallenge') || getEntityModel(entity, 'DuelistMemorial')) {
+      if (getEntityModel(entity, 'Duelist') || getEntityModel(entity, 'DuelistAssignment') || getEntityModel(entity, 'DuelistMemorial')) {
         duelistState.updateEntity(entity)
         duelistQueryState.updateEntity(entity)
       }
