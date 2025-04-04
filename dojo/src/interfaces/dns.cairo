@@ -18,6 +18,7 @@ pub use pistols::systems::{
         fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait},
         fools_coin::{IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait},
         lords_mock::{ILordsMockDispatcher, ILordsMockDispatcherTrait},
+        budokan_mock::{IBudokanMockDispatcher, IBudokanMockDispatcherTrait},
     }
 };
 pub use pistols::interfaces::{
@@ -140,6 +141,10 @@ pub impl DnsImpl of DnsTrait {
     fn vrf_mock_address(self: @WorldStorage) -> ContractAddress {
         (self.find_contract_address(@"vrf_mock"))
     }
+    #[inline(always)]
+    fn budokan_mock_address(self: @WorldStorage) -> ContractAddress {
+        (self.find_contract_address(@"budokan_mock"))
+    }
 
     //--------------------------
     // address validators
@@ -241,6 +246,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn vrf_mock_dispatcher(self: @WorldStorage) -> IVrfProviderDispatcher {
         (IVrfProviderDispatcher{ contract_address: self.vrf_mock_address() })
+    }
+    #[inline(always)]
+    fn budokan_mock_dispatcher(self: @WorldStorage) -> IBudokanMockDispatcher {
+        (IBudokanMockDispatcher{ contract_address: self.budokan_mock_address() })
     }
 
 }

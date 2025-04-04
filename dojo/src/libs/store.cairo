@@ -60,6 +60,8 @@ pub use pistols::systems::components::{
 use pistols::types::{
     rules::{RewardValues},
 };
+use tournaments::components::models::game::{TokenMetadata, TokenMetadataValue};
+
 
 #[derive(Copy, Drop)]
 pub struct Store {
@@ -226,6 +228,15 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_tournament_settings_value(self: @Store, settings_id: u32) -> TournamentSettingsValue {
         (self.world.read_value(settings_id))
+    }
+
+    #[inline(always)]
+    fn get_budokan_token_metadata(self: @Store, token_id: u64) -> TokenMetadata {
+        (self.world.read_model(token_id))
+    }
+    #[inline(always)]
+    fn get_budokan_token_metadata_value(self: @Store, token_id: u64) -> TokenMetadataValue {
+        (self.world.read_value(token_id))
     }
 
     //----------------------------------

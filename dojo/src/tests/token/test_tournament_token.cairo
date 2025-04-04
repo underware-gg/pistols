@@ -1,16 +1,16 @@
-// use starknet::{ContractAddress};
+use starknet::{ContractAddress};
 // use dojo::world::{WorldStorage};
 
 use pistols::systems::{
     tokens::{
-        tournament_token::{ITournamentTokenDispatcherTrait},
+        tournament_token::{},
     }
 };
 use pistols::models::{
     // tournament::{Tournament, TournamentTrait},
-    config::{TokenConfig},
     tournament::{TournamentSettingsValue, TournamentType, TOURNAMENT_SETTINGS},
 };
+use tournaments::components::models::game::{TokenMetadata};
 
 // use pistols::interfaces::dns::{DnsTrait};
 // use pistols::types::constants::{CONST};
@@ -20,30 +20,30 @@ use pistols::tests::tester::{
         StoreTrait,
         TestSystems, FLAGS,
         OWNER,
+        ITournamentTokenDispatcherTrait,
+        IGameTokenDispatcherTrait,
     },
 };
 
-use nft_combo::erc721::erc721_combo::{ERC721ComboComponent as combo};
 use openzeppelin_token::erc721::interface;
 
 //
 // Setup
 //
 
-const TOKEN_ID_1: u256 = 1;
-const TOKEN_ID_2: u256 = 2;
-const TOKEN_ID_3: u256 = 3;
-const TOKEN_ID_4: u256 = 4;
-const TOKEN_ID_5: u256 = 5;
+const SETTINGS_ID: u32 = TOURNAMENT_SETTINGS::LAST_MAN_STANDING;
 
-const BUDOKAN_ID_1: u256 = 1000;
-const BUDOKAN_ID_2: u256 = 1001;
-const BUDOKAN_ID_3: u256 = 1002;
-const BUDOKAN_ID_4: u256 = 1003;
-const BUDOKAN_ID_5: u256 = 1004;
+const TOKEN_ID_0: u64 = 0;
+const TOKEN_ID_1: u64 = 1;
+const TOKEN_ID_2: u64 = 2;
+
+const TOURNAMENT_ID_1: u64 = 1000;
+const TOURNAMENT_ID_2: u64 = 1001;
+
+const PLAYER_NAME: felt252 = 'Player';
 
 
-fn setup(_fee_amount: u128) -> TestSystems {
+fn setup() -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(FLAGS::TOURNAMENT);
 
     // drop all events
@@ -55,9 +55,17 @@ fn setup(_fee_amount: u128) -> TestSystems {
     (sys)
 }
 
-fn _assert_minted_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
-    let token_config: TokenConfig = (*sys.store).get_token_config((*sys.tournament).contract_address);
-    assert_eq!(token_config.minted_count, minted_count, "{}", msg);
+fn _mint(sys: @TestSystems, recipient: ContractAddress) -> u64 {
+    // mint from budokan
+    tester::impersonate(*sys.budokan.contract_address);
+    // public mint function in the budokan game component
+    ((*sys.tournament_game).mint(
+        player_name: PLAYER_NAME,
+        settings_id: SETTINGS_ID,
+        start: Option::None,
+        end: Option::None,
+        to: recipient,
+    ))
 }
 
 //
@@ -66,21 +74,27 @@ fn _assert_minted_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) {
 
 #[test]
 fn test_initializer() {
-    let mut sys: TestSystems = setup(0);
+    let mut sys: TestSystems = setup();
     assert_eq!(sys.tournament.symbol(), "TOURNAMENT", "Symbol is wrong");
     assert!(sys.tournament.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
     assert!(sys.tournament.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
-    _assert_minted_count(@sys, 0, "Should eq 0");
 
     // settings created
     let settings: TournamentSettingsValue = sys.store.get_tournament_settings_value(TOURNAMENT_SETTINGS::LAST_MAN_STANDING);
     assert_eq!(settings.tournament_type, TournamentType::LastManStanding, "Should eq LastManStanding");
     assert_eq!(settings.required_fame, 3000, "Should eq 3000");
+
+    // budokan creator token
+    assert_eq!(sys.tournament.total_supply(), 1, "total_supply");
+    assert_eq!(sys.tournament.owner_of(TOKEN_ID_0.into()), sys.tournament.contract_address, "owner_of(0)");
+    let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(TOKEN_ID_0);
+    assert_eq!(token_metadata.player_name, 'Creator', "token_metadata.player_name");
+    assert_eq!(token_metadata.minted_by, sys.tournament.contract_address, "token_metadata.minted_by");
 }
 
 #[test]
 fn test_contract_uri() {
-    let mut sys: TestSystems = setup(0);
+    let mut sys: TestSystems = setup();
     let uri: ByteArray = sys.tournament.contract_uri();
     let uri_camel: ByteArray = sys.tournament.contractURI();
     println!("___tournament.contract_uri():{}", uri);
@@ -89,17 +103,10 @@ fn test_contract_uri() {
 }
 
 #[test]
-#[ignore]
 fn test_token_uri() {
-    let mut sys: TestSystems = setup(0);
-
-    // let tournament = Tournament {
-    //     token_id: TOKEN_ID_1.low,
-    //     budokan_id: BUDOKAN_ID_1.low,
-    // };
-    // tester::set_Tournament(ref sys.world, @tournament);
-
-    let uri = sys.tournament.token_uri(TOKEN_ID_2);
+    let mut sys: TestSystems = setup();
+    let token_id: u64 = _mint(@sys, OWNER());
+    let uri = sys.tournament.token_uri(token_id.into());
     assert_gt!(uri.len(), 100, "Uri 1 should not be empty");
     println!("___tournaments.token_uri(1):{}", uri);
 }
@@ -107,7 +114,7 @@ fn test_token_uri() {
 #[test]
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
-    let mut sys: TestSystems = setup(0);
+    let mut sys: TestSystems = setup();
     sys.tournament.token_uri(999);
 }
 
@@ -116,43 +123,15 @@ fn test_token_uri_invalid() {
 // mint
 //
 
-// #[test]
-// // #[should_panic(expected: ('TOKEN: caller is not minter', 'ENTRYPOINT_FAILED'))] // for Dojo contracts
-// // #[should_panic(expected: ('ENTRYPOINT_NOT_FOUND', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for accounts
-// #[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for random addresses
-// fn test_mint_duelist_not_minter() {
-//     let mut sys: TestSystems = setup(0);
-//     // let account: ContractAddress = tester::deploy_mock_account();
-//     // tester::impersonate(account);
-//     sys.duelists.mint_duelists(OWNER(), 1, 0x1234);
-// }
-
-
-
-//---------------------------------
-// metadata_update
-//
 #[test]
-fn test_update_contract_metadata() {
-    let mut sys: TestSystems = setup(0);
-    tester::drop_all_events(sys.tournament.contract_address);
-    sys.tournament.update_contract_metadata();
-    let _event = tester::pop_log::<combo::ContractURIUpdated>(sys.tournament.contract_address, selector!("ContractURIUpdated")).unwrap();
-}
-#[test]
-fn test_update_token_metadata() {
-    let mut sys: TestSystems = setup(0);
-    tester::drop_all_events(sys.tournament.contract_address);
-    sys.tournament.update_token_metadata(TOKEN_ID_1.low);
-    let event = tester::pop_log::<combo::MetadataUpdate>(sys.tournament.contract_address, selector!("MetadataUpdate")).unwrap();
-    assert_eq!(event.token_id, TOKEN_ID_1.into(), "event.token_id");
-}
-#[test]
-fn test_update_tokens_metadata() {
-    let mut sys: TestSystems = setup(0);
-    tester::drop_all_events(sys.tournament.contract_address);
-    sys.tournament.update_tokens_metadata(TOKEN_ID_1.low, TOKEN_ID_2.low);
-    let event = tester::pop_log::<combo::BatchMetadataUpdate>(sys.tournament.contract_address, selector!("BatchMetadataUpdate")).unwrap();
-    assert_eq!(event.from_token_id, TOKEN_ID_1.into(), "event.from_token_id");
-    assert_eq!(event.to_token_id, TOKEN_ID_2.into(), "event.to_token_id");
+fn test_mint() {
+    let mut sys: TestSystems = setup();
+    let token_id: u64 = _mint(@sys, OWNER());
+    assert_eq!(token_id, TOKEN_ID_1, "token_id");
+    assert_eq!(sys.tournament.owner_of(TOKEN_ID_1.into()), OWNER(), "owner_of(1)");
+    assert_eq!(sys.tournament.total_supply(), 2, "total_supply");
+    // check budokan components created
+    let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(token_id);
+    assert_eq!(token_metadata.minted_by, sys.budokan.contract_address, "token_metadata.minted_by");
+    assert_eq!(token_metadata.player_name, PLAYER_NAME, "token_metadata.player_name");
 }

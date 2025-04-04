@@ -12,7 +12,6 @@ mod systems {
     pub mod rng;
     pub mod rng_mock;
     pub mod tutorial;
-    #[cfg(feature:'vrf_mock')]
     pub mod vrf_mock;
     pub mod tokens {
         // erc721
@@ -24,8 +23,9 @@ mod systems {
         pub mod fame_coin;
         pub mod fools_coin;
         // mocks
-        #[cfg(feature:'lords_mock')]
+        // #[cfg(feature:'lords_mock')]
         pub mod lords_mock;
+        pub mod budokan_mock;
     }
     pub mod components {
         pub mod coin_component;

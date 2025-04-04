@@ -29,10 +29,9 @@ cairo_test = "2.9.4"
 dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.4.0" }
 # openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v1.0.0" }
 
-[features]
-default = ["lords_mock", "vrf_mock"]
-lords_mock = []
-vrf_mock = []
+# [features]
+# default = ["lords_mock"]
+# lords_mock = []
 
 [[target.starknet-contract]]
 sierra = true

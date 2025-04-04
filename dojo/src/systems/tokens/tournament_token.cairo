@@ -292,7 +292,7 @@ pub mod tournament_token {
             let metadata = ContractMetadata {
                 name: self.name(),
                 symbol: self.symbol(),
-                description: "Pistols at Dawn Duels",
+                description: "Pistols at Dawn Tournament Entry",
                 image: Option::Some(METADATA::CONTRACT_IMAGE(base_uri.clone())),
                 banner_image: Option::Some(METADATA::CONTRACT_BANNER_IMAGE(base_uri.clone())),
                 featured_image: Option::Some(METADATA::CONTRACT_FEATURED_IMAGE(base_uri.clone())),
@@ -340,7 +340,7 @@ pub mod tournament_token {
             let metadata = TokenMetadata {
                 token_id,
                 name: format!("Tournament #{}", token_id),
-                description: format!("Pistols at Dawn Tournament #{}. https://pistols.gg", token_id),
+                description: format!("Pistols at Dawn Tournament Entry #{}. https://pistols.gg", token_id),
                 image: Option::Some(image),
                 image_data: Option::None,
                 external_url: Option::Some(METADATA::EXTERNAL_LINK()), // TODO: format external token link

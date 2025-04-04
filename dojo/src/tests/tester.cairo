@@ -27,6 +27,7 @@ pub mod tester {
             fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
             fools_coin::{fools_coin, IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait},
             lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
+            budokan_mock::{budokan_mock, IBudokanMockDispatcher, IBudokanMockDispatcherTrait},
         },
         components::{
             token_bound::{TokenBoundAddress, TokenBoundAddressTrait},
@@ -57,8 +58,8 @@ pub mod tester {
     };
 
     // use pistols::tests::mock_account::DualCaseAccountMock;
-    use pistols::tests::token::mock_duelist::{
-        duelist_token as mock_duelist,
+    use pistols::tests::token::{
+        mock_duelist::{duelist_token as mock_duelist},
     };
 
     use pistols::types::challenge_state::{ChallengeState};
@@ -74,6 +75,7 @@ pub mod tester {
         // ERC721Component,
         ERC721Component::{Transfer, Approval}
     };
+    pub use tournaments::components::interfaces::{IGameTokenDispatcher, IGameTokenDispatcherTrait};
 
     
     //
@@ -169,7 +171,9 @@ pub mod tester {
         pub duelists: IDuelistTokenDispatcher,
         pub pack: IPackTokenDispatcher,
         pub tournament: ITournamentTokenDispatcher,
+        pub tournament_game: IGameTokenDispatcher,
         pub rng: IRngMockDispatcher,
+        pub budokan: IBudokanMockDispatcher,
         pub account: ContractAddress,
     }
 
@@ -191,7 +195,9 @@ pub mod tester {
                 duelists: world.duelist_token_dispatcher(),
                 pack: world.pack_token_dispatcher(),
                 tournament: world.tournament_token_dispatcher(),
+                tournament_game: IGameTokenDispatcher{ contract_address: world.tournament_token_address() },
                 rng: IRngMockDispatcher{ contract_address: world.rng_address() },
+                budokan: world.budokan_mock_dispatcher(),
                 account: mock_account,
             })
         }
@@ -225,7 +231,6 @@ pub mod tester {
         deploy_bank     = deploy_bank || deploy_fame || deploy_lords || deploy_duelist;
         deploy_vrf      = deploy_vrf || deploy_game || deploy_pack;
         
-// println!("---- 0");
         let mut resources: Array<TestResource> = array![
             // pistols models
             TestResource::Model(pistols::models::config::m_Config::TEST_CLASS_HASH),
@@ -352,13 +357,17 @@ pub mod tester {
 
         if (deploy_tournament) {
             resources.append(TestResource::Contract(tournament_token::TEST_CLASS_HASH));
+            resources.append(TestResource::Contract(budokan_mock::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"tournament_token")
                     .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
                     .with_init_calldata([
                         'http://localhost:3000',
-                        0, // minter_address
                     ].span()),
+            );
+            contract_defs.append(
+                ContractDefTrait::new(@"pistols", @"budokan_mock")
+                    // .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         }
 
@@ -421,24 +430,28 @@ pub mod tester {
         testing::set_block_number(1);
         testing::set_block_timestamp(INITIAL_TIMESTAMP);
 
-// println!("---- 1");
         let mut world: WorldStorage = spawn_test_world([namespace_def].span());
-// println!("---- 2");
 
         world.sync_perms_and_inits(contract_defs.span());
-// println!("---- 3");
+
+        // build result
+        let mock_account: ContractAddress = if (deploy_account) {deploy_mock_account()} else {ZERO()};
+        let sys: TestSystems = TestSystemsTrait::from_world(world, mock_account);
 
         // initializers
-// println!("---- 4");
+        if (deploy_game) {
+            world.dispatcher.grant_owner(selector_from_tag!("pistols-game"), OWNER());
+        }
         if (deploy_admin) {
             world.dispatcher.grant_owner(selector_from_tag!("pistols-admin"), OWNER());
         }
-// println!("---- 5");
+        if (deploy_tournament) {
+            world.dispatcher.grant_owner(selector_from_tag!("pistols-tournament_token"), OWNER());
+        }
         if (deploy_lords) {
             let lords = world.lords_mock_dispatcher();
             execute_lords_faucet(@lords, OWNER());
             execute_lords_faucet(@lords, OTHER());
-// println!("---- 6");
             if (approve) {
                 let spender = world.bank_address();
                 execute_lords_approve(@lords, OWNER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
@@ -446,19 +459,11 @@ pub mod tester {
                 execute_lords_approve(@lords, BUMMER(), spender, 1_000_000 * CONST::ETH_TO_WEI.low);
             }
         }
-// println!("---- 7");
-
-        let mock_account: ContractAddress = if (deploy_account) {
-            (deploy_mock_account())
-        } else {
-            ZERO()
-        };
-
 
         impersonate(OWNER());
 
 // println!("READY!");
-        (TestSystemsTrait::from_world(world, mock_account))
+        (sys)
     }
 
 

@@ -16,7 +16,7 @@ pub trait IDuelistToken<TState> {
     fn transfer_from(ref self: TState, from: ContractAddress, to: ContractAddress, token_id: u256);
     fn owner_of(self: @TState, token_id: u256) -> ContractAddress;
     // Token
-    fn exists(self: @TState, token_id: u128) -> bool;
+    fn token_exists(self: @TState, token_id: u128) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u256) -> bool;
     // Duelist
     fn is_alive(self: @TState, token_id: u128) -> bool;
@@ -82,7 +82,7 @@ pub mod duelist_token {
             let as_felt: felt252 = token_id.low.into();
             (as_felt.try_into().unwrap())
         }
-        fn exists(self: @ContractState, token_id: u128) -> bool {
+        fn token_exists(self: @ContractState, token_id: u128) -> bool {
             (self.owner_of(token_id.into()).is_non_zero())
         }
         fn is_owner_of(self: @ContractState, address: ContractAddress, token_id: u256) -> bool {
