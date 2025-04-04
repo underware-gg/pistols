@@ -87,7 +87,6 @@ default = "pistols"
 ]
 "pistols-tournament_token" = [
   "sstr:https://assets.underware.gg", # base_uri
-  "0x025b1e8fc5e887aeccde45d1c07bf45e3e4897740d70a7e9adc58a68324df1f5", # minter_address (budokan)
 ]
 
 
@@ -99,4 +98,5 @@ order_inits = []
 skip_contracts = [
   "pistols-lords_mock",
   "pistols-vrf_mock",
+  "pistols-budokan_mock",
 ]

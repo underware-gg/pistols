@@ -41,7 +41,7 @@ pub trait ITournamentToken<TState> {
     fn last_token_id(self: @TState) -> u256;
     fn is_minting_paused(self: @TState) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u256) -> bool;
-    fn exists(self: @TState, token_id: u256) -> bool;
+    fn token_exists(self: @TState, token_id: u256) -> bool;
     // (CamelOnly)
     fn maxSupply(self: @TState) -> u256;
     fn totalSupply(self: @TState) -> u256;
@@ -64,16 +64,10 @@ pub trait ITournamentToken<TState> {
     // IERC721ComboABI end
     //-----------------------------------
 
-    // ITokenComponentPublic
-    fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
-    fn update_contract_metadata(ref self: TState);
-    fn update_token_metadata(ref self: TState, token_id: u128);
-    fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
-
-    // IDuelTokenPublic
+    // ITournamentTokenPublic
     fn is_active(self: @TState, tournament_id: u64) -> bool;
 
-    // IDuelTokenProtected
+    // ITournamentTokenProtected
 }
 
 // Exposed to clients
@@ -83,7 +77,7 @@ pub trait ITournamentTokenPublic<TState> {
     fn is_active(self: @TState, tournament_id: u64) -> bool;
 }
 
-// Exposed to world
+// Exposed to world and admins
 #[starknet::interface]
 pub trait ITournamentTokenProtected<TState> {
     fn create_settings(ref self: TState);
@@ -92,8 +86,8 @@ pub trait ITournamentTokenProtected<TState> {
 #[dojo::contract]
 pub mod tournament_token {
     // use core::num::traits::Zero;
-    use starknet::{ContractAddress};
-    use dojo::world::{WorldStorage};
+    // use starknet::{ContractAddress};
+    use dojo::world::{WorldStorage, IWorldDispatcherTrait};
 
     //-----------------------------------
     // ERC-721 Start
@@ -106,19 +100,14 @@ pub mod tournament_token {
     use nft_combo::utils::encoder::{Encoder};
     use tournaments::components::game::{game_component};
     use tournaments::components::interfaces::{IGameDetails, ISettings};//, IGameToken};
-    use pistols::systems::components::token_component::{TokenComponent};
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
     component!(path: ERC721ComboComponent, storage: erc721_combo, event: ERC721ComboEvent);
-    component!(path: TokenComponent, storage: token, event: TokenEvent);
     component!(path: game_component, storage: game, event: GameEvent);
     impl ERC721InternalImpl = ERC721Component::InternalImpl<ContractState>;
     impl ERC721ComboInternalImpl = ERC721ComboComponent::InternalImpl<ContractState>;
     #[abi(embed_v0)]
     impl ERC721ComboMixinImpl = ERC721ComboComponent::ERC721ComboMixinImpl<ContractState>;
-    #[abi(embed_v0)]
-    impl TokenComponentPublicImpl = TokenComponent::TokenComponentPublicImpl<ContractState>;
-    impl TokenComponentInternalImpl = TokenComponent::TokenComponentInternalImpl<ContractState>;
     #[abi(embed_v0)]
     impl GameImpl = game_component::GameImpl<ContractState>;
     impl GameInternalImpl = game_component::InternalImpl<ContractState>;
@@ -131,8 +120,6 @@ pub mod tournament_token {
         #[substorage(v0)]
         erc721_combo: ERC721ComboComponent::Storage,
         #[substorage(v0)]
-        token: TokenComponent::Storage,
-        #[substorage(v0)]
         game: game_component::Storage,
     }
     #[event]
@@ -144,8 +131,6 @@ pub mod tournament_token {
         ERC721Event: ERC721Component::Event,
         #[flat]
         ERC721ComboEvent: ERC721ComboComponent::Event,
-        #[flat]
-        TokenEvent: TokenComponent::Event,
         #[flat]
         GameEvent: game_component::Event,
     }
@@ -166,12 +151,13 @@ pub mod tournament_token {
     use pistols::types::{
         constants::{METADATA},
     };
+    use pistols::interfaces::dns::{SELECTORS};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use graffiti::url::{UrlImpl};
 
     pub mod Errors {
-        pub const INVALID_CALLER: felt252           = 'TORNAMENT: Invalid caller';
+        pub const CALLER_NOT_OWNER: felt252         = 'TORNAMENT: Caller not owner';
     }
 
     //*******************************
@@ -189,7 +175,6 @@ pub mod tournament_token {
     fn dojo_init(
         ref self: ContractState,
         base_uri: felt252,
-        minter_address: ContractAddress,
     ) {
         self.erc721_combo.initializer(
             TOKEN_NAME(),
@@ -197,9 +182,6 @@ pub mod tournament_token {
             base_uri.to_string(),
             Option::None, // contract_uri (use hooks)
             Option::None, // max_supply (infinite)
-        );
-        self.token.initialize(
-            minter_address,
         );
         // initialize budokan
         self.game.initializer(
@@ -215,7 +197,7 @@ pub mod tournament_token {
             SCORE_ATTRIBUTE(),
             SETTINGS_MODEL(),
         );
-        self.create_settings();
+        self._create_settings();
     }
 
     #[generate_trait]
@@ -272,6 +254,21 @@ pub mod tournament_token {
     #[abi(embed_v0)]
     impl TournamentTokenProtectedImpl of super::ITournamentTokenProtected<ContractState> {
         fn create_settings(ref self: ContractState) {
+            self._assert_caller_is_owner();
+            self._create_settings();
+        }
+    }
+
+    //------------------------------------
+    // Internal calls
+    //
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        fn _assert_caller_is_owner(self: @ContractState) {
+            let mut world = self.world_default();
+            assert(world.dispatcher.is_owner(SELECTORS::TOURNAMENT_TOKEN, starknet::get_caller_address()) == true, Errors::CALLER_NOT_OWNER);
+        }
+        fn _create_settings(ref self: ContractState) {
             let mut store: Store = StoreTrait::new(self.world_default());
             store.set_tournament_settings(@TournamentSettings {
                 settings_id: TOURNAMENT_SETTINGS::LAST_MAN_STANDING,
@@ -281,7 +278,6 @@ pub mod tournament_token {
             });
         }
     }
-
 
     //-----------------------------------
     // ERC721ComboHooksTrait

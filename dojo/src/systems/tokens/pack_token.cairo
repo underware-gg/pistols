@@ -42,7 +42,7 @@ pub trait IPackToken<TState> {
     fn last_token_id(self: @TState) -> u256;
     fn is_minting_paused(self: @TState) -> bool;
     fn is_owner_of(self: @TState, address: ContractAddress, token_id: u256) -> bool;
-    fn exists(self: @TState, token_id: u256) -> bool;
+    fn token_exists(self: @TState, token_id: u256) -> bool;
     // (CamelOnly)
     fn maxSupply(self: @TState) -> u256;
     fn totalSupply(self: @TState) -> u256;
