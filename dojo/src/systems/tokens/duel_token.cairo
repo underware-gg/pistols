@@ -55,17 +55,13 @@ pub trait IDuelToken<TState> {
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn update_contract_metadata(ref self: TState);
     fn update_token_metadata(ref self: TState, token_id: u128);
-    fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
+    // fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
 
     // IDuelTokenPublic
     fn get_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> u128;
     fn has_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> bool;
     fn create_duel(ref self: TState, duel_type: DuelType, duelist_id: u128, challenged_address: ContractAddress, premise: Premise, quote: felt252, expire_hours: u64, lives_staked: u8) -> u128;
     fn reply_duel(ref self: TState, duel_id: u128, duelist_id: u128, accepted: bool) -> ChallengeState;
-    // fn delete_duel(ref self: TState, duel_id: u128);
-
-    // IDuelTokenProtected
-    fn transfer_to_winner(ref self: TState, duel_id: u128);
 }
 
 // Exposed to clients
@@ -91,7 +87,6 @@ pub trait IDuelTokenPublic<TState> {
         duelist_id: u128,
         accepted: bool,
     ) -> ChallengeState;
-    // fn delete_duel(ref self: TState, duel_id: u128);
 }
 
 // Exposed to world
@@ -459,14 +454,6 @@ pub mod duel_token {
 
             (challenge.state)
         }
-
-        // fn delete_duel(ref self: ContractState,
-        //     duel_id: u128,
-        // ) {
-        //     self.erc721_combo._require_owner_of(starknet::get_caller_address(), duel_id.into());
-        //     assert(false, Errors::NOT_IMPLEMENTED);
-        //     self.token.burn(duel_id.into());
-        // }
     }
 
     

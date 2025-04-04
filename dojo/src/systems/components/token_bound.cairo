@@ -165,8 +165,7 @@ pub mod TokenBoundComponent {
     //-----------------------------------------
     // Internal
     //
-    #[embeddable_as(TokenBoundInternalImpl)]
-    pub impl InternalImpl<
+    pub impl TokenBoundInternalImpl<
         TContractState,
         +HasComponent<TContractState>,
         +IWorldProvider<TContractState>,

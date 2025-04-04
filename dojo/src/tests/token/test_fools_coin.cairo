@@ -12,6 +12,9 @@ use pistols::tests::tester::{tester,
         OWNER,
     }
 };
+use pistols::interfaces::dns::{
+    IFoolsCoinProtectedDispatcher, IFoolsCoinProtectedDispatcherTrait,
+};
 use pistols::types::constants::{CONST};
 
 const AMOUNT: u128 = 1000 * CONST::ETH_TO_WEI.low;
@@ -43,12 +46,16 @@ fn test_initializer() {
 // protected calls
 //
 
+pub fn _protected(sys: @TestSystems) -> IFoolsCoinProtectedDispatcher {
+    (IFoolsCoinProtectedDispatcher{contract_address: (*sys.fools).contract_address})
+}
+
 #[test]
 // #[should_panic(expected:('FOOLS: Invalid caller', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for Dojo contracts
 // #[should_panic(expected: ('ENTRYPOINT_NOT_FOUND', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for accounts
 #[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for random addresses
 fn test_reward_player_invalid_caller() {
     let mut sys: TestSystems = setup(0);
-    sys.fools.reward_player(OWNER(), 1_000);
+    _protected(@sys).reward_player(OWNER(), 1_000);
 }
 

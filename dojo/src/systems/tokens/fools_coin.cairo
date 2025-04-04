@@ -21,9 +21,6 @@ pub trait IFoolsCoin<TState> {
     fn totalSupply(self: @TState) -> u256;
     fn balanceOf(self: @TState, account: ContractAddress) -> u256;
     fn transferFrom(ref self: TState, sender: ContractAddress, recipient: ContractAddress, amount: u256) -> bool;
-
-    // IFoolsCoinProtected
-    fn reward_player(ref self: TState, recipient: ContractAddress, amount: u128);
 }
 
 // Exposed to world

@@ -7,13 +7,6 @@ pub trait IBank<TState> {
     fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128);
     fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128);
     fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u64);
-
-    // IBankProtected
-    fn charge_purchase(ref self: TState, payer: ContractAddress, lords_amount: u128);
-    fn peg_minted_fame_to_purchased_lords(ref self: TState, payer: ContractAddress, lords_amount: u128);
-    fn release_lords_from_fame_to_be_burned(ref self: TState, season_id: u32, duel_id: u128, bills: Span<LordsReleaseBill>) -> u128;
-    fn duelist_lost_fame_to_pool(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u128, pool_id: PoolType);
-    fn release_season_pool(ref self: TState, season_id: u32);
 }
 
 // Exposed to clients
@@ -55,6 +48,7 @@ pub mod bank {
         DnsTrait,
         Erc20Dispatcher, Erc20DispatcherTrait,
         IFameCoinDispatcher, IFameCoinDispatcherTrait,
+        IFameCoinProtectedDispatcher, IFameCoinProtectedDispatcherTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
     };
     use pistols::models::{
@@ -189,6 +183,7 @@ pub mod bank {
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
             let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
             let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
+            let fame_protected_dispatcher: IFameCoinProtectedDispatcher = store.world.fame_coin_protected_dispatcher();
             // gather leaderboards and distribution
             let positions: Span<LeaderboardPosition> = store.get_leaderboard(season_id).get_all_positions();
             let rules: Rules = store.get_season_rules(season_id);
@@ -228,7 +223,7 @@ pub mod bank {
             let fame_supply: u128 = fame_dispatcher.total_supply().low;
             self._release_pegged_lords(store, season_id, 0, fame_supply, @bills.span());
             // burn FAME from pool
-            fame_dispatcher.burn(pool_season.balance_fame);
+            fame_protected_dispatcher.burn(pool_season.balance_fame);
             // empty from pool
             pool_season.empty();
             store.set_pool(@pool_season);

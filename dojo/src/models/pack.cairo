@@ -80,7 +80,7 @@ mod PACK_TYPES {
 use pistols::systems::tokens::pack_token::pack_token::{Errors as PackErrors};
 use pistols::interfaces::dns::{
     DnsTrait,
-    IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+    IDuelistTokenProtectedDispatcherTrait,
 };
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::libs::store::{Store, StoreTrait};
@@ -93,8 +93,9 @@ pub impl PackImpl of PackTrait {
             PackType::Unknown => { [].span() },
             PackType::StarterPack |
             PackType::Duelists5x => {
-                let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-                (duelist_dispatcher.mint_duelists(recipient, self.pack_type.description().quantity, self.seed))
+                (store.world.duelist_token_protected_dispatcher()
+                    .mint_duelists(recipient, self.pack_type.description().quantity, self.seed)
+                )
             },
         };
         self.is_open = true;

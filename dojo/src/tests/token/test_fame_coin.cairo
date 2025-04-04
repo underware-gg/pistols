@@ -13,6 +13,9 @@ use pistols::tests::tester::{tester,
         OWNER, OTHER,
     }
 };
+use pistols::interfaces::dns::{
+    IFameCoinProtectedDispatcher, IFameCoinProtectedDispatcherTrait,
+};
 use pistols::types::constants::{CONST, FAME};
 
 const AMOUNT: u128 = 1000 * CONST::ETH_TO_WEI.low;
@@ -80,11 +83,20 @@ fn test_token_bound_address() {
     assert_ne!(balance_2, 0, "balance_2");
 }
 
+
+//---------------------------------
+// protected calls
+//
+
+pub fn _protected(sys: @TestSystems) -> IFameCoinProtectedDispatcher {
+    (IFameCoinProtectedDispatcher{contract_address: (*sys.fame).contract_address})
+}
+
 #[test]
 #[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_fame_mint_not_minter() {
     let mut sys: TestSystems = setup(0);
-    sys.fame.minted_duelist(123);
+    _protected(@sys).minted_duelist(123);
 }
 
 #[test]
@@ -92,36 +104,28 @@ fn test_fame_mint_not_minter() {
 fn test_fame_mint_already_registered() {
     let mut sys: TestSystems = setup(0);
     tester::impersonate(sys.duelists.contract_address);
-    sys.fame.minted_duelist(TOKEN_ID_1_1.low);
+    _protected(@sys).minted_duelist(TOKEN_ID_1_1.low);
 }
 
 #[test]
 #[should_panic(expected: ('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_fame_reward_not_minter() {
     let mut sys: TestSystems = setup(0);
-    sys.fame.reward_duelist(123, 0);
+    _protected(@sys).reward_duelist(123, 0);
 }
-
-
-
-
-
-//---------------------------------
-// fails
-//
 
 #[test]
 #[should_panic(expected:('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_minted_duelist_not_allowed() {
     let mut sys: TestSystems = setup(0);
-    sys.fame.minted_duelist(1);
+    _protected(@sys).minted_duelist(1);
 }
 
 #[test]
 #[should_panic(expected:('COIN: caller is not minter', 'ENTRYPOINT_FAILED'))]
 fn test_reward_duelist_not_allowed() {
     let mut sys: TestSystems = setup(0);
-    sys.fame.reward_duelist(1, AMOUNT);
+    _protected(@sys).reward_duelist(1, AMOUNT);
 }
 
 #[test]
@@ -129,7 +133,7 @@ fn test_reward_duelist_not_allowed() {
 fn test_burn_not_allowed() {
     let mut sys: TestSystems = tester::setup_world(FLAGS::FAME | FLAGS::DUELIST);
     tester::impersonate(sys.duelists.contract_address);
-    sys.fame.burn(AMOUNT);
+    _protected(@sys).burn(AMOUNT);
 }
 
 #[test]

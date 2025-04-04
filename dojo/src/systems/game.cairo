@@ -73,9 +73,10 @@ pub mod game {
     use pistols::interfaces::dns::{
         DnsTrait,
         IDuelistTokenDispatcherTrait,
-        IDuelTokenDispatcherTrait,
+        IDuelistTokenProtectedDispatcherTrait,
+        IDuelTokenProtectedDispatcherTrait,
         ITutorialDispatcherTrait,
-        IBankDispatcherTrait,
+        IBankProtectedDispatcherTrait,
         SELECTORS,
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
@@ -359,7 +360,7 @@ pub mod game {
             let new_season_id: u32 = season.collect(ref store);
             store.set_config_season_id(new_season_id);
             // release...
-            store.world.bank_dispatcher().release_season_pool(season.season_id);
+            store.world.bank_protected_dispatcher().release_season_pool(season.season_id);
             // all hail the collector
             Trophy::Collector.progress(store.world, starknet::get_caller_address(), 1);
             (new_season_id)
@@ -580,14 +581,14 @@ pub mod game {
             if (challenge.state.is_concluded()) {
                 // transfer rewards
                 let tournament_id: u64 = 0;
-                let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_dispatcher().transfer_rewards(challenge, tournament_id);
+                let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_protected_dispatcher().transfer_rewards(challenge, tournament_id);
 
                 // update leaderboards
                 self._update_scoreboards(ref store, @challenge, @round, ref rewards_a, ref rewards_b);
 
                 // send duel token to winner
                 if (challenge.winner != 0) {
-                    store.world.duel_token_dispatcher().transfer_to_winner(challenge.duel_id);
+                    store.world.duel_token_protected_dispatcher().transfer_to_winner(challenge.duel_id);
                 }
 
                 // events

@@ -46,8 +46,7 @@ pub mod CoinComponent {
     //-----------------------------------------
     // Internal
     //
-    #[embeddable_as(CoinComponentInternalImpl)]
-    pub impl CoinComponentInternal<
+    pub impl CoinComponentInternalImpl<
         TContractState,
         +HasComponent<TContractState>,
         +IWorldProvider<TContractState>,
@@ -87,6 +86,7 @@ pub mod CoinComponent {
             (caller)
         }
 
+        // if public, wrap in the contract
         fn mint(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
             amount: u256,
@@ -96,6 +96,7 @@ pub mod CoinComponent {
             erc20.mint(recipient, amount);
         }
 
+        // if public, wrap in the contract
         fn faucet(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
         ) {

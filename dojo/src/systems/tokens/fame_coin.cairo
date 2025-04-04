@@ -29,11 +29,6 @@ pub trait IFameCoin<TState> {
     fn transfer_from_token(ref self: TState, contract_address: ContractAddress, sender_token_id: u128, recipient: ContractAddress, amount: u256) -> bool;
     fn transfer_from_token_to_token(ref self: TState, contract_address: ContractAddress, sender_token_id: u128, recipient_token_id: u128, amount: u256) -> bool;
     fn burn_from_token(ref self: TState, contract_address: ContractAddress, token_id: u128, amount: u256);
-    
-    // IFameCoinProtected
-    fn minted_duelist(ref self: TState, duelist_id: u128);
-    fn reward_duelist(ref self: TState, duelist_id: u128, amount: u128);
-    fn burn(ref self: TState, amount: u128);
 }
 
 // Exposed to world

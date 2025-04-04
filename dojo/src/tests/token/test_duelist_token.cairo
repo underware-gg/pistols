@@ -14,6 +14,9 @@ use pistols::models::{
     season::{SeasonScoreboard},
     pool::{Pool, PoolType},
 };
+use pistols::interfaces::dns::{
+    IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait,
+};
 
 // use pistols::interfaces::dns::{DnsTrait};
 use pistols::types::constants::{FAME};
@@ -574,6 +577,10 @@ fn test_duelist_memorialize_not_owner() {
 // private calls
 //
 
+pub fn _protected(sys: @TestSystems) -> IDuelistTokenProtectedDispatcher {
+    (IDuelistTokenProtectedDispatcher{contract_address: (*sys.duelists).contract_address})
+}
+
 #[test]
 // #[should_panic(expected: ('TOKEN: caller is not minter', 'ENTRYPOINT_FAILED'))] // for Dojo contracts
 // #[should_panic(expected: ('ENTRYPOINT_NOT_FOUND', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))] // for accounts
@@ -582,7 +589,7 @@ fn test_mint_duelist_not_minter() {
     let mut sys: TestSystems = setup(0);
     // let account: ContractAddress = tester::deploy_mock_account();
     // tester::impersonate(account);
-    sys.duelists.mint_duelists(OWNER(), 1, 0x1234);
+    _protected(@sys).mint_duelists(OWNER(), 1, 0x1234);
 }
 
 #[test]
@@ -595,7 +602,7 @@ fn test_transfer_rewards_invalid_caller() {
     let challenge: Challenge = sys.store.get_challenge(duel_id);
     // let account: ContractAddress = tester::deploy_mock_account();
     // tester::impersonate(account);
-    sys.duelists.transfer_rewards(challenge, 0);
+    _protected(@sys).transfer_rewards(challenge, 0);
 }
 
 
@@ -617,12 +624,12 @@ fn test_update_token_metadata() {
     let event = tester::pop_log::<combo::MetadataUpdate>(sys.duelists.contract_address, selector!("MetadataUpdate")).unwrap();
     assert_eq!(event.token_id, TOKEN_ID_1_1.into(), "event.token_id");
 }
-#[test]
-fn test_update_tokens_metadata() {
-    let mut sys: TestSystems = setup(0);
-    tester::drop_all_events(sys.duelists.contract_address);
-    sys.duelists.update_tokens_metadata(TOKEN_ID_1_1.low, TOKEN_ID_1_2.low);
-    let event = tester::pop_log::<combo::BatchMetadataUpdate>(sys.duelists.contract_address, selector!("BatchMetadataUpdate")).unwrap();
-    assert_eq!(event.from_token_id, TOKEN_ID_1_1.into(), "event.from_token_id");
-    assert_eq!(event.to_token_id, TOKEN_ID_1_2.into(), "event.to_token_id");
-}
+// #[test]
+// fn test_update_tokens_metadata() {
+//     let mut sys: TestSystems = setup(0);
+//     tester::drop_all_events(sys.duelists.contract_address);
+//     sys.duelists.update_tokens_metadata(TOKEN_ID_1_1.low, TOKEN_ID_1_2.low);
+//     let event = tester::pop_log::<combo::BatchMetadataUpdate>(sys.duelists.contract_address, selector!("BatchMetadataUpdate")).unwrap();
+//     assert_eq!(event.from_token_id, TOKEN_ID_1_1.into(), "event.from_token_id");
+//     assert_eq!(event.to_token_id, TOKEN_ID_1_2.into(), "event.to_token_id");
+// }

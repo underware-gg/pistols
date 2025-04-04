@@ -5,18 +5,18 @@ use dojo::meta::interface::{IDeployedResourceDispatcher, IDeployedResourceDispat
 
 pub use pistols::systems::{
     admin::{IAdminDispatcher, IAdminDispatcherTrait},
-    bank::{IBankDispatcher, IBankDispatcherTrait},
+    bank::{IBankDispatcher, IBankDispatcherTrait, IBankProtectedDispatcher, IBankProtectedDispatcherTrait},
     game::{IGameDispatcher, IGameDispatcherTrait},
     tutorial::{ITutorialDispatcher, ITutorialDispatcherTrait},
     rng::{IRngDispatcher, IRngDispatcherTrait},
     rng_mock::{IRngMockDispatcher, IRngMockDispatcherTrait},
     tokens::{
-        duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
-        duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
+        duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait, IDuelTokenProtectedDispatcher, IDuelTokenProtectedDispatcherTrait},
+        duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait, IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait},
         pack_token::{IPackTokenDispatcher, IPackTokenDispatcherTrait},
         tournament_token::{ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait},
-        fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait},
-        fools_coin::{IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait},
+        fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait, IFameCoinProtectedDispatcher, IFameCoinProtectedDispatcherTrait},
+        fools_coin::{IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait, IFoolsCoinProtectedDispatcher, IFoolsCoinProtectedDispatcherTrait},
         lords_mock::{ILordsMockDispatcher, ILordsMockDispatcherTrait},
         budokan_mock::{IBudokanMockDispatcher, IBudokanMockDispatcherTrait},
     }
@@ -184,6 +184,10 @@ pub impl DnsImpl of DnsTrait {
         (IBankDispatcher{ contract_address: self.bank_address() })
     }
     #[inline(always)]
+    fn bank_protected_dispatcher(self: @WorldStorage) -> IBankProtectedDispatcher {
+        (IBankProtectedDispatcher{ contract_address: self.bank_address() })
+    }
+    #[inline(always)]
     fn game_dispatcher(self: @WorldStorage) -> IGameDispatcher {
         (IGameDispatcher{ contract_address: self.game_address() })
     }
@@ -204,9 +208,17 @@ pub impl DnsImpl of DnsTrait {
         (IDuelTokenDispatcher{ contract_address: self.duel_token_address() })
     }
     #[inline(always)]
+    fn duel_token_protected_dispatcher(self: @WorldStorage) -> IDuelTokenProtectedDispatcher {
+        (IDuelTokenProtectedDispatcher{ contract_address: self.duel_token_address() })
+    }
+    #[inline(always)]
     fn duelist_token_dispatcher(self: @WorldStorage) -> IDuelistTokenDispatcher {
         (IDuelistTokenDispatcher{ contract_address: self.duelist_token_address() })
-    }   
+    }
+    #[inline(always)]
+    fn duelist_token_protected_dispatcher(self: @WorldStorage) -> IDuelistTokenProtectedDispatcher {
+        (IDuelistTokenProtectedDispatcher{ contract_address: self.duelist_token_address() })
+    }
     #[inline(always)]
     fn pack_token_dispatcher(self: @WorldStorage) -> IPackTokenDispatcher {
         (IPackTokenDispatcher{ contract_address: self.pack_token_address() })
@@ -220,8 +232,16 @@ pub impl DnsImpl of DnsTrait {
         (IFameCoinDispatcher{ contract_address: self.fame_coin_address() })
     }
     #[inline(always)]
+    fn fame_coin_protected_dispatcher(self: @WorldStorage) -> IFameCoinProtectedDispatcher {
+        (IFameCoinProtectedDispatcher{ contract_address: self.fame_coin_address() })
+    }
+    #[inline(always)]
     fn fools_coin_dispatcher(self: @WorldStorage) -> IFoolsCoinDispatcher {
         (IFoolsCoinDispatcher{ contract_address: self.fools_coin_address() })
+    }
+    #[inline(always)]
+    fn fools_coin_protected_dispatcher(self: @WorldStorage) -> IFoolsCoinProtectedDispatcher {
+        (IFoolsCoinProtectedDispatcher{ contract_address: self.fools_coin_address() })
     }
     // need access to store...
     #[inline(always)]

@@ -401,12 +401,12 @@ fn test_update_token_metadata() {
     let event = tester::pop_log::<combo::MetadataUpdate>(sys.pack.contract_address, selector!("MetadataUpdate")).unwrap();
     assert_eq!(event.token_id, TOKEN_ID_1.into(), "event.token_id");
 }
-#[test]
-fn test_update_tokens_metadata() {
-    let mut sys: TestSystems = setup(0);
-    tester::drop_all_events(sys.pack.contract_address);
-    sys.pack.update_tokens_metadata(TOKEN_ID_1.low, TOKEN_ID_2.low);
-    let event = tester::pop_log::<combo::BatchMetadataUpdate>(sys.pack.contract_address, selector!("BatchMetadataUpdate")).unwrap();
-    assert_eq!(event.from_token_id, TOKEN_ID_1.into(), "event.from_token_id");
-    assert_eq!(event.to_token_id, TOKEN_ID_2.into(), "event.to_token_id");
-}
+// #[test]
+// fn test_update_tokens_metadata() {
+//     let mut sys: TestSystems = setup(0);
+//     tester::drop_all_events(sys.pack.contract_address);
+//     sys.pack.update_tokens_metadata(TOKEN_ID_1.low, TOKEN_ID_2.low);
+//     let event = tester::pop_log::<combo::BatchMetadataUpdate>(sys.pack.contract_address, selector!("BatchMetadataUpdate")).unwrap();
+//     assert_eq!(event.from_token_id, TOKEN_ID_1.into(), "event.from_token_id");
+//     assert_eq!(event.to_token_id, TOKEN_ID_2.into(), "event.to_token_id");
+// }

@@ -53,7 +53,7 @@ pub trait IPackToken<TState> {
     fn can_mint(self: @TState, recipient: ContractAddress) -> bool;
     fn update_contract_metadata(ref self: TState);
     fn update_token_metadata(ref self: TState, token_id: u128);
-    fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
+    // fn update_tokens_metadata(ref self: TState, from_token_id: u128, to_token_id: u128);
 
     // IPackTokenPublic
     fn can_claim_starter_pack(self: @TState, recipient: ContractAddress) -> bool;
@@ -132,7 +132,7 @@ pub mod pack_token {
 
     use pistols::interfaces::dns::{
         DnsTrait,
-        IBankDispatcherTrait,
+        IBankProtectedDispatcherTrait,
         IVrfProviderDispatcherTrait, Source,
     };
     use pistols::models::{
@@ -236,7 +236,7 @@ pub mod pack_token {
             // transfer mint fee
             let lords_amount: u128 = self.calc_mint_fee(recipient, pack_type);
             if (lords_amount != 0) {
-                store.world.bank_dispatcher().charge_purchase(recipient, lords_amount.into());
+                store.world.bank_protected_dispatcher().charge_purchase(recipient, lords_amount.into());
             }
 
             // create vrf seed
@@ -269,7 +269,7 @@ pub mod pack_token {
             let token_ids: Span<u128> = pack.open(ref store, recipient);
 
             // minted fame, peg to paid LORDS
-            store.world.bank_dispatcher().peg_minted_fame_to_purchased_lords(recipient, pack.lords_amount.into());
+            store.world.bank_protected_dispatcher().peg_minted_fame_to_purchased_lords(recipient, pack.lords_amount.into());
 
             // burn!
             self.erc721.burn(pack_id.into());
