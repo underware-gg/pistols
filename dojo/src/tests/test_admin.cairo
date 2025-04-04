@@ -68,7 +68,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
     fn test_grant_admin_not_owner() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         tester::execute_admin_grant_admin(@sys.admin, OTHER(), BUMMER(), true);
@@ -88,7 +88,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_paused_not_owner() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         tester::execute_admin_set_paused(@sys.admin, OTHER(), true);
@@ -117,7 +117,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('ADMIN: not admin', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('ADMIN: Caller not admin', 'ENTRYPOINT_FAILED'))]
     fn test_set_treasury_not_owner() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::ADMIN);
         tester::execute_admin_set_treasury(@sys.admin, OTHER(), BUMMER());

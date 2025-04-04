@@ -29,10 +29,11 @@ pub mod admin {
     use pistols::libs::store::{Store, StoreTrait};
 
     mod Errors {
+        pub const CALLER_NOT_OWNER: felt252     = 'ADMIN: Caller not owner';
+        pub const CALLER_NOT_ADMIN: felt252     = 'ADMIN: Caller not admin';
         pub const INVALID_OWNER: felt252        = 'ADMIN: Invalid account_address';
         pub const INVALID_TREASURY: felt252     = 'ADMIN: Invalid treasury_address';
         pub const INVALID_DESCRIPTION: felt252  = 'ADMIN: Invalid description';
-        pub const NOT_ADMIN: felt252            = 'ADMIN: not admin';
     }
 
     fn dojo_init(
@@ -120,11 +121,11 @@ pub mod admin {
     impl InternalImpl of InternalTrait {
         #[inline(always)]
         fn _assert_caller_is_admin(self: @ContractState) {
-            assert(self.am_i_admin(starknet::get_caller_address()) == true, Errors::NOT_ADMIN);
+            assert(self.am_i_admin(starknet::get_caller_address()) == true, Errors::CALLER_NOT_ADMIN);
         }
         fn _assert_caller_is_owner(self: @ContractState) {
             let mut world = self.world_default();
-            assert(world.dispatcher.is_owner(SELECTORS::ADMIN, starknet::get_caller_address()) == true, Errors::NOT_ADMIN);
+            assert(world.dispatcher.is_owner(SELECTORS::ADMIN, starknet::get_caller_address()) == true, Errors::CALLER_NOT_OWNER);
         }
     }
 }
