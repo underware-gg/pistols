@@ -1385,8 +1385,6 @@ $logo-url: '/logos/logo_avante.svg';
   background-color: var(--bg-color);
   color: $color-darkest;
   position: absolute;
-  top: 10%;
-  left: 20%;
   padding: aspect-width(0.4);
   font-size: aspect-width(1.6);
   text-shadow: $text-shadow;
@@ -1439,24 +1437,15 @@ $logo-url: '/logos/logo_avante.svg';
       border-right: none;
     }
   }
-
-  .DialogBalloonText {
-    margin: aspect-width(2);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-height: 0;
-  }
 }
 
 // For backwards compatibility
 .TempBarkeepTalkBalloon {
   @extend .DialogBalloon;
+  top: 38%;
+  left: 26%;
   --bg-color: #{$color-bright};
   --border-color: #{$color-dark};
-}
-
-.TempBarkeepTalkBalloonText {
-  @extend .DialogBalloonText;
 }
 
 .DemonTalkBaloon {
@@ -1890,20 +1879,20 @@ td {
 
 .PaginationWood.ui.pagination.menu .item:first-child,
 .PaginationWood.ui.pagination.menu .item:last-child {
-  background: url('images/ui/leaderboards/button_background_all.png') no-repeat center/contain;
+  background: url('/images/ui/leaderboards/button_background_all.png') no-repeat center/contain;
 }
 
 .PaginationWood.ui.pagination.menu .item:nth-child(2),
 .PaginationWood.ui.pagination.menu .item:nth-last-child(2) {
-  background: url('images/ui/leaderboards/button_background_page.png') no-repeat center/contain;
+  background: url('/images/ui/leaderboards/button_background_page.png') no-repeat center/contain;
 }
 
 .PaginationWood.ui.pagination.menu .item:not(:first-child):not(:last-child):not(:nth-child(2)):not(:nth-last-child(2)) {
-  background: url('images/ui/leaderboards/button_background_number.png') no-repeat center/contain;
+  background: url('/images/ui/leaderboards/button_background_number.png') no-repeat center/contain;
 }
 
 .PaginationWood.ui.pagination.menu .active.item {
-  background: url('images/ui/leaderboards/button_background_selected.png') no-repeat center/contain !important;
+  background: url('/images/ui/leaderboards/button_background_selected.png') no-repeat center/contain !important;
   transform: scale(1.06);
 }
 

@@ -27,7 +27,7 @@ export default function ScLeaderboards() {
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext();
   
   // Get season data
-  const { seasonTableIds } = useAllSeasonTableIds();
+  const { seasonTableIds = [] } = useAllSeasonTableIds();
   
   // Safely set the selected season to the active season or the first available one
   const [selectedSeason, setSelectedSeason] = useState<string | null>(null);
@@ -129,7 +129,7 @@ export default function ScLeaderboards() {
     const { name: playerName } = usePlayer(owner);
 
     // TODO: Get actual season stats for this duelist
-    const seasonId = BigInt(selectedSeason.replace(/\D/g, ''));
+    const seasonId = selectedSeason ? BigInt(selectedSeason.replace(/\D/g, '')) : 0n;
     const seasonStats = useDuelistSeasonStats(duelistId, seasonId);
 
     const backgroundImage = `/images/ui/leaderboards/duelist_background${isMe ? '_mine' : ''}${isDead ? '_dead' : ''}.png`;
@@ -205,8 +205,8 @@ export default function ScLeaderboards() {
   // Calculate pagination
   const itemsPerPage = activePage === 1 ? 3 : 7;
   const startIndex = activePage === 1 ? 0 : 3 + ((activePage - 2) * 7);
-  const paginatedScores = scores.slice(startIndex, startIndex + itemsPerPage);
-  const totalPages = Math.ceil((scores.length - 3) / 7) + 1;
+  const paginatedScores = scores?.slice(startIndex, startIndex + itemsPerPage) || [];
+  const totalPages = Math.ceil(((scores?.length || 0) - 3) / 7) + 1;
 
   const LeaderboardPodium = ({
     rank,
@@ -227,7 +227,7 @@ export default function ScLeaderboards() {
     const { isDead } = useDuelist(duelistId);
     const { owner } = useOwnerOfDuelist(duelistId);
     
-    const seasonId = BigInt(selectedSeason.replace(/\D/g, ''));
+    const seasonId = selectedSeason ? BigInt(selectedSeason.replace(/\D/g, '')) : undefined;
     const { wins, losses } = useDuelistSeasonStats(duelistId, seasonId);
     
     const podiumType = rank === 1 ? 'gold' : rank === 2 ? 'silver' : 'bronze';
@@ -485,12 +485,14 @@ export default function ScLeaderboards() {
           
           <div className='TextDivider bright LeaderboardsDivider EqualMargin'>Current Season</div>
           
-          <SeasonRow
-            key={seasonTableIds[0]}
-            season={seasonTableIds[0]}
-            isSelected={selectedSeason === seasonTableIds[0]}
-            onClick={() => handleSeasonSelect(seasonTableIds[0])}
-          />
+          {seasonTableIds.length > 0 && (
+            <SeasonRow
+              key={seasonTableIds[0]}
+              season={seasonTableIds[0]}
+              isSelected={selectedSeason === seasonTableIds[0]}
+              onClick={() => handleSeasonSelect(seasonTableIds[0])}
+            />
+          )}
           
           <div className='TextDivider bright LeaderboardsDivider EqualMargin'>Past Seasons</div>
           
