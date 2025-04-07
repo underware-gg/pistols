@@ -1,12 +1,10 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { useLordsBalance, useEtherBalance } from '@underware/pistols-sdk/dojo'
-import { useFoolsBalance } from '/src/hooks/useFools'
-import { useFameBalance, useFameBalanceDuelist } from '/src/hooks/useFame'
+import { useLordsBalance, useEtherBalance, useFoolsBalance, useFameBalance, useDuelistFameBalance } from '/src/stores/coinStore'
 import { Balance } from '/src/components/account/Balance'
-import ProgressBar from '../ui/ProgressBar'
-import { IconSizeProp } from '../ui/Icons'
 import { weiToEth } from '@underware/pistols-sdk/utils/starknet'
+import { IconSizeProp } from '/src/components/ui/Icons'
+import ProgressBar from '/src/components/ui/ProgressBar'
 
 
 //
@@ -34,7 +32,7 @@ export const LordsBalance = ({
   clean = false,
   size = null,
 }) => {
-  const { balance } = useLordsBalance(address)
+  const { balance } = useLordsBalance(address, 0n)
   return (
     <Balance lords size={size} wei={balance} pre={pre} post={post} clean={clean} />
   )
@@ -83,7 +81,19 @@ export const FameBalanceDuelist = ({
   duelistId: BigNumberish
   size?: IconSizeProp
 }) => {
-  const { balance } = useFameBalanceDuelist(duelistId)
+  const { balance } = useDuelistFameBalance(duelistId)
+  return (
+    <Balance fame size={size} wei={balance} />
+  )
+}
+export const FameLivesDuelist = ({
+  duelistId,
+  size = null,
+}: {
+  duelistId: BigNumberish
+  size?: IconSizeProp
+}) => {
+  const { balance } = useDuelistFameBalance(duelistId)
   return (
     <Balance fame size={size} wei={balance / 1000n} />
   )
@@ -105,7 +115,7 @@ export const FameProgressBar = ({
   height?: number
   hideValue?: boolean
 }) => {
-  const { balance } = useFameBalanceDuelist(duelistId)
+  const { balance } = useDuelistFameBalance(duelistId)
   const progressPercent = useMemo(() => {
     return Number(weiToEth(balance)) % 1000
   }, [balance])

@@ -1,11 +1,10 @@
-import React from 'react'
-import { Grid, Menu } from 'semantic-ui-react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Grid, Label, Menu, SemanticICONS } from 'semantic-ui-react'
 import { usePistolsScene, usePistolsContext } from '/src/hooks/PistolsContext'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { IconClick } from '/src/components/ui/Icons'
 import { makeDuelDataUrl } from '/src/utils/pistols'
-import { SceneName } from '/src/data/assets'
-
+import * as TWEEN from '@tweenjs/tween.js'
 
 export function MenuDuel({
   duelId,
@@ -13,7 +12,7 @@ export function MenuDuel({
   duelId: bigint
 }) {
   const { dispatchSetting, settings, SettingsActions } = useSettings()
-  const { dispatchSetDuel } = usePistolsContext()
+  const { dispatchSetDuel, tutorialOpener } = usePistolsContext()
   const { dispatchSceneBack } = usePistolsScene()
 
   const _backToTavern = () => {
@@ -25,7 +24,8 @@ export function MenuDuel({
     dispatchSetting(SettingsActions.SFX_ENABLED, !settings.sfxEnabled)
   }
 
-  const _skipAnimation = () => {
+  const _openTutorial = () => {
+    tutorialOpener.open()
   }
 
   return (
@@ -33,16 +33,14 @@ export function MenuDuel({
       <div className='MenuBottomBackground NoDrag NoMouse'>
         <img className='MenuBackgroundImage' src='/images/ui/duel/bottom_nav.png'/>
       </div>
-      <Menu secondary compact className='YesMouse' size='huge' style={{ minHeight: '0' }}>
+      <Menu secondary compact className='YesMouse' size='huge' style={{ minHeight: '0', position: 'relative' }}>
         <Menu.Item className='button_duel' type='tavern' onClick={() => _backToTavern()}>
           Back to Tavern
         </Menu.Item>
 
-        {/* <Menu.Item disabled={!canSkip} onClick={() => _skipAnimation()}>
-          Skip animation
-        </Menu.Item> */}
-
-        {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
+        <Menu.Item className='button_duel' type='help' onClick={() => _openTutorial()}>
+          Help
+        </Menu.Item>
 
         <Menu.Item className='button_duel' type='icon'>
           <IconClick name='database' onClick={() => window?.open(makeDuelDataUrl(duelId), '_blank')} className='icon-control' />
@@ -51,6 +49,14 @@ export function MenuDuel({
         <Menu.Item className='button_duel' type='icon'>
           <IconClick name={settings.sfxEnabled ? 'volume up' : 'volume off'} onClick={() => _switchSfx()} className='icon-control'  />
         </Menu.Item>
+
+
+
+        {/* <Menu.Item disabled={!canSkip} onClick={() => _skipAnimation()}>
+          Skip animation
+        </Menu.Item> */}
+
+        {/* <SettingsMenuItem prefix='SFX' settingsKey={SettingsActions.SFX_ENABLED} currentValue={settings.sfxEnabled} /> */}
 
       </Menu>
     </div>
@@ -70,30 +76,146 @@ export function MenuDuelControl({
     dispatchSetting(SettingsActions.DUEL_SPEED_FACTOR, newSpeed > 2.0 ? 0.5 : newSpeed)
   }
 
+  const ControlMenuItem = React.memo(({ 
+    icon, 
+    onClick, 
+    tooltip, 
+    children 
+  }: {
+    icon?: string;
+    onClick?: () => void;
+    tooltip?: string;
+    children?: React.ReactNode;
+  }) => {
+    const [tooltipOpacity, setTooltipOpacity] = useState(0);
+    const tooltipTimeoutRef = useRef(null);
+    const leaveTimeoutRef = useRef(null);
+    const tweenRef = useRef(null);
+    
+    const handleMouseEnter = useCallback(() => {
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current);
+        leaveTimeoutRef.current = null;
+      }
+      
+      if (tweenRef.current) {
+        tweenRef.current.stop();
+      }
+      
+      const tween = new TWEEN.Tween({ opacity: 0 })
+        .to({ opacity: 1 }, 300)
+        .onUpdate(obj => setTooltipOpacity(obj.opacity))
+        .delay(400)
+        .start();
+      
+      tweenRef.current = tween;
+    }, []);
+    
+    const handleMouseLeave = useCallback(() => {
+      if (tweenRef.current) {
+        tweenRef.current.stop();
+        tweenRef.current = null;
+      }
+      
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current);
+      }
+      
+      leaveTimeoutRef.current = setTimeout(() => {
+        const tween = new TWEEN.Tween({ opacity: tooltipOpacity })
+          .to({ opacity: 0 }, 200)
+          .onUpdate(obj => setTooltipOpacity(obj.opacity))
+          .onComplete(() => {
+            tweenRef.current = null;
+          })
+          .start();
+        
+        tweenRef.current = tween;
+      }, 200);
+    }, [tooltipOpacity]);
+    
+    useEffect(() => {
+      return () => {
+        if (tooltipTimeoutRef.current) {
+          clearTimeout(tooltipTimeoutRef.current);
+        }
+        if (leaveTimeoutRef.current) {
+          clearTimeout(leaveTimeoutRef.current);
+        }
+        if (tweenRef.current) {
+          tweenRef.current.stop();
+        }
+      };
+    }, []);
+    
+    return (
+      <Menu.Item className='button_duel' type='icon-vertical'>
+        <div className='Relative'>
+          <Label 
+            pointing='right' 
+            className='NoMouse NoDrag'
+            style={{ 
+              position: 'absolute', 
+              top: '-120%', 
+              right: '180%', 
+              opacity: tooltipOpacity,
+              whiteSpace: 'nowrap',
+              zIndex: 1000
+            }}
+          >
+            {tooltip}
+          </Label>
+          <IconClick 
+            name={icon as SemanticICONS} 
+            onClick={onClick} 
+            className='icon-control'
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          />
+        </div>
+        {children}
+      </Menu.Item>
+    );
+  });
+
+  // Memoize the menu items to prevent unnecessary re-renders
+  const menuItems = useMemo(() => (
+    <>
+      <ControlMenuItem 
+        icon='angle double right' 
+        onClick={() => _switchSpeedFactor()} 
+        tooltip="Change playback speed"
+      >
+        <div>{settings.duelSpeedFactor}</div>
+      </ControlMenuItem>
+
+      <ControlMenuItem 
+        icon={isPlaying ? 'pause' : 'play'} 
+        onClick={() => clickPlay()} 
+        tooltip={`${isPlaying ? 'Pause' : 'Play'} animation`}
+      />
+
+      <ControlMenuItem 
+        icon='plus' 
+        onClick={() => clickStep()} 
+        tooltip="Step forward"
+      />
+
+      <ControlMenuItem 
+        icon='redo' 
+        onClick={() => clickReset()} 
+        tooltip="Reset animation"
+      />
+    </>
+  ), [isPlaying, settings.duelSpeedFactor, _switchSpeedFactor, clickPlay, clickStep, clickReset]);
+
   return (
     <div className='MenuRightDuel NoMouse'>
       <div className='MenuRightBackground NoDrag NoMouse'>
         <img className='MenuBackgroundImageFliped' src='/images/ui/duel/side_nav.png'/>
       </div>
       <Menu secondary compact vertical className='YesMouse' size='huge' style={{ minHeight: '0' }}>
-
-        <Menu.Item className='button_duel' type='icon-vertical'>
-          <IconClick name='angle double right' onClick={() => _switchSpeedFactor()} className='icon-control' />
-          <div>{settings.duelSpeedFactor}</div>
-        </Menu.Item>
-
-        <Menu.Item className='button_duel' type='icon-vertical'>
-          <IconClick name={isPlaying ? 'pause' : 'play'} onClick={() => clickPlay()} className='icon-control' />
-        </Menu.Item>
-
-        <Menu.Item className='button_duel' type='icon-vertical'>
-          <IconClick name='plus'  onClick={() => clickStep()} className='icon-control' />
-        </Menu.Item>
-
-        <Menu.Item className='button_duel' type='icon-vertical'>
-          <IconClick name='redo' onClick={() => clickReset()} className='icon-control' />
-        </Menu.Item>
-
+        {menuItems}
       </Menu>
     </div>
   )

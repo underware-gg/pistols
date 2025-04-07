@@ -138,6 +138,7 @@ fn test_token_uri() {
             registered: 999999,
             active: 999999,
         },
+        status: Default::default(),
     };
     let duelist_b = Duelist {
         duelist_id: ID(OTHER()),
@@ -146,6 +147,7 @@ fn test_token_uri() {
             registered: 999999,
             active: 999999,
         },
+        status: Default::default(),
     };
     let challenge = Challenge {
         duel_id: DUEL_ID_1.low,

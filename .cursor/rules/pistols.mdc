@@ -1,0 +1,17 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+@Docs https://book.dojoengine.org/
+@Docs https://book.cairo-lang.org/
+@Docs https://docs.swmansion.com/scarb/corelib/modules.html
+
+
+

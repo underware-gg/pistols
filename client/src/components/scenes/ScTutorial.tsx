@@ -57,8 +57,14 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   const [textOpacity, setTextOpacity] = useState(0)
   const [showCardPack, setShowCardPack] = useState(false)
   const [cardPackClickable, setCardPackClickable] = useState(false)
+  const [hasSkippedScene, setHasSkippedScene] = useState(false)
+  const [skipProgress, setSkipProgress] = useState(0)
+  const [isHoldingSkip, setIsHoldingSkip] = useState(false)
+  const [skipSource, setSkipSource] = useState<'mouse' | 'keyboard' | null>(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
   const textOpacityRef = useRef(0)
   const currentTween = useRef<TWEEN.Tween<any> | null>(null)
+  const skipTween = useRef<TWEEN.Tween<any> | null>(null)
 
   // Scene Initialization & Cleanup
   useEffect(() => {
@@ -78,6 +84,11 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       setCardPackClickable(false)
       currentTween.current?.stop()
       currentTween.current = null
+      skipTween.current?.stop()
+      skipTween.current = null
+      setHasSkippedScene(false)
+      setSkipSource(null)
+      setIsTransitioning(false)
     }
   }, [currentTutorialScene])
 
@@ -95,6 +106,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   // Text Animation Timers
   useEffect(() => {
     if (textDuration <= 0) return
+    if (hasSkippedScene) return
 
     const skipTimeout = setTimeout(() => setCanSkipText(true), textDuration * 0.8)
     const nextTextTimeout = setTimeout(() => {
@@ -106,17 +118,31 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       clearTimeout(skipTimeout)
       clearTimeout(nextTextTimeout)
     }
-  }, [totalDuration, textDuration])
+  }, [totalDuration, textDuration, hasSkippedScene])
 
   // Keyboard Controls
   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === 'Space') handleSkipText()
+      
+      if (event.code === 'Escape') {
+        startSkipProgress('keyboard')
+      }
+    }
+    
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.code === 'Escape') {
+        stopSkipProgress('keyboard')
+      }
     }
 
-    window.addEventListener('keydown', handleKeyPress)
-    return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [canSkipText])
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [canSkipText, isHoldingSkip])
 
   // Scene-specific Effects
   useEffect(() => {
@@ -156,6 +182,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
     setCurrentTextIndex(-1)
     setDisplayText(undefined)
     setCurrentSceneData(TUTORIAL_SCENE_DATA[currentTutorialScene])
+    setIsTransitioning(false)
 
     setTimeout(() => setCurrentTextIndex(0), SCENE_CHANGE_ANIMATION_DURATION * 1.5)
   }
@@ -180,6 +207,8 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   }
 
   function handleSceneProgression() {
+    setIsTransitioning(true)
+    
     switch (currentTutorialScene) {
       case SceneName.Tutorial:
         dispatchSetScene(SceneName.TutorialScene2)
@@ -196,7 +225,6 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         if (canClaimStarterPack) {
           animateTextOpacity(0)
           setShowCardPack(true)
-          console.log('showCardPack', showCardPack)
           setTimeout(() => {
             tutorialOpener.open()
           }, 1000)
@@ -278,6 +306,47 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
     setCurrentTextIndex(prev => prev + 1)
   }
 
+  function startSkipProgress(source: 'mouse' | 'keyboard') {
+    if (isHoldingSkip || isTransitioning) return
+    if (skipSource !== null && skipSource !== source) return
+    
+    setIsHoldingSkip(true)
+    setSkipSource(source)
+    
+    skipTween.current?.stop()
+    skipTween.current = new TWEEN.Tween({ progress: 0 })
+      .to({ progress: 1 }, 1000)
+      .easing(TWEEN.Easing.Circular.Out)
+      .onUpdate(({ progress }) => {
+        setSkipProgress(progress)
+      })
+      .onComplete(() => {
+        setIsHoldingSkip(false)
+        setSkipProgress(0)
+        setSkipSource(null)
+        setHasSkippedScene(true)
+        handleSceneProgression()
+      })
+      .start()
+  }
+  
+  function stopSkipProgress(source: 'mouse' | 'keyboard') {
+    if (!isHoldingSkip) return
+    if (skipSource !== source) return
+    
+    setIsHoldingSkip(false)
+    setSkipSource(null)
+    
+    skipTween.current?.stop()
+    skipTween.current = new TWEEN.Tween({ progress: skipProgress })
+      .to({ progress: 0 }, 200)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .onUpdate(({ progress }) => {
+        setSkipProgress(progress)
+      })
+      .start()
+  }
+
   function animateTextOpacity(targetOpacity: number, delay: number = 0) {
     currentTween.current?.stop()
     currentTween.current = new TWEEN.Tween({ opacity: textOpacityRef.current })
@@ -323,19 +392,47 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
               />
             </div>
 
-            {canSkipText && (
+            {canSkipText && !isTransitioning && (
               <div className="indicator">
                 ♦
               </div>
             )}
+            
+            <div className="tutorialButtonsContainer">
+              <div 
+                className="nextButton YesMouse"
+                onClick={handleSkipText}
+                style={{ opacity: isTransitioning ? 0.5 : 1, pointerEvents: isTransitioning ? 'none' : 'auto' }}
+              >
+                <span className="nextText">Next</span>
+                <div className="nextIcon">
+                  <img className="svg" src="/icons/icon_spacebar.svg" />
+                </div>
+              </div>
 
-            <div 
-              className="nextButton YesMouse"
-              onClick={handleSkipText}
-            >
-              <span className="nextText">Next</span>
-              <div className="nextIcon">
-                <img className="svg" src="/icons/icon_spacebar.svg" />
+              <div 
+                className="nextButton YesMouse"
+                onMouseDown={() => startSkipProgress('mouse')}
+                onMouseUp={() => stopSkipProgress('mouse')}
+                onMouseLeave={() => stopSkipProgress('mouse')}
+                style={{ opacity: isTransitioning ? 0.5 : 1, pointerEvents: isTransitioning ? 'none' : 'auto' }}
+              >
+                <span className="nextText">Skip</span>
+                <div className="nextIcon" style={{ position: 'relative', overflow: 'visible' }}>
+                  <div>Esc</div>
+                  <svg width="200%" height="200%" viewBox="0 0 36 36" style={{ position: 'absolute', top: '-50%', left: '-50%' }}>
+                    <circle 
+                      cx="18" 
+                      cy="18" 
+                      r="15" 
+                      fill="none" 
+                      stroke="#fff" 
+                      strokeWidth="4" 
+                      strokeDasharray={`${skipProgress * 100} 100`}
+                      transform="rotate(0 18 18)"
+                    />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
@@ -353,9 +450,14 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
         onComplete={() => setCardPackClickable(true)}
       />
 
-      {showCardPack && (
-        <CardPack packType={constants.PackType.StarterPack} isOpen={showCardPack} clickable={cardPackClickable} cardPackSize={CARD_PACK_SIZE} maxTilt={MAX_TILT} onComplete={(selectedDuelistId) => goToRealDuel(selectedDuelistId)} optionalTitle="Choose your Duelist:" />
-      )}
+      <CardPack 
+        packType={constants.PackType.StarterPack} 
+        isOpen={showCardPack} 
+        clickable={cardPackClickable} 
+        cardPackSize={CARD_PACK_SIZE} 
+        maxTilt={MAX_TILT} 
+        onComplete={(selectedDuelistId) => goToRealDuel(selectedDuelistId)} 
+        optionalTitle="Choose your Duelist:" />
     </>
   )
 }

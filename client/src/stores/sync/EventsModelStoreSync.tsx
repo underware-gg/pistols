@@ -1,10 +1,11 @@
 import { useEffect, useMemo } from 'react'
-import { formatQueryValue, getEntityModel, useDojoSetup, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
+import { useAccount } from '@starknet-react/core'
+import { formatQueryValue, getEntityModel, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
-import { useEventsStore } from '/src/stores/eventsStore'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { useEventsStore } from '../eventsModelStore'
 import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
-import * as torii from '@dojoengine/torii-client'
+import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
+// import * as torii from '@dojoengine/torii-client'
 
 
 // Sync entities: Add only once to a top level component
@@ -12,53 +13,40 @@ export function EventsModelStoreSync() {
   const eventsState = useEventsStore((state) => state)
   const mounted = useMounted()
 
-  const { duelistIds } = useDuelistsOfPlayer()
+  const { address } = useAccount()
 
-  // const query = useMemo<PistolsQueryBuilder>(() => ({
-  //   pistols: {
-  //     PlayerRequiredAction: {
-  //       $: {
-  //         where: {
-  //           duelist_id: { $in: duelistIds.map(id => formatQueryValue(id)) }
-  //         },
-  //       },
-  //     },
-  //   },
-  // }), [duelistIds])
   const query = useMemo<PistolsQueryBuilder>(() => (
-    new PistolsQueryBuilder()
-      .withClause(
-        new PistolsClauseBuilder().where(
-          "pistols-PlayerRequiredAction",
-          "duelist_id",
-          "In", duelistIds.map(id => formatQueryValue(id))
-        ).build()
-      )
-      .withLimit(50)
-      .withEntityModels([
-        "pistols-PlayerRequiredAction",
-      ])
-      .includeHashedKeys()
-  ), [duelistIds])
+    isPositiveBigint(address)
+      ? new PistolsQueryBuilder()
+        .withClause(
+          new PistolsClauseBuilder().keys(
+            ['pistols-CallToActionEvent'],
+            [formatQueryValue(address), undefined],
+          ).build()
+        )
+        .withEntityModels([
+          'pistols-CallToActionEvent',
+        ])
+        .includeHashedKeys()
+      : undefined
+  ), [address])
 
   useSdkEventsSub({
     query,
-    enabled: (mounted && duelistIds.length > 0),
+    historical: false,
+    enabled: (mounted && Boolean(query)),
     setEntities: (entities: PistolsEntity[]) => {
-      // console.log(`GET PlayerRequiredAction() ======>`, entities)
+      // console.log(`GET CallToActionEvent() ======>`, entities)
       eventsState.setEntities(entities)
     },
     updateEntity: (entity: PistolsEntity) => {
-      // console.log(`SUB PlayerRequiredAction() ======>`, entity)
-      const requiresAction = getEntityModel(entity, 'PlayerRequiredAction')
-      // console.log(`SUB PlayerRequiredAction() ======> model:`, requiresAction, duelistIds.includes(BigInt(requiresAction.duelist_id)))
-      if (requiresAction) {
-        if (duelistIds.includes(BigInt(requiresAction.duelist_id))) {
-          eventsState.updateEntity(entity)
-        }
+      // console.log(`SUB CallToActionEvent() ======>`, entity)
+      const model = getEntityModel(entity, 'CallToActionEvent')
+      if (bigintEquals(model?.player_address, address)) {
+        // console.log(`SUB CallToActionEvent() ======> model:`, getEntityModel(entity, 'CallToActionEvent'))
+        eventsState.updateEntity(entity)
       }
     },
-    historical: false, // historical events
   })
 
   // // TESTING raw events from client
@@ -67,7 +55,7 @@ export function EventsModelStoreSync() {
   //   Keys: {
   //     // keys: ['0x13d9ee239f33fea4f8785b9e3870ade909e20a9599ae7cd62c1c292b73af1b7'],
   //     keys: [undefined],
-  //     models: ["pistols-PlayerRequiredAction"],
+  //     models: ["pistols-CallToActionEvent"],
   //     pattern_matching: "FixedLen",
   //   },
   // }
@@ -82,7 +70,7 @@ export function EventsModelStoreSync() {
   //         offset: 0,
   //         dont_include_hashed_keys: true,
   //         order_by: [],
-  //         entity_models: ["pistols-PlayerRequiredAction"],
+  //         entity_models: ["pistols-CallToActionEvent"],
   //         entity_updated_after: 0,
   //       },
   //       false, // historical
@@ -92,7 +80,7 @@ export function EventsModelStoreSync() {
   //   if (sdk) _fetch()
   // }, [sdk])
 
-  // useEffect(() => console.log("EventsModelStoreSync() =>", eventsState.entities), [eventsState.entities])
+  useEffect(() => console.log("EventsModelStoreSync() =>", eventsState.entities), [eventsState.entities])
 
   return (<></>)
 }

@@ -7,7 +7,7 @@ import { poseidon } from '@underware/pistols-sdk/utils/starknet'
 import { CommitMoveMessage } from '@underware/pistols-sdk/pistols'
 import { DuelTutorialLevel, tutorialScenes } from '/src/data/tutorialConstants'
 import { SceneName } from '/src/data/assets'
-import { useTableId } from '../stores/configStore'
+import { useTableId } from '/src/stores/configStore'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '../three/game'
 
 import { emitter } from '../three/game'

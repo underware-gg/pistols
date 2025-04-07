@@ -119,7 +119,7 @@ const createStore = () => {
       });
     },
     updateUsernames: (usernames: Map<string, string>) => {
-      console.log("updateUsername()[Player] =>", usernames)
+      // console.log("updateUsername()[Player] =>", usernames)
       set((state: State) => {
         usernames.forEach((value: string, key: string) => {
           const _key = bigintToHex(key)

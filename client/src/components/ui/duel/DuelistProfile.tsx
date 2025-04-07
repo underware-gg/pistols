@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Image, SemanticFLOATS } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useGameAspect } from '/src/hooks/useGameAspect'
-import { useGetSeasonScoreboard } from '/src/hooks/useScore'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 import { DuelTutorialLevel } from '/src/data/tutorialConstants'
@@ -28,7 +27,6 @@ export default function DuelistProfile({
   speedFactor: number
   tutorialLevel: DuelTutorialLevel
 }) {
-  const score = useGetSeasonScoreboard(duelistId)
   const { aspectWidth } = useGameAspect()
 
   const { dispatchSelectDuelistId } = usePistolsContext()
@@ -38,12 +36,12 @@ export default function DuelistProfile({
   const [lastDamage, setLastDamage] = useState(0)
   const [lastHitChance, setLastHitChance] = useState(0)
 
-  const { profilePic, profileType, name, nameAndId } = useDuelist(duelistId)
+  const { profilePic, profileType, name, nameAndId, status } = useDuelist(duelistId)
 
   useEffect(() => {
     setArchetypeImage1('/images/' + 'duelist_female_' + ArchetypeNames[constants.Archetype.Villainous].toLowerCase() + '.png')
     setArchetypeImage2('/images/' + 'duelist_female_' + ArchetypeNames[constants.Archetype.Trickster].toLowerCase() + '.png')
-  }, [score])
+  }, [status])
 
   useEffect(() => {
     const damageDelta = damage - lastDamage
@@ -151,13 +149,11 @@ export default function DuelistProfile({
 
           <div ref={hitChanceContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
             <div ref={hitChanceNumberRef} className='NumberDelta HitChance' data-floated={floated}>
-              {/* { hitChanceDelta > 0 ? '+' : '' }{hitChanceDelta}% */}
               {hitChance}%
             </div>  
           </div>
           <div ref={damageContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
             <div ref={damageNumberRef} className='NumberDelta Damage' data-floated={floated}>
-              {/* { damageDelta > 0 ? '+' : '' }{damageDelta} */}
               {damage}
             </div>
           </div>

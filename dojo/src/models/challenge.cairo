@@ -1,7 +1,6 @@
 use starknet::{ContractAddress};
 use pistols::types::challenge_state::{ChallengeState, ChallengeStateTrait};
 use pistols::types::round_state::{RoundState};
-use pistols::types::rules::{RewardValues};
 use pistols::types::premise::{Premise};
 use pistols::types::timestamp::{Period};
 
@@ -59,7 +58,7 @@ pub struct Moves {
     pub card_2: u8,         // PacesCard,
     pub card_3: u8,         // TacticsCard,
     pub card_4: u8,         // BladesCard,
-} // [f] + [128 + 64 + 32(4*8)]:224
+} // [f] + [128 + 64 + 32(4*8)]: 224 bits
 
 #[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
 pub struct DuelistState {
@@ -69,22 +68,7 @@ pub struct DuelistState {
     pub health: u8,     // 0..CONST::FULL_HEALTH
     pub dice_fire: u8,  // 0..100
     pub honour: u8,     // honour granted
-} // [5*8]:40
-
-
-//---------------------
-// ON-CHAIN events
-//
-#[derive(Copy, Drop, Serde)]
-#[dojo::event(historical:false)]
-pub struct ChallengeRewards {
-    #[key]
-    pub duel_id: u128,
-    #[key]
-    pub duelist_id: u128,
-    //-----------------------
-    pub rewards: RewardValues,
-}
+} // [5*8]: 40 bits
 
 
 

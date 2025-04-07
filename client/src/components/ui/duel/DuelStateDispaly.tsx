@@ -29,7 +29,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
   const { dispatchSetTutorialLevel } = usePistolsContext()
 
   const { challengeDescription } = useChallengeDescription(duelId)
-  const { isFinished, isTutorial, tutorialLevel, duelistIdA, duelistIdB, winnerDuelistId, duelistAddressA, duelistAddressB } = useGetChallenge(duelId)
+  const { isFinished, isTutorial, tutorialLevel, duelistIdA, duelistIdB, winnerDuelistId, duelistAddressA, duelistAddressB, isCanceled, isExpired } = useGetChallenge(duelId)
 
   const { name: playerNameA } = usePlayer(duelistAddressA)
   const { name: playerNameB } = usePlayer(duelistAddressB)
@@ -39,12 +39,32 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
   const rewardsA = useGetChallengeRewards(isFinished ? duelId : 0n, duelistIdA)
   const rewardsB = useGetChallengeRewards(isFinished ? duelId : 0n, duelistIdB)
 
-  const winnerIsA = useMemo(() => (winnerDuelistId == duelistIdA), [winnerDuelistId, duelistIdA])
-  const winnerIsB = useMemo(() => (winnerDuelistId == duelistIdB), [winnerDuelistId, duelistIdB])
+  // Determine if we need to swap the display (if player B is the current user)
+  const shouldSwap = isYouB
+  
+  // Define the actual display order based on whether we should swap
+  const leftPlayerName = shouldSwap ? playerNameB : playerNameA
+  const rightPlayerName = shouldSwap ? playerNameA : playerNameB
+  const leftDuelistId = shouldSwap ? duelistIdB : duelistIdA
+  const rightDuelistId = shouldSwap ? duelistIdA : duelistIdB
+  const leftRewards = shouldSwap ? rewardsB : rewardsA
+  const rightRewards = shouldSwap ? rewardsA : rewardsB
+
+  const winnerIsLeft = useMemo(() => (winnerDuelistId == leftDuelistId), [winnerDuelistId, leftDuelistId])
+  const winnerIsRight = useMemo(() => (winnerDuelistId == rightDuelistId), [winnerDuelistId, rightDuelistId])
 
   const [animatedText, setAnimatedText] = useState("")
   const [showOutcome, setShowOutcome] = useState(false)
   const [showRewards, setShowRewards] = useState(false)
+  const [showDisplay, setShowDisplay] = useState(false)
+  const animationSequenceStarted = useRef(false)
+
+  // Text to display based on duel state
+  const statusText = useMemo(() => {
+    if (isCanceled) return "Duel was canceled"
+    if (isExpired) return "Duel has expired"
+    return challengeDescription
+  }, [challengeDescription, isCanceled, isExpired])
 
   const handleContinue = useCallback(() => {
     if (tutorialLevel === 1) {
@@ -56,39 +76,64 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
       dispatchSetScene(SceneName.TutorialScene4)
       dispatchSetTutorialLevel(DuelTutorialLevel.NONE)
     }
-  }, [tutorialLevel, dispatchSetTutorialLevel, dispatchSetScene])
+  }, [tutorialLevel, dispatchSetTutorialLevel, dispatchSetScene, dispatchSetting])
 
+  // Reset animation states when duel state changes
   useEffect(() => {
-    if (!isTutorial && isFinished && animated === AnimationState.Finished) {
-      setAnimatedText(challengeDescription)
+    // Reset all animation states when animation state changes
+    if (animated !== AnimationState.Finished) {
+      setAnimatedText("")
+      setShowOutcome(false)
+      setShowRewards(false)
+      setShowDisplay(false)
+      animationSequenceStarted.current = false;
+    } 
+    // Start animation sequence only once after the duel is finished
+    else if (!isTutorial && (isFinished || isCanceled || isExpired) && !animationSequenceStarted.current) {
+      animationSequenceStarted.current = true;
+      
+      // Step 1: Show the container with a fade-in
+      setTimeout(() => {
+        setShowDisplay(true);
+        
+        // Step 2: Start text animation after container appears
+        setTimeout(() => {
+          setAnimatedText(statusText);
+        }, 500);
+      }, 300);
     }
-  }, [isTutorial, isFinished, animated])
+  }, [animated, isTutorial, isFinished, isCanceled, isExpired, statusText]);
 
-  const RewardRow = ({delay, children, animation = 'fadeIn'}) => (
-    showRewards ? (
-      <div className={animation} style={{
-        animationDelay: `${delay}s`,
-        width: '60%',
-        margin: '0 auto',
-        minHeight: aspectHeight(2)
-      }}>
+  const RewardRow = ({ show, delay, children, animation = 'fadeIn' }) => {
+    const baseStyle = {
+      width: '60%',
+      margin: '0 auto',
+      minHeight: aspectHeight(2)
+    }
+    
+    return show ? (
+      <div 
+        className={animation} 
+        style={{
+          ...baseStyle,
+          animationDelay: `${delay}s`
+        }}
+      >
         {children}
       </div>
     ) : (
       <div style={{
-        width: '60%',
-        margin: '0 auto',
-        minHeight: aspectHeight(2),
+        ...baseStyle,
         visibility: 'hidden'
       }}>
         {children}
       </div>
     )
-  )
+  }
 
   return (
     <>
-      {(!isTutorial && isFinished && animated == AnimationState.Finished) &&
+      {(!isTutorial && (isFinished || isCanceled || isExpired) && animated === AnimationState.Finished && showDisplay) &&
         <div className='NoMouse NoDrag' style={{ 
           position: 'absolute', 
           left: 0, 
@@ -120,183 +165,223 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                 text={animatedText}
                 slideDirection='top'
                 delayPerCharacter={20}
-                onAnimationComplete={() => setShowOutcome(true)}
+                onAnimationComplete={() => {
+                  // Don't show outcome for canceled/expired duels
+                  if (!isCanceled && !isExpired) {
+                    setTimeout(() => setShowOutcome(true), 300);
+                  } else {
+                    // Skip directly to the end for canceled/expired duels
+                    setTimeout(() => setShowRewards(true), 300);
+                  }
+                }}
               />
             </h2>
 
-            <div className={`TextDivider DuelDivider bright ${showOutcome ? 'DividerAnimation' : ''}`} ></div>
+            {(!isCanceled && !isExpired) && (
+              <>
+                <div className={`TextDivider DuelDivider bright ${showOutcome ? 'DividerAnimation' : ''}`} ></div>
 
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-evenly', 
-              alignItems: 'center', 
-              marginBottom: aspectHeight(2),
-              fontSize: aspectWidth(1.6),
-              height: aspectHeight(4),
-              width: '100%',
-            }}>
-              <AnimatedText
-                text={showOutcome ? playerNameA : ''}
-                delayPerCharacter={50}
-                style={{color: winnerIsA ? '#00ff00' : '#ff4444'}}
-              />
-              <AnimatedText
-                text={showOutcome ? 'VS' : ''}
-                delayPerCharacter={0}
-                slideDirection='top' 
-                style={{fontSize: aspectWidth(2)}}
-              />
-              <AnimatedText
-                text={showOutcome ? playerNameB : ''}
-                delayPerCharacter={50}
-                reverse
-                style={{color: winnerIsB ? '#00ff00' : '#ff4444'}}
-                onAnimationComplete={() => setShowRewards(true)}
-              />
-            </div>
-
-            <Grid style={{width: '100%', height: aspectHeight(25)}}>
-              <Row>
-                <Col width={7} textAlign='center'>
-                  <RewardRow delay={0} animation='slideInFromTop'>
-                    <div className={winnerIsA ? 'H3 Important' : 'H3 Negative'} style={{
-                      fontSize: aspectWidth(2),
-                      color: winnerIsA ? '#FFD700' : '#FF4444',
-                      textShadow: `0 0 10px ${winnerIsA ? '#FFD70080' : '#FF444480'}`,
-                      marginBottom: aspectHeight(1)
-                    }}>{winnerIsA ? 'Victory' : 'Defeat'}</div>
-                  </RewardRow>
-
-                  <div style={{fontSize: aspectWidth(1.2)}}>
-                    <RewardRow delay={0.3} animation='slideInFromTop'>
-                      <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5)}}>
-                        <div style={{textAlign: 'left'}}>{winnerIsA ? '+' : '-'}</div>
-                        <div style={{textAlign: 'right'}}>
-                          <Balance fame wei={winnerIsA ? rewardsA?.fame_gained_wei : rewardsA?.fame_lost_wei || 0n} size='large' />
-                        </div>
-                      </div>
-                    </RewardRow>
-
-                    <RewardRow delay={0.6} animation='slideInFromTop'>
-                      <div style={{display: 'flex', justifyContent: winnerIsA ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
-                        {winnerIsA ? (
-                          <>
-                            <div style={{textAlign: 'left'}}>+</div>
-                            <div style={{textAlign: 'right'}}>
-                              <Balance fools wei={rewardsA?.fools_gained_wei || 0n} size='large' />
-                            </div>
-                          </>
-                        ) : (
-                          <div>-</div>
-                        )}
-                      </div>
-                    </RewardRow>
-
-                    <RewardRow delay={0.9} animation='slideInFromTop'>
-                      <div style={{display: 'flex', justifyContent: winnerIsA ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
-                        {winnerIsA ? (
-                          <>
-                            <div style={{textAlign: 'left'}}>+</div>
-                            <div style={{textAlign: 'right', fontSize: aspectWidth(1)}}>
-                              {Number(rewardsA?.points_scored || 0)} Points
-                            </div>
-                          </>
-                        ) : (
-                          <div>-</div>
-                        )}
-                      </div>
-                    </RewardRow>
-
-                    <RewardRow delay={1.2} animation='slideInFromTop'>
-                      <Divider className="Brightest" style={{ width: '120%', marginLeft: '-10%' }} />
-                    </RewardRow>
-
-                    <RewardRow delay={1.5} animation='slideInFromTop'>
-                      <div style={{
-                        fontSize: aspectWidth(1.6),
-                        color: winnerIsA ? '#FFD700' : '#FF4444',
-                        textShadow: `0 0 10px ${winnerIsA ? '#FFD70080' : '#FF444480'}`
-                      }}>
-                        {winnerIsA ? rewardsA?.position_string : (rewardsA?.survived ? 'Duelist Survived' : 'Duelist Died')}
-                      </div>
-                    </RewardRow>
-
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  marginBottom: aspectHeight(2),
+                  fontSize: aspectWidth(1.6),
+                  height: aspectHeight(4),
+                  width: '100%',
+                }}>
+                  <div style={{ flex: 5, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <AnimatedText
+                      text={showOutcome ? leftPlayerName : ''}
+                      delayPerCharacter={50}
+                      style={{color: winnerIsLeft ? '#00ff00' : '#ff4444'}}
+                    />
                   </div>
-                </Col>
-
-                <Col width={2}>
-                  <RewardRow delay={0}>
-                    <Divider vertical className="Brightest">Rewards</Divider>
-                  </RewardRow>
-                </Col>
-
-                <Col width={7} textAlign='center'>
-                  <RewardRow delay={0} animation='slideInFromTop'>
-                    <div className={winnerIsB ? 'H3 Important' : 'H3 Negative'} style={{
-                      fontSize: aspectWidth(2),
-                      color: winnerIsB ? '#FFD700' : '#FF4444',
-                      textShadow: `0 0 10px ${winnerIsB ? '#FFD70080' : '#FF444480'}`,
-                      marginBottom: aspectHeight(1)
-                    }}>{winnerIsB ? 'Victory' : 'Defeat'}</div>
-                  </RewardRow>
-
-                  <div style={{fontSize: aspectWidth(1.2)}}>
-                    <RewardRow delay={0.3} animation='slideInFromTop'>
-                      <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5)}}>
-                        <div style={{textAlign: 'left'}}>{winnerIsB ? '+' : '-'}</div>
-                        <div style={{textAlign: 'right'}}>
-                          <Balance fame wei={winnerIsB ? rewardsB?.fame_gained_wei : rewardsB?.fame_lost_wei || 0n} size='large' />
-                        </div>
-                      </div>
-                    </RewardRow>
-
-                    <RewardRow delay={0.6} animation='slideInFromTop'>
-                      <div style={{display: 'flex', justifyContent: winnerIsB ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
-                        {winnerIsB ? (
-                          <>
-                            <div style={{textAlign: 'left'}}>+</div>
-                            <div style={{textAlign: 'right'}}>
-                              <Balance fools wei={rewardsB?.fools_gained_wei || 0n} size='large' />
-                            </div>
-                          </>
-                        ) : (
-                          <div>-</div>
-                        )}
-                      </div>
-                    </RewardRow>
-
-                    <RewardRow delay={0.9} animation='slideInFromTop'>
-                      <div style={{display: 'flex', justifyContent: winnerIsB ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
-                        {winnerIsB ? (
-                          <>
-                            <div style={{textAlign: 'left'}}>+</div>
-                            <div style={{textAlign: 'right', fontSize: aspectWidth(1)}}>
-                              {Number(rewardsB?.points_scored || 0)} Points
-                            </div>
-                          </>
-                        ) : (
-                          <div>-</div>
-                        )}
-                      </div>
-                    </RewardRow>
-
-                    <RewardRow delay={1.2} animation='slideInFromTop'>
-                      <Divider className="Brightest" style={{ width: '120%', marginLeft: '-10%' }} />
-                    </RewardRow>
-
-                    <RewardRow delay={1.5} animation='slideInFromTop'>
-                      <div style={{
-                        fontSize: aspectWidth(1.6),
-                        color: winnerIsB ? '#FFD700' : '#FF4444',
-                        textShadow: `0 0 10px ${winnerIsB ? '#FFD70080' : '#FF444480'}`
-                      }}>
-                        {winnerIsB ? rewardsB?.position_string : (rewardsB?.survived ? 'Duelist Survived' : 'Duelist Died')}
-                      </div>
-                    </RewardRow>
+                  <div style={{ flex: 2, textAlign: 'center' }}>
+                    <AnimatedText
+                      text={showOutcome ? 'VS' : ''}
+                      delayPerCharacter={0}
+                      slideDirection='top' 
+                      style={{fontSize: aspectWidth(2)}}
+                    />
                   </div>
-                </Col>
-              </Row>
-            </Grid>
+                  <div style={{ flex: 5, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <AnimatedText
+                      text={showOutcome ? rightPlayerName : ''}
+                      delayPerCharacter={50}
+                      reverse
+                      style={{color: winnerIsRight ? '#00ff00' : '#ff4444'}}
+                      onAnimationComplete={() => {
+                        // Ensure we only trigger this once
+                        if (!showRewards) {
+                          setTimeout(() => setShowRewards(true), 300);
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {(!isCanceled && !isExpired) && (
+              <Grid style={{width: '100%', height: aspectHeight(25)}}>
+                <Row>
+                  <Col width={7} textAlign='center'>
+                    <RewardRow show={showRewards} delay={0} animation='slideInFromTop'>
+                      <div className={winnerIsLeft ? 'H3 Important' : 'H3 Negative'} style={{
+                        fontSize: aspectWidth(2),
+                        color: winnerIsLeft ? '#FFD700' : '#FF4444',
+                        textShadow: `0 0 10px ${winnerIsLeft ? '#FFD70080' : '#FF444480'}`,
+                        marginBottom: aspectHeight(1)
+                      }}>{winnerIsLeft ? 'Victory' : 'Defeat'}</div>
+                    </RewardRow>
+
+                    <div style={{fontSize: aspectWidth(1.2)}}>
+                      <RewardRow show={showRewards} delay={0.3} animation='slideInFromTop'>
+                        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5)}}>
+                          <div style={{textAlign: 'left'}}>{winnerIsLeft ? '+' : '-'}</div>
+                          <div style={{textAlign: 'right'}}>
+                            <Balance fame wei={winnerIsLeft ? leftRewards?.fame_gained_wei : leftRewards?.fame_lost_wei || 0n} size='large' />
+                          </div>
+                        </div>
+                      </RewardRow>
+
+                      <RewardRow show={showRewards} delay={0.6} animation='slideInFromTop'>
+                        <div style={{display: 'flex', justifyContent: winnerIsLeft ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
+                          {winnerIsLeft ? (
+                            <>
+                              <div style={{textAlign: 'left'}}>+</div>
+                              <div style={{textAlign: 'right'}}>
+                                <Balance fools wei={leftRewards?.fools_gained_wei || 0n} size='large' />
+                              </div>
+                            </>
+                          ) : (
+                            <div>-</div>
+                          )}
+                        </div>
+                      </RewardRow>
+
+                      <RewardRow show={showRewards} delay={0.9} animation='slideInFromTop'>
+                        <div style={{display: 'flex', justifyContent: winnerIsLeft ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
+                          {winnerIsLeft ? (
+                            <>
+                              <div style={{textAlign: 'left'}}>+</div>
+                              <div style={{textAlign: 'right', fontSize: aspectWidth(1)}}>
+                                {Number(leftRewards?.points_scored || 0)} Points
+                              </div>
+                            </>
+                          ) : (
+                            <div>-</div>
+                          )}
+                        </div>
+                      </RewardRow>
+
+                      <RewardRow show={showRewards} delay={1.2} animation='slideInFromTop'>
+                        <Divider className="Brightest" style={{ width: '120%', marginLeft: '-10%' }} />
+                      </RewardRow>
+
+                      <RewardRow show={showRewards} delay={1.5} animation='slideInFromTop'>
+                        <div style={{
+                          fontSize: aspectWidth(1.6),
+                          color: winnerIsLeft ? '#FFD700' : '#FF4444',
+                          textShadow: `0 0 10px ${winnerIsLeft ? '#FFD70080' : '#FF444480'}`
+                        }}>
+                          {winnerIsLeft ? leftRewards?.position_string : (leftRewards?.survived ? 'Duelist Survived' : 'Duelist Died')}
+                        </div>
+                      </RewardRow>
+
+                    </div>
+                  </Col>
+
+                  <Col width={2}>
+                    <RewardRow show={showRewards} delay={0}>
+                      <Divider vertical className="Brightest">Rewards</Divider>
+                    </RewardRow>
+                  </Col>
+
+                  <Col width={7} textAlign='center'>
+                    <RewardRow show={showRewards} delay={0} animation='slideInFromTop'>
+                      <div className={winnerIsRight ? 'H3 Important' : 'H3 Negative'} style={{
+                        fontSize: aspectWidth(2),
+                        color: winnerIsRight ? '#FFD700' : '#FF4444',
+                        textShadow: `0 0 10px ${winnerIsRight ? '#FFD70080' : '#FF444480'}`,
+                        marginBottom: aspectHeight(1)
+                      }}>{winnerIsRight ? 'Victory' : 'Defeat'}</div>
+                    </RewardRow>
+
+                    <div style={{fontSize: aspectWidth(1.2)}}>
+                      <RewardRow show={showRewards} delay={0.3} animation='slideInFromTop'>
+                        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: aspectHeight(0.5)}}>
+                          <div style={{textAlign: 'left'}}>{winnerIsRight ? '+' : '-'}</div>
+                          <div style={{textAlign: 'right'}}>
+                            <Balance fame wei={winnerIsRight ? rightRewards?.fame_gained_wei : rightRewards?.fame_lost_wei || 0n} size='large' />
+                          </div>
+                        </div>
+                      </RewardRow>
+
+                      <RewardRow show={showRewards} delay={0.6} animation='slideInFromTop'>
+                        <div style={{display: 'flex', justifyContent: winnerIsRight ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
+                          {winnerIsRight ? (
+                            <>
+                              <div style={{textAlign: 'left'}}>+</div>
+                              <div style={{textAlign: 'right'}}>
+                                <Balance fools wei={rightRewards?.fools_gained_wei || 0n} size='large' />
+                              </div>
+                            </>
+                          ) : (
+                            <div>-</div>
+                          )}
+                        </div>
+                      </RewardRow>
+
+                      <RewardRow show={showRewards} delay={0.9} animation='slideInFromTop'>
+                        <div style={{display: 'flex', justifyContent: winnerIsRight ? 'space-between' : 'flex-end', marginBottom: aspectHeight(0.5)}}>
+                          {winnerIsRight ? (
+                            <>
+                              <div style={{textAlign: 'left'}}>+</div>
+                              <div style={{textAlign: 'right', fontSize: aspectWidth(1)}}>
+                                {Number(rightRewards?.points_scored || 0)} Points
+                              </div>
+                            </>
+                          ) : (
+                            <div>-</div>
+                          )}
+                        </div>
+                      </RewardRow>
+
+                      <RewardRow show={showRewards} delay={1.2} animation='slideInFromTop'>
+                        <Divider className="Brightest" style={{ width: '120%', marginLeft: '-10%' }} />
+                      </RewardRow>
+
+                      <RewardRow show={showRewards} delay={1.5} animation='slideInFromTop'>
+                        <div style={{
+                          fontSize: aspectWidth(1.6),
+                          color: winnerIsRight ? '#FFD700' : '#FF4444',
+                          textShadow: `0 0 10px ${winnerIsRight ? '#FFD70080' : '#FF444480'}`
+                        }}>
+                          {winnerIsRight ? rightRewards?.position_string : (rightRewards?.survived ? 'Duelist Survived' : 'Duelist Died')}
+                        </div>
+                      </RewardRow>
+                    </div>
+                  </Col>
+                </Row>
+              </Grid>
+            )}
+
+            {/* TODO: Handle expired and canceled properly as there might be some deductions and rewards given */}
+            {(isCanceled || isExpired) && showRewards && (
+              <div className='fadeIn' style={{ 
+                width: '100%',
+                textAlign: 'center',
+                marginTop: aspectHeight(3),
+                marginBottom: aspectHeight(3),
+                color: '#ff4444',
+                fontSize: aspectWidth(2)
+              }}>
+                <p>{isCanceled ? 'The duel was canceled. No rewards were distributed.' : 'The duel has expired. No rewards were distributed.'}</p>
+              </div>
+            )}
+            
             <div style={{ width: '100%', height: aspectHeight(7), marginTop: aspectHeight(2) }}>
               {showRewards && (
                 <div className='fadeIn' style={{ animationDelay: '2s', width: '100%', height: '100%' }}>
@@ -308,7 +393,9 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                       <Col width={2}>
                       </Col>
                       <Col width={7}>
-                        <ChallengeButton challengedPlayerAddress={isYouA ? duelistAddressB : duelistAddressA} customLabel={isYouA || isYouB ? 'Rematch!' : null} fillParent />
+                        {!isCanceled && !isExpired && (
+                          <ChallengeButton challengedPlayerAddress={isYouA ? duelistAddressB : duelistAddressA} customLabel={isYouA || isYouB ? 'Rematch!' : null} fillParent />
+                        )}
                       </Col>
                     </Row>
                   </Grid>
@@ -318,7 +405,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
           </div>
         </div>
       }
-      {(isTutorial && isFinished && animated == AnimationState.Finished) &&
+      {(isTutorial && isFinished && animated === AnimationState.Finished) &&
         <Segment style={{ position: 'absolute', top: '50%' }}>
           <h3 className='Important' style={{ fontSize: aspectWidth(1.3) }}>{challengeDescription}</h3>
           <ActionButton large fill label='Continue' onClick={() => handleContinue()} />

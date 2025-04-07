@@ -63,6 +63,7 @@ export const useSdkEntitiesGet = ({
 }: UseSdkEntitiesGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
+  const limit = useMemo(() => query?.build().limit, [query])
 
   useEffect(() => {
     let _mounted = true
@@ -73,6 +74,9 @@ export const useSdkEntitiesGet = ({
       }).then((data: PistolsEntity[]) => {
         if (!_mounted) return
         console.log("useSdkEntitiesGet() GOT:", data)
+        if (data.length == limit) {
+          console.warn("useSdkEntitiesGet() LIMIT REACHED!!!! Possible loss of data", limit, query)
+        }
         const entities = _filterEntities(data)
         if (entities.length > 0) {
           // console.log("useSdkEntitiesGet() GOT>>>>>>>>>>>>", entities)
@@ -81,6 +85,8 @@ export const useSdkEntitiesGet = ({
         } else if (retryInterval > 0) {
           console.log("useSdkEntitiesGet() retry...", retryInterval)
           setTimeout(() => _get(), retryInterval)
+        } else {
+          setIsLoading(false)
         }
       }).catch((error: Error) => {
         if (!_mounted) return
@@ -108,6 +114,7 @@ export const useSdkEntitiesSub = ({
 }: UseSdkEntitiesSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
+  const limit = useMemo(() => query?.build().limit, [query])
 
   useEffect(() => {
     let _mounted = true
@@ -129,6 +136,9 @@ export const useSdkEntitiesSub = ({
         if (!_mounted) return
         const [initialEntities, sub] = response;
         // console.log("ENTITIES SUB ====== initialEntities:", initialEntities);
+        if (initialEntities.length == limit) {
+          console.warn("useSdkEntitiesSub() LIMIT REACHED!!!! Possible loss of data", limit, query)
+        }
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
           setEntities(_filterEntities(initialEntities))
@@ -168,6 +178,7 @@ export const useSdkEventsGet = ({
 }: UseSdkEventsGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
+  const limit = useMemo(() => query?.build().limit, [query])
 
   useEffect(() => {
     let _mounted = true
@@ -180,6 +191,9 @@ export const useSdkEventsGet = ({
         if (!_mounted) return
         // console.log("useSdkEventsGet() GOT:", historical, response.data)
         const entities = _parseEvents(data, historical)
+        if (entities.length == limit) {
+          console.warn("useSdkEventsGet() LIMIT REACHED!!!! Possible loss of data", limit, query)
+        }
         if (entities.length > 0) {
           // console.log("useSdkEventsGet() GOT>>>>>>>>>>>>", historical, entities)
           setEntities(entities)
@@ -190,7 +204,7 @@ export const useSdkEventsGet = ({
         }
       }).catch((error: Error) => {
         if (!_mounted) return
-        console.error("useSdkEventsGet() error:", error, query)
+        console.error("useSdkEventsGet() error:", historical, error, query)
         setIsLoading(false)
       })
     }
@@ -215,19 +229,20 @@ export const useSdkEventsSub = ({
 }: UseSdkEventsSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
+  const limit = useMemo(() => query?.build().limit, [query])
 
   useEffect(() => {
     let _mounted = true
     let _unsubscribe: (() => void) = undefined;
     const _subscribe = async () => {
       setIsLoading(true)
-      // console.log("EVENTS SUB _______ query:", query);
+      // console.log("useSdkEventsSub() _______ query:", query);
       await sdk.subscribeEventQuery({
         query,
         historical,
         callback: (response: SdkEventsCallbackResponse) => {
           if (response.error) {
-            console.error("useSdkEventsSub() callback error:", response.error, query)
+            console.error("useSdkEventsSub() callback error:", historical, response.error, query)
           } else {
             // console.log("useSdkEventsSub() SUB:", historical, response.data);
             _parseEvents(response.data, historical).forEach(entity => updateEntity(entity))
@@ -235,8 +250,11 @@ export const useSdkEventsSub = ({
         },
       }).then(response => {
         if (!_mounted) return
+        console.log("useSdkEventsSub() ====== initialEntities:", historical, response);
         const [initialEntities, sub] = response;
-        // console.log("EVENTS SUB ====== initialEntities:", initialEntities);
+        if (initialEntities.length == limit) {
+          console.warn("useSdkEventsSub() LIMIT REACHED!!!! Possible loss of data", limit, query)
+        }
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
           setEntities(_parseEvents(initialEntities, historical))
@@ -244,7 +262,7 @@ export const useSdkEventsSub = ({
         }
       }).catch(error => {
         if (!_mounted) return
-        console.error("useSdkEventsSub() promise error:", error, query)
+        console.error("useSdkEventsSub() promise error:", historical, error, query)
         setIsLoading(false)
       })
     };

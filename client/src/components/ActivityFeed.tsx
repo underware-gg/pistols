@@ -1,15 +1,15 @@
 import React, { useEffect, useMemo } from 'react'
-import { useAllPlayersActivityFeed, ActivityState } from '/src/stores/historicalEventsStore'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
+import { useAllPlayersActivityFeed, ActivityState } from '/src/stores/eventsHistoricalStore'
+import { useCallToActions } from '/src/stores/eventsModelStore'
 import { useChallenge } from '/src/stores/challengeStore'
-import { useRequiredActions } from '/src/stores/eventsStore'
-import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { ChallengeLink, DuelistLink, PlayerLink, TimestampDeltaElapsed } from '/src/components/Links'
 import { ChallengeStateReplyVerbs } from '/src/utils/pistols'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export default function ActivityFeed() {
   const { allPlayersActivity } = useAllPlayersActivityFeed()
-  const { requiredDuelIds } = useRequiredActions()
+  const { requiredDuelIds } = useCallToActions()
 
   const { clientSeconds, updateTimestamp } = useClientTimestamp(true, 60)
   useEffect(() => {
@@ -17,7 +17,6 @@ export default function ActivityFeed() {
   }, [allPlayersActivity])
 
   const items = useMemo(() => ([...allPlayersActivity].reverse().map((a) =>
-    
     <ActivityItem
       key={`${a.activity}-${a.identifier.toString()}-${a.timestamp}-${a.player_address}`}
       clientSeconds={clientSeconds}
@@ -26,14 +25,12 @@ export default function ActivityFeed() {
     />)
   ), [allPlayersActivity, clientSeconds, requiredDuelIds])
 
-
   return (
     <div className='FillParent'>
       {items}
     </div>
   );
 }
-
 
 interface ActivityItemProps {
   activity: ActivityState
@@ -71,16 +68,18 @@ const ActivityItem = ({
     return <ActivityItemMovesRevealed activity={activity} clientSeconds={clientSeconds} />
   }
   if (activity.activity === constants.Activity.ChallengeResolved) {
-    return (isRequired ? <ActivityItemChallengeEnded activity={activity} clientSeconds={clientSeconds} />
+    return (isRequired
+      ? <ActivityItemChallengeEnded activity={activity} clientSeconds={clientSeconds} />
       : <ActivityItemChallengeResolved activity={activity} clientSeconds={clientSeconds} />
     )
   }
   if (activity.activity === constants.Activity.ChallengeDraw) {
-    return (isRequired ? <ActivityItemChallengeEnded activity={activity} clientSeconds={clientSeconds} />
+    return (isRequired
+      ? <ActivityItemChallengeEnded activity={activity} clientSeconds={clientSeconds} />
       : <ActivityItemChallengeDraw activity={activity} clientSeconds={clientSeconds} />
     )
   }
-  if (activity.activity === constants.Activity.ChallengeExpired) {
+  if (activity.activity === constants.Activity.ChallengeCanceled) {
     return <ActivityItemChallengeCanceled activity={activity} clientSeconds={clientSeconds} />
   }
   if (activity.activity === constants.Activity.PlayerTimedOut) {

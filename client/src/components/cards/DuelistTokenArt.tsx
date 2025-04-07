@@ -3,8 +3,7 @@ import { BigNumberish } from 'starknet'
 import { duelist_token } from '@underware/pistols-sdk/pistols/tokens'
 import { DuelistTokenImage } from '@underware/pistols-sdk/pistols/components'
 import { useDuelist } from '/src/stores/duelistStore'
-import { useFameBalanceDuelist } from '/src/hooks/useFame'
-import { useGetSeasonScoreboard } from '/src/hooks/useScore'
+import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { usePlayer } from '/src/stores/playerStore'
@@ -18,9 +17,8 @@ export function DuelistTokenArt({
   className?: string,
   style?: React.CSSProperties,
 }) {
-  const { profileType, profilePic, currentDuelId } = useDuelist(duelistId)
-  const { balance_eth, lives, isLoading } = useFameBalanceDuelist(duelistId)
-  const score = useGetSeasonScoreboard(duelistId)
+  const { profileType, profilePic, currentDuelId, status } = useDuelist(duelistId)
+  const { balance_eth, lives, isLoading } = useDuelistFameBalance(duelistId)
   const { owner } = useOwnerOfDuelist(duelistId)
   const { name } = usePlayer(owner)
 
@@ -28,20 +26,20 @@ export function DuelistTokenArt({
     duelist_id: duelistId,
     owner: bigintToHex(owner),
     username: name,
-    honour: score.honour,
-    archetype: score.archetype,
+    honour: status.honour,
+    archetype: status.archetype,
     profile_type: profileType,
     profile_id: profilePic,
-    total_duels: score.total_duels,
-    total_wins: score.total_wins,
-    total_losses: score.total_losses,
-    total_draws: score.total_draws,
+    total_duels: status.total_duels,
+    total_wins: status.total_wins,
+    total_losses: status.total_losses,
+    total_draws: status.total_draws,
     fame: Number(balance_eth),
     lives,
     is_memorized: false,
     duel_id: currentDuelId,
-    is_loading: isLoading,
-  }), [score])
-  
+    is_loading: (isLoading !== false),
+  }), [name, profileType, profilePic, currentDuelId, history, balance_eth, lives, isLoading])
+
   return <DuelistTokenImage props={props} className={className} style={style} />
 }

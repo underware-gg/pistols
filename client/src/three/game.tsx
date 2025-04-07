@@ -25,7 +25,7 @@ import { map } from '@underware/pistols-sdk/utils'
 import { SpriteSheet } from './SpriteSheetMaker.tsx'
 import { DuelistsManager } from './DuelistsManager.tsx'
 import { Action } from '/src/utils/pistols.tsx'
-import { DuelistState } from '/src/components/scenes/Duel.tsx'
+import { DuelistState } from '../components/ui/duel/DuelContext.tsx'
 
 
 //---------------------------
@@ -1474,12 +1474,18 @@ function fadeInCurrentScene() {
     .start();
 }
 
-export function startDuelWithPlayers(duelistNameA, duelistModelA, isDuelistAYou, isDuelistBYou, duelistNameB, duelistModelB) {  
-  _duelistManager.switchDuelists(duelistNameA, duelistModelA, isDuelistAYou, isDuelistBYou, duelistNameB, duelistModelB)
-  setTimeout(() => {
-    startSummoningAnimation(_duelistTentaclesA, _duelistHighlightA, isDuelistAYou)
-    startSummoningAnimation(_duelistTentaclesB, _duelistHighlightB, isDuelistBYou)
-  }, 500)
+export function spawnDuelist(duelist, duelistName, duelistModel, isYou) {
+  if (duelist == 'A') {
+    _duelistManager.setupDuelistA(duelistName, duelistModel, isYou)
+    setTimeout(() => {
+      startSummoningAnimation(_duelistTentaclesA, _duelistHighlightA, isYou)
+    }, 500)
+  } else {
+    _duelistManager.setupDuelistB(duelistName, duelistModel, isYou)
+    setTimeout(() => {
+      startSummoningAnimation(_duelistTentaclesB, _duelistHighlightB, isYou)
+    }, 500)
+  }
 }
 
 export function setDuelTimePercentage(timePassed: number) {

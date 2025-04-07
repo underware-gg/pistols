@@ -174,17 +174,17 @@ pub mod duelist_token {
         IBankDispatcher, IBankDispatcherTrait,
     };
     use pistols::models::{
-        pool::{PoolType, PoolTypeTrait, LordsReleaseBill},
-        player::{Activity, ActivityTrait},
+        pool::{PoolType, PoolTypeTrait, LordsReleaseBill, ReleaseReason},
         duelist::{
             Duelist, DuelistValue,
             DuelistTimestamps,
             DuelistChallengeValue,
-            ScoreboardValue, ScoreTrait,
             DuelistMemorial, CauseOfDeath, //DuelistMemorialValue,
+            DuelistStatusTrait,
             Archetype,
         },
         challenge::{Challenge},
+        events::{Activity, ActivityTrait},
     };
     use pistols::types::{
         profile_type::{ProfileTypeTrait, ProfileManagerTrait},
@@ -364,6 +364,7 @@ pub mod duelist_token {
                         registered: timestamp,
                         active: timestamp,
                     },
+                    status: Default::default(),
                 };
                 store.set_duelist(@duelist);
 
@@ -413,8 +414,8 @@ pub mod duelist_token {
             let treasury_address: ContractAddress = store.get_config_treasury_address();
             self._process_rewards(@fame_dispatcher, @fools_dispatcher, challenge.duelist_id_a, rewards_a);
             self._process_rewards(@fame_dispatcher, @fools_dispatcher, challenge.duelist_id_b, rewards_b);
-            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_a, challenge.duelist_id_a, ref rewards_a, rewards_b.fame_gained);
-            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_b, challenge.duelist_id_b, ref rewards_b, rewards_a.fame_gained);
+            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_a, challenge.duel_id, challenge.duelist_id_a, ref rewards_a, rewards_b.fame_gained);
+            self._process_lost_fame(@fame_dispatcher, @bank_dispatcher, treasury_address, distribution, balance_b, challenge.duel_id, challenge.duelist_id_b, ref rewards_b, rewards_a.fame_gained);
 
             // DEAD
             if (!rewards_a.survived) {
@@ -469,6 +470,7 @@ pub mod duelist_token {
             underware_address: ContractAddress,
             distribution: @FeeDistribution,
             fame_balance: u128,
+            duel_id: u128,
             duelist_id: u128,
             ref values: RewardValues,
             winners_minted_fame: u128,
@@ -502,13 +504,16 @@ pub mod duelist_token {
                     (*bank_dispatcher).duelist_lost_fame_to_pool(starknet::get_contract_address(), duelist_id, amount, *distribution.pool_id);
                     distribution_due -= amount;
                 }
-                // release LORDS do tournament creator + burn
+                // release LORDS to tournament creator + burn
                 if (*distribution.creator_percent != 0 && distribution.creator_address.is_non_zero()) {
                     let amount: u128 = MathTrait::percentage(distribution_total, *distribution.creator_percent);
                     release_bills.append(LordsReleaseBill {
+                        reason: ReleaseReason::FameLostToCreator,
+                        duelist_id,
                         recipient: *distribution.creator_address,
-                        fame_amount: amount,
-                        lords_amount: 0,
+                        pegged_fame: amount,
+                        pegged_lords: 0,
+                        sponsored_lords: 0,
                     });
                     distribution_due -= amount;
                     total_to_burn += amount; // released, need to burn
@@ -516,14 +521,21 @@ pub mod duelist_token {
                 // remaining FAME to underware
                 let mut underware_due: u128 = residual_due + distribution_due;
                 release_bills.append(LordsReleaseBill {
+                    reason: ReleaseReason::FameLostToDeveloper,
+                    duelist_id,
                     recipient: underware_address,
-                    fame_amount: underware_due,
-                    lords_amount: 0,
+                    pegged_fame: underware_due,
+                    pegged_lords: 0,
+                    sponsored_lords: 0,
                 });
                 total_to_burn += underware_due; // released, need to burn
                 //
                 // release LORDS and burn FAME
-                values.lords_unlocked += (*bank_dispatcher).release_lords_from_fame_to_be_burned(release_bills.span());
+                let season_table_id: felt252 = match (*distribution.pool_id) {
+                    PoolType::Season(table_id) => {table_id},
+                    _ => {0},
+                };
+                values.lords_unlocked += (*bank_dispatcher).release_lords_from_fame_to_be_burned(season_table_id, duel_id, release_bills.span());
                 (*fame_dispatcher).burn_from_token(starknet::get_contract_address(), duelist_id, total_to_burn.into());
             } else {
                 values.survived = true;
@@ -571,11 +583,14 @@ pub mod duelist_token {
 
             // remaining fame to be burned and released
             let bill = LordsReleaseBill {
+                reason: ReleaseReason::SacrificedToDeveloper,
+                duelist_id,
                 recipient: store.get_config_treasury_address(),
-                fame_amount: due_amount,
-                lords_amount: 0,
+                pegged_fame: due_amount,
+                pegged_lords: 0,
+                sponsored_lords: 0,
             };
-            bank_dispatcher.release_lords_from_fame_to_be_burned(array![bill].span());
+            bank_dispatcher.release_lords_from_fame_to_be_burned(0, 0, array![bill].span());
             fame_dispatcher.burn_from_token(starknet::get_contract_address(), duelist_id, due_amount.into());
 // println!("remaining: {}", self._fame_balance(@fame_dispatcher, duelist_id));
 
@@ -644,28 +659,28 @@ pub mod duelist_token {
             let base_uri: ByteArray = self.erc721._base_uri();
             let owner: ContractAddress = self.owner_of(token_id);
             let challenge: DuelistChallengeValue = store.get_duelist_challenge_value(token_id.low);
-            let table_id: felt252 = store.get_config_season_table_id();
-            let scoreboard: ScoreboardValue = store.get_scoreboard_value(token_id.low.into(), table_id);
-            let archetype: Archetype = scoreboard.score.get_archetype();
+            let archetype: Archetype = duelist.status.get_archetype();
             let duelist_image: ByteArray = duelist.profile_type.get_uri(base_uri.clone());
             let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
             let lives: u128 = (fame_balance / FAME::ONE_LIFE.low);
+            let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
+            let tokenbound_address = fame_dispatcher.address_of_token(starknet::get_contract_address(), token_id.low);
             // Image
             let image: ByteArray = UrlImpl::new(format!("{}/api/pistols/duelist_token/{}/image", base_uri.clone(), token_id))
                 .add("owner", format!("0x{:x}", owner), false)
                 // .add("username", username, false)
-                .add("honour", scoreboard.score.get_honour(), false)
+                .add("honour", duelist.status.get_honour(), false)
                 .add("archetype", archetype.into(), false)
                 .add("profile_type", duelist.profile_type.into(), false)
                 .add("profile_id", duelist.profile_type.profile_id().to_string(), false)
-                .add("table_id", table_id.to_string(), false)
-                .add("total_duels", scoreboard.score.total_duels.to_string(), false)
-                .add("total_wins", scoreboard.score.total_wins.to_string(), false)
-                .add("total_losses", scoreboard.score.total_losses.to_string(), false)
-                .add("total_draws", scoreboard.score.total_draws.to_string(), false)
+                .add("total_duels", duelist.status.total_duels.to_string(), false)
+                .add("total_wins", duelist.status.total_wins.to_string(), false)
+                .add("total_losses", duelist.status.total_losses.to_string(), false)
+                .add("total_draws", duelist.status.total_draws.to_string(), false)
                 .add("fame", ETH(fame_balance.into()).low.to_string(), false)
                 .add("lives", lives.to_string(), false)
                 .add("duel_id", format!("0x{:x}", challenge.duel_id), false)
+                .add("tokenbound_address", format!("0x{:x}", tokenbound_address), false)
                 // .add("is_memorized", is_memorized.to_string(), false)
                 .build();
             // Attributes
@@ -676,7 +691,7 @@ pub mod duelist_token {
                 },
                 Attribute {
                     key: "Honour",
-                    value: scoreboard.score.get_honour(),
+                    value: duelist.status.get_honour(),
                 },
                 Attribute {
                     key: "Archetype",
@@ -696,29 +711,21 @@ pub mod duelist_token {
                 },
                 Attribute {
                     key: "Total Duels",
-                    value: scoreboard.score.total_duels.to_string(),
+                    value: duelist.status.total_duels.to_string(),
                 },
             ];
-            if (scoreboard.score.total_duels != 0) {
-                attributes.append(Attribute {
-                    key: "Season",
-                    value: table_id.to_string(),
-                });
+            if (duelist.status.total_duels != 0) {
                 attributes.append(Attribute {
                     key: "Total Wins",
-                    value: scoreboard.score.total_wins.to_string(),
+                    value: duelist.status.total_wins.to_string(),
                 });
                 attributes.append(Attribute {
                     key: "Total Losses",
-                    value: scoreboard.score.total_losses.to_string(),
+                    value: duelist.status.total_losses.to_string(),
                 });
                 attributes.append(Attribute {
                     key: "Total Draws",
-                    value: scoreboard.score.total_draws.to_string(),
-                });
-                attributes.append(Attribute {
-                    key: "Score",
-                    value: scoreboard.score.points.to_string(),
+                    value: duelist.status.total_draws.to_string(),
                 });
             }
             // metadata
@@ -726,6 +733,10 @@ pub mod duelist_token {
                 Attribute {
                     key: "duelist_image",
                     value: duelist_image.clone(),
+                },
+                Attribute {
+                    key: "tokenbound_address",
+                    value: format!("0x{:x}", tokenbound_address),
                 },
             ];
             // return the metadata to be rendered by the component

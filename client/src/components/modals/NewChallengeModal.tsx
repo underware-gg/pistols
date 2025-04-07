@@ -16,7 +16,7 @@ import { FormInput } from '/src/components/ui/Form'
 import { FeesToPay } from '/src/components/account/LordsBalance'
 import { Balance } from '/src/components/account/Balance'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { useFameBalanceDuelist } from '/src/hooks/useFame'
+import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { DUELIST_CARD_HEIGHT } from '/src/data/cardConstants'
 import { DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
 import { useGameAspect } from '/src/hooks/useGameAspect'
@@ -319,7 +319,7 @@ function NewChallengeForm({
   setArgs: (args: any) => void
 }) {
   const { tableId } = useTableId()
-  const { lives } = useFameBalanceDuelist(duelistId)
+  const { lives } = useDuelistFameBalance(duelistId)
 
   const { aspectWidth } = useGameAspect()
   

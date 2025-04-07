@@ -12,14 +12,15 @@ import { SettingsProvider } from '/src/hooks/SettingsContext'
 import { PistolsProvider } from '/src/hooks/PistolsContext'
 import ErrorModal from '/src/components/modals/ErrorModal'
 import MainPage from '/src/pages/MainPage'
+import InternalPageIndex from '/src/pages/internal/InternalPageIndex'
 import AdminPage from '/src/pages/internal/AdminPage'
 import PoolsPage from '/src/pages/internal/PoolsPage'
+import SeasonsTestPage from '/src/pages/internal/SeasonsTestPage'
 import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
 import ErrorPage from '/src/pages/error/ErrorPage'
 import TestPageIndex from '/src/pages/tests/TestPageIndex'
 import ConnectTestPage from '/src/pages/tests/ConnectTestPage'
-import SeasonsTestPage from '/src/pages/tests/SeasonsTestPage'
 import IconsTestPage from '/src/pages/tests/IconsTestPage'
 import SignTestPage from '/src/pages/tests/SignTestPage'
 import TimestampTestPage from '/src/pages/tests/TimestampTestPage'
@@ -69,8 +70,10 @@ const router = createBrowserRouter([
   {
     path: '/internal',
     children: [
+      { path: "", element: <InternalPageIndex /> },
       { path: "admin", element: <AdminPage /> },
       { path: "pools", element: <PoolsPage /> },
+      { path: "seasons", element: <SeasonsTestPage /> },
       { path: "snapshot", element: <SnapshotPage /> },
     ],
   },
@@ -80,7 +83,6 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <TestPageIndex /> },
       { path: "connect", element: <ConnectTestPage /> },
-      { path: "seasons", element: <SeasonsTestPage /> },
       { path: "tokens", element: <TokensTestPage /> },
       { path: "tutorial", element: <TutorialTestPage /> },
       { path: "timestamp", element: <TimestampTestPage /> },

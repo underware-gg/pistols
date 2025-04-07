@@ -7,8 +7,9 @@ import { BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
 import { bigintEquals } from '@underware/pistols-sdk/utils'
 import { EMOJI } from '/src/data/messages'
 import { BigNumberish } from 'starknet'
-import { useDuelistRequiresAction, useDuelRequiresAction } from '/src/stores/eventsStore'
+import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { useIsMyDuelist } from '/src/hooks/useIsYou'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -26,8 +27,8 @@ export function useDuelIcons({
     challenge: { duelistIdA, duelistIdB, winner, isAwaiting, isInProgress, isFinished },
     round1, duelStage, completedStagesA, completedStagesB, turnA, turnB,
   } = useDuel(duelId)
-  const isRequiredAction = useDuelRequiresAction(duelId)
-  const isDuelistRequiresAction = useDuelistRequiresAction(duelistId)
+  const isCallToAction = useDuelCallToAction(duelId)
+  const isMyDuelist = useIsMyDuelist(duelistId)
 
   const isA = useMemo(() => bigintEquals(duelistId, duelistIdA), [duelistId, duelistIdA])
   const isB = useMemo(() => bigintEquals(duelistId, duelistIdB), [duelistId, duelistIdB])
@@ -54,13 +55,12 @@ export function useDuelIcons({
     //
     // Required Action...
     if (isFinished) { 
-      if (isRequiredAction) {
-        if (isDuelistRequiresAction) {
-          icons.push(<LoadingIcon key='isTurn' size={iconSize} className='Brightest' />)
+      if (isCallToAction) {
+        if (isMyDuelist) {
+          icons.push(<LoadingIcon key='finished' size={iconSize} className='Brightest' />)
         } else {
-          icons.push(<EmojiIcon emoji={EMOJI.IDLE} size={iconSize} />)
+          icons.push(<EmojiIcon key='finished' emoji={EMOJI.IDLE} size={iconSize} />)
         }
-
         return { icons }
       }
     }
@@ -69,16 +69,16 @@ export function useDuelIcons({
     if (isAwaiting) {
       if (isA) {
         icons = [
-          <CompletedIcon key='isA' completed={true}>
+          <CompletedIcon key='awaitingA' completed={true}>
             <EmojiIcon emoji={EMOJI.AGREEMENT} size={iconSize} />
           </CompletedIcon>
         ]
       } else {
         icons = [
-          <CompletedIcon key='isB' completed={false}>
+          <CompletedIcon key='awaitingB' completed={false}>
             <EmojiIcon emoji={EMOJI.AGREEMENT} size={iconSize} />
           </CompletedIcon>,
-          <LoadingIcon key='isTurn' size={iconSize} className='Brightest' />
+          <LoadingIcon key='loading' size={iconSize} className='Brightest' />
         ]
       }
     }

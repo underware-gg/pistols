@@ -67,10 +67,9 @@ void main() {
   result = tex0;
   
   // Check for masks matching texture 0
-  vec4 mask0 = vec4(0.0);
   if (uMasksSize > 0 && uMasksRenderOrder[0] == uTexturesRenderOrder[0]) {
-    mask0 = texture2D(uMasks[0], tex0Uv);
-    allMasks = mix(allMasks, mask0, mask0.a);
+    vec4 m = texture2D(uMasks[0], tex0Uv);
+    allMasks = mix(allMasks, m, m.a);
   }
   if (uMasksSize > 1 && uMasksRenderOrder[1] == uTexturesRenderOrder[0]) {
     vec4 m = texture2D(uMasks[1], tex0Uv);

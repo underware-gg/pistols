@@ -27,7 +27,7 @@
             "description": "Reveal moves of a Duelist in a Duel"
           },
           {
-            "entrypoint": "clear_required_action",
+            "entrypoint": "clear_call_to_action",
             "description": "Clear the required action call for a duelist"
           },
           {

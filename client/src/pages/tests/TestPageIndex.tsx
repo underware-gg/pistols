@@ -5,7 +5,6 @@ import App from '/src/components/App'
 
 const testPages = [
   { name: 'connect', connected: true },
-  { name: 'seasons', connected: true },
   { name: 'tokens', connected: true },
   { name: 'tutorial', connected: true },
   { name: 'timestamp', connected: true },
@@ -15,6 +14,16 @@ const testPages = [
 ]
 
 export default function TestPageIndex() {
+  return (
+    <App>
+      <Container text>
+        <TestPageMainMenu />
+      </Container>
+    </App>
+  );
+}
+
+export function TestPageMainMenu() {
   const [activeItem, setActiveItem] = useState('home')
   const navigate = useNavigate()
   const _click = (name: string) => {
@@ -22,30 +31,21 @@ export default function TestPageIndex() {
     navigate(`/tests/${name}`)
   }
   return (
-    <App>
-      <Container text>
-        <Menu inverted vertical>
-          {testPages.map(page => (
-            <MenuItem
-              key={page.name}
-              name={page.name}
-              icon='arrow right'
-              active={activeItem === page.name}
-              onClick={() => _click(page.name)}
-            />
-          ))}
-        </Menu>
-      </Container>
-    </App>
+    <>
+      <h3>Test pagess</h3>
+      <Menu inverted vertical>
+        {testPages.map(page => (
+          <MenuItem
+            key={page.name}
+            name={page.name}
+            icon='arrow right'
+            active={activeItem === page.name}
+            onClick={() => _click(page.name)}
+          />
+        ))}
+      </Menu>
+    </>
   );
-}
-
-export function BackToTestPageIndex() {
-  const navigate = useNavigate()
-  const _click = () => {
-    navigate('/tests')
-  }
-  return <Button onClick={_click} icon='arrow left' content='Tests' />
 }
 
 export function TestPageMenu() {
@@ -56,7 +56,6 @@ export function TestPageMenu() {
   }
   return (
     <>
-      <br />
       <Menu inverted>
         <MenuItem
           icon='arrow left'

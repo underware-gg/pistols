@@ -15,7 +15,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
   IGame: {
     commit_moves: 'Commit moves of a Duelist in a Duel',
     reveal_moves: 'Reveal moves of a Duelist in a Duel',
-    clear_required_action: 'Clear the required action call for a duelist',
+    clear_call_to_action: 'Clear the required action call for a duelist',
     collect_duel: 'Close expired duels',
     collect_season: 'Close the current season and start the next one',
   },
@@ -95,17 +95,7 @@ export const getArchetypeValue = (name: Archetype): number | undefined => _index
 export const getArchetypeFromValue = (value: number): Archetype | undefined => Object.keys(Archetype)[value] as Archetype;
 export const getArchetypeMap = (): Record<Archetype, number> => Object.keys(Archetype).reduce((acc, v, index) => { acc[v as Archetype] = index; return acc; }, {} as Record<Archetype, number>);
 
-// from: ../dojo/src/models/pack.cairo
-export enum PackType {
-  Unknown = 'Unknown', // 0
-  StarterPack = 'StarterPack', // 1
-  Duelists5x = 'Duelists5x', // 2
-};
-export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
-export const getPackTypeFromValue = (value: number): PackType | undefined => Object.keys(PackType)[value] as PackType;
-export const getPackTypeMap = (): Record<PackType, number> => Object.keys(PackType).reduce((acc, v, index) => { acc[v as PackType] = index; return acc; }, {} as Record<PackType, number>);
-
-// from: ../dojo/src/models/player.cairo
+// from: ../dojo/src/models/events.cairo
 export enum Activity {
   Undefined = 'Undefined', // 0
   TutorialFinished = 'TutorialFinished', // 1
@@ -115,7 +105,7 @@ export enum Activity {
   DuelistSpawned = 'DuelistSpawned', // 5
   DuelistDied = 'DuelistDied', // 6
   ChallengeCreated = 'ChallengeCreated', // 7
-  ChallengeExpired = 'ChallengeExpired', // 8
+  ChallengeCanceled = 'ChallengeCanceled', // 8
   ChallengeReplied = 'ChallengeReplied', // 9
   MovesCommitted = 'MovesCommitted', // 10
   MovesRevealed = 'MovesRevealed', // 11
@@ -126,6 +116,16 @@ export enum Activity {
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
 export const getActivityMap = (): Record<Activity, number> => Object.keys(Activity).reduce((acc, v, index) => { acc[v as Activity] = index; return acc; }, {} as Record<Activity, number>);
+
+// from: ../dojo/src/models/pack.cairo
+export enum PackType {
+  Unknown = 'Unknown', // 0
+  StarterPack = 'StarterPack', // 1
+  Duelists5x = 'Duelists5x', // 2
+};
+export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
+export const getPackTypeFromValue = (value: number): PackType | undefined => Object.keys(PackType)[value] as PackType;
+export const getPackTypeMap = (): Record<PackType, number> => Object.keys(PackType).reduce((acc, v, index) => { acc[v as PackType] = index; return acc; }, {} as Record<PackType, number>);
 
 // from: ../dojo/src/models/pool.cairo
 export enum PoolType {
@@ -139,6 +139,18 @@ export enum PoolType {
 export const getPoolTypeValue = (name: PoolType): number | undefined => _indexOrUndefined(Object.keys(PoolType).indexOf(name));
 export const getPoolTypeFromValue = (value: number): PoolType | undefined => Object.keys(PoolType)[value] as PoolType;
 export const getPoolTypeMap = (): Record<PoolType, number> => Object.keys(PoolType).reduce((acc, v, index) => { acc[v as PoolType] = index; return acc; }, {} as Record<PoolType, number>);
+
+// from: ../dojo/src/models/pool.cairo
+export enum ReleaseReason {
+  Undefined = 'Undefined', // 0
+  FameLostToCreator = 'FameLostToCreator', // 1
+  FameLostToDeveloper = 'FameLostToDeveloper', // 2
+  SacrificedToDeveloper = 'SacrificedToDeveloper', // 3
+  LeaderboardPrize = 'LeaderboardPrize', // 4
+};
+export const getReleaseReasonValue = (name: ReleaseReason): number | undefined => _indexOrUndefined(Object.keys(ReleaseReason).indexOf(name));
+export const getReleaseReasonFromValue = (value: number): ReleaseReason | undefined => Object.keys(ReleaseReason)[value] as ReleaseReason;
+export const getReleaseReasonMap = (): Record<ReleaseReason, number> => Object.keys(ReleaseReason).reduce((acc, v, index) => { acc[v as ReleaseReason] = index; return acc; }, {} as Record<ReleaseReason, number>);
 
 // from: ../dojo/src/models/season.cairo
 export enum SeasonPhase {

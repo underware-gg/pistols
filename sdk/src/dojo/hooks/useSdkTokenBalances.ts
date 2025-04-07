@@ -18,55 +18,70 @@ type UseSdkGetResult = {
 }
 
 export type UseSdkTokenBalancesGetProps = {
-  contracts: string[]
-  accounts?: string[]
-  tokenIds?: string[]
-  setBalances: (balances: torii.TokenBalance[]) => void
+  contract: string
+  account?: string
+  tokenIds?: BigNumberish[]
   enabled?: boolean
-  forceCounter?: number
+  setBalances: (balances: torii.TokenBalance[]) => void
 }
 export type UseSdkTokenBalancesSubProps = {
   contracts: string[]
-  accounts?: string[]
-  tokenIds?: string[]
-  updateBalance: (balance: torii.TokenBalance) => void
   enabled?: boolean
+  updateBalance: (balance: torii.TokenBalance) => void
 }
 
 //---------------------------------------
 // TokenBalances get/subscribe
 //
 export const useSdkTokenBalancesGet = ({
-  contracts,
-  accounts,
+  contract,
+  account,
   tokenIds,
   setBalances,
   enabled = true,
-  forceCounter = 0,
 }: UseSdkTokenBalancesGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
 
   useEffect(() => {
+    let _mounted = true
     const _get = async () => {
-      // console.warn("useSdkTokenBalancesGet() GET........", enabled, forceCounter, contracts, accounts)
+      // console.log("useSdkTokenBalancesGet() GET........", enabled, contract, account, tokenIds)
       setIsLoading(true)
       await sdk.getTokenBalances(
-        contracts,
-        accounts ?? [],
+        [contract],
+        account ? [account] : [],
         tokenIds?.map(a => toToriiTokenId(a)) ?? []
       ).then((balances: torii.TokenBalance[]) => {
-          // console.log("useSdkTokenBalancesGet() GOT:", balances)
+        if (!_mounted) return
+        // console.log("useSdkTokenBalancesGet() GOT:", balances)
+        if (balances.length > 0) {
           setBalances(balances)
-        }).catch((error: Error) => {
-          console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contracts, accounts)
-        }).finally(() => {
-          setIsLoading(false)
-        })
+        } else if (!tokenIds) {
+          // initialize zero balance
+          // console.log("useSdkTokenBalancesGet() initialize balance:", contract, account)
+          const _balances = [{
+            contract_address: contract,
+            account_address: account,
+            token_id: '0x0',
+            balance: '0x0',
+          }]
+          setBalances(_balances)
+        }
+      }).catch((error: Error) => {
+        if (!_mounted) return
+        console.error("useSdkTokenBalancesGet().sdk.get() error:", error, contract, account)
+      }).finally(() => {
+        setIsLoading(false)
+      })
+      // console.log("useSdkTokenBalancesGet() done!", account)
     }
     // get...
-    if (sdk && enabled) _get()
-  }, [sdk, enabled, contracts, accounts, tokenIds, forceCounter])
+    if (sdk && enabled && isPositiveBigint(contract) && (isPositiveBigint(account) || tokenIds)) _get()
+    return () => {
+      _mounted = false
+    }
+  }, [sdk, enabled, contract, account, tokenIds])
 
   return {
     isLoading,
@@ -75,8 +90,6 @@ export const useSdkTokenBalancesGet = ({
 
 export const useSdkTokenBalancesSub = ({
   contracts,
-  accounts,
-  tokenIds,
   updateBalance,
   enabled = true,
 }: UseSdkTokenBalancesSubProps): UseSdkGetResult => {
@@ -85,13 +98,13 @@ export const useSdkTokenBalancesSub = ({
   useEffect(() => {
     let _subscription: torii.Subscription = undefined;
     const _subscribe = () => {
-      console.log(`useSdkTokenBalancesSub() SUBSCRIBE......`, contracts, accounts)
+      console.log(`useSdkTokenBalancesSub() SUBSCRIBE......`, contracts)
       _subscription = sdk.onTokenBalanceUpdated(
         contracts,
-        accounts ?? [],
-        tokenIds?.map(a => toToriiTokenId(a)) ?? [],
+        [],
+        [],
         (balance: torii.TokenBalance) => {
-          console.log("useSdkTokenBalancesSub() SUB:", balance);
+          console.log("useSdkTokenBalancesSub() SUB:", isPositiveBigint(balance.contract_address), balance);
           if (isPositiveBigint(balance.contract_address)) {
             updateBalance(balance);
           }
@@ -99,13 +112,13 @@ export const useSdkTokenBalancesSub = ({
       )
     };
     // subscribe
-    if (sdk && enabled) _subscribe()
+    if (sdk && enabled && contracts.length > 0) _subscribe()
     // unsubscribe
     return () => {
       _subscription?.cancel()
       _subscription = undefined
     }
-  }, [sdk, enabled, contracts, accounts, tokenIds])
+  }, [sdk, enabled, contracts])
 
   return {
     isLoading: false,
@@ -120,5 +133,6 @@ export const useSdkTokenBalancesSub = ({
 //
 // Format token ids for torii token queries
 function toToriiTokenId(value: BigNumberish) {
-  return BigInt(value).toString(16).padStart(64, "0");
+  // return BigInt(value).toString(16).padStart(64, "0");
+  return BigInt(value).toString().padStart(64, "0");
 }

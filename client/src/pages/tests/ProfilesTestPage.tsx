@@ -117,8 +117,8 @@ function Profiles({
     return props.map((e, index) => {
       const { profile, prop } = e;
       const state = _randomChallengeState()
-      const is_finished = (state == constants.ChallengeState.Resolved || state == constants.ChallengeState.Draw);
-      const winner = is_finished ? (Math.floor(Math.random() * 3)) : 0;
+      const is_concluded = (state == constants.ChallengeState.Resolved || state == constants.ChallengeState.Draw);
+      const winner = is_concluded ? (Math.floor(Math.random() * 3)) : 0;
       let nextProfileIndex = (index < props.length - 1) ? index + 1 : 0;
       const duel_prop: duel_token.DuelSvgProps = {
         // base_uri: 'https://localhost:5173',

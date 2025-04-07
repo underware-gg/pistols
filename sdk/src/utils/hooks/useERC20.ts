@@ -21,9 +21,9 @@ export const useERC20Balance = (
   const balance_eth = useMemo(() => weiToEth(balance?.value ?? 0n), [balance])
   // console.log(`BALANCE`, (bigintToHex(contractAddress)), (bigintToHex(ownerAddress)), balance)
 
-  const noFundsForFee = useMemo(() => {
-    if (!fee || !balance) return false
-    return (BigInt(balance.value) < BigInt(fee))
+  const canAffordFee = useMemo(() => {
+    if (balance == null || !fee) return undefined
+    return (BigInt(balance.value) >= BigInt(fee))
   }, [balance, fee])
 
   return {
@@ -32,7 +32,7 @@ export const useERC20Balance = (
     formatted: balance?.formatted ?? 0,   // eth
     decimals: balance?.decimals ?? 0,     // 18
     symbol: balance?.symbol ?? '?',       // eth
-    noFundsForFee,
+    canAffordFee,
     isLoading,
   }
 }

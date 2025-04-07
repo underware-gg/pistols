@@ -279,7 +279,10 @@
 .DuelistCard {
   position: relative;
   z-index: 2;
-  transform: translateX(-50%);
+
+  &.Left {
+    transform: translateX(-80%);
+  }
 }
 
 .DuelIconsContainer {

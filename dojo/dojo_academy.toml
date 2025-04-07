@@ -10,7 +10,7 @@ description = "An on-chain pistol duelling game of honour and betrayal."
 icon_uri = "https://assets.underware.gg/pistols/logo.png"
 cover_uri = "https://assets.underware.gg/pistols/splash.png"
 website = "https://pistols.gg"
-seed = "pistols"
+seed = "academy-v0.14.0"
 
 [world.socials]
 x = "https://x.com/underware_gg"
@@ -23,7 +23,7 @@ chain_id = "WP_PISTOLS_ACADEMY"
 rpc_url = "https://api.cartridge.gg/x/pistols-academy/katana"
 account_address = "0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec"
 private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
-world_address = "0xbee2bb53422762f6c51fb478a8a5da41a64ad678860d02800e0dbdac23dc36"
+world_address = "0x26ee0ad15771037e62341e39119d627cb25626e67349419cf3c5436d8eabefe"
 
 #--------------------------
 # namespaces
@@ -51,6 +51,7 @@ default = "pistols"
   "pistols-duel_token",
   "pistols-duelist_token",
   "pistols-pack_token",
+  "pistols-bank",
 ]
 # ERC-20
 "pistols-CoinConfig" = [
@@ -59,7 +60,6 @@ default = "pistols"
   "pistols-lords_mock",
 ]
 "pistols-TokenBoundAddress" = ["pistols-fame_coin"]
-"pistols-Pool" = ["pistols-bank"]
 # arcade trophies
 "pistols-TrophyCreation" = ["pistols-game"]
 "pistols-TrophyProgression" = ["pistols-game"]
@@ -71,7 +71,7 @@ default = "pistols"
 "pistols-admin" = [
   "0x0", # treasury_address (or initializer)
   "0x0", # lords_address (use lords_mock)
-  "0x0", # vrf_address (use vrf_mock)
+  "0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f", # vrf_address (sepolia)
 ]
 "pistols-duel_token" = [
   "sstr:https://assets.underware.gg", # base_uri
@@ -95,4 +95,6 @@ default = "pistols"
 #
 [migration]
 order_inits = []
-skip_contracts = []
+skip_contracts = [
+  "pistols-vrf_mock",
+]

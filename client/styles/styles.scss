@@ -1394,25 +1394,50 @@ $logo-url: '/logos/logo_avante.svg';
   -webkit-box-orient: vertical;
   border-radius: aspect-width(0.625);
   z-index: 999;
+  --tail-position: left; /* default value, can be overridden */
 
   &:before {
-    content:"";
+    content: "";
     position: absolute;
-    right: aspect-width(-1.875);
     top: aspect-width(4.8125);
     border-top: aspect-width(0.9375) solid transparent;
-    border-left: aspect-width(1.875) solid var(--border-color);
     border-bottom: aspect-width(0) solid transparent;
   }
   
   &:after {
-    content:"";
+    content: "";
     position: absolute;
-    right: aspect-width(-1.24);
     top: aspect-width(5);
     border-top: aspect-width(0.625) solid transparent;
-    border-left: aspect-width(1.25) solid var(--bg-color);
     border-bottom: aspect-width(0) solid transparent;
+  }
+
+  &:has([data-tail="left"]), &[data-tail="left"] {
+    &:before {
+      left: aspect-width(-1.875);
+      border-right: aspect-width(1.875) solid var(--border-color);
+      border-left: none;
+    }
+    
+    &:after {
+      left: aspect-width(-1.24);
+      border-right: aspect-width(1.25) solid var(--bg-color);
+      border-left: none;
+    }
+  }
+
+  &:has([data-tail="right"]), &[data-tail="right"], &:not([data-tail="left"]) {
+    &:before {
+      right: aspect-width(-1.875);
+      border-left: aspect-width(1.875) solid var(--border-color);
+      border-right: none;
+    }
+    
+    &:after {
+      right: aspect-width(-1.24);
+      border-left: aspect-width(1.25) solid var(--bg-color);
+      border-right: none;
+    }
   }
 
   .DialogBalloonText {
@@ -1446,8 +1471,9 @@ $logo-url: '/logos/logo_avante.svg';
 }
 
 .GateTalkBaloon {
-  @extend .DemonTalkBaloon;
-  left: 10%;
+  @extend .DialogBalloon;
+  top: 52%;
+  left: 56%;
   color: $color-darkest;
   z-index: 800;
   --bg-color: #{$color-bright};
@@ -1837,6 +1863,50 @@ td {
   background-color: $color-bright;
 }
 
+.PaginationWood.ui.pagination.menu {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.PaginationWood.ui.pagination.menu .item {
+  border: none;
+  background-color: transparent;
+  width: aspect-width(3.8);
+  height: aspect-width(4.4);
+  font-size: aspect-width(2) !important;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 0 aspect-width(0.5) 0;
+  transition: transform 0.2s, filter 0.2s;
+}
+
+.PaginationWood.ui.pagination.menu .item:hover {
+  transform: scale(1.12);
+  filter: brightness(1.2);
+}
+
+.PaginationWood.ui.pagination.menu .item:first-child,
+.PaginationWood.ui.pagination.menu .item:last-child {
+  background: url('images/ui/leaderboards/button_background_all.png') no-repeat center/contain;
+}
+
+.PaginationWood.ui.pagination.menu .item:nth-child(2),
+.PaginationWood.ui.pagination.menu .item:nth-last-child(2) {
+  background: url('images/ui/leaderboards/button_background_page.png') no-repeat center/contain;
+}
+
+.PaginationWood.ui.pagination.menu .item:not(:first-child):not(:last-child):not(:nth-child(2)):not(:nth-last-child(2)) {
+  background: url('images/ui/leaderboards/button_background_number.png') no-repeat center/contain;
+}
+
+.PaginationWood.ui.pagination.menu .active.item {
+  background: url('images/ui/leaderboards/button_background_selected.png') no-repeat center/contain !important;
+  transform: scale(1.06);
+}
+
 //
 // <Modal>
 .ui.modal {
@@ -1966,6 +2036,11 @@ a.active.step:hover,
   // border-bottom: 1px solid rgba(255, 255, 255, .1); // original
   border-top: 1px solid rgba($color-brightest, .15);
   border-bottom: 1px solid rgba($color-brightest, .25);
+}
+
+.DividerSmall {
+  margin-left: aspect-width(5) !important;
+  margin-right: aspect-width(5) !important;
 }
 
 .TextDivider {
@@ -2296,11 +2371,31 @@ a.active.step:hover,
 }
 
 .button_duel[type="tavern"] {
-  width: aspect-width(9.8);
+  position: absolute !important;
+  bottom: aspect-width(-0.2);
+  right: aspect-width(0.4);
+  width: aspect-width(9);
+}
+
+.button_duel[type="help"] {
+  position: absolute !important;
+  bottom: aspect-width(-0.2);
+  right: aspect-width(-3.5);
+  width: aspect-width(4);
 }
 
 .button_duel[type="icon"] {
-  width: aspect-width(2.9);
+  position: absolute !important;
+  bottom: aspect-width(-0.3);
+  width: aspect-width(2.5);
+
+  &:nth-of-type(1) {
+    right: aspect-width(-6.4);
+  }
+
+  &:nth-of-type(2) {
+    right: aspect-width(-9);
+  }
 }
 
 .button_duel[type="icon-vertical"] {
@@ -2443,10 +2538,16 @@ a.active.step:hover,
   animation: blink 1s infinite;
 }
 
-.nextButton {
+.tutorialButtonsContainer {
   position: absolute;
   bottom: aspect-width(1);
   right: aspect-width(1);
+  display: flex;
+  align-items: center;
+  gap: aspect-width(1);
+}
+
+.nextButton {
   display: flex;
   align-items: center;
   justify-content: center;

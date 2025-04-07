@@ -1,27 +1,6 @@
 use starknet::{ContractAddress};
 
-#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-pub enum Activity {
-    Undefined,          // 0
-    TutorialFinished,   // 1
-    PackStarter,        // 2
-    PackPurchased,      // 3
-    PackOpened,         // 4
-    DuelistSpawned,     // 5
-    DuelistDied,        // 6
-    ChallengeCreated,   // 7
-    ChallengeExpired,   // 8
-    ChallengeReplied,   // 9
-    MovesCommitted,     // 10
-    MovesRevealed,      // 11
-    PlayerTimedOut,     // 12
-    ChallengeResolved,  // 13
-    ChallengeDraw,      // 14
-}
 
-//---------------------
-// Player
-//
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct Player {
@@ -29,6 +8,7 @@ pub struct Player {
     pub player_address: ContractAddress,   // controller wallet
     //-----------------------
     pub timestamps: PlayerTimestamps,
+    // pub referral_code: felt252,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, IntrospectPacked)]
@@ -38,28 +18,6 @@ pub struct PlayerTimestamps {
 }
 
 
-//---------------------
-// ON-CHAIN events
-//
-#[derive(Copy, Drop, Serde)]
-#[dojo::event(historical:true)]
-pub struct PlayerActivity {
-    #[key]
-    pub player_address: ContractAddress,
-    //-----------------------
-    pub timestamp: u64,         // seconds since epoch
-    pub activity: Activity,
-    pub identifier: felt252,    // (optional) duel_id, duelist_id, ...
-    pub is_public: bool,        // can be displayed in activity log
-}
-#[derive(Copy, Drop, Serde)]
-#[dojo::event(historical:false)]
-pub struct PlayerRequiredAction {
-    #[key]
-    pub duelist_id: u128,
-    //-----------------------
-    pub duel_id: u128,
-}
 
 //--------------------------
 // OFF-CHAIN signed messages
@@ -93,9 +51,8 @@ pub struct PlayerBookmark {
 //----------------------------------
 // Traits
 //
-use dojo::world::{WorldStorage};
-use dojo::event::EventStorage;
 use pistols::libs::store::{Store, StoreTrait};
+use pistols::models::events::{Activity, ActivityTrait};
 
 mod PlayerErrors {
     pub const PLAYER_NOT_REGISTERED: felt252    = 'PLAYER: Not registered';
@@ -119,37 +76,5 @@ pub impl PlayerImpl of PlayerTrait {
     #[inline(always)]
     fn exists(self: @Player) -> bool {
         (*self.timestamps.registered != 0)
-    }
-}
-
-
-#[generate_trait]
-pub impl ActivityImpl of ActivityTrait {
-    fn emit(self: @Activity, ref world: WorldStorage, player_address: ContractAddress, identifier: felt252) {
-        world.emit_event(@PlayerActivity{
-            player_address,
-            timestamp: starknet::get_block_timestamp(),
-            activity: *self,
-            identifier,
-            is_public: self.is_public(),
-        });
-    }
-    fn is_public(self: @Activity) -> bool {
-        match self {
-            Activity::PackPurchased |
-            Activity::PackOpened => false,
-            _ => true,
-        }
-    }
-    fn can_register_player(self: @Activity) -> bool {
-        match self {
-            // Activity::PackStarter => true,
-            // Activity::TutorialFinished => true,
-            // Activity::DuelistSpawned => true,
-            // Activity::ChallengeCreated => true,
-            // Activity::ChallengeReplied => true,
-            // _ => false,
-            _ => true,
-        }
     }
 }

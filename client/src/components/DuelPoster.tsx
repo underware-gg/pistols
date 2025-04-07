@@ -1,4 +1,5 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState, useMemo } from 'react'
+import { BigNumberish } from 'starknet'
 import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
 import { useChallenge } from '/src/stores/challengeStore'
 import { useDuel } from '/src/hooks/useDuel'
@@ -10,7 +11,7 @@ import { InteractibleComponent, InteractibleComponentHandle } from '/src/compone
 import { CardColor } from '/src/data/cardAssets'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { useIsBookmarked, usePlayer } from '/src/stores/playerStore'
-import { useIsMyAccount, useIsMyDuelist } from '/src/hooks/useIsYou'
+import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { Grid } from 'semantic-ui-react'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useTable } from '/src/stores/tableStore'
@@ -25,11 +26,10 @@ import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { useDuelTokenContract } from '/src/hooks/useTokenContract'
-import { SceneName } from '/src/data/assets'
 import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
-import { useDuelRequiresAction } from '/src/stores/eventsStore'
-import { BigNumberish } from 'starknet'
-import { useFameBalanceDuelist } from '/src/hooks/useFame'
+import { useDuelCallToAction } from '/src/stores/eventsModelStore'
+import { useDuelistFameBalance } from '/src/stores/coinStore'
+import { SceneName } from '/src/data/assets'
 
 
 const Row = Grid.Row
@@ -76,7 +76,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
 
   const { duel_token, game } = useDojoSystemCalls()
   const { account } = useAccount()
-  const isRequiredAction = useDuelRequiresAction(props.duelId)
+  const isCallToAction = useDuelCallToAction(props.duelId)
   const { duelistSelectOpener } = usePistolsContext()
 
   const {
@@ -112,7 +112,21 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   const { isMyAccount: isYouA } = useIsMyAccount(duelistAddressA)
   const { isMyAccount: isYouB } = useIsMyAccount(duelistAddressB)
 
-  const { lives, isLoading } = useFameBalanceDuelist(challengingDuelistId)
+  const { lives, isLoading } = useDuelistFameBalance(challengingDuelistId)
+  
+  const [leftDuelistId, leftDuelistAddress, leftPlayerName] = useMemo(() => {
+    if (isYouB) {
+      return [duelistIdB, duelistAddressB, playerNameB]
+    }
+    return [duelistIdA, duelistAddressA, playerNameA]
+  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB])
+  
+  const [rightDuelistId, rightDuelistAddress, rightPlayerName] = useMemo(() => {
+    if (isYouB) {
+      return [duelistIdA, duelistAddressA, playerNameA]
+    }
+    return [duelistIdB, duelistAddressB, playerNameB]
+  }, [isYouB, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB, playerNameA, playerNameB])
 
   const isChallenger = useMemo(() => isYouA, [isYouA])
   const isChallenged = useMemo(() => isYouB, [isYouB])
@@ -178,20 +192,20 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   }));
   
   const isDead = (duelistId: number) => {
-    return duelistId !== Number(winnerDuelistId) && isFinished && !isRequiredAction
+    return duelistId !== Number(winnerDuelistId) && isFinished && !isCallToAction
   }
 
   useEffect(() => {
     if (!props.isSmall) return
 
-    if ((isYouA && turnA) || (isYouB && turnB) || isRequiredAction) {
+    if ((isYouA && turnA) || (isYouB && turnB) || isCallToAction) {
       setCardColor(CardColor.ORANGE)
       baseRef.current?.toggleBlink(true)
     } else {
       setCardColor(CardColor.WHITE)
       baseRef.current?.toggleBlink(false)
     }
-  }, [isYouA, isYouB, turnA, turnB, props.isSmall, isRequiredAction])
+  }, [isYouA, isYouB, turnA, turnB, props.isSmall, isCallToAction])
 
   return (
     <InteractibleComponent
@@ -218,22 +232,22 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
         props.isSmall ? (
           <div className='Poster'>
             <div className='PlayerNameB'>
-              <p className='NoMargin Overflow NoBreak Bold Black'>{playerNameB}</p>
+              <p className='NoMargin Overflow NoBreak Bold Black'>{rightPlayerName}</p>
             </div>
             <div className='ProfilePicContainer'>
               <div className='ProfilePicChallengeContainer Left Small'>
-                <ProfilePic profilePic={0} width={6} disabled={isDead(Number(duelistIdA))}  removeBorder removeCorners className='ProfilePicChallenge Left' />
-                <img id='DefeatedOverlay' className={ `Left ${isDead(Number(duelistIdA)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+                <ProfilePic profilePic={0} width={6} disabled={isDead(Number(leftDuelistId))}  removeBorder removeCorners className='ProfilePicChallenge Left' />
+                <img id='DefeatedOverlay' className={ `Left ${isDead(Number(leftDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
               </div>
               <div className='ProfilePicChallengeContainer Right Small'>
-                <ProfilePic profilePic={0} width={6} disabled={isDead(Number(duelistIdB))}  removeBorder removeCorners className='ProfilePicChallenge Right' />
-                <img id='DefeatedOverlay' className={ `Right ${isDead(Number(duelistIdB)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+                <ProfilePic profilePic={0} width={6} disabled={isDead(Number(rightDuelistId))}  removeBorder removeCorners className='ProfilePicChallenge Right' />
+                <img id='DefeatedOverlay' className={ `Right ${isDead(Number(rightDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
               </div>
             </div>
             <div className='PlayerNameA'>
-              <p className='NoMargin Overflow NoBreak Bold Black'>{playerNameA}</p>
+              <p className='NoMargin Overflow NoBreak Bold Black'>{leftPlayerName}</p>
               <div className='DuelIconsContainer NoMouse NoDrag'>
-                <DuelIconsAsGrid duelId={props.duelId} duelistIdA={duelistIdA} duelistIdB={duelistIdB} size='big' />
+                <DuelIconsAsGrid duelId={props.duelId} duelistIdA={leftDuelistId} duelistIdB={rightDuelistId} size='big' />
               </div>
             </div>
             <div className='TableDescriptionFooter'>
@@ -251,40 +265,47 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
             </div>
 
             <div className='PlayerNameB Large'>
-              <p className='NoMargin Overflow NoBreak Bold Black'>{playerNameB}</p>
+              <p className='NoMargin Overflow NoBreak Bold Black'>{rightPlayerName}</p>
             </div>
             <div className='ProfilePicContainer Large'>
               <div className='ProfilePicChallengeContainer Left Large'>
-                <ProfilePic profilePic={0} width={15} height={13} dimmed={isDead(Number(duelistIdA))}  removeBorder removeCorners className='ProfilePicChallenge Left' onClick={() => dispatchSelectPlayerAddress(duelistAddressA)} />
-                <img id='DefeatedOverlay' className={ `NoMouse NoDrag Left ${isDead(Number(duelistIdA)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+                <ProfilePic profilePic={0} width={15} height={13} dimmed={isDead(Number(leftDuelistId))}  removeBorder removeCorners className='ProfilePicChallenge Left' onClick={() => dispatchSelectPlayerAddress(leftDuelistAddress)} />
+                <img id='DefeatedOverlay' className={ `NoMouse NoDrag Left ${isDead(Number(leftDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
               </div>
               <div className='VS'>
                 VS
               </div>
               <div className='ProfilePicChallengeContainer Right Large'>
-                <ProfilePic profilePic={0} width={15} height={13} dimmed={isDead(Number(duelistIdB))}  removeBorder removeCorners className='ProfilePicChallenge Right' onClick={() => dispatchSelectPlayerAddress(duelistAddressB)} />
-                <img id='DefeatedOverlay' className={ `NoMouse NoDrag Right ${isDead(Number(duelistIdB)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+                <ProfilePic profilePic={0} width={15} height={13} dimmed={isDead(Number(rightDuelistId))}  removeBorder removeCorners className='ProfilePicChallenge Right' onClick={() => dispatchSelectPlayerAddress(rightDuelistAddress)} />
+                <img id='DefeatedOverlay' className={ `NoMouse NoDrag Right ${isDead(Number(rightDuelistId)) ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
               </div>
             </div>
             <div className='PlayerNameA Large'>
-              <p className='NoMargin Overflow NoBreak Bold Black'>{playerNameA}</p>
+              <p className='NoMargin Overflow NoBreak Bold Black'>{leftPlayerName}</p>
             </div>
             
             <div className='DuelInfoContainer'>
-              <div className='DuelistCard' style={{ width: aspectWidth(DUELIST_CARD_WIDTH / 2), height: aspectWidth(DUELIST_CARD_HEIGHT) }}>
-                {duelistIdA ? (
+              <div className='DuelistCard Left' style={{ width: aspectWidth(DUELIST_CARD_WIDTH / 2), height: aspectWidth(DUELIST_CARD_HEIGHT) }}>
+                {leftDuelistId || challengingDuelistId ? (
                   <DuelistCard
-                    duelistId={Number(duelistIdA)}
+                    duelistId={Number(leftDuelistId || challengingDuelistId)}
                     isSmall={true}
                     isLeft={true}
                     isVisible={true}
                     isFlipped={true}
                     instantFlip={true}
                     isHanging={true}
+                    isHangingLeft={true}
                     isHighlightable={true}
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
-                    onClick={() => dispatchSelectDuelistId(duelistIdA)}
+                    onClick={() => {
+                      if (leftDuelistId && state != constants.ChallengeState.Awaiting) {
+                        dispatchSelectDuelistId(leftDuelistId)
+                      } else {
+                        duelistSelectOpener.open()
+                      }
+                    }}
                   />
                 ) : null}
               </div>
@@ -296,7 +317,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                 </Row>
                 <Row columns='equal' textAlign='center'>
                   <Col>
-                    <h3 className='Quote Darkest'>{`“${quote}”`}</h3>
+                    <h3 className='Quote Darkest'>{`"${quote}"`}</h3>
                     <h3 className='Quote Darkest'>~ Staking {livesStaked} {livesStaked == 1 ? 'life' : 'lives!'} ~</h3>
                   </Col>
                 </Row>
@@ -309,7 +330,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                   </Row>
                   <Row textAlign='center'>
                     <Col width={16} textAlign='right' className='Darkest'>
-                      <DuelIconsAsGrid duelId={props.duelId} duelistIdA={duelistIdA} duelistIdB={duelistIdB} size='big' />
+                      <DuelIconsAsGrid duelId={props.duelId} duelistIdA={leftDuelistId} duelistIdB={rightDuelistId} size='big' />
                     </Col>
                   </Row>
                 </>}
@@ -327,20 +348,21 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                 </Row>
 
               </Grid>
-              <div className='DuelistCard' style={{ width: aspectWidth(DUELIST_CARD_WIDTH / 2), height: aspectWidth(DUELIST_CARD_HEIGHT) }}>
-                {duelistIdB || challengingDuelistId ? (
+              <div className='DuelistCard Right' style={{ width: aspectWidth(DUELIST_CARD_WIDTH / 2), height: aspectWidth(DUELIST_CARD_HEIGHT) }}>
+                {rightDuelistId ? (
                   <DuelistCard
-                    duelistId={Number(duelistIdB || challengingDuelistId)}
+                    duelistId={Number(rightDuelistId)}
                     isSmall={true}
                     isLeft={false}
                     isVisible={true}
                     isFlipped={true}
                     instantFlip={true}
                     isHanging={true}
+                    isHangingLeft={false}
                     isHighlightable={true}
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
-                    onClick={() => duelistSelectOpener.open()}
+                    onClick={() => dispatchSelectDuelistId(rightDuelistId)}
                   />
                 ) : null}
               </div>
@@ -385,12 +407,12 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                       )
                     ))
                 }
-                {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || isRequiredAction) &&
+                {((state == constants.ChallengeState.Awaiting && isChallenger) || state == constants.ChallengeState.InProgress || (state !== constants.ChallengeState.Awaiting && isCallToAction)) &&
                   <Col>
                     <ActionButton large fillParent important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
                   </Col>
                 }
-                {isFinished && !isRequiredAction &&
+                {isFinished && !isCallToAction &&
                   <Col>
                     <ActionButton large fillParent important label='Replay Duel!' onClick={() => _gotoDuel()} />
                   </Col>

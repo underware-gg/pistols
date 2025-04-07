@@ -6,6 +6,7 @@ katana \
   --chain-id KATANA_LOCAL \
   --invoke-max-steps 10000000 $* \
   --http.cors_origins "*" \
+  --cartridge.paymaster \
   --dev \
   --dev.accounts 10 \
   --dev.no-fee \

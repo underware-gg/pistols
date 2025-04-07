@@ -39,10 +39,12 @@ interface CardPack {
   clickable?: boolean,
   cardPackSize: number,
   maxTilt: number,
-  optionalTitle?: string
+  optionalTitle?: string,
+  customButtonLabel?: string,
+  atTutorialEnding?: boolean
 }
 
-export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle }: CardPack) => {
+export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle, customButtonLabel, atTutorialEnding = false }: CardPack) => {
   const { account } = useAccount()
   const { pack_token } = useDojoSystemCalls()
   const { duelistIds } = useDuelistsOfPlayer()
@@ -77,28 +79,28 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   }
 
   useEffect(() => {
+    if (cardPackRef.current) {
+      cardPackRef.current.style.setProperty('--card-pack-opacity', '0')
+    }
+  }, [])
+
+  useEffect(() => {
     if (!isClaiming) {
-      console.log('Not claiming, setting previous duelist IDs:', [...duelistIds])
       previousDuelistIdsRef.current = [...duelistIds]
       return
     }
 
     const expectedNewIds = quantity
-    console.log('---------quantity:', quantity)
-    console.log('Expected new IDs:', expectedNewIds)
     const newIds = duelistIds.filter(id => !previousDuelistIdsRef.current.includes(id))
-    console.log('Found new IDs:', newIds)
 
     if (newIds.length === expectedNewIds) {
-      console.log('Got expected number of new IDs, setting claiming to false')
       setIsClaiming(false)
       setNewDuelistIds(newIds.map(id => Number(id)))
     }
-  }, [isClaiming, duelistIds, packType])
+  }, [isClaiming, duelistIds, quantity])
 
   useEffect(() => {
     if (newDuelistIds.length > 0) {
-      console.log('New duelist IDs received, handling seal click:', newDuelistIds)
       handleSealClick()
     }
   }, [newDuelistIds])
@@ -127,8 +129,18 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
     }
   }, [isOpen])
 
+  const _close = () => {
+    new TWEEN.Tween({ opacity: 1 })
+      .to({ opacity: 0 }, CARD_PACK_OPACITY_DURATION)
+      .easing(TWEEN.Easing.Quadratic.Out)
+      .onUpdate(({ opacity }) => {
+        cardPackRef.current?.style.setProperty('--card-pack-opacity', opacity.toString())
+      })
+      .start()
+  }
+
   const handleMouseMove = (e: MouseEvent) => {
-    if (!cardPackRef.current || sealClicked) {
+    if (!cardPackRef.current || sealClicked || !clickable) {
       cardPackRef.current?.style.setProperty('--card-pack-rotate-x', '0deg')
       cardPackRef.current?.style.setProperty('--card-pack-rotate-y', '0deg')
       return;
@@ -151,7 +163,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [sealClicked]);
+  }, [sealClicked, clickable]);
 
   const getLinePosition = (index: number, numCards: number) => {
     const totalWidth = aspectWidth(16 * numCards);
@@ -330,24 +342,23 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   const handleButtonClick = () => {
     if (!hasRevealed) {
       handleRevealAll()
-    } else if (packType === constants.PackType.StarterPack) {
-      if (selectedDuelistId !== undefined) {
-        onComplete?.(selectedDuelistId)
-      }
     } else {
       onComplete?.()
+      setShowRevealButton(false)
+      _close()
     }
   }
 
   const getButtonLabel = () => {
     if (!hasRevealed) return 'Reveal All'
-    if (packType === constants.PackType.StarterPack) return 'Go to Duel'
+    if (customButtonLabel) return customButtonLabel
+    if (packType === constants.PackType.StarterPack && atTutorialEnding) return 'Go to Tavern!'
     return 'Close'
   }
 
   const isButtonDisabled = () => {
     if (!hasRevealed) return false
-    if (packType === constants.PackType.StarterPack && selectedDuelistId === undefined) return true
+    if (packType === constants.PackType.StarterPack && atTutorialEnding && selectedDuelistId === undefined) return true
     return false
   }
 

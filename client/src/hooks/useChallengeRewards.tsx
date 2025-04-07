@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols'
-import { useSdkStateEventsGet, formatQueryValue, getEntityMapModels } from '@underware/pistols-sdk/dojo'
+import { useSdkStateEventsGet, formatQueryValue, getEntityModel } from '@underware/pistols-sdk/dojo'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/utils/starknet'
 import { models } from '@underware/pistols-sdk/pistols/gen'
@@ -12,12 +12,12 @@ export const useGetChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNum
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().keys(
-            ["pistols-ChallengeRewards"],
+            ["pistols-ChallengeRewardsEvent"],
             [formatQueryValue(duel_id), formatQueryValue(duelist_id)]
           ).build()
         )
         .withEntityModels(
-          ["pistols-ChallengeRewards"]
+          ["pistols-ChallengeRewardsEvent"]
         )
         .includeHashedKeys()
       : null
@@ -28,7 +28,7 @@ export const useGetChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNum
     historical: false,
     retryInterval: 1000,
   })
-  const rewards = useMemo(() => getEntityMapModels<models.ChallengeRewards>(entities, 'ChallengeRewards')?.[0]?.rewards, [entities])
+  const rewards = useMemo(() => getEntityModel<models.ChallengeRewardsEvent>(entities?.[0], 'ChallengeRewardsEvent')?.rewards, [entities])
 
   const fame_lost_wei = useMemo(() => BigInt(rewards?.fame_lost ?? 0), [rewards])
   const fame_gained_wei = useMemo(() => BigInt(rewards?.fame_gained ?? 0), [rewards])

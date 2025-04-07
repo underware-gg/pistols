@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { usePlayer } from '/src/stores/playerStore'
 import { formatTimestampDeltaElapsed, bigintToDecimal } from '@underware/pistols-sdk/utils'
-import { useDuelist } from '../stores/duelistStore'
+import { useDuelist } from '/src/stores/duelistStore'
 
 export const PlayerLink = ({
   address,

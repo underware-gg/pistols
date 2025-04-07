@@ -1,11 +1,17 @@
+import { useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
-import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
-import * as torii from '@dojoengine/torii-client'
-import { useMemo } from 'react'
+import { useERC20Balance } from '@underware/pistols-sdk/utils/hooks'
+import { useSdkTokenBalancesGet, useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { useFameContract, useFoolsContract, useLordsContract } from '/src/hooks/useTokenContract'
+import { useDuelistTokenBoundAddress } from '/src/hooks/useTokenBound'
+import { makeTokenBoundAddress } from '@underware/pistols-sdk/pistols'
+import { SetupResult } from '@underware/pistols-sdk/dojo'
+import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/utils/starknet'
-import { useSdkTokenBalancesGet } from '@underware/pistols-sdk/dojo'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
+import * as torii from '@dojoengine/torii-client'
 
 
 interface BalancesByAccount {
@@ -16,11 +22,10 @@ interface Contracts {
 }
 interface State {
   contracts: Contracts,
-  initialized: boolean,
-  initialize: (contractAddress: string[]) => void
   setBalances: (balances: torii.TokenBalance[]) => void;
   updateBalance: (balance: torii.TokenBalance) => void;
   getBalance: (contractAddress: BigNumberish, accountAddress: BigNumberish) => bigint | undefined | null;
+  getAccounts: (contractAddress: BigNumberish) => string[];
 }
 
 const createStore = () => {
@@ -29,47 +34,42 @@ const createStore = () => {
   }
   return create<State>()(immer((set, get) => ({
     contracts: {},
-    initialized: false,
-    initialize: (contractAddress: string[]) => {
-      set((state: State) => ({
-        contracts: {
-          ...contractAddress.reduce((acc, contract) => {
-            acc[contract] = {}
-            return acc
-          }, {} as Contracts),
-        },
-        initialized: true,
-      }))
-    },
     setBalances: (balances: torii.TokenBalance[]) => {
-      // console.log("coinStore() SET:", balances)
+      console.log("coinStore() SET:", balances)
       set((state: State) => {
         // insert if not exists
         balances.forEach((balance) => {
           const _contract = bigintToHex(balance.contract_address)
           const _owner = bigintToHex(balance.account_address)
+          if (!state.contracts[_contract]) {
+            state.contracts[_contract] = {}
+          }
           state.contracts[_contract][_owner] = _parseBalance(balance)
         })
       });
     },
     updateBalance: (balance: torii.TokenBalance) => {
-      throw new Error('coinStore.updateBalance() not implemented')
-      // set((state: State) => {
-      //   // insert ONLY if exists
-      //   const _contract = bigintToHex(balance.contract_address)
-      //   const _owner = bigintToHex(balance.account_address)
-      //   if (state.contracts[_contract][_owner] != undefined) {
-      //     state.contracts[_contract][_owner] = _parseBalance(balance)
-      //   }
-      // });
+      console.log('coinStore() UPDATE:', balance)
+      set((state: State) => {
+        const _contract = bigintToHex(balance.contract_address)
+        const _account = bigintToHex(balance.account_address)
+        // update only if account is being tracked
+        if (state.contracts[_contract]?.[_account] != undefined) {
+          state.contracts[_contract][_account] = _parseBalance(balance)
+        }
+      });
     },
     getBalance: (contractAddress: BigNumberish, accountAddress: BigNumberish): bigint | undefined | null => {
-      if (!get().initialized) return undefined
       const _contractAddress = bigintToHex(contractAddress)
       const balances = get().contracts[_contractAddress]
-      // if (!balances) throw new Error(`coinStore() contract not initialized: ${_contractAddress}`)
       if (!balances) return undefined
       return balances[bigintToHex(accountAddress)] ?? null
+    },
+    getAccounts: (contractAddress: BigNumberish): string[] => {
+      const _contractAddress = bigintToHex(contractAddress)
+      const balances = get().contracts[_contractAddress]
+      if (!balances) return []
+      return Object.keys(balances)
     },
   })))
 }
@@ -84,33 +84,93 @@ export const useCoinStore = createStore();
 export const useCoinBalance = (
   contractAddress: BigNumberish,
   accountAddress: BigNumberish,
-  // watch: boolean = false,
+  fee: BigNumberish = 0n, // optionally calculate if there is enough balance to pay this fee
 ) => {
   const state = useCoinStore((state) => state)
   const balance = useMemo(() => state.getBalance(contractAddress, accountAddress), [state.contracts, contractAddress, accountAddress])
   const balance_eth = useMemo(() => (balance != null ? weiToEth(balance) : balance), [balance])
-  // console.log(`BALANCE`, (bigintToHex(contractAddress)), (bigintToHex(ownerAddress)), balance)
+  // console.log(`COIN BALANCE`, (bigintToHex(contractAddress)), (bigintToHex(accountAddress)), balance)
 
-  const supply = 1;
-  const contracts = useMemo(() => (isPositiveBigint(contractAddress) ? [bigintToHex(contractAddress)] : []), [contractAddress])
-  const accounts = useMemo(() => (isPositiveBigint(accountAddress) ? [bigintToHex(accountAddress)] : []), [accountAddress])
   const { isLoading } = useSdkTokenBalancesGet({
-    contracts,
-    accounts,
+    contract: bigintToHex(contractAddress || 0n),
+    account: bigintToHex(accountAddress || 0n),
     setBalances: state.setBalances,
-    enabled: (contracts.length > 0 && accounts.length > 0 && supply > 0
-      // && balance === null
-    ),
-    forceCounter: supply,
+    enabled: (balance == null),
   })
 
+  const canAffordFee = useMemo(() => {
+    if (balance == null || !fee) return undefined
+    return (balance >= BigInt(fee))
+  }, [balance, fee])
+
   return {
-    balance: balance ?? 0n,        // wei
-    balance_eth,                          // eth
-    // formatted: balance?.formatted ?? 0,   // eth
-    // decimals: balance?.decimals ?? 0,     // 18
-    // symbol: balance?.symbol ?? '?',       // eth
-    // noFundsForFee,
-    isLoading,
+    balance: balance ?? 0n,           // wei value
+    balance_eth: balance_eth ?? 0n,   // eth value
+    canAffordFee,
+    isLoading: (balance == null || isLoading),
   }
+}
+
+export const fetchNewTokenBoundCoins = async (sdk: SetupResult['sdk'], coinAddress: BigNumberish, tokenAddress: BigNumberish, tokenIds: bigint[]) => {
+  if (tokenIds.length == 0) return
+  const setBalances = useCoinStore.getState().setBalances
+  const accounts = useCoinStore.getState().getAccounts(coinAddress)
+  const tokenBoundAddresses = tokenIds
+    .map((tokenId) => bigintToHex(makeTokenBoundAddress(tokenAddress, tokenId)))
+    .filter((address) => !accounts.includes(address))
+  // console.log("fetchNewTokenBoundCoins()...", tokenAddress, tokenIds, tokenBoundAddresses, accounts)
+  if (tokenBoundAddresses.length > 0) {
+    await sdk.getTokenBalances(
+      [coinAddress as string],
+      tokenBoundAddresses,
+      [], // no token ids
+    ).then((balances: torii.TokenBalance[]) => {
+      // console.log("fetchNewTokenBoundCoins() GOT:", balances)
+      setBalances(balances)
+    }).catch((error: Error) => {
+      console.error("fetchNewTokenBoundCoins().sdk.get() error:", error, tokenIds)
+    })
+  }
+}
+
+
+//----------------------------------------
+// token balances
+//
+
+export const useLordsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
+  const { lordsContractAddress } = useLordsContract()
+  return useCoinBalance(lordsContractAddress, address, fee)
+}
+
+export const useFoolsBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
+  const { foolsContractAddress } = useFoolsContract()
+  return useCoinBalance(foolsContractAddress, address, fee)
+}
+
+export const useFameBalance = (address: BigNumberish, fee: BigNumberish = 0n) => {
+  const { fameContractAddress } = useFameContract()
+  const result = useCoinBalance(fameContractAddress, address, fee)
+  // console.log('useFameBalance COIN FAME:', address, result)
+  const lives = useMemo(() => Math.floor(Number(result.balance / constants.FAME.ONE_LIFE)), [result.balance])
+  return {
+    ...result,
+    lives,
+    isAlive: (lives > 0),
+  }
+}
+
+export const useDuelistFameBalance = (duelistId: BigNumberish, fee: BigNumberish = 0n) => {
+  const { address } = useDuelistTokenBoundAddress(duelistId)
+  return useFameBalance(address, fee)
+}
+
+
+
+//----------------------------------------
+// RPC balances
+//
+export const useEtherBalance = (address: BigNumberish, fee: BigNumberish = 0n, watch: boolean = false) => {
+  const { selectedNetworkConfig } = useStarknetContext()
+  return useERC20Balance(selectedNetworkConfig.etherAddress, address, fee, watch)
 }

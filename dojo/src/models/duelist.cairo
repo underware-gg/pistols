@@ -12,6 +12,7 @@ pub struct Duelist {
     //-----------------------
     pub profile_type: ProfileType,
     pub timestamps: DuelistTimestamps,
+    pub status: DuelistStatus,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, IntrospectPacked)]
@@ -19,6 +20,17 @@ pub struct DuelistTimestamps {
     pub registered: u64,    // seconds since epoch, started
     pub active: u64,        // seconds since epoch, ended
 }
+
+#[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
+pub struct DuelistStatus {
+    pub total_duels: u16,
+    pub total_wins: u16,
+    pub total_losses: u16,
+    pub total_draws: u16,
+    pub honour: u8,         // 0..100
+    pub honour_log: u64,    // past 8 duels, each byte holds one duel honour
+} // [8 + 4*16 + 64] = 136 bits
+
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -28,29 +40,6 @@ pub struct DuelistChallenge {
     //-----------------------
     pub duel_id: u128,      // current Challenge a Duelist is in
 }
-
-// Per table scoreboard
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct Scoreboard {
-    #[key]
-    pub holder: felt252,    // duelist_id or player_address
-    #[key]
-    pub table_id: felt252,
-    //------------
-    pub score: Score,
-}
-
-#[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
-pub struct Score {
-    pub honour: u8,             // 0..100
-    pub points: u16,
-    pub total_duels: u16,
-    pub total_wins: u16,
-    pub total_losses: u16,
-    pub total_draws: u16,
-    pub honour_history: u64,    // past 8 duels, each byte holds one duel honour
-} // [8 + 4*16 + 64] = 128 bytes
 
 // cfrated for dead duelists
 #[derive(Copy, Drop, Serde)]
@@ -117,55 +106,53 @@ impl ArchetypeDefault of Default<Archetype> {
 }
 
 #[generate_trait]
-pub impl ScoreImpl of ScoreTrait {
+pub impl DuelistStatusImpl of DuelistStatusTrait {
     #[inline(always)]
-    fn is_villain(self: @Score) -> bool {
+    fn is_villain(self: @DuelistStatus) -> bool {
         (*self.total_duels > 0 && *self.honour < HONOUR::TRICKSTER_START)
     }
     #[inline(always)]
-    fn is_trickster(self: @Score) -> bool {
+    fn is_trickster(self: @DuelistStatus) -> bool {
         (*self.honour >= HONOUR::TRICKSTER_START && *self.honour < HONOUR::LORD_START)
     }
     #[inline(always)]
-    fn is_lord(self: @Score) -> bool {
+    fn is_lord(self: @DuelistStatus) -> bool {
         (*self.honour >= HONOUR::LORD_START)
     }
     #[inline(always)]
-    fn get_archetype(self: @Score) -> Archetype {
+    fn get_archetype(self: @DuelistStatus) -> Archetype {
         if (self.is_lord()) {(Archetype::Honourable)}
         else if (self.is_trickster()) {(Archetype::Trickster)}
         else if (self.is_villain()) {(Archetype::Villainous)}
         else {(Archetype::Undefined)}
     }
     #[inline(always)]
-    fn get_honour(self: @Score) -> ByteArray {
+    fn get_honour(self: @DuelistStatus) -> ByteArray {
         (format!("{}.{}", *self.honour / 10, *self.honour % 10))
     }
 
     // update duel totals only
-    fn update_totals(ref score_a: Score, ref score_b: Score, rewards_a: @RewardValues, rewards_b: @RewardValues, winner: u8) {
-        score_a.total_duels += 1;
-        score_b.total_duels += 1;
-        score_a.points += *rewards_a.points_scored;
-        score_b.points += *rewards_b.points_scored;
+    fn apply_challenge_results(ref status_a: DuelistStatus, ref status_b: DuelistStatus, rewards_a: @RewardValues, rewards_b: @RewardValues, winner: u8) {
+        status_a.total_duels += 1;
+        status_b.total_duels += 1;
         if (winner == 1) {
-            score_a.total_wins += 1;
-            score_b.total_losses += 1;
+            status_a.total_wins += 1;
+            status_b.total_losses += 1;
         } else if (winner == 2) {
-            score_b.total_wins += 1;
-            score_a.total_losses += 1;
+            status_b.total_wins += 1;
+            status_a.total_losses += 1;
         } else {
-            score_a.total_draws += 1;
-            score_b.total_draws += 1;
+            status_a.total_draws += 1;
+            status_b.total_draws += 1;
         }
     }
     // average honour has an extra decimal, eg: 100 = 10.0
-    fn update_honour(ref self: Score, duel_honour: u8) {
-        let history_pos: usize = ((self.total_duels.into() - 1) % 8) * 8;
-        self.honour_history =
-            (self.honour_history & ~BitwiseU64::shl(0xff, history_pos)) |
-            BitwiseU64::shl(duel_honour.into(), history_pos);
-        self.honour = (BitwiseU64::sum_bytes(self.honour_history) / core::cmp::min(self.total_duels.into(), 8)).try_into().unwrap();
+    fn update_honour(ref self: DuelistStatus, duel_honour: u8) {
+        let log_pos: usize = ((self.total_duels.into() - 1) % 8) * 8;
+        self.honour_log =
+            (self.honour_log & ~BitwiseU64::shl(0xff, log_pos)) |
+            BitwiseU64::shl(duel_honour.into(), log_pos);
+        self.honour = (BitwiseU64::sum_bytes(self.honour_log) / core::cmp::min(self.total_duels.into(), 8)).try_into().unwrap();
     }
 }
 

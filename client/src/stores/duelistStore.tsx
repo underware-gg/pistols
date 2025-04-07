@@ -8,6 +8,8 @@ import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/utils/
 import { PistolsSchemaType, getProfileDescription } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
+import { ArchetypeNames } from '/src/utils/pistols'
+import { EMOJI } from '/src/data/messages'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 
@@ -64,6 +66,8 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const isDead = useMemo(() => Boolean(duelistMemorial), [duelistMemorial])
   const causeOfDeath = useMemo(() => parseEnumVariant<constants.CauseOfDeath>(duelistMemorial?.cause_of_death), [duelistMemorial])
 
+  const status = useDuelistStatus(duelist?.status)
+
   // profile
   const {
     variant: profileType,
@@ -73,7 +77,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const profilePic = useMemo(() => (profileDescription.profile_id), [profileDescription])
   const name = useMemo(() => (profileDescription.name), [profileDescription])
   const gender = useMemo(() => (profileDescription.gender), [profileDescription])
-  const isNpc = useMemo(() => (profileType != constants.ProfileType.Duelist), [profileType])
+  const isNpc = useMemo(() => (profileType == constants.ProfileType.Character || profileType == constants.ProfileType.Bot), [profileType])
   const characterType = useMemo(() => (profileDescription.gender == constants.Gender.Female ? CharacterType.FEMALE : CharacterType.MALE), [profileDescription])
 
   const nameAndId = useMemo(() => (
@@ -102,6 +106,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     isInAction,
     isInactive,
     inactiveFameDripped,
+    status,
     // dead duelists
     isDead,
     isAlive: !isDead,
@@ -136,8 +141,8 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
       }
     })
     return {
-      notDuelingIds,
-      duellingIds,
+      notDuelingIds: notDuelingIds.sort((a, b) => Number(BigInt(a) - BigInt(b))),
+      duellingIds: duellingIds.sort((a, b) => Number(BigInt(a) - BigInt(b))),
       duelPerDuelists,
     }
   }, [alive_entities])
@@ -149,3 +154,45 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
   }
 }
 
+
+//----------------------
+// DuelistStatus
+//
+export const calcWinRatio = (total_duels: number, total_wins: number) => (total_duels > 0 ? (total_wins / total_duels) : null)
+
+export function useDuelistStatus(status: models.DuelistStatus | undefined) {
+  const total_duels = useMemo(() => Number(status?.total_duels ?? 0), [status])
+  const total_wins = useMemo(() => Number(status?.total_wins ?? 0), [status])
+  const total_losses = useMemo(() => Number(status?.total_losses ?? 0), [status])
+  const total_draws = useMemo(() => Number(status?.total_draws ?? 0), [status])
+  const honour = useMemo(() => (Number(status?.honour ?? 0) / 10.0), [status, total_duels])
+  const honourDisplay = useMemo(() => (total_duels > 0 && honour > 0 ? honour.toFixed(1) : EMOJI.ZERO), [honour, total_duels])
+  const honourAndTotal = useMemo(() => (total_duels > 0 && honour > 0 ? <>{honour.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : EMOJI.ZERO), [honour, total_duels])
+  const winRatio = useMemo(() => calcWinRatio(total_duels, total_wins), [total_duels, total_wins])
+
+  const isVillainous = useMemo(() => (total_duels > 0 && (honour * 10) < constants.HONOUR.TRICKSTER_START), [honour, total_duels])
+  const isTrickster = useMemo(() => ((honour * 10) >= constants.HONOUR.TRICKSTER_START && (honour * 10) < constants.HONOUR.LORD_START), [honour])
+  const isHonourable = useMemo(() => ((honour * 10) >= constants.HONOUR.LORD_START), [honour])
+  const archetype = useMemo(() => (
+    isHonourable ? constants.Archetype.Honourable
+      : isTrickster ? constants.Archetype.Trickster
+        : isVillainous ? constants.Archetype.Villainous
+          : constants.Archetype.Undefined), [isVillainous, isTrickster, isHonourable])
+  const archetypeName = useMemo(() => (ArchetypeNames[archetype]), [archetype])
+
+  return {
+    total_duels,
+    total_wins,
+    total_losses,
+    total_draws,
+    isVillainous,
+    isTrickster,
+    isHonourable,
+    archetype,
+    archetypeName,
+    honour,
+    honourDisplay,
+    honourAndTotal,
+    winRatio,
+  }
+}

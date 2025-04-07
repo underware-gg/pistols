@@ -24,11 +24,7 @@ enum SceneName {
 //
 enum TextureName {
   Testcard = 'Testcard',
-  bg_gate = 'bg_gate',
   bg_door = 'bg_door',
-  bg_gate_mask = 'bg_gate_mask',
-  bg_tavern = 'bg_tavern',
-  bg_tavern_mask = 'bg_tavern_mask',
   bg_duelists = 'bg_duelists',
   bg_duelists_mask = 'bg_duelists_mask',
   bg_duels = 'bg_duels',
@@ -42,6 +38,12 @@ enum TextureName {
   duel_water_dudv = 'duel_water_dudv',
   duel_water_map = 'duel_water_map',
   cliffs = 'cliffs',
+  
+  bg_entrance_background = 'bg_entrance_background',
+  bg_entrance_tavern = 'bg_entrance_tavern',
+  bg_entrance_player = 'bg_entrance_player',
+  bg_entrance_foreground = 'bg_entrance_foreground',
+  bg_entrance_door_mask = 'bg_entrance_door_mask',
 
   bg_tavern_bar = 'bg_tavern_bar',
   bg_tavern_bar_mask = 'bg_tavern_bar_mask',
@@ -98,17 +100,15 @@ enum TextureName {
   bg_profile_chest_mask = 'bg_profile_chest_mask',
   bg_profile_door_mask = 'bg_profile_door_mask',
   bg_profile_background = 'bg_profile_background',
+
+  bg_leaderboards = 'bg_leaderboards',
 }
 type TextureAttributes = {
   path: string
 }
 const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.Testcard]: { path: '/textures/testcard.jpg' },
-  [TextureName.bg_gate]: { path: '/images/bg_gate.jpg' },
   [TextureName.bg_door]: { path: '/images/bg_door.jpg' },
-  [TextureName.bg_gate_mask]: { path: '/images/bg_gate_mask.png' },
-  [TextureName.bg_tavern]: { path: '/images/bg_tavern.jpg' },
-  [TextureName.bg_tavern_mask]: { path: '/images/bg_tavern_mask.png' },
   [TextureName.bg_duelists]: { path: '/images/bg_duelists.jpg' },
   [TextureName.bg_duelists_mask]: { path: '/images/bg_duelists_mask.png' },
   [TextureName.bg_duels]: { path: '/images/bg_duels.png' },
@@ -122,6 +122,12 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.duel_water_dudv]: { path: '/textures/waterdudv.jpg' },
   [TextureName.duel_water_map]: { path: '/textures/water_map.ktx2' },
   [TextureName.cliffs]: { path: '/textures/cliffs.png' },
+
+  [TextureName.bg_entrance_background]: { path: '/images/scenes/gate/bg_entrance_background.png' },
+  [TextureName.bg_entrance_tavern]: { path: '/images/scenes/gate/bg_entrance_tavern.png' },
+  [TextureName.bg_entrance_player]: { path: '/images/scenes/gate/bg_entrance_player.png' },
+  [TextureName.bg_entrance_foreground]: { path: '/images/scenes/gate/bg_entrance_foreground.png' },
+  [TextureName.bg_entrance_door_mask]: { path: '/images/scenes/gate/bg_entrance_door_mask.png' },
   
   [TextureName.bg_tavern_bar]: { path: '/images/scenes/tavern/bg_tavern_bar.png' },
   [TextureName.bg_tavern_bar_mask]: { path: '/images/scenes/tavern/bg_tavern_bar_mask.png' },
@@ -179,6 +185,8 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_profile_chest_mask]: { path: '/images/scenes/profile/bg_profile_chest_mask.png' },
   [TextureName.bg_profile_background]: { path: '/images/scenes/profile/bg_profile_background.png' },
   [TextureName.bg_profile_door_mask]: { path: '/images/scenes/profile/bg_profile_door_mask.png' },
+
+  [TextureName.bg_leaderboards]: { path: '/images/scenes/leaderboards/bg_leaderboards.png' },
 }
 
 interface SceneData {
@@ -205,10 +213,16 @@ interface SceneObject {
 
 const sceneBackgrounds: Record<SceneName, SceneData> = {
   [SceneName.Gate]: {
-    backgrounds: [{ texture: TextureName.bg_gate, shiftMultiplier: 0, renderOrder: 0 }],
+    backgrounds: [
+      { texture: TextureName.bg_entrance_background, shiftMultiplier: -0.03, renderOrder: 0 },
+      { texture: TextureName.bg_entrance_tavern, shiftMultiplier: -0.015, renderOrder: 1 },
+      { texture: TextureName.bg_entrance_player, shiftMultiplier: -0.005, renderOrder: 2 },
+      { texture: TextureName.bg_entrance_foreground, shiftMultiplier: 0.02, renderOrder: 3 },
+    ],
     items: [
-      { name: 'door', color: 'ff0000', description: 'Knock on door', mask: TextureName.bg_gate_mask, renderOrder: 0 },
-    ]
+      { name: 'door', color: 'ff0000', description: 'Knock on door', mask: TextureName.bg_entrance_door_mask, renderOrder: 1 },
+    ],
+    scaleAddon: 0.046
   },
   [SceneName.Door]: { backgrounds: [{ texture: TextureName.bg_door, shiftMultiplier: 0, renderOrder: 0 }] },
   [SceneName.Profile]: {
@@ -262,7 +276,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     ]
   },
   [SceneName.Leaderboards]: {
-    backgrounds: [{ texture: TextureName.bg_duelists, shiftMultiplier: 0, renderOrder: 0 }]
+    backgrounds: [{ texture: TextureName.bg_leaderboards, shiftMultiplier: 0, renderOrder: 0 }]
   },
   [SceneName.Graveyard]: {
     backgrounds: [{ texture: TextureName.bg_graveyard, shiftMultiplier: 0, renderOrder: 0 }],
@@ -314,7 +328,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { texture: TextureName.bg_demon_right_hand, shiftMultiplier: -0.01, renderOrder: 4, animatedIdle: 0.01 },
     ],
     items: [
-      { name: 'demon_left', color: '00ff00', description: 'Drink, forget this happened', mask: TextureName.bg_demon_left_hand_mask, renderOrder: 3 },
+      { name: 'demon_left', color: 'ff0000', description: 'Drink, forget this happened', mask: TextureName.bg_demon_left_hand_mask, renderOrder: 3 },
       { name: 'demon_right', color: '0000ff', description: 'Take the gun, become my patron', mask: TextureName.bg_demon_right_hand_mask, renderOrder: 4 },
     ],
     scaleAddon: 0.01
@@ -322,9 +336,9 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
   [SceneName.TutorialScene5]: {
     backgrounds: [
       { texture: TextureName.bg_resurrection_background, shiftMultiplier: -0.02, renderOrder: 0 },
-      { texture: TextureName.bg_resurrection_table, shiftMultiplier: -0.005, renderOrder: 1 },
-      { texture: TextureName.bg_resurrection_barkeep, shiftMultiplier: 0.005, renderOrder: 2 },
-      { texture: TextureName.bg_resurrection_player, shiftMultiplier: 0.015, renderOrder: 3 },
+      { texture: TextureName.bg_resurrection_table, shiftMultiplier: -0.01, renderOrder: 1 },
+      { texture: TextureName.bg_resurrection_barkeep, shiftMultiplier: -0.005, renderOrder: 2 },
+      { texture: TextureName.bg_resurrection_player, shiftMultiplier: 0.005, renderOrder: 3 },
     ],
     scaleAddon: 0.045
   },

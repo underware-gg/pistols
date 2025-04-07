@@ -176,11 +176,13 @@ pub mod duel_token {
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
     };
     use pistols::models::{
-        player::{PlayerTrait, Activity, ActivityTrait},
+        player::{PlayerTrait},
         challenge::{Challenge, ChallengeTrait, ChallengeValue, Round, RoundTrait},
         duelist::{DuelistTrait, DuelistValue, ProfileTypeTrait},
         pact::{PactTrait},
         table::{TableConfig, TableConfigTrait},
+        season::{SeasonConfigValue},
+        events::{Activity, ActivityTrait},
     };
     use pistols::types::{
         challenge_state::{ChallengeState, ChallengeStateTrait},
@@ -322,16 +324,16 @@ pub mod duel_token {
 
             // assert duelist is not in a challenge
             store.enter_challenge(duelist_id_a, duel_id);
-            store.emit_required_action(duelist_id_a, duel_id);
 
             // calc expiration
+            let season: SeasonConfigValue = store.get_current_season_value();
             let timestamp: u64 = starknet::get_block_timestamp();
+            let timestamp_end: u64 = timestamp + 
+                if (expire_hours == 0) {TIMESTAMP::ONE_DAY}
+                else {TimestampTrait::from_hours(expire_hours)};
             let timestamps = Period {
                 start: timestamp,
-                end: (timestamp + 
-                    if (expire_hours == 0) {TIMESTAMP::ONE_DAY}
-                    else {TimestampTrait::from_hours(expire_hours)}
-                ),
+                end: core::cmp::min(timestamp_end, season.period.end),
             };
 
             // create challenge
@@ -371,6 +373,11 @@ pub mod duel_token {
                 challenge.set_pact(ref store);
             }
 
+            // Duelist 1 is ready to commit
+            store.emit_challenge_action(@challenge, 1, true);
+            // Duelist 2 has to reply
+            store.emit_challenge_reply_action(@challenge, true);
+
             // events
             PlayerTrait::check_in(ref store, Activity::ChallengeCreated, address_a, duel_id.into());
 
@@ -392,10 +399,11 @@ pub mod duel_token {
             let address_b: ContractAddress = starknet::get_caller_address();
             let duelist_id_b: u128 = duelist_id;
             let timestamp: u64 = starknet::get_block_timestamp();
-            
+
             // validate table
             let table: TableConfig = store.get_table_config(challenge.table_id);
-            table.assert_can_join(@store);
+            // validated on create_duel
+            // table.assert_can_join(@store);
 
             if (challenge.timestamps.has_expired()) {
                 // Expired, close it!
@@ -436,7 +444,9 @@ pub mod duel_token {
 
                     // assert duelist is not in a challenge
                     store.enter_challenge(duelist_id_b, duel_id);
-                    store.emit_required_action(duelist_id_b, duel_id);
+
+                    // Duelist 2 can commit
+                    store.emit_challenge_action(@challenge, 2, true);
 
                     // update timestamps
                     challenge.state = ChallengeState::InProgress;
@@ -453,14 +463,17 @@ pub mod duel_token {
                 }
             }
 
+            // replied
+            store.emit_challenge_reply_action(@challenge, false);
+
             // duel canceled!
             if (challenge.state.is_canceled()) {
                 challenge.timestamps.end = timestamp;
                 challenge.unset_pact(ref store);
                 store.exit_challenge(challenge.duelist_id_a);
-                store.emit_required_action(challenge.duelist_id_a, 0);
-                store.emit_required_action(challenge.duelist_id_b, 0);
-                Activity::ChallengeExpired.emit(ref store.world, starknet::get_caller_address(), challenge.duel_id.into());
+                store.emit_clear_challenge_action(@challenge, 1);
+                store.emit_clear_challenge_action(@challenge, 2);
+                Activity::ChallengeCanceled.emit(ref store.world, starknet::get_caller_address(), challenge.duel_id.into());
             } else {
                 PlayerTrait::check_in(ref store, Activity::ChallengeReplied, address_b, duel_id.into());
             }

@@ -1,3 +1,4 @@
+use core::num::traits::Zero;
 use starknet::{ContractAddress};
 use dojo::world::{WorldStorage};
 use dojo::model::{Model, ModelPtr, ModelStorage, ModelValueStorage};
@@ -12,10 +13,10 @@ pub use pistols::models::{
     },
     pool::{
         Pool, PoolType,
+        LordsReleaseBill,
     },
     player::{
         Player, PlayerValue,
-        PlayerRequiredAction,
     },
     pack::{
         Pack, PackValue,
@@ -23,12 +24,10 @@ pub use pistols::models::{
     challenge::{
         Challenge, ChallengeValue,
         Round, RoundValue,
-        ChallengeRewards,
     },
     duelist::{
         Duelist, DuelistValue, DuelistTimestamps,
         DuelistChallenge, DuelistChallengeValue,
-        Scoreboard, ScoreboardValue,
         DuelistMemorial, DuelistMemorialValue,
     },
     leaderboard::{
@@ -39,19 +38,25 @@ pub use pistols::models::{
     },
     table::{
         TableConfig, TableConfigValue,
+        TableScoreboard, TableScoreboardValue,
         RulesType,
     },
     season::{
         SeasonConfig, SeasonConfigValue,
     },
-};
-use pistols::types::{
-    rules::{RewardValues},
+    events::{
+        CallToActionEvent,
+        ChallengeRewardsEvent,
+        LordsReleaseEvent,
+    },
 };
 pub use pistols::systems::components::{
     token_bound::{
         TokenBoundAddress, TokenBoundAddressValue,
     },
+};
+use pistols::types::{
+    rules::{RewardValues},
 };
 
 #[derive(Copy, Drop)]
@@ -106,10 +111,10 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_value(duel_id))
     }
 
-    // #[inline(always)]
-    // fn get_duelist(self: @Store, duelist_id: u128) -> Duelist {
-    //     (self.world.read_model(duelist_id))
-    // }
+    #[inline(always)]
+    fn get_duelist(self: @Store, duelist_id: u128) -> Duelist {
+        (self.world.read_model(duelist_id))
+    }
     #[inline(always)]
     fn get_duelist_value(self: @Store, duelist_id: u128) -> DuelistValue {
         (self.world.read_value(duelist_id))
@@ -134,13 +139,13 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_scoreboard_value(self: @Store, holder: felt252, table_id: felt252) -> ScoreboardValue {
-        (self.world.read_value((holder, table_id),))
+    fn get_scoreboard_value(self: @Store, table_id: felt252, holder: felt252) -> TableScoreboardValue {
+        (self.world.read_value((table_id, holder),))
     }
 
     #[inline(always)]
-    fn get_scoreboard(self: @Store, holder: felt252, table_id: felt252) -> Scoreboard {
-        (self.world.read_model((holder, table_id),))
+    fn get_scoreboard(self: @Store, table_id: felt252, holder: felt252) -> TableScoreboard {
+        (self.world.read_model((table_id, holder),))
     }
 
     #[inline(always)]
@@ -260,7 +265,7 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_scoreboard(ref self: Store, model: @Scoreboard) {
+    fn set_scoreboard(ref self: Store, model: @TableScoreboard) {
         self.world.write_model(model);
     }
 
@@ -365,19 +370,57 @@ pub impl StoreImpl of StoreTrait {
     //
 
     #[inline(always)]
-    fn emit_required_action(ref self: Store, duelist_id: u128, duel_id: u128) {
-        self.world.emit_event(@PlayerRequiredAction{
+    fn emit_challenge_reply_action(ref self: Store, challenge: @Challenge, reply_required: bool) {
+        if ((*challenge.address_b).is_non_zero()) {
+            // duelist is challenger (just to be unique)
+            self.emit_call_to_action(*challenge.address_b, *challenge.duelist_id_a,
+                if (reply_required) {*challenge.duel_id} else {0},
+                reply_required);
+        }
+    }
+    #[inline(always)]
+    fn emit_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8, call_to_action: bool) {
+        if (duelist_number == 1) {
+            self.emit_call_to_action(*challenge.address_a, *challenge.duelist_id_a, *challenge.duel_id, call_to_action);
+        } else if (duelist_number == 2) {
+            self.emit_call_to_action(*challenge.address_b, *challenge.duelist_id_b, *challenge.duel_id, call_to_action);
+        }
+    }
+    #[inline(always)]
+    fn emit_clear_challenge_action(ref self: Store, challenge: @Challenge, duelist_number: u8) {
+        if (duelist_number == 1) {
+            self.emit_call_to_action(*challenge.address_a, *challenge.duelist_id_a, 0, false);
+        } else if (duelist_number == 2) {
+            self.emit_call_to_action(*challenge.address_b, *challenge.duelist_id_b, 0, false);
+        }
+    }
+    #[inline(always)]
+    fn emit_call_to_action(ref self: Store, player_address: ContractAddress, duelist_id: u128, duel_id: u128, call_to_action: bool) {
+        self.world.emit_event(@CallToActionEvent{
+            player_address,
             duelist_id,
             duel_id,
+            call_to_action,
+            timestamp: if (duel_id.is_non_zero()) {starknet::get_block_timestamp()} else {0},
         });
     }
 
     #[inline(always)]
     fn emit_challenge_rewards(ref self: Store, duel_id: u128, duelist_id: u128, rewards: RewardValues) {
-        self.world.emit_event(@ChallengeRewards{
+        self.world.emit_event(@ChallengeRewardsEvent{
             duel_id,
             duelist_id,
             rewards,
+        });
+    }
+
+    #[inline(always)]
+    fn emit_lords_release(ref self: Store, season_table_id: felt252, duel_id: u128, bill: @LordsReleaseBill) {
+        self.world.emit_event(@LordsReleaseEvent {
+            season_table_id,
+            duel_id,
+            bill: *bill,
+            timestamp: starknet::get_block_timestamp(),
         });
     }
 }

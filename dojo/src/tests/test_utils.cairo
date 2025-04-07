@@ -5,7 +5,7 @@
 mod tests {
     use starknet::{ContractAddress};
 
-    use pistols::models::duelist::{Score, ScoreTrait};
+    use pistols::models::duelist::{DuelistStatus, DuelistStatusTrait};
     use pistols::models::pact::{PactTrait};
     use pistols::utils::short_string::{ShortString};
 
@@ -19,42 +19,42 @@ mod tests {
     }
 
     #[test]
-    fn test_update_score_honour() {
-        let mut score: Score = Default::default();
-        score.total_duels = 1;
-        score.update_honour(100);
-        assert!(score.is_lord(), "is_lord()");
+    fn test_update_honour() {
+        let mut status: DuelistStatus = Default::default();
+        status.total_duels = 1;
+        status.update_honour(100);
+        assert!(status.is_lord(), "is_lord()");
     }
 
     #[test]
-    fn test_honour_history() {
-        let mut score: Score = Default::default();
+    fn test_honour_log() {
+        let mut status: DuelistStatus = Default::default();
         let mut sum: u8 = 0;
         let mut n: u8 = 1;
         loop {
             if (n > 8) { break; }
-            score.total_duels += 1;
-            score.update_honour(n);
+            status.total_duels += 1;
+            status.update_honour(n);
             sum += n;
-            assert_eq!(score.honour, (sum / n), "sum_8__{}", n);
+            assert_eq!(status.honour, (sum / n), "sum_8__{}", n);
             n += 1;
         };
-        assert_eq!(score.honour_history, 0x0807060504030201, "0x0807060504030201");
-        // loop history
+        assert_eq!(status.honour_log, 0x0807060504030201, "0x0807060504030201");
+        // loop status
         loop {
             if (n > 16) { break; }
-            score.total_duels += 1;
-            score.update_honour(n);
+            status.total_duels += 1;
+            status.update_honour(n);
             sum -= n - 8;
             sum += n;
-            assert_eq!(score.honour, (sum / 8), "sum_16__{}", n);
+            assert_eq!(status.honour, (sum / 8), "sum_16__{}", n);
             n += 1;
         };
-        assert_eq!(score.honour_history, 0x100f0e0d0c0b0a09, "0x100f0e0d0c0b0a09");
+        assert_eq!(status.honour_log, 0x100f0e0d0c0b0a09, "0x100f0e0d0c0b0a09");
         // new loop
-        score.total_duels += 1;
-        score.update_honour(n);
-        assert_eq!(score.honour_history, 0x100f0e0d0c0b0a11, "0x100f0e0d0c0b0a11");
+        status.total_duels += 1;
+        status.update_honour(n);
+        assert_eq!(status.honour_log, 0x100f0e0d0c0b0a11, "0x100f0e0d0c0b0a11");
     }
 
 }

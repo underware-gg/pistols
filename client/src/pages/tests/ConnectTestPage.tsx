@@ -73,7 +73,7 @@ export function Connect() {
   const { disconnect } = useDisconnect()
   const { connectors } = useConnect()
   const { chain } = useNetwork()
-  const { openProfile } = useConnectedController()
+  const { username, openProfile } = useConnectedController()
   return (
     <>
       <StarknetConnectModal opener={connectOpener} />
@@ -104,7 +104,12 @@ export function Connect() {
               {connector && <Grid>
                 <Grid.Row>
                   <ProfilePic small profilePicUrl={getConnectorIcon(connector)} className='NoBorder'/>
-                  <div>&nbsp;&nbsp;{connector.name}&nbsp;&nbsp;</div>
+                  <div>
+                    &nbsp;&nbsp;
+                    {connector.name}
+                    {username && ` (${username})`}
+                    &nbsp;&nbsp;
+                    </div>
                   {Boolean(openProfile) && <Button size='tiny' onClick={() => openProfile()}>Profile</Button>}
                 </Grid.Row>
               </Grid>}

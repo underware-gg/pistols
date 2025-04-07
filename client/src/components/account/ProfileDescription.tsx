@@ -2,11 +2,10 @@ import React from 'react'
 import { Grid } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
-import { useGetSeasonScoreboard } from '/src/hooks/useScore'
 import { useDuelist } from '/src/stores/duelistStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { FameBalanceDuelist } from '/src/components/account/LordsBalance'
+import { FameLivesDuelist } from '/src/components/account/LordsBalance'
 import { AddressShort } from '/src/components/ui/AddressShort'
 import { EMOJI } from '/src/data/messages'
 
@@ -33,7 +32,7 @@ export function ProfileBadge({
 }: {
   duelistId: BigNumberish
 }) {
-  const { isVillainous, isTrickster, isHonourable } = useGetSeasonScoreboard(duelistId)
+  const { status: {isVillainous, isTrickster, isHonourable } } = useDuelist(duelistId)
   if (isVillainous) return <>{EMOJI.VILLAIN}</>
   if (isTrickster) return <>{EMOJI.TRICKSTER}</>
   if (isHonourable) return <>{EMOJI.LORD}</>
@@ -59,7 +58,7 @@ export function ProfileDescription({
   displayFameBalance?: boolean
   displayHonor?: boolean
 }) {
-  const { total_wins, total_losses, total_draws, total_duels, honourAndTotal } = useGetSeasonScoreboard(duelistId)
+  const { status: {total_wins, total_losses, total_draws, total_duels, honourAndTotal } } = useDuelist(duelistId)
 
   // if its a duelist...
   const { owner } = useOwnerOfDuelist(duelistId)
@@ -91,7 +90,7 @@ export function ProfileDescription({
         {displayHonor && <h3 className='Important NoMargin TitleCase'>
           Honour: <span className='Coin'>{honourAndTotal}</span>
         </h3>}
-        {displayFameBalance && <h5><FameBalanceDuelist duelistId={duelistId} size='big' /></h5>}
+        {displayFameBalance && <h5><FameLivesDuelist duelistId={duelistId} size='big' /></h5>}
       </div>
 
       {displayStats && total_duels > 0 &&

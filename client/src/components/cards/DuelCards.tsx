@@ -16,7 +16,7 @@ import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 
 interface DuelistCardsProps {
   isLeft: boolean
-  duelistId: bigint
+  duelistId: BigNumberish
   onClick?: (isLeft?: boolean, shouldClose?: boolean) => void
 }
 
@@ -1131,8 +1131,7 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance, visible }) => {
   )
 }
 
-const Cards = forwardRef<CardsHandle, { duelId: BigNumberish, tutorialLevel: DuelTutorialLevel }>(({ duelId, tutorialLevel }, ref) => {
-  const { duelistIdA, duelistIdB } = useChallenge(duelId)
+const Cards = forwardRef<CardsHandle, { duelistIdA: BigNumberish, duelistIdB: BigNumberish, tutorialLevel: DuelTutorialLevel }>(({ duelistIdA, duelistIdB, tutorialLevel }, ref) => {
 
   const [isOverlayVisible, setIsOverlayVisible] = useState(false)
 
