@@ -1,19 +1,17 @@
-import React, { ReactNode, useMemo } from 'react'
+import React from 'react'
 import { useAccount } from '@starknet-react/core'
+import { useConnectedController } from '@underware/pistols-sdk/dojo'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
-import { usePlayer } from '/src/stores/playerStore'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { SceneName } from '/src/data/assets'
 import { useGameAspect } from '/src/hooks/useGameAspect'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
-import { FoolsBalance } from './LordsBalance'
+import { FoolsBalance } from '/src/components/account/LordsBalance'
 
 export default function AccountHeader() {
   const { isConnected } = useAccount()
   const { dispatchSetScene } = usePistolsScene()
   const { address } = useAccount()
-  const { username } = usePlayer(address)
-  const { duelistIds } = useDuelistsOfPlayer()
+  const { username } = useConnectedController()
   
   const { aspectWidth } = useGameAspect()
 
