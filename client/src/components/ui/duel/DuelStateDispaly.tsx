@@ -89,7 +89,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
       animationSequenceStarted.current = false;
     } 
     // Start animation sequence only once after the duel is finished
-    else if (!isTutorial && (isFinished || isCanceled || isExpired) && !animationSequenceStarted.current) {
+    else if (!isTutorial && (isFinished || isCanceled || isExpired) && animated === AnimationState.Finished && !animationSequenceStarted.current) {
       animationSequenceStarted.current = true;
       
       // Step 1: Show the container with a fade-in
