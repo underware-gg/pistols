@@ -226,7 +226,7 @@ interface SceneObject {
 const sceneBackgrounds: Record<SceneName, SceneData> = {
   [SceneName.Gate]: {
     backgrounds: [
-      { texture: TextureName.bg_entrance_background, shiftMultiplier: -0.01, renderOrder: 0 },
+      { texture: TextureName.bg_entrance_background, shiftMultiplier: -0.008, renderOrder: 0 },
       { texture: TextureName.bg_entrance_tavern, shiftMultiplier: -0.005, renderOrder: 1 },
       { texture: TextureName.bg_entrance_sign, shiftMultiplier: -0.003, renderOrder: 2 },
       { texture: TextureName.bg_entrance_fog_background, shiftMultiplier: 0.0, renderOrder: 3, opaque: true, animateShift: { enabled: true, isLeft: false, speed: 0.0005 } },
