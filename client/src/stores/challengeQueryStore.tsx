@@ -217,15 +217,15 @@ export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNum
     // Count wins, losses and draws
     const stats = result.reduce((acc, challenge) => {      
       const isDuelistA = BigInt(challenge.duelist_id_a) === BigInt(duelistId)
-      const winner = BigInt(challenge.winner)
+      const winner = challenge.winner
       
       // Draw case
       if (winner === 0n) {
         acc.losses++
       } 
       // Win case
-      else if ((isDuelistA && winner === BigInt(challenge.duelist_id_a)) || 
-               (!isDuelistA && winner === BigInt(challenge.duelist_id_b))) {
+      else if ((isDuelistA && winner === 1) || 
+               (!isDuelistA && winner === 2)) {
         acc.wins++
       } 
       // Loss case
