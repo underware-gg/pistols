@@ -104,6 +104,17 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
     }
   }, [animated, isTutorial, isFinished, isCanceled, isExpired, statusText]);
 
+  useEffect(() => {
+    setTimeout(() => {
+        setShowDisplay(true);
+        
+        // Step 2: Start text animation after container appears
+        setTimeout(() => {
+          setAnimatedText("Honor has been satisfied in favor of fortunaregem!");
+        }, 500);
+      }, 300);
+  }, [])
+
   const RewardRow = ({ show, delay, children, animation = 'fadeIn' }) => {
     const baseStyle = {
       width: '60%',
@@ -133,7 +144,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
 
   return (
     <>
-      {(!isTutorial && (isFinished || isCanceled || isExpired) && animated === AnimationState.Finished && showDisplay) &&
+      {(!isTutorial && (isFinished || isCanceled || isExpired) && showDisplay) &&
         <div className='NoMouse NoDrag' style={{ 
           position: 'absolute', 
           left: 0, 
@@ -151,15 +162,16 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: '1rem',
+            padding: aspectWidth(1),
             width: aspectWidth(42),
             marginTop: '-10%',
           }}>
-            <h2 className='Important' style={{ 
+            <h2 className='Important Relative' style={{ 
               fontSize: aspectWidth(2.5),
               textAlign: 'center',
               marginBottom: aspectHeight(1),
               margin: '0 auto',
+              width: '100%',
             }}>
               <AnimatedText
                 text={animatedText}

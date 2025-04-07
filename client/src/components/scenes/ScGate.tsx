@@ -25,7 +25,7 @@ export default function ScGate() {
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
   const { value: textureShiftBubble, timestamp: textureShiftBubbleTimestamp } = useGameEvent('texture_shift_1', null)
-  const { value: textureShiftLogo, timestamp: textureShiftLogoTimestamp } = useGameEvent('texture_shift_3', null)
+  const { value: textureShiftLogo, timestamp: textureShiftLogoTimestamp } = useGameEvent('texture_shift_6', null)
   
   useEffect(() => {
     // Set up the text display with delay

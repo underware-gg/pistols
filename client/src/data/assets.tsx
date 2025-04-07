@@ -41,9 +41,12 @@ enum TextureName {
   
   bg_entrance_background = 'bg_entrance_background',
   bg_entrance_tavern = 'bg_entrance_tavern',
+  bg_entrance_sign = 'bg_entrance_sign',
   bg_entrance_player = 'bg_entrance_player',
   bg_entrance_foreground = 'bg_entrance_foreground',
   bg_entrance_door_mask = 'bg_entrance_door_mask',
+  bg_entrance_fog_background = 'bg_entrance_fog_background',
+  bg_entrance_fog_foreground = 'bg_entrance_fog_foreground',
 
   bg_tavern_bar = 'bg_tavern_bar',
   bg_tavern_bar_mask = 'bg_tavern_bar_mask',
@@ -125,9 +128,12 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
 
   [TextureName.bg_entrance_background]: { path: '/images/scenes/gate/bg_entrance_background.png' },
   [TextureName.bg_entrance_tavern]: { path: '/images/scenes/gate/bg_entrance_tavern.png' },
+  [TextureName.bg_entrance_sign]: { path: '/images/scenes/gate/bg_entrance_sign.png' },
   [TextureName.bg_entrance_player]: { path: '/images/scenes/gate/bg_entrance_player.png' },
   [TextureName.bg_entrance_foreground]: { path: '/images/scenes/gate/bg_entrance_foreground.png' },
   [TextureName.bg_entrance_door_mask]: { path: '/images/scenes/gate/bg_entrance_door_mask.png' },
+  [TextureName.bg_entrance_fog_background]: { path: '/images/scenes/gate/bg_entrance_fog_background.png' },
+  [TextureName.bg_entrance_fog_foreground]: { path: '/images/scenes/gate/bg_entrance_fog_foreground.png' },
   
   [TextureName.bg_tavern_bar]: { path: '/images/scenes/tavern/bg_tavern_bar.png' },
   [TextureName.bg_tavern_bar_mask]: { path: '/images/scenes/tavern/bg_tavern_bar_mask.png' },
@@ -200,7 +206,13 @@ interface SceneBackgroundObject {
   shiftMultiplier: number,
   renderOrder: number,
   animatedIdle?: number,
-  hidden?: boolean
+  hidden?: boolean,
+  opaque?: boolean,
+  animateShift?: {
+    enabled: boolean,
+    isLeft: boolean,
+    speed: number
+  }
 }
 
 interface SceneObject {
@@ -214,10 +226,13 @@ interface SceneObject {
 const sceneBackgrounds: Record<SceneName, SceneData> = {
   [SceneName.Gate]: {
     backgrounds: [
-      { texture: TextureName.bg_entrance_background, shiftMultiplier: -0.03, renderOrder: 0 },
-      { texture: TextureName.bg_entrance_tavern, shiftMultiplier: -0.015, renderOrder: 1 },
-      { texture: TextureName.bg_entrance_player, shiftMultiplier: -0.005, renderOrder: 2 },
-      { texture: TextureName.bg_entrance_foreground, shiftMultiplier: 0.02, renderOrder: 3 },
+      { texture: TextureName.bg_entrance_background, shiftMultiplier: -0.01, renderOrder: 0 },
+      { texture: TextureName.bg_entrance_tavern, shiftMultiplier: -0.005, renderOrder: 1 },
+      { texture: TextureName.bg_entrance_sign, shiftMultiplier: -0.003, renderOrder: 2 },
+      { texture: TextureName.bg_entrance_fog_background, shiftMultiplier: 0.0, renderOrder: 3, opaque: true, animateShift: { enabled: true, isLeft: false, speed: 0.0005 } },
+      { texture: TextureName.bg_entrance_player, shiftMultiplier: 0.002, renderOrder: 4 },
+      { texture: TextureName.bg_entrance_fog_foreground, shiftMultiplier: 0.01, renderOrder: 5, opaque: true, animateShift: { enabled: true, isLeft: true, speed: 0.0005 } },
+      { texture: TextureName.bg_entrance_foreground, shiftMultiplier: 0.012, renderOrder: 6 },
     ],
     items: [
       { name: 'door', color: 'ff0000', description: 'Knock on door', mask: TextureName.bg_entrance_door_mask, renderOrder: 1 },

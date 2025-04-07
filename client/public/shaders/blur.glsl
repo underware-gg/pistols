@@ -8,7 +8,7 @@ float gaussian(vec2 i, int samples) {
   return exp( -.5* dot(i/=sigma,i) ) / ( 2.0 * PI * sigma*sigma );
 }
 
-vec4 blur(int size, sampler2D sp[5], vec2 U[5], vec2 scale, int samples) {
+vec4 blur(int size, sampler2D sp[7], vec2 U[7], vec2 scale, int samples) {
   vec4 O = vec4(0);  
   int s = max(samples / sLOD, 1);
   
@@ -30,6 +30,14 @@ vec4 blur(int size, sampler2D sp[5], vec2 U[5], vec2 scale, int samples) {
     }
     if (size > 4) {
       vec4 nextTex = textureLod( sp[4], U[4] + scale * d, float(LOD) );
+      texColor = mix(texColor, nextTex, nextTex.a);
+    }
+    if (size > 5) {
+      vec4 nextTex = textureLod( sp[5], U[5] + scale * d, float(LOD) );
+      texColor = mix(texColor, nextTex, nextTex.a);
+    }
+    if (size > 6) {
+      vec4 nextTex = textureLod( sp[6], U[6] + scale * d, float(LOD) );
       texColor = mix(texColor, nextTex, nextTex.a);
     }
 

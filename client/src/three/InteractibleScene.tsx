@@ -36,7 +36,7 @@ export class InteractibleScene extends THREE.Scene {
   isClickable: boolean = true
 
   opacityTweens: any[] = []
-  currentOpacities: number[] = [1, 1, 1, 1, 1]
+  currentOpacities: number[] = [1, 1, 1, 1, 1, 1, 1]
 
   lastClickTimeStamp: number
   private currentRandomValues: number[] = []
@@ -44,6 +44,8 @@ export class InteractibleScene extends THREE.Scene {
   private nextTargetRandomValues: number[] = []
   private randomInterpolationProgress: number = 0
   private readonly RANDOM_INTERPOLATION_SPEED = 0.01
+  private animatedShiftValues: number[] = []
+  private layerShiftAmounts: number[] = []
 
   constructor(sceneName: string, renderer: THREE.WebGLRenderer, camera: THREE.Camera) {
     super()
@@ -85,6 +87,8 @@ export class InteractibleScene extends THREE.Scene {
       const background = this.sceneData.backgrounds[i]
       return Math.random() * (background.animatedIdle || 0)
     })
+    this.animatedShiftValues = new Array(numBackgrounds).fill(0)
+    this.layerShiftAmounts = new Array(numBackgrounds).fill(0)
 
     if (this.sceneData.backgrounds && this.sceneData.backgrounds.length > 0) {
 
@@ -100,8 +104,11 @@ export class InteractibleScene extends THREE.Scene {
           mesh.scale.set(1 + this.sceneData.scaleAddon, 1 + this.sceneData.scaleAddon, 1)
         }
 
-        this.fbo_background_scenes[index] = new THREE.Scene();
-        this.fbo_background_scenes[index].add(mesh)
+        // Only add to fbo_background_scenes if not opaque
+        if (!background.opaque) {
+          this.fbo_background_scenes[index] = new THREE.Scene();
+          this.fbo_background_scenes[index].add(mesh)
+        }
       })
 
       this.fbo_background = new THREE.WebGLRenderTarget(
@@ -162,19 +169,25 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uPickedColor', this.pickedColor)
     this.maskShader.setUniformValue('uExcludedColor', new THREE.Color(0, 0, 0))
     this.maskShader.setUniformValue('uHiddenOpacities', this.sceneData.backgrounds.map(background => background.hidden ? 0.0 : 1.0))
+    this.maskShader.setUniformValue('uOpaque', this.sceneData.backgrounds.map(background => background.opaque || false))
     this.maskShader.setUniformValue('uClickable', this.isClickable)
     this.maskShader.setUniformValue('uSamples', 1)
     this.maskShader.setUniformValue('uShiftAmount', 0.0)
+    this.maskShader.setUniformValue('uShiftAmountLayer', this.layerShiftAmounts)
     this.maskShader.setUniformValue('uTextureShift0', new THREE.Vector2(0.0, 0.0))
     this.maskShader.setUniformValue('uTextureShift1', new THREE.Vector2(0.0, 0.0))
     this.maskShader.setUniformValue('uTextureShift2', new THREE.Vector2(0.0, 0.0))
     this.maskShader.setUniformValue('uTextureShift3', new THREE.Vector2(0.0, 0.0))
     this.maskShader.setUniformValue('uTextureShift4', new THREE.Vector2(0.0, 0.0))
+    this.maskShader.setUniformValue('uTextureShift5', new THREE.Vector2(0.0, 0.0))
+    this.maskShader.setUniformValue('uTextureShift6', new THREE.Vector2(0.0, 0.0))
     this.maskShader.setUniformValue('uRandomShift0', 0.0)
     this.maskShader.setUniformValue('uRandomShift1', 0.0)
     this.maskShader.setUniformValue('uRandomShift2', 0.0)
     this.maskShader.setUniformValue('uRandomShift3', 0.0)
     this.maskShader.setUniformValue('uRandomShift4', 0.0)
+    this.maskShader.setUniformValue('uRandomShift5', 0.0)
+    this.maskShader.setUniformValue('uRandomShift6', 0.0)
     this.maskShader.setUniformValue('uHighlightColor', new THREE.Color('#ffcf40'))
     this.maskShader.setUniformValue('uHighlightOpacity', 0.4)
     this.maskShader.setUniformValue('uMasksSize', this.sceneData.items?.length || 0)
@@ -223,14 +236,16 @@ export class InteractibleScene extends THREE.Scene {
     });
 
     this.fbo_background_scenes.forEach(scene => {
-        scene.traverse((child) => {
-            if (child instanceof THREE.Mesh) {
-                child.geometry.dispose();
-                if (child.material instanceof THREE.Material) {
-                    child.material.dispose();
+        if (scene) {
+            scene.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                    child.geometry.dispose();
+                    if (child.material instanceof THREE.Material) {
+                        child.material.dispose();
+                    }
                 }
-            }
-        });
+            });
+        }
     });
 
     this.fbo_mask_scene = null;
@@ -300,7 +315,8 @@ export class InteractibleScene extends THREE.Scene {
     // Render background scenes
     this.renderer.setRenderTarget(this.fbo_background);
     this.sceneData.backgrounds.forEach((background, index) => {
-        if (background.renderOrder > hitMask.renderOrder) {
+        // Skip opaque backgrounds as they're not in the fbo_background_scenes
+        if (background.renderOrder > hitMask.renderOrder && !background.opaque && this.fbo_background_scenes[index]) {
           this.renderer.clear();
           this.renderer.render(this.fbo_background_scenes[index], this.camera);
 
@@ -396,6 +412,8 @@ export class InteractibleScene extends THREE.Scene {
     this.targetRandomValues = new Array(this.sceneData.backgrounds?.length || 0).fill(0)
     this.nextTargetRandomValues = new Array(this.sceneData.backgrounds?.length || 0).fill(0)
     this.randomInterpolationProgress = 0
+    this.animatedShiftValues = new Array(this.sceneData.backgrounds?.length || 0).fill(0)
+    this.layerShiftAmounts = new Array(this.sceneData.backgrounds?.length || 0).fill(0)
   }
 
   private calculateTextureShifts() {
@@ -424,22 +442,42 @@ export class InteractibleScene extends THREE.Scene {
         this.currentRandomValues[index] = 0
       }
 
-      const aspectRatio = 1920/1080;
-      const screenSize = Math.min(window.innerWidth, window.innerHeight);
-      const width = screenSize * aspectRatio;
-      const height = screenSize;
-      const scaledMousePos = this.mouseScreenPos.clone();
-      scaledMousePos.x *= width/window.innerWidth;
-      scaledMousePos.y *= height/window.innerHeight;
-      const textureShift = scaledMousePos.multiplyScalar(background.shiftMultiplier);
-      
-      // Set uniform value for shader
-      this.maskShader.setUniformValue(`uTextureShift${index}`, textureShift);
-      this.maskShader.setUniformValue(`uRandomShift${index}`, this.currentRandomValues[index]);
-      
-      // Emit texture shift events
-      emitter.emit(`texture_shift_${index}`, textureShift);
+      // Handle animated shift if present
+      if (background.animateShift?.enabled) {
+        // Update the layer shift amount
+        this.layerShiftAmounts[index] += (background.animateShift.isLeft ? -1 : 1) * background.animateShift.speed;
+        
+        // Create a vector that shifts in the specified direction
+        const shiftVector = new THREE.Vector2(this.layerShiftAmounts[index], 0);
+        
+        // Set the texture shift uniform
+        this.maskShader.setUniformValue(`uTextureShift${index}`, shiftVector);
+        this.maskShader.setUniformValue(`uRandomShift${index}`, this.currentRandomValues[index]);
+        
+        // Emit texture shift events
+        emitter.emit(`texture_shift_${index}`, shiftVector);
+      } else {
+        // Regular mouse-based shifting for non-animated backgrounds
+        const aspectRatio = 1920/1080;
+        const screenSize = Math.min(window.innerWidth, window.innerHeight);
+        const width = screenSize * aspectRatio;
+        const height = screenSize;
+        const scaledMousePos = this.mouseScreenPos.clone();
+        scaledMousePos.x *= width/window.innerWidth;
+        scaledMousePos.y *= height/window.innerHeight;
+        const textureShift = scaledMousePos.multiplyScalar(background.shiftMultiplier);
+        
+        // Set uniform value for shader
+        this.maskShader.setUniformValue(`uTextureShift${index}`, textureShift);
+        this.maskShader.setUniformValue(`uRandomShift${index}`, this.currentRandomValues[index]);
+        
+        // Emit texture shift events
+        emitter.emit(`texture_shift_${index}`, textureShift);
+      }
     })
+    
+    // Update the layer shift amount uniform after all calculations
+    this.maskShader.setUniformValue('uShiftAmountLayer', this.layerShiftAmounts);
   }
 
   public toggleBlur(shouldBlur: boolean) {

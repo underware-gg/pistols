@@ -2,15 +2,16 @@ varying vec2 vUv;
 
 // constants
 uniform int uMasksSize;
-uniform sampler2D uMasks[5];
-uniform int uMasksRenderOrder[5];
+uniform sampler2D uMasks[7];
+uniform int uMasksRenderOrder[7];
 uniform int uTexturesSize;
-uniform sampler2D uTextures[5];
-uniform int uTexturesRenderOrder[5];
+uniform sampler2D uTextures[7];
+uniform int uTexturesRenderOrder[7];
 uniform vec2 uResolution;
 uniform vec3 uHighlightColor;
 uniform float uHighlightOpacity;
-uniform float uHiddenOpacities[5];
+uniform float uHiddenOpacities[7];
+uniform bool uOpaque[7];
 
 // varying
 uniform float uTime;
@@ -19,6 +20,7 @@ uniform vec3 uExcludedColor;
 uniform bool uClickable;
 uniform int uSamples; //from 2 to 35
 uniform float uShiftAmount; // from 0.0 to 1.0
+uniform float uShiftAmountLayer[7]; // per-layer shift amount
 
 //If it works it aint stupid...
 uniform vec2 uTextureShift0;
@@ -26,13 +28,17 @@ uniform vec2 uTextureShift1;
 uniform vec2 uTextureShift2;
 uniform vec2 uTextureShift3;
 uniform vec2 uTextureShift4;
+uniform vec2 uTextureShift5;
+uniform vec2 uTextureShift6;
 uniform float uRandomShift0;
 uniform float uRandomShift1;
 uniform float uRandomShift2;
 uniform float uRandomShift3;
 uniform float uRandomShift4;
+uniform float uRandomShift5;
+uniform float uRandomShift6;
 
-int MAX_ELEMENTS = 5;
+int MAX_ELEMENTS = 7;
 
 vec2 getShiftForIndex(int index) {
   if (index == 0) return uTextureShift0 + uRandomShift0;
@@ -40,16 +46,32 @@ vec2 getShiftForIndex(int index) {
   if (index == 2) return uTextureShift2 + uRandomShift2;
   if (index == 3) return uTextureShift3 + uRandomShift3;
   if (index == 4) return uTextureShift4 + uRandomShift4;
+  if (index == 5) return uTextureShift5 + uRandomShift5;
+  if (index == 6) return uTextureShift6 + uRandomShift6;
   return vec2(0.0);
+}
+
+float getLayerShiftForIndex(int index) {
+  if (index == 0) return uShiftAmountLayer[0];
+  if (index == 1) return uShiftAmountLayer[1];
+  if (index == 2) return uShiftAmountLayer[2];
+  if (index == 3) return uShiftAmountLayer[3];
+  if (index == 4) return uShiftAmountLayer[4];
+  if (index == 5) return uShiftAmountLayer[5];
+  if (index == 6) return uShiftAmountLayer[6];
+  return 0.0;
 }
 
 void main() {
   vec2 shiftedUv = vUv + vec2(uShiftAmount, 0.0);
   shiftedUv.x = mod(shiftedUv.x, 1.0);
 
-  vec2 shiftedUvs[5];
-  for(int i = 0; i < 5; i++) {
-    shiftedUvs[i] = shiftedUv + getShiftForIndex(i);
+  vec2 shiftedUvs[7];
+  for(int i = 0; i < 7; i++) {
+    float layerShift = getLayerShiftForIndex(i);
+    vec2 combinedShift = vec2(uShiftAmount + layerShift, 0.0);
+    shiftedUvs[i] = vUv + combinedShift + getShiftForIndex(i);
+    shiftedUvs[i].x = mod(shiftedUvs[i].x, 1.0);
   }
   
   vec2 ps = 1.0 / uResolution;
@@ -87,6 +109,14 @@ void main() {
     vec4 m = texture2D(uMasks[4], tex0Uv);
     allMasks = mix(allMasks, m, m.a);
   }
+  if (uMasksSize > 5 && uMasksRenderOrder[5] == uTexturesRenderOrder[0]) {
+    vec4 m = texture2D(uMasks[5], tex0Uv);
+    allMasks = mix(allMasks, m, m.a);
+  }
+  if (uMasksSize > 6 && uMasksRenderOrder[6] == uTexturesRenderOrder[0]) {
+    vec4 m = texture2D(uMasks[6], tex0Uv);
+    allMasks = mix(allMasks, m, m.a);
+  }
   
   // Texture 1
   vec2 tex1Uv = shiftedUvs[1];
@@ -94,8 +124,8 @@ void main() {
     vec4 tex1 = texture2D(uTextures[1], tex1Uv);
     tex1.a *= uHiddenOpacities[1];
     
-    // Clear mask where texture 1 covers it
-    if (tex1.a > 0.0) {
+    // Clear mask where texture 1 covers it, but only if not opaque
+    if (tex1.a > 0.0 && !uOpaque[1]) {
       allMasks *= (1.0 - tex1.a);
     }
     
@@ -122,6 +152,14 @@ void main() {
       vec4 m = texture2D(uMasks[4], tex1Uv);
       allMasks = mix(allMasks, m, m.a);
     }
+    if (uMasksSize > 5 && uMasksRenderOrder[5] == uTexturesRenderOrder[1]) {
+      vec4 m = texture2D(uMasks[5], tex1Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 6 && uMasksRenderOrder[6] == uTexturesRenderOrder[1]) {
+      vec4 m = texture2D(uMasks[6], tex1Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
   }
   
   // Texture 2
@@ -130,8 +168,8 @@ void main() {
     vec4 tex2 = texture2D(uTextures[2], tex2Uv);
     tex2.a *= uHiddenOpacities[2];
     
-    // Clear mask where texture 2 covers it
-    if (tex2.a > 0.0) {
+    // Clear mask where texture 2 covers it, but only if not opaque
+    if (tex2.a > 0.0 && !uOpaque[2]) {
       allMasks *= (1.0 - tex2.a);
     }
     
@@ -158,6 +196,14 @@ void main() {
       vec4 m = texture2D(uMasks[4], tex2Uv);
       allMasks = mix(allMasks, m, m.a);
     }
+    if (uMasksSize > 5 && uMasksRenderOrder[5] == uTexturesRenderOrder[2]) {
+      vec4 m = texture2D(uMasks[5], tex2Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 6 && uMasksRenderOrder[6] == uTexturesRenderOrder[2]) {
+      vec4 m = texture2D(uMasks[6], tex2Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
   }
   
   // Texture 3
@@ -166,8 +212,8 @@ void main() {
     vec4 tex3 = texture2D(uTextures[3], tex3Uv);
     tex3.a *= uHiddenOpacities[3];
     
-    // Clear mask where texture 3 covers it
-    if (tex3.a > 0.0) {
+    // Clear mask where texture 3 covers it, but only if not opaque
+    if (tex3.a > 0.0 && !uOpaque[3]) {
       allMasks *= (1.0 - tex3.a);
     }
     
@@ -194,6 +240,14 @@ void main() {
       vec4 m = texture2D(uMasks[4], tex3Uv);
       allMasks = mix(allMasks, m, m.a);
     }
+    if (uMasksSize > 5 && uMasksRenderOrder[5] == uTexturesRenderOrder[3]) {
+      vec4 m = texture2D(uMasks[5], tex3Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 6 && uMasksRenderOrder[6] == uTexturesRenderOrder[3]) {
+      vec4 m = texture2D(uMasks[6], tex3Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
   }
   
   // Texture 4
@@ -202,8 +256,8 @@ void main() {
     vec4 tex4 = texture2D(uTextures[4], tex4Uv);
     tex4.a *= uHiddenOpacities[4];
     
-    // Clear mask where texture 4 covers it
-    if (tex4.a > 0.0) {
+    // Clear mask where texture 4 covers it, but only if not opaque
+    if (tex4.a > 0.0 && !uOpaque[4]) {
       allMasks *= (1.0 - tex4.a);
     }
     
@@ -228,6 +282,102 @@ void main() {
     }
     if (uMasksSize > 4 && uMasksRenderOrder[4] == uTexturesRenderOrder[4]) {
       vec4 m = texture2D(uMasks[4], tex4Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 5 && uMasksRenderOrder[5] == uTexturesRenderOrder[4]) {
+      vec4 m = texture2D(uMasks[5], tex4Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 6 && uMasksRenderOrder[6] == uTexturesRenderOrder[4]) {
+      vec4 m = texture2D(uMasks[6], tex4Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+  }
+  
+  // Texture 5
+  vec2 tex5Uv = shiftedUvs[5];
+  if (uTexturesSize > 5) {
+    vec4 tex5 = texture2D(uTextures[5], tex5Uv);
+    tex5.a *= uHiddenOpacities[5];
+    
+    // Clear mask where texture 5 covers it, but only if not opaque
+    if (tex5.a > 0.0 && !uOpaque[5]) {
+      allMasks *= (1.0 - tex5.a);
+    }
+    
+    result = mix(result, tex5, tex5.a);
+    
+    // Check for masks matching texture 5
+    if (uMasksSize > 0 && uMasksRenderOrder[0] == uTexturesRenderOrder[5]) {
+      vec4 m = texture2D(uMasks[0], tex5Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 1 && uMasksRenderOrder[1] == uTexturesRenderOrder[5]) {
+      vec4 m = texture2D(uMasks[1], tex5Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 2 && uMasksRenderOrder[2] == uTexturesRenderOrder[5]) {
+      vec4 m = texture2D(uMasks[2], tex5Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 3 && uMasksRenderOrder[3] == uTexturesRenderOrder[5]) {
+      vec4 m = texture2D(uMasks[3], tex5Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 4 && uMasksRenderOrder[4] == uTexturesRenderOrder[5]) {
+      vec4 m = texture2D(uMasks[4], tex5Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 5 && uMasksRenderOrder[5] == uTexturesRenderOrder[5]) {
+      vec4 m = texture2D(uMasks[5], tex5Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 6 && uMasksRenderOrder[6] == uTexturesRenderOrder[5]) {
+      vec4 m = texture2D(uMasks[6], tex5Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+  }
+  
+  // Texture 6
+  vec2 tex6Uv = shiftedUvs[6];
+  if (uTexturesSize > 6) {
+    vec4 tex6 = texture2D(uTextures[6], tex6Uv);
+    tex6.a *= uHiddenOpacities[6];
+    
+    // Clear mask where texture 6 covers it, but only if not opaque
+    if (tex6.a > 0.0 && !uOpaque[6]) {
+      allMasks *= (1.0 - tex6.a);
+    }
+    
+    result = mix(result, tex6, tex6.a);
+    
+    // Check for masks matching texture 6
+    if (uMasksSize > 0 && uMasksRenderOrder[0] == uTexturesRenderOrder[6]) {
+      vec4 m = texture2D(uMasks[0], tex6Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 1 && uMasksRenderOrder[1] == uTexturesRenderOrder[6]) {
+      vec4 m = texture2D(uMasks[1], tex6Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 2 && uMasksRenderOrder[2] == uTexturesRenderOrder[6]) {
+      vec4 m = texture2D(uMasks[2], tex6Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 3 && uMasksRenderOrder[3] == uTexturesRenderOrder[6]) {
+      vec4 m = texture2D(uMasks[3], tex6Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 4 && uMasksRenderOrder[4] == uTexturesRenderOrder[6]) {
+      vec4 m = texture2D(uMasks[4], tex6Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 5 && uMasksRenderOrder[5] == uTexturesRenderOrder[6]) {
+      vec4 m = texture2D(uMasks[5], tex6Uv);
+      allMasks = mix(allMasks, m, m.a);
+    }
+    if (uMasksSize > 6 && uMasksRenderOrder[6] == uTexturesRenderOrder[6]) {
+      vec4 m = texture2D(uMasks[6], tex6Uv);
       allMasks = mix(allMasks, m, m.a);
     }
   }
