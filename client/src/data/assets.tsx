@@ -100,6 +100,8 @@ enum TextureName {
   bg_profile_chest_mask = 'bg_profile_chest_mask',
   bg_profile_door_mask = 'bg_profile_door_mask',
   bg_profile_background = 'bg_profile_background',
+
+  bg_leaderboards = 'bg_leaderboards',
 }
 type TextureAttributes = {
   path: string
@@ -183,6 +185,8 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_profile_chest_mask]: { path: '/images/scenes/profile/bg_profile_chest_mask.png' },
   [TextureName.bg_profile_background]: { path: '/images/scenes/profile/bg_profile_background.png' },
   [TextureName.bg_profile_door_mask]: { path: '/images/scenes/profile/bg_profile_door_mask.png' },
+
+  [TextureName.bg_leaderboards]: { path: '/images/scenes/leaderboards/bg_leaderboards.png' },
 }
 
 interface SceneData {
@@ -272,7 +276,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     ]
   },
   [SceneName.Leaderboards]: {
-    backgrounds: [{ texture: TextureName.bg_duelists, shiftMultiplier: 0, renderOrder: 0 }]
+    backgrounds: [{ texture: TextureName.bg_leaderboards, shiftMultiplier: 0, renderOrder: 0 }]
   },
   [SceneName.Graveyard]: {
     backgrounds: [{ texture: TextureName.bg_graveyard, shiftMultiplier: 0, renderOrder: 0 }],

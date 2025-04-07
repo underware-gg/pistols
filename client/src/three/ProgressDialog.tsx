@@ -416,10 +416,13 @@ export class ProgressDialogManager {
     this.dialogB = new ProgressDialogMesh(camera, duelistBPosition, false)
   }
 
-  public setData(duelistAName: string, duelistBName: string, isYouA: boolean, isYouB: boolean) {
+  public setDataA(duelistAName: string, isYouA: boolean) {
     this.isDialogAYou = isYouA
 
     this.dialogA.setDuelistData(duelistAName, isYouA)
+  }
+
+  public setDataB(duelistBName: string, isYouB: boolean) {
     this.dialogB.setDuelistData(duelistBName, isYouB)
   }
 
@@ -441,9 +444,13 @@ export class ProgressDialogManager {
     this.dialogB.hideElement()
   }
 
-  public updateDialogPositions(positionA: THREE.Vector3, positionB: THREE.Vector3) {
-    this.dialogA.updatePosition(positionA)
-    this.dialogB.updatePosition(positionB)
+  public updateDialogPositions(positionA?: THREE.Vector3, positionB?: THREE.Vector3) {
+    if (positionA) {
+      this.dialogA.updatePosition(positionA)
+    }
+    if (positionB) {
+      this.dialogB.updatePosition(positionB)
+    }
   }
 
   public update(duelistAPositionX: number, duelistBPositionX: number) {
@@ -578,6 +585,7 @@ export class ProgressDialogMesh {
   private isLeft: boolean
   private isYou: boolean
 
+  private shouldBeVisible: boolean = false
   private dialogTitle: string
   private duelistName: string
   private isThinkingBubble: boolean
@@ -591,6 +599,7 @@ export class ProgressDialogMesh {
     this.originalPositionY = position.y
 
     this.dialogTitle = this.isLeft ? 'Challenger' : 'Challenged'
+    this.shouldBeVisible = false
   }
 
   public setElement(element: HTMLElement) {
@@ -616,6 +625,7 @@ export class ProgressDialogMesh {
   public setDuelistData(duelistName: string, isYou: boolean) {
     this.duelistName = duelistName
     this.isYou = isYou
+    this.shouldBeVisible = true
 
     this.updateElement()
   }
@@ -711,6 +721,8 @@ export class ProgressDialogMesh {
 
   public showElement() {
     if (!this.element) return
+
+    if (!this.shouldBeVisible) return
 
     this.element.style.opacity = "1"
     this.element.style.visibility = "visible"

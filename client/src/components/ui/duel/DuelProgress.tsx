@@ -8,7 +8,6 @@ import { useIsMyDuelist } from '/src/hooks/useIsYou'
 import { DuelStage, useDuel } from '/src/hooks/useDuel'
 import CommitPacesModal from '/src/components/modals/CommitPacesModal'
 
-
 export default function DuelProgress({
   isA = false,
   isB = false,
@@ -34,10 +33,7 @@ export default function DuelProgress({
 
   const duelProgressRef = useRef(null)
 
-
-  //------------------------------
   // Duelist interaction
-  //
   const { isConnected } = useAccount()
   const isMyDuelist = useIsMyDuelist(duelistId)
 
@@ -47,7 +43,6 @@ export default function DuelProgress({
   const { reveal, canReveal } = useRevealAction(duelId, isYou ? duelistId : 0n, round1Moves?.hashed, duelStage == DuelStage.Round1Reveal)
 
   const onClick = useCallback(() => {
-    if (!isConnected) console.warn(`onClickReveal: not connected!`)
     if (isMyDuelist && isConnected && completedStages[duelStage] === false) {
       if (duelStage == DuelStage.Round1Commit) {
         setCommitModalIsOpen(true)
@@ -60,21 +55,19 @@ export default function DuelProgress({
     }
   }, [isMyDuelist, isConnected, duelStage, completedStages, canReveal])
 
-  // auto-reveal
+  // Auto-reveal when conditions are met
   useEffect(() => {
     if (canAutoReveal && canReveal && isYou) {
       onClick?.()
     }
   }, [onClick, canAutoReveal, canReveal, isYou])
 
-
-  //-------------------------
-  // Duel progression
-  //
+  // Update player progress in the game
   useEffect(() => {
     gameImpl.updatePlayerProgress(isA, completedStages, onClick)
   }, [gameImpl, isA, completedStages, onClick])
   
+  // Set duelist element in the game
   useEffect(() => {
     if (duelProgressRef.current) {
       gameImpl?.setDuelistElement(isA, duelProgressRef.current)
@@ -85,14 +78,16 @@ export default function DuelProgress({
 
   const { canSign, sign_and_restore, hand } = useSignAndRestoreMovesFromHash(duelId, duelistId, round1Moves?.hashed)
 
+  // Sign and restore moves when possible
   useEffect(() =>{
     if (isMyDuelist && canSign) {
       sign_and_restore()
     }
   }, [canSign, isMyDuelist])
 
+  // Reveal cards when hand is available
   useEffect(() =>{
-    if (isMyDuelist && hand && hand.card_fire && hand.card_dodge && hand.card_tactics && hand.card_blades) {
+    if (isYou && hand && hand.card_fire && hand.card_dodge && hand.card_tactics && hand.card_blades) {
       setTimeout(() => {
         revealCards({
           fire: hand.card_fire,
@@ -102,9 +97,8 @@ export default function DuelProgress({
         })
       }, 1000);
     }
-  }, [hand, isMyDuelist])
+  }, [hand, isYou, revealCards])
 
-  //------------------------------
   return (
     <>
       <CommitPacesModal duelId={duelId} duelistId={duelistId} isOpen={commitModalIsOpen} setIsOpen={setCommitModalIsOpen} />

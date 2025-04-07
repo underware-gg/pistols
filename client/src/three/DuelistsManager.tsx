@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { CharacterType, AnimName } from '/src/data/assets'
-import { DuelistState } from '/src/components/scenes/Duel'
+import { DuelistState } from '/src/components/ui/duel/DuelContext'
 import { AudioName } from '/src/data/audioAssets'
 import { Action } from '/src/utils/pistols'
 import { Actor } from './SpriteSheetMaker'
@@ -30,11 +30,6 @@ export class DuelistsManager {
   
   private scene: THREE.Scene
   private spriteSheets: any
-
-  private mousePointer = new THREE.Vector2()
-  private raycaster = new THREE.Raycaster()
-
-  private darkBackground: THREE.Mesh
 
   private duelProgressDialogManger: ProgressDialogManager
 
@@ -69,11 +64,13 @@ export class DuelistsManager {
     this.duelistA.name = localStorage.getItem(DuelistsData.DUELIST_A_NAME)
     this.duelistA.actor = new Actor(this.duelistA.model == CharacterType.MALE ? this.spriteSheets.MALE : this.spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, PACES_X_0, false)
     this.scene.add(this.duelistA.actor.mesh)
+    this.hideActor(true)
     
     this.duelistB.model = localStorage.getItem(DuelistsData.DUELIST_B_MODEL) == CharacterType.MALE ? CharacterType.MALE : CharacterType.FEMALE
     this.duelistB.name = localStorage.getItem(DuelistsData.DUELIST_B_NAME)
     this.duelistB.actor = new Actor(this.duelistB.model == CharacterType.MALE ? this.spriteSheets.MALE : this.spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, PACES_X_0, true)
     this.scene.add(this.duelistB.actor.mesh)
+    this.hideActor(false)
   }
 
   //-------------------------------------------
@@ -92,32 +89,44 @@ export class DuelistsManager {
   // New duel setup reset
   //
 
-  public switchDuelists(duelistNameA: string, duelistModelA: CharacterType, isDuelistAYou: boolean, isDuelistBYou: boolean, duelistNameB: string, duelistModelB: CharacterType) {
-    localStorage.setItem(DuelistsData.DUELIST_A_MODEL, duelistModelA)
-    localStorage.setItem(DuelistsData.DUELIST_B_MODEL, duelistModelB)
+  public setupDuelistA(duelistName: string, duelistModel: CharacterType, isDuelistAYou: boolean) {
+    localStorage.setItem(DuelistsData.DUELIST_A_MODEL, duelistModel)
+    localStorage.setItem(DuelistsData.DUELIST_A_NAME, duelistName)
     this.duelistA.model = localStorage.getItem(DuelistsData.DUELIST_A_MODEL) == CharacterType.MALE ? CharacterType.MALE : CharacterType.FEMALE
-    this.duelistB.model = localStorage.getItem(DuelistsData.DUELIST_B_MODEL) == CharacterType.MALE ? CharacterType.MALE : CharacterType.FEMALE
-
-    localStorage.setItem(DuelistsData.DUELIST_A_NAME, duelistNameA)
-    localStorage.setItem(DuelistsData.DUELIST_B_NAME, duelistNameB)
     this.duelistA.name = localStorage.getItem(DuelistsData.DUELIST_A_NAME)
-    this.duelistB.name = localStorage.getItem(DuelistsData.DUELIST_B_NAME)
+    this.duelistA.actor.replaceSpriteSheets(this.spriteSheets[this.duelistA.model])
 
-    this.duelistA.actor.replaceSpriteSheets(this.spriteSheets[this.duelistA.model]) //TODO check if works instead of this.duelistA.model == CharacterType.MALE ? this.spriteSheets.MALE : this.spriteSheets.FEMALE
-    this.duelistB.actor.replaceSpriteSheets(this.spriteSheets[this.duelistB.model])
-
-    this.duelProgressDialogManger.setData(duelistNameA, duelistNameB, isDuelistAYou, isDuelistBYou)
-
+    this.duelProgressDialogManger.setDataA(duelistName, isDuelistAYou)
+    
     const positionA = new THREE.Vector3(this.duelistA.actor.mesh.position.x + 0.1, ACTOR_HEIGHT * (this.duelistA.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistA.actor.mesh.position.z)
-    const positionB = new THREE.Vector3(this.duelistB.actor.mesh.position.x - 0.1, ACTOR_HEIGHT * (this.duelistB.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistB.actor.mesh.position.z)
-    this.duelProgressDialogManger.updateDialogPositions(positionA, positionB)
+    this.duelProgressDialogManger.updateDialogPositions(positionA)
 
-    //called when we switch to the duel scene or reoload, makes the dialogs show up nicely
     this.showDialogsTimeout = setTimeout(() => {
       this.duelProgressDialogManger.showDialogs()
     }, 400)
 
     this.resetActorPositions()
+    this.showActor(true)
+  }
+
+  public setupDuelistB(duelistName: string, duelistModel: CharacterType, isDuelistBYou: boolean) {
+    localStorage.setItem(DuelistsData.DUELIST_B_MODEL, duelistModel)
+    localStorage.setItem(DuelistsData.DUELIST_B_NAME, duelistName)
+    this.duelistB.model = localStorage.getItem(DuelistsData.DUELIST_B_MODEL) == CharacterType.MALE ? CharacterType.MALE : CharacterType.FEMALE
+    this.duelistB.name = localStorage.getItem(DuelistsData.DUELIST_B_NAME)
+    this.duelistB.actor.replaceSpriteSheets(this.spriteSheets[this.duelistB.model])
+
+    this.duelProgressDialogManger.setDataB(duelistName, isDuelistBYou)
+
+    const positionB = new THREE.Vector3(this.duelistB.actor.mesh.position.x - 0.1, ACTOR_HEIGHT * (this.duelistB.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistB.actor.mesh.position.z)
+    this.duelProgressDialogManger.updateDialogPositions(null, positionB)
+
+    this.showDialogsTimeout = setTimeout(() => {
+      this.duelProgressDialogManger.showDialogs()
+    }, 400)
+
+    this.resetActorPositions()
+    this.showActor(false)
   }
 
   private showDialogsTimeout
@@ -132,6 +141,9 @@ export class DuelistsManager {
     this.playActorAnimation(this.duelistB, AnimName.STILL, null, true)
 
     this.duelProgressDialogManger.showDialogs()
+
+    this.hideActor(true)
+    this.hideActor(false)
 
     return true
   }
@@ -161,6 +173,22 @@ export class DuelistsManager {
   public resetActorPositions() {
     this.duelistA.actor.mesh.position.set(PACES_X_0, this.duelistA.actor.mesh.position.y, this.duelistA.actor.mesh.position.z)
     this.duelistB.actor.mesh.position.set(-PACES_X_0, this.duelistB.actor.mesh.position.y, this.duelistB.actor.mesh.position.z)
+  }
+
+  public showActor(isA: boolean) {
+    if (isA) {
+      this.duelistA.actor.mesh.visible = true
+    } else {
+      this.duelistB.actor.mesh.visible = true
+    }
+  }
+
+  public hideActor(isA: boolean) {
+    if (isA) {
+      this.duelistA.actor.mesh.visible = false
+    } else {
+      this.duelistB.actor.mesh.visible = false
+    }
   }
 
   public animateDuelistBlade() {

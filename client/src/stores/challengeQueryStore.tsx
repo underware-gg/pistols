@@ -8,10 +8,12 @@ import { useCallToActions } from './eventsModelStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
-import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
 import { keysToEntityId } from '@underware/pistols-sdk/utils/hooks'
+import { useEntityModel } from '@underware/pistols-sdk/dojo'
+import { useChallengeStore } from './challengeStore'
 
 //-----------------------------------------
 // Stores only the entity ids and sorting data from a challenges query
@@ -177,4 +179,65 @@ export const useQueryChallengeIds = (
     states,
     challengePlayerMap
   }
+}
+
+/**
+ * Returns the number of wins, losses, and draws for a specific duelist in a given season
+ * @param duelistId The ID of the duelist to query
+ * @param seasonId The ID of the season to query (optional)
+ * @returns Object containing wins, losses, and draws counts
+ */
+export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNumberish) {
+  const entities = useChallengeStore((state) => state.entities);
+
+  let result = Object.values(entities)
+    .map((e) => 
+      useEntityModel<models.Challenge>(e, 'Challenge')
+    )
+    .filter((e) => 
+      BigInt(e.duelist_id_a) === BigInt(duelistId) || BigInt(e.duelist_id_b) === BigInt(duelistId)
+    )
+    .filter((e) => {
+      const state = parseEnumVariant<constants.ChallengeState>(e.state)
+      return state === constants.ChallengeState.Resolved || 
+             state === constants.ChallengeState.Draw ||
+             state === constants.ChallengeState.Expired
+    })
+    // .filter((e) => 
+    //   BigInt(e.table_id) === BigInt(seasonId)
+    // ) //TODO filter by correct season!
+
+    console.log('result', result)
+    
+  
+  const stats = useMemo(() => {
+    if (!duelistId || !seasonId) {
+      return { wins: 0, losses: 0 }
+    }
+    // Count wins, losses and draws
+    const stats = result.reduce((acc, challenge) => {      
+      const isDuelistA = BigInt(challenge.duelist_id_a) === BigInt(duelistId)
+      const winner = BigInt(challenge.winner)
+      
+      // Draw case
+      if (winner === 0n) {
+        acc.losses++
+      } 
+      // Win case
+      else if ((isDuelistA && winner === BigInt(challenge.duelist_id_a)) || 
+               (!isDuelistA && winner === BigInt(challenge.duelist_id_b))) {
+        acc.wins++
+      } 
+      // Loss case
+      else {
+        acc.losses++
+      }
+      
+      return acc
+    }, { wins: 0, losses: 0 })
+    
+    return stats
+  }, [result, duelistId, seasonId])
+
+  return stats
 }

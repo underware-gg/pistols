@@ -45,10 +45,6 @@ function _DuelTutorialOverlay({ tutorialType, opener, onComplete }: DuelTutorial
     setHasType(effectiveTutorialType !== undefined)
   }, [tutorialType])
 
-  useEffect(() => {
-    console.log('opener.isOpen', opener.isOpen)
-  }, [opener.isOpen])
-
   const handleSelectTutorialType = (type: DuelTutorialLevel) => {
     setSelectedTutorialType(type)
     setCurrentSlide(0)

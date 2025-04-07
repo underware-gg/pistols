@@ -149,13 +149,11 @@ export default function DuelistProfile({
 
           <div ref={hitChanceContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
             <div ref={hitChanceNumberRef} className='NumberDelta HitChance' data-floated={floated}>
-              {/* { hitChanceDelta > 0 ? '+' : '' }{hitChanceDelta}% */}
               {hitChance}%
             </div>  
           </div>
           <div ref={damageContainerRef} className='NumberDeltaContainer NoMouse NoDrag'>
             <div ref={damageNumberRef} className='NumberDelta Damage' data-floated={floated}>
-              {/* { damageDelta > 0 ? '+' : '' }{damageDelta} */}
               {damage}
             </div>
           </div>

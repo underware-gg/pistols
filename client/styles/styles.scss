@@ -1863,6 +1863,50 @@ td {
   background-color: $color-bright;
 }
 
+.PaginationWood.ui.pagination.menu {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.PaginationWood.ui.pagination.menu .item {
+  border: none;
+  background-color: transparent;
+  width: aspect-width(3.8);
+  height: aspect-width(4.4);
+  font-size: aspect-width(2) !important;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 0 aspect-width(0.5) 0;
+  transition: transform 0.2s, filter 0.2s;
+}
+
+.PaginationWood.ui.pagination.menu .item:hover {
+  transform: scale(1.12);
+  filter: brightness(1.2);
+}
+
+.PaginationWood.ui.pagination.menu .item:first-child,
+.PaginationWood.ui.pagination.menu .item:last-child {
+  background: url('images/ui/leaderboards/button_background_all.png') no-repeat center/contain;
+}
+
+.PaginationWood.ui.pagination.menu .item:nth-child(2),
+.PaginationWood.ui.pagination.menu .item:nth-last-child(2) {
+  background: url('images/ui/leaderboards/button_background_page.png') no-repeat center/contain;
+}
+
+.PaginationWood.ui.pagination.menu .item:not(:first-child):not(:last-child):not(:nth-child(2)):not(:nth-last-child(2)) {
+  background: url('images/ui/leaderboards/button_background_number.png') no-repeat center/contain;
+}
+
+.PaginationWood.ui.pagination.menu .active.item {
+  background: url('images/ui/leaderboards/button_background_selected.png') no-repeat center/contain !important;
+  transform: scale(1.06);
+}
+
 //
 // <Modal>
 .ui.modal {
