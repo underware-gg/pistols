@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Grid, Image } from 'semantic-ui-react'
+import { Grid } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useStarknetContext, useConnectedController, getConnectorIcon } from '@underware/pistols-sdk/dojo'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
@@ -90,11 +90,13 @@ export default function WalletHeader({
 
       {!isConnected &&
         <Row columns={'equal'}>
+          {!hasFinishedTutorial &&
+            <Col verticalAlign='middle'>
+              <PlayGameButton large={false} />
+            </Col>
+          }
           <Col verticalAlign='middle'>
-            {hasFinishedTutorial ?
-              <ConnectButton large={false} />
-              : <PlayGameButton large={false} />
-            }
+            <ConnectButton large={false} />
           </Col>
         </Row>
       }
