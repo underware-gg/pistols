@@ -104,16 +104,16 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
     }
   }, [animated, isTutorial, isFinished, isCanceled, isExpired, statusText]);
 
-  useEffect(() => {
-    setTimeout(() => {
-        setShowDisplay(true);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //       setShowDisplay(true);
         
-        // Step 2: Start text animation after container appears
-        setTimeout(() => {
-          setAnimatedText("Honor has been satisfied in favor of fortunaregem!");
-        }, 500);
-      }, 300);
-  }, [])
+  //       // Step 2: Start text animation after container appears
+  //       setTimeout(() => {
+  //         setAnimatedText("Honor has been satisfied in favor of fortunaregem!");
+  //       }, 500);
+  //     }, 300);
+  // }, [])
 
   const RewardRow = ({ show, delay, children, animation = 'fadeIn' }) => {
     const baseStyle = {
