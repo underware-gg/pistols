@@ -106,7 +106,6 @@ mod tests {
     pub mod test_season;
     pub mod test_tournament;
     pub mod test_tutorial;
-    pub mod test_utils;
     // utils
     pub mod tester;
     pub mod prefabs;

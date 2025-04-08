@@ -140,8 +140,8 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_pact(self: @Store, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> Pact {
-        let pair: u128 = PactTrait::make_pair(address_a, address_b);
+    fn get_pact(self: @Store, duel_type: DuelType, a: u256, b: u256) -> Pact {
+        let pair: u128 = PactTrait::make_pair(a, b);
         (self.world.read_model((duel_type, pair),))
     }
 

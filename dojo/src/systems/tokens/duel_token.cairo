@@ -169,6 +169,7 @@ pub mod duel_token {
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
+    use pistols::utils::misc::{ContractAddressIntoU256};
     use pistols::utils::math::{MathTrait};
     use graffiti::url::{UrlImpl};
 
@@ -236,11 +237,11 @@ pub mod duel_token {
         //
         fn get_pact(self: @ContractState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
-            (store.get_pact(duel_type, address_a, address_b).duel_id)
+            (store.get_pact(duel_type, address_a.into(), address_b.into()).duel_id)
         }
         fn has_pact(self: @ContractState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
-            (store.get_pact(duel_type, address_a, address_b).duel_id != 0)
+            (store.get_pact(duel_type, address_a.into(), address_b.into()).duel_id != 0)
         }
 
         //-----------------------------------
