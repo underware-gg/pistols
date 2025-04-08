@@ -116,9 +116,9 @@ pub mod duel_token {
     component!(path: ERC721ComboComponent, storage: erc721_combo, event: ERC721ComboEvent);
     component!(path: TokenComponent, storage: token, event: TokenEvent);
     impl ERC721InternalImpl = ERC721Component::InternalImpl<ContractState>;
-    impl ERC721ComboInternalImpl = ERC721ComboComponent::InternalImpl<ContractState>;
     #[abi(embed_v0)]
     impl ERC721ComboMixinImpl = ERC721ComboComponent::ERC721ComboMixinImpl<ContractState>;
+    impl ERC721ComboInternalImpl = ERC721ComboComponent::InternalImpl<ContractState>;
     #[abi(embed_v0)]
     impl TokenComponentPublicImpl = TokenComponent::TokenComponentPublicImpl<ContractState>;
     impl TokenComponentInternalImpl = TokenComponent::TokenComponentInternalImpl<ContractState>;

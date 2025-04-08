@@ -1,22 +1,17 @@
 use starknet::{ContractAddress};
 
-    // based on:
-// use tournaments::presets::tournament::{ITournament};
+// based on: tournaments::presets::tournament::{ITournament};
 use tournaments::components::models::tournament::{Registration};
-use tournaments::components::models::schedule::{Phase};
+// use tournaments::components::models::schedule::{Phase};
 
 #[starknet::interface]
 pub trait IBudokanMock<TState> {
-    fn get_registration(
-        self: @TState, game_address: ContractAddress, token_id: u64,
-    ) -> Registration;
-    fn current_phase(self: @TState, tournament_id: u64) -> Phase;
-    fn get_tournament_id_for_token_id(
-        self: @TState, game_address: ContractAddress, token_id: u64,
-    ) -> u64;
+    // fn current_phase(self: @TState, tournament_id: u64) -> Phase;
+    fn get_registration(self: @TState, game_address: ContractAddress, token_id: u64) -> Registration;
+    fn get_tournament_id_for_token_id(self: @TState, game_address: ContractAddress, token_id: u64) -> u64;
 
     // mock helpers
-    fn mint_entry(ref self: TState, tournament_id: u64, recipient: ContractAddress) -> u64;
+    // fn mint_entry(ref self: TState, tournament_id: u64, recipient: ContractAddress) -> u64;
 }
 
 #[dojo::contract]
@@ -27,8 +22,13 @@ pub mod budokan_mock {
     // use dojo::model::{ModelStorage};
 
     use tournaments::components::models::tournament::{Registration};
-    use tournaments::components::models::schedule::{Phase};
+    // use tournaments::components::models::schedule::{Phase};
     // use pistols::utils::misc::{ZERO};
+
+    use pistols::tests::test_tournament::{
+        TOURNAMENT_ID_1,
+        // SETTINGS_ID,
+    };
 
     #[generate_trait]
     impl WorldDefaultImpl of WorldDefaultTrait {
@@ -41,34 +41,34 @@ pub mod budokan_mock {
     #[abi(embed_v0)]
     impl BudokanMockImpl of super::IBudokanMock<ContractState> {
 
-        fn get_registration(
-            self: @ContractState, game_address: ContractAddress, token_id: u64,
+        // fn current_phase(self: @ContractState, tournament_id: u64) -> Phase {
+        //     // (Phase::Scheduled)
+        //     (Phase::Registration)
+        //     // (Phase::Staging)
+        //     // (Phase::Live)
+        //     // (Phase::Submission)
+        //     // (Phase::Finalized)
+        // }
+
+        fn get_registration(self: @ContractState,
+            game_address: ContractAddress,
+            token_id: u64,
         ) -> Registration {
             (Registration {
                 game_address: game_address,
                 game_token_id: token_id,
-                tournament_id: 0,
-                entry_number: 0,
+                tournament_id: TOURNAMENT_ID_1,
+                entry_number: token_id.try_into().unwrap(),
                 has_submitted: false,
             })
         }
-        fn current_phase(self: @ContractState, tournament_id: u64) -> Phase {
-            // (Phase::Scheduled)
-            (Phase::Registration)
-            // (Phase::Staging)
-            // (Phase::Live)
-            // (Phase::Submission)
-            // (Phase::Finalized)
-        }
-        fn get_tournament_id_for_token_id(
-            self: @ContractState, game_address: ContractAddress, token_id: u64,
+        fn get_tournament_id_for_token_id(self: @ContractState,
+            game_address: ContractAddress,
+            token_id: u64,
         ) -> u64 {
-            (0)
+            (self.get_registration(game_address, token_id).tournament_id)
         }
 
-        fn mint_entry(ref self: ContractState, tournament_id: u64, recipient: ContractAddress) -> u64 {
-            (0)
-        }
     }
 
 }

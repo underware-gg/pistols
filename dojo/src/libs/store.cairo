@@ -45,6 +45,8 @@ pub use pistols::models::{
     tournament::{
         TournamentEntry, TournamentEntryValue,
         TournamentSettings, TournamentSettingsValue,
+        Tournament, TournamentValue,
+        TournamentRound, TournamentRoundValue,
     },
     events::{
         CallToActionEvent,
@@ -231,12 +233,30 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_budokan_token_metadata(self: @Store, token_id: u64) -> TokenMetadata {
-        (self.world.read_model(token_id))
+    fn get_tournament(self: @Store, tournament_id: u64) -> Tournament {
+        (self.world.read_model(tournament_id))
     }
     #[inline(always)]
-    fn get_budokan_token_metadata_value(self: @Store, token_id: u64) -> TokenMetadataValue {
-        (self.world.read_value(token_id))
+    fn get_tournament_value(self: @Store, tournament_id: u64) -> TournamentValue {
+        (self.world.read_value(tournament_id))
+    }
+
+    #[inline(always)]
+    fn get_tournament_round(self: @Store, tournament_id: u64, round_number: u8) -> TournamentRound {
+        (self.world.read_model((tournament_id, round_number),))
+    }
+    #[inline(always)]
+    fn get_tournament_round_value(self: @Store, tournament_id: u64, round_number: u8) -> TournamentRoundValue {
+        (self.world.read_value((tournament_id, round_number),))
+    }
+
+    #[inline(always)]
+    fn get_budokan_token_metadata(self: @Store, entry_id: u64) -> TokenMetadata {
+        (self.world.read_model(entry_id))
+    }
+    #[inline(always)]
+    fn get_budokan_token_metadata_value(self: @Store, entry_id: u64) -> TokenMetadataValue {
+        (self.world.read_value(entry_id))
     }
 
     //----------------------------------
@@ -337,6 +357,16 @@ pub impl StoreImpl of StoreTrait {
         self.world.write_model(model);
     }
 
+    #[inline(always)]
+    fn set_tournament(ref self: Store, model: @Tournament) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_tournament_round(ref self: Store, model: @TournamentRound) {
+        self.world.write_model(model);
+    }
+
     //----------------------------------
     // Single member setters
     // https://book.dojoengine.org/framework/world/api#read_member-and-read_member_of_models
@@ -367,6 +397,11 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_season_rules(self: @Store, season_id: u32) -> Rules {
         (self.world.read_member(Model::<SeasonConfig>::ptr_from_keys(season_id), selector!("rules")))
+    }
+
+    #[inline(always)]
+    fn get_tournament_entry_minter_address(self: @Store, entry_id: u64) -> ContractAddress {
+        (self.world.read_member(Model::<TokenMetadata>::ptr_from_keys(entry_id), selector!("minted_by")))
     }
 
     // setters

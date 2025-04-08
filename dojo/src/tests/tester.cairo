@@ -139,8 +139,8 @@ pub mod tester {
     //-------------------------------
     // Test world
 
-    const INITIAL_TIMESTAMP: u64 = 0x100000000;
-    const TIMESTEP: u64 = 0x1;
+    pub const INITIAL_TIMESTAMP: u64 = 0x100000000;
+    pub const TIMESTEP: u64 = 0x1;
 
     pub mod FLAGS {
         pub const GAME: u16       = 0b1;
@@ -222,14 +222,14 @@ pub mod tester {
         
         deploy_game     = deploy_game || approve;
         deploy_lords    = deploy_lords || deploy_game || deploy_duelist || approve;
-        deploy_admin    = deploy_admin || deploy_game || deploy_lords;
+        deploy_admin    = deploy_admin || deploy_game || deploy_lords || deploy_tournament;
         deploy_duel     = deploy_duel || deploy_game;
         deploy_pack     = deploy_pack || deploy_duelist;
         deploy_fame     = deploy_fame || deploy_game || deploy_duelist;
         deploy_fools    = deploy_fools || deploy_game;
         deploy_rng_mock = deploy_rng_mock || deploy_tutorial;
         deploy_bank     = deploy_bank || deploy_fame || deploy_lords || deploy_duelist;
-        deploy_vrf      = deploy_vrf || deploy_game || deploy_pack;
+        deploy_vrf      = deploy_vrf || deploy_game || deploy_pack || deploy_tournament;
         
         let mut resources: Array<TestResource> = array![
             // pistols models
@@ -250,6 +250,8 @@ pub mod tester {
             TestResource::Model(pistols::models::pool::m_Pool::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_TournamentEntry::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_TournamentSettings::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::tournament::m_Tournament::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::tournament::m_TournamentRound::TEST_CLASS_HASH),
             TestResource::Model(pistols::systems::components::token_bound::m_TokenBoundAddress::TEST_CLASS_HASH),
             // pistols events
             TestResource::Event(pistols::models::events::e_PlayerActivityEvent::TEST_CLASS_HASH),
@@ -764,18 +766,23 @@ pub mod tester {
     //
 
     // depends on use dojo::model::{Model};
+    #[inline(always)]
     pub fn set_Config(ref world: WorldStorage, model: @Config) {
         world.write_model_test(model);
     }
+    #[inline(always)]
     pub fn set_Duelist(ref world: WorldStorage, model: @Duelist) {
         world.write_model_test(model);
     }
+    #[inline(always)]
     pub fn set_SeasonScoreboard(ref world: WorldStorage, model: @SeasonScoreboard) {
         world.write_model_test(model);
     }
+    #[inline(always)]
     pub fn set_Challenge(ref world: WorldStorage, model: @Challenge) {
         world.write_model_test(model);
     }
+    #[inline(always)]
     pub fn set_Pack(ref world: WorldStorage, model: @Pack) {
         world.write_model_test(model);
     }

@@ -28,6 +28,7 @@ pub use pistols::interfaces::{
 pub use pistols::libs::store::{Store, StoreTrait};
 pub use pistols::models::config::{CONFIG, Config};
 pub use pistols::utils::misc::{ZERO};
+pub use tournaments::components::tournament::{ITournamentDispatcher, ITournamentDispatcherTrait};
 
 pub mod SELECTORS {
     // systems
@@ -243,7 +244,8 @@ pub impl DnsImpl of DnsTrait {
     fn fools_coin_protected_dispatcher(self: @WorldStorage) -> IFoolsCoinProtectedDispatcher {
         (IFoolsCoinProtectedDispatcher{ contract_address: self.fools_coin_address() })
     }
-    // need access to store...
+
+    // dispatchers that need access to the store...
     #[inline(always)]
     fn lords_dispatcher(self: @Store) -> Erc20Dispatcher {
         (Erc20Dispatcher{ contract_address: self.get_config_lords_address() })
@@ -252,6 +254,10 @@ pub impl DnsImpl of DnsTrait {
     #[inline(always)]
     fn vrf_dispatcher(self: @Store) -> IVrfProviderDispatcher {
         (IVrfProviderDispatcher{ contract_address: self.get_config_vrf_address() })
+    }
+    #[inline(always)]
+    fn budokan_dispatcher_from_entry_id(self: @Store, entry_id: u64) -> ITournamentDispatcher {
+        (ITournamentDispatcher{ contract_address: self.get_tournament_entry_minter_address(entry_id) })
     }
 
 

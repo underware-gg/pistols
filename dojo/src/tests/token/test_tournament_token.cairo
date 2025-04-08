@@ -3,29 +3,29 @@ use starknet::{ContractAddress};
 
 use pistols::systems::{
     tokens::{
-        tournament_token::{},
+        tournament_token::{ITournamentTokenProtectedDispatcher, ITournamentTokenProtectedDispatcherTrait},
     }
 };
 use pistols::models::{
     // tournament::{Tournament, TournamentTrait},
     tournament::{TournamentSettingsValue, TournamentType, TOURNAMENT_SETTINGS},
 };
-use tournaments::components::models::game::{TokenMetadata};
-
 // use pistols::interfaces::dns::{DnsTrait};
 // use pistols::types::constants::{CONST};
+
 use pistols::tests::tester::{
     tester,
     tester::{
         StoreTrait,
         TestSystems, FLAGS,
-        OWNER,
+        OWNER, OTHER,
         ITournamentTokenDispatcherTrait,
         IGameTokenDispatcherTrait,
     },
 };
 
 use openzeppelin_token::erc721::interface;
+use tournaments::components::models::game::{TokenMetadata};
 
 //
 // Setup
@@ -135,3 +135,27 @@ fn test_mint() {
     assert_eq!(token_metadata.minted_by, sys.budokan.contract_address, "token_metadata.minted_by");
     assert_eq!(token_metadata.player_name, PLAYER_NAME, "token_metadata.player_name");
 }
+
+//---------------------------------
+// protected calls
+//
+
+pub fn _protected(sys: @TestSystems) -> ITournamentTokenProtectedDispatcher {
+    (ITournamentTokenProtectedDispatcher{contract_address: (*sys.tournament).contract_address})
+}
+
+#[test]
+fn test_create_settings() {
+    let mut sys: TestSystems = setup();
+    _protected(@sys).create_settings();
+    // no panic!
+}
+
+#[test]
+#[should_panic(expected: ('TOURNAMENT: Caller not owner', 'ENTRYPOINT_FAILED'))]
+fn test_create_settings_not_owner() {
+    let mut sys: TestSystems = setup();
+    tester::impersonate(OTHER());
+    _protected(@sys).create_settings();
+}
+
