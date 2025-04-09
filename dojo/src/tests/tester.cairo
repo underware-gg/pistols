@@ -670,6 +670,14 @@ pub mod tester {
         (*sys.tournament).enlist_duelist(entry_id, duelist_id);
         _next_block();
     }
+    pub fn execute_join_duel(sys: @TestSystems, sender: ContractAddress,
+        entry_id: u64,
+    ) -> u128 {
+        impersonate(sender);
+        let duel_id: u128 = (*sys.tournament).join_duel(entry_id);
+        _next_block();
+        (duel_id)
+    }
 
     // ::game
     pub fn execute_commit_moves(system: @IGameDispatcher, sender: ContractAddress,

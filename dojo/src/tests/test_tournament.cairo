@@ -149,7 +149,7 @@ fn test_start_tournament_other_ok() {
 #[should_panic(expected: ('TOURNAMENT: Invalid entry', 'ENTRYPOINT_FAILED'))]
 fn test_start_tournament_invalid_entry() {
     let mut sys: TestSystems = tester::setup_world(FLAGS::TOURNAMENT);
-    let _tournament_id: u64 = tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
 }
 
 #[test]
@@ -157,7 +157,7 @@ fn test_start_tournament_invalid_entry() {
 fn test_start_tournament_not_startable() {
     let mut sys: TestSystems = tester::setup_world(FLAGS::TOURNAMENT);
     _mint(ref sys, OWNER()); // ENTRY_ID_1
-    let _tournament_id: u64 = tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
 }
 
 #[test]
@@ -166,8 +166,8 @@ fn test_start_tournament_already_started() {
     let mut sys: TestSystems = tester::setup_world(FLAGS::TOURNAMENT);
     _mint(ref sys, OWNER()); // ENTRY_ID_1
     tester::set_block_timestamp(TIMESTAMP_START);
-    let _tournament_id: u64 = tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
-    let _tournament_id: u64 = tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
 }
 
 
@@ -215,4 +215,104 @@ fn test_enlist_duelist_already_enlisted() {
     sys.tournament.enlist_duelist(entry_id_1, ID(OWNER()));
     assert!(!sys.tournament.can_enlist_duelist(entry_id_1, ID(OWNER())));
     sys.tournament.enlist_duelist(entry_id_1, ID(OWNER()));
+}
+
+
+//--------------------------------
+// join duel
+//
+
+#[test]
+fn test_join_duel() {
+    let mut sys: TestSystems = tester::setup_world(FLAGS::TOURNAMENT);
+    // mint+enlist 1
+    tester::impersonate(OWNER());
+    let entry_id_1: u64 = _mint(ref sys, OWNER());
+    tester::execute_enlist_duelist(@sys, OWNER(), entry_id_1, ID(OWNER()));
+    // mint+enlist 2
+    tester::impersonate(OTHER());
+    let entry_id_2: u64 = _mint(ref sys, OTHER());
+    sys.tournament.enlist_duelist(entry_id_2, ID(OTHER()));
+    // start tournament
+    tester::set_block_timestamp(TIMESTAMP_START);
+    let _tournament_id: u64 = tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    // join 1...
+    tester::impersonate(OWNER());
+    assert!(sys.tournament.can_join_duel(entry_id_1));
+    let duel_id_1: u128 = tester::execute_join_duel(@sys, OWNER(), entry_id_1);
+    assert_gt!(duel_id_1, 0, "duel_id_1");
+
+// TODO: check Challenge
+
+    // join 2...
+    tester::impersonate(OTHER());
+    assert!(sys.tournament.can_join_duel(entry_id_2));
+    let duel_id_2: u128 = tester::execute_join_duel(@sys, OTHER(), entry_id_2);
+    assert_gt!(duel_id_2, 0, "duel_id_2");
+
+// TODO: check Challenge
+
+}
+
+#[test]
+#[should_panic(expected: ('TOURNAMENT: Not your entry', 'ENTRYPOINT_FAILED'))]
+fn test_join_duel_invalid_entry() {
+    let mut sys: TestSystems = tester::setup_world(FLAGS::TOURNAMENT);
+    let entry_id: u64 = _mint(ref sys, OWNER());
+    // start...
+    tester::set_block_timestamp(TIMESTAMP_START);
+    tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    // panic...
+    tester::impersonate(OWNER());
+    assert!(!sys.tournament.can_join_duel(entry_id + 1));
+    tester::execute_join_duel(@sys, OWNER(), entry_id + 1);
+}
+
+#[test]
+#[should_panic(expected: ('TOURNAMENT: Not your entry', 'ENTRYPOINT_FAILED'))]
+fn test_join_duel_not_your_entry() {
+    let mut sys: TestSystems = tester::setup_world(FLAGS::TOURNAMENT);
+    let _entry_id_1: u64 = _mint(ref sys, OWNER());
+    let entry_id_2: u64 = _mint(ref sys, OTHER());
+    // start...
+    tester::set_block_timestamp(TIMESTAMP_START);
+    tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    // panic...
+    tester::impersonate(OWNER());
+    assert!(!sys.tournament.can_join_duel(entry_id_2));
+    tester::execute_join_duel(@sys, OWNER(), entry_id_2);
+}
+
+#[test]
+#[should_panic(expected: ('TOURNAMENT: Not playable', 'ENTRYPOINT_FAILED'))]
+fn test_join_duel_not_playable() {
+    let mut sys: TestSystems = tester::setup_world(FLAGS::TOURNAMENT);
+    let entry_id: u64 = _mint(ref sys, OWNER());
+    assert!(!sys.tournament.can_join_duel(entry_id));
+    tester::execute_join_duel(@sys, OWNER(), entry_id);
+}
+
+#[test]
+#[should_panic(expected: ('TOURNAMENT: Not started', 'ENTRYPOINT_FAILED'))]
+fn test_join_duel_not_started() {
+    let mut sys: TestSystems = tester::setup_world(FLAGS::TOURNAMENT);
+    let entry_id: u64 = _mint(ref sys, OWNER());
+    // trime traver only...
+    tester::set_block_timestamp(TIMESTAMP_START);
+    // panic...
+    assert!(!sys.tournament.can_join_duel(entry_id));
+    tester::execute_join_duel(@sys, OWNER(), entry_id);
+}
+
+#[test]
+#[should_panic(expected: ('TOURNAMENT: Not enlisted', 'ENTRYPOINT_FAILED'))]
+fn test_join_duel_not_enlisted() {
+    let mut sys: TestSystems = tester::setup_world(FLAGS::TOURNAMENT);
+    let entry_id: u64 = _mint(ref sys, OWNER());
+    // start...
+    tester::set_block_timestamp(TIMESTAMP_START);
+    tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    // panic...
+    assert!(!sys.tournament.can_join_duel(entry_id));
+    tester::execute_join_duel(@sys, OWNER(), entry_id);
 }
