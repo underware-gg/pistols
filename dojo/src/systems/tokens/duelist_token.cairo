@@ -505,7 +505,7 @@ pub mod duelist_token {
                     _ => {0},
                 };
                 values.lords_unlocked += (*bank_protected_dispatcher).release_lords_from_fame_to_be_burned(season_id, duel_id, release_bills.span());
-                IFameCoinDispatcher{contract_address: *bank_protected_dispatcher.contract_address}
+                IFameCoinDispatcher{contract_address: *fame_protected_dispatcher.contract_address}
                     .burn_from_token(starknet::get_contract_address(), duelist_id, total_to_burn.into());
             } else {
                 values.survived = true;

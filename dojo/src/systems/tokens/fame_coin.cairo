@@ -126,7 +126,7 @@ pub mod fame_coin {
     // Public
     //
     #[abi(embed_v0)]
-    impl FamePublicImpl of super::IFameCoinProtected<ContractState> {
+    impl FameCoinProtectedImpl of super::IFameCoinProtected<ContractState> {
         fn minted_duelist(ref self: ContractState,
             duelist_id: u128,
         ) {

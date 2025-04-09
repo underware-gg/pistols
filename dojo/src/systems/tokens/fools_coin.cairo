@@ -105,7 +105,7 @@ pub mod fools_coin {
     // Public
     //
     #[abi(embed_v0)]
-    impl FoolsPublicImpl of super::IFoolsCoinProtected<ContractState> {
+    impl FoolsCoinProtectedImpl of super::IFoolsCoinProtected<ContractState> {
         fn reward_player(ref self: ContractState,
             recipient: ContractAddress,
             amount: u128,
