@@ -77,8 +77,8 @@ pub trait ITournamentToken<TState> {
     fn get_tournament_id(self: @TState, entry_id: u64) -> u64;
     fn can_start_tournament(self: @TState, entry_id: u64) -> bool;
     fn start_tournament(ref self: TState, entry_id: u64) -> u64;
-    // fn can_enlist_duelist(self: @TState, entry_id: u64, duelist_id: u128) -> bool;
-    // fn enlist_duelist(ref self: TState, entry_id: u64, duelist_id: u128);
+    fn can_enlist_duelist(self: @TState, entry_id: u64, duelist_id: u128) -> bool;
+    fn enlist_duelist(ref self: TState, entry_id: u64, duelist_id: u128);
     // fn can_start_duel(self: @TState, entry_id: u64) -> bool;
     // fn start_duel(ref self: TState, entry_id: u64);
     // fn can_end_round(self: @TState, entry_id: u64) -> bool;
@@ -95,9 +95,9 @@ pub trait ITournamentTokenPublic<TState> {
     // - will shuffle initial bracket
     fn can_start_tournament(self: @TState, entry_id: u64) -> bool;
     fn start_tournament(ref self: TState, entry_id: u64) -> u64;
-    // // Phase 2 -- Enlist Duelist (per player)
-    // fn can_enlist_duelist(self: @TState, entry_id: u64, duelist_id: u128) -> bool;
-    // fn enlist_duelist(ref self: TState, entry_id: u64, duelist_id: u128);
+    // Phase 2 -- Enlist Duelist (per player)
+    fn can_enlist_duelist(self: @TState, entry_id: u64, duelist_id: u128) -> bool;
+    fn enlist_duelist(ref self: TState, entry_id: u64, duelist_id: u128);
     // // Phase 3 -- Play tournament (per player)
     // fn can_start_duel(self: @TState, entry_id: u64) -> bool;
     // fn start_duel(ref self: TState, entry_id: u64);
@@ -117,7 +117,7 @@ pub trait ITournamentTokenProtected<TState> {
 #[dojo::contract]
 pub mod tournament_token {
     use core::num::traits::Zero;
-    // use starknet::{ContractAddress};
+    use starknet::{ContractAddress};
     use dojo::world::{WorldStorage, IWorldDispatcherTrait};
 
     //-----------------------------------
@@ -173,12 +173,13 @@ pub mod tournament_token {
     //     DnsTrait,
     // };
     use pistols::models::{
+        duelist::{DuelistTrait},
         tournament::{
-            TournamentEntryValue,
+            TournamentEntry, TournamentEntryValue,
             TournamentSettings, TournamentSettingsValue, TournamentSettingsValueTrait,
-            TournamentType, TOURNAMENT_SETTINGS,
             Tournament, TournamentValue,
             TournamentRound,
+            TournamentType, TOURNAMENT_SETTINGS,
         },
     };
     use pistols::types::{
@@ -186,7 +187,7 @@ pub mod tournament_token {
     };
     use pistols::interfaces::dns::{
         DnsTrait, SELECTORS,
-        // IDuelistTokenDispatcherTrait,
+        IDuelistTokenDispatcherTrait,
         ITournamentDispatcher, ITournamentDispatcherTrait,
         IVrfProviderDispatcherTrait, Source,
     };
@@ -206,6 +207,7 @@ pub mod tournament_token {
         pub const BUDOKAN_NOT_STARTABLE: felt252    = 'TOURNAMENT: Not startable';
         pub const BUDOKAN_NOT_PLAYABLE: felt252     = 'TOURNAMENT: Not playable';
         pub const ALREADY_STARTED: felt252          = 'TOURNAMENT: Already started';
+        pub const ALREADY_ENLISTED: felt252         = 'TOURNAMENT: Already enlisted';
         pub const NOT_YOUR_ENTRY: felt252           = 'TOURNAMENT: Not your entry';
         pub const NOT_YOUR_DUELIST: felt252         = 'TOURNAMENT: Not your duelist';
         pub const DUELIST_IN_CHALLENGE: felt252     = 'TOURNAMENT: In a challenge';
@@ -334,10 +336,37 @@ pub mod tournament_token {
             (tournament_id)
         }
 
+        //-----------------------------------
+        // Phase 2 -- Enlist Duelist
+        //
+        fn can_enlist_duelist(self: @ContractState, entry_id: u64, duelist_id: u128) -> bool {
+            let store: Store = StoreTrait::new(self.world_default());
+            let caller: ContractAddress = starknet::get_caller_address();
+            (
+                self.is_owner_of(caller, entry_id.into()) &&
+                store.world.duelist_token_dispatcher().is_owner_of(caller, duelist_id.into()) &&
+                store.get_tournament_entry_value(entry_id).duelist_id.is_zero()
+            )
+        }
+        fn enlist_duelist(ref self: ContractState, entry_id: u64, duelist_id: u128) {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            // validate ownership
+            let caller: ContractAddress = starknet::get_caller_address();
+            assert(self.is_owner_of(caller, entry_id.into()) == true, Errors::NOT_YOUR_ENTRY);
+            assert(store.world.duelist_token_dispatcher().is_owner_of(caller, duelist_id.into()) == true, Errors::NOT_YOUR_DUELIST);
+            // enlist duelist in this tournament
+            let mut entry: TournamentEntry = store.get_tournament_entry(entry_id);
+            assert(entry.duelist_id.is_zero(), Errors::ALREADY_ENLISTED);
+            entry.duelist_id = duelist_id;
+            store.set_tournament_entry(@entry);
+            // validate and create DuelistAssignment
+            DuelistTrait::enter_tournament(ref store, duelist_id, entry_id);
+        }
+
         // //-----------------------------------
-        // // Phase 2 -- Enlist Duelist
+        // // Phase 3 -- Start Duel
         // //
-        // fn can_enlist_duelist(self: @ContractState, entry_id: u64, duelist_id: u128) -> bool {
+        // fn can_start_duel(self: @ContractState) -> bool {
         //     let store: Store = StoreTrait::new(self.world_default());
         //     let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
         //     let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
@@ -346,7 +375,7 @@ pub mod tournament_token {
         //         entry.duelist_id.is_non_zero()
         //     )
         // }
-        // fn enlist_duelist(ref self: ContractState, entry_id: u64, duelist_id: u128) {
+        // fn start_duel(ref self: ContractState, entry_id: u64) {
         //     let mut store: Store = StoreTrait::new(self.world_default());
         //     // budokan must be startable
         //     let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);

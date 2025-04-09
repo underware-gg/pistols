@@ -84,11 +84,12 @@ pub mod tester {
     //
 
     pub fn ZERO()      -> ContractAddress { starknet::contract_address_const::<0x0>() }
-    pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // duelists 1-2
-    pub fn OWNER2()    -> ContractAddress { starknet::contract_address_const::<0x2>() } // duelists 1-2
-    pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x3>() } // duelists 3-4
-    pub fn OTHER2()    -> ContractAddress { starknet::contract_address_const::<0x4>() } // duelists 3-4
-    pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x5>() } // duelists 5-6
+    pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // owner of duelists 1-2
+    pub fn OWNER2()    -> ContractAddress { starknet::contract_address_const::<0x2>() } // owner of duelists 1-2
+    pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x3>() } // owner of duelists 3-4
+    pub fn OTHER2()    -> ContractAddress { starknet::contract_address_const::<0x4>() } // owner of duelists 3-4
+    pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x5>() } // owner of duelists 5-6
+    pub fn BUMMER2()   -> ContractAddress { starknet::contract_address_const::<0x6>() } // owner of duelists 5-6
     pub fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x222>() }
     pub fn SPENDER()   -> ContractAddress { starknet::contract_address_const::<0x333>() }
     pub fn TREASURY()  -> ContractAddress { starknet::contract_address_const::<0x444>() }
@@ -122,8 +123,11 @@ pub mod tester {
     // set_contract_address : to define the address of the calling contract,
     // set_account_contract_address : to define the address of the account used for the current transaction.
     pub fn impersonate(address: ContractAddress) {
-        testing::set_contract_address(address);
-        testing::set_account_contract_address(address);
+        testing::set_contract_address(address);             // starknet::get_execution_info().contract_address
+        testing::set_account_contract_address(address);     // starknet::get_execution_info().tx_info.account_contract_address
+    }
+    pub fn get_impersonator() -> ContractAddress {
+        (starknet::get_execution_info().tx_info.account_contract_address)
     }
 
     #[inline(always)]
@@ -215,6 +219,7 @@ pub mod tester {
         let mut deploy_fame: bool = (flags & FLAGS::FAME) != 0;
         let mut deploy_account: bool = (flags & FLAGS::ACCOUNT) != 0;
         let mut deploy_tournament: bool = (flags & FLAGS::TOURNAMENT) != 0;
+        let mut deploy_duelist_mock: bool = false;
         let mut deploy_bank: bool = false;
         let mut deploy_pack: bool = false;
         let mut deploy_fools: bool = false;
@@ -230,6 +235,7 @@ pub mod tester {
         deploy_rng_mock = deploy_rng_mock || deploy_tutorial;
         deploy_bank     = deploy_bank || deploy_fame || deploy_lords || deploy_duelist;
         deploy_vrf      = deploy_vrf || deploy_game || deploy_pack || deploy_tournament;
+        deploy_duelist_mock = !deploy_duelist && (deploy_game || deploy_tournament);
         
         let mut resources: Array<TestResource> = array![
             // pistols models
@@ -270,12 +276,6 @@ pub mod tester {
             TestResource::Model(tournaments::components::models::game::m_SettingsDetails::TEST_CLASS_HASH),
             TestResource::Model(tournaments::components::models::game::m_SettingsCounter::TEST_CLASS_HASH),
         ];
-        if (deploy_rng_mock) {
-            resources.append(TestResource::Model(pistols::systems::rng_mock::m_MockedValue::TEST_CLASS_HASH));
-        }
-        if (!deploy_duelist && deploy_game) {
-            resources.append(TestResource::Model(pistols::tests::token::mock_duelist::m_MockDuelistOwners::TEST_CLASS_HASH));
-        }
 
         let mut contract_defs: Array<ContractDef> = array![];
 
@@ -338,7 +338,8 @@ pub mod tester {
                     ].span())
             );
         }
-        else if (deploy_game) {
+        else if (deploy_duelist_mock) {
+            resources.append(TestResource::Model(pistols::tests::token::mock_duelist::m_MockDuelistOwners::TEST_CLASS_HASH));
             resources.append(TestResource::Contract(mock_duelist::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duelist_token")
@@ -346,7 +347,7 @@ pub mod tester {
             );
         }
 
-        if (deploy_duelist) {
+        if (deploy_pack) {
             resources.append(TestResource::Contract(pack_token::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"pack_token")
@@ -410,6 +411,7 @@ pub mod tester {
         }
 
         if (deploy_rng_mock) {
+            resources.append(TestResource::Model(pistols::systems::rng_mock::m_MockedValue::TEST_CLASS_HASH));
             resources.append(TestResource::Contract(rng_mock::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"rng_mock")
@@ -649,6 +651,24 @@ pub mod tester {
         let new_state: ChallengeState = (*system).reply_duel(duel_id, token_id, accepted);
         _next_block();
         (new_state)
+    }
+
+    // ::tournament_token
+    pub fn execute_start_tournament(sys: @TestSystems, sender: ContractAddress,
+        entry_id: u64,
+    ) -> u64 {
+        impersonate(sender);
+        let tournament_id: u64 = (*sys.tournament).start_tournament(entry_id);
+        _next_block();
+        (tournament_id)
+    }
+    pub fn execute_enlist_duelist(sys: @TestSystems, sender: ContractAddress,
+        entry_id: u64,
+        duelist_id: u128,
+    ) {
+        impersonate(sender);
+        (*sys.tournament).enlist_duelist(entry_id, duelist_id);
+        _next_block();
     }
 
     // ::game

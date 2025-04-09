@@ -23,6 +23,7 @@ use pistols::tests::tester::{
         IGameTokenDispatcherTrait,
     },
 };
+// use pistols::systems::tokens::budokan_mock::budokan_mock::{TOURNAMENT_ID_1, TOURNAMENT_ID_2};
 
 use openzeppelin_token::erc721::interface;
 use tournaments::components::models::game::{TokenMetadata};
@@ -33,12 +34,9 @@ use tournaments::components::models::game::{TokenMetadata};
 
 const SETTINGS_ID: u32 = TOURNAMENT_SETTINGS::LAST_MAN_STANDING;
 
-const TOKEN_ID_0: u64 = 0;
-const TOKEN_ID_1: u64 = 1;
-const TOKEN_ID_2: u64 = 2;
-
-const TOURNAMENT_ID_1: u64 = 1000;
-const TOURNAMENT_ID_2: u64 = 1001;
+const ENTRY_ID_0: u64 = 0;
+const ENTRY_ID_1: u64 = 1;
+const ENTRY_ID_2: u64 = 2;
 
 const PLAYER_NAME: felt252 = 'Player';
 
@@ -86,8 +84,9 @@ fn test_initializer() {
 
     // budokan creator token
     assert_eq!(sys.tournament.total_supply(), 1, "total_supply");
-    assert_eq!(sys.tournament.owner_of(TOKEN_ID_0.into()), sys.tournament.contract_address, "owner_of(0)");
-    let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(TOKEN_ID_0);
+    assert_eq!(sys.tournament.owner_of(ENTRY_ID_0.into()), sys.tournament.contract_address, "owner_of(0)");
+    assert!(sys.tournament.is_owner_of(sys.tournament.contract_address, ENTRY_ID_0.into()), "is_owner_of(0)");
+    let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(ENTRY_ID_0);
     assert_eq!(token_metadata.player_name, 'Creator', "token_metadata.player_name");
     assert_eq!(token_metadata.minted_by, sys.tournament.contract_address, "token_metadata.minted_by");
 }
@@ -127,8 +126,9 @@ fn test_token_uri_invalid() {
 fn test_mint() {
     let mut sys: TestSystems = setup();
     let token_id: u64 = _mint(@sys, OWNER());
-    assert_eq!(token_id, TOKEN_ID_1, "token_id");
-    assert_eq!(sys.tournament.owner_of(TOKEN_ID_1.into()), OWNER(), "owner_of(1)");
+    assert_eq!(token_id, ENTRY_ID_1, "token_id");
+    assert_eq!(sys.tournament.owner_of(ENTRY_ID_1.into()), OWNER(), "owner_of(1)");
+    assert!(sys.tournament.is_owner_of(OWNER(), ENTRY_ID_1.into()), "is_owner_of(1)");
     assert_eq!(sys.tournament.total_supply(), 2, "total_supply");
     // check budokan components created
     let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(token_id);

@@ -25,10 +25,8 @@ pub mod budokan_mock {
     // use tournaments::components::models::schedule::{Phase};
     // use pistols::utils::misc::{ZERO};
 
-    use pistols::tests::test_tournament::{
-        TOURNAMENT_ID_1,
-        // SETTINGS_ID,
-    };
+    pub const TOURNAMENT_ID_1: u64 = 100;
+    pub const TOURNAMENT_ID_2: u64 = 200;
 
     #[generate_trait]
     impl WorldDefaultImpl of WorldDefaultTrait {
