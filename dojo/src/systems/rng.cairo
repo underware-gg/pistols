@@ -92,7 +92,8 @@ pub impl ShuffleImpl of ShuffleTrait {
     fn new(wrapped: @RngWrap, initial_seed: felt252, shuffle_size: u8, salt: felt252) -> Shuffle {
         let rng = IRngDispatcher{ contract_address: *wrapped.rng_address };
         let seed: felt252 = rng.reseed(initial_seed, salt, *wrapped.mocked);
-        let shuffler = ShufflerTrait::new(shuffle_size, rng.is_mocked());
+        let is_mocked: bool = (rng.is_mocked() && (*wrapped.mocked).len() > 0);
+        let shuffler = ShufflerTrait::new(shuffle_size, is_mocked);
         (Shuffle {
             seed,
             last_card: 0,
@@ -106,6 +107,7 @@ pub impl ShuffleImpl of ShuffleTrait {
             self.seed = BitwiseU256::shr(self.seed.into(), ShufflerTrait::BITS).try_into().unwrap();
         }
         self.last_card = self.shuffler.get_next(self.seed);
+// println!("draw_next(): {} of {} = {}", self.shuffler.pos, self.shuffler.size, self.last_card);
         (self.last_card)
     }
 }

@@ -577,7 +577,7 @@ type type_SELECTORS = {
   FAME_COIN: bigint, // cairo: felt252
   FOOLS_COIN: bigint, // cairo: felt252
   LORDS_MOCK: bigint, // cairo: felt252
-  VR_MOCK: bigint, // cairo: felt252
+  VRF_MOCK: bigint, // cairo: felt252
   CONFIG: bigint, // cairo: felt252
   SEASON_CONFIG: bigint, // cairo: felt252
   TOKEN_CONFIG: bigint, // cairo: felt252
@@ -596,7 +596,7 @@ export const SELECTORS: type_SELECTORS = {
   FAME_COIN: BigInt('0x0371b95cb7056eb2d21819662e973ed32c345c989aa9f6097e7811a5665a0b0a'), // selector_from_tag!("pistols-fame_coin")
   FOOLS_COIN: BigInt('0x058070034702ab2b03c2911459d7299e63048e70e3d41f77e1d806b4cb8f2dcd'), // selector_from_tag!("pistols-fools_coin")
   LORDS_MOCK: BigInt('0x02b1156e63a09854c3d8dba0cad93b41e1fc4662466a0ffc2a9ec9e54b4bc788'), // selector_from_tag!("pistols-lords_mock")
-  VR_MOCK: BigInt('0x07d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e'), // selector_from_tag!("pistols-vrf_mock")
+  VRF_MOCK: BigInt('0x07d13bd4624d7bc31b13c78648f762d0b293e1ca94e19173659859209082629e'), // selector_from_tag!("pistols-vrf_mock")
   CONFIG: BigInt('0x060742fa7259b7ce3ebc0a2dde90b740d1234c770199a822fa2e7cf779dc0392'), // selector_from_tag!("pistols-Config")
   SEASON_CONFIG: BigInt('0x0407b92d935dd7193931243082059cb7180309a73de27eea948ffa0649f6ebf3'), // selector_from_tag!("pistols-SeasonConfig")
   TOKEN_CONFIG: BigInt('0x056ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed'), // selector_from_tag!("pistols-TokenConfig")

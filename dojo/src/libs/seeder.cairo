@@ -1,14 +1,14 @@
 use starknet::{ContractAddress};
 
-use pistols::utils::hash::{hash_values, make_block_hash, FeltToLossy};
+use pistols::utils::hash::{hash_values, make_block_hash};
 
-pub fn make_seed(caller: ContractAddress, uuid: usize) -> u128 {
+pub fn make_seed(caller: ContractAddress, uuid: usize) -> felt252 {
     let hash: felt252 = hash_values([
         make_block_hash(),
         caller.into(),
         uuid.into(),
     ].span());
-    (hash.to_u128_lossy())
+    (hash)
 }
 
 

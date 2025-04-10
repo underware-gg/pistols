@@ -178,7 +178,7 @@ pub mod tournament_token {
             TournamentEntry, TournamentEntryValue,
             TournamentSettings, TournamentSettingsValue, TournamentSettingsValueTrait,
             Tournament, TournamentValue,
-            TournamentRound, TournamentRoundValue,
+            TournamentRound, TournamentRoundValue, TournamentRoundTrait,
             TournamentType, TOURNAMENT_SETTINGS,
         },
     };
@@ -191,6 +191,7 @@ pub mod tournament_token {
         ITournamentDispatcher, ITournamentDispatcherTrait,
         IVrfProviderDispatcherTrait, Source,
     };
+    use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use graffiti::url::{UrlImpl};
@@ -216,6 +217,8 @@ pub mod tournament_token {
         pub const DUELIST_IN_TOURNAMENT: felt252    = 'TOURNAMENT: In a tournament';
         pub const CALLER_NOT_OWNER: felt252         = 'TOURNAMENT: Caller not owner';
     }
+
+    pub const MAX_ENTRIES: u8 = 32;
 
     //*******************************
     // erc721
@@ -297,7 +300,7 @@ pub mod tournament_token {
             assert(self.erc721_combo.token_exists(entry_id.into()), Errors::INVALID_ENTRY);
             let store: Store = StoreTrait::new(self.world_default());
             // verify tournament not started
-            let tournament_id: u64 = self._get_tournament_id(@store, entry_id);
+            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_dispatcher(@store, entry_id);
             (tournament_id)
         }
 
@@ -310,7 +313,7 @@ pub mod tournament_token {
             }
             let store: Store = StoreTrait::new(self.world_default());
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
-            let tournament_id: u64 = self._get_tournament_id(@store, entry_id);
+            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_dispatcher(@store, entry_id);
             let tournament: TournamentValue = store.get_tournament_value(tournament_id);
             (
                 // correct lifecycle
@@ -326,13 +329,13 @@ pub mod tournament_token {
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             assert(token_metadata.lifecycle.can_start(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_STARTABLE);
             // verify tournament not started
-            let tournament_id: u64 = self._get_tournament_id(@store, entry_id);
+            let (budokan_dispatcher, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_dispatcher(@store, entry_id);
             let mut tournament: Tournament = store.get_tournament(tournament_id);
             assert(tournament.round_number.is_zero(), Errors::ALREADY_STARTED);
             tournament.round_number = 1;
             // initialize round
             let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_caller_address()));
-            let round: TournamentRound = self._initialize_round(tournament_id, 1, seed);
+            let round: TournamentRound = self._initialize_round(ref store, budokan_dispatcher, tournament_id, 1, seed);
             // store!
             store.set_tournament(@tournament);
             store.set_tournament_round(@round);
@@ -375,7 +378,7 @@ pub mod tournament_token {
         fn can_join_duel(self: @ContractState, entry_id: u64) -> bool {
             let store: Store = StoreTrait::new(self.world_default());
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
-            let tournament_id: u64 = self._get_tournament_id(@store, entry_id);
+            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_dispatcher(@store, entry_id);
             let tournament: TournamentValue = store.get_tournament_value(tournament_id);
 // TODO: validate TournamentRound?
             (
@@ -397,7 +400,7 @@ pub mod tournament_token {
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             assert(token_metadata.lifecycle.is_playable(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_PLAYABLE);
             // tournament has started
-            let tournament_id: u64 = self._get_tournament_id(@store, entry_id);
+            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_dispatcher(@store, entry_id);
             let tournament: TournamentValue = store.get_tournament_value(tournament_id);
             assert(tournament.round_number.is_non_zero(), Errors::NOT_STARTED);
             // entry not started (duelist must be empty)
@@ -449,21 +452,32 @@ pub mod tournament_token {
             });
         }
 
-        fn _get_tournament_id(self: @ContractState, store: @Store, entry_id: u64) -> u64 {
+        fn _get_budokan_dispatcher(self: @ContractState, store: @Store, entry_id: u64) -> (ITournamentDispatcher, u64) {
             let budokan_dispatcher: ITournamentDispatcher = store.budokan_dispatcher_from_entry_id(entry_id);
             let tournament_id: u64 = if (budokan_dispatcher.contract_address.is_non_zero()) {
                 budokan_dispatcher.get_tournament_id_for_token_id(starknet::get_contract_address(), entry_id)
             } else {0}; // invalid entry
-            (tournament_id)
+            (budokan_dispatcher, tournament_id)
         }
 
-        fn _initialize_round(ref self: ContractState, tournament_id: u64, round_number: u8, seed: felt252) -> TournamentRound {
-            let round: TournamentRound = TournamentRound {
+        fn _initialize_round(ref self: ContractState,
+            ref store: Store,
+            budokan_dispatcher: ITournamentDispatcher,
+            tournament_id: u64,
+            round_number: u8,
+            seed: felt252,
+        ) -> TournamentRound {
+            let entry_count: u32 = budokan_dispatcher.tournament_entries(tournament_id);
+            let mut round = TournamentRound {
                 tournament_id,
                 round_number,
-                bracket: 0x1234,
+                entry_count: core::cmp::min(entry_count, MAX_ENTRIES.into()).try_into().unwrap(),
+                bracket: 0,
                 results: 0,
             };
+            // shuffle entries
+            let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
+            round.shuffle(wrapped, seed);
             (round)
         }
     }

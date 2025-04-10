@@ -259,6 +259,9 @@ pub mod tester {
             TestResource::Model(pistols::models::tournament::m_Tournament::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_TournamentRound::TEST_CLASS_HASH),
             TestResource::Model(pistols::systems::components::token_bound::m_TokenBoundAddress::TEST_CLASS_HASH),
+            // mocks
+            TestResource::Model(pistols::systems::rng_mock::m_MockedValue::TEST_CLASS_HASH),
+            TestResource::Model(pistols::tests::token::mock_duelist::m_MockDuelistOwners::TEST_CLASS_HASH),
             // pistols events
             TestResource::Event(pistols::models::events::e_PlayerActivityEvent::TEST_CLASS_HASH),
             TestResource::Event(pistols::models::events::e_CallToActionEvent::TEST_CLASS_HASH),
@@ -339,7 +342,6 @@ pub mod tester {
             );
         }
         else if (deploy_duelist_mock) {
-            resources.append(TestResource::Model(pistols::tests::token::mock_duelist::m_MockDuelistOwners::TEST_CLASS_HASH));
             resources.append(TestResource::Contract(mock_duelist::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"duelist_token")
@@ -370,6 +372,7 @@ pub mod tester {
             );
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"budokan_mock")
+                    .with_init_calldata([].span())
                     // .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         }
@@ -411,7 +414,6 @@ pub mod tester {
         }
 
         if (deploy_rng_mock) {
-            resources.append(TestResource::Model(pistols::systems::rng_mock::m_MockedValue::TEST_CLASS_HASH));
             resources.append(TestResource::Contract(rng_mock::TEST_CLASS_HASH));
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"rng_mock")

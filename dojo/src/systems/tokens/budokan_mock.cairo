@@ -9,20 +9,23 @@ pub trait IBudokanMock<TState> {
     // fn current_phase(self: @TState, tournament_id: u64) -> Phase;
     fn get_registration(self: @TState, game_address: ContractAddress, token_id: u64) -> Registration;
     fn get_tournament_id_for_token_id(self: @TState, game_address: ContractAddress, token_id: u64) -> u64;
+    fn tournament_entries(self: @TState, tournament_id: u64) -> u32;
 
     // mock helpers
-    // fn mint_entry(ref self: TState, tournament_id: u64, recipient: ContractAddress) -> u64;
+    fn set_tournament_id(ref self: TState, tournament_id: u64);
 }
 
 #[dojo::contract]
 pub mod budokan_mock {
-    // use core::num::traits::Zero;
+    use core::num::traits::Zero;
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage};
-    // use dojo::model::{ModelStorage};
+    use dojo::model::{ModelStorage};
 
     use tournaments::components::models::tournament::{Registration};
     // use tournaments::components::models::schedule::{Phase};
+
+    use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
     // use pistols::utils::misc::{ZERO};
 
     pub const TOURNAMENT_ID_1: u64 = 100;
@@ -52,10 +55,13 @@ pub mod budokan_mock {
             game_address: ContractAddress,
             token_id: u64,
         ) -> Registration {
+            let mut world = self.world_default();
+            let mocked: MockedValue = world.read_model('tournament_id');
+            let tournament_id: u64 = mocked.value.try_into().unwrap();
             (Registration {
-                game_address: game_address,
+                game_address,
                 game_token_id: token_id,
-                tournament_id: TOURNAMENT_ID_1,
+                tournament_id: if (tournament_id.is_non_zero()) {tournament_id} else {TOURNAMENT_ID_1},
                 entry_number: token_id.try_into().unwrap(),
                 has_submitted: false,
             })
@@ -67,6 +73,21 @@ pub mod budokan_mock {
             (self.get_registration(game_address, token_id).tournament_id)
         }
 
+        fn tournament_entries(self: @ContractState, tournament_id: u64) -> u32 {
+            if (tournament_id == TOURNAMENT_ID_1) {(5)}
+            else if (tournament_id == TOURNAMENT_ID_2) {(2)}
+            else {(0)}
+        }
+
+        fn set_tournament_id(ref self: ContractState, tournament_id: u64) {
+            let mut world = self.world_default();
+            world.write_model(
+                @MockedValueTrait::new(
+                    'tournament_id',
+                    tournament_id.into(),
+                )
+            );
+        }
     }
 
 }

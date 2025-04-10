@@ -46,7 +46,7 @@ pub mod SELECTORS {
     pub const FOOLS_COIN: felt252 = selector_from_tag!("pistols-fools_coin");
     // mocks
     pub const LORDS_MOCK: felt252 = selector_from_tag!("pistols-lords_mock");
-    pub const VR_MOCK: felt252 = selector_from_tag!("pistols-vrf_mock");
+    pub const VRF_MOCK: felt252 = selector_from_tag!("pistols-vrf_mock");
     // models
     pub const CONFIG: felt252 = selector_from_tag!("pistols-Config");
     pub const SEASON_CONFIG: felt252 = selector_from_tag!("pistols-SeasonConfig");
