@@ -198,6 +198,7 @@ pub mod tournament_token {
 
     use tournaments::components::models::{
         game::{TokenMetadataValue},
+        tournament::{Registration},
     };
     use tournaments::components::libs::{
         lifecycle::{LifecycleTrait},
@@ -211,6 +212,7 @@ pub mod tournament_token {
         pub const ALREADY_ENLISTED: felt252         = 'TOURNAMENT: Already enlisted';
         pub const NOT_YOUR_ENTRY: felt252           = 'TOURNAMENT: Not your entry';
         pub const NOT_YOUR_DUELIST: felt252         = 'TOURNAMENT: Not your duelist';
+        pub const INVALID_DUELIST: felt252          = 'TOURNAMENT: Invalid duelist';
         pub const NOT_ENLISTED: felt252             = 'TOURNAMENT: Not enlisted';
         pub const NOT_STARTED: felt252              = 'TOURNAMENT: Not started';
         pub const DUELIST_IN_CHALLENGE: felt252     = 'TOURNAMENT: In a challenge';
@@ -300,7 +302,7 @@ pub mod tournament_token {
             assert(self.erc721_combo.token_exists(entry_id.into()), Errors::INVALID_ENTRY);
             let store: Store = StoreTrait::new(self.world_default());
             // verify tournament not started
-            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_dispatcher(@store, entry_id);
+            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_tournament_id(@store, entry_id);
             (tournament_id)
         }
 
@@ -313,7 +315,7 @@ pub mod tournament_token {
             }
             let store: Store = StoreTrait::new(self.world_default());
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
-            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_dispatcher(@store, entry_id);
+            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_tournament_id(@store, entry_id);
             let tournament: TournamentValue = store.get_tournament_value(tournament_id);
             (
                 // correct lifecycle
@@ -329,7 +331,7 @@ pub mod tournament_token {
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             assert(token_metadata.lifecycle.can_start(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_STARTABLE);
             // verify tournament not started
-            let (budokan_dispatcher, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_dispatcher(@store, entry_id);
+            let (budokan_dispatcher, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_tournament_id(@store, entry_id);
             let mut tournament: Tournament = store.get_tournament(tournament_id);
             assert(tournament.round_number.is_zero(), Errors::ALREADY_STARTED);
             tournament.round_number = 1;
@@ -362,14 +364,26 @@ pub mod tournament_token {
             // validate ownership
             let caller: ContractAddress = starknet::get_caller_address();
             assert(self.is_owner_of(caller, entry_id.into()) == true, Errors::NOT_YOUR_ENTRY);
+            assert(duelist_id.is_non_zero(), Errors::INVALID_DUELIST);
             assert(store.world.duelist_token_dispatcher().is_owner_of(caller, duelist_id.into()) == true, Errors::NOT_YOUR_DUELIST);
             // enlist duelist in this tournament
-            let mut entry: TournamentEntry = store.get_tournament_entry(entry_id);
-            assert(entry.duelist_id.is_zero(), Errors::ALREADY_ENLISTED);
-            entry.duelist_id = duelist_id;
-            store.set_tournament_entry(@entry);
-            // validate and create DuelistAssignment
-            DuelistTrait::enter_tournament(ref store, duelist_id, entry_id);
+            let registration: Option<Registration> = self._get_budokan_registration(@store, entry_id);
+            match registration {
+                Option::Some(registration) => {
+                    let mut entry: TournamentEntry = store.get_tournament_entry(entry_id);
+                    assert(entry.duelist_id.is_zero(), Errors::ALREADY_ENLISTED);
+                    entry.tournament_id = registration.tournament_id;
+                    entry.entry_number = registration.entry_number.try_into().unwrap();
+                    entry.duelist_id = duelist_id;
+                    store.set_tournament_entry(@entry);
+                    // validate and create DuelistAssignment
+                    DuelistTrait::enter_tournament(ref store, duelist_id, entry_id);
+                },
+                Option::None => {
+                    // should never get here since entry is owned and exists
+                    assert(false, Errors::INVALID_ENTRY);
+                },
+            }
         }
 
         //-----------------------------------
@@ -378,18 +392,18 @@ pub mod tournament_token {
         fn can_join_duel(self: @ContractState, entry_id: u64) -> bool {
             let store: Store = StoreTrait::new(self.world_default());
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
-            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_dispatcher(@store, entry_id);
-            let tournament: TournamentValue = store.get_tournament_value(tournament_id);
+            let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
+            let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
 // TODO: validate TournamentRound?
             (
                 // owns entry
                 self.is_owner_of(starknet::get_caller_address(), entry_id.into()) &&
                 // correct lifecycle
                 token_metadata.lifecycle.is_playable(starknet::get_block_timestamp()) &&
-                // tournament has started
-                tournament.round_number.is_non_zero() &&
                 // enlisted
-                store.get_tournament_entry_value(entry_id).duelist_id.is_non_zero()
+                entry.tournament_id.is_non_zero() &&
+                // tournament has started
+                tournament.round_number.is_non_zero()
             )
         }
         fn join_duel(ref self: ContractState, entry_id: u64) -> u128 {
@@ -399,15 +413,14 @@ pub mod tournament_token {
             // budokan must be playable
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             assert(token_metadata.lifecycle.is_playable(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_PLAYABLE);
-            // tournament has started
-            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_dispatcher(@store, entry_id);
-            let tournament: TournamentValue = store.get_tournament_value(tournament_id);
-            assert(tournament.round_number.is_non_zero(), Errors::NOT_STARTED);
             // entry not started (duelist must be empty)
             let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
-            assert(entry.duelist_id.is_non_zero(), Errors::NOT_ENLISTED);
+            assert(entry.tournament_id.is_non_zero(), Errors::NOT_ENLISTED);
+            // tournament has started
+            let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
+            assert(tournament.round_number.is_non_zero(), Errors::NOT_STARTED);
             // join...
-            let _round: TournamentRoundValue = store.get_tournament_round_value(tournament_id, tournament.round_number);
+            let _round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.round_number);
 
             // TODO: if duel NOT started (player)
             // TODO: if duel NOT started (opponent)
@@ -452,12 +465,20 @@ pub mod tournament_token {
             });
         }
 
-        fn _get_budokan_dispatcher(self: @ContractState, store: @Store, entry_id: u64) -> (ITournamentDispatcher, u64) {
+        fn _get_budokan_tournament_id(self: @ContractState, store: @Store, entry_id: u64) -> (ITournamentDispatcher, u64) {
             let budokan_dispatcher: ITournamentDispatcher = store.budokan_dispatcher_from_entry_id(entry_id);
             let tournament_id: u64 = if (budokan_dispatcher.contract_address.is_non_zero()) {
                 budokan_dispatcher.get_tournament_id_for_token_id(starknet::get_contract_address(), entry_id)
             } else {0}; // invalid entry
             (budokan_dispatcher, tournament_id)
+        }
+
+        fn _get_budokan_registration(self: @ContractState, store: @Store, entry_id: u64) -> Option<Registration> {
+            let budokan_dispatcher: ITournamentDispatcher = store.budokan_dispatcher_from_entry_id(entry_id);
+            (if (budokan_dispatcher.contract_address.is_non_zero())
+                {Option::Some(budokan_dispatcher.get_registration(starknet::get_contract_address(), entry_id))}
+                else {Option::None}
+            )
         }
 
         fn _initialize_round(ref self: ContractState,

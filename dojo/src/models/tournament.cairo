@@ -8,6 +8,8 @@ pub struct TournamentEntry {
     #[key]
     pub entry_id: u64,      // token id
     //------
+    pub tournament_id: u64, // budokan tournament_id
+    pub entry_number: u8,   // entry number in the tournament
     pub duelist_id: u128,   // enlisted duelist id
     pub score: u32,         // budokan score
     pub points: u16,        // duelist points
