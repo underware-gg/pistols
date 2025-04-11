@@ -86,7 +86,9 @@ fn test_initializer() {
     // settings created
     let settings: TournamentSettingsValue = sys.store.get_tournament_settings_value(TOURNAMENT_SETTINGS::LAST_MAN_STANDING);
     assert_eq!(settings.tournament_type, TournamentType::LastManStanding, "Should eq LastManStanding");
-    assert_eq!(settings.required_fame, 3000, "Should eq 3000");
+    assert_eq!(settings.min_lives, 3, "Should eq 3");
+    assert_eq!(settings.max_lives, 3, "Should eq 3");
+    assert_eq!(settings.lives_staked, 1, "Should eq 1");
 
     // budokan creator token
     assert_eq!(sys.tournaments.total_supply(), 1, "total_supply");

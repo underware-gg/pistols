@@ -1,3 +1,4 @@
+use pistols::types::timestamp::{Period};
 
 //------------------------------------
 // Tournament entry (tournament_token)
@@ -26,7 +27,9 @@ pub struct TournamentSettings {
     pub settings_id: u32,
     //------
     pub tournament_type: TournamentType,
-    pub required_fame: u128,
+    pub min_lives: u8,
+    pub max_lives: u8,
+    pub lives_staked: u8,
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
@@ -61,9 +64,38 @@ pub struct TournamentRound {
     #[key]
     pub round_number: u8,
     //------
-    pub entry_count: u8,
+    pub entry_count: u8,        // participating in this round
+    pub timestamps: Period,     // will never expire after tournament
     pub bracket: u256,          // duelist pairings: 32 * 8-bit slots
     pub results: u64,           // bitmap: 32 * 2-bit slots (????)
+}
+
+//------------------------------------
+// Links tournament rounds to its Duels
+//
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct TournamentToChallenge {
+    #[key]
+    pub keys: TournamentDuelKeys,
+    //-------------------------
+    pub duel_id: u128,
+}
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct ChallengeToTournament {
+    #[key]
+    pub duel_id: u128,
+    //-------------------------
+    pub keys: TournamentDuelKeys,
+}
+
+#[derive(Copy, Drop, Serde, IntrospectPacked)]
+pub struct TournamentDuelKeys {
+    pub tournament_id: u64,
+    pub round_number: u8,
+    pub entry_number_a: u8,     // min(entry_number_a, entry_number_b)
+    pub entry_number_b: u8,     // max(entry_number_a, entry_number_b)
 }
 
 
@@ -148,6 +180,7 @@ mod unit {
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
     use pistols::types::shuffler::{ShufflerTrait};
+    use pistols::types::timestamp::{Period};
     use pistols::utils::bitwise::{BitwiseU256};
     use pistols::tests::tester::{tester};
 
@@ -158,12 +191,17 @@ mod unit {
             entry_count,
             bracket: 0,
             results: 0,
+            timestamps: Period {
+                start: 0,
+                end: 0,
+            },
         };
         round.shuffle(wrapped, 0x3453534534534543);
         let round_value = TournamentRoundValue {
             entry_count: round.entry_count,
             bracket: round.bracket,
             results: round.results,
+            timestamps: round.timestamps,
         };
         // check pairings
         let is_odd: bool = (entry_count % 2) == 1;

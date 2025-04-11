@@ -47,6 +47,9 @@ pub use pistols::models::{
         TournamentSettings, TournamentSettingsValue,
         Tournament, TournamentValue,
         TournamentRound, TournamentRoundValue,
+        TournamentToChallenge, TournamentToChallengeValue,
+        ChallengeToTournament, ChallengeToTournamentValue,
+        TournamentDuelKeys,
     },
     events::{
         CallToActionEvent,
@@ -251,6 +254,16 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
+    fn get_tournament_to_challenge_value(self: @Store, keys: @TournamentDuelKeys) -> TournamentToChallengeValue {
+        (self.world.read_value(*keys))
+    }
+    #[inline(always)]
+    fn get_challenge_to_tournament_value(self: @Store, duel_id: u128) -> ChallengeToTournamentValue {
+        (self.world.read_value(duel_id))
+    }
+    
+
+    #[inline(always)]
     fn get_budokan_token_metadata(self: @Store, entry_id: u64) -> TokenMetadata {
         (self.world.read_model(entry_id))
     }
@@ -364,6 +377,15 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_tournament_round(ref self: Store, model: @TournamentRound) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_challenge_to_tournament(ref self: Store, model: @ChallengeToTournament) {
+        self.world.write_model(model);
+    }
+    #[inline(always)]
+    fn set_tournament_to_challenge(ref self: Store, model: @TournamentToChallenge) {
         self.world.write_model(model);
     }
 

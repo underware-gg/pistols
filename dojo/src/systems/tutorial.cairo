@@ -115,7 +115,6 @@ pub mod tutorial {
                 premise: Premise::Lesson,
                 quote: level.quote(),
                 lives_staked: 1,
-                tournament_id: 0,
                 // duelists
                 address_a: starknet::get_caller_address(),
                 address_b: starknet::get_caller_address(),

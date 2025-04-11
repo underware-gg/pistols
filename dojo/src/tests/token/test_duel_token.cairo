@@ -148,7 +148,6 @@ fn test_token_uri() {
         premise: Premise::Honour,
         quote: 'For honour!!!',
         lives_staked: 1,
-        tournament_id: 0,
         // duelists
         address_a: OWNER(),
         address_b: OTHER()  ,

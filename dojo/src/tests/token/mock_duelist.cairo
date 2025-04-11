@@ -40,6 +40,7 @@ pub mod duelist_token {
     use pistols::tests::tester::tester::{
         OWNER, OWNED_BY_OWNER,
         OTHER, OWNED_BY_OTHER,
+        PLAYER_1, PLAYER_2,
     };
 
     #[generate_trait]
@@ -77,6 +78,8 @@ pub mod duelist_token {
             // hard-coded owners
             if (token_id.low == OWNED_BY_OWNER()) { return OWNER(); }
             if (token_id.low == OWNED_BY_OTHER()) { return OTHER(); }
+            if (token_id.low == PLAYER_1().duelist_id) { return PLAYER_1().address; }
+            if (token_id.low == PLAYER_2().duelist_id) { return PLAYER_2().address; }
 
             // low part is always the owner address
             let as_felt: felt252 = token_id.low.into();

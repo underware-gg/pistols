@@ -99,6 +99,34 @@ pub mod tester {
     pub fn OWNED_BY_OWNER() -> u128 { 0xeeee }
     pub fn OWNED_BY_OTHER() -> u128 { 0xdddd }
 
+    pub struct TestPlayer {
+        pub address: ContractAddress,
+        pub duelist_id: u128,
+        pub entry_number: u8,
+    }
+    pub fn PLAYER_1() -> TestPlayer {(TestPlayer {
+        address: starknet::contract_address_const::<0xa0001>(),
+        duelist_id: 0xd0001,
+        entry_number: 1,
+    })}
+    pub fn PLAYER_2() -> TestPlayer {(TestPlayer {
+        address: starknet::contract_address_const::<0xa0002>(),
+        duelist_id: 0xd0002,
+        entry_number: 2,
+    })}
+    pub fn PLAYER_3() -> TestPlayer {(TestPlayer {
+        address: starknet::contract_address_const::<0xa0003>(),
+        duelist_id: 0xd0003,
+        entry_number: 4,
+    })}
+    pub fn PLAYER_4() -> TestPlayer {(TestPlayer {
+        address: starknet::contract_address_const::<0xa0004>(),
+        duelist_id: 0xd0004,
+        entry_number: 3,
+    })}
+
+    
+
     pub const SEASON_ID_1: u32 = 1;
     pub const SEASON_ID_2: u32 = 2;
 
@@ -255,6 +283,8 @@ pub mod tester {
             TestResource::Model(pistols::models::tournament::m_TournamentSettings::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_Tournament::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_TournamentRound::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::tournament::m_TournamentToChallenge::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::tournament::m_ChallengeToTournament::TEST_CLASS_HASH),
             TestResource::Model(pistols::systems::components::token_bound::m_TokenBoundAddress::TEST_CLASS_HASH),
             // mocks
             TestResource::Model(pistols::systems::rng_mock::m_MockedValue::TEST_CLASS_HASH),
