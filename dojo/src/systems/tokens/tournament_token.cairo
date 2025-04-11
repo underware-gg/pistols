@@ -83,7 +83,6 @@ pub trait ITournamentToken<TState> {
     fn join_duel(ref self: TState, entry_id: u64) -> u128;
     // fn can_end_round(self: @TState, entry_id: u64) -> bool;
     // fn end_round(ref self: TState, entry_id: u64);
-    fn calc_duel_id(self: @TState, entry_id: u64, round_number: u8) -> u128;
 }
 
 // Exposed to clients
@@ -107,8 +106,6 @@ pub trait ITournamentTokenPublic<TState> {
     // // - or end tournament if end conditions met
     // fn can_end_round(self: @TState, entry_id: u64) -> bool;
     // fn end_round(ref self: TState, entry_id: u64);
-    // misc
-    fn calc_duel_id(self: @TState, entry_id: u64, round_number: u8) -> u128;
 }
 
 // Exposed to world and admins
@@ -176,7 +173,6 @@ pub mod tournament_token {
     //     DnsTrait,
     // };
     use pistols::models::{
-        challenge::{ChallengeTrait},
         duelist::{DuelistTrait},
         tournament::{
             TournamentEntry, TournamentEntryValue,
@@ -433,22 +429,6 @@ pub mod tournament_token {
 
 
             (1)
-        }
-
-        fn calc_duel_id(self: @ContractState,
-            entry_id: u64,
-            round_number: u8,
-        ) -> u128 {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
-            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, round_number);
-            let opponent_entry_number: u8 = round.get_opponent_entry_number(entry.entry_number);
-            (ChallengeTrait::calc_tournament_duel_id(
-                entry.tournament_id,
-                round_number,
-                entry.entry_number,
-                opponent_entry_number, // will be zero if round not started or not paired (odd entries)
-            ))
         }
     }
 
