@@ -71,6 +71,7 @@ pub struct TournamentRound {
 //---------------------------
 // Traits
 //
+use pistols::systems::tokens::tournament_token::tournament_token::{MAX_ENTRIES};
 use pistols::systems::rng::{RngWrap, Shuffle, ShuffleTrait};
 use pistols::utils::bitwise::{BitwiseU256};
 
@@ -83,15 +84,16 @@ pub impl TournamentSettingsValueImpl of TournamentSettingsValueTrait {
 
 #[generate_trait]
 pub impl TournamentRoundImpl of TournamentRoundTrait {
+    const SHUFFLE_SALT: felt252 = 'tournament_round';
     fn shuffle(ref self: TournamentRound, wrapped: @RngWrap, seed: felt252) {
-        let mut shuffle: Shuffle = ShuffleTrait::new(wrapped, seed, self.entry_count, 'tournament_round');
+        let mut shuffle: Shuffle = ShuffleTrait::new(wrapped, seed, self.entry_count, Self::SHUFFLE_SALT);
         let mut i: u8 = 0;
         while (i < self.entry_count / 2) {
             let entry_a: u8 = shuffle.draw_next();
             let entry_b: u8 = shuffle.draw_next();
+            // println!("shuffle({}): {}-{} of {}", i, entry_a, entry_b, self.entry_count);
             let index_a: usize = entry_a.into() - 1;
             let index_b: usize = entry_b.into() - 1;
-            // println!("shuffle({}): {}-{} of {}", i, entry_a, entry_b, self.entry_count);
             self.bracket = BitwiseU256::set_byte(self.bracket, index_a, entry_b.into());
             self.bracket = BitwiseU256::set_byte(self.bracket, index_b, entry_a.into());
             i += 1;
@@ -99,6 +101,18 @@ pub impl TournamentRoundImpl of TournamentRoundTrait {
     }
 }
 
+#[generate_trait]
+pub impl TournamentRoundValueImpl of TournamentRoundValueTrait {
+    fn get_opponent_entry_number(self: @TournamentRoundValue, entry_number: u8) -> u8 {
+        (if (entry_number > 0 && entry_number <= MAX_ENTRIES) {
+            let index: usize = (entry_number - 1).try_into().unwrap();
+            let entry: u8 = BitwiseU256::get_byte(*self.bracket, index).try_into().unwrap();
+            (entry)
+        } else {
+            (0)
+        })
+    }
+}
 
 //---------------------------
 // Converters
@@ -128,26 +142,29 @@ pub impl TournamentTypeDebug of core::fmt::Debug<TournamentType> {
 #[cfg(test)]
 mod unit {
     use super::{
-        TournamentRound, TournamentRoundTrait,
+        TournamentRound, TournamentRoundTrait, TournamentRoundValue, TournamentRoundValueTrait,
     };
     use pistols::systems::tokens::tournament_token::tournament_token::{MAX_ENTRIES};
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
+    use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
+    use pistols::types::shuffler::{ShufflerTrait};
     use pistols::utils::bitwise::{BitwiseU256};
-    use pistols::libs::seeder::{make_seed};
     use pistols::tests::tester::{tester};
 
-    fn _test_tournament_round(entry_count: u8) {
-        let mut sys: tester::TestSystems = tester::setup_world(tester::FLAGS::MOCK_RNG);
-        let mut round: TournamentRound = TournamentRound {
+    fn _test_tournament_round(wrapped: @RngWrap, entry_count: u8) -> @TournamentRoundValue {
+        let mut round = TournamentRound {
             tournament_id: 1,
             round_number: 1,
             entry_count,
             bracket: 0,
             results: 0,
         };
-        let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
-        let seed: felt252 = make_seed(sys.rng.contract_address, 1);
-        round.shuffle(wrapped, seed);
+        round.shuffle(wrapped, 0x3453534534534543);
+        let round_value = TournamentRoundValue {
+            entry_count: round.entry_count,
+            bracket: round.bracket,
+            results: round.results,
+        };
         // check pairings
         let is_odd: bool = (entry_count % 2) == 1;
         let mut not_paired: u8 = 0;
@@ -168,6 +185,11 @@ mod unit {
                 let index_a: usize = (entry_b - 1).try_into().unwrap();
                 // println!("___entry({}): [{}]={} > [{}]={}", _index_a, index_a, entry_a, index_b, entry_b);
                 assert_eq!(_index_a, index_a, "({}) _index_a", i);
+                // match opponents
+                let opponent_a: u256 = round_value.get_opponent_entry_number(entry_b.try_into().unwrap()).into();
+                let opponent_b: u256 = round_value.get_opponent_entry_number(entry_a.try_into().unwrap()).into();
+                assert_eq!(opponent_a, entry_a, "({}) opponent_a", i);
+                assert_eq!(opponent_b, entry_b, "({}) opponent_b", i);
             }
             // println!("___entry({}): [{}]={}", i, _index_a, entry_a);
             i += 1;
@@ -177,20 +199,42 @@ mod unit {
         } else {
             assert_eq!(not_paired, 0, "!is_odd: not_paired={}", not_paired);
         }
+        (@round_value)
     }
 
     #[test]
     fn test_tournament_round_shuffle_max() {
-        _test_tournament_round(MAX_ENTRIES.into());
+        let mut sys: tester::TestSystems = tester::setup_world(tester::FLAGS::MOCK_RNG);
+        let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+        _test_tournament_round(wrapped, MAX_ENTRIES.into());
     }
 
     #[test]
     fn test_tournament_round_shuffle_min() {
-        _test_tournament_round(2);
+        let mut sys: tester::TestSystems = tester::setup_world(tester::FLAGS::MOCK_RNG);
+        let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+        let round_value = _test_tournament_round(wrapped, 2);
+        assert_eq!(round_value.get_opponent_entry_number(0), 0);
+        assert_eq!(round_value.get_opponent_entry_number(1), 2);
+        assert_eq!(round_value.get_opponent_entry_number(2), 1);
+        assert_eq!(round_value.get_opponent_entry_number(3), 0);
     }
 
     #[test]
     fn test_tournament_round_shuffle_odd() {
-        _test_tournament_round(17);
+        let mut sys: tester::TestSystems = tester::setup_world(tester::FLAGS::MOCK_RNG);
+        let map: Span<MockedValue> = [
+            MockedValueTrait::new(TournamentRoundTrait::SHUFFLE_SALT, ShufflerTrait::mock_to_seed([1, 4, 5, 2, 3].span())),
+        ].span();
+        let wrapped: @RngWrap = RngWrapTrait::wrap(sys.rng.contract_address, map);
+        let round_value = _test_tournament_round(wrapped, 5);
+        assert_eq!(round_value.get_opponent_entry_number(0), 0);
+        assert_eq!(round_value.get_opponent_entry_number(1), 4);
+        assert_eq!(round_value.get_opponent_entry_number(2), 5);
+        assert_eq!(round_value.get_opponent_entry_number(3), 0);
+        assert_eq!(round_value.get_opponent_entry_number(4), 1);
+        assert_eq!(round_value.get_opponent_entry_number(5), 2);
+        assert_eq!(round_value.get_opponent_entry_number(6), 0);
     }
+
 }

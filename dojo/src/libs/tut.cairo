@@ -29,6 +29,7 @@ pub impl TutorialLevelImpl of TutorialLevelTrait {
     fn make_duel_id(self: @TutorialLevel, player_id: u128) -> u128 {
         let tutorial_id: u128 = (*self).into();
         let mut duel_id: u128 = hash_values([
+            'tutorial',
             player_id.into(),
             tutorial_id.into(),
         ].span()).to_u128_lossy();

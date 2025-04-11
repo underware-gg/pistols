@@ -83,6 +83,7 @@ pub trait ITournamentToken<TState> {
     fn join_duel(ref self: TState, entry_id: u64) -> u128;
     // fn can_end_round(self: @TState, entry_id: u64) -> bool;
     // fn end_round(ref self: TState, entry_id: u64);
+    fn calc_duel_id(self: @TState, entry_id: u64, round_number: u8) -> u128;
 }
 
 // Exposed to clients
@@ -106,6 +107,8 @@ pub trait ITournamentTokenPublic<TState> {
     // // - or end tournament if end conditions met
     // fn can_end_round(self: @TState, entry_id: u64) -> bool;
     // fn end_round(ref self: TState, entry_id: u64);
+    // misc
+    fn calc_duel_id(self: @TState, entry_id: u64, round_number: u8) -> u128;
 }
 
 // Exposed to world and admins
@@ -178,7 +181,7 @@ pub mod tournament_token {
             TournamentEntry, TournamentEntryValue,
             TournamentSettings, TournamentSettingsValue, TournamentSettingsValueTrait,
             Tournament, TournamentValue,
-            TournamentRound, TournamentRoundValue, TournamentRoundTrait,
+            TournamentRound, TournamentRoundValue, TournamentRoundTrait, TournamentRoundValueTrait,
             TournamentType, TOURNAMENT_SETTINGS,
         },
     };
@@ -194,6 +197,8 @@ pub mod tournament_token {
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
+    use pistols::utils::misc::{FeltToLossy};
+    use pistols::utils::hash::{hash_values};
     use graffiti::url::{UrlImpl};
 
     use tournaments::components::models::{
@@ -431,7 +436,34 @@ pub mod tournament_token {
             (1)
         }
 
-
+        fn calc_duel_id(self: @ContractState,
+            entry_id: u64,
+            round_number: u8,
+        ) -> u128 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
+            let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
+            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, round_number);
+            let opponent_entry_number: u8 = round.get_opponent_entry_number(entry.entry_number);
+            (if (
+                entry.tournament_id.is_non_zero() &&
+                round_number.is_non_zero() &&
+                round_number <= tournament.round_number &&
+                entry.entry_number.is_non_zero() &&
+                opponent_entry_number.is_non_zero()
+            ) {
+                let duel_id: u128 = hash_values([
+                    'tournament',
+                    entry.tournament_id.into(),
+                    round_number.into(),
+                    core::cmp::min(entry.entry_number, opponent_entry_number).into(),
+                    core::cmp::max(entry.entry_number, opponent_entry_number).into(),
+                ].span()).to_u128_lossy();
+                (duel_id)
+            } else {
+                (0)
+            })
+        }
     }
 
     
