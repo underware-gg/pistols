@@ -491,9 +491,23 @@ mod tests {
 
     #[test]
     #[should_panic(expected:('DUEL: Invalid duel type', 'ENTRYPOINT_FAILED'))]
-    fn test_tutorial_on_production() {
+    fn test_create_tutorial_on_production() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Tutorial, 0, 1);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Invalid duel type', 'ENTRYPOINT_FAILED'))]
+    fn test_create_tournament_on_production() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Tournament, 0, 1);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUEL: Invalid duel type', 'ENTRYPOINT_FAILED'))]
+    fn test_create_undefined_on_production() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
+        let _duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Undefined, 0, 1);
     }
 
 }

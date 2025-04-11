@@ -293,7 +293,7 @@ pub mod pack_token {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // mint!
-            let token_id: u128 = self.token.mint(recipient);
+            let token_id: u128 = self.token.mint_next(recipient);
 
             // create Duelist
             let mut pack = Pack {

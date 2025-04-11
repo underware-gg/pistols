@@ -282,7 +282,8 @@ pub mod duelist_token {
                 // burn fame_dripped
                 let survived: bool = self._reactivate_or_sacrifice(duelist_id, Option::Some(fame_dripped), CauseOfDeath::Forsaken);
                 // only duel_token and owner can poke alive duelists
-                if (survived && !self.world_default().is_duel_contract(starknet::get_caller_address())) {
+                let world = self.world_default();
+                if (survived && !world.caller_is_duel_contract()) {
                     self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
                 }
             }
@@ -317,7 +318,7 @@ pub mod duelist_token {
             assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
 
             // mint tokens
-            let duelist_ids: Span<u128> = self.token.mint_multiple(recipient, quantity);
+            let duelist_ids: Span<u128> = self.token.mint_next_multiple(recipient, quantity);
 
             // create duelists
             let timestamp: u64 = starknet::get_block_timestamp();

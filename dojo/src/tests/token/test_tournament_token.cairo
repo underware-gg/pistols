@@ -1,10 +1,8 @@
 use starknet::{ContractAddress};
 // use dojo::world::{WorldStorage};
 
-use pistols::systems::{
-    tokens::{
-        tournament_token::{ITournamentTokenProtectedDispatcher, ITournamentTokenProtectedDispatcherTrait},
-    }
+use pistols::systems::tokens::{
+    tournament_token::{ITournamentTokenProtectedDispatcher, ITournamentTokenProtectedDispatcherTrait},
 };
 use pistols::models::{
     // tournament::{Tournament, TournamentTrait},
@@ -20,12 +18,12 @@ use pistols::tests::tester::{
         TestSystems, FLAGS,
         OWNER, OTHER,
         ITournamentTokenDispatcherTrait,
-        IGameTokenDispatcherTrait,
     },
 };
 // use pistols::systems::tokens::budokan_mock::budokan_mock::{TOURNAMENT_ID_1, TOURNAMENT_ID_2};
 
 use openzeppelin_token::erc721::interface;
+use tournaments::components::interfaces::{IGameTokenDispatcher, IGameTokenDispatcherTrait};
 use tournaments::components::models::game::{TokenMetadata};
 
 //
@@ -46,7 +44,7 @@ fn setup() -> TestSystems {
 
     // drop all events
     tester::drop_all_events(sys.world.dispatcher.contract_address);
-    tester::drop_all_events(sys.tournament.contract_address);
+    tester::drop_all_events(sys.tournaments.contract_address);
 
     tester::impersonate(OWNER());
 
@@ -57,13 +55,21 @@ fn _mint(sys: @TestSystems, recipient: ContractAddress) -> u64 {
     // mint from budokan
     tester::impersonate(*sys.budokan.contract_address);
     // public mint function in the budokan game component
-    ((*sys.tournament_game).mint(
+    (_game_token(sys).mint(
         player_name: PLAYER_NAME,
         settings_id: SETTINGS_ID,
         start: Option::None,
         end: Option::None,
         to: recipient,
     ))
+}
+
+pub fn _protected(sys: @TestSystems) -> ITournamentTokenProtectedDispatcher {
+    (ITournamentTokenProtectedDispatcher{contract_address: (*sys.tournaments).contract_address})
+}
+
+pub fn _game_token(sys: @TestSystems) -> IGameTokenDispatcher {
+    (IGameTokenDispatcher{contract_address: (*sys.tournaments).contract_address})
 }
 
 //
@@ -73,9 +79,9 @@ fn _mint(sys: @TestSystems, recipient: ContractAddress) -> u64 {
 #[test]
 fn test_initializer() {
     let mut sys: TestSystems = setup();
-    assert_eq!(sys.tournament.symbol(), "TOURNAMENT", "Symbol is wrong");
-    assert!(sys.tournament.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
-    assert!(sys.tournament.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
+    assert_eq!(sys.tournaments.symbol(), "TOURNAMENT", "Symbol is wrong");
+    assert!(sys.tournaments.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
+    assert!(sys.tournaments.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
 
     // settings created
     let settings: TournamentSettingsValue = sys.store.get_tournament_settings_value(TOURNAMENT_SETTINGS::LAST_MAN_STANDING);
@@ -83,19 +89,19 @@ fn test_initializer() {
     assert_eq!(settings.required_fame, 3000, "Should eq 3000");
 
     // budokan creator token
-    assert_eq!(sys.tournament.total_supply(), 1, "total_supply");
-    assert_eq!(sys.tournament.owner_of(ENTRY_ID_0.into()), sys.tournament.contract_address, "owner_of(0)");
-    assert!(sys.tournament.is_owner_of(sys.tournament.contract_address, ENTRY_ID_0.into()), "is_owner_of(0)");
+    assert_eq!(sys.tournaments.total_supply(), 1, "total_supply");
+    assert_eq!(sys.tournaments.owner_of(ENTRY_ID_0.into()), sys.tournaments.contract_address, "owner_of(0)");
+    assert!(sys.tournaments.is_owner_of(sys.tournaments.contract_address, ENTRY_ID_0.into()), "is_owner_of(0)");
     let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(ENTRY_ID_0);
     assert_eq!(token_metadata.player_name, 'Creator', "token_metadata.player_name");
-    assert_eq!(token_metadata.minted_by, sys.tournament.contract_address, "token_metadata.minted_by");
+    assert_eq!(token_metadata.minted_by, sys.tournaments.contract_address, "token_metadata.minted_by");
 }
 
 #[test]
 fn test_contract_uri() {
     let mut sys: TestSystems = setup();
-    let uri: ByteArray = sys.tournament.contract_uri();
-    let uri_camel: ByteArray = sys.tournament.contractURI();
+    let uri: ByteArray = sys.tournaments.contract_uri();
+    let uri_camel: ByteArray = sys.tournaments.contractURI();
     println!("___tournament.contract_uri():{}", uri);
     assert!(tester::starts_with(uri.clone(), "data:"), "contract_uri() should be a json string");
     assert_eq!(uri.clone(), uri_camel.clone(), "uri_camel");
@@ -105,7 +111,7 @@ fn test_contract_uri() {
 fn test_token_uri() {
     let mut sys: TestSystems = setup();
     let token_id: u64 = _mint(@sys, OWNER());
-    let uri = sys.tournament.token_uri(token_id.into());
+    let uri = sys.tournaments.token_uri(token_id.into());
     assert_gt!(uri.len(), 100, "Uri 1 should not be empty");
     println!("___tournaments.token_uri(1):{}", uri);
 }
@@ -114,7 +120,7 @@ fn test_token_uri() {
 #[should_panic(expected: ('ERC721: invalid token ID', 'ENTRYPOINT_FAILED'))]
 fn test_token_uri_invalid() {
     let mut sys: TestSystems = setup();
-    sys.tournament.token_uri(999);
+    sys.tournaments.token_uri(999);
 }
 
 
@@ -127,9 +133,9 @@ fn test_mint() {
     let mut sys: TestSystems = setup();
     let token_id: u64 = _mint(@sys, OWNER());
     assert_eq!(token_id, ENTRY_ID_1, "token_id");
-    assert_eq!(sys.tournament.owner_of(ENTRY_ID_1.into()), OWNER(), "owner_of(1)");
-    assert!(sys.tournament.is_owner_of(OWNER(), ENTRY_ID_1.into()), "is_owner_of(1)");
-    assert_eq!(sys.tournament.total_supply(), 2, "total_supply");
+    assert_eq!(sys.tournaments.owner_of(ENTRY_ID_1.into()), OWNER(), "owner_of(1)");
+    assert!(sys.tournaments.is_owner_of(OWNER(), ENTRY_ID_1.into()), "is_owner_of(1)");
+    assert_eq!(sys.tournaments.total_supply(), 2, "total_supply");
     // check budokan components created
     let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(token_id);
     assert_eq!(token_metadata.minted_by, sys.budokan.contract_address, "token_metadata.minted_by");
@@ -139,10 +145,6 @@ fn test_mint() {
 //---------------------------------
 // protected calls
 //
-
-pub fn _protected(sys: @TestSystems) -> ITournamentTokenProtectedDispatcher {
-    (ITournamentTokenProtectedDispatcher{contract_address: (*sys.tournament).contract_address})
-}
 
 #[test]
 fn test_create_settings() {

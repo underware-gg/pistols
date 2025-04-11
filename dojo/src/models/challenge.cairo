@@ -87,6 +87,7 @@ pub struct DuelistState {
 //------------------------------------
 // Traits
 //
+use core::num::traits::Zero;
 use pistols::types::cards::{
     deck::{Deck, DeckType, DeckTypeTrait},
     hand::{DuelistHand},
@@ -101,8 +102,8 @@ use pistols::types::{
 };
 use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::utils::hash::{hash_values};
+use pistols::utils::misc::{FeltToLossy, ZERO};
 use pistols::utils::math::{MathTrait};
-use pistols::utils::misc::{ZERO};
 
 #[generate_trait]
 pub impl ChallengeImpl of ChallengeTrait {
@@ -126,6 +127,10 @@ pub impl ChallengeImpl of ChallengeTrait {
     fn is_tutorial(self: @Challenge) -> bool {
         (*self.duel_type == DuelType::Tutorial)
     }
+    #[inline(always)]
+    fn is_tournament(self: @Challenge) -> bool {
+        (*self.duel_type == DuelType::Tournament)
+    }
     fn get_deck_type(self: @Challenge) -> DeckType {
         if (
             self.is_tutorial() &&
@@ -140,6 +145,35 @@ pub impl ChallengeImpl of ChallengeTrait {
     fn get_deck(self: @Challenge) -> Deck {
         (self.get_deck_type().build_deck())
     }
+
+    fn calc_tournament_duel_id(
+        tournament_id: u64,
+        round_number: u8,
+        entry_number_a: u8,
+        entry_number_b: u8,
+    ) -> u128 {
+        (if (
+            tournament_id.is_non_zero() &&
+            round_number.is_non_zero() &&
+            entry_number_a.is_non_zero() &&
+            entry_number_b.is_non_zero() &&
+            entry_number_a != entry_number_b
+        ) {
+            let duel_id: u128 = hash_values([
+                'tournament',
+                tournament_id.into(),
+                round_number.into(),
+                core::cmp::min(entry_number_a, entry_number_b).into(),
+                core::cmp::max(entry_number_a, entry_number_b).into(),
+            ].span()).to_u128_lossy();
+            (duel_id)
+        } else {
+            (0)
+        })
+    }
+
+
+
 }
 
 #[generate_trait]

@@ -48,9 +48,9 @@ pub mod TOURNAMENT_SETTINGS {
 #[dojo::model]
 pub struct Tournament {
     #[key]
-    pub tournament_id: u64,     // budokan id
+    pub tournament_id: u64,         // budokan id
     //------
-    pub round_number: u8,       // current round, zero if not started yet
+    pub current_round_number: u8,   // current round, zero if not started yet
 }
 
 #[derive(Copy, Drop, Serde)]

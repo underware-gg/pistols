@@ -12,8 +12,8 @@ pub trait ITokenComponentPublic<TState> {
 pub trait ITokenComponentInternal<TState> {
     fn initialize(ref self: TState, minter_address: ContractAddress);
     fn set_minter_address(ref self: TState, minter_address: ContractAddress);
-    fn mint(ref self: TState, recipient: ContractAddress) -> u128;
-    fn mint_multiple(ref self: TState, recipient: ContractAddress, quantity: usize) -> Span<u128>;
+    fn mint_next(ref self: TState, recipient: ContractAddress) -> u128;
+    fn mint_next_multiple(ref self: TState, recipient: ContractAddress, quantity: usize) -> Span<u128>;
     fn burn(ref self: TState, token_id: u128);
 }
 
@@ -130,13 +130,13 @@ pub mod TokenComponent {
             store.set_token_config(@token_config);
         }
 
-        fn mint(ref self: ComponentState<TContractState>,
+        fn mint_next(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
         ) -> u128 {
-            (*self.mint_multiple(recipient, 1)[0])
+            (*self.mint_next_multiple(recipient, 1)[0])
         }
 
-        fn mint_multiple(ref self: ComponentState<TContractState>,
+        fn mint_next_multiple(ref self: ComponentState<TContractState>,
             recipient: ContractAddress,
             quantity: usize,
         ) -> Span<u128> {

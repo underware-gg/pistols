@@ -93,6 +93,16 @@ pub trait IDuelTokenPublic<TState> {
 #[starknet::interface]
 pub trait IDuelTokenProtected<TState> {
     fn transfer_to_winner(ref self: TState, duel_id: u128);
+    fn join_tournament_duel(
+        ref self: TState,
+        player_address: ContractAddress,
+        tournament_id: u128,
+        round_number: u8,
+        duelist_id_a: u128,
+        duelist_id_b: u128,
+        expire_hours: u64,
+        lives_staked: u8,
+    ) -> u128;
 }
 
 #[dojo::contract]
@@ -259,7 +269,7 @@ pub mod duel_token {
             let mut store: Store = StoreTrait::new(self.world_default());
 
             // mint to game, so it can transfer to winner
-            let duel_id: u128 = self.token.mint(store.world.game_address());
+            let duel_id: u128 = self.token.mint_next(store.world.game_address());
 
             // validate duelist ownership
             let address_a: ContractAddress = starknet::get_caller_address();
@@ -285,16 +295,10 @@ pub mod duel_token {
                 DuelType::Seasonal | 
                 DuelType::Practice => {}, // ok!
                 DuelType::Undefined | 
+                DuelType::Tournament |
                 DuelType::Tutorial => {
                     // create tutorials with the tutorial contact only
                     assert(false, Errors::INVALID_DUEL_TYPE);
-                },
-                DuelType::Tournament => {
-// TODO...
-// if (tournament_id != 0) {
-//     assert(tournament.can_join(address_a, 0), Errors::CHALLENGED_NOT_ADMITTED);
-//     assert(tournament.can_join(address_b, 0), Errors::CHALLENGED_NOT_ADMITTED);
-// }
                 },
             };
 
@@ -476,6 +480,25 @@ pub mod duel_token {
             } else if (challenge.winner == 2) {
                 self.transfer_from(owner, challenge.address_b, duel_id.into());
             }
+        }
+
+        fn join_tournament_duel(
+            ref self: ContractState,
+            player_address: ContractAddress,
+            tournament_id: u128,
+            round_number: u8,
+            duelist_id_a: u128,
+            duelist_id_b: u128,
+            expire_hours: u64,
+            lives_staked: u8,
+        ) -> u128 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(store.world.caller_is_tournament_contract(), Errors::INVALID_CALLER);
+
+
+
+
+            (0)
         }
     }
 

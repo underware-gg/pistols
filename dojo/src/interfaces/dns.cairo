@@ -161,16 +161,12 @@ pub impl DnsImpl of DnsTrait {
         (self.is_world_contract(starknet::get_caller_address()))
     }
     #[inline(always)]
-    fn is_game_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
-        (contract_address == self.game_address())
+    fn caller_is_duel_contract(self: @WorldStorage) -> bool {
+        (starknet::get_caller_address() == self.duel_token_address())
     }
     #[inline(always)]
-    fn is_duel_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
-        (contract_address == self.duel_token_address())
-    }
-    #[inline(always)]
-    fn is_duelist_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
-        (contract_address == self.duelist_token_address())
+    fn caller_is_tournament_contract(self: @WorldStorage) -> bool {
+        (starknet::get_caller_address() == self.tournament_token_address())
     }
 
     //--------------------------

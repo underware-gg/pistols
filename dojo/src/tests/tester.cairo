@@ -75,7 +75,6 @@ pub mod tester {
         // ERC721Component,
         ERC721Component::{Transfer, Approval}
     };
-    pub use tournaments::components::interfaces::{IGameTokenDispatcher, IGameTokenDispatcherTrait};
 
     
     //
@@ -174,8 +173,7 @@ pub mod tester {
         pub duels: IDuelTokenDispatcher,
         pub duelists: IDuelistTokenDispatcher,
         pub pack: IPackTokenDispatcher,
-        pub tournament: ITournamentTokenDispatcher,
-        pub tournament_game: IGameTokenDispatcher,
+        pub tournaments: ITournamentTokenDispatcher,
         pub rng: IRngMockDispatcher,
         pub budokan: IBudokanMockDispatcher,
         pub account: ContractAddress,
@@ -198,8 +196,7 @@ pub mod tester {
                 duels: world.duel_token_dispatcher(),
                 duelists: world.duelist_token_dispatcher(),
                 pack: world.pack_token_dispatcher(),
-                tournament: world.tournament_token_dispatcher(),
-                tournament_game: IGameTokenDispatcher{ contract_address: world.tournament_token_address() },
+                tournaments: world.tournament_token_dispatcher(),
                 rng: IRngMockDispatcher{ contract_address: world.rng_address() },
                 budokan: world.budokan_mock_dispatcher(),
                 account: mock_account,
@@ -660,7 +657,7 @@ pub mod tester {
         entry_id: u64,
     ) -> u64 {
         impersonate(sender);
-        let tournament_id: u64 = (*sys.tournament).start_tournament(entry_id);
+        let tournament_id: u64 = (*sys.tournaments).start_tournament(entry_id);
         _next_block();
         (tournament_id)
     }
@@ -669,14 +666,14 @@ pub mod tester {
         duelist_id: u128,
     ) {
         impersonate(sender);
-        (*sys.tournament).enlist_duelist(entry_id, duelist_id);
+        (*sys.tournaments).enlist_duelist(entry_id, duelist_id);
         _next_block();
     }
     pub fn execute_join_duel(sys: @TestSystems, sender: ContractAddress,
         entry_id: u64,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*sys.tournament).join_duel(entry_id);
+        let duel_id: u128 = (*sys.tournaments).join_duel(entry_id);
         _next_block();
         (duel_id)
     }

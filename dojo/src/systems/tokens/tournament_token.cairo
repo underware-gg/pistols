@@ -176,6 +176,7 @@ pub mod tournament_token {
     //     DnsTrait,
     // };
     use pistols::models::{
+        challenge::{ChallengeTrait},
         duelist::{DuelistTrait},
         tournament::{
             TournamentEntry, TournamentEntryValue,
@@ -197,8 +198,6 @@ pub mod tournament_token {
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
-    use pistols::utils::misc::{FeltToLossy};
-    use pistols::utils::hash::{hash_values};
     use graffiti::url::{UrlImpl};
 
     use tournaments::components::models::{
@@ -326,7 +325,7 @@ pub mod tournament_token {
                 // correct lifecycle
                 token_metadata.lifecycle.can_start(starknet::get_block_timestamp()) &&
                 // tournament not started
-                tournament.round_number.is_zero()
+                tournament.current_round_number.is_zero()
             )
         }
         fn start_tournament(ref self: ContractState, entry_id: u64) -> u64 {
@@ -338,8 +337,8 @@ pub mod tournament_token {
             // verify tournament not started
             let (budokan_dispatcher, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_tournament_id(@store, entry_id);
             let mut tournament: Tournament = store.get_tournament(tournament_id);
-            assert(tournament.round_number.is_zero(), Errors::ALREADY_STARTED);
-            tournament.round_number = 1;
+            assert(tournament.current_round_number.is_zero(), Errors::ALREADY_STARTED);
+            tournament.current_round_number = 1;
             // initialize round
             let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_caller_address()));
             let round: TournamentRound = self._initialize_round(ref store, budokan_dispatcher, tournament_id, 1, seed);
@@ -408,7 +407,7 @@ pub mod tournament_token {
                 // enlisted
                 entry.tournament_id.is_non_zero() &&
                 // tournament has started
-                tournament.round_number.is_non_zero()
+                tournament.current_round_number.is_non_zero()
             )
         }
         fn join_duel(ref self: ContractState, entry_id: u64) -> u128 {
@@ -423,9 +422,9 @@ pub mod tournament_token {
             assert(entry.tournament_id.is_non_zero(), Errors::NOT_ENLISTED);
             // tournament has started
             let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
-            assert(tournament.round_number.is_non_zero(), Errors::NOT_STARTED);
+            assert(tournament.current_round_number.is_non_zero(), Errors::NOT_STARTED);
             // join...
-            let _round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.round_number);
+            let _round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.current_round_number);
 
             // TODO: if duel NOT started (player)
             // TODO: if duel NOT started (opponent)
@@ -442,27 +441,14 @@ pub mod tournament_token {
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
             let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
-            let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
             let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, round_number);
             let opponent_entry_number: u8 = round.get_opponent_entry_number(entry.entry_number);
-            (if (
-                entry.tournament_id.is_non_zero() &&
-                round_number.is_non_zero() &&
-                round_number <= tournament.round_number &&
-                entry.entry_number.is_non_zero() &&
-                opponent_entry_number.is_non_zero()
-            ) {
-                let duel_id: u128 = hash_values([
-                    'tournament',
-                    entry.tournament_id.into(),
-                    round_number.into(),
-                    core::cmp::min(entry.entry_number, opponent_entry_number).into(),
-                    core::cmp::max(entry.entry_number, opponent_entry_number).into(),
-                ].span()).to_u128_lossy();
-                (duel_id)
-            } else {
-                (0)
-            })
+            (ChallengeTrait::calc_tournament_duel_id(
+                entry.tournament_id,
+                round_number,
+                entry.entry_number,
+                opponent_entry_number, // will be zero if round not started or not paired (odd entries)
+            ))
         }
     }
 
