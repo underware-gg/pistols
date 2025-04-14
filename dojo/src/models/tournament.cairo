@@ -74,6 +74,7 @@ pub struct TournamentRound {
 //------------------------------------
 // Links tournament rounds to its Duels
 //
+// TournamentToChallenge: required for player B to find the duel created by player A
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct TournamentToChallenge {
@@ -82,6 +83,7 @@ pub struct TournamentToChallenge {
     //-------------------------
     pub duel_id: u128,
 }
+// ChallengeToTournament: required to settle results of a duel in the tournament
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct ChallengeToTournament {
@@ -106,7 +108,7 @@ pub struct TournamentDuelKeys {
 //
 use pistols::systems::tokens::tournament_token::tournament_token::{MAX_ENTRIES};
 use pistols::systems::rng::{RngWrap, Shuffle, ShuffleTrait};
-use pistols::utils::bitwise::{BitwiseU256};
+use pistols::utils::bytemap::{BytemapU256};
 
 #[generate_trait]
 pub impl TournamentSettingsValueImpl of TournamentSettingsValueTrait {
@@ -127,8 +129,8 @@ pub impl TournamentRoundImpl of TournamentRoundTrait {
             // println!("shuffle({}): {}-{} of {}", i, entry_a, entry_b, self.entry_count);
             let index_a: usize = entry_a.into() - 1;
             let index_b: usize = entry_b.into() - 1;
-            self.bracket = BitwiseU256::set_byte(self.bracket, index_a, entry_b.into());
-            self.bracket = BitwiseU256::set_byte(self.bracket, index_b, entry_a.into());
+            self.bracket = BytemapU256::set_byte(self.bracket, index_a, entry_b.into());
+            self.bracket = BytemapU256::set_byte(self.bracket, index_b, entry_a.into());
             i += 1;
         };
     }
@@ -139,7 +141,7 @@ pub impl TournamentRoundValueImpl of TournamentRoundValueTrait {
     fn get_opponent_entry_number(self: @TournamentRoundValue, entry_number: u8) -> u8 {
         (if (entry_number > 0 && entry_number <= MAX_ENTRIES) {
             let index: usize = (entry_number - 1).try_into().unwrap();
-            let entry: u8 = BitwiseU256::get_byte(*self.bracket, index).try_into().unwrap();
+            let entry: u8 = BytemapU256::get_byte(*self.bracket, index).try_into().unwrap();
             (entry)
         } else {
             (0)
@@ -182,7 +184,7 @@ mod unit {
     use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
     use pistols::types::shuffler::{ShufflerTrait};
     use pistols::types::timestamp::{Period};
-    use pistols::utils::bitwise::{BitwiseU256};
+    use pistols::utils::bytemap::{BytemapU256};
     use pistols::tests::tester::{tester};
 
     fn _test_tournament_round(wrapped: @RngWrap, entry_count: u8) -> @TournamentRoundValue {
@@ -211,7 +213,7 @@ mod unit {
         while (i < round.entry_count.into()) {
             // index_a > entry_a
             let _index_a: usize = i;
-            let entry_a: u256 = BitwiseU256::get_byte(round.bracket, _index_a.into());
+            let entry_a: u256 = BytemapU256::get_byte(round.bracket, _index_a.into());
             if (entry_a == 0) {
                 assert!(is_odd, "({}): is_odd", i);
                 assert_eq!(not_paired, 0, "({}): not_paired", i);
@@ -219,7 +221,7 @@ mod unit {
             } else {
                 // entry_a > index_b > entry_b
                 let index_b: usize = (entry_a - 1).try_into().unwrap();
-                let entry_b: u256 = BitwiseU256::get_byte(round.bracket, index_b);
+                let entry_b: u256 = BytemapU256::get_byte(round.bracket, index_b);
                 // entry_b > back to index_a
                 let index_a: usize = (entry_b - 1).try_into().unwrap();
                 // println!("___entry({}): [{}]={} > [{}]={}", _index_a, index_a, entry_a, index_b, entry_b);

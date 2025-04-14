@@ -76,6 +76,7 @@ use pistols::libs::store::{Store, StoreTrait};
 use pistols::types::rules::{RewardValues};
 use pistols::types::constants::{HONOUR};
 use pistols::utils::bitwise::{BitwiseU64};
+use pistols::utils::bytemap::{BytemapU64};
 use pistols::utils::math::{MathU64};
 
 #[generate_trait]
@@ -164,7 +165,7 @@ pub impl DuelistStatusImpl of DuelistStatusTrait {
         self.honour_log =
             (self.honour_log & ~BitwiseU64::shl(0xff, log_pos)) |
             BitwiseU64::shl(duel_honour.into(), log_pos);
-        self.honour = (BitwiseU64::sum_bytes(self.honour_log) / core::cmp::min(self.total_duels.into(), 8)).try_into().unwrap();
+        self.honour = (BytemapU64::sum_bytes(self.honour_log) / core::cmp::min(self.total_duels.into(), 8)).try_into().unwrap();
     }
 }
 
