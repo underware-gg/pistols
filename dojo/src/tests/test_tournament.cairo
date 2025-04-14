@@ -33,11 +33,10 @@ use pistols::tests::tester::{
         TestSystems, FLAGS,
         ID, OWNER, OTHER, ZERO,
         // OWNED_BY_OWNER, OWNED_BY_OTHER,
-        PLAYER_1, PLAYER_2,
         ITournamentTokenDispatcherTrait,
     },
 };
-// use pistols::systems::tokens::budokan_mock::budokan_mock::{TOURNAMENT_ID_1, TOURNAMENT_ID_2};
+use pistols::systems::tokens::budokan_mock::{PLAYER_1, PLAYER_2};
 
 use tournaments::components::{
     models::{

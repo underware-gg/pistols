@@ -40,8 +40,8 @@ pub mod duelist_token {
     use pistols::tests::tester::tester::{
         OWNER, OWNED_BY_OWNER,
         OTHER, OWNED_BY_OTHER,
-        PLAYER_1, PLAYER_2,
     };
+    use pistols::systems::tokens::budokan_mock::{PLAYER_1, PLAYER_2};
 
     #[generate_trait]
     impl WorldDefaultImpl of WorldDefaultTrait {

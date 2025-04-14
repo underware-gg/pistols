@@ -4,6 +4,33 @@ use starknet::{ContractAddress};
 use tournaments::components::models::tournament::{Registration};
 // use tournaments::components::models::schedule::{Phase};
 
+pub struct TestPlayer {
+    pub address: ContractAddress,
+    pub duelist_id: u128,
+    pub entry_number: u8,
+}
+pub fn PLAYER_1() -> TestPlayer {(TestPlayer {
+    address: starknet::contract_address_const::<0xa0001>(),
+    duelist_id: 0xd0001,
+    entry_number: 1,
+})}
+pub fn PLAYER_2() -> TestPlayer {(TestPlayer {
+    address: starknet::contract_address_const::<0xa0002>(),
+    duelist_id: 0xd0002,
+    entry_number: 2,
+})}
+pub fn PLAYER_3() -> TestPlayer {(TestPlayer {
+    address: starknet::contract_address_const::<0xa0003>(),
+    duelist_id: 0xd0003,
+    entry_number: 4,
+})}
+pub fn PLAYER_4() -> TestPlayer {(TestPlayer {
+    address: starknet::contract_address_const::<0xa0004>(),
+    duelist_id: 0xd0004,
+    entry_number: 3,
+})}
+
+
 #[starknet::interface]
 pub trait IBudokanMock<TState> {
     // fn current_phase(self: @TState, tournament_id: u64) -> Phase;
@@ -25,8 +52,8 @@ pub mod budokan_mock {
     use tournaments::components::models::tournament::{Registration};
     // use tournaments::components::models::schedule::{Phase};
 
+    use super::{PLAYER_1, PLAYER_2};
     use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
-    use pistols::tests::tester::tester::{PLAYER_1, PLAYER_2};
     // use pistols::utils::misc::{ZERO};
 
     pub const TOURNAMENT_ID_1: u64 = 100;
