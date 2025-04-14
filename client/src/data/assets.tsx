@@ -232,6 +232,8 @@ interface SceneBackgroundObject {
   animatedIdle?: number,
   hidden?: boolean,
   opaque?: boolean,
+  blurred?: boolean,
+  samples?: number,
   animateShift?: {
     enabled: boolean,
     isLeft: boolean,
@@ -258,13 +260,13 @@ interface SceneObject {
 const sceneBackgrounds: Record<SceneName, SceneData> = {
   [SceneName.Gate]: {
     backgrounds: [
-      { texture: TextureName.bg_entrance_background, shiftMultiplier: -0.008, renderOrder: 0 },
+      { texture: TextureName.bg_entrance_background, shiftMultiplier: -0.008, renderOrder: 0, blurred: true, samples: 24 },
       { texture: TextureName.bg_entrance_tavern, shiftMultiplier: -0.005, renderOrder: 1 },
       { texture: TextureName.bg_entrance_sign, shiftMultiplier: -0.003, renderOrder: 2 },
       { texture: TextureName.bg_entrance_fog_background, shiftMultiplier: 0.0, renderOrder: 3, opaque: true, animateShift: { enabled: true, isLeft: false, speed: 0.0005 } },
       { texture: TextureName.bg_entrance_player, shiftMultiplier: 0.002, renderOrder: 4 },
       { texture: TextureName.bg_entrance_fog_foreground, shiftMultiplier: 0.01, renderOrder: 5, opaque: true, animateShift: { enabled: true, isLeft: true, speed: 0.0005 } },
-      { texture: TextureName.bg_entrance_foreground, shiftMultiplier: 0.012, renderOrder: 6 },
+      { texture: TextureName.bg_entrance_foreground, shiftMultiplier: 0.012, renderOrder: 6, blurred: true, samples: 24 },
     ],
     items: [
       { name: 'door', color: 'ff0000', description: 'Knock on door', mask: TextureName.bg_entrance_door_mask, renderOrder: 1 },
@@ -273,16 +275,16 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
   },
   [SceneName.Door]: { 
     backgrounds: [
-      { texture: TextureName.bg_door_background, shiftMultiplier: -0.01, renderOrder: 0 },
-      { texture: TextureName.bg_door_face, shiftMultiplier: 0.005, renderOrder: 1, states: [
+      { texture: TextureName.bg_door_background, shiftMultiplier: -0.005, renderOrder: 0 },
+      { texture: TextureName.bg_door_face, shiftMultiplier: 0.001, renderOrder: 1, states: [
         { texture: TextureName.bg_door_face, minDuration: 0.5, maxDuration: 5, baseDuration: 3.25, nextTextures: [TextureName.bg_door_face_blink] },
         { texture: TextureName.bg_door_face_blink, minDuration: 0.1, maxDuration: 0.2, baseDuration: 0.15, nextTextures: [TextureName.bg_door_face] },
       ] },
-      { texture: TextureName.bg_door_face_angry, shiftMultiplier: 0.005, renderOrder: 2, isAnimated: true, states: [
+      { texture: TextureName.bg_door_face_angry, shiftMultiplier: 0.001, renderOrder: 2, isAnimated: true, states: [
         { texture: TextureName.bg_door_face_angry, minDuration: 0.5, maxDuration: 5, baseDuration: 3.25, nextTextures: [TextureName.bg_door_face_angry_blink] },
         { texture: TextureName.bg_door_face_angry_blink, minDuration: 0.1, maxDuration: 0.2, baseDuration: 0.15, nextTextures: [TextureName.bg_door_face_angry] },
       ] },
-      { texture: TextureName.bg_door_door, shiftMultiplier: 0.01, renderOrder: 3 },
+      { texture: TextureName.bg_door_door, shiftMultiplier: 0.005, renderOrder: 3 },
     ] 
   },
   [SceneName.Profile]: {

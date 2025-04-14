@@ -30,6 +30,10 @@ export default function ScDoor() {
   // clear tavern state
   useEffectOnce(() => {
     setIsLoading(false)
+    const scene = (_currentScene as InteractibleScene);
+    if (scene) {
+      scene.showItem(TextureName.bg_door_face_angry, true)
+    }
   }, [])
 
   useEffectOnce(() => {

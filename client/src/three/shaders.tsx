@@ -14,7 +14,6 @@ export async function loadShaders() {
 
   const globalShaders = [
     'common.glsl',
-    'blur.glsl',
     'noise.glsl',
   ];
 

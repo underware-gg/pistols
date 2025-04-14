@@ -37,6 +37,8 @@ export class InteractibleScene extends THREE.Scene {
 
   opacityTweens: any[] = []
   currentOpacities: number[] = [1, 1, 1, 1, 1, 1, 1]
+  currentSamples: number[] = []
+  blurTween: any;
 
   lastClickTimeStamp: number
   private currentRandomValues: number[] = []
@@ -73,6 +75,7 @@ export class InteractibleScene extends THREE.Scene {
     if (!this.sceneData.backgrounds) return
 
     this.currentTextures = this.sceneData.backgrounds.map(background => _textures[background.texture]);
+    this.currentSamples = this.sceneData.backgrounds.map(background => background.blurred ? (background.samples || 0) : 0);
 
     const bgDistance = -1
     const vFOV = THREE.MathUtils.degToRad(cameraData.fieldOfView * 0.5)
@@ -184,7 +187,7 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uHiddenOpacities', this.sceneData.backgrounds.map(background => background.hidden ? 0.0 : 1.0))
     this.maskShader.setUniformValue('uOpaque', this.sceneData.backgrounds.map(background => background.opaque || false))
     this.maskShader.setUniformValue('uClickable', this.isClickable)
-    this.maskShader.setUniformValue('uSamples', 1)
+    this.maskShader.setUniformValue('uSamples', this.currentSamples)
     this.maskShader.setUniformValue('uShiftAmount', 0.0)
     this.maskShader.setUniformValue('uShiftAmountLayer', this.layerShiftAmounts)
     this.maskShader.setUniformValue('uTextureShift0', new THREE.Vector2(0.0, 0.0))
@@ -496,11 +499,30 @@ export class InteractibleScene extends THREE.Scene {
   }
 
   public toggleBlur(shouldBlur: boolean) {
-    new TWEEN.Tween({ value: shouldBlur ? 1 : 20 })
-      .to({ value: shouldBlur ? 20 : 1 }, 400)
+    if (this.blurTween) {
+      this.blurTween.stop();
+    }
+    
+    const startSamples = [...this.currentSamples];
+    
+    const targetSamples = this.sceneData.backgrounds.map(background => {
+      if (shouldBlur) {
+        return 30;
+      } else {
+        return background.blurred ? (background.samples || 0) : 0;
+      }
+    });
+    
+    this.blurTween = new TWEEN.Tween({ progress: 0 })
+      .to({ progress: 1 }, 600)
       .easing(TWEEN.Easing.Quartic.Out)
       .onUpdate((obj) => {
-        this.maskShader.setUniformValue('uSamples', obj.value);
+        this.currentSamples = startSamples.map((startValue, index) => {
+          const targetValue = targetSamples[index];
+          return Math.round(startValue + (targetValue - startValue) * obj.progress);
+        });
+        
+        this.maskShader.setUniformValue('uSamples', this.currentSamples);
       })
       .start();
   }
