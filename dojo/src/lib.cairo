@@ -84,6 +84,7 @@ mod utils {
     pub mod byte_arrays;
     pub mod bitwise;
     pub mod bytemap;
+    pub mod nibblemap;
     pub mod hash;
     pub mod math;
     pub mod misc;
