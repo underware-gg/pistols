@@ -16,7 +16,7 @@ historical = [
 
 [indexing]
 pending = true
-transactions = false
+transactions = true
 contracts = [
   "erc721:$duel_token", # duel_token
   "erc721:$duelist_token", # duelist_token
