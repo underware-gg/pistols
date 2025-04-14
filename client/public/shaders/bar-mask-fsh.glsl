@@ -9,7 +9,8 @@ uniform sampler2D uTextures[7];
 uniform int uTexturesRenderOrder[7];
 uniform vec2 uResolution;
 uniform vec3 uHighlightColor;
-uniform float uHighlightOpacity;
+uniform float uHighlightOpacityShimmer;
+uniform float uHighlightOpacitySelected;
 uniform float uHiddenOpacities[7];
 uniform bool uOpaque[7];
 
@@ -400,12 +401,12 @@ void main() {
   float glowAlpha = 0.0;
   if (allMasks.a > 0.0) {
     glowAlpha = (sin(clamp(mod((uTime * 2.0 + vUv.y * 2.0), 8.0), 0.0, 1.0) * PI * 2.0));
-    glowAlpha *= (uHighlightOpacity * 0.5) * allMasks.a;
+    glowAlpha *= (uHighlightOpacityShimmer * 0.5) * allMasks.a;
   }
   
   float highlightAmount = 0.0;
   if (selected && uClickable) {
-    highlightAmount = uHighlightOpacity;
+    highlightAmount = uHighlightOpacitySelected;
   }
 
   result.rgb = linearToSRGB(result.rgb);

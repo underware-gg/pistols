@@ -10,7 +10,7 @@ import {
   sizes,
   SCENE_CHANGE_ANIMATION_DURATION,
 } from './game';
-import { sceneBackgrounds, SceneData, SceneObject, TextureName } from '/src/data/assets';
+import { sceneBackgrounds, SceneData, SceneObject, TextureName, TextureState, AnimatedLayer, SceneBackgroundObject } from '/src/data/assets';
 import { ShaderMaterial } from './shaders'
 import TWEEN from '@tweenjs/tween.js'
 
@@ -47,6 +47,9 @@ export class InteractibleScene extends THREE.Scene {
   private animatedShiftValues: number[] = []
   private layerShiftAmounts: number[] = []
 
+  private animatedLayers: Map<number, AnimatedLayer> = new Map();
+  private currentTextures: THREE.Texture[] = [];
+
   constructor(sceneName: string, renderer: THREE.WebGLRenderer, camera: THREE.Camera) {
     super()
 
@@ -62,8 +65,14 @@ export class InteractibleScene extends THREE.Scene {
 
   public setSceneData(sceneName: string) {
     this.dispose()
+    this.animatedLayers.clear()
+    this.currentTextures = [];
 
     this.sceneData = sceneBackgrounds[sceneName]
+
+    if (!this.sceneData.backgrounds) return
+
+    this.currentTextures = this.sceneData.backgrounds.map(background => _textures[background.texture]);
 
     const bgDistance = -1
     const vFOV = THREE.MathUtils.degToRad(cameraData.fieldOfView * 0.5)
@@ -108,6 +117,10 @@ export class InteractibleScene extends THREE.Scene {
         if (!background.opaque) {
           this.fbo_background_scenes[index] = new THREE.Scene();
           this.fbo_background_scenes[index].add(mesh)
+        }
+
+        if (background.isAnimated) {
+          this.initializeAnimationLayer(background, index);
         }
       })
 
@@ -188,13 +201,14 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uRandomShift4', 0.0)
     this.maskShader.setUniformValue('uRandomShift5', 0.0)
     this.maskShader.setUniformValue('uRandomShift6', 0.0)
-    this.maskShader.setUniformValue('uHighlightColor', new THREE.Color('#ffcf40'))
-    this.maskShader.setUniformValue('uHighlightOpacity', 0.4)
+    this.maskShader.setUniformValue('uHighlightColor', new THREE.Color('#eeb4ff'))
+    this.maskShader.setUniformValue('uHighlightOpacityShimmer', 0.8)
+    this.maskShader.setUniformValue('uHighlightOpacitySelected', 0.4)
     this.maskShader.setUniformValue('uMasksSize', this.sceneData.items?.length || 0)
     this.maskShader.setUniformValue('uMasks', this.sceneData.items?.map(item => _textures[item.mask]) || [])
     this.maskShader.setUniformValue('uMasksRenderOrder', this.sceneData.items?.map(item => item.renderOrder) || [])
     this.maskShader.setUniformValue('uTexturesSize', this.sceneData.backgrounds?.length || 0)
-    this.maskShader.setUniformValue('uTextures', this.sceneData.backgrounds.map(background => _textures[background.texture]))
+    this.maskShader.setUniformValue('uTextures', this.currentTextures)
     this.maskShader.setUniformValue('uTexturesRenderOrder', this.sceneData.backgrounds.map(background => background.renderOrder))
     this.maskShader.setUniformValue('uResolution', new THREE.Vector2(sizes.canvasWidth, sizes.canvasHeight))
 
@@ -259,6 +273,7 @@ export class InteractibleScene extends THREE.Scene {
   public render(elapsedTime: number, enabled: boolean = true) {
     if (!this.isClickable) return
     this.calculateTextureShifts()
+    this.updateAnimation(elapsedTime - this.timeOffset)
 
     if (this.renderer && enabled) {
       if (this.timeOffset === 0) {
@@ -557,11 +572,11 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uExcludedColor', item ? new THREE.Color(0, 0, 0) : new THREE.Color(0, 0, 0))
   }
 
-  public hideItem(item: TextureName) {
+  public hideItem(item: TextureName, instant: boolean = false) {
     const index = this.sceneData.backgrounds.findIndex(background => background.texture === item)
     this.opacityTweens[index]?.stop()
     this.opacityTweens[index] = new TWEEN.Tween({ value: this.currentOpacities[index] })
-      .to({ value: 0 }, 400)
+      .to({ value: 0 }, instant ? 0 : 400)
       .easing(TWEEN.Easing.Quadratic.Out)
       .onUpdate((obj) => {
         this.currentOpacities[index] = obj.value
@@ -576,18 +591,91 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uHiddenOpacities', this.currentOpacities);
   }
 
-  public showItem(item: TextureName) {
+  public showItem(item: TextureName, instant: boolean = false) {
     const index = this.sceneData.backgrounds.findIndex(background => background.texture === item)
 
     this.opacityTweens[index]?.stop()
     this.opacityTweens[index] = new TWEEN.Tween({ value: this.currentOpacities[index] })
-      .to({ value: 1 }, 400)
+      .to({ value: 1 }, instant ? 0 : 400)
       .easing(TWEEN.Easing.Quadratic.Out)
       .onUpdate((obj) => {
         this.currentOpacities[index] = obj.value
         this.maskShader.setUniformValue('uHiddenOpacities', this.currentOpacities);
       })
       .start();
+  }
+
+  private initializeAnimationLayer(background: SceneBackgroundObject, index: number) {
+    if (!background.states || !background.isAnimated) return;
+    
+    const initialState = background.states[0];
+    const nextTexture = this.getNextTexture(initialState);
+    
+    this.animatedLayers.set(index, {
+      currentState: initialState,
+      nextTexture,
+      currentDuration: this.calculateDuration(initialState),
+      startTime: 0
+    });
+
+    this.currentTextures[index] = _textures[initialState.texture];
+  }
+  
+  private getNextTexture(currentState: TextureState): TextureName {
+    if (!currentState.nextTextures.length) return currentState.texture;
+    
+    if (currentState.transitionProbabilities) {
+      const total = currentState.transitionProbabilities.reduce((a, b) => a + b, 0);
+      let random = Math.random() * total;
+      for (let i = 0; i < currentState.nextTextures.length; i++) {
+        random -= currentState.transitionProbabilities[i];
+        if (random <= 0) return currentState.nextTextures[i];
+      }
+    }
+    
+    return currentState.nextTextures[Math.floor(Math.random() * currentState.nextTextures.length)];
+  }
+  
+  private calculateDuration(state: TextureState): number {
+    const normalRandom = () => {
+      let u = 0, v = 0;
+      while (u === 0) u = Math.random();
+      while (v === 0) v = Math.random();
+      return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    };
+
+    const range = state.maxDuration - state.minDuration;
+    const stdDev = range / 4;
+    
+    let duration = state.baseDuration + (normalRandom() * stdDev);
+    
+    duration = Math.max(state.minDuration, Math.min(state.maxDuration, duration));
+
+    console.log(duration)
+    
+    return duration;
+  }
+  
+  public updateAnimation(deltaTime: number) {
+    this.animatedLayers.forEach((layer, index) => {
+      
+      if (deltaTime - layer.startTime >= layer.currentDuration) {
+        const nextState = this.sceneData.backgrounds[index].states?.find(
+          state => state.texture === layer.nextTexture
+        );
+        
+        if (nextState) {
+          layer.currentState = nextState;
+          layer.nextTexture = this.getNextTexture(nextState);
+          layer.currentDuration = this.calculateDuration(nextState);
+          layer.startTime = deltaTime;
+
+          this.currentTextures[index] = _textures[nextState.texture];
+          
+          this.maskShader.setUniformValue('uTextures', this.currentTextures);
+        }
+      }
+    });
   }
 
 }

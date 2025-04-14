@@ -467,45 +467,6 @@ TextArea::selection {
   z-index: 1000;
 }
 
-//
-// Backgrounds
-//
-.LightenBackground {
-  background-color: #fffb;
-  background-blend-mode:lighten;
-}
-.Background {
-    background-color: #1c130c;
-}
-.BackgroundSplash {
-  @extend .Background;
-  background-image: url('/images/bg_duel.jpg');
-}
-.BackgroundGate {
-  @extend .Background;
-  background-image: url('/images/bg_gate.jpg');
-}
-.BackgroundDuelists {
-  @extend .Background;
-  background-image: url('/images/bg_duelists.jpg');
-}
-.BackgroundDuelsYour {
-  @extend .Background;
-  background-image: url('/images/bg_duels_yours.jpg');
-}
-.BackgroundDuelsLive {
-  @extend .Background;
-  background-image: url('/images/bg_duels_live.jpg');
-}
-.BackgroundDuelsPast {
-  @extend .Background;
-  background-image: url('/images/bg_duels_past.jpg');
-}
-.BackgroundDuel {
-  @extend .Background;
-  background-image: url('/images/bg_duel.jpg');
-}
-
 
 //------------------------
 // GAME

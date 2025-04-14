@@ -369,7 +369,7 @@ export default function ScDuelists() {
 
       <img 
         ref={sweepRef}
-        src="/images/hand_sweep.png"
+        src="/images/ui/hand_sweep.png"
         style={{
           position: 'absolute',
           width: '100%',
@@ -384,7 +384,7 @@ export default function ScDuelists() {
       />
       <img
         ref={throwRef}
-        src="/images/hand_throw.png" 
+        src="/images/ui/hand_throw.png" 
         style={{
           position: 'absolute', 
           width: '100%',

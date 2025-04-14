@@ -252,7 +252,7 @@ export default function ScDuelsBoard() {
       }}>
         {posterGrids}
       </div>
-      <img src='/images/bg_duels_lighting.png' className='NoMouse NoDrag' style={{
+      <img src='/images/scenes/duels_board/bg_duels_lighting.png' className='NoMouse NoDrag' style={{
         width: '100%',
         height: '100%',
         position: 'absolute',
