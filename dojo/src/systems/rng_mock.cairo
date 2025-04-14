@@ -50,16 +50,16 @@ pub impl MockedValueImpl of MockedValueTrait {
 #[derive(Copy, Drop, Serde)]
 pub struct RngWrap {
     pub rng_address: ContractAddress,
-    pub mocked: Span<MockedValue>,
+    pub mocked: Option<Span<MockedValue>>,
 }
 #[generate_trait]
 pub impl RngWrapImpl of RngWrapTrait {
     #[inline(always)]
     fn new(rng_address: ContractAddress) -> @RngWrap {
-        (Self::wrap(rng_address, [].span()))
+        (Self::wrap(rng_address, Option::None))
     }
     #[inline(always)]
-    fn wrap(rng_address: ContractAddress, mocked: Span<MockedValue>) -> @RngWrap {
+    fn wrap(rng_address: ContractAddress, mocked: Option<Span<MockedValue>>) -> @RngWrap {
         (@RngWrap {
             rng_address,
             mocked,

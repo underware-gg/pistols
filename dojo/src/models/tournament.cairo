@@ -261,10 +261,10 @@ mod unit {
     #[test]
     fn test_tournament_round_shuffle_odd() {
         let mut sys: tester::TestSystems = tester::setup_world(tester::FLAGS::MOCK_RNG);
-        let map: Span<MockedValue> = [
+        let mocked: Span<MockedValue> = [
             MockedValueTrait::new(TournamentRoundTrait::SHUFFLE_SALT, ShufflerTrait::mock_to_seed([1, 4, 5, 2, 3].span())),
         ].span();
-        let wrapped: @RngWrap = RngWrapTrait::wrap(sys.rng.contract_address, map);
+        let wrapped: @RngWrap = RngWrapTrait::wrap(sys.rng.contract_address, Option::Some(mocked));
         let round_value = _test_tournament_round(wrapped, 5);
         assert_eq!(round_value.get_opponent_entry_number(0), 0);
         assert_eq!(round_value.get_opponent_entry_number(1), 4);

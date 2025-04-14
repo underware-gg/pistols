@@ -202,7 +202,7 @@ pub mod tutorial {
 
             // execute game loop...
             let deck: Deck = challenge.get_deck();
-            let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), mocked);
+            let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), Option::Some(mocked));
             let progress: DuelProgress = game_loop(wrapped, @deck, ref round);
 
             // end challenge
@@ -220,7 +220,7 @@ pub mod tutorial {
                 let level: TutorialLevel = challenge.into();
                 let mut round: Round = store.get_round(duel_id);
                 let (_, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(@round.moves_b.as_hand());
-                let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), mocked);
+                let wrapped = RngWrapTrait::wrap(store.world.rng_mock_address(), Option::Some(mocked));
                 (game_loop(wrapped, @challenge.get_deck(), ref round))
             } else {
                 {Default::default()}

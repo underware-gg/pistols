@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use pistols::systems::rng::{RngWrapTrait};
+    use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::challenge::{Round, MovesTrait, DuelistStateTrait};
     use pistols::types::duel_progress::{DuelProgress, DuelStep};
     use pistols::types::round_state::{RoundState};
@@ -68,7 +68,8 @@ mod tests {
         round.moves_b.set_salt_and_moves(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
-        let progress: DuelProgress = game_loop(RngWrapTrait::new((*sys.rng).contract_address), @DeckType::Classic.build_deck(), ref round);
+        let wrapped: @RngWrap = RngWrapTrait::wrap((*sys.rng).contract_address, Option::Some([].span())); // force using mocked rng
+        let progress: DuelProgress = game_loop(wrapped, @DeckType::Classic.build_deck(), ref round);
         (round, progress)
     }
 

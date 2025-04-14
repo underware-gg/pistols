@@ -49,7 +49,10 @@ pub impl DiceImpl of DiceTrait {
             rng: IRngDispatcher{ contract_address: *wrapped.rng_address },
             seed: initial_seed,
             last_dice: 0,
-            mocked: *wrapped.mocked,
+            mocked: match *wrapped.mocked {
+                Option::Some(mocked) => mocked,
+                Option::None => [].span(),
+            },
         })
     }
 
@@ -91,8 +94,12 @@ pub struct Shuffle {
 pub impl ShuffleImpl of ShuffleTrait {
     fn new(wrapped: @RngWrap, initial_seed: felt252, shuffle_size: u8, salt: felt252) -> Shuffle {
         let rng = IRngDispatcher{ contract_address: *wrapped.rng_address };
-        let seed: felt252 = rng.reseed(initial_seed, salt, *wrapped.mocked);
-        let is_mocked: bool = (rng.is_mocked() && (*wrapped.mocked).len() > 0);
+        let mocked: Span<MockedValue> = match *wrapped.mocked {
+            Option::Some(mocked) => mocked,
+            Option::None => [].span(),
+        };
+        let seed: felt252 = rng.reseed(initial_seed, salt, mocked);
+        let is_mocked: bool = (rng.is_mocked() && (*wrapped.mocked).is_some());
         let shuffler = ShufflerTrait::new(shuffle_size, is_mocked);
         (Shuffle {
             seed,

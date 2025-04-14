@@ -107,12 +107,12 @@ mod tests {
     #[test]
     fn test_rng_mock_dice() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let map: Span<MockedValue> = [
+        let mocked: Span<MockedValue> = [
             MockedValueTrait::new('dice_1', 1),
             MockedValueTrait::new('dice_2', 22),
             MockedValueTrait::new('dice_3', 34),
         ].span();
-        let mut dice: Dice = DiceTrait::new(RngWrapTrait::wrap(sys.rng.contract_address, map), 0x1212121212);
+        let mut dice: Dice = DiceTrait::new(RngWrapTrait::wrap(sys.rng.contract_address, Option::Some(mocked)), 0x1212121212);
         let d1 = dice.throw('dice_1', 100);
         let d2 = dice.throw('dice_2', 100);
         let d3 = dice.throw('dice_3', 100);
@@ -124,10 +124,10 @@ mod tests {
     #[test]
     fn test_rng_mock_shuffle() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let map: Span<MockedValue> = [
+        let mocked: Span<MockedValue> = [
             MockedValueTrait::new('shuffle', ShufflerTrait::mock_to_seed([1, 22, 34, 7, 25].span())),
         ].span();
-        let mut shuffle: Shuffle = ShuffleTrait::new(RngWrapTrait::wrap(sys.rng.contract_address, map), 0x1212121212, 34, 'shuffle');
+        let mut shuffle: Shuffle = ShuffleTrait::new(RngWrapTrait::wrap(sys.rng.contract_address, Option::Some(mocked)), 0x1212121212, 34, 'shuffle');
         assert_eq!(shuffle.draw_next(), 1, "shuffle_1");
         assert_eq!(shuffle.draw_next(), 22, "shuffle_22");
         assert_eq!(shuffle.draw_next(), 34, "shuffle_34");
@@ -138,12 +138,12 @@ mod tests {
     #[test]
     fn test_rng_mock_dice_wrapped() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let map: Span<MockedValue> = [
+        let mocked: Span<MockedValue> = [
             MockedValueTrait::new('dice_1', 1),
             MockedValueTrait::new('dice_2', 22),
             MockedValueTrait::new('dice_3', 34),
         ].span();
-        let mut dice: Dice = DiceTrait::new(RngWrapTrait::wrap(sys.rng.contract_address, map), 0x1212121212);
+        let mut dice: Dice = DiceTrait::new(RngWrapTrait::wrap(sys.rng.contract_address, Option::Some(mocked)), 0x1212121212);
         let d1 = dice.throw('dice_1', 100);
         let d2 = dice.throw('dice_2', 100);
         let d3 = dice.throw('dice_3', 100);
@@ -155,10 +155,10 @@ mod tests {
     #[test]
     fn test_rng_mock_shuffle_wrapped() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let map: Span<MockedValue> = [
+        let mocked: Span<MockedValue> = [
             MockedValueTrait::shuffled('shuffle', [1, 22, 34].span()),
         ].span();
-        let mut shuffle: Shuffle = ShuffleTrait::new(RngWrapTrait::wrap(sys.rng.contract_address, map), 0x1212121212, 34, 'shuffle');
+        let mut shuffle: Shuffle = ShuffleTrait::new(RngWrapTrait::wrap(sys.rng.contract_address, Option::Some(mocked)), 0x1212121212, 34, 'shuffle');
         let s1 = shuffle.draw_next();
         let s2 = shuffle.draw_next();
         let s3 = shuffle.draw_next();
