@@ -7,14 +7,15 @@ use pistols::types::timestamp::{Period};
 #[dojo::model]
 pub struct TournamentEntry {
     #[key]
-    pub entry_id: u64,      // token id
+    pub entry_id: u64,              // token id
     //------
-    pub tournament_id: u64, // budokan tournament_id
-    pub entry_number: u8,   // entry number in the tournament
-    pub duelist_id: u128,   // enlisted duelist id
-    pub score: u32,         // budokan score
-    pub points: u16,        // duelist points
-    pub fame: u128,         // duelist FAME
+    pub tournament_id: u64,         // budokan tournament_id
+    pub entry_number: u8,           // entry number in the tournament
+    pub duelist_id: u128,           // enlisted duelist id
+    // progress
+    pub current_round_number: u8,   // current round this player is in
+    pub score: u32,                 // budokan score (Fame less decimals)
+    pub fame: u128,                 // duelist FAME
 }
 
 //------------------------------------

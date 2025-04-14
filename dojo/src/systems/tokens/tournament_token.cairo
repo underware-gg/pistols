@@ -446,12 +446,15 @@ pub mod tournament_token {
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             assert(token_metadata.lifecycle.is_playable(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_PLAYABLE);
             // enlisted
-            let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
+            let mut entry: TournamentEntry = store.get_tournament_entry(entry_id);
             assert(entry.tournament_id.is_non_zero(), Errors::NOT_ENLISTED);
             assert(entry.duelist_id.is_non_zero(), Errors::NOT_ENLISTED);
             // tournament has started
             let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
             assert(tournament.current_round_number.is_non_zero(), Errors::NOT_STARTED);
+            // update entry
+            entry.current_round_number = tournament.current_round_number;
+            store.set_tournament_entry(@entry);
             // Get round pairing
             let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.current_round_number);
             let opponent_entry_number: u8 = round.get_opponent_entry_number(entry.entry_number);

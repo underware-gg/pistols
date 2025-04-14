@@ -9,11 +9,12 @@ use pistols::systems::tokens::{
 use pistols::models::{
     challenge::{Challenge, DuelType},
     tournament::{
+        TournamentEntry,
         Tournament, TournamentType,
         TournamentRound,
         TournamentSettings, TournamentSettingsValue,
-        // ChallengeToTournamentValue, TournamentToChallengeValue,
         TournamentDuelKeys,
+        // ChallengeToTournamentValue, TournamentToChallengeValue,
         // TOURNAMENT_SETTINGS,
     },
 };
@@ -319,10 +320,16 @@ fn test_join_duel_ok() {
     tester::impersonate(A);
     let entry_id_1: u64 = _mint(ref sys, A);
     tester::execute_enlist_duelist(@sys, A, entry_id_1, ID_A);
+    let entry_1: TournamentEntry = sys.store.get_tournament_entry(entry_id_1);
+    assert_eq!(entry_1.duelist_id, ID_A, "__entry_1.duelist_id");
+    assert_eq!(entry_1.current_round_number, 0, "__entry_1.current_round_number");
     // mint+enlist 2
     tester::impersonate(B);
     let entry_id_2: u64 = _mint(ref sys, B);
     tester::execute_enlist_duelist(@sys, B, entry_id_2, ID_B);
+    let entry_2: TournamentEntry = sys.store.get_tournament_entry(entry_id_2);
+    assert_eq!(entry_2.duelist_id, ID_B, "__entry_2.duelist_id");
+    assert_eq!(entry_2.current_round_number, 0, "__entry_2.current_round_number");
     //
     // start tournament
     //
@@ -346,6 +353,10 @@ fn test_join_duel_ok() {
     assert_eq!(keys_1.round_number, 1, "keys_1.round_number");
     assert_eq!(keys_1.entry_number_a, 1, "keys_1.entry_number_a");
     assert_eq!(keys_1.entry_number_b, 2, "keys_1.entry_number_b");
+    let entry_1: TournamentEntry = sys.store.get_tournament_entry(entry_id_1);
+    assert_eq!(entry_1.tournament_id, tournament_id, "entry_1.tournament_id");
+    assert_eq!(entry_1.entry_number, 1, "entry_1.entry_number");
+    assert_eq!(entry_1.current_round_number, 1, "entry_1.current_round_number");
     //
     // join 2...
     tester::impersonate(B);
@@ -356,6 +367,10 @@ fn test_join_duel_ok() {
     assert_eq!(ch_2.state, ChallengeState::InProgress, "ch_2.state");
     assert_eq!(ch_2.address_b, B, "ch_2.address_b");
     assert_eq!(ch_2.duelist_id_b, ID_B, "ch_2.duelist_id_b");
+    let entry_2: TournamentEntry = sys.store.get_tournament_entry(entry_id_2);
+    assert_eq!(entry_2.tournament_id, tournament_id, "entry_2.tournament_id");
+    assert_eq!(entry_2.entry_number, 2, "entry_2.entry_number");
+    assert_eq!(entry_2.current_round_number, 1, "entry_2.current_round_number");
 }
 
 #[test]
