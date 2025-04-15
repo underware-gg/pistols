@@ -164,6 +164,7 @@ pub mod duel_token {
     use pistols::interfaces::dns::{
         DnsTrait,
         IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+        IGameDispatcherTrait,
     };
     use pistols::models::{
         player::{PlayerTrait},
@@ -583,10 +584,18 @@ pub mod duel_token {
                     duel_id,
                 });
 
-                // Duelist 1 is ready to commit
-                store.emit_challenge_action(@challenge, duelist_number, true);
-
-                (challenge)
+                if (keys.entry_number_b.is_zero()) {
+                    // no opponent! declare winner
+                    // collect rewards for this player
+                    store.world.game_dispatcher().collect_duel(duel_id);
+                } else {
+                    // assert duelist is not in a challenge
+                    store.enter_challenge(duelist_id, duel_id);
+                    // Duelist 1 is ready to commit
+                    store.emit_challenge_action(@challenge, duelist_number, true);
+                    // events
+                    PlayerTrait::check_in(ref store, Activity::ChallengeCreated, player_address, duel_id.into());
+                }
             }
             //-----------------------------------
             // EXISTING DUEL
@@ -619,17 +628,15 @@ pub mod duel_token {
                 // save!
                 store.set_challenge(@challenge);
 
+                // assert duelist is not in a challenge
+                store.enter_challenge(duelist_id, duel_id);
+
                 // Duelist 2 can commit
                 store.emit_challenge_action(@challenge, duelist_number, true);
 
-                (challenge)
+                // events
+                PlayerTrait::check_in(ref store, Activity::ChallengeReplied, player_address, duel_id.into());
             };
-
-            // assert duelist is not in a challenge
-            store.enter_challenge(duelist_id, duel_id);
-
-            // events
-            PlayerTrait::check_in(ref store, Activity::ChallengeCreated, player_address, duel_id.into());
 
             (duel_id)
         }

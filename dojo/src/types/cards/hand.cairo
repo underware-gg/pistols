@@ -21,6 +21,7 @@ pub enum FinalBlow {
     Paces: PacesCard,   // ended in Pistols round
     Blades: BladesCard, // ended in Blades round
     Forsaken,           // some player(s) timed-out
+    Unpaired,           // unpaired in tournament
 }
 impl FinalBlowDefault of Default<FinalBlow> {
     fn default() -> FinalBlow {(FinalBlow::Undefined)}
@@ -73,6 +74,7 @@ impl FinalBlowIntoByteArray of core::traits::Into<FinalBlow, ByteArray> {
             FinalBlow::Paces(_) =>  "Paces",
             FinalBlow::Blades(_) => "Blades",
             FinalBlow::Forsaken =>  "Forsaken",
+            FinalBlow::Unpaired =>  "Unpaired",
         }
     }
 }

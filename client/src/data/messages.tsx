@@ -22,6 +22,7 @@ export const EMOJI = {
   ALIVE: '❤️',
   INJURED: '🩸',
   TIMED_OUT: '👻',
+  UNPAIRED: '🍀',
   DEAD: '☠️',
   BOUNTY: '💰',
   WINNER: '🏅',

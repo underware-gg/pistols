@@ -46,6 +46,7 @@ pub trait IGameProtected<TState> {
 
 #[dojo::contract]
 pub mod game {
+    use core::num::traits::Zero;
     use starknet::{ContractAddress};
     use dojo::world::{WorldStorage, IWorldDispatcherTrait};
 
@@ -82,7 +83,7 @@ pub mod game {
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::models::{
         player::{PlayerTrait},
-        challenge::{Challenge, ChallengeTrait, Round, RoundTrait, MovesTrait},
+        challenge::{Challenge, ChallengeTrait, DuelType, Round, RoundTrait, MovesTrait},
         duelist::{Duelist, DuelistTrait, DuelistStatusTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
@@ -119,11 +120,11 @@ pub mod game {
         pub const INVALID_SALT: felt252              = 'PISTOLS: Invalid salt';
         pub const INVALID_MOVES_COUNT: felt252       = 'PISTOLS: Invalid moves count';
         pub const MOVES_HASH_MISMATCH: felt252       = 'PISTOLS: Moves hash mismatch';
-        pub const IMPOSSIBLE_ERROR: felt252          = 'PISTOLS: Impossible error';
         pub const SEASON_IS_NOT_ACTIVE: felt252      = 'PISTOLS: Season is not active';
         pub const SEASON_IS_ACTIVE: felt252          = 'PISTOLS: Season is active';
-        pub const SEASON_NOT_ENDGAME: felt252        = 'PISTOLS: Not endgame';
         pub const BAD_SHUFFLE_SEED: felt252          = 'PISTOLS: Bad shuffle seed';
+        pub const INVALID_DUEL_TYPE: felt252         = 'PISTOLS: Invalid duel type';
+        pub const IMPOSSIBLE_ERROR: felt252          = 'PISTOLS: Impossible error';
     }
 
     fn dojo_init(ref self: ContractState) {
@@ -340,16 +341,26 @@ pub mod game {
         fn collect_duel(ref self: ContractState, duel_id: u128) {
             let mut store: Store = StoreTrait::new(self.world_default());
             let mut challenge: Challenge = store.get_challenge(duel_id);
-            assert(self.can_collect_duel(duel_id), Errors::CHALLENGE_IN_PROGRESS);
-            // collect!
             let mut round: Round = store.get_round(duel_id);
-            if (challenge.state == ChallengeState::Awaiting) {
-                // if pending, set to expired...
-                challenge.state = ChallengeState::Expired;
-                self._finish_challenge(ref store, ref challenge, ref round, Option::None);
+
+            if (store.world.caller_is_duel_contract()) {
+                // tournament unpaired player > declared winner
+                assert(challenge.duel_type == DuelType::Tournament, Errors::INVALID_DUEL_TYPE);
+                let winner: u8 = if (challenge.address_b.is_zero()) {1} else if (challenge.address_a.is_zero()) {2} else {0};
+                round.final_blow = FinalBlow::Unpaired;
+                self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner));
             } else {
-                // some player timed out...
-                assert(self._finish_challenge_if_timed_out(ref store, ref challenge, ref round), Errors::IMPOSSIBLE_ERROR);
+                // outside call
+                assert(self.can_collect_duel(duel_id), Errors::CHALLENGE_IN_PROGRESS);
+                // collect!
+                if (challenge.state == ChallengeState::Awaiting) {
+                    // if pending, set to expired...
+                    challenge.state = ChallengeState::Expired;
+                    self._finish_challenge(ref store, ref challenge, ref round, Option::None);
+                } else {
+                    // some player timed out...
+                    assert(self._finish_challenge_if_timed_out(ref store, ref challenge, ref round), Errors::IMPOSSIBLE_ERROR);
+                }
             }
         }
 
@@ -451,9 +462,6 @@ pub mod game {
                 survived: (fame_balance - rewards_loss.fame_lost) >= FAME::ONE_LIFE.low,
             })
         }
-
-
-
 
         fn get_timestamp(self: @ContractState) -> u64 {
             (starknet::get_block_timestamp())
@@ -574,9 +582,7 @@ pub mod game {
             challenge.unset_pact(ref store);
             // exit challenge
             store.exit_challenge(challenge.duelist_id_a);
-            if (challenge.duelist_id_b != 0) {
-                store.exit_challenge(challenge.duelist_id_b);
-            }
+            store.exit_challenge(challenge.duelist_id_b);
             // distributions
             if (challenge.state.is_concluded()) {
                 // transfer rewards

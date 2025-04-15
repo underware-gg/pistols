@@ -496,11 +496,13 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn emit_challenge_rewards(ref self: Store, duel_id: u128, duelist_id: u128, rewards: RewardValues) {
-        self.world.emit_event(@ChallengeRewardsEvent{
-            duel_id,
-            duelist_id,
-            rewards,
-        });
+        if (duelist_id.is_non_zero()) {
+            self.world.emit_event(@ChallengeRewardsEvent{
+                duel_id,
+                duelist_id,
+                rewards,
+            });
+        }
     }
 
     #[inline(always)]

@@ -135,6 +135,8 @@ export function useDuelIcons({
       
       if (round1?.endedInTimeout && moves1?.timeout) {
         icons.push(<EmojiIcon key='timedOut' emoji={EMOJI.TIMED_OUT} size={iconSize} />)
+      } else if (round1?.unpairedWin) {
+        icons.push(<EmojiIcon key='unpairedWin' emoji={EMOJI.UNPAIRED} size={iconSize} />)
       } else if (dead) {
         icons.push(<EmojiIcon key='dead' emoji={dead} size={iconSize} />)
       }

@@ -88,9 +88,11 @@ pub impl DuelistImpl of DuelistTrait {
         self.set_duelist_challenge(@assignment);
     }
     fn exit_challenge(ref self: Store, duelist_id: u128) {
-        let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
-        assignment.duel_id = 0;
-        self.set_duelist_challenge(@assignment);
+        if (duelist_id.is_non_zero()) {
+            let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
+            assignment.duel_id = 0;
+            self.set_duelist_challenge(@assignment);
+        }
     }
     fn enter_tournament(ref self: Store, duelist_id: u128, entry_id: u64) {
         let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
