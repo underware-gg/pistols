@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { SceneName } from '/src/data/assets'
+import { SceneName, TextureName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { TavernAudios } from '/src/components/GameContainer'
 import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
@@ -33,9 +33,9 @@ export default function ScTavern() {
           break
         case 'bartender':
           setOpen(true);
+          (_currentScene as InteractibleScene)?.excludeItem(TextureName.bg_tavern_bartender_mask);
           (_currentScene as InteractibleScene)?.toggleBlur(true);
           (_currentScene as InteractibleScene)?.setClickable(false);
-          (_currentScene as InteractibleScene)?.excludeItem(sceneBackgrounds.Tavern.items.find(item => item.name === 'bartender'));
           break;
       }
     }

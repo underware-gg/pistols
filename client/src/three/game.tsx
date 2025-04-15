@@ -55,6 +55,12 @@ export const cameraData = {
   farPlane: 150,
 }
 
+export const cameraDataStatic = {
+  fieldOfView: 13,
+  nearPlane: 0.1,
+  farPlane: 1,
+}
+
 const lightCameraShadowData = {
   intensity: 2,
   mapSize: 8192,
@@ -326,10 +332,10 @@ export function setCameras() {
   _duelCameraParent.add(_duelCamera)
   _duelCamera.position.set(0, 0.05, 0)
   _staticCamera = new THREE.PerspectiveCamera(
-    cameraData.fieldOfView,
+    cameraDataStatic.fieldOfView,
     ASPECT,
-    cameraData.nearPlane,
-    cameraData.farPlane,
+    cameraDataStatic.nearPlane,
+    cameraDataStatic.farPlane,
   )
 }
 
@@ -1438,8 +1444,12 @@ export function switchScene(sceneName) {
       
       if (sceneName != SceneName.Duel) {
         _duelistManager.hideElements()
+        _renderer.getContext().disable(_renderer.getContext().DEPTH_TEST);
       } else if (_statsEnabled) {
         resetDuelScene()
+        _renderer.getContext().enable(_renderer.getContext().DEPTH_TEST);
+      } else {
+        _renderer.getContext().enable(_renderer.getContext().DEPTH_TEST);
       }
     });
   }

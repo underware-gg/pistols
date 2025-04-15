@@ -38,6 +38,7 @@ export class InteractibleScene extends THREE.Scene {
   opacityTweens: any[] = []
   currentOpacities: number[] = [1, 1, 1, 1, 1, 1, 1]
   currentSamples: number[] = []
+  currentDarkStrength: number = 0.0
   blurTween: any;
 
   lastClickTimeStamp: number
@@ -76,6 +77,7 @@ export class InteractibleScene extends THREE.Scene {
 
     this.currentTextures = this.sceneData.backgrounds.map(background => _textures[background.texture]);
     this.currentSamples = this.sceneData.backgrounds.map(background => background.blurred ? (background.samples || 0) : 0);
+    this.currentDarkStrength = 0.0;
 
     const bgDistance = -1
     const vFOV = THREE.MathUtils.degToRad(cameraData.fieldOfView * 0.5)
@@ -168,7 +170,7 @@ export class InteractibleScene extends THREE.Scene {
       )
     }
 
-    this.maskShader = new ShaderMaterial("BAR_MASK", {
+    this.maskShader = new ShaderMaterial("INTERACTIBLE_MASK", {
       transparent: true,
       depthTest: false,
       alphaTest: 0.5,
@@ -188,6 +190,7 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uOpaque', this.sceneData.backgrounds.map(background => background.opaque || false))
     this.maskShader.setUniformValue('uClickable', this.isClickable)
     this.maskShader.setUniformValue('uSamples', this.currentSamples)
+    this.maskShader.setUniformValue('uDarkStrength', this.currentDarkStrength)
     this.maskShader.setUniformValue('uShiftAmount', 0.0)
     this.maskShader.setUniformValue('uShiftAmountLayer', this.layerShiftAmounts)
     this.maskShader.setUniformValue('uTextureShift0', new THREE.Vector2(0.0, 0.0))
@@ -504,6 +507,7 @@ export class InteractibleScene extends THREE.Scene {
     }
     
     const startSamples = [...this.currentSamples];
+    const startDarkStrength = this.currentDarkStrength;
     
     const targetSamples = this.sceneData.backgrounds.map(background => {
       if (shouldBlur) {
@@ -512,6 +516,8 @@ export class InteractibleScene extends THREE.Scene {
         return background.blurred ? (background.samples || 0) : 0;
       }
     });
+    
+    const targetDarkStrength = shouldBlur ? 0.8 : 0.0;
     
     this.blurTween = new TWEEN.Tween({ progress: 0 })
       .to({ progress: 1 }, 600)
@@ -522,7 +528,10 @@ export class InteractibleScene extends THREE.Scene {
           return Math.round(startValue + (targetValue - startValue) * obj.progress);
         });
         
+        this.currentDarkStrength = startDarkStrength + (targetDarkStrength - startDarkStrength) * obj.progress;
+        
         this.maskShader.setUniformValue('uSamples', this.currentSamples);
+        this.maskShader.setUniformValue('uDarkStrength', this.currentDarkStrength);
       })
       .start();
   }
@@ -586,11 +595,13 @@ export class InteractibleScene extends THREE.Scene {
     return this.isClickable
   }
 
-  public excludeItem(item?: SceneObject) {
+  public excludeItem(mask?: TextureName) {
+    const item = this.sceneData.items.find(item => item.mask === mask)
     this.maskShader.setUniformValue('uExcludedColor', item ? new THREE.Color('#' + item.color) : new THREE.Color(0, 0, 0))
   }
 
-  public includeItem(item?: SceneObject) {
+  public includeItem(mask?: TextureName) {
+    const item = this.sceneData.items.find(item => item.mask === mask)
     this.maskShader.setUniformValue('uExcludedColor', item ? new THREE.Color(0, 0, 0) : new THREE.Color(0, 0, 0))
   }
 

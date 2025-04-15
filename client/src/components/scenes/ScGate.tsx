@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { sceneBackgrounds, SceneName } from '/src/data/assets'
+import { sceneBackgrounds, SceneName, TextureName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useTextureShift } from '/src/hooks/useTextureShift'
 import { TavernAudios } from '/src/components/GameContainer'
@@ -21,7 +21,7 @@ export default function ScGate() {
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
   const { x: bubbleShiftX, y: bubbleShiftY } = useTextureShift(1)
-  const { x: logoShiftX, y: logoShiftY } = useTextureShift(6)
+  const { x: logoShiftX, y: logoShiftY } = useTextureShift(5)
   
   useEffect(() => {
     // Set up the text display with delay
@@ -38,7 +38,7 @@ export default function ScGate() {
         
       const scene = (_currentScene as InteractibleScene);
       if (scene) {
-        scene.excludeItem(sceneBackgrounds.Gate.items[0])
+        scene.excludeItem(TextureName.bg_entrance_door_mask)
         scene.toggleBlur(true)
         
         setTimeout(() => {

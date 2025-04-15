@@ -20,6 +20,7 @@ uniform vec3 uPickedColor;
 uniform vec3 uExcludedColor;
 uniform bool uClickable;
 uniform int uSamples[7]; //from 2 to 35
+uniform float uDarkStrength; // from 0.0 to 1.0
 uniform float uShiftAmount; // from 0.0 to 1.0
 uniform float uShiftAmountLayer[7]; // per-layer shift amount
 

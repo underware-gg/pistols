@@ -47,9 +47,13 @@ export async function loadShaders() {
     vsh: await loadShader('/shaders/highlight-effect-vsh.glsl'),
     fsh: await loadShader('/shaders/highlight-effect-fsh.glsl'),
   };
-  ShaderManager.shaderCode['BAR_MASK'] = {
-    vsh: await loadShader('/shaders/bar-mask-vsh.glsl'),
-    fsh: await loadShader('/shaders/bar-mask-fsh.glsl'),
+  ShaderManager.shaderCode['INTERACTIBLE_MASK_BLUR'] = {
+    vsh: await loadShader('/shaders/interactible-mask-blur-vsh.glsl'),
+    fsh: await loadShader('/shaders/interactible-mask-blur-fsh.glsl'),
+  };
+  ShaderManager.shaderCode['INTERACTIBLE_MASK'] = {
+    vsh: await loadShader('/shaders/interactible-mask-vsh.glsl'),
+    fsh: await loadShader('/shaders/interactible-mask-fsh.glsl'),
   };
 }
 
