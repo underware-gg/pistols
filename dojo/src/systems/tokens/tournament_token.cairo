@@ -90,17 +90,23 @@ pub trait ITournamentToken<TState> {
 pub trait ITournamentTokenPublic<TState> {
     // misc
     fn get_tournament_id(self: @TState, entry_id: u64) -> u64;
+
     // Phase 0 -- Budokan registration
-    // Phase 1 -- Start tournament (anyone can start)
+
+    // Phase 1 -- Enlist Duelist (per player)
+    // - can be called by before or after start_tournament()
+    fn can_enlist_duelist(self: @TState, entry_id: u64, duelist_id: u128) -> bool;
+    fn enlist_duelist(ref self: TState, entry_id: u64, duelist_id: u128);
+
+    // Phase 2 -- Start tournament (anyone can start)
     // - will shuffle initial bracket
     fn can_start_tournament(self: @TState, entry_id: u64) -> bool;
     fn start_tournament(ref self: TState, entry_id: u64) -> u64;
-    // Phase 2 -- Enlist Duelist (per player)
-    fn can_enlist_duelist(self: @TState, entry_id: u64, duelist_id: u128) -> bool;
-    fn enlist_duelist(ref self: TState, entry_id: u64, duelist_id: u128);
+
     // Phase 3 -- Join tournament (per player)
     fn can_join_duel(self: @TState, entry_id: u64) -> bool;
     fn join_duel(ref self: TState, entry_id: u64) -> u128;
+
     // // Phase 4 -- End round (anyone can end)
     // // - will shuffle next bracket
     // // - or end tournament if end conditions met
@@ -315,7 +321,7 @@ pub mod tournament_token {
         }
 
         //-----------------------------------
-        // Phase 1 -- Start tournament
+        // Phase 2 -- Start tournament
         //
         fn can_start_tournament(self: @ContractState, entry_id: u64) -> bool {
             if (!self.erc721_combo.token_exists(entry_id.into())) {
@@ -354,7 +360,7 @@ pub mod tournament_token {
         }
 
         //-----------------------------------
-        // Phase 2 -- Enlist Duelist
+        // Phase 1 -- Enlist Duelist
         //
         fn can_enlist_duelist(self: @ContractState, entry_id: u64, duelist_id: u128) -> bool {
             let store: Store = StoreTrait::new(self.world_default());
