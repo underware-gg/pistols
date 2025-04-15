@@ -65,10 +65,19 @@ pub struct TournamentRound {
     #[key]
     pub round_number: u8,
     //------
-    pub entry_count: u8,        // participating in this round
+    pub entry_count: u8,        // participating in this round, maximum of 32
     pub timestamps: Period,     // will never expire after tournament
-    pub bracket: u256,          // duelist pairings: 32 * 8-bit slots
-    pub results: u64,           // bitmap: 32 * 2-bit slots (????)
+    // bracket (duelist pairings): 32 bytes, one for each duelist
+    // ex: duel between 4 and 7: byte[4-1] = 7, byte[7-1] = 4
+    pub bracket: u256,
+    // results: 32 nibbles (4-bit), one for each duelist
+    // bit 0 (0b0001): 1 = duelist is winning or won / 0 = duelist is losing or lost
+    // bit 1 (0b0010): 1 = duelist survived / 0 = duelist dead or not qualified
+    // bit 2 (0b0100): 1 = duelist is still playing / 0 = duelist finished playing
+    // bit 3 (0b1000): 1 = duelist is participating in this round / 0 = empty slot
+    // ps1: never 2 paired duelists are both winning
+    // ps2: all winners go to the next round, losers only if finished and survived
+    pub results: u128,
 }
 
 //------------------------------------
@@ -106,9 +115,10 @@ pub struct TournamentDuelKeys {
 //---------------------------
 // Traits
 //
-use pistols::systems::tokens::tournament_token::tournament_token::{MAX_ENTRIES};
 use pistols::systems::rng::{RngWrap, Shuffle, ShuffleTrait};
+use pistols::utils::bitwise::{BitwiseU128};
 use pistols::utils::bytemap::{BytemapU256};
+use pistols::utils::nibblemap::{NibblemapU128};
 
 #[generate_trait]
 pub impl TournamentSettingsValueImpl of TournamentSettingsValueTrait {
@@ -120,6 +130,9 @@ pub impl TournamentSettingsValueImpl of TournamentSettingsValueTrait {
 #[generate_trait]
 pub impl TournamentRoundImpl of TournamentRoundTrait {
     const SHUFFLE_SALT: felt252 = 'tournament_round';
+    const MAX_ENTRIES: u8 = 32;
+    const NIBBLE_LOSING: u8 = 0b1100;   // playing and losing
+    const NIBBLE_WINNING: u8 = 0b1101;  // playing and winning
     fn shuffle(ref self: TournamentRound, wrapped: @RngWrap, seed: felt252) {
         let mut shuffle: Shuffle = ShuffleTrait::new(wrapped, seed, self.entry_count, Self::SHUFFLE_SALT);
         let mut i: u8 = 0;
@@ -133,13 +146,64 @@ pub impl TournamentRoundImpl of TournamentRoundTrait {
             self.bracket = BytemapU256::set_byte(self.bracket, index_b, entry_a.into());
             i += 1;
         };
+        self.results = BitwiseU128::shr(
+            // even entries: all duelists are playing and losing (0b1100)
+            if (self.entry_count % 2 == 0) {0xcccccccccccccccccccccccccccccccc}
+            // odd entries: last player won but need to settle (0b1101)
+            else {0xdccccccccccccccccccccccccccccccc},
+            ((Self::MAX_ENTRIES - self.entry_count) * 4).into());
+    }
+    fn moved_first(ref self: TournamentRound, entry_number: u8, opponent_entry_number: u8) {
+        self.results = NibblemapU128::set_nibble(self.results, (entry_number - 1).into(), 0b1101);              // player who moved is winning
+        // self.results = NibblemapU128::set_nibble(self.results, (opponent_entry_number - 1).into(), 0b1100);  // already unset (original state)
+    }
+    fn moved_second(ref self: TournamentRound, entry_number: u8, opponent_entry_number: u8) {
+        // self.results = NibblemapU128::set_nibble(self.results, (entry_number - 1).into(), 0b1100);           // already unset (original state)
+        self.results = NibblemapU128::set_nibble(self.results, (opponent_entry_number - 1).into(), 0b1100);     // opponent has to move
+    }
+    fn finished_duel(ref self: TournamentRound,
+        entry_number_a: u8, entry_number_b: u8,
+        survived_a: bool, survived_b: bool,
+        winner: u8,
+    ) {
+        let value_a: u128 =
+            if (winner == 1) {0b1011}       // winners always survive
+            else if (survived_a) {0b1010}   // lost but survived
+            else {0b1000};                  // out!
+        self.results = NibblemapU128::set_nibble(self.results, (entry_number_a - 1).into(), value_a);
+        // if odd entries, second is empty
+        if (entry_number_b != 0) {
+            let value_b: u128 =
+                if (winner == 2) {0b1011}       // winners always survive
+                else if (survived_b) {0b1010}   // lost but survived
+                else {0b1000};                  // out!
+            self.results = NibblemapU128::set_nibble(self.results, (entry_number_b - 1).into(), value_b);
+        }
+    }
+    fn have_all_duels_finished(self: @TournamentRound) -> bool {
+        // check if all playing bits are cleared (0b0100)
+        ((*self.results & 0x44444444444444444444444444444444) == 0)
+    }
+    fn get_surviving_entries(self: @TournamentRound) -> Array<u8> {
+        let mut result: Array<u8> = array![];
+        let mut i: u8 = 0;
+        while (i < Self::MAX_ENTRIES) {
+            if ((NibblemapU128::get_nibble(*self.results, i.into()) & 0b1010) == 0b1010) {
+                result.append(i + 1);
+            }
+            i += 1;
+        };
+        (result)
+    }
+    fn _get_nibble(self: @TournamentRound, entry_number: u8) -> u8 {
+        (NibblemapU128::get_nibble(*self.results, (entry_number - 1).into())).try_into().unwrap()
     }
 }
 
 #[generate_trait]
 pub impl TournamentRoundValueImpl of TournamentRoundValueTrait {
     fn get_opponent_entry_number(self: @TournamentRoundValue, entry_number: u8) -> u8 {
-        (if (entry_number > 0 && entry_number <= MAX_ENTRIES) {
+        (if (entry_number > 0 && entry_number <= TournamentRoundTrait::MAX_ENTRIES) {
             let index: usize = (entry_number - 1).try_into().unwrap();
             let entry: u8 = BytemapU256::get_byte(*self.bracket, index).try_into().unwrap();
             (entry)
@@ -179,16 +243,16 @@ mod unit {
     use super::{
         TournamentRound, TournamentRoundTrait, TournamentRoundValue, TournamentRoundValueTrait,
     };
-    use pistols::systems::tokens::tournament_token::tournament_token::{MAX_ENTRIES};
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
     use pistols::types::shuffler::{ShufflerTrait};
     use pistols::types::timestamp::{Period};
     use pistols::utils::bytemap::{BytemapU256};
+    use pistols::utils::nibblemap::{NibblemapU128};
     use pistols::tests::tester::{tester};
 
-    fn _test_tournament_round(wrapped: @RngWrap, entry_count: u8) -> @TournamentRoundValue {
-        let mut round = TournamentRound {
+    fn NEW_ROUND(entry_count: u8) -> TournamentRound {
+        (TournamentRound {
             tournament_id: 1,
             round_number: 1,
             entry_count,
@@ -198,7 +262,11 @@ mod unit {
                 start: 0,
                 end: 0,
             },
-        };
+        })
+    }
+
+    fn _test_tournament_round(wrapped: @RngWrap, entry_count: u8) -> @TournamentRoundValue {
+        let mut round = NEW_ROUND(entry_count);
         round.shuffle(wrapped, 0x3453534534534543);
         let round_value = TournamentRoundValue {
             entry_count: round.entry_count,
@@ -206,8 +274,19 @@ mod unit {
             results: round.results,
             timestamps: round.timestamps,
         };
-        // check pairings
         let is_odd: bool = (entry_count % 2) == 1;
+        // println!("results {} : {:x}", entry_count, round.results);
+        // initial results
+        let mut e: u8 = 1;
+        while (e <= TournamentRoundTrait::MAX_ENTRIES) {
+            let expected: u8 =
+                if (is_odd && e == entry_count) {TournamentRoundTrait::NIBBLE_WINNING}
+                else if (e <= entry_count) {TournamentRoundTrait::NIBBLE_LOSING}
+                else {0};
+            assert_eq!(round._get_nibble(e), expected, "({}) of {} == {}", e, entry_count, expected);
+            e += 1;
+        };
+        // check pairings
         let mut not_paired: u8 = 0;
         let mut i: usize = 0;
         while (i < round.entry_count.into()) {
@@ -235,6 +314,7 @@ mod unit {
             // println!("___entry({}): [{}]={}", i, _index_a, entry_a);
             i += 1;
         };
+        // missing paired
         if (is_odd) {
             assert_ne!(not_paired, 0, "is_odd: not_paired={}", not_paired);
         } else {
@@ -247,7 +327,7 @@ mod unit {
     fn test_tournament_round_shuffle_max() {
         let mut sys: tester::TestSystems = tester::setup_world(tester::FLAGS::MOCK_RNG);
         let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
-        _test_tournament_round(wrapped, MAX_ENTRIES.into());
+        _test_tournament_round(wrapped, TournamentRoundTrait::MAX_ENTRIES);
     }
 
     #[test]
@@ -276,6 +356,222 @@ mod unit {
         assert_eq!(round_value.get_opponent_entry_number(4), 1);
         assert_eq!(round_value.get_opponent_entry_number(5), 2);
         assert_eq!(round_value.get_opponent_entry_number(6), 0);
+    }
+
+    #[test]
+    fn test_tournament_round_commit_reveal() {
+        let mut sys: tester::TestSystems = tester::setup_world(0);
+        let mut round = NEW_ROUND(TournamentRoundTrait::MAX_ENTRIES);
+        let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+        round.shuffle(wrapped, 0x1234);
+        // initial state
+        assert_eq!(round._get_nibble(1), TournamentRoundTrait::NIBBLE_LOSING, "(1) (start)");
+        assert_eq!(round._get_nibble(2), TournamentRoundTrait::NIBBLE_LOSING, "(2) (start)");
+        assert_eq!(round._get_nibble(3), TournamentRoundTrait::NIBBLE_LOSING, "(3) (start)");
+        assert_eq!(round._get_nibble(4), TournamentRoundTrait::NIBBLE_LOSING, "(4) (start)");
+        assert_eq!(round._get_nibble(29), TournamentRoundTrait::NIBBLE_LOSING, "(29) (start)");
+        assert_eq!(round._get_nibble(30), TournamentRoundTrait::NIBBLE_LOSING, "(30) (start)");
+        assert_eq!(round._get_nibble(31), TournamentRoundTrait::NIBBLE_LOSING, "(31) (start)");
+        assert_eq!(round._get_nibble(32), TournamentRoundTrait::NIBBLE_LOSING, "(32) (start)");
+        // commit 1
+        round.moved_first(1, 29);
+        round.moved_first(2, 31);
+        round.moved_first(4, 32);
+        assert_eq!(round._get_nibble(1), TournamentRoundTrait::NIBBLE_WINNING, "(1) (commit 1)");
+        assert_eq!(round._get_nibble(2), TournamentRoundTrait::NIBBLE_WINNING, "(2) (commit 1)");
+        assert_eq!(round._get_nibble(3), TournamentRoundTrait::NIBBLE_LOSING, "(3) (start)"); // no change
+        assert_eq!(round._get_nibble(4), TournamentRoundTrait::NIBBLE_WINNING, "(4) (commit 1)");
+        assert_eq!(round._get_nibble(29), TournamentRoundTrait::NIBBLE_LOSING, "(29) (commit 1)");
+        assert_eq!(round._get_nibble(30), TournamentRoundTrait::NIBBLE_LOSING, "(30) (start)"); // no change
+        assert_eq!(round._get_nibble(31), TournamentRoundTrait::NIBBLE_LOSING, "(31) (commit 1)");
+        assert_eq!(round._get_nibble(32), TournamentRoundTrait::NIBBLE_LOSING, "(32) (commit 1)");
+        // commit 2
+        round.moved_second(29, 1);
+        round.moved_second(31, 2);
+        round.moved_second(32, 4);
+        assert_eq!(round._get_nibble(1), TournamentRoundTrait::NIBBLE_LOSING, "(1) (commit 2)");
+        assert_eq!(round._get_nibble(2), TournamentRoundTrait::NIBBLE_LOSING, "(2) (commit 2)");
+        assert_eq!(round._get_nibble(3), TournamentRoundTrait::NIBBLE_LOSING, "(3) (start)"); // no change
+        assert_eq!(round._get_nibble(4), TournamentRoundTrait::NIBBLE_LOSING, "(4) (commit 2)");
+        assert_eq!(round._get_nibble(29), TournamentRoundTrait::NIBBLE_LOSING, "(29) (commit 2)");
+        assert_eq!(round._get_nibble(30), TournamentRoundTrait::NIBBLE_LOSING, "(30) (start)"); // no change
+        assert_eq!(round._get_nibble(31), TournamentRoundTrait::NIBBLE_LOSING, "(31) (commit 2)");
+        assert_eq!(round._get_nibble(32), TournamentRoundTrait::NIBBLE_LOSING, "(32) (commit 2)");
+        // reveal 1
+        round.moved_first(29, 1);
+        round.moved_first(31, 2);
+        round.moved_first(32, 4);
+        assert_eq!(round._get_nibble(1), TournamentRoundTrait::NIBBLE_LOSING, "(1) (reveal 1)");
+        assert_eq!(round._get_nibble(2), TournamentRoundTrait::NIBBLE_LOSING, "(2) (reveal 1)");
+        assert_eq!(round._get_nibble(3), TournamentRoundTrait::NIBBLE_LOSING, "(3) (start)"); // no change
+        assert_eq!(round._get_nibble(4), TournamentRoundTrait::NIBBLE_LOSING, "(4) (reveal 1)");
+        assert_eq!(round._get_nibble(29), TournamentRoundTrait::NIBBLE_WINNING, "(29) (reveal 1)");
+        assert_eq!(round._get_nibble(30), TournamentRoundTrait::NIBBLE_LOSING, "(30) (start)"); // no change
+        assert_eq!(round._get_nibble(31), TournamentRoundTrait::NIBBLE_WINNING, "(31) (reveal 1)");
+        assert_eq!(round._get_nibble(32), TournamentRoundTrait::NIBBLE_WINNING, "(32) (reveal 1)");
+        // finished duel -- all dead
+        round.finished_duel(1, 29, false, false, 0);
+        round.finished_duel(2, 31, true, false, 1);
+        round.finished_duel(4, 32, false, true, 2);
+        assert_eq!(round._get_nibble(1), 0b1000, "(1) (finished dead)");
+        assert_eq!(round._get_nibble(2), 0b1011, "(2) (finished dead)");
+        assert_eq!(round._get_nibble(3), TournamentRoundTrait::NIBBLE_LOSING, "(3) (start)"); // no change
+        assert_eq!(round._get_nibble(4), 0b1000, "(4) (finished dead)");
+        assert_eq!(round._get_nibble(29), 0b1000, "(29) (finished dead)");
+        assert_eq!(round._get_nibble(30), TournamentRoundTrait::NIBBLE_LOSING, "(30) (start)"); // no change
+        assert_eq!(round._get_nibble(31), 0b1000, "(31) (finished dead)");
+        assert_eq!(round._get_nibble(32), 0b1011, "(32) (finished dead)");
+        // finished duel -- all alive
+        round.finished_duel(1, 29, true, true, 0);
+        round.finished_duel(2, 31, true, true, 1);
+        round.finished_duel(4, 32, true, true, 2);
+        assert_eq!(round._get_nibble(1), 0b1010, "(1) (finished alive)");
+        assert_eq!(round._get_nibble(2), 0b1011, "(2) (finished alive)");
+        assert_eq!(round._get_nibble(3), TournamentRoundTrait::NIBBLE_LOSING, "(3) (start)"); // no change
+        assert_eq!(round._get_nibble(4), 0b1010, "(4) (finished alive)");
+        assert_eq!(round._get_nibble(29), 0b1010, "(29) (finished alive)");
+        assert_eq!(round._get_nibble(30), TournamentRoundTrait::NIBBLE_LOSING, "(30) (start)"); // no change
+        assert_eq!(round._get_nibble(31), 0b1010, "(31) (finished alive)");
+        assert_eq!(round._get_nibble(32), 0b1011, "(32) (finished alive)");
+    }
+
+    #[test]
+    fn test_tournament_round_finished_draw_dead() {
+        let mut sys: tester::TestSystems = tester::setup_world(0);
+        let mut round = NEW_ROUND(TournamentRoundTrait::MAX_ENTRIES);
+        let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+        round.shuffle(wrapped, 0x1234);
+        let mut e: u8 = 1;
+        loop {
+            assert_eq!(round.have_all_duels_finished(), false, "({}) (false)", e);
+            round.finished_duel(e, e + 1, false, false, 0);
+            e += 2;
+            if (e > TournamentRoundTrait::MAX_ENTRIES) { break; }
+        };
+        assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
+        // get survivors
+        let survivors: Span<u8> = round.get_surviving_entries().span();
+        assert_eq!(survivors.len(), 0, "surviving");
+    }
+
+    #[test]
+    fn test_tournament_round_finished_win_1() {
+        let mut sys: tester::TestSystems = tester::setup_world(0);
+        let mut round = NEW_ROUND(TournamentRoundTrait::MAX_ENTRIES);
+        let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+        round.shuffle(wrapped, 0x1234);
+        let mut e: u8 = 1;
+        loop {
+            assert_eq!(round.have_all_duels_finished(), false, "({}) (false)", e);
+            round.finished_duel(e, e + 1, true, false, 1);
+            e += 2;
+            if (e > TournamentRoundTrait::MAX_ENTRIES) { break; }
+        };
+        assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
+        // get survivors
+        let survivors: Span<u8> = round.get_surviving_entries().span();
+        assert_eq!(survivors.len(), (round.entry_count / 2).into(), "surviving");
+        let mut i: u8 = 0;
+        while (i.into() < survivors.len()) {
+            assert_eq!(*survivors[i.into()], (i * 2 + 1), "survivors({})", i+1);
+            i += 1;
+        };
+    }
+
+    #[test]
+    fn test_tournament_round_finished_win_2() {
+        let mut sys: tester::TestSystems = tester::setup_world(0);
+        let mut round = NEW_ROUND(TournamentRoundTrait::MAX_ENTRIES);
+        let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+        round.shuffle(wrapped, 0x1234);
+        let mut e: u8 = 1;
+        loop {
+            assert_eq!(round.have_all_duels_finished(), false, "({}) (false)", e);
+            round.finished_duel(e, e + 1, false, true, 2);
+            e += 2;
+            if (e > TournamentRoundTrait::MAX_ENTRIES) { break; }
+        };
+        assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
+        // get survivors
+        let survivors: Span<u8> = round.get_surviving_entries().span();
+        assert_eq!(survivors.len(), (round.entry_count / 2).into(), "surviving");
+        let mut i: u8 = 0;
+        while (i.into() < survivors.len()) {
+            assert_eq!(*survivors[i.into()], (i * 2 + 2), "survivors({})", i+1);
+            i += 1;
+        };
+    }
+
+    #[test]
+    fn test_tournament_round_finished_win_1_alive() {
+        let mut sys: tester::TestSystems = tester::setup_world(0);
+        let mut round = NEW_ROUND(TournamentRoundTrait::MAX_ENTRIES);
+        let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+        round.shuffle(wrapped, 0x1234);
+        let mut e: u8 = 1;
+        loop {
+            assert_eq!(round.have_all_duels_finished(), false, "({}) (false)", e);
+            round.finished_duel(e, e + 1, true, true, 1);
+            e += 2;
+            if (e > TournamentRoundTrait::MAX_ENTRIES) { break; }
+        };
+        assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
+        // get survivors
+        let survivors: Span<u8> = round.get_surviving_entries().span();
+        assert_eq!(survivors.len(), round.entry_count.into(), "surviving");
+        let mut i: u8 = 0;
+        while (i.into() < survivors.len()) {
+            assert_eq!(*survivors[i.into()], i + 1, "survivors({})", i+1);
+            i += 1;
+        };
+    }
+
+    #[test]
+    fn test_tournament_round_finished_win_2_alive() {
+        let mut sys: tester::TestSystems = tester::setup_world(0);
+        let mut round = NEW_ROUND(TournamentRoundTrait::MAX_ENTRIES);
+        let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+        round.shuffle(wrapped, 0x1234);
+        let mut e: u8 = 1;
+        loop {
+            assert_eq!(round.have_all_duels_finished(), false, "({}) (false)", e);
+            round.finished_duel(e, e + 1, true, true, 2);
+            e += 2;
+            if (e > TournamentRoundTrait::MAX_ENTRIES) { break; }
+        };
+        assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
+        // get survivors
+        let survivors: Span<u8> = round.get_surviving_entries().span();
+        assert_eq!(survivors.len(), round.entry_count.into(), "surviving");
+        let mut i: u8 = 0;
+        while (i.into() < survivors.len()) {
+            assert_eq!(*survivors[i.into()], i + 1, "survivors({})", i+1);
+            i += 1;
+        };
+    }
+
+    #[test]
+    fn test_tournament_round_finished_draw_alive() {
+        let mut sys: tester::TestSystems = tester::setup_world(0);
+        let mut round = NEW_ROUND(TournamentRoundTrait::MAX_ENTRIES);
+        let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+        round.shuffle(wrapped, 0x1234);
+        let mut e: u8 = 1;
+        loop {
+            assert_eq!(round.have_all_duels_finished(), false, "({}) (false)", e);
+            round.finished_duel(e, e + 1, true, true, 0);
+            e += 2;
+            if (e > TournamentRoundTrait::MAX_ENTRIES) { break; }
+        };
+        assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
+        // get survivors
+        let survivors: Span<u8> = round.get_surviving_entries().span();
+        assert_eq!(survivors.len(), round.entry_count.into(), "surviving");
+        let mut i: u8 = 0;
+        while (i.into() < survivors.len()) {
+            assert_eq!(*survivors[i.into()], i + 1, "survivors({})", i+1);
+            i += 1;
+        };
     }
 
 }

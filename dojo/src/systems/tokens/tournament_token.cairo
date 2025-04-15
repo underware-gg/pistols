@@ -229,8 +229,6 @@ pub mod tournament_token {
         pub const CALLER_NOT_OWNER: felt252         = 'TOURNAMENT: Caller not owner';
     }
 
-    pub const MAX_ENTRIES: u8 = 32;
-
     //*******************************
     // erc721
     fn TOKEN_NAME()   -> ByteArray {("Pistols at Dawn Tournaments")}
@@ -403,7 +401,7 @@ pub mod tournament_token {
                     let mut entry: TournamentEntry = store.get_tournament_entry(entry_id);
                     assert(entry.duelist_id.is_zero(), Errors::ALREADY_ENLISTED);
                     assert(registration.entry_number.is_non_zero(), Errors::INVALID_ENTRY_NUMBER);
-                    assert(registration.entry_number <= MAX_ENTRIES.into(), Errors::TOURNAMENT_FULL);
+                    assert(registration.entry_number <= TournamentRoundTrait::MAX_ENTRIES.into(), Errors::TOURNAMENT_FULL);
                     entry.tournament_id = registration.tournament_id;
                     entry.entry_number = registration.entry_number.try_into().unwrap();
                     entry.duelist_id = duelist_id;
@@ -546,7 +544,7 @@ pub mod tournament_token {
             let mut round = TournamentRound {
                 tournament_id,
                 round_number,
-                entry_count: core::cmp::min(entry_count, MAX_ENTRIES.into()).try_into().unwrap(),
+                entry_count: core::cmp::min(entry_count, TournamentRoundTrait::MAX_ENTRIES.into()).try_into().unwrap(),
                 bracket: 0,
                 results: 0,
                 timestamps,
