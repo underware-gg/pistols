@@ -172,7 +172,7 @@ pub mod duel_token {
         pact::{PactTrait},
         events::{Activity, ActivityTrait},
         tournament::{
-            TournamentDuelKeys,
+            TournamentDuelKeys, TournamentDuelKeysTrait,
             TournamentSettingsValue,
             ChallengeToTournament, TournamentToChallenge,
         },
@@ -509,14 +509,14 @@ pub mod duel_token {
             assert(store.world.caller_is_tournament_contract(), Errors::INVALID_CALLER);
 
             // check if duel is minted
-            let duelist_number: u8 = if (entry_number < opponent_entry_number || opponent_entry_number.is_zero()) {1} else {2};
-            let keys = TournamentDuelKeys {
+            let keys: @TournamentDuelKeys = TournamentDuelKeysTrait::new(
                 tournament_id,
                 round_number,
-                entry_number_a: if (duelist_number == 1) {entry_number} else {opponent_entry_number},
-                entry_number_b: if (duelist_number == 2) {entry_number} else {opponent_entry_number},
-            };
-            let mut duel_id: u128 = store.get_tournament_to_challenge_value(@keys).duel_id;
+                entry_number,
+                opponent_entry_number,
+            );
+            let mut duel_id: u128 = store.get_tournament_duel_id(keys);
+            let duelist_number: u8 = if (entry_number == *keys.entry_number_a) {1} else {2};
             
             //-----------------------------------
             // NEW DUEL
@@ -576,10 +576,10 @@ pub mod duel_token {
                 // tournament links
                 store.set_challenge_to_tournament(@ChallengeToTournament {
                     duel_id,
-                    keys,
+                    keys: *keys,
                 });
                 store.set_tournament_to_challenge(@TournamentToChallenge {
-                    keys,
+                    keys: *keys,
                     duel_id,
                 });
 
@@ -597,12 +597,12 @@ pub mod duel_token {
                 assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
                 if (duelist_number == 1) {
-                    assert(keys.entry_number_a == entry_number, Errors::NOT_YOUR_CHALLENGE);
+                    assert(*keys.entry_number_a == entry_number, Errors::NOT_YOUR_CHALLENGE);
                     assert(challenge.address_a.is_zero(), Errors::INVALID_REPLY_SELF);
                     challenge.address_a = player_address;
                     challenge.duelist_id_a = duelist_id;
                 } else {
-                    assert(keys.entry_number_b == entry_number, Errors::NOT_YOUR_CHALLENGE);
+                    assert(*keys.entry_number_b == entry_number, Errors::NOT_YOUR_CHALLENGE);
                     assert(challenge.address_b.is_zero(), Errors::INVALID_REPLY_SELF);
                     challenge.address_b = player_address;
                     challenge.duelist_id_b = duelist_id;

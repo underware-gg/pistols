@@ -425,6 +425,10 @@ pub impl StoreImpl of StoreTrait {
     fn get_tournament_entry_minter_address(self: @Store, entry_id: u64) -> ContractAddress {
         (self.world.read_member(Model::<TokenMetadata>::ptr_from_keys(entry_id), selector!("minted_by")))
     }
+    #[inline(always)]
+    fn get_tournament_duel_id(self: @Store, keys: @TournamentDuelKeys) -> u128 {
+        (self.world.read_member(Model::<TournamentToChallenge>::ptr_from_keys(*keys), selector!("duel_id")))
+    }
 
     // setters
 

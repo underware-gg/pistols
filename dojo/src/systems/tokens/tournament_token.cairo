@@ -173,6 +173,7 @@ pub mod tournament_token {
     //     DnsTrait,
     // };
     use pistols::models::{
+        challenge::{ChallengeValue},
         duelist::{DuelistTrait},
         tournament::{
             TournamentEntry, TournamentEntryValue,
@@ -180,7 +181,7 @@ pub mod tournament_token {
             Tournament, TournamentValue,
             TournamentRound, TournamentRoundValue, TournamentRoundTrait, TournamentRoundValueTrait,
             TournamentType, TOURNAMENT_SETTINGS,
-            // TournamentDuelKeys,
+            TournamentDuelKeys, TournamentDuelKeysTrait,
         },
     };
     use pistols::types::{
@@ -424,7 +425,18 @@ pub mod tournament_token {
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
             let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
+            // check if joined
+            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.current_round_number);
 // TODO: validate TournamentRound?
+            let opponent_entry_number: u8 = round.get_opponent_entry_number(entry.entry_number);
+            let keys: @TournamentDuelKeys = TournamentDuelKeysTrait::new(
+                entry.tournament_id,
+                tournament.current_round_number,
+                entry.entry_number,
+                opponent_entry_number,
+            );
+            let mut duel_id: u128 = store.get_tournament_duel_id(keys);
+            let mut challenge: ChallengeValue = store.get_challenge_value(duel_id);
             (
                 // owns entry
                 self.is_owner_of(starknet::get_caller_address(), entry_id.into()) &&
@@ -433,7 +445,9 @@ pub mod tournament_token {
                 // enlisted
                 entry.tournament_id.is_non_zero() &&
                 // tournament has started
-                tournament.current_round_number.is_non_zero()
+                tournament.current_round_number.is_non_zero() &&
+                // not joined
+                (duel_id.is_zero() || (challenge.duelist_id_a != entry.duelist_id && challenge.duelist_id_b != entry.duelist_id))
             )
         }
         fn join_duel(ref self: ContractState, entry_id: u64) -> u128 {

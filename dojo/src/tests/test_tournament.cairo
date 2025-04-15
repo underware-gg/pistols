@@ -199,7 +199,7 @@ fn test_start_tournament() {
     assert_eq!(tournament.current_round_number, 1);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert_ne!(round.bracket, 0);
-    assert_eq!(round.results, 0);
+    assert_ne!(round.results, 0);
     // end state
     assert!(!sys.tournaments.can_start_tournament(ENTRY_ID_1), "can_start() started");
     assert_eq!(sys.tournaments.get_tournament_id(ENTRY_ID_1), tournament_id, "get_tournament_id()");
@@ -340,6 +340,7 @@ fn test_join_duel_ok() {
     tester::impersonate(A);
     assert!(sys.tournaments.can_join_duel(entry_id_1));
     let duel_id_1: u128 = tester::execute_join_duel(@sys, A, entry_id_1);
+    assert!(!sys.tournaments.can_join_duel(entry_id_1), "already_joined_a");
     let ch_1: Challenge = sys.store.get_challenge(duel_id_1);
     let keys_1: TournamentDuelKeys = sys.store.get_challenge_to_tournament_value(duel_id_1).keys;
     assert_gt!(duel_id_1, 0, "duel_id_1");
@@ -362,6 +363,7 @@ fn test_join_duel_ok() {
     tester::impersonate(B);
     assert!(sys.tournaments.can_join_duel(entry_id_2));
     let duel_id_2: u128 = tester::execute_join_duel(@sys, B, entry_id_2);
+    assert!(!sys.tournaments.can_join_duel(entry_id_2), "already_joined_b");
     let ch_2: Challenge = sys.store.get_challenge(duel_id_2);
     assert_eq!(duel_id_2, duel_id_1, "duel_id_2 == duel_id_1");
     assert_eq!(ch_2.state, ChallengeState::InProgress, "ch_2.state");
@@ -371,6 +373,63 @@ fn test_join_duel_ok() {
     assert_eq!(entry_2.tournament_id, tournament_id, "entry_2.tournament_id");
     assert_eq!(entry_2.entry_number, 2, "entry_2.entry_number");
     assert_eq!(entry_2.current_round_number, 1, "entry_2.current_round_number");
+}
+
+#[test]
+#[should_panic(expected: ('DUEL: Reply self', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+fn test_join_duel_already_joined_a() {
+    let mut sys: TestSystems = setup(3, FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT);
+    let A: ContractAddress = PLAYER_1().address;
+    let B: ContractAddress = PLAYER_2().address;
+    let ID_A: u128 = PLAYER_1().duelist_id;
+    let ID_B: u128 = PLAYER_2().duelist_id;
+    // mint+enlist 1
+    tester::impersonate(A);
+    let entry_id_1: u64 = _mint(ref sys, A);
+    tester::execute_enlist_duelist(@sys, A, entry_id_1, ID_A);
+    // mint+enlist 2
+    tester::impersonate(B);
+    let entry_id_2: u64 = _mint(ref sys, B);
+    tester::execute_enlist_duelist(@sys, B, entry_id_2, ID_B);
+    // start tournament
+    tester::set_block_timestamp(TIMESTAMP_START);
+    tester::execute_start_tournament(@sys, A, ENTRY_ID_1);
+    //
+    // join A twice...
+    tester::impersonate(A);
+    tester::execute_join_duel(@sys, A, entry_id_1);
+    assert!(!sys.tournaments.can_join_duel(entry_id_1));
+    tester::execute_join_duel(@sys, A, entry_id_1);
+}
+
+#[test]
+#[should_panic(expected: ('DUEL: Challenge not Awaiting', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+fn test_join_duel_already_joined_b() {
+    let mut sys: TestSystems = setup(3, FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT);
+    let A: ContractAddress = PLAYER_1().address;
+    let B: ContractAddress = PLAYER_2().address;
+    let ID_A: u128 = PLAYER_1().duelist_id;
+    let ID_B: u128 = PLAYER_2().duelist_id;
+    // mint+enlist 1
+    tester::impersonate(A);
+    let entry_id_1: u64 = _mint(ref sys, A);
+    tester::execute_enlist_duelist(@sys, A, entry_id_1, ID_A);
+    // mint+enlist 2
+    tester::impersonate(B);
+    let entry_id_2: u64 = _mint(ref sys, B);
+    tester::execute_enlist_duelist(@sys, B, entry_id_2, ID_B);
+    // start tournament
+    tester::set_block_timestamp(TIMESTAMP_START);
+    tester::execute_start_tournament(@sys, A, ENTRY_ID_1);
+    //
+    // join A
+    tester::impersonate(A);
+    tester::execute_join_duel(@sys, A, entry_id_1);
+    // join B twice...
+    tester::impersonate(B);
+    tester::execute_join_duel(@sys, B, entry_id_2);
+    assert!(!sys.tournaments.can_join_duel(entry_id_2));
+    tester::execute_join_duel(@sys, B, entry_id_2);
 }
 
 #[test]

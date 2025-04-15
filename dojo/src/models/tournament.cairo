@@ -115,6 +115,7 @@ pub struct TournamentDuelKeys {
 //---------------------------
 // Traits
 //
+use core::num::traits::Zero;
 use pistols::systems::rng::{RngWrap, Shuffle, ShuffleTrait};
 use pistols::utils::bitwise::{BitwiseU128};
 use pistols::utils::bytemap::{BytemapU256};
@@ -124,6 +125,24 @@ use pistols::utils::nibblemap::{NibblemapU128};
 pub impl TournamentSettingsValueImpl of TournamentSettingsValueTrait {
     fn exists(self: @TournamentSettingsValue) -> bool {
         (*self.tournament_type != TournamentType::Undefined)
+    }
+}
+
+#[generate_trait]
+pub impl TournamentDuelKeysImpl of TournamentDuelKeysTrait {
+    fn new(
+        tournament_id: u64,
+        round_number: u8,
+        entry_number: u8,
+        opponent_entry_number: u8,
+    ) -> @TournamentDuelKeys {
+        let duelist_number: u8 = if (entry_number < opponent_entry_number || opponent_entry_number.is_zero()) {1} else {2};
+        (@TournamentDuelKeys {
+            tournament_id,
+            round_number,
+            entry_number_a: if (duelist_number == 1) {entry_number} else {opponent_entry_number},
+            entry_number_b: if (duelist_number == 2) {entry_number} else {opponent_entry_number},
+        })
     }
 }
 
