@@ -265,8 +265,8 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { texture: TextureName.bg_entrance_sign, shiftMultiplier: -0.003, renderOrder: 2 },
       { texture: TextureName.bg_entrance_fog_background, shiftMultiplier: 0.0, renderOrder: 3, opaque: true, animateShift: { enabled: true, isLeft: false, speed: 0.0005 } },
       { texture: TextureName.bg_entrance_player, shiftMultiplier: 0.002, renderOrder: 4 },
-      { texture: TextureName.bg_entrance_foreground, shiftMultiplier: 0.012, renderOrder: 6 },
-      { texture: TextureName.bg_entrance_fog_foreground, shiftMultiplier: 0.01, renderOrder: 5, opaque: true, animateShift: { enabled: true, isLeft: true, speed: 0.0005 } },
+      { texture: TextureName.bg_entrance_foreground, shiftMultiplier: 0.012, renderOrder: 5 },
+      { texture: TextureName.bg_entrance_fog_foreground, shiftMultiplier: 0.01, renderOrder: 6, opaque: true, animateShift: { enabled: true, isLeft: true, speed: 0.0005 } },
     ],
     items: [
       { name: 'door', color: 'ff0000', description: 'Knock on door', mask: TextureName.bg_entrance_door_mask, renderOrder: 1 },

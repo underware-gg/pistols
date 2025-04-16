@@ -1,5 +1,9 @@
 varying vec2 vUv;
 
+precision highp float;
+precision highp int;
+precision highp sampler2D;
+
 // constants
 uniform int uMasksSize;
 uniform sampler2D uMasks[7];
@@ -194,8 +198,8 @@ vec4 sampleAll(vec2 uvs[7]) {
 }
 
 void main() {
-  vec2 shiftedUv = vUv + vec2(uShiftAmount, 0.0);
-  shiftedUv.x = mod(shiftedUv.x, 1.0);
+  // vec2 shiftedUv = vUv + vec2(uShiftAmount, 0.0);
+  // shiftedUv.x = mod(shiftedUv.x, 1.0);
 
   vec2 shiftedUvs[7];
   for(int i = 0; i < 7; i++) {

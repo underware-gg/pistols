@@ -299,7 +299,7 @@ vec4 upsampleCombined(sampler2D textures[7], vec2 uvs[7], vec2 multiplier, float
   return sum / 12.0;
 }
 
-vec4 blur(vec2 U[7], vec2 scale, vec4 allMasks, int index) {
+vec4 blur(vec2 uvs[7], vec2 scale, vec4 allMasks, int index) {
   bool allSamplesNoBlur = false;
   float blurStrengths[7];
 
@@ -319,10 +319,10 @@ vec4 blur(vec2 U[7], vec2 scale, vec4 allMasks, int index) {
   }
   
   if (allSamplesNoBlur) {
-    return sampleAllTextures(uTextures, U, scale, blurStrengths, vec2(0.0), allMasks, index);
+    return sampleAllTextures(uTextures, uvs, scale, blurStrengths, vec2(0.0), allMasks, index);
   }
 
-  vec4 color = downsampleCombined(uTextures, U, scale, blurStrengths, allMasks, index);
+  vec4 color = downsampleCombined(uTextures, uvs, scale, blurStrengths, allMasks, index);
   
   // Check if any layer needs extra passes - unrolled
   bool needsExtraPass = false;
@@ -334,18 +334,18 @@ vec4 blur(vec2 U[7], vec2 scale, vec4 allMasks, int index) {
   }
   
   if (needsExtraPass) {
-    color = downsampleCombined(uTextures, U, scale * 2.0, blurStrengths, allMasks, index);
-    color = upsampleCombined(uTextures, U, scale * 2.0, blurStrengths, allMasks, index);
+    color = downsampleCombined(uTextures, uvs, scale * 2.0, blurStrengths, allMasks, index);
+    color = upsampleCombined(uTextures, uvs, scale * 2.0, blurStrengths, allMasks, index);
   }
 
-  color = upsampleCombined(uTextures, U, scale, blurStrengths, allMasks, index);
+  color = upsampleCombined(uTextures, uvs, scale, blurStrengths, allMasks, index);
     
   return color;
 }
 
 void main() {
-  vec2 shiftedUv = vUv + vec2(uShiftAmount, 0.0);
-  shiftedUv.x = mod(shiftedUv.x, 1.0);
+  // vec2 shiftedUv = vUv + vec2(uShiftAmount, 0.0);
+  // shiftedUv.x = mod(shiftedUv.x, 1.0);
 
   vec2 shiftedUvs[7];
   for(int i = 0; i < 7; i++) {

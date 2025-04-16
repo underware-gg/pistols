@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 
 
-class ShaderManager {
+export class ShaderManager {
   static shaderCode = {};
 };
 
@@ -54,6 +54,18 @@ export async function loadShaders() {
   ShaderManager.shaderCode['INTERACTIBLE_MASK'] = {
     vsh: await loadShader('/shaders/interactible-mask-vsh.glsl'),
     fsh: await loadShader('/shaders/interactible-mask-fsh.glsl'),
+  };
+  ShaderManager.shaderCode['INTERACTIBLE_TEXTURE'] = {
+    vsh: await loadShader('/shaders/interactible-mask-vsh.glsl'),
+    fsh: await loadShader('/shaders/interactible-texture-fsh.glsl'),
+  };
+  ShaderManager.shaderCode['TEXTURE_BLUR'] = {
+    vsh: await loadShader('/shaders/texture-blur-vsh.glsl'),
+    fsh: await loadShader('/shaders/texture-blur-fsh.glsl'),
+  };
+  ShaderManager.shaderCode['MASK_OCCLUSION'] = {
+    vsh: await loadShader('/shaders/mask-occlusion-vsh.glsl'),
+    fsh: await loadShader('/shaders/mask-occlusion-fsh.glsl'),
   };
 }
 

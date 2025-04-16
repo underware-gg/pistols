@@ -11,7 +11,8 @@ import Stats from 'three/addons/libs/stats.module.js'
 import { Rain } from './Rain.tsx'
 import { Grass } from './Grass.tsx'
 import * as shaders from './shaders.tsx'
-import { InteractibleScene } from './InteractibleScene.tsx'
+import { InteractibleScene } from './InteractibleScene'
+import { InteractibleLayeredScene } from './InteractibleLayeredScene'
 
 // event emitter
 // var ee = require('event-emitter');
@@ -1039,6 +1040,8 @@ export function animate() {
 
         if (_currentScene instanceof InteractibleScene) {
           _currentScene.render(elapsedTime)
+        } else if (_currentScene instanceof InteractibleLayeredScene) {
+          _currentScene.render(elapsedTime)
         }
       }
 
@@ -1066,7 +1069,7 @@ function setupScenes() {
     if (sceneName === SceneName.Duel) {
       _scenes[sceneName] = setupDuelScene()
     } else if (sceneName !== SceneName.TutorialDuel) {
-      _scenes[sceneName] = setupStaticScene(sceneName)
+      _scenes[sceneName] = setupStaticScene(sceneName, false)
     }
   })
 }
@@ -1396,8 +1399,10 @@ function setCameraHelpers(scene) {
 //
 // Static Scenes
 //
-function setupStaticScene(sceneName) {
-  const scene = new InteractibleScene(sceneName, _renderer, _staticCamera)
+function setupStaticScene(sceneName, useLayered = false) {
+  const scene = useLayered 
+    ? new InteractibleLayeredScene(sceneName, _renderer, _staticCamera)
+    : new InteractibleScene(sceneName, _renderer, _staticCamera)
 
   scene.add(_staticCamera)
 
