@@ -64,8 +64,8 @@ mod tests {
         };
         let mut hand_a: DuelistHand = round.moves_a.as_hand();
         let mut hand_b: DuelistHand = round.moves_b.as_hand();
-        round.moves_a.set_salt_and_moves(SALT_A, moves_a);
-        round.moves_b.set_salt_and_moves(SALT_B, moves_b);
+        round.moves_a.reveal_salt_and_moves(SALT_A, moves_a);
+        round.moves_b.reveal_salt_and_moves(SALT_B, moves_b);
         round.state_a.initialize(hand_a);
         round.state_b.initialize(hand_b);
         let wrapped: @RngWrap = RngWrapTrait::wrap((*sys.rng).contract_address, Option::Some([].span())); // force using mocked rng

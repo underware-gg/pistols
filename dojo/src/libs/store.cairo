@@ -429,6 +429,10 @@ pub impl StoreImpl of StoreTrait {
     fn get_tournament_duel_id(self: @Store, keys: @TournamentDuelKeys) -> u128 {
         (self.world.read_member(Model::<TournamentToChallenge>::ptr_from_keys(*keys), selector!("duel_id")))
     }
+    #[inline(always)]
+    fn get_duel_tournament_keys(self: @Store, duel_id: u128) -> TournamentDuelKeys {
+        (self.world.read_member(Model::<ChallengeToTournament>::ptr_from_keys(duel_id), selector!("keys")))
+    }
 
     // setters
 

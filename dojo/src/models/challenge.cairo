@@ -164,7 +164,7 @@ pub impl RoundImpl of RoundTrait {
 
 #[generate_trait]
 pub impl MovesImpl of MovesTrait {
-    fn set_salt_and_moves(ref self: Moves, salt: felt252, moves: Span<u8>) {
+    fn reveal_salt_and_moves(ref self: Moves, salt: felt252, moves: Span<u8>) {
         self.salt = salt;
         self.card_1 = moves.value_or_zero(0);
         self.card_2 = moves.value_or_zero(1);
@@ -179,6 +179,14 @@ pub impl MovesImpl of MovesTrait {
             card_tactics: (*self.card_3).into(),
             card_blades: (*self.card_4).into(),
         })
+    }
+    #[inline(always)]
+    fn has_comitted(self: @Moves) -> bool {
+        (*self.hashed != 0)
+    }
+    #[inline(always)]
+    fn has_revealed(self: @Moves) -> bool {
+        (*self.salt != 0)
     }
     #[inline(always)]
     fn set_commit_timeout(ref self: Moves, rules: Rules, current_timestamp: u64) {

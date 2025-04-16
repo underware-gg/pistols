@@ -5,6 +5,7 @@ use dojo::model::{ModelStorageTest};
 use pistols::systems::tokens::{
     // tournament_token::{ITournamentTokenProtectedDispatcher, ITournamentTokenProtectedDispatcherTrait},
     duel_token::{IDuelTokenProtectedDispatcher, IDuelTokenProtectedDispatcherTrait},
+    budokan_mock::{PLAYERS},
 };
 use pistols::models::{
     challenge::{Challenge, DuelType},
@@ -37,7 +38,6 @@ use pistols::tests::tester::{
         ITournamentTokenDispatcherTrait,
     },
 };
-use pistols::systems::tokens::budokan_mock::{PLAYERS};
 
 use tournaments::components::{
     models::{
@@ -66,7 +66,7 @@ pub const PLAYER_NAME: felt252 = 'Player';
 pub const TIMESTAMP_START: u64 = (tester::INITIAL_TIMESTAMP + TIMESTAMP::ONE_DAY);
 pub const TIMESTAMP_END: u64 = (TIMESTAMP_START + (TIMESTAMP::ONE_DAY * 7));
 
-fn setup(lives_staked: u8, flags: u16) -> TestSystems {
+pub fn setup(lives_staked: u8, flags: u16) -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(flags);
 
     tester::impersonate(sys.tournaments.contract_address);
@@ -90,7 +90,7 @@ fn setup(lives_staked: u8, flags: u16) -> TestSystems {
     (sys)
 }
 
-fn _mint(ref sys: TestSystems, recipient: ContractAddress) -> u64 {
+pub fn _mint(ref sys: TestSystems, recipient: ContractAddress) -> u64 {
     let total_supply: u64 = sys.tournaments.total_supply().try_into().unwrap();
     let player_name: felt252 = ShortStringTrait::concat('Player', total_supply.to_short_string());
     // mint from budokan
@@ -370,6 +370,14 @@ fn test_join_duel_ok() {
     assert_eq!(entry_1.tournament_id, tournament_id, "entry_1.tournament_id");
     assert_eq!(entry_1.entry_number, 1, "entry_1.entry_number");
     assert_eq!(entry_1.current_round_number, 1, "entry_1.current_round_number");
+    // member getters
+    let member_keys_1: TournamentDuelKeys = sys.store.get_duel_tournament_keys(duel_id_1);
+    assert_eq!(member_keys_1.tournament_id, keys_1.tournament_id, "member_keys_1.tournament_id");
+    assert_eq!(member_keys_1.round_number, keys_1.round_number, "member_keys_1.round_number");
+    assert_eq!(member_keys_1.entry_number_a, keys_1.entry_number_a, "member_keys_1.entry_number_a");
+    assert_eq!(member_keys_1.entry_number_b, keys_1.entry_number_b, "member_keys_1.entry_number_b");
+    let member_duel_id_1: u128 = sys.store.get_tournament_duel_id(@keys_1);
+    assert_eq!(member_duel_id_1, duel_id_1, "member_duel_id_1");
     //
     // join P2...
     tester::impersonate(P2);
@@ -540,4 +548,26 @@ fn test_join_duel_token_invalid_caller() {
         timestamp_end,
     );
 }
+
+
+//--------------------------------
+// Tournament Round
+//
+
+
+// TODO: duel > commit / reveal > set result flags > finish > clear flags
+// TODO: duel > commit (A/B) > abandon > expire > collect winner
+// TODO: duel > commit/reveal (A/B) > abandon > expire > collect winner
+
+// TODO: collect tournament round > all duels completed
+// TODO: collect tournament round > missing duels
+
+// TODO: single round tournament > finish tournament after 1st duel > !can_start_round()
+
+// TODO: multi round tournament > [A] vs B + C vs [D] > A vs D
+// TODO: multi round tournament > !can_finish() > duel more > finish tournament
+// TODO: multi round tournament > single winner > finish tournament
+
+// TODO: multi round tournament > missing wins from 1st round > collect and continue
+// TODO: multi round tournament > missing draws from 1st round > cannot collect, cannot continue
 
