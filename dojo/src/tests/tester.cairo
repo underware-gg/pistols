@@ -371,8 +371,8 @@ pub mod tester {
             );
             contract_defs.append(
                 ContractDefTrait::new(@"pistols", @"budokan_mock")
+                    .with_writer_of([selector_from_tag!("pistols-MockedValue")].span())
                     .with_init_calldata([].span())
-                    // .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
             );
         }
 

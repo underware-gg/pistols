@@ -135,6 +135,7 @@ pub trait IBudokanMock<TState> {
 
     // mock helpers
     fn set_tournament_id(ref self: TState, tournament_id: u64);
+    fn get_tournament_id(self: @TState) -> u64;
 }
 
 #[dojo::contract]
@@ -151,13 +152,17 @@ pub mod budokan_mock {
     use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
     // use pistols::utils::misc::{ZERO};
 
-    pub const TOURNAMENT_ID_1: u64 = 100;
-    pub const TOURNAMENT_ID_2: u64 = 200;
-    pub const TOURNAMENT_ID_3: u64 = 300;
-    pub const TOURNAMENT_ID_4: u64 = 400;
-    pub const TOURNAMENT_ID_5: u64 = 500;
-    pub const TOURNAMENT_ID_6: u64 = 600;
-    pub const TOURNAMENT_ID_7: u64 = 700;
+    pub const TOURNAMENT_ID_1: u64 = 1001;   // 1 entry
+    pub const TOURNAMENT_ID_2: u64 = 1002;   // 2 entries
+    pub const TOURNAMENT_ID_3: u64 = 1003;   // 3 entries
+    pub const TOURNAMENT_ID_4: u64 = 1004;   // 4 entries
+    pub const TOURNAMENT_ID_5: u64 = 1005;   // 5 entries
+    pub const TOURNAMENT_ID_6: u64 = 1006;   // 6 entries
+    pub const TOURNAMENT_ID_7: u64 = 1007;   // 7 entries
+
+    fn dojo_init(ref self: ContractState) {
+        self.set_tournament_id(TOURNAMENT_ID_2);
+    }
 
     #[generate_trait]
     impl WorldDefaultImpl of WorldDefaultTrait {
@@ -183,13 +188,9 @@ pub mod budokan_mock {
             game_address: ContractAddress,
             token_id: u64,
         ) -> Registration {
-            let mut world = self.world_default();
-            // tournament (stored or default)
-            let mocked: MockedValue = world.read_model('tournament_id');
-            let mut tournament_id: u64 = mocked.value.try_into().unwrap();
-            if (tournament_id.is_zero()) {
-                tournament_id = TOURNAMENT_ID_2;
-            }
+            // let mut world = self.world_default();
+            // stored tournament
+            let mut tournament_id: u64 = self.get_tournament_id();
             // entry number
             let entry_number: u32 = PLAYERS::from_entry_id(token_id).entry_number.into();
 // println!("___get_registration({}): t[{}], e[{}]", token_id, tournament_id, entry_number);
@@ -209,8 +210,12 @@ pub mod budokan_mock {
         }
 
         fn tournament_entries(self: @ContractState, tournament_id: u64) -> u32 {
-            ((tournament_id / 100).try_into().unwrap())
+            ((tournament_id % 1000).try_into().unwrap())
         }
+
+        //-----------------------------------
+        // Mock Helpers
+        //
 
         fn set_tournament_id(ref self: ContractState, tournament_id: u64) {
             let mut world = self.world_default();
@@ -220,6 +225,14 @@ pub mod budokan_mock {
                     tournament_id.into(),
                 )
             );
+        }
+
+        fn get_tournament_id(self: @ContractState) -> u64 {
+            let mut world = self.world_default();
+            // tournament (stored or default)
+            let mocked: MockedValue = world.read_model('tournament_id');
+            let mut tournament_id: u64 = mocked.value.try_into().unwrap();
+            (tournament_id)
         }
     }
 
