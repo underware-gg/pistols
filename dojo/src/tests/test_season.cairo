@@ -94,8 +94,8 @@ mod tests {
         tester::set_block_timestamp(season_1.period.end);
         tester::execute_collect_season(@sys.game, OWNER());
         // continue challenge
-        let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-        let (challenge, _) = prefabs::commit_reveal_get(@sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+        let (challenge, _) = prefabs::commit_reveal_get(@sys, duel_id, OWNER(), OTHER(), mocked, moves_a, moves_b);
         assert_eq!(challenge.state, ChallengeState::Draw, "ChallengeState::Draw");
         // settled on season 2
         let season_2: SeasonConfig = sys.store.get_current_season();

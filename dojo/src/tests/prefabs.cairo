@@ -16,7 +16,7 @@ pub mod prefabs {
             ID,
         }
     };
-    use pistols::systems::rng_mock::{IRngMockDispatcherTrait, ShufflerTrait};
+    use pistols::systems::rng_mock::{IRngMockDispatcherTrait, MockedValue, MockedValueTrait};
     use pistols::types::cards::env::{ENV_DICES};
 
     pub const NAME_A: felt252 = 'Sensei';
@@ -36,26 +36,10 @@ pub mod prefabs {
 
 
     #[derive(Copy, Drop)]
-    pub struct SaltsValues {
-        pub salts: Span<felt252>,
-        pub values: Span<felt252>,
-    }
-
-    #[derive(Copy, Drop)]
     pub struct PlayerMoves {
         pub salt: felt252,
         pub moves: Span<u8>,
         pub hashed: u128,
-    }
-
-    #[generate_trait]
-    pub impl SaltsValuesImpl of SaltsValuesTrait {
-        fn new(salts: Span<felt252>, values: Span<felt252>) -> SaltsValues {
-            (SaltsValues{salts, values})
-        }
-        fn empty() -> SaltsValues {
-            (SaltsValues{salts: [].span(), values: [].span()})
-        }
     }
 
     #[generate_trait]
@@ -64,7 +48,6 @@ pub mod prefabs {
             (PlayerMoves{salt, moves, hashed: make_moves_hash(salt, moves)})
         }
     }
-
 
     pub fn start_new_challenge(sys: @TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, duel_type: DuelType, lives_staked: u8) -> u128 {
         let duel_id: u128 = tester::execute_create_duel(sys.duels, duelist_a, duelist_b, MESSAGE, duel_type, 48, lives_staked);
@@ -81,8 +64,8 @@ pub mod prefabs {
         (challenge, round, duel_id)
     }
 
-    pub fn commit_reveal_get(sys: @TestSystems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, salts: SaltsValues, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeValue, RoundValue) {
-        (*sys.rng).set_mocked_values(salts.salts, salts.values);
+    pub fn commit_reveal_get(sys: @TestSystems, duel_id: u128, duelist_a: ContractAddress, duelist_b: ContractAddress, mocked: Span<MockedValue>, moves_a: PlayerMoves, moves_b: PlayerMoves) -> (ChallengeValue, RoundValue) {
+        (*sys.rng).mock_values(mocked);
         tester::execute_commit_moves(sys.game, duelist_a, duel_id, moves_a.hashed);
         tester::execute_commit_moves(sys.game, duelist_b, duel_id, moves_b.hashed);
         tester::execute_reveal_moves(sys.game, duelist_a, duel_id, moves_a.salt, moves_a.moves);
@@ -92,70 +75,75 @@ pub mod prefabs {
     }
 
 
-    pub fn get_moves_custom(moves_a: Span<u8>, moves_b: Span<u8>) -> (SaltsValues, PlayerMoves, PlayerMoves) {
+    pub fn get_moves_custom(moves_a: Span<u8>, moves_b: Span<u8>) -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
         (
-            SaltsValues{
-                salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [1, 1, ShufflerTrait::mock_to_seed(
+            [
+                MockedValueTrait::new('shoot_a', 1),
+                MockedValueTrait::new('shoot_b', 1),
+                MockedValueTrait::shuffled('env', 
                     [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
                     ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()
-                )].span(),
-            },
+                ),
+            ].span(),
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
         )
     }
 
-    pub fn get_moves_dual_miss() -> (SaltsValues, PlayerMoves, PlayerMoves) {
+    pub fn get_moves_dual_miss() -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
         let moves_a: Span<u8> = [1, 2].span();
         let moves_b: Span<u8> = [1, 2].span();
         (
-            SaltsValues{
-                salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [100, 100, ShufflerTrait::mock_to_seed(
+            [
+                MockedValueTrait::new('shoot_a', 100),
+                MockedValueTrait::new('shoot_b', 100),
+                MockedValueTrait::shuffled('env',
                     [ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,
                     ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,ENV_CARD_MISS,].span()
-                )].span(),
-            },
+                ),
+            ].span(),
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
         )
     }
 
-    pub fn get_moves_dual_crit() -> (SaltsValues, PlayerMoves, PlayerMoves) {
+    pub fn get_moves_dual_crit() -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
         let moves_a: Span<u8> = [1, 2].span();
         let moves_b: Span<u8> = [1, 2].span();
         (
-            SaltsValues{
-                salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [1, 1, ShufflerTrait::mock_to_seed([ENV_CARD_CRIT].span())].span(),
-            },
+            [
+                MockedValueTrait::new('shoot_a', 1),
+                MockedValueTrait::new('shoot_b', 1),
+                MockedValueTrait::shuffled('env', [ENV_CARD_CRIT].span()),
+            ].span(),
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
         )
     }
 
-    pub fn get_moves_crit_a() -> (SaltsValues, PlayerMoves, PlayerMoves) {
+    pub fn get_moves_crit_a() -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
         let moves_a: Span<u8> = [1, 2].span();
         let moves_b: Span<u8> = [2, 3].span();
         (
-            SaltsValues{
-                salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [1, 1, ShufflerTrait::mock_to_seed([ENV_CARD_CRIT].span())].span(),
-            },
+            [
+                MockedValueTrait::new('shoot_a', 1),
+                MockedValueTrait::new('shoot_b', 1),
+                MockedValueTrait::shuffled('env', [ENV_CARD_CRIT].span()),
+            ].span(),
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
         )
     }
 
-    pub fn get_moves_crit_b() -> (SaltsValues, PlayerMoves, PlayerMoves) {
+    pub fn get_moves_crit_b() -> (Span<MockedValue>, PlayerMoves, PlayerMoves) {
         let moves_a: Span<u8> = [2, 3].span();
         let moves_b: Span<u8> = [1, 2].span();
         (
-            SaltsValues{
-                salts: ['shoot_a', 'shoot_b', 'env'].span(),
-                values: [100, 1, ShufflerTrait::mock_to_seed([ENV_CARD_CRIT].span())].span(),
-            },
+            [
+                MockedValueTrait::new('shoot_a', 100),
+                MockedValueTrait::new('shoot_b', 1),
+                MockedValueTrait::shuffled('env', [ENV_CARD_CRIT].span()),
+            ].span(),
             PlayerMovesTrait::new(SALT_A, moves_a),
             PlayerMovesTrait::new(SALT_B, moves_b),
         )

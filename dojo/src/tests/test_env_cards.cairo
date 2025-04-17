@@ -13,7 +13,7 @@ mod tests {
     use pistols::libs::game_loop::{game_loop};
     use pistols::utils::short_string::{ShortString};
 
-    use pistols::systems::rng_mock::{IRngMockDispatcherTrait, ShufflerTrait};
+    use pistols::systems::rng_mock::{IRngMockDispatcherTrait, MockedValueTrait};
     use pistols::tests::tester::{tester,
         tester::{
             TestSystems, FLAGS,
@@ -45,14 +45,11 @@ mod tests {
         env_cards: Span<felt252>,
         fire_dices: Span<felt252>,
     ) -> (Round, DuelProgress) {
-        (*sys.rng).set_mocked_values(
-            ['shoot_a', 'shoot_b'].span(),
-            fire_dices,
-        );
-        (*sys.rng).set_mocked_values(
-            ['env'].span(),
-            [ShufflerTrait::mock_to_seed(env_cards)].span(),
-        );
+        (*sys.rng).mock_values([
+            MockedValueTrait::new('shoot_a', *fire_dices[0]),
+            MockedValueTrait::new('shoot_b', *fire_dices[1]),
+            MockedValueTrait::shuffled('env', env_cards),
+        ].span());
         let mut round = Round {
             duel_id: 0x1234,
             state: RoundState::Reveal,

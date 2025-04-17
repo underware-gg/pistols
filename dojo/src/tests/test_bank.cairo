@@ -30,11 +30,10 @@ mod tests {
     };
     use pistols::tests::prefabs::{prefabs,
         prefabs::{
-            SaltsValues,
             PlayerMoves,
         },
     };
-    use pistols::systems::rng_mock::{IRngMockDispatcherTrait};
+    use pistols::systems::rng_mock::{IRngMockDispatcherTrait, MockedValue};
     use pistols::utils::math::{MathU128};
 
     fn consume_imports() {
@@ -49,11 +48,11 @@ mod tests {
     // Challenge results
     //
     fn _test_bank_resolved(sys: @TestSystems, address_a: ContractAddress, address_b: ContractAddress, winner: u8) {
-        let (salts, moves_a, moves_b): (SaltsValues, PlayerMoves, PlayerMoves) = 
+        let (mocked, moves_a, moves_b): (Span<MockedValue>, PlayerMoves, PlayerMoves) = 
             if (winner == 1) {prefabs::get_moves_crit_a()}
             else if (winner == 2) {prefabs::get_moves_crit_b()}
             else  {prefabs::get_moves_dual_miss()};
-        (*sys.rng).set_mocked_values(salts.salts, salts.values);
+        (*sys.rng).mock_values(mocked);
 
         let duelist_id_a: u128 = ID(address_a);
         let duelist_id_b: u128 = ID(address_b);
@@ -154,8 +153,8 @@ mod tests {
     }
 
     fn _test_bank_draw(sys: @TestSystems, address_a: ContractAddress, address_b: ContractAddress, lives: u8, flames_up: bool) {
-        let (salts, moves_a, moves_b): (SaltsValues, PlayerMoves, PlayerMoves) = prefabs::get_moves_dual_crit();
-        (*sys.rng).set_mocked_values(salts.salts, salts.values);
+        let (mocked, moves_a, moves_b): (Span<MockedValue>, PlayerMoves, PlayerMoves) = prefabs::get_moves_dual_crit();
+        (*sys.rng).mock_values(mocked);
 
 // let mut fame_balance_a: u128 = tester::fame_balance_of_token(@sys, duelist_id_a);
 // let mut fame_balance_b: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);

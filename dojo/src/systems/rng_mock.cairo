@@ -8,7 +8,7 @@ pub use pistols::types::shuffler::{Shuffler, ShufflerTrait};
 //
 // 1. game testing:
 //    - deploy test world with this contract instead of rng.cairo
-//    - store MockedValues on-chain by calling set_mocked_values()
+//    - store MockedValues on-chain by calling mock_values()
 //    - game_loop() will use these values instead of seeded rng
 //
 // 2. tutorial scripting:
@@ -76,13 +76,13 @@ pub trait IRngMock<TState> {
     fn reseed(self: @TState, seed: felt252, salt: felt252, mocked: Span<MockedValue>) -> felt252;
     fn is_mocked(self: @TState) -> bool;
     // IMocker
-    fn set_mocked_values(ref self: TState, salts: Span<felt252>, values: Span<felt252>);
+    fn mock_values(ref self: TState, mocked: Span<MockedValue>);
 }
 
 // used for testing only
 #[starknet::interface]
 pub trait IMocker<TState> {
-    fn set_mocked_values(ref self: TState, salts: Span<felt252>, values: Span<felt252>);
+    fn mock_values(ref self: TState, mocked: Span<MockedValue>);
 }
 
 #[dojo::contract]
@@ -91,7 +91,7 @@ pub mod rng_mock {
     use dojo::world::{WorldStorage};
     use dojo::model::{ModelStorage};
 
-    use super::{IMocker, MockedValue, MockedValueTrait};
+    use super::{IMocker, MockedValue};
     use pistols::systems::rng::{IRng};
     use pistols::utils::hash::{hash_values};
 
@@ -147,22 +147,13 @@ pub mod rng_mock {
 
     #[abi(embed_v0)]
     impl MockerImpl of IMocker<ContractState> {
-        fn set_mocked_values(ref self: ContractState, salts: Span<felt252>, values: Span<felt252>) {
+        fn mock_values(ref self: ContractState, mocked: Span<MockedValue>) {
             let mut world = self.world_default();
-            let mut index: usize = 0;
-            while (index < salts.len() && index < values.len()) {
-                // println!("set_mocked_values {} {} {}", index, salts[index], values[index]);
-                let v: u256 = (*values[index]).try_into().unwrap();
-                assert(v > 0, 'salt value > 0');
-                // assert(v < 256, 'salt value < 256');
-                world.write_model(
-                    @MockedValueTrait::new(
-                        *salts[index],
-                        *values[index],
-                    )
-                );
-                index += 1;
-            }
+            let mut i: usize = 0;
+            while (i < mocked.len()) {
+                world.write_model(mocked.at(i));
+                i += 1;
+            };
         }
     }
 }

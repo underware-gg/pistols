@@ -3169,7 +3169,7 @@ export function setupWorld(provider: DojoProvider) {
 	// const build_rng_mock_setMockedValues_calldata = (salts: Array<BigNumberish>, values: Array<BigNumberish>): DojoCall => {
 	// 	return {
 	// 		contractName: "rng_mock",
-	// 		entrypoint: "set_mocked_values",
+	// 		entrypoint: "mock_values",
 	// 		calldata: [salts, values],
 	// 	};
 	// };
@@ -3178,7 +3178,7 @@ export function setupWorld(provider: DojoProvider) {
 	// 	try {
 	// 		return await provider.execute(
 	// 			snAccount,
-	// 			build_rng_mock_setMockedValues_calldata(salts, values),
+	// 			build_rng_mock_setMockedValues_calldata(mocked, values),
 	// 			"pistols",
 	// 		);
 	// 	} catch (error) {

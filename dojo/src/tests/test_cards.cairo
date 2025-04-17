@@ -17,7 +17,7 @@ mod tests {
     use pistols::libs::game_loop::{game_loop};
     use pistols::utils::short_string::{ShortString};
 
-    use pistols::systems::rng_mock::{IRngMockDispatcherTrait, ShufflerTrait};
+    use pistols::systems::rng_mock::{IRngMockDispatcherTrait, MockedValueTrait};
     use pistols::tests::tester::{tester,
         tester::{
             TestSystems, FLAGS,
@@ -30,7 +30,6 @@ mod tests {
         prefabs::{
             SALT_A, SALT_B,
             ENV_CARD_NEUTRAL,
-            // SaltsValues, SaltsValuesTrait,
             // PlayerMoves, PlayerMovesTrait,
         },
     };
@@ -41,9 +40,9 @@ mod tests {
     #[test]
     fn test_game_loop() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::MOCK_RNG);
-        let (salts, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+        let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         let duel_id = prefabs::start_new_challenge(@sys, OWNER(), OTHER(), DuelType::Practice, 1);
-        let (challenge, round) = prefabs::commit_reveal_get(@sys, duel_id, OWNER(), OTHER(), salts, moves_a, moves_b);
+        let (challenge, round) = prefabs::commit_reveal_get(@sys, duel_id, OWNER(), OTHER(), mocked, moves_a, moves_b);
         assert_gt!(round.state_a.damage, CONST::INITIAL_DAMAGE, "final_damage_a");
         assert_gt!(round.state_b.damage, CONST::INITIAL_DAMAGE, "final_damage_b");
         assert_lt!(round.state_a.health, CONST::FULL_HEALTH, "final_health_a");
@@ -60,13 +59,12 @@ mod tests {
 
     fn execute_game_loop(sys: @TestSystems, moves_a: Span<u8>, moves_b: Span<u8>, shuffle: bool) -> (Round, DuelProgress) {
         if (!shuffle) {
-            (*sys.rng).set_mocked_values(
-                ['env'].span(),
-                [ShufflerTrait::mock_to_seed(
+            (*sys.rng).mock_values([
+                MockedValueTrait::shuffled('env',
                     [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL,
                     ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()
-                )].span()
-            );
+                )
+            ].span());
         }
         let mut round = Round {
             duel_id: 0x1234,
@@ -103,8 +101,8 @@ mod tests {
     #[test]
     fn test_hand_progress() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
-        sys.rng.set_mocked_values(salts.salts, salts.values);
+        let (mocked, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
+        sys.rng.mock_values(mocked);
         let moves_a: Span<u8> = [5, 6, 1, BladesCard::Grapple.into()].span();
         let moves_b: Span<u8> = [10, 9, 3, BladesCard::PocketPistol.into()].span();
         let (round, progress) = execute_game_loop(@sys, moves_a, moves_b, true);
@@ -181,8 +179,8 @@ mod tests {
     #[test]
     fn test_fire_no_dodge() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let (salts, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
-        sys.rng.set_mocked_values(salts.salts, salts.values);
+        let (mocked, _moves_a, _moves_b) = prefabs::get_moves_dual_miss();
+        sys.rng.mock_values(mocked);
         let (round, progress) = execute_game_loop(@sys,
             [1, 1].span(),
             [2, 2].span(),
