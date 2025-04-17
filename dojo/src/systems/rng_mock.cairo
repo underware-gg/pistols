@@ -74,7 +74,7 @@ pub impl RngWrapImpl of RngWrapTrait {
 pub trait IRngMock<TState> {
     // IRng
     fn reseed(self: @TState, seed: felt252, salt: felt252, mocked: Span<MockedValue>) -> felt252;
-    fn is_mocked(self: @TState) -> bool;
+    fn is_mocked(self: @TState, salt: felt252) -> bool;
     // IMocker
     fn mock_values(ref self: TState, mocked: Span<MockedValue>);
 }
@@ -140,8 +140,10 @@ pub mod rng_mock {
             let new_seed: felt252 = hash_values([seed.into(), salt].span());
             (new_seed)
         }
-        fn is_mocked(self: @ContractState) -> bool {
-            (true)
+        fn is_mocked(self: @ContractState, salt: felt252) -> bool {
+            let mut world = self.world_default();
+            let found: MockedValue = world.read_model(salt);
+            (found.exists)
         }
     }
 

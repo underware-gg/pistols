@@ -12,7 +12,13 @@ mod tests {
         Dice, DiceTrait,
         Shuffle, ShuffleTrait,
     };
-    use pistols::tests::tester::{tester, tester::{TestSystems, FLAGS}};
+    use pistols::tests::tester::{
+        tester,
+        tester::{
+            TestSystems, FLAGS,
+            IRngMockDispatcherTrait,
+        }
+    };
     use pistols::libs::seeder::{make_seed};
 
     #[test]
@@ -105,7 +111,7 @@ mod tests {
     //
 
     #[test]
-    fn test_rng_mock_dice() {
+    fn test_rng_mock_dice_wrapped() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let mocked: Span<MockedValue> = [
             MockedValueTrait::new('dice_1', 1),
@@ -122,28 +128,15 @@ mod tests {
     }
 
     #[test]
-    fn test_rng_mock_shuffle() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
-        let mocked: Span<MockedValue> = [
-            MockedValueTrait::new('shuffle', ShufflerTrait::mock_to_seed([1, 22, 34, 7, 25].span())),
-        ].span();
-        let mut shuffle: Shuffle = ShuffleTrait::new(RngWrapTrait::wrap(sys.rng.contract_address, Option::Some(mocked)), 0x1212121212, 34, 'shuffle');
-        assert_eq!(shuffle.draw_next(), 1, "shuffle_1");
-        assert_eq!(shuffle.draw_next(), 22, "shuffle_22");
-        assert_eq!(shuffle.draw_next(), 34, "shuffle_34");
-        assert_eq!(shuffle.draw_next(), 7, "shuffle_7");
-        assert_eq!(shuffle.draw_next(), 25, "shuffle_25");
-    }
-
-    #[test]
-    fn test_rng_mock_dice_wrapped() {
+    fn test_rng_mock_dice_mocked() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let mocked: Span<MockedValue> = [
             MockedValueTrait::new('dice_1', 1),
             MockedValueTrait::new('dice_2', 22),
             MockedValueTrait::new('dice_3', 34),
         ].span();
-        let mut dice: Dice = DiceTrait::new(RngWrapTrait::wrap(sys.rng.contract_address, Option::Some(mocked)), 0x1212121212);
+        sys.rng.mock_values(mocked);
+        let mut dice: Dice = DiceTrait::new(RngWrapTrait::new(sys.rng.contract_address), 0x1212121212);
         let d1 = dice.throw('dice_1', 100);
         let d2 = dice.throw('dice_2', 100);
         let d3 = dice.throw('dice_3', 100);
@@ -165,5 +158,57 @@ mod tests {
         assert_eq!(s1, 1, "shuffle_1");
         assert_eq!(s2, 22, "shuffle_2");
         assert_eq!(s3, 34, "shuffle_3");
+    }
+
+    #[test]
+    fn test_rng_mock_shuffle_mocked() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let mocked: Span<MockedValue> = [
+            MockedValueTrait::shuffled('shuffle', [1, 22, 34].span()),
+        ].span();
+        sys.rng.mock_values(mocked);
+        let mut shuffle: Shuffle = ShuffleTrait::new(RngWrapTrait::new(sys.rng.contract_address), 0x1212121212, 34, 'shuffle');
+        let s1 = shuffle.draw_next();
+        let s2 = shuffle.draw_next();
+        let s3 = shuffle.draw_next();
+        assert_eq!(s1, 1, "shuffle_1");
+        assert_eq!(s2, 22, "shuffle_2");
+        assert_eq!(s3, 34, "shuffle_3");
+    }
+
+    fn _test_rng_mock_shuffle(values: Span<felt252>, size: u8) {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
+        let mocked: Span<MockedValue> = [
+            MockedValueTrait::shuffled('shuffle', values),
+        ].span();
+        sys.rng.mock_values(mocked);
+        let mut shuffle: Shuffle = ShuffleTrait::new(RngWrapTrait::new(sys.rng.contract_address), 0x1212121212, size, 'shuffle');
+        let mut i: usize = 0;
+        while (i < size.into()) {
+            let v: u8 = (*values[i]).try_into().unwrap();
+            let next: u8 = shuffle.draw_next();
+            assert_eq!(next, v, "next[{}]: {}", i, v);
+            i += 1;
+        };
+    }
+
+    #[test]
+    fn test_rng_mock_shuffle_ascending() {
+        _test_rng_mock_shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].span(), 10);
+    }
+
+    #[test]
+    fn test_rng_mock_shuffle_descending() {
+        _test_rng_mock_shuffle([10, 9, 8, 7, 6, 5, 4, 3, 2, 1].span(), 10);
+    }
+
+    #[test]
+    fn test_rng_mock_shuffle_alternating() {
+        _test_rng_mock_shuffle([2, 1, 4, 3, 6, 5, 8, 7, 10, 9].span(), 10);
+    }
+
+    #[test]
+    fn test_rng_mock_shuffle_loop() {
+        _test_rng_mock_shuffle([1, 3, 5, 7, 9, 10, 8, 6, 4, 2].span(), 10);
     }
 }

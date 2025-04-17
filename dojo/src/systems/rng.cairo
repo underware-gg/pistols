@@ -7,7 +7,7 @@ pub use pistols::systems::rng_mock::{MockedValue, RngWrap, RngWrapTrait};
 #[starknet::interface]
 pub trait IRng<TState> {
     fn reseed(self: @TState, seed: felt252, salt: felt252, mocked: Span<MockedValue>) -> felt252;
-    fn is_mocked(self: @TState) -> bool;
+    fn is_mocked(self: @TState, salt: felt252) -> bool;
 }
 
 #[dojo::contract]
@@ -23,7 +23,7 @@ pub mod rng {
             let new_seed: felt252 = hash_values([seed.into(), salt].span());
             (new_seed)
         }
-        fn is_mocked(self: @ContractState) -> bool {
+        fn is_mocked(self: @ContractState, salt: felt252) -> bool {
             (false)
         }
     }
@@ -50,6 +50,7 @@ pub impl DiceImpl of DiceTrait {
             seed: initial_seed,
             last_dice: 0,
             mocked: match *wrapped.mocked {
+                // mocked values are used in rng_mock contract (tutorials and tests)
                 Option::Some(mocked) => mocked,
                 Option::None => [].span(),
             },
@@ -94,12 +95,12 @@ pub struct Shuffle {
 pub impl ShuffleImpl of ShuffleTrait {
     fn new(wrapped: @RngWrap, initial_seed: felt252, shuffle_size: u8, salt: felt252) -> Shuffle {
         let rng = IRngDispatcher{ contract_address: *wrapped.rng_address };
-        let mocked: Span<MockedValue> = match *wrapped.mocked {
-            Option::Some(mocked) => mocked,
-            Option::None => [].span(),
+        let (is_mocked, mocked): (bool, Span<MockedValue>) = match *wrapped.mocked {
+            // mocked values are used in rng_mock contract (tutorials and tests)
+            Option::Some(mocked) => (true, mocked),
+            Option::None => (rng.is_mocked(salt), [].span()),
         };
         let seed: felt252 = rng.reseed(initial_seed, salt, mocked);
-        let is_mocked: bool = (rng.is_mocked() && (*wrapped.mocked).is_some());
         let shuffler = ShufflerTrait::new(shuffle_size, is_mocked);
         (Shuffle {
             seed,
