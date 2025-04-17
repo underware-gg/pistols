@@ -527,6 +527,7 @@ pub mod duel_token {
                 duel_id = self.token.mint_next(store.world.game_address());
 
                 // create challenge
+                let timestamp: u64 = starknet::get_block_timestamp();
                 let challenge = Challenge {
                     duel_id,
                     duel_type: DuelType::Tournament,
@@ -545,7 +546,7 @@ pub mod duel_token {
                     winner: 0,
                     // timestamps
                     timestamps: Period {
-                        start: starknet::get_block_timestamp(),
+                        start: timestamp,
                         end: timestamp_end,
                     },
                 };
@@ -569,6 +570,7 @@ pub mod duel_token {
                     state_b: Default::default(),
                     final_blow: Default::default(),
                 };
+                round.set_commit_timeout(store.get_current_season_rules(), timestamp);
 
                 // save!
                 store.set_challenge(@challenge);

@@ -429,7 +429,7 @@ pub mod game {
                 (true)
             } else if (
                 challenge.state == ChallengeState::InProgress && 
-                (round.moves_a.timeout.has_timed_out() || round.moves_b.timeout.has_timed_out())
+                (round.moves_a.timeout.has_timed_out(@challenge) || round.moves_b.timeout.has_timed_out(@challenge))
             ) {
                 (true)
             } else {
@@ -575,8 +575,8 @@ pub mod game {
         }
 
         fn _finish_challenge_if_timed_out(ref self: ContractState, ref store: Store, ref challenge: Challenge, ref round: Round) -> bool {
-            let timed_out_a: bool = round.moves_a.timeout.has_timed_out();
-            let timed_out_b: bool = round.moves_b.timeout.has_timed_out();
+            let timed_out_a: bool = round.moves_a.timeout.has_timed_out(@challenge);
+            let timed_out_b: bool = round.moves_b.timeout.has_timed_out(@challenge);
             if (timed_out_a || timed_out_b) {
                 // finish challenge + round
                 let winner: u8 =

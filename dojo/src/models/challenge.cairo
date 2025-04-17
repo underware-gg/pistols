@@ -190,15 +190,15 @@ pub impl MovesImpl of MovesTrait {
     }
     #[inline(always)]
     fn set_commit_timeout(ref self: Moves, rules: Rules, current_timestamp: u64) {
-        self.timeout = if (self.hashed == 0) {(current_timestamp + rules.get_reply_timeout())} else {(0)};
+        self.timeout = if (!self.has_comitted()) {(current_timestamp + rules.get_reply_timeout())} else {(0)};
     }
     #[inline(always)]
     fn set_reveal_timeout(ref self: Moves, rules: Rules, current_timestamp: u64) {
-        self.timeout = if (self.salt == 0) {(current_timestamp + rules.get_reply_timeout())} else {(0)};
+        self.timeout = if (!self.has_revealed()) {(current_timestamp + rules.get_reply_timeout())} else {(0)};
     }
     #[inline(always)]
-    fn has_timed_out(ref self: Moves) -> bool {
-        (self.timeout.has_timed_out())
+    fn has_timed_out(ref self: Moves, challenge: @Challenge) -> bool {
+        (self.timeout.has_timed_out(challenge))
     }
 }
 

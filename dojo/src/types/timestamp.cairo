@@ -23,6 +23,8 @@ pub struct Period {
 //----------------------------------------
 // Traits
 //
+use pistols::models::challenge::{Challenge, DuelType};
+
 #[generate_trait]
 pub impl PeriodImpl of PeriodTrait {
     #[inline(always)]
@@ -34,8 +36,17 @@ pub impl PeriodImpl of PeriodTrait {
 #[generate_trait]
 pub impl TimestampImpl of TimestampTrait {
     #[inline(always)]
-    fn has_timed_out(self: u64) -> bool {
-        (self != 0 && starknet::get_block_timestamp() > self)
+    fn has_timed_out(self: u64, challenge: @Challenge) -> bool {
+        if (self == 0) {
+            (false)
+        } else {
+            let timestamp: u64 = starknet::get_block_timestamp();
+            (
+                timestamp > self ||
+                // tournament lifecycle cannot be extended
+                (*challenge.duel_type == DuelType::Tournament && timestamp > *challenge.timestamps.end)
+            )
+        }
     }
     #[inline(always)]
     fn from_minutes(minutes: u64) -> u64 {
