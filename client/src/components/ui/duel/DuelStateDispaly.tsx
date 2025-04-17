@@ -49,6 +49,8 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
   const rightDuelistId = shouldSwap ? duelistIdA : duelistIdB
   const leftRewards = shouldSwap ? rewardsB : rewardsA
   const rightRewards = shouldSwap ? rewardsA : rewardsB
+  const isLeftMe = shouldSwap ? isYouB : isYouA
+  const isRightMe = shouldSwap ? isYouA : isYouB
 
   const winnerIsLeft = useMemo(() => (winnerDuelistId == leftDuelistId), [winnerDuelistId, leftDuelistId])
   const winnerIsRight = useMemo(() => (winnerDuelistId == rightDuelistId), [winnerDuelistId, rightDuelistId])
@@ -80,16 +82,13 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
 
   // Reset animation states when duel state changes
   useEffect(() => {
-    // Reset all animation states when animation state changes
     if (animated !== AnimationState.Finished) {
       setAnimatedText("")
       setShowOutcome(false)
       setShowRewards(false)
       setShowDisplay(false)
       animationSequenceStarted.current = false;
-    } 
-    // Start animation sequence only once after the duel is finished
-    else if (!isTutorial && (isFinished || isCanceled || isExpired) && animated === AnimationState.Finished && !animationSequenceStarted.current) {
+    } else if (!isTutorial && (isFinished || isCanceled || isExpired) && animated === AnimationState.Finished && !animationSequenceStarted.current) {
       animationSequenceStarted.current = true;
       
       // Step 1: Show the container with a fade-in
@@ -103,17 +102,6 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
       }, 300);
     }
   }, [animated, isTutorial, isFinished, isCanceled, isExpired, statusText]);
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //       setShowDisplay(true);
-        
-  //       // Step 2: Start text animation after container appears
-  //       setTimeout(() => {
-  //         setAnimatedText("Honor has been satisfied in favor of fortunaregem!");
-  //       }, 500);
-  //     }, 300);
-  // }, [])
 
   const RewardRow = ({ show, delay, children, animation = 'fadeIn' }) => {
     const baseStyle = {
@@ -206,7 +194,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                     <AnimatedText
                       text={showOutcome ? leftPlayerName : ''}
                       delayPerCharacter={50}
-                      style={{color: winnerIsLeft ? '#00ff00' : '#ff4444'}}
+                      style={{color: isLeftMe ? '#00ff00' : '#ff4444'}}
                     />
                   </div>
                   <div style={{ flex: 2, textAlign: 'center' }}>
@@ -222,7 +210,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                       text={showOutcome ? rightPlayerName : ''}
                       delayPerCharacter={50}
                       reverse
-                      style={{color: winnerIsRight ? '#00ff00' : '#ff4444'}}
+                      style={{color: isRightMe ? '#00ff00' : '#ff4444'}}
                       onAnimationComplete={() => {
                         // Ensure we only trigger this once
                         if (!showRewards) {

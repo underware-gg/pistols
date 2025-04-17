@@ -10,7 +10,6 @@ interface DuelUIControlsProps {
   onStep: () => void;
   onReset: () => void;
   isPlaying: boolean;
-  isAnimatingStep: boolean;
 }
 
 /**
@@ -23,7 +22,6 @@ export const DuelUIControls: React.FC<DuelUIControlsProps> = ({
   onStep,
   onReset,
   isPlaying,
-  isAnimatingStep,
 }) => {
 
   return (
@@ -32,11 +30,7 @@ export const DuelUIControls: React.FC<DuelUIControlsProps> = ({
       <MenuDuel duelId={duelId} />
       <MenuDuelControl 
         clickPlay={onPlay}
-        clickStep={() => {
-          if (!isAnimatingStep) {
-            onStep();
-          }
-        }} 
+        clickStep={onStep} 
         clickReset={onReset}
         isPlaying={isPlaying}
       />

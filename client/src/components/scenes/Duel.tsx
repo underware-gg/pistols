@@ -29,46 +29,12 @@ export default function Duel({
   tutorial: DuelTutorialLevel,
   cachedDuelData?: any
 }) {
-  const { debugMode, duelSpeedFactor } = useSettings()
-  
-  // Animation control refs and state
-  const cardsRef = useRef<CardsHandle>(null)
-  const currentStepRef = useRef(0)
-  const isAnimatingStepRef = useRef(false)
-  const isPlayingRef = useRef(true)
-  const speedRef = useRef(duelSpeedFactor)
-  const [isPlaying, setIsPlaying] = useState(true)
-  const [triggerReset, setTriggerReset] = useState(false)
-
-  // Force a reset of current step and animation state when duelId changes
-  useEffect(() => {
-    currentStepRef.current = 0
-    isAnimatingStepRef.current = false
-    isPlayingRef.current = true
-    setIsPlaying(true)
-    setTriggerReset(prev => !prev) // Toggle to force reset
-  }, [duelId])
-
-  // Update speed ref when setting changes
-  useEffect(() => {
-    speedRef.current = duelSpeedFactor
-  }, [duelSpeedFactor])
 
   return (
     <DuelContextProvider duelId={duelId} cachedDuelData={cachedDuelData}>
       <DuelContent 
         duelId={duelId}
         tutorial={tutorial}
-        debugMode={debugMode}
-        cardsRef={cardsRef}
-        currentStepRef={currentStepRef}
-        isAnimatingStepRef={isAnimatingStepRef}
-        isPlayingRef={isPlayingRef}
-        speedRef={speedRef}
-        isPlaying={isPlaying}
-        setIsPlaying={setIsPlaying}
-        triggerReset={triggerReset}
-        setTriggerReset={setTriggerReset}
       />
     </DuelContextProvider>
   )
@@ -80,29 +46,9 @@ export default function Duel({
 const DuelContent: React.FC<{
   duelId: bigint,
   tutorial: DuelTutorialLevel,
-  debugMode: boolean,
-  cardsRef: React.RefObject<CardsHandle>,
-  currentStepRef: React.MutableRefObject<number>,
-  isAnimatingStepRef: React.MutableRefObject<boolean>,
-  isPlayingRef: React.MutableRefObject<boolean>,
-  speedRef: React.MutableRefObject<number>,
-  isPlaying: boolean,
-  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>,
-  triggerReset: boolean,
-  setTriggerReset: React.Dispatch<React.SetStateAction<boolean>>
 }> = ({
   duelId,
   tutorial,
-  debugMode,
-  cardsRef,
-  currentStepRef,
-  isAnimatingStepRef,
-  isPlayingRef,
-  speedRef,
-  isPlaying,
-  setIsPlaying,
-  triggerReset,
-  setTriggerReset
 }) => {
   const {
     isSceneStarted,
@@ -118,42 +64,59 @@ const DuelContent: React.FC<{
     completedStagesRight,
     canAutoRevealLeft,
     canAutoRevealRight,
+    settings,
     challenge,
     clearActionFlag
   } = useDuelContext()
   
   const { tutorialOpener } = usePistolsContext()
+  
+  // Animation control refs and state
+  const cardsRef = useRef<CardsHandle>(null)
+  const currentStepRef = useRef(0)
+  const isPlayingRef = useRef(true)
+  const [isPlaying, setIsPlaying] = useState(true)
+  const [triggerReset, setTriggerReset] = useState(false)
+
+  // Force a reset of current step and animation state when duelId changes
+  useEffect(() => {
+    currentStepRef.current = 0
+    isPlayingRef.current = true
+    setIsPlaying(true)
+    setTriggerReset(prev => !prev) // Toggle to force reset
+  }, [duelId])
 
   // Track first render for animation timing
   const hasInitializedCards = useRef(false)
   const animationsDelayedForLoading = useRef(false)
   
-  const resetDuelAnimation = useRef<DuelAnimationControllerRef>(null)
+  const duelAnimationControllerRef = useRef<DuelAnimationControllerRef>(null)
 
   const handlePlay = () => {
     isPlayingRef.current = !isPlayingRef.current
     setIsPlaying(isPlayingRef.current)
     
-    if (isPlayingRef.current && !isAnimatingStepRef.current && resetDuelAnimation.current) {
+    if (isPlayingRef.current && duelAnimationControllerRef.current) {
       setTimeout(() => {
-        if (resetDuelAnimation.current && isPlayingRef.current) {
-          resetDuelAnimation.current.stepForward()
+        if (duelAnimationControllerRef.current && isPlayingRef.current) {
+          duelAnimationControllerRef.current.stepForward()
         }
       }, 100)
     }
   }
 
   const handleReset = () => {
-    if (resetDuelAnimation.current) {
-      resetDuelAnimation.current.resetDuel()
+    if (duelAnimationControllerRef.current) {
+      
+      duelAnimationControllerRef.current.resetDuel()
     }
-    setTriggerReset(!triggerReset)
+    
   }
   
   // Effect to detect triggerReset changes
   useEffect(() => {
-    if (triggerReset && resetDuelAnimation.current) {
-      resetDuelAnimation.current.resetDuel()
+    if (triggerReset && duelAnimationControllerRef.current) {
+      duelAnimationControllerRef.current.resetDuel()
     }
   }, [triggerReset])
   
@@ -193,12 +156,10 @@ const DuelContent: React.FC<{
       {shouldShowAnimations && (
         <DuelAnimationController
           cardsRef={cardsRef}
-          isAnimatingStepRef={isAnimatingStepRef}
           isPlayingRef={isPlayingRef}
-          speedRef={speedRef}
           currentStepRef={currentStepRef}
           tutorialLevel={tutorial}
-          ref={resetDuelAnimation}
+          ref={duelAnimationControllerRef}
         />
       )}
 
@@ -216,7 +177,7 @@ const DuelContent: React.FC<{
         revealCards={(cards) => {
           if (cardsRef.current && isSceneStarted && isDataSet) {
             cardsRef.current.spawnCards('A', cards)
-            resetDuelAnimation.current.setCardsSpawnedLeft(true);
+            duelAnimationControllerRef.current.setCardsSpawnedLeft(true);
           }
         }}
       />
@@ -233,7 +194,7 @@ const DuelContent: React.FC<{
         revealCards={(cards) => {
           if (cardsRef.current && isSceneStarted && isDataSet) {
             cardsRef.current.spawnCards('B', cards)
-            resetDuelAnimation.current.setCardsSpawnedRight(true);
+            duelAnimationControllerRef.current.setCardsSpawnedRight(true);
           }
         }}
       />
@@ -263,7 +224,7 @@ const DuelContent: React.FC<{
             duelistId={leftDuelist?.id || BigInt(0)} 
             damage={statsLeft?.damage || 0} 
             hitChance={statsLeft?.hitChance || 0} 
-            speedFactor={speedRef.current} 
+            speedFactor={settings.duelSpeedFactor} 
             tutorialLevel={tutorial} 
           />
         </div>
@@ -283,7 +244,7 @@ const DuelContent: React.FC<{
             duelistId={rightDuelist?.id || BigInt(0)} 
             damage={statsRight?.damage || 0} 
             hitChance={statsRight?.hitChance || 0} 
-            speedFactor={speedRef.current} 
+            speedFactor={settings.duelSpeedFactor} 
             tutorialLevel={tutorial} 
           />
         </div>
@@ -296,15 +257,14 @@ const DuelContent: React.FC<{
 
       <DuelUIControls
         duelId={duelId}
-        debugMode={debugMode}
+        debugMode={settings.debugMode}
         isPlaying={isPlaying}
-        isAnimatingStep={isAnimatingStepRef.current}
         onPlay={handlePlay}
         onStep={() => {
-          if (!isAnimatingStepRef.current && isSceneStarted && isDataSet) {
-            console.log("Manual step triggered");
-            if (resetDuelAnimation.current) {
-              resetDuelAnimation.current.stepForward();
+          if (isSceneStarted && isDataSet) {
+            console.log("Step button clicked");
+            if (duelAnimationControllerRef.current) {
+              duelAnimationControllerRef.current.stepForward();
             }
           }
         }}
