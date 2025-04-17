@@ -172,7 +172,7 @@ pub impl TournamentRoundImpl of TournamentRoundTrait {
         self.results = BitwiseU128::shr(
             // even entries: all duelists are playing and losing (0b1100)
             if (self.entry_count % 2 == 0) {0xcccccccccccccccccccccccccccccccc}
-            // odd entries: last player wins, but need to collect (0b1101)
+            // odd entries: last player wins (0b1101) > but need to collect_duel()
             else {0xdccccccccccccccccccccccccccccccc},
             ((Self::MAX_ENTRIES - self.entry_count) * 4).into());
     }
@@ -251,7 +251,8 @@ pub impl TournamentResultsImpl of TournamentResultsTrait {
         let mut result: Array<u8> = array![];
         let mut i: u8 = 0;
         while (i < TournamentRoundTrait::MAX_ENTRIES) {
-            if ((NibblemapU128::get_nibble(self, i.into()) & 0b0010) == 0b0010) {
+            // if ((NibblemapU128::get_nibble(self, i.into()) & 0b0011) != 0) {     // survived OR winning
+            if ((NibblemapU128::get_nibble(self, i.into()) & 0b0010) == 0b0010) {   // survived after round ended
                 result.append(i + 1);
             }
             i += 1;

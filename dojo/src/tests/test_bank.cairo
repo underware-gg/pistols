@@ -195,6 +195,10 @@ mod tests {
         assert_ne!(rewards_a.fools_gained, 0, "DEATH_rewards_a.fools_gained != 0");
         assert_ne!(rewards_b.fools_gained, 0, "DEATH_rewards_b.fools_gained != 0");
         assert_eq!(rewards_a.fame_lost, rewards_b.fame_lost, "DEATH_rewards_a.fame_lost == rewards_b.fame_lost"); // lose same amount
+        if (lives == 3) {
+            assert_eq!(rewards_a.survived, false, "DEATH_rewards_a.survived");
+            assert_eq!(rewards_b.survived, false, "DEATH_rewards_b.survived");
+        }
 
         // commit+reveal
         tester::execute_commit_moves(sys.game, address_a, duel_id, moves_a.hashed);
@@ -342,11 +346,15 @@ mod tests {
         tester::execute_claim_starter_pack(@sys.pack, OTHER());
 // tester::print_pools(@sys, 1, "CLAIMED");
         _test_bank_draw(@sys, OWNER(), OTHER(), 3, false);
+        assert!(!sys.duelists.is_alive(ID(OWNER())), "OWNER dead");
+        assert!(!sys.duelists.is_alive(ID(OTHER())), "OTHER dead");
 // tester::print_pools(@sys, 1, "DRAW_1");
         // transfer remaining duelists
         tester::execute_transfer_duelist(@sys.duelists, OWNER(), OWNER2(), ID(OWNER2()));
         tester::execute_transfer_duelist(@sys.duelists, OTHER(), OTHER2(), ID(OTHER2()));
         _test_bank_draw(@sys, OWNER2(), OTHER2(), 3, false);
+        assert!(!sys.duelists.is_alive(ID(OWNER2())), "OWNER2 dead");
+        assert!(!sys.duelists.is_alive(ID(OTHER2())), "OTHER2 dead");
 // tester::print_pools(@sys, 1, "DRAW_2");
         let order: Span<u128> = [
             ID(OWNER()), // fame 3000 - 3000 = 0 / score 10

@@ -24,9 +24,9 @@ pub mod PLAYERS {
     pub fn P1()  -> TestPlayer {(TestPlayerTrait::new(1, 1, starknet::contract_address_const::<0xa0001>(), 0xd0001))}
     pub fn P2()  -> TestPlayer {(TestPlayerTrait::new(2, 2, starknet::contract_address_const::<0xa0002>(), 0xd0002))}
     pub fn P3()  -> TestPlayer {(TestPlayerTrait::new(3, 3, starknet::contract_address_const::<0xa0003>(), 0xd0003))}
-    pub fn P4()  -> TestPlayer {(TestPlayerTrait::new(4, 4, starknet::contract_address_const::<0xa0004>(), 0xd0004))}
-    pub fn P5()  -> TestPlayer {(TestPlayerTrait::new(5, 5, starknet::contract_address_const::<0xa0005>(), 0xd0005))}
-    pub fn P6()  -> TestPlayer {(TestPlayerTrait::new(6, 6, starknet::contract_address_const::<0xa0006>(), 0xd0006))}
+    pub fn P4()  -> TestPlayer {(TestPlayerTrait::new(4, 6, starknet::contract_address_const::<0xa0004>(), 0xd0004))}
+    pub fn P5()  -> TestPlayer {(TestPlayerTrait::new(5, 4, starknet::contract_address_const::<0xa0005>(), 0xd0005))}
+    pub fn P6()  -> TestPlayer {(TestPlayerTrait::new(6, 5, starknet::contract_address_const::<0xa0006>(), 0xd0006))}
     pub fn P7()  -> TestPlayer {(TestPlayerTrait::new(7, 7, starknet::contract_address_const::<0xa0007>(), 0xd0007))}
     pub fn P8()  -> TestPlayer {(TestPlayerTrait::new(8, 8, starknet::contract_address_const::<0xa0008>(), 0xd0008))}
     pub fn P9()  -> TestPlayer {(TestPlayerTrait::new(9, 9, starknet::contract_address_const::<0xa0009>(), 0xd0009))}
@@ -155,10 +155,10 @@ pub mod budokan_mock {
     pub const TOURNAMENT_OF_1: u64 = 1001;   // 1 entry
     pub const TOURNAMENT_OF_2: u64 = 1002;   // 2 entries
     pub const TOURNAMENT_OF_3: u64 = 1003;   // 3 entries
-    pub const TOURNAMENT_OF_4: u64 = 1004;   // 4 entries
+    // pub const TOURNAMENT_OF_4: u64 = 1004;   // 4 entries
     pub const TOURNAMENT_OF_5: u64 = 1005;   // 5 entries
     pub const TOURNAMENT_OF_6: u64 = 1006;   // 6 entries
-    pub const TOURNAMENT_OF_7: u64 = 1007;   // 7 entries
+    // pub const TOURNAMENT_OF_7: u64 = 1007;   // 7 entries
 
     fn dojo_init(ref self: ContractState) {
         self.set_tournament_id(TOURNAMENT_OF_2);
