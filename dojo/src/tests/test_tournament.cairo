@@ -15,7 +15,8 @@ use pistols::models::{
     tournament::{
         TournamentEntry,
         Tournament, TournamentType,
-        TournamentRound, TournamentRoundValue, TournamentRoundValueTrait,
+        TournamentRound, TournamentRoundValue,
+        TournamentBracketTrait,
         TournamentSettings, TournamentSettingsValue,
         TournamentDuelKeys,
         // ChallengeToTournamentValue, TournamentToChallengeValue,
@@ -415,8 +416,8 @@ fn test_join_duel_ok() {
     assert_eq!(member_duel_id_p1, duel_id_p1, "member_duel_id_p1");
     // round
     let round: TournamentRoundValue = sys.store.get_tournament_round_value(tournament_id, 1);
-    assert_eq!(round.get_opponent_entry_number(1), 2, "round.get_opponent_entry_number(1)");
-    assert_eq!(round.get_opponent_entry_number(2), 1, "round.get_opponent_entry_number(2)");
+    assert_eq!(round.bracket.get_opponent_entry_number(1), 2, "round.bracket.get_opponent_entry_number(1)");
+    assert_eq!(round.bracket.get_opponent_entry_number(2), 1, "round.bracket.get_opponent_entry_number(2)");
 }
 
 #[test]
@@ -476,7 +477,7 @@ fn test_join_duel_ok_single() {
     assert_eq!(member_duel_id_p1, duel_id_p1, "member_duel_id_p1");
     // round
     let round: TournamentRoundValue = sys.store.get_tournament_round_value(tournament_id, 1);
-    assert_eq!(round.get_opponent_entry_number(1), 0, "round.get_opponent_entry_number(1)");
+    assert_eq!(round.bracket.get_opponent_entry_number(1), 0, "round.bracket.get_opponent_entry_number(1)");
 }
 
 #[test]

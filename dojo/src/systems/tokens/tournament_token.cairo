@@ -185,7 +185,8 @@ pub mod tournament_token {
             TournamentEntry, TournamentEntryValue,
             TournamentSettings, TournamentSettingsValue, TournamentSettingsValueTrait,
             Tournament, TournamentValue,
-            TournamentRound, TournamentRoundValue, TournamentRoundTrait, TournamentRoundValueTrait,
+            TournamentRound, TournamentRoundValue, TournamentRoundTrait,
+            TournamentBracketTrait,
             TournamentType, TOURNAMENT_SETTINGS,
             TournamentDuelKeys, TournamentDuelKeysTrait,
         },
@@ -434,7 +435,7 @@ pub mod tournament_token {
             // check if joined
             let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.current_round_number);
 // TODO: validate TournamentRound?
-            let opponent_entry_number: u8 = round.get_opponent_entry_number(entry.entry_number);
+            let opponent_entry_number: u8 = round.bracket.get_opponent_entry_number(entry.entry_number);
             let keys: @TournamentDuelKeys = TournamentDuelKeysTrait::new(
                 entry.tournament_id,
                 tournament.current_round_number,
@@ -475,7 +476,7 @@ pub mod tournament_token {
             store.set_tournament_entry(@entry);
             // Get round pairing
             let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.current_round_number);
-            let opponent_entry_number: u8 = round.get_opponent_entry_number(entry.entry_number);
+            let opponent_entry_number: u8 = round.bracket.get_opponent_entry_number(entry.entry_number);
             // Create duel
             let settings: TournamentSettingsValue = store.get_tournament_settings_value(token_metadata.settings_id);
             let duel_id: u128 = store.world.duel_token_protected_dispatcher().join_tournament_duel(
