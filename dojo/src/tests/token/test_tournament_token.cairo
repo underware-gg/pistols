@@ -20,7 +20,7 @@ use pistols::tests::tester::{
         ITournamentTokenDispatcherTrait,
     },
 };
-// use pistols::systems::tokens::budokan_mock::budokan_mock::{TOURNAMENT_ID_1, TOURNAMENT_ID_2};
+// use pistols::systems::tokens::budokan_mock::budokan_mock::{TOURNAMENT_OF_1, TOURNAMENT_OF_2};
 
 use openzeppelin_token::erc721::interface;
 use tournaments::components::interfaces::{IGameTokenDispatcher, IGameTokenDispatcherTrait};

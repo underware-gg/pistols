@@ -152,16 +152,16 @@ pub mod budokan_mock {
     use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
     // use pistols::utils::misc::{ZERO};
 
-    pub const TOURNAMENT_ID_1: u64 = 1001;   // 1 entry
-    pub const TOURNAMENT_ID_2: u64 = 1002;   // 2 entries
-    pub const TOURNAMENT_ID_3: u64 = 1003;   // 3 entries
-    pub const TOURNAMENT_ID_4: u64 = 1004;   // 4 entries
-    pub const TOURNAMENT_ID_5: u64 = 1005;   // 5 entries
-    pub const TOURNAMENT_ID_6: u64 = 1006;   // 6 entries
-    pub const TOURNAMENT_ID_7: u64 = 1007;   // 7 entries
+    pub const TOURNAMENT_OF_1: u64 = 1001;   // 1 entry
+    pub const TOURNAMENT_OF_2: u64 = 1002;   // 2 entries
+    pub const TOURNAMENT_OF_3: u64 = 1003;   // 3 entries
+    pub const TOURNAMENT_OF_4: u64 = 1004;   // 4 entries
+    pub const TOURNAMENT_OF_5: u64 = 1005;   // 5 entries
+    pub const TOURNAMENT_OF_6: u64 = 1006;   // 6 entries
+    pub const TOURNAMENT_OF_7: u64 = 1007;   // 7 entries
 
     fn dojo_init(ref self: ContractState) {
-        self.set_tournament_id(TOURNAMENT_ID_2);
+        self.set_tournament_id(TOURNAMENT_OF_2);
     }
 
     #[generate_trait]

@@ -232,7 +232,7 @@ pub impl TournamentRoundImpl of TournamentRoundTrait {
         // check if all playing bits are cleared (0b0100)
         ((*self.results & 0x44444444444444444444444444444444) == 0)
     }
-    fn get_surviving_entries(self: @TournamentRound) -> Array<u8> {
+    fn get_surviving_entries(self: @TournamentRound) -> Span<u8> {
         let mut result: Array<u8> = array![];
         let mut i: u8 = 0;
         while (i < Self::MAX_ENTRIES) {
@@ -241,7 +241,7 @@ pub impl TournamentRoundImpl of TournamentRoundTrait {
             }
             i += 1;
         };
-        (result)
+        (result.span())
     }
     
     //------------------------------------
@@ -518,7 +518,7 @@ mod unit {
         };
         assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
         // get survivors
-        let survivors: Span<u8> = round.get_surviving_entries().span();
+        let survivors: Span<u8> = round.get_surviving_entries();
         assert_eq!(survivors.len(), 0, "surviving");
     }
 
@@ -541,7 +541,7 @@ mod unit {
         };
         assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
         // get survivors
-        let survivors: Span<u8> = round.get_surviving_entries().span();
+        let survivors: Span<u8> = round.get_surviving_entries();
         assert_eq!(survivors.len(), round.entry_count.into(), "surviving");
         let mut i: u8 = 0;
         while (i.into() < survivors.len()) {
@@ -569,7 +569,7 @@ mod unit {
         };
         assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
         // get survivors
-        let survivors: Span<u8> = round.get_surviving_entries().span();
+        let survivors: Span<u8> = round.get_surviving_entries();
         assert_eq!(survivors.len(), (round.entry_count / 2).into(), "surviving");
         let mut i: u8 = 0;
         while (i.into() < survivors.len()) {
@@ -597,7 +597,7 @@ mod unit {
         };
         assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
         // get survivors
-        let survivors: Span<u8> = round.get_surviving_entries().span();
+        let survivors: Span<u8> = round.get_surviving_entries();
         assert_eq!(survivors.len(), (round.entry_count / 2).into(), "surviving");
         let mut i: u8 = 0;
         while (i.into() < survivors.len()) {
@@ -625,7 +625,7 @@ mod unit {
         };
         assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
         // get survivors
-        let survivors: Span<u8> = round.get_surviving_entries().span();
+        let survivors: Span<u8> = round.get_surviving_entries();
         assert_eq!(survivors.len(), round.entry_count.into(), "surviving");
         let mut i: u8 = 0;
         while (i.into() < survivors.len()) {
@@ -653,7 +653,7 @@ mod unit {
         };
         assert_eq!(round.have_all_duels_finished(), true, "ended (true)");
         // get survivors
-        let survivors: Span<u8> = round.get_surviving_entries().span();
+        let survivors: Span<u8> = round.get_surviving_entries();
         assert_eq!(survivors.len(), round.entry_count.into(), "surviving");
         let mut i: u8 = 0;
         while (i.into() < survivors.len()) {
