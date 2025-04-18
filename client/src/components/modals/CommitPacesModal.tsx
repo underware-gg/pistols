@@ -24,7 +24,7 @@ const STRATEGY_DESCRIPTIONS = {
 const STRATEGY_WEIGHTS = {
   villainous: {
     fire: [10, 8, 6, 4, 2, 0, 0, 0, 0, 0],
-    dodge: [10, 10, 10, 10, 0, 0, 0, 0, 0, 0],
+    dodge: [10, 8, 5, 2, 0, 0, 0, 0, 0, 0],
     tactics: [0, 4, 10, 0, 4, 0],
     blades: [10, 0, 10, 0]
   },
