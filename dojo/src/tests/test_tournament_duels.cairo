@@ -32,7 +32,6 @@ use pistols::models::{
         // TournamentSettings, TournamentSettingsValue,
         // TournamentDuelKeys,
         // ChallengeToTournamentValue, TournamentToChallengeValue,
-        // TOURNAMENT_SETTINGS,
     },
 };
 use pistols::types::{

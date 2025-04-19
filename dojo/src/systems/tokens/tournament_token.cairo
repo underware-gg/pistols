@@ -183,13 +183,14 @@ pub mod tournament_token {
         duelist::{DuelistTrait},
         tournament::{
             TournamentEntry, TournamentEntryValue,
-            TournamentSettings, TournamentSettingsValue, TournamentSettingsValueTrait,
+            TournamentSettingsValue,
+            TournamentType, TournamentTypeTrait,
+            TournamentRules,
             Tournament, TournamentValue,
             TournamentState,
             TournamentRound, TournamentRoundValue, TournamentRoundTrait,
             TournamentBracketTrait,
             TournamentResultsTrait,
-            TournamentType, TOURNAMENT_SETTINGS,
             TournamentDuelKeys, TournamentDuelKeysTrait,
         },
     };
@@ -299,7 +300,7 @@ pub mod tournament_token {
         fn setting_exists(self: @ContractState, settings_id: u32) -> bool {
             let store: Store = StoreTrait::new(self.world_default());
             let settings: TournamentSettingsValue = store.get_tournament_settings_value(settings_id);
-            (settings.exists())
+            (settings.tournament_type.exists())
         }
     }
     #[abi(embed_v0)]
@@ -337,7 +338,7 @@ pub mod tournament_token {
             let lives: u8 = duelist_dispatcher.life_count(duelist_id);
             // get tournament settings
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
-            let settings: TournamentSettingsValue = store.get_tournament_settings_value(token_metadata.settings_id);
+            let rules: TournamentRules = store.get_tournament_settings_rules(token_metadata.settings_id);
             (
                 // owns entry
                 self.is_owner_of(starknet::get_caller_address(), entry_id.into()) &&
@@ -346,7 +347,7 @@ pub mod tournament_token {
                 // not enlisted
                 store.get_tournament_entry_value(entry_id).duelist_id.is_zero() &&
                 // lives are valid
-                lives >= settings.min_lives && lives <= settings.max_lives
+                lives >= rules.min_lives && lives <= rules.max_lives
             )
         }
         fn enlist_duelist(ref self: ContractState, entry_id: u64, duelist_id: u128) {
@@ -361,12 +362,12 @@ pub mod tournament_token {
 
             // validate duelist health
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
-            let settings: TournamentSettingsValue = store.get_tournament_settings_value(token_metadata.settings_id);
+            let rules: TournamentRules = store.get_tournament_settings_rules(token_metadata.settings_id);
             duelist_dispatcher.poke(duelist_id);
             let lives: u8 = duelist_dispatcher.life_count(duelist_id);
             assert(lives > 0, Errors::DUELIST_IS_DEAD);
-            assert(lives >= settings.min_lives, Errors::INSUFFICIENT_LIVES);
-            assert(lives <= settings.max_lives, Errors::TOO_MANY_LIVES);
+            assert(lives >= rules.min_lives, Errors::INSUFFICIENT_LIVES);
+            assert(lives <= rules.max_lives, Errors::TOO_MANY_LIVES);
 
             // enlist duelist in this tournament
             let registration: Option<Registration> = self._get_budokan_registration(@store, entry_id);
@@ -485,7 +486,7 @@ pub mod tournament_token {
             let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.round_number);
             let opponent_entry_number: u8 = round.bracket.get_opponent_entry_number(entry.entry_number);
             // Create duel
-            let settings: TournamentSettingsValue = store.get_tournament_settings_value(token_metadata.settings_id);
+            let rules: TournamentRules = store.get_tournament_settings_rules(token_metadata.settings_id);
             let duel_id: u128 = store.world.duel_token_protected_dispatcher().join_tournament_duel(
                 starknet::get_caller_address(),
                 entry.duelist_id,
@@ -493,7 +494,7 @@ pub mod tournament_token {
                 tournament.round_number,
                 entry.entry_number,
                 opponent_entry_number,
-                settings,
+                rules,
                 round.timestamps.end,
             );
             (duel_id)
@@ -574,14 +575,8 @@ pub mod tournament_token {
         }
         fn _create_settings(ref self: ContractState) {
             let mut store: Store = StoreTrait::new(self.world_default());
-            store.set_tournament_settings(@TournamentSettings {
-                settings_id: TOURNAMENT_SETTINGS::LAST_MAN_STANDING,
-                tournament_type: TournamentType::LastManStanding,
-                max_rounds: 1,
-                min_lives: 3,
-                max_lives: 3,
-                lives_staked: 1,
-            });
+            store.set_tournament_settings(TournamentType::LastManStanding.tournament_settings());
+            store.set_tournament_settings(TournamentType::BestOfThree.tournament_settings());
         }
 
         fn _get_budokan_tournament_id(self: @ContractState, store: @Store, entry_id: u64) -> (ITournamentDispatcher, u64) {

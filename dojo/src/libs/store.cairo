@@ -45,6 +45,7 @@ pub use pistols::models::{
     tournament::{
         TournamentEntry, TournamentEntryValue,
         TournamentSettings, TournamentSettingsValue,
+        TournamentType, TournamentTypeTrait, TournamentRules,
         Tournament, TournamentValue,
         TournamentRound, TournamentRoundValue,
         TournamentToChallenge, TournamentToChallengeValue,
@@ -421,6 +422,11 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_member(Model::<SeasonConfig>::ptr_from_keys(season_id), selector!("rules")))
     }
 
+    #[inline(always)]
+    fn get_tournament_settings_rules(self: @Store, settings_id: u32) -> TournamentRules {
+        let tournament_type: TournamentType = self.world.read_member(Model::<TournamentSettings>::ptr_from_keys(settings_id), selector!("tournament_type"));
+        (tournament_type.rules())
+    }
     #[inline(always)]
     fn get_tournament_entry_minter_address(self: @Store, entry_id: u64) -> ContractAddress {
         (self.world.read_member(Model::<TokenMetadata>::ptr_from_keys(entry_id), selector!("minted_by")))

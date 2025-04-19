@@ -1,7 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 use pistols::models::challenge::{DuelType};
-use pistols::models::tournament::{TournamentSettingsValue};
+use pistols::models::tournament::{TournamentRules};
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::premise::{Premise};
 
@@ -102,7 +102,7 @@ pub trait IDuelTokenProtected<TState> {
         round_number: u8,
         entry_number: u8,
         opponent_entry_number: u8,
-        settings: TournamentSettingsValue,
+        rules: TournamentRules,
         timestamp_end: u64,
     ) -> u128;
 }
@@ -174,7 +174,7 @@ pub mod duel_token {
         events::{Activity, ActivityTrait},
         tournament::{
             TournamentDuelKeys, TournamentDuelKeysTrait,
-            TournamentSettingsValue,
+            TournamentRules,
             ChallengeToTournament, TournamentToChallenge,
         },
     };
@@ -503,7 +503,7 @@ pub mod duel_token {
             round_number: u8,
             entry_number: u8,
             opponent_entry_number: u8,
-            settings: TournamentSettingsValue,
+            rules: TournamentRules,
             timestamp_end: u64,
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
@@ -534,7 +534,7 @@ pub mod duel_token {
                     premise: Premise::Tournament,
                     quote: '---Tournament---',
                     // quote: format!("Tournament #{} Round {}", tournament_id, round_number),
-                    lives_staked: settings.lives_staked,
+                    lives_staked: rules.lives_staked,
                     // duelists
                     address_a: if (duelist_number == 1) {player_address} else {ZERO()},
                     address_b: if (duelist_number == 2) {player_address} else {ZERO()},

@@ -14,14 +14,13 @@ use pistols::models::{
     challenge::{Challenge, DuelType},
     tournament::{
         TournamentEntry,
-        Tournament, TournamentType,
+        Tournament, TournamentType, TournamentRules,
         TournamentState,
         TournamentRound, TournamentRoundValue,
         TournamentBracketTrait,
-        TournamentSettings, TournamentSettingsValue,
+        TournamentSettings,
         TournamentDuelKeys,
         // ChallengeToTournamentValue, TournamentToChallengeValue,
-        // TOURNAMENT_SETTINGS,
     },
 };
 use pistols::types::{
@@ -44,6 +43,7 @@ use pistols::tests::tester::{
         IBudokanMockDispatcherTrait,
     },
 };
+use pistols::tests::test_duel::tests::{_duel_until_death};
 
 use tournaments::components::{
     models::{
@@ -76,15 +76,9 @@ pub fn setup(lives_staked: u8, flags: u16) -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(flags);
 
     tester::impersonate(sys.tournaments.contract_address);
-    let min_lives: u8 = core::cmp::max(lives_staked, 3);
-    let max_lives: u8 = min_lives + 1;
     let settings = TournamentSettings {
         settings_id: SETTINGS_ID,
         tournament_type: TournamentType::LastManStanding,
-        max_rounds: 1,
-        min_lives,
-        max_lives,
-        lives_staked,
     };
     sys.store.set_tournament_settings(@settings);
 
@@ -163,33 +157,6 @@ fn test_lifecycle() {
     assert!(token_metadata.lifecycle.can_start(tester::get_block_timestamp()), "phase 2.can_start");
     assert!(!token_metadata.lifecycle.is_playable(tester::get_block_timestamp()), "phase 2.is_playable");
     assert!(token_metadata.lifecycle.has_expired(tester::get_block_timestamp()), "phase 2.has_expired");
-}
-
-#[test]
-fn test_mock_settings_1() {
-    let mut sys: TestSystems = setup(1, 0);
-    let settings: TournamentSettingsValue = sys.store.get_tournament_settings_value(SETTINGS_ID);
-    assert_eq!(settings.min_lives, 3);
-    assert_eq!(settings.max_lives, 4);
-    assert_eq!(settings.lives_staked, 1);
-}
-
-#[test]
-fn test_mock_settings_3() {
-    let mut sys: TestSystems = setup(3, 0);
-    let settings: TournamentSettingsValue = sys.store.get_tournament_settings_value(SETTINGS_ID);
-    assert_eq!(settings.min_lives, 3);
-    assert_eq!(settings.max_lives, 4);
-    assert_eq!(settings.lives_staked, 3);
-}
-
-#[test]
-fn test_mock_settings_5() {
-    let mut sys: TestSystems = setup(5, 0);
-    let settings: TournamentSettingsValue = sys.store.get_tournament_settings_value(SETTINGS_ID);
-    assert_eq!(settings.min_lives, 5);
-    assert_eq!(settings.max_lives, 6);
-    assert_eq!(settings.lives_staked, 5);
 }
 
 #[test]
@@ -310,9 +277,10 @@ fn test_enlist_duelist_not_your_duelist() {
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Insufficient lives', 'ENTRYPOINT_FAILED'))]
 fn test_enlist_duelist_insufficient_lives() {
-    let mut sys: TestSystems = setup(4, FLAGS::TOURNAMENT);
+    let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT | FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+    _duel_until_death(@sys, 2, 1, 1);
     let entry_id_1: u64 = _mint(ref sys, OWNER());
-    assert!(!sys.tournaments.can_enlist_duelist(entry_id_1, ID(OTHER())));
+    assert!(!sys.tournaments.can_enlist_duelist(entry_id_1, ID(OWNER())));
     sys.tournaments.enlist_duelist(entry_id_1, ID(OWNER()));
 }
 
@@ -600,12 +568,12 @@ fn test_join_duel_not_enlisted() {
 fn test_join_duel_token_invalid_caller() {
     let mut sys: TestSystems = setup(3, FLAGS::DUEL | FLAGS::TOURNAMENT);
     tester::impersonate(OWNER());
-    let settings: TournamentSettingsValue = sys.store.get_tournament_settings_value(SETTINGS_ID);
+    let rules: TournamentRules = sys.store.get_tournament_settings_rules(SETTINGS_ID);
     let timestamp_end: u64 = TIMESTAMP::ONE_DAY;
     _protected_duel(@sys).join_tournament_duel(
         OWNER(), ID(OWNER()),
         1, 1, 1, 2,
-        settings,
+        rules,
         timestamp_end,
     );
 }

@@ -19,34 +19,6 @@ pub struct TournamentEntry {
 }
 
 //------------------------------------
-// Budokan settings
-//
-#[derive(Copy, Drop, Serde)]
-#[dojo::model]
-pub struct TournamentSettings {
-    #[key]
-    pub settings_id: u32,
-    //------
-    pub tournament_type: TournamentType,
-    pub max_rounds: u8,     // maximum number of rounds, 0 if unlimited
-    pub min_lives: u8,      // min lives required to enlist Duelist
-    pub max_lives: u8,      // max lives allowed to enlist Duelist
-    pub lives_staked: u8,   // lives staked by each duel in the tournament
-}
-
-#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
-pub enum TournamentType {
-    Undefined,          // 0
-    LastManStanding,    // 1
-    // HighestScore,       // 2
-}
-
-pub mod TOURNAMENT_SETTINGS {
-    pub const LAST_MAN_STANDING: u32 = 1;
-    // pub const HIGHEST_SCORE: u32 = 2;
-}
-
-//------------------------------------
 // Tournament loop
 //
 #[derive(Copy, Drop, Serde)]
@@ -122,6 +94,69 @@ pub struct TournamentDuelKeys {
 
 
 
+//------------------------------------
+// Tournament settings/rules
+// selected in Budokan
+//
+#[derive(Copy, Drop, Serde)]
+#[dojo::model]
+pub struct TournamentSettings {
+    #[key]
+    pub settings_id: u32,
+    //------
+    pub tournament_type: TournamentType,
+    // pub description: ByteArray,
+}
+
+#[derive(Serde, Copy, Drop, PartialEq, Introspect)]
+pub enum TournamentType {
+    Undefined,          // 0
+    LastManStanding,    // 2
+    BestOfThree,        // 1
+}
+
+#[derive(Copy, Drop, Serde, Default)]
+pub struct TournamentRules {
+    pub settings_id: u32,       // Budokan settings id
+    pub description: felt252,   // @generateContants:shortstring
+    pub max_rounds: u8,         // maximum number of rounds, 0 if unlimited
+    pub min_lives: u8,          // min lives required to enlist Duelist
+    pub max_lives: u8,          // max lives allowed to enlist Duelist
+    pub lives_staked: u8,       // lives staked by each duel in the tournament
+}
+
+// to be exported to typescript by generateConstants
+// IMPORTANT: names must be in sync with enum TournamentType
+pub mod TOURNAMENT_RULES {
+    use super::{TournamentRules};
+    pub const Undefined: TournamentRules = TournamentRules {
+        settings_id: 0,
+        description: 'Undefined',
+        max_rounds: 0,
+        min_lives: 0,
+        max_lives: 0,
+        lives_staked: 0,
+    };
+    pub const LastManStanding: TournamentRules = TournamentRules {
+        settings_id: 1,
+        description: 'Last Man Standing',
+        max_rounds: 0,      // unlimited
+        min_lives: 3,       // anyone can join
+        max_lives: 3,       // death guaranteed on loss
+        lives_staked: 3,    // suden death
+    };
+    pub const BestOfThree: TournamentRules = TournamentRules {
+        settings_id: 2,
+        description: 'Best of Three',
+        max_rounds: 3,
+        min_lives: 3,
+        max_lives: 3,
+        lives_staked: 1,
+    };
+}
+
+
+
 //---------------------------
 // Traits
 //
@@ -130,11 +165,26 @@ use pistols::systems::rng::{RngWrap, Shuffle, ShuffleTrait};
 use pistols::utils::bitwise::{BitwiseU128};
 use pistols::utils::bytemap::{BytemapU256};
 use pistols::utils::nibblemap::{NibblemapU128};
+// use pistols::utils::short_string::{ShortStringTrait};
 
 #[generate_trait]
-pub impl TournamentSettingsValueImpl of TournamentSettingsValueTrait {
-    fn exists(self: @TournamentSettingsValue) -> bool {
-        (*self.tournament_type != TournamentType::Undefined)
+pub impl TournamentTypeImpl of TournamentTypeTrait {
+    fn rules(self: @TournamentType) -> TournamentRules {
+        match self {
+            TournamentType::Undefined           => TOURNAMENT_RULES::Undefined,
+            TournamentType::LastManStanding     => TOURNAMENT_RULES::LastManStanding,
+            TournamentType::BestOfThree         => TOURNAMENT_RULES::BestOfThree,
+        }
+    }
+    fn exists(self: @TournamentType) -> bool {
+        (*self != TournamentType::Undefined)
+    }
+    fn tournament_settings(self: @TournamentType) -> @TournamentSettings {
+        @TournamentSettings {
+            settings_id: self.rules().settings_id,
+            tournament_type: *self,
+            // description: self.rules().description.to_string(),
+        }
     }
 }
 
@@ -291,9 +341,9 @@ pub impl TournamentResultsImpl of TournamentResultsTrait {
 impl TournamentStateIntoByteArray of core::traits::Into<TournamentState, ByteArray> {
     fn into(self: TournamentState) -> ByteArray {
         match self {
-            TournamentState::Undefined  => "Undefined",
-            TournamentState::InProgress => "InProgress",
-            TournamentState::Finished   => "Finished",
+            TournamentState::Undefined      => "TournamentState::Undefined",
+            TournamentState::InProgress     => "TournamentState::InProgress",
+            TournamentState::Finished       => "TournamentState::Finished",
         }
     }
 }
@@ -309,6 +359,7 @@ impl TournamentTypeIntoByteArray of core::traits::Into<TournamentType, ByteArray
         match self {
             TournamentType::Undefined       => "TournamentType::Undefined",
             TournamentType::LastManStanding => "TournamentType::LastManStanding",
+            TournamentType::BestOfThree     => "TournamentType::BestOfThree",
         }
     }
 }

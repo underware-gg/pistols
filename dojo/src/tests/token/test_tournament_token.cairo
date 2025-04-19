@@ -5,8 +5,12 @@ use pistols::systems::tokens::{
     tournament_token::{ITournamentTokenProtectedDispatcher, ITournamentTokenProtectedDispatcherTrait},
 };
 use pistols::models::{
-    // tournament::{Tournament, TournamentTrait},
-    tournament::{TournamentSettingsValue, TournamentType, TOURNAMENT_SETTINGS},
+    tournament::{
+        // Tournament, TournamentTrait,
+        // TournamentType,
+        TournamentRules,
+        TOURNAMENT_RULES,
+    },
 };
 // use pistols::interfaces::dns::{DnsTrait};
 // use pistols::types::constants::{CONST};
@@ -30,7 +34,7 @@ use tournaments::components::models::game::{TokenMetadata};
 // Setup
 //
 
-const SETTINGS_ID: u32 = TOURNAMENT_SETTINGS::LAST_MAN_STANDING;
+const SETTINGS_ID: u32 = TOURNAMENT_RULES::LastManStanding.settings_id;
 
 const ENTRY_ID_0: u64 = 0;
 const ENTRY_ID_1: u64 = 1;
@@ -72,6 +76,11 @@ pub fn _game_token(sys: @TestSystems) -> IGameTokenDispatcher {
     (IGameTokenDispatcher{contract_address: (*sys.tournaments).contract_address})
 }
 
+use tournaments::components::interfaces::{ISettingsDispatcher, ISettingsDispatcherTrait};
+pub fn _budokan_settings_interface(sys: @TestSystems) -> ISettingsDispatcher {
+    (ISettingsDispatcher{contract_address: (*sys.tournaments).contract_address})
+}
+
 //
 // initialize
 //
@@ -83,12 +92,20 @@ fn test_initializer() {
     assert!(sys.tournaments.supports_interface(interface::IERC721_ID), "should support IERC721_ID");
     assert!(sys.tournaments.supports_interface(interface::IERC721_METADATA_ID), "should support METADATA");
 
-    // settings created
-    let settings: TournamentSettingsValue = sys.store.get_tournament_settings_value(TOURNAMENT_SETTINGS::LAST_MAN_STANDING);
-    assert_eq!(settings.tournament_type, TournamentType::LastManStanding, "Should eq LastManStanding");
-    assert_eq!(settings.min_lives, 3, "Should eq 3");
-    assert_eq!(settings.max_lives, 3, "Should eq 3");
-    assert_eq!(settings.lives_staked, 1, "Should eq 1");
+    // budokan hooks
+    assert!(_budokan_settings_interface(@sys).setting_exists(1), "setting_exists(1)");
+    assert!(_budokan_settings_interface(@sys).setting_exists(2), "setting_exists(2)");
+    assert!(!_budokan_settings_interface(@sys).setting_exists(999), "setting_exists(999)");
+
+    let rules: TournamentRules = sys.store.get_tournament_settings_rules(1);
+    assert_eq!(rules.settings_id, 1, "LastManStanding.settings_id");
+    assert_gt!(rules.lives_staked, 0, "LastManStanding.lives_staked");
+    let rules: TournamentRules = sys.store.get_tournament_settings_rules(2);
+    assert_eq!(rules.settings_id, 2, "BestOfThree.settings_id");
+    assert_gt!(rules.lives_staked, 0, "BestOfThree.lives_staked");
+    let rules: TournamentRules = sys.store.get_tournament_settings_rules(999);
+    assert_eq!(rules.settings_id, 0, "Undefined.settings_id");
+    assert_eq!(rules.lives_staked, 0, "Undefined.lives_staked");
 
     // budokan creator token
     assert_eq!(sys.tournaments.total_supply(), 1, "total_supply");

@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+pub mod tests {
     use starknet::{ContractAddress};
 
     use pistols::models::{
@@ -494,7 +494,7 @@ mod tests {
     //-------------------------------
     // lives staked / death
     //
-    fn _duel_until_death(sys: @TestSystems, winner: u8, challenge_count: u8, lives_staked: u8) {
+    pub fn _duel_until_death(sys: @TestSystems, winner: u8, challenge_count: u8, lives_staked: u8) {
         let (mocked, moves_a, moves_b) = if (winner == 1) {prefabs::get_moves_crit_a()} else {prefabs::get_moves_crit_b()};
         (*sys).rng.mock_values(mocked);
 
