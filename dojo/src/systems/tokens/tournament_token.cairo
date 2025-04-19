@@ -98,7 +98,7 @@ pub trait ITournamentTokenPublic<TState> {
     fn can_enlist_duelist(self: @TState, entry_id: u64, duelist_id: u128) -> bool;
     fn enlist_duelist(ref self: TState, entry_id: u64, duelist_id: u128);
 
-    // Phase 2 -- Start tournament (anyone can start)
+    // Phase 2 -- Start tournament (any contestant can start)
     // - will shuffle initial bracket
     fn can_start_tournament(self: @TState, entry_id: u64) -> bool;
     fn start_tournament(ref self: TState, entry_id: u64) -> u64; // returns tournament_id
@@ -107,7 +107,7 @@ pub trait ITournamentTokenPublic<TState> {
     fn can_join_duel(self: @TState, entry_id: u64) -> bool;
     fn join_duel(ref self: TState, entry_id: u64) -> u128; // returns duel_id
 
-    // Phase 4 -- End round (anyone can end)
+    // Phase 4 -- End round (any contestant can end)
     // - will shuffle next bracket
     // - or close tournament
     fn can_end_round(self: @TState, entry_id: u64) -> bool;
@@ -403,6 +403,8 @@ pub mod tournament_token {
             let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_tournament_id(@store, entry_id);
             let tournament: TournamentValue = store.get_tournament_value(tournament_id);
             (
+                // owns entry
+                self.is_owner_of(starknet::get_caller_address(), entry_id.into()) &&
                 // correct lifecycle
                 token_metadata.lifecycle.can_start(starknet::get_block_timestamp()) &&
                 // tournament not started (don't exist yet)
@@ -412,6 +414,9 @@ pub mod tournament_token {
         fn start_tournament(ref self: ContractState, entry_id: u64) -> u64 {
             assert(self.erc721_combo.token_exists(entry_id.into()), Errors::INVALID_ENTRY);
             let mut store: Store = StoreTrait::new(self.world_default());
+            // validate ownership
+            let caller: ContractAddress = starknet::get_caller_address();
+            assert(self.is_owner_of(caller, entry_id.into()) == true, Errors::NOT_YOUR_ENTRY);
             // verify lifecycle
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             assert(token_metadata.lifecycle.can_start(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_STARTABLE);
@@ -422,7 +427,7 @@ pub mod tournament_token {
             tournament.state = TournamentState::InProgress;
             tournament.round_number = 1;
             // initialize round
-            let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_caller_address()));
+            let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
             let round: TournamentRound = self._initialize_round(ref store, budokan_dispatcher, tournament_id, 1, token_metadata.lifecycle, seed);
             // store!
             store.set_tournament(@tournament);
@@ -467,7 +472,8 @@ pub mod tournament_token {
         fn join_duel(ref self: ContractState, entry_id: u64) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
             // validate ownership
-            assert(self.is_owner_of(starknet::get_caller_address(), entry_id.into()) == true, Errors::NOT_YOUR_ENTRY);
+            let caller: ContractAddress = starknet::get_caller_address();
+            assert(self.is_owner_of(caller, entry_id.into()) == true, Errors::NOT_YOUR_ENTRY);
             // budokan must be playable
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             assert(token_metadata.lifecycle.is_playable(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_PLAYABLE);
@@ -488,7 +494,7 @@ pub mod tournament_token {
             // Create duel
             let rules: TournamentRules = store.get_tournament_settings_rules(token_metadata.settings_id);
             let duel_id: u128 = store.world.duel_token_protected_dispatcher().join_tournament_duel(
-                starknet::get_caller_address(),
+                caller,
                 entry.duelist_id,
                 entry.tournament_id,
                 tournament.round_number,
@@ -513,6 +519,8 @@ pub mod tournament_token {
             let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
             let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.round_number);
             (
+                // owns entry
+                self.is_owner_of(starknet::get_caller_address(), entry_id.into()) &&
                 // is valid round
                 round.entry_count > 0 &&
                 // end conditions
@@ -529,6 +537,9 @@ pub mod tournament_token {
         fn end_round(ref self: ContractState, entry_id: u64) -> Option<u8> {
             assert(self.erc721_combo.token_exists(entry_id.into()), Errors::INVALID_ENTRY);
             let mut store: Store = StoreTrait::new(self.world_default());
+            // validate ownership
+            let caller: ContractAddress = starknet::get_caller_address();
+            assert(self.is_owner_of(caller, entry_id.into()) == true, Errors::NOT_YOUR_ENTRY);
             // verify lifecycle
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);

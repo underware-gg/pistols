@@ -172,15 +172,15 @@ fn test_mock_budokan() {
 }
 
 #[test] 
-fn test_start_tournament() {
+fn test_start_tournament_ok() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
     let entry_id_1: u64 = _mint(ref sys, OWNER()); // ENTRY_ID_1
     assert_eq!(entry_id_1, ENTRY_ID_1, "entry_id_1");
     assert_eq!(entry_id_1, PLAYERS::P1().entry_id, "PLAYERS::P1().entry_id");
-    assert!(!sys.tournaments.can_start_tournament(entry_id_1), "can_start() false");
+    assert!(!sys.tournaments.can_start_tournament(entry_id_1), "can_start_tournament() false");
     // time travel
     tester::set_block_timestamp(TIMESTAMP_START);
-    assert!(sys.tournaments.can_start_tournament(entry_id_1), "can_start() true");
+    assert!(sys.tournaments.can_start_tournament(entry_id_1), "can_start_tournament() true");
     let tournament_id: u64 = tester::execute_start_tournament(@sys, OWNER(), entry_id_1);
     assert!(tournament_id > 0, "tournament_id");
     assert_eq!(tournament_id, TOURNAMENT_OF_2, "TOURNAMENT_OF_2"); // default tournament (2 entries)
@@ -192,24 +192,27 @@ fn test_start_tournament() {
     assert_ne!(round.bracket, 0);
     assert_ne!(round.results, 0);
     // end state
-    assert!(!sys.tournaments.can_start_tournament(entry_id_1), "can_start() started");
+    assert!(!sys.tournaments.can_start_tournament(entry_id_1), "can_start_tournament() started");
     assert_eq!(sys.tournaments.get_tournament_id(entry_id_1), tournament_id, "get_tournament_id()");
-}
-
-#[test] 
-fn test_start_tournament_other_ok() {
-    let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    _mint(ref sys, OWNER()); // ENTRY_ID_1
-    tester::set_block_timestamp(TIMESTAMP_START);
-    let tournament_id: u64 = tester::execute_start_tournament(@sys, OTHER(), ENTRY_ID_1);
-    assert!(tournament_id > 0, "tournament_id");
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Invalid entry', 'ENTRYPOINT_FAILED'))]
 fn test_start_tournament_invalid_entry() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
+    assert!(!sys.tournaments.can_start_tournament(ENTRY_ID_1), "can_start_tournament()");
     tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+}
+
+#[test]
+#[should_panic(expected: ('TOURNAMENT: Not your entry', 'ENTRYPOINT_FAILED'))]
+fn test_start_tournament_not_owner() {
+    let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
+    _mint(ref sys, OWNER()); // ENTRY_ID_1
+    tester::set_block_timestamp(TIMESTAMP_START);
+    tester::impersonate(OTHER());
+    assert!(!sys.tournaments.can_start_tournament(ENTRY_ID_1), "can_start_tournament()");
+    tester::execute_start_tournament(@sys, OTHER(), ENTRY_ID_1);
 }
 
 #[test]
@@ -217,6 +220,7 @@ fn test_start_tournament_invalid_entry() {
 fn test_start_tournament_not_startable() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
     _mint(ref sys, OWNER()); // ENTRY_ID_1
+    assert!(!sys.tournaments.can_start_tournament(ENTRY_ID_1), "can_start_tournament()");
     tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
 }
 
@@ -227,6 +231,7 @@ fn test_start_tournament_already_started() {
     _mint(ref sys, OWNER()); // ENTRY_ID_1
     tester::set_block_timestamp(TIMESTAMP_START);
     tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    assert!(!sys.tournaments.can_start_tournament(ENTRY_ID_1), "can_start_tournament()");
     tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
 }
 
