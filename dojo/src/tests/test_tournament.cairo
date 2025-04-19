@@ -15,6 +15,7 @@ use pistols::models::{
     tournament::{
         TournamentEntry,
         Tournament, TournamentType,
+        TournamentState,
         TournamentRound, TournamentRoundValue,
         TournamentBracketTrait,
         TournamentSettings, TournamentSettingsValue,
@@ -80,6 +81,7 @@ pub fn setup(lives_staked: u8, flags: u16) -> TestSystems {
     let settings = TournamentSettings {
         settings_id: SETTINGS_ID,
         tournament_type: TournamentType::LastManStanding,
+        max_rounds: 1,
         min_lives,
         max_lives,
         lives_staked,
@@ -217,7 +219,8 @@ fn test_start_tournament() {
     assert_eq!(tournament_id, TOURNAMENT_OF_2, "TOURNAMENT_OF_2"); // default tournament (2 entries)
     assert_eq!(sys.budokan.tournament_entries(tournament_id), 2, "tournament_entries()");
     let tournament: Tournament = sys.store.get_tournament(tournament_id);
-    assert_eq!(tournament.current_round_number, 1);
+    assert_eq!(tournament.state, TournamentState::InProgress);
+    assert_eq!(tournament.round_number, 1);
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     assert_ne!(round.bracket, 0);
     assert_ne!(round.results, 0);

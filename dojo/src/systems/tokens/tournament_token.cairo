@@ -185,6 +185,7 @@ pub mod tournament_token {
             TournamentEntry, TournamentEntryValue,
             TournamentSettings, TournamentSettingsValue, TournamentSettingsValueTrait,
             Tournament, TournamentValue,
+            TournamentState,
             TournamentRound, TournamentRoundValue, TournamentRoundTrait,
             TournamentBracketTrait,
             TournamentResultsTrait,
@@ -233,6 +234,7 @@ pub mod tournament_token {
         pub const TOO_MANY_LIVES: felt252           = 'TOURNAMENT: Too many lives';
         pub const NOT_ENLISTED: felt252             = 'TOURNAMENT: Not enlisted';
         pub const NOT_STARTED: felt252              = 'TOURNAMENT: Not started';
+        pub const HAS_ENDED: felt252                = 'TOURNAMENT: Has ended';
         pub const DUELIST_IN_CHALLENGE: felt252     = 'TOURNAMENT: In a challenge';
         pub const DUELIST_IN_TOURNAMENT: felt252    = 'TOURNAMENT: In a tournament';
         pub const INVALID_ROUND: felt252            = 'TOURNAMENT: Invalid round';
@@ -402,8 +404,8 @@ pub mod tournament_token {
             (
                 // correct lifecycle
                 token_metadata.lifecycle.can_start(starknet::get_block_timestamp()) &&
-                // tournament not started
-                tournament.current_round_number.is_zero()
+                // tournament not started (don't exist yet)
+                tournament.state == TournamentState::Undefined
             )
         }
         fn start_tournament(ref self: ContractState, entry_id: u64) -> u64 {
@@ -415,8 +417,9 @@ pub mod tournament_token {
             // verify tournament not started
             let (budokan_dispatcher, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_tournament_id(@store, entry_id);
             let mut tournament: Tournament = store.get_tournament(tournament_id);
-            assert(tournament.current_round_number.is_zero(), Errors::ALREADY_STARTED);
-            tournament.current_round_number = 1;
+            assert(tournament.state == TournamentState::Undefined, Errors::ALREADY_STARTED);
+            tournament.state = TournamentState::InProgress;
+            tournament.round_number = 1;
             // initialize round
             let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_caller_address()));
             let round: TournamentRound = self._initialize_round(ref store, budokan_dispatcher, tournament_id, 1, token_metadata.lifecycle, seed);
@@ -436,12 +439,12 @@ pub mod tournament_token {
             let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
             let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
             // check if joined
-            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.current_round_number);
+            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.round_number);
 // TODO: validate TournamentRound?
             let opponent_entry_number: u8 = round.bracket.get_opponent_entry_number(entry.entry_number);
             let keys: @TournamentDuelKeys = TournamentDuelKeysTrait::new(
                 entry.tournament_id,
-                tournament.current_round_number,
+                tournament.round_number,
                 entry.entry_number,
                 opponent_entry_number,
             );
@@ -455,7 +458,7 @@ pub mod tournament_token {
                 // enlisted
                 entry.tournament_id.is_non_zero() &&
                 // tournament has started
-                tournament.current_round_number.is_non_zero() &&
+                tournament.state == TournamentState::InProgress &&
                 // not joined
                 (duel_id.is_zero() || (challenge.duelist_id_a != entry.duelist_id && challenge.duelist_id_b != entry.duelist_id))
             )
@@ -473,12 +476,13 @@ pub mod tournament_token {
             assert(entry.duelist_id.is_non_zero(), Errors::NOT_ENLISTED);
             // tournament has started
             let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
-            assert(tournament.current_round_number.is_non_zero(), Errors::NOT_STARTED);
+            assert(tournament.state != TournamentState::Finished, Errors::HAS_ENDED);
+            assert(tournament.state == TournamentState::InProgress, Errors::NOT_STARTED);
             // update entry
-            entry.current_round_number = tournament.current_round_number;
+            entry.current_round_number = tournament.round_number;
             store.set_tournament_entry(@entry);
             // Get round pairing
-            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.current_round_number);
+            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.round_number);
             let opponent_entry_number: u8 = round.bracket.get_opponent_entry_number(entry.entry_number);
             // Create duel
             let settings: TournamentSettingsValue = store.get_tournament_settings_value(token_metadata.settings_id);
@@ -486,7 +490,7 @@ pub mod tournament_token {
                 starknet::get_caller_address(),
                 entry.duelist_id,
                 entry.tournament_id,
-                tournament.current_round_number,
+                tournament.round_number,
                 entry.entry_number,
                 opponent_entry_number,
                 settings,
@@ -506,7 +510,7 @@ pub mod tournament_token {
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
             let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
-            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.current_round_number);
+            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.round_number);
             (
                 // is valid round
                 round.entry_count > 0 &&
@@ -528,7 +532,7 @@ pub mod tournament_token {
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
             let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
-            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.current_round_number);
+            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.round_number);
             assert(round.entry_count > 0, Errors::INVALID_ROUND);
             // end conditions
             assert(

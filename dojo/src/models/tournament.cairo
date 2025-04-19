@@ -55,8 +55,17 @@ pub struct Tournament {
     #[key]
     pub tournament_id: u64,         // budokan id
     //------
-    pub current_round_number: u8,   // current round, zero if not started yet
+    pub state: TournamentState,
+    pub round_number: u8,           // current or last round
 }
+
+#[derive(Copy, Drop, Serde, PartialEq, Introspect)]
+pub enum TournamentState {
+    Undefined,   // 0
+    InProgress,  // 1
+    Finished,    // 2
+}
+
 
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
@@ -279,6 +288,22 @@ pub impl TournamentResultsImpl of TournamentResultsTrait {
 //---------------------------
 // Converters
 //
+impl TournamentStateIntoByteArray of core::traits::Into<TournamentState, ByteArray> {
+    fn into(self: TournamentState) -> ByteArray {
+        match self {
+            TournamentState::Undefined  => "Undefined",
+            TournamentState::InProgress => "InProgress",
+            TournamentState::Finished   => "Finished",
+        }
+    }
+}
+pub impl TournamentStateDebug of core::fmt::Debug<TournamentState> {
+    fn fmt(self: @TournamentState, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = (*self).into();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
 impl TournamentTypeIntoByteArray of core::traits::Into<TournamentType, ByteArray> {
     fn into(self: TournamentType) -> ByteArray {
         match self {
