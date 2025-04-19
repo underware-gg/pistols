@@ -81,8 +81,8 @@ pub trait ITournamentToken<TState> {
     fn enlist_duelist(ref self: TState, entry_id: u64, duelist_id: u128);
     fn can_join_duel(self: @TState, entry_id: u64) -> bool;
     fn join_duel(ref self: TState, entry_id: u64) -> u128;
-    // fn can_end_round(self: @TState, entry_id: u64) -> bool;
-    // fn end_round(ref self: TState, entry_id: u64);
+    fn can_end_round(self: @TState, entry_id: u64) -> bool;
+    fn end_round(ref self: TState, entry_id: u64) -> Option<u8>;
 }
 
 // Exposed to clients
@@ -101,17 +101,17 @@ pub trait ITournamentTokenPublic<TState> {
     // Phase 2 -- Start tournament (anyone can start)
     // - will shuffle initial bracket
     fn can_start_tournament(self: @TState, entry_id: u64) -> bool;
-    fn start_tournament(ref self: TState, entry_id: u64) -> u64;
+    fn start_tournament(ref self: TState, entry_id: u64) -> u64; // returns tournament_id
 
     // Phase 3 -- Join tournament (per player)
     fn can_join_duel(self: @TState, entry_id: u64) -> bool;
-    fn join_duel(ref self: TState, entry_id: u64) -> u128;
+    fn join_duel(ref self: TState, entry_id: u64) -> u128; // returns duel_id
 
-    // // Phase 4 -- End round (anyone can end)
-    // // - will shuffle next bracket
-    // // - or end tournament if end conditions met
-    // fn can_end_round(self: @TState, entry_id: u64) -> bool;
-    // fn end_round(ref self: TState, entry_id: u64);
+    // Phase 4 -- End round (anyone can end)
+    // - will shuffle next bracket
+    // - or close tournament
+    fn can_end_round(self: @TState, entry_id: u64) -> bool;
+    fn end_round(ref self: TState, entry_id: u64) -> Option<u8>; // returns next round number
 }
 
 // Exposed to world and admins
@@ -187,13 +187,14 @@ pub mod tournament_token {
             Tournament, TournamentValue,
             TournamentRound, TournamentRoundValue, TournamentRoundTrait,
             TournamentBracketTrait,
+            TournamentResultsTrait,
             TournamentType, TOURNAMENT_SETTINGS,
             TournamentDuelKeys, TournamentDuelKeysTrait,
         },
     };
     use pistols::types::{
         constants::{METADATA},
-        timestamp::{Period, TIMESTAMP},
+        timestamp::{Period, PeriodTrait, TIMESTAMP},
     };
     use pistols::interfaces::dns::{
         DnsTrait, SELECTORS,
@@ -234,6 +235,8 @@ pub mod tournament_token {
         pub const NOT_STARTED: felt252              = 'TOURNAMENT: Not started';
         pub const DUELIST_IN_CHALLENGE: felt252     = 'TOURNAMENT: In a challenge';
         pub const DUELIST_IN_TOURNAMENT: felt252    = 'TOURNAMENT: In a tournament';
+        pub const INVALID_ROUND: felt252            = 'TOURNAMENT: Invalid round';
+        pub const STILL_PLAYABLE: felt252           = 'TOURNAMENT: Still playable';
         pub const CALLER_NOT_OWNER: felt252         = 'TOURNAMENT: Caller not owner';
     }
 
@@ -322,45 +325,6 @@ pub mod tournament_token {
         }
 
         //-----------------------------------
-        // Phase 2 -- Start tournament
-        //
-        fn can_start_tournament(self: @ContractState, entry_id: u64) -> bool {
-            if (!self.erc721_combo.token_exists(entry_id.into())) {
-                return false;
-            }
-            let store: Store = StoreTrait::new(self.world_default());
-            let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
-            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_tournament_id(@store, entry_id);
-            let tournament: TournamentValue = store.get_tournament_value(tournament_id);
-            (
-                // correct lifecycle
-                token_metadata.lifecycle.can_start(starknet::get_block_timestamp()) &&
-                // tournament not started
-                tournament.current_round_number.is_zero()
-            )
-        }
-        fn start_tournament(ref self: ContractState, entry_id: u64) -> u64 {
-            assert(self.erc721_combo.token_exists(entry_id.into()), Errors::INVALID_ENTRY);
-            let mut store: Store = StoreTrait::new(self.world_default());
-            // verify lifecycle
-            let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
-            assert(token_metadata.lifecycle.can_start(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_STARTABLE);
-            // verify tournament not started
-            let (budokan_dispatcher, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_tournament_id(@store, entry_id);
-            let mut tournament: Tournament = store.get_tournament(tournament_id);
-            assert(tournament.current_round_number.is_zero(), Errors::ALREADY_STARTED);
-            tournament.current_round_number = 1;
-            // initialize round
-            let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_caller_address()));
-            let round: TournamentRound = self._initialize_round(ref store, budokan_dispatcher, tournament_id, 1, token_metadata.lifecycle, seed);
-            // store!
-            store.set_tournament(@tournament);
-            store.set_tournament_round(@round);
-            // return tournament id
-            (tournament_id)
-        }
-
-        //-----------------------------------
         // Phase 1 -- Enlist Duelist
         //
         fn can_enlist_duelist(self: @ContractState, entry_id: u64, duelist_id: u128) -> bool {
@@ -422,6 +386,45 @@ pub mod tournament_token {
                     assert(false, Errors::INVALID_ENTRY);
                 },
             }
+        }
+
+        //-----------------------------------
+        // Phase 2 -- Start tournament
+        //
+        fn can_start_tournament(self: @ContractState, entry_id: u64) -> bool {
+            if (!self.erc721_combo.token_exists(entry_id.into())) {
+                return false;
+            }
+            let store: Store = StoreTrait::new(self.world_default());
+            let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
+            let (_, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_tournament_id(@store, entry_id);
+            let tournament: TournamentValue = store.get_tournament_value(tournament_id);
+            (
+                // correct lifecycle
+                token_metadata.lifecycle.can_start(starknet::get_block_timestamp()) &&
+                // tournament not started
+                tournament.current_round_number.is_zero()
+            )
+        }
+        fn start_tournament(ref self: ContractState, entry_id: u64) -> u64 {
+            assert(self.erc721_combo.token_exists(entry_id.into()), Errors::INVALID_ENTRY);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            // verify lifecycle
+            let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
+            assert(token_metadata.lifecycle.can_start(starknet::get_block_timestamp()), Errors::BUDOKAN_NOT_STARTABLE);
+            // verify tournament not started
+            let (budokan_dispatcher, tournament_id): (ITournamentDispatcher, u64) = self._get_budokan_tournament_id(@store, entry_id);
+            let mut tournament: Tournament = store.get_tournament(tournament_id);
+            assert(tournament.current_round_number.is_zero(), Errors::ALREADY_STARTED);
+            tournament.current_round_number = 1;
+            // initialize round
+            let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(starknet::get_caller_address()));
+            let round: TournamentRound = self._initialize_round(ref store, budokan_dispatcher, tournament_id, 1, token_metadata.lifecycle, seed);
+            // store!
+            store.set_tournament(@tournament);
+            store.set_tournament_round(@round);
+            // return tournament id
+            (tournament_id)
         }
 
         //-----------------------------------
@@ -491,6 +494,57 @@ pub mod tournament_token {
             );
             (duel_id)
         }
+
+        //-----------------------------------
+        // Phase 4 -- End round
+        //
+        fn can_end_round(self: @ContractState, entry_id: u64) -> bool {
+            if (!self.erc721_combo.token_exists(entry_id.into())) {
+                return false;
+            }
+            let store: Store = StoreTrait::new(self.world_default());
+            let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
+            let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
+            let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
+            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.current_round_number);
+            (
+                // is valid round
+                round.entry_count > 0 &&
+                // end conditions
+                (
+                    // tournament has ended
+                    !token_metadata.lifecycle.is_playable(starknet::get_block_timestamp()) ||
+                    // round lifecycle has ended
+                    round.timestamps.has_expired() ||
+                    // all duels have finished
+                    round.results.have_all_duels_finished()
+                )
+            )
+        }
+        fn end_round(ref self: ContractState, entry_id: u64) -> Option<u8> {
+            assert(self.erc721_combo.token_exists(entry_id.into()), Errors::INVALID_ENTRY);
+            let mut store: Store = StoreTrait::new(self.world_default());
+            // verify lifecycle
+            let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
+            let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
+            let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
+            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.current_round_number);
+            assert(round.entry_count > 0, Errors::INVALID_ROUND);
+            // end conditions
+            assert(
+                (
+                    !token_metadata.lifecycle.is_playable(starknet::get_block_timestamp()) ||
+                    round.timestamps.has_expired() ||
+                    round.results.have_all_duels_finished()
+                ), Errors::STILL_PLAYABLE
+            );
+
+            // TODO...
+            // END ROUND
+            // OR END TOURRNAMENT
+
+            (Option::None)
+        }
     }
 
     
@@ -519,6 +573,7 @@ pub mod tournament_token {
             store.set_tournament_settings(@TournamentSettings {
                 settings_id: TOURNAMENT_SETTINGS::LAST_MAN_STANDING,
                 tournament_type: TournamentType::LastManStanding,
+                max_rounds: 1,
                 min_lives: 3,
                 max_lives: 3,
                 lives_staked: 1,

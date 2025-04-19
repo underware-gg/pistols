@@ -28,9 +28,10 @@ pub struct TournamentSettings {
     pub settings_id: u32,
     //------
     pub tournament_type: TournamentType,
-    pub min_lives: u8,
-    pub max_lives: u8,
-    pub lives_staked: u8,
+    pub max_rounds: u8,     // maximum number of rounds, 0 if unlimited
+    pub min_lives: u8,      // min lives required to enlist Duelist
+    pub max_lives: u8,      // max lives allowed to enlist Duelist
+    pub lives_staked: u8,   // lives staked by each duel in the tournament
 }
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
