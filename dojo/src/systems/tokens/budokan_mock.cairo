@@ -135,7 +135,9 @@ pub trait IBudokanMock<TState> {
 
     // mock helpers
     fn set_tournament_id(ref self: TState, tournament_id: u64);
+    fn set_settings_id(ref self: TState, settings_id: u32);
     fn get_tournament_id(self: @TState) -> u64;
+    fn get_settings_id(self: @TState) -> u32;
 }
 
 #[dojo::contract]
@@ -149,6 +151,9 @@ pub mod budokan_mock {
     // use tournaments::components::models::schedule::{Phase};
 
     use super::{PLAYERS};
+    use pistols::models::tournament::{
+        TournamentType, TournamentTypeTrait,
+    };
     use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
     // use pistols::utils::misc::{ZERO};
 
@@ -162,6 +167,7 @@ pub mod budokan_mock {
 
     fn dojo_init(ref self: ContractState) {
         self.set_tournament_id(TOURNAMENT_OF_2);
+        self.set_settings_id(TournamentType::LastManStanding.rules().settings_id);
     }
 
     #[generate_trait]
@@ -226,13 +232,27 @@ pub mod budokan_mock {
                 )
             );
         }
+        fn set_settings_id(ref self: ContractState, settings_id: u32) {
+            let mut world = self.world_default();
+            world.write_model(
+                @MockedValueTrait::new(
+                    'settings_id',
+                    settings_id.into(),
+                )
+            );
+        }
 
         fn get_tournament_id(self: @ContractState) -> u64 {
             let mut world = self.world_default();
             // tournament (stored or default)
             let mocked: MockedValue = world.read_model('tournament_id');
-            let mut tournament_id: u64 = mocked.value.try_into().unwrap();
-            (tournament_id)
+            (mocked.value.try_into().unwrap())
+        }
+        fn get_settings_id(self: @ContractState) -> u32 {
+            let mut world = self.world_default();
+            // tournament (stored or default)
+            let mocked: MockedValue = world.read_model('settings_id');
+            (mocked.value.try_into().unwrap())
         }
     }
 

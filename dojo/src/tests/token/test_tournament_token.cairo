@@ -9,7 +9,7 @@ use pistols::models::{
         // Tournament, TournamentTrait,
         // TournamentType,
         TournamentRules,
-        TOURNAMENT_RULES,
+        // TOURNAMENT_RULES,
     },
 };
 // use pistols::interfaces::dns::{DnsTrait};
@@ -22,6 +22,7 @@ use pistols::tests::tester::{
         TestSystems, FLAGS,
         OWNER, OTHER,
         ITournamentTokenDispatcherTrait,
+        IBudokanMockDispatcherTrait,
     },
 };
 // use pistols::systems::tokens::budokan_mock::budokan_mock::{TOURNAMENT_OF_1, TOURNAMENT_OF_2};
@@ -33,8 +34,6 @@ use tournaments::components::models::game::{TokenMetadata};
 //
 // Setup
 //
-
-const SETTINGS_ID: u32 = TOURNAMENT_RULES::LastManStanding.settings_id;
 
 const ENTRY_ID_0: u64 = 0;
 const ENTRY_ID_1: u64 = 1;
@@ -59,9 +58,10 @@ fn _mint(sys: @TestSystems, recipient: ContractAddress) -> u64 {
     // mint from budokan
     tester::impersonate(*sys.budokan.contract_address);
     // public mint function in the budokan game component
+    let settings_id: u32 = (*sys.budokan).get_settings_id();
     (_game_token(sys).mint(
         player_name: PLAYER_NAME,
-        settings_id: SETTINGS_ID,
+        settings_id: settings_id,
         start: Option::None,
         end: Option::None,
         to: recipient,

@@ -55,6 +55,7 @@ pub mod tester {
             SeasonScoreboard,
         },
         pool::{Pool, PoolType},
+        tournament::{TournamentRound},
     };
 
     // use pistols::tests::mock_account::DualCaseAccountMock;
@@ -679,6 +680,14 @@ pub mod tester {
         _next_block();
         (duel_id)
     }
+    pub fn execute_end_round(sys: @TestSystems, sender: ContractAddress,
+        entry_id: u64,
+    ) -> Option<u8> {
+        impersonate(sender);
+        let next_round_id: Option<u8> = (*sys.tournaments).end_round(entry_id);
+        _next_block();
+        (next_round_id)
+    }
 
     // ::game
     pub fn execute_commit_moves(system: @IGameDispatcher, sender: ContractAddress,
@@ -813,6 +822,10 @@ pub mod tester {
     }
     #[inline(always)]
     pub fn set_Pack(ref world: WorldStorage, model: @Pack) {
+        world.write_model_test(model);
+    }
+    #[inline(always)]
+    pub fn set_TournamentRound(ref world: WorldStorage, model: @TournamentRound) {
         world.write_model_test(model);
     }
 

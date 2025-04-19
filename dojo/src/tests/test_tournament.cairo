@@ -14,11 +14,10 @@ use pistols::models::{
     challenge::{Challenge, DuelType},
     tournament::{
         TournamentEntry,
-        Tournament, TournamentType, TournamentRules,
+        Tournament, TournamentType, TournamentTypeTrait, TournamentRules,
         TournamentState,
         TournamentRound, TournamentRoundValue,
         TournamentBracketTrait,
-        TournamentSettings,
         TournamentDuelKeys,
         // ChallengeToTournamentValue, TournamentToChallengeValue,
     },
@@ -38,7 +37,6 @@ use pistols::tests::tester::{
         StoreTrait,
         TestSystems, FLAGS,
         ID, OWNER, OTHER, ZERO,
-        // OWNED_BY_OWNER, OWNED_BY_OTHER,
         ITournamentTokenDispatcherTrait,
         IBudokanMockDispatcherTrait,
     },
@@ -60,8 +58,6 @@ use tournaments::components::{
 // Setup
 //
 
-pub const SETTINGS_ID: u32 = 101;
-
 pub const ENTRY_ID_0: u64 = 0;  // creator
 pub const ENTRY_ID_1: u64 = 1;
 pub const ENTRY_ID_2: u64 = 2;
@@ -72,15 +68,8 @@ pub const PLAYER_NAME: felt252 = 'Player';
 pub const TIMESTAMP_START: u64 = (tester::INITIAL_TIMESTAMP + TIMESTAMP::ONE_DAY);
 pub const TIMESTAMP_END: u64 = (TIMESTAMP_START + (TIMESTAMP::ONE_DAY * 7));
 
-pub fn setup(lives_staked: u8, flags: u16) -> TestSystems {
+fn setup(_lives_staked: u8, flags: u16) -> TestSystems {
     let mut sys: TestSystems = tester::setup_world(flags);
-
-    tester::impersonate(sys.tournaments.contract_address);
-    let settings = TournamentSettings {
-        settings_id: SETTINGS_ID,
-        tournament_type: TournamentType::LastManStanding,
-    };
-    sys.store.set_tournament_settings(@settings);
 
     // drop all events
     tester::drop_all_events(sys.world.dispatcher.contract_address);
@@ -98,9 +87,10 @@ pub fn _mint(ref sys: TestSystems, recipient: ContractAddress) -> u64 {
     // let caller: ContractAddress = tester::get_impersonator();
     tester::impersonate(sys.budokan.contract_address);
     // public mint function in the budokan game component
+    let settings_id: u32 = sys.budokan.get_settings_id(); // default LastManStanding
     let token_id: u64 = sys.tournaments.mint(
         player_name,
-        settings_id: SETTINGS_ID,
+        settings_id,
         start: Option::None,
         end: Option::None,
         to: recipient,
@@ -111,7 +101,7 @@ pub fn _mint(ref sys: TestSystems, recipient: ContractAddress) -> u64 {
         token_id,
         player_name,
         minted_by: sys.budokan.contract_address,
-        settings_id: SETTINGS_ID,
+        settings_id,
         lifecycle: Lifecycle {
             mint: 1,
             start: Option::Some(TIMESTAMP_START),
@@ -573,7 +563,8 @@ fn test_join_duel_not_enlisted() {
 fn test_join_duel_token_invalid_caller() {
     let mut sys: TestSystems = setup(3, FLAGS::DUEL | FLAGS::TOURNAMENT);
     tester::impersonate(OWNER());
-    let rules: TournamentRules = sys.store.get_tournament_settings_rules(SETTINGS_ID);
+    // let rules: TournamentRules = sys.store.get_tournament_settings_rules(MOCK_SETTINGS_ID);
+    let rules: TournamentRules = TournamentType::LastManStanding.rules(); // mock default
     let timestamp_end: u64 = TIMESTAMP::ONE_DAY;
     _protected_duel(@sys).join_tournament_duel(
         OWNER(), ID(OWNER()),

@@ -100,6 +100,7 @@ pub trait ITournamentTokenPublic<TState> {
 
     // Phase 2 -- Start tournament (any contestant can start)
     // - will shuffle initial bracket
+    // - requires VRF!
     fn can_start_tournament(self: @TState, entry_id: u64) -> bool;
     fn start_tournament(ref self: TState, entry_id: u64) -> u64; // returns tournament_id
 
@@ -110,6 +111,7 @@ pub trait ITournamentTokenPublic<TState> {
     // Phase 4 -- End round (any contestant can end)
     // - will shuffle next bracket
     // - or close tournament
+    // - requires VRF!
     fn can_end_round(self: @TState, entry_id: u64) -> bool;
     fn end_round(ref self: TState, entry_id: u64) -> Option<u8>; // returns next round number
 }
@@ -241,6 +243,7 @@ pub mod tournament_token {
         pub const INVALID_ROUND: felt252            = 'TOURNAMENT: Invalid round';
         pub const STILL_PLAYABLE: felt252           = 'TOURNAMENT: Still playable';
         pub const CALLER_NOT_OWNER: felt252         = 'TOURNAMENT: Caller not owner';
+        pub const IMPOSSIBLE_ERROR: felt252         = 'TOURNAMENT: Impossible error';
     }
 
     //*******************************
@@ -428,7 +431,13 @@ pub mod tournament_token {
             tournament.round_number = 1;
             // initialize round
             let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
-            let round: TournamentRound = self._initialize_round(ref store, budokan_dispatcher, tournament_id, 1, token_metadata.lifecycle, seed);
+            let round: TournamentRound = self._initialize_round(ref store,
+                tournament_id, 1,
+                token_metadata.lifecycle,
+                core::cmp::min(budokan_dispatcher.tournament_entries(tournament_id), TournamentRoundTrait::MAX_ENTRIES.into()),
+                Option::None,
+                seed,
+            );
             // store!
             store.set_tournament(@tournament);
             store.set_tournament_round(@round);
@@ -521,6 +530,8 @@ pub mod tournament_token {
             (
                 // owns entry
                 self.is_owner_of(starknet::get_caller_address(), entry_id.into()) &&
+                // tournament is active
+                tournament.state == TournamentState::InProgress &&
                 // is valid round
                 round.entry_count > 0 &&
                 // end conditions
@@ -543,10 +554,12 @@ pub mod tournament_token {
             // verify lifecycle
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
-            let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
-            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.round_number);
-            assert(round.entry_count > 0, Errors::INVALID_ROUND);
+            let mut tournament: Tournament = store.get_tournament(entry.tournament_id);
+            assert(tournament.state != TournamentState::Finished, Errors::HAS_ENDED);
+            assert(tournament.state == TournamentState::InProgress, Errors::NOT_STARTED);
             // end conditions
+            let mut round: TournamentRound = store.get_tournament_round(entry.tournament_id, tournament.round_number);
+            assert(round.entry_count > 0, Errors::INVALID_ROUND);
             assert(
                 (
                     !token_metadata.lifecycle.is_playable(starknet::get_block_timestamp()) ||
@@ -555,15 +568,45 @@ pub mod tournament_token {
                 ), Errors::STILL_PLAYABLE
             );
 
-            // TODO...
-            // END ROUND
-            // OR END TOURRNAMENT
+            // end round
+            round.ended_round();
+            store.set_tournament_round(@round);
 
-            (Option::None)
+            // can go to next round?
+            let mut result: Option<u8> = Option::None;
+            let rules: TournamentRules = store.get_tournament_settings_rules(token_metadata.settings_id);
+            if (rules.max_rounds == 0 || tournament.round_number < rules.max_rounds) {
+                // get survivors...
+                let survivors: Span<u8> = round.results.get_surviving_entries();
+                if (survivors.len() >= 2) {
+                    // shuffle next round
+                    tournament.round_number += 1;
+                    let seed: felt252 = store.vrf_dispatcher().consume_random(Source::Nonce(caller));
+                    let next_round: TournamentRound = self._initialize_round(ref store,
+                        tournament.tournament_id, tournament.round_number,
+                        token_metadata.lifecycle,
+                        survivors.len(),
+                        Option::Some(survivors),
+                        seed,
+                    );
+                    store.set_tournament_round(@next_round);
+                    // return next round number
+                    result = Option::Some(tournament.round_number);
+                }
+            }
+            
+            // end tournament!
+            if (result.is_none()) {
+                tournament.state = TournamentState::Finished;
+            };
+
+            store.set_tournament(@tournament);
+
+            (result)
         }
     }
 
-    
+
     //-----------------------------------
     // Protected
     //
@@ -608,13 +651,13 @@ pub mod tournament_token {
 
         fn _initialize_round(ref self: ContractState,
             ref store: Store,
-            budokan_dispatcher: ITournamentDispatcher,
             tournament_id: u64,
             round_number: u8,
             lifecycle: Lifecycle,
+            entry_count: u32,
+            survivors: Option<Span<u8>>,
             seed: felt252,
         ) -> TournamentRound {
-            let entry_count: u32 = budokan_dispatcher.tournament_entries(tournament_id);
             let mut timestamps: Period = Period {
                 start: starknet::get_block_timestamp(),
                 end: starknet::get_block_timestamp() + TIMESTAMP::ONE_DAY
@@ -630,14 +673,25 @@ pub mod tournament_token {
             let mut round = TournamentRound {
                 tournament_id,
                 round_number,
-                entry_count: core::cmp::min(entry_count, TournamentRoundTrait::MAX_ENTRIES.into()).try_into().unwrap(),
+                entry_count: entry_count.try_into().unwrap(),
                 bracket: 0,
                 results: 0,
                 timestamps,
             };
             // shuffle entries
             let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
-            round.shuffle(wrapped, seed);
+            match survivors {
+                Option::Some(survivors) => {
+                    // nth round!
+                    assert(round_number > 1, Errors::IMPOSSIBLE_ERROR);
+                    round.shuffle_survivors(wrapped, seed, survivors);
+                },
+                Option::None => {
+                    // 1st round!
+                    assert(round_number == 1, Errors::IMPOSSIBLE_ERROR);
+                    round.shuffle_all(wrapped, seed);
+                },
+            }
             (round)
         }
     }
