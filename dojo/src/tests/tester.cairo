@@ -684,9 +684,9 @@ pub mod tester {
         entry_id: u64,
     ) -> Option<u8> {
         impersonate(sender);
-        let next_round_id: Option<u8> = (*sys.tournaments).end_round(entry_id);
+        let next_round_option: Option<u8> = (*sys.tournaments).end_round(entry_id);
         _next_block();
-        (next_round_id)
+        (next_round_option)
     }
 
     // ::game

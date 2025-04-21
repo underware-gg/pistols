@@ -333,6 +333,18 @@ pub impl TournamentResultsImpl of TournamentResultsTrait {
         ((self._get_nibble(entry_number) & 0b0010) == 0b0010) // check survived bit (0b0010)
     }
 
+    fn playing_count(self: u128) -> u8 {
+        // count playing bits (0b0100)
+        let mut count: u8 = 0;
+        let mut e: u8 = 1;  
+        while (e <= TournamentRoundTrait::MAX_ENTRIES) {
+            if ((self._get_nibble(e) & 0b0100) == 0b0100) {
+                count += 1;
+            }
+            e += 1;
+        };
+        (count)
+    }
     #[inline(always)]
     fn have_all_duels_finished(self: u128) -> bool {
         // check if all playing bits are cleared (0b0100)

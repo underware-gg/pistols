@@ -627,7 +627,7 @@ fn test_end_round_not_played() {
     // end_round
     tester::impersonate(P1().address);
     assert!(!sys.tournaments.can_end_round(P1().entry_id), "!can_end_round()");
-    let _next_round_id: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
+    let _next_round: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
 }
 
 #[test]
@@ -636,12 +636,12 @@ fn test_end_round_not_owner() {
     let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
     let (_tournament_id, _duel_ids) = _setup_start_tournament_of_2(ref sys, TournamentType::LastManStanding, [1, 2].span());
     //
-    // tournamnt timeout
+    // tournament timeout
     tester::set_block_timestamp(TIMESTAMP_END);
     // end_round
     tester::impersonate(OTHER());
     assert!(!sys.tournaments.can_end_round(P1().entry_id), "!can_end_round()");
-    let _next_round_id: Option<u8> = tester::execute_end_round(@sys, OTHER(), P1().entry_id);
+    let _next_round: Option<u8> = tester::execute_end_round(@sys, OTHER(), P1().entry_id);
 }
 
 #[test]
@@ -649,14 +649,14 @@ fn test_end_round_all_round_timeout() {
     let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
     let (tournament_id, _duel_ids) = _setup_start_tournament_of_2(ref sys, TournamentType::LastManStanding, [1, 2].span());
     //
-    // tournamnt timeout
+    // tournament timeout
     let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
     tester::set_block_timestamp(round.timestamps.end + 1);
     // end_round
     tester::impersonate(P1().address);
     assert!(sys.tournaments.can_end_round(P1().entry_id), "can_end_round()");
-    let next_round_id: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
-    assert!(next_round_id.is_none(), "next_round_id");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
+    assert!(next_round_option.is_none(), "next_round_id");
     // OK!
     _assert_round_ended(@sys, tournament_id, 1, [].span());
 }
@@ -666,14 +666,14 @@ fn test_end_round_all_tournament_timeout() {
     let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
     let (tournament_id, _duel_ids) = _setup_start_tournament_of_2(ref sys, TournamentType::LastManStanding, [1, 2].span());
     //
-    // tournamnt timeout
+    // tournament timeout
     tester::set_block_timestamp(TIMESTAMP_END);
     // end_round
     // (with P2 now...)
     tester::impersonate(P2().address);
     assert!(sys.tournaments.can_end_round(P2().entry_id), "can_end_round()");
-    let next_round_id: Option<u8> = tester::execute_end_round(@sys, P2().address, P2().entry_id);
-    assert!(next_round_id.is_none(), "next_round_id");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P2().address, P2().entry_id);
+    assert!(next_round_option.is_none(), "next_round_id");
     // OK!
     _assert_round_ended(@sys, tournament_id, 1, [].span());
 }
@@ -702,8 +702,8 @@ fn test_end_round_all_players_finished() {
     // end_round
     tester::impersonate(P1().address); // needed to call can_end_round()
     assert!(sys.tournaments.can_end_round(P1().entry_id), "can_end_round()");
-    let next_round_id: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
-    assert!(next_round_id.is_none(), "next_round_id");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
+    assert!(next_round_option.is_none(), "next_round_id");
     // OK!
     _assert_round_ended(@sys, tournament_id, 1, [EN_1].span());
     // player can collect...
@@ -731,8 +731,8 @@ fn test_end_round_left_players_winning() {
     tester::set_block_timestamp(round.timestamps.end + 1);
     tester::impersonate(P1().address); // needed to call can_end_round()
     assert!(sys.tournaments.can_end_round(P1().entry_id), "can_end_round()");
-    let next_round_id: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
-    assert!(next_round_id.is_none(), "next_round_id");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
+    assert!(next_round_option.is_none(), "next_round_id");
     // OK!
     _assert_round_ended(@sys, tournament_id, 1, [EN_1].span());
     // player can collect now...
@@ -747,76 +747,94 @@ fn test_end_round_already_ended() {
     let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
     let (_tournament_id, _duel_ids) = _setup_start_tournament_of_2(ref sys, TournamentType::LastManStanding, [1, 2].span());
     //
-    // tournamnt timeout
+    // tournament timeout
     tester::set_block_timestamp(TIMESTAMP_END);
     // end_round
     tester::impersonate(P1().address);
     assert!(sys.tournaments.can_end_round(P1().entry_id), "can_end_round()");
-    let next_round_id: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
-    assert!(next_round_id.is_none(), "next_round_id");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
+    assert!(next_round_option.is_none(), "next_round_id");
     // end again...
     tester::impersonate(P1().address);
     assert!(!sys.tournaments.can_end_round(P1().entry_id), "!can_end_round()");
-    let _next_round_id: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
+    let _next_round: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
+}
+
+#[test]
+fn test_end_round_unpaired_win() {
+    let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
+    let (tournament_id, _duel_ids) = _setup_start_tournament_of_3(ref sys, TournamentType::LastManStanding, [1, 2, 3].span());
+    let EN_3: u8 = P3().entry_number;
+    //
+    // end tournament!
+    let mut round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
+    tester::set_block_timestamp(round.timestamps.end + 1);
+    tester::impersonate(P3().address);
+    assert!(sys.tournaments.can_end_round(P3().entry_id), "can_end_round(1)");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P3().address, P3().entry_id);
+    assert!(next_round_option.is_none(), "next_round_option_end(1)");
+    _assert_round_ended(@sys, tournament_id, 1, [EN_3].span());
+}
+
+#[test]
+fn test_end_round_unpaired_win_collected() {
+    let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
+    let (tournament_id, duel_ids) = _setup_start_tournament_of_3(ref sys, TournamentType::LastManStanding, [1, 2, 3].span());
+    let EN_3: u8 = P3().entry_number;
+    //
+    // draw, other win
+    let duel_id_p1: u128 = *duel_ids[0];
+    let _ch_1: Challenge = sys.store.get_challenge(duel_id_p1);
+    let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+    sys.rng.mock_values(mocked);
+    tester::execute_commit_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
+    tester::execute_commit_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.hashed);
+    tester::execute_reveal_moves_ID(@sys.game, P1().address, P1().duelist_id, duel_id_p1, moves_a.salt, moves_a.moves);
+    tester::execute_reveal_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.salt, moves_b.moves);
+    let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
+    assert!(!round.results.is_winning(1), "is_winning_a");
+    assert!(!round.results.is_winning(2), "is_winning_b");
+    assert!(round.results.is_winning(3), "is_winning_c");
+    //
+    // end tournament!
+    tester::impersonate(P3().address);
+    assert!(sys.tournaments.can_end_round(P3().entry_id), "can_end_round(1)");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P3().address, P3().entry_id);
+    assert!(next_round_option.is_none(), "next_round_option_end(1)");
+    _assert_round_ended(@sys, tournament_id, 1, [EN_3].span());
 }
 
 
 
+//--------------------------------
+// Round End (multi rounds)
+//
 
-
-// #[test]
-// fn test_end_round_single_ok() {
-//     let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
-//     let (tournament_id, _duel_ids) = _setup_start_tournament_of_2(ref sys, TournamentType::LastManStanding, [1, 2].span());
-//     let EN_1: u8 = P1().entry_number;
-//     let EN_2: u8 = P2().entry_number;
-//     //
-//     // trait dueling
-//     let mut round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
-//     round.finished_duel(EN_1, EN_2, true, false, 1);
-//     // end_round
-//     tester::impersonate(P1);
-//     assert!(!sys.tournaments.can_end_round(P1().entry_id), "!can_collect()");
-    // let result: Option<u8> = tester::execute_end_round(@sys.tournaments, P1().address, EN_1);
-    // assert!(result.is_none(), "result");
-
-//     // check results
-//     assert!(round.results.have_all_duels_finished(), "round.results.have_all_duels_finished()");
-//     let survivors: Span<u8> = round.results.get_surviving_entries();
-//     assert_eq!(survivors.len(), 1, "survivors.len()");
-//     assert_eq!(*survivors[0], EN_2, "survivors[0]");
-// }
-
-// #[test]
-// fn test_end_round_not_owner() {
-//     let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
-//     let (tournament_id, _duel_ids) = _setup_start_tournament_of_2(ref sys, TournamentType::LastManStanding, [1, 2].span());
-//     let EN_1: u8 = P1().entry_number;
-//     let EN_2: u8 = P2().entry_number;
-//     //
-//     // trait dueling
-//     let mut round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
-//     round.finished_duel(EN_1, EN_2, true, false, 1);
-//     // end_round
-//     tester::impersonate(OTHER());
-//     assert!(!sys.tournaments.can_end_round(P1().entry_id), "!can_collect()");
-//     // >>> TIME TRAVEL
-//     // >>> END_ROUND
-// }
-
-
-
-
-
-
-
-
-
-
+fn _assert_next_round(sys: @TestSystems, tournament_id: u64, new_round_number: u8, expected_players: Span<u8>) {
+    assert_gt!(new_round_number, 1, "[{}:{}] new_round_number", tournament_id, new_round_number);
+    let tournament: Tournament = sys.store.get_tournament(tournament_id);
+    assert_eq!(tournament.state, TournamentState::InProgress, "[{}:{}] tournament.state", tournament_id, new_round_number);
+    assert_eq!(tournament.round_number, new_round_number, "[{}:{}] tournament.round_number", tournament_id, new_round_number);
+    let prev_round: TournamentRound = sys.store.get_tournament_round(tournament_id, new_round_number - 1);
+    assert!(prev_round.results.have_all_duels_finished(), "[{}:{}] prev_round.results.have_all_duels_finished()", tournament_id, new_round_number);
+    let new_round: TournamentRound = sys.store.get_tournament_round(tournament_id, new_round_number);
+    assert!(!new_round.results.have_all_duels_finished(), "[{}:{}] new_round.results.have_all_duels_finished()", tournament_id, new_round_number);
+    // entries
+    let survivors: Span<u8> = prev_round.results.get_surviving_entries();
+    assert_eq!(survivors.len(), expected_players.len(), "[{}:{}] survivors.len()", tournament_id, new_round_number);
+    assert_eq!(new_round.entry_count.into(), survivors.len(), "[{}:{}] new_round.entry_count", tournament_id, new_round_number);
+    assert_eq!(new_round.results.playing_count().into(), survivors.len(), "[{}:{}] new_round.results.playing_count()", tournament_id, new_round_number);
+    let mut i: usize = 0;
+    while (i < survivors.len()) {
+        let entry_number: u8 = *survivors[i];
+        assert!(expected_players.contains(@entry_number), "[{}:{}] survivors[{}]: {}", tournament_id, new_round_number, i, entry_number);
+        assert!(new_round.results.is_playing(entry_number), "[{}:{}] is_winning[{}]: {}", tournament_id, new_round_number, i, entry_number);
+        i += 1;
+    };
+}
 
 #[test]
-#[ignore]
-fn test_end_round_incomplete_duels() {
+fn test_next_round_finished_ok() {
     let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
     let (tournament_id, _duel_ids) = _setup_start_tournament_of_6(ref sys, TournamentType::LastManStanding, [1, 2, 3, 4, 5, 6].span());
     let EN_1: u8 = P1().entry_number;
@@ -826,48 +844,191 @@ fn test_end_round_incomplete_duels() {
     let EN_5: u8 = P5().entry_number; // 4
     let EN_6: u8 = P6().entry_number; // 5
     //
-    // run duel with traits
+    // trait dueling Round 1
     let mut round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
+    round.finished_duel(EN_1, EN_2, true, false, 1);
+    round.finished_duel(EN_3, EN_4, true, false, 1);
+    round.finished_duel(EN_5, EN_6, false, true, 2);
+    tester::set_TournamentRound(ref sys.world, @round);
+    assert!(round.results.is_winning(EN_1), "round.results.is_winning(EN_1)_1");
+    assert!(round.results.is_winning(EN_3), "round.results.is_winning(EN_3)_1");
+    assert!(round.results.is_winning(EN_6), "round.results.is_winning(EN_6)_1");
     //
-    // trait dueling
-    round.moved_first(EN_1, EN_2);
-    assert!(round.results.is_winning(EN_1), "finished_duel_1_a");
-    assert!(!round.results.is_winning(EN_2), "finished_duel_1_b");
-    round.moved_first(EN_4, EN_3);
-    assert!(round.results.is_winning(EN_4), "finished_duel_2_a");
-    assert!(!round.results.is_winning(EN_3), "finished_duel_2_b");
-    round.moved_second(EN_5, EN_6);
-    assert!(!round.results.is_winning(EN_5), "finished_duel_3_a");
-    assert!(!round.results.is_winning(EN_6), "finished_duel_3_b");
-    
-    // time travel...
-    // end_round()
+    // end_round(1)
+    tester::set_block_timestamp(round.timestamps.end + 1);
+    tester::impersonate(P1().address);
+    assert!(sys.tournaments.can_end_round(P1().entry_id), "can_end_round(1)");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
+    assert!(next_round_option.is_some(), "next_round_option(1)");
+    let next_round_id: u8 = next_round_option.unwrap();
+    assert_eq!(next_round_id, 2, "next_round_id(1)");
+    _assert_next_round(@sys, tournament_id, next_round_id, [EN_1, EN_3, EN_6].span());
+    //
+    // trait dueling Round 2
+    let mut round: TournamentRound = sys.store.get_tournament_round(tournament_id, 2);
+    round.finished_duel(EN_1, EN_3, true, false, 1);
+    tester::set_TournamentRound(ref sys.world, @round);
+    assert!(round.results.is_winning(EN_1), "round.results.is_winning(EN_1)_2");
+    assert!(round.results.is_winning(EN_6), "round.results.is_winning(EN_6)_2");
+    //
+    // end_round(2)
+    tester::set_block_timestamp(round.timestamps.end + 1);
+    tester::impersonate(P4().address);
+    assert!(sys.tournaments.can_end_round(P4().entry_id), "can_end_round(2)");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P4().address, P4().entry_id);
+    assert!(next_round_option.is_some(), "next_round_option(2)");
+    let next_round_id: u8 = next_round_option.unwrap();
+    assert_eq!(next_round_id, 3, "next_round_id(2)");
+    _assert_next_round(@sys, tournament_id, next_round_id, [EN_1, EN_6].span());
+    //
+    // trait dueling Round 3
+    let mut round: TournamentRound = sys.store.get_tournament_round(tournament_id, 3);
+    round.finished_duel(EN_1, EN_6, false, true, 2);
+    tester::set_TournamentRound(ref sys.world, @round);
+    assert!(round.results.is_winning(EN_6), "round.results.is_winning(EN_6)_3");
+    //
+    // end tournament!
+    tester::set_block_timestamp(round.timestamps.end + 1);
+    tester::impersonate(P6().address);
+    assert!(sys.tournaments.can_end_round(P6().entry_id), "can_end_round(3)");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P6().address, P6().entry_id);
+    assert!(next_round_option.is_none(), "next_round_option_end(3)");
+    _assert_round_ended(@sys, tournament_id, 3, [EN_6].span());
+}
 
-    // finished!
-    let survivors: Span<u8> = round.results.get_surviving_entries();
-    assert_eq!(survivors.len(), 2, "survivors.len()");
-// println!("survivors: {}, {}, {} / {} {} {}", EN_6, EN_2, EN_3, *survivors[0], *survivors[1], *survivors[2]);
-    assert!(survivors.contains(@EN_1), "survivors[0]");
-    assert!(survivors.contains(@EN_4), "survivors[1]");
-    assert!(!round.results.have_all_duels_finished(), "round.results.have_all_duels_finished()");
+#[test]
+fn test_next_round_incomplete_ok() {
+    let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
+    let (tournament_id, _duel_ids) = _setup_start_tournament_of_6(ref sys, TournamentType::LastManStanding, [1, 2, 3, 4, 5, 6].span());
+    let EN_1: u8 = P1().entry_number;
+    let EN_2: u8 = P2().entry_number;
+    let EN_3: u8 = P3().entry_number;
+    let EN_4: u8 = P4().entry_number; // 6
+    let EN_5: u8 = P5().entry_number; // 4
+    let EN_6: u8 = P6().entry_number; // 5
+    //
+    // trait dueling Round 1
+    let mut round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
+    round.moved_first(EN_1, EN_2);
+    round.moved_first(EN_3, EN_4);
+    round.moved_first(EN_6, EN_5);
+    tester::set_TournamentRound(ref sys.world, @round);
+    assert!(round.results.is_winning(EN_1), "round.results.is_winning(EN_1)_1");
+    assert!(round.results.is_winning(EN_3), "round.results.is_winning(EN_3)_1");
+    assert!(round.results.is_winning(EN_6), "round.results.is_winning(EN_6)_1");
+    //
+    // end_round(1)
+    tester::set_block_timestamp(round.timestamps.end + 1);
+    tester::impersonate(P1().address);
+    assert!(sys.tournaments.can_end_round(P1().entry_id), "can_end_round(1)");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
+    assert!(next_round_option.is_some(), "next_round_option(1)");
+    let next_round_id: u8 = next_round_option.unwrap();
+    assert_eq!(next_round_id, 2, "next_round_id(1)");
+    _assert_next_round(@sys, tournament_id, next_round_id, [EN_1, EN_3, EN_6].span());
+    //
+    // trait dueling Round 2
+    let mut round: TournamentRound = sys.store.get_tournament_round(tournament_id, 2);
+    round.moved_first(EN_1, EN_3);
+    tester::set_TournamentRound(ref sys.world, @round);
+    assert!(round.results.is_winning(EN_1), "round.results.is_winning(EN_1)_2");
+    assert!(round.results.is_winning(EN_6), "round.results.is_winning(EN_6)_2");
+    //
+    // end_round(2)
+    tester::set_block_timestamp(round.timestamps.end + 1);
+    tester::impersonate(P4().address);
+    assert!(sys.tournaments.can_end_round(P4().entry_id), "can_end_round(2)");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P4().address, P4().entry_id);
+    assert!(next_round_option.is_some(), "next_round_option(2)");
+    let next_round_id: u8 = next_round_option.unwrap();
+    assert_eq!(next_round_id, 3, "next_round_id(2)");
+    _assert_next_round(@sys, tournament_id, next_round_id, [EN_1, EN_6].span());
+    //
+    // trait dueling Round 3
+    let mut round: TournamentRound = sys.store.get_tournament_round(tournament_id, 3);
+    round.moved_first(EN_6, EN_1);
+    tester::set_TournamentRound(ref sys.world, @round);
+    assert!(round.results.is_winning(EN_6), "round.results.is_winning(EN_6)_3");
+    //
+    // end tournament!
+    tester::set_block_timestamp(round.timestamps.end + 1);
+    tester::impersonate(P6().address);
+    assert!(sys.tournaments.can_end_round(P6().entry_id), "can_end_round(3)");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P6().address, P6().entry_id);
+    assert!(next_round_option.is_none(), "next_round_option_end(3)");
+    _assert_round_ended(@sys, tournament_id, 3, [EN_6].span());
+}
+
+#[test]
+fn test_next_round_single_player() {
+    let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
+    let (tournament_id, _duel_ids) = _setup_start_tournament_of_6(ref sys, TournamentType::LastManStanding, [1, 2, 3, 4, 5, 6].span());
+    let EN_1: u8 = P1().entry_number;
+    let EN_2: u8 = P2().entry_number;
+    // let EN_3: u8 = P3().entry_number;
+    // let EN_4: u8 = P4().entry_number; // 6
+    // let EN_5: u8 = P5().entry_number; // 4
+    // let EN_6: u8 = P6().entry_number; // 5
+    //
+    // trait dueling Round 1
+    let mut round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
+    round.moved_first(EN_1, EN_2);
+    tester::set_TournamentRound(ref sys.world, @round);
+    assert!(round.results.is_winning(EN_1), "round.results.is_winning(EN_1)_1");
+    //
+    // end tournament!
+    tester::set_block_timestamp(round.timestamps.end + 1);
+    tester::impersonate(P1().address);
+    assert!(sys.tournaments.can_end_round(P1().entry_id), "can_end_round(1)");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
+    assert!(next_round_option.is_none(), "next_round_option_end(1)");
+    _assert_round_ended(@sys, tournament_id, 1, [EN_1].span());
 }
 
 
+#[test]
+fn test_next_round_incomplete_collect() {
+    let mut sys: TestSystems = setup(FLAGS::GAME | FLAGS::DUEL | FLAGS::TOURNAMENT | FLAGS::MOCK_RNG);
+    let (tournament_id, duel_ids) = _setup_start_tournament_of_3(ref sys, TournamentType::LastManStanding, [1, 2, 3].span());
+    let EN_3: u8 = P3().entry_number;
+    //
+    // draw, other win
+    let duel_id_p1: u128 = *duel_ids[0];
+    let _ch_1: Challenge = sys.store.get_challenge(duel_id_p1);
+    let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
+    sys.rng.mock_values(mocked);
+    tester::execute_commit_moves_ID(@sys.game, P2().address, P2().duelist_id, duel_id_p1, moves_b.hashed);
+    let round: TournamentRound = sys.store.get_tournament_round(tournament_id, 1);
+    assert!(round.results.is_winning(1), "is_winning_a");
+    assert!(!round.results.is_winning(2), "is_winning_b");
+    assert!(round.results.is_winning(3), "is_winning_c");
+    //
+    // end_round(1)
+    // tester::set_block_timestamp(round.timestamps.end + 1);
+    tester::impersonate(P1().address);
+    assert!(sys.tournaments.can_end_round(P1().entry_id), "can_end_round(1)");
+    let next_round_option: Option<u8> = tester::execute_end_round(@sys, P1().address, P1().entry_id);
+    assert!(next_round_option.is_some(), "next_round_option(1)");
+    let next_round_id: u8 = next_round_option.unwrap();
+    assert_eq!(next_round_id, 2, "next_round_id(1)");
+    _assert_next_round(@sys, tournament_id, next_round_id, [EN_1, EN_3].span());
 
 
 
+
+
+    // //
+    // // end tournament!
+    // tester::impersonate(P3().address);
+    // assert!(sys.tournaments.can_end_round(P3().entry_id), "can_end_round(1)");
+    // let next_round_option: Option<u8> = tester::execute_end_round(@sys, P3().address, P3().entry_id);
+    // assert!(next_round_option.is_none(), "next_round_option_end(1)");
+    // _assert_round_ended(@sys, tournament_id, 1, [EN_3].span());
+}
 
 //--------------------------------
 // Tournament End (multi rounds)
 //
-
-
-// TODO: collect tournament round > all duels completed
-// TODO: collect tournament round > missing duels
-
-// TODO: multi round tournament > [A] vs B + C vs [D] > A vs D
-// TODO: multi round tournament > !can_finish() > duel more > finish tournament
-// TODO: multi round tournament > single winner > finish tournament
 
 // TODO: multi round tournament > missing wins from 1st round > collect and continue -- clone test_end_round_left_players_winning() with commit/reveal
 // TODO: multi round tournament > missing draws from 1st round > cannot collect, cannot continue

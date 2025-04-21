@@ -36,6 +36,7 @@ fn NEW_ROUND(entry_count: u8) -> TournamentRound {
 fn _test_shuffle_all(wrapped: @RngWrap, entry_count: u8) -> @TournamentRound {
     let mut round = NEW_ROUND(entry_count);
     round.shuffle_all(wrapped, 0x3453534534534543);
+    assert_eq!(round.results.playing_count(), entry_count, "playing_count");
     let is_odd: bool = (entry_count % 2) == 1;
     // println!("results {} : {:x}", entry_count, round.results);
     // initial results
@@ -447,6 +448,7 @@ fn _test_shuffle_survivors(wrapped: @RngWrap, survivors: Span<u8>) -> @Tournamen
     let entry_count: u8 = survivors.len().try_into().unwrap();
     let mut round = NEW_ROUND(entry_count);
     round.shuffle_survivors(wrapped, 0x2212121211221212, survivors);
+    assert_eq!(round.results.playing_count(), entry_count, "playing_count");
     let is_odd: bool = (entry_count % 2) == 1;
     // println!("results {} : {:x}", entry_count, round.results);
     // check pairings
