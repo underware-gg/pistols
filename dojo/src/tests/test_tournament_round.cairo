@@ -8,6 +8,7 @@ use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
 use pistols::types::timestamp::{Period};
 use pistols::utils::bytemap::{BytemapU256};
 use pistols::utils::nibblemap::{NibblemapU128};
+use pistols::utils::arrays::{SpanUtilsTrait};
 use pistols::tests::tester::{tester};
 
 const NIBBLE_LOSING: u8 = 0b1100;   // playing and losing
@@ -26,6 +27,11 @@ fn NEW_ROUND(entry_count: u8) -> TournamentRound {
         },
     })
 }
+
+
+//--------------------------------
+// shuffle_all()
+//
 
 fn _test_shuffle_all(wrapped: @RngWrap, entry_count: u8) -> @TournamentRound {
     let mut round = NEW_ROUND(entry_count);
@@ -71,6 +77,7 @@ fn _test_shuffle_all(wrapped: @RngWrap, entry_count: u8) -> @TournamentRound {
             // match opponents
             let opponent_a: u256 = round.bracket.get_opponent_entry_number(entry_b.try_into().unwrap()).into();
             let opponent_b: u256 = round.bracket.get_opponent_entry_number(entry_a.try_into().unwrap()).into();
+            assert_ne!(opponent_a, opponent_b, "({}) SELF-MATCH!!!", e);
             assert_eq!(opponent_a, entry_a, "({}) opponent_a", i);
             assert_eq!(opponent_b, entry_b, "({}) opponent_b", i);
         }
@@ -79,7 +86,7 @@ fn _test_shuffle_all(wrapped: @RngWrap, entry_count: u8) -> @TournamentRound {
     };
     // missing paired
     if (is_odd) {
-        assert_ne!(not_paired, 0, "is_odd: not_paired={}", not_paired);
+        assert_eq!(not_paired, 1, "is_odd: not_paired={}", not_paired);
     } else {
         assert_eq!(not_paired, 0, "!is_odd: not_paired={}", not_paired);
     }
@@ -428,4 +435,112 @@ fn test_shuffle_all_finished_win_2_alive() {
         assert_eq!(*survivors[i.into()], i + 1, "survivors({})", i+1);
         i += 1;
     };
+}
+
+
+
+//--------------------------------
+// shuffle_survivors()
+//
+
+fn _test_shuffle_survivors(wrapped: @RngWrap, survivors: Span<u8>) -> @TournamentRound {
+    let entry_count: u8 = survivors.len().try_into().unwrap();
+    let mut round = NEW_ROUND(entry_count);
+    round.shuffle_survivors(wrapped, 0x2212121211221212, survivors);
+    let is_odd: bool = (entry_count % 2) == 1;
+    // println!("results {} : {:x}", entry_count, round.results);
+    // check pairings
+    let mut not_paired: u8 = 0;
+    let mut not_playing: u8 = 0;
+    let mut is_playing: u8 = 0;
+    let mut e: u8 = 1;
+    while (e <= TournamentRoundTrait::MAX_ENTRIES) {
+        let nibble: u8 = round.results._get_nibble(e);
+        if (!survivors.contains(@e)) {
+            // not playing
+            not_playing += 1;
+            assert_eq!(nibble, 0, "[{}] !is_playing: bad nibble {:x}", e, nibble);
+            assert!(!round.results.is_playing(e), "({}) !is_playing: bad is_playing", e);
+        } else {
+            // is playing
+            is_playing += 1;
+            assert_gt!(nibble, 0, "[{}] is_playing: bad nibble {:x}", e, nibble);
+            assert!(round.results.is_playing(e), "({}) is_playing: bad is_playing", e);
+            let entry_a: u8 = e;
+            let entry_b: u8 = round.bracket.get_opponent_entry_number(entry_a);
+            assert_ne!(entry_b, entry_a, "({}) SELF-MATCH!!!", e);
+            if (entry_b == 0) {
+                assert!(is_odd, "[{}]: is_odd", e);
+                assert_eq!(not_paired, 0, "[{}]: not_paired", e);
+                assert!(round.results.is_playing(e), "({}) is_playing: bad is_playing", e);
+                assert!(round.results.is_winning(e), "({}) is_winning: bad is_winning", e);
+                not_paired += 1;
+            } else {
+                assert!(round.results.is_playing(entry_a), "({}) is_playing: bad is_playing", entry_a);
+                assert!(round.results.is_playing(entry_b), "({}) is_playing: bad is_playing", entry_b);
+                assert!(!round.results.is_winning(entry_a), "({}) !is_winning: bad is_winning", entry_a);
+                assert!(!round.results.is_winning(entry_b), "({}) !is_winning: bad is_winning", entry_b);
+                // match opponents
+                let opponent_a: u8 = round.bracket.get_opponent_entry_number(entry_b).try_into().unwrap();
+                assert_eq!(opponent_a, entry_a, "[{}] opponent_a", e);
+            }            
+        }
+        e += 1;
+    };
+    assert_eq!(is_playing, entry_count, "is_playing={}", is_playing);
+    assert_eq!(not_playing, TournamentRoundTrait::MAX_ENTRIES - entry_count, "not_playing={}", not_playing);
+    // missing paired
+    if (is_odd) {
+        assert_eq!(not_paired, 1, "is_odd: not_paired={}", not_paired);
+    } else {
+        assert_eq!(not_paired, 0, "!is_odd: not_paired={}", not_paired);
+    }
+    (@round)
+}
+
+#[test]
+fn test_shuffle_survivors_max() {
+    let mut sys: tester::TestSystems = tester::setup_world(tester::FLAGS::MOCK_RNG);
+    let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+    _test_shuffle_survivors(wrapped, [1,4,8,3,15,31,18,24,29,32,16,17,2,5,10,21].span());
+}
+
+#[test]
+fn test_shuffle_survivors_min1() {
+    let mut sys: tester::TestSystems = tester::setup_world(tester::FLAGS::MOCK_RNG);
+    let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+    let round: @TournamentRound = _test_shuffle_survivors(wrapped, [1,32].span());
+    assert_eq!((*round.bracket).get_opponent_entry_number(0), 0);
+    assert_eq!((*round.bracket).get_opponent_entry_number(1), 32);
+    assert_eq!((*round.bracket).get_opponent_entry_number(2), 0);
+    assert_eq!((*round.bracket).get_opponent_entry_number(32), 1);
+    assert_eq!((*round.bracket).get_opponent_entry_number(31), 0);
+}
+
+#[test]
+fn test_shuffle_survivors_min2() {
+    let mut sys: tester::TestSystems = tester::setup_world(tester::FLAGS::MOCK_RNG);
+    let wrapped: @RngWrap = RngWrapTrait::new(sys.rng.contract_address);
+    let round: @TournamentRound = _test_shuffle_survivors(wrapped, [15,16].span());
+    assert_eq!((*round.bracket).get_opponent_entry_number(0), 0);
+    assert_eq!((*round.bracket).get_opponent_entry_number(1), 0);
+    assert_eq!((*round.bracket).get_opponent_entry_number(15), 16);
+    assert_eq!((*round.bracket).get_opponent_entry_number(16), 15);
+    assert_eq!((*round.bracket).get_opponent_entry_number(32), 0);
+    assert_eq!((*round.bracket).get_opponent_entry_number(31), 0);
+}
+
+#[test]
+fn test_shuffle_survivors_odd() {
+    let mut sys: tester::TestSystems = tester::setup_world(tester::FLAGS::MOCK_RNG);
+    let mocked: Span<MockedValue> = [
+        MockedValueTrait::shuffled(TournamentRoundTrait::SHUFFLE_SALT, [1, 4, 5, 2, 3].span()),
+    ].span();
+    let wrapped: @RngWrap = RngWrapTrait::wrap(sys.rng.contract_address, Option::Some(mocked));
+    let round: @TournamentRound = _test_shuffle_survivors(wrapped, [5, 10, 15, 20, 25].span());
+    assert_eq!((*round.bracket).get_opponent_entry_number(0), 0);
+    assert_eq!((*round.bracket).get_opponent_entry_number(5), 20);
+    assert_eq!((*round.bracket).get_opponent_entry_number(10), 25);
+    assert_eq!((*round.bracket).get_opponent_entry_number(25), 10);
+    assert_eq!((*round.bracket).get_opponent_entry_number(15), 0);    
 }

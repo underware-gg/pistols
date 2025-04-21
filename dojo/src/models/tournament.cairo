@@ -161,6 +161,7 @@ pub mod TOURNAMENT_RULES {
 // Traits
 //
 use core::num::traits::Zero;
+use pistols::systems::tokens::tournament_token::tournament_token::{Errors as TournamentErrors};
 use pistols::systems::rng::{RngWrap, Shuffle, ShuffleTrait};
 use pistols::utils::bitwise::{BitwiseU128};
 use pistols::utils::bytemap::{BytemapU256};
@@ -220,6 +221,7 @@ pub impl TournamentRoundImpl of TournamentRoundTrait {
         let mut shuffle: Shuffle = ShuffleTrait::new(wrapped, seed, self.entry_count, Self::SHUFFLE_SALT);
         let mut i: u8 = 0;
         while (i < self.entry_count / 2) {
+            // ps: if odd, last entry will be unpaired (value = 0), leading to a free win
             let entry_a: u8 = shuffle.draw_next();
             let entry_b: u8 = shuffle.draw_next();
             // println!("shuffle({}): {}-{} of {}", i, entry_a, entry_b, self.entry_count);
@@ -230,21 +232,40 @@ pub impl TournamentRoundImpl of TournamentRoundTrait {
             i += 1;
         };
         self.results = BitwiseU128::shr(
-            // even entries: all duelists are playing and losing (0b1100)
-            if (self.entry_count % 2 == 0) {0xcccccccccccccccccccccccccccccccc}
-            // odd entries: last player wins (0b1101) > but need to collect_duel()
-            else {0xdccccccccccccccccccccccccccccccc},
+            if (self.entry_count % 2 == 0)
+                // even entries: all duelists are playing and losing (0b1100)
+                {0xcccccccccccccccccccccccccccccccc}
+                // odd entries: last player wins (0b1101) > but need to collect_duel()
+                else {0xdccccccccccccccccccccccccccccccc},
             ((Self::MAX_ENTRIES - self.entry_count) * 4).into()
         );
     }
     fn shuffle_survivors(ref self: TournamentRound, wrapped: @RngWrap, seed: felt252, survivors: Span<u8>) {
-        panic!("shuffle_survivors() not implemented");
+        assert(self.entry_count.into() == survivors.len(), TournamentErrors::IMPOSSIBLE_ERROR);
+        let mut shuffle: Shuffle = ShuffleTrait::new(wrapped, seed, self.entry_count, Self::SHUFFLE_SALT);
+        let mut i: u8 = 0;
+        while (i < self.entry_count / 2) {
+            let entry_a: u8 = *survivors[shuffle.draw_next().into() - 1];
+            let entry_b: u8 = *survivors[shuffle.draw_next().into() - 1];
+            // println!("shuffle({}): {}-{} of {}", i, entry_a, entry_b, self.entry_count);
+            let index_a: usize = entry_a.into() - 1;
+            let index_b: usize = entry_b.into() - 1;
+            self.bracket = BytemapU256::set_byte(self.bracket, index_a, entry_b.into());
+            self.bracket = BytemapU256::set_byte(self.bracket, index_b, entry_a.into());
+            self.moved_second(entry_a, entry_b); // both need to play
+            i += 1;
+        };
+        if (self.entry_count % 2 == 1) {
+            let entry_last: u8 = *survivors[shuffle.draw_next().into() - 1];
+            // odd entries: last player wins (0b1101) > but need to collect_duel()
+            self.moved_first(entry_last, 0); // winning
+        }
     }
 
     //------------------------------------
     // duelling
     //
-    fn moved_first(ref self: TournamentRound, entry_number: u8, opponent_entry_number: u8) {
+    fn moved_first(ref self: TournamentRound, entry_number: u8, _opponent_entry_number: u8) {
         self.results._set_nibble(entry_number, 0b1101);              // player who moved is winning
         // self.results._set_nibble(opponent_entry_number, 0b1100);  // already unset (original state)
     }
