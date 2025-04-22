@@ -35,9 +35,9 @@ use tournaments::components::models::game::{TokenMetadata};
 // Setup
 //
 
-const ENTRY_ID_0: u64 = 0;
-const ENTRY_ID_1: u64 = 1;
-const ENTRY_ID_2: u64 = 2;
+const PASS_ID_0: u64 = 0;
+const PASS_ID_1: u64 = 1;
+const PASS_ID_2: u64 = 2;
 
 const PLAYER_NAME: felt252 = 'Player';
 
@@ -109,9 +109,9 @@ fn test_initializer() {
 
     // budokan creator token
     assert_eq!(sys.tournaments.total_supply(), 1, "total_supply");
-    assert_eq!(sys.tournaments.owner_of(ENTRY_ID_0.into()), sys.tournaments.contract_address, "owner_of(0)");
-    assert!(sys.tournaments.is_owner_of(sys.tournaments.contract_address, ENTRY_ID_0.into()), "is_owner_of(0)");
-    let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(ENTRY_ID_0);
+    assert_eq!(sys.tournaments.owner_of(PASS_ID_0.into()), sys.tournaments.contract_address, "owner_of(0)");
+    assert!(sys.tournaments.is_owner_of(sys.tournaments.contract_address, PASS_ID_0.into()), "is_owner_of(0)");
+    let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(PASS_ID_0);
     assert_eq!(token_metadata.player_name, 'Creator', "token_metadata.player_name");
     assert_eq!(token_metadata.minted_by, sys.tournaments.contract_address, "token_metadata.minted_by");
 }
@@ -151,9 +151,9 @@ fn test_token_uri_invalid() {
 fn test_mint() {
     let mut sys: TestSystems = setup();
     let token_id: u64 = _mint(@sys, OWNER());
-    assert_eq!(token_id, ENTRY_ID_1, "token_id");
-    assert_eq!(sys.tournaments.owner_of(ENTRY_ID_1.into()), OWNER(), "owner_of(1)");
-    assert!(sys.tournaments.is_owner_of(OWNER(), ENTRY_ID_1.into()), "is_owner_of(1)");
+    assert_eq!(token_id, PASS_ID_1, "token_id");
+    assert_eq!(sys.tournaments.owner_of(PASS_ID_1.into()), OWNER(), "owner_of(1)");
+    assert!(sys.tournaments.is_owner_of(OWNER(), PASS_ID_1.into()), "is_owner_of(1)");
     assert_eq!(sys.tournaments.total_supply(), 2, "total_supply");
     // check budokan components created
     let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(token_id);

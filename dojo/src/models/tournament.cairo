@@ -5,9 +5,9 @@ use pistols::types::timestamp::{Period};
 //
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
-pub struct TournamentEntry {
+pub struct TournamentPass {
     #[key]
-    pub entry_id: u64,              // token id
+    pub pass_id: u64,               // token id
     //------
     pub tournament_id: u64,         // budokan tournament_id
     pub entry_number: u8,           // entry number in the tournament

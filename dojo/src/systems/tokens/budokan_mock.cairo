@@ -6,15 +6,15 @@ use tournaments::components::models::tournament::{Registration};
 
 pub mod PLAYERS {
     pub struct TestPlayer {
-        pub entry_id: u64,
+        pub pass_id: u64,
         pub entry_number: u8,
         pub address: starknet::ContractAddress,
         pub duelist_id: u128,
     }
     #[generate_trait]
     impl TestPlayerImpl of TestPlayerTrait {
-        fn new(entry_id: u64, entry_number: u8, address: starknet::ContractAddress, duelist_id: u128) -> TestPlayer {(TestPlayer {
-            entry_id,
+        fn new(pass_id: u64, entry_number: u8, address: starknet::ContractAddress, duelist_id: u128) -> TestPlayer {(TestPlayer {
+            pass_id,
             entry_number,
             address,
             duelist_id,
@@ -88,39 +88,39 @@ pub mod PLAYERS {
         else if (duelist_id == P32().duelist_id) {(P32())}
         else {(PZERO())}
     }
-    pub fn from_entry_id(entry_id: u64) -> TestPlayer {
-        if (entry_id == P1().entry_id) {(P1())}
-        else if (entry_id == P2().entry_id) {(P2())}
-        else if (entry_id == P3().entry_id) {(P3())}
-        else if (entry_id == P4().entry_id) {(P4())}
-        else if (entry_id == P5().entry_id) {(P5())}
-        else if (entry_id == P6().entry_id) {(P6())}
-        else if (entry_id == P7().entry_id) {(P7())}
-        else if (entry_id == P8().entry_id) {(P8())}
-        else if (entry_id == P9().entry_id) {(P9())}
-        else if (entry_id == P10().entry_id) {(P10())}
-        else if (entry_id == P11().entry_id) {(P11())}
-        else if (entry_id == P12().entry_id) {(P12())}
-        else if (entry_id == P13().entry_id) {(P13())}
-        else if (entry_id == P14().entry_id) {(P14())}
-        else if (entry_id == P15().entry_id) {(P15())}
-        else if (entry_id == P16().entry_id) {(P16())}
-        else if (entry_id == P17().entry_id) {(P17())}
-        else if (entry_id == P18().entry_id) {(P18())}
-        else if (entry_id == P19().entry_id) {(P19())}
-        else if (entry_id == P20().entry_id) {(P20())}
-        else if (entry_id == P21().entry_id) {(P21())}
-        else if (entry_id == P22().entry_id) {(P22())}
-        else if (entry_id == P23().entry_id) {(P23())}
-        else if (entry_id == P24().entry_id) {(P24())}
-        else if (entry_id == P25().entry_id) {(P25())}
-        else if (entry_id == P26().entry_id) {(P26())}
-        else if (entry_id == P27().entry_id) {(P27())}
-        else if (entry_id == P28().entry_id) {(P28())}
-        else if (entry_id == P29().entry_id) {(P29())}
-        else if (entry_id == P30().entry_id) {(P30())}
-        else if (entry_id == P31().entry_id) {(P31())}
-        else if (entry_id == P32().entry_id) {(P32())}
+    pub fn from_pass_id(pass_id: u64) -> TestPlayer {
+        if (pass_id == P1().pass_id) {(P1())}
+        else if (pass_id == P2().pass_id) {(P2())}
+        else if (pass_id == P3().pass_id) {(P3())}
+        else if (pass_id == P4().pass_id) {(P4())}
+        else if (pass_id == P5().pass_id) {(P5())}
+        else if (pass_id == P6().pass_id) {(P6())}
+        else if (pass_id == P7().pass_id) {(P7())}
+        else if (pass_id == P8().pass_id) {(P8())}
+        else if (pass_id == P9().pass_id) {(P9())}
+        else if (pass_id == P10().pass_id) {(P10())}
+        else if (pass_id == P11().pass_id) {(P11())}
+        else if (pass_id == P12().pass_id) {(P12())}
+        else if (pass_id == P13().pass_id) {(P13())}
+        else if (pass_id == P14().pass_id) {(P14())}
+        else if (pass_id == P15().pass_id) {(P15())}
+        else if (pass_id == P16().pass_id) {(P16())}
+        else if (pass_id == P17().pass_id) {(P17())}
+        else if (pass_id == P18().pass_id) {(P18())}
+        else if (pass_id == P19().pass_id) {(P19())}
+        else if (pass_id == P20().pass_id) {(P20())}
+        else if (pass_id == P21().pass_id) {(P21())}
+        else if (pass_id == P22().pass_id) {(P22())}
+        else if (pass_id == P23().pass_id) {(P23())}
+        else if (pass_id == P24().pass_id) {(P24())}
+        else if (pass_id == P25().pass_id) {(P25())}
+        else if (pass_id == P26().pass_id) {(P26())}
+        else if (pass_id == P27().pass_id) {(P27())}
+        else if (pass_id == P28().pass_id) {(P28())}
+        else if (pass_id == P29().pass_id) {(P29())}
+        else if (pass_id == P30().pass_id) {(P30())}
+        else if (pass_id == P31().pass_id) {(P31())}
+        else if (pass_id == P32().pass_id) {(P32())}
         else {(PZERO())}
     }
 }
@@ -198,7 +198,7 @@ pub mod budokan_mock {
             // stored tournament
             let mut tournament_id: u64 = self.get_tournament_id();
             // entry number
-            let entry_number: u32 = PLAYERS::from_entry_id(token_id).entry_number.into();
+            let entry_number: u32 = PLAYERS::from_pass_id(token_id).entry_number.into();
 // println!("___get_registration({}): t[{}], e[{}]", token_id, tournament_id, entry_number);
             (Registration {
                 game_address,

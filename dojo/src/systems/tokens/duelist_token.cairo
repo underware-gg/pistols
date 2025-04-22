@@ -651,7 +651,7 @@ pub mod duelist_token {
                 .add("fame", ETH(fame_balance.into()).low.to_string(), false)
                 .add("lives", lives.to_string(), false)
                 .add("duel_id", format!("0x{:x}", assignment.duel_id), false)
-                .add("entry_id", format!("0x{:x}", assignment.entry_id), false)
+                .add("pass_id", format!("0x{:x}", assignment.pass_id), false)
                 .add("tokenbound_address", format!("0x{:x}", tokenbound_address), false)
                 // .add("is_memorized", is_memorized.to_string(), false)
                 .build();

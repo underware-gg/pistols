@@ -252,8 +252,8 @@ pub impl DnsImpl of DnsTrait {
         (IVrfProviderDispatcher{ contract_address: self.get_config_vrf_address() })
     }
     #[inline(always)]
-    fn budokan_dispatcher_from_entry_id(self: @Store, entry_id: u64) -> ITournamentDispatcher {
-        (ITournamentDispatcher{ contract_address: self.get_tournament_entry_minter_address(entry_id) })
+    fn budokan_dispatcher_from_pass_id(self: @Store, pass_id: u64) -> ITournamentDispatcher {
+        (ITournamentDispatcher{ contract_address: self.get_tournament_pass_minter_address(pass_id) })
     }
 
 

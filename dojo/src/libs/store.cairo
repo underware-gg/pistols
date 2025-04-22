@@ -43,7 +43,7 @@ pub use pistols::models::{
         Rules,
     },
     tournament::{
-        TournamentEntry, TournamentEntryValue,
+        TournamentPass, TournamentPassValue,
         TournamentSettings, TournamentSettingsValue,
         TournamentType, TournamentTypeTrait, TournamentRules,
         Tournament, TournamentValue,
@@ -219,12 +219,12 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_tournament_entry(self: @Store, entry_id: u64) -> TournamentEntry {
-        (self.world.read_model(entry_id))
+    fn get_tournament_pass(self: @Store, pass_id: u64) -> TournamentPass {
+        (self.world.read_model(pass_id))
     }
     #[inline(always)]
-    fn get_tournament_entry_value(self: @Store, entry_id: u64) -> TournamentEntryValue {
-        (self.world.read_value(entry_id))
+    fn get_tournament_pass_value(self: @Store, pass_id: u64) -> TournamentPassValue {
+        (self.world.read_value(pass_id))
     }
 
     #[inline(always)]
@@ -265,12 +265,12 @@ pub impl StoreImpl of StoreTrait {
     
 
     #[inline(always)]
-    fn get_budokan_token_metadata(self: @Store, entry_id: u64) -> TokenMetadata {
-        (self.world.read_model(entry_id))
+    fn get_budokan_token_metadata(self: @Store, pass_id: u64) -> TokenMetadata {
+        (self.world.read_model(pass_id))
     }
     #[inline(always)]
-    fn get_budokan_token_metadata_value(self: @Store, entry_id: u64) -> TokenMetadataValue {
-        (self.world.read_value(entry_id))
+    fn get_budokan_token_metadata_value(self: @Store, pass_id: u64) -> TokenMetadataValue {
+        (self.world.read_value(pass_id))
     }
 
     //----------------------------------
@@ -362,7 +362,7 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn set_tournament_entry(ref self: Store, model: @TournamentEntry) {
+    fn set_tournament_pass(ref self: Store, model: @TournamentPass) {
         self.world.write_model(model);
     }
     
@@ -428,8 +428,8 @@ pub impl StoreImpl of StoreTrait {
         (tournament_type.rules())
     }
     #[inline(always)]
-    fn get_tournament_entry_minter_address(self: @Store, entry_id: u64) -> ContractAddress {
-        (self.world.read_member(Model::<TokenMetadata>::ptr_from_keys(entry_id), selector!("minted_by")))
+    fn get_tournament_pass_minter_address(self: @Store, pass_id: u64) -> ContractAddress {
+        (self.world.read_member(Model::<TokenMetadata>::ptr_from_keys(pass_id), selector!("minted_by")))
     }
     #[inline(always)]
     fn get_tournament_duel_id(self: @Store, keys: @TournamentDuelKeys) -> u128 {

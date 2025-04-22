@@ -252,7 +252,7 @@ pub mod tester {
             TestResource::Model(pistols::models::season::m_SeasonConfig::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::leaderboard::m_Leaderboard::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pool::m_Pool::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::tournament::m_TournamentEntry::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::tournament::m_TournamentPass::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_TournamentSettings::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_Tournament::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_TournamentRound::TEST_CLASS_HASH),
@@ -657,34 +657,34 @@ pub mod tester {
 
     // ::tournament_token
     pub fn execute_start_tournament(sys: @TestSystems, sender: ContractAddress,
-        entry_id: u64,
+        pass_id: u64,
     ) -> u64 {
         impersonate(sender);
-        let tournament_id: u64 = (*sys.tournaments).start_tournament(entry_id);
+        let tournament_id: u64 = (*sys.tournaments).start_tournament(pass_id);
         _next_block();
         (tournament_id)
     }
     pub fn execute_enlist_duelist(sys: @TestSystems, sender: ContractAddress,
-        entry_id: u64,
+        pass_id: u64,
         duelist_id: u128,
     ) {
         impersonate(sender);
-        (*sys.tournaments).enlist_duelist(entry_id, duelist_id);
+        (*sys.tournaments).enlist_duelist(pass_id, duelist_id);
         _next_block();
     }
     pub fn execute_join_duel(sys: @TestSystems, sender: ContractAddress,
-        entry_id: u64,
+        pass_id: u64,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*sys.tournaments).join_duel(entry_id);
+        let duel_id: u128 = (*sys.tournaments).join_duel(pass_id);
         _next_block();
         (duel_id)
     }
     pub fn execute_end_round(sys: @TestSystems, sender: ContractAddress,
-        entry_id: u64,
+        pass_id: u64,
     ) -> Option<u8> {
         impersonate(sender);
-        let next_round_option: Option<u8> = (*sys.tournaments).end_round(entry_id);
+        let next_round_option: Option<u8> = (*sys.tournaments).end_round(pass_id);
         _next_block();
         (next_round_option)
     }

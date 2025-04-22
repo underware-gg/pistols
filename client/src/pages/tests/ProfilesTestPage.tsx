@@ -108,7 +108,7 @@ function Profiles({
         lives,
         is_memorized: false,
         duel_id: (is_dueling) ? Math.floor(Math.random() * 1000) : 0,
-        entry_id: (is_dueling) ? (Math.random() > 0.5 ? 100 : 0) : 0,
+        pass_id: (is_dueling) ? (Math.random() > 0.5 ? 100 : 0) : 0,
       };
       return { profile, prop }
     })

@@ -13,7 +13,7 @@ use pistols::systems::tokens::{
 use pistols::models::{
     challenge::{Challenge, DuelType},
     tournament::{
-        TournamentEntry,
+        TournamentPass,
         Tournament, TournamentType, TournamentTypeTrait, TournamentRules,
         TournamentState,
         TournamentRound, TournamentRoundValue,
@@ -58,11 +58,11 @@ use tournaments::components::{
 // Setup
 //
 
-pub const ENTRY_ID_0: u64 = 0;  // creator
-pub const ENTRY_ID_1: u64 = 1;
-pub const ENTRY_ID_2: u64 = 2;
-pub const ENTRY_ID_3: u64 = 3;
-pub const ENTRY_ID_4: u64 = 4;
+pub const PASS_ID_0: u64 = 0;  // creator
+pub const PASS_ID_1: u64 = 1;
+pub const PASS_ID_2: u64 = 2;
+pub const PASS_ID_3: u64 = 3;
+pub const PASS_ID_4: u64 = 4;
 
 pub const PLAYER_NAME: felt252 = 'Player';
 pub const TIMESTAMP_START: u64 = (tester::INITIAL_TIMESTAMP + TIMESTAMP::ONE_DAY);
@@ -128,9 +128,9 @@ pub fn _protected_duel(sys: @TestSystems) -> IDuelTokenProtectedDispatcher {
 #[test]
 fn test_lifecycle() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    _mint(ref sys, OWNER()); // ENTRY_ID_1
+    _mint(ref sys, OWNER()); // PASS_ID_1
     // mint phase
-    let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(ENTRY_ID_1);
+    let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(PASS_ID_1);
     assert!(token_metadata.lifecycle.mint > 0);
     assert!(token_metadata.lifecycle.start.is_some());
     assert!(token_metadata.lifecycle.end.is_some());
@@ -152,11 +152,11 @@ fn test_lifecycle() {
 #[test]
 fn test_mock_budokan() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    _mint(ref sys, OWNER()); // ENTRY_ID_1
+    _mint(ref sys, OWNER()); // PASS_ID_1
     // time travel
     tester::set_block_timestamp(TIMESTAMP_START);
     sys.budokan.set_tournament_id(TOURNAMENT_OF_5);
-    let tournament_id: u64 = tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    let tournament_id: u64 = tester::execute_start_tournament(@sys, OWNER(), PASS_ID_1);
     assert_eq!(tournament_id, TOURNAMENT_OF_5, "TOURNAMENT_OF_5");
     assert_eq!(sys.budokan.tournament_entries(tournament_id), 5, "tournament_entries()");
 }
@@ -164,14 +164,14 @@ fn test_mock_budokan() {
 #[test] 
 fn test_start_tournament_ok() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    let entry_id_1: u64 = _mint(ref sys, OWNER()); // ENTRY_ID_1
-    assert_eq!(entry_id_1, ENTRY_ID_1, "entry_id_1");
-    assert_eq!(entry_id_1, PLAYERS::P1().entry_id, "PLAYERS::P1().entry_id");
-    assert!(!sys.tournaments.can_start_tournament(entry_id_1), "can_start_tournament() false");
+    let pass_id_1: u64 = _mint(ref sys, OWNER()); // PASS_ID_1
+    assert_eq!(pass_id_1, PASS_ID_1, "pass_id_1");
+    assert_eq!(pass_id_1, PLAYERS::P1().pass_id, "PLAYERS::P1().pass_id");
+    assert!(!sys.tournaments.can_start_tournament(pass_id_1), "can_start_tournament() false");
     // time travel
     tester::set_block_timestamp(TIMESTAMP_START);
-    assert!(sys.tournaments.can_start_tournament(entry_id_1), "can_start_tournament() true");
-    let tournament_id: u64 = tester::execute_start_tournament(@sys, OWNER(), entry_id_1);
+    assert!(sys.tournaments.can_start_tournament(pass_id_1), "can_start_tournament() true");
+    let tournament_id: u64 = tester::execute_start_tournament(@sys, OWNER(), pass_id_1);
     assert!(tournament_id > 0, "tournament_id");
     assert_eq!(tournament_id, TOURNAMENT_OF_2, "TOURNAMENT_OF_2"); // default tournament (2 entries)
     assert_eq!(sys.budokan.tournament_entries(tournament_id), 2, "tournament_entries()");
@@ -182,47 +182,47 @@ fn test_start_tournament_ok() {
     assert_ne!(round.bracket, 0);
     assert_ne!(round.results, 0);
     // end state
-    assert!(!sys.tournaments.can_start_tournament(entry_id_1), "can_start_tournament() started");
-    assert_eq!(sys.tournaments.get_tournament_id(entry_id_1), tournament_id, "get_tournament_id()");
+    assert!(!sys.tournaments.can_start_tournament(pass_id_1), "can_start_tournament() started");
+    assert_eq!(sys.tournaments.get_tournament_id(pass_id_1), tournament_id, "get_tournament_id()");
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Invalid entry', 'ENTRYPOINT_FAILED'))]
 fn test_start_tournament_invalid_entry() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    assert!(!sys.tournaments.can_start_tournament(ENTRY_ID_1), "can_start_tournament()");
-    tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    assert!(!sys.tournaments.can_start_tournament(PASS_ID_1), "can_start_tournament()");
+    tester::execute_start_tournament(@sys, OWNER(), PASS_ID_1);
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Not your entry', 'ENTRYPOINT_FAILED'))]
 fn test_start_tournament_not_owner() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    _mint(ref sys, OWNER()); // ENTRY_ID_1
+    _mint(ref sys, OWNER()); // PASS_ID_1
     tester::set_block_timestamp(TIMESTAMP_START);
     tester::impersonate(OTHER());
-    assert!(!sys.tournaments.can_start_tournament(ENTRY_ID_1), "can_start_tournament()");
-    tester::execute_start_tournament(@sys, OTHER(), ENTRY_ID_1);
+    assert!(!sys.tournaments.can_start_tournament(PASS_ID_1), "can_start_tournament()");
+    tester::execute_start_tournament(@sys, OTHER(), PASS_ID_1);
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Not startable', 'ENTRYPOINT_FAILED'))]
 fn test_start_tournament_not_startable() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    _mint(ref sys, OWNER()); // ENTRY_ID_1
-    assert!(!sys.tournaments.can_start_tournament(ENTRY_ID_1), "can_start_tournament()");
-    tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    _mint(ref sys, OWNER()); // PASS_ID_1
+    assert!(!sys.tournaments.can_start_tournament(PASS_ID_1), "can_start_tournament()");
+    tester::execute_start_tournament(@sys, OWNER(), PASS_ID_1);
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Already started', 'ENTRYPOINT_FAILED'))]
 fn test_start_tournament_already_started() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    _mint(ref sys, OWNER()); // ENTRY_ID_1
+    _mint(ref sys, OWNER()); // PASS_ID_1
     tester::set_block_timestamp(TIMESTAMP_START);
-    tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
-    assert!(!sys.tournaments.can_start_tournament(ENTRY_ID_1), "can_start_tournament()");
-    tester::execute_start_tournament(@sys, OWNER(), ENTRY_ID_1);
+    tester::execute_start_tournament(@sys, OWNER(), PASS_ID_1);
+    assert!(!sys.tournaments.can_start_tournament(PASS_ID_1), "can_start_tournament()");
+    tester::execute_start_tournament(@sys, OWNER(), PASS_ID_1);
 }
 
 
@@ -233,40 +233,40 @@ fn test_start_tournament_already_started() {
 #[test]
 fn test_enlist_duelist() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    let entry_id_1: u64 = _mint(ref sys, OWNER());
-    assert!(sys.tournaments.can_enlist_duelist(entry_id_1, ID(OWNER())));
-    tester::execute_enlist_duelist(@sys, OWNER(), entry_id_1, ID(OWNER()));
+    let pass_id_1: u64 = _mint(ref sys, OWNER());
+    assert!(sys.tournaments.can_enlist_duelist(pass_id_1, ID(OWNER())));
+    tester::execute_enlist_duelist(@sys, OWNER(), pass_id_1, ID(OWNER()));
     // another...
-    let entry_id_2: u64 = _mint(ref sys, OTHER());
-    assert!(sys.tournaments.can_enlist_duelist(entry_id_2, ID(OTHER())));
-    sys.tournaments.enlist_duelist(entry_id_2, ID(OTHER()));
+    let pass_id_2: u64 = _mint(ref sys, OTHER());
+    assert!(sys.tournaments.can_enlist_duelist(pass_id_2, ID(OTHER())));
+    sys.tournaments.enlist_duelist(pass_id_2, ID(OTHER()));
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Not your entry', 'ENTRYPOINT_FAILED'))]
 fn test_enlist_duelist_not_your_entry() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    let entry_id_1: u64 = _mint(ref sys, OWNER());
-    assert!(!sys.tournaments.can_enlist_duelist(entry_id_1 + 1, ID(OWNER())));
-    sys.tournaments.enlist_duelist(entry_id_1 + 1, ID(OWNER()));
+    let pass_id_1: u64 = _mint(ref sys, OWNER());
+    assert!(!sys.tournaments.can_enlist_duelist(pass_id_1 + 1, ID(OWNER())));
+    sys.tournaments.enlist_duelist(pass_id_1 + 1, ID(OWNER()));
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Invalid duelist', 'ENTRYPOINT_FAILED'))]
 fn test_enlist_duelist_invalid_duelist() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    let entry_id_1: u64 = _mint(ref sys, OWNER());
-    assert!(!sys.tournaments.can_enlist_duelist(entry_id_1, ID(OTHER())));
-    sys.tournaments.enlist_duelist(entry_id_1, 0);
+    let pass_id_1: u64 = _mint(ref sys, OWNER());
+    assert!(!sys.tournaments.can_enlist_duelist(pass_id_1, ID(OTHER())));
+    sys.tournaments.enlist_duelist(pass_id_1, 0);
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Not your duelist', 'ENTRYPOINT_FAILED'))]
 fn test_enlist_duelist_not_your_duelist() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    let entry_id_1: u64 = _mint(ref sys, OWNER());
-    assert!(!sys.tournaments.can_enlist_duelist(entry_id_1, ID(OTHER())));
-    sys.tournaments.enlist_duelist(entry_id_1, ID(OTHER()));
+    let pass_id_1: u64 = _mint(ref sys, OWNER());
+    assert!(!sys.tournaments.can_enlist_duelist(pass_id_1, ID(OTHER())));
+    sys.tournaments.enlist_duelist(pass_id_1, ID(OTHER()));
 }
 
 #[test]
@@ -274,20 +274,20 @@ fn test_enlist_duelist_not_your_duelist() {
 fn test_enlist_duelist_insufficient_lives() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT | FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
     _duel_until_death(@sys, 2, 1, 1);
-    let entry_id_1: u64 = _mint(ref sys, OWNER());
-    assert!(!sys.tournaments.can_enlist_duelist(entry_id_1, ID(OWNER())));
-    sys.tournaments.enlist_duelist(entry_id_1, ID(OWNER()));
+    let pass_id_1: u64 = _mint(ref sys, OWNER());
+    assert!(!sys.tournaments.can_enlist_duelist(pass_id_1, ID(OWNER())));
+    sys.tournaments.enlist_duelist(pass_id_1, ID(OWNER()));
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Already enlisted', 'ENTRYPOINT_FAILED'))]
 fn test_enlist_duelist_already_enlisted() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    let entry_id_1: u64 = _mint(ref sys, OWNER());
-    assert!(sys.tournaments.can_enlist_duelist(entry_id_1, ID(OWNER())));
-    sys.tournaments.enlist_duelist(entry_id_1, ID(OWNER()));
-    assert!(!sys.tournaments.can_enlist_duelist(entry_id_1, ID(OWNER())));
-    sys.tournaments.enlist_duelist(entry_id_1, ID(OWNER()));
+    let pass_id_1: u64 = _mint(ref sys, OWNER());
+    assert!(sys.tournaments.can_enlist_duelist(pass_id_1, ID(OWNER())));
+    sys.tournaments.enlist_duelist(pass_id_1, ID(OWNER()));
+    assert!(!sys.tournaments.can_enlist_duelist(pass_id_1, ID(OWNER())));
+    sys.tournaments.enlist_duelist(pass_id_1, ID(OWNER()));
 }
 
 
@@ -306,35 +306,35 @@ fn test_join_duel_ok() {
     sys.budokan.set_tournament_id(TOURNAMENT_OF_2);
     //
     // mint+enlist 1
-    let entry_id_1: u64 = _mint(ref sys, P1);
-    assert_eq!(entry_id_1, ENTRY_ID_1, "entry_id_1");
-    assert_eq!(entry_id_1, PLAYERS::P1().entry_id, "PLAYERS::P1().entry_id");
-    tester::execute_enlist_duelist(@sys, P1, entry_id_1, ID_P1);
-    let entry_1: TournamentEntry = sys.store.get_tournament_entry(entry_id_1);
+    let pass_id_1: u64 = _mint(ref sys, P1);
+    assert_eq!(pass_id_1, PASS_ID_1, "pass_id_1");
+    assert_eq!(pass_id_1, PLAYERS::P1().pass_id, "PLAYERS::P1().pass_id");
+    tester::execute_enlist_duelist(@sys, P1, pass_id_1, ID_P1);
+    let entry_1: TournamentPass = sys.store.get_tournament_pass(pass_id_1);
     assert_eq!(entry_1.duelist_id, ID_P1, "__entry_1.duelist_id");
     assert_eq!(entry_1.current_round_number, 0, "__entry_1.current_round_number");
     //
     // mint+enlist 2
-    let entry_id_2: u64 = _mint(ref sys, P2);
-    assert_eq!(entry_id_2, ENTRY_ID_2, "entry_id_2");
-    assert_eq!(entry_id_2, PLAYERS::P2().entry_id, "PLAYERS::P2().entry_id");
-    tester::execute_enlist_duelist(@sys, P2, entry_id_2, ID_P2);
-    let entry_2: TournamentEntry = sys.store.get_tournament_entry(entry_id_2);
+    let pass_id_2: u64 = _mint(ref sys, P2);
+    assert_eq!(pass_id_2, PASS_ID_2, "pass_id_2");
+    assert_eq!(pass_id_2, PLAYERS::P2().pass_id, "PLAYERS::P2().pass_id");
+    tester::execute_enlist_duelist(@sys, P2, pass_id_2, ID_P2);
+    let entry_2: TournamentPass = sys.store.get_tournament_pass(pass_id_2);
     assert_eq!(entry_2.duelist_id, ID_P2, "__entry_2.duelist_id");
     assert_eq!(entry_2.current_round_number, 0, "__entry_2.current_round_number");
     //
     // start tournament
     //
     tester::set_block_timestamp(TIMESTAMP_START);
-    let tournament_id: u64 = tester::execute_start_tournament(@sys, P1, entry_id_1);
+    let tournament_id: u64 = tester::execute_start_tournament(@sys, P1, pass_id_1);
     //
     // join P1...
     tester::impersonate(P1); // needed for assertion
-    assert!(sys.tournaments.can_join_duel(entry_id_1));
-    let duel_id_p1: u128 = tester::execute_join_duel(@sys, P1, entry_id_1);
+    assert!(sys.tournaments.can_join_duel(pass_id_1));
+    let duel_id_p1: u128 = tester::execute_join_duel(@sys, P1, pass_id_1);
     assert_gt!(duel_id_p1, 0, "duel_id_p1");
-    assert!(!sys.tournaments.can_join_duel(entry_id_1), "already_joined_a");
-    let entry_1: TournamentEntry = sys.store.get_tournament_entry(entry_id_1);
+    assert!(!sys.tournaments.can_join_duel(pass_id_1), "already_joined_a");
+    let entry_1: TournamentPass = sys.store.get_tournament_pass(pass_id_1);
     assert_eq!(entry_1.tournament_id, tournament_id, "entry_1.tournament_id");
     assert_eq!(entry_1.entry_number, 1, "entry_1.entry_number");
     assert_eq!(entry_1.current_round_number, 1, "entry_1.current_round_number");
@@ -348,11 +348,11 @@ fn test_join_duel_ok() {
     //
     // join P2... ()
     tester::impersonate(P2); // needed for assertion
-    assert!(sys.tournaments.can_join_duel(entry_id_2));
-    let duel_id_p2: u128 = tester::execute_join_duel(@sys, P2, entry_id_2);
+    assert!(sys.tournaments.can_join_duel(pass_id_2));
+    let duel_id_p2: u128 = tester::execute_join_duel(@sys, P2, pass_id_2);
     assert_gt!(duel_id_p2, 0, "duel_id_p2");
-    assert!(!sys.tournaments.can_join_duel(entry_id_2), "already_joined_b");
-    let entry_2: TournamentEntry = sys.store.get_tournament_entry(entry_id_2);
+    assert!(!sys.tournaments.can_join_duel(pass_id_2), "already_joined_b");
+    let entry_2: TournamentPass = sys.store.get_tournament_pass(pass_id_2);
     assert_eq!(entry_2.tournament_id, tournament_id, "entry_2.tournament_id");
     assert_eq!(entry_2.entry_number, 2, "entry_2.entry_number");
     assert_eq!(entry_2.current_round_number, 1, "entry_2.current_round_number");
@@ -395,24 +395,24 @@ fn test_join_duel_ok_single() {
     sys.budokan.set_tournament_id(TOURNAMENT_OF_1);
     //
     // mint+enlist 1
-    let entry_id_1: u64 = _mint(ref sys, P1);
-    tester::execute_enlist_duelist(@sys, P1, entry_id_1, ID_P1);
-    let entry_1: TournamentEntry = sys.store.get_tournament_entry(entry_id_1);
+    let pass_id_1: u64 = _mint(ref sys, P1);
+    tester::execute_enlist_duelist(@sys, P1, pass_id_1, ID_P1);
+    let entry_1: TournamentPass = sys.store.get_tournament_pass(pass_id_1);
     assert_eq!(entry_1.duelist_id, ID_P1, "__entry_1.duelist_id");
     assert_eq!(entry_1.current_round_number, 0, "__entry_1.current_round_number");
     //
     // start tournament
     //
     tester::set_block_timestamp(TIMESTAMP_START);
-    let tournament_id: u64 = tester::execute_start_tournament(@sys, P1, entry_id_1);
+    let tournament_id: u64 = tester::execute_start_tournament(@sys, P1, pass_id_1);
     //
     // join P1...
     tester::impersonate(P1); // needed for assertion
-    assert!(sys.tournaments.can_join_duel(entry_id_1));
-    let duel_id_p1: u128 = tester::execute_join_duel(@sys, P1, entry_id_1);
+    assert!(sys.tournaments.can_join_duel(pass_id_1));
+    let duel_id_p1: u128 = tester::execute_join_duel(@sys, P1, pass_id_1);
     assert_gt!(duel_id_p1, 0, "duel_id_p1");
-    assert!(!sys.tournaments.can_join_duel(entry_id_1), "already_joined_b");
-    let entry_1: TournamentEntry = sys.store.get_tournament_entry(entry_id_1);
+    assert!(!sys.tournaments.can_join_duel(pass_id_1), "already_joined_b");
+    let entry_1: TournamentPass = sys.store.get_tournament_pass(pass_id_1);
     assert_eq!(entry_1.tournament_id, tournament_id, "entry_1.tournament_id");
     assert_eq!(entry_1.entry_number, 1, "entry_1.entry_number");
     assert_eq!(entry_1.current_round_number, 1, "entry_1.current_round_number");
@@ -455,19 +455,19 @@ fn test_join_duel_already_joined_a() {
     let ID_P1: u128 = PLAYERS::P1().duelist_id;
     let ID_P2: u128 = PLAYERS::P2().duelist_id;
     // mint+enlist 1
-    let entry_id_1: u64 = _mint(ref sys, P1);
-    tester::execute_enlist_duelist(@sys, P1, entry_id_1, ID_P1);
+    let pass_id_1: u64 = _mint(ref sys, P1);
+    tester::execute_enlist_duelist(@sys, P1, pass_id_1, ID_P1);
     // mint+enlist 2
-    let entry_id_2: u64 = _mint(ref sys, P2);
-    tester::execute_enlist_duelist(@sys, P2, entry_id_2, ID_P2);
+    let pass_id_2: u64 = _mint(ref sys, P2);
+    tester::execute_enlist_duelist(@sys, P2, pass_id_2, ID_P2);
     // start tournament
     tester::set_block_timestamp(TIMESTAMP_START);
-    tester::execute_start_tournament(@sys, P1, entry_id_1);
+    tester::execute_start_tournament(@sys, P1, pass_id_1);
     //
     // join A twice...
-    tester::execute_join_duel(@sys, P1, entry_id_1);
-    assert!(!sys.tournaments.can_join_duel(entry_id_1));
-    tester::execute_join_duel(@sys, P1, entry_id_1);
+    tester::execute_join_duel(@sys, P1, pass_id_1);
+    assert!(!sys.tournaments.can_join_duel(pass_id_1));
+    tester::execute_join_duel(@sys, P1, pass_id_1);
 }
 
 #[test]
@@ -479,83 +479,83 @@ fn test_join_duel_already_joined_b() {
     let ID_P1: u128 = PLAYERS::P1().duelist_id;
     let ID_P2: u128 = PLAYERS::P2().duelist_id;
     // mint+enlist 1
-    let entry_id_1: u64 = _mint(ref sys, P1);
-    tester::execute_enlist_duelist(@sys, P1, entry_id_1, ID_P1);
+    let pass_id_1: u64 = _mint(ref sys, P1);
+    tester::execute_enlist_duelist(@sys, P1, pass_id_1, ID_P1);
     // mint+enlist 2
-    let entry_id_2: u64 = _mint(ref sys, P2);
-    tester::execute_enlist_duelist(@sys, P2, entry_id_2, ID_P2);
+    let pass_id_2: u64 = _mint(ref sys, P2);
+    tester::execute_enlist_duelist(@sys, P2, pass_id_2, ID_P2);
     // start tournament
     tester::set_block_timestamp(TIMESTAMP_START);
-    tester::execute_start_tournament(@sys, P1, entry_id_1);
+    tester::execute_start_tournament(@sys, P1, pass_id_1);
     //
     // join A
-    tester::execute_join_duel(@sys, P1, entry_id_1);
+    tester::execute_join_duel(@sys, P1, pass_id_1);
     // join B twice...
-    tester::execute_join_duel(@sys, P2, entry_id_2);
-    assert!(!sys.tournaments.can_join_duel(entry_id_2));
-    tester::execute_join_duel(@sys, P2, entry_id_2);
+    tester::execute_join_duel(@sys, P2, pass_id_2);
+    assert!(!sys.tournaments.can_join_duel(pass_id_2));
+    tester::execute_join_duel(@sys, P2, pass_id_2);
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Not your entry', 'ENTRYPOINT_FAILED'))]
 fn test_join_duel_invalid_entry() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    let entry_id_1: u64 = _mint(ref sys, OWNER());
+    let pass_id_1: u64 = _mint(ref sys, OWNER());
     // enlist...
-    tester::execute_enlist_duelist(@sys, OWNER(), entry_id_1, ID(OWNER()));
+    tester::execute_enlist_duelist(@sys, OWNER(), pass_id_1, ID(OWNER()));
     // panic...
-    assert!(!sys.tournaments.can_join_duel(entry_id_1 + 1));
-    tester::execute_join_duel(@sys, OWNER(), entry_id_1 + 1);
+    assert!(!sys.tournaments.can_join_duel(pass_id_1 + 1));
+    tester::execute_join_duel(@sys, OWNER(), pass_id_1 + 1);
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Not your entry', 'ENTRYPOINT_FAILED'))]
 fn test_join_duel_not_your_entry() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    let _entry_id_1: u64 = _mint(ref sys, OWNER());
-    let entry_id_2: u64 = _mint(ref sys, OTHER());
+    let _pass_id_1: u64 = _mint(ref sys, OWNER());
+    let pass_id_2: u64 = _mint(ref sys, OTHER());
     // panic...
-    assert!(!sys.tournaments.can_join_duel(entry_id_2));
-    tester::execute_join_duel(@sys, OWNER(), entry_id_2);
+    assert!(!sys.tournaments.can_join_duel(pass_id_2));
+    tester::execute_join_duel(@sys, OWNER(), pass_id_2);
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Not playable', 'ENTRYPOINT_FAILED'))]
 fn test_join_duel_not_playable() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    let entry_id_1: u64 = _mint(ref sys, OWNER());
+    let pass_id_1: u64 = _mint(ref sys, OWNER());
     // enlist...
-    tester::execute_enlist_duelist(@sys, OWNER(), entry_id_1, ID(OWNER()));
+    tester::execute_enlist_duelist(@sys, OWNER(), pass_id_1, ID(OWNER()));
     // panic...
-    assert!(!sys.tournaments.can_join_duel(entry_id_1));
-    tester::execute_join_duel(@sys, OWNER(), entry_id_1);
+    assert!(!sys.tournaments.can_join_duel(pass_id_1));
+    tester::execute_join_duel(@sys, OWNER(), pass_id_1);
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Not started', 'ENTRYPOINT_FAILED'))]
 fn test_join_duel_not_started() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    let entry_id_1: u64 = _mint(ref sys, OWNER());
+    let pass_id_1: u64 = _mint(ref sys, OWNER());
     // enlist...
-    tester::execute_enlist_duelist(@sys, OWNER(), entry_id_1, ID(OWNER()));
+    tester::execute_enlist_duelist(@sys, OWNER(), pass_id_1, ID(OWNER()));
     // trime traver only...
     tester::set_block_timestamp(TIMESTAMP_START);
     // panic...
-    assert!(!sys.tournaments.can_join_duel(entry_id_1));
-    tester::execute_join_duel(@sys, OWNER(), entry_id_1);
+    assert!(!sys.tournaments.can_join_duel(pass_id_1));
+    tester::execute_join_duel(@sys, OWNER(), pass_id_1);
 }
 
 #[test]
 #[should_panic(expected: ('TOURNAMENT: Not enlisted', 'ENTRYPOINT_FAILED'))]
 fn test_join_duel_not_enlisted() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
-    let entry_id_1: u64 = _mint(ref sys, OWNER());
+    let pass_id_1: u64 = _mint(ref sys, OWNER());
     // start...
     tester::set_block_timestamp(TIMESTAMP_START);
-    tester::execute_start_tournament(@sys, OWNER(), entry_id_1);
+    tester::execute_start_tournament(@sys, OWNER(), pass_id_1);
     // panic...
-    assert!(!sys.tournaments.can_join_duel(entry_id_1));
-    tester::execute_join_duel(@sys, OWNER(), entry_id_1);
+    assert!(!sys.tournaments.can_join_duel(pass_id_1));
+    tester::execute_join_duel(@sys, OWNER(), pass_id_1);
 }
 
 #[test]

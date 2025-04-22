@@ -39,7 +39,7 @@ pub struct DuelistAssignment {
     pub duelist_id: u128,
     //-----------------------
     pub duel_id: u128,      // current Challenge a Duelist is in
-    pub entry_id: u64,      // current Tournament a Duelist is in
+    pub pass_id: u64,       // current Tournament a Duelist is in
 }
 
 // cfrated for dead duelists
@@ -94,16 +94,16 @@ pub impl DuelistImpl of DuelistTrait {
             self.set_duelist_challenge(@assignment);
         }
     }
-    fn enter_tournament(ref self: Store, duelist_id: u128, entry_id: u64) {
+    fn enter_tournament(ref self: Store, duelist_id: u128, pass_id: u64) {
         let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
         assert(assignment.duel_id.is_zero(), TournamentErrors::DUELIST_IN_CHALLENGE);
-        assert(assignment.entry_id.is_zero(), TournamentErrors::DUELIST_IN_TOURNAMENT);
-        assignment.entry_id = entry_id;
+        assert(assignment.pass_id.is_zero(), TournamentErrors::DUELIST_IN_TOURNAMENT);
+        assignment.pass_id = pass_id;
         self.set_duelist_challenge(@assignment);
     }
     fn exit_tournament(ref self: Store, duelist_id: u128) {
         let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
-        assignment.entry_id = 0;
+        assignment.pass_id = 0;
         self.set_duelist_challenge(@assignment);
     }
 }

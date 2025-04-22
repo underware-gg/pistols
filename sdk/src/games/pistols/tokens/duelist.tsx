@@ -33,7 +33,7 @@ export type DuelistSvgProps = {
   lives: number
   is_memorized: boolean
   duel_id: BigNumberish
-  entry_id: BigNumberish
+  pass_id: BigNumberish
   // optional
   is_loading?: boolean
 }

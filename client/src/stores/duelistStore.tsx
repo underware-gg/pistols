@@ -60,7 +60,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   // current duel a duelist is in
   const currentDuelId = useMemo(() => BigInt(duelistChallenge?.duel_id ?? 0), [duelistChallenge])
-  const currentEntryId = useMemo(() => BigInt(duelistChallenge?.entry_id ?? 0), [duelistChallenge])
+  const currentPassId = useMemo(() => BigInt(duelistChallenge?.pass_id ?? 0), [duelistChallenge])
   const isInAction = useMemo(() => (currentDuelId > 0n), [currentDuelId])
 
   // memorial (dead duelists)
@@ -104,7 +104,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     gender,
     isNpc,
     currentDuelId,
-    currentEntryId,
+    currentPassId,
     isInAction,
     isInactive,
     inactiveFameDripped,
