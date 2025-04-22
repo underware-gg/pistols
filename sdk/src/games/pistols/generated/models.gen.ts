@@ -994,8 +994,8 @@ export interface SchemaType extends ISchemaType {
 		MockedValue: MockedValue,
 		MockedValueValue: MockedValueValue,
 		Period: Period,
-	},
-	tournaments: {
+	// },
+	// tournaments: {
 		GameCounter: GameCounter,
 		GameCounterValue: GameCounterValue,
 		GameMetadata: GameMetadata,
@@ -1011,8 +1011,8 @@ export interface SchemaType extends ISchemaType {
 		TokenMetadata: TokenMetadata,
 		TokenMetadataValue: TokenMetadataValue,
 		Lifecycle: Lifecycle,
-	},
-	achievement: {
+	// },
+	// achievement: {
 		TrophyCreation: TrophyCreation,
 		TrophyCreationValue: TrophyCreationValue,
 		TrophyProgression: TrophyProgression,
