@@ -7,7 +7,7 @@ export START_BLOCK=1
 
 # custom params
 # export WORLD_ADDRESS=0x55fefc4a4e5c94def16d25bd1afa87407d114600560f75100f3edc8d5eaced6
-# export TORII_PATH=../../dojo/target/release/torii
+# export TORII_PATH=../../torii/target/debug/torii
 # export START_BLOCK=720000
 
 echo "* TORII   : $TORII_PATH"

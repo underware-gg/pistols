@@ -7,7 +7,6 @@ export interface Challenge {
 	duel_id: BigNumberish;
 	duel_type: DuelTypeEnum;
 	premise: PremiseEnum;
-	quote: BigNumberish;
 	lives_staked: BigNumberish;
 	address_a: string;
 	address_b: string;
@@ -19,11 +18,21 @@ export interface Challenge {
 	timestamps: Period;
 }
 
+// Type definition for `pistols::models::challenge::ChallengeMessage` struct
+export interface ChallengeMessage {
+	duel_id: BigNumberish;
+	message: string;
+}
+
+// Type definition for `pistols::models::challenge::ChallengeMessageValue` struct
+export interface ChallengeMessageValue {
+	message: string;
+}
+
 // Type definition for `pistols::models::challenge::ChallengeValue` struct
 export interface ChallengeValue {
 	duel_type: DuelTypeEnum;
 	premise: PremiseEnum;
-	quote: BigNumberish;
 	lives_staked: BigNumberish;
 	address_a: string;
 	address_b: string;
@@ -124,7 +133,7 @@ export interface TokenConfigValue {
 // Type definition for `pistols::models::duelist::Duelist` struct
 export interface Duelist {
 	duelist_id: BigNumberish;
-	profile_type: ProfileTypeEnum;
+	duelist_profile: DuelistProfileEnum;
 	timestamps: DuelistTimestamps;
 	status: DuelistStatus;
 }
@@ -179,7 +188,7 @@ export interface DuelistTimestamps {
 
 // Type definition for `pistols::models::duelist::DuelistValue` struct
 export interface DuelistValue {
-	profile_type: ProfileTypeEnum;
+	duelist_profile: DuelistProfileEnum;
 	timestamps: DuelistTimestamps;
 	status: DuelistStatus;
 }
@@ -701,7 +710,7 @@ export type CauseOfDeathEnum = CairoCustomEnum;
 export const packType = [
 	'Unknown',
 	'StarterPack',
-	'Duelists5x',
+	'GenesisDuelists5x',
 ] as const;
 export type PackType = { [key in typeof packType[number]]: string };
 export type PackTypeEnum = CairoCustomEnum;
@@ -804,24 +813,7 @@ export const challengeState = [
 export type ChallengeState = { [key in typeof challengeState[number]]: string };
 export type ChallengeStateEnum = CairoCustomEnum;
 
-// Type definition for `pistols::types::premise::Premise` enum
-export const premise = [
-	'Undefined',
-	'Matter',
-	'Debt',
-	'Dispute',
-	'Honour',
-	'Hatred',
-	'Blood',
-	'Nothing',
-	'Tournament',
-	'Treaty',
-	'Lesson',
-] as const;
-export type Premise = { [key in typeof premise[number]]: string };
-export type PremiseEnum = CairoCustomEnum;
-
-// Type definition for `pistols::types::profile_type::BotProfile` enum
+// Type definition for `pistols::types::duelist_profile::BotProfile` enum
 export const botProfile = [
 	'Unknown',
 	'TinMan',
@@ -831,7 +823,7 @@ export const botProfile = [
 export type BotProfile = { [key in typeof botProfile[number]]: string };
 export type BotProfileEnum = CairoCustomEnum;
 
-// Type definition for `pistols::types::profile_type::CharacterProfile` enum
+// Type definition for `pistols::types::duelist_profile::CharacterProfile` enum
 export const characterProfile = [
 	'Unknown',
 	'Bartender',
@@ -842,8 +834,23 @@ export const characterProfile = [
 export type CharacterProfile = { [key in typeof characterProfile[number]]: string };
 export type CharacterProfileEnum = CairoCustomEnum;
 
-// Type definition for `pistols::types::profile_type::DuelistProfile` enum
+// Type definition for `pistols::types::duelist_profile::DuelistProfile` enum
 export const duelistProfile = [
+	'Undefined',
+	'Character',
+	'Bot',
+	'Genesis',
+] as const;
+export type DuelistProfile = { 
+	Undefined: string,
+	Character: CharacterProfileEnum,
+	Bot: BotProfileEnum,
+	Genesis: GenesisProfileEnum,
+};
+export type DuelistProfileEnum = CairoCustomEnum;
+
+// Type definition for `pistols::types::duelist_profile::GenesisProfile` enum
+export const genesisProfile = [
 	'Unknown',
 	'Duke',
 	'Duella',
@@ -867,23 +874,25 @@ export const duelistProfile = [
 	'NynJah',
 	'Thrak',
 ] as const;
-export type DuelistProfile = { [key in typeof duelistProfile[number]]: string };
-export type DuelistProfileEnum = CairoCustomEnum;
+export type GenesisProfile = { [key in typeof genesisProfile[number]]: string };
+export type GenesisProfileEnum = CairoCustomEnum;
 
-// Type definition for `pistols::types::profile_type::ProfileType` enum
-export const profileType = [
+// Type definition for `pistols::types::premise::Premise` enum
+export const premise = [
 	'Undefined',
-	'Duelist',
-	'Character',
-	'Bot',
+	'Matter',
+	'Debt',
+	'Dispute',
+	'Honour',
+	'Hatred',
+	'Blood',
+	'Nothing',
+	'Tournament',
+	'Treaty',
+	'Lesson',
 ] as const;
-export type ProfileType = { 
-	Undefined: string,
-	Duelist: DuelistProfileEnum,
-	Character: CharacterProfileEnum,
-	Bot: BotProfileEnum,
-};
-export type ProfileTypeEnum = CairoCustomEnum;
+export type Premise = { [key in typeof premise[number]]: string };
+export type PremiseEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::round_state::RoundState` enum
 export const roundState = [
@@ -938,6 +947,8 @@ export type ReleaseReasonEnum = CairoCustomEnum;
 export interface SchemaType extends ISchemaType {
 	pistols: {
 		Challenge: Challenge,
+		ChallengeMessage: ChallengeMessage,
+		ChallengeMessageValue: ChallengeMessageValue,
 		ChallengeValue: ChallengeValue,
 		DuelistState: DuelistState,
 		Moves: Moves,
@@ -1052,7 +1063,6 @@ export const schema: SchemaType = {
 				Tournament: undefined,
 				Treaty: undefined,
 				Lesson: undefined, }),
-			quote: 0,
 			lives_staked: 0,
 			address_a: "",
 			address_b: "",
@@ -1070,6 +1080,13 @@ export const schema: SchemaType = {
 			season_id: 0,
 			winner: 0,
 		timestamps: { start: 0, end: 0, },
+		},
+		ChallengeMessage: {
+			duel_id: 0,
+		message: "",
+		},
+		ChallengeMessageValue: {
+		message: "",
 		},
 		ChallengeValue: {
 		duel_type: new CairoCustomEnum({ 
@@ -1090,7 +1107,6 @@ export const schema: SchemaType = {
 				Tournament: undefined,
 				Treaty: undefined,
 				Lesson: undefined, }),
-			quote: 0,
 			lives_staked: 0,
 			address_a: "",
 			address_b: "",
@@ -1195,11 +1211,11 @@ export const schema: SchemaType = {
 		},
 		Duelist: {
 			duelist_id: 0,
-		profile_type: new CairoCustomEnum({ 
+		duelist_profile: new CairoCustomEnum({ 
 					Undefined: "",
-				Duelist: undefined,
 				Character: undefined,
-				Bot: undefined, }),
+				Bot: undefined,
+				Genesis: undefined, }),
 		timestamps: { registered: 0, active: 0, },
 		status: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 		},
@@ -1250,11 +1266,11 @@ export const schema: SchemaType = {
 			active: 0,
 		},
 		DuelistValue: {
-		profile_type: new CairoCustomEnum({ 
+		duelist_profile: new CairoCustomEnum({ 
 					Undefined: "",
-				Duelist: undefined,
 				Character: undefined,
-				Bot: undefined, }),
+				Bot: undefined,
+				Genesis: undefined, }),
 		timestamps: { registered: 0, active: 0, },
 		status: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 		},
@@ -1274,7 +1290,7 @@ export const schema: SchemaType = {
 		pack_type: new CairoCustomEnum({ 
 					Unknown: "",
 				StarterPack: undefined,
-				Duelists5x: undefined, }),
+				GenesisDuelists5x: undefined, }),
 			seed: 0,
 			lords_amount: 0,
 			is_open: false,
@@ -1283,7 +1299,7 @@ export const schema: SchemaType = {
 		pack_type: new CairoCustomEnum({ 
 					Unknown: "",
 				StarterPack: undefined,
-				Duelists5x: undefined, }),
+				GenesisDuelists5x: undefined, }),
 			seed: 0,
 			lords_amount: 0,
 			is_open: false,
@@ -1703,6 +1719,8 @@ export const schema: SchemaType = {
 };
 export enum ModelsMapping {
 	Challenge = 'pistols-Challenge',
+	ChallengeMessage = 'pistols-ChallengeMessage',
+	ChallengeMessageValue = 'pistols-ChallengeMessageValue',
 	ChallengeValue = 'pistols-ChallengeValue',
 	DuelType = 'pistols-DuelType',
 	DuelistState = 'pistols-DuelistState',
@@ -1769,11 +1787,11 @@ export enum ModelsMapping {
 	FinalBlow = 'pistols-FinalBlow',
 	PacesCard = 'pistols-PacesCard',
 	ChallengeState = 'pistols-ChallengeState',
-	Premise = 'pistols-Premise',
 	BotProfile = 'pistols-BotProfile',
 	CharacterProfile = 'pistols-CharacterProfile',
 	DuelistProfile = 'pistols-DuelistProfile',
-	ProfileType = 'pistols-ProfileType',
+	GenesisProfile = 'pistols-GenesisProfile',
+	Premise = 'pistols-Premise',
 	RoundState = 'pistols-RoundState',
 	Rules = 'pistols-Rules',
 	Period = 'pistols-Period',

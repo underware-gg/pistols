@@ -133,7 +133,7 @@ export const getActivityMap = (): Record<Activity, number> => Object.keys(Activi
 export enum PackType {
   Unknown = 'Unknown', // 0
   StarterPack = 'StarterPack', // 1
-  Duelists5x = 'Duelists5x', // 2
+  GenesisDuelists5x = 'GenesisDuelists5x', // 2
 };
 export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
 export const getPackTypeFromValue = (value: number): PackType | undefined => Object.keys(PackType)[value] as PackType;
@@ -325,37 +325,42 @@ export const getDuelistDrawnCardValue = (name: DuelistDrawnCard): number | undef
 export const getDuelistDrawnCardFromValue = (value: number): DuelistDrawnCard | undefined => Object.keys(DuelistDrawnCard)[value] as DuelistDrawnCard;
 export const getDuelistDrawnCardMap = (): Record<DuelistDrawnCard, number> => Object.keys(DuelistDrawnCard).reduce((acc, v, index) => { acc[v as DuelistDrawnCard] = index; return acc; }, {} as Record<DuelistDrawnCard, number>);
 
-// from: ../dojo/src/types/premise.cairo
-export enum Premise {
-  Undefined = 'Undefined', // 0
-  Matter = 'Matter', // 1
-  Debt = 'Debt', // 2
-  Dispute = 'Dispute', // 3
-  Honour = 'Honour', // 4
-  Hatred = 'Hatred', // 5
-  Blood = 'Blood', // 6
-  Nothing = 'Nothing', // 7
-  Tournament = 'Tournament', // 8
-  Treaty = 'Treaty', // 9
-  Lesson = 'Lesson', // 10
-};
-export const getPremiseValue = (name: Premise): number | undefined => _indexOrUndefined(Object.keys(Premise).indexOf(name));
-export const getPremiseFromValue = (value: number): Premise | undefined => Object.keys(Premise)[value] as Premise;
-export const getPremiseMap = (): Record<Premise, number> => Object.keys(Premise).reduce((acc, v, index) => { acc[v as Premise] = index; return acc; }, {} as Record<Premise, number>);
-
-// from: ../dojo/src/types/profile_type.cairo
-export enum ProfileType {
-  Undefined = 'Undefined', // 0
-  Duelist = 'Duelist', // 1
-  Character = 'Character', // 2
-  Bot = 'Bot', // 3
-};
-export const getProfileTypeValue = (name: ProfileType): number | undefined => _indexOrUndefined(Object.keys(ProfileType).indexOf(name));
-export const getProfileTypeFromValue = (value: number): ProfileType | undefined => Object.keys(ProfileType)[value] as ProfileType;
-export const getProfileTypeMap = (): Record<ProfileType, number> => Object.keys(ProfileType).reduce((acc, v, index) => { acc[v as ProfileType] = index; return acc; }, {} as Record<ProfileType, number>);
-
-// from: ../dojo/src/types/profile_type.cairo
+// from: ../dojo/src/types/duelist_profile.cairo
 export enum DuelistProfile {
+  Undefined = 'Undefined', // 0
+  Character = 'Character', // 1
+  Bot = 'Bot', // 2
+  Genesis = 'Genesis', // 3
+};
+export const getDuelistProfileValue = (name: DuelistProfile): number | undefined => _indexOrUndefined(Object.keys(DuelistProfile).indexOf(name));
+export const getDuelistProfileFromValue = (value: number): DuelistProfile | undefined => Object.keys(DuelistProfile)[value] as DuelistProfile;
+export const getDuelistProfileMap = (): Record<DuelistProfile, number> => Object.keys(DuelistProfile).reduce((acc, v, index) => { acc[v as DuelistProfile] = index; return acc; }, {} as Record<DuelistProfile, number>);
+
+// from: ../dojo/src/types/duelist_profile.cairo
+export enum CharacterProfile {
+  Unknown = 'Unknown', // 0
+  Bartender = 'Bartender', // 1
+  Drunkard = 'Drunkard', // 2
+  Devil = 'Devil', // 3
+  Player = 'Player', // 4
+};
+export const getCharacterProfileValue = (name: CharacterProfile): number | undefined => _indexOrUndefined(Object.keys(CharacterProfile).indexOf(name));
+export const getCharacterProfileFromValue = (value: number): CharacterProfile | undefined => Object.keys(CharacterProfile)[value] as CharacterProfile;
+export const getCharacterProfileMap = (): Record<CharacterProfile, number> => Object.keys(CharacterProfile).reduce((acc, v, index) => { acc[v as CharacterProfile] = index; return acc; }, {} as Record<CharacterProfile, number>);
+
+// from: ../dojo/src/types/duelist_profile.cairo
+export enum BotProfile {
+  Unknown = 'Unknown', // 0
+  TinMan = 'TinMan', // 1
+  Scarecrow = 'Scarecrow', // 2
+  Leon = 'Leon', // 3
+};
+export const getBotProfileValue = (name: BotProfile): number | undefined => _indexOrUndefined(Object.keys(BotProfile).indexOf(name));
+export const getBotProfileFromValue = (value: number): BotProfile | undefined => Object.keys(BotProfile)[value] as BotProfile;
+export const getBotProfileMap = (): Record<BotProfile, number> => Object.keys(BotProfile).reduce((acc, v, index) => { acc[v as BotProfile] = index; return acc; }, {} as Record<BotProfile, number>);
+
+// from: ../dojo/src/types/duelist_profile.cairo
+export enum GenesisProfile {
   Unknown = 'Unknown', // 0
   Duke = 'Duke', // 1
   Duella = 'Duella', // 2
@@ -379,42 +384,27 @@ export enum DuelistProfile {
   NynJah = 'NynJah', // 20
   Thrak = 'Thrak', // 21
 };
-export const getDuelistProfileValue = (name: DuelistProfile): number | undefined => _indexOrUndefined(Object.keys(DuelistProfile).indexOf(name));
-export const getDuelistProfileFromValue = (value: number): DuelistProfile | undefined => Object.keys(DuelistProfile)[value] as DuelistProfile;
-export const getDuelistProfileMap = (): Record<DuelistProfile, number> => Object.keys(DuelistProfile).reduce((acc, v, index) => { acc[v as DuelistProfile] = index; return acc; }, {} as Record<DuelistProfile, number>);
+export const getGenesisProfileValue = (name: GenesisProfile): number | undefined => _indexOrUndefined(Object.keys(GenesisProfile).indexOf(name));
+export const getGenesisProfileFromValue = (value: number): GenesisProfile | undefined => Object.keys(GenesisProfile)[value] as GenesisProfile;
+export const getGenesisProfileMap = (): Record<GenesisProfile, number> => Object.keys(GenesisProfile).reduce((acc, v, index) => { acc[v as GenesisProfile] = index; return acc; }, {} as Record<GenesisProfile, number>);
 
-// from: ../dojo/src/types/profile_type.cairo
-export enum CharacterProfile {
-  Unknown = 'Unknown', // 0
-  Bartender = 'Bartender', // 1
-  Drunkard = 'Drunkard', // 2
-  Devil = 'Devil', // 3
-  Player = 'Player', // 4
-};
-export const getCharacterProfileValue = (name: CharacterProfile): number | undefined => _indexOrUndefined(Object.keys(CharacterProfile).indexOf(name));
-export const getCharacterProfileFromValue = (value: number): CharacterProfile | undefined => Object.keys(CharacterProfile)[value] as CharacterProfile;
-export const getCharacterProfileMap = (): Record<CharacterProfile, number> => Object.keys(CharacterProfile).reduce((acc, v, index) => { acc[v as CharacterProfile] = index; return acc; }, {} as Record<CharacterProfile, number>);
-
-// from: ../dojo/src/types/profile_type.cairo
-export enum BotProfile {
-  Unknown = 'Unknown', // 0
-  TinMan = 'TinMan', // 1
-  Scarecrow = 'Scarecrow', // 2
-  Leon = 'Leon', // 3
-};
-export const getBotProfileValue = (name: BotProfile): number | undefined => _indexOrUndefined(Object.keys(BotProfile).indexOf(name));
-export const getBotProfileFromValue = (value: number): BotProfile | undefined => Object.keys(BotProfile)[value] as BotProfile;
-export const getBotProfileMap = (): Record<BotProfile, number> => Object.keys(BotProfile).reduce((acc, v, index) => { acc[v as BotProfile] = index; return acc; }, {} as Record<BotProfile, number>);
-
-// from: ../dojo/src/types/profile_type.cairo
-export enum Gender {
+// from: ../dojo/src/types/premise.cairo
+export enum Premise {
   Undefined = 'Undefined', // 0
-  Male = 'Male', // 1
-  Female = 'Female', // 2
+  Matter = 'Matter', // 1
+  Debt = 'Debt', // 2
+  Dispute = 'Dispute', // 3
+  Honour = 'Honour', // 4
+  Hatred = 'Hatred', // 5
+  Blood = 'Blood', // 6
+  Nothing = 'Nothing', // 7
+  Tournament = 'Tournament', // 8
+  Treaty = 'Treaty', // 9
+  Lesson = 'Lesson', // 10
 };
-export const getGenderValue = (name: Gender): number | undefined => _indexOrUndefined(Object.keys(Gender).indexOf(name));
-export const getGenderFromValue = (value: number): Gender | undefined => Object.keys(Gender)[value] as Gender;
-export const getGenderMap = (): Record<Gender, number> => Object.keys(Gender).reduce((acc, v, index) => { acc[v as Gender] = index; return acc; }, {} as Record<Gender, number>);
+export const getPremiseValue = (name: Premise): number | undefined => _indexOrUndefined(Object.keys(Premise).indexOf(name));
+export const getPremiseFromValue = (value: number): Premise | undefined => Object.keys(Premise)[value] as Premise;
+export const getPremiseMap = (): Record<Premise, number> => Object.keys(Premise).reduce((acc, v, index) => { acc[v as Premise] = index; return acc; }, {} as Record<Premise, number>);
 
 // from: ../dojo/src/types/round_state.cairo
 export enum RoundState {
@@ -498,17 +488,25 @@ export type EnvCardPoints = {
   damage : number,
 };
 
+// from: ../dojo/src/types/duelist_profile.cairo
+export type CollectionDescription = {
+  name : string,
+  folder_name : string,
+  profile_count : number,
+  is_playable : boolean,
+  duelist_id_base : bigint,
+};
+
+// from: ../dojo/src/types/duelist_profile.cairo
+export type ProfileDescription = {
+  name : string,
+  quote : string,
+};
+
 // from: ../dojo/src/types/premise.cairo
 export type PremiseDescription = {
   name : string,
   prefix : string,
-};
-
-// from: ../dojo/src/types/profile_type.cairo
-export type ProfileDescription = {
-  profile_id : number,
-  gender : Gender,
-  name : string,
 };
 
 
@@ -646,7 +644,7 @@ export const CONFIG: type_CONFIG = {
 type type_PACK_TYPES = {
   Unknown: PackDescription, // cairo: PackDescription
   StarterPack: PackDescription, // cairo: PackDescription
-  Duelists5x: PackDescription, // cairo: PackDescription
+  GenesisDuelists5x: PackDescription, // cairo: PackDescription
 };
 export const PACK_TYPES: type_PACK_TYPES = {
   Unknown: {
@@ -667,11 +665,11 @@ export const PACK_TYPES: type_PACK_TYPES = {
     price_lords: (20n * CONST.ETH_TO_WEI),
     quantity: 2,
   },
-  Duelists5x: {
-    id: 'Duelists5x',
+  GenesisDuelists5x: {
+    id: 'GenesisDuelists5x',
     name: 'Duelists 5-pack',
-    image_url_closed: '/tokens/Duelists5x.jpg',
-    image_url_open: '/tokens/Duelists5x.jpg',
+    image_url_closed: '/tokens/GenesisDuelists5x.jpg',
+    image_url_open: '/tokens/GenesisDuelists5x.jpg',
     can_purchase: true,
     price_lords: (50n * CONST.ETH_TO_WEI),
     quantity: 5,
@@ -939,6 +937,217 @@ export const TACTICS_POINTS: type_TACTICS_POINTS = {
   },
 };
 
+// from: ../dojo/src/types/duelist_profile.cairo
+type type_COLLECTIONS = {
+  Undefined: CollectionDescription, // cairo: CollectionDescription
+  Character: CollectionDescription, // cairo: CollectionDescription
+  Bot: CollectionDescription, // cairo: CollectionDescription
+  Genesis: CollectionDescription, // cairo: CollectionDescription
+};
+export const COLLECTIONS: type_COLLECTIONS = {
+  Undefined: {
+    name: 'Undefined',
+    folder_name: 'undefined',
+    profile_count: 0,
+    is_playable: false,
+    duelist_id_base: 0n,
+  },
+  Character: {
+    name: 'Tavern Characters',
+    folder_name: 'characters',
+    profile_count: 4,
+    is_playable: false,
+    duelist_id_base: BigInt('0x100000000'),
+  },
+  Bot: {
+    name: 'Practice bots',
+    folder_name: 'bots',
+    profile_count: 3,
+    is_playable: false,
+    duelist_id_base: BigInt('0x200000000'),
+  },
+  Genesis: {
+    name: 'Genesis Collection',
+    folder_name: 'genesis',
+    profile_count: 21,
+    is_playable: true,
+    duelist_id_base: 0n,
+  },
+};
+
+// from: ../dojo/src/types/duelist_profile.cairo
+type type_CHARACTER_PROFILES = {
+  Unknown: ProfileDescription, // cairo: ProfileDescription
+  Bartender: ProfileDescription, // cairo: ProfileDescription
+  Drunkard: ProfileDescription, // cairo: ProfileDescription
+  Devil: ProfileDescription, // cairo: ProfileDescription
+  Player: ProfileDescription, // cairo: ProfileDescription
+};
+export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
+  Unknown: {
+    name: 'Unknown',
+    quote: '',
+  },
+  Bartender: {
+    name: 'Bartender',
+    quote: 'Quote',
+  },
+  Drunkard: {
+    name: 'Drunkard',
+    quote: 'Quote',
+  },
+  Devil: {
+    name: 'Devil',
+    quote: 'Quote',
+  },
+  Player: {
+    name: 'Stranger',
+    quote: 'Quote',
+  },
+};
+
+// from: ../dojo/src/types/duelist_profile.cairo
+type type_BOT_PROFILES = {
+  Unknown: ProfileDescription, // cairo: ProfileDescription
+  TinMan: ProfileDescription, // cairo: ProfileDescription
+  Scarecrow: ProfileDescription, // cairo: ProfileDescription
+  Leon: ProfileDescription, // cairo: ProfileDescription
+};
+export const BOT_PROFILES: type_BOT_PROFILES = {
+  Unknown: {
+    name: 'Unknown',
+    quote: '',
+  },
+  TinMan: {
+    name: 'Tin Man',
+    quote: 'Quote',
+  },
+  Scarecrow: {
+    name: 'Scarecrow',
+    quote: 'Quote',
+  },
+  Leon: {
+    name: 'Leon',
+    quote: 'Quote',
+  },
+};
+
+// from: ../dojo/src/types/duelist_profile.cairo
+type type_GENESIS_PROFILES = {
+  Unknown: ProfileDescription, // cairo: ProfileDescription
+  Duke: ProfileDescription, // cairo: ProfileDescription
+  Duella: ProfileDescription, // cairo: ProfileDescription
+  Jameson: ProfileDescription, // cairo: ProfileDescription
+  Pilgrim: ProfileDescription, // cairo: ProfileDescription
+  Jack: ProfileDescription, // cairo: ProfileDescription
+  Pops: ProfileDescription, // cairo: ProfileDescription
+  SerWalker: ProfileDescription, // cairo: ProfileDescription
+  Bloberto: ProfileDescription, // cairo: ProfileDescription
+  Squiddo: ProfileDescription, // cairo: ProfileDescription
+  SlenderDuck: ProfileDescription, // cairo: ProfileDescription
+  LadyVengeance: ProfileDescription, // cairo: ProfileDescription
+  Breadman: ProfileDescription, // cairo: ProfileDescription
+  Brutus: ProfileDescription, // cairo: ProfileDescription
+  Pistolopher: ProfileDescription, // cairo: ProfileDescription
+  Secreto: ProfileDescription, // cairo: ProfileDescription
+  ShadowMare: ProfileDescription, // cairo: ProfileDescription
+  Karaku: ProfileDescription, // cairo: ProfileDescription
+  Misty: ProfileDescription, // cairo: ProfileDescription
+  Kenzu: ProfileDescription, // cairo: ProfileDescription
+  NynJah: ProfileDescription, // cairo: ProfileDescription
+  Thrak: ProfileDescription, // cairo: ProfileDescription
+};
+export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
+  Unknown: {
+    name: 'Unknown',
+    quote: '',
+  },
+  Duke: {
+    name: 'Duke',
+    quote: 'Prepare to be Duked!',
+  },
+  Duella: {
+    name: 'Duella',
+    quote: 'Quote',
+  },
+  Jameson: {
+    name: 'Jameson',
+    quote: 'Quote',
+  },
+  Pilgrim: {
+    name: 'Pilgrim',
+    quote: 'Quote',
+  },
+  Jack: {
+    name: 'Jack',
+    quote: 'Quote',
+  },
+  Pops: {
+    name: 'Pops',
+    quote: 'Quote',
+  },
+  SerWalker: {
+    name: 'Ser Walker',
+    quote: 'Quote',
+  },
+  Bloberto: {
+    name: 'Bloberto',
+    quote: 'Quote',
+  },
+  Squiddo: {
+    name: 'Squiddo',
+    quote: 'Quote',
+  },
+  SlenderDuck: {
+    name: 'Slender Duck',
+    quote: 'Quote',
+  },
+  LadyVengeance: {
+    name: 'Lady Vengeance',
+    quote: 'Quote',
+  },
+  Breadman: {
+    name: 'Breadman',
+    quote: 'Quote',
+  },
+  Brutus: {
+    name: 'Brutus',
+    quote: 'Quote',
+  },
+  Pistolopher: {
+    name: 'Pistolopher',
+    quote: 'Quote',
+  },
+  Secreto: {
+    name: 'Secreto',
+    quote: 'Quote',
+  },
+  ShadowMare: {
+    name: 'Shadow Mare',
+    quote: 'Quote',
+  },
+  Karaku: {
+    name: 'Karaku',
+    quote: 'Quote',
+  },
+  Misty: {
+    name: 'Misty',
+    quote: 'Quote',
+  },
+  Kenzu: {
+    name: 'Kenzu',
+    quote: 'Quote',
+  },
+  NynJah: {
+    name: 'Nyn Jah',
+    quote: 'Quote',
+  },
+  Thrak: {
+    name: 'Thrak',
+    quote: 'Quote',
+  },
+};
+
 // from: ../dojo/src/types/premise.cairo
 type type_PREMISES = {
   Undefined: PremiseDescription, // cairo: PremiseDescription
@@ -998,230 +1207,6 @@ export const PREMISES: type_PREMISES = {
     name: 'Lesson',
     prefix: 'to learn about',
   },
-};
-
-// from: ../dojo/src/types/profile_type.cairo
-type type_DUELIST_PROFILES = {
-  Unknown: ProfileDescription, // cairo: ProfileDescription
-  Duke: ProfileDescription, // cairo: ProfileDescription
-  Duella: ProfileDescription, // cairo: ProfileDescription
-  Jameson: ProfileDescription, // cairo: ProfileDescription
-  Pilgrim: ProfileDescription, // cairo: ProfileDescription
-  Jack: ProfileDescription, // cairo: ProfileDescription
-  Pops: ProfileDescription, // cairo: ProfileDescription
-  SerWalker: ProfileDescription, // cairo: ProfileDescription
-  Bloberto: ProfileDescription, // cairo: ProfileDescription
-  Squiddo: ProfileDescription, // cairo: ProfileDescription
-  SlenderDuck: ProfileDescription, // cairo: ProfileDescription
-  LadyVengeance: ProfileDescription, // cairo: ProfileDescription
-  Breadman: ProfileDescription, // cairo: ProfileDescription
-  Brutus: ProfileDescription, // cairo: ProfileDescription
-  Pistolopher: ProfileDescription, // cairo: ProfileDescription
-  Secreto: ProfileDescription, // cairo: ProfileDescription
-  ShadowMare: ProfileDescription, // cairo: ProfileDescription
-  Karaku: ProfileDescription, // cairo: ProfileDescription
-  Misty: ProfileDescription, // cairo: ProfileDescription
-  Kenzu: ProfileDescription, // cairo: ProfileDescription
-  NynJah: ProfileDescription, // cairo: ProfileDescription
-  Thrak: ProfileDescription, // cairo: ProfileDescription
-};
-export const DUELIST_PROFILES: type_DUELIST_PROFILES = {
-  Unknown: {
-    profile_id: 0,
-    gender: Gender.Undefined,
-    name: 'Unknown',
-  },
-  Duke: {
-    profile_id: 1,
-    gender: Gender.Male,
-    name: 'Duke',
-  },
-  Duella: {
-    profile_id: 2,
-    gender: Gender.Female,
-    name: 'Duella',
-  },
-  Jameson: {
-    profile_id: 3,
-    gender: Gender.Male,
-    name: 'Jameson',
-  },
-  Pilgrim: {
-    profile_id: 4,
-    gender: Gender.Male,
-    name: 'Pilgrim',
-  },
-  Jack: {
-    profile_id: 5,
-    gender: Gender.Male,
-    name: 'Jack',
-  },
-  Pops: {
-    profile_id: 6,
-    gender: Gender.Male,
-    name: 'Pops',
-  },
-  SerWalker: {
-    profile_id: 7,
-    gender: Gender.Male,
-    name: 'Ser Walker',
-  },
-  Bloberto: {
-    profile_id: 8,
-    gender: Gender.Male,
-    name: 'Bloberto',
-  },
-  Squiddo: {
-    profile_id: 9,
-    gender: Gender.Male,
-    name: 'Squiddo',
-  },
-  SlenderDuck: {
-    profile_id: 10,
-    gender: Gender.Male,
-    name: 'Slender Duck',
-  },
-  LadyVengeance: {
-    profile_id: 11,
-    gender: Gender.Female,
-    name: 'Lady Vengeance',
-  },
-  Breadman: {
-    profile_id: 12,
-    gender: Gender.Male,
-    name: 'Breadman',
-  },
-  Brutus: {
-    profile_id: 13,
-    gender: Gender.Male,
-    name: 'Brutus',
-  },
-  Pistolopher: {
-    profile_id: 14,
-    gender: Gender.Male,
-    name: 'Pistolopher',
-  },
-  Secreto: {
-    profile_id: 15,
-    gender: Gender.Male,
-    name: 'Secreto',
-  },
-  ShadowMare: {
-    profile_id: 16,
-    gender: Gender.Female,
-    name: 'Shadow Mare',
-  },
-  Karaku: {
-    profile_id: 17,
-    gender: Gender.Male,
-    name: 'Karaku',
-  },
-  Misty: {
-    profile_id: 18,
-    gender: Gender.Female,
-    name: 'Misty',
-  },
-  Kenzu: {
-    profile_id: 19,
-    gender: Gender.Female,
-    name: 'Kenzu',
-  },
-  NynJah: {
-    profile_id: 20,
-    gender: Gender.Male,
-    name: 'Nyn Jah',
-  },
-  Thrak: {
-    profile_id: 21,
-    gender: Gender.Male,
-    name: 'Thrak',
-  },
-};
-
-// from: ../dojo/src/types/profile_type.cairo
-type type_CHARACTER_PROFILES = {
-  Unknown: ProfileDescription, // cairo: ProfileDescription
-  Bartender: ProfileDescription, // cairo: ProfileDescription
-  Drunkard: ProfileDescription, // cairo: ProfileDescription
-  Devil: ProfileDescription, // cairo: ProfileDescription
-  Player: ProfileDescription, // cairo: ProfileDescription
-};
-export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
-  Unknown: {
-    profile_id: 0,
-    gender: Gender.Undefined,
-    name: 'Unknown',
-  },
-  Bartender: {
-    profile_id: 1,
-    gender: Gender.Male,
-    name: 'Bartender',
-  },
-  Drunkard: {
-    profile_id: 2,
-    gender: Gender.Male,
-    name: 'Drunkard',
-  },
-  Devil: {
-    profile_id: 3,
-    gender: Gender.Male,
-    name: 'Devil',
-  },
-  Player: {
-    profile_id: 4,
-    gender: Gender.Male,
-    name: 'Stranger',
-  },
-};
-
-// from: ../dojo/src/types/profile_type.cairo
-type type_BOT_PROFILES = {
-  Unknown: ProfileDescription, // cairo: ProfileDescription
-  TinMan: ProfileDescription, // cairo: ProfileDescription
-  Scarecrow: ProfileDescription, // cairo: ProfileDescription
-  Leon: ProfileDescription, // cairo: ProfileDescription
-};
-export const BOT_PROFILES: type_BOT_PROFILES = {
-  Unknown: {
-    profile_id: 0,
-    gender: Gender.Undefined,
-    name: 'Unknown',
-  },
-  TinMan: {
-    profile_id: 1,
-    gender: Gender.Male,
-    name: 'Tin Man',
-  },
-  Scarecrow: {
-    profile_id: 2,
-    gender: Gender.Male,
-    name: 'Scarecrow',
-  },
-  Leon: {
-    profile_id: 3,
-    gender: Gender.Male,
-    name: 'Leon',
-  },
-};
-
-// from: ../dojo/src/types/profile_type.cairo
-type type_PROFILES = {
-  DUELIST_PROFILE_COUNT: number, // cairo: u8
-  CHARACTER_PROFILE_COUNT: number, // cairo: u8
-  BOT_PROFILE_COUNT: number, // cairo: u8
-  DUELIST_ID_BASE: bigint, // cairo: u128
-  CHARACTER_ID_BASE: bigint, // cairo: u128
-  BOT_ID_BASE: bigint, // cairo: u128
-  UNDEFINED_ID_BASE: bigint, // cairo: u128
-};
-export const PROFILES: type_PROFILES = {
-  DUELIST_PROFILE_COUNT: 21,
-  CHARACTER_PROFILE_COUNT: 4,
-  BOT_PROFILE_COUNT: 3,
-  DUELIST_ID_BASE: BigInt('0x100000000'),
-  CHARACTER_ID_BASE: BigInt('0x200000000'),
-  BOT_ID_BASE: BigInt('0x300000000'),
-  UNDEFINED_ID_BASE: BigInt('0xf00000000'),
 };
 
 // from: ../dojo/src/types/trophies.cairo

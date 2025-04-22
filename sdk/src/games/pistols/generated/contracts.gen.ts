@@ -1,5 +1,5 @@
 import { DojoProvider, DojoCall } from "@dojoengine/core";
-import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum, ByteArray } from "starknet";
+import { Account, AccountInterface, BigNumberish, CairoOption, CairoCustomEnum } from "starknet";
 import * as models from "./models.gen";
 
 export function setupWorld(provider: DojoProvider) {
@@ -472,19 +472,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duel_token_createDuel_calldata = (duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, premise: CairoCustomEnum, quote: BigNumberish, expireHours: BigNumberish, livesStaked: BigNumberish): DojoCall => {
+	const build_duel_token_createDuel_calldata = (duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: string): DojoCall => {
 		return {
 			contractName: "duel_token",
 			entrypoint: "create_duel",
-			calldata: [duelType, duelistId, challengedAddress, premise, quote, expireHours, livesStaked],
+			calldata: [duelType, duelistId, challengedAddress, livesStaked, expireHours, premise, message],
 		};
 	};
 
-	const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, premise: CairoCustomEnum, quote: BigNumberish, expireHours: BigNumberish, livesStaked: BigNumberish) => {
+  const duel_token_createDuel = async (snAccount: Account | AccountInterface, duelType: CairoCustomEnum, duelistId: BigNumberish, challengedAddress: string, livesStaked: BigNumberish, expireHours: BigNumberish, premise: CairoCustomEnum, message: string) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_duel_token_createDuel_calldata(duelType, duelistId, challengedAddress, premise, quote, expireHours, livesStaked),
+				build_duel_token_createDuel_calldata(duelType, duelistId, challengedAddress, livesStaked, expireHours, premise, message),
 				"pistols",
 			);
 		} catch (error) {
@@ -1302,19 +1302,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duelist_token_mintDuelists_calldata = (recipient: string, quantity: BigNumberish, seed: BigNumberish): DojoCall => {
+	const build_duelist_token_mintDuelists_calldata = (recipient: string, profileSample: CairoCustomEnum, quantity: BigNumberish, seed: BigNumberish): DojoCall => {
 		return {
 			contractName: "duelist_token",
 			entrypoint: "mint_duelists",
-			calldata: [recipient, quantity, seed],
+			calldata: [recipient, profileSample, quantity, seed],
 		};
 	};
 
-	const duelist_token_mintDuelists = async (snAccount: Account | AccountInterface, recipient: string, quantity: BigNumberish, seed: BigNumberish) => {
+	const duelist_token_mintDuelists = async (snAccount: Account | AccountInterface, recipient: string, profileSample: CairoCustomEnum, quantity: BigNumberish, seed: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_duelist_token_mintDuelists_calldata(recipient, quantity, seed),
+				build_duelist_token_mintDuelists_calldata(recipient, profileSample, quantity, seed),
 				"pistols",
 			);
 		} catch (error) {
