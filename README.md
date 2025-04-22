@@ -4,7 +4,9 @@
 
 A fully on-chain game, made with love, by [Underware](https://underware.gg/), with [Dojo](https://www.dojoengine.org/), for [Realms](https://realms.world/), on [Starknet](https://www.starknet.io/).
 
-Winner of the [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059)
+Started as a joke with [Calc](https://x.com/Calcutat) at Autonomous Worlds Istanbul 2023. Winner of the [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/1747626446720258059)
+
+Follow us on [@Pistols_gg](https://x.com/pistols_gg) and the `#duels` channel in the [Realms Discord](https://discord.gg/realmsworld)
 
 ```
                                           ~~^             ^J~                                                           
@@ -21,15 +23,15 @@ Winner of the [Dojo Game Jam #3](https://twitter.com/ohayo_dojo/status/174762644
          ^JB##GP5Y?77J5GBB#####BP5GBJ!!!77JJ!~^^^^^^        /                                                           
        ~YB#GP55YY5GB##BPY7!~~?Y   ^!      7~                                                                            
      .^Y##BG5555B&&#P?^:      :?~  ^^.   ^!!                                                                             
-    ?B#BGP5P##&@&Y^            ^~~~~~!fDm                                                                               
-   P#BBG5YP###&B~..                                                                                                     
-  B#PBG5J5B&#&#!.         ____  _      __        __              __     _______     ____  __           __           
- J#5PGGY?YBB#@B^.        / __ \(_)____/ /_____  / /____   ____ _/ /_   <  / __ \   / __ )/ /___  _____/ /_______    
- YGGGGPJ?JGBB@#7.       / /_/ / / ___/ __/ __ \/ / ___/  / __ `/ __/   / / / / /  / __  / / __ \/ ___/ //_/ ___/    
- JP5?~^...^?JG&#^      / ____/ (__  ) /_/ /_/ / (__  )  / /_/ / /_    / / /_/ /  / /_/ / / /_/ / /__/ ,< (__  )     
- ~PY!::. .:7?YBB^     /_/   /_/____/\__/\____/_/____/   \__,_/\__/   /_/\____/  /_____/_/\____/\___/_/|_/____/      
-  ~55J!~:^7?5PY^                                                                                                        
-    ~?YYYJ?7!^        A game of honour, chance and betrayal. Defend thine honour, scound! By Underware.gg.               
+    ?B#BGP5P##&@&Y^            ^~~~~~!                                                                               
+   P#BBG5YP###&B~..   -__ /\\             ,        ,,                     ,        -_____                       
+  B#PBG5J5B&#&#!.       ||  \\  '        ||        ||               _    ||          ' | -,    _   ;            
+ J#5PGGY?YBB#@B^.      /||__|| \\  _-_, =||=  /'\\ ||  _-_,        < \, =||=        /| |  |`  < \, \\/\/\ \\/\\ 
+ YGGGGPJ?JGBB@#7.      \||__|| || ||_.   ||  || || || ||_.         /-||  ||         || |==||  /-|| || | | || || 
+ JP5?~^...^?JG&#^       ||  |, ||  ~ ||  ||  || || ||  ~ ||       (( ||  ||        ~|| |  |, (( || || | | || || 
+ ~PY!::. .:7?YBB^     _-||-_/  \\ ,-_-   \\, \\,/  \\ ,-_-         \/\\  \\,        ~-____,   \/\\ \\/\\/ \\ \\ 
+  ~55J!~:^7?5PY^        ||                                                         (                                                                                                                               
+    ~?YYYJ?7!^              A game of honour, chance and betrayal. Defend thine honour, scound! By Underware.gg
        ^^^                                                                                                                       
 ```
 
@@ -46,7 +48,7 @@ Pistols at Dawn is an onchain game, in which you face off against another Lord i
 > turn around, slowly, a dark menace in your shoulder, and raise your pistol. The cur stands there, a defiant sneer upon his face,
 > and throws his still smoking pistol to the ground. You take a deep breath, and whisper "May you find honour in death, you wretch!"**
 > 
-> **Blood sprays in a beautiful arc from his head, and he drops like a felled log. Silence, interrupteed only by the spattering of
+> **Blood sprays in a beautiful arc from his head, and he drops like a felled log. Silence, interrupted only by the spattering of
 > blood from your arm, into the morning grass.**
 
 ## Team
@@ -55,13 +57,13 @@ Pistols at Dawn is an onchain game, in which you face off against another Lord i
 * Mataleone — Engineering - [@matalecode](https://x.com/matalecode)
 * FortunaRegem - Engineering, Frontend, UI & Animations - [@FortunaRegem](https://x.com/FortunaRegem)
 * Amaro — Art, Design, UI & Animations - [@AmaroKoberle](https://x.com/AmaroKoberle)
+* Parsa - Comms, Marketing, Operations - [@ParsaBolor] (https://x.com/ParsaBolor)
+* Mononoke - Art, Brand, Marketing - [@MononokeArts] (https://x.com/MononokeArts)
 * Jubilee - R&D, Technical 3D systems
 
-### Contributors
+### Other Contributors
 
 * Voltrevo — Engineering, Hidden information mechanism
-* Mononoke — Logo & Art
-
 
 ## Contents
 
