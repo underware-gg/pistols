@@ -1,6 +1,6 @@
 import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
-import { CairoCustomEnum, BigNumberish } from 'starknet';
+import { CairoCustomEnum, CairoOption, CairoOptionVariant, BigNumberish } from 'starknet';
 
 // Type definition for `pistols::models::challenge::Challenge` struct
 export interface Challenge {
@@ -9,7 +9,6 @@ export interface Challenge {
 	premise: PremiseEnum;
 	quote: BigNumberish;
 	lives_staked: BigNumberish;
-	tournament_id: BigNumberish;
 	address_a: string;
 	address_b: string;
 	duelist_id_a: BigNumberish;
@@ -26,7 +25,6 @@ export interface ChallengeValue {
 	premise: PremiseEnum;
 	quote: BigNumberish;
 	lives_staked: BigNumberish;
-	tournament_id: BigNumberish;
 	address_a: string;
 	address_b: string;
 	duelist_id_a: BigNumberish;
@@ -131,15 +129,17 @@ export interface Duelist {
 	status: DuelistStatus;
 }
 
-// Type definition for `pistols::models::duelist::DuelistChallenge` struct
-export interface DuelistChallenge {
+// Type definition for `pistols::models::duelist::DuelistAssignment` struct
+export interface DuelistAssignment {
 	duelist_id: BigNumberish;
 	duel_id: BigNumberish;
+	pass_id: BigNumberish;
 }
 
-// Type definition for `pistols::models::duelist::DuelistChallengeValue` struct
-export interface DuelistChallengeValue {
+// Type definition for `pistols::models::duelist::DuelistAssignmentValue` struct
+export interface DuelistAssignmentValue {
 	duel_id: BigNumberish;
+	pass_id: BigNumberish;
 }
 
 // Type definition for `pistols::models::duelist::DuelistMemorial` struct
@@ -309,6 +309,99 @@ export interface SeasonScoreboardValue {
 	points: BigNumberish;
 }
 
+// Type definition for `pistols::models::tournament::ChallengeToTournament` struct
+export interface ChallengeToTournament {
+	duel_id: BigNumberish;
+	keys: TournamentDuelKeys;
+}
+
+// Type definition for `pistols::models::tournament::ChallengeToTournamentValue` struct
+export interface ChallengeToTournamentValue {
+	keys: TournamentDuelKeys;
+}
+
+// Type definition for `pistols::models::tournament::Tournament` struct
+export interface Tournament {
+	tournament_id: BigNumberish;
+	state: TournamentStateEnum;
+	round_number: BigNumberish;
+}
+
+// Type definition for `pistols::models::tournament::TournamentDuelKeys` struct
+export interface TournamentDuelKeys {
+	tournament_id: BigNumberish;
+	round_number: BigNumberish;
+	entry_number_a: BigNumberish;
+	entry_number_b: BigNumberish;
+}
+
+// Type definition for `pistols::models::tournament::TournamentPass` struct
+export interface TournamentPass {
+	pass_id: BigNumberish;
+	tournament_id: BigNumberish;
+	entry_number: BigNumberish;
+	duelist_id: BigNumberish;
+	current_round_number: BigNumberish;
+	score: BigNumberish;
+	fame: BigNumberish;
+}
+
+// Type definition for `pistols::models::tournament::TournamentPassValue` struct
+export interface TournamentPassValue {
+	tournament_id: BigNumberish;
+	entry_number: BigNumberish;
+	duelist_id: BigNumberish;
+	current_round_number: BigNumberish;
+	score: BigNumberish;
+	fame: BigNumberish;
+}
+
+// Type definition for `pistols::models::tournament::TournamentRound` struct
+export interface TournamentRound {
+	tournament_id: BigNumberish;
+	round_number: BigNumberish;
+	entry_count: BigNumberish;
+	timestamps: Period;
+	bracket: BigNumberish;
+	results: BigNumberish;
+}
+
+// Type definition for `pistols::models::tournament::TournamentRoundValue` struct
+export interface TournamentRoundValue {
+	entry_count: BigNumberish;
+	timestamps: Period;
+	bracket: BigNumberish;
+	results: BigNumberish;
+}
+
+// Type definition for `pistols::models::tournament::TournamentSettings` struct
+export interface TournamentSettings {
+	settings_id: BigNumberish;
+	tournament_type: TournamentTypeEnum;
+}
+
+// Type definition for `pistols::models::tournament::TournamentSettingsValue` struct
+export interface TournamentSettingsValue {
+	tournament_type: TournamentTypeEnum;
+}
+
+// Type definition for `pistols::models::tournament::TournamentToChallenge` struct
+export interface TournamentToChallenge {
+	keys: TournamentDuelKeys;
+	duel_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::tournament::TournamentToChallengeValue` struct
+export interface TournamentToChallengeValue {
+	duel_id: BigNumberish;
+}
+
+// Type definition for `pistols::models::tournament::TournamentValue` struct
+export interface TournamentValue {
+	state: TournamentStateEnum;
+	round_number: BigNumberish;
+}
+
 // Type definition for `pistols::systems::components::token_bound::TokenBoundAddress` struct
 export interface TokenBoundAddress {
 	recipient: string;
@@ -339,6 +432,113 @@ export interface MockedValueValue {
 export interface Period {
 	start: BigNumberish;
 	end: BigNumberish;
+}
+
+// Type definition for `tournaments::components::models::game::GameCounter` struct
+export interface GameCounter {
+	key: BigNumberish;
+	count: BigNumberish;
+}
+
+// Type definition for `tournaments::components::models::game::GameCounterValue` struct
+export interface GameCounterValue {
+	count: BigNumberish;
+}
+
+// Type definition for `tournaments::components::models::game::GameMetadata` struct
+export interface GameMetadata {
+	contract_address: string;
+	creator_address: string;
+	name: BigNumberish;
+	description: string;
+	developer: BigNumberish;
+	publisher: BigNumberish;
+	genre: BigNumberish;
+	image: string;
+}
+
+// Type definition for `tournaments::components::models::game::GameMetadataValue` struct
+export interface GameMetadataValue {
+	creator_address: string;
+	name: BigNumberish;
+	description: string;
+	developer: BigNumberish;
+	publisher: BigNumberish;
+	genre: BigNumberish;
+	image: string;
+}
+
+// Type definition for `tournaments::components::models::game::Score` struct
+export interface Score {
+	game_id: BigNumberish;
+	score: BigNumberish;
+}
+
+// Type definition for `tournaments::components::models::game::ScoreValue` struct
+export interface ScoreValue {
+	score: BigNumberish;
+}
+
+// Type definition for `tournaments::components::models::game::Settings` struct
+export interface Settings {
+	id: BigNumberish;
+	name: BigNumberish;
+	value: BigNumberish;
+}
+
+// Type definition for `tournaments::components::models::game::SettingsCounter` struct
+export interface SettingsCounter {
+	key: BigNumberish;
+	count: BigNumberish;
+}
+
+// Type definition for `tournaments::components::models::game::SettingsCounterValue` struct
+export interface SettingsCounterValue {
+	count: BigNumberish;
+}
+
+// Type definition for `tournaments::components::models::game::SettingsDetails` struct
+export interface SettingsDetails {
+	id: BigNumberish;
+	name: BigNumberish;
+	description: string;
+	exists: boolean;
+}
+
+// Type definition for `tournaments::components::models::game::SettingsDetailsValue` struct
+export interface SettingsDetailsValue {
+	name: BigNumberish;
+	description: string;
+	exists: boolean;
+}
+
+// Type definition for `tournaments::components::models::game::SettingsValue` struct
+export interface SettingsValue {
+	value: BigNumberish;
+}
+
+// Type definition for `tournaments::components::models::game::TokenMetadata` struct
+export interface TokenMetadata {
+	token_id: BigNumberish;
+	minted_by: string;
+	player_name: BigNumberish;
+	settings_id: BigNumberish;
+	lifecycle: Lifecycle;
+}
+
+// Type definition for `tournaments::components::models::game::TokenMetadataValue` struct
+export interface TokenMetadataValue {
+	minted_by: string;
+	player_name: BigNumberish;
+	settings_id: BigNumberish;
+	lifecycle: Lifecycle;
+}
+
+// Type definition for `tournaments::components::models::lifecycle::Lifecycle` struct
+export interface Lifecycle {
+	mint: BigNumberish;
+	start: CairoOption<BigNumberish>;
+	end: CairoOption<BigNumberish>;
 }
 
 // Type definition for `achievement::events::index::TrophyCreation` struct
@@ -527,6 +727,24 @@ export const seasonPhase = [
 export type SeasonPhase = { [key in typeof seasonPhase[number]]: string };
 export type SeasonPhaseEnum = CairoCustomEnum;
 
+// Type definition for `pistols::models::tournament::TournamentState` enum
+export const tournamentState = [
+	'Undefined',
+	'InProgress',
+	'Finished',
+] as const;
+export type TournamentState = { [key in typeof tournamentState[number]]: string };
+export type TournamentStateEnum = CairoCustomEnum;
+
+// Type definition for `pistols::models::tournament::TournamentType` enum
+export const tournamentType = [
+	'Undefined',
+	'LastManStanding',
+	'BestOfThree',
+] as const;
+export type TournamentType = { [key in typeof tournamentType[number]]: string };
+export type TournamentTypeEnum = CairoCustomEnum;
+
 // Type definition for `pistols::types::cards::blades::BladesCard` enum
 export const bladesCard = [
 	'None',
@@ -544,12 +762,14 @@ export const finalBlow = [
 	'Paces',
 	'Blades',
 	'Forsaken',
+	'Unpaired',
 ] as const;
 export type FinalBlow = { 
 	Undefined: string,
 	Paces: PacesCardEnum,
 	Blades: BladesCardEnum,
 	Forsaken: string,
+	Unpaired: string,
 };
 export type FinalBlowEnum = CairoCustomEnum;
 
@@ -730,8 +950,8 @@ export interface SchemaType extends ISchemaType {
 		TokenConfig: TokenConfig,
 		TokenConfigValue: TokenConfigValue,
 		Duelist: Duelist,
-		DuelistChallenge: DuelistChallenge,
-		DuelistChallengeValue: DuelistChallengeValue,
+		DuelistAssignment: DuelistAssignment,
+		DuelistAssignmentValue: DuelistAssignmentValue,
 		DuelistMemorial: DuelistMemorial,
 		DuelistMemorialValue: DuelistMemorialValue,
 		DuelistStatus: DuelistStatus,
@@ -756,11 +976,41 @@ export interface SchemaType extends ISchemaType {
 		SeasonConfigValue: SeasonConfigValue,
 		SeasonScoreboard: SeasonScoreboard,
 		SeasonScoreboardValue: SeasonScoreboardValue,
+		ChallengeToTournament: ChallengeToTournament,
+		ChallengeToTournamentValue: ChallengeToTournamentValue,
+		Tournament: Tournament,
+		TournamentDuelKeys: TournamentDuelKeys,
+		TournamentPass: TournamentPass,
+		TournamentPassValue: TournamentPassValue,
+		TournamentRound: TournamentRound,
+		TournamentRoundValue: TournamentRoundValue,
+		TournamentSettings: TournamentSettings,
+		TournamentSettingsValue: TournamentSettingsValue,
+		TournamentToChallenge: TournamentToChallenge,
+		TournamentToChallengeValue: TournamentToChallengeValue,
+		TournamentValue: TournamentValue,
 		TokenBoundAddress: TokenBoundAddress,
 		TokenBoundAddressValue: TokenBoundAddressValue,
 		MockedValue: MockedValue,
 		MockedValueValue: MockedValueValue,
 		Period: Period,
+	},
+	tournaments: {
+		GameCounter: GameCounter,
+		GameCounterValue: GameCounterValue,
+		GameMetadata: GameMetadata,
+		GameMetadataValue: GameMetadataValue,
+		Score: Score,
+		ScoreValue: ScoreValue,
+		Settings: Settings,
+		SettingsCounter: SettingsCounter,
+		SettingsCounterValue: SettingsCounterValue,
+		SettingsDetails: SettingsDetails,
+		SettingsDetailsValue: SettingsDetailsValue,
+		SettingsValue: SettingsValue,
+		TokenMetadata: TokenMetadata,
+		TokenMetadataValue: TokenMetadataValue,
+		Lifecycle: Lifecycle,
 	},
 	achievement: {
 		TrophyCreation: TrophyCreation,
@@ -804,7 +1054,6 @@ export const schema: SchemaType = {
 				Lesson: undefined, }),
 			quote: 0,
 			lives_staked: 0,
-			tournament_id: 0,
 			address_a: "",
 			address_b: "",
 			duelist_id_a: 0,
@@ -843,7 +1092,6 @@ export const schema: SchemaType = {
 				Lesson: undefined, }),
 			quote: 0,
 			lives_staked: 0,
-			tournament_id: 0,
 			address_a: "",
 			address_b: "",
 			duelist_id_a: 0,
@@ -892,7 +1140,8 @@ export const schema: SchemaType = {
 					Undefined: "",
 				Paces: undefined,
 				Blades: undefined,
-				Forsaken: undefined, }),
+				Forsaken: undefined,
+				Unpaired: undefined, }),
 		},
 		RoundValue: {
 		moves_a: { salt: 0, hashed: 0, timeout: 0, card_1: 0, card_2: 0, card_3: 0, card_4: 0, },
@@ -908,7 +1157,8 @@ export const schema: SchemaType = {
 					Undefined: "",
 				Paces: undefined,
 				Blades: undefined,
-				Forsaken: undefined, }),
+				Forsaken: undefined,
+				Unpaired: undefined, }),
 		},
 		CoinConfig: {
 			coin_address: "",
@@ -953,12 +1203,14 @@ export const schema: SchemaType = {
 		timestamps: { registered: 0, active: 0, },
 		status: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 		},
-		DuelistChallenge: {
+		DuelistAssignment: {
 			duelist_id: 0,
 			duel_id: 0,
+			pass_id: 0,
 		},
-		DuelistChallengeValue: {
+		DuelistAssignmentValue: {
 			duel_id: 0,
+			pass_id: 0,
 		},
 		DuelistMemorial: {
 			duelist_id: 0,
@@ -1120,6 +1372,85 @@ export const schema: SchemaType = {
 		SeasonScoreboardValue: {
 			points: 0,
 		},
+		ChallengeToTournament: {
+			duel_id: 0,
+		keys: { tournament_id: 0, round_number: 0, entry_number_a: 0, entry_number_b: 0, },
+		},
+		ChallengeToTournamentValue: {
+		keys: { tournament_id: 0, round_number: 0, entry_number_a: 0, entry_number_b: 0, },
+		},
+		Tournament: {
+			tournament_id: 0,
+		state: new CairoCustomEnum({ 
+					Undefined: "",
+				InProgress: undefined,
+				Finished: undefined, }),
+			round_number: 0,
+		},
+		TournamentDuelKeys: {
+			tournament_id: 0,
+			round_number: 0,
+			entry_number_a: 0,
+			entry_number_b: 0,
+		},
+		TournamentPass: {
+			pass_id: 0,
+			tournament_id: 0,
+			entry_number: 0,
+			duelist_id: 0,
+			current_round_number: 0,
+			score: 0,
+			fame: 0,
+		},
+		TournamentPassValue: {
+			tournament_id: 0,
+			entry_number: 0,
+			duelist_id: 0,
+			current_round_number: 0,
+			score: 0,
+			fame: 0,
+		},
+		TournamentRound: {
+			tournament_id: 0,
+			round_number: 0,
+			entry_count: 0,
+		timestamps: { start: 0, end: 0, },
+		bracket: 0,
+			results: 0,
+		},
+		TournamentRoundValue: {
+			entry_count: 0,
+		timestamps: { start: 0, end: 0, },
+		bracket: 0,
+			results: 0,
+		},
+		TournamentSettings: {
+			settings_id: 0,
+		tournament_type: new CairoCustomEnum({ 
+					Undefined: "",
+				LastManStanding: undefined,
+				BestOfThree: undefined, }),
+		},
+		TournamentSettingsValue: {
+		tournament_type: new CairoCustomEnum({ 
+					Undefined: "",
+				LastManStanding: undefined,
+				BestOfThree: undefined, }),
+		},
+		TournamentToChallenge: {
+		keys: { tournament_id: 0, round_number: 0, entry_number_a: 0, entry_number_b: 0, },
+			duel_id: 0,
+		},
+		TournamentToChallengeValue: {
+			duel_id: 0,
+		},
+		TournamentValue: {
+		state: new CairoCustomEnum({ 
+					Undefined: "",
+				InProgress: undefined,
+				Finished: undefined, }),
+			round_number: 0,
+		},
 		TokenBoundAddress: {
 			recipient: "",
 			contract_address: "",
@@ -1141,6 +1472,83 @@ export const schema: SchemaType = {
 		Period: {
 			start: 0,
 			end: 0,
+		},
+		GameCounter: {
+			key: 0,
+			count: 0,
+		},
+		GameCounterValue: {
+			count: 0,
+		},
+		GameMetadata: {
+			contract_address: "",
+			creator_address: "",
+			name: 0,
+		description: "",
+			developer: 0,
+			publisher: 0,
+			genre: 0,
+		image: "",
+		},
+		GameMetadataValue: {
+			creator_address: "",
+			name: 0,
+		description: "",
+			developer: 0,
+			publisher: 0,
+			genre: 0,
+		image: "",
+		},
+		Score: {
+			game_id: 0,
+			score: 0,
+		},
+		ScoreValue: {
+			score: 0,
+		},
+		Settings: {
+			id: 0,
+			name: 0,
+			value: 0,
+		},
+		SettingsCounter: {
+			key: 0,
+			count: 0,
+		},
+		SettingsCounterValue: {
+			count: 0,
+		},
+		SettingsDetails: {
+			id: 0,
+			name: 0,
+		description: "",
+			exists: false,
+		},
+		SettingsDetailsValue: {
+			name: 0,
+		description: "",
+			exists: false,
+		},
+		SettingsValue: {
+			value: 0,
+		},
+		TokenMetadata: {
+			token_id: 0,
+			minted_by: "",
+			player_name: 0,
+			settings_id: 0,
+		lifecycle: { mint: 0, start: new CairoOption(CairoOptionVariant.None), end: new CairoOption(CairoOptionVariant.None), },
+		},
+		TokenMetadataValue: {
+			minted_by: "",
+			player_name: 0,
+			settings_id: 0,
+		lifecycle: { mint: 0, start: new CairoOption(CairoOptionVariant.None), end: new CairoOption(CairoOptionVariant.None), },
+		},
+		Lifecycle: {
+			mint: 0,
+		start: new CairoOption(CairoOptionVariant.None),
+		end: new CairoOption(CairoOptionVariant.None),
 		},
 		TrophyCreation: {
 			id: 0,
@@ -1309,8 +1717,8 @@ export enum ModelsMapping {
 	TokenConfigValue = 'pistols-TokenConfigValue',
 	CauseOfDeath = 'pistols-CauseOfDeath',
 	Duelist = 'pistols-Duelist',
-	DuelistChallenge = 'pistols-DuelistChallenge',
-	DuelistChallengeValue = 'pistols-DuelistChallengeValue',
+	DuelistAssignment = 'pistols-DuelistAssignment',
+	DuelistAssignmentValue = 'pistols-DuelistAssignmentValue',
 	DuelistMemorial = 'pistols-DuelistMemorial',
 	DuelistMemorialValue = 'pistols-DuelistMemorialValue',
 	DuelistStatus = 'pistols-DuelistStatus',
@@ -1338,6 +1746,21 @@ export enum ModelsMapping {
 	SeasonPhase = 'pistols-SeasonPhase',
 	SeasonScoreboard = 'pistols-SeasonScoreboard',
 	SeasonScoreboardValue = 'pistols-SeasonScoreboardValue',
+	ChallengeToTournament = 'pistols-ChallengeToTournament',
+	ChallengeToTournamentValue = 'pistols-ChallengeToTournamentValue',
+	Tournament = 'pistols-Tournament',
+	TournamentDuelKeys = 'pistols-TournamentDuelKeys',
+	TournamentPass = 'pistols-TournamentPass',
+	TournamentPassValue = 'pistols-TournamentPassValue',
+	TournamentRound = 'pistols-TournamentRound',
+	TournamentRoundValue = 'pistols-TournamentRoundValue',
+	TournamentSettings = 'pistols-TournamentSettings',
+	TournamentSettingsValue = 'pistols-TournamentSettingsValue',
+	TournamentState = 'pistols-TournamentState',
+	TournamentToChallenge = 'pistols-TournamentToChallenge',
+	TournamentToChallengeValue = 'pistols-TournamentToChallengeValue',
+	TournamentType = 'pistols-TournamentType',
+	TournamentValue = 'pistols-TournamentValue',
 	TokenBoundAddress = 'pistols-TokenBoundAddress',
 	TokenBoundAddressValue = 'pistols-TokenBoundAddressValue',
 	MockedValue = 'pistols-MockedValue',
@@ -1354,6 +1777,21 @@ export enum ModelsMapping {
 	RoundState = 'pistols-RoundState',
 	Rules = 'pistols-Rules',
 	Period = 'pistols-Period',
+	GameCounter = 'tournaments-GameCounter',
+	GameCounterValue = 'tournaments-GameCounterValue',
+	GameMetadata = 'tournaments-GameMetadata',
+	GameMetadataValue = 'tournaments-GameMetadataValue',
+	Score = 'tournaments-Score',
+	ScoreValue = 'tournaments-ScoreValue',
+	Settings = 'tournaments-Settings',
+	SettingsCounter = 'tournaments-SettingsCounter',
+	SettingsCounterValue = 'tournaments-SettingsCounterValue',
+	SettingsDetails = 'tournaments-SettingsDetails',
+	SettingsDetailsValue = 'tournaments-SettingsDetailsValue',
+	SettingsValue = 'tournaments-SettingsValue',
+	TokenMetadata = 'tournaments-TokenMetadata',
+	TokenMetadataValue = 'tournaments-TokenMetadataValue',
+	Lifecycle = 'tournaments-Lifecycle',
 	TrophyCreation = 'achievement-TrophyCreation',
 	TrophyCreationValue = 'achievement-TrophyCreationValue',
 	TrophyProgression = 'achievement-TrophyProgression',

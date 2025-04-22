@@ -174,6 +174,26 @@ export const getSeasonPhaseValue = (name: SeasonPhase): number | undefined => _i
 export const getSeasonPhaseFromValue = (value: number): SeasonPhase | undefined => Object.keys(SeasonPhase)[value] as SeasonPhase;
 export const getSeasonPhaseMap = (): Record<SeasonPhase, number> => Object.keys(SeasonPhase).reduce((acc, v, index) => { acc[v as SeasonPhase] = index; return acc; }, {} as Record<SeasonPhase, number>);
 
+// from: ../dojo/src/models/tournament.cairo
+export enum TournamentState {
+  Undefined = 'Undefined', // 0
+  InProgress = 'InProgress', // 1
+  Finished = 'Finished', // 2
+};
+export const getTournamentStateValue = (name: TournamentState): number | undefined => _indexOrUndefined(Object.keys(TournamentState).indexOf(name));
+export const getTournamentStateFromValue = (value: number): TournamentState | undefined => Object.keys(TournamentState)[value] as TournamentState;
+export const getTournamentStateMap = (): Record<TournamentState, number> => Object.keys(TournamentState).reduce((acc, v, index) => { acc[v as TournamentState] = index; return acc; }, {} as Record<TournamentState, number>);
+
+// from: ../dojo/src/models/tournament.cairo
+export enum TournamentType {
+  Undefined = 'Undefined', // 0
+  LastManStanding = 'LastManStanding', // 1
+  BestOfThree = 'BestOfThree', // 2
+};
+export const getTournamentTypeValue = (name: TournamentType): number | undefined => _indexOrUndefined(Object.keys(TournamentType).indexOf(name));
+export const getTournamentTypeFromValue = (value: number): TournamentType | undefined => Object.keys(TournamentType)[value] as TournamentType;
+export const getTournamentTypeMap = (): Record<TournamentType, number> => Object.keys(TournamentType).reduce((acc, v, index) => { acc[v as TournamentType] = index; return acc; }, {} as Record<TournamentType, number>);
+
 // from: ../dojo/src/types/boolean.cairo
 export enum Boolean {
   Undefined = 'Undefined', // 0
@@ -241,6 +261,7 @@ export enum FinalBlow {
   Paces = 'Paces', // 1
   Blades = 'Blades', // 2
   Forsaken = 'Forsaken', // 3
+  Unpaired = 'Unpaired', // 4
 };
 export const getFinalBlowValue = (name: FinalBlow): number | undefined => _indexOrUndefined(Object.keys(FinalBlow).indexOf(name));
 export const getFinalBlowFromValue = (value: number): FinalBlow | undefined => Object.keys(FinalBlow)[value] as FinalBlow;
@@ -449,6 +470,16 @@ export type PackDescription = {
   quantity : number,
 };
 
+// from: ../dojo/src/models/tournament.cairo
+export type TournamentRules = {
+  settings_id : number,
+  description : string,
+  max_rounds : number,
+  min_lives : number,
+  max_lives : number,
+  lives_staked : number,
+};
+
 // from: ../dojo/src/types/cards/cards.cairo
 export type CardPoints = {
   name : string,
@@ -653,6 +684,55 @@ type type_PlayerErrors = {
 };
 export const PlayerErrors: type_PlayerErrors = {
   PLAYER_NOT_REGISTERED: 'PLAYER: Not registered',
+};
+
+// from: ../dojo/src/models/tournament.cairo
+type type_TOURNAMENT_RULES = {
+  Undefined: TournamentRules, // cairo: TournamentRules
+  LastManStanding: TournamentRules, // cairo: TournamentRules
+  BestOfThree: TournamentRules, // cairo: TournamentRules
+};
+export const TOURNAMENT_RULES: type_TOURNAMENT_RULES = {
+  Undefined: {
+    settings_id: 0,
+    description: 'Undefined',
+    max_rounds: 0,
+    min_lives: 0,
+    max_lives: 0,
+    lives_staked: 0,
+  },
+  LastManStanding: {
+    settings_id: 1,
+    description: 'Last Man Standing',
+    max_rounds: 0,
+    min_lives: 3,
+    max_lives: 3,
+    lives_staked: 3,
+  },
+  BestOfThree: {
+    settings_id: 2,
+    description: 'Best of Three',
+    max_rounds: 3,
+    min_lives: 3,
+    max_lives: 3,
+    lives_staked: 1,
+  },
+};
+
+// from: ../dojo/src/systems/tokens/budokan_mock.cairo
+type type_budokan_mock = {
+  TOURNAMENT_OF_1: bigint, // cairo: u64
+  TOURNAMENT_OF_2: bigint, // cairo: u64
+  TOURNAMENT_OF_3: bigint, // cairo: u64
+  TOURNAMENT_OF_5: bigint, // cairo: u64
+  TOURNAMENT_OF_6: bigint, // cairo: u64
+};
+export const budokan_mock: type_budokan_mock = {
+  TOURNAMENT_OF_1: 1001n,
+  TOURNAMENT_OF_2: 1002n,
+  TOURNAMENT_OF_3: 1003n,
+  TOURNAMENT_OF_5: 1005n,
+  TOURNAMENT_OF_6: 1006n,
 };
 
 // from: ../dojo/src/types/cards/blades.cairo
