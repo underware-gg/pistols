@@ -10,16 +10,16 @@ import { BigNumberish } from 'starknet';
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext';
 import { DuelistCard } from '/src/components/cards/DuelistCard';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
-import { useAllSeasonTableIds, useLeaderboard, useSeason } from '/src/stores/tableStore';
 import { useConfig } from '/src/stores/configStore';
 import { formatTimestampDeltaCountdown, formatTimestampLocal } from '@underware/pistols-sdk/utils';
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks';
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists';
-import { useTableTotals } from '/src/hooks/useTable';
 import { useSeasonPool } from '/src/stores/bankStore';
 import { Balance } from '../account/Balance';
 import { useIsMyAccount } from '/src/hooks/useIsYou';
 import { useDuelistSeasonStats } from '/src/stores/challengeQueryStore';
+import { useSeason, useAllSeasonIds, useLeaderboard } from '/src/stores/seasonStore';
+import { useSeasonTotals } from '/src/hooks/useSeason';
 
 export default function ScLeaderboards() {
   const { aspectWidth, aspectHeight } = useGameAspect();
@@ -27,25 +27,25 @@ export default function ScLeaderboards() {
   const { dispatchSelectPlayerAddress, dispatchSelectDuelistId } = usePistolsContext();
   
   // Get season data
-  const { seasonTableIds = [] } = useAllSeasonTableIds();
+  const { seasonIds } = useAllSeasonIds()
   
   // Safely set the selected season to the active season or the first available one
-  const [selectedSeason, setSelectedSeason] = useState<string | null>(null);
+  const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
 
   // Set selected season on first load
   useEffect(() => {
-    if (selectedSeason) return;
+    if (selectedSeasonId) return;
     
-    if (seasonTableIds.length > 0) {
-      setSelectedSeason(seasonTableIds[0]);
+    if (seasonIds.length > 0) {
+      setSelectedSeasonId(seasonIds[0]);
     }
-  }, [seasonTableIds, selectedSeason]);
+  }, [seasonIds, selectedSeasonId]);
 
-  function SeasonRow({ season, isSelected, onClick }: { season: string, isSelected: boolean, onClick: () => void }) {
+  function SeasonRow({ season, isSelected, onClick }: { season: number, isSelected: boolean, onClick: () => void }) {
     const [isHovered, setIsHovered] = useState(false);
     const { seasonId, timestamp_start, timestamp_end, isActive } = useSeason(season);
     const { clientTimestamp } = useClientTimestamp(isActive);
-    const { accountsCount } = useTableTotals(season);
+    const { accountsCount } = useSeasonTotals(season);
     const poolSeason = useSeasonPool(season);
     
     const timeLeft = useMemo(() => {
@@ -129,8 +129,7 @@ export default function ScLeaderboards() {
     const { name: playerName } = usePlayer(owner);
 
     // TODO: Get actual season stats for this duelist
-    const seasonId = selectedSeason ? BigInt(selectedSeason.replace(/\D/g, '')) : 0n;
-    const seasonStats = useDuelistSeasonStats(duelistId, seasonId);
+    const seasonStats = useDuelistSeasonStats(duelistId, selectedSeasonId);
 
     const backgroundImage = `/images/ui/leaderboards/duelist_background${isMe ? '_mine' : ''}${isDead ? '_dead' : ''}.png`;
 
@@ -195,12 +194,12 @@ export default function ScLeaderboards() {
   }
 
   const handleSeasonSelect = (seasonId: number) => {
-    setSelectedSeason(seasonId);
+    setSelectedSeasonId(seasonId);
     setActivePage(1); // Reset to first page when changing seasons
   };
 
   // Get leaderboard data for selected season
-  const { maxPositions = 0, scores = [] } = useLeaderboard(selectedSeason || '');
+  const { maxPositions = 0, scores = [] } = useLeaderboard(selectedSeasonId || 0);
   
   // Calculate pagination
   const itemsPerPage = activePage === 1 ? 3 : 7;
@@ -227,8 +226,7 @@ export default function ScLeaderboards() {
     const { isDead } = useDuelist(duelistId);
     const { owner } = useOwnerOfDuelist(duelistId);
     
-    const seasonId = selectedSeason ? BigInt(selectedSeason.replace(/\D/g, '')) : undefined;
-    const { wins, losses } = useDuelistSeasonStats(duelistId, seasonId);
+    const { wins, losses } = useDuelistSeasonStats(duelistId, selectedSeasonId);
     
     const podiumType = rank === 1 ? 'gold' : rank === 2 ? 'silver' : 'bronze';
     const podiumImage = `/images/ui/leaderboards/podium_${podiumType}${isDead ? '_dead' : ''}.png`;
@@ -485,26 +483,26 @@ export default function ScLeaderboards() {
           
           <div className='TextDivider bright LeaderboardsDivider EqualMargin'>Current Season</div>
           
-          {seasonTableIds.length > 0 && (
+          {seasonIds.length > 0 && (
             <SeasonRow
-              key={seasonTableIds[0]}
-              season={seasonTableIds[0]}
-              isSelected={selectedSeason === seasonTableIds[0]}
-              onClick={() => handleSeasonSelect(seasonTableIds[0])}
+              key={seasonIds[0]}
+              season={seasonIds[0]}
+              isSelected={selectedSeasonId === seasonIds[0]}
+              onClick={() => handleSeasonSelect(seasonIds[0])}
             />
           )}
           
           <div className='TextDivider bright LeaderboardsDivider EqualMargin'>Past Seasons</div>
           
-          {seasonTableIds.length > 1 && (
+          {seasonIds.length > 1 && (
             <>
               
               <div style={{ overflow: 'auto', flex: 1 }}>
-                {seasonTableIds.slice(1).map(season => (
+                {seasonIds.slice(1).map(season => (
                   <SeasonRow
                     key={season}
                     season={season}
-                    isSelected={selectedSeason === season}
+                    isSelected={selectedSeasonId === season}
                     onClick={() => handleSeasonSelect(season)}
                   />
                 ))}
@@ -512,7 +510,7 @@ export default function ScLeaderboards() {
             </>
           )}
           
-          {seasonTableIds.length < 2 && (
+          {seasonIds.length < 2 && (
             <div style={{ 
               flex: 1, 
               display: 'flex', 
@@ -532,7 +530,7 @@ export default function ScLeaderboards() {
       {/* Right Side - Leaderboard */}
       <div style={{ flex: '1.5', padding: aspectWidth(3), paddingRight: aspectWidth(4), paddingLeft: aspectWidth(0) }}>
         <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
-          {selectedSeason ? (
+          {selectedSeasonId ? (
             <>
               {activePage === 1 && (
                 <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: aspectWidth(1), marginBottom: aspectHeight(7) }}>

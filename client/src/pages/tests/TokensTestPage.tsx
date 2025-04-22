@@ -243,6 +243,7 @@ function TestImages() {
     lives: 4,
     is_memorized: false,
     duel_id: 0,
+    pass_id: 0,
   }, {
     includeMimeType: true,
   })
