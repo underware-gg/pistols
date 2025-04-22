@@ -40,7 +40,7 @@ pub mod tutorial {
     use pistols::interfaces::dns::{DnsTrait};
     use pistols::systems::rng::{RngWrapTrait, MockedValue};
     use pistols::models::{
-        challenge::{Challenge, ChallengeTrait, DuelType, Round, MovesTrait},
+        challenge::{Challenge, ChallengeTrait, ChallengeMessage, DuelType, Round, MovesTrait},
     };
     use pistols::types::{
         premise::{Premise},
@@ -113,7 +113,6 @@ pub mod tutorial {
                 duel_id,
                 duel_type: DuelType::Tutorial,
                 premise: Premise::Lesson,
-                quote: level.quote(),
                 lives_staked: 1,
                 // duelists
                 address_a: starknet::get_caller_address(),
@@ -131,6 +130,11 @@ pub mod tutorial {
                 },
             };
 
+            let message: ChallengeMessage = ChallengeMessage {
+                duel_id,
+                message: level.message(),
+            };
+
             // create Round
             let mut round = Round {
                 duel_id: challenge.duel_id,
@@ -143,6 +147,7 @@ pub mod tutorial {
             };
 
             store.set_challenge(@challenge);
+            store.set_challenge_message(@message);
             store.set_round(@round);
 
             (challenge.duel_id)

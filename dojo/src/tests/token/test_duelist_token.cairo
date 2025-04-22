@@ -598,7 +598,7 @@ fn test_mint_duelist_not_minter() {
 #[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))] // for random addresses
 fn test_transfer_rewards_invalid_caller() {
     let mut sys: TestSystems = setup(0);
-    let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), 'premise', DuelType::Seasonal, 0, 1);
+    let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), "", DuelType::Seasonal, 0, 1);
     let challenge: Challenge = sys.store.get_challenge(duel_id);
     // let account: ContractAddress = tester::deploy_mock_account();
     // tester::impersonate(account);

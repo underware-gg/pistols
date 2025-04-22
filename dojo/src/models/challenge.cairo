@@ -16,7 +16,6 @@ pub struct Challenge {
     // settings
     pub duel_type: DuelType,        // duel type
     pub premise: Premise,           // premise of the dispute
-    pub quote: felt252,             // message to challenged
     pub lives_staked: u8,           // lives staked by challenger
     // duelists
     pub address_a: ContractAddress, // Challenger wallet
@@ -38,6 +37,15 @@ pub enum DuelType {
     Tournament,     // 2
     Tutorial,       // 3
     Practice,       // 4
+}
+
+#[derive(Clone, Drop, Serde)]
+#[dojo::model]
+pub struct ChallengeMessage {
+    #[key]
+    pub duel_id: u128,
+    //-------------------------
+    pub message: ByteArray,
 }
 
 //

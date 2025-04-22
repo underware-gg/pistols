@@ -80,7 +80,7 @@ function _NewChallengeModal({
   const _create_duel = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await duel_token.create_duel(account, constants.DuelType.Seasonal, challengingDuelistId, challengingAddress, args.premise, args.quote, args.expire_hours, args.lives_staked)
+      await duel_token.create_duel(account, constants.DuelType.Seasonal, challengingDuelistId, challengingAddress, args.premise, args.message, args.expire_hours, args.lives_staked)
       setIsSubmitting(false)
     }
     if (args?.canSubmit) _submit()
@@ -315,22 +315,22 @@ function NewChallengeForm({
   const { aspectWidth } = useGameAspect()
   
   const [premise, setPremise] = useState(constants.Premise.Honour)
-  const [quote, setQuote] = useState('')
+  const [message, setMessage] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
   const [lives_staked, setLivesStaked] = useState(Math.min(1, lives))
 
-  const canSubmit = useMemo(() => (quote.length > 3 && (days + hours) > 0 && lives_staked > 0), [quote, days, hours, lives_staked])
+  const canSubmit = useMemo(() => (message.length > 3 && (days + hours) > 0 && lives_staked > 0), [message, days, hours, lives_staked])
 
   useEffect(() => {
     setArgs({
       premise,
-      quote,
+      message,
       expire_hours: ((days * 24) + hours),
       lives_staked,
       canSubmit,
     })
-  }, [canSubmit, premise, quote, days, hours, lives_staked])
+  }, [canSubmit, premise, message, days, hours, lives_staked])
 
   const premiseOptions = useMemo(() => Object.keys(constants.Premise).slice(1).map((premise) => ({
     key: `${premise}`,
@@ -371,12 +371,12 @@ function NewChallengeForm({
       </Form.Field>
 
       <Form.Field>
-        <div className={`NewChallengeDivider Small VerticalSpacing Centered ${quote.length > 3 ? '' : 'Warning'}`}>{constants.PREMISES[premise].prefix.toUpperCase()}</div>
+        <div className={`NewChallengeDivider Small VerticalSpacing Centered ${message.length > 3 ? '' : 'Warning'}`}>{constants.PREMISES[premise].prefix.toUpperCase()}</div>
         <FormInput
           placeholder={'DESCRIBE YOUR REASONING'}
-          value={quote}
+          value={message}
           fluid
-          setValue={setQuote}
+          setValue={setMessage}
           code={true}
           disabled={false}
           maxLength={31}

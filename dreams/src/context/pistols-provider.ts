@@ -49,7 +49,7 @@ Use these to call functions with graphql
         - duelist_id: Your duelist ID (the Challenger)
         - challenged_address: The challenged player's wallet address
         - premise: The premise of the challenge see <PREMISE_VALUES>. Always use the "Training" code
-        - quote: The quote of the challenge, a string of 31 characters max, encoded as a fetlt252 short string
+        - message: The message of the challenge, from Challenger to Challenged
         - expire_hours: The number of hours before the challenge expires, from 1 to 24
       </PARAMETERS>
       <EXAMPLE>

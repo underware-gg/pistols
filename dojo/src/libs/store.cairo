@@ -23,6 +23,7 @@ pub use pistols::models::{
     },
     challenge::{
         Challenge, ChallengeValue,
+        ChallengeMessage, ChallengeMessageValue,
         Round, RoundValue,
         DuelType,
     },
@@ -111,6 +112,12 @@ pub impl StoreImpl of StoreTrait {
     fn get_challenge_value(self: @Store, duel_id: u128) -> ChallengeValue {
         (self.world.read_value(duel_id))
     }
+
+    #[inline(always)]
+    fn get_challenge_message_value(self: @Store, duel_id: u128) -> ChallengeMessageValue {
+        (self.world.read_value(duel_id))
+    }
+
 
     #[inline(always)]
     fn get_round(self: @Store, duel_id: u128) -> Round {
@@ -289,6 +296,11 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_challenge(ref self: Store, model: @Challenge) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_challenge_message(ref self: Store, model: @ChallengeMessage) {
         self.world.write_model(model);
     }
 

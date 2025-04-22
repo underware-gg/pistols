@@ -1,5 +1,5 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
-import { AccountInterface, BigNumberish, Call, CallData, UniversalDetails } from 'starknet'
+import { AccountInterface, BigNumberish, Call, CallData, UniversalDetails, byteArray } from 'starknet'
 import { arrayClean, shortAddress, isPositiveBigint, bigintToHex } from 'src/utils/misc/types'
 import { NAMESPACE, getLordsAddress, getBankAddress, getVrfAddress } from 'src/games/pistols/config/config'
 import { stringToFelt, bigintToU256 } from 'src/utils/starknet/starknet'
@@ -173,16 +173,16 @@ export function createSystemCalls(
     // duel_token
     //
     duel_token: {
-      create_duel: async (signer: AccountInterface, duel_type: constants.DuelType, duelist_id: BigNumberish, challenged_address: BigNumberish, premise: constants.Premise, quote: string, expire_hours: number, lives_staked: number): Promise<boolean> => {
+      create_duel: async (signer: AccountInterface, duel_type: constants.DuelType, duelist_id: BigNumberish, challenged_address: BigNumberish, lives_staked: number, expire_hours: number, premise: constants.Premise, message: string): Promise<boolean> => {
         let calls: DojoCalls = [
           contractCalls.duel_token.buildCreateDuelCalldata(
             makeCustomEnum(duel_type),
             duelist_id,
             bigintToHex(challenged_address),
-            makeCustomEnum(premise),
-            stringToFelt(quote),
-            expire_hours,
             lives_staked,
+            expire_hours,
+            makeCustomEnum(premise),
+            byteArray.byteArrayFromString(message),
           ),
         ]
         return await _executeTransaction(signer, calls)

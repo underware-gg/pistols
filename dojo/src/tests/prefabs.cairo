@@ -13,7 +13,7 @@ pub mod prefabs {
         tester::{
             // StoreTrait,
             TestSystems,
-            ID,
+            ID, MESSAGE,
         }
     };
     use pistols::systems::rng_mock::{IRngMockDispatcherTrait, MockedValue, MockedValueTrait};
@@ -21,7 +21,6 @@ pub mod prefabs {
 
     pub const NAME_A: felt252 = 'Sensei';
     pub const NAME_B: felt252 = 'Senpai';
-    pub const MESSAGE: felt252 = 'For honour!!!';
     pub const DUEL_TYPE: DuelType = DuelType::Practice;
     pub const PRIZE_VALUE: u128 = 0;
     // pub const PRIZE_VALUE: u128 = 20_000_000_000_000_000_000;
@@ -50,7 +49,7 @@ pub mod prefabs {
     }
 
     pub fn start_new_challenge(sys: @TestSystems, duelist_a: ContractAddress, duelist_b: ContractAddress, duel_type: DuelType, lives_staked: u8) -> u128 {
-        let duel_id: u128 = tester::execute_create_duel(sys.duels, duelist_a, duelist_b, MESSAGE, duel_type, 48, lives_staked);
+        let duel_id: u128 = tester::execute_create_duel(sys.duels, duelist_a, duelist_b, MESSAGE(), duel_type, 48, lives_staked);
         tester::elapse_block_timestamp(TimestampTrait::from_minutes(2));
         tester::execute_reply_duel(sys.duels, duelist_b, ID(duelist_b), duel_id, true);
         (duel_id)

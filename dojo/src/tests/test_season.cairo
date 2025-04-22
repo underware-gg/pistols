@@ -15,12 +15,10 @@ mod tests {
             StoreTrait,
             IGameDispatcherTrait,
             TestSystems, FLAGS,
-            ID, OWNER, OTHER, SEASON_ID_1, SEASON_ID_2,
+            ID, OWNER, OTHER, SEASON_ID_1, SEASON_ID_2, MESSAGE,
         }
     };
     use pistols::tests::prefabs::{prefabs};
-
-    const PREMISE_1: felt252 = 'For honour!!!';
 
     #[test]
     fn test_season_initializer() {
@@ -44,7 +42,7 @@ mod tests {
         assert_eq!(season_1.season_id, 1, "season_id");
         assert_eq!(season_1.phase, SeasonPhase::InProgress, "phase");
         // create a challenge in season 1
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 0, 1);
         // let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         tester::execute_reply_duel(@sys.duels, OWNER(), ID(OWNER()), duel_id, false);
         //  time travel
@@ -73,7 +71,7 @@ mod tests {
         assert_eq!(new_season.rules, Rules::Season, "new_season.rules");
         assert_eq!(new_season.season_id, season_2.season_id, "new_season.season_id");
         // create a challenge in season 2
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 0, 1);
         // let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         // assert_eq!(challenge.season_id, season_2.season_id, "challenge.season_id_2");
         tester::execute_reply_duel(@sys.duels, OWNER(), ID(OWNER()), duel_id, false);
@@ -85,7 +83,7 @@ mod tests {
         let season_1: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season_1.period.end - TIMESTAMP::ONE_HOUR);
         // create a challenge in season 1
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), PREMISE_1, DuelType::Seasonal, 0, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 0, 1);
         tester::execute_reply_duel(@sys.duels, OTHER(), ID(OTHER()), duel_id, true);
         let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
         assert_eq!(challenge.season_id, 0, "challenge.season_id_1");

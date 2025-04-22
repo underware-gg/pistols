@@ -175,7 +175,7 @@ query getChallenge{
         duel_id
         duel_type
         premise
-        quote
+        message
         state
       }
     }
@@ -225,7 +225,7 @@ query getAllChallenges {
         duel_id
         duel_type
         premise
-        quote
+        message
         state
       }
     }

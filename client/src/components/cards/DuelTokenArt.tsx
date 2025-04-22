@@ -16,7 +16,7 @@ export function DuelTokenArt({
   className?: string,
   style?: React.CSSProperties,
 }) {
-  const { seasonId, duelType, premise, quote, state, winner, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB } = useChallenge(duelId)
+  const { seasonId, duelType, premise, message, state, winner, duelistIdA, duelistIdB, duelistAddressA, duelistAddressB } = useChallenge(duelId)
   const { profileType: profileTypeA, profilePic: profilePicA } = useDuelist(duelistIdA)
   const { profileType: profileTypeB, profilePic: profilePicB } = useDuelist(duelistIdB)
   const { name: usernameA } = usePlayer(duelistAddressA)
@@ -26,7 +26,7 @@ export function DuelTokenArt({
     duel_id: duelId,
     duel_type: duelType,
     premise,
-    quote,
+    message,
     state,
     winner,
     season_id: seasonId,
@@ -38,7 +38,7 @@ export function DuelTokenArt({
     username_b: usernameB,
     address_a: bigintToHex(duelistAddressA),
     address_b: bigintToHex(duelistAddressB),
-  }), [duelId, seasonId, premise, quote, state, winner, profileTypeA, profilePicA, profileTypeB, profilePicB, usernameA, usernameB, duelistAddressA, duelistAddressB])
+  }), [duelId, seasonId, premise, message, state, winner, profileTypeA, profilePicA, profileTypeB, profilePicB, usernameA, usernameB, duelistAddressA, duelistAddressB])
 
   return <DuelTokenImage props={props} className={className} style={style} />
 }

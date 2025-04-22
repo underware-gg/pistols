@@ -35,6 +35,7 @@ export function ChallengeStoreSync() {
       )
       .withEntityModels([
         'pistols-Challenge',
+        'pistols-ChallengeMessage',
         'pistols-Round',
       ])
       .withLimit(_limit)

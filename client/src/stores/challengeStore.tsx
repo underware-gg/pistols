@@ -33,6 +33,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const entity = useMemo(() => entities[entityId], [entities[entityId]])
 
   const challenge = useEntityModel<models.Challenge>(entity, 'Challenge')
+  const challengeMessage = useEntityModel<models.ChallengeMessage>(entity, 'ChallengeMessage')
   // const fameBalance = useEntityModel<models.ChallengeFameBalance>(entity, 'ChallengeFameBalance')
   // console.log(`useChallenge(${Number(duelId)}) =>`, 
   //   fameBalance, 
@@ -58,7 +59,7 @@ export const useChallenge = (duelId: BigNumberish) => {
   const winnerAddress = useMemo(() => (winner == 1 ? duelistAddressA : winner == 2 ? duelistAddressB : 0n), [winner, duelistAddressA, duelistAddressB])
   const winnerDuelistId = useMemo(() => (winner == 1 ? duelistIdA : winner == 2 ? duelistIdB : 0n), [winner, duelistIdA, duelistIdB])
   const premise = useMemo(() => (parseEnumVariant<constants.Premise>(challenge?.premise) ?? constants.Premise.Undefined), [challenge])
-  const quote = useMemo(() => feltToString(challenge?.quote ?? 0n), [challenge])
+  const message = useMemo(() => (challengeMessage?.message ?? ''), [challengeMessage])
   const livesStaked = useMemo(() => Number(challenge?.lives_staked ?? 0), [challenge])
   const timestampStart = useMemo(() => Number(challenge?.timestamps.start ?? 0), [challenge])
   const timestampEnd = useMemo(() => Number(challenge?.timestamps.end ?? 0), [challenge])
@@ -86,7 +87,7 @@ export const useChallenge = (duelId: BigNumberish) => {
     duelistIdA,
     duelistIdB,
     premise,
-    quote,
+    message,
     livesStaked,
     // progress and results
     winner,
@@ -213,6 +214,7 @@ export const useGetChallenge = (duel_id: BigNumberish) => {
         )
         .withEntityModels([
           "pistols-Challenge",
+          "pistols-ChallengeMessage",
           'pistols-Round',
         ])
         .includeHashedKeys()

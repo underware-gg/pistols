@@ -26,7 +26,7 @@ use pistols::tests::tester::{tester,
     tester::{
         StoreTrait,
         TestSystems, FLAGS,
-        ID, OWNER, OTHER, BUMMER, RECIPIENT, ZERO, SEASON_ID_1,
+        ID, OWNER, OTHER, BUMMER, RECIPIENT, ZERO, SEASON_ID_1, MESSAGE,
     },
 };
 
@@ -67,10 +67,10 @@ fn create_duel(sys: @TestSystems, recipient: ContractAddress, challenged_address
         duel_type: DuelType::Practice,
         duelist_id: ID(recipient),
         challenged_address: challenged_address,
-        premise: Premise::Honour,
-        quote: 'For honour!!!',
-        expire_hours: 1,
         lives_staked: 1,
+        expire_hours: 1,
+        premise: Premise::Honour,
+        message: MESSAGE(),
     );
 // println!("---BB");
 }
@@ -146,7 +146,6 @@ fn test_token_uri() {
         duel_id: DUEL_ID_1.low,
         duel_type: DuelType::Practice,
         premise: Premise::Honour,
-        quote: 'For honour!!!',
         lives_staked: 1,
         // duelists
         address_a: OWNER(),

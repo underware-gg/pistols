@@ -24,6 +24,7 @@ const query: PistolsQueryBuilder = new PistolsQueryBuilder()
     "pistols-DuelistAssignment",
     "pistols-DuelistMemorial",
     "pistols-Challenge",
+    "pistols-ChallengeMessage",
     'pistols-Round',
     "pistols-Pack",
     "pistols-Pool",
@@ -75,7 +76,7 @@ export function EntityStoreSync() {
       duelistQueryState.setEntities(duelistEntities)
       bankState.setEntities(filterEntitiesByModel(entities, 'Pool'))
       // challenge initial state is handled by <ChallengeStoreSync>
-      // const challengeEntities = filterEntitiesByModel(entities, ['Challenge', 'Round'])
+      // const challengeEntities = filterEntitiesByModel(entities, ['Challenge', 'ChallengeMessage', 'Round'])
       // challengeState.setEntities(challengeEntities)
       // challengeQueryState.setEntities(challengeEntities)
     },
@@ -100,7 +101,7 @@ export function EntityStoreSync() {
         duelistState.updateEntity(entity)
         duelistQueryState.updateEntity(entity)
       }
-      if (getEntityModel(entity, 'Challenge') || getEntityModel(entity, 'Round')) {
+      if (getEntityModel(entity, 'Challenge') || getEntityModel(entity, 'ChallengeMessage') || getEntityModel(entity, 'Round')) {
         challengeState.updateEntity(entity)
         challengeQueryState.updateEntity(entity)
       }

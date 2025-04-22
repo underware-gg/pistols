@@ -21,9 +21,9 @@ const useGetChallengesBySeasonQuery = (seasonId: BigNumberish) => {
             "pistols-Challenge", "season_id", "Eq", formatQueryValue(seasonId),
           ).build()
         )
-        .withEntityModels(
-          ["pistols-Challenge"]
-        )
+        .withEntityModels([
+          "pistols-Challenge",
+        ])
         .includeHashedKeys()
       : null
   ), [seasonId])

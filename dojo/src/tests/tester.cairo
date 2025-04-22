@@ -100,6 +100,8 @@ pub mod tester {
     pub fn OWNED_BY_OWNER() -> u128 { 0xeeee }
     pub fn OWNED_BY_OTHER() -> u128 { 0xdddd }
 
+    pub fn MESSAGE() -> ByteArray {("For honour!!!")}
+
     pub const SEASON_ID_1: u32 = 1;
     pub const SEASON_ID_2: u32 = 2;
 
@@ -240,18 +242,19 @@ pub mod tester {
             TestResource::Model(pistols::models::config::m_Config::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::config::m_TokenConfig::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::config::m_CoinConfig::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::player::m_Player::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::pack::m_Pack::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::challenge::m_Challenge::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::challenge::m_ChallengeMessage::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::challenge::m_Round::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::duelist::m_Duelist::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::duelist::m_DuelistAssignment::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::duelist::m_DuelistMemorial::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::leaderboard::m_Leaderboard::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::pack::m_Pack::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pact::m_Pact::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::pool::m_Pool::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::player::m_Player::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::season::m_SeasonScoreboard::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::season::m_SeasonConfig::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::leaderboard::m_Leaderboard::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::pool::m_Pool::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_TournamentPass::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_TournamentSettings::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_Tournament::TEST_CLASS_HASH),
@@ -623,24 +626,24 @@ pub mod tester {
     pub fn execute_create_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
         challenged: ContractAddress,
         // premise: Premise,
-        quote: felt252,
+        message: ByteArray,
         duel_type: DuelType,
         expire_hours: u64,
         lives_staked: u8,
     ) -> u128 {
-        (execute_create_duel_ID(system, sender, ID(sender), challenged, quote, duel_type, expire_hours, lives_staked))
+        (execute_create_duel_ID(system, sender, ID(sender), challenged, message, duel_type, expire_hours, lives_staked))
     }
     pub fn execute_create_duel_ID(system: @IDuelTokenDispatcher, sender: ContractAddress,
         token_id: u128,
         challenged: ContractAddress,
         // premise: Premise,
-        quote: felt252,
+        message: ByteArray,
         duel_type: DuelType,
         expire_hours: u64,
         lives_staked: u8,
     ) -> u128 {
         impersonate(sender);
-        let duel_id: u128 = (*system).create_duel(duel_type, token_id, challenged, Premise::Nothing, quote, expire_hours, lives_staked);
+        let duel_id: u128 = (*system).create_duel(duel_type, token_id, challenged, lives_staked, expire_hours, Premise::Nothing, message);
         _next_block();
         (duel_id)
     }

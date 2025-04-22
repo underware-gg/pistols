@@ -30,12 +30,11 @@ pub mod tests {
             // IFameCoinDispatcherTrait,
             ID, OWNER, OTHER, BUMMER, FAKE_OWNER_OF_1,
             _assert_is_alive, _assert_is_dead,
-            SEASON_ID_1,
+            SEASON_ID_1, MESSAGE,
         }
     };
     use pistols::tests::prefabs::{prefabs,
         prefabs::{
-            MESSAGE,
             PlayerMoves,
         },
     };
@@ -695,7 +694,7 @@ pub mod tests {
     #[test]
     fn test_commit_before_reply_a_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE, DuelType::Seasonal, 48, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 48, 1);
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, 0x1212112);
         // no panic!
     }
@@ -704,7 +703,7 @@ pub mod tests {
     #[should_panic(expected:('PISTOLS: Accept challenge first', 'ENTRYPOINT_FAILED'))]
     fn test_commit_before_reply_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME);
-        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE, DuelType::Seasonal, 48, 1);
+        let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), OTHER(), MESSAGE(), DuelType::Seasonal, 48, 1);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, 0x1212112);
     }
 

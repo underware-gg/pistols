@@ -252,7 +252,7 @@ function TestImages() {
     duel_id: 16,
     duel_type: constants.DuelType.Seasonal,
     premise: constants.Premise.Honour,
-    quote: 'Die scum!!!',
+    message: 'Die scum!!!',
     state: constants.ChallengeState.Resolved,
     winner: 1,
     season_id: 1,

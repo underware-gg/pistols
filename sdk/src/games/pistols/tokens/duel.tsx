@@ -19,7 +19,6 @@ export type DuelSvgProps = {
   duel_id: BigNumberish
   duel_type: constants.DuelType
   premise: constants.Premise
-  quote: string
   state: constants.ChallengeState
   winner: number
   season_id: number
@@ -31,6 +30,7 @@ export type DuelSvgProps = {
   username_b: string
   address_a: BigNumberish
   address_b: BigNumberish
+  message: string
   // optional
   is_loading?: boolean
 }

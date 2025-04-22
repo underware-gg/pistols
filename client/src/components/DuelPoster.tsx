@@ -91,7 +91,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
     isCanceled,
     isExpired,
     premise,
-    quote,
+    message,
     winnerDuelistId,
     isDraw,
     livesStaked,
@@ -318,7 +318,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                 </Row>
                 <Row columns='equal' textAlign='center'>
                   <Col>
-                    <h3 className='Quote Darkest'>{`"${quote}"`}</h3>
+                    <h3 className='Quote Darkest'>{`"${message}"`}</h3>
                     <h3 className='Quote Darkest'>~ Staking {livesStaked} {livesStaked == 1 ? 'life' : 'lives!'} ~</h3>
                   </Col>
                 </Row>

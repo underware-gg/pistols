@@ -44,11 +44,11 @@ pub impl TutorialLevelImpl of TutorialLevelTrait {
             _ => ProfileType::Undefined,
         }
     }
-    fn quote(self: @TutorialLevel) -> felt252 {
+    fn message(self: @TutorialLevel) -> ByteArray {
         match self {
-            TutorialLevel::Level1 => 'I challenge you, SCUM!!',
-            TutorialLevel::Level2 => 'Prepare for a real duel!',
-            _ => 0,
+            TutorialLevel::Level1 => "I challenge you, SCUM!!",
+            TutorialLevel::Level2 => "Prepare for a real duel!",
+            _ => "",
         }
     }
     fn make_moves(self: @TutorialLevel, player_hand: @DuelistHand) -> (Span<u8>, Span<MockedValue>) {
@@ -166,8 +166,7 @@ impl TutorialLevelIntoU128 of core::traits::Into<TutorialLevel, u128> {
 }
 impl ChallengeIntoTutorialLevel of core::traits::Into<Challenge, TutorialLevel> {
     fn into(self: Challenge) -> TutorialLevel {
-        if (self.quote == TutorialLevel::Level1.quote())        { TutorialLevel::Level1 }
-        else if (self.quote == TutorialLevel::Level2.quote())   { TutorialLevel::Level2 }
-        else                                                    { TutorialLevel::Undefined }
+        let tutorial_id: u128 = self.duel_id & 0xff;
+        (tutorial_id.into())
     }
 }

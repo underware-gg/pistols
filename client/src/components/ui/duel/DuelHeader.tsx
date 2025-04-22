@@ -11,7 +11,7 @@ export default function DuelHeader({
   tutorialLevel: DuelTutorialLevel
 }) {
 
-  const { seasonName, quote } = useGetChallenge(duelId)
+  const { seasonName, message } = useGetChallenge(duelId)
   const { seasonName: currentSeasonName } = useCurrentSeason()
   const seasonDescription = useMemo(() => (seasonName ?? currentSeasonName), [seasonName, currentSeasonName])
 
@@ -19,7 +19,7 @@ export default function DuelHeader({
     <>
       <div className='TavernBoard NoMouse NoDrag' style={{ backgroundImage: 'url(/images/ui/duel/wager_main.png)', backgroundSize: '100% 100%' }}>
         <div className='TavernTitle' data-contentlength={1}>Settling the matter of:</div>
-        <div className='TavernQuote' data-contentlength={Math.floor(quote.length / 10)}>{`"${quote}"`}</div>
+        <div className='TavernQuote' data-contentlength={Math.floor(message.length / 10)}>{`"${message}"`}</div>
         <div className='TavernTable' data-contentlength={Math.floor(seasonDescription.length / 10)}>{seasonDescription}</div>
       </div>
     </>

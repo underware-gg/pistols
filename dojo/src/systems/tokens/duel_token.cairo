@@ -61,7 +61,7 @@ pub trait IDuelToken<TState> {
     // IDuelTokenPublic
     fn get_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> u128;
     fn has_pact(self: @TState, duel_type: DuelType, address_a: ContractAddress, address_b: ContractAddress) -> bool;
-    fn create_duel(ref self: TState, duel_type: DuelType, duelist_id: u128, challenged_address: ContractAddress, premise: Premise, quote: felt252, expire_hours: u64, lives_staked: u8) -> u128;
+    fn create_duel(ref self: TState, duel_type: DuelType, duelist_id: u128, challenged_address: ContractAddress, lives_staked: u8, expire_hours: u64, premise: Premise, message: ByteArray) -> u128;
     fn reply_duel(ref self: TState, duel_id: u128, duelist_id: u128, accepted: bool) -> ChallengeState;
 }
 
@@ -77,10 +77,10 @@ pub trait IDuelTokenPublic<TState> {
         duel_type: DuelType,
         duelist_id: u128,
         challenged_address: ContractAddress,
-        premise: Premise,
-        quote: felt252,
-        expire_hours: u64,
         lives_staked: u8,
+        expire_hours: u64,
+        premise: Premise,
+        message: ByteArray,
     ) -> u128;
     fn reply_duel( //@description: Reply to a Duel (accept or reject)
         ref self: TState,
@@ -168,7 +168,7 @@ pub mod duel_token {
     };
     use pistols::models::{
         player::{PlayerTrait},
-        challenge::{Challenge, ChallengeTrait, ChallengeValue, DuelType, Round, RoundTrait},
+        challenge::{Challenge, ChallengeTrait, ChallengeValue, ChallengeMessage, ChallengeMessageValue, DuelType, Round, RoundTrait},
         duelist::{DuelistTrait, DuelistValue, ProfileTypeTrait},
         pact::{PactTrait},
         events::{Activity, ActivityTrait},
@@ -274,10 +274,10 @@ pub mod duel_token {
             duel_type: DuelType,
             duelist_id: u128,
             challenged_address: ContractAddress,
-            premise: Premise,
-            quote: felt252,
-            expire_hours: u64,
             lives_staked: u8,
+            expire_hours: u64,
+            premise: Premise,
+            message: ByteArray,
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
@@ -332,7 +332,6 @@ pub mod duel_token {
                 duel_id,
                 duel_type,
                 premise,
-                quote,
                 lives_staked: core::cmp::max(lives_staked, 1),
                 // duelists
                 address_a,
@@ -361,6 +360,13 @@ pub mod duel_token {
             // save!
             store.set_challenge(@challenge);
             store.set_round(@round);
+
+            if (message.len() > 0) {
+                store.set_challenge_message(@ChallengeMessage {
+                    duel_id,
+                    message,
+                });
+            }
 
             // set the pact + assert it does not exist
             if (address_b.is_non_zero()) {
@@ -532,8 +538,6 @@ pub mod duel_token {
                     duel_id,
                     duel_type: DuelType::Tournament,
                     premise: Premise::Tournament,
-                    quote: '---Tournament---',
-                    // quote: format!("Tournament #{} Round {}", tournament_id, round_number),
                     lives_staked: rules.lives_staked,
                     // duelists
                     address_a: if (duelist_number == 1) {player_address} else {ZERO()},
@@ -678,11 +682,11 @@ pub mod duel_token {
             let duelist_b: DuelistValue = store.get_duelist_value(challenge.duelist_id_b);
             let duelist_name_a: ByteArray = format!("Duelist #{}", challenge.duelist_id_a);
             let duelist_name_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);
+            let challenge_message: ChallengeMessageValue = store.get_challenge_message_value(token_id.low);
             // Image
             let image: ByteArray = UrlImpl::new(format!("{}/api/pistols/duel_token/{}/image", base_uri.clone(), token_id))
                 .add("duel_type", challenge.duel_type.into(), true)
                 .add("premise", challenge.premise.name(), true)
-                .add("quote", challenge.quote.to_string(), true)
                 .add("state", challenge.state.into(), false)
                 .add("winner", challenge.winner.to_string(), false)
                 .add("season_id", challenge.season_id.to_string(), false)
@@ -692,6 +696,7 @@ pub mod duel_token {
                 .add("profile_id_b", duelist_b.profile_type.profile_id().to_string(), false)
                 .add("address_a", format!("0x{:x}", challenge.address_a), false)
                 .add("address_b", format!("0x{:x}", challenge.address_b), false)
+                .add("message", challenge_message.message, true)
                 .build();
             // Attributes
             let mut attributes: Array<Attribute> = array![
@@ -714,10 +719,6 @@ pub mod duel_token {
                 Attribute {
                     key: "Premise",
                     value: challenge.premise.name(),
-                },
-                Attribute {
-                    key: "Quote",
-                    value: challenge.quote.to_string(),
                 },
                 Attribute {
                     key: "State",

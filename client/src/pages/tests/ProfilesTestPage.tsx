@@ -126,7 +126,7 @@ function Profiles({
         duel_id: Math.floor(Math.random() * 1000),
         duel_type: constants.DuelType.Seasonal,
         premise: _randomPremise(),
-        quote: _randomQuote(),
+        message: _randomQuote(),
         state,
         winner,
         season_id: 1,
