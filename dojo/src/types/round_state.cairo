@@ -8,11 +8,11 @@ pub enum RoundState {
 }
 
 pub trait RoundStateTrait {
-    fn is_concluded(self: @RoundState) -> bool;
+    fn is_finished(self: @RoundState) -> bool;
 }
 
 impl RoundStateImpl of RoundStateTrait {
-    fn is_concluded(self: @RoundState) -> bool {
+    fn is_finished(self: @RoundState) -> bool {
         match self {
             RoundState::Null        => true,
             RoundState::Commit      => false,

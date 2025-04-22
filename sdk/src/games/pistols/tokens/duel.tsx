@@ -62,9 +62,9 @@ const WEBSITE_Y = (HEIGHT * 0.97);
 export const renderSvg = (props: DuelSvgProps, options: SvgRenderOptions = {}): string => {
   const profile_a = _getProfile(props.profile_type_a, props.profile_id_a)
   const profile_b = _getProfile(props.profile_type_b, props.profile_id_b)
-  const is_concluded = (props.state === constants.ChallengeState.Resolved || props.state === constants.ChallengeState.Draw);
-  const is_dead_a = (is_concluded && props.winner != 1);
-  const is_dead_b = (is_concluded && props.winner != 2);
+  const is_finished = (props.state === constants.ChallengeState.Resolved || props.state === constants.ChallengeState.Draw);
+  const is_dead_a = (is_finished && props.winner != 1);
+  const is_dead_b = (is_finished && props.winner != 2);
   let image_duelist_a = renderDuelistImageUrl(props.profile_type_a, props.profile_id_a)
   let image_duelist_b = renderDuelistImageUrl(props.profile_type_b, props.profile_id_b)
   let image_paper = `/images/ui/duel_paper.png`

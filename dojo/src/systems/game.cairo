@@ -21,7 +21,7 @@ pub trait IGame<TState> {
         moves: Span<u8>,
     );
     fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear the required action call for a duelist
-    fn collect_duel(ref self: TState, duel_id: u128); // @description: Close expired duels
+    fn collect_duel(ref self: TState, duel_id: u128) -> u8; // @description: Close expired duels
     fn collect_season(ref self: TState) -> u32; // @description: Close the current season and start the next one
 
     // view calls
@@ -344,7 +344,7 @@ pub mod game {
             store.emit_call_to_action(starknet::get_caller_address(), duelist_id, 0, false);
         }
 
-        fn collect_duel(ref self: ContractState, duel_id: u128) {
+        fn collect_duel(ref self: ContractState, duel_id: u128) -> u8 {
             let mut store: Store = StoreTrait::new(self.world_default());
             let mut challenge: Challenge = store.get_challenge(duel_id);
             let mut round: Round = store.get_round(duel_id);
@@ -354,6 +354,21 @@ pub mod game {
                 assert(challenge.duel_type == DuelType::Tournament, Errors::INVALID_DUEL_TYPE);
                 let winner: u8 = if (challenge.address_b.is_zero()) {1} else if (challenge.address_a.is_zero()) {2} else {0};
                 round.final_blow = FinalBlow::Unpaired;
+                self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner));
+            } else if (store.world.caller_is_tournament_contract()) {
+                // tournament collect previous round duel
+                assert(challenge.duel_type == DuelType::Tournament, Errors::INVALID_DUEL_TYPE);
+                let winner: u8 =
+                    if (
+                        (round.moves_a.has_comitted() && !round.moves_b.has_comitted()) ||
+                        (round.moves_a.has_revealed() && !round.moves_b.has_revealed())
+                    ) {1}
+                    else if (
+                        (round.moves_b.has_comitted() && !round.moves_a.has_comitted()) ||
+                        (round.moves_b.has_revealed() && !round.moves_a.has_revealed())
+                    ) {2}
+                    else {0};
+                round.final_blow = FinalBlow::Forsaken;
                 self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner));
             } else {
                 // outside call
@@ -368,6 +383,7 @@ pub mod game {
                     assert(self._finish_challenge_if_timed_out(ref store, ref challenge, ref round), Errors::IMPOSSIBLE_ERROR);
                 }
             }
+            (challenge.winner)
         }
 
         fn collect_season(ref self: ContractState) -> u32 {
@@ -399,7 +415,7 @@ pub mod game {
             let challenge: Challenge = store.get_challenge(duel_id);
             if (challenge.is_tutorial()) {
                 (store.world.tutorial_dispatcher().get_duel_progress(duel_id))
-            } else if (challenge.state.is_concluded()) {
+            } else if (challenge.state.is_finished()) {
                 let mut round: Round = store.get_round(duel_id);
                 let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
                 (game_loop(wrapped, @challenge.get_deck(), ref round))
@@ -624,7 +640,7 @@ pub mod game {
             store.exit_challenge(challenge.duelist_id_a);
             store.exit_challenge(challenge.duelist_id_b);
             // distributions
-            if (challenge.state.is_concluded()) {
+            if (challenge.state.is_finished()) {
                 // transfer rewards
                 let tournament_id: u64 = 0;
                 let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_protected_dispatcher().transfer_rewards(challenge, tournament_id);

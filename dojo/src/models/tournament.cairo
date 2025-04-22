@@ -163,6 +163,8 @@ pub mod TOURNAMENT_RULES {
 use core::num::traits::Zero;
 use pistols::systems::tokens::tournament_token::tournament_token::{Errors as TournamentErrors};
 use pistols::systems::rng::{RngWrap, Shuffle, ShuffleTrait};
+use pistols::models::challenge::{Challenge};
+use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::bitwise::{BitwiseU128};
 use pistols::utils::bytemap::{BytemapU256};
 use pistols::utils::nibblemap::{NibblemapU128};
@@ -214,6 +216,19 @@ pub impl TournamentRoundImpl of TournamentRoundTrait {
     const NIBBLE_LOSING: u8 = 0b1100;   // playing and losing
     const NIBBLE_WINNING: u8 = 0b1101;  // playing and winning
 
+    fn get_challenge(self: @TournamentRound, store: @Store, entry_number: u8) -> Challenge {
+        let opponent_entry_number: u8 = (*self.bracket).get_opponent_entry_number(entry_number);
+        let keys: @TournamentDuelKeys = TournamentDuelKeysTrait::new(
+            *self.tournament_id,
+            *self.round_number,
+            entry_number,
+            opponent_entry_number,
+        );
+        let mut duel_id: u128 = store.get_tournament_duel_id(keys);
+        let mut challenge: Challenge = store.get_challenge(duel_id);
+        (challenge)
+    }
+
     //------------------------------------
     // initializers
     //
@@ -235,7 +250,7 @@ pub impl TournamentRoundImpl of TournamentRoundTrait {
             if (self.entry_count % 2 == 0)
                 // even entries: all duelists are playing and losing (0b1100)
                 {0xcccccccccccccccccccccccccccccccc}
-                // odd entries: last player wins (0b1101) > but need to collect_duel()
+                // odd entries: last player wins (0b1101) > but still need to join_duel()
                 else {0xdccccccccccccccccccccccccccccccc},
             ((Self::MAX_ENTRIES - self.entry_count) * 4).into()
         );
@@ -257,7 +272,7 @@ pub impl TournamentRoundImpl of TournamentRoundTrait {
         };
         if (self.entry_count % 2 == 1) {
             let entry_last: u8 = *survivors[shuffle.draw_next().into() - 1];
-            // odd entries: last player wins (0b1101) > but need to collect_duel()
+            // odd entries: last player wins (0b1101) > but still need to join_duel()
             self.moved_first(entry_last, 0); // winning
         }
     }
@@ -312,7 +327,6 @@ pub impl TournamentBracketImpl of TournamentBracketTrait {
         })
     }
 }
-
 
 #[generate_trait]
 pub impl TournamentResultsImpl of TournamentResultsTrait {

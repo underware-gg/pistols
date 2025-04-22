@@ -181,7 +181,7 @@ pub mod tournament_token {
     //     DnsTrait,
     // };
     use pistols::models::{
-        challenge::{ChallengeValue},
+        challenge::{Challenge},
         duelist::{DuelistTrait},
         tournament::{
             TournamentEntry, TournamentEntryValue,
@@ -190,13 +190,15 @@ pub mod tournament_token {
             TournamentRules,
             Tournament, TournamentValue,
             TournamentState,
-            TournamentRound, TournamentRoundValue, TournamentRoundTrait,
+            TournamentRound, TournamentRoundTrait,
+            TournamentRoundValue,
             TournamentBracketTrait,
             TournamentResultsTrait,
-            TournamentDuelKeys, TournamentDuelKeysTrait,
+            // TournamentDuelKeys, TournamentDuelKeysTrait,
         },
     };
     use pistols::types::{
+        challenge_state::{ChallengeState, ChallengeStateTrait},
         constants::{METADATA},
         timestamp::{Period, PeriodTrait, TIMESTAMP},
     };
@@ -206,6 +208,7 @@ pub mod tournament_token {
         ITournamentDispatcher, ITournamentDispatcherTrait,
         IVrfProviderDispatcherTrait, Source,
         IDuelTokenProtectedDispatcherTrait,
+        IGameDispatcherTrait,
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
     use pistols::libs::store::{Store, StoreTrait};
@@ -238,6 +241,7 @@ pub mod tournament_token {
         pub const NOT_ENLISTED: felt252             = 'TOURNAMENT: Not enlisted';
         pub const NOT_STARTED: felt252              = 'TOURNAMENT: Not started';
         pub const HAS_ENDED: felt252                = 'TOURNAMENT: Has ended';
+        pub const NOT_QUALIFIED: felt252            = 'TOURNAMENT: Not qualified';
         pub const DUELIST_IN_CHALLENGE: felt252     = 'TOURNAMENT: In a challenge';
         pub const DUELIST_IN_TOURNAMENT: felt252    = 'TOURNAMENT: In a tournament';
         pub const INVALID_ROUND: felt252            = 'TOURNAMENT: Invalid round';
@@ -453,18 +457,8 @@ pub mod tournament_token {
             let token_metadata: TokenMetadataValue = store.get_budokan_token_metadata_value(entry_id);
             let entry: TournamentEntryValue = store.get_tournament_entry_value(entry_id);
             let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
-            // check if joined
-            let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.round_number);
-// TODO: validate TournamentRound?
-            let opponent_entry_number: u8 = round.bracket.get_opponent_entry_number(entry.entry_number);
-            let keys: @TournamentDuelKeys = TournamentDuelKeysTrait::new(
-                entry.tournament_id,
-                tournament.round_number,
-                entry.entry_number,
-                opponent_entry_number,
-            );
-            let mut duel_id: u128 = store.get_tournament_duel_id(keys);
-            let mut challenge: ChallengeValue = store.get_challenge_value(duel_id);
+            let round: TournamentRound = store.get_tournament_round(entry.tournament_id, tournament.round_number);
+            let challenge: Challenge = round.get_challenge(@store, entry.entry_number);
             (
                 // owns entry
                 self.is_owner_of(starknet::get_caller_address(), entry_id.into()) &&
@@ -474,8 +468,10 @@ pub mod tournament_token {
                 entry.tournament_id.is_non_zero() &&
                 // tournament has started
                 tournament.state == TournamentState::InProgress &&
+                // is qualified
+                round.results.is_playing(entry.entry_number) &&
                 // not joined
-                (duel_id.is_zero() || (challenge.duelist_id_a != entry.duelist_id && challenge.duelist_id_b != entry.duelist_id))
+                (!challenge.state.exists() || (challenge.duelist_id_a != entry.duelist_id && challenge.duelist_id_b != entry.duelist_id))
             )
         }
         fn join_duel(ref self: ContractState, entry_id: u64) -> u128 {
@@ -494,11 +490,20 @@ pub mod tournament_token {
             let tournament: TournamentValue = store.get_tournament_value(entry.tournament_id);
             assert(tournament.state != TournamentState::Finished, Errors::HAS_ENDED);
             assert(tournament.state == TournamentState::InProgress, Errors::NOT_STARTED);
+            // collect pending duels
+            if (tournament.round_number > 1) {
+                let prev_round: TournamentRound = store.get_tournament_round(entry.tournament_id, tournament.round_number - 1);
+                let prev_challenge: Challenge = prev_round.get_challenge(@store, entry.entry_number);
+                if (prev_challenge.state == ChallengeState::InProgress) {
+                    store.world.game_dispatcher().collect_duel(prev_challenge.duel_id);
+                }
+            }
             // update entry
             entry.current_round_number = tournament.round_number;
             store.set_tournament_entry(@entry);
             // Get round pairing
             let round: TournamentRoundValue = store.get_tournament_round_value(entry.tournament_id, tournament.round_number);
+            assert(round.results.is_playing(entry.entry_number), Errors::NOT_QUALIFIED);
             let opponent_entry_number: u8 = round.bracket.get_opponent_entry_number(entry.entry_number);
             // Create duel
             let rules: TournamentRules = store.get_tournament_settings_rules(token_metadata.settings_id);
