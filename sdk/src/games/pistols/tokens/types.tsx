@@ -1,3 +1,4 @@
+import { getCollectionDescription } from '../misc/profiles';
 import * as constants from '../generated/constants'
 
 
@@ -18,29 +19,10 @@ export const ArchetypeCardUrl: Record<constants.Archetype, string> = {
   [constants.Archetype.Undefined]: `/textures/cards/card_circular_neutral.png`,
 }
 
-export const ProfileTypeFolder: Record<constants.ProfileType, string> = {
-  [constants.ProfileType.Undefined]: 'duelists',
-  [constants.ProfileType.Duelist]: 'duelists',
-  [constants.ProfileType.Character]: 'characters',
-  [constants.ProfileType.Bot]: 'bots',
-}
 
-
-export const renderDuelistImageUrl = (profile_type: constants.ProfileType, profile_id: number): string => {
-  const folder = ProfileTypeFolder[profile_type];
-  return `/profiles/${folder}/${('00' + profile_id.toString()).slice(-2)}.jpg`;
-}
-
-export const _getProfile = (profile_type: constants.ProfileType, profile_id: number) => {
-  switch (profile_type) {
-    case constants.ProfileType.Duelist:
-      return constants.DUELIST_PROFILES[constants.getDuelistProfileFromValue(profile_id)]
-    case constants.ProfileType.Character:
-      return constants.CHARACTER_PROFILES[constants.getCharacterProfileFromValue(profile_id)]
-    case constants.ProfileType.Bot:
-      return constants.BOT_PROFILES[constants.getBotProfileFromValue(profile_id)]
-  }
-  return constants.DUELIST_PROFILES[constants.getDuelistProfileFromValue(0)]
+export const renderDuelistImageUrl = (duelist_profile: constants.DuelistProfile, profile_id: number): string => {
+  const collection = getCollectionDescription(duelist_profile);
+  return `/profiles/${collection.folder_name}/${('00' + profile_id.toString()).slice(-2)}.jpg`;
 }
 
 

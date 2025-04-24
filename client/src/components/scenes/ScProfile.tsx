@@ -47,7 +47,7 @@ export default function ScProfile() {
           if (canClaimStarterPack) {
             setShowCardPack(true)
           } else {
-            shopOpener.open({ packType: constants.PackType.Duelists5x })
+            shopOpener.open({ packType: constants.PackType.GenesisDuelists5x })
           }
           break
         case 'door':

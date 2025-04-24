@@ -80,7 +80,16 @@ function _NewChallengeModal({
   const _create_duel = () => {
     const _submit = async () => {
       setIsSubmitting(true)
-      await duel_token.create_duel(account, constants.DuelType.Seasonal, challengingDuelistId, challengingAddress, args.premise, args.message, args.expire_hours, args.lives_staked)
+      await duel_token.create_duel(
+        account,
+        constants.DuelType.Seasonal,
+        challengingDuelistId,
+        challengingAddress,
+        args.lives_staked,
+        args.expire_hours,
+        args.premise,
+        args.message,
+      )
       setIsSubmitting(false)
     }
     if (args?.canSubmit) _submit()
@@ -320,7 +329,7 @@ function NewChallengeForm({
   const [hours, setHours] = useState(0)
   const [lives_staked, setLivesStaked] = useState(Math.min(1, lives))
 
-  const canSubmit = useMemo(() => (message.length > 3 && (days + hours) > 0 && lives_staked > 0), [message, days, hours, lives_staked])
+  const canSubmit = useMemo(() => ((days + hours) > 0 && lives_staked > 0), [message, days, hours, lives_staked])
 
   useEffect(() => {
     setArgs({
@@ -373,7 +382,7 @@ function NewChallengeForm({
       <Form.Field>
         <div className={`NewChallengeDivider Small VerticalSpacing Centered ${message.length > 3 ? '' : 'Warning'}`}>{constants.PREMISES[premise].prefix.toUpperCase()}</div>
         <FormInput
-          placeholder={'DESCRIBE YOUR REASONING'}
+          placeholder={'OPTIONAL: DESCRIBE YOUR REASONING'}
           value={message}
           fluid
           setValue={setMessage}

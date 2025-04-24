@@ -72,7 +72,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
       } else {
         setIsNoFundsModalOpen(true)
       }
-    } else if (packType === constants.PackType.Duelists5x && packId) {
+    } else if (packType === constants.PackType.GenesisDuelists5x && packId) {
       setIsClaiming(true)
       await pack_token.open(account, packId)
     }

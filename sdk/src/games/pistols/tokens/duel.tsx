@@ -4,7 +4,7 @@ import {
   renderDuelistImageUrl, card_cross,
   STAR, PISTOL,
   SvgRenderOptions,
-  _getProfile, _packSvg,
+  _packSvg,
   COLOR_TITLE,
 } from './types'
 import { BigNumberish } from 'starknet'
@@ -12,6 +12,7 @@ import { assets as profileAssets } from './assets/profiles'
 import { assets as cardsAssets } from './assets/cards'
 import { assets as uiAssets } from './assets/ui'
 import { getAsset } from './assets'
+import { getProfileDescription } from '../misc/profiles'
 import * as constants from '../generated/constants'
 
 export type DuelSvgProps = {
@@ -22,8 +23,8 @@ export type DuelSvgProps = {
   state: constants.ChallengeState
   winner: number
   season_id: number
-  profile_type_a: constants.ProfileType
-  profile_type_b: constants.ProfileType
+  profile_type_a: constants.DuelistProfile
+  profile_type_b: constants.DuelistProfile
   profile_id_a: number
   profile_id_b: number
   username_a: string
@@ -60,8 +61,8 @@ const WEBSITE_Y = (HEIGHT * 0.97);
 
 
 export const renderSvg = (props: DuelSvgProps, options: SvgRenderOptions = {}): string => {
-  const profile_a = _getProfile(props.profile_type_a, props.profile_id_a)
-  const profile_b = _getProfile(props.profile_type_b, props.profile_id_b)
+  const profile_a = getProfileDescription(props.profile_type_a, props.profile_id_a)
+  const profile_b = getProfileDescription(props.profile_type_b, props.profile_id_b)
   const is_finished = (props.state === constants.ChallengeState.Resolved || props.state === constants.ChallengeState.Draw);
   const is_dead_a = (is_finished && props.winner != 1);
   const is_dead_b = (is_finished && props.winner != 2);

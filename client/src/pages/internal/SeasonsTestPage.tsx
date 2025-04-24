@@ -220,9 +220,9 @@ function DuelsReport({ seasonId }: { seasonId: number }) {
           duelistsSet.add(BigInt(challenge.duelist_id_b))
         }
         if (round) {
-          const { variant, value } = parseCustomEnum<constants.FinalBlow>(round.final_blow)
+          const { variant, value } = parseCustomEnum<constants.FinalBlow, string>(round.final_blow)
           if (variant !== constants.FinalBlow.Undefined) {
-            const { variant: paces } = parseCustomEnum<constants.FinalBlow>(value)
+            const paces = constants.getPacesCardValue(value as constants.PacesCard)
             const key = `${variant}:${paces}`;
             if (!finalBlowSet[key]) finalBlowSet[key] = 0;
             finalBlowSet[key]++;
@@ -311,7 +311,7 @@ function PacksReport({ seasonId }: { seasonId: number }) {
           packsCount++;
           if (pack_type == constants.PackType.StarterPack) {
             starterCount++;
-          } else if (pack_type == constants.PackType.Duelists5x) {
+          } else if (pack_type == constants.PackType.GenesisDuelists5x) {
             duelistPackCount++;
             if (pack.is_open) duelistPackOpenedCount++;
             if (!pack.is_open) duelistPackClosedCount++;

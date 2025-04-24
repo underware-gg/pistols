@@ -73,7 +73,7 @@ function Purchases() {
       <Button disabled={!canClaimStarterPack} onClick={() => pack_token.claim_starter_pack(account)}>Claim Starter Pack</Button>
       &nbsp;&nbsp;<span className='Code'>(mint PACK + burn PACK + mint 2 DUELISTS)</span>
       <br />
-      <Button disabled={canClaimStarterPack} onClick={() => pack_token.purchase(account, constants.PackType.Duelists5x)}>Purchase Pack</Button>
+      <Button disabled={canClaimStarterPack} onClick={() => pack_token.purchase(account, constants.PackType.GenesisDuelists5x)}>Purchase Pack</Button>
       &nbsp;&nbsp;<span className='Code'>(transfer $LORDS + mint PACK)</span>
       <br />
       <Button disabled={packIds.length === 0} onClick={() => pack_token.open(account, packIds[0])}>Open Pack {packIds[0] ?? ''}</Button>
@@ -233,7 +233,7 @@ function TestImages() {
     username: 'Patron',
     honour: 99,
     archetype: constants.Archetype.Honourable,
-    profile_type: constants.ProfileType.Duelist,
+    profile_type: constants.DuelistProfile.Genesis,
     profile_id: 16,
     total_duels: 10,
     total_wins: 5,
@@ -256,8 +256,8 @@ function TestImages() {
     state: constants.ChallengeState.Resolved,
     winner: 1,
     season_id: 1,
-    profile_type_a: constants.ProfileType.Duelist,
-    profile_type_b: constants.ProfileType.Bot,
+    profile_type_a: constants.DuelistProfile.Genesis,
+    profile_type_b: constants.DuelistProfile.Bot,
     profile_id_a: 11,
     profile_id_b: 2,
     username_a: 'Mataleone',

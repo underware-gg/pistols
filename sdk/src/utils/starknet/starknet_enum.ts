@@ -9,19 +9,19 @@ export type CustomEnumValue = number | BigNumberish | BigNumberish[] | string
 // (see starknet.test.ts)
 // https://starknetjs.com/docs/api/classes/cairocustomenum/
 // https://starknetjs.com/docs/guides/cairo_enum#cairo-custom-enum
-export const parseCustomEnum = <T extends CustomEnumValue>(data: CairoCustomEnum | string | null): {
-  variant: string | undefined, // variant name
+export const parseCustomEnum = <N extends string, T extends CustomEnumValue>(data: CairoCustomEnum | string | null): {
+  variant: N | undefined, // variant name
   value: T | undefined,      // variant value
 } => (
   !data ? { variant: undefined, value: undefined }
-    : typeof data === 'string' ? { variant: data, value: undefined }
+    : typeof data === 'string' ? { variant: data as N, value: undefined }
       : data instanceof CairoCustomEnum ? {
-        variant: data.activeVariant(),
+        variant: data.activeVariant() as N,
         value: data.unwrap() as T,
       } : { variant: undefined, value: undefined }
 )
-export const parseEnumVariant = <T extends string>(data: CairoCustomEnum | string | null): T | undefined => (
-  parseCustomEnum(data).variant as T
+export const parseEnumVariant = <N extends string>(data: CairoCustomEnum | string | null): N | undefined => (
+  parseCustomEnum<N, number>(data).variant
 )
 
 //

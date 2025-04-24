@@ -3,23 +3,23 @@ import { Image, SemanticFLOATS } from 'semantic-ui-react'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 
-export const ProfileTypeFolder: Record<constants.ProfileType, string> = {
-  [constants.ProfileType.Undefined]: 'duelists',
-  [constants.ProfileType.Duelist]: 'duelists',
-  [constants.ProfileType.Character]: 'characters',
-  [constants.ProfileType.Bot]: 'bots',
+export const DuelistProfileFolder: Record<constants.DuelistProfile, string> = {
+  [constants.DuelistProfile.Undefined]: 'duelists',
+  [constants.DuelistProfile.Genesis]: 'duelists',
+  [constants.DuelistProfile.Character]: 'characters',
+  [constants.DuelistProfile.Bot]: 'bots',
 }
 
-export const makeProfilePicUrl = (profilePic: number | null, profileType = constants.ProfileType.Duelist) => {
+export const makeProfilePicUrl = (profilePic: number | null, profileType = constants.DuelistProfile.Genesis) => {
   if (profilePic === null) return null
-  const folder = ProfileTypeFolder[profileType]
+  const folder = DuelistProfileFolder[profileType]
   return `/profiles/${folder}/${('00' + profilePic).slice(-2)}.jpg`
 }
 
 export function ProfilePic({
   profilePic = null,
   profilePicUrl = null,
-  profileType = constants.ProfileType.Duelist,
+  profileType = constants.DuelistProfile.Genesis,
   small = false,
   medium = false,
   large = false,
@@ -42,7 +42,7 @@ export function ProfilePic({
 }: {
   profilePic?: number
   profilePicUrl?: string
-  profileType?: constants.ProfileType
+  profileType?: constants.DuelistProfile
   small?: boolean
   medium?: boolean
   large?: boolean

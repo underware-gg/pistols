@@ -39,8 +39,8 @@ export function DuelistTokenArt({
     is_memorized: false,
     duel_id: currentDuelId,
     pass_id: currentPassId,
-    is_loading: (isLoading !== false),
-  }), [name, profileType, profilePic, currentDuelId, history, balance_eth, lives, isLoading])
+    is_loading: !!isLoading,
+  }), [name, profileType, profilePic, currentDuelId, currentPassId, balance_eth, lives, isLoading])
 
   return <DuelistTokenImage props={props} className={className} style={style} />
 }

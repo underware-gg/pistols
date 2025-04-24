@@ -165,7 +165,7 @@ export default function ScLeaderboards() {
 
           <Grid.Column width={3} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => dispatchSelectDuelistId(duelistId)}>
             <div style={{ width: aspectWidth(0.05), height: '100%', backgroundColor: 'white', opacity: 0.3, marginRight: aspectWidth(0.6) }} />
-            <ProfilePic profilePic={duelistProfilePic} profileType={constants.ProfileType.Duelist} width={2.5} />
+            <ProfilePic profilePic={duelistProfilePic} profileType={constants.DuelistProfile.Genesis} width={2.5} />
             <div style={{ marginLeft: aspectWidth(1), fontSize: aspectWidth(0.8), color: '#888', overflow: 'hidden', textOverflow: 'ellipsis' }}>{duelistName}</div>
           </Grid.Column>
 

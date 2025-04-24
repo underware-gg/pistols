@@ -5,7 +5,7 @@ import { main, BotContext } from "../main";
 import chalk from "chalk";
 
 const botContext: BotContext = {
-  profile: constants.BotProfile.Leon,
+  duelist_profile: constants.BotProfile.Leon,
   description: constants.BOT_PROFILES[constants.BotProfile.Leon],
   emoji: "👑",
   context: "You are a wise and strategic duelist. Highly honourable and noble.",

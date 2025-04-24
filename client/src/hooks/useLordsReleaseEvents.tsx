@@ -34,7 +34,7 @@ export const useLordsReleaseEvents = (season_id: number) => {
 
   const bills = useMemo(() => (
     events.map(e => {
-      const { variant, value } = parseCustomEnum<constants.ReleaseReason>(e.bill.reason)
+      const { variant, value } = parseCustomEnum<constants.ReleaseReason, number>(e.bill.reason)
       const bill = {
         seasonId: feltToString(e.season_id),
         duelistId: BigInt(e.bill.duelist_id),

@@ -1111,7 +1111,7 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance, visible }) => {
       </div>
       <div className={ isLeft ? 'data-window left' : 'data-window right' }>
         <div className={`Relative ${visible ? 'YesMouse NoDrag' : 'NoMouse NoDrag'}`} onClick={() => dispatchSelectDuelistId(duelistId)} >
-          <ProfilePic className='NoMouse NoDrag' width={10}  circle profilePic={profilePic} profileType={profileType} />
+          <ProfilePic className='NoMouse NoDrag' width={10} circle profilePic={profilePic} profileType={profileType} />
           <img className='NoMouse NoDrag profile-outline' src='/images/ui/duel/card_details/profile_border.png' />
         </div>
         <div className='value-name' data-contentlength={contentLength}>{name}</div>

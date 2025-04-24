@@ -5,7 +5,7 @@ import { getEntityModel, useEntityModel } from '@underware/pistols-sdk/dojo'
 import { useClientTimestamp, useEntityId, useEntityIds } from '@underware/pistols-sdk/utils/hooks'
 import { isPositiveBigint, bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
-import { PistolsSchemaType, getProfileDescription } from '@underware/pistols-sdk/pistols'
+import { PistolsSchemaType, getCollectionDescription, getProfileDescription, getProfileGender, getProfileId } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
@@ -73,13 +73,16 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const {
     variant: profileType,
     value: profileValue,
-  } = useMemo(() => parseCustomEnum<constants.DuelistProfile>(duelist?.profile_type), [duelist])
-  const profileDescription = useMemo(() => getProfileDescription(profileType as constants.ProfileType, profileValue), [profileType, profileValue])
-  const profilePic = useMemo(() => (profileDescription.profile_id), [profileDescription])
+  } = useMemo(() => parseCustomEnum<constants.DuelistProfile, constants.GenesisProfile | constants.CharacterProfile | constants.BotProfile>(duelist?.duelist_profile), [duelist])
+  const profileCollection = useMemo(() => getCollectionDescription(profileType), [profileType])
+  const profileDescription = useMemo(() => getProfileDescription(profileType, profileValue), [profileType, profileValue])
+  const profilePic = useMemo(() => getProfileId(profileType, profileValue), [profileType, profileValue])
+
   const name = useMemo(() => (profileDescription.name), [profileDescription])
-  const gender = useMemo(() => (profileDescription.gender), [profileDescription])
-  const isNpc = useMemo(() => (profileType == constants.ProfileType.Character || profileType == constants.ProfileType.Bot), [profileType])
-  const characterType = useMemo(() => (profileDescription.gender == constants.Gender.Female ? CharacterType.FEMALE : CharacterType.MALE), [profileDescription])
+  const isNpc = useMemo(() => (!profileCollection.is_playable), [profileCollection])
+
+  const gender = useMemo(() => (getProfileGender(profileType, profileValue)), [profileType, profileValue])
+  const characterType = useMemo(() => (gender == 'Female' ? CharacterType.FEMALE : CharacterType.MALE), [gender])
 
   const nameAndId = useMemo(() => (
     isNpc ? (name || 'NPC') : `${name || 'Duelist'} #${isValidDuelistId ? bigintToDecimal(duelistId) : '?'}`
@@ -97,8 +100,10 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     exists,
     timestampRegistered,
     timestampActive,
-    profileType: profileType as constants.ProfileType,
+    profileType,
     profileValue,
+    profileCollection,
+    profileDescription,
     profilePic,
     characterType,
     gender,

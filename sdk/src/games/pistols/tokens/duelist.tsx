@@ -4,7 +4,7 @@ import {
   renderDuelistImageUrl, card_cross,
   STAR, PISTOL,
   SvgRenderOptions,
-  _getProfile, _packSvg,
+  _packSvg,
   COLOR_TITLE,
 } from './types'
 import { BigNumberish } from 'starknet'
@@ -13,6 +13,7 @@ import { assets as cardsAssets } from './assets/cards'
 import { shortAddress } from 'src/utils/misc/types'
 import { map } from 'src/utils/misc/math'
 import { getAsset } from './assets'
+import { getProfileDescription } from '../misc/profiles'
 import * as constants from '../generated/constants'
 
 
@@ -23,7 +24,7 @@ export type DuelistSvgProps = {
   username: string
   honour: number
   archetype: constants.Archetype
-  profile_type: constants.ProfileType
+  profile_type: constants.DuelistProfile
   profile_id: number
   total_duels: number
   total_wins: number
@@ -87,7 +88,7 @@ const _renderStat = (x: number, y: number, key: string, value: string) => {
 }
 
 export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}): string => {
-  const profile = _getProfile(props.profile_type, props.profile_id)
+  const profile = getProfileDescription(props.profile_type, props.profile_id)
   const profile_url = renderDuelistImageUrl(props.profile_type, props.profile_id);
   const card_url = ArchetypeCardUrl[props.archetype];
   const life_bar_value = (props.fame % 1000);

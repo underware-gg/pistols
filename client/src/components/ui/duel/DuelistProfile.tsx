@@ -116,7 +116,7 @@ export default function DuelistProfile({
       {floated == 'left' &&
         <>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
-            <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePicUrl={tutorialLevel === DuelTutorialLevel.FULL ? archetypeImage1 : undefined} profilePic={tutorialLevel === DuelTutorialLevel.FULL ? undefined : profilePic} profileType={tutorialLevel === DuelTutorialLevel.FULL ? constants.ProfileType.Duelist : profileType} />
+          <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePicUrl={tutorialLevel === DuelTutorialLevel.FULL ? archetypeImage1 : undefined} profilePic={tutorialLevel === DuelTutorialLevel.FULL ? undefined : profilePic} profileType={tutorialLevel === DuelTutorialLevel.FULL ? constants.DuelistProfile.Genesis : profileType} />
           </div>
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
@@ -139,7 +139,7 @@ export default function DuelistProfile({
       {floated == 'right' &&
         <>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
-            <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePicUrl={tutorialLevel === DuelTutorialLevel.FULL ? archetypeImage2 : undefined} profilePic={tutorialLevel === DuelTutorialLevel.FULL ? undefined : profilePic} profileType={tutorialLevel === DuelTutorialLevel.FULL ? constants.ProfileType.Duelist : profileType} />
+          <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePicUrl={tutorialLevel === DuelTutorialLevel.FULL ? archetypeImage2 : undefined} profilePic={tutorialLevel === DuelTutorialLevel.FULL ? undefined : profilePic} profileType={tutorialLevel === DuelTutorialLevel.FULL ? constants.DuelistProfile.Genesis : profileType} />
           </div>
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>

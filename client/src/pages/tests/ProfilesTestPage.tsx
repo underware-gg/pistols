@@ -26,11 +26,11 @@ export default function ProfilesTestPage() {
       <Container>
         <TestPageMenu />
         <br />
-        <Profiles profiles={constants.DUELIST_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Duelist} />
+        <Profiles profiles={constants.GENESIS_PROFILES as unknown as Profiles} profileType={constants.DuelistProfile.Genesis} />
         <br />
-        <Profiles profiles={constants.CHARACTER_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Character} />
+        <Profiles profiles={constants.CHARACTER_PROFILES as unknown as Profiles} profileType={constants.DuelistProfile.Character} />
         <br />
-        <Profiles profiles={constants.BOT_PROFILES as unknown as Profiles} profileType={constants.ProfileType.Bot} />
+        <Profiles profiles={constants.BOT_PROFILES as unknown as Profiles} profileType={constants.DuelistProfile.Bot} />
         <br />
       </Container>
     </App>
@@ -82,12 +82,12 @@ function Profiles({
   profileType,
 }: {
   profiles: Profiles,
-  profileType: constants.ProfileType,
+  profileType: constants.DuelistProfile,
 }) {
   const style = { width: 'auto', height: '300px', backgroundColor: 'black' }
 
   const props = useMemo(() => {
-    return Object.entries(profiles).map(([key, profile]) => {
+    return Object.entries(profiles).map(([key, profile], index) => {
       const { archetype, honour } = _randomArchetype()
       const { fame, lives, rookie, dead } = _randomFame(archetype)
       const is_dueling = (honour > 0 && !dead && Math.random() > 0.25);
@@ -99,7 +99,7 @@ function Profiles({
         honour,
         archetype,
         profile_type: profileType,
-        profile_id: profile.profile_id,
+        profile_id: index,
         total_duels: rookie ? 0 : 10,
         total_wins: rookie ? 0 : 4,
         total_losses: rookie ? 0 : 3,
@@ -140,9 +140,9 @@ function Profiles({
         address_b: props[nextProfileIndex].prop.owner,
       };
       return (
-        <Row key={`${profileType}-${profile.profile_id}`} className='ModalText'>
+        <Row key={`${profileType}-${prop.profile_id}`} className='ModalText'>
           <Cell className='Code'>
-            {profile.profile_id}
+            {prop.profile_id}
           </Cell>
           <Cell className='Inactive'>
             {profileType}
@@ -151,7 +151,7 @@ function Profiles({
             {profile.name}
           </Cell>
           <Cell>
-            <img src={makeProfilePicUrl(profile.profile_id, profileType)} style={style} />
+            <img src={makeProfilePicUrl(prop.profile_id, profileType)} style={style} />
           </Cell>
           <Cell>
             <DuelistTokenImage props={prop} style={style} />

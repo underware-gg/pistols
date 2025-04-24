@@ -28,7 +28,7 @@ import { PROVIDER_GUIDE } from "./context/pistols-provider";
 import { buildCharacter } from "./context/pistols-character";
 
 export type BotContext = {
-  profile: constants.BotProfile
+  duelist_profile: constants.BotProfile
   description: constants.ProfileDescription
   emoji: string
   context: string

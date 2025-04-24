@@ -14,7 +14,7 @@ export const makeDuelDataUrl = (duelId: BigNumberish) => {
   return `/dueldata/${bigintToDecimal(duelId)}`
 }
 
-export const PLAYER_CHARACTER_ID = makeCharacterDuelistId(constants.ProfileType.Character, constants.CharacterProfile.Player)
+export const PLAYER_CHARACTER_ID = makeCharacterDuelistId(constants.DuelistProfile.Character, constants.CharacterProfile.Player)
 
 
 //------------------------------------------

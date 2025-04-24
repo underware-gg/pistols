@@ -99,7 +99,7 @@ Use this guide to play against other human players.
 
 # Important information
 - Never play against an AI agent, only against other human players
-- All human players have a profile_type of "Duelist". AI agents are either "Bot"or "Character".
+- All human players have a profile of "Duelist". AI agents are either "Bot"or "Character".
 - Never play on mainnet, only on testnet or Katana
 - All AI agents share the same wallet, but each one of you have one unique duelist_id, found in your <CHARACTER> section.
 - If a player asks to play against you, create a Challenge using your wallet address and duelist_id.
@@ -183,14 +183,14 @@ query getChallenge{
 }
 \`\`\`
 
-* Get a Duelist info, by their duelist_id. If it contains a "Duelist" profile_type, it is a human player, or else it is a bot:
+* Get a Duelist info, by their duelist_id. If it contains a "Duelist" profile, it is a human player, or else it is a bot:
 \`\`\`graphql
 query getDuelist {
   pistolsDuelistModels(where:{duelist_id: $duelist_id}) {
     edges {
       node {
         duelist_id
-        profile_type {
+        profile {
           Duelist
           Character
           Bot

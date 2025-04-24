@@ -42,8 +42,8 @@ interface State {
 const createStore = () => {
   const _parseEntity = (e: PistolsEntity) => {
     let duelist = e.models.pistols.Duelist
-    const { variant } = parseCustomEnum<constants.ProfileType>(duelist?.profile_type)
-    if (!duelist || variant != constants.ProfileType.Duelist) return undefined
+    const { variant } = parseCustomEnum<constants.DuelistProfile, any>(duelist?.duelist_profile)
+    if (!duelist || variant != constants.DuelistProfile.Genesis) return undefined
     let currentChallenge = e.models.pistols.DuelistAssignment
     let memorial = e.models.pistols.DuelistMemorial
     return {

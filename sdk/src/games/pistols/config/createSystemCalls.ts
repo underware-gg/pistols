@@ -1,8 +1,8 @@
 import { DojoCall, DojoProvider, getContractByName } from '@dojoengine/core'
-import { AccountInterface, BigNumberish, Call, CallData, UniversalDetails, byteArray } from 'starknet'
+import { AccountInterface, BigNumberish, Call, CallData, UniversalDetails } from 'starknet'
 import { arrayClean, shortAddress, isPositiveBigint, bigintToHex } from 'src/utils/misc/types'
 import { NAMESPACE, getLordsAddress, getBankAddress, getVrfAddress } from 'src/games/pistols/config/config'
-import { stringToFelt, bigintToU256 } from 'src/utils/starknet/starknet'
+import { bigintToU256 } from 'src/utils/starknet/starknet'
 import { makeCustomEnum } from 'src/utils/starknet/starknet_enum'
 import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
 import { DojoManifest } from 'src/dojo/contexts/Dojo'
@@ -182,7 +182,7 @@ export function createSystemCalls(
             lives_staked,
             expire_hours,
             makeCustomEnum(premise),
-            byteArray.byteArrayFromString(message),
+            message,
           ),
         ]
         return await _executeTransaction(signer, calls)
