@@ -11,9 +11,7 @@ export default function CurrentChainHint() {
   return (
     <>
       <div className='Code Disabled AbsoluteBottom Padded AlignLeft'>
-        v{PACKAGE_VERSION}
-        <br />
-        ({currentSeasonId})
+        v{PACKAGE_VERSION} s{currentSeasonId}
         <br />
         {selectedNetworkId}
         {'/'}
