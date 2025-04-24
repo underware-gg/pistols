@@ -1,7 +1,7 @@
 import {
   ArchetypeCardUrl,
   COLOR_SHADOW, COLOR_LIGHT, COLOR_DARK,
-  renderDuelistImageUrl, card_cross,
+  card_cross,
   STAR, PISTOL,
   SvgRenderOptions,
   _packSvg,
@@ -12,7 +12,7 @@ import { assets as profileAssets } from './assets/profiles'
 import { assets as cardsAssets } from './assets/cards'
 import { assets as uiAssets } from './assets/ui'
 import { getAsset } from './assets'
-import { getProfileDescription } from '../misc/profiles'
+import { getProfileDescription, makeProfilePicUrl } from '../misc/profiles'
 import * as constants from '../generated/constants'
 
 export type DuelSvgProps = {
@@ -66,8 +66,8 @@ export const renderSvg = (props: DuelSvgProps, options: SvgRenderOptions = {}): 
   const is_finished = (props.state === constants.ChallengeState.Resolved || props.state === constants.ChallengeState.Draw);
   const is_dead_a = (is_finished && props.winner != 1);
   const is_dead_b = (is_finished && props.winner != 2);
-  let image_duelist_a = renderDuelistImageUrl(props.profile_type_a, props.profile_id_a)
-  let image_duelist_b = renderDuelistImageUrl(props.profile_type_b, props.profile_id_b)
+  let image_duelist_a = makeProfilePicUrl(props.profile_id_a, props.profile_type_a)
+  let image_duelist_b = makeProfilePicUrl(props.profile_id_b, props.profile_type_b)
   let image_paper = `/images/ui/duel_paper.png`
   let svg = `
 <svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 ${WIDTH} ${HEIGHT}'>

@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
 import { Container, Table } from 'semantic-ui-react'
-import { makeProfilePicUrl } from '/src/components/account/ProfilePic'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
+import { makeProfilePicUrl } from '@underware/pistols-sdk/pistols'
 import { duelist_token, duel_token } from '@underware/pistols-sdk/pistols/tokens'
 import { DuelistTokenImage, DuelTokenImage } from '@underware/pistols-sdk/pistols/components'
 import { map } from '@underware/pistols-sdk/utils'
+import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import App from '/src/components/App'
 
 // const Row = Grid.Row

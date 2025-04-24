@@ -76,10 +76,10 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   } = useMemo(() => parseCustomEnum<constants.DuelistProfile, constants.GenesisProfile | constants.CharacterProfile | constants.BotProfile>(duelist?.duelist_profile), [duelist])
   const profileCollection = useMemo(() => getCollectionDescription(profileType), [profileType])
   const profileDescription = useMemo(() => getProfileDescription(profileType, profileValue), [profileType, profileValue])
-  const profilePic = useMemo(() => getProfileId(profileType, profileValue), [profileType, profileValue])
+  const profileId = useMemo(() => getProfileId(profileType, profileValue), [profileType, profileValue])
 
   const name = useMemo(() => (profileDescription.name), [profileDescription])
-  const isNpc = useMemo(() => (!profileCollection.is_playable), [profileCollection])
+  const isNpc = useMemo(() => (profileCollection ? !profileCollection.is_playable : false), [profileCollection])
 
   const gender = useMemo(() => (getProfileGender(profileType, profileValue)), [profileType, profileValue])
   const characterType = useMemo(() => (gender == 'Female' ? CharacterType.FEMALE : CharacterType.MALE), [gender])
@@ -104,7 +104,8 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     profileValue,
     profileCollection,
     profileDescription,
-    profilePic,
+    profileId,
+    profilePic: profileId,
     characterType,
     gender,
     isNpc,

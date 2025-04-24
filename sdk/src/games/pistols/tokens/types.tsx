@@ -20,12 +20,6 @@ export const ArchetypeCardUrl: Record<constants.Archetype, string> = {
 }
 
 
-export const renderDuelistImageUrl = (duelist_profile: constants.DuelistProfile, profile_id: number): string => {
-  const collection = getCollectionDescription(duelist_profile);
-  return `/profiles/${collection.folder_name}/${('00' + profile_id.toString()).slice(-2)}.jpg`;
-}
-
-
 //--------------------------------
 // renderer
 //

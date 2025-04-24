@@ -24,6 +24,11 @@ import {
 // (duelist_profile.cairo)
 //
 
+export const makeProfilePicUrl = (profileId: number | null, profileType = DuelistProfile.Genesis) => {
+  const collection = getCollectionDescription(profileType);
+  return `/profiles/${collection.folder_name}/${('00' + profileId.toString()).slice(-2)}.jpg`;
+}
+
 export const getCollectionDescription = (profile: DuelistProfile): CollectionDescription => {
   return COLLECTIONS[profile];
 }
