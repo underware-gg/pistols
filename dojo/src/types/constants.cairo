@@ -55,10 +55,9 @@ pub mod METADATA {
         format!("{}/pistols/logo.png", base_uri)
     }
     pub fn CONTRACT_BANNER_IMAGE(base_uri: ByteArray) -> ByteArray {
-        format!("{}/pistols/splash.png", base_uri)
+        format!("{}/pistols/splash.jpg", base_uri)
     }
     pub fn CONTRACT_FEATURED_IMAGE(base_uri: ByteArray) -> ByteArray {
-        format!("{}/pistols/splash_og.png", base_uri)
+        format!("{}/pistols/splash_og.jpg", base_uri)
     }
-
 }

@@ -8,7 +8,7 @@
 name = "Pistols at Dawn"
 description = "An on-chain pistol duelling game of honour and betrayal."
 icon_uri = "https://assets.underware.gg/pistols/logo.png"
-cover_uri = "https://assets.underware.gg/pistols/splash.png"
+cover_uri = "https://assets.underware.gg/pistols/splash.jpg"
 website = "https://pistols.gg"
 seed = "academy-v0.14.0"
 
