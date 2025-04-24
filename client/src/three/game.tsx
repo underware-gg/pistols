@@ -11,7 +11,8 @@ import Stats from 'three/addons/libs/stats.module.js'
 import { Rain } from './Rain.tsx'
 import { Grass } from './Grass.tsx'
 import * as shaders from './shaders.tsx'
-import { InteractibleScene } from './InteractibleScene.tsx'
+import { InteractibleScene } from './InteractibleScene'
+import { InteractibleLayeredScene } from './InteractibleLayeredScene'
 
 // event emitter
 // var ee = require('event-emitter');
@@ -53,6 +54,12 @@ export const cameraData = {
   fieldOfView: 13,
   nearPlane: 0.1,
   farPlane: 150,
+}
+
+export const cameraDataStatic = {
+  fieldOfView: 13,
+  nearPlane: 0.1,
+  farPlane: 1,
 }
 
 const lightCameraShadowData = {
@@ -326,10 +333,10 @@ export function setCameras() {
   _duelCameraParent.add(_duelCamera)
   _duelCamera.position.set(0, 0.05, 0)
   _staticCamera = new THREE.PerspectiveCamera(
-    cameraData.fieldOfView,
+    cameraDataStatic.fieldOfView,
     ASPECT,
-    cameraData.nearPlane,
-    cameraData.farPlane,
+    cameraDataStatic.nearPlane,
+    cameraDataStatic.farPlane,
   )
 }
 
@@ -1033,6 +1040,8 @@ export function animate() {
 
         if (_currentScene instanceof InteractibleScene) {
           _currentScene.render(elapsedTime)
+        } else if (_currentScene instanceof InteractibleLayeredScene) {
+          _currentScene.render(elapsedTime)
         }
       }
 
@@ -1060,7 +1069,7 @@ function setupScenes() {
     if (sceneName === SceneName.Duel) {
       _scenes[sceneName] = setupDuelScene()
     } else if (sceneName !== SceneName.TutorialDuel) {
-      _scenes[sceneName] = setupStaticScene(sceneName)
+      _scenes[sceneName] = setupStaticScene(sceneName, false)
     }
   })
 }
@@ -1390,8 +1399,10 @@ function setCameraHelpers(scene) {
 //
 // Static Scenes
 //
-function setupStaticScene(sceneName) {
-  const scene = new InteractibleScene(sceneName, _renderer, _staticCamera)
+function setupStaticScene(sceneName, useLayered = false) {
+  const scene = useLayered 
+    ? new InteractibleLayeredScene(sceneName, _renderer, _staticCamera)
+    : new InteractibleScene(sceneName, _renderer, _staticCamera)
 
   scene.add(_staticCamera)
 
@@ -1438,8 +1449,12 @@ export function switchScene(sceneName) {
       
       if (sceneName != SceneName.Duel) {
         _duelistManager.hideElements()
+        _renderer.getContext().disable(_renderer.getContext().DEPTH_TEST);
       } else if (_statsEnabled) {
         resetDuelScene()
+        _renderer.getContext().enable(_renderer.getContext().DEPTH_TEST);
+      } else {
+        _renderer.getContext().enable(_renderer.getContext().DEPTH_TEST);
       }
     });
   }

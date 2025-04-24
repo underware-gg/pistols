@@ -23,7 +23,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
   const didImmediateReset = useRef(false);
   
   const { gameImpl } = useThreeJsContext();
-  const { dispatchAnimated } = useGameplayContext();
+  const { animated, dispatchAnimated } = useGameplayContext();
   const { tutorialOpener } = usePistolsContext();
   const context = useDuelContext();
 
@@ -48,6 +48,12 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
       gameImpl.resetDuelScene(true);
     }
   }, [duelId, gameImpl]);
+
+  useEffect(() => {
+    if (gameImpl) {
+      gameImpl.setDuelistSpeedFactor(context.settings.duelSpeedFactor);
+    }
+  }, [context.settings.duelSpeedFactor, gameImpl]);
   
   // Handle tutorial visibility
   useEffect(() => {
@@ -140,11 +146,12 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
   }, [duelId, context, gameImpl, dispatchAnimated]);
 
   // Update left duelist info when it changes
-  // Update left duelist info when it changes
   useEffect(() => {
     if (!gameImpl || !didSceneInit.current || !context.leftDuelist.id) return;
     
-    // Add a small delay before spawning duelist A
+    // Skip delay if we already have initialized duelists
+    const spawnDelay = didPlayersInitA.current ? 0 : 600;
+    
     const timerA = setTimeout(() => {
       try {
         gameImpl.spawnDuelist(
@@ -157,7 +164,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
       } catch (error) {
         console.error("Error updating left duelist info:", error);
       }
-    }, 600);
+    }, spawnDelay);
     
     return () => clearTimeout(timerA);
   }, [
@@ -165,14 +172,23 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
     context.leftDuelist.id,
     context.leftDuelist.name, 
     context.leftDuelist.characterType,
-    context.leftDuelist.isYou
+    context.leftDuelist.isYou,
+    context.duelInProgress
   ]);
+
+  useEffect(() => {
+    if (animated == AnimationState.Round1) {
+      gameImpl?.removeHighlightEffects();
+    }
+  }, [animated, gameImpl]);
 
   // Update right duelist info when it changes
   useEffect(() => {
     if (!gameImpl || !didSceneInit.current || !context.rightDuelist.id) return;
     
-    // Add a small delay before spawning duelist B
+    // Skip delay if we already have initialized duelists
+    const spawnDelay = didPlayersInitB.current ? 0 : 600;
+    
     const timerB = setTimeout(() => {
       try {
         gameImpl.spawnDuelist(
@@ -185,7 +201,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
       } catch (error) {
         console.error("Error updating right duelist info:", error);
       }
-    }, 600);
+    }, spawnDelay);
     
     return () => clearTimeout(timerB);
   }, [
@@ -193,7 +209,8 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
     context.rightDuelist.id,
     context.rightDuelist.name, 
     context.rightDuelist.characterType,
-    context.rightDuelist.isYou
+    context.rightDuelist.isYou,
+    context.duelInProgress
   ]);
 
   useEffect(() => {

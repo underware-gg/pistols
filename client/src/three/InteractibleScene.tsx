@@ -1,4 +1,7 @@
 import * as THREE from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { clamp } from '@underware/pistols-sdk/utils'
 import {
   WIDTH, HEIGHT,
@@ -6,12 +9,12 @@ import {
   _currentScene,
   emitter,
   ASPECT,
-  cameraData,
+  cameraDataStatic,
   sizes,
   SCENE_CHANGE_ANIMATION_DURATION,
 } from './game';
-import { sceneBackgrounds, SceneData, SceneObject, TextureName } from '/src/data/assets';
-import { ShaderMaterial } from './shaders'
+import { sceneBackgrounds, SceneData, SceneObject, TextureName, TextureState, AnimatedLayer, SceneBackgroundObject } from '/src/data/assets';
+import { ShaderManager, ShaderMaterial } from './shaders'
 import TWEEN from '@tweenjs/tween.js'
 
 export class InteractibleScene extends THREE.Scene {
@@ -20,11 +23,15 @@ export class InteractibleScene extends THREE.Scene {
 
   maskOverlay: THREE.Mesh
   maskShader: ShaderMaterial
+  
+  backgroundScene: THREE.Scene
+  backgroundMesh: THREE.Mesh
+  backgroundBlurShader: ShaderMaterial
 
   fbo_mask: THREE.WebGLRenderTarget
   fbo_mask_scene: THREE.Scene
-  fbo_background: THREE.WebGLRenderTarget
-  fbo_background_scenes: THREE.Scene[] = []
+  fbo_blur_background: THREE.WebGLRenderTarget
+
   renderer: THREE.WebGLRenderer
   camera: THREE.Camera
 
@@ -37,6 +44,9 @@ export class InteractibleScene extends THREE.Scene {
 
   opacityTweens: any[] = []
   currentOpacities: number[] = [1, 1, 1, 1, 1, 1, 1]
+  currentSamples: number[] = []
+  currentDarkStrength: number = 0.0
+  blurTween: any;
 
   lastClickTimeStamp: number
   private currentRandomValues: number[] = []
@@ -46,6 +56,9 @@ export class InteractibleScene extends THREE.Scene {
   private readonly RANDOM_INTERPOLATION_SPEED = 0.01
   private animatedShiftValues: number[] = []
   private layerShiftAmounts: number[] = []
+
+  private animatedLayers: Map<number, AnimatedLayer> = new Map();
+  private currentTextures: THREE.Texture[] = [];
 
   constructor(sceneName: string, renderer: THREE.WebGLRenderer, camera: THREE.Camera) {
     super()
@@ -62,11 +75,19 @@ export class InteractibleScene extends THREE.Scene {
 
   public setSceneData(sceneName: string) {
     this.dispose()
+    this.animatedLayers.clear()
+    this.currentTextures = [];
 
     this.sceneData = sceneBackgrounds[sceneName]
 
+    if (!this.sceneData.backgrounds) return
+
+    this.currentTextures = this.sceneData.backgrounds.map(background => _textures[background.texture]);
+    this.currentSamples = this.sceneData.backgrounds.map(background => background.blurred ? (background.samples || 0) : 0);
+    this.currentDarkStrength = 0.0;
+
     const bgDistance = -1
-    const vFOV = THREE.MathUtils.degToRad(cameraData.fieldOfView * 0.5)
+    const vFOV = THREE.MathUtils.degToRad(cameraDataStatic.fieldOfView * 0.5)
     const height = 2 * Math.tan(vFOV) * Math.abs(bgDistance)
     const width = height * ASPECT
     const fullScreenGeom = new THREE.PlaneGeometry(width, height)
@@ -76,7 +97,6 @@ export class InteractibleScene extends THREE.Scene {
     this.pickedColor = new THREE.Color(0, 0, 0)
     this.timeOffset = 0
 
-    // Initialize random values arrays
     const numBackgrounds = this.sceneData.backgrounds?.length || 0
     this.currentRandomValues = new Array(numBackgrounds).fill(0)
     this.targetRandomValues = new Array(numBackgrounds).fill(0).map((_, i) => {
@@ -91,54 +111,69 @@ export class InteractibleScene extends THREE.Scene {
     this.layerShiftAmounts = new Array(numBackgrounds).fill(0)
 
     if (this.sceneData.backgrounds && this.sceneData.backgrounds.length > 0) {
-
       this.sceneData.backgrounds.forEach((background, index) => {
-        const geometry = new THREE.PlaneGeometry(width, height)
-        const material = new THREE.MeshBasicMaterial({
-          transparent: true,
-          map: _textures[background.texture]
-        })
-        const mesh = new THREE.Mesh(geometry, material)
-        mesh.position.set(0, 0, bgDistance)
-        if (this.sceneData.scaleAddon) {
-          mesh.scale.set(1 + this.sceneData.scaleAddon, 1 + this.sceneData.scaleAddon, 1)
-        }
-
-        // Only add to fbo_background_scenes if not opaque
-        if (!background.opaque) {
-          this.fbo_background_scenes[index] = new THREE.Scene();
-          this.fbo_background_scenes[index].add(mesh)
+        if (background.isAnimated) {
+          this.initializeAnimationLayer(background, index);
         }
       })
 
-      this.fbo_background = new THREE.WebGLRenderTarget(
+      this.fbo_blur_background = new THREE.WebGLRenderTarget(
         WIDTH, HEIGHT,
         {
-          minFilter: THREE.NearestFilter,
-          magFilter: THREE.NearestFilter,
+          minFilter: THREE.LinearFilter,
+          magFilter: THREE.LinearFilter,
           format: THREE.RGBAFormat,
-          type: THREE.FloatType
+          type: THREE.FloatType,
+          generateMipmaps: false,
+          colorSpace: THREE.SRGBColorSpace,
+          depthBuffer: false,
+          stencilBuffer: false,
         }
       );
     }
 
     if (this.sceneData.items && this.sceneData.items.length > 0) {
-      
       this.fbo_mask_scene = new THREE.Scene()
 
-      this.sceneData.items.forEach(item => {
+      this.sceneData.backgrounds.forEach(background => {
         const mesh = new THREE.Mesh(
           new THREE.PlaneGeometry(width, height),
-          new THREE.MeshBasicMaterial({
+          new ShaderMaterial("MASK_OCCLUSION", {
             transparent: true,
-            map: _textures[item.mask]
+            depthTest: false,
+            alphaTest: 0.5,
           })
         )
-        mesh.position.set(0, 0, bgDistance)
+        mesh.material.setUniformValue('uTexture', _textures[background.texture])
+        mesh.material.setUniformValue('uOpaque', background.opaque)
+        mesh.name = `bg_${background.renderOrder}`
+        mesh.position.set(0, 0, bgDistance + background.renderOrder * 0.00001)
+        
         if (this.sceneData.scaleAddon) {
           mesh.scale.set(1 + this.sceneData.scaleAddon, 1 + this.sceneData.scaleAddon, 1)
         }
+
         this.fbo_mask_scene.add(mesh)
+
+        this.sceneData.items.forEach(item => {
+          if (item.renderOrder === background.renderOrder) {
+            const itemMesh = new THREE.Mesh(
+              new THREE.PlaneGeometry(width, height),
+              new THREE.MeshBasicMaterial({
+                transparent: true, 
+                map: _textures[item.mask]
+              })
+            )
+            itemMesh.name = `mask_${item.mask}_${background.renderOrder}`
+            itemMesh.position.set(0, 0, bgDistance + background.renderOrder * 0.00001)
+            
+            if (this.sceneData.scaleAddon) {
+              itemMesh.scale.set(1 + this.sceneData.scaleAddon, 1 + this.sceneData.scaleAddon, 1)
+            }
+            
+            this.fbo_mask_scene.add(itemMesh)
+          }
+        })
       })
 
       this.fbo_mask = new THREE.WebGLRenderTarget(
@@ -152,7 +187,7 @@ export class InteractibleScene extends THREE.Scene {
       )
     }
 
-    this.maskShader = new ShaderMaterial("BAR_MASK", {
+    this.maskShader = new ShaderMaterial("INTERACTIBLE_MASK", {
       transparent: true,
       depthTest: false,
       alphaTest: 0.5,
@@ -171,7 +206,8 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uHiddenOpacities', this.sceneData.backgrounds.map(background => background.hidden ? 0.0 : 1.0))
     this.maskShader.setUniformValue('uOpaque', this.sceneData.backgrounds.map(background => background.opaque || false))
     this.maskShader.setUniformValue('uClickable', this.isClickable)
-    this.maskShader.setUniformValue('uSamples', 1)
+    this.maskShader.setUniformValue('uSamples', this.currentSamples)
+    this.maskShader.setUniformValue('uDarkStrength', this.currentDarkStrength)
     this.maskShader.setUniformValue('uShiftAmount', 0.0)
     this.maskShader.setUniformValue('uShiftAmountLayer', this.layerShiftAmounts)
     this.maskShader.setUniformValue('uTextureShift0', new THREE.Vector2(0.0, 0.0))
@@ -188,13 +224,14 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uRandomShift4', 0.0)
     this.maskShader.setUniformValue('uRandomShift5', 0.0)
     this.maskShader.setUniformValue('uRandomShift6', 0.0)
-    this.maskShader.setUniformValue('uHighlightColor', new THREE.Color('#ffcf40'))
-    this.maskShader.setUniformValue('uHighlightOpacity', 0.4)
+    this.maskShader.setUniformValue('uHighlightColor', new THREE.Color('#eeb4ff'))
+    this.maskShader.setUniformValue('uHighlightOpacityShimmer', 0.8)
+    this.maskShader.setUniformValue('uHighlightOpacitySelected', 0.4)
     this.maskShader.setUniformValue('uMasksSize', this.sceneData.items?.length || 0)
     this.maskShader.setUniformValue('uMasks', this.sceneData.items?.map(item => _textures[item.mask]) || [])
     this.maskShader.setUniformValue('uMasksRenderOrder', this.sceneData.items?.map(item => item.renderOrder) || [])
     this.maskShader.setUniformValue('uTexturesSize', this.sceneData.backgrounds?.length || 0)
-    this.maskShader.setUniformValue('uTextures', this.sceneData.backgrounds.map(background => _textures[background.texture]))
+    this.maskShader.setUniformValue('uTextures', this.currentTextures)
     this.maskShader.setUniformValue('uTexturesRenderOrder', this.sceneData.backgrounds.map(background => background.renderOrder))
     this.maskShader.setUniformValue('uResolution', new THREE.Vector2(sizes.canvasWidth, sizes.canvasHeight))
 
@@ -205,6 +242,27 @@ export class InteractibleScene extends THREE.Scene {
     }
     this.maskOverlay.name = 'bg'
     this.add(this.maskOverlay)
+
+    this.backgroundBlurShader = new ShaderMaterial("TEXTURE_BLUR", {
+      transparent: false,
+      depthTest: false,
+      depthWrite: false,
+      blending: THREE.NoBlending,
+    })
+
+    this.backgroundScene = new THREE.Scene()
+    this.backgroundMesh = new THREE.Mesh(fullScreenGeom, this.backgroundBlurShader)
+    this.backgroundMesh.position.set(0, 0, bgDistance)
+    if (this.sceneData.scaleAddon) {
+      this.backgroundMesh.scale.set(1 + this.sceneData.scaleAddon, 1 + this.sceneData.scaleAddon, 1)
+    }
+    this.backgroundScene.add(this.backgroundMesh)
+
+    this.backgroundBlurShader.setUniformValue('uMask', null)
+    this.backgroundBlurShader.setUniformValue('uTexture', null)
+    this.backgroundBlurShader.setUniformValue('uResolution', new THREE.Vector2(sizes.canvasWidth, sizes.canvasHeight))
+    this.backgroundBlurShader.setUniformValue('uExcludedColor', new THREE.Color(0, 0, 0))
+    this.backgroundBlurShader.setUniformValue('uSamples', 0)
 
     if (this.sceneData.backgrounds && this.sceneData.backgrounds.length > 0) {
       document.addEventListener('mousemove', this.onMouseMove.bind(this), false);
@@ -221,11 +279,8 @@ export class InteractibleScene extends THREE.Scene {
     document.removeEventListener('click', this.onMouseClick.bind(this), false);
     window.removeEventListener('resize', this.onResize, false);
 
-    // Dispose of WebGLRenderTargets
     this.fbo_mask?.dispose();
-    this.fbo_background?.dispose();
     
-    // Dispose of scene objects
     this.fbo_mask_scene?.traverse((child) => {
         if (child instanceof THREE.Mesh) {
             child.geometry.dispose();
@@ -235,60 +290,30 @@ export class InteractibleScene extends THREE.Scene {
         }
     });
 
-    this.fbo_background_scenes.forEach(scene => {
-        if (scene) {
-            scene.traverse((child) => {
-                if (child instanceof THREE.Mesh) {
-                    child.geometry.dispose();
-                    if (child.material instanceof THREE.Material) {
-                        child.material.dispose();
-                    }
-                }
-            });
-        }
-    });
-
     this.fbo_mask_scene = null;
-    this.fbo_background_scenes = [];
 
-    // Dispose of shaders
     this.maskShader?.dispose();
     this.maskShader = null;
   }
 
   public render(elapsedTime: number, enabled: boolean = true) {
-    if (!this.isClickable) return
-    this.calculateTextureShifts()
+    if (this.isClickable) {
+      this.calculateTextureShifts()
+      this.updateAnimation(elapsedTime - this.timeOffset)
+    }
 
     if (this.renderer && enabled) {
       if (this.timeOffset === 0) {
-        // always start rendering scene with a glow (4 seconds delay)
         this.timeOffset = (elapsedTime % 4.0) + 1.0;
       }
       this.maskShader.setUniformValue("uTime", elapsedTime - this.timeOffset)
 
-      // Apply position offsets to the mask meshes in the fbo_mask_scene before rendering
-      if (this.sceneData.items) {
-          this.sceneData.items.forEach((item, index) => {
-              const background = this.sceneData.backgrounds.find(background => background.renderOrder === item.renderOrder);
-              if (background) {
-                  const mesh = this.fbo_mask_scene.children[index] as THREE.Mesh
-                  const aspectRatio = 1920/1080;
-                  const screenSize = Math.min(window.innerWidth, window.innerHeight);
-                  const width = screenSize * aspectRatio;
-                  const height = screenSize;
-                  const scaledMousePos = this.mouseScreenPos.clone();
-                  scaledMousePos.x *= width/window.innerWidth;
-                  scaledMousePos.y *= height/window.innerHeight;
-                  scaledMousePos.multiplyScalar(-background.shiftMultiplier * 2);
-                  const offsetX = scaledMousePos.x * ((mesh.geometry as THREE.PlaneGeometry).parameters.width || 1) * 0.5;
-                  const offsetY = scaledMousePos.y * ((mesh.geometry as THREE.PlaneGeometry).parameters.height || 1) * 0.5;
-                  mesh.position.set(offsetX, offsetY, mesh.position.z)
-              }
-          });
-      }
+      this.renderer.setRenderTarget(this.fbo_blur_background);
+      this.renderer.clear();
+      this.renderer.render(this, this.camera);
 
-      // Render mask scene
+      this.backgroundBlurShader.setUniformValue('uTexture', this.fbo_blur_background.texture)
+
       if (this.sceneData.items) {
         this.renderer.setRenderTarget(this.fbo_mask);
         this.renderer.clear();
@@ -298,7 +323,12 @@ export class InteractibleScene extends THREE.Scene {
         this.renderer.readRenderTargetPixels(this.fbo_mask, this.mousePos.x, this.mousePos.y, 1, 1, maskRead);
 
         this.checkRenderOrders(maskRead);
+      } else {
+        this.renderer.setRenderTarget(null);
       }
+
+      this.renderer.render(this.backgroundScene, this.camera);
+
     } else {
       this.timeOffset = 0
       this.pickColor(0, 0, 0)
@@ -307,39 +337,17 @@ export class InteractibleScene extends THREE.Scene {
 
   private checkRenderOrders(maskRead: Float32Array) {
     const maskColor = new THREE.Color(maskRead[0], maskRead[1], maskRead[2]);
-    let hasFoundOverlap = false;
-
     const hitMask = this.sceneData.items?.find(item => item.color == maskColor.getHexString())
-    
-    if (hitMask) {
-    // Render background scenes
-    this.renderer.setRenderTarget(this.fbo_background);
-    this.sceneData.backgrounds.forEach((background, index) => {
-        // Skip opaque backgrounds as they're not in the fbo_background_scenes
-        if (background.renderOrder > hitMask.renderOrder && !background.opaque && this.fbo_background_scenes[index]) {
-          this.renderer.clear();
-          this.renderer.render(this.fbo_background_scenes[index], this.camera);
-
-          // Read pixel data and check alpha values
-          const bgRead = new Float32Array(4);
-          this.renderer.readRenderTargetPixels(this.fbo_background, this.mousePos.x, this.mousePos.y, 1, 1, bgRead);
-          
-          if (bgRead[3] > 0) {
-            hasFoundOverlap = true;
-          }
-        }
-      });
-    }
-
-    this.renderer.setRenderTarget(null);
 
     if (this.isClickable) {
-      if (!hasFoundOverlap) {
+      if (hitMask) {
         this.pickColor(maskRead[0], maskRead[1], maskRead[2]);
       } else {
         this.pickColor(0, 0, 0)
       }
     }
+
+    this.renderer.setRenderTarget(null);
   }
 
   pickColor(r: number, g: number, b: number) {
@@ -367,6 +375,7 @@ export class InteractibleScene extends THREE.Scene {
 
   onResize() {
     this.maskShader?.setUniformValue('uResolution', new THREE.Vector2(sizes.canvasWidth, sizes.canvasHeight))
+    this.backgroundBlurShader.setUniformValue('uResolution', new THREE.Vector2(sizes.canvasWidth, sizes.canvasHeight))
   }
 
   // get mouse position over the canvas for bar interaction
@@ -417,11 +426,9 @@ export class InteractibleScene extends THREE.Scene {
   }
 
   private calculateTextureShifts() {
-    // Update interpolation progress
     this.randomInterpolationProgress += this.RANDOM_INTERPOLATION_SPEED
     
     if (this.randomInterpolationProgress >= 1) {
-      // When we reach the target, set up the next transition
       this.randomInterpolationProgress = 0
       this.targetRandomValues = [...this.nextTargetRandomValues]
       this.nextTargetRandomValues = this.nextTargetRandomValues.map((_, i) => {
@@ -430,11 +437,9 @@ export class InteractibleScene extends THREE.Scene {
       })
     }
 
-    // Use cosine interpolation for smooth transitions
     const smoothProgress = (1 - Math.cos(this.randomInterpolationProgress * Math.PI)) / 2
 
     this.sceneData.backgrounds.forEach((background, index) => {
-      // Only apply random shift if animatedIdle exists
       if (background.animatedIdle) {
         this.currentRandomValues[index] = this.targetRandomValues[index] * (1 - smoothProgress) + 
                                         this.nextTargetRandomValues[index] * smoothProgress
@@ -442,22 +447,13 @@ export class InteractibleScene extends THREE.Scene {
         this.currentRandomValues[index] = 0
       }
 
-      // Handle animated shift if present
       if (background.animateShift?.enabled) {
-        // Update the layer shift amount
         this.layerShiftAmounts[index] += (background.animateShift.isLeft ? -1 : 1) * background.animateShift.speed;
-        
-        // Create a vector that shifts in the specified direction
         const shiftVector = new THREE.Vector2(this.layerShiftAmounts[index], 0);
-        
-        // Set the texture shift uniform
         this.maskShader.setUniformValue(`uTextureShift${index}`, shiftVector);
         this.maskShader.setUniformValue(`uRandomShift${index}`, this.currentRandomValues[index]);
-        
-        // Emit texture shift events
         emitter.emit(`texture_shift_${index}`, shiftVector);
       } else {
-        // Regular mouse-based shifting for non-animated backgrounds
         const aspectRatio = 1920/1080;
         const screenSize = Math.min(window.innerWidth, window.innerHeight);
         const width = screenSize * aspectRatio;
@@ -466,26 +462,74 @@ export class InteractibleScene extends THREE.Scene {
         scaledMousePos.x *= width/window.innerWidth;
         scaledMousePos.y *= height/window.innerHeight;
         const textureShift = scaledMousePos.multiplyScalar(background.shiftMultiplier);
-        
-        // Set uniform value for shader
         this.maskShader.setUniformValue(`uTextureShift${index}`, textureShift);
         this.maskShader.setUniformValue(`uRandomShift${index}`, this.currentRandomValues[index]);
-        
-        // Emit texture shift events
         emitter.emit(`texture_shift_${index}`, textureShift);
       }
     })
     
-    // Update the layer shift amount uniform after all calculations
+    // Apply position offsets to the mask meshes in the fbo_mask_scene before rendering
+    if (this.sceneData.items) {
+      this.sceneData.items.forEach((item, index) => {
+        const background = this.sceneData.backgrounds.find(background => background.renderOrder === item.renderOrder);
+        if (background) {
+          const meshes = this.fbo_mask_scene.children.filter(child => child.name === `bg_${background.renderOrder}` || child.name === `mask_${item.mask}_${background.renderOrder}`) as THREE.Mesh[]
+          const aspectRatio = 1920/1080;
+          const screenSize = Math.min(window.innerWidth, window.innerHeight);
+          const width = screenSize * aspectRatio;
+          const height = screenSize;
+          const scaledMousePos = this.mouseScreenPos.clone();
+          scaledMousePos.x *= width/window.innerWidth;
+          scaledMousePos.y *= height/window.innerHeight;
+          scaledMousePos.multiplyScalar(-background.shiftMultiplier * 2);
+          const offsetX = scaledMousePos.x * ((meshes[0].geometry as THREE.PlaneGeometry).parameters.width || 1) * 0.5;
+          const offsetY = scaledMousePos.y * ((meshes[0].geometry as THREE.PlaneGeometry).parameters.height || 1) * 0.5;
+          meshes.forEach(mesh => {
+            mesh.position.set(offsetX, offsetY, mesh.position.z)
+          })
+        }
+      });
+    
+      this.backgroundBlurShader.setUniformValue('uMask', this.fbo_mask.texture)
+    }
+    
     this.maskShader.setUniformValue('uShiftAmountLayer', this.layerShiftAmounts);
   }
 
   public toggleBlur(shouldBlur: boolean) {
-    new TWEEN.Tween({ value: shouldBlur ? 1 : 20 })
-      .to({ value: shouldBlur ? 20 : 1 }, 400)
+    if (this.blurTween) {
+      this.blurTween.stop();
+    }
+    
+    const startSamples = [...this.currentSamples];
+    const startDarkStrength = this.currentDarkStrength;
+    
+    const targetSamples = this.sceneData.backgrounds.map(background => {
+      if (shouldBlur) {
+        return 30;
+      } else {
+        return background.blurred ? (background.samples || 0) : 0;
+      }
+    });
+    
+    const targetDarkStrength = shouldBlur ? 0.8 : 0.0;
+    
+    this.blurTween = new TWEEN.Tween({ progress: 0 })
+      .to({ progress: 1 }, 600)
       .easing(TWEEN.Easing.Quartic.Out)
       .onUpdate((obj) => {
-        this.maskShader.setUniformValue('uSamples', obj.value);
+        this.currentSamples = startSamples.map((startValue, index) => {
+          const targetValue = targetSamples[index];
+          return Math.round(startValue + (targetValue - startValue) * obj.progress);
+        });
+        
+        this.currentDarkStrength = startDarkStrength + (targetDarkStrength - startDarkStrength) * obj.progress;
+        
+        this.maskShader.setUniformValue('uSamples', this.currentSamples);
+        this.maskShader.setUniformValue('uDarkStrength', this.currentDarkStrength);
+
+        this.backgroundBlurShader.setUniformValue('uSamples', this.currentSamples[0]);
+
       })
       .start();
   }
@@ -549,19 +593,23 @@ export class InteractibleScene extends THREE.Scene {
     return this.isClickable
   }
 
-  public excludeItem(item?: SceneObject) {
+  public excludeItem(mask?: TextureName) {
+    const item = this.sceneData.items.find(item => item.mask === mask)
     this.maskShader.setUniformValue('uExcludedColor', item ? new THREE.Color('#' + item.color) : new THREE.Color(0, 0, 0))
+    this.backgroundBlurShader.setUniformValue('uExcludedColor', item ? new THREE.Color('#' + item.color) : new THREE.Color(0, 0, 0))
   }
 
-  public includeItem(item?: SceneObject) {
+  public includeItem(mask?: TextureName) {
+    const item = this.sceneData.items.find(item => item.mask === mask)
     this.maskShader.setUniformValue('uExcludedColor', item ? new THREE.Color(0, 0, 0) : new THREE.Color(0, 0, 0))
+    this.backgroundBlurShader.setUniformValue('uExcludedColor', new THREE.Color(0, 0, 0))
   }
 
-  public hideItem(item: TextureName) {
+  public hideItem(item: TextureName, instant: boolean = false) {
     const index = this.sceneData.backgrounds.findIndex(background => background.texture === item)
     this.opacityTweens[index]?.stop()
     this.opacityTweens[index] = new TWEEN.Tween({ value: this.currentOpacities[index] })
-      .to({ value: 0 }, 400)
+      .to({ value: 0 }, instant ? 0 : 400)
       .easing(TWEEN.Easing.Quadratic.Out)
       .onUpdate((obj) => {
         this.currentOpacities[index] = obj.value
@@ -576,18 +624,91 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uHiddenOpacities', this.currentOpacities);
   }
 
-  public showItem(item: TextureName) {
+  public showItem(item: TextureName, instant: boolean = false) {
     const index = this.sceneData.backgrounds.findIndex(background => background.texture === item)
 
     this.opacityTweens[index]?.stop()
     this.opacityTweens[index] = new TWEEN.Tween({ value: this.currentOpacities[index] })
-      .to({ value: 1 }, 400)
+      .to({ value: 1 }, instant ? 0 : 400)
       .easing(TWEEN.Easing.Quadratic.Out)
       .onUpdate((obj) => {
         this.currentOpacities[index] = obj.value
         this.maskShader.setUniformValue('uHiddenOpacities', this.currentOpacities);
       })
       .start();
+  }
+
+  private initializeAnimationLayer(background: SceneBackgroundObject, index: number) {
+    if (!background.states || !background.isAnimated) return;
+    
+    const initialState = background.states[0];
+    const nextTexture = this.getNextTexture(initialState);
+    
+    this.animatedLayers.set(index, {
+      currentState: initialState,
+      nextTexture,
+      currentDuration: this.calculateDuration(initialState),
+      startTime: 0
+    });
+
+    this.currentTextures[index] = _textures[initialState.texture];
+  }
+  
+  private getNextTexture(currentState: TextureState): TextureName {
+    if (!currentState.nextTextures.length) return currentState.texture;
+    
+    if (currentState.transitionProbabilities) {
+      const total = currentState.transitionProbabilities.reduce((a, b) => a + b, 0);
+      let random = Math.random() * total;
+      for (let i = 0; i < currentState.nextTextures.length; i++) {
+        random -= currentState.transitionProbabilities[i];
+        if (random <= 0) return currentState.nextTextures[i];
+      }
+    }
+    
+    return currentState.nextTextures[Math.floor(Math.random() * currentState.nextTextures.length)];
+  }
+  
+  private calculateDuration(state: TextureState): number {
+    const normalRandom = () => {
+      let u = 0, v = 0;
+      while (u === 0) u = Math.random();
+      while (v === 0) v = Math.random();
+      return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    };
+
+    const range = state.maxDuration - state.minDuration;
+    const stdDev = range / 4;
+    
+    let duration = state.baseDuration + (normalRandom() * stdDev);
+    
+    duration = Math.max(state.minDuration, Math.min(state.maxDuration, duration));
+
+    console.log(duration)
+    
+    return duration;
+  }
+  
+  public updateAnimation(deltaTime: number) {
+    this.animatedLayers.forEach((layer, index) => {
+      
+      if (deltaTime - layer.startTime >= layer.currentDuration) {
+        const nextState = this.sceneData.backgrounds[index].states?.find(
+          state => state.texture === layer.nextTexture
+        );
+        
+        if (nextState) {
+          layer.currentState = nextState;
+          layer.nextTexture = this.getNextTexture(nextState);
+          layer.currentDuration = this.calculateDuration(nextState);
+          layer.startTime = deltaTime;
+
+          this.currentTextures[index] = _textures[nextState.texture];
+          
+          this.maskShader.setUniformValue('uTextures', this.currentTextures);
+        }
+      }
+    });
   }
 
 }

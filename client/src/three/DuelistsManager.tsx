@@ -265,14 +265,20 @@ export class DuelistsManager {
             this.playActorAnimation(this.duelistB, AnimName.SHOT_DEAD_FRONT, () => _updateB())
           } else if (statsB.health < 3) {
             this.playActorAnimation(this.duelistB, AnimName.SHOT_INJURED_FRONT, () => _updateB())
+          } else {
+            _updateB()
           }
         } else {
           if (statsB.health == 0) {
             this.playActorAnimation(this.duelistB, AnimName.SHOT_DEAD_BACK, () => _updateB())
           } else if (statsB.health < 3) {
             this.playActorAnimation(this.duelistB, AnimName.SHOT_INJURED_BACK, () => _updateB())
+          } else {
+            _updateB()
           }
         }
+      } else {
+        _updateB()
       }
     } else {
       _updateB()
@@ -285,14 +291,20 @@ export class DuelistsManager {
             this.playActorAnimation(this.duelistA, AnimName.SHOT_DEAD_FRONT, () => _updateA())
           } else if (statsA.health < 3) {
             this.playActorAnimation(this.duelistA, AnimName.SHOT_INJURED_FRONT, () => _updateA())
+          } else {
+            _updateA()
           }
         } else {
           if (statsA.health == 0) {
             this.playActorAnimation(this.duelistA, AnimName.SHOT_DEAD_BACK, () => _updateA())
           } else if (statsA.health < 3) {
             this.playActorAnimation(this.duelistA, AnimName.SHOT_INJURED_BACK, () => _updateA())
+          } else {
+            _updateA()
           }
         }
+      } else {
+        _updateA()
       }
     } else {
       _updateA()

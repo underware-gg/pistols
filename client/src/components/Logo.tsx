@@ -11,7 +11,7 @@ export default function Logo({
 
   if (!showName) {
     return (
-      <Image src='/images/logo.png' width={aspectWidth(width)} height={aspectWidth(width)} centered />
+      <Image src='/images/logo/logo.png' width={aspectWidth(width)} height={aspectWidth(width)} centered />
     )
   }
 
@@ -22,8 +22,8 @@ export default function Logo({
       alignItems: 'center',
       gap: aspectWidth(vertical ? 1 : 2)
     }}>
-      <Image src='/images/logo.png' width={aspectWidth(width)} height={aspectWidth(width)} />
-      <Image src={square ? '/images/logo_text_square.png' : '/images/logo_text.png'} width={vertical ? aspectWidth(width * 1.5) : undefined} height={vertical ? undefined : aspectWidth(square ? width * 0.9 : width * 0.5)} />
+      <Image src='/images/logo/logo.png' width={aspectWidth(width)} height={aspectWidth(width)} />
+      <Image src={square ? '/images/logo/logo_text_square.png' : '/images/logo/logo_text.png'} width={vertical ? aspectWidth(width * 1.5) : undefined} height={vertical ? undefined : aspectWidth(square ? width * 0.9 : width * 0.5)} />
     </div>
   )
 }

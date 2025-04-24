@@ -10,9 +10,12 @@ import { Divider } from '/src/components/ui/Divider'
 import { PACKAGE_VERSION } from '/src/utils/constants'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
-import { SceneName } from '/src/data/assets'
+import { sceneBackgrounds, SceneName, TextureName } from '/src/data/assets'
 import Logo from '/src/components/Logo'
 import { Modal } from 'semantic-ui-react'
+import { useTextureShift } from '/src/hooks/useTextureShift'
+import { _currentScene } from '/src/three/game'
+import { InteractibleScene } from '/src/three/InteractibleScene'
 
 export default function ScDoor() {
   const { isReady } = useDojoStatus()
@@ -21,9 +24,16 @@ export default function ScDoor() {
   const [visibleChars, setVisibleChars] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
 
+  const { x: bubbleShiftX, y: bubbleShiftY } = useTextureShift(2)
+  const { x: uiShiftX, y: uiShiftY } = useTextureShift(3)
+
   // clear tavern state
   useEffectOnce(() => {
     setIsLoading(false)
+    const scene = (_currentScene as InteractibleScene);
+    if (scene) {
+      scene.showItem(TextureName.bg_door_face_angry, true)
+    }
   }, [])
 
   useEffectOnce(() => {
@@ -39,10 +49,19 @@ export default function ScDoor() {
     addCharacter(0)
   }, [])
 
+  useEffect(() => {
+    if (isLoading) {
+      const scene = (_currentScene as InteractibleScene);
+      if (scene) {
+        scene.hideItem(TextureName.bg_door_face_angry, true)
+      }
+    }
+  }, [isLoading])
+
   return (
     <div id='Door'>
       <div className='UIContainer' >
-        <div className={`UIPage ${!isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: !isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute' }}>
+        <div className={`UIPage ${!isLoading ? '' : 'NoMouse NoDrag'}`} style={{ opacity: !isLoading ? 1 : 0, transition: 'opacity 0.5s', position: 'absolute', transform: `translate(${uiShiftX}px, ${uiShiftY}px)` }}>
           <DoorHeader />
           <VStack className='NoPadding'>
 
@@ -80,8 +99,9 @@ export default function ScDoor() {
         style={{
           position: 'absolute',
           left: '1%',
-          top: '55%',
+          top: '60%',
           width: '30%',
+          transform: `translate(${bubbleShiftX}px, ${bubbleShiftY}px)`
         }}
       >
         <img src="/images/ui/tavern/bubble_door.png" style={{ width: '100%' }}/>

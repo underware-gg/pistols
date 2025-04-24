@@ -13,9 +13,7 @@ import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 
 export interface DuelAnimationControllerProps {
   cardsRef: React.RefObject<CardsHandle>;
-  isAnimatingStepRef: React.MutableRefObject<boolean>;
   isPlayingRef: React.MutableRefObject<boolean>;
-  speedRef: React.MutableRefObject<number>;
   currentStepRef: React.MutableRefObject<number>;
   tutorialLevel: DuelTutorialLevel;
 }
@@ -31,9 +29,7 @@ export interface DuelAnimationControllerRef {
 // Convert component to forwardRef to expose resetDuel function
 export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, DuelAnimationControllerProps>(({
   cardsRef,
-  isAnimatingStepRef,
   isPlayingRef,
-  speedRef,
   currentStepRef,
   tutorialLevel
 }, ref) => {
@@ -48,6 +44,9 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
     rightDuelist,
     statsLeft,
     statsRight,
+    settings: {
+      duelSpeedFactor,
+    },
     setStatsLeft,
     setStatsRight,
     resetStats,
@@ -59,14 +58,13 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
   const cardRevealTimeoutRef = useRef(null);
   const gameBladeAnimationTimeoutRef = useRef(null);
   const gameAnimationTimeoutRef = useRef(null);
-  const hasUnmountedRef = useRef(false);
   const hasSpawnedCardsLeftRef = useRef(false);
   const hasSpawnedCardsRightRef = useRef(false);
+  const isAnimatingStepRef = useRef(false);
 
   // Set up cleanup on unmount
   useEffect(() => {
     return () => {
-      hasUnmountedRef.current = true;
       resetStep();
     };
   }, []);
@@ -204,16 +202,15 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
 
           if (cardsRef.current) {
             // Start by revealing tactics cards
-            cardsRef.current.revealCard('A', DuelistCardType.TACTICS, speedRef.current);
-            cardsRef.current.revealCard('B', DuelistCardType.TACTICS, speedRef.current);
+            cardsRef.current.revealCard('A', DuelistCardType.TACTICS, duelSpeedFactor);
+            cardsRef.current.revealCard('B', DuelistCardType.TACTICS, duelSpeedFactor);
           }
 
           // Start animation if set to play
           if (isPlayingRef.current) {
             nextStepCallbackRef.current = setTimeout(() => {
-              if (gameImpl) gameImpl.removeHighlightEffects();
               playStep();
-            }, tutorialLevel === DuelTutorialLevel.SIMPLE ? 500 : (Constants.BASE_CARD_REVEAL_DURATION * 1.2) / speedRef.current);
+            }, tutorialLevel === DuelTutorialLevel.SIMPLE ? 500 : (Constants.BASE_CARD_REVEAL_DURATION * 1.2) / duelSpeedFactor);
           }
         };
         
@@ -242,6 +239,8 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
       nextStepCallbackRef.current = null;
     }
 
+    isAnimatingStepRef.current = true;
+
     currentStepRef.current += 1;
     const step = duelProgress.steps[currentStepRef.current];
 
@@ -250,12 +249,10 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
       return;
     }
 
-    isAnimatingStepRef.current = true;
-
     // Draw a new environment card if present
     if (step.card_env !== constants.EnvCard.None) {
       if (cardsRef.current) {
-        cardsRef.current.drawNextCard(speedRef.current);
+        cardsRef.current.drawNextCard(duelSpeedFactor);
       }
     }
 
@@ -310,15 +307,15 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
         cardRevealTimeoutRef.current = setTimeout(() => {
           revealCardsA.forEach(card => {
             if (cardsRef.current) {
-              cardsRef.current.revealCard('A', card.type, speedRef.current, leftState.health > 0);
+              cardsRef.current.revealCard('A', card.type, duelSpeedFactor, leftState.health > 0);
             }
           });
           revealCardsB.forEach(card => {
             if (cardsRef.current) {
-              cardsRef.current.revealCard('B', card.type, speedRef.current, rightState.health > 0);
+              cardsRef.current.revealCard('B', card.type, duelSpeedFactor, rightState.health > 0);
             }
           });
-        }, Math.max(...[...revealCardsA, ...revealCardsB].map(card => card.delay || 0), 0) / speedRef.current);
+        }, Math.max(...[...revealCardsA, ...revealCardsB].map(card => card.delay || 0), 0) / duelSpeedFactor);
       }
 
       let newStatsLeft: typeof statsLeft = null;
@@ -355,7 +352,7 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
             gameImpl.prepareActionAnimation();
             gameImpl.animateDuelistBlade();
           }
-        }, 1000 / speedRef.current);
+        }, 1000 / duelSpeedFactor);
       }
 
       const timeDelay = Constants.DRAW_CARD_BASE_DURATION + 200 + (shouldDoblePause ? (Constants.BASE_CARD_REVEAL_DURATION + 200) : 200);
@@ -393,27 +390,25 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
             newStatsRight?.health ?? 3
           );
         }
-      }, tutorialLevel === DuelTutorialLevel.SIMPLE ? 500 : step.card_env != constants.EnvCard.None ? (timeDelay / speedRef.current) : 3000 / speedRef.current);
+      }, tutorialLevel === DuelTutorialLevel.SIMPLE ? 500 : step.card_env != constants.EnvCard.None ? (timeDelay / duelSpeedFactor) : 3000 / duelSpeedFactor);
 
       // Schedule next step if we have more steps and are in playing mode
       if (currentStepRef.current < duelProgress.steps.length - 1 && isPlayingRef.current) {
         nextStepCallbackRef.current = setTimeout(() => {
-          if (hasUnmountedRef.current) {
-            resetEverything();
-          } else if (isPlayingRef.current) { // Double check we're still in play mode
+          if (isPlayingRef.current) { // Double check we're still in play mode
             playStep();
           } else {
             // Not playing, just mark as not animating
             isAnimatingStepRef.current = false;
             console.log("Animation paused");
           }
-        }, timeDelayNextStep / speedRef.current);
+        }, timeDelayNextStep / duelSpeedFactor);
       } else {
         // If this is the last step or not playing, mark as finished
         setTimeout(() => {
           isAnimatingStepRef.current = false;
           console.log("Animation sequence complete");
-        }, timeDelayNextStep / speedRef.current);
+        }, timeDelayNextStep / duelSpeedFactor);
       }
     } catch (error) {
       console.error("Error in playStep:", error);
@@ -472,7 +467,6 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
     currentStepRef.current = 0;
     hasSpawnedCardsLeftRef.current = false;
     hasSpawnedCardsRightRef.current = false;
-    hasUnmountedRef.current = false;
     isAnimatingStepRef.current = false;
     
     // Clear all timeout references

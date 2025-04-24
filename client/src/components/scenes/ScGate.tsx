@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { sceneBackgrounds, SceneName } from '/src/data/assets'
+import { sceneBackgrounds, SceneName, TextureName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
+import { useTextureShift } from '/src/hooks/useTextureShift'
 import { TavernAudios } from '/src/components/GameContainer'
 import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
 import Logo from '/src/components/Logo'
 import AnimatedText from '../ui/AnimatedText'
 import TWEEN from '@tweenjs/tween.js'
-import { _currentScene, emitter } from '/src/three/game'
+import { _currentScene } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 
@@ -18,13 +19,11 @@ export default function ScGate() {
   
   const [textOpacity, setTextOpacity] = useState(0)
   const [text, setText] = useState('')
-  const [balloonPosition, setBalloonPosition] = useState({ x: 0, y: 0 })
-  const [logoPosition, setLogoPosition] = useState({ x: 0, y: 0 })
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
-  const { value: textureShiftBubble, timestamp: textureShiftBubbleTimestamp } = useGameEvent('texture_shift_1', null)
-  const { value: textureShiftLogo, timestamp: textureShiftLogoTimestamp } = useGameEvent('texture_shift_6', null)
+  const { x: bubbleShiftX, y: bubbleShiftY } = useTextureShift(1)
+  const { x: logoShiftX, y: logoShiftY } = useTextureShift(5)
   
   useEffect(() => {
     // Set up the text display with delay
@@ -41,7 +40,7 @@ export default function ScGate() {
         
       const scene = (_currentScene as InteractibleScene);
       if (scene) {
-        scene.excludeItem(sceneBackgrounds.Gate.items[0])
+        scene.excludeItem(TextureName.bg_entrance_door_mask)
         scene.toggleBlur(true)
         
         setTimeout(() => {
@@ -58,30 +57,6 @@ export default function ScGate() {
   }, [])
 
   useEffect(() => {
-    const handleTextureShift = (shift: { x: number, y: number }) => {
-      const scaledX = -shift.x * aspectWidth(100)
-      const scaledY = shift.y * aspectHeight(100)
-      setBalloonPosition({ x: scaledX, y: scaledY })
-    }
-
-    if (textureShiftBubble && text.includes('OY!')) {
-      handleTextureShift(textureShiftBubble)
-    }
-  }, [textureShiftBubble, textureShiftBubbleTimestamp, text])
-
-  useEffect(() => {
-    const handleTextureShift = (shift: { x: number, y: number }) => {
-      const scaledX = -shift.x * aspectWidth(100)
-      const scaledY = shift.y * aspectHeight(100)
-      setLogoPosition({ x: scaledX, y: scaledY })
-    }
-
-    if (textureShiftLogo) {
-      handleTextureShift(textureShiftLogo)
-    }
-  }, [textureShiftLogo, textureShiftLogoTimestamp])
-
-  useEffect(() => {
     if (itemClicked) {
       switch (itemClicked) {
         case 'door':
@@ -93,7 +68,7 @@ export default function ScGate() {
 
   return (
     <>
-      <div style={{ position: 'absolute', right: '4%', bottom: '6%', zIndex: 1, transform: `translate(${logoPosition.x}px, ${logoPosition.y}px)` }}>
+      <div style={{ position: 'absolute', right: '4%', bottom: '6%', zIndex: 1, transform: `translate(${logoShiftX}px, ${logoShiftY}px)` }}>
         <Logo width={12} showName vertical />
       </div>
 
@@ -103,7 +78,7 @@ export default function ScGate() {
         className='FillParent'
         style={{ 
           opacity: textOpacity,
-          transform: `translate(${balloonPosition.x}px, ${balloonPosition.y}px)`
+          transform: `translate(${bubbleShiftX}px, ${bubbleShiftY}px)`
         }}
       >
         <div className='GateTalkBaloon NoMouse NoDrag' data-tail="left" >

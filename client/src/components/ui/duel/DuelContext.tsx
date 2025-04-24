@@ -10,6 +10,7 @@ import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
+import { useSettings } from '/src/hooks/SettingsContext'
 
 export type DuelistState = {
   damage: number, 
@@ -45,6 +46,10 @@ export type DuelContextState = {
   rightDuelist: DuelistInfo,
   statsLeft: DuelistState,
   statsRight: DuelistState,
+  settings: {
+    duelSpeedFactor: number,
+    debugMode: boolean,
+  },
   challenge: {
     timestampStart: number,
     timestampEnd: number,
@@ -97,6 +102,11 @@ const defaultChallenge = {
   isCanceled: false
 }
 
+const duelSettings = {
+  duelSpeedFactor: 1,
+  debugMode: false,
+}
+
 // Default empty completed stages
 const defaultCompletedStages = {}
 
@@ -122,6 +132,7 @@ const DuelContext = createContext<DuelContextState>({
   rightDuelist: emptyDuelistInfo,
   statsLeft: defaultState,
   statsRight: defaultState,
+  settings: duelSettings,
   challenge: defaultChallenge,
   duelProgress: null,
   hasWithdrawnOrAbandoned: false,
@@ -165,16 +176,17 @@ export const DuelContextProvider: React.FC<{
     sceneStarted: 0,
     dataSet: 0
   });
+
+  const { duelSpeedFactor, debugMode } = useSettings()
   
   // Get challenge data
-  const challengeData = useGetChallenge(duelId);
   const { 
     duelistIdA, duelistIdB, 
     duelistAddressA, duelistAddressB, 
     timestampStart, timestampEnd, 
     isTutorial, isAwaiting, isInProgress, isFinished,
     isExpired, isCanceled
-  } = challengeData;
+  } = useGetChallenge(duelId);
 
   // Get duelist data
   const duelistA = useDuelist(duelistIdA);
@@ -359,6 +371,10 @@ export const DuelContextProvider: React.FC<{
     rightDuelist: rightDuelist || emptyDuelistInfo,
     statsLeft,
     statsRight,
+    settings: {
+      duelSpeedFactor,
+      debugMode,
+    },
     challenge: {
       timestampStart: timestampStart || 0,
       timestampEnd: timestampEnd || 0,

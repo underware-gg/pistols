@@ -205,12 +205,12 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
 
   useEffect(() => {
     if (frontRef.current) {
-      frontRef.current.style.setProperty('--component-cursor', props.mouseDisabled ? 'default' : 'pointer')
+      frontRef.current.style.setProperty('--component-cursor', props.mouseDisabled || !props.isVisible ? 'default' : 'pointer')
     }
     if (backgroundRef.current) {
-      backgroundRef.current.style.setProperty('--component-cursor', props.mouseDisabled ? 'default' : 'pointer')
+      backgroundRef.current.style.setProperty('--component-cursor', props.mouseDisabled || !props.isVisible ? 'default' : 'pointer')
     }
-  }, [props.mouseDisabled])
+  }, [props.mouseDisabled, props.isVisible])
 
   useEffect(() => {
     if (frontRef.current) {
@@ -655,7 +655,7 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
         </div>
         <div 
           ref={frontRef}
-          className={`component-container ${props.mouseDisabled ? 'NoMouse' : 'YesMouse'} NoDrag`}
+          className={`component-container ${props.mouseDisabled || !props.isVisible ? 'NoMouse' : 'YesMouse'} NoDrag`}
           onMouseDown={handleMouseDown}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}

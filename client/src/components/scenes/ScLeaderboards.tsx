@@ -603,11 +603,12 @@ export default function ScLeaderboards() {
 
               {scores.length === 0 && (
                 <div style={{ 
-                  flex: 1, 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  color: '#888',
+                  position: 'absolute', 
+                  bottom: aspectHeight(-1), 
+                  left: 0, 
+                  right: 0, 
+                  textAlign: 'center',
+                  color: '#a37349',
                   fontSize: aspectWidth(2)
                 }}>
                   No leaderboard data available for this season
