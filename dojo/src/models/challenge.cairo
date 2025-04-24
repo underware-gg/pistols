@@ -102,7 +102,7 @@ use pistols::types::cards::{
     hand::{FinalBlow},
 };
 use pistols::types::{
-    profile_type::{CharacterProfile},
+    duelist_profile::{CharacterProfile},
     rules::{Rules, RulesTrait},
     timestamp::{TimestampTrait},
     constants::{CONST},

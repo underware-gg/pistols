@@ -1,6 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 use pistols::models::challenge::{Challenge};
+use pistols::types::duelist_profile::{DuelistProfile};
 use pistols::types::rules::{RewardValues};
 
 #[starknet::interface]
@@ -87,7 +88,7 @@ pub trait IDuelistTokenPublic<TState> {
 // Exposed to world
 #[starknet::interface]
 pub trait IDuelistTokenProtected<TState> {
-    fn mint_duelists(ref self: TState, recipient: ContractAddress, quantity: usize, seed: felt252) -> Span<u128>;
+    fn mint_duelists(ref self: TState, recipient: ContractAddress, profile_sample: DuelistProfile, quantity: usize, seed: felt252) -> Span<u128>;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64) -> (RewardValues, RewardValues);
 }
 
@@ -166,7 +167,7 @@ pub mod duelist_token {
         events::{Activity, ActivityTrait},
     };
     use pistols::types::{
-        profile_type::{ProfileTypeTrait, ProfileManagerTrait},
+        duelist_profile::{ProfileManagerTrait, DuelistProfile, DuelistProfileTrait},
         rules::{
             Rules, RulesTrait,
             PoolDistribution, PoolDistributionTrait,
@@ -311,6 +312,7 @@ pub mod duelist_token {
     impl DuelistTokenProtectedImpl of super::IDuelistTokenProtected<ContractState> {
         fn mint_duelists(ref self: ContractState,
             recipient: ContractAddress,
+            profile_sample: DuelistProfile,
             quantity: usize,
             seed: felt252,
         ) -> Span<u128>{
@@ -328,7 +330,7 @@ pub mod duelist_token {
                 // create Duelist
                 let duelist = Duelist {
                     duelist_id: *duelist_ids[i],
-                    profile_type: ProfileManagerTrait::randomize_duelist(rnd.low.into()),
+                    duelist_profile: ProfileManagerTrait::randomize_profile(profile_sample, rnd.low.into()),
                     timestamps: DuelistTimestamps {
                         registered: timestamp,
                         active: timestamp,
@@ -631,7 +633,7 @@ pub mod duelist_token {
             let owner: ContractAddress = self.owner_of(token_id);
             let assignment: DuelistAssignmentValue = store.get_duelist_challenge_value(token_id.low);
             let archetype: Archetype = duelist.status.get_archetype();
-            let duelist_image: ByteArray = duelist.profile_type.get_uri(base_uri.clone());
+            let duelist_image: ByteArray = duelist.duelist_profile.get_uri(base_uri.clone());
             let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
             let lives: u128 = (fame_balance / FAME::ONE_LIFE.low);
             let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
@@ -642,8 +644,8 @@ pub mod duelist_token {
                 // .add("username", username, false)
                 .add("honour", duelist.status.get_honour(), false)
                 .add("archetype", archetype.into(), false)
-                .add("profile_type", duelist.profile_type.into(), false)
-                .add("profile_id", duelist.profile_type.profile_id().to_string(), false)
+                .add("profile_type", duelist.duelist_profile.into(), false)
+                .add("profile_id", duelist.duelist_profile.profile_id().to_string(), false)
                 .add("total_duels", duelist.status.total_duels.to_string(), false)
                 .add("total_wins", duelist.status.total_wins.to_string(), false)
                 .add("total_losses", duelist.status.total_losses.to_string(), false)
@@ -659,7 +661,7 @@ pub mod duelist_token {
             let mut attributes: Array<Attribute> = array![
                 Attribute {
                     key: "Name",
-                    value: duelist.profile_type.name(),
+                    value: duelist.duelist_profile.name(),
                 },
                 Attribute {
                     key: "Honour",
@@ -715,7 +717,7 @@ pub mod duelist_token {
             // https://docs.opensea.io/docs/metadata-standards#metadata-structure
             let metadata = TokenMetadata {
                 token_id,
-                name: format!("{} #{}", duelist.profile_type.name(), token_id),
+                name: format!("{} #{}", duelist.duelist_profile.name(), token_id),
                 description: format!("Pistols at Dawn Duelist #{}. https://pistols.gg", token_id),
                 image: Option::Some(image),
                 image_data: Option::None,

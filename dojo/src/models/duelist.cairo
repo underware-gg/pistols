@@ -1,5 +1,5 @@
 use starknet::{ContractAddress};
-pub use pistols::types::profile_type::{ProfileType, ProfileTypeTrait, DuelistProfile, BotProfile};
+pub use pistols::types::duelist_profile::{DuelistProfile, DuelistProfileTrait, GenesisProfile, BotProfile};
 
 //---------------------
 // Duelist
@@ -10,7 +10,7 @@ pub struct Duelist {
     #[key]
     pub duelist_id: u128,   // erc721 token_id
     //-----------------------
-    pub profile_type: ProfileType,
+    pub duelist_profile: DuelistProfile,
     pub timestamps: DuelistTimestamps,
     pub status: DuelistStatus,
 }

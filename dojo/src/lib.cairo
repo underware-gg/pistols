@@ -60,8 +60,8 @@ mod types {
     pub mod challenge_state;
     pub mod constants;
     pub mod duel_progress;
+    pub mod duelist_profile;
     pub mod premise;
-    pub mod profile_type;
     pub mod round_state;
     pub mod rules;
     pub mod shuffler;

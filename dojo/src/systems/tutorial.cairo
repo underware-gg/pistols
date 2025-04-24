@@ -44,7 +44,7 @@ pub mod tutorial {
     };
     use pistols::types::{
         premise::{Premise},
-        profile_type::{ProfileType, ProfileTypeTrait, CharacterProfile, BotProfile, ProfileManagerTrait},
+        duelist_profile::{DuelistProfile, DuelistProfileTrait, CharacterProfile, BotProfile, ProfileManagerTrait},
         challenge_state::{ChallengeState, ChallengeStateTrait},
         duel_progress::{DuelProgress},
         round_state::{RoundState},
@@ -68,8 +68,8 @@ pub mod tutorial {
     fn dojo_init(ref self: ContractState) {
         let mut store: Store = StoreTrait::new(self.world_default());
         // create agent profiles
-        ProfileManagerTrait::initialize(ref store, ProfileType::Character(CharacterProfile::Unknown));
-        ProfileManagerTrait::initialize(ref store, ProfileType::Bot(BotProfile::Unknown));
+        ProfileManagerTrait::initialize(ref store, DuelistProfile::Character(CharacterProfile::Unknown));
+        ProfileManagerTrait::initialize(ref store, DuelistProfile::Bot(BotProfile::Unknown));
     }
 
     #[generate_trait]
@@ -103,8 +103,8 @@ pub mod tutorial {
             assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
             assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
 
-            let player_profile: ProfileType = ProfileType::Character(CharacterProfile::Player);
-            let opponent_profile: ProfileType = level.opponent_profile();
+            let player_profile: DuelistProfile = DuelistProfile::Character(CharacterProfile::Player);
+            let opponent_profile: DuelistProfile = level.opponent_profile();
 
             let duel_id: u128 = level.make_duel_id(player_id);
 
@@ -117,8 +117,8 @@ pub mod tutorial {
                 // duelists
                 address_a: starknet::get_caller_address(),
                 address_b: starknet::get_caller_address(),
-                duelist_id_a: opponent_profile.duelist_id(),
-                duelist_id_b: player_profile.duelist_id(),
+                duelist_id_a: opponent_profile.make_duelist_id(),
+                duelist_id_b: player_profile.make_duelist_id(),
                 // progress
                 state: ChallengeState::InProgress,
                 season_id: 0,

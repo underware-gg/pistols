@@ -739,8 +739,8 @@ pub mod tournament_token {
                 // .add("winner_address", format!("0x{:x}", tournament.winner_address), false)
                 // .add("winner_duelist_id", tournament.winner_duelist_id.to_string(), false)
                 // .add("winner_name", winner_name.clone(), false)
-                // .add("profile_type", winner_duelist.profile_type.into(), false)
-                // .add("profile_id", winner_duelist.profile_type.profile_id().to_string(), false)
+                // .add("profile_type", winner_duelist.duelist_profile.into(), false)
+                // .add("profile_id", winner_duelist.duelist_profile.duelist_profile_id().to_string(), false)
                 .build();
             // Attributes
             let mut attributes: Array<Attribute> = array![

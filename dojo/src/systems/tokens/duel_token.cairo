@@ -169,7 +169,7 @@ pub mod duel_token {
     use pistols::models::{
         player::{PlayerTrait},
         challenge::{Challenge, ChallengeTrait, ChallengeValue, ChallengeMessage, ChallengeMessageValue, DuelType, Round, RoundTrait},
-        duelist::{DuelistTrait, DuelistValue, ProfileTypeTrait},
+        duelist::{DuelistTrait, DuelistValue, DuelistProfileTrait},
         pact::{PactTrait},
         events::{Activity, ActivityTrait},
         tournament::{
@@ -690,10 +690,10 @@ pub mod duel_token {
                 .add("state", challenge.state.into(), false)
                 .add("winner", challenge.winner.to_string(), false)
                 .add("season_id", challenge.season_id.to_string(), false)
-                .add("profile_type_a", duelist_a.profile_type.into(), false)
-                .add("profile_type_a", duelist_b.profile_type.into(), false)
-                .add("profile_id_a", duelist_a.profile_type.profile_id().to_string(), false)
-                .add("profile_id_b", duelist_b.profile_type.profile_id().to_string(), false)
+                .add("profile_type_a", duelist_a.duelist_profile.into(), false)
+                .add("profile_type_b", duelist_b.duelist_profile.into(), false)
+                .add("profile_id_a", duelist_a.duelist_profile.profile_id().to_string(), false)
+                .add("profile_id_b", duelist_b.duelist_profile.profile_id().to_string(), false)
                 .add("address_a", format!("0x{:x}", challenge.address_a), false)
                 .add("address_b", format!("0x{:x}", challenge.address_b), false)
                 .add("message", challenge_message.message, true)

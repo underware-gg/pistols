@@ -68,11 +68,11 @@ fn _assert_duelist_count(sys: @TestSystems, minted_count: u128, msg: ByteArray) 
 }
 
 fn _purchase(sys: @TestSystems, recipient: ContractAddress) -> u128 {
-    let price: u128 = (*sys.pack).calc_mint_fee(recipient, PackType::Duelists5x);
+    let price: u128 = (*sys.pack).calc_mint_fee(recipient, PackType::GenesisDuelists5x);
     assert_ne!(price, 0, "invalid price");
     tester::impersonate(recipient);
     tester::execute_lords_approve(sys.lords, recipient, (*sys.bank).contract_address, price);
-    (*sys.pack).purchase(PackType::Duelists5x);
+    (*sys.pack).purchase(PackType::GenesisDuelists5x);
     (price)
 }
 
@@ -107,7 +107,7 @@ fn test_token_uri() {
 
     let pack = Pack {
         pack_id: TOKEN_ID_1.low,
-        pack_type: PackType::Duelists5x,
+        pack_type: PackType::GenesisDuelists5x,
         seed: 999999,
         lords_amount: 50 * CONST::ETH_TO_WEI.low,
         is_open: false,
@@ -174,7 +174,7 @@ fn test_claim_purchase() {
 
     let pack_2: Pack = sys.store.get_pack(TOKEN_ID_2.low);
     assert_eq!(pack_2.pack_id, TOKEN_ID_2.low, "pack_2.pack_id");
-    assert_eq!(pack_2.pack_type, PackType::Duelists5x, "pack_2.pack_type");
+    assert_eq!(pack_2.pack_type, PackType::GenesisDuelists5x, "pack_2.pack_type");
     assert_ne!(pack_2.seed, pack_1.seed, "pack_2.seed");
     assert!(!pack_2.is_open, "pack_2.is_open");
 
@@ -201,7 +201,7 @@ fn test_claim_not_sponsored() {
 fn test_mint_no_allowance_zero() {
     let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
-    sys.pack.purchase(PackType::Duelists5x);
+    sys.pack.purchase(PackType::GenesisDuelists5x);
 }
 
 #[test]
@@ -217,9 +217,9 @@ fn test_claim_twice() {
 fn test_mint_no_allowance_half() {
     let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
-    let price: u128 = sys.pack.calc_mint_fee(OWNER(), PackType::Duelists5x);
+    let price: u128 = sys.pack.calc_mint_fee(OWNER(), PackType::GenesisDuelists5x);
     tester::execute_lords_approve(@sys.lords, OWNER(), sys.bank.contract_address, price / 2);
-    sys.pack.purchase(PackType::Duelists5x);
+    sys.pack.purchase(PackType::GenesisDuelists5x);
 }
 
 #[test]

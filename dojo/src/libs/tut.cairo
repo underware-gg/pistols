@@ -12,7 +12,7 @@ pub enum TutorialLevel {
 //
 use pistols::systems::rng_mock::{MockedValue, MockedValueTrait};
 use pistols::models::challenge::{Challenge};
-use pistols::types::profile_type::{ProfileType,CharacterProfile};
+use pistols::types::duelist_profile::{DuelistProfile,CharacterProfile};
 use pistols::types::cards::{
     hand::{DuelistHand, DuelistHandTrait},
     paces::{PacesCard, PacesCardTrait},
@@ -37,11 +37,11 @@ pub impl TutorialLevelImpl of TutorialLevelTrait {
         duel_id = (duel_id & ~0xff) | tutorial_id;
         (duel_id)
     }
-    fn opponent_profile(self: @TutorialLevel) -> ProfileType {
+    fn opponent_profile(self: @TutorialLevel) -> DuelistProfile {
         match self {
-            TutorialLevel::Level1 => ProfileType::Character(CharacterProfile::Drunkard),
-            TutorialLevel::Level2 => ProfileType::Character(CharacterProfile::Bartender),
-            _ => ProfileType::Undefined,
+            TutorialLevel::Level1 => DuelistProfile::Character(CharacterProfile::Drunkard),
+            TutorialLevel::Level2 => DuelistProfile::Character(CharacterProfile::Bartender),
+            _ => DuelistProfile::Undefined,
         }
     }
     fn message(self: @TutorialLevel) -> ByteArray {

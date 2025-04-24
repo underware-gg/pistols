@@ -11,7 +11,7 @@ use pistols::models::{
     challenge::{Challenge, DuelType},
     duelist::{
         Duelist,
-        ProfileType, DuelistProfile, BotProfile,
+        DuelistProfile, GenesisProfile, BotProfile,
         DuelistTimestamps,
     },
     config::{TokenConfig},
@@ -126,7 +126,7 @@ fn test_token_uri() {
 
     let duelist_a = Duelist {
         duelist_id: ID(OWNER()),
-        profile_type: ProfileType::Duelist(DuelistProfile::LadyVengeance),
+        duelist_profile: DuelistProfile::Genesis(GenesisProfile::LadyVengeance),
         timestamps: DuelistTimestamps {
             registered: 999999,
             active: 999999,
@@ -135,7 +135,7 @@ fn test_token_uri() {
     };
     let duelist_b = Duelist {
         duelist_id: ID(OTHER()),
-        profile_type: ProfileType::Bot(BotProfile::Leon),
+        duelist_profile: DuelistProfile::Bot(BotProfile::Leon),
         timestamps: DuelistTimestamps {
             registered: 999999,
             active: 999999,

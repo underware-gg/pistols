@@ -4,7 +4,7 @@ use starknet::{ContractAddress};
 pub enum PackType {
     Unknown,        // 0
     StarterPack,    // 1
-    Duelists5x,     // 2
+    GenesisDuelists5x,     // 2
 }
 
 //------------------------
@@ -62,11 +62,11 @@ mod PACK_TYPES {
         price_lords: 20 * CONST::ETH_TO_WEI.low,
         quantity: 2,
     };  
-    pub const Duelists5x: PackDescription = PackDescription {
-        id: 'Duelists5x',
+    pub const GenesisDuelists5x: PackDescription = PackDescription {
+        id: 'GenesisDuelists5x',
         name: 'Duelists 5-pack',
-        image_url_closed: '/tokens/Duelists5x.jpg',
-        image_url_open: '/tokens/Duelists5x.jpg',
+        image_url_closed: '/tokens/GenesisDuelists5x.jpg',
+        image_url_open: '/tokens/GenesisDuelists5x.jpg',
         can_purchase: true,
         price_lords: 50 * CONST::ETH_TO_WEI.low,
         quantity: 5,
@@ -82,6 +82,7 @@ use pistols::interfaces::dns::{
     DnsTrait,
     IDuelistTokenProtectedDispatcherTrait,
 };
+use pistols::types::duelist_profile::{DuelistProfile, GenesisProfile};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::libs::store::{Store, StoreTrait};
 
@@ -92,9 +93,14 @@ pub impl PackImpl of PackTrait {
         let token_ids: Span<u128> = match self.pack_type {
             PackType::Unknown => { [].span() },
             PackType::StarterPack |
-            PackType::Duelists5x => {
+            PackType::GenesisDuelists5x => {
                 (store.world.duelist_token_protected_dispatcher()
-                    .mint_duelists(recipient, self.pack_type.description().quantity, self.seed)
+                    .mint_duelists(
+                        recipient,
+                        DuelistProfile::Genesis(GenesisProfile::Unknown),
+                        self.pack_type.description().quantity,
+                        self.seed,
+                    )
                 )
             },
         };
@@ -108,9 +114,9 @@ pub impl PackImpl of PackTrait {
 pub impl PackTypeImpl of PackTypeTrait {
     fn description(self: @PackType) -> PackDescription {
         match self {
-            PackType::Unknown       => PACK_TYPES::Unknown,
-            PackType::StarterPack   => PACK_TYPES::StarterPack,
-            PackType::Duelists5x    => PACK_TYPES::Duelists5x,
+            PackType::Unknown               => PACK_TYPES::Unknown,
+            PackType::StarterPack           => PACK_TYPES::StarterPack,
+            PackType::GenesisDuelists5x     => PACK_TYPES::GenesisDuelists5x,
         }
     }
     fn identifier(self: @PackType) -> felt252 {

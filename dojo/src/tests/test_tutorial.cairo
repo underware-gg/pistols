@@ -5,7 +5,7 @@ mod tests {
         duelist::{DuelistValue},
     };
     use pistols::types::{
-        profile_type::{ProfileType, ProfileTypeTrait, ProfileManagerTrait, CharacterProfile},
+        duelist_profile::{DuelistProfile, DuelistProfileTrait, ProfileManagerTrait, CharacterProfile},
         challenge_state::{ChallengeState},
         duel_progress::{DuelProgress},
         round_state::{RoundState},
@@ -41,26 +41,26 @@ mod tests {
     fn test_tutorial_profiles() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
         // Characters created
-        let profiles: Span<ProfileType> = ProfileManagerTrait::get_all_profiles_by_type(ProfileType::Character(0_u8.into()));
+        let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Character(0_u8.into()));
         let mut i: usize = 0;
         while (i < profiles.len()) {
-            let profile: ProfileType = *profiles.at(i);
-            let duelist: DuelistValue = sys.store.get_duelist_value(profile.duelist_id());
-            assert!(duelist.profile_type == profile, "Character profile not created: {}", profile.description().name);
+            let profile: DuelistProfile = *profiles.at(i);
+            let duelist: DuelistValue = sys.store.get_duelist_value(profile.make_duelist_id());
+            assert!(duelist.duelist_profile == profile, "Character profile not created: {}", profile.description().name);
             i += 1;
         };
         // Bots created
-        let profiles: Span<ProfileType> = ProfileManagerTrait::get_all_profiles_by_type(ProfileType::Bot(0_u8.into()));
+        let profiles: Span<DuelistProfile> = ProfileManagerTrait::_get_all_profiles_by_type(DuelistProfile::Bot(0_u8.into()));
         let mut i: usize = 0;
         while (i < profiles.len()) {
-            let profile: ProfileType = *profiles.at(i);
-            let duelist: DuelistValue = sys.store.get_duelist_value(profile.duelist_id());
-            assert!(duelist.profile_type == profile, "Bot profile not created: {}", profile.description().name);
+            let profile: DuelistProfile = *profiles.at(i);
+            let duelist: DuelistValue = sys.store.get_duelist_value(profile.make_duelist_id());
+            assert!(duelist.duelist_profile == profile, "Bot profile not created: {}", profile.description().name);
             i += 1;
         };
     }
 
-    fn _test_tutorial_create(tutorial_id: u128, profile: ProfileType) {
+    fn _test_tutorial_create(tutorial_id: u128, duelist_profile: DuelistProfile) {
         let mut sys: TestSystems = tester::setup_world(FLAGS::TUTORIAL);
         tester::impersonate(OWNER());
         // duel_id
@@ -80,19 +80,19 @@ mod tests {
         assert_eq!(challenge.premise, Premise::Lesson, "challenge.premise");
         assert_eq!(challenge.address_a, OWNER(), "challenge.address_a");
         assert_eq!(challenge.address_b, OWNER(), "challenge.address_b");
-        assert_eq!(challenge.duelist_id_a, profile.duelist_id(), "challenge.duelist_id_a");
-        assert_eq!(challenge.duelist_id_b, ProfileType::Character(CharacterProfile::Player).duelist_id(), "challenge.duelist_id_b");
+        assert_eq!(challenge.duelist_id_a, duelist_profile.make_duelist_id(), "challenge.duelist_id_a");
+        assert_eq!(challenge.duelist_id_b, DuelistProfile::Character(CharacterProfile::Player).make_duelist_id(), "challenge.duelist_id_b");
         assert_eq!(round.state, RoundState::Commit, "round.state");
     }
 
     #[test]
     fn test_tutorial_create_level_1() {
-        _test_tutorial_create(1, ProfileType::Character(CharacterProfile::Drunkard));
+        _test_tutorial_create(1, DuelistProfile::Character(CharacterProfile::Drunkard));
     }
 
     #[test]
     fn test_tutorial_create_level_2() {
-        _test_tutorial_create(2, ProfileType::Character(CharacterProfile::Bartender));
+        _test_tutorial_create(2, DuelistProfile::Character(CharacterProfile::Bartender));
     }
 
     #[test]

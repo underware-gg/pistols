@@ -425,7 +425,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
 
         let bank_address: ContractAddress = sys.bank.contract_address;
         let price_starter: u128 = PackType::StarterPack.description().price_lords;
-        let price_pack: u128 = PackType::Duelists5x.description().price_lords;
+        let price_pack: u128 = PackType::GenesisDuelists5x.description().price_lords;
         assert_ne!(price_starter, 0, "price_starter");
         assert_ne!(price_pack, 0, "price_pack");
 
@@ -450,7 +450,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
         pool_peg = tester::assert_balance(sys.store.get_pool(PoolType::FamePeg).balance_lords, pool_peg, 0, price_starter, "pool_peg CLAIM");
 
         // purchase to PoolType::Purchases
-        let pack: Pack = sys.pack.purchase(PackType::Duelists5x);
+        let pack: Pack = sys.pack.purchase(PackType::GenesisDuelists5x);
         balance_bank = tester::assert_lords_balance(sys.lords, bank_address, balance_bank, 0, price_pack, "balance_bank PURCHASE");
         pool_bank = tester::assert_balance(sys.store.get_pool(PoolType::Purchases).balance_lords, pool_bank, 0, price_pack, "pool_bank PURCHASE");
         pool_peg = tester::assert_balance(sys.store.get_pool(PoolType::FamePeg).balance_lords, pool_peg, 0, 0, "pool_peg PURCHASE");
