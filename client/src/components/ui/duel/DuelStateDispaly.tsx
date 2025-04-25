@@ -15,6 +15,7 @@ import { usePlayer } from '/src/stores/playerStore'
 import { Balance } from '../../account/Balance'
 import AnimatedText from '../AnimatedText'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
+import { makeDuelTweetUrl } from '/src/utils/pistols'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -29,7 +30,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
   const { dispatchSetTutorialLevel } = usePistolsContext()
 
   const { challengeDescription } = useChallengeDescription(duelId)
-  const { isFinished, isTutorial, tutorialLevel, duelistIdA, duelistIdB, winnerDuelistId, duelistAddressA, duelistAddressB, isCanceled, isExpired } = useGetChallenge(duelId)
+  const { isFinished, isTutorial, tutorialLevel, duelistIdA, duelistIdB, winnerDuelistId, duelistAddressA, duelistAddressB, isCanceled, isExpired, quote, premise, livesStaked } = useGetChallenge(duelId)
 
   const { name: playerNameA } = usePlayer(duelistAddressA)
   const { name: playerNameB } = usePlayer(duelistAddressB)
@@ -82,24 +83,28 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
 
   // Reset animation states when duel state changes
   useEffect(() => {
-    if (animated !== AnimationState.Finished) {
+    const callFinished = () => {
+      if (animationSequenceStarted.current) return;
+      animationSequenceStarted.current = true;
+
+      setTimeout(() => {
+        setShowDisplay(true);
+        setTimeout(() => {
+          setAnimatedText(statusText);
+        }, 500);
+      }, 300);
+    }
+    
+    if (isCanceled || isExpired) {
+      callFinished()
+    } else if (animated !== AnimationState.Finished) {
       setAnimatedText("")
       setShowOutcome(false)
       setShowRewards(false)
       setShowDisplay(false)
       animationSequenceStarted.current = false;
-    } else if (!isTutorial && (isFinished || isCanceled || isExpired) && animated === AnimationState.Finished && !animationSequenceStarted.current) {
-      animationSequenceStarted.current = true;
-      
-      // Step 1: Show the container with a fade-in
-      setTimeout(() => {
-        setShowDisplay(true);
-        
-        // Step 2: Start text animation after container appears
-        setTimeout(() => {
-          setAnimatedText(statusText);
-        }, 500);
-      }, 300);
+    } else if (!isTutorial && (isFinished || isCanceled || isExpired)) {
+      callFinished()
     }
   }, [animated, isTutorial, isFinished, isCanceled, isExpired, statusText]);
 
@@ -387,12 +392,26 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                 <div className='fadeIn' style={{ animationDelay: '2s', width: '100%', height: '100%' }}>
                   <Grid className='YesMouse' textAlign='center' style={{ width: '100%' }}>
                     <Row columns='equal'>
-                      <Col width={7}>
+                      <Col width={5}>
                         <ActionButton large fillParent label='Leave Duel' className='FillParent' onClick={() => dispatchSceneBack()} />
                       </Col>
-                      <Col width={2}>
+                      <Col width={6}>
+                        <ActionButton large fillParent label='Share' className='FillParent' onClick={() => {
+                          const tweetUrl = makeDuelTweetUrl(
+                            duelId, 
+                            quote, 
+                            premise, 
+                            livesStaked, 
+                            isYouA, 
+                            isYouB, 
+                            leftPlayerName, 
+                            rightPlayerName,
+                            true
+                          );
+                          window.open(tweetUrl, '_blank');
+                        }} />
                       </Col>
-                      <Col width={7}>
+                      <Col width={5}>
                         {!isCanceled && !isExpired && (
                           <ChallengeButton challengedPlayerAddress={isYouA ? duelistAddressB : duelistAddressA} customLabel={isYouA || isYouB ? 'Rematch!' : null} fillParent />
                         )}

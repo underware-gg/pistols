@@ -6,7 +6,8 @@ enum CardColor {
   YELLOW = '#f1d242',
   BLUE = '#4d9ad6',
   BROWN  = '#27110b',
-  ORANGE = '#ffa500'
+  ORANGE = '#ffa500',
+  PURPLE = '#c64dc6'
 }
 
 interface CardData {

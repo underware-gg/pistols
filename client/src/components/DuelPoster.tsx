@@ -200,7 +200,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
     if (!props.isSmall) return
 
     if ((isYouA && turnA) || (isYouB && turnB) || isCallToAction) {
-      setCardColor(CardColor.ORANGE)
+      setCardColor(CardColor.PURPLE)
       baseRef.current?.toggleBlink(true)
     } else {
       setCardColor(CardColor.WHITE)

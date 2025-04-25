@@ -18,9 +18,19 @@ export const makeDuelUrl = (duelId: BigNumberish) => {
   return `https://${window.location.hostname}/duel/${duelId}`;
 }
 
-export const makeDuelTweetUrl = (duelId: BigNumberish, quote: string, premise: constants.Premise, livesStaked: number, isYouA: boolean, isYouB: boolean, leftPlayerName: string, rightPlayerName: string) => {
+export const makeDuelTweetUrl = (
+  duelId: BigNumberish, 
+  quote: string, 
+  premise: constants.Premise, 
+  livesStaked: number, 
+  isYouA: boolean, 
+  isYouB: boolean, 
+  leftPlayerName: string, 
+  rightPlayerName: string,
+  isFinished: boolean = false
+) => {
   const duelUrl = makeDuelUrl(duelId);
-                
+              
   // Limit quote length for Twitter
   const MAX_QUOTE_LENGTH = 40;
   const shortQuote = quote && quote.length > MAX_QUOTE_LENGTH 
@@ -40,45 +50,62 @@ export const makeDuelTweetUrl = (duelId: BigNumberish, quote: string, premise: c
   
   // Generate proper tweet based on context
   let tweetText;
-  
-  if (isYouA) {
-    // I challenged them
-    if (isPremiseOver && quote) {
-      // If premise is "OVER" and we have a quote
-      if (shortQuote.length < MAX_QUOTE_LENGTH - 10) { 
-        tweetText = encodeURIComponent(`⚔️ CHALLENGE ISSUED! ⚔️\n\nI've called out ${rightPlayerName} ${premiseText} this grave matter:\n\n"${shortQuote}"\n\n${highStakes}${randomEmoji()} Honor demands satisfaction at @Pistols_gg!\n${duelUrl}\n#PistolsAtDawn`);
-      } else {
-        tweetText = encodeURIComponent(`⚔️ CHALLENGE ISSUED! ⚔️\n\nI've summoned ${rightPlayerName} to face me in combat at @Pistols_gg!\n\n${randomEmoji()} The offense? Too serious for Twitter...\n\n${highStakes}${randomEmoji()} Come witness justice served!\n${duelUrl}\n#PistolsAtDawn`);
-      }
+
+  // For completed duels - suspenseful messaging without spoilers
+  if (isFinished) {
+    if (isYouA || isYouB) {
+      // You were a participant
+      const opponentName = isYouA ? rightPlayerName : leftPlayerName;
+      tweetText = encodeURIComponent(`⚔️ DUEL CONCLUDED! ⚔️\n\nMy honor was on the line against ${opponentName} ${premiseText}...\n\n${randomEmoji()} The outcome will shock you! See what happened at @Pistols_gg\n\n${duelUrl}\n#PistolsAtDawn`);
     } else {
-      // For other premises (TO, FOR, etc)
-      tweetText = encodeURIComponent(`⚔️ CHALLENGE ISSUED! ⚔️\n\nI've challenged ${rightPlayerName} ${premiseText} in PISTOLS AT DAWN!\n\n${quote ? `The reason: "${shortQuote}"\n\n` : ''}${highStakes}${randomEmoji()} Dawn breaks, pistols ready at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
-    }
-  } else if (isYouB) {
-    // They challenged me
-    if (isPremiseOver && quote) {
-      // If premise is "OVER" and we have a quote
-      if (shortQuote.length < MAX_QUOTE_LENGTH - 10) {
-        tweetText = encodeURIComponent(`⚔️ DUEL SUMMONING! ⚔️\n\n${rightPlayerName} has challenged me ${premiseText} these fighting words:\n\n"${shortQuote}"\n\n${highStakes}${randomEmoji()} Will I survive? Find out at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
+      // Spectator view
+      if (livesStaked > 1) {
+        tweetText = encodeURIComponent(`⚔️ BLOOD HAS BEEN SPILLED! ⚔️\n\n${leftPlayerName} vs ${rightPlayerName} ${premiseText} reached its shocking conclusion!\n\n${randomEmoji()} Fortune favored one duelist... but who?\n\n${randomEmoji()} See the fate that awaited at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
       } else {
-        tweetText = encodeURIComponent(`⚔️ DUEL SUMMONING! ⚔️\n\n${rightPlayerName} dares question my honor at @Pistols_gg!\n\n${randomEmoji()} The accusation? Come see for yourself...\n\n${highStakes}${randomEmoji()} My reputation hangs in the balance!\n${duelUrl}\n#PistolsAtDawn`);
+        tweetText = encodeURIComponent(`⚔️ DRAMATIC FINISH! ⚔️\n\n${leftPlayerName} vs ${rightPlayerName} ${premiseText} just ended!\n\n${randomEmoji()} You won't believe how this duel concluded...\n\n${randomEmoji()} Witness the final moments at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
       }
-    } else {
-      // For other premises (TO, FOR, etc)
-      tweetText = encodeURIComponent(`⚔️ DUEL SUMMONING! ⚔️\n\n${rightPlayerName} has challenged me ${premiseText} in PISTOLS AT DAWN!\n\n${quote ? `Their accusations: "${shortQuote}"\n\n` : ''}${highStakes}${randomEmoji()} Victory or death at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
     }
   } else {
-    // Spectator view
-    if (isPremiseOver && quote) {
-      // If premise is "OVER" and we have a quote
-      if (shortQuote.length < MAX_QUOTE_LENGTH - 10) {
-        tweetText = encodeURIComponent(`⚔️ DUEL ALERT! ⚔️\n\n${leftPlayerName} vs ${rightPlayerName} ${premiseText}:\n\n"${shortQuote}"\n\n${highStakes}${randomEmoji()} Blood will be spilled at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
+    // For ongoing or new duels - original messaging
+    if (isYouA) {
+      // I challenged them
+      if (isPremiseOver && quote) {
+        // If premise is "OVER" and we have a quote
+        if (shortQuote.length < MAX_QUOTE_LENGTH - 10) { 
+          tweetText = encodeURIComponent(`⚔️ CHALLENGE ISSUED! ⚔️\n\nI've called out ${rightPlayerName} ${premiseText} this grave matter:\n\n"${shortQuote}"\n\n${highStakes}${randomEmoji()} Honor demands satisfaction at @Pistols_gg!\n${duelUrl}\n#PistolsAtDawn`);
+        } else {
+          tweetText = encodeURIComponent(`⚔️ CHALLENGE ISSUED! ⚔️\n\nI've summoned ${rightPlayerName} to face me in combat at @Pistols_gg!\n\n${randomEmoji()} The offense? Too serious for Twitter...\n\n${highStakes}${randomEmoji()} Come witness justice served!\n${duelUrl}\n#PistolsAtDawn`);
+        }
       } else {
-        tweetText = encodeURIComponent(`⚔️ DUEL ALERT! ⚔️\n\n${leftPlayerName} vs ${rightPlayerName} at @Pistols_gg!\n\n${randomEmoji()} The scandal that started it all? Too juicy for Twitter!\n\n${highStakes}${randomEmoji()} Witness the bloodshed!\n${duelUrl}\n#PistolsAtDawn`);
+        // For other premises (TO, FOR, etc)
+        tweetText = encodeURIComponent(`⚔️ CHALLENGE ISSUED! ⚔️\n\nI've challenged ${rightPlayerName} ${premiseText} in PISTOLS AT DAWN!\n\n${quote ? `The reason: "${shortQuote}"\n\n` : ''}${highStakes}${randomEmoji()} Dawn breaks, pistols ready at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
+      }
+    } else if (isYouB) {
+      // They challenged me
+      if (isPremiseOver && quote) {
+        // If premise is "OVER" and we have a quote
+        if (shortQuote.length < MAX_QUOTE_LENGTH - 10) {
+          tweetText = encodeURIComponent(`⚔️ DUEL SUMMONING! ⚔️\n\n${rightPlayerName} has challenged me ${premiseText} these fighting words:\n\n"${shortQuote}"\n\n${highStakes}${randomEmoji()} Will I survive? Find out at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
+        } else {
+          tweetText = encodeURIComponent(`⚔️ DUEL SUMMONING! ⚔️\n\n${rightPlayerName} dares question my honor at @Pistols_gg!\n\n${randomEmoji()} The accusation? Come see for yourself...\n\n${highStakes}${randomEmoji()} My reputation hangs in the balance!\n${duelUrl}\n#PistolsAtDawn`);
+        }
+      } else {
+        // For other premises (TO, FOR, etc)
+        tweetText = encodeURIComponent(`⚔️ DUEL SUMMONING! ⚔️\n\n${rightPlayerName} has challenged me ${premiseText} in PISTOLS AT DAWN!\n\n${quote ? `Their accusations: "${shortQuote}"\n\n` : ''}${highStakes}${randomEmoji()} Victory or death at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
       }
     } else {
-      // For other premises (TO, FOR, etc)
-      tweetText = encodeURIComponent(`⚔️ DUEL ALERT! ⚔️\n\n${leftPlayerName} vs ${rightPlayerName} ${premiseText} in PISTOLS AT DAWN!\n\n${quote ? `Fighting over: "${shortQuote}"\n\n` : ''}${highStakes}${randomEmoji()} Only one will leave with honor at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
+      // Spectator view
+      if (isPremiseOver && quote) {
+        // If premise is "OVER" and we have a quote
+        if (shortQuote.length < MAX_QUOTE_LENGTH - 10) {
+          tweetText = encodeURIComponent(`⚔️ DUEL ALERT! ⚔️\n\n${leftPlayerName} vs ${rightPlayerName} ${premiseText}:\n\n"${shortQuote}"\n\n${highStakes}${randomEmoji()} Blood will be spilled at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
+        } else {
+          tweetText = encodeURIComponent(`⚔️ DUEL ALERT! ⚔️\n\n${leftPlayerName} vs ${rightPlayerName} at @Pistols_gg!\n\n${randomEmoji()} The scandal that started it all? Too juicy for Twitter!\n\n${highStakes}${randomEmoji()} Witness the bloodshed!\n${duelUrl}\n#PistolsAtDawn`);
+        }
+      } else {
+        // For other premises (TO, FOR, etc)
+        tweetText = encodeURIComponent(`⚔️ DUEL ALERT! ⚔️\n\n${leftPlayerName} vs ${rightPlayerName} ${premiseText} in PISTOLS AT DAWN!\n\n${quote ? `Fighting over: "${shortQuote}"\n\n` : ''}${highStakes}${randomEmoji()} Only one will leave with honor at @Pistols_gg\n${duelUrl}\n#PistolsAtDawn`);
+      }
     }
   }
   
