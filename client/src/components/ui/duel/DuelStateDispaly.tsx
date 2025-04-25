@@ -16,6 +16,11 @@ import { Balance } from '../../account/Balance'
 import AnimatedText from '../AnimatedText'
 import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { makeDuelTweetUrl } from '/src/utils/pistols'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { useCanCollectDuel } from '/src/hooks/usePistolsContractCalls'
+import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
+import { BigNumberish } from 'starknet'
+import { useAccount } from '@starknet-react/core'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -29,8 +34,12 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
   const { dispatchSetScene, dispatchSceneBack } = usePistolsScene()
   const { dispatchSetTutorialLevel } = usePistolsContext()
 
+  const { account } = useAccount()
+  
   const { challengeDescription } = useChallengeDescription(duelId)
-  const { isFinished, isTutorial, tutorialLevel, duelistIdA, duelistIdB, winnerDuelistId, duelistAddressA, duelistAddressB, isCanceled, isExpired, quote, premise, livesStaked } = useGetChallenge(duelId)
+  const { isFinished, isTutorial, tutorialLevel, duelistIdA, duelistIdB, winnerDuelistId, duelistAddressA, duelistAddressB, isCanceled, isExpired, quote, premise, livesStaked, needToSyncExpired, state } = useGetChallenge(duelId)
+  const { canCollectDuel } = useCanCollectDuel(duelId)
+  const { duel_token, game } = useDojoSystemCalls()
 
   const { name: playerNameA } = usePlayer(duelistAddressA)
   const { name: playerNameB } = usePlayer(duelistAddressB)
@@ -80,6 +89,14 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
       dispatchSetTutorialLevel(DuelTutorialLevel.NONE)
     }
   }, [tutorialLevel, dispatchSetTutorialLevel, dispatchSetScene, dispatchSetting])
+
+  const _collectDuel = () => {
+    game.collect_duel(account, duelId)
+  }
+
+  const _submit = async (duelistId?: BigNumberish, accepted?: boolean) => {
+    await duel_token.reply_duel(account, duelistId, duelId, accepted)
+  }
 
   // Reset animation states when duel state changes
   useEffect(() => {
@@ -392,30 +409,40 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                 <div className='fadeIn' style={{ animationDelay: '2s', width: '100%', height: '100%' }}>
                   <Grid className='YesMouse' textAlign='center' style={{ width: '100%' }}>
                     <Row columns='equal'>
-                      <Col width={5}>
+                      <Col>
                         <ActionButton large fillParent label='Leave Duel' className='FillParent' onClick={() => dispatchSceneBack()} />
                       </Col>
-                      <Col width={6}>
-                        <ActionButton large fillParent label='Share' className='FillParent' onClick={() => {
-                          const tweetUrl = makeDuelTweetUrl(
-                            duelId, 
-                            quote, 
-                            premise, 
-                            livesStaked, 
-                            isYouA, 
-                            isYouB, 
-                            leftPlayerName, 
-                            rightPlayerName,
-                            true
-                          );
-                          window.open(tweetUrl, '_blank');
-                        }} />
-                      </Col>
-                      <Col width={5}>
-                        {!isCanceled && !isExpired && (
+                      {!isCanceled && !isExpired && (
+                        <Col>
+                          <ActionButton large fillParent label='Share' className='FillParent' onClick={() => {
+                            const tweetUrl = makeDuelTweetUrl(
+                              duelId, 
+                              quote, 
+                              premise, 
+                              livesStaked, 
+                              isYouA, 
+                              isYouB, 
+                              leftPlayerName, 
+                              rightPlayerName,
+                              true
+                            );
+                            window.open(tweetUrl, '_blank');
+                          }} />
+                        </Col>
+                      )}
+                      {(state === constants.ChallengeState.InProgress && canCollectDuel) ? (
+                        <Col>
+                          <ActionButton large fillParent important label='Timed Out, Collect Duel' onClick={() => _collectDuel()} />
+                        </Col>
+                      ) : (needToSyncExpired && (isYouA || isYouB)) ? (
+                        <Col>
+                          <ActionButton large fillParent important label='Expired, Collect Duel' onClick={() => _submit(0n, false)} />
+                        </Col>
+                      ) : (
+                        <Col>
                           <ChallengeButton challengedPlayerAddress={isYouA ? duelistAddressB : duelistAddressA} customLabel={isYouA || isYouB ? 'Rematch!' : null} fillParent />
-                        )}
-                      </Col>
+                        </Col>
+                      )}
                     </Row>
                   </Grid>
                 </div>

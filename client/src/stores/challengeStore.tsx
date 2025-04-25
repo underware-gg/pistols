@@ -67,11 +67,12 @@ export const useChallenge = (duelId: BigNumberish) => {
   const { clientSeconds } = useClientTimestamp(false)
   let _state = useMemo(() => parseEnumVariant<constants.ChallengeState>(challenge?.state), [challenge])
   let state = useMemo(() => {
+    console.log('state', _state, timestampEnd, clientSeconds)
     if (_state == constants.ChallengeState.Awaiting && (timestampEnd < clientSeconds)) {
       return constants.ChallengeState.Expired
     }
     return _state
-  }, [_state])
+  }, [_state, clientSeconds, timestampEnd])
 
   return {
     challengeExists: (challenge != null),
