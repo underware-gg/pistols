@@ -101,7 +101,7 @@ dependencies = [
 [[package]]
 name = "tournaments"
 version = "0.0.1"
-source = "git+https://github.com/underware-gg/tournaments?branch=pistols#761e6f0805a1de5d55f6a21b9ae295fd6a29e06a"
+source = "git+https://github.com/underware-gg/tournaments?branch=pistols#7c62855f042370d6de33bff89d214c8ca198354d"
 dependencies = [
  "dojo",
  "openzeppelin_introspection",
