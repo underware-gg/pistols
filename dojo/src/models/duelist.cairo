@@ -42,7 +42,7 @@ pub struct DuelistAssignment {
     pub pass_id: u64,       // current Tournament a Duelist is in
 }
 
-// cfrated for dead duelists
+// created for dead duelists
 #[derive(Copy, Drop, Serde)]
 #[dojo::model]
 pub struct DuelistMemorial {

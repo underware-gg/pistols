@@ -101,6 +101,10 @@ pub impl StoreImpl of StoreTrait {
     fn get_player_duelist_stack(self: @Store, address: ContractAddress, profile: DuelistProfile) -> PlayerDuelistStack {
         (self.world.read_model((address, profile),))
     }
+    #[inline(always)]
+    fn get_player_duelist_stack_from_id(self: @Store, address: ContractAddress, duelist_id: u128) -> PlayerDuelistStack {
+        (self.get_player_duelist_stack(address, self.get_duelist_profile(duelist_id)))
+    }
     // #[inline(always)]
     // fn get_player_duelist_stack_value(self: @Store, address: ContractAddress) -> PlayerDuelistStackValue {
     //     (self.world.read_value(address))
@@ -469,6 +473,11 @@ pub impl StoreImpl of StoreTrait {
     #[inline(always)]
     fn get_duel_tournament_keys(self: @Store, duel_id: u128) -> TournamentDuelKeys {
         (self.world.read_member(Model::<ChallengeToTournament>::ptr_from_keys(duel_id), selector!("keys")))
+    }
+
+    #[inline(always)]
+    fn get_duelist_profile(self: @Store, duelist_id: u128) -> DuelistProfile {
+        (self.world.read_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("duelist_profile")))
     }
 
     // setters

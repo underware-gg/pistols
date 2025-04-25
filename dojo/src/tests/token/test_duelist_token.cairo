@@ -276,6 +276,13 @@ fn test_duelist_stack() {
     assert_eq!(duelist_2_2.duelist_profile, profile_1);
     assert_eq!(duelist_3_1.duelist_profile, profile_3);
     assert_eq!(duelist_3_2.duelist_profile, profile_3);
+    // validate member getter
+    assert_eq!(duelist_1_1.duelist_profile, sys.store.get_duelist_profile(duelist_1_1.duelist_id));
+    assert_eq!(duelist_1_2.duelist_profile, sys.store.get_duelist_profile(duelist_1_2.duelist_id));
+    assert_eq!(duelist_2_1.duelist_profile, sys.store.get_duelist_profile(duelist_2_1.duelist_id));
+    assert_eq!(duelist_2_2.duelist_profile, sys.store.get_duelist_profile(duelist_2_2.duelist_id));
+    assert_eq!(duelist_3_1.duelist_profile, sys.store.get_duelist_profile(duelist_3_1.duelist_id));
+    assert_eq!(duelist_3_2.duelist_profile, sys.store.get_duelist_profile(duelist_3_2.duelist_id));
     // baseline stacks
     let id_1_1: u128 = duelist_1_1.duelist_id;
     let id_1_2: u128 = duelist_1_2.duelist_id;

@@ -7,6 +7,7 @@ pub mod tests {
         duelist::{DuelistStatus},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         season::{SeasonScoreboard},
+        player::{PlayerDuelistStack},
     };
     use pistols::types::{
         cards::hand::{PacesCard, FinalBlow, DeckType},
@@ -497,10 +498,22 @@ pub mod tests {
         let (mocked, moves_a, moves_b) = if (winner == 1) {prefabs::get_moves_crit_a()} else {prefabs::get_moves_crit_b()};
         (*sys).rng.mock_values(mocked);
 
+        let to_death: bool = (challenge_count * lives_staked == MAX_LIVES);
+        let mut duelist_id_a: u128 = 0;
+        let mut duelist_id_b: u128 = 0;
         if ((*sys).duelists.total_supply() == 0) {
             tester::fund_duelists_pool(sys, 2);
-            let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(sys.pack, OWNER())[0];
-            let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(sys.pack, OTHER())[0];
+            duelist_id_a = *tester::execute_claim_starter_pack(sys.pack, OWNER())[0];
+            duelist_id_b = *tester::execute_claim_starter_pack(sys.pack, OTHER())[0];
+            if (to_death) {
+                // println!("testing stack_1...");
+                let stack_a_1: PlayerDuelistStack = sys.store.get_player_duelist_stack_from_id(OWNER(), duelist_id_a);
+                let stack_b_1: PlayerDuelistStack = sys.store.get_player_duelist_stack_from_id(OTHER(), duelist_id_b);
+                assert_eq!(stack_a_1.current_duelist_id, duelist_id_a, "stack_a_1.current");
+                assert_eq!(stack_b_1.current_duelist_id, duelist_id_b, "stack_b_1.current");
+                assert_eq!(stack_a_1.stacked_ids.len(), 1, "stack_a_1.len()");
+                assert_eq!(stack_b_1.stacked_ids.len(), 1, "stack_b_1.len()");
+            }
         }
         let duelist_id_a: u128 = ID(OWNER());
         let duelist_id_b: u128 = ID(OTHER());
@@ -525,6 +538,19 @@ pub mod tests {
         assert!((*sys).duelists.is_alive(loser_id) == (loser_lives > 0), "duelists.is_alive(loser_id)_END");
         assert_eq!((*sys).duelists.life_count(winner_id), MAX_LIVES, "duelists.life_count(winner_id)_END");
         assert_eq!((*sys).duelists.life_count(loser_id), loser_lives, "duelists.life_count(loser_id)_END");
+
+        if (to_death && winner != 1) {
+            // println!("testing stack_a_2...");
+            let stack_a_2: PlayerDuelistStack = sys.store.get_player_duelist_stack_from_id(OWNER(), duelist_id_a);
+            assert_eq!(stack_a_2.current_duelist_id, 0, "stack_a_2.current");
+            assert_eq!(stack_a_2.stacked_ids.len(), 0, "stack_a_2.len()");
+        }
+        if (to_death && winner != 2) {
+            // println!("testing stack_b_2...");
+            let stack_b_2: PlayerDuelistStack = sys.store.get_player_duelist_stack_from_id(OTHER(), duelist_id_b);
+            assert_eq!(stack_b_2.current_duelist_id, 0, "stack_b_2.current");
+            assert_eq!(stack_b_2.stacked_ids.len(), 0, "stack_b_2.len()");
+        }
     }
 
     #[test]

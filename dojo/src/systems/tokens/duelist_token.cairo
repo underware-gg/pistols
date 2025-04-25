@@ -598,8 +598,12 @@ pub mod duelist_token {
                 season_id: store.get_current_season_id(),
             };
             store.set_duelist_memorial(@memorial);
+            // remove from stack
+            let mut stack: PlayerDuelistStack = store.get_player_duelist_stack_from_id(memorial.player_address, duelist_id);
+            stack.remove(duelist_id);
+            store.set_player_duelist_stack(@stack);
             // events
-            Activity::DuelistDied.emit(ref store.world, starknet::get_caller_address(), duelist_id.into());
+            Activity::DuelistDied.emit(ref store.world, memorial.player_address, duelist_id.into());
         }
     }
 
@@ -615,14 +619,14 @@ pub mod duelist_token {
             if (from.is_non_zero()) {
                 // remove from previous owner stack
                 let mut store: Store = StoreTrait::new(self.world_default());
-                let duelist: DuelistValue = store.get_duelist_value(token_id.low);
-                let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(from, duelist.duelist_profile);
+                let duelist_profile: DuelistProfile = store.get_duelist_profile(token_id.low);
+                let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(from, duelist_profile);
                 stack.remove(token_id.low);
                 store.set_player_duelist_stack(@stack);
                 // append to new owner stack
                 // ps: from is zero when minting, will append in mint_duelists()
                 if (to.is_non_zero()) {
-                    let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(to, duelist.duelist_profile);
+                    let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(to, duelist_profile);
                     stack.append(token_id.low);
                     store.set_player_duelist_stack(@stack);
                 }
