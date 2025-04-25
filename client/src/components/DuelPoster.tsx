@@ -15,7 +15,7 @@ import { useIsMyAccount } from '/src/hooks/useIsYou'
 import { Grid } from 'semantic-ui-react'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useCurrentSeason } from '/src/stores/seasonStore'
-import { makeDuelDataUrl } from '/src/utils/pistols'
+import { makeDuelDataUrl, makeDuelTweetUrl } from '/src/utils/pistols'
 import { BookmarkIcon, IconClick } from '/src/components/ui/Icons'
 import { ChallengeTime } from '/src/components/ChallengeTime'
 import { ActionButton, BalanceRequiredButton } from '/src/components/ui/Buttons'
@@ -260,6 +260,10 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
             <div className='TableDescriptionTitle Important'>
               {seasonDescription.toUpperCase()}
               <IconClick name='database' className='AbsoluteRight' style={{ marginTop: aspectWidth(1.4), marginRight: aspectWidth(1.4) }} size={'small'} onClick={() => window?.open(makeDuelDataUrl(props.duelId), '_blank')} />
+              <IconClick name='share' className='AbsoluteRight' style={{ marginTop: aspectWidth(1.4), marginRight: aspectWidth(4.4) }} size={'small'} onClick={() => {
+                const twitterUrl = makeDuelTweetUrl(props.duelId, quote, premise, livesStaked, isYouA, isYouB, leftPlayerName, rightPlayerName)
+                window?.open(twitterUrl, '_blank');
+              }} />
             </div>
             <div className='BookmarkSection DuelPoster'>
               <BookmarkIcon isBookmarked={isBookmarked} size='big' fitted onClick={publish} />
