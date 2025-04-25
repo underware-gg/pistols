@@ -163,6 +163,7 @@ pub mod duelist_token {
             DuelistStatusTrait,
             Archetype,
         },
+        player::{PlayerDuelistStack, PlayerDuelistStackTrait},
         challenge::{Challenge},
         events::{Activity, ActivityTrait},
     };
@@ -338,6 +339,11 @@ pub mod duelist_token {
                     status: Default::default(),
                 };
                 store.set_duelist(@duelist);
+
+                // add to player's stack
+                let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(recipient, duelist.duelist_profile);
+                stack.append(duelist.duelist_id);
+                store.set_player_duelist_stack(@stack);
 
                 // mint fame
                 store.world.fame_coin_protected_dispatcher().minted_duelist(duelist.duelist_id);
@@ -602,6 +608,27 @@ pub mod duelist_token {
     // ERC721ComboHooksTrait
     //
     pub impl ERC721ComboHooksImpl of ERC721ComboComponent::ERC721ComboHooksTrait<ContractState> {
+        fn before_update(ref self: ERC721ComboComponent::ComponentState<ContractState>, to: ContractAddress, token_id: u256, auth: ContractAddress) {
+            let mut self = self.get_contract_mut();
+            let mut erc721 = ERC721Component::HasComponent::get_component_mut(ref self);
+            let from: ContractAddress = erc721._owner_of(token_id);
+            if (from.is_non_zero()) {
+                // remove from previous owner stack
+                let mut store: Store = StoreTrait::new(self.world_default());
+                let duelist: DuelistValue = store.get_duelist_value(token_id.low);
+                let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(from, duelist.duelist_profile);
+                stack.remove(token_id.low);
+                store.set_player_duelist_stack(@stack);
+                // append to new owner stack
+                // ps: from is zero when minting, will append in mint_duelists()
+                if (to.is_non_zero()) {
+                    let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(to, duelist.duelist_profile);
+                    stack.append(token_id.low);
+                    store.set_player_duelist_stack(@stack);
+                }
+            }
+        }
+
         fn render_contract_uri(self: @ERC721ComboComponent::ComponentState<ContractState>) -> Option<ContractMetadata> {
             let self = self.get_contract(); // get the component's contract state
             let base_uri: ByteArray = self.erc721._base_uri();

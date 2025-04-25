@@ -16,12 +16,24 @@ pub impl SpanUtilsImpl<T, +Clone<T>, +Drop<T>> of SpanUtilsTrait<T> {
     fn contains<+PartialEq<T>>(mut self: Span<T>, value: @T) -> bool {
         loop {
             match self.pop_front() {
-                Option::Some(v) => { if v == value {
-                    break true;
-                } },
+                Option::Some(v) => { if v == value { break true; } },
                 Option::None => { break false; },
             };
         }
+    }
+    fn remove<+PartialEq<T>>(mut self: Span<T>, value: @T) -> Array<T> {
+        let mut ret: Array<T> = array![];
+        loop {
+            match self.pop_front() {
+                Option::Some(v) => {
+                    if (v != value) {
+                        ret.append(v.clone());
+                    }
+                },
+                Option::None => { break; },
+            };
+        };
+        (ret)
     }
     fn concat(self: Span<T>, other: Span<T>) -> Array<T> {
         let mut ret = array![];
@@ -40,6 +52,9 @@ pub impl ArrayUtilsImpl<T, +Clone<T>, +Drop<T>> of ArrayUtilsTrait<T> {
     // from alexandria
     fn contains<+PartialEq<T>>(self: @Array<T>, value: @T) -> bool {
         (self.span().contains(value))
+    }
+    fn remove<+PartialEq<T>>(self: @Array<T>, value: @T) -> Array<T> {
+        (self.span().remove(value))
     }
     fn extend_from_span<+Destruct<T>>(ref self: Array<T>, mut other: Span<T>) {
         while let Option::Some(elem) = other.pop_front() {
@@ -89,6 +104,55 @@ mod unit {
             }
             i += 1;
         };
+    }
+
+    #[test]
+    fn test_array_remove() {
+        let mut array: Array<usize> = array![0, 2, 3, 4];
+        let mut span: Span<usize> = array.span();
+        // remove 2
+        array = array.remove(@2);
+        span = span.remove(@2).span();
+        assert_eq!(array.len(), 3, "[removed 2]");
+        assert_eq!(span.len(), 3, "[removed 2]");
+        assert_eq!(*array[0], 0, "[removed 2]");
+        assert_eq!(*array[1], 3, "[removed 2]");
+        assert_eq!(*array[2], 4, "[removed 2]");
+        assert_eq!(*span[0], 0, "[removed 2]");
+        assert_eq!(*span[1], 3, "[removed 2]");
+        assert_eq!(*span[2], 4, "[removed 2]");
+        // remove non-existent
+        array = array.remove(@2);
+        span = span.remove(@2).span();
+        assert_eq!(array.len(), 3, "[removed 2 again]");
+        assert_eq!(span.len(), 3, "[removed 2 again]");
+        assert_eq!(*array[0], 0, "[removed 2 again]");
+        assert_eq!(*array[1], 3, "[removed 2 again]");
+        assert_eq!(*array[2], 4, "[removed 2 again]");
+        assert_eq!(*span[0], 0, "[removed 2 again]");
+        assert_eq!(*span[1], 3, "[removed 2 again]");
+        assert_eq!(*span[2], 4, "[removed 2 again]");
+        // remove back
+        array = array.remove(@4);
+        span = span.remove(@4).span();
+        assert_eq!(array.len(), 2, "[removed back]");
+        assert_eq!(span.len(), 2, "[removed back]");
+        assert_eq!(*array[0], 0, "[removed back]");
+        assert_eq!(*array[1], 3, "[removed back]");
+        assert_eq!(*span[0], 0, "[removed back]");
+        assert_eq!(*span[1], 3, "[removed back]");
+        // remove front
+        array = array.remove(@0);
+        span = span.remove(@0).span();
+        assert_eq!(array.len(), 1, "[removed front]");
+        assert_eq!(span.len(), 1, "[removed front]");
+        assert_eq!(*array[0], 3, "[removed front]");
+        assert_eq!(*span[0], 3, "[removed front]");
+        // remove last
+        array = array.remove(@3);
+        span = span.remove(@3).span();
+        assert_eq!(array.len(), 0, "[removed last]");
+        assert_eq!(span.len(), 0, "[removed last]");
     }
 
     #[test]

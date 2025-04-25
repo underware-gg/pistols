@@ -253,6 +253,7 @@ pub mod tester {
             TestResource::Model(pistols::models::pact::m_Pact::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::pool::m_Pool::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::player::m_Player::TEST_CLASS_HASH),
+            TestResource::Model(pistols::models::player::m_PlayerDuelistStack::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::season::m_SeasonScoreboard::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::season::m_SeasonConfig::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::tournament::m_TournamentPass::TEST_CLASS_HASH),

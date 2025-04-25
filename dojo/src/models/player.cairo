@@ -1,4 +1,5 @@
 use starknet::{ContractAddress};
+pub use pistols::types::duelist_profile::{DuelistProfile};
 
 
 #[derive(Copy, Drop, Serde)]
@@ -17,6 +18,19 @@ pub struct PlayerTimestamps {
     pub claimed_starter_pack: bool,
 }
 
+
+#[derive(Clone, Drop, Serde)]
+#[dojo::model]
+pub struct PlayerDuelistStack {
+    #[key]
+    pub player_address: ContractAddress,    // controller wallet
+    #[key]
+    pub duelist_profile: DuelistProfile,
+    //-----------------------
+    pub current_duelist_id: u128,           // current Duelist id
+    pub level: u8,                          // current level (stack size)
+    pub stacked_ids: Array<u128>,           // stacked Duelist ids
+}
 
 
 //--------------------------
@@ -51,8 +65,10 @@ pub struct PlayerBookmark {
 //----------------------------------
 // Traits
 //
-use pistols::libs::store::{Store, StoreTrait};
+use core::num::traits::Zero;
 use pistols::models::events::{Activity, ActivityTrait};
+use pistols::libs::store::{Store, StoreTrait};
+use pistols::utils::arrays::{ArrayUtilsTrait};
 
 mod PlayerErrors {
     pub const PLAYER_NOT_REGISTERED: felt252    = 'PLAYER: Not registered';
@@ -76,5 +92,23 @@ pub impl PlayerImpl of PlayerTrait {
     #[inline(always)]
     fn exists(self: @Player) -> bool {
         (*self.timestamps.registered != 0)
+    }
+}
+
+#[generate_trait]
+pub impl PlayerDuelistStackImpl of PlayerDuelistStackTrait {
+    fn append(ref self: PlayerDuelistStack, duelist_id: u128) {
+        self.stacked_ids.append(duelist_id);
+        self.level = self.stacked_ids.len().try_into().unwrap();
+        if (self.current_duelist_id.is_zero()) {
+            self.current_duelist_id = duelist_id;
+        }
+    }
+    fn remove(ref self: PlayerDuelistStack, duelist_id: u128) {
+        self.stacked_ids = self.stacked_ids.remove(@duelist_id);
+        self.level = self.stacked_ids.len().try_into().unwrap();
+        if (self.current_duelist_id == duelist_id) {
+            self.current_duelist_id = if (self.level > 0) {*self.stacked_ids[0]} else {0};
+        }
     }
 }

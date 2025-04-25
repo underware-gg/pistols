@@ -607,16 +607,21 @@ impl DuelistProfileIntoByteArray of core::traits::Into<DuelistProfile, ByteArray
     }
 }
 // for println! format! (core::fmt::Display<>) assert! (core::fmt::Debug<>)
-pub impl DuelistProfileDebug of core::fmt::Debug<DuelistProfile> {
+pub impl DuelistProfileDisplay of core::fmt::Display<DuelistProfile> {
     fn fmt(self: @DuelistProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-        let result: ByteArray = (*self).into();
+        let result = match self {
+            DuelistProfile::Undefined =>        format!("Undefined"),
+            DuelistProfile::Character(p) =>     { let id: u8 = (*p).into(); format!("Character::{}({})", self.name(), id) },
+            DuelistProfile::Bot(p) =>           { let id: u8 = (*p).into(); format!("Bot::{}({})", self.name(), id) },
+            DuelistProfile::Genesis(p) =>       { let id: u8 = (*p).into(); format!("Genesis::{}({})", self.name(), id) },
+        };
         f.buffer.append(@result);
         Result::Ok(())
     }
 }
-pub impl GenesisProfileDebug of core::fmt::Debug<GenesisProfile> {
-    fn fmt(self: @GenesisProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
-        let result: ByteArray = DuelistProfile::Genesis(*self).name();
+pub impl DuelistProfileDebug of core::fmt::Debug<DuelistProfile> {
+    fn fmt(self: @DuelistProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result = format!("{}", self);
         f.buffer.append(@result);
         Result::Ok(())
     }
@@ -631,6 +636,13 @@ pub impl CharacterProfileDebug of core::fmt::Debug<CharacterProfile> {
 pub impl BotProfileDebug of core::fmt::Debug<BotProfile> {
     fn fmt(self: @BotProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = DuelistProfile::Bot(*self).name();
+        f.buffer.append(@result);
+        Result::Ok(())
+    }
+}
+pub impl GenesisProfileDebug of core::fmt::Debug<GenesisProfile> {
+    fn fmt(self: @GenesisProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let result: ByteArray = DuelistProfile::Genesis(*self).name();
         f.buffer.append(@result);
         Result::Ok(())
     }

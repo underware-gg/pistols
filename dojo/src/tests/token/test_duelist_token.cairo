@@ -1,5 +1,5 @@
 use core::num::traits::Zero;
-// use starknet::{ContractAddress};
+use starknet::{ContractAddress};
 // use dojo::world::{WorldStorage};
 
 use pistols::models::{
@@ -9,6 +9,7 @@ use pistols::models::{
         DuelistProfile, GenesisProfile,
         DuelistMemorialValue, CauseOfDeath,
     },
+    player::{PlayerDuelistStack},
     challenge::{Challenge, DuelType},
     config::{TokenConfig},
     season::{SeasonScoreboard},
@@ -53,7 +54,7 @@ fn setup(_fee_amount: u128) -> TestSystems {
 
     tester::set_current_season(ref sys, SEASON_ID_1);
 
-    tester::fund_duelists_pool(@sys, 2);
+    tester::fund_duelists_pool(@sys, 5);
 
     // initialize contracts
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
@@ -227,6 +228,90 @@ fn test_transfer_no_allowance() {
 //     _assert_minted_count(@sys, 1, 'invalid total_supply');
 //     assert(sys.duelists.balance_of(OWNER()) == 0, 'invalid balance_of (0)');
 // }
+
+
+
+
+//---------------------------------
+// Duelist stack
+//
+
+fn _assert_stack(sys: @TestSystems, account: ContractAddress, profile: DuelistProfile, ids: Span<u128>) {
+    let stack: PlayerDuelistStack = (*sys.store).get_player_duelist_stack(account, profile);
+// println!("acc {:x}: {} len {}", account, profile, stack.stacked_ids.len());
+    assert_eq!(stack.stacked_ids.len(), ids.len(), "acc {:x}: {}", account, profile);
+    assert_eq!(stack.level.into(), ids.len(), "level {:x}: {}", account, profile);
+    assert_eq!(stack.current_duelist_id,  if (ids.len() > 0) {*ids[0]} else {0}, "current_duelist_id {:x}: {}", account, profile);
+    let mut i: usize = 0;
+    while (i < ids.len()) {
+// println!("ids[{}] {:x} {} id:{}", i, account, profile, ids[i]);
+        assert_eq!(stack.stacked_ids[i], ids[i], "ids[{}] {:x} {} id:{}", i, account, profile, ids[i]);
+        i += 1;
+    };
+}
+
+#[test]
+fn test_duelist_stack() {
+    let mut sys: TestSystems = setup(0);
+
+    let acc1 = starknet::contract_address_const::<0x0201>();
+    let acc2 = starknet::contract_address_const::<0x0102>();
+    let acc3 = starknet::contract_address_const::<0x0303>();
+    let tokens1: Span<u128> = tester::execute_claim_starter_pack(@sys.pack, acc1);
+    let tokens2: Span<u128> = tester::execute_claim_starter_pack(@sys.pack, acc2);
+    let tokens3: Span<u128> = tester::execute_claim_starter_pack(@sys.pack, acc3);
+    let duelist_1_1: Duelist = sys.store.get_duelist(*tokens1[0]);
+    let duelist_1_2: Duelist = sys.store.get_duelist(*tokens1[1]);
+    let duelist_2_1: Duelist = sys.store.get_duelist(*tokens2[0]);
+    let duelist_2_2: Duelist = sys.store.get_duelist(*tokens2[1]);
+    let duelist_3_1: Duelist = sys.store.get_duelist(*tokens3[0]);
+    let duelist_3_2: Duelist = sys.store.get_duelist(*tokens3[1]);
+    // baseline profiles
+    let profile_1 = DuelistProfile::Genesis((1_u8+1).into());
+    let profile_2 = DuelistProfile::Genesis((2_u8+1).into());
+    let profile_3 = DuelistProfile::Genesis((3_u8+1).into());
+    assert_eq!(duelist_1_1.duelist_profile, profile_1);
+    assert_eq!(duelist_1_2.duelist_profile, profile_2);
+    assert_eq!(duelist_2_1.duelist_profile, profile_2);
+    assert_eq!(duelist_2_2.duelist_profile, profile_1);
+    assert_eq!(duelist_3_1.duelist_profile, profile_3);
+    assert_eq!(duelist_3_2.duelist_profile, profile_3);
+    // baseline stacks
+    let id_1_1: u128 = duelist_1_1.duelist_id;
+    let id_1_2: u128 = duelist_1_2.duelist_id;
+    let id_2_1: u128 = duelist_2_1.duelist_id;
+    let id_2_2: u128 = duelist_2_2.duelist_id;
+    let id_3_1: u128 = duelist_3_1.duelist_id;
+    let id_3_2: u128 = duelist_3_2.duelist_id;
+    _assert_stack(@sys, acc1, profile_1, [id_1_1].span());
+    _assert_stack(@sys, acc1, profile_2, [id_1_2].span());
+    _assert_stack(@sys, acc1, profile_3, [].span());
+    _assert_stack(@sys, acc2, profile_1, [id_2_2].span());
+    _assert_stack(@sys, acc2, profile_2, [id_2_1].span());
+    _assert_stack(@sys, acc2, profile_3, [].span());
+    _assert_stack(@sys, acc3, profile_1, [].span());
+    _assert_stack(@sys, acc3, profile_2, [].span());
+    _assert_stack(@sys, acc3, profile_3, [id_3_1, id_3_2].span());
+    // transfer...
+    tester::impersonate(acc2);
+    sys.duelists.transfer_from(acc2, acc1, id_2_1.into());
+    _assert_stack(@sys, acc1, profile_1, [id_1_1].span());
+    _assert_stack(@sys, acc1, profile_2, [id_1_2, id_2_1].span());
+    _assert_stack(@sys, acc2, profile_1, [id_2_2].span());
+    _assert_stack(@sys, acc2, profile_2, [].span());
+    tester::impersonate(acc3);
+    sys.duelists.transfer_from(acc3, acc1, id_3_1.into());
+    _assert_stack(@sys, acc1, profile_3, [id_3_1].span());
+    _assert_stack(@sys, acc3, profile_3, [id_3_2].span());
+    tester::impersonate(acc3);
+    sys.duelists.transfer_from(acc3, acc1, id_3_2.into());
+    _assert_stack(@sys, acc1, profile_3, [id_3_1, id_3_2].span());
+    _assert_stack(@sys, acc3, profile_3, [].span());
+    tester::impersonate(acc1);
+    sys.duelists.transfer_from(acc1, acc2, id_3_2.into());
+    _assert_stack(@sys, acc1, profile_3, [id_3_1].span());
+    _assert_stack(@sys, acc2, profile_3, [id_3_2].span());
+}
 
 
 //---------------------------------

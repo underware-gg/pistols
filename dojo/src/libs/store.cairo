@@ -17,6 +17,7 @@ pub use pistols::models::{
     },
     player::{
         Player, PlayerValue,
+        PlayerDuelistStack, PlayerDuelistStackValue,
     },
     pack::{
         Pack, PackValue,
@@ -66,6 +67,7 @@ pub use pistols::systems::components::{
 };
 use pistols::types::{
     rules::{RewardValues},
+    duelist_profile::{DuelistProfile},
 };
 use tournaments::components::models::game::{TokenMetadata, TokenMetadataValue};
 
@@ -92,6 +94,15 @@ pub impl StoreImpl of StoreTrait {
     }
     // #[inline(always)]
     // fn get_player_value(self: @Store, address: ContractAddress) -> PlayerValue {
+    //     (self.world.read_value(address))
+    // }
+
+    #[inline(always)]
+    fn get_player_duelist_stack(self: @Store, address: ContractAddress, profile: DuelistProfile) -> PlayerDuelistStack {
+        (self.world.read_model((address, profile),))
+    }
+    // #[inline(always)]
+    // fn get_player_duelist_stack_value(self: @Store, address: ContractAddress) -> PlayerDuelistStackValue {
     //     (self.world.read_value(address))
     // }
 
@@ -289,6 +300,11 @@ pub impl StoreImpl of StoreTrait {
 
     #[inline(always)]
     fn set_player(ref self: Store, model: @Player) {
+        self.world.write_model(model);
+    }
+
+    #[inline(always)]
+    fn set_player_duelist_stack(ref self: Store, model: @PlayerDuelistStack) {
         self.world.write_model(model);
     }
 
