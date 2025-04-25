@@ -1,0 +1,103 @@
+#--------------------------
+# dojo profile config
+# https://book.dojoengine.org/framework/config
+# https://github.com/dojoengine/dojo/blob/main/examples/simple/dojo_dev.toml
+#
+
+[world]
+name = "Pistols at Dawn"
+description = "An on-chain pistol duelling game of honour and betrayal."
+icon_uri = "https://assets.underware.gg/pistols/logo.png"
+cover_uri = "https://assets.underware.gg/pistols/splash.jpg"
+website = "https://pistols.gg"
+seed = "pistols_v1_0_0"
+
+[world.socials]
+x = "https://x.com/underware_gg"
+github = "https://github.com/underware-gg/pistols"
+# discord = "https://discord.gg/FB2wR6uF"
+# telegram = "https://t.me/dojoengine"
+
+[env]
+chain_id = "SN_MAIN"
+rpc_url = "https://api.cartridge.gg/x/starknet/mainnet" # or env: STARKNET_RPC_URL
+# account_address = ""  # env: DOJO_ACCOUNT_ADDRESS
+# private_key = ""      # env: DOJO_PRIVATE_KEY
+world_address = "0x2ed4c10d6a2862906255a8450de7cc87c610be85638c548ff50a63de240cbd"
+lords_address = "0x0124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49"
+world_block = 803585    # LORDS deployment block
+
+#--------------------------
+# namespaces
+#
+[namespace]
+default = "pistols"
+
+#--------------------------
+# namespaces
+#
+[owners]
+"pistols" = [
+  "pistols-game",
+  "pistols-admin",
+]
+
+#--------------------------
+# writers
+#
+[writers]
+"pistols" = [
+  "pistols-game",
+  "pistols-tutorial",
+  "pistols-admin",
+  "pistols-duel_token",
+  "pistols-duelist_token",
+  "pistols-pack_token",
+  "pistols-tournament_token",
+  "pistols-bank",
+]
+# ERC-20
+"pistols-CoinConfig" = [
+  "pistols-fame_coin",
+  "pistols-fools_coin",
+  # "pistols-lords_mock",
+]
+"pistols-TokenBoundAddress" = ["pistols-fame_coin"]
+# arcade trophies
+"pistols-TrophyCreation" = ["pistols-game"]
+"pistols-TrophyProgression" = ["pistols-game"]
+
+#--------------------------
+# init_calldata
+#
+[init_call_args]
+"pistols-admin" = [
+  "0x0", # treasury_address (or initializer)
+  "0x0124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49", # lords_address (sepolia)
+  "0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f", # vrf_address (sepolia)
+]
+"pistols-duel_token" = [
+  "sstr:https://assets.underware.gg", # base_uri
+  "0x0", # minter_address
+]
+"pistols-duelist_token" = [
+  "sstr:https://assets.underware.gg", # base_uri
+]
+"pistols-pack_token" = [
+  "sstr:https://assets.underware.gg", # base_uri
+]
+"pistols-tournament_token" = [
+  "sstr:https://assets.underware.gg", # base_uri
+]
+
+
+#--------------------------
+# migration
+#
+[migration]
+order_inits = []
+skip_contracts = [
+  "pistols-lords_mock",
+  "pistols-vrf_mock",
+  "pistols-budokan_mock",
+]
