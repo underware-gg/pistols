@@ -47,7 +47,7 @@ export interface InteractibleComponentHandle {
   setScale: (scale: number[] | number, duration?: number, easing?: any, interpolation?: any) => void
   setRotation: (rotation: number[] | number, duration?: number, easing?: any, interpolation?: any) => void
   setZIndex: (index: number, backgroundIndex?: number) => void
-  toggleVisibility: (isVisible: boolean) => void
+  toggleVisibility: (isVisible: boolean, instant?: boolean) => void
   toggleHighlight: (isHighlighted: boolean, shouldBeWhite?: boolean, color?: string) => void
   toggleDefeated: (isDefeated: boolean) => void //TODO remove and add to where needed only?
   playHanging: () => void
@@ -205,12 +205,12 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
 
   useEffect(() => {
     if (frontRef.current) {
-      frontRef.current.style.setProperty('--component-cursor', props.mouseDisabled || !props.isVisible ? 'default' : 'pointer')
+      frontRef.current.style.setProperty('--component-cursor', props.mouseDisabled || visibility.dataField1[0] == 0 ? 'default' : 'pointer')
     }
     if (backgroundRef.current) {
-      backgroundRef.current.style.setProperty('--component-cursor', props.mouseDisabled || !props.isVisible ? 'default' : 'pointer')
+      backgroundRef.current.style.setProperty('--component-cursor', props.mouseDisabled || visibility.dataField1[0] == 0 ? 'default' : 'pointer')
     }
-  }, [props.mouseDisabled, props.isVisible])
+  }, [props.mouseDisabled, visibility.dataField1[0]])
 
   useEffect(() => {
     if (frontRef.current) {
@@ -655,7 +655,7 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
         </div>
         <div 
           ref={frontRef}
-          className={`component-container ${props.mouseDisabled || !props.isVisible ? 'NoMouse' : 'YesMouse'} NoDrag`}
+          className={`component-container ${props.mouseDisabled || visibility.dataField1[0] == 0 ? 'NoMouse' : 'YesMouse'} NoDrag`}
           onMouseDown={handleMouseDown}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
