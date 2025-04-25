@@ -132,37 +132,24 @@ export function Header() {
             <CurtainUI visible={!atTavern && !atTutorial} short={true} />
             <BannerButton button={<MusicToggle size='big' />} visible={atTavern} />
           </div>
-          <Image className='NoMouse NoDrag NoSelection' src='/images/ui/tavern/wooden_corners.png' style={{ position: 'absolute' }} />
-          <div className='NoMouse NoDrag UIHeader NoSelection' style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div className='Padded' style={{ flex: '1' }}>
-              {!atTavern && 
-                <div className='YesMouse' style={{ padding: aspectWidth(1.4) }}>
-                  <BackButton />
-                </div>
-              }
-            </div>
-            <div className='TitleCase NoBreak Relative' style={{ flex: '1', textAlign: 'center', height: '1px' }}>
-              {/* {showTable && <>
-                <h1>Pistols at Dawn</h1>
-                <p className='AlignTop'>
-                  <IconClick name='ticket' size={'big'} onClick={() => _changeTable()} style={{ marginBottom: '0.4em' }} />
-                  {' '}<b className='Important H3 Anchor' onClick={() => _changeTable()}>{description}</b>
-                </p>
-              </>} */}
-              {/* //TODO add table name when needed */}
-            </div>
-            <div style={{ flex: '1', textAlign: 'right' }}>
-              {!atProfile &&
-                <AccountHeader />
-              }
-            </div>
+          <Image className='NoMouse NoDrag NoSelection ' src='/images/ui/tavern/wooden_corners.png' style={{ position: 'absolute' }} />
+          <div className='UIHeaderCorner' style={{ padding: `${aspectWidth(1)}px ${aspectWidth(2)}px` }}>
+            {!atTavern && 
+              <BackButton />
+            }
+          </div>
+
+          <div className='UIHeaderCorner right'>
+            {!atProfile &&
+              <AccountHeader />
+            }
           </div>
         </>
       }
 
       {/* door and gate UI */}
       <>
-        <BannerButton button={<BackButton />} visible={atDoor} short={true} />
+        <BannerButton button={<BackButton icon='left-arrow' size='big'/>} visible={atDoor} short={true} />
         <BannerButton button={<MusicToggle size='big'/>} right={true} visible={atGate || atDoor} short={true} />
       </>
     </div>
@@ -310,7 +297,7 @@ function CurtainUI({
         </div>}
         
         {atDuelists && <div style={{width: '90%' }}>
-          <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
+          <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
             <FilterPlayerName  />
             <div>
               <label style={{marginRight: '10px'}}>Filters:</label>
@@ -345,7 +332,7 @@ function CurtainUI({
         </div>}
 
         {atDuelsBoard && <div style={{width: '90%'}}>
-          <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
+          <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
             <FilterPlayerName  />
             <FilterButton label='Show All Live Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
             <FilterButton label='Bookmarked' state={filterShowBookmarkedDuels} onClick={() => setFilterShowBookmarkedDuels(!filterShowBookmarkedDuels)} />
@@ -385,7 +372,7 @@ function CurtainUI({
           </div>
         </div>}
         {atGraveyard && <div style={{width: '90%'}}>
-          <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
+          <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
             <FilterPlayerName  />
             <FilterButton label='Show All Past Duels' state={filterShowAllDuels} onClick={() => setFilterShowAllDuels(!filterShowAllDuels)} />
             <FilterButton label='Bookmarked' state={filterShowBookmarkedDuels} onClick={() => setFilterShowBookmarkedDuels(!filterShowBookmarkedDuels)} />
@@ -428,21 +415,52 @@ function CurtainUI({
     </div>
   )
 }
-
 export function FilterPlayerName() {
   const {
     filterPlayerName,
     setFilterPlayerName,
   } = useQueryParams()
+  const { aspectWidth } = useGameAspect()
+  
   return (
-    <div style={{display: 'flex', justifyContent: 'space-evenly'}}>
-      <Input id='FilterByName' placeholder='Filter by Name' size='mini'
+    <div style={{
+      position: 'relative',
+      minWidth: aspectWidth(12)
+    }}>
+      <Input 
+        id='FilterByName' 
+        placeholder='FILTER BY NAME' 
+        size='mini'
+        className='YesMouse'
         value={filterPlayerName.toUpperCase()}
         onChange={(e) => setFilterPlayerName(e.target.value)}
+        style={{
+          width: '100%',
+          height: aspectWidth(2.8),
+          padding: aspectWidth(0.5),
+          color: '#f1d242',
+          fontSize: aspectWidth(1),
+          fontWeight: 'bold',
+        }}
         action={{
-          icon: 'close', size: 'mini',
+          icon: filterPlayerName ? 'close' : 'search', 
+          size: 'mini',
           className: 'FilterButton',
-          onClick: () => setFilterPlayerName('')
+          onClick: () => setFilterPlayerName(''),
+          style: {
+            padding: aspectWidth(0.8),
+            cursor: 'pointer',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#f1d242',
+            backgroundColor: 'rgba(95, 16, 17, 0.8)',
+            borderRadius: `0 ${aspectWidth(0.4)}px ${aspectWidth(0.4)}px 0`,
+            border: 'none',
+            boxShadow: `inset 0 0 ${aspectWidth(0.2)}px rgba(241, 210, 66, 0.3)`,
+            fontSize: aspectWidth(1.1)
+          }
         }}
       />
     </div>

@@ -277,7 +277,13 @@ export function SettingsMenuItem({
   )
 }
 
-export function BackButton() {
+export function BackButton({
+  icon = 'back_arrow',
+  size = 'huge',
+}: {
+  icon?: string
+  size?: IconSizeProp
+}) {
   const { dispatchSetScene, atDoor, dispatchSceneBack } = usePistolsScene();
 
   const handleClick = () => {
@@ -289,7 +295,7 @@ export function BackButton() {
   }
 
   return (
-    <CustomIcon icon name='left-arrow' onClick={() => handleClick()} size='big' disabled={false} />
+    <CustomIcon icon png={icon == 'back_arrow'} raw={icon == 'back_arrow'} name={icon} onClick={() => handleClick()} size={size} disabled={false} />
   );
 }
 

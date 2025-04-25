@@ -267,6 +267,7 @@ interface CustomIconProps {
   png?: boolean,        // use pure png file
   svg?: boolean,        // use pure svg file
   alt?: string,
+  raw?: boolean,        // used for removing the top margin when loading svg or pngs
   // <Icon> fallback
   // optionals
   className?: string,
@@ -292,6 +293,7 @@ export function CustomIcon({
   color = '#c8b6a8', // $color-text
   tooltip = null,
   onClick = null,
+  raw = false,
 }: CustomIconProps) {
   const component = useMemo(() => {
     const _extension = png ? 'png' : 'svg'
@@ -308,9 +310,9 @@ export function CustomIcon({
         backgroundImage: `url(${_url})`,
       }
       return (
-        <i className={`${className} icon ${size} NoMargin Relative`}>
+        <i className={`${className} ${onClick ? 'IconClick' : ''} icon ${size} NoMargin Relative`} onClick={() => onClick?.() ?? {}}>
           {' '}
-          <div className={png ? 'CustomIconPng' : 'CustomIconSvg'} style={_style} />
+          <div className={raw ? 'CustomIconRaw' : png ? 'CustomIconPng' : 'CustomIconSvg'} style={_style} />
         </i>
       )
     }

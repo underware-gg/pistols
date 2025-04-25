@@ -661,6 +661,20 @@ $ui-container-gap: 1em;
   left: 0;
   width: 100%;
 }
+
+.UIHeaderCorner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: aspect-width(20);
+  height: aspect-width(6);
+
+  &.right {
+    left: unset;
+    right: 0;
+  }
+}
+
 .UIContainer {
   // background-color: red;
   background-image: linear-gradient(to right, #000a, transparent);
@@ -1310,9 +1324,12 @@ $logo-url: '/logos/logo_avante.svg';
 }
 .CustomIconPng {
   @extend .CustomIconSvg;
-  top: 0.2em;
 }
 
+.CustomIconRaw {
+  @extend .CustomIconSvg;
+  top: 0;
+}
 .TransferIcon {
   transform: rotate(0deg);
   line-height: 1.01em;
