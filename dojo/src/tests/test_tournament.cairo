@@ -45,7 +45,7 @@ use pistols::tests::test_duel::tests::{_duel_until_death};
 
 use tournaments::components::{
     models::{
-        game::{TokenMetadata},
+        game::{TokenMetadata, TokenMetadataValue},
         lifecycle::{Lifecycle},
     },
     libs::{
@@ -130,7 +130,7 @@ fn test_lifecycle() {
     let mut sys: TestSystems = setup(3, FLAGS::TOURNAMENT);
     _mint(ref sys, OWNER()); // PASS_ID_1
     // mint phase
-    let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(PASS_ID_1);
+    let token_metadata: TokenMetadataValue = sys.store.get_budokan_token_metadata_value(PASS_ID_1);
     assert!(token_metadata.lifecycle.mint > 0);
     assert!(token_metadata.lifecycle.start.is_some());
     assert!(token_metadata.lifecycle.end.is_some());

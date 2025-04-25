@@ -29,7 +29,7 @@ use pistols::tests::tester::{
 
 use openzeppelin_token::erc721::interface;
 use tournaments::components::interfaces::{IGameTokenDispatcher, IGameTokenDispatcherTrait};
-use tournaments::components::models::game::{TokenMetadata};
+use tournaments::components::models::game::{TokenMetadataValue};
 
 //
 // Setup
@@ -111,7 +111,7 @@ fn test_initializer() {
     assert_eq!(sys.tournaments.total_supply(), 1, "total_supply");
     assert_eq!(sys.tournaments.owner_of(PASS_ID_0.into()), sys.tournaments.contract_address, "owner_of(0)");
     assert!(sys.tournaments.is_owner_of(sys.tournaments.contract_address, PASS_ID_0.into()), "is_owner_of(0)");
-    let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(PASS_ID_0);
+    let token_metadata: TokenMetadataValue = sys.store.get_budokan_token_metadata_value(PASS_ID_0);
     assert_eq!(token_metadata.player_name, 'Creator', "token_metadata.player_name");
     assert_eq!(token_metadata.minted_by, sys.tournaments.contract_address, "token_metadata.minted_by");
 }
@@ -156,7 +156,7 @@ fn test_mint() {
     assert!(sys.tournaments.is_owner_of(OWNER(), PASS_ID_1.into()), "is_owner_of(1)");
     assert_eq!(sys.tournaments.total_supply(), 2, "total_supply");
     // check budokan components created
-    let token_metadata: TokenMetadata = sys.store.get_budokan_token_metadata(token_id);
+    let token_metadata: TokenMetadataValue = sys.store.get_budokan_token_metadata_value(token_id);
     assert_eq!(token_metadata.minted_by, sys.budokan.contract_address, "token_metadata.minted_by");
     assert_eq!(token_metadata.player_name, PLAYER_NAME, "token_metadata.player_name");
 }

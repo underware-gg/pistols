@@ -63,7 +63,7 @@ pub mod TokenBoundComponent {
         ERC20Component::{ERC20Impl, InternalImpl as ERC20InternalImpl},
     };
 
-    use super::{TokenBoundAddress, TokenBoundAddressTrait};
+    use super::{TokenBoundAddress, TokenBoundAddressTrait, TokenBoundAddressValue};
     use pistols::interfaces::dns::{DnsTrait};
     use pistols::libs::store::{
         Store, StoreTrait,
@@ -109,7 +109,7 @@ pub mod TokenBoundComponent {
         ) -> (ContractAddress, u128) {
             let mut world = DnsTrait::storage(self.get_contract().world_dispatcher(), @"pistols");
             let mut store: Store = StoreTrait::new(world);
-            let token_bound_address: TokenBoundAddress = store.get_token_bound_address(address);
+            let token_bound_address: TokenBoundAddressValue = store.get_token_bound_address_value(address);
             (token_bound_address.contract_address, token_bound_address.token_id)
         }
 

@@ -90,10 +90,10 @@ pub impl StoreImpl of StoreTrait {
     fn get_player(self: @Store, address: ContractAddress) -> Player {
         (self.world.read_model(address))
     }
-    #[inline(always)]
-    fn get_payer_value(self: @Store, address: ContractAddress) -> PlayerValue {
-        (self.world.read_value(address))
-    }
+    // #[inline(always)]
+    // fn get_player_value(self: @Store, address: ContractAddress) -> PlayerValue {
+    //     (self.world.read_value(address))
+    // }
 
     #[inline(always)]
     fn get_pack(self: @Store, pack_id: u128) -> Pack {
@@ -157,40 +157,39 @@ pub impl StoreImpl of StoreTrait {
     }
 
     #[inline(always)]
-    fn get_scoreboard_value(self: @Store, season_id: u32, holder: felt252) -> SeasonScoreboardValue {
-        (self.world.read_value((season_id, holder),))
-    }
-
-    #[inline(always)]
     fn get_scoreboard(self: @Store, season_id: u32, holder: felt252) -> SeasonScoreboard {
         (self.world.read_model((season_id, holder),))
     }
+    // #[inline(always)]
+    // fn get_scoreboard_value(self: @Store, season_id: u32, holder: felt252) -> SeasonScoreboardValue {
+    //     (self.world.read_value((season_id, holder),))
+    // }
 
-    #[inline(always)]
-    fn get_leaderboard_value(self: @Store, season_id: u32) -> LeaderboardValue {
-        (self.world.read_value(season_id))
-    }
     #[inline(always)]
     fn get_leaderboard(self: @Store, season_id: u32) -> Leaderboard {
         (self.world.read_model(season_id))
     }
+    // #[inline(always)]
+    // fn get_leaderboard_value(self: @Store, season_id: u32) -> LeaderboardValue {
+    //     (self.world.read_value(season_id))
+    // }
 
     #[inline(always)]
     fn get_season_config(self: @Store, season_id: u32) -> SeasonConfig {
         (self.world.read_model(season_id))
     }
-    #[inline(always)]
-    fn get_season_config_value(self: @Store, season_id: u32) -> SeasonConfigValue {
-        (self.world.read_value(season_id))
-    }
+    // #[inline(always)]
+    // fn get_season_config_value(self: @Store, season_id: u32) -> SeasonConfigValue {
+    //     (self.world.read_value(season_id))
+    // }
     #[inline(always)]
     fn get_current_season(self: @Store) -> SeasonConfig {
         (self.world.read_model(self.get_current_season_id()))
     }
-    #[inline(always)]
-    fn get_current_season_value(self: @Store) -> SeasonConfigValue {
-        (self.world.read_value(self.get_current_season_id()))
-    }
+    // #[inline(always)]
+    // fn get_current_season_value(self: @Store) -> SeasonConfigValue {
+    //     (self.world.read_value(self.get_current_season_id()))
+    // }
 
     #[inline(always)]
     fn get_coin_config(self: @Store, contract_address: ContractAddress) -> CoinConfig {
@@ -224,6 +223,10 @@ pub impl StoreImpl of StoreTrait {
     fn get_token_bound_address(self: @Store, recipient: ContractAddress) -> TokenBoundAddress {
         (self.world.read_model(recipient))
     }
+    #[inline(always)]
+    fn get_token_bound_address_value(self: @Store, recipient: ContractAddress) -> TokenBoundAddressValue {
+        (self.world.read_value(recipient))
+    }
 
     #[inline(always)]
     fn get_tournament_pass(self: @Store, pass_id: u64) -> TournamentPass {
@@ -234,10 +237,10 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_value(pass_id))
     }
 
-    #[inline(always)]
-    fn get_tournament_settings(self: @Store, settings_id: u32) -> TournamentSettings {
-        (self.world.read_model(settings_id))
-    }
+    // #[inline(always)]
+    // fn get_tournament_settings(self: @Store, settings_id: u32) -> TournamentSettings {
+    //     (self.world.read_model(settings_id))
+    // }
     #[inline(always)]
     fn get_tournament_settings_value(self: @Store, settings_id: u32) -> TournamentSettingsValue {
         (self.world.read_value(settings_id))
@@ -261,20 +264,20 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_value((tournament_id, round_number),))
     }
 
-    #[inline(always)]
-    fn get_tournament_to_challenge_value(self: @Store, keys: @TournamentDuelKeys) -> TournamentToChallengeValue {
-        (self.world.read_value(*keys))
-    }
+    // #[inline(always)]
+    // fn get_tournament_to_challenge_value(self: @Store, keys: @TournamentDuelKeys) -> TournamentToChallengeValue {
+    //     (self.world.read_value(*keys))
+    // }
     #[inline(always)]
     fn get_challenge_to_tournament_value(self: @Store, duel_id: u128) -> ChallengeToTournamentValue {
         (self.world.read_value(duel_id))
     }
     
 
-    #[inline(always)]
-    fn get_budokan_token_metadata(self: @Store, pass_id: u64) -> TokenMetadata {
-        (self.world.read_model(pass_id))
-    }
+    // #[inline(always)]
+    // fn get_budokan_token_metadata(self: @Store, pass_id: u64) -> TokenMetadata {
+    //     (self.world.read_model(pass_id))
+    // }
     #[inline(always)]
     fn get_budokan_token_metadata_value(self: @Store, pass_id: u64) -> TokenMetadataValue {
         (self.world.read_value(pass_id))
