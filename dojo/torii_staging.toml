@@ -17,7 +17,7 @@ historical = [
 [indexing]
 pending = true
 transactions = true
-world_block = 722607
+world_block = 23920
 contracts = [
   "erc721:0x269d3b0edf05d979a48041ed4712b4362b675231458f0a30657a447349a9f2c", # duel_token
   "erc721:0x6aa7db7bd15bed06fd9b8cd08c5d80a05d1d3ad7b67707c412df6991f9819bb", # duelist_token

@@ -89,6 +89,7 @@ execute_command () {
 export GAME_SLUG="pistols"
 export PROJECT_NAME=$(toml get $DOJO_PROFILE_FILE --raw world.name)
 export WORLD_ADDRESS=$(get_profile_env "world_address")
+export WORLD_BLOCK=$(get_profile_env "world_block")
 export LORDS_ADDRESS=$(get_profile_env "lords_address")
 export TORII_CONFIG_TEMPLATE_PATH="./torii_TEMPLATE.toml"
 export TORII_CONFIG_PATH="./torii_$PROFILE.toml"

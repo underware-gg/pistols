@@ -25,7 +25,7 @@ rpc_url = "https://api.cartridge.gg/x/starknet/sepolia" # or env: STARKNET_RPC_U
 # private_key = ""      # env: DOJO_PRIVATE_KEY
 world_address = "0x2ed4c10d6a2862906255a8450de7cc87c610be85638c548ff50a63de240cbd"
 lords_address = "0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210"
-world_block = 722607
+world_block = 23920     # LORDS deployment block
 
 #--------------------------
 # namespaces
@@ -60,7 +60,7 @@ default = "pistols"
 "pistols-CoinConfig" = [
   "pistols-fame_coin",
   "pistols-fools_coin",
-  "pistols-lords_mock",
+  # "pistols-lords_mock",
 ]
 "pistols-TokenBoundAddress" = ["pistols-fame_coin"]
 # arcade trophies

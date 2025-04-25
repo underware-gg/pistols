@@ -6,8 +6,9 @@ if [[
   -z "$PROJECT_NAME" ||
   -z "$PROFILE" ||
   -z "$MANIFEST_FILE_PATH" ||
+  "$RPC_URL" != "http"* ||
   "$WORLD_ADDRESS" != "0x"* ||
-  "$RPC_URL" != "http"*
+  -z "$WORLD_BLOCK"
 ]]; then
   echo "! Missing data 👎"
   exit 1
@@ -81,6 +82,7 @@ echo ">>> Create torii config [$TORII_CONFIG_PATH]..."
 cp $TORII_CONFIG_TEMPLATE_PATH $TORII_CONFIG_PATH
 sed -i '' -e "s|\$profile|$PROFILE|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$world_address|$WORLD_ADDRESS|g" $TORII_CONFIG_PATH
+sed -i '' -e "s|\$world_block|$WORLD_BLOCK|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$rpc_url|$RPC_URL|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$duel_token|$DUEL_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$duelist_token|$DUELIST_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
