@@ -20,9 +20,9 @@ pub trait IGame<TState> {
         salt: felt252,
         moves: Span<u8>,
     );
-    fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear the required action call for a duelist
     fn collect_duel(ref self: TState, duel_id: u128) -> u8; // @description: Close expired duels
     fn collect_season(ref self: TState) -> u32; // @description: Close the current season and start the next one
+    fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear the required action call for a duelist
 
     // view calls
     fn get_duel_deck(self: @TState, duel_id: u128) -> Span<Span<u8>>;

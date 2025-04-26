@@ -117,16 +117,20 @@ if [[ "$PROFILE" == "dev" ]]; then
   # list copied files
   echo "------------------------------------------------------------------------------"
   ls -ld $SDK_GAME_PATH/* | grep -E 'ts|json'
+  cd -
 fi
 
-if [[ "$PROFILE" == "mainnet" ]]; then
+if [[ "$CHAIN_ID" == "SN_SEPOLIA" || "$CHAIN_ID" == "SN_MAIN" ]]; then
+  cd ../client
   echo "------------------------------------------------------------------------------"
   echo ">>> Generate controller preset..."
   # npm run generate-controller-preset --sdk=../sdk/src/games/pistols
-  # npx --package=@underware/pistols-sdk generate-controller-preset --out:"../sdk/src/games/pistols/generated/preset.json"
-  # ../sdk/dist/bin/generateControllerPreset.mjs --out:"../sdk/src/games/pistols/generated/preset.json"
-  execute_command "npm run generate-controller-preset --sdk=$SDK_GAME_PATH"
+  # npx --package=@underware/pistols-sdk generate-controller-preset --chain_id:"SN_MAIN" --out:"../sdk/src/games/pistols/generated/preset.json"
+  # ../sdk/dist/bin/generateControllerPreset.mjs --chain_id:"SN_MAIN" --out:"../sdk/src/games/pistols/generated/preset.json"
+  # cd ../sdk && turbo build && cd -
+  execute_command "npm run generate-controller-preset --chain_id="$CHAIN_ID" --sdk=$SDK_GAME_PATH"
   echo "👍?"
+  cd -
 fi
 
 #------------------

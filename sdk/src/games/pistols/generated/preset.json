@@ -1,9 +1,7 @@
 {
   "origin": [
-    "pistols.underware.gg",
-    "pistols.stage.underware.gg",
-    "play.pistols.gg",
-    "stage.pistols.gg"
+    "*.pistols.gg",
+    "*.underware.gg"
   ],
   "theme": {
     "colors": {
@@ -13,198 +11,203 @@
     "icon": "icon.png",
     "name": "Pistols at Dawn"
   },
-  "policies": {
-    "contracts": {
-      "0x0619c7bd5d5d635e010ef3bf9a59ecc49fa055f19bb2202e530554cfda655b59": {
-        "description": "Game loop contract",
-        "methods": [
-          {
-            "entrypoint": "commit_moves",
-            "description": "Commit moves of a Duelist in a Duel"
+  "chains": {
+    "SN_MAIN": {},
+    "SN_SEPOLIA": {
+      "policies": {
+        "contracts": {
+          "0x0154d9a74e8106255d8146b250683ba939f4db3e98b586997caf9514163ca963": {
+            "description": "Game loop contract",
+            "methods": [
+              {
+                "entrypoint": "commit_moves",
+                "description": "Commit moves of a Duelist in a Duel"
+              },
+              {
+                "entrypoint": "reveal_moves",
+                "description": "Reveal moves of a Duelist in a Duel"
+              },
+              {
+                "entrypoint": "clear_call_to_action",
+                "description": "Clear the required action call for a duelist"
+              },
+              {
+                "entrypoint": "collect_duel",
+                "description": "Close expired duels"
+              },
+              {
+                "entrypoint": "collect_season",
+                "description": "Close the current season and start the next one"
+              }
+            ]
           },
-          {
-            "entrypoint": "reveal_moves",
-            "description": "Reveal moves of a Duelist in a Duel"
+          "0x0320a19527bb1e661df4e41639c755353f6a401b24a8922a1d086a9667391428": {
+            "description": "Bank contract",
+            "methods": [
+              {
+                "entrypoint": "sponsor_duelists",
+                "description": "Sponsor duelist starter packs with $LORDS"
+              },
+              {
+                "entrypoint": "sponsor_season",
+                "description": "Sponsor the current season with $LORDS"
+              },
+              {
+                "entrypoint": "sponsor_tournament",
+                "description": "Sponsor a tournament with $LORDS"
+              }
+            ]
           },
-          {
-            "entrypoint": "clear_call_to_action",
-            "description": "Clear the required action call for a duelist"
+          "0x032fecc3b90057da30d74fa450abcdd55621cd88000fe709384f8a6b1a910c9f": {
+            "description": "Packs ERC721 contract",
+            "methods": [
+              {
+                "entrypoint": "claim_starter_pack",
+                "description": "Claim the starter pack, mint Duelists"
+              },
+              {
+                "entrypoint": "purchase",
+                "description": "Purchase a closed pack"
+              },
+              {
+                "entrypoint": "open",
+                "description": "Open a pack, mint its contents"
+              }
+            ]
           },
-          {
-            "entrypoint": "collect_duel",
-            "description": "Close expired duels"
+          "0x03e1da8b8d6208af7d90ae32d1c3a6f597223022bc0e72b5abc2ba07009c560f": {
+            "description": "Duel ERC721 contract",
+            "methods": [
+              {
+                "entrypoint": "create_duel",
+                "description": "Create a Duel, mint its token"
+              },
+              {
+                "entrypoint": "reply_duel",
+                "description": "Reply to a Duel (accept or reject)"
+              }
+            ]
           },
-          {
-            "entrypoint": "collect_season",
-            "description": "Close the current season and start the next one"
+          "0x03d042d2022519481f424b01f1a68268f773d0220275a102e809f49dee62c1c3": {
+            "description": "Duelist ERC721 contract",
+            "methods": [
+              {
+                "entrypoint": "poke",
+                "description": "Reactivates an inactive Duelist"
+              },
+              {
+                "entrypoint": "sacrifice",
+                "description": "Sacrifices a Duelist"
+              },
+              {
+                "entrypoint": "memorialize",
+                "description": "Memorializes a Duelist"
+              }
+            ]
+          },
+          "0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f": {
+            "description": "Cartridge VRF Provider",
+            "methods": [
+              {
+                "entrypoint": "request_random",
+                "description": "Request a random number"
+              }
+            ]
           }
-        ]
-      },
-      "0x07b04bc75c3d4ba5b37d2dfc91501424dd23f517a820aee89adeeef4ececb391": {
-        "description": "Packs ERC721 contract",
-        "methods": [
+        },
+        "messages": [
           {
-            "entrypoint": "claim_starter_pack",
-            "description": "Claim the starter pack, mint Duelists"
+            "types": {
+              "StarknetDomain": [
+                {
+                  "name": "name",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "version",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "chainId",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "revision",
+                  "type": "shortstring"
+                }
+              ],
+              "pistols-PlayerOnline": [
+                {
+                  "name": "identity",
+                  "type": "ContractAddress"
+                },
+                {
+                  "name": "timestamp",
+                  "type": "felt"
+                }
+              ]
+            },
+            "primaryType": "pistols-PlayerOnline",
+            "domain": {
+              "name": "Underware_gg",
+              "version": "1.0.0",
+              "chainId": "SN_SEPOLIA",
+              "revision": "1"
+            },
+            "name": "PlayerOnline",
+            "description": "Notify the server that a player is online"
           },
           {
-            "entrypoint": "purchase",
-            "description": "Purchase a closed pack"
-          },
-          {
-            "entrypoint": "open",
-            "description": "Open a pack, mint its contents"
-          }
-        ]
-      },
-      "0x00899524b10391115869ab095fe4385e17dd3dfd27b3a01bcc579ed939552e4c": {
-        "description": "Duel ERC721 contract",
-        "methods": [
-          {
-            "entrypoint": "create_duel",
-            "description": "Create a Duel, mint its token"
-          },
-          {
-            "entrypoint": "reply_duel",
-            "description": "Reply to a Duel (accept or reject)"
-          }
-        ]
-      },
-      "0x0611b5c48d17de65d8015d48d491e0d120361a85099e28f3630600b3a91a98b0": {
-        "description": "Duelist ERC721 contract",
-        "methods": [
-          {
-            "entrypoint": "poke",
-            "description": "Reactivates an inactive Duelist"
-          },
-          {
-            "entrypoint": "sacrifice",
-            "description": "Sacrifices a Duelist"
-          },
-          {
-            "entrypoint": "memorialize",
-            "description": "Memorializes a Duelist"
-          }
-        ]
-      },
-      "0x05c3c66f68bf24a4f61263d18622f97769ef62497f07a0ce9b07c7f02d6aa435": {
-        "description": "Bank contract",
-        "methods": [
-          {
-            "entrypoint": "sponsor_duelists",
-            "description": "Sponsor duelist starter packs with $LORDS"
-          },
-          {
-            "entrypoint": "sponsor_season",
-            "description": "Sponsor the current season with $LORDS"
-          },
-          {
-            "entrypoint": "sponsor_tournament",
-            "description": "Sponsor a tournament with $LORDS"
-          }
-        ]
-      },
-      "0x05355768013cba6f96d985d189c0a69362d1a79a962e0d595ba7ea114ead720c": {
-        "description": "Cartridge VRF Provider",
-        "methods": [
-          {
-            "entrypoint": "request_random",
-            "description": "Request a random number"
+            "types": {
+              "StarknetDomain": [
+                {
+                  "name": "name",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "version",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "chainId",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "revision",
+                  "type": "shortstring"
+                }
+              ],
+              "pistols-PlayerBookmark": [
+                {
+                  "name": "identity",
+                  "type": "ContractAddress"
+                },
+                {
+                  "name": "target_address",
+                  "type": "ContractAddress"
+                },
+                {
+                  "name": "target_id",
+                  "type": "u128"
+                },
+                {
+                  "name": "enabled",
+                  "type": "bool"
+                }
+              ]
+            },
+            "primaryType": "pistols-PlayerBookmark",
+            "domain": {
+              "name": "Underware_gg",
+              "version": "1.0.0",
+              "chainId": "SN_SEPOLIA",
+              "revision": "1"
+            },
+            "name": "PlayerBookmark",
+            "description": "Notify the server that a player follows another player or token"
           }
         ]
       }
-    },
-    "messages": [
-      {
-        "types": {
-          "StarknetDomain": [
-            {
-              "name": "name",
-              "type": "shortstring"
-            },
-            {
-              "name": "version",
-              "type": "shortstring"
-            },
-            {
-              "name": "chainId",
-              "type": "shortstring"
-            },
-            {
-              "name": "revision",
-              "type": "shortstring"
-            }
-          ],
-          "pistols-PlayerOnline": [
-            {
-              "name": "identity",
-              "type": "ContractAddress"
-            },
-            {
-              "name": "timestamp",
-              "type": "felt"
-            }
-          ]
-        },
-        "primaryType": "pistols-PlayerOnline",
-        "domain": {
-          "name": "Underware_gg",
-          "version": "1.0.0",
-          "chainId": "KATANA_LOCAL",
-          "revision": "1"
-        },
-        "name": "PlayerOnline",
-        "description": "Notify the server that a player is online"
-      },
-      {
-        "types": {
-          "StarknetDomain": [
-            {
-              "name": "name",
-              "type": "shortstring"
-            },
-            {
-              "name": "version",
-              "type": "shortstring"
-            },
-            {
-              "name": "chainId",
-              "type": "shortstring"
-            },
-            {
-              "name": "revision",
-              "type": "shortstring"
-            }
-          ],
-          "pistols-PlayerBookmark": [
-            {
-              "name": "identity",
-              "type": "ContractAddress"
-            },
-            {
-              "name": "target_address",
-              "type": "ContractAddress"
-            },
-            {
-              "name": "target_id",
-              "type": "u128"
-            },
-            {
-              "name": "enabled",
-              "type": "bool"
-            }
-          ]
-        },
-        "primaryType": "pistols-PlayerBookmark",
-        "domain": {
-          "name": "Underware_gg",
-          "version": "1.0.0",
-          "chainId": "KATANA_LOCAL",
-          "revision": "1"
-        },
-        "name": "PlayerBookmark",
-        "description": "Notify the server that a player follows another player or token"
-      }
-    ]
+    }
   }
 }
