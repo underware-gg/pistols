@@ -680,8 +680,6 @@ export class InteractibleScene extends THREE.Scene {
     let duration = state.baseDuration + (normalRandom() * stdDev);
     
     duration = Math.max(state.minDuration, Math.min(state.maxDuration, duration));
-
-    console.log(duration)
     
     return duration;
   }

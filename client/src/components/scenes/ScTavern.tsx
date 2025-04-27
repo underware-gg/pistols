@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { SceneName, TextureName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
-import { TavernAudios } from '/src/components/GameContainer'
 import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
 import { _currentScene } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
@@ -53,7 +52,6 @@ export default function ScTavern() {
     <div>
 
       <ActivityPanel />
-      <TavernAudios />
       <BarkeepModal open={open} setOpen={setOpen} />
 
       <DojoSetupErrorDetector />

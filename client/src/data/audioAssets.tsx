@@ -13,6 +13,20 @@ enum AudioName {
   STRIKE_LIGHT = 'STRIKE_LIGHT',
   STRIKE_HEAVY = 'STRIKE_HEAVY',
   STRIKE_BLOCK = 'STRIKE_BLOCK',
+
+  // UI
+  // UI_BUTTON_CLICK = 'UI_BUTTON_CLICK',
+
+  // environment
+  DOOR_KNOCKING = 'DOOR_KNOCKING',
+  DOORKEEP_GRUNTING_1 = 'DOORKEEP_GRUNTING_1',
+  DOORKEEP_GRUNTING_2 = 'DOORKEEP_GRUNTING_2',
+  DOORKEEP_GRUNTING_3 = 'DOORKEEP_GRUNTING_3',
+  DOORKEEP_GRUNTING_4 = 'DOORKEEP_GRUNTING_4',
+  DOOR_CREAKING = 'DOOR_CREAKING',
+  KNIFE_IMPACT = 'KNIFE_IMPACT',
+  KNIFE_SHARPEN = 'KNIFE_SHARPEN',
+  KNIFE_SWISH = 'KNIFE_SWISH',
 }
 
 interface AudioAsset {
@@ -80,6 +94,67 @@ let AUDIO_ASSETS: AudioAssets = {
     loop: false,
     delaySeconds: 0.9,
   },
+
+  // environment
+  DOOR_KNOCKING: {
+    path: '/audio/sfx/env/door-knocking.mp3',
+    loop: false,
+    volume: 0.1,
+    delaySeconds: 0.1,
+  },
+  DOORKEEP_GRUNTING_1: {
+    path: '/audio/sfx/env/doorkeep-grunting-1.mp3',
+    loop: false,
+    volume: 0.1,
+    delaySeconds: 0,
+  },
+  DOORKEEP_GRUNTING_2: {
+    path: '/audio/sfx/env/doorkeep-grunting-2.mp3',
+    loop: false,
+    volume: 0.1,
+    delaySeconds: 0,
+  },
+  DOORKEEP_GRUNTING_3: {
+    path: '/audio/sfx/env/doorkeep-grunting-3.mp3',
+    loop: false,
+    volume: 0.1,
+    delaySeconds: 0,
+  },
+  DOORKEEP_GRUNTING_4: {
+    path: '/audio/sfx/env/doorkeep-grunting-4.mp3',
+    loop: false,
+    volume: 0.1,
+    delaySeconds: 0,
+  },
+  DOOR_CREAKING: {
+    path: '/audio/sfx/env/door-creaking.mp3',
+    loop: false,
+    volume: 0.1,
+    delaySeconds: 0.1,
+  },
+  KNIFE_IMPACT: {
+    path: '/audio/sfx/env/knife-impact.mp3',
+    loop: false,
+    volume: 0.5,
+    delaySeconds: 0,
+  },
+  KNIFE_SHARPEN: {
+    path: '/audio/sfx/env/knife-sharpen.mp3',
+    loop: false,
+    volume: 0.5,
+    delaySeconds: 0,
+  },
+  KNIFE_SWISH: {
+    path: '/audio/sfx/env/knife-swish.mp3',
+    loop: false,
+    volume: 0.5,
+    delaySeconds: 0,
+  },
+  
+  
+  
+  
+  
 }
 
 

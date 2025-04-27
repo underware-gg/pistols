@@ -11,7 +11,7 @@ import * as TWEEN from '@tweenjs/tween.js'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppGame from '/src/components/AppGame'
-import GameContainer from '/src/components/GameContainer'
+import GameContainer, { TavernAudios } from '/src/components/GameContainer'
 import Background from '/src/components/Background'
 import PlayerModal from '/src/components/modals/PlayerModal'
 import DuelistModal from '/src/components/modals/DuelistModal'
@@ -95,6 +95,7 @@ export default function MainPage({
         <Header />
         <CurrentChainHint />
         <MouseToolTip />
+        <TavernAudios />
       </Background>
     </AppGame>
   );

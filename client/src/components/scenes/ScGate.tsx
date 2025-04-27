@@ -1,20 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
-import { sceneBackgrounds, SceneName, TextureName } from '/src/data/assets'
+import { usePistolsScene } from '/src/hooks/PistolsContext'
+import { SceneName, TextureName } from '/src/data/assets'
 import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useTextureShift } from '/src/hooks/useTextureShift'
-import { TavernAudios } from '/src/components/GameContainer'
 import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
 import Logo from '/src/components/Logo'
 import AnimatedText from '../ui/AnimatedText'
 import TWEEN from '@tweenjs/tween.js'
 import { _currentScene } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
-import { useGameAspect } from '/src/hooks/useGameAspect'
+import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
+import { AudioName } from '/src/data/audioAssets'
 
 export default function ScGate() {
-  const { aspectWidth, aspectHeight } = useGameAspect()
-
   const { dispatchSetScene } = usePistolsScene()
   
   const [textOpacity, setTextOpacity] = useState(0)
@@ -24,6 +22,8 @@ export default function ScGate() {
   const { value: itemClicked, timestamp } = useGameEvent('scene_click', null)
   const { x: bubbleShiftX, y: bubbleShiftY } = useTextureShift(1)
   const { x: logoShiftX, y: logoShiftY } = useTextureShift(5)
+
+  const { gameImpl } = useThreeJsContext()
   
   useEffect(() => {
     // Set up the text display with delay
@@ -60,11 +60,12 @@ export default function ScGate() {
     if (itemClicked) {
       switch (itemClicked) {
         case 'door':
+          gameImpl?.playAudio(AudioName.DOOR_KNOCKING)
           dispatchSetScene(SceneName.Door)
           break
       }
     }
-  }, [itemClicked, timestamp])
+  }, [itemClicked, timestamp, gameImpl])
 
   return (
     <>
@@ -72,7 +73,6 @@ export default function ScGate() {
         <Logo width={12} showName vertical />
       </div>
 
-      <TavernAudios />
       {/* <BarkeepModal /> */}
       <div
         className='FillParent'

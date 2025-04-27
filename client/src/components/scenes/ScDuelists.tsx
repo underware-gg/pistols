@@ -6,7 +6,6 @@ import { useGameEvent } from '/src/hooks/useGameEvent'
 import { useQueryPlayerIds } from '/src/stores/playerStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DojoSetupErrorDetector } from '/src/components/account/DojoSetupErrorDetector'
-import { TavernAudios } from '/src/components/GameContainer'
 import { POSTER_HEIGHT_SMALL, POSTER_WIDTH_SMALL, ProfilePoster, ProfilePosterHandle } from '../ui/ProfilePoster'
 import { SceneName } from '/src/data/assets'
 import { useQueryChallengeIds } from '/src/stores/challengeQueryStore'
@@ -399,8 +398,6 @@ export default function ScDuelists() {
       />
 
       <DuelTutorialOverlay opener={tutorialOpener} />
-
-      <TavernAudios />
 
       <DojoSetupErrorDetector />
     </div>

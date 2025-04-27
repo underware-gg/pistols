@@ -33,6 +33,8 @@ type ActionButtonProps = {
   confirmMessage?: string
   className?: string
   onClick: () => void
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
 }
 
 export const ActionButton = ({
@@ -50,6 +52,8 @@ export const ActionButton = ({
   confirmMessage = null,
   className = null,
   onClick,
+  onMouseEnter,
+  onMouseLeave,
 }: ActionButtonProps) => {
   const classNames = useMemo(() => {
     let classNames = []
@@ -85,6 +89,8 @@ export const ActionButton = ({
         active={active}
         disabled={disabled}
         onClick={() => _click()}
+        onMouseEnter={() => onMouseEnter?.()}
+        onMouseLeave={() => onMouseLeave?.()}
       >
         {label}
       </Button>

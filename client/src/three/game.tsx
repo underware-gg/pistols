@@ -1603,7 +1603,7 @@ export function animateActions(actionA: Action, actionB: Action, healthA: number
 //-------------------------------
 // Audio
 //
-export function playAudio(name: AudioName, enabled: boolean = true) {
+export function playAudio(name: AudioName, enabled: boolean = true, fadeInDuration: number = 0.0) {
   const asset = AUDIO_ASSETS[name]
   if (asset?.object) {
     setTimeout(() => {
@@ -1611,7 +1611,26 @@ export function playAudio(name: AudioName, enabled: boolean = true) {
         asset.object.stop()
       }
       if (enabled) {
+        // Set initial volume to 0 for fade in
+        const originalVolume = asset.volume ?? 1
+        asset.object.setVolume(0)
         asset.object.play()
+        
+        // Fade in
+        if (fadeInDuration > 0) {
+          const startTime = Date.now()
+          const fadeInterval = setInterval(() => {
+            const elapsedTime = (Date.now() - startTime) / 1000
+            const progress = Math.min(elapsedTime / fadeInDuration, 1)
+            asset.object.setVolume(progress * originalVolume)
+            
+            if (progress >= 1) {
+              clearInterval(fadeInterval)
+            }
+          }, 50)
+        } else {
+          asset.object.setVolume(originalVolume)
+        }
       }
     }, (asset.delaySeconds ?? 0) * 1000)
   }
@@ -1622,9 +1641,29 @@ export function pauseAudio(name: AudioName) {
   asset?.object?.pause()
 }
 
-export function stopAudio(name: AudioName) {
+export function stopAudio(name: AudioName, fadeOutDuration: number = 0.0) {
   const asset = AUDIO_ASSETS[name]
-  asset?.object?.stop()
+  if (asset?.object?.isPlaying) {
+    if (fadeOutDuration <= 0) {
+      asset.object.stop()
+    } else {
+      // Fade out
+      const originalVolume = asset.object.getVolume()
+      const startTime = Date.now()
+      const fadeInterval = setInterval(() => {
+        const elapsedTime = (Date.now() - startTime) / 1000
+        const progress = Math.min(elapsedTime / fadeOutDuration, 1)
+        asset.object.setVolume(originalVolume * (1 - progress))
+        
+        if (progress >= 1) {
+          clearInterval(fadeInterval)
+          asset.object.stop()
+          // Reset volume to original
+          asset.object.setVolume(originalVolume)
+        }
+      }, 50)
+    }
+  }
 }
 
 export function setSfxEnabled(enabled: boolean) {

@@ -150,7 +150,7 @@ export function Header() {
       {/* door and gate UI */}
       <>
         <BannerButton button={<BackButton icon='left-arrow' size='big'/>} visible={atDoor} short={true} />
-        <BannerButton button={<MusicToggle size='big'/>} right={true} visible={atGate || atDoor} short={true} />
+        <BannerButton button={<MusicToggle size='big'/>} right={true} visible={atDoor} short={true} />
       </>
     </div>
   )

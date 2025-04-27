@@ -106,8 +106,9 @@ const GameAudios = ({
 // Will disable MUSIC settings if not interacted yet
 //
 export const TavernAudios = () => {
-  const { musicEnabled } = useSettings()
+  const { musicEnabled, sfxEnabled } = useSettings()
   const { gameImpl, audioLoaded } = useThreeJsContext()
+  const { atGate, atDoor, atDuel, atTutorial } = usePistolsScene()
 
   useEffect(() => {
     return () => {
@@ -116,8 +117,22 @@ export const TavernAudios = () => {
   }, [])
 
   useEffect(() => {
-    gameImpl?.playAudio(AudioName.MUSIC_MENUS, musicEnabled && audioLoaded)
-  }, [gameImpl, musicEnabled, audioLoaded])
+    gameImpl?.playAudio(AudioName.MUSIC_MENUS, musicEnabled && audioLoaded && !atGate && !atDoor && !atDuel && !atTutorial, 2)
+  }, [gameImpl, musicEnabled, audioLoaded, atGate, atDoor, atDuel])
+
+  useEffect(() => {
+    const handleClick = () => {
+      if (sfxEnabled && gameImpl && audioLoaded && !atTutorial && !atGate) {
+        gameImpl.playAudio(AudioName.KNIFE_SHARPEN, true)
+      }
+    }
+    
+    document.addEventListener('click', handleClick)
+    
+    return () => {
+      document.removeEventListener('click', handleClick)
+    }
+  }, [gameImpl, sfxEnabled, audioLoaded, atTutorial, atGate])
 
   return <></>
 }
