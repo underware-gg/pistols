@@ -974,14 +974,14 @@ pub mod tester {
         let pool_purchases: Pool = (*sys.store).get_pool(PoolType::Purchases);
         let pool_peg: Pool = (*sys.store).get_pool(PoolType::FamePeg);
         let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(season_id));
-        let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
+        let pool_flame: Pool = (*sys.store).get_pool(PoolType::Sacrifice);
         println!(">>>>>>>>>>>>>>>>>> {}",  prefix);
         println!("BANK_______________LORDS:{} FAME:{}", ETH(lords_balance_bank), ETH(fame_balance_bank));
         println!("TREASURY___________LORDS:{}", ETH(lords_balance_treasury));
         println!("Pool::Purchases____LORDS:{} FAME:{}", ETH(pool_purchases.balance_lords), ETH(pool_purchases.balance_fame));
         println!("Pool::FamePeg______LORDS:{} FAME:{}", ETH(pool_peg.balance_lords), ETH(pool_peg.balance_fame));
         println!("Pool::Season_______LORDS:{} FAME:{}", ETH(pool_season.balance_lords), ETH(pool_season.balance_fame));
-        println!("Pool::SacredFlame__LORDS:{} FAME:{}", ETH(pool_flame.balance_lords), ETH(pool_flame.balance_fame));
+        println!("Pool::Sacrifice__LORDS:{} FAME:{}", ETH(pool_flame.balance_lords), ETH(pool_flame.balance_fame));
     }
 
     pub fn starts_with(input: ByteArray, prefix: ByteArray) -> bool {

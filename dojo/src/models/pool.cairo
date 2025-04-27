@@ -17,7 +17,7 @@ use starknet::{ContractAddress};
 //  - FAME: lost in duels, will be burned to release LORDS from PoolType::FamePeg
 //  - LORDS: from sponsors, distributed directly to winners
 //
-// PoolType::SacredFlame
+// PoolType::Sacrifice
 //  - FAME: from dead and sacrificed duelists, burned to release LORDS from PoolType::FamePeg
 //  - LORDS: -
 //
@@ -30,7 +30,7 @@ pub enum PoolType {
     FamePeg,                // 2
     Season: u32,            // 3
     Tournament: u64,        // 4
-    SacredFlame,            // 5
+    Sacrifice,              // 5
 }
 impl PoolTypeDefault of Default<PoolType> {
     fn default() -> PoolType {(PoolType::Undefined)}
@@ -119,7 +119,7 @@ impl PoolTypeIntoByteArray of core::traits::Into<PoolType, ByteArray> {
             PoolType::FamePeg       =>  "FamePeg",
             PoolType::Season        =>  "Season",
             PoolType::Tournament    =>  "Tournament",
-            PoolType::SacredFlame   =>  "SacredFlame",
+            PoolType::Sacrifice     =>  "Sacrifice",
         }
     }
 }

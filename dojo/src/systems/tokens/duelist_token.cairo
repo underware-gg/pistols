@@ -493,15 +493,15 @@ pub mod duelist_token {
                 let mut release_bills: Array<LordsReleaseBill> = array![];
                 //
                 // Process residuals (dead duelist)
-                // the residual balance is split between sacred flame + underware
+                // the residual balance is split between sacrifice pool + underware
                 let mut residual_due: u128 = (fame_balance - values.fame_lost);
                 values.survived = (residual_due >= FAME::ONE_LIFE.low);
                 if (values.survived) {
                     residual_due = 0;
                 } else {
-                    // transfer to PoolType::SacredFlame, do not burn
-                    let amount: u128 = MathTrait::percentage(residual_due, FAME::SACRED_FLAME_PERCENTAGE);
-                    (*bank_protected_dispatcher).duelist_lost_fame_to_pool(starknet::get_contract_address(), duelist_id, amount, PoolType::SacredFlame);
+                    // transfer to PoolType::Sacrifice, do not burn
+                    let amount: u128 = MathTrait::percentage(residual_due, FAME::SACRIFICE_PERCENTAGE);
+                    (*bank_protected_dispatcher).duelist_lost_fame_to_pool(starknet::get_contract_address(), duelist_id, amount, PoolType::Sacrifice);
                     residual_due -= amount;
                 }
                 //
@@ -576,12 +576,12 @@ pub mod duelist_token {
 // println!("fame_dripped: {}", fame_dripped.unwrap());
 // println!("fame_balance: {}", fame_balance);
 // println!("due_amount: {}", due_amount);
-            // 60% of one life goes to sacred flame
+            // 60% of one life goes to sacrifice pool
             let survived: bool = (fame_balance - due_amount) >= FAME::ONE_LIFE.low;
 // println!("survived: {}", survived);
             if (!survived) {
-                let amount: u128 = MathTrait::percentage(FAME::ONE_LIFE.low, FAME::SACRED_FLAME_PERCENTAGE);
-                bank_dispatcher.duelist_lost_fame_to_pool(starknet::get_contract_address(), duelist_id, amount, PoolType::SacredFlame);
+                let amount: u128 = MathTrait::percentage(FAME::ONE_LIFE.low, FAME::SACRIFICE_PERCENTAGE);
+                bank_dispatcher.duelist_lost_fame_to_pool(starknet::get_contract_address(), duelist_id, amount, PoolType::Sacrifice);
                 // burn the full balance
                 due_amount = fame_balance - amount;
                 // emit event...

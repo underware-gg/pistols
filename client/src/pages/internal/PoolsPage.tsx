@@ -178,17 +178,17 @@ function Pools() {
 
   const poolPurchases = usePool(constants.PoolType.Purchases)
   const poolFamePeg = usePool(constants.PoolType.FamePeg)
-  const poolSacredFlame = usePool(constants.PoolType.SacredFlame)
+  const poolSacrifice = usePool(constants.PoolType.Sacrifice)
 
   const { currentSeasonId } = useConfig()
   const poolSeason = useSeasonPool(currentSeasonId)
 
   const poolTotalLords = useMemo(() => (
-    poolPurchases.balanceLords + poolFamePeg.balanceLords + poolSacredFlame.balanceLords + poolSeason.balanceLords
-  ), [poolPurchases, poolFamePeg, poolSacredFlame, poolSeason])
+    poolPurchases.balanceLords + poolFamePeg.balanceLords + poolSacrifice.balanceLords + poolSeason.balanceLords
+  ), [poolPurchases, poolFamePeg, poolSacrifice, poolSeason])
   const poolTotalFame = useMemo(() => (
-    poolPurchases.balanceFame + poolFamePeg.balanceFame + poolSacredFlame.balanceFame + poolSeason.balanceFame
-  ), [poolPurchases, poolFamePeg, poolSacredFlame, poolSeason])
+    poolPurchases.balanceFame + poolFamePeg.balanceFame + poolSacrifice.balanceFame + poolSeason.balanceFame
+  ), [poolPurchases, poolFamePeg, poolSacrifice, poolSeason])
 
   const diffLords = useMemo(() => (bankLordsBalance - poolTotalLords), [bankLordsBalance, poolTotalLords])
   const diffFame = useMemo(() => (bankFameBalance - poolTotalFame), [bankFameBalance, poolTotalFame])
@@ -214,7 +214,7 @@ function Pools() {
         </Row>
         <PoolRow pool={poolPurchases} />
         <PoolRow pool={poolFamePeg} />
-        <PoolRow pool={poolSacredFlame} />
+        <PoolRow pool={poolSacrifice} />
         <PoolRow pool={poolSeason} />
         <Row className='ModalText'>
           <Cell>Pools Total</Cell>

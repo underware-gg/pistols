@@ -396,7 +396,7 @@ fn test_duelist_inactive() {
     // OTHER will not drip until activated
     let token_id_other: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
 
-    let pool_flame: Pool = sys.store.get_pool(PoolType::SacredFlame);
+    let pool_flame: Pool = sys.store.get_pool(PoolType::Sacrifice);
     assert_eq!(pool_flame.balance_fame, 0, "pool_flame.balance_fame");
 
     let balance_initial: u128 = sys.fame.balance_of_token(sys.duelists.contract_address, token_id).low;
@@ -489,7 +489,7 @@ fn _test_duelist_reactivate(ref sys: TestSystems, token_id: u128, dripped_fame: 
     // Fame supply down
     let fame_supply: u128 = sys.fame.total_supply().low;
     // Flames up?
-    let pool_flame: Pool = sys.store.get_pool(PoolType::SacredFlame);
+    let pool_flame: Pool = sys.store.get_pool(PoolType::Sacrifice);
     let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
     if (should_survive) {
         assert_eq!(memorial.cause_of_death, CauseOfDeath::None, "AFTER_cause_of_death");
@@ -637,7 +637,7 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128, cause_of_death: Ca
     // Fame supply down
     let fame_supply: u128 = (*sys.fame).total_supply().low;
     // Flames up?
-    let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
+    let pool_flame: Pool = (*sys.store).get_pool(PoolType::Sacrifice);
     let pool_amount: u128 = ((FAME::ONE_LIFE.low / 10) * 6);
     assert_eq!(fame_balance, 0, "AFTER_fame_balance_DEAD");
     assert_eq!(fame_supply, fame_supply_start - fame_balance_start + pool_amount, "AFTER_fame_supply_DEAD");

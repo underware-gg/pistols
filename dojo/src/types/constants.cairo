@@ -43,8 +43,8 @@ pub mod FAME {
     // how long it takes to drip 1 FAME
     pub const TIMESTAMP_TO_DRIP_ONE_FAME: u64 = (10 * TIMESTAMP::ONE_MINUTE);
 
-    // residual FAME (<1000) that goes to PoolType::SacredFlame
-    pub const SACRED_FLAME_PERCENTAGE: u8 = 60;
+    // residual FAME (<1000) that goes to PoolType::Sacrifice
+    pub const SACRIFICE_PERCENTAGE: u8 = 60;
 }
 
 pub mod METADATA {

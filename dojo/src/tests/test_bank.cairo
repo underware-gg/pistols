@@ -76,8 +76,8 @@ mod tests {
         let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_ID_1));
         assert_eq!(pool_season.balance_lords, 0, "RESOLVED_pool_season.balance_lords");
         assert_eq!(pool_season.balance_fame, 0, "RESOLVED_pool_season.balance_fame");
-        // PoolType::SacredFlame == zero
-        let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
+        // PoolType::Sacrifice == zero
+        let pool_flame: Pool = (*sys.store).get_pool(PoolType::Sacrifice);
         assert_eq!(pool_flame.balance_lords, 0, "RESOLVED_pool_flame.balance_lords");
         assert_eq!(pool_flame.balance_fame, 0, "RESOLVED_pool_flame.balance_fame");
 
@@ -146,8 +146,8 @@ mod tests {
         assert_eq!(pool_season.balance_lords, 0, "RESOLVED_pool_season.balance_lords END");
         assert_eq!(pool_season.balance_fame, fame_balance_bank, "RESOLVED_pool_season.balance_fame END");
 
-        // PoolType::SacredFlame == zero (still)
-        let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
+        // PoolType::Sacrifice == zero (still)
+        let pool_flame: Pool = (*sys.store).get_pool(PoolType::Sacrifice);
         assert_eq!(pool_flame.balance_lords, 0, "RESOLVED_pool_flame.balance_lords");
         assert_eq!(pool_flame.balance_fame, 0, "RESOLVED_pool_flame.balance_fame");
     }
@@ -172,7 +172,7 @@ mod tests {
 
         let pool_peg: Pool = (*sys.store).get_pool(PoolType::FamePeg);
         let pool_season: Pool = (*sys.store).get_pool(PoolType::Season(SEASON_ID_1));
-        let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
+        let pool_flame: Pool = (*sys.store).get_pool(PoolType::Sacrifice);
         assert_eq!(pool_flame.balance_lords, 0, "DEATH_pool_flame.balance_lords");
         assert_eq!(pool_flame.balance_fame, 0, "DEATH_pool_flame.balance_fame");
 
@@ -227,8 +227,8 @@ mod tests {
         // PoolType::Season() up
         tester::assert_balance_up((*sys.store).get_pool(PoolType::Season(SEASON_ID_1)).balance_fame, pool_season.balance_fame, format!("DEATH_pool_season.balance_fame [{}]", duel_id));
         if (flames_up) {
-            // PoolType::SacredFlame up
-            tester::assert_balance_up((*sys.store).get_pool(PoolType::SacredFlame).balance_fame, pool_flame.balance_fame, format!("DEATH_pool_flame.balance_fame [{}]", duel_id));
+            // PoolType::Sacrifice up
+            tester::assert_balance_up((*sys.store).get_pool(PoolType::Sacrifice).balance_fame, pool_flame.balance_fame, format!("DEATH_pool_flame.balance_fame [{}]", duel_id));
         }
     }
 
@@ -311,9 +311,9 @@ mod tests {
         assert_eq!(pool_season.balance_lords, 0, "COLLECTED_pool_season.balance_lords AFTER = 0");
         assert_eq!(pool_season.balance_fame, 0, "COLLECTED_pool_season.balance_fame AFTER = 0");
 
-        // PoolType::SacredFlame increased if DEAD
+        // PoolType::Sacrifice increased if DEAD
         // let has_deads: bool = (order.len() > 2);
-        let pool_flame: Pool = (*sys.store).get_pool(PoolType::SacredFlame);
+        let pool_flame: Pool = (*sys.store).get_pool(PoolType::Sacrifice);
         assert_eq!(pool_flame.balance_lords, 0, "COLLECTED_pool_flame.balance_lords = 0");
         if (flames_up) { // everyone dies with ZERO fame
             assert_ne!(pool_flame.balance_fame, 0, "COLLECTED_pool_flame.balance_fame_DEADS > 0");
