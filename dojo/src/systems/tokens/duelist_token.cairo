@@ -262,9 +262,13 @@ pub mod duelist_token {
             duelist_id: u128,
         ) -> u64 {
             let mut store: Store = StoreTrait::new(self.world_default());
-            let timestamp_active: u64 = store.get_duelist_value(duelist_id).timestamps.active;
-            let timestamp: u64 = starknet::get_block_timestamp();
-            (timestamp - timestamp_active)
+            let timestamp_active: u64 = store.get_duelist_timestamps(duelist_id).active;
+            if (timestamp_active.is_zero()) {
+                (0)
+            } else {
+                let timestamp: u64 = starknet::get_block_timestamp();
+                (timestamp - timestamp_active)
+            }
         }
 
         #[inline(always)]
@@ -334,7 +338,7 @@ pub mod duelist_token {
                     duelist_profile: ProfileManagerTrait::randomize_profile(profile_sample, rnd.low.into()),
                     timestamps: DuelistTimestamps {
                         registered: timestamp,
-                        active: timestamp,
+                        active: 0,
                     },
                     status: Default::default(),
                 };

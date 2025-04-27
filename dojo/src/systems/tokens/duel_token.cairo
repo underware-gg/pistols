@@ -448,6 +448,9 @@ pub mod duel_token {
                     challenge.timestamps.start = timestamp;
                     challenge.timestamps.end = 0;
 
+                    store.set_duelist_timestamp_active(challenge.duelist_id_a, timestamp);
+                    store.set_duelist_timestamp_active(challenge.duelist_id_b, timestamp);
+
                     // set reply timeouts
                     let mut round: Round = store.get_round(duel_id);
                     round.set_commit_timeout(store.get_current_season_rules(), timestamp);

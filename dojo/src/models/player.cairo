@@ -27,7 +27,7 @@ pub struct PlayerDuelistStack {
     #[key]
     pub duelist_profile: DuelistProfile,
     //-----------------------
-    pub current_duelist_id: u128,           // current Duelist id
+    pub active_duelist_id: u128,            // the active dueling Duelist id
     pub level: u8,                          // current level (stack size)
     pub stacked_ids: Array<u128>,           // stacked Duelist ids
 }
@@ -100,15 +100,15 @@ pub impl PlayerDuelistStackImpl of PlayerDuelistStackTrait {
     fn append(ref self: PlayerDuelistStack, duelist_id: u128) {
         self.stacked_ids.append(duelist_id);
         self.level = self.stacked_ids.len().try_into().unwrap();
-        if (self.current_duelist_id.is_zero()) {
-            self.current_duelist_id = duelist_id;
+        if (self.active_duelist_id.is_zero()) {
+            self.active_duelist_id = duelist_id;
         }
     }
     fn remove(ref self: PlayerDuelistStack, duelist_id: u128) {
         self.stacked_ids = self.stacked_ids.remove(@duelist_id);
         self.level = self.stacked_ids.len().try_into().unwrap();
-        if (self.current_duelist_id == duelist_id) {
-            self.current_duelist_id = if (self.level > 0) {*self.stacked_ids[0]} else {0};
+        if (self.active_duelist_id == duelist_id) {
+            self.active_duelist_id = if (self.level > 0) {*self.stacked_ids[0]} else {0};
         }
     }
 }

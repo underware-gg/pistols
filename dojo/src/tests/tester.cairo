@@ -500,7 +500,7 @@ pub mod tester {
     }
 
     pub fn set_block_timestamp(new_timestamp: u64) -> (u64, u64) {
-        assert_ge!(new_timestamp, starknet::get_block_timestamp(), "<<< Back in time...");
+        assert_ge!(new_timestamp, starknet::get_block_timestamp(), "set_block_timestamp() <<< Back in time...");
         let new_block_number = get_block_number() + 1;
         testing::set_block_number(new_block_number);
         testing::set_block_timestamp(new_timestamp);
@@ -622,6 +622,15 @@ pub mod tester {
         (*system).transfer_from(sender, to, token_id.into());
         _next_block();
     }
+
+    pub fn activate_duelist(ref sys: TestSystems, token_id: u128) {
+        let mut duelist: Duelist = sys.store.get_duelist(token_id);
+        if (duelist.timestamps.active == 0) {
+            duelist.timestamps.active = core::cmp::max(get_block_timestamp() - 1, 1);
+            set_Duelist(ref sys.world, @duelist);
+        }
+    }
+
 
     // ::duel_token
     pub fn execute_create_duel(system: @IDuelTokenDispatcher, sender: ContractAddress,
@@ -840,7 +849,7 @@ pub mod tester {
     }
 
     pub fn make_duelist_inactive(sys: @TestSystems, token_id: u128, dripped_fame: u64) {
-        let timestamp_active: u64 = (*sys.store).get_duelist_value(token_id).timestamps.active;
+        let timestamp_active: u64 = (*sys.store).get_duelist_timestamps(token_id).active;
         let elapsed: u64 = FAME::MAX_INACTIVE_TIMESTAMP + (FAME::TIMESTAMP_TO_DRIP_ONE_FAME * dripped_fame);
         set_block_timestamp(timestamp_active + elapsed);
     }

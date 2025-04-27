@@ -479,6 +479,10 @@ pub impl StoreImpl of StoreTrait {
     fn get_duelist_profile(self: @Store, duelist_id: u128) -> DuelistProfile {
         (self.world.read_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("duelist_profile")))
     }
+    #[inline(always)]
+    fn get_duelist_timestamps(self: @Store, duelist_id: u128) -> DuelistTimestamps {
+        (self.world.read_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("timestamps")))
+    }
 
     // setters
 

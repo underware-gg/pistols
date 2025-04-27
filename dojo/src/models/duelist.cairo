@@ -81,6 +81,9 @@ use pistols::utils::math::{MathU64};
 
 #[generate_trait]
 pub impl DuelistImpl of DuelistTrait {
+    fn is_activated(self: @Duelist) -> bool {
+        (*self.timestamps.active != 0)
+    }
     fn enter_challenge(ref self: Store, duelist_id: u128, duel_id: u128) {
         let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
         assert(assignment.duel_id == 0, DuelErrors::DUELIST_IN_CHALLENGE);

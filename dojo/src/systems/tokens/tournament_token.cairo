@@ -388,6 +388,7 @@ pub mod tournament_token {
                     entry.entry_number = registration.entry_number.try_into().unwrap();
                     entry.duelist_id = duelist_id;
                     store.set_tournament_pass(@entry);
+                    store.set_duelist_timestamp_active(duelist_id, starknet::get_block_timestamp());
                     // validate and create DuelistAssignment
                     DuelistTrait::enter_tournament(ref store, duelist_id, pass_id);
                 },

@@ -129,7 +129,7 @@ fn test_token_uri() {
         duelist_profile: DuelistProfile::Genesis(GenesisProfile::LadyVengeance),
         timestamps: DuelistTimestamps {
             registered: 999999,
-            active: 999999,
+            active: 0,
         },
         status: Default::default(),
     };

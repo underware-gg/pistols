@@ -281,7 +281,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
                 duelist_profile,
                 timestamps: DuelistTimestamps {
                     registered: timestamp,
-                    active: timestamp,
+                    active: 0,
                 },
                 status: Default::default(),
             });

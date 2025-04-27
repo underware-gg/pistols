@@ -100,14 +100,22 @@ pub mod tests {
         let fame_balance_b_init: u128 = tester::fame_balance_of_token(@sys, duelist_id_b);
         let fools_balance_a_init: u128 = sys.fools.balance_of(OWNER()).low;
         let fools_balance_b_init: u128 = sys.fools.balance_of(OTHER()).low;
+        let timestamp_active_a: u64 = sys.store.get_duelist_timestamps(ID(OWNER())).active;
+        let timestamp_active_b: u64 = sys.store.get_duelist_timestamps(ID(OTHER())).active;
         assert_gt!(fame_balance_a_init, 0, "fame_balance_a_init");
         assert_gt!(fame_balance_b_init, 0, "fame_balance_b_init");
         assert_eq!(fools_balance_a_init, 0, "fools_balance_a_init");
         assert_eq!(fools_balance_b_init, 0, "fools_balance_b_init");
+        assert_eq!(timestamp_active_a, 0, "timestamp_active_a");
+        assert_eq!(timestamp_active_b, 0, "timestamp_active_b");
 
         let (challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
         assert_eq!(sys.store.get_challenge(duel_id).get_deck_type(), DeckType::Classic, "challenge.deck_type");
         tester::assert_pact(@sys, duel_id, challenge, true, true, "started");
+        let timestamp_active_a: u64 = sys.store.get_duelist_timestamps(ID(OWNER())).active;
+        let timestamp_active_b: u64 = sys.store.get_duelist_timestamps(ID(OTHER())).active;
+        assert_gt!(timestamp_active_a, 0, "timestamp_active_a");
+        assert_gt!(timestamp_active_b, 0, "timestamp_active_b");
 
         // duel nft owned by contract
         assert_eq!(sys.duels.owner_of(duel_id.into()), sys.game.contract_address, "duels.owner_of");
@@ -509,8 +517,8 @@ pub mod tests {
                 // println!("testing stack_1...");
                 let stack_a_1: PlayerDuelistStack = sys.store.get_player_duelist_stack_from_id(OWNER(), duelist_id_a);
                 let stack_b_1: PlayerDuelistStack = sys.store.get_player_duelist_stack_from_id(OTHER(), duelist_id_b);
-                assert_eq!(stack_a_1.current_duelist_id, duelist_id_a, "stack_a_1.current");
-                assert_eq!(stack_b_1.current_duelist_id, duelist_id_b, "stack_b_1.current");
+                assert_eq!(stack_a_1.active_duelist_id, duelist_id_a, "stack_a_1.current");
+                assert_eq!(stack_b_1.active_duelist_id, duelist_id_b, "stack_b_1.current");
                 assert_eq!(stack_a_1.stacked_ids.len(), 1, "stack_a_1.len()");
                 assert_eq!(stack_b_1.stacked_ids.len(), 1, "stack_b_1.len()");
             }
@@ -542,13 +550,13 @@ pub mod tests {
         if (to_death && winner != 1) {
             // println!("testing stack_a_2...");
             let stack_a_2: PlayerDuelistStack = sys.store.get_player_duelist_stack_from_id(OWNER(), duelist_id_a);
-            assert_eq!(stack_a_2.current_duelist_id, 0, "stack_a_2.current");
+            assert_eq!(stack_a_2.active_duelist_id, 0, "stack_a_2.current");
             assert_eq!(stack_a_2.stacked_ids.len(), 0, "stack_a_2.len()");
         }
         if (to_death && winner != 2) {
             // println!("testing stack_b_2...");
             let stack_b_2: PlayerDuelistStack = sys.store.get_player_duelist_stack_from_id(OTHER(), duelist_id_b);
-            assert_eq!(stack_b_2.current_duelist_id, 0, "stack_b_2.current");
+            assert_eq!(stack_b_2.active_duelist_id, 0, "stack_b_2.current");
             assert_eq!(stack_b_2.stacked_ids.len(), 0, "stack_b_2.len()");
         }
     }

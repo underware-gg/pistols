@@ -86,7 +86,7 @@ pub impl SeasonManagerImpl of SeasonManagerTrait {
     }
     #[inline(always)]
     fn get_next_season_duration() -> u64 {
-        (TIMESTAMP::ONE_HOUR)
+        (TIMESTAMP::ONE_WEEK)
     }
 }
 
