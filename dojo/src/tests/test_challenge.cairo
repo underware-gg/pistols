@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod tests {
+    use starknet::{ContractAddress};
     use pistols::models::{
         challenge::{ChallengeTrait, DuelType},
         player::{Player, PlayerTrait},
@@ -16,7 +17,9 @@ mod tests {
             TestSystems, FLAGS,
             IGameDispatcherTrait,
             IDuelTokenDispatcherTrait,
-            ID, ZERO, OWNER, OTHER, BUMMER, FAKE_OWNER_OF_1, OWNED_BY_OWNER, MESSAGE,
+            IDuelistTokenDispatcherTrait,
+            ID, ZERO, OWNER, OTHER, BUMMER, STACKER, STACKER2,
+            FAKE_OWNER_OF_1, OWNED_BY_OWNER, MESSAGE,
         }
     };
 
@@ -28,7 +31,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Not your duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Not your duelist', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_invalid_challenged_not_your_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let _duel_id: u128 = tester::execute_create_duel(@sys.duels, FAKE_OWNER_OF_1(), OTHER(), MESSAGE(), DuelType::Seasonal, 0, 1);
@@ -42,7 +45,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Invalid duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Invalid duelist', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_challenge_invalid_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         tester::execute_create_duel_ID(@sys.duels, OWNER(), 0, OTHER(), MESSAGE(), DuelType::Seasonal, 0, 1);
@@ -400,7 +403,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Not your duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Not your duelist', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_reply_wrong_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::LORDS | FLAGS::APPROVE);
         let A = OWNER();
@@ -423,6 +426,106 @@ mod tests {
         // reply with different TOKEN ID
         // panic!
         tester::execute_reply_duel(@sys.duels, BUMMER(), ID(BUMMER()), duel_id, true);
+    }
+
+
+    //-----------------------------------------
+    // duelist stacks
+    //
+
+    fn _mint_stacker_duelists(sys: @TestSystems, acc1: ContractAddress, acc2: ContractAddress) -> (u128, u128, u128, u128) {
+        tester::fund_duelists_pool(sys, 2);
+        let tokens1: Span<u128> = tester::execute_claim_starter_pack(sys.pack, acc1);
+        let tokens2: Span<u128> = tester::execute_claim_starter_pack(sys.pack, acc2);
+        let duelist_id_1_1: u128 = sys.store.get_duelist(*tokens1[0]).duelist_id;
+        let duelist_id_1_2: u128 = sys.store.get_duelist(*tokens1[1]).duelist_id;
+        let duelist_id_2_1: u128 = sys.store.get_duelist(*tokens2[0]).duelist_id;
+        let duelist_id_2_2: u128 = sys.store.get_duelist(*tokens2[1]).duelist_id;
+        (duelist_id_1_1, duelist_id_1_2, duelist_id_2_1, duelist_id_2_2)
+    }
+
+    #[test]
+    fn test_stacker_activet_OK() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
+        let A = STACKER();
+        let B = STACKER2();
+        let (duelist_id_a_active, duelist_id_a_inactive, duelist_id_b_active, duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
+
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys.duels, A, duelist_id_a_inactive, B, MESSAGE(), DuelType::Practice, 48, 1);
+        let ch = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::Awaiting, "state");
+        assert_eq!(ch.address_a, A, "challenger");
+        assert_eq!(ch.address_b, B, "challenged");
+        assert_eq!(ch.duelist_id_a, duelist_id_a_active, "challenger_id");
+        assert_eq!(ch.duelist_id_b, 0, "challenged_id"); // challenged an address, id is empty
+        // reply...
+        tester::execute_reply_duel(@sys.duels, B, duelist_id_b_inactive, duel_id, true);
+        let ch = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::InProgress, "ChallengeState::InProgress");
+        assert_eq!(ch.duelist_id_b, duelist_id_b_active, "challenged_id_ok");   // << UPDATED!!!
+    }
+
+    #[test]
+    fn test_stacker_active_switch_OK() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
+        let A = STACKER();
+        let B = STACKER2();
+        let (duelist_id_a_active, duelist_id_a_inactive, duelist_id_b_active, duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
+        // make active
+        tester::activate_duelist(ref sys, duelist_id_a_active);
+        tester::activate_duelist(ref sys, duelist_id_b_active);
+        // death by inactivity
+        tester::make_duelist_inactive(@sys, duelist_id_a_active, 3000);
+        tester::make_duelist_inactive(@sys, duelist_id_b_active, 3000);
+
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys.duels, A, duelist_id_a_inactive, B, MESSAGE(), DuelType::Practice, 48, 1);
+        let ch = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::Awaiting, "state");
+        assert_eq!(ch.address_a, A, "challenger");
+        assert_eq!(ch.address_b, B, "challenged");
+        assert_eq!(ch.duelist_id_a, duelist_id_a_inactive, "challenger_id");
+        assert_eq!(ch.duelist_id_b, 0, "challenged_id"); // challenged an address, id is empty
+        assert!(!sys.duelists.is_alive(duelist_id_a_active), "duelist_id_a_active dead");
+        assert!(sys.duelists.is_alive(duelist_id_a_inactive), "duelist_id_a_inactive alive");
+        // reply...
+        tester::execute_reply_duel(@sys.duels, B, duelist_id_b_inactive, duel_id, true);
+        let ch = sys.store.get_challenge_value(duel_id);
+        assert_eq!(ch.state, ChallengeState::InProgress, "ChallengeState::InProgress");
+        assert_eq!(ch.duelist_id_b, duelist_id_b_inactive, "challenged_id_ok");   // << UPDATED!!!
+        assert!(!sys.duelists.is_alive(duelist_id_b_active), "duelist_id_b_active dead");
+        assert!(sys.duelists.is_alive(duelist_id_b_inactive), "duelist_id_b_inactive alive");
+    }
+
+    #[test]
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+    fn test_stacker_not_stacked_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
+        let A = OWNER(); // not a stacker
+        let B = STACKER2();
+        let (duelist_id_a_active, _duelist_id_a_inactive, _duelist_id_b_active, _duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
+        // make active
+        tester::activate_duelist(ref sys, duelist_id_a_active);
+        // death by inactivity
+        tester::make_duelist_inactive(@sys, duelist_id_a_active, 3000);
+
+        let _duel_id: u128 = tester::execute_create_duel_ID(@sys.duels, A, duelist_id_a_active, B, MESSAGE(), DuelType::Practice, 48, 1);
+    }
+
+    #[test]
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+    fn test_stacker_not_stacked_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
+        let A = STACKER(); // not a stacker
+        let B = OWNER();
+        let (duelist_id_a_active, _duelist_id_a_inactive, duelist_id_b_active, _duelist_id_b_inactive) = _mint_stacker_duelists(@sys, A, B);
+        // make active
+        tester::activate_duelist(ref sys, duelist_id_b_active);
+        // death by inactivity
+        tester::make_duelist_inactive(@sys, duelist_id_b_active, 3000);
+
+        let duel_id: u128 = tester::execute_create_duel_ID(@sys.duels, A, duelist_id_a_active, B, MESSAGE(), DuelType::Practice, 48, 1);
+        // reply...
+        tester::execute_reply_duel(@sys.duels, B, duelist_id_b_active, duel_id, true);
     }
 
 
@@ -462,7 +565,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Invalid duelist', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Invalid duelist', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
     fn test_open_challenge_invalid_duelist() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE);
         let duel_id: u128 = tester::execute_create_duel(@sys.duels, OWNER(), ZERO(), MESSAGE(), DuelType::Seasonal, 0, 1);

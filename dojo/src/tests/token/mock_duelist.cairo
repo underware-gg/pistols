@@ -22,6 +22,7 @@ pub trait IDuelistToken<TState> {
     fn is_alive(self: @TState, token_id: u128) -> bool;
     fn life_count(self: @TState, duelist_id: u128) -> u8;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64) -> (RewardValues, RewardValues);
+    fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
     fn poke(ref self: TState, duelist_id: u128) -> bool;
     fn sacrifice(ref self: TState, duelist_id: u128);
 }
@@ -42,6 +43,8 @@ pub mod duelist_token {
         OTHER, OWNED_BY_OTHER,
     };
     use pistols::systems::tokens::budokan_mock::{PLAYERS};
+    use pistols::systems::tokens::duelist_token::duelist_token::{Errors};
+    // use pistols::libs::store::{Store, StoreTrait};
 
     #[generate_trait]
     impl WorldDefaultImpl of WorldDefaultTrait {
@@ -100,6 +103,12 @@ pub mod duelist_token {
         }
         fn transfer_rewards(ref self: ContractState, challenge: Challenge, tournament_id: u64) -> (RewardValues, RewardValues) {
             (Default::default(), Default::default())
+        }
+        fn get_validated_active_duelist_id(ref self: ContractState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128 {
+            assert(duelist_id.is_non_zero(), Errors::INVALID_DUELIST);
+            // let mut store: Store = StoreTrait::new(self.world_default());
+            assert(self.is_owner_of(address, duelist_id.into()) == true, Errors::NOT_YOUR_DUELIST);
+            (duelist_id)
         }
         fn poke(ref self: ContractState, duelist_id: u128) -> bool {
             (true)

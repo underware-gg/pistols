@@ -276,7 +276,7 @@ fn test_duelist_stack() {
     assert_eq!(duelist_2_2.duelist_profile, profile_1);
     assert_eq!(duelist_3_1.duelist_profile, profile_3);
     assert_eq!(duelist_3_2.duelist_profile, profile_3);
-    // validate member getter
+    // validate member getter: store.get_duelist_profile()
     assert_eq!(duelist_1_1.duelist_profile, sys.store.get_duelist_profile(duelist_1_1.duelist_id));
     assert_eq!(duelist_1_2.duelist_profile, sys.store.get_duelist_profile(duelist_1_2.duelist_id));
     assert_eq!(duelist_2_1.duelist_profile, sys.store.get_duelist_profile(duelist_2_1.duelist_id));
@@ -299,6 +299,13 @@ fn test_duelist_stack() {
     _assert_stack(@sys, acc3, profile_1, [].span());
     _assert_stack(@sys, acc3, profile_2, [].span());
     _assert_stack(@sys, acc3, profile_3, [id_3_1, id_3_2].span());
+    // validate member getter: store.get_active_duelist_id()
+    assert_eq!(sys.store.get_active_duelist_id(acc3, id_3_1), id_3_1);
+    assert_eq!(sys.store.get_active_duelist_id(acc3, id_3_2), id_3_1);
+    assert_eq!(sys.store.get_active_duelist_id(acc3, id_1_1), 0); // now owned by acc3
+    assert_eq!(sys.store.get_active_duelist_id(acc3, id_1_2), 0); // now owned by acc3
+    assert_eq!(sys.store.get_active_duelist_id(acc3, id_2_1), 0); // now owned by acc3
+    assert_eq!(sys.store.get_active_duelist_id(acc3, id_2_2), 0); // now owned by acc3
     // transfer...
     tester::impersonate(acc2);
     sys.duelists.transfer_from(acc2, acc1, id_2_1.into());
@@ -306,6 +313,10 @@ fn test_duelist_stack() {
     _assert_stack(@sys, acc1, profile_2, [id_1_2, id_2_1].span());
     _assert_stack(@sys, acc2, profile_1, [id_2_2].span());
     _assert_stack(@sys, acc2, profile_2, [].span());
+    assert_eq!(sys.store.get_active_duelist_id(acc1, id_1_2), id_1_2);
+    assert_eq!(sys.store.get_active_duelist_id(acc1, id_2_1), id_1_2);
+    assert_eq!(sys.store.get_active_duelist_id(acc2, id_2_1), 0);
+    assert_eq!(sys.store.get_active_duelist_id(acc2, id_2_2), id_2_2);
     tester::impersonate(acc3);
     sys.duelists.transfer_from(acc3, acc1, id_3_1.into());
     _assert_stack(@sys, acc1, profile_3, [id_3_1].span());
@@ -314,6 +325,10 @@ fn test_duelist_stack() {
     sys.duelists.transfer_from(acc3, acc1, id_3_2.into());
     _assert_stack(@sys, acc1, profile_3, [id_3_1, id_3_2].span());
     _assert_stack(@sys, acc3, profile_3, [].span());
+    assert_eq!(sys.store.get_active_duelist_id(acc1, id_3_1), id_3_1);
+    assert_eq!(sys.store.get_active_duelist_id(acc1, id_3_1), id_3_1);
+    assert_eq!(sys.store.get_active_duelist_id(acc3, id_3_1), 0);
+    assert_eq!(sys.store.get_active_duelist_id(acc3, id_3_1), 0);
     tester::impersonate(acc1);
     sys.duelists.transfer_from(acc1, acc2, id_3_2.into());
     _assert_stack(@sys, acc1, profile_3, [id_3_1].span());

@@ -163,7 +163,7 @@ pub mod duel_token {
 
     use pistols::interfaces::dns::{
         DnsTrait,
-        IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
+        IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait,
         IGameDispatcherTrait,
     };
     use pistols::models::{
@@ -198,7 +198,6 @@ pub mod duel_token {
 
     pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'DUEL: Invalid caller';
-        pub const INVALID_DUELIST: felt252          = 'DUEL: Invalid duelist';
         pub const INVALID_DUELIST_A_NULL: felt252   = 'DUEL: Duelist A null';
         pub const INVALID_DUELIST_B_NULL: felt252   = 'DUEL: Duelist B null';
         pub const INVALID_CHALLENGED_SELF: felt252  = 'DUEL: Challenged self';
@@ -206,11 +205,6 @@ pub mod duel_token {
         pub const INVALID_REPLY_SELF: felt252       = 'DUEL: Reply self';
         pub const INVALID_CHALLENGE: felt252        = 'DUEL: Invalid challenge';
         pub const NOT_YOUR_CHALLENGE: felt252       = 'DUEL: Not your challenge';
-        pub const NOT_YOUR_DUELIST: felt252         = 'DUEL: Not your duelist';
-        pub const DUELIST_IS_DEAD_A: felt252        = 'DUEL: Duelist A is dead!';
-        pub const DUELIST_IS_DEAD_B: felt252        = 'DUEL: Duelist B is dead!';
-        pub const INSUFFICIENT_LIVES_A: felt252     = 'DUEL: Insufficient lives A';
-        pub const INSUFFICIENT_LIVES_B: felt252     = 'DUEL: Insufficient lives B';
         // pub const CHALLENGER_NOT_ADMITTED: felt252  = 'DUEL: Challenger not allowed';
         // pub const CHALLENGED_NOT_ADMITTED: felt252  = 'DUEL: Challenged not allowed';
         pub const CHALLENGE_NOT_AWAITING: felt252   = 'DUEL: Challenge not Awaiting';
@@ -281,28 +275,6 @@ pub mod duel_token {
         ) -> u128 {
             let mut store: Store = StoreTrait::new(self.world_default());
 
-            // mint to game, so it can transfer to winner
-            let duel_id: u128 = self.token.mint_next(store.world.game_address());
-
-            // validate duelist ownership
-            let address_a: ContractAddress = starknet::get_caller_address();
-            let duelist_id_a: u128 = duelist_id;
-            let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-            assert(duelist_id_a.is_non_zero(), Errors::INVALID_DUELIST);
-            assert(duelist_dispatcher.is_owner_of(address_a, duelist_id_a.into()) == true, Errors::NOT_YOUR_DUELIST);
-
-            // validate duelist health
-// println!("poke A... {}", duelist_id_a);
-            duelist_dispatcher.poke(duelist_id_a);
-            let lives: u8 = duelist_dispatcher.life_count(duelist_id_a);
-            assert(lives > 0, Errors::DUELIST_IS_DEAD_A);
-            assert(lives >= lives_staked, Errors::INSUFFICIENT_LIVES_A);
-
-            // validate challenged
-            let address_b: ContractAddress = challenged_address;
-            // assert(address_b.is_non_zero(), Errors::INVALID_CHALLENGED); // allow open challenge
-            assert(address_b != address_a, Errors::INVALID_CHALLENGED_SELF);
-
             // validate duel type
             match duel_type {
                 DuelType::Seasonal | 
@@ -315,7 +287,19 @@ pub mod duel_token {
                 },
             };
 
-            // assert duelist is not in a challenge
+            // validate challenged
+            let address_a: ContractAddress = starknet::get_caller_address();
+            let address_b: ContractAddress = challenged_address;
+            assert(address_b != address_a, Errors::INVALID_CHALLENGED_SELF);
+
+            // get active duelist from stack
+            let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
+            let duelist_id_a: u128 = duelist_dispatcher.get_validated_active_duelist_id(address_a, duelist_id, lives_staked);
+
+            // mint to game, so it can transfer to winner
+            let duel_id: u128 = self.token.mint_next(store.world.game_address());
+
+            // assert duelist is not in a challenge, get into it
             store.enter_challenge(duelist_id_a, duel_id);
 
             // calc expiration
@@ -397,7 +381,6 @@ pub mod duel_token {
             assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
             let address_b: ContractAddress = starknet::get_caller_address();
-            let duelist_id_b: u128 = duelist_id;
             let timestamp: u64 = starknet::get_block_timestamp();
 
             if (challenge.timestamps.has_expired()) {
@@ -420,25 +403,15 @@ pub mod duel_token {
 
                 // Challenged is accepting...
                 if (accepted) {
+                    // get active duelist from stack
+                    let duelist_dispatcher: IDuelistTokenProtectedDispatcher = store.world.duelist_token_protected_dispatcher();
+                    challenge.duelist_id_b = duelist_dispatcher.get_validated_active_duelist_id(address_b, duelist_id, challenge.lives_staked);
+
                     // validate duelist
-                    assert(duelist_id_b.is_non_zero(), Errors::INVALID_DUELIST);
-                    assert(duelist_id_b != challenge.duelist_id_a, Errors::INVALID_CHALLENGED_SELF);
-                    // validate ownership
-                    let duelist_dispatcher = store.world.duelist_token_dispatcher();
-                    assert(duelist_dispatcher.is_owner_of(address_b, duelist_id_b.into()) == true, Errors::NOT_YOUR_DUELIST);
-
-                    // validate duelist health
-    // println!("poke B... {}", duelist_id_b);
-                    duelist_dispatcher.poke(duelist_id_b);
-                    let lives: u8 = duelist_dispatcher.life_count(duelist_id_b);
-                    assert(lives > 0, Errors::DUELIST_IS_DEAD_B);
-                    assert(lives >= challenge.lives_staked, Errors::INSUFFICIENT_LIVES_B);
-
-                    // duelist is ok
-                    challenge.duelist_id_b = duelist_id_b;
+                    assert(challenge.duelist_id_b != challenge.duelist_id_a, Errors::INVALID_CHALLENGED_SELF);
 
                     // assert duelist is not in a challenge
-                    store.enter_challenge(duelist_id_b, duel_id);
+                    store.enter_challenge(challenge.duelist_id_b, duel_id);
 
                     // Duelist 2 can commit
                     store.emit_challenge_action(@challenge, 2, true);

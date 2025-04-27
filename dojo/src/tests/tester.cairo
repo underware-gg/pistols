@@ -84,15 +84,17 @@ pub mod tester {
     //
 
     pub fn ZERO()      -> ContractAddress { starknet::contract_address_const::<0x0>() }
-    pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // owner of duelists 1-2
-    pub fn OWNER2()    -> ContractAddress { starknet::contract_address_const::<0x2>() } // owner of duelists 1-2
-    pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x3>() } // owner of duelists 3-4
-    pub fn OTHER2()    -> ContractAddress { starknet::contract_address_const::<0x4>() } // owner of duelists 3-4
-    pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x5>() } // owner of duelists 5-6
-    pub fn BUMMER2()   -> ContractAddress { starknet::contract_address_const::<0x6>() } // owner of duelists 5-6
+    pub fn OWNER()     -> ContractAddress { starknet::contract_address_const::<0x1>() } // mock owner of duelists 1-2
+    pub fn OWNER2()    -> ContractAddress { starknet::contract_address_const::<0x2>() } // mock owner of duelists 1-2
+    pub fn OTHER()     -> ContractAddress { starknet::contract_address_const::<0x3>() } // mock owner of duelists 3-4
+    pub fn OTHER2()    -> ContractAddress { starknet::contract_address_const::<0x4>() } // mock owner of duelists 3-4
+    pub fn BUMMER()    -> ContractAddress { starknet::contract_address_const::<0x5>() } // mock owner of duelists 5-6
+    pub fn BUMMER2()   -> ContractAddress { starknet::contract_address_const::<0x6>() } // mock owner of duelists 5-6
     pub fn RECIPIENT() -> ContractAddress { starknet::contract_address_const::<0x222>() }
     pub fn SPENDER()   -> ContractAddress { starknet::contract_address_const::<0x333>() }
     pub fn TREASURY()  -> ContractAddress { starknet::contract_address_const::<0x444>() }
+    pub fn STACKER()   -> ContractAddress { starknet::contract_address_const::<0x0101>() } // owns 2 stacked duelists
+    pub fn STACKER2()  -> ContractAddress { starknet::contract_address_const::<0x0202>() } // owns 2 stacked duelists
     // low part is owned token, but different address
     pub fn FAKE_OWNER_OF_1() -> ContractAddress { starknet::contract_address_const::<0x1234000000000000000000000000000000001>() }
     pub fn FAKE_OWNER_OF_2() -> ContractAddress { starknet::contract_address_const::<0x2234000000000000000000000000000000002>() }

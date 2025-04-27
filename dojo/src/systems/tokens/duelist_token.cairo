@@ -64,7 +64,7 @@ pub trait IDuelistToken<TState> {
     fn is_inactive(self: @TState, duelist_id: u128) -> bool;
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
-    fn poke(ref self: TState, duelist_id: u128);
+    fn poke(ref self: TState, duelist_id: u128) -> bool;
     fn sacrifice(ref self: TState, duelist_id: u128);
     fn memorialize(ref self: TState, duelist_id: u128);
 }
@@ -80,7 +80,7 @@ pub trait IDuelistTokenPublic<TState> {
     fn inactive_timestamp(self: @TState, duelist_id: u128) -> u64;
     fn inactive_fame_dripped(self: @TState, duelist_id: u128) -> u128;
     // write
-    fn poke(ref self: TState, duelist_id: u128); //@description: Reactivates an inactive Duelist
+    fn poke(ref self: TState, duelist_id: u128) -> bool; //@description: Reactivates an inactive Duelist
     fn sacrifice(ref self: TState, duelist_id: u128); //@description: Sacrifices a Duelist
     fn memorialize(ref self: TState, duelist_id: u128); //@description: Memorializes a Duelist
 }
@@ -89,6 +89,7 @@ pub trait IDuelistTokenPublic<TState> {
 #[starknet::interface]
 pub trait IDuelistTokenProtected<TState> {
     fn mint_duelists(ref self: TState, recipient: ContractAddress, profile_sample: DuelistProfile, quantity: usize, seed: felt252) -> Span<u128>;
+    fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
     fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64) -> (RewardValues, RewardValues);
 }
 
@@ -182,12 +183,12 @@ pub mod duelist_token {
     use pistols::utils::misc::{ETH};
     use graffiti::url::{UrlImpl};
 
-    mod Errors {
+    pub mod Errors {
         pub const INVALID_CALLER: felt252           = 'DUELIST: Invalid caller';
         pub const INVALID_DUELIST: felt252          = 'DUELIST: Invalid duelist';
+        pub const NOT_YOUR_DUELIST: felt252         = 'DUELIST: Not your duelist';
         pub const DUELIST_IS_DEAD: felt252          = 'DUELIST: Duelist is dead!';
-        pub const DUELIST_A_IS_DEAD: felt252        = 'DUELIST: Duelist A is dead!';
-        pub const DUELIST_B_IS_DEAD: felt252        = 'DUELIST: Duelist B is dead!';
+        pub const INSUFFICIENT_LIVES: felt252       = 'DUELIST: Insufficient lives';
         pub const NOT_IMPLEMENTED: felt252          = 'DUELIST: Not implemented';
     }
 
@@ -282,17 +283,19 @@ pub mod duelist_token {
         
         fn poke(ref self: ContractState,
             duelist_id: u128,
-        ) {
+        ) -> bool {
+            let mut survived: bool = true;
             let mut fame_dripped: u128 = self.inactive_fame_dripped(duelist_id);
             if (fame_dripped != 0) {
                 // burn fame_dripped
-                let survived: bool = self._reactivate_or_sacrifice(duelist_id, Option::Some(fame_dripped), CauseOfDeath::Forsaken);
+                survived = self._reactivate_or_sacrifice(duelist_id, Option::Some(fame_dripped), CauseOfDeath::Forsaken);
                 // only duel_token and owner can poke alive duelists
                 let world = self.world_default();
                 if (survived && !world.caller_is_duel_contract()) {
                     self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
                 }
             }
+            (survived)
         }
 
         fn sacrifice(ref self: ContractState,
@@ -361,7 +364,31 @@ pub mod duelist_token {
 
             (duelist_ids)
         }
-        
+
+        fn get_validated_active_duelist_id(ref self: ContractState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128 {
+            assert(duelist_id.is_non_zero(), Errors::INVALID_DUELIST);
+
+           // validate duelist ownership
+            let mut store: Store = StoreTrait::new(self.world_default());
+            assert(self.is_owner_of(address, duelist_id.into()) == true, Errors::NOT_YOUR_DUELIST);
+            
+            // get active duelist from stack
+            let mut active_duelist_id: u128 = store.get_active_duelist_id(address, duelist_id);
+            // poke inactivity (it may die!)
+// println!("poke A... {}", duelist_id_a);
+            if (self.poke(active_duelist_id) == false) {
+                // died, get next in line...
+                active_duelist_id = store.get_active_duelist_id(address, duelist_id);
+            }
+
+            // validate duelist health
+            let lives: u8 = self.life_count(active_duelist_id);
+            assert(lives > 0, Errors::DUELIST_IS_DEAD);
+            assert(lives >= lives_staked, Errors::INSUFFICIENT_LIVES);
+
+            (active_duelist_id)
+        }
+
         fn transfer_rewards(
             ref self: ContractState,
             challenge: Challenge,

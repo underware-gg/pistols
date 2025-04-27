@@ -577,14 +577,14 @@ pub mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Duelist A is dead!', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let challenge_count: u8 = MAX_LIVES + 1;
         _duel_until_death(@sys, WIN_2, challenge_count, 1);
     }
     #[test]
-    #[should_panic(expected:('DUEL: Duelist B is dead!', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         let challenge_count: u8 = MAX_LIVES + 1;
@@ -599,7 +599,7 @@ pub mod tests {
         _duel_until_death(@sys, WIN_2, 1, 1);
     }
     #[test]
-    #[should_panic(expected:('DUEL: Duelist A is dead!', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_1_1_1_dead_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         _duel_until_death(@sys, WIN_2, 1, 1);
@@ -616,7 +616,7 @@ pub mod tests {
         _duel_until_death(@sys, WIN_1, 1, 1);
     }
     #[test]
-    #[should_panic(expected:('DUEL: Duelist B is dead!', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_1_1_1_dead_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         _duel_until_death(@sys, WIN_1, 1, 1);
@@ -632,7 +632,7 @@ pub mod tests {
         _duel_until_death(@sys, WIN_2, 1, 2);
     }
     #[test]
-    #[should_panic(expected:('DUEL: Duelist A is dead!', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_1_2_dead_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         _duel_until_death(@sys, WIN_2, 1, 1);
@@ -647,7 +647,7 @@ pub mod tests {
         _duel_until_death(@sys, WIN_1, 1, 2);
     }
     #[test]
-    #[should_panic(expected:('DUEL: Duelist B is dead!', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_1_2_dead_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         _duel_until_death(@sys, WIN_1, 1, 1);
@@ -656,7 +656,7 @@ pub mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Insufficient lives A', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Insufficient lives', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_2_2_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         _duel_until_death(@sys, WIN_2, 1, 2);
@@ -671,7 +671,7 @@ pub mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Insufficient lives A', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Insufficient lives', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_inactive_alive_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         // duel once to create duelists
@@ -696,7 +696,7 @@ pub mod tests {
     }
 
     #[test]
-    #[should_panic(expected:('DUEL: Duelist A is dead!', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_inactive_dead_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         // duel once to create duelists
@@ -706,7 +706,7 @@ pub mod tests {
         _duel_until_death(@sys, WIN_2, 1, 2);
     }
     #[test]
-    #[should_panic(expected:('DUEL: Duelist B is dead!', 'ENTRYPOINT_FAILED'))]
+    #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
     fn test_duel_until_death_inactive_dead_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         // duel once to create duelists
