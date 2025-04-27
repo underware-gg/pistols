@@ -650,6 +650,7 @@ fn _test_duelist_sacrifice(sys: @TestSystems, token_id: u128, cause_of_death: Ca
 }
 
 #[test]
+#[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_sacrifice_OK() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -657,7 +658,8 @@ fn test_duelist_sacrifice_OK() {
 }
 
 #[test]
-#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
+// #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_sacrifice_already_dead() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -666,7 +668,8 @@ fn test_duelist_sacrifice_already_dead() {
 }
 
 #[test]
-#[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
+// #[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_sacrifice_not_owner() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -675,6 +678,7 @@ fn test_duelist_sacrifice_not_owner() {
 }
 
 #[test]
+#[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_memorialize_OK() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -682,7 +686,8 @@ fn test_duelist_memorialize_OK() {
 }
 
 #[test]
-#[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
+// #[should_panic(expected:('DUELIST: Duelist is dead!', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_memorialize_already_dead() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;
@@ -691,7 +696,8 @@ fn test_duelist_memorialize_already_dead() {
 }
 
 #[test]
-#[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected:('DUELIST: Not implemented', 'ENTRYPOINT_FAILED'))]
+// #[should_panic(expected:('ERC721Combo: not owner', 'ENTRYPOINT_FAILED'))]
 fn test_duelist_memorialize_not_owner() {
     let mut sys: TestSystems = setup(0);
     let token_id: u128 = TOKEN_ID_1_1.low;

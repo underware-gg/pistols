@@ -301,6 +301,7 @@ pub mod duelist_token {
         fn sacrifice(ref self: ContractState,
             duelist_id: u128,
         ) {
+            assert(false, Errors::NOT_IMPLEMENTED);
             self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
             self._reactivate_or_sacrifice(duelist_id, Option::None, CauseOfDeath::Sacrifice);
         }
@@ -308,6 +309,7 @@ pub mod duelist_token {
         fn memorialize(ref self: ContractState,
             duelist_id: u128,
         ) {
+            assert(false, Errors::NOT_IMPLEMENTED);
             self.erc721_combo._require_owner_of(starknet::get_caller_address(), duelist_id.into());
             self._reactivate_or_sacrifice(duelist_id, Option::None, CauseOfDeath::Memorize);
         }
