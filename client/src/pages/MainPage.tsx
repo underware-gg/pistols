@@ -19,6 +19,7 @@ import ChallengeModal from '/src/components/modals/ChallengeModal'
 import NewChallengeModal from '/src/components/modals/NewChallengeModal'
 import SelectDuelistModal from '/src/components/modals/SelectDuelistModal'
 import WalletFinderModal from '/src/components/modals/WalletFinderModal'
+import SettingsModal from '/src/components/modals/SettingsModal'
 import ScProfile from '/src/components/scenes/ScProfile'
 import ScTavern from '/src/components/scenes/ScTavern'
 import ScDuelsBoard from '/src/components/scenes/ScDuelsBoard'
@@ -168,7 +169,8 @@ function TutorialUI({
 
 
 function Modals() {
-  const { walletFinderOpener, duelistSelectOpener } = usePistolsContext()
+  const { walletFinderOpener, duelistSelectOpener, settingsOpener } = usePistolsContext()
+
   return (
     <>
       <ChallengeModal />
@@ -177,6 +179,7 @@ function Modals() {
       <NewChallengeModal />
       <SelectDuelistModal opener={duelistSelectOpener} />
       <WalletFinderModal opener={walletFinderOpener} />
+      <SettingsModal opener={settingsOpener} />
     </>
   )
 }

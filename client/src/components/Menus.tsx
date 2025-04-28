@@ -11,8 +11,7 @@ export function MenuDuel({
 } : {
   duelId: bigint
 }) {
-  const { dispatchSetting, settings, SettingsActions } = useSettings()
-  const { dispatchSetDuel, tutorialOpener } = usePistolsContext()
+  const { dispatchSetDuel, tutorialOpener, settingsOpener } = usePistolsContext()
   const { dispatchSceneBack } = usePistolsScene()
 
   const _backToTavern = () => {
@@ -20,8 +19,8 @@ export function MenuDuel({
     dispatchSetDuel(0n)
   }
 
-  const _switchSfx = () => {
-    dispatchSetting(SettingsActions.SFX_ENABLED, !settings.sfxEnabled)
+  const _openSettings = () => {
+    settingsOpener.open()
   }
 
   const _openTutorial = () => {
@@ -47,7 +46,7 @@ export function MenuDuel({
         </Menu.Item>
 
         <Menu.Item className='button_duel' type='icon'>
-          <IconClick name={settings.sfxEnabled ? 'volume up' : 'volume off'} onClick={() => _switchSfx()} className='icon-control'  />
+          <IconClick name={'settings'} onClick={() => _openSettings()} className='icon-control'  />
         </Menu.Item>
 
 

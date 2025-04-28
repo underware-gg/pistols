@@ -129,7 +129,11 @@ export default function ScDoor() {
                 />
                 <Divider content='OR' as='h5' className='DividerSmall'/>
                 <EnterAsGuestButton 
-                  onButtonHover={() => playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_4)}
+                  onButtonHover={() => {
+                    playButtonHoverSound(AudioName.DOORKEEP_GRUNTING_4);
+                    (_currentScene as InteractibleScene)?.hideItem(TextureName.bg_door_face_angry, true)
+                  }}
+                  onButtonLeave={() => (_currentScene as InteractibleScene)?.showItem(TextureName.bg_door_face_angry, true)}
                   onDoorCreak={playDoorCreakingSound}
                 />
               </>}
@@ -188,9 +192,11 @@ function DoorHeader() {
 
 export function EnterAsGuestButton({
   onButtonHover,
+  onButtonLeave,
   onDoorCreak
 }: {
   onButtonHover?: () => void,
+  onButtonLeave?: () => void,
   onDoorCreak?: () => void
 }) {
   const { dispatchSetScene } = usePistolsScene()
@@ -207,6 +213,7 @@ export function EnterAsGuestButton({
       onClick={() => _enterAsGuest()} 
       label='Enter as Guest' 
       onMouseEnter={onButtonHover}
+      onMouseLeave={onButtonLeave}
     />
   )
 }

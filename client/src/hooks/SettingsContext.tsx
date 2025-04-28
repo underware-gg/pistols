@@ -12,7 +12,9 @@ export const initialState = {
   debugScene: false,
   framerate: 60,
   musicEnabled: true,
+  musicVolume: 1.0,
   sfxEnabled: true,
+  sfxVolume: 1.0,
   duelSpeedFactor: 1.0,
   completedTutorialLevel: 0,
   // internal
@@ -24,7 +26,9 @@ const SettingsActions = {
   DEBUG_SCENE: 'settings.DEBUG_SCENE',
   FRAMERATE: 'settings.FRAMERATE',
   MUSIC_ENABLED: 'settings.MUSIC_ENABLED',
+  MUSIC_VOLUME: 'settings.MUSIC_VOLUME',
   SFX_ENABLED: 'settings.SFX_ENABLED',
+  SFX_VOLUME: 'settings.SFX_VOLUME',
   DUEL_SPEED_FACTOR: 'settings.DUEL_SPEED_FACTOR',
   TUTORIAL_LEVEL: 'settings.TUTORIAL_LEVEL',
 }
@@ -39,7 +43,9 @@ type ActionType =
   | { type: 'DEBUG_SCENE', payload: boolean }
   | { type: 'FRAMERATE', payload: number }
   | { type: 'MUSIC_ENABLED', payload: boolean }
+  | { type: 'MUSIC_VOLUME', payload: number }
   | { type: 'SFX_ENABLED', payload: boolean }
+  | { type: 'SFX_VOLUME', payload: number }
   | { type: 'DUEL_SPEED_FACTOR', payload: number }
   | { type: 'TUTORIAL_LEVEL', payload: number }
   // internal
@@ -76,7 +82,9 @@ const SettingsProvider = ({
       [SettingsActions.DEBUG_SCENE]: () => setCookie(cookieName, state.debugScene, _options),
       [SettingsActions.FRAMERATE]: () => setCookie(cookieName, state.framerate, _options),
       [SettingsActions.MUSIC_ENABLED]: () => setCookie(cookieName, state.musicEnabled, _options),
+      [SettingsActions.MUSIC_VOLUME]: () => setCookie(cookieName, state.musicVolume, _options),
       [SettingsActions.SFX_ENABLED]: () => setCookie(cookieName, state.sfxEnabled, _options),
+      [SettingsActions.SFX_VOLUME]: () => setCookie(cookieName, state.sfxVolume, _options),
       [SettingsActions.DUEL_SPEED_FACTOR]: () => setCookie(cookieName, Number(state.duelSpeedFactor), _options),
       [SettingsActions.TUTORIAL_LEVEL]: () => setCookie(cookieName, state.completedTutorialLevel, _options),
     }
@@ -113,6 +121,16 @@ const SettingsProvider = ({
       case SettingsActions.SFX_ENABLED: {
         newState.sfxEnabled = action.payload as boolean
         cookieSetter(SettingsActions.SFX_ENABLED, newState)
+        break
+      }
+      case SettingsActions.MUSIC_VOLUME: {
+        newState.musicVolume = action.payload as number
+        cookieSetter(SettingsActions.MUSIC_VOLUME, newState)
+        break
+      }
+      case SettingsActions.SFX_VOLUME: {
+        newState.sfxVolume = action.payload as number
+        cookieSetter(SettingsActions.SFX_VOLUME, newState)
         break
       }
       case SettingsActions.DUEL_SPEED_FACTOR: {

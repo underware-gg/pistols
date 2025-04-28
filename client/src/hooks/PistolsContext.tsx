@@ -50,6 +50,7 @@ export const initialState = {
   bookOpener: null as Opener,
   duelistSelectOpener: null as Opener,
   walletFinderOpener: null as Opener,
+  settingsOpener: null as Opener,
 }
 
 const PistolsActions = {
@@ -113,6 +114,7 @@ const PistolsProvider = ({
   const bookOpener = useOpener()
   const duelistSelectOpener = useOpener()
   const walletFinderOpener = useOpener()
+  const settingsOpener = useOpener()
 
   const [hasSearchParams, setHasSearchParams] = useState(false)
 
@@ -226,6 +228,7 @@ const PistolsProvider = ({
                         bookOpener.isOpen || 
                         duelistSelectOpener.isOpen || 
                         walletFinderOpener.isOpen ||
+                        settingsOpener.isOpen ||
                         hasSearchParams ||
                         (state.challengingAddress && state.challengingDuelistId)
 
@@ -237,6 +240,7 @@ const PistolsProvider = ({
     bookOpener.isOpen,
     duelistSelectOpener.isOpen,
     walletFinderOpener.isOpen,
+    settingsOpener.isOpen,
     hasSearchParams,
     state.challengingAddress,
     state.challengingDuelistId
@@ -252,6 +256,7 @@ const PistolsProvider = ({
       bookOpener,
       duelistSelectOpener,
       walletFinderOpener,
+      settingsOpener,
     } }}>
       {children}
     </PistolsContext.Provider>

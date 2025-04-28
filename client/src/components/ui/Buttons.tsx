@@ -6,7 +6,7 @@ import { useSettings } from '/src/hooks/SettingsContext'
 import { useThreeJsContext } from '/src/hooks/ThreeJsContext'
 import { useLordsBalance } from '/src/stores/coinStore'
 import { LordsBagIcon } from '/src/components/account/Balance'
-import { CustomIcon, IconSizeProp } from '/src/components/ui/Icons'
+import { CustomIcon, IconClick, IconSizeProp } from '/src/components/ui/Icons'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { SceneName } from '/src/data/assets'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
@@ -189,6 +189,21 @@ interface SettingsIconProps {
   icon?: boolean
 }
 
+export function SettingsGearButton({
+  size = 'large',
+}: {
+  size?: IconSizeProp
+}) {
+  const { settingsOpener } = usePistolsContext()
+  return (
+    <IconClick 
+      name="settings" 
+      onClick={() => settingsOpener.open()} 
+      size={size}
+    />
+  )
+}
+
 export function SettingsIcon({
   nameOn = 'toggle on',
   nameOff = 'toggle off',
@@ -226,6 +241,7 @@ export function MusicToggle({
     />
   )
 }
+
 export function SfxToggle({
   size = 'large',
 }: {

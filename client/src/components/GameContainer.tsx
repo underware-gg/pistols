@@ -106,7 +106,7 @@ const GameAudios = ({
 // Will disable MUSIC settings if not interacted yet
 //
 export const TavernAudios = () => {
-  const { musicEnabled, sfxEnabled } = useSettings()
+  const { musicEnabled, sfxEnabled, musicVolume, sfxVolume } = useSettings()
   const { gameImpl, audioLoaded } = useThreeJsContext()
   const { atGate, atDoor, atDuel, atTutorial } = usePistolsScene()
 
@@ -115,6 +115,14 @@ export const TavernAudios = () => {
       gameImpl?.stopAudio(AudioName.MUSIC_MENUS)
     }
   }, [])
+
+  useEffect(() => {
+    gameImpl?.setVolumeMultiplier(musicVolume)
+  }, [musicVolume, gameImpl])
+
+  useEffect(() => {
+    gameImpl?.setSfxVolumeMultiplier(sfxVolume)
+  }, [sfxVolume, gameImpl])
 
   useEffect(() => {
     gameImpl?.playAudio(AudioName.MUSIC_MENUS, musicEnabled && audioLoaded && !atGate && !atDoor && !atDuel && !atTutorial, 2)

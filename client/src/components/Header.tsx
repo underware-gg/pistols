@@ -5,7 +5,7 @@ import { useQueryParams, SortDirection, ChallengeColumn, PlayerColumn } from '/s
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { ChallengeStateNames, LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
-import { BackButton, MusicToggle, FilterButton } from '/src/components/ui/Buttons'
+import { BackButton, MusicToggle, FilterButton, SettingsGearButton } from '/src/components/ui/Buttons'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import { arrayRemoveValue } from '@underware/pistols-sdk/utils'
 import { SceneName } from '/src/data/assets'
@@ -130,7 +130,7 @@ export function Header() {
         <>
           <div className='UIHeader NoMouse NoDrag NoSelection' style={{ display: 'flex', justifyContent: 'space-between' }}>
             <CurtainUI visible={!atTavern && !atTutorial} short={true} />
-            <BannerButton button={<MusicToggle size='big' />} visible={atTavern} />
+            <BannerButton button={<SettingsGearButton size='big'/>} visible={atTavern || atProfile} right={true} />
           </div>
           <Image className='NoMouse NoDrag NoSelection ' src='/images/ui/tavern/wooden_corners.png' style={{ position: 'absolute' }} />
           <div className='UIHeaderCorner' style={{ padding: `${aspectWidth(1)}px ${aspectWidth(2)}px` }}>
@@ -150,7 +150,7 @@ export function Header() {
       {/* door and gate UI */}
       <>
         <BannerButton button={<BackButton icon='left-arrow' size='big'/>} visible={atDoor} short={true} />
-        <BannerButton button={<MusicToggle size='big'/>} right={true} visible={atDoor} short={true} />
+        <BannerButton button={<SettingsGearButton size='big'/>} right={true} visible={atDoor} short={true} />
       </>
     </div>
   )
@@ -203,7 +203,8 @@ function BannerButton({
         borderColor: '#f1d242', 
         borderWidth: `${aspectWidth(0.2)}px`,
         borderRadius: '500px', 
-        backgroundColor: '#5f1011' 
+        backgroundColor: '#5f1011',
+        paddingLeft: aspectWidth(0.24),
       }}>
         {button}
       </div>

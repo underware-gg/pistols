@@ -71,8 +71,12 @@ export default function DuelistProfile({
       .to({ rotation: endRotation, rotationText: endRotationText, y: -150, scale: 1.6 }, duration)
       .easing(TWEEN.Easing.Elastic.Out)
       .onUpdate((value) => {
-        referenceContainer.current.style.transform = `rotate(${value.rotation}deg) translateY(${value.y}px)`;
-        referenceText.current.style.transform = `rotate(${value.rotationText}deg) scale(${value.scale})`;
+        if (referenceContainer.current) {
+          referenceContainer.current.style.transform = `rotate(${value.rotation}deg) translateY(${value.y}px)`;
+        }
+        if (referenceText.current) {
+          referenceText.current.style.transform = `rotate(${value.rotationText}deg) scale(${value.scale})`;
+        }
       })
       .start();
 
@@ -86,12 +90,18 @@ export default function DuelistProfile({
         .to({ opacity: 0 }, duration / 4)
         .delay(duration / 2)
         .onUpdate((value) => {
-          referenceText.current.style.opacity = value.opacity.toString();
+          if (referenceText.current) {
+            referenceText.current.style.opacity = value.opacity.toString();
+          }
         })
         .onComplete(() => {
-          referenceContainer.current.style.transform = `rotate(0deg) translateY(0px)`;
-          referenceText.current.style.transform = `rotate(0deg) scale(0.9)`;
-          referenceText.current.style.opacity = '0';
+          if (referenceContainer.current) {
+            referenceContainer.current.style.transform = `rotate(0deg) translateY(0px)`;
+          }
+          if (referenceText.current) {
+            referenceText.current.style.transform = `rotate(0deg) scale(0.9)`;
+            referenceText.current.style.opacity = '0';
+          }
         })
       )
       .start();

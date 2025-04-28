@@ -20,7 +20,7 @@ import ee from 'event-emitter'
 export var emitter = ee()
 
 import { TEXTURES, SPRITESHEETS, TextureName } from '/src/data/assets.tsx'
-import { AudioName, AUDIO_ASSETS } from '/src/data/audioAssets.tsx'
+import { AudioName, AUDIO_ASSETS, AudioType } from '/src/data/audioAssets.tsx'
 import { SceneName } from '/src/data/assets.tsx'
 import { map } from '@underware/pistols-sdk/utils'
 import { SpriteSheet } from './SpriteSheetMaker.tsx'
@@ -281,7 +281,7 @@ async function loadAssets() {
   
   setTimeout(() => {
     checkKTX2LoaderState(ktx2Loader)
-  }, 5_000)
+  }, 10_000)
 }
 
 let ktxLoaderCount = 0
@@ -1603,6 +1603,30 @@ export function animateActions(actionA: Action, actionB: Action, healthA: number
 //-------------------------------
 // Audio
 //
+
+let volumeMultiplier = 1.0
+let sfxVolumeMultiplier = 1.0
+
+export function setVolumeMultiplier(multiplier: number) {
+  volumeMultiplier = multiplier
+  // Update volume for all currently playing music tracks
+  Object.entries(AUDIO_ASSETS).forEach(([name, asset]) => {
+    if (asset?.object?.isPlaying && asset.type === AudioType.MUSIC) {
+      asset.object.setVolume((asset.volume ?? 1) * volumeMultiplier)
+    }
+  })
+}
+
+export function setSfxVolumeMultiplier(multiplier: number) {
+  sfxVolumeMultiplier = multiplier
+  // Update volume for all currently playing sfx tracks
+  Object.entries(AUDIO_ASSETS).forEach(([name, asset]) => {
+    if (asset?.object?.isPlaying && asset.type === AudioType.SFX) {
+      asset.object.setVolume((asset.volume ?? 1) * sfxVolumeMultiplier)
+    }
+  })
+}
+
 export function playAudio(name: AudioName, enabled: boolean = true, fadeInDuration: number = 0.0) {
   const asset = AUDIO_ASSETS[name]
   if (asset?.object) {
@@ -1612,7 +1636,7 @@ export function playAudio(name: AudioName, enabled: boolean = true, fadeInDurati
       }
       if (enabled) {
         // Set initial volume to 0 for fade in
-        const originalVolume = asset.volume ?? 1
+        const originalVolume = (asset.volume ?? 1) * (asset.type === AudioType.SFX ? sfxVolumeMultiplier : volumeMultiplier)
         asset.object.setVolume(0)
         asset.object.play()
         
@@ -1648,7 +1672,7 @@ export function stopAudio(name: AudioName, fadeOutDuration: number = 0.0) {
       asset.object.stop()
     } else {
       // Fade out
-      const originalVolume = asset.object.getVolume()
+      const originalVolume = asset.object.getVolume() * (asset.type === AudioType.SFX ? sfxVolumeMultiplier : volumeMultiplier)
       const startTime = Date.now()
       const fadeInterval = setInterval(() => {
         const elapsedTime = (Date.now() - startTime) / 1000

@@ -1,0 +1,153 @@
+@import 'color';
+@import 'aspect';
+
+.SettingsModal {
+  .SettingsCloseIcon {
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    top: aspect-width(0.6);
+    right: 0;
+    color: $color-bright;
+    cursor: pointer;
+    font-size: 0.8em;
+    transition: color 0.2s ease scale 0.2s ease;
+
+    &:hover {
+      color: $color-brightest;
+      transform: scale(1.1);
+    }
+  }
+
+  .SettingsSection {
+    margin-bottom: 2rem;
+
+    h3 {
+      color: $color-brightest;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .SettingsControl {
+    padding: aspect-width(1);
+    margin-bottom: 1.5rem;
+
+    .ControlHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: aspect-width(0.3);
+      font-size: aspect-width(1.2);
+
+      span {
+        color: $color-bright;
+      }
+    }
+
+    .ui.button {
+      background-color: transparent;
+      color: $color-bright;
+      border: 1px solid $color-bright;
+      padding: 0.5rem;
+
+      &:hover {
+        background-color: $color-bright;
+        color: $color-darkest;
+      }
+    }
+
+    .MuiSlider-root {
+      color: $color-important;
+
+      .MuiSlider-thumb {
+        background-color: $color-important;
+      }
+
+      .MuiSlider-track {
+        background-color: $color-important;
+      }
+
+      .MuiSlider-rail {
+        background-color: rgba($color-important, 0.3);
+      }
+    }
+  }
+
+  .ReturnToTavern {
+    margin-bottom: 2rem;
+  }
+
+  .InfoSection {
+    border-top: 1px solid $color-bright;
+    padding-top: 1rem;
+    margin-top: 2rem;
+
+    .InfoButtons {
+      display: flex;
+      justify-content: flex-end;
+      margin-left: auto;
+
+      .spaced {
+        margin-left: aspect-width(2.5);
+      }
+
+      .ui.button {
+        background-color: transparent;
+        color: $color-bright;
+        border: 1px solid $color-bright;
+        padding: 0.5rem 1rem;
+
+        &:hover {
+          background-color: $color-bright;
+          color: $color-darkest;
+        }
+      }
+    }
+  }
+
+  .socialIconStyle {
+    width: aspect-width(2.2);
+    height: aspect-width(2.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-color: rgba(239, 151, 88, 0.15);
+    color: #ef9758;
+    font-size: aspect-width(1.2);
+    transition: transform 0.2s, background-color 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .socialIconStyle > .icon {
+    width: 80%;
+    height: 80%;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: unset !important;
+    align-content: center;
+  }
+  
+  .socialLinkStyle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #c8b6a8;
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+    text-decoration: none;
+    transition: color 0.2s, scale 0.2s;
+    width: auto;
+    
+  }
+
+  .socialLinkStyle:hover {
+    color: #ef9758;
+    scale: 1.05;
+    
+    .socialIconStyle {
+      background-color: rgba(239, 151, 88, 0.25);
+    }
+  }
+} 

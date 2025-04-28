@@ -303,9 +303,9 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
   },
   [SceneName.Tavern]: {
     backgrounds: [
-      { texture: TextureName.bg_tavern_background, shiftMultiplier: -0.015, renderOrder: 0 },
-      { texture: TextureName.bg_tavern_bartender, shiftMultiplier: 0.005, renderOrder: 1 },
-      { texture: TextureName.bg_tavern_bar, shiftMultiplier: 0.01, renderOrder: 2 },
+      { texture: TextureName.bg_tavern_background, shiftMultiplier: -0.01, renderOrder: 0 },
+      { texture: TextureName.bg_tavern_bartender, shiftMultiplier: 0.004, renderOrder: 1 },
+      { texture: TextureName.bg_tavern_bar, shiftMultiplier: 0.011, renderOrder: 2 },
     ],
     items: [
       { name: 'pistol', color: 'ff0000', description: 'Leaderboards', mask: TextureName.bg_tavern_trophy_mask, renderOrder: 0 },
@@ -313,7 +313,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { name: 'bartender', color: '00ff00', description: 'Bartender', mask: TextureName.bg_tavern_bartender_mask, renderOrder: 1 },
       { name: 'bottle', color: '0000ff', description: 'Dueling', mask: TextureName.bg_tavern_bar_mask, renderOrder: 2 },
     ],
-    scaleAddon: 0.016
+    scaleAddon: 0.014
   },
   [SceneName.Duelists]: {
     backgrounds: [
@@ -342,7 +342,9 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     ]
   },
   [SceneName.Leaderboards]: {
-    backgrounds: [{ texture: TextureName.bg_leaderboards, shiftMultiplier: 0, renderOrder: 0 }]
+    backgrounds: [
+      { texture: TextureName.bg_leaderboards, shiftMultiplier: 0, renderOrder: 0 }
+    ]
   },
   [SceneName.Graveyard]: {
     backgrounds: [
