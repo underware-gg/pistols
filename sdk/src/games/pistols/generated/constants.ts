@@ -15,9 +15,9 @@ export const INTERFACE_DESCRIPTIONS: any = {
   IGame: {
     commit_moves: 'Commit moves of a Duelist in a Duel',
     reveal_moves: 'Reveal moves of a Duelist in a Duel',
-    clear_call_to_action: 'Clear the required action call for a duelist',
     collect_duel: 'Close expired duels',
     collect_season: 'Close the current season and start the next one',
+    clear_call_to_action: 'Clear the required action call for a duelist',
   },
   // from: ../dojo/src/systems/tokens/duel_token.cairo
   IDuelTokenPublic: {
@@ -146,7 +146,7 @@ export enum PoolType {
   FamePeg = 'FamePeg', // 2
   Season = 'Season', // 3
   Tournament = 'Tournament', // 4
-  SacredFlame = 'SacredFlame', // 5
+  Sacrifice = 'Sacrifice', // 5
 };
 export const getPoolTypeValue = (name: PoolType): number | undefined => _indexOrUndefined(Object.keys(PoolType).indexOf(name));
 export const getPoolTypeFromValue = (value: number): PoolType | undefined => Object.keys(PoolType)[value] as PoolType;
@@ -582,14 +582,14 @@ type type_FAME = {
   ONE_LIFE: bigint, // cairo: u256
   MAX_INACTIVE_TIMESTAMP: bigint, // cairo: u64
   TIMESTAMP_TO_DRIP_ONE_FAME: bigint, // cairo: u64
-  SACRED_FLAME_PERCENTAGE: number, // cairo: u8
+  SACRIFICE_PERCENTAGE: number, // cairo: u8
 };
 export const FAME: type_FAME = {
   MINT_GRANT_AMOUNT: (3000n * CONST.ETH_TO_WEI),
   ONE_LIFE: (1000n * CONST.ETH_TO_WEI),
   MAX_INACTIVE_TIMESTAMP: TIMESTAMP.FOUR_WEEKS,
   TIMESTAMP_TO_DRIP_ONE_FAME: (10n * TIMESTAMP.ONE_MINUTE),
-  SACRED_FLAME_PERCENTAGE: 60,
+  SACRIFICE_PERCENTAGE: 60,
 };
 
 // from: ../dojo/src/interfaces/dns.cairo

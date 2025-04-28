@@ -17,11 +17,12 @@ historical = [
 [indexing]
 pending = true
 transactions = true
+world_block = 1
 contracts = [
-  "erc721:0x4a41ff366e3353d172dcbd20ca9ed4f29d207c2d5b1a9e60ceb9a42e8541da4", # duel_token
-  "erc721:0x10caf4864f3dfd2cb5b0f0a523e30d136c83dcc090f11786cdf094b4c040d07", # duelist_token
+  "erc721:0x548eecbb59a0dbbb0b6502a0fe68561cab9734de6d17265f00c907720ffba62", # duel_token
+  "erc721:0x449843e9ec51d4ad59e0a60ba6fc116c93d859b1952f57cd723f7429ce51d99", # duelist_token
   "erc721:0x2bf948b276094aac70bb12f87851c18c4694fcee6869667b00ca33fbf9789b9", # pack_token
-  "erc721:0x21c3e2a55e75835db5f7eacf1a12ee15553d3a6cdcca425296f019dffea2906", # tournament_token
+  # "erc721:$tournament_token", # tournament_token
   "erc20:0x439331284377eeb53b8f88cc00bf352147e60e1fb17f090c162830eb50bfe22", # fame_coin
   "erc20:0x4a59256955ddbae0a4088a16a5755ef406ccc248e111f290dab6462bf1a2441", # fools_coin
   "erc20:0x12400b0bb6147510ed276b255953d6d4d34cfa788036b470e8e4fdef2769eed", # lords
