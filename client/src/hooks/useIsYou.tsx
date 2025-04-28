@@ -28,3 +28,12 @@ export const useIsMyDuelist = (otherDuelistId: BigNumberish) => {
   ), [address, owner, isPlayerCharacter, otherDuelistId])
   return isMyDuelist
 }
+
+export const checkIsDuelistCharacter = (duelistId: BigNumberish) => {
+  const isPlayerCharacter = bigintEquals(duelistId ?? 0, PLAYER_CHARACTER_ID)
+  const isCharacter = BigInt(duelistId ?? 0) >= constants.PROFILES.CHARACTER_ID_BASE
+  return {
+    isPlayerCharacter,
+    isCharacter,
+  }
+}

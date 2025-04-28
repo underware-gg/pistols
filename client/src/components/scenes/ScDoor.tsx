@@ -190,13 +190,13 @@ export function EnterAsGuestButton({
   onButtonHover,
   onDoorCreak
 }: {
-  onButtonHover: () => void,
-  onDoorCreak: () => void
+  onButtonHover?: () => void,
+  onDoorCreak?: () => void
 }) {
   const { dispatchSetScene } = usePistolsScene()
 
   const _enterAsGuest = () => {
-    onDoorCreak()
+    onDoorCreak?.()
     dispatchSetScene(SceneName.Tavern)
   }
   
@@ -217,13 +217,13 @@ export function PlayGameButton({
   onDoorCreak
 }: {
   large?: boolean,
-  onButtonHover: () => void,
-  onDoorCreak: () => void
+  onButtonHover?: () => void,
+  onDoorCreak?: () => void
 }) {
   const { dispatchSetScene } = usePistolsScene()
 
   const _playGame = () => {
-    onDoorCreak()
+    onDoorCreak?.()
     dispatchSetScene(SceneName.Tutorial)
   }
   
@@ -247,8 +247,8 @@ export function ConnectButton({
 }: {
   setLoading?: (loading: boolean) => void,
   large?: boolean,
-  onButtonHover: () => void,
-  onDoorCreak: () => void
+  onButtonHover?: () => void,
+  onDoorCreak?: () => void
 }) {
   const { isConnected, isConnecting } = useAccount()
   const { isLoading, isError } = useDojoStatus()
@@ -271,17 +271,16 @@ export function ConnectButton({
   
   const handleMouseEnter = () => {
     if (canConnect) {
-      onButtonHover()
+      onButtonHover?.()
     }
   }
 
   const handleTutorialChoice = (playTutorial: boolean) => {
     setShowTutorialPrompt(false)
+    onDoorCreak?.()
     if (playTutorial) {
-      onDoorCreak()
       dispatchSetScene(SceneName.Tutorial)
     } else {
-      onDoorCreak()
       dispatchSetScene(SceneName.Tavern)
     }
   }
@@ -294,7 +293,7 @@ export function ConnectButton({
         if (canClaimStarterPack) {
           setShowTutorialPrompt(true)
         } else {
-          onDoorCreak()
+          onDoorCreak?.()
           dispatchSetScene(SceneName.Tavern)
         }
       }, 1000)

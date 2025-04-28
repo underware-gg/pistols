@@ -4,7 +4,7 @@ import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { useGetChallenge } from '/src/stores/challengeStore'
 import { useDuelist } from '/src/stores/duelistStore'
-import { useIsMyAccount } from '/src/hooks/useIsYou'
+import { checkIsDuelistCharacter, useIsMyAccount } from '/src/hooks/useIsYou'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
 import { useDuelCallToAction } from '/src/stores/eventsModelStore'
 import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
@@ -26,6 +26,8 @@ export type DuelistInfo = {
   name: string,
   characterType: CharacterType,
   isYou: boolean,
+  isCharacter: boolean,
+  isPlayerCharacter: boolean,
 }
 
 export type DuelContextState = {
@@ -88,6 +90,8 @@ const emptyDuelistInfo: DuelistInfo = {
   name: "",
   characterType: null,
   isYou: false,
+  isCharacter: false,
+  isPlayerCharacter: false,
 }
 
 // Default empty challenge
@@ -321,6 +325,11 @@ export const DuelContextProvider: React.FC<{
     swapSides ? canAutoRevealA : canAutoRevealB,
   [swapSides, canAutoRevealA, canAutoRevealB]);
 
+  const isCharacterA = checkIsDuelistCharacter(duelistIdA).isCharacter
+  const isCharacterB = checkIsDuelistCharacter(duelistIdB).isCharacter
+  const isPlayerCharacterA = checkIsDuelistCharacter(duelistIdA).isPlayerCharacter
+  const isPlayerCharacterB = checkIsDuelistCharacter(duelistIdB).isPlayerCharacter
+
   // Prepare duelist information - only recompute when necessary
   const leftDuelist = useMemo(() => ({
     id: swapSides ? duelistIdB : duelistIdA,
@@ -328,6 +337,8 @@ export const DuelContextProvider: React.FC<{
     name: swapSides ? duelistB.name : duelistA.name,
     characterType: swapSides ? duelistB.characterType : duelistA.characterType,
     isYou: swapSides ? isYouB : isYouA,
+    isCharacter: swapSides ? isCharacterB : isCharacterA,
+    isPlayerCharacter: swapSides ? isPlayerCharacterB : isPlayerCharacterA,
   }), [
     swapSides, 
     duelistIdA, duelistIdB, 
@@ -343,6 +354,8 @@ export const DuelContextProvider: React.FC<{
     name: swapSides ? duelistA.name : duelistB.name,
     characterType: swapSides ? duelistA.characterType : duelistB.characterType,
     isYou: swapSides ? isYouA : isYouB,
+    isCharacter: swapSides ? isCharacterA : isCharacterB,
+    isPlayerCharacter: swapSides ? isPlayerCharacterA : isPlayerCharacterB,
   }), [
     swapSides, 
     duelistIdA, duelistIdB, 

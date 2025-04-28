@@ -158,7 +158,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
           'A',
           context.leftDuelist.name,
           context.leftDuelist.characterType,
-          context.leftDuelist.isYou
+          context.leftDuelist.isCharacter ? context.leftDuelist.isPlayerCharacter : context.leftDuelist.isYou
         );
         didPlayersInitA.current = true;
       } catch (error) {
@@ -169,10 +169,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
     return () => clearTimeout(timerA);
   }, [
     gameImpl, 
-    context.leftDuelist.id,
-    context.leftDuelist.name, 
-    context.leftDuelist.characterType,
-    context.leftDuelist.isYou,
+    context.leftDuelist,
     context.duelInProgress
   ]);
 
@@ -195,7 +192,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
           'B',
           context.rightDuelist.name,
           context.rightDuelist.characterType,
-          context.rightDuelist.isYou
+          context.rightDuelist.isCharacter ? context.rightDuelist.isPlayerCharacter : context.rightDuelist.isYou
         );
         didPlayersInitB.current = true;
       } catch (error) {
@@ -206,10 +203,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
     return () => clearTimeout(timerB);
   }, [
     gameImpl, 
-    context.rightDuelist.id,
-    context.rightDuelist.name, 
-    context.rightDuelist.characterType,
-    context.rightDuelist.isYou,
+    context.rightDuelist,
     context.duelInProgress
   ]);
 
