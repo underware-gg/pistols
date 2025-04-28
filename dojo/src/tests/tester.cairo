@@ -23,11 +23,11 @@ pub mod tester {
             duel_token::{duel_token, IDuelTokenDispatcher, IDuelTokenDispatcherTrait},
             duelist_token::{duelist_token, IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait},
             pack_token::{pack_token, IPackTokenDispatcher, IPackTokenDispatcherTrait},
-            tournament_token::{tournament_token, ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait},
+            // tournament_token::{tournament_token, ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait},
             fame_coin::{fame_coin, IFameCoinDispatcher, IFameCoinDispatcherTrait},
             fools_coin::{fools_coin, IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait},
             lords_mock::{lords_mock, ILordsMockDispatcher, ILordsMockDispatcherTrait},
-            budokan_mock::{budokan_mock, IBudokanMockDispatcher, IBudokanMockDispatcherTrait},
+            // budokan_mock::{budokan_mock, IBudokanMockDispatcher, IBudokanMockDispatcherTrait},
         },
         components::{
             token_bound::{TokenBoundAddress, TokenBoundAddressTrait},
@@ -55,7 +55,7 @@ pub mod tester {
             SeasonScoreboard,
         },
         pool::{Pool, PoolType},
-        tournament::{TournamentRound},
+        // tournament::{TournamentRound},
     };
 
     // use pistols::tests::mock_account::DualCaseAccountMock;
@@ -178,9 +178,9 @@ pub mod tester {
         pub duels: IDuelTokenDispatcher,
         pub duelists: IDuelistTokenDispatcher,
         pub pack: IPackTokenDispatcher,
-        pub tournaments: ITournamentTokenDispatcher,
+        // pub tournaments: ITournamentTokenDispatcher,
         pub rng: IRngMockDispatcher,
-        pub budokan: IBudokanMockDispatcher,
+        // pub budokan: IBudokanMockDispatcher,
         pub account: ContractAddress,
     }
 
@@ -201,9 +201,9 @@ pub mod tester {
                 duels: world.duel_token_dispatcher(),
                 duelists: world.duelist_token_dispatcher(),
                 pack: world.pack_token_dispatcher(),
-                tournaments: world.tournament_token_dispatcher(),
+                // tournaments: world.tournament_token_dispatcher(),
                 rng: IRngMockDispatcher{ contract_address: world.rng_address() },
-                budokan: world.budokan_mock_dispatcher(),
+                // budokan: world.budokan_mock_dispatcher(),
                 account: mock_account,
             })
         }
@@ -258,12 +258,12 @@ pub mod tester {
             TestResource::Model(pistols::models::player::m_PlayerDuelistStack::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::season::m_SeasonScoreboard::TEST_CLASS_HASH),
             TestResource::Model(pistols::models::season::m_SeasonConfig::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::tournament::m_TournamentPass::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::tournament::m_TournamentSettings::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::tournament::m_Tournament::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::tournament::m_TournamentRound::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::tournament::m_TournamentToChallenge::TEST_CLASS_HASH),
-            TestResource::Model(pistols::models::tournament::m_ChallengeToTournament::TEST_CLASS_HASH),
+            // TestResource::Model(pistols::models::tournament::m_TournamentPass::TEST_CLASS_HASH),
+            // TestResource::Model(pistols::models::tournament::m_TournamentSettings::TEST_CLASS_HASH),
+            // TestResource::Model(pistols::models::tournament::m_Tournament::TEST_CLASS_HASH),
+            // TestResource::Model(pistols::models::tournament::m_TournamentRound::TEST_CLASS_HASH),
+            // TestResource::Model(pistols::models::tournament::m_TournamentToChallenge::TEST_CLASS_HASH),
+            // TestResource::Model(pistols::models::tournament::m_ChallengeToTournament::TEST_CLASS_HASH),
             TestResource::Model(pistols::systems::components::token_bound::m_TokenBoundAddress::TEST_CLASS_HASH),
             // mocks
             TestResource::Model(pistols::systems::rng_mock::m_MockedValue::TEST_CLASS_HASH),
@@ -277,13 +277,13 @@ pub mod tester {
             TestResource::Event(achievement::events::index::e_TrophyCreation::TEST_CLASS_HASH),
             TestResource::Event(achievement::events::index::e_TrophyProgression::TEST_CLASS_HASH),
             // budokan
-            TestResource::Model(tournaments::components::models::game::m_GameMetadata::TEST_CLASS_HASH),
-            TestResource::Model(tournaments::components::models::game::m_TokenMetadata::TEST_CLASS_HASH),
-            TestResource::Model(tournaments::components::models::game::m_GameCounter::TEST_CLASS_HASH),
-            TestResource::Model(tournaments::components::models::game::m_Score::TEST_CLASS_HASH),
-            TestResource::Model(tournaments::components::models::game::m_Settings::TEST_CLASS_HASH),
-            TestResource::Model(tournaments::components::models::game::m_SettingsDetails::TEST_CLASS_HASH),
-            TestResource::Model(tournaments::components::models::game::m_SettingsCounter::TEST_CLASS_HASH),
+            // TestResource::Model(tournaments::components::models::game::m_GameMetadata::TEST_CLASS_HASH),
+            // TestResource::Model(tournaments::components::models::game::m_TokenMetadata::TEST_CLASS_HASH),
+            // TestResource::Model(tournaments::components::models::game::m_GameCounter::TEST_CLASS_HASH),
+            // TestResource::Model(tournaments::components::models::game::m_Score::TEST_CLASS_HASH),
+            // TestResource::Model(tournaments::components::models::game::m_Settings::TEST_CLASS_HASH),
+            // TestResource::Model(tournaments::components::models::game::m_SettingsDetails::TEST_CLASS_HASH),
+            // TestResource::Model(tournaments::components::models::game::m_SettingsCounter::TEST_CLASS_HASH),
         ];
 
         let mut contract_defs: Array<ContractDef> = array![];
@@ -366,22 +366,22 @@ pub mod tester {
             );
         }
 
-        if (deploy_tournament) {
-            resources.append(TestResource::Contract(tournament_token::TEST_CLASS_HASH));
-            resources.append(TestResource::Contract(budokan_mock::TEST_CLASS_HASH));
-            contract_defs.append(
-                ContractDefTrait::new(@"pistols", @"tournament_token")
-                    .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
-                    .with_init_calldata([
-                        'http://localhost:3000',
-                    ].span()),
-            );
-            contract_defs.append(
-                ContractDefTrait::new(@"pistols", @"budokan_mock")
-                    .with_writer_of([selector_from_tag!("pistols-MockedValue")].span())
-                    .with_init_calldata([].span())
-            );
-        }
+        // if (deploy_tournament) {
+        //     resources.append(TestResource::Contract(tournament_token::TEST_CLASS_HASH));
+        //     resources.append(TestResource::Contract(budokan_mock::TEST_CLASS_HASH));
+        //     contract_defs.append(
+        //         ContractDefTrait::new(@"pistols", @"tournament_token")
+        //             .with_writer_of([dojo::utils::bytearray_hash(@"pistols")].span())
+        //             .with_init_calldata([
+        //                 'http://localhost:3000',
+        //             ].span()),
+        //     );
+        //     contract_defs.append(
+        //         ContractDefTrait::new(@"pistols", @"budokan_mock")
+        //             .with_writer_of([selector_from_tag!("pistols-MockedValue")].span())
+        //             .with_init_calldata([].span())
+        //     );
+        // }
 
         if (deploy_lords) {
             resources.append(TestResource::Contract(lords_mock::TEST_CLASS_HASH));
@@ -457,9 +457,9 @@ pub mod tester {
         if (deploy_admin) {
             world.dispatcher.grant_owner(selector_from_tag!("pistols-admin"), OWNER());
         }
-        if (deploy_tournament) {
-            world.dispatcher.grant_owner(selector_from_tag!("pistols-tournament_token"), OWNER());
-        }
+        // if (deploy_tournament) {
+        //     world.dispatcher.grant_owner(selector_from_tag!("pistols-tournament_token"), OWNER());
+        // }
         if (deploy_lords) {
             let lords = world.lords_mock_dispatcher();
             execute_lords_faucet(@lords, OWNER());
@@ -670,39 +670,39 @@ pub mod tester {
         (new_state)
     }
 
-    // ::tournament_token
-    pub fn execute_start_tournament(sys: @TestSystems, sender: ContractAddress,
-        pass_id: u64,
-    ) -> u64 {
-        impersonate(sender);
-        let tournament_id: u64 = (*sys.tournaments).start_tournament(pass_id);
-        _next_block();
-        (tournament_id)
-    }
-    pub fn execute_enlist_duelist(sys: @TestSystems, sender: ContractAddress,
-        pass_id: u64,
-        duelist_id: u128,
-    ) {
-        impersonate(sender);
-        (*sys.tournaments).enlist_duelist(pass_id, duelist_id);
-        _next_block();
-    }
-    pub fn execute_join_duel(sys: @TestSystems, sender: ContractAddress,
-        pass_id: u64,
-    ) -> u128 {
-        impersonate(sender);
-        let duel_id: u128 = (*sys.tournaments).join_duel(pass_id);
-        _next_block();
-        (duel_id)
-    }
-    pub fn execute_end_round(sys: @TestSystems, sender: ContractAddress,
-        pass_id: u64,
-    ) -> Option<u8> {
-        impersonate(sender);
-        let next_round_option: Option<u8> = (*sys.tournaments).end_round(pass_id);
-        _next_block();
-        (next_round_option)
-    }
+    // // ::tournament_token
+    // pub fn execute_start_tournament(sys: @TestSystems, sender: ContractAddress,
+    //     pass_id: u64,
+    // ) -> u64 {
+    //     impersonate(sender);
+    //     let tournament_id: u64 = (*sys.tournaments).start_tournament(pass_id);
+    //     _next_block();
+    //     (tournament_id)
+    // }
+    // pub fn execute_enlist_duelist(sys: @TestSystems, sender: ContractAddress,
+    //     pass_id: u64,
+    //     duelist_id: u128,
+    // ) {
+    //     impersonate(sender);
+    //     (*sys.tournaments).enlist_duelist(pass_id, duelist_id);
+    //     _next_block();
+    // }
+    // pub fn execute_join_duel(sys: @TestSystems, sender: ContractAddress,
+    //     pass_id: u64,
+    // ) -> u128 {
+    //     impersonate(sender);
+    //     let duel_id: u128 = (*sys.tournaments).join_duel(pass_id);
+    //     _next_block();
+    //     (duel_id)
+    // }
+    // pub fn execute_end_round(sys: @TestSystems, sender: ContractAddress,
+    //     pass_id: u64,
+    // ) -> Option<u8> {
+    //     impersonate(sender);
+    //     let next_round_option: Option<u8> = (*sys.tournaments).end_round(pass_id);
+    //     _next_block();
+    //     (next_round_option)
+    // }
 
     // ::game
     pub fn execute_commit_moves(system: @IGameDispatcher, sender: ContractAddress,
@@ -839,10 +839,10 @@ pub mod tester {
     pub fn set_Pack(ref world: WorldStorage, model: @Pack) {
         world.write_model_test(model);
     }
-    #[inline(always)]
-    pub fn set_TournamentRound(ref world: WorldStorage, model: @TournamentRound) {
-        world.write_model_test(model);
-    }
+    // #[inline(always)]
+    // pub fn set_TournamentRound(ref world: WorldStorage, model: @TournamentRound) {
+    //     world.write_model_test(model);
+    // }
 
     pub fn set_current_season(ref sys: TestSystems, season_id: u32) {
         let mut config: Config = sys.store.get_config();

@@ -1,7 +1,7 @@
 use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 use pistols::models::challenge::{DuelType};
-use pistols::models::tournament::{TournamentRules};
+// use pistols::models::tournament::{TournamentRules};
 use pistols::types::challenge_state::{ChallengeState};
 use pistols::types::premise::{Premise};
 
@@ -94,17 +94,17 @@ pub trait IDuelTokenPublic<TState> {
 #[starknet::interface]
 pub trait IDuelTokenProtected<TState> {
     fn transfer_to_winner(ref self: TState, duel_id: u128);
-    fn join_tournament_duel(
-        ref self: TState,
-        player_address: ContractAddress,
-        duelist_id: u128,
-        tournament_id: u64,
-        round_number: u8,
-        entry_number: u8,
-        opponent_entry_number: u8,
-        rules: TournamentRules,
-        timestamp_end: u64,
-    ) -> u128;
+    // fn join_tournament_duel(
+    //     ref self: TState,
+    //     player_address: ContractAddress,
+    //     duelist_id: u128,
+    //     tournament_id: u64,
+    //     round_number: u8,
+    //     entry_number: u8,
+    //     opponent_entry_number: u8,
+    //     rules: TournamentRules,
+    //     timestamp_end: u64,
+    // ) -> u128;
 }
 
 #[dojo::contract]
@@ -164,7 +164,7 @@ pub mod duel_token {
     use pistols::interfaces::dns::{
         DnsTrait,
         IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait,
-        IGameDispatcherTrait,
+        // IGameDispatcherTrait,
     };
     use pistols::models::{
         player::{PlayerTrait},
@@ -172,11 +172,11 @@ pub mod duel_token {
         duelist::{DuelistTrait, DuelistValue, DuelistProfileTrait},
         pact::{PactTrait},
         events::{Activity, ActivityTrait},
-        tournament::{
-            TournamentDuelKeys, TournamentDuelKeysTrait,
-            TournamentRules,
-            ChallengeToTournament, TournamentToChallenge,
-        },
+        // tournament::{
+        //     TournamentDuelKeys, TournamentDuelKeysTrait,
+        //     TournamentRules,
+        //     ChallengeToTournament, TournamentToChallenge,
+        // },
     };
     use pistols::types::{
         challenge_state::{ChallengeState, ChallengeStateTrait},
@@ -187,7 +187,7 @@ pub mod duel_token {
     };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
-    use pistols::utils::misc::{ZERO, ContractAddressIntoU256};
+    use pistols::utils::misc::{ContractAddressIntoU256};//, ZERO};
     use pistols::utils::math::{MathTrait};
 
     // use tournaments::components::{
@@ -478,150 +478,150 @@ pub mod duel_token {
             }
         }
 
-        fn join_tournament_duel(ref self: ContractState,
-            player_address: ContractAddress,
-            duelist_id: u128,
-            tournament_id: u64,
-            round_number: u8,
-            entry_number: u8,
-            opponent_entry_number: u8,
-            rules: TournamentRules,
-            timestamp_end: u64,
-        ) -> u128 {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.caller_is_tournament_contract(), Errors::INVALID_CALLER);
+//         fn join_tournament_duel(ref self: ContractState,
+//             player_address: ContractAddress,
+//             duelist_id: u128,
+//             tournament_id: u64,
+//             round_number: u8,
+//             entry_number: u8,
+//             opponent_entry_number: u8,
+//             rules: TournamentRules,
+//             timestamp_end: u64,
+//         ) -> u128 {
+//             let mut store: Store = StoreTrait::new(self.world_default());
+//             assert(store.world.caller_is_tournament_contract(), Errors::INVALID_CALLER);
 
-            // check if duel is minted
-            let keys: @TournamentDuelKeys = TournamentDuelKeysTrait::new(
-                tournament_id,
-                round_number,
-                entry_number,
-                opponent_entry_number,
-            );
-            let mut duel_id: u128 = store.get_tournament_duel_id(keys);
-            let duelist_number: u8 = if (entry_number == *keys.entry_number_a) {1} else {2};
+//             // check if duel is minted
+//             let keys: @TournamentDuelKeys = TournamentDuelKeysTrait::new(
+//                 tournament_id,
+//                 round_number,
+//                 entry_number,
+//                 opponent_entry_number,
+//             );
+//             let mut duel_id: u128 = store.get_tournament_duel_id(keys);
+//             let duelist_number: u8 = if (entry_number == *keys.entry_number_a) {1} else {2};
             
-            //-----------------------------------
-            // NEW DUEL
-            //
-            if (duel_id.is_zero()) {
-                // mint to game, so it can transfer to winner
-                duel_id = self.token.mint_next(store.world.game_address());
+//             //-----------------------------------
+//             // NEW DUEL
+//             //
+//             if (duel_id.is_zero()) {
+//                 // mint to game, so it can transfer to winner
+//                 duel_id = self.token.mint_next(store.world.game_address());
 
-                // create challenge
-                let timestamp: u64 = starknet::get_block_timestamp();
-                let challenge = Challenge {
-                    duel_id,
-                    duel_type: DuelType::Tournament,
-                    premise: Premise::Tournament,
-                    lives_staked: rules.lives_staked,
-                    // duelists
-                    address_a: if (duelist_number == 1) {player_address} else {ZERO()},
-                    address_b: if (duelist_number == 2) {player_address} else {ZERO()},
-                    duelist_id_a: if (duelist_number == 1) {duelist_id} else {0},
-                    duelist_id_b: if (duelist_number == 2) {duelist_id} else {0},
-                    // progress
-                    state: ChallengeState::Awaiting,
-                    season_id: 0,
-                    winner: 0,
-                    // timestamps
-                    timestamps: Period {
-                        start: timestamp,
-                        end: timestamp_end,
-                    },
-                };
-// println!("player_address: {:x}", player_address);
-// println!("duelist_id: {}", duelist_id);
-// println!("entry_number: {}", entry_number);
-// println!("opponent_entry_number: {}", opponent_entry_number);
-// println!("duelist_number: {}", duelist_number);
-// println!("challenge.address_a: {:x}", challenge.address_a);
-// println!("challenge.address_b: {:x}", challenge.address_b);
-// println!("challenge.duelist_id_a: {}", challenge.duelist_id_a);
-// println!("challenge.duelist_id_b: {}", challenge.duelist_id_b);
+//                 // create challenge
+//                 let timestamp: u64 = starknet::get_block_timestamp();
+//                 let challenge = Challenge {
+//                     duel_id,
+//                     duel_type: DuelType::Tournament,
+//                     premise: Premise::Tournament,
+//                     lives_staked: rules.lives_staked,
+//                     // duelists
+//                     address_a: if (duelist_number == 1) {player_address} else {ZERO()},
+//                     address_b: if (duelist_number == 2) {player_address} else {ZERO()},
+//                     duelist_id_a: if (duelist_number == 1) {duelist_id} else {0},
+//                     duelist_id_b: if (duelist_number == 2) {duelist_id} else {0},
+//                     // progress
+//                     state: ChallengeState::Awaiting,
+//                     season_id: 0,
+//                     winner: 0,
+//                     // timestamps
+//                     timestamps: Period {
+//                         start: timestamp,
+//                         end: timestamp_end,
+//                     },
+//                 };
+// // println!("player_address: {:x}", player_address);
+// // println!("duelist_id: {}", duelist_id);
+// // println!("entry_number: {}", entry_number);
+// // println!("opponent_entry_number: {}", opponent_entry_number);
+// // println!("duelist_number: {}", duelist_number);
+// // println!("challenge.address_a: {:x}", challenge.address_a);
+// // println!("challenge.address_b: {:x}", challenge.address_b);
+// // println!("challenge.duelist_id_a: {}", challenge.duelist_id_a);
+// // println!("challenge.duelist_id_b: {}", challenge.duelist_id_b);
 
-                // create Round, ready for player A to commit
-                let mut round = Round {
-                    duel_id: challenge.duel_id,
-                    state: RoundState::Commit,
-                    moves_a: Default::default(),
-                    moves_b: Default::default(),
-                    state_a: Default::default(),
-                    state_b: Default::default(),
-                    final_blow: Default::default(),
-                };
-                round.set_commit_timeout(store.get_current_season_rules(), timestamp);
+//                 // create Round, ready for player A to commit
+//                 let mut round = Round {
+//                     duel_id: challenge.duel_id,
+//                     state: RoundState::Commit,
+//                     moves_a: Default::default(),
+//                     moves_b: Default::default(),
+//                     state_a: Default::default(),
+//                     state_b: Default::default(),
+//                     final_blow: Default::default(),
+//                 };
+//                 round.set_commit_timeout(store.get_current_season_rules(), timestamp);
 
-                // save!
-                store.set_challenge(@challenge);
-                store.set_round(@round);
+//                 // save!
+//                 store.set_challenge(@challenge);
+//                 store.set_round(@round);
 
-                // tournament links
-                store.set_challenge_to_tournament(@ChallengeToTournament {
-                    duel_id,
-                    keys: *keys,
-                });
-                store.set_tournament_to_challenge(@TournamentToChallenge {
-                    keys: *keys,
-                    duel_id,
-                });
+//                 // tournament links
+//                 store.set_challenge_to_tournament(@ChallengeToTournament {
+//                     duel_id,
+//                     keys: *keys,
+//                 });
+//                 store.set_tournament_to_challenge(@TournamentToChallenge {
+//                     keys: *keys,
+//                     duel_id,
+//                 });
 
-                if (keys.entry_number_b.is_zero()) {
-                    // no opponent! declare winner
-                    // collect rewards for this player
-                    store.world.game_dispatcher().collect_duel(duel_id);
-                } else {
-                    // assert duelist is not in a challenge
-                    store.enter_challenge(duelist_id, duel_id);
-                    // Duelist 1 is ready to commit
-                    store.emit_challenge_action(@challenge, duelist_number, true);
-                    // events
-                    PlayerTrait::check_in(ref store, Activity::ChallengeCreated, player_address, duel_id.into());
-                }
-            }
-            //-----------------------------------
-            // EXISTING DUEL
-            //
-            else {
-                let mut challenge: Challenge = store.get_challenge(duel_id);
-                assert(challenge.exists(), Errors::INVALID_CHALLENGE);
-                assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
+//                 if (keys.entry_number_b.is_zero()) {
+//                     // no opponent! declare winner
+//                     // collect rewards for this player
+//                     store.world.game_dispatcher().collect_duel(duel_id);
+//                 } else {
+//                     // assert duelist is not in a challenge
+//                     store.enter_challenge(duelist_id, duel_id);
+//                     // Duelist 1 is ready to commit
+//                     store.emit_challenge_action(@challenge, duelist_number, true);
+//                     // events
+//                     PlayerTrait::check_in(ref store, Activity::ChallengeCreated, player_address, duel_id.into());
+//                 }
+//             }
+//             //-----------------------------------
+//             // EXISTING DUEL
+//             //
+//             else {
+//                 let mut challenge: Challenge = store.get_challenge(duel_id);
+//                 assert(challenge.exists(), Errors::INVALID_CHALLENGE);
+//                 assert(challenge.state == ChallengeState::Awaiting, Errors::CHALLENGE_NOT_AWAITING);
 
-                if (duelist_number == 1) {
-                    assert(*keys.entry_number_a == entry_number, Errors::NOT_YOUR_CHALLENGE);
-                    assert(challenge.address_a.is_zero(), Errors::INVALID_REPLY_SELF);
-                    challenge.address_a = player_address;
-                    challenge.duelist_id_a = duelist_id;
-                } else {
-                    assert(*keys.entry_number_b == entry_number, Errors::NOT_YOUR_CHALLENGE);
-                    assert(challenge.address_b.is_zero(), Errors::INVALID_REPLY_SELF);
-                    challenge.address_b = player_address;
-                    challenge.duelist_id_b = duelist_id;
-                }
+//                 if (duelist_number == 1) {
+//                     assert(*keys.entry_number_a == entry_number, Errors::NOT_YOUR_CHALLENGE);
+//                     assert(challenge.address_a.is_zero(), Errors::INVALID_REPLY_SELF);
+//                     challenge.address_a = player_address;
+//                     challenge.duelist_id_a = duelist_id;
+//                 } else {
+//                     assert(*keys.entry_number_b == entry_number, Errors::NOT_YOUR_CHALLENGE);
+//                     assert(challenge.address_b.is_zero(), Errors::INVALID_REPLY_SELF);
+//                     challenge.address_b = player_address;
+//                     challenge.duelist_id_b = duelist_id;
+//                 }
 
-                if (challenge.timestamps.has_expired()) {
-                    // Expired, close it!
-                    challenge.state = ChallengeState::Expired;
-                } else {
-                    // game on!
-                    challenge.state = ChallengeState::InProgress;
-                }
+//                 if (challenge.timestamps.has_expired()) {
+//                     // Expired, close it!
+//                     challenge.state = ChallengeState::Expired;
+//                 } else {
+//                     // game on!
+//                     challenge.state = ChallengeState::InProgress;
+//                 }
 
-                // save!
-                store.set_challenge(@challenge);
+//                 // save!
+//                 store.set_challenge(@challenge);
 
-                // assert duelist is not in a challenge
-                store.enter_challenge(duelist_id, duel_id);
+//                 // assert duelist is not in a challenge
+//                 store.enter_challenge(duelist_id, duel_id);
 
-                // Duelist 2 can commit
-                store.emit_challenge_action(@challenge, duelist_number, true);
+//                 // Duelist 2 can commit
+//                 store.emit_challenge_action(@challenge, duelist_number, true);
 
-                // events
-                PlayerTrait::check_in(ref store, Activity::ChallengeReplied, player_address, duel_id.into());
-            };
+//                 // events
+//                 PlayerTrait::check_in(ref store, Activity::ChallengeReplied, player_address, duel_id.into());
+//             };
 
-            (duel_id)
-        }
+//             (duel_id)
+//         }
     }
 
 

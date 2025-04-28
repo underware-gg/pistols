@@ -95,15 +95,4 @@ dependencies = [
  "nft_combo",
  "openzeppelin_introspection",
  "openzeppelin_token",
- "tournaments",
-]
-
-[[package]]
-name = "tournaments"
-version = "0.0.1"
-source = "git+https://github.com/underware-gg/tournaments?branch=pistols#7c62855f042370d6de33bff89d214c8ca198354d"
-dependencies = [
- "dojo",
- "openzeppelin_introspection",
- "openzeppelin_token",
 ]

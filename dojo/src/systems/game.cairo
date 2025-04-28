@@ -89,7 +89,7 @@ pub mod game {
         pact::{PactTrait},
         season::{SeasonConfig, SeasonConfigTrait, SeasonScoreboard, SeasonScoreboardTrait},
         events::{Activity, ActivityTrait},
-        tournament::{TournamentRound, TournamentRoundTrait, TournamentDuelKeys},
+        // tournament::{TournamentRound, TournamentRoundTrait, TournamentDuelKeys},
     };
     use pistols::types::{
         challenge_state::{ChallengeState, ChallengeStateTrait},
@@ -229,8 +229,8 @@ pub mod game {
                 round.set_commit_timeout(rules, timestamp);
             }
 
-            // update tournanemnt (if applicable)
-            self._update_tournament(ref store, duel_id, @round);
+            // // update tournanemnt (if applicable)
+            // self._update_tournament(ref store, duel_id, @round);
 
             // update duelist timestamp
             store.set_duelist_timestamp_active(duelist_id, timestamp);
@@ -311,8 +311,8 @@ pub mod game {
                 store.set_round(@round);
                 // clear self flag
                 store.emit_challenge_action(@challenge, duelist_number, false);
-                // update tournanemnt (if applicable)
-                self._update_tournament(ref store, duel_id, @round);
+                // // update tournanemnt (if applicable)
+                // self._update_tournament(ref store, duel_id, @round);
                 return;
             }
 
@@ -355,21 +355,21 @@ pub mod game {
                 let winner: u8 = if (challenge.address_b.is_zero()) {1} else if (challenge.address_a.is_zero()) {2} else {0};
                 round.final_blow = FinalBlow::Unpaired;
                 self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner));
-            } else if (store.world.caller_is_tournament_contract()) {
-                // tournament collect previous round duel
-                assert(challenge.duel_type == DuelType::Tournament, Errors::INVALID_DUEL_TYPE);
-                let winner: u8 =
-                    if (
-                        (round.moves_a.has_comitted() && !round.moves_b.has_comitted()) ||
-                        (round.moves_a.has_revealed() && !round.moves_b.has_revealed())
-                    ) {1}
-                    else if (
-                        (round.moves_b.has_comitted() && !round.moves_a.has_comitted()) ||
-                        (round.moves_b.has_revealed() && !round.moves_a.has_revealed())
-                    ) {2}
-                    else {0};
-                round.final_blow = FinalBlow::Forsaken;
-                self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner));
+            // } else if (store.world.caller_is_tournament_contract()) {
+            //     // tournament collect previous round duel
+            //     assert(challenge.duel_type == DuelType::Tournament, Errors::INVALID_DUEL_TYPE);
+            //     let winner: u8 =
+            //         if (
+            //             (round.moves_a.has_comitted() && !round.moves_b.has_comitted()) ||
+            //             (round.moves_a.has_revealed() && !round.moves_b.has_revealed())
+            //         ) {1}
+            //         else if (
+            //             (round.moves_b.has_comitted() && !round.moves_a.has_comitted()) ||
+            //             (round.moves_b.has_revealed() && !round.moves_a.has_revealed())
+            //         ) {2}
+            //         else {0};
+            //     round.final_blow = FinalBlow::Forsaken;
+            //     self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner));
             } else {
                 // outside call
                 assert(self.can_collect_duel(duel_id), Errors::CHALLENGE_IN_PROGRESS);
@@ -556,39 +556,39 @@ pub mod game {
             (owner)
         }
 
-        fn _get_tournament_round(ref self: ContractState, ref store: Store, duel_id: u128) -> Option<(TournamentDuelKeys, TournamentRound)> {
-            let keys: TournamentDuelKeys = store.get_duel_tournament_keys(duel_id);
-            if (keys.tournament_id.is_non_zero() && keys.round_number.is_non_zero()) {
-                Option::Some((keys, store.get_tournament_round(keys.tournament_id, keys.round_number)))
-            } else {
-                (Option::None)
-            }
-        }
+        // fn _get_tournament_round(ref self: ContractState, ref store: Store, duel_id: u128) -> Option<(TournamentDuelKeys, TournamentRound)> {
+        //     let keys: TournamentDuelKeys = store.get_duel_tournament_keys(duel_id);
+        //     if (keys.tournament_id.is_non_zero() && keys.round_number.is_non_zero()) {
+        //         Option::Some((keys, store.get_tournament_round(keys.tournament_id, keys.round_number)))
+        //     } else {
+        //         (Option::None)
+        //     }
+        // }
 
-        fn _update_tournament(ref self: ContractState, ref store: Store, duel_id: u128, round: @Round) {
-            let mut tournament_round: Option<(TournamentDuelKeys, TournamentRound)> = self._get_tournament_round(ref store, duel_id);
-            match tournament_round {
-                Option::Some((keys, mut tournament_round)) => {
-                    if (*round.state == RoundState::Commit) {
-                        if (round.moves_a.has_comitted() && !round.moves_b.has_comitted()) {
-                            tournament_round.moved_first(keys.entry_number_a, keys.entry_number_b);
-                        } else if (round.moves_b.has_comitted() && !round.moves_a.has_comitted()) {
-                            tournament_round.moved_first(keys.entry_number_b, keys.entry_number_a);
-                        }
-                    } else if (*round.state == RoundState::Reveal) {
-                        if (round.moves_a.has_revealed() && !round.moves_b.has_revealed()) {
-                            tournament_round.moved_first(keys.entry_number_a, keys.entry_number_b);
-                        } else if (round.moves_b.has_revealed() && !round.moves_a.has_revealed()) {
-                            tournament_round.moved_first(keys.entry_number_b, keys.entry_number_a);
-                        } else {
-                            tournament_round.moved_second(keys.entry_number_a, keys.entry_number_b);
-                        }
-                    }
-                    store.set_tournament_round(@tournament_round);
-                },
-                Option::None => {}
-            };
-        }
+        // fn _update_tournament(ref self: ContractState, ref store: Store, duel_id: u128, round: @Round) {
+        //     let mut tournament_round: Option<(TournamentDuelKeys, TournamentRound)> = self._get_tournament_round(ref store, duel_id);
+        //     match tournament_round {
+        //         Option::Some((keys, mut tournament_round)) => {
+        //             if (*round.state == RoundState::Commit) {
+        //                 if (round.moves_a.has_comitted() && !round.moves_b.has_comitted()) {
+        //                     tournament_round.moved_first(keys.entry_number_a, keys.entry_number_b);
+        //                 } else if (round.moves_b.has_comitted() && !round.moves_a.has_comitted()) {
+        //                     tournament_round.moved_first(keys.entry_number_b, keys.entry_number_a);
+        //                 }
+        //             } else if (*round.state == RoundState::Reveal) {
+        //                 if (round.moves_a.has_revealed() && !round.moves_b.has_revealed()) {
+        //                     tournament_round.moved_first(keys.entry_number_a, keys.entry_number_b);
+        //                 } else if (round.moves_b.has_revealed() && !round.moves_a.has_revealed()) {
+        //                     tournament_round.moved_first(keys.entry_number_b, keys.entry_number_a);
+        //                 } else {
+        //                     tournament_round.moved_second(keys.entry_number_a, keys.entry_number_b);
+        //                 }
+        //             }
+        //             store.set_tournament_round(@tournament_round);
+        //         },
+        //         Option::None => {}
+        //     };
+        // }
 
         fn _finish_challenge_if_timed_out(ref self: ContractState, ref store: Store, ref challenge: Challenge, ref round: Round) -> bool {
             let timed_out_a: bool = round.moves_a.timeout.has_timed_out(@challenge);
@@ -662,21 +662,21 @@ pub mod game {
                 store.emit_challenge_rewards(challenge.duel_id, challenge.duelist_id_a, rewards_a);
                 store.emit_challenge_rewards(challenge.duel_id, challenge.duelist_id_b, rewards_b);
 
-                // settle tournament
-                let mut tournament_round: Option<(TournamentDuelKeys, TournamentRound)> = self._get_tournament_round(ref store, challenge.duel_id);
-                match tournament_round {
-                    Option::Some((keys, mut tournament_round)) => {
-                        tournament_round.finished_duel(
-                            keys.entry_number_a,
-                            keys.entry_number_b,
-                            rewards_a.survived,
-                            rewards_b.survived,
-                            challenge.winner,
-                        );
-                        store.set_tournament_round(@tournament_round);
-                    },
-                    Option::None => {}
-                }
+                // // settle tournament
+                // let mut tournament_round: Option<(TournamentDuelKeys, TournamentRound)> = self._get_tournament_round(ref store, challenge.duel_id);
+                // match tournament_round {
+                //     Option::Some((keys, mut tournament_round)) => {
+                //         tournament_round.finished_duel(
+                //             keys.entry_number_a,
+                //             keys.entry_number_b,
+                //             rewards_a.survived,
+                //             rewards_b.survived,
+                //             challenge.winner,
+                //         );
+                //         store.set_tournament_round(@tournament_round);
+                //     },
+                //     Option::None => {}
+                // }
             }
         }
 

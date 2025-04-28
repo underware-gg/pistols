@@ -53,7 +53,7 @@ default = "pistols"
   "pistols-duel_token",
   "pistols-duelist_token",
   "pistols-pack_token",
-  "pistols-tournament_token",
+  # "pistols-tournament_token",
   "pistols-bank",
 ]
 # ERC-20
@@ -86,9 +86,9 @@ default = "pistols"
 "pistols-pack_token" = [
   "sstr:https://assets.underware.gg", # base_uri
 ]
-"pistols-tournament_token" = [
-  "sstr:https://assets.underware.gg", # base_uri
-]
+# "pistols-tournament_token" = [
+#   "sstr:https://assets.underware.gg", # base_uri
+# ]
 
 
 #--------------------------
@@ -99,5 +99,5 @@ order_inits = []
 skip_contracts = [
   "pistols-lords_mock",
   "pistols-vrf_mock",
-  "pistols-budokan_mock",
+  # "pistols-budokan_mock",
 ]

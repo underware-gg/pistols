@@ -22,7 +22,7 @@ openzeppelin_introspection = { git = "https://github.com/OpenZeppelin/cairo-cont
 # openzeppelin_token = { path = "../../cairo-contracts" }
 # cartridge_vrf = { git = "https://github.com/cartridge-gg/vrf" }
 # tournaments = { git = "https://github.com/Provable-Games/tournaments.git" }
-tournaments = { git = "https://github.com/underware-gg/tournaments", branch = "pistols" }
+# tournaments = { git = "https://github.com/underware-gg/tournaments", branch = "pistols" }
 
 [dev-dependencies]
 cairo_test = "2.9.4"
@@ -39,13 +39,13 @@ build-external-contracts = [
   "dojo::world::world_contract::world",
   "achievement::events::index::e_TrophyCreation",
   "achievement::events::index::e_TrophyProgression",
-  "tournaments::components::models::game::m_GameMetadata",
-  "tournaments::components::models::game::m_TokenMetadata",
-  "tournaments::components::models::game::m_GameCounter",
-  "tournaments::components::models::game::m_Score",
-  "tournaments::components::models::game::m_Settings",
-  "tournaments::components::models::game::m_SettingsDetails",
-  "tournaments::components::models::game::m_SettingsCounter",
+  # "tournaments::components::models::game::m_GameMetadata",
+  # "tournaments::components::models::game::m_TokenMetadata",
+  # "tournaments::components::models::game::m_GameCounter",
+  # "tournaments::components::models::game::m_Score",
+  # "tournaments::components::models::game::m_Settings",
+  # "tournaments::components::models::game::m_SettingsDetails",
+  # "tournaments::components::models::game::m_SettingsCounter",
 ]
 
 

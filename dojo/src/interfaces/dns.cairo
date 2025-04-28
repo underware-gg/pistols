@@ -14,11 +14,11 @@ pub use pistols::systems::{
         duel_token::{IDuelTokenDispatcher, IDuelTokenDispatcherTrait, IDuelTokenProtectedDispatcher, IDuelTokenProtectedDispatcherTrait},
         duelist_token::{IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait, IDuelistTokenProtectedDispatcher, IDuelistTokenProtectedDispatcherTrait},
         pack_token::{IPackTokenDispatcher, IPackTokenDispatcherTrait},
-        tournament_token::{ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait},
+        // tournament_token::{ITournamentTokenDispatcher, ITournamentTokenDispatcherTrait},
         fame_coin::{IFameCoinDispatcher, IFameCoinDispatcherTrait, IFameCoinProtectedDispatcher, IFameCoinProtectedDispatcherTrait},
         fools_coin::{IFoolsCoinDispatcher, IFoolsCoinDispatcherTrait, IFoolsCoinProtectedDispatcher, IFoolsCoinProtectedDispatcherTrait},
         lords_mock::{ILordsMockDispatcher, ILordsMockDispatcherTrait},
-        budokan_mock::{IBudokanMockDispatcher, IBudokanMockDispatcherTrait},
+        // budokan_mock::{IBudokanMockDispatcher, IBudokanMockDispatcherTrait},
     }
 };
 pub use pistols::interfaces::{
@@ -28,7 +28,7 @@ pub use pistols::interfaces::{
 pub use pistols::libs::store::{Store, StoreTrait};
 pub use pistols::models::config::{CONFIG, Config};
 pub use pistols::utils::misc::{ZERO};
-pub use tournaments::components::tournament::{ITournamentDispatcher, ITournamentDispatcherTrait};
+// pub use tournaments::components::tournament::{ITournamentDispatcher, ITournamentDispatcherTrait};
 
 pub mod SELECTORS {
     // systems
@@ -121,10 +121,10 @@ pub impl DnsImpl of DnsTrait {
     fn pack_token_address(self: @WorldStorage) -> ContractAddress {
         (self.find_contract_address(@"pack_token"))
     }
-    #[inline(always)]
-    fn tournament_token_address(self: @WorldStorage) -> ContractAddress {
-        (self.find_contract_address(@"tournament_token"))
-    }
+    // #[inline(always)]
+    // fn tournament_token_address(self: @WorldStorage) -> ContractAddress {
+    //     (self.find_contract_address(@"tournament_token"))
+    // }
     #[inline(always)]
     fn fame_coin_address(self: @WorldStorage) -> ContractAddress {
         (self.find_contract_address(@"fame_coin"))
@@ -142,10 +142,10 @@ pub impl DnsImpl of DnsTrait {
     fn vrf_mock_address(self: @WorldStorage) -> ContractAddress {
         (self.find_contract_address(@"vrf_mock"))
     }
-    #[inline(always)]
-    fn budokan_mock_address(self: @WorldStorage) -> ContractAddress {
-        (self.find_contract_address(@"budokan_mock"))
-    }
+    // #[inline(always)]
+    // fn budokan_mock_address(self: @WorldStorage) -> ContractAddress {
+    //     (self.find_contract_address(@"budokan_mock"))
+    // }
 
     //--------------------------
     // address validators
@@ -164,10 +164,10 @@ pub impl DnsImpl of DnsTrait {
     fn caller_is_duel_contract(self: @WorldStorage) -> bool {
         (starknet::get_caller_address() == self.duel_token_address())
     }
-    #[inline(always)]
-    fn caller_is_tournament_contract(self: @WorldStorage) -> bool {
-        (starknet::get_caller_address() == self.tournament_token_address())
-    }
+    // #[inline(always)]
+    // fn caller_is_tournament_contract(self: @WorldStorage) -> bool {
+    //     (starknet::get_caller_address() == self.tournament_token_address())
+    // }
 
     //--------------------------
     // dispatchers
@@ -220,10 +220,10 @@ pub impl DnsImpl of DnsTrait {
     fn pack_token_dispatcher(self: @WorldStorage) -> IPackTokenDispatcher {
         (IPackTokenDispatcher{ contract_address: self.pack_token_address() })
     }
-    #[inline(always)]
-    fn tournament_token_dispatcher(self: @WorldStorage) -> ITournamentTokenDispatcher {
-        (ITournamentTokenDispatcher{ contract_address: self.tournament_token_address() })
-    }
+    // #[inline(always)]
+    // fn tournament_token_dispatcher(self: @WorldStorage) -> ITournamentTokenDispatcher {
+    //     (ITournamentTokenDispatcher{ contract_address: self.tournament_token_address() })
+    // }
     #[inline(always)]
     fn fame_coin_dispatcher(self: @WorldStorage) -> IFameCoinDispatcher {
         (IFameCoinDispatcher{ contract_address: self.fame_coin_address() })
@@ -251,10 +251,10 @@ pub impl DnsImpl of DnsTrait {
     fn vrf_dispatcher(self: @Store) -> IVrfProviderDispatcher {
         (IVrfProviderDispatcher{ contract_address: self.get_config_vrf_address() })
     }
-    #[inline(always)]
-    fn budokan_dispatcher_from_pass_id(self: @Store, pass_id: u64) -> ITournamentDispatcher {
-        (ITournamentDispatcher{ contract_address: self.get_tournament_pass_minter_address(pass_id) })
-    }
+    // #[inline(always)]
+    // fn budokan_dispatcher_from_pass_id(self: @Store, pass_id: u64) -> ITournamentDispatcher {
+    //     (ITournamentDispatcher{ contract_address: self.get_tournament_pass_minter_address(pass_id) })
+    // }
 
 
     //--------------------------
@@ -269,9 +269,9 @@ pub impl DnsImpl of DnsTrait {
     fn vrf_mock_dispatcher(self: @WorldStorage) -> IVrfProviderDispatcher {
         (IVrfProviderDispatcher{ contract_address: self.vrf_mock_address() })
     }
-    #[inline(always)]
-    fn budokan_mock_dispatcher(self: @WorldStorage) -> IBudokanMockDispatcher {
-        (IBudokanMockDispatcher{ contract_address: self.budokan_mock_address() })
-    }
+    // #[inline(always)]
+    // fn budokan_mock_dispatcher(self: @WorldStorage) -> IBudokanMockDispatcher {
+    //     (IBudokanMockDispatcher{ contract_address: self.budokan_mock_address() })
+    // }
 
 }

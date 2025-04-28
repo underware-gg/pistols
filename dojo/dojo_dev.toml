@@ -52,7 +52,7 @@ default = "pistols"
   "pistols-duel_token",
   "pistols-duelist_token",
   "pistols-pack_token",
-  "pistols-tournament_token",
+  # "pistols-tournament_token",
   "pistols-bank",
 ]
 # ERC-20
@@ -65,8 +65,8 @@ default = "pistols"
 # arcade trophies
 "pistols-TrophyCreation" = ["pistols-game"]
 "pistols-TrophyProgression" = ["pistols-game"]
-# mocks
-"pistols-MockedValue" = ["pistols-budokan_mock"]
+# # mocks
+# "pistols-MockedValue" = ["pistols-budokan_mock"]
 
 #--------------------------
 # init_calldata
@@ -90,10 +90,10 @@ default = "pistols"
   # "sstr:http://localhost:3000", # base_uri
   "sstr:https://assets.underware.gg", # base_uri
 ]
-"pistols-tournament_token" = [
-  # "sstr:http://localhost:3000", # base_uri
-  "sstr:https://assets.underware.gg", # base_uri
-]
+# "pistols-tournament_token" = [
+#   # "sstr:http://localhost:3000", # base_uri
+#   "sstr:https://assets.underware.gg", # base_uri
+# ]
 "pistols-lords_mock" = [
   "0x0", # minter_address
   "10000000000000000000000", # faucet_amount: 10,000 LORDS

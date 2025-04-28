@@ -76,13 +76,13 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS::DUEL | FLAGS::TOURNAMENT);
         tester::impersonate(OWNER());
         assert!(!sys.world.caller_is_duel_contract(), "!caller_is_duel_contract(OWNER)");
-        assert!(!sys.world.caller_is_tournament_contract(), "!caller_is_tournament_contract(OWNER)");
+        // assert!(!sys.world.caller_is_tournament_contract(), "!caller_is_tournament_contract(OWNER)");
         tester::impersonate(sys.duels.contract_address);
         assert!(sys.world.caller_is_duel_contract(), "caller_is_duel_contract(sys.duels)");
-        assert!(!sys.world.caller_is_tournament_contract(), "!caller_is_tournament_contract(sys.duels)");
-        tester::impersonate(sys.tournaments.contract_address);
-        assert!(!sys.world.caller_is_duel_contract(), "!caller_is_duel_contract(sys.tournaments)");
-        assert!(sys.world.caller_is_tournament_contract(), "caller_is_tournament_contract(sys.tournaments)");
+        // assert!(!sys.world.caller_is_tournament_contract(), "!caller_is_tournament_contract(sys.duels)");
+        // tester::impersonate(sys.tournaments.contract_address);
+        // assert!(!sys.world.caller_is_duel_contract(), "!caller_is_duel_contract(sys.tournaments)");
+        // assert!(sys.world.caller_is_tournament_contract(), "caller_is_tournament_contract(sys.tournaments)");
     }
 
     #[test]

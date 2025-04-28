@@ -18,14 +18,14 @@ mod systems {
         pub mod pack_token;
         pub mod duelist_token;
         pub mod duel_token;
-        pub mod tournament_token;
+        // pub mod tournament_token;
         // erc20
         pub mod fame_coin;
         pub mod fools_coin;
         // mocks
         // #[cfg(feature:'lords_mock')]
         pub mod lords_mock;
-        pub mod budokan_mock;
+        // pub mod budokan_mock;
     }
     pub mod components {
         pub mod coin_component;
@@ -52,7 +52,7 @@ mod models {
     pub mod pool;
     pub mod leaderboard;
     pub mod season;
-    pub mod tournament;
+    // pub mod tournament;
 }
 
 mod types {
@@ -106,9 +106,9 @@ mod tests {
     pub mod test_env_cards;
     pub mod test_rng;
     pub mod test_season;
-    pub mod test_tournament;
-    pub mod test_tournament_duels;
-    pub mod test_tournament_round;
+    // pub mod test_tournament;
+    // pub mod test_tournament_duels;
+    // pub mod test_tournament_round;
     pub mod test_tutorial;
     // utils
     pub mod tester;
@@ -120,7 +120,7 @@ mod tests {
         pub mod test_duel_token;
         pub mod test_duelist_token;
         pub mod test_pack_token;
-        pub mod test_tournament_token;
+        // pub mod test_tournament_token;
         pub mod test_fame_coin;
         pub mod test_fools_coin;
         // mocks

@@ -42,7 +42,7 @@ pub mod duelist_token {
         OWNER, OWNED_BY_OWNER,
         OTHER, OWNED_BY_OTHER,
     };
-    use pistols::systems::tokens::budokan_mock::{PLAYERS};
+    // use pistols::systems::tokens::budokan_mock::{PLAYERS};
     use pistols::systems::tokens::duelist_token::duelist_token::{Errors};
     // use pistols::libs::store::{Store, StoreTrait};
 
@@ -82,8 +82,8 @@ pub mod duelist_token {
             if (token_id.low == OWNED_BY_OWNER()) { return OWNER(); }
             if (token_id.low == OWNED_BY_OTHER()) { return OTHER(); }
 
-            let owner: ContractAddress = PLAYERS::from_duelist_id(token_id.low).address;
-            if (owner != ZERO()) { return owner; }
+            // let owner: ContractAddress = PLAYERS::from_duelist_id(token_id.low).address;
+            // if (owner != ZERO()) { return owner; }
 
             // low part is always the owner address
             let as_felt: felt252 = token_id.low.into();
