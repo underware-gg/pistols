@@ -71,7 +71,7 @@ pub enum CauseOfDeath {
 //
 use core::num::traits::Zero;
 use pistols::systems::tokens::duel_token::duel_token::{Errors as DuelErrors};
-// use pistols::systems::tokens::tournament_token::tournament_token::{Errors as TournamentErrors};
+use pistols::systems::tokens::tournament_token::tournament_token::{Errors as TournamentErrors};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::types::rules::{RewardValues};
 use pistols::types::constants::{HONOUR};
@@ -97,13 +97,13 @@ pub impl DuelistImpl of DuelistTrait {
             self.set_duelist_challenge(@assignment);
         }
     }
-    // fn enter_tournament(ref self: Store, duelist_id: u128, pass_id: u64) {
-    //     let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
-    //     assert(assignment.duel_id.is_zero(), TournamentErrors::DUELIST_IN_CHALLENGE);
-    //     assert(assignment.pass_id.is_zero(), TournamentErrors::DUELIST_IN_TOURNAMENT);
-    //     assignment.pass_id = pass_id;
-    //     self.set_duelist_challenge(@assignment);
-    // }
+    fn enter_tournament(ref self: Store, duelist_id: u128, pass_id: u64) {
+        let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
+        assert(assignment.duel_id.is_zero(), TournamentErrors::DUELIST_IN_CHALLENGE);
+        assert(assignment.pass_id.is_zero(), TournamentErrors::DUELIST_IN_TOURNAMENT);
+        assignment.pass_id = pass_id;
+        self.set_duelist_challenge(@assignment);
+    }
     fn exit_tournament(ref self: Store, duelist_id: u128) {
         let mut assignment: DuelistAssignment = self.get_duelist_challenge(duelist_id);
         assignment.pass_id = 0;

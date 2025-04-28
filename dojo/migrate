@@ -87,7 +87,7 @@ sed -i '' -e "s|\$rpc_url|$RPC_URL|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$duel_token|$DUEL_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$duelist_token|$DUELIST_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$pack_token|$PACK_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
-# sed -i '' -e "s|\$tournament_token|$TOURNAMENT_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
+sed -i '' -e "s|\$tournament_token|$TOURNAMENT_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$fame_coin|$FAME_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$fools_coin|$FOOLS_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
 sed -i '' -e "s|\$lords|$LORDS_TOKEN_ADDRESS|g" $TORII_CONFIG_PATH
