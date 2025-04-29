@@ -241,7 +241,7 @@ export default function ScLeaderboards() {
     useEffect(() => {
       if (posterRef.current && isMe) {
         setTimeout(() => {
-          posterRef.current.toggleHighlight(true, false, 'green');
+          posterRef.current?.toggleHighlight(true, false, 'green');
         }, 50);
       }
     }, [isMe]);
@@ -299,6 +299,13 @@ export default function ScLeaderboards() {
               instantVisible={true}
               isHighlightable={false}
               onClick={() => dispatchSelectPlayerAddress(owner)}
+              onHover={(hovered) => {
+                if (hovered) {
+                  posterRef.current?.setScale(1.05, 200)
+                } else {
+                  posterRef.current?.setScale(1, 200)
+                }
+              }}
             />
           </div>
           

@@ -189,60 +189,56 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                   </div>
                 </div>
 
-                {/* Underware Social Links */}
+                {/* Left side social links */}
                 <div style={{ 
                   display: 'grid', 
                   gridTemplateColumns: '1fr 1fr',
                   gridGap: '0.8rem',
                   marginTop: '0.5rem'
                 }}>
-                  <a 
-                    href="https://underware.gg" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <div 
                     className="socialLinkStyle"
+                    onClick={() => window.open('https://underware.gg', '_blank')}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="globe" />
                     </div>
                     <span>Website</span>
-                  </a>
+                  </div>
                   
-                  <a 
-                    href="https://discord.gg/underware" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <div 
                     className="socialLinkStyle"
+                    onClick={() => window.open('https://discord.gg/underware', '_blank')}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="discord" />
                     </div>
                     <span>Discord</span>
-                  </a>
+                  </div>
                   
-                  <a 
-                    href="https://github.com/funDAOmental" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <div 
                     className="socialLinkStyle"
+                    onClick={() => window.open('https://github.com/underware-gg', '_blank')}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="github" />
                     </div>
                     <span>GitHub</span>
-                  </a>
+                  </div>
                   
-                  <a 
-                    href="https://x.com/underware_gg" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <div 
                     className="socialLinkStyle"
+                    onClick={() => window.open('https://x.com/underware_gg', '_blank')}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="twitter" />
                     </div>
                     <span>Twitter</span>
-                  </a>
+                  </div>
                 </div>
               </div>
               
@@ -263,60 +259,56 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                   <Logo vertical showName width={6} />
                 </div>
 
-                {/* Game Social Links */}
+                {/* Right side social links */}
                 <div style={{ 
                   display: 'grid', 
                   gridTemplateColumns: '1fr 1fr',
                   gridGap: '0.8rem',
                   marginTop: '0.5rem'
                 }}>
-                  <a 
-                    href="https://pistols.at" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <div 
                     className="socialLinkStyle"
+                    onClick={() => window.open('https://pistols.gg', '_blank')}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="globe" />
                     </div>
                     <span>Website</span>
-                  </a>
+                  </div>
                   
-                  <a 
-                    href="https://github.com/funDAOmental/pistols" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <div 
                     className="socialLinkStyle"
+                    onClick={() => window.open('https://github.com/underware-gg/pistols', '_blank')}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="github" />
                     </div>
                     <span>GitHub</span>
-                  </a>
+                  </div>
                   
-                  <a 
-                    href="https://x.com/dawnpistols" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <div 
                     className="socialLinkStyle"
+                    onClick={() => window.open('https://x.com/pistols_gg', '_blank')}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="twitter" />
                     </div>
                     <span>Twitter</span>
-                  </a>
+                  </div>
                   
-                  <a 
-                    href="https://book.dojoengine.org/" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
+                  <div 
                     className="socialLinkStyle"
+                    onClick={() => window.open('https://book.dojoengine.org/', '_blank')}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="book" />
                     </div>
                     <span>Docs</span>
-                  </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -342,11 +334,10 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                 maxWidth: '500px',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
               }}>
-                <a 
-                  href="https://x.com/lootrealms?lang=en" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                <div 
+                  onClick={() => window.open('https://x.com/lootrealms?lang=en', '_blank')}
                   title="Explore the Realms World Discord"
+                  style={{ cursor: 'pointer' }}
                 >
                   <img 
                     src="/images/logo/RealmsWorld.svg" 
@@ -362,12 +353,11 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                     onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                     onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   />
-                </a>
-                <a 
-                  href="https://starknet.io/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                </div>
+                <div 
+                  onClick={() => window.open('https://starknet.io/', '_blank')}
                   title="Learn more about Starknet"
+                  style={{ cursor: 'pointer' }}
                 >
                   <img 
                     src="/images/logo/starknet.png" 
@@ -383,12 +373,11 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                     onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                     onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   />
-                </a>
-                <a 
-                  href="https://www.dojoengine.org/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                </div>
+                <div 
+                  onClick={() => window.open('https://www.dojoengine.org/', '_blank')}
                   title="Learn more about Dojo"
+                  style={{ cursor: 'pointer' }}
                 >
                   <img 
                     src="/images/logo/dojo.svg" 
@@ -404,12 +393,11 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                     onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                     onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   />
-                </a>
-                <a 
-                  href="https://docs.cartridge.gg/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                </div>
+                <div 
+                  onClick={() => window.open('https://docs.cartridge.gg/', '_blank')}
                   title="Learn more about Cartridge"
+                  style={{ cursor: 'pointer' }}
                 >
                   <img 
                     src="/images/logo/cartridge.svg" 
@@ -425,7 +413,7 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                     onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                     onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   />
-                </a>
+                </div>
               </div>
             </div>
 
