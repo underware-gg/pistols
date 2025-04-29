@@ -6249,8 +6249,8 @@
       ]
     },
     {
-      "address": "0x140005d4651f46b5fb5d6cda8aaa47c701c40eb24a8a971c13fc1eaa8ff8486",
-      "class_hash": "0x25ff1639b213dcde10d8a349e9879ae64e69ab17c26b1dd76ed0d33f24f3817",
+      "address": "0x2d2bd22d7066c4b96ba522faee4c320eff4ea88079599daf6bf2591fc0ef48d",
+      "class_hash": "0xfa95b103b928cb4c37499a27cad000f58ac2b29e13988733199fab62132ff7",
       "abi": [
         {
           "type": "impl",
@@ -7006,6 +7006,13 @@
               "inputs": [],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "do_that_thing",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -7139,6 +7146,7 @@
         "collect_season",
         "clear_call_to_action",
         "create_trophies",
+        "do_that_thing",
         "upgrade"
       ]
     },
@@ -9454,8 +9462,8 @@
       ]
     },
     {
-      "address": "0x5a1ff44f755106e98dc490738807fb555258cc1a35b90ca386a99d2f8d87e91",
-      "class_hash": "0x67569d715bfc20aa46663c802eee63eef02a65128f8c03eb5af16ea8618d7bb",
+      "address": "0x78436123e7591350e70393fea910f400a2bd50d188b9d5f85a7b1681bca3484",
+      "class_hash": "0x2184561c3b6a53b5e8f6e5177e0bee7e5bc46106d4d8ae874bae573293b7f5f",
       "abi": [
         {
           "type": "impl",

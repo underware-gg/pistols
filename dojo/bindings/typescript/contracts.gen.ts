@@ -2222,6 +2222,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_game_doThatThing_calldata = (): DojoCall => {
+		return {
+			contractName: "game",
+			entrypoint: "do_that_thing",
+			calldata: [],
+		};
+	};
+
+	const game_doThatThing = async (snAccount: Account | AccountInterface) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_game_doThatThing_calldata(),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_game_getDuelDeck_calldata = (duelId: BigNumberish): DojoCall => {
 		return {
 			contractName: "game",
@@ -3612,6 +3633,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildCommitMovesCalldata: build_game_commitMoves_calldata,
 			createTrophies: game_createTrophies,
 			buildCreateTrophiesCalldata: build_game_createTrophies_calldata,
+			doThatThing: game_doThatThing,
+			buildDoThatThingCalldata: build_game_doThatThing_calldata,
 			getDuelDeck: game_getDuelDeck,
 			buildGetDuelDeckCalldata: build_game_getDuelDeck_calldata,
 			getDuelProgress: game_getDuelProgress,

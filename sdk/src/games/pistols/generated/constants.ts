@@ -429,8 +429,35 @@ export const getRulesMap = (): Record<Rules, number> => Object.keys(Rules).reduc
 // from: ../dojo/src/types/trophies.cairo
 export enum Trophy {
   None = 'None', // 0
-  FirstBlood = 'FirstBlood', // 1
-  Collector = 'Collector', // 2
+  BeginnersLuck = 'BeginnersLuck', // 1
+  FirstBlood = 'FirstBlood', // 2
+  PerfectDodge = 'PerfectDodge', // 3
+  DodgeAndKill = 'DodgeAndKill', // 4
+  ShotInTheBack = 'ShotInTheBack', // 5
+  ShotAtTheBack = 'ShotAtTheBack', // 6
+  DuelCollector = 'DuelCollector', // 7
+  VillainousScum = 'VillainousScum', // 8
+  HonourableLord = 'HonourableLord', // 9
+  Blindfold = 'Blindfold', // 10
+  BloodBath = 'BloodBath', // 11
+  BladesClash = 'BladesClash', // 12
+  DoubleBarrel = 'DoubleBarrel', // 13
+  TrippleBarrel = 'TrippleBarrel', // 14
+  QuadrupleBarrel = 'QuadrupleBarrel', // 15
+  QuintupleBarrel = 'QuintupleBarrel', // 16
+  VillainousDeath = 'VillainousDeath', // 17
+  TricksterDeath = 'TricksterDeath', // 18
+  HonourableDeath = 'HonourableDeath', // 19
+  PocketPistol = 'PocketPistol', // 20
+  Behead = 'Behead', // 21
+  Grapple = 'Grapple', // 22
+  Seppuku = 'Seppuku', // 23
+  DoubleSeppuku = 'DoubleSeppuku', // 24
+  GoneBananas = 'GoneBananas', // 25
+  BeatTheOdds = 'BeatTheOdds', // 26
+  WastedAmmo = 'WastedAmmo', // 27
+  DoThatThing = 'DoThatThing', // 28
+  SeasonCollector = 'SeasonCollector', // 29
 };
 export const getTrophyValue = (name: Trophy): number | undefined => _indexOrUndefined(Object.keys(Trophy).indexOf(name));
 export const getTrophyFromValue = (value: number): Trophy | undefined => Object.keys(Trophy)[value] as Trophy;
@@ -1210,23 +1237,85 @@ export const PREMISES: type_PREMISES = {
 };
 
 // from: ../dojo/src/types/trophies.cairo
-type type_TROPHY = {
+type type_TROPHY_ID = {
   COUNT: number, // cairo: u8
+  None: string, // cairo: felt252
+  BeginnersLuck: string, // cairo: felt252
+  FirstBlood: string, // cairo: felt252
+  PerfectDodge: string, // cairo: felt252
+  DodgeAndKill: string, // cairo: felt252
+  ShotInTheBack: string, // cairo: felt252
+  ShotAtTheBack: string, // cairo: felt252
+  DuelCollector: string, // cairo: felt252
+  VillainousScum: string, // cairo: felt252
+  HonourableLord: string, // cairo: felt252
+  Blindfold: string, // cairo: felt252
+  BloodBath: string, // cairo: felt252
+  BladesClash: string, // cairo: felt252
+  DoubleBarrel: string, // cairo: felt252
+  TrippleBarrel: string, // cairo: felt252
+  QuadrupleBarrel: string, // cairo: felt252
+  QuintupleBarrel: string, // cairo: felt252
+  VillainousDeath: string, // cairo: felt252
+  TricksterDeath: string, // cairo: felt252
+  HonourableDeath: string, // cairo: felt252
+  PocketPistol: string, // cairo: felt252
+  Behead: string, // cairo: felt252
+  Grapple: string, // cairo: felt252
+  Seppuku: string, // cairo: felt252
+  DoubleSeppuku: string, // cairo: felt252
+  GoneBananas: string, // cairo: felt252
+  BeatTheOdds: string, // cairo: felt252
+  WastedAmmo: string, // cairo: felt252
+  DoThatThing: string, // cairo: felt252
+  SeasonCollector: string, // cairo: felt252
 };
-export const TROPHY: type_TROPHY = {
-  COUNT: 2,
+export const TROPHY_ID: type_TROPHY_ID = {
+  COUNT: 29,
+  None: '',
+  BeginnersLuck: 'BeginnersLuck',
+  FirstBlood: 'FirstBlood',
+  PerfectDodge: 'PerfectDodge',
+  DodgeAndKill: 'DodgeAndKill',
+  ShotInTheBack: 'ShotInTheBack',
+  ShotAtTheBack: 'ShotAtTheBack',
+  DuelCollector: 'DuelCollector',
+  VillainousScum: 'VillainousScum',
+  HonourableLord: 'HonourableLord',
+  Blindfold: 'Blindfold',
+  BloodBath: 'BloodBath',
+  BladesClash: 'BladesClash',
+  DoubleBarrel: 'DoubleBarrel',
+  TrippleBarrel: 'TrippleBarrel',
+  QuadrupleBarrel: 'QuadrupleBarrel',
+  QuintupleBarrel: 'QuintupleBarrel',
+  VillainousDeath: 'VillainousDeath',
+  TricksterDeath: 'TricksterDeath',
+  HonourableDeath: 'HonourableDeath',
+  PocketPistol: 'PocketPistol',
+  Behead: 'Behead',
+  Grapple: 'Grapple',
+  Seppuku: 'Seppuku',
+  DoubleSeppuku: 'DoubleSeppuku',
+  GoneBananas: 'GoneBananas',
+  BeatTheOdds: 'BeatTheOdds',
+  WastedAmmo: 'WastedAmmo',
+  DoThatThing: 'DoThatThing',
+  SeasonCollector: 'SeasonCollector',
 };
 
 // from: ../dojo/src/types/trophies.cairo
-type type_TROPHY_ID = {
-  None: string, // cairo: felt252
-  FirstBlood: string, // cairo: felt252
-  Collector: string, // cairo: felt252
+type type_TROPHY_GROUP = {
+  Player: string, // cairo: felt252
+  Honour: string, // cairo: felt252
+  Duelist: string, // cairo: felt252
+  Tactics: string, // cairo: felt252
 };
-export const TROPHY_ID: type_TROPHY_ID = {
-  None: '',
-  FirstBlood: 'FIRST_BLOOD',
-  Collector: 'COLLECTOR',
+export const TROPHY_GROUP: type_TROPHY_GROUP = {
+  Player: 'Player',
+  Honour: 'Honour',
+  Duelist: 'Duelist',
+  Tactics: 'Tactics',
 };
 
 // from: ../dojo/src/types/typed_data.cairo
