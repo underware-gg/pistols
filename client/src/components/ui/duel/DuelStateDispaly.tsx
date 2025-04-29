@@ -37,7 +37,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
   const { account } = useAccount()
   
   const { challengeDescription } = useChallengeDescription(duelId)
-  const { isFinished, isTutorial, tutorialLevel, duelistIdA, duelistIdB, winnerDuelistId, duelistAddressA, duelistAddressB, isCanceled, isExpired, quote, premise, livesStaked, needToSyncExpired, state } = useGetChallenge(duelId)
+  const { isFinished, isTutorial, tutorialLevel, duelistIdA, duelistIdB, winnerDuelistId, duelistAddressA, duelistAddressB, isCanceled, isExpired, premise, livesStaked, needToSyncExpired, state, message } = useGetChallenge(duelId)
   const { canCollectDuel } = useCanCollectDuel(duelId)
   const { duel_token, game } = useDojoSystemCalls()
 
@@ -417,7 +417,7 @@ export default function DuelStateDisplay({ duelId }: { duelId: bigint }) {
                           <ActionButton large fillParent label='Share' className='FillParent' onClick={() => {
                             const tweetUrl = makeDuelTweetUrl(
                               duelId, 
-                              quote, 
+                              message, 
                               premise, 
                               livesStaked, 
                               isYouA, 

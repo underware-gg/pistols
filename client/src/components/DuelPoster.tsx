@@ -261,7 +261,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
               {seasonDescription.toUpperCase()}
               <IconClick name='database' className='AbsoluteRight' style={{ marginTop: aspectWidth(1.4), marginRight: aspectWidth(1.4) }} size={'small'} onClick={() => window?.open(makeDuelDataUrl(props.duelId), '_blank')} />
               <IconClick name='share' className='AbsoluteRight' style={{ marginTop: aspectWidth(1.4), marginRight: aspectWidth(4.4) }} size={'small'} onClick={() => {
-                const twitterUrl = makeDuelTweetUrl(props.duelId, quote, premise, livesStaked, isYouA, isYouB, leftPlayerName, rightPlayerName)
+                const twitterUrl = makeDuelTweetUrl(props.duelId, message, premise, livesStaked, isYouA, isYouB, leftPlayerName, rightPlayerName)
                 window?.open(twitterUrl, '_blank');
               }} />
             </div>
