@@ -1,8 +1,8 @@
 {
   "world": {
     "class_hash": "0x75fc75bcd1a7f8b4bf64b74978b0f89c8cee44bb755c1dae6f82284756451ec",
-    "address": "0x2ed4c10d6a2862906255a8450de7cc87c610be85638c548ff50a63de240cbd",
-    "seed": "pistols_v0_15_0",
+    "address": "0x4d8e1e053b604bb19e5b339596463d41aeccc99b2f9c1ae5f20954b02cccf04",
+    "seed": "pistols_v0_15_1",
     "name": "Pistols at Dawn",
     "entrypoints": [
       "uuid",
@@ -1312,8 +1312,8 @@
   },
   "contracts": [
     {
-      "address": "0x522dca84183b5b48c841315684d265138a9205c812e46c336e243375b21e802",
-      "class_hash": "0x67bdf919082201d01f0925e2805dd0c895a1e58d6326a95fb659f1c27e1d6d0",
+      "address": "0x65fb0a2a04bfde66d4d9172d537a324c8b3b9ff8c67b39826023d122a94e9c7",
+      "class_hash": "0x5042c6ddcec16fe409641076ae756ee001fcf2a69406e3ff23dca86117dc245",
       "abi": [
         {
           "type": "impl",
@@ -1598,8 +1598,8 @@
       ]
     },
     {
-      "address": "0x4a85260e01473cb97dd246ed46989b0803790dfd9404ff0d47fb2d0b72a3a5a",
-      "class_hash": "0xe5115bee27aa4ddcf75a08433cffc59875f99e826e4ba735406b9e1c7713d5",
+      "address": "0x5aadbdf456aa5c8be5438e8e7465c5e6b7bb48fc2e9339f30ced197315d8896",
+      "class_hash": "0x12faf7124864364ff51f048d39f6246ed9a64146805e6cf8cd6a39a0eb03273",
       "abi": [
         {
           "type": "impl",
@@ -1810,7 +1810,7 @@
               "type": "core::integer::u64"
             },
             {
-              "name": "SacredFlame",
+              "name": "Sacrifice",
               "type": "()"
             }
           ]
@@ -2044,8 +2044,8 @@
       ]
     },
     {
-      "address": "0x269d3b0edf05d979a48041ed4712b4362b675231458f0a30657a447349a9f2c",
-      "class_hash": "0x7d390267fa968cb2a30d096e73dbb8811d03a942ca9952749fa81505ea6e8cc",
+      "address": "0x377acc27a0ca83d1894a1ae62636ba3998197505b20b918e3e74effe395c6a7",
+      "class_hash": "0x25c8443c9e4c121e923fb4e5b440efdebc33667b5aea315dd3a9cdeaec4076a",
       "abi": [
         {
           "type": "impl",
@@ -2370,36 +2370,6 @@
           "interface_name": "pistols::systems::tokens::duel_token::IDuelTokenProtected"
         },
         {
-          "type": "struct",
-          "name": "pistols::models::tournament::TournamentRules",
-          "members": [
-            {
-              "name": "settings_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "description",
-              "type": "core::felt252"
-            },
-            {
-              "name": "max_rounds",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "min_lives",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "max_lives",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "lives_staked",
-              "type": "core::integer::u8"
-            }
-          ]
-        },
-        {
           "type": "interface",
           "name": "pistols::systems::tokens::duel_token::IDuelTokenProtected",
           "items": [
@@ -2413,50 +2383,6 @@
                 }
               ],
               "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "join_tournament_duel",
-              "inputs": [
-                {
-                  "name": "player_address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "duelist_id",
-                  "type": "core::integer::u128"
-                },
-                {
-                  "name": "tournament_id",
-                  "type": "core::integer::u64"
-                },
-                {
-                  "name": "round_number",
-                  "type": "core::integer::u8"
-                },
-                {
-                  "name": "entry_number",
-                  "type": "core::integer::u8"
-                },
-                {
-                  "name": "opponent_entry_number",
-                  "type": "core::integer::u8"
-                },
-                {
-                  "name": "rules",
-                  "type": "pistols::models::tournament::TournamentRules"
-                },
-                {
-                  "name": "timestamp_end",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u128"
-                }
-              ],
               "state_mutability": "external"
             }
           ]
@@ -3414,7 +3340,6 @@
         "create_duel",
         "reply_duel",
         "transfer_to_winner",
-        "join_tournament_duel",
         "upgrade",
         "safe_transfer_from",
         "transfer_from",
@@ -3429,8 +3354,8 @@
       ]
     },
     {
-      "address": "0x6aa7db7bd15bed06fd9b8cd08c5d80a05d1d3ad7b67707c412df6991f9819bb",
-      "class_hash": "0x7731dbf214a9c3c7384758cb2e003576c1f0c35ee2cbefc6683d32612af0a19",
+      "address": "0x6012ef19b1a4c6d0b06f583c4d5fa13ba39e56297760073da636ab48e5ee6c8",
+      "class_hash": "0x2fe5425f940f17f1d38d96fd31a36d428f8e7a3e3a5e65f7fe8050297386ee7",
       "abi": [
         {
           "type": "impl",
@@ -3622,7 +3547,11 @@
                   "type": "core::integer::u128"
                 }
               ],
-              "outputs": [],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
               "state_mutability": "external"
             },
             {
@@ -4078,6 +4007,30 @@
               "outputs": [
                 {
                   "type": "core::array::Span::<core::integer::u128>"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "get_validated_active_duelist_id",
+              "inputs": [
+                {
+                  "name": "address",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                },
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                },
+                {
+                  "name": "lives_staked",
+                  "type": "core::integer::u8"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::integer::u128"
                 }
               ],
               "state_mutability": "external"
@@ -5057,6 +5010,7 @@
         "sacrifice",
         "memorialize",
         "mint_duelists",
+        "get_validated_active_duelist_id",
         "transfer_rewards",
         "upgrade",
         "safe_transfer_from",
@@ -5072,7 +5026,7 @@
       ]
     },
     {
-      "address": "0x685f7f847a3320f77c7ed7c3cbc21d851dad88b759669857c14fb61f6c0f1d6",
+      "address": "0x5c625ad8a1356b367d01a13defaa5e5b47f4cd6b364caeba39ca3c22d9a3c2b",
       "class_hash": "0x35a050c9b030a5a9a040b6cf3b419feb327995cbf269ad04d4ab81cb8ff249e",
       "abi": [
         {
@@ -5775,7 +5729,7 @@
       ]
     },
     {
-      "address": "0x5b4d376987bf78cc3423b7b8da30429a0a14d88c7fb5c19808d6511ebffbcaa",
+      "address": "0x4ca61a36aecafbda9370456e3a6cfe5e5e4496f9f067ad33b4b107efec81a0f",
       "class_hash": "0x1adb971dc544cb243d0e83e1928f7f3396a7f1067da89a8b9ed31f86b74983b",
       "abi": [
         {
@@ -6295,8 +6249,8 @@
       ]
     },
     {
-      "address": "0x64aa14f6495f2f82aa302aa70cee6021799ca03d7fe6b95e11030215ccf1b2f",
-      "class_hash": "0x45b1be504275cc3b2090477f76b1c6486b5528fb539a44cb4d743c63d8e3cd4",
+      "address": "0x8e63a48288f4672d955f97dc5d3e026712f927fc4262dde1b49070c3b98397",
+      "class_hash": "0xfa95b103b928cb4c37499a27cad000f58ac2b29e13988733199fab62132ff7",
       "abi": [
         {
           "type": "impl",
@@ -6840,18 +6794,6 @@
             },
             {
               "type": "function",
-              "name": "clear_call_to_action",
-              "inputs": [
-                {
-                  "name": "duelist_id",
-                  "type": "core::integer::u128"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
               "name": "collect_duel",
               "inputs": [
                 {
@@ -6875,6 +6817,18 @@
                   "type": "core::integer::u32"
                 }
               ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "clear_call_to_action",
+              "inputs": [
+                {
+                  "name": "duelist_id",
+                  "type": "core::integer::u128"
+                }
+              ],
+              "outputs": [],
               "state_mutability": "external"
             },
             {
@@ -7052,6 +7006,13 @@
               "inputs": [],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "do_that_thing",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -7181,15 +7142,16 @@
         "dojo_init",
         "commit_moves",
         "reveal_moves",
-        "clear_call_to_action",
         "collect_duel",
         "collect_season",
+        "clear_call_to_action",
         "create_trophies",
+        "do_that_thing",
         "upgrade"
       ]
     },
     {
-      "address": "0x428c890408e56e52eb3ef47f64e69d1c3a5b1171560fc95a84e6d8cd4e772f9",
+      "address": "0x578b4e302d95d233a1e5a45b648b7066a21896f288a31a98f77e8bd177b7b9b",
       "class_hash": "0x3529bf30288415282e83292921154884e7e84b62073160fe5cfe3a0cf9962d4",
       "abi": [
         {
@@ -8398,7 +8360,7 @@
       ]
     },
     {
-      "address": "0x1039a8d3dc70ab697ff69fa79899afb8d07ae61d84a964f1e43878a9fa452a2",
+      "address": "0x5b4214455b2c4756bb5d41ca665baf578546ed87d692e599aed9bdfc60001a",
       "class_hash": "0x378f30a4892275416d1642ca62cbb702ad53e8018394eeed93fc03f1cae5b6f",
       "abi": [
         {
@@ -8667,7 +8629,7 @@
       ]
     },
     {
-      "address": "0x59899cc1b78a4015ae4739d4d072d80869d3ffb573d540fef210f9c9957bf11",
+      "address": "0x74c0e01a0982b68fb283388c64d24dfa89939e9e2beacd95253f6c9a35d0be6",
       "class_hash": "0x5371a0dfba053a935e68977a803b7bf9a6153dc13bd6d03acf16acb3f7f4027",
       "abi": [
         {
@@ -8960,1470 +8922,8 @@
       ]
     },
     {
-      "address": "0x752601ef5c405668e662467782e59ea6e4998e0d1d04d362f21361e5cd53dc8",
-      "class_hash": "0x557744d8a43cf1a316c00b2feef4d4553cf0aee547418974d5639cd3249791b",
-      "abi": [
-        {
-          "type": "impl",
-          "name": "tournament_token__ContractImpl",
-          "interface_name": "dojo::contract::interface::IContract"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::interface::IContract",
-          "items": []
-        },
-        {
-          "type": "impl",
-          "name": "tournament_token__DeployedContractImpl",
-          "interface_name": "dojo::meta::interface::IDeployedResource"
-        },
-        {
-          "type": "struct",
-          "name": "core::byte_array::ByteArray",
-          "members": [
-            {
-              "name": "data",
-              "type": "core::array::Array::<core::bytes_31::bytes31>"
-            },
-            {
-              "name": "pending_word",
-              "type": "core::felt252"
-            },
-            {
-              "name": "pending_word_len",
-              "type": "core::integer::u32"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::meta::interface::IDeployedResource",
-          "items": [
-            {
-              "type": "function",
-              "name": "dojo_name",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "function",
-          "name": "dojo_init",
-          "inputs": [
-            {
-              "name": "base_uri",
-              "type": "core::felt252"
-            }
-          ],
-          "outputs": [],
-          "state_mutability": "external"
-        },
-        {
-          "type": "impl",
-          "name": "SettingsImpl",
-          "interface_name": "tournaments::components::interfaces::ISettings"
-        },
-        {
-          "type": "enum",
-          "name": "core::bool",
-          "variants": [
-            {
-              "name": "False",
-              "type": "()"
-            },
-            {
-              "name": "True",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "tournaments::components::interfaces::ISettings",
-          "items": [
-            {
-              "type": "function",
-              "name": "setting_exists",
-              "inputs": [
-                {
-                  "name": "settings_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "GameDetailsImpl",
-          "interface_name": "tournaments::components::interfaces::IGameDetails"
-        },
-        {
-          "type": "interface",
-          "name": "tournaments::components::interfaces::IGameDetails",
-          "items": [
-            {
-              "type": "function",
-              "name": "score",
-              "inputs": [
-                {
-                  "name": "game_id",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u32"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "TournamentTokenPublicImpl",
-          "interface_name": "pistols::systems::tokens::tournament_token::ITournamentTokenPublic"
-        },
-        {
-          "type": "enum",
-          "name": "core::option::Option::<core::integer::u8>",
-          "variants": [
-            {
-              "name": "Some",
-              "type": "core::integer::u8"
-            },
-            {
-              "name": "None",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "pistols::systems::tokens::tournament_token::ITournamentTokenPublic",
-          "items": [
-            {
-              "type": "function",
-              "name": "get_tournament_id",
-              "inputs": [
-                {
-                  "name": "pass_id",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u64"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "can_enlist_duelist",
-              "inputs": [
-                {
-                  "name": "pass_id",
-                  "type": "core::integer::u64"
-                },
-                {
-                  "name": "duelist_id",
-                  "type": "core::integer::u128"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "enlist_duelist",
-              "inputs": [
-                {
-                  "name": "pass_id",
-                  "type": "core::integer::u64"
-                },
-                {
-                  "name": "duelist_id",
-                  "type": "core::integer::u128"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "can_start_tournament",
-              "inputs": [
-                {
-                  "name": "pass_id",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "start_tournament",
-              "inputs": [
-                {
-                  "name": "pass_id",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u64"
-                }
-              ],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "can_join_duel",
-              "inputs": [
-                {
-                  "name": "pass_id",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "join_duel",
-              "inputs": [
-                {
-                  "name": "pass_id",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u128"
-                }
-              ],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "can_end_round",
-              "inputs": [
-                {
-                  "name": "pass_id",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "end_round",
-              "inputs": [
-                {
-                  "name": "pass_id",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::option::Option::<core::integer::u8>"
-                }
-              ],
-              "state_mutability": "external"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "TournamentTokenProtectedImpl",
-          "interface_name": "pistols::systems::tokens::tournament_token::ITournamentTokenProtected"
-        },
-        {
-          "type": "interface",
-          "name": "pistols::systems::tokens::tournament_token::ITournamentTokenProtected",
-          "items": [
-            {
-              "type": "function",
-              "name": "create_settings",
-              "inputs": [],
-              "outputs": [],
-              "state_mutability": "external"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "WorldProviderImpl",
-          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
-        },
-        {
-          "type": "struct",
-          "name": "dojo::world::iworld::IWorldDispatcher",
-          "members": [
-            {
-              "name": "contract_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::world_provider::IWorldProvider",
-          "items": [
-            {
-              "type": "function",
-              "name": "world_dispatcher",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "dojo::world::iworld::IWorldDispatcher"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "UpgradeableImpl",
-          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
-        },
-        {
-          "type": "interface",
-          "name": "dojo::contract::components::upgradeable::IUpgradeable",
-          "items": [
-            {
-              "type": "function",
-              "name": "upgrade",
-              "inputs": [
-                {
-                  "name": "new_class_hash",
-                  "type": "core::starknet::class_hash::ClassHash"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "ERC721ComboMixinImpl",
-          "interface_name": "nft_combo::erc721::interface::IERC721ComboABI"
-        },
-        {
-          "type": "struct",
-          "name": "core::integer::u256",
-          "members": [
-            {
-              "name": "low",
-              "type": "core::integer::u128"
-            },
-            {
-              "name": "high",
-              "type": "core::integer::u128"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "core::array::Span::<core::felt252>",
-          "members": [
-            {
-              "name": "snapshot",
-              "type": "@core::array::Array::<core::felt252>"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "nft_combo::erc721::interface::IERC721ComboABI",
-          "items": [
-            {
-              "type": "function",
-              "name": "supports_interface",
-              "inputs": [
-                {
-                  "name": "interface_id",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "balance_of",
-              "inputs": [
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u256"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "owner_of",
-              "inputs": [
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "safe_transfer_from",
-              "inputs": [
-                {
-                  "name": "from",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "to",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                },
-                {
-                  "name": "data",
-                  "type": "core::array::Span::<core::felt252>"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "transfer_from",
-              "inputs": [
-                {
-                  "name": "from",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "to",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "approve",
-              "inputs": [
-                {
-                  "name": "to",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "set_approval_for_all",
-              "inputs": [
-                {
-                  "name": "operator",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "approved",
-                  "type": "core::bool"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "get_approved",
-              "inputs": [
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "is_approved_for_all",
-              "inputs": [
-                {
-                  "name": "owner",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "operator",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "balanceOf",
-              "inputs": [
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u256"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "ownerOf",
-              "inputs": [
-                {
-                  "name": "tokenId",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "safeTransferFrom",
-              "inputs": [
-                {
-                  "name": "from",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "to",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "tokenId",
-                  "type": "core::integer::u256"
-                },
-                {
-                  "name": "data",
-                  "type": "core::array::Span::<core::felt252>"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "transferFrom",
-              "inputs": [
-                {
-                  "name": "from",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "to",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "tokenId",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "setApprovalForAll",
-              "inputs": [
-                {
-                  "name": "operator",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "approved",
-                  "type": "core::bool"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "getApproved",
-              "inputs": [
-                {
-                  "name": "tokenId",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "isApprovedForAll",
-              "inputs": [
-                {
-                  "name": "owner",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "operator",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "name",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "symbol",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "token_uri",
-              "inputs": [
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "tokenURI",
-              "inputs": [
-                {
-                  "name": "tokenId",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "max_supply",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u256"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "total_supply",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u256"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "last_token_id",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u256"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "is_minting_paused",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "is_owner_of",
-              "inputs": [
-                {
-                  "name": "address",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "token_exists",
-              "inputs": [
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "maxSupply",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u256"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "totalSupply",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u256"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "contract_uri",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "contractURI",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "royalty_info",
-              "inputs": [
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                },
-                {
-                  "name": "sale_price",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u256)"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "default_royalty",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128, core::integer::u128)"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "token_royalty",
-              "inputs": [
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128, core::integer::u128)"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "royaltyInfo",
-              "inputs": [
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                },
-                {
-                  "name": "sale_price",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u256)"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "defaultRoyalty",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128, core::integer::u128)"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "tokenRoyalty",
-              "inputs": [
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u256"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "(core::starknet::contract_address::ContractAddress, core::integer::u128, core::integer::u128)"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "impl",
-          "name": "GameImpl",
-          "interface_name": "tournaments::components::interfaces::IGameToken"
-        },
-        {
-          "type": "enum",
-          "name": "core::option::Option::<core::integer::u64>",
-          "variants": [
-            {
-              "name": "Some",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "None",
-              "type": "()"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "tournaments::components::models::game::GameMetadata",
-          "members": [
-            {
-              "name": "contract_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "creator_address",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "name",
-              "type": "core::felt252"
-            },
-            {
-              "name": "description",
-              "type": "core::byte_array::ByteArray"
-            },
-            {
-              "name": "developer",
-              "type": "core::felt252"
-            },
-            {
-              "name": "publisher",
-              "type": "core::felt252"
-            },
-            {
-              "name": "genre",
-              "type": "core::felt252"
-            },
-            {
-              "name": "image",
-              "type": "core::byte_array::ByteArray"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "tournaments::components::models::lifecycle::Lifecycle",
-          "members": [
-            {
-              "name": "mint",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "start",
-              "type": "core::option::Option::<core::integer::u64>"
-            },
-            {
-              "name": "end",
-              "type": "core::option::Option::<core::integer::u64>"
-            }
-          ]
-        },
-        {
-          "type": "struct",
-          "name": "tournaments::components::models::game::TokenMetadata",
-          "members": [
-            {
-              "name": "token_id",
-              "type": "core::integer::u64"
-            },
-            {
-              "name": "minted_by",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "player_name",
-              "type": "core::felt252"
-            },
-            {
-              "name": "settings_id",
-              "type": "core::integer::u32"
-            },
-            {
-              "name": "lifecycle",
-              "type": "tournaments::components::models::lifecycle::Lifecycle"
-            }
-          ]
-        },
-        {
-          "type": "interface",
-          "name": "tournaments::components::interfaces::IGameToken",
-          "items": [
-            {
-              "type": "function",
-              "name": "mint",
-              "inputs": [
-                {
-                  "name": "player_name",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "settings_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "start",
-                  "type": "core::option::Option::<core::integer::u64>"
-                },
-                {
-                  "name": "end",
-                  "type": "core::option::Option::<core::integer::u64>"
-                },
-                {
-                  "name": "to",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::integer::u64"
-                }
-              ],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "emit_metadata_update",
-              "inputs": [
-                {
-                  "name": "game_id",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "game_metadata",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "tournaments::components::models::game::GameMetadata"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "token_metadata",
-              "inputs": [
-                {
-                  "name": "token_id",
-                  "type": "core::integer::u64"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "tournaments::components::models::game::TokenMetadata"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "game_count",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u64"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "namespace",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "score_model",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "score_attribute",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "settings_model",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::byte_array::ByteArray"
-                }
-              ],
-              "state_mutability": "view"
-            }
-          ]
-        },
-        {
-          "type": "constructor",
-          "name": "constructor",
-          "inputs": []
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "class_hash",
-              "type": "core::starknet::class_hash::ClassHash",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "Upgraded",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
-              "kind": "nested"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_introspection::src5::SRC5Component::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_token::erc721::erc721::ERC721Component::Transfer",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "from",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "key"
-            },
-            {
-              "name": "to",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "key"
-            },
-            {
-              "name": "token_id",
-              "type": "core::integer::u256",
-              "kind": "key"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_token::erc721::erc721::ERC721Component::Approval",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "owner",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "key"
-            },
-            {
-              "name": "approved",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "key"
-            },
-            {
-              "name": "token_id",
-              "type": "core::integer::u256",
-              "kind": "key"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_token::erc721::erc721::ERC721Component::ApprovalForAll",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "owner",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "key"
-            },
-            {
-              "name": "operator",
-              "type": "core::starknet::contract_address::ContractAddress",
-              "kind": "key"
-            },
-            {
-              "name": "approved",
-              "type": "core::bool",
-              "kind": "data"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "openzeppelin_token::erc721::erc721::ERC721Component::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "Transfer",
-              "type": "openzeppelin_token::erc721::erc721::ERC721Component::Transfer",
-              "kind": "nested"
-            },
-            {
-              "name": "Approval",
-              "type": "openzeppelin_token::erc721::erc721::ERC721Component::Approval",
-              "kind": "nested"
-            },
-            {
-              "name": "ApprovalForAll",
-              "type": "openzeppelin_token::erc721::erc721::ERC721Component::ApprovalForAll",
-              "kind": "nested"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::ContractURIUpdated",
-          "kind": "struct",
-          "members": []
-        },
-        {
-          "type": "event",
-          "name": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::MetadataUpdate",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "token_id",
-              "type": "core::integer::u256",
-              "kind": "key"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::BatchMetadataUpdate",
-          "kind": "struct",
-          "members": [
-            {
-              "name": "from_token_id",
-              "type": "core::integer::u256",
-              "kind": "key"
-            },
-            {
-              "name": "to_token_id",
-              "type": "core::integer::u256",
-              "kind": "key"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "ContractURIUpdated",
-              "type": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::ContractURIUpdated",
-              "kind": "nested"
-            },
-            {
-              "name": "MetadataUpdate",
-              "type": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::MetadataUpdate",
-              "kind": "nested"
-            },
-            {
-              "name": "BatchMetadataUpdate",
-              "type": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::BatchMetadataUpdate",
-              "kind": "nested"
-            }
-          ]
-        },
-        {
-          "type": "event",
-          "name": "tournaments::components::game::game_component::Event",
-          "kind": "enum",
-          "variants": []
-        },
-        {
-          "type": "event",
-          "name": "pistols::systems::tokens::tournament_token::tournament_token::Event",
-          "kind": "enum",
-          "variants": [
-            {
-              "name": "UpgradeableEvent",
-              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "WorldProviderEvent",
-              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
-              "kind": "nested"
-            },
-            {
-              "name": "SRC5Event",
-              "type": "openzeppelin_introspection::src5::SRC5Component::Event",
-              "kind": "flat"
-            },
-            {
-              "name": "ERC721Event",
-              "type": "openzeppelin_token::erc721::erc721::ERC721Component::Event",
-              "kind": "flat"
-            },
-            {
-              "name": "ERC721ComboEvent",
-              "type": "nft_combo::erc721::erc721_combo::ERC721ComboComponent::Event",
-              "kind": "flat"
-            },
-            {
-              "name": "GameEvent",
-              "type": "tournaments::components::game::game_component::Event",
-              "kind": "flat"
-            }
-          ]
-        }
-      ],
-      "init_calldata": [
-        "sstr:https://assets.underware.gg"
-      ],
-      "tag": "pistols-tournament_token",
-      "selector": "0x4ca33d8b161f957a982bee3486b9a85c5bc5de8baf22be1f987b3471e5c0b9c",
-      "systems": [
-        "dojo_init",
-        "enlist_duelist",
-        "start_tournament",
-        "join_duel",
-        "end_round",
-        "create_settings",
-        "upgrade",
-        "safe_transfer_from",
-        "transfer_from",
-        "approve",
-        "set_approval_for_all",
-        "safeTransferFrom",
-        "transferFrom",
-        "setApprovalForAll",
-        "mint",
-        "emit_metadata_update"
-      ]
-    },
-    {
-      "address": "0x25d8bbe3ae7b94f7a4064a7ead2f6da7fe37f759484cf13802719fbcabc6e94",
-      "class_hash": "0x7a71c379a1b844ae1c597131b94de89ce856dc69275f32e146f3302195281f2",
+      "address": "0x1e324ef99ffdf0ec5bfa2437ed283e2c97952b014feb1b19d4168f2cf399c31",
+      "class_hash": "0x2184561c3b6a53b5e8f6e5177e0bee7e5bc46106d4d8ae874bae573293b7f5f",
       "abi": [
         {
           "type": "impl",
@@ -11083,12 +9583,6 @@
     },
     {
       "members": [],
-      "class_hash": "0x115cffead33ee9d60195dbfce25c506f75692020b73e8fdffb90ae3c3ad6195",
-      "tag": "pistols-ChallengeToTournament",
-      "selector": "0x3b3ac14368c21157c2ae71de432820029e6938882a0c5a167cd1d990b8f9359"
-    },
-    {
-      "members": [],
       "class_hash": "0x5706ba4f26824e9b6ebce383468f8bb7655fa1cb9a7e61a3ca674992b73b6f2",
       "tag": "pistols-CoinConfig",
       "selector": "0x26fad4dff063a4f2c3b3889723194b9bdbbbf833e44ff2d573af01741b966ac"
@@ -11116,18 +9610,6 @@
       "class_hash": "0x3866f56df8048b396b14135fda9c40296c36284f29cd9c004de62a7af0421b7",
       "tag": "pistols-DuelistMemorial",
       "selector": "0x399b9689c37bf440c4f0478f361f68bd59161d01a096160d3ceaeae53b67b71"
-    },
-    {
-      "members": [],
-      "class_hash": "0xdc2e5bb9a031c39c331e7452da6001f874a496eedab97472fa7f5c911a8ec2",
-      "tag": "pistols-GameCounter",
-      "selector": "0x26eec1f6b779fa5bedf01d752f5ff36330d3d83377955414ad9606d34566957"
-    },
-    {
-      "members": [],
-      "class_hash": "0x32268509eabc1bd319688f1fca9d8151159dbb09b9cf26734dc23e0afffafe4",
-      "tag": "pistols-GameMetadata",
-      "selector": "0x7c059f0935a8b55055f5b02a2ad2c6a29aee83ceb10da72ed91d8240874861"
     },
     {
       "members": [],
@@ -11167,7 +9649,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x9e045b54620cd67f484d295e291d36bdb91befe5e949f0c07b74a71ff71b02",
+      "class_hash": "0x7c7f30c8675536c25cd44864734a51910e7eeaf90d7f2d46978ffe9051f55f6",
       "tag": "pistols-PlayerDuelistStack",
       "selector": "0xb47a4ea3849ae004ed3d0ba58070c0eb3cdca2bed8c9a6ab6bfe01210effc6"
     },
@@ -11179,7 +9661,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x3a0b999387aef7f089af03a16514e0e0530bb40a3be4a9b087d4ea3d56d0ba5",
+      "class_hash": "0x3cfc00c056d9350e4d2578e3e12766e744699c658b65ca91b1740399bbffbfc",
       "tag": "pistols-Pool",
       "selector": "0xb4328e5f120dfe361a8f367e6ea51e2be55dbc6b1c9f2c17a87b7d06ab8972"
     },
@@ -11188,12 +9670,6 @@
       "class_hash": "0x2548893501415f4828dff9d1b64a5ed6c497438ed305e6bc21f301fb0bb5797",
       "tag": "pistols-Round",
       "selector": "0x617e0a3d97aa8cb3f83bbb5341ede98d3e3d825b6424bcab0676933fec52bc2"
-    },
-    {
-      "members": [],
-      "class_hash": "0x18fc1c720db350bed92a902bee4a63a7df92b49569eabfcf5d46fc6bb73628a",
-      "tag": "pistols-Score",
-      "selector": "0x7b0ade5bb417aeb6f35b4db687ac9be1b6f34f28827e375c5ac59b8bf4fee5c"
     },
     {
       "members": [],
@@ -11209,24 +9685,6 @@
     },
     {
       "members": [],
-      "class_hash": "0xfe76028a63cb7cb179e39108da14dfc7a2a0b86ee2d32363dd9cf796d81fe7",
-      "tag": "pistols-Settings",
-      "selector": "0x3cc4022d8419487a7e2ea51336d0b6995f03250bd06d159dbaff6790552ea8c"
-    },
-    {
-      "members": [],
-      "class_hash": "0x1540d593f7b6d0ec355e68e7d066ad39cbb99c32c96a46d572c758c70f40c02",
-      "tag": "pistols-SettingsCounter",
-      "selector": "0x4ca592ab81f97ce7d204e3f285dbd9ffbc060e1be59d1fd5024dcfb7dc64508"
-    },
-    {
-      "members": [],
-      "class_hash": "0x7289d1d56a6e92ff99925fdfac1f70d7829a991211281fdda7e6f4bb15b4453",
-      "tag": "pistols-SettingsDetails",
-      "selector": "0x105465af482290f84252c61916a593513256fef315de612534f4959b2444f65"
-    },
-    {
-      "members": [],
       "class_hash": "0x1cffc5a620fe04958256b135067dae1cc2f1238989852f2081154f7ede43974",
       "tag": "pistols-TokenBoundAddress",
       "selector": "0x51e7eddb7555dc0cb6f6bdb0de4d85ac38457ede50d70e4f714a27c00047c8f"
@@ -11236,42 +9694,6 @@
       "class_hash": "0x3decd5c15132304f305bbad2f89f85727ac6d90962b650cce923c5788e7cc2f",
       "tag": "pistols-TokenConfig",
       "selector": "0x56ebd3387f45e8b292b472f3539e675031f12cf156c07c309c6403044f71fed"
-    },
-    {
-      "members": [],
-      "class_hash": "0x33d1fab3b617046a970045ee9e236a70a7585a8938b9c54eddd2b1ef9979b9a",
-      "tag": "pistols-TokenMetadata",
-      "selector": "0x135eb76704388937602a23efa2f44a8472c5375b9adfce91c92abeb6d3d4ed0"
-    },
-    {
-      "members": [],
-      "class_hash": "0x1d840706d59f3d10d5b14fe8ae385c767724028b6abfd83046d4a3128bef805",
-      "tag": "pistols-Tournament",
-      "selector": "0x64a3b762eec4af43f2cfb665215f82c50647598d9c96878fc07ad36b634f23f"
-    },
-    {
-      "members": [],
-      "class_hash": "0x6df07d1ceea0b037072426ec04d084902ec6eb5340bb32fcd78d891f664ed6f",
-      "tag": "pistols-TournamentPass",
-      "selector": "0x41703fda947f86058e7f7f93f669d761ec05349abb31f521c74e610770bb997"
-    },
-    {
-      "members": [],
-      "class_hash": "0x647e79a29955c5707dfb0d52c07e7f0a0327ac1d671e2108d0d45e87e3b5731",
-      "tag": "pistols-TournamentRound",
-      "selector": "0x6190706b6c595b9cd36804f52ee3b5a30561461e312f0ee96e8eeec5db778fb"
-    },
-    {
-      "members": [],
-      "class_hash": "0x5c1b3b23777ba1c29d1fa38d8f8ff2e8a752ac09fde97235d36f3681e94813e",
-      "tag": "pistols-TournamentSettings",
-      "selector": "0x188fa61e9c4d2eba9a965c2319ac0c978cd4d9683977924de711d8f335b6346"
-    },
-    {
-      "members": [],
-      "class_hash": "0x2be88e1ffe690aaa8aae0a7cea1bd971c5bcecd5bb66ef37a085bac85a2dd8d",
-      "tag": "pistols-TournamentToChallenge",
-      "selector": "0x13da5d020bbe2d7a1b782241234d0433d4179d33c84fed78398b24eb27c62ea"
     }
   ],
   "events": [
