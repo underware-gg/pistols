@@ -12,6 +12,7 @@ import StarknetConnectModal from '/src/components/starknet/StarknetConnectModal'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 import { ProfilePic } from '/src/components/account/ProfilePic'
+import { NODE_ENV } from '/src/utils/env'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -51,7 +52,7 @@ export function DojoAccount() {
         <Row>
           <Cell>import.meta.env.NODE_ENV</Cell>
           <Cell className='Code Important'>
-            {import.meta.env.NODE_ENV}
+            {NODE_ENV}
           </Cell>
         </Row>
         <Row>

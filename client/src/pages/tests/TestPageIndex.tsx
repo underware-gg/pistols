@@ -5,12 +5,12 @@ import App from '/src/components/App'
 
 const testPages = [
   { name: 'connect', connected: true },
+  { name: 'sign', connected: true },
   { name: 'tokens', connected: true },
   { name: 'tutorial', connected: true },
   { name: 'timestamp', connected: true },
   { name: 'profiles', connected: false },
   { name: 'icons', connected: false },
-  // { name: 'sign', connected: true },
 ]
 
 export default function TestPageIndex() {
