@@ -42,6 +42,7 @@ pub trait IGame<TState> {
 #[starknet::interface]
 pub trait IGameProtected<TState> {
     fn create_trophies(ref self: TState);
+    fn do_that_thing(ref self: TState);
 }
 
 #[dojo::contract]
@@ -102,7 +103,7 @@ pub mod game {
         cards::hand::{FinalBlow},
         constants::{FAME},
     };
-    use pistols::types::trophies::{Trophy, TrophyTrait, TROPHY};
+    use pistols::types::trophies::{Trophy, TrophyTrait, TrophyProgressTrait, TROPHY_ID};
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::libs::game_loop::{game_loop, make_moves_hash};
 
@@ -336,6 +337,13 @@ pub mod game {
             self._finish_challenge(ref store, ref challenge, ref round, Option::Some(progress.winner));
             // store.set_challenge(@challenge); // _finish_challenge() does it
             // store.set_round(@round); // _finish_challenge() does it
+
+            // deliver trophies
+            if (challenge.winner.is_non_zero()) {
+                TrophyProgressTrait::duel_resolved(@store.world, @challenge, @round, @progress);
+            } else {
+                TrophyProgressTrait::duel_draw(@store.world, @challenge, @round, @progress);
+            }
         }
 
         fn clear_call_to_action(ref self: ContractState, duelist_id: u128) {
@@ -382,6 +390,8 @@ pub mod game {
                     // some player timed out...
                     assert(self._finish_challenge_if_timed_out(ref store, ref challenge, ref round), Errors::IMPOSSIBLE_ERROR);
                 }
+                // arcade
+                TrophyProgressTrait::collected_duel(@store.world, @starknet::get_caller_address());
             }
             (challenge.winner)
         }
@@ -394,8 +404,8 @@ pub mod game {
             store.set_config_season_id(new_season_id);
             // release...
             store.world.bank_protected_dispatcher().release_season_pool(season.season_id);
-            // all hail the collector
-            Trophy::Collector.progress(store.world, starknet::get_caller_address(), 1);
+            // arcade
+            TrophyProgressTrait::collected_season(@store.world, @starknet::get_caller_address());
             (new_season_id)
         }
 
@@ -513,6 +523,9 @@ pub mod game {
             self._assert_caller_is_owner();
             self._create_trophies();
         }
+        fn do_that_thing(ref self: ContractState) {
+            TrophyProgressTrait::the_thing(@self.world_default(), @starknet::get_caller_address());
+        }
     }
 
 
@@ -529,7 +542,7 @@ pub mod game {
         fn _create_trophies(ref self: ContractState) {
             let mut world = self.world_default();
             let mut trophy_id: u8 = 1;
-            while trophy_id <= TROPHY::COUNT {
+            while (trophy_id <= TROPHY_ID::COUNT) {
                 let trophy: Trophy = trophy_id.into();
                 self.achievable.create(
                     world,
@@ -712,13 +725,8 @@ pub mod game {
                 store.set_leaderboard(@leaderboard);
             }
 
-            // unlock achievements
-            if (*challenge.winner != 0) {
-                let winner_address: ContractAddress = (*challenge).winner_address();
-
-                // TODO: check win count first!
-                Trophy::FirstBlood.progress(store.world, winner_address, 1);
-            }
+            TrophyProgressTrait::duelist_scored(@store.world, challenge.address_a, @duelist_a.status, @rewards_a, *challenge.winner == 1);
+            TrophyProgressTrait::duelist_scored(@store.world, challenge.address_b, @duelist_b.status, @rewards_b, *challenge.winner == 2);
         }
     }
 }

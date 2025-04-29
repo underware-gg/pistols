@@ -30,13 +30,11 @@ pub impl PacesCardImpl of PacesCardTrait {
     }
     #[inline(always)]
     fn is_before(self: @PacesCard, other: @PacesCard) -> bool {
-        let pace: u8 = (*self).into();
-        (pace < (*other).into())
+        (self < other)
     }
-    #[inline]
+    #[inline(always)]
     fn is_after(self: @PacesCard, other: @PacesCard) -> bool {
-        let pace: u8 = (*self).into();
-        (pace > (*other).into())
+        (self > other)
     }
     fn honour(self: @PacesCard) -> u8 {
         match self {
@@ -67,6 +65,23 @@ pub impl PacesCardImpl of PacesCardTrait {
             PacesCard::Paces9.into(),
             PacesCard::Paces10.into(),
         ].span())
+    }
+}
+
+impl PacesCardPartialOrd of PartialOrd<PacesCard> {
+    fn le(lhs: PacesCard, rhs: PacesCard) -> bool {
+        (!Self::gt(lhs, rhs))
+    }
+    fn ge(lhs: PacesCard, rhs: PacesCard) -> bool {
+        (Self::gt(lhs, rhs) || lhs == rhs)
+    }
+    fn lt(lhs: PacesCard, rhs: PacesCard) -> bool {
+        (!Self::gt(lhs, rhs) && lhs != rhs)
+    }
+    fn gt(lhs: PacesCard, rhs: PacesCard) -> bool {
+        let l: u8 = lhs.into();
+        let r: u8 = rhs.into();
+        (l > r)
     }
 }
 
@@ -141,5 +156,14 @@ mod unit {
             // println!("PacesCard {} == {}", i, as_u8);
             i += 1;
         };
+    }
+    #[test]
+    fn test_partial_ord() {
+        assert!(PacesCard::Paces1 < PacesCard::Paces2);
+        assert!(PacesCard::Paces1 <= PacesCard::Paces2);
+        assert!(PacesCard::Paces1 <= PacesCard::Paces1);
+        assert!(PacesCard::Paces2 > PacesCard::Paces1);
+        assert!(PacesCard::Paces2 >= PacesCard::Paces1);
+        assert!(PacesCard::Paces2 >= PacesCard::Paces2);
     }
 }

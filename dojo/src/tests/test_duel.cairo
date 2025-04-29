@@ -32,6 +32,7 @@ pub mod tests {
             ID, OWNER, OTHER, BUMMER, FAKE_OWNER_OF_1,
             _assert_is_alive, _assert_is_dead,
             SEASON_ID_1, MESSAGE,
+            Trophy,
         }
     };
     use pistols::tests::prefabs::{prefabs,
@@ -86,7 +87,7 @@ pub mod tests {
         assert_eq!(final_step.state_b.dice_fire, round.state_b.dice_fire, "state_final_b.dice_fire");
     }
 
-    fn _test_resolved_draw(mocked: Span<MockedValue>, moves_a: PlayerMoves, moves_b: PlayerMoves, final_health: u8) {
+    fn _test_resolved_draw(mocked: Span<MockedValue>, moves_a: PlayerMoves, moves_b: PlayerMoves, final_health: u8) -> TestSystems {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         sys.rng.mock_values(mocked);
 
@@ -123,6 +124,7 @@ pub mod tests {
         tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
         tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
         tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::drop_dojo_events(@sys);
         tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
         let (challenge, round) = tester::get_Challenge_Round(@sys, duel_id);
         tester::assert_pact(@sys, duel_id, challenge, false, false, "ended");
@@ -186,26 +188,24 @@ pub mod tests {
         assert_eq!(fools_balance_b, 0, "fools_balance_b_final");
 
         _assert_duel_progress(@sys, duel_id, moves_a.moves, moves_b.moves);
+        
+        (sys)
     }
 
     #[test]
     fn test_resolved_draw_miss() {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_miss();
-        _test_resolved_draw(mocked, moves_a, moves_b, CONST::FULL_HEALTH);
+        let sys: TestSystems = _test_resolved_draw(mocked, moves_a, moves_b, CONST::FULL_HEALTH);
+        tester::assert_event_trophy(@sys, Trophy::Blindfold, OTHER());
+        // tester::assert_event_trophy(@sys, Trophy::Blindfold, OWNER());
     }
 
     #[test]
     fn test_resolved_draw_crit() {
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
-// (*salts.salts[0]).print();
-// (*salts.salts[1]).print();
-// (*salts.values[0]).print();
-// (*salts.values[1]).print();
-// (*moves_a.moves[0]).print();
-// (*moves_a.moves[1]).print();
-// (*moves_b.moves[0]).print();
-// (*moves_b.moves[1]).print();
-        _test_resolved_draw(mocked, moves_a, moves_b, 0);
+        let sys: TestSystems = _test_resolved_draw(mocked, moves_a, moves_b, 0);
+        tester::assert_event_trophy(@sys, Trophy::BloodBath, OTHER());
+        // tester::assert_event_trophy(@sys, Trophy::BloodBath, OWNER());
     }
 
     

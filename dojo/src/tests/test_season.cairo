@@ -16,6 +16,7 @@ mod tests {
             IGameDispatcherTrait,
             TestSystems, FLAGS,
             ID, OWNER, OTHER, SEASON_ID_1, SEASON_ID_2, MESSAGE,
+            Trophy,
         }
     };
     use pistols::tests::prefabs::{prefabs};
@@ -105,7 +106,9 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let season: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season.period.end);
+        tester::drop_dojo_events(@sys);
         tester::execute_collect_season(@sys.game, OWNER());
+        tester::assert_event_trophy(@sys, Trophy::SeasonCollector, OWNER());
         // no panic!
     }
 

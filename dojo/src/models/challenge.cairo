@@ -127,6 +127,12 @@ pub impl ChallengeImpl of ChallengeTrait {
         else {ZERO()})
     }
     #[inline(always)]
+    fn loser_address(self: @Challenge) -> ContractAddress {
+        (if (*self.winner == 1) {*self.address_b}
+        else if (*self.winner == 2) {*self.address_a}
+        else {ZERO()})
+    }
+    #[inline(always)]
     fn exists(self: @Challenge) -> bool {
         ((*self).state.exists())
     }
@@ -227,6 +233,10 @@ pub impl DuelistStateImpl of DuelistStateTrait {
     fn apply_chances(ref self: DuelistState, amount: i8) {
         self.chances.addi(amount);
         self.chances.clampi(0, 100);
+    }
+    #[inline(always)]
+    fn has_hit(self: @DuelistState) -> bool {
+        (*self.dice_fire > 0 && self.dice_fire <= self.chances)
     }
 }
 

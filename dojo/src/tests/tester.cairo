@@ -63,9 +63,12 @@ pub mod tester {
         mock_duelist::{duelist_token as mock_duelist},
     };
 
-    use pistols::types::challenge_state::{ChallengeState};
-    use pistols::types::constants::{CONST, FAME};
-    use pistols::types::premise::{Premise};
+    pub use pistols::types::{
+        premise::{Premise},
+        challenge_state::{ChallengeState},
+        trophies::{Trophy, TrophyTrait},
+        constants::{CONST, FAME},
+    };
     use pistols::utils::byte_arrays::{BoolToString};
     use pistols::utils::misc::{ContractAddressIntoU256};
     use pistols::utils::short_string::{ShortString};
@@ -559,6 +562,24 @@ pub mod tester {
     pub fn assert_only_event_approval(emitter: ContractAddress, owner: ContractAddress, spender: ContractAddress, token_id: u256) {
         assert_event_approval(emitter, owner, spender, token_id);
         assert_no_events_left(emitter);
+    }
+
+    // dojo events, based on:
+    // https://github.com/cartridge-gg/arcade/blob/main/packages/achievement/src/tests/test_achievable.cairo#L77
+    pub fn drop_dojo_events(sys: @TestSystems) {
+        drop_all_events(*sys.world.dispatcher.contract_address);
+    }
+    pub fn assert_event_trophy(sys: @TestSystems, trophy: Trophy, address: ContractAddress) {
+        let contract_event = testing::pop_log::<dojo::world::world::Event>(*sys.world.dispatcher.contract_address).unwrap();
+        match contract_event {
+            dojo::world::world::Event::EventEmitted(event) => {
+                assert_eq!(*event.keys.at(0), address.into(), "Invalid player id");
+                assert_eq!(*event.keys.at(1), trophy.identifier(), "Invalid task id");
+                // assert_eq!(*event.values.at(0), 1, "Invalid count");
+                // assert_eq!(*event.values.at(1), 0, "Invalid time");
+            },
+            _ => {},
+        }
     }
 
 
