@@ -1,7 +1,7 @@
 #
 # torii config for profile [sepolia]
 #
-world_address = "0x4a97f61f0850e0878547419604378242ddefb26481b03b161c73cbcc90f504c"
+world_address = "0x4d8e1e053b604bb19e5b339596463d41aeccc99b2f9c1ae5f20954b02cccf04"
 rpc = "https://api.cartridge.gg/x/starknet/sepolia"
 
 [events]
@@ -16,12 +16,14 @@ historical = [
 
 [indexing]
 pending = true
-transactions = false
+transactions = true
+world_block = 23920
 contracts = [
-  "erc721:0x3e1da8b8d6208af7d90ae32d1c3a6f597223022bc0e72b5abc2ba07009c560f", # duel_token
-  "erc721:0x3d042d2022519481f424b01f1a68268f773d0220275a102e809f49dee62c1c3", # duelist_token
-  "erc721:0x32fecc3b90057da30d74fa450abcdd55621cd88000fe709384f8a6b1a910c9f", # pack_token
-  "erc20:0x714094302620cab7ac11446e06b62bd3276434abc1a530241a299da3646db81", # fame_coin
-  "erc20:0x424ac81a20192ad4503cdf830547aa6a82ae0bf5b36c96c3520cab69e30014a", # fools_coin
+  "erc721:0x377acc27a0ca83d1894a1ae62636ba3998197505b20b918e3e74effe395c6a7", # duel_token
+  "erc721:0x6012ef19b1a4c6d0b06f583c4d5fa13ba39e56297760073da636ab48e5ee6c8", # duelist_token
+  "erc721:0x578b4e302d95d233a1e5a45b648b7066a21896f288a31a98f77e8bd177b7b9b", # pack_token
+  # "erc721:$tournament_token", # tournament_token
+  "erc20:0x5c625ad8a1356b367d01a13defaa5e5b47f4cd6b364caeba39ca3c22d9a3c2b", # fame_coin
+  "erc20:0x4ca61a36aecafbda9370456e3a6cfe5e5e4496f9f067ad33b4b107efec81a0f", # fools_coin
   "erc20:0x044e6bcc627e6201ce09f781d1aae44ea4c21c2fdef299e34fce55bef2d02210", # lords
 ]
