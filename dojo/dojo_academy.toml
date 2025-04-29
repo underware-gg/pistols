@@ -10,7 +10,7 @@ description = "An on-chain pistol duelling game of honour and betrayal."
 icon_uri = "https://assets.underware.gg/pistols/logo.png"
 cover_uri = "https://assets.underware.gg/pistols/splash.jpg"
 website = "https://pistols.gg"
-seed = "academy-v0.14.0"
+seed = "pistols_v0_15_1"
 
 [world.socials]
 x = "https://x.com/underware_gg"
@@ -23,7 +23,7 @@ chain_id = "WP_PISTOLS_ACADEMY"
 rpc_url = "https://api.cartridge.gg/x/pistols-academy/katana"
 account_address = "0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec"
 private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
-world_address = "0x26ee0ad15771037e62341e39119d627cb25626e67349419cf3c5436d8eabefe"
+world_address = "0x4d8e1e053b604bb19e5b339596463d41aeccc99b2f9c1ae5f20954b02cccf04"
 world_block = 1
 
 #--------------------------

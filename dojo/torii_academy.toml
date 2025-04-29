@@ -1,7 +1,7 @@
 #
 # torii config for profile [academy]
 #
-world_address = "0x26ee0ad15771037e62341e39119d627cb25626e67349419cf3c5436d8eabefe"
+world_address = "0x4d8e1e053b604bb19e5b339596463d41aeccc99b2f9c1ae5f20954b02cccf04"
 rpc = "https://api.cartridge.gg/x/pistols-academy/katana"
 
 [events]
@@ -16,12 +16,14 @@ historical = [
 
 [indexing]
 pending = true
-transactions = false
+transactions = true
+world_block = 1
 contracts = [
-  "erc721:0x696c58bcb91164430e7fa80fd5c50df871f5df8ad2839ba5dd2601a5682c4b8", # duel_token
-  "erc721:0x141671758f2ca13ec22da04ce2c9e8e0eddeeb92ec5118d1689eabc67c56cb8", # duelist_token
-  "erc721:0x3fb0d6ab36e585ee77513f1d5c6480c9854744683c40feb356340b596e059a7", # pack_token
-  "erc20:0x70aeb5ce8607df0c403c2b49e4a896b3e5dfd56e9bb3b54102e7d29e30ff19c", # fame_coin
-  "erc20:0x3b305ffce54084a7ac5fc3d98966cb6726f805a7dc33170c6af0401b4e31c16", # fools_coin
-  "erc20:0x21483ef29cba2dc6af9ba3ff3ea130c085491ea13a3d21c491eb9c1728e9a84", # lords
+  "erc721:0x377acc27a0ca83d1894a1ae62636ba3998197505b20b918e3e74effe395c6a7", # duel_token
+  "erc721:0x6012ef19b1a4c6d0b06f583c4d5fa13ba39e56297760073da636ab48e5ee6c8", # duelist_token
+  "erc721:0x578b4e302d95d233a1e5a45b648b7066a21896f288a31a98f77e8bd177b7b9b", # pack_token
+  # "erc721:$tournament_token", # tournament_token
+  "erc20:0x5c625ad8a1356b367d01a13defaa5e5b47f4cd6b364caeba39ca3c22d9a3c2b", # fame_coin
+  "erc20:0x4ca61a36aecafbda9370456e3a6cfe5e5e4496f9f067ad33b4b107efec81a0f", # fools_coin
+  "erc20:0x2d68d64389d24893362ba035f5cadd144f16212624f9880dfcf7078d9dcb2c5", # lords
 ]
