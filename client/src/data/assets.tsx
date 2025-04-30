@@ -343,7 +343,8 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
   },
   [SceneName.Leaderboards]: {
     backgrounds: [
-      { texture: TextureName.bg_leaderboards, shiftMultiplier: 0, renderOrder: 0 }
+      { texture: TextureName.bg_leaderboards, shiftMultiplier: 0, renderOrder: 0 },
+      { texture: TextureName.bg_leaderboards, shiftMultiplier: 0, renderOrder: 0 },
     ]
   },
   [SceneName.Graveyard]: {
@@ -419,6 +420,8 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
 enum CharacterType {
   FEMALE = 'FEMALE',
   MALE = 'MALE',
+  CARD = 'CARD',
+  EXPLOSION = 'EXPLOSION',
 }
 enum AnimName {
   STILL = 'STILL',
@@ -439,11 +442,13 @@ enum AnimName {
   STRUCK_INJURED = 'STRUCK_INJURED',
   STRUCK_DEAD = 'STRUCK_DEAD',
   SEPPUKU = 'SEPPUKU',
+  BURN = 'BURN',
+  EXPLODE = 'EXPLODE',
 }
 interface AnimationAsset {
-  path: string
-  frameCount: number
-  frameRate: number
+  path?: string
+  frameCount?: number
+  frameRate?: number
 }
 type Spritesheets = {
   [key in CharacterType]: Animations
@@ -543,6 +548,16 @@ const SPRITESHEETS: Spritesheets = {
       frameCount: 19,
       frameRate: 8,
     },
+    [AnimName.BURN]: {
+      path: '',
+      frameCount: 0,
+      frameRate: 0,
+    },
+    [AnimName.EXPLODE]: { 
+      path: '',
+      frameCount: 0,
+      frameRate: 0,
+    },
   },
   MALE: {
     [AnimName.STILL]: {
@@ -635,7 +650,65 @@ const SPRITESHEETS: Spritesheets = {
       frameCount: 16,
       frameRate: 8,
     },
+    [AnimName.BURN]: {},
+    [AnimName.EXPLODE]: {},
   },
+  CARD: {
+    [AnimName.STILL]: {
+      path: '/textures/animations/Card/Idle',
+      frameCount: 3,
+      frameRate: 8,
+    },
+    [AnimName.BURN]: {
+      path: '/textures/animations/Card/Burn',
+      frameCount: 7,
+      frameRate: 8,
+    },
+    [AnimName.EXPLODE]: {},
+    [AnimName.STILL_BLADE]: {},
+    [AnimName.STEP_1]: {},
+    [AnimName.STEP_2]: {},
+    [AnimName.TWO_STEPS]: {},
+    [AnimName.SHOOT]: {},
+    [AnimName.DODGE_BACK]: {},
+    [AnimName.DODGE_FRONT]: {},
+    [AnimName.STRUCK_INJURED]: {},
+    [AnimName.STRUCK_DEAD]: {},
+    [AnimName.SEPPUKU]: {},
+    [AnimName.STRIKE_LIGHT]: {},
+    [AnimName.STRIKE_HEAVY]: {},
+    [AnimName.STRIKE_BLOCK]: {},
+    [AnimName.SHOT_INJURED_BACK]: {},
+    [AnimName.SHOT_INJURED_FRONT]: {},
+    [AnimName.SHOT_DEAD_BACK]: {},
+    [AnimName.SHOT_DEAD_FRONT]: {},
+  },
+  EXPLOSION: {
+    [AnimName.EXPLODE]: {
+      path: '/textures/animations/Explosion/Explode',
+      frameCount: 6,
+      frameRate: 8,
+    },
+    [AnimName.STILL]: {},
+    [AnimName.BURN]: {},
+    [AnimName.STILL_BLADE]: {},
+    [AnimName.STEP_1]: {},
+    [AnimName.STEP_2]: {},
+    [AnimName.TWO_STEPS]: {},
+    [AnimName.SHOOT]: {},
+    [AnimName.DODGE_BACK]: {},
+    [AnimName.DODGE_FRONT]: {},
+    [AnimName.STRUCK_INJURED]: {},
+    [AnimName.STRUCK_DEAD]: {},
+    [AnimName.SEPPUKU]: {},
+    [AnimName.STRIKE_LIGHT]: {},
+    [AnimName.STRIKE_HEAVY]: {},
+    [AnimName.STRIKE_BLOCK]: {},
+    [AnimName.SHOT_INJURED_BACK]: {},
+    [AnimName.SHOT_INJURED_FRONT]: {},
+    [AnimName.SHOT_DEAD_BACK]: {},
+    [AnimName.SHOT_DEAD_FRONT]: {},
+  }
 }
 
 

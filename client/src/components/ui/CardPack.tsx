@@ -442,6 +442,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
               isLeft={false}
               isVisible={false}
               isSelected={selectedDuelistId === id}
+              isHighlightable={true}
               onHover={(isHovered) => {
                 if (cardRefs.current[i] && id !== selectedDuelistId) {
                   cardRefs.current[i].setScale(isHovered ? 1.1 : 1, CARD_PACK_CARD_SCALE_DURATION);

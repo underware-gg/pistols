@@ -161,8 +161,6 @@ let _duelistManager: DuelistsManager
 // Duelist highlight effects
 let _duelistHighlightA: THREE.Group
 let _duelistHighlightB: THREE.Group
-let _duelistTentaclesA: THREE.Group
-let _duelistTentaclesB: THREE.Group
 
 let _scenes: Partial<Record<SceneName, THREE.Scene>> = {}
 export let _currentScene: THREE.Scene = null
@@ -370,254 +368,15 @@ function setGUI() {
 function createDuelistHighlight() {
   const playerColor = 0xff3333;
   const accentColor = 0xff6666;
-  
-  // Create tentacles
-  // Tentacle configuration parameters
-  const tentacleConfig = {
-    baseThickness: 0.14,        // Base thickness of the tentacle
-    tipTaperFactor: 2.5,        // Controls how much the tentacle tapers (higher = more tapering)
-    length: 2.2,                // Base length of tentacles
-    lengthVariation: 0.2,       // Variation in length (±20%)
-    segments: 15,               // Number of segments for tentacle curve
-    radialSegments: 8,          // Number of segments around the circumference
-    curvatureStrength: 0.15,    // How much the tentacle curves (x-direction)
-    secondaryCurve: 0.12,       // Secondary curve strength (z-direction)
-    wiggleSpeed: 3.5,           // Base speed of wiggle animation
-    wiggleSpeedVariation: 0.5,  // Variation in wiggle speed
-    wiggleAmount: 0.4,          // Base amount of wiggle
-    wiggleAmountVariation: 0.2, // Variation in wiggle amount
-    positionVariation: 0.08,    // Position variation as fraction of radius (±8%)
-    angleVariation: 0.03,       // Angle variation as fraction of circle (±3%)
-    rotationVariation: 0.15     // Random rotation in other axes (±0.15 radians)
-  };
-  
-  // Create tentacle material
-  const tentacleMaterial = new THREE.MeshStandardMaterial({
-    color: playerColor,
-    emissive: playerColor,
-    emissiveIntensity: 0.5,
-    transparent: true,
-    opacity: 0,
-    roughness: 0.3,
-    metalness: 0.2,
-  });
-  // Create tentacle group
-  const tentacleGroup = new THREE.Group();
-  
-  // Function to create a tentacle with dynamic curve
-  // const createTentacle = (length, segments) => {
-  //   // Create initial curve points - these will be updated during animation
-  //   const curvePoints = [];
-  //   for (let j = 0; j <= segments; j++) {
-  //     const t = j / segments;
-  //     curvePoints.push(new THREE.Vector3(0, length * t, 0));
-  //   }
-    
-  //   // Create a curve that will be updated
-  //   const curve = new THREE.CatmullRomCurve3(curvePoints);
-    
-  //   // Create a tube with initial curve
-  //   const tubeGeometry = new THREE.TubeGeometry(
-  //     curve,
-  //     segments * 3, // More segments for smoother curve
-  //     tentacleConfig.baseThickness, // Starting radius
-  //     tentacleConfig.radialSegments, // Radial segments
-  //     false // Not closed
-  //   );
-    
-  //   // Apply initial tapering
-  //   const positionAttribute = tubeGeometry.getAttribute('position');
-  //   const vertexCount = positionAttribute.count;
-    
-  //   // Store original vertex positions relative to their segment centers
-  //   // This will help us update the geometry correctly during animation
-  //   const originalRelativePositions = [];
-    
-  //   for (let i = 0; i < vertexCount; i++) {
-  //     const tubularIndex = Math.floor(i / (tentacleConfig.radialSegments + 1));
-  //     const t = tubularIndex / (segments * 3);
-      
-  //     // Non-linear taper for more realistic tentacle shape
-  //     const radius = tentacleConfig.baseThickness * Math.pow(1 - t, tentacleConfig.tipTaperFactor);
-  //     const scale = radius / tentacleConfig.baseThickness;
-      
-  //     // Get current position
-  //     const x = positionAttribute.getX(i);
-  //     const y = positionAttribute.getY(i);
-  //     const z = positionAttribute.getZ(i);
-      
-  //     // Get position relative to center of current ring
-  //     const ringCenter = curve.getPointAt(Math.min(t, 1));
-  //     const relX = (x - ringCenter.x) * scale;
-  //     const relY = (y - ringCenter.y) * scale;
-  //     const relZ = (z - ringCenter.z) * scale;
-      
-  //     // Store the relative position and the tubular index for later use
-  //     originalRelativePositions.push({
-  //       relX, relY, relZ, 
-  //       tubularIndex,
-  //       t: Math.min(t, 1)
-  //     });
-      
-  //     // Apply initial taper
-  //     positionAttribute.setXYZ(
-  //       i,
-  //       ringCenter.x + relX,
-  //       ringCenter.y + relY,
-  //       ringCenter.z + relZ
-  //     );
-  //   }
-    
-  //   // Store the data needed for animation
-  //   tubeGeometry.userData = {
-  //     curve,
-  //     curvePoints,
-  //     originalRelativePositions,
-  //     segments
-  //   };
-    
-  //   positionAttribute.needsUpdate = true;
-  //   tubeGeometry.computeVertexNormals();
-    
-  //   return new THREE.Mesh(tubeGeometry, tentacleMaterial.clone());
-  // };
-  
-  // // Function to place tentacles in a circle
-  // const createTentacleCircle = (radius, count) => {
-  //   const tentacles = [];
-    
-  //   for (let i = 0; i < count; i++) {
-  //     const angle = (i / count) * Math.PI * 2;
-      
-  //     // Add variation to length (±20%)
-  //     const lengthVariation = 1 + (Math.random() * tentacleConfig.lengthVariation * 2 - tentacleConfig.lengthVariation);
-  //     const tentacleLength = tentacleConfig.length * lengthVariation;
-      
-  //     // Create a single tentacle
-  //     const tentacle = createTentacle(tentacleLength, tentacleConfig.segments);
-  //     tentacle.name = 'tentacle';
-      
-  //     // Add position variation (±8% of radius)
-  //     const radiusVariation = radius * (1 + (Math.random() * tentacleConfig.positionVariation * 2 - tentacleConfig.positionVariation));
-      
-  //     // Add angle variation (±3% of a full circle)
-  //     const angleVariation = angle + (Math.random() * tentacleConfig.angleVariation * 2 - tentacleConfig.angleVariation);
-      
-  //     // Position the tentacle in a circle with variation
-  //     tentacle.position.x = Math.cos(angleVariation) * radiusVariation;
-  //     tentacle.position.z = Math.sin(angleVariation) * radiusVariation;
-  //     tentacle.position.y = 0; // Start at ground level
-      
-  //     // Rotate to point outward from center
-  //     tentacle.rotation.y = Math.PI * 2 - angleVariation;
-      
-  //     // Add random rotation in other axes for more organic look
-  //     tentacle.rotation.x = (Math.random() * tentacleConfig.rotationVariation * 2) - tentacleConfig.rotationVariation;
-  //     tentacle.rotation.z = (Math.random() * tentacleConfig.rotationVariation * 2) - tentacleConfig.rotationVariation;
-      
-  //     // Store animation data
-  //     tentacle.userData = {
-  //       ...tentacle.userData,
-  //       initialAngle: angleVariation,
-  //       initialRadius: radiusVariation,
-  //       initialRotation: {
-  //         x: tentacle.rotation.x,
-  //         y: tentacle.rotation.y,
-  //         z: tentacle.rotation.z
-  //       },
-  //       timeOffset: Math.random() * Math.PI * 2,
-  //       wiggleSpeed: tentacleConfig.wiggleSpeed + Math.random() * tentacleConfig.wiggleSpeedVariation,
-  //       wiggleAmount: tentacleConfig.wiggleAmount + Math.random() * tentacleConfig.wiggleAmountVariation,
-  //       length: tentacleLength
-  //     };
-      
-  //     tentacles.push(tentacle);
-  //     tentacleGroup.add(tentacle);
-  //   }
-    
-  //   return tentacles;
-  // };
-  
-  // Create circle of tentacles (60% larger than teeth circle)
-  const tentacleRadius = 0.24 * 1.6; // Using the same radius as the teeth would have been
-  const tentacleCount = 12; // Fewer tentacles than teeth, as they're larger
-  // const tentacles = createTentacleCircle(tentacleRadius, tentacleCount);
-  
-  // Store the initial time for animation
-  const initialTime = Date.now() / 1000;
+
   const group = new THREE.Group();
-  
-  // Add animation function to the group
-  // tentacleGroup.userData.animateTentacles = function(deltaTime, elapsedTime) {
-  //   const time = elapsedTime;
-    
-  //   // Animate each tentacle
-  //   tentacles.forEach((tentacle, index) => {
-  //     const data = tentacle.userData;
-  //     const geometry = tentacle.geometry;
-  //     const geometryData = geometry.userData;
-      
-  //     // Update the curve points for wiggling effect
-  //     // First point always stays at the base (0,0,0)
-  //     geometryData.curvePoints[0].set(0, 0, 0);
-      
-  //     for (let j = 1; j <= geometryData.segments; j++) {
-  //       const t = j / geometryData.segments;
-        
-  //       // Increase wiggle amount as we move up the tentacle
-  //       const wiggleFactor = t * t; // Quadratic increase for more movement at the tip
-        
-  //       // Create different frequencies of movement
-  //       const timeScale = data.wiggleSpeed;
-  //       const xWiggle = Math.sin(time * timeScale + data.timeOffset + j * 0.5) * data.wiggleAmount * wiggleFactor;
-  //       const zWiggle = Math.cos(time * timeScale * 0.7 + data.timeOffset + j * 0.3) * data.wiggleAmount * wiggleFactor;
-        
-  //       // The base of the tentacle stays relatively still, the tip moves more
-  //       geometryData.curvePoints[j].set(
-  //         xWiggle,
-  //         data.length * t, // Height increases linearly
-  //         zWiggle
-  //       );
-  //     }
-      
-  //     // Update the curve with new points
-  //     geometryData.curve.points = geometryData.curvePoints;
-      
-  //     // Update all vertices based on the new curve
-  //     const positionAttribute = geometry.getAttribute('position');
-      
-  //     for (let i = 0; i < geometryData.originalRelativePositions.length; i++) {
-  //       const vertexData = geometryData.originalRelativePositions[i];
-        
-  //       // Get the updated position on the curve
-  //       const pointOnCurve = geometryData.curve.getPointAt(vertexData.t);
-        
-  //       // Apply the relative offset to maintain the tube shape
-  //       positionAttribute.setXYZ(
-  //         i,
-  //         pointOnCurve.x + vertexData.relX,
-  //         pointOnCurve.y + vertexData.relY,
-  //         pointOnCurve.z + vertexData.relZ
-  //       );
-  //     }
-      
-  //     positionAttribute.needsUpdate = true;
-  //     geometry.computeVertexNormals();
-      
-  //     // Also apply some rotation to the entire tentacle for additional movement
-  //     const rotWiggleX = Math.sin(time * 0.5 + data.timeOffset) * 0.05;
-  //     const rotWiggleZ = Math.cos(time * 0.3 + data.timeOffset) * 0.05;
-      
-  //     tentacle.rotation.x = data.initialRotation.x + rotWiggleX;
-  //     tentacle.rotation.z = data.initialRotation.z + rotWiggleZ;
-  //   });
-  // };
   
   // Rotating magical runes ring
   const runeRingGeometry = new THREE.RingGeometry(0.25, 0.32, 32, 2, 0, Math.PI * 2);
   const runeRingMaterial = new THREE.MeshBasicMaterial({
     color: playerColor,
     transparent: true,
+    alphaTest: 0.5,
     opacity: 0, // Start invisible
     side: THREE.DoubleSide,
     blending: THREE.AdditiveBlending,
@@ -637,7 +396,8 @@ function createDuelistHighlight() {
     transparent: true,
     opacity: 0, // Start invisible
     side: THREE.DoubleSide,
-    blending: THREE.AdditiveBlending
+    blending: THREE.AdditiveBlending,
+    depthWrite: false // Don't write to depth buffer
   });
   const pillar = new THREE.Mesh(pillarGeometry, pillarMaterial);
   pillar.position.y = 5;
@@ -664,7 +424,8 @@ function createDuelistHighlight() {
     size: 0.04,
     transparent: true,
     opacity: 1, // Start invisible
-    blending: THREE.AdditiveBlending
+    blending: THREE.AdditiveBlending,
+    depthWrite: false // Don't write to depth buffer
   });
   
   const positions = new Float32Array(particlesCount * 3);
@@ -697,28 +458,15 @@ function createDuelistHighlight() {
   
   // Set initial state - invisible
   group.visible = false;
-  group.scale.set(0.01, 0.01, 0.01);
-
-  tentacleGroup.visible = false
+  group.scale.set(0.01, 0.01, 0.01);  
   
-  return {
-    group,
-    tentacleGroup
-  };
+  return group;
 }
 
-function startSummoningAnimation(tentacleGroup: THREE.Group, group: THREE.Group, isPlayerHighlight = true) {
+function startSummoningAnimation(group: THREE.Group, isPlayerHighlight = true) {
     // Set colors based on isPlayerHighlight
     const playerColor = isPlayerHighlight ? 0x00ff88 : 0xff3333;
     const accentColor = isPlayerHighlight ? 0x00ff88 : 0xff3333;
-    
-    // Update materials with the appropriate colors
-    // tentacleGroup.traverse((child) => {
-    //   if (child instanceof THREE.Mesh && child.material) {
-    //     (child.material as THREE.MeshStandardMaterial).color.setHex(playerColor);
-    //     (child.material as THREE.MeshStandardMaterial).emissive.setHex(playerColor);
-    //   }
-    // });
     
     // Update colors for all effect elements
     const runeRing = group.getObjectByName('rotatingElement') as THREE.Mesh;
@@ -740,40 +488,12 @@ function startSummoningAnimation(tentacleGroup: THREE.Group, group: THREE.Group,
     if (particles && particles.material) {
       (particles.material as THREE.PointsMaterial).color.setHex(accentColor);
     }
-    
-    // tentacleGroup.visible = true;
-    
-    // // Animate scale from 0 to 1
-    // new TWEEN.Tween(tentacleGroup.scale)
-    //   .to({ x: 1, y: 1, z: 1 }, 0)
-    //   .easing(TWEEN.Easing.Linear.None)
-    //   .start();
-    
-    // // Animate opacity of each tentacle from 0 to 1
-    // tentacleGroup.children.forEach((tentacle, index) => {
-    //   if (tentacle instanceof THREE.Mesh && tentacle.material) {
-    //     // Add slight delay for each tentacle for a more organic appearance
-    //     const delay = index * 50;
-        
-    //     new TWEEN.Tween((tentacle.material as THREE.MeshStandardMaterial))
-    //       .to({ opacity: 1 }, 800)
-    //       .delay(delay)
-    //       .easing(TWEEN.Easing.Cubic.Out)
-    //       .onComplete(() => {
-    //         // When all tentacles are visible, fade in other effects
-    //         if (index === tentacleGroup.children.length - 1) {
-    //           fadeInHighlightEffects(tentacleGroup, group);
-    //         }
-    //       })
-    //       .start();
-    //   }
-    // });
 
-    fadeInHighlightEffects(tentacleGroup, group);
+    fadeInHighlightEffects(group);
 }
 
 // Helper function to fade in the highlight effects (except tentacles)
-function fadeInHighlightEffects(tentacleGroup: THREE.Group, group: THREE.Group) {
+function fadeInHighlightEffects(group: THREE.Group) {
   group.visible = true;
 
   new TWEEN.Tween(group.scale)
@@ -814,25 +534,6 @@ function fadeInHighlightEffects(tentacleGroup: THREE.Group, group: THREE.Group) 
     new TWEEN.Tween((particles.material as THREE.PointsMaterial))
       .to({ opacity: 0.4 }, 800)
       .easing(TWEEN.Easing.Cubic.Out)
-      .start();
-  }
-  
-  // After effects are faded in, retract the tentacles
-  // setTimeout(() => {
-  //   retractTentacles(tentacleGroup);
-  // }, 1000);
-}
-
-// Helper function to retract tentacles
-function retractTentacles(tentacleGroup: THREE.Group) {
-  if (tentacleGroup) {
-    new TWEEN.Tween(tentacleGroup.position)
-      .to({ y: -2 }, 2000)
-      .easing(TWEEN.Easing.Quartic.InOut)
-      .onComplete(() => {
-        // Remove tentacles from scene to save resources
-        tentacleGroup.visible = false
-      })
       .start();
   }
 }
@@ -892,17 +593,6 @@ function completeSummoningAnimation(group: THREE.Group) {
 
 // Function to animate the highlight effects
 function animateHighlights(deltaTime) {
-  // Shared time value for syncing animations
-  const time = performance.now() * 0.001;
-
-  if (_duelistTentaclesA && _duelistTentaclesA.visible) {
-    _duelistTentaclesA.userData.animateTentacles(deltaTime, time);
-  }
-
-  if (_duelistTentaclesB && _duelistTentaclesB.visible) {
-    _duelistTentaclesB.userData.animateTentacles(deltaTime, time);
-  }
-  
   if (_duelistHighlightA && _duelistHighlightA.visible) {    
     // Animate particles
     const particlesA = _duelistHighlightA.getObjectByName('magicParticles') as THREE.Points;
@@ -1091,21 +781,14 @@ function setupDuelScene() {
   loadGltf(scene)
   
   // Create duelist highlight effects
-  const { group: groupA, tentacleGroup: tentacleGroupA } = createDuelistHighlight();
-  const { group: groupB, tentacleGroup: tentacleGroupB } = createDuelistHighlight();
+  const groupA = createDuelistHighlight();
+  const groupB = createDuelistHighlight();
   _duelistHighlightA = groupA;
   _duelistHighlightB = groupB;
   _duelistHighlightA.position.set(0.5, 0, 2);
   _duelistHighlightB.position.set(-0.5, 0, 2);
   scene.add(_duelistHighlightA);
   scene.add(_duelistHighlightB);
-
-  _duelistTentaclesA = tentacleGroupA;
-  _duelistTentaclesB = tentacleGroupB;
-  _duelistTentaclesA.position.set(0.5, 0, 2);
-  _duelistTentaclesB.position.set(-0.5, 0, 2);
-  scene.add(_duelistTentaclesA);
-  scene.add(_duelistTentaclesB);
 
   _duelistManager = new DuelistsManager(scene, _duelCamera, _spriteSheets)
 
@@ -1116,7 +799,8 @@ export function hideDialogs() {
   _duelistManager.hideElements()
 }
 
-export function resetDuelScene(resetCamera = true) {
+export function resetDuelScene(resetCamera = true, fullReset = true) {
+  if (fullReset) _duelistManager?.resetDuelistsSpawned()
   if (!_duelistManager.resetDuelists()) return
 
   emitter.emit('animated', AnimationState.None)
@@ -1134,10 +818,7 @@ export function resetDuelScene(resetCamera = true) {
     zoomCameraToPaces(10, 0)
   }
   zoomCameraToPaces(0, 4)
-
-  completeSummoningAnimation(_duelistTentaclesA)
-  completeSummoningAnimation(_duelistTentaclesB)
-}
+} 
 
 function setEnvironment(scene: THREE.Scene) { //TODO add skymap
   /**
@@ -1422,6 +1103,8 @@ export function switchScene(sceneName) {
 
   if (_currentScene === sceneName) return;
 
+  console.log(`Switching scene to ${sceneName}`)
+
   if (!_currentScene) {
     _sceneName = sceneName
     _currentScene = _scenes[sceneName]
@@ -1468,7 +1151,9 @@ function fadeOutCurrentScene(callback) {
   _tweens.staticFade = new TWEEN.Tween({ opacity: 0 })
     .to({ opacity: 1 }, SCENE_CHANGE_ANIMATION_DURATION)
     .onUpdate(({ opacity }) => {
-      overlay.style.opacity = opacity.toString()
+      if (overlay) {
+        overlay.style.opacity = opacity.toString()
+      }
     })
     .onComplete(() => {
       callback();
@@ -1484,22 +1169,26 @@ function fadeInCurrentScene() {
   _tweens.staticFade = new TWEEN.Tween({ opacity: 1 })
     .to({ opacity: 0 }, SCENE_CHANGE_ANIMATION_DURATION)
     .onUpdate(({ opacity }) => {
-      overlay.style.opacity = opacity.toString()
+      if (overlay) {
+        overlay.style.opacity = opacity.toString()
+      }
     })
     .start();
 }
 
-export function spawnDuelist(duelist, duelistName, duelistModel, isYou) {
+export function setOnLoadComplete(onLoadComplete: () => void) {
+  _duelistManager.setLoadCompleteCallback(onLoadComplete)
+}
+
+export function spawnDuelist(duelist, duelistName, duelistModel, isYou, frontMaterialPath, backMaterialPath) {
   if (duelist == 'A') {
-    _duelistManager.setupDuelistA(duelistName, duelistModel, isYou)
-    setTimeout(() => {
-      startSummoningAnimation(_duelistTentaclesA, _duelistHighlightA, isYou)
-    }, 500)
+    _duelistManager.setupDuelistA(duelistName, duelistModel, isYou, frontMaterialPath, backMaterialPath, () => {
+      startSummoningAnimation(_duelistHighlightA, isYou)
+    })
   } else {
-    _duelistManager.setupDuelistB(duelistName, duelistModel, isYou)
-    setTimeout(() => {
-      startSummoningAnimation(_duelistTentaclesB, _duelistHighlightB, isYou)
-    }, 500)
+    _duelistManager.setupDuelistB(duelistName, duelistModel, isYou, frontMaterialPath, backMaterialPath, () => {
+      startSummoningAnimation(_duelistHighlightB, isYou)
+    })
   }
 }
 

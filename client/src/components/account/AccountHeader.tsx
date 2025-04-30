@@ -1,10 +1,9 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useConnectedController } from '@underware/pistols-sdk/dojo'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { SceneName } from '/src/data/assets'
-import { useGameAspect } from '/src/hooks/useGameAspect'
 import { FoolsBalance } from '/src/components/account/LordsBalance'
 
 export default function AccountHeader() {
@@ -12,35 +11,40 @@ export default function AccountHeader() {
   const { dispatchSetScene } = usePistolsScene()
   const { address } = useAccount()
   const { username } = useConnectedController()
-  
-  const { aspectWidth } = useGameAspect()
 
-  const _click = () => {
+  const handleClick = () => {
     dispatchSetScene(SceneName.Profile)
   }
 
+  
+
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <div className='NoMouse' style={{ flex: 1, textAlign: 'right' }}>
-        {!isConnected ? <h3>Guest</h3>
-          : <>
-            <h3>{username}</h3>
-            <h5>
+    <div 
+      onClick={handleClick} 
+      className="YesMouse AccountHeaderContainer"
+    >
+      <div className="RightHighlight" />
+      
+      <div className="AccountInfo">
+        {!isConnected ? (
+          <h3 className="Username">Guest</h3>
+        ) : (
+          <>
+            <h3 className="Username">{username}</h3>
+            <h5 className="Info">
               <FoolsBalance address={address} />
-              {/* Total Alive Duelists: {duelistIds.length} */}
-              {/* TODO: Replace this with other info preferably multiple of them, ideas:
-              - Total Duelists icon + number
-              - FOOLS amount earned
-              - Profile lvl once introduced
-              - Total dead duelists?
-              - IDEA: We could create special user flares, like earnable tags ex. "Pistol FLinger", "FOOLS Collector", "Blade Master", etc., that players could unlock with achievements or leveling up and we show it here and on profiles
-              */}
             </h5>
-          </>}
+          </>
+        )}
       </div>
-      <div style={{ padding: aspectWidth(0.6) }}>
-        {/* TODO replace with selkectedDuelist for profile pic */}
-        <ProfilePic profilePic={0} medium removeBorder onClick={() => _click()} /> 
+      
+      <div className="ProfileContainer">
+        <ProfilePic 
+          profilePic={0} 
+          medium 
+          borderColor="rgba(120, 60, 190, 0.8)"
+          borderWidth={0.15}
+        />
       </div>
     </div>
   );

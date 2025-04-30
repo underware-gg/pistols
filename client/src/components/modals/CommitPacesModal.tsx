@@ -103,6 +103,13 @@ function _CommitPacesModal({
     return account && messageToSign && firePaces && dodgePaces && firePaces != dodgePaces && tactics && blades && !isSubmitting
   }, [account, messageToSign, firePaces, dodgePaces, tactics, blades, isSubmitting, isSimpleTutorial])
 
+  const _closeModal = useCallback(() => {
+    setIsOpen(false)
+    setTimeout(() => {
+      emitter.emit('hover_description', null)
+    }, 300)
+  }, [setIsOpen])
+
   const _submit = useCallback(async () => {
     if (canSubmit) {
       setIsSubmitting(true)
@@ -111,7 +118,7 @@ function _CommitPacesModal({
       if (hash && salt) {
         await game.commit_moves(account, duelistId, duelId, hash)
         dispatchSetMoves(messageToSign, moves, salt)
-        setIsOpen(false)
+        _closeModal()
       }
       setIsSubmitting(false)
     }
@@ -277,12 +284,7 @@ function _CommitPacesModal({
         left: aspectWidth(10) + boxW,
         display: 'flex',
       }}
-      onClose={() => {
-        setIsOpen(false)
-        setTimeout(() => {
-          emitter.emit('hover_description', null)
-        }, 300)
-      }}
+      onClose={_closeModal}
       open={isOpen}
     >
       {/* Header */}

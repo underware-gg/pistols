@@ -4,12 +4,14 @@ import { DuelistState } from '/src/components/ui/duel/DuelContext'
 import { AudioName } from '/src/data/audioAssets'
 import { Action } from '/src/utils/pistols'
 import { Actor } from './SpriteSheetMaker'
+import { Card } from './CardMesh'
 import { _sfxEnabled, AnimationState, emitter, playAudio, shakeCamera } from './game'
 import { ProgressDialogManager } from './ProgressDialog'
 
 const ACTOR_WIDTH = 2.5
 const ACTOR_HEIGHT = 1.35
 const PACES_X_0 = 0.5
+const ACTOR_Z = 2
 
 enum DuelistsData {
   DUELIST_A_MODEL = 'DUELIST_A_MODEL',
@@ -24,31 +26,44 @@ interface Duelist {
   model: CharacterType,
   name: string,
   actor: Actor,
+  spawnCard: Actor,
+  spawnExplosion: Actor,
+  cardMesh: Card
 }
 
 export class DuelistsManager {
   
   private scene: THREE.Scene
+  private camera: THREE.PerspectiveCamera
   private spriteSheets: any
 
   private duelProgressDialogManger: ProgressDialogManager
+
+  private speedFactor: number = 1
 
   public duelistA: Duelist = {
     id: 'A',
     model: undefined,
     name: undefined,
-    actor: undefined
+    actor: undefined,
+    spawnCard: undefined,
+    spawnExplosion: undefined,
+    cardMesh: undefined
   }
   public duelistB: Duelist = {
     id: 'B',
     model: undefined,
     name: undefined,
-    actor: undefined
+    actor: undefined,
+    spawnCard: undefined,
+    spawnExplosion: undefined,
+    cardMesh: undefined
   }
  
   constructor(scene: THREE.Scene, camera: THREE.PerspectiveCamera, spriteSheets: any) {
      
     this.scene = scene
+    this.camera = camera
     this.spriteSheets = spriteSheets
 
     this.loadDuelists()
@@ -62,14 +77,30 @@ export class DuelistsManager {
   private loadDuelists() {
     this.duelistA.model = localStorage.getItem(DuelistsData.DUELIST_A_MODEL) == CharacterType.MALE ? CharacterType.MALE : CharacterType.FEMALE
     this.duelistA.name = localStorage.getItem(DuelistsData.DUELIST_A_NAME)
-    this.duelistA.actor = new Actor(this.duelistA.model == CharacterType.MALE ? this.spriteSheets.MALE : this.spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, PACES_X_0, false)
+    this.duelistA.actor = new Actor(this.duelistA.model == CharacterType.MALE ? this.spriteSheets.MALE : this.spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, PACES_X_0, ACTOR_Z, false)
+    this.duelistA.spawnCard = new Actor(this.spriteSheets.CARD, ACTOR_WIDTH * 1.2, ACTOR_HEIGHT * 1.1, PACES_X_0, ACTOR_Z - 0.04, false)
+    this.duelistA.spawnExplosion = new Actor(this.spriteSheets.EXPLOSION, ACTOR_WIDTH * 1.2, ACTOR_HEIGHT * 1.2, PACES_X_0, ACTOR_Z - 0.06, false)
+    this.duelistA.cardMesh = new Card(true, PACES_X_0, ACTOR_Z - 0.02, this.camera)
+    
     this.scene.add(this.duelistA.actor.mesh)
+    this.scene.add(this.duelistA.spawnCard.mesh)
+    this.scene.add(this.duelistA.spawnExplosion.mesh)
+    this.scene.add(this.duelistA.cardMesh)
+    
     this.hideActor(true)
     
     this.duelistB.model = localStorage.getItem(DuelistsData.DUELIST_B_MODEL) == CharacterType.MALE ? CharacterType.MALE : CharacterType.FEMALE
     this.duelistB.name = localStorage.getItem(DuelistsData.DUELIST_B_NAME)
-    this.duelistB.actor = new Actor(this.duelistB.model == CharacterType.MALE ? this.spriteSheets.MALE : this.spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, PACES_X_0, true)
+    this.duelistB.actor = new Actor(this.duelistB.model == CharacterType.MALE ? this.spriteSheets.MALE : this.spriteSheets.FEMALE, ACTOR_WIDTH, ACTOR_HEIGHT, PACES_X_0, ACTOR_Z, true)
+    this.duelistB.spawnCard = new Actor(this.spriteSheets.CARD, ACTOR_WIDTH * 1.2, ACTOR_HEIGHT * 1.1, PACES_X_0, ACTOR_Z - 0.04, true)
+    this.duelistB.spawnExplosion = new Actor(this.spriteSheets.EXPLOSION, ACTOR_WIDTH * 1.2, ACTOR_HEIGHT * 1.2, PACES_X_0, ACTOR_Z - 0.06, true)
+    this.duelistB.cardMesh = new Card(false, PACES_X_0, ACTOR_Z - 0.02, this.camera)
+    
     this.scene.add(this.duelistB.actor.mesh)
+    this.scene.add(this.duelistB.spawnCard.mesh)
+    this.scene.add(this.duelistB.spawnExplosion.mesh)
+    this.scene.add(this.duelistB.cardMesh)
+    
     this.hideActor(false)
   }
 
@@ -79,7 +110,12 @@ export class DuelistsManager {
 
   public update(deltaTime: number, elapsedTime: number) {
     this.duelistA.actor?.update(elapsedTime)
+    this.duelistA.spawnCard?.update(elapsedTime)
+    this.duelistA.spawnExplosion?.update(elapsedTime)
+    
     this.duelistB.actor?.update(elapsedTime)
+    this.duelistB.spawnCard?.update(elapsedTime)
+    this.duelistB.spawnExplosion?.update(elapsedTime)
 
     this.duelProgressDialogManger.update(this.duelistA.actor.mesh.position.x + 0.1, this.duelistB.actor.mesh.position.x - 0.1)
   }
@@ -89,44 +125,141 @@ export class DuelistsManager {
   // New duel setup reset
   //
 
-  public setupDuelistA(duelistName: string, duelistModel: CharacterType, isDuelistAYou: boolean) {
+  private spawnHighlightA: () => void
+  private spawnHighlightB: () => void
+  private duelistsSpawned = false
+
+  public setupDuelistA(duelistName: string, duelistModel: CharacterType, isDuelistAYou: boolean, frontMaterialPath: string, backMaterialPath: string, spawnHighlight: () => void) {
     localStorage.setItem(DuelistsData.DUELIST_A_MODEL, duelistModel)
     localStorage.setItem(DuelistsData.DUELIST_A_NAME, duelistName)
     this.duelistA.model = localStorage.getItem(DuelistsData.DUELIST_A_MODEL) == CharacterType.MALE ? CharacterType.MALE : CharacterType.FEMALE
     this.duelistA.name = localStorage.getItem(DuelistsData.DUELIST_A_NAME)
     this.duelistA.actor.replaceSpriteSheets(this.spriteSheets[this.duelistA.model])
 
+    this.spawnHighlightA = spawnHighlight
+
     this.duelProgressDialogManger.setDataA(duelistName, isDuelistAYou)
     
     const positionA = new THREE.Vector3(this.duelistA.actor.mesh.position.x + 0.1, ACTOR_HEIGHT * (this.duelistA.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistA.actor.mesh.position.z)
     this.duelProgressDialogManger.updateDialogPositions(positionA)
 
-    this.showDialogsTimeout = setTimeout(() => {
-      this.duelProgressDialogManger.showDialogs()
-    }, 400)
-
     this.resetActorPositions()
-    this.showActor(true)
+
+    // Reset card mesh to prepare for the animation
+    this.duelistA.cardMesh.reset()
+    this.duelistA.cardMesh.setLoadCompleteCallback(() => {
+      this.deferAnimateExplosion(true)
+    })
+    this.duelistA.cardMesh.setFrontMaterialPath(frontMaterialPath)
+    this.duelistA.cardMesh.setBackMaterialPath(backMaterialPath)
   }
 
-  public setupDuelistB(duelistName: string, duelistModel: CharacterType, isDuelistBYou: boolean) {
+  public setupDuelistB(duelistName: string, duelistModel: CharacterType, isDuelistBYou: boolean, frontMaterialPath: string, backMaterialPath: string, spawnHighlight: () => void) {
+    console.log('setupDuelistB', frontMaterialPath, backMaterialPath)
     localStorage.setItem(DuelistsData.DUELIST_B_MODEL, duelistModel)
     localStorage.setItem(DuelistsData.DUELIST_B_NAME, duelistName)
     this.duelistB.model = localStorage.getItem(DuelistsData.DUELIST_B_MODEL) == CharacterType.MALE ? CharacterType.MALE : CharacterType.FEMALE
     this.duelistB.name = localStorage.getItem(DuelistsData.DUELIST_B_NAME)
     this.duelistB.actor.replaceSpriteSheets(this.spriteSheets[this.duelistB.model])
 
+    this.spawnHighlightB = spawnHighlight
+
     this.duelProgressDialogManger.setDataB(duelistName, isDuelistBYou)
 
     const positionB = new THREE.Vector3(this.duelistB.actor.mesh.position.x - 0.1, ACTOR_HEIGHT * (this.duelistB.model == CharacterType.MALE ? 0.85 : 0.75), this.duelistB.actor.mesh.position.z)
     this.duelProgressDialogManger.updateDialogPositions(null, positionB)
 
-    this.showDialogsTimeout = setTimeout(() => {
-      this.duelProgressDialogManger.showDialogs()
-    }, 400)
-
     this.resetActorPositions()
-    this.showActor(false)
+    
+    // Reset card mesh to prepare for the animation
+    this.duelistB.cardMesh.reset()
+    this.duelistB.cardMesh.setLoadCompleteCallback(() => {
+      this.deferAnimateExplosion(false)
+    })
+    this.duelistB.cardMesh.setFrontMaterialPath(frontMaterialPath)
+    this.duelistB.cardMesh.setBackMaterialPath(backMaterialPath)
+  }
+
+  private animateExplosionTimeoutA: NodeJS.Timeout
+  private animateExplosionTimeoutB: NodeJS.Timeout
+  private showActorTimeoutA: NodeJS.Timeout
+  private showActorTimeoutB: NodeJS.Timeout
+
+  public clearAnimationTimeouts(timeout: NodeJS.Timeout) {
+    if (timeout) {
+      clearTimeout(timeout)
+      timeout = null
+    }
+  }
+
+  private deferAnimateExplosion(isA: boolean, delay: number = 1000) {
+    this.clearAnimationTimeouts(isA ? this.animateExplosionTimeoutA : this.animateExplosionTimeoutB)
+    this.clearAnimationTimeouts(isA ? this.showActorTimeoutA : this.showActorTimeoutB)
+    
+    if (this.duelistsSpawned) {
+      this.onLoadCompleteCallback()
+      this.showActor(isA)
+      if (isA) {
+        this.spawnHighlightA()
+      } else {
+        this.spawnHighlightB()
+      }
+      this.duelProgressDialogManger.showDialogs()
+      return
+    }
+
+    let timeout;
+    let showActorTimeout;
+    
+    timeout = setTimeout(() => {
+      const duelist = isA ? this.duelistA : this.duelistB;
+    
+      duelist.cardMesh.playEnter(() => {
+        this.duelistsSpawned = true
+        this.animateExplosion(isA)
+        
+        showActorTimeout = setTimeout(() => {
+          this.onLoadCompleteCallback()
+          this.showActor(isA)
+          if (isA) {
+            this.spawnHighlightA()
+          } else {
+            this.spawnHighlightB()
+          }
+          this.showDialogsTimeout = setTimeout(() => {
+            this.duelProgressDialogManger.showDialogs()
+          }, 400 / this.speedFactor)
+        }, (400 + ((1000 / 8.0) * 3.0)) / this.speedFactor)
+      });
+    }, delay)
+
+    if (isA) {
+      this.animateExplosionTimeoutA = timeout
+      this.showActorTimeoutA = showActorTimeout
+    } else {
+      this.animateExplosionTimeoutB = timeout
+      this.showActorTimeoutB = showActorTimeout
+    }
+  }
+
+  private onLoadCompleteCallback: () => void
+
+  public setLoadCompleteCallback(callback: () => void) {
+    this.onLoadCompleteCallback = callback
+  }
+
+  public resetDuelistsSpawned() {
+    this.duelistsSpawned = false;
+    
+    this.clearAnimationTimeouts(this.animateExplosionTimeoutA);
+    this.clearAnimationTimeouts(this.animateExplosionTimeoutB);
+    this.clearAnimationTimeouts(this.showActorTimeoutA);
+    this.clearAnimationTimeouts(this.showActorTimeoutB);
+    
+    if (this.showDialogsTimeout) {
+      clearTimeout(this.showDialogsTimeout);
+      this.showDialogsTimeout = null;
+    }
   }
 
   private showDialogsTimeout
@@ -140,10 +273,28 @@ export class DuelistsManager {
     this.playActorAnimation(this.duelistA, AnimName.STILL, null, true)
     this.playActorAnimation(this.duelistB, AnimName.STILL, null, true)
 
-    this.duelProgressDialogManger.showDialogs()
+    if (!this.duelistsSpawned) {
+      this.duelistA.spawnCard.playLoop(AnimName.STILL, null, () => {
+        this.duelistA.spawnCard.mesh.visible = true
+      }, null)
+      this.duelistB.spawnCard.playLoop(AnimName.STILL, null, () => {
+        this.duelistB.spawnCard.mesh.visible = true
+      }, null)
 
-    this.hideActor(true)
-    this.hideActor(false)
+      this.duelistA.spawnExplosion.mesh.visible = false
+      this.duelistB.spawnExplosion.mesh.visible = false
+
+      // Reset card meshes
+      this.duelistA.cardMesh.reset()
+      this.duelistB.cardMesh.reset()
+
+      this.hideActor(true)
+      this.hideActor(false)
+
+      this.hideElements()
+    } else {
+      this.showElements()
+    }
 
     return true
   }
@@ -160,9 +311,22 @@ export class DuelistsManager {
     this.duelProgressDialogManger.hideDialogs()
   }
 
+  public showElements() {
+    this.duelProgressDialogManger.showDialogs()
+  }
+
   public setDuelistSpeedFactor(speedFactor) {
     this.duelistA.actor.setSpeedFactor(speedFactor)
+    this.duelistA.spawnCard.setSpeedFactor(speedFactor)
+    this.duelistA.spawnExplosion.setSpeedFactor(speedFactor)
+    this.duelistA.cardMesh.setSpeedFactor(speedFactor)
+
     this.duelistB.actor.setSpeedFactor(speedFactor)
+    this.duelistB.spawnCard.setSpeedFactor(speedFactor)
+    this.duelistB.spawnExplosion.setSpeedFactor(speedFactor)
+    this.duelistB.cardMesh.setSpeedFactor(speedFactor)
+
+    this.speedFactor = speedFactor
   }
 
 
@@ -406,7 +570,10 @@ export class DuelistsManager {
       }
       onStart = () => { playAudio(AudioName.BODY_FALL, _sfxEnabled) }
     } else if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK, AnimName.STRUCK_INJURED].includes(key)) {
-      if (key == AnimName.SHOT_INJURED_BACK) {
+      if (duelist.model == CharacterType.MALE && key == AnimName.SHOT_INJURED_BACK) {
+        movement.x = 0.352
+        movement.frames = 8 * 2
+      } else if (duelist.model == CharacterType.FEMALE && key == AnimName.SHOT_INJURED_BACK) {
         movement.x = 0.352 * 2
         movement.frames = 8 * 2
       }
@@ -430,27 +597,61 @@ export class DuelistsManager {
     }
   }
 
+  public animateExplosion(isA: boolean) {
+    const duelist = isA ? this.duelistA : this.duelistB
+    setTimeout(() => {
+      duelist.cardMesh.hide()
+    }, ((1000 / 8.0) * 4) / this.speedFactor)
+    duelist.spawnCard.playOnce(AnimName.BURN, { x: 0, y: 0, z: 0, frames: 0 }, null, () => {
+      duelist.spawnCard.mesh.visible = false
+    })
 
+    setTimeout(() => {
+      duelist.spawnExplosion.playOnce(AnimName.EXPLODE, { x: 0, y: 0, z: 0, frames: 0 }, () => {
+        duelist.spawnExplosion.mesh.visible = true
+      }, () => {
+        duelist.spawnExplosion.mesh.visible = false
+      })
+    }, (400 / this.speedFactor))
+  }
 
   //----------------
   // Dispose
   //
 
   public dispose() {
+    // Clean up card meshes
+    if (this.duelistA.cardMesh) {
+      this.duelistA.cardMesh.resetAnimations();
+      this.scene.remove(this.duelistA.cardMesh);
+    }
+    
+    if (this.duelistB.cardMesh) {
+      this.duelistB.cardMesh.resetAnimations();
+      this.scene.remove(this.duelistB.cardMesh);
+    }
+    
     this.duelistA = {
       id: 'A',
       model: undefined,
       name: undefined,
-      actor: undefined
+      actor: undefined,
+      spawnCard: undefined,
+      spawnExplosion: undefined,
+      cardMesh: undefined
     }
     this.duelistB = {
       id: 'B',
       model: undefined,
       name: undefined,
-      actor: undefined
+      actor: undefined,
+      spawnCard: undefined,
+      spawnExplosion: undefined,
+      cardMesh: undefined
     }
 
     this.scene = null
     this.spriteSheets = null
   }
+
 }

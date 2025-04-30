@@ -77,19 +77,19 @@ let AUDIO_ASSETS: AudioAssets = {
   BODY_FALL: {
     path: '/audio/sfx/body-fall.mp3',
     loop: false,
-    delaySeconds: 0.4,
+    delaySeconds: 1.2,
     type: AudioType.SFX,
   },
   GRUNT_FEMALE: {
     path: '/audio/sfx/grunt-female.mp3',
     loop: false,
-    delaySeconds: 0.6,
+    delaySeconds: 1.1,
     type: AudioType.SFX,
   },
   GRUNT_MALE: {
     path: '/audio/sfx/grunt-man.mp3',
     loop: false,
-    delaySeconds: 0.6,
+    delaySeconds: 1.1,
     type: AudioType.SFX,
   },
   STRIKE_LIGHT: {
