@@ -265,7 +265,7 @@ pub mod game {
             assert(round.state == RoundState::Reveal, Errors::ROUND_NOT_IN_REVEAL);
 
             // validate duelist
-            self._validate_ownership(@store.world, duelist_id);
+            // self._validate_ownership(@store.world, duelist_id); // no need to validate, only commiter can reveal
             let duelist_number: u8 = challenge.duelist_number(duelist_id);
             assert(duelist_number != 0, Errors::NOT_YOUR_DUEL);
 
@@ -333,7 +333,7 @@ pub mod game {
             let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
             let progress: DuelProgress = game_loop(wrapped, @challenge.get_deck(), ref round);
 
-            // update challenge
+            // update models, handle rewards, leaderboards and tournaments
             self._finish_challenge(ref store, ref challenge, ref round, Option::Some(progress.winner));
             // store.set_challenge(@challenge); // _finish_challenge() does it
             // store.set_round(@round); // _finish_challenge() does it
