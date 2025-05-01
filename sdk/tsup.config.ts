@@ -4,6 +4,7 @@ export default defineConfig({
   entry: [
     "src/exports/index.ts",
     "src/exports/abis.ts",
+    "src/exports/api.ts",
     "src/exports/dojo.ts",
     "src/exports/dojo_graphql.ts",
     "src/exports/fix.ts",

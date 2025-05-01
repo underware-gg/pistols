@@ -35,6 +35,10 @@
       "import": "./dist/abis.js",
       "types": "./dist/abis.d.ts"
     },
+    "./api": {
+      "import": "./dist/api.js",
+      "types": "./dist/api.d.ts"
+    },
     "./dojo": {
       "import": "./dist/dojo.js",
       "types": "./dist/dojo.d.ts"

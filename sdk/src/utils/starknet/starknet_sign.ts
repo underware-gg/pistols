@@ -39,44 +39,33 @@ type SignMessagesResult = {
   typeSelectorName: string
   messageHash: string
   // signature: WeierstrassSignatureType, //{r,s}
-  signature: Signature,
-  signatureArray: bigint[], // [r,s] or [...]
+  signatureRaw: Signature,
   signatureHash: bigint,
+  signature: bigint[], // [r,s] or [...]
 }
 export const signMessages = async (account: AccountInterface, starknetDomain: StarknetDomain, messages: Messages): Promise<SignMessagesResult> => {
   const typedMessage = createTypedMessage({ starknetDomain, messages })
   const typeHash = getTypeHash(typedMessage, typedMessage.primaryType)
   const typeSelectorName = getTypeSelectorName(typedMessage, typedMessage.primaryType)
   const messageHash = getMessageHash(typedMessage, account.address)
-  //--------------------------------
-  // TODO: CONTROLLER UPGRADE BROKE THIS!!!
-  // lets just hash the messages for now
-  //
-  // const signature = await account.signMessage(typedMessage)
-  const signature = [
-    // poseidon(Object.values(messages).map(v => BigInt(v as string))),
-    messages.duelId,
-    messages.duelistId,
-  ] as Signature
-  //
-  //--------------------------------
-  let signatureArray: bigint[] =
-    Array.isArray(signature) ? signature.map(v => BigInt(v)) // [...]
-      : splitSignature(signature) // {r,s}
-  const signatureHash =
-    signatureArray.length == 2 ? poseidon(signatureArray)
-      : signatureArray.length >= 2 ? poseidon(signatureArray.slice(-2))
-        : 0n
-  console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature, signatureArray, 'sigHash:', bigintToHex(signatureHash))
+  // sign
+  const signatureRaw = await account.signMessage(typedMessage)
+  // convert to array
+  let signature: bigint[] =
+    Array.isArray(signatureRaw) ? signatureRaw.map(v => BigInt(v)) // [...]
+      : splitSignature(signatureRaw) // {r,s}
+  // if array has only 2 elements, produce the hash
+  const signatureHash = signature.length == 2 ? poseidon(signature) : 0n
+  console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature, signatureRaw, 'sigHash:', bigintToHex(signatureHash))
   // throw new Error('STOP')
   return {
     typedMessage,
     typeHash,
     typeSelectorName,
     messageHash,
-    signature,
-    signatureArray,
+    signatureRaw,
     signatureHash,
+    signature,
   }
 }
 export const verifyMessages = async (account: AccountInterface, provider: RpcProvider, starknetDomain: StarknetDomain, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {

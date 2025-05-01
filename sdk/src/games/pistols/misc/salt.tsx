@@ -1,7 +1,8 @@
-import { AccountInterface, BigNumberish, StarknetDomain } from 'starknet'
+import { AccountInterface, StarknetDomain } from 'starknet'
 import { signMessages, Messages } from 'src/utils/starknet/starknet_sign'
 import { bigintToHex } from 'src/utils/misc/types'
 import { make_moves_hash, _make_move_mask, _make_move_hash } from '../cairo/make_moves_hash'
+import { apiGenerateControllerSalt } from 'src/exports/api'
 
 export interface CommitMoveMessage extends Messages {
   duelId: bigint,
@@ -10,6 +11,7 @@ export interface CommitMoveMessage extends Messages {
 
 /** @returns a salt from account signature, or 0 if fails */
 const signAndGenerateSalt = async (
+  serverUrl: string,
   account: AccountInterface, 
   starknetDomain: StarknetDomain, 
   messageToSign: CommitMoveMessage,
@@ -17,12 +19,21 @@ const signAndGenerateSalt = async (
   let result = 0n
   if (messageToSign) {
     try {
-      const { signatureHash } = await signMessages(account, starknetDomain, messageToSign)
-      if (signatureHash == 0n) {
-        // get on-chain????
-        throw new Error('null signature')
+      const { signatureHash, signature, messageHash } = await signMessages(account, starknetDomain, messageToSign)
+      if (signatureHash > 0n) {
+        result = signatureHash
+      } else if (signature.length > 0 && serverUrl) {
+        result = await apiGenerateControllerSalt(
+          serverUrl,
+          account.address,
+          starknetDomain,
+          messageHash,
+          signature,
+        )
       }
-      result = signatureHash
+      if (signatureHash > 0n) {
+        throw new Error('from(): unable to generate salt')
+      }
     } catch (e) {
       console.warn(`signAndGenerateSalt() exception:`, e)
     }
@@ -32,12 +43,13 @@ const signAndGenerateSalt = async (
 
 /** @returns the felt252 hash for an action, or 0 if fail */
 export const signAndGenerateMovesHash = async (
+  serverUrl: string,
   account: AccountInterface, 
   starknetDomain: StarknetDomain, 
   messageToSign: CommitMoveMessage,
   moves: number[]
 ): Promise<{ hash: bigint, salt: bigint }> => {
-  const salt = await signAndGenerateSalt(account, starknetDomain, messageToSign)
+  const salt = await signAndGenerateSalt(serverUrl, account, starknetDomain, messageToSign)
   const hash = make_moves_hash(salt, moves)
   console.log(`signAndGenerateMovesHash():`, messageToSign, moves, bigintToHex(salt), bigintToHex(hash))
   return { hash, salt }
@@ -45,13 +57,14 @@ export const signAndGenerateMovesHash = async (
 
 /** @returns the original action from an action hash, or 0 if fail */
 export const signAndRestoreMovesFromHash = async (
+  serverUrl: string,
   account: AccountInterface, 
   starknetDomain: StarknetDomain, 
   messageToSign: CommitMoveMessage,
   hash: bigint, 
   decks: number[][]
 ): Promise<{ salt: bigint, moves: number[] }> => {
-  const salt = await signAndGenerateSalt(account, starknetDomain, messageToSign)
+  const salt = await signAndGenerateSalt(serverUrl, account, starknetDomain, messageToSign)
   let moves = []
   console.log(`___RESTORE decks:`, decks)
   console.log(`___RESTORE message:`, messageToSign, '\nsalt:', bigintToHex(salt), '\nhash:', bigintToHex(hash))
@@ -99,8 +112,3 @@ export const signAndRestoreMovesFromHash = async (
     moves,
   }
 }
-
-// 12078656863973367808n
-// 12078656863973366908n
-// 0xa7a0026c1cf76000
-// 0xa7a0026c1cf75c7c
