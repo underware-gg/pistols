@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useGameAspect } from '/src/hooks/useGameAspect'
-import { CardColor} from '/src/data/cardAssets'
+import { CardColor} from '@underware/pistols-sdk/pistols/constants'
 import * as TWEEN from '@tweenjs/tween.js'
 import * as Constants from '/src/data/cardConstants'
 

@@ -8,7 +8,7 @@ import { DUELIST_CARD_WIDTH, DUELIST_CARD_HEIGHT } from '/src/data/cardConstants
 import { DuelistCard } from '/src/components/cards/DuelistCard'
 import { DuelIconsAsGrid } from '/src/components/DuelIcons'
 import { InteractibleComponent, InteractibleComponentHandle } from '/src/components/InteractibleComponent'
-import { CardColor } from '/src/data/cardAssets'
+import { CardColor } from '@underware/pistols-sdk/pistols/constants'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { useIsBookmarked, usePlayer } from '/src/stores/playerStore'
 import { useIsMyAccount } from '/src/hooks/useIsYou'

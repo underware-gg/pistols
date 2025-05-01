@@ -8,7 +8,7 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 import * as Constants from '/src/data/cardConstants'
 import { CardsHandle } from '/src/components/cards/DuelCards'
 import { DuelStage } from '/src/hooks/useDuel'
-import { EnvironmentCardsTextures } from '/src/data/cardAssets'
+import { EnvironmentCardsTextures } from '@underware/pistols-sdk/pistols/constants'
 import { DuelTutorialLevel } from '/src/data/tutorialConstants'
 
 export interface DuelAnimationControllerProps {

@@ -290,7 +290,7 @@ const DuelContent: React.FC<{
 // import { useDuelCallToAction } from '../../stores/eventsModelStore'
 // import { DuelStage, useAnimatedDuel } from '/src/hooks/useDuel'
 // import { DojoSetupErrorDetector } from '../account/DojoSetupErrorDetector'
-// import { EnvironmentCardsTextures } from '/src/data/cardAssets'
+// import { EnvironmentCardsTextures } from '@underware/pistols-sdk/pistols/constants'
 // import { AnimationState } from '/src/three/game'
 // import { Action } from '/src/utils/pistols'
 // import { MenuDuel, MenuDuelControl } from '/src/components/Menus'

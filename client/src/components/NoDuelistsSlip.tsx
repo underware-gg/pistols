@@ -1,7 +1,7 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react'
 import { useDuelistsOfPlayer } from '../hooks/useTokenDuelists'
 import { InteractibleComponent, InteractibleComponentHandle, InteractibleComponentProps } from '/src/components/InteractibleComponent'
-import { CardColor } from '/src/data/cardAssets'
+import { CardColor } from '@underware/pistols-sdk/pistols/constants'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { useCanClaimStarterPack } from '/src/hooks/usePistolsContractCalls'
 

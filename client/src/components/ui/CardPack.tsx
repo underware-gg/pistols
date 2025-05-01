@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import TWEEN from '@tweenjs/tween.js'
 import { DuelistCard, DuelistCardHandle } from '../cards/DuelistCard';
-import { FireCardsTextures } from '/src/data/cardAssets';
+import { FireCardsTextures } from '@underware/pistols-sdk/pistols/constants';
 import { useGameAspect } from '/src/hooks/useGameAspect';
 import { CARD_PACK_CARD_SIZE_WIDTH, CARD_PACK_CARD_SIZE_HEIGHT } from '/src/data/cardConstants';
 import { ActionButton } from './Buttons';

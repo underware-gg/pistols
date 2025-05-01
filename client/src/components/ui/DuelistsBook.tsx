@@ -5,7 +5,7 @@ import { DuelistCard } from '../cards/DuelistCard';
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
 import { Opener } from '/src/hooks/useOpener';
-import { CardColor } from '/src/data/cardAssets';
+import { CardColor } from '@underware/pistols-sdk/pistols/constants';
 import { usePistolsContext } from '/src/hooks/PistolsContext';
 
 const ANIMATION_DURATION = 500;
