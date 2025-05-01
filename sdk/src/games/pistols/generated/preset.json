@@ -136,6 +136,46 @@
                   "type": "shortstring"
                 }
               ],
+              "Message": [
+                {
+                  "name": "duelId",
+                  "type": "felt"
+                },
+                {
+                  "name": "duelistId",
+                  "type": "felt"
+                }
+              ]
+            },
+            "primaryType": "Message",
+            "domain": {
+              "name": "Underware_gg",
+              "version": "1.0.0",
+              "chainId": "SN_SEPOLIA",
+              "revision": "1"
+            },
+            "description": "Verify the identity of a player in a Duel"
+          },
+          {
+            "types": {
+              "StarknetDomain": [
+                {
+                  "name": "name",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "version",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "chainId",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "revision",
+                  "type": "shortstring"
+                }
+              ],
               "pistols-PlayerOnline": [
                 {
                   "name": "identity",
@@ -155,7 +195,7 @@
               "revision": "1"
             },
             "name": "PlayerOnline",
-            "description": "Notify the server that a player is online"
+            "description": "Notify when a player is online"
           },
           {
             "types": {
@@ -204,7 +244,7 @@
               "revision": "1"
             },
             "name": "PlayerBookmark",
-            "description": "Notify the server that a player follows another player or token"
+            "description": "Notify when a player follows another player or token"
           }
         ]
       }

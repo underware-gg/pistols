@@ -16,7 +16,7 @@ export const useTypedMessage = ({
   starknetDomain,
   messages,
 }: {
-    account: AccountInterface
+  account: AccountInterface
   starknetDomain: StarknetDomain
   messages: any
 }): UseTypedMessageResult => {

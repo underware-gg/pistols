@@ -5,6 +5,7 @@ import type { DojoAppConfig, DojoManifest, ContractPolicyDescriptions, SignedMes
 import { NetworkId, NETWORKS } from 'src/games/pistols/config/networks'
 import { makeControllerPolicies } from 'src/dojo/setup/controller'
 import {
+  make_typed_data_CommitMoveMessage,
   make_typed_data_PlayerBookmark,
   make_typed_data_PlayerOnline,
 } from './signed_messages'
@@ -121,7 +122,14 @@ const contractPolicyDescriptions_vrf = (networkId: NetworkId): ContractPolicyDes
 export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: boolean): SessionPolicies => {
   const signedMessagePolicyDescriptions: SignedMessagePolicyDescriptions = [
     {
-      description: 'Notify the server that a player is online',
+      description: 'Verify the identity of a player in a Duel',
+      typedData: make_typed_data_CommitMoveMessage(makeStarknetDomain(networkId), {
+        duelId: 0n,
+        duelistId: 0n,
+      }),
+    },
+    {
+      description: 'Notify when a player is online',
       typedData: make_typed_data_PlayerOnline({
         networkId: networkId,
         identity: '0x0',
@@ -129,7 +137,7 @@ export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: 
       }),
     },
     {
-      description: 'Notify the server that a player follows another player or token',
+      description: 'Notify when a player follows another player or token',
       typedData: make_typed_data_PlayerBookmark({
         networkId: networkId,
         identity: '0x0',

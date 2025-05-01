@@ -1,9 +1,11 @@
-import { BigNumberish, StarknetType, typedData } from 'starknet'
+import { BigNumberish, StarknetDomain, StarknetType } from 'starknet'
 import { bigintToDecimal, bigintToHex } from 'src/utils/misc/types'
 import { PistolsSchemaType } from 'src/games/pistols/config/types'
 import { generateTypedData } from 'src/dojo/setup/controller'
 import { makeStarknetDomain } from 'src/games/pistols/config/config'
 import { NetworkId } from 'src/games/pistols/config/networks'
+import { createTypedMessage } from 'src/utils/starknet/starknet_sign'
+import { CommitMoveMessage } from 'src/exports/pistols'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 //
@@ -16,8 +18,23 @@ import * as models from 'src/games/pistols/generated/models.gen'
 // const encoded = typedData.encodeValue({}, 'u128', bigintToHex(target_id))
 //
 
-export type OmitFieldOrder<T> = Omit<T, 'fieldOrder'>;
 
+//----------------------------------------
+// typed data messages messages
+//
+
+export function make_typed_data_CommitMoveMessage(starknetDomain: StarknetDomain, messages: CommitMoveMessage) {
+  return createTypedMessage({
+    starknetDomain,
+    messages,
+  })
+}
+
+
+//----------------------------------------
+// off-chain torii messages
+//
+export type OmitFieldOrder<T> = Omit<T, 'fieldOrder'>;
 export function make_typed_data_PlayerOnline({
   networkId,
   identity,
