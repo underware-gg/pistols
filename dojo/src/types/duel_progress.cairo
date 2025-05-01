@@ -50,7 +50,7 @@ pub struct SpecialsDrawn {
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum DuelistDrawnCard {
-    None: (),
+    None,
     Fire: PacesCard,
     Dodge: PacesCard,
     Blades: BladesCard,

@@ -81,7 +81,7 @@ mod rocket_builder {
 }
 enum PlayerCharacter {
   Godzilla,
-  Dragon: (),
+  Dragon,
   Fox: u128,
   // Rhyno
 }

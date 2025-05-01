@@ -1,9 +1,9 @@
 
 #[derive(Copy, Drop, Serde, PartialEq)]
 pub enum Boolean {
-    Undefined: (),
-    True: (),
-    False: (),
+    Undefined,
+    True,
+    False,
 }
 
 impl BooleanIntoByteArray of core::traits::Into<Boolean, ByteArray> {

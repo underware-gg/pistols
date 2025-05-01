@@ -23,7 +23,7 @@ import { bigintToHex } from "../misc/types";
 //   Warning: felt252,
 //   Critical: Array<u64>,
 //   Response: Order,
-//   Empty: (),
+//   Empty,
 //   User: UserType,
 // }
 //
