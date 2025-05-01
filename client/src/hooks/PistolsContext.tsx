@@ -20,13 +20,6 @@ import { emitter } from '../three/game'
 // State
 //
 
-type StoredMoves = {
-  [key: string]: {
-    moves: number[]
-    salt: bigint
-  }
-}
-
 export const initialState = {
   walletSig: { address: 0n, sig: 0n },
   // opening modals
@@ -42,7 +35,6 @@ export const initialState = {
   currentScene: undefined as SceneName,
   tutorialLevel: undefined as DuelTutorialLevel,
   sceneStack: [] as SceneName[],
-  moves: {} as StoredMoves,
   // injected
   connectOpener: null as Opener,
   shopOpener: null as Opener,
@@ -63,7 +55,6 @@ const PistolsActions = {
   SELECT_PLAYER_ADDRESS: 'SELECT_PLAYER_ADDRESS',
   SELECT_CHALLENGING_ADDRESS: 'SELECT_CHALLENGING_ADDRESS',
   SELECT_CHALLENGING_DUELIST_ID: 'SELECT_CHALLENGING_DUELIST_ID',
-  SET_MOVES: 'SET_MOVES',
   SET_TUTORIAL_LEVEL: 'SET_TUTORIAL_LEVEL',
   RESET_VALUES: 'RESET_VALUES',
 }
@@ -84,7 +75,6 @@ type ActionType =
   | { type: 'SELECT_PLAYER_ADDRESS', payload: bigint }
   | { type: 'SELECT_CHALLENGING_ADDRESS', payload: bigint }
   | { type: 'SELECT_CHALLENGING_DUELIST_ID', payload: bigint }
-  | { type: 'SET_MOVES', payload: StoredMoves }
   | { type: 'RESET_VALUES', payload: null }
   | { type: 'SET_TUTORIAL_LEVEL', payload: DuelTutorialLevel }
 
@@ -201,11 +191,6 @@ const PistolsProvider = ({
         newState.challengingDuelistId = action.payload as bigint
         break
       }
-      case PistolsActions.SET_MOVES: {
-        const newMove = action.payload as StoredMoves
-        newState.moves = { ...state.moves, ...newMove }
-        break
-      }
       case PistolsActions.SET_TUTORIAL_LEVEL: {
         newState.tutorialLevel = action.payload as DuelTutorialLevel
         break
@@ -269,10 +254,6 @@ export { PistolsProvider, PistolsContext, PistolsActions }
 //--------------------------------
 // Hooks
 //
-
-const makeStoredMovesKey = (message: CommitMoveMessage): string => {
-  return message ? bigintToHex(poseidon([message.duelId, message.duelistId])) : null
-}
 
 export const usePistolsContext = () => {
   const { state, dispatch } = useContext(PistolsContext)
@@ -340,18 +321,6 @@ export const usePistolsContext = () => {
     })
   }, [dispatch])
 
-  const dispatchSetMoves = useCallback((message: CommitMoveMessage, moves: number[], salt: bigint ) => {
-    const key = makeStoredMovesKey(message)
-    if (!key) {
-      console.warn(`dispatchSetMoves: Invalid message [${message}] [${salt}]`)
-      return
-    }
-    dispatch({
-      type: PistolsActions.SET_MOVES,
-      payload: { [key]: { moves, salt } },
-    })
-  }, [dispatch])
-
   const __dispatchSetScene = useCallback((newScene: SceneName) => {
     dispatch({
       type: PistolsActions.SET_SCENE,
@@ -386,8 +355,6 @@ export const usePistolsContext = () => {
     dispatchSelectPlayerAddress,
     dispatchChallengingPlayerAddress,
     dispatchChallengingDuelistId,
-    dispatchSetMoves,
-    makeStoredMovesKey,
     __dispatchSetScene, // used internally only
     __dispatchSceneBack, // used internally only
     __dispatchResetValues,  // used internally only

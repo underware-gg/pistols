@@ -51,7 +51,7 @@ const signAndGenerateSalt = async (
         }
         // save cookie backup
         if (salt > 0n) {
-          cookies.set(cookieKey, shortAddress(salt));
+          cookies.set(cookieKey, bigintToHex(salt));
           console.log(`SALT backup to cookie[${cookieKey}]:`, shortAddress(salt))
         }
       }

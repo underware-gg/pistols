@@ -67,7 +67,7 @@ function _CommitPacesModal({
 }: CommitPacesModalProps) {
   const { account } = useAccount()
   const { game } = useDojoSystemCalls()
-  const { dispatchSetMoves, tutorialLevel } = usePistolsContext()
+  const { tutorialLevel } = usePistolsContext()
   const { starknetDomain } = useDojoSetup()
 
   const [firePaces, setFirePaces] = useState(0)
@@ -111,7 +111,6 @@ function _CommitPacesModal({
       const { hash, salt } = await signAndGenerateMovesHash(SALT_SERVER_URL, account, starknetDomain, messageToSign, moves)
       if (hash && salt) {
         await game.commit_moves(account, duelistId, duelId, hash)
-        dispatchSetMoves(messageToSign, moves, salt)
         setIsOpen(false)
       }
       setIsSubmitting(false)
