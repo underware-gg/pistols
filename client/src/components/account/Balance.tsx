@@ -2,7 +2,7 @@ import { ReactNode, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { CustomIcon, EmojiIcon, IconSizeProp } from '/src/components/ui/Icons'
 import { ethToWei, weiToEthString } from '@underware/pistols-sdk/utils/starknet'
-import { EMOJI } from '/src/data/messages'
+import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 
 type CoinIconProps = {
@@ -25,14 +25,14 @@ export function FoolsIcon({
   size = null,
 }: CoinIconProps) {
   return <CustomIcon logo svg name='fools' size={size} alt='$FOOLS' />
-  // return <EmojiIcon emoji={EMOJI.FOOLS} size={size} alt='$FOOLS' />
+  // return <EmojiIcon emoji={EMOJIS.FOOLS} size={size} alt='$FOOLS' />
 }
 
 export function FameIcon({
   size = null,
 }: CoinIconProps) {
   // return <CustomIcon logo svg name='fame1' size={size} alt='$FAME' />
-  return <EmojiIcon emoji={EMOJI.FAME} size={size} alt='$FAME' />
+  return <EmojiIcon emoji={EMOJIS.FAME} size={size} alt='$FAME' />
 }
 
 export function Balance({
@@ -77,7 +77,7 @@ export function Balance({
         : eth != null ? weiToEthString(ethToWei(eth), _decimals)
           : ''
     )
-    return fools ? result : ((result == '0' || result == '0.0') ? EMOJI.ZERO : result)
+    return fools ? result : ((result == '0' || result == '0.0') ? EMOJIS.ZERO : result)
   }, [decimals, eth, wei])
 
   const classNames = useMemo(() => {

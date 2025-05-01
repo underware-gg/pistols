@@ -9,7 +9,7 @@ import { useCallToActions } from '/src/stores/eventsModelStore'
 import { Icon, EmojiIcon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink } from '/src/components/Links'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
-import { EMOJI } from '/src/data/messages'
+import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 
 export const ActionIcon = (isActive: boolean) => {
   const { duelistIds } = useDuelistsOfPlayer()
@@ -156,7 +156,7 @@ const ActionItem = ({
   if (lives == 0) {
     return (
       <>
-        <EmojiIcon emoji={EMOJI.DEAD} />{' '}
+        <EmojiIcon emoji={EMOJIS.DEAD} />{' '}
         <DuelistLink duelistId={duelistId} useName />
         {' is dead!'}
         <br />

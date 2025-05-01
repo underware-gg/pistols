@@ -3,7 +3,7 @@ import { Icon, IconGroup } from 'semantic-ui-react'
 import { IconSizeProp } from 'semantic-ui-react/dist/commonjs/elements/Icon/Icon'
 import { ActionEmojis, ActionNames } from '/src/utils/pistols'
 import { EmojiIcon, _downSize } from '/src/components/ui/Icons'
-import { EMOJI } from '/src/data/messages'
+import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 export function PacesIcon({
@@ -23,7 +23,7 @@ export function PacesIcon({
   return (
     // <EmojiIcon emoji={emoji} size={size} className='PacesIconRound' />
     <IconGroup size={_downSize(size)}>
-      <EmojiIcon emoji={dodge ? EMOJI.DODGE : EMOJI.PACES} size={size} />
+      <EmojiIcon emoji={dodge ? EMOJIS.DODGE : EMOJIS.PACES} size={size} />
       <EmojiIcon emoji={_paces} size={size} className={`PacesIcon`} />
     </IconGroup>
   )
@@ -39,7 +39,7 @@ export function BladesIcon({
   if (!ActionNames[blade]) {
     return <Icon name='question circle' size={size} />
   }
-  const emoji = ActionEmojis[blade] ?? EMOJI.UNKNOWN
+  const emoji = ActionEmojis[blade] ?? EMOJIS.UNKNOWN
   return (
     // <IconGroup size='large'>
     // <Icon size={size} name='circle outline' />
@@ -59,8 +59,8 @@ export function ArchetypeIcon({
   honourable?: boolean
   size?: IconSizeProp
 }) {
-  if (villainous) return <EmojiIcon emoji={EMOJI.VILLAIN} size={size} />
-  if (trickster) return <EmojiIcon emoji={EMOJI.TRICKSTER} size={size} />
-  if (honourable) return <EmojiIcon emoji={EMOJI.LORD} size={size} />
-  return <EmojiIcon emoji={EMOJI.NEUTRAL} size={size} />
+  if (villainous) return <EmojiIcon emoji={EMOJIS.VILLAIN} size={size} />
+  if (trickster) return <EmojiIcon emoji={EMOJIS.TRICKSTER} size={size} />
+  if (honourable) return <EmojiIcon emoji={EMOJIS.LORD} size={size} />
+  return <EmojiIcon emoji={EMOJIS.NEUTRAL} size={size} />
 }

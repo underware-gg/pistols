@@ -9,7 +9,7 @@ import { PistolsSchemaType, getCollectionDescription, getProfileDescription, get
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
-import { EMOJI } from '/src/data/messages'
+import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 
@@ -174,8 +174,8 @@ export function useDuelistStatus(status: models.DuelistStatus | undefined) {
   const total_losses = useMemo(() => Number(status?.total_losses ?? 0), [status])
   const total_draws = useMemo(() => Number(status?.total_draws ?? 0), [status])
   const honour = useMemo(() => (Number(status?.honour ?? 0) / 10.0), [status, total_duels])
-  const honourDisplay = useMemo(() => (total_duels > 0 && honour > 0 ? honour.toFixed(1) : EMOJI.ZERO), [honour, total_duels])
-  const honourAndTotal = useMemo(() => (total_duels > 0 && honour > 0 ? <>{honour.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : EMOJI.ZERO), [honour, total_duels])
+  const honourDisplay = useMemo(() => (total_duels > 0 && honour > 0 ? honour.toFixed(1) : EMOJIS.ZERO), [honour, total_duels])
+  const honourAndTotal = useMemo(() => (total_duels > 0 && honour > 0 ? <>{honour.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : EMOJIS.ZERO), [honour, total_duels])
   const winRatio = useMemo(() => calcWinRatio(total_duels, total_wins), [total_duels, total_wins])
 
   const isVillainous = useMemo(() => (total_duels > 0 && (honour * 10) < constants.HONOUR.TRICKSTER_START), [honour, total_duels])

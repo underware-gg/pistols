@@ -7,7 +7,7 @@ import { usePlayer } from '/src/stores/playerStore'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { FameLivesDuelist } from '/src/components/account/LordsBalance'
 import { AddressShort } from '/src/components/ui/AddressShort'
-import { EMOJI } from '/src/data/messages'
+import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 
 const Row = Grid.Row
 const Col = Grid.Column
@@ -33,9 +33,9 @@ export function ProfileBadge({
   duelistId: BigNumberish
 }) {
   const { status: {isVillainous, isTrickster, isHonourable } } = useDuelist(duelistId)
-  if (isVillainous) return <>{EMOJI.VILLAIN}</>
-  if (isTrickster) return <>{EMOJI.TRICKSTER}</>
-  if (isHonourable) return <>{EMOJI.LORD}</>
+  if (isVillainous) return <>{EMOJIS.VILLAIN}</>
+  if (isTrickster) return <>{EMOJIS.TRICKSTER}</>
+  if (isHonourable) return <>{EMOJIS.LORD}</>
   return <></>
 }
 

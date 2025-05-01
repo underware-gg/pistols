@@ -121,7 +121,7 @@ export default function AccountHeader() {
 //         </div>
 //         {isInAction &&
 //           <div className='AbsoluteRight Padded'>
-//             <EmojiIcon emoji={EMOJI.IN_ACTION} />
+//             <EmojiIcon emoji={EMOJIS.IN_ACTION} />
 //           </div>
 //         }
 //       </div>

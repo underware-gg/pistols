@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { useChallenge, useRoundTimeout } from '/src/stores/challengeStore'
 import { formatTimestampLocal, formatTimestampDeltaElapsed, formatTimestampDeltaCountdown } from '@underware/pistols-sdk/utils'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
-import { EMOJI } from '/src/data/messages'
+import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 
 export function ChallengeTime({
   duelId,
@@ -34,10 +34,10 @@ export function ChallengeTime({
   return (
     <>
       {elapsed && <>
-        {` ${EMOJI.IN_PROGRESS} `} <span className='Number Smaller'>{elapsed}</span>
+        {` ${EMOJIS.IN_PROGRESS} `} <span className='Number Smaller'>{elapsed}</span>
       </>}
       {countdown && <>
-        {` ${EMOJI.AWAITING} `} <span className='Number Smaller'>{countdown}</span>
+        {` ${EMOJIS.AWAITING} `} <span className='Number Smaller'>{countdown}</span>
       </>}
       {(!elapsed && !countdown) && <>
         <span className='Number Smaller'>{date}</span>

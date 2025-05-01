@@ -10,7 +10,7 @@ import { ArchetypeNames } from '/src/utils/pistols'
 import { FameLivesDuelist, FameProgressBar } from '/src/components/account/LordsBalance'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { EmojiIcon } from '/src/components/ui/Icons'
-import { EMOJI } from '/src/data/messages'
+import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { InteractibleComponent, InteractibleComponentHandle, InteractibleComponentProps } from '/src/components/InteractibleComponent'
 import { ProfileBadge } from '/src/components/account/ProfileDescription'
 import { Grid, GridRow, GridColumn } from 'semantic-ui-react'
@@ -171,10 +171,10 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
           {/* <DuelistTokenArt duelistId={props.duelistId} className='Absolute' /> */}
           <div className='InDuelEmoji'>
             {isInAction &&
-              <EmojiIcon emoji={EMOJI.IN_ACTION} size={props.isSmall ? 'small' : 'big'} />
+              <EmojiIcon emoji={EMOJIS.IN_ACTION} size={props.isSmall ? 'small' : 'big'} />
             }
             {!isAlive &&
-              <EmojiIcon emoji={EMOJI.DEAD} size={props.isSmall ? 'small' : 'big'} />
+              <EmojiIcon emoji={EMOJIS.DEAD} size={props.isSmall ? 'small' : 'big'} />
             }
           </div>
           <div className='HounourCircle'>

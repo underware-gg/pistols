@@ -12,7 +12,7 @@ import { bigintToDecimal, bigintToHex, formatTimestampLocal } from '@underware/p
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
 import { DuelIconsAsRow } from '/src/components/DuelIcons'
-import { EMOJI } from '/src/data/messages'
+import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import AppDojo from '/src/components/AppDojo'
 
 const Row = Table.Row
@@ -267,7 +267,7 @@ function MovesStats({
           {/* <Row>
             <Cell>Fire Dice</Cell>
             <Cell>
-              {EMOJI.DICE} {state.dice_fire} over {state.chances}%
+              {EMOJIS.DICE} {state.dice_fire} over {state.chances}%
             </Cell>
           </Row> */}
         </Body>
@@ -301,7 +301,7 @@ function MovesStats({
 
 function _dice(dice: number) {
   if (dice == 0) return '-'
-  return <>{EMOJI.DICE} {dice.toString()}</>
+  return <>{EMOJIS.DICE} {dice.toString()}</>
 }
 
 function _env_card_name(card: any) {
@@ -348,9 +348,9 @@ function StateRow({
           {(card_a || card_b) && <Cell>{card_a}</Cell>}
           <Cell>{_dice(state_a.dice_fire)}</Cell>
           <Cell>{state_a.chances.toString()}%</Cell>
-          <Cell>{EMOJI.FIRE} {state_a.damage.toString()}</Cell>
-          <Cell>{EMOJI.LIFE} {state_a.health.toString()}</Cell>
-          <Cell>{EMOJI.HONOUR} {state_a.honour.toString()}</Cell>
+          <Cell>{EMOJIS.FIRE} {state_a.damage.toString()}</Cell>
+          <Cell>{EMOJIS.LIFE} {state_a.health.toString()}</Cell>
+          <Cell>{EMOJIS.HONOUR} {state_a.honour.toString()}</Cell>
           <Cell>{specials_a?.coin_toss ? 'Yes' : '-'}</Cell>
           <Cell>{specials_a?.reversal ? 'Yes' : '-'}</Cell>
           <Cell>{_env_card_name(specials_a?.shots_modifier)}</Cell>
@@ -361,9 +361,9 @@ function StateRow({
           {(card_a || card_b) && <Cell>{card_b}</Cell>}
           <Cell>{_dice(state_b.dice_fire)}</Cell>
           <Cell>{state_b.chances.toString()}%</Cell>
-          <Cell>{EMOJI.FIRE} {state_b.damage.toString()}</Cell>
-          <Cell>{EMOJI.LIFE} {state_b.health.toString()}</Cell>
-          <Cell>{EMOJI.HONOUR} {state_b.honour.toString()}</Cell>
+          <Cell>{EMOJIS.FIRE} {state_b.damage.toString()}</Cell>
+          <Cell>{EMOJIS.LIFE} {state_b.health.toString()}</Cell>
+          <Cell>{EMOJIS.HONOUR} {state_b.honour.toString()}</Cell>
           <Cell>{specials_b?.coin_toss ? 'Yes' : '-'}</Cell>
           <Cell>{specials_b?.reversal ? 'Yes' : '-'}</Cell>
           <Cell>{_env_card_name(specials_b?.shots_modifier)}</Cell>

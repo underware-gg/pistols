@@ -1,9 +1,9 @@
 import { BigNumberish } from 'starknet'
-import { EMOJI } from '/src/data/messages'
-import { SceneName } from '/src/data/assets'
+import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { bigintToDecimal } from '@underware/pistols-sdk/utils'
 import { makeCharacterDuelistId } from '@underware/pistols-sdk/pistols'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { SceneName } from '/src/data/assets'
 
 
 //------------------------------------------
@@ -262,21 +262,21 @@ export const ActionVerbs: Record<Action, string> = {
 }
 
 export const ActionEmojis: Record<Action, string> = {
-  [Action.None]: EMOJI.IDLE,
-  [Action.Paces1]: EMOJI.PACES,
-  [Action.Paces2]: EMOJI.PACES,
-  [Action.Paces3]: EMOJI.PACES,
-  [Action.Paces4]: EMOJI.PACES,
-  [Action.Paces5]: EMOJI.PACES,
-  [Action.Paces6]: EMOJI.PACES,
-  [Action.Paces7]: EMOJI.PACES,
-  [Action.Paces8]: EMOJI.PACES,
-  [Action.Paces9]: EMOJI.PACES,
-  [Action.Paces10]: EMOJI.PACES,
-  [Action.Seppuku]: EMOJI.SEPPUKU,
-  [Action.PocketPistol]: EMOJI.POCKET_PISTOL,
-  [Action.Behead]: EMOJI.BEHEAD,
-  [Action.Grapple]: EMOJI.GRAPPLE,
+  [Action.None]: EMOJIS.IDLE,
+  [Action.Paces1]: EMOJIS.PACES,
+  [Action.Paces2]: EMOJIS.PACES,
+  [Action.Paces3]: EMOJIS.PACES,
+  [Action.Paces4]: EMOJIS.PACES,
+  [Action.Paces5]: EMOJIS.PACES,
+  [Action.Paces6]: EMOJIS.PACES,
+  [Action.Paces7]: EMOJIS.PACES,
+  [Action.Paces8]: EMOJIS.PACES,
+  [Action.Paces9]: EMOJIS.PACES,
+  [Action.Paces10]: EMOJIS.PACES,
+  [Action.Seppuku]: EMOJIS.SEPPUKU,
+  [Action.PocketPistol]: EMOJIS.POCKET_PISTOL,
+  [Action.Behead]: EMOJIS.BEHEAD,
+  [Action.Grapple]: EMOJIS.GRAPPLE,
 }
 
 export const ArchetypeNames: Record<constants.Archetype, string> = {
