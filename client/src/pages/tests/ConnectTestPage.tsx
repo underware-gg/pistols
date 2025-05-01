@@ -5,7 +5,7 @@ import { useAccount, useConnect, useDisconnect, useNetwork } from '@starknet-rea
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDojoSetup, useStarknetContext, getConnectorIcon, useConnectedController } from '@underware/pistols-sdk/dojo'
 import { useTypedMessage, useAsyncMemo } from '@underware/pistols-sdk/utils/hooks'
-import { Messages, Revision, splitSignature, feltToString } from '@underware/pistols-sdk/utils/starknet'
+import { Messages, splitSignature, feltToString } from '@underware/pistols-sdk/utils/starknet'
 import { bigintToHex, shortAddress } from '@underware/pistols-sdk/utils'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import StarknetConnectModal from '/src/components/starknet/StarknetConnectModal'
@@ -34,7 +34,7 @@ export default function ConnectTestPage() {
         {/* <DojoAccount /> */}
         <Connect />
         {/* <Sign revision={0} /> */}
-        <Sign revision={1} />
+        <Sign />
         <EthSign />
       </Container>
     </AppDojo>
@@ -140,17 +140,14 @@ export function Connect() {
   )
 }
 
-function Sign({
-  revision,
-}: {
-  revision: Revision
-}) {
+function Sign() {
   const { account, isConnected } = useAccount()
   const { starknetDomain, dojoProvider } = useDojoSetup()
 
+  const REVISION = '1'
   const messages: Messages = useMemo(() => ({
     game: 'PISTOLS_AT_10_BLOCKS',
-    purpose: `SIGN_V${revision}_TEST`,
+    purpose: `SIGN_V${REVISION}_TEST`,
   }), [])
   const { typedMessage, messageHash, typeHash } = useTypedMessage({
     account,
@@ -173,15 +170,15 @@ function Sign({
 
   const { value: isVerified } = useAsyncMemo(async () => {
     if (!signature || signature.length == 0) return undefined
-    console.log(`V${revision} verifying...`)
+    console.log(`V${REVISION} verifying...`)
     const result = await dojoProvider.provider.verifyMessageInStarknet(typedMessage, signature, account.address)
-    console.log(`V${revision} verifyed:`, result)
+    console.log(`V${REVISION} verifyed:`, result)
     return result
   }, [signature, typedMessage], undefined, false)
 
   return (
     <>
-      <Button disabled={!isConnected || isSigning} onClick={() => _sign()}>Sign V{revision}</Button>
+      <Button disabled={!isConnected || isSigning} onClick={() => _sign()}>Sign V{REVISION}</Button>
       <Table celled striped size='small' color={isVerified == true ? 'green' : isVerified === false ? 'red' : 'orange'}>
         <Body>
           <Row columns={'equal'} verticalAlign='top'>

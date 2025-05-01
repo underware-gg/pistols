@@ -161,7 +161,6 @@ export const makeStarknetDomain = (networkId: NetworkId): StarknetDomain => ({
 })
 
 
-
 export const makeDojoAppConfig = (networkId: NetworkId, controllerConnector: Connector | undefined): DojoAppConfig => {
   return {
     selectedNetworkId: networkId,

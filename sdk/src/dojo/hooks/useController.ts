@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BigNumberish } from 'starknet'
-import { Connector, useAccount } from '@starknet-react/core'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { BigNumberish, CallData, shortString } from 'starknet'
+import { useAccount } from '@starknet-react/core'
 import { ControllerConnector } from '@cartridge/connector'
 import { ProfileContextTypeVariant } from '@cartridge/controller'
 import { useContractClassHash } from 'src/utils/hooks/useContractClassHash'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { KATANA_CLASS_HASH } from '@dojoengine/core'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
-import { bigintEquals } from 'src/utils/misc/types'
+import { bigintEquals, bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 
 // sync from here:
 // https://github.com/cartridge-gg/controller/blob/main/packages/account-wasm/src/constants.rs
@@ -90,5 +90,60 @@ export const useControllerAccount = (contractAddress: BigNumberish) => {
     isDeployed,
     isControllerAccount,
     isKatanaAccount,
+  }
+}
+
+
+//-----------------------------------
+// verify controller signature
+//
+// based on:
+// https://github.com/cartridge-gg/controller/blob/main/examples/next/src/components/SignMessage.tsx
+//
+export const useVerifyControllerSignature = (messageHash: BigNumberish, signature: BigNumberish[]) => {
+  const { address, account } = useAccount();
+  const [isLoading, setIsLoading] = useState<boolean>();
+  const [isValid, setIsValid] = useState<boolean>();
+
+  useEffect(() => {
+    let _mounted = true
+    const _verify = async () => {
+      setIsLoading(true);
+      setIsValid(undefined);
+      try {
+        const res = await account.callContract(
+          {
+            contractAddress: address,
+            entrypoint: "is_valid_signature",
+            calldata: CallData.compile({
+              hash: bigintToHex(messageHash),
+              signature: signature.map(s => bigintToHex(s)),
+            }),
+          },
+          "pending",
+        );
+        if (_mounted) {
+          setIsLoading(false);
+          setIsValid(res[0] === shortString.encodeShortString("VALID"));
+        }
+      } catch (e) {
+        console.error(e)
+        if (_mounted) {
+          setIsLoading(false);
+          setIsValid(false);
+        }
+      }
+    }
+    if (account && isPositiveBigint(messageHash) && signature?.length > 0) {
+      _verify()
+    }
+    return () => {
+      _mounted = false
+    }
+  }, [account, messageHash, signature])
+
+  return {
+    isLoading,
+    isValid,
   }
 }

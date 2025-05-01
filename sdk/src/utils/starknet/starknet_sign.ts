@@ -6,7 +6,6 @@ import {
   WeierstrassSignatureType,
   typedData,
   BigNumberish,
-  TypedDataRevision,
   StarknetDomain,
   RpcProvider,
 } from 'starknet'
@@ -14,7 +13,6 @@ import { bigintToHex, cleanObject, isBigint } from 'src/utils/misc/types'
 import { poseidon } from 'src/utils/starknet/starknet'
 
 export type Messages = { [key: string]: string | BigInt }
-export type Revision = 0 | 1
 
 export const splitSignature = (signature: Signature): bigint[] => {
   if (Array.isArray(signature)) {
@@ -92,10 +90,10 @@ export function getMessageHash(td: TypedData, address: BigNumberish): string {
   return (td && address) ? typedData.getMessageHash(td, address) : undefined
 }
 export function getTypeHash(td: TypedData, type: string): string {
-  return td ? typedData.getTypeHash(td.types, type, !td.domain?.revision ? TypedDataRevision.LEGACY : TypedDataRevision.ACTIVE) : undefined
+  return td ? typedData.getTypeHash(td.types, type, '1') : undefined
 }
 export function getTypeSelectorName(td: TypedData, type: string): string {
-  return td ? typedData.encodeType(td.types, type, !td.domain?.revision ? TypedDataRevision.LEGACY : TypedDataRevision.ACTIVE) : undefined
+  return td ? typedData.encodeType(td.types, type, '1') : undefined
 }
 
 
@@ -116,28 +114,18 @@ export function createTypedMessage({
   messages,
 }: TypedMessageOptions): TypedData {
   const _messages = cleanObject(messages)
-  const revision = starknetDomain?.revision ? parseInt(starknetDomain.revision.toString()) : -1
-  const result = (revision == 0) ? {
-    primaryType: 'Message',
-    domain: starknetDomain,
-    types: {
-      StarkNetDomain: [
-        { name: 'name', type: 'felt' },
-        { name: 'chainId', type: 'felt' },
-        { name: 'version', type: 'felt' },
-      ],
-      Message: Object.keys(_messages).map((name) => ({ name, type: 'felt' })),
-    },
-    message: _messages,
-  } : (revision == 1) ? {
-    primaryType: 'Message',
-    domain: starknetDomain,
+  if (starknetDomain?.revision !== '1') {
+    throw new Error(`createTypedMessage() Unsupported revision: ${starknetDomain?.revision}`)
+  }
+  // aligned with:
+  // https://github.com/cartridge-gg/controller/blob/main/examples/next/src/components/SignMessage.tsx
+  const result = {
     types: {
       StarknetDomain: [
-        { name: 'revision', type: 'string' },
-        { name: 'name', type: 'string' },
-        { name: 'chainId', type: 'string' },
-        { name: 'version', type: 'string' },
+        { name: 'name', type: 'shortstring' },
+        { name: 'version', type: 'shortstring' },
+        { name: 'chainId', type: 'shortstring' },
+        { name: 'revision', type: 'shortstring' },
       ],
       Message: Object.keys(_messages).map((name) => ({
         name,
@@ -145,13 +133,14 @@ export function createTypedMessage({
         // type: typeof _messages[name] == 'bigint' ? 'felt' : 'string',
       })),
     },
+    primaryType: 'Message',
+    domain: starknetDomain,
     message: Object.keys(_messages).reduce((acc, name) => {
       acc[name] = (isBigint(_messages[name])
-      //@ts-ignore
-        ? bigintToHex(_messages[name])
+        ? bigintToHex(_messages[name] as string)
         : _messages[name])
       return acc
     }, {} as { [key: string]: any }),
-  } : undefined
+  }
   return result
 }
