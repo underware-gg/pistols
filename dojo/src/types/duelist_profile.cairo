@@ -113,7 +113,6 @@ mod COLLECTIONS {
 #[derive(Copy, Drop, Serde, Default)]
 pub struct ProfileDescription {
     pub name: felt252, // @generateContants:shortstring
-    pub quote: felt252, // @generateContants:shortstring
 }
 
 // IMPORTANT: names must be in sync with enum CharacterProfile
@@ -121,23 +120,18 @@ mod CHARACTER_PROFILES {
     use super::{ProfileDescription};
     pub const Unknown: ProfileDescription = ProfileDescription {
         name: 'Unknown',
-        quote: '',
     };
     pub const Bartender: ProfileDescription = ProfileDescription {
         name: 'Bartender',
-        quote: 'Quote',
     };
     pub const Drunkard: ProfileDescription = ProfileDescription {
         name: 'Drunkard',
-        quote: 'Quote',
     };
     pub const Devil: ProfileDescription = ProfileDescription {
         name: 'Devil',
-        quote: 'Quote',
     };
     pub const Player: ProfileDescription = ProfileDescription {
         name: 'Stranger',
-        quote: 'Quote',
     };
 }
 
@@ -146,19 +140,15 @@ mod BOT_PROFILES {
     use super::{ProfileDescription};
     pub const Unknown: ProfileDescription = ProfileDescription {
         name: 'Unknown',
-        quote: '',
     };
     pub const TinMan: ProfileDescription = ProfileDescription {
         name: 'Tin Man',
-        quote: 'Quote',
     };
     pub const Scarecrow: ProfileDescription = ProfileDescription {
         name: 'Scarecrow',
-        quote: 'Quote',
     };
     pub const Leon: ProfileDescription = ProfileDescription {
         name: 'Leon',
-        quote: 'Quote',
     };
 }
 
@@ -168,91 +158,69 @@ mod GENESIS_PROFILES {
     use super::{ProfileDescription};
     pub const Unknown: ProfileDescription = ProfileDescription {
         name: 'Unknown',
-        quote: '',
     };
     pub const Duke: ProfileDescription = ProfileDescription {
         name: 'Duke',
-        quote: 'Prepare to be Duked!',
     };
     pub const Duella: ProfileDescription = ProfileDescription {
         name: 'Duella',
-        quote: 'Quote',
     };
     pub const Jameson: ProfileDescription = ProfileDescription {
         name: 'Jameson',
-        quote: 'Quote',
     };
     pub const Pilgrim: ProfileDescription = ProfileDescription {
         name: 'Pilgrim',
-        quote: 'Quote',
     };
     pub const Jack: ProfileDescription = ProfileDescription {
         name: 'Jack',
-        quote: 'Quote',
     };
     pub const Pops: ProfileDescription = ProfileDescription {
         name: 'Pops',
-        quote: 'Quote',
     };
     pub const SerWalker: ProfileDescription = ProfileDescription {
         name: 'Ser Walker',
-        quote: 'Quote',
     };
     pub const Bloberto: ProfileDescription = ProfileDescription {
         name: 'Bloberto',
-        quote: 'Quote',
     };
     pub const Squiddo: ProfileDescription = ProfileDescription {
         name: 'Squiddo',
-        quote: 'Quote',
     };
     pub const SlenderDuck: ProfileDescription = ProfileDescription {
         name: 'Slender Duck',
-        quote: 'Quote',
     };
     pub const LadyVengeance: ProfileDescription = ProfileDescription {
         name: 'Lady Vengeance',
-        quote: 'Quote',
     };
     pub const Breadman: ProfileDescription = ProfileDescription {
         name: 'Breadman',
-        quote: 'Quote',
     };
     pub const Brutus: ProfileDescription = ProfileDescription {
         name: 'Brutus',
-        quote: 'Quote',
     };
     pub const Pistolopher: ProfileDescription = ProfileDescription {
         name: 'Pistolopher',
-        quote: 'Quote',
     };
     pub const Secreto: ProfileDescription = ProfileDescription {
         name: 'Secreto',
-        quote: 'Quote',
     };
     pub const ShadowMare: ProfileDescription = ProfileDescription {
         name: 'Shadow Mare',
-        quote: 'Quote',
     };
     pub const Karaku: ProfileDescription = ProfileDescription {
         name: 'Karaku',
-        quote: 'Quote',
     };
     pub const Misty: ProfileDescription = ProfileDescription {
         name: 'Misty',
-        quote: 'Quote',
     };
     pub const Kenzu: ProfileDescription = ProfileDescription {
         name: 'Kenzu',
-        quote: 'Quote',
     };
     pub const NynJah: ProfileDescription = ProfileDescription {
         name: 'Nyn Jah',
-        quote: 'Quote',
     };
     pub const Thrak: ProfileDescription = ProfileDescription {
         name: 'Thrak',
-        quote: 'Quote',
     };
 }
 
