@@ -63,7 +63,8 @@ export const useSdkEntitiesGet = ({
 }: UseSdkEntitiesGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
-  const limit = useMemo(() => query?.build().limit, [query])
+  // const limit = useMemo(() => query?.build().limit, [query])
+  const limit = 1000;
 
   useEffect(() => {
     let _mounted = true
@@ -114,7 +115,8 @@ export const useSdkEntitiesSub = ({
 }: UseSdkEntitiesSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
-  const limit = useMemo(() => query?.build().limit, [query])
+  // const limit = useMemo(() => query?.build().limit, [query])
+  const limit = 1000;
 
   useEffect(() => {
     let _mounted = true
@@ -178,7 +180,8 @@ export const useSdkEventsGet = ({
 }: UseSdkEventsGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
-  const limit = useMemo(() => query?.build().limit, [query])
+  // const limit = useMemo(() => query?.build().limit, [query])
+  const limit = 1000;
 
   useEffect(() => {
     let _mounted = true
@@ -229,7 +232,8 @@ export const useSdkEventsSub = ({
 }: UseSdkEventsSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
-  const limit = useMemo(() => query?.build().limit, [query])
+  // const limit = useMemo(() => query?.build().limit, [query])
+  const limit = 1000;
 
   useEffect(() => {
     let _mounted = true

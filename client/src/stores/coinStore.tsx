@@ -12,6 +12,7 @@ import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/utils/starknet'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import * as torii from '@dojoengine/torii-client'
+import { Page } from '@dojoengine/torii-client'
 
 
 interface BalancesByAccount {
@@ -120,13 +121,16 @@ export const fetchNewTokenBoundCoins = async (sdk: SetupResult['sdk'], coinAddre
     .filter((address) => !accounts.includes(address))
   // console.log("fetchNewTokenBoundCoins()...", tokenAddress, tokenIds, tokenBoundAddresses, accounts)
   if (tokenBoundAddresses.length > 0) {
-    await sdk.getTokenBalances(
-      [coinAddress as string],
-      tokenBoundAddresses,
-      [], // no token ids
-    ).then((balances: torii.TokenBalance[]) => {
+    await sdk.getTokenBalances({
+      contractAddresses: [coinAddress as string],
+      accountAddresses: tokenBoundAddresses,
+      tokenIds: [],
+    }).then((balances: Page<torii.TokenBalance>) => {
       // console.log("fetchNewTokenBoundCoins() GOT:", balances)
-      setBalances(balances)
+      setBalances(balances.items)
+      if (balances.next_cursor) {
+        console.warn("fetchNewTokenBoundCoins() LOST PAGE!!!! ", coinAddress, tokenBoundAddresses)
+      }
     }).catch((error: Error) => {
       console.error("fetchNewTokenBoundCoins().sdk.get() error:", error, tokenIds)
     })

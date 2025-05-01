@@ -3,6 +3,8 @@ import { BigNumberish } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { isPositiveBigint } from 'src/utils/misc/types'
 import * as torii from '@dojoengine/torii-client'
+import { Page } from '@dojoengine/torii-client'
+import { SubscriptionCallbackArgs } from '@dojoengine/sdk'
 
 
 //---------------------------------------
@@ -48,15 +50,15 @@ export const useSdkTokenBalancesGet = ({
     const _get = async () => {
       // console.log("useSdkTokenBalancesGet() GET........", enabled, contract, account, tokenIds)
       setIsLoading(true)
-      await sdk.getTokenBalances(
-        [contract],
-        account ? [account] : [],
-        tokenIds?.map(a => toToriiTokenId(a)) ?? []
-      ).then((balances: torii.TokenBalance[]) => {
+      await sdk.getTokenBalances({
+        contractAddresses: [contract],
+        accountAddresses: account ? [account] : [],
+        tokenIds: tokenIds?.map(a => toToriiTokenId(a)) ?? []
+      }).then((balances: Page<torii.TokenBalance>) => {
         if (!_mounted) return
         // console.log("useSdkTokenBalancesGet() GOT:", balances)
-        if (balances.length > 0) {
-          setBalances(balances)
+        if (balances.items.length > 0) {
+          setBalances(balances.items)
         } else if (!tokenIds) {
           // initialize zero balance
           // console.log("useSdkTokenBalancesGet() initialize balance:", contract, account)
@@ -67,6 +69,9 @@ export const useSdkTokenBalancesGet = ({
             balance: '0x0',
           }]
           setBalances(_balances)
+        }
+        if (balances.next_cursor) {
+          console.warn("useSdkTokenBalancesGet() LOST PAGE!!!! ", contract, account, tokenIds)
         }
       }).catch((error: Error) => {
         if (!_mounted) return
@@ -99,17 +104,22 @@ export const useSdkTokenBalancesSub = ({
     let _subscription: torii.Subscription = undefined;
     const _subscribe = () => {
       console.log(`useSdkTokenBalancesSub() SUBSCRIBE......`, contracts)
-      _subscription = sdk.onTokenBalanceUpdated(
-        contracts,
-        [],
-        [],
-        (balance: torii.TokenBalance) => {
-          console.log("useSdkTokenBalancesSub() SUB:", isPositiveBigint(balance.contract_address), balance);
-          if (isPositiveBigint(balance.contract_address)) {
-            updateBalance(balance);
+      _subscription = sdk.onTokenBalanceUpdated({
+        contractAddresses: contracts,
+        accountAddresses: [],
+        tokenIds: [],
+        callback: (response: SubscriptionCallbackArgs<torii.TokenBalance>) => {
+          if (response.data) {
+            let balance: torii.TokenBalance = response.data;
+            console.log("useSdkTokenBalancesSub() SUB:", isPositiveBigint(balance.contract_address), balance);
+            if (isPositiveBigint(balance.contract_address)) {
+              updateBalance(balance);
+            }
+          } else if (response.error) {
+            console.error("useSdkTokenBalancesSub() SUBSCRIPTION ERROR:", response.error)
           }
-        },
-      )
+        }
+      })
     };
     // subscribe
     if (sdk && enabled && contracts.length > 0) _subscribe()
