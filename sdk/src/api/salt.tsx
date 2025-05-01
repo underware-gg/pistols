@@ -36,7 +36,9 @@ export const apiGenerateControllerSalt = async (
     if (data.salt) {
       result = BigInt(data.salt)
     } else if (data.error) {
-      console.error("apiGenerateControllerSalt() ERROR:", data.error);
+      console.warn("apiGenerateControllerSalt() ERROR:", data.error,
+        // data.message,
+      );
     } else {
       console.error("apiGenerateControllerSalt() Invalid response:", data);
     }

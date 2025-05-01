@@ -20,7 +20,6 @@ export const useVerifyControllerSignatureApi = (
     let _mounted = true
     const _verify = async () => {
       setIsLoading(true);
-      setIsValid(undefined);
       try {
         const res = await apiVerifyControllerSignature(
           serverUrl,
@@ -41,6 +40,7 @@ export const useVerifyControllerSignatureApi = (
         }
       }
     }
+    setIsValid(undefined);
     if (account && isPositiveBigint(messageHash) && signature?.length > 0) {
       _verify()
     }

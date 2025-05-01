@@ -1,12 +1,14 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Button, Container, Grid, Table } from 'semantic-ui-react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSetup, useVerifyControllerSignature } from '@underware/pistols-sdk/dojo'
 import { useTypedMessage } from '@underware/pistols-sdk/utils/hooks'
+import { useVerifyControllerSignatureApi, useGenerateControllerSaltApi } from '@underware/pistols-sdk/api'
 import { Messages } from '@underware/pistols-sdk/utils/starknet'
-import { bigintToHex } from '@underware/pistols-sdk/utils'
+import { bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { CommitMoveMessage } from '@underware/pistols-sdk/pistols'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
+import { SALT_SERVER_URL } from '/src/utils/env'
 import { Connect } from './ConnectTestPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
@@ -21,12 +23,16 @@ const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
 export default function SignTestPage() {
-  const messages1: Messages = useMemo(() => ({
+  const testMessages: Messages = useMemo(() => ({
     game: 'PISTOLS_AT_10_BLOCKS',
     purpose: `SIGN_TEST`,
     nonce: 1n,
   }), [])
-  const messages2: CommitMoveMessage = useMemo(() => ({
+  const messagesDuel1: CommitMoveMessage = useMemo(() => ({
+    duelId: 100n,
+    duelistId: 1n,
+  }), [])
+  const messagesDuel2: CommitMoveMessage = useMemo(() => ({
     duelId: 100n,
     duelistId: 2n,
   }), [])
@@ -39,18 +45,23 @@ export default function SignTestPage() {
       <Container>
         <Connect />
 
-        <Grid columns={'equal'} style={{ width: '1200px' }}>
+        <Grid columns={'equal'} style={{ width: '1450px' }}>
           <Grid.Row>
+            {/* <Grid.Column>
+              <Sign messages={testMessages} />
+            </Grid.Column> */}
             <Grid.Column>
-              <Sign messages={messages1} />
+              <Sign messages={messagesDuel2} />
             </Grid.Column>
             <Grid.Column>
-              <Sign messages={messages2} />
+              <Sign messages={messagesDuel2} />
+            </Grid.Column>
+            <Grid.Column>
+              <Sign messages={messagesDuel2} fromAccount='0x0458f10bf89dfd916eaeabbf6866870bd5bb8b05c6df7de0ad36bb8ad66dce69' />
             </Grid.Column>
           </Grid.Row>
         </Grid>
       </Container>
-
     </AppDojo>
   )
 }
@@ -58,8 +69,10 @@ export default function SignTestPage() {
 
 function Sign({
   messages,
+  fromAccount,
 }: {
   messages: Messages,
+  fromAccount?: string,
 }) {
   const { account, isConnected } = useAccount()
   const { starknetDomain } = useDojoSetup()
@@ -74,6 +87,11 @@ function Sign({
   const [signature, setSignature] = useState<string[]>([])
   // const signaturePair = useMemo(() => signature?.length == 2 ? splitSignature(signature) : null, [signature])
 
+  useEffect(() => {
+    setIsSigning(false)
+    setSignature([])
+  }, [isConnected, account])
+
   const _sign = async () => {
     console.log(`SIGN message:`, typedMessage)
     setIsSigning(true)
@@ -83,6 +101,8 @@ function Sign({
     setIsSigning(false)
   }
   const { isLoading, isValid } = useVerifyControllerSignature(messageHash, signature)
+  const { isLoading: isLoadingApi, isValid: isValidApi } = useVerifyControllerSignatureApi(SALT_SERVER_URL, messageHash, signature, fromAccount)
+  const { isLoading: isLoadingSalt, isError: isErrorSalt, salt } = useGenerateControllerSaltApi(SALT_SERVER_URL, starknetDomain, messageHash, signature, fromAccount)
 
   return (
     <>
@@ -130,10 +150,37 @@ function Sign({
 
           <Row columns={'equal'} verticalAlign='top'>
             <Cell>
-              Verified
+              Verified (on-chain)
             </Cell>
-            <Cell className={`Code ${isValid === true ? 'BgPositive' : isValid === false ? 'BgNegative' : ''}`}>
+            <Cell className={`Code ${isValid === true ? 'Darkest BgPositive' : isValid === false ? 'BgNegative' : ''}`}>
               {isLoading ? 'verifying...' : isValid === true ? 'VALIDATED' : isValid === false ? 'INVALID' : '?'}
+            </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Verified (API)
+            </Cell>
+            <Cell className={`Code ${isValidApi === true ? 'Darkest BgPositive' : isValidApi === false ? 'BgNegative' : ''}`}>
+              {isLoadingApi ? 'verifying...' : isValidApi === true ? 'VALIDATED' : isValidApi === false ? 'INVALID' : '?'}
+            </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Salt Server:
+            </Cell>
+            <Cell className='Code'>
+              {SALT_SERVER_URL}
+            </Cell>
+          </Row>
+
+          <Row columns={'equal'} verticalAlign='top'>
+            <Cell>
+              Salt (API)
+            </Cell>
+            <Cell className={`Code ${isPositiveBigint(salt) ? 'Darkest BgPositive' : isErrorSalt ? 'BgNegative' : ''}`}>
+              {isLoadingSalt ? 'generating...' : isPositiveBigint(salt) ? bigintToHex(salt) : isErrorSalt ? 'ERROR' : '?'}
             </Cell>
           </Row>
 

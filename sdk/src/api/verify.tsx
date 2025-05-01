@@ -33,9 +33,12 @@ export const apiVerifyControllerSignature = async (
       }
     );
     const data = await response.json();
-    console.log(`apiVerifyControllerSignature() data:`, data)
-    if (data.verified) {
-      result = (data.verified == true)
+    // console.log(`apiVerifyControllerSignature() data:`, data)
+    if (data.verified === true || data.verified === false) {
+      result = data.verified;
+      if (data.error) {
+        console.warn("apiVerifyControllerSignature() INVALID:", data.error);
+      }
     } else if (data.error) {
       console.error("apiVerifyControllerSignature() ERROR:", data.error);
     } else {
@@ -45,5 +48,5 @@ export const apiVerifyControllerSignature = async (
     console.error("apiVerifyControllerSignature() EXCEPTION:", error);
   }
 
-  return result
+  return result;
 }

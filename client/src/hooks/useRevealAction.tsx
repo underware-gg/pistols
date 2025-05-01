@@ -7,6 +7,7 @@ import { useGetDuelDeck } from '/src/hooks/usePistolsContractCalls'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { PLAYER_CHARACTER_ID } from '/src/utils/pistols'
+import { SALT_SERVER_URL } from '/src/utils/env'
 
 export function useSignAndRestoreMovesFromHash(duelId: bigint, duelistId: bigint, hash: bigint) {
   const { account } = useAccount()
@@ -39,7 +40,7 @@ export function useSignAndRestoreMovesFromHash(duelId: bigint, duelistId: bigint
 
   const sign_and_restore = useCallback(async () => {
     if (canSign) {
-      const { salt, moves } = await signAndRestoreMovesFromHash(account, starknetDomain, messageToSign, hash, decks)
+      const { salt, moves } = await signAndRestoreMovesFromHash(SALT_SERVER_URL, account, starknetDomain, messageToSign, hash, decks)
       if (salt > 0n && moves) {
         setSalt(salt)
         setMoves(moves)

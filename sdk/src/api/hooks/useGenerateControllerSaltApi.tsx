@@ -21,7 +21,6 @@ export const useGenerateControllerSaltApi = (
     const _verify = async () => {
       setIsLoading(true);
       setIsError(undefined);
-      setSalt(undefined);
       try {
         const result = await apiGenerateControllerSalt(
           serverUrl,
@@ -47,6 +46,7 @@ export const useGenerateControllerSaltApi = (
         }
       }
     }
+    setSalt(undefined);
     if (account && isPositiveBigint(messageHash) && signature?.length > 0) {
       _verify()
     }

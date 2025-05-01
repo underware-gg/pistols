@@ -109,7 +109,6 @@ export const useVerifyControllerSignature = (messageHash: BigNumberish, signatur
     let _mounted = true
     const _verify = async () => {
       setIsLoading(true);
-      setIsValid(undefined);
       try {
         const res = await account.callContract(
           {
@@ -134,6 +133,7 @@ export const useVerifyControllerSignature = (messageHash: BigNumberish, signatur
         }
       }
     }
+    setIsValid(undefined);
     if (account && isPositiveBigint(messageHash) && signature?.length > 0) {
       _verify()
     }
