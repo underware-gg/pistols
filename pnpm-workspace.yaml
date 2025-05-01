@@ -42,6 +42,7 @@ catalog:
   starknetid.js: ^4.0.0
   typescript: ^5.5.4
   tsup: ^8.3.5
+  universal-cookie: "^8.0.1"
 
   # daydreams
   "@daydreamsai/core": ^0.0.4

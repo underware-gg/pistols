@@ -30,6 +30,7 @@
 | `@dojoengine/sdk`        |          |           | ✅      |                | ✅         |
 | `@dojoengine/utils`      | ✅       |           |         |                |            |
 | `@apollo/client`         |          |           |         | ✅             |            |
+| `universal-cookie`       |          |           |         |                | ✅         |
 
 
 ## Installation

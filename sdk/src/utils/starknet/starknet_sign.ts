@@ -56,7 +56,7 @@ export const signMessages = async (account: AccountInterface, starknetDomain: St
       : splitSignature(signatureRaw) // {r,s}
   // if array has only 2 elements, produce the hash
   const signatureHash = signature.length == 2 ? poseidon(signature) : 0n
-  console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature, signatureRaw, 'sigHash:', bigintToHex(signatureHash))
+  // console.log(`SIG:`, typedMessage, 'type:', typeSelectorName, typeHash, 'message:', messageHash, signature, signatureRaw, 'sigHash:', bigintToHex(signatureHash))
   // throw new Error('STOP')
   return {
     typedMessage,
@@ -67,10 +67,6 @@ export const signMessages = async (account: AccountInterface, starknetDomain: St
     signatureHash,
     signature,
   }
-}
-export const verifyMessages = async (account: AccountInterface, provider: RpcProvider, starknetDomain: StarknetDomain, messages: Messages, signature: WeierstrassSignatureType): Promise<boolean> => {
-  const typedMessage = createTypedMessage({ starknetDomain, messages })
-  return provider.verifyMessageInStarknet(typedMessage, signature, account.address)
 }
 
 // ref:

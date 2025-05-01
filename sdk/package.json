@@ -119,6 +119,7 @@
     "react": "catalog:",
     "starknet": "catalog:",
     "starknetid.js": "catalog:",
+    "universal-cookie": "catalog:",
     "zustand": "catalog:"
   },
   "devDependencies": {

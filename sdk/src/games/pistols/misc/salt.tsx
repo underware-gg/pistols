@@ -1,8 +1,11 @@
 import { AccountInterface, StarknetDomain } from 'starknet'
 import { signMessages, Messages } from 'src/utils/starknet/starknet_sign'
-import { bigintToHex } from 'src/utils/misc/types'
+import { bigintToHex, shortAddress } from 'src/utils/misc/types'
 import { make_moves_hash, _make_move_mask, _make_move_hash } from '../cairo/make_moves_hash'
 import { apiGenerateControllerSalt } from 'src/exports/api'
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies(null, { path: '/' });
 
 export interface CommitMoveMessage extends Messages {
   duelId: bigint,
@@ -16,29 +19,50 @@ const signAndGenerateSalt = async (
   starknetDomain: StarknetDomain, 
   messageToSign: CommitMoveMessage,
 ): Promise<bigint> => {
-  let result = 0n
+  let salt = 0n
   if (messageToSign) {
     try {
-      const { signatureHash, signature, messageHash } = await signMessages(account, starknetDomain, messageToSign)
-      if (signatureHash > 0n) {
-        result = signatureHash
-      } else if (signature.length > 0 && serverUrl) {
-        result = await apiGenerateControllerSalt(
-          serverUrl,
-          account.address,
-          starknetDomain,
-          messageHash,
-          signature,
-        )
+      //
+      // 1: try to restore from cookie...
+      //
+      const cookieKey = `salt[${bigintToHex(messageToSign.duelId)},${bigintToHex(messageToSign.duelistId)}]`;
+      salt = BigInt(cookies.get(cookieKey) || '0');
+      console.log(`SALT COOKIE [${cookieKey}]:`, shortAddress(salt))
+      //
+      // 2: try hashed signature (non-controller wallets)...
+      //
+      if (salt == 0n) {
+        const { signatureHash, signature, messageHash } = await signMessages(account, starknetDomain, messageToSign)
+        if (signatureHash > 0n) {
+          console.log(`SALT HASHED:`, shortAddress(salt))
+          salt = signatureHash
+        } else if (signature.length > 0 && serverUrl) {
+          //
+          // 3: generate controller signed salt...
+          //
+          salt = await apiGenerateControllerSalt(
+            serverUrl,
+            account.address,
+            starknetDomain,
+            messageHash,
+            signature,
+          )
+          console.log(`SALT GENERATED(${serverUrl}):`, shortAddress(salt))
+        }
+        // save cookie backup
+        if (salt > 0n) {
+          cookies.set(cookieKey, shortAddress(salt));
+          console.log(`SALT backup to cookie[${cookieKey}]:`, shortAddress(salt))
+        }
       }
-      if (signatureHash > 0n) {
-        throw new Error('from(): unable to generate salt')
+      if (salt == 0n) {
+        throw new Error('unable to generate salt!')
       }
     } catch (e) {
       console.warn(`signAndGenerateSalt() exception:`, e)
     }
   }
-  return result
+  return salt
 }
 
 /** @returns the felt252 hash for an action, or 0 if fail */
