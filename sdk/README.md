@@ -8,7 +8,8 @@
 * `@underware/pistols-sdk/dojo`: Dojo utils and hooks
 * `@underware/pistols-sdk/dojo/graphql`: Dojo GraphQL utils and hooks
 * `@underware/pistols-sdk/utils`: Misc and Starknet utils
-* `@underware/pistols-sdk/utils/hooks`: Misc and Starknet utility hooks
+* `@underware/pistols-sdk/utils/hooks`: Misc utility hooks
+* `@underware/pistols-sdk/utils/starknet`: Starknet utils
 * `@underware/pistols-sdk/abis`: Misc Starknet ABIs
 * `@underware/pistols-sdk/fix`: Temporary fixes for dependencies
 
