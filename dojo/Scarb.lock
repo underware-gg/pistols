@@ -4,15 +4,15 @@ version = 1
 [[package]]
 name = "achievement"
 version = "0.0.0"
-source = "git+https://github.com/rsodre/arcade?branch=dojo_v1.4.0#1472ee90b09a09539eeea02b7227d8a4957e5b5c"
+source = "git+https://github.com/rsodre/arcade?branch=dojo_v1.5.0#119118ce439ad9fe96f1bf066d1c819fedf777f2"
 dependencies = [
  "dojo",
 ]
 
 [[package]]
 name = "dojo"
-version = "1.4.0"
-source = "git+https://github.com/dojoengine/dojo?tag=v1.4.0#22ef7101e84429f4f06fa634f927dd6ad2c48752"
+version = "1.5.0"
+source = "git+https://github.com/dojoengine/dojo?tag=v1.5.0#812f17c9c57fd057d0bf1e648a591ea0ca9ea718"
 dependencies = [
  "dojo_plugin",
 ]
@@ -20,15 +20,15 @@ dependencies = [
 [[package]]
 name = "dojo_cairo_test"
 version = "1.0.12"
-source = "git+https://github.com/dojoengine/dojo?tag=v1.4.0#22ef7101e84429f4f06fa634f927dd6ad2c48752"
+source = "git+https://github.com/dojoengine/dojo?tag=v1.5.0#812f17c9c57fd057d0bf1e648a591ea0ca9ea718"
 dependencies = [
  "dojo",
 ]
 
 [[package]]
 name = "dojo_plugin"
-version = "2.9.4"
-source = "git+https://github.com/dojoengine/dojo?tag=v1.4.0#22ef7101e84429f4f06fa634f927dd6ad2c48752"
+version = "2.10.1"
+source = "git+https://github.com/dojoengine/dojo?tag=v1.5.0#812f17c9c57fd057d0bf1e648a591ea0ca9ea718"
 
 [[package]]
 name = "graffiti"

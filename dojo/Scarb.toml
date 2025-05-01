@@ -1,7 +1,7 @@
 [package]
 name = "pistols"
 version = "0.15.3"
-cairo-version = "2.9.4"
+cairo-version = "2.10.1"
 edition = "2024_07"
 
 [cairo]
@@ -11,9 +11,9 @@ sierra-replace-ids = true
 migrate = "./migrate"
 
 [dependencies]
-dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.4.0" }
-# achievement = { git = "https://github.com/cartridge-gg/arcade", tag = "v1.4.0" }
-achievement = { git = "https://github.com/rsodre/arcade", branch = "dojo_v1.4.0" }
+dojo = { git = "https://github.com/dojoengine/dojo", tag = "v1.5.0" }
+# achievement = { git = "https://github.com/cartridge-gg/arcade", tag = "v1.5.0" }
+achievement = { git = "https://github.com/rsodre/arcade", branch = "dojo_v1.5.0" }
 graffiti = { git = "https://github.com/rsodre/graffiti", rev = "url" }
 nft_combo = { git = "https://github.com/underware-gg/cairo-nft-combo", tag = "v1.0.0"}
 openzeppelin_token = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v1.0.0" }
@@ -25,8 +25,8 @@ openzeppelin_introspection = { git = "https://github.com/OpenZeppelin/cairo-cont
 # tournaments = { git = "https://github.com/underware-gg/tournaments", branch = "pistols" }
 
 [dev-dependencies]
-cairo_test = "2.9.4"
-dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.4.0" }
+cairo_test = "2.10.1"
+dojo_cairo_test = { git = "https://github.com/dojoengine/dojo.git", tag = "v1.5.0" }
 # openzeppelin_account = { git = "https://github.com/OpenZeppelin/cairo-contracts", tag = "v1.0.0" }
 
 # [features]

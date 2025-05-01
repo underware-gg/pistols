@@ -99,8 +99,8 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 rustup override set stable
 rustup update
 
-# Install Cargo
-curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh
+# Install Scarb v2.10.1
+curl --proto '=https' --tlsv1.2 -sSf https://docs.swmansion.com/scarb/install.sh | sh -s -- -v 2.10.1
 
 # Install starkli
 # https://github.com/xJonathanLEI/starkli
@@ -112,6 +112,7 @@ curl -fsSL https://get.pnpm.io/install.sh | sh -
 
 # other stuff you will need
 pnpm install -g turbo
+brew install llvm@19
 brew install jq
 brew install protobuf
 cargo install toml-cli
@@ -124,12 +125,12 @@ Install the [Cairo 1.0](https://marketplace.visualstudio.com/items?itemName=star
 
 > [Dojo Book](https://book.dojoengine.org/getting-started)
 
-Currenty using Dojo version `v1.4.0`
+Currenty using Dojo version `v1.5.0`
 
 ```sh
 curl -L https://install.dojoengine.org | bash
 # open new terminal to update PATH
-dojoup -v v1.4.0
+dojoup -v v1.5.0
 
 # test dojo
 cd dojo
