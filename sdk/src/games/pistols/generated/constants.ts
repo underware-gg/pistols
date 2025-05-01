@@ -527,7 +527,6 @@ export type CollectionDescription = {
 // from: ../dojo/src/types/duelist_profile.cairo
 export type ProfileDescription = {
   name : string,
-  quote : string,
 };
 
 // from: ../dojo/src/types/premise.cairo
@@ -1013,23 +1012,18 @@ type type_CHARACTER_PROFILES = {
 export const CHARACTER_PROFILES: type_CHARACTER_PROFILES = {
   Unknown: {
     name: 'Unknown',
-    quote: '',
   },
   Bartender: {
     name: 'Bartender',
-    quote: 'Quote',
   },
   Drunkard: {
     name: 'Drunkard',
-    quote: 'Quote',
   },
   Devil: {
     name: 'Devil',
-    quote: 'Quote',
   },
   Player: {
     name: 'Stranger',
-    quote: 'Quote',
   },
 };
 
@@ -1043,19 +1037,15 @@ type type_BOT_PROFILES = {
 export const BOT_PROFILES: type_BOT_PROFILES = {
   Unknown: {
     name: 'Unknown',
-    quote: '',
   },
   TinMan: {
     name: 'Tin Man',
-    quote: 'Quote',
   },
   Scarecrow: {
     name: 'Scarecrow',
-    quote: 'Quote',
   },
   Leon: {
     name: 'Leon',
-    quote: 'Quote',
   },
 };
 
@@ -1087,91 +1077,69 @@ type type_GENESIS_PROFILES = {
 export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
   Unknown: {
     name: 'Unknown',
-    quote: '',
   },
   Duke: {
     name: 'Duke',
-    quote: 'Prepare to be Duked!',
   },
   Duella: {
     name: 'Duella',
-    quote: 'Quote',
   },
   Jameson: {
     name: 'Jameson',
-    quote: 'Quote',
   },
   Pilgrim: {
     name: 'Pilgrim',
-    quote: 'Quote',
   },
   Jack: {
     name: 'Jack',
-    quote: 'Quote',
   },
   Pops: {
     name: 'Pops',
-    quote: 'Quote',
   },
   SerWalker: {
     name: 'Ser Walker',
-    quote: 'Quote',
   },
   Bloberto: {
     name: 'Bloberto',
-    quote: 'Quote',
   },
   Squiddo: {
     name: 'Squiddo',
-    quote: 'Quote',
   },
   SlenderDuck: {
     name: 'Slender Duck',
-    quote: 'Quote',
   },
   LadyVengeance: {
     name: 'Lady Vengeance',
-    quote: 'Quote',
   },
   Breadman: {
     name: 'Breadman',
-    quote: 'Quote',
   },
   Brutus: {
     name: 'Brutus',
-    quote: 'Quote',
   },
   Pistolopher: {
     name: 'Pistolopher',
-    quote: 'Quote',
   },
   Secreto: {
     name: 'Secreto',
-    quote: 'Quote',
   },
   ShadowMare: {
     name: 'Shadow Mare',
-    quote: 'Quote',
   },
   Karaku: {
     name: 'Karaku',
-    quote: 'Quote',
   },
   Misty: {
     name: 'Misty',
-    quote: 'Quote',
   },
   Kenzu: {
     name: 'Kenzu',
-    quote: 'Quote',
   },
   NynJah: {
     name: 'Nyn Jah',
-    quote: 'Quote',
   },
   Thrak: {
     name: 'Thrak',
-    quote: 'Quote',
   },
 };
 
