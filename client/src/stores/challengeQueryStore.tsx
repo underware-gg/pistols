@@ -11,8 +11,7 @@ import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
-import { keysToEntityId } from '@underware/pistols-sdk/utils/hooks'
-import { useEntityModel } from '@underware/pistols-sdk/dojo'
+import { useEntityModel, keysToEntityId } from '@underware/pistols-sdk/dojo'
 import { useChallengeStore } from './challengeStore'
 
 //-----------------------------------------

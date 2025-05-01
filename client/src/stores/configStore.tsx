@@ -1,9 +1,6 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityModel, getEntityModel } from '@underware/pistols-sdk/dojo'
-import { useRouteSlugs } from '/src/hooks/useRoute'
-import { feltToString } from '@underware/pistols-sdk/utils/starknet'
-import { keysToEntityId } from '@underware/pistols-sdk/utils/hooks'
+import { useEntityModel, getEntityModel, keysToEntityId } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 

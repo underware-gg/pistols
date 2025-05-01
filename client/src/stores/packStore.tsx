@@ -1,10 +1,9 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityId } from '@underware/pistols-sdk/utils/hooks'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
-import { formatQueryValue, useEntityModel, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { formatQueryValue, useEntityModel, useSdkEntitiesGet, useEntityId } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 

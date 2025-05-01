@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
+import { useDojoSystem, useEntityModel, makeCustomEnumEntityId } from '@underware/pistols-sdk/dojo'
+import { feltToString, makeAbiCustomEnum } from '@underware/pistols-sdk/utils/starknet'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { feltToString, makeAbiCustomEnum, makeCustomEnumEntityId, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
-import { useDojoSystem, useEntityModel } from '@underware/pistols-sdk/dojo'
 import { usePackType } from '/src/stores/packStore'
 
 export const useBankStore = createDojoStore<PistolsSchemaType>();

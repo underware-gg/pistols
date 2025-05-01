@@ -2,8 +2,7 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
-import { useEntityId, keysToEntityId } from '@underware/pistols-sdk/utils/hooks'
-import { useEntityModel, getEntityModel } from '@underware/pistols-sdk/dojo'
+import { useEntityId, keysToEntityId, useEntityModel, getEntityModel } from '@underware/pistols-sdk/dojo'
 import { models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useTokenConfigStore = createDojoStore<PistolsSchemaType>();

@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityModel } from '@underware/pistols-sdk/dojo'
-import { useEntityId } from '@underware/pistols-sdk/utils/hooks'
+import { useEntityModel, useEntityId } from '@underware/pistols-sdk/dojo'
 import { parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'

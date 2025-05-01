@@ -1,8 +1,18 @@
 import { useMemo } from 'react'
-import { BigNumberish } from 'starknet'
+import { BigNumberish, CairoCustomEnum, CallData, Calldata } from 'starknet'
 import { getEntityIdFromKeys } from '@dojoengine/utils'
 
+//
+// make Dojo entity Id from keys
 export const keysToEntityId = (keys: BigNumberish[]): string => (getEntityIdFromKeys(keys.map(v => BigInt(v ?? 0))) as string)
+
+//
+// make the entity Id for a full CairoCustomEnum built with makeAbiCustomEnum()
+export const makeCustomEnumEntityId = (data: CairoCustomEnum | undefined): string | undefined => {
+  if (!data) return undefined
+  let calldata: Calldata = CallData.compile([data])
+  return keysToEntityId(calldata)
+}
 
 // same as @dojoengine/sdk/src/react/hooks/useEntityId()
 // but the response is always a hex string

@@ -1,5 +1,4 @@
-import { CairoCustomEnum, BigNumberish, Abi, CallData, Calldata } from 'starknet'
-import { keysToEntityId } from 'src/utils/hooks/useEntityId'
+import { CairoCustomEnum, BigNumberish, Abi, CallData } from 'starknet'
 import { bigintToHex } from 'src/utils/misc/types'
 
 export type CustomEnumValue = number | BigNumberish | BigNumberish[] | string
@@ -76,13 +75,4 @@ export const makeAbiCustomEnum = <T extends CustomEnumValue>(
     _variants[name] = (v.name == variant ? makeCustomEnum(variant, value).unwrap() as T : undefined)
   });
   return new CairoCustomEnum(_variants)
-}
-
-//
-// make the entity Id for a full CairoCustomEnum built with makeAbiCustomEnum()
-//
-export const makeCustomEnumEntityId = (data: CairoCustomEnum | undefined): string | undefined => {
-  if (!data) return undefined
-  let calldata: Calldata = CallData.compile([data])
-  return keysToEntityId(calldata)
 }

@@ -13,7 +13,7 @@
 * `@underware/pistols-sdk/fix`: Temporary fixes for dependencies
 
 
-## Dependencies
+## Dependencies (sort of...)
 
 |                          | `/utils` | `/abis`  | `/dojo` | `/dojo/graphql` | `/pistols` |
 |--------------------------|:--------:|:--------:|:-------:|:---------------:|:----------:|

@@ -1,11 +1,11 @@
 import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityId, useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
-import { formatQueryValue, useEntityModel, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
-import { feltToString, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
-import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { formatQueryValue, useEntityId, useEntityModel, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder, PistolsEntity, movesToHand } from '@underware/pistols-sdk/pistols'
+import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
+import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
