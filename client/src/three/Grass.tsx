@@ -7,9 +7,6 @@ const GRASS_PATCH_SIZE_DEPTH = 0.51;
 const GRASS_WIDTH = 0.012;
 const GRASS_HEIGHT = 0.1;
 const MAX_GRASS_GROWTH = 0.2;
-const NUM_GRASS = (32) * 5;
-const GRASS_SEGMENTS_HIGH = 6;
-const GRASS_VERTICES_HIGH = (GRASS_SEGMENTS_HIGH + 1) * 2;
 
 export class Grass extends THREE.Object3D {
 
@@ -21,26 +18,37 @@ export class Grass extends THREE.Object3D {
   private depthMaterial: shaders.ShaderMaterial;
   private mesh: THREE.InstancedMesh;
 
-  private grassDebugObject = {
-    baseColor: '#655d06',
-    tipColor: '#bbc624'
+  private grassSettings = {
+    density: 32 * 5,
+    segments: 6,
+    vertices: 14,
+    color: {
+      base: '#655d06',
+      tip: '#bbc624'
+    }
   }
 
-  constructor(params: { height: number; offset: number; heightmap: any; dims: any; transforms: any; growth: number }) {
+  constructor(params: { height: number; offset: number; heightmap: any; dims: any; transforms: any; growth: number, density: number, segments: number }) {
     super();
 
-    this.geometryHigh = this.createGrassGeometry(GRASS_SEGMENTS_HIGH, params.transforms);
+    let grassVertices = (params.segments + 1) * 2
+
+    this.grassSettings.density = params.density
+    this.grassSettings.segments = params.segments
+    this.grassSettings.vertices = (params.segments + 1) * 2
+
+    this.geometryHigh = this.createGrassGeometry(this.grassSettings.segments, params.transforms);
 
     this.materialHigh = this.createGrassMaterial(
       "GRASS",
       {
-        segments: GRASS_SEGMENTS_HIGH,
-        vertices: GRASS_VERTICES_HIGH,
+        segments: this.grassSettings.segments,
+        vertices: this.grassSettings.vertices,
         height: params.height,
         offset: params.offset,
         heightmap: params.heightmap,
         dims: params.dims,
-        transparent: true,
+        transparent: false,
         depthWrite: false,
         depthTest: true,
         alphaTest: 0.5,
@@ -51,8 +59,8 @@ export class Grass extends THREE.Object3D {
     this.depthMaterial = this.createGrassMaterial(
       "GRASS_SHADOW",
       {
-        segments: GRASS_SEGMENTS_HIGH,
-        vertices: GRASS_VERTICES_HIGH,
+        segments: this.grassSettings.segments,
+        vertices: this.grassSettings.vertices,
         height: params.height,
         offset: params.offset,
         heightmap: params.heightmap,
@@ -140,7 +148,7 @@ export class Grass extends THREE.Object3D {
       const irregularEllipsePoints = this.createIrregularEllipse(numPoints, GRASS_PATCH_SIZE_LENGTH, GRASS_PATCH_SIZE_DEPTH, perturbationScale);
       const shapePoints = irregularEllipsePoints.getPoints(numPoints);
 
-      while (offsets.length < (transformIndex + 1) * NUM_GRASS * 3) {
+      while (offsets.length < (transformIndex + 1) * this.grassSettings.density * 3) {
         const angle = Math.random() * Math.PI * 2;
         const radius = Math.sqrt(Math.random());
         const perturbation = 0.1 * (Math.random() - 0.5);
@@ -154,7 +162,7 @@ export class Grass extends THREE.Object3D {
     });
 
     const geo = new THREE.InstancedBufferGeometry();
-    geo.instanceCount = transforms.length * NUM_GRASS;
+    geo.instanceCount = transforms.length * this.grassSettings.density;
     geo.setAttribute('vertIndex', new THREE.Uint8BufferAttribute(vertID, 1));
     geo.setAttribute('position', new THREE.InstancedBufferAttribute(new Float32Array(offsets), 3));
     geo.setIndex(indices);
@@ -165,22 +173,22 @@ export class Grass extends THREE.Object3D {
   private createGrassMaterial(name: string, params: { segments?: number; vertices?: number; height: number; offset: number; heightmap: any; dims: any; transparent?: boolean; depthWrite?: boolean; depthTest?: boolean; alphaTest?: number; growth?: number }) {
     let material = new shaders.ShaderMaterial(name, {})
     material.setUniformValue('grassSize', new THREE.Vector2(GRASS_WIDTH, GRASS_HEIGHT + (MAX_GRASS_GROWTH * params.growth)));
-    material.setUniformValue('grassParams', new THREE.Vector4(GRASS_SEGMENTS_HIGH, GRASS_VERTICES_HIGH, params.height, params.offset));
+    material.setUniformValue('grassParams', new THREE.Vector4(this.grassSettings.segments, this.grassSettings.vertices, params.height, params.offset));
     material.setUniformValue('heightmap', params.heightmap);
     material.setUniformValue('heightParams', new THREE.Vector4(params.dims, 0, 0, 0))
     material.setUniformValue('windDirection', new THREE.Vector3(0.0, 0.0, -1.0))
     material.setUniformValue('windStrength', 8)
     material.setUniformValue('windSpeed', 1.0)
     material.setUniformValue('gradientOffset', 1.9)
-    material.setUniformValue('baseColor', new THREE.Color(this.grassDebugObject.baseColor))
-    material.setUniformValue('tipColor', new THREE.Color(this.grassDebugObject.tipColor))
+    material.setUniformValue('baseColor', new THREE.Color(this.grassSettings.color.base))
+    material.setUniformValue('tipColor', new THREE.Color(this.grassSettings.color.tip))
     material.setUniformValue('opacity', 1.0)
 
     return material;
   }
 
   private createMesh(geometry: THREE.InstancedBufferGeometry, material: any, depthMaterial: THREE.Material, transforms: any[]) {
-    const mesh = new THREE.InstancedMesh(geometry, material, transforms.length * NUM_GRASS);
+    const mesh = new THREE.InstancedMesh(geometry, material, transforms.length * this.grassSettings.density);
 
     mesh.position.set(0, 0, 0);
     mesh.castShadow = true;
@@ -238,15 +246,15 @@ export class Grass extends THREE.Object3D {
       .name('gradientOffset')
       .min(0.0).max(10.0).step(0.01);
     grassFolder
-      .addColor(this.grassDebugObject, 'baseColor')
+      .addColor(this.grassSettings.color, 'base')
       .onChange(() => {
-        this.materialHigh.setUniformValue('baseColor', new THREE.Color(this.grassDebugObject.baseColor))
+        this.materialHigh.setUniformValue('baseColor', new THREE.Color(this.grassSettings.color.base))
       })
       .name('baseColor');
     grassFolder
-      .addColor(this.grassDebugObject, 'tipColor')
+      .addColor(this.grassSettings.color, 'tip')
       .onChange(() => {
-        this.materialHigh.setUniformValue('tipColor', new THREE.Color(this.grassDebugObject.tipColor))
+        this.materialHigh.setUniformValue('tipColor', new THREE.Color(this.grassSettings.color.tip))
       })
       .name('tipColor');
   }

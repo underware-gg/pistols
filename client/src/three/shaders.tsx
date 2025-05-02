@@ -43,6 +43,10 @@ export async function loadShaders() {
     vsh: await loadShader('/shaders/water-model-vsh.glsl'),
     fsh: await loadShader('/shaders/water-model-fsh.glsl'),
   };
+  ShaderManager.shaderCode['WATER_NONREFLECTIVE'] = {
+    vsh: await loadShader('/shaders/water-nonreflective-vsh.glsl'),
+    fsh: await loadShader('/shaders/water-nonreflective-fsh.glsl'),
+  };
   ShaderManager.shaderCode['HIGHLIGHT'] = {
     vsh: await loadShader('/shaders/highlight-effect-vsh.glsl'),
     fsh: await loadShader('/shaders/highlight-effect-fsh.glsl'),
@@ -108,4 +112,63 @@ export class ReflectorMaterial extends Reflector {
   getUniforms() {
     return (this.material as ShaderMaterial).uniforms
   }
+
+  dispose() {
+    if (this.material) {
+      (this.material as ShaderMaterial).dispose();
+    }
+    if (this.geometry) {
+      this.geometry.dispose();
+    }
+    // Call parent dispose method which handles the render target
+    super.dispose();
+  }
 }
+
+export class NonReflectorMaterial extends THREE.Mesh {
+
+  constructor(shaderType, geometry) {
+    // Create a ShaderMaterial with the specified shader
+    const material = new ShaderMaterial(shaderType, {
+      uniforms: {
+        time: { value: 0.0 },
+        waterStrength: { value: 0.04 },
+        waterSpeed: { value: 0.03 },
+        waveStrength: { value: 0.04 },
+        waveSpeed: { value: 0.05 },
+        windDirection: { value: new THREE.Vector2(1.0, 0.0) },
+        tDudv: { value: null },
+        waterMap: { value: null },
+        colorDeep: { value: new THREE.Color(0x35595e) },
+        colorShallow: { value: new THREE.Color(0x597f86) }
+      },
+      transparent: true,
+      side: THREE.DoubleSide
+    });
+    
+    // Add customProgramCacheKey to fix shader compilation
+    material.customProgramCacheKey = function() {
+      return 'NonReflectorMaterial-' + shaderType;
+    };
+    
+    super(geometry, material);
+  }
+
+  setUniformValue(name, value) {
+    (this.material as ShaderMaterial).uniforms[name] = { value: value };
+  }
+
+  getUniforms() {
+    return (this.material as ShaderMaterial).uniforms
+  }
+
+  dispose() {
+    if (this.material) {
+      (this.material as ShaderMaterial).dispose();
+    }
+    if (this.geometry) {
+      this.geometry.dispose();
+    }
+  }
+}
+

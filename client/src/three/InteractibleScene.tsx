@@ -45,6 +45,9 @@ export class InteractibleScene extends THREE.Scene {
   currentDarkStrength: number = 0.0
   blurTween: any;
 
+  blurEnabled: boolean = true
+  sceneShiftEnabled: boolean = true
+
   lastClickTimeStamp: number
   private currentRandomValues: number[] = []
   private targetRandomValues: number[] = []
@@ -294,7 +297,7 @@ export class InteractibleScene extends THREE.Scene {
   }
 
   public render(elapsedTime: number, enabled: boolean = true) {
-    if (this.isClickable) {
+    if (this.isClickable && this.sceneShiftEnabled) {
       this.calculateTextureShifts()
       this.updateAnimation(elapsedTime - this.timeOffset)
     }
@@ -372,7 +375,7 @@ export class InteractibleScene extends THREE.Scene {
 
   onResize() {
     this.maskShader?.setUniformValue('uResolution', new THREE.Vector2(sizes.canvasWidth, sizes.canvasHeight))
-    this.backgroundBlurShader.setUniformValue('uResolution', new THREE.Vector2(sizes.canvasWidth, sizes.canvasHeight))
+    this.backgroundBlurShader?.setUniformValue('uResolution', new THREE.Vector2(sizes.canvasWidth, sizes.canvasHeight))
   }
 
   // get mouse position over the canvas for bar interaction
@@ -493,6 +496,40 @@ export class InteractibleScene extends THREE.Scene {
     this.maskShader.setUniformValue('uShiftAmountLayer', this.layerShiftAmounts);
   }
 
+  public updateSettings(sceneShiftEnabled: boolean, blurEnabled: boolean) {
+    console.log('updateSettings', sceneShiftEnabled, blurEnabled)
+    this.sceneShiftEnabled = sceneShiftEnabled
+    this.blurEnabled = blurEnabled
+
+    this.toggleBlur(false)
+
+    if (!this.sceneShiftEnabled) {
+      this.layerShiftAmounts = this.sceneData.backgrounds.map(() => 0);
+      this.maskShader.setUniformValue('uShiftAmountLayer', this.layerShiftAmounts);
+      
+      this.sceneData.backgrounds.forEach((background, index) => {
+        this.maskShader.setUniformValue(`uTextureShift${index}`, new THREE.Vector2(0, 0));
+        this.maskShader.setUniformValue(`uRandomShift${index}`, 0.0);
+      });
+      
+      if (this.sceneData.items) {
+        this.sceneData.items.forEach((item) => {
+          const background = this.sceneData.backgrounds.find(bg => bg.renderOrder === item.renderOrder);
+          if (background) {
+            const meshes = this.fbo_mask_scene.children.filter(
+              child => child.name === `bg_${background.renderOrder}` || 
+                      child.name === `mask_${item.mask}_${background.renderOrder}`
+            ) as THREE.Mesh[];
+            
+            meshes.forEach(mesh => {
+              mesh.position.set(0, 0, mesh.position.z);
+            });
+          }
+        });
+      }
+    }
+  }
+
   public toggleBlur(shouldBlur: boolean) {
     if (this.blurTween) {
       this.blurTween.stop();
@@ -502,7 +539,7 @@ export class InteractibleScene extends THREE.Scene {
     const startDarkStrength = this.currentDarkStrength;
     
     const targetSamples = this.sceneData.backgrounds.map(background => {
-      if (shouldBlur) {
+      if (shouldBlur && this.blurEnabled) {
         return 30;
       } else {
         return background.blurred ? (background.samples || 0) : 0;

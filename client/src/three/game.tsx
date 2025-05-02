@@ -53,7 +53,7 @@ export const sizes = {
 export const cameraData = {
   fieldOfView: 13,
   nearPlane: 0.1,
-  farPlane: 150,
+  farPlane: 15000,
 }
 
 export const cameraDataStatic = {
@@ -65,12 +65,23 @@ export const cameraDataStatic = {
 const lightCameraShadowData = {
   intensity: 2,
   mapSize: 8192,
-  near: 30,
-  far: 80,
-  top: 30,
-  bottom: 10,
+  near: 45,
+  far: 70,
+  top: 20,
+  bottom: 12,
   left: -10,
   right: 10,
+}
+
+const grassLightCameraShadowData = {
+  intensity: 0,
+  mapSize: 1024,
+  near: 45,
+  far: 55,
+  top: 14,
+  bottom: 12,
+  left: -9,
+  right: 9,
 }
 
 /**
@@ -146,12 +157,15 @@ let _stats
 let _controls
 export let _gui: GUI
 
+let _sunLight: THREE.DirectionalLight
+
 let _grassTransforms
 let _growthPercentage = 0.0
 let _grass
 
 let _ground
 let _groundMirror
+let _groundMirrorChildItem
 let _skyVideo
 let _skyVideoTexture
 let _ladySecond
@@ -183,6 +197,22 @@ const _tweens = {
   staticZoom: null,
   staticFade: null,
 }
+
+// Setup default quality settings - these will be used for initial instantiation
+let _currentQualitySettings = {
+  shadowMapEnabled: true,
+  shadowMapType: THREE.PCFSoftShadowMap as THREE.ShadowMapType,
+  shadowMapSize: 8192,
+  resolutionScale: 1.0,
+  grassCount: 32 * 5,
+  grassSegments: 6,
+  reflectionsEnabled: true,
+  reflectionQuality: 1.0,
+  waterEffects: true,
+  particlesMultiplier: 1.0,
+  sceneShiftEnabled: true,
+  blurEnabled: true
+};
 
 export async function init(canvas, framerate = 60, statsEnabled = false) {
 
@@ -310,12 +340,12 @@ function setRender(canvas) {
     powerPreference: 'low-power' //TODO requires more testing
   })
   _renderer.setSize(WIDTH, HEIGHT)
-  _renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
+  _renderer.setPixelRatio(window.devicePixelRatio * _currentQualitySettings.resolutionScale);
   // _renderer.outputColorSpace = THREE.LinearSRGBColorSpace
   // _renderer.autoClear = false
   // _renderer.autoClearColor = false
-  _renderer.shadowMap.enabled = true
-  _renderer.shadowMap.type = THREE.PCFSoftShadowMap
+  _renderer.shadowMap.enabled = _currentQualitySettings.shadowMapEnabled
+  _renderer.shadowMap.type = _currentQualitySettings.shadowMapType
 
   // _renderer.debug.checkShaderErrors = false;
 }
@@ -348,7 +378,7 @@ function onWindowResize() {
   sizes.canvasWidth = canvasWidth
   sizes.canvasHeight = canvasHeight
   _renderer.setSize(canvasWidth, canvasHeight)
-  _renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3))
+  _renderer.setPixelRatio(window.devicePixelRatio * _currentQualitySettings.resolutionScale);
   console.log(`Canvas size:`, Math.ceil(canvasWidth), Math.ceil(canvasHeight), `${Math.ceil((canvasHeight / 1080) * 100)}%`)
 
   // setup cam
@@ -817,7 +847,7 @@ export function resetDuelScene(resetCamera = true, fullReset = true) {
   if (resetCamera) {
     zoomCameraToPaces(10, 0)
   }
-  zoomCameraToPaces(0, 4)
+  zoomCameraToPaces(10, 4)
 } 
 
 function setEnvironment(scene: THREE.Scene) { //TODO add skymap
@@ -857,7 +887,12 @@ function loadGltf(scene: THREE.Scene) {
             child.shadow.camera.bottom = lightCameraShadowData.bottom
             child.shadow.camera.left = lightCameraShadowData.left
             child.shadow.camera.right = lightCameraShadowData.right
+            child.shadow.bias = -0.0001; 
+            child.shadow.normalBias = 0.01;
             child.castShadow = true
+
+            _sunLight = child
+            
 
             //Light helpers
             // const dirLightCameraHelper2 = new THREE.CameraHelper(child.shadow.camera)
@@ -952,11 +987,20 @@ function loadGltf(scene: THREE.Scene) {
           child.visible = false
           child.geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
 
-          _groundMirror = createWaterPlane("Water", child.geometry, {
-            height: -0.001,
-            rotation: child.rotation,
-            scale: child.scale
-          })
+          _groundMirrorChildItem = child
+
+          _groundMirror = createWaterPlane(
+            _currentQualitySettings.reflectionsEnabled ? "WATER" : "WATER_NONREFLECTIVE",
+            _groundMirrorChildItem.geometry, 
+            _currentQualitySettings.reflectionsEnabled, 
+            {
+              height: -0.001,
+              rotation: child.rotation,
+              scale: child.scale,
+              waveEnabled: _currentQualitySettings.waterEffects,
+              renderScale: _currentQualitySettings.reflectionQuality
+            }
+          )
 
           scene.add(_groundMirror)
         }
@@ -971,17 +1015,33 @@ function loadGltf(scene: THREE.Scene) {
   );
 }
 
-function createWaterPlane(name, geometry, params) {
-  const water = new shaders.ReflectorMaterial("WATER", geometry, {
-    clipBias: 0.0003,
-    textureWidth: WIDTH,
-    textureHeight: HEIGHT, //TODO check if this works??
-  });
+function createWaterPlane(name, geometry, reflective, params) {
+  let water; 
 
-  water.setUniformValue('waterStrength', 0.04)
-  water.setUniformValue('waterSpeed', 0.03)
-  water.setUniformValue('waveStrength', 0.04)
-  water.setUniformValue('waveSpeed', 0.05)
+  if (reflective) {
+    water = new shaders.ReflectorMaterial("WATER", geometry, {
+      clipBias: 0.0003,
+      textureWidth: WIDTH * params.renderScale,
+      textureHeight: HEIGHT * params.renderScale, //TODO check if this works??
+    });
+    
+    // Add customProgramCacheKey to the material to fix shader compilation
+    (water.material as any).customProgramCacheKey = function() {
+      return 'ReflectorMaterial-WATER-' + Math.random();
+    };
+  } else {
+    water = new shaders.NonReflectorMaterial("WATER_NONREFLECTIVE", geometry);
+    
+    // Add customProgramCacheKey to the material to fix shader compilation
+    (water.material as any).customProgramCacheKey = function() {
+      return 'NonReflectorMaterial-WATER_NONREFLECTIVE-' + Math.random();
+    };
+  }
+
+  water.setUniformValue('waterStrength', params.waveEnabled ? 0.04 : 0.0)
+  water.setUniformValue('waterSpeed', params.waveEnabled ? 0.03 : 0.0)
+  water.setUniformValue('waveStrength', params.waveEnabled ? 0.04 : 0.0)
+  water.setUniformValue('waveSpeed', params.waveEnabled ? 0.05 : 0.0)
   water.setUniformValue('tDudv', _textures[TextureName.duel_water_dudv])
   water.setUniformValue('waterMap', _textures[TextureName.duel_water_map])
   water.setUniformValue('windDirection', new THREE.Vector2(1.0, 0.0))
@@ -1042,7 +1102,6 @@ function createWaterPlane(name, geometry, params) {
 function createGrass() {
   if (!_scenes[SceneName.Duel]) return;
   if (!_grassTransforms) return;
-  if (_grass) return;
 
   _grass = new Grass(
     {
@@ -1051,7 +1110,9 @@ function createGrass() {
       heightmap: null,
       dims: 256,
       transforms: _grassTransforms,
-      growth: _growthPercentage
+      growth: _growthPercentage,
+      density: _currentQualitySettings.grassCount,
+      segments: _currentQualitySettings.grassSegments
     }
   );
 
@@ -1499,4 +1560,196 @@ function disposeTexturesAndSpriteSheets() {
     _textures[textureKey].dispose()
   }
   _textures = {}
+}
+
+// Add quality setting functions before the dispose function
+// Functions to update quality settings for the current scene
+
+/**
+ * Updates shadow settings for the current scene
+ * @param enabled Whether shadows are enabled
+ * @param shadowType The type of shadow mapping to use
+ * @param mapSize The shadow map size
+ */
+export function updateShadows(enabled: boolean, shadowType: THREE.ShadowMapType, mapSize: number) {
+  // Save current settings
+  _currentQualitySettings.shadowMapEnabled = enabled;
+  _currentQualitySettings.shadowMapType = shadowType;
+  _currentQualitySettings.shadowMapSize = mapSize;
+  
+  // Update renderer shadow settings
+  if (_renderer) {
+    // First disable shadows to reset state
+    _renderer.shadowMap.enabled = false
+    _renderer.shadowMap.autoUpdate = false
+    
+    // Force renderer to clear shadow maps
+    _renderer.shadowMap.needsUpdate = true
+    
+    // Now re-enable with new settings
+    _renderer.shadowMap.type = shadowType
+    _renderer.shadowMap.enabled = enabled
+    _renderer.shadowMap.autoUpdate = enabled
+  }
+  
+  // Update directional light shadow settings
+  if (_sunLight) {
+    _sunLight.castShadow = enabled
+    
+    if (enabled) {
+      // Clean up existing shadow map
+      if (_sunLight.shadow.map) {
+        _sunLight.shadow.map.dispose()
+        _sunLight.shadow.map = null
+      }
+      
+      // Reset shadow settings
+      _sunLight.shadow.mapSize.set(mapSize, mapSize)
+      _sunLight.shadow.bias = -0.0001
+      _sunLight.shadow.normalBias = 0.01
+      
+      // Update the shadow camera and force an updat
+      _sunLight.shadow.camera.updateProjectionMatrix()
+      _sunLight.shadow.needsUpdate = true
+      _sunLight.updateMatrixWorld(true)
+      
+      // Force a re-render
+      if (_renderer) {
+        _renderer.shadowMap.needsUpdate = true
+      }
+    }
+  }
+  
+  console.log(`Shadow settings updated: ${enabled ? 'Enabled' : 'Disabled'}, Type: ${shadowType}, Map Size: ${mapSize}x${mapSize}`);
+}
+
+/**
+ * Updates the resolution scale for the renderer
+ * @param scale Resolution scale (0.5 - 1.0)
+ */
+export function updateResolution(scale: number) {
+  // Save current setting
+  _currentQualitySettings.resolutionScale = scale;
+
+  if (_renderer) {
+    _renderer.setPixelRatio(window.devicePixelRatio * scale);
+  }
+}
+
+/**
+ * Updates grass quality settings
+ * @param density Number of grass instances
+ * @param segments Number of grass segments
+ */
+export function updateGrass(density: number, segments: number) {
+  // Save current settings
+  _currentQualitySettings.grassCount = density;
+  _currentQualitySettings.grassSegments = segments;
+  
+  
+  // Recreate grass with new settings if it exists
+  if (_grass) {
+    // Remove old grass
+    if (_scenes[SceneName.Duel]) {
+      _scenes[SceneName.Duel].remove(_grass)
+    }
+    
+    // Dispose of old grass
+    _grass.dispose()
+    
+    createGrass()
+  }
+}
+
+/**
+ * Updates water quality settings
+ * @param reflective Whether to use reflective water
+ * @param quality Water quality multiplier (0.5-1.0)
+ * @param waveEffects Whether wave effects are enabled
+ */
+export function updateWater(reflective: boolean, quality: number, waveEffects: boolean) {
+  // Save current settings
+  _currentQualitySettings.reflectionsEnabled = reflective;
+  _currentQualitySettings.reflectionQuality = quality;
+  _currentQualitySettings.waterEffects = waveEffects;
+  
+  // If we have a water plane
+  if (_groundMirror) {
+    // Remove existing water plane from the scene
+    _scenes[SceneName.Duel].remove(_groundMirror)
+    
+    // Dispose of the current water object
+    _groundMirror?.dispose();
+    _groundMirror = null
+
+    _groundMirror = createWaterPlane(
+      reflective ? "WATER" : "WATER_NONREFLECTIVE", 
+      _groundMirrorChildItem.geometry, 
+      reflective, 
+      {
+        height: -0.001,
+        rotation: _groundMirrorChildItem.rotation || new THREE.Euler(),
+        scale: _groundMirrorChildItem.scale || new THREE.Vector3(1, 1, 1),
+        waveEnabled: waveEffects,
+        renderScale: quality
+      }
+    );
+
+    _scenes[SceneName.Duel].add(_groundMirror)
+     
+  }
+}
+
+/**
+ * Updates particle effect quality
+ * @param density Particle density multiplier (0.5-1.0)
+ */
+export function updateParticles(density: number) {
+  // Save current setting
+  _currentQualitySettings.particlesMultiplier = density;
+  
+  // Update any particle systems (Rain, highlight effects, etc.)
+  if (_duelistHighlightA) {
+    const particlesA = _duelistHighlightA.getObjectByName('magicParticles') as THREE.Points
+    if (particlesA && particlesA.geometry) {
+      // Update particle visibility based on density
+      const scales = particlesA.geometry.attributes.scale.array as Float32Array
+      for (let i = 0; i < scales.length; i++) {
+        if (i < scales.length * density) {
+          scales[i] = Math.random() * 0.5
+        } else {
+          scales[i] = 0
+        }
+      }
+      particlesA.geometry.attributes.scale.needsUpdate = true
+    }
+  }
+  
+  if (_duelistHighlightB) {
+    const particlesB = _duelistHighlightB.getObjectByName('magicParticles') as THREE.Points
+    if (particlesB && particlesB.geometry) {
+      // Update particle visibility based on density
+      const scales = particlesB.geometry.attributes.scale.array as Float32Array
+      for (let i = 0; i < scales.length; i++) {
+        if (i < scales.length * density) {
+          scales[i] = Math.random() * 0.5
+        } else {
+          scales[i] = 0
+        }
+      }
+      particlesB.geometry.attributes.scale.needsUpdate = true
+    }
+  }
+}
+
+export function updateInteractibeSceneSettings(sceneShiftEnabled: boolean, blurEnabled: boolean) {
+  // Save current settings
+  _currentQualitySettings.sceneShiftEnabled = sceneShiftEnabled;
+  _currentQualitySettings.blurEnabled = blurEnabled;
+  
+  Object.values(_scenes).forEach(scene => {
+    if (scene instanceof InteractibleScene) {
+      scene.updateSettings(sceneShiftEnabled, blurEnabled)
+    }
+  });
 }

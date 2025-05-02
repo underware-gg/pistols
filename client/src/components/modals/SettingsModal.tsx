@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Modal, Button, Icon, Image } from 'semantic-ui-react'
 import { useSettings } from '/src/hooks/SettingsContext'
 import { usePistolsScene } from '/src/hooks/PistolsContext'
@@ -19,6 +19,23 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
   const { atGate, atDoor, atTutorial, dispatchSetScene } = usePistolsScene()
   const [view, setView] = useState<'settings' | 'about'>('settings')
   const { aspectWidth, aspectHeight } = useGameAspect()
+
+  const handleQualityChange = (value: string) => {
+    dispatchSetting(SettingsActions.QUALITY, value)
+  }
+
+  // Log quality changes and apply them to the game
+  useEffect(() => {
+    // This effect will run whenever the quality setting changes
+    console.log(`Quality setting changed to: ${settings.quality}`);
+    
+    // Apply quality settings to the game engine - uncomment when ready to implement
+    // setQualityPreset(settings.quality as QualityPreset);
+    
+    // // Apply changes to existing scene
+    // applyQualityChanges();
+    
+  }, [settings.quality]);
 
   const handleMusicToggle = () => {
     dispatchSetting(SettingsActions.MUSIC_ENABLED, !settings.musicEnabled)
@@ -49,6 +66,16 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
     }
   }
 
+  // Function to get description text for each quality setting
+  const getQualityDescription = (quality: string) => {
+    switch(quality) {
+      case 'low': return "Optimized for performance with reduced graphics quality.";
+      case 'medium': return "Balanced approach between visual quality and performance.";
+      case 'high': return "Maximum visual fidelity, with all graphical features enabled.";
+      default: return "";
+    }
+  };
+
   return (
     <Modal
       open={opener.isOpen}
@@ -67,6 +94,28 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
       <Modal.Content>
         {view === 'settings' ? (
           <>
+            <div className="SettingsSection">
+              <h3>Quality Settings</h3>
+              
+              {/* The tentacles of quality shall wrap around your game experience, squeezing out the best performance! */}
+              <div className="QualitySelector">
+                {['low', 'medium', 'high'].map((quality) => (
+                  <Button 
+                    key={quality}
+                    className={`QualityButton ${settings.quality === quality ? 'active' : ''}`}
+                    onClick={() => handleQualityChange(quality)}
+                  >
+                    {quality.charAt(0).toUpperCase() + quality.slice(1)}
+                  </Button>
+                ))}
+              </div>
+              
+              {/* Description of selected quality level */}
+              <div className="QualityDescription">
+                {getQualityDescription(settings.quality)}
+              </div>
+            </div>
+
             <div className="SettingsSection">
               <h3>Audio Settings</h3>
               
@@ -146,60 +195,24 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
             </div>
           </>
         ) : (
-          <div className="AboutSection" style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            position: 'relative',
-            minHeight: aspectHeight(52)
-          }}>
+          <div className="AboutSection">
             {/* Top section - Split into left and right */}
-            <div style={{ 
-              display: 'flex',
-              width: '100%',
-              marginBottom: '2rem',
-              gap: '1rem'
-            }}>
+            <div className="SplitSection">
               {/* Left Side - Underware */}
-              <div style={{ 
-                flex: 1,
-                paddingRight: '1rem',
-                borderRight: '1px solid rgba(200, 182, 168, 0.3)'
-              }}>
-                <div style={{ 
-                  fontSize: '1.1rem', 
-                  color: '#c8b6a8', 
-                  marginBottom: aspectWidth(1),
-                  fontWeight: 500,
-                  width: '100%',
-                  textAlign: 'center'
-                }}>
+              <div className="SectionSide LeftSide">
+                <div className="SectionTitle">
                   Game made by:
                 </div>
                 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
-                  <div className='NoMouse NoDrag' style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: aspectWidth(1),
-                    width: '100%',
-                  }}>
-                    <Image src='/images/logo/underware_text.svg' width={aspectWidth(8.4)} height={aspectWidth(8.4)} />
-                  </div>
+                <div className="LogoContainer">
+                  <Image src='/images/logo/underware_text.svg' width={aspectWidth(8.4)} height={aspectWidth(8.4)} />
                 </div>
 
                 {/* Left side social links */}
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: '1fr 1fr',
-                  gridGap: '0.8rem',
-                  marginTop: '0.5rem'
-                }}>
+                <div className="SocialLinksGrid">
                   <div 
                     className="socialLinkStyle"
                     onClick={() => window.open('https://underware.gg', '_blank')}
-                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="globe" />
@@ -210,7 +223,6 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                   <div 
                     className="socialLinkStyle"
                     onClick={() => window.open('https://discord.gg/underware', '_blank')}
-                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="discord" />
@@ -221,7 +233,6 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                   <div 
                     className="socialLinkStyle"
                     onClick={() => window.open('https://github.com/underware-gg', '_blank')}
-                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="github" />
@@ -232,7 +243,6 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                   <div 
                     className="socialLinkStyle"
                     onClick={() => window.open('https://x.com/underware_gg', '_blank')}
-                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="twitter" />
@@ -243,33 +253,20 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
               </div>
               
               {/* Right Side - Game */}
-              <div style={{ flex: 1, paddingLeft: '1rem' }}>
-                <div style={{ 
-                  fontSize: '1.1rem', 
-                  color: '#c8b6a8', 
-                  marginBottom: aspectWidth(1),
-                  fontWeight: 500,
-                  width: '100%',
-                  textAlign: 'center'
-                }}>
+              <div className="SectionSide RightSide">
+                <div className="SectionTitle">
                   Game info:
                 </div>
                 
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                <div className="CenteredLogo">
                   <Logo vertical showName width={6} />
                 </div>
 
                 {/* Right side social links */}
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: '1fr 1fr',
-                  gridGap: '0.8rem',
-                  marginTop: '0.5rem'
-                }}>
+                <div className="SocialLinksGrid">
                   <div 
                     className="socialLinkStyle"
                     onClick={() => window.open('https://pistols.gg', '_blank')}
-                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="globe" />
@@ -280,7 +277,6 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                   <div 
                     className="socialLinkStyle"
                     onClick={() => window.open('https://github.com/underware-gg/pistols', '_blank')}
-                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="github" />
@@ -291,7 +287,6 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                   <div 
                     className="socialLinkStyle"
                     onClick={() => window.open('https://x.com/pistols_gg', '_blank')}
-                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="twitter" />
@@ -302,7 +297,6 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
                   <div 
                     className="socialLinkStyle"
                     onClick={() => window.open('https://book.dojoengine.org/', '_blank')}
-                    style={{ cursor: 'pointer' }}
                   >
                     <div className="socialIconStyle">
                       <Icon name="book" />
@@ -314,119 +308,53 @@ export default function SettingsModal({ opener }: SettingsModalProps) {
             </div>
 
             {/* Partner logos - Pinned to bottom but above version */}
-            <div style={{ 
-              position: 'absolute',
-              bottom: '3rem',
-              left: 0,
-              right: 0
-            }}>
-              <div className="PartnerLogos" style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: aspectWidth(2.5),
-                padding: aspectWidth(1.5),
-                backgroundColor: 'rgba(239, 151, 88, 0.15)',
-                border: '1px solid rgba(239, 151, 88, 0.15)',
-                borderRadius: '6px',
-                margin: '0 auto',
-                width: '85%',
-                maxWidth: '500px',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
-              }}>
+            <div className="PartnerLogosContainer">
+              <div className="PartnerLogos">
                 <div 
+                  className="PartnerLogo"
                   onClick={() => window.open('https://x.com/lootrealms?lang=en', '_blank')}
                   title="Explore the Realms World Discord"
-                  style={{ cursor: 'pointer' }}
                 >
                   <img 
                     src="/images/logo/RealmsWorld.svg" 
                     alt="RealmsWorld" 
-                    style={{ 
-                      width: aspectWidth(3.6), 
-                      height: aspectWidth(3.6), 
-                      objectFit: 'contain',
-                      transition: 'transform 0.2s',
-                      cursor: 'pointer',
-                      filter: 'brightness(1.2) drop-shadow(0 0 8px rgba(239, 151, 88, 1))'
-                    }} 
-                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   />
                 </div>
                 <div 
+                  className="PartnerLogo"
                   onClick={() => window.open('https://starknet.io/', '_blank')}
                   title="Learn more about Starknet"
-                  style={{ cursor: 'pointer' }}
                 >
                   <img 
                     src="/images/logo/starknet.png" 
                     alt="Starknet" 
-                    style={{ 
-                      width: aspectWidth(4), 
-                      height: aspectWidth(3.6), 
-                      objectFit: 'contain',
-                      transition: 'transform 0.2s',
-                      cursor: 'pointer',
-                      filter: 'brightness(1.2) drop-shadow(0 0 8px rgba(239, 151, 88, 1))'
-                    }} 
-                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    className="starknet"
                   />
                 </div>
                 <div 
+                  className="PartnerLogo"
                   onClick={() => window.open('https://www.dojoengine.org/', '_blank')}
                   title="Learn more about Dojo"
-                  style={{ cursor: 'pointer' }}
                 >
                   <img 
                     src="/images/logo/dojo.svg" 
                     alt="Dojo" 
-                    style={{ 
-                      width: aspectWidth(3.6), 
-                      height: aspectWidth(3.6), 
-                      objectFit: 'contain',
-                      transition: 'transform 0.2s',
-                      cursor: 'pointer',
-                      filter: 'brightness(1.2) drop-shadow(0 0 8px rgba(239, 151, 88, 1))'
-                    }} 
-                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   />
                 </div>
                 <div 
+                  className="PartnerLogo"
                   onClick={() => window.open('https://docs.cartridge.gg/', '_blank')}
                   title="Learn more about Cartridge"
-                  style={{ cursor: 'pointer' }}
                 >
                   <img 
                     src="/images/logo/cartridge.svg" 
                     alt="Cartridge" 
-                    style={{ 
-                      width: aspectWidth(3.6), 
-                      height: aspectWidth(3.6), 
-                      objectFit: 'contain',
-                      transition: 'transform 0.2s',
-                      cursor: 'pointer',
-                      filter: 'brightness(1.2) drop-shadow(0 0 8px rgba(239, 151, 88, 1))'
-                    }} 
-                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                   />
                 </div>
               </div>
             </div>
 
-            <div style={{
-              position: 'absolute',
-              bottom: aspectWidth(1),
-              left: 0,
-              right: 0,
-              fontSize: '0.85rem',
-              color: 'rgba(200, 182, 168, 0.8)',
-              opacity: 0.7,
-              textAlign: 'center'
-            }}>
+            <div className="VersionNumber">
               v{PACKAGE_VERSION}
             </div>
           </div>

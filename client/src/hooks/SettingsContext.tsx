@@ -17,6 +17,7 @@ export const initialState = {
   sfxVolume: 1.0,
   duelSpeedFactor: 1.0,
   completedTutorialLevel: 0,
+  quality: 'high',
   // internal
   initialized: false,
 }
@@ -31,6 +32,7 @@ const SettingsActions = {
   SFX_VOLUME: 'settings.SFX_VOLUME',
   DUEL_SPEED_FACTOR: 'settings.DUEL_SPEED_FACTOR',
   TUTORIAL_LEVEL: 'settings.TUTORIAL_LEVEL',
+  QUALITY: 'settings.QUALITY',
 }
 
 //--------------------------------
@@ -48,6 +50,7 @@ type ActionType =
   | { type: 'SFX_VOLUME', payload: number }
   | { type: 'DUEL_SPEED_FACTOR', payload: number }
   | { type: 'TUTORIAL_LEVEL', payload: number }
+  | { type: 'QUALITY', payload: string }
   // internal
   | { type: 'INITIALIZED', payload: boolean }
 
@@ -87,6 +90,7 @@ const SettingsProvider = ({
       [SettingsActions.SFX_VOLUME]: () => setCookie(cookieName, state.sfxVolume, _options),
       [SettingsActions.DUEL_SPEED_FACTOR]: () => setCookie(cookieName, Number(state.duelSpeedFactor), _options),
       [SettingsActions.TUTORIAL_LEVEL]: () => setCookie(cookieName, state.completedTutorialLevel, _options),
+      [SettingsActions.QUALITY]: () => setCookie(cookieName, state.quality, _options),
     }
     _setters[cookieName]?.()
   }, [setCookie])
@@ -141,6 +145,11 @@ const SettingsProvider = ({
       case SettingsActions.TUTORIAL_LEVEL: {
         newState.completedTutorialLevel = action.payload as number
         cookieSetter(SettingsActions.TUTORIAL_LEVEL, newState)
+        break
+      }
+      case SettingsActions.QUALITY: {
+        newState.quality = action.payload as string
+        cookieSetter(SettingsActions.QUALITY, newState)
         break
       }
       default:

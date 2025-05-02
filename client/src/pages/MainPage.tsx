@@ -34,6 +34,7 @@ import ScLeaderboards from '/src/components/scenes/ScLeaderboards'
 
 // test sdk
 import { helloPistols } from '@underware/pistols-sdk'
+import { useQuality } from '../hooks/useQuality'
 
 helloPistols();
 export default function MainPage({
@@ -42,8 +43,6 @@ export default function MainPage({
   // this hook will parse slugs and manage the current scene
   usePistolsSceneFromRoute()
   useSetPageTitle()
-
-  const { gameImpl } = useThreeJsContext()
 
   const [showTutorial, setShowTutorial] = useState(tutorial)
   const overlayRef = useRef<HTMLDivElement>(null)
@@ -109,8 +108,40 @@ function MainUI() {
   useSyncRouterParams()
 
   const { gameImpl } = useThreeJsContext()
+  const { qualityConfig } = useQuality()
   const { currentDuel, tutorialLevel } = usePistolsContext()
   const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards } = usePistolsScene()
+
+  useEffect(() => {
+    if (!gameImpl) return;
+    
+    // Apply each quality setting
+    gameImpl.updateShadows(
+      qualityConfig.shadowMapEnabled,
+      qualityConfig.shadowMapType,
+      qualityConfig.shadowMapSize
+    );
+    
+    gameImpl.updateResolution(qualityConfig.resolutionScale);
+    
+    gameImpl.updateGrass(
+      qualityConfig.grassCount,
+      qualityConfig.grassSegments
+    );
+    
+    gameImpl.updateWater(
+      qualityConfig.reflectionsEnabled,
+      qualityConfig.reflectionQuality,
+      qualityConfig.waterEffects
+    );
+    
+    gameImpl.updateParticles(qualityConfig.particlesMultiplier);
+    
+    gameImpl.updateInteractibeSceneSettings(
+      qualityConfig.sceneShiftEnabled,
+      qualityConfig.blurEnabled
+    );
+  }, [gameImpl, qualityConfig]);
 
   const [currentScene, setCurrentScene] = useState<JSX.Element | null>(null);
   useEffect(() => {
