@@ -1,5 +1,5 @@
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import {
   useSdkEntitiesGet,
   UseSdkEntitiesGetProps,
@@ -91,7 +91,6 @@ export const useSdkStateEntitiesSub = ({
 
 export const useSdkStateEventsGet = ({
   query,
-  historical,
   enabled = true,
   retryInterval = 0,
 }: Omit<UseSdkEventsGetProps, 'setEntities'>): useSdkStateResult => {
@@ -101,7 +100,6 @@ export const useSdkStateEventsGet = ({
   const { isLoading } = useSdkEventsGet({
     query,
     enabled,
-    historical,
     retryInterval,
     setEntities: (entities: PistolsEntity[]) => {
       console.log('useSdkStateEventsGet() GOT:', entities, query)

@@ -4,6 +4,7 @@ import { bigintToHex, arrayClean } from 'src/utils/misc/types'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import {
   PistolsQueryBuilder,
+  PistolsHistoricalQueryBuilder,
   PistolsEntity,
   PistolsModelType,
   PistolsSchemaModelNames,
@@ -36,10 +37,10 @@ export type UseSdkEntitiesSubProps = UseSdkEntitiesProps & {
 }
 
 export type UseSdkEventsGetProps = UseSdkEntitiesGetProps & {
-  historical: boolean
+  query: PistolsQueryBuilder | PistolsHistoricalQueryBuilder
 }
 export type UseSdkEventsSubProps = UseSdkEntitiesSubProps & {
-  historical: boolean
+  query: PistolsQueryBuilder | PistolsHistoricalQueryBuilder
 }
 
 type SdkEntitiesCallbackResponse = {
@@ -172,13 +173,13 @@ export const useSdkEntitiesSub = ({
 export const useSdkEventsGet = ({
   query,
   setEntities,
-  historical,
   enabled = true,
   retryInterval = 0,
 }: UseSdkEventsGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
   const limit = useMemo(() => query?.build().pagination.limit, [query])
+  const historical = useMemo(() => query?.build().historical, [query])
 
   useEffect(() => {
     let _mounted = true
@@ -186,7 +187,6 @@ export const useSdkEventsGet = ({
       setIsLoading(true)
       sdk.getEventMessages({
         query,
-        historical,
       }).then((data: PistolsEntity[] | PistolsEntity[][]) => {
         if (!_mounted) return
         // console.log("useSdkEventsGet() GOT:", historical, response.data)
@@ -224,12 +224,12 @@ export const useSdkEventsSub = ({
   query,
   setEntities,
   updateEntity,
-  historical,
   enabled = true,
 }: UseSdkEventsSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
   const limit = useMemo(() => query?.build().pagination.limit, [query])
+  const historical = useMemo(() => query?.build().historical, [query])
 
   useEffect(() => {
     let _mounted = true
@@ -239,7 +239,6 @@ export const useSdkEventsSub = ({
       console.log("useSdkEventsSub() _______ query:", query);
       await sdk.subscribeEventQuery({
         query,
-        historical,
         callback: (response: SdkEventsCallbackResponse) => {
           if (response.error) {
             console.error("useSdkEventsSub() callback error:", historical, response.error, query)

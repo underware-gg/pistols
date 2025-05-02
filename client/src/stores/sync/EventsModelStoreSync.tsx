@@ -33,7 +33,6 @@ export function EventsModelStoreSync() {
 
   useSdkEventsSub({
     query,
-    historical: false,
     enabled: (mounted && Boolean(query)),
     setEntities: (entities: PistolsEntity[]) => {
       // console.log(`GET CallToActionEvent() ======>`, entities)

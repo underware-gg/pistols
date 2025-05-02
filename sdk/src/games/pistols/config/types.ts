@@ -1,4 +1,4 @@
-import { ParsedEntity, UnionOfModelData, ToriiQueryBuilder, ClauseBuilder } from '@dojoengine/sdk'
+import { ParsedEntity, UnionOfModelData, ToriiQueryBuilder, ClauseBuilder, HistoricalToriiQueryBuilder } from '@dojoengine/sdk'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 type PistolsSchemaType = models.SchemaType;
@@ -16,9 +16,11 @@ export type {
 }
 
 class PistolsQueryBuilder extends ToriiQueryBuilder<PistolsSchemaType> { }
+class PistolsHistoricalQueryBuilder extends HistoricalToriiQueryBuilder<PistolsSchemaType> { }
 class PistolsClauseBuilder extends ClauseBuilder<PistolsSchemaType> { }
 
 export {
   PistolsQueryBuilder,
+  PistolsHistoricalQueryBuilder,
   PistolsClauseBuilder,
 }
