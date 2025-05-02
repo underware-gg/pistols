@@ -19,7 +19,7 @@ import { InteractibleLayeredScene } from './InteractibleLayeredScene'
 import ee from 'event-emitter'
 export var emitter = ee()
 
-import { TEXTURES, SPRITESHEETS, TextureName } from '/src/data/assets.tsx'
+import { TEXTURES, SPRITESHEETS, TextureName, AnimName } from '/src/data/assets.tsx'
 import { AudioName, AUDIO_ASSETS, AudioType } from '/src/data/audioAssets.tsx'
 import { SceneName } from '/src/data/assets.tsx'
 import { map } from '@underware/pistols-sdk/utils'
@@ -1287,7 +1287,9 @@ export function animateActions(actionA: Action, actionB: Action, healthA: number
   }, 2000);
 }
 
-
+export function animateDuelistTest(duelist: string, key: AnimName) {
+  _duelistManager.playActorAnimationTest(duelist, key)
+}
 
 //-------------------------------
 // Audio

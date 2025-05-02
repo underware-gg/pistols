@@ -5,6 +5,7 @@ export class SpriteSheet {
   frameCount = 1
   textures = []
   frameRate = 8
+  isFlipped = false
   isLoaded = false
 
   constructor(key, SHEET, loader) {
@@ -16,6 +17,10 @@ export class SpriteSheet {
     if (SHEET.frameRate) {
       this.frameRate = SHEET.frameRate
     }
+
+    if (SHEET.isFlipped) {
+      this.isFlipped = SHEET.isFlipped
+    }
   }
 
   async loadTextures(SHEET, loader) {
@@ -23,11 +28,6 @@ export class SpriteSheet {
       const frameNumber = ('000' + f.toString()).slice(-3)
       const path = `${SHEET.path}/frame_${frameNumber}.ktx2`
       const tex = await loader.loadAsync(path)
-
-      if (path.includes("Dodge_Front")) {
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.repeat.x = -1; 
-      }
 
       tex.colorSpace = THREE.SRGBColorSpace
       tex.generateMipmaps = false
@@ -233,7 +233,11 @@ export class Actor {
     this.controls.loopCount = next.count
     this.controls.loop = next.loop
     this.controls.callback = next.onEnd
-    
+    if (this.currentSheet.isFlipped) {
+      this.mesh.rotation.y = Math.PI
+    } else {
+      this.mesh.rotation.y = 0
+    }
     this.controls.frameMovement = next.move
     this.controls.startPositionX = this.mesh.position.x;
     this.controls.targetPositionX = this.controls.startPositionX + this.controls.frameMovement.x * (this.controls.flipped ? -1 : 1);

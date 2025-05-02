@@ -356,8 +356,8 @@ export class DuelistsManager {
   }
 
   public animateDuelistBlade() {
-    this.playActorAnimation(this.duelistA, AnimName.STILL_BLADE)
-    this.playActorAnimation(this.duelistB, AnimName.STILL_BLADE)
+    this.playActorAnimation(this.duelistA, AnimName.STILL_BLADE, null, true)
+    this.playActorAnimation(this.duelistB, AnimName.STILL_BLADE, null, true)
   }
 
   public animatePace(pace: number, statsA: DuelistState, statsB: DuelistState) {
@@ -513,7 +513,7 @@ export class DuelistsManager {
     if (healthA === 0) {
       this.playActorAnimation(this.duelistA, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
     } else if (healthA < 3) {
-      this.playActorAnimation(this.duelistA, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
+      // this.playActorAnimation(this.duelistA, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
       checkBothSurvived()
     } else {
       checkBothSurvived()
@@ -522,7 +522,7 @@ export class DuelistsManager {
     if (healthB === 0) {
       this.playActorAnimation(this.duelistB, AnimName.STRUCK_DEAD, () => this.finishAnimation(healthA, healthB))
     } else if (healthB < 3) {
-      this.playActorAnimation(this.duelistB, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
+      // this.playActorAnimation(this.duelistB, AnimName.STRUCK_INJURED, () => this.finishAnimation(healthA, healthB))
       checkBothSurvived()
     } else {
       checkBothSurvived()
@@ -536,6 +536,14 @@ export class DuelistsManager {
               : AnimName.SEPPUKU
 
     return result
+  }
+
+  public playActorAnimationTest(duelist: string, key: AnimName) {
+    if (duelist == 'A') {
+      this.playActorAnimation(this.duelistA, key, null, false)
+    } else {
+      this.playActorAnimation(this.duelistB, key, null, false)
+    }
   }
 
   private playActorAnimation(duelist: Duelist, key: AnimName, onEnd: Function = null, loop: boolean = false) {
@@ -569,10 +577,10 @@ export class DuelistsManager {
         }
       }
       onStart = () => { playAudio(AudioName.BODY_FALL, _sfxEnabled) }
-    } else if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK, AnimName.STRUCK_INJURED].includes(key)) {
+    } else if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK].includes(key)) {
       if (duelist.model == CharacterType.MALE && key == AnimName.SHOT_INJURED_BACK) {
         movement.x = 0.352
-        movement.frames = 8 * 2
+        movement.frames = 8
       } else if (duelist.model == CharacterType.FEMALE && key == AnimName.SHOT_INJURED_BACK) {
         movement.x = 0.352 * 2
         movement.frames = 8 * 2
