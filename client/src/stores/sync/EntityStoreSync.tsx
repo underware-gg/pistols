@@ -1,4 +1,4 @@
-import { useSdkEntitiesSub, getEntityModel, filterEntitiesByModel, getEntityModels } from '@underware/pistols-sdk/dojo'
+import { useSdkEntitiesSub, filterEntitiesByModel, entityHasModels } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
@@ -11,6 +11,7 @@ import { useChallengeStore } from '/src/stores/challengeStore'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { usePackStore } from '/src/stores/packStore'
 import { useBankStore } from '/src/stores/bankStore'
+import { useEffect } from 'react'
 
 const _limit = 1000
 const query: PistolsQueryBuilder = new PistolsQueryBuilder()
@@ -25,6 +26,7 @@ const query: PistolsQueryBuilder = new PistolsQueryBuilder()
     "pistols-DuelistMemorial",
     "pistols-Challenge",
     "pistols-ChallengeMessage",
+    "pistols-PlayerDuelistStack",
     'pistols-Round',
     "pistols-Pack",
     "pistols-Pool",
@@ -71,9 +73,8 @@ export function EntityStoreSync() {
       seasonState.setEntities(filterEntitiesByModel(entities, ['SeasonConfig', 'Leaderboard']))
       playerState.setEntities(filterEntitiesByModel(entities, 'Player'))
       playerState.updateMessages(filterEntitiesByModel(entities, ['PlayerOnline', 'PlayerBookmark']))
-      const duelistEntities = filterEntitiesByModel(entities, ['Duelist', 'DuelistAssignment', 'DuelistMemorial'])
-      duelistState.setEntities(duelistEntities)
-      duelistQueryState.setEntities(duelistEntities)
+      duelistState.setEntities(filterEntitiesByModel(entities, ['Duelist', 'DuelistAssignment', 'DuelistMemorial', 'PlayerDuelistStack']))
+      duelistQueryState.setEntities(filterEntitiesByModel(entities, ['Duelist', 'DuelistAssignment', 'DuelistMemorial']))
       bankState.setEntities(filterEntitiesByModel(entities, 'Pool'))
       // challenge initial state is handled by <ChallengeStoreSync>
       // const challengeEntities = filterEntitiesByModel(entities, ['Challenge', 'ChallengeMessage', 'Round'])
@@ -82,33 +83,36 @@ export function EntityStoreSync() {
     },
     updateEntity: (entity: PistolsEntity) => {
       console.log("EntityStoreSync() SUB UPDATE =======> [entity]:", entity)
-      if (getEntityModel(entity, 'Config')) {
+      if (entityHasModels(entity, ['Config'])) {
         configState.updateEntity(entity)
       }
-      if (getEntityModel(entity, 'TokenConfig')) {
+      if (entityHasModels(entity, ['TokenConfig'])) {
         tokenState.updateEntity(entity)
       }
-      if (getEntityModel(entity, 'SeasonConfig') || getEntityModel(entity, 'Leaderboard')) {
+      if (entityHasModels(entity, ['SeasonConfig', 'Leaderboard'])) {
         seasonState.updateEntity(entity)
       }
-      if (getEntityModel(entity, 'Player')) {
+      if (entityHasModels(entity, ['Player'])) {
         playerState.updateEntity(entity)
       }
-      if (getEntityModels(entity, ['PlayerOnline', 'PlayerBookmark']).length > 0) {
+      if (entityHasModels(entity, ['PlayerOnline', 'PlayerBookmark'])) {
         playerState.updateMessages([entity])
       }
-      if (getEntityModel(entity, 'Duelist') || getEntityModel(entity, 'DuelistAssignment') || getEntityModel(entity, 'DuelistMemorial')) {
+      if (entityHasModels(entity, ['Duelist', 'DuelistAssignment', 'DuelistMemorial'])) {
         duelistState.updateEntity(entity)
         duelistQueryState.updateEntity(entity)
       }
-      if (getEntityModel(entity, 'Challenge') || getEntityModel(entity, 'ChallengeMessage') || getEntityModel(entity, 'Round')) {
+      if (entityHasModels(entity, ['PlayerDuelistStack'])) {
+        duelistState.updateEntity(entity)
+      }
+      if (entityHasModels(entity, ['Challenge', 'ChallengeMessage', 'Round'])) {
         challengeState.updateEntity(entity)
         challengeQueryState.updateEntity(entity)
       }
-      if (getEntityModels(entity, ['Pack']).length > 0) {
+      if (entityHasModels(entity, ['Pack'])) {
         packState.updateEntity(entity)
       }
-      if (getEntityModels(entity, ['Pool']).length > 0) {
+      if (entityHasModels(entity, ['Pool'])) {
         bankState.updateEntity(entity)
       }
     },

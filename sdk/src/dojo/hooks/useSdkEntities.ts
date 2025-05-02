@@ -316,6 +316,9 @@ export const getEntityModel = <M extends PistolsModelType>(entity: PistolsEntity
 export const getEntityModels = <M extends PistolsModelType>(entity: PistolsEntity, modelNames: PistolsSchemaModelNames[]): M[] => (
   arrayClean(modelNames.map(modelName => getEntityModel<M>(entity, modelName)))
 )
+export const entityHasModels = (entity: PistolsEntity, modelNames: PistolsSchemaModelNames[]): boolean => (
+  modelNames.some(modelName => Boolean(entity?.models.pistols?.[modelName]))
+)
 
 export const useEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: PistolsSchemaModelNames): M => {
   const model = useMemo(() => getEntityModel<M>(entity, modelName), [entity, modelName])

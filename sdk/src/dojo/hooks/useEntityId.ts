@@ -13,6 +13,10 @@ export const makeCustomEnumEntityId = (data: CairoCustomEnum | undefined): strin
   let calldata: Calldata = CallData.compile([data])
   return keysToEntityId(calldata)
 }
+export const getCustomEnumCalldata = (data: CairoCustomEnum | undefined): string[] | undefined => {
+  if (!data) return undefined
+  return CallData.compile([data])
+}
 
 // same as @dojoengine/sdk/src/react/hooks/useEntityId()
 // but the response is always a hex string

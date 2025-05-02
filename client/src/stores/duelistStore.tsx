@@ -1,15 +1,16 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityId, useEntityIds, getEntityModel, useEntityModel } from '@underware/pistols-sdk/dojo'
-import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
-import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
+import { useEntityId, useEntityIds, getEntityModel, useEntityModel, useDojoSystem, keysToEntityId, getCustomEnumCalldata } from '@underware/pistols-sdk/dojo'
+import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
+import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
 import { isPositiveBigint, bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
 import { PistolsSchemaType, getCollectionDescription, getProfileDescription, getProfileGender, getProfileId } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
+import { useAccount } from '@starknet-react/core'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 
@@ -202,5 +203,38 @@ export function useDuelistStatus(status: models.DuelistStatus | undefined) {
     honourDisplay,
     honourAndTotal,
     winRatio,
+  }
+}
+
+
+
+//-------------------------------
+// Duelist Stack
+//
+
+const _useDuelistStackEntityId = (address: BigNumberish, profileType: constants.DuelistProfile, profileId: number): string | undefined => {
+  const { abi } = useDojoSystem('duelist_token')
+  const _enum = makeAbiCustomEnum(abi, 'DuelistProfile', profileType, profileId)
+  const calldata = useMemoGate(() => getCustomEnumCalldata(_enum), [_enum])
+  const entityId = useMemoGate(() => (keysToEntityId([address, ...calldata])), [address, calldata])
+  return entityId
+}
+
+export const useDuelistStack = (duelist_id: BigNumberish) => {
+  const entities = useDuelistStore((state) => state.entities)
+  const { address } = useAccount()
+  const { profileType, profileId } = useDuelist(duelist_id)
+  const entityId = _useDuelistStackEntityId(address, profileType, profileId)
+
+  const stack = useEntityModel<models.PlayerDuelistStack>(entities[entityId], 'PlayerDuelistStack')
+
+  const activeDuelistId = useMemo(() => (stack?.active_duelist_id ?? undefined), [stack])
+  const stackedDuelistIds = useMemo(() => (stack?.stacked_ids ?? []).map(id => Number(id)), [stack])
+  const level = useMemo(() => (stack?.level ?? undefined), [stack])
+
+  return {
+    activeDuelistId,
+    stackedDuelistIds,
+    level,
   }
 }
