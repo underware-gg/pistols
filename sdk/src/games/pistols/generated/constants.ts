@@ -337,30 +337,30 @@ export const getDuelistProfileFromValue = (value: number): DuelistProfile | unde
 export const getDuelistProfileMap = (): Record<DuelistProfile, number> => Object.keys(DuelistProfile).reduce((acc, v, index) => { acc[v as DuelistProfile] = index; return acc; }, {} as Record<DuelistProfile, number>);
 
 // from: ../dojo/src/types/duelist_profile.cairo
-export enum CharacterProfile {
+export enum CharacterKey {
   Unknown = 'Unknown', // 0
   Bartender = 'Bartender', // 1
   Drunkard = 'Drunkard', // 2
   Devil = 'Devil', // 3
   Player = 'Player', // 4
 };
-export const getCharacterProfileValue = (name: CharacterProfile): number | undefined => _indexOrUndefined(Object.keys(CharacterProfile).indexOf(name));
-export const getCharacterProfileFromValue = (value: number): CharacterProfile | undefined => Object.keys(CharacterProfile)[value] as CharacterProfile;
-export const getCharacterProfileMap = (): Record<CharacterProfile, number> => Object.keys(CharacterProfile).reduce((acc, v, index) => { acc[v as CharacterProfile] = index; return acc; }, {} as Record<CharacterProfile, number>);
+export const getCharacterKeyValue = (name: CharacterKey): number | undefined => _indexOrUndefined(Object.keys(CharacterKey).indexOf(name));
+export const getCharacterKeyFromValue = (value: number): CharacterKey | undefined => Object.keys(CharacterKey)[value] as CharacterKey;
+export const getCharacterKeyMap = (): Record<CharacterKey, number> => Object.keys(CharacterKey).reduce((acc, v, index) => { acc[v as CharacterKey] = index; return acc; }, {} as Record<CharacterKey, number>);
 
 // from: ../dojo/src/types/duelist_profile.cairo
-export enum BotProfile {
+export enum BotKey {
   Unknown = 'Unknown', // 0
   TinMan = 'TinMan', // 1
   Scarecrow = 'Scarecrow', // 2
   Leon = 'Leon', // 3
 };
-export const getBotProfileValue = (name: BotProfile): number | undefined => _indexOrUndefined(Object.keys(BotProfile).indexOf(name));
-export const getBotProfileFromValue = (value: number): BotProfile | undefined => Object.keys(BotProfile)[value] as BotProfile;
-export const getBotProfileMap = (): Record<BotProfile, number> => Object.keys(BotProfile).reduce((acc, v, index) => { acc[v as BotProfile] = index; return acc; }, {} as Record<BotProfile, number>);
+export const getBotKeyValue = (name: BotKey): number | undefined => _indexOrUndefined(Object.keys(BotKey).indexOf(name));
+export const getBotKeyFromValue = (value: number): BotKey | undefined => Object.keys(BotKey)[value] as BotKey;
+export const getBotKeyMap = (): Record<BotKey, number> => Object.keys(BotKey).reduce((acc, v, index) => { acc[v as BotKey] = index; return acc; }, {} as Record<BotKey, number>);
 
 // from: ../dojo/src/types/duelist_profile.cairo
-export enum GenesisProfile {
+export enum GenesisKey {
   Unknown = 'Unknown', // 0
   Duke = 'Duke', // 1
   Duella = 'Duella', // 2
@@ -384,9 +384,9 @@ export enum GenesisProfile {
   NynJah = 'NynJah', // 20
   Thrak = 'Thrak', // 21
 };
-export const getGenesisProfileValue = (name: GenesisProfile): number | undefined => _indexOrUndefined(Object.keys(GenesisProfile).indexOf(name));
-export const getGenesisProfileFromValue = (value: number): GenesisProfile | undefined => Object.keys(GenesisProfile)[value] as GenesisProfile;
-export const getGenesisProfileMap = (): Record<GenesisProfile, number> => Object.keys(GenesisProfile).reduce((acc, v, index) => { acc[v as GenesisProfile] = index; return acc; }, {} as Record<GenesisProfile, number>);
+export const getGenesisKeyValue = (name: GenesisKey): number | undefined => _indexOrUndefined(Object.keys(GenesisKey).indexOf(name));
+export const getGenesisKeyFromValue = (value: number): GenesisKey | undefined => Object.keys(GenesisKey)[value] as GenesisKey;
+export const getGenesisKeyMap = (): Record<GenesisKey, number> => Object.keys(GenesisKey).reduce((acc, v, index) => { acc[v as GenesisKey] = index; return acc; }, {} as Record<GenesisKey, number>);
 
 // from: ../dojo/src/types/premise.cairo
 export enum Premise {

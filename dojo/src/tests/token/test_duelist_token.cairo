@@ -6,7 +6,7 @@ use pistols::models::{
     pack::{PackType, PackTypeTrait},
     duelist::{
         Duelist, DuelistTimestamps,
-        DuelistProfile, GenesisProfile,
+        DuelistProfile, GenesisKey,
         DuelistMemorialValue, CauseOfDeath,
     },
     player::{PlayerDuelistStack},
@@ -118,7 +118,7 @@ fn test_token_uri() {
 
     let duelist = Duelist {
         duelist_id: TOKEN_ID_1_1.low,
-        duelist_profile: DuelistProfile::Genesis(GenesisProfile::LadyVengeance),
+        duelist_profile: DuelistProfile::Genesis(GenesisKey::LadyVengeance),
         timestamps: DuelistTimestamps {
             registered: 999999,
             active: 0,
@@ -722,7 +722,7 @@ fn test_mint_duelist_not_minter() {
     let mut sys: TestSystems = setup(0);
     // let account: ContractAddress = tester::deploy_mock_account();
     // tester::impersonate(account);
-    _protected(@sys).mint_duelists(OWNER(), DuelistProfile::Genesis(GenesisProfile::Unknown), 1, 0x1234);
+    _protected(@sys).mint_duelists(OWNER(), DuelistProfile::Genesis(GenesisKey::Unknown), 1, 0x1234);
 }
 
 #[test]

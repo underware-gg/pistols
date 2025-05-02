@@ -102,7 +102,7 @@ use pistols::types::cards::{
     hand::{FinalBlow},
 };
 use pistols::types::{
-    duelist_profile::{CharacterProfile},
+    duelist_profile::{CharacterKey},
     rules::{Rules, RulesTrait},
     timestamp::{TimestampTrait},
     constants::{CONST},
@@ -147,7 +147,7 @@ pub impl ChallengeImpl of ChallengeTrait {
     fn get_deck_type(self: @Challenge) -> DeckType {
         if (
             self.is_tutorial() &&
-            ((*self).duelist_id_a.into() == CharacterProfile::Drunkard || (*self).duelist_id_b.into() == CharacterProfile::Drunkard)
+            ((*self).duelist_id_a.into() == CharacterKey::Drunkard || (*self).duelist_id_b.into() == CharacterKey::Drunkard)
         ) {
             (DeckType::PacesOnly)
         } else {

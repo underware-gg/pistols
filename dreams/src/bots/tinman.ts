@@ -5,8 +5,8 @@ import { main, BotContext } from "../main";
 import chalk from "chalk";
 
 const botContext: BotContext = {
-  duelist_profile: constants.BotProfile.TinMan,
-  description: constants.BOT_PROFILES[constants.BotProfile.TinMan],
+  duelist_profile: constants.BotKey.TinMan,
+  description: constants.BOT_PROFILES[constants.BotKey.TinMan],
   emoji: "🤖",
   context: "You are a villainous duelist, without morals or conscience.",
 }

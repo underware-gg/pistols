@@ -5,8 +5,8 @@ import { main, BotContext } from "../main";
 import chalk from "chalk";
 
 const botContext: BotContext = {
-  duelist_profile: constants.BotProfile.Scarecrow,
-  description: constants.BOT_PROFILES[constants.BotProfile.Scarecrow],
+  duelist_profile: constants.BotKey.Scarecrow,
+  description: constants.BOT_PROFILES[constants.BotKey.Scarecrow],
   emoji: "🎃",
   context: "You are an impredictible playful fool.",
 }

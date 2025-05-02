@@ -112,7 +112,7 @@ export const makeDuelTweetUrl = (
   return `https://twitter.com/intent/tweet?text=${tweetText}`;
 }
 
-export const PLAYER_CHARACTER_ID = makeCharacterDuelistId(constants.DuelistProfile.Character, constants.CharacterProfile.Player)
+export const PLAYER_CHARACTER_ID = makeCharacterDuelistId(constants.DuelistProfile.Character, constants.CharacterKey.Player)
 
 
 //------------------------------------------

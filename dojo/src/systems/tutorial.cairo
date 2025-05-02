@@ -44,7 +44,7 @@ pub mod tutorial {
     };
     use pistols::types::{
         premise::{Premise},
-        duelist_profile::{DuelistProfile, DuelistProfileTrait, CharacterProfile, BotProfile, ProfileManagerTrait},
+        duelist_profile::{DuelistProfile, DuelistProfileTrait, CharacterKey, BotKey, ProfileManagerTrait},
         challenge_state::{ChallengeState, ChallengeStateTrait},
         duel_progress::{DuelProgress},
         round_state::{RoundState},
@@ -68,8 +68,8 @@ pub mod tutorial {
     fn dojo_init(ref self: ContractState) {
         let mut store: Store = StoreTrait::new(self.world_default());
         // create agent profiles
-        ProfileManagerTrait::initialize(ref store, DuelistProfile::Character(CharacterProfile::Unknown));
-        ProfileManagerTrait::initialize(ref store, DuelistProfile::Bot(BotProfile::Unknown));
+        ProfileManagerTrait::initialize(ref store, DuelistProfile::Character(CharacterKey::Unknown));
+        ProfileManagerTrait::initialize(ref store, DuelistProfile::Bot(BotKey::Unknown));
     }
 
     #[generate_trait]
@@ -103,7 +103,7 @@ pub mod tutorial {
             assert(level != TutorialLevel::Undefined, Errors::INVALID_TUTORIAL_LEVEL);
             assert(player_id.is_non_zero(), Errors::INVALID_PLAYER);
 
-            let player_profile: DuelistProfile = DuelistProfile::Character(CharacterProfile::Player);
+            let player_profile: DuelistProfile = DuelistProfile::Character(CharacterKey::Player);
             let opponent_profile: DuelistProfile = level.opponent_profile();
 
             let duel_id: u128 = level.make_duel_id(player_id);

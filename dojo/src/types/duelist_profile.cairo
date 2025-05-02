@@ -5,9 +5,9 @@
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
 pub enum DuelistProfile {
     Undefined,
-    Character: CharacterProfile,    // Character(id)
-    Bot: BotProfile,                // Bot(id)
-    Genesis: GenesisProfile,        // Genesis(id)
+    Character: CharacterKey,    // Character(id)
+    Bot: BotKey,                // Bot(id)
+    Genesis: GenesisKey,        // Genesis(id)
     // Eternum: u16,   // Eternum(realm id)
 }
 
@@ -15,7 +15,7 @@ pub enum DuelistProfile {
 // Profiles
 //
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-pub enum CharacterProfile {
+pub enum CharacterKey {
     Unknown,
     Bartender,
     Drunkard,
@@ -24,7 +24,7 @@ pub enum CharacterProfile {
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-pub enum BotProfile {
+pub enum BotKey {
     Unknown,
     TinMan,
     Scarecrow,
@@ -32,7 +32,7 @@ pub enum BotProfile {
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, Introspect)]
-pub enum GenesisProfile {
+pub enum GenesisKey {
     Unknown,
     Duke,
     Duella,
@@ -115,7 +115,7 @@ pub struct ProfileDescription {
     pub name: felt252, // @generateContants:shortstring
 }
 
-// IMPORTANT: names must be in sync with enum CharacterProfile
+// IMPORTANT: names must be in sync with enum CharacterKey
 mod CHARACTER_PROFILES {
     use super::{ProfileDescription};
     pub const Unknown: ProfileDescription = ProfileDescription {
@@ -135,7 +135,7 @@ mod CHARACTER_PROFILES {
     };
 }
 
-// IMPORTANT: names must be in sync with enum BotProfile
+// IMPORTANT: names must be in sync with enum BotKey
 mod BOT_PROFILES {
     use super::{ProfileDescription};
     pub const Unknown: ProfileDescription = ProfileDescription {
@@ -153,7 +153,7 @@ mod BOT_PROFILES {
 }
 
 // to be exported to typescript by generateConstants
-// IMPORTANT: names must be in sync with enum GenesisProfile
+// IMPORTANT: names must be in sync with enum GenesisKey
 mod GENESIS_PROFILES {
     use super::{ProfileDescription};
     pub const Unknown: ProfileDescription = ProfileDescription {
@@ -315,18 +315,18 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
     }
     fn description(self: @DuelistProfile) -> ProfileDescription {
         (match *self {
-            DuelistProfile::Undefined =>            CHARACTER_PROFILES::Unknown,
-            DuelistProfile::Character(profile) =>   profile.into(),
-            DuelistProfile::Bot(profile) =>         profile.into(),
-            DuelistProfile::Genesis(profile) =>     profile.into(),
+            DuelistProfile::Undefined =>        CHARACTER_PROFILES::Unknown,
+            DuelistProfile::Character(key) =>   key.into(),
+            DuelistProfile::Bot(key) =>         key.into(),
+            DuelistProfile::Genesis(key) =>     key.into(),
         })
     }
     fn profile_id(self: @DuelistProfile) -> u8 {
         (match *self {
-            DuelistProfile::Undefined =>            0,
-            DuelistProfile::Character(profile) =>   profile.into(),
-            DuelistProfile::Bot(profile) =>         profile.into(),
-            DuelistProfile::Genesis(profile) =>     profile.into(),
+            DuelistProfile::Undefined =>        0,
+            DuelistProfile::Character(key) =>   key.into(),
+            DuelistProfile::Bot(key) =>         key.into(),
+            DuelistProfile::Genesis(key) =>     key.into(),
         })
     }
     fn exists(self: @DuelistProfile) -> bool {
@@ -334,8 +334,8 @@ pub impl DuelistProfileImpl of DuelistProfileTrait {
     }
     fn make_duelist_id(self: @DuelistProfile) -> u128 {
         (match *self {
-            DuelistProfile::Character(profile) =>   profile.into(),
-            DuelistProfile::Bot(profile) =>         profile.into(),
+            DuelistProfile::Character(key) =>   key.into(),
+            DuelistProfile::Bot(key) =>         key.into(),
             _ => 0,
         })
     }
@@ -367,52 +367,52 @@ impl DuelistProfileIntoCollectionDescription of core::traits::Into<DuelistProfil
         }
     }
 }
-impl GenesisProfileIntoDescription of core::traits::Into<GenesisProfile, ProfileDescription> {
-    fn into(self: GenesisProfile) -> ProfileDescription {
+impl GenesisKeyIntoDescription of core::traits::Into<GenesisKey, ProfileDescription> {
+    fn into(self: GenesisKey) -> ProfileDescription {
         match self {
-            GenesisProfile::Unknown =>          GENESIS_PROFILES::Unknown,
-            GenesisProfile::Duke =>             GENESIS_PROFILES::Duke,
-            GenesisProfile::Duella =>           GENESIS_PROFILES::Duella,
-            GenesisProfile::Jameson =>          GENESIS_PROFILES::Jameson,
-            GenesisProfile::Pilgrim =>          GENESIS_PROFILES::Pilgrim,
-            GenesisProfile::Jack =>             GENESIS_PROFILES::Jack,
-            GenesisProfile::Pops =>             GENESIS_PROFILES::Pops,
-            GenesisProfile::SerWalker =>        GENESIS_PROFILES::SerWalker,
-            GenesisProfile::Bloberto =>         GENESIS_PROFILES::Bloberto,
-            GenesisProfile::Squiddo =>          GENESIS_PROFILES::Squiddo,
-            GenesisProfile::SlenderDuck =>      GENESIS_PROFILES::SlenderDuck,
-            GenesisProfile::LadyVengeance =>    GENESIS_PROFILES::LadyVengeance,
-            GenesisProfile::Breadman =>         GENESIS_PROFILES::Breadman,
-            GenesisProfile::Brutus =>           GENESIS_PROFILES::Brutus,
-            GenesisProfile::Pistolopher =>      GENESIS_PROFILES::Pistolopher,
-            GenesisProfile::Secreto =>          GENESIS_PROFILES::Secreto,
-            GenesisProfile::ShadowMare =>       GENESIS_PROFILES::ShadowMare,
-            GenesisProfile::Karaku =>           GENESIS_PROFILES::Karaku,
-            GenesisProfile::Misty =>            GENESIS_PROFILES::Misty,
-            GenesisProfile::Kenzu =>            GENESIS_PROFILES::Kenzu,
-            GenesisProfile::NynJah =>           GENESIS_PROFILES::NynJah,
-            GenesisProfile::Thrak =>            GENESIS_PROFILES::Thrak,
+            GenesisKey::Unknown =>          GENESIS_PROFILES::Unknown,
+            GenesisKey::Duke =>             GENESIS_PROFILES::Duke,
+            GenesisKey::Duella =>           GENESIS_PROFILES::Duella,
+            GenesisKey::Jameson =>          GENESIS_PROFILES::Jameson,
+            GenesisKey::Pilgrim =>          GENESIS_PROFILES::Pilgrim,
+            GenesisKey::Jack =>             GENESIS_PROFILES::Jack,
+            GenesisKey::Pops =>             GENESIS_PROFILES::Pops,
+            GenesisKey::SerWalker =>        GENESIS_PROFILES::SerWalker,
+            GenesisKey::Bloberto =>         GENESIS_PROFILES::Bloberto,
+            GenesisKey::Squiddo =>          GENESIS_PROFILES::Squiddo,
+            GenesisKey::SlenderDuck =>      GENESIS_PROFILES::SlenderDuck,
+            GenesisKey::LadyVengeance =>    GENESIS_PROFILES::LadyVengeance,
+            GenesisKey::Breadman =>         GENESIS_PROFILES::Breadman,
+            GenesisKey::Brutus =>           GENESIS_PROFILES::Brutus,
+            GenesisKey::Pistolopher =>      GENESIS_PROFILES::Pistolopher,
+            GenesisKey::Secreto =>          GENESIS_PROFILES::Secreto,
+            GenesisKey::ShadowMare =>       GENESIS_PROFILES::ShadowMare,
+            GenesisKey::Karaku =>           GENESIS_PROFILES::Karaku,
+            GenesisKey::Misty =>            GENESIS_PROFILES::Misty,
+            GenesisKey::Kenzu =>            GENESIS_PROFILES::Kenzu,
+            GenesisKey::NynJah =>           GENESIS_PROFILES::NynJah,
+            GenesisKey::Thrak =>            GENESIS_PROFILES::Thrak,
         }
     }
 }
-impl CharacterProfileIntoDescription of core::traits::Into<CharacterProfile, ProfileDescription> {
-    fn into(self: CharacterProfile) -> ProfileDescription {
+impl CharacterKeyIntoDescription of core::traits::Into<CharacterKey, ProfileDescription> {
+    fn into(self: CharacterKey) -> ProfileDescription {
         match self {
-            CharacterProfile::Unknown =>        CHARACTER_PROFILES::Unknown,
-            CharacterProfile::Bartender =>      CHARACTER_PROFILES::Bartender,
-            CharacterProfile::Drunkard =>       CHARACTER_PROFILES::Drunkard,
-            CharacterProfile::Devil =>          CHARACTER_PROFILES::Devil,
-            CharacterProfile::Player =>         CHARACTER_PROFILES::Player,
+            CharacterKey::Unknown =>        CHARACTER_PROFILES::Unknown,
+            CharacterKey::Bartender =>      CHARACTER_PROFILES::Bartender,
+            CharacterKey::Drunkard =>       CHARACTER_PROFILES::Drunkard,
+            CharacterKey::Devil =>          CHARACTER_PROFILES::Devil,
+            CharacterKey::Player =>         CHARACTER_PROFILES::Player,
         }
     }
 }
-impl BotProfileIntoDescription of core::traits::Into<BotProfile, ProfileDescription> {
-    fn into(self: BotProfile) -> ProfileDescription {
+impl BotKeyIntoDescription of core::traits::Into<BotKey, ProfileDescription> {
+    fn into(self: BotKey) -> ProfileDescription {
         match self {
-            BotProfile::Unknown =>      BOT_PROFILES::Unknown,
-            BotProfile::TinMan =>       BOT_PROFILES::TinMan,
-            BotProfile::Scarecrow =>    BOT_PROFILES::Scarecrow,
-            BotProfile::Leon =>         BOT_PROFILES::Leon,
+            BotKey::Unknown =>      BOT_PROFILES::Unknown,
+            BotKey::TinMan =>       BOT_PROFILES::TinMan,
+            BotKey::Scarecrow =>    BOT_PROFILES::Scarecrow,
+            BotKey::Leon =>         BOT_PROFILES::Leon,
         }
     }
 }
@@ -422,97 +422,97 @@ impl BotProfileIntoDescription of core::traits::Into<BotProfile, ProfileDescript
 //----------------------------------------
 // profile_id converters
 //
-impl U8IntoGenesisProfile of core::traits::Into<u8, GenesisProfile> {
-    fn into(self: u8) -> GenesisProfile {
-        if self == 1        { GenesisProfile::Duke }
-        else if self == 2   { GenesisProfile::Duella }
-        else if self == 3   { GenesisProfile::Jameson }
-        else if self == 4   { GenesisProfile::Pilgrim }
-        else if self == 5   { GenesisProfile::Jack }
-        else if self == 6   { GenesisProfile::Pops }
-        else if self == 7   { GenesisProfile::SerWalker }
-        else if self == 8   { GenesisProfile::Bloberto }
-        else if self == 9   { GenesisProfile::Squiddo }
-        else if self == 10  { GenesisProfile::SlenderDuck }
-        else if self == 11  { GenesisProfile::LadyVengeance }
-        else if self == 12  { GenesisProfile::Breadman }
-        else if self == 13  { GenesisProfile::Brutus }
-        else if self == 14  { GenesisProfile::Pistolopher }
-        else if self == 15  { GenesisProfile::Secreto }
-        else if self == 16  { GenesisProfile::ShadowMare }
-        else if self == 17  { GenesisProfile::Karaku }
-        else if self == 18  { GenesisProfile::Misty }
-        else if self == 19  { GenesisProfile::Kenzu }
-        else if self == 20  { GenesisProfile::NynJah }
-        else if self == 21  { GenesisProfile::Thrak }
-        else                { GenesisProfile::Unknown }
+impl U8IntoGenesisKey of core::traits::Into<u8, GenesisKey> {
+    fn into(self: u8) -> GenesisKey {
+        if self == 1        { GenesisKey::Duke }
+        else if self == 2   { GenesisKey::Duella }
+        else if self == 3   { GenesisKey::Jameson }
+        else if self == 4   { GenesisKey::Pilgrim }
+        else if self == 5   { GenesisKey::Jack }
+        else if self == 6   { GenesisKey::Pops }
+        else if self == 7   { GenesisKey::SerWalker }
+        else if self == 8   { GenesisKey::Bloberto }
+        else if self == 9   { GenesisKey::Squiddo }
+        else if self == 10  { GenesisKey::SlenderDuck }
+        else if self == 11  { GenesisKey::LadyVengeance }
+        else if self == 12  { GenesisKey::Breadman }
+        else if self == 13  { GenesisKey::Brutus }
+        else if self == 14  { GenesisKey::Pistolopher }
+        else if self == 15  { GenesisKey::Secreto }
+        else if self == 16  { GenesisKey::ShadowMare }
+        else if self == 17  { GenesisKey::Karaku }
+        else if self == 18  { GenesisKey::Misty }
+        else if self == 19  { GenesisKey::Kenzu }
+        else if self == 20  { GenesisKey::NynJah }
+        else if self == 21  { GenesisKey::Thrak }
+        else                { GenesisKey::Unknown }
     }
 }
-impl GenesisProfileIntoU8 of core::traits::Into<GenesisProfile, u8> {
-    fn into(self: GenesisProfile) -> u8 {
+impl GenesisKeyIntoU8 of core::traits::Into<GenesisKey, u8> {
+    fn into(self: GenesisKey) -> u8 {
         match self {
-            GenesisProfile::Unknown =>          0,
-            GenesisProfile::Duke =>             1,
-            GenesisProfile::Duella =>           2,
-            GenesisProfile::Jameson =>          3,
-            GenesisProfile::Pilgrim =>          4,
-            GenesisProfile::Jack =>             5,
-            GenesisProfile::Pops =>             6,
-            GenesisProfile::SerWalker =>        7,
-            GenesisProfile::Bloberto =>         8,
-            GenesisProfile::Squiddo =>          9,
-            GenesisProfile::SlenderDuck =>      10,
-            GenesisProfile::LadyVengeance =>    11,
-            GenesisProfile::Breadman =>         12,
-            GenesisProfile::Brutus =>           13,
-            GenesisProfile::Pistolopher =>      14,
-            GenesisProfile::Secreto =>          15,
-            GenesisProfile::ShadowMare =>       16,
-            GenesisProfile::Karaku =>           17,
-            GenesisProfile::Misty =>            18,
-            GenesisProfile::Kenzu =>            19,
-            GenesisProfile::NynJah =>           20,
-            GenesisProfile::Thrak =>            21,
+            GenesisKey::Unknown =>          0,
+            GenesisKey::Duke =>             1,
+            GenesisKey::Duella =>           2,
+            GenesisKey::Jameson =>          3,
+            GenesisKey::Pilgrim =>          4,
+            GenesisKey::Jack =>             5,
+            GenesisKey::Pops =>             6,
+            GenesisKey::SerWalker =>        7,
+            GenesisKey::Bloberto =>         8,
+            GenesisKey::Squiddo =>          9,
+            GenesisKey::SlenderDuck =>      10,
+            GenesisKey::LadyVengeance =>    11,
+            GenesisKey::Breadman =>         12,
+            GenesisKey::Brutus =>           13,
+            GenesisKey::Pistolopher =>      14,
+            GenesisKey::Secreto =>          15,
+            GenesisKey::ShadowMare =>       16,
+            GenesisKey::Karaku =>           17,
+            GenesisKey::Misty =>            18,
+            GenesisKey::Kenzu =>            19,
+            GenesisKey::NynJah =>           20,
+            GenesisKey::Thrak =>            21,
         }
     }
 }
 
-impl U8IntoCharacterProfile of core::traits::Into<u8, CharacterProfile> {
-    fn into(self: u8) -> CharacterProfile {
-        if self == 1        { CharacterProfile::Bartender }
-        else if self == 2   { CharacterProfile::Drunkard }
-        else if self == 3   { CharacterProfile::Devil }
-        else if self == 4   { CharacterProfile::Player }
-        else                { CharacterProfile::Unknown }
+impl U8IntoCharacterKey of core::traits::Into<u8, CharacterKey> {
+    fn into(self: u8) -> CharacterKey {
+        if self == 1        { CharacterKey::Bartender }
+        else if self == 2   { CharacterKey::Drunkard }
+        else if self == 3   { CharacterKey::Devil }
+        else if self == 4   { CharacterKey::Player }
+        else                { CharacterKey::Unknown }
     }
 }
-impl CharacterProfileIntoU8 of core::traits::Into<CharacterProfile, u8> {
-    fn into(self: CharacterProfile) -> u8 {
+impl CharacterKeyIntoU8 of core::traits::Into<CharacterKey, u8> {
+    fn into(self: CharacterKey) -> u8 {
         match self {
-            CharacterProfile::Unknown =>    0,
-            CharacterProfile::Bartender =>  1,
-            CharacterProfile::Drunkard =>   2,
-            CharacterProfile::Devil =>      3,
-            CharacterProfile::Player =>     4,
+            CharacterKey::Unknown =>    0,
+            CharacterKey::Bartender =>  1,
+            CharacterKey::Drunkard =>   2,
+            CharacterKey::Devil =>      3,
+            CharacterKey::Player =>     4,
         }
     }
 }
 
-impl U8IntoBotProfile of core::traits::Into<u8, BotProfile> {
-    fn into(self: u8) -> BotProfile {
-        if self == 1        { BotProfile::TinMan }
-        else if self == 2   { BotProfile::Scarecrow }
-        else if self == 3   { BotProfile::Leon }
-        else                { BotProfile::Unknown }
+impl U8IntoBotKey of core::traits::Into<u8, BotKey> {
+    fn into(self: u8) -> BotKey {
+        if self == 1        { BotKey::TinMan }
+        else if self == 2   { BotKey::Scarecrow }
+        else if self == 3   { BotKey::Leon }
+        else                { BotKey::Unknown }
     }
 }
-impl BotProfileIntoU8 of core::traits::Into<BotProfile, u8> {
-    fn into(self: BotProfile) -> u8 {
+impl BotKeyIntoU8 of core::traits::Into<BotKey, u8> {
+    fn into(self: BotKey) -> u8 {
         match self {
-            BotProfile::Unknown =>      0,
-            BotProfile::TinMan =>       1,
-            BotProfile::Scarecrow =>    2,
-            BotProfile::Leon =>         3,
+            BotKey::Unknown =>      0,
+            BotKey::TinMan =>       1,
+            BotKey::Scarecrow =>    2,
+            BotKey::Leon =>         3,
         }
     }
 }
@@ -523,8 +523,8 @@ impl BotProfileIntoU8 of core::traits::Into<BotProfile, u8> {
 //----------------------------------------
 // Duelist id converters
 //
-impl CharacterProfileIntoDuelistId of core::traits::Into<CharacterProfile, u128> {
-    fn into(self: CharacterProfile) -> u128 {
+impl CharacterKeyIntoDuelistId of core::traits::Into<CharacterKey, u128> {
+    fn into(self: CharacterKey) -> u128 {
         let profile_id: u8 = self.into();
         (if (profile_id.is_non_zero())
             {COLLECTIONS::Character.duelist_id_base + profile_id.into()}
@@ -532,8 +532,8 @@ impl CharacterProfileIntoDuelistId of core::traits::Into<CharacterProfile, u128>
         )
     }
 }
-impl BotProfileIntoDuelistId of core::traits::Into<BotProfile, u128> {
-    fn into(self: BotProfile) -> u128 {
+impl BotKeyIntoDuelistId of core::traits::Into<BotKey, u128> {
+    fn into(self: BotKey) -> u128 {
         let profile_id: u8 = self.into();
         (if (profile_id.is_non_zero())
             {COLLECTIONS::Bot.duelist_id_base + profile_id.into()}
@@ -542,15 +542,15 @@ impl BotProfileIntoDuelistId of core::traits::Into<BotProfile, u128> {
     }
 }
 
-impl DuelistIdIntoCharacterProfile of core::traits::Into<u128, CharacterProfile> {
-    fn into(self: u128) -> CharacterProfile {
+impl DuelistIdIntoCharacterKey of core::traits::Into<u128, CharacterKey> {
+    fn into(self: u128) -> CharacterKey {
         let id: u128 = self ^ COLLECTIONS::Character.duelist_id_base;
         let id: u8 = if (id < 0xff) { (self & 0xff).try_into().unwrap() } else { 0 };
         (id.into())
     }
 }
-impl DuelistIdIntoBotProfile of core::traits::Into<u128, BotProfile> {
-    fn into(self: u128) -> BotProfile {
+impl DuelistIdIntoBotKey of core::traits::Into<u128, BotKey> {
+    fn into(self: u128) -> BotKey {
         let zero: u128 = self ^ COLLECTIONS::Bot.duelist_id_base;
         let id: u8 = if (zero < 0xff) { (self & 0xff).try_into().unwrap() } else { 0 };
         (id.into())
@@ -579,9 +579,9 @@ pub impl DuelistProfileDisplay of core::fmt::Display<DuelistProfile> {
     fn fmt(self: @DuelistProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result = match self {
             DuelistProfile::Undefined =>        format!("Undefined"),
-            DuelistProfile::Character(p) =>     { let id: u8 = (*p).into(); format!("Character::{}({})", self.name(), id) },
-            DuelistProfile::Bot(p) =>           { let id: u8 = (*p).into(); format!("Bot::{}({})", self.name(), id) },
-            DuelistProfile::Genesis(p) =>       { let id: u8 = (*p).into(); format!("Genesis::{}({})", self.name(), id) },
+            DuelistProfile::Character(key) =>   { let id: u8 = (*key).into(); format!("Character::{}({})", self.name(), id) },
+            DuelistProfile::Bot(key) =>         { let id: u8 = (*key).into(); format!("Bot::{}({})", self.name(), id) },
+            DuelistProfile::Genesis(key) =>     { let id: u8 = (*key).into(); format!("Genesis::{}({})", self.name(), id) },
         };
         f.buffer.append(@result);
         Result::Ok(())
@@ -594,22 +594,22 @@ pub impl DuelistProfileDebug of core::fmt::Debug<DuelistProfile> {
         Result::Ok(())
     }
 }
-pub impl CharacterProfileDebug of core::fmt::Debug<CharacterProfile> {
-    fn fmt(self: @CharacterProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+pub impl CharacterKeyDebug of core::fmt::Debug<CharacterKey> {
+    fn fmt(self: @CharacterKey, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = DuelistProfile::Character(*self).name();
         f.buffer.append(@result);
         Result::Ok(())
     }
 }
-pub impl BotProfileDebug of core::fmt::Debug<BotProfile> {
-    fn fmt(self: @BotProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+pub impl BotKeyDebug of core::fmt::Debug<BotKey> {
+    fn fmt(self: @BotKey, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = DuelistProfile::Bot(*self).name();
         f.buffer.append(@result);
         Result::Ok(())
     }
 }
-pub impl GenesisProfileDebug of core::fmt::Debug<GenesisProfile> {
-    fn fmt(self: @GenesisProfile, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+pub impl GenesisKeyDebug of core::fmt::Debug<GenesisKey> {
+    fn fmt(self: @GenesisKey, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
         let result: ByteArray = DuelistProfile::Genesis(*self).name();
         f.buffer.append(@result);
         Result::Ok(())
@@ -627,7 +627,7 @@ mod unit {
 
     use super::{
         DuelistProfile, DuelistProfileTrait,
-        GenesisProfile, CharacterProfile, BotProfile,
+        GenesisKey, CharacterKey, BotKey,
         ProfileDescription,
         ProfileManagerTrait,
         COLLECTIONS,
@@ -681,7 +681,7 @@ mod unit {
             let profile: DuelistProfile = DuelistProfile::Genesis(p.into());
             assert!(profile.exists(), "({}) exists", p);
             assert_eq!(profile.make_duelist_id(), 0, "({}) bad duelist_id", p);
-            assert_ne!(profile, DuelistProfile::Genesis(GenesisProfile::Unknown), "Duelist({}) is Unknown", p);
+            assert_ne!(profile, DuelistProfile::Genesis(GenesisKey::Unknown), "Duelist({}) is Unknown", p);
             assert_eq!(p, profile.profile_id(), "({}) bad p", p);
             assert_eq!(p, last_profile_id + 1, "({}) == ({}): p", p, p-1);
             let desc: ProfileDescription = *descriptions.at((p-1).into());
@@ -705,7 +705,7 @@ mod unit {
         while (p.into() <= descriptions.len()) {
             let profile: DuelistProfile = DuelistProfile::Character(p.into());
             assert!(profile.exists(), "({}) exists", p);
-            assert_ne!(profile, DuelistProfile::Character(CharacterProfile::Unknown), "({}) is Unknown", p);
+            assert_ne!(profile, DuelistProfile::Character(CharacterKey::Unknown), "({}) is Unknown", p);
             assert_eq!(p, profile.profile_id(), "({}) bad p", p);
             assert_eq!(p, last_profile_id + 1, "({}) == ({}): p", p, p-1);
             let desc: ProfileDescription = *descriptions.at((p-1).into());
@@ -729,7 +729,7 @@ mod unit {
         while (p.into() <= descriptions.len()) {
             let profile: DuelistProfile = DuelistProfile::Bot(p.into());
             assert!(profile.exists(), "({}) exists", p);
-            assert_ne!(profile, DuelistProfile::Bot(BotProfile::Unknown), "({}) is Unknown", p);
+            assert_ne!(profile, DuelistProfile::Bot(BotKey::Unknown), "({}) is Unknown", p);
             assert_eq!(p, profile.profile_id(), "({}) bad profile_id", p);
             assert_eq!(p, last_profile_id + 1, "({}) == ({}): profile_id", p, p-1);
             let desc: ProfileDescription = *descriptions.at((p-1).into());
@@ -745,8 +745,8 @@ mod unit {
         assert_eq!(COLLECTIONS::Genesis.duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
         while (p <= COLLECTIONS::Genesis.profile_count.into()) {
-            let profile: GenesisProfile = p.into();
-            assert_eq!(DuelistProfile::Genesis(profile).make_duelist_id(), 0, "({}) bad type_id", p);
+            let key: GenesisKey = p.into();
+            assert_eq!(DuelistProfile::Genesis(key).make_duelist_id(), 0, "({}) bad type_id", p);
             p += 1;
         };
     }
@@ -756,11 +756,11 @@ mod unit {
         assert_gt!(COLLECTIONS::Character.duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
         while (p <= COLLECTIONS::Character.profile_count.into()) {
-            let profile: CharacterProfile = p.into();
-            let expected_id: u128 = (COLLECTIONS::Character.duelist_id_base | p.into());
+            let key: CharacterKey = p.into();
+            let expected_id: u128 = (COLLECTIONS::Character.duelist_id_base | key.into());
             assert_gt!(expected_id, COLLECTIONS::Character.duelist_id_base, "({}) low id", p);
-            assert_eq!(expected_id, DuelistProfile::Character(profile).make_duelist_id(), "({}) bad type_id", p);
-            assert_eq!(expected_id.into(), profile, "({}) bad profile", p);
+            assert_eq!(expected_id, DuelistProfile::Character(key).make_duelist_id(), "({}) bad type_id", p);
+            assert_eq!(expected_id.into(), key, "({}) bad profile", p);
             p += 1;
         };
     }
@@ -770,11 +770,11 @@ mod unit {
         assert_gt!(COLLECTIONS::Bot.duelist_id_base, 0, "bad base id");
         let mut p: u8 = 1;
         while (p <= COLLECTIONS::Bot.profile_count.into()) {
-            let profile: BotProfile = p.into();
-            let expected_id: u128 = (COLLECTIONS::Bot.duelist_id_base | p.into());
+            let key: BotKey = p.into();
+            let expected_id: u128 = (COLLECTIONS::Bot.duelist_id_base | key.into());
             assert_gt!(expected_id, COLLECTIONS::Bot.duelist_id_base, "({}) low id", p);
-            assert_eq!(expected_id, DuelistProfile::Bot(profile).make_duelist_id(), "({}) bad type_id", p);
-            assert_eq!(expected_id.into(), profile, "({}) bad profile", p);
+            assert_eq!(expected_id, DuelistProfile::Bot(key).make_duelist_id(), "({}) bad type_id", p);
+            assert_eq!(expected_id.into(), key, "({}) bad profile", p);
             p += 1;
         };
     }
@@ -782,26 +782,26 @@ mod unit {
     #[test]
     fn test_profile_duelist_ids_misc() {
         // duelist
-        assert_eq!(0_u128.into(), CharacterProfile::Unknown, "Character 0");
-        assert_eq!(1_u128.into(), CharacterProfile::Unknown, "Character 1");
-        assert_eq!(1000_u128.into(), CharacterProfile::Unknown, "Character 1000");
-        assert_eq!(0x121212121231231231241212_u128.into(), CharacterProfile::Unknown, "Character 1000");
-        assert_eq!(COLLECTIONS::Character.duelist_id_base.into(), CharacterProfile::Unknown, "Character CHAR_ID");
-        assert_eq!(COLLECTIONS::Bot.duelist_id_base.into(), CharacterProfile::Unknown, "Character BOT_ID");
-        assert_eq!((COLLECTIONS::Bot.duelist_id_base + 1).into(), CharacterProfile::Unknown, "Character BOT_ID+1");
-        assert_ne!((COLLECTIONS::Character.duelist_id_base + 1).into(), CharacterProfile::Unknown, "Character CHAR_ID+1");
-        assert_ne!((COLLECTIONS::Character.duelist_id_base + COLLECTIONS::Character.profile_count.into()).into(), CharacterProfile::Unknown, "Character CHAR_ID+COUNT");
-        assert_eq!((COLLECTIONS::Character.duelist_id_base + COLLECTIONS::Character.profile_count.into() + 1).into(), CharacterProfile::Unknown, "Character CHAR_ID+COUNT+1");
+        assert_eq!(0_u128.into(), CharacterKey::Unknown, "Character 0");
+        assert_eq!(1_u128.into(), CharacterKey::Unknown, "Character 1");
+        assert_eq!(1000_u128.into(), CharacterKey::Unknown, "Character 1000");
+        assert_eq!(0x121212121231231231241212_u128.into(), CharacterKey::Unknown, "Character 1000");
+        assert_eq!(COLLECTIONS::Character.duelist_id_base.into(), CharacterKey::Unknown, "Character CHAR_ID");
+        assert_eq!(COLLECTIONS::Bot.duelist_id_base.into(), CharacterKey::Unknown, "Character BOT_ID");
+        assert_eq!((COLLECTIONS::Bot.duelist_id_base + 1).into(), CharacterKey::Unknown, "Character BOT_ID+1");
+        assert_ne!((COLLECTIONS::Character.duelist_id_base + 1).into(), CharacterKey::Unknown, "Character CHAR_ID+1");
+        assert_ne!((COLLECTIONS::Character.duelist_id_base + COLLECTIONS::Character.profile_count.into()).into(), CharacterKey::Unknown, "Character CHAR_ID+COUNT");
+        assert_eq!((COLLECTIONS::Character.duelist_id_base + COLLECTIONS::Character.profile_count.into() + 1).into(), CharacterKey::Unknown, "Character CHAR_ID+COUNT+1");
         // bot
-        assert_eq!(0_u128.into(), BotProfile::Unknown, "Bot 0");
-        assert_eq!(1_u128.into(), BotProfile::Unknown, "Bot 1");
-        assert_eq!(1000_u128.into(), BotProfile::Unknown, "Bot 1000");
-        assert_eq!(0x121212121231231231241212_u128.into(), BotProfile::Unknown, "Bot 1000");
-        assert_eq!(COLLECTIONS::Bot.duelist_id_base.into(), BotProfile::Unknown, "Bot BOT_ID");
-        assert_eq!(COLLECTIONS::Character.duelist_id_base.into(), BotProfile::Unknown, "Bot CHAR_ID");
-        assert_eq!((COLLECTIONS::Character.duelist_id_base + 1).into(), BotProfile::Unknown, "Bot CHAR_ID+1");
-        assert_ne!((COLLECTIONS::Bot.duelist_id_base + 1).into(), BotProfile::Unknown, "Bot BOT_ID+1");
-        assert_ne!((COLLECTIONS::Bot.duelist_id_base + COLLECTIONS::Bot.profile_count.into()).into(), BotProfile::Unknown, "Bot BOT_ID+COUNT");
-        assert_eq!((COLLECTIONS::Bot.duelist_id_base + COLLECTIONS::Bot.profile_count.into() + 1).into(), BotProfile::Unknown, "Bot BOT_ID+COUNT+1");
+        assert_eq!(0_u128.into(), BotKey::Unknown, "Bot 0");
+        assert_eq!(1_u128.into(), BotKey::Unknown, "Bot 1");
+        assert_eq!(1000_u128.into(), BotKey::Unknown, "Bot 1000");
+        assert_eq!(0x121212121231231231241212_u128.into(), BotKey::Unknown, "Bot 1000");
+        assert_eq!(COLLECTIONS::Bot.duelist_id_base.into(), BotKey::Unknown, "Bot BOT_ID");
+        assert_eq!(COLLECTIONS::Character.duelist_id_base.into(), BotKey::Unknown, "Bot CHAR_ID");
+        assert_eq!((COLLECTIONS::Character.duelist_id_base + 1).into(), BotKey::Unknown, "Bot CHAR_ID+1");
+        assert_ne!((COLLECTIONS::Bot.duelist_id_base + 1).into(), BotKey::Unknown, "Bot BOT_ID+1");
+        assert_ne!((COLLECTIONS::Bot.duelist_id_base + COLLECTIONS::Bot.profile_count.into()).into(), BotKey::Unknown, "Bot BOT_ID+COUNT");
+        assert_eq!((COLLECTIONS::Bot.duelist_id_base + COLLECTIONS::Bot.profile_count.into() + 1).into(), BotKey::Unknown, "Bot BOT_ID+COUNT+1");
     }
 }

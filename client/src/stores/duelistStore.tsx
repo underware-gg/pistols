@@ -32,8 +32,8 @@ export const useAllDuelistsIds = () => {
 
 const useDuelistProfile = (duelist: models.Duelist) => {
   const { variant, value } = useMemo(() => parseCustomEnum<constants.DuelistProfile, DuelistProfileKey>(duelist?.duelist_profile), [duelist])
-  const profileType: constants.DuelistProfile = variant;  // ex: GenesisProfile
-  const profileKey: DuelistProfileKey = value;            // ex: GenesisProfile::Duke
+  const profileType: constants.DuelistProfile = variant;  // ex: GenesisKey
+  const profileKey: DuelistProfileKey = value;            // ex: GenesisKey::Duke
 
   const profileCollection: constants.CollectionDescription = useMemo(() => getCollectionDescription(profileType), [profileType])
   const profileDescription: constants.ProfileDescription = useMemo(() => getProfileDescription(profileType, profileKey), [profileType, profileKey])

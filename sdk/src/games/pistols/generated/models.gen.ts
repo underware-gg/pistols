@@ -611,17 +611,17 @@ export const challengeState = [
 export type ChallengeState = { [key in typeof challengeState[number]]: string };
 export type ChallengeStateEnum = CairoCustomEnum;
 
-// Type definition for `pistols::types::duelist_profile::BotProfile` enum
+// Type definition for `pistols::types::duelist_profile::BotKey` enum
 export const botProfile = [
 	'Unknown',
 	'TinMan',
 	'Scarecrow',
 	'Leon',
 ] as const;
-export type BotProfile = { [key in typeof botProfile[number]]: string };
-export type BotProfileEnum = CairoCustomEnum;
+export type BotKey = { [key in typeof botProfile[number]]: string };
+export type BotKeyEnum = CairoCustomEnum;
 
-// Type definition for `pistols::types::duelist_profile::CharacterProfile` enum
+// Type definition for `pistols::types::duelist_profile::CharacterKey` enum
 export const characterProfile = [
 	'Unknown',
 	'Bartender',
@@ -629,8 +629,8 @@ export const characterProfile = [
 	'Devil',
 	'Player',
 ] as const;
-export type CharacterProfile = { [key in typeof characterProfile[number]]: string };
-export type CharacterProfileEnum = CairoCustomEnum;
+export type CharacterKey = { [key in typeof characterProfile[number]]: string };
+export type CharacterKeyEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::duelist_profile::DuelistProfile` enum
 export const duelistProfile = [
@@ -641,13 +641,13 @@ export const duelistProfile = [
 ] as const;
 export type DuelistProfile = { 
 	Undefined: string,
-	Character: CharacterProfileEnum,
-	Bot: BotProfileEnum,
-	Genesis: GenesisProfileEnum,
+	Character: CharacterKeyEnum,
+	Bot: BotKeyEnum,
+	Genesis: GenesisKeyEnum,
 };
 export type DuelistProfileEnum = CairoCustomEnum;
 
-// Type definition for `pistols::types::duelist_profile::GenesisProfile` enum
+// Type definition for `pistols::types::duelist_profile::GenesisKey` enum
 export const genesisProfile = [
 	'Unknown',
 	'Duke',
@@ -672,8 +672,8 @@ export const genesisProfile = [
 	'NynJah',
 	'Thrak',
 ] as const;
-export type GenesisProfile = { [key in typeof genesisProfile[number]]: string };
-export type GenesisProfileEnum = CairoCustomEnum;
+export type GenesisKey = { [key in typeof genesisProfile[number]]: string };
+export type GenesisKeyEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::premise::Premise` enum
 export const premise = [
@@ -1404,10 +1404,10 @@ export enum ModelsMapping {
 	FinalBlow = 'pistols-FinalBlow',
 	PacesCard = 'pistols-PacesCard',
 	ChallengeState = 'pistols-ChallengeState',
-	BotProfile = 'pistols-BotProfile',
-	CharacterProfile = 'pistols-CharacterProfile',
+	BotKey = 'pistols-BotKey',
+	CharacterKey = 'pistols-CharacterKey',
 	DuelistProfile = 'pistols-DuelistProfile',
-	GenesisProfile = 'pistols-GenesisProfile',
+	GenesisKey = 'pistols-GenesisKey',
 	Premise = 'pistols-Premise',
 	RoundState = 'pistols-RoundState',
 	Rules = 'pistols-Rules',

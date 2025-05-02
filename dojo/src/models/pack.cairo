@@ -82,7 +82,7 @@ use pistols::interfaces::dns::{
     DnsTrait,
     IDuelistTokenProtectedDispatcherTrait,
 };
-use pistols::types::duelist_profile::{DuelistProfile, GenesisProfile};
+use pistols::types::duelist_profile::{DuelistProfile, GenesisKey};
 use pistols::utils::short_string::{ShortStringTrait};
 use pistols::libs::store::{Store, StoreTrait};
 
@@ -97,7 +97,7 @@ pub impl PackImpl of PackTrait {
                 (store.world.duelist_token_protected_dispatcher()
                     .mint_duelists(
                         recipient,
-                        DuelistProfile::Genesis(GenesisProfile::Unknown),
+                        DuelistProfile::Genesis(GenesisKey::Unknown),
                         self.pack_type.description().quantity,
                         self.seed,
                     )

@@ -1,5 +1,5 @@
 use starknet::{ContractAddress};
-pub use pistols::types::duelist_profile::{DuelistProfile, DuelistProfileTrait, GenesisProfile, BotProfile};
+pub use pistols::types::duelist_profile::{DuelistProfile, DuelistProfileTrait, GenesisKey, BotKey};
 
 //---------------------
 // Duelist
