@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Account, TypedData, stark } from 'starknet'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import { useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
@@ -47,7 +47,7 @@ export const useSdkPublishTypedData = (
       // await sdk.sendMessage(typedData, account)
 
       try {
-        console.log('SIGNED_MESSAGE: sign...', serialize(typedData), typedData)
+        // console.log('SIGNED_MESSAGE: sign...', serialize(typedData), typedData)
         let signature = await account.signMessage(typedData);
         // console.log('SIGNED_MESSAGE: signature:', signature)
         if (!Array.isArray(signature)) {

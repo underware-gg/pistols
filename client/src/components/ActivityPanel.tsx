@@ -3,7 +3,7 @@ import { usePistolsScene } from '/src/hooks/PistolsContext'
 import { IconClick } from '/src/components/ui/Icons'
 import ActivityAction, { ActionIcon } from '/src/components/ActivityAction'
 import ActivityFeed from '/src/components/ActivityFeed'
-import ActivityPlayers from '/src/components/ActivityPlayers'
+import ActivityOnline from '/src/components/ActivityOnline'
 
 enum PanelType {
   Closed = 'Closed',
@@ -35,13 +35,13 @@ export const ActivityPanel = () => {
   const [panelType, setPanelType] = useState(PanelType.Activity)
 
   const isClosed = useMemo(() => (panelType === PanelType.Closed), [panelType])
-  const isActivity = useMemo(() => (panelType === PanelType.Activity), [panelType])
-  const isPlayers = useMemo(() => (panelType === PanelType.Online), [panelType])
-  const isAction = useMemo(() => (panelType === PanelType.Action), [panelType])
+  const inActivity = useMemo(() => (panelType === PanelType.Activity), [panelType])
+  const inOnline = useMemo(() => (panelType === PanelType.Online), [panelType])
+  const inAction = useMemo(() => (panelType === PanelType.Action), [panelType])
 
   const _panelTitle = useCallback((type: PanelType) => {
     const className = (panelType == type ? 'Active Anchor' : 'Inactive Anchor ImportantHover')
-    const name = (type == PanelType.Action ? ActionIcon(isAction) : type)
+    const name = (type == PanelType.Action ? ActionIcon(inAction) : type)
     // const name = type
     return (
       <span className={className} onClick={() => setPanelType(type)}>
@@ -58,11 +58,11 @@ export const ActivityPanel = () => {
   return (
     <div className={`${isClosed ? 'ActivityPanelCollapsed' : 'ActivityPanel'} Relative`}>
       <h3 className='TitleCase'>
-        {<PanelTitle panelType={PanelType.Action} isActive={isAction} setPanelType={setPanelType} />}
+        {<PanelTitle panelType={PanelType.Action} isActive={inAction} setPanelType={setPanelType} />}
         <span className={'Inactive'}>{` | `}</span>
-        {<PanelTitle panelType={PanelType.Activity} isActive={isActivity} setPanelType={setPanelType} />}
+        {<PanelTitle panelType={PanelType.Activity} isActive={inActivity} setPanelType={setPanelType} />}
         <span className={'Inactive'}>{` | `}</span>
-        {<PanelTitle panelType={PanelType.Online} isActive={isPlayers} setPanelType={setPanelType} />}
+        {<PanelTitle panelType={PanelType.Online} isActive={inOnline} setPanelType={setPanelType} />}
         {/* <span className={'Inactive'}>{` | `}</span> */}
         {/* {_panelTitle(PanelType.Action)} */}
       </h3>
@@ -70,9 +70,9 @@ export const ActivityPanel = () => {
       {!isClosed && <IconClick className='ActivityPanelIcon' name={'close'} onClick={() => setPanelType(PanelType.Closed)} />}
 
       <div className='ActivityFeed'>
-        {isActivity && <ActivityFeed />}
-        {isPlayers && <ActivityPlayers />}
-        {isAction && <ActivityAction />}
+        {inAction && <ActivityAction />}
+        {inActivity && <ActivityFeed />}
+        {inOnline && <ActivityOnline />}
       </div>
     </div>
   );

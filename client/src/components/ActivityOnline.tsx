@@ -8,7 +8,7 @@ import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
 import { PlayerLink } from '/src/components/Links'
 import { BookmarkIcon, OnlineStatusIcon } from '/src/components/ui/Icons'
 
-export default function ActivityPlayers() {
+export default function ActivityOnline() {
   const { address } = useAccount()
   const { bookmarkedPlayers } = usePlayer(address)
   const { playersOnline } = usePlayersOnline()

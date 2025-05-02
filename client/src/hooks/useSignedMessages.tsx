@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Account, BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useSdkPublishTypedData, useStarknetContext } from '@underware/pistols-sdk/dojo'
@@ -12,11 +12,11 @@ export function usePlayerOnlineSignedMessage(timestamp: number) {
   const { selectedNetworkId } = useStarknetContext()
   const { account } = useAccount()
   const typedData = useMemo(() => (
-    make_typed_data_PlayerOnline({
+    timestamp > 0 ? make_typed_data_PlayerOnline({
       networkId: selectedNetworkId,
       identity: account?.address ?? 0,
       timestamp: Math.floor(timestamp),
-    })
+    }) : null
   ), [account, timestamp])
   const { publish, isPublishing } = useSdkPublishTypedData(account as Account, typedData)
   return {
