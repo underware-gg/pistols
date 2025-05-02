@@ -109,8 +109,11 @@ export const useSdkTokenBalancesSub = ({
         accountAddresses: [],
         tokenIds: [],
         callback: (response: SubscriptionCallbackArgs<torii.TokenBalance>) => {
-          if (response.data) {
-            let balance: torii.TokenBalance = response.data;
+          // console.log("useSdkTokenBalancesSub() RESPONSE:", response);
+          let balance: torii.TokenBalance = response.data ??
+            // it's actually returning a torii.TokenBalance!!!
+            ((response as any).contract_address ? response as unknown as torii.TokenBalance : undefined);
+          if (balance) {
             console.log("useSdkTokenBalancesSub() SUB:", isPositiveBigint(balance.contract_address), balance);
             if (isPositiveBigint(balance.contract_address)) {
               updateBalance(balance);
