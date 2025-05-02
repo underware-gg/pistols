@@ -1,6 +1,14 @@
 import { BigNumberish } from 'starknet'
 
 //
+// misc
+//
+
+export const hasNull = (v: any[]): boolean => (v.some(e => (e == null)))
+export const hasNotNull = (v: any[]): boolean => (!hasNull(v))
+export const nullGate = <T>(v: any[], result: T): (T | null) => (!hasNull(v) ? result : null)
+
+//
 // numbers
 //
 

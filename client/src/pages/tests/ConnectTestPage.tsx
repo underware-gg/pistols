@@ -4,7 +4,7 @@ import { Container, Table, Button, Image, Grid } from 'semantic-ui-react'
 import { useAccount, useConnect, useDisconnect, useNetwork } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDojoSetup, useStarknetContext, getConnectorIcon, useConnectedController } from '@underware/pistols-sdk/dojo'
-import { useTypedMessage, useAsyncMemo } from '@underware/pistols-sdk/utils/hooks'
+import { useTypedMessage, useMemoAsync } from '@underware/pistols-sdk/utils/hooks'
 import { Messages, splitSignature, feltToString } from '@underware/pistols-sdk/utils/starknet'
 import { bigintToHex, shortAddress } from '@underware/pistols-sdk/utils'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
@@ -168,7 +168,7 @@ function Sign() {
     setIsSigning(false)
   }
 
-  const { value: isVerified } = useAsyncMemo(async () => {
+  const { value: isVerified } = useMemoAsync(async () => {
     if (!signature || signature.length == 0) return undefined
     console.log(`V${REVISION} verifying...`)
     const result = await dojoProvider.provider.verifyMessageInStarknet(typedMessage, signature, account.address)

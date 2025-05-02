@@ -1,26 +1,24 @@
 import { useMemo } from 'react'
 import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols'
 import { useSdkStateEventsGet, formatQueryValue, getEntityModel } from '@underware/pistols-sdk/dojo'
-import { feltToString, parseCustomEnum, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
+import { feltToString, parseCustomEnum } from '@underware/pistols-sdk/utils/starknet'
+import { useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { models, constants } from '@underware/pistols-sdk/pistols/gen'
-import { BigNumberish } from 'starknet'
 
 export const useLordsReleaseEvents = (season_id: number) => {
-  const query = useMemo<PistolsQueryBuilder>(() => (
-    (Boolean(season_id))
-      ? new PistolsQueryBuilder()
-        .withClause(
-          new PistolsClauseBuilder().keys(
-            ["pistols-LordsReleaseEvent"],
-            [formatQueryValue(season_id)]
-          ).build()
-        )
-        .withEntityModels(
-          ["pistols-LordsReleaseEvent"]
-        )
-        .withLimit(1000)
-        .includeHashedKeys()
-      : null
+  const query = useMemoGate<PistolsQueryBuilder>(() => (
+    new PistolsQueryBuilder()
+      .withClause(
+        new PistolsClauseBuilder().keys(
+          ["pistols-LordsReleaseEvent"],
+          [formatQueryValue(season_id)]
+        ).build()
+      )
+      .withEntityModels(
+        ["pistols-LordsReleaseEvent"]
+      )
+      .withLimit(1000)
+      .includeHashedKeys()
   ), [season_id])
 
   const { entities } = useSdkStateEventsGet({

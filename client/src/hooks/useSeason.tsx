@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
+import { useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { formatQueryValue, getEntityModel, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
-import { parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
+import { parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 
@@ -13,19 +14,17 @@ import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 //
 
 const useGetChallengesBySeasonQuery = (seasonId: BigNumberish) => {
-  const query = useMemo<PistolsQueryBuilder>(() => (
-    seasonId
-      ? new PistolsQueryBuilder()
-        .withClause(
-          new PistolsClauseBuilder().where(
-            "pistols-Challenge", "season_id", "Eq", formatQueryValue(seasonId),
-          ).build()
-        )
-        .withEntityModels([
-          "pistols-Challenge",
-        ])
-        .includeHashedKeys()
-      : null
+  const query = useMemoGate<PistolsQueryBuilder>(() => (
+    new PistolsQueryBuilder()
+      .withClause(
+        new PistolsClauseBuilder().where(
+          "pistols-Challenge", "season_id", "Eq", formatQueryValue(seasonId),
+        ).build()
+      )
+      .withEntityModels([
+        "pistols-Challenge",
+      ])
+      .includeHashedKeys()
   ), [seasonId])
   const { entities } = useSdkStateEntitiesGet({ query })
   const challenges = useMemo(() => entities.map(e => getEntityModel<models.Challenge>(e, 'Challenge')), [entities])

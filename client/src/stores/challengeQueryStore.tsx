@@ -11,7 +11,7 @@ import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
-import { useEntityModel, keysToEntityId } from '@underware/pistols-sdk/dojo'
+import { keysToEntityId, getEntityModel } from '@underware/pistols-sdk/dojo'
 import { useChallengeStore } from './challengeStore'
 
 //-----------------------------------------
@@ -191,7 +191,7 @@ export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNum
 
   let result = Object.values(entities)
     .map((e) => 
-      useEntityModel<models.Challenge>(e, 'Challenge')
+      getEntityModel<models.Challenge>(e, 'Challenge')
     )
     .filter((e) => 
       BigInt(e.duelist_id_a) === BigInt(duelistId) || BigInt(e.duelist_id_b) === BigInt(duelistId)
@@ -206,8 +206,6 @@ export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNum
     //   BigInt(e.table_id) === BigInt(seasonId)
     // ) //TODO filter by correct season!
 
-    console.log('result', result)
-    
   
   const stats = useMemo(() => {
     if (!duelistId || !seasonId) {

@@ -63,8 +63,7 @@ export const useSdkEntitiesGet = ({
 }: UseSdkEntitiesGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
-  // const limit = useMemo(() => query?.build().limit, [query])
-  const limit = 1000;
+  const limit = useMemo(() => query?.build().pagination.limit, [query])
 
   useEffect(() => {
     let _mounted = true
@@ -115,8 +114,7 @@ export const useSdkEntitiesSub = ({
 }: UseSdkEntitiesSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
-  // const limit = useMemo(() => query?.build().limit, [query])
-  const limit = 1000;
+  const limit = useMemo(() => query?.build().pagination.limit, [query])
 
   useEffect(() => {
     let _mounted = true
@@ -180,8 +178,7 @@ export const useSdkEventsGet = ({
 }: UseSdkEventsGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
-  // const limit = useMemo(() => query?.build().limit, [query])
-  const limit = 1000;
+  const limit = useMemo(() => query?.build().pagination.limit, [query])
 
   useEffect(() => {
     let _mounted = true
@@ -232,15 +229,14 @@ export const useSdkEventsSub = ({
 }: UseSdkEventsSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
-  // const limit = useMemo(() => query?.build().limit, [query])
-  const limit = 1000;
+  const limit = useMemo(() => query?.build().pagination.limit, [query])
 
   useEffect(() => {
     let _mounted = true
     let _unsubscribe: (() => void) = undefined;
     const _subscribe = async () => {
       setIsLoading(true)
-      // console.log("useSdkEventsSub() _______ query:", query);
+      console.log("useSdkEventsSub() _______ query:", query);
       await sdk.subscribeEventQuery({
         query,
         historical,
@@ -261,6 +257,7 @@ export const useSdkEventsSub = ({
         }
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
+          console.log("useSdkEventsSub() ====== initialEntities>>>>>", historical, initialEntities, _parseEvents(initialEntities, historical))
           setEntities(_parseEvents(initialEntities, historical))
           setIsLoading(false)
         }

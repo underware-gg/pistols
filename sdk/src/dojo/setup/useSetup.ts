@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { init, SDKConfig } from '@dojoengine/sdk'
 import { DojoProvider } from '@dojoengine/core'
-import { useAsyncMemo } from 'src/utils/hooks/useAsyncMemo'
+import { useMemoAsync } from 'src/utils/hooks/useMemoAsync'
 import { useMounted } from 'src/utils/hooks/useMounted'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
 import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
@@ -39,7 +39,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
   const {
     value: dojoProvider,
     isError: dojoProviderIsError,
-  } = useAsyncMemo<DojoProvider>(async () => {
+  } = useMemoAsync<DojoProvider>(async () => {
     if (!mounted) return undefined
     if (!manifest) return null
     console.log(`DojoProvider...`, selectedNetworkConfig.rpcUrl)
@@ -53,7 +53,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
   const {
     value: sdk,
     isError: sdkIsError,
-  } = useAsyncMemo(async () => {
+  } = useMemoAsync(async () => {
     if (!mounted) return undefined
     if (!dojoProvider) return undefined
     if (!starknetDomain) return undefined
@@ -82,7 +82,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
   const {
     value: contractCalls,
     isError: contractCallsIsError,
-  } = useAsyncMemo<ReturnType<typeof setupWorld>>(async () => {
+  } = useMemoAsync<ReturnType<typeof setupWorld>>(async () => {
     if (!mounted) return undefined
     if (!dojoProvider) return (dojoProvider as any) // undefined or null
     return await setupWorld(dojoProvider)

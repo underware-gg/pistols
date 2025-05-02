@@ -1,7 +1,5 @@
-import { useMemo } from 'react'
-import { formatQueryValue, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
-import { useMounted } from '@underware/pistols-sdk/utils/hooks'
-import { stringToFelt } from '@underware/pistols-sdk/utils/starknet'
+import { useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { useMemoGate, useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
@@ -15,7 +13,7 @@ const _limit = 1000
 //
 export function ChallengeStoreSync() {
   const { currentSeasonId } = useConfig()
-  const query = useMemo<PistolsQueryBuilder>(() => (
+  const query = useMemoGate<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
       .withClause(
         new PistolsClauseBuilder().compose().or([
@@ -23,13 +21,13 @@ export function ChallengeStoreSync() {
           new PistolsClauseBuilder().where(
             "pistols-Challenge",
             "season_id",
-            "Eq", formatQueryValue(currentSeasonId),
+            "Eq", currentSeasonId
           ),
           // Unfinished challenges
           new PistolsClauseBuilder().where(
             "pistols-Challenge",
             "season_id",
-            "Eq", formatQueryValue(0),
+            "Eq", 0
           ),
         ]).build()
       )

@@ -1,6 +1,6 @@
 import { useEffect, useState, DependencyList } from 'react'
 
-export function useAsyncMemo<T>(runner: () => Promise<T> | undefined | null, deps: DependencyList, initialValue?: T, errorValue?: T) {
+export function useMemoAsync<T>(runner: () => Promise<T> | undefined | null, deps: DependencyList, initialValue?: T, errorValue?: T) {
   const [value, setValue] = useState<T | undefined>(initialValue)
   const [isRunning, setIsRunning] = useState(false)
   const [isResolved, setIsResolved] = useState(false)
@@ -21,7 +21,7 @@ export function useAsyncMemo<T>(runner: () => Promise<T> | undefined | null, dep
           }
         })
         .catch((e) => {
-          console.warn(`useAsyncMemo() exception:`, e)
+          console.warn(`useMemoAsync() exception:`, e)
           if (_mounted) {
             setValue(errorValue)
             setIsRunning(false)

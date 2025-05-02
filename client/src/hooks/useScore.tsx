@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
+import { useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { getEntityModel, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols'
 import { formatQueryValue } from '@underware/pistols-sdk/dojo'
@@ -13,7 +14,7 @@ export const useGetCurrentSeasonScoreboard = (duelist_id: BigNumberish) => {
 }
 
 export const useGetSeasonScoreboard = (season_id: number, duelist_id: BigNumberish) => {
-  const query = useMemo<PistolsQueryBuilder>(() => (
+  const query = useMemoGate<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
       .withClause(
         new PistolsClauseBuilder().keys(

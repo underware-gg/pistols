@@ -3,9 +3,9 @@ import { Container, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAllSeasonIds, useLeaderboard, useSeason } from '../../stores/seasonStore'
 import { bigintToDecimal, bigintToHex, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal } from '@underware/pistols-sdk/utils'
-import { formatQueryValue, getEntityModel, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { getEntityModel, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { parseCustomEnum, parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
-import { useClientTimestamp, useMounted } from '@underware/pistols-sdk/utils/hooks'
+import { useClientTimestamp, useMemoGate, useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
 import { useLordsReleaseEvents } from '/src/hooks/useLordsReleaseEvents'
 import { useSeasonPool } from '/src/stores/bankStore'
@@ -166,11 +166,11 @@ function SeasonRow({
 
 function DuelsReport({ seasonId }: { seasonId: number }) {
   const mounted = useMounted()
-  const query = useMemo<PistolsQueryBuilder>(() => (
+  const query = useMemoGate<PistolsQueryBuilder>(() => (
     new PistolsQueryBuilder()
       .withClause(
         new PistolsClauseBuilder().where(
-          "pistols-Challenge", "season_id", "Eq", formatQueryValue(seasonId),
+          "pistols-Challenge", "season_id", "Eq", seasonId,
         ).build()
       )
       .withEntityModels(['pistols-Challenge', 'pistols-Round'])
