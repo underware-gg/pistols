@@ -97,7 +97,7 @@ pub mod game {
         duel_progress::{DuelProgress},
         round_state::{RoundState},
         typed_data::{CommitMoveMessage, CommitMoveMessageTrait},
-        rules::{Rules, RulesTrait ,RewardValues},
+        rules::{Rules, RulesTrait ,RewardValues, DuelBonus},
         timestamp::{PeriodTrait, TimestampTrait},
         cards::deck::{DeckTrait},
         cards::hand::{FinalBlow},
@@ -334,16 +334,9 @@ pub mod game {
             let progress: DuelProgress = game_loop(wrapped, @challenge.get_deck(), ref round);
 
             // update models, handle rewards, leaderboards and tournaments
-            self._finish_challenge(ref store, ref challenge, ref round, Option::Some(progress.winner));
+            self._finish_challenge(ref store, ref challenge, ref round, Option::Some(progress.winner), Option::Some(@progress));
             // store.set_challenge(@challenge); // _finish_challenge() does it
             // store.set_round(@round); // _finish_challenge() does it
-
-            // deliver trophies
-            if (challenge.winner.is_non_zero()) {
-                TrophyProgressTrait::duel_resolved(@store.world, @challenge, @round, @progress);
-            } else {
-                TrophyProgressTrait::duel_draw(@store.world, @challenge, @round, @progress);
-            }
         }
 
         fn clear_call_to_action(ref self: ContractState, duelist_id: u128) {
@@ -362,7 +355,7 @@ pub mod game {
                 assert(challenge.duel_type == DuelType::Tournament, Errors::INVALID_DUEL_TYPE);
                 let winner: u8 = if (challenge.address_b.is_zero()) {1} else if (challenge.address_a.is_zero()) {2} else {0};
                 round.final_blow = FinalBlow::Unpaired;
-                self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner));
+                self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner), Option::None);
             // } else if (store.world.caller_is_tournament_contract()) {
             //     // tournament collect previous round duel
             //     assert(challenge.duel_type == DuelType::Tournament, Errors::INVALID_DUEL_TYPE);
@@ -377,7 +370,7 @@ pub mod game {
             //         ) {2}
             //         else {0};
             //     round.final_blow = FinalBlow::Forsaken;
-            //     self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner));
+            //     self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner), Option::None);
             } else {
                 // outside call
                 assert(self.can_collect_duel(duel_id), Errors::CHALLENGE_IN_PROGRESS);
@@ -385,7 +378,7 @@ pub mod game {
                 if (challenge.state == ChallengeState::Awaiting) {
                     // if pending, set to expired...
                     challenge.state = ChallengeState::Expired;
-                    self._finish_challenge(ref store, ref challenge, ref round, Option::None);
+                    self._finish_challenge(ref store, ref challenge, ref round, Option::None, Option::None);
                 } else {
                     // some player timed out...
                     assert(self._finish_challenge_if_timed_out(ref store, ref challenge, ref round), Errors::IMPOSSIBLE_ERROR);
@@ -425,7 +418,7 @@ pub mod game {
             let challenge: Challenge = store.get_challenge(duel_id);
             if (challenge.is_tutorial()) {
                 (store.world.tutorial_dispatcher().get_duel_progress(duel_id))
-            } else if (challenge.state.is_finished()) {
+            } else if (challenge.state.spilled_blood()) {
                 let mut round: Round = store.get_round(duel_id);
                 let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
                 (game_loop(wrapped, @challenge.get_deck(), ref round))
@@ -477,8 +470,8 @@ pub mod game {
             let mut store: Store = StoreTrait::new(self.world_default());
             let rules: Rules = store.get_current_season_rules();
             let fame_balance: u128 = store.world.duelist_token_dispatcher().fame_balance(duelist_id);
-            let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false);
-            let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true);
+            let rewards_loss: RewardValues = rules.calc_rewards(fame_balance, lives_staked, false, @Default::default());
+            let rewards_win: RewardValues = rules.calc_rewards(fame_balance, lives_staked, true, @Default::default());
             let mut leaderboard: Leaderboard = store.get_leaderboard(season_id);
             let position: u8 = leaderboard.insert_score(duelist_id, rewards_win.points_scored);
             (RewardValues{
@@ -613,7 +606,7 @@ pub mod game {
                     else if (!timed_out_b) {2}
                     else {0};
                 round.final_blow = FinalBlow::Forsaken;
-                self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner));
+                self._finish_challenge(ref store, ref challenge, ref round, Option::Some(winner), Option::None);
                 
                 // timeout events
                 if (timed_out_a) {
@@ -631,7 +624,7 @@ pub mod game {
             }
         }
 
-        fn _finish_challenge(ref self: ContractState, ref store: Store, ref challenge: Challenge, ref round: Round, winner: Option<u8>) {
+        fn _finish_challenge(ref self: ContractState, ref store: Store, ref challenge: Challenge, ref round: Round, winner: Option<u8>, progress: Option<@DuelProgress>) {
             match winner {
                 Option::Some(winner) => {
                     challenge.winner = winner;
@@ -653,10 +646,22 @@ pub mod game {
             store.exit_challenge(challenge.duelist_id_a);
             store.exit_challenge(challenge.duelist_id_b);
             // distributions
-            if (challenge.state.is_finished()) {
+            if (challenge.state.spilled_blood()) {
+                // deliver trophies
+                let bonus: DuelBonus = match (progress) {
+                    Option::Some(progress) => {
+                        (if (challenge.winner != 0) {
+                            (TrophyProgressTrait::duel_resolved(@store.world, @challenge, @round, progress))
+                        } else {
+                            (TrophyProgressTrait::duel_draw(@store.world, @challenge, @round, progress))
+                        })
+                    },
+                    Option::None => {(Default::default())}
+                };
+                
                 // transfer rewards
                 let tournament_id: u64 = 0;
-                let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_protected_dispatcher().transfer_rewards(challenge, tournament_id);
+                let (mut rewards_a, mut rewards_b): (RewardValues, RewardValues) = store.world.duelist_token_protected_dispatcher().transfer_rewards(challenge, tournament_id, bonus);
 
                 // update leaderboards
                 self._update_scoreboards(ref store, @challenge, @round, ref rewards_a, ref rewards_b);

@@ -36,6 +36,19 @@ pub struct RewardValues {
     pub survived: bool,
 }
 
+#[derive(Copy, Drop, Serde, Default)]
+pub struct DuelBonus {
+    pub duelist_a: DuelistBonus,
+    pub duelist_b: DuelistBonus,
+}
+#[derive(Copy, Drop, Serde, Default)]
+pub struct DuelistBonus {
+    pub kill_pace: u8,
+    pub hit: bool,
+    pub dodge: bool,
+    pub seppukku: bool,
+}
+
 
 //---------------------------
 // Traits
@@ -78,7 +91,7 @@ pub impl RulesImpl of RulesTrait {
         (@result)
     }
     // end game calculations
-    fn calc_rewards(self: @Rules, fame_balance: u128, lives_staked: u8, is_winner: bool) -> RewardValues {
+    fn calc_rewards(self: @Rules, fame_balance: u128, lives_staked: u8, is_winner: bool, bonus: @DuelistBonus) -> RewardValues {
         (match self {
             Rules::Season => {
                 let mut result: RewardValues = Default::default();
@@ -95,11 +108,16 @@ pub impl RulesImpl of RulesTrait {
                     result.fame_gained *= lives_staked.into();
                     result.fools_gained *= lives_staked.into();
                     // calc score
-                    result.points_scored = 100;
+                    result.points_scored = 100 + ((*bonus.kill_pace).into() * 2);
                 } else {
                     result.fame_lost = one_life * lives_staked.into();
                     result.points_scored = 10;
                 }
+                // apply bonus
+                if (*bonus.kill_pace > 0) { result.points_scored += 10 }
+                else if (*bonus.hit) { result.points_scored += 5 }
+                if (*bonus.dodge) { result.points_scored += 20 }
+                if (*bonus.seppukku) { result.points_scored += 10 }
                 (result)
             },
             _ => Default::default()
@@ -199,6 +217,7 @@ mod unit {
     use super::{
         Rules, RulesTrait,
         RewardDistribution, RewardValues,
+        DuelistBonus,
     };
     use pistols::models::leaderboard::{LeaderboardTrait};
     use pistols::utils::misc::{WEI};
@@ -233,11 +252,11 @@ mod unit {
 
     #[test]
     fn test_calc_rewards() {
-        let winner_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true);
-        let winner_2_1: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 1, true);
-        let winner_1_2: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 2, true);
-        let winner_2_2: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 2, true);
-        let loser_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false);
+        let winner_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, @Default::default());
+        let winner_2_1: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 1, true, @Default::default());
+        let winner_1_2: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 2, true, @Default::default());
+        let winner_2_2: RewardValues = Rules::Season.calc_rewards(WEI(5_000).low, 2, true, @Default::default());
+        let loser_1_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @Default::default());
         // greater balances win less FAME
         assert_gt!(winner_1_1.fame_gained, winner_2_1.fame_gained, "balance_fame_gained");
         assert_gt!(winner_1_2.fame_gained, winner_2_2.fame_gained, "balance_fame_gained");
@@ -266,5 +285,59 @@ mod unit {
         // les points
         assert_gt!(loser_1_1.points_scored, 0, "loser_1_1.points_scored");
         assert_lt!(loser_1_1.points_scored, winner_1_1.points_scored, "loser_1_1.points_scored");
+    }
+
+    #[test]
+    fn test_calc_rewards_bonus() {
+        let bonus_paces_1 = DuelistBonus {
+            kill_pace: 1,
+            hit: false,
+            dodge: false,
+            seppukku: false,
+        };
+        let bonus_paces_10 = DuelistBonus {
+            kill_pace: 10,
+            hit: false,
+            dodge: false,
+            seppukku: false,
+        };
+        let bonus_paces_10_dodge = DuelistBonus {
+            kill_pace: 10,
+            hit: false,
+            dodge: true,
+            seppukku: false,
+        };
+        let winner_paces_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, @bonus_paces_1);
+        let winner_paces_10: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, @bonus_paces_10);
+        let winner_paces_10_dodge: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, @bonus_paces_10_dodge);
+        // always same points
+        assert_lt!(winner_paces_1.points_scored, winner_paces_10.points_scored, "paces_1 < paces_10");
+        assert_lt!(winner_paces_10.points_scored, winner_paces_10_dodge.points_scored, "paces_10 < paces_10_dodge");
+       // losers bonus
+        let bonus_hit = DuelistBonus {
+            kill_pace: 0,
+            hit: true,
+            dodge: false,
+            seppukku: false,
+        };
+        let bonus_seppukku = DuelistBonus {
+            kill_pace: 0,
+            hit: false,
+            dodge: false,
+            seppukku: true,
+        };
+        let bonus_dodge = DuelistBonus {
+            kill_pace: 0,
+            hit: false,
+            dodge: true,
+            seppukku: false,
+        };
+        let loser_default: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @Default::default());
+        let loser_hit: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @bonus_hit);
+        let loser_seppukku: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @bonus_seppukku);
+        let loser_dodge: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @bonus_dodge);
+        assert_lt!(loser_default.points_scored, loser_hit.points_scored, "LOSER: default < hit");
+        assert_lt!(loser_hit.points_scored, loser_seppukku.points_scored, "LOSER: hit < seppukku");
+        assert_lt!(loser_seppukku.points_scored, loser_dodge.points_scored, "LOSER: seppukku < bonus_dodge");
     }
 }

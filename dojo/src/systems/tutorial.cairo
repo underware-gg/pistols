@@ -221,7 +221,7 @@ pub mod tutorial {
         fn get_duel_progress(self: @ContractState, duel_id: u128) -> DuelProgress {
             let mut store: Store = StoreTrait::new(self.world_default());
             let challenge: Challenge = store.get_challenge(duel_id);
-            if (challenge.state.is_finished()) {
+            if (challenge.state.spilled_blood()) {
                 let level: TutorialLevel = challenge.into();
                 let mut round: Round = store.get_round(duel_id);
                 let (_, mocked): (Span<u8>, Span<MockedValue>) = level.make_moves(@round.moves_b.as_hand());

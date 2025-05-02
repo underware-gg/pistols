@@ -634,7 +634,7 @@ use pistols::models::{
 };
 use pistols::types::{
     duel_progress::{DuelProgress},
-    rules::{RewardValues},
+    rules::{RewardValues, DuelBonus, DuelistBonus},
     cards::hand::{
         DuelistHand,
         PacesCard,
@@ -647,12 +647,14 @@ use pistols::types::{
 #[generate_trait]
 pub impl TrophyProgressImpl of TrophyProgressTrait {
     // Duel has a winner
-    fn duel_resolved(world: @WorldStorage, challenge: @Challenge, round: @Round, progress: @DuelProgress) {
+    fn duel_resolved(world: @WorldStorage, challenge: @Challenge, round: @Round, progress: @DuelProgress) -> DuelBonus {
         let store: @ArcadeStore = @ArcadeStoreTrait::new(*world);
         let (hand_winner, hand_loser): (@DuelistHand, @DuelistHand) =
             if (*challenge.winner == 1) {(progress.hand_a, progress.hand_b)}
             else {(progress.hand_b, progress.hand_a)};
         let mut last_pace: @PacesCard = @PacesCard::Paces10;
+        let mut bonus_winner: DuelistBonus = Default::default();
+        let mut bonus_loser: DuelistBonus = Default::default();
         match (round.final_blow) {
             FinalBlow::Paces(pace) => {
                 last_pace = pace;
@@ -668,6 +670,7 @@ pub impl TrophyProgressImpl of TrophyProgressTrait {
                     Trophy::ShotAtTheBack.progress(store, @challenge.winner_address(), 1);
                     Trophy::ShotInTheBack.progress(store, @challenge.loser_address(), 1);
                 }
+                bonus_winner.kill_pace = (*pace).into();
             },
             FinalBlow::Blades(blade) => {
                 match (*blade) {
@@ -682,6 +685,7 @@ pub impl TrophyProgressImpl of TrophyProgressTrait {
                     },
                     BladesCard::Seppuku => {
                         Trophy::Seppuku.progress(store, @challenge.loser_address(), 1);
+                        bonus_loser.seppukku = true;
                     },
                     _ => {}
                 }
@@ -694,14 +698,20 @@ pub impl TrophyProgressImpl of TrophyProgressTrait {
             },
             _ => {}
         }
-        Self::_duel_misc(store, challenge, round, progress, last_pace);
+        let mut bonus = DuelBonus {
+            duelist_a: if (*challenge.winner == 1) {bonus_winner} else {bonus_loser},
+            duelist_b: if (*challenge.winner == 1) {bonus_loser} else {bonus_winner},
+        };
+        Self::_duel_misc(store, challenge, round, progress, last_pace, ref bonus);
+        (bonus)
     }
 
     // Finished Duel in a draw
-    fn duel_draw(world: @WorldStorage, challenge: @Challenge, round: @Round, progress: @DuelProgress) {
+    fn duel_draw(world: @WorldStorage, challenge: @Challenge, round: @Round, progress: @DuelProgress) -> DuelBonus {
         let store: @ArcadeStore = @ArcadeStoreTrait::new(*world);
+        let mut bonus: DuelBonus = Default::default();
         match (round.final_blow) {
-            FinalBlow::Paces(_pace) => {
+            FinalBlow::Paces(pace) => {
                 if (
                     progress.hand_a.card_fire == progress.hand_b.card_fire
                     && round.state_a.health.is_zero() // a died
@@ -709,12 +719,16 @@ pub impl TrophyProgressImpl of TrophyProgressTrait {
                 ) {
                     Trophy::BloodBath.progress(store, challenge.address_a, 1);
                     Trophy::BloodBath.progress(store, challenge.address_b, 1);
+                    bonus.duelist_a.kill_pace = (*pace).into();
+                    bonus.duelist_b.kill_pace = (*pace).into();
                 }
             },
             FinalBlow::Blades(blade) => {
                 if (*blade == BladesCard::Seppuku) {
                     Trophy::DoubleSeppuku.progress(store, challenge.address_a, 1);
                     Trophy::DoubleSeppuku.progress(store, challenge.address_b, 1);
+                    bonus.duelist_a.seppukku = true;
+                    bonus.duelist_b.seppukku = true;
                 } else {
                     Trophy::BladesClash.progress(store, challenge.address_a, 1);
                     Trophy::BladesClash.progress(store, challenge.address_b, 1);
@@ -722,16 +736,17 @@ pub impl TrophyProgressImpl of TrophyProgressTrait {
             },
             _ => {}
         }
-        Self::_duel_misc(store, challenge, round, progress, @PacesCard::Paces10);
+        Self::_duel_misc(store, challenge, round, progress, @PacesCard::Paces10, ref bonus);
+        (bonus)
     }
 
-    fn _duel_misc(store: @ArcadeStore, challenge: @Challenge, round: @Round, progress: @DuelProgress, last_pace: @PacesCard) {
+    fn _duel_misc(store: @ArcadeStore, challenge: @Challenge, round: @Round, progress: @DuelProgress, last_pace: @PacesCard, ref bonus: DuelBonus) {
         // test dodge for both players
-        Self::_duel_dodge(store, challenge.address_a, progress.hand_a, progress.hand_b, last_pace);
-        Self::_duel_dodge(store, challenge.address_b, progress.hand_b, progress.hand_a, last_pace);
+        Self::_duel_dodge(store, challenge.address_a, progress.hand_a, progress.hand_b, last_pace, ref bonus.duelist_a);
+        Self::_duel_dodge(store, challenge.address_b, progress.hand_b, progress.hand_a, last_pace, ref bonus.duelist_b);
         // test odds for both players
-        Self::_duel_odds(store, challenge.address_a, progress.hand_a, round.state_a, last_pace);
-        Self::_duel_odds(store, challenge.address_b, progress.hand_b, round.state_b, last_pace);
+        Self::_duel_odds(store, challenge.address_a, progress.hand_a, round.state_a, last_pace, ref bonus.duelist_a);
+        Self::_duel_odds(store, challenge.address_b, progress.hand_b, round.state_b, last_pace, ref bonus.duelist_b);
         // shot at same pace...
         if (
             progress.hand_a.card_fire == progress.hand_b.card_fire
@@ -742,14 +757,16 @@ pub impl TrophyProgressImpl of TrophyProgressTrait {
             Trophy::Blindfold.progress(store, challenge.address_b, 1);
         }
     }
-    fn _duel_dodge(store: @ArcadeStore, address: @ContractAddress, hand_a: @DuelistHand, hand_b: @DuelistHand, last_pace: @PacesCard) {
+    fn _duel_dodge(store: @ArcadeStore, address: @ContractAddress, hand_a: @DuelistHand, hand_b: @DuelistHand, last_pace: @PacesCard, ref bonus: DuelistBonus) {
         if (hand_a.card_dodge <= last_pace && hand_a.card_dodge == hand_b.card_fire) {
             Trophy::PerfectDodge.progress(store, address, 1);
+            bonus.dodge = true;
         }
     }
-    fn _duel_odds(store: @ArcadeStore, address: @ContractAddress, hand: @DuelistHand, state: @DuelistState, last_pace: @PacesCard) {
+    fn _duel_odds(store: @ArcadeStore, address: @ContractAddress, hand: @DuelistHand, state: @DuelistState, last_pace: @PacesCard, ref bonus: DuelistBonus) {
         if (hand.card_fire <= last_pace) {
             if (state.has_hit()) {
+                bonus.hit = true;
                 if (*state.chances <= 10) {
                     Trophy::BeatTheOdds.progress(store, address, 1);
                 }

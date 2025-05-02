@@ -2,7 +2,7 @@ use starknet::{ContractAddress};
 use dojo::world::IWorldDispatcher;
 use pistols::models::challenge::{Challenge};
 use pistols::types::duelist_profile::{DuelistProfile};
-use pistols::types::rules::{RewardValues};
+use pistols::types::rules::{RewardValues, DuelBonus};
 
 #[starknet::interface]
 pub trait IDuelistToken<TState> {
@@ -90,7 +90,7 @@ pub trait IDuelistTokenPublic<TState> {
 pub trait IDuelistTokenProtected<TState> {
     fn mint_duelists(ref self: TState, recipient: ContractAddress, profile_sample: DuelistProfile, quantity: usize, seed: felt252) -> Span<u128>;
     fn get_validated_active_duelist_id(ref self: TState, address: ContractAddress, duelist_id: u128, lives_staked: u8) -> u128;
-    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64) -> (RewardValues, RewardValues);
+    fn transfer_rewards(ref self: TState, challenge: Challenge, tournament_id: u64, bonus: DuelBonus) -> (RewardValues, RewardValues);
 }
 
 #[dojo::contract]
@@ -173,7 +173,7 @@ pub mod duelist_token {
         rules::{
             Rules, RulesTrait,
             PoolDistribution, PoolDistributionTrait,
-            RewardValues,
+            RewardValues, DuelBonus,
         },
         constants::{CONST, FAME, METADATA},
     };
@@ -395,6 +395,7 @@ pub mod duelist_token {
             ref self: ContractState,
             challenge: Challenge,
             tournament_id: u64,
+            bonus: DuelBonus,
         ) -> (RewardValues, RewardValues) {
             // validate caller (game contract only)
             let mut store: Store = StoreTrait::new(self.world_default());
@@ -418,8 +419,8 @@ pub mod duelist_token {
             let balance_b: u128 = self._fame_balance(@fame_dispatcher, challenge.duelist_id_b);
 
             // calculate fees
-            let mut rewards_a: RewardValues = rules.calc_rewards(balance_a, challenge.lives_staked, challenge.winner == 1);
-            let mut rewards_b: RewardValues = rules.calc_rewards(balance_b, challenge.lives_staked, challenge.winner == 2);
+            let mut rewards_a: RewardValues = rules.calc_rewards(balance_a, challenge.lives_staked, challenge.winner == 1, @bonus.duelist_a);
+            let mut rewards_b: RewardValues = rules.calc_rewards(balance_b, challenge.lives_staked, challenge.winner == 2, @bonus.duelist_b);
 
             // transfer gains
             let treasury_address: ContractAddress = store.get_config_treasury_address();

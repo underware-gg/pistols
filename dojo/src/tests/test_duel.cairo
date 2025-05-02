@@ -10,7 +10,7 @@ pub mod tests {
         player::{PlayerDuelistStack},
     };
     use pistols::types::{
-        cards::hand::{PacesCard, FinalBlow, DeckType},
+        cards::hand::{PacesCard, BladesCard, FinalBlow, DeckType},
         challenge_state::{ChallengeState},
         duel_progress::{DuelProgress, DuelStep},
         round_state::{RoundState},
@@ -37,10 +37,14 @@ pub mod tests {
     };
     use pistols::tests::prefabs::{prefabs,
         prefabs::{
-            PlayerMoves,
+            PlayerMoves, PlayerMovesTrait,
+            SALT_A, SALT_B, ENV_CARD_NEUTRAL
         },
     };
-    use pistols::systems::rng_mock::{IRngMockDispatcherTrait, MockedValue};
+    use pistols::systems::rng_mock::{
+        IRngMockDispatcherTrait,
+        MockedValue, MockedValueTrait,
+    };
 
     const MAX_LIVES: u8 = 3;
     const WIN_1: u8 = 1;
@@ -1257,5 +1261,65 @@ pub mod tests {
         _assert_timed_out(@sys, duel_id, 2); // 2 wins
     }
 
+
+    //-------------------------------
+    // score bonuses
+    //
+
+    #[test]
+    fn test_score_bonus_dodge_a() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_B, [2, 1, 0, BladesCard::Seppuku.into()].span());
+        let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_A, [1, 3, 0, BladesCard::Seppuku.into()].span());
+        sys.rng.mock_values([
+                MockedValueTrait::new('shoot_a', 99),
+                MockedValueTrait::new('shoot_b', 99),
+                MockedValueTrait::shuffled('env', [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()),
+            ].span()
+        );
+        tester::fund_duelists_pool(@sys, 2);
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
+        assert_eq!(challenge.winner, 0, "challenge.winner");
+        let score_a: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OWNER()).into());
+        let score_b: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OTHER()).into());
+        // A dodged, scored more points
+        assert_gt!(score_a.points, score_b.points, "score_a.points > score_b.points");
+    }
+
+    #[test]
+    fn test_score_bonus_dodge_b() {
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let moves_a: PlayerMoves = PlayerMovesTrait::new(SALT_A, [1, 3, 0, BladesCard::Seppuku.into()].span());
+        let moves_b: PlayerMoves = PlayerMovesTrait::new(SALT_B, [2, 1, 0, BladesCard::Seppuku.into()].span());
+        sys.rng.mock_values([
+                MockedValueTrait::new('shoot_a', 99),
+                MockedValueTrait::new('shoot_b', 99),
+                MockedValueTrait::shuffled('env', [ENV_CARD_NEUTRAL, ENV_CARD_NEUTRAL].span()),
+            ].span()
+        );
+        tester::fund_duelists_pool(@sys, 2);
+        let _duelist_id_a: u128 = *tester::execute_claim_starter_pack(@sys.pack, OWNER())[0];
+        let _duelist_id_b: u128 = *tester::execute_claim_starter_pack(@sys.pack, OTHER())[0];
+        let (_challenge, _round, duel_id) = prefabs::start_get_new_challenge(@sys, OWNER(), OTHER(), DuelType::Seasonal, 1);
+        tester::execute_commit_moves(@sys.game, OWNER(), duel_id, moves_a.hashed);
+        tester::execute_commit_moves(@sys.game, OTHER(), duel_id, moves_b.hashed);
+        tester::execute_reveal_moves(@sys.game, OWNER(), duel_id, moves_a.salt, moves_a.moves);
+        tester::execute_reveal_moves(@sys.game, OTHER(), duel_id, moves_b.salt, moves_b.moves);
+        let challenge: ChallengeValue = sys.store.get_challenge_value(duel_id);
+        assert_eq!(challenge.state, ChallengeState::Draw, "challenge.state");
+        assert_eq!(challenge.winner, 0, "challenge.winner");
+        let score_a: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OWNER()).into());
+        let score_b: SeasonScoreboard = sys.store.get_scoreboard(SEASON_ID_1, ID(OTHER()).into());
+        // B dodged, scored more points
+        assert_lt!(score_a.points, score_b.points, "score_a.points < score_b.points");
+    }
 
 }

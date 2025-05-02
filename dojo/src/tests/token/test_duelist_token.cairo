@@ -744,7 +744,7 @@ fn test_transfer_rewards_invalid_caller() {
     let challenge: Challenge = sys.store.get_challenge(duel_id);
     // let account: ContractAddress = tester::deploy_mock_account();
     // tester::impersonate(account);
-    _protected(@sys).transfer_rewards(challenge, 0);
+    _protected(@sys).transfer_rewards(challenge, 0, Default::default());
 }
 
 
