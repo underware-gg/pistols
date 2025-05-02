@@ -244,6 +244,9 @@ function TestImages() {
     is_memorized: false,
     duel_id: 0,
     pass_id: 0,
+    timestamp_registered: 0x1,
+    timestamp_active: 0x6814fbaa,
+    level: 2,
   }, {
     includeMimeType: true,
   })

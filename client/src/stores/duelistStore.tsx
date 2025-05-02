@@ -11,6 +11,7 @@ import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { useAccount } from '@starknet-react/core'
+import { useOwnerOfDuelist } from '../hooks/useTokenDuelists'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
 
@@ -262,13 +263,13 @@ export const useDuelistStack = (duelist_id: BigNumberish) => {
   } = useDuelistProfile(duelist)
 
   // get stack
-  const { address } = useAccount()
-  const stackEntityId = _useDuelistStackEntityId(address, profileType, profileId)
+  const { owner } = useOwnerOfDuelist(duelist_id)
+  const stackEntityId = _useDuelistStackEntityId(owner, profileType, profileId)
   const stack = useEntityModel<models.PlayerDuelistStack>(entities[stackEntityId], 'PlayerDuelistStack')
 
   const activeDuelistId = useMemo(() => (stack?.active_duelist_id ?? undefined), [stack])
   const stackedDuelistIds = useMemo(() => (stack?.stacked_ids ?? []).map(id => Number(id)), [stack])
-  const level = useMemo(() => (stack?.level ?? undefined), [stack])
+  const level = useMemo(() => Number(stack?.level ?? 0), [stack])
 
   return {
     activeDuelistId,

@@ -109,6 +109,9 @@ function Profiles({
         is_memorized: false,
         duel_id: (is_dueling) ? Math.floor(Math.random() * 1000) : 0,
         pass_id: (is_dueling) ? (Math.random() > 0.5 ? 100 : 0) : 0,
+        timestamp_registered: 0x1,
+        timestamp_active: 0x6814fbaa,
+        level: (1 + Math.floor(Math.random() * 4)),
       };
       return { profile, prop }
     })

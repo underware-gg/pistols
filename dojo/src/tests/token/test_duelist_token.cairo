@@ -134,6 +134,15 @@ fn test_token_uri() {
     };
     tester::set_SeasonScoreboard(ref sys.world, @scoreboard);
 
+    let stack = PlayerDuelistStack {
+        player_address: OWNER(),
+        duelist_profile: duelist.duelist_profile,
+        level: 2,
+        active_duelist_id: TOKEN_ID_1_1.low,
+        stacked_ids: array![TOKEN_ID_1_1.low, TOKEN_ID_1_2.low],
+    };
+    tester::set_PlayerDuelistStack(ref sys.world, @stack);
+
     let uri_1 = sys.duelists.token_uri(TOKEN_ID_1_1);
     let uri_2 = sys.duelists.token_uri(TOKEN_ID_1_2);
     

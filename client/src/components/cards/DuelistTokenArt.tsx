@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { duelist_token } from '@underware/pistols-sdk/pistols/tokens'
 import { DuelistTokenImage } from '@underware/pistols-sdk/pistols/components'
-import { useDuelist } from '/src/stores/duelistStore'
+import { useDuelist, useDuelistStack } from '/src/stores/duelistStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
@@ -17,10 +17,11 @@ export function DuelistTokenArt({
   className?: string,
   style?: React.CSSProperties,
 }) {
-  const { profileType, profilePic, currentDuelId, currentPassId, status } = useDuelist(duelistId)
+  const { profileType, profilePic, currentDuelId, currentPassId, status, timestampRegistered, timestampActive } = useDuelist(duelistId)
   const { balance_eth, lives, isLoading } = useDuelistFameBalance(duelistId)
   const { owner } = useOwnerOfDuelist(duelistId)
   const { name } = usePlayer(owner)
+  const { level } = useDuelistStack(duelistId)
 
   const props = useMemo<duelist_token.DuelistSvgProps>(() => ({
     duelist_id: duelistId,
@@ -39,6 +40,10 @@ export function DuelistTokenArt({
     is_memorized: false,
     duel_id: currentDuelId,
     pass_id: currentPassId,
+    timestamp_registered: timestampRegistered,
+    timestamp_active: timestampActive,
+    level,
+    //
     is_loading: !!isLoading,
   }), [name, profileType, profilePic, currentDuelId, currentPassId, balance_eth, lives, isLoading])
 

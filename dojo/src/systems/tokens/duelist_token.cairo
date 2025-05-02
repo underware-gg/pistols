@@ -702,6 +702,7 @@ pub mod duelist_token {
             let lives: u128 = (fame_balance / FAME::ONE_LIFE.low);
             let fame_dispatcher: IFameCoinDispatcher = self.world_default().fame_coin_dispatcher();
             let tokenbound_address = fame_dispatcher.address_of_token(starknet::get_contract_address(), token_id.low);
+            let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(owner, duelist.duelist_profile);
             // Image
             let image: ByteArray = UrlImpl::new(format!("{}/api/pistols/duelist_token/{}/image", base_uri.clone(), token_id))
                 .add("owner", format!("0x{:x}", owner), false)
@@ -718,8 +719,11 @@ pub mod duelist_token {
                 .add("lives", lives.to_string(), false)
                 .add("duel_id", format!("0x{:x}", assignment.duel_id), false)
                 .add("pass_id", format!("0x{:x}", assignment.pass_id), false)
-                .add("tokenbound_address", format!("0x{:x}", tokenbound_address), false)
+                .add("timestamp_registered", format!("{}", duelist.timestamps.registered), false)
+                .add("timestamp_active", format!("{}", duelist.timestamps.active), false)
+                .add("level", format!("{}", stack.level), false)
                 // .add("is_memorized", is_memorized.to_string(), false)
+                // .add("tokenbound_address", format!("0x{:x}", tokenbound_address), false)
                 .build();
             // Attributes
             let mut attributes: Array<Attribute> = array![
@@ -746,6 +750,10 @@ pub mod duelist_token {
                 Attribute {
                     key: "Alive",
                     value: if (fame_balance != 0) {"Alive"} else {"Dead"},
+                },
+                Attribute {
+                    key: "Level",
+                    value: stack.level.to_string(),
                 },
                 Attribute {
                     key: "Total Duels",

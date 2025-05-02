@@ -35,6 +35,9 @@ export type DuelistSvgProps = {
   is_memorized: boolean
   duel_id: BigNumberish
   pass_id: BigNumberish
+  timestamp_registered: number
+  timestamp_active: number
+  level: number
   // optional
   is_loading?: boolean
 }

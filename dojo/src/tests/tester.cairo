@@ -55,6 +55,7 @@ pub mod tester {
             SeasonScoreboard,
         },
         pool::{Pool, PoolType},
+        player::{PlayerDuelistStack},
         // tournament::{TournamentRound},
     };
 
@@ -856,6 +857,10 @@ pub mod tester {
     }
     #[inline(always)]
     pub fn set_SeasonScoreboard(ref world: WorldStorage, model: @SeasonScoreboard) {
+        world.write_model_test(model);
+    }
+    #[inline(always)]
+    pub fn set_PlayerDuelistStack(ref world: WorldStorage, model: @PlayerDuelistStack) {
         world.write_model_test(model);
     }
     #[inline(always)]
