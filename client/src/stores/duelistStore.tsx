@@ -5,7 +5,7 @@ import { useEntityId, useEntityIds, getEntityModel, useEntityModel, useDojoSyste
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
 import { isPositiveBigint, bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
-import { PistolsSchemaType, getCollectionDescription, getProfileDescription, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender } from '@underware/pistols-sdk/pistols'
+import { PistolsSchemaType, getCollectionDescription, getProfileDescription, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender, getProfileQuote } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
@@ -41,6 +41,7 @@ const useDuelistProfile = (duelist: models.Duelist) => {
   const profileGender: DuelistGender = useMemo(() => (getProfileGender(profileType, profileKey)), [profileType, profileKey])
   const duelistName: string = useMemo(() => (profileDescription.name), [profileDescription])
   const isNpc: boolean = useMemo(() => (profileCollection ? !profileCollection.is_playable : false), [profileCollection])
+  const quote: string = useMemo(() => (getProfileQuote(profileType, profileKey)), [profileType, profileKey])
 
   return {
     profileType,
@@ -51,6 +52,7 @@ const useDuelistProfile = (duelist: models.Duelist) => {
     profileGender,
     duelistName,
     isNpc,
+    quote,
   }
 }
 
@@ -104,6 +106,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     profileGender,
     duelistName,
     isNpc,
+    quote,
   } = useDuelistProfile(duelist)
 
   // for animations
@@ -142,6 +145,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     profileGender,
     characterType,
     isNpc,
+    quote,
     // dead duelists
     isDead,
     isAlive: !isDead,

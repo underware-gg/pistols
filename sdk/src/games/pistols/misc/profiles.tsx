@@ -95,6 +95,57 @@ export const isBotDuelistId = (duelistId: BigNumberish): boolean => {
 
 
 //------------------------------------------
+// quotes per profile (for animations)
+//
+const characterQuotes: Record<CharacterKey, string> = {
+  [CharacterKey.Unknown]: 'The quick brown fox jumps over the lazy dog',
+  [CharacterKey.Bartender]: 'The quick brown fox jumps over the lazy dog',
+  [CharacterKey.Drunkard]: 'The quick brown fox jumps over the lazy dog',
+  [CharacterKey.Devil]: 'The quick brown fox jumps over the lazy dog',
+  [CharacterKey.Player]: 'The quick brown fox jumps over the lazy dog',
+};
+const botQuotes: Record<BotKey, string> = {
+  [BotKey.Unknown]: 'The quick brown fox jumps over the lazy dog',
+  [BotKey.TinMan]: 'The quick brown fox jumps over the lazy dog',
+  [BotKey.Scarecrow]: 'The quick brown fox jumps over the lazy dog',
+  [BotKey.Leon]: 'The quick brown fox jumps over the lazy dog',
+};
+const genesisQuotes: Record<GenesisKey, string> = {
+  [GenesisKey.Unknown]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Duke]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Duella]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Jameson]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Pilgrim]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Jack]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Pops]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.SerWalker]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Bloberto]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Squiddo]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.SlenderDuck]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.LadyVengeance]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Breadman]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Brutus]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Pistolopher]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Secreto]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.ShadowMare]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Karaku]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Misty]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Kenzu]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.NynJah]: 'The quick brown fox jumps over the lazy dog',
+  [GenesisKey.Thrak]: 'The quick brown fox jumps over the lazy dog',
+};
+
+export const getProfileQuote = (profileType: DuelistProfile, profileKey: DuelistProfileKey): string => {
+  switch (profileType) {
+    case DuelistProfile.Character: return characterQuotes[profileKey as CharacterKey];
+    case DuelistProfile.Bot: return botQuotes[profileKey as BotKey];
+    case DuelistProfile.Genesis: return genesisQuotes[profileKey as GenesisKey];
+    default: return 'Male';
+  };
+}
+
+
+//------------------------------------------
 // gender per profile (for animations)
 //
 export type DuelistGender = 'Male' | 'Female' | 'Other';
