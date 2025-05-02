@@ -8,6 +8,7 @@ import {
   useSdkEventsGet,
   UseSdkEventsGetProps,
 } from 'src/dojo/hooks/useSdkEntities'
+import { bigintToDecimal } from 'src/exports/utils'
 import {
   PistolsEntity,
   PistolsSchemaType,
@@ -96,6 +97,7 @@ export const useSdkStateEventsGet = ({
 }: Omit<UseSdkEventsGetProps, 'setEntities'>): useSdkStateResult => {
   const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [query])
   const state = useStore(store, (state) => state)
+  const historical = useMemo(() => query?.build().historical, [query])
 
   const { isLoading } = useSdkEventsGet({
     query,
@@ -103,7 +105,12 @@ export const useSdkStateEventsGet = ({
     retryInterval,
     setEntities: (entities: PistolsEntity[]) => {
       console.log('useSdkStateEventsGet() GOT:', entities, query)
-      state.setEntities([...entities]);
+      if (historical) {
+        // historical events can have duplicated entityIds
+        state.setEntities(entities.map((e, i) => ({...e, entityId: bigintToDecimal(i) })));
+      } else {
+        state.setEntities([...entities]);
+      }
     },
   })
 

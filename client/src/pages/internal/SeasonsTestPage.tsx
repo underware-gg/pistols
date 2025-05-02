@@ -2,12 +2,12 @@ import React, { useMemo, useState } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAllSeasonIds, useLeaderboard, useSeason } from '../../stores/seasonStore'
-import { bigintToDecimal, bigintToHex, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal } from '@underware/pistols-sdk/utils'
+import { bigintToDecimal, bigintToHex, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { getEntityModel, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
-import { parseCustomEnum, parseEnumVariant, stringToFelt } from '@underware/pistols-sdk/utils/starknet'
+import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
 import { useClientTimestamp, useMemoGate, useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
-import { useLordsReleaseEvents } from '/src/hooks/useLordsReleaseEvents'
+import { useLordsReleaseEvents, LordsReleaseBill } from '/src/hooks/useLordsReleaseEvents'
 import { useSeasonPool } from '/src/stores/bankStore'
 import { useSeasonTotals } from '../../hooks/useSeason'
 import { useAccount } from '@starknet-react/core'
@@ -487,8 +487,10 @@ function LordsReleaseEvents({
     <Table celled color='green'>
       <Header fullWidth>
         <Row>
-          <HeaderCell><h3 className='Important'>Duel</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Account</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Username</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Duelist</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Duel</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Reason</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Pegged Lords</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Sponsored Lords</h3></HeaderCell>
@@ -498,21 +500,36 @@ function LordsReleaseEvents({
       </Header>
       <Body>
         {bills.map((bill, index) => (
-          <Row key={`${index}`}>
-            <Cell>Duel #{bigintToDecimal(bill.duelId)}</Cell>
-            <Cell>Duelist #{bigintToDecimal(bill.duelistId)}</Cell>
-            <Cell>{bill.reason}{bill.position ? ` (${bill.position})` : ''}</Cell>
-            <Cell>
-              <Balance fame wei={bill.peggedFame} />
-              {` = `}
-              <Balance lords wei={bill.peggedLords} decimals={6} />
-            </Cell>
-            <Cell><Balance lords wei={bill.sponsoredLords} decimals={6} /></Cell>
-            <Cell><AddressShort address={bill.recipient} /></Cell>
-            <Cell>{formatTimestampLocal(bill.timestamp)}</Cell>
-          </Row>
+          <BillRow key={`${index}`} bill={bill} />
         ))}
       </Body>
     </Table>
   )
 }
+
+function BillRow({
+  bill,
+}: {
+  bill: LordsReleaseBill,
+}) {
+  const { owner, isLoading: isLoadingOwner } = useOwnerOfDuelist(bill.duelistId)
+  const { username } = usePlayer(owner)
+  return (
+    <Row>
+      <Cell>{isLoadingOwner ? '...' : <AddressShort address={owner} />}</Cell>
+      <Cell className='Code'>{username || '...'}</Cell>
+      <Cell>Duelist #{bigintToDecimal(bill.duelistId)}</Cell>
+      <Cell>Duel #{bigintToDecimal(bill.duelId)}</Cell>
+      <Cell>{bill.reason}{bill.position ? ` (${bill.position})` : ''}</Cell>
+      <Cell>
+        <Balance fame wei={bill.peggedFame} />
+        {` = `}
+        <Balance lords wei={bill.peggedLords} decimals={6} />
+      </Cell>
+      <Cell><Balance lords wei={bill.sponsoredLords} decimals={6} /></Cell>
+      <Cell><AddressShort address={bill.recipient} /></Cell>
+      <Cell>{formatTimestampLocal(bill.timestamp)}</Cell>
+    </Row>
+  )
+}
+
