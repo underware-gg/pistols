@@ -24,6 +24,8 @@ import {
 // (duelist_profile.cairo)
 //
 
+export type DuelistProfileKey = GenesisProfile | CharacterProfile | BotProfile;
+
 export const makeProfilePicUrl = (profileId: number | null, profileType = DuelistProfile.Genesis) => {
   const collection = getCollectionDescription(profileType);
   return `/profiles/${collection.folder_name}/${('00' + profileId.toString()).slice(-2)}.jpg`;
@@ -33,7 +35,7 @@ export const getCollectionDescription = (profile: DuelistProfile): CollectionDes
   return COLLECTIONS[profile];
 }
 
-export const getProfileId = (profileType: DuelistProfile, profileValue: GenesisProfile | CharacterProfile | BotProfile): number => {
+export const getProfileId = (profileType: DuelistProfile, profileValue: DuelistProfileKey): number => {
   switch (profileType) {
     case DuelistProfile.Genesis: return getGenesisProfileValue(profileValue as GenesisProfile);
     case DuelistProfile.Character: return getCharacterProfileValue(profileValue as CharacterProfile);
@@ -42,7 +44,7 @@ export const getProfileId = (profileType: DuelistProfile, profileValue: GenesisP
   };
 }
 
-export const getProfileDescription = (profileType: DuelistProfile, profileValue: GenesisProfile | CharacterProfile | BotProfile | number): ProfileDescription => {
+export const getProfileDescription = (profileType: DuelistProfile, profileValue: DuelistProfileKey | number): ProfileDescription => {
   switch (profileType) {
     case DuelistProfile.Genesis: return GENESIS_PROFILES[typeof profileValue === 'number' ? getGenesisProfileFromValue(profileValue as number) : profileValue as GenesisProfile];
     case DuelistProfile.Character: return CHARACTER_PROFILES[typeof profileValue === 'number' ? getCharacterProfileFromValue(profileValue as number) : profileValue as CharacterProfile];
@@ -51,7 +53,7 @@ export const getProfileDescription = (profileType: DuelistProfile, profileValue:
   };
 }
 
-export const makeCharacterDuelistId = (profileType: DuelistProfile, profileValue: GenesisProfile | CharacterProfile | BotProfile): BigNumberish => {
+export const makeCharacterDuelistId = (profileType: DuelistProfile, profileValue: DuelistProfileKey): BigNumberish => {
   const _getId = (): number => {
     switch (profileType) {
       case DuelistProfile.Genesis: return getGenesisProfileValue(profileValue as GenesisProfile);
@@ -79,21 +81,21 @@ export const isBotDuelistId = (duelistId: BigNumberish): boolean => {
 //------------------------------------------
 // gender per profile (for animations)
 //
-type Gender = 'Male' | 'Female' | 'Other';
-const characterGenders: Record<CharacterProfile, Gender> = {
+export type DuelistGender = 'Male' | 'Female' | 'Other';
+const characterGenders: Record<CharacterProfile, DuelistGender> = {
   [CharacterProfile.Unknown]: 'Male',
   [CharacterProfile.Bartender]: 'Male',
   [CharacterProfile.Drunkard]: 'Male',
   [CharacterProfile.Devil]: 'Male',
   [CharacterProfile.Player]: 'Male',
 };
-const botGenders: Record<BotProfile, Gender> = {
+const botGenders: Record<BotProfile, DuelistGender> = {
   [BotProfile.Unknown]: 'Male',
   [BotProfile.TinMan]: 'Male',
   [BotProfile.Scarecrow]: 'Male',
   [BotProfile.Leon]: 'Male',
 };
-const genesisGenders: Record<GenesisProfile, Gender> = {
+const genesisGenders: Record<GenesisProfile, DuelistGender> = {
   [GenesisProfile.Unknown]: 'Male',
   [GenesisProfile.Duke]: 'Male',
   [GenesisProfile.Duella]: 'Female',
@@ -118,7 +120,7 @@ const genesisGenders: Record<GenesisProfile, Gender> = {
   [GenesisProfile.Thrak]: 'Male',
 };
 
-export const getProfileGender = (profileType: DuelistProfile, profileValue: GenesisProfile | CharacterProfile | BotProfile): Gender => {
+export const getProfileGender = (profileType: DuelistProfile, profileValue: DuelistProfileKey): DuelistGender => {
   switch (profileType) {
     case DuelistProfile.Character: return characterGenders[profileValue as CharacterProfile];
     case DuelistProfile.Bot: return botGenders[profileValue as BotProfile];

@@ -5,7 +5,7 @@ import { useEntityId, useEntityIds, getEntityModel, useEntityModel, useDojoSyste
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
 import { isPositiveBigint, bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
-import { PistolsSchemaType, getCollectionDescription, getProfileDescription, getProfileGender, getProfileId } from '@underware/pistols-sdk/pistols'
+import { PistolsSchemaType, getCollectionDescription, getProfileDescription, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
@@ -27,6 +27,30 @@ export const useAllDuelistsIds = () => {
   const duelistIds = useMemo(() => Object.values(entities).map(e => BigInt(e.models.pistols.Duelist.duelist_id)), [entities])
   return {
     duelistIds,
+  }
+}
+
+const useDuelistProfile = (duelist: models.Duelist) => {
+  const { variant, value } = useMemo(() => parseCustomEnum<constants.DuelistProfile, DuelistProfileKey>(duelist?.duelist_profile), [duelist])
+  const profileType: constants.DuelistProfile = variant;  // ex: GenesisProfile
+  const profileKey: DuelistProfileKey = value;            // ex: GenesisProfile::Duke
+
+  const profileCollection: constants.CollectionDescription = useMemo(() => getCollectionDescription(profileType), [profileType])
+  const profileDescription: constants.ProfileDescription = useMemo(() => getProfileDescription(profileType, profileKey), [profileType, profileKey])
+  const profileId: number = useMemo(() => getProfileId(profileType, profileKey), [profileType, profileKey])
+  const profileGender: DuelistGender = useMemo(() => (getProfileGender(profileType, profileKey)), [profileType, profileKey])
+  const duelistName: string = useMemo(() => (profileDescription.name), [profileDescription])
+  const isNpc: boolean = useMemo(() => (profileCollection ? !profileCollection.is_playable : false), [profileCollection])
+
+  return {
+    profileType,
+    profileKey,
+    profileCollection,
+    profileDescription,
+    profileId,
+    profileGender,
+    duelistName,
+    isNpc,
   }
 }
 
@@ -72,22 +96,22 @@ export const useDuelist = (duelist_id: BigNumberish) => {
 
   // profile
   const {
-    variant: profileType,
-    value: profileValue,
-  } = useMemo(() => parseCustomEnum<constants.DuelistProfile, constants.GenesisProfile | constants.CharacterProfile | constants.BotProfile>(duelist?.duelist_profile), [duelist])
-  const profileCollection = useMemo(() => getCollectionDescription(profileType), [profileType])
-  const profileDescription = useMemo(() => getProfileDescription(profileType, profileValue), [profileType, profileValue])
-  const profileId = useMemo(() => getProfileId(profileType, profileValue), [profileType, profileValue])
+    profileType,
+    profileKey,
+    profileCollection,
+    profileDescription,
+    profileId,
+    profileGender,
+    duelistName,
+    isNpc,
+  } = useDuelistProfile(duelist)
 
-  const name = useMemo(() => (profileDescription.name), [profileDescription])
-  const isNpc = useMemo(() => (profileCollection ? !profileCollection.is_playable : false), [profileCollection])
-
-  const gender = useMemo(() => (getProfileGender(profileType, profileValue)), [profileType, profileValue])
-  const characterType = useMemo(() => (gender == 'Female' ? CharacterType.FEMALE : CharacterType.MALE), [gender])
+  // for animations
+  const characterType = useMemo(() => (profileGender == 'Female' ? CharacterType.FEMALE : CharacterType.MALE), [profileGender])
 
   const nameAndId = useMemo(() => (
-    isNpc ? (name || 'NPC') : `${name || 'Duelist'} #${isValidDuelistId ? bigintToDecimal(duelistId) : '?'}`
-  ), [name, duelistId, isValidDuelistId, isNpc])
+    isNpc ? (duelistName || 'NPC') : `${duelistName || 'Duelist'} #${isValidDuelistId ? bigintToDecimal(duelistId) : '?'}`
+  ), [duelistName, duelistId, isValidDuelistId, isNpc])
   const duelistIdDisplay = useMemo(() => (
     isNpc ? 'NPC' : `Duelist #${isValidDuelistId ? bigintToDecimal(duelistId) : '?'}`
   ), [duelistId, isValidDuelistId, isNpc])
@@ -95,27 +119,29 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   return {
     isValidDuelistId,
     duelistId,
-    name,
-    nameAndId,
-    duelistIdDisplay,
     exists,
     timestampRegistered,
     timestampActive,
-    profileType,
-    profileValue,
-    profileCollection,
-    profileDescription,
-    profileId,
-    profilePic: profileId,
-    characterType,
-    gender,
-    isNpc,
+    // duelist activity
     currentDuelId,
     currentPassId,
     isInAction,
     isInactive,
     inactiveFameDripped,
     status,
+    // profile
+    name: duelistName,
+    nameAndId,
+    duelistIdDisplay,
+    profileType,
+    profileKey,
+    profileCollection,
+    profileDescription,
+    profileId,
+    profilePic: profileId,
+    profileGender,
+    characterType,
+    isNpc,
     // dead duelists
     isDead,
     isAlive: !isDead,
@@ -222,11 +248,19 @@ const _useDuelistStackEntityId = (address: BigNumberish, profileType: constants.
 
 export const useDuelistStack = (duelist_id: BigNumberish) => {
   const entities = useDuelistStore((state) => state.entities)
-  const { address } = useAccount()
-  const { profileType, profileId } = useDuelist(duelist_id)
-  const entityId = _useDuelistStackEntityId(address, profileType, profileId)
 
-  const stack = useEntityModel<models.PlayerDuelistStack>(entities[entityId], 'PlayerDuelistStack')
+  // get duelist profile
+  const duelistEntityId = useEntityId([duelist_id])
+  const duelist = useEntityModel<models.Duelist>(entities[duelistEntityId], 'Duelist')
+  const {
+    profileType,
+    profileId,
+  } = useDuelistProfile(duelist)
+
+  // get stack
+  const { address } = useAccount()
+  const stackEntityId = _useDuelistStackEntityId(address, profileType, profileId)
+  const stack = useEntityModel<models.PlayerDuelistStack>(entities[stackEntityId], 'PlayerDuelistStack')
 
   const activeDuelistId = useMemo(() => (stack?.active_duelist_id ?? undefined), [stack])
   const stackedDuelistIds = useMemo(() => (stack?.stacked_ids ?? []).map(id => Number(id)), [stack])
