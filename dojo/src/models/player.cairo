@@ -15,6 +15,8 @@ pub struct Player {
 #[derive(Copy, Drop, Serde, PartialEq, IntrospectPacked)]
 pub struct PlayerTimestamps {
     pub registered: u64,
+    pub claimed_gift: u64,
+    // generic flags
     pub claimed_starter_pack: bool,
 }
 

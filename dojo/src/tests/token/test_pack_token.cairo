@@ -115,6 +115,7 @@ fn test_token_uri() {
 
     tester::set_Pack(ref sys.world, @pack);
 
+    assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack");
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
     _purchase(@sys, OWNER());
 
@@ -147,6 +148,7 @@ fn test_claim_purchase() {
 
     let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
 
+    assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
     _assert_minted_count(@sys, 1, "total_supply 1");
     _assert_duelist_count(@sys, starter_pack_duelist_count.into(), "duelist_supply [starter_pack_duelist_count]");
@@ -184,6 +186,7 @@ fn test_claim_purchase() {
     assert_eq!(balance_owner, balance_owner_initial - price, "balance_owner");
     assert_eq!(balance_bank, balance_bank_initial + price, "balance_bank");
 
+    assert!(sys.pack.can_claim_starter_pack(OTHER()), "can_claim_starter_pack_OTHER");
     tester::execute_claim_starter_pack(@sys.pack, OTHER());
 }
 
@@ -191,8 +194,11 @@ fn test_claim_purchase() {
 #[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_claim_not_sponsored() {
     let mut sys: TestSystems = setup(0);
+    assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    assert!(sys.pack.can_claim_starter_pack(OTHER()), "can_claim_starter_pack_OTHER");
     tester::execute_claim_starter_pack(@sys.pack, OTHER());
+    assert!(sys.pack.can_claim_starter_pack(BUMMER()), "can_claim_starter_pack_BUMMER");
     tester::execute_claim_starter_pack(@sys.pack, BUMMER());
 }
 
@@ -200,16 +206,27 @@ fn test_claim_not_sponsored() {
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance_zero() {
     let mut sys: TestSystems = setup(0);
+    assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
     sys.pack.purchase(PackType::GenesisDuelists5x);
 }
 
 #[test]
-#[should_panic(expected: ('PACK: Already claimed', 'ENTRYPOINT_FAILED'))]
+#[should_panic(expected: ('PACK: Ineligible', 'ENTRYPOINT_FAILED'))]
 fn test_claim_twice() {
     let mut sys: TestSystems = setup(0);
+    assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    assert!(!sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Ineligible', 'ENTRYPOINT_FAILED'))]
+fn test_claim_gift() {
+    let mut sys: TestSystems = setup(0);
+    assert!(!sys.pack.can_claim_gift(OWNER()), "can_claim_gift_OWNER");
+    tester::execute_claim_gift(@sys.pack, OWNER());
 }
 
 #[test]

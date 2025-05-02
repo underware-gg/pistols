@@ -635,6 +635,12 @@ pub mod tester {
         _next_block();
         (token_ids)
     }
+    pub fn execute_claim_gift(system: @IPackTokenDispatcher, sender: ContractAddress) -> Span<u128> {
+        impersonate(sender);
+        let token_ids: Span<u128> = (*system).claim_gift();
+        _next_block();
+        (token_ids)
+    }
 
     // ::duelist_token
     pub fn execute_transfer_duelist(system: @IDuelistTokenDispatcher, sender: ContractAddress,

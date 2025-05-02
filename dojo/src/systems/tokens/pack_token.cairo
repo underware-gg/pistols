@@ -57,9 +57,11 @@ pub trait IPackToken<TState> {
 
     // IPackTokenPublic
     fn can_claim_starter_pack(self: @TState, recipient: ContractAddress) -> bool;
+    fn can_claim_gift(self: @TState, recipient: ContractAddress) -> bool;
     fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
     fn claim_starter_pack(ref self: TState) -> Span<u128>;
+    fn claim_gift(ref self: TState) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
 }
@@ -69,10 +71,12 @@ pub trait IPackToken<TState> {
 pub trait IPackTokenPublic<TState> {
     // view
     fn can_claim_starter_pack(self: @TState, recipient: ContractAddress) -> bool;
+    fn can_claim_gift(self: @TState, recipient: ContractAddress) -> bool;
     fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
     // write
     fn claim_starter_pack(ref self: TState) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
+    fn claim_gift(ref self: TState) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
     fn purchase(ref self: TState, pack_type: PackType) -> Pack; //@description: Purchase a closed pack
     fn open(ref self: TState, pack_id: u128) -> Span<u128>; //@description: Open a pack, mint its contents
 }
@@ -148,7 +152,7 @@ pub mod pack_token {
 
     pub mod Errors {
         pub const NOT_IMPLEMENTED: felt252      = 'PACK: Not implemented';
-        pub const ALREADY_CLAIMED: felt252      = 'PACK: Already claimed';
+        pub const INELIGIBLE: felt252           = 'PACK: Ineligible';
         pub const CLAIM_FIRST: felt252          = 'PACK: Claim duelists first';
         pub const NOT_FOR_SALE: felt252         = 'PACK: Not for sale';
         pub const ALREADY_OPENED: felt252       = 'PACK: Already opened';
@@ -191,18 +195,13 @@ pub mod pack_token {
     #[abi(embed_v0)]
     impl PackTokenPublicImpl of super::IPackTokenPublic<ContractState> {
 
+        //
+        // starter packs
+        //
         fn can_claim_starter_pack(self: @ContractState, recipient: ContractAddress) -> bool {
             let mut store: Store = StoreTrait::new(self.world_default());
             let player: Player = store.get_player(recipient);
             (!player.timestamps.claimed_starter_pack)
-        }
-
-        fn can_purchase(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> bool {
-            (!self.can_claim_starter_pack(recipient) && pack_type.can_purchase())
-        }
-
-        fn calc_mint_fee(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> u128 {
-            (pack_type.mint_fee())
         }
 
         fn claim_starter_pack(ref self: ContractState) -> Span<u128> {
@@ -210,7 +209,7 @@ pub mod pack_token {
 
             // validate
             let recipient: ContractAddress = starknet::get_caller_address();
-            assert(self.can_claim_starter_pack(recipient), Errors::ALREADY_CLAIMED);
+            assert(self.can_claim_starter_pack(recipient), Errors::INELIGIBLE);
 
             // mint
             let lords_amount: u128 = self.calc_mint_fee(recipient, PackType::StarterPack);
@@ -221,6 +220,32 @@ pub mod pack_token {
 
             // open immediately
             (self.open(pack.pack_id))
+        }
+
+        //
+        // gifts
+        //
+
+        fn can_claim_gift(self: @ContractState, recipient: ContractAddress) -> bool {
+            (false)
+        }
+
+        fn claim_gift(ref self: ContractState) -> Span<u128> {
+            let recipient: ContractAddress = starknet::get_caller_address();
+            assert(self.can_claim_gift(recipient), Errors::INELIGIBLE);
+            ([].span())
+        }
+
+        //
+        // purchases
+        //
+
+        fn can_purchase(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> bool {
+            (!self.can_claim_starter_pack(recipient) && pack_type.can_purchase())
+        }
+
+        fn calc_mint_fee(self: @ContractState, recipient: ContractAddress, pack_type: PackType) -> u128 {
+            (pack_type.mint_fee())
         }
 
         fn purchase(ref self: ContractState, pack_type: PackType) -> Pack {
