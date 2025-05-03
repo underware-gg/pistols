@@ -9,7 +9,6 @@ import {
   make_typed_data_PlayerBookmark,
   make_typed_data_PlayerOnline,
 } from './signed_messages'
-import * as constants from '../generated/constants'
 import pistols_manifest_dev from '../manifests/manifest_dev.json'
 import pistols_manifest_academy from '../manifests/manifest_academy.json'
 import pistols_manifest_staging from '../manifests/manifest_staging.json'
@@ -30,6 +29,15 @@ const manifests: Record<NetworkId, DojoManifest> = {
 }
 
 export const NAMESPACE = 'pistols'
+
+// starknet domain
+export const makeStarknetDomain = (networkId: NetworkId): StarknetDomain => ({
+  name: 'Underware_gg',
+  version: '1.0.0',
+  chainId: NETWORKS[networkId].chainId,
+  revision: '1',
+})
+
 
 //----------------------------------------
 // contract addresses
@@ -159,14 +167,6 @@ export const makePistolsPolicies = (networkId: NetworkId, mock: boolean, admin: 
     signedMessagePolicyDescriptions,
   );
 };
-
-// starknet domain
-export const makeStarknetDomain = (networkId: NetworkId): StarknetDomain => ({
-  name: constants.TYPED_DATA.NAME,
-  version: constants.TYPED_DATA.VERSION,
-  chainId: NETWORKS[networkId].chainId,
-  revision: '1',
-})
 
 
 export const makeDojoAppConfig = (networkId: NetworkId, controllerConnector: Connector | undefined): DojoAppConfig => {

@@ -10,13 +10,13 @@ export const INTERFACE_DESCRIPTIONS: any = {
     sponsor_duelists: 'Sponsor duelist starter packs with $LORDS',
     sponsor_season: 'Sponsor the current season with $LORDS',
     sponsor_tournament: 'Sponsor a tournament with $LORDS',
+    collect_season: 'Close the current season and start the next one',
   },
   // from: ../dojo/src/systems/game.cairo
   IGame: {
     commit_moves: 'Commit moves of a Duelist in a Duel',
     reveal_moves: 'Reveal moves of a Duelist in a Duel',
     collect_duel: 'Close expired duels',
-    collect_season: 'Close the current season and start the next one',
     clear_call_to_action: 'Clear the required action call for a duelist',
   },
   // from: ../dojo/src/systems/tokens/duel_token.cairo
@@ -1285,18 +1285,6 @@ export const TROPHY_GROUP: type_TROPHY_GROUP = {
   Honour: 'Honour',
   Duelist: 'Duelist',
   Tactics: 'Tactics',
-};
-
-// from: ../dojo/src/types/typed_data.cairo
-type type_TYPED_DATA = {
-  NAME: string, // cairo: felt252
-  VERSION: string, // cairo: felt252
-  COMMIT_MOVE_MESSAGE_TYPE_HASH: bigint, // cairo: felt252
-};
-export const TYPED_DATA: type_TYPED_DATA = {
-  NAME: 'Underware_gg',
-  VERSION: '1.0.0',
-  COMMIT_MOVE_MESSAGE_TYPE_HASH: BigInt('0x74fe0c723488214ab442c24761e9b32d30216def5e93d1c110375d993482ae'),
 };
 
 // from: ../dojo/src/utils/bitwise.cairo
