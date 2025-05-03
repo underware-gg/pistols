@@ -37,7 +37,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   
-  const { nameAndId: name, profilePic, profileType, isInAction, status } = useDuelist(props.duelistId)
+  const { nameAndId: name, profilePic, profileType, isInAction, totals } = useDuelist(props.duelistId)
   const {isAlive} = useDuelistFameBalance(props.duelistId)
 
   // const { activeDuelistId, stackedDuelistIds, level } = useDuelistStack(props.duelistId)
@@ -47,19 +47,19 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
   
   const archetypeImage = useMemo(() => {
-    let imageName = 'card_circular_' + (ArchetypeNames[status.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[status.archetype].toLowerCase())
+    let imageName = 'card_circular_' + (ArchetypeNames[totals.archetype].toLowerCase() == 'undefined' ? 'honourable' : ArchetypeNames[totals.archetype].toLowerCase())
     return '/textures/cards/' + imageName + '.png'
-  }, [status])
+  }, [totals])
 
   const winPercentage = useMemo(() => {
-    if (!status.total_duels || status.total_duels === 0) return '0%'
-    return `${((status.total_wins / status.total_duels) * 100).toFixed(1)}%`
-  }, [status.total_duels, status.total_wins])
+    if (!totals.total_duels || totals.total_duels === 0) return '0%'
+    return `${((totals.total_wins / totals.total_duels) * 100).toFixed(1)}%`
+  }, [totals.total_duels, totals.total_wins])
 
   const lossPercentage = useMemo(() => {
-    if (!status.total_duels || status.total_duels === 0) return '0%'
-    return `${(((status.total_losses + status.total_draws) / status.total_duels) * 100).toFixed(1)}%`
-  }, [status.total_duels, status.total_losses, status.total_draws])
+    if (!totals.total_duels || totals.total_duels === 0) return '0%'
+    return `${(((totals.total_losses + totals.total_draws) / totals.total_duels) * 100).toFixed(1)}%`
+  }, [totals.total_duels, totals.total_losses, totals.total_draws])
 
   const baseRef = useRef<InteractibleComponentHandle>(null);
 
@@ -212,11 +212,11 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                       </GridRow>
                       <GridRow>
                         <GridColumn className='Bold' textAlign='left' width={6}>Honour:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{status.honour}/10</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{totals.honour}/10</GridColumn>
                       </GridRow>
                       <GridRow>
                         <GridColumn className='Bold' textAlign='left' width={6}>Archetype:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{ArchetypeNames[status.archetype]}</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{ArchetypeNames[totals.archetype]}</GridColumn>
                       </GridRow>
                     </Grid>
                   </GridColumn>
@@ -225,15 +225,15 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                     <Grid className='NoMargin'>
                       <GridRow>
                         <GridColumn className='Bold' textAlign='left' width={6}>Duels:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{status.total_duels}</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{totals.total_duels}</GridColumn>
                       </GridRow>
                       <GridRow>
                         <GridColumn className='Bold' textAlign='left' width={6}>Wins:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{status.total_wins} ({winPercentage})</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{totals.total_wins} ({winPercentage})</GridColumn>
                       </GridRow>
                       <GridRow>
                         <GridColumn className='Bold' textAlign='left' width={6}>Losses:</GridColumn>
-                        <GridColumn textAlign='right' width={10}>{status.total_losses + status.total_draws} ({lossPercentage})</GridColumn>
+                        <GridColumn textAlign='right' width={10}>{totals.total_losses + totals.total_draws} ({lossPercentage})</GridColumn>
                       </GridRow>
                     </Grid>
                   </GridColumn>

@@ -85,7 +85,7 @@ pub mod game {
     use pistols::models::{
         player::{PlayerTrait},
         challenge::{Challenge, ChallengeTrait, DuelType, Round, RoundTrait, MovesTrait},
-        duelist::{Duelist, DuelistTrait, DuelistStatusTrait},
+        duelist::{DuelistTrait, Totals, TotalsTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
         season::{SeasonConfig, SeasonConfigTrait, SeasonScoreboard, SeasonScoreboardTrait},
@@ -699,15 +699,23 @@ pub mod game {
         }
 
         fn _update_scoreboards(self: @ContractState, ref store: Store, challenge: @Challenge, round: @Round, ref rewards_a: RewardValues, ref rewards_b: RewardValues) {
-            // update duelists status
-            let mut duelist_a: Duelist = store.get_duelist(*challenge.duelist_id_a);
-            let mut duelist_b: Duelist = store.get_duelist(*challenge.duelist_id_b);
-            DuelistStatusTrait::apply_challenge_results(ref duelist_a.status, ref duelist_b.status, @rewards_a, @rewards_b, *challenge.winner);
-            duelist_a.status.update_honour(*round.state_a.honour);
-            duelist_b.status.update_honour(*round.state_b.honour);
-            // save
-            store.set_duelist(@duelist_a);
-            store.set_duelist(@duelist_b);
+            // update player totals
+            let mut totals_player_a: Totals = store.get_player_totals(*challenge.address_a);
+            let mut totals_player_b: Totals = store.get_player_totals(*challenge.address_b);
+            TotalsTrait::apply_challenge_results(ref totals_player_a, ref totals_player_b, @rewards_a, @rewards_b, *challenge.winner);
+            totals_player_a.update_honour(*round.state_a.honour);
+            totals_player_b.update_honour(*round.state_b.honour);
+            store.set_player_totals(*challenge.address_a, totals_player_a);
+            store.set_player_totals(*challenge.address_b, totals_player_b);
+
+            // update duelist totals
+            let mut totals_duelist_a: Totals = store.get_duelist_totals(*challenge.duelist_id_a);
+            let mut totals_duelist_b: Totals = store.get_duelist_totals(*challenge.duelist_id_b);
+            TotalsTrait::apply_challenge_results(ref totals_duelist_a, ref totals_duelist_b, @rewards_a, @rewards_b, *challenge.winner);
+            totals_duelist_a.update_honour(*round.state_a.honour);
+            totals_duelist_b.update_honour(*round.state_b.honour);
+            store.set_duelist_totals(*challenge.duelist_id_a, totals_duelist_a);
+            store.set_duelist_totals(*challenge.duelist_id_b, totals_duelist_b);
 
             // per season score
             let mut scoreboard_a: SeasonScoreboard = store.get_scoreboard(*challenge.season_id, (*challenge).duelist_id_a.into());
@@ -730,8 +738,8 @@ pub mod game {
                 store.set_leaderboard(@leaderboard);
             }
 
-            TrophyProgressTrait::duelist_scored(@store.world, challenge.address_a, @duelist_a.status, @rewards_a, *challenge.winner == 1);
-            TrophyProgressTrait::duelist_scored(@store.world, challenge.address_b, @duelist_b.status, @rewards_b, *challenge.winner == 2);
+            TrophyProgressTrait::duelist_scored(@store.world, challenge.address_a, @totals_player_a, @totals_duelist_a, @rewards_a, *challenge.winner == 1);
+            TrophyProgressTrait::duelist_scored(@store.world, challenge.address_b, @totals_player_b, @totals_duelist_b, @rewards_b, *challenge.winner == 2);
         }
     }
 }

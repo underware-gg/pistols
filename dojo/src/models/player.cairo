@@ -1,4 +1,5 @@
 use starknet::{ContractAddress};
+use pistols::models::duelist::{Totals};
 pub use pistols::types::duelist_profile::{DuelistProfile};
 
 
@@ -9,6 +10,7 @@ pub struct Player {
     pub player_address: ContractAddress,   // controller wallet
     //-----------------------
     pub timestamps: PlayerTimestamps,
+    pub totals: Totals,
     // pub referral_code: felt252,
 }
 

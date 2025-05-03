@@ -17,7 +17,7 @@ export function DuelistTokenArt({
   className?: string,
   style?: React.CSSProperties,
 }) {
-  const { profileType, profilePic, currentDuelId, currentPassId, status, timestampRegistered, timestampActive } = useDuelist(duelistId)
+  const { profileType, profilePic, currentDuelId, currentPassId, totals, timestampRegistered, timestampActive } = useDuelist(duelistId)
   const { balance_eth, lives, isLoading } = useDuelistFameBalance(duelistId)
   const { owner } = useOwnerOfDuelist(duelistId)
   const { name } = usePlayer(owner)
@@ -27,14 +27,14 @@ export function DuelistTokenArt({
     duelist_id: duelistId,
     owner: bigintToHex(owner),
     username: name,
-    honour: status.honour,
-    archetype: status.archetype,
+    honour: totals.honour,
+    archetype: totals.archetype,
     profile_type: profileType,
     profile_id: profilePic,
-    total_duels: status.total_duels,
-    total_wins: status.total_wins,
-    total_losses: status.total_losses,
-    total_draws: status.total_draws,
+    total_duels: totals.total_duels,
+    total_wins: totals.total_wins,
+    total_losses: totals.total_losses,
+    total_draws: totals.total_draws,
     fame: Number(balance_eth),
     lives,
     is_memorized: false,

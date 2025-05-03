@@ -135,7 +135,7 @@ export interface Duelist {
 	duelist_id: BigNumberish;
 	duelist_profile: DuelistProfileEnum;
 	timestamps: DuelistTimestamps;
-	status: DuelistStatus;
+	status: Totals;
 }
 
 // Type definition for `pistols::models::duelist::DuelistAssignment` struct
@@ -170,8 +170,8 @@ export interface DuelistMemorialValue {
 	season_id: BigNumberish;
 }
 
-// Type definition for `pistols::models::duelist::DuelistStatus` struct
-export interface DuelistStatus {
+// Type definition for `pistols::models::duelist::Totals` struct
+export interface Totals {
 	total_duels: BigNumberish;
 	total_wins: BigNumberish;
 	total_losses: BigNumberish;
@@ -190,7 +190,7 @@ export interface DuelistTimestamps {
 export interface DuelistValue {
 	duelist_profile: DuelistProfileEnum;
 	timestamps: DuelistTimestamps;
-	status: DuelistStatus;
+	status: Totals;
 }
 
 // Type definition for `pistols::models::leaderboard::Leaderboard` struct
@@ -763,7 +763,7 @@ export interface SchemaType extends ISchemaType {
 		DuelistAssignmentValue: DuelistAssignmentValue,
 		DuelistMemorial: DuelistMemorial,
 		DuelistMemorialValue: DuelistMemorialValue,
-		DuelistStatus: DuelistStatus,
+		Totals: Totals,
 		DuelistTimestamps: DuelistTimestamps,
 		DuelistValue: DuelistValue,
 		Leaderboard: Leaderboard,
@@ -1023,7 +1023,7 @@ export const schema: SchemaType = {
 			player_address: "",
 			season_id: 0,
 		},
-		DuelistStatus: {
+		Totals: {
 			total_duels: 0,
 			total_wins: 0,
 			total_losses: 0,
@@ -1369,7 +1369,7 @@ export enum ModelsMapping {
 	DuelistAssignmentValue = 'pistols-DuelistAssignmentValue',
 	DuelistMemorial = 'pistols-DuelistMemorial',
 	DuelistMemorialValue = 'pistols-DuelistMemorialValue',
-	DuelistStatus = 'pistols-DuelistStatus',
+	Totals = 'pistols-Totals',
 	DuelistTimestamps = 'pistols-DuelistTimestamps',
 	DuelistValue = 'pistols-DuelistValue',
 	Leaderboard = 'pistols-Leaderboard',

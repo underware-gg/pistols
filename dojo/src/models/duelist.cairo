@@ -12,7 +12,7 @@ pub struct Duelist {
     //-----------------------
     pub duelist_profile: DuelistProfile,
     pub timestamps: DuelistTimestamps,
-    pub status: DuelistStatus,
+    pub totals: Totals,
 }
 
 #[derive(Copy, Drop, Serde, PartialEq, IntrospectPacked)]
@@ -22,7 +22,7 @@ pub struct DuelistTimestamps {
 }
 
 #[derive(Copy, Drop, Serde, Default, IntrospectPacked)]
-pub struct DuelistStatus {
+pub struct Totals {
     pub total_duels: u16,
     pub total_wins: u16,
     pub total_losses: u16,
@@ -124,48 +124,48 @@ impl ArchetypeDefault of Default<Archetype> {
 }
 
 #[generate_trait]
-pub impl DuelistStatusImpl of DuelistStatusTrait {
+pub impl TotalsImpl of TotalsTrait {
     #[inline(always)]
-    fn is_villain(self: @DuelistStatus) -> bool {
+    fn is_villain(self: @Totals) -> bool {
         (*self.total_duels > 0 && *self.honour < HONOUR::TRICKSTER_START)
     }
     #[inline(always)]
-    fn is_trickster(self: @DuelistStatus) -> bool {
+    fn is_trickster(self: @Totals) -> bool {
         (*self.honour >= HONOUR::TRICKSTER_START && *self.honour < HONOUR::LORD_START)
     }
     #[inline(always)]
-    fn is_lord(self: @DuelistStatus) -> bool {
+    fn is_lord(self: @Totals) -> bool {
         (*self.honour >= HONOUR::LORD_START)
     }
     #[inline(always)]
-    fn get_archetype(self: @DuelistStatus) -> Archetype {
+    fn get_archetype(self: @Totals) -> Archetype {
         if (self.is_lord()) {(Archetype::Honourable)}
         else if (self.is_trickster()) {(Archetype::Trickster)}
         else if (self.is_villain()) {(Archetype::Villainous)}
         else {(Archetype::Undefined)}
     }
     #[inline(always)]
-    fn get_honour(self: @DuelistStatus) -> ByteArray {
+    fn get_honour(self: @Totals) -> ByteArray {
         (format!("{}.{}", *self.honour / 10, *self.honour % 10))
     }
 
     // update duel totals only
-    fn apply_challenge_results(ref status_a: DuelistStatus, ref status_b: DuelistStatus, rewards_a: @RewardValues, rewards_b: @RewardValues, winner: u8) {
-        status_a.total_duels += 1;
-        status_b.total_duels += 1;
+    fn apply_challenge_results(ref totals_a: Totals, ref totals_b: Totals, rewards_a: @RewardValues, rewards_b: @RewardValues, winner: u8) {
+        totals_a.total_duels += 1;
+        totals_b.total_duels += 1;
         if (winner == 1) {
-            status_a.total_wins += 1;
-            status_b.total_losses += 1;
+            totals_a.total_wins += 1;
+            totals_b.total_losses += 1;
         } else if (winner == 2) {
-            status_b.total_wins += 1;
-            status_a.total_losses += 1;
+            totals_b.total_wins += 1;
+            totals_a.total_losses += 1;
         } else {
-            status_a.total_draws += 1;
-            status_b.total_draws += 1;
+            totals_a.total_draws += 1;
+            totals_b.total_draws += 1;
         }
     }
     // average honour has an extra decimal, eg: 100 = 10.0
-    fn update_honour(ref self: DuelistStatus, duel_honour: u8) {
+    fn update_honour(ref self: Totals, duel_honour: u8) {
         let log_pos: usize = ((self.total_duels.into() - 1) % 8) * 8;
         self.honour_log =
             (self.honour_log & ~BitwiseU64::shl(0xff, log_pos)) |
@@ -203,4 +203,54 @@ pub impl CauseOfDeathDebug of core::fmt::Debug<CauseOfDeath> {
         f.buffer.append(@result);
         Result::Ok(())
     }
+}
+
+
+
+//------------------------------------------------------
+// libs::utils tests
+//
+#[cfg(test)]
+mod unit {
+    use super::{Totals, TotalsTrait};
+
+    #[test]
+    fn test_totals_honour_lord() {
+        let mut totals: Totals = Default::default();
+        totals.total_duels = 1;
+        totals.update_honour(100);
+        assert!(totals.is_lord(), "is_lord()");
+    }
+
+    #[test]
+    fn test_totals_honour_log() {
+        let mut totals: Totals = Default::default();
+        let mut sum: u8 = 0;
+        let mut n: u8 = 1;
+        loop {
+            if (n > 8) { break; }
+            totals.total_duels += 1;
+            totals.update_honour(n);
+            sum += n;
+            assert_eq!(totals.honour, (sum / n), "sum_8__{}", n);
+            n += 1;
+        };
+        assert_eq!(totals.honour_log, 0x0807060504030201, "0x0807060504030201");
+        // loop totals
+        loop {
+            if (n > 16) { break; }
+            totals.total_duels += 1;
+            totals.update_honour(n);
+            sum -= n - 8;
+            sum += n;
+            assert_eq!(totals.honour, (sum / 8), "sum_16__{}", n);
+            n += 1;
+        };
+        assert_eq!(totals.honour_log, 0x100f0e0d0c0b0a09, "0x100f0e0d0c0b0a09");
+        // new loop
+        totals.total_duels += 1;
+        totals.update_honour(n);
+        assert_eq!(totals.honour_log, 0x100f0e0d0c0b0a11, "0x100f0e0d0c0b0a11");
+    }
+
 }

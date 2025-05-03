@@ -251,7 +251,7 @@ pub impl ProfileManagerImpl of ProfileManagerTrait {
                     registered: timestamp,
                     active: 0,
                 },
-                status: Default::default(),
+                totals: Default::default(),
             });
             i += 1;
         };

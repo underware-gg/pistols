@@ -222,7 +222,7 @@ export function SnapDuelist({
         gender: undefined,
         characterType: undefined,
         status: {
-          ...duelist.status,
+          ...duelist.totals,
           honourDisplay: undefined,
           honourAndTotal: undefined,
           archetypeName: undefined,

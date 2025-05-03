@@ -123,7 +123,7 @@ fn test_token_uri() {
             registered: 999999,
             active: 0,
         },
-        status: Default::default(),
+        totals: Default::default(),
     };
     tester::set_Duelist(ref sys.world, @duelist);
 

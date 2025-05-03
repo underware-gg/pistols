@@ -8,6 +8,7 @@ import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, shortAddre
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { SortDirection } from './queryParamsStore'
 import { PlayerColumn } from './queryParamsStore'
+import { useTotals } from './duelistStore'
 
 interface PlayerState {
   player_address: string
@@ -152,6 +153,7 @@ export const usePlayer = (address: BigNumberish) => {
   const timestampRegistered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
   const bookmarkedPlayers = useMemo(() => (player?.bookmarked_players ?? []), [player])
   const bookmarkedTokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
+  const totals = useTotals(player?.totals)
 
   // TODO... check if completed tutorial from Activity events
   const hasFinishedTutorial = false
@@ -178,6 +180,7 @@ export const usePlayer = (address: BigNumberish) => {
     bookmarkedDuelists,
     hasFinishedTutorial,
     isAvailable,
+    totals,
   }
 }
 

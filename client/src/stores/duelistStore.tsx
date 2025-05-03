@@ -95,7 +95,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const isDead = useMemo(() => Boolean(duelistMemorial), [duelistMemorial])
   const causeOfDeath = useMemo(() => parseEnumVariant<constants.CauseOfDeath>(duelistMemorial?.cause_of_death), [duelistMemorial])
 
-  const status = useDuelistStatus(duelist?.status)
+  const totals = useTotals(duelist?.totals)
 
   // profile
   const {
@@ -132,7 +132,7 @@ export const useDuelist = (duelist_id: BigNumberish) => {
     isInAction,
     isInactive,
     inactiveFameDripped,
-    status,
+    totals,
     // profile
     name: duelistName,
     nameAndId,
@@ -196,11 +196,11 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
 
 
 //----------------------
-// DuelistStatus
+// Totals
 //
 export const calcWinRatio = (total_duels: number, total_wins: number) => (total_duels > 0 ? (total_wins / total_duels) : null)
 
-export function useDuelistStatus(status: models.DuelistStatus | undefined) {
+export function useTotals(status: models.Totals | undefined) {
   const total_duels = useMemo(() => Number(status?.total_duels ?? 0), [status])
   const total_wins = useMemo(() => Number(status?.total_wins ?? 0), [status])
   const total_losses = useMemo(() => Number(status?.total_losses ?? 0), [status])

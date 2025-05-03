@@ -161,7 +161,7 @@ pub mod duelist_token {
             DuelistTimestamps,
             DuelistAssignmentValue,
             DuelistMemorial, CauseOfDeath, //DuelistMemorialValue,
-            DuelistStatusTrait,
+            TotalsTrait,
             Archetype,
         },
         player::{PlayerDuelistStack, PlayerDuelistStackTrait},
@@ -345,7 +345,7 @@ pub mod duelist_token {
                         registered: timestamp,
                         active: 0,
                     },
-                    status: Default::default(),
+                    totals: Default::default(),
                 };
                 store.set_duelist(@duelist);
 
@@ -697,7 +697,7 @@ pub mod duelist_token {
             let base_uri: ByteArray = self.erc721._base_uri();
             let owner: ContractAddress = self.owner_of(token_id);
             let assignment: DuelistAssignmentValue = store.get_duelist_challenge_value(token_id.low);
-            let archetype: Archetype = duelist.status.get_archetype();
+            let archetype: Archetype = duelist.totals.get_archetype();
             let duelist_image: ByteArray = duelist.duelist_profile.get_uri(base_uri.clone());
             let fame_balance: u128 = self._fame_balance(@store.world.fame_coin_dispatcher(), token_id.low);
             let lives: u128 = (fame_balance / FAME::ONE_LIFE.low);
@@ -708,14 +708,14 @@ pub mod duelist_token {
             let image: ByteArray = UrlImpl::new(format!("{}/api/pistols/duelist_token/{}/image", base_uri.clone(), token_id))
                 .add("owner", format!("0x{:x}", owner), false)
                 // .add("username", username, false)
-                .add("honour", duelist.status.get_honour(), false)
+                .add("honour", duelist.totals.get_honour(), false)
                 .add("archetype", archetype.into(), false)
                 .add("profile_type", duelist.duelist_profile.into(), false)
                 .add("profile_id", duelist.duelist_profile.profile_id().to_string(), false)
-                .add("total_duels", duelist.status.total_duels.to_string(), false)
-                .add("total_wins", duelist.status.total_wins.to_string(), false)
-                .add("total_losses", duelist.status.total_losses.to_string(), false)
-                .add("total_draws", duelist.status.total_draws.to_string(), false)
+                .add("total_duels", duelist.totals.total_duels.to_string(), false)
+                .add("total_wins", duelist.totals.total_wins.to_string(), false)
+                .add("total_losses", duelist.totals.total_losses.to_string(), false)
+                .add("total_draws", duelist.totals.total_draws.to_string(), false)
                 .add("fame", ETH(fame_balance.into()).low.to_string(), false)
                 .add("lives", lives.to_string(), false)
                 .add("duel_id", format!("0x{:x}", assignment.duel_id), false)
@@ -734,7 +734,7 @@ pub mod duelist_token {
                 },
                 Attribute {
                     key: "Honour",
-                    value: duelist.status.get_honour(),
+                    value: duelist.totals.get_honour(),
                 },
                 Attribute {
                     key: "Archetype",
@@ -758,21 +758,21 @@ pub mod duelist_token {
                 },
                 Attribute {
                     key: "Total Duels",
-                    value: duelist.status.total_duels.to_string(),
+                    value: duelist.totals.total_duels.to_string(),
                 },
             ];
-            if (duelist.status.total_duels != 0) {
+            if (duelist.totals.total_duels != 0) {
                 attributes.append(Attribute {
                     key: "Total Wins",
-                    value: duelist.status.total_wins.to_string(),
+                    value: duelist.totals.total_wins.to_string(),
                 });
                 attributes.append(Attribute {
                     key: "Total Losses",
-                    value: duelist.status.total_losses.to_string(),
+                    value: duelist.totals.total_losses.to_string(),
                 });
                 attributes.append(Attribute {
                     key: "Total Draws",
-                    value: duelist.status.total_draws.to_string(),
+                    value: duelist.totals.total_draws.to_string(),
                 });
             }
             // metadata

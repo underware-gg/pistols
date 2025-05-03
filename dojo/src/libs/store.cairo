@@ -32,6 +32,7 @@ pub use pistols::models::{
         Duelist, DuelistValue, DuelistTimestamps,
         DuelistAssignment, DuelistAssignmentValue,
         DuelistMemorial, DuelistMemorialValue,
+        Totals,
     },
     leaderboard::{
         Leaderboard, LeaderboardValue,
@@ -484,6 +485,14 @@ pub impl StoreImpl of StoreTrait {
         (self.world.read_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("duelist_profile")))
     }
     #[inline(always)]
+    fn get_duelist_totals(self: @Store, duelist_id: u128) -> Totals {
+        (self.world.read_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("totals")))
+    }
+    #[inline(always)]
+    fn get_player_totals(self: @Store, address: ContractAddress) -> Totals {
+        (self.world.read_member(Model::<Player>::ptr_from_keys(address), selector!("totals")))
+    }
+    #[inline(always)]
     fn get_active_duelist_id(self: @Store, address: ContractAddress, duelist_id: u128) -> u128 {
         (self.world.read_member(Model::<PlayerDuelistStack>::ptr_from_keys((
             address,
@@ -512,6 +521,14 @@ pub impl StoreImpl of StoreTrait {
         let mut timestamps: DuelistTimestamps = self.world.read_member(model_ptr, selector!("timestamps"));
         timestamps.active = current_timestamp;
         self.world.write_member(model_ptr, selector!("timestamps"), timestamps);
+    }
+    #[inline(always)]
+    fn set_duelist_totals(ref self: Store, duelist_id: u128, totals: Totals) {
+        self.world.write_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("totals"), totals);
+    }
+    #[inline(always)]
+    fn set_player_totals(ref self: Store, address: ContractAddress, totals: Totals) {
+        self.world.write_member(Model::<Player>::ptr_from_keys(address), selector!("totals"), totals);
     }
 
 

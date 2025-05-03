@@ -246,7 +246,8 @@ mod tests {
         let mut i: usize = 0;
         while (i < order.len()) {
             let position: LeaderboardPosition = *positions[i];
-            assert_eq!(position.duelist_id, *order[i], "leaderboard_position [{}]:[{}]", i, position.duelist_id);
+// println!("leaderboard[{}] = {}", i, position.points);
+            assert_eq!(position.duelist_id, *order[i], "leaderboard_position [{}]:[{}]", i, position.duelist_id, );
             let owner: ContractAddress = (*sys.duelists).owner_of(position.duelist_id.into());
             assert_eq!((*sys.lords).balance_of(owner), 0, "leaderboard_balance of [{}]:[{}] == 0", i, position.duelist_id);
             i += 1;
@@ -409,9 +410,10 @@ tester::print_pools(@sys, 1, "COLLECTED");
         _test_bank_draw(@sys, OTHER(), BUMMER(), 3, true);
         let order: Span<u128> = [
             ID(OTHER()), // fame 3000 + 250 - 3000 = 250 (DEAD) / score 100 + 10 = 110
+            ID(BUMMER()), // fame 3000 - 3000 - 0 (DEAD) / score 20?
             ID(OWNER()), // fame 3000 - 1000 = 2000 / score 10
-            ID(BUMMER()), // fame 3000 - 3000 - 0 (DEAD) / score 10
             ].span();
+
         _test_season_collect(@sys, order, true);
     }
 

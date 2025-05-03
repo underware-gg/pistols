@@ -630,7 +630,7 @@ use pistols::models::{
         Challenge, ChallengeTrait, Round,
         DuelistState, DuelistStateTrait,
     },
-    duelist::{DuelistStatus, DuelistStatusTrait},
+    duelist::{Totals, TotalsTrait},
 };
 use pistols::types::{
     duel_progress::{DuelProgress},
@@ -777,27 +777,30 @@ pub impl TrophyProgressImpl of TrophyProgressTrait {
     }
 
     // duelist trophies
-    fn duelist_scored(world: @WorldStorage, address: @ContractAddress, status: @DuelistStatus, rewards: @RewardValues, won: bool) {
+    fn duelist_scored(world: @WorldStorage, address: @ContractAddress, player_totals: @Totals, duelist_totals: @Totals, rewards: @RewardValues, won: bool) {
         let store: @ArcadeStore = @ArcadeStoreTrait::new(*world);
         if (!*rewards.survived) {
-            if ((*status).is_villain()) {
+            if ((*duelist_totals).is_villain()) {
                 Trophy::VillainousDeath.progress(store, address, 1);
-            } else if ((*status).is_trickster()) {
+            } else if ((*duelist_totals).is_trickster()) {
                 Trophy::TricksterDeath.progress(store, address, 1);
-            } else if ((*status).is_lord()) {
+            } else if ((*duelist_totals).is_lord()) {
                 Trophy::HonourableDeath.progress(store, address, 1);
             }
         }
         if (won) {
-            if (*status.total_wins == 1) {
+            if (*player_totals.total_duels == 1 && *player_totals.total_wins == 1) {
+                Trophy::BeginnersLuck.progress(store, address, 1);
+            }
+            if (*duelist_totals.total_wins == 1) {
                 Trophy::FirstBlood.progress(store, address, 1);
-            } else if (*status.total_wins == 2) {
+            } else if (*duelist_totals.total_wins == 2) {
                 Trophy::DoubleBarrel.progress(store, address, 1);
-            } else if (*status.total_wins == 3) {
+            } else if (*duelist_totals.total_wins == 3) {
                 Trophy::TrippleBarrel.progress(store, address, 1);
-            } else if (*status.total_wins == 4) {
+            } else if (*duelist_totals.total_wins == 4) {
                 Trophy::QuadrupleBarrel.progress(store, address, 1);
-            } else if (*status.total_wins == 5) {
+            } else if (*duelist_totals.total_wins == 5) {
                 Trophy::QuintupleBarrel.progress(store, address, 1);
             }
         }
