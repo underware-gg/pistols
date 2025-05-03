@@ -13,6 +13,7 @@ export PROFILE=
 export ARG_BINDINGS=
 export ARG_OFFLINE=
 export ARG_INSPECT=
+export ARG_VERBOSE=
 
 # parse arguments
 for arg in "$@"
@@ -29,9 +30,11 @@ do
   elif [[ $arg == "--offline" ]]; then
     export ARG_OFFLINE="--offline"
   elif [[ $arg == "--inspect" ]]; then
-    export ARG_INSPECT="true"
+    export ARG_INSPECT="--stats.by-tag"
   elif [[ $arg == "--bindings" ]]; then
     export ARG_BINDINGS="--typescript"
+  elif [[ $arg == "--verbose" ]]; then
+    export ARG_VERBOSE="-vvv"
   else
     echo "❌ Error: Invalid argument: $arg"
     exit 1

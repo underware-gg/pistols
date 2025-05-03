@@ -48,6 +48,10 @@ build-external-contracts = [
   # "tournaments::components::models::game::m_SettingsCounter",
 ]
 
+# debug contract size issues
+# needed by `sozo build --stats.by-tag`
+# casm = true
+
 
 #--------------------------
 # Dojo profiles declaration
