@@ -36,12 +36,12 @@ export default function DuelistProfile({
   const [lastDamage, setLastDamage] = useState(0)
   const [lastHitChance, setLastHitChance] = useState(0)
 
-  const { profilePic, profileType, name, nameAndId, status } = useDuelist(duelistId)
+  const { profilePic, profileType, name, nameAndId, totals } = useDuelist(duelistId)
 
   useEffect(() => {
     setArchetypeImage1('/images/' + 'duelist_female_' + ArchetypeNames[constants.Archetype.Villainous].toLowerCase() + '.png')
     setArchetypeImage2('/images/' + 'duelist_female_' + ArchetypeNames[constants.Archetype.Trickster].toLowerCase() + '.png')
-  }, [status])
+  }, [totals])
 
   useEffect(() => {
     const damageDelta = damage - lastDamage

@@ -32,7 +32,7 @@ export function ProfileBadge({
 }: {
   duelistId: BigNumberish
 }) {
-  const { status: {isVillainous, isTrickster, isHonourable } } = useDuelist(duelistId)
+  const { totals: { isVillainous, isTrickster, isHonourable } } = useDuelist(duelistId)
   if (isVillainous) return <>{EMOJIS.VILLAIN}</>
   if (isTrickster) return <>{EMOJIS.TRICKSTER}</>
   if (isHonourable) return <>{EMOJIS.LORD}</>
@@ -58,7 +58,7 @@ export function ProfileDescription({
   displayFameBalance?: boolean
   displayHonor?: boolean
 }) {
-  const { status: {total_wins, total_losses, total_draws, total_duels, honourAndTotal } } = useDuelist(duelistId)
+  const { totals: { total_wins, total_losses, total_draws, total_duels, honourAndTotal } } = useDuelist(duelistId)
 
   // if its a duelist...
   const { owner } = useOwnerOfDuelist(duelistId)

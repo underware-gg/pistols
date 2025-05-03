@@ -5,6 +5,7 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { models } from '@underware/pistols-sdk/pistols/gen'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { SortDirection } from './queryParamsStore'
 import { PlayerColumn } from './queryParamsStore'
@@ -16,6 +17,7 @@ interface PlayerState {
   username: string
   name: string
   isNew: boolean
+  totals: models.Totals
   // off-chain messages
   bookmarked_players: string[]
   bookmarked_tokens: {
@@ -46,6 +48,7 @@ const createStore = () => {
       username: shortAddress(event.player_address),
       name: shortAddress(event.player_address),
       isNew: true,
+      totals: event.totals,
       // off-chain messages
       bookmarked_players: [],
       bookmarked_tokens: {},
