@@ -2,15 +2,18 @@
 @import 'aspect';
 
 .SettingsModal {
+  min-width: aspect-width(40);
+  max-width: aspect-width(50);
+
   .SettingsCloseIcon {
     position: absolute;
-    width: 3rem;
-    height: 3rem;
+    width: aspect-width(3);
+    height: aspect-width(3);
     top: aspect-width(0.6);
     right: 0;
     color: $color-bright;
     cursor: pointer;
-    font-size: 0.8em;
+    font-size: aspect-width(0.8);
     transition: color 0.2s ease scale 0.2s ease;
 
     &:hover {
@@ -20,17 +23,70 @@
   }
 
   .SettingsSection {
-    margin-bottom: 2rem;
+    margin-bottom: aspect-width(2);
 
     h3 {
       color: $color-brightest;
-      margin-bottom: 1rem;
+      margin-bottom: aspect-width(1);
     }
   }
 
+  .QualitySelector {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: aspect-width(0.75);
+    padding:0  aspect-width(1);
+    margin-top: aspect-width(2);
+    gap: aspect-width(0.5);
+    
+    .QualityButton {
+      flex: 1;
+      text-transform: capitalize;
+      background-color: transparent;
+      color: $color-bright;
+      border: 1px solid rgba($color-bright, 0.3);
+      transition: all 0.2s ease;
+      padding: aspect-width(0.6) aspect-width(0.5);
+      font-size: aspect-width(0.95);
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: aspect-width(0.4);
+      
+      &.active {
+        background-color: rgba($color-important, 0.15);
+        color: $color-important;
+        border: 1px solid $color-important;
+        font-weight: bold;
+        box-shadow: 0 0 aspect-width(0.8) rgba($color-important, 0.25);
+      }
+      
+      &:hover:not(.active) {
+        background-color: rgba($color-bright, 0.1);
+        border-color: rgba($color-important, 0.5);
+        color: $color-brightest;
+      }
+      
+      .magic {
+        margin-left: aspect-width(0.4) !important;
+        color: inherit;
+      }
+    }
+  }
+  
+  .QualityDescription {
+    margin-bottom: aspect-width(1.5);
+    color: $color-bright;
+    font-size: aspect-width(0.85);
+    font-style: italic;
+    text-align: center;
+    min-height: aspect-width(1.5);
+  }
+
   .SettingsControl {
-    padding: aspect-width(1);
-    margin-bottom: 1.5rem;
+    padding:0  aspect-width(1);
+    margin-bottom: aspect-width(1.5);
 
     .ControlHeader {
       display: flex;
@@ -48,7 +104,7 @@
       background-color: transparent;
       color: $color-bright;
       border: 1px solid $color-bright;
-      padding: 0.5rem;
+      padding: aspect-width(0.5);
 
       &:hover {
         background-color: $color-bright;
@@ -74,13 +130,13 @@
   }
 
   .ReturnToTavern {
-    margin-bottom: 2rem;
+    margin-bottom: aspect-width(2);
   }
 
   .InfoSection {
     border-top: 1px solid $color-bright;
-    padding-top: 1rem;
-    margin-top: 2rem;
+    padding-top: aspect-width(1);
+    margin-top: aspect-width(2);
 
     .InfoButtons {
       display: flex;
@@ -88,20 +144,132 @@
       margin-left: auto;
 
       .spaced {
-        margin-left: aspect-width(2.5);
+        margin-left: aspect-width(5.2);
       }
 
       .ui.button {
         background-color: transparent;
         color: $color-bright;
         border: 1px solid $color-bright;
-        padding: 0.5rem 1rem;
+        padding: aspect-width(0.5) aspect-width(1);
 
         &:hover {
           background-color: $color-bright;
           color: $color-darkest;
         }
       }
+    }
+  }
+
+  .AboutSection {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: aspect-height(58);
+
+    .SplitSection {
+      display: flex;
+      width: 100%;
+      margin-bottom: aspect-width(2);
+      gap: aspect-width(1);
+
+      .SectionSide {
+        flex: 1;
+        
+        &.LeftSide {
+          padding-right: aspect-width(1);
+          border-right: 1px solid rgba($color-bright, 0.3);
+        }
+        
+        &.RightSide {
+          padding-left: aspect-width(1);
+        }
+
+        .SectionTitle {
+          font-size: aspect-width(1.1);
+          color: $color-bright;
+          margin-bottom: aspect-width(1);
+          font-weight: 500;
+          width: 100%;
+          text-align: center;
+        }
+
+        .LogoContainer {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: aspect-width(1);
+          width: 100%;
+          margin-bottom: aspect-width(1.5);
+        }
+
+        .CenteredLogo {
+          display: flex;
+          justify-content: center;
+          margin-bottom: aspect-width(1.5);
+        }
+
+        .SocialLinksGrid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          grid-gap: aspect-width(0.8);
+          margin-top: aspect-width(0.5);
+        }
+      }
+    }
+
+    .PartnerLogosContainer {
+      position: absolute;
+      bottom: aspect-width(3);
+      left: 0;
+      right: 0;
+      
+      .PartnerLogos {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: aspect-width(2.5);
+        padding: aspect-width(1.5);
+        background-color: rgba($color-important, 0.15);
+        border: 1px solid rgba($color-important, 0.15);
+        border-radius: aspect-width(0.6);
+        margin: 0 auto;
+        width: 85%;
+        max-width: aspect-width(50);
+        box-shadow: 0 aspect-width(0.2) aspect-width(0.8) rgba(0, 0, 0, 0.15);
+        
+        .PartnerLogo {
+          cursor: pointer;
+          
+          img {
+            width: aspect-width(3.6);
+            height: aspect-width(3.6);
+            object-fit: contain;
+            transition: transform 0.2s;
+            cursor: pointer;
+            filter: brightness(1.2) drop-shadow(0 0 aspect-width(0.8) rgba($color-important, 1));
+            
+            &.starknet {
+              width: aspect-width(4);
+            }
+            
+            &:hover {
+              transform: scale(1.1);
+            }
+          }
+        }
+      }
+    }
+    
+    .VersionNumber {
+      position: absolute;
+      bottom: aspect-width(1);
+      left: 0;
+      right: 0;
+      font-size: aspect-width(0.85);
+      color: rgba($color-bright, 0.8);
+      opacity: 0.7;
+      text-align: center;
     }
   }
 
@@ -112,8 +280,8 @@
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    background-color: rgba(239, 151, 88, 0.15);
-    color: #ef9758;
+    background-color: rgba($color-important, 0.15);
+    color: $color-important;
     font-size: aspect-width(1.2);
     transition: transform 0.2s, background-color 0.2s;
     cursor: pointer;
@@ -132,22 +300,22 @@
   .socialLinkStyle {
     display: flex;
     align-items: center;
-    gap: 12px;
-    color: #c8b6a8;
-    font-size: 1rem;
-    margin-bottom: 0.7rem;
+    gap: aspect-width(1.2);
+    color: $color-bright;
+    font-size: aspect-width(1);
+    margin-bottom: aspect-width(0.7);
     text-decoration: none;
     transition: color 0.2s, scale 0.2s;
     width: auto;
-    
+    cursor: pointer;
   }
 
   .socialLinkStyle:hover {
-    color: #ef9758;
+    color: $color-important;
     scale: 1.05;
     
     .socialIconStyle {
-      background-color: rgba(239, 151, 88, 0.25);
+      background-color: rgba($color-important, 0.25);
     }
   }
 } 

@@ -321,6 +321,22 @@ export function BackButton({
   );
 }
 
+export function HomeButton({
+  size = 'huge',
+}: {
+  size?: IconSizeProp
+}) {
+  const { dispatchSetScene } = usePistolsScene();
+
+  const handleClick = () => {
+    dispatchSetScene(SceneName.Tavern);
+  }
+
+  return (
+    <CustomIcon icon png raw name={'home'} onClick={() => handleClick()} size={size} disabled={false} />
+  );
+}
+
 export function ChallengeButton({
   challengedPlayerAddress,
   fillParent = false,

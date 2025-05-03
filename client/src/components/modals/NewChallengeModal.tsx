@@ -297,7 +297,10 @@ function _NewChallengeModal({
               <Col>
                 {canJoin &&
                   <ActionButton
+                    large
+                    fill
                     disabled={!args?.canSubmit || isSubmitting}
+                    important={args?.canSubmit}
                     label='Submit Challenge!'
                     onClick={() => _create_duel()}
                   />

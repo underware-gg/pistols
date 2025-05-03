@@ -1,0 +1,99 @@
+@import 'color';
+@import 'aspect';
+
+.AccountHeaderContainer {
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  display: flex;
+  align-items: center; 
+  border-radius: aspect-width(0.5);
+  padding: aspect-width(0.5);
+  margin: aspect-width(0.2);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+
+  .AccountInfo {
+    flex: 1;
+    text-align: right;
+    margin-right: aspect-width(1);
+    position: relative;
+    z-index: 2;
+  }
+  
+  .ProfileContainer {
+    position: relative;
+    z-index: 2;
+  }
+  
+  // Right purple highlight - more visible
+  .RightHighlight {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: aspect-width(8);
+    background: linear-gradient(90deg, rgba(120,60,190,0) 0%, rgba(120,60,190, 1) 100%);
+    z-index: 1;
+  }
+  
+  .Username {
+    margin: 0;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  }
+  
+  .Info {
+    margin: 0;
+    color: rgba(255,255,255,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: aspect-width(0.5);
+  }
+}
+
+.AccountHeaderContainer:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(40,40,40,0) 0%, rgba(40,40,40,0.75) 50%);
+  mask-image: linear-gradient(to right, transparent 0%, black 50%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 50%);
+}
+
+.AccountHeaderContainer:hover:before {
+  background: linear-gradient(to right, rgba(50,50,50,0) 0%, rgba(50,50,50,0.9) 50%);
+}
+
+.AccountHeaderContainer:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 1px solid transparent;
+  border-image-source: linear-gradient(to right, transparent, rgba(120,60,190,0.5));
+  border-image-slice: 1;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.AccountHeaderContainer:hover:after {
+  border-image-source: linear-gradient(to right, transparent, rgba(120,60,190,0.9));
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+
+.AccountHeaderContainer:hover {
+  transform: translateY(-2px);
+}

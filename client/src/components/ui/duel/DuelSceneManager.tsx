@@ -5,6 +5,7 @@ import { useGameplayContext } from '/src/hooks/GameplayContext';
 import { AnimationState } from '/src/three/game';
 import { usePistolsContext } from '/src/hooks/PistolsContext';
 import { DuelTutorialLevel } from '/src/data/tutorialConstants';
+import { useDuelistTokenSvg } from '/src/hooks/useDuelistTokenSvg';
 
 interface DuelSceneManagerProps {
   duelId: bigint;
@@ -27,12 +28,15 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
   const { tutorialOpener } = usePistolsContext();
   const context = useDuelContext();
 
+  const duelistASVG = useDuelistTokenSvg(context.leftDuelist.id);
+  const duelistBSVG = useDuelistTokenSvg(context.rightDuelist.id);
+
   // Immediate reset on component mount (only once)
   useEffect(() => {
     if (didImmediateReset.current) return;
     
     if (gameImpl) {
-      gameImpl.resetDuelScene(true);
+      gameImpl.resetDuelScene(true, true);
       didImmediateReset.current = true;
     }
   }, [gameImpl]);
@@ -45,7 +49,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
     didTutorialRun.current = false;
     
     if (gameImpl) {
-      gameImpl.resetDuelScene(true);
+      gameImpl.resetDuelScene(true, true);
     }
   }, [duelId, gameImpl]);
 
@@ -121,7 +125,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
             Number(context.leftDuelist.id), 
             Number(context.rightDuelist.id)
           );
-          gameImpl.resetDuelScene(false);
+          gameImpl.resetDuelScene(false, true);
           
           didSceneInit.current = true;
           
@@ -145,6 +149,14 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
     pollForData();
   }, [duelId, context, gameImpl, dispatchAnimated]);
 
+  useEffect(() => {
+    if (gameImpl) {
+      gameImpl.setOnLoadComplete(() => {
+        context.setDuelistsLoaded(true);
+      });
+    }
+  }, [gameImpl, context.setDuelistsLoaded]);
+
   // Update left duelist info when it changes
   useEffect(() => {
     if (!gameImpl || !didSceneInit.current || !context.leftDuelist.id) return;
@@ -158,7 +170,9 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
           'A',
           context.leftDuelist.name,
           context.leftDuelist.characterType,
-          context.leftDuelist.isCharacter ? context.leftDuelist.isPlayerCharacter : context.leftDuelist.isYou
+          context.leftDuelist.isCharacter ? context.leftDuelist.isPlayerCharacter : context.leftDuelist.isYou,
+          duelistASVG,
+          "/textures/cards/card_back.png"
         );
         didPlayersInitA.current = true;
       } catch (error) {
@@ -174,10 +188,10 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
   ]);
 
   useEffect(() => {
-    if (animated == AnimationState.Round1) {
+    if (context.duelInProgress) {
       gameImpl?.removeHighlightEffects();
     }
-  }, [animated, gameImpl]);
+  }, [gameImpl, context.duelInProgress]);
 
   // Update right duelist info when it changes
   useEffect(() => {
@@ -192,7 +206,9 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
           'B',
           context.rightDuelist.name,
           context.rightDuelist.characterType,
-          context.rightDuelist.isCharacter ? context.rightDuelist.isPlayerCharacter : context.rightDuelist.isYou
+          context.rightDuelist.isCharacter ? context.rightDuelist.isPlayerCharacter : context.rightDuelist.isYou,
+          duelistBSVG,
+          "/textures/cards/card_back.png"
         );
         didPlayersInitB.current = true;
       } catch (error) {

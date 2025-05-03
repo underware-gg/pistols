@@ -1131,7 +1131,7 @@ const PlayerStats = ({ duelistId, isLeft, damage, hitChance, visible }) => {
   )
 }
 
-const Cards = forwardRef<CardsHandle, { duelistIdA: BigNumberish, duelistIdB: BigNumberish, tutorialLevel: DuelTutorialLevel }>(({ duelistIdA, duelistIdB, tutorialLevel }, ref) => {
+const Cards = forwardRef<CardsHandle, { duelistIdA: BigNumberish, duelistIdB: BigNumberish, tutorialLevel: DuelTutorialLevel, speedFactor: number }>(({ duelistIdA, duelistIdB, tutorialLevel, speedFactor }, ref) => {
 
   const [isOverlayVisible, setIsOverlayVisible] = useState(false)
 
@@ -1166,11 +1166,11 @@ const Cards = forwardRef<CardsHandle, { duelistIdA: BigNumberish, duelistIdB: Bi
     }
   }
 
-  const drawNextCard = (speedFactor: number) => {
+  const drawNextCard = () => {
     environmentDeck.current?.drawCard(speedFactor)
   }
 
-  const revealCard = (duelist: string, type: DuelistCardType, speedFactor: number, alive?: boolean) => {
+  const revealCard = (duelist: string, type: DuelistCardType, alive?: boolean) => {
     if (duelist == 'A') {
       duelistAHand.current?.revealCard(type, speedFactor, alive)
     } else {
@@ -1281,8 +1281,8 @@ const Cards = forwardRef<CardsHandle, { duelistIdA: BigNumberish, duelistIdB: Bi
 export interface CardsHandle {
   resetCards: () => void
   spawnCards: (duelist: string, cards: DuelistHand) => void
-  drawNextCard: (speedFactor: number) => void
-  revealCard: (duelist: string, type: DuelistCardType, speedFactor: number, alive?: boolean) => void
+  drawNextCard: () => void
+  revealCard: (duelist: string, type: DuelistCardType, alive?: boolean) => void
   updateDuelistData(damageA: number, damageB: number, hitChanceA: number, hitChanceB: number)
   setAllEnvCards: (cardsData: CardData[]) => void
 }

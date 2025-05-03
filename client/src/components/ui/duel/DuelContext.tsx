@@ -34,6 +34,7 @@ export type DuelContextState = {
   duelId: bigint,
   isTutorial: boolean,
   isLoading: boolean,
+  areDuelistsLoaded: boolean,
   isSceneStarted: boolean,
   isDataSet: boolean,
   isPlaying: boolean,
@@ -73,6 +74,7 @@ export type DuelContextState = {
   setStatsRight: React.Dispatch<React.SetStateAction<DuelistState>>,
   clearActionFlag: () => void,
   resetStats: () => void,
+  setDuelistsLoaded: (value: boolean) => void,
 }
 
 const defaultState: DuelistState = {
@@ -124,6 +126,7 @@ const DuelContext = createContext<DuelContextState>({
   isLoading: true,
   isSceneStarted: false,
   isDataSet: false,
+  areDuelistsLoaded: false,
   isPlaying: true,
   duelInProgress: false,
   swapSides: undefined,
@@ -149,6 +152,7 @@ const DuelContext = createContext<DuelContextState>({
   setStatsRight: noop,
   clearActionFlag: noop,
   resetStats: noop,
+  setDuelistsLoaded: noop,
 });
 
 export const useDuelContext = () => useContext(DuelContext);
@@ -228,7 +232,7 @@ export const DuelContextProvider: React.FC<{
   const [duelInProgress, setDuelInProgress] = useState(false);
   const [statsLeft, setStatsLeft] = useState<DuelistState>(defaultState);
   const [statsRight, setStatsRight] = useState<DuelistState>(defaultState);
-
+  const [areDuelistsLoaded, setDuelistsLoaded] = useState(false);
   // Create safe setters that prevent unnecessary state updates
   const setSceneStarted = useCallback((value: boolean) => {
     // Never set to false once it's been true
@@ -372,6 +376,7 @@ export const DuelContextProvider: React.FC<{
     isLoading,
     isSceneStarted,
     isDataSet,
+    areDuelistsLoaded,
     isPlaying, 
     duelInProgress,
     swapSides,
@@ -408,15 +413,17 @@ export const DuelContextProvider: React.FC<{
     setStatsLeft,
     setStatsRight,
     clearActionFlag,
-    resetStats
+    resetStats,
+    setDuelistsLoaded,
   }), [
     duelId, isTutorial, isLoading, isSceneStarted, isDataSet, isPlaying, duelInProgress,
     swapSides, duelStage, completedStagesLeft, completedStagesRight,
     canAutoRevealLeft, canAutoRevealRight, leftDuelist, rightDuelist,
     statsLeft, statsRight, duelProgress, hasWithdrawnOrAbandoned,
     positionToAB, setSceneStarted, setDataSet, setDuelInProgress, setIsPlaying,
-    setStatsLeft, setStatsRight, clearActionFlag, resetStats,
-    timestampStart, timestampEnd, isAwaiting, isInProgress, isFinished, isExpired, isCanceled
+    setStatsLeft, setStatsRight, clearActionFlag, resetStats, setDuelistsLoaded,
+    timestampStart, timestampEnd, isAwaiting, isInProgress, isFinished, isExpired, isCanceled,
+    areDuelistsLoaded,
   ]);
 
   return (

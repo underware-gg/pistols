@@ -19,7 +19,7 @@ import { InteractibleLayeredScene } from './InteractibleLayeredScene'
 import ee from 'event-emitter'
 export var emitter = ee()
 
-import { TEXTURES, SPRITESHEETS, TextureName } from '/src/data/assets.tsx'
+import { TEXTURES, SPRITESHEETS, TextureName, AnimName } from '/src/data/assets.tsx'
 import { AudioName, AUDIO_ASSETS, AudioType } from '/src/data/audioAssets.tsx'
 import { SceneName } from '/src/data/assets.tsx'
 import { map } from '@underware/pistols-sdk/utils'
@@ -53,7 +53,7 @@ export const sizes = {
 export const cameraData = {
   fieldOfView: 13,
   nearPlane: 0.1,
-  farPlane: 150,
+  farPlane: 15000,
 }
 
 export const cameraDataStatic = {
@@ -65,12 +65,23 @@ export const cameraDataStatic = {
 const lightCameraShadowData = {
   intensity: 2,
   mapSize: 8192,
-  near: 30,
-  far: 80,
-  top: 30,
-  bottom: 10,
+  near: 45,
+  far: 70,
+  top: 20,
+  bottom: 12,
   left: -10,
   right: 10,
+}
+
+const grassLightCameraShadowData = {
+  intensity: 0,
+  mapSize: 1024,
+  near: 45,
+  far: 55,
+  top: 14,
+  bottom: 12,
+  left: -9,
+  right: 9,
 }
 
 /**
@@ -146,12 +157,15 @@ let _stats
 let _controls
 export let _gui: GUI
 
+let _sunLight: THREE.DirectionalLight
+
 let _grassTransforms
 let _growthPercentage = 0.0
 let _grass
 
 let _ground
 let _groundMirror
+let _groundMirrorChildItem
 let _skyVideo
 let _skyVideoTexture
 let _ladySecond
@@ -161,8 +175,6 @@ let _duelistManager: DuelistsManager
 // Duelist highlight effects
 let _duelistHighlightA: THREE.Group
 let _duelistHighlightB: THREE.Group
-let _duelistTentaclesA: THREE.Group
-let _duelistTentaclesB: THREE.Group
 
 let _scenes: Partial<Record<SceneName, THREE.Scene>> = {}
 export let _currentScene: THREE.Scene = null
@@ -185,6 +197,22 @@ const _tweens = {
   staticZoom: null,
   staticFade: null,
 }
+
+// Setup default quality settings - these will be used for initial instantiation
+let _currentQualitySettings = {
+  shadowMapEnabled: true,
+  shadowMapType: THREE.PCFSoftShadowMap as THREE.ShadowMapType,
+  shadowMapSize: 8192,
+  resolutionScale: 1.0,
+  grassCount: 32 * 5,
+  grassSegments: 6,
+  reflectionsEnabled: true,
+  reflectionQuality: 1.0,
+  waterEffects: true,
+  particlesMultiplier: 1.0,
+  sceneShiftEnabled: true,
+  blurEnabled: true
+};
 
 export async function init(canvas, framerate = 60, statsEnabled = false) {
 
@@ -312,12 +340,12 @@ function setRender(canvas) {
     powerPreference: 'low-power' //TODO requires more testing
   })
   _renderer.setSize(WIDTH, HEIGHT)
-  _renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3));
+  _renderer.setPixelRatio(window.devicePixelRatio * _currentQualitySettings.resolutionScale);
   // _renderer.outputColorSpace = THREE.LinearSRGBColorSpace
   // _renderer.autoClear = false
   // _renderer.autoClearColor = false
-  _renderer.shadowMap.enabled = true
-  _renderer.shadowMap.type = THREE.PCFSoftShadowMap
+  _renderer.shadowMap.enabled = _currentQualitySettings.shadowMapEnabled
+  _renderer.shadowMap.type = _currentQualitySettings.shadowMapType
 
   // _renderer.debug.checkShaderErrors = false;
 }
@@ -350,7 +378,7 @@ function onWindowResize() {
   sizes.canvasWidth = canvasWidth
   sizes.canvasHeight = canvasHeight
   _renderer.setSize(canvasWidth, canvasHeight)
-  _renderer.setPixelRatio(Math.min(window.devicePixelRatio, 3))
+  _renderer.setPixelRatio(window.devicePixelRatio * _currentQualitySettings.resolutionScale);
   console.log(`Canvas size:`, Math.ceil(canvasWidth), Math.ceil(canvasHeight), `${Math.ceil((canvasHeight / 1080) * 100)}%`)
 
   // setup cam
@@ -370,254 +398,15 @@ function setGUI() {
 function createDuelistHighlight() {
   const playerColor = 0xff3333;
   const accentColor = 0xff6666;
-  
-  // Create tentacles
-  // Tentacle configuration parameters
-  const tentacleConfig = {
-    baseThickness: 0.14,        // Base thickness of the tentacle
-    tipTaperFactor: 2.5,        // Controls how much the tentacle tapers (higher = more tapering)
-    length: 2.2,                // Base length of tentacles
-    lengthVariation: 0.2,       // Variation in length (±20%)
-    segments: 15,               // Number of segments for tentacle curve
-    radialSegments: 8,          // Number of segments around the circumference
-    curvatureStrength: 0.15,    // How much the tentacle curves (x-direction)
-    secondaryCurve: 0.12,       // Secondary curve strength (z-direction)
-    wiggleSpeed: 3.5,           // Base speed of wiggle animation
-    wiggleSpeedVariation: 0.5,  // Variation in wiggle speed
-    wiggleAmount: 0.4,          // Base amount of wiggle
-    wiggleAmountVariation: 0.2, // Variation in wiggle amount
-    positionVariation: 0.08,    // Position variation as fraction of radius (±8%)
-    angleVariation: 0.03,       // Angle variation as fraction of circle (±3%)
-    rotationVariation: 0.15     // Random rotation in other axes (±0.15 radians)
-  };
-  
-  // Create tentacle material
-  const tentacleMaterial = new THREE.MeshStandardMaterial({
-    color: playerColor,
-    emissive: playerColor,
-    emissiveIntensity: 0.5,
-    transparent: true,
-    opacity: 0,
-    roughness: 0.3,
-    metalness: 0.2,
-  });
-  // Create tentacle group
-  const tentacleGroup = new THREE.Group();
-  
-  // Function to create a tentacle with dynamic curve
-  // const createTentacle = (length, segments) => {
-  //   // Create initial curve points - these will be updated during animation
-  //   const curvePoints = [];
-  //   for (let j = 0; j <= segments; j++) {
-  //     const t = j / segments;
-  //     curvePoints.push(new THREE.Vector3(0, length * t, 0));
-  //   }
-    
-  //   // Create a curve that will be updated
-  //   const curve = new THREE.CatmullRomCurve3(curvePoints);
-    
-  //   // Create a tube with initial curve
-  //   const tubeGeometry = new THREE.TubeGeometry(
-  //     curve,
-  //     segments * 3, // More segments for smoother curve
-  //     tentacleConfig.baseThickness, // Starting radius
-  //     tentacleConfig.radialSegments, // Radial segments
-  //     false // Not closed
-  //   );
-    
-  //   // Apply initial tapering
-  //   const positionAttribute = tubeGeometry.getAttribute('position');
-  //   const vertexCount = positionAttribute.count;
-    
-  //   // Store original vertex positions relative to their segment centers
-  //   // This will help us update the geometry correctly during animation
-  //   const originalRelativePositions = [];
-    
-  //   for (let i = 0; i < vertexCount; i++) {
-  //     const tubularIndex = Math.floor(i / (tentacleConfig.radialSegments + 1));
-  //     const t = tubularIndex / (segments * 3);
-      
-  //     // Non-linear taper for more realistic tentacle shape
-  //     const radius = tentacleConfig.baseThickness * Math.pow(1 - t, tentacleConfig.tipTaperFactor);
-  //     const scale = radius / tentacleConfig.baseThickness;
-      
-  //     // Get current position
-  //     const x = positionAttribute.getX(i);
-  //     const y = positionAttribute.getY(i);
-  //     const z = positionAttribute.getZ(i);
-      
-  //     // Get position relative to center of current ring
-  //     const ringCenter = curve.getPointAt(Math.min(t, 1));
-  //     const relX = (x - ringCenter.x) * scale;
-  //     const relY = (y - ringCenter.y) * scale;
-  //     const relZ = (z - ringCenter.z) * scale;
-      
-  //     // Store the relative position and the tubular index for later use
-  //     originalRelativePositions.push({
-  //       relX, relY, relZ, 
-  //       tubularIndex,
-  //       t: Math.min(t, 1)
-  //     });
-      
-  //     // Apply initial taper
-  //     positionAttribute.setXYZ(
-  //       i,
-  //       ringCenter.x + relX,
-  //       ringCenter.y + relY,
-  //       ringCenter.z + relZ
-  //     );
-  //   }
-    
-  //   // Store the data needed for animation
-  //   tubeGeometry.userData = {
-  //     curve,
-  //     curvePoints,
-  //     originalRelativePositions,
-  //     segments
-  //   };
-    
-  //   positionAttribute.needsUpdate = true;
-  //   tubeGeometry.computeVertexNormals();
-    
-  //   return new THREE.Mesh(tubeGeometry, tentacleMaterial.clone());
-  // };
-  
-  // // Function to place tentacles in a circle
-  // const createTentacleCircle = (radius, count) => {
-  //   const tentacles = [];
-    
-  //   for (let i = 0; i < count; i++) {
-  //     const angle = (i / count) * Math.PI * 2;
-      
-  //     // Add variation to length (±20%)
-  //     const lengthVariation = 1 + (Math.random() * tentacleConfig.lengthVariation * 2 - tentacleConfig.lengthVariation);
-  //     const tentacleLength = tentacleConfig.length * lengthVariation;
-      
-  //     // Create a single tentacle
-  //     const tentacle = createTentacle(tentacleLength, tentacleConfig.segments);
-  //     tentacle.name = 'tentacle';
-      
-  //     // Add position variation (±8% of radius)
-  //     const radiusVariation = radius * (1 + (Math.random() * tentacleConfig.positionVariation * 2 - tentacleConfig.positionVariation));
-      
-  //     // Add angle variation (±3% of a full circle)
-  //     const angleVariation = angle + (Math.random() * tentacleConfig.angleVariation * 2 - tentacleConfig.angleVariation);
-      
-  //     // Position the tentacle in a circle with variation
-  //     tentacle.position.x = Math.cos(angleVariation) * radiusVariation;
-  //     tentacle.position.z = Math.sin(angleVariation) * radiusVariation;
-  //     tentacle.position.y = 0; // Start at ground level
-      
-  //     // Rotate to point outward from center
-  //     tentacle.rotation.y = Math.PI * 2 - angleVariation;
-      
-  //     // Add random rotation in other axes for more organic look
-  //     tentacle.rotation.x = (Math.random() * tentacleConfig.rotationVariation * 2) - tentacleConfig.rotationVariation;
-  //     tentacle.rotation.z = (Math.random() * tentacleConfig.rotationVariation * 2) - tentacleConfig.rotationVariation;
-      
-  //     // Store animation data
-  //     tentacle.userData = {
-  //       ...tentacle.userData,
-  //       initialAngle: angleVariation,
-  //       initialRadius: radiusVariation,
-  //       initialRotation: {
-  //         x: tentacle.rotation.x,
-  //         y: tentacle.rotation.y,
-  //         z: tentacle.rotation.z
-  //       },
-  //       timeOffset: Math.random() * Math.PI * 2,
-  //       wiggleSpeed: tentacleConfig.wiggleSpeed + Math.random() * tentacleConfig.wiggleSpeedVariation,
-  //       wiggleAmount: tentacleConfig.wiggleAmount + Math.random() * tentacleConfig.wiggleAmountVariation,
-  //       length: tentacleLength
-  //     };
-      
-  //     tentacles.push(tentacle);
-  //     tentacleGroup.add(tentacle);
-  //   }
-    
-  //   return tentacles;
-  // };
-  
-  // Create circle of tentacles (60% larger than teeth circle)
-  const tentacleRadius = 0.24 * 1.6; // Using the same radius as the teeth would have been
-  const tentacleCount = 12; // Fewer tentacles than teeth, as they're larger
-  // const tentacles = createTentacleCircle(tentacleRadius, tentacleCount);
-  
-  // Store the initial time for animation
-  const initialTime = Date.now() / 1000;
+
   const group = new THREE.Group();
-  
-  // Add animation function to the group
-  // tentacleGroup.userData.animateTentacles = function(deltaTime, elapsedTime) {
-  //   const time = elapsedTime;
-    
-  //   // Animate each tentacle
-  //   tentacles.forEach((tentacle, index) => {
-  //     const data = tentacle.userData;
-  //     const geometry = tentacle.geometry;
-  //     const geometryData = geometry.userData;
-      
-  //     // Update the curve points for wiggling effect
-  //     // First point always stays at the base (0,0,0)
-  //     geometryData.curvePoints[0].set(0, 0, 0);
-      
-  //     for (let j = 1; j <= geometryData.segments; j++) {
-  //       const t = j / geometryData.segments;
-        
-  //       // Increase wiggle amount as we move up the tentacle
-  //       const wiggleFactor = t * t; // Quadratic increase for more movement at the tip
-        
-  //       // Create different frequencies of movement
-  //       const timeScale = data.wiggleSpeed;
-  //       const xWiggle = Math.sin(time * timeScale + data.timeOffset + j * 0.5) * data.wiggleAmount * wiggleFactor;
-  //       const zWiggle = Math.cos(time * timeScale * 0.7 + data.timeOffset + j * 0.3) * data.wiggleAmount * wiggleFactor;
-        
-  //       // The base of the tentacle stays relatively still, the tip moves more
-  //       geometryData.curvePoints[j].set(
-  //         xWiggle,
-  //         data.length * t, // Height increases linearly
-  //         zWiggle
-  //       );
-  //     }
-      
-  //     // Update the curve with new points
-  //     geometryData.curve.points = geometryData.curvePoints;
-      
-  //     // Update all vertices based on the new curve
-  //     const positionAttribute = geometry.getAttribute('position');
-      
-  //     for (let i = 0; i < geometryData.originalRelativePositions.length; i++) {
-  //       const vertexData = geometryData.originalRelativePositions[i];
-        
-  //       // Get the updated position on the curve
-  //       const pointOnCurve = geometryData.curve.getPointAt(vertexData.t);
-        
-  //       // Apply the relative offset to maintain the tube shape
-  //       positionAttribute.setXYZ(
-  //         i,
-  //         pointOnCurve.x + vertexData.relX,
-  //         pointOnCurve.y + vertexData.relY,
-  //         pointOnCurve.z + vertexData.relZ
-  //       );
-  //     }
-      
-  //     positionAttribute.needsUpdate = true;
-  //     geometry.computeVertexNormals();
-      
-  //     // Also apply some rotation to the entire tentacle for additional movement
-  //     const rotWiggleX = Math.sin(time * 0.5 + data.timeOffset) * 0.05;
-  //     const rotWiggleZ = Math.cos(time * 0.3 + data.timeOffset) * 0.05;
-      
-  //     tentacle.rotation.x = data.initialRotation.x + rotWiggleX;
-  //     tentacle.rotation.z = data.initialRotation.z + rotWiggleZ;
-  //   });
-  // };
   
   // Rotating magical runes ring
   const runeRingGeometry = new THREE.RingGeometry(0.25, 0.32, 32, 2, 0, Math.PI * 2);
   const runeRingMaterial = new THREE.MeshBasicMaterial({
     color: playerColor,
     transparent: true,
+    alphaTest: 0.5,
     opacity: 0, // Start invisible
     side: THREE.DoubleSide,
     blending: THREE.AdditiveBlending,
@@ -637,7 +426,8 @@ function createDuelistHighlight() {
     transparent: true,
     opacity: 0, // Start invisible
     side: THREE.DoubleSide,
-    blending: THREE.AdditiveBlending
+    blending: THREE.AdditiveBlending,
+    depthWrite: false // Don't write to depth buffer
   });
   const pillar = new THREE.Mesh(pillarGeometry, pillarMaterial);
   pillar.position.y = 5;
@@ -664,7 +454,8 @@ function createDuelistHighlight() {
     size: 0.04,
     transparent: true,
     opacity: 1, // Start invisible
-    blending: THREE.AdditiveBlending
+    blending: THREE.AdditiveBlending,
+    depthWrite: false // Don't write to depth buffer
   });
   
   const positions = new Float32Array(particlesCount * 3);
@@ -697,28 +488,15 @@ function createDuelistHighlight() {
   
   // Set initial state - invisible
   group.visible = false;
-  group.scale.set(0.01, 0.01, 0.01);
-
-  tentacleGroup.visible = false
+  group.scale.set(0.01, 0.01, 0.01);  
   
-  return {
-    group,
-    tentacleGroup
-  };
+  return group;
 }
 
-function startSummoningAnimation(tentacleGroup: THREE.Group, group: THREE.Group, isPlayerHighlight = true) {
+function startSummoningAnimation(group: THREE.Group, isPlayerHighlight = true) {
     // Set colors based on isPlayerHighlight
     const playerColor = isPlayerHighlight ? 0x00ff88 : 0xff3333;
     const accentColor = isPlayerHighlight ? 0x00ff88 : 0xff3333;
-    
-    // Update materials with the appropriate colors
-    // tentacleGroup.traverse((child) => {
-    //   if (child instanceof THREE.Mesh && child.material) {
-    //     (child.material as THREE.MeshStandardMaterial).color.setHex(playerColor);
-    //     (child.material as THREE.MeshStandardMaterial).emissive.setHex(playerColor);
-    //   }
-    // });
     
     // Update colors for all effect elements
     const runeRing = group.getObjectByName('rotatingElement') as THREE.Mesh;
@@ -740,40 +518,12 @@ function startSummoningAnimation(tentacleGroup: THREE.Group, group: THREE.Group,
     if (particles && particles.material) {
       (particles.material as THREE.PointsMaterial).color.setHex(accentColor);
     }
-    
-    // tentacleGroup.visible = true;
-    
-    // // Animate scale from 0 to 1
-    // new TWEEN.Tween(tentacleGroup.scale)
-    //   .to({ x: 1, y: 1, z: 1 }, 0)
-    //   .easing(TWEEN.Easing.Linear.None)
-    //   .start();
-    
-    // // Animate opacity of each tentacle from 0 to 1
-    // tentacleGroup.children.forEach((tentacle, index) => {
-    //   if (tentacle instanceof THREE.Mesh && tentacle.material) {
-    //     // Add slight delay for each tentacle for a more organic appearance
-    //     const delay = index * 50;
-        
-    //     new TWEEN.Tween((tentacle.material as THREE.MeshStandardMaterial))
-    //       .to({ opacity: 1 }, 800)
-    //       .delay(delay)
-    //       .easing(TWEEN.Easing.Cubic.Out)
-    //       .onComplete(() => {
-    //         // When all tentacles are visible, fade in other effects
-    //         if (index === tentacleGroup.children.length - 1) {
-    //           fadeInHighlightEffects(tentacleGroup, group);
-    //         }
-    //       })
-    //       .start();
-    //   }
-    // });
 
-    fadeInHighlightEffects(tentacleGroup, group);
+    fadeInHighlightEffects(group);
 }
 
 // Helper function to fade in the highlight effects (except tentacles)
-function fadeInHighlightEffects(tentacleGroup: THREE.Group, group: THREE.Group) {
+function fadeInHighlightEffects(group: THREE.Group) {
   group.visible = true;
 
   new TWEEN.Tween(group.scale)
@@ -814,25 +564,6 @@ function fadeInHighlightEffects(tentacleGroup: THREE.Group, group: THREE.Group) 
     new TWEEN.Tween((particles.material as THREE.PointsMaterial))
       .to({ opacity: 0.4 }, 800)
       .easing(TWEEN.Easing.Cubic.Out)
-      .start();
-  }
-  
-  // After effects are faded in, retract the tentacles
-  // setTimeout(() => {
-  //   retractTentacles(tentacleGroup);
-  // }, 1000);
-}
-
-// Helper function to retract tentacles
-function retractTentacles(tentacleGroup: THREE.Group) {
-  if (tentacleGroup) {
-    new TWEEN.Tween(tentacleGroup.position)
-      .to({ y: -2 }, 2000)
-      .easing(TWEEN.Easing.Quartic.InOut)
-      .onComplete(() => {
-        // Remove tentacles from scene to save resources
-        tentacleGroup.visible = false
-      })
       .start();
   }
 }
@@ -892,17 +623,6 @@ function completeSummoningAnimation(group: THREE.Group) {
 
 // Function to animate the highlight effects
 function animateHighlights(deltaTime) {
-  // Shared time value for syncing animations
-  const time = performance.now() * 0.001;
-
-  if (_duelistTentaclesA && _duelistTentaclesA.visible) {
-    _duelistTentaclesA.userData.animateTentacles(deltaTime, time);
-  }
-
-  if (_duelistTentaclesB && _duelistTentaclesB.visible) {
-    _duelistTentaclesB.userData.animateTentacles(deltaTime, time);
-  }
-  
   if (_duelistHighlightA && _duelistHighlightA.visible) {    
     // Animate particles
     const particlesA = _duelistHighlightA.getObjectByName('magicParticles') as THREE.Points;
@@ -1091,21 +811,14 @@ function setupDuelScene() {
   loadGltf(scene)
   
   // Create duelist highlight effects
-  const { group: groupA, tentacleGroup: tentacleGroupA } = createDuelistHighlight();
-  const { group: groupB, tentacleGroup: tentacleGroupB } = createDuelistHighlight();
+  const groupA = createDuelistHighlight();
+  const groupB = createDuelistHighlight();
   _duelistHighlightA = groupA;
   _duelistHighlightB = groupB;
   _duelistHighlightA.position.set(0.5, 0, 2);
   _duelistHighlightB.position.set(-0.5, 0, 2);
   scene.add(_duelistHighlightA);
   scene.add(_duelistHighlightB);
-
-  _duelistTentaclesA = tentacleGroupA;
-  _duelistTentaclesB = tentacleGroupB;
-  _duelistTentaclesA.position.set(0.5, 0, 2);
-  _duelistTentaclesB.position.set(-0.5, 0, 2);
-  scene.add(_duelistTentaclesA);
-  scene.add(_duelistTentaclesB);
 
   _duelistManager = new DuelistsManager(scene, _duelCamera, _spriteSheets)
 
@@ -1116,7 +829,8 @@ export function hideDialogs() {
   _duelistManager.hideElements()
 }
 
-export function resetDuelScene(resetCamera = true) {
+export function resetDuelScene(resetCamera = true, fullReset = true) {
+  if (fullReset) _duelistManager?.resetDuelistsSpawned()
   if (!_duelistManager.resetDuelists()) return
 
   emitter.emit('animated', AnimationState.None)
@@ -1133,11 +847,8 @@ export function resetDuelScene(resetCamera = true) {
   if (resetCamera) {
     zoomCameraToPaces(10, 0)
   }
-  zoomCameraToPaces(0, 4)
-
-  completeSummoningAnimation(_duelistTentaclesA)
-  completeSummoningAnimation(_duelistTentaclesB)
-}
+  zoomCameraToPaces(10, 4)
+} 
 
 function setEnvironment(scene: THREE.Scene) { //TODO add skymap
   /**
@@ -1176,7 +887,12 @@ function loadGltf(scene: THREE.Scene) {
             child.shadow.camera.bottom = lightCameraShadowData.bottom
             child.shadow.camera.left = lightCameraShadowData.left
             child.shadow.camera.right = lightCameraShadowData.right
+            child.shadow.bias = -0.0001; 
+            child.shadow.normalBias = 0.01;
             child.castShadow = true
+
+            _sunLight = child
+            
 
             //Light helpers
             // const dirLightCameraHelper2 = new THREE.CameraHelper(child.shadow.camera)
@@ -1271,11 +987,20 @@ function loadGltf(scene: THREE.Scene) {
           child.visible = false
           child.geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(Math.PI / 2));
 
-          _groundMirror = createWaterPlane("Water", child.geometry, {
-            height: -0.001,
-            rotation: child.rotation,
-            scale: child.scale
-          })
+          _groundMirrorChildItem = child
+
+          _groundMirror = createWaterPlane(
+            _currentQualitySettings.reflectionsEnabled ? "WATER" : "WATER_NONREFLECTIVE",
+            _groundMirrorChildItem.geometry, 
+            _currentQualitySettings.reflectionsEnabled, 
+            {
+              height: -0.001,
+              rotation: child.rotation,
+              scale: child.scale,
+              waveEnabled: _currentQualitySettings.waterEffects,
+              renderScale: _currentQualitySettings.reflectionQuality
+            }
+          )
 
           scene.add(_groundMirror)
         }
@@ -1290,17 +1015,33 @@ function loadGltf(scene: THREE.Scene) {
   );
 }
 
-function createWaterPlane(name, geometry, params) {
-  const water = new shaders.ReflectorMaterial("WATER", geometry, {
-    clipBias: 0.0003,
-    textureWidth: WIDTH,
-    textureHeight: HEIGHT, //TODO check if this works??
-  });
+function createWaterPlane(name, geometry, reflective, params) {
+  let water; 
 
-  water.setUniformValue('waterStrength', 0.04)
-  water.setUniformValue('waterSpeed', 0.03)
-  water.setUniformValue('waveStrength', 0.04)
-  water.setUniformValue('waveSpeed', 0.05)
+  if (reflective) {
+    water = new shaders.ReflectorMaterial("WATER", geometry, {
+      clipBias: 0.0003,
+      textureWidth: WIDTH * params.renderScale,
+      textureHeight: HEIGHT * params.renderScale, //TODO check if this works??
+    });
+    
+    // Add customProgramCacheKey to the material to fix shader compilation
+    (water.material as any).customProgramCacheKey = function() {
+      return 'ReflectorMaterial-WATER-' + Math.random();
+    };
+  } else {
+    water = new shaders.NonReflectorMaterial("WATER_NONREFLECTIVE", geometry);
+    
+    // Add customProgramCacheKey to the material to fix shader compilation
+    (water.material as any).customProgramCacheKey = function() {
+      return 'NonReflectorMaterial-WATER_NONREFLECTIVE-' + Math.random();
+    };
+  }
+
+  water.setUniformValue('waterStrength', params.waveEnabled ? 0.04 : 0.0)
+  water.setUniformValue('waterSpeed', params.waveEnabled ? 0.03 : 0.0)
+  water.setUniformValue('waveStrength', params.waveEnabled ? 0.04 : 0.0)
+  water.setUniformValue('waveSpeed', params.waveEnabled ? 0.05 : 0.0)
   water.setUniformValue('tDudv', _textures[TextureName.duel_water_dudv])
   water.setUniformValue('waterMap', _textures[TextureName.duel_water_map])
   water.setUniformValue('windDirection', new THREE.Vector2(1.0, 0.0))
@@ -1361,7 +1102,6 @@ function createWaterPlane(name, geometry, params) {
 function createGrass() {
   if (!_scenes[SceneName.Duel]) return;
   if (!_grassTransforms) return;
-  if (_grass) return;
 
   _grass = new Grass(
     {
@@ -1370,7 +1110,9 @@ function createGrass() {
       heightmap: null,
       dims: 256,
       transforms: _grassTransforms,
-      growth: _growthPercentage
+      growth: _growthPercentage,
+      density: _currentQualitySettings.grassCount,
+      segments: _currentQualitySettings.grassSegments
     }
   );
 
@@ -1422,6 +1164,8 @@ export function switchScene(sceneName) {
 
   if (_currentScene === sceneName) return;
 
+  console.log(`Switching scene to ${sceneName}`)
+
   if (!_currentScene) {
     _sceneName = sceneName
     _currentScene = _scenes[sceneName]
@@ -1468,7 +1212,9 @@ function fadeOutCurrentScene(callback) {
   _tweens.staticFade = new TWEEN.Tween({ opacity: 0 })
     .to({ opacity: 1 }, SCENE_CHANGE_ANIMATION_DURATION)
     .onUpdate(({ opacity }) => {
-      overlay.style.opacity = opacity.toString()
+      if (overlay) {
+        overlay.style.opacity = opacity.toString()
+      }
     })
     .onComplete(() => {
       callback();
@@ -1484,22 +1230,26 @@ function fadeInCurrentScene() {
   _tweens.staticFade = new TWEEN.Tween({ opacity: 1 })
     .to({ opacity: 0 }, SCENE_CHANGE_ANIMATION_DURATION)
     .onUpdate(({ opacity }) => {
-      overlay.style.opacity = opacity.toString()
+      if (overlay) {
+        overlay.style.opacity = opacity.toString()
+      }
     })
     .start();
 }
 
-export function spawnDuelist(duelist, duelistName, duelistModel, isYou) {
+export function setOnLoadComplete(onLoadComplete: () => void) {
+  _duelistManager.setLoadCompleteCallback(onLoadComplete)
+}
+
+export function spawnDuelist(duelist, duelistName, duelistModel, isYou, frontMaterialPath, backMaterialPath) {
   if (duelist == 'A') {
-    _duelistManager.setupDuelistA(duelistName, duelistModel, isYou)
-    setTimeout(() => {
-      startSummoningAnimation(_duelistTentaclesA, _duelistHighlightA, isYou)
-    }, 500)
+    _duelistManager.setupDuelistA(duelistName, duelistModel, isYou, frontMaterialPath, backMaterialPath, () => {
+      startSummoningAnimation(_duelistHighlightA, isYou)
+    })
   } else {
-    _duelistManager.setupDuelistB(duelistName, duelistModel, isYou)
-    setTimeout(() => {
-      startSummoningAnimation(_duelistTentaclesB, _duelistHighlightB, isYou)
-    }, 500)
+    _duelistManager.setupDuelistB(duelistName, duelistModel, isYou, frontMaterialPath, backMaterialPath, () => {
+      startSummoningAnimation(_duelistHighlightB, isYou)
+    })
   }
 }
 
@@ -1598,7 +1348,9 @@ export function animateActions(actionA: Action, actionB: Action, healthA: number
   }, 2000);
 }
 
-
+export function animateDuelistTest(duelist: string, key: AnimName) {
+  _duelistManager.playActorAnimationTest(duelist, key)
+}
 
 //-------------------------------
 // Audio
@@ -1808,4 +1560,196 @@ function disposeTexturesAndSpriteSheets() {
     _textures[textureKey].dispose()
   }
   _textures = {}
+}
+
+// Add quality setting functions before the dispose function
+// Functions to update quality settings for the current scene
+
+/**
+ * Updates shadow settings for the current scene
+ * @param enabled Whether shadows are enabled
+ * @param shadowType The type of shadow mapping to use
+ * @param mapSize The shadow map size
+ */
+export function updateShadows(enabled: boolean, shadowType: THREE.ShadowMapType, mapSize: number) {
+  // Save current settings
+  _currentQualitySettings.shadowMapEnabled = enabled;
+  _currentQualitySettings.shadowMapType = shadowType;
+  _currentQualitySettings.shadowMapSize = mapSize;
+  
+  // Update renderer shadow settings
+  if (_renderer) {
+    // First disable shadows to reset state
+    _renderer.shadowMap.enabled = false
+    _renderer.shadowMap.autoUpdate = false
+    
+    // Force renderer to clear shadow maps
+    _renderer.shadowMap.needsUpdate = true
+    
+    // Now re-enable with new settings
+    _renderer.shadowMap.type = shadowType
+    _renderer.shadowMap.enabled = enabled
+    _renderer.shadowMap.autoUpdate = enabled
+  }
+  
+  // Update directional light shadow settings
+  if (_sunLight) {
+    _sunLight.castShadow = enabled
+    
+    if (enabled) {
+      // Clean up existing shadow map
+      if (_sunLight.shadow.map) {
+        _sunLight.shadow.map.dispose()
+        _sunLight.shadow.map = null
+      }
+      
+      // Reset shadow settings
+      _sunLight.shadow.mapSize.set(mapSize, mapSize)
+      _sunLight.shadow.bias = -0.0001
+      _sunLight.shadow.normalBias = 0.01
+      
+      // Update the shadow camera and force an updat
+      _sunLight.shadow.camera.updateProjectionMatrix()
+      _sunLight.shadow.needsUpdate = true
+      _sunLight.updateMatrixWorld(true)
+      
+      // Force a re-render
+      if (_renderer) {
+        _renderer.shadowMap.needsUpdate = true
+      }
+    }
+  }
+  
+  console.log(`Shadow settings updated: ${enabled ? 'Enabled' : 'Disabled'}, Type: ${shadowType}, Map Size: ${mapSize}x${mapSize}`);
+}
+
+/**
+ * Updates the resolution scale for the renderer
+ * @param scale Resolution scale (0.5 - 1.0)
+ */
+export function updateResolution(scale: number) {
+  // Save current setting
+  _currentQualitySettings.resolutionScale = scale;
+
+  if (_renderer) {
+    _renderer.setPixelRatio(window.devicePixelRatio * scale);
+  }
+}
+
+/**
+ * Updates grass quality settings
+ * @param density Number of grass instances
+ * @param segments Number of grass segments
+ */
+export function updateGrass(density: number, segments: number) {
+  // Save current settings
+  _currentQualitySettings.grassCount = density;
+  _currentQualitySettings.grassSegments = segments;
+  
+  
+  // Recreate grass with new settings if it exists
+  if (_grass) {
+    // Remove old grass
+    if (_scenes[SceneName.Duel]) {
+      _scenes[SceneName.Duel].remove(_grass)
+    }
+    
+    // Dispose of old grass
+    _grass.dispose()
+    
+    createGrass()
+  }
+}
+
+/**
+ * Updates water quality settings
+ * @param reflective Whether to use reflective water
+ * @param quality Water quality multiplier (0.5-1.0)
+ * @param waveEffects Whether wave effects are enabled
+ */
+export function updateWater(reflective: boolean, quality: number, waveEffects: boolean) {
+  // Save current settings
+  _currentQualitySettings.reflectionsEnabled = reflective;
+  _currentQualitySettings.reflectionQuality = quality;
+  _currentQualitySettings.waterEffects = waveEffects;
+  
+  // If we have a water plane
+  if (_groundMirror) {
+    // Remove existing water plane from the scene
+    _scenes[SceneName.Duel].remove(_groundMirror)
+    
+    // Dispose of the current water object
+    _groundMirror?.dispose();
+    _groundMirror = null
+
+    _groundMirror = createWaterPlane(
+      reflective ? "WATER" : "WATER_NONREFLECTIVE", 
+      _groundMirrorChildItem.geometry, 
+      reflective, 
+      {
+        height: -0.001,
+        rotation: _groundMirrorChildItem.rotation || new THREE.Euler(),
+        scale: _groundMirrorChildItem.scale || new THREE.Vector3(1, 1, 1),
+        waveEnabled: waveEffects,
+        renderScale: quality
+      }
+    );
+
+    _scenes[SceneName.Duel].add(_groundMirror)
+     
+  }
+}
+
+/**
+ * Updates particle effect quality
+ * @param density Particle density multiplier (0.5-1.0)
+ */
+export function updateParticles(density: number) {
+  // Save current setting
+  _currentQualitySettings.particlesMultiplier = density;
+  
+  // Update any particle systems (Rain, highlight effects, etc.)
+  if (_duelistHighlightA) {
+    const particlesA = _duelistHighlightA.getObjectByName('magicParticles') as THREE.Points
+    if (particlesA && particlesA.geometry) {
+      // Update particle visibility based on density
+      const scales = particlesA.geometry.attributes.scale.array as Float32Array
+      for (let i = 0; i < scales.length; i++) {
+        if (i < scales.length * density) {
+          scales[i] = Math.random() * 0.5
+        } else {
+          scales[i] = 0
+        }
+      }
+      particlesA.geometry.attributes.scale.needsUpdate = true
+    }
+  }
+  
+  if (_duelistHighlightB) {
+    const particlesB = _duelistHighlightB.getObjectByName('magicParticles') as THREE.Points
+    if (particlesB && particlesB.geometry) {
+      // Update particle visibility based on density
+      const scales = particlesB.geometry.attributes.scale.array as Float32Array
+      for (let i = 0; i < scales.length; i++) {
+        if (i < scales.length * density) {
+          scales[i] = Math.random() * 0.5
+        } else {
+          scales[i] = 0
+        }
+      }
+      particlesB.geometry.attributes.scale.needsUpdate = true
+    }
+  }
+}
+
+export function updateInteractibeSceneSettings(sceneShiftEnabled: boolean, blurEnabled: boolean) {
+  // Save current settings
+  _currentQualitySettings.sceneShiftEnabled = sceneShiftEnabled;
+  _currentQualitySettings.blurEnabled = blurEnabled;
+  
+  Object.values(_scenes).forEach(scene => {
+    if (scene instanceof InteractibleScene) {
+      scene.updateSettings(sceneShiftEnabled, blurEnabled)
+    }
+  });
 }

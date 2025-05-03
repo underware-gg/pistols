@@ -5,6 +5,7 @@ export class SpriteSheet {
   frameCount = 1
   textures = []
   frameRate = 8
+  isFlipped = false
   isLoaded = false
 
   constructor(key, SHEET, loader) {
@@ -16,6 +17,10 @@ export class SpriteSheet {
     if (SHEET.frameRate) {
       this.frameRate = SHEET.frameRate
     }
+
+    if (SHEET.isFlipped) {
+      this.isFlipped = SHEET.isFlipped
+    }
   }
 
   async loadTextures(SHEET, loader) {
@@ -23,11 +28,6 @@ export class SpriteSheet {
       const frameNumber = ('000' + f.toString()).slice(-3)
       const path = `${SHEET.path}/frame_${frameNumber}.ktx2`
       const tex = await loader.loadAsync(path)
-
-      if (path.includes("Dodge_Front")) {
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.repeat.x = -1; 
-      }
 
       tex.colorSpace = THREE.SRGBColorSpace
       tex.generateMipmaps = false
@@ -40,7 +40,6 @@ export class SpriteSheet {
 
   makeMaterial() {
     return new THREE.MeshBasicMaterial({
-      // transparent: true,
       side: THREE.DoubleSide,
       alphaTest: 0.5
     })
@@ -54,10 +53,10 @@ export class Actor {
   currentSheet: SpriteSheet = null
   controls: any = {}
   ready: boolean = false
-  animationQueue: { key: string, count: number, loop: boolean, move: { x: number, y: number, z: number }, onStart: any, onEnd: any }[] = []  // Animation queue
+  animationQueue: { key: string, count: number, loop: boolean, move: { x: number, y: number, z: number }, onStart: any, onEnd: any }[] = []
   startPosition: { x: number, height: number } = { x: null, height: null }
 
-  constructor(spriteSheets: any, width: number, height: number, startPositionX: number, flipped: boolean) {
+  constructor(spriteSheets: any, width: number, height: number, startPositionX: number, startPositionZ: number, flipped: boolean) {
     const geometry = new THREE.PlaneGeometry(width, height)
 
     this.replaceSpriteSheets(spriteSheets)
@@ -69,10 +68,10 @@ export class Actor {
     this.startPosition.height = height
 
     if (flipped) {
-      this.mesh.position.set(-startPositionX, (height / 2), 2)
+      this.mesh.position.set(-startPositionX, (height / 2), startPositionZ)
     } else {
       this.mesh.rotateY(Math.PI)
-      this.mesh.position.set(startPositionX, (height / 2), 2)
+      this.mesh.position.set(startPositionX, (height / 2), startPositionZ)
     }
     this.mesh.rotateZ(Math.PI)
     this.mesh.castShadow = true
@@ -118,6 +117,10 @@ export class Actor {
   }
 
   playRepeat(key, loopCount, frameMovement = { x: 0, y: 0, z: 0, frames: 0 }, onStart = null, onEnd = null, loop = null) {
+    if (!frameMovement) {
+      frameMovement = { x: 0, y: 0, z: 0, frames: 0 }
+    }
+
     this.animationQueue.push({ key: key, count: loopCount, move: frameMovement, onStart: onStart, onEnd: onEnd, loop: loop });
   }
 
@@ -230,7 +233,11 @@ export class Actor {
     this.controls.loopCount = next.count
     this.controls.loop = next.loop
     this.controls.callback = next.onEnd
-    
+    if (this.currentSheet.isFlipped) {
+      this.mesh.rotation.y = Math.PI
+    } else {
+      this.mesh.rotation.y = 0
+    }
     this.controls.frameMovement = next.move
     this.controls.startPositionX = this.mesh.position.x;
     this.controls.targetPositionX = this.controls.startPositionX + this.controls.frameMovement.x * (this.controls.flipped ? -1 : 1);

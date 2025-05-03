@@ -204,6 +204,7 @@ const DuelContent: React.FC<{
         duelistIdB={rightDuelist?.id || BigInt(0)} 
         ref={cardsRef} 
         tutorialLevel={tutorial}
+        speedFactor={settings.duelSpeedFactor}
       />
       
       <DuelHeader duelId={duelId} tutorialLevel={tutorial} />

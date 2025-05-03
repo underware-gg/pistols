@@ -193,10 +193,10 @@ export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNum
     .map((e) => 
       getEntityModel<models.Challenge>(e, 'Challenge')
     )
-    .filter((e) => 
+    ?.filter((e) => 
       BigInt(e.duelist_id_a) === BigInt(duelistId) || BigInt(e.duelist_id_b) === BigInt(duelistId)
     )
-    .filter((e) => {
+    ?.filter((e) => {
       const state = parseEnumVariant<constants.ChallengeState>(e.state)
       return state === constants.ChallengeState.Resolved || 
              state === constants.ChallengeState.Draw ||
@@ -205,8 +205,7 @@ export function useDuelistSeasonStats(duelistId: BigNumberish, seasonId?: BigNum
     // .filter((e) => 
     //   BigInt(e.table_id) === BigInt(seasonId)
     // ) //TODO filter by correct season!
-
-  
+ 
   const stats = useMemo(() => {
     if (!duelistId || !seasonId) {
       return { wins: 0, losses: 0 }

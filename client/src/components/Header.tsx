@@ -5,7 +5,7 @@ import { useQueryParams, SortDirection, ChallengeColumn, PlayerColumn } from '/s
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { ChallengeStateNames, LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
-import { BackButton, MusicToggle, FilterButton, SettingsGearButton } from '/src/components/ui/Buttons'
+import { BackButton, MusicToggle, FilterButton, SettingsGearButton, HomeButton } from '/src/components/ui/Buttons'
 import { SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import { arrayRemoveValue } from '@underware/pistols-sdk/utils'
 import { SceneName } from '/src/data/assets'
@@ -135,7 +135,10 @@ export function Header() {
           <Image className='NoMouse NoDrag NoSelection ' src='/images/ui/tavern/wooden_corners.png' style={{ position: 'absolute' }} />
           <div className='UIHeaderCorner' style={{ padding: `${aspectWidth(1)}px ${aspectWidth(2)}px` }}>
             {!atTavern && 
-              <BackButton />
+              <>
+                <BackButton />
+                <HomeButton />
+              </>
             }
           </div>
 
