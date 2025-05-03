@@ -7,6 +7,8 @@ pub trait IBank<TState> {
     fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128);
     fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128);
     fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u64);
+    fn can_collect_season(self: @TState) -> bool;
+    fn collect_season(ref self: TState) -> u32;
 }
 
 // Exposed to clients
@@ -15,6 +17,8 @@ pub trait IBankPublic<TState> {
     fn sponsor_duelists(ref self: TState, payer: ContractAddress, lords_amount: u128); //@description: Sponsor duelist starter packs with $LORDS
     fn sponsor_season(ref self: TState, payer: ContractAddress, lords_amount: u128); //@description: Sponsor the current season with $LORDS
     fn sponsor_tournament(ref self: TState, payer: ContractAddress, lords_amount: u128, tournament_id: u64); //@description: Sponsor a tournament with $LORDS
+    fn can_collect_season(self: @TState) -> bool;
+    fn collect_season(ref self: TState) -> u32; // @description: Close the current season and start the next one
 }
 
 // Exposed to world
@@ -56,7 +60,10 @@ pub mod bank {
         pool::{Pool, PoolTrait, PoolType, LordsReleaseBill, ReleaseReason},
         leaderboard::{LeaderboardTrait, LeaderboardPosition},
     };
-    use pistols::types::rules::{Rules, RulesTrait, RewardDistribution};
+    use pistols::types::{
+        rules::{Rules, RulesTrait, RewardDistribution},
+        trophies::{TrophyProgressTrait}
+    };
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::math::{MathTrait};
 
@@ -115,6 +122,26 @@ pub mod bank {
             // assert(tournament.is_active(), Errors::INVALID_TOURNAMENT);
             self._transfer_lords_to_pool(store, payer, lords_amount.into(), PoolType::Tournament(tournament_id));
         }
+
+        fn can_collect_season(self: @ContractState) -> bool {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let season: SeasonConfig = store.get_current_season();
+            (season.can_collect())
+        }
+
+        fn collect_season(ref self: ContractState) -> u32 {
+            let mut store: Store = StoreTrait::new(self.world_default());
+            // collect season if permitted
+            let mut season: SeasonConfig = store.get_current_season();
+            let new_season_id: u32 = season.collect(ref store);
+            store.set_config_season_id(new_season_id);
+            // release...
+            self.release_season_pool(season.season_id);
+            // arcade
+            TrophyProgressTrait::collected_season(@store.world, @starknet::get_caller_address());
+            (new_season_id)
+        }
+
     }
 
     #[abi(embed_v0)]

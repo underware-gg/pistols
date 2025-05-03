@@ -1,4 +1,4 @@
-use starknet::{ContractAddress};
+// use starknet::{ContractAddress};
 use pistols::types::duel_progress::{DuelProgress};
 use pistols::models::leaderboard::{LeaderboardPosition};
 use pistols::types::rules::{RewardValues};
@@ -21,7 +21,6 @@ pub trait IGame<TState> {
         moves: Span<u8>,
     );
     fn collect_duel(ref self: TState, duel_id: u128) -> u8; // @description: Close expired duels
-    fn collect_season(ref self: TState) -> u32; // @description: Close the current season and start the next one
     fn clear_call_to_action(ref self: TState, duelist_id: u128); // @description: Clear the required action call for a duelist
 
     // view calls
@@ -30,12 +29,8 @@ pub trait IGame<TState> {
     fn get_duelist_leaderboard_position(self: @TState, season_id: u32, duelist_id: u128) -> LeaderboardPosition;
     fn get_leaderboard(self: @TState, season_id: u32) -> Span<LeaderboardPosition>;
     fn can_collect_duel(self: @TState, duel_id: u128) -> bool;
-    fn can_collect_season(self: @TState) -> bool;
     fn calc_season_reward(self: @TState, season_id: u32, duelist_id: u128, lives_staked: u8) -> RewardValues;
     fn get_timestamp(self: @TState) -> u64;
-    
-    // test calls
-    fn test_validate_commit_message(self: @TState, account: ContractAddress, signature: Array<felt252>, duelId: felt252, duelistId: felt252) -> bool;
 }
 
 // Exposed to world
@@ -78,7 +73,6 @@ pub mod game {
         IDuelistTokenProtectedDispatcherTrait,
         IDuelTokenProtectedDispatcherTrait,
         ITutorialDispatcherTrait,
-        IBankProtectedDispatcherTrait,
         SELECTORS,
     };
     use pistols::systems::rng::{RngWrap, RngWrapTrait};
@@ -88,7 +82,7 @@ pub mod game {
         duelist::{DuelistTrait, Totals, TotalsTrait},
         leaderboard::{Leaderboard, LeaderboardTrait, LeaderboardPosition},
         pact::{PactTrait},
-        season::{SeasonConfig, SeasonConfigTrait, SeasonScoreboard, SeasonScoreboardTrait},
+        season::{SeasonScoreboard, SeasonScoreboardTrait},
         events::{Activity, ActivityTrait},
         // tournament::{TournamentRound, TournamentRoundTrait, TournamentDuelKeys},
     };
@@ -96,7 +90,6 @@ pub mod game {
         challenge_state::{ChallengeState, ChallengeStateTrait},
         duel_progress::{DuelProgress},
         round_state::{RoundState},
-        typed_data::{CommitMoveMessage, CommitMoveMessageTrait},
         rules::{Rules, RulesTrait ,RewardValues, DuelBonus},
         timestamp::{PeriodTrait, TimestampTrait},
         cards::deck::{DeckTrait},
@@ -389,19 +382,6 @@ pub mod game {
             (challenge.winner)
         }
 
-        fn collect_season(ref self: ContractState) -> u32 {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            // collect season if permitted
-            let mut season: SeasonConfig = store.get_current_season();
-            let new_season_id: u32 = season.collect(ref store);
-            store.set_config_season_id(new_season_id);
-            // release...
-            store.world.bank_protected_dispatcher().release_season_pool(season.season_id);
-            // arcade
-            TrophyProgressTrait::collected_season(@store.world, @starknet::get_caller_address());
-            (new_season_id)
-        }
-
 
         //------------------------------------
         // view calls
@@ -456,12 +436,6 @@ pub mod game {
             }
         }
 
-        fn can_collect_season(self: @ContractState) -> bool {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            let season: SeasonConfig = store.get_current_season();
-            (season.can_collect())
-        }
-
         fn calc_season_reward(self: @ContractState,
             season_id: u32,
             duelist_id: u128,
@@ -490,19 +464,6 @@ pub mod game {
 
         fn get_timestamp(self: @ContractState) -> u64 {
             (starknet::get_block_timestamp())
-        }
-
-        fn test_validate_commit_message(self: @ContractState,
-            account: ContractAddress,
-            signature: Array<felt252>,
-            duelId: felt252,
-            duelistId: felt252,
-        ) -> bool {
-            let msg = CommitMoveMessage {
-                duelId,
-                duelistId,
-            };
-            (msg.validate(account, signature))
         }
     }
 
