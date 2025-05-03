@@ -449,7 +449,7 @@ mod tests {
     //
 
     #[test]
-    fn test_blades_seppukku_a() {
+    fn test_blades_seppuku_a() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(@sys,
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
@@ -466,7 +466,7 @@ mod tests {
         _assert_is_alive(round.state_b, "alive_b");
     }
     #[test]
-    fn test_blades_seppukku_b() {
+    fn test_blades_seppuku_b() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(@sys,
             [1, 2, 0, 0].span(),
@@ -483,7 +483,7 @@ mod tests {
         _assert_is_dead(round.state_b, "dead_b");
     }
     #[test]
-    fn test_blades_seppukku_draw() {
+    fn test_blades_seppuku_draw() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(@sys,
             [1, 2, 0, BladesCard::Seppuku.into()].span(),
@@ -500,7 +500,7 @@ mod tests {
         _assert_is_dead(round.state_b, "dead_b");
     }
     #[test]
-    fn test_blades_seppukku_other() {
+    fn test_blades_seppuku_other() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::MOCK_RNG);
         let (round, progress) = execute_game_loop(@sys,
             [1, 2, 0, BladesCard::Seppuku.into()].span(),

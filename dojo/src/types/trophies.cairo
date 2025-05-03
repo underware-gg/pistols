@@ -685,7 +685,6 @@ pub impl TrophyProgressImpl of TrophyProgressTrait {
                     },
                     BladesCard::Seppuku => {
                         Trophy::Seppuku.progress(store, @challenge.loser_address(), 1);
-                        bonus_loser.seppukku = true;
                     },
                     _ => {}
                 }
@@ -727,8 +726,6 @@ pub impl TrophyProgressImpl of TrophyProgressTrait {
                 if (*blade == BladesCard::Seppuku) {
                     Trophy::DoubleSeppuku.progress(store, challenge.address_a, 1);
                     Trophy::DoubleSeppuku.progress(store, challenge.address_b, 1);
-                    bonus.duelist_a.seppukku = true;
-                    bonus.duelist_b.seppukku = true;
                 } else {
                     Trophy::BladesClash.progress(store, challenge.address_a, 1);
                     Trophy::BladesClash.progress(store, challenge.address_b, 1);

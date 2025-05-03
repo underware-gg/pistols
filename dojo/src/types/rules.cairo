@@ -41,12 +41,11 @@ pub struct DuelBonus {
     pub duelist_a: DuelistBonus,
     pub duelist_b: DuelistBonus,
 }
-#[derive(Copy, Drop, Serde, Default)]
+#[derive(Copy, Drop, Serde, IntrospectPacked, Default)]
 pub struct DuelistBonus {
     pub kill_pace: u8,
     pub hit: bool,
     pub dodge: bool,
-    pub seppukku: bool,
 }
 
 
@@ -114,10 +113,9 @@ pub impl RulesImpl of RulesTrait {
                     result.points_scored = 10;
                 }
                 // apply bonus
+                if (*bonus.dodge) { result.points_scored += 20 }
                 if (*bonus.kill_pace > 0) { result.points_scored += 10 }
                 else if (*bonus.hit) { result.points_scored += 5 }
-                if (*bonus.dodge) { result.points_scored += 20 }
-                if (*bonus.seppukku) { result.points_scored += 10 }
                 (result)
             },
             _ => Default::default()
@@ -293,19 +291,16 @@ mod unit {
             kill_pace: 1,
             hit: false,
             dodge: false,
-            seppukku: false,
         };
         let bonus_paces_10 = DuelistBonus {
             kill_pace: 10,
             hit: false,
             dodge: false,
-            seppukku: false,
         };
         let bonus_paces_10_dodge = DuelistBonus {
             kill_pace: 10,
             hit: false,
             dodge: true,
-            seppukku: false,
         };
         let winner_paces_1: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, @bonus_paces_1);
         let winner_paces_10: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, true, @bonus_paces_10);
@@ -318,26 +313,16 @@ mod unit {
             kill_pace: 0,
             hit: true,
             dodge: false,
-            seppukku: false,
-        };
-        let bonus_seppukku = DuelistBonus {
-            kill_pace: 0,
-            hit: false,
-            dodge: false,
-            seppukku: true,
         };
         let bonus_dodge = DuelistBonus {
             kill_pace: 0,
             hit: false,
             dodge: true,
-            seppukku: false,
         };
         let loser_default: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @Default::default());
         let loser_hit: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @bonus_hit);
-        let loser_seppukku: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @bonus_seppukku);
         let loser_dodge: RewardValues = Rules::Season.calc_rewards(WEI(3_000).low, 1, false, @bonus_dodge);
         assert_lt!(loser_default.points_scored, loser_hit.points_scored, "LOSER: default < hit");
-        assert_lt!(loser_hit.points_scored, loser_seppukku.points_scored, "LOSER: hit < seppukku");
-        assert_lt!(loser_seppukku.points_scored, loser_dodge.points_scored, "LOSER: seppukku < bonus_dodge");
+        assert_lt!(loser_hit.points_scored, loser_dodge.points_scored, "LOSER: hit < dodge");
     }
 }
