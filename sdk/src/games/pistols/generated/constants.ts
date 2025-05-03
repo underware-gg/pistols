@@ -33,6 +33,7 @@ export const INTERFACE_DESCRIPTIONS: any = {
   // from: ../dojo/src/systems/tokens/pack_token.cairo
   IPackTokenPublic: {
     claim_starter_pack: 'Claim the starter pack, mint Duelists',
+    claim_gift: 'Claim gift pack, if available',
     purchase: 'Purchase a closed pack',
     open: 'Open a pack, mint its contents',
   },

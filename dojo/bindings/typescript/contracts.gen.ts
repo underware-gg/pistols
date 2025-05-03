@@ -1454,19 +1454,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_duelist_token_transferRewards_calldata = (challenge: models.Challenge, tournamentId: BigNumberish): DojoCall => {
+	const build_duelist_token_transferRewards_calldata = (challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus): DojoCall => {
 		return {
 			contractName: "duelist_token",
 			entrypoint: "transfer_rewards",
-			calldata: [challenge, tournamentId],
+			calldata: [challenge, tournamentId, bonus],
 		};
 	};
 
-	const duelist_token_transferRewards = async (snAccount: Account | AccountInterface, challenge: models.Challenge, tournamentId: BigNumberish) => {
+	const duelist_token_transferRewards = async (snAccount: Account | AccountInterface, challenge: models.Challenge, tournamentId: BigNumberish, bonus: models.DuelBonus) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_duelist_token_transferRewards_calldata(challenge, tournamentId),
+				build_duelist_token_transferRewards_calldata(challenge, tournamentId, bonus),
 				"pistols",
 			);
 		} catch (error) {
@@ -2628,6 +2628,23 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_pack_token_canClaimGift_calldata = (recipient: string): DojoCall => {
+		return {
+			contractName: "pack_token",
+			entrypoint: "can_claim_gift",
+			calldata: [recipient],
+		};
+	};
+
+	const pack_token_canClaimGift = async (recipient: string) => {
+		try {
+			return await provider.call("pistols", build_pack_token_canClaimGift_calldata(recipient));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_pack_token_canClaimStarterPack_calldata = (recipient: string): DojoCall => {
 		return {
 			contractName: "pack_token",
@@ -2673,6 +2690,27 @@ export function setupWorld(provider: DojoProvider) {
 	const pack_token_canPurchase = async (recipient: string, packType: CairoCustomEnum) => {
 		try {
 			return await provider.call("pistols", build_pack_token_canPurchase_calldata(recipient, packType));
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_pack_token_claimGift_calldata = (): DojoCall => {
+		return {
+			contractName: "pack_token",
+			entrypoint: "claim_gift",
+			calldata: [],
+		};
+	};
+
+	const pack_token_claimGift = async (snAccount: Account | AccountInterface) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_pack_token_claimGift_calldata(),
+				"pistols",
+			);
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -3681,12 +3719,16 @@ export function setupWorld(provider: DojoProvider) {
 			buildBalanceOfCalldata: build_pack_token_balanceOf_calldata,
 			calcMintFee: pack_token_calcMintFee,
 			buildCalcMintFeeCalldata: build_pack_token_calcMintFee_calldata,
+			canClaimGift: pack_token_canClaimGift,
+			buildCanClaimGiftCalldata: build_pack_token_canClaimGift_calldata,
 			canClaimStarterPack: pack_token_canClaimStarterPack,
 			buildCanClaimStarterPackCalldata: build_pack_token_canClaimStarterPack_calldata,
 			canMint: pack_token_canMint,
 			buildCanMintCalldata: build_pack_token_canMint_calldata,
 			canPurchase: pack_token_canPurchase,
 			buildCanPurchaseCalldata: build_pack_token_canPurchase_calldata,
+			claimGift: pack_token_claimGift,
+			buildClaimGiftCalldata: build_pack_token_claimGift_calldata,
 			claimStarterPack: pack_token_claimStarterPack,
 			buildClaimStarterPackCalldata: build_pack_token_claimStarterPack_calldata,
 			contractUri: pack_token_contractUri,

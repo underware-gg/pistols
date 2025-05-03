@@ -2060,8 +2060,8 @@
       ]
     },
     {
-      "address": "0x7a2def8bdb38df2f462c7f2d146963cc15c6701e0c2e1a8ab7ef3ac8f033213",
-      "class_hash": "0x319fe181e8045c8f178e7dc8569273630e9453bd6e98164724584f3ee275a14",
+      "address": "0x161244013e17154e73f8c76e5749ed2438cca11a43166cf58b798c8e94f4ab6",
+      "class_hash": "0x3476b19e8b755d3da9b1ffe463d32c477ffb76102a9c34eb79fcd39ecb68a1b",
       "abi": [
         {
           "type": "impl",
@@ -3370,8 +3370,8 @@
       ]
     },
     {
-      "address": "0x56d99e2f36f4016fe709994eaa0c082b63e1ee0e0a3f773b5b6f50e5a03359c",
-      "class_hash": "0x38a06fe6cc3bf47e473605fd84381106ed8c789495fd73e951e40a494ab2f0a",
+      "address": "0x357bfcef4c3230fb28f039b813dd0165b19b11ce1eea2ba323d9e34abef8ae6",
+      "class_hash": "0x67b14234ba29d4c430965db18504560f712fac638b3f28507da2af4a2836b30",
       "abi": [
         {
           "type": "impl",
@@ -3603,7 +3603,7 @@
         },
         {
           "type": "enum",
-          "name": "pistols::types::duelist_profile::CharacterProfile",
+          "name": "pistols::types::duelist_profile::CharacterKey",
           "variants": [
             {
               "name": "Unknown",
@@ -3629,7 +3629,7 @@
         },
         {
           "type": "enum",
-          "name": "pistols::types::duelist_profile::BotProfile",
+          "name": "pistols::types::duelist_profile::BotKey",
           "variants": [
             {
               "name": "Unknown",
@@ -3651,7 +3651,7 @@
         },
         {
           "type": "enum",
-          "name": "pistols::types::duelist_profile::GenesisProfile",
+          "name": "pistols::types::duelist_profile::GenesisKey",
           "variants": [
             {
               "name": "Unknown",
@@ -3753,15 +3753,15 @@
             },
             {
               "name": "Character",
-              "type": "pistols::types::duelist_profile::CharacterProfile"
+              "type": "pistols::types::duelist_profile::CharacterKey"
             },
             {
               "name": "Bot",
-              "type": "pistols::types::duelist_profile::BotProfile"
+              "type": "pistols::types::duelist_profile::BotKey"
             },
             {
               "name": "Genesis",
-              "type": "pistols::types::duelist_profile::GenesisProfile"
+              "type": "pistols::types::duelist_profile::GenesisKey"
             }
           ]
         },
@@ -3959,6 +3959,38 @@
         },
         {
           "type": "struct",
+          "name": "pistols::types::rules::DuelistBonus",
+          "members": [
+            {
+              "name": "kill_pace",
+              "type": "core::integer::u8"
+            },
+            {
+              "name": "hit",
+              "type": "core::bool"
+            },
+            {
+              "name": "dodge",
+              "type": "core::bool"
+            }
+          ]
+        },
+        {
+          "type": "struct",
+          "name": "pistols::types::rules::DuelBonus",
+          "members": [
+            {
+              "name": "duelist_a",
+              "type": "pistols::types::rules::DuelistBonus"
+            },
+            {
+              "name": "duelist_b",
+              "type": "pistols::types::rules::DuelistBonus"
+            }
+          ]
+        },
+        {
+          "type": "struct",
           "name": "pistols::types::rules::RewardValues",
           "members": [
             {
@@ -4062,6 +4094,10 @@
                 {
                   "name": "tournament_id",
                   "type": "core::integer::u64"
+                },
+                {
+                  "name": "bonus",
+                  "type": "pistols::types::rules::DuelBonus"
                 }
               ],
               "outputs": [
@@ -6265,8 +6301,8 @@
       ]
     },
     {
-      "address": "0x6bdedf5c904382637efef197e6c8c2384b197ec8d301fc9c33bceec68ff3086",
-      "class_hash": "0x4a881800ff35a51d80d2bcbf51c9c3bfdbffe854d7d1ddae3b0a66151996081",
+      "address": "0x7074ef1ac5e48380fd4c6f8a7940c4a57774fb3d4a8cf436747a98d4625aca",
+      "class_hash": "0x6b968fb7a82dc385ca6ae20690501786f83b0fced4f202969c7f1f96fd1725c",
       "abi": [
         {
           "type": "impl",
@@ -7707,8 +7743,8 @@
       ]
     },
     {
-      "address": "0xa612de0016b46be659c046383e98c23309678156ab4ae01fbb3fa51a3e2f27",
-      "class_hash": "0x3f57170b573737acdfa23334e1cedb03d1114ca060726115de0c419808e516f",
+      "address": "0x54613f2371c4b8f7cf36635a68b7c495957c070026608078c2fe47c96a1b235",
+      "class_hash": "0x21e62ba205bcebe0a8d23ab607ecb698f07808ca9d2895179b57f538ca93df4",
       "abi": [
         {
           "type": "impl",
@@ -7867,6 +7903,22 @@
             },
             {
               "type": "function",
+              "name": "can_claim_gift",
+              "inputs": [
+                {
+                  "name": "recipient",
+                  "type": "core::starknet::contract_address::ContractAddress"
+                }
+              ],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
               "name": "can_purchase",
               "inputs": [
                 {
@@ -7908,6 +7960,17 @@
             {
               "type": "function",
               "name": "claim_starter_pack",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::array::Span::<core::integer::u128>"
+                }
+              ],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "claim_gift",
               "inputs": [],
               "outputs": [
                 {
@@ -8900,6 +8963,7 @@
       "systems": [
         "dojo_init",
         "claim_starter_pack",
+        "claim_gift",
         "purchase",
         "open",
         "upgrade",
@@ -9478,8 +9542,8 @@
       ]
     },
     {
-      "address": "0x1ab64b1450de033f1f3c000149410164ff55f1faa3d39f319295f88e1a4ce80",
-      "class_hash": "0x30325648c6792c8465a09d6cc7fddd990d551cf94c5a0548e4ed6e89df90d2d",
+      "address": "0x2ab4bcca134c2e448ee9a7aa6c8785d317f6e242664fabab1ff5913854b8c8",
+      "class_hash": "0x2c9e9717b70a9f320f3e9b8bd4b02d0ca8cf76b3215176f3cea1ce0ec48f7cc",
       "abi": [
         {
           "type": "impl",
@@ -10385,7 +10449,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x2b7b66204e7d9b786b631579a530a8998b63d7d02b43d6cd2289d499f085d0",
+      "class_hash": "0x6569704e96b8f52ff180335023889650fc2eb93b456a3ffb4ec93d07cc2a83f",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -10427,7 +10491,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x7714010b7744da58c0bf55812adfb6f510234a95c7926f62aa1fdff64d51b14",
+      "class_hash": "0x2d39da1d8bfed05c1b63d90be9b9dce46c2e0f4f8cfcaa486bc7efd222de606",
       "tag": "pistols-Player",
       "selector": "0x4fc7ed2304172cd24d40e2b967bf3642228eec13547b09e0ffdfb85469f6f86"
     },
@@ -10439,7 +10503,7 @@
     },
     {
       "members": [],
-      "class_hash": "0xb6133eee0c59c61eb8e2772406cb01b4aebfe3fadf1d38f9427ac1b8a226a5",
+      "class_hash": "0x1c219eb4438d34e919de1faa927be3ad753f74c4f27774f19c92fb42e08b898",
       "tag": "pistols-PlayerDuelistStack",
       "selector": "0xb47a4ea3849ae004ed3d0ba58070c0eb3cdca2bed8c9a6ab6bfe01210effc6"
     },

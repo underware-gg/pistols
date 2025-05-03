@@ -135,7 +135,7 @@ export interface Duelist {
 	duelist_id: BigNumberish;
 	duelist_profile: DuelistProfileEnum;
 	timestamps: DuelistTimestamps;
-	status: Totals;
+	totals: Totals;
 }
 
 // Type definition for `pistols::models::duelist::DuelistAssignment` struct
@@ -170,16 +170,6 @@ export interface DuelistMemorialValue {
 	season_id: BigNumberish;
 }
 
-// Type definition for `pistols::models::duelist::Totals` struct
-export interface Totals {
-	total_duels: BigNumberish;
-	total_wins: BigNumberish;
-	total_losses: BigNumberish;
-	total_draws: BigNumberish;
-	honour: BigNumberish;
-	honour_log: BigNumberish;
-}
-
 // Type definition for `pistols::models::duelist::DuelistTimestamps` struct
 export interface DuelistTimestamps {
 	registered: BigNumberish;
@@ -190,7 +180,17 @@ export interface DuelistTimestamps {
 export interface DuelistValue {
 	duelist_profile: DuelistProfileEnum;
 	timestamps: DuelistTimestamps;
-	status: Totals;
+	totals: Totals;
+}
+
+// Type definition for `pistols::models::duelist::Totals` struct
+export interface Totals {
+	total_duels: BigNumberish;
+	total_wins: BigNumberish;
+	total_losses: BigNumberish;
+	total_draws: BigNumberish;
+	honour: BigNumberish;
+	honour_log: BigNumberish;
 }
 
 // Type definition for `pistols::models::leaderboard::Leaderboard` struct
@@ -241,6 +241,7 @@ export interface PactValue {
 export interface Player {
 	player_address: string;
 	timestamps: PlayerTimestamps;
+	totals: Totals;
 }
 
 // Type definition for `pistols::models::player::PlayerBookmark` struct
@@ -286,12 +287,14 @@ export interface PlayerOnlineValue {
 // Type definition for `pistols::models::player::PlayerTimestamps` struct
 export interface PlayerTimestamps {
 	registered: BigNumberish;
+	claimed_gift: BigNumberish;
 	claimed_starter_pack: boolean;
 }
 
 // Type definition for `pistols::models::player::PlayerValue` struct
 export interface PlayerValue {
 	timestamps: PlayerTimestamps;
+	totals: Totals;
 }
 
 // Type definition for `pistols::models::pool::Pool` struct
@@ -612,24 +615,24 @@ export type ChallengeState = { [key in typeof challengeState[number]]: string };
 export type ChallengeStateEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::duelist_profile::BotKey` enum
-export const botProfile = [
+export const botKey = [
 	'Unknown',
 	'TinMan',
 	'Scarecrow',
 	'Leon',
 ] as const;
-export type BotKey = { [key in typeof botProfile[number]]: string };
+export type BotKey = { [key in typeof botKey[number]]: string };
 export type BotKeyEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::duelist_profile::CharacterKey` enum
-export const characterProfile = [
+export const characterKey = [
 	'Unknown',
 	'Bartender',
 	'Drunkard',
 	'Devil',
 	'Player',
 ] as const;
-export type CharacterKey = { [key in typeof characterProfile[number]]: string };
+export type CharacterKey = { [key in typeof characterKey[number]]: string };
 export type CharacterKeyEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::duelist_profile::DuelistProfile` enum
@@ -648,7 +651,7 @@ export type DuelistProfile = {
 export type DuelistProfileEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::duelist_profile::GenesisKey` enum
-export const genesisProfile = [
+export const genesisKey = [
 	'Unknown',
 	'Duke',
 	'Duella',
@@ -672,7 +675,7 @@ export const genesisProfile = [
 	'NynJah',
 	'Thrak',
 ] as const;
-export type GenesisKey = { [key in typeof genesisProfile[number]]: string };
+export type GenesisKey = { [key in typeof genesisKey[number]]: string };
 export type GenesisKeyEnum = CairoCustomEnum;
 
 // Type definition for `pistols::types::premise::Premise` enum
@@ -763,9 +766,9 @@ export interface SchemaType extends ISchemaType {
 		DuelistAssignmentValue: DuelistAssignmentValue,
 		DuelistMemorial: DuelistMemorial,
 		DuelistMemorialValue: DuelistMemorialValue,
-		Totals: Totals,
 		DuelistTimestamps: DuelistTimestamps,
 		DuelistValue: DuelistValue,
+		Totals: Totals,
 		Leaderboard: Leaderboard,
 		LeaderboardValue: LeaderboardValue,
 		Pack: Pack,
@@ -792,8 +795,8 @@ export interface SchemaType extends ISchemaType {
 		MockedValue: MockedValue,
 		MockedValueValue: MockedValueValue,
 		Period: Period,
-	// },
-	// achievement: {
+	},
+	achievement: {
 		TrophyCreation: TrophyCreation,
 		TrophyCreationValue: TrophyCreationValue,
 		TrophyProgression: TrophyProgression,
@@ -987,7 +990,7 @@ export const schema: SchemaType = {
 				Bot: undefined,
 				Genesis: undefined, }),
 		timestamps: { registered: 0, active: 0, },
-		status: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
+		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 		},
 		DuelistAssignment: {
 			duelist_id: 0,
@@ -1023,14 +1026,6 @@ export const schema: SchemaType = {
 			player_address: "",
 			season_id: 0,
 		},
-		Totals: {
-			total_duels: 0,
-			total_wins: 0,
-			total_losses: 0,
-			total_draws: 0,
-			honour: 0,
-			honour_log: 0,
-		},
 		DuelistTimestamps: {
 			registered: 0,
 			active: 0,
@@ -1042,7 +1037,15 @@ export const schema: SchemaType = {
 				Bot: undefined,
 				Genesis: undefined, }),
 		timestamps: { registered: 0, active: 0, },
-		status: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
+		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
+		},
+		Totals: {
+			total_duels: 0,
+			total_wins: 0,
+			total_losses: 0,
+			total_draws: 0,
+			honour: 0,
+			honour_log: 0,
 		},
 		Leaderboard: {
 			season_id: 0,
@@ -1089,7 +1092,8 @@ export const schema: SchemaType = {
 		},
 		Player: {
 			player_address: "",
-		timestamps: { registered: 0, claimed_starter_pack: false, },
+		timestamps: { registered: 0, claimed_gift: 0, claimed_starter_pack: false, },
+		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 		},
 		PlayerBookmark: {
 			identity: "",
@@ -1125,10 +1129,12 @@ export const schema: SchemaType = {
 		},
 		PlayerTimestamps: {
 			registered: 0,
+			claimed_gift: 0,
 			claimed_starter_pack: false,
 		},
 		PlayerValue: {
-		timestamps: { registered: 0, claimed_starter_pack: false, },
+		timestamps: { registered: 0, claimed_gift: 0, claimed_starter_pack: false, },
+		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
 		},
 		Pool: {
 		pool_id: new CairoCustomEnum({ 
@@ -1369,9 +1375,9 @@ export enum ModelsMapping {
 	DuelistAssignmentValue = 'pistols-DuelistAssignmentValue',
 	DuelistMemorial = 'pistols-DuelistMemorial',
 	DuelistMemorialValue = 'pistols-DuelistMemorialValue',
-	Totals = 'pistols-Totals',
 	DuelistTimestamps = 'pistols-DuelistTimestamps',
 	DuelistValue = 'pistols-DuelistValue',
+	Totals = 'pistols-Totals',
 	Leaderboard = 'pistols-Leaderboard',
 	LeaderboardValue = 'pistols-LeaderboardValue',
 	Pack = 'pistols-Pack',

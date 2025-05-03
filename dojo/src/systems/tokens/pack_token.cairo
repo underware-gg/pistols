@@ -61,7 +61,7 @@ pub trait IPackToken<TState> {
     fn can_purchase(self: @TState, recipient: ContractAddress, pack_type: PackType) -> bool;
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
     fn claim_starter_pack(ref self: TState) -> Span<u128>;
-    fn claim_gift(ref self: TState) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
+    fn claim_gift(ref self: TState) -> Span<u128>;
     fn purchase(ref self: TState, pack_type: PackType) -> Pack;
     fn open(ref self: TState, pack_id: u128) -> Span<u128>;
 }
@@ -76,7 +76,7 @@ pub trait IPackTokenPublic<TState> {
     fn calc_mint_fee(self: @TState, recipient: ContractAddress, pack_type: PackType) -> u128;
     // write
     fn claim_starter_pack(ref self: TState) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
-    fn claim_gift(ref self: TState) -> Span<u128>; //@description: Claim the starter pack, mint Duelists
+    fn claim_gift(ref self: TState) -> Span<u128>; //@description: Claim gift pack, if available
     fn purchase(ref self: TState, pack_type: PackType) -> Pack; //@description: Purchase a closed pack
     fn open(ref self: TState, pack_id: u128) -> Span<u128>; //@description: Open a pack, mint its contents
 }
