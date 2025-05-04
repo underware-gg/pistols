@@ -120,7 +120,7 @@ function SeasonRow({
   const { phase, timestamp_start, timestamp_end, isActive } = useSeason(seasonId)
   const { clientTimestamp } = useClientTimestamp(isActive)
   const { canCollectSeason } = useCanCollectSeason()
-  const { game: { collectSeason } } = useDojoContractCalls()
+  const { bank: { collectSeason } } = useDojoContractCalls()
   const poolSeason = useSeasonPool(seasonId)
   const { accountsCount } = useSeasonTotals(seasonId)
   return (

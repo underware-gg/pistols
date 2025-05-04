@@ -104,7 +104,7 @@ export const useCanCollectDuel = (duel_id: bigint) => {
 }
 
 export const useCanCollectSeason = () => {
-  const { game: { canCollectSeason } } = useDojoContractCalls()
+  const { bank: { canCollectSeason } } = useDojoContractCalls()
   const options = useMemo(() => ({
     call: canCollectSeason,
     args: [],
@@ -257,28 +257,3 @@ export const useAdminAmIOwner = () => {
   }
 }
 
-
-
-
-//------------------------------------------
-// TEST/DEBUG
-//
-export const useTestValidateSignature = () => {
-  const { game: { testValidateCommitMessage } } = useDojoContractCalls()
-  const options = useMemo(() => ({
-    call: testValidateCommitMessage,
-    args: [
-      '0xe29882a1fcba1e7e10cad46212257fea5c752a4f9b1b1ec683c503a2cf5c8a', // account
-      [173730084075620862592063244223266966993038958055152214202416930759334968124n, 1417567916191820063020424621516241329682320435780260605909088968782369795432n],
-      163115167366171702731397391899782408079n,
-      1n,
-    ],
-    defaultValue: false,
-  }), [])
-  const { value, isLoading } = useSdkCallPromise<boolean>(options)
-  console.log(`useTestValidateSignature()`, isLoading ? '...' : value)
-  return {
-    isValidated: value,
-    isLoading,
-  }
-}

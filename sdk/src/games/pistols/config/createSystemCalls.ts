@@ -111,23 +111,17 @@ export function createSystemCalls(
         ]
         return await _executeTransaction(signer, calls)
       },
-      collect_duel: async (signer: AccountInterface, duel_id: BigNumberish): Promise<boolean> => {
+      clear_call_to_action: async (signer: AccountInterface, duel_id: BigNumberish): Promise<boolean> => {
         const calls: DojoCalls = [
-          contractCalls.game.buildCollectDuelCalldata(
+          contractCalls.game.buildClearCallToActionCalldata(
             duel_id,
           ),
         ]
         return await _executeTransaction(signer, calls)
       },
-      collect_season: async (signer: AccountInterface): Promise<boolean> => {
+      collect_duel: async (signer: AccountInterface, duel_id: BigNumberish): Promise<boolean> => {
         const calls: DojoCalls = [
-          contractCalls.game.buildCollectSeasonCalldata(),
-        ]
-        return await _executeTransaction(signer, calls)
-      },
-      clear_call_to_action: async (signer: AccountInterface, duel_id: BigNumberish): Promise<boolean> => {
-        const calls: DojoCalls = [
-          contractCalls.game.buildClearCallToActionCalldata(
+          contractCalls.game.buildCollectDuelCalldata(
             duel_id,
           ),
         ]
@@ -261,6 +255,12 @@ export function createSystemCalls(
             lords_amount,
             tournament_id,
           ),
+        ]
+        return await _executeTransaction(signer, calls)
+      },
+      collect_season: async (signer: AccountInterface): Promise<boolean> => {
+        const calls: DojoCalls = [
+          contractCalls.bank.buildCollectSeasonCalldata(),
         ]
         return await _executeTransaction(signer, calls)
       },
