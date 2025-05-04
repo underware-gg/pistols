@@ -105,6 +105,23 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_bank_canCollectSeason_calldata = (): DojoCall => {
+		return {
+			contractName: "bank",
+			entrypoint: "can_collect_season",
+			calldata: [],
+		};
+	};
+
+	const bank_canCollectSeason = async () => {
+		try {
+			return await provider.call("pistols", build_bank_canCollectSeason_calldata());
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_bank_chargePurchase_calldata = (payer: string, lordsAmount: BigNumberish): DojoCall => {
 		return {
 			contractName: "bank",
@@ -118,6 +135,27 @@ export function setupWorld(provider: DojoProvider) {
 			return await provider.execute(
 				snAccount,
 				build_bank_chargePurchase_calldata(payer, lordsAmount),
+				"pistols",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_bank_collectSeason_calldata = (): DojoCall => {
+		return {
+			contractName: "bank",
+			entrypoint: "collect_season",
+			calldata: [],
+		};
+	};
+
+	const bank_collectSeason = async (snAccount: Account | AccountInterface) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_bank_collectSeason_calldata(),
 				"pistols",
 			);
 		} catch (error) {
@@ -2100,23 +2138,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_game_canCollectSeason_calldata = (): DojoCall => {
-		return {
-			contractName: "game",
-			entrypoint: "can_collect_season",
-			calldata: [],
-		};
-	};
-
-	const game_canCollectSeason = async () => {
-		try {
-			return await provider.call("pistols", build_game_canCollectSeason_calldata());
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_game_clearCallToAction_calldata = (duelistId: BigNumberish): DojoCall => {
 		return {
 			contractName: "game",
@@ -2151,27 +2172,6 @@ export function setupWorld(provider: DojoProvider) {
 			return await provider.execute(
 				snAccount,
 				build_game_collectDuel_calldata(duelId),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_game_collectSeason_calldata = (): DojoCall => {
-		return {
-			contractName: "game",
-			entrypoint: "collect_season",
-			calldata: [],
-		};
-	};
-
-	const game_collectSeason = async (snAccount: Account | AccountInterface) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_game_collectSeason_calldata(),
 				"pistols",
 			);
 		} catch (error) {
@@ -2343,23 +2343,6 @@ export function setupWorld(provider: DojoProvider) {
 				build_game_revealMoves_calldata(duelistId, duelId, salt, moves),
 				"pistols",
 			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
-	const build_game_testValidateCommitMessage_calldata = (account: string, signature: Array<BigNumberish>, duelId: BigNumberish, duelistId: BigNumberish): DojoCall => {
-		return {
-			contractName: "game",
-			entrypoint: "test_validate_commit_message",
-			calldata: [account, signature, duelId, duelistId],
-		};
-	};
-
-	const game_testValidateCommitMessage = async (account: string, signature: Array<BigNumberish>, duelId: BigNumberish, duelistId: BigNumberish) => {
-		try {
-			return await provider.call("pistols", build_game_testValidateCommitMessage_calldata(account, signature, duelId, duelistId));
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -3435,8 +3418,12 @@ export function setupWorld(provider: DojoProvider) {
 			buildUrgentUpdateCalldata: build_admin_urgentUpdate_calldata,
 		},
 		bank: {
+			canCollectSeason: bank_canCollectSeason,
+			buildCanCollectSeasonCalldata: build_bank_canCollectSeason_calldata,
 			chargePurchase: bank_chargePurchase,
 			buildChargePurchaseCalldata: build_bank_chargePurchase_calldata,
+			collectSeason: bank_collectSeason,
+			buildCollectSeasonCalldata: build_bank_collectSeason_calldata,
 			duelistLostFameToPool: bank_duelistLostFameToPool,
 			buildDuelistLostFameToPoolCalldata: build_bank_duelistLostFameToPool_calldata,
 			pegMintedFameToPurchasedLords: bank_pegMintedFameToPurchasedLords,
@@ -3659,14 +3646,10 @@ export function setupWorld(provider: DojoProvider) {
 			buildCalcSeasonRewardCalldata: build_game_calcSeasonReward_calldata,
 			canCollectDuel: game_canCollectDuel,
 			buildCanCollectDuelCalldata: build_game_canCollectDuel_calldata,
-			canCollectSeason: game_canCollectSeason,
-			buildCanCollectSeasonCalldata: build_game_canCollectSeason_calldata,
 			clearCallToAction: game_clearCallToAction,
 			buildClearCallToActionCalldata: build_game_clearCallToAction_calldata,
 			collectDuel: game_collectDuel,
 			buildCollectDuelCalldata: build_game_collectDuel_calldata,
-			collectSeason: game_collectSeason,
-			buildCollectSeasonCalldata: build_game_collectSeason_calldata,
 			commitMoves: game_commitMoves,
 			buildCommitMovesCalldata: build_game_commitMoves_calldata,
 			createTrophies: game_createTrophies,
@@ -3685,8 +3668,6 @@ export function setupWorld(provider: DojoProvider) {
 			buildGetTimestampCalldata: build_game_getTimestamp_calldata,
 			revealMoves: game_revealMoves,
 			buildRevealMovesCalldata: build_game_revealMoves_calldata,
-			testValidateCommitMessage: game_testValidateCommitMessage,
-			buildTestValidateCommitMessageCalldata: build_game_testValidateCommitMessage_calldata,
 		},
 		lords_mock: {
 			allowance: lords_mock_allowance,

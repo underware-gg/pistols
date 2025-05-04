@@ -1614,8 +1614,8 @@
       ]
     },
     {
-      "address": "0x1ee259d254f3cf47bda72432884da4d176b3d2754334193ad1e6d9bf891f786",
-      "class_hash": "0x7c2bd3a9ca9b5325e343d6e6bcfc71037f320b1f2a401de0a3291d3e958bb32",
+      "address": "0x6998cece58452da910e83b1852f273b02a03fa18418bf63c363b49b8af9d92c",
+      "class_hash": "0x3cc8f773b27e53052b769c89528e52c9ba8513c870931728d648a5d7b7e6fb",
       "abi": [
         {
           "type": "impl",
@@ -1673,6 +1673,20 @@
           "interface_name": "pistols::systems::bank::IBankPublic"
         },
         {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
           "type": "interface",
           "name": "pistols::systems::bank::IBankPublic",
           "items": [
@@ -1726,6 +1740,28 @@
                 }
               ],
               "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "can_collect_season",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::bool"
+                }
+              ],
+              "state_mutability": "view"
+            },
+            {
+              "type": "function",
+              "name": "collect_season",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::integer::u32"
+                }
+              ],
               "state_mutability": "external"
             }
           ]
@@ -2051,6 +2087,7 @@
         "sponsor_duelists",
         "sponsor_season",
         "sponsor_tournament",
+        "collect_season",
         "charge_purchase",
         "peg_minted_fame_to_purchased_lords",
         "release_lords_from_fame_to_be_burned",
@@ -2060,8 +2097,8 @@
       ]
     },
     {
-      "address": "0x161244013e17154e73f8c76e5749ed2438cca11a43166cf58b798c8e94f4ab6",
-      "class_hash": "0x3476b19e8b755d3da9b1ffe463d32c477ffb76102a9c34eb79fcd39ecb68a1b",
+      "address": "0x21b6cd4fd9639cf76871c9848fc2dec6578f0711b12aa905ce3470fd33904a9",
+      "class_hash": "0x1fae6d01fe085347ae2faf08b36b0a625146f5b916bccbe3b75989ef12d5e1c",
       "abi": [
         {
           "type": "impl",
@@ -3370,8 +3407,8 @@
       ]
     },
     {
-      "address": "0x357bfcef4c3230fb28f039b813dd0165b19b11ce1eea2ba323d9e34abef8ae6",
-      "class_hash": "0x67b14234ba29d4c430965db18504560f712fac638b3f28507da2af4a2836b30",
+      "address": "0xc53fb9f7dd2e8ce755ee9a590cfdea78cc0a513dd28340715fb4847848a273",
+      "class_hash": "0x587c2ba2bcb641dc8fb82f226e6ad72854e9ee2a1c53e370f0e117f268f4259",
       "abi": [
         {
           "type": "impl",
@@ -3658,6 +3695,14 @@
               "type": "()"
             },
             {
+              "name": "SerWalker",
+              "type": "()"
+            },
+            {
+              "name": "LadyVengeance",
+              "type": "()"
+            },
+            {
               "name": "Duke",
               "type": "()"
             },
@@ -3667,6 +3712,18 @@
             },
             {
               "name": "Jameson",
+              "type": "()"
+            },
+            {
+              "name": "Misty",
+              "type": "()"
+            },
+            {
+              "name": "Karaku",
+              "type": "()"
+            },
+            {
+              "name": "Kenzu",
               "type": "()"
             },
             {
@@ -3682,7 +3739,11 @@
               "type": "()"
             },
             {
-              "name": "SerWalker",
+              "name": "NynJah",
+              "type": "()"
+            },
+            {
+              "name": "Thrak",
               "type": "()"
             },
             {
@@ -3698,15 +3759,11 @@
               "type": "()"
             },
             {
-              "name": "LadyVengeance",
-              "type": "()"
-            },
-            {
               "name": "Breadman",
               "type": "()"
             },
             {
-              "name": "Brutus",
+              "name": "Groggus",
               "type": "()"
             },
             {
@@ -3722,23 +3779,195 @@
               "type": "()"
             },
             {
-              "name": "Karaku",
+              "name": "Fjolnir",
               "type": "()"
             },
             {
-              "name": "Misty",
+              "name": "ChimpDylan",
               "type": "()"
             },
             {
-              "name": "Kenzu",
+              "name": "Hinata",
               "type": "()"
             },
             {
-              "name": "NynJah",
+              "name": "HelixVex",
               "type": "()"
             },
             {
-              "name": "Thrak",
+              "name": "BuccaneerJames",
+              "type": "()"
+            },
+            {
+              "name": "TheSensei",
+              "type": "()"
+            },
+            {
+              "name": "SenseiTarrence",
+              "type": "()"
+            },
+            {
+              "name": "ThePainter",
+              "type": "()"
+            },
+            {
+              "name": "Ashe",
+              "type": "()"
+            },
+            {
+              "name": "SerGogi",
+              "type": "()"
+            },
+            {
+              "name": "TheSurvivor",
+              "type": "()"
+            },
+            {
+              "name": "TheFrenchman",
+              "type": "()"
+            },
+            {
+              "name": "SerFocger",
+              "type": "()"
+            },
+            {
+              "name": "SillySosij",
+              "type": "()"
+            },
+            {
+              "name": "BloodBeard",
+              "type": "()"
+            },
+            {
+              "name": "Fredison",
+              "type": "()"
+            },
+            {
+              "name": "TheBard",
+              "type": "()"
+            },
+            {
+              "name": "Ponzimancer",
+              "type": "()"
+            },
+            {
+              "name": "DealerTani",
+              "type": "()"
+            },
+            {
+              "name": "SerRichard",
+              "type": "()"
+            },
+            {
+              "name": "Recipromancer",
+              "type": "()"
+            },
+            {
+              "name": "Mataleone",
+              "type": "()"
+            },
+            {
+              "name": "FortunaRegem",
+              "type": "()"
+            },
+            {
+              "name": "Amaro",
+              "type": "()"
+            },
+            {
+              "name": "Mononoke",
+              "type": "()"
+            },
+            {
+              "name": "Parsa",
+              "type": "()"
+            },
+            {
+              "name": "Jubilee",
+              "type": "()"
+            },
+            {
+              "name": "LadyOfCrows",
+              "type": "()"
+            },
+            {
+              "name": "BananaDuke",
+              "type": "()"
+            },
+            {
+              "name": "LordGladstone",
+              "type": "()"
+            },
+            {
+              "name": "LadyStrokes",
+              "type": "()"
+            },
+            {
+              "name": "Bliss",
+              "type": "()"
+            },
+            {
+              "name": "StormMirror",
+              "type": "()"
+            },
+            {
+              "name": "Aldreda",
+              "type": "()"
+            },
+            {
+              "name": "Petronella",
+              "type": "()"
+            },
+            {
+              "name": "SeraphinaRose",
+              "type": "()"
+            },
+            {
+              "name": "LucienDeSombrel",
+              "type": "()"
+            },
+            {
+              "name": "FyernVirelock",
+              "type": "()"
+            },
+            {
+              "name": "Noir",
+              "type": "()"
+            },
+            {
+              "name": "QueenAce",
+              "type": "()"
+            },
+            {
+              "name": "JoshPeel",
+              "type": "()"
+            },
+            {
+              "name": "IronHandRogan",
+              "type": "()"
+            },
+            {
+              "name": "GoodPupStarky",
+              "type": "()"
+            },
+            {
+              "name": "ImyaSuspect",
+              "type": "()"
+            },
+            {
+              "name": "TheAlchemist",
+              "type": "()"
+            },
+            {
+              "name": "PonziusPilate",
+              "type": "()"
+            },
+            {
+              "name": "MistressNoodle",
+              "type": "()"
+            },
+            {
+              "name": "MasterOfSecrets",
               "type": "()"
             }
           ]
@@ -6301,8 +6530,8 @@
       ]
     },
     {
-      "address": "0x7074ef1ac5e48380fd4c6f8a7940c4a57774fb3d4a8cf436747a98d4625aca",
-      "class_hash": "0x6b968fb7a82dc385ca6ae20690501786f83b0fced4f202969c7f1f96fd1725c",
+      "address": "0x56d8e3a93690854a1139e11f3d8020fc0df9e8f9fe37c45b73356bff0c7c107",
+      "class_hash": "0x1a84d6f583707d526c47320f4924203e5559ec453f05f82474da20ab9c026fe",
       "abi": [
         {
           "type": "impl",
@@ -6862,17 +7091,6 @@
             },
             {
               "type": "function",
-              "name": "collect_season",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::integer::u32"
-                }
-              ],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
               "name": "clear_call_to_action",
               "inputs": [
                 {
@@ -6969,17 +7187,6 @@
             },
             {
               "type": "function",
-              "name": "can_collect_season",
-              "inputs": [],
-              "outputs": [
-                {
-                  "type": "core::bool"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
               "name": "calc_season_reward",
               "inputs": [
                 {
@@ -7009,34 +7216,6 @@
               "outputs": [
                 {
                   "type": "core::integer::u64"
-                }
-              ],
-              "state_mutability": "view"
-            },
-            {
-              "type": "function",
-              "name": "test_validate_commit_message",
-              "inputs": [
-                {
-                  "name": "account",
-                  "type": "core::starknet::contract_address::ContractAddress"
-                },
-                {
-                  "name": "signature",
-                  "type": "core::array::Array::<core::felt252>"
-                },
-                {
-                  "name": "duelId",
-                  "type": "core::felt252"
-                },
-                {
-                  "name": "duelistId",
-                  "type": "core::felt252"
-                }
-              ],
-              "outputs": [
-                {
-                  "type": "core::bool"
                 }
               ],
               "state_mutability": "view"
@@ -7195,7 +7374,6 @@
         "commit_moves",
         "reveal_moves",
         "collect_duel",
-        "collect_season",
         "clear_call_to_action",
         "create_trophies",
         "do_that_thing",
@@ -7743,8 +7921,8 @@
       ]
     },
     {
-      "address": "0x54613f2371c4b8f7cf36635a68b7c495957c070026608078c2fe47c96a1b235",
-      "class_hash": "0x21e62ba205bcebe0a8d23ab607ecb698f07808ca9d2895179b57f538ca93df4",
+      "address": "0x5bfea651a21c7b21186579886c60ace7d0c85bf6840ce8f51e371eba5153bbd",
+      "class_hash": "0x564fe14743e58ec836353f89052be7a5f1b63d6126cf89af7df6d7e1be3a414",
       "abi": [
         {
           "type": "impl",
@@ -9542,8 +9720,8 @@
       ]
     },
     {
-      "address": "0x2ab4bcca134c2e448ee9a7aa6c8785d317f6e242664fabab1ff5913854b8c8",
-      "class_hash": "0x2c9e9717b70a9f320f3e9b8bd4b02d0ca8cf76b3215176f3cea1ce0ec48f7cc",
+      "address": "0x7267dc5c676b0cc07e1609799408d1c93f4445c31a7df6f3036e4b089b6f2d7",
+      "class_hash": "0x5e5fc154ffdbcb4b74041b6f3ea640a985361f2cfa9ea5f23fc232a18bcf04e",
       "abi": [
         {
           "type": "impl",
@@ -10449,7 +10627,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x6569704e96b8f52ff180335023889650fc2eb93b456a3ffb4ec93d07cc2a83f",
+      "class_hash": "0x2f1cc8a4e21e78cee51f6c68381d501886669e282efc42d8b276ba1db4b14e2",
       "tag": "pistols-Duelist",
       "selector": "0x1ec34ce9ccaa39b540179d85e0dd0d46c1c1ae712f4cb40a9cd7f8c21ebaa46"
     },
@@ -10503,7 +10681,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x1c219eb4438d34e919de1faa927be3ad753f74c4f27774f19c92fb42e08b898",
+      "class_hash": "0x257b1c7f7d3e897f7fc99e911a61752ffd4f7ab57245c6d3a1b9f6b1d7e63b6",
       "tag": "pistols-PlayerDuelistStack",
       "selector": "0xb47a4ea3849ae004ed3d0ba58070c0eb3cdca2bed8c9a6ab6bfe01210effc6"
     },

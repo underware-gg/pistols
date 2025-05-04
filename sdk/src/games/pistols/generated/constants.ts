@@ -363,27 +363,75 @@ export const getBotKeyMap = (): Record<BotKey, number> => Object.keys(BotKey).re
 // from: ../dojo/src/types/duelist_profile.cairo
 export enum GenesisKey {
   Unknown = 'Unknown', // 0
-  Duke = 'Duke', // 1
-  Duella = 'Duella', // 2
-  Jameson = 'Jameson', // 3
-  Pilgrim = 'Pilgrim', // 4
-  Jack = 'Jack', // 5
-  Pops = 'Pops', // 6
-  SerWalker = 'SerWalker', // 7
-  Bloberto = 'Bloberto', // 8
-  Squiddo = 'Squiddo', // 9
-  SlenderDuck = 'SlenderDuck', // 10
-  LadyVengeance = 'LadyVengeance', // 11
-  Breadman = 'Breadman', // 12
-  Brutus = 'Brutus', // 13
-  Pistolopher = 'Pistolopher', // 14
-  Secreto = 'Secreto', // 15
-  ShadowMare = 'ShadowMare', // 16
-  Karaku = 'Karaku', // 17
-  Misty = 'Misty', // 18
-  Kenzu = 'Kenzu', // 19
-  NynJah = 'NynJah', // 20
-  Thrak = 'Thrak', // 21
+  SerWalker = 'SerWalker', // 1
+  LadyVengeance = 'LadyVengeance', // 2
+  Duke = 'Duke', // 3
+  Duella = 'Duella', // 4
+  Jameson = 'Jameson', // 5
+  Misty = 'Misty', // 6
+  Karaku = 'Karaku', // 7
+  Kenzu = 'Kenzu', // 8
+  Pilgrim = 'Pilgrim', // 9
+  Jack = 'Jack', // 10
+  Pops = 'Pops', // 11
+  NynJah = 'NynJah', // 12
+  Thrak = 'Thrak', // 13
+  Bloberto = 'Bloberto', // 14
+  Squiddo = 'Squiddo', // 15
+  SlenderDuck = 'SlenderDuck', // 16
+  Breadman = 'Breadman', // 17
+  Groggus = 'Groggus', // 18
+  Pistolopher = 'Pistolopher', // 19
+  Secreto = 'Secreto', // 20
+  ShadowMare = 'ShadowMare', // 21
+  Fjolnir = 'Fjolnir', // 22
+  ChimpDylan = 'ChimpDylan', // 23
+  Hinata = 'Hinata', // 24
+  HelixVex = 'HelixVex', // 25
+  BuccaneerJames = 'BuccaneerJames', // 26
+  TheSensei = 'TheSensei', // 27
+  SenseiTarrence = 'SenseiTarrence', // 28
+  ThePainter = 'ThePainter', // 29
+  Ashe = 'Ashe', // 30
+  SerGogi = 'SerGogi', // 31
+  TheSurvivor = 'TheSurvivor', // 32
+  TheFrenchman = 'TheFrenchman', // 33
+  SerFocger = 'SerFocger', // 34
+  SillySosij = 'SillySosij', // 35
+  BloodBeard = 'BloodBeard', // 36
+  Fredison = 'Fredison', // 37
+  TheBard = 'TheBard', // 38
+  Ponzimancer = 'Ponzimancer', // 39
+  DealerTani = 'DealerTani', // 40
+  SerRichard = 'SerRichard', // 41
+  Recipromancer = 'Recipromancer', // 42
+  Mataleone = 'Mataleone', // 43
+  FortunaRegem = 'FortunaRegem', // 44
+  Amaro = 'Amaro', // 45
+  Mononoke = 'Mononoke', // 46
+  Parsa = 'Parsa', // 47
+  Jubilee = 'Jubilee', // 48
+  LadyOfCrows = 'LadyOfCrows', // 49
+  BananaDuke = 'BananaDuke', // 50
+  LordGladstone = 'LordGladstone', // 51
+  LadyStrokes = 'LadyStrokes', // 52
+  Bliss = 'Bliss', // 53
+  StormMirror = 'StormMirror', // 54
+  Aldreda = 'Aldreda', // 55
+  Petronella = 'Petronella', // 56
+  SeraphinaRose = 'SeraphinaRose', // 57
+  LucienDeSombrel = 'LucienDeSombrel', // 58
+  FyernVirelock = 'FyernVirelock', // 59
+  Noir = 'Noir', // 60
+  QueenAce = 'QueenAce', // 61
+  JoshPeel = 'JoshPeel', // 62
+  IronHandRogan = 'IronHandRogan', // 63
+  GoodPupStarky = 'GoodPupStarky', // 64
+  ImyaSuspect = 'ImyaSuspect', // 65
+  TheAlchemist = 'TheAlchemist', // 66
+  PonziusPilate = 'PonziusPilate', // 67
+  MistressNoodle = 'MistressNoodle', // 68
+  MasterOfSecrets = 'MasterOfSecrets', // 69
 };
 export const getGenesisKeyValue = (name: GenesisKey): number | undefined => _indexOrUndefined(Object.keys(GenesisKey).indexOf(name));
 export const getGenesisKeyFromValue = (value: number): GenesisKey | undefined => Object.keys(GenesisKey)[value] as GenesisKey;
@@ -996,7 +1044,7 @@ export const COLLECTIONS: type_COLLECTIONS = {
   Genesis: {
     name: 'Genesis Collection',
     folder_name: 'genesis',
-    profile_count: 21,
+    profile_count: 69,
     is_playable: true,
     duelist_id_base: 0n,
   },
@@ -1053,31 +1101,85 @@ export const BOT_PROFILES: type_BOT_PROFILES = {
 // from: ../dojo/src/types/duelist_profile.cairo
 type type_GENESIS_PROFILES = {
   Unknown: ProfileDescription, // cairo: ProfileDescription
+  SerWalker: ProfileDescription, // cairo: ProfileDescription
+  LadyVengeance: ProfileDescription, // cairo: ProfileDescription
   Duke: ProfileDescription, // cairo: ProfileDescription
   Duella: ProfileDescription, // cairo: ProfileDescription
   Jameson: ProfileDescription, // cairo: ProfileDescription
+  Misty: ProfileDescription, // cairo: ProfileDescription
+  Karaku: ProfileDescription, // cairo: ProfileDescription
+  Kenzu: ProfileDescription, // cairo: ProfileDescription
   Pilgrim: ProfileDescription, // cairo: ProfileDescription
   Jack: ProfileDescription, // cairo: ProfileDescription
   Pops: ProfileDescription, // cairo: ProfileDescription
-  SerWalker: ProfileDescription, // cairo: ProfileDescription
+  NynJah: ProfileDescription, // cairo: ProfileDescription
+  Thrak: ProfileDescription, // cairo: ProfileDescription
   Bloberto: ProfileDescription, // cairo: ProfileDescription
   Squiddo: ProfileDescription, // cairo: ProfileDescription
   SlenderDuck: ProfileDescription, // cairo: ProfileDescription
-  LadyVengeance: ProfileDescription, // cairo: ProfileDescription
   Breadman: ProfileDescription, // cairo: ProfileDescription
-  Brutus: ProfileDescription, // cairo: ProfileDescription
+  Groggus: ProfileDescription, // cairo: ProfileDescription
   Pistolopher: ProfileDescription, // cairo: ProfileDescription
   Secreto: ProfileDescription, // cairo: ProfileDescription
   ShadowMare: ProfileDescription, // cairo: ProfileDescription
-  Karaku: ProfileDescription, // cairo: ProfileDescription
-  Misty: ProfileDescription, // cairo: ProfileDescription
-  Kenzu: ProfileDescription, // cairo: ProfileDescription
-  NynJah: ProfileDescription, // cairo: ProfileDescription
-  Thrak: ProfileDescription, // cairo: ProfileDescription
+  Fjolnir: ProfileDescription, // cairo: ProfileDescription
+  ChimpDylan: ProfileDescription, // cairo: ProfileDescription
+  Hinata: ProfileDescription, // cairo: ProfileDescription
+  HelixVex: ProfileDescription, // cairo: ProfileDescription
+  BuccaneerJames: ProfileDescription, // cairo: ProfileDescription
+  TheSensei: ProfileDescription, // cairo: ProfileDescription
+  SenseiTarrence: ProfileDescription, // cairo: ProfileDescription
+  ThePainter: ProfileDescription, // cairo: ProfileDescription
+  Ashe: ProfileDescription, // cairo: ProfileDescription
+  SerGogi: ProfileDescription, // cairo: ProfileDescription
+  TheSurvivor: ProfileDescription, // cairo: ProfileDescription
+  TheFrenchman: ProfileDescription, // cairo: ProfileDescription
+  SerFocger: ProfileDescription, // cairo: ProfileDescription
+  SillySosij: ProfileDescription, // cairo: ProfileDescription
+  BloodBeard: ProfileDescription, // cairo: ProfileDescription
+  Fredison: ProfileDescription, // cairo: ProfileDescription
+  TheBard: ProfileDescription, // cairo: ProfileDescription
+  Ponzimancer: ProfileDescription, // cairo: ProfileDescription
+  DealerTani: ProfileDescription, // cairo: ProfileDescription
+  SerRichard: ProfileDescription, // cairo: ProfileDescription
+  Recipromancer: ProfileDescription, // cairo: ProfileDescription
+  Mataleone: ProfileDescription, // cairo: ProfileDescription
+  FortunaRegem: ProfileDescription, // cairo: ProfileDescription
+  Amaro: ProfileDescription, // cairo: ProfileDescription
+  Mononoke: ProfileDescription, // cairo: ProfileDescription
+  Parsa: ProfileDescription, // cairo: ProfileDescription
+  Jubilee: ProfileDescription, // cairo: ProfileDescription
+  LadyOfCrows: ProfileDescription, // cairo: ProfileDescription
+  BananaDuke: ProfileDescription, // cairo: ProfileDescription
+  LordGladstone: ProfileDescription, // cairo: ProfileDescription
+  LadyStrokes: ProfileDescription, // cairo: ProfileDescription
+  Bliss: ProfileDescription, // cairo: ProfileDescription
+  StormMirror: ProfileDescription, // cairo: ProfileDescription
+  Aldreda: ProfileDescription, // cairo: ProfileDescription
+  Petronella: ProfileDescription, // cairo: ProfileDescription
+  SeraphinaRose: ProfileDescription, // cairo: ProfileDescription
+  LucienDeSombrel: ProfileDescription, // cairo: ProfileDescription
+  FyernVirelock: ProfileDescription, // cairo: ProfileDescription
+  Noir: ProfileDescription, // cairo: ProfileDescription
+  QueenAce: ProfileDescription, // cairo: ProfileDescription
+  JoshPeel: ProfileDescription, // cairo: ProfileDescription
+  IronHandRogan: ProfileDescription, // cairo: ProfileDescription
+  GoodPupStarky: ProfileDescription, // cairo: ProfileDescription
+  ImyaSuspect: ProfileDescription, // cairo: ProfileDescription
+  TheAlchemist: ProfileDescription, // cairo: ProfileDescription
+  PonziusPilate: ProfileDescription, // cairo: ProfileDescription
+  MistressNoodle: ProfileDescription, // cairo: ProfileDescription
+  MasterOfSecrets: ProfileDescription, // cairo: ProfileDescription
 };
 export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
   Unknown: {
     name: 'Unknown',
+  },
+  SerWalker: {
+    name: 'Ser Walker',
+  },
+  LadyVengeance: {
+    name: 'Lady Vengeance',
   },
   Duke: {
     name: 'Duke',
@@ -1088,17 +1190,29 @@ export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
   Jameson: {
     name: 'Jameson',
   },
+  Misty: {
+    name: 'Misty',
+  },
+  Karaku: {
+    name: 'Karaku',
+  },
+  Kenzu: {
+    name: 'Kenzu',
+  },
   Pilgrim: {
     name: 'Pilgrim',
   },
   Jack: {
-    name: 'Jack',
+    name: 'Foolish Jack',
   },
   Pops: {
     name: 'Pops',
   },
-  SerWalker: {
-    name: 'Ser Walker',
+  NynJah: {
+    name: 'Nyn Jah',
+  },
+  Thrak: {
+    name: 'Thrak',
   },
   Bloberto: {
     name: 'Bloberto',
@@ -1109,14 +1223,11 @@ export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
   SlenderDuck: {
     name: 'Slender Duck',
   },
-  LadyVengeance: {
-    name: 'Lady Vengeance',
-  },
   Breadman: {
     name: 'Breadman',
   },
-  Brutus: {
-    name: 'Brutus',
+  Groggus: {
+    name: 'Groggus',
   },
   Pistolopher: {
     name: 'Pistolopher',
@@ -1127,20 +1238,149 @@ export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
   ShadowMare: {
     name: 'Shadow Mare',
   },
-  Karaku: {
-    name: 'Karaku',
+  Fjolnir: {
+    name: 'Fjolnir',
   },
-  Misty: {
-    name: 'Misty',
+  ChimpDylan: {
+    name: 'Chimp Dylan',
   },
-  Kenzu: {
-    name: 'Kenzu',
+  Hinata: {
+    name: 'Hinata',
   },
-  NynJah: {
-    name: 'Nyn Jah',
+  HelixVex: {
+    name: 'Helix Vex',
   },
-  Thrak: {
-    name: 'Thrak',
+  BuccaneerJames: {
+    name: 'Buccaneer James',
+  },
+  TheSensei: {
+    name: 'The Sensei',
+  },
+  SenseiTarrence: {
+    name: 'Sensei Tarrence',
+  },
+  ThePainter: {
+    name: 'The Painter',
+  },
+  Ashe: {
+    name: 'Ashe',
+  },
+  SerGogi: {
+    name: 'Ser Gogi',
+  },
+  TheSurvivor: {
+    name: 'The Survivor',
+  },
+  TheFrenchman: {
+    name: 'The Frenchman',
+  },
+  SerFocger: {
+    name: 'Ser FOCGer',
+  },
+  SillySosij: {
+    name: 'Silly Sosij',
+  },
+  BloodBeard: {
+    name: 'Blood Beard',
+  },
+  Fredison: {
+    name: 'Fredison',
+  },
+  TheBard: {
+    name: 'The Bard',
+  },
+  Ponzimancer: {
+    name: 'Ponzimancer',
+  },
+  DealerTani: {
+    name: 'Dealer Tani',
+  },
+  SerRichard: {
+    name: 'Ser Richard',
+  },
+  Recipromancer: {
+    name: 'Ser Recipro',
+  },
+  Mataleone: {
+    name: 'Ser Mata',
+  },
+  FortunaRegem: {
+    name: 'Master of Veils',
+  },
+  Amaro: {
+    name: 'Monsieur Bongo',
+  },
+  Mononoke: {
+    name: 'The Sorceress',
+  },
+  Parsa: {
+    name: 'The Barbarian',
+  },
+  Jubilee: {
+    name: 'Magus Jubilee',
+  },
+  LadyOfCrows: {
+    name: 'Lady of Crows',
+  },
+  BananaDuke: {
+    name: 'Banana Duke',
+  },
+  LordGladstone: {
+    name: 'Lord Gladstone',
+  },
+  LadyStrokes: {
+    name: 'Lady Strokes',
+  },
+  Bliss: {
+    name: 'Bliss',
+  },
+  StormMirror: {
+    name: 'Storm Mirror',
+  },
+  Aldreda: {
+    name: 'Aldreda',
+  },
+  Petronella: {
+    name: 'Petronella Gigglefern',
+  },
+  SeraphinaRose: {
+    name: 'Seraphina Rose',
+  },
+  LucienDeSombrel: {
+    name: 'Lucien De Sombrel',
+  },
+  FyernVirelock: {
+    name: 'Fyern Virelock',
+  },
+  Noir: {
+    name: 'Noir',
+  },
+  QueenAce: {
+    name: 'Queen Ace',
+  },
+  JoshPeel: {
+    name: 'Josh Peel',
+  },
+  IronHandRogan: {
+    name: 'Iron Hand Rogan',
+  },
+  GoodPupStarky: {
+    name: 'Good Pup Starky',
+  },
+  ImyaSuspect: {
+    name: 'Imya Suspect',
+  },
+  TheAlchemist: {
+    name: 'The Alchemist',
+  },
+  PonziusPilate: {
+    name: 'Ponzius Pilate',
+  },
+  MistressNoodle: {
+    name: 'Mistress Noodle',
+  },
+  MasterOfSecrets: {
+    name: 'Master of Secrets',
   },
 };
 

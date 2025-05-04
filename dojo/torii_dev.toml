@@ -19,9 +19,9 @@ pending = true
 transactions = true
 world_block = 1
 contracts = [
-  "erc721:0x161244013e17154e73f8c76e5749ed2438cca11a43166cf58b798c8e94f4ab6", # duel_token
-  "erc721:0x357bfcef4c3230fb28f039b813dd0165b19b11ce1eea2ba323d9e34abef8ae6", # duelist_token
-  "erc721:0x54613f2371c4b8f7cf36635a68b7c495957c070026608078c2fe47c96a1b235", # pack_token
+  "erc721:0x21b6cd4fd9639cf76871c9848fc2dec6578f0711b12aa905ce3470fd33904a9", # duel_token
+  "erc721:0xc53fb9f7dd2e8ce755ee9a590cfdea78cc0a513dd28340715fb4847848a273", # duelist_token
+  "erc721:0x5bfea651a21c7b21186579886c60ace7d0c85bf6840ce8f51e371eba5153bbd", # pack_token
   # "erc721:$tournament_token", # tournament_token
   "erc20:0x51adc6aa7bf88a528ae5f7342d5a26a86610634da7e73f3b42ee6d6f86ce8d9", # fame_coin
   "erc20:0x7a9d496c57f5832230d2379300c49fd665378d79931e210af4f6a1b668b9bec", # fools_coin
