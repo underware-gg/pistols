@@ -770,12 +770,6 @@ pub mod tester {
         (*system).collect_duel(duel_id);
         _next_block();
     }
-    pub fn execute_collect_season(system: @IGameDispatcher, sender: ContractAddress) -> u32 {
-        impersonate(sender);
-        let new_season_id: u32 = (*system).collect_season();
-        _next_block();
-        (new_season_id)
-    }
 
     // ::tutorial
     pub fn execute_create_tutorial(system: @ITutorialDispatcher, sender: ContractAddress,
@@ -807,11 +801,11 @@ pub mod tester {
     }
 
     // ::bank
-    pub fn execute_sponsor_duelists(system: @IBankDispatcher, sender: ContractAddress,
+    pub fn execute_sponsor_duelists(sys: @TestSystems, sender: ContractAddress,
         amount: u128,
     ) {
         impersonate(sender);
-        (*system).sponsor_duelists(sender, amount);
+        (*sys.bank).sponsor_duelists(sender, amount);
         _next_block();
     }
     pub fn fund_duelists_pool(sys: @TestSystems, quantity: u8) {
@@ -823,7 +817,13 @@ pub mod tester {
         execute_lords_approve(sys.lords, sponsor, *sys.bank.contract_address, balance.low);
         // fund pool
         let price: u128 = PackType::StarterPack.description().price_lords;
-        execute_sponsor_duelists(sys.bank, sponsor, price * quantity.into());
+        execute_sponsor_duelists(sys, sponsor, price * quantity.into());
+    }
+    pub fn execute_collect_season(sys: @TestSystems, sender: ContractAddress) -> u32 {
+        impersonate(sender);
+        let new_season_id: u32 = (*sys.bank).collect_season();
+        _next_block();
+        (new_season_id)
     }
 
     //

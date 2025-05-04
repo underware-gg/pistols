@@ -272,7 +272,7 @@ mod tests {
         // collect season
         let season: SeasonConfig = (*sys.store).get_current_season();
         tester::set_block_timestamp(season.period.end);
-        tester::execute_collect_season(sys.game, OWNER());
+        tester::execute_collect_season(sys, OWNER());
 
         // duelists got some LORDS
         let mut last_balance: u128 = 0xffffffffffffffffffffffffffffffff;

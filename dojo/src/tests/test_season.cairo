@@ -13,7 +13,7 @@ mod tests {
     use pistols::tests::tester::{tester,
         tester::{
             StoreTrait,
-            IGameDispatcherTrait,
+            IBankDispatcherTrait,
             TestSystems, FLAGS,
             ID, OWNER, OTHER, SEASON_ID_1, SEASON_ID_2, MESSAGE,
             Trophy,
@@ -48,12 +48,12 @@ mod tests {
         tester::execute_reply_duel(@sys.duels, OWNER(), ID(OWNER()), duel_id, false);
         //  time travel
         assert!(!season_1.can_collect(), "!season_1.can_collect");
-        assert!(!sys.game.can_collect_season(), "!sys.game.can_collect_season");
+        assert!(!sys.bank.can_collect_season(), "!sys.bank.can_collect_season");
         tester::set_block_timestamp(season_1.period.end);
         assert!(season_1.can_collect(), "season_1.can_collect");
-        assert!(sys.game.can_collect_season(), "sys.game.can_collect_season");
+        assert!(sys.bank.can_collect_season(), "sys.bank.can_collect_season");
         // collect
-        let new_season_id: u32 = tester::execute_collect_season(@sys.game, OWNER());
+        let new_season_id: u32 = tester::execute_collect_season(@sys, OWNER());
         assert_ne!(new_season_id, 0, "new_season_id != 0");
         assert_ne!(new_season_id, season_1.season_id, "new_season_id");
         // past season is ended
@@ -66,7 +66,7 @@ mod tests {
         assert_eq!(season_2.season_id, SEASON_ID_2, "season_2.season_id == SEASON_ID_2");
         assert_eq!(season_2.phase, SeasonPhase::InProgress, "season_2.phase");
         assert!(!season_2.can_collect(), "!season_2.can_collect");
-        assert!(!sys.game.can_collect_season(), "!sys.game.can_collect_season_NEW");
+        assert!(!sys.bank.can_collect_season(), "!sys.bank.can_collect_season_NEW");
         // get new season
         let new_season: SeasonConfig = sys.store.get_season_config( new_season_id);
         assert_eq!(new_season.rules, Rules::Season, "new_season.rules");
@@ -91,7 +91,7 @@ mod tests {
         assert_eq!(challenge.state, ChallengeState::InProgress, "ChallengeState::InProgress");
         // collect season 1
         tester::set_block_timestamp(season_1.period.end);
-        tester::execute_collect_season(@sys.game, OWNER());
+        tester::execute_collect_season(@sys, OWNER());
         // continue challenge
         let (mocked, moves_a, moves_b) = prefabs::get_moves_dual_crit();
         let (challenge, _) = prefabs::commit_reveal_get(@sys, duel_id, OWNER(), OTHER(), mocked, moves_a, moves_b);
@@ -107,7 +107,7 @@ mod tests {
         let season: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season.period.end);
         tester::drop_dojo_events(@sys);
-        tester::execute_collect_season(@sys.game, OWNER());
+        tester::execute_collect_season(@sys, OWNER());
         tester::assert_event_trophy(@sys, Trophy::SeasonCollector, OWNER());
         // no panic!
     }
@@ -117,7 +117,7 @@ mod tests {
     fn test_collect_still_active() {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let _season: SeasonConfig = sys.store.get_current_season();
-        tester::execute_collect_season(@sys.game, OWNER());
+        tester::execute_collect_season(@sys, OWNER());
     }
 
     #[test]
@@ -126,9 +126,9 @@ mod tests {
         let mut sys: TestSystems = tester::setup_world(FLAGS:: ADMIN | FLAGS::GAME);
         let season: SeasonConfig = sys.store.get_current_season();
         tester::set_block_timestamp(season.period.end);
-        tester::execute_collect_season(@sys.game, OWNER());
+        tester::execute_collect_season(@sys, OWNER());
         // panic! >>>> will collect new season
-        tester::execute_collect_season(@sys.game, OWNER());
+        tester::execute_collect_season(@sys, OWNER());
     }
 
 }
