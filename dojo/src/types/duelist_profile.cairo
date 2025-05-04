@@ -51,7 +51,7 @@ pub enum GenesisKey {
     Squiddo,                // 15
     SlenderDuck,            // 16
     Breadman,               // 17
-    Brutus,                 // 18
+    Groggus,                // 18
     Pistolopher,            // 19
     Secreto,                // 20
     ShadowMare,             // 21
@@ -75,13 +75,13 @@ pub enum GenesisKey {
     Ponzimancer,            // 39
     DealerTani,             // 40
     SerRichard,             // 41
-    SerRecipro,             // 42
-    MataLeao,               // 43
-    MasterOfVeils,          // 44
-    MonsieurBongo,          // 45
-    TheSorceress,           // 46
-    TheBarbarian,           // 47
-    MagusJubilee,           // 48
+    Recipromancer,          // 42
+    Mataleone,              // 43
+    FortunaRegem,           // 44
+    Amaro,                  // 45
+    Mononoke,               // 46
+    Parsa,                  // 47
+    Jubilee,                // 48
     LadyOfCrows,            // 49
     BananaDuke,             // 50
     LordGladstone,          // 51
@@ -252,8 +252,8 @@ mod GENESIS_PROFILES {
     pub const Breadman: ProfileDescription = ProfileDescription {  // 17
         name: 'Breadman',
     };
-    pub const Brutus: ProfileDescription = ProfileDescription {  // 18
-        name: 'Brutus',
+    pub const Groggus: ProfileDescription = ProfileDescription {  // 18
+        name: 'Groggus',
     };
     pub const Pistolopher: ProfileDescription = ProfileDescription {  // 19
         name: 'Pistolopher',
@@ -324,25 +324,25 @@ mod GENESIS_PROFILES {
     pub const SerRichard: ProfileDescription = ProfileDescription {  // 41
         name: 'Ser Richard',
     };
-    pub const SerRecipro: ProfileDescription = ProfileDescription {  // 42
+    pub const Recipromancer: ProfileDescription = ProfileDescription {  // 42
         name: 'Ser Recipro',
     };
-    pub const MataLeao: ProfileDescription = ProfileDescription {  // 43
+    pub const Mataleone: ProfileDescription = ProfileDescription {  // 43
         name: 'Ser Mata',
     };
-    pub const MasterOfVeils: ProfileDescription = ProfileDescription {  // 44
+    pub const FortunaRegem: ProfileDescription = ProfileDescription {  // 44
         name: 'Master of Veils',
     };
-    pub const MonsieurBongo: ProfileDescription = ProfileDescription {  // 45
+    pub const Amaro: ProfileDescription = ProfileDescription {  // 45
         name: 'Monsieur Bongo',
     };
-    pub const TheSorceress: ProfileDescription = ProfileDescription {  // 46
+    pub const Mononoke: ProfileDescription = ProfileDescription {  // 46
         name: 'The Sorceress',
     };
-    pub const TheBarbarian: ProfileDescription = ProfileDescription {  // 47
+    pub const Parsa: ProfileDescription = ProfileDescription {  // 47
         name: 'The Barbarian',
     };
-    pub const MagusJubilee: ProfileDescription = ProfileDescription {  // 48
+    pub const Jubilee: ProfileDescription = ProfileDescription {  // 48
         name: 'Magus Jubilee',
     };
     pub const LadyOfCrows: ProfileDescription = ProfileDescription {  // 49
@@ -576,7 +576,7 @@ impl GenesisKeyIntoDescription of core::traits::Into<GenesisKey, ProfileDescript
             GenesisKey::Squiddo =>          GENESIS_PROFILES::Squiddo,          // 15
             GenesisKey::SlenderDuck =>      GENESIS_PROFILES::SlenderDuck,      // 16
             GenesisKey::Breadman =>         GENESIS_PROFILES::Breadman,         // 17
-            GenesisKey::Brutus =>           GENESIS_PROFILES::Brutus,           // 18
+            GenesisKey::Groggus =>          GENESIS_PROFILES::Groggus,          // 18
             GenesisKey::Pistolopher =>      GENESIS_PROFILES::Pistolopher,      // 19
             GenesisKey::Secreto =>          GENESIS_PROFILES::Secreto,          // 20
             GenesisKey::ShadowMare =>       GENESIS_PROFILES::ShadowMare,       // 21
@@ -600,13 +600,13 @@ impl GenesisKeyIntoDescription of core::traits::Into<GenesisKey, ProfileDescript
             GenesisKey::Ponzimancer =>      GENESIS_PROFILES::Ponzimancer,      // 39
             GenesisKey::DealerTani =>       GENESIS_PROFILES::DealerTani,       // 40
             GenesisKey::SerRichard =>       GENESIS_PROFILES::SerRichard,       // 41
-            GenesisKey::SerRecipro =>       GENESIS_PROFILES::SerRecipro,       // 42
-            GenesisKey::MataLeao =>         GENESIS_PROFILES::MataLeao,         // 43
-            GenesisKey::MasterOfVeils =>    GENESIS_PROFILES::MasterOfVeils,    // 44
-            GenesisKey::MonsieurBongo =>    GENESIS_PROFILES::MonsieurBongo,    // 45
-            GenesisKey::TheSorceress =>     GENESIS_PROFILES::TheSorceress,     // 46
-            GenesisKey::TheBarbarian =>     GENESIS_PROFILES::TheBarbarian,     // 47
-            GenesisKey::MagusJubilee =>     GENESIS_PROFILES::MagusJubilee,     // 48
+            GenesisKey::Recipromancer =>    GENESIS_PROFILES::Recipromancer,    // 42
+            GenesisKey::Mataleone =>        GENESIS_PROFILES::Mataleone,        // 43
+            GenesisKey::FortunaRegem =>     GENESIS_PROFILES::FortunaRegem,     // 44
+            GenesisKey::Amaro =>            GENESIS_PROFILES::Amaro,            // 45
+            GenesisKey::Mononoke =>         GENESIS_PROFILES::Mononoke,         // 46
+            GenesisKey::Parsa =>            GENESIS_PROFILES::Parsa,            // 47
+            GenesisKey::Jubilee =>          GENESIS_PROFILES::Jubilee,          // 48
             GenesisKey::LadyOfCrows =>      GENESIS_PROFILES::LadyOfCrows,      // 49
             GenesisKey::BananaDuke =>       GENESIS_PROFILES::BananaDuke,       // 50
             GenesisKey::LordGladstone =>    GENESIS_PROFILES::LordGladstone,    // 51
@@ -675,40 +675,40 @@ impl GenesisKeyIntoU8 of core::traits::Into<GenesisKey, u8> {
     fn into(self: GenesisKey) -> u8 {
         match self {
             GenesisKey::Unknown =>          0,
-            GenesisKey::SerWalker =>       1,
-            GenesisKey::LadyVengeance =>   2,
-            GenesisKey::Duke =>            3,
-            GenesisKey::Duella =>          4,
-            GenesisKey::Jameson =>         5,
-            GenesisKey::Misty =>           6,
-            GenesisKey::Karaku =>          7,
-            GenesisKey::Kenzu =>           8,
-            GenesisKey::Pilgrim =>         9,
-            GenesisKey::Jack =>            10,
-            GenesisKey::Pops =>            11,
-            GenesisKey::NynJah =>          12,
-            GenesisKey::Thrak =>           13,
-            GenesisKey::Bloberto =>        14,
-            GenesisKey::Squiddo =>         15,
-            GenesisKey::SlenderDuck =>     16,
-            GenesisKey::Breadman =>        17,
-            GenesisKey::Brutus =>          18,
-            GenesisKey::Pistolopher =>     19,
-            GenesisKey::Secreto =>         20,
-            GenesisKey::ShadowMare =>      21,
-            GenesisKey::Fjolnir =>         22,
-            GenesisKey::ChimpDylan =>      23,
-            GenesisKey::Hinata =>          24,
-            GenesisKey::HelixVex =>        25,
-            GenesisKey::BuccaneerJames =>  26,
-            GenesisKey::TheSensei =>       27,
-            GenesisKey::SenseiTarrence =>  28,
-            GenesisKey::ThePainter =>      29,
-            GenesisKey::Ashe =>            30,
-            GenesisKey::SerGogi =>         31,
-            GenesisKey::TheSurvivor =>     32,
-            GenesisKey::TheFrenchman =>    33,
-            GenesisKey::SerFocger =>       34,
+            GenesisKey::SerWalker =>        1,
+            GenesisKey::LadyVengeance =>    2,
+            GenesisKey::Duke =>             3,
+            GenesisKey::Duella =>           4,
+            GenesisKey::Jameson =>          5,
+            GenesisKey::Misty =>            6,
+            GenesisKey::Karaku =>           7,
+            GenesisKey::Kenzu =>            8,
+            GenesisKey::Pilgrim =>          9,
+            GenesisKey::Jack =>             10,
+            GenesisKey::Pops =>             11,
+            GenesisKey::NynJah =>           12,
+            GenesisKey::Thrak =>            13,
+            GenesisKey::Bloberto =>         14,
+            GenesisKey::Squiddo =>          15,
+            GenesisKey::SlenderDuck =>      16,
+            GenesisKey::Breadman =>         17,
+            GenesisKey::Groggus =>          18,
+            GenesisKey::Pistolopher =>      19,
+            GenesisKey::Secreto =>          20,
+            GenesisKey::ShadowMare =>       21,
+            GenesisKey::Fjolnir =>          22,
+            GenesisKey::ChimpDylan =>       23,
+            GenesisKey::Hinata =>           24,
+            GenesisKey::HelixVex =>         25,
+            GenesisKey::BuccaneerJames =>   26,
+            GenesisKey::TheSensei =>        27,
+            GenesisKey::SenseiTarrence =>   28,
+            GenesisKey::ThePainter =>       29,
+            GenesisKey::Ashe =>             30,
+            GenesisKey::SerGogi =>          31,
+            GenesisKey::TheSurvivor =>      32,
+            GenesisKey::TheFrenchman =>     33,
+            GenesisKey::SerFocger =>        34,
             GenesisKey::SillySosij =>       35,
             GenesisKey::BloodBeard =>       36,
             GenesisKey::Fredison =>         37,
@@ -716,13 +716,13 @@ impl GenesisKeyIntoU8 of core::traits::Into<GenesisKey, u8> {
             GenesisKey::Ponzimancer =>      39,
             GenesisKey::DealerTani =>       40,
             GenesisKey::SerRichard =>       41,
-            GenesisKey::SerRecipro =>       42,
-            GenesisKey::MataLeao =>         43,
-            GenesisKey::MasterOfVeils =>    44,
-            GenesisKey::MonsieurBongo =>    45,
-            GenesisKey::TheSorceress =>     46,
-            GenesisKey::TheBarbarian =>     47,
-            GenesisKey::MagusJubilee =>     48,
+            GenesisKey::Recipromancer =>    42,
+            GenesisKey::Mataleone =>        43,
+            GenesisKey::FortunaRegem =>     44,
+            GenesisKey::Amaro =>            45,
+            GenesisKey::Mononoke =>         46,
+            GenesisKey::Parsa =>            47,
+            GenesisKey::Jubilee =>          48,
             GenesisKey::LadyOfCrows =>      49,
             GenesisKey::BananaDuke =>       50,
             GenesisKey::LordGladstone =>    51,
@@ -760,7 +760,7 @@ impl U8IntoGenesisKey of core::traits::Into<u8, GenesisKey> {
         else if self == 15  { GenesisKey::Squiddo }
         else if self == 16  { GenesisKey::SlenderDuck }
         else if self == 17  { GenesisKey::Breadman }
-        else if self == 18  { GenesisKey::Brutus }
+        else if self == 18  { GenesisKey::Groggus }
         else if self == 19  { GenesisKey::Pistolopher }
         else if self == 20  { GenesisKey::Secreto }
         else if self == 21  { GenesisKey::ShadowMare }
@@ -784,13 +784,13 @@ impl U8IntoGenesisKey of core::traits::Into<u8, GenesisKey> {
         else if self == 39  { GenesisKey::Ponzimancer }
         else if self == 40  { GenesisKey::DealerTani }
         else if self == 41  { GenesisKey::SerRichard }
-        else if self == 42  { GenesisKey::SerRecipro }
-        else if self == 43  { GenesisKey::MataLeao }
-        else if self == 44  { GenesisKey::MasterOfVeils }
-        else if self == 45  { GenesisKey::MonsieurBongo }
-        else if self == 46  { GenesisKey::TheSorceress }
-        else if self == 47  { GenesisKey::TheBarbarian }
-        else if self == 48  { GenesisKey::MagusJubilee }
+        else if self == 42  { GenesisKey::Recipromancer }
+        else if self == 43  { GenesisKey::Mataleone }
+        else if self == 44  { GenesisKey::FortunaRegem }
+        else if self == 45  { GenesisKey::Amaro }
+        else if self == 46  { GenesisKey::Mononoke }
+        else if self == 47  { GenesisKey::Parsa }
+        else if self == 48  { GenesisKey::Jubilee }
         else if self == 49  { GenesisKey::LadyOfCrows }
         else if self == 50  { GenesisKey::BananaDuke }
         else if self == 51  { GenesisKey::LordGladstone }
