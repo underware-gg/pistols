@@ -97,6 +97,12 @@ pub enum GenesisKey {
     QueenAce,               // 61
     JoshPeel,               // 62
     IronHandRogan,          // 63
+    GoodPupStarky,          // 64
+    ImyaSuspect,            // 65
+    TheAlchemist,           // 66
+    PonziusPilate,          // 67
+    MistressNoodle,         // 68
+    MasterOfSecrets,        // 69
 }
 
 
@@ -141,7 +147,7 @@ mod COLLECTIONS {
     pub const Genesis: CollectionDescription = CollectionDescription {
         name: 'Genesis Collection',
         folder_name: 'genesis',
-        profile_count: 63,
+        profile_count: 69,
         is_playable: true,
         duelist_id_base: 0,
     };
@@ -390,6 +396,24 @@ mod GENESIS_PROFILES {
     pub const IronHandRogan: ProfileDescription = ProfileDescription {  // 63
         name: 'Iron Hand Rogan',
     };
+    pub const GoodPupStarky: ProfileDescription = ProfileDescription {  // 64
+        name: 'Good Pup Starky',
+    };
+    pub const ImyaSuspect: ProfileDescription = ProfileDescription {  // 65
+        name: 'Imya Suspect',
+    };
+    pub const TheAlchemist: ProfileDescription = ProfileDescription {  // 66
+        name: 'The Alchemist',
+    };
+    pub const PonziusPilate: ProfileDescription = ProfileDescription {  // 67
+        name: 'Ponzius Pilate',
+    };
+    pub const MistressNoodle: ProfileDescription = ProfileDescription {  // 68
+        name: 'Mistress Noodle',
+    };
+    pub const MasterOfSecrets: ProfileDescription = ProfileDescription {  // 69
+        name: 'Master of Secrets',
+    };
 }
 
 
@@ -622,6 +646,12 @@ impl GenesisKeyIntoDescription of core::traits::Into<GenesisKey, ProfileDescript
             GenesisKey::QueenAce =>         GENESIS_PROFILES::QueenAce,         // 61
             GenesisKey::JoshPeel =>         GENESIS_PROFILES::JoshPeel,         // 62
             GenesisKey::IronHandRogan =>    GENESIS_PROFILES::IronHandRogan,    // 63
+            GenesisKey::GoodPupStarky =>    GENESIS_PROFILES::GoodPupStarky,    // 64
+            GenesisKey::ImyaSuspect =>      GENESIS_PROFILES::ImyaSuspect,      // 65
+            GenesisKey::TheAlchemist =>     GENESIS_PROFILES::TheAlchemist,     // 66
+            GenesisKey::PonziusPilate =>    GENESIS_PROFILES::PonziusPilate,    // 67
+            GenesisKey::MistressNoodle =>   GENESIS_PROFILES::MistressNoodle,   // 68
+            GenesisKey::MasterOfSecrets =>  GENESIS_PROFILES::MasterOfSecrets,  // 69
         }
     }
 }
@@ -738,6 +768,12 @@ impl GenesisKeyIntoU8 of core::traits::Into<GenesisKey, u8> {
             GenesisKey::QueenAce =>         61,
             GenesisKey::JoshPeel =>         62,
             GenesisKey::IronHandRogan =>    63,
+            GenesisKey::GoodPupStarky =>    64,
+            GenesisKey::ImyaSuspect =>      65,
+            GenesisKey::TheAlchemist =>     66,
+            GenesisKey::PonziusPilate =>    67,
+            GenesisKey::MistressNoodle =>   68,
+            GenesisKey::MasterOfSecrets =>  69,
         }
     }
 }
@@ -806,6 +842,12 @@ impl U8IntoGenesisKey of core::traits::Into<u8, GenesisKey> {
         else if self == 61  { GenesisKey::QueenAce }
         else if self == 62  { GenesisKey::JoshPeel }
         else if self == 63  { GenesisKey::IronHandRogan }
+        else if self == 64  { GenesisKey::GoodPupStarky }
+        else if self == 65  { GenesisKey::ImyaSuspect }
+        else if self == 66  { GenesisKey::TheAlchemist }
+        else if self == 67  { GenesisKey::PonziusPilate }
+        else if self == 68  { GenesisKey::MistressNoodle }
+        else if self == 69  { GenesisKey::MasterOfSecrets }
         else                { GenesisKey::Unknown }
     }
 }
