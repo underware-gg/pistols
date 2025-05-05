@@ -174,7 +174,7 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
 <path id='circle' d='M${92},350a200,200 0 1,1 ${WIDTH - 92 - 92},0' />
 <text class='TITLE'>
   <textPath startOffset='50%' xlink:href='#circle'>
-  ${profile.name} #${props.duelist_id}
+  ${profile.name}
   </textPath>
 </text>
 
@@ -228,7 +228,7 @@ ${is_alive &&
 // STATS
 ${_renderStat(STAT_GAP, STAT1_Y, 'ID', `#${props.duelist_id}`)}
 ${_renderStat(STAT_GAP, STAT2_Y, 'Fame', `${props.fame}`)}
-${_renderStat(STAT_GAP, STAT3_Y, 'State', state)}
+${_renderStat(STAT_GAP, STAT3_Y, 'Health', state)}
 ${is_duelling
   ? _renderStat(STAT_GAP, STAT4_Y, 'Duel', `#${props.duel_id.toString()}`)
   : _renderStat(STAT_GAP, STAT4_Y, 'Dueling', `No`)

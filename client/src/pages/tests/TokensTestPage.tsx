@@ -234,7 +234,7 @@ function TestImages() {
     honour: 99,
     archetype: constants.Archetype.Honourable,
     profile_type: constants.DuelistProfile.Genesis,
-    profile_id: 16,
+    profile_id: 2,
     total_duels: 10,
     total_wins: 5,
     total_losses: 2,
