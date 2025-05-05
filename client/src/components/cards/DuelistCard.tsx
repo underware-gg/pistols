@@ -26,9 +26,11 @@ interface DuelistCardProps extends InteractibleComponentProps {
   isSmall?: boolean
   isAnimating?: boolean
   showQuote?: boolean
+  hideSouls?: boolean
 
   showBack?: boolean
   animateFlip?: (showBack: boolean) => void
+  showSouls?: (duelistId: number, stackedDuelistIds: number[]) => void
 }
 
 export interface DuelistCardHandle extends InteractibleComponentHandle {
@@ -41,6 +43,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   
   const { nameAndId: name, profilePic, profileType, isInAction, totals, quote } = useDuelist(props.duelistId)
   const {isAlive} = useDuelistFameBalance(props.duelistId)
+  const { stackedDuelistIds, level } = useDuelistStack(props.duelistId)
 
   // const { activeDuelistId, stackedDuelistIds, level } = useDuelistStack(props.duelistId)
   // console.log('DUELSIT STACK:', props.duelistId, level, activeDuelistId, stackedDuelistIds)
@@ -131,7 +134,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       childrenBehindFront={
         <>
           <div 
-            className='duelist-card-image-drawing YesMouse'
+            className='duelist-card-image-drawing YesMouse NoDrag'
             style={{ 
               position: 'absolute',
               cursor: quote ? 'cursor' : 'default'
@@ -154,6 +157,51 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       }
       childrenInFront={
         <>
+          {!props.hideSouls && (
+            <div 
+              className='duelist-card-top-right YesMouse' 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                transform: 'translate(-30%, -35%)',
+                zIndex: 10,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: aspectWidth(props.width * 0.25),
+                height: aspectWidth(props.width * 0.25),
+                backgroundImage: 'url("/images/ui/card_souls.png")',
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                filter: 'drop-shadow(0 0 5px rgba(255, 215, 0, 0.7))',
+                textShadow: '0px 0px 2px #000, 0px 0px 4px #000',
+                cursor: !props.isSmall ? 'pointer' : 'default'
+              }}
+              onMouseEnter={() => !props.isSmall && emitter.emit('hover_description', 'Souls bound to this duelist. Click to see them.')}
+              onMouseLeave={() => !props.isSmall && emitter.emit('hover_description', null)}
+              onClick={() => {
+                if (!props.isSmall) {
+                  if (props.showSouls && stackedDuelistIds.length > 0) {
+                    props.showSouls(props.duelistId, stackedDuelistIds);
+                  }
+                }
+              }}
+            >
+              <span style={{
+                fontWeight: 'bold',
+                fontSize: aspectWidth(props.width * 0.1),
+                color: 'white',
+                textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
+                fontFamily: 'Garamond',
+                position: 'relative',
+                top: aspectWidth(props.width * 0.02)
+              }}>
+                {level || 0}
+              </span>
+            </div>
+          )}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"

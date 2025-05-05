@@ -203,54 +203,54 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
                 position: 'relative',
               }}
             >
-              <div id={`corner-tl-${duelistId}`} style={{
+              <div id={`corner-tr-${duelistId}`} style={{
                 position: 'absolute',
                 top: aspectWidth(-DUELIST_CARD_WIDTH * 0.05),
-                left: aspectWidth(-DUELIST_CARD_WIDTH * 0.05), 
+                right: aspectWidth(-DUELIST_CARD_WIDTH * 0.05), 
                 width: 0,
                 height: 0,
-                borderLeft: `${aspectWidth(DUELIST_CARD_WIDTH * 0.4)}px solid #f0e6d9`,
+                borderRight: `${aspectWidth(DUELIST_CARD_WIDTH * 0.4)}px solid #f0e6d9`,
                 borderBottom: `${aspectWidth(DUELIST_CARD_WIDTH * 0.4)}px solid transparent`,
                 filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.8))',
                 zIndex: 20,
                 pointerEvents: 'none',
               }} />
 
-              <div id={`corner-tl-fill-${duelistId}`} style={{
+              <div id={`corner-tr-fill-${duelistId}`} style={{
                 position: 'absolute',
                 top: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
-                left: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
+                right: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
                 width: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
                 height: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
                 background: '#e0d1bd',
-                clipPath: 'polygon(0 0, 100% 0, 0 100%)',
-                boxShadow: `inset ${aspectWidth(18)}px ${aspectWidth(18)}px ${aspectWidth(10)}px #f0e6d9, inset ${aspectWidth(8)}px ${aspectWidth(8)}px ${aspectWidth(20)}px #f0e6d9`,
+                clipPath: 'polygon(100% 0, 100% 100%, 0 0)',
+                boxShadow: `inset ${aspectWidth(-18)}px ${aspectWidth(18)}px ${aspectWidth(10)}px #f0e6d9, inset ${aspectWidth(-8)}px ${aspectWidth(8)}px ${aspectWidth(20)}px #f0e6d9`,
                 zIndex: 21,
                 pointerEvents: 'none'
               }} />
 
-              <div id={`corner-br-${duelistId}`} style={{
+              <div id={`corner-bl-${duelistId}`} style={{
                 position: 'absolute',
                 bottom: aspectWidth(-DUELIST_CARD_WIDTH * 0.05),
-                right: aspectWidth(-DUELIST_CARD_WIDTH * 0.05),
+                left: aspectWidth(-DUELIST_CARD_WIDTH * 0.05),
                 width: 0,
                 height: 0,
-                borderRight: `${aspectWidth(DUELIST_CARD_WIDTH * 0.4)}px solid #f0e6d9`,
+                borderLeft: `${aspectWidth(DUELIST_CARD_WIDTH * 0.4)}px solid #f0e6d9`,
                 borderTop: `${aspectWidth(DUELIST_CARD_WIDTH * 0.4)}px solid transparent`,
                 filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.8))',
                 zIndex: 20,
                 pointerEvents: 'none'
               }} />
 
-              <div id={`corner-br-fill-${duelistId}`} style={{
+              <div id={`corner-bl-fill-${duelistId}`} style={{
                 position: 'absolute',
                 bottom: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
-                right: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
+                left: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
                 width: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px', 
                 height: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
                 background: '#e0d1bd',
-                clipPath: 'polygon(100% 100%, 100% 0, 0 100%)',
-                boxShadow: `inset ${aspectWidth(-18)}px ${aspectWidth(-18)}px ${aspectWidth(10)}px #f0e6d9, inset ${aspectWidth(-8)}px ${aspectWidth(-8)}px ${aspectWidth(20)}px #f0e6d9`,
+                clipPath: 'polygon(0 100%, 100% 100%, 0 0)',
+                boxShadow: `inset ${aspectWidth(18)}px ${aspectWidth(-18)}px ${aspectWidth(10)}px #f0e6d9, inset ${aspectWidth(8)}px ${aspectWidth(-8)}px ${aspectWidth(20)}px #f0e6d9`,
                 zIndex: 21,
                 pointerEvents: 'none'
               }} />
