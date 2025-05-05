@@ -18,12 +18,14 @@ import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { ChallengeTableSelectedDuelist } from '/src/components/ChallengeTable'
 import { DUELIST_CARD_WIDTH } from '/src/data/cardConstants'
+import { emitter } from '/src/three/game'
 
 interface DuelistCardProps extends InteractibleComponentProps {
   duelistId: number
   address?: BigNumberish
   isSmall?: boolean
   isAnimating?: boolean
+  showQuote?: boolean
 
   showBack?: boolean
   animateFlip?: (showBack: boolean) => void
@@ -37,7 +39,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { aspectWidth } = useGameAspect()
   const { dispatchSelectPlayerAddress } = usePistolsContext()
   
-  const { nameAndId: name, profilePic, profileType, isInAction, totals } = useDuelist(props.duelistId)
+  const { nameAndId: name, profilePic, profileType, isInAction, totals, quote } = useDuelist(props.duelistId)
   const {isAlive} = useDuelistFameBalance(props.duelistId)
 
   // const { activeDuelistId, stackedDuelistIds, level } = useDuelistStack(props.duelistId)
@@ -50,6 +52,8 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
     let imageName = 'card_circular_' + (ArchetypeNames[totals.archetype].toLowerCase() == 'undefined' || ArchetypeNames[totals.archetype].toLowerCase() == 'neutral' ? 'neutral' : ArchetypeNames[totals.archetype].toLowerCase())
     return '/textures/cards/' + imageName + '.png'
   }, [totals])
+
+  
 
   const winPercentage = useMemo(() => {
     if (!totals.total_duels || totals.total_duels === 0) return '0%'
@@ -126,7 +130,25 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       ref={baseRef}
       childrenBehindFront={
         <>
-          <ProfilePic profileType={profileType} profilePic={profilePic} width={(props.width ?? DUELIST_CARD_WIDTH) * 0.7} disabled={!isAlive} removeBorder removeCorners removeShadow className='duelist-card-image-drawing'/>
+          <div 
+            className='duelist-card-image-drawing YesMouse'
+            style={{ 
+              position: 'absolute',
+              cursor: quote ? 'cursor' : 'default'
+            }}
+            onMouseEnter={() => !props.isSmall && quote && emitter.emit('hover_description', quote)}
+            onMouseLeave={() => !props.isSmall && emitter.emit('hover_description', null)}
+          >
+            <ProfilePic 
+              profileType={profileType} 
+              profilePic={profilePic} 
+              width={(props.width ?? DUELIST_CARD_WIDTH) * 0.7} 
+              disabled={!isAlive} 
+              removeBorder 
+              removeCorners 
+              removeShadow 
+            />
+          </div>
           <img id='DuelistDeadOverlay' className={ `Left ${!isAlive ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
         </>
       }
@@ -185,13 +207,32 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
           </div>
           <div className="duelist-card-details">
             {props.isSmall ? (
-              <>
+              props.showQuote ? (
+                <div className="duelist-quote" style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                  height: '100%',
+                  padding: '0.5rem',
+                  fontSize: aspectWidth(1),
+                  lineHeight: '1.2',
+                  overflow: 'auto',
+                  fontStyle: 'italic',
+                  color: '#200'
+                }}>
+                  {quote}
+                </div>
+              ) : (
+                <>
                 <div className="duelist-fame">
                   <FameLivesDuelist duelistId={props.duelistId} />
                 </div>
                 <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} height={props.height * 0.1} hideValue />
                 <div className="duelist-name small" data-contentlength={_nameLength(playerName)}>{playerName}</div>
-              </>
+                  <FameLivesDuelist duelistId={props.duelistId} />
+                </>
+              )
             ) : (
               <>
                 <div className="duelist-fame">

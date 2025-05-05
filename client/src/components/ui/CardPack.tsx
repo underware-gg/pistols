@@ -507,6 +507,7 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType, packId
               isLeft={false}
               isVisible={false}
               isSelected={selectedDuelistId === id}
+              showQuote={true}
               isHighlightable={true}
               onHover={(isHovered) => {
                 if (cardRefs.current[i] && id !== selectedDuelistId) {
