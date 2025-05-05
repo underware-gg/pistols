@@ -36,9 +36,6 @@ pub trait IBankProtected<TState> {
     // transfer FAME to payer, adding to PoolType::Season(season_id)
     // (called by duelist_token)
     fn duelist_lost_fame_to_pool(ref self: TState, contract_address: ContractAddress, token_id: u128, fame_amount: u128, pool_id: PoolType);
-    // release PoolType::Season(season_id)
-    // (called by game)
-    fn release_season_pool(ref self: TState, season_id: u32);
 }
 
 #[dojo::contract]
@@ -136,7 +133,7 @@ pub mod bank {
             let new_season_id: u32 = season.collect(ref store);
             store.set_config_season_id(new_season_id);
             // release...
-            self.release_season_pool(season.season_id);
+            self._release_season_pool(store, season.season_id);
             // arcade
             TrophyProgressTrait::collected_season(@store.world, @starknet::get_caller_address());
             (new_season_id)
@@ -194,66 +191,6 @@ pub mod bank {
             let fame_supply: u128 = fame_dispatcher.total_supply().low;
             let released_lords: u128 = self._release_pegged_lords(store, season_id, duel_id, fame_supply, @bills);
             (released_lords)
-        }
-
-        // - convert PoolType::Season FAME to LORDS
-        // - transfer PoolType::Season FAME (as LORDS) to recipients
-        // - transfer PoolType::FamePeg LORDS to recipients (sponsors, if any)
-        // - burn FAME from PoolType::Season
-        // - remove FAME from PoolType::Season
-        // - remove LORDS from PoolType::Season (sponsors, if any)
-        // - remove LORDS from PoolType::FamePeg (sponsors, if any)
-        fn release_season_pool(ref self: ContractState,
-            season_id: u32,
-        ) {
-            let mut store: Store = StoreTrait::new(self.world_default());
-            assert(store.world.caller_is_world_contract(), Errors::INVALID_CALLER);
-            let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
-            let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
-            let fame_protected_dispatcher: IFameCoinProtectedDispatcher = store.world.fame_coin_protected_dispatcher();
-            // gather leaderboards and distribution
-            let positions: Span<LeaderboardPosition> = store.get_leaderboard(season_id).get_all_positions();
-            let rules: Rules = store.get_season_rules(season_id);
-            let distribution: @RewardDistribution = rules.get_season_distribution(positions.len());
-            // get pool balances
-            let mut pool_season: Pool = store.get_pool(PoolType::Season(season_id));
-            let mut due_amount_fame: u128 = pool_season.balance_fame;
-            let mut due_amount_lords: u128 = pool_season.balance_lords;
-            // calculate bills
-            let mut bills: Array<LordsReleaseBill> = array![];
-            let mut i: usize = 0;
-            while (i < (*distribution.percents).len()) { // distribution is never greater than positions
-                let position: LeaderboardPosition = *positions[i];
-                let percent: u8 = *((*distribution.percents)[i]);
-                let (fame_amount, lords_amount): (u128, u128) = 
-                    if (i == (*distribution.percents).len() - 1) {
-                        // last one, leave no changes!
-                        (due_amount_fame, due_amount_lords)
-                    } else {(
-                        MathTrait::percentage(pool_season.balance_fame, percent),
-                        if (due_amount_lords == 0) {0}
-                        else {MathTrait::percentage(pool_season.balance_lords, percent)}
-                    )};
-                bills.append(LordsReleaseBill {
-                    reason: ReleaseReason::LeaderboardPrize(position.position),
-                    duelist_id: position.duelist_id,
-                    recipient: duelist_dispatcher.owner_of(position.duelist_id.into()),
-                    pegged_fame:fame_amount,
-                    pegged_lords: 0,
-                    sponsored_lords: lords_amount,
-                });
-                due_amount_fame -= fame_amount;
-                due_amount_lords -= lords_amount;
-                i += 1;
-            };
-            // release...
-            let fame_supply: u128 = fame_dispatcher.total_supply().low;
-            self._release_pegged_lords(store, season_id, 0, fame_supply, @bills.span());
-            // burn FAME from pool
-            fame_protected_dispatcher.burn(pool_season.balance_fame);
-            // empty from pool
-            pool_season.empty();
-            store.set_pool(@pool_season);
         }
     }
 
@@ -340,6 +277,65 @@ pub mod bank {
             }
             // return amount released
             (lords_released)
+        }
+
+        // - convert PoolType::Season FAME to LORDS
+        // - transfer PoolType::Season FAME (as LORDS) to recipients
+        // - transfer PoolType::FamePeg LORDS to recipients (sponsors, if any)
+        // - burn FAME from PoolType::Season
+        // - remove FAME from PoolType::Season
+        // - remove LORDS from PoolType::Season (sponsors, if any)
+        // - remove LORDS from PoolType::FamePeg (sponsors, if any)
+        fn _release_season_pool(ref self: ContractState,
+            mut store: Store,
+            season_id: u32,
+        ) {
+            let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
+            let fame_dispatcher: IFameCoinDispatcher = store.world.fame_coin_dispatcher();
+            let fame_protected_dispatcher: IFameCoinProtectedDispatcher = store.world.fame_coin_protected_dispatcher();
+            // gather leaderboards and distribution
+            let positions: Span<LeaderboardPosition> = store.get_leaderboard(season_id).get_all_positions();
+            let rules: Rules = store.get_season_rules(season_id);
+            let distribution: @RewardDistribution = rules.get_season_distribution(positions.len());
+            // get pool balances
+            let mut pool_season: Pool = store.get_pool(PoolType::Season(season_id));
+            let mut due_amount_fame: u128 = pool_season.balance_fame;
+            let mut due_amount_lords: u128 = pool_season.balance_lords;
+            // calculate bills
+            let mut bills: Array<LordsReleaseBill> = array![];
+            let mut i: usize = 0;
+            while (i < (*distribution.percents).len()) { // distribution is never greater than positions
+                let position: LeaderboardPosition = *positions[i];
+                let percent: u8 = *((*distribution.percents)[i]);
+                let (fame_amount, lords_amount): (u128, u128) = 
+                    if (i == (*distribution.percents).len() - 1) {
+                        // last one, leave no changes!
+                        (due_amount_fame, due_amount_lords)
+                    } else {(
+                        MathTrait::percentage(pool_season.balance_fame, percent),
+                        if (due_amount_lords == 0) {0}
+                        else {MathTrait::percentage(pool_season.balance_lords, percent)}
+                    )};
+                bills.append(LordsReleaseBill {
+                    reason: ReleaseReason::LeaderboardPrize(position.position),
+                    duelist_id: position.duelist_id,
+                    recipient: duelist_dispatcher.owner_of(position.duelist_id.into()),
+                    pegged_fame:fame_amount,
+                    pegged_lords: 0,
+                    sponsored_lords: lords_amount,
+                });
+                due_amount_fame -= fame_amount;
+                due_amount_lords -= lords_amount;
+                i += 1;
+            };
+            // release...
+            let fame_supply: u128 = fame_dispatcher.total_supply().low;
+            self._release_pegged_lords(store, season_id, 0, fame_supply, @bills.span());
+            // burn FAME from pool
+            fame_protected_dispatcher.burn(pool_season.balance_fame);
+            // empty from pool
+            pool_season.empty();
+            store.set_pool(@pool_season);
         }
     }
 }

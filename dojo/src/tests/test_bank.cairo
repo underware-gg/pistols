@@ -325,7 +325,7 @@ mod tests {
 
     #[test]
     fn test_bank_resolved_draw_alive() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST |  FLAGS::FAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         tester::fund_duelists_pool(@sys, 2);
         tester::execute_claim_starter_pack(@sys.pack, OWNER());
         tester::execute_claim_starter_pack(@sys.pack, OTHER());
@@ -339,7 +339,7 @@ mod tests {
 
     #[test]
     fn test_bank_resolved_draw_dead() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST |  FLAGS::FAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
 // tester::print_pools(@sys, 1, "INIT");
         tester::fund_duelists_pool(@sys, 2);
 // tester::print_pools(@sys, 1, "FUNDED");
@@ -384,7 +384,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
 
     #[test]
     fn test_bank_resolved_win_a() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST |  FLAGS::FAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         tester::fund_duelists_pool(@sys, 3);
         tester::execute_claim_starter_pack(@sys.pack, OWNER());
         tester::execute_claim_starter_pack(@sys.pack, OTHER());
@@ -393,15 +393,15 @@ tester::print_pools(@sys, 1, "COLLECTED");
         _test_bank_draw(@sys, OWNER(), BUMMER(), 3, true);
         let order: Span<u128> = [
             ID(OWNER()), // fame 3000 + 250 - 3000 = 250 (DEAD) / score 100 + 10 = 110
+            ID(BUMMER()), // fame 3000 - 3000 - 0 (DEAD) / score 20?? > scoring changed
             ID(OTHER()), // fame 3000 - 1000 = 2000 / score 10
-            ID(BUMMER()), // fame 3000 - 3000 - 0 (DEAD) / score 10
         ].span();
         _test_season_collect(@sys, order, true);
     }
 
     #[test]
     fn test_bank_resolved_win_b() {
-        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
+        let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::DUEL | FLAGS::DUELIST |  FLAGS::FAME | FLAGS::LORDS | FLAGS::APPROVE | FLAGS::MOCK_RNG);
         tester::fund_duelists_pool(@sys, 3);
         tester::execute_claim_starter_pack(@sys.pack, OWNER());
         tester::execute_claim_starter_pack(@sys.pack, OTHER());
@@ -410,7 +410,7 @@ tester::print_pools(@sys, 1, "COLLECTED");
         _test_bank_draw(@sys, OTHER(), BUMMER(), 3, true);
         let order: Span<u128> = [
             ID(OTHER()), // fame 3000 + 250 - 3000 = 250 (DEAD) / score 100 + 10 = 110
-            ID(BUMMER()), // fame 3000 - 3000 - 0 (DEAD) / score 20?
+            ID(BUMMER()), // fame 3000 - 3000 - 0 (DEAD) / score 20?? > scoring changed
             ID(OWNER()), // fame 3000 - 1000 = 2000 / score 10
             ].span();
 

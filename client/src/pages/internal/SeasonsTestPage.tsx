@@ -3,7 +3,7 @@ import { Container, Table } from 'semantic-ui-react'
 import { BigNumberish } from 'starknet'
 import { useAllSeasonIds, useLeaderboard, useSeason } from '../../stores/seasonStore'
 import { bigintToDecimal, bigintToHex, formatTimestampDeltaCountdown, formatTimestampDeltaTime, formatTimestampLocal, isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { getEntityModel, useDojoContractCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { getEntityModel, useDojoSystemCalls, useSdkStateEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
 import { useClientTimestamp, useMemoGate, useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useCanCollectSeason } from '/src/hooks/usePistolsContractCalls'
@@ -120,7 +120,7 @@ function SeasonRow({
   const { phase, timestamp_start, timestamp_end, isActive } = useSeason(seasonId)
   const { clientTimestamp } = useClientTimestamp(isActive)
   const { canCollectSeason } = useCanCollectSeason()
-  const { bank: { collectSeason } } = useDojoContractCalls()
+  const { bank } = useDojoSystemCalls()
   const poolSeason = useSeasonPool(seasonId)
   const { accountsCount } = useSeasonTotals(seasonId)
   return (
@@ -155,7 +155,7 @@ function SeasonRow({
             <ActionButton
               disabled={!canCollectSeason}
               label={'Collect'}
-              onClick={() => collectSeason(account)}
+            onClick={() => bank.collect_season(account)}
             />
           }
         </Cell>
