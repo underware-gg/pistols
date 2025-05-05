@@ -324,25 +324,25 @@ function NewChallengeForm({
 }) {
   const { lives } = useDuelistFameBalance(duelistId)
 
-  const { aspectWidth } = useGameAspect()
+  const { aspectWidth, aspectHeight } = useGameAspect()
   
   const [premise, setPremise] = useState(constants.Premise.Honour)
   const [message, setMessage] = useState('')
   const [days, setDays] = useState(7)
   const [hours, setHours] = useState(0)
-  const [lives_staked, setLivesStaked] = useState(Math.min(1, lives))
+  const [highStakes, setHighStakes] = useState(false)
 
-  const canSubmit = useMemo(() => ((days + hours) > 0 && lives_staked > 0), [message, days, hours, lives_staked])
+  const hasEnoughLives = useMemo(() => (lives >= 3n), [lives])
 
   useEffect(() => {
     setArgs({
       premise,
       message,
-      expire_hours: ((days * 24) + hours),
-      lives_staked,
-      canSubmit,
+      expire_hours: ((7 * 24) + 0), //DEFAULT TO 7 DAYS FOR NOW
+      lives_staked: highStakes ? 3 : 1,
+      canSubmit: true,
     })
-  }, [canSubmit, premise, message, days, hours, lives_staked])
+  }, [premise, message, days, hours, highStakes])
 
   const premiseOptions = useMemo(() => Object.keys(constants.Premise).slice(1).map((premise) => ({
     key: `${premise}`,
@@ -350,23 +350,11 @@ function NewChallengeForm({
     text: `${premise}`,
   })), [])
 
-  const daysOptions = useMemo(() => Array.from(Array(8).keys()).map(index => ({
-    key: `${index}d`,
-    value: `${index}`,
-    text: `${index} days`,
-  })), [])
-
-  const hoursOptions = useMemo(() => Array.from(Array(24).keys()).map(index => ({
-    key: `${index}h`,
-    value: `${index}`,
-    text: `${index} hours`,
-  })), [])
-
-  const livesOptions = useMemo(() => [...Array(lives).keys()].map(index => ({
-    key: `${index + 1}`,
-    value: `${index + 1}`,
-    text: `${index + 1} lives`,
-  })), [lives])
+  const handleHighStakesToggle = () => {
+    if (hasEnoughLives) {
+      setHighStakes(!highStakes)
+    }
+  }
 
   return (
     <Form style={{ width: '80%', marginLeft: '10%' }}>
@@ -382,7 +370,7 @@ function NewChallengeForm({
         />
       </Form.Field>
 
-      <Form.Field>
+      <Form.Field style={{ marginTop: aspectHeight(2) }}>
         <div className={`NewChallengeDivider Small VerticalSpacing Centered ${message.length > 3 ? '' : 'Warning'}`}>{constants.PREMISES[premise].prefix.toUpperCase()}</div>
         <FormInput
           placeholder={'OPTIONAL: DESCRIBE YOUR REASONING'}
@@ -394,21 +382,70 @@ function NewChallengeForm({
           maxLength={31}
         />
       </Form.Field>
-
-      <div className={`NewChallengeDivider Small VerticalSpacing Centered ${(days + hours) > 0 ? '' : 'Warning'}`}>DURATION</div>
-      <Grid>
-        <Row>
-          <Col width={8}>
-            <Dropdown className='FillWidth' defaultValue='7' placeholder='Days' selection options={daysOptions} onChange={(e, { value }) => setDays(parseInt(value as string))} />
-          </Col>
-          <Col width={8}>
-            <Dropdown className='FillWidth' defaultValue='0' placeholder='Hours' selection options={hoursOptions} onChange={(e, { value }) => setHours(parseInt(value as string))} />
-          </Col>
-        </Row>
-      </Grid>
-
-      <div className={`NewChallengeDivider Small VerticalSpacing Centered ${lives_staked > 0 ? '' : 'Warning'}`}>STAKES</div>
-       <Dropdown className='FillWidth' defaultValue='1' placeholder='Lives' selection options={livesOptions} onChange={(e, { value }) => setLivesStaked(parseInt(value as string))} />
+      
+      <div className={`NewChallengeDivider Small VerticalSpacing Centered`} style={{ marginTop: aspectHeight(2) }}>STAKES</div>
+      
+      <div 
+        className={`${!hasEnoughLives ? 'Canceled' : highStakes ? 'Important' : ''}`}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginTop: aspectHeight(1),
+          marginBottom: aspectHeight(1),
+          position: 'relative',
+          cursor: hasEnoughLives ? 'pointer' : 'not-allowed'
+        }}
+        onClick={handleHighStakesToggle}
+        tabIndex={hasEnoughLives ? 0 : -1}
+        onKeyDown={(e) => e.key === 'Enter' && handleHighStakesToggle()}
+        aria-label="Toggle high stakes"
+      >
+        <div 
+          style={{
+            width: aspectWidth(2),
+            height: aspectWidth(2),
+            border: `2px solid ${highStakes ? '#ef9758' : '#efe1d7'}`,
+            borderRadius: aspectWidth(0.4),
+            marginRight: aspectWidth(1.2),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: highStakes ? 'rgba(239, 151, 88, 0.2)' : 'transparent',
+            boxShadow: highStakes ? '0 0 10px rgba(239, 151, 88, 0.3)' : 'none',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          {highStakes && <div style={{
+            width: '60%',
+            height: '60%',
+            backgroundColor: '#ef9758',
+            borderRadius: aspectWidth(0.2)
+          }} />}
+        </div>
+        
+        <div style={{ 
+          fontWeight: '600', 
+          fontSize: aspectWidth(1),
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px'
+        }}>
+          HIGH STAKES (3 LIVES AT RISK)
+        </div>
+        
+        {!hasEnoughLives && (
+          <div style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: '50%',
+            height: '2px',
+            background: 'linear-gradient(to right, transparent 5%, #e34a4a 15%, #e34a4a 85%, transparent 95%)',
+            boxShadow: '0 0 8px #e34a4a',
+            transform: 'translateY(-50%)'
+          }} />
+        )}
+      </div>
     </Form>
   )
 }

@@ -55,7 +55,7 @@ enum TextureName {
   bg_door_face_angry_blink = 'bg_door_face_angry_blink',
 
   bg_tavern_bar = 'bg_tavern_bar',
-  bg_tavern_bar_mask = 'bg_tavern_bar_mask',
+  bg_tavern_pistol_mask = 'bg_tavern_pistol_mask',
   bg_tavern_bartender = 'bg_tavern_bartender',
   bg_tavern_bartender_mask = 'bg_tavern_bartender_mask',
   bg_tavern_background = 'bg_tavern_background',
@@ -153,7 +153,7 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_door_face_angry_blink]: { path: '/images/scenes/door/bg_door_face_angry_blink.png' },
 
   [TextureName.bg_tavern_bar]: { path: '/images/scenes/tavern/bg_tavern_bar.png' },
-  [TextureName.bg_tavern_bar_mask]: { path: '/images/scenes/tavern/bg_tavern_bar_mask.png' },
+  [TextureName.bg_tavern_pistol_mask]: { path: '/images/scenes/tavern/bg_tavern_pistol_mask.png' },
   [TextureName.bg_tavern_bartender]: { path: '/images/scenes/tavern/bg_tavern_bartender.png' },
   [TextureName.bg_tavern_bartender_mask]: { path: '/images/scenes/tavern/bg_tavern_bartender_mask.png' },
   [TextureName.bg_tavern_background]: { path: '/images/scenes/tavern/bg_tavern_background.png' },
@@ -314,7 +314,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { name: 'pistol', color: 'ff0000', description: 'Leaderboards', mask: TextureName.bg_tavern_trophy_mask, renderOrder: 0 },
       { name: 'shovel', color: 'ffff00', description: 'Past Duels', mask: TextureName.bg_tavern_crypt_mask, renderOrder: 0 },
       { name: 'bartender', color: '00ff00', description: 'Bartender', mask: TextureName.bg_tavern_bartender_mask, renderOrder: 1 },
-      { name: 'bottle', color: '0000ff', description: 'Dueling', mask: TextureName.bg_tavern_bar_mask, renderOrder: 2 },
+      { name: 'bottle', color: '0000ff', description: 'Dueling', mask: TextureName.bg_tavern_pistol_mask, renderOrder: 2 },
     ],
     scaleAddon: 0.014
   },
