@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useDuelist, useDuelistStatus } from '/src/stores/duelistStore';
+import React, { useEffect, useMemo } from 'react';
+import { useDuelist } from '/src/stores/duelistStore';
 import { BigNumberish } from 'starknet';
 
 // Interface for exported duelist data
@@ -28,7 +28,7 @@ export const DuelistData: React.FC<DuelistDataProps & {
     nameAndId,
     isDead,
     isInAction,
-    status: duelistStatus,
+    totals: duelistTotals,
   } = useDuelist(duelistId);
 
   // Get detailed status information
@@ -39,7 +39,7 @@ export const DuelistData: React.FC<DuelistDataProps & {
     total_draws,
     honour,
     winRatio
-  } = useDuelistStatus(duelistStatus);
+  } = duelistTotals;
   
   // Create a data object to expose
   const duelistData = useMemo(() => {

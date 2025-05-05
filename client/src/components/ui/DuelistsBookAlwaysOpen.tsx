@@ -3,8 +3,8 @@ import { useGameAspect } from '/src/hooks/useGameAspect';
 import { DuelistCard } from '../cards/DuelistCard';
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
-import { CardColor } from '/src/data/cardAssets';
 import { usePistolsContext } from '/src/hooks/PistolsContext';
+import { CardColor } from '@underware/pistols-sdk/pistols/constants'
 
 interface DuelistsBookAlwaysOpenProps {
   width: number;

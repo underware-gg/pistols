@@ -47,7 +47,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
   
   const archetypeImage = useMemo(() => {
-    let imageName = 'card_circular_' + (ArchetypeNames[totals.archetype].toLowerCase() == 'neutral' ? 'honourable' : ArchetypeNames[totals.archetype].toLowerCase())
+    let imageName = 'card_circular_' + (ArchetypeNames[totals.archetype].toLowerCase() == 'undefined' || ArchetypeNames[totals.archetype].toLowerCase() == 'neutral' ? 'neutral' : ArchetypeNames[totals.archetype].toLowerCase())
     return '/textures/cards/' + imageName + '.png'
   }, [totals])
 

@@ -7,7 +7,7 @@ import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 
 interface PackTypeListItemProps {
-  packType: number
+  packType: constants.PackType
   isSelected: boolean
   onClick: () => void
 }

@@ -1,15 +1,10 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import * as TWEEN from '@tweenjs/tween.js'
 import { CardPack, CardPackHandle } from './CardPack'
-import { useGame } from '@context'
-import { useFullScreenManager } from '@hooks'
-import { CardPackRef, CardPackAttributes, CardAsset } from '@types'
-import { Vector2 } from '@utils/types'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 import * as Constants from '/src/data/cardConstants'
 import { AnimationData } from '../InteractibleComponent'
-import { usePack } from '/src/stores/packStore'
 
 // Animation wrapper constants
 const CARD_PACK_WIDTH_RATIO = 0.75
