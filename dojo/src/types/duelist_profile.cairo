@@ -262,7 +262,7 @@ mod GENESIS_PROFILES {
         name: 'Groggus',
     };
     pub const Pistolopher: ProfileDescription = ProfileDescription {  // 19
-        name: 'Pistolopher',
+        name: 'Carrot Calc',
     };
     pub const Secreto: ProfileDescription = ProfileDescription {  // 20
         name: 'Secreto',
@@ -343,7 +343,7 @@ mod GENESIS_PROFILES {
         name: 'Monsieur Bongo',
     };
     pub const Mononoke: ProfileDescription = ProfileDescription {  // 46
-        name: 'The Sorceress',
+        name: 'The Duchess',
     };
     pub const Parsa: ProfileDescription = ProfileDescription {  // 47
         name: 'The Barbarian',
@@ -367,7 +367,7 @@ mod GENESIS_PROFILES {
         name: 'Bliss',
     };
     pub const StormMirror: ProfileDescription = ProfileDescription {  // 54
-        name: 'Storm Mirror',
+        name: 'Javy The Bold',
     };
     pub const Aldreda: ProfileDescription = ProfileDescription {  // 55
         name: 'Aldreda',
