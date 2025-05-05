@@ -108,11 +108,18 @@ pub impl PlayerDuelistStackImpl of PlayerDuelistStackTrait {
             self.active_duelist_id = duelist_id;
         }
     }
-    fn remove(ref self: PlayerDuelistStack, duelist_id: u128) {
+    fn remove(ref self: PlayerDuelistStack, duelist_id: u128) -> bool {
+        let current_level: u8 = self.level;
         self.stacked_ids = self.stacked_ids.remove(@duelist_id);
         self.level = self.stacked_ids.len().try_into().unwrap();
-        if (self.active_duelist_id == duelist_id) {
-            self.active_duelist_id = if (self.level > 0) {*self.stacked_ids[0]} else {0};
+        if (self.level < current_level) {
+            if (self.active_duelist_id == duelist_id) {
+                self.active_duelist_id = if (self.level > 0) {*self.stacked_ids[0]} else {0};
+            }
+            (true)
+        } else {
+            // no changes
+            (false)
         }
     }
 }

@@ -655,14 +655,16 @@ pub mod duelist_token {
                 let mut store: Store = StoreTrait::new(self.world_default());
                 let duelist_profile: DuelistProfile = store.get_duelist_profile(token_id.low);
                 let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(from, duelist_profile);
-                stack.remove(token_id.low);
-                store.set_player_duelist_stack(@stack);
-                // append to new owner stack
-                // ps: from is zero when minting, will append in mint_duelists()
-                if (to.is_non_zero()) {
-                    let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(to, duelist_profile);
-                    stack.append(token_id.low);
+                if (stack.remove(token_id.low)) {
+                    // removed from stack (duelist is alive)
                     store.set_player_duelist_stack(@stack);
+                    // append to new owner stack
+                    // ps: `from` is zero when minting, added in mint_duelists()
+                    if (to.is_non_zero()) {
+                        let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(to, duelist_profile);
+                        stack.append(token_id.low);
+                        store.set_player_duelist_stack(@stack);
+                    }
                 }
             }
         }
