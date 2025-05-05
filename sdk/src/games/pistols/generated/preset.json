@@ -16,7 +16,7 @@
     "SN_SEPOLIA": {
       "policies": {
         "contracts": {
-          "0x035f5f67dc80bb86146a55028c88fa2f2f0debef00e0742fdbf0c10cd8f9dc9e": {
+          "0x008e63a48288f4672d955f97dc5d3e026712f927fc4262dde1b49070c3b98397": {
             "description": "Game loop contract",
             "methods": [
               {
@@ -32,12 +32,15 @@
                 "description": "Close expired duels"
               },
               {
+                "entrypoint": "collect_season"
+              },
+              {
                 "entrypoint": "clear_call_to_action",
                 "description": "Clear the required action call for a duelist"
               }
             ]
           },
-          "0x033bbc8dbfb40a7135df42880247873d9ad585d254a92971e5131b265778d64c": {
+          "0x05aadbdf456aa5c8be5438e8e7465c5e6b7bb48fc2e9339f30ced197315d8896": {
             "description": "Bank contract",
             "methods": [
               {
@@ -51,22 +54,15 @@
               {
                 "entrypoint": "sponsor_tournament",
                 "description": "Sponsor a tournament with $LORDS"
-              },
-              {
-                "entrypoint": "collect_season"
               }
             ]
           },
-          "0x04490854533aeee77bfb8bc9d3a967fb377f9c68735cedbc28d3696d0edb9373": {
+          "0x0578b4e302d95d233a1e5a45b648b7066a21896f288a31a98f77e8bd177b7b9b": {
             "description": "Packs ERC721 contract",
             "methods": [
               {
                 "entrypoint": "claim_starter_pack",
                 "description": "Claim the starter pack, mint Duelists"
-              },
-              {
-                "entrypoint": "claim_gift",
-                "description": "Claim gift pack, if available"
               },
               {
                 "entrypoint": "purchase",
@@ -78,7 +74,7 @@
               }
             ]
           },
-          "0x02244bd444ba8dc1796487235d3c3aabd019344438da411959e6ab259068ea0d": {
+          "0x0377acc27a0ca83d1894a1ae62636ba3998197505b20b918e3e74effe395c6a7": {
             "description": "Duel ERC721 contract",
             "methods": [
               {
@@ -91,7 +87,7 @@
               }
             ]
           },
-          "0x01ce3aee914c0c3dd2ffc2327d30697f0a2a2ae8e65923e3bb161b63b0813a30": {
+          "0x06012ef19b1a4c6d0b06f583c4d5fa13ba39e56297760073da636ab48e5ee6c8": {
             "description": "Duelist ERC721 contract",
             "methods": [
               {
