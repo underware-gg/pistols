@@ -382,15 +382,21 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   // main game scenes (no slugs)
   [SceneName.Door]: { baseUrl: '/door' },
   [SceneName.Tavern]: { baseUrl: '/tavern' },
+  
+  [SceneName.DuelistBook]: { baseUrl: '/profile/duelistbook', title: 'Pistols - Duelists' },
+  [SceneName.CardPacks]: { baseUrl: '/profile/cardpacks', title: 'Pistols - Card Packs' },
   [SceneName.Profile]: { baseUrl: '/profile', title: 'Pistols - Profile' },
+
   [SceneName.Duelists]: { baseUrl: '/balcony', title: 'Pistols - Duelists' },
   [SceneName.DuelsBoard]: { baseUrl: '/duels', title: 'Pistols - Your Duels' },
   [SceneName.Leaderboards]: { baseUrl: '/leaderboards', title: 'Pistols - Leaderboards' },
   [SceneName.Graveyard]: { baseUrl: '/graveyard', title: 'Pistols - Past Duels' },
   [SceneName.Tournament]: { baseUrl: '/__tournament__', title: 'Pistols - Tournament' },
   [SceneName.IRLTournament]: { baseUrl: '/__irltournament__', title: 'Pistols - IRL Tournament' },
+  
   // scenes with duelId
   [SceneName.Duel]: { baseUrl: '/duel', hasDuelId: true, title: 'Pistols - Duel!' },
+  
   // tutorial scenes
   [SceneName.Tutorial]: { baseUrl: '/tutorial/entry', title: 'Pistols - Tutorial' },
   [SceneName.TutorialScene2]: { baseUrl: '/tutorial/conflict', title: 'Pistols - Tutorial' },
@@ -398,6 +404,7 @@ export const sceneRoutes: Record<SceneName, SceneRoute> = {
   [SceneName.TutorialScene4]: { baseUrl: '/tutorial/demon', title: 'Pistols - Tutorial' },
   [SceneName.TutorialScene5]: { baseUrl: '/tutorial/resurrection', title: 'Pistols - Tutorial' },
   [SceneName.TutorialDuel]: { baseUrl: '/tutorial/duel', hasDuelId: true, title: 'Pistols - Tutorial' },
+  
   // '/' must be the last...
   [SceneName.Gate]: { baseUrl: '/' },
 }
@@ -484,6 +491,8 @@ export const usePistolsScene = () => {
     atDoor: (currentScene == SceneName.Door),
     atTavern: (currentScene == SceneName.Tavern),
     atProfile: (currentScene == SceneName.Profile),
+    atCardPacks: (currentScene == SceneName.CardPacks),
+    atDuelistBook: (currentScene == SceneName.DuelistBook),
     atDuelists: (currentScene == SceneName.Duelists),
     atDuelsBoard: (currentScene == SceneName.DuelsBoard),
     atLeaderboards: (currentScene == SceneName.Leaderboards),

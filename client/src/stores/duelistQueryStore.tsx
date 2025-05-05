@@ -111,7 +111,7 @@ export const useQueryDuelistIds = (
 
     // filter by name
     if (filterName) {
-      result = result.filter((e) => e.name.includes(filterName))
+      result = result.filter((e) => e.name.toLowerCase().includes(filterName.toLowerCase()))
     }
 
     // filter by bookmarked duelists

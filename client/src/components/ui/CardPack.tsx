@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import TWEEN from '@tweenjs/tween.js'
 import { DuelistCard, DuelistCardHandle } from '../cards/DuelistCard';
 import { FireCardsTextures } from '@underware/pistols-sdk/pistols/constants';
@@ -33,6 +33,8 @@ import { Modal } from 'semantic-ui-react';
 
 interface CardPack {
   onComplete?: (selectedDuelistId?: number) => void
+  onClick?: (e: React.MouseEvent, fromPack?: boolean) => void
+  onHover?: (isHovered: boolean) => void
   packType: constants.PackType,
   packId?: number
   isOpen?: boolean
@@ -41,10 +43,16 @@ interface CardPack {
   maxTilt: number,
   optionalTitle?: string,
   customButtonLabel?: string,
-  atTutorialEnding?: boolean
+  atTutorialEnding?: boolean,
+  cardPackOnly?: boolean
 }
 
-export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle, customButtonLabel, atTutorialEnding = false }: CardPack) => {
+// Add this interface to expose methods
+export interface CardPackHandle {
+  isInProcessOfClaiming: () => boolean;
+}
+
+export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType, packId, onComplete, onClick, onHover, isOpen = false, clickable = true, cardPackSize, maxTilt, optionalTitle, customButtonLabel, atTutorialEnding = false, cardPackOnly = false }: CardPack, ref) => {
   const { account } = useAccount()
   const { pack_token } = useDojoSystemCalls()
   const { duelistIds } = useDuelistsOfPlayer()
@@ -63,6 +71,24 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   const [newDuelistIds, setNewDuelistIds] = useState<number[]>([])
   const [revealedDuelists, setRevealedDuelists] = useState<Set<number>>(new Set())
   const previousDuelistIdsRef = useRef<bigint[]>([])
+
+  const handleCardPackClick = (e: React.MouseEvent, fromInternalElement: boolean = false) => {
+    if (fromInternalElement) {
+      e.stopPropagation();
+    }
+
+    if (isClaiming || sealClicked || cardsSpawned) {
+      e.stopPropagation();
+      return;
+    }
+    
+    onClick?.(e, fromInternalElement);
+  }
+  
+  const handleCardPackHover = (isHovered: boolean) => {
+    setIsHovering(isHovered)
+    onHover?.(isHovered);
+  }
 
   const _claim = async () => {
     if (packType === constants.PackType.StarterPack) {
@@ -140,7 +166,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   }
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!cardPackRef.current || sealClicked || !clickable) {
+    if (sealClicked || maxTilt === 0) {
       cardPackRef.current?.style.setProperty('--card-pack-rotate-x', '0deg')
       cardPackRef.current?.style.setProperty('--card-pack-rotate-y', '0deg')
       return;
@@ -161,9 +187,22 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
   }
 
   useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [sealClicked, clickable]);
+    window.removeEventListener('mousemove', handleMouseMove);
+    
+    const shouldAddListener = clickable && !sealClicked && maxTilt > 0;
+    
+    if (shouldAddListener) {
+      window.addEventListener('mousemove', handleMouseMove);
+    } else {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cardPackRef.current?.style.setProperty('--card-pack-rotate-x', '0deg')
+      cardPackRef.current?.style.setProperty('--card-pack-rotate-y', '0deg')
+    }
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [clickable, sealClicked, maxTilt, handleMouseMove]);
 
   const getLinePosition = (index: number, numCards: number) => {
     const totalWidth = aspectWidth(16 * numCards);
@@ -312,7 +351,7 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
       if (!pack) return;
       pack.style.removeProperty('--card-pack-size');
     };
-  }, []);
+  }, [cardPackSize]);
 
   const handleRevealAll = () => {
     if (!clickable) return
@@ -392,29 +431,50 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
     }
   }
 
+  // Add useImperativeHandle to expose the functions
+  useImperativeHandle(ref, () => ({
+    isInProcessOfClaiming: () => {
+      return sealClicked || isClaiming || cardsSpawned;
+    }
+  }));
+
   return (
     <>
-      <div className={`card-pack ${clickable ? 'YesMouse' : 'NoMouse'}`} ref={cardPackRef}>
+      <div 
+        className={`card-pack YesMouse`} 
+        ref={cardPackRef}
+        onClick={e => handleCardPackClick(e, false)}
+        onMouseEnter={() => cardPackOnly && handleCardPackHover(true)}
+        onMouseLeave={() => cardPackOnly && handleCardPackHover(false)}
+      >
         {/* Inner bag */}
-        <div className="inner-bag" ref={innerBagRef} />
+        {!cardPackOnly && <div className="inner-bag" ref={innerBagRef} />}
 
         {/* Front bag */}
-        <div className="front-bag" ref={frontBagRef}>
-          <div className="front-bag-layer-1" />
-          <div className="front-bag-layer-2" />
-          <div className="front-bag-layer-3" />
-          <div className="front-bag-layer-4" />
+        <div className="front-bag YesMouse" onClick={e => handleCardPackClick(e, true)} ref={frontBagRef}>
+          {!cardPackOnly && (
+            <>
+              <div className="front-bag-layer-1" />
+              <div className="front-bag-layer-2" />
+              <div className="front-bag-layer-3" />
+              <div className="front-bag-layer-4" />
+            </>
+          )}
         </div>
 
         {/* Flip container */}
-        <div className={`flip-container ${isOpening ? 'opening' : ''}`} ref={flipContainerRef}>
+        <div className={`flip-container YesMouse ${isOpening ? 'opening' : ''}`} onClick={e => handleCardPackClick(e, true)} ref={flipContainerRef}>
           <div className="flipper" ref={flipperRef}>
             {/* Front cover */}
             <div className="front-cover" >
-              <div className="front-cover-layer-1" />
-              <div className="front-cover-layer-2" />
-              <div className="front-cover-layer-3" />
-              <div className="front-cover-layer-4" />
+              {!cardPackOnly && (
+                <>
+                  <div className="front-cover-layer-1" />
+                  <div className="front-cover-layer-2" />
+                  <div className="front-cover-layer-3" />
+                  <div className="front-cover-layer-4" />
+                </>
+              )}
             </div>
             {/* Back cover */}
             <div className="back-cover" />
@@ -423,10 +483,15 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
 
         {/* Seal */}
         <div 
-          className={`seal ${isHovering || isClaiming  || sealClicked ? 'hover' : ''} ${isClaiming || sealClicked ? 'claiming' : ''}`}
-          onClick={_claim}
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
+          className={`seal YesMouse NoDrag ${ isHovering || isClaiming  || sealClicked ? 'hover' : ''} ${isClaiming || sealClicked ? 'claiming' : ''}`}
+          onClick={(e) => {
+            handleCardPackClick(e, true);
+            if (!cardPackOnly) {
+              _claim();
+            }
+          }}
+          onMouseEnter={() => !cardPackOnly && handleCardPackHover(true)}
+          onMouseLeave={() => !cardPackOnly && handleCardPackHover(false)}
           ref={sealRef}
         />
 
@@ -455,48 +520,52 @@ export const CardPack = ({ packType, packId, onComplete, isOpen = false, clickab
 
       </div>
 
-      {hasRevealed && optionalTitle && (
-        <div className="card-pack-title">
-          {optionalTitle}
-        </div>
-      )}
-      <div className={`reveal-button-container NoDrag ${showRevealButton ? 'visible' : 'hidden NoMouse'}`}>
-        <ActionButton 
-          large 
-          fill 
-          label={getButtonLabel()} 
-          onClick={handleButtonClick}
-          disabled={isButtonDisabled()}
-          dimmed
-        />
-      </div>
+      {!cardPackOnly && (
+        <>
+          {hasRevealed && optionalTitle && (
+            <div className="card-pack-title">
+              {optionalTitle}
+            </div>
+          )}
+          <div className={`reveal-button-container NoDrag ${showRevealButton ? 'visible' : 'hidden NoMouse'}`}>
+            <ActionButton 
+              large 
+              fill 
+              label={getButtonLabel()} 
+              onClick={handleButtonClick}
+              disabled={isButtonDisabled()}
+              dimmed
+            />
+          </div>
 
-    <Modal
-      size="tiny"
-      open={isNoFundsModalOpen}
-      className="ModalText"
-    >
-      <Modal.Header>
-        <h3 className="Important">We're Sorry</h3>
-      </Modal.Header>
-      <Modal.Content>
-        <p>Currently there are no starter packs available. Please contact us for assistance.</p>
-      </Modal.Content>
-      <Modal.Actions>
-        <Button
-          primary
-          onClick={() => {
-            window.open('https://x.com/underware_gg', '_blank') //TODO change for support page on website
-            setIsNoFundsModalOpen(false)
-          }}
-        >
-          Contact Us
-        </Button>
-      </Modal.Actions>
-    </Modal>
+          <Modal
+            size="tiny"
+            open={isNoFundsModalOpen}
+            className="ModalText"
+          >
+            <Modal.Header>
+              <h3 className="Important">We're Sorry</h3>
+            </Modal.Header>
+            <Modal.Content>
+              <p>Currently there are no starter packs available. Please contact us for assistance.</p>
+            </Modal.Content>
+            <Modal.Actions>
+              <Button
+                primary
+                onClick={() => {
+                  window.open('https://x.com/underware_gg', '_blank') //TODO change for support page on website
+                  setIsNoFundsModalOpen(false)
+                }}
+              >
+                Contact Us
+              </Button>
+            </Modal.Actions>
+          </Modal>
+        </>
+      )}
     </>
   )
-}
+})
 
 //TODO add card pack entry animation fade in and like a spin with it inceasing size
 //TODO polissh card reveal animations

@@ -1,15 +1,22 @@
 enum SceneName {
   Gate = 'Gate',
   Door = 'Door',
-  Profile = 'Profile',
+  
   Tavern = 'Tavern',
+  
+  Profile = 'Profile',
+  CardPacks = 'CardPacks',
+  DuelistBook = 'DuelistBook',
+  
   Duelists = 'Duelists',
   DuelsBoard = 'Your Duels',
   Leaderboards = 'Leaderboards',
   Graveyard = 'Graveyard',
+  
   Tournament = 'Tournament',
   IRLTournament = 'IRL Tournament',
   Duel = 'Duel',
+  
   Tutorial = 'TutorialStart',
   TutorialScene2 = 'TutorialScene2',
   TutorialScene3 = 'TutorialScene3',
@@ -112,6 +119,10 @@ enum TextureName {
   bg_profile_door_mask = 'bg_profile_door_mask',
   bg_profile_background = 'bg_profile_background',
 
+  bg_duelisbook_table = 'bg_duelisbook_table',
+
+  bg_cardpacks_box = 'bg_cardpacks_box',
+
   bg_leaderboards = 'bg_leaderboards',
 }
 type TextureAttributes = {
@@ -140,6 +151,7 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_door_face_blink]: { path: '/images/scenes/door/bg_door_face_blink.png' },
   [TextureName.bg_door_face_angry]: { path: '/images/scenes/door/bg_door_face_angry.png' },
   [TextureName.bg_door_face_angry_blink]: { path: '/images/scenes/door/bg_door_face_angry_blink.png' },
+
   [TextureName.bg_tavern_bar]: { path: '/images/scenes/tavern/bg_tavern_bar.png' },
   [TextureName.bg_tavern_bar_mask]: { path: '/images/scenes/tavern/bg_tavern_bar_mask.png' },
   [TextureName.bg_tavern_bartender]: { path: '/images/scenes/tavern/bg_tavern_bartender.png' },
@@ -204,6 +216,10 @@ const TEXTURES: Record<TextureName, TextureAttributes> = {
   [TextureName.bg_profile_chest_mask]: { path: '/images/scenes/profile/bg_profile_chest_mask.png' },
   [TextureName.bg_profile_background]: { path: '/images/scenes/profile/bg_profile_background.png' },
   [TextureName.bg_profile_door_mask]: { path: '/images/scenes/profile/bg_profile_door_mask.png' },
+
+  [TextureName.bg_duelisbook_table]: { path: '/images/scenes/profile/duelistbook/bg_duelistbook_table.png' },
+  
+  [TextureName.bg_cardpacks_box]: { path: '/images/scenes/profile/cardpacks/bg_cardpack_box.png' },
 
   [TextureName.bg_leaderboards]: { path: '/images/scenes/leaderboards/bg_leaderboards.png' },
 }
@@ -287,20 +303,7 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
       { texture: TextureName.bg_door_door, shiftMultiplier: 0.005, renderOrder: 3 },
     ] 
   },
-  [SceneName.Profile]: {
-    backgrounds: [
-      { texture: TextureName.bg_profile_background, shiftMultiplier: -0.03, renderOrder: 0 },
-      { texture: TextureName.bg_profile_player, shiftMultiplier: -0.002, renderOrder: 1 },
-      { texture: TextureName.bg_profile_items, shiftMultiplier: 0.005, renderOrder: 2 },
-      { texture: TextureName.bg_profile_table, shiftMultiplier: 0.015, renderOrder: 3 },
-    ],
-    items: [
-      { name: 'door', color: 'ff0000', description: 'Exit tavern', mask: TextureName.bg_profile_door_mask, renderOrder: 0 },
-      { name: 'book', color: 'ffff00', description: 'Your Duelists', mask: TextureName.bg_profile_book_mask, renderOrder: 2 },
-      { name: 'chest', color: '0000ff', description: 'Card Packs', mask: TextureName.bg_profile_chest_mask, renderOrder: 2 },
-    ],
-    scaleAddon: 0.031
-  },
+
   [SceneName.Tavern]: {
     backgrounds: [
       { texture: TextureName.bg_tavern_background, shiftMultiplier: -0.01, renderOrder: 0 },
@@ -315,6 +318,34 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
     ],
     scaleAddon: 0.014
   },
+
+  [SceneName.Profile]: {
+    backgrounds: [
+      { texture: TextureName.bg_profile_background, shiftMultiplier: -0.03, renderOrder: 0 },
+      { texture: TextureName.bg_profile_player, shiftMultiplier: -0.002, renderOrder: 1 },
+      { texture: TextureName.bg_profile_items, shiftMultiplier: 0.005, renderOrder: 2 },
+      { texture: TextureName.bg_profile_table, shiftMultiplier: 0.015, renderOrder: 3 },
+    ],
+    items: [
+      { name: 'door', color: 'ff0000', description: 'Exit tavern', mask: TextureName.bg_profile_door_mask, renderOrder: 0 },
+      { name: 'book', color: 'ffff00', description: 'Your Duelists', mask: TextureName.bg_profile_book_mask, renderOrder: 2 },
+      { name: 'chest', color: '0000ff', description: 'Card Packs', mask: TextureName.bg_profile_chest_mask, renderOrder: 2 },
+    ],
+    scaleAddon: 0.031
+  },
+  [SceneName.CardPacks]: {
+    backgrounds: [
+      { texture: TextureName.bg_cardpacks_box, shiftMultiplier: 0, renderOrder: 0 },
+      { texture: TextureName.bg_cardpacks_box, shiftMultiplier: 0, renderOrder: 0 },
+    ]
+  },
+  [SceneName.DuelistBook]: {
+    backgrounds: [
+      { texture: TextureName.bg_duelisbook_table, shiftMultiplier: 0, renderOrder: 0 },
+      { texture: TextureName.bg_duelisbook_table, shiftMultiplier: 0, renderOrder: 0 },
+    ]
+  },
+
   [SceneName.Duelists]: {
     backgrounds: [
       { texture: TextureName.bg_duelists_background, shiftMultiplier: 0, renderOrder: 0 },
@@ -373,9 +404,9 @@ const sceneBackgrounds: Record<SceneName, SceneData> = {
   },
   [SceneName.TutorialScene2]: {
     backgrounds: [
-      { texture: TextureName.bg_conflict_background, shiftMultiplier: -0.02, renderOrder: 0 },
-      { texture: TextureName.bg_conflict_drunkard, shiftMultiplier: -0.01, renderOrder: 1 },
-      { texture: TextureName.bg_conflict_player, shiftMultiplier: 0.00, renderOrder: 2 },
+      { texture: TextureName.bg_conflict_background, shiftMultiplier: -0.01, renderOrder: 0 },
+      { texture: TextureName.bg_conflict_drunkard, shiftMultiplier: -0.002, renderOrder: 1 },
+      { texture: TextureName.bg_conflict_player, shiftMultiplier: 0.002, renderOrder: 2 },
       { texture: TextureName.bg_conflict_bar, shiftMultiplier: 0.01, renderOrder: 3 },
       { texture: TextureName.bg_conflict_barkeep, shiftMultiplier: 0.02, renderOrder: 4 },
     ],

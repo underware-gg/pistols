@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react'
 import { Image, Input, ButtonGroup, Divider } from 'semantic-ui-react'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useQueryParams, SortDirection, ChallengeColumn, PlayerColumn } from '/src/stores/queryParamsStore'
@@ -12,6 +12,210 @@ import { SceneName } from '/src/data/assets'
 import WalletHeader from '/src/components/account/WalletHeader'
 import AccountHeader from '/src/components/account/AccountHeader'
 import * as TWEEN from '@tweenjs/tween.js'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
+import { useAllDuelistsIds } from '/src/stores/duelistStore'
+import DuelistData, { DuelistDataValues } from '/src/components/ui/DuelistData'
+
+function DuelistStats() {
+  const { duelistIds } = useDuelistsOfPlayer();
+  const { address } = useAccount();
+  
+  // Refs to store duelist data
+  const duelistDataRef = useRef<Record<string, DuelistDataValues>>({});
+  const [dataLoaded, setDataLoaded] = useState(false);
+  
+  // Stats object to store aggregated data
+  const [stats, setStats] = useState({
+    total: 0,
+    alive: 0,
+    dead: 0,
+    totalWins: 0,
+    totalLosses: 0,
+    totalDraws: 0,
+    totalDuels: 0,
+    totalHonour: 0,
+    duelistsWithHonour: 0
+  });
+  
+  // A function to track when all duelists are loaded
+  const checkAllLoaded = useCallback(() => {
+    const loadedCount = Object.keys(duelistDataRef.current).length;
+    if (loadedCount === duelistIds.length && loadedCount > 0) {
+      // All duelist data is loaded, now aggregate the stats
+      const aggregated = Object.values(duelistDataRef.current).reduce((acc, duelist) => {
+        return {
+          total: acc.total + 1,
+          alive: acc.alive + (duelist.isDead ? 0 : 1),
+          dead: acc.dead + (duelist.isDead ? 1 : 0),
+          totalWins: acc.totalWins + duelist.totalWins,
+          totalLosses: acc.totalLosses + duelist.totalLosses,
+          totalDraws: acc.totalDraws + duelist.totalDraws,
+          totalDuels: acc.totalDuels + duelist.totalDuels,
+          totalHonour: acc.totalHonour + (duelist.honour * 10),
+          duelistsWithHonour: acc.duelistsWithHonour + (duelist.honour > 0 ? 1 : 0)
+        };
+      }, {
+        total: 0,
+        alive: 0,
+        dead: 0,
+        totalWins: 0,
+        totalLosses: 0,
+        totalDraws: 0,
+        totalDuels: 0,
+        totalHonour: 0,
+        duelistsWithHonour: 0
+      });
+      
+      setStats(aggregated);
+      setDataLoaded(true);
+    }
+  }, [duelistIds.length]);
+  
+  // Handle data loaded from each DuelistData component
+  const handleDuelistDataLoad = useCallback((data: DuelistDataValues) => {
+    const idStr = data.id.toString();
+    if (!duelistDataRef.current[idStr] || 
+        JSON.stringify(duelistDataRef.current[idStr]) !== JSON.stringify(data)) {
+      duelistDataRef.current[idStr] = data;
+      checkAllLoaded();
+    }
+  }, [checkAllLoaded]);
+  
+  // Calculate derived statistics
+  // The tentacle gods are pleased with your accurate statistics gathering
+  const winRate = useMemo(() => {
+    if (stats.totalDuels === 0) return "0%";
+    const rate = (stats.totalWins / stats.totalDuels) * 100;
+    return `${rate.toFixed(0)}%`;
+  }, [stats.totalWins, stats.totalDuels]);
+  
+  const avgHonour = useMemo(() => {
+    if (stats.duelistsWithHonour === 0) return "0";
+    // Only calculate average honor for duelists with honor > 0
+    const avg = stats.totalHonour / stats.duelistsWithHonour;
+    return avg.toFixed(1);
+  }, [stats.totalHonour, stats.duelistsWithHonour]);
+
+  // Style for stat items
+  const statItemStyle = {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    padding: '0 15px',
+    position: 'relative' as const
+  };
+  
+  const statValueStyle = {
+    fontSize: '1.4em',
+    fontWeight: 'bold' as const,
+    color: '#f1d242'
+  };
+  
+  const statLabelStyle = {
+    fontSize: '0.8em',
+    color: '#e6aa0e',
+    marginTop: '4px'
+  };
+  
+  const dividerStyle = {
+    position: 'absolute' as const,
+    right: 0,
+    top: '15%',
+    height: '70%',
+    width: '1px',
+    background: 'rgba(241, 210, 66, 0.3)'
+  };
+
+  return (
+    <>
+      {/* Render invisible DuelistData components to load the data */}
+      {duelistIds.map(duelistId => (
+        <DuelistData 
+          key={duelistId.toString()} 
+          duelistId={duelistId} 
+          onDataLoad={handleDuelistDataLoad} 
+        />
+      ))}
+      
+      {!dataLoaded && duelistIds.length > 0 ? (
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          width: '100%', 
+          padding: '20px',
+          color: '#f1d242'
+        }}>
+          <div style={{ 
+            position: 'relative',
+            width: '30px',
+            height: '30px'
+          }}>
+            <div style={{ 
+              position: 'absolute',
+              top: '0',
+              left: '0',
+              width: '100%',
+              height: '100%',
+              border: '3px solid rgba(241, 210, 66, 0.2)',
+              borderTopColor: '#f1d242',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }}></div>
+            <style>{`
+              @keyframes spin {
+                to { transform: rotate(360deg); }
+              }
+            `}</style>
+          </div>
+          <span style={{ marginLeft: '10px' }}>Loading duelist data...</span>
+        </div>
+      ) : (
+        <>
+          <div style={statItemStyle}>
+            <span style={statValueStyle}>{stats.total}</span>
+            <span style={statLabelStyle}>YOUR DUELISTS</span>
+            <div style={dividerStyle}></div>
+          </div>
+          
+          <div style={statItemStyle}>
+            <span style={statValueStyle}>{stats.alive}</span>
+            <span style={statLabelStyle}>ALIVE</span>
+            <div style={dividerStyle}></div>
+          </div>
+          
+          <div style={statItemStyle}>
+            <span style={statValueStyle}>{stats.dead}</span>
+            <span style={statLabelStyle}>FALLEN</span>
+            <div style={dividerStyle}></div>
+          </div>
+          
+          <div style={statItemStyle}>
+            <span style={statValueStyle}>{winRate}</span>
+            <span style={statLabelStyle}>WIN RATE</span>
+            <div style={dividerStyle}></div>
+          </div>
+          
+          <div style={statItemStyle}>
+            <span style={statValueStyle}>{avgHonour}</span>
+            <span style={statLabelStyle}>AVG HONOUR</span>
+            {stats.duelistsWithHonour > 0 && stats.duelistsWithHonour < stats.total && (
+              <span style={{
+                position: 'absolute',
+                bottom: '-15px',
+                fontSize: '0.65em',
+                color: '#e6aa0e',
+                fontStyle: 'italic'
+              }}>
+                ({stats.duelistsWithHonour} with honour)
+              </span>
+            )}
+          </div>
+        </>
+      )}
+    </>
+  );
+}
 
 interface SortButtonProps {
   label: string
@@ -102,7 +306,7 @@ function useExit() {
 
 export function Header() {
 
-  const { atDuel, atGate, atDoor, atProfile, atTavern, atTutorial } = usePistolsScene()
+  const { atDuel, atGate, atDoor, atProfile, atTavern, atTutorial, atDuelistBook, atCardPacks } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
 
   const [show, setShow] = useState(false);
@@ -129,7 +333,7 @@ export function Header() {
       {show &&
         <>
           <div className='UIHeader NoMouse NoDrag NoSelection' style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <CurtainUI visible={!atTavern && !atTutorial} short={true} />
+            <CurtainUI visible={!atTavern && !atTutorial && !atCardPacks} short={true} />
             <BannerButton button={<SettingsGearButton size='big'/>} visible={atTavern || atProfile} right={true} />
           </div>
           <Image className='NoMouse NoDrag NoSelection ' src='/images/ui/tavern/wooden_corners.png' style={{ position: 'absolute' }} />
@@ -223,7 +427,7 @@ function CurtainUI({
   visible?: boolean
 }) {
 
-  const { atProfile, atDuelists, atDuelsBoard, atGraveyard } = usePistolsScene()
+  const { atProfile, atDuelists, atDuelsBoard, atGraveyard, atDuelistBook } = usePistolsScene()
   const { aspectWidth } = useGameAspect()
   const {
     walletFinderOpener,
@@ -413,6 +617,70 @@ function CurtainUI({
                 />
               </ButtonGroup>
             </div>
+          </div>
+        </div>}
+        {atDuelistBook && <div style={{width: '90%'}}>
+          <div style={{display: 'flex', justifyContent: 'space-evenly', alignItems: 'center'}}>
+            <div style={{
+              textAlign: 'center',
+              margin: '0 auto',
+              background: 'linear-gradient(180deg, #f1d242 0%, #e6aa0e 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              color: 'transparent',
+              textShadow: '0 0 10px rgba(241, 210, 66, 0.5)',
+              fontSize: '2em',
+              fontWeight: 'bold',
+              letterSpacing: '3px',
+              transform: 'scale(1.2)',
+              padding: '10px 0',
+              position: 'relative',
+              animation: 'glow 2s ease-in-out infinite alternate'
+            }}>
+              GENESIS COLLECTION
+              <div style={{
+                position: 'absolute',
+                height: '2px',
+                background: 'linear-gradient(90deg, transparent 0%, #f1d242 30%, #f1d242 70%, transparent 100%)',
+                width: '100%',
+                bottom: '5px',
+                left: '0',
+                animation: 'shimmer 3s infinite'
+              }}></div>
+              <style>
+                {`
+                @keyframes glow {
+                  from {
+                    textShadow: 0 0 10px rgba(241, 210, 66, 0.5);
+                  }
+                  to {
+                    textShadow: 0 0 20px rgba(241, 210, 66, 0.8);
+                  }
+                }
+                @keyframes shimmer {
+                  0% {
+                    opacity: 0.6;
+                  }
+                  50% {
+                    opacity: 1;
+                  }
+                  100% {
+                    opacity: 0.6;
+                  }
+                }
+                `}
+              </style>
+            </div>
+          </div>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: '10px',
+            gap: '25px',
+            color: '#f1d242',
+            fontSize: '1.1em'
+          }}>
+            <DuelistStats />
           </div>
         </div>}
       </div>

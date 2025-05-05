@@ -35,6 +35,8 @@ import ScLeaderboards from '/src/components/scenes/ScLeaderboards'
 // test sdk
 import { helloPistols } from '@underware/pistols-sdk'
 import { useQuality } from '../hooks/useQuality'
+import ScCardPacks from '../components/scenes/ScCardPacks'
+import ScDuelistBook from '../components/scenes/ScDuelistBook'
 
 helloPistols();
 export default function MainPage({
@@ -110,7 +112,7 @@ function MainUI() {
   const { gameImpl } = useThreeJsContext()
   const { qualityConfig } = useQuality()
   const { currentDuel, tutorialLevel } = usePistolsContext()
-  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards } = usePistolsScene()
+  const { atGate, atProfile, atTavern, atDuel, atDoor, atDuelsBoard, atDuelists, atGraveyard, atTutorial, atLeaderboards, atCardPacks, atDuelistBook } = usePistolsScene()
 
   useEffect(() => {
     if (!gameImpl) return;
@@ -151,6 +153,8 @@ function MainUI() {
       else if (atDuel && currentDuel > 0n) setCurrentScene(<Duel duelId={currentDuel} tutorial={tutorialLevel} />);
       else if (atTutorial) setCurrentScene(<TutorialUI />);
       else if (atProfile) setCurrentScene(<ScProfile />);
+      else if (atCardPacks) setCurrentScene(<ScCardPacks />);
+      else if (atDuelistBook) setCurrentScene(<ScDuelistBook />);
       else if (atDuelsBoard) setCurrentScene(<ScDuelsBoard />);
       else if (atDuelists) setCurrentScene(<ScDuelists />);
       else if (atGraveyard) setCurrentScene(<ScGraveyard />);
@@ -159,7 +163,7 @@ function MainUI() {
     }, SCENE_CHANGE_ANIMATION_DURATION);
 
     return () => clearTimeout(timer);
-  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atGraveyard, currentDuel]);
+  }, [atGate, atDoor, atDuel, atProfile, atTavern, atDuelsBoard, atDuelists, atGraveyard, atLeaderboards, atCardPacks, atDuelistBook, currentDuel, tutorialLevel]);
 
   if (!gameImpl) return <></>
 

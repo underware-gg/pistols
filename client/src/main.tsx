@@ -41,6 +41,8 @@ const router = createBrowserRouter([
       { path: "gate", element: <MainPage /> },
       { path: "door", element: <MainPage /> },
       { path: "profile", element: <MainPage /> },
+      { path: "profile/cardpacks", element: <MainPage /> },
+      { path: "profile/duelistbook", element: <MainPage /> },
       { path: "tavern", element: <MainPage /> },
       { path: "leaderboards", element: <MainPage /> },
       { path: "tutorial/entry", element: <MainPage tutorial={true} /> },
