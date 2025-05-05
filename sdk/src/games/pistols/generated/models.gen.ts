@@ -242,6 +242,7 @@ export interface Player {
 	player_address: string;
 	timestamps: PlayerTimestamps;
 	totals: Totals;
+	alive_duelist_count: BigNumberish;
 }
 
 // Type definition for `pistols::models::player::PlayerBookmark` struct
@@ -295,6 +296,7 @@ export interface PlayerTimestamps {
 export interface PlayerValue {
 	timestamps: PlayerTimestamps;
 	totals: Totals;
+	alive_duelist_count: BigNumberish;
 }
 
 // Type definition for `pistols::models::pool::Pool` struct
@@ -530,6 +532,7 @@ export const packType = [
 	'Unknown',
 	'StarterPack',
 	'GenesisDuelists5x',
+	'FreeDuelist',
 ] as const;
 export type PackType = { [key in typeof packType[number]]: string };
 export type PackTypeEnum = CairoCustomEnum;
@@ -778,6 +781,7 @@ export const activity = [
 	'PlayerTimedOut',
 	'ChallengeResolved',
 	'ChallengeDraw',
+	'ClaimedGift',
 ] as const;
 export type Activity = { [key in typeof activity[number]]: string };
 export type ActivityEnum = CairoCustomEnum;
@@ -843,8 +847,8 @@ export interface SchemaType extends ISchemaType {
 		MockedValue: MockedValue,
 		MockedValueValue: MockedValueValue,
 		Period: Period,
-	// },
-	// achievement: {
+	},
+	achievement: {
 		TrophyCreation: TrophyCreation,
 		TrophyCreationValue: TrophyCreationValue,
 		TrophyProgression: TrophyProgression,
@@ -1111,7 +1115,8 @@ export const schema: SchemaType = {
 		pack_type: new CairoCustomEnum({ 
 					Unknown: "",
 				StarterPack: undefined,
-				GenesisDuelists5x: undefined, }),
+				GenesisDuelists5x: undefined,
+				FreeDuelist: undefined, }),
 			seed: 0,
 			lords_amount: 0,
 			is_open: false,
@@ -1120,7 +1125,8 @@ export const schema: SchemaType = {
 		pack_type: new CairoCustomEnum({ 
 					Unknown: "",
 				StarterPack: undefined,
-				GenesisDuelists5x: undefined, }),
+				GenesisDuelists5x: undefined,
+				FreeDuelist: undefined, }),
 			seed: 0,
 			lords_amount: 0,
 			is_open: false,
@@ -1142,6 +1148,7 @@ export const schema: SchemaType = {
 			player_address: "",
 		timestamps: { registered: 0, claimed_gift: 0, claimed_starter_pack: false, },
 		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
+			alive_duelist_count: 0,
 		},
 		PlayerBookmark: {
 			identity: "",
@@ -1183,6 +1190,7 @@ export const schema: SchemaType = {
 		PlayerValue: {
 		timestamps: { registered: 0, claimed_gift: 0, claimed_starter_pack: false, },
 		totals: { total_duels: 0, total_wins: 0, total_losses: 0, total_draws: 0, honour: 0, honour_log: 0, },
+			alive_duelist_count: 0,
 		},
 		Pool: {
 		pool_id: new CairoCustomEnum({ 
@@ -1351,7 +1359,8 @@ export const schema: SchemaType = {
 				MovesRevealed: undefined,
 				PlayerTimedOut: undefined,
 				ChallengeResolved: undefined,
-				ChallengeDraw: undefined, }),
+				ChallengeDraw: undefined,
+				ClaimedGift: undefined, }),
 			identifier: 0,
 			is_public: false,
 		},
@@ -1372,7 +1381,8 @@ export const schema: SchemaType = {
 				MovesRevealed: undefined,
 				PlayerTimedOut: undefined,
 				ChallengeResolved: undefined,
-				ChallengeDraw: undefined, }),
+				ChallengeDraw: undefined,
+				ClaimedGift: undefined, }),
 			identifier: 0,
 			is_public: false,
 		},

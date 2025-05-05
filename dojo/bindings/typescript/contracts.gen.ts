@@ -227,27 +227,6 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_bank_releaseSeasonPool_calldata = (seasonId: BigNumberish): DojoCall => {
-		return {
-			contractName: "bank",
-			entrypoint: "release_season_pool",
-			calldata: [seasonId],
-		};
-	};
-
-	const bank_releaseSeasonPool = async (snAccount: Account | AccountInterface, seasonId: BigNumberish) => {
-		try {
-			return await provider.execute(
-				snAccount,
-				build_bank_releaseSeasonPool_calldata(seasonId),
-				"pistols",
-			);
-		} catch (error) {
-			console.error(error);
-			throw error;
-		}
-	};
-
 	const build_bank_sponsorDuelists_calldata = (payer: string, lordsAmount: BigNumberish): DojoCall => {
 		return {
 			contractName: "bank",
@@ -3430,8 +3409,6 @@ export function setupWorld(provider: DojoProvider) {
 			buildPegMintedFameToPurchasedLordsCalldata: build_bank_pegMintedFameToPurchasedLords_calldata,
 			releaseLordsFromFameToBeBurned: bank_releaseLordsFromFameToBeBurned,
 			buildReleaseLordsFromFameToBeBurnedCalldata: build_bank_releaseLordsFromFameToBeBurned_calldata,
-			releaseSeasonPool: bank_releaseSeasonPool,
-			buildReleaseSeasonPoolCalldata: build_bank_releaseSeasonPool_calldata,
 			sponsorDuelists: bank_sponsorDuelists,
 			buildSponsorDuelistsCalldata: build_bank_sponsorDuelists_calldata,
 			sponsorSeason: bank_sponsorSeason,

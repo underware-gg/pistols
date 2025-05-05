@@ -125,6 +125,7 @@ export enum Activity {
   PlayerTimedOut = 'PlayerTimedOut', // 12
   ChallengeResolved = 'ChallengeResolved', // 13
   ChallengeDraw = 'ChallengeDraw', // 14
+  ClaimedGift = 'ClaimedGift', // 15
 };
 export const getActivityValue = (name: Activity): number | undefined => _indexOrUndefined(Object.keys(Activity).indexOf(name));
 export const getActivityFromValue = (value: number): Activity | undefined => Object.keys(Activity)[value] as Activity;
@@ -135,6 +136,7 @@ export enum PackType {
   Unknown = 'Unknown', // 0
   StarterPack = 'StarterPack', // 1
   GenesisDuelists5x = 'GenesisDuelists5x', // 2
+  FreeDuelist = 'FreeDuelist', // 3
 };
 export const getPackTypeValue = (name: PackType): number | undefined => _indexOrUndefined(Object.keys(PackType).indexOf(name));
 export const getPackTypeFromValue = (value: number): PackType | undefined => Object.keys(PackType)[value] as PackType;
@@ -720,6 +722,7 @@ type type_PACK_TYPES = {
   Unknown: PackDescription, // cairo: PackDescription
   StarterPack: PackDescription, // cairo: PackDescription
   GenesisDuelists5x: PackDescription, // cairo: PackDescription
+  FreeDuelist: PackDescription, // cairo: PackDescription
 };
 export const PACK_TYPES: type_PACK_TYPES = {
   Unknown: {
@@ -748,6 +751,15 @@ export const PACK_TYPES: type_PACK_TYPES = {
     can_purchase: true,
     price_lords: (50n * CONST.ETH_TO_WEI),
     quantity: 5,
+  },
+  FreeDuelist: {
+    id: 'FreeDuelist',
+    name: 'Free Duelist',
+    image_url_closed: '/tokens/StarterPack.jpg',
+    image_url_open: '/tokens/StarterPack.jpg',
+    can_purchase: false,
+    price_lords: (10n * CONST.ETH_TO_WEI),
+    quantity: 1,
   },
 };
 
@@ -1230,7 +1242,7 @@ export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
     name: 'Groggus',
   },
   Pistolopher: {
-    name: 'Pistolopher',
+    name: 'Carrot Calc',
   },
   Secreto: {
     name: 'Secreto',
@@ -1311,7 +1323,7 @@ export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
     name: 'Monsieur Bongo',
   },
   Mononoke: {
-    name: 'The Sorceress',
+    name: 'The Duchess',
   },
   Parsa: {
     name: 'The Barbarian',
@@ -1335,7 +1347,7 @@ export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
     name: 'Bliss',
   },
   StormMirror: {
-    name: 'Storm Mirror',
+    name: 'Javy The Bold',
   },
   Aldreda: {
     name: 'Aldreda',
