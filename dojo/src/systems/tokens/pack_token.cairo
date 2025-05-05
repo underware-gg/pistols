@@ -147,6 +147,7 @@ pub mod pack_token {
     use pistols::libs::store::{Store, StoreTrait};
     use pistols::utils::short_string::{ShortStringTrait};
     use pistols::utils::byte_arrays::{BoolToStringTrait};
+    use pistols::types::timestamp::{TimestampTrait, TIMESTAMP};
     use pistols::types::constants::{METADATA};
     use pistols::utils::misc::{ZERO};
 
@@ -205,9 +206,6 @@ pub mod pack_token {
         }
 
         fn claim_starter_pack(ref self: ContractState) -> Span<u128> {
-            let mut store: Store = StoreTrait::new(self.world_default());
-
-            // validate
             let recipient: ContractAddress = starknet::get_caller_address();
             assert(self.can_claim_starter_pack(recipient), Errors::INELIGIBLE);
 
@@ -216,6 +214,7 @@ pub mod pack_token {
             let pack: Pack = self._mint_pack(PackType::StarterPack, recipient, recipient.into(), lords_amount);
             
             // events
+            let mut store: Store = StoreTrait::new(self.world_default());
             PlayerTrait::check_in(ref store, Activity::PackStarter, recipient, pack.pack_id.into());
 
             // open immediately
@@ -227,13 +226,34 @@ pub mod pack_token {
         //
 
         fn can_claim_gift(self: @ContractState, recipient: ContractAddress) -> bool {
-            (false)
+            let mut store: Store = StoreTrait::new(self.world_default());
+            let player: Player = store.get_player(recipient);
+            // has not claimed or passed 24 hours
+            if (
+                player.timestamps.claimed_starter_pack &&   // has claimed starter pack
+                player.timestamps.claimed_gift.has_elapsed(TIMESTAMP::ONE_DAY) && // passed 24 hours from last gift
+                store.get_player_alive_duelist_count(recipient) == 0 // no alive duelists
+            ) {
+                (true)
+            } else {
+                (false)
+            }
         }
 
         fn claim_gift(ref self: ContractState) -> Span<u128> {
             let recipient: ContractAddress = starknet::get_caller_address();
             assert(self.can_claim_gift(recipient), Errors::INELIGIBLE);
-            ([].span())
+
+            // mint
+            let lords_amount: u128 = self.calc_mint_fee(recipient, PackType::FreeDuelist);
+            let pack: Pack = self._mint_pack(PackType::FreeDuelist, recipient, recipient.into(), lords_amount);
+            
+            // events
+            let mut store: Store = StoreTrait::new(self.world_default());
+            PlayerTrait::check_in(ref store, Activity::ClaimedGift, recipient, pack.pack_id.into());
+
+            // open immediately
+            (self.open(pack.pack_id))
         }
 
         //

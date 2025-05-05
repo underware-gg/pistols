@@ -19,6 +19,7 @@ pub enum Activity {
     PlayerTimedOut,     // 12
     ChallengeResolved,  // 13
     ChallengeDraw,      // 14
+    ClaimedGift,        // 15
 }
 
 

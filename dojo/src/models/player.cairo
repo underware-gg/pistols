@@ -92,6 +92,9 @@ pub impl PlayerImpl of PlayerTrait {
         } else if (activity == Activity::PackStarter) {
             player.timestamps.claimed_starter_pack = true;
             store.set_player(@player);
+        } else if (activity == Activity::ClaimedGift) {
+            player.timestamps.claimed_gift = starknet::get_block_timestamp();
+            store.set_player(@player);
         }
         activity.emit(ref store.world, player_address, identifier);
     }

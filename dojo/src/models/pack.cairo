@@ -2,9 +2,10 @@ use starknet::{ContractAddress};
 
 #[derive(Serde, Copy, Drop, PartialEq, Introspect)]
 pub enum PackType {
-    Unknown,        // 0
-    StarterPack,    // 1
-    GenesisDuelists5x,     // 2
+    Unknown,            // 0
+    StarterPack,        // 1
+    GenesisDuelists5x,  // 2
+    FreeDuelist,        // 3
 }
 
 //------------------------
@@ -61,7 +62,7 @@ mod PACK_TYPES {
         can_purchase: false,
         price_lords: 20 * CONST::ETH_TO_WEI.low,
         quantity: 2,
-    };  
+    };
     pub const GenesisDuelists5x: PackDescription = PackDescription {
         id: 'GenesisDuelists5x',
         name: 'Duelists 5-pack',
@@ -70,6 +71,15 @@ mod PACK_TYPES {
         can_purchase: true,
         price_lords: 50 * CONST::ETH_TO_WEI.low,
         quantity: 5,
+    };
+    pub const FreeDuelist: PackDescription = PackDescription {
+        id: 'FreeDuelist',
+        name: 'Free Duelist',
+        image_url_closed: '/tokens/StarterPack.jpg',
+        image_url_open: '/tokens/StarterPack.jpg',
+        can_purchase: false,
+        price_lords: 10 * CONST::ETH_TO_WEI.low,
+        quantity: 1,
     };
 }
 
@@ -93,6 +103,7 @@ pub impl PackImpl of PackTrait {
         let token_ids: Span<u128> = match self.pack_type {
             PackType::Unknown => { [].span() },
             PackType::StarterPack |
+            PackType::FreeDuelist |
             PackType::GenesisDuelists5x => {
                 (store.world.duelist_token_protected_dispatcher()
                     .mint_duelists(
@@ -117,6 +128,7 @@ pub impl PackTypeImpl of PackTypeTrait {
             PackType::Unknown               => PACK_TYPES::Unknown,
             PackType::StarterPack           => PACK_TYPES::StarterPack,
             PackType::GenesisDuelists5x     => PACK_TYPES::GenesisDuelists5x,
+            PackType::FreeDuelist           => PACK_TYPES::FreeDuelist,
         }
     }
     fn identifier(self: @PackType) -> felt252 {

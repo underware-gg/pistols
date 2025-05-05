@@ -49,6 +49,10 @@ pub impl TimestampImpl of TimestampTrait {
         }
     }
     #[inline(always)]
+    fn has_elapsed(self: u64, timestamp_to_elapse: u64) -> bool {
+        (starknet::get_block_timestamp() > (self + timestamp_to_elapse))
+    }
+    #[inline(always)]
     fn from_minutes(minutes: u64) -> u64 {
         (minutes * TIMESTAMP::ONE_MINUTE)
     }
@@ -73,6 +77,7 @@ pub impl TimestampImpl of TimestampTrait {
 #[cfg(test)]
 mod unit {
     use super::{TimestampTrait, TIMESTAMP};
+    use pistols::tests::tester::{tester};
 
     #[test]
     fn test_timestamp() {
@@ -84,6 +89,31 @@ mod unit {
         assert_eq!(TimestampTrait::from_days(21), TIMESTAMP::THREE_WEEKS, "THREE_WEEKS");
         assert_eq!(TimestampTrait::from_days(28), TIMESTAMP::FOUR_WEEKS, "FOUR_WEEKS");
         assert_eq!(TimestampTrait::from_datetime(1, 1, 1), TIMESTAMP::ONE_DAY + TIMESTAMP::ONE_HOUR + TIMESTAMP::ONE_MINUTE, "from_datetime");
+    }
+
+    #[test]
+    fn test_timestamp_has_elapsed() {
+        let mut timestamp: u64 = 0;
+        assert!(!timestamp.has_elapsed(TIMESTAMP::ONE_MINUTE), "[0] ONE_MINUTE");
+        assert!(!timestamp.has_elapsed(TIMESTAMP::ONE_HOUR), "[0] ONE_HOUR");
+        tester::set_block_timestamp(TIMESTAMP::ONE_MINUTE);
+        assert!(!timestamp.has_elapsed(TIMESTAMP::ONE_MINUTE), "[1] ONE_MINUTE");
+        assert!(!timestamp.has_elapsed(TIMESTAMP::ONE_HOUR), "[1] ONE_HOUR");
+        tester::elapse_block_timestamp(1);
+        assert!(timestamp.has_elapsed(TIMESTAMP::ONE_MINUTE), "[2] ONE_MINUTE");
+        assert!(!timestamp.has_elapsed(TIMESTAMP::ONE_HOUR), "[2] ONE_HOUR");
+        tester::elapse_block_timestamp(TIMESTAMP::ONE_HOUR - TIMESTAMP::ONE_MINUTE);
+        assert!(timestamp.has_elapsed(TIMESTAMP::ONE_MINUTE), "[3] ONE_MINUTE");
+        assert!(timestamp.has_elapsed(TIMESTAMP::ONE_HOUR), "[3] ONE_HOUR");
+        timestamp = tester::get_block_timestamp();
+        assert!(!timestamp.has_elapsed(TIMESTAMP::ONE_MINUTE), "[4] ONE_MINUTE");
+        assert!(!timestamp.has_elapsed(TIMESTAMP::ONE_HOUR), "[4] ONE_HOUR");
+        tester::elapse_block_timestamp(TIMESTAMP::ONE_MINUTE + 1);
+        assert!(timestamp.has_elapsed(TIMESTAMP::ONE_MINUTE), "[5] ONE_MINUTE");
+        assert!(!timestamp.has_elapsed(TIMESTAMP::ONE_HOUR), "[5] ONE_HOUR");
+        tester::elapse_block_timestamp(TIMESTAMP::ONE_HOUR - TIMESTAMP::ONE_MINUTE);
+        assert!(timestamp.has_elapsed(TIMESTAMP::ONE_MINUTE), "[6] ONE_MINUTE");
+        assert!(timestamp.has_elapsed(TIMESTAMP::ONE_HOUR), "[6] ONE_HOUR");
     }
 
     // // test if "free" starknet::get_block_timestamp() is really free...

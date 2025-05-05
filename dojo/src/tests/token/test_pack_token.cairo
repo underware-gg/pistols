@@ -1,9 +1,8 @@
 use starknet::{ContractAddress};
 // use dojo::world::{WorldStorage};
-
 use pistols::systems::{
     tokens::{
-        // duelist_token::{IDuelistTokenDispatcher},
+        duelist_token::{IDuelistTokenDispatcherTrait},
         pack_token::{IPackTokenDispatcherTrait},
         lords_mock::{ILordsMockDispatcherTrait},
     },
@@ -16,6 +15,7 @@ use pistols::models::{
 
 // use pistols::interfaces::dns::{DnsTrait};
 use pistols::types::constants::{CONST};
+use pistols::types::timestamp::{TIMESTAMP};
 use pistols::tests::tester::{
     tester,
     tester::{
@@ -222,14 +222,6 @@ fn test_claim_twice() {
 }
 
 #[test]
-#[should_panic(expected: ('PACK: Ineligible', 'ENTRYPOINT_FAILED'))]
-fn test_claim_gift() {
-    let mut sys: TestSystems = setup(0);
-    assert!(!sys.pack.can_claim_gift(OWNER()), "can_claim_gift_OWNER");
-    tester::execute_claim_gift(@sys.pack, OWNER());
-}
-
-#[test]
 #[should_panic(expected: ('BANK: insufficient allowance', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
 fn test_mint_no_allowance_half() {
     let mut sys: TestSystems = setup(0);
@@ -252,6 +244,89 @@ fn test_mint_not_for_sale() {
     let mut sys: TestSystems = setup(0);
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
     sys.pack.purchase(PackType::StarterPack);
+}
+
+
+//
+// free gifts...
+//
+
+#[test]
+fn test_claim_gift() {
+    let mut sys: TestSystems = setup(0);
+    // 1: claim starter pack
+    assert!(!sys.pack.can_claim_gift(OWNER()), "!can_claim_gift_1");
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    assert_eq!(sys.duelists.balance_of(OWNER()), 2, "balance_of(OWNER) 2");
+    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 2, "alive_duelist_count::claimed_starter_pack");
+    // 2: no alive duelists
+    assert!(!sys.pack.can_claim_gift(OWNER()), "!can_claim_gift_2");
+    tester::impersonate(OWNER());
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
+    assert_eq!(sys.duelists.balance_of(OWNER()), 0, "balance_of(OWNER) 0");
+    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 0, "alive_duelist_count::transferred_out");
+    // claim!
+    assert!(sys.pack.can_claim_gift(OWNER()), "can_claim_gift_CLAIM");
+    tester::execute_claim_gift(@sys.pack, OWNER());
+    assert_eq!(sys.duelists.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
+    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 1, "alive_duelist_count::claimed_gift");
+    // no more claim!
+    assert!(!sys.pack.can_claim_gift(OWNER()), "!can_claim_gift_AFTER");
+    // transfer out...
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_3);
+    assert_eq!(sys.duelists.balance_of(OWNER()), 0, "balance_of(OWNER) 0");
+    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 0, "alive_duelist_count::transferred_out");
+    // 3: passed 24 hours...
+    assert!(!sys.pack.can_claim_gift(OWNER()), "!can_claim_gift_transfered_gift");
+    tester::elapse_block_timestamp(TIMESTAMP::ONE_DAY + 1);
+    assert!(sys.pack.can_claim_gift(OWNER()), "can_claim_gift_next_day");
+    tester::execute_claim_gift(@sys.pack, OWNER());
+    assert_eq!(sys.duelists.balance_of(OWNER()), 1, "balance_of(OWNER) 1");
+    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 1, "alive_duelist_count::claimed_gift");
+    // no more claim!
+    assert!(!sys.pack.can_claim_gift(OWNER()), "!can_claim_gift_END");
+}
+
+#[test]
+#[should_panic(expected: ('BANK: insufficient LORDS pool', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED'))]
+fn test_claim_gift_not_sponsored() {
+    let mut sys: TestSystems = setup(0);
+    // 1: claim starter pack -- DRAIN ALL LORDS
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OTHER());
+    // 2: no alive duelists
+    tester::impersonate(OWNER());
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
+    // claim!
+    assert!(sys.pack.can_claim_gift(OWNER()), "can_claim_gift_CLAIM");
+    tester::execute_claim_gift(@sys.pack, OWNER());
+}
+
+#[test]
+fn test_claim_gift_sponsored() {
+    let mut sys: TestSystems = setup(0);
+    // 1: claim starter pack -- DRAIN ALL LORDS
+    tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    tester::execute_claim_starter_pack(@sys.pack, OTHER());
+    // 2: no alive duelists
+    tester::impersonate(OWNER());
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_1);
+    sys.duelists.transfer_from(OWNER(), OTHER(), TOKEN_ID_2);
+    // sponsor...
+    tester::fund_duelists_pool(@sys, 1);
+    // claim!
+    assert!(sys.pack.can_claim_gift(OWNER()), "can_claim_gift_CLAIM");
+    tester::execute_claim_gift(@sys.pack, OWNER());
+}
+
+#[test]
+#[should_panic(expected: ('PACK: Ineligible', 'ENTRYPOINT_FAILED'))]
+fn test_claim_gift_ineligible() {
+    let mut sys: TestSystems = setup(0);
+    assert!(!sys.pack.can_claim_gift(OWNER()), "can_claim_gift_OWNER");
+    tester::execute_claim_gift(@sys.pack, OWNER());
 }
 
 
