@@ -217,7 +217,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                   padding: '0.5rem',
                   fontSize: aspectWidth(1),
                   lineHeight: '1.2',
-                  overflow: 'auto',
+                  overflow: 'hidden',
                   fontStyle: 'italic',
                   color: '#200'
                 }}>
@@ -230,7 +230,6 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                 </div>
                 <FameProgressBar duelistId={props.duelistId} width={props.width * 0.8} height={props.height * 0.1} hideValue />
                 <div className="duelist-name small" data-contentlength={_nameLength(playerName)}>{playerName}</div>
-                  <FameLivesDuelist duelistId={props.duelistId} />
                 </>
               )
             ) : (
