@@ -10,6 +10,7 @@ import _images_ui_card_pack_outter_png from "./encoded/_images_ui_card_pack_outt
 import _images_ui_card_pack_seal_background_png from "./encoded/_images_ui_card_pack_seal_background_png"
 import _images_ui_card_pack_seal_png from "./encoded/_images_ui_card_pack_seal_png"
 import _images_ui_card_pack_png from "./encoded/_images_ui_card_pack_png"
+import _images_ui_card_souls_png from "./encoded/_images_ui_card_souls_png"
 import _images_ui_duel_paper_png from "./encoded/_images_ui_duel_paper_png"
 import _images_ui_hand_card_multiple_bottom_png from "./encoded/_images_ui_hand_card_multiple_bottom_png"
 import _images_ui_hand_card_multiple_top_png from "./encoded/_images_ui_hand_card_multiple_top_png"
@@ -31,6 +32,7 @@ export const assets = {
   _images_ui_card_pack_seal_background_png: _images_ui_card_pack_seal_background_png,
   _images_ui_card_pack_seal_png: _images_ui_card_pack_seal_png,
   _images_ui_card_pack_png: _images_ui_card_pack_png,
+  _images_ui_card_souls_png: _images_ui_card_souls_png,
   _images_ui_duel_paper_png: _images_ui_duel_paper_png,
   _images_ui_hand_card_multiple_bottom_png: _images_ui_hand_card_multiple_bottom_png,
   _images_ui_hand_card_multiple_top_png: _images_ui_hand_card_multiple_top_png,
