@@ -263,25 +263,30 @@ fn test_mint_not_for_sale() {
 fn test_open() {
     let mut sys: TestSystems = setup(0);
 
-    let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
+    let starter_pack_count: usize = PackType::StarterPack.description().quantity;
+    assert_eq!(starter_pack_count, 2, "starter_pack_count");
 
     // claiming opens and mint duelists
+    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 0, "alive_duelist_count::zero");
     tester::execute_claim_starter_pack(@sys.pack, OWNER());
-    _assert_duelist_count(@sys, starter_pack_duelist_count.into(), "duelist_supply");
+    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 2, "alive_duelist_count::claimed_starter_pack");
+    _assert_duelist_count(@sys, starter_pack_count.into(), "duelist_supply");
     let pack_1: Pack = sys.store.get_pack(TOKEN_ID_1.low);
     assert!(pack_1.is_open, "pack_1.is_open == true");
 
     // purchase, minted count does not change
     _purchase(@sys, OWNER());
-    _assert_duelist_count(@sys, starter_pack_duelist_count.into(), "duelist_supply_after_purchase");
+    _assert_duelist_count(@sys, starter_pack_count.into(), "duelist_supply_after_purchase");
     let pack_2: Pack = sys.store.get_pack(TOKEN_ID_2.low);
     assert!(!pack_2.is_open, "pack_2.is_open == false");
+    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 2, "alive_duelist_count::unopened");
 
     // open, minted count +5
     sys.pack.open(TOKEN_ID_2.low);
-    _assert_duelist_count(@sys, starter_pack_duelist_count.into() + 5, "duelist_supply_after_open");
+    _assert_duelist_count(@sys, starter_pack_count.into() + 5, "duelist_supply_after_open");
     let pack_2: Pack = sys.store.get_pack(TOKEN_ID_2.low);
     assert!(pack_2.is_open, "pack_2.is_open == false");
+    assert_eq!(sys.store.get_player_alive_duelist_count(OWNER()), 2 + 5, "alive_duelist_count::opened");
 }
 
 #[test]

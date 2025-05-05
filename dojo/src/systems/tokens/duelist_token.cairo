@@ -164,7 +164,7 @@ pub mod duelist_token {
             TotalsTrait,
             Archetype,
         },
-        player::{PlayerDuelistStack, PlayerDuelistStackTrait},
+        player::{PlayerTrait, PlayerDuelistStack, PlayerDuelistStackTrait},
         challenge::{Challenge},
         events::{Activity, ActivityTrait},
     };
@@ -363,6 +363,8 @@ pub mod duelist_token {
                 rnd /= 0x100;
                 i += 1;
             };
+
+            PlayerTrait::append_alive_duelist(ref store, recipient, quantity.try_into().unwrap());
 
             (duelist_ids)
         }
@@ -636,6 +638,7 @@ pub mod duelist_token {
             let mut stack: PlayerDuelistStack = store.get_player_duelist_stack_from_id(memorial.player_address, duelist_id);
             stack.remove(duelist_id);
             store.set_player_duelist_stack(@stack);
+            PlayerTrait::remove_alive_duelist(ref store, memorial.player_address, 1);
             // events
             Activity::DuelistDied.emit(ref store.world, memorial.player_address, duelist_id.into());
         }
@@ -658,12 +661,14 @@ pub mod duelist_token {
                 if (stack.remove(token_id.low)) {
                     // removed from stack (duelist is alive)
                     store.set_player_duelist_stack(@stack);
+                    PlayerTrait::remove_alive_duelist(ref store, from, 1);
                     // append to new owner stack
                     // ps: `from` is zero when minting, added in mint_duelists()
                     if (to.is_non_zero()) {
                         let mut stack: PlayerDuelistStack = store.get_player_duelist_stack(to, duelist_profile);
                         stack.append(token_id.low);
                         store.set_player_duelist_stack(@stack);
+                        PlayerTrait::append_alive_duelist(ref store, to, 1);
                     }
                 }
             }

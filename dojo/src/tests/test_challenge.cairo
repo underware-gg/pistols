@@ -441,11 +441,13 @@ mod tests {
         let duelist_id_1_2: u128 = sys.store.get_duelist(*tokens1[1]).duelist_id;
         let duelist_id_2_1: u128 = sys.store.get_duelist(*tokens2[0]).duelist_id;
         let duelist_id_2_2: u128 = sys.store.get_duelist(*tokens2[1]).duelist_id;
+        assert_eq!(sys.store.get_player_alive_duelist_count(acc1), 2, "acc1:claimed_starter_pack:alive_duelist_count");
+        assert_eq!(sys.store.get_player_alive_duelist_count(acc2), 2, "acc2:claimed_starter_pack:alive_duelist_count");
         (duelist_id_1_1, duelist_id_1_2, duelist_id_2_1, duelist_id_2_2)
     }
 
     #[test]
-    fn test_stacker_activet_OK() {
+    fn test_stacker_active_OK() {
         let mut sys: TestSystems = tester::setup_world(FLAGS::GAME | FLAGS::APPROVE | FLAGS::DUELIST);
         let A = STACKER();
         let B = STACKER2();
@@ -487,6 +489,7 @@ mod tests {
         assert_eq!(ch.duelist_id_b, 0, "challenged_id"); // challenged an address, id is empty
         assert!(!sys.duelists.is_alive(duelist_id_a_active), "duelist_id_a_active dead");
         assert!(sys.duelists.is_alive(duelist_id_a_inactive), "duelist_id_a_inactive alive");
+        assert_eq!(sys.store.get_player_alive_duelist_count(A), 1, "alive_duelist_count::died_a");
         // reply...
         tester::execute_reply_duel(@sys.duels, B, duelist_id_b_inactive, duel_id, true);
         let ch = sys.store.get_challenge_value(duel_id);
@@ -494,6 +497,7 @@ mod tests {
         assert_eq!(ch.duelist_id_b, duelist_id_b_inactive, "challenged_id_ok");   // << UPDATED!!!
         assert!(!sys.duelists.is_alive(duelist_id_b_active), "duelist_id_b_active dead");
         assert!(sys.duelists.is_alive(duelist_id_b_inactive), "duelist_id_b_inactive alive");
+        assert_eq!(sys.store.get_player_alive_duelist_count(B), 1, "alive_duelist_count::died_b");
     }
 
     #[test]

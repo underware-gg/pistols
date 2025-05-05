@@ -262,7 +262,6 @@ fn _assert_stack(sys: @TestSystems, account: ContractAddress, profile: DuelistPr
 #[test]
 fn test_duelist_stack() {
     let mut sys: TestSystems = setup(0);
-
     let acc1 = starknet::contract_address_const::<0x0201>();
     let acc2 = starknet::contract_address_const::<0x0102>();
     let acc3 = starknet::contract_address_const::<0x0303>();
@@ -292,6 +291,10 @@ fn test_duelist_stack() {
     assert_eq!(duelist_2_2.duelist_profile, sys.store.get_duelist_profile(duelist_2_2.duelist_id));
     assert_eq!(duelist_3_1.duelist_profile, sys.store.get_duelist_profile(duelist_3_1.duelist_id));
     assert_eq!(duelist_3_2.duelist_profile, sys.store.get_duelist_profile(duelist_3_2.duelist_id));
+    // validate member getter: store.get_player_alive_duelist_count()
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc1), 2, "acc1:alive_duelist_count:baseline");
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc2), 2, "acc2:alive_duelist_count:baseline");
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc3), 2, "acc3:alive_duelist_count:baseline");
     // baseline stacks
     let id_1_1: u128 = duelist_1_1.duelist_id;
     let id_1_2: u128 = duelist_1_2.duelist_id;
@@ -326,6 +329,9 @@ fn test_duelist_stack() {
     assert_eq!(sys.store.get_active_duelist_id(acc1, id_2_1), id_1_2);
     assert_eq!(sys.store.get_active_duelist_id(acc2, id_2_1), 0);
     assert_eq!(sys.store.get_active_duelist_id(acc2, id_2_2), id_2_2);
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc1), 3, "acc1:alive_duelist_count:transfer_1");
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc2), 1, "acc2:alive_duelist_count:transfer_1");
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc3), 2, "acc3:alive_duelist_count:transfer_1");
     tester::impersonate(acc3);
     sys.duelists.transfer_from(acc3, acc1, id_3_1.into());
     _assert_stack(@sys, acc1, profile_3, [id_3_1].span());
@@ -338,10 +344,16 @@ fn test_duelist_stack() {
     assert_eq!(sys.store.get_active_duelist_id(acc1, id_3_1), id_3_1);
     assert_eq!(sys.store.get_active_duelist_id(acc3, id_3_1), 0);
     assert_eq!(sys.store.get_active_duelist_id(acc3, id_3_1), 0);
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc1), 5, "acc1:alive_duelist_count:transfer_2");
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc2), 1, "acc2:alive_duelist_count:transfer_2");
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc3), 0, "acc3:alive_duelist_count:transfer_2");
     tester::impersonate(acc1);
     sys.duelists.transfer_from(acc1, acc2, id_3_2.into());
     _assert_stack(@sys, acc1, profile_3, [id_3_1].span());
     _assert_stack(@sys, acc2, profile_3, [id_3_2].span());
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc1), 4, "acc1:alive_duelist_count:transfer_3");
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc2), 2, "acc2:alive_duelist_count:transfer_3");
+    assert_eq!(sys.store.get_player_alive_duelist_count(acc3), 0, "acc3:alive_duelist_count:transfer_3");
 }
 
 

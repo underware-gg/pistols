@@ -488,9 +488,14 @@ pub impl StoreImpl of StoreTrait {
     fn get_duelist_totals(self: @Store, duelist_id: u128) -> Totals {
         (self.world.read_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("totals")))
     }
+
     #[inline(always)]
     fn get_player_totals(self: @Store, address: ContractAddress) -> Totals {
         (self.world.read_member(Model::<Player>::ptr_from_keys(address), selector!("totals")))
+    }
+    #[inline(always)]
+    fn get_player_alive_duelist_count(self: @Store, address: ContractAddress) -> u16 {
+        (self.world.read_member(Model::<Player>::ptr_from_keys(address), selector!("alive_duelist_count")))
     }
     #[inline(always)]
     fn get_active_duelist_id(self: @Store, address: ContractAddress, duelist_id: u128) -> u128 {
@@ -526,9 +531,14 @@ pub impl StoreImpl of StoreTrait {
     fn set_duelist_totals(ref self: Store, duelist_id: u128, totals: Totals) {
         self.world.write_member(Model::<Duelist>::ptr_from_keys(duelist_id), selector!("totals"), totals);
     }
+
     #[inline(always)]
     fn set_player_totals(ref self: Store, address: ContractAddress, totals: Totals) {
         self.world.write_member(Model::<Player>::ptr_from_keys(address), selector!("totals"), totals);
+    }
+    #[inline(always)]
+    fn set_player_alive_duelist_count(ref self: Store, address: ContractAddress, alive_duelist_count: u16) {
+        self.world.write_member(Model::<Player>::ptr_from_keys(address), selector!("alive_duelist_count"), alive_duelist_count);
     }
 
 

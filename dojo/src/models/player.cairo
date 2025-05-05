@@ -11,6 +11,7 @@ pub struct Player {
     //-----------------------
     pub timestamps: PlayerTimestamps,
     pub totals: Totals,
+    pub alive_duelist_count: u16,
     // pub referral_code: felt252,
 }
 
@@ -73,6 +74,7 @@ use core::num::traits::Zero;
 use pistols::models::events::{Activity, ActivityTrait};
 use pistols::libs::store::{Store, StoreTrait};
 use pistols::utils::arrays::{ArrayUtilsTrait};
+use pistols::utils::math::{MathU16};
 
 mod PlayerErrors {
     pub const PLAYER_NOT_REGISTERED: felt252    = 'PLAYER: Not registered';
@@ -92,6 +94,16 @@ pub impl PlayerImpl of PlayerTrait {
             store.set_player(@player);
         }
         activity.emit(ref store.world, player_address, identifier);
+    }
+    fn append_alive_duelist(ref store: Store, player_address: ContractAddress, quantity: u16) {
+        let mut alive_duelist_count: u16 = store.get_player_alive_duelist_count(player_address);
+        alive_duelist_count += quantity;
+        store.set_player_alive_duelist_count(player_address, alive_duelist_count);
+    }
+    fn remove_alive_duelist(ref store: Store, player_address: ContractAddress, quantity: u16) {
+        let mut alive_duelist_count: u16 = store.get_player_alive_duelist_count(player_address);
+        alive_duelist_count = MathU16::sub(alive_duelist_count, quantity);
+        store.set_player_alive_duelist_count(player_address, alive_duelist_count);
     }
     #[inline(always)]
     fn exists(self: @Player) -> bool {
