@@ -1438,6 +1438,17 @@ $logo-url: '/logos/logo_avante.svg';
   z-index: 800;
   --bg-color: #{$color-dark};
   --border-color: #{$color-darkest};
+  
+  .demon-text-wrapper {
+    width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    
+    div {
+      white-space: normal;
+    }
+  }
 }
 
 .GateTalkBaloon {
@@ -2497,6 +2508,17 @@ a.active.step:hover,
   margin: 0 auto;
   text-align: center;
   padding: aspect-width(1);
+  
+  .tutorial-text-wrapper {
+    width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    
+    div {
+      white-space: normal;
+    }
+  }
 }
 
 .indicator {

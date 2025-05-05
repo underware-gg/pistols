@@ -31,17 +31,12 @@ export default function DuelistProfile({
 
   const { dispatchSelectDuelistId } = usePistolsContext()
 
-  const [archetypeImage1, setArchetypeImage1] = useState<string>()
-  const [archetypeImage2, setArchetypeImage2] = useState<string>()
+  const archetypeImage1 = '/images/' + 'duelist_female_' + ArchetypeNames[constants.Archetype.Villainous].toLowerCase() + '.png'
+  const archetypeImage2 = '/images/' + 'duelist_female_' + ArchetypeNames[constants.Archetype.Trickster].toLowerCase() + '.png'
   const [lastDamage, setLastDamage] = useState(0)
   const [lastHitChance, setLastHitChance] = useState(0)
 
   const { profilePic, profileType, name, nameAndId, totals } = useDuelist(duelistId)
-
-  useEffect(() => {
-    setArchetypeImage1('/images/' + 'duelist_female_' + ArchetypeNames[constants.Archetype.Villainous].toLowerCase() + '.png')
-    setArchetypeImage2('/images/' + 'duelist_female_' + ArchetypeNames[constants.Archetype.Trickster].toLowerCase() + '.png')
-  }, [totals])
 
   useEffect(() => {
     const damageDelta = damage - lastDamage
@@ -126,7 +121,14 @@ export default function DuelistProfile({
       {floated == 'left' &&
         <>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
-          <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePicUrl={tutorialLevel === DuelTutorialLevel.FULL ? archetypeImage1 : undefined} profilePic={tutorialLevel === DuelTutorialLevel.FULL ? undefined : profilePic} profileType={tutorialLevel === DuelTutorialLevel.FULL ? constants.DuelistProfile.Genesis : profileType} />
+            <ProfilePic 
+              className='NoMouse NoDrag ProfilePicDuel' 
+              duel 
+              circle 
+              profilePicUrl={tutorialLevel === DuelTutorialLevel.FULL ? archetypeImage1 : undefined} 
+              profilePic={tutorialLevel === DuelTutorialLevel.FULL ? undefined : profilePic} 
+              profileType={tutorialLevel === DuelTutorialLevel.FULL ? constants.DuelistProfile.Genesis : profileType}
+            />
           </div>
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>
@@ -149,7 +151,14 @@ export default function DuelistProfile({
       {floated == 'right' &&
         <>
           <div className='YesMouse NoDrag' onClick={() => dispatchSelectDuelistId(duelistId)}>
-          <ProfilePic className='NoMouse NoDrag ProfilePicDuel' duel circle profilePicUrl={tutorialLevel === DuelTutorialLevel.FULL ? archetypeImage2 : undefined} profilePic={tutorialLevel === DuelTutorialLevel.FULL ? undefined : profilePic} profileType={tutorialLevel === DuelTutorialLevel.FULL ? constants.DuelistProfile.Genesis : profileType} />
+            <ProfilePic 
+              className='NoMouse NoDrag ProfilePicDuel' 
+              duel 
+              circle 
+              profilePicUrl={tutorialLevel === DuelTutorialLevel.FULL ? archetypeImage2 : undefined} 
+              profilePic={tutorialLevel === DuelTutorialLevel.FULL ? undefined : profilePic} 
+              profileType={tutorialLevel === DuelTutorialLevel.FULL ? constants.DuelistProfile.Genesis : profileType}
+            />
           </div>
           <div className='DuelistHonour NoMouse NoDrag' data-floated={floated}>
             <div style={{ fontSize: aspectWidth(1), fontWeight: 'bold', color: '#25150b' }}>{hitChance + "%"}</div>

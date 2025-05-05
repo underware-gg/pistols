@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { usePistolsContext, usePistolsScene } from '/src/hooks/PistolsContext'
 import { _currentScene, SCENE_CHANGE_ANIMATION_DURATION } from '/src/three/game'
 import { InteractibleScene } from '/src/three/InteractibleScene'
@@ -9,7 +9,7 @@ import { useConnectToSelectedNetwork, useDojoStatus, useDojoSystemCalls } from '
 import { useTutorialLevel, useTutorialPlayerId } from '/src/hooks/useTutorial'
 import { useAccount, useDisconnect } from '@starknet-react/core'
 import { useGameEvent } from '/src/hooks/useGameEvent'
-import AnimatedText from '../ui/AnimatedText'
+import AnimatedText, { AnimatedTextHandle } from '../ui/AnimatedText'
 import * as TWEEN from '@tweenjs/tween.js'
 import { CardPack } from '../ui/CardPack'
 import DuelTutorialOverlay from '../ui/duel/DuelTutorialOverlay'
@@ -62,13 +62,20 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   const [isHoldingSkip, setIsHoldingSkip] = useState(false)
   const [skipSource, setSkipSource] = useState<'mouse' | 'keyboard' | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const [isSkipReady, setIsSkipReady] = useState(true)
   const textOpacityRef = useRef(0)
   const currentTween = useRef<TWEEN.Tween<any> | null>(null)
   const skipTween = useRef<TWEEN.Tween<any> | null>(null)
+  const animatedTextRef = useRef<AnimatedTextHandle>(null)
+  const currentTutorialSceneRef = useRef<string>(currentTutorialScene)
 
+
+  // Scene Initialization & Cleanup
+  
   // Scene Initialization & Cleanup
   useEffect(() => {
     if (!currentTutorialScene) return
+    currentTutorialSceneRef.current = currentTutorialScene
     
     initializeScene()
 
@@ -102,6 +109,17 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
 
     handleTextDisplay()
   }, [currentTextIndex])
+
+  useEffect(() => {
+    console.log('currentTutorialScene', duelIdSimple, duelIdFull)
+    if (currentTutorialScene === SceneName.TutorialScene2 && !duelIdSimple) {
+      setIsSkipReady(false)
+    } else if (currentTutorialScene === SceneName.TutorialScene3 && !duelIdFull) {
+      setIsSkipReady(false)
+    } else {
+      setIsSkipReady(true)
+    }
+  }, [currentTutorialScene, duelIdFull, duelIdSimple])
 
   // Text Animation Timers
   useEffect(() => {
@@ -208,8 +226,7 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
 
   function handleSceneProgression() {
     setIsTransitioning(true)
-    
-    switch (currentTutorialScene) {
+    switch (currentTutorialSceneRef.current) {
       case SceneName.Tutorial:
         dispatchSetScene(SceneName.TutorialScene2)
         break
@@ -301,9 +318,16 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
   }
 
   function handleSkipText() {
-    if (!canSkipText) return
-    setCanSkipText(false)
-    setCurrentTextIndex(prev => prev + 1)
+    if (!canSkipText) {
+      if (animatedTextRef.current) {
+        animatedTextRef.current.skipAnimation()
+        
+        setCanSkipText(true)
+      }
+    } else {
+      setCanSkipText(false)
+      setCurrentTextIndex(prev => prev + 1)
+    }
   }
 
   function startSkipProgress(source: 'mouse' | 'keyboard') {
@@ -387,8 +411,10 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
 
             <div className="textContainer">
               <AnimatedText
+                ref={animatedTextRef}
                 text={displayText?.text}
                 delayPerCharacter={ANIMATION_TIME_PER_LETTER}
+                containerClassName="tutorial-text-wrapper"
               />
             </div>
 
@@ -412,10 +438,10 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
 
               <div 
                 className="nextButton YesMouse"
-                onMouseDown={() => startSkipProgress('mouse')}
-                onMouseUp={() => stopSkipProgress('mouse')}
-                onMouseLeave={() => stopSkipProgress('mouse')}
-                style={{ opacity: isTransitioning ? 0.5 : 1, pointerEvents: isTransitioning ? 'none' : 'auto' }}
+                onMouseDown={() => isSkipReady && startSkipProgress('mouse')}
+                onMouseUp={() => isSkipReady && stopSkipProgress('mouse')}
+                onMouseLeave={() => isSkipReady && stopSkipProgress('mouse')}
+                style={{ opacity: isTransitioning || !isSkipReady ? 0.5 : 1, pointerEvents: isTransitioning || !isSkipReady ? 'none' : 'auto' }}
               >
                 <span className="nextText">Skip</span>
                 <div className="nextIcon" style={{ position: 'relative', overflow: 'visible' }}>
@@ -440,7 +466,12 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
       )}
       {currentTutorialScene === SceneName.TutorialScene4 && (
         <div className='DemonTalkBaloon NoMouse NoDrag' style={{ opacity: textOpacity }}>
-          <AnimatedText text={displayText?.text} delayPerCharacter={ANIMATION_TIME_PER_LETTER} onAnimationComplete={handleAnimationComplete} />
+          <AnimatedText 
+            text={displayText?.text} 
+            delayPerCharacter={ANIMATION_TIME_PER_LETTER} 
+            onAnimationComplete={handleAnimationComplete} 
+            containerClassName="demon-text-wrapper"
+          />
         </div>
       )}
 
@@ -463,4 +494,3 @@ export default function ScTutorial({ currentTutorialScene }: { currentTutorialSc
 }
 
 //TODO on click of duelist card, go to duel with it
-//TODO add text choose duelist above duelist pack

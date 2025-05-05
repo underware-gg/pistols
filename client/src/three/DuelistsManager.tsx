@@ -155,7 +155,6 @@ export class DuelistsManager {
   }
 
   public setupDuelistB(duelistName: string, duelistModel: CharacterType, isDuelistBYou: boolean, frontMaterialPath: string, backMaterialPath: string, spawnHighlight: () => void) {
-    console.log('setupDuelistB', frontMaterialPath, backMaterialPath)
     localStorage.setItem(DuelistsData.DUELIST_B_MODEL, duelistModel)
     localStorage.setItem(DuelistsData.DUELIST_B_NAME, duelistName)
     this.duelistB.model = localStorage.getItem(DuelistsData.DUELIST_B_MODEL) == CharacterType.MALE ? CharacterType.MALE : CharacterType.FEMALE
@@ -561,7 +560,7 @@ export class DuelistsManager {
       movement.x = 0.352 * 2
     } else if (key == AnimName.SHOOT) {
       onStart = () => { 
-        playAudio(AudioName.SHOOT, _sfxEnabled)
+        playAudio(AudioName.SHOOT, _sfxEnabled, 0.0, this.speedFactor)
         setTimeout(() => {
           shakeCamera(150, 0.01)
         }, 900)
@@ -576,7 +575,7 @@ export class DuelistsManager {
           movement.frames = 8 + 4
         }
       }
-      onStart = () => { playAudio(AudioName.BODY_FALL, _sfxEnabled) }
+      onStart = () => { playAudio(AudioName.BODY_FALL, _sfxEnabled, 0.0, this.speedFactor) }
     } else if ([AnimName.SHOT_INJURED_FRONT, AnimName.SHOT_INJURED_BACK].includes(key)) {
       if (duelist.model == CharacterType.MALE && key == AnimName.SHOT_INJURED_BACK) {
         movement.x = 0.352
@@ -586,16 +585,16 @@ export class DuelistsManager {
         movement.frames = 8 * 2
       }
       if (duelist.model == CharacterType.MALE) {
-        onStart = () => { playAudio(AudioName.GRUNT_MALE, _sfxEnabled) }
+        onStart = () => { playAudio(AudioName.GRUNT_MALE, _sfxEnabled, 0.0, this.speedFactor) }
       } else {
-        onStart = () => { playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled) }
+        onStart = () => { playAudio(AudioName.GRUNT_FEMALE, _sfxEnabled, 0.0, this.speedFactor) }
       }
     } else if (key == AnimName.STRIKE_LIGHT) {
-      onStart = () => { playAudio(AudioName.STRIKE_LIGHT, _sfxEnabled) }
+      onStart = () => { playAudio(AudioName.STRIKE_LIGHT, _sfxEnabled, 0.0, this.speedFactor) }
     } else if (key == AnimName.STRIKE_HEAVY) {
-      onStart = () => { playAudio(AudioName.STRIKE_HEAVY, _sfxEnabled) }
+      onStart = () => { playAudio(AudioName.STRIKE_HEAVY, _sfxEnabled, 0.0, this.speedFactor) }
     } else if (key == AnimName.STRIKE_BLOCK) {
-      onStart = () => { playAudio(AudioName.STRIKE_BLOCK, _sfxEnabled) }
+      onStart = () => { playAudio(AudioName.STRIKE_BLOCK, _sfxEnabled, 0.0, this.speedFactor) }
     }
 
     if (loop) {

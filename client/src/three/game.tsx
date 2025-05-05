@@ -847,7 +847,7 @@ export function resetDuelScene(resetCamera = true, fullReset = true) {
   if (resetCamera) {
     zoomCameraToPaces(10, 0)
   }
-  zoomCameraToPaces(10, 4)
+  zoomCameraToPaces(0, 4)
 } 
 
 function setEnvironment(scene: THREE.Scene) { //TODO add skymap
@@ -1379,7 +1379,7 @@ export function setSfxVolumeMultiplier(multiplier: number) {
   })
 }
 
-export function playAudio(name: AudioName, enabled: boolean = true, fadeInDuration: number = 0.0) {
+export function playAudio(name: AudioName, enabled: boolean = true, fadeInDuration: number = 0.0, speedFactor: number = 1.0) {
   const asset = AUDIO_ASSETS[name]
   if (asset?.object) {
     setTimeout(() => {
@@ -1408,7 +1408,7 @@ export function playAudio(name: AudioName, enabled: boolean = true, fadeInDurati
           asset.object.setVolume(originalVolume)
         }
       }
-    }, (asset.delaySeconds ?? 0) * 1000)
+    }, (asset.delaySeconds ?? 0) * 1000 / speedFactor)
   }
 }
 
