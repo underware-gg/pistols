@@ -1615,7 +1615,7 @@
     },
     {
       "address": "0x426c16fe76f12586718c07e47c8e4312e9fee5e7dc849a75f3c587ad9e70b4f",
-      "class_hash": "0x3cc8f773b27e53052b769c89528e52c9ba8513c870931728d648a5d7b7e6fb",
+      "class_hash": "0x380fd97074db2d44a4aca70fa9a4eac47ff1292453d1838278befecc2eaca08",
       "abi": [
         {
           "type": "impl",
@@ -1950,18 +1950,6 @@
               ],
               "outputs": [],
               "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "release_season_pool",
-              "inputs": [
-                {
-                  "name": "season_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
             }
           ]
         },
@@ -2092,13 +2080,12 @@
         "peg_minted_fame_to_purchased_lords",
         "release_lords_from_fame_to_be_burned",
         "duelist_lost_fame_to_pool",
-        "release_season_pool",
         "upgrade"
       ]
     },
     {
       "address": "0x2e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c",
-      "class_hash": "0x1fae6d01fe085347ae2faf08b36b0a625146f5b916bccbe3b75989ef12d5e1c",
+      "class_hash": "0x5abc2ba652473c066a01b39ded721c14e82caf2fbd6c4fd7b32eb3ea152efa0",
       "abi": [
         {
           "type": "impl",
@@ -3408,7 +3395,7 @@
     },
     {
       "address": "0x7aaa9866750a0db82a54ba8674c38620fa2f967d2fbb31133def48e0527c87f",
-      "class_hash": "0x587c2ba2bcb641dc8fb82f226e6ad72854e9ee2a1c53e370f0e117f268f4259",
+      "class_hash": "0x6ae28005b34772ca66df586a66ca5a40b9fabb14feafb3dcb1fa287c068da86",
       "abi": [
         {
           "type": "impl",
@@ -6531,7 +6518,7 @@
     },
     {
       "address": "0x2c6a7c98a9dea8322b51018eef7be99ebedd209cebdaacb9f4c5bbf661c1cc9",
-      "class_hash": "0x1a84d6f583707d526c47320f4924203e5559ec453f05f82474da20ab9c026fe",
+      "class_hash": "0x7e4d5847680da16b49dd8d5be29f55b6a4e5042ff6a5df7352664089a5d3e38",
       "abi": [
         {
           "type": "impl",
@@ -7382,7 +7369,7 @@
     },
     {
       "address": "0x71333ac75b7d5ba89a2d0c2b67d5b955258a4d46eb42f3428da6137bbbfdfd9",
-      "class_hash": "0x564fe14743e58ec836353f89052be7a5f1b63d6126cf89af7df6d7e1be3a414",
+      "class_hash": "0x3ace620254e27428a531254b2d9ea82f09a47e74ce44b0da1ddfd7feba97286",
       "abi": [
         {
           "type": "impl",
@@ -7479,6 +7466,10 @@
             },
             {
               "name": "GenesisDuelists5x",
+              "type": "()"
+            },
+            {
+              "name": "FreeDuelist",
               "type": "()"
             }
           ]
@@ -9883,7 +9874,7 @@
     },
     {
       "members": [],
-      "class_hash": "0xa2632d49fe85d65005c96b9aa577e8119df36b101815e1511ebfd25b45f424",
+      "class_hash": "0x565027b2b6933226871e94dcc7ca665a5766859496471dba4ad8869e465fb25",
       "tag": "pistols-Pack",
       "selector": "0x64159b4947adcdc7a87b41f7889ba33495ac8e3a3a333305c7712806763fa2d"
     },
@@ -9895,7 +9886,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x2d39da1d8bfed05c1b63d90be9b9dce46c2e0f4f8cfcaa486bc7efd222de606",
+      "class_hash": "0x5cd73dff8a9f5a247fd711e8d0a04fa8838fff99dc0d3af54bb6e80dc3165cc",
       "tag": "pistols-Player",
       "selector": "0x4fc7ed2304172cd24d40e2b967bf3642228eec13547b09e0ffdfb85469f6f86"
     },
@@ -9975,7 +9966,7 @@
     },
     {
       "members": [],
-      "class_hash": "0xbb4815ab6f5d436b31a208ba692cd033136b3413f3b37d858ec62847b674dd",
+      "class_hash": "0x742a8b06468408b9086d21cd2515412728e1ff614c75752e2eb4d781b1851d2",
       "tag": "pistols-PlayerActivityEvent",
       "selector": "0x46a192c105a4598953e7aeaf3809703964eb9e6d65403156d0458dcd2ee379b"
     },
