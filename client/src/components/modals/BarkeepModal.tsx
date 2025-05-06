@@ -20,7 +20,7 @@ export default function BarkeepModal({ open, setOpen }) {
 
   useEffect(() => {
     if (open) {
-      setDisplayText('Looking for trouble? Or just a drink?')
+      setDisplayText('Get lost, mortal. I\'m not serving weaklings today. Come back when you\'ve got some real guts... or never.')
     }
   }, [open])
 
@@ -37,7 +37,7 @@ export default function BarkeepModal({ open, setOpen }) {
         <div className='DialogDivider' />
         <div className='DialogOptionsWrapper YesMouse'>
           {/* <div className='DialogOptionsTitle'>Choose what to do:</div> */}
-          <input
+          {/* <input
               type="text"
               className="DialogInput DialogInput"
               placeholder="Type your message..."
@@ -48,7 +48,7 @@ export default function BarkeepModal({ open, setOpen }) {
                   e.currentTarget.value = ''
                 }
               }}
-            />
+            /> */}
             <button
               onClick={() => setOpen(false)}
               className="DialogButton"

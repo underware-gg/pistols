@@ -14,6 +14,7 @@ import { Opener } from '/src/hooks/useOpener'
 import { NoDuelistsSlip, NoDuelistsSlipHandle } from '../NoDuelistsSlip'
 import { emitter } from '/src/three/game'
 import { SceneName } from '/src/data/assets'
+import { usePlayerDuelistsOrganized } from '../PlayerDuelistsOrganized'
 
 const HAND_CARD_WIDTH = 110
 const HAND_CARD_HEIGHT = HAND_CARD_WIDTH * (1080/1920)
@@ -40,7 +41,8 @@ function _SelectDuelistModal({
   const { dispatchChallengingPlayerAddress, dispatchChallengingDuelistId } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
   
-  const { duelistIds } = useDuelistsOfPlayer()
+  // const { duelistIds } = useDuelistsOfPlayer()
+  const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized()
 
   const { notDuelingIds: availableDuelists } = useDuellingDuelists(duelistIds);
 

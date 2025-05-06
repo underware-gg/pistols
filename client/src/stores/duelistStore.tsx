@@ -277,3 +277,7 @@ export const useDuelistStack = (duelist_id: BigNumberish) => {
     level,
   }
 }
+
+
+
+

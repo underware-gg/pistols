@@ -10,9 +10,11 @@ import { Icon, EmojiIcon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink } from '/src/components/Links'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
+import { usePlayerDuelistsOrganized } from './PlayerDuelistsOrganized'
 
 export const ActionIcon = (isActive: boolean) => {
-  const { duelistIds } = useDuelistsOfPlayer()
+  // const { duelistIds } = useDuelistsOfPlayer()
+  const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized();
   const { requiresAction, duelPerDuelist } = useCallToActions()
   const replyOnly = useMemo(() => (
     requiresAction && !Object.keys(duelPerDuelist).some((duelistId) => (duelistIds.includes(BigInt(duelistId))))
@@ -36,7 +38,8 @@ export default function ActivityAction() {
   const { bookmarkedDuelists } = usePlayer(address)
 
   const { duelPerDuelist } = useCallToActions()
-  const { duelistIds } = useDuelistsOfPlayer()
+  // const { duelistIds } = useDuelistsOfPlayer()
+  const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized();
   const sortedDuelistIds = useMemo(() => (
     Array.from(new Set([
       // join with duelists in actions (other player when replying)
@@ -45,7 +48,12 @@ export default function ActivityAction() {
     ])).sort((a, b) => {
       const duelA = duelPerDuelist[bigintToHex(a)] ?? null
       const duelB = duelPerDuelist[bigintToHex(b)] ?? null
-      if (!duelA && !duelB) return Number(b - a)
+      if (!duelA && !duelB) {
+        // Convert BigNumberish to bigint before subtraction
+        const bigA = typeof a === 'bigint' ? a : BigInt(a.toString())
+        const bigB = typeof b === 'bigint' ? b : BigInt(b.toString())
+        return Number(bigB - bigA)
+      }
       if (!duelA) return 1
       if (!duelB) return -1
       return Number(duelB.duelId - duelA.duelId)
@@ -56,13 +64,21 @@ export default function ActivityAction() {
   const actions = useMemo(() => (sortedDuelistIds.map((duelistId) => {
     const duel = duelPerDuelist[bigintToHex(duelistId)]
     const duelId = duel?.duelId ?? 0n
-    const isReply = (duelId > 0n && !duelistIds.includes(duelistId))
+    const isReply = (duelId > 0n && !duelistIds.some(id => 
+      typeof id === 'bigint' && typeof duelistId === 'bigint' 
+        ? id === duelistId
+        : BigInt(id.toString()) === BigInt(duelistId.toString())
+    ))
     return (
       <ActionItem
-        key={duelistId}
+        key={bigintToHex(duelistId)}
         duelistId={duelistId}
         duelId={duelId}
-        isBookmarked={bookmarkedDuelists.includes(duelistId)}
+        isBookmarked={bookmarkedDuelists.some(id => 
+          typeof id === 'bigint' && typeof duelistId === 'bigint'
+            ? id === duelistId
+            : BigInt(id.toString()) === BigInt(duelistId.toString())
+        )}
         callToAction={duel?.callToAction ?? false}
         isReply={isReply}
       />

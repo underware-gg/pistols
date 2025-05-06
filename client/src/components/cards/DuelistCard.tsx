@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useMemo, useRef } from 'react'
+import React, { forwardRef, useImperativeHandle, useMemo, useRef, useState, useEffect } from 'react'
 import { BigNumberish } from 'starknet'
 import { useDuelist, useDuelistStack } from '/src/stores/duelistStore'
 import { useGameAspect } from '/src/hooks/useGameAspect'
@@ -27,6 +27,7 @@ interface DuelistCardProps extends InteractibleComponentProps {
   isAnimating?: boolean
   showQuote?: boolean
   hideSouls?: boolean
+  shouldAnimateIncrease?: boolean
 
   showBack?: boolean
   animateFlip?: (showBack: boolean) => void
@@ -35,6 +36,7 @@ interface DuelistCardProps extends InteractibleComponentProps {
 
 export interface DuelistCardHandle extends InteractibleComponentHandle {
   duelistId: number
+  animateSoulsIncrease: () => void
 }
 
 export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((props: DuelistCardProps, ref: React.Ref<DuelistCardHandle>) => {
@@ -45,8 +47,34 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
   const {isAlive} = useDuelistFameBalance(props.duelistId)
   const { stackedDuelistIds, level } = useDuelistStack(props.duelistId)
 
-  // const { activeDuelistId, stackedDuelistIds, level } = useDuelistStack(props.duelistId)
-  // console.log('DUELSIT STACK:', props.duelistId, level, activeDuelistId, stackedDuelistIds)
+  // Animation states
+  const [isAnimatingSouls, setIsAnimatingSouls] = useState(false)
+  const [displayLevel, setDisplayLevel] = useState(props.shouldAnimateIncrease ? (level - 1) || 0 : level || 0)
+  const [soulsAnimationClass, setSoulsAnimationClass] = useState('')
+  const [numberAnimationClass, setNumberAnimationClass] = useState('')
+  const [newBadgeAnimationClass, setNewBadgeAnimationClass] = useState('')
+  
+  // Fixed useEffect to ensure displayLevel stays at incremented value after animation
+  useEffect(() => {
+    if (!isAnimatingSouls) {
+      setDisplayLevel(props.shouldAnimateIncrease && !isAnimatingSouls ? (level - 1) || 0 : level || 0)
+    }
+  }, [level, isAnimatingSouls, props.shouldAnimateIncrease])
+
+  // Don't show souls for dead duelists
+  const showSouls = useMemo(() => !props.hideSouls && isAlive, [props.hideSouls, isAlive])
+
+  // Show NEW badge ONLY when level is 0 or 1 AND shouldAnimateIncrease is true
+  const isNewDuelist = props.shouldAnimateIncrease && (level === 0 || level === 1)
+
+  // Added a flag to track when animation is complete
+  const [animationCompleted, setAnimationCompleted] = useState(false)
+  useEffect(() => {
+    if (animationCompleted) {
+      setDisplayLevel(level || 0)
+      setAnimationCompleted(false)
+    }
+  }, [animationCompleted, level])
 
   const { owner } = useOwnerOfDuelist(props.duelistId)
   const { name: playerName } = usePlayer(isPositiveBigint(props.address) ? props.address : owner)
@@ -70,6 +98,61 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
 
   const baseRef = useRef<InteractibleComponentHandle>(null);
 
+  const animateSoulsIncrease = () => {
+    if (isAnimatingSouls) return
+    
+    setIsAnimatingSouls(true)
+    
+    if (isNewDuelist) {
+      // Special NEW badge animation
+      setNewBadgeAnimationClass('new-badge-pop')
+      
+      // After animation, reset
+      setTimeout(() => {
+        setIsAnimatingSouls(false)
+        setNewBadgeAnimationClass('')
+        // Mark animation as completed so we can set final level
+        setAnimationCompleted(true)
+      }, 800)
+    } else {
+      // Regular souls animation for higher levels
+      setSoulsAnimationClass('souls-increasing')
+      
+      // Scale up the soul emblem first - more concise timing for better sync
+      setTimeout(() => {
+        // Apply the number scale-out animation
+        setNumberAnimationClass('number-scale-out')
+        
+        // Shorter delay to increment for better sync
+        setTimeout(() => {
+          // Increment the number while it's scaled down
+          setDisplayLevel(prevLevel => prevLevel + 1)
+          
+          // Quicker transition to slam for better flow
+          setTimeout(() => {
+            setSoulsAnimationClass('souls-impact')
+            setNumberAnimationClass('number-slam')
+            
+            // After impact, play final pulse with shorter delay
+            setTimeout(() => {
+              setSoulsAnimationClass('souls-final-pulse')
+              setNumberAnimationClass('number-settle')
+              
+              // Reset animation state - longer settle time for satisfaction
+              setTimeout(() => {
+                setIsAnimatingSouls(false)
+                setSoulsAnimationClass('')
+                setNumberAnimationClass('')
+                // Mark animation as completed so we can set final level
+                setAnimationCompleted(true)
+              }, 800)
+            }, 200)
+          }, 80)
+        }, 300)
+      }, 200)
+    }
+  }
+
   useImperativeHandle(ref, () => ({
     flip: (flipped, isLeft, duration, easing, interpolation) =>
       baseRef.current?.flip(flipped, isLeft, duration, easing, interpolation),
@@ -92,7 +175,8 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
     toggleBlink: (isBlinking, duration) => baseRef.current?.toggleBlink(isBlinking, duration),
     getStyle: () => baseRef.current?.getStyle() || { translateX: 0, translateY: 0, rotation: 0, scale: 1 },
     
-    duelistId: props.duelistId
+    duelistId: props.duelistId,
+    animateSoulsIncrease,
   }));
 
   const _nameLength = (name: string) => {
@@ -157,50 +241,161 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       }
       childrenInFront={
         <>
-          {!props.hideSouls && (
-            <div 
-              className='duelist-card-top-right YesMouse' 
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                transform: 'translate(-30%, -35%)',
-                zIndex: 10,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: aspectWidth(props.width * 0.25),
-                height: aspectWidth(props.width * 0.25),
-                backgroundImage: 'url("/images/ui/card_souls.png")',
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-                filter: 'drop-shadow(0 0 5px rgba(255, 215, 0, 0.7))',
-                textShadow: '0px 0px 2px #000, 0px 0px 4px #000',
-                cursor: !props.isSmall ? 'pointer' : 'default'
-              }}
-              onMouseEnter={() => !props.isSmall && emitter.emit('hover_description', 'Souls bound to this duelist. Click to see them.')}
-              onMouseLeave={() => !props.isSmall && emitter.emit('hover_description', null)}
-              onClick={() => {
-                if (!props.isSmall) {
-                  if (props.showSouls && stackedDuelistIds.length > 0) {
-                    props.showSouls(props.duelistId, stackedDuelistIds);
+          {showSouls && (
+            isNewDuelist ? (
+              <div 
+                className={`duelist-new-badge YesMouse ${newBadgeAnimationClass}`}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  transform: 'translate(-30%, -35%)',
+                  zIndex: 10,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: aspectWidth(props.width * 0.3),
+                  height: aspectWidth(props.width * 0.3),
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, #ffcc33 0%, #cc8800 100%)',
+                  boxShadow: '0 0 8px rgba(102, 51, 0, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.4)',
+                  border: '2px solid #c90',
+                  cursor: !props.isSmall ? 'pointer' : 'default',
+                  overflow: 'hidden'
+                }}
+                onMouseEnter={() => !props.isSmall && emitter.emit('hover_description', 'This is a new duelist!')}
+                onMouseLeave={() => !props.isSmall && emitter.emit('hover_description', null)}
+                onClick={() => {
+                  if (!props.isSmall) {
+                    if (props.showSouls && stackedDuelistIds.length > 0) {
+                      props.showSouls(props.duelistId, stackedDuelistIds);
+                    }
                   }
-                }
-              }}
-            >
-              <span style={{
-                fontWeight: 'bold',
-                fontSize: aspectWidth(props.width * 0.1),
-                color: 'white',
-                textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
-                fontFamily: 'Garamond',
-                position: 'relative',
-                top: aspectWidth(props.width * 0.02)
-              }}>
-                {level || 0}
-              </span>
-            </div>
+                }}
+              >
+                <div style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%)',
+                  top: '-30%',
+                  left: '-30%',
+                  borderRadius: '50%'
+                }} />
+                
+                <span style={{
+                  fontWeight: '900',
+                  fontSize: aspectWidth(props.width * 0.09),
+                  color: '#632',
+                  textShadow: '0 1px 1px rgba(255,255,255,0.6)',
+                  fontFamily: 'Garamond',
+                  letterSpacing: '0.5px',
+                  transform: 'rotate(-5deg)'
+                }}>
+                  NEW
+                </span>
+                
+                {/* Shine effect during animation */}
+                {newBadgeAnimationClass === 'new-badge-pop' && (
+                  <div className="shine-effect" style={{
+                    position: 'absolute',
+                    width: '200%',
+                    height: '50%',
+                    background: 'linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%)',
+                    transform: 'rotate(45deg) translateY(-50%)',
+                    animation: 'shine-sweep 0.8s ease-in-out'
+                  }} />
+                )}
+              </div>
+            ) : (
+              <div 
+                className={`duelist-card-top-right YesMouse ${soulsAnimationClass}`}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  transform: 'translate(-30%, -35%)',
+                  zIndex: 10,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: aspectWidth(props.width * 0.25),
+                  height: aspectWidth(props.width * 0.25),
+                  backgroundImage: 'url("/images/ui/card_souls.png")',
+                  backgroundSize: 'contain',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center',
+                  filter: isAnimatingSouls 
+                    ? 'drop-shadow(0 0 10px rgba(255, 215, 0, 0.9)) brightness(1.3)' 
+                    : 'drop-shadow(0 0 5px rgba(255, 215, 0, 0.7))',
+                  textShadow: '0px 0px 2px #000, 0px 0px 4px #000',
+                  cursor: !props.isSmall ? 'pointer' : 'default',
+                  transition: 'filter 0.3s ease, transform 0.5s ease'
+                }}
+                onMouseEnter={() => !props.isSmall && emitter.emit('hover_description', 'Souls bound to this duelist. Click to see them.')}
+                onMouseLeave={() => !props.isSmall && emitter.emit('hover_description', null)}
+                onClick={() => {
+                  if (!props.isSmall) {
+                    if (props.showSouls && stackedDuelistIds.length > 0) {
+                      props.showSouls(props.duelistId, stackedDuelistIds);
+                    }
+                  }
+                }}
+              >
+                <span className={numberAnimationClass} style={{
+                  fontWeight: 'bold',
+                  fontSize: aspectWidth(props.width * 0.1),
+                  color: 'white',
+                  textShadow: isAnimatingSouls 
+                    ? '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 0 10px #ffd700'
+                    : '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
+                  fontFamily: 'Garamond',
+                  position: 'relative',
+                  top: aspectWidth(props.width * 0.02),
+                  display: 'inline-block',
+                  transformOrigin: 'center center',
+                  transition: 'text-shadow 0.3s ease, color 0.3s ease',
+                }}>
+                  {displayLevel}
+                </span>
+
+                {/* Impact shockwave effect for when number lands */}
+                {isAnimatingSouls && soulsAnimationClass === 'souls-impact' && (
+                  <div className="shockwave-container" style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'none'
+                  }}>
+                    <div className="shockwave" />
+                  </div>
+                )}
+
+                {/* Soul particles during animation */}
+                {isAnimatingSouls && (
+                  <div className="soul-particles" style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    pointerEvents: 'none'
+                  }}>
+                    {[...Array(12)].map((_, i) => (
+                      <div key={i} className="soul-particle" style={{
+                        position: 'absolute',
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: '#ffd700',
+                        opacity: 0,
+                        animation: `soul-particle-${i % 8} 1.2s ease-out forwards`,
+                        animationDelay: `${i * 0.1}s`,
+                        boxShadow: '0 0 5px #ffd700, 0 0 10px #ffd700'
+                      }} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
           )}
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -225,6 +420,164 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                 .DuelistNameSVG{
                   font-weight:bold;
                   font-variant-caps:small-caps;
+                }
+                
+                /* NEW badge animations */
+                @keyframes new-badge-pop {
+                  0% { transform: translate(-30%, -35%) scale(0.2); }
+                  40% { transform: translate(-30%, -35%) scale(1.3); }
+                  60% { transform: translate(-30%, -35%) scale(0.9); }
+                  80% { transform: translate(-30%, -35%) scale(1.1); }
+                  100% { transform: translate(-30%, -35%) scale(1); }
+                }
+                
+                .new-badge-pop {
+                  animation: new-badge-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+                }
+                
+                @keyframes shine-sweep {
+                  0% { transform: rotate(45deg) translateX(-150%); }
+                  100% { transform: rotate(45deg) translateX(150%); }
+                }
+                
+                @keyframes pulse {
+                  0% { transform: translate(-30%, -35%) scale(1); }
+                  50% { transform: translate(-30%, -35%) scale(1.2); }
+                  100% { transform: translate(-30%, -35%) scale(1); }
+                }
+                
+                @keyframes impact-pulse {
+                  0% { transform: translate(-30%, -35%) scale(1.2); }
+                  15% { transform: translate(-31%, -34%) scale(0.85); }
+                  30% { transform: translate(-29%, -36%) scale(1.15); }
+                  45% { transform: translate(-30.5%, -34.5%) scale(0.95); }
+                  60% { transform: translate(-29.5%, -35.5%) scale(1.05); }
+                  75% { transform: translate(-30%, -35%) scale(0.98); }
+                  100% { transform: translate(-30%, -35%) scale(1); }
+                }
+                
+                @keyframes glow {
+                  0% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7)); }
+                  50% { filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.9)) brightness(1.3); }
+                  100% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7)); }
+                }
+                
+                @keyframes impact-glow {
+                  0% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.9)) brightness(1.4); }
+                  40% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8)) brightness(1.2); }
+                  70% { filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8)) brightness(1.3); }
+                  100% { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.7)) brightness(1.1); }
+                }
+                
+                .souls-increasing {
+                  animation: pulse 0.5s ease infinite, glow 0.5s ease infinite;
+                }
+                
+                .souls-impact {
+                  animation: impact-pulse 0.4s cubic-bezier(0.2, 0.8, 0.3, 1.2) forwards, impact-glow 0.4s ease-out forwards;
+                }
+                
+                .souls-final-pulse {
+                  animation: pulse 1s ease-out forwards, glow 0.8s ease-out forwards;
+                }
+                
+                /* Number animations */
+                @keyframes number-scale-out {
+                  0% { transform: scale(1); opacity: 1; }
+                  100% { transform: scale(0); opacity: 0; }
+                }
+                
+                @keyframes number-slam {
+                  0% { transform: scale(0); opacity: 0; }
+                  10% { transform: scale(2.2); opacity: 1; }
+                  20% { transform: scale(1.7) rotate(2deg); }
+                  30% { transform: scale(1.9) rotate(-1.5deg); }
+                  40% { transform: scale(1.6) rotate(1deg); }
+                  50% { transform: scale(1.8) rotate(-0.5deg); }
+                  60% { transform: scale(1.7) rotate(0deg); }
+                  70% { transform: scale(1.7); }
+                  80% { transform: scale(1.6); }
+                  90% { transform: scale(1.55); }
+                  100% { transform: scale(1.4); }
+                }
+                
+                @keyframes number-settle {
+                  0% { transform: scale(1.4); }
+                  25% { transform: scale(1.2); }
+                  50% { transform: scale(1.1); }
+                  75% { transform: scale(1.05); }
+                  100% { transform: scale(1); }
+                }
+                
+                .number-scale-out {
+                  animation: number-scale-out 0.25s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+                }
+                
+                .number-slam {
+                  animation: number-slam 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+                }
+                
+                .number-settle {
+                  animation: number-settle 0.7s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+                }
+                
+                /* Shockwave animation */
+                @keyframes shockwave {
+                  0% { transform: scale(0.1); opacity: 0; }
+                  20% { opacity: 0.7; }
+                  100% { transform: scale(2); opacity: 0; }
+                }
+                
+                .shockwave {
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%) scale(0.1);
+                  width: 100%;
+                  height: 100%;
+                  border-radius: 50%;
+                  background: radial-gradient(circle, rgba(255,215,0,0.6) 0%, rgba(255,215,0,0) 70%);
+                  animation: shockwave 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+                }
+                
+                @keyframes soul-particle-0 {
+                  0% { transform: translate(50%, 50%) scale(0); opacity: 1; }
+                  100% { transform: translate(20%, -100%) scale(1.6); opacity: 0; }
+                }
+                
+                @keyframes soul-particle-1 {
+                  0% { transform: translate(50%, 50%) scale(0); opacity: 1; }
+                  100% { transform: translate(100%, -50%) scale(1.6); opacity: 0; }
+                }
+                
+                @keyframes soul-particle-2 {
+                  0% { transform: translate(50%, 50%) scale(0); opacity: 1; }
+                  100% { transform: translate(120%, 30%) scale(1.6); opacity: 0; }
+                }
+                
+                @keyframes soul-particle-3 {
+                  0% { transform: translate(50%, 50%) scale(0); opacity: 1; }
+                  100% { transform: translate(80%, 120%) scale(1.6); opacity: 0; }
+                }
+                
+                @keyframes soul-particle-4 {
+                  0% { transform: translate(50%, 50%) scale(0); opacity: 1; }
+                  100% { transform: translate(0%, 100%) scale(1.6); opacity: 0; }
+                }
+                
+                @keyframes soul-particle-5 {
+                  0% { transform: translate(50%, 50%) scale(0); opacity: 1; }
+                  100% { transform: translate(-70%, 50%) scale(1.6); opacity: 0; }
+                }
+                
+                @keyframes soul-particle-6 {
+                  0% { transform: translate(50%, 50%) scale(0); opacity: 1; }
+                  100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+                }
+                
+                @keyframes soul-particle-7 {
+                  0% { transform: translate(50%, 50%) scale(0); opacity: 1; }
+                  100% { transform: translate(30%, -80%) scale(1.6); opacity: 0; }
                 }
               `}
             </style>

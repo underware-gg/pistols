@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useGameAspect } from '/src/hooks/useGameAspect';
 import { DuelistCard } from '../cards/DuelistCard';
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
+import { usePlayerDuelistsOrganized } from '/src/components/PlayerDuelistsOrganized';
 import { DUELIST_CARD_HEIGHT, DUELIST_CARD_WIDTH } from '/src/data/cardConstants';
 import { usePistolsContext } from '/src/hooks/PistolsContext';
 import { CardColor } from '@underware/pistols-sdk/pistols/constants'
+import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists';
 
 interface DuelistsBookAlwaysOpenProps {
   width: number;
@@ -57,7 +58,7 @@ export const DuelistsBookAlwaysOpen: React.FC<DuelistsBookAlwaysOpenProps> = ({
       bookRef.current.style.setProperty('--book-rotate-y', `${bookRotateY}deg`);
       bookRef.current.style.setProperty('--book-rotate-z', `${bookRotateZ}deg`);
       bookRef.current.style.setProperty('--book-opacity', '1');
-      bookRef.current.style.setProperty('--z-index', `${zIndex}`);
+      bookRef.current.style.setProperty('--book-z-index', `${zIndex}`);
       bookRef.current.style.filter = dropShadow ? `drop-shadow(${dropShadow})` : 'none';
     }
   }, [width, height, aspectWidth, bookTranslateX, bookTranslateY, bookRotateX, bookRotateY, bookRotateZ, bookScale, zIndex, dropShadow]);
@@ -161,7 +162,10 @@ function BookCoverLayer({
 
 function BookSheets({ width, height }: { width?: number; height?: number }) {
   const { aspectWidth, aspectHeight } = useGameAspect();
-  const { duelistIds } = useDuelistsOfPlayer();
+  const { activeDuelists, deadDuelists } = usePlayerDuelistsOrganized();
+  
+  const duelistIds = useMemo(() => [...activeDuelists, ...deadDuelists], [activeDuelists, deadDuelists]);
+  
   const { selectedDuelistId, dispatchSelectDuelistId } = usePistolsContext()
 
   const sheetsRef = useRef<HTMLDivElement>(null);
@@ -173,7 +177,7 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
   const [sheetGap, setSheetGap] = useState(width ? width / 5 / (sheetCount - 1) : 0.1);
   const [sheetOrder, setSheetOrder] = useState<number[]>(Array.from({length: sheetCount}, (_, i) => i));
   
-  const maxPages = useMemo(() => Math.ceil(duelistIds.length / duelistsPerPage / 2) * 2, [duelistIds]);
+  const maxPages = useMemo(() => Math.ceil(duelistIds.length / duelistsPerPage), [duelistIds]);
 
   const PageContentMemo = useMemo(() => {
     if (!duelistIds || !width || !height) return [];
@@ -216,44 +220,44 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
                 pointerEvents: 'none',
               }} />
 
-              <div id={`corner-tr-fill-${duelistId}`} style={{
-                position: 'absolute',
-                top: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
-                right: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
-                width: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
-                height: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
-                background: '#e0d1bd',
-                clipPath: 'polygon(100% 0, 100% 100%, 0 0)',
-                boxShadow: `inset ${aspectWidth(-18)}px ${aspectWidth(18)}px ${aspectWidth(10)}px #f0e6d9, inset ${aspectWidth(-8)}px ${aspectWidth(8)}px ${aspectWidth(20)}px #f0e6d9`,
-                zIndex: 21,
-                pointerEvents: 'none'
-              }} />
+                <div id={`corner-tr-fill-${duelistId}`} style={{
+                  position: 'absolute',
+                  top: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
+                  right: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
+                  width: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
+                  height: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
+                  background: '#e0d1bd',
+                  clipPath: 'polygon(100% 0, 100% 100%, 0 0)',
+                  boxShadow: `inset ${aspectWidth(-18)}px ${aspectWidth(18)}px ${aspectWidth(10)}px #f0e6d9, inset ${aspectWidth(-8)}px ${aspectWidth(8)}px ${aspectWidth(20)}px #f0e6d9`,
+                  zIndex: 21,
+                  pointerEvents: 'none'
+                }} />
 
-              <div id={`corner-bl-${duelistId}`} style={{
-                position: 'absolute',
-                bottom: aspectWidth(-DUELIST_CARD_WIDTH * 0.05),
-                left: aspectWidth(-DUELIST_CARD_WIDTH * 0.05),
-                width: 0,
-                height: 0,
-                borderLeft: `${aspectWidth(DUELIST_CARD_WIDTH * 0.4)}px solid #f0e6d9`,
-                borderTop: `${aspectWidth(DUELIST_CARD_WIDTH * 0.4)}px solid transparent`,
-                filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.8))',
-                zIndex: 20,
-                pointerEvents: 'none'
-              }} />
+                <div id={`corner-bl-${duelistId}`} style={{
+                  position: 'absolute',
+                  bottom: aspectWidth(-DUELIST_CARD_WIDTH * 0.05),
+                  left: aspectWidth(-DUELIST_CARD_WIDTH * 0.05),
+                  width: 0,
+                  height: 0,
+                  borderLeft: `${aspectWidth(DUELIST_CARD_WIDTH * 0.4)}px solid #f0e6d9`,
+                  borderTop: `${aspectWidth(DUELIST_CARD_WIDTH * 0.4)}px solid transparent`,
+                  filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.8))',
+                  zIndex: 20,
+                  pointerEvents: 'none'
+                }} />
 
-              <div id={`corner-bl-fill-${duelistId}`} style={{
-                position: 'absolute',
-                bottom: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
-                left: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
-                width: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px', 
-                height: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
-                background: '#e0d1bd',
-                clipPath: 'polygon(0 100%, 100% 100%, 0 0)',
-                boxShadow: `inset ${aspectWidth(18)}px ${aspectWidth(-18)}px ${aspectWidth(10)}px #f0e6d9, inset ${aspectWidth(8)}px ${aspectWidth(-8)}px ${aspectWidth(20)}px #f0e6d9`,
-                zIndex: 21,
-                pointerEvents: 'none'
-              }} />
+                <div id={`corner-bl-fill-${duelistId}`} style={{
+                  position: 'absolute',
+                  bottom: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
+                  left: aspectWidth(-DUELIST_CARD_WIDTH * 0.15),
+                  width: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px', 
+                  height: aspectWidth(DUELIST_CARD_WIDTH * 0.6) + 'px',
+                  background: '#e0d1bd',
+                  clipPath: 'polygon(0 100%, 100% 100%, 0 0)',
+                  boxShadow: `inset ${aspectWidth(18)}px ${aspectWidth(-18)}px ${aspectWidth(10)}px #f0e6d9, inset ${aspectWidth(8)}px ${aspectWidth(-8)}px ${aspectWidth(20)}px #f0e6d9`,
+                  zIndex: 21,
+                  pointerEvents: 'none'
+                }} />
 
               <DuelistCard 
                 duelistId={Number(duelistId)}
@@ -280,7 +284,7 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
     }
 
     return pages;
-  }, [duelistIds, aspectWidth, width, height, maxPages]);
+  }, [duelistIds, aspectWidth, width, height, maxPages, deadDuelists]);
 
   const handleNextPage = () => {
     if (currentPage < maxPages - 2) {
@@ -444,6 +448,7 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
     return orderIndex >= sheetCount / 2 - 2 && orderIndex <= sheetCount / 2 + 1;
   };
 
+  const buttonWidth = width ? width * 0.2 : 8;
   const buttonHeight = width ? width * 0.08 : 2;
   const buttonPadding = width ? width * 0.03 : 0.5;
 
@@ -470,6 +475,7 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
                       left: aspectWidth(buttonPadding),
                       padding: `${aspectWidth(buttonPadding * 0.5)}px ${aspectWidth(buttonPadding)}px`,
                       height: aspectWidth(buttonHeight),
+                      width: aspectWidth(buttonWidth),
                       fontSize: aspectWidth(buttonHeight * 0.5),
                       borderRadius: aspectWidth(buttonHeight * 0.2)
                     }}
@@ -480,7 +486,7 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
               </div>
               <div className="page-content right-page YesMouse">
                 {renderDuelistsForPage(i, false)}
-                {currentPage < maxPages - 1 && 
+                {currentPage < maxPages - 2 && 
                   <button 
                     onClick={handleNextPage} 
                     className="next-button YesMouse NoDrag"
@@ -490,6 +496,7 @@ function BookSheets({ width, height }: { width?: number; height?: number }) {
                       right: aspectWidth(buttonPadding),
                       padding: `${aspectWidth(buttonPadding * 0.5)}px ${aspectWidth(buttonPadding)}px`,
                       height: aspectWidth(buttonHeight),
+                      width: aspectWidth(buttonWidth),
                       fontSize: aspectWidth(buttonHeight * 0.5),
                       borderRadius: aspectWidth(buttonHeight * 0.2)
                     }}

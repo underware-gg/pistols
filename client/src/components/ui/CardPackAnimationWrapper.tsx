@@ -269,7 +269,7 @@ export const CardPackAnimationWrapper = forwardRef<CardPackAnimationWrapperHandl
       .onUpdate((obj) => {
         if (wrapperRef.current) {
           zIndexRef.current.zIndex = obj.zIndex
-          wrapperRef.current.style.setProperty('--z-index', obj.zIndex.toString())
+          wrapperRef.current.style.setProperty('--pack-z-index', obj.zIndex.toString())
         }
       })
       .start()
@@ -452,7 +452,7 @@ export const CardPackAnimationWrapper = forwardRef<CardPackAnimationWrapperHandl
         `,
         transformStyle: 'preserve-3d',
         transformOrigin: 'center center',
-        zIndex: 'var(--z-index, 1)',
+        zIndex: 'var(--pack-z-index, 1)',
         overflow: 'visible',
         display: 'flex',
         justifyContent: 'center',

@@ -47,8 +47,9 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
     didPlayersInitA.current = false;
     didPlayersInitB.current = false;
     didTutorialRun.current = false;
-    
+    console.log('resetting duel scene');
     if (gameImpl) {
+      console.log('resetting duel scene 2');
       gameImpl.resetDuelScene(true, true);
     }
   }, [duelId, gameImpl]);
