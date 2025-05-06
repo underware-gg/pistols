@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { BigNumberish, addAddressPadding } from 'starknet'
-import { bigintToHex, arrayClean } from 'src/utils/misc/types'
+import { BigNumberish } from 'starknet'
+import { bigintToAddress, arrayClean } from 'src/utils/misc/types'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import {
   PistolsQueryBuilder,
@@ -303,7 +303,7 @@ const _parseEvents = (data: PistolsEntity[] | PistolsEntity[][], historical: boo
 //
 // Format Bignumberish value for torii query operators
 export const formatQueryValue = (value: BigNumberish): string => {
-  return addAddressPadding(bigintToHex(value))
+  return bigintToAddress(value)
 }
 
 //

@@ -1,4 +1,4 @@
-import { BigNumberish } from 'starknet'
+import { BigNumberish, addAddressPadding } from 'starknet'
 
 //
 // misc
@@ -34,6 +34,7 @@ export const capitalize = (v: string) => (v.charAt(0).toUpperCase() + v.slice(1)
 //
 
 export const bigintToHex = (v: BigNumberish): `0x${string}` => (!v ? '0x0' : `0x${BigInt(v).toString(16)}`)
+export const bigintToAddress = (v: BigNumberish): string => addAddressPadding(bigintToHex(v))
 export const bigintToDecimal = (v: BigNumberish): string => (!v ? '0' : BigInt(v).toString())
 export const bigintToNumber = (v: BigNumberish): number => (!v ? 0 : Number(BigInt(v)))
 export const bigintEquals = (a: BigNumberish | null, b: BigNumberish | null): boolean => (a != null && b != null && BigInt(a) == BigInt(b))

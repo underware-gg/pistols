@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
-import { bigintToHex, shortAddress } from '@underware/pistols-sdk/utils'
+import { bigintToAddress, shortAddress } from '@underware/pistols-sdk/utils'
 import { CopyIcon } from '/src/components/ui/Icons'
 
 function AddressShort({
@@ -20,7 +20,7 @@ function AddressShort({
   ifExists?: boolean
   small?: boolean
 }) {
-  const display = useMemo(() => (shortAddress(bigintToHex(address), small)), [address, small])
+  const display = useMemo(() => (shortAddress(bigintToAddress(address), small)), [address, small])
 
   const classNames = useMemo(() => {
     let classNames = ['Code']
@@ -28,7 +28,7 @@ function AddressShort({
     return classNames
   }, [important])
 
-  const copyIcon = useMemo(() => (copyLink && address && <CopyIcon content={bigintToHex(address)} />), [copyLink, address])
+  const copyIcon = useMemo(() => (copyLink && address && <CopyIcon content={bigintToAddress(address)} />), [copyLink, address])
 
   if (ifExists && BigInt(address ?? 0) == 0n) return <></>
   return (
