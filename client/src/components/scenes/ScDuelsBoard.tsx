@@ -9,6 +9,8 @@ import { useGameAspect } from '/src/hooks/useGameAspect'
 import { PosterGrid, PosterGridHandle } from '/src/components/PosterGrid'
 import { DuelPoster, DuelPosterHandle } from '/src/components/DuelPoster'
 import { _currentScene } from '/src/three/game'
+import { SceneName } from '/src/data/assets'
+import { ActionButton } from '../ui/Buttons'
 
 export default function ScDuelsBoard() {
   const { address } = useAccount()
@@ -259,6 +261,24 @@ export default function ScDuelsBoard() {
         mixBlendMode: 'soft-light',
         pointerEvents: 'none'
       }} />
+      <div style={{
+        position: 'absolute',
+        bottom: aspectHeight(2),
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: aspectWidth(40),
+        zIndex: 10,
+        display: 'flex',
+        justifyContent: 'center'
+      }}>
+        <ActionButton 
+          large 
+          fill 
+          important 
+          label="View your past duels in the graveyard" 
+          onClick={() => dispatchSetScene(SceneName.Graveyard)}
+        />
+      </div>
     </>
   )
 }

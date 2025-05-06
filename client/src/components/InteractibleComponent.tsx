@@ -518,6 +518,7 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
   }
 
   const setComponentZIndex = (index: number, backgroundIndex?: number) => {
+    console.log('setting z-index', index, backgroundIndex)
     frontRef.current?.style.setProperty('--z-index', index.toString())
     if (backgroundRef.current) {
       backgroundRef.current.style.setProperty('--z-index', backgroundIndex ? backgroundIndex.toString() : index.toString())
@@ -646,7 +647,7 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
     document.addEventListener('mouseup', handleMouseUp)
   }, [props.isDraggable, spring, boxW, boxH, props.width, props.height, scale, rotation, props.onClick])
 
-  
+
   const component = useMemo(() => {
     return (
       <>

@@ -57,7 +57,7 @@ export const DuelistsBookAlwaysOpen: React.FC<DuelistsBookAlwaysOpenProps> = ({
       bookRef.current.style.setProperty('--book-rotate-y', `${bookRotateY}deg`);
       bookRef.current.style.setProperty('--book-rotate-z', `${bookRotateZ}deg`);
       bookRef.current.style.setProperty('--book-opacity', '1');
-      bookRef.current.style.setProperty('--z-index', `${zIndex}`);
+      bookRef.current.style.setProperty('--book-z-index', `${zIndex}`);
       bookRef.current.style.filter = dropShadow ? `drop-shadow(${dropShadow})` : 'none';
     }
   }, [width, height, aspectWidth, bookTranslateX, bookTranslateY, bookRotateX, bookRotateY, bookRotateZ, bookScale, zIndex, dropShadow]);

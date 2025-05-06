@@ -373,6 +373,9 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType, packId
     orderedCards.forEach(({cardRef, duelistId}, index) => {
       setTimeout(() => {
         cardRef?.flip(true, true, CARD_PACK_FLIP_DURATION);
+        setTimeout(() => {
+          cardRef?.animateSoulsIncrease();
+        }, CARD_PACK_FLIP_DURATION)
         setRevealedDuelists(prev => new Set([...prev, duelistId]));
       }, index * CARD_PACK_REVEAL_DELAY);
     });
@@ -404,6 +407,9 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType, packId
   const handleCardClick = (id: number, cardRef: DuelistCardHandle | null) => {
     if (!revealedDuelists.has(id)) {
       cardRef?.flip(true, true, CARD_PACK_FLIP_DURATION);
+      setTimeout(() => {
+        cardRef?.animateSoulsIncrease();
+      }, CARD_PACK_FLIP_DURATION)
       setRevealedDuelists(prev => {
         const newSet = new Set([...prev, id]);
         if (newSet.size === newDuelistIds.length) {
@@ -509,6 +515,8 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType, packId
               isSelected={selectedDuelistId === id}
               showQuote={true}
               isHighlightable={true}
+              startZIndex={100}
+              shouldAnimateIncrease={true}
               onHover={(isHovered) => {
                 if (cardRefs.current[i] && id !== selectedDuelistId) {
                   cardRefs.current[i].setScale(isHovered ? 1.1 : 1, CARD_PACK_CARD_SCALE_DURATION);
