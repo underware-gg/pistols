@@ -249,7 +249,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                   position: 'absolute',
                   top: 0,
                   left: 0,
-                  transform: 'translate(-30%, -30%) rotate(40deg)',
+                  transform: 'translate(-30%, -30%) rotate(-40deg)',
                   zIndex: 10,
                   display: 'flex',
                   justifyContent: 'center',
@@ -270,10 +270,10 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                   fontWeight: '900',
                   fontSize: aspectWidth(props.width * 0.12),
                   color: '#ffd700',
-                  textShadow: '0 0 5px #ffd700, -2px -2px 0 #632, 2px -2px 0 #632, -2px 2px 0 #632, 2px 2px 0 #632',
+                  textShadow: '0 0 5px #ffd700, -2px -2px 0 #421, 2px -2px 0 #421, -2px 2px 0 #421, 2px 2px 0 #421',
                   fontFamily: 'Garamond',
                   letterSpacing: '0.5px',
-                  WebkitTextStroke: '1px #632',
+                  WebkitTextStroke: '1.5px #421',
                   animation: 'new-text-pulse 2s ease-in-out infinite'
                 }}>
                   NEW

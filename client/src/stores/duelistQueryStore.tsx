@@ -42,24 +42,33 @@ interface State {
 const createStore = () => {
   const _parseEntity = (e: PistolsEntity) => {
     let duelist = e.models.pistols.Duelist
-    const { variant } = parseCustomEnum<constants.DuelistProfile, any>(duelist?.duelist_profile)
-    if (!duelist || variant != constants.DuelistProfile.Genesis) return undefined
-    let currentChallenge = e.models.pistols.DuelistAssignment
-    let memorial = e.models.pistols.DuelistMemorial
-    return {
-      duelist_id: BigInt(duelist.duelist_id),
-      timestamp_registered: Number(duelist.timestamps.registered),
-      timestamp_active: Number(duelist.timestamps.active),
-      name: 'DUELIST_????',
-      fame: 0,
-      honour: Number(duelist.totals.honour ?? 0),
-      win_ratio: calcWinRatio(Number(duelist.totals.total_duels ?? 0), Number(duelist.totals.total_wins ?? 0)),
-      total_duels: Number(duelist.totals.total_duels ?? 0),
-      total_wins: Number(duelist.totals.total_wins ?? 0),
-      total_losses: Number(duelist.totals.total_losses ?? 0),
-      total_draws: Number(duelist.totals.total_draws ?? 0),
-      is_active: (Number(duelist.totals.total_duels ?? 0) > 0 || isPositiveBigint(currentChallenge?.duel_id ?? 0n)),
-      is_alive: !Boolean(memorial),
+    if (!duelist) return undefined
+    
+    try {
+      const { variant } = parseCustomEnum<constants.DuelistProfile, any>(duelist?.duelist_profile)
+      if (variant != constants.DuelistProfile.Genesis) return undefined
+      
+      let currentChallenge = e.models.pistols.DuelistAssignment
+      let memorial = e.models.pistols.DuelistMemorial
+      
+      return {
+        duelist_id: BigInt(duelist.duelist_id),
+        timestamp_registered: Number(duelist.timestamps?.registered || 0),
+        timestamp_active: Number(duelist.timestamps?.active || 0),
+        name: 'DUELIST_????',
+        fame: 0,
+        honour: Number(duelist.totals?.honour ?? 0),
+        win_ratio: calcWinRatio(Number(duelist.totals?.total_duels ?? 0), Number(duelist.totals?.total_wins ?? 0)),
+        total_duels: Number(duelist.totals?.total_duels ?? 0),
+        total_wins: Number(duelist.totals?.total_wins ?? 0),
+        total_losses: Number(duelist.totals?.total_losses ?? 0),
+        total_draws: Number(duelist.totals?.total_draws ?? 0),
+        is_active: (Number(duelist.totals?.total_duels ?? 0) > 0 || isPositiveBigint(currentChallenge?.duel_id ?? 0n)),
+        is_alive: !Boolean(memorial),
+      }
+    } catch (error) {
+      console.error("Error parsing duelist entity:", error)
+      return undefined
     }
   }
   return create<State>()(immer((set) => ({

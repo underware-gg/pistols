@@ -91,6 +91,7 @@ export const CardPack = forwardRef<CardPackHandle, CardPack>(({ packType, packId
   }
 
   const _claim = async () => {
+    if (isClaiming) return
     if (packType === constants.PackType.StarterPack) {
       if (fundedCount > 0) {
         setIsClaiming(true)
