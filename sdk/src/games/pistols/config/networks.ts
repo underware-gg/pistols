@@ -65,6 +65,7 @@ export type DojoNetworkConfig = {
   chainId: ChainId
   chain: Chain
   name: string
+  slot: string,
   rpcUrl: string
   toriiUrl: string
   graphqlUrl: string
@@ -92,6 +93,7 @@ const localKatanaConfig: DojoNetworkConfig = {
   chainId: ChainId.KATANA_LOCAL,
   name: 'Katana Local',
   rpcUrl: LOCAL_KATANA,
+  slot: undefined,
   // toriiUrl: LOCAL_TORII,
   // toriiUrl: 'http://127.0.0.1:8080',
   toriiUrl: 'http://0.0.0.0:8080',
@@ -177,6 +179,7 @@ const academySlotConfig: DojoNetworkConfig = {
   chain: undefined, // derive from this
   chainId: ChainId.PISTOLS_ACADEMY,
   name: 'Katana Academy',
+  slot: 'pistols-academy',
   rpcUrl: 'https://api.cartridge.gg/x/pistols-academy/katana',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-academy/torii',
   graphqlUrl: 'https://api.cartridge.gg/x/pistols-academy/torii/graphql',
@@ -230,6 +233,7 @@ const pistolsStagingConfig: DojoNetworkConfig = {
   chain: { ...sepolia },
   chainId: ChainId.SN_SEPOLIA,
   name: 'Sepolia Staging',
+  slot: 'pistols-staging',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-staging/torii',
   graphqlUrl: 'https://api.cartridge.gg/x/pistols-staging/torii/graphql',
@@ -251,6 +255,7 @@ const snSepoliaConfig: DojoNetworkConfig = {
   chain: { ...sepolia },
   chainId: ChainId.SN_SEPOLIA,
   name: 'Sepolia Testnet',
+  slot: 'pistols-sepolia',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/sepolia',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii',
   graphqlUrl: 'https://api.cartridge.gg/x/pistols-sepolia/torii/graphql',
@@ -272,6 +277,7 @@ const snMainnetConfig: DojoNetworkConfig = {
   chain: { ...mainnet },
   chainId: ChainId.SN_MAIN,
   name: 'Mainnet',
+  slot: 'pistols-mainnet',
   // rpcUrl: 'https://api.cartridge.gg/rpc/starknet',
   rpcUrl: 'https://api.cartridge.gg/x/starknet/mainnet',
   toriiUrl: 'https://api.cartridge.gg/x/pistols-mainnet/torii',

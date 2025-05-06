@@ -26,13 +26,10 @@ export const makeControllerConnector = (
   namespace: string,
   chainId: string,
   rpcUrl: string,
-  toriiUrl: string,
+  slot: string,
   policies: SessionPolicies | undefined, // if undefined, use preset 
   tokens: Tokens,
 ): Connector => {
-  // extract slot service name from rpcUrl
-  const slot = /api\.cartridge\.gg\/x\/([^/]+)\/torii/.exec(toriiUrl)?.[1];
-
   const options: ControllerOptions = {
     // ProviderOptions
     defaultChainId: bigintToHex(stringToFelt(chainId)),
