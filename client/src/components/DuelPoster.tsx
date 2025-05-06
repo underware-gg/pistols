@@ -305,7 +305,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     width={DUELIST_CARD_WIDTH}
                     height={DUELIST_CARD_HEIGHT}
                     onClick={() => {
-                      if (leftDuelistId && state != constants.ChallengeState.Awaiting) {
+                      if ((leftDuelistId && state != constants.ChallengeState.Awaiting) || isChallenger) {
                         dispatchSelectDuelistId(leftDuelistId)
                       } else {
                         duelistSelectOpener.open()

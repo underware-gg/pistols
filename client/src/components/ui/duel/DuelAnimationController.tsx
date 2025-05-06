@@ -104,13 +104,11 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
 
     // Safety check for the uninitialized case
     if (!leftDuelist?.id || !rightDuelist?.id) {
-      console.log("Waiting for duelist data to be fully loaded before starting animations");
       return;
     }
 
     // Throttle initial animation when first mounting or after refresh
     if (!duelInProgress) {
-      console.log("Waiting for duelists to be fully loaded before starting animations", areDuelistsLoaded);
       if (!areDuelistsLoaded) return;
       
       // Use a timeout to make sure the initialization happens after the scene is fully ready
@@ -411,14 +409,12 @@ export const DuelAnimationController = forwardRef<DuelAnimationControllerRef, Du
           } else {
             // Not playing, just mark as not animating
             isAnimatingStepRef.current = false;
-            console.log("Animation paused");
           }
         }, timeDelayNextStep / speedFactorRef.current);
       } else {
         // If this is the last step or not playing, mark as finished
         setTimeout(() => {
           isAnimatingStepRef.current = false;
-          console.log("Animation sequence complete");
         }, timeDelayNextStep / speedFactorRef.current);
       }
     } catch (error) {

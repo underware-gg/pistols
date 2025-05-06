@@ -8,13 +8,8 @@ import { SceneName } from '/src/data/assets'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 
 export default function ScDuelistBook() {
-  const { bookOpener } = usePistolsContext()
   const { dispatchSetScene } = usePistolsScene()
   const { aspectWidth, aspectHeight } = useGameAspect()
-
-  useEffect(() => {
-    bookOpener.open()
-  }, [])
 
   const handleGetMoreDuelists = () => {
     // Navigate to card packs screen
