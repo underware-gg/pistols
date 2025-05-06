@@ -114,7 +114,7 @@ const localKatanaConfig: DojoNetworkConfig = {
       name: 'Local Katana 2',
       address: '0x17cc6ca902ed4e8baa8463a7009ff18cc294fa85a94b4ce6ac30a9ebd6057c7',
       privateKey: '0x14d6672dcb4b77ca36a887e9a11cd9d637d5012468175829e9c6e770c61642',
-      active: true,
+      // active: true,
     },
     {
       name: 'Local Katana 3',

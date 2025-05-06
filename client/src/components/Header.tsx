@@ -15,9 +15,11 @@ import * as TWEEN from '@tweenjs/tween.js'
 import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { useAllDuelistsIds } from '/src/stores/duelistStore'
 import DuelistData, { DuelistDataValues } from '/src/components/ui/DuelistData'
+import { usePlayerDuelistsOrganized } from './PlayerDuelistsOrganized'
 
 function DuelistStats() {
-  const { duelistIds } = useDuelistsOfPlayer();
+  // const { duelistIds } = useDuelistsOfPlayer();
+  const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized();
   const { address } = useAccount();
   
   // Refs to store duelist data
@@ -92,7 +94,7 @@ function DuelistStats() {
   const avgHonour = useMemo(() => {
     if (stats.duelistsWithHonour === 0) return "0";
     // Only calculate average honor for duelists with honor > 0
-    const avg = stats.totalHonour / stats.duelistsWithHonour;
+    const avg = stats.totalHonour / (stats.duelistsWithHonour * 10);
     return avg.toFixed(1);
   }, [stats.totalHonour, stats.duelistsWithHonour]);
 
@@ -174,7 +176,7 @@ function DuelistStats() {
         <>
           <div style={statItemStyle}>
             <span style={statValueStyle}>{stats.total}</span>
-            <span style={statLabelStyle}>YOUR DUELISTS</span>
+            <span style={statLabelStyle}>ACTIVE DUELISTS</span>
             <div style={dividerStyle}></div>
           </div>
           
@@ -199,17 +201,6 @@ function DuelistStats() {
           <div style={statItemStyle}>
             <span style={statValueStyle}>{avgHonour}</span>
             <span style={statLabelStyle}>AVG HONOUR</span>
-            {stats.duelistsWithHonour > 0 && stats.duelistsWithHonour < stats.total && (
-              <span style={{
-                position: 'absolute',
-                bottom: '-15px',
-                fontSize: '0.65em',
-                color: '#e6aa0e',
-                fontStyle: 'italic'
-              }}>
-                ({stats.duelistsWithHonour} with honour)
-              </span>
-            )}
           </div>
         </>
       )}

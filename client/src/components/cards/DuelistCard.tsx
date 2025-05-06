@@ -61,6 +61,9 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
     }
   }, [level, isAnimatingSouls, props.shouldAnimateIncrease])
 
+  // Don't show souls for dead duelists
+  const showSouls = useMemo(() => !props.hideSouls && isAlive, [props.hideSouls, isAlive])
+
   // Show NEW badge ONLY when level is 0 or 1 AND shouldAnimateIncrease is true
   const isNewDuelist = props.shouldAnimateIncrease && (level === 0 || level === 1)
 
@@ -238,7 +241,7 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
       }
       childrenInFront={
         <>
-          {!props.hideSouls && (
+          {showSouls && (
             isNewDuelist ? (
               <div 
                 className={`duelist-new-badge YesMouse ${newBadgeAnimationClass}`}
