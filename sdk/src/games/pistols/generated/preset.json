@@ -12,7 +12,153 @@
     "name": "Pistols at Dawn"
   },
   "chains": {
-    "SN_MAIN": {},
+    "SN_MAIN": {
+      "policies": {
+        "contracts": {
+          "0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f": {
+            "description": "Cartridge VRF Provider",
+            "methods": [
+              {
+                "entrypoint": "request_random",
+                "description": "Request a random number"
+              }
+            ]
+          }
+        },
+        "messages": [
+          {
+            "types": {
+              "StarknetDomain": [
+                {
+                  "name": "name",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "version",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "chainId",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "revision",
+                  "type": "shortstring"
+                }
+              ],
+              "Message": [
+                {
+                  "name": "duelId",
+                  "type": "felt"
+                },
+                {
+                  "name": "duelistId",
+                  "type": "felt"
+                }
+              ]
+            },
+            "primaryType": "Message",
+            "domain": {
+              "name": "Underware_gg",
+              "version": "1.0.0",
+              "chainId": "SN_MAIN",
+              "revision": "1"
+            },
+            "description": "Verify the identity of a player in a Duel"
+          },
+          {
+            "types": {
+              "StarknetDomain": [
+                {
+                  "name": "name",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "version",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "chainId",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "revision",
+                  "type": "shortstring"
+                }
+              ],
+              "pistols-PlayerOnline": [
+                {
+                  "name": "identity",
+                  "type": "ContractAddress"
+                },
+                {
+                  "name": "timestamp",
+                  "type": "felt"
+                }
+              ]
+            },
+            "primaryType": "pistols-PlayerOnline",
+            "domain": {
+              "name": "Underware_gg",
+              "version": "1.0.0",
+              "chainId": "SN_MAIN",
+              "revision": "1"
+            },
+            "name": "PlayerOnline",
+            "description": "Notify when a player is online"
+          },
+          {
+            "types": {
+              "StarknetDomain": [
+                {
+                  "name": "name",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "version",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "chainId",
+                  "type": "shortstring"
+                },
+                {
+                  "name": "revision",
+                  "type": "shortstring"
+                }
+              ],
+              "pistols-PlayerBookmark": [
+                {
+                  "name": "identity",
+                  "type": "ContractAddress"
+                },
+                {
+                  "name": "target_address",
+                  "type": "ContractAddress"
+                },
+                {
+                  "name": "target_id",
+                  "type": "u128"
+                },
+                {
+                  "name": "enabled",
+                  "type": "bool"
+                }
+              ]
+            },
+            "primaryType": "pistols-PlayerBookmark",
+            "domain": {
+              "name": "Underware_gg",
+              "version": "1.0.0",
+              "chainId": "SN_MAIN",
+              "revision": "1"
+            },
+            "name": "PlayerBookmark",
+            "description": "Notify when a player follows another player or token"
+          }
+        ]
+      }
+    },
     "SN_SEPOLIA": {
       "policies": {
         "contracts": {

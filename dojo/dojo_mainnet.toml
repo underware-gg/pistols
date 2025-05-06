@@ -13,7 +13,7 @@ website = "https://pistols.gg"
 seed = "pistols_v1_0_0"
 
 [world.socials]
-x = "https://x.com/underware_gg"
+x = "https://x.com/pistols_gg"
 github = "https://github.com/underware-gg/pistols"
 # discord = "https://discord.gg/FB2wR6uF"
 # telegram = "https://t.me/dojoengine"
@@ -25,7 +25,7 @@ rpc_url = "https://api.cartridge.gg/x/starknet/mainnet" # or env: STARKNET_RPC_U
 # private_key = ""      # env: DOJO_PRIVATE_KEY
 world_address = "0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5"
 lords_address = "0x0124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49"
-world_block = 803585    # LORDS deployment block
+world_block = 88597     # LORDS deployment block
 
 #--------------------------
 # namespaces

@@ -1,0 +1,29 @@
+#
+# torii config for profile [mainnet]
+#
+world_address = "0x8b4838140a3cbd36ebe64d4b5aaf56a30cc3753c928a79338bf56c53f506c5"
+rpc = "https://api.cartridge.gg/x/starknet/mainnet"
+
+[events]
+raw = true
+
+[sql]
+historical = [
+  "pistols-PlayerActivityEvent",
+  "pistols-LordsReleaseEvent",
+  "pistols-TrophyProgression",
+]
+
+[indexing]
+pending = true
+transactions = true
+world_block = 88597
+contracts = [
+  "erc721:0x2e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c", # duel_token
+  "erc721:0x7aaa9866750a0db82a54ba8674c38620fa2f967d2fbb31133def48e0527c87f", # duelist_token
+  "erc721:0x71333ac75b7d5ba89a2d0c2b67d5b955258a4d46eb42f3428da6137bbbfdfd9", # pack_token
+  # "erc721:$tournament_token", # tournament_token
+  "erc20:0x2549653a4ae1ff8d04a20b8820a49cbe97486c536ec0e4c8f68aa33d80067cf", # fame_coin
+  "erc20:0x68a7a07e08fc3e723a878223d00f669106780d5ea6665eb15d893476d47bf3b", # fools_coin
+  "erc20:0x0124aeb495b947201f5fac96fd1138e326ad86195b98df6dec9009158a533b49", # lords
+]
