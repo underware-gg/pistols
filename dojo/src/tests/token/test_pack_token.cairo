@@ -13,6 +13,7 @@ use pistols::models::{
     config::{TokenConfig},
 };
 
+use pistols::types::duelist_profile::{DuelistProfile, GenesisKey};
 // use pistols::interfaces::dns::{DnsTrait};
 use pistols::types::constants::{CONST};
 use pistols::types::timestamp::{TIMESTAMP};
@@ -149,7 +150,7 @@ fn test_claim_purchase() {
     let starter_pack_duelist_count: usize = PackType::StarterPack.description().quantity;
 
     assert!(sys.pack.can_claim_starter_pack(OWNER()), "can_claim_starter_pack_OWNER");
-    tester::execute_claim_starter_pack(@sys.pack, OWNER());
+    let owner_ids: Span<u128> = tester::execute_claim_starter_pack(@sys.pack, OWNER());
     _assert_minted_count(@sys, 1, "total_supply 1");
     _assert_duelist_count(@sys, starter_pack_duelist_count.into(), "duelist_supply [starter_pack_duelist_count]");
     assert_eq!(sys.pack.balance_of(OWNER()), 0, "balance_of 0");
@@ -187,7 +188,21 @@ fn test_claim_purchase() {
     assert_eq!(balance_bank, balance_bank_initial + price, "balance_bank");
 
     assert!(sys.pack.can_claim_starter_pack(OTHER()), "can_claim_starter_pack_OTHER");
-    tester::execute_claim_starter_pack(@sys.pack, OTHER());
+    let other_ids: Span<u128> = tester::execute_claim_starter_pack(@sys.pack, OTHER());
+
+    // duelists should be the same
+    let owner_profile_1: DuelistProfile = sys.store.get_duelist_profile(*owner_ids[0]);
+    let owner_profile_2: DuelistProfile = sys.store.get_duelist_profile(*owner_ids[1]);
+    let other_profile_1: DuelistProfile = sys.store.get_duelist_profile(*other_ids[0]);
+    let other_profile_2: DuelistProfile = sys.store.get_duelist_profile(*other_ids[1]);
+// println!("owner_profile_1:{}", owner_profile_1);
+// println!("owner_profile_2:{}", owner_profile_2);
+// println!("other_profile_1:{}", other_profile_1);
+// println!("other_profile_2:{}", other_profile_2);
+    assert_eq!(owner_profile_1, DuelistProfile::Genesis(GenesisKey::SerWalker), "owner_profile_1");
+    assert_eq!(other_profile_1, DuelistProfile::Genesis(GenesisKey::SerWalker), "other_profile_1");
+    assert_eq!(owner_profile_2, DuelistProfile::Genesis(GenesisKey::LadyVengeance), "owner_profile_2");
+    assert_eq!(other_profile_2, DuelistProfile::Genesis(GenesisKey::LadyVengeance), "other_profile_2");
 }
 
 #[test]

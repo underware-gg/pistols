@@ -102,7 +102,16 @@ pub impl PackImpl of PackTrait {
         assert(!self.is_open, PackErrors::ALREADY_OPENED);
         let token_ids: Span<u128> = match self.pack_type {
             PackType::Unknown => { [].span() },
-            PackType::StarterPack |
+            PackType::StarterPack => {
+                (store.world.duelist_token_protected_dispatcher()
+                    .mint_duelists(
+                        recipient,
+                        DuelistProfile::Genesis(GenesisKey::Unknown),
+                        self.pack_type.description().quantity,
+                        0x0100, // mint always Ser Walker + Lady Vengeance
+                    )
+                )
+            },
             PackType::FreeDuelist |
             PackType::GenesisDuelists5x => {
                 (store.world.duelist_token_protected_dispatcher()
