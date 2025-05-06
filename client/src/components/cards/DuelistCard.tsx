@@ -41,9 +41,9 @@ export interface DuelistCardHandle extends InteractibleComponentHandle {
 
 export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((props: DuelistCardProps, ref: React.Ref<DuelistCardHandle>) => {
   const { aspectWidth } = useGameAspect()
-  const { dispatchSelectPlayerAddress } = usePistolsContext()
+  const { dispatchSelectPlayerAddress, dispatchSelectDuel } = usePistolsContext()
   
-  const { nameAndId: name, profilePic, profileType, isInAction, totals, quote } = useDuelist(props.duelistId)
+  const { nameAndId: name, profilePic, profileType, isInAction, totals, quote, currentDuelId } = useDuelist(props.duelistId)
   const {isAlive} = useDuelistFameBalance(props.duelistId)
   const { stackedDuelistIds, level } = useDuelistStack(props.duelistId)
 
@@ -249,19 +249,12 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                   position: 'absolute',
                   top: 0,
                   left: 0,
-                  transform: 'translate(-30%, -35%)',
+                  transform: 'translate(-30%, -30%) rotate(40deg)',
                   zIndex: 10,
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  width: aspectWidth(props.width * 0.3),
-                  height: aspectWidth(props.width * 0.3),
-                  borderRadius: '50%',
-                  background: 'radial-gradient(circle, #ffcc33 0%, #cc8800 100%)',
-                  boxShadow: '0 0 8px rgba(102, 51, 0, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.4)',
-                  border: '2px solid #c90',
                   cursor: !props.isSmall ? 'pointer' : 'default',
-                  overflow: 'hidden'
                 }}
                 onMouseEnter={() => !props.isSmall && emitter.emit('hover_description', 'This is a new duelist!')}
                 onMouseLeave={() => !props.isSmall && emitter.emit('hover_description', null)}
@@ -273,39 +266,18 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                   }
                 }}
               >
-                <div style={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '100%',
-                  backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%)',
-                  top: '-30%',
-                  left: '-30%',
-                  borderRadius: '50%'
-                }} />
-                
                 <span style={{
                   fontWeight: '900',
-                  fontSize: aspectWidth(props.width * 0.09),
-                  color: '#632',
-                  textShadow: '0 1px 1px rgba(255,255,255,0.6)',
+                  fontSize: aspectWidth(props.width * 0.12),
+                  color: '#ffd700',
+                  textShadow: '0 0 5px #ffd700, -2px -2px 0 #632, 2px -2px 0 #632, -2px 2px 0 #632, 2px 2px 0 #632',
                   fontFamily: 'Garamond',
                   letterSpacing: '0.5px',
-                  transform: 'rotate(-5deg)'
+                  WebkitTextStroke: '1px #632',
+                  animation: 'new-text-pulse 2s ease-in-out infinite'
                 }}>
                   NEW
                 </span>
-                
-                {/* Shine effect during animation */}
-                {newBadgeAnimationClass === 'new-badge-pop' && (
-                  <div className="shine-effect" style={{
-                    position: 'absolute',
-                    width: '200%',
-                    height: '50%',
-                    background: 'linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%)',
-                    transform: 'rotate(45deg) translateY(-50%)',
-                    animation: 'shine-sweep 0.8s ease-in-out'
-                  }} />
-                )}
               </div>
             ) : (
               <div 
@@ -424,11 +396,17 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
                 
                 /* NEW badge animations */
                 @keyframes new-badge-pop {
-                  0% { transform: translate(-30%, -35%) scale(0.2); }
-                  40% { transform: translate(-30%, -35%) scale(1.3); }
-                  60% { transform: translate(-30%, -35%) scale(0.9); }
-                  80% { transform: translate(-30%, -35%) scale(1.1); }
-                  100% { transform: translate(-30%, -35%) scale(1); }
+                  0% { transform: translate(-30%, -30%) rotate(40deg) scale(0.2); }
+                  40% { transform: translate(-30%, -30%) rotate(40deg) scale(1.3); }
+                  60% { transform: translate(-30%, -30%) rotate(40deg) scale(0.9); }
+                  80% { transform: translate(-30%, -30%) rotate(40deg) scale(1.1); }
+                  100% { transform: translate(-30%, -30%) rotate(40deg) scale(1); }
+                }
+                
+                @keyframes new-text-pulse {
+                  0% { transform: scale(1); filter: brightness(1); }
+                  50% { transform: scale(1.15); filter: brightness(1.3) drop-shadow(0 0 8px #ffd700); }
+                  100% { transform: scale(1); filter: brightness(1); }
                 }
                 
                 .new-badge-pop {
@@ -596,9 +574,27 @@ export const DuelistCard = forwardRef<DuelistCardHandle, DuelistCardProps>((prop
 
           {/* <DuelistTokenArt duelistId={props.duelistId} className='Absolute' /> */}
           <div className='InDuelEmoji'>
-            {isInAction &&
-              <EmojiIcon emoji={EMOJIS.IN_ACTION} size={props.isSmall ? 'small' : 'big'} />
-            }
+            {isInAction && (
+              <div 
+                className="YesMouse"
+                onClick={() => {
+                  if (currentDuelId && currentDuelId > 0n) {
+                    dispatchSelectDuel(currentDuelId);
+                    setTimeout(() => {
+                      !props.isSmall && emitter.emit('hover_description', null)
+                    }, 100);
+                  }
+                }}
+                onMouseEnter={() => !props.isSmall && emitter.emit('hover_description', 'Click to view active duel')}
+                onMouseLeave={() => !props.isSmall && emitter.emit('hover_description', null)}
+                style={{ cursor: 'pointer' }}
+              >
+                <EmojiIcon 
+                  emoji={EMOJIS.IN_ACTION} 
+                  size={props.isSmall ? 'small' : 'big'} 
+                />
+              </div>
+            )}
             {!isAlive &&
               <EmojiIcon emoji={EMOJIS.DEAD} size={props.isSmall ? 'small' : 'big'} />
             }

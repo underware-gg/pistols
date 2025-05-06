@@ -438,6 +438,11 @@ export class ProgressDialogManager {
     this.dialogA.showElement()
     this.dialogB.showElement()
   }
+  
+  public resetDialogs() {
+    this.dialogA.reset()
+    this.dialogB.reset()
+  }
 
   public hideDialogs() {
     this.dialogA.hideElement()
@@ -627,6 +632,13 @@ export class ProgressDialogMesh {
     this.isYou = isYou
     this.shouldBeVisible = true
 
+    this.updateElement()
+  }
+
+  public reset() {
+    this.duelistName = ''
+    this.isYou = false
+    this.shouldBeVisible = false
     this.updateElement()
   }
 

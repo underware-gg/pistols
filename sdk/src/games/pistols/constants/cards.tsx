@@ -364,7 +364,7 @@ const TacticsCardsTextures: Record<constants.TacticsCard, CardData> = {
     description: 'NONE'
   },
   [constants.TacticsCard.Insult]: {
-    path: '/textures/cards/illustrations/Second_Reaction.png',
+    path: '/textures/cards/illustrations/Insult.png',
     cardFrontPath: '/textures/cards/card_front_brown.png',
     color: CardColor.WHITE,
     title: 'Insult',
@@ -372,7 +372,7 @@ const TacticsCardsTextures: Record<constants.TacticsCard, CardData> = {
     description: `Increase your opponents damage by ${getTextSpan(CardColor.RED, '+1')} and decrease your opponents hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`
   },
   [constants.TacticsCard.CoinToss]: {
-    path: '/textures/cards/illustrations/Second_Reaction.png',
+    path: '/textures/cards/illustrations/Coin_Flip.png',
     cardFrontPath: '/textures/cards/card_front_brown.png',
     color: CardColor.WHITE,
     title: 'Coin Flip',
@@ -380,7 +380,7 @@ const TacticsCardsTextures: Record<constants.TacticsCard, CardData> = {
     description: 'First special card doesn\'t affect you'
   },
   [constants.TacticsCard.Vengeful]: {
-    path: '/textures/cards/illustrations/Second_Reaction.png',
+    path: '/textures/cards/illustrations/Vengeful.png',
     cardFrontPath: '/textures/cards/card_front_brown.png',
     color: CardColor.WHITE,
     title: 'Vengeful',
@@ -388,7 +388,7 @@ const TacticsCardsTextures: Record<constants.TacticsCard, CardData> = {
     description: `Increases your damage by ${getTextSpan(CardColor.RED, '+1')}`
   },
   [constants.TacticsCard.ThickCoat]: {
-    path: '/textures/cards/illustrations/Second_Reaction.png',
+    path: '/textures/cards/illustrations/Thick_Coat.png',
     cardFrontPath: '/textures/cards/card_front_brown.png',
     color: CardColor.WHITE,
     title: 'Thick coat',
@@ -396,7 +396,7 @@ const TacticsCardsTextures: Record<constants.TacticsCard, CardData> = {
     description: `Reduce opponents damage by ${getTextSpan(CardColor.RED, '-1')}`
   },
   [constants.TacticsCard.Reversal]: {
-    path: '/textures/cards/illustrations/Second_Reaction.png',
+    path: '/textures/cards/illustrations/Reversal.png',
     cardFrontPath: '/textures/cards/card_front_brown.png',
     color: CardColor.WHITE,
     title: 'Reversal',
@@ -404,7 +404,7 @@ const TacticsCardsTextures: Record<constants.TacticsCard, CardData> = {
     description: 'Next negative environment card, excluding specials, is turned into a positive for all players'
   },
   [constants.TacticsCard.Bananas]: {
-    path: '/textures/cards/illustrations/Second_Reaction.png',
+    path: '/textures/cards/illustrations/Bananas.png',
     cardFrontPath: '/textures/cards/card_front_brown.png',
     color: CardColor.WHITE,
     title: 'Bananas',
@@ -423,7 +423,7 @@ const BladesCardsTextures: Record<constants.BladesCard, CardData> = {
     description: `NONE`
   },
   [constants.BladesCard.Seppuku]: {
-    path: '/textures/cards/illustrations/Decapitation.png',
+    path: '/textures/cards/illustrations/Seppuku.png',
     cardFrontPath: '/textures/cards/card_front_brown.png',
     color: CardColor.WHITE,
     title: 'Sepuku',
@@ -431,7 +431,7 @@ const BladesCardsTextures: Record<constants.BladesCard, CardData> = {
     description: `Increase your damage by ${getTextSpan(CardColor.RED, '+1')} and your hit chance by ${getTextSpan(CardColor.YELLOW, '+20%')}`
   },
   [constants.BladesCard.PocketPistol]: {
-    path: '/textures/cards/illustrations/Decapitation.png',
+    path: '/textures/cards/illustrations/Pocket_Pistol.png',
     cardFrontPath: '/textures/cards/card_front_brown.png',
     color: CardColor.WHITE,
     title: 'Pocket Pistol',
@@ -439,7 +439,7 @@ const BladesCardsTextures: Record<constants.BladesCard, CardData> = {
     description: `Decrease opponents hit chance by ${getTextSpan(CardColor.YELLOW, '-10%')}`
   },
   [constants.BladesCard.Behead]: {
-    path: '/textures/cards/illustrations/Decapitation.png',
+    path: '/textures/cards/illustrations/Behead.png',
     cardFrontPath: '/textures/cards/card_front_brown.png',
     color: CardColor.WHITE,
     title: 'Behead',
@@ -447,7 +447,7 @@ const BladesCardsTextures: Record<constants.BladesCard, CardData> = {
     description: `Increases your damage by ${getTextSpan(CardColor.RED, '+1')}`
   },
   [constants.BladesCard.Grapple]: {
-    path: '/textures/cards/illustrations/Decapitation.png',
+    path: '/textures/cards/illustrations/Grapple.png',
     cardFrontPath: '/textures/cards/card_front_brown.png',
     color: CardColor.WHITE,
     title: 'Grapple',

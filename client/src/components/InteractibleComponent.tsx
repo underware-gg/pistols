@@ -518,7 +518,6 @@ export const InteractibleComponent = forwardRef<InteractibleComponentHandle, Int
   }
 
   const setComponentZIndex = (index: number, backgroundIndex?: number) => {
-    console.log('setting z-index', index, backgroundIndex)
     frontRef.current?.style.setProperty('--z-index', index.toString())
     if (backgroundRef.current) {
       backgroundRef.current.style.setProperty('--z-index', backgroundIndex ? backgroundIndex.toString() : index.toString())

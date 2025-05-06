@@ -290,6 +290,8 @@ export class DuelistsManager {
       this.hideActor(true)
       this.hideActor(false)
 
+      this.duelProgressDialogManger.resetDialogs()
+
       this.hideElements()
     } else {
       this.showElements()

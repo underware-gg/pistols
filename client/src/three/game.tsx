@@ -1207,6 +1207,10 @@ export function switchScene(sceneName) {
 function fadeOutCurrentScene(callback) {
   const overlay = document.getElementById('game-black-overlay');
 
+  if (!overlay) {
+    return;
+  }
+
   _tweens.staticFade?.stop();
 
   _tweens.staticFade = new TWEEN.Tween({ opacity: 0 })
@@ -1224,6 +1228,10 @@ function fadeOutCurrentScene(callback) {
 
 function fadeInCurrentScene() {
   const overlay = document.getElementById('game-black-overlay');
+
+  if (!overlay) {
+    return;
+  }
 
   _tweens.staticFade?.stop();
 

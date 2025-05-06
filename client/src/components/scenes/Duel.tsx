@@ -263,7 +263,6 @@ const DuelContent: React.FC<{
         onPlay={handlePlay}
         onStep={() => {
           if (isSceneStarted && isDataSet) {
-            console.log("Step button clicked");
             if (duelAnimationControllerRef.current) {
               duelAnimationControllerRef.current.stepForward();
             }
