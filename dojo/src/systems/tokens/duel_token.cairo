@@ -453,6 +453,9 @@ pub mod duel_token {
             // update challenge
             store.set_challenge(@challenge);
 
+            // update token metadata
+            self.update_token_metadata(duel_id);
+
             (challenge.state)
         }
     }

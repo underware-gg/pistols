@@ -69,8 +69,9 @@ pub mod game {
     //
     use pistols::interfaces::dns::{
         DnsTrait,
-        IDuelistTokenDispatcherTrait,
+        IDuelistTokenDispatcher, IDuelistTokenDispatcherTrait,
         IDuelistTokenProtectedDispatcherTrait,
+        IDuelTokenDispatcherTrait,
         IDuelTokenProtectedDispatcherTrait,
         ITutorialDispatcherTrait,
         SELECTORS,
@@ -656,6 +657,13 @@ pub mod game {
                 //     },
                 //     Option::None => {}
                 // }
+            }
+            // update token metadata
+            store.world.duel_token_dispatcher().update_token_metadata(challenge.duel_id);
+            let duelist_dispatcher: IDuelistTokenDispatcher = store.world.duelist_token_dispatcher();
+            duelist_dispatcher.update_token_metadata(challenge.duelist_id_a);
+            if (challenge.duelist_id_b.is_non_zero()) {
+                duelist_dispatcher.update_token_metadata(challenge.duelist_id_b);
             }
         }
 
