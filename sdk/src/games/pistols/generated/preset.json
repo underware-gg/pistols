@@ -15,6 +15,99 @@
     "SN_MAIN": {
       "policies": {
         "contracts": {
+          "0x02c6a7c98a9dea8322b51018eef7be99ebedd209cebdaacb9f4c5bbf661c1cc9": {
+            "description": "Game loop contract",
+            "methods": [
+              {
+                "entrypoint": "commit_moves",
+                "description": "Commit moves of a Duelist in a Duel"
+              },
+              {
+                "entrypoint": "reveal_moves",
+                "description": "Reveal moves of a Duelist in a Duel"
+              },
+              {
+                "entrypoint": "collect_duel",
+                "description": "Close expired duels"
+              },
+              {
+                "entrypoint": "clear_call_to_action",
+                "description": "Clear the required action call for a duelist"
+              }
+            ]
+          },
+          "0x0426c16fe76f12586718c07e47c8e4312e9fee5e7dc849a75f3c587ad9e70b4f": {
+            "description": "Bank contract",
+            "methods": [
+              {
+                "entrypoint": "sponsor_duelists",
+                "description": "Sponsor duelist starter packs with $LORDS"
+              },
+              {
+                "entrypoint": "sponsor_season",
+                "description": "Sponsor the current season with $LORDS"
+              },
+              {
+                "entrypoint": "sponsor_tournament",
+                "description": "Sponsor a tournament with $LORDS"
+              },
+              {
+                "entrypoint": "collect_season",
+                "description": "Close the current season and start the next one"
+              }
+            ]
+          },
+          "0x071333ac75b7d5ba89a2d0c2b67d5b955258a4d46eb42f3428da6137bbbfdfd9": {
+            "description": "Packs ERC721 contract",
+            "methods": [
+              {
+                "entrypoint": "claim_starter_pack",
+                "description": "Claim the starter pack, mint Duelists"
+              },
+              {
+                "entrypoint": "claim_gift",
+                "description": "Claim gift pack, if available"
+              },
+              {
+                "entrypoint": "purchase",
+                "description": "Purchase a closed pack"
+              },
+              {
+                "entrypoint": "open",
+                "description": "Open a pack, mint its contents"
+              }
+            ]
+          },
+          "0x02e9c711b1a7e2784570b1bda5082a92606044e836ba392d2b977d280fb74b3c": {
+            "description": "Duel ERC721 contract",
+            "methods": [
+              {
+                "entrypoint": "create_duel",
+                "description": "Create a Duel, mint its token"
+              },
+              {
+                "entrypoint": "reply_duel",
+                "description": "Reply to a Duel (accept or reject)"
+              }
+            ]
+          },
+          "0x07aaa9866750a0db82a54ba8674c38620fa2f967d2fbb31133def48e0527c87f": {
+            "description": "Duelist ERC721 contract",
+            "methods": [
+              {
+                "entrypoint": "poke",
+                "description": "Reactivates an inactive Duelist"
+              },
+              {
+                "entrypoint": "sacrifice",
+                "description": "Sacrifices a Duelist"
+              },
+              {
+                "entrypoint": "memorialize",
+                "description": "Memorializes a Duelist"
+              }
+            ]
+          },
           "0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f": {
             "description": "Cartridge VRF Provider",
             "methods": [
