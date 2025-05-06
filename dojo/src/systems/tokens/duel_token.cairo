@@ -169,7 +169,7 @@ pub mod duel_token {
     use pistols::models::{
         player::{PlayerTrait},
         challenge::{Challenge, ChallengeTrait, ChallengeValue, ChallengeMessage, ChallengeMessageValue, DuelType, Round, RoundTrait},
-        duelist::{DuelistTrait, DuelistValue, DuelistProfileTrait},
+        duelist::{DuelistTrait, DuelistProfile, DuelistProfileTrait},
         pact::{PactTrait},
         events::{Activity, ActivityTrait},
         // tournament::{
@@ -657,10 +657,17 @@ pub mod duel_token {
             // gather data
             let base_uri: ByteArray = self.erc721._base_uri();
             let challenge: ChallengeValue = store.get_challenge_value(token_id.low);
-            let duelist_a: DuelistValue = store.get_duelist_value(challenge.duelist_id_a);
-            let duelist_b: DuelistValue = store.get_duelist_value(challenge.duelist_id_b);
-            let duelist_name_a: ByteArray = format!("Duelist #{}", challenge.duelist_id_a);
-            let duelist_name_b: ByteArray = format!("Duelist #{}", challenge.duelist_id_b);
+            let (duelist_profile_a, duelist_name_a): (DuelistProfile, ByteArray) = (
+                store.get_duelist_profile(challenge.duelist_id_a),
+                format!("Duelist #{}", challenge.duelist_id_a),
+            );
+            let (duelist_profile_b, duelist_name_b): (DuelistProfile, ByteArray) =
+            if (challenge.duelist_id_b.is_non_zero()) {(
+                store.get_duelist_profile(challenge.duelist_id_b),
+                format!("Duelist #{}", challenge.duelist_id_b),
+            )} else {
+                (DuelistProfile::Undefined, "Undefined")
+            };
             let challenge_message: ChallengeMessageValue = store.get_challenge_message_value(token_id.low);
             // Image
             let image: ByteArray = UrlImpl::new(format!("{}/api/pistols/duel_token/{}/image", base_uri.clone(), token_id))
@@ -669,10 +676,10 @@ pub mod duel_token {
                 .add("state", challenge.state.into(), false)
                 .add("winner", challenge.winner.to_string(), false)
                 .add("season_id", challenge.season_id.to_string(), false)
-                .add("profile_type_a", duelist_a.duelist_profile.into(), false)
-                .add("profile_type_b", duelist_b.duelist_profile.into(), false)
-                .add("profile_id_a", duelist_a.duelist_profile.profile_id().to_string(), false)
-                .add("profile_id_b", duelist_b.duelist_profile.profile_id().to_string(), false)
+                .add("profile_type_a", duelist_profile_a.into(), false)
+                .add("profile_id_a", duelist_profile_a.profile_id().to_string(), false)
+                .add("profile_type_b", duelist_profile_b.into(), false)
+                .add("profile_id_b", duelist_profile_b.profile_id().to_string(), false)
                 .add("address_a", format!("0x{:x}", challenge.address_a), false)
                 .add("address_b", format!("0x{:x}", challenge.address_b), false)
                 .add("message", challenge_message.message, true)
