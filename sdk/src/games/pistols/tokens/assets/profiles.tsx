@@ -80,6 +80,7 @@ import _profiles_genesis_66_jpg from "./encoded/_profiles_genesis_66_jpg"
 import _profiles_genesis_67_jpg from "./encoded/_profiles_genesis_67_jpg"
 import _profiles_genesis_68_jpg from "./encoded/_profiles_genesis_68_jpg"
 import _profiles_genesis_69_jpg from "./encoded/_profiles_genesis_69_jpg"
+import _profiles_undefined_00_jpg from "./encoded/_profiles_undefined_00_jpg"
 
 export const assets = {
   _profiles_bots_00_jpg: _profiles_bots_00_jpg,
@@ -161,4 +162,5 @@ export const assets = {
   _profiles_genesis_67_jpg: _profiles_genesis_67_jpg,
   _profiles_genesis_68_jpg: _profiles_genesis_68_jpg,
   _profiles_genesis_69_jpg: _profiles_genesis_69_jpg,
+  _profiles_undefined_00_jpg: _profiles_undefined_00_jpg,
 }

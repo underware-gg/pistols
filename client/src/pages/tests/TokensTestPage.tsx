@@ -270,6 +270,26 @@ function TestImages() {
   }, {
     includeMimeType: true,
   })
+  const duel_pending_svg = duel_token.renderSvg({
+    // base_uri: 'https://localhost:5173',
+    duel_id: 16,
+    duel_type: constants.DuelType.Seasonal,
+    premise: constants.Premise.Honour,
+    message: 'Die scum!!!',
+    state: constants.ChallengeState.Awaiting,
+    winner: 1,
+    season_id: 1,
+    profile_type_a: constants.DuelistProfile.Genesis,
+    profile_type_b: constants.DuelistProfile.Undefined,
+    profile_id_a: 11,
+    profile_id_b: 0,
+    username_a: 'Mataleone',
+    username_b: 'Undefined',
+    address_a: '0xc1bba2af9427c5a277474c079a1283c880ee8a6f0f8fbf73ce969c08d88befe',
+    address_b: '0xc079a1283c88c1bba2af9427c5a2774740ee8a6f0f8fbf73ce969c08d88befe',
+  }, {
+    includeMimeType: true,
+  })
   // const duelist_svg_no_mime = duelist_svg.replace('data:image/svg+xml,', '')
   // const duel_svg_no_mime = duel_svg.replace('data:image/svg+xml,', '')
 
@@ -289,6 +309,9 @@ function TestImages() {
           <HeaderCell>
             <h3 className='Important'>TEST DUEL<br />{`<embed>`}</h3>
           </HeaderCell>
+          <HeaderCell>
+            <h3 className='Important'>PENDING DUEL<br />{`<img>`}</h3>
+          </HeaderCell>
         </Row>
       </Header>
 
@@ -305,6 +328,9 @@ function TestImages() {
           </Cell>
           <Cell>
             <embed src={duel_svg} style={_style} />
+          </Cell>
+          <Cell>
+            <img src={duel_pending_svg} style={_style} />
           </Cell>
         </Row>
       </Body>
