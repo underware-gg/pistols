@@ -1320,7 +1320,7 @@ export const GENESIS_PROFILES: type_GENESIS_PROFILES = {
     name: 'Master of Veils',
   },
   Amaro: {
-    name: 'Monsieur Bongo',
+    name: 'Tentaccio',
   },
   Mononoke: {
     name: 'The Duchess',

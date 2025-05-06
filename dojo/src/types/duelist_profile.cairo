@@ -340,7 +340,7 @@ mod GENESIS_PROFILES {
         name: 'Master of Veils',
     };
     pub const Amaro: ProfileDescription = ProfileDescription {  // 45
-        name: 'Monsieur Bongo',
+        name: 'Tentaccio',
     };
     pub const Mononoke: ProfileDescription = ProfileDescription {  // 46
         name: 'The Duchess',
