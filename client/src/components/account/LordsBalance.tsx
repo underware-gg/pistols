@@ -31,10 +31,11 @@ export const LordsBalance = ({
   post = null,
   clean = false,
   size = null,
+  decimals = undefined,
 }) => {
   const { balance } = useLordsBalance(address, 0n)
   return (
-    <Balance lords size={size} wei={balance} pre={pre} post={post} clean={clean} />
+    <Balance lords size={size} wei={balance} pre={pre} post={post} clean={clean} decimals={decimals} />
   )
 }
 

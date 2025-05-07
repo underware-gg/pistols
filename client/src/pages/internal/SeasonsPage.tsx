@@ -20,7 +20,7 @@ import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
-import { AddressShort } from '/src/components/ui/AddressShort'
+import { Address } from '/src/components/ui/Address'
 import { Balance } from '/src/components/account/Balance'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -35,7 +35,7 @@ const Body = Table.Body
 const Header = Table.Header
 const HeaderCell = Table.HeaderCell
 
-export default function SeasonsTestPage() {
+export default function SeasonsPage() {
   return (
     <AppDojo>
       <Container>
@@ -516,7 +516,7 @@ function BillRow({
   const { username } = usePlayer(owner)
   return (
     <Row>
-      <Cell>{isLoadingOwner ? '...' : <AddressShort address={owner} />}</Cell>
+      <Cell>{isLoadingOwner ? '...' : <Address address={owner} />}</Cell>
       <Cell className='Code'>{username || '...'}</Cell>
       <Cell>Duelist #{bigintToDecimal(bill.duelistId)}</Cell>
       <Cell>Duel #{bigintToDecimal(bill.duelId)}</Cell>
@@ -527,7 +527,7 @@ function BillRow({
         <Balance lords wei={bill.peggedLords} decimals={6} />
       </Cell>
       <Cell><Balance lords wei={bill.sponsoredLords} decimals={6} /></Cell>
-      <Cell><AddressShort address={bill.recipient} /></Cell>
+      <Cell><Address address={bill.recipient} /></Cell>
       <Cell>{formatTimestampLocal(bill.timestamp)}</Cell>
     </Row>
   )

@@ -10,7 +10,7 @@ import { ProfilePic } from '/src/components/account/ProfilePic'
 import { FoolsBalance, LordsBalance } from '/src/components/account/LordsBalance'
 import { LordsFaucet } from '/src/components/account/LordsFaucet'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { AddressShort } from '/src/components/ui/AddressShort'
+import { Address } from '/src/components/ui/Address'
 import { ConnectButton, PlayGameButton } from '/src/components/scenes/ScDoor'
 import { SceneName } from '/src/data/assets'
 
@@ -47,7 +47,7 @@ export default function WalletHeader({
         <Col width={12} textAlign='left'>
           {isConnected && <>
             <h4>{connectionName}</h4>
-            {username && <span className='H4 Bold'>{username} <span className='Inactive'>|</span> </span>} <AddressShort address={address ?? 0n} />
+            {username && <span className='H4 Bold'>{username} <span className='Inactive'>|</span> </span>} <Address address={address ?? 0n} />
             <h5>
               LORDS: <LordsBalance address={address} />
               <span className='Inactive'> | </span>

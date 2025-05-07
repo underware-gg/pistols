@@ -9,7 +9,7 @@ import { ProfilePic } from '/src/components/account/ProfilePic'
 import { ActionButton } from '/src/components/ui/Buttons'
 import { ChallengeButton } from '/src/components/ui/Buttons'
 import { FormInput } from '/src/components/ui/Form'
-import { AddressShort } from '/src/components/ui/AddressShort'
+import { Address } from '/src/components/ui/Address'
 import { Divider } from '/src/components/ui/Divider'
 import { Opener } from '/src/hooks/useOpener'
 
@@ -85,7 +85,7 @@ function _WalletFinderModal({
 
                 <Divider />
                 <div className='ModalText'>
-                  {isStarknetAddress ? <Checked checked={true}>Starknet Address: <span className='Important'><AddressShort address={validatedAddress} /></span></Checked>
+                  {isStarknetAddress ? <Checked checked={true}>Starknet Address: <span className='Important'><Address address={validatedAddress} /></span></Checked>
                     : isEthereumAddress ? <Checked checked={false}>Ethereum wallets not supported yet</Checked>
                       : <Checked loading>Enter a valid address or ID</Checked>
                   }

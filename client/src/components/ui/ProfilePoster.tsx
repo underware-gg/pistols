@@ -15,7 +15,7 @@ import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { usePlayerBookmarkSignedMessage } from '/src/hooks/useSignedMessages'
 import { SceneName } from '/src/data/assets'
 import { useDuelistsOfOwner } from '/src/hooks/useTokenDuelists'
-import { AddressShort } from './AddressShort'
+import { Address } from './Address'
 import { ChallengeButton } from '/src/components/ui/Buttons'
 import { BigNumberish } from 'starknet'
 
@@ -200,7 +200,7 @@ export const ProfilePoster = forwardRef<ProfilePosterHandle, ProfilePosterProps>
             <div className='ProfileSection'>
               <ProfilePic profilePic={0} width={22} height={22} removeCorners borderColor='#201a18' borderWidth={0.4} />
               <div className='PlayerName'>{name}</div>
-              <div className='PlayerAddress'><AddressShort address={props.playerAddress} /></div>
+              <div className='PlayerAddress'><Address address={props.playerAddress} /></div>
             </div>
 
             <div className='BookmarkSection PlayerPoster'>

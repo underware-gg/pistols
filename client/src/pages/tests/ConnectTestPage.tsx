@@ -13,6 +13,8 @@ import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 import { ProfilePic } from '/src/components/account/ProfilePic'
 import { NODE_ENV } from '/src/utils/env'
+import { LordsBalance } from '/src/components/account/LordsBalance'
+import { Address } from '/src/components/ui/Address'
 
 //@ts-ignore
 BigInt.prototype.toJSON = function () { return bigintToHex(this) }
@@ -89,6 +91,7 @@ export function Connect() {
               {' : '}
               {selectedNetworkConfig.chainId}
             </Cell>
+            <Cell></Cell>
           </Row>
           <Row className='H5'>
             <Cell>Connected to</Cell>
@@ -98,6 +101,7 @@ export function Connect() {
                 : <span className='Negative'>Disconnected</span>
               }
             </Cell>
+            <Cell></Cell>
           </Row>
           <Row className='H5'>
             <Cell>Connector</Cell>
@@ -116,11 +120,15 @@ export function Connect() {
               </Grid>}
               {!connector && JSON.stringify(connectors.map(c => c.id))}
             </Cell>
+            <Cell></Cell>
           </Row>
           <Row className='H5'>
             <Cell>Account</Cell>
             <Cell className='Code'>
-              {address}
+              <Address address={address} full />
+            </Cell>
+            <Cell className='Code'>
+              <LordsBalance address={address} size='big' decimals={3} />
             </Cell>
           </Row>
           <Row>
@@ -132,6 +140,7 @@ export function Connect() {
               &nbsp;&nbsp;
               <Button disabled={!isConnected || isConnecting} onClick={() => disconnect()}>Disconnect</Button>
             </Cell>
+            <Cell></Cell>
           </Row>
         </Body>
       </Table>

@@ -5,6 +5,7 @@ import { TestPageMainMenu } from '/src/pages/tests/TestPageIndex'
 import App from '/src/components/App'
 
 const internalPages = [
+  { name: 'admin', connected: true },
   { name: 'pools', connected: true },
   { name: 'seasons', connected: true },
   { name: 'snapshot', connected: true },

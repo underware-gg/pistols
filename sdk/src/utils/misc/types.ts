@@ -48,11 +48,11 @@ export const isPositiveBigint = (v: BigNumberish | null): boolean => {
 }
 export const isNumeric = (v: string | null): boolean => (v != null && /^\d+$/.test(v))
 
-export const shortAddress = (address: bigint | string | null, small: boolean = false) => {
+export const shortAddress = (address: bigint | string | null) => {
   const _address = (typeof address === 'bigint') ? bigintToHex(address) : address
-  const addresLength = small ? 7 : 12
-  const sliceStart = small ? 2 : 6
-  const sliceEnd = small ? 3 : 4
+  const addresLength = 12
+  const sliceStart = 6
+  const sliceEnd = 4
   return (
     !_address ? '?'
       : !_address.startsWith('0x') ? `(${_address})`  // not hex

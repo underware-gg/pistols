@@ -3,14 +3,14 @@ import { BigNumberish } from 'starknet'
 import { bigintToAddress, shortAddress } from '@underware/pistols-sdk/utils'
 import { CopyIcon } from '/src/components/ui/Icons'
 
-function AddressShort({
+function Address({
   address,
   pre = '',
   post = '',
   copyLink = 'right',
   important = false,
   ifExists = false,
-  small = false,
+  full = false,
 }: {
   address: BigNumberish
   pre?: string
@@ -18,9 +18,13 @@ function AddressShort({
   copyLink?: 'left' | 'right' | false
   important?: boolean
   ifExists?: boolean
-  small?: boolean
+  full?: boolean
 }) {
-  const display = useMemo(() => (shortAddress(bigintToAddress(address), small)), [address, small])
+  const isZero = useMemo(() => (BigInt(address ?? 0) == 0n), [address])
+
+  const display = useMemo(() => (
+    isZero ? '0x0' : full ? bigintToAddress(address) : shortAddress(bigintToAddress(address))
+  ), [address, full])
 
   const classNames = useMemo(() => {
     let classNames = ['Code']
@@ -30,7 +34,8 @@ function AddressShort({
 
   const copyIcon = useMemo(() => (copyLink && address && <CopyIcon content={bigintToAddress(address)} />), [copyLink, address])
 
-  if (ifExists && BigInt(address ?? 0) == 0n) return <></>
+  if (ifExists && isZero) return <></>
+
   return (
     <span className={classNames.join(' ')} data-contentlength={Math.floor(display.length / 3)}>
       {pre} {copyLink == 'left' && copyIcon}{display}{copyLink == 'right' && copyIcon} {post}
@@ -39,5 +44,5 @@ function AddressShort({
 }
 
 export {
-  AddressShort,
+  Address,
 }

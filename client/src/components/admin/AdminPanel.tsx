@@ -4,7 +4,7 @@ import { useAccount, useDisconnect } from '@starknet-react/core'
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { ConfigForm } from '/src/components/admin/TableConfigForm'
 import { OwnerForm } from '/src/components/admin/OwnerForm'
-import { AddressShort } from '/src/components/ui/AddressShort'
+import { Address } from '/src/components/ui/Address'
 import StarknetConnectModal from '/src/components/starknet/StarknetConnectModal'
 
 export const AdminPanel = ({
@@ -20,7 +20,7 @@ export const AdminPanel = ({
         &nbsp;&nbsp;
         <Button disabled={!isConnected || isConnecting} onClick={() => disconnect()}>Disconnect</Button>
         &nbsp;&nbsp;
-        Admin Panel <span className='Disabled'>|</span> <AddressShort address={address} />
+        Admin Panel <span className='Disabled'>|</span> <Address address={address} />
       </div>
 
       {isConnected && <>

@@ -6,7 +6,7 @@ import { useDuelist } from '/src/stores/duelistStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { FameLivesDuelist } from '/src/components/account/LordsBalance'
-import { AddressShort } from '/src/components/ui/AddressShort'
+import { Address } from '/src/components/ui/Address'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 
 const Row = Grid.Row
@@ -45,7 +45,6 @@ export function ProfileDescription({
   displayNameSmall = false,
   displayStats = false,
   displayOwnerAddress = false,
-  displayOwnerAddressSmall = false,
   displayFameBalance = false,
   displayHonor = true,
 }: {
@@ -54,7 +53,6 @@ export function ProfileDescription({
   displayNameSmall?: boolean
   displayStats?: boolean
   displayOwnerAddress?: boolean
-  displayOwnerAddressSmall?: boolean
   displayFameBalance?: boolean
   displayHonor?: boolean
 }) {
@@ -86,7 +84,7 @@ export function ProfileDescription({
           (<h1 className='NoMargin'><ProfileName duelistId={duelistId} badges={false} /></h1>)
         }
         
-        {displayOwnerAddress && <AddressShort address={owner} small={displayOwnerAddressSmall}/>}
+        {displayOwnerAddress && <Address address={owner} />}
         {displayHonor && <h3 className='Important NoMargin TitleCase'>
           Honour: <span className='Coin'>{honourAndTotal}</span>
         </h3>}
