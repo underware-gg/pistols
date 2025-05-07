@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { PistolsClauseBuilder, PistolsQueryBuilder } from '@underware/pistols-sdk/pistols'
 import { useSdkStateEventsGet, formatQueryValue, getEntityModel } from '@underware/pistols-sdk/dojo'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { weiToEth } from '@underware/pistols-sdk/utils/starknet'
+import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useGetChallengeRewards = (duel_id: BigNumberish, duelist_id: BigNumberish) => {

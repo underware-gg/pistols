@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish, Account } from 'starknet'
 import { useContractWrite } from 'src/utils/hooks/useContractWrite'
-import { bigintToU256 } from 'src/utils/starknet/starknet'
+import { bigintToU256 } from 'src/starknet/starknet'
 import { bigintToHex } from 'src/utils/misc/types'
 import { erc20_abi } from 'src/abis/abis'
 

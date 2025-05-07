@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useLordsBalance, useEtherBalance, useFoolsBalance, useFameBalance, useDuelistFameBalance } from '/src/stores/coinStore'
 import { Balance } from '/src/components/account/Balance'
-import { weiToEth } from '@underware/pistols-sdk/utils/starknet'
+import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { IconSizeProp } from '/src/components/ui/Icons'
 import ProgressBar from '/src/components/ui/ProgressBar'
 

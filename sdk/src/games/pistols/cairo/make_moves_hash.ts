@@ -1,5 +1,5 @@
 import { BigNumberish } from 'starknet'
-import { poseidon } from 'src/utils/starknet/starknet'
+import { poseidon } from 'src/starknet/starknet'
 import * as constants from '../generated/constants'
 
 //

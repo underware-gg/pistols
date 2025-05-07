@@ -4,7 +4,7 @@ import { PistolsSchemaType } from 'src/games/pistols/config/types'
 import { generateTypedData } from 'src/dojo/setup/controller'
 import { makeStarknetDomain } from 'src/games/pistols/config/config'
 import { NetworkId } from 'src/games/pistols/config/networks'
-import { createTypedMessage } from 'src/utils/starknet/starknet_sign'
+import { createTypedMessage } from 'src/starknet/starknet_sign'
 import { CommitMoveMessage } from 'src/exports/pistols'
 import * as models from 'src/games/pistols/generated/models.gen'
 

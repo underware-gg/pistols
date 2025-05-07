@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { stringToFelt } from '@underware/pistols-sdk/utils/starknet'
+import { stringToFelt } from '@underware/pistols-sdk/starknet'
 import { formatQueryValue, getEntityModel, useSdkStateEntitiesSub } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsClauseBuilder, makePactPair } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'

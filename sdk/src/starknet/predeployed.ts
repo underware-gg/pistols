@@ -1,6 +1,6 @@
 import { Account, AccountInterface, RpcProvider } from 'starknet'
 import { Connector } from '@starknet-react/core'
-import { stringToFelt } from 'src/utils/starknet/starknet'
+import { stringToFelt } from 'src/starknet/starknet'
 import { ExternalWallet } from "@cartridge/controller";
 
 export const PREDEPLOYED_ID = 'predeployed';

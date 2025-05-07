@@ -7,7 +7,7 @@ import {
 import { usePredeployedConnector } from 'src/utils/hooks/usePredeployedConnector'
 import { DojoAppConfig } from 'src/dojo/contexts/Dojo'
 import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
-import { PREDEPLOYED_ID } from 'src/utils/starknet/predeployed'
+import { PREDEPLOYED_ID } from 'src/starknet/predeployed'
 
 export const supportedConnetorIds = {
   CONTROLLER: 'controller', // same as ControllerConnector.id

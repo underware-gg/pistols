@@ -1,5 +1,5 @@
 import { BigNumberish } from 'starknet'
-import { bigintToU256 } from 'src/utils/starknet/starknet'
+import { bigintToU256 } from 'src/starknet/starknet'
 
 //
 // IMPORTANT!!!

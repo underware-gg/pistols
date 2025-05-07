@@ -19,7 +19,7 @@ import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
 import AppDojo from '/src/components/AppDojo'
 import * as ENV from '/src/utils/env'
-import { ethToWei } from '@underware/pistols-sdk/utils/starknet'
+import { ethToWei } from '@underware/pistols-sdk/starknet'
 
 const Row = Table.Row
 const Cell = Table.Cell

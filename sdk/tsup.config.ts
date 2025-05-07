@@ -15,9 +15,10 @@ export default defineConfig({
     "src/exports/pistols_controller.ts",
     "src/exports/pistols_constants.ts",
     "src/exports/pistols_tokens.ts",
+    "src/exports/starknet.ts",
+    "src/exports/starknet_components.ts",
     "src/exports/utils.ts",
-    "src/exports/utils_hooks.ts",
-    "src/exports/utils_starknet.ts"
+    "src/exports/utils_hooks.ts"
   ],
   format: ["esm"],
   clean: true,

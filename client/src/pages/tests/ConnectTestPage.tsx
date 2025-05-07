@@ -5,7 +5,7 @@ import { useAccount, useConnect, useDisconnect, useNetwork } from '@starknet-rea
 import { usePistolsContext } from '/src/hooks/PistolsContext'
 import { useDojoSetup, useStarknetContext, getConnectorIcon, useConnectedController } from '@underware/pistols-sdk/dojo'
 import { useTypedMessage, useMemoAsync } from '@underware/pistols-sdk/utils/hooks'
-import { Messages, splitSignature, feltToString } from '@underware/pistols-sdk/utils/starknet'
+import { Messages, splitSignature, feltToString } from '@underware/pistols-sdk/starknet'
 import { bigintToHex, shortAddress } from '@underware/pistols-sdk/utils'
 import { TestPageMenu } from '/src/pages/tests/TestPageIndex'
 import StarknetConnectModal from '/src/components/starknet/StarknetConnectModal'

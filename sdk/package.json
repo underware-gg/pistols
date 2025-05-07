@@ -79,6 +79,14 @@
       "import": "./dist/pistols_tokens.js",
       "types": "./dist/pistols_tokens.d.ts"
     },
+    "./starknet": {
+      "import": "./dist/starknet.js",
+      "types": "./dist/starknet.d.ts"
+    },
+    "./starknet/components": {
+      "import": "./dist/starknet_components.js",
+      "types": "./dist/starknet_components.d.ts"
+    },
     "./utils": {
       "import": "./dist/utils.js",
       "types": "./dist/utils.d.ts"
@@ -86,10 +94,6 @@
     "./utils/hooks": {
       "import": "./dist/utils_hooks.js",
       "types": "./dist/utils_hooks.d.ts"
-    },
-    "./utils/starknet": {
-      "import": "./dist/utils_starknet.js",
-      "types": "./dist/utils_starknet.d.ts"
     },
     "./package.json": "./package.json"
   },

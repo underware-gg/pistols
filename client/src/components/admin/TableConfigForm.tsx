@@ -4,7 +4,7 @@ import { useAccount } from '@starknet-react/core'
 import { useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
 import { FormInput, FormCheckbox, FormSelectFromMap } from '/src/components/ui/Form'
 import { Balance } from '/src/components/account/Balance'
-import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/utils/starknet'
+import { STARKNET_ADDRESS_LENGTHS } from '@underware/pistols-sdk/starknet'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 const Row = Table.Row

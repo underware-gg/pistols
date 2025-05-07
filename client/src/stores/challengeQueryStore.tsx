@@ -10,7 +10,7 @@ import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { parseEnumVariant } from '@underware/pistols-sdk/utils/starknet'
+import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { keysToEntityId, getEntityModel } from '@underware/pistols-sdk/dojo'
 import { useChallengeStore } from './challengeStore'
 

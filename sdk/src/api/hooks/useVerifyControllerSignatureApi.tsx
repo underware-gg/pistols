@@ -3,7 +3,7 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { apiVerifyControllerSignature } from 'src/api/verify'
 import { isPositiveBigint } from 'src/utils/misc/types'
-import { feltToString } from 'src/utils/starknet/starknet'
+import { feltToString } from 'src/starknet/starknet'
 
 
 export const useVerifyControllerSignatureApi = (

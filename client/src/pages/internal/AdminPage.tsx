@@ -1,5 +1,6 @@
 import React from 'react'
 import { Container, Table } from 'semantic-ui-react'
+import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
 import { useConfig } from '/src/stores/configStore'
 import { Address } from '/src/components/ui/Address'
 import { LordsBalance } from '/src/components/account/LordsBalance'
@@ -47,6 +48,7 @@ function Config() {
           <HeaderCell width={4}><h3>Config</h3></HeaderCell>
           <HeaderCell></HeaderCell>
           <HeaderCell></HeaderCell>
+          <HeaderCell></HeaderCell>
         </Row>
       </Header>
       <Body className='H5 Code'>
@@ -56,6 +58,7 @@ function Config() {
             {isPaused ? 'true' : 'false'}
           </Cell>
           <Cell></Cell>
+          <Cell></Cell>
         </Row>
         <Row>
           <Cell className='Important'>currentSeasonId</Cell>
@@ -63,11 +66,15 @@ function Config() {
             {currentSeasonId}
           </Cell>
           <Cell></Cell>
+          <Cell></Cell>
         </Row>
         <Row>
           <Cell className='Important'>Treasury</Cell>
           <Cell>
             <Address address={treasuryAddress} full />
+          </Cell>
+          <Cell className='Smaller'>
+            <ExplorerLink address={treasuryAddress} voyager />
           </Cell>
           <Cell>
             <LordsBalance address={treasuryAddress} size='big' decimals={3} />
@@ -78,12 +85,18 @@ function Config() {
           <Cell>
             <Address address={vrfAddress} full />
           </Cell>
+          <Cell className='Smaller'>
+            <ExplorerLink address={vrfAddress} voyager />
+          </Cell>
           <Cell></Cell>
         </Row>
         <Row>
           <Cell className='Important'>lordsAddress</Cell>
           <Cell>
             <Address address={lordsAddress} full />
+          </Cell>
+          <Cell className='Smaller'>
+            <ExplorerLink address={lordsAddress} voyager />
           </Cell>
           <Cell></Cell>
         </Row>

@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams, useLocation, useParams } from 'react-rout
 import { BigNumberish } from 'starknet'
 import { Opener, useOpener } from '/src/hooks/useOpener'
 import { bigintToHex, bigintToDecimal, isPositiveBigint, bigintEquals } from '@underware/pistols-sdk/utils'
-import { poseidon } from '@underware/pistols-sdk/utils/starknet'
+import { poseidon } from '@underware/pistols-sdk/starknet'
 import { CommitMoveMessage } from '@underware/pistols-sdk/pistols'
 import { DuelTutorialLevel, tutorialScenes } from '/src/data/tutorialConstants'
 import { SceneName } from '/src/data/assets'

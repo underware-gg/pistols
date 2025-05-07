@@ -12,8 +12,8 @@ import {
   KATANA_ETH_CONTRACT_ADDRESS,
 } from '@dojoengine/core'
 import { supportedConnetorIds } from 'src/dojo/setup/connectors'
-import { PredeployedAccount } from 'src/utils/starknet/predeployed'
-import { stringToFelt } from 'src/utils/starknet/starknet'
+import { PredeployedAccount } from 'src/starknet/predeployed'
+import { stringToFelt } from 'src/starknet/starknet'
 
 //
 // supported networks

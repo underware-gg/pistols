@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { PistolsClauseBuilder, PistolsHistoricalQueryBuilder } from '@underware/pistols-sdk/pistols'
 import { useSdkStateEventsGet, getEntityModel, formatQueryValue } from '@underware/pistols-sdk/dojo'
-import { parseCustomEnum } from '@underware/pistols-sdk/utils/starknet'
+import { parseCustomEnum } from '@underware/pistols-sdk/starknet'
 import { useMemoGate } from '@underware/pistols-sdk/utils/hooks'
 import { models, constants } from '@underware/pistols-sdk/pistols/gen'
 
