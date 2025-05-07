@@ -1,4 +1,4 @@
-import { useSdkEntitiesSub, filterEntitiesByModel, entityHasModels } from '@underware/pistols-sdk/dojo'
+import { useSdkEntitiesSub, filterEntitiesByModel, entityHasModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
@@ -13,28 +13,71 @@ import { usePackStore } from '/src/stores/packStore'
 import { useBankStore } from '/src/stores/bankStore'
 import { useEffect } from 'react'
 
-const _limit = 1000
-const query: PistolsQueryBuilder = new PistolsQueryBuilder()
-  .withEntityModels([
-    "pistols-Config",
-    "pistols-TokenConfig",
-    "pistols-SeasonConfig",
-    "pistols-Leaderboard",
-    "pistols-Player",
-    "pistols-Duelist",
-    "pistols-DuelistAssignment",
-    "pistols-DuelistMemorial",
-    "pistols-Challenge",
-    "pistols-ChallengeMessage",
-    "pistols-PlayerDuelistStack",
-    'pistols-Round',
-    "pistols-Pack",
-    "pistols-Pool",
-    // off-chain signed messages
-    "pistols-PlayerOnline",
-    "pistols-PlayerBookmark",
-  ])
+const _modelsAdmin = [
+  // admin
+  "pistols-Config",
+  "pistols-TokenConfig",
+  "pistols-SeasonConfig",
+  "pistols-Leaderboard",
+  "pistols-Pool",
+  // Other
+  "pistols-Pack",
+];
+const _modelsPlayers = [
+  // players
+  "pistols-Player",
+  // off-chain signed messages
+  "pistols-PlayerOnline",
+  "pistols-PlayerBookmark",
+];
+const _modelsDuelists = [
+  // Duelists
+  "pistols-Duelist",
+  "pistols-DuelistAssignment",
+  "pistols-DuelistMemorial",
+];
+const _modelsStacks = [
+  // Stacks
+  "pistols-PlayerDuelistStack",
+];
+const _modelsChallenges = [
+  // Challenges
+  "pistols-Challenge",
+  "pistols-ChallengeMessage",
+  'pistols-Round',
+];
+
+
+const _limit = 1200
+const query_get_admin: PistolsQueryBuilder = new PistolsQueryBuilder()
+  .withEntityModels(_modelsAdmin)
   .withLimit(_limit)
+  .includeHashedKeys()
+const query_get_players: PistolsQueryBuilder = new PistolsQueryBuilder()
+  .withEntityModels(_modelsPlayers)
+  .withLimit(_limit)
+  .includeHashedKeys()
+const query_get_duelists: PistolsQueryBuilder = new PistolsQueryBuilder()
+  .withEntityModels(_modelsDuelists)
+  .withLimit(_limit)
+  .includeHashedKeys()
+const query_get_duelist_stacks: PistolsQueryBuilder = new PistolsQueryBuilder()
+  .withEntityModels(_modelsStacks)
+  .withLimit(_limit)
+  .includeHashedKeys()
+// const query_get_challenges: PistolsQueryBuilder = new PistolsQueryBuilder()
+//   .withEntityModels(_modelsChallenges)
+//   .withLimit(_limit)
+//   .includeHashedKeys()
+const query_sub: PistolsQueryBuilder = new PistolsQueryBuilder()
+  .withEntityModels([
+    ..._modelsAdmin,
+    ..._modelsPlayers,
+    ..._modelsDuelists,
+    ..._modelsStacks,
+    ..._modelsChallenges,
+  ])
+  .withLimit(10)
   .includeHashedKeys()
 
 
@@ -43,46 +86,92 @@ const query: PistolsQueryBuilder = new PistolsQueryBuilder()
 // Sync entities: Add only once to a top level component
 //
 export function EntityStoreSync() {
+  // admin
   const configState = useConfigStore((state) => state)
-  const seasonState = useSeasonConfigStore((state) => state)
   const tokenState = useTokenConfigStore((state) => state)
+  const seasonState = useSeasonConfigStore((state) => state)
+  const bankState = useBankStore((state) => state)
+  const packState = usePackStore((state) => state)
+  // players
   const playerState = usePlayerStore((state) => state)
+  // duelists
   const duelistState = useDuelistStore((state) => state)
   const duelistQueryState = useDuelistQueryStore((state) => state)
+  // challenges
   const challengeState = useChallengeStore((state) => state)
   const challengeQueryState = useChallengeQueryStore((state) => state)
-  const packState = usePackStore((state) => state)
-  const bankState = useBankStore((state) => state)
 
   const mounted = useMounted()
 
-  useSdkEntitiesSub({
-    query,
+  const { isFinished: isFinishedAdmin } = useSdkEntitiesGet({
+    query: query_get_admin,
     enabled: mounted,
     setEntities: (entities: PistolsEntity[]) => {
-      // console.log("EntityStoreSync() SET =======> [entities]:", entities)
+      console.log("EntityStoreSync() SET ADMIN =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModel(entities, 'Config'))
       // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModel(entities, 'TokenConfig'))
       // console.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModel(entities, 'SeasonConfig'))
       // console.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModel(entities, 'Leaderboard'))
-      // console.log("EntityStoreSync() SET =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
-      // console.log("EntityStoreSync() SET =======> [Player]:", filterEntitiesByModel(entities, 'Player'))
       // console.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModel(entities, 'Pool'))
       configState.setEntities(filterEntitiesByModel(entities, 'Config'))
       tokenState.setEntities(filterEntitiesByModel(entities, 'TokenConfig'))
       seasonState.setEntities(filterEntitiesByModel(entities, ['SeasonConfig', 'Leaderboard']))
+      bankState.setEntities(filterEntitiesByModel(entities, 'Pool'))
+      packState.setEntities(filterEntitiesByModel(entities, 'Pack'))
+    },
+  })
+
+  const { isFinished: isFinishedPlayers } = useSdkEntitiesGet({
+    query: query_get_players,
+    enabled: (mounted),
+    setEntities: (entities: PistolsEntity[]) => {
+      console.log("EntityStoreSync() SET PLAYERS =======> [entities]:", entities)
+      // console.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModel(entities, 'Player'))
       playerState.setEntities(filterEntitiesByModel(entities, 'Player'))
       playerState.updateMessages(filterEntitiesByModel(entities, ['PlayerOnline', 'PlayerBookmark']))
-      duelistState.setEntities(filterEntitiesByModel(entities, ['Duelist', 'DuelistAssignment', 'DuelistMemorial', 'PlayerDuelistStack']))
-      duelistQueryState.setEntities(filterEntitiesByModel(entities, ['Duelist', 'DuelistAssignment', 'DuelistMemorial']))
-      bankState.setEntities(filterEntitiesByModel(entities, 'Pool'))
-      // challenge initial state is handled by <ChallengeStoreSync>
-      // const challengeEntities = filterEntitiesByModel(entities, ['Challenge', 'ChallengeMessage', 'Round'])
-      // challengeState.setEntities(challengeEntities)
-      // challengeQueryState.setEntities(challengeEntities)
+    },
+  })
+
+  const { isFinished: isFinishedDuelists } = useSdkEntitiesGet({
+    query: query_get_duelists,
+    enabled: (mounted),
+    setEntities: (entities: PistolsEntity[]) => {
+      console.log("EntityStoreSync() SET DUELISTS =======> [entities]:", entities)
+      // console.log("EntityStoreSync() SET DUELISTS =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
+      duelistState.setEntities(entities)
+      duelistQueryState.setEntities(entities)
+    },
+  })
+
+  const { isFinished: isFinishedStacks } = useSdkEntitiesGet({
+    query: query_get_duelist_stacks,
+    enabled: (mounted),
+    setEntities: (entities: PistolsEntity[]) => {
+      console.log("EntityStoreSync() SET STACKS =======> [entities]:", entities)
+      // console.log("EntityStoreSync() SET STACKS =======> [PlayerDuelistStack]:", filterEntitiesByModel(entities, 'PlayerDuelistStack'))
+      duelistState.setEntities(entities)
+    },
+  })
+
+  // challenge initial state is handled by <ChallengeStoreSync>
+  // useSdkEntitiesGet({
+  //   query: query_get_challenges,
+  //   enabled: mounted,
+  //   setEntities: (entities: PistolsEntity[]) => {
+  //     console.log("EntityStoreSync() SET CHALLENGES =======> [entities]:", entities)
+  //     challengeState.setEntities(entities)
+  //     challengeQueryState.setEntities(entities)
+  //   },
+  // })
+
+  useSdkEntitiesSub({
+    query: query_sub,
+    enabled: (mounted && isFinishedAdmin && isFinishedPlayers && isFinishedDuelists && isFinishedStacks),
+    setEntities: (entities: PistolsEntity[]) => {
+      console.log("EntityStoreSync() SET =======> [entities]: DISCARD!", entities.length)
     },
     updateEntity: (entity: PistolsEntity) => {
-      console.log("EntityStoreSync() SUB UPDATE =======> [entity]:", entity)
+      // console.log("EntityStoreSync() SUB UPDATE =======> [entity]:", entity)
       if (entityHasModels(entity, ['Config'])) {
         configState.updateEntity(entity)
       }

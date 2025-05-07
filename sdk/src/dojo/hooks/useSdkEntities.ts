@@ -21,6 +21,7 @@ import {
 
 type UseSdkGetResult = {
   isLoading: boolean | undefined
+  isFinished: boolean | undefined
 }
 
 type UseSdkEntitiesProps = {
@@ -104,6 +105,7 @@ export const useSdkEntitiesGet = ({
 
   return {
     isLoading,
+    isFinished: (isLoading === false)
   }
 }
 
@@ -163,6 +165,7 @@ export const useSdkEntitiesSub = ({
 
   return {
     isLoading,
+    isFinished: (isLoading === false)
   }
 }
 
@@ -217,6 +220,7 @@ export const useSdkEventsGet = ({
 
   return {
     isLoading,
+    isFinished: (isLoading === false)
   }
 }
 
@@ -278,6 +282,7 @@ export const useSdkEventsSub = ({
 
   return {
     isLoading,
+    isFinished: (isLoading === false)
   }
 }
 

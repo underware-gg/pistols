@@ -15,7 +15,7 @@ import { SubscriptionCallbackArgs } from '@dojoengine/sdk'
 // updates calls: updateEntity() (optional)
 //
 
-type UseSdkGetResult = {
+type UseSdkTokenGetResult = {
   isLoading: boolean | undefined
 }
 
@@ -41,7 +41,7 @@ export const useSdkTokenBalancesGet = ({
   tokenIds,
   setBalances,
   enabled = true,
-}: UseSdkTokenBalancesGetProps): UseSdkGetResult => {
+}: UseSdkTokenBalancesGetProps): UseSdkTokenGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
 
@@ -97,7 +97,7 @@ export const useSdkTokenBalancesSub = ({
   contracts,
   updateBalance,
   enabled = true,
-}: UseSdkTokenBalancesSubProps): UseSdkGetResult => {
+}: UseSdkTokenBalancesSubProps): UseSdkTokenGetResult => {
   const { sdk } = useDojoSetup()
 
   useEffect(() => {
