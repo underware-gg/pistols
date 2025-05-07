@@ -52,7 +52,10 @@ export const getDuelTokenAddress = (networkId: NetworkId): string => (getContrac
 export const getPackTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'pack_token')?.address ?? '0x0')
 export const getTournamentTokenAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'tournament_token')?.address ?? '0x0')
 // contracts
+export const getWorldAddress = (networkId: NetworkId): string => (manifests[networkId]?.world?.address ?? '0x0')
+export const getGameAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'game')?.address ?? '0x0')
 export const getBankAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'bank')?.address ?? '0x0')
+export const getAdminAddress = (networkId: NetworkId): string => (getContractByName(manifests[networkId], NAMESPACE, 'admin')?.address ?? '0x0')
 export const getVrfAddress = (networkId: NetworkId): string => (NETWORKS[networkId].vrfAddress || (getContractByName(manifests[networkId], NAMESPACE, 'vrf_mock')?.address ?? '0x0'))
 
 
