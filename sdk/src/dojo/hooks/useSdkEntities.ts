@@ -26,24 +26,15 @@ type UseSdkGetResult = {
   isFinished: boolean | undefined
 }
 
-type UseSdkEntitiesProps = {
+export type UseSdkGetProps = {
   query: PistolsQueryBuilder
   enabled?: boolean
-}
-export type UseSdkEntitiesGetProps = UseSdkEntitiesProps & {
   retryInterval?: number
   setEntities: (entities: PistolsEntity[]) => void // stores set callback (erases previous state)
 }
-export type UseSdkEntitiesSubProps = UseSdkEntitiesProps & {
+export type UseSdkSubProps = UseSdkGetProps & {
   setEntities: (entities: PistolsEntity[]) => void // stores set callback (erases previous state)
   updateEntity: (entities: PistolsEntity) => void // store update callback
-}
-
-export type UseSdkEventsGetProps = UseSdkEntitiesGetProps & {
-  query: PistolsQueryBuilder | PistolsHistoricalQueryBuilder
-}
-export type UseSdkEventsSubProps = UseSdkEntitiesSubProps & {
-  query: PistolsQueryBuilder | PistolsHistoricalQueryBuilder
 }
 
 export type SdkSubscribeResponse = [
@@ -70,7 +61,7 @@ export const useSdkEntitiesGet = ({
   setEntities,
   enabled = true,
   retryInterval = 0,
-}: UseSdkEntitiesGetProps): UseSdkGetResult => {
+}: UseSdkGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
   const limit = useMemo(() => query?.build().pagination.limit, [query])
@@ -119,7 +110,7 @@ export const useSdkEntitiesSub = ({
   setEntities,
   updateEntity,
   enabled = true,
-}: UseSdkEntitiesSubProps): UseSdkGetResult => {
+}: UseSdkSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
   const limit = useMemo(() => query?.build().pagination.limit, [query])
@@ -185,7 +176,7 @@ export const useSdkEventsGet = ({
   setEntities,
   enabled = true,
   retryInterval = 0,
-}: UseSdkEventsGetProps): UseSdkGetResult => {
+}: UseSdkGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
   const limit = useMemo(() => query?.build().pagination.limit, [query])
@@ -236,7 +227,7 @@ export const useSdkEventsSub = ({
   setEntities,
   updateEntity,
   enabled = true,
-}: UseSdkEventsSubProps): UseSdkGetResult => {
+}: UseSdkSubProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
   const [isLoading, setIsLoading] = useState<boolean>()
   const limit = useMemo(() => query?.build().pagination.limit, [query])

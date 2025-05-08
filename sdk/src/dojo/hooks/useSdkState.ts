@@ -2,11 +2,10 @@ import { createDojoStore } from '@dojoengine/sdk/react'
 import { useMemo } from 'react'
 import {
   useSdkEntitiesGet,
-  UseSdkEntitiesGetProps,
+  UseSdkGetProps,
   useSdkEntitiesSub,
-  UseSdkEntitiesSubProps,
+  UseSdkSubProps,
   useSdkEventsGet,
-  UseSdkEventsGetProps,
 } from 'src/dojo/hooks/useSdkEntities'
 import { bigintToDecimal } from 'src/exports/utils'
 import {
@@ -32,7 +31,7 @@ export type useSdkStateResult = {
 export const useSdkStateEntitiesGet = ({
   query,
   enabled = true,
-}: Omit<UseSdkEntitiesGetProps, 'setEntities'>): useSdkStateResult => {
+}: Omit<UseSdkGetProps, 'setEntities'>): useSdkStateResult => {
   const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [query])
   const state = useStore(store, (state) => state)
 
@@ -56,7 +55,7 @@ export const useSdkStateEntitiesGet = ({
 export const useSdkStateEntitiesSub = ({
   query,
   enabled = true,
-}: Omit<UseSdkEntitiesSubProps, 'setEntities' | 'updateEntity'>): useSdkStateResult => {
+}: Omit<UseSdkSubProps, 'setEntities' | 'updateEntity'>): useSdkStateResult => {
   const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [query])
   const state = useStore(store, (state) => state)
 
@@ -94,7 +93,7 @@ export const useSdkStateEventsGet = ({
   query,
   enabled = true,
   retryInterval = 0,
-}: Omit<UseSdkEventsGetProps, 'setEntities'>): useSdkStateResult => {
+}: Omit<UseSdkGetProps, 'setEntities'>): useSdkStateResult => {
   const store = useMemo(() => createDojoStore<PistolsSchemaType>(), [query])
   const state = useStore(store, (state) => state)
   const historical = useMemo(() => query?.build().historical, [query])
