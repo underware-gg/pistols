@@ -39,17 +39,6 @@ export const ActivityPanel = () => {
   const inOnline = useMemo(() => (panelType === PanelType.Online), [panelType])
   const inAction = useMemo(() => (panelType === PanelType.Action), [panelType])
 
-  const _panelTitle = useCallback((type: PanelType) => {
-    const className = (panelType == type ? 'Active Anchor' : 'Inactive Anchor ImportantHover')
-    const name = (type == PanelType.Action ? ActionIcon(inAction) : type)
-    // const name = type
-    return (
-      <span className={className} onClick={() => setPanelType(type)}>
-        {name}
-      </span>
-    )
-  }, [panelType, setPanelType])
-
   const { atGate, atDoor, atDuel, atTutorial } = usePistolsScene()
   if (atGate || atDoor || atDuel || atTutorial) {
     return <></>

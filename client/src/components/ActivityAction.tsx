@@ -18,7 +18,7 @@ export const ActionIcon = (isActive: boolean) => {
   const { requiresAction, duelPerDuelist } = useCallToActions()
   const replyOnly = useMemo(() => (
     requiresAction && !Object.keys(duelPerDuelist).some((duelistId) => (duelistIds.includes(BigInt(duelistId))))
-  ), [duelistIds, duelPerDuelist])
+  ), [requiresAction, duelistIds, duelPerDuelist])
   const name = useMemo(() => (isActive ? 'circle' : 'circle outline'), [isActive])
   const className = useMemo(() => (
     replyOnly ? 'Warning'

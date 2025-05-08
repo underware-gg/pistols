@@ -6,14 +6,15 @@ import { PistolsHistoricalQueryBuilder } from '@underware/pistols-sdk/pistols'
 
 const query: PistolsHistoricalQueryBuilder = new PistolsHistoricalQueryBuilder()
   .withEntityModels([
-    "pistols-PlayerActivityEvent",
+    'pistols-PlayerActivityEvent',
   ])
+  .withDirection('Backward')
   .withLimit(100)
 
 // Sync entities: Add only once to a top level component
 export function EventsHistoricalStoreSync() {
   const historicalEventsState = useHistoricalEventsStore((state) => state)
-  
+
   const mounted = useMounted()
 
   useSdkEventsSub({
@@ -23,7 +24,7 @@ export function EventsHistoricalStoreSync() {
     updateEntity: historicalEventsState.updateEvent,
   })
 
-  useEffect(() => console.log("EventsHistoricalStoreSync() =>", historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
+  useEffect(() => console.log('EventsHistoricalStoreSync() =>', historicalEventsState.playerActivity), [historicalEventsState.playerActivity])
 
   return (<></>)
 }
