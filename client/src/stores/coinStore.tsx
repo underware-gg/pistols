@@ -1,9 +1,9 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useERC20Balance } from '@underware/pistols-sdk/utils/hooks'
-import { useSdkTokenBalancesGet, useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { useDojoSetup, useSdkTokenBalancesGet, useStarknetContext } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useDuelistTokenBoundAddress } from '/src/hooks/useTokenBound'
 import { makeTokenBoundAddress } from '@underware/pistols-sdk/pistols'
@@ -112,31 +112,6 @@ export const useCoinBalance = (
   }
 }
 
-export const fetchNewTokenBoundCoins = async (sdk: SetupResult['sdk'], coinAddress: BigNumberish, tokenAddress: BigNumberish, tokenIds: bigint[]) => {
-  if (tokenIds.length == 0) return
-  const setBalances = useCoinStore.getState().setBalances
-  const accounts = useCoinStore.getState().getAccounts(coinAddress)
-  const tokenBoundAddresses = tokenIds
-    .map((tokenId) => bigintToHex(makeTokenBoundAddress(tokenAddress, tokenId)))
-    .filter((address) => !accounts.includes(address))
-  // console.log("fetchNewTokenBoundCoins()...", tokenAddress, tokenIds, tokenBoundAddresses, accounts)
-  if (tokenBoundAddresses.length > 0) {
-    await sdk.getTokenBalances({
-      contractAddresses: [coinAddress as string],
-      accountAddresses: tokenBoundAddresses,
-      tokenIds: [],
-    }).then((balances: Page<torii.TokenBalance>) => {
-      // console.log("fetchNewTokenBoundCoins() GOT:", balances)
-      setBalances(balances.items)
-      if (balances.next_cursor) {
-        console.warn("fetchNewTokenBoundCoins() LOST PAGE!!!! ", coinAddress, tokenBoundAddresses)
-      }
-    }).catch((error: Error) => {
-      console.error("fetchNewTokenBoundCoins().sdk.get() error:", error, tokenIds)
-    })
-  }
-}
-
 
 //----------------------------------------
 // token balances
@@ -168,6 +143,54 @@ export const useDuelistFameBalance = (duelistId: BigNumberish, fee: BigNumberish
   const { address } = useDuelistTokenBoundAddress(duelistId)
   return useFameBalance(address, fee)
 }
+
+
+
+//----------------------------------------
+// fetch new balances
+//
+
+export const useFetchAccountsBalances = (coinAddress: BigNumberish, newAccounts: BigNumberish[]) => {
+  const { sdk } = useDojoSetup()
+  useEffect(() => {
+    fetchAccountsBalances(sdk, coinAddress, newAccounts)
+  }, [sdk, coinAddress, newAccounts])
+  return {}
+}
+
+export const fetchAccountsBalances = async (sdk: SetupResult['sdk'], coinAddress: BigNumberish, newAccounts: BigNumberish[]) => {
+  // console.log("fetchAccountsBalances()...", tokenAddress, tokenIds, tokenBoundAddresses, accounts)
+  const accounts = useCoinStore.getState().getAccounts(coinAddress)
+  const accountAddresses = newAccounts
+    .map((address) => bigintToHex(address))
+    .filter((address) => !accounts.includes(address))
+
+  if (accountAddresses.length > 0) {
+    const setBalances = useCoinStore.getState().setBalances
+    await sdk.getTokenBalances({
+      contractAddresses: [coinAddress as string],
+      accountAddresses,
+      tokenIds: [],
+    }).then((balances: Page<torii.TokenBalance>) => {
+      // console.log("fetchAccountsBalances() GOT:", balances)
+      setBalances(balances.items)
+      if (balances.next_cursor) {
+        console.warn("fetchAccountsBalances() LIMIT REACHED!!!! Possible loss of data", coinAddress, accounts)
+      }
+    }).catch((error: Error) => {
+      console.error("fetchAccountsBalances().sdk.get() error:", error, accounts)
+    })
+  }
+}
+
+export const fetchTokenBoundBalances = async (sdk: SetupResult['sdk'], coinAddress: BigNumberish, tokenAddress: BigNumberish, tokenIds: bigint[]) => {
+  if (tokenIds.length == 0) return
+  const tokenBoundAddresses = tokenIds.map((tokenId) => makeTokenBoundAddress(tokenAddress, tokenId))
+  // console.log("fetchTokenBoundBalances()...", tokenAddress, tokenIds, tokenBoundAddresses, accounts)
+  await fetchAccountsBalances(sdk, coinAddress, tokenBoundAddresses);
+}
+
+
 
 
 

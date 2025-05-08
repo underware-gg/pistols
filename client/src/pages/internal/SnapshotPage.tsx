@@ -9,7 +9,7 @@ import { useDuelist, useAllDuelistsIds } from '/src/stores/duelistStore'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { useSeasonTotals } from '../../hooks/useSeason'
 import { useGetSeasonScoreboard } from '/src/hooks/useScore'
-import { useDuelistFameBalance, fetchNewTokenBoundCoins } from '/src/stores/coinStore'
+import { useDuelistFameBalance, fetchTokenBoundBalances } from '/src/stores/coinStore'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
@@ -104,7 +104,7 @@ export function Snapshots() {
 
   const { sdk } = useDojoSetup()
   const { fameContractAddress, duelistContractAddress } = useTokenContracts()
-  fetchNewTokenBoundCoins(sdk, fameContractAddress, duelistContractAddress, allDuelistIds)
+  fetchTokenBoundBalances(sdk, fameContractAddress, duelistContractAddress, allDuelistIds)
 
   return (
     <Container text>

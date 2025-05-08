@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Container, Table } from 'semantic-ui-react'
 import { usePlayer, usePlayerStore } from '/src/stores/playerStore'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
@@ -12,6 +12,9 @@ import { Connect } from '/src/pages/tests/ConnectTestPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
 import { BigNumberish } from 'starknet'
+import { useFetchAccountsBalances } from '/src/stores/coinStore'
+import { useTokenContracts } from '/src/hooks/useTokenContracts'
+import { useDelay } from '@underware/pistols-sdk/utils/hooks'
 
 // const Row = Grid.Row
 // const Col = Grid.Column
@@ -42,6 +45,12 @@ export default function PlayersPage() {
 
 function Players() {
   const players = usePlayerStore.getState().players
+
+  const playerAddresses = useMemo(() => Object.keys(players), [players])
+
+  const { lordsContractAddress } = useTokenContracts()
+  useFetchAccountsBalances(lordsContractAddress, playerAddresses)
+
   return (
     <Table celled color='orange'>
       <Header>
@@ -54,7 +63,7 @@ function Players() {
         </Row>
       </Header>
       <Body>
-        {Object.keys(players).map((address, i) => (
+        {playerAddresses.map(address => (
           <PlayerRow key={address} address={address} />
         ))}
       </Body>
@@ -68,6 +77,7 @@ function PlayerRow({
   address: BigNumberish,
 }) {
   const { isNew, username, timestampRegistered } = usePlayer(address)
+  const ready = useDelay(true, 2000) // wait to batch fetch
   return (
     <Row className='H5 Number'>
       <Cell>
@@ -83,7 +93,7 @@ function PlayerRow({
         <ExplorerLink address={address} voyager />
       </Cell>
       <Cell>
-        <LordsBalance address={address} size='big' />
+        {!ready ? '...' : <LordsBalance address={address} size='big' />}
       </Cell>
     </Row>
   )

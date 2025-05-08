@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useDojoSetup, useSdkTokenBalancesSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useTokenStore } from '/src/stores/tokenStore'
-import { fetchNewTokenBoundCoins, useCoinStore } from '/src/stores/coinStore'
+import { fetchTokenBoundBalances, useCoinStore } from '/src/stores/coinStore'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import * as torii from '@dojoengine/torii-client'
@@ -68,7 +68,7 @@ export function TokenStoreSync() {
       if (newAccounts.length > 0) {
         // console.log("TokenStoreSync() TRACK newAccounts =>", newAccounts)
         newAccounts.forEach((address) => {
-          fetchNewTokenBoundCoins(sdk, fameContractAddress, duelistContractAddress, _balances[address])
+          fetchTokenBoundBalances(sdk, fameContractAddress, duelistContractAddress, _balances[address])
         })
         setTrackedAccounts(allAccounts)
       }
