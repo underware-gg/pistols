@@ -146,8 +146,8 @@ export const useQueryChallengeIds = (
     // filter by name
     if (filterName) {
       result = result.filter((e) => (
-        duelistEntities[e.duelist_entity_id_a].name.includes(filterName) ||
-        duelistEntities[e.duelist_entity_id_b].name.includes(filterName)
+        duelistEntities[e.duelist_entity_id_a]?.name?.includes(filterName) ||
+        duelistEntities[e.duelist_entity_id_b]?.name?.includes(filterName)
       ))
     }
 
