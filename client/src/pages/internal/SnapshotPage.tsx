@@ -13,7 +13,7 @@ import { useDuelistFameBalance, fetchNewTokenBoundCoins } from '/src/stores/coin
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
-import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
+import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 import { SeasonSelectDropdown } from '/src/components/SeasonSelectDropdown'
 import { CopyIcon, IconClick } from '/src/components/ui/Icons'
 import AppDojo from '/src/components/AppDojo'
@@ -72,7 +72,9 @@ export default function SnapshotPage() {
   return (
     <AppDojo>
       <InternalPageMenu />
-      <Snapshots />
+      <InternalPageWrapper>
+        <Snapshots />
+      </InternalPageWrapper>
     </AppDojo>
   )
 }

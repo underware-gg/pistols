@@ -8,7 +8,7 @@ import { useConfig } from '/src/stores/configStore'
 import { Address } from '/src/components/ui/Address'
 import { LordsBalance } from '/src/components/account/LordsBalance'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
-import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
+import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 // import { AdminPanel } from '/src/components/admin/AdminPanel'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
@@ -31,13 +31,16 @@ export default function AdminPage() {
         <InternalPageMenu />
         <CurrentChainHint />
         <Connect />
-
-        {/* <AdminPanel /> */}
-        <Config />
-        <Contracts />
-        <br />
-        
         <EntityStoreSync />
+
+        <InternalPageWrapper>
+          {/* <AdminPanel /> */}
+          <Config />
+          <Contracts />
+          <br />
+          <EntityStoreSync />
+        </InternalPageWrapper>
+        
       </Container>
     </AppDojo>
   );

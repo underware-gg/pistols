@@ -19,7 +19,7 @@ import { PistolsQueryBuilder } from '@underware/pistols-sdk/pistols'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { PlayerNameSync } from '/src/stores/sync/PlayerNameSync'
 import { ActionButton } from '/src/components/ui/Buttons'
-import { InternalPageMenu } from '/src/pages/internal/InternalPageIndex'
+import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/InternalPageIndex'
 import { Address } from '/src/components/ui/Address'
 import { Balance } from '/src/components/account/Balance'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
@@ -43,10 +43,12 @@ export default function SeasonsPage() {
         <CurrentChainHint />
         <Connect />
 
-        <EntityStoreSync />
-        <PlayerNameSync />
+        <InternalPageWrapper>
+          <EntityStoreSync />
+          <PlayerNameSync />
+          <Seasons />
+        </InternalPageWrapper>
 
-        <Seasons />
       </Container>
     </AppDojo>
   );

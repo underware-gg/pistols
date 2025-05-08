@@ -13,9 +13,8 @@ import { BalanceRequiredButton } from '/src/components/ui/Buttons'
 import { Balance } from '/src/components/account/Balance'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import { InternalPageMenu } from './InternalPageIndex'
+import { InternalPageMenu, InternalPageWrapper } from './InternalPageIndex'
 import CurrentChainHint from '/src/components/CurrentChainHint'
-import ChallengeModal from '/src/components/modals/ChallengeModal'
 import StoreSync from '/src/stores/sync/StoreSync'
 import AppDojo from '/src/components/AppDojo'
 import * as ENV from '/src/utils/env'
@@ -33,17 +32,17 @@ export default function PoolsPage() {
       <Container>
         <InternalPageMenu />
         <CurrentChainHint />
-
-        <Connect />
-        <Account />
-        <br />
-        <Bank />
-        <br />
-        <Pools />
-        <br />
-
         <StoreSync />
-        <ChallengeModal />
+
+        <InternalPageWrapper>
+          <Connect />
+          <Account />
+          <br />
+          <Bank />
+          <br />
+          <Pools />
+          <br />
+        </InternalPageWrapper>
       </Container>
     </AppDojo>
   );
