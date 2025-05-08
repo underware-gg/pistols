@@ -1,5 +1,6 @@
 import {
   SchemaType,
+  GetParams,
   ToriiResponse,
   ParsedEntity,
   ClauseBuilder,
@@ -14,6 +15,7 @@ type PistolsSchemaModels = PistolsSchemaType['pistols'];
 type PistolsSchemaModelNames = keyof PistolsSchemaModels;
 
 // export type ToriiResponse<T extends SchemaType> = Pagination<T, StandardizedQueryResult<T>>;
+type PistolsGetParams = GetParams<PistolsSchemaType>;
 type PistolsToriiResponse = ToriiResponse<PistolsSchemaType>;
 type PistolsModelType = UnionOfModelData<PistolsSchemaType>;
 type PistolsEntity = ParsedEntity<PistolsSchemaType>;
@@ -22,6 +24,7 @@ export type {
   PistolsSchemaType,
   PistolsSchemaModels,
   PistolsSchemaModelNames,
+  PistolsGetParams,
   PistolsToriiResponse,
   PistolsModelType,
   PistolsEntity,

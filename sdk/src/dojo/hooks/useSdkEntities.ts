@@ -9,6 +9,7 @@ import {
   PistolsHistoricalQueryBuilder,
   PistolsModelType,
   PistolsSchemaModelNames,
+  PistolsGetParams,
 } from 'src/games/pistols/config/types'
 import * as torii from '@dojoengine/torii-client'
 
@@ -49,11 +50,62 @@ type SdkSubscriptionCallbackResponse = {
 
 
 //---------------------------------------
-// entities get/subscribe
+// get w/ pagination
 //
 
 const _filterItems = (data: PistolsEntity[]): PistolsEntity[] => {
   return data ? data.filter(e => e && e.entityId != '0x0') : []
+}
+
+const _useSdkGet = (prefix: string, {
+  fn,
+  query,
+  enabled,
+  setEntities,
+  retryInterval = 0,
+}: UseSdkGetProps & {
+  fn: (query: PistolsGetParams) => Promise<PistolsToriiResponse>
+}): UseSdkGetResult => {
+  const [isLoading, setIsLoading] = useState<boolean>()
+
+  useEffect(() => {
+    let _mounted = true
+    const _get = async () => {
+      setIsLoading(true)
+      try {
+        let currentPage = 0;
+        while (query) {
+          const response: PistolsToriiResponse = await fn({ query });
+          if (!_mounted) return
+          console.log(`${prefix} GOT[page:${currentPage}]:`, response)
+          const entities = _filterItems(response.getItems())
+          if (entities.length > 0) {
+            // console.log(`${prefix} GOT>>>>>>>>>>>>`, entities)
+            setEntities(entities)
+            query = response.cursor ? response.getNextQuery(query) : null
+          } else if (currentPage == 0 && retryInterval > 0) {
+            console.log(`${prefix} retry...`, retryInterval)
+            setTimeout(() => _get(), retryInterval)
+          }
+          currentPage++;
+        }
+        setIsLoading(false)
+      } catch (error) {
+        console.error(`${prefix} exception:`, error)
+        if (_mounted) setIsLoading(false)
+      }
+    }
+    // get...
+    if (enabled && fn && query) _get()
+    return () => {
+      _mounted = false
+    }
+  }, [enabled, fn, query])
+
+  return {
+    isLoading,
+    isFinished: (isLoading === false)
+  }
 }
 
 export const useSdkEntitiesGet = ({
@@ -63,47 +115,51 @@ export const useSdkEntitiesGet = ({
   retryInterval = 0,
 }: UseSdkGetProps): UseSdkGetResult => {
   const { sdk } = useDojoSetup()
-  const [isLoading, setIsLoading] = useState<boolean>()
-  const limit = useMemo(() => query?.build().pagination.limit, [query])
+  // const limit = useMemo(() => query?.build().pagination.limit, [query])
 
-  useEffect(() => {
-    let _mounted = true
-    const _get = async () => {
-      setIsLoading(true)
-      await sdk.getEntities({
-        query,
-      }).then((response: PistolsToriiResponse) => {
-        if (!_mounted) return
-        console.log("useSdkEntitiesGet() GOT:", response)
-        const entities = _filterItems(response.getItems())
-        if (entities.length > 0) {
-          // console.log("useSdkEntitiesGet() GOT>>>>>>>>>>>>", entities)
-          setEntities(entities)
-          setIsLoading(false)
-        } else if (retryInterval > 0) {
-          console.log("useSdkEntitiesGet() retry...", retryInterval)
-          setTimeout(() => _get(), retryInterval)
-        } else {
-          setIsLoading(false)
-        }
-      }).catch((error: Error) => {
-        if (!_mounted) return
-        console.error("useSdkEntitiesGet().sdk.get() error:", error, query)
-        setIsLoading(false)
-      })
-    }
-    // get...
-    if (sdk && query && enabled) _get()
-    return () => {
-      _mounted = false
-    }
-  }, [sdk, query, enabled])
+  const { isLoading, isFinished } = _useSdkGet('useSdkEntitiesGet()', {
+    fn: sdk.getEntities,
+    query,
+    setEntities,
+    enabled,
+    retryInterval,
+  })
 
   return {
     isLoading,
-    isFinished: (isLoading === false)
+    isFinished,
   }
 }
+
+export const useSdkEventsGet = ({
+  query,
+  setEntities,
+  enabled = true,
+  retryInterval = 0,
+}: UseSdkGetProps): UseSdkGetResult => {
+  const { sdk } = useDojoSetup()
+  const historical = useMemo(() => query?.build().historical, [query])
+  // const limit = useMemo(() => query?.build().pagination.limit, [query])
+
+  const { isLoading, isFinished } = _useSdkGet(`useSdkEventsGet(${historical})`, {
+    fn: sdk.getEventMessages,
+    query,
+    setEntities,
+    enabled,
+    retryInterval,
+  })
+
+  return {
+    isLoading,
+    isFinished,
+  }
+}
+
+
+
+//---------------------------------------
+// subscriptions...
+//
 
 export const useSdkEntitiesSub = ({
   query,
@@ -128,7 +184,7 @@ export const useSdkEntitiesSub = ({
             console.error("useSdkEntitiesSub() callback error:", response.error, query)
           } else {
             console.log("useSdkEntitiesSub() SUB:", response.data);
-            _filterItems(response.data).forEach(entity => updateEntity(entity) )
+            _filterItems(response.data).forEach(entity => updateEntity(entity))
           }
         },
       }).then((response: SdkSubscribeResponse) => {
@@ -159,62 +215,6 @@ export const useSdkEntitiesSub = ({
       _mounted = false
     }
   }, [sdk, enabled, query])
-
-  return {
-    isLoading,
-    isFinished: (isLoading === false)
-  }
-}
-
-
-//---------------------------------------
-// events get/subscribe
-//
-
-export const useSdkEventsGet = ({
-  query,
-  setEntities,
-  enabled = true,
-  retryInterval = 0,
-}: UseSdkGetProps): UseSdkGetResult => {
-  const { sdk } = useDojoSetup()
-  const [isLoading, setIsLoading] = useState<boolean>()
-  const limit = useMemo(() => query?.build().pagination.limit, [query])
-  const historical = useMemo(() => query?.build().historical, [query])
-
-  useEffect(() => {
-    let _mounted = true
-    const _get = async () => {
-      setIsLoading(true)
-      sdk.getEventMessages({
-        query,
-      }).then((response: PistolsToriiResponse) => {
-        if (!_mounted) return
-        // console.log("useSdkEventsGet() GOT:", historical, response.data)
-        const entities = _filterItems(response.getItems())
-        // if (entities.length == limit) {
-        //   console.warn("useSdkEventsGet() LIMIT REACHED!!!! Possible loss of data", limit, query)
-        // }
-        if (entities.length > 0) {
-          // console.log("useSdkEventsGet() GOT>>>>>>>>>>>>", historical, entities)
-          setEntities(entities)
-          setIsLoading(false)
-        } else if (retryInterval > 0) {
-          console.log("useSdkEventsGet() retry...", historical, retryInterval)
-          setTimeout(() => _get(), retryInterval)
-        }
-      }).catch((error: Error) => {
-        if (!_mounted) return
-        console.error("useSdkEventsGet() error:", historical, error, query)
-        setIsLoading(false)
-      })
-    }
-    // get...
-    if (sdk && query && enabled) _get()
-    return () => {
-      _mounted = false
-    }
-  }, [sdk, query, enabled])
 
   return {
     isLoading,
