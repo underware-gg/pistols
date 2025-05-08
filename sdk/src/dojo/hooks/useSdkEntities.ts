@@ -3,12 +3,14 @@ import { BigNumberish } from 'starknet'
 import { bigintToAddress, arrayClean } from 'src/utils/misc/types'
 import { useDojoSetup } from 'src/dojo/contexts/DojoContext'
 import {
+  PistolsToriiResponse,
+  PistolsEntity,
   PistolsQueryBuilder,
   PistolsHistoricalQueryBuilder,
-  PistolsEntity,
   PistolsModelType,
   PistolsSchemaModelNames,
 } from 'src/games/pistols/config/types'
+import * as torii from '@dojoengine/torii-client'
 
 
 //---------------------------------------
@@ -44,12 +46,13 @@ export type UseSdkEventsSubProps = UseSdkEntitiesSubProps & {
   query: PistolsQueryBuilder | PistolsHistoricalQueryBuilder
 }
 
-type SdkEntitiesCallbackResponse = {
+export type SdkSubscribeResponse = [
+  PistolsToriiResponse,
+  torii.Subscription
+];
+
+type SdkSubscriptionCallbackResponse = {
   data?: PistolsEntity[]
-  error?: Error
-};
-type SdkEventsCallbackResponse = {
-  data?: PistolsEntity[] | PistolsEntity[][]
   error?: Error
 };
 
@@ -57,6 +60,11 @@ type SdkEventsCallbackResponse = {
 //---------------------------------------
 // entities get/subscribe
 //
+
+const _filterItems = (data: PistolsEntity[]): PistolsEntity[] => {
+  return data ? data.filter(e => e && e.entityId != '0x0') : []
+}
+
 export const useSdkEntitiesGet = ({
   query,
   setEntities,
@@ -73,13 +81,10 @@ export const useSdkEntitiesGet = ({
       setIsLoading(true)
       await sdk.getEntities({
         query,
-      }).then((data: PistolsEntity[]) => {
+      }).then((response: PistolsToriiResponse) => {
         if (!_mounted) return
-        console.log("useSdkEntitiesGet() GOT:", data)
-        if (data.length == limit) {
-          console.warn("useSdkEntitiesGet() LIMIT REACHED!!!! Possible loss of data", limit, query)
-        }
-        const entities = _filterEntities(data)
+        console.log("useSdkEntitiesGet() GOT:", response)
+        const entities = _filterItems(response.getItems())
         if (entities.length > 0) {
           // console.log("useSdkEntitiesGet() GOT>>>>>>>>>>>>", entities)
           setEntities(entities)
@@ -127,24 +132,25 @@ export const useSdkEntitiesSub = ({
       console.log("ENTITIES SUB _______ query:", query);
       sdk.subscribeEntityQuery({
         query,
-        callback: (response: SdkEntitiesCallbackResponse) => {
+        callback: (response: SdkSubscriptionCallbackResponse) => {
           if (response.error) {
             console.error("useSdkEntitiesSub() callback error:", response.error, query)
           } else {
             console.log("useSdkEntitiesSub() SUB:", response.data);
-            _filterEntities(response.data).forEach(entity => updateEntity(entity) )
+            _filterItems(response.data).forEach(entity => updateEntity(entity) )
           }
         },
-      }).then(response => {
+      }).then((response: SdkSubscribeResponse) => {
         if (!_mounted) return
+        // console.log("useSdkEntitiesSub() ENTITIES SUB ====== initialEntities:", response);
         const [initialEntities, sub] = response;
-        // console.log("ENTITIES SUB ====== initialEntities:", initialEntities);
-        if (initialEntities.length == limit) {
-          console.warn("useSdkEntitiesSub() LIMIT REACHED!!!! Possible loss of data", limit, query)
-        }
+        // if (initialEntities.getItems().length == limit) {
+        //   console.warn("useSdkEntitiesSub() LIMIT REACHED!!!! Possible loss of data", limit, query)
+        // }
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
-          setEntities(_filterEntities(initialEntities))
+          console.log("useSdkEntitiesSub() ====== initialEntities>>>>>", initialEntities)
+          setEntities(_filterItems(initialEntities.getItems()))
         }
         setIsLoading(false)
       }).catch(error => {
@@ -173,6 +179,7 @@ export const useSdkEntitiesSub = ({
 //---------------------------------------
 // events get/subscribe
 //
+
 export const useSdkEventsGet = ({
   query,
   setEntities,
@@ -190,13 +197,13 @@ export const useSdkEventsGet = ({
       setIsLoading(true)
       sdk.getEventMessages({
         query,
-      }).then((data: PistolsEntity[] | PistolsEntity[][]) => {
+      }).then((response: PistolsToriiResponse) => {
         if (!_mounted) return
         // console.log("useSdkEventsGet() GOT:", historical, response.data)
-        const entities = _parseEvents(data, historical)
-        if (entities.length == limit) {
-          console.warn("useSdkEventsGet() LIMIT REACHED!!!! Possible loss of data", limit, query)
-        }
+        const entities = _filterItems(response.getItems())
+        // if (entities.length == limit) {
+        //   console.warn("useSdkEventsGet() LIMIT REACHED!!!! Possible loss of data", limit, query)
+        // }
         if (entities.length > 0) {
           // console.log("useSdkEventsGet() GOT>>>>>>>>>>>>", historical, entities)
           setEntities(entities)
@@ -243,25 +250,25 @@ export const useSdkEventsSub = ({
       console.log("useSdkEventsSub() _______ query:", query);
       await sdk.subscribeEventQuery({
         query,
-        callback: (response: SdkEventsCallbackResponse) => {
+        callback: (response: SdkSubscriptionCallbackResponse) => {
           if (response.error) {
             console.error("useSdkEventsSub() callback error:", historical, response.error, query)
           } else {
             // console.log("useSdkEventsSub() SUB:", historical, response.data);
-            _parseEvents(response.data, historical).forEach(entity => updateEntity(entity))
+            _filterItems(response.data).forEach(entity => updateEntity(entity))
           }
         },
-      }).then(response => {
+      }).then((response: SdkSubscribeResponse) => {
         if (!_mounted) return
-        console.log("useSdkEventsSub() ====== initialEntities:", historical, response);
+        // console.log("useSdkEventsSub() ENTITIES SUB ====== initialEntities:", historical, response);
         const [initialEntities, sub] = response;
-        if (initialEntities.length == limit) {
-          console.warn("useSdkEventsSub() LIMIT REACHED!!!! Possible loss of data", limit, query)
-        }
+        // if (initialEntities.getItems().length == limit) {
+        //   console.warn("useSdkEventsSub() LIMIT REACHED!!!! Possible loss of data", limit, query)
+        // }
         if (!_unsubscribe) {
           _unsubscribe = () => sub.cancel()
-          console.log("useSdkEventsSub() ====== initialEntities>>>>>", historical, initialEntities, _parseEvents(initialEntities, historical))
-          setEntities(_parseEvents(initialEntities, historical))
+          console.log("useSdkEventsSub() ====== initialEntities>>>>>", historical, initialEntities, _filterItems(initialEntities.getItems()))
+          setEntities(_filterItems(initialEntities.getItems()))
           setIsLoading(false)
         }
       }).catch(error => {
@@ -284,20 +291,6 @@ export const useSdkEventsSub = ({
     isLoading,
     isFinished: (isLoading === false)
   }
-}
-
-const _filterEntities = (data: PistolsEntity[]): PistolsEntity[] => {
-  return (data ?? []).filter(e => e && e.entityId != '0x0')
-}
-
-const _parseEvents = (data: PistolsEntity[] | PistolsEntity[][], historical: boolean): PistolsEntity[] => {
-  return _filterEntities(
-    !data ? []
-      : !historical ? (data as PistolsEntity[])
-        : (data as PistolsEntity[][]).reduce((acc: PistolsEntity[], e: PistolsEntity[]) => (
-          acc.concat(e)
-        ), [] as PistolsEntity[])
-  )
 }
 
 

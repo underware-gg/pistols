@@ -11,8 +11,8 @@ import { SetupResult } from '@underware/pistols-sdk/dojo'
 import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { weiToEth } from '@underware/pistols-sdk/starknet'
 import { constants } from '@underware/pistols-sdk/pistols/gen'
-import * as torii from '@dojoengine/torii-client'
 import { Page } from '@dojoengine/torii-client'
+import * as torii from '@dojoengine/torii-client'
 
 
 interface BalancesByAccount {

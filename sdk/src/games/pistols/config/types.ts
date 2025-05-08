@@ -1,9 +1,20 @@
-import { ParsedEntity, UnionOfModelData, ToriiQueryBuilder, ClauseBuilder, HistoricalToriiQueryBuilder } from '@dojoengine/sdk'
+import {
+  SchemaType,
+  ToriiResponse,
+  ParsedEntity,
+  ClauseBuilder,
+  ToriiQueryBuilder,
+  HistoricalToriiQueryBuilder,
+  UnionOfModelData,
+} from '@dojoengine/sdk'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 type PistolsSchemaType = models.SchemaType;
 type PistolsSchemaModels = PistolsSchemaType['pistols'];
 type PistolsSchemaModelNames = keyof PistolsSchemaModels;
+
+// export type ToriiResponse<T extends SchemaType> = Pagination<T, StandardizedQueryResult<T>>;
+type PistolsToriiResponse = ToriiResponse<PistolsSchemaType>;
 type PistolsModelType = UnionOfModelData<PistolsSchemaType>;
 type PistolsEntity = ParsedEntity<PistolsSchemaType>;
 
@@ -11,6 +22,7 @@ export type {
   PistolsSchemaType,
   PistolsSchemaModels,
   PistolsSchemaModelNames,
+  PistolsToriiResponse,
   PistolsModelType,
   PistolsEntity,
 }
