@@ -4,14 +4,14 @@ import { immer } from 'zustand/middleware/immer'
 import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols'
-import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
+import { arrayRemoveValue, bigintEquals, bigintToHex, bigintToNumber, isPositiveBigint, shortAddress, sortObjectByValue } from '@underware/pistols-sdk/utils'
 import { models } from '@underware/pistols-sdk/pistols/gen'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { SortDirection } from './queryParamsStore'
 import { PlayerColumn } from './queryParamsStore'
 import { useTotals } from './duelistStore'
 
-interface PlayerState {
+export interface PlayerState {
   player_address: string
   timestamp_registered: number
   username: string
@@ -42,7 +42,7 @@ interface State {
 const createStore = () => {
   const _parseEvent = (e: PistolsEntity): PlayerState => {
     const event = e.models.pistols.Player
-    return event ? {
+    return isPositiveBigint(event?.player_address) ? {
       player_address: bigintToHex(event.player_address),
       timestamp_registered: bigintToNumber(event.timestamps.registered),
       username: shortAddress(event.player_address),

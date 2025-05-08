@@ -10,6 +10,7 @@ const internalPages = [
   { name: 'admin', connected: true },
   { name: 'pools', connected: true },
   { name: 'seasons', connected: true },
+  { name: 'players', connected: true },
   { name: 'snapshot', connected: true },
 ]
 

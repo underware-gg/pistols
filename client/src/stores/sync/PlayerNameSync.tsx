@@ -15,13 +15,14 @@ export function PlayerNameSync() {
     Object.keys(players).filter(p => players[p].isNew)
   ), [players])
 
-  const { connectorId, controllerConnector } = useConnectedController()
+  const { connectorId, isControllerConnected } = useConnectedController()
   const { selectedNetworkConfig } = useStarknetContext()
 
   useEffect(() => {
     if (newPlayerAddresses.length == 0) return
-    if (controllerConnector) {
+    if (isControllerConnected) {
       lookupAddresses(newPlayerAddresses).then((result) => {
+        // console.log("PlayerNameSync() GOT:", newPlayerAddresses, result)
         updateUsernames(result)
       })
     } else if (connectorId == supportedConnetorIds.PREDEPLOYED) {
@@ -32,7 +33,7 @@ export function PlayerNameSync() {
         }, new Map<string, string>())
       )
     }
-  }, [newPlayerAddresses, connectorId, controllerConnector, selectedNetworkConfig])
+  }, [newPlayerAddresses, connectorId, isControllerConnected, selectedNetworkConfig])
 
   return (<></>)
 }

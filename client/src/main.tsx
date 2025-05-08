@@ -15,7 +15,8 @@ import MainPage from '/src/pages/MainPage'
 import InternalPageIndex from '/src/pages/internal/InternalPageIndex'
 import AdminPage from '/src/pages/internal/AdminPage'
 import PoolsPage from '/src/pages/internal/PoolsPage'
-import SeasonsPage from './pages/internal/SeasonsPage'
+import SeasonsPage from '/src/pages/internal/SeasonsPage'
+import PlayersPage from '/src/pages/internal/PlayersPage'
 import SnapshotPage from '/src/pages/internal/SnapshotPage'
 import DuelDataPage from '/src/pages/DuelDataPage'
 import ErrorPage from '/src/pages/error/ErrorPage'
@@ -70,6 +71,7 @@ const router = createBrowserRouter([
       { path: "admin", element: <AdminPage /> },
       { path: "pools", element: <PoolsPage /> },
       { path: "seasons", element: <SeasonsPage /> },
+      { path: "players", element: <PlayersPage /> },
       { path: "snapshot", element: <SnapshotPage /> },
     ],
   },
