@@ -48,7 +48,7 @@ const _modelsChallenges = [
 ];
 
 
-const _limit = 1200
+const _limit = 1500
 const query_get_admin: PistolsQueryBuilder = new PistolsQueryBuilder()
   .withEntityModels(_modelsAdmin)
   .withLimit(_limit)
