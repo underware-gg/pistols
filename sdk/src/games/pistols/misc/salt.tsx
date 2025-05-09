@@ -2,7 +2,7 @@ import { AccountInterface, StarknetDomain } from 'starknet'
 import { signMessages, Messages } from 'src/starknet/starknet_sign'
 import { bigintToHex, shortAddress } from 'src/utils/misc/types'
 import { make_moves_hash, _make_move_mask, _make_move_hash } from '../cairo/make_moves_hash'
-import { apiGenerateControllerSalt } from 'src/exports/api'
+import { apiGenerateControllerSalt } from 'src/api/salt'
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies(null, { path: '/' });

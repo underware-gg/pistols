@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { z } from "zod";
-import { NETWORKS, NetworkId } from "@underware/pistols-sdk/pistols";
+import { NETWORKS, NetworkId } from "@underware/pistols-sdk/pistols/config";
 import chalk from "chalk";
 
 const DEFAULT_NETWORK_ID = process.env.DEFAULT_NETWORK_ID as NetworkId;

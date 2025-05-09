@@ -7,11 +7,11 @@ import {
   UseSdkSubProps,
   useSdkEventsGet,
 } from 'src/dojo/hooks/useSdkEntities'
-import { bigintToDecimal } from 'src/exports/utils'
+import { bigintToDecimal } from 'src/utils/misc/types'
 import {
   PistolsEntity,
   PistolsSchemaType,
-} from 'src/games/pistols/config/types'
+} from 'src/games/pistols/sdk/types_web'
 import { useStore } from 'zustand'
 
 export type useSdkStateResult = {

@@ -1,7 +1,8 @@
 // import { constants } from '@underware/pistols-sdk/pistols/gen'
 
 import { getContractByName } from '@dojoengine/core';
-import { makeDojoAppConfig, NetworkId } from '@underware/pistols-sdk/pistols';
+import { NetworkId } from '@underware/pistols-sdk/pistols/config';
+import { makeDojoAppConfig } from '@underware/pistols-sdk/pistols/dojo';
 import { bigintToHex } from '@underware/pistols-sdk/utils';
 import { stringToFelt } from '@underware/pistols-sdk/starknet';
 import { constants } from '@underware/pistols-sdk/pistols/gen';
@@ -57,7 +58,7 @@ Use these to call functions with graphql
             "contractAddress": "${duel_contract?.address ?? '0x0'}",
             "entrypoint": "create_duel",
             "calldata": [
-              "${bigintToHex(constants.DuelType.Practice)}",
+              "${bigintToHex(constants.getDuelTypeValue(constants.DuelType.Practice) ?? 0)}",
               "0x300000001",
               "0x123",
               ${constants.Premise.Lesson},

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { BigNumberish } from 'starknet'
-import { PistolsEntity } from '@underware/pistols-sdk/pistols'
+import { PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 
 
 //

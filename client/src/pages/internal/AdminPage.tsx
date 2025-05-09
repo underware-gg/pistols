@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { Container, Table } from 'semantic-ui-react'
-import { useDojoSystem, useStarknetContext } from '@underware/pistols-sdk/dojo'
+import { getAdminAddress, getBankAddress, getGameAddress, getWorldAddress } from '@underware/pistols-sdk/pistols/config'
+import { useStarknetContext } from '@underware/pistols-sdk/dojo'
 import { useTokenContracts } from '/src/hooks/useTokenContracts'
 import { ExplorerLink } from '@underware/pistols-sdk/starknet/components'
 import { useConfig } from '/src/stores/configStore'
@@ -13,7 +14,6 @@ import { InternalPageMenu, InternalPageWrapper } from '/src/pages/internal/Inter
 import { Connect } from '/src/pages/tests/ConnectTestPage'
 import CurrentChainHint from '/src/components/CurrentChainHint'
 import AppDojo from '/src/components/AppDojo'
-import { getAdminAddress, getBankAddress, getGameAddress, getWorldAddress } from '@underware/pistols-sdk/pistols'
 
 // const Row = Grid.Row
 // const Col = Grid.Column

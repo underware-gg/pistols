@@ -1,9 +1,9 @@
 import { useEffect, useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
+import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { formatQueryValue, getEntityModel, useSdkEventsSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useEventsStore } from '../eventsModelStore'
-import { PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
 import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
 // import * as torii from '@dojoengine/torii-client'
 

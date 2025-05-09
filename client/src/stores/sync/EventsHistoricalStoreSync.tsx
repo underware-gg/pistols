@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useSdkEventsSub } from '@underware/pistols-sdk/dojo'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useHistoricalEventsStore } from '/src/stores/eventsHistoricalStore'
-import { PistolsHistoricalQueryBuilder } from '@underware/pistols-sdk/pistols'
+import { PistolsHistoricalQueryBuilder } from '@underware/pistols-sdk/pistols/sdk'
 
 const query: PistolsHistoricalQueryBuilder = new PistolsHistoricalQueryBuilder()
   .withEntityModels([

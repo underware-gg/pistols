@@ -1,6 +1,6 @@
 import { BigNumberish, StarknetDomain } from 'starknet'
 import { bigintToHex } from 'src/utils/misc/types'
-import { feltToString } from 'src/exports/starknet'
+import { feltToString } from 'src/starknet/starknet'
 import { ControllerVerifyParams } from './verify'
 
 export type SaltGeneratorResponse = {

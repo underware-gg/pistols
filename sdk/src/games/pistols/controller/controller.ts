@@ -2,6 +2,7 @@ import { Connector } from '@starknet-react/core'
 import type { Tokens } from '@cartridge/controller'
 import { NetworkId, NETWORKS } from 'src/games/pistols/config/networks'
 import { makeControllerConnector } from 'src/dojo/setup/controller'
+import { makePistolsPolicies } from 'src/games/pistols/dojo/policies'
 import {
   getLordsAddress,
   getFameAddress,
@@ -9,9 +10,8 @@ import {
   getDuelistTokenAddress,
   getDuelTokenAddress,
   getPackTokenAddress,
-  makePistolsPolicies,
   NAMESPACE,
-} from './config'
+} from 'src/games/pistols/config/config'
 
 export const makePistolsControllerConnector = (networkId: NetworkId): Connector => {
   const tokens: Tokens = {

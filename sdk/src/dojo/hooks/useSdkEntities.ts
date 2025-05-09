@@ -10,7 +10,7 @@ import {
   PistolsModelType,
   PistolsSchemaModelNames,
   PistolsGetParams,
-} from 'src/games/pistols/config/types'
+} from 'src/games/pistols/sdk/types_web'
 import * as torii from '@dojoengine/torii-client'
 
 

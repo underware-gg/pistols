@@ -1,10 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { useDojoSetup, useDojoSystemCalls } from '@underware/pistols-sdk/dojo'
-import { CommitMoveMessage, signAndRestoreMovesFromHash } from '@underware/pistols-sdk/pistols'
+import { CommitMoveMessage, signAndRestoreMovesFromHash, movesToHand } from '@underware/pistols-sdk/pistols'
 import { useGetDuelDeck } from '/src/hooks/usePistolsContractCalls'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
-import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { PLAYER_CHARACTER_ID } from '/src/utils/pistols'
 import { SALT_SERVER_URL } from '/src/utils/env'
 

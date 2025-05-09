@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { PistolsSchemaType } from '@underware/pistols-sdk/pistols'
+import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { bigintToHex } from '@underware/pistols-sdk/utils';
 import { BigNumberish } from 'starknet';
 

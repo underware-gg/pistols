@@ -1,11 +1,11 @@
 import { BigNumberish, StarknetDomain, StarknetType } from 'starknet'
 import { bigintToDecimal, bigintToHex } from 'src/utils/misc/types'
-import { PistolsSchemaType } from 'src/games/pistols/config/types'
+import { PistolsSchemaType } from 'src/games/pistols/sdk/types_web'
 import { generateTypedData } from 'src/dojo/setup/controller'
 import { makeStarknetDomain } from 'src/games/pistols/config/config'
 import { NetworkId } from 'src/games/pistols/config/networks'
 import { createTypedMessage } from 'src/starknet/starknet_sign'
-import { CommitMoveMessage } from 'src/exports/pistols'
+import { CommitMoveMessage } from 'src/games/pistols/misc/salt'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 //

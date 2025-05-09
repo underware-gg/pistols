@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react'
-import { init, SDKConfig } from '@dojoengine/sdk'
+import { init, SDK, SDKConfig } from '@dojoengine/sdk'
 import { DojoProvider } from '@dojoengine/core'
 import { useMemoAsync } from 'src/utils/hooks/useMemoAsync'
 import { useMounted } from 'src/utils/hooks/useMounted'
@@ -8,6 +8,7 @@ import { DojoNetworkConfig } from 'src/games/pistols/config/networks'
 import { useDeployedSystem } from 'src/dojo/hooks/useDojoSystem'
 import { createSystemCalls } from 'src/games/pistols/config/createSystemCalls'
 import { setupWorld } from 'src/games/pistols/generated/contracts.gen'
+import { PistolsSchemaType } from 'src/games/pistols/sdk/types_web'
 import * as models from 'src/games/pistols/generated/models.gen'
 
 export type SetupResult = ReturnType<typeof useSetup> | null
@@ -68,7 +69,7 @@ export function useSetup(dojoAppConfig: DojoAppConfig, selectedNetworkConfig: Do
       },
       domain: starknetDomain,
     }
-    const sdk = await init<models.SchemaType>(config);
+    const sdk: SDK<PistolsSchemaType> = await init<PistolsSchemaType>(config);
     console.log(`TORII CLIENT OK!`)
     return sdk
   }, [mounted, selectedNetworkConfig, manifest, starknetDomain, dojoProvider], undefined, null)

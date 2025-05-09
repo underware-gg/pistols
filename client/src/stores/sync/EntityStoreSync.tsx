@@ -1,5 +1,5 @@
 import { useSdkEntitiesSub, filterEntitiesByModel, entityHasModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
-import { PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols'
+import { PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
 import { useSeasonConfigStore } from '/src/stores/seasonStore'

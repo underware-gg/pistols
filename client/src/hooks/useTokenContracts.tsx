@@ -9,7 +9,7 @@ import {
   getPackTokenAddress,
   getDuelTokenAddress,
   getTournamentTokenAddress,
-} from '@underware/pistols-sdk/pistols'
+} from '@underware/pistols-sdk/pistols/config'
 
 export const useTokenContracts = () => {
   const { selectedNetworkId } = useStarknetContext()

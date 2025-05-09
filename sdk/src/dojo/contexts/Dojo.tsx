@@ -3,15 +3,11 @@ import { StarknetDomain, TypedData } from 'starknet'
 import { Connector } from '@starknet-react/core'
 import { Method } from '@cartridge/controller'
 import { NetworkId } from 'src/games/pistols/config/networks'
-import { Manifest } from '@dojoengine/core'
 import { StarknetProvider, useStarknetContext } from 'src/dojo/contexts/StarknetProvider'
+import { DojoManifest } from 'src/games/pistols/config/config'
 import { DojoProvider } from 'src/dojo/contexts/DojoContext'
 import { DojoStatus } from 'src/dojo/contexts/DojoStatus'
 import { useSetup } from 'src/dojo/setup/useSetup'
-
-// TODO: Manifest is outdated???
-// export type DojoManifest = Manifest
-export type DojoManifest = Manifest & any
 
 export type ContractPolicyDescriptions = {
   [contract_name: string]: {

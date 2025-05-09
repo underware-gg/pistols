@@ -5,7 +5,7 @@ import { useSdkPublishTypedData, useStarknetContext } from '@underware/pistols-s
 import {
   make_typed_data_PlayerBookmark,
   make_typed_data_PlayerOnline,
-} from '@underware/pistols-sdk/pistols'
+} from '@underware/pistols-sdk/pistols/dojo'
 
 
 export function usePlayerOnlineSignedMessage(timestamp: number) {

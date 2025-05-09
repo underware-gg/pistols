@@ -1,10 +1,5 @@
-export * from '../games/pistols/config/config'
-export * from '../games/pistols/config/createSystemCalls'
-export * from '../games/pistols/config/duel_progress'
-export * from '../games/pistols/config/networks'
-export * from '../games/pistols/config/signed_messages'
-export * from '../games/pistols/config/types'
 export * from '../games/pistols/misc/helpers'
+export * from '../games/pistols/misc/duel_progress'
 export * from '../games/pistols/misc/profiles'
 export * from '../games/pistols/misc/salt'
 // in sync with cairo sources

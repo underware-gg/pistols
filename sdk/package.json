@@ -59,21 +59,33 @@
       "import": "./dist/pistols.js",
       "types": "./dist/pistols.d.ts"
     },
-    "./pistols/gen": {
-      "import": "./dist/pistols_gen.js",
-      "types": "./dist/pistols_gen.d.ts"
+    "./pistols/config": {
+      "import": "./dist/pistols_config.js",
+      "types": "./dist/pistols_config.d.ts"
     },
     "./pistols/components": {
       "import": "./dist/pistols_components.js",
       "types": "./dist/pistols_components.d.ts"
     },
-    "./pistols/controller": {
-      "import": "./dist/pistols_controller.js",
-      "types": "./dist/pistols_controller.d.ts"
-    },
     "./pistols/constants": {
       "import": "./dist/pistols_constants.js",
       "types": "./dist/pistols_constants.d.ts"
+    },
+    "./pistols/dojo": {
+      "import": "./dist/pistols_dojo.js",
+      "types": "./dist/pistols_dojo.d.ts"
+    },
+    "./pistols/gen": {
+      "import": "./dist/pistols_gen.js",
+      "types": "./dist/pistols_gen.d.ts"
+    },
+    "./pistols/node": {
+      "import": "./dist/pistols_node.js",
+      "types": "./dist/pistols_node.d.ts"
+    },
+    "./pistols/sdk": {
+      "import": "./dist/pistols_sdk.js",
+      "types": "./dist/pistols_sdk.d.ts"
     },
     "./pistols/tokens": {
       "import": "./dist/pistols_tokens.js",

@@ -4,7 +4,7 @@ import { createDojoStore } from '@dojoengine/sdk/react'
 import { isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { formatQueryValue, useEntityModel, useSdkEntitiesGet, useEntityId } from '@underware/pistols-sdk/dojo'
-import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols'
+import { PistolsSchemaType, PistolsQueryBuilder, PistolsEntity, PistolsClauseBuilder } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const usePackStore = createDojoStore<PistolsSchemaType>();

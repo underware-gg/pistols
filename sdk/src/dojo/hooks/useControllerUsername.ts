@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BigNumberish } from 'starknet'
 import { lookupAddresses } from '@cartridge/controller'
-import { bigintToHex, isPositiveBigint } from 'src/exports/utils'
+import { bigintToHex, isPositiveBigint } from 'src/utils/misc/types'
 
 export function useControllerUsername(address: BigNumberish) {
   const { usernames, isLoading } = useControllerUsernames(address)
