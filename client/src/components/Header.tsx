@@ -19,7 +19,7 @@ import { usePlayerDuelistsOrganized } from './PlayerDuelistsOrganized'
 
 function DuelistStats() {
   // const { duelistIds } = useDuelistsOfPlayer();
-  const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized();
+  const { activeDuelists: duelistIds, deadDuelists } = usePlayerDuelistsOrganized();
   const { address } = useAccount();
   
   // Refs to store duelist data
@@ -67,11 +67,13 @@ function DuelistStats() {
         totalHonour: 0,
         duelistsWithHonour: 0
       });
+
+      aggregated.dead = deadDuelists.length;
       
       setStats(aggregated);
       setDataLoaded(true);
     }
-  }, [duelistIds.length]);
+  }, [duelistIds.length, deadDuelists.length]);
   
   // Handle data loaded from each DuelistData component
   const handleDuelistDataLoad = useCallback((data: DuelistDataValues) => {
