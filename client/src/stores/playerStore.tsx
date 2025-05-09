@@ -18,6 +18,7 @@ export interface PlayerState {
   name: string
   isNew: boolean
   totals: models.Totals
+  aliveDuelistCount: number
   // off-chain messages
   bookmarked_players: string[]
   bookmarked_tokens: {
@@ -34,21 +35,22 @@ interface State {
   players: PlayersByAddress,
   players_online: TimestampByAddress,
   setEntities: (entities: PistolsEntity[]) => void;
-  updateEntity: (event: PistolsEntity) => void;
+  updateEntity: (entity: PistolsEntity) => void;
   updateMessages: (entities: PistolsEntity[]) => void;
   updateUsernames: (usernames: Map<string, string>) => void;
 }
 
 const createStore = () => {
-  const _parseEvent = (e: PistolsEntity): PlayerState => {
-    const event = e.models.pistols.Player
-    return isPositiveBigint(event?.player_address) ? {
-      player_address: bigintToHex(event.player_address),
-      timestamp_registered: bigintToNumber(event.timestamps.registered),
-      username: shortAddress(event.player_address),
-      name: shortAddress(event.player_address),
+  const _parseEntity = (e: PistolsEntity): PlayerState | undefined => {
+    const model: Partial<models.Player> | undefined = e.models.pistols.Player
+    return isPositiveBigint(model?.player_address) ? {
+      player_address: bigintToHex(model.player_address),
+      timestamp_registered: bigintToNumber(model.timestamps.registered),
+      username: shortAddress(model.player_address),
+      name: shortAddress(model.player_address),
       isNew: true,
-      totals: event.totals,
+      totals: model.totals,
+      aliveDuelistCount: bigintToNumber(model.alive_duelist_count),
       // off-chain messages
       bookmarked_players: [],
       bookmarked_tokens: {},
@@ -63,7 +65,7 @@ const createStore = () => {
         state.players = entities.sort((a, b) => (
           Number(b.models.pistols.Player?.timestamps.registered ?? 0) - Number(a.models.pistols.Player?.timestamps.registered ?? 0)
         )).reduce((acc, e) => {
-          const player = _parseEvent(e)
+          const player = _parseEntity(e)
           if (player) {
             acc[player.player_address] = player
           }
@@ -75,7 +77,7 @@ const createStore = () => {
       // console.log("updateEntity()[Player] =>", e)
       set((state: State) => {
         // only insert!
-        const player = _parseEvent(e)
+        const player = _parseEntity(e)
         if (!state.players[player.player_address]) {
           state.players[player.player_address] = player
         }
@@ -154,6 +156,7 @@ export const usePlayer = (address: BigNumberish) => {
   const username = useMemo(() => (player?.username ?? undefined), [player])
   const name = useMemo(() => (player?.name ?? 'Unknown'), [player])
   const timestampRegistered = useMemo(() => (player?.timestamp_registered ?? 0), [player])
+  const aliveDuelistCount = useMemo(() => (player?.aliveDuelistCount ?? 0), [player])
   const bookmarkedPlayers = useMemo(() => (player?.bookmarked_players ?? []), [player])
   const bookmarkedTokens = useMemo(() => (player?.bookmarked_tokens ?? {}), [player])
   const totals = useTotals(player?.totals)
@@ -177,6 +180,7 @@ export const usePlayer = (address: BigNumberish) => {
     username,
     name,
     timestampRegistered,
+    aliveDuelistCount,
     bookmarkedPlayers,
     bookmarkedTokens,
     bookmarkedDuels,

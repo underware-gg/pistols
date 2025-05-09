@@ -56,8 +56,9 @@ function Players() {
       <Header>
         <Row className='H5'>
           <HeaderCell><h3 className='Important'>Registered</h3></HeaderCell>
-          <HeaderCell><h3 className='Important'>Username</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Address</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Username</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Alive Duelists</h3></HeaderCell>
           <HeaderCell><h3 className='Important'></h3></HeaderCell>
           <HeaderCell><h3 className='Important'>$LORDS</h3></HeaderCell>
         </Row>
@@ -76,7 +77,7 @@ function PlayerRow({
 }: {
   address: BigNumberish,
 }) {
-  const { isNew, username, timestampRegistered } = usePlayer(address)
+  const { isNew, username, timestampRegistered, aliveDuelistCount } = usePlayer(address)
   const ready = useDelay(true, 2000) // wait to batch fetch
   return (
     <Row className='H5 Number'>
@@ -84,10 +85,13 @@ function PlayerRow({
         {formatTimestampLocal(timestampRegistered)}
       </Cell>
       <Cell>
+        <Address address={address} />
+      </Cell>
+      <Cell>
         {isNew ? '...' : (username || '?')}
       </Cell>
       <Cell>
-        <Address address={address} full />
+        {aliveDuelistCount}
       </Cell>
       <Cell>
         <ExplorerLink address={address} voyager />
