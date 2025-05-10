@@ -20,6 +20,7 @@ import { useIsMyAccount } from '/src/hooks/useIsYou';
 import { useDuelistSeasonStats } from '/src/stores/challengeQueryStore';
 import { useSeason, useAllSeasonIds, useLeaderboard } from '/src/stores/seasonStore';
 import { useSeasonTotals } from '/src/hooks/useSeason';
+import { ethToWei } from '@underware/pistols-sdk/starknet';
 
 export default function ScLeaderboards() {
   const { aspectWidth, aspectHeight } = useGameAspect();
@@ -47,6 +48,10 @@ export default function ScLeaderboards() {
     const { clientTimestamp } = useClientTimestamp(isActive);
     const { accountsCount } = useSeasonTotals(season);
     const poolSeason = useSeasonPool(season);
+
+    useEffect(() => {
+      console.log(`SeasonR`, poolSeason)
+    }, [poolSeason])
     
     const timeLeft = useMemo(() => {
       if (!timestamp_end) return 'Unknown';
@@ -100,7 +105,7 @@ export default function ScLeaderboards() {
           <Grid.Column width={4}>
             <div style={{ fontSize: aspectWidth(0.9), color: '#888' }}>Prize Pool:</div>
             <div style={{ fontSize: aspectWidth(1.1), fontWeight: 'bold', color: 'white' }}>
-              <Balance lords wei={poolSeason.balanceLords} />
+              <Balance lords wei={poolSeason.balanceLords + ((poolSeason.balanceFame / 3000n) * 10n)} />
             </div>
           </Grid.Column>
           
@@ -117,16 +122,16 @@ export default function ScLeaderboards() {
     );
   }
 
-  function PlayerRow({ duelistId, rank, score, isMe = false }: { 
+  function PlayerRow({ duelistId, rank, score }: { 
     duelistId: BigNumberish, 
     rank: number, 
     score: number,
-    isMe?: boolean 
   }) {
     const [isHovered, setIsHovered] = useState(false);
     const { name: duelistName, profilePic: duelistProfilePic, isDead } = useDuelist(duelistId);
     const { owner } = useOwnerOfDuelist(duelistId);
     const { name: playerName } = usePlayer(owner);
+    const { isMyAccount: isMe } = useIsMyAccount(owner);
 
     // TODO: Get actual season stats for this duelist
     const seasonStats = useDuelistSeasonStats(duelistId, selectedSeasonId);
@@ -167,6 +172,8 @@ export default function ScLeaderboards() {
             <div style={{ width: aspectWidth(0.05), height: '100%', backgroundColor: 'white', opacity: 0.3, marginRight: aspectWidth(0.6) }} />
             <ProfilePic profilePic={duelistProfilePic} profileType={constants.DuelistProfile.Genesis} width={2.5} />
             <div style={{ marginLeft: aspectWidth(1), fontSize: aspectWidth(0.8), color: '#888', overflow: 'hidden', textOverflow: 'ellipsis' }}>{duelistName}</div>
+            <img id='DuelistDeadOverlayLeaderboard' className={ `${isDead ? 'visible' : ''}`} src='/textures/cards/card_disabled.png' />
+            <div id='DuelistDeadOverlayLeaderboard' className={ `${isDead ? 'visible filter' : ''}`} />
           </Grid.Column>
 
           <Grid.Column width={2}>
@@ -588,8 +595,6 @@ export default function ScLeaderboards() {
                       duelistId={entry.duelistId}
                       rank={startIndex + index + 1}
                       score={entry.score}
-                      // TODO: Detect if this is the current user's duelist
-                      isMe={false}
                     />
                   ))}
                 </div>
