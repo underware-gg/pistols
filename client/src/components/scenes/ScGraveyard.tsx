@@ -136,18 +136,17 @@ export default function ScGraveyard() {
         ref.current.setPostersData(getDuelsForPage((renderOrder == 0 ? -1 : (renderOrder == 2 ? 1 : 0))))
       }
     })
-  }, [allDuelPosters])
 
-  const initialLoad = useRef(true)
-  useEffect(() => {
-    if (posterRefs.current) {
-      setTimeout(() => {
-        Object.entries(posterRefs.current).forEach(([key, ref]) => {
-          posterRefs.current[Number(key)].toggleVisibility(true)
-        })
+    const visibilityTimeout = setTimeout(() => {
+      Object.entries(posterRefs.current).forEach(([key, ref]) => {
+        if (ref) {
+          ref.toggleVisibility(true)
+        }
+      })
+    }, 100)
 
-        initialLoad.current = false
-      }, initialLoad.current ? 10 : 300)
+    return () => {
+      clearTimeout(visibilityTimeout)
     }
   }, [allDuelPosters])
 
@@ -157,9 +156,15 @@ export default function ScGraveyard() {
     
     const targetX = direction === 'left' ? -100 : 100;
     const startX = direction === 'left' ? 100 : -100;
+    const duration = 1000
+
+    // First ensure all posters are visible before animation
+    Object.values(posterRefs.current).forEach(ref => {
+      if (ref) ref.toggleVisibility(true)
+    })
 
     mainTween.current = new TWEEN.Tween({ x: 0 })
-      .to({ x: targetX }, 1200)
+      .to({ x: targetX }, duration)
       .easing(TWEEN.Easing.Quadratic.InOut)
       .onUpdate(({x}) => {
         if (gridRefs.current[centerGridIndex].ref.current) {
@@ -169,7 +174,7 @@ export default function ScGraveyard() {
       .start()
 
     secondTween.current = new TWEEN.Tween({ x: startX })
-      .to({ x: 0 }, 1200)
+      .to({ x: 0 }, duration)
       .easing(TWEEN.Easing.Quadratic.InOut)
       .onUpdate(({x}) => {
         if (gridRefs.current[movingGridIndex].ref.current) {
@@ -186,6 +191,12 @@ export default function ScGraveyard() {
           if (shiftedRef?.ref.current) {
             shiftedRef.ref.current.setTransformX(100)
             shiftedRef.ref.current.setPostersData(getDuelsForPage(newPage + 1))
+            // Ensure new posters are visible
+            setTimeout(() => {
+              Object.values(posterRefs.current).forEach(ref => {
+                if (ref) ref.toggleVisibility(true)
+              })
+            }, 50)
           }
         } else {
           gridRefs.current.forEach(grid => {
@@ -196,6 +207,12 @@ export default function ScGraveyard() {
           if (shiftedRef?.ref.current) {
             shiftedRef.ref.current.setTransformX(-100)
             shiftedRef.ref.current.setPostersData(getDuelsForPage(newPage - 1))
+            // Ensure new posters are visible
+            setTimeout(() => {
+              Object.values(posterRefs.current).forEach(ref => {
+                if (ref) ref.toggleVisibility(true)
+              })
+            }, 50)
           }
         }
         setPageNumber(newPage)
@@ -203,7 +220,7 @@ export default function ScGraveyard() {
       })
       .start();
 
-    (_currentScene as InteractibleScene)?.shiftImage(direction === 'left')
+    (_currentScene as InteractibleScene)?.shiftImage(direction === 'left', duration)
   }
 
   const handlePageChange = (newPage: number) => {

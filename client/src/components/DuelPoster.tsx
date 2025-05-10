@@ -199,7 +199,10 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
   useEffect(() => {
     if (!props.isSmall) return
 
-    if ((isYouA && turnA) || (isYouB && turnB) || isCallToAction) {
+    if ((isYouA && turnA) || (isYouB && turnB)) {
+      setCardColor(CardColor.PURPLE)
+      baseRef.current?.toggleBlink(true)
+    } else if (isFinished && isCallToAction) {
       setCardColor(CardColor.PURPLE)
       baseRef.current?.toggleBlink(true)
     } else {
