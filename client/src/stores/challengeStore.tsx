@@ -6,7 +6,7 @@ import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder, PistolsEn
 import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
-import { isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintToDecimal, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
@@ -208,7 +208,11 @@ export const useGetChallenge = (duel_id: BigNumberish) => {
       ? new PistolsQueryBuilder()
         .withClause(
           new PistolsClauseBuilder().keys(
-            ["pistols-Challenge"],
+            [
+              "pistols-Challenge",
+              "pistols-ChallengeMessage",
+              'pistols-Round',
+            ],
             [formatQueryValue(duel_id)]
           ).build()
         )
