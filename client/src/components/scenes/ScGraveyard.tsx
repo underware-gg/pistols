@@ -83,11 +83,16 @@ export default function ScGraveyard() {
 
   const allDuelPosters = useMemo(() => {
     const posters = new Map<bigint, JSX.Element>()
-
-    Object.values(posterRefs.current).forEach(posterRef => {
-      posterRef?.toggleVisibility(false)
-    })
     
+    const currentIds = new Set(challengeIds.map(id => Number(id)))
+    
+    Object.keys(posterRefs.current).forEach(key => {
+      const numKey = Number(key)
+      if (!currentIds.has(numKey)) {
+        delete posterRefs.current[numKey]
+      }
+    })
+
     const createPoster = (duel: bigint) => (
       <div 
         key={duel} 
@@ -118,18 +123,17 @@ export default function ScGraveyard() {
     )
 
     challengeIds.forEach(duel => {
-      if (!posters.has(duel)) {
-        posters.set(duel, createPoster(duel))
-      }
+      posters.set(duel, createPoster(duel))
     })
 
     return posters
   }, [challengeIds, aspectWidth, aspectHeight])
 
   useEffect(() => {
+    setPageNumber(0)
+    
     gridRefs.current.forEach(({ref}, index) => {
       if (ref.current) {
-        setPageNumber(0)
         const renderOrder = gridRefs.current[index].renderOrder
         const translateX = (renderOrder - 1) * 100
         ref.current.setTransformX(translateX)
@@ -141,6 +145,7 @@ export default function ScGraveyard() {
       Object.entries(posterRefs.current).forEach(([key, ref]) => {
         if (ref) {
           ref.toggleVisibility(true)
+          ref.setScale(1)
         }
       })
     }, 100)
