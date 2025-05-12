@@ -66,8 +66,8 @@ mod PACK_TYPES {
     pub const GenesisDuelists5x: PackDescription = PackDescription {
         id: 'GenesisDuelists5x',
         name: 'Duelists 5-pack',
-        image_url_closed: '/tokens/GenesisDuelists5x.jpg',
-        image_url_open: '/tokens/GenesisDuelists5x.jpg',
+        image_url_closed: '/tokens/GenesisDuelists5x.png',
+        image_url_open: '/tokens/GenesisDuelists5x.png',
         can_purchase: true,
         price_lords: 50 * CONST::ETH_TO_WEI.low,
         quantity: 5,

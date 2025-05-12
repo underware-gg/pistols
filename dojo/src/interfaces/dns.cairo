@@ -152,6 +152,8 @@ pub impl DnsImpl of DnsTrait {
     //
     #[inline(always)]
     fn is_world_contract(self: @WorldStorage, contract_address: ContractAddress) -> bool {
+        // TODO: use safe dispatchers
+        // https://book.cairo-lang.org/ch102-02-interacting-with-another-contract.html#handling-errors-with-safe-dispatchers
         (contract_address == self.find_contract_address(
             @self.find_contract_name(contract_address)
         ))
