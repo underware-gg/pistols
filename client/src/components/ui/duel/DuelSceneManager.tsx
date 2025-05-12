@@ -117,14 +117,16 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
         setTimeout(pollForData, 100);
         return;
       }
-      
+
+      const duelistLeft = context.isYouA ? context.leftDuelist.id : context.isYouB ? context.rightDuelist.id : context.leftDuelist.id
+      const duelistRight = context.isYouA ? context.rightDuelist.id : context.isYouB ? context.leftDuelist.id : context.rightDuelist.id
       // Initialize scene
       if (!didSceneInit.current) {
         try {          
           gameImpl.setDuelData(
             Number(duelId), 
-            Number(context.leftDuelist.id), 
-            Number(context.rightDuelist.id)
+            Number(duelistLeft), 
+            Number(duelistRight)
           );
           gameImpl.resetDuelScene(false, true);
           

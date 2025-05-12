@@ -4,6 +4,7 @@ import GUI from 'lil-gui'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
 import TWEEN from '@tweenjs/tween.js'
 //@ts-ignore
@@ -865,8 +866,11 @@ function setEnvironment(scene: THREE.Scene) { //TODO add skymap
 }
 
 function loadGltf(scene: THREE.Scene) {
-  const loader = new GLTFLoader();
+  var dracoLoader = new DRACOLoader();
+  dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
 
+  const loader = new GLTFLoader();
+  loader.setDRACOLoader( dracoLoader );
   loader.load(
     '/models/Duel_3_water_y.glb',
     function (gltf) {

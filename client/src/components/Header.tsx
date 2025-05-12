@@ -19,7 +19,7 @@ import { usePlayerDuelistsOrganized } from './PlayerDuelistsOrganized'
 
 function DuelistStats() {
   // const { duelistIds } = useDuelistsOfPlayer();
-  const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized();
+  const { activeDuelists: duelistIds, deadDuelists } = usePlayerDuelistsOrganized();
   const { address } = useAccount();
   
   // Refs to store duelist data
@@ -67,11 +67,13 @@ function DuelistStats() {
         totalHonour: 0,
         duelistsWithHonour: 0
       });
+
+      aggregated.dead = deadDuelists.length;
       
       setStats(aggregated);
       setDataLoaded(true);
     }
-  }, [duelistIds.length]);
+  }, [duelistIds.length, deadDuelists.length]);
   
   // Handle data loaded from each DuelistData component
   const handleDuelistDataLoad = useCallback((data: DuelistDataValues) => {
@@ -97,36 +99,6 @@ function DuelistStats() {
     const avg = stats.totalHonour / (stats.duelistsWithHonour * 10);
     return avg.toFixed(1);
   }, [stats.totalHonour, stats.duelistsWithHonour]);
-
-  // Style for stat items
-  const statItemStyle = {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    padding: '0 15px',
-    position: 'relative' as const
-  };
-  
-  const statValueStyle = {
-    fontSize: '1.4em',
-    fontWeight: 'bold' as const,
-    color: '#f1d242'
-  };
-  
-  const statLabelStyle = {
-    fontSize: '0.8em',
-    color: '#e6aa0e',
-    marginTop: '4px'
-  };
-  
-  const dividerStyle = {
-    position: 'absolute' as const,
-    right: 0,
-    top: '15%',
-    height: '70%',
-    width: '1px',
-    background: 'rgba(241, 210, 66, 0.3)'
-  };
 
   return (
     <>
@@ -173,36 +145,41 @@ function DuelistStats() {
           <span style={{ marginLeft: '10px' }}>Loading duelist data...</span>
         </div>
       ) : (
-        <>
-          <div style={statItemStyle}>
-            <span style={statValueStyle}>{stats.total}</span>
-            <span style={statLabelStyle}>ACTIVE DUELISTS</span>
-            <div style={dividerStyle}></div>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%',
+          gap: '10px'
+        }}>
+          <div className="header-duelist-stat-item">
+            <span className="header-duelist-stat-value">{stats.total + stats.dead}</span>
+            <span className="header-duelist-stat-label">TOTAL DUELISTS</span>
+            <div className="header-duelist-stat-divider"></div>
           </div>
           
-          <div style={statItemStyle}>
-            <span style={statValueStyle}>{stats.alive}</span>
-            <span style={statLabelStyle}>ALIVE</span>
-            <div style={dividerStyle}></div>
+          <div className="header-duelist-stat-item">
+            <span className="header-duelist-stat-value">{stats.alive}</span>
+            <span className="header-duelist-stat-label">ALIVE & ACTIVE</span>
+            <div className="header-duelist-stat-divider"></div>
           </div>
           
-          <div style={statItemStyle}>
-            <span style={statValueStyle}>{stats.dead}</span>
-            <span style={statLabelStyle}>FALLEN</span>
-            <div style={dividerStyle}></div>
+          <div className="header-duelist-stat-item">
+            <span className="header-duelist-stat-value">{stats.dead}</span>
+            <span className="header-duelist-stat-label">FALLEN</span>
+            <div className="header-duelist-stat-divider"></div>
           </div>
           
-          <div style={statItemStyle}>
-            <span style={statValueStyle}>{winRate}</span>
-            <span style={statLabelStyle}>WIN RATE</span>
-            <div style={dividerStyle}></div>
+          <div className="header-duelist-stat-item">
+            <span className="header-duelist-stat-value">{winRate}</span>
+            <span className="header-duelist-stat-label">WIN RATE</span>
+            <div className="header-duelist-stat-divider"></div>
           </div>
           
-          <div style={statItemStyle}>
-            <span style={statValueStyle}>{avgHonour}</span>
-            <span style={statLabelStyle}>AVG HONOUR</span>
+          <div className="header-duelist-stat-item">
+            <span className="header-duelist-stat-value">{avgHonour}</span>
+            <span className="header-duelist-stat-label">AVG HONOUR</span>
           </div>
-        </>
+        </div>
       )}
     </>
   );
@@ -620,22 +597,22 @@ function CurtainUI({
               WebkitBackgroundClip: 'text',
               color: 'transparent',
               textShadow: '0 0 10px rgba(241, 210, 66, 0.5)',
-              fontSize: '2em',
+              fontSize: aspectWidth(2),
               fontWeight: 'bold',
-              letterSpacing: '3px',
+              letterSpacing: aspectWidth(0.3),
               transform: 'scale(1.2)',
-              padding: '10px 0',
+              padding: `${aspectWidth(1)} 0`,
               position: 'relative',
               animation: 'glow 2s ease-in-out infinite alternate'
             }}>
               GENESIS COLLECTION
               <div style={{
                 position: 'absolute',
-                height: '2px',
+                height: aspectWidth(0.2),
                 background: 'linear-gradient(90deg, transparent 0%, #f1d242 30%, #f1d242 70%, transparent 100%)',
                 width: '100%',
-                bottom: '5px',
                 left: '0',
+                marginTop: aspectWidth(0.2),
                 animation: 'shimmer 3s infinite'
               }}></div>
               <style>
@@ -666,10 +643,10 @@ function CurtainUI({
           <div style={{
             display: 'flex',
             justifyContent: 'center',
-            marginTop: '10px',
-            gap: '25px',
+            marginTop: aspectWidth(1.3),
+            gap: aspectWidth(2.5),
             color: '#f1d242',
-            fontSize: '1.1em'
+            fontSize: aspectWidth(1.1)
           }}>
             <DuelistStats />
           </div>

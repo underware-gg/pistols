@@ -2749,3 +2749,43 @@ a.active.step:hover,
   width: aspect-width(30);
   text-align: center;
 }
+
+.header-duelist-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 aspect-width(1.5);
+  position: relative;
+  width: aspect-width(12);
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+}
+
+.header-duelist-stat-value {
+  font-size: aspect-width(1.4);
+  font-weight: bold;
+  color: $color-warning;
+  width: 100%;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.header-duelist-stat-label {
+  font-size: aspect-width(0.8);
+  color: #e6aa0e;
+  margin-top: aspect-width(0.4);
+  width: 100%;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.header-duelist-stat-divider {
+  position: absolute;
+  right: 0;
+  top: 15%;
+  height: 70%;
+  width: aspect-width(0.1);
+  background: rgba(241, 210, 66, 0.3);
+}

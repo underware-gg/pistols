@@ -15,15 +15,14 @@ import { LiveChallengeStates, PastChallengeStates } from '/src/utils/pistols'
 
 const useGetChallengesBySeasonQuery = (seasonId: BigNumberish) => {
   const query = useMemoGate<PistolsQueryBuilder>(() => (
-    new PistolsQueryBuilder()
+     new PistolsQueryBuilder()
       .withClause(
         new PistolsClauseBuilder().where(
-          "pistols-Challenge", "season_id", "Eq", formatQueryValue(seasonId),
+          "pistols-Challenge", "season_id", "Eq", seasonId,
         ).build()
       )
-      .withEntityModels([
-        "pistols-Challenge",
-      ])
+      .withEntityModels(['pistols-Challenge', 'pistols-Round'])
+      .withLimit(10000)
       .includeHashedKeys()
   ), [seasonId])
   const { entities } = useSdkStateEntitiesGet({ query })

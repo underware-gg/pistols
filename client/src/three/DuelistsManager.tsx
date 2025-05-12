@@ -196,7 +196,7 @@ export class DuelistsManager {
     this.clearAnimationTimeouts(isA ? this.showActorTimeoutA : this.showActorTimeoutB)
     
     if (this.duelistsSpawned) {
-      this.onLoadCompleteCallback()
+      this.onLoadCompleteCallback?.()
       this.showActor(isA)
       if (isA) {
         this.spawnHighlightA()
@@ -218,7 +218,7 @@ export class DuelistsManager {
         this.animateExplosion(isA)
         
         showActorTimeout = setTimeout(() => {
-          this.onLoadCompleteCallback()
+          this.onLoadCompleteCallback?.()
           this.showActor(isA)
           if (isA) {
             this.spawnHighlightA()

@@ -5,11 +5,11 @@ import { BigNumberish } from 'starknet'
 import { useAccount } from '@starknet-react/core'
 import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
 import { useCallToActions } from './eventsModelStore'
-import { usePlayer } from '/src/stores/playerStore'
+import { usePlayer, usePlayerStore } from '/src/stores/playerStore'
 import { ChallengeColumn, SortDirection } from '/src/stores/queryParamsStore'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
-import { bigintEquals, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { bigintEquals, bigintToHex, bigintToNumber, isPositiveBigint } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { keysToEntityId, getEntityModel } from '@underware/pistols-sdk/dojo'
 import { useChallengeStore } from './challengeStore'
@@ -105,6 +105,7 @@ export const useQueryChallengeIds = (
 
   const entities = useChallengeQueryStore((state) => state.entities);
   const duelistEntities = useDuelistQueryStore((state) => state.entities);
+  const playerEntities = usePlayerStore((state) => state.players);
   const targetId = useMemo(() => (isPositiveBigint(playerAddressOrDuelistId) ? BigInt(playerAddressOrDuelistId) : 0n), [playerAddressOrDuelistId, duelistEntities])
 
   const [challengeIds, states, challengePlayerMap] = useMemo(() => {
@@ -145,9 +146,12 @@ export const useQueryChallengeIds = (
 
     // filter by name
     if (filterName) {
+      const filterNameLower = filterName.toLowerCase();
       result = result.filter((e) => (
-        duelistEntities[e.duelist_entity_id_a]?.name?.includes(filterName) ||
-        duelistEntities[e.duelist_entity_id_b]?.name?.includes(filterName)
+        duelistEntities[e.duelist_entity_id_a]?.name?.toLowerCase().includes(filterNameLower) ||
+        duelistEntities[e.duelist_entity_id_b]?.name?.toLowerCase().includes(filterNameLower) ||
+        playerEntities[bigintToHex(e.address_a)]?.name?.toLowerCase().includes(filterNameLower) ||
+        playerEntities[bigintToHex(e.address_b)]?.name?.toLowerCase().includes(filterNameLower)
       ))
     }
 
