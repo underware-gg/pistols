@@ -580,12 +580,12 @@ export class InteractibleScene extends THREE.Scene {
       .start();
   }
 
-  public shiftImage(isLeft: boolean) {
+  public shiftImage(isLeft: boolean, duration: number = 1200) {
     this.setClickable(false);
     
     const shiftAmount = { value: 0 };
     new TWEEN.Tween(shiftAmount)
-      .to({ value: isLeft ? 1 : -1 }, 1200)
+      .to({ value: isLeft ? 1 : -1 }, duration)
       .easing(TWEEN.Easing.Quadratic.InOut)
       .onStart(() => {
         this.setClickable(false);
