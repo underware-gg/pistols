@@ -74,6 +74,7 @@ const _useSdkGet = (prefix: string, {
       setIsLoading(true)
       try {
         let currentPage = 0;
+        let lastCursor = undefined;
         while (query) {
           const response: PistolsToriiResponse = await fn({ query });
           if (!_mounted) return
@@ -82,10 +83,17 @@ const _useSdkGet = (prefix: string, {
           if (entities.length > 0) {
             // console.log(`${prefix} GOT>>>>>>>>>>>>`, entities)
             setEntities(entities)
-            query = response.cursor ? response.getNextQuery(query) : null
-          } else if (currentPage == 0 && retryInterval > 0) {
-            console.log(`${prefix} retry...`, retryInterval)
-            setTimeout(() => _get(), retryInterval)
+            query = (
+              response.cursor && // has next cursor
+              response.cursor != lastCursor // avoid sdk sending repeated cursor
+            ) ? response.getNextQuery(query) : null
+            lastCursor = response.cursor
+          } else {
+            query = null
+            if (currentPage == 0 && retryInterval > 0) {
+              console.log(`${prefix} retry...`, retryInterval)
+              setTimeout(() => _get(), retryInterval)
+            }
           }
           currentPage++;
         }
