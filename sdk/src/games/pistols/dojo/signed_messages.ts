@@ -89,28 +89,3 @@ export function make_typed_data_PlayerBookmark({
   )
 }
 
-
-//
-// example: from...
-//
-// export enum TutorialProgress {
-//   None = 'None', // 0
-//   FinishedFirst = 'FinishedFirst', // 1
-//   FinishedSecond = 'FinishedSecond', // 2
-//   FinishedFirstDuel = 'FinishedFirstDuel', // 3
-// };
-//
-// to...
-// TutorialProgress: [
-//   { name: 'None', type: '()' },
-//   { name: 'FinishedFirst', type: '()' },
-//   { name: 'FinishedSecond', type: '()' },
-//   { name: 'FinishedFirstDuel', type: '()' },
-// ]
-//
-function makeEnumType(enumNames: string[]): StarknetType[] {
-  return enumNames.map(name => ({
-    name,
-    type: '()',
-  }))
-}

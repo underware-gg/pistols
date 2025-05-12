@@ -42,7 +42,7 @@ export const useSdkPublishTypedData = (
 
       setIsPublishing(true)
 
-      // console.log('ONLINE: publish...', message, typedData)
+      // console.log('ONLINE: publish...', typedData)
       // await sdk.sendMessage(typedData, account)
 
       try {

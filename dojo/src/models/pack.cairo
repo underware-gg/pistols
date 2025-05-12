@@ -65,7 +65,7 @@ mod PACK_TYPES {
     };
     pub const GenesisDuelists5x: PackDescription = PackDescription {
         id: 'GenesisDuelists5x',
-        name: 'Duelists 5-pack',
+        name: 'Genesis Duelists 5-pack',
         image_url_closed: '/tokens/GenesisDuelists5x.png',
         image_url_open: '/tokens/GenesisDuelists5x.png',
         can_purchase: true,
