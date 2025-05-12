@@ -745,9 +745,9 @@ export const PACK_TYPES: type_PACK_TYPES = {
   },
   GenesisDuelists5x: {
     id: 'GenesisDuelists5x',
-    name: 'Duelists 5-pack',
-    image_url_closed: '/tokens/GenesisDuelists5x.jpg',
-    image_url_open: '/tokens/GenesisDuelists5x.jpg',
+    name: 'Genesis Duelists 5-pack',
+    image_url_closed: '/tokens/GenesisDuelists5x.png',
+    image_url_open: '/tokens/GenesisDuelists5x.png',
     can_purchase: true,
     price_lords: (50n * CONST.ETH_TO_WEI),
     quantity: 5,

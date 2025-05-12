@@ -104,7 +104,7 @@ export RPC_URL=${STARKNET_RPC_URL:-$(get_profile_env "rpc_url")}
 export MANIFEST_FILE_PATH="./manifest_$PROFILE.json"
 export BINDINGS_PATH="./bindings"
 export SDK_GAME_PATH="../sdk/src/games/$GAME_SLUG"
-export SDK_MANIFEST_PATH="$SDK_GAME_PATH/manifests"
+export SDK_MANIFEST_PATH="$SDK_GAME_PATH/config/manifests"
 
 # contracts
 export ADMIN_ADDRESS=$(get_contract_address "pistols-admin")
