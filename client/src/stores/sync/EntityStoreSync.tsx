@@ -5,7 +5,7 @@ import { useConfigStore } from '/src/stores/configStore'
 import { useSeasonConfigStore } from '/src/stores/seasonStore'
 import { useTokenConfigStore } from '/src/stores/tokenConfigStore'
 import { usePlayerStore } from '/src/stores/playerStore'
-import { useDuelistStore } from '/src/stores/duelistStore'
+import { useDuelistStore, useDuelistStackStore } from '/src/stores/duelistStore'
 import { useDuelistQueryStore } from '/src/stores/duelistQueryStore'
 import { useChallengeStore } from '/src/stores/challengeStore'
 import { useChallengeQueryStore } from '/src/stores/challengeQueryStore'
@@ -97,6 +97,7 @@ export function EntityStoreSync() {
   // duelists
   const duelistState = useDuelistStore((state) => state)
   const duelistQueryState = useDuelistQueryStore((state) => state)
+  const duelistStackState = useDuelistStackStore((state) => state)
   // challenges
   const challengeState = useChallengeStore((state) => state)
   const challengeQueryState = useChallengeQueryStore((state) => state)
@@ -149,7 +150,7 @@ export function EntityStoreSync() {
     setEntities: (entities: PistolsEntity[]) => {
       console.log("EntityStoreSync() SET STACKS =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET STACKS =======> [PlayerDuelistStack]:", filterEntitiesByModel(entities, 'PlayerDuelistStack'))
-      duelistState.setEntities(entities)
+      duelistStackState.setEntities(entities)
     },
   })
 
@@ -192,7 +193,7 @@ export function EntityStoreSync() {
         duelistQueryState.updateEntity(entity)
       }
       if (entityHasModels(entity, ['PlayerDuelistStack'])) {
-        duelistState.updateEntity(entity)
+        duelistStackState.updateEntity(entity)
       }
       if (entityHasModels(entity, ['Challenge', 'ChallengeMessage', 'Round'])) {
         challengeState.updateEntity(entity)
@@ -211,6 +212,7 @@ export function EntityStoreSync() {
   // useEffect(() => console.log("EntityStoreSync() [seasonState.entities] =>", seasonState.entities), [seasonState.entities])
   // useEffect(() => console.log("EntityStoreSync() [tokenStore.entities] =>", tokenState.entities), [tokenState.entities])
   // useEffect(() => console.log("EntityStoreSync() [duelistStore.entities] =>", duelistState.entities), [duelistState.entities])
+  // useEffect(() => console.log("EntityStoreSync() [duelistStackStore.entities] =>", duelistStackState.entities), [duelistStackState.entities])
   // useEffect(() => console.log("EntityStoreSync() [playerState.players] =>", playerState.players), [playerState.players])
   // useEffect(() => console.log("EntityStoreSync() [playerState.players_online] =>", playerState.players_online), [playerState.players_online])
 

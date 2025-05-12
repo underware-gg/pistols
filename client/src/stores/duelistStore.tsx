@@ -11,10 +11,10 @@ import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
-import { useAccount } from '@starknet-react/core'
 import { useOwnerOfDuelist } from '../hooks/useTokenDuelists'
 
 export const useDuelistStore = createDojoStore<PistolsSchemaType>();
+export const useDuelistStackStore = createDojoStore<PistolsSchemaType>();
 
 // export const useAllDuelistsEntityIds = () => {
 //   const entities = useStore((state) => state.entities)
@@ -253,11 +253,10 @@ const _useDuelistStackEntityId = (address: BigNumberish, profileType: constants.
 }
 
 export const useDuelistStack = (duelist_id: BigNumberish) => {
-  const entities = useDuelistStore((state) => state.entities)
-
   // get duelist profile
+  const duelistEntities = useDuelistStore((state) => state.entities)
   const duelistEntityId = useEntityId([duelist_id])
-  const duelist = useEntityModel<models.Duelist>(entities[duelistEntityId], 'Duelist')
+  const duelist = useEntityModel<models.Duelist>(duelistEntities[duelistEntityId], 'Duelist')
   const {
     profileType,
     profileId,
@@ -265,8 +264,9 @@ export const useDuelistStack = (duelist_id: BigNumberish) => {
 
   // get stack
   const { owner } = useOwnerOfDuelist(duelist_id)
+  const stackEntities = useDuelistStackStore((state) => state.entities)
   const stackEntityId = _useDuelistStackEntityId(owner, profileType, profileId)
-  const stack = useEntityModel<models.PlayerDuelistStack>(entities[stackEntityId], 'PlayerDuelistStack')
+  const stack = useEntityModel<models.PlayerDuelistStack>(stackEntities[stackEntityId], 'PlayerDuelistStack')
 
   const activeDuelistId = useMemo(() => (stack?.active_duelist_id ?? undefined), [stack])
   const stackedDuelistIds = useMemo(() => (stack?.stacked_ids ?? []).map(id => Number(id)), [stack])
@@ -278,7 +278,3 @@ export const useDuelistStack = (duelist_id: BigNumberish) => {
     level,
   }
 }
-
-
-
-

@@ -55,7 +55,7 @@ function Players() {
     <Table celled color='orange'>
       <Header>
         <Row className='H5'>
-          <HeaderCell><h3 className='Important'>Registered</h3></HeaderCell>
+          <HeaderCell><h3 className='Important'>Registered ({playerAddresses.length})</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Address</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Username</h3></HeaderCell>
           <HeaderCell><h3 className='Important'>Alive Duelists</h3></HeaderCell>
