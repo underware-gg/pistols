@@ -2,9 +2,10 @@ import { BigNumberish } from 'starknet'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
-import { constants } from '@underware/pistols-sdk/pistols/gen'
+import { constants as C } from '@underware/pistols-sdk/pistols/gen'
 import { arrayClean, bigintToHex, bigintToNumber } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
+import { ac } from 'vitest/dist/chunks/reporters.d.79o4mouw.js'
 
 
 //-----------------------------------------
@@ -14,7 +15,7 @@ import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 export interface ActivityState {
   player_address: BigNumberish
   timestamp: number
-  activity: constants.Activity
+  activity: C.Activity
   identifier: bigint
   is_public: boolean
   index: number
@@ -31,27 +32,47 @@ const createStore = () => {
     return event ? {
       player_address: bigintToHex(event.player_address),
       timestamp: bigintToNumber(event.timestamp),
-      activity: parseEnumVariant<constants.Activity>(event.activity),
+      activity: parseEnumVariant<C.Activity>(event.activity),
       identifier: BigInt(event.identifier),
       is_public: event.is_public,
       index: index ?? 0,
     } : undefined
+  }
+  const _pushEvent = (state: State, activity: ActivityState) => {
+    if (activity) {
+      state.playerActivity = [
+        ...state.playerActivity
+          // remove older events of new activity
+          .filter((a) => !(
+            (
+              [C.Activity.MovesRevealed, C.Activity.MovesCommitted, C.Activity.ChallengeResolved, C.Activity.ChallengeDraw].includes(activity.activity)
+              && [C.Activity.MovesRevealed, C.Activity.MovesCommitted].includes(a.activity)
+            )
+            && a.identifier === activity.identifier
+            // && a.player_address === activity.player_address
+          )),
+        // add new event
+        activity,
+      ]
+    }
   }
   return create<State>()(immer((set) => ({
     playerActivity: [],
     setEvents: (events: PistolsEntity[]) => {
       console.log("historicalEventsStore() => SET:", events)
       set((state: State) => {
-        state.playerActivity = arrayClean(events.map((e, i) => _parseEvent(e, i)))
+        const activities = arrayClean(events.map((e, i) => _parseEvent(e, i)))
           // .sort((a, b) => (a.timestamp - b.timestamp))
-          .sort((a, b) => ((a.timestamp != b.timestamp) ? (a.timestamp - b.timestamp) : (b.index - a.index)))
+          // .sort((a, b) => ((a.timestamp != b.timestamp) ? (a.timestamp - b.timestamp) : (a.index - b.index)))
+          .sort((a, b) => (b.index - a.index))
+        state.playerActivity = [];
+        activities.forEach(a => _pushEvent(state, a))
       })
     },
     updateEvent: (e: PistolsEntity) => {
       console.log("historicalEventsStore() => UPDATE:", e)
       set((state: State) => {
-        const activity = _parseEvent(e)
-        if (activity) state.playerActivity.push(activity)
+        _pushEvent(state, _parseEvent(e))
       });
     },
   })))
