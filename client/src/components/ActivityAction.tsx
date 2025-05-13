@@ -1,45 +1,28 @@
 import React, { useMemo } from 'react'
 import { useAccount } from '@starknet-react/core'
 import { BigNumberish } from 'starknet'
-import { useDuelistsOfPlayer } from '/src/hooks/useTokenDuelists'
 import { useDuelist } from '/src/stores/duelistStore'
 import { usePlayer } from '/src/stores/playerStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useCallToActions } from '/src/stores/eventsModelStore'
 import { Icon, EmojiIcon } from '/src/components/ui/Icons'
 import { ChallengeLink, DuelistLink } from '/src/components/Links'
-import { bigintToHex } from '@underware/pistols-sdk/utils'
+import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
 import { usePlayerDuelistsOrganized } from './PlayerDuelistsOrganized'
 
-export const ActionIcon = (isActive: boolean) => {
-  // const { duelistIds } = useDuelistsOfPlayer()
-  const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized();
-  const { requiresAction, duelPerDuelist } = useCallToActions()
-  const replyOnly = useMemo(() => (
-    requiresAction && !Object.keys(duelPerDuelist).some((duelistId) => (duelistIds.includes(BigInt(duelistId))))
-  ), [requiresAction, duelistIds, duelPerDuelist])
-  const name = useMemo(() => (isActive ? 'circle' : 'circle outline'), [isActive])
-  const className = useMemo(() => (
-    replyOnly ? 'Warning'
-      : requiresAction ? 'Positive'
-        : ''
-  ), [requiresAction, replyOnly])
-  return (
-    <Icon size='small'
-      name={name}
-      className={className}
-    />
-  )
+
+type ActionType = 'Waiting' | 'ReplyChallenge' | 'ActionRequired' | 'Idle';
+type Action = {
+  actionType: ActionType
+  duelId?: bigint
+  duelistId?: BigNumberish
 }
 
-export default function ActivityAction() {
-  const { address } = useAccount()
-  const { bookmarkedDuelists } = usePlayer(address)
-
+export function usePlayersActions() {
   const { duelPerDuelist } = useCallToActions()
-  // const { duelistIds } = useDuelistsOfPlayer()
   const { activeDuelists: duelistIds } = usePlayerDuelistsOrganized();
+
   const sortedDuelistIds = useMemo(() => (
     Array.from(new Set([
       // join with duelists in actions (other player when replying)
@@ -61,33 +44,82 @@ export default function ActivityAction() {
     })
   ), [duelistIds, duelPerDuelist])
 
-  const actions = useMemo(() => (sortedDuelistIds.map((duelistId) => {
-    const duel = duelPerDuelist[bigintToHex(duelistId)]
-    const duelId = duel?.duelId ?? 0n
-    const isReply = (duelId > 0n && !duelistIds.some(id => 
-      typeof id === 'bigint' && typeof duelistId === 'bigint' 
-        ? id === duelistId
-        : BigInt(id.toString()) === BigInt(duelistId.toString())
-    ))
+  const actions = useMemo(() => (
+    sortedDuelistIds.map(d => BigInt(d)).map((duelistId) => {
+      const duel = duelPerDuelist[bigintToHex(duelistId)]
+      const duelId = BigInt(duel?.duelId ?? 0)
+      const isReply = (duelId > 0n && !duelistIds.some(id =>
+        (typeof id === 'bigint' && typeof duelistId === 'bigint')
+          ? id === duelistId
+          : BigInt(id.toString()) === BigInt(duelistId.toString())
+      ))
+      const actionType =
+        isReply ? 'ReplyChallenge'
+          : duelId > 0n ? (duel?.callToAction ? 'ActionRequired' : 'Waiting')
+            : 'Idle'
+      const action: Action = {
+        actionType,
+        duelId,
+        duelistId,
+      }
+      return action
+    })//.sort((a, b) => Number(b.duelId - a.duelId))
+  ), [sortedDuelistIds, duelPerDuelist])
+
+  const replyCount = useMemo(() => actions.filter((a) => a.actionType === 'ReplyChallenge').length, [actions])
+  const actionCount = useMemo(() => actions.filter((a) => a.actionType === 'ActionRequired').length, [actions])
+  const waitingCount = useMemo(() => actions.filter((a) => a.actionType === 'Waiting').length, [actions])
+  const idleCount = useMemo(() => actions.filter((a) => a.actionType === 'Idle').length, [actions])
+
+  return {
+    actions,
+    replyCount,
+    actionCount,
+    waitingCount,
+    idleCount,
+  }
+}
+
+
+export const ActionIcon = (isActive: boolean) => {
+  const { actionCount, replyCount } = usePlayersActions()
+  const pulsing = useMemo(() => (!isActive && (actionCount > 0 || replyCount > 0)), [isActive, actionCount, replyCount])
+  const name = useMemo(() => (pulsing ? 'dot circle outline' : isActive ? 'circle' : 'circle outline'), [isActive, pulsing])
+  const className = useMemo(() => {
+    let classNames = []
+    if (actionCount > 0) classNames.push('Positive')
+    else if (replyCount > 0) classNames.push('Warning')
+    if (pulsing) classNames.push('IconPulse')
+    return classNames.join(' ')
+  }, [replyCount, actionCount, pulsing])
+  return (
+    <Icon size='small'
+      className={className}
+      name={name}
+    />
+  )
+}
+
+export default function ActivityAction() {
+  const { actions, idleCount } = usePlayersActions()
+  const items = useMemo(() => (actions.map((a) => {
     return (
       <ActionItem
-        key={bigintToHex(duelistId)}
-        duelistId={duelistId}
-        duelId={duelId}
-        isBookmarked={bookmarkedDuelists.some(id => 
-          typeof id === 'bigint' && typeof duelistId === 'bigint'
-            ? id === duelistId
-            : BigInt(id.toString()) === BigInt(duelistId.toString())
-        )}
-        callToAction={duel?.callToAction ?? false}
-        isReply={isReply}
+        key={`${a.actionType}-${bigintToDecimal(a.duelId ?? 0) }-${bigintToDecimal(a.duelistId ?? 0) }`}
+        duelistId={a.duelistId}
+        duelId={a.duelId}
+        actionType={a.actionType}
       />
     )
-  })), [sortedDuelistIds, duelistIds, duelPerDuelist, bookmarkedDuelists])
-
+  })), [actions])
   return (
     <div className='FillParent'>
-      {actions}
+      {items}
+      {idleCount > 0 && <>
+        <Icon name='circle outline' />
+        <b>+{idleCount}</b> Duelists ready to duel!
+        <br />
+      </>}
     </div>
   );
 }
@@ -95,24 +127,17 @@ export default function ActivityAction() {
 
 const ActionItem = ({
   duelistId,
-  isBookmarked,
   duelId,
-  callToAction,
-  isReply,
+  actionType,
 }: {
   duelistId: BigNumberish
-  isBookmarked?: boolean
-  duelId: bigint
-  callToAction: boolean
-  isReply: boolean
+  duelId: BigNumberish
+  actionType: ActionType
 }) => {
-  const { isInactive } = useDuelist(duelistId)
-  const { lives, isLoading } = useDuelistFameBalance(duelistId)
+  // const { isInactive } = useDuelist(duelistId)
+  // const { lives, isLoading } = useDuelistFameBalance(duelistId)
 
-  // const { duelistContractAddress } = useTokenContracts()
-  // const { publish } = usePlayerBookmarkSignedMessage(duelistContractAddress, duelistId, !isBookmarked)
-
-  if (isReply) {
+  if (actionType === 'ReplyChallenge') {
     return (
       <>
         {/* <Icon name='circle' className='Invisible' /> */}
@@ -125,8 +150,8 @@ const ActionItem = ({
   }
 
   // in a duel, required to play
-  if (duelId > 0n) {
-    return callToAction ?
+  if (actionType === 'ActionRequired') {
+    return (
       <>
         <Icon name='circle' className='Positive' />
         <DuelistLink duelistId={duelistId} useName />
@@ -134,7 +159,11 @@ const ActionItem = ({
         <ChallengeLink duelId={duelId} />
         <br />
       </>
-      :
+    )
+  }
+
+  if (actionType === 'Waiting') {
+    return (
       <>
         <Icon name='circle' />
         <DuelistLink duelistId={duelistId} useName />
@@ -142,52 +171,55 @@ const ActionItem = ({
         <ChallengeLink duelId={duelId} />
         <br />
       </>
-  }
-
-  // dripping fame!
-  if (isInactive) {
-    return (
-      <>
-        <Icon name='circle' className='Negative' />
-        <DuelistLink duelistId={duelistId} useName />
-        {'is inactive losing FAME!'}
-        <br />
-      </>
     )
   }
 
-  if (isLoading) {
-    return (
-      <>
-        <Icon name='circle outline' />
-        <DuelistLink duelistId={duelistId} useName />
-        {'...'}
-        <br />
-      </>
-    )
-  }
+  // // dripping fame!
+  // if (isInactive) {
+  //   return (
+  //     <>
+  //       <Icon name='circle' className='Negative' />
+  //       <DuelistLink duelistId={duelistId} useName />
+  //       {'is inactive losing FAME!'}
+  //       <br />
+  //     </>
+  //   )
+  // }
+
+  // if (isLoading) {
+  //   return (
+  //     <>
+  //       <Icon name='circle outline' />
+  //       <DuelistLink duelistId={duelistId} useName />
+  //       {'...'}
+  //       <br />
+  //     </>
+  //   )
+  // }
 
 
-  // dripping fame!
-  if (lives == 0) {
-    return (
-      <>
-        <EmojiIcon emoji={EMOJIS.DEAD} />{' '}
-        <DuelistLink duelistId={duelistId} useName />
-        {' is dead!'}
-        <br />
-      </>
-    )
-  }
+  // // dripping fame!
+  // if (lives == 0) {
+  //   return (
+  //     <>
+  //       <EmojiIcon emoji={EMOJIS.DEAD} />{' '}
+  //       <DuelistLink duelistId={duelistId} useName />
+  //       {' is dead!'}
+  //       <br />
+  //     </>
+  //   )
+  // }
 
-  // idle
-  return (
-    <>
-      <Icon name='circle outline' />
-      <DuelistLink duelistId={duelistId} useName />
-      {' is ready to duel!'}
-      <br />
-    </>
-  )
+  // // idle
+  // return (
+  //   <>
+  //     <Icon name='circle outline' />
+  //     <DuelistLink duelistId={duelistId} useName />
+  //     {' is ready to duel!'}
+  //     <br />
+  //   </>
+  // )
+
+  return <></>
 }
 

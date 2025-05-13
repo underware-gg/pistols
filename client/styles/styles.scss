@@ -1284,6 +1284,14 @@ $ui-container-gap: 1em;
     @extend .IconClick_active;
   }
 }
+.IconPulse {
+  animation: pulsing 2s linear infinite;
+}
+@keyframes pulsing {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.8); }
+  100% { transform: scale(1); }
+}
 @keyframes IconClickAnimation {
 	from { -webkit-transform: scale(0.9); }
 	to { -webkit-transform: scale(1); }
