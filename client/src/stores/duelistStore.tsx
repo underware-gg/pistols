@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
 import { useEntityId, useEntityIds, getEntityModel, useEntityModel, useDojoSystem, keysToEntityId, getCustomEnumCalldata } from '@underware/pistols-sdk/dojo'
@@ -201,41 +201,46 @@ export const useDuellingDuelists = (duelistIds: BigNumberish[]) => {
 //
 export const calcWinRatio = (total_duels: number, total_wins: number) => (total_duels > 0 ? (total_wins / total_duels) : null)
 
-export function useTotals(status: models.Totals | undefined) {
-  const total_duels = useMemo(() => Number(status?.total_duels ?? 0), [status])
-  const total_wins = useMemo(() => Number(status?.total_wins ?? 0), [status])
-  const total_losses = useMemo(() => Number(status?.total_losses ?? 0), [status])
-  const total_draws = useMemo(() => Number(status?.total_draws ?? 0), [status])
-  const honour = useMemo(() => (Number(status?.honour ?? 0) / 10.0), [status, total_duels])
-  const honourDisplay = useMemo(() => (total_duels > 0 && honour > 0 ? honour.toFixed(1) : EMOJIS.ZERO), [honour, total_duels])
-  const honourAndTotal = useMemo(() => (total_duels > 0 && honour > 0 ? <>{honour.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : EMOJIS.ZERO), [honour, total_duels])
-  const winRatio = useMemo(() => calcWinRatio(total_duels, total_wins), [total_duels, total_wins])
+export function useTotals(totals: models.Totals | undefined) {
+  const result = useMemo(() => {
+    const total_duels = Number(totals?.total_duels ?? 0);
+    const total_wins = Number(totals?.total_wins ?? 0);
+    const total_losses = Number(totals?.total_losses ?? 0);
+    const total_draws = Number(totals?.total_draws ?? 0);
+    const winRatio = calcWinRatio(total_duels, total_wins)
 
-  const isVillainous = useMemo(() => (total_duels > 0 && (honour * 10) < constants.HONOUR.TRICKSTER_START), [honour, total_duels])
-  const isTrickster = useMemo(() => ((honour * 10) >= constants.HONOUR.TRICKSTER_START && (honour * 10) < constants.HONOUR.LORD_START), [honour])
-  const isHonourable = useMemo(() => ((honour * 10) >= constants.HONOUR.LORD_START), [honour])
-  const archetype = useMemo(() => (
-    isHonourable ? constants.Archetype.Honourable
-      : isTrickster ? constants.Archetype.Trickster
-        : isVillainous ? constants.Archetype.Villainous
-          : constants.Archetype.Undefined), [isVillainous, isTrickster, isHonourable])
-  const archetypeName = useMemo(() => (ArchetypeNames[archetype]), [archetype])
+    const honour = Number(totals?.honour ?? 0) / 10.0;
+    const honourDisplay = (total_duels > 0 && honour > 0 ? honour.toFixed(1) : EMOJIS.ZERO)
+    const honourAndTotal = total_duels > 0 && honour > 0 ? <>{honour.toFixed(1)}<span className='Smaller'>/{total_duels}</span></> : EMOJIS.ZERO
 
-  return {
-    total_duels,
-    total_wins,
-    total_losses,
-    total_draws,
-    isVillainous,
-    isTrickster,
-    isHonourable,
-    archetype,
-    archetypeName,
-    honour,
-    honourDisplay,
-    honourAndTotal,
-    winRatio,
-  }
+    const isVillainous = total_duels > 0 && (honour * 10) < constants.HONOUR.TRICKSTER_START;
+    const isTrickster = (honour * 10) >= constants.HONOUR.TRICKSTER_START && (honour * 10) < constants.HONOUR.LORD_START;
+    const isHonourable = (honour * 10) >= constants.HONOUR.LORD_START;
+    const archetype = (
+      isHonourable ? constants.Archetype.Honourable
+        : isTrickster ? constants.Archetype.Trickster
+          : isVillainous ? constants.Archetype.Villainous
+            : constants.Archetype.Undefined);
+    const archetypeName = ArchetypeNames[archetype]
+
+    return {
+      total_duels,
+      total_wins,
+      total_losses,
+      total_draws,
+      winRatio,
+      honour,
+      honourDisplay,
+      honourAndTotal,
+      archetype,
+      archetypeName,
+      isVillainous,
+      isTrickster,
+      isHonourable,
+    }
+  }, [totals])
+
+  return result
 }
 
 
