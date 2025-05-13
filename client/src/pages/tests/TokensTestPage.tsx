@@ -6,7 +6,7 @@ import { useTokenIdsOfPlayer } from '/src/stores/tokenStore'
 import { EntityStoreSync } from '/src/stores/sync/EntityStoreSync'
 import { TokenStoreSync } from '/src/stores/sync/TokenStoreSync'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
-import { useERC721TokenUri } from '@underware/pistols-sdk/utils/hooks'
+import { useERC721TokenUri, useMemoAsync } from '@underware/pistols-sdk/utils/hooks'
 import { duelist_token, duel_token } from '@underware/pistols-sdk/pistols/tokens'
 import { bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
 import { Connect } from '/src/pages/tests/ConnectTestPage'
@@ -226,70 +226,76 @@ function TokenRow({
 
 
 function TestImages() {
-  const duelist_svg = duelist_token.renderSvg({
-    // base_uri: 'https://localhost:5173',
-    duelist_id: 16,
-    owner: '0x0',
-    username: 'Patron',
-    honour: 99,
-    archetype: constants.Archetype.Honourable,
-    profile_type: constants.DuelistProfile.Genesis,
-    profile_id: 2,
-    total_duels: 10,
-    total_wins: 5,
-    total_losses: 2,
-    total_draws: 3,
-    fame: 4250,
-    lives: 4,
-    is_memorized: false,
-    duel_id: 0,
-    pass_id: 0,
-    timestamp_registered: 0x1,
-    timestamp_active: 0x6814fbaa,
-    level: 2,
-  }, {
-    includeMimeType: true,
-  })
-  const duel_svg = duel_token.renderSvg({
-    // base_uri: 'https://localhost:5173',
-    duel_id: 16,
-    duel_type: constants.DuelType.Seasonal,
-    premise: constants.Premise.Honour,
-    message: 'Die scum!!!',
-    state: constants.ChallengeState.Resolved,
-    winner: 1,
-    season_id: 1,
-    profile_type_a: constants.DuelistProfile.Genesis,
-    profile_type_b: constants.DuelistProfile.Bot,
-    profile_id_a: 11,
-    profile_id_b: 2,
-    username_a: 'Mataleone',
-    username_b: 'Recipromancer',
-    address_a: '0xc1bba2af9427c5a277474c079a1283c880ee8a6f0f8fbf73ce969c08d88befe',
-    address_b: '0xc079a1283c88c1bba2af9427c5a2774740ee8a6f0f8fbf73ce969c08d88befe',
-  }, {
-    includeMimeType: true,
-  })
-  const duel_pending_svg = duel_token.renderSvg({
-    // base_uri: 'https://localhost:5173',
-    duel_id: 16,
-    duel_type: constants.DuelType.Seasonal,
-    premise: constants.Premise.Honour,
-    message: 'Die scum!!!',
-    state: constants.ChallengeState.Awaiting,
-    winner: 1,
-    season_id: 1,
-    profile_type_a: constants.DuelistProfile.Genesis,
-    profile_type_b: constants.DuelistProfile.Undefined,
-    profile_id_a: 11,
-    profile_id_b: 0,
-    username_a: 'Mataleone',
-    username_b: 'Undefined',
-    address_a: '0xc1bba2af9427c5a277474c079a1283c880ee8a6f0f8fbf73ce969c08d88befe',
-    address_b: '0xc079a1283c88c1bba2af9427c5a2774740ee8a6f0f8fbf73ce969c08d88befe',
-  }, {
-    includeMimeType: true,
-  })
+  const { value: duelist_svg } = useMemoAsync<string>(async () => {
+    return await duelist_token.renderSvg({
+      // base_uri: 'https://localhost:5173',
+      duelist_id: 16,
+      owner: '0x0',
+      username: 'Patron',
+      honour: 99,
+      archetype: constants.Archetype.Honourable,
+      profile_type: constants.DuelistProfile.Genesis,
+      profile_id: 2,
+      total_duels: 10,
+      total_wins: 5,
+      total_losses: 2,
+      total_draws: 3,
+      fame: 4250,
+      lives: 4,
+      is_memorized: false,
+      duel_id: 0,
+      pass_id: 0,
+      timestamp_registered: 0x1,
+      timestamp_active: 0x6814fbaa,
+      level: 2,
+    }, {
+      includeMimeType: true,
+    })
+  }, [], undefined, null)
+  const { value: duel_svg } = useMemoAsync<string>(async () => {
+    return await duel_token.renderSvg({
+      // base_uri: 'https://localhost:5173',
+      duel_id: 16,
+      duel_type: constants.DuelType.Seasonal,
+      premise: constants.Premise.Honour,
+      message: 'Die scum!!!',
+      state: constants.ChallengeState.Resolved,
+      winner: 1,
+      season_id: 1,
+      profile_type_a: constants.DuelistProfile.Genesis,
+      profile_type_b: constants.DuelistProfile.Bot,
+      profile_id_a: 11,
+      profile_id_b: 2,
+      username_a: 'Mataleone',
+      username_b: 'Recipromancer',
+      address_a: '0xc1bba2af9427c5a277474c079a1283c880ee8a6f0f8fbf73ce969c08d88befe',
+      address_b: '0xc079a1283c88c1bba2af9427c5a2774740ee8a6f0f8fbf73ce969c08d88befe',
+    }, {
+      includeMimeType: true,
+    })
+  }, [], undefined, null)
+  const { value: duel_pending_svg } = useMemoAsync<string>(async () => {
+    return await duel_token.renderSvg({
+      // base_uri: 'https://localhost:5173',
+      duel_id: 16,
+      duel_type: constants.DuelType.Seasonal,
+      premise: constants.Premise.Honour,
+      message: 'Die scum!!!',
+      state: constants.ChallengeState.Awaiting,
+      winner: 1,
+      season_id: 1,
+      profile_type_a: constants.DuelistProfile.Genesis,
+      profile_type_b: constants.DuelistProfile.Undefined,
+      profile_id_a: 11,
+      profile_id_b: 0,
+      username_a: 'Mataleone',
+      username_b: 'Undefined',
+      address_a: '0xc1bba2af9427c5a277474c079a1283c880ee8a6f0f8fbf73ce969c08d88befe',
+      address_b: '0xc079a1283c88c1bba2af9427c5a2774740ee8a6f0f8fbf73ce969c08d88befe',
+    }, {
+      includeMimeType: true,
+    })
+  }, [], undefined, null)
   // const duelist_svg_no_mime = duelist_svg.replace('data:image/svg+xml,', '')
   // const duel_svg_no_mime = duel_svg.replace('data:image/svg+xml,', '')
 

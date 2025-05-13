@@ -4,14 +4,14 @@ import {
   card_cross,
   STAR, PISTOL,
   SvgRenderOptions,
-  _packSvg,
+  encodeSvg,
   COLOR_TITLE,
 } from './types'
 import { BigNumberish } from 'starknet'
-import { assets as profileAssets } from './assets/profiles'
-import { assets as cardsAssets } from './assets/cards'
-import { assets as uiAssets } from './assets/ui'
-import { getAsset } from './assets'
+import { assets as profileAssets } from './assets/generated/profiles'
+import { assets as cardsAssets } from './assets/generated/cards'
+import { assets as uiAssets } from './assets/generated/ui'
+import { getAsset } from './assets/assets'
 import { getProfileDescription, getProfileKey, makeProfilePicUrl } from '../misc/profiles'
 import * as constants from '../generated/constants'
 
@@ -60,7 +60,7 @@ const NAME_X2 = (WIDTH - PROFILE_GAP);
 const WEBSITE_Y = (HEIGHT * 0.97);
 
 
-export const renderSvg = (props: DuelSvgProps, options: SvgRenderOptions = {}): string => {
+export const renderSvg = async (props: DuelSvgProps, options: SvgRenderOptions = {}): Promise<string> => {
   const profile_key_a = getProfileKey(props.profile_type_a, props.profile_id_a)
   const profile_key_b = getProfileKey(props.profile_type_b, props.profile_id_b)
   const profile_a = getProfileDescription(props.profile_type_a, profile_key_a)
@@ -130,7 +130,7 @@ export const renderSvg = (props: DuelSvgProps, options: SvgRenderOptions = {}): 
 </style>
 
 // paper background
-<image href='${getAsset(uiAssets, image_paper)}' x='0' y='0' width='${WIDTH}px' height='${HEIGHT}px'/>
+<image href='${await getAsset(uiAssets, image_paper)}' x='0' y='0' width='${WIDTH}px' height='${HEIGHT}px'/>
 
 // profiles
 <mask id='mask1'>
@@ -139,16 +139,16 @@ export const renderSvg = (props: DuelSvgProps, options: SvgRenderOptions = {}): 
 <mask id='mask2'>
   <path d='M${PROFILE_X2},${PROFILE_Y}h${PROFILE_W}v${PROFILE_H}h-${PROFILE_W - MASK_SKEW}z' fill='white'/>
 </mask>
-<image ${is_dead_a ? `class='dead'` : ''} href='${getAsset(profileAssets, image_duelist_a)}' x='${PROFILE_X1}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' mask='url(#mask1)'/>
-<image ${is_dead_b ? `class='dead'` : ''} href='${getAsset(profileAssets, image_duelist_b)}' x='${PROFILE_X2}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' mask='url(#mask2)'/>
+<image ${is_dead_a ? `class='dead'` : ''} href='${await getAsset(profileAssets, image_duelist_a)}' x='${PROFILE_X1}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' mask='url(#mask1)'/>
+<image ${is_dead_b ? `class='dead'` : ''} href='${await getAsset(profileAssets, image_duelist_b)}' x='${PROFILE_X2}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' mask='url(#mask2)'/>
 <path class='PROFILE' d='M${PROFILE_X1},${PROFILE_Y}h${PROFILE_W - MASK_SKEW}l${MASK_SKEW},${PROFILE_H}h-${PROFILE_W}z'/>
 <path class='PROFILE' d='M${PROFILE_X2},${PROFILE_Y}h${PROFILE_W}v${PROFILE_H}h-${PROFILE_W - MASK_SKEW}z'/>
 <text class='VS' x='${HALF_WIDTH}' y='${PROFILE_Y+PROFILE_H/2}'>
   vs
 </text>
 // cross
-${is_dead_a && `<image href='${getAsset(cardsAssets, card_cross)}' x='${PROFILE_X1}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`}
-${is_dead_b && `<image href='${getAsset(cardsAssets, card_cross)}' x='${PROFILE_X2}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`}
+${is_dead_a && `<image href='${await getAsset(cardsAssets, card_cross)}' x='${PROFILE_X1}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`}
+${is_dead_b && `<image href='${await getAsset(cardsAssets, card_cross)}' x='${PROFILE_X2}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`}
 
 // usernames
 <text class='TITLE' x='${NAME_X1}' y='${TITLE_Y}'>
@@ -182,5 +182,5 @@ ${is_dead_b && `<image href='${getAsset(cardsAssets, card_cross)}' x='${PROFILE_
 
 </svg>
 `;
-  return _packSvg(svg, options)
+  return encodeSvg(svg, options)
 }

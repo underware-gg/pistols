@@ -1,5 +1,7 @@
-import React, { useMemo } from 'react'
+import React from 'react'
+import { useMemoAsync } from 'src/utils/hooks/useMemoAsync'
 import { SvgRenderOptions } from '../tokens/types'
+import { loadingSvg, errorSvg } from './loadingSvg'
 import * as duelist_token from '../tokens/duelist'
 
 export function DuelistTokenImage({
@@ -14,7 +16,9 @@ export function DuelistTokenImage({
   const options: SvgRenderOptions = {
     includeMimeType: true,
   }
-  const svg = useMemo(() => (duelist_token.renderSvg(props, options)), [props])
+  const { value: svg } = useMemoAsync<string>(async () => {
+    return await duelist_token.renderSvg(props, options)
+  }, [props], loadingSvg, errorSvg)
   return (
     <img src={svg} className={className} style={style} />
   )

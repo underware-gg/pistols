@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { duelist_token, SvgRenderOptions } from '@underware/pistols-sdk/pistols/tokens'
+import { bigintToHex } from '@underware/pistols-sdk/utils'
+import { useMemoAsync } from '@underware/pistols-sdk/utils/hooks'
 import { useDuelist, useDuelistStack } from '/src/stores/duelistStore'
 import { useDuelistFameBalance } from '/src/stores/coinStore'
 import { useOwnerOfDuelist } from '/src/hooks/useTokenDuelists'
-import { bigintToHex } from '@underware/pistols-sdk/utils'
 import { usePlayer } from '/src/stores/playerStore'
 
 export function useDuelistTokenProps(duelistId: BigNumberish) {
@@ -44,7 +45,9 @@ export function useDuelistTokenSvg(duelistId: BigNumberish) {
   const props = useDuelistTokenProps(duelistId)
   const options: SvgRenderOptions = {
     includeMimeType: true,
-  }  
-  const svg = useMemo(() => (duelist_token.renderSvg(props, options)), [props])
+  }
+  const { value: svg } = useMemoAsync<string>(async () => {
+    return await duelist_token.renderSvg(props, options)
+  }, [props], undefined, null)
   return svg
 }

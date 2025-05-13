@@ -4,15 +4,15 @@ import {
   card_cross,
   STAR, PISTOL,
   SvgRenderOptions,
-  _packSvg,
+  encodeSvg,
   COLOR_TITLE,
 } from './types'
 import { BigNumberish } from 'starknet'
-import { assets as profileAssets } from './assets/profiles'
-import { assets as cardsAssets } from './assets/cards'
+import { assets as profileAssets } from './assets/generated/profiles'
+import { assets as cardsAssets } from './assets/generated/cards'
 import { shortAddress } from 'src/utils/misc/types'
 import { map } from 'src/utils/misc/math'
-import { getAsset } from './assets'
+import { getAsset } from './assets/assets'
 import { getProfileDescription, getProfileKey, makeProfilePicUrl } from '../misc/profiles'
 import * as constants from '../generated/constants'
 
@@ -90,7 +90,7 @@ const _renderStat = (x: number, y: number, key: string, value: string) => {
 `
 }
 
-export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}): string => {
+export const renderSvg = async (props: DuelistSvgProps, options: SvgRenderOptions = {}): Promise<string> => {
   const profile_key = getProfileKey(props.profile_type, props.profile_id)
   const profile = getProfileDescription(props.profile_type, profile_key)
   const profile_url = makeProfilePicUrl(props.profile_id, props.profile_type);
@@ -167,8 +167,8 @@ export const renderSvg = (props: DuelistSvgProps, options: SvgRenderOptions = {}
     fill:none;
   }
 </style>
-<image ${!is_alive ? `class='dead'` : ''} href='${getAsset(profileAssets, profile_url)}' x='${PROFILE_X}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />
-<image href='${getAsset(cardsAssets, card_url)}' x='0' y='0' width='${WIDTH}px' height='${HEIGHT}px' />
+<image ${!is_alive ? `class='dead'` : ''} href='${await getAsset(profileAssets, profile_url)}' x='${PROFILE_X}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />
+<image href='${await getAsset(cardsAssets, card_url)}' x='0' y='0' width='${WIDTH}px' height='${HEIGHT}px' />
 
 // name
 <path id='circle' d='M${92},350a200,200 0 1,1 ${WIDTH - 92 - 92},0' />
@@ -184,7 +184,7 @@ ${(props.is_loading !== true) &&
 
 // Dead duelist cross
 ${(!is_alive && props.is_memorized === false) &&
-  `<image href='${getAsset(cardsAssets, card_cross)}' x='${PROFILE_X}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`
+  `<image href='${await getAsset(cardsAssets, card_cross)}' x='${PROFILE_X}' y='${PROFILE_Y}' width='${PROFILE_W}px' height='${PROFILE_H}px' />`
 }
 
 // Honour slots
@@ -252,5 +252,5 @@ ${_renderStat(WIDTH - STAT_GAP - STAT_W, STAT5_Y, props.archetype != constants.A
 </svg>
 `;
   // svg = svg.map('\n', '');
-  return _packSvg(svg, options)
+  return encodeSvg(svg, options)
 }

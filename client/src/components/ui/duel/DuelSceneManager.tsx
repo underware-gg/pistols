@@ -31,6 +31,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
   const duelistASVG = useDuelistTokenSvg(context.leftDuelist.id);
   const duelistBSVG = useDuelistTokenSvg(context.rightDuelist.id);
 
+
   // Immediate reset on component mount (only once)
   useEffect(() => {
     if (didImmediateReset.current) return;
@@ -162,7 +163,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
 
   // Update left duelist info when it changes
   useEffect(() => {
-    if (!gameImpl || !didSceneInit.current || !context.leftDuelist.id) return;
+    if (!gameImpl || !didSceneInit.current || !context.leftDuelist.id || !duelistASVG) return;
     
     // Skip delay if we already have initialized duelists
     const spawnDelay = didPlayersInitA.current ? 0 : 600;
@@ -187,7 +188,8 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
   }, [
     gameImpl, 
     context.leftDuelist,
-    context.duelInProgress
+    context.duelInProgress,
+    duelistASVG,
   ]);
 
   useEffect(() => {
@@ -198,7 +200,7 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
 
   // Update right duelist info when it changes
   useEffect(() => {
-    if (!gameImpl || !didSceneInit.current || !context.rightDuelist.id) return;
+    if (!gameImpl || !didSceneInit.current || !context.rightDuelist.id || !duelistBSVG) return;
     
     // Skip delay if we already have initialized duelists
     const spawnDelay = didPlayersInitB.current ? 0 : 600;
@@ -223,7 +225,8 @@ export const DuelSceneManager: React.FC<DuelSceneManagerProps> = ({
   }, [
     gameImpl, 
     context.rightDuelist,
-    context.duelInProgress
+    context.duelInProgress,
+    duelistBSVG,
   ]);
 
   useEffect(() => {

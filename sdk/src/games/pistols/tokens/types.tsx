@@ -28,7 +28,7 @@ export type SvgRenderOptions = {
   encodeBase64?: boolean,
 };
 
-export const _packSvg = (svg: string, options: SvgRenderOptions): string => {
+export const encodeSvg = (svg: string, options: SvgRenderOptions): string => {
   let lines = svg.split('\n');
   lines = lines.map(l => l.trim());
   lines = lines.filter(l => l.length > 0);
