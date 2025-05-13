@@ -7,10 +7,10 @@ catalog:
   #--------------------------------
   # dojo.js
   #
-  "@dojoengine/core": 1.5.4
-  "@dojoengine/sdk": 1.5.4
-  "@dojoengine/torii-client": 1.5.4
-  "@dojoengine/utils": 1.5.4
+  "@dojoengine/core": 1.5.6
+  "@dojoengine/sdk": 1.5.6
+  "@dojoengine/torii-client": 1.5.6
+  "@dojoengine/utils": 1.5.6
   # "@dojoengine/core": ../../dojo.js/packages/core
   # "@dojoengine/sdk": ../../dojo.js/packages/sdk
   # "@dojoengine/torii-client": ../../dojo.js/packages/torii-client
