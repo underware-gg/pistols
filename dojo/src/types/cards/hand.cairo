@@ -65,6 +65,13 @@ pub impl FinalBlowImpl of FinalBlowTrait {
             _ => false,
         })
     }
+    fn spilt_blood(self: @FinalBlow) -> bool {
+        (match self {
+            FinalBlow::Paces(_) => true,
+            FinalBlow::Blades(_) => true,
+            _ => false,
+        })
+    }
 }
 
 impl FinalBlowIntoByteArray of core::traits::Into<FinalBlow, ByteArray> {

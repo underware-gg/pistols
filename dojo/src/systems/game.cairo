@@ -94,7 +94,7 @@ pub mod game {
         rules::{Rules, RulesTrait ,RewardValues, DuelBonus},
         timestamp::{PeriodTrait, TimestampTrait},
         cards::deck::{DeckTrait},
-        cards::hand::{FinalBlow},
+        cards::hand::{FinalBlow, FinalBlowTrait},
         constants::{FAME},
     };
     use pistols::types::trophies::{Trophy, TrophyTrait, TrophyProgressTrait, TROPHY_ID};
@@ -399,12 +399,14 @@ pub mod game {
             let challenge: Challenge = store.get_challenge(duel_id);
             if (challenge.is_tutorial()) {
                 (store.world.tutorial_dispatcher().get_duel_progress(duel_id))
-            } else if (challenge.state.spilled_blood()) {
-                let mut round: Round = store.get_round(duel_id);
-                let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
-                (game_loop(wrapped, @challenge.get_deck(), ref round))
             } else {
-                {Default::default()}
+                let mut round: Round = store.get_round(duel_id);
+                if (round.final_blow.spilt_blood()) {
+                    let wrapped: @RngWrap = RngWrapTrait::new(store.world.rng_address());
+                    (game_loop(wrapped, @challenge.get_deck(), ref round))
+                } else {
+                    {Default::default()}
+                }
             }
         }
 
@@ -608,7 +610,7 @@ pub mod game {
             store.exit_challenge(challenge.duelist_id_a);
             store.exit_challenge(challenge.duelist_id_b);
             // distributions
-            if (challenge.state.spilled_blood()) {
+            if (challenge.state.is_concluded()) {
                 // deliver trophies
                 let bonus: DuelBonus = match (progress) {
                     Option::Some(progress) => {
