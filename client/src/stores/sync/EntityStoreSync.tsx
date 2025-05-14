@@ -1,4 +1,4 @@
-import { useSdkEntitiesSub, filterEntitiesByModel, entityHasModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { useSdkEntitiesSub, filterEntitiesByModels, entityContainsModels, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsQueryBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { useMounted } from '@underware/pistols-sdk/utils/hooks'
 import { useConfigStore } from '/src/stores/configStore'
@@ -109,16 +109,16 @@ export function EntityStoreSync() {
     enabled: mounted,
     setEntities: (entities: PistolsEntity[]) => {
       console.log("EntityStoreSync() SET ADMIN =======> [entities]:", entities)
-      // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModel(entities, 'Config'))
-      // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModel(entities, 'TokenConfig'))
-      // console.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModel(entities, 'SeasonConfig'))
-      // console.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModel(entities, 'Leaderboard'))
-      // console.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModel(entities, 'Pool'))
-      configState.setEntities(filterEntitiesByModel(entities, 'Config'))
-      tokenState.setEntities(filterEntitiesByModel(entities, 'TokenConfig'))
-      seasonState.setEntities(filterEntitiesByModel(entities, ['SeasonConfig', 'Leaderboard']))
-      bankState.setEntities(filterEntitiesByModel(entities, 'Pool'))
-      packState.setEntities(filterEntitiesByModel(entities, 'Pack'))
+      // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModels(entities, ['Config']))
+      // console.log("EntityStoreSync() SET =======> [TokenConfig]:", filterEntitiesByModels(entities, ['TokenConfig']))
+      // console.log("EntityStoreSync() SET =======> [SeasonConfig]:", filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
+      // console.log("EntityStoreSync() SET =======> [Leaderboard]:", filterEntitiesByModels(entities, ['Leaderboard']))
+      // console.log("EntityStoreSync() SET =======> [Pool]:", filterEntitiesByModels(entities, ['Pool']))
+      configState.setEntities(filterEntitiesByModels(entities, ['Config']))
+      tokenState.setEntities(filterEntitiesByModels(entities, ['TokenConfig']))
+      seasonState.setEntities(filterEntitiesByModels(entities, ['SeasonConfig', 'Leaderboard']))
+      bankState.setEntities(filterEntitiesByModels(entities, ['Pool']))
+      packState.setEntities(filterEntitiesByModels(entities, ['Pack']))
     },
   })
 
@@ -127,9 +127,9 @@ export function EntityStoreSync() {
     enabled: (mounted),
     setEntities: (entities: PistolsEntity[]) => {
       console.log("EntityStoreSync() SET PLAYERS =======> [entities]:", entities)
-      // console.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModel(entities, 'Player'))
-      playerState.setEntities(filterEntitiesByModel(entities, 'Player'))
-      playerState.updateMessages(filterEntitiesByModel(entities, ['PlayerOnline', 'PlayerBookmark']))
+      // console.log("EntityStoreSync() SET PLAYERS =======> [Player]:", filterEntitiesByModels(entities, ['Player']))
+      playerState.setEntities(filterEntitiesByModels(entities, ['Player']))
+      playerState.updateMessages(filterEntitiesByModels(entities, ['PlayerOnline', 'PlayerBookmark']))
     },
   })
 
@@ -138,7 +138,7 @@ export function EntityStoreSync() {
     enabled: (mounted),
     setEntities: (entities: PistolsEntity[]) => {
       console.log("EntityStoreSync() SET DUELISTS =======> [entities]:", entities)
-      // console.log("EntityStoreSync() SET DUELISTS =======> [Duelist]:", filterEntitiesByModel(entities, 'Duelist'))
+      // console.log("EntityStoreSync() SET DUELISTS =======> [Duelist]:", filterEntitiesByModels(entities, ['Duelist']))
       duelistState.setEntities(entities)
       duelistQueryState.setEntities(entities)
     },
@@ -149,7 +149,7 @@ export function EntityStoreSync() {
     enabled: (mounted),
     setEntities: (entities: PistolsEntity[]) => {
       console.log("EntityStoreSync() SET STACKS =======> [entities]:", entities)
-      // console.log("EntityStoreSync() SET STACKS =======> [PlayerDuelistStack]:", filterEntitiesByModel(entities, 'PlayerDuelistStack'))
+      // console.log("EntityStoreSync() SET STACKS =======> [PlayerDuelistStack]:", filterEntitiesByModels(entities, ['PlayerDuelistStack']))
       duelistStackState.setEntities(entities)
     },
   })
@@ -173,36 +173,36 @@ export function EntityStoreSync() {
     },
     updateEntity: (entity: PistolsEntity) => {
       // console.log("EntityStoreSync() SUB UPDATE =======> [entity]:", entity)
-      if (entityHasModels(entity, ['Config'])) {
+      if (entityContainsModels(entity, ['Config'])) {
         configState.updateEntity(entity)
       }
-      if (entityHasModels(entity, ['TokenConfig'])) {
+      if (entityContainsModels(entity, ['TokenConfig'])) {
         tokenState.updateEntity(entity)
       }
-      if (entityHasModels(entity, ['SeasonConfig', 'Leaderboard'])) {
+      if (entityContainsModels(entity, ['SeasonConfig', 'Leaderboard'])) {
         seasonState.updateEntity(entity)
       }
-      if (entityHasModels(entity, ['Player'])) {
+      if (entityContainsModels(entity, ['Player'])) {
         playerState.updateEntity(entity)
       }
-      if (entityHasModels(entity, ['PlayerOnline', 'PlayerBookmark'])) {
+      if (entityContainsModels(entity, ['PlayerOnline', 'PlayerBookmark'])) {
         playerState.updateMessages([entity])
       }
-      if (entityHasModels(entity, ['Duelist', 'DuelistAssignment', 'DuelistMemorial'])) {
+      if (entityContainsModels(entity, ['Duelist', 'DuelistAssignment', 'DuelistMemorial'])) {
         duelistState.updateEntity(entity)
         duelistQueryState.updateEntity(entity)
       }
-      if (entityHasModels(entity, ['PlayerDuelistStack'])) {
+      if (entityContainsModels(entity, ['PlayerDuelistStack'])) {
         duelistStackState.updateEntity(entity)
       }
-      if (entityHasModels(entity, ['Challenge', 'ChallengeMessage', 'Round'])) {
+      if (entityContainsModels(entity, ['Challenge', 'ChallengeMessage', 'Round'])) {
         challengeState.updateEntity(entity)
         challengeQueryState.updateEntity(entity)
       }
-      if (entityHasModels(entity, ['Pack'])) {
+      if (entityContainsModels(entity, ['Pack'])) {
         packState.updateEntity(entity)
       }
-      if (entityHasModels(entity, ['Pool'])) {
+      if (entityContainsModels(entity, ['Pool'])) {
         bankState.updateEntity(entity)
       }
     },

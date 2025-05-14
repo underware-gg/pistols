@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityModel, useEntityId } from '@underware/pistols-sdk/dojo'
+import { useEntityModelByKeys } from '@underware/pistols-sdk/dojo'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -26,11 +26,8 @@ export const useCurrentSeason = () => {
 }
 
 export const useSeason = (season_id: number) => {
-  const entityId = useEntityId([season_id])
   const entities = useSeasonConfigStore((state) => state.entities);
-  const entity = useMemo(() => entities[entityId], [entities[entityId]])
-
-  const season = useEntityModel<models.SeasonConfig>(entity, 'SeasonConfig')
+  const season = useEntityModelByKeys<models.SeasonConfig>(entities, 'SeasonConfig', [season_id])
   // console.log(`useSeason() =>`, season_id, season)
 
   const seasonExists = useMemo(() => Boolean(season), [season])
@@ -61,11 +58,8 @@ export type DuelistScore = {
 }
 
 export const useLeaderboard = (season_id: number) => {
-  const entityId = useEntityId([season_id])
   const entities = useSeasonConfigStore((state) => state.entities);
-  const entity = useMemo(() => entities[entityId], [entities[entityId]])
-
-  const leaderboard = useEntityModel<models.Leaderboard>(entity, 'Leaderboard')
+  const leaderboard = useEntityModelByKeys<models.Leaderboard>(entities, 'Leaderboard', [season_id])
   // console.log(`useLeaderboard() =>`, season_id, leaderboard)
 
   const maxPositions = useMemo(() => Number(leaderboard?.positions ?? 0), [leaderboard])

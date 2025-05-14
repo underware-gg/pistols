@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useDojoSystem, useEntityModel, makeCustomEnumEntityId } from '@underware/pistols-sdk/dojo'
+import { useDojoSystem, makeCustomEnumEntityId, useEntityModelById } from '@underware/pistols-sdk/dojo'
 import { feltToString, makeAbiCustomEnum } from '@underware/pistols-sdk/starknet'
 import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
@@ -20,9 +20,7 @@ const _usePoolEntityId = (pool_type: string, value?: bigint): string | undefined
 const _usePool = (pool_type: string, value?: bigint) => {
   const entities = useBankStore((state) => state.entities);
   const entityId = _usePoolEntityId(pool_type, value)
-  const entity = useMemo(() => entities[entityId], [entities])
-
-  const pool = useEntityModel<models.Pool>(entity, 'Pool')
+  const pool = useEntityModelById<models.Pool>(entities, 'Pool', entityId)
   // useEffect(() => console.log(`useConfig() =>`, config), [config])
 
   // const poolId = useMemo(() => (pool?.pool_id ?? '?'), [pool])

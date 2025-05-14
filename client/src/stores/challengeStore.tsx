@@ -1,12 +1,12 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { formatQueryValue, useEntityId, useEntityModel, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
+import { formatQueryValue, useEntityModelByKeys, useSdkEntitiesGet } from '@underware/pistols-sdk/dojo'
 import { PistolsSchemaType, PistolsQueryBuilder, PistolsClauseBuilder, PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
-import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { useClientTimestamp } from '@underware/pistols-sdk/utils/hooks'
-import { bigintToDecimal, bigintToHex, isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { isPositiveBigint } from '@underware/pistols-sdk/utils'
+import { movesToHand } from '@underware/pistols-sdk/pistols'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 
 export const useChallengeStore = createDojoStore<PistolsSchemaType>();
@@ -29,13 +29,10 @@ export const useAllChallengesIds = () => {
 }
 
 export const useChallenge = (duelId: BigNumberish) => {
-  const entityId = useEntityId([duelId])
   const entities = useChallengeStore((state) => state.entities);
-  const entity = useMemo(() => entities[entityId], [entities[entityId]])
-
-  const challenge = useEntityModel<models.Challenge>(entity, 'Challenge')
-  const challengeMessage = useEntityModel<models.ChallengeMessage>(entity, 'ChallengeMessage')
-  // const fameBalance = useEntityModel<models.ChallengeFameBalance>(entity, 'ChallengeFameBalance')
+  const challenge = useEntityModelByKeys<models.Challenge>(entities, 'Challenge', [duelId])
+  const challengeMessage = useEntityModelByKeys<models.ChallengeMessage>(entities, 'ChallengeMessage', [duelId])
+  // const fameBalance = useEntityModelByKeys<models.ChallengeFameBalance>(entities, 'ChallengeFameBalance', [duelId])
   // console.log(`useChallenge(${Number(duelId)}) =>`, 
   //   fameBalance, 
   //   BigInt(fameBalance?.balance_a ?? 0) / ETH_TO_WEI,
@@ -110,11 +107,8 @@ export const useChallenge = (duelId: BigNumberish) => {
 }
 
 export const useRound = (duelId: BigNumberish) => {
-  const entityId = useEntityId([duelId])
   const entities = useChallengeStore((state) => state.entities);
-  const entity = useMemo(() => entities[entityId], [entities[entityId]])
-
-  const round = useEntityModel<models.Round>(entity, 'Round')
+  const round = useEntityModelByKeys<models.Round>(entities, 'Round', [duelId])
 
   const state = useMemo(() => (parseEnumVariant<constants.RoundState>(round?.state) ?? null), [round])
 
@@ -181,12 +175,10 @@ export const useRound = (duelId: BigNumberish) => {
 }
 
 export const useRoundTimeout = (duelId: BigNumberish, autoUpdate = false) => {
-  const { clientSeconds } = useClientTimestamp(autoUpdate)
-
-  const entityId = useEntityId([duelId])
   const entities = useChallengeStore((state) => state.entities);
-  const entity = useMemo(() => entities[entityId], [entities[entityId]])
-  const round = useEntityModel<models.Round>(entity, 'Round')
+  const round = useEntityModelByKeys<models.Round>(entities, 'Round', [duelId])
+
+  const { clientSeconds } = useClientTimestamp(autoUpdate)
   const timeoutTimestamp = useMemo(() => (
     Math.max(Number(round?.moves_a.timeout ?? 0), Number(round?.moves_b.timeout ?? 0))
   ), [round])

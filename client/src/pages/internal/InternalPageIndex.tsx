@@ -79,6 +79,6 @@ export function InternalPageWrapper({ children }: { children?: React.ReactNode }
     || bigintEquals(address, '0x07e268203c670265e8af497a201d568947db4087438c7fdac2be3b956de73811') // fortuna
     || bigintEquals(address, '0x0458f10bf89dfd916eaeabbf6866870bd5bb8b05c6df7de0ad36bb8ad66dce69') // rogers
   ), [address])
-  if (!isAuthorized) return <></>
+  if (!isAuthorized) return <h1>No access</h1>
   return children
 }

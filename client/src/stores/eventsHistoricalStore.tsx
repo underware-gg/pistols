@@ -5,7 +5,6 @@ import { PistolsEntity } from '@underware/pistols-sdk/pistols/sdk'
 import { constants as C } from '@underware/pistols-sdk/pistols/gen'
 import { arrayClean, bigintToHex, bigintToNumber } from '@underware/pistols-sdk/utils'
 import { parseEnumVariant } from '@underware/pistols-sdk/starknet'
-import { ac } from 'vitest/dist/chunks/reporters.d.79o4mouw.js'
 
 
 //-----------------------------------------

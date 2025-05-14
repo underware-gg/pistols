@@ -1,12 +1,12 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { createDojoStore } from '@dojoengine/sdk/react'
-import { useEntityId, useEntityIds, getEntityModel, useEntityModel, useDojoSystem, keysToEntityId, getCustomEnumCalldata } from '@underware/pistols-sdk/dojo'
+import { useEntityIds, getEntityModel, useDojoSystem, keysToEntityId, getCustomEnumCalldata, useEntityModelByKeys, useEntityModelById } from '@underware/pistols-sdk/dojo'
 import { useClientTimestamp, useMemoGate } from '@underware/pistols-sdk/utils/hooks'
-import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { isPositiveBigint, bigintToDecimal, bigintToHex } from '@underware/pistols-sdk/utils'
-import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
+import { makeAbiCustomEnum, parseCustomEnum, parseEnumVariant } from '@underware/pistols-sdk/starknet'
 import { getCollectionDescription, getProfileDescription, getProfileGender, getProfileId, DuelistProfileKey, DuelistGender, getProfileQuote } from '@underware/pistols-sdk/pistols'
+import { PistolsSchemaType } from '@underware/pistols-sdk/pistols/sdk'
 import { constants, models } from '@underware/pistols-sdk/pistols/gen'
 import { CharacterType } from '/src/data/assets'
 import { ArchetypeNames } from '/src/utils/pistols'
@@ -62,13 +62,10 @@ export const useDuelist = (duelist_id: BigNumberish) => {
   const isValidDuelistId = useMemo(() => (isPositiveBigint(duelist_id) && BigInt(duelist_id) <= BigInt(constants.CONST.MAX_DUELIST_ID)), [duelist_id])
   const duelistId = useMemo(() => BigInt(duelist_id), [duelist_id])
 
-  const entityId = useEntityId([duelist_id])
   const entities = useDuelistStore((state) => state.entities);
-  const entity = useMemo(() => entities[entityId], [entities[entityId]])
-
-  const duelist = useEntityModel<models.Duelist>(entity, 'Duelist')
-  const duelistChallenge = useEntityModel<models.DuelistAssignment>(entity, 'DuelistAssignment')
-  const duelistMemorial = useEntityModel<models.DuelistMemorial>(entity, 'DuelistMemorial')
+  const duelist = useEntityModelByKeys<models.Duelist>(entities, 'Duelist', [duelist_id])
+  const duelistChallenge = useEntityModelByKeys<models.DuelistAssignment>(entities, 'DuelistAssignment', [duelist_id])
+  const duelistMemorial = useEntityModelByKeys<models.DuelistMemorial>(entities, 'DuelistMemorial', [duelist_id])
   // console.log(`useDuelist() =>`, duelist_id, duelist)
   // console.log(`DuelistMemorial =>`, duelist_id, duelistMemorial)
 
@@ -260,8 +257,7 @@ const _useDuelistStackEntityId = (address: BigNumberish, profileType: constants.
 export const useDuelistStack = (duelist_id: BigNumberish) => {
   // get duelist profile
   const duelistEntities = useDuelistStore((state) => state.entities)
-  const duelistEntityId = useEntityId([duelist_id])
-  const duelist = useEntityModel<models.Duelist>(duelistEntities[duelistEntityId], 'Duelist')
+  const duelist = useEntityModelByKeys<models.Duelist>(duelistEntities, 'Duelist', [duelist_id])
   const {
     profileType,
     profileId,
@@ -271,7 +267,7 @@ export const useDuelistStack = (duelist_id: BigNumberish) => {
   const { owner } = useOwnerOfDuelist(duelist_id)
   const stackEntities = useDuelistStackStore((state) => state.entities)
   const stackEntityId = _useDuelistStackEntityId(owner, profileType, profileId)
-  const stack = useEntityModel<models.PlayerDuelistStack>(stackEntities[stackEntityId], 'PlayerDuelistStack')
+  const stack = useEntityModelById<models.PlayerDuelistStack>(stackEntities, 'PlayerDuelistStack', stackEntityId)
 
   const activeDuelistId = useMemo(() => (stack?.active_duelist_id ?? undefined), [stack])
   const stackedDuelistIds = useMemo(() => (stack?.stacked_ids ?? []).map(id => Number(id)), [stack])

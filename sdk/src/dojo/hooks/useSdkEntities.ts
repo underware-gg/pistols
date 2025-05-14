@@ -12,6 +12,7 @@ import {
   PistolsGetParams,
 } from 'src/games/pistols/sdk/types_web'
 import * as torii from '@dojoengine/torii-client'
+import { useEntityId } from 'src/exports/dojo'
 
 
 //---------------------------------------
@@ -309,30 +310,24 @@ export const formatQueryValue = (value: BigNumberish): string => {
 export const getEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: PistolsSchemaModelNames): M => (
   entity?.models.pistols?.[modelName] as M
 )
-export const getEntityModels = <M extends PistolsModelType>(entity: PistolsEntity, modelNames: PistolsSchemaModelNames[]): M[] => (
-  arrayClean(modelNames.map(modelName => getEntityModel<M>(entity, modelName)))
-)
-export const entityHasModels = (entity: PistolsEntity, modelNames: PistolsSchemaModelNames[]): boolean => (
+export const entityContainsModels = (entity: PistolsEntity, modelNames: PistolsSchemaModelNames[]): boolean => (
   modelNames.some(modelName => Boolean(entity?.models.pistols?.[modelName]))
 )
 
-export const useEntityModel = <M extends PistolsModelType>(entity: PistolsEntity, modelName: PistolsSchemaModelNames): M => {
+// as hooks
+export const useEntityModelByKeys = <M extends PistolsModelType>(entities: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames, keys: BigNumberish[]): M => {
+  const entityId = useEntityId(keys)
+  return useEntityModelById(entities, modelName, entityId)
+}
+export const useEntityModelById = <M extends PistolsModelType>(entities: Record<string, PistolsEntity>, modelName: PistolsSchemaModelNames, entityId: string): M => {
+  const entity = useMemo(() => entities[entityId], [entities[entityId]])
   const model = useMemo(() => getEntityModel<M>(entity, modelName), [entity, modelName])
   return model
-}
-export const useEntityModels = <M extends PistolsModelType>(entity: PistolsEntity, modelNames: PistolsSchemaModelNames[]): M[] => {
-  const models = useMemo(() => getEntityModels<M>(entity, modelNames), [entity, modelNames])
-  return models
 }
 
 //
 // Filter entities by model
 //
-export const filterEntitiesByModel = (entities: PistolsEntity[], modelNames: PistolsSchemaModelNames | PistolsSchemaModelNames[]): PistolsEntity[] => {
-  if (Array.isArray(modelNames)) {
-    return entities.filter(e => {
-      return (getEntityModels(e, modelNames).length > 0)
-    })
-  }
-  return entities.filter(e => Boolean(getEntityModel(e, modelNames)))
+export const filterEntitiesByModels = (entities: PistolsEntity[], modelNames: PistolsSchemaModelNames[]): PistolsEntity[] => {
+  return entities.filter(e => entityContainsModels(e, modelNames))
 }
