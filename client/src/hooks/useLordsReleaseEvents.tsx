@@ -30,7 +30,7 @@ export const useLordsReleaseEvents = (season_id: number) => {
       .withEntityModels(
         ["pistols-LordsReleaseEvent"]
       )
-      .withLimit(1000)
+      .withLimit(200)
       .includeHashedKeys()
   ), [season_id])
 
