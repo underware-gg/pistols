@@ -48,6 +48,11 @@ export function ChallengeStoreSync() {
   useSdkEntitiesGet({
     query,
     enabled: mounted,
+    resetStore: () => {
+      console.log("ChallengeStoreSync() RESET =======>")
+      challengeState.resetStore()
+      queryState.resetStore()
+    },
     setEntities: (entities: PistolsEntity[]) => {
       console.log("ChallengeStoreSync() SET =======> [entity]:", entities)
       challengeState.setEntities(entities)

@@ -107,6 +107,14 @@ export function EntityStoreSync() {
   const { isFinished: isFinishedAdmin } = useSdkEntitiesGet({
     query: query_get_admin,
     enabled: mounted,
+    resetStore: () => {
+      console.log("EntityStoreSync() RESET ADMIN =======>")
+      configState.resetStore()
+      tokenState.resetStore()
+      seasonState.resetStore()
+      bankState.resetStore()
+      packState.resetStore()
+    },
     setEntities: (entities: PistolsEntity[]) => {
       console.log("EntityStoreSync() SET ADMIN =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET =======> [Config]:", filterEntitiesByModels(entities, ['Config']))
@@ -136,6 +144,11 @@ export function EntityStoreSync() {
   const { isFinished: isFinishedDuelists } = useSdkEntitiesGet({
     query: query_get_duelists,
     enabled: (mounted),
+    resetStore: () => {
+      console.log("EntityStoreSync() RESET DUELISTS =======>")
+      duelistState.resetStore()
+      duelistQueryState.resetStore()
+    },
     setEntities: (entities: PistolsEntity[]) => {
       console.log("EntityStoreSync() SET DUELISTS =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET DUELISTS =======> [Duelist]:", filterEntitiesByModels(entities, ['Duelist']))
@@ -147,6 +160,10 @@ export function EntityStoreSync() {
   const { isFinished: isFinishedStacks } = useSdkEntitiesGet({
     query: query_get_duelist_stacks,
     enabled: (mounted),
+    resetStore: () => {
+      console.log("EntityStoreSync() RESET STACKS =======>")
+      duelistStackState.resetStore()
+    },
     setEntities: (entities: PistolsEntity[]) => {
       console.log("EntityStoreSync() SET STACKS =======> [entities]:", entities)
       // console.log("EntityStoreSync() SET STACKS =======> [PlayerDuelistStack]:", filterEntitiesByModels(entities, ['PlayerDuelistStack']))

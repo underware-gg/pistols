@@ -32,10 +32,10 @@ export type UseSdkGetProps = {
   query: PistolsQueryBuilder
   enabled?: boolean
   retryInterval?: number
+  resetStore?: () => void // called on the 1st page to reset store, is present
   setEntities: (entities: PistolsEntity[]) => void // stores set callback (erases previous state)
 }
 export type UseSdkSubProps = UseSdkGetProps & {
-  setEntities: (entities: PistolsEntity[]) => void // stores set callback (erases previous state)
   updateEntity: (entities: PistolsEntity) => void // store update callback
 }
 
@@ -63,6 +63,7 @@ const _useSdkGet = (prefix: string, {
   query,
   enabled,
   setEntities,
+  resetStore,
   retryInterval = 0,
 }: UseSdkGetProps & {
   fn: (query: PistolsGetParams) => Promise<PistolsToriiResponse>
@@ -74,13 +75,17 @@ const _useSdkGet = (prefix: string, {
     const _get = async () => {
       setIsLoading(true)
       try {
-        let currentPage = 0;
+        let pageIndex = 0;
         let lastCursor = undefined;
         while (query) {
           const response: PistolsToriiResponse = await fn({ query });
           if (!_mounted) return
-          console.log(`${prefix} GOT[page:${currentPage}]:`, response)
+          console.log(`${prefix} GOT[page:${pageIndex}]:`, response)
           const entities = _filterItems(response.getItems())
+          if (pageIndex == 0 && resetStore) {
+            // console.log(`${prefix} RESET>>>>>>>>>>>>`)
+            resetStore?.()
+          }
           if (entities.length > 0) {
             // console.log(`${prefix} GOT>>>>>>>>>>>>`, entities)
             setEntities(entities)
@@ -91,12 +96,12 @@ const _useSdkGet = (prefix: string, {
             lastCursor = response.cursor
           } else {
             query = null
-            if (currentPage == 0 && retryInterval > 0) {
+            if (pageIndex == 0 && retryInterval > 0) {
               console.log(`${prefix} retry...`, retryInterval)
               setTimeout(() => _get(), retryInterval)
             }
           }
-          currentPage++;
+          pageIndex++;
         }
         setIsLoading(false)
       } catch (error) {
@@ -119,6 +124,7 @@ const _useSdkGet = (prefix: string, {
 
 export const useSdkEntitiesGet = ({
   query,
+  resetStore,
   setEntities,
   enabled = true,
   retryInterval = 0,
@@ -129,6 +135,7 @@ export const useSdkEntitiesGet = ({
   const { isLoading, isFinished } = _useSdkGet('useSdkEntitiesGet()', {
     fn: sdk.getEntities,
     query,
+    resetStore,
     setEntities,
     enabled,
     retryInterval,
@@ -142,6 +149,7 @@ export const useSdkEntitiesGet = ({
 
 export const useSdkEventsGet = ({
   query,
+  resetStore,
   setEntities,
   enabled = true,
   retryInterval = 0,
@@ -153,6 +161,7 @@ export const useSdkEventsGet = ({
   const { isLoading, isFinished } = _useSdkGet(`useSdkEventsGet(${historical})`, {
     fn: sdk.getEventMessages,
     query,
+    resetStore,
     setEntities,
     enabled,
     retryInterval,

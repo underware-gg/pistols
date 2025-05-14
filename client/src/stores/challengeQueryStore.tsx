@@ -35,6 +35,7 @@ interface StateEntities {
 }
 interface State {
   entities: StateEntities,
+  resetStore: () => void;
   setEntities: (entities: PistolsEntity[]) => void;
   updateEntity: (entity: PistolsEntity) => void;
 }
@@ -61,6 +62,11 @@ const createStore = () => {
   }
   return create<State>()(immer((set) => ({
     entities: {},
+    resetStore: () => {
+      set((state: State) => {
+        state.entities = {}
+      })
+    },
     setEntities: (entities: PistolsEntity[]) => {
       // console.warn("setEntities() =>", entities)
       set((state: State) => {
