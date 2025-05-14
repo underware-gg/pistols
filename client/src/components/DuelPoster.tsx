@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState, useMemo } from 'react'
 import { BigNumberish } from 'starknet'
 import { useChallengeDescription } from '/src/hooks/useChallengeDescription'
-import { useChallenge } from '/src/stores/challengeStore'
+import { useChallenge, useRound } from '/src/stores/challengeStore'
 import { useDuel } from '/src/hooks/useDuel'
 import { useGameAspect } from '/src/hooks/useGameAspect'
 import { DUELIST_CARD_WIDTH, DUELIST_CARD_HEIGHT } from '/src/data/cardConstants'
@@ -97,6 +97,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
     livesStaked,
     needToSyncExpired,
   } = useChallenge(props.duelId)
+  const { endedInBlades, endedInPaces } = useRound(props.duelId)
   const { canCollectDuel } = useCanCollectDuel(props.duelId)
   const { challengeDescription } = useChallengeDescription(props.duelId)
   const { seasonName: currentSeasonName } = useCurrentSeason()
@@ -420,7 +421,7 @@ export const DuelPoster = forwardRef<DuelPosterHandle, DuelPosterProps>((props: 
                     <ActionButton large fillParent important label='Go to Live Duel!' onClick={() => _gotoDuel()} />
                   </Col>
                 }
-                {isFinished && !isCallToAction &&
+                {isFinished && !isCallToAction && (endedInBlades || endedInPaces) &&
                   <Col>
                     <ActionButton large fillParent important label='Replay Duel!' onClick={() => _gotoDuel()} />
                   </Col>

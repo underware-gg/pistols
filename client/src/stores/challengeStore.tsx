@@ -123,8 +123,9 @@ export const useRound = (duelId: BigNumberish) => {
     value: finalBlowValue,    // pace or blades card
   } = useMemo(() => parseCustomEnum<constants.FinalBlow, number>(round?.final_blow), [round])
   const endedInBlades = useMemo(() => (finalBlowType === constants.FinalBlow.Blades), [finalBlowType])
-  const endedInTimeout = useMemo(() => (finalBlowType === constants.FinalBlow.Forsaken), [finalBlowType])
-  const unpairedWin= useMemo(() => (finalBlowType === constants.FinalBlow.Unpaired), [finalBlowType])
+  const endedInPaces = useMemo(() => (finalBlowType === constants.FinalBlow.Paces), [finalBlowType])
+  const endedInAbandon = useMemo(() => (finalBlowType === constants.FinalBlow.Forsaken), [finalBlowType])
+  const unpairedWin = useMemo(() => (finalBlowType === constants.FinalBlow.Unpaired), [finalBlowType])
 
   const hand_a = useMemo(() => round ? movesToHand(
     //@ts-ignore
@@ -163,15 +164,19 @@ export const useRound = (duelId: BigNumberish) => {
 
   return {
     state,
-    endedInBlades,
-    endedInTimeout,
-    unpairedWin,
     hand_a,
     hand_b,
     moves_a,
     moves_b,
     state_a,
     state_b,
+    // final blow
+    finalBlow: finalBlowType,
+    finalBlowValue,
+    endedInBlades,
+    endedInPaces,
+    endedInAbandon,
+    unpairedWin,
   }
 }
 

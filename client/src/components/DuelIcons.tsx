@@ -133,11 +133,11 @@ export function useDuelIcons({
         icons.push(<BladesIcon key='blades' blade={cardBlades} size={iconSize} />)
       }
       
-      if (round1?.endedInTimeout && moves1?.timeout) {
+      if (round1?.endedInAbandon && moves1?.timeout) {
         icons.push(<EmojiIcon key='timedOut' emoji={EMOJIS.TIMED_OUT} size={iconSize} />)
       } else if (round1?.unpairedWin) {
         icons.push(<EmojiIcon key='unpairedWin' emoji={EMOJIS.UNPAIRED} size={iconSize} />)
-      } else if (dead) {
+      } else if (dead && (round1?.endedInBlades || round1?.endedInPaces)) {
         icons.push(<EmojiIcon key='dead' emoji={dead} size={iconSize} />)
       }
 

@@ -6,13 +6,17 @@ import { useDuelist } from '/src/stores/duelistStore'
 import { useCurrentSeason } from '../stores/seasonStore'
 import { useRouteSlugs } from '/src/hooks/useRoute'
 import { useDuelProgress } from '/src/hooks/usePistolsContractCalls'
+import { usePlayer } from '../stores/playerStore'
+import { EntityStoreSync } from '../stores/sync/EntityStoreSync'
 import { ChallengeStoreSync } from '/src/stores/sync/ChallengeStoreSync'
+import { PlayerNameSync } from '../stores/sync/PlayerNameSync'
 import { ChallengeStateNames, RoundStateNames } from '/src/utils/pistols'
 import { bigintToDecimal, bigintToHex, formatTimestampLocal } from '@underware/pistols-sdk/utils'
-import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { BladesIcon, PacesIcon } from '/src/components/ui/PistolsIcon'
 import { DuelIconsAsRow } from '/src/components/DuelIcons'
+import { constants } from '@underware/pistols-sdk/pistols/gen'
 import { EMOJIS } from '@underware/pistols-sdk/pistols/constants'
+import { Address } from '../components/ui/Address'
 import AppDojo from '/src/components/AppDojo'
 
 const Row = Table.Row
@@ -24,7 +28,9 @@ const HeaderCell = Table.HeaderCell
 export default function DuelDataPage() {
   return (
     <AppDojo backgroundImage={null}>
+      <EntityStoreSync />
       <ChallengeStoreSync />
+      <PlayerNameSync />
       <StatsLoader />
     </AppDojo>
   );
@@ -47,7 +53,6 @@ function Stats({
   duelId: bigint
 }) {
   const { round1 } = useDuel(duelId)
-
   const challenge = useGetChallenge(duelId)
 
   return (
@@ -58,7 +63,7 @@ function Stats({
         <DuelStats duelId={duelId} />
 
         {round1 && <>
-          <RoundStats duelId={duelId} round={round1} />
+          <RoundStats duelId={duelId} round={round1} challenge={challenge} />
           <DuelProgress duelId={duelId} />
           <br />
         </>}
@@ -78,8 +83,10 @@ function DuelStats({
   const { seasonName: currentSeasonName } = useCurrentSeason()
   const seasonDescription = useMemo(() => (challenge.seasonName ?? currentSeasonName), [challenge.seasonName, currentSeasonName])
 
-  const { nameAndId: nameA } = useDuelist(challenge.duelistIdA)
-  const { nameAndId: nameB } = useDuelist(challenge.duelistIdB)
+  const { username: usernameA } = usePlayer(challenge.duelistAddressA)
+  const { username: usernameB } = usePlayer(challenge.duelistAddressB)
+  const { name: nameA } = useDuelist(challenge.duelistIdA)
+  const { name: nameB } = useDuelist(challenge.duelistIdB)
 
   return (
     <Table celled striped color='red'>
@@ -99,16 +106,16 @@ function DuelStats({
           <Cell>
             Account A
           </Cell>
-          <Cell className='Smaller'>
-            <b>{bigintToHex(challenge.duelistAddressA)}</b>
+          <Cell>
+            {usernameA} : <Address address={challenge.duelistAddressA} />
           </Cell>
         </Row>
         <Row>
           <Cell>
             Account B
           </Cell>
-          <Cell className='Smaller'>
-            <b>{bigintToHex(challenge.duelistAddressB)}</b>
+          <Cell>
+            {usernameB} : <Address address={challenge.duelistAddressB} />
           </Cell>
         </Row>
         <Row>
@@ -192,14 +199,14 @@ function DuelStats({
 function RoundStats({
   duelId,
   round,
+  challenge,
 }: {
   duelId: bigint
   round: any
+  challenge: any
 }) {
-  const { challenge } = useDuel(duelId)
-  const { nameAndId: nameA } = useDuelist(challenge.duelistIdA)
-  const { nameAndId: nameB } = useDuelist(challenge.duelistIdB)
-  // console.log('round', round)
+  const { name: nameA } = useDuelist(challenge.duelistIdA)
+  const { name: nameB } = useDuelist(challenge.duelistIdB)
   return (
     <>
       <Table celled striped color='orange'>
@@ -220,7 +227,12 @@ function RoundStats({
           <Row>
             <Cell>Final Blow</Cell>
             <Cell>
-              {round.finalBlow}: {round.endedInBlades ? <BladesIcon blade={round.finalBlow} /> : round.finalBlow ? <PacesIcon paces={round.finalBlow} /> : '-'}
+              {round.finalBlow}:&nbsp;
+              {
+                round.endedInPaces ? <PacesIcon paces={round.finalBlowValue} /> :
+                  round.endedInBlades ? <>{round.finalBlowValue} <BladesIcon blade={round.finalBlowValue} /></> :
+                    '-'
+              }
             </Cell>
           </Row>
         </Body>
